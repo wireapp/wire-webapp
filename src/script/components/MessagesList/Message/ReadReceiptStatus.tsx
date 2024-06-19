@@ -42,7 +42,7 @@ export const ReadReceiptStatus = ({message, is1to1Conversation, onClickDetails}:
       const text = is1to1Conversation ? formatTimeShort(readReceipts[0].time) : readReceipts.length.toString(10);
       setReadReceiptText(text);
     }
-  }, [is1to1Conversation, message.expectsReadConfirmation, readReceipts]);
+  }, [is1to1Conversation, readReceipts]);
 
   const showEyeIndicator = !!readReceiptText;
 

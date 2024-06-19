@@ -320,7 +320,7 @@ export const removeAnimationsClass = (element: HTMLElement | null) => {
   }
 };
 
-export const checkIsMessageDelivered = (isLastDeliveredMessage: boolean, readReceipts: ReadReceipt[]) => {
-  const readReceiptText = readReceipts.length ? formatTimeShort(readReceipts[0].time) : '';
+export const checkIsMessageDelivered = (isLastDeliveredMessage: boolean, readReceipts?: ReadReceipt[]) => {
+  const readReceiptText = readReceipts?.length ? formatTimeShort(readReceipts[0].time) : '';
   return isLastDeliveredMessage && readReceiptText === '';
 };
