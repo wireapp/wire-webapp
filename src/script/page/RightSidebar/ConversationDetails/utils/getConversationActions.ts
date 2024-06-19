@@ -50,7 +50,7 @@ const getConversationActions = (
   const getNextConversation = () => conversationRepository.getNextConversation(conversationEntity);
   const userPermissions = UserPermission.generatePermissionHelpers(teamRole);
 
-  const allMenuElements = [
+  const allMenuElements: {item: MenuItem; condition: boolean}[] = [
     {
       condition: userPermissions.canCreateGroupConversation() && is1to1Action && !isServiceMode,
       item: {
