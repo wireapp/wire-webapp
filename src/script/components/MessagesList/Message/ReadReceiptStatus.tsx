@@ -29,17 +29,11 @@ import {formatTimeShort} from 'Util/TimeUtil';
 
 export interface ReadReceiptStatusProps {
   is1to1Conversation: boolean;
-  isLastDeliveredMessage: boolean;
   message: Message;
   onClickDetails?: (message: Message) => void;
 }
 
-export const ReadReceiptStatus = ({
-  message,
-  is1to1Conversation,
-  isLastDeliveredMessage,
-  onClickDetails,
-}: ReadReceiptStatusProps) => {
+export const ReadReceiptStatus = ({message, is1to1Conversation, onClickDetails}: ReadReceiptStatusProps) => {
   const [readReceiptText, setReadReceiptText] = useState('');
   const {readReceipts} = useKoSubscribableChildren(message, ['readReceipts']);
 
@@ -48,19 +42,12 @@ export const ReadReceiptStatus = ({
       const text = is1to1Conversation ? formatTimeShort(readReceipts[0].time) : readReceipts.length.toString(10);
       setReadReceiptText(text);
     }
-  }, [is1to1Conversation, readReceipts]);
+  }, [is1to1Conversation, message.expectsReadConfirmation, readReceipts]);
 
-  const showDeliveredMessage = isLastDeliveredMessage && readReceiptText === '';
   const showEyeIndicator = !!readReceiptText;
 
   return (
     <>
-      {showDeliveredMessage && (
-        <span className="message-status" data-uie-name="status-message-read-receipt-delivered">
-          {t('conversationMessageDelivered')}
-        </span>
-      )}
-
       {showEyeIndicator && (
         <button
           className={cx(

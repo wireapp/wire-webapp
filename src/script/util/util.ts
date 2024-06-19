@@ -22,11 +22,14 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {Runtime} from '@wireapp/commons';
 
+import {formatTimeShort} from 'Util/TimeUtil';
+
 import {isTabKey} from './KeyboardUtil';
 
 import {Config} from '../Config';
 import type {Conversation} from '../entity/Conversation';
 import {AuthError} from '../error/AuthError';
+import {ReadReceipt} from '../storage';
 
 export const checkIndexedDb = (): Promise<void> => {
   if (!Runtime.isSupportingIndexedDb()) {
@@ -315,4 +318,9 @@ export const removeAnimationsClass = (element: HTMLElement | null) => {
       }
     });
   }
+};
+
+export const checkIsMessageDelivered = (isLastDeliveredMessage: boolean, readReceipts: ReadReceipt[]) => {
+  const readReceiptText = readReceipts.length ? formatTimeShort(readReceipts[0].time) : '';
+  return isLastDeliveredMessage && readReceiptText === '';
 };

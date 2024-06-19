@@ -19,7 +19,10 @@
 
 import cx from 'classnames';
 
+import {Icon} from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {t} from 'Util/LocalizerUtil';
+import {checkIsMessageDelivered} from 'Util/util';
 
 import {ReadReceiptStatus} from './ReadReceiptStatus';
 
@@ -32,10 +35,17 @@ export interface PingMessageProps {
 }
 
 const PingMessage = ({message, is1to1Conversation, isLastDeliveredMessage}: PingMessageProps) => {
-  const {unsafeSenderName, caption, ephemeral_caption, isObfuscated, get_icon_classes} = useKoSubscribableChildren(
-    message,
-    ['unsafeSenderName', 'caption', 'ephemeral_caption', 'isObfuscated', 'get_icon_classes'],
-  );
+  const {unsafeSenderName, caption, ephemeral_caption, isObfuscated, get_icon_classes, readReceipts} =
+    useKoSubscribableChildren(message, [
+      'unsafeSenderName',
+      'caption',
+      'ephemeral_caption',
+      'isObfuscated',
+      'get_icon_classes',
+      'readReceipts',
+    ]);
+
+  const showDeliveredMessageIcon = checkIsMessageDelivered(isLastDeliveredMessage, readReceipts);
 
   return (
     <div className="message-header" data-uie-name="element-message-ping">
@@ -45,6 +55,7 @@ const PingMessage = ({message, is1to1Conversation, isLastDeliveredMessage}: Ping
       <div
         className={cx('message-header-label', {
           'ephemeral-message-obfuscated': isObfuscated,
+          'message-header-ping-delivered': showDeliveredMessageIcon,
         })}
         title={ephemeral_caption}
         data-uie-name="element-message-ping-text"
@@ -54,11 +65,13 @@ const PingMessage = ({message, is1to1Conversation, isLastDeliveredMessage}: Ping
           <span className="ellipsis">{caption}</span>
         </p>
 
-        <ReadReceiptStatus
-          message={message}
-          is1to1Conversation={is1to1Conversation}
-          isLastDeliveredMessage={isLastDeliveredMessage}
-        />
+        {showDeliveredMessageIcon ? (
+          <div className="message-ping-delivered-icon" title={t('conversationMessageDelivered')}>
+            <Icon.OutlineCheck />
+          </div>
+        ) : (
+          <ReadReceiptStatus message={message} is1to1Conversation={is1to1Conversation} />
+        )}
       </div>
     </div>
   );
