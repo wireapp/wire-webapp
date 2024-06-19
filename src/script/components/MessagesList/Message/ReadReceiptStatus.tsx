@@ -46,29 +46,29 @@ export const ReadReceiptStatus = ({message, is1to1Conversation, onClickDetails}:
 
   const showEyeIndicator = !!readReceiptText;
 
+  if (!showEyeIndicator) {
+    return null;
+  }
+
   return (
-    <>
-      {showEyeIndicator && (
-        <button
-          className={cx(
-            'message-status-read',
-            is1to1Conversation && 'message-status-read__one-on-one',
-            !!onClickDetails && 'message-status-read__clickable',
-          )}
-          data-uie-name="status-message-read-receipts"
-          aria-label={t('accessibility.messageDetailsReadReceipts', readReceiptText)}
-          {...(!is1to1Conversation && {
-            onClick: () => {
-              onClickDetails?.(message);
-            },
-          })}
-        >
-          <Icon.Read />
-          <span className="message-status-read__count" data-uie-name="status-message-read-receipt-count">
-            {readReceiptText}
-          </span>
-        </button>
+    <button
+      className={cx(
+        'message-status-read',
+        is1to1Conversation && 'message-status-read__one-on-one',
+        !!onClickDetails && 'message-status-read__clickable',
       )}
-    </>
+      data-uie-name="status-message-read-receipts"
+      aria-label={t('accessibility.messageDetailsReadReceipts', readReceiptText)}
+      {...(!is1to1Conversation && {
+        onClick: () => {
+          onClickDetails?.(message);
+        },
+      })}
+    >
+      <Icon.Read />
+      <span className="message-status-read__count" data-uie-name="status-message-read-receipt-count">
+        {readReceiptText}
+      </span>
+    </button>
   );
 };

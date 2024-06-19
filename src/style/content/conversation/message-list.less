@@ -176,7 +176,8 @@
   }
 }
 
-.message-ping-delivered-icon {
+.message-ping-delivered-icon,
+.message-header-ping .delivered-message-icon {
   display: flex;
   width: var(--delivered-state-width);
   align-items: center;
@@ -191,7 +192,7 @@
   font-weight: @font-weight-regular;
   white-space: normal;
 
-  &.message-header-ping-delivered {
+  &:has(.delivered-message-icon) {
     width: 100%;
     justify-content: space-between;
   }
