@@ -19,6 +19,7 @@
 
 import React from 'react';
 
+import {typedEntries} from 'Util/ArrayUtil';
 import {SVGIconFileName, getAllSVGs} from 'Util/SVGProvider';
 import {PascalCase, RemoveSuffix} from 'Util/TypeUtil';
 
@@ -35,7 +36,7 @@ interface NamedIconProps extends IconProps {
 const normalizeIconName = (name: SVGIconFileName): PascalCaseIconName =>
   name
     .replace(/-icon$/, '')
-    .replace(/\b\w/g, found => found.toUpperCase())
+    .replace(/\b\w/g, (found: string) => found.toUpperCase())
     .replace(/-/g, '') as PascalCaseIconName;
 
 const createSvgComponent = (svg: HTMLElement, displayName: string): React.FC<IconProps> => {
@@ -66,14 +67,6 @@ const createSvgComponent = (svg: HTMLElement, displayName: string): React.FC<Ico
   SVGComponent.displayName = displayName;
   return SVGComponent;
 };
-
-type Entries<T> = {
-  [K in keyof T]: [K, T[K]];
-}[keyof T][];
-
-function typedEntries<T extends {}>(obj: T): Entries<T> {
-  return Object.entries(obj) as Entries<T>;
-}
 
 const icons = typedEntries(getAllSVGs()).reduce<IconList>(
   (list, [key, svg]) => {
