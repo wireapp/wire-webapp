@@ -26,7 +26,7 @@ void main() {
     // This is the clear version of the pixel we are currently rendering
     vec4 clearPixel = texture2D(u_image, v_texCoord);
 
-    blend = texture2D(u_mask, v_texCoord).r;
+    float blend = texture2D(u_mask, v_texCoord).r;
 
     // The gl_FragColor is a mix between the blurred and the clear pixel depending on the segmentation mask given
     gl_FragColor = mix(blurredPixel, clearPixel, blend);
