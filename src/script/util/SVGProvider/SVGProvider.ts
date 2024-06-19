@@ -22,8 +22,8 @@ import {iconFileNames} from '../../generated/iconFileNames';
 type ElementType<T extends ReadonlyArray<unknown>> = T extends ReadonlyArray<infer ElementType> ? ElementType : never;
 type SVGFileNameWithExtension = ElementType<typeof iconFileNames>;
 
-export type SVGIconFileName = SVGFileNameWithExtension extends `${infer Name}.svg` ? Name : never;
-export type SVGProvider = Record<SVGIconFileName, Document>;
+export type SVGIconName = SVGFileNameWithExtension extends `${infer Name}.svg` ? Name : never;
+export type SVGProvider = Record<SVGIconName, Document>;
 
 const parser = new DOMParser();
 
@@ -38,6 +38,6 @@ const createSVGs = (fileNames: typeof iconFileNames): SVGProvider => {
 const svgs = createSVGs(iconFileNames);
 
 const getAllSVGs = () => svgs;
-const getSVG = (iconName: SVGIconFileName) => svgs[iconName];
+const getSVG = (iconName: SVGIconName) => svgs[iconName];
 
 export {getAllSVGs, getSVG};

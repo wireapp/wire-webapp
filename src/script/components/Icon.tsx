@@ -20,20 +20,20 @@
 import React from 'react';
 
 import {typedEntries} from 'Util/ArrayUtil';
-import {SVGIconFileName, getAllSVGs} from 'Util/SVGProvider';
+import {SVGIconName, getAllSVGs} from 'Util/SVGProvider';
 import {PascalCase, RemoveSuffix} from 'Util/TypeUtil';
 
-type PascalCaseIconName = PascalCase<RemoveSuffix<SVGIconFileName, '-icon'>>;
+type PascalCaseIconName = PascalCase<RemoveSuffix<SVGIconName, '-icon'>>;
 
 type IconProps = React.SVGProps<SVGSVGElement>;
 
 type IconList = Record<PascalCaseIconName, React.FC<IconProps>>;
 
 interface NamedIconProps extends IconProps {
-  name: SVGIconFileName;
+  name: SVGIconName;
 }
 
-const normalizeIconName = (name: SVGIconFileName): PascalCaseIconName =>
+const normalizeIconName = (name: SVGIconName): PascalCaseIconName =>
   name
     .replace(/-icon$/, '')
     .replace(/\b\w/g, (found: string) => found.toUpperCase())
