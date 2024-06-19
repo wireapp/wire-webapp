@@ -20,6 +20,7 @@
 import cx from 'classnames';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {checkIsMessageDelivered} from 'Util/util';
 
 import {ReadReceiptStatus} from './ReadReceiptStatus';
 
@@ -32,10 +33,17 @@ export interface PingMessageProps {
 }
 
 const PingMessage = ({message, is1to1Conversation, isLastDeliveredMessage}: PingMessageProps) => {
-  const {unsafeSenderName, caption, ephemeral_caption, isObfuscated, get_icon_classes} = useKoSubscribableChildren(
-    message,
-    ['unsafeSenderName', 'caption', 'ephemeral_caption', 'isObfuscated', 'get_icon_classes'],
-  );
+  const {unsafeSenderName, caption, ephemeral_caption, isObfuscated, get_icon_classes, readReceipts} =
+    useKoSubscribableChildren(message, [
+      'unsafeSenderName',
+      'caption',
+      'ephemeral_caption',
+      'isObfuscated',
+      'get_icon_classes',
+      'readReceipts',
+    ]);
+
+  const showDeliveredMessageIcon = checkIsMessageDelivered(isLastDeliveredMessage, readReceipts);
 
   return (
     <div className="message-header" data-uie-name="element-message-ping">
@@ -45,6 +53,7 @@ const PingMessage = ({message, is1to1Conversation, isLastDeliveredMessage}: Ping
       <div
         className={cx('message-header-label', {
           'ephemeral-message-obfuscated': isObfuscated,
+          'message-header-ping-delivered': showDeliveredMessageIcon,
         })}
         title={ephemeral_caption}
         data-uie-name="element-message-ping-text"
@@ -54,11 +63,20 @@ const PingMessage = ({message, is1to1Conversation, isLastDeliveredMessage}: Ping
           <span className="ellipsis">{caption}</span>
         </p>
 
-        <ReadReceiptStatus
-          message={message}
-          is1to1Conversation={is1to1Conversation}
-          isLastDeliveredMessage={isLastDeliveredMessage}
-        />
+        {showDeliveredMessageIcon ? (
+          <div className="message-ping-delivered-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none">
+              <path
+                fill="#676B71"
+                fillRule="evenodd"
+                d="M14 8A6 6 0 1 1 2 8a6 6 0 0 1 12 0Zm2 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0Zm-8.659 3.27 5.128-5.127-1.414-1.415-4.42 4.421-1.69-1.69-1.414 1.415 2.396 2.396.707.708.707-.708Z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </div>
+        ) : (
+          <ReadReceiptStatus message={message} is1to1Conversation={is1to1Conversation} />
+        )}
       </div>
     </div>
   );
