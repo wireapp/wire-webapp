@@ -28,11 +28,12 @@ import {Icon} from 'Components/Icon';
 import {IgnoreOutsideClickWrapper} from 'Components/InputBar/util/clickHandlers';
 import {useMessageActionsState} from 'Components/MessagesList/Message/ContentMessage/MessageActions/MessageActions.state';
 import {isEnterKey, isEscapeKey, isKey, isOneOfKeys, isSpaceKey, KEY} from 'Util/KeyboardUtil';
+import {SVGIconName} from 'Util/SVGProvider';
 
 export interface ContextMenuEntry {
   availability?: Availability.Type;
   click?: (event?: MouseEvent) => void;
-  icon?: string;
+  icon?: SVGIconName;
   identifier?: string;
   isChecked?: boolean;
   isDisabled?: boolean;
