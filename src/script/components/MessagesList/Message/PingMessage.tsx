@@ -19,7 +19,8 @@
 
 import cx from 'classnames';
 
-import {Icon} from 'Components/Icon';
+import {OutlineCheck} from '@wireapp/react-ui-kit';
+
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {checkIsMessageDelivered} from 'Util/util';
@@ -67,7 +68,7 @@ const PingMessage = ({message, is1to1Conversation, isLastDeliveredMessage}: Ping
 
         {showDeliveredMessageIcon ? (
           <div className="message-ping-delivered-icon" title={t('conversationMessageDelivered')}>
-            <Icon.OutlineCheck />
+            <OutlineCheck />
           </div>
         ) : (
           <ReadReceiptStatus message={message} is1to1Conversation={is1to1Conversation} />
