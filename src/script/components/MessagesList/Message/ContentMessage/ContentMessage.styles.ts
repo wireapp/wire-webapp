@@ -21,7 +21,7 @@ import {CSSObject} from '@emotion/react';
 
 export const messageBodyWrapper: CSSObject = {
   display: 'grid',
-  gridTemplateColumns: 'calc(100% - 56px) 56px',
+  gridTemplateColumns: 'calc(100% - var(--delivered-state-width)) var(--delivered-state-width)',
   paddingLeft: 'var(--conversation-message-sender-width)',
 };
 
@@ -29,5 +29,5 @@ export const deliveredMessageIndicator: CSSObject = {
   display: 'flex',
   justifyContent: 'center',
   paddingTop: '2px',
-  width: '56px',
+  width: 'var(--delivered-state-width)',
 };
