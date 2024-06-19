@@ -270,7 +270,11 @@ export const ContentMessageComponent = ({
 
         <div css={deliveredMessageIndicator}>
           {showDeliveredMessageIcon && (
-            <div data-uie-name="status-message-read-receipt-delivered" title={t('conversationMessageDelivered')}>
+            <div
+              data-uie-name="status-message-read-receipt-delivered"
+              title={showDeliveredMessageIcon ? t('conversationMessageDelivered') : ''}
+              data-uie-value={showDeliveredMessageIcon ? 'Delivered' : ''}
+            >
               <OutlineCheck />
             </div>
           )}

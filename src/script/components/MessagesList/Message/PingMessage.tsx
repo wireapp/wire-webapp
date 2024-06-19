@@ -67,7 +67,12 @@ const PingMessage = ({message, is1to1Conversation, isLastDeliveredMessage}: Ping
         </p>
 
         {showDeliveredMessageIcon ? (
-          <div className="message-ping-delivered-icon" title={t('conversationMessageDelivered')}>
+          <div
+            className="message-ping-delivered-icon"
+            data-uie-name="status-message-read-receipt-delivered"
+            title={showDeliveredMessageIcon ? t('conversationMessageDelivered') : ''}
+            data-uie-value={showDeliveredMessageIcon ? 'Delivered' : ''}
+          >
             <OutlineCheck />
           </div>
         ) : (
