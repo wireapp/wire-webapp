@@ -19,11 +19,8 @@
 
 import cx from 'classnames';
 
-import {OutlineCheck} from '@wireapp/react-ui-kit';
-
+import {DeliveredMessage} from 'Components/MessagesList/Message/DeliveredMessage';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
-import {checkIsMessageDelivered} from 'Util/util';
 
 import {ReadReceiptStatus} from './ReadReceiptStatus';
 
@@ -46,17 +43,14 @@ const PingMessage = ({message, is1to1Conversation, isLastDeliveredMessage}: Ping
       'readReceipts',
     ]);
 
-  const showDeliveredMessageIcon = checkIsMessageDelivered(isLastDeliveredMessage, readReceipts);
-
   return (
     <div className="message-header" data-uie-name="element-message-ping">
       <div className="message-header-icon">
         <div className={`icon-ping ${get_icon_classes}`} />
       </div>
       <div
-        className={cx('message-header-label', {
+        className={cx('message-header-label message-header-ping', {
           'ephemeral-message-obfuscated': isObfuscated,
-          'message-header-ping-delivered': showDeliveredMessageIcon,
         })}
         title={ephemeral_caption}
         data-uie-name="element-message-ping-text"
@@ -66,13 +60,8 @@ const PingMessage = ({message, is1to1Conversation, isLastDeliveredMessage}: Ping
           <span className="ellipsis">{caption}</span>
         </p>
 
-        {showDeliveredMessageIcon ? (
-          <div className="message-ping-delivered-icon" title={t('conversationMessageDelivered')}>
-            <OutlineCheck />
-          </div>
-        ) : (
-          <ReadReceiptStatus message={message} is1to1Conversation={is1to1Conversation} />
-        )}
+        <DeliveredMessage isLastDeliveredMessage={isLastDeliveredMessage} readReceipts={readReceipts} />
+        <ReadReceiptStatus message={message} is1to1Conversation={is1to1Conversation} />
       </div>
     </div>
   );

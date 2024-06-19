@@ -23,8 +23,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
 import ko from 'knockout';
 
-import {OutlineCheck} from '@wireapp/react-ui-kit';
-
+import {DeliveredMessage} from 'Components/MessagesList/Message/DeliveredMessage';
 import {ReadIndicator} from 'Components/MessagesList/Message/ReadIndicator';
 import {Conversation} from 'src/script/entity/Conversation';
 import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
@@ -33,8 +32,6 @@ import {useRelativeTimestamp} from 'src/script/hooks/useRelativeTimestamp';
 import {StatusType} from 'src/script/message/StatusType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getMessageAriaLabel} from 'Util/conversationMessages';
-import {t} from 'Util/LocalizerUtil';
-import {checkIsMessageDelivered} from 'Util/util';
 
 import {ContentAsset} from './asset';
 import {deliveredMessageIndicator, messageBodyWrapper} from './ContentMessage.styles';
@@ -167,8 +164,6 @@ export const ContentMessageComponent = ({
     }
   };
 
-  const showDeliveredMessageIcon = checkIsMessageDelivered(isLastDeliveredMessage, readReceipts);
-
   // Closing another ActionMenu on outside click
   useClickOutside(messageRef, hideActionMenuVisibility);
 
@@ -269,11 +264,7 @@ export const ContentMessageComponent = ({
         </div>
 
         <div css={deliveredMessageIndicator}>
-          {showDeliveredMessageIcon && (
-            <div data-uie-name="status-message-read-receipt-delivered" title={t('conversationMessageDelivered')}>
-              <OutlineCheck />
-            </div>
-          )}
+          <DeliveredMessage isLastDeliveredMessage={isLastDeliveredMessage} readReceipts={readReceipts} />
         </div>
       </div>
 
