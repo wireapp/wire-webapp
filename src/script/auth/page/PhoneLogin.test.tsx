@@ -27,7 +27,7 @@ import {initialRootState} from '../module/reducer';
 import {ROUTE} from '../route';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
-jest.mock('../util/SVGProvider');
+jest.mock('Util/SVGProvider');
 const backButtonId = 'go-login';
 const phoneInputId = 'enter-phone';
 const countryCodeInputId = 'enter-country-code';

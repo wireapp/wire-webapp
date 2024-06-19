@@ -24,7 +24,7 @@ import {UserAvatar} from './UserAvatar';
 import {User} from '../../entity/User';
 
 import {AVATAR_SIZE, STATE} from '.';
-jest.mock('../../auth/util/SVGProvider');
+jest.mock('Util/SVGProvider');
 
 describe('UserAvatar', () => {
   it('shows participant initials if no avatar is defined', async () => {

@@ -19,7 +19,7 @@
 
 import React from 'react';
 
-import {getAllSVGs} from '../auth/util/SVGProvider';
+import {getAllSVGs} from 'Util/SVGProvider';
 
 type IconProps = React.SVGProps<SVGSVGElement>;
 

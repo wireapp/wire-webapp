@@ -24,10 +24,11 @@ import {FormattedMessage, useIntl} from 'react-intl';
 
 import {CloseIcon, Content, Footer, Header, Link, Small} from '@wireapp/react-ui-kit';
 
+import {getSVG} from 'Util/SVGProvider';
+
 import {Config} from '../../Config';
 import {cookiePolicyStrings, footerStrings} from '../../strings';
 import {EXTERNAL_ROUTE} from '../externalRoute';
-import {getSVG} from '../util/SVGProvider';
 
 export interface Props extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;

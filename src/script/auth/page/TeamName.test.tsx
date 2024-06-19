@@ -26,7 +26,7 @@ import {initialRootState} from '../module/reducer';
 import {initialAuthState} from '../module/reducer/authReducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
-jest.mock('../util/SVGProvider');
+jest.mock('Util/SVGProvider');
 
 describe('when entering a team name', () => {
   describe('the submit button', () => {

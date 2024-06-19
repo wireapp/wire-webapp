@@ -27,6 +27,7 @@ import {AnyAction, Dispatch} from 'redux';
 import {Runtime, UrlUtil} from '@wireapp/commons';
 import {COLOR, ContainerXS, FlexBox, Text} from '@wireapp/react-ui-kit';
 
+import {getSVG} from 'Util/SVGProvider';
 import {afterRender} from 'Util/util';
 
 import {Page} from './Page';
@@ -35,7 +36,6 @@ import {customEnvRedirectStrings} from '../../strings';
 import {actionRoot} from '../module/action';
 import {bindActionCreators} from '../module/reducer';
 import {QUERY_KEY} from '../route';
-import {getSVG} from '../util/SVGProvider';
 
 const REDIRECT_DELAY = 5000;
 const CustomEnvironmentRedirectComponent = ({doNavigate, doSendNavigationEvent}: DispatchProps) => {

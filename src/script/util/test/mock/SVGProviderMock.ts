@@ -20,7 +20,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import {SVGProvider} from 'src/script/auth/util/SVGProvider';
+import {SVGProvider} from 'Util/SVGProvider';
 
 const parser = new DOMParser();
 const mockSVG = parser.parseFromString(
@@ -36,7 +36,7 @@ const mockFileList: SVGProvider = fs
     return Object.assign(list, {[iconName]: mockSVG});
   }, {});
 
-jest.mock('../../../auth/util/SVGProvider', () => ({
+jest.mock('Util/SVGProvider', () => ({
   getAllSVGs: jest.fn().mockImplementation(() => mockFileList),
   getSVG: jest.fn().mockImplementation((iconName: string) => mockFileList[iconName]),
 }));

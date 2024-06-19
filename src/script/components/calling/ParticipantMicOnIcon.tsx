@@ -21,7 +21,7 @@ import React from 'react';
 
 import {keyframes} from '@emotion/react';
 
-import {getSVG} from '../../auth/util/SVGProvider';
+import {getSVG} from 'Util/SVGProvider';
 
 const fadeAnimation = keyframes`
   0%   { opacity: 0.2; }
