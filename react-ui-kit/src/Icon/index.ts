@@ -58,6 +58,7 @@ export * from './MuteIcon';
 export * from './NotificationIcon';
 export * from './NotificationOffIcon';
 export * from './OptionsIcon';
+export * from './OutlineCheck';
 export * from './GridIcon';
 export * from './PeopleIcon';
 export * from './PingIcon';
