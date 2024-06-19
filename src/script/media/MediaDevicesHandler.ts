@@ -79,6 +79,7 @@ export class MediaDevicesHandler {
   public deviceSupport: DeviceSupport;
   private previousDeviceSupport: PreviousDeviceSupport;
   private onMediaDevicesRefresh?: () => void;
+  private devicesAreInit = false;
 
   static get CONFIG() {
     return {
@@ -152,8 +153,6 @@ export class MediaDevicesHandler {
       audiooutput: this.availableDevices.audiooutput().length,
       videoinput: this.availableDevices.videoinput().length,
     };
-
-    this.initializeMediaDevices();
   }
 
   public setOnMediaDevicesRefreshHandler(handler: () => void): void {
@@ -163,13 +162,15 @@ export class MediaDevicesHandler {
   /**
    * Initialize the list of MediaDevices and subscriptions.
    */
-  private initializeMediaDevices(): void {
-    if (Runtime.isSupportingUserMedia()) {
-      this.refreshMediaDevices().then(() => {
+  public initializeMediaDevices(): Promise<MediaDeviceInfo[] | void> {
+    if (Runtime.isSupportingUserMedia() && !this.devicesAreInit) {
+      this.devicesAreInit = true;
+      return this.refreshMediaDevices().then(() => {
         this.subscribeToObservables();
         this.subscribeToDevices();
       });
     }
+    return Promise.resolve();
   }
 
   /**
