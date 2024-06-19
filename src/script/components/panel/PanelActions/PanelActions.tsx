@@ -19,13 +19,15 @@
 
 import React from 'react';
 
+import {SVGIconFileName} from 'Util/SVGProvider';
+
 import {listCSS} from './PanelActions.styles';
 
 import {Icon} from '../../Icon';
 
 export interface MenuItem {
   click: () => void;
-  icon: string;
+  icon: SVGIconFileName;
   identifier: string;
   label: string;
 }
