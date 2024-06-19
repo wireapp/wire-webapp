@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.18.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.17.9...@wireapp/react-ui-kit@9.18.0) (2024-06-19)
+
+### Features
+
+* **react-ui-kit:** Add OutlineCheck Icon ([#6304](https://github.com/wireapp/wire-web-packages/issues/6304)) ([fc542fd](https://github.com/wireapp/wire-web-packages/commit/fc542fddb139445d5228404fcb848a4d66c3f5b0))
+
 ## [9.17.9](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.17.8...@wireapp/react-ui-kit@9.17.9) (2024-06-18)
 
 ### Bug Fixes
