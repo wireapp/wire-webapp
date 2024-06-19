@@ -19,7 +19,9 @@
 
 import cx from 'classnames';
 
+import {Icon} from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {t} from 'Util/LocalizerUtil';
 import {checkIsMessageDelivered} from 'Util/util';
 
 import {ReadReceiptStatus} from './ReadReceiptStatus';
@@ -64,15 +66,8 @@ const PingMessage = ({message, is1to1Conversation, isLastDeliveredMessage}: Ping
         </p>
 
         {showDeliveredMessageIcon ? (
-          <div className="message-ping-delivered-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none">
-              <path
-                fill="#676B71"
-                fillRule="evenodd"
-                d="M14 8A6 6 0 1 1 2 8a6 6 0 0 1 12 0Zm2 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0Zm-8.659 3.27 5.128-5.127-1.414-1.415-4.42 4.421-1.69-1.69-1.414 1.415 2.396 2.396.707.708.707-.708Z"
-                clipRule="evenodd"
-              />
-            </svg>
+          <div className="message-ping-delivered-icon" title={t('conversationMessageDelivered')}>
+            <Icon.OutlineCheck />
           </div>
         ) : (
           <ReadReceiptStatus message={message} is1to1Conversation={is1to1Conversation} />
