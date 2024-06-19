@@ -20,12 +20,7 @@
 import React from 'react';
 
 import {SVGIconFileName, getAllSVGs} from 'Util/SVGProvider';
-
-type RemoveSuffix<S extends string, Suffix extends string> = S extends `${infer P}${Suffix}` ? P : S;
-
-type PascalCase<S extends string> = S extends `${infer F}-${infer R}`
-  ? `${Capitalize<F>}${PascalCase<Capitalize<R>>}`
-  : Capitalize<S>;
+import {PascalCase, RemoveSuffix} from 'Util/TypeUtil';
 
 type PascalCaseIconName = PascalCase<RemoveSuffix<SVGIconFileName, '-icon'>>;
 
@@ -47,10 +42,17 @@ const createSvgComponent = (svg: HTMLElement, displayName: string): React.FC<Ico
   const SVGComponent: React.FC<IconProps> = oProps => {
     const viewBox = svg.getAttribute('viewBox');
     if (!viewBox) {
-      console.error('Svg icon must have a viewBox attribute');
+      throw Error('Svg icon must have a viewBox attribute');
     }
     const regex = /0 0 (?<width>\d+) (?<height>\d+)/;
-    const {width, height} = regex.exec(viewBox).groups;
+
+    const match = regex.exec(viewBox);
+
+    if (!match) {
+      throw Error('Svg icon viewBox attribute must be in the format "0 0 width height"');
+    }
+
+    const {width, height} = match.groups as {width: string; height: string};
 
     const props = {
       height: oProps.height ?? height,
