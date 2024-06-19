@@ -83,6 +83,7 @@ import {
   UploadIcon,
   VerificationShieldIcon,
   WireIcon,
+  OutlineCheck,
 } from '@wireapp/react-ui-kit';
 
 const icons = [
@@ -153,6 +154,7 @@ const icons = [
   HideIcon,
   VerificationShieldIcon,
   WireIcon,
+  OutlineCheck,
 ];
 
 const brandIcons = [
