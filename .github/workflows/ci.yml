@@ -43,3 +43,11 @@ jobs:
           files: ./coverage/lcov.info
           flags: unittests
           token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: 'Initialize CodeQL'
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+
+      - name: 'Perform CodeQL Analysis'
+        uses: github/codeql-action/analyze@v3
