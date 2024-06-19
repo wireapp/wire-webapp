@@ -1182,7 +1182,7 @@
   "participantDevicesHeader": "Geräte",
   "participantDevicesHeadline": "{{brandName}} gibt jedem Gerät einen einzigartigen Fingerabdruck. Vergleichen Sie diese mit {{user}} und überprüfen Sie Ihre Unterhaltung.",
   "participantDevicesLearnMore": "Mehr erfahren",
-  "participantDevicesNoClients": "{{user}} has no devices attached to their account and won’t get your messages or calls at the moment.",
+  "participantDevicesNoClients": "{{user}} hat keine Geräte, die mit dem Benutzerkonto verbunden sind, und wird Ihre Nachrichten oder Anrufe im Moment nicht erhalten.",
   "participantDevicesProteusDeviceVerification": "Proteus-Geräteüberprüfung",
   "participantDevicesProteusKeyFingerprint": "Proteus-Schlüssel-Fingerabdruck",
   "participantDevicesSelfAllDevices": "Alle meine Geräte anzeigen",
