@@ -1,5 +1,4 @@
 #define BLUR_QUALITY 14 //The higher the value, the more blur. Must be an even number.
-#define SMOOTH 3 // This will create a smooth transition between the blurred and the clear part (the higher the value, the smoother)
 
 precision mediump float;
 
@@ -21,16 +20,14 @@ void main() {
             colorSum += texture2D(u_image, v_texCoord + onePixel * vec2(i, j));
         }
     }
+    // This is the blurred version of the pixel we are currently rendering
     vec4 blurredPixel = vec4((colorSum / (pow(float(BLUR_QUALITY), 2.0) * 4.0)).rgb, 1);
 
-    float blend;
-    for (int i = -SMOOTH; i < SMOOTH; i++) {
-        for (int j = -SMOOTH; j < SMOOTH; j++) {
-            blend += texture2D(u_mask, v_texCoord + onePixel * vec2(i, j)).r == 1.0 ? 1.0 : 0.0;
-        }
-    }
-    blend = blend / pow(float((SMOOTH) * 2), 2.0);
-    //blend = texture2D(u_mask, v_texCoord).r;
+    // This is the clear version of the pixel we are currently rendering
     vec4 clearPixel = texture2D(u_image, v_texCoord);
+
+    blend = texture2D(u_mask, v_texCoord).r;
+
+    // The gl_FragColor is a mix between the blurred and the clear pixel depending on the segmentation mask given
     gl_FragColor = mix(blurredPixel, clearPixel, blend);
 }
