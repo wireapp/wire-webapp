@@ -26,7 +26,7 @@ import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
 
-jest.mock('../util/SVGProvider');
+jest.mock('Util/SVGProvider');
 function createMockedURLSearchParams(value: string) {
   return class MockedURLSearchParams extends window.URLSearchParams {
     constructor() {

@@ -29,7 +29,7 @@ import {ROUTE} from '../route';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
 
-jest.mock('../util/SVGProvider');
+jest.mock('Util/SVGProvider');
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),

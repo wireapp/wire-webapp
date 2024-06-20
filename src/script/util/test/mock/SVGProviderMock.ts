@@ -20,7 +20,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import {SVGProvider} from 'src/script/auth/util/SVGProvider';
+import {SVGIconName, SVGProvider} from 'Util/SVGProvider';
 
 const parser = new DOMParser();
 const mockSVG = parser.parseFromString(
@@ -28,15 +28,15 @@ const mockSVG = parser.parseFromString(
   'image/svg+xml',
 );
 
-const mockFileList: SVGProvider = fs
+const mockFileList = fs
   .readdirSync(path.resolve(__dirname, '../../../../../resource/image/icon'))
   .filter(file => file.endsWith('.svg'))
   .reduce((list, file: string) => {
     const iconName = file.substring(file.lastIndexOf('/') + 1).replace(/\.svg$/i, '');
     return Object.assign(list, {[iconName]: mockSVG});
-  }, {});
+  }, {} as SVGProvider);
 
-jest.mock('../../../auth/util/SVGProvider', () => ({
+jest.mock('Util/SVGProvider', () => ({
   getAllSVGs: jest.fn().mockImplementation(() => mockFileList),
-  getSVG: jest.fn().mockImplementation((iconName: string) => mockFileList[iconName]),
+  getSVG: jest.fn().mockImplementation((iconName: SVGIconName) => mockFileList[iconName]),
 }));

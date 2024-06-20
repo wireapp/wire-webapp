@@ -28,7 +28,7 @@ import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
 
-jest.mock('../util/SVGProvider');
+jest.mock('Util/SVGProvider');
 
 const emailInputId = 'enter-email';
 const verifyButtonId = 'do-verify-email';

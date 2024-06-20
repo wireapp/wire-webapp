@@ -198,7 +198,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
   const getParticipantContext = (event: React.MouseEvent<HTMLDivElement>, participant: Participant) => {
     event.preventDefault();
 
-    const muteParticipant = {
+    const muteParticipant: ContextMenuEntry = {
       click: () => callingRepository.sendModeratorMute(conversation.qualifiedId, [participant]),
       icon: 'mic-off-icon',
       identifier: `moderator-mute-participant`,

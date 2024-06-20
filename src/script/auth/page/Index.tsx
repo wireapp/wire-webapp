@@ -28,6 +28,8 @@ import {AnyAction, Dispatch} from 'redux';
 import {UrlUtil} from '@wireapp/commons';
 import {Button, ButtonVariant, ContainerXS, ErrorMessage, Text} from '@wireapp/react-ui-kit';
 
+import {getSVG} from 'Util/SVGProvider';
+
 import {Page} from './Page';
 
 import {Config} from '../../Config';
@@ -36,7 +38,6 @@ import {indexStrings, logoutReasonStrings} from '../../strings';
 import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {QUERY_KEY, ROUTE} from '../route';
-import {getSVG} from '../util/SVGProvider';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 

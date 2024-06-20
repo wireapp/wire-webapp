@@ -19,30 +19,41 @@
 
 import React from 'react';
 
-import {getAllSVGs} from '../auth/util/SVGProvider';
+import {typedEntries} from 'Util/ArrayUtil';
+import {SVGIconName, getAllSVGs} from 'Util/SVGProvider';
+import {PascalCase, RemoveSuffix} from 'Util/TypeUtil';
+
+type PascalCaseIconName = PascalCase<RemoveSuffix<SVGIconName, '-icon'>>;
 
 type IconProps = React.SVGProps<SVGSVGElement>;
 
-type IconList = Record<string, React.FC<IconProps>>;
+type IconList = Record<PascalCaseIconName, React.FC<IconProps>>;
 
 interface NamedIconProps extends IconProps {
-  name: string;
+  name: SVGIconName;
 }
 
-const normalizeIconName = (name: string) =>
+const normalizeIconName = (name: SVGIconName): PascalCaseIconName =>
   name
     .replace(/-icon$/, '')
-    .replace(/\b\w/g, found => found.toUpperCase())
-    .replace(/-/g, '');
+    .replace(/\b\w/g, (found: string) => found.toUpperCase())
+    .replace(/-/g, '') as PascalCaseIconName;
 
 const createSvgComponent = (svg: HTMLElement, displayName: string): React.FC<IconProps> => {
   const SVGComponent: React.FC<IconProps> = oProps => {
     const viewBox = svg.getAttribute('viewBox');
     if (!viewBox) {
-      console.error('Svg icon must have a viewBox attribute');
+      throw Error('Svg icon must have a viewBox attribute');
     }
     const regex = /0 0 (?<width>\d+) (?<height>\d+)/;
-    const {width, height} = regex.exec(viewBox).groups;
+
+    const match = regex.exec(viewBox);
+
+    if (!match) {
+      throw Error('Svg icon viewBox attribute must be in the format "0 0 width height"');
+    }
+
+    const {width, height} = match.groups as {width: string; height: string};
 
     const props = {
       height: oProps.height ?? height,
@@ -57,10 +68,13 @@ const createSvgComponent = (svg: HTMLElement, displayName: string): React.FC<Ico
   return SVGComponent;
 };
 
-const icons = Object.entries(getAllSVGs()).reduce<IconList>((list, [key, svg]) => {
-  const name = normalizeIconName(key);
-  return Object.assign(list, {[name]: createSvgComponent(svg.documentElement, `Icon.${name}`)});
-}, {});
+const icons = typedEntries(getAllSVGs()).reduce<IconList>(
+  (list, [key, svg]) => {
+    const name = normalizeIconName(key);
+    return Object.assign(list, {[name]: createSvgComponent(svg.documentElement, `Icon.${name}`)});
+  },
+  {} as Record<PascalCaseIconName, React.FC<IconProps>>,
+);
 
 const IconComponent: React.FC<NamedIconProps> = ({name, ...props}) => {
   const componentName = normalizeIconName(name);
