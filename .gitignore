@@ -8,7 +8,7 @@
 /keys
 /package-lock.json
 /resource
-/src/script/generated
+/src/script/components/Icon.tsx # auto generated file
 /temp
 CHANGELOG.md
 node_modules
