@@ -202,7 +202,11 @@ export const ContentMessageComponent = ({
 
       <div css={messageBodyWrapper(isEphemeralMessage)}>
         {isEphemeralMessage && (
-          <div css={messageEphemeralTimer} {...(ephemeralCaption && {title: ephemeralCaption})}>
+          <div
+            css={messageEphemeralTimer}
+            {...(ephemeralCaption && {title: ephemeralCaption})}
+            className="message-ephemeral-timer"
+          >
             <EphemeralTimer message={message} />
           </div>
         )}
