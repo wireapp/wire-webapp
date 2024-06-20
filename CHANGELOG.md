@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [27.0.9](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.0.8...@wireapp/api-client@27.0.9) (2024-06-20)
+
+### Bug Fixes
+
+* Improve asset loading ([#6309](https://github.com/wireapp/wire-web-packages/issues/6309)) ([e733a14](https://github.com/wireapp/wire-web-packages/commit/e733a145eb5408c359e6ca81cb883fc80d57449c))
+
 ## [27.0.8](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.0.7...@wireapp/api-client@27.0.8) (2024-06-19)
 
 **Note:** Version bump only for package @wireapp/api-client
