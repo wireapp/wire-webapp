@@ -8,12 +8,14 @@
 /keys
 /package-lock.json
 /resource
-/src/script/components/Icon.tsx # auto generated file
 /temp
 CHANGELOG.md
 node_modules
 npm-debug.log
 yarn-error.log
+
+# auto generated source files
+/src/script/components/Icon.tsx
 
 # yarn 2 - not using zero-installs
 .pnp.*
