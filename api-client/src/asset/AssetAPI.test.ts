@@ -45,7 +45,6 @@ describe('"AssetAPI"', () => {
         },
         url: expect.stringMatching(new RegExp(assetId)),
       }),
-      true,
     );
   });
 
@@ -68,7 +67,6 @@ describe('"AssetAPI"', () => {
         params: {},
         url: expect.stringMatching(new RegExp(assetId)),
       }),
-      true,
     );
   });
 });
