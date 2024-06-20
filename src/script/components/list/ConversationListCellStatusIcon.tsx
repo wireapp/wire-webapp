@@ -19,7 +19,7 @@
 
 import {useMemo} from 'react';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -48,7 +48,7 @@ const ConversationListCellStatusIcon = ({conversation}: ConversationListCellStat
           data-uie-name="status-pending"
           title={t('accessibility.conversationStatusPending')}
         >
-          <Icon.Pending className="svg-icon" />
+          <Icon.PendingIcon className="svg-icon" />
         </span>
       )}
 
@@ -58,7 +58,7 @@ const ConversationListCellStatusIcon = ({conversation}: ConversationListCellStat
           data-uie-name="status-mention"
           title={t('accessibility.conversationStatusUnreadMention')}
         >
-          <Icon.Mention className="svg-icon" />
+          <Icon.MentionIcon className="svg-icon" />
         </span>
       )}
 
@@ -69,7 +69,7 @@ const ConversationListCellStatusIcon = ({conversation}: ConversationListCellStat
           title={t('accessibility.conversationStatusUnreadReply')}
           aria-label={t('accessibility.conversationStatusUnreadReply')}
         >
-          <Icon.Reply className="svg-icon" />
+          <Icon.ReplyIcon className="svg-icon" />
         </span>
       )}
 
@@ -79,7 +79,7 @@ const ConversationListCellStatusIcon = ({conversation}: ConversationListCellStat
           data-uie-name="status-ping"
           title={t('accessibility.conversationStatusUnreadPing')}
         >
-          <Icon.Ping className="svg-icon" />
+          <Icon.PingIcon className="svg-icon" />
         </span>
       )}
 
@@ -89,7 +89,7 @@ const ConversationListCellStatusIcon = ({conversation}: ConversationListCellStat
           data-uie-name="status-missed-call"
           title={t('accessibility.callStatusMissed')}
         >
-          <Icon.Hangup className="svg-icon" />
+          <Icon.HangupIcon className="svg-icon" />
         </span>
       )}
 
@@ -99,7 +99,7 @@ const ConversationListCellStatusIcon = ({conversation}: ConversationListCellStat
           data-uie-name="status-silence"
           title={t('accessibility.conversationStatusMuted')}
         >
-          <Icon.Mute className="svg-icon" />
+          <Icon.MuteIcon className="svg-icon" />
         </span>
       )}
 

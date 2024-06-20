@@ -25,7 +25,7 @@ import {amplify} from 'amplify';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {t} from 'Util/LocalizerUtil';
 
@@ -152,32 +152,32 @@ const Preferences: React.FC<PreferencesProps> = ({
 
   const items = [
     {
-      IconComponent: Icon.Profile,
+      IconComponent: Icon.ProfileIcon,
       id: ContentState.PREFERENCES_ACCOUNT,
       label: t('preferencesAccount'),
       uieName: 'go-account',
     },
     {
-      IconComponent: Icon.Devices,
+      IconComponent: Icon.DevicesIcon,
       id: ContentState.PREFERENCES_DEVICES,
       label: t('preferencesDevices'),
       uieName: 'go-devices',
     },
     {
-      IconComponent: Icon.Options,
+      IconComponent: Icon.OptionsIcon,
       id: ContentState.PREFERENCES_OPTIONS,
       label: t('preferencesOptions'),
       uieName: 'go-options',
     },
     {
-      IconComponent: Icon.Av,
+      IconComponent: Icon.AvIcon,
       hidden: !supportsCalling,
       id: ContentState.PREFERENCES_AV,
       label: t('preferencesAV'),
       uieName: 'go-audio-video',
     },
     {
-      IconComponent: Icon.About,
+      IconComponent: Icon.AboutIcon,
       id: ContentState.PREFERENCES_ABOUT,
       label: t('preferencesAbout'),
       uieName: 'go-about',

@@ -21,7 +21,7 @@ import {FC} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
 import {Config} from '../../../Config';
@@ -55,7 +55,7 @@ const PastedFileControls: FC<PastedFileControlsProps> = ({pastedFile, onClear, o
           />
         ) : (
           <span className="conversation-input-bar-paste-icon">
-            <Icon.File />
+            <Icon.FileIcon />
           </span>
         )}
 
@@ -70,7 +70,7 @@ const PastedFileControls: FC<PastedFileControlsProps> = ({pastedFile, onClear, o
           onClick={onClear}
           aria-label={t('pastedFileCloseMessage')}
         >
-          <Icon.Close />
+          <Icon.CloseIcon />
         </button>
 
         <button
@@ -79,7 +79,7 @@ const PastedFileControls: FC<PastedFileControlsProps> = ({pastedFile, onClear, o
           onClick={onSend}
           aria-label={t('pastedFileSendMessage')}
         >
-          <Icon.Send />
+          <Icon.SendIcon />
         </button>
       </div>
     </div>

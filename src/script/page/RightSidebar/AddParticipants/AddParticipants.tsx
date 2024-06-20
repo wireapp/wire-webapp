@@ -25,7 +25,7 @@ import cx from 'classnames';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {SearchInput} from 'Components/SearchInput';
 import {ServiceList} from 'Components/ServiceList/ServiceList';
 import {UserSearchableList} from 'Components/UserSearchableList';
@@ -258,7 +258,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
                         data-uie-name="go-manage-services"
                       >
                         <div className="left-column-icon left-column-icon-dark">
-                          <Icon.Service />
+                          <Icon.ServiceIcon />
                         </div>
 
                         <div className="column-center">{t('addParticipantsManageServices')}</div>
@@ -272,7 +272,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
 
               {!services.length && !isInitialServiceSearch && (
                 <div className="search__no-services">
-                  <Icon.Service className="search__no-services__icon" />
+                  <Icon.ServiceIcon className="search__no-services__icon" />
 
                   {canManageServices() && !!manageServicesUrl && (
                     <>

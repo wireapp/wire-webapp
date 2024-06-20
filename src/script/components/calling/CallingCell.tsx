@@ -31,7 +31,19 @@ import {Duration} from 'Components/calling/Duration';
 import {GroupVideoGrid} from 'Components/calling/GroupVideoGrid';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {Icon} from 'Components/Icon';
+import {
+  CameraIcon,
+  CameraOffIcon,
+  ChevronRight,
+  CloseIcon,
+  FullscreenIcon,
+  HangupIcon,
+  MicOffIcon,
+  MicOnIcon,
+  PickupIcon,
+  ScreenshareIcon,
+  ScreenshareOffIcon,
+} from 'Components/Icon';
 import {ConversationClassifiedBar} from 'Components/input/ClassifiedBar';
 import {usePushToTalk} from 'src/script/hooks/usePushToTalk/usePushToTalk';
 import {useAppMainState, ViewType} from 'src/script/page/state';
@@ -200,7 +212,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
 
     const muteParticipant: ContextMenuEntry = {
       click: () => callingRepository.sendModeratorMute(conversation.qualifiedId, [participant]),
-      icon: 'mic-off-icon',
+      icon: MicOffIcon,
       identifier: `moderator-mute-participant`,
       isDisabled: participant.isMuted(),
       label: t('moderatorMenuEntryMute'),
@@ -213,7 +225,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
           participants.filter(p => p !== participant),
         );
       },
-      icon: 'mic-off-icon',
+      icon: MicOffIcon,
       identifier: 'moderator-mute-others',
       label: t('moderatorMenuEntryMuteAllOthers'),
     };
@@ -417,11 +429,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
             <div className="conversation-list-cell-right">
               {isOngoing && isDetachedCallingFeatureEnabled && (
                 <button className="call-ui__button" onClick={toggleDetachedWindow}>
-                  {isDetachedWindow ? (
-                    <Icon.Close className="small-icon" />
-                  ) : (
-                    <Icon.Fullscreen className="small-icon" />
-                  )}
+                  {isDetachedWindow ? <CloseIcon className="small-icon" /> : <FullscreenIcon className="small-icon" />}
                 </button>
               )}
 
@@ -433,7 +441,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
                   type="button"
                   data-uie-name="do-call-controls-call-leave"
                 >
-                  <Icon.Hangup className="small-icon" style={{maxWidth: 17}} />
+                  <HangupIcon className="small-icon" style={{maxWidth: 17}} />
                 </button>
               )}
             </div>
@@ -459,7 +467,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
 
               {isOngoing && !isDetachedWindow && (
                 <div className="group-video__minimized-wrapper__overlay" data-uie-name="do-maximize-call">
-                  <Icon.Fullscreen />
+                  <FullscreenIcon />
                 </div>
               )}
             </div>
@@ -495,7 +503,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
                       aria-checked={!isMuted}
                       disabled={isConnecting}
                     >
-                      {isMuted ? <Icon.MicOff className="small-icon" /> : <Icon.MicOn className="small-icon" />}
+                      {isMuted ? <MicOffIcon className="small-icon" /> : <MicOnIcon className="small-icon" />}
                     </button>
                   </li>
 
@@ -513,9 +521,9 @@ const CallingCell: React.FC<CallingCellProps> = ({
                         data-uie-value={selfSharesCamera ? 'active' : 'inactive'}
                       >
                         {selfSharesCamera ? (
-                          <Icon.Camera className="small-icon" />
+                          <CameraIcon className="small-icon" />
                         ) : (
-                          <Icon.CameraOff className="small-icon" />
+                          <CameraOffIcon className="small-icon" />
                         )}
                       </button>
                     </li>
@@ -539,9 +547,9 @@ const CallingCell: React.FC<CallingCellProps> = ({
                         disabled={disableScreenButton || isDetachedWindow}
                       >
                         {selfSharesScreen ? (
-                          <Icon.Screenshare className="small-icon" />
+                          <ScreenshareIcon className="small-icon" />
                         ) : (
-                          <Icon.ScreenshareOff className="small-icon" />
+                          <ScreenshareOffIcon className="small-icon" />
                         )}
                       </button>
                     </li>
@@ -564,7 +572,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
                     aria-pressed={showParticipants}
                   >
                     <span>{t('callParticipants', participants.length)}</span>
-                    <Icon.ChevronRight className="chevron" />
+                    <ChevronRight className="chevron" />
                   </button>
                 </li>
               )}
@@ -585,7 +593,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
                     type="button"
                     data-uie-name="do-call-controls-call-decline"
                   >
-                    <Icon.Hangup className="small-icon" style={{maxWidth: 17}} />
+                    <HangupIcon className="small-icon" style={{maxWidth: 17}} />
                   </button>
                 </li>
               )}
@@ -610,7 +618,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
                       aria-label={t('callAccept')}
                       data-uie-name="do-call-controls-call-accept"
                     >
-                      <Icon.Pickup className="small-icon" />
+                      <PickupIcon className="small-icon" />
                     </button>
                   )}
                 </li>

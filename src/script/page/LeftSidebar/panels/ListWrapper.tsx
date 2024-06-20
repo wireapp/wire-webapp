@@ -23,7 +23,7 @@ import {css} from '@emotion/react';
 import {throttle} from 'underscore';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 import {isScrollable, isScrolledBottom, isScrolledTop} from 'Util/scroll-helpers';
 
@@ -104,7 +104,7 @@ const ListWrapper = ({
               title={t('tooltipSearchClose')}
               data-uie-name={`do-close-${id}`}
             >
-              <Icon.Close />
+              <Icon.CloseIcon />
             </button>
           </>
         )}

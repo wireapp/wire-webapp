@@ -19,7 +19,7 @@
 
 import React from 'react';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {MediaDeviceType} from 'src/script/media/MediaDeviceType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -50,7 +50,7 @@ const AudioOutPreferences: React.FC<AudioOutPreferencesProps> = ({devicesHandler
         onChange={deviceId => devicesHandler.currentDeviceId[MediaDeviceType.AUDIO_OUTPUT](deviceId)}
         devices={availableDevices as MediaDeviceInfo[]}
         value={currentDeviceId}
-        icon={Icon.Speaker}
+        icon={Icon.SpeakerIcon}
         defaultDeviceName={t('preferencesAVSpeakers')}
         title={t('preferencesAVSpeakers')}
       />

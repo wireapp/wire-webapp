@@ -19,7 +19,7 @@
 
 import {FC} from 'react';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatLocale} from 'Util/TimeUtil';
@@ -62,7 +62,7 @@ const DetailViewModalHeader: FC<DetailViewModalHeaderProps> = ({messageEntity, o
         onClick={onCloseClick}
         data-uie-name="do-close-detail-view"
       >
-        <Icon.Close />
+        <Icon.CloseIcon />
       </button>
     </header>
   );

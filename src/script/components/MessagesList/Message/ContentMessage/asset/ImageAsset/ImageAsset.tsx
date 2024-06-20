@@ -21,7 +21,7 @@ import React from 'react';
 
 import {CSSObject} from '@emotion/react';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {AssetImage} from 'Components/Image';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
@@ -68,7 +68,7 @@ export const ImageAsset = ({asset, message, onClick}: ImageAssetProps) => {
 
       {isObfuscated && (
         <div className="image-icon flex-center full-screen bg-color-ephemeral">
-          <Icon.Image />
+          <Icon.ImageIcon />
         </div>
       )}
 

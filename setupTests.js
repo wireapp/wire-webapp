@@ -31,7 +31,6 @@ import 'src/script/util/test/mock/matchMediaMock';
 import 'src/script/util/test/mock/mediaDevicesMock';
 import 'src/script/util/test/mock/navigatorPermissionsMock';
 import 'src/script/util/test/mock/ResponseMock';
-import 'src/script/util/test/mock/SVGProviderMock';
 import 'src/script/util/test/mock/WebRTCMock';
 import 'src/script/util/test/mock/resizeObserver.mock';
 

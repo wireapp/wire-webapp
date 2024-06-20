@@ -17,7 +17,7 @@
  *
  */
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {formatTimeShort} from 'Util/TimeUtil';
 
@@ -46,11 +46,11 @@ export const ReadIndicator = ({
     return (
       <div css={ReadIndicatorContainer} className="read-indicator-wrapper">
         <span css={ReadIndicatorStyles(showIconOnly)} data-uie-name="status-message-read-receipts">
-          {showIconOnly && readReceiptText && <Icon.Read />}
+          {showIconOnly && readReceiptText && <Icon.ReadIcon />}
 
           {!showIconOnly && !!readReceiptText && (
             <div css={ReadReceiptText} data-uie-name="status-message-read-receipt-text">
-              <Icon.Read /> {readReceiptText}
+              <Icon.ReadIcon /> {readReceiptText}
             </div>
           )}
         </span>
@@ -67,7 +67,7 @@ export const ReadIndicator = ({
   if (showIconOnly) {
     return (
       <span css={ReadIndicatorStyles(true)} data-uie-name="status-message-read-receipts-header">
-        <Icon.Read />
+        <Icon.ReadIcon />
       </span>
     );
   }
@@ -81,7 +81,7 @@ export const ReadIndicator = ({
         data-uie-name="status-message-read-receipts"
       >
         <div css={ReadReceiptText} data-uie-name="status-message-read-receipt-count">
-          <Icon.Read /> {readReceiptCount}
+          <Icon.ReadIcon /> {readReceiptCount}
         </div>
       </button>
     </div>

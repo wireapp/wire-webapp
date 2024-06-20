@@ -23,7 +23,7 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 
@@ -81,13 +81,13 @@ const MentionSuggestionsItemComponent: React.ForwardRefRenderFunction<HTMLDivEle
         </div>
       )}
       {isExternal && (
-        <Icon.External className="mention-suggestion-list__item__guest-badge" data-uie-name="status-external" />
+        <Icon.ExternalIcon className="mention-suggestion-list__item__guest-badge" data-uie-name="status-external" />
       )}
       {suggestion.isFederated && (
-        <Icon.Federation className="mention-suggestion-list__item__guest-badge" data-uie-name="status-federated" />
+        <Icon.FederationIcon className="mention-suggestion-list__item__guest-badge" data-uie-name="status-federated" />
       )}
       {isDirectGuest && !suggestion.isFederated && (
-        <Icon.Guest className="mention-suggestion-list__item__guest-badge" data-uie-name="status-guest" />
+        <Icon.GuestIcon className="mention-suggestion-list__item__guest-badge" data-uie-name="status-guest" />
       )}
     </div>
   );
