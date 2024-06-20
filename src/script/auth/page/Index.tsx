@@ -68,9 +68,8 @@ const IndexComponent = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps
       <ContainerXS centerText verticalCenter style={{width: '380px'}}>
         <LogoFullIcon
           aria-hidden="true"
-          scale={1.3}
-          width={78}
-          height={25}
+          width={102}
+          height={33}
           style={{marginBottom: '80px'}}
           data-uie-name="ui-wire-logo"
         />
