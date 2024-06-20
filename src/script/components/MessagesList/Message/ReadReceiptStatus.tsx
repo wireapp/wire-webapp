@@ -21,7 +21,7 @@ import {useEffect, useState} from 'react';
 
 import cx from 'classnames';
 
-import {Icon} from 'Components/Icon';
+import {ReadIcon} from 'Components/Icon';
 import {Message} from 'src/script/entity/message/Message';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -65,7 +65,7 @@ export const ReadReceiptStatus = ({message, is1to1Conversation, onClickDetails}:
         },
       })}
     >
-      <Icon.Read />
+      <ReadIcon />
       <span className="message-status-read__count" data-uie-name="status-message-read-receipt-count">
         {readReceiptText}
       </span>

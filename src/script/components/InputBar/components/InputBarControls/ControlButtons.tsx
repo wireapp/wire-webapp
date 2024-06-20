@@ -19,7 +19,7 @@
 
 import React from 'react';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {Config} from 'src/script/Config';
 import {Conversation} from 'src/script/entity/Conversation';
 import {t} from 'Util/LocalizerUtil';
@@ -71,7 +71,7 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
           data-uie-name="do-cancel-edit"
           aria-label={t('accessibility.cancelMsgEdit')}
         >
-          <Icon.Close />
+          <Icon.CloseIcon />
         </button>
       </li>
     );
@@ -92,7 +92,7 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
             aria-label={pingTooltip}
             data-uie-name="do-ping"
           >
-            <Icon.Ping />
+            <Icon.PingIcon />
           </button>
         </li>
         {!disableFilesharing && (

@@ -27,7 +27,7 @@ import {container} from 'tsyringe';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingCell} from 'Components/calling/CallingCell';
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {UserInfo} from 'Components/UserInfo';
 import {UserVerificationBadges} from 'Components/VerificationBadge';
@@ -174,7 +174,7 @@ const Conversations: React.FC<ConversationsProps> = ({
         onClick={onClickPreferences}
         data-uie-name="go-preferences"
       >
-        <Icon.Settings />
+        <Icon.SettingsIcon />
       </button>
 
       {teamState.isTeam() ? (
@@ -319,7 +319,7 @@ const Conversations: React.FC<ConversationsProps> = ({
           {archivedConversations.length === 0 ? (
             <div className="conversations-hint" data-uie-name="status-start-conversation-hint">
               <div className="conversations-hint-text">{t('conversationsNoConversations')}</div>
-              <Icon.ArrowDownLong className="conversations-hint-arrow" />
+              <Icon.ArrowDownLongIcon className="conversations-hint-arrow" />
             </div>
           ) : (
             <div className="conversations-all-archived">{t('conversationsAllArchived')}</div>

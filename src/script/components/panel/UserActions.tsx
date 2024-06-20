@@ -27,6 +27,7 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import * as Icon from 'Components/Icon';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {ConversationState} from 'src/script/conversation/ConversationState';
 import {TeamState} from 'src/script/team/TeamState';
@@ -157,7 +158,7 @@ const UserActions: React.FC<UserActionsProps> = ({
           amplify.publish(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT);
           onAction(Actions.OPEN_PROFILE);
         },
-        icon: 'profile-icon',
+        Icon: Icon.ProfileIcon,
         identifier: ActionIdentifier[Actions.OPEN_PROFILE],
         label: t('groupParticipantActionSelfProfile'),
       }
@@ -174,7 +175,7 @@ const UserActions: React.FC<UserActionsProps> = ({
             await actionsViewModel.leaveConversation(conversation);
             onAction(Actions.LEAVE);
           },
-          icon: 'leave-icon',
+          Icon: Icon.LeaveIcon,
           identifier: ActionIdentifier[Actions.LEAVE],
           label: t('groupParticipantActionLeave'),
         }
@@ -187,7 +188,7 @@ const UserActions: React.FC<UserActionsProps> = ({
             await create1to1Conversation(user, true);
             onAction(Actions.OPEN_CONVERSATION);
           },
-          icon: 'message-icon',
+          Icon: Icon.MessageIcon,
           identifier: ActionIdentifier[Actions.OPEN_CONVERSATION],
           label: t('groupParticipantActionOpenConversation'),
         }
@@ -212,7 +213,7 @@ const UserActions: React.FC<UserActionsProps> = ({
               throw error;
             }
           },
-          icon: 'message-icon',
+          Icon: Icon.MessageIcon,
           identifier: ActionIdentifier[Actions.START_CONVERSATION],
           label: t('groupParticipantActionStartConversation'),
         }
@@ -226,7 +227,7 @@ const UserActions: React.FC<UserActionsProps> = ({
             await create1to1Conversation(user, true);
             onAction(Actions.ACCEPT_REQUEST);
           },
-          icon: 'check-icon',
+          Icon: Icon.CheckIcon,
           identifier: ActionIdentifier[Actions.ACCEPT_REQUEST],
           label: t('groupParticipantActionIncomingRequest'),
         }
@@ -239,7 +240,7 @@ const UserActions: React.FC<UserActionsProps> = ({
             await actionsViewModel.ignoreConnectionRequest(user);
             onAction(Actions.IGNORE_REQUEST);
           },
-          icon: 'close-icon',
+          Icon: Icon.CloseIcon,
           identifier: ActionIdentifier[Actions.IGNORE_REQUEST],
           label: t('groupParticipantActionIgnoreRequest'),
         }
@@ -253,7 +254,7 @@ const UserActions: React.FC<UserActionsProps> = ({
             await create1to1Conversation(user, false);
             onAction(Actions.CANCEL_REQUEST);
           },
-          icon: 'undo-icon',
+          Icon: Icon.UndoIcon,
           identifier: ActionIdentifier[Actions.CANCEL_REQUEST],
           label: t('groupParticipantActionCancelRequest'),
         }
@@ -289,7 +290,7 @@ const UserActions: React.FC<UserActionsProps> = ({
             }
             onAction(Actions.SEND_REQUEST);
           },
-          icon: 'plus-icon',
+          Icon: Icon.PlusIcon,
           identifier: ActionIdentifier[Actions.SEND_REQUEST],
           label: t('groupParticipantActionSendRequest'),
         }
@@ -303,7 +304,7 @@ const UserActions: React.FC<UserActionsProps> = ({
             await create1to1Conversation(user, false);
             onAction(Actions.BLOCK);
           },
-          icon: 'block-icon',
+          Icon: Icon.BlockIcon,
           identifier: ActionIdentifier[Actions.BLOCK],
           label: t('groupParticipantActionBlock'),
         }
@@ -317,7 +318,7 @@ const UserActions: React.FC<UserActionsProps> = ({
             await create1to1Conversation(user, !conversation);
             onAction(Actions.UNBLOCK);
           },
-          icon: 'block-icon',
+          Icon: Icon.BlockIcon,
           identifier: ActionIdentifier[Actions.UNBLOCK],
           label: t('groupParticipantActionUnblock'),
         }
@@ -334,7 +335,7 @@ const UserActions: React.FC<UserActionsProps> = ({
             await actionsViewModel.removeFromConversation(conversation, user);
             onAction(Actions.REMOVE);
           },
-          icon: 'minus-icon',
+          Icon: Icon.MinusIcon,
           identifier: 'do-remove',
           label: t('groupParticipantActionRemove'),
         }

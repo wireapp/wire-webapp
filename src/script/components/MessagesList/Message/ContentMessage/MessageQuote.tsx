@@ -25,7 +25,7 @@ import cx from 'classnames';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {AssetImage} from 'Components/Image';
 import {Text} from 'src/script/entity/message/Text';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -184,7 +184,7 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
         </button>
         {was_edited && (
           <span data-uie-name="message-edited-quote" title={quotedMessage.displayEditedTimestamp()}>
-            <Icon.Edit />
+            <Icon.EditIcon />
           </span>
         )}
       </div>

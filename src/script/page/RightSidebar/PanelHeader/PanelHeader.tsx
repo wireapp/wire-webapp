@@ -23,7 +23,7 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 
 import {DragableClickWrapper} from 'Components/DragableClickWrapper';
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 import {noop} from 'Util/util';
 
@@ -82,7 +82,7 @@ const PanelHeader: FC<PanelHeaderProps> = ({
       {showBackArrow && (
         <DragableClickWrapper onClick={() => onGoBack()}>
           <button className="icon-button" data-uie-name={goBackUie} title={goBackTitle} onBlur={handleBlur}>
-            <Icon.ArrowLeft />
+            <Icon.ArrowLeftIcon />
           </button>
         </DragableClickWrapper>
       )}
@@ -95,7 +95,7 @@ const PanelHeader: FC<PanelHeaderProps> = ({
 
       <DragableClickWrapper onClick={onClose}>
         <button className="icon-button" data-uie-name={closeUie} title={closeBtnTitle} onBlur={handleBlur}>
-          <Icon.Close className="right-panel-close" />
+          <Icon.CloseIcon className="right-panel-close" />
         </button>
       </DragableClickWrapper>
 
@@ -109,7 +109,7 @@ const PanelHeader: FC<PanelHeaderProps> = ({
             onClick={onToggleMute}
             data-uie-name="do-mute"
           >
-            <Icon.Mute />
+            <Icon.MuteIcon />
           </button>
         </DragableClickWrapper>
       )}

@@ -19,15 +19,11 @@
 
 import React from 'react';
 
-import {SVGIconName} from 'Util/SVGProvider';
-
 import {listCSS} from './PanelActions.styles';
-
-import {Icon} from '../../Icon';
 
 export interface MenuItem {
   click: () => void;
-  icon: SVGIconName;
+  Icon: React.FC<React.SVGProps<SVGSVGElement>>;
   identifier: string;
   label: string;
 }
@@ -39,11 +35,11 @@ export interface PanelActionsProps {
 const PanelActions: React.FC<PanelActionsProps> = ({items}) => {
   return (
     <ul css={listCSS}>
-      {items.map(({click, identifier, icon, label}) => (
+      {items.map(({click, identifier, Icon, label}) => (
         <li key={identifier}>
           <button className="panel__action-item" onClick={click} data-uie-name={identifier} type="button">
             <span className="panel__action-item__icon">
-              <Icon name={icon} />
+              <Icon />
             </span>
 
             <span data-uie-name={`${identifier}-item-text`} className="panel__action-item__text">

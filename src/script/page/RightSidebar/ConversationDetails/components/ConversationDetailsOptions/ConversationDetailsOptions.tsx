@@ -21,7 +21,7 @@ import {FC} from 'react';
 
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {ReceiptModeToggle} from 'Components/toggle/ReceiptModeToggle';
 import {t} from 'Util/LocalizerUtil';
 
@@ -79,7 +79,7 @@ const ConversationDetailsOptions: FC<ConversationDetailsOptionsProps> = ({
             className="conversation-details__notifications"
             onClick={openNotificationsPanel}
             dataUieName="go-notifications"
-            icon={<Icon.Notification />}
+            icon={<Icon.NotificationIcon />}
             title={t('conversationDetailsActionNotifications')}
             statusUieName="status-notifications"
             statusText={notificationStatusText}
@@ -91,7 +91,7 @@ const ConversationDetailsOptions: FC<ConversationDetailsOptionsProps> = ({
             className="conversation-details__timed-messages"
             onClick={openTimedMessagePanel}
             dataUieName="go-timed-messages"
-            icon={<Icon.Timer />}
+            icon={<Icon.TimerIcon />}
             title={t('conversationDetailsActionTimedMessages')}
             statusUieName="status-timed-messages"
             statusText={timedMessagesText}
@@ -103,7 +103,7 @@ const ConversationDetailsOptions: FC<ConversationDetailsOptionsProps> = ({
             className="conversation-details__guest-options"
             onClick={openGuestPanel}
             dataUieName="go-guest-options"
-            icon={<Icon.Guest />}
+            icon={<Icon.GuestIcon />}
             title={t('conversationDetailsActionGuestOptions')}
             statusUieName="status-allow-guests"
             statusText={guestOptionsText}
@@ -115,7 +115,7 @@ const ConversationDetailsOptions: FC<ConversationDetailsOptionsProps> = ({
             className="conversation-details__services-options"
             onClick={openServicePanel}
             dataUieName="go-services-options"
-            icon={<Icon.Service className="service-icon" />}
+            icon={<Icon.ServiceIcon className="service-icon" />}
             title={t('conversationDetailsActionServicesOptions')}
             statusUieName="status-allow-services"
             statusText={servicesOptionsText}

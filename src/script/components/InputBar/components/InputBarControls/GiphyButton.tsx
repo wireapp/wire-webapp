@@ -21,7 +21,7 @@ import React from 'react';
 
 import {IconButton} from '@wireapp/react-ui-kit';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
 export type GiphyButtonProps = {
@@ -40,7 +40,7 @@ const GiphyButton: React.FC<GiphyButtonProps> = ({onGifClick}) => {
           onClick={onGifClick}
           data-uie-name="do-giphy-popover"
         >
-          <Icon.Gif />
+          <Icon.GifIcon />
         </IconButton>
       </li>
     </>

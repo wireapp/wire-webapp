@@ -29,7 +29,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {CSS_SQUARE} from 'Util/CSSMixin';
 import {KEY} from 'Util/KeyboardUtil';
 
-import {Icon} from './Icon';
+import * as Icon from './Icon';
 import {UserName} from './UserName';
 
 import {User} from '../entity/User';
@@ -67,10 +67,10 @@ const availabilityIconBaseProps = {
 };
 const availabilityIconRenderer: Record<Availability.Type, () => ReactNode> = {
   [Availability.Type.AVAILABLE]: () => (
-    <Icon.AvailabilityAvailable {...availabilityIconBaseProps} data-uie-value="available" />
+    <Icon.AvailabilityAvailableIcon {...availabilityIconBaseProps} data-uie-value="available" />
   ),
-  [Availability.Type.AWAY]: () => <Icon.AvailabilityAway {...availabilityIconBaseProps} data-uie-value="away" />,
-  [Availability.Type.BUSY]: () => <Icon.AvailabilityBusy {...availabilityIconBaseProps} data-uie-value="busy" />,
+  [Availability.Type.AWAY]: () => <Icon.AvailabilityAwayIcon {...availabilityIconBaseProps} data-uie-value="away" />,
+  [Availability.Type.BUSY]: () => <Icon.AvailabilityBusyIcon {...availabilityIconBaseProps} data-uie-value="busy" />,
   [Availability.Type.NONE]: () => null,
 };
 

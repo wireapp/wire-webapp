@@ -19,7 +19,6 @@
 
 import React, {useEffect, useState} from 'react';
 
-import {SVGIcon} from '@wireapp/react-ui-kit/lib/Icon/SVGIcon';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {Navigate, useNavigate} from 'react-router-dom';
@@ -28,7 +27,7 @@ import {AnyAction, Dispatch} from 'redux';
 import {UrlUtil} from '@wireapp/commons';
 import {Button, ButtonVariant, ContainerXS, ErrorMessage, Text} from '@wireapp/react-ui-kit';
 
-import {getSVG} from 'Util/SVGProvider';
+import {LogoFullIcon} from 'Components/Icon';
 
 import {Page} from './Page';
 
@@ -67,16 +66,13 @@ const IndexComponent = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps
   return (
     <Page>
       <ContainerXS centerText verticalCenter style={{width: '380px'}}>
-        <SVGIcon
+        <LogoFullIcon
           aria-hidden="true"
-          scale={1.3}
-          realWidth={78}
-          realHeight={25}
+          width={102}
+          height={33}
           style={{marginBottom: '80px'}}
           data-uie-name="ui-wire-logo"
-        >
-          <g dangerouslySetInnerHTML={{__html: getSVG('logo-full-icon')?.documentElement?.innerHTML}} />
-        </SVGIcon>
+        />
         <Text
           block
           center

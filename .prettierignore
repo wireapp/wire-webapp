@@ -7,7 +7,6 @@ src/i18n/
 /resource
 /assets
 /src/ext
-/src/script/generated
 CHANGELOG.md
 node_modules
 npm-debug.log

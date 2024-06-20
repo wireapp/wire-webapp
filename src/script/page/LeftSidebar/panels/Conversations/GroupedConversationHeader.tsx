@@ -21,7 +21,7 @@ import React, {useEffect, useState} from 'react';
 
 import cx from 'classnames';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import type {ConversationLabel} from '../../../../conversation/ConversationLabelRepository';
@@ -55,7 +55,7 @@ const GroupedConversationHeader: React.FC<GroupedConversationHeaderProps> = ({on
       id={conversationLabel.id}
     >
       <span className="disclose-icon">
-        <Icon.Disclose />
+        <Icon.DiscloseIcon />
       </span>
 
       <h3 className="conversation-folder__head__name">{conversationLabel.name}</h3>

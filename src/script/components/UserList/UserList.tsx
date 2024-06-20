@@ -22,7 +22,7 @@ import {ChangeEvent, useCallback, useState} from 'react';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {collapseButton, collapseIcon} from 'Components/UserList/UserList.styles';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isEnterKey, isSpaceKey} from 'Util/KeyboardUtil';
@@ -241,7 +241,7 @@ export const UserList = ({
               data-uie-name="do-toggle-selected-search-list"
             >
               <span css={collapseIcon(isSelectedContactsOpen)} aria-hidden="true">
-                <Icon.Disclose width={16} height={16} />
+                <Icon.DiscloseIcon width={16} height={16} />
               </span>
 
               {t('userListSelectedContacts', selectedUsersCount)}
@@ -269,7 +269,7 @@ export const UserList = ({
             data-uie-name="do-toggle-search-list"
           >
             <span css={collapseIcon(isContactsOpen)} aria-hidden="true">
-              <Icon.Disclose width={16} height={16} />
+              <Icon.DiscloseIcon width={16} height={16} />
             </span>
 
             {t('userListContacts')}

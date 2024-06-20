@@ -22,7 +22,7 @@ import {FC, useEffect} from 'react';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {ServiceDetails} from 'Components/panel/ServiceDetails';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
@@ -109,7 +109,7 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
             onKeyDown={event => handleKeyDown(event, onOpen)}
           >
             <span className="panel__action-item__icon">
-              <Icon.Message />
+              <Icon.MessageIcon />
             </span>
 
             <div className="panel__action-item__text">{t('groupParticipantActionOpenConversation')}</div>
@@ -126,7 +126,7 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
             onKeyDown={event => handleKeyDown(event, () => onRemove(serviceUser))}
           >
             <span className="panel__action-item__icon">
-              <Icon.Minus />
+              <Icon.MinusIcon />
             </span>
 
             <div className="panel__action-item__text">{t('groupParticipantActionRemove')}</div>

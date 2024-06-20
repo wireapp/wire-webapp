@@ -27,7 +27,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {ErrorFallback} from 'Components/ErrorFallback';
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {UserClassifiedBar} from 'Components/input/ClassifiedBar';
 import {UserBlockedBadge} from 'Components/UserBlockedBadge/UserBlockedBadge';
 import {UserInfo} from 'Components/UserInfo';
@@ -103,7 +103,7 @@ const UserDetailsComponent: React.FC<UserDetailsProps> = ({
 
       {badge && (
         <div className="panel-participant__label panel-participant__label--external" data-uie-name="status-external">
-          <Icon.External />
+          <Icon.ExternalIcon />
           <span>{badge}</span>
         </div>
       )}
@@ -116,14 +116,14 @@ const UserDetailsComponent: React.FC<UserDetailsProps> = ({
 
       {participant.isFederated && (
         <div className="panel-participant__label" data-uie-name="status-federated-user">
-          <Icon.Federation />
+          <Icon.FederationIcon />
           <span>{t('conversationFederationIndicator')}</span>
         </div>
       )}
 
       {user.isDirectGuest && user.isAvailable && (
         <div className="panel-participant__label" data-uie-name="status-guest">
-          <Icon.Guest />
+          <Icon.GuestIcon />
           <span>{t('conversationGuestIndicator')}</span>
         </div>
       )}
@@ -136,7 +136,7 @@ const UserDetailsComponent: React.FC<UserDetailsProps> = ({
 
       {isGroupAdmin && (
         <div className="panel-participant__label" data-uie-name="status-admin">
-          <Icon.GroupAdmin />
+          <Icon.GroupAdminIcon />
           <span>{t('conversationDetailsGroupAdmin')}</span>
         </div>
       )}
