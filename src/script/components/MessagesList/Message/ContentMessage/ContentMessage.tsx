@@ -34,7 +34,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getMessageAriaLabel} from 'Util/conversationMessages';
 
 import {ContentAsset} from './asset';
-import {deliveredMessageIndicator, messageBodyWrapper} from './ContentMessage.styles';
+import {deliveredMessageIndicator, messageBodyWrapper, messageEphemeralTimer} from './ContentMessage.styles';
 import {MessageActionsMenu} from './MessageActions/MessageActions';
 import {useMessageActionsState} from './MessageActions/MessageActions.state';
 import {MessageReactionsList} from './MessageActions/MessageReactions/MessageReactionsList';
@@ -157,6 +157,7 @@ export const ContentMessageComponent = ({
   const isImageMessage = !!asset?.isImage();
 
   const isAssetMessage = isFileMessage || isAudioMessage || isVideoMessage || isImageMessage;
+  const isEphemeralMessage = ephemeral_status === EphemeralStatusType.ACTIVE;
 
   const hideActionMenuVisibility = () => {
     if (isFocused) {
@@ -199,7 +200,13 @@ export const ContentMessageComponent = ({
         </MessageHeader>
       )}
 
-      <div css={messageBodyWrapper}>
+      <div css={messageBodyWrapper(isEphemeralMessage)}>
+        {isEphemeralMessage && (
+          <div css={messageEphemeralTimer} {...(ephemeralCaption && {title: ephemeralCaption})}>
+            <EphemeralTimer message={message} />
+          </div>
+        )}
+
         <div
           className={cx('message-body', {
             'message-asset': isAssetMessage,
@@ -208,14 +215,7 @@ export const ContentMessageComponent = ({
             'icon-file': isObfuscated && isFileMessage,
             'icon-movie': isObfuscated && isVideoMessage,
           })}
-          {...(ephemeralCaption && {title: ephemeralCaption})}
         >
-          {ephemeral_status === EphemeralStatusType.ACTIVE && (
-            <div className="message-ephemeral-timer">
-              <EphemeralTimer message={message} />
-            </div>
-          )}
-
           {quote && (
             <Quote
               conversation={conversation}
