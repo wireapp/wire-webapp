@@ -188,7 +188,7 @@ export const MessagesList: FC<MessagesListParams> = ({
     if (lastMessage) {
       if (!isLastReceivedMessage(lastMessage, conversation)) {
         // if the last loaded message is not the last of the conversation, we load the subsequent messages
-        conversationRepository.getSubsequentMessages(conversation, lastMessage as ContentMessage);
+        conversationRepository.getSubsequentMessages(conversation, lastMessage);
       }
     }
   };
