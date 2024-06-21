@@ -972,7 +972,7 @@ export class ConversationRepository {
    * Get subsequent messages starting with the given message.
    * @returns Resolves with the messages
    */
-  async getSubsequentMessages(conversationEntity: Conversation, messageEntity: ContentMessage) {
+  async getSubsequentMessages(conversationEntity: Conversation, messageEntity: Message) {
     const messageDate = new Date(messageEntity.timestamp());
     conversationEntity.isLoadingMessages(true);
 
