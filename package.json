@@ -148,7 +148,7 @@
     "ts-node": "10.9.2",
     "tsc-watch": "6.2.0",
     "typescript": "5.4.5",
-    "webpack": "5.92.0",
+    "webpack": "5.92.1",
     "webpack-cli": "5.1.4",
     "webpack-dev-middleware": "7.2.1",
     "webpack-hot-middleware": "2.26.1",
