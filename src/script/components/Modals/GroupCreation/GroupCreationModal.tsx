@@ -30,7 +30,7 @@ import {Button, ButtonVariant, Select} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {ModalComponent} from 'Components/ModalComponent';
 import {SearchInput} from 'Components/SearchInput';
 import {TextInput} from 'Components/TextInput';
@@ -338,7 +338,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
               aria-label={t('accessibility.groupCreationParticipantsActionBack')}
               data-uie-name="go-back"
             >
-              <Icon.ArrowLeft aria-hidden="true" className="modal__header__button" />
+              <Icon.ArrowLeftIcon aria-hidden="true" className="modal__header__button" />
             </button>
 
             <h2 id="group-creation-label" className="modal__header__title" data-uie-name="status-people-selected">
@@ -369,7 +369,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
               aria-label={t('accessibility.groupCreationActionCloseModal')}
               data-uie-name="do-close"
             >
-              <Icon.Close aria-hidden="true" className="modal__header__button" />
+              <Icon.CloseIcon aria-hidden="true" className="modal__header__button" />
             </button>
 
             <h2 id="group-creation-label" className="modal__header__title">

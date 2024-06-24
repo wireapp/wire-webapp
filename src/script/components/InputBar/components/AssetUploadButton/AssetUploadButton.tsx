@@ -21,7 +21,7 @@ import {useRef} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
 interface AssetUploadButtonProps {
@@ -56,7 +56,7 @@ export const AssetUploadButton = ({onSelectFiles, acceptedFileTypes}: AssetUploa
         onClick={() => fileRef.current?.click()}
         data-uie-name="do-share-file"
       >
-        <Icon.Attachment />
+        <Icon.AttachmentIcon />
         <input
           ref={fileRef}
           accept={acceptedFileTypes?.join(',')}

@@ -28,7 +28,7 @@ import {IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-ki
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {ConversationVerificationBadges} from 'Components/VerificationBadge';
 import {User} from 'src/script/entity/User';
@@ -294,7 +294,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
                 data-uie-name="do-video-call"
                 disabled={isReadOnlyConversation}
               >
-                <Icon.Camera />
+                <Icon.CameraIcon />
               </button>
             )}
 
@@ -311,7 +311,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
               data-uie-name="do-call"
               disabled={isReadOnlyConversation}
             >
-              <Icon.Pickup />
+              <Icon.PickupIcon />
             </button>
           </div>
         )}
@@ -337,7 +337,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
                 data-uie-name="do-call"
                 disabled={isReadOnlyConversation}
               >
-                <Icon.Pickup />
+                <Icon.PickupIcon />
               </IconButton>
             )}
           </>
@@ -350,7 +350,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
             className={cx('conversation-title-bar-icon', {active: isRightSidebarOpen})}
             data-uie-name="do-open-info"
           >
-            <Icon.Info />
+            <Icon.InfoIcon />
           </button>
         )}
       </li>

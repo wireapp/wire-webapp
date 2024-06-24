@@ -26,7 +26,7 @@ import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {EnrichedFields} from 'Components/panel/EnrichedFields';
 import {UserActions, Actions} from 'Components/panel/UserActions';
 import {UserDetails} from 'Components/panel/UserDetails';
@@ -159,7 +159,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
               type="button"
             >
               <span className="panel__action-item__icon">
-                <Icon.Devices />
+                <Icon.DevicesIcon />
               </span>
 
               <span className="panel__action-item__text">{t('conversationDetailsActionDevices')}</span>
@@ -183,7 +183,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
                 onKeyDown={(event: React.KeyboardEvent<HTMLElement>) => handleKeyDown(event, toggleAdmin)}
               >
                 <span className="panel__action-item__icon">
-                  <Icon.GroupAdmin />
+                  <Icon.GroupAdminIcon />
                 </span>
 
                 <BaseToggle

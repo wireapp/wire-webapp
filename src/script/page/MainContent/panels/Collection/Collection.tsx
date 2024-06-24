@@ -23,7 +23,7 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
@@ -177,7 +177,7 @@ const Collection = ({
         onSelect={() => setDetailCategory('audio')}
         label={t('collectionSectionAudio')}
       >
-        <Icon.MicOn className="collection-header-icon" />
+        <Icon.MicOnIcon className="collection-header-icon" />
       </CollectionSection>
       <CollectionSection
         messages={files}
@@ -201,7 +201,7 @@ const Collection = ({
             onClick={createNavigate(generateConversationUrl(conversation))}
             aria-label={t('fullsearchCancelLabel')}
           >
-            <Icon.Close />
+            <Icon.CloseIcon />
           </button>
         </div>
         <h2 className="content-titlebar-items-center">{display_name}</h2>

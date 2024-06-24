@@ -23,7 +23,7 @@ import {css} from '@emotion/react';
 import {throttle} from 'underscore';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {useConnectionQuality} from 'src/script/hooks/useConnectionQuality';
 import {t} from 'Util/LocalizerUtil';
 import {isScrollable, isScrolledBottom, isScrolledTop} from 'Util/scroll-helpers';
@@ -100,7 +100,7 @@ const ListWrapper = ({
           <header className={`left-list-header left-list-header-${id}`} data-uie-name="conversation-list-header">
             {isSlow && (
               <p className="slow-connection-indicator">
-                <Icon.Network />
+                <Icon.NetworkIcon />
                 <span>{t('internetConnectionSlow')}</span>
               </p>
             )}
@@ -118,7 +118,7 @@ const ListWrapper = ({
                     title={t('tooltipSearchClose')}
                     data-uie-name={`do-close-${id}`}
                   >
-                    <Icon.Close />
+                    <Icon.CloseIcon />
                   </button>
                 )}
               </>

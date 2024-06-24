@@ -21,7 +21,7 @@ import React, {useState} from 'react';
 
 import {Runtime} from '@wireapp/commons';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {ModalComponent} from 'Components/ModalComponent';
 import {User} from 'src/script/entity/User';
 import {t} from 'Util/LocalizerUtil';
@@ -73,7 +73,7 @@ const InviteModal: React.FC<InviteModalProps> = ({selfUser, onClose}) => {
         </h2>
 
         <button type="button" className="modal__header__button" onClick={onClose} data-uie-name="do-close">
-          <Icon.Close />
+          <Icon.CloseIcon />
         </button>
       </div>
 

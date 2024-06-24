@@ -23,7 +23,7 @@ import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {partition} from 'underscore';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {UserList, UserlistMode} from 'Components/UserList';
 import {Conversation} from 'src/script/entity/Conversation';
 import {UserRepository} from 'src/script/user/UserRepository';
@@ -270,7 +270,7 @@ export const PeopleTab = ({
           {!canSearchUnconnectedUsers ? (
             <div className="start-ui-no-search-results__content">
               <span className="start-ui-no-search-results__icon">
-                <Icon.Message />
+                <Icon.MessageIcon />
               </span>
               <p className="start-ui-no-search-results__text" data-uie-name="label-no-search-result">
                 {t('searchNoMatchesPartner')}
@@ -279,7 +279,7 @@ export const PeopleTab = ({
           ) : isFederated ? (
             <div className="start-ui-fed-wrapper">
               <span className="start-ui-fed-wrapper__icon">
-                <Icon.Profile />
+                <Icon.ProfileIcon />
               </span>
               <div className="start-ui-fed-wrapper__text">{t('searchTrySearchFederation')}</div>
               <div className="start-ui-fed-wrapper__button">

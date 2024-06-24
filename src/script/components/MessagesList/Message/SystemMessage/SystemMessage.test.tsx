@@ -26,16 +26,14 @@ import {RenameMessage} from 'src/script/entity/message/RenameMessage';
 import {SystemMessage} from './SystemMessage';
 
 jest.mock('Components/Icon', () => ({
-  Icon: {
-    Edit: () => {
-      return <span data-uie-name="editicon" className="editicon"></span>;
-    },
-    Read: () => {
-      return <span data-uie-name="readicon" className="readicon"></span>;
-    },
-    Timer: () => {
-      return <span data-uie-name="timericon" className="timericon"></span>;
-    },
+  EditIcon: () => {
+    return <span data-uie-name="editicon" className="editicon"></span>;
+  },
+  ReadIcon: () => {
+    return <span data-uie-name="readicon" className="readicon"></span>;
+  },
+  TimerIcon: () => {
+    return <span data-uie-name="timericon" className="timericon"></span>;
   },
   __esModule: true,
 }));
