@@ -279,10 +279,6 @@ export const Conversation = ({
   };
 
   const handleMarkdownLinkClick = (event: MouseEvent | KeyboardEvent, messageDetails: MessageDetails) => {
-    if (isAuxRightClickEvent(event)) {
-      // Default browser behavior on right click
-      return true;
-    }
     const href = messageDetails.href!;
     PrimaryModal.show(PrimaryModal.type.CONFIRM, {
       primaryAction: {
@@ -325,7 +321,7 @@ export const Conversation = ({
       userDomain: '',
     },
   ) => {
-    if (isMouseRightClickEvent(event)) {
+    if (isMouseRightClickEvent(event) || isAuxRightClickEvent(event)) {
       // Default browser behavior on right click
       return true;
     }
