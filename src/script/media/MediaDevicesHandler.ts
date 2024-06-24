@@ -77,6 +77,7 @@ export class MediaDevicesHandler {
   public currentDeviceId: DeviceIds;
   public currentAvailableDeviceId: CurrentAvailableDeviceId;
   public deviceSupport: DeviceSupport;
+  public getMediaDeviceAccessStream?: (withVideo: boolean) => Promise<MediaStream | void>;
   private previousDeviceSupport: PreviousDeviceSupport;
   private onMediaDevicesRefresh?: () => void;
   private devicesAreInit = false;
@@ -161,13 +162,15 @@ export class MediaDevicesHandler {
 
   /**
    * Initialize the list of MediaDevices and subscriptions.
+   * @param withVideo If `withVideo=true`, the camera is also used for initialization.
+   * @return Promise<void>
    */
-  public initializeMediaDevices(): Promise<MediaDeviceInfo[] | void> {
+  public async initializeMediaDevices(withVideo: boolean): Promise<void> {
     if (Runtime.isSupportingUserMedia() && !this.devicesAreInit) {
-      this.devicesAreInit = true;
-      return this.refreshMediaDevices().then(() => {
+      return this.refreshMediaDevices(withVideo).then(() => {
         this.subscribeToObservables();
         this.subscribeToDevices();
+        this.devicesAreInit = true;
       });
     }
     return Promise.resolve();
@@ -249,9 +252,11 @@ export class MediaDevicesHandler {
 
   /**
    * Update list of available MediaDevices.
+   * @param [withVideoTrack=false] If `withVideoTrack=true`, a video track is also created when the device list is read.
+   * This ensures that the video device labels can also be read. This is necessary for initializing the entire device list.
    * @returns Resolves with all MediaDevices when the list has been updated
    */
-  public async refreshMediaDevices(): Promise<MediaDeviceInfo[]> {
+  public async refreshMediaDevices(withVideoTrack = false): Promise<MediaDeviceInfo[]> {
     const setDevices = (type: MediaDeviceType, devices: MediaDeviceInfo[]): void => {
       this.availableDevices[type](devices);
       const currentId = this.currentDeviceId[type];
@@ -273,7 +278,7 @@ export class MediaDevicesHandler {
 
     try {
       this.removeAllDevices();
-      const mediaDevices = await this.enumerateMediaDevices();
+      const mediaDevices = await this.enumerateMediaDevices(withVideoTrack);
 
       if (!mediaDevices) {
         throw new Error('No media devices found');
@@ -345,15 +350,23 @@ export class MediaDevicesHandler {
 
   /**
    * Enumerates all known Media Devices Infos of a System.
+   * @param withVideoTrack If `withVideoTrack=true`, then an audio and video track is created to enforce the device access
+   * permissionm
    * @returns All enumerated MediaDeviceInfos
    */
-  private async enumerateMediaDevices(): Promise<MediaDeviceInfo[]> {
+  private async enumerateMediaDevices(withVideoTrack: boolean): Promise<MediaDeviceInfo[]> {
+    if (!this.getMediaDeviceAccessStream) {
+      return Promise.reject('No `getMediaDeviceAccessStream` query methode handler was set!');
+    }
     // On Firefox, the device labels obtained from ```navigator.mediaDevices.enumerateDevices()``` will also be set to
     // the blank string in the case where there is no more active MediaStream, even though the application has been
     // previously temporarily authorized to access the devices by calling ```navigator.mediaDevices.getUserMedia()```.
-    const mediaPromise = navigator.mediaDevices.getUserMedia({audio: true, video: false});
+    const mediaPromise = this.getMediaDeviceAccessStream(withVideoTrack);
     return mediaPromise.then(stream => {
-      return navigator.mediaDevices.enumerateDevices().then(devices => {
+      if (!stream) {
+        return [];
+      }
+      return window.navigator.mediaDevices.enumerateDevices().then(devices => {
         stream?.getTracks().forEach(track => track.stop());
         return devices;
       });

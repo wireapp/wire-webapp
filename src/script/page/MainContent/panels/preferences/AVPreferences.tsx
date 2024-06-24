@@ -58,7 +58,7 @@ const AVPreferences = ({
   const initializeMediaDevices = async () => {
     setCheckingPermissions(true);
     try {
-      await devicesHandler?.initializeMediaDevices();
+      await devicesHandler?.initializeMediaDevices(true);
     } catch (error) {
       logger.warn(`Initialization of media devices failed: ${error.message}`, error);
     } finally {
@@ -72,6 +72,11 @@ const AVPreferences = ({
 
   return (
     <PreferencesPage title={t('preferencesAV')}>
+      {isCheckingPermissions && (
+        <div className="preferences-av-spinner-select">
+          <div className="icon-spinner spin accent-text"></div>
+        </div>
+      )}
       {!isCheckingPermissions && deviceSupport.audioinput && (
         <MicrophonePreferences
           {...{devicesHandler, streamHandler}}
