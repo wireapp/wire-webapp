@@ -8,18 +8,13 @@ on:
         required: true
         type: choice
         options:
-          - wire-webapp-qa-al2-migration
-          - wire-webapp-mls-al2
-          - wire-webapp-dev
-          - wire-webapp-staging
-          - wire-webapp-prod
+          - wire-webapp-main
           - wire-webapp-qa
           - wire-webapp-mls
-          - wire-webapp-edge
 
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   deploy:
@@ -42,7 +37,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18.16.x
+          node-version: 20.14.x
           cache: 'yarn'
 
       - name: Install JS dependencies
