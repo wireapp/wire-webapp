@@ -20,7 +20,7 @@
 import React from 'react';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {ModalComponent} from 'Components/ModalComponent';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -58,7 +58,7 @@ const ServiceModal: React.FC<ServiceModalProps> = ({
           <>
             <div className="modal__header">
               <button className="modal__header__button" type="button" onClick={onClose} data-uie-name="do-close">
-                <Icon.Close />
+                <Icon.CloseIcon />
               </button>
             </div>
 

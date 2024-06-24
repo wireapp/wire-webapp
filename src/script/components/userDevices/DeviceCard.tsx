@@ -29,7 +29,7 @@ import {splitFingerprint} from 'Util/StringUtil';
 
 import {type ClientEntity} from '../../client/ClientEntity';
 import {FormattedId} from '../../page/MainContent/panels/preferences/DevicesPreferences/components/FormattedId';
-import {Icon} from '../Icon';
+import * as Icon from '../Icon';
 import {LegalHoldDot} from '../LegalHoldDot';
 
 export interface DeviceCardProps {

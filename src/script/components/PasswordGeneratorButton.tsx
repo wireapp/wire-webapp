@@ -21,7 +21,7 @@ import React from 'react';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 import {generateRandomPassword} from 'Util/StringUtil';
 
@@ -38,7 +38,7 @@ const PasswordGeneratorButton: React.FC<PasswordGeneratorButtonProps> = ({passwo
 
   return (
     <Button variant={ButtonVariant.TERTIARY} onClick={generatePassword} data-uie-name="do-generate-password">
-      <Icon.Shield data-uie-name="generate-password-icon" width="16" height="16" css={{marginRight: '10px'}} />
+      <Icon.ShieldIcon data-uie-name="generate-password-icon" width="16" height="16" css={{marginRight: '10px'}} />
       {t('generatePassword')}
     </Button>
   );

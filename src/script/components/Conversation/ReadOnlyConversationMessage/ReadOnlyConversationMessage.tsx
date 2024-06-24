@@ -23,7 +23,7 @@ import ko from 'knockout';
 
 import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {CONVERSATION_READONLY_STATE} from 'src/script/conversation/ConversationRepository';
 import {Conversation} from 'src/script/entity/Conversation';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -124,7 +124,7 @@ const ReadOnlyConversationMessageBase = ({children}: {children: ReactNode}) => {
     <div className="readonly-message-header readonly-message-container">
       <div className="readonly-message-header-icon readonly-message-header-icon--svg">
         <div>
-          <Icon.Info />
+          <Icon.InfoIcon />
         </div>
       </div>
       <p className="readonly-message-header-label" data-uie-name="element-readonly-conversation">

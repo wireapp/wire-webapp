@@ -24,7 +24,7 @@ import cx from 'classnames';
 import {isEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import {Icon} from './Icon';
+import * as Icon from './Icon';
 
 import type {User} from '../entity/User';
 import {MAX_HANDLE_LENGTH} from '../user/UserHandleGenerator';
@@ -103,7 +103,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
               onClick={() => setInput('')}
               aria-label={t('accessibility.searchInput.cancel')}
             >
-              <Icon.Close css={{fill: 'var(--text-input-background)', height: 8, width: 8}} />
+              <Icon.CloseIcon css={{fill: 'var(--text-input-background)', height: 8, width: 8}} />
             </button>
           )}
         </div>

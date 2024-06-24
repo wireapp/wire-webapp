@@ -21,7 +21,7 @@ import {useRef} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
 interface ImageUploadButtonProps {
@@ -54,7 +54,7 @@ export const ImageUploadButton = ({onSelectImages, acceptedImageTypes}: ImageUpl
         onClick={() => imageRef.current?.click()}
         data-uie-name="do-share-image"
       >
-        <Icon.Image />
+        <Icon.ImageIcon />
 
         <input
           ref={imageRef}

@@ -25,7 +25,7 @@ import {singleActionButtonStyle} from './SingleAction.styles';
 
 export interface MenuItem {
   click: () => void;
-  icon: string;
+  Icon: React.FC<React.SVGProps<SVGSVGElement>>;
   identifier: string;
   label: string;
 }

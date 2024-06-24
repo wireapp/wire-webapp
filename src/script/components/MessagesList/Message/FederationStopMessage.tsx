@@ -21,7 +21,7 @@ import React from 'react';
 
 import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {Config} from 'src/script/Config';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -47,7 +47,7 @@ const FederationStopMessage: React.FC<FederationStopMessageProps> = ({message, i
     <div className="message-header">
       <div className="message-header-icon message-header-icon--svg">
         <div>
-          <Icon.Info />
+          <Icon.InfoIcon />
         </div>
       </div>
       <div

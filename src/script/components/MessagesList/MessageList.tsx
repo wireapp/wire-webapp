@@ -46,7 +46,6 @@ import {groupMessagesBySenderAndTime, isMarker} from './utils/messagesGroup';
 import {updateScroll, FocusedElement} from './utils/scrollUpdater';
 
 import {Conversation} from '../../entity/Conversation';
-import {isContentMessage} from '../../guards/Message';
 
 interface MessagesListParams {
   cancelConnectionRequest: (message: MemberMessage) => void;
@@ -189,9 +188,7 @@ export const MessagesList: FC<MessagesListParams> = ({
     if (lastMessage) {
       if (!isLastReceivedMessage(lastMessage, conversation)) {
         // if the last loaded message is not the last of the conversation, we load the subsequent messages
-        if (isContentMessage(lastMessage)) {
-          conversationRepository.getSubsequentMessages(conversation, lastMessage);
-        }
+        conversationRepository.getSubsequentMessages(conversation, lastMessage);
       }
     }
   };

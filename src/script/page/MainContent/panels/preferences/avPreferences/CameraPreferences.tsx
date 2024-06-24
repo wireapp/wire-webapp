@@ -19,7 +19,7 @@
 
 import React, {useEffect, useRef, useState} from 'react';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {MediaDeviceType} from 'src/script/media/MediaDeviceType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -120,7 +120,7 @@ const CameraPreferences: React.FC<CameraPreferencesProps> = ({
         devices={availableDevices as MediaDeviceInfo[]}
         value={currentDeviceId}
         defaultDeviceName={t('preferencesAVCamera')}
-        icon={Icon.Camera}
+        icon={Icon.CameraIcon}
         isRequesting={isRequesting}
         onChange={deviceId => devicesHandler.currentDeviceId[MediaDeviceType.VIDEO_INPUT](deviceId)}
         title={t('preferencesAVCamera')}

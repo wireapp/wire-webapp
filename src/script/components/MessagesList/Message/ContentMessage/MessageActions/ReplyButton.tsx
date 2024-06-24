@@ -19,7 +19,7 @@
 
 import {FC} from 'react';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
 import {getActionsMenuCSS, getIconCSS, messageActionsMenuButton} from './MessageActions.styles';
@@ -54,7 +54,7 @@ const ReplyButton: FC<ReplyButtonProps> = ({
       onClick={onReplyClick}
       onKeyDown={onKeyPress}
     >
-      <Icon.Reply className="svg-icon" css={reactionImgSize} />
+      <Icon.ReplyIcon className="svg-icon" css={reactionImgSize} />
     </button>
   );
 };

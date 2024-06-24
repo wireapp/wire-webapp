@@ -14,6 +14,9 @@ node_modules
 npm-debug.log
 yarn-error.log
 
+# auto generated source files
+/src/script/components/Icon.tsx
+
 # yarn 2 - not using zero-installs
 .pnp.*
 .yarn/*
