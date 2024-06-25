@@ -435,12 +435,6 @@ export const InputBar = ({
     });
   };
 
-  const onWindowClick = (event: Event): void =>
-    handleClickOutsideOfInputBar(event, () => {
-      cancelMessageEditing(true);
-      cancelMessageReply();
-    });
-
   useEffect(() => {
     amplify.subscribe(WebAppEvents.CONVERSATION.IMAGE.SEND, uploadImages);
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REPLY, replyMessage);
@@ -458,7 +452,7 @@ export const InputBar = ({
   }, []);
 
   const saveDraft = async (editorState: string) => {
-    await saveDraftState(storageRepository, conversation, editorState, replyMessageEntity?.id);
+    await saveDraftState(storageRepository, conversation, editorState, replyMessageEntity?.id, editedMessage?.id);
   };
 
   const loadDraft = async () => {
@@ -469,6 +463,12 @@ export const InputBar = ({
         if (replyEntity?.isReplyable()) {
           setReplyMessageEntity(replyEntity);
         }
+      });
+    }
+
+    if (draftState.editedMessage) {
+      void draftState.editedMessage.then(editedMessage => {
+        setEditedMessage(editedMessage);
       });
     }
 
@@ -498,6 +498,15 @@ export const InputBar = ({
   }, [replyMessageEntity]);
 
   useEffect(() => {
+    const onWindowClick = (event: Event): void =>
+      handleClickOutsideOfInputBar(event, () => {
+        // We want to add a timeout in case the click happens because the user switched conversation and the component is unmounting.
+        // In this case we want to keep the edited message for this conversation
+        setTimeout(() => {
+          cancelMessageEditing(true);
+          cancelMessageReply();
+        });
+      });
     if (isEditing) {
       window.addEventListener('click', onWindowClick);
 
@@ -507,7 +516,7 @@ export const InputBar = ({
     }
 
     return () => undefined;
-  }, [isEditing]);
+  }, [cancelMessageEditing, cancelMessageReply, isEditing]);
 
   useFilePaste(checkFileSharingPermission(handlePasteFiles));
 

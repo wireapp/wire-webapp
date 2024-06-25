@@ -25,6 +25,7 @@ import {StorageKey, StorageRepository} from '../../../storage';
 export interface DraftState {
   editorState: string | null;
   messageReply?: Promise<ContentMessage>;
+  editedMessage?: Promise<ContentMessage>;
 }
 
 const generateConversationInputStorageKey = (conversationEntity: Conversation): string =>
@@ -32,25 +33,27 @@ const generateConversationInputStorageKey = (conversationEntity: Conversation): 
 
 export const saveDraftState = async (
   storageRepository: StorageRepository,
-  conversationEntity: Conversation,
+  conversation: Conversation,
   editorState: string,
   replyMessageId?: string,
+  editedMessageId?: string,
 ): Promise<void> => {
   // we only save state for newly written messages
-  const storageKey = generateConversationInputStorageKey(conversationEntity);
+  const storageKey = generateConversationInputStorageKey(conversation);
 
   await storageRepository.storageService.saveToSimpleStorage<any>(storageKey, {
     editorState,
     replyId: replyMessageId,
+    editedMessageId,
   });
 };
 
 export const loadDraftState = async (
-  conversationEntity: Conversation,
+  conversation: Conversation,
   storageRepository: StorageRepository,
   messageRepository: MessageRepository,
 ): Promise<DraftState> => {
-  const storageKey = generateConversationInputStorageKey(conversationEntity);
+  const storageKey = generateConversationInputStorageKey(conversation);
   const storageValue = await storageRepository.storageService.loadFromSimpleStorage<any>(storageKey);
 
   if (typeof storageValue === 'undefined') {
@@ -58,16 +61,26 @@ export const loadDraftState = async (
   }
 
   const replyMessageId = storageValue?.replyId;
+  const editedMessageId = storageValue?.editedMessageId;
 
   let messageReply = null;
 
   if (replyMessageId) {
     const message =
-      (await messageRepository.getMessageInConversationById(conversationEntity, replyMessageId)) ||
-      (await messageRepository.getMessageInConversationByReplacementId(conversationEntity, replyMessageId));
+      (await messageRepository.getMessageInConversationById(conversation, replyMessageId)) ||
+      (await messageRepository.getMessageInConversationByReplacementId(conversation, replyMessageId));
 
     messageReply = messageRepository.ensureMessageSender(message) as Promise<ContentMessage>;
   }
 
-  return {...storageValue, messageReply};
+  let editedMessage = null;
+  if (editedMessageId) {
+    const message =
+      (await messageRepository.getMessageInConversationById(conversation, editedMessageId)) ||
+      (await messageRepository.getMessageInConversationByReplacementId(conversation, editedMessageId));
+
+    editedMessage = messageRepository.ensureMessageSender(message) as Promise<ContentMessage>;
+  }
+
+  return {...storageValue, messageReply, editedMessage};
 };
