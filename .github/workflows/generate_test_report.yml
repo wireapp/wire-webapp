@@ -51,8 +51,15 @@ jobs:
         run: |
           echo -e "COMMIT SHA = ${{ inputs.commit }}" >> ./unit-tests.log
 
-      - name: Save test coverage results
-        uses: actions/upload-artifact@v4
-        with:
-          name: code-coverage-report
-          path: ./unit-tests.log
+      - name: Install AWS CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y awscli
+
+      - name: Upload unit-tests.log to S3
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: eu-west-1
+        run: |
+          aws s3 cp ${{ env.UNIT_TEST_REPORT_FILE }} s3://your-bucket-name/path/to/unit-tests.log
