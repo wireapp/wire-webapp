@@ -24,8 +24,8 @@ import {StorageKey, StorageRepository} from '../../../storage';
 
 export interface DraftState {
   editorState: string | null;
-  messageReply?: Promise<ContentMessage>;
-  editedMessage?: Promise<ContentMessage>;
+  messageReply?: ContentMessage;
+  editedMessage?: ContentMessage;
 }
 
 const generateConversationInputStorageKey = (conversationEntity: Conversation): string =>
@@ -65,21 +65,20 @@ export const loadDraftState = async (
 
   let messageReply = null;
 
-  if (replyMessageId) {
+  const loadMessage = async (messageId: string) => {
     const message =
-      (await messageRepository.getMessageInConversationById(conversation, replyMessageId)) ||
-      (await messageRepository.getMessageInConversationByReplacementId(conversation, replyMessageId));
+      (await messageRepository.getMessageInConversationById(conversation, messageId)) ||
+      (await messageRepository.getMessageInConversationByReplacementId(conversation, messageId));
+    return messageRepository.ensureMessageSender(message);
+  };
 
-    messageReply = messageRepository.ensureMessageSender(message) as Promise<ContentMessage>;
+  if (replyMessageId) {
+    messageReply = await loadMessage(replyMessageId);
   }
 
   let editedMessage = null;
   if (editedMessageId) {
-    const message =
-      (await messageRepository.getMessageInConversationById(conversation, editedMessageId)) ||
-      (await messageRepository.getMessageInConversationByReplacementId(conversation, editedMessageId));
-
-    editedMessage = messageRepository.ensureMessageSender(message) as Promise<ContentMessage>;
+    editedMessage = await loadMessage(editedMessageId);
   }
 
   return {...storageValue, messageReply, editedMessage};

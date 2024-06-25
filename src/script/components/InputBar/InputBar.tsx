@@ -458,18 +458,14 @@ export const InputBar = ({
   const loadDraft = async () => {
     const draftState = await loadDraftState(conversation, storageRepository, messageRepository);
 
-    if (draftState.messageReply) {
-      void draftState.messageReply.then(replyEntity => {
-        if (replyEntity?.isReplyable()) {
-          setReplyMessageEntity(replyEntity);
-        }
-      });
+    const reply = draftState.messageReply;
+    if (reply?.isReplyable()) {
+      setReplyMessageEntity(reply);
     }
 
-    if (draftState.editedMessage) {
-      void draftState.editedMessage.then(editedMessage => {
-        setEditedMessage(editedMessage);
-      });
+    const editedMessage = draftState.editedMessage;
+    if (editedMessage) {
+      setEditedMessage(editedMessage);
     }
 
     return draftState;
