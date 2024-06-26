@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [46.0.17](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.0.16...@wireapp/core@46.0.17) (2024-06-26)
+
+### Bug Fixes
+
+* Improve logger verbosity ([#6324](https://github.com/wireapp/wire-web-packages/issues/6324)) ([4268789](https://github.com/wireapp/wire-web-packages/commit/4268789a05898595716236676851ac417cfa3284))
+
 ## [46.0.16](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.0.15...@wireapp/core@46.0.16) (2024-06-20)
 
 **Note:** Version bump only for package @wireapp/core
