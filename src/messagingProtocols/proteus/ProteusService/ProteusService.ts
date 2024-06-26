@@ -106,11 +106,12 @@ export class ProteusService {
     }
 
     if (!cryptoMigrationStore.coreCrypto.isReady(dbName) && this.cryptoClient.migrateFromCryptobox) {
-      this.logger.info(`Migrating data from cryptobox store (${dbName}) to corecrypto.`);
+      this.logger.info(`Migrating from cryptobox to corecrypto.`);
       try {
+        const startTime = Date.now();
         await this.cryptoClient.migrateFromCryptobox(dbName);
         cryptoMigrationStore.coreCrypto.markAsReady(dbName);
-        this.logger.info(`Successfully migrated from cryptobox store (${dbName}) to corecrypto.`);
+        this.logger.info(`Successfully migrated from cryptobox to corecrypto (took ${Date.now() - startTime}ms).`);
       } catch (error) {
         this.logger.error('Client was not able to perform DB migration: ', error);
       }
