@@ -283,7 +283,7 @@ jobs:
                 "targets": "[\"wire-webapp-mls-al2\"]"
               },
               "staging": {
-                "targets": "[\"wire-webapp-staging-al2\"]"
+                "targets": "[\"wire-webapp-staging\"]"
               }
             }
           export_to: env
