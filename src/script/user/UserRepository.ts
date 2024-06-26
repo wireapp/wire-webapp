@@ -52,7 +52,6 @@ import {matchQualifiedIds} from 'Util/QualifiedId';
 import {fixWebsocketString} from 'Util/StringUtil';
 import {isAxiosError, isBackendError} from 'Util/TypePredicateUtil';
 
-import {valueFromType} from './AvailabilityMapper';
 import {showAvailabilityModal} from './AvailabilityModal';
 import {ConsentValue} from './ConsentValue';
 import {UserMapper} from './UserMapper';
@@ -383,13 +382,12 @@ export class UserRepository extends TypedEventEmitter<Events> {
       };
     });
 
-    this.logger.log(`Found locally stored clients for '${userIds.length}' users`, recipients);
     const userEntities = await this.getUsersById(userIds);
     userEntities.forEach(userEntity => {
       const clientEntities = recipients[userEntity.id];
       const tooManyClients = clientEntities.length > 8;
       if (tooManyClients) {
-        this.logger.warn(`Found '${clientEntities.length}' clients for '${userEntity.name()}'`);
+        this.logger.debug(`Found '${clientEntities.length}' clients for '${userEntity.name()}'`);
       }
       userEntity.devices(clientEntities);
     });
@@ -491,15 +489,10 @@ export class UserRepository extends TypedEventEmitter<Events> {
       return;
     }
     const hasAvailabilityChanged = availability !== selfUser.availability();
-    const newAvailabilityValue = valueFromType(availability);
     if (hasAvailabilityChanged) {
-      const oldAvailabilityValue = valueFromType(selfUser.availability());
-      this.logger.log(`Availability was changed from '${oldAvailabilityValue}' to '${newAvailabilityValue}'`);
       await this.updateUser(selfUser.qualifiedId, {availability});
       amplify.publish(WebAppEvents.TEAM.UPDATE_INFO);
       showAvailabilityModal(availability);
-    } else {
-      this.logger.log(`Availability was again set to '${newAvailabilityValue}'`);
     }
   };
 
@@ -1049,13 +1042,9 @@ export class UserRepository extends TypedEventEmitter<Events> {
         if (isMarketingConsent) {
           const hasGivenConsent = consentValue === ConsentValue.GIVEN;
           this.propertyRepository.marketingConsent(hasGivenConsent);
-
-          this.logger.log(`Marketing consent retrieved as '${consentValue}'`);
           return;
         }
       }
-
-      this.logger.log(`Marketing consent not set. Defaulting to '${this.propertyRepository.marketingConsent()}'`);
     } catch (error) {
       this.logger.warn(`Failed to retrieve marketing consent: ${error.message || error.code}`, error);
     }
