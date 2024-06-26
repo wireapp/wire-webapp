@@ -118,7 +118,11 @@ export const EmptyConversationList = ({currentTab, onChangeTab, searchValue = ''
     return (
       <div css={wrapper}>
         <div>
-          <p css={paragraph}>{searchValue ? t('searchConversationsNoResult') : t('conversationDirectEmptyMessage')}</p>
+          <p css={paragraph}>
+            {searchValue
+              ? t('searchConversationsNoResult')
+              : t('conversationDirectEmptyMessage', {brandName: Config.getConfig().BRAND_NAME})}
+          </p>
 
           <ConnectWithNewUsersButton />
         </div>
