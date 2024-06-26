@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [46.0.18](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.0.17...@wireapp/core@46.0.18) (2024-06-26)
+
+### Bug Fixes
+
+* Improve coreCrypto migration logs ([#6325](https://github.com/wireapp/wire-web-packages/issues/6325)) ([aa861e9](https://github.com/wireapp/wire-web-packages/commit/aa861e9743164dca41cac0f0bbac7c116667a9e6))
+
 ## [46.0.17](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.0.16...@wireapp/core@46.0.17) (2024-06-26)
 
 ### Bug Fixes
