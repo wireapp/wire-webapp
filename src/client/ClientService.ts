@@ -118,14 +118,13 @@ export class ClientService {
     } catch (error) {
       const notFoundOnBackend = axios.isAxiosError(error) ? error.response?.status === StatusCodes.NOT_FOUND : false;
       if (notFoundOnBackend && this.storeEngine) {
-        this.logger.log('Could not find valid client on backend');
         const shouldDeleteWholeDatabase = loadedClient.type === ClientType.TEMPORARY;
-        this.logger.log('Deleting previous identity');
         await this.proteusService.wipe(this.storeEngine);
         if (shouldDeleteWholeDatabase) {
-          this.logger.log('Last client was temporary - Deleting content database');
           await this.storeEngine.clearTables();
         }
+        const log = `No valid client on backend, deleting identity (deleting content: ${shouldDeleteWholeDatabase ? 'yes' : 'no'})`;
+        this.logger.warn(log);
       }
     }
     return undefined;

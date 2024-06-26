@@ -604,13 +604,13 @@ export class MLSService extends TypedEventEmitter<Events> {
    * @returns true if the client has successfully established the group, false otherwise
    */
   public readonly tryEstablishingMLSGroup = async (groupId: string): Promise<boolean> => {
-    this.logger.info(`Trying to establish a MLS group with id ${groupId}.`);
+    this.logger.debug(`Trying to establish a MLS group with id ${groupId}.`);
 
     // Before trying to register a group, check if the group is already established locally.
     // We could have received a welcome message in the meantime.
     const doesMLSGroupExistLocally = await this.conversationExists(groupId);
     if (doesMLSGroupExistLocally) {
-      this.logger.info(`MLS Group with id ${groupId} already exists, skipping the initialisation.`);
+      this.logger.debug(`MLS Group with id ${groupId} already exists, skipping the initialisation.`);
       return false;
     }
 
@@ -620,11 +620,11 @@ export class MLSService extends TypedEventEmitter<Events> {
     } catch (error) {
       // If conversation already existed, locally, nothing more to do, we've received a welcome message.
       if (isCoreCryptoMLSConversationAlreadyExistsError(error)) {
-        this.logger.info(`MLS Group with id ${groupId} already exists, skipping the initialisation.`);
+        this.logger.debug(`MLS Group with id ${groupId} already exists, skipping the initialisation.`);
         return false;
       }
 
-      this.logger.info(`MLS Group with id ${groupId} was not established succesfully, wiping the group locally...`);
+      this.logger.warn(`MLS Group with id ${groupId} was not established succesfully, wiping the group locally...`);
       // Otherwise it's a backend error. Somebody else might have created the group in the meantime.
       // We should wipe the group locally, wait for the welcome message or join later via external commit.
       await this.wipeConversation(groupId);

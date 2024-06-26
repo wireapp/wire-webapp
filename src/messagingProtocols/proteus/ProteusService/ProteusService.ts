@@ -313,9 +313,9 @@ export class ProteusService {
       if (!sessionExists) {
         await this.cryptoClient.saveSession(sessionId);
         this.config.onNewClient?.({userId, clientId});
-        this.logger.info(`Created a new session from message for session ID "${sessionId}" and decrypted the message`);
+        this.logger.debug(`Created a new session from message for session ID "${sessionId}" and decrypted the message`);
       } else {
-        this.logger.info(`Decrypted message for session ID "${sessionId}"`);
+        this.logger.debug(`Decrypted message for session ID "${sessionId}"`);
       }
 
       return decryptedMessage;
