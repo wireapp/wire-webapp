@@ -44,7 +44,7 @@ export class BackupService {
     const tableCount = await table.count();
     const parallelBatchDriver = new DexieBatch({batchSize: BackupService.CONFIG.BATCH_SIZE, limit: tableCount});
     const batchCount = await parallelBatchDriver.eachBatch(collection, batch => onProgress(batch));
-    this.logger.log(`Exported store '${table.name}' in '${batchCount}' batches`);
+    this.logger.debug(`Exported store '${table.name}' in '${batchCount}' batches`);
   }
 
   getDatabaseVersion(): number {
