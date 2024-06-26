@@ -435,7 +435,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
   private async matchesEpoch(groupId: string, backendEpoch: number): Promise<boolean> {
     const localEpoch = await this.mlsService.getEpoch(groupId);
 
-    this.logger.log(
+    this.logger.debug(
       `Comparing conversation's (group_id: ${groupId}) local and backend epoch number: {local: ${String(
         localEpoch,
       )}, backend: ${backendEpoch}}`,
@@ -445,7 +445,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
   }
 
   public async handleConversationsEpochMismatch() {
-    this.logger.info(`There were some missed messages, handling possible epoch mismatch in MLS conversations.`);
+    this.logger.warn(`There were some missed messages, handling possible epoch mismatch in MLS conversations.`);
 
     //fetch all the mls conversations from backend
     const conversations = await this.apiClient.api.conversation.getConversationList();
@@ -472,7 +472,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
     } = subconversation;
 
     if (await this.hasEpochMismatch(groupId, epoch)) {
-      this.logger.log(
+      this.logger.warn(
         `Subconversation "${subconversationId}" (parent id: ${parentConversationId.id}) was not established or its epoch number was out of date, joining via external commit`,
       );
 
@@ -501,7 +501,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
     const {qualified_id: qualifiedId, group_id: groupId, epoch} = remoteMlsConversation;
 
     if (await this.hasEpochMismatch(groupId, epoch)) {
-      this.logger.log(
+      this.logger.warn(
         `Conversation (id ${qualifiedId.id}) was not established or it's epoch number was out of date, joining via external commit`,
       );
 
@@ -553,7 +553,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
     otherUserId: QualifiedId,
     shouldRetry = true,
   ): Promise<MLSConversation> => {
-    this.logger.info(`Trying to establish a MLS 1:1 conversation with user ${otherUserId.id}...`);
+    this.logger.debug(`Trying to establish a MLS 1:1 conversation with user ${otherUserId.id}...`);
 
     // Before trying to register a group, check if the group is already established o backend.
     // If remote epoch is higher than 0, it means that the group was already established.
@@ -561,7 +561,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
     const mlsConversation = await this.getMLS1to1Conversation(otherUserId);
 
     if (mlsConversation.epoch > 0) {
-      this.logger.info(
+      this.logger.debug(
         `Conversation (id ${mlsConversation.qualified_id.id}) is already established on backend, checking the local epoch...`,
       );
 
@@ -569,13 +569,13 @@ export class ConversationService extends TypedEventEmitter<Events> {
 
       // If group is already established locally, there's nothing more to do
       if (isMLSGroupEstablishedLocally) {
-        this.logger.info(`Conversation (id ${mlsConversation.qualified_id.id}) is already established locally.`);
+        this.logger.debug(`Conversation (id ${mlsConversation.qualified_id.id}) is already established locally.`);
         return mlsConversation;
       }
 
       // If local epoch is 0 it means that we've not received a welcome message
       // We try joining via external commit.
-      this.logger.info(
+      this.logger.debug(
         `Conversation (id ${mlsConversation.qualified_id.id}) is not yet established locally, joining via external commit...`,
       );
 
@@ -594,13 +594,13 @@ export class ConversationService extends TypedEventEmitter<Events> {
 
       return this.getMLS1to1Conversation(otherUserId);
     } catch (error) {
-      this.logger.info(`Could not register MLS group with id ${groupId}: `, error);
-
       if (!shouldRetry) {
+        this.logger.error(`Could not register MLS group with id ${groupId}: `, error);
+
         throw error;
       }
 
-      this.logger.info(
+      this.logger.error(
         `Conversation (id ${mlsConversation.qualified_id.id}) is not established, retrying to establish it`,
       );
       return this.establishMLS1to1Conversation(groupId, selfUser, otherUserId, false);
@@ -630,11 +630,11 @@ export class ConversationService extends TypedEventEmitter<Events> {
     const wasGroupEstablishedBySelfClient = await this.mlsService.tryEstablishingMLSGroup(groupId);
 
     if (!wasGroupEstablishedBySelfClient) {
-      this.logger.info('Group was not established by self client, skipping adding users to the group.');
+      this.logger.debug('Group was not established by self client, skipping adding users to the group.');
       return;
     }
 
-    this.logger.info('Group was established by self client, adding other users to the group...');
+    this.logger.debug('Group was established by self client, adding other users to the group...');
     const usersToAdd: KeyPackageClaimUser[] = [
       ...qualifiedUsers,
       {...selfUserId, skipOwnClientId: this.apiClient.validatedClientId},
@@ -648,9 +648,9 @@ export class ConversationService extends TypedEventEmitter<Events> {
 
     const addedUsers = conversation.members.others;
     if (addedUsers.length > 0) {
-      this.logger.info(`Successfully added ${addedUsers} users to the group.`);
+      this.logger.debug(`Successfully added ${addedUsers} users to the group.`);
     } else {
-      this.logger.info('No other users were added to the group.');
+      this.logger.debug('No other users were added to the group.');
     }
   }
 
@@ -659,7 +659,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
       return await this.mlsService.handleMLSMessageAddEvent(event, this.groupIdFromConversationId);
     } catch (error) {
       if (isCoreCryptoMLSWrongEpochError(error)) {
-        this.logger.info(
+        this.logger.warn(
           `Received message for the wrong epoch in conversation ${event.conversation}, handling epoch mismatch...`,
         );
         const {qualified_conversation: conversationId, subconv} = event;
@@ -715,7 +715,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
           throw new Error('Qualified conversation id is missing in the event');
         }
 
-        this.logger.info(
+        this.logger.warn(
           `Received an orphan welcome message, joining the conversation (${conversationId.id}) via external commit...`,
         );
 

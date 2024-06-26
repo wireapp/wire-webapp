@@ -208,7 +208,7 @@ export class E2EIServiceInternal {
       identity,
       nonce: enrollmentData.nonce,
     });
-    this.logger.log('oidc data', oidcData);
+    this.logger.debug('oidc data', oidcData);
 
     if (!oidcData.data.validated) {
       throw new Error('Error while trying to continue OAuth flow. OIDC challenge not validated');
@@ -226,7 +226,7 @@ export class E2EIServiceInternal {
       expirySecs: 30,
       nonce: oidcData.nonce,
     });
-    this.logger.log('dpop data', dpopData);
+    this.logger.debug('dpop data', dpopData);
 
     if (!isResponseStatusValid(dpopData.data.status)) {
       throw new Error('Error while trying to continue OAuth flow. DPOP challenge not validated');

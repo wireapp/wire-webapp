@@ -203,7 +203,7 @@ export class NotificationService extends TypedEventEmitter<Events> {
     dryRun: boolean = false,
   ): AsyncGenerator<HandledEventPayload> {
     for (const event of notification.payload) {
-      this.logger.log(`Handling event of type "${event.type}" for notification with ID "${notification.id}"`, event);
+      this.logger.debug(`Handling event of type "${event.type}"`, event);
       let lastEventDate: Date | undefined = undefined;
       try {
         lastEventDate = await this.database.getLastEventDate();

@@ -690,15 +690,15 @@ export class Account extends TypedEventEmitter<Events> {
 
   private async initEngine(context: Context, encryptedStore: EncryptedStore): Promise<CRUDEngine> {
     const dbName = this.generateDbName(context);
-    this.logger.log(`Initialising store with name "${dbName}"...`);
+    this.logger.debug(`Initialising store with name "${dbName}"...`);
     const openDb = async () => {
       const dbKey = await generateSecretKey({keyId: 'db-key', keySize: 32, secretsDb: encryptedStore});
       const initializedDb = await this.options.createStore?.(dbName, dbKey.key);
       if (initializedDb) {
-        this.logger.info(`Initialized store with existing engine "${dbName}".`);
+        this.logger.debug(`Initialized store with existing engine "${dbName}".`);
         return initializedDb;
       }
-      this.logger.info(`Initialized store with new memory engine "${dbName}".`);
+      this.logger.debug(`Initialized store with new memory engine "${dbName}".`);
       const memoryEngine = new MemoryEngine();
       await memoryEngine.init(dbName);
       return memoryEngine;
