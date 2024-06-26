@@ -486,7 +486,7 @@ export class BackupRepository {
     const metaData = new TextDecoder().decode(rawData);
     const parsedMetaData = JSON.parse(metaData);
     const archiveVersion = this._verifyMetadata(user, parsedMetaData);
-    this.logger.log('Validated metadata during history import', files);
+    this.logger.debug('Validated metadata during history import', files);
     return archiveVersion;
   }
 
