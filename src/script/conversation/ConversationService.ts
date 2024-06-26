@@ -413,10 +413,7 @@ export class ConversationService {
 
     return this.storageService
       .save(StorageSchemata.OBJECT_STORE.CONVERSATIONS, conversation_et.id, conversationData)
-      .then(() => {
-        this.logger.info(`State of conversation '${conversation_et.id}' was stored`);
-        return conversation_et;
-      });
+      .then(() => conversation_et);
   }
 
   /**
