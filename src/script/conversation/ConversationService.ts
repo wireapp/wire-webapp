@@ -45,8 +45,6 @@ import type {
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
-import {getLogger, Logger} from 'Util/Logger';
-
 import {MLSCapableConversation} from './ConversationSelectors';
 
 import type {Conversation as ConversationEntity} from '../entity/Conversation';
@@ -61,7 +59,6 @@ import {StorageSchemata} from '../storage/StorageSchemata';
 
 export class ConversationService {
   private readonly eventService: EventService;
-  private readonly logger: Logger;
 
   constructor(
     eventService: EventService,
@@ -70,7 +67,6 @@ export class ConversationService {
     private readonly core = container.resolve(Core),
   ) {
     this.eventService = eventService;
-    this.logger = getLogger('ConversationService');
   }
 
   private get coreConversationService() {
