@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [27.0.10](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.0.9...@wireapp/api-client@27.0.10) (2024-06-26)
+
+### Bug Fixes
+
+* Improve logger verbosity ([#6324](https://github.com/wireapp/wire-web-packages/issues/6324)) ([4268789](https://github.com/wireapp/wire-web-packages/commit/4268789a05898595716236676851ac417cfa3284))
+
 ## [27.0.9](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.0.8...@wireapp/api-client@27.0.9) (2024-06-20)
 
 ### Bug Fixes
