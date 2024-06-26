@@ -24,7 +24,7 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {noop, preventFocusOutside} from 'Util/util';
 
-import {Icon} from './Icon';
+import {LoadingIcon} from './Icon';
 
 interface ModalComponentProps extends HTMLProps<HTMLDivElement> {
   children: React.ReactNode;
@@ -155,7 +155,7 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
       {...rest}
     >
       {showLoading ? (
-        <Icon.Loading width="48" height="48" css={{path: {fill: 'var(--modal-bg)'}}} />
+        <LoadingIcon width="48" height="48" css={{path: {fill: 'var(--modal-bg)'}}} />
       ) : (
         <div
           id={trapId}

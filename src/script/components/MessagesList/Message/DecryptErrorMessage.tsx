@@ -19,7 +19,7 @@
 
 import React, {useState} from 'react';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {Config} from 'src/script/Config';
 import {MotionDuration} from 'src/script/motion/MotionDuration';
 import {t} from 'Util/LocalizerUtil';
@@ -90,7 +90,7 @@ const DecryptErrorMessage: React.FC<DecryptErrorMessageProps> = ({message, onCli
         {message.isRecoverable && (
           <div className="message-header-decrypt-reset-session">
             {isResettingSession ? (
-              <Icon.Loading className="accent-fill" data-uie-name="status-loading" />
+              <Icon.LoadingIcon className="accent-fill" data-uie-name="status-loading" />
             ) : (
               <button
                 type="button"

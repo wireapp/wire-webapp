@@ -26,7 +26,7 @@ import {CALL_TYPE} from '@wireapp/avs';
 import {IconButton, IconButtonVariant, Select, useMatchMedia} from '@wireapp/react-ui-kit';
 
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {ConversationClassifiedBar} from 'Components/input/ClassifiedBar';
 import {isMediaDevice} from 'src/script/guards/MediaDevice';
 import {MediaDeviceType} from 'src/script/media/MediaDeviceType';
@@ -388,7 +388,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   right: 0,
                 }}
               >
-                <Icon.ArrowNext css={{left: 4, position: 'relative'}} />
+                <Icon.ArrowNextIcon css={{left: 4, position: 'relative'}} />
               </button>
             )}
             {currentPage !== 0 && (
@@ -405,7 +405,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   left: 0,
                 }}
               >
-                <Icon.ArrowNext css={{position: 'relative', right: 4, transform: 'rotate(180deg)'}} />
+                <Icon.ArrowNextIcon css={{position: 'relative', right: 4, transform: 'rotate(180deg)'}} />
               </button>
             )}
             {!verticalBreakpoint && (
@@ -436,14 +436,14 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   data-uie-name="do-call-controls-video-minimize"
                 >
                   {hasUnreadMessages ? (
-                    <Icon.MessageUnread
+                    <Icon.MessageUnreadIcon
                       css={{
                         marginRight: '-2px',
                         marginTop: '-2px',
                       }}
                     />
                   ) : (
-                    <Icon.Message />
+                    <Icon.MessageIcon />
                   )}
                   <span id="minimize-label" className="video-controls__button__label">
                     {t('videoCallOverlayConversations')}
@@ -469,7 +469,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                     {t('videoCallOverlayMicrophone')}
                   </span>
 
-                  {isMuted ? <Icon.MicOff width={16} height={16} /> : <Icon.MicOn width={16} height={16} />}
+                  {isMuted ? <Icon.MicOffIcon width={16} height={16} /> : <Icon.MicOnIcon width={16} height={16} />}
                 </button>
 
                 {showSwitchMicrophone && (
@@ -508,10 +508,10 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                           menuIsOpen
                           wrapperCSS={{marginBottom: 0}}
                         />
-                        <Icon.Chevron css={{height: '16px'}} />
+                        <Icon.ChevronIcon css={{height: '16px'}} />
                       </>
                     ) : (
-                      <Icon.Chevron css={{rotate: '180deg', height: '16px'}} />
+                      <Icon.ChevronIcon css={{rotate: '180deg', height: '16px'}} />
                     )}
                   </button>
                 )}
@@ -532,9 +532,9 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                     data-uie-name="do-call-controls-toggle-video"
                   >
                     {selfSharesCamera ? (
-                      <Icon.Camera width={16} height={16} />
+                      <Icon.CameraIcon width={16} height={16} />
                     ) : (
-                      <Icon.CameraOff width={16} height={16} />
+                      <Icon.CameraOffIcon width={16} height={16} />
                     )}
 
                     <span id="video-label" className="video-controls__button__label">
@@ -572,10 +572,10 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                           menuIsOpen
                           wrapperCSS={{marginBottom: 0}}
                         />
-                        <Icon.Chevron css={{height: '16px'}} />
+                        <Icon.ChevronIcon css={{height: '16px'}} />
                       </>
                     ) : (
-                      <Icon.Chevron css={{rotate: '180deg', height: '16px'}} />
+                      <Icon.ChevronIcon css={{rotate: '180deg', height: '16px'}} />
                     )}
                   </button>
                 </li>
@@ -601,9 +601,9 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   data-uie-name="do-toggle-screen"
                 >
                   {selfSharesScreen ? (
-                    <Icon.Screenshare width={16} height={16} />
+                    <Icon.ScreenshareIcon width={16} height={16} />
                   ) : (
-                    <Icon.ScreenshareOff width={16} height={16} />
+                    <Icon.ScreenshareOffIcon width={16} height={16} />
                   )}
                   <span id="screen-share-label" className="video-controls__button__label">
                     {t('videoCallOverlayShareScreen')}
@@ -620,7 +620,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   aria-labelledby="leave-label"
                   data-uie-name="do-call-controls-video-call-cancel"
                 >
-                  <Icon.Hangup />
+                  <Icon.HangupIcon />
                   <span id="leave-label" className="video-controls__button__label">
                     {t('videoCallOverlayHangUp')}
                   </span>

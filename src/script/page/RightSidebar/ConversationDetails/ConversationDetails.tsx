@@ -27,7 +27,7 @@ import {HideIcon} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {ConversationProtocolDetails} from 'Components/panel/ConversationProtocolDetails/ConversationProtocolDetails';
 import {EnrichedFields} from 'Components/panel/EnrichedFields';
 import {PanelActions} from 'Components/panel/PanelActions';
@@ -343,7 +343,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
                     data-uie-name="go-add-people"
                   >
                     <span className="panel__action-item__icon">
-                      <Icon.Plus />
+                      <Icon.PlusIcon />
                     </span>
 
                     <span className="panel__action-item__text">{t('conversationDetailsActionAddParticipants')}</span>
@@ -378,7 +378,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
                         data-uie-name="go-conversation-participants"
                       >
                         <span className="panel__action-item__icon">
-                          <Icon.People />
+                          <Icon.PeopleIcon />
                         </span>
 
                         <span className="panel__action-item__text">
@@ -442,7 +442,9 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
 
               {isSingleUserMode && (
                 <div className="panel__info-item" data-uie-name="label-1to1-read-receipts">
-                  <span className="panel__info-item__icon">{hasReceiptsEnabled ? <Icon.Read /> : <HideIcon />}</span>
+                  <span className="panel__info-item__icon">
+                    {hasReceiptsEnabled ? <Icon.ReadIcon /> : <HideIcon />}
+                  </span>
 
                   <span>
                     <p className="panel__action-item__status-title">

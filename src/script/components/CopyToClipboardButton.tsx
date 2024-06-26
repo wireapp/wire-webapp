@@ -21,7 +21,7 @@ import React, {useState} from 'react';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {copyText} from 'Util/ClipboardUtil';
 
 interface CopyToClipboardButtonProps {
@@ -62,7 +62,7 @@ const CopyToClipboardButton: React.FC<CopyToClipboardButtonProps> = ({
       variant={ButtonVariant.TERTIARY}
       data-uie-name="do-copy-to-clipboard"
     >
-      <Icon.Copy data-uie-name="copy-to-clipboard-icon" width="16" height="16" css={{marginRight: '10px'}} />
+      <Icon.CopyIcon data-uie-name="copy-to-clipboard-icon" width="16" height="16" css={{marginRight: '10px'}} />
       {isCopying ? copySuccessText : displayText}
     </Button>
   );

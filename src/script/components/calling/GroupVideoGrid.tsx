@@ -23,7 +23,7 @@ import {css} from '@emotion/react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -133,7 +133,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
               justifyContent: 'center',
             }}
           >
-            <Icon.Loading
+            <Icon.LoadingIcon
               css={{
                 '> path': {
                   fill: 'var(--main-color)',
@@ -182,7 +182,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
           />
           {selfIsMuted && !minimized && (
             <span className="group-video-grid__element__label__icon" data-uie-name="status-call-audio-muted">
-              <Icon.MicOff data-uie-name="mic-icon-off" />
+              <Icon.MicOffIcon data-uie-name="mic-icon-off" />
             </span>
           )}
         </GroupVideoThumbnailWrapper>
@@ -200,7 +200,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
           >
             {selfIsMuted && !minimized && (
               <span className="group-video-grid__element__label__icon" data-uie-name="status-call-audio-muted">
-                <Icon.MicOff data-uie-name="mic-icon-off" />
+                <Icon.MicOffIcon data-uie-name="mic-icon-off" />
               </span>
             )}
             <Avatar

@@ -21,7 +21,7 @@ import React from 'react';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {MemberMessage as MemberMessageEntity} from 'src/script/entity/message/MemberMessage';
 import {User} from 'src/script/entity/User';
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
@@ -98,7 +98,7 @@ export const MemberMessage: React.FC<MemberMessageProps> = ({
       {hasUsers && (
         <div className="message-header">
           <div className="message-header-icon message-header-icon--svg text-foreground">
-            {isGroupCreation && <Icon.Message />}
+            {isGroupCreation && <Icon.MessageIcon />}
             {isMemberRemoval && <span className="icon-minus" />}
             {isMemberJoin && <span className="icon-plus" />}
           </div>
@@ -149,7 +149,7 @@ export const MemberMessage: React.FC<MemberMessageProps> = ({
       {isGroupCreation && hasReadReceiptsTurnedOn && (
         <div className="message-header" data-uie-name="label-group-creation-receipts">
           <div className="message-header-icon message-header-icon--svg text-foreground">
-            <Icon.Read />
+            <Icon.ReadIcon />
           </div>
           <p className="message-header-label">
             <span className="ellipsis">{t('conversationCreateReceiptsEnabled')}</span>
@@ -171,7 +171,7 @@ export const MemberMessage: React.FC<MemberMessageProps> = ({
           </div>
           <div className="message-header">
             <div className="message-header-icon message-header-icon--svg text-foreground">
-              <Icon.Info />
+              <Icon.InfoIcon />
             </div>
             <p className="message-header-label">{t('conversationUnverifiedUserWarning')}</p>
           </div>

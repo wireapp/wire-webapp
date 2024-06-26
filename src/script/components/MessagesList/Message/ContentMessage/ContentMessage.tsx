@@ -23,8 +23,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
 import ko from 'knockout';
 
-import {OutlineCheck} from '@wireapp/react-ui-kit';
-
+import {DeliveredMessage} from 'Components/MessagesList/Message/DeliveredMessage';
 import {ReadIndicator} from 'Components/MessagesList/Message/ReadIndicator';
 import {Conversation} from 'src/script/entity/Conversation';
 import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
@@ -33,11 +32,9 @@ import {useRelativeTimestamp} from 'src/script/hooks/useRelativeTimestamp';
 import {StatusType} from 'src/script/message/StatusType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getMessageAriaLabel} from 'Util/conversationMessages';
-import {t} from 'Util/LocalizerUtil';
-import {checkIsMessageDelivered} from 'Util/util';
 
 import {ContentAsset} from './asset';
-import {deliveredMessageIndicator, messageBodyWrapper} from './ContentMessage.styles';
+import {deliveredMessageIndicator, messageBodyWrapper, messageEphemeralTimer} from './ContentMessage.styles';
 import {MessageActionsMenu} from './MessageActions/MessageActions';
 import {useMessageActionsState} from './MessageActions/MessageActions.state';
 import {MessageReactionsList} from './MessageActions/MessageReactions/MessageReactionsList';
@@ -160,14 +157,13 @@ export const ContentMessageComponent = ({
   const isImageMessage = !!asset?.isImage();
 
   const isAssetMessage = isFileMessage || isAudioMessage || isVideoMessage || isImageMessage;
+  const isEphemeralMessage = ephemeral_status === EphemeralStatusType.ACTIVE;
 
   const hideActionMenuVisibility = () => {
     if (isFocused) {
       setActionMenuVisibility(false);
     }
   };
-
-  const showDeliveredMessageIcon = checkIsMessageDelivered(isLastDeliveredMessage, readReceipts);
 
   // Closing another ActionMenu on outside click
   useClickOutside(messageRef, hideActionMenuVisibility);
@@ -204,7 +200,17 @@ export const ContentMessageComponent = ({
         </MessageHeader>
       )}
 
-      <div css={messageBodyWrapper}>
+      <div css={messageBodyWrapper(isEphemeralMessage)}>
+        {isEphemeralMessage && (
+          <div
+            css={messageEphemeralTimer}
+            {...(ephemeralCaption && {title: ephemeralCaption})}
+            className="message-ephemeral-timer"
+          >
+            <EphemeralTimer message={message} />
+          </div>
+        )}
+
         <div
           className={cx('message-body', {
             'message-asset': isAssetMessage,
@@ -213,14 +219,7 @@ export const ContentMessageComponent = ({
             'icon-file': isObfuscated && isFileMessage,
             'icon-movie': isObfuscated && isVideoMessage,
           })}
-          {...(ephemeralCaption && {title: ephemeralCaption})}
         >
-          {ephemeral_status === EphemeralStatusType.ACTIVE && (
-            <div className="message-ephemeral-timer">
-              <EphemeralTimer message={message} />
-            </div>
-          )}
-
           {quote && (
             <Quote
               conversation={conversation}
@@ -269,11 +268,7 @@ export const ContentMessageComponent = ({
         </div>
 
         <div css={deliveredMessageIndicator}>
-          {showDeliveredMessageIcon && (
-            <div data-uie-name="status-message-read-receipt-delivered" title={t('conversationMessageDelivered')}>
-              <OutlineCheck />
-            </div>
-          )}
+          <DeliveredMessage isLastDeliveredMessage={isLastDeliveredMessage} readReceipts={readReceipts} />
         </div>
       </div>
 

@@ -19,7 +19,7 @@
 
 import cx from 'classnames';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
 interface SendMessageButtonProps {
@@ -38,7 +38,7 @@ export const SendMessageButton = ({disabled, onSend}: SendMessageButtonProps) =>
       data-uie-name="do-send-message"
       onClick={onSend}
     >
-      <Icon.Send />
+      <Icon.SendIcon />
     </button>
   );
 };

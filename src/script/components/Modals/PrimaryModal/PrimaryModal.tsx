@@ -26,7 +26,7 @@ import {Checkbox, CheckboxLabel, COLOR, Form, Link, Text, Input, Loading} from '
 
 import {CopyToClipboardButton} from 'Components/CopyToClipboardButton';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {ModalComponent} from 'Components/ModalComponent';
 import {PasswordGeneratorButton} from 'Components/PasswordGeneratorButton';
 import {Config} from 'src/script/Config';
@@ -268,7 +268,7 @@ export const PrimaryModalComponent: FC = () => {
                   aria-label={closeBtnTitle}
                   data-uie-name="do-close"
                 >
-                  <Icon.Close className="modal__header__icon" aria-hidden="true" />
+                  <Icon.CloseIcon className="modal__header__icon" aria-hidden="true" />
                 </button>
               )}
             </div>

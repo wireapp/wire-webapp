@@ -21,7 +21,7 @@ import React from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {UserInfo} from 'Components/UserInfo';
 import {User} from 'src/script/entity/User';
 import {t} from 'Util/LocalizerUtil';
@@ -72,7 +72,7 @@ export const CallParticipantItemContent = ({
           type="button"
           data-uie-name="participant-menu-icon"
         >
-          <Icon.Chevron />
+          <Icon.ChevronIcon />
         </button>
       )}
     </div>

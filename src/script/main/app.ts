@@ -615,11 +615,7 @@ export class App {
   private async initiateSelfUser() {
     const userEntity = await this.repository.user.getSelf([{position: 'App.initiateSelfUser', vendor: 'webapp'}]);
 
-    this.logger.info(`Loaded self user with ID '${userEntity.id}'`);
-
     if (!userEntity.hasActivatedIdentity()) {
-      this.logger.info('User does not have an activated identity and seems to be a temporary guest');
-
       if (!userEntity.isTemporaryGuest()) {
         throw new Error('User does not have an activated identity');
       }
@@ -663,7 +659,7 @@ export class App {
    */
   private _subscribeToUnloadEvents(selfUser: User): void {
     window.addEventListener('unload', () => {
-      this.logger.info("'window.onunload' was triggered, so we will disconnect from the backend.");
+      this.logger.info("'window.onunload' was triggered, disconnecting from backend.");
       this.repository.event.disconnectWebSocket();
       this.repository.calling.destroy();
 
@@ -793,7 +789,6 @@ export class App {
    * Refresh the web app or desktop wrapper
    */
   readonly refresh = (): void => {
-    this.logger.info('Refresh to update started');
     if (Runtime.isDesktopApp()) {
       // if we are in a desktop env, we just warn the wrapper that we need to reload. It then decide what should be done
       amplify.publish(WebAppEvents.LIFECYCLE.RESTART);

@@ -23,7 +23,7 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {VerifiedIcon} from 'Components/VerifiedIcon';
+import {VerificationIcon} from 'Components/VerifiedIcon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {Declension, joinNames, t} from 'Util/LocalizerUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
@@ -60,7 +60,7 @@ const VerificationMessage: React.FC<VerificationMessageProps> = ({message}) => {
   return (
     <div className="message-header">
       <div className="message-header-icon">
-        <VerifiedIcon isVerified={isTypeVerified} />
+        <VerificationIcon isVerified={isTypeVerified} />
       </div>
       <div
         className="message-header-label message-header-label--verification"

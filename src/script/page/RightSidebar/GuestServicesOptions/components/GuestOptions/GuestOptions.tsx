@@ -24,7 +24,7 @@ import {container} from 'tsyringe';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {RadioGroup} from 'Components/Radio';
 import {SelectText} from 'Components/SelectText';
@@ -279,7 +279,12 @@ const GuestOptions: FC<GuestOptionsProps> = ({
         <p className="guest-options__info-head">
           {hasAccessCode && accessCodeHasPassword ? (
             <span style={{display: 'flex', alignItems: 'center', marginBottom: 8}}>
-              <Icon.Shield data-uie-name="generate-password-icon" width="16" height="16" css={{marginRight: '10px'}} />
+              <Icon.ShieldIcon
+                data-uie-name="generate-password-icon"
+                width="16"
+                height="16"
+                css={{marginRight: '10px'}}
+              />
               {t('guestOptionsInfoPasswordSecured')}
             </span>
           ) : (
@@ -309,7 +314,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
                   >
                     <span className="panel__action-item__default">
                       <span className="panel__action-item__icon">
-                        <Icon.Copy />
+                        <Icon.CopyIcon />
                       </span>
 
                       <span className="panel__action-item__text">{t('guestOptionsCopyLink')}</span>
@@ -317,7 +322,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
 
                     <span className="panel__action-item__alternative">
                       <span className="panel__action-item__icon">
-                        <Icon.Check />
+                        <Icon.CheckIcon />
                       </span>
 
                       <span className="panel__action-item__text" data-uie-name="status-copy-link-done">
@@ -333,7 +338,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
                     onClick={revokeAccessCode}
                   >
                     <span className="panel__action-item__icon">
-                      <Icon.Close />
+                      <Icon.CloseIcon />
                     </span>
 
                     <span className="panel__action-item__text" data-uie-name="do-revoke-link">
@@ -351,7 +356,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
                     onClick={() => requestAccessCode()}
                     data-uie-name="do-create-link"
                   >
-                    <Icon.Link width="16" height="16" css={{marginRight: '10px'}} />
+                    <Icon.LinkIcon width="16" height="16" css={{marginRight: '10px'}} />
                     {t('guestOptionsCreateLink')}
                   </Button>
                 </div>
@@ -385,7 +390,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
                       onClick={createLink}
                       data-uie-name="do-create-link"
                     >
-                      <Icon.Link width="16" height="16" css={{marginRight: '10px'}} />
+                      <Icon.LinkIcon width="16" height="16" css={{marginRight: '10px'}} />
                       {t('guestOptionsCreateLink')}
                     </Button>
                   </div>
@@ -397,7 +402,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
           {!isGuestLinkEnabled && (
             <div className="panel__action-item--info">
               <span className="panel__action-item__icon--info">
-                <Icon.Info />
+                <Icon.InfoIcon />
               </span>
 
               <p className="panel__action-item__text--info" data-uie-name="guest-link-disabled-info">

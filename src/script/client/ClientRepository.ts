@@ -460,7 +460,7 @@ export class ClientRepository {
             if (wasUpdated) {
               // Clear the previous client in DB (in case the domain changes the primary key will also change, thus invalidating the previous client)
               await this.clientService.deleteClientFromDb(client.meta.primary_key);
-              this.logger.info(`Updating local client`);
+              this.logger.debug(`Updating local client`);
               promises.push(this.saveClientInDb(userId, client));
               continue;
             }

@@ -24,7 +24,7 @@ import {amplify} from 'amplify';
 import {Button, ButtonVariant, CircleCloseIcon, Input, SearchIcon} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {ConversationLabel} from 'src/script/conversation/ConversationLabelRepository';
 import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/state';
 import {handleEnterDown} from 'Util/KeyboardUtil';
@@ -112,7 +112,7 @@ export const ConversationHeader = ({
             data-uie-name="go-create-group"
             css={button}
           >
-            <Icon.Plus />
+            <Icon.PlusIcon />
 
             {t('conversationGroupCreate')}
           </Button>

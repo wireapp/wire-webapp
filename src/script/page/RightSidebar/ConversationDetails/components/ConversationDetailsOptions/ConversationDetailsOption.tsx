@@ -19,7 +19,7 @@
 
 import {FC, ReactElement} from 'react';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 
 interface ConversationDetailsOptionProps {
   className: string;

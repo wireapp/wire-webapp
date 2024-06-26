@@ -21,7 +21,7 @@ import React from 'react';
 
 import ko from 'knockout';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {UserBlockedBadge} from 'Components/UserBlockedBadge/UserBlockedBadge';
 import {UserInfo} from 'Components/UserInfo';
 import {UserVerificationBadges} from 'Components/VerificationBadge';

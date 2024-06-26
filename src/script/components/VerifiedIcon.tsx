@@ -19,7 +19,7 @@
 
 import React from 'react';
 
-import {Icon} from './Icon';
+import {VerifiedIcon, NotVerifiedIcon} from './Icon';
 
 export interface VerifiedIconProps {
   className?: string;
@@ -27,15 +27,13 @@ export interface VerifiedIconProps {
   isVerified: boolean;
 }
 
-const VerifiedIcon: React.FC<VerifiedIconProps> = ({isVerified, dataUieName, className}) => {
+export const VerificationIcon: React.FC<VerifiedIconProps> = ({isVerified, dataUieName, className}) => {
   return isVerified ? (
-    <Icon.Verified className={className ?? 'verified-icon'} data-uie-name={dataUieName ?? 'user-device-verified'} />
+    <VerifiedIcon className={className ?? 'verified-icon'} data-uie-name={dataUieName ?? 'user-device-verified'} />
   ) : (
-    <Icon.NotVerified
+    <NotVerifiedIcon
       className={className ?? 'not-verified-icon'}
       data-uie-name={dataUieName ?? 'user-device-not-verified'}
     />
   );
 };
-
-export {VerifiedIcon};
