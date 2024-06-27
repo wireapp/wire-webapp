@@ -47,8 +47,8 @@ export const SystemMessage: React.FC<SystemMessageProps> = ({message}) => {
     return (
       <>
         <SystemMessageBase message={message} isSenderNameVisible icon={<Icon.EditIcon />} />
-        <div className="message-body font-weight-bold" css={messageBodyWrapper()}>
-          {message.name}
+        <div css={messageBodyWrapper()}>
+          <div className="message-body font-weight-bold">{message.name}</div>
         </div>
       </>
     );
