@@ -25,6 +25,8 @@ import {MotionDuration} from 'src/script/motion/MotionDuration';
 import {t} from 'Util/LocalizerUtil';
 import {splitFingerprint} from 'Util/StringUtil';
 
+import {messageBodyWrapper} from './ContentMessage/ContentMessage.styles';
+
 import {DecryptErrorMessage as DecryptErrorMessageEntity} from '../../../entity/message/DecryptErrorMessage';
 import {FormattedId} from '../../../page/MainContent/panels/preferences/DevicesPreferences/components/FormattedId';
 
@@ -71,7 +73,7 @@ const DecryptErrorMessage: React.FC<DecryptErrorMessageProps> = ({message, onCli
         </div>
       </div>
 
-      <div className="message-body message-body-decrypt-error">
+      <div className="message-body message-body-decrypt-error" css={messageBodyWrapper()}>
         <p className="message-header-decrypt-error-label" data-uie-name="status-decrypt-error">
           {message.code && (
             <>
