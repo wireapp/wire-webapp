@@ -26,6 +26,18 @@ function capitalize(string: string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
+function convertToJsx(html: string): string {
+  // convert attributes to camelCase
+  return html.replace(/<(\w+)([^>]*)\/?>/g, (_, tagName: string, attributes: string) => {
+    // Convert attributes to camelCase
+    const camelCaseAttributes = attributes.trim().replace(/[\w-]+="[^"]*"/g, attr => {
+      const [key, value] = attr.split('=');
+      return `${camelize(key)}=${value}`;
+    });
+    return `<${tagName} ${camelCaseAttributes}>`;
+  });
+}
+
 function camelize(str: string) {
   return str
     .replace(/(?:^\w|[A-Z]|[\b\-_]\w)/g, function (word, index) {
@@ -56,7 +68,7 @@ const reactComponents = svgIcons.map(({name, content}) => {
 
   return `export const ${capitalize(camelize(name.replace(/\.svg$/, '')))} = (props: IconProps) => {
     return <svg width="${baseProps.width}" height="${baseProps.height}" viewBox="${baseProps.viewBox}" aria-hidden="true" {...props}>
-      ${svgElement?.innerHTML}
+      ${convertToJsx(svgElement?.innerHTML ?? '')}
       </svg>;
   };`;
 });
