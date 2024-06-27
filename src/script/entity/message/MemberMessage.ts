@@ -42,13 +42,12 @@ export class MemberMessage extends SystemMessage {
   public readonly targetedUsers: ko.PureComputed<User[]>;
   public readonly name: ko.Observable<string>;
   public readonly otherUser: ko.PureComputed<User>;
-  public readonly senderName: ko.PureComputed<string>;
   public readonly showNamedCreation: ko.PureComputed<boolean>;
   public readonly htmlGroupCreationHeader: ko.PureComputed<string>;
   public readonly remoteUserEntities: ko.PureComputed<User[]>;
   public showServicesWarning: boolean;
   public memberMessageType: SystemMessageType;
-  public reason: MemberLeaveReason;
+  public reason?: MemberLeaveReason;
   /** this can be used to check uniqueness of the message. It's computed using the timestamp + users involved in the event */
   public readonly hash: ko.PureComputed<string>;
 
