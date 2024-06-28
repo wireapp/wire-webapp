@@ -19,7 +19,7 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const messageBodyWrapper = (isEphemeralMessage: boolean): CSSObject => ({
+export const messageBodyWrapper = (isEphemeralMessage = false): CSSObject => ({
   display: 'grid',
   gridTemplateColumns: isEphemeralMessage
     ? '64px calc(100% - var(--delivered-state-width) - 64px) var(--delivered-state-width)'
