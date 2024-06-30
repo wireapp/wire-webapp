@@ -37,6 +37,7 @@ import {Participant} from '../../calling/Participant';
 import {useVideoGrid} from '../../calling/videoGridHandler';
 import {MediaRepository} from '../../media/MediaRepository';
 import {CallViewTab} from '../../view_model/CallingViewModel';
+import {PushToTalkHandler} from './PushToTalkHandler';
 
 export interface CallingContainerProps {
   readonly callingRepository: CallingRepository;
@@ -171,6 +172,10 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
           screens={selectableScreens as unknown as Screen[]}
           windows={selectableWindows as unknown as Screen[]}
         />
+      )}
+
+      {joinedCall && Number.isInteger(joinedCall.muteState()) && (
+        <PushToTalkHandler call={joinedCall} callingRepository={callingRepository} />
       )}
     </Fragment>
   );
