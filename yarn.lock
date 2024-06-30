@@ -3579,6 +3579,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@remix-run/router@npm:1.17.0":
+  version: 1.17.0
+  resolution: "@remix-run/router@npm:1.17.0"
+  checksum: 10/bffc96ebe5c5658c2ea0585f7b2b7fd4760366ad63cdc05062f84ea84ba0f88dd70e75d802ed938f08b17be5348a8add8e4eef30e1d6422ea27a0ecb02cda66e
+  languageName: node
+  linkType: hard
+
 "@rollup/plugin-babel@npm:^5.2.0":
   version: 5.3.1
   resolution: "@rollup/plugin-babel@npm:5.3.1"
@@ -14540,6 +14547,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-router@npm:6.24.0":
+  version: 6.24.0
+  resolution: "react-router@npm:6.24.0"
+  dependencies:
+    "@remix-run/router": "npm:1.17.0"
+  peerDependencies:
+    react: ">=16.8"
+  checksum: 10/71d750e4422d74e1981b38f54c0dd02a7af7b1059cab471d96e4dc3374824557f6eec8449fe557c0ed8af18569554de8d565bbfd708c1fc90d3421b3d6c6ac82
+  languageName: node
+  linkType: hard
+
 "react-select@npm:5.7.7":
   version: 5.7.7
   resolution: "react-select@npm:5.7.7"
@@ -17575,7 +17593,7 @@ __metadata:
     react-error-boundary: "npm:4.0.13"
     react-intl: "npm:6.6.8"
     react-redux: "npm:9.1.2"
-    react-router: "npm:6.23.1"
+    react-router: "npm:6.24.0"
     react-router-dom: "npm:6.23.1"
     react-transition-group: "npm:4.4.5"
     redux: "npm:5.0.1"
