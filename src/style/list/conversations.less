@@ -25,6 +25,12 @@
 .conversations-sidebar {
   position: relative;
 
+  &:hover {
+    .conversations-sidebar-handle {
+      display: block;
+    }
+  }
+
   .conversations-sidebar-items {
     display: flex;
     overflow: auto;
@@ -32,6 +38,7 @@
     height: 100vh;
     flex-direction: column;
     padding: 8px;
+    padding-top: 14px;
     border-right: 1px solid var(--border-color);
     background: var(--sidebar-bg);
     transition: width 0.3s ease-in-out;
@@ -50,6 +57,11 @@
       .conversations-sidebar-btn svg {
         width: 16px;
         height: 16px;
+      }
+
+      .folders-open-indicator,
+      .external-link-icon {
+        display: none;
       }
     }
   }
@@ -118,7 +130,7 @@
     background-color: var(--sidebar-folder-selected-bg);
 
     svg {
-      transform: rotate(90deg);
+      transform: rotate(-90deg);
     }
   }
 }
@@ -204,9 +216,17 @@
     margin-bottom: 4px;
   }
 
+  .external-link-icon {
+    margin-left: auto;
+    path {
+      fill: var(--text-input-placeholder);
+    }
+  }
+
   &--text-wrapper {
     position: relative;
     display: flex;
+    width: 100%;
     align-items: center;
     gap: 12px;
   }
@@ -264,6 +284,11 @@
   svg {
     width: 14px;
     height: 14px;
+  }
+
+  svg.folders-open-indicator {
+    width: 8px;
+    margin-left: auto;
   }
 }
 

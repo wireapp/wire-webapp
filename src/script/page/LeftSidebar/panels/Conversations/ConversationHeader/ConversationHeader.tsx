@@ -113,8 +113,6 @@ export const ConversationHeader = ({
             css={button}
           >
             <Icon.PlusIcon />
-
-            {t('conversationGroupCreate')}
           </Button>
         )}
       </div>

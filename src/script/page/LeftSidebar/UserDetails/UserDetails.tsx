@@ -115,6 +115,7 @@ const UserDetailsComponent = ({user, isTeam = false, groupId, isSideBarOpen = fa
               tabIndex={TabIndex.FOCUSABLE}
               title={userName}
             >
+              77777777
               {userName}
             </span>
           </div>
