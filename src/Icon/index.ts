@@ -38,6 +38,7 @@ export * from './EditDocumentIcon';
 export * from './EditIcon';
 export * from './EnterIcon';
 export * from './ErrorIcon';
+export * from './ExternalLinkIcon';
 export * from './FileIcon';
 export * from './GifIcon';
 export * from './GroupIcon';
