@@ -30,6 +30,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import * as Icon from 'Components/Icon';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {ConversationState} from 'src/script/conversation/ConversationState';
+import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/state';
 import {TeamState} from 'src/script/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -141,6 +142,8 @@ const UserActions: React.FC<UserActionsProps> = ({
   ]);
   const isTeamMember = teamState.isInTeam(user);
 
+  const {setCurrentTab: setCurrentSidebarTab} = useSidebarStore();
+
   const has1to1Conversation = conversationState.has1to1ConversationWithUser(user.qualifiedId);
 
   const isNotMe = !user.isMe && isSelfActivated;
@@ -200,6 +203,7 @@ const UserActions: React.FC<UserActionsProps> = ({
           click: async () => {
             try {
               await create1to1Conversation(user, true);
+              setCurrentSidebarTab(SidebarTabs.DIRECTS);
               onAction(Actions.START_CONVERSATION);
             } catch (error) {
               if (error instanceof ClientMLSError && error.label === ClientMLSErrorLabel.NO_KEY_PACKAGES_AVAILABLE) {
