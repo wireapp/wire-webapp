@@ -47,14 +47,14 @@ export const DetachedCallingCell = ({
   const {joinedCall: activeCall, viewMode} = useKoSubscribableChildren(callState, ['joinedCall', 'viewMode']);
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
 
-  const isDetachedWindow = viewMode === CallingViewMode.DETACHED_WINDOW;
+  const isFullScreenGrid = viewMode === CallingViewMode.FULL_SCREEN_GRID;
 
   const closeDetachedWindow = () => {
     mediaRepository.streamHandler.resetMediaDevices();
     callState.viewMode(CallingViewMode.MINIMIZED);
   };
 
-  if (!activeCall || !isDetachedWindow || !selfUser) {
+  if (!activeCall || !isFullScreenGrid || !selfUser) {
     return null;
   }
 

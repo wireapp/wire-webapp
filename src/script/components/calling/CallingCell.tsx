@@ -120,7 +120,6 @@ const CallingCell: React.FC<CallingCellProps> = ({
 
   const {viewMode} = useKoSubscribableChildren(callState, ['viewMode']);
   const isFullScreenGrid = viewMode === CallingViewMode.FULL_SCREEN_GRID;
-  const isDetachedWindow = viewMode === CallingViewMode.DETACHED_WINDOW;
 
   const {isVideoCallingEnabled} = useKoSubscribableChildren(teamState, ['isVideoCallingEnabled']);
 
@@ -224,7 +223,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
 
   const handleMaximizeKeydown = useCallback(
     (event: React.KeyboardEvent<HTMLInputElement>) => {
-      if (!isOngoing || isDetachedWindow) {
+      if (!isOngoing) {
         return;
       }
       if (isSpaceOrEnterKey(event.key)) {
@@ -234,12 +233,14 @@ const CallingCell: React.FC<CallingCellProps> = ({
     [isOngoing, callState],
   );
 
-  const handleMaximizeClick = useCallback(() => {
-    if (!isOngoing || isDetachedWindow) {
+  const toggleMaximizedView = useCallback(() => {
+    if (!isOngoing) {
       return;
     }
-    callState.viewMode(CallingViewMode.FULL_SCREEN_GRID);
-  }, [isOngoing, callState]);
+
+    const isFullScreenGrid = viewMode === CallingViewMode.FULL_SCREEN_GRID;
+    callState.viewMode(isFullScreenGrid ? CallingViewMode.MINIMIZED : CallingViewMode.FULL_SCREEN_GRID);
+  }, [isOngoing, callState, viewMode]);
 
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
   const {showAlert, clearShowAlert} = useCallAlertState();
@@ -314,18 +315,10 @@ const CallingCell: React.FC<CallingCellProps> = ({
   const callStartedAlert = isGroup ? callGroupStartedAlert : call1To1StartedAlert;
   const ongoingCallAlert = isGroup ? onGoingGroupCallAlert : onGoingCallAlert;
 
-  const toggleDetachedWindow = () => {
-    if (isDetachedWindow) {
-      callState.viewMode(CallingViewMode.MINIMIZED);
-    } else {
-      callState.viewMode(CallingViewMode.DETACHED_WINDOW);
-    }
-  };
-
   const isDetachedCallingFeatureEnabled = useDetachedCallingFeatureState(state => state.isSupported());
 
   return (
-    <div css={{height: isDetachedWindow ? '100%' : 'auto'}}>
+    <div>
       {isIncoming && (
         <p role="alert" className="visually-hidden">
           {t('callConversationAcceptOrDecline', conversationName)}
@@ -338,7 +331,6 @@ const CallingCell: React.FC<CallingCellProps> = ({
           data-uie-name="item-call"
           data-uie-id={conversation.id}
           data-uie-value={conversation.display_name()}
-          css={{height: isDetachedWindow ? '100%' : 'unset'}}
         >
           {muteState === MuteState.REMOTE_MUTED && isFullUi && (
             <div className="conversation-list-calling-cell__info-bar">{t('muteStateRemoteMute')}</div>
@@ -416,11 +408,11 @@ const CallingCell: React.FC<CallingCellProps> = ({
 
             <div className="conversation-list-cell-right">
               {isOngoing && isDetachedCallingFeatureEnabled && (
-                <button className="call-ui__button" onClick={toggleDetachedWindow}>
-                  {isDetachedWindow ? (
-                    <Icon.CloseIcon className="small-icon" />
+                <button className="call-ui__button" onClick={toggleMaximizedView}>
+                  {isFullScreenGrid ? (
+                    <Icon.CloseDetachedWindowIcon className="small-icon" />
                   ) : (
-                    <Icon.FullscreenIcon className="small-icon" />
+                    <Icon.OpenDetachedWindowIcon className="small-icon" />
                   )}
                 </button>
               )}
@@ -441,9 +433,8 @@ const CallingCell: React.FC<CallingCellProps> = ({
 
           {(isOngoing || selfHasActiveVideo) && !isFullScreenGrid && !!videoGrid?.grid?.length && isFullUi ? (
             <div
-              css={{flex: isDetachedWindow ? 1 : 'unset'}}
               className="group-video__minimized-wrapper"
-              onClick={handleMaximizeClick}
+              onClick={toggleMaximizedView}
               onKeyDown={handleMaximizeKeydown}
               role="button"
               tabIndex={TabIndex.FOCUSABLE}
@@ -457,7 +448,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
                 setMaximizedParticipant={setMaximizedParticipant}
               />
 
-              {isOngoing && !isDetachedWindow && (
+              {isOngoing && (
                 <div className="group-video__minimized-wrapper__overlay" data-uie-name="do-maximize-call">
                   <Icon.FullscreenIcon />
                 </div>
@@ -536,7 +527,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
                         data-uie-value={selfSharesScreen ? 'active' : 'inactive'}
                         data-uie-enabled={disableScreenButton ? 'false' : 'true'}
                         title={t('videoCallOverlayShareScreen')}
-                        disabled={disableScreenButton || isDetachedWindow}
+                        disabled={disableScreenButton}
                       >
                         {selfSharesScreen ? (
                           <Icon.ScreenshareIcon className="small-icon" />
@@ -557,7 +548,6 @@ const CallingCell: React.FC<CallingCellProps> = ({
                     className={cx('call-ui__button call-ui__button--participants', {
                       'call-ui__button--active': showParticipants,
                     })}
-                    disabled={isDetachedWindow}
                     onClick={() => setShowParticipants(prevState => !prevState)}
                     type="button"
                     data-uie-name="do-toggle-participants"
