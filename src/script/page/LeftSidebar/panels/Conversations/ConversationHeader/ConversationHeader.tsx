@@ -111,10 +111,9 @@ export const ConversationHeader = ({
             onClick={() => amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, 'conversation_details')}
             data-uie-name="go-create-group"
             css={button}
+            title={t('conversationDetailsActionCreateGroup')}
           >
             <Icon.PlusIcon />
-
-            {t('conversationGroupCreate')}
           </Button>
         )}
       </div>

@@ -17,7 +17,7 @@
  *
  */
 
-import {ChevronIcon, GroupIcon, InfoIcon, MessageIcon, StarIcon} from '@wireapp/react-ui-kit';
+import {GroupIcon, InfoIcon, MessageIcon, StarIcon, ExternalLinkIcon} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
@@ -97,7 +97,7 @@ export const ConversationTabs = ({
       type: SidebarTabs.FOLDER,
       title: t('folderViewTooltip'),
       dataUieName: 'go-folders-view',
-      Icon: <ChevronIcon />,
+      Icon: <Icon.FoldersOutline />,
       unreadConversations: totalUnreadConversations,
     },
     {
@@ -154,7 +154,7 @@ export const ConversationTabs = ({
           title={t('searchConnect', Shortcut.getShortcutTooltip(ShortcutType.START))}
           label={t('searchConnect')}
           type={SidebarTabs.CONNECT}
-          Icon={<Icon.PlusIcon />}
+          Icon={<Icon.AddParticipantsIcon />}
           onChangeTab={onChangeTab}
           conversationTabIndex={conversationTabs.length + 1}
           dataUieName="go-people"
@@ -195,6 +195,7 @@ export const ConversationTabs = ({
           <span className="conversations-sidebar-btn--text-wrapper">
             <InfoIcon />
             <span className="conversations-sidebar-btn--text">{t('preferencesAboutSupport')}</span>
+            <ExternalLinkIcon className="external-link-icon" />
           </span>
         </a>
       </div>
