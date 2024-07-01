@@ -105,8 +105,12 @@ export const DetachedWindow = ({children, name, onClose, width = 600, height = 6
  * @param target the target document object
  */
 const copyStyles = (source: Document, target: Document) => {
-  source.head.querySelectorAll('link, style').forEach(htmlElement => {
-    target.head.appendChild(htmlElement.cloneNode(true));
+  const targetHead = target.head;
+
+  const elements = source.head.querySelectorAll('link, style');
+
+  elements.forEach(htmlElement => {
+    targetHead.insertBefore(htmlElement.cloneNode(true), targetHead.firstChild);
   });
 
   target.body.className = source.body.className;
