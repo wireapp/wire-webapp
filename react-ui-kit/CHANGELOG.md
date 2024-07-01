@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.19.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.18.1...@wireapp/react-ui-kit@9.19.0) (2024-07-01)
+
+### Features
+
+* **react-ui-kit:** Add new external link icon (WPB-9694) ([#6339](https://github.com/wireapp/wire-web-packages/issues/6339)) ([a133ad4](https://github.com/wireapp/wire-web-packages/commit/a133ad4287530d6c82550a02124791db8517f0de))
+
 ## [9.18.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.18.0...@wireapp/react-ui-kit@9.18.1) (2024-06-26)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
