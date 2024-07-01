@@ -30,6 +30,7 @@ import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {IntegrationRepository} from 'src/script/integration/IntegrationRepository';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
+import {useSidebarStore, SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/state';
 import {UserRepository} from 'src/script/user/UserRepository';
 import {MainViewModel} from 'src/script/view_model/MainViewModel';
 import {t} from 'Util/LocalizerUtil';
@@ -93,6 +94,8 @@ const StartUI: React.FC<StartUIProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState(Tabs.PEOPLE);
 
+  const {setCurrentTab: setCurrentSidebarTab} = useSidebarStore();
+
   const peopleSearchResults = useRef<SearchResultsData | undefined>(undefined);
 
   const openFirstConversation = async (): Promise<void> => {
@@ -113,6 +116,7 @@ const StartUI: React.FC<StartUIProps> = ({
     }
 
     const conversationEntity = await actions.getOrCreate1to1Conversation(user);
+    setCurrentSidebarTab(SidebarTabs.RECENT);
     return actions.open1to1Conversation(conversationEntity);
   };
 
