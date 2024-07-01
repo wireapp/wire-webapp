@@ -29,7 +29,8 @@ type DetachedCallingFeatureState = {
 
 //TODO: This is a temporary solution for PoC to enable detached calling cell feature
 export const useDetachedCallingFeatureState = create<DetachedCallingFeatureState>((set, get) => ({
-  isEnabled: false,
+  //FIXME: This should be false by default
+  isEnabled: true,
   isSupported: () => !Runtime.isDesktopApp() && get().isEnabled,
   toggle: shouldOpen => set({isEnabled: shouldOpen}),
 }));

@@ -131,13 +131,13 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
 
   const conversation = joinedCall?.conversation;
 
-  if (isDetachedWindow || !joinedCall || !conversation || conversation.removed_from_conversation()) {
+  if (!joinedCall || !conversation || conversation.removed_from_conversation()) {
     return null;
   }
 
   return (
     <Fragment>
-      {isFullScreenGrid && !!videoGrid?.grid.length && (
+      {(isFullScreenGrid || isDetachedWindow) && !!videoGrid?.grid.length && (
         <FullscreenVideoCall
           key={joinedCall.conversation.id}
           videoGrid={videoGrid}
