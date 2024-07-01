@@ -34,7 +34,7 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "rootDirs": ["src/script"],
-    "target": "es2017",
+    "target": "ESNext",
     "strict": true
   },
   "exclude": ["node_modules", "server/", "src/sw.js", "src/worker/"]
