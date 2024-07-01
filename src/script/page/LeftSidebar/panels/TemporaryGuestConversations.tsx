@@ -19,12 +19,9 @@
 
 import React from 'react';
 
-import {container} from 'tsyringe';
-
 import {CallingCell} from 'Components/calling/CallingCell';
 import * as Icon from 'Components/Icon';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {CallingViewMode, CallState} from 'src/script/calling/CallState';
 import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -38,23 +35,17 @@ type TemporaryGuestConversations = {
   callingViewModel: CallingViewModel;
   listViewModel: ListViewModel;
   selfUser: User;
-  callState?: CallState;
 };
 
 const TemporaryGuestConversations: React.FC<TemporaryGuestConversations> = ({
   selfUser,
   listViewModel,
   callingViewModel,
-  callState = container.resolve(CallState),
 }) => {
   const {expirationIsUrgent, expirationRemainingText} = useKoSubscribableChildren(selfUser, [
     'expirationIsUrgent',
     'expirationRemainingText',
   ]);
-
-  const {viewMode} = useKoSubscribableChildren(callState, ['viewMode']);
-
-  const isCallWindowDetached = viewMode === CallingViewMode.DETACHED_WINDOW;
 
   const {activeCalls} = useKoSubscribableChildren(callingViewModel, ['activeCalls']);
   const isAccountCreationEnabled = Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION;
@@ -81,21 +72,19 @@ const TemporaryGuestConversations: React.FC<TemporaryGuestConversations> = ({
       {activeCalls.map(call => {
         const {conversation} = call;
         return (
-          !isCallWindowDetached && (
-            <CallingCell
-              key={conversation.id}
-              data-uie-name="item-call"
-              data-uie-uid={conversation.id}
-              data-uie-value={conversation.display_name()}
-              call={call}
-              isTemporaryUser
-              isFullUi
-              callActions={callingViewModel.callActions}
-              callingRepository={callingViewModel.callingRepository}
-              hasAccessToCamera={callingViewModel.hasAccessToCamera()}
-              pushToTalkKey={callingViewModel.propertiesRepository.getPreference(PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY)}
-            />
-          )
+          <CallingCell
+            key={conversation.id}
+            data-uie-name="item-call"
+            data-uie-uid={conversation.id}
+            data-uie-value={conversation.display_name()}
+            call={call}
+            isTemporaryUser
+            isFullUi
+            callActions={callingViewModel.callActions}
+            callingRepository={callingViewModel.callingRepository}
+            hasAccessToCamera={callingViewModel.hasAccessToCamera()}
+            pushToTalkKey={callingViewModel.propertiesRepository.getPreference(PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY)}
+          />
         );
       })}
       <div className="temporary-guest__content">

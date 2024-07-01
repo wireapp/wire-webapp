@@ -36,7 +36,7 @@ import type {AudioRepository} from '../audio/AudioRepository';
 import {AudioType} from '../audio/AudioType';
 import type {Call} from '../calling/Call';
 import {CallingRepository} from '../calling/CallingRepository';
-import {CallingViewMode, CallState} from '../calling/CallState';
+import {CallState} from '../calling/CallState';
 import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
@@ -342,16 +342,9 @@ export class CallingViewModel {
           });
         };
 
-        this.mediaStreamHandler.selectScreenToShare(showScreenSelection).then(() => {
-          const isAudioCall = [CALL_TYPE.NORMAL, CALL_TYPE.FORCED_AUDIO].includes(call.initialType);
-          const isDetachedWindow = this.callState.viewMode() === CallingViewMode.DETACHED_WINDOW;
-          const isFullScreenVideoCall =
-            call.initialType === CALL_TYPE.VIDEO && this.callState.viewMode() === CallingViewMode.FULL_SCREEN_GRID;
-          if ((isAudioCall || isFullScreenVideoCall) && !isDetachedWindow) {
-            this.callState.viewMode(CallingViewMode.MINIMIZED);
-          }
-          return this.callingRepository.toggleScreenshare(call);
-        });
+        this.mediaStreamHandler
+          .selectScreenToShare(showScreenSelection)
+          .then(() => this.callingRepository.toggleScreenshare(call));
       },
     };
   }
