@@ -53,7 +53,6 @@ import type {Participant} from '../../calling/Participant';
 import type {Grid} from '../../calling/videoGridHandler';
 import type {Conversation} from '../../entity/Conversation';
 import {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
-import {useAppState} from '../../page/useAppState';
 import {TeamState} from '../../team/TeamState';
 import {CallViewTab, CallViewTabs} from '../../view_model/CallingViewModel';
 
@@ -272,9 +271,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     }
   };
 
-  const unreadMessagesCount = useAppState(state => state.unreadMessagesCount);
-  const hasUnreadMessages = unreadMessagesCount > 0;
-
   const {showAlert, isGroupCall, clearShowAlert} = useCallAlertState();
 
   const totalPages = callPages.length;
@@ -434,20 +430,10 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   type="button"
                   aria-labelledby="minimize-label"
                   data-uie-name="do-call-controls-video-minimize"
+                  // FIXME: update copy
+                  title={t('videoCallOverlayConversations')}
                 >
-                  {hasUnreadMessages ? (
-                    <Icon.MessageUnreadIcon
-                      css={{
-                        marginRight: '-2px',
-                        marginTop: '-2px',
-                      }}
-                    />
-                  ) : (
-                    <Icon.MessageIcon />
-                  )}
-                  <span id="minimize-label" className="video-controls__button__label">
-                    {t('videoCallOverlayConversations')}
-                  </span>
+                  <Icon.CloseDetachedWindowIcon />
                 </button>
               </li>
             )}
@@ -464,11 +450,8 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   data-uie-name="do-call-controls-video-call-mute"
                   role="switch"
                   aria-checked={!isMuted}
+                  title={t('videoCallOverlayMicrophone')}
                 >
-                  <span id="mute-label" className="video-controls__button__label">
-                    {t('videoCallOverlayMicrophone')}
-                  </span>
-
                   {isMuted ? <Icon.MicOffIcon width={16} height={16} /> : <Icon.MicOnIcon width={16} height={16} />}
                 </button>
 
@@ -530,16 +513,13 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                     css={selfSharesCamera ? videoControlActiveStyles : videoControlInActiveStyles}
                     aria-labelledby="video-label"
                     data-uie-name="do-call-controls-toggle-video"
+                    title={t('videoCallOverlayCamera')}
                   >
                     {selfSharesCamera ? (
                       <Icon.CameraIcon width={16} height={16} />
                     ) : (
                       <Icon.CameraOffIcon width={16} height={16} />
                     )}
-
-                    <span id="video-label" className="video-controls__button__label">
-                      {t('videoCallOverlayCamera')}
-                    </span>
                   </button>
 
                   <button
@@ -599,15 +579,13 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   data-uie-value={selfSharesScreen ? 'active' : 'inactive'}
                   data-uie-enabled={canShareScreen ? 'true' : 'false'}
                   data-uie-name="do-toggle-screen"
+                  title={t('videoCallOverlayShareScreen')}
                 >
                   {selfSharesScreen ? (
                     <Icon.ScreenshareIcon width={16} height={16} />
                   ) : (
                     <Icon.ScreenshareOffIcon width={16} height={16} />
                   )}
-                  <span id="screen-share-label" className="video-controls__button__label">
-                    {t('videoCallOverlayShareScreen')}
-                  </span>
                 </button>
               </li>
 
@@ -619,11 +597,9 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   type="button"
                   aria-labelledby="leave-label"
                   data-uie-name="do-call-controls-video-call-cancel"
+                  title={t('videoCallOverlayHangUp')}
                 >
                   <Icon.HangupIcon />
-                  <span id="leave-label" className="video-controls__button__label">
-                    {t('videoCallOverlayHangUp')}
-                  </span>
                 </button>
               </li>
             </div>
