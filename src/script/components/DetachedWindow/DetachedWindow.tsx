@@ -37,6 +37,7 @@ interface DetachedWindowProps {
   height?: number;
   onClose: () => void;
   name: string;
+  onNewWindowOpened?: (newWindow: Window) => void;
 }
 
 const memoizedCreateCacheWithContainer = weakMemoize((container: HTMLHeadElement) => {
@@ -44,7 +45,14 @@ const memoizedCreateCacheWithContainer = weakMemoize((container: HTMLHeadElement
   return newCache;
 });
 
-export const DetachedWindow = ({children, name, onClose, width = 600, height = 600}: DetachedWindowProps) => {
+export const DetachedWindow = ({
+  children,
+  name,
+  onClose,
+  width = 600,
+  height = 600,
+  onNewWindowOpened,
+}: DetachedWindowProps) => {
   const newWindow = useMemo(() => {
     const {top, left} = calculateChildWindowPosition(height, width);
 
@@ -79,6 +87,8 @@ export const DetachedWindow = ({children, name, onClose, width = 600, height = 6
 
     newWindow.addEventListener('beforeunload', onClose);
     window.addEventListener('beforeunload', onClose);
+
+    onNewWindowOpened?.(newWindow);
 
     return () => {
       newWindow.close();

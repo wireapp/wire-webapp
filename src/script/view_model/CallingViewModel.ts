@@ -344,9 +344,10 @@ export class CallingViewModel {
 
         this.mediaStreamHandler.selectScreenToShare(showScreenSelection).then(() => {
           const isAudioCall = [CALL_TYPE.NORMAL, CALL_TYPE.FORCED_AUDIO].includes(call.initialType);
+          const isDetachedWindow = this.callState.viewMode() === CallingViewMode.DETACHED_WINDOW;
           const isFullScreenVideoCall =
             call.initialType === CALL_TYPE.VIDEO && this.callState.viewMode() === CallingViewMode.FULL_SCREEN_GRID;
-          if (isAudioCall || isFullScreenVideoCall) {
+          if ((isAudioCall || isFullScreenVideoCall) && !isDetachedWindow) {
             this.callState.viewMode(CallingViewMode.MINIMIZED);
           }
           return this.callingRepository.toggleScreenshare(call);
