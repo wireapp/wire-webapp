@@ -274,7 +274,7 @@ jobs:
                 "targets": "[\"wire-webapp-master-al2\"]"
               },
               "new-navigation": {
-                "targets": "[\"wire-webapp-edge-al2\"]"
+                "targets": "[\"wire-webapp-edge\"]"
               },
               "production": {
                 "targets": "[\"wire-webapp-prod-al2\"]"

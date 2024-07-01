@@ -246,7 +246,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
 
   const answerCall = () => {
     callActions.answer(call);
-    setCurrentView(ViewType.LEFT_SIDEBAR);
+    setCurrentView(ViewType.MOBILE_LEFT_SIDEBAR);
   };
 
   const answerOrRejectCall = useCallback(
@@ -634,7 +634,6 @@ const CallingCell: React.FC<CallingCellProps> = ({
                         <CallParticipantsListItem
                           key={participant.clientId}
                           callParticipant={participant}
-                          selfInTeam={selfUser && teamState.isInTeam(selfUser)}
                           isSelfVerified={isSelfVerified}
                           showContextMenu={!!isModerator}
                           onContextMenu={event => getParticipantContext(event, participant)}

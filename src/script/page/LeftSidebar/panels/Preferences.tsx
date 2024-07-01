@@ -37,14 +37,10 @@ import {
   PreferenceNotificationRepository,
 } from '../../../notification/PreferenceNotificationRepository';
 import {TeamRepository} from '../../../team/TeamRepository';
-import {ContentViewModel} from '../../../view_model/ContentViewModel';
-import {ANIMATED_PAGE_TRANSITION_DURATION} from '../../MainContent';
-import {useAppMainState, ViewType} from '../../state';
 import {ContentState, useAppState} from '../../useAppState';
 
 type PreferencesProps = {
-  contentViewModel: ContentViewModel;
-  onClose: () => void;
+  onPreferenceItemClick: (itemId: ContentState) => void;
   teamRepository: Pick<TeamRepository, 'getTeam'>;
   preferenceNotificationRepository: Pick<PreferenceNotificationRepository, 'getNotifications'>;
 };
@@ -115,10 +111,9 @@ const PreferenceItem: React.FC<{
 };
 
 const Preferences: React.FC<PreferencesProps> = ({
-  contentViewModel,
   teamRepository,
   preferenceNotificationRepository,
-  onClose,
+  onPreferenceItemClick,
 }) => {
   const contentState = useAppState(state => state.contentState);
 
@@ -126,21 +121,6 @@ const Preferences: React.FC<PreferencesProps> = ({
     // Update local team
     teamRepository.getTeam();
   }, [teamRepository]);
-
-  const supportsCalling = Runtime.isSupportingLegacyCalling();
-
-  const {setCurrentView} = useAppMainState(state => state.responsiveView);
-
-  const onClickSelect = (item: (typeof items)[number]) => {
-    setCurrentView(ViewType.CENTRAL_COLUMN);
-    contentViewModel.switchContent(item.id);
-
-    setTimeout(() => {
-      const centerColumn = document.getElementById('center-column');
-      const nextElementToFocus = centerColumn?.querySelector("[tabindex='0']") as HTMLElement | null;
-      nextElementToFocus?.focus();
-    }, ANIMATED_PAGE_TRANSITION_DURATION + 1);
-  };
 
   useEffect(() => {
     if (NEW_DEVICE_NOTIFICATION_STATES.includes(contentState)) {
@@ -150,7 +130,9 @@ const Preferences: React.FC<PreferencesProps> = ({
     }
   }, [contentState, preferenceNotificationRepository]);
 
-  const items = [
+  const supportsCalling = Runtime.isSupportingLegacyCalling();
+
+  const preferencesItems = [
     {
       IconComponent: Icon.ProfileIcon,
       id: ContentState.PREFERENCES_ACCOUNT,
@@ -185,19 +167,19 @@ const Preferences: React.FC<PreferencesProps> = ({
   ];
 
   return (
-    <ListWrapper id="preferences" header={t('preferencesHeadline')} onClose={onClose}>
+    <ListWrapper id="preferences" header={t('preferencesHeadline')} headerUieName="preferences-header-title">
       <ul
         role="tablist"
         aria-label={t('tooltipPreferencesTabs')}
         className="left-list-items no-scroll preferences-list-items"
       >
-        {items
+        {preferencesItems
           .filter(item => !item.hidden)
           .map(item => (
             <PreferenceItem
               key={item.id}
               label={item.label}
-              onSelect={() => onClickSelect(item)}
+              onSelect={() => onPreferenceItemClick(item.id)}
               isSelected={contentState === item.id}
               uieName={item.uieName}
               IconComponent={item.IconComponent}

@@ -122,15 +122,7 @@ export class ContentViewModel {
   }
 
   private _shiftContent(hideSidebar: boolean = false): void {
-    const sidebar = document.querySelector(`#${this.sidebarId}`) as HTMLElement | null;
-
-    if (hideSidebar) {
-      if (sidebar) {
-        sidebar.style.visibility = 'hidden';
-      }
-    } else if (sidebar) {
-      sidebar.style.visibility = '';
-    }
+    useAppMainState.getState().leftSidebar.hide(hideSidebar);
   }
 
   private changeConversation(conversationEntity: Conversation, messageEntity?: Message): void {

@@ -50,7 +50,6 @@ export interface UserListItemProps {
   onClick: (user: User, event: MouseEvent | ChangeEvent) => void;
   onKeyDown: (user: User, event: KeyboardEvent) => void;
   user: User;
-  selfInTeam: boolean;
   showArrow: boolean;
 }
 
@@ -66,7 +65,6 @@ export const UserListItem = ({
   noInteraction,
   noUnderline = false,
   user,
-  selfInTeam,
   onClick,
   onKeyDown,
 }: UserListItemProps) => {
@@ -115,10 +113,8 @@ export const UserListItem = ({
           groupId={groupId}
           participant={user}
           shortDescription={contentInfoText}
-          selfInTeam={selfInTeam}
           {...(isSelf && {selfString})}
           hasUsernameInfo={hasUsernameInfo}
-          showAvailabilityState
         />
 
         <UserStatusBadges

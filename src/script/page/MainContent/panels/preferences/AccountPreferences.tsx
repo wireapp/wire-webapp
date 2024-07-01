@@ -145,7 +145,12 @@ export const AccountPreferences = ({
 
         <div className="preferences-account-image">
           <ErrorBoundary FallbackComponent={ErrorFallback}>
-            <AvatarInput selfUser={selfUser} isActivatedAccount={isActivatedAccount} userRepository={userRepository} />
+            <AvatarInput
+              selfUser={selfUser}
+              isActivatedAccount={isActivatedAccount}
+              userRepository={userRepository}
+              hideAvailabilityStatus
+            />
           </ErrorBoundary>
         </div>
 

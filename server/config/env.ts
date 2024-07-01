@@ -227,6 +227,8 @@ export type Env = {
   /** Sets Support URLs to specific pages */
   URL_SUPPORT_INDEX: string;
 
+  URL_SUPPORT_FOLDERS: string;
+
   URL_SUPPORT_BUG_REPORT: string;
 
   URL_SUPPORT_CALLING: string;
@@ -254,6 +256,8 @@ export type Env = {
   URL_SUPPORT_SCREEN_ACCESS_DENIED: string;
 
   URL_SUPPORT_SYSTEM_KEYCHAIN_ACCESS: string;
+
+  URL_SUPPORT_FAVORITES: string;
 
   URL_LEARN_MORE_ABOUT_GUEST_LINKS: string;
 

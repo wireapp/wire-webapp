@@ -23,6 +23,7 @@ import ko from 'knockout';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/state';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {TypedEventTarget} from 'Util/TypedEventTarget';
@@ -71,15 +72,6 @@ export const createLabel = (
   name,
   type,
 });
-
-export const createLabelGroups = (groups: Conversation[] = []) =>
-  createLabel(t('conversationLabelGroups'), groups, DefaultLabelIds.Groups);
-
-export const createLabelPeople = (contacts: Conversation[] = []) =>
-  createLabel(t('conversationLabelPeople'), contacts, DefaultLabelIds.Contacts);
-
-export const createLabelFavorites = (favorites: Conversation[] = []) =>
-  createLabel(t('conversationLabelFavorites'), favorites, DefaultLabelIds.Favorites);
 
 export class ConversationLabelRepository extends TypedEventTarget<{type: 'conversation-favorited'}> {
   labels: ko.ObservableArray<ConversationLabel>;
@@ -191,6 +183,11 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
       favoriteLabel.conversations(
         favoriteLabel.conversations().filter(conversation => conversation !== removedConversation),
       );
+      // trigger a rerender on sidebar to remove the conversation from favorites
+      const {currentTab, setCurrentTab} = useSidebarStore.getState();
+      if (currentTab === SidebarTabs.FAVORITES) {
+        setCurrentTab(SidebarTabs.FAVORITES);
+      }
     }
     this.saveLabels();
   };
@@ -228,8 +225,12 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
 
   readonly removeConversationFromLabel = (label: ConversationLabel, removeConversation: Conversation): void => {
     label.conversations(label.conversations().filter(conversation => conversation !== removeConversation));
+    // Delete folder if it no longer contains any conversation
     if (!label.conversations().length) {
       this.labels.remove(label);
+      // switch sidebar to recent tabs
+      const {setCurrentTab} = useSidebarStore.getState();
+      setCurrentTab(SidebarTabs.RECENT);
     }
     this.saveLabels();
   };

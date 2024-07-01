@@ -57,7 +57,6 @@ const AvailabilityButtons: React.FC<AvailabilityInputProps> = ({availability}) =
   } = {
     [Availability.Type.AVAILABLE]: (
       <Icon.AvailabilityAvailableIcon
-        className="availability-state-icon"
         css={{...iconStyles, fill: 'var(--green-500)', stroke: 'var(--green-500)'}}
         data-uie-name="status-availability-icon"
         data-uie-value="available"
@@ -65,7 +64,6 @@ const AvailabilityButtons: React.FC<AvailabilityInputProps> = ({availability}) =
     ),
     [Availability.Type.BUSY]: (
       <Icon.AvailabilityBusyIcon
-        className="availability-state-icon"
         css={{...iconStyles, fill: 'var(--amber-500)', stroke: 'var(--amber-500)'}}
         data-uie-name="status-availability-icon"
         data-uie-value="busy"
@@ -73,7 +71,6 @@ const AvailabilityButtons: React.FC<AvailabilityInputProps> = ({availability}) =
     ),
     [Availability.Type.AWAY]: (
       <Icon.AvailabilityAwayIcon
-        className="availability-state-icon"
         css={{...iconStyles, fill: 'var(--red-500)', stroke: 'var(--red-500)'}}
         data-uie-name="status-availability-icon"
         data-uie-value="away"
