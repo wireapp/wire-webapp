@@ -101,10 +101,9 @@ export const AppContainer: FC<AppProps> = ({config, clientType}) => {
       </StyledApp>
 
       <DetachedCallingCell
-        callActions={mainView.calling.callActions}
         callingRepository={app.repository.calling}
-        pushToTalkKey={repositories.properties.getPreference(PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY)}
-        hasAccessToCamera={mainView.calling.hasAccessToCamera()}
+        mediaRepository={app.repository.media}
+        toggleScreenshare={mainView.calling.callActions.toggleScreenshare}
       />
     </>
   );
