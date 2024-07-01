@@ -116,7 +116,7 @@ const StartUI: React.FC<StartUIProps> = ({
     }
 
     const conversationEntity = await actions.getOrCreate1to1Conversation(user);
-    setCurrentSidebarTab(SidebarTabs.DIRECTS);
+    setCurrentSidebarTab(SidebarTabs.RECENT);
     return actions.open1to1Conversation(conversationEntity);
   };
 

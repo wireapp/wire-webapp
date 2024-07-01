@@ -151,6 +151,7 @@ const UserActions: React.FC<UserActionsProps> = ({
   const create1to1Conversation = async (userEntity: User, showConversation: boolean): Promise<void> => {
     const conversationEntity = await actionsViewModel.getOrCreate1to1Conversation(userEntity);
     if (showConversation) {
+      setCurrentSidebarTab(SidebarTabs.RECENT);
       actionsViewModel.open1to1Conversation(conversationEntity);
     }
   };
@@ -203,7 +204,6 @@ const UserActions: React.FC<UserActionsProps> = ({
           click: async () => {
             try {
               await create1to1Conversation(user, true);
-              setCurrentSidebarTab(SidebarTabs.DIRECTS);
               onAction(Actions.START_CONVERSATION);
             } catch (error) {
               if (error instanceof ClientMLSError && error.label === ClientMLSErrorLabel.NO_KEY_PACKAGES_AVAILABLE) {
@@ -292,6 +292,7 @@ const UserActions: React.FC<UserActionsProps> = ({
               // Only open the new conversation if we aren't currently in a conversation context
               await actionsViewModel.open1to1Conversation(savedConversation);
             }
+            setCurrentSidebarTab(SidebarTabs.RECENT);
             onAction(Actions.SEND_REQUEST);
           },
           Icon: Icon.PlusIcon,
