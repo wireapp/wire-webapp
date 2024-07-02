@@ -121,9 +121,17 @@
 }
 
 .conversations-sidebar-folders-wrapper {
+  svg {
+    transition: transform 0.15s ease-in-out;
+  }
+
   &.active {
     border-radius: 10px;
     background-color: var(--sidebar-folder-selected-bg);
+
+    svg.folders-open-indicator {
+      transform: rotate(180deg);
+    }
   }
 }
 
