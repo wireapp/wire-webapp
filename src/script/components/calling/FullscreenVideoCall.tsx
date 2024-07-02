@@ -23,19 +23,20 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {container} from 'tsyringe';
 
 import {CALL_TYPE} from '@wireapp/avs';
-import {IconButton, IconButtonVariant, Select, useMatchMedia} from '@wireapp/react-ui-kit';
+import {GridIcon, IconButton, IconButtonVariant, Select, useMatchMedia} from '@wireapp/react-ui-kit';
 
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import * as Icon from 'Components/Icon';
 import {ConversationClassifiedBar} from 'Components/input/ClassifiedBar';
+import {isCallViewOption} from 'src/script/guards/CallView';
 import {isMediaDevice} from 'src/script/guards/MediaDevice';
+import {useToggleState} from 'src/script/hooks/useToggleState';
 import {MediaDeviceType} from 'src/script/media/MediaDeviceType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, isEscapeKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {preventFocusOutside} from 'Util/util';
 
-import {ButtonGroup} from './ButtonGroup';
 import {Duration} from './Duration';
 import {
   videoControlActiveStyles,
@@ -54,7 +55,7 @@ import type {Grid} from '../../calling/videoGridHandler';
 import type {Conversation} from '../../entity/Conversation';
 import {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
 import {TeamState} from '../../team/TeamState';
-import {CallViewTab, CallViewTabs} from '../../view_model/CallingViewModel';
+import {CallViewTab} from '../../view_model/CallingViewModel';
 
 enum BlurredBackgroundStatus {
   OFF = 'bluroff',
@@ -153,11 +154,33 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   const [videoOptionsOpen, setVideoOptionsOpen] = useState(false);
   const minimize = () => callState.viewMode(CallingViewMode.MINIMIZED);
 
+  const [isParticipantsListOpen, toggleParticipantsList] = useToggleState(false);
+  const [isCallViewOpen, toggleCallView] = useToggleState(false);
+
   const showToggleVideo =
     isVideoCallingEnabled &&
     (call.initialType === CALL_TYPE.VIDEO || conversation.supportsVideoCall(call.isConference));
 
   const showSwitchMicrophone = audioinput.length > 1;
+
+  const callViewOptions = [
+    {
+      label: t('videoCallOverlayViewModeLabel'),
+      options: [
+        {
+          label: t('videoCallOverlayViewModeAll'),
+          value: CallViewTab.ALL,
+        },
+        {
+          label: t('videoCallOverlayViewModeSpeakers'),
+          value: CallViewTab.SPEAKERS,
+        },
+      ],
+    },
+  ];
+
+  const selectedCallViewOption =
+    callViewOptions[0].options.find(option => option.value === activeCallViewTab) ?? callViewOptions[0].options[0];
 
   const audioOptions = [
     {
@@ -428,7 +451,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   onClick={minimize}
                   onKeyDown={event => handleKeyDown(event, () => minimize())}
                   type="button"
-                  aria-labelledby="minimize-label"
                   data-uie-name="do-call-controls-video-minimize"
                   // FIXME: update copy
                   title={t('videoCallOverlayConversations')}
@@ -446,7 +468,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   onKeyDown={event => handleKeyDown(event, () => toggleMute(call, !isMuted))}
                   css={!isMuted ? videoControlActiveStyles : videoControlInActiveStyles}
                   type="button"
-                  aria-labelledby="mute-label"
                   data-uie-name="do-call-controls-video-call-mute"
                   role="switch"
                   aria-checked={!isMuted}
@@ -511,7 +532,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                     aria-checked={selfSharesCamera}
                     tabIndex={TabIndex.FOCUSABLE}
                     css={selfSharesCamera ? videoControlActiveStyles : videoControlInActiveStyles}
-                    aria-labelledby="video-label"
                     data-uie-name="do-call-controls-toggle-video"
                     title={t('videoCallOverlayCamera')}
                   >
@@ -575,7 +595,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   onClick={() => toggleScreenshare(call)}
                   onKeyDown={event => handleKeyDown(event, () => toggleScreenshare(call))}
                   type="button"
-                  aria-labelledby="screen-share-label"
                   data-uie-value={selfSharesScreen ? 'active' : 'inactive'}
                   data-uie-enabled={canShareScreen ? 'true' : 'false'}
                   data-uie-name="do-toggle-screen"
@@ -595,7 +614,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   onClick={() => leave(call)}
                   onKeyDown={event => handleKeyDown(event, () => leave(call))}
                   type="button"
-                  aria-labelledby="leave-label"
                   data-uie-name="do-call-controls-video-call-cancel"
                   title={t('videoCallOverlayHangUp')}
                 >
@@ -607,17 +625,61 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
               <div
                 css={{...(!horizontalSmBreakpoint && {minWidth: '157px'}), display: 'flex', justifyContent: 'flex-end'}}
               >
-                {participants.length > 2 && !horizontalXsBreakpoint && (
-                  <ButtonGroup
-                    items={Object.values(CallViewTabs)}
-                    onChangeItem={item => {
-                      setActiveCallViewTab(item as CallViewTab);
-                      setMaximizedParticipant(call, null);
-                    }}
-                    currentItem={activeCallViewTab}
-                    textSubstitute={participants.length.toString()}
-                  />
+                {participants.length > 2 && (
+                  <li className="video-controls__item">
+                    <button
+                      className="video-controls__button"
+                      onClick={toggleCallView}
+                      onKeyDown={event => handleKeyDown(event, toggleCallView)}
+                      css={isCallViewOpen ? videoControlActiveStyles : videoControlInActiveStyles}
+                      type="button"
+                      data-uie-name="do-call-controls-video-call-mute"
+                      role="switch"
+                      aria-checked={!isMuted}
+                      title={t('videoCallOverlayMicrophone')}
+                    >
+                      <Select
+                        // eslint-disable-next-line jsx-a11y/no-autofocus
+                        autoFocus
+                        value={selectedCallViewOption}
+                        id="select-call-view"
+                        dataUieName="select-call-view"
+                        controlShouldRenderValue={false}
+                        isClearable={false}
+                        backspaceRemovesValue={false}
+                        hideSelectedOptions={false}
+                        options={callViewOptions}
+                        onChange={selectedOption => {
+                          if (isCallViewOption(selectedOption)) {
+                            setActiveCallViewTab(selectedOption.value);
+                          }
+                        }}
+                        onKeyDown={event => isEscapeKey(event) && setAudioOptionsOpen(false)}
+                        menuPlacement="top"
+                        menuIsOpen={isCallViewOpen}
+                        wrapperCSS={{marginBottom: 16, width: 0, height: 0}}
+                        menuCSS={{right: 0, bottom: 10}}
+                      />
+                      <GridIcon width={16} height={16} />
+                    </button>
+                  </li>
                 )}
+                <li className="video-controls__item">
+                  <button
+                    className="video-controls__button"
+                    data-uie-value={isParticipantsListOpen ? 'active' : 'inactive'}
+                    onClick={toggleParticipantsList}
+                    onKeyDown={event => handleKeyDown(event, toggleParticipantsList)}
+                    css={isParticipantsListOpen ? videoControlActiveStyles : videoControlInActiveStyles}
+                    type="button"
+                    data-uie-name="do-toggle-call-participants-list"
+                    role="switch"
+                    aria-checked={isParticipantsListOpen}
+                    title={t('videoCallOverlayMicrophone')}
+                  >
+                    <Icon.PeopleIcon width={16} height={16} />
+                  </button>
+                </li>
               </div>
             )}
           </ul>

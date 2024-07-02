@@ -68,8 +68,8 @@ export const DetachedCallingCell = ({
   return (
     <DetachedWindow
       name="WIRE_PICTURE_IN_PICTURE_CALL"
-      width={290}
-      height={290}
+      width={800}
+      height={600}
       onClose={closeDetachedWindow}
       onNewWindowOpened={onNewWindowOpened}
     >
