@@ -446,14 +446,13 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
             {!horizontalSmBreakpoint && (
               <li className="video-controls__item__minimize">
                 <button
-                  className="video-controls__button"
+                  className="video-controls__button video-controls__button--small"
                   css={videoControlInActiveStyles}
                   onClick={minimize}
                   onKeyDown={event => handleKeyDown(event, () => minimize())}
                   type="button"
                   data-uie-name="do-call-controls-video-minimize"
-                  // FIXME: update copy
-                  title={t('videoCallOverlayConversations')}
+                  title={t('videoCallOverlayCloseFullScreen')}
                 >
                   <Icon.CloseDetachedWindowIcon />
                 </button>
@@ -628,7 +627,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                 {participants.length > 2 && (
                   <li className="video-controls__item">
                     <button
-                      className="video-controls__button"
+                      className="video-controls__button video-controls__button--small"
                       onClick={toggleCallView}
                       onKeyDown={event => handleKeyDown(event, toggleCallView)}
                       css={isCallViewOpen ? videoControlActiveStyles : videoControlInActiveStyles}
@@ -636,7 +635,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                       data-uie-name="do-call-controls-video-call-mute"
                       role="switch"
                       aria-checked={!isMuted}
-                      title={t('videoCallOverlayMicrophone')}
+                      title={t('videoCallOverlayChangeViewMode')}
                     >
                       <Select
                         // eslint-disable-next-line jsx-a11y/no-autofocus
@@ -666,7 +665,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                 )}
                 <li className="video-controls__item">
                   <button
-                    className="video-controls__button"
+                    className="video-controls__button video-controls__button--small"
                     data-uie-value={isParticipantsListOpen ? 'active' : 'inactive'}
                     onClick={toggleParticipantsList}
                     onKeyDown={event => handleKeyDown(event, toggleParticipantsList)}
@@ -675,7 +674,11 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                     data-uie-name="do-toggle-call-participants-list"
                     role="switch"
                     aria-checked={isParticipantsListOpen}
-                    title={t('videoCallOverlayMicrophone')}
+                    title={
+                      isParticipantsListOpen
+                        ? t('videoCallOverlayHideParticipantsList')
+                        : t('videoCallOverlayShowParticipantsList')
+                    }
                   >
                     <Icon.PeopleIcon width={16} height={16} />
                   </button>

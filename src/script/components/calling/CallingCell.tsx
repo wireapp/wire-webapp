@@ -408,7 +408,11 @@ const CallingCell: React.FC<CallingCellProps> = ({
 
             <div className="conversation-list-cell-right">
               {isOngoing && isDetachedCallingFeatureEnabled && (
-                <button className="call-ui__button" onClick={toggleMaximizedView}>
+                <button
+                  className="call-ui__button"
+                  onClick={toggleMaximizedView}
+                  title={isFullScreenGrid ? t('videoCallOverlayCloseFullScreen') : t('videoCallOverlayOpenFullScreen')}
+                >
                   {isFullScreenGrid ? (
                     <Icon.CloseDetachedWindowIcon className="small-icon" />
                   ) : (
