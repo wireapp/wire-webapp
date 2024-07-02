@@ -144,9 +144,14 @@ describe('MediaDevicesHandler', () => {
     ],
   };
 
+  let enumerateDevicesSpy: jasmine.Spy;
+
+  beforeEach(() => {
+    enumerateDevicesSpy = spyOn(window.navigator.mediaDevices, 'enumerateDevices');
+  });
   describe('refreshMediaDevices', () => {
-    it('filters duplicate microphones and keeps the ones marked with "communications"', () => {
-      spyOn(navigator.mediaDevices, 'enumerateDevices').and.returnValue(
+    it('filters duplicate microphones and keeps the ones marked with "communications"', done => {
+      enumerateDevicesSpy.and.returnValue(
         Promise.resolve([
           {
             deviceId: 'default',
@@ -170,14 +175,19 @@ describe('MediaDevicesHandler', () => {
       );
 
       const devicesHandler = new MediaDevicesHandler();
+      devicesHandler.getMediaDeviceAccessStream = (_: boolean) => {
+        return Promise.resolve(new MediaStream());
+      };
+      devicesHandler.initializeMediaDevices(true);
 
       setTimeout(() => {
         expect(devicesHandler.availableDevices.audioinput().length).toEqual(1);
+        done();
       });
     });
 
-    it('filters duplicate speakers', () => {
-      spyOn(navigator.mediaDevices, 'enumerateDevices').and.returnValue(
+    it('filters duplicate speakers', done => {
+      enumerateDevicesSpy.and.returnValue(
         Promise.resolve([
           ...realWorldTestSetup.cameras,
           ...realWorldTestSetup.microphones,
@@ -186,6 +196,10 @@ describe('MediaDevicesHandler', () => {
       );
 
       const devicesHandler = new MediaDevicesHandler();
+      devicesHandler.getMediaDeviceAccessStream = (_: boolean) => {
+        return Promise.resolve(new MediaStream());
+      };
+      devicesHandler.initializeMediaDevices(true);
 
       expect(realWorldTestSetup.cameras.length).toEqual(2);
       expect(realWorldTestSetup.microphones.length).toEqual(5);
@@ -195,13 +209,13 @@ describe('MediaDevicesHandler', () => {
         expect(devicesHandler.availableDevices.videoinput().length).toEqual(2);
         expect(devicesHandler.availableDevices.audioinput().length).toEqual(3);
         expect(devicesHandler.availableDevices.audiooutput().length).toEqual(4);
+        done();
       });
     });
   });
 
-  describe('constructor', () => {
+  describe('initializeMediaDevices', () => {
     it('loads available devices and listens to input devices changes', done => {
-      const enumerateDevicesSpy = spyOn(navigator.mediaDevices, 'enumerateDevices');
       enumerateDevicesSpy.and.returnValue(
         Promise.resolve([
           ...fakeWorldTestSetup.cameras,
@@ -211,8 +225,13 @@ describe('MediaDevicesHandler', () => {
       );
 
       const devicesHandler = new MediaDevicesHandler();
+      devicesHandler.getMediaDeviceAccessStream = (_: boolean) => {
+        return Promise.resolve(new MediaStream());
+      };
+      devicesHandler.initializeMediaDevices(true);
+
       setTimeout(() => {
-        expect(navigator.mediaDevices.enumerateDevices).toHaveBeenCalledTimes(1);
+        expect(enumerateDevicesSpy).toHaveBeenCalledTimes(1);
         expect(devicesHandler.availableDevices.videoinput()).toEqual(fakeWorldTestSetup.cameras);
         expect(devicesHandler.availableDevices.audiooutput()).toEqual(fakeWorldTestSetup.speakers);
 
@@ -221,7 +240,7 @@ describe('MediaDevicesHandler', () => {
         navigator.mediaDevices!.ondevicechange?.(Event.prototype);
 
         setTimeout(() => {
-          expect(navigator.mediaDevices.enumerateDevices).toHaveBeenCalledTimes(2);
+          expect(enumerateDevicesSpy).toHaveBeenCalledTimes(2);
           expect(devicesHandler.availableDevices.videoinput()).toEqual(newCameras);
           expect(devicesHandler.availableDevices.audiooutput()).toEqual([]);
           done();
@@ -232,7 +251,7 @@ describe('MediaDevicesHandler', () => {
 
   describe('currentAvailableDeviceId', () => {
     it('only exposes available device', done => {
-      spyOn(navigator.mediaDevices, 'enumerateDevices').and.returnValue(
+      enumerateDevicesSpy.and.returnValue(
         Promise.resolve([
           ...fakeWorldTestSetup.cameras,
           ...fakeWorldTestSetup.microphones,
@@ -241,6 +260,11 @@ describe('MediaDevicesHandler', () => {
       );
 
       const devicesHandler = new MediaDevicesHandler();
+      devicesHandler.getMediaDeviceAccessStream = (_: boolean) => {
+        return Promise.resolve(new MediaStream());
+      };
+      devicesHandler.initializeMediaDevices(true);
+
       setTimeout(() => {
         devicesHandler.currentDeviceId.videoinput(fakeWorldTestSetup.cameras[0].deviceId);
 

@@ -72,6 +72,35 @@ export class MediaStreamHandler {
     }
   }
 
+  /**
+   * The method creates a media stream to enforce access rights to the camera and the microphone. If access is not possible, it starts a user pop-up
+   * @param video When `video=true` then the camera is also addressed. In many cases this is not necessary, because one
+   * track is enough to enforce the general permissions.
+   * @returns Promise with active MediaStream
+   */
+  requestMediaSreamAccess(video: boolean): Promise<MediaStream> {
+    const audio = true;
+    const screen = false;
+    return window.navigator.mediaDevices
+      .getUserMedia({audio, video})
+      .then((mediaStream: MediaStream) => {
+        return mediaStream;
+      })
+      .catch((error: Error) => {
+        const name = error.name as MEDIA_STREAM_ERROR;
+        if (
+          [
+            MEDIA_STREAM_ERROR.NOT_READABLE_ERROR,
+            MEDIA_STREAM_ERROR.NOT_ALLOWED_ERROR,
+            MEDIA_STREAM_ERROR.NOT_FOUND_ERROR,
+          ].includes(name)
+        ) {
+          this.schedulePermissionHint(audio, video, screen);
+        }
+        throw error;
+      });
+  }
+
   selectScreenToShare(showScreenSelection: () => Promise<void>): Promise<void> {
     if (this.screensharingMethod === ScreensharingMethods.DESKTOP_CAPTURER) {
       return showScreenSelection();
