@@ -30,7 +30,7 @@ interface Config {
   CONSTRAINTS: {
     SCREEN: {
       DESKTOP_CAPTURER: MediaTrackConstraints & {
-        mandatory: {chromeMediaSource: string; chromeMediaSourceId?: string; maxHeight: number; minHeight: number};
+        mandatory: {chromeMediaSource: string; chromeMediaSourceId?: string; maxHeight?: number; minHeight?: number};
       };
       DISPLAY_MEDIA: MediaTrackConstraints;
       USER_MEDIA: MediaTrackConstraints & {mediaSource: string};
@@ -57,16 +57,10 @@ export class MediaConstraintsHandler {
           DESKTOP_CAPTURER: {
             mandatory: {
               chromeMediaSource: 'desktop',
-              maxHeight: 1080,
-              minHeight: 1080,
             },
           },
           DISPLAY_MEDIA: {
-            frameRate: 5,
-            height: {
-              ideal: 1080,
-              max: 1080,
-            },
+            frameRate: 12,
           },
           USER_MEDIA: {
             frameRate: 5,
