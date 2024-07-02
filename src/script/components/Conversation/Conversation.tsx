@@ -494,17 +494,16 @@ export const Conversation = ({
             }
 
             return (
-              <div className="calling-cell" key={conversation.id}>
-                <CallingCell
-                  classifiedDomains={classifiedDomains}
-                  call={call}
-                  callActions={callingViewModel.callActions}
-                  callingRepository={callingRepository}
-                  pushToTalkKey={callingViewModel.propertiesRepository.getPreference(
-                    PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY,
-                  )}
-                />
-              </div>
+              <CallingCell
+                key={conversation.id}
+                classifiedDomains={classifiedDomains}
+                call={call}
+                callActions={callingViewModel.callActions}
+                callingRepository={callingRepository}
+                pushToTalkKey={callingViewModel.propertiesRepository.getPreference(
+                  PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY,
+                )}
+              />
             );
           })}
 
