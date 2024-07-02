@@ -17,6 +17,7 @@
  *
  */
 
+import {CSSObject} from '@emotion/react';
 import {
   components,
   ContainerProps,
@@ -117,11 +118,11 @@ export const CustomOption = (dataUieName: string) => (props: OptionProps<Option>
 };
 
 // eslint-disable-next-line react/display-name
-export const Menu = (dataUieName: string) => (props: MenuProps) => {
+export const Menu = (dataUieName: string, css?: CSSObject) => (props: MenuProps) => {
   const {children} = props;
 
   return (
-    <components.Menu {...props}>
+    <components.Menu {...props} css={css}>
       <div
         {...(dataUieName && {
           'data-uie-name': `dropdown-${dataUieName}`,
