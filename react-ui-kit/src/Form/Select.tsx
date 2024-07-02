@@ -51,6 +51,7 @@ interface SelectProps<IsMulti extends boolean, Group extends GroupBase<Option>>
   disabled?: boolean;
   dataUieName: string;
   options: Option[] | Group[];
+  menuCSS?: CSSObject;
   wrapperCSS?: CSSObject;
   label?: string;
   helperText?: string;
@@ -72,6 +73,7 @@ export const Select = <IsMulti extends boolean = false, Group extends GroupBase<
   options,
   isMulti,
   wrapperCSS = {},
+  menuCSS = {},
   markInvalid = false,
   required = false,
   isSearchable = false,
@@ -114,7 +116,7 @@ export const Select = <IsMulti extends boolean = false, Group extends GroupBase<
           SelectContainer,
           DropdownIndicator,
           Option: CustomOption(dataUieName),
-          Menu: Menu(dataUieName),
+          Menu: Menu(dataUieName, menuCSS),
           ValueContainer,
           IndicatorsContainer,
         }}
