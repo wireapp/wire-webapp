@@ -19,7 +19,7 @@
 
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {Config} from 'src/script/Config';
 import {ProtocolUpdateMessage as ProtocolUpdateMessageEntity} from 'src/script/entity/message/ProtocolUpdateMessage';
 import {SystemMessage} from 'src/script/entity/message/SystemMessage';
@@ -47,7 +47,7 @@ export const ProtocolUpdateMessage = ({message}: ProtocolUpdateMessageProps) => 
     return (
       <>
         {messages.map(message => (
-          <SystemMessageBase key={message.caption} icon={<Icon.Info />} message={message} />
+          <SystemMessageBase key={message.caption} icon={<Icon.InfoIcon />} message={message} />
         ))}
       </>
     );
@@ -56,5 +56,5 @@ export const ProtocolUpdateMessage = ({message}: ProtocolUpdateMessageProps) => 
   const migratedToMLSMessage = createSystemMessage(
     t('conversationProtocolUpdatedToMLS', {}, replaceLink(Config.getConfig().URL.SUPPORT.MLS_LEARN_MORE)),
   );
-  return <SystemMessageBase message={migratedToMLSMessage} icon={<Icon.Info />} />;
+  return <SystemMessageBase message={migratedToMLSMessage} icon={<Icon.InfoIcon />} />;
 };

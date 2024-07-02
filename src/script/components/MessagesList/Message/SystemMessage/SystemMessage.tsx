@@ -21,7 +21,7 @@ import React from 'react';
 
 import {MLSVerified} from '@wireapp/react-ui-kit';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {E2EIVerificationMessage} from 'src/script/entity/message/E2EIVerificationMessage';
 import {JoinedAfterMLSMigrationFinalisationMessage} from 'src/script/entity/message/JoinedAfterMLSMigrationFinalisationMessage';
 import {MessageTimerUpdateMessage} from 'src/script/entity/message/MessageTimerUpdateMessage';
@@ -35,6 +35,7 @@ import {SystemMessage as SystemMessageEntity} from 'src/script/entity/message/Sy
 
 import {SystemMessageBase} from './SystemMessageBase';
 
+import {messageBodyWrapper} from '../ContentMessage/ContentMessage.styles';
 import {ProtocolUpdateMessage as ProtocolUpdateMessageComponent} from '../ProtocolUpdateMessage';
 
 export interface SystemMessageProps {
@@ -45,22 +46,24 @@ export const SystemMessage: React.FC<SystemMessageProps> = ({message}) => {
   if (message instanceof RenameMessage) {
     return (
       <>
-        <SystemMessageBase message={message} isSenderNameVisible icon={<Icon.Edit />} />
-        <div className="message-body font-weight-bold">{message.name}</div>
+        <SystemMessageBase message={message} isSenderNameVisible icon={<Icon.EditIcon />} />
+        <div css={messageBodyWrapper()}>
+          <div className="message-body font-weight-bold">{message.name}</div>
+        </div>
       </>
     );
   }
 
   if (message instanceof MessageTimerUpdateMessage) {
-    return <SystemMessageBase message={message} isSenderNameVisible icon={<Icon.Timer />} />;
+    return <SystemMessageBase message={message} isSenderNameVisible icon={<Icon.TimerIcon />} />;
   }
 
   if (message instanceof ReceiptModeUpdateMessage) {
-    return <SystemMessageBase message={message} isSenderNameVisible icon={<Icon.Read />} />;
+    return <SystemMessageBase message={message} isSenderNameVisible icon={<Icon.ReadIcon />} />;
   }
 
   if (message instanceof MLSConversationRecoveredMessage) {
-    return <SystemMessageBase message={message} icon={<Icon.Info />} />;
+    return <SystemMessageBase message={message} icon={<Icon.InfoIcon />} />;
   }
 
   if (message instanceof E2EIVerificationMessage) {
@@ -72,15 +75,15 @@ export const SystemMessage: React.FC<SystemMessageProps> = ({message}) => {
   }
 
   if (message instanceof JoinedAfterMLSMigrationFinalisationMessage) {
-    return <SystemMessageBase message={message} icon={<Icon.Info />} />;
+    return <SystemMessageBase message={message} icon={<Icon.InfoIcon />} />;
   }
 
   if (message instanceof OneToOneMigratedToMlsMessage) {
-    return <SystemMessageBase message={message} icon={<Icon.Info />} />;
+    return <SystemMessageBase message={message} icon={<Icon.InfoIcon />} />;
   }
 
   if (message instanceof MLSMigrationFinalisationOngoingCallMessage) {
-    return <SystemMessageBase message={message} icon={<Icon.Info />} />;
+    return <SystemMessageBase message={message} icon={<Icon.InfoIcon />} />;
   }
 
   return <SystemMessageBase message={message} />;

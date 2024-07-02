@@ -31,7 +31,7 @@ export const header: CSSObject = {
 export const label: CSSObject = {
   color: 'var(--main-color)',
   fontWeight: 'var(--font-weight-semibold)',
-  fontSize: 'var(--font-size-base)',
+  fontSize: 'var(--font-size-medium)',
   paddingBlock: '8px',
   textOverflow: 'ellipsis',
   overflow: 'hidden',
@@ -40,10 +40,6 @@ export const label: CSSObject = {
 
 export const button: CSSObject = {
   marginBottom: 0,
-
-  svg: {
-    marginRight: '8px',
-  },
 };
 
 const commonIconStyles: CSSObject = {

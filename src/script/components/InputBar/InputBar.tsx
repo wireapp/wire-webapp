@@ -435,12 +435,6 @@ export const InputBar = ({
     });
   };
 
-  const onWindowClick = (event: Event): void =>
-    handleClickOutsideOfInputBar(event, () => {
-      cancelMessageEditing(true);
-      cancelMessageReply();
-    });
-
   useEffect(() => {
     amplify.subscribe(WebAppEvents.CONVERSATION.IMAGE.SEND, uploadImages);
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REPLY, replyMessage);
@@ -458,18 +452,20 @@ export const InputBar = ({
   }, []);
 
   const saveDraft = async (editorState: string) => {
-    await saveDraftState(storageRepository, conversation, editorState, replyMessageEntity?.id);
+    await saveDraftState(storageRepository, conversation, editorState, replyMessageEntity?.id, editedMessage?.id);
   };
 
   const loadDraft = async () => {
     const draftState = await loadDraftState(conversation, storageRepository, messageRepository);
 
-    if (draftState.messageReply) {
-      void draftState.messageReply.then(replyEntity => {
-        if (replyEntity?.isReplyable()) {
-          setReplyMessageEntity(replyEntity);
-        }
-      });
+    const reply = draftState.messageReply;
+    if (reply?.isReplyable()) {
+      setReplyMessageEntity(reply);
+    }
+
+    const editedMessage = draftState.editedMessage;
+    if (editedMessage) {
+      setEditedMessage(editedMessage);
     }
 
     return draftState;
@@ -498,6 +494,15 @@ export const InputBar = ({
   }, [replyMessageEntity]);
 
   useEffect(() => {
+    const onWindowClick = (event: Event): void =>
+      handleClickOutsideOfInputBar(event, () => {
+        // We want to add a timeout in case the click happens because the user switched conversation and the component is unmounting.
+        // In this case we want to keep the edited message for this conversation
+        setTimeout(() => {
+          cancelMessageEditing(true);
+          cancelMessageReply();
+        });
+      });
     if (isEditing) {
       window.addEventListener('click', onWindowClick);
 
@@ -507,7 +512,7 @@ export const InputBar = ({
     }
 
     return () => undefined;
-  }, [isEditing]);
+  }, [cancelMessageEditing, cancelMessageReply, isEditing]);
 
   useFilePaste(checkFileSharingPermission(handlePasteFiles));
 

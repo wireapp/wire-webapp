@@ -23,7 +23,7 @@ import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 
 import {t} from 'Util/LocalizerUtil';
 
-import {Icon} from '../Icon';
+import * as Icon from '../Icon';
 
 export interface ReceiptModeToggleProps {
   onReceiptModeChanged: (receiptMode: RECEIPT_MODE) => void;
@@ -49,7 +49,7 @@ const ReceiptModeToggle = ({receiptMode, onReceiptModeChanged}: ReceiptModeToggl
           className="panel__action-item-label"
         >
           <span className="panel__action-item__icon">
-            <Icon.Read />
+            <Icon.ReadIcon />
           </span>
 
           <span className="panel__action-item__summary">

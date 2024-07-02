@@ -22,7 +22,7 @@ import React from 'react';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {Conversation} from 'src/script/entity/Conversation';
 import {EphemeralTimings} from 'src/script/ephemeral/EphemeralTimings';
 import {TeamState} from 'src/script/team/TeamState';
@@ -119,7 +119,7 @@ const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({
         )
       ) : (
         <span className={cx({disabled: isTimerDisabled})} css={{display: 'flex'}}>
-          <Icon.Timer data-uie-name="message-timer-icon" />
+          <Icon.TimerIcon data-uie-name="message-timer-icon" />
         </span>
       )}
     </button>

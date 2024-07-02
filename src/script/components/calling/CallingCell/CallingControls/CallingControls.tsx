@@ -25,7 +25,7 @@ import {
   cellControlsWrapper,
 } from 'Components/calling/CallingCell/CallingControls/CallingControls.styles';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -75,14 +75,13 @@ export const CallingControls = ({
   teamState = container.resolve(TeamState),
   supportsVideoCall,
 }: CallingControlsProps) => {
+  const {isVideoCallingEnabled} = useKoSubscribableChildren(teamState, ['isVideoCallingEnabled']);
   const {sharesScreen: selfSharesScreen, sharesCamera: selfSharesCamera} = useKoSubscribableChildren(selfParticipant, [
     'sharesScreen',
     'sharesCamera',
   ]);
 
   const {showAlert, clearShowAlert} = useCallAlertState();
-
-  const {isVideoCallingEnabled} = useKoSubscribableChildren(teamState, ['isVideoCallingEnabled']);
 
   const isVideoUnsupported = !selfSharesCamera && !supportsVideoCall;
   const showVideoButton = isVideoCallingEnabled && (isVideoCall || isOngoing);
@@ -105,7 +104,7 @@ export const CallingControls = ({
                 aria-checked={!isMuted}
                 disabled={isConnecting}
               >
-                {isMuted ? <Icon.MicOff className="small-icon" /> : <Icon.MicOn className="small-icon" />}
+                {isMuted ? <Icon.MicOffIcon className="small-icon" /> : <Icon.MicOnIcon className="small-icon" />}
               </button>
             </li>
 
@@ -123,9 +122,9 @@ export const CallingControls = ({
                   data-uie-value={selfSharesCamera ? 'active' : 'inactive'}
                 >
                   {selfSharesCamera ? (
-                    <Icon.Camera className="small-icon" />
+                    <Icon.CameraIcon className="small-icon" />
                   ) : (
-                    <Icon.CameraOff className="small-icon" />
+                    <Icon.CameraOffIcon className="small-icon" />
                   )}
                 </button>
               </li>
@@ -149,9 +148,9 @@ export const CallingControls = ({
                   disabled={disableScreenButton || isDetachedWindow}
                 >
                   {selfSharesScreen ? (
-                    <Icon.Screenshare className="small-icon" />
+                    <Icon.ScreenshareIcon className="small-icon" />
                   ) : (
-                    <Icon.ScreenshareOff className="small-icon" />
+                    <Icon.ScreenshareOffIcon className="small-icon" />
                   )}
                 </button>
               </li>
@@ -177,7 +176,7 @@ export const CallingControls = ({
               type="button"
               data-uie-name="do-call-controls-call-decline"
             >
-              <Icon.Hangup className="small-icon" style={{maxWidth: 17}} />
+              <Icon.HangupIcon className="small-icon" style={{maxWidth: 17}} />
             </button>
           </li>
         )}
@@ -202,7 +201,7 @@ export const CallingControls = ({
                 aria-label={t('callAccept')}
                 data-uie-name="do-call-controls-call-accept"
               >
-                <Icon.Pickup className="small-icon" />
+                <Icon.PickupIcon className="small-icon" />
               </button>
             )}
           </li>
@@ -217,7 +216,7 @@ export const CallingControls = ({
               type="button"
               data-uie-name="do-call-controls-call-leave"
             >
-              <Icon.Hangup className="small-icon" style={{maxWidth: 17}} />
+              <Icon.HangupIcon className="small-icon" style={{maxWidth: 17}} />
             </button>
           </li>
         )}

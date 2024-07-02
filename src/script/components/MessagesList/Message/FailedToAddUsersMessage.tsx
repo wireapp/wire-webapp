@@ -24,7 +24,7 @@ import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {getUserName} from 'Components/UserName';
 import {Config} from 'src/script/Config';
 import {User} from 'src/script/entity/User';
@@ -177,7 +177,7 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
       <div className="message-header">
         <div className="message-header-icon message-header-icon--svg">
           <div className="svg-red">
-            <Icon.Info />
+            <Icon.InfoIcon />
           </div>
         </div>
         <div

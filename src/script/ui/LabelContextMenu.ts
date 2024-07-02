@@ -17,6 +17,7 @@
  *
  */
 
+import {PlusIcon} from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
 import {ContextMenuEntry, showContextMenu} from './ContextMenu';
@@ -31,7 +32,7 @@ export const showLabelContextMenu = (
 ): void => {
   const newLabel: ContextMenuEntry = {
     click: () => labelRepository.addConversationToNewLabel(conversation),
-    icon: 'plus-icon',
+    icon: PlusIcon,
     label: t('conversationsPopoverNewFolder'),
   };
   const separator: ContextMenuEntry = {isSeparator: true};

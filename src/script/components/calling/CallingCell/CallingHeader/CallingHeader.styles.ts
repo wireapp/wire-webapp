@@ -69,3 +69,12 @@ export const cbrCallState: CSSObject = {
   fontWeight: 'var(--font-weight-semibold)',
   marginLeft: '6px',
 };
+
+export const detachedWindowButton: CSSObject = {
+  alignItems: 'center',
+  background: 'transparent',
+  border: 'none',
+  display: 'flex',
+  justifyContent: 'center',
+  padding: '8px 12px',
+};

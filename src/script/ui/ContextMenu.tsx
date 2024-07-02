@@ -24,7 +24,7 @@ import {createRoot, Root} from 'react-dom/client';
 
 import {Availability} from '@wireapp/protocol-messaging';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {IgnoreOutsideClickWrapper} from 'Components/InputBar/util/clickHandlers';
 import {useMessageActionsState} from 'Components/MessagesList/Message/ContentMessage/MessageActions/MessageActions.state';
 import {isEnterKey, isEscapeKey, isKey, isOneOfKeys, isSpaceKey, KEY} from 'Util/KeyboardUtil';
@@ -32,7 +32,7 @@ import {isEnterKey, isEscapeKey, isKey, isOneOfKeys, isSpaceKey, KEY} from 'Util
 export interface ContextMenuEntry {
   availability?: Availability.Type;
   click?: (event?: MouseEvent) => void;
-  icon?: string;
+  icon?: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   identifier?: string;
   isChecked?: boolean;
   isDisabled?: boolean;
@@ -213,10 +213,10 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
                         },
                       })}
                 >
-                  {entry.icon && <Icon name={entry.icon} className={`${contextMenuClassName}__icon`} />}
+                  {entry.icon && <entry.icon className={`${contextMenuClassName}__icon`} />}
                   <span>{entry.label}</span>
                   {entry.isChecked && (
-                    <Icon.Check
+                    <Icon.CheckIcon
                       className={`${contextMenuClassName}__check`}
                       data-uie-name={`${contextMenuClassName}-check`}
                     />

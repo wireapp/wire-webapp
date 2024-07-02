@@ -21,7 +21,7 @@ import React from 'react';
 
 import {Tooltip} from '@wireapp/react-ui-kit';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
 import {badgesWrapper, icon} from './UserStatusBadges.styles';
@@ -29,22 +29,22 @@ import {badgesWrapper, icon} from './UserStatusBadges.styles';
 const badgeToComponentMap = {
   guest: () => (
     <Tooltip css={icon} body={t('conversationGuestIndicator')}>
-      <Icon.Guest data-uie-name="status-guest" />
+      <Icon.GuestIcon data-uie-name="status-guest" />
     </Tooltip>
   ),
   federated: () => (
     <Tooltip css={icon} body={t('conversationFederationIndicator')}>
-      <Icon.Federation data-uie-name="status-federated-user" />
+      <Icon.FederationIcon data-uie-name="status-federated-user" />
     </Tooltip>
   ),
   external: () => (
     <Tooltip css={icon} body={t('rolePartner')}>
-      <Icon.External data-uie-name="status-external" />
+      <Icon.ExternalIcon data-uie-name="status-external" />
     </Tooltip>
   ),
   verified: () => (
     <span css={icon}>
-      <Icon.Verified data-uie-name="status-verified" />
+      <Icon.VerifiedIcon data-uie-name="status-verified" />
     </span>
   ),
 } as const;

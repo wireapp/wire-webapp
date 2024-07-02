@@ -26,10 +26,9 @@ export const textEllipsis: CSSObject = {
 };
 
 export const wrapper = (isSideBarOpen: boolean): CSSObject => ({
-  marginBlock: '8px 16px',
+  marginBottom: '32px',
 
   ...(isSideBarOpen && {
-    marginBlock: '0 32px',
     display: 'grid',
     gridTemplateAreas: '"avatar userName" "avatar userHandle"',
     gap: '0 8px',

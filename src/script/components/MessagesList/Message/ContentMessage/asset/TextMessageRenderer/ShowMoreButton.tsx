@@ -21,7 +21,7 @@ import {FC, HTMLProps} from 'react';
 
 import cx from 'classnames';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
 import {t} from 'Util/LocalizerUtil';
 
@@ -45,7 +45,7 @@ export const ShowMoreButton: FC<ShowMoreButtonProps & HTMLProps<HTMLButtonElemen
       type="button"
     >
       <span>{active ? t('replyQuoteShowLess') : t('replyQuoteShowMore')}</span>
-      <Icon.Disclose
+      <Icon.DiscloseIcon
         className={cx('disclose-icon', {
           'upside-down': active,
         })}

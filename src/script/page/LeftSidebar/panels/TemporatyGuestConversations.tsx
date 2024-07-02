@@ -22,7 +22,7 @@ import React from 'react';
 import {container} from 'tsyringe';
 
 import {CallingCell} from 'Components/calling/CallingCell';
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {CallingViewMode, CallState} from 'src/script/calling/CallState';
 import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
@@ -100,7 +100,7 @@ const TemporaryGuestConversations: React.FC<TemporaryGuestConversations> = ({
         );
       })}
       <div className="temporary-guest__content">
-        <Icon.LogoFull />
+        <Icon.LogoFullIcon />
         <div className="temporary-guest__description">{t('temporaryGuestDescription')}</div>
         {isAccountCreationEnabled && (
           <button
@@ -132,7 +132,7 @@ const TemporaryGuestConversations: React.FC<TemporaryGuestConversations> = ({
           data-uie-name="go-preferences"
           onClick={openPreferences}
         >
-          <Icon.Settings />
+          <Icon.SettingsIcon />
         </button>
       </div>
     </div>

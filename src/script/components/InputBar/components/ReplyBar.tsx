@@ -25,7 +25,7 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {RestrictedVideo} from 'Components/asset/RestrictedVideo';
 import {ParticipantMicOnIcon} from 'Components/calling/ParticipantMicOnIcon';
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {AssetImage} from 'Components/Image';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -55,7 +55,7 @@ const ReplyBar: FC<ReplyBarProps> = ({replyMessageEntity, onCancel}) => {
         onClick={onCancel}
         data-uie-name="do-close-reply-box"
       >
-        <Icon.Close className="close-icon" />
+        <Icon.CloseIcon className="close-icon" />
       </button>
 
       <div className="input-bar__reply__body">
@@ -68,7 +68,7 @@ const ReplyBar: FC<ReplyBarProps> = ({replyMessageEntity, onCancel}) => {
             </span>
 
             {wasEdited && (
-              <Icon.Edit
+              <Icon.EditIcon
                 className="edit-icon"
                 data-uie-name="message-edited-reply-box"
                 aria-label={t('replyBarEditMessage')}
@@ -113,7 +113,7 @@ const ReplyBar: FC<ReplyBarProps> = ({replyMessageEntity, onCancel}) => {
 
           {replyAsset?.isFile() && (
             <div className="input-bar__reply__message" data-uie-name="media-file-reply-box">
-              <Icon.File className="input-bar__reply__icon" />
+              <Icon.FileIcon className="input-bar__reply__icon" />
 
               <span tabIndex={TabIndex.FOCUSABLE}>{replyAsset.file_name}</span>
             </div>
@@ -121,7 +121,7 @@ const ReplyBar: FC<ReplyBarProps> = ({replyMessageEntity, onCancel}) => {
 
           {replyAsset?.isLocation() && (
             <div className="input-bar__reply__message" data-uie-name="media-location-reply-box">
-              <Icon.Location className="input-bar__reply__icon" aria-label={t('replyBarLocation')} />
+              <Icon.LocationIcon className="input-bar__reply__icon" aria-label={t('replyBarLocation')} />
 
               <span tabIndex={TabIndex.FOCUSABLE}>{replyAsset.name}</span>
             </div>

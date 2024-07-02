@@ -286,7 +286,6 @@ const Conversations: React.FC<ConversationsProps> = ({
               pushToTalkKey={propertiesRepository.getPreference(PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY)}
               isFullUi
               hasAccessToCamera={callingViewModel.hasAccessToCamera()}
-              isSelfVerified={selfUser.is_verified()}
             />
           )
         );

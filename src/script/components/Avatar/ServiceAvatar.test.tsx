@@ -24,7 +24,6 @@ import {AVATAR_SIZE} from 'Components/Avatar';
 import {ServiceAvatar} from './ServiceAvatar';
 
 import {ServiceEntity} from '../../integration/ServiceEntity';
-jest.mock('../../auth/util/SVGProvider');
 
 describe('ServiceAvatar', () => {
   it('shows a service icon', async () => {

@@ -22,7 +22,7 @@ import React from 'react';
 import {CSSObject} from '@emotion/react';
 import cx from 'classnames';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -69,7 +69,7 @@ export const UserClassifiedBar: React.FC<UserClassifiedBarProps> = ({
       data-uie-name="classified-label"
       css={{...style}}
     >
-      {classified ? <Icon.Check /> : <Icon.Info />}
+      {classified ? <Icon.CheckIcon /> : <Icon.InfoIcon />}
       {text}
     </div>
   );

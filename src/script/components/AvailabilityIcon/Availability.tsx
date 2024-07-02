@@ -22,9 +22,10 @@ import {ReactNode} from 'react';
 import {Availability as AvailabilityProp} from '@wireapp/protocol-messaging';
 
 import {AVATAR_SIZE} from 'Components/Avatar';
-import {Icon} from 'Components/Icon';
 
 import * as styles from './Availability.styles';
+
+import * as Icon from '../Icon';
 
 const availabilityIconBaseProps = {
   'data-uie-name': 'status-availability-icon',
@@ -32,21 +33,21 @@ const availabilityIconBaseProps = {
 
 const availabilityIconRenderer: Record<AvailabilityProp.Type, (avatarSize: AVATAR_SIZE) => ReactNode> = {
   [AvailabilityProp.Type.AVAILABLE]: avatarSize => (
-    <Icon.AvailabilityAvailable
+    <Icon.AvailabilityAvailableIcon
       {...availabilityIconBaseProps}
       css={styles.iconStyles(AvailabilityProp.Type.AVAILABLE, avatarSize)}
       data-uie-value="available"
     />
   ),
   [AvailabilityProp.Type.AWAY]: avatarSize => (
-    <Icon.AvailabilityAway
+    <Icon.AvailabilityAwayIcon
       {...availabilityIconBaseProps}
       css={styles.iconStyles(AvailabilityProp.Type.AWAY, avatarSize)}
       data-uie-value="away"
     />
   ),
   [AvailabilityProp.Type.BUSY]: avatarSize => (
-    <Icon.AvailabilityBusy
+    <Icon.AvailabilityBusyIcon
       {...availabilityIconBaseProps}
       css={styles.iconStyles(AvailabilityProp.Type.BUSY, avatarSize)}
       data-uie-value="busy"

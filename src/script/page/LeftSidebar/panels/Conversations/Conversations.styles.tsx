@@ -28,7 +28,7 @@ export const conversationsSidebarStyles = (mdBreakpoint: Boolean): CSSObject => 
   zIndex: mdBreakpoint ? '1000' : 'auto',
 });
 
-export const conversationsSidebarHandleStyles = (rotate: Boolean): CSSObject => ({
+export const conversationsSidebarHandleStyles = (isSidebarOpen: Boolean): CSSObject => ({
   position: 'absolute',
   zIndex: '1000',
   top: '8px',
@@ -36,7 +36,8 @@ export const conversationsSidebarHandleStyles = (rotate: Boolean): CSSObject => 
   width: '24px',
   height: '24px',
   borderWidth: '2px',
-  transform: rotate ? 'rotate(180deg)' : 'rotate(0deg)',
+  display: 'none',
+  transform: isSidebarOpen ? 'rotate(180deg)' : 'rotate(0deg)',
   '&:hover': {
     borderColor: 'var(--accent-color-300)',
     backgroundColor: 'var(--accent-color-50)',

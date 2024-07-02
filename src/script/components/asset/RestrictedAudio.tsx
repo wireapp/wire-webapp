@@ -19,7 +19,7 @@
 
 import React from 'react';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
 export type RestrictedAudioProps = React.HTMLProps<HTMLDivElement>;
@@ -28,7 +28,7 @@ const RestrictedAudio: React.FC<RestrictedAudioProps> = ({}) => {
   return (
     <div className="audio-restricted">
       <div className="audio-restricted__icon">
-        <Icon.MicOn width={24} height={24} />
+        <Icon.MicOnIcon width={24} height={24} />
       </div>
       <div className="audio-restricted__description">
         <div className="audio-restricted__description__headline">

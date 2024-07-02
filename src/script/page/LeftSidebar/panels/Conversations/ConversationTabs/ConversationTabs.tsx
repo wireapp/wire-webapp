@@ -17,9 +17,9 @@
  *
  */
 
-import {ChevronIcon, GroupIcon, InfoIcon, MessageIcon, StarIcon} from '@wireapp/react-ui-kit';
+import {GroupIcon, InfoIcon, MessageIcon, StarIcon, ExternalLinkIcon} from '@wireapp/react-ui-kit';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {ConversationFolderTab} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTab/ConversationFolderTab';
 import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/state';
@@ -90,14 +90,14 @@ export const ConversationTabs = ({
       type: SidebarTabs.DIRECTS,
       title: t('conversationLabelDirects'),
       dataUieName: 'go-directs-view',
-      Icon: <Icon.People />,
+      Icon: <Icon.PeopleIcon />,
       unreadConversations: directConversations.filter(conversation => conversation.hasUnread()).length,
     },
     {
       type: SidebarTabs.FOLDER,
       title: t('folderViewTooltip'),
       dataUieName: 'go-folders-view',
-      Icon: <ChevronIcon />,
+      Icon: <Icon.FoldersOutline />,
       unreadConversations: totalUnreadConversations,
     },
     {
@@ -105,7 +105,7 @@ export const ConversationTabs = ({
       title: t('tooltipConversationsArchived', archivedConversations.length),
       label: t('conversationFooterArchive'),
       dataUieName: 'go-archive',
-      Icon: <Icon.Archive />,
+      Icon: <Icon.ArchiveIcon />,
       unreadConversations: totalUnreadArchivedConversations,
     },
   ];
@@ -154,7 +154,7 @@ export const ConversationTabs = ({
           title={t('searchConnect', Shortcut.getShortcutTooltip(ShortcutType.START))}
           label={t('searchConnect')}
           type={SidebarTabs.CONNECT}
-          Icon={<Icon.Plus />}
+          Icon={<Icon.AddParticipantsIcon />}
           onChangeTab={onChangeTab}
           conversationTabIndex={conversationTabs.length + 1}
           dataUieName="go-people"
@@ -172,7 +172,7 @@ export const ConversationTabs = ({
           title={t('preferencesHeadline', Shortcut.getShortcutTooltip(ShortcutType.START))}
           label={t('preferencesHeadline')}
           type={SidebarTabs.PREFERENCES}
-          Icon={<Icon.Settings />}
+          Icon={<Icon.SettingsIcon />}
           onChangeTab={tab => {
             onChangeTab(tab);
             onClickPreferences();
@@ -195,6 +195,7 @@ export const ConversationTabs = ({
           <span className="conversations-sidebar-btn--text-wrapper">
             <InfoIcon />
             <span className="conversations-sidebar-btn--text">{t('preferencesAboutSupport')}</span>
+            <ExternalLinkIcon className="external-link-icon" />
           </span>
         </a>
       </div>

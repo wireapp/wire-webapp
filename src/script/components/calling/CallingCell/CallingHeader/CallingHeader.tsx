@@ -22,7 +22,7 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {Avatar, AVATAR_SIZE, GroupAvatar} from 'Components/Avatar';
 import {useDetachedCallingFeatureState} from 'Components/calling/DetachedCallingCell/DetachedCallingFeature.state';
 import {Duration} from 'Components/calling/Duration';
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
 import {
@@ -33,6 +33,7 @@ import {
   callingHeaderWrapper,
   cbrCallState,
   conversationCallName,
+  detachedWindowButton,
 } from './CallingHeader.styles';
 
 import {User} from '../../../../entity/User';
@@ -152,12 +153,8 @@ export const CallingHeader = ({
 
       {isOngoing && isDetachedCallingFeatureEnabled && (
         <div>
-          <button className="call-ui__button" onClick={toggleDetachedWindow}>
-            {isDetachedWindow ? (
-              <Icon.CloseDetachedWindowIcon className="small-icon" />
-            ) : (
-              <Icon.OpenDetachedWindowIcon className="small-icon" />
-            )}
+          <button css={detachedWindowButton} onClick={toggleDetachedWindow}>
+            {isDetachedWindow ? <Icon.CloseDetachedWindowIcon /> : <Icon.OpenDetachedWindowIcon />}
           </button>
         </div>
       )}

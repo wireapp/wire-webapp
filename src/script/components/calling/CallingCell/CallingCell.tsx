@@ -29,7 +29,7 @@ import {CallingControls} from 'Components/calling/CallingCell/CallingControls';
 import {CallingHeader} from 'Components/calling/CallingCell/CallingHeader';
 import {GroupVideoGrid} from 'Components/calling/GroupVideoGrid';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {ConversationClassifiedBar} from 'Components/input/ClassifiedBar';
 import {usePushToTalk} from 'src/script/hooks/usePushToTalk/usePushToTalk';
 import {useAppMainState, ViewType} from 'src/script/page/state';
@@ -100,10 +100,9 @@ export const CallingCell = ({
     selfUser,
     display_name: conversationName,
   } = useKoSubscribableChildren(conversation, ['isGroup', 'participating_user_ets', 'selfUser', 'display_name']);
-  const {activeCallViewTab} = useKoSubscribableChildren(callState, ['activeCallViewTab']);
-  const {viewMode} = useKoSubscribableChildren(callState, ['viewMode']);
+  const {activeCallViewTab, viewMode} = useKoSubscribableChildren(callState, ['activeCallViewTab', 'viewMode']);
 
-  const selfParticipant = call?.getSelfParticipant();
+  const selfParticipant = call.getSelfParticipant();
 
   const {sharesCamera: selfSharesCamera, hasActiveVideo: selfHasActiveVideo} = useKoSubscribableChildren(
     selfParticipant,
@@ -113,7 +112,6 @@ export const CallingCell = ({
   const {activeSpeakers} = useKoSubscribableChildren(call, ['activeSpeakers']);
 
   const isVideoCall = call.initialType === CALL_TYPE.VIDEO;
-
   const isFullScreenGrid = viewMode === CallingViewMode.FULL_SCREEN_GRID;
   const isDetachedWindow = viewMode === CallingViewMode.DETACHED_WINDOW;
 
@@ -254,11 +252,7 @@ export const CallingCell = ({
   });
 
   const toggleDetachedWindow = () => {
-    if (isDetachedWindow) {
-      callState.viewMode(CallingViewMode.MINIMIZED);
-    } else {
-      callState.viewMode(CallingViewMode.DETACHED_WINDOW);
-    }
+    callState.viewMode(isDetachedWindow ? CallingViewMode.MINIMIZED : CallingViewMode.DETACHED_WINDOW);
   };
 
   return (
@@ -297,8 +291,8 @@ export const CallingCell = ({
             startedAt={startedAt}
             isCbrEnabled={isCbrEnabled}
             toggleDetachedWindow={toggleDetachedWindow}
-            isDetachedWindow={isDetachedWindow}
             isDetached={isDetached}
+            isDetachedWindow={isDetachedWindow}
           />
 
           {(isOngoing || selfHasActiveVideo) && !isFullScreenGrid && !!videoGrid?.grid?.length && isFullUi ? (
@@ -325,7 +319,7 @@ export const CallingCell = ({
 
                   {isOngoing && !isDetachedWindow && (
                     <div className="group-video__minimized-wrapper__overlay" data-uie-name="do-maximize-call">
-                      <Icon.Fullscreen />
+                      <Icon.FullscreenIcon />
                     </div>
                   )}
                 </div>

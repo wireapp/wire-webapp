@@ -21,6 +21,7 @@ import cx from 'classnames';
 
 import {useMatchMedia} from '@wireapp/react-ui-kit';
 
+import * as Icons from 'Components/Icon';
 import {Config} from 'src/script/Config';
 import {createLabel} from 'src/script/conversation/ConversationLabelRepository';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
@@ -137,6 +138,7 @@ export const ConversationFolderTab = ({
         <span className="conversations-sidebar-btn--text-wrapper">
           {Icon}
           <span className="conversations-sidebar-btn--text">{label || title}</span>
+          <Icons.ChevronIcon className="folders-open-indicator" />
         </span>
       </button>
       <div className={cx('conversations-sidebar-folders', {active: isFoldersTabOpen})}>
@@ -165,7 +167,12 @@ export const ConversationFolderTab = ({
                 onClick={() => toggleFolder(folder.id)}
               >
                 <span>{folder.name}</span>
-                {!!unreadCount && <span className={cx('conversations-sidebar-btn--badge', {active: isActive})} />}
+                {!!unreadCount && (
+                  <span
+                    className={cx('conversations-sidebar-btn--badge', {active: isActive})}
+                    data-uie-name="unread-badge"
+                  />
+                )}
               </button>
             );
           })}
