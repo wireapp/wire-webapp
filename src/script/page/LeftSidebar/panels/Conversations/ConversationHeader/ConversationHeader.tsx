@@ -21,7 +21,7 @@ import {KeyboardEvent, useEffect, useRef} from 'react';
 
 import {amplify} from 'amplify';
 
-import {Button, ButtonVariant, CircleCloseIcon, Input, SearchIcon} from '@wireapp/react-ui-kit';
+import {CircleCloseIcon, IconButton, Input, SearchIcon} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/Icon';
@@ -106,15 +106,14 @@ export const ConversationHeader = ({
         </h2>
 
         {currentTab !== SidebarTabs.ARCHIVES && canCreateGroupConversation() && (
-          <Button
-            variant={ButtonVariant.TERTIARY}
+          <IconButton
             onClick={() => amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, 'conversation_details')}
             data-uie-name="go-create-group"
             css={button}
             title={t('conversationDetailsActionCreateGroup')}
           >
             <Icon.PlusIcon />
-          </Button>
+          </IconButton>
         )}
       </div>
 
