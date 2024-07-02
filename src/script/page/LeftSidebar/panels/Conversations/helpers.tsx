@@ -44,6 +44,8 @@ export function getTabConversations({
   const conversationSearchFilter = (conversation: Conversation) =>
     conversation.display_name().toLowerCase().includes(conversationsFilter.toLowerCase());
 
+  const conversationArchivedFilter = (conversation: Conversation) => !archivedConversations.includes(conversation);
+
   if ([SidebarTabs.FOLDER, SidebarTabs.RECENT].includes(currentTab)) {
     return {
       conversations: conversations.filter(conversationSearchFilter),
@@ -53,14 +55,14 @@ export function getTabConversations({
 
   if (currentTab === SidebarTabs.GROUPS) {
     return {
-      conversations: groupConversations.filter(conversationSearchFilter),
+      conversations: groupConversations.filter(conversationArchivedFilter, conversationSearchFilter),
       searchInputPlaceholder: t('searchGroupConversations'),
     };
   }
 
   if (currentTab === SidebarTabs.DIRECTS) {
     return {
-      conversations: directConversations.filter(conversationSearchFilter),
+      conversations: directConversations.filter(conversationArchivedFilter, conversationSearchFilter),
       searchInputPlaceholder: t('searchDirectConversations'),
     };
   }
