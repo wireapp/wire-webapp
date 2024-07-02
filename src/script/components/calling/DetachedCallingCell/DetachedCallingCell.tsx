@@ -72,8 +72,8 @@ export const DetachedCallingCell = ({
         pushToTalkKey={pushToTalkKey}
         isFullUi
         hasAccessToCamera={hasAccessToCamera}
-        isSelfVerified={selfUser.is_verified()}
         setMaximizedParticipant={participant => activeCall.maximizedParticipant(participant)}
+        isDetached
       />
     </DetachedWindow>
   );
