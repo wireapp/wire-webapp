@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.20.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.19.0...@wireapp/react-ui-kit@9.20.0) (2024-07-02)
+
+### Features
+
+* add ability to extend select menu styles ([#6340](https://github.com/wireapp/wire-web-packages/issues/6340)) ([c90ebd1](https://github.com/wireapp/wire-web-packages/commit/c90ebd19433ae5e665f657f33882ea551070255e))
+
 # [9.19.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.18.1...@wireapp/react-ui-kit@9.19.0) (2024-07-01)
 
 ### Features
