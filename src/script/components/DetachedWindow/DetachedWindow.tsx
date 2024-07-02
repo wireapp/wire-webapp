@@ -36,6 +36,7 @@ interface DetachedWindowProps {
   height?: number;
   onClose: () => void;
   name: string;
+  onNewWindowOpened?: (newWindow: Window) => void;
 }
 
 const memoizedCreateCacheWithContainer = weakMemoize((container: HTMLHeadElement) => {
@@ -43,7 +44,14 @@ const memoizedCreateCacheWithContainer = weakMemoize((container: HTMLHeadElement
   return newCache;
 });
 
-export const DetachedWindow = ({children, name, onClose, width = 600, height = 600}: DetachedWindowProps) => {
+export const DetachedWindow = ({
+  children,
+  name,
+  onClose,
+  width = 600,
+  height = 600,
+  onNewWindowOpened,
+}: DetachedWindowProps) => {
   const newWindow = useMemo(() => {
     const {top, left} = calculateChildWindowPosition(height, width);
 
@@ -77,6 +85,8 @@ export const DetachedWindow = ({children, name, onClose, width = 600, height = 6
     newWindow.addEventListener('beforeunload', onClose);
     window.addEventListener('beforeunload', onClose);
 
+    onNewWindowOpened?.(newWindow);
+
     return () => {
       newWindow.close();
       newWindow.removeEventListener('beforeunload', onClose);
@@ -102,8 +112,12 @@ export const DetachedWindow = ({children, name, onClose, width = 600, height = 6
  * @param target the target document object
  */
 const copyStyles = (source: Document, target: Document) => {
-  source.head.querySelectorAll('link, style').forEach(htmlElement => {
-    target.head.appendChild(htmlElement.cloneNode(true));
+  const targetHead = target.head;
+
+  const elements = source.head.querySelectorAll('link, style');
+
+  elements.forEach(htmlElement => {
+    targetHead.insertBefore(htmlElement.cloneNode(true), targetHead.firstChild);
   });
 
   target.body.className = source.body.className;

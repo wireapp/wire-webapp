@@ -27,6 +27,7 @@ export const classifiedBarStyles: CSSObject = {
 export const videoControlActiveStyles = css`
   background-color: var(--main-color);
   border: 1px solid var(--main-color);
+  svg,
   svg > path {
     fill: var(--app-bg-secondary);
   }

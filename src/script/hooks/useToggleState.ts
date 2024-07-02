@@ -17,20 +17,10 @@
  *
  */
 
-import {create} from 'zustand';
+import {useCallback, useState} from 'react';
 
-import {Runtime} from '@wireapp/commons';
-
-type DetachedCallingFeatureState = {
-  isEnabled: boolean;
-  isSupported: () => boolean;
-  toggle: (shouldEnable: boolean) => void;
+export const useToggleState = (initialState = false) => {
+  const [state, setState] = useState(initialState);
+  const toggle = useCallback(() => setState(currentState => !currentState), []);
+  return [state, toggle] as const;
 };
-
-//TODO: This is a temporary solution for PoC to enable detached calling cell feature
-export const useDetachedCallingFeatureState = create<DetachedCallingFeatureState>((set, get) => ({
-  //FIXME: This should be false by default
-  isEnabled: true,
-  isSupported: () => !Runtime.isDesktopApp() && get().isEnabled,
-  toggle: shouldOpen => set({isEnabled: shouldOpen}),
-}));

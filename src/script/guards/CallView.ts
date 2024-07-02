@@ -17,20 +17,20 @@
  *
  */
 
-import {create} from 'zustand';
+import {CallViewTab} from '../view_model/CallingViewModel';
 
-import {Runtime} from '@wireapp/commons';
+interface CallViewOption {
+  label: string;
+  value: CallViewTab;
+}
 
-type DetachedCallingFeatureState = {
-  isEnabled: boolean;
-  isSupported: () => boolean;
-  toggle: (shouldEnable: boolean) => void;
+export const isCallViewOption = (option: unknown): option is CallViewOption => {
+  const callViewValues = Object.values(CallViewTab) as string[];
+  return (
+    !!option &&
+    typeof option === 'object' &&
+    'value' in option &&
+    typeof option?.value === 'string' &&
+    callViewValues.includes(option.value)
+  );
 };
-
-//TODO: This is a temporary solution for PoC to enable detached calling cell feature
-export const useDetachedCallingFeatureState = create<DetachedCallingFeatureState>((set, get) => ({
-  //FIXME: This should be false by default
-  isEnabled: true,
-  isSupported: () => !Runtime.isDesktopApp() && get().isEnabled,
-  toggle: shouldOpen => set({isEnabled: shouldOpen}),
-}));

@@ -51,7 +51,7 @@ import {EmptyConversationList} from './EmptyConversationList';
 import {getTabConversations} from './helpers';
 import {SidebarStatus, SidebarTabs, useFolderState, useSidebarStore} from './state';
 
-import {CallingViewMode, CallState} from '../../../../calling/CallState';
+import {CallState} from '../../../../calling/CallState';
 import {createLabel} from '../../../../conversation/ConversationLabelRepository';
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
 import {ConversationState} from '../../../../conversation/ConversationState';
@@ -120,9 +120,7 @@ const Conversations: React.FC<ConversationsProps> = ({
     'unreadConversations',
     'visibleConversations',
   ]);
-  const {activeCalls, viewMode} = useKoSubscribableChildren(callState, ['activeCalls', 'viewMode']);
-
-  const isCallWindowDetached = viewMode === CallingViewMode.DETACHED_WINDOW;
+  const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
 
   const {conversationLabelRepository} = conversationRepository;
   const favoriteConversations = conversationLabelRepository.getFavorites(conversations);
@@ -278,8 +276,7 @@ const Conversations: React.FC<ConversationsProps> = ({
         const {callingRepository} = callingViewModel;
 
         return (
-          conversation &&
-          !isCallWindowDetached && (
+          conversation && (
             <div className="calling-cell" key={conversation.id}>
               <CallingCell
                 classifiedDomains={classifiedDomains}
