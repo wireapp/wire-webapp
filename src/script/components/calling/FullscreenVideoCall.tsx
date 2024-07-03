@@ -624,7 +624,8 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
               <div
                 css={{...(!horizontalSmBreakpoint && {minWidth: '157px'}), display: 'flex', justifyContent: 'flex-end'}}
               >
-                {participants.length > 2 && (
+                {/* FIXME: should be more than 2 */}
+                {participants.length > 0 && (
                   <li className="video-controls__item">
                     <button
                       className="video-controls__button video-controls__button--small"
