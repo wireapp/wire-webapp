@@ -19,7 +19,6 @@
 
 import React, {Fragment, useEffect} from 'react';
 
-import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation/';
 import {container} from 'tsyringe';
 
 import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
@@ -27,7 +26,6 @@ import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-import {CallingParticipantList} from './CallingCell/CallIngParticipantList';
 import {ChooseScreen, Screen} from './ChooseScreen';
 import {FullscreenVideoCall} from './FullscreenVideoCall';
 
@@ -70,11 +68,8 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     maximizedParticipant,
     state: currentCallState,
     muteState,
-    participants,
-  } = useKoSubscribableChildren(joinedCall!, ['maximizedParticipant', 'state', 'muteState', 'participants']);
+  } = useKoSubscribableChildren(joinedCall!, ['maximizedParticipant', 'state', 'muteState']);
   const conversation = joinedCall!.conversation;
-
-  const {selfUser, roles} = useKoSubscribableChildren(conversation, ['selfUser', 'roles']);
 
   const isMuted = muteState !== MuteState.NOT_MUTED;
 
@@ -134,8 +129,6 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
 
   const toggleMute = (call: Call, muteState: boolean) => callingRepository.muteCall(call, muteState);
 
-  const isModerator = selfUser && roles[selfUser.id] === DefaultConversationRoleName.WIRE_ADMIN;
-
   if (!joinedCall || !conversation || conversation.removed_from_conversation()) {
     return null;
   }
@@ -143,40 +136,31 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
   return (
     <Fragment>
       {isDetachedWindow && !!videoGrid?.grid.length && (
-        <div css={{display: 'flex', height: '100vh'}}>
-          <FullscreenVideoCall
-            key={conversation.id}
-            videoGrid={videoGrid}
-            call={joinedCall}
-            activeCallViewTab={activeCallViewTab}
-            conversation={conversation}
-            canShareScreen={callingRepository.supportsScreenSharing}
-            maximizedParticipant={maximizedParticipant}
-            mediaDevicesHandler={mediaDevicesHandler}
-            isMuted={isMuted}
-            muteState={muteState}
-            isChoosingScreen={isChoosingScreen}
-            switchCameraInput={switchCameraInput}
-            switchMicrophoneInput={switchMicrophoneInput}
-            switchSpeakerOutput={switchSpeakerOutput}
-            switchBlurredBackground={status => callingRepository.switchVideoBackgroundBlur(status)}
-            setMaximizedParticipant={setMaximizedParticipant}
-            setActiveCallViewTab={setActiveCallViewTab}
-            toggleMute={toggleMute}
-            toggleCamera={toggleCamera}
-            toggleScreenshare={toggleScreenshare}
-            leave={leave}
-            changePage={changePage}
-          />
-          <CallingParticipantList
-            callingRepository={callingRepository}
-            conversation={conversation}
-            participants={participants}
-            isModerator={isModerator}
-            isSelfVerified={selfUser?.is_verified()}
-            showParticipants={true}
-          />
-        </div>
+        <FullscreenVideoCall
+          key={conversation.id}
+          videoGrid={videoGrid}
+          call={joinedCall}
+          activeCallViewTab={activeCallViewTab}
+          conversation={conversation}
+          canShareScreen={callingRepository.supportsScreenSharing}
+          maximizedParticipant={maximizedParticipant}
+          callingRepository={callingRepository}
+          mediaDevicesHandler={mediaDevicesHandler}
+          isMuted={isMuted}
+          muteState={muteState}
+          isChoosingScreen={isChoosingScreen}
+          switchCameraInput={switchCameraInput}
+          switchMicrophoneInput={switchMicrophoneInput}
+          switchSpeakerOutput={switchSpeakerOutput}
+          switchBlurredBackground={status => callingRepository.switchVideoBackgroundBlur(status)}
+          setMaximizedParticipant={setMaximizedParticipant}
+          setActiveCallViewTab={setActiveCallViewTab}
+          toggleMute={toggleMute}
+          toggleCamera={toggleCamera}
+          toggleScreenshare={toggleScreenshare}
+          leave={leave}
+          changePage={changePage}
+        />
       )}
 
       {isChoosingScreen && (
