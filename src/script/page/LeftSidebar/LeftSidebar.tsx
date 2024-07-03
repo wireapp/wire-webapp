@@ -27,7 +27,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/state';
 
 import {Conversations} from './panels/Conversations';
-import {TemporaryGuestConversations} from './panels/TemporatyGuestConversations';
+import {TemporaryGuestConversations} from './panels/TemporaryGuestConversations';
 
 import {User} from '../../entity/User';
 import {ListViewModel} from '../../view_model/ListViewModel';
