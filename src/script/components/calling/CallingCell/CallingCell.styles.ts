@@ -28,18 +28,14 @@ export const callingCellWrapper: CSSObject = {
   padding: '12px 12px 16px',
 };
 
-export const callingContainer = (isDetachedWindow: boolean): CSSObject => ({
+export const callingContainer: CSSObject = {
   position: 'relative',
   display: 'flex',
   flexDirection: 'column',
   flexShrink: '0',
-  padding: isDetachedWindow ? '12px' : '10px 12px 20px',
+  padding: '10px 12px 20px',
   animation: 'show-call-ui @animation-timing-fast ease-in-out 0s 1',
-
-  ...(isDetachedWindow && {
-    height: '100%',
-  }),
-});
+};
 
 export const infoBar: CSSObject = {
   backgroundColor: 'var(--accent-color)',

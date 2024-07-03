@@ -61,7 +61,6 @@ interface AnsweringControlsProps {
   classifiedDomains?: string[];
   isTemporaryUser?: boolean;
   setMaximizedParticipant?: (participant: Participant | null) => void;
-  isDetached?: boolean;
 }
 
 export type CallingCellProps = VideoCallProps & AnsweringControlsProps;
@@ -80,7 +79,6 @@ export const CallingCell = ({
   setMaximizedParticipant,
   teamState = container.resolve(TeamState),
   callState = container.resolve(CallState),
-  isDetached = false,
 }: CallingCellProps) => {
   const {conversation} = call;
   const {reason, state, isCbrEnabled, startedAt, maximizedParticipant, muteState} = useKoSubscribableChildren(call, [
@@ -112,7 +110,6 @@ export const CallingCell = ({
   const {activeSpeakers} = useKoSubscribableChildren(call, ['activeSpeakers']);
 
   const isVideoCall = call.initialType === CALL_TYPE.VIDEO;
-  const isFullScreenGrid = viewMode === CallingViewMode.FULL_SCREEN_GRID;
   const isDetachedWindow = viewMode === CallingViewMode.DETACHED_WINDOW;
 
   const isMuted = muteState !== MuteState.NOT_MUTED;
@@ -164,21 +161,21 @@ export const CallingCell = ({
 
   const handleMaximizeKeydown = useCallback(
     (event: React.KeyboardEvent<HTMLInputElement>) => {
-      if (!isOngoing || isDetachedWindow) {
+      if (!isOngoing) {
         return;
       }
       if (isSpaceOrEnterKey(event.key)) {
-        callState.viewMode(CallingViewMode.FULL_SCREEN_GRID);
+        callState.viewMode(CallingViewMode.DETACHED_WINDOW);
       }
     },
     [isOngoing, callState],
   );
 
   const handleMaximizeClick = useCallback(() => {
-    if (!isOngoing || isDetachedWindow) {
+    if (!isOngoing) {
       return;
     }
-    callState.viewMode(CallingViewMode.FULL_SCREEN_GRID);
+    callState.viewMode(CallingViewMode.DETACHED_WINDOW);
   }, [isOngoing, callState]);
 
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
@@ -256,7 +253,7 @@ export const CallingCell = ({
   };
 
   return (
-    <div css={callingContainer(isDetached)}>
+    <div css={callingContainer}>
       {isIncoming && (
         <p role="alert" className="visually-hidden">
           {t('callConversationAcceptOrDecline', conversationName)}
@@ -269,7 +266,6 @@ export const CallingCell = ({
           data-uie-name="item-call"
           data-uie-id={conversation.id}
           data-uie-value={conversation.display_name()}
-          css={{height: isDetachedWindow ? '100%' : 'unset'}}
         >
           {muteState === MuteState.REMOTE_MUTED && isFullUi && (
             <div className="conversation-list-calling-cell__info-bar">{t('muteStateRemoteMute')}</div>
@@ -291,17 +287,13 @@ export const CallingCell = ({
             startedAt={startedAt}
             isCbrEnabled={isCbrEnabled}
             toggleDetachedWindow={toggleDetachedWindow}
-            isDetached={isDetached}
             isDetachedWindow={isDetachedWindow}
           />
 
-          {(isOngoing || selfHasActiveVideo) && !isFullScreenGrid && !!videoGrid?.grid?.length && isFullUi ? (
+          {(isOngoing || selfHasActiveVideo) && !isDetachedWindow && !!videoGrid?.grid?.length && isFullUi ? (
             <>
-              {isDetachedWindow && !isDetached ? (
-                <></>
-              ) : (
+              {!isDetachedWindow && (
                 <div
-                  css={{flex: isDetachedWindow ? 1 : 'unset'}}
                   className="group-video__minimized-wrapper"
                   onClick={handleMaximizeClick}
                   onKeyDown={handleMaximizeKeydown}
@@ -317,7 +309,7 @@ export const CallingCell = ({
                     setMaximizedParticipant={setMaximizedParticipant}
                   />
 
-                  {isOngoing && !isDetachedWindow && (
+                  {isOngoing && (
                     <div className="group-video__minimized-wrapper__overlay" data-uie-name="do-maximize-call">
                       <Icon.FullscreenIcon />
                     </div>

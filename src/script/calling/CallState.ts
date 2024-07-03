@@ -39,7 +39,7 @@ export enum MuteState {
 }
 
 export enum CallingViewMode {
-  FULL_SCREEN_GRID = 'full-screen-grid',
+  DETACHED_WINDOW = 'detached_window',
   MINIMIZED = 'minimized',
 }
 
