@@ -33,15 +33,10 @@ export interface PingMessageProps {
 }
 
 const PingMessage = ({message, is1to1Conversation, isLastDeliveredMessage}: PingMessageProps) => {
-  const {unsafeSenderName, caption, ephemeral_caption, isObfuscated, get_icon_classes, readReceipts} =
-    useKoSubscribableChildren(message, [
-      'unsafeSenderName',
-      'caption',
-      'ephemeral_caption',
-      'isObfuscated',
-      'get_icon_classes',
-      'readReceipts',
-    ]);
+  const {unsafeSenderName, caption, ephemeral_caption, isObfuscated, get_icon_classes} = useKoSubscribableChildren(
+    message,
+    ['unsafeSenderName', 'caption', 'ephemeral_caption', 'isObfuscated', 'get_icon_classes'],
+  );
 
   return (
     <div className="message-header" data-uie-name="element-message-ping">
@@ -60,7 +55,7 @@ const PingMessage = ({message, is1to1Conversation, isLastDeliveredMessage}: Ping
           <span className="ellipsis">{caption}</span>
         </p>
 
-        <DeliveredMessage isLastDeliveredMessage={isLastDeliveredMessage} readReceipts={readReceipts} />
+        <DeliveredMessage isLastDeliveredMessage={isLastDeliveredMessage} />
         <ReadReceiptStatus message={message} is1to1Conversation={is1to1Conversation} />
       </div>
     </div>

@@ -107,7 +107,6 @@ export const ContentMessageComponent = ({
     status,
     quote,
     isObfuscated,
-    readReceipts,
   } = useKoSubscribableChildren(message, [
     'senderName',
     'timestamp',
@@ -120,7 +119,6 @@ export const ContentMessageComponent = ({
     'status',
     'quote',
     'isObfuscated',
-    'readReceipts',
   ]);
 
   const timeAgo = useRelativeTimestamp(message.timestamp());
@@ -268,7 +266,7 @@ export const ContentMessageComponent = ({
         </div>
 
         <div css={deliveredMessageIndicator}>
-          <DeliveredMessage isLastDeliveredMessage={isLastDeliveredMessage} readReceipts={readReceipts} />
+          <DeliveredMessage isLastDeliveredMessage={isLastDeliveredMessage} />
         </div>
       </div>
 
