@@ -63,8 +63,9 @@ export const ConversationFolderTab = ({
   const {status: sidebarStatus, setStatus: setSidebarStatus} = useSidebarStore();
   const {openFolder, isFoldersTabOpen, toggleFoldersTab, expandedFolder} = useFolderState();
   const {conversationLabelRepository} = conversationRepository;
-  const mdBreakpoint = useMatchMedia('(max-width: 1000px)');
-  const isSideBarOpen = sidebarStatus === SidebarStatus.AUTO ? mdBreakpoint : sidebarStatus === SidebarStatus.OPEN;
+  const isScreenLessThanMdBreakpoint = useMatchMedia('(max-width: 1000px)');
+  const isSideBarOpen =
+    sidebarStatus === SidebarStatus.AUTO ? !isScreenLessThanMdBreakpoint : sidebarStatus === SidebarStatus.OPEN;
 
   function toggleFolder(folderId: string) {
     openFolder(folderId);
