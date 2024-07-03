@@ -90,7 +90,6 @@ const TemporaryGuestConversations: React.FC<TemporaryGuestConversations> = ({
               call={call}
               isTemporaryUser
               isFullUi
-              isSelfVerified={false}
               callActions={callingViewModel.callActions}
               callingRepository={callingViewModel.callingRepository}
               hasAccessToCamera={callingViewModel.hasAccessToCamera()}
