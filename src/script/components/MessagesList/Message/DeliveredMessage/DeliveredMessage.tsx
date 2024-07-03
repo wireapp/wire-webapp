@@ -20,20 +20,13 @@
 import {OutlineCheck} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/LocalizerUtil';
-import {formatTimeShort} from 'Util/TimeUtil';
-
-import {ReadReceipt} from '../../../../storage';
 
 interface DeliveredMessageProps {
   isLastDeliveredMessage?: boolean;
-  readReceipts?: ReadReceipt[];
 }
 
-export const DeliveredMessage = ({isLastDeliveredMessage = false, readReceipts = []}: DeliveredMessageProps) => {
-  const readReceiptText = readReceipts.length ? formatTimeShort(readReceipts[0].time) : '';
-  const showDeliveredMessageIcon = isLastDeliveredMessage && readReceiptText === '';
-
-  if (!showDeliveredMessageIcon) {
+export const DeliveredMessage = ({isLastDeliveredMessage = false}: DeliveredMessageProps) => {
+  if (!isLastDeliveredMessage) {
     return null;
   }
 
