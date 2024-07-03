@@ -133,7 +133,8 @@
 
     &__wrapper {
       overflow: hidden;
-      max-height: 0;
+      width: 296px;
+      flex-shrink: 0;
       border-radius: 0 0 8px 8px;
       color: var(--background);
 
@@ -142,10 +143,6 @@
         border-top: 1px solid var(--border-color);
         margin: 0;
         content: '';
-      }
-
-      &--active {
-        max-height: 184px;
       }
     }
   }
