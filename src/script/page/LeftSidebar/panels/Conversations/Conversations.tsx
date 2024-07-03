@@ -378,7 +378,8 @@ const Conversations: React.FC<ConversationsProps> = ({
               />
             )}
 
-            {((showSearchInput && currentTabConversations.length === 0) || hasNoConversations) && (
+            {((showSearchInput && currentTabConversations.length === 0) ||
+              (hasNoConversations && currentTab !== SidebarTabs.ARCHIVES)) && (
               <EmptyConversationList
                 currentTab={currentTab}
                 onChangeTab={changeTab}
