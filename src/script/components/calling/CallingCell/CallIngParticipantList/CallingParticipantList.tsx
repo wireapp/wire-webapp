@@ -26,6 +26,8 @@ import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
+import {labelStyles} from './CallingParticipantList.styles';
+
 import {CallingRepository} from '../../../../calling/CallingRepository';
 import {Participant} from '../../../../calling/Participant';
 import {Conversation} from '../../../../entity/Conversation';
@@ -81,6 +83,7 @@ export const CallingParticipantList = ({
         'call-ui__participant-list__wrapper--active': showParticipants,
       })}
     >
+      <p css={labelStyles}>{t('videoCallOverlayParticipantsListLabel', participants.length)}</p>
       <FadingScrollbar className="call-ui__participant-list__container">
         <ul className="call-ui__participant-list" data-uie-name="list-call-ui-participants">
           {participants

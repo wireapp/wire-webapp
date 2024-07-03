@@ -1530,6 +1530,7 @@
   "videoCallOverlayConversations": "Conversations",
   "videoCallOverlayOpenFullScreen": "Open the call in full screen",
   "videoCallOverlayCloseFullScreen": "Go back to minimized view",
+  "videoCallOverlayParticipantsListLabel": "Participants ({{count}})",
   "videoCallOverlayShowParticipantsList": "Show participants list",
   "videoCallOverlayHideParticipantsList": "Hide participants list",
   "videoCallOverlayFitVideoLabel": "Double-click to view full screen",
