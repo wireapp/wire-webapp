@@ -23,6 +23,7 @@ import cx from 'classnames';
 
 import {CallParticipantsListItem} from 'Components/calling/CallParticipantsListItem';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
+import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
@@ -55,7 +56,7 @@ export const CallingParticipantList = ({
 
     const muteParticipant = {
       click: () => callingRepository.sendModeratorMute(conversation.qualifiedId, [participant]),
-      icon: 'mic-off-icon',
+      icon: Icon.MicOffIcon,
       identifier: `moderator-mute-participant`,
       isDisabled: participant.isMuted(),
       label: t('moderatorMenuEntryMute'),
@@ -68,7 +69,7 @@ export const CallingParticipantList = ({
           participants.filter(p => p !== participant),
         );
       },
-      icon: 'mic-off-icon',
+      icon: Icon.MicOffIcon,
       identifier: 'moderator-mute-others',
       label: t('moderatorMenuEntryMuteAllOthers'),
     };
