@@ -31,6 +31,7 @@ interface ConversationTabProps {
   unreadConversations?: number;
   dataUieName: string;
   isActive?: boolean;
+  showNotificationBadge?: boolean;
 }
 
 export const ConversationTab = ({
@@ -43,6 +44,7 @@ export const ConversationTab = ({
   unreadConversations = 0,
   dataUieName,
   isActive = false,
+  showNotificationBadge = false,
 }: ConversationTabProps) => {
   return (
     <button
@@ -58,8 +60,11 @@ export const ConversationTab = ({
     >
       <span className="conversations-sidebar-btn--text-wrapper">
         {Icon}
-        {unreadConversations > 0 && (
-          <span className={cx('conversations-sidebar-btn--badge', {active: isActive})} data-uie-name="unread-badge" />
+        {(unreadConversations > 0 || showNotificationBadge) && (
+          <span
+            className={cx('conversations-sidebar-btn--badge', {active: isActive})}
+            data-uie-name={showNotificationBadge ? 'notification-badge' : 'unread-badge'}
+          />
         )}
         <span className="conversations-sidebar-btn--text">{label || title}</span>
       </span>

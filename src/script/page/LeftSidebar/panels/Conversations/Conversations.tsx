@@ -105,6 +105,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   const [isConversationFilterFocused, setIsConversationFilterFocused] = useState(false);
   const {classifiedDomains, isTeam} = useKoSubscribableChildren(teamState, ['classifiedDomains', 'isTeam']);
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
+  const {notifications} = useKoSubscribableChildren(preferenceNotificationRepository, ['notifications']);
 
   const {
     activeConversation,
@@ -274,6 +275,7 @@ const Conversations: React.FC<ConversationsProps> = ({
           archivedConversations={archivedConversations}
           conversationRepository={conversationRepository}
           onClickPreferences={() => onClickPreferences(ContentState.PREFERENCES_ACCOUNT)}
+          showNotificationsBadge={notifications.length > 0}
         />
       </FadingScrollbar>
 
