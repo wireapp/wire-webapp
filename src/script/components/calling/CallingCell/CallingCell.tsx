@@ -32,6 +32,7 @@ import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import * as Icon from 'Components/Icon';
 import {ConversationClassifiedBar} from 'Components/input/ClassifiedBar';
 import {usePushToTalk} from 'src/script/hooks/usePushToTalk/usePushToTalk';
+import {useToggleState} from 'src/script/hooks/useToggleState';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isEnterKey, isSpaceOrEnterKey} from 'Util/KeyboardUtil';
@@ -45,6 +46,7 @@ import {useVideoGrid} from '../../../calling/videoGridHandler';
 import {generateConversationUrl} from '../../../router/routeGenerator';
 import {TeamState} from '../../../team/TeamState';
 import {CallActions, CallViewTab} from '../../../view_model/CallingViewModel';
+import {ChooseScreen} from '../ChooseScreen';
 
 interface VideoCallProps {
   hasAccessToCamera?: boolean;
@@ -54,7 +56,10 @@ interface VideoCallProps {
 interface AnsweringControlsProps {
   call: Call;
   callActions: CallActions;
-  callingRepository: Pick<CallingRepository, 'supportsScreenSharing' | 'sendModeratorMute'>;
+  callingRepository: Pick<
+    CallingRepository,
+    'supportsScreenSharing' | 'sendModeratorMute' | 'onChooseScreen' | 'toggleScreenshare'
+  >;
   pushToTalkKey: string | null;
   isFullUi?: boolean;
   callState?: CallState;
@@ -98,9 +103,15 @@ export const CallingCell = ({
     selfUser,
     display_name: conversationName,
   } = useKoSubscribableChildren(conversation, ['isGroup', 'participating_user_ets', 'selfUser', 'display_name']);
-  const {activeCallViewTab, viewMode} = useKoSubscribableChildren(callState, ['activeCallViewTab', 'viewMode']);
+  const {activeCallViewTab, viewMode, hasAvailableScreensToShare} = useKoSubscribableChildren(callState, [
+    'activeCallViewTab',
+    'viewMode',
+    'hasAvailableScreensToShare',
+  ]);
 
   const selfParticipant = call.getSelfParticipant();
+
+  const [isShareScreenMenuOpen, toggleChooseScreenMenu] = useToggleState(false);
 
   const {sharesCamera: selfSharesCamera, hasActiveVideo: selfHasActiveVideo} = useKoSubscribableChildren(
     selfParticipant,
@@ -252,109 +263,120 @@ export const CallingCell = ({
     callState.viewMode(isDetachedWindow ? CallingViewMode.MINIMIZED : CallingViewMode.DETACHED_WINDOW);
   };
 
+  const isScreenshareActive = hasAvailableScreensToShare && isShareScreenMenuOpen;
+
+  const toggleScreenShareMenu = (call: Call) => {
+    toggleChooseScreenMenu();
+    return callingRepository.toggleScreenshare(call);
+  };
+
   return (
-    <div css={callingContainer}>
-      {isIncoming && (
-        <p role="alert" className="visually-hidden">
-          {t('callConversationAcceptOrDecline', conversationName)}
-        </p>
-      )}
+    <>
+      <div css={callingContainer}>
+        {isIncoming && (
+          <p role="alert" className="visually-hidden">
+            {t('callConversationAcceptOrDecline', conversationName)}
+          </p>
+        )}
 
-      {(!isDeclined || isTemporaryUser) && (
-        <div
-          className="conversation-list-calling-cell-background"
-          data-uie-name="item-call"
-          data-uie-id={conversation.id}
-          data-uie-value={conversation.display_name()}
-        >
-          {muteState === MuteState.REMOTE_MUTED && isFullUi && (
-            <div className="conversation-list-calling-cell__info-bar">{t('muteStateRemoteMute')}</div>
-          )}
+        {(!isDeclined || isTemporaryUser) && (
+          <div
+            className="conversation-list-calling-cell-background"
+            data-uie-name="item-call"
+            data-uie-id={conversation.id}
+            data-uie-value={conversation.display_name()}
+          >
+            {muteState === MuteState.REMOTE_MUTED && isFullUi && (
+              <div className="conversation-list-calling-cell__info-bar">{t('muteStateRemoteMute')}</div>
+            )}
 
-          <CallingHeader
-            isGroup={isGroup}
-            isOngoing={isOngoing}
-            showAlert={showAlert}
-            isVideoCall={isVideoCall}
-            clearShowAlert={clearShowAlert}
-            conversationUrl={conversationUrl}
-            callStartedAlert={isGroup ? callGroupStartedAlert : call1To1StartedAlert}
-            ongoingCallAlert={isGroup ? onGoingGroupCallAlert : onGoingCallAlert}
-            isTemporaryUser={!!isTemporaryUser}
-            conversationParticipants={conversationParticipants}
-            conversationName={conversationName}
-            currentCallStatus={currentCallStatus}
-            startedAt={startedAt}
-            isCbrEnabled={isCbrEnabled}
-            toggleDetachedWindow={toggleDetachedWindow}
-            isDetachedWindow={isDetachedWindow}
-          />
+            <CallingHeader
+              isGroup={isGroup}
+              isOngoing={isOngoing}
+              showAlert={showAlert}
+              isVideoCall={isVideoCall}
+              clearShowAlert={clearShowAlert}
+              conversationUrl={conversationUrl}
+              callStartedAlert={isGroup ? callGroupStartedAlert : call1To1StartedAlert}
+              ongoingCallAlert={isGroup ? onGoingGroupCallAlert : onGoingCallAlert}
+              isTemporaryUser={!!isTemporaryUser}
+              conversationParticipants={conversationParticipants}
+              conversationName={conversationName}
+              currentCallStatus={currentCallStatus}
+              startedAt={startedAt}
+              isCbrEnabled={isCbrEnabled}
+              toggleDetachedWindow={toggleDetachedWindow}
+              isDetachedWindow={isDetachedWindow}
+            />
 
-          {(isOngoing || selfHasActiveVideo) && !isDetachedWindow && !!videoGrid?.grid?.length && isFullUi ? (
-            <>
-              {!isDetachedWindow && (
+            {(isOngoing || selfHasActiveVideo) && !isDetachedWindow && !!videoGrid?.grid?.length && isFullUi ? (
+              <>
+                {!isDetachedWindow && (
+                  <div
+                    className="group-video__minimized-wrapper"
+                    onClick={handleMaximizeClick}
+                    onKeyDown={handleMaximizeKeydown}
+                    role="button"
+                    tabIndex={TabIndex.FOCUSABLE}
+                    aria-label={t('callMaximizeLabel')}
+                  >
+                    <GroupVideoGrid
+                      grid={activeCallViewTab === CallViewTab.ALL ? videoGrid : {grid: activeSpeakers, thumbnail: null}}
+                      minimized
+                      maximizedParticipant={maximizedParticipant}
+                      selfParticipant={selfParticipant}
+                      setMaximizedParticipant={setMaximizedParticipant}
+                    />
+
+                    {isOngoing && (
+                      <div className="group-video__minimized-wrapper__overlay" data-uie-name="do-maximize-call">
+                        <Icon.FullscreenIcon />
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
+            ) : (
+              showNoCameraPreview &&
+              isFullUi && (
                 <div
-                  className="group-video__minimized-wrapper"
-                  onClick={handleMaximizeClick}
-                  onKeyDown={handleMaximizeKeydown}
-                  role="button"
-                  tabIndex={TabIndex.FOCUSABLE}
-                  aria-label={t('callMaximizeLabel')}
+                  className="group-video__minimized-wrapper group-video__minimized-wrapper--no-camera-access"
+                  data-uie-name="label-no-camera-access-preview"
                 >
-                  <GroupVideoGrid
-                    grid={activeCallViewTab === CallViewTab.ALL ? videoGrid : {grid: activeSpeakers, thumbnail: null}}
-                    minimized
-                    maximizedParticipant={maximizedParticipant}
-                    selfParticipant={selfParticipant}
-                    setMaximizedParticipant={setMaximizedParticipant}
-                  />
-
-                  {isOngoing && (
-                    <div className="group-video__minimized-wrapper__overlay" data-uie-name="do-maximize-call">
-                      <Icon.FullscreenIcon />
-                    </div>
-                  )}
+                  {t('callNoCameraAccess')}
                 </div>
-              )}
-            </>
-          ) : (
-            showNoCameraPreview &&
-            isFullUi && (
-              <div
-                className="group-video__minimized-wrapper group-video__minimized-wrapper--no-camera-access"
-                data-uie-name="label-no-camera-access-preview"
-              >
-                {t('callNoCameraAccess')}
-              </div>
-            )
-          )}
+              )
+            )}
 
-          {classifiedDomains && (
-            <ConversationClassifiedBar conversation={conversation} classifiedDomains={classifiedDomains} />
-          )}
+            {classifiedDomains && (
+              <ConversationClassifiedBar conversation={conversation} classifiedDomains={classifiedDomains} />
+            )}
 
-          <CallingControls
-            answerCall={answerCall}
-            call={call}
-            callActions={callActions}
-            call1To1StartedAlert={call1To1StartedAlert}
-            isFullUi={isFullUi}
-            isMuted={isMuted}
-            isConnecting={isConnecting}
-            isDetachedWindow={isDetachedWindow}
-            isIncoming={isIncoming}
-            isOutgoing={isOutgoing}
-            isDeclined={isDeclined}
-            isGroup={isGroup}
-            isVideoCall={isVideoCall}
-            isOngoing={isOngoing}
-            selfParticipant={selfParticipant}
-            disableScreenButton={!callingRepository.supportsScreenSharing}
-            teamState={teamState}
-            supportsVideoCall={conversation.supportsVideoCall(call.isConference)}
-          />
-        </div>
-      )}
-    </div>
+            <CallingControls
+              answerCall={answerCall}
+              call={call}
+              callActions={callActions}
+              call1To1StartedAlert={call1To1StartedAlert}
+              isFullUi={isFullUi}
+              isMuted={isMuted}
+              isConnecting={isConnecting}
+              isDetachedWindow={isDetachedWindow}
+              isIncoming={isIncoming}
+              isOutgoing={isOutgoing}
+              isDeclined={isDeclined}
+              isGroup={isGroup}
+              isVideoCall={isVideoCall}
+              isOngoing={isOngoing}
+              selfParticipant={selfParticipant}
+              disableScreenButton={!callingRepository.supportsScreenSharing}
+              teamState={teamState}
+              supportsVideoCall={conversation.supportsVideoCall(call.isConference)}
+              toggleScreenShare={toggleScreenShareMenu}
+            />
+          </div>
+        )}
+      </div>
+      {isScreenshareActive && <ChooseScreen choose={callingRepository.onChooseScreen} />}
+    </>
   );
 };

@@ -53,6 +53,7 @@ interface CallingControlsProps {
   disableScreenButton: boolean;
   teamState: TeamState;
   supportsVideoCall: boolean;
+  toggleScreenShare: (call: Call) => void;
 }
 
 export const CallingControls = ({
@@ -74,6 +75,7 @@ export const CallingControls = ({
   selfParticipant,
   teamState = container.resolve(TeamState),
   supportsVideoCall,
+  toggleScreenShare,
 }: CallingControlsProps) => {
   const {isVideoCallingEnabled} = useKoSubscribableChildren(teamState, ['isVideoCallingEnabled']);
   const {sharesScreen: selfSharesScreen, sharesCamera: selfSharesCamera} = useKoSubscribableChildren(selfParticipant, [
@@ -139,13 +141,13 @@ export const CallingControls = ({
                     'with-tooltip with-tooltip--bottom': disableScreenButton,
                   })}
                   data-tooltip={disableScreenButton ? t('videoCallScreenShareNotSupported') : undefined}
-                  onClick={() => callActions.toggleScreenshare(call)}
+                  onClick={() => toggleScreenShare(call)}
                   type="button"
                   data-uie-name="do-call-controls-toggle-screenshare"
                   data-uie-value={selfSharesScreen ? 'active' : 'inactive'}
                   data-uie-enabled={disableScreenButton ? 'false' : 'true'}
                   title={t('videoCallOverlayShareScreen')}
-                  disabled={disableScreenButton || isDetachedWindow}
+                  disabled={disableScreenButton}
                 >
                   {selfSharesScreen ? (
                     <Icon.ScreenshareIcon className="small-icon" />

@@ -56,7 +56,7 @@ export class CallState {
   public readonly activeCalls: ko.PureComputed<Call[]>;
   public readonly joinedCall: ko.PureComputed<Call | undefined>;
   public readonly activeCallViewTab = ko.observable(CallViewTab.ALL);
-  readonly isChoosingScreen: ko.PureComputed<boolean>;
+  readonly hasAvailableScreensToShare: ko.PureComputed<boolean>;
   readonly isSpeakersViewActive: ko.PureComputed<boolean>;
   public readonly viewMode = ko.observable<CallingViewMode>(CallingViewMode.MINIMIZED);
 
@@ -68,7 +68,7 @@ export class CallState {
         call => call.state() === CALL_STATE.INCOMING && call.reason() !== CALL_REASON.ANSWERED_ELSEWHERE,
       ),
     );
-    this.isChoosingScreen = ko.pureComputed(
+    this.hasAvailableScreensToShare = ko.pureComputed(
       () => this.selectableScreens().length > 0 || this.selectableWindows().length > 0,
     );
 
@@ -80,7 +80,7 @@ export class CallState {
     });
     this.isSpeakersViewActive = ko.pureComputed(() => this.activeCallViewTab() === CallViewTab.SPEAKERS);
 
-    this.isChoosingScreen = ko.pureComputed(
+    this.hasAvailableScreensToShare = ko.pureComputed(
       () => this.selectableScreens().length > 0 || this.selectableWindows().length > 0,
     );
   }
