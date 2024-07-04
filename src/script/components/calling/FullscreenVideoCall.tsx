@@ -335,7 +335,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   const isModerator = selfUser && roles[selfUser.id] === DefaultConversationRoleName.WIRE_ADMIN;
 
   return (
-    <div css={{display: 'flex', height: '100vh'}}>
+    <div className="video-calling-wrapper">
       <div id="video-calling" className="video-calling">
         <div id="video-title" className="video-title">
           {horizontalSmBreakpoint && (

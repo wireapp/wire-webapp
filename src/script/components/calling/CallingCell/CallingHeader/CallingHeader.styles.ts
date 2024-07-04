@@ -77,4 +77,12 @@ export const detachedWindowButton: CSSObject = {
   display: 'flex',
   justifyContent: 'center',
   padding: '8px 12px',
+
+  '& svg': {
+    fill: 'var(--text-color)',
+  },
+
+  '& svg path': {
+    fill: 'var(--text-color)',
+  },
 };
