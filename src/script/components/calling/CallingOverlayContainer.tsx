@@ -24,7 +24,6 @@ import {container} from 'tsyringe';
 import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
-import {useToggleState} from 'src/script/hooks/useToggleState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {ChooseScreen} from './ChooseScreen';
@@ -32,7 +31,7 @@ import {FullscreenVideoCall} from './FullscreenVideoCall';
 
 import {Call} from '../../calling/Call';
 import {CallingRepository} from '../../calling/CallingRepository';
-import {CallingViewMode, CallState, MuteState} from '../../calling/CallState';
+import {CallingViewMode, CallState, DesktopScreenShareMenu, MuteState} from '../../calling/CallState';
 import {LEAVE_CALL_REASON} from '../../calling/enum/LeaveCallReason';
 import {Participant} from '../../calling/Participant';
 import {useVideoGrid} from '../../calling/videoGridHandler';
@@ -43,7 +42,7 @@ export interface CallingContainerProps {
   readonly callingRepository: CallingRepository;
   readonly mediaRepository: MediaRepository;
   readonly callState?: CallState;
-  readonly toggleScreenshare: (call: Call) => void;
+  readonly toggleScreenshare: (call: Call, customScreenShareMenu: DesktopScreenShareMenu) => void;
 }
 
 const CallingContainer: React.FC<CallingContainerProps> = ({
@@ -55,12 +54,17 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
   const {devicesHandler: mediaDevicesHandler} = mediaRepository;
   const {viewMode} = useKoSubscribableChildren(callState, ['viewMode']);
   const isDetachedWindow = viewMode === CallingViewMode.DETACHED_WINDOW;
-  const [isShareScreenMenuOpen, toggleChooseScreenMenu] = useToggleState(false);
 
-  const {activeCallViewTab, joinedCall, hasAvailableScreensToShare} = useKoSubscribableChildren(callState, [
+  const {
+    activeCallViewTab,
+    joinedCall,
+    hasAvailableScreensToShare,
+    desktopScreenShareMenu: customScreenShareMenu,
+  } = useKoSubscribableChildren(callState, [
     'activeCallViewTab',
     'joinedCall',
     'hasAvailableScreensToShare',
+    'customScreenShareMenu',
   ]);
 
   const {
@@ -126,14 +130,14 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     return null;
   }
 
-  const toggleScreenShareMenu = (call: Call) => {
-    toggleChooseScreenMenu();
-    toggleScreenshare(call);
+  const toggleDetachedWindowScreenShare = (call: Call) => {
+    toggleScreenshare(call, DesktopScreenShareMenu.DETACHED_WINDOW);
   };
 
   const {conversation} = joinedCall;
 
-  const isScreenshareActive = hasAvailableScreensToShare && isShareScreenMenuOpen;
+  const isScreenshareActive =
+    hasAvailableScreensToShare && customScreenShareMenu === DesktopScreenShareMenu.DETACHED_WINDOW;
 
   return (
     <Fragment>
@@ -159,7 +163,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
           setActiveCallViewTab={setActiveCallViewTab}
           toggleMute={toggleMute}
           toggleCamera={toggleCamera}
-          toggleScreenshare={toggleScreenShareMenu}
+          toggleScreenshare={toggleDetachedWindowScreenShare}
           leave={leave}
           changePage={changePage}
         />

@@ -43,6 +43,12 @@ export enum CallingViewMode {
   MINIMIZED = 'minimized',
 }
 
+export enum DesktopScreenShareMenu {
+  NONE = 'none',
+  MAIN_WINDOW = 'main_window',
+  DETACHED_WINDOW = 'detached_window',
+}
+
 @singleton()
 export class CallState {
   public readonly calls: ko.ObservableArray<Call> = ko.observableArray();
@@ -59,6 +65,7 @@ export class CallState {
   readonly hasAvailableScreensToShare: ko.PureComputed<boolean>;
   readonly isSpeakersViewActive: ko.PureComputed<boolean>;
   public readonly viewMode = ko.observable<CallingViewMode>(CallingViewMode.MINIMIZED);
+  public readonly desktopScreenShareMenu = ko.observable<DesktopScreenShareMenu>(DesktopScreenShareMenu.NONE);
 
   constructor() {
     this.joinedCall = ko.pureComputed(() => this.calls().find(call => call.state() === CALL_STATE.MEDIA_ESTAB));
@@ -68,9 +75,10 @@ export class CallState {
         call => call.state() === CALL_STATE.INCOMING && call.reason() !== CALL_REASON.ANSWERED_ELSEWHERE,
       ),
     );
-    this.hasAvailableScreensToShare = ko.pureComputed(
-      () => this.selectableScreens().length > 0 || this.selectableWindows().length > 0,
-    );
+    this.hasAvailableScreensToShare = ko.pureComputed(() => {
+      const hasAvailableScreensToShare = this.selectableScreens().length > 0 || this.selectableWindows().length > 0;
+      return hasAvailableScreensToShare;
+    });
 
     this.calls.subscribe(activeCalls => {
       const activeCallIds = activeCalls.map(call => call.conversation.qualifiedId);

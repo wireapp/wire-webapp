@@ -26,6 +26,7 @@ import {
 } from 'Components/calling/CallingCell/CallingControls/CallingControls.styles';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import * as Icon from 'Components/Icon';
+import {DesktopScreenShareMenu} from 'src/script/calling/CallState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -53,7 +54,6 @@ interface CallingControlsProps {
   disableScreenButton: boolean;
   teamState: TeamState;
   supportsVideoCall: boolean;
-  toggleScreenShare: (call: Call) => void;
 }
 
 export const CallingControls = ({
@@ -75,7 +75,6 @@ export const CallingControls = ({
   selfParticipant,
   teamState = container.resolve(TeamState),
   supportsVideoCall,
-  toggleScreenShare,
 }: CallingControlsProps) => {
   const {isVideoCallingEnabled} = useKoSubscribableChildren(teamState, ['isVideoCallingEnabled']);
   const {sharesScreen: selfSharesScreen, sharesCamera: selfSharesCamera} = useKoSubscribableChildren(selfParticipant, [
@@ -141,7 +140,7 @@ export const CallingControls = ({
                     'with-tooltip with-tooltip--bottom': disableScreenButton,
                   })}
                   data-tooltip={disableScreenButton ? t('videoCallScreenShareNotSupported') : undefined}
-                  onClick={() => toggleScreenShare(call)}
+                  onClick={() => callActions.toggleScreenshare(call, DesktopScreenShareMenu.MAIN_WINDOW)}
                   type="button"
                   data-uie-name="do-call-controls-toggle-screenshare"
                   data-uie-value={selfSharesScreen ? 'active' : 'inactive'}

@@ -27,6 +27,7 @@ import {StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingContainer} from 'Components/calling/CallingOverlayContainer';
+import {ChooseScreen} from 'Components/calling/ChooseScreen';
 import {useDetachedCallingFeatureState} from 'Components/calling/DetachedCallingCell/DetachedCallingFeature.state';
 import {ErrorFallback} from 'Components/ErrorFallback';
 import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationModal';
@@ -46,6 +47,7 @@ import {RootProvider} from './RootProvider';
 import {useAppMainState, ViewType} from './state';
 import {useAppState, ContentState} from './useAppState';
 
+import {CallState, DesktopScreenShareMenu} from '../calling/CallState';
 import {ConversationState} from '../conversation/ConversationState';
 import {User} from '../entity/User';
 import {useActiveWindow} from '../hooks/useActiveWindow';
@@ -71,6 +73,7 @@ interface AppMainProps {
   selfUser: User;
   mainView: MainViewModel;
   conversationState?: ConversationState;
+  callState?: CallState;
   /** will block the user from being able to interact with the application (no notifications and no messages will be shown) */
   locked: boolean;
 }
@@ -80,6 +83,7 @@ export const AppMain: FC<AppMainProps> = ({
   mainView,
   selfUser,
   conversationState = container.resolve(ConversationState),
+  callState = container.resolve(CallState),
   locked,
 }) => {
   const apiContext = app.getAPIContext();
@@ -99,8 +103,16 @@ export const AppMain: FC<AppMainProps> = ({
     'isActivatedAccount',
   ]);
 
+  const {hasAvailableScreensToShare, desktopScreenShareMenu: customScreenShareMenu} = useKoSubscribableChildren(
+    callState,
+    ['hasAvailableScreensToShare', 'customScreenShareMenu'],
+  );
+
   const teamState = container.resolve(TeamState);
   const userState = container.resolve(UserState);
+
+  const isScreenshareActive =
+    hasAvailableScreensToShare && customScreenShareMenu === DesktopScreenShareMenu.MAIN_WINDOW;
 
   const {
     history,
@@ -284,6 +296,8 @@ export const AppMain: FC<AppMainProps> = ({
                   toggleScreenshare={mainView.calling.callActions.toggleScreenshare}
                 />
               )}
+
+              {isScreenshareActive && <ChooseScreen choose={repositories.calling.onChooseScreen} />}
 
               <LegalHoldModal
                 selfUser={selfUser}
