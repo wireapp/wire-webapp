@@ -50,7 +50,6 @@ export const DetachedCallingCell = ({
   const isDetachedWindow = viewMode === CallingViewMode.DETACHED_WINDOW;
 
   const closeDetachedWindow = () => {
-    mediaRepository.streamHandler.resetMediaDevices();
     callState.viewMode(CallingViewMode.MINIMIZED);
   };
 
@@ -58,21 +57,8 @@ export const DetachedCallingCell = ({
     return null;
   }
 
-  const onNewWindowOpened = (newWindow: Window) => {
-    const newMediaDevices = newWindow?.navigator?.mediaDevices;
-    if (newMediaDevices) {
-      mediaRepository.streamHandler.setMediaDevices(newMediaDevices);
-    }
-  };
-
   return (
-    <DetachedWindow
-      name="WIRE_PICTURE_IN_PICTURE_CALL"
-      width={1026}
-      height={829}
-      onClose={closeDetachedWindow}
-      onNewWindowOpened={onNewWindowOpened}
-    >
+    <DetachedWindow name="WIRE_PICTURE_IN_PICTURE_CALL" width={1026} height={829} onClose={closeDetachedWindow}>
       <CallingContainer
         callingRepository={callingRepository}
         mediaRepository={mediaRepository}

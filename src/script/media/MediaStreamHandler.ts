@@ -42,7 +42,6 @@ export class MediaStreamHandler {
   private readonly logger: Logger;
   private requestHintTimeout: number | undefined;
   private readonly screensharingMethod: ScreensharingMethods;
-  private mediaDevices: MediaDevices;
 
   constructor(
     private readonly constraintsHandler: MediaConstraintsHandler,
@@ -50,7 +49,6 @@ export class MediaStreamHandler {
   ) {
     this.logger = getLogger('MediaStreamHandler');
     this.requestHintTimeout = undefined;
-    this.mediaDevices = window.navigator.mediaDevices;
 
     this.screensharingMethod = ScreensharingMethods.NONE;
     if (window.desktopCapturer) {
@@ -79,14 +77,6 @@ export class MediaStreamHandler {
       return showScreenSelection();
     }
     return Promise.resolve();
-  }
-
-  public setMediaDevices(mediaDevices: MediaDevices): void {
-    this.mediaDevices = mediaDevices;
-  }
-
-  public resetMediaDevices(): void {
-    this.mediaDevices = window.navigator.mediaDevices;
   }
 
   /**
@@ -152,10 +142,12 @@ export class MediaStreamHandler {
     }
 
     const supportsGetDisplayMedia = screen && this.screensharingMethod === ScreensharingMethods.DISPLAY_MEDIA;
-    const mediaAPI = supportsGetDisplayMedia ? this.mediaDevices.getDisplayMedia : this.mediaDevices.getUserMedia;
+    const mediaAPI = supportsGetDisplayMedia
+      ? navigator.mediaDevices.getDisplayMedia
+      : navigator.mediaDevices.getUserMedia;
 
     return mediaAPI
-      .call(this.mediaDevices, mediaConstraints)
+      .call(navigator.mediaDevices, mediaConstraints)
       .then((mediaStream: MediaStream) => {
         this.clearPermissionRequestHint(audio, video, screen);
         return mediaStream;
