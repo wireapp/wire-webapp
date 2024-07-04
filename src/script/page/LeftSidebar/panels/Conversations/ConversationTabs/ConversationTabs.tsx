@@ -41,6 +41,7 @@ interface ConversationTabsProps {
   onChangeTab: (tab: SidebarTabs, folderId?: string) => void;
   currentTab: SidebarTabs;
   onClickPreferences: () => void;
+  showNotificationsBadge?: boolean;
 }
 
 export const ConversationTabs = ({
@@ -53,6 +54,7 @@ export const ConversationTabs = ({
   onChangeTab,
   currentTab,
   onClickPreferences,
+  showNotificationsBadge = false,
 }: ConversationTabsProps) => {
   const totalUnreadConversations = unreadConversations.length;
 
@@ -179,6 +181,7 @@ export const ConversationTabs = ({
           }}
           conversationTabIndex={1}
           dataUieName="go-preferences"
+          showNotificationBadge={showNotificationsBadge}
           isActive={currentTab === SidebarTabs.PREFERENCES}
         />
 
