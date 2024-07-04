@@ -20,7 +20,6 @@
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {Avatar, AVATAR_SIZE, GroupAvatar} from 'Components/Avatar';
-import {useDetachedCallingFeatureState} from 'Components/calling/DetachedCallingCell/DetachedCallingFeature.state';
 import {Duration} from 'Components/calling/Duration';
 import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
@@ -77,8 +76,6 @@ export const CallingHeader = ({
   toggleDetachedWindow,
   isDetachedWindow,
 }: CallingHeaderProps) => {
-  const isDetachedCallingFeatureEnabled = useDetachedCallingFeatureState(state => state.isSupported());
-
   return (
     <div css={callingHeaderContainer}>
       <div
@@ -148,7 +145,7 @@ export const CallingHeader = ({
         </h2>
       </div>
 
-      {isOngoing && isDetachedCallingFeatureEnabled && (
+      {isOngoing && (
         <div>
           <button css={detachedWindowButton} onClick={toggleDetachedWindow}>
             {isDetachedWindow ? <Icon.CloseDetachedWindowIcon /> : <Icon.OpenDetachedWindowIcon />}

@@ -69,7 +69,6 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     state: currentCallState,
     muteState,
   } = useKoSubscribableChildren(joinedCall!, ['maximizedParticipant', 'state', 'muteState']);
-  const conversation = joinedCall!.conversation;
 
   const isMuted = muteState !== MuteState.NOT_MUTED;
 
@@ -129,9 +128,11 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
 
   const toggleMute = (call: Call, muteState: boolean) => callingRepository.muteCall(call, muteState);
 
-  if (!joinedCall || !conversation || conversation.removed_from_conversation()) {
+  if (!joinedCall || !joinedCall.conversation || joinedCall.conversation.removed_from_conversation()) {
     return null;
   }
+
+  const {conversation} = joinedCall;
 
   return (
     <Fragment>

@@ -25,6 +25,7 @@ import {container} from 'tsyringe';
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
 import {DetachedCallingCell} from 'Components/calling/DetachedCallingCell';
+import {useDetachedCallingFeatureState} from 'Components/calling/DetachedCallingCell/DetachedCallingFeature.state';
 import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
 import {SIGN_OUT_REASON} from 'src/script/auth/SignOutReason';
 import {useAppSoftLock} from 'src/script/hooks/useAppSoftLock';
@@ -83,6 +84,7 @@ export const AppContainer: FC<AppProps> = ({config, clientType}) => {
   const {repository: repositories} = app;
 
   const {softLockEnabled} = useAppSoftLock(repositories.calling, repositories.notification);
+  const {isEnabled: isDetachedCallingFeatureEnabled} = useDetachedCallingFeatureState();
 
   if (hasOtherInstance) {
     app.redirectToLogin(SIGN_OUT_REASON.MULTIPLE_TABS);
@@ -100,11 +102,13 @@ export const AppContainer: FC<AppProps> = ({config, clientType}) => {
         <PrimaryModalComponent />
       </StyledApp>
 
-      <DetachedCallingCell
-        callingRepository={app.repository.calling}
-        mediaRepository={app.repository.media}
-        toggleScreenshare={mainView.calling.callActions.toggleScreenshare}
-      />
+      {isDetachedCallingFeatureEnabled && (
+        <DetachedCallingCell
+          callingRepository={app.repository.calling}
+          mediaRepository={app.repository.media}
+          toggleScreenshare={mainView.calling.callActions.toggleScreenshare}
+        />
+      )}
     </>
   );
 };

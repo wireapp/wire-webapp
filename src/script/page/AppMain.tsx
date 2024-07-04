@@ -26,6 +26,8 @@ import {container} from 'tsyringe';
 import {StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {CallingContainer} from 'Components/calling/CallingOverlayContainer';
+import {useDetachedCallingFeatureState} from 'Components/calling/DetachedCallingCell/DetachedCallingFeature.state';
 import {ErrorFallback} from 'Components/ErrorFallback';
 import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationModal';
 import {LegalHoldModal} from 'Components/Modals/LegalHoldModal/LegalHoldModal';
@@ -221,6 +223,8 @@ export const AppMain: FC<AppMainProps> = ({
   const showLeftSidebar = (isMobileView && isMobileLeftSidebarView) || (!isMobileView && !isLeftSidebarHidden);
   const showMainContent = !isMobileView || isMobileCentralColumnView;
 
+  const {isEnabled: isDetachedCallingFeatureEnabled} = useDetachedCallingFeatureState();
+
   return (
     <StyledApp
       themeId={THEME_ID.DEFAULT}
@@ -272,6 +276,14 @@ export const AppMain: FC<AppMainProps> = ({
           {!locked && (
             <>
               <FeatureConfigChangeNotifier selfUserId={selfUser.id} teamState={teamState} />
+
+              {!isDetachedCallingFeatureEnabled && (
+                <CallingContainer
+                  callingRepository={repositories.calling}
+                  mediaRepository={repositories.media}
+                  toggleScreenshare={mainView.calling.callActions.toggleScreenshare}
+                />
+              )}
 
               <LegalHoldModal
                 selfUser={selfUser}
