@@ -24,7 +24,7 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {container} from 'tsyringe';
 
 import {CALL_TYPE} from '@wireapp/avs';
-import {GridIcon, IconButton, IconButtonVariant, Select, useMatchMedia} from '@wireapp/react-ui-kit';
+import {GridIcon, IconButton, IconButtonVariant, Select} from '@wireapp/react-ui-kit';
 
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import * as Icon from 'Components/Icon';
@@ -32,6 +32,7 @@ import {ConversationClassifiedBar} from 'Components/input/ClassifiedBar';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {isCallViewOption} from 'src/script/guards/CallView';
 import {isMediaDevice} from 'src/script/guards/MediaDevice';
+import {useActiveWindowMatchMedia} from 'src/script/hooks/useActiveWindowMatchMedia';
 import {useToggleState} from 'src/script/hooks/useToggleState';
 import {MediaDeviceType} from 'src/script/media/MediaDeviceType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -307,9 +308,9 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   const totalPages = callPages.length;
 
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
-  const horizontalSmBreakpoint = useMatchMedia('max-width: 680px');
-  const horizontalXsBreakpoint = useMatchMedia('max-width: 500px');
-  const verticalBreakpoint = useMatchMedia('max-height: 420px');
+  const horizontalSmBreakpoint = useActiveWindowMatchMedia('max-width: 680px');
+  const horizontalXsBreakpoint = useActiveWindowMatchMedia('max-width: 500px');
+  const verticalBreakpoint = useActiveWindowMatchMedia('max-height: 420px');
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent): void => {
