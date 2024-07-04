@@ -116,7 +116,7 @@ export const CallingHeader = ({
         )}
 
         <h2 css={callDetails}>
-          <div css={conversationCallName}>{conversationName} - long name test</div>
+          <div css={conversationCallName}>{conversationName}</div>
 
           {currentCallStatus && (
             <div data-uie-name={currentCallStatus.dataUieName} css={callDescription}>
