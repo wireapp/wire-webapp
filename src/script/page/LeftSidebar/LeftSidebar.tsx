@@ -17,14 +17,19 @@
  *
  */
 
-import React, {useEffect} from 'react';
+import React, {useEffect, useRef} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
+import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {ConversationState} from 'src/script/conversation/ConversationState';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/state';
+import {generateConversationUrl} from 'src/script/router/routeGenerator';
+import {createNavigate} from 'src/script/router/routerBindings';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {Conversations} from './panels/Conversations';
 import {TemporaryGuestConversations} from './panels/TemporaryGuestConversations';
@@ -37,32 +42,59 @@ type LeftSidebarProps = {
   listViewModel: ListViewModel;
   selfUser: User;
   isActivatedAccount: boolean;
+  conversationState: ConversationState;
 };
 
-const LeftSidebar: React.FC<LeftSidebarProps> = ({listViewModel, selfUser, isActivatedAccount}) => {
+const LeftSidebar: React.FC<LeftSidebarProps> = ({
+  listViewModel,
+  selfUser,
+  isActivatedAccount,
+  conversationState = container.resolve(ConversationState),
+}) => {
   const {conversationRepository, propertiesRepository} = listViewModel;
   const repositories = listViewModel.contentViewModel.repositories;
   const listState = useAppState(state => state.listState);
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   const switchList = (list: ListState) => listViewModel.switchList(list);
 
-  const {setCurrentTab} = useSidebarStore();
+  const {setCurrentTab, currentTab} = useSidebarStore();
+
+  const {visibleConversations: conversations} = useKoSubscribableChildren(conversationState, ['visibleConversations']);
 
   useEffect(() => {
-    amplify.subscribe(WebAppEvents.SHORTCUT.START, () => {
+    function openCreateGroupModal() {
       amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, 'conversation_details');
-    });
+    }
 
-    amplify.subscribe(WebAppEvents.SHORTCUT.SEARCH, () => {
+    async function jumpToRecentSearch() {
+      if (currentTab === SidebarTabs.PREFERENCES) {
+        const link = generateConversationUrl(conversations[0].qualifiedId);
+
+        createNavigate(link)();
+      }
+
       setCurrentTab(SidebarTabs.RECENT);
-      switchList(ListState.START_UI);
-    });
-  }, []);
+      await switchList(ListState.START_UI);
+
+      inputRef.current?.focus();
+    }
+
+    amplify.subscribe(WebAppEvents.SHORTCUT.START, openCreateGroupModal);
+
+    amplify.subscribe(WebAppEvents.SHORTCUT.SEARCH, jumpToRecentSearch);
+
+    return () => {
+      amplify.unsubscribe(WebAppEvents.SHORTCUT.START, openCreateGroupModal);
+      amplify.unsubscribe(WebAppEvents.SHORTCUT.SEARCH, jumpToRecentSearch);
+    };
+  }, [conversations, currentTab, setCurrentTab, inputRef]);
 
   return (
     <aside id="left-column" className={cx('left-column', {'left-column--light-theme': !isActivatedAccount})}>
       {[ListState.CONVERSATIONS, ListState.START_UI, ListState.PREFERENCES, ListState.ARCHIVE].includes(listState) && (
         <Conversations
+          inputRef={inputRef}
           selfUser={selfUser}
           listViewModel={listViewModel}
           searchRepository={repositories.search}

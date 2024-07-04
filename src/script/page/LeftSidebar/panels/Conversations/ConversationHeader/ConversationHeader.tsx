@@ -17,7 +17,7 @@
  *
  */
 
-import {KeyboardEvent, useEffect, useRef} from 'react';
+import {forwardRef, ForwardRefRenderFunction, KeyboardEvent} from 'react';
 
 import {amplify} from 'amplify';
 
@@ -55,21 +55,22 @@ interface ConversationHeaderProps {
   onSearchEnterClick: (event: KeyboardEvent<HTMLInputElement>) => void;
 }
 
-export const ConversationHeader = ({
-  currentTab,
-  selfUser,
-  showSearchInput = false,
-  searchValue = '',
-  setSearchValue,
-  currentFolder,
-  searchInputPlaceholder,
-  setIsConversationFilterFocused,
-  onSearchEnterClick,
-}: ConversationHeaderProps) => {
+export const ConversationHeaderComponent: ForwardRefRenderFunction<HTMLInputElement, ConversationHeaderProps> = (
+  {
+    currentTab,
+    selfUser,
+    showSearchInput = false,
+    searchValue = '',
+    setSearchValue,
+    currentFolder,
+    searchInputPlaceholder,
+    setIsConversationFilterFocused,
+    onSearchEnterClick,
+  },
+  inputRef,
+) => {
   const {canCreateGroupConversation} = generatePermissionHelpers(selfUser.teamRole());
   const isFolderView = currentTab === SidebarTabs.FOLDER;
-
-  const inputRef = useRef<HTMLInputElement | null>(null);
 
   const conversationsHeaderTitle: Partial<Record<SidebarTabs, string>> = {
     [SidebarTabs.RECENT]: t('conversationViewAllConversations'),
@@ -80,12 +81,6 @@ export const ConversationHeader = ({
     [SidebarTabs.ARCHIVES]: t('conversationFooterArchive'),
     [SidebarTabs.CONNECT]: t('searchConnect'),
   };
-
-  useEffect(() => {
-    amplify.subscribe(WebAppEvents.SHORTCUT.SEARCH, () => {
-      inputRef?.current?.focus();
-    });
-  }, []);
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Escape') {
@@ -141,3 +136,5 @@ export const ConversationHeader = ({
     </>
   );
 };
+
+export const ConversationHeader = forwardRef(ConversationHeaderComponent);

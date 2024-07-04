@@ -82,9 +82,11 @@ type ConversationsProps = {
   searchRepository: SearchRepository;
   teamRepository: TeamRepository;
   userRepository: UserRepository;
+  inputRef: React.MutableRefObject<HTMLInputElement | null>;
 };
 
 const Conversations: React.FC<ConversationsProps> = ({
+  inputRef,
   integrationRepository,
   searchRepository,
   teamRepository,
@@ -312,6 +314,7 @@ const Conversations: React.FC<ConversationsProps> = ({
         id="conversations"
         headerElement={
           <ConversationHeader
+            ref={inputRef}
             currentFolder={currentFolder}
             currentTab={currentTab}
             selfUser={selfUser}
