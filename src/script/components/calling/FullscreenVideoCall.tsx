@@ -672,7 +672,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                           onKeyDown={event => isEscapeKey(event) && setAudioOptionsOpen(false)}
                           menuPlacement="top"
                           menuIsOpen={isCallViewOpen}
-                          wrapperCSS={{marginBottom: 16, width: 0, height: 0}}
+                          wrapperCSS={{marginBottom: 0, width: 0, height: 0}}
                           menuCSS={{right: 0, bottom: 10}}
                         />
                         <GridIcon width={16} height={16} />
