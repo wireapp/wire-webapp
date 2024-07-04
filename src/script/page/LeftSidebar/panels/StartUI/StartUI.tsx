@@ -147,7 +147,7 @@ const StartUI: React.FC<StartUIProps> = ({
       <div className="start-ui-header-user-input" data-uie-name="enter-search">
         <SearchInput
           input={searchQuery}
-          placeholder={t('searchPeoplePlaceholder')}
+          placeholder={t('searchPeopleOnlyPlaceholder')}
           setInput={setSearchQuery}
           onEnter={openFirstConversation}
           forceDark
