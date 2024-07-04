@@ -63,21 +63,16 @@ export class MediaConstraintsHandler {
             frameRate: 12,
           },
           USER_MEDIA: {
-            frameRate: 5,
-            height: {exact: 720},
+            frameRate: 12,
             mediaSource: 'screen',
           },
         },
         VIDEO: {
           [VIDEO_QUALITY_MODE.FULL_HD]: {
-            frameRate: 15,
-            height: 1080,
-            width: 1920,
+            frameRate: 30,
           },
           [VIDEO_QUALITY_MODE.GROUP]: {
             frameRate: 15,
-            height: 720,
-            width: 1280,
           },
           [VIDEO_QUALITY_MODE.HD]: {
             frameRate: 15,
