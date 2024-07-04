@@ -55,6 +55,7 @@ import {CallState} from '../../../../calling/CallState';
 import {createLabel} from '../../../../conversation/ConversationLabelRepository';
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
 import {ConversationState} from '../../../../conversation/ConversationState';
+import type {Conversation} from '../../../../entity/Conversation';
 import {User} from '../../../../entity/User';
 import {useConversationFocus} from '../../../../hooks/useConversationFocus';
 import {PreferenceNotificationRepository} from '../../../../notification/PreferenceNotificationRepository';
@@ -120,6 +121,7 @@ const Conversations: React.FC<ConversationsProps> = ({
     'unreadConversations',
     'visibleConversations',
   ]);
+
   const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
 
   const {conversationLabelRepository} = conversationRepository;
@@ -177,6 +179,20 @@ const Conversations: React.FC<ConversationsProps> = ({
       listViewModel.contentViewModel.loadPreviousContent();
     }
   }, [activeConversation, conversationState, listViewModel.contentViewModel, conversations.length]);
+
+  useEffect(() => {
+    amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, (conversation?: Conversation) => {
+      if (!conversation) {
+        return;
+      }
+
+      const includesConversation = currentTabConversations.includes(conversation);
+
+      if (!includesConversation) {
+        setCurrentTab(SidebarTabs.RECENT);
+      }
+    });
+  }, [currentTabConversations]);
 
   useEffect(() => {
     if (!activeConversation) {
