@@ -47,6 +47,7 @@ import {useAppState, ContentState} from './useAppState';
 
 import {ConversationState} from '../conversation/ConversationState';
 import {User} from '../entity/User';
+import {useActiveWindow} from '../hooks/useActiveWindow';
 import {useInitializeRootFontSize} from '../hooks/useRootFontSize';
 import {App} from '../main/app';
 import {initialiseMLSMigrationFlow} from '../mls/MLSMigration';
@@ -81,6 +82,8 @@ export const AppMain: FC<AppMainProps> = ({
   locked,
 }) => {
   const apiContext = app.getAPIContext();
+
+  useActiveWindow(window);
 
   useInitializeRootFontSize();
 
