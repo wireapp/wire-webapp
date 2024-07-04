@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.21.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.20.0...@wireapp/react-ui-kit@9.21.0) (2024-07-04)
+
+### Features
+
+* allow match media to support external window ([#6341](https://github.com/wireapp/wire-web-packages/issues/6341)) ([6adc9f2](https://github.com/wireapp/wire-web-packages/commit/6adc9f23585ab298679ed2b4f6ae93ffcf274f46))
+
 # [9.20.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.19.0...@wireapp/react-ui-kit@9.20.0) (2024-07-02)
 
 ### Features
