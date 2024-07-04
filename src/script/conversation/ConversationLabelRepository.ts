@@ -251,15 +251,18 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
   };
 
   readonly addConversationToLabel = (label: ConversationLabel, conversation: Conversation): void => {
+    const {setCurrentTab} = useSidebarStore.getState();
     if (!label.conversations().includes(conversation)) {
       this.removeConversationFromAllLabels(conversation);
       label.conversations.push(conversation);
       amplify.publish(WebAppEvents.CONTENT.EXPAND_FOLDER, label.id);
       this.saveLabels();
+      setCurrentTab(SidebarTabs.FOLDER);
     }
   };
 
   readonly addConversationToNewLabel = (conversation: Conversation) => {
+    const {setCurrentTab} = useSidebarStore.getState();
     PrimaryModal.show(PrimaryModal.type.INPUT, {
       primaryAction: {
         action: (name: string) => {
@@ -268,6 +271,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
           this.labels.push(newFolder);
           amplify.publish(WebAppEvents.CONTENT.EXPAND_FOLDER, newFolder.id);
           this.saveLabels();
+          setCurrentTab(SidebarTabs.FOLDER);
         },
         text: t('modalCreateFolderAction'),
       },
