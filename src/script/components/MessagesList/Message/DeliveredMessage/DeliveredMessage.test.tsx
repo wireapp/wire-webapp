@@ -22,7 +22,6 @@ import {render} from '@testing-library/react';
 import {DeliveredMessage} from './DeliveredMessage';
 
 import {withTheme} from '../../../../auth/util/test/TestUtil';
-import {ReadReceipt} from '../../../../storage';
 
 describe('DeliveredMessage', () => {
   it('should render null if isLastDeliveredMessage is false', () => {
@@ -30,16 +29,8 @@ describe('DeliveredMessage', () => {
     expect(queryByTestId('status-message-read-receipt-delivered')).toBeNull();
   });
 
-  it('should render null if readReceipts is not empty', () => {
-    const readReceipts = [{time: '123', userId: 'userId-1'}] as ReadReceipt[];
-    const {queryByTestId} = render(
-      withTheme(<DeliveredMessage isLastDeliveredMessage={true} readReceipts={readReceipts} />),
-    );
-    expect(queryByTestId('status-message-read-receipt-delivered')).toBeNull();
-  });
-
-  it('should render the delivered message icon if isLastDeliveredMessage is true and readReceipts is empty', () => {
-    const {queryByTestId} = render(withTheme(<DeliveredMessage isLastDeliveredMessage={true} readReceipts={[]} />));
+  it('should render the delivered message icon if isLastDeliveredMessage is true', () => {
+    const {queryByTestId} = render(withTheme(<DeliveredMessage isLastDeliveredMessage={true} />));
     expect(queryByTestId('status-message-read-receipt-delivered')).not.toBeNull();
   });
 });
