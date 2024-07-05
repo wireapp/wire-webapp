@@ -84,7 +84,7 @@ export const AppContainer: FC<AppProps> = ({config, clientType}) => {
   const {repository: repositories} = app;
 
   const {softLockEnabled} = useAppSoftLock(repositories.calling, repositories.notification);
-  const {isEnabled: isDetachedCallingFeatureEnabled} = useDetachedCallingFeatureState();
+  const {isSupported: isDetachedCallingFeatureEnabled} = useDetachedCallingFeatureState();
 
   if (hasOtherInstance) {
     app.redirectToLogin(SIGN_OUT_REASON.MULTIPLE_TABS);
@@ -102,7 +102,7 @@ export const AppContainer: FC<AppProps> = ({config, clientType}) => {
         <PrimaryModalComponent />
       </StyledApp>
 
-      {isDetachedCallingFeatureEnabled && (
+      {isDetachedCallingFeatureEnabled() && (
         <DetachedCallingCell
           callingRepository={app.repository.calling}
           mediaRepository={app.repository.media}

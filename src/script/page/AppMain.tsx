@@ -235,7 +235,7 @@ export const AppMain: FC<AppMainProps> = ({
   const showLeftSidebar = (isMobileView && isMobileLeftSidebarView) || (!isMobileView && !isLeftSidebarHidden);
   const showMainContent = !isMobileView || isMobileCentralColumnView;
 
-  const {isEnabled: isDetachedCallingFeatureEnabled} = useDetachedCallingFeatureState();
+  const {isSupported: isDetachedCallingFeatureEnabled} = useDetachedCallingFeatureState();
 
   return (
     <StyledApp
@@ -290,7 +290,7 @@ export const AppMain: FC<AppMainProps> = ({
               <FeatureConfigChangeNotifier selfUserId={selfUser.id} teamState={teamState} />
 
               {/* FIXME: This is a temporary solution to show the calling container in the main app if the detached feature is off */}
-              {!isDetachedCallingFeatureEnabled && (
+              {!isDetachedCallingFeatureEnabled() && (
                 <CallingContainer
                   callingRepository={repositories.calling}
                   mediaRepository={repositories.media}
