@@ -17,12 +17,9 @@
  *
  */
 
-import {useEffect, useState} from 'react';
-
 import {MediaDeviceType} from 'src/script/media/MediaDeviceType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
-import {getLogger} from 'Util/Logger';
 
 import {AudioOutPreferences} from './avPreferences/AudioOutPreferences';
 import {CallOptions} from './avPreferences/CallOptions';
@@ -35,8 +32,6 @@ import type {CallingRepository} from '../../../../calling/CallingRepository';
 import type {MediaRepository} from '../../../../media/MediaRepository';
 import type {PropertiesRepository} from '../../../../properties/PropertiesRepository';
 
-const logger = getLogger('AVPreferences');
-
 interface AVPreferencesProps {
   callingRepository: CallingRepository;
   mediaRepository: MediaRepository;
@@ -48,43 +43,22 @@ const AVPreferences = ({
   propertiesRepository,
   callingRepository,
 }: AVPreferencesProps) => {
-  const [isCheckingPermissions, setCheckingPermissions] = useState(false);
   const deviceSupport = useKoSubscribableChildren(devicesHandler?.deviceSupport, [
     MediaDeviceType.AUDIO_INPUT,
     MediaDeviceType.AUDIO_OUTPUT,
     MediaDeviceType.VIDEO_INPUT,
   ]);
 
-  const initializeMediaDevices = async () => {
-    setCheckingPermissions(true);
-    try {
-      await devicesHandler?.initializeMediaDevices(true);
-    } catch (error) {
-      logger.warn(`Initialization of media devices failed: ${error.message}`, error);
-    } finally {
-      setCheckingPermissions(false);
-    }
-  };
-
-  useEffect(() => {
-    initializeMediaDevices();
-  }, []);
-
   return (
     <PreferencesPage title={t('preferencesAV')}>
-      {isCheckingPermissions && (
-        <div className="preferences-av-spinner-select">
-          <div className="icon-spinner spin accent-text"></div>
-        </div>
-      )}
-      {!isCheckingPermissions && deviceSupport.audioinput && (
+      {deviceSupport.audioinput && (
         <MicrophonePreferences
           {...{devicesHandler, streamHandler}}
           refreshStream={() => callingRepository.refreshAudioInput()}
         />
       )}
-      {!isCheckingPermissions && deviceSupport.audiooutput && <AudioOutPreferences {...{devicesHandler}} />}
-      {!isCheckingPermissions && deviceSupport.videoinput && (
+      {deviceSupport.audiooutput && <AudioOutPreferences {...{devicesHandler}} />}
+      {deviceSupport.videoinput && (
         <CameraPreferences
           {...{devicesHandler, streamHandler}}
           refreshStream={() => callingRepository.refreshVideoInput()}
