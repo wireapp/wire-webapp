@@ -1401,6 +1401,7 @@
   "searchOthers": "Połącz",
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Osoby",
+  "searchPeopleOnlyPlaceholder": "Search people",
   "searchPeoplePlaceholder": "Search for people and conversations",
   "searchServiceConfirmButton": "Open Conversation",
   "searchServicePlaceholder": "Szukaj według nazwy",

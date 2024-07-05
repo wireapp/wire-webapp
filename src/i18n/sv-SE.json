@@ -1401,6 +1401,7 @@
   "searchOthers": "Anslut",
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Personer",
+  "searchPeopleOnlyPlaceholder": "Search people",
   "searchPeoplePlaceholder": "Search for people and conversations",
   "searchServiceConfirmButton": "Lägg till tjänst",
   "searchServicePlaceholder": "Sök efter namn",

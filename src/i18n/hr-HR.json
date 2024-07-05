@@ -1401,6 +1401,7 @@
   "searchOthers": "Poveži se",
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Kontakti",
+  "searchPeopleOnlyPlaceholder": "Search people",
   "searchPeoplePlaceholder": "Search for people and conversations",
   "searchServiceConfirmButton": "Otvori razgovor",
   "searchServicePlaceholder": "Traži po imenu",

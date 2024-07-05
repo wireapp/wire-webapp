@@ -1401,6 +1401,7 @@
   "searchOthers": "つながる",
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "メンバー",
+  "searchPeopleOnlyPlaceholder": "Search people",
   "searchPeoplePlaceholder": "Search for people and conversations",
   "searchServiceConfirmButton": "サービスを追加",
   "searchServicePlaceholder": "名前で検索する",

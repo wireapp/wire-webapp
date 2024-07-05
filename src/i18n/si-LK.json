@@ -1401,6 +1401,7 @@
   "searchOthers": "සබඳින්න",
   "searchOthersFederation": "{{domainName}} වෙත සම්බන්ධ වන්න",
   "searchPeople": "පුද්ගලයින්",
+  "searchPeopleOnlyPlaceholder": "Search people",
   "searchPeoplePlaceholder": "Search for people and conversations",
   "searchServiceConfirmButton": "සංවාදය අරින්න",
   "searchServicePlaceholder": "නමින් සොයන්න",

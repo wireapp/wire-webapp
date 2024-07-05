@@ -1401,6 +1401,7 @@
   "searchOthers": "Připojit",
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Kontakty",
+  "searchPeopleOnlyPlaceholder": "Search people",
   "searchPeoplePlaceholder": "Search for people and conversations",
   "searchServiceConfirmButton": "Open Conversation",
   "searchServicePlaceholder": "Hledat podle jména",
