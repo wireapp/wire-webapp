@@ -640,8 +640,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                     justifyContent: 'flex-end',
                   }}
                 >
-                  {/* FIXME: should be more than 2 */}
-                  {participants.length > 0 && (
+                  {participants.length > 2 && (
                     <li className="video-controls__item">
                       <button
                         className="video-controls__button video-controls__button--small"
@@ -649,7 +648,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                         onKeyDown={event => handleKeyDown(event, toggleCallView)}
                         css={isCallViewOpen ? videoControlActiveStyles : videoControlInActiveStyles}
                         type="button"
-                        data-uie-name="do-call-controls-video-call-mute"
+                        data-uie-name="do-call-controls-video-call-view"
                         role="switch"
                         aria-checked={!isMuted}
                         title={t('videoCallOverlayChangeViewMode')}
@@ -668,6 +667,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                           onChange={selectedOption => {
                             if (isCallViewOption(selectedOption)) {
                               setActiveCallViewTab(selectedOption.value);
+                              setMaximizedParticipant(call, null);
                             }
                           }}
                           onKeyDown={event => isEscapeKey(event) && setAudioOptionsOpen(false)}
