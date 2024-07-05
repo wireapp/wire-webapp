@@ -1401,6 +1401,7 @@
   "searchOthers": "Verbind",
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Deelnemers",
+  "searchPeopleOnlyPlaceholder": "Search people",
   "searchPeoplePlaceholder": "Search for people and conversations",
   "searchServiceConfirmButton": "Service toevoegen",
   "searchServicePlaceholder": "Zoeken op naam",
