@@ -75,10 +75,9 @@ export class CallState {
         call => call.state() === CALL_STATE.INCOMING && call.reason() !== CALL_REASON.ANSWERED_ELSEWHERE,
       ),
     );
-    this.hasAvailableScreensToShare = ko.pureComputed(() => {
-      const hasAvailableScreensToShare = this.selectableScreens().length > 0 || this.selectableWindows().length > 0;
-      return hasAvailableScreensToShare;
-    });
+    this.hasAvailableScreensToShare = ko.pureComputed(
+      () => this.selectableScreens().length > 0 || this.selectableWindows().length > 0,
+    );
 
     this.calls.subscribe(activeCalls => {
       const activeCallIds = activeCalls.map(call => call.conversation.qualifiedId);

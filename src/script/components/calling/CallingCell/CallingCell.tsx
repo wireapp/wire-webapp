@@ -54,10 +54,7 @@ interface VideoCallProps {
 interface AnsweringControlsProps {
   call: Call;
   callActions: CallActions;
-  callingRepository: Pick<
-    CallingRepository,
-    'supportsScreenSharing' | 'sendModeratorMute' | 'onChooseScreen' | 'toggleScreenshare'
-  >;
+  callingRepository: Pick<CallingRepository, 'supportsScreenSharing'>;
   pushToTalkKey: string | null;
   isFullUi?: boolean;
   callState?: CallState;

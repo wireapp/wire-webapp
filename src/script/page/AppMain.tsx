@@ -289,6 +289,7 @@ export const AppMain: FC<AppMainProps> = ({
             <>
               <FeatureConfigChangeNotifier selfUserId={selfUser.id} teamState={teamState} />
 
+              {/* FIXME: This is a temporary solution to show the calling container in the main app if the detached feature is off */}
               {!isDetachedCallingFeatureEnabled && (
                 <CallingContainer
                   callingRepository={repositories.calling}
