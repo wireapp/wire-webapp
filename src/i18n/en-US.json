@@ -471,7 +471,7 @@
   "conversationDirectEmptyMessage": "You have no contacts yet. Search for people on {{brandName}} and get connected.",
   "conversationEditTimestamp": "Edited: {{date}}",
   "conversationFavoritesTabEmptyLinkText": "How to label conversations as favorites",
-  "conversationFavoritesTabEmptyMessage": "Select your favorite conversations, and you’ll find them here \uD83D\uDC4D",
+  "conversationFavoritesTabEmptyMessage": "Select your favorite conversations, and you’ll find them here 👍",
   "conversationFederationIndicator": "Federated",
   "conversationFileAssetRestricted": "Receiving files is prohibited",
   "conversationFoldersEmptyText": "Add your conversations to folders to stay organized.",
