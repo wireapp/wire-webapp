@@ -32,8 +32,5 @@ export class MediaRepository {
     this.devicesHandler = new MediaDevicesHandler();
     this.constraintsHandler = new MediaConstraintsHandler(this.devicesHandler.currentAvailableDeviceId);
     this.streamHandler = new MediaStreamHandler(this.constraintsHandler, permissionRepository);
-    this.devicesHandler.getMediaDeviceAccessStream = (withVideo: boolean): Promise<MediaStream | void> => {
-      return this.streamHandler.requestMediaSreamAccess(withVideo);
-    };
   }
 }
