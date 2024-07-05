@@ -1401,6 +1401,7 @@
   "searchOthers": "Užmegzti kontaktą",
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Žmonės",
+  "searchPeopleOnlyPlaceholder": "Search people",
   "searchPeoplePlaceholder": "Search for people and conversations",
   "searchServiceConfirmButton": "Pridėti paslaugą",
   "searchServicePlaceholder": "Ieškokite pagal vardą",

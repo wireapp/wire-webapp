@@ -1401,6 +1401,7 @@
   "searchOthers": "Ligar",
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Pessoas",
+  "searchPeopleOnlyPlaceholder": "Search people",
   "searchPeoplePlaceholder": "Search for people and conversations",
   "searchServiceConfirmButton": "Open Conversation",
   "searchServicePlaceholder": "Pesquisar por nome",

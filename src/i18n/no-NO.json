@@ -1401,6 +1401,7 @@
   "searchOthers": "Connect",
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Kontakter",
+  "searchPeopleOnlyPlaceholder": "Search people",
   "searchPeoplePlaceholder": "Search for people and conversations",
   "searchServiceConfirmButton": "Open Conversation",
   "searchServicePlaceholder": "Search by name",
