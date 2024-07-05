@@ -165,9 +165,7 @@ export class Runtime {
     if (!Runtime.isSupportingRTCPeerConnection()) {
       return false;
     }
-
-    const peerConnection = new RTCPeerConnection(undefined);
-    return 'createDataChannel' in peerConnection;
+    return !!(window.RTCPeerConnection.prototype && window.RTCPeerConnection.prototype.createDataChannel);
   };
 
   public static isSupportingUserMedia = (): boolean => {
