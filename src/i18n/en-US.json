@@ -1544,7 +1544,6 @@
   "videoCallvideoInputCamera": "Camera",
   "videoSpeakersTabAll": "All ({{count}})",
   "videoSpeakersTabSpeakers": "Speakers",
-  "viewingInAnotherWindow": "Viewing in another window",
   "warningCallIssues": "This version of {{brandName}} can not participate in the call. Please use",
   "warningCallQualityPoor": "Poor connection",
   "warningCallUnsupportedIncoming": "{{user}} is calling. Your browser doesn’t support calls.",

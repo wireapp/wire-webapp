@@ -51,11 +51,10 @@ import {EmptyConversationList} from './EmptyConversationList';
 import {getTabConversations} from './helpers';
 import {SidebarStatus, SidebarTabs, useFolderState, useSidebarStore} from './state';
 
-import {CallState} from '../../../../calling/CallState';
+import {CallingViewMode, CallState} from '../../../../calling/CallState';
 import {createLabel} from '../../../../conversation/ConversationLabelRepository';
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
 import {ConversationState} from '../../../../conversation/ConversationState';
-import type {Conversation} from '../../../../entity/Conversation';
 import {User} from '../../../../entity/User';
 import {useConversationFocus} from '../../../../hooks/useConversationFocus';
 import {PreferenceNotificationRepository} from '../../../../notification/PreferenceNotificationRepository';
@@ -105,7 +104,6 @@ const Conversations: React.FC<ConversationsProps> = ({
   const [isConversationFilterFocused, setIsConversationFilterFocused] = useState(false);
   const {classifiedDomains, isTeam} = useKoSubscribableChildren(teamState, ['classifiedDomains', 'isTeam']);
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
-  const {notifications} = useKoSubscribableChildren(preferenceNotificationRepository, ['notifications']);
 
   const {
     activeConversation,
@@ -122,8 +120,9 @@ const Conversations: React.FC<ConversationsProps> = ({
     'unreadConversations',
     'visibleConversations',
   ]);
+  const {activeCalls, viewMode} = useKoSubscribableChildren(callState, ['activeCalls', 'viewMode']);
 
-  const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
+  const isCallWindowDetached = viewMode === CallingViewMode.DETACHED_WINDOW;
 
   const {conversationLabelRepository} = conversationRepository;
   const favoriteConversations = conversationLabelRepository.getFavorites(conversations);
@@ -143,11 +142,8 @@ const Conversations: React.FC<ConversationsProps> = ({
   const {openFolder, closeFolder, expandedFolder, isFoldersTabOpen, toggleFoldersTab} = useFolderState();
   const {currentFocus, handleKeyDown, resetConversationFocus} = useConversationFocus(conversations);
 
-  // false when screen is larger than 1000px
-  // true when screen is smaller than 1000px
-  const isScreenLessThanMdBreakpoint = useMatchMedia('(max-width: 1000px)');
-  const isSideBarOpen =
-    sidebarStatus === SidebarStatus.AUTO ? !isScreenLessThanMdBreakpoint : sidebarStatus === SidebarStatus.OPEN;
+  const mdBreakpoint = useMatchMedia('(max-width: 1000px)');
+  const isSideBarOpen = sidebarStatus === SidebarStatus.AUTO ? mdBreakpoint : sidebarStatus === SidebarStatus.OPEN;
 
   const {conversations: currentTabConversations, searchInputPlaceholder} = getTabConversations({
     currentTab,
@@ -180,20 +176,6 @@ const Conversations: React.FC<ConversationsProps> = ({
       listViewModel.contentViewModel.loadPreviousContent();
     }
   }, [activeConversation, conversationState, listViewModel.contentViewModel, conversations.length]);
-
-  useEffect(() => {
-    amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, (conversation?: Conversation) => {
-      if (!conversation) {
-        return;
-      }
-
-      const includesConversation = currentTabConversations.includes(conversation);
-
-      if (!includesConversation) {
-        setCurrentTab(SidebarTabs.RECENT);
-      }
-    });
-  }, [currentTabConversations]);
 
   useEffect(() => {
     if (!activeConversation) {
@@ -256,7 +238,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   }
 
   const sidebar = (
-    <nav className="conversations-sidebar" css={conversationsSidebarStyles(isScreenLessThanMdBreakpoint)}>
+    <nav className="conversations-sidebar" css={conversationsSidebarStyles(mdBreakpoint)}>
       <FadingScrollbar className="conversations-sidebar-items" data-is-collapsed={!isSideBarOpen}>
         <UserDetails
           user={selfUser}
@@ -275,7 +257,6 @@ const Conversations: React.FC<ConversationsProps> = ({
           archivedConversations={archivedConversations}
           conversationRepository={conversationRepository}
           onClickPreferences={() => onClickPreferences(ContentState.PREFERENCES_ACCOUNT)}
-          showNotificationsBadge={notifications.length > 0}
         />
       </FadingScrollbar>
 
@@ -297,17 +278,20 @@ const Conversations: React.FC<ConversationsProps> = ({
         const {callingRepository} = callingViewModel;
 
         return (
-          conversation && (
-            <CallingCell
-              key={conversation.id}
-              classifiedDomains={classifiedDomains}
-              call={call}
-              callActions={callingViewModel.callActions}
-              callingRepository={callingRepository}
-              pushToTalkKey={propertiesRepository.getPreference(PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY)}
-              isFullUi
-              hasAccessToCamera={callingViewModel.hasAccessToCamera()}
-            />
+          conversation &&
+          !isCallWindowDetached && (
+            <div className="calling-cell" key={conversation.id}>
+              <CallingCell
+                classifiedDomains={classifiedDomains}
+                call={call}
+                callActions={callingViewModel.callActions}
+                callingRepository={callingRepository}
+                pushToTalkKey={propertiesRepository.getPreference(PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY)}
+                isFullUi
+                hasAccessToCamera={callingViewModel.hasAccessToCamera()}
+                isSelfVerified={selfUser.is_verified()}
+              />
+            </div>
           )
         );
       })}
@@ -325,7 +309,7 @@ const Conversations: React.FC<ConversationsProps> = ({
 
   return (
     <div className="conversations-wrapper">
-      <div className="conversations-sidebar-spacer" css={conversationsSpacerStyles(isScreenLessThanMdBreakpoint)} />
+      <div className="conversations-sidebar-spacer" css={conversationsSpacerStyles(mdBreakpoint)} />
       <ListWrapper
         id="conversations"
         headerElement={
@@ -343,7 +327,7 @@ const Conversations: React.FC<ConversationsProps> = ({
         }
         hasHeader={!isPreferences}
         sidebar={sidebar}
-        footer={callingView}
+        before={callingView}
       >
         {isPreferences ? (
           <Preferences
@@ -366,8 +350,7 @@ const Conversations: React.FC<ConversationsProps> = ({
               />
             )}
 
-            {((showSearchInput && currentTabConversations.length === 0) ||
-              (hasNoConversations && currentTab !== SidebarTabs.ARCHIVES)) && (
+            {((showSearchInput && currentTabConversations.length === 0) || hasNoConversations) && (
               <EmptyConversationList
                 currentTab={currentTab}
                 onChangeTab={changeTab}
