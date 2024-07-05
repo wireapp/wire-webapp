@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.2.9](https://github.com/wireapp/wire-web-packages/compare/@wireapp/commons@5.2.8...@wireapp/commons@5.2.9) (2024-07-05)
+
+### Bug Fixes
+
+* do not create an RTC object for check ([#6326](https://github.com/wireapp/wire-web-packages/issues/6326)) ([34449e8](https://github.com/wireapp/wire-web-packages/commit/34449e8b43e8e654d68e23ce9e25c2ac1c23ea5c))
+
 ## [5.2.8](https://github.com/wireapp/wire-web-packages/compare/@wireapp/commons@5.2.7...@wireapp/commons@5.2.8) (2024-05-21)
 
 **Note:** Version bump only for package @wireapp/commons
