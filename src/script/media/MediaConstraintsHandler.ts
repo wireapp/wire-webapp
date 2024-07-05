@@ -73,11 +73,11 @@ export class MediaConstraintsHandler {
           },
           [VIDEO_QUALITY_MODE.GROUP]: {
             frameRate: 15,
+            height: 720,
+            width: 1280,
           },
           [VIDEO_QUALITY_MODE.HD]: {
             frameRate: 15,
-            height: 720,
-            width: 1280,
           },
           [VIDEO_QUALITY_MODE.MOBILE]: {
             frameRate: 15,
