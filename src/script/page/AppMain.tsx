@@ -103,16 +103,16 @@ export const AppMain: FC<AppMainProps> = ({
     'isActivatedAccount',
   ]);
 
-  const {hasAvailableScreensToShare, desktopScreenShareMenu: customScreenShareMenu} = useKoSubscribableChildren(
-    callState,
-    ['hasAvailableScreensToShare', 'customScreenShareMenu'],
-  );
+  const {hasAvailableScreensToShare, desktopScreenShareMenu} = useKoSubscribableChildren(callState, [
+    'hasAvailableScreensToShare',
+    'desktopScreenShareMenu',
+  ]);
 
   const teamState = container.resolve(TeamState);
   const userState = container.resolve(UserState);
 
   const isScreenshareActive =
-    hasAvailableScreensToShare && customScreenShareMenu === DesktopScreenShareMenu.MAIN_WINDOW;
+    hasAvailableScreensToShare && desktopScreenShareMenu === DesktopScreenShareMenu.MAIN_WINDOW;
 
   const {
     history,

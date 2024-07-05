@@ -65,7 +65,7 @@ export interface CallActions {
   switchScreenInput: (deviceId: string) => void;
   toggleCamera: (call: Call) => void;
   toggleMute: (call: Call, muteState: boolean) => void;
-  toggleScreenshare: (call: Call, customScreenShareMenu: DesktopScreenShareMenu) => void;
+  toggleScreenshare: (call: Call, desktopScreenShareMenu: DesktopScreenShareMenu) => void;
 }
 
 export enum CallViewTab {
@@ -320,12 +320,12 @@ export class CallingViewModel {
       toggleMute: (call: Call, muteState: boolean) => {
         this.callingRepository.muteCall(call, muteState);
       },
-      toggleScreenshare: async (call, customScreenShareMenu): Promise<void> => {
+      toggleScreenshare: async (call, desktopScreenShareMenu): Promise<void> => {
         if (call.getSelfParticipant().sharesScreen()) {
           return this.callingRepository.toggleScreenshare(call);
         }
         const showScreenSelection = (): Promise<void> => {
-          this.callState.desktopScreenShareMenu(customScreenShareMenu);
+          this.callState.desktopScreenShareMenu(desktopScreenShareMenu);
           return new Promise(resolve => {
             this.callingRepository.onChooseScreen = (deviceId: string): void => {
               this.mediaDevicesHandler.currentDeviceId.screeninput(deviceId);

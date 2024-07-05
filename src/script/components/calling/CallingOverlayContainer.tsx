@@ -42,7 +42,7 @@ export interface CallingContainerProps {
   readonly callingRepository: CallingRepository;
   readonly mediaRepository: MediaRepository;
   readonly callState?: CallState;
-  readonly toggleScreenshare: (call: Call, customScreenShareMenu: DesktopScreenShareMenu) => void;
+  readonly toggleScreenshare: (call: Call, desktopScreenShareMenu: DesktopScreenShareMenu) => void;
 }
 
 const CallingContainer: React.FC<CallingContainerProps> = ({
@@ -55,17 +55,10 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
   const {viewMode} = useKoSubscribableChildren(callState, ['viewMode']);
   const isDetachedWindow = viewMode === CallingViewMode.DETACHED_WINDOW;
 
-  const {
-    activeCallViewTab,
-    joinedCall,
-    hasAvailableScreensToShare,
-    desktopScreenShareMenu: customScreenShareMenu,
-  } = useKoSubscribableChildren(callState, [
-    'activeCallViewTab',
-    'joinedCall',
-    'hasAvailableScreensToShare',
-    'customScreenShareMenu',
-  ]);
+  const {activeCallViewTab, joinedCall, hasAvailableScreensToShare, desktopScreenShareMenu} = useKoSubscribableChildren(
+    callState,
+    ['activeCallViewTab', 'joinedCall', 'hasAvailableScreensToShare', 'desktopScreenShareMenu'],
+  );
 
   const {
     maximizedParticipant,
@@ -137,7 +130,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
   const {conversation} = joinedCall;
 
   const isScreenshareActive =
-    hasAvailableScreensToShare && customScreenShareMenu === DesktopScreenShareMenu.DETACHED_WINDOW;
+    hasAvailableScreensToShare && desktopScreenShareMenu === DesktopScreenShareMenu.DETACHED_WINDOW;
 
   return (
     <Fragment>

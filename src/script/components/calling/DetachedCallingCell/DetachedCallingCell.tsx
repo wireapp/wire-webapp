@@ -22,7 +22,7 @@ import {container} from 'tsyringe';
 import {DetachedWindow} from 'Components/DetachedWindow';
 import {Call} from 'src/script/calling/Call';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
-import {CallState, CallingViewMode} from 'src/script/calling/CallState';
+import {CallState, CallingViewMode, DesktopScreenShareMenu} from 'src/script/calling/CallState';
 import {MediaRepository} from 'src/script/media/MediaRepository';
 import {UserState} from 'src/script/user/UserState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -32,7 +32,7 @@ import {CallingContainer} from '../CallingOverlayContainer';
 interface DetachedCallingCellProps {
   callingRepository: CallingRepository;
   mediaRepository: MediaRepository;
-  toggleScreenshare: (call: Call) => void;
+  toggleScreenshare: (call: Call, desktopScreenShareMenu: DesktopScreenShareMenu) => void;
   callState?: CallState;
   userState?: UserState;
 }
