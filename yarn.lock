@@ -9411,10 +9411,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"highlight.js@npm:11.9.0":
-  version: 11.9.0
-  resolution: "highlight.js@npm:11.9.0"
-  checksum: 10/44b3e42bc096a2e5207e514826a10ff7671de315a7216ebaeba76593d4f16dfe3f7078390cb5c2b08eae657694fef4fb65d775376db48480c829c83fbc4f157a
+"highlight.js@npm:11.10.0":
+  version: 11.10.0
+  resolution: "highlight.js@npm:11.10.0"
+  checksum: 10/fc8747bcd4a491fc6a47ff80536881dcc9ea9b36cdc2a22a7be5670b89d76ca6c26df9d749017a23bbb2eb708331097a5ecbcee6330fb9064512d80cc3369d99
   languageName: node
   linkType: hard
 
@@ -17568,7 +17568,7 @@ __metadata:
     eslint-plugin-prettier: "npm:5.1.3"
     fake-indexeddb: "npm:6.0.0"
     generate-changelog: "npm:1.8.0"
-    highlight.js: "npm:11.9.0"
+    highlight.js: "npm:11.10.0"
     html-webpack-plugin: "npm:5.6.0"
     http-status-codes: "npm:2.3.0"
     husky: "npm:9.0.11"
