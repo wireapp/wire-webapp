@@ -105,7 +105,7 @@
     "babel-plugin-transform-import-meta": "2.2.1",
     "cross-env": "7.0.3",
     "css-loader": "7.1.2",
-    "cssnano": "7.0.3",
+    "cssnano": "7.0.4",
     "dexie": "4.0.7",
     "dotenv": "16.4.5",
     "dpdm": "3.14.0",
