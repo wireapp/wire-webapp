@@ -9,7 +9,7 @@
     "@wireapp/avs": "9.7.15",
     "@wireapp/commons": "5.2.8",
     "@wireapp/core": "46.0.19",
-    "@wireapp/react-ui-kit": "9.18.1",
+    "@wireapp/react-ui-kit": "9.21.0",
     "@wireapp/store-engine-dexie": "2.1.10",
     "@wireapp/webapp-events": "0.22.0",
     "amplify": "https://github.com/wireapp/amplify#head=master",
