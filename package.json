@@ -21,7 +21,7 @@
     "date-fns": "3.6.0",
     "dexie-batch": "0.4.3",
     "dexie-encrypted": "2.0.0",
-    "emoji-picker-react": "4.11.0",
+    "emoji-picker-react": "4.11.1",
     "highlight.js": "11.10.0",
     "http-status-codes": "2.3.0",
     "jimp": "0.22.12",
