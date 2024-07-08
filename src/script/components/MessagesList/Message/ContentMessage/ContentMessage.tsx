@@ -68,6 +68,7 @@ export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetS
   selfId: QualifiedId;
   isMsgElementsFocusable: boolean;
   onClickReaction: (emoji: string) => void;
+  is1to1?: boolean;
 }
 
 export const ContentMessageComponent = ({
@@ -89,6 +90,7 @@ export const ContentMessageComponent = ({
   isMsgElementsFocusable,
   onClickReaction,
   onClickDetails,
+  is1to1,
 }: ContentMessageProps) => {
   const messageRef = useRef<HTMLDivElement | null>(null);
 
@@ -265,9 +267,11 @@ export const ContentMessageComponent = ({
           )}
         </div>
 
-        <div css={deliveredMessageIndicator}>
-          <DeliveredMessage isLastDeliveredMessage={isLastDeliveredMessage} />
-        </div>
+        {message.expectsReadConfirmation && (
+          <div css={deliveredMessageIndicator}>
+            <DeliveredMessage isLastDeliveredMessage={isLastDeliveredMessage} is1to1Conversation={is1to1} />
+          </div>
+        )}
       </div>
 
       {[StatusType.FAILED, StatusType.FEDERATION_ERROR].includes(status) && (

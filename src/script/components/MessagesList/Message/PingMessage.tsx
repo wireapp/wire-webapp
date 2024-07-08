@@ -55,7 +55,9 @@ const PingMessage = ({message, is1to1Conversation, isLastDeliveredMessage}: Ping
           <span className="ellipsis">{caption}</span>
         </p>
 
-        <DeliveredMessage isLastDeliveredMessage={isLastDeliveredMessage} />
+        {message.expectsReadConfirmation && (
+          <DeliveredMessage isLastDeliveredMessage={isLastDeliveredMessage} is1to1Conversation={is1to1Conversation} />
+        )}
         <ReadReceiptStatus message={message} is1to1Conversation={is1to1Conversation} />
       </div>
     </div>

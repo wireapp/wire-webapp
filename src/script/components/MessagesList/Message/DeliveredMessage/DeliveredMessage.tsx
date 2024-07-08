@@ -23,10 +23,14 @@ import {t} from 'Util/LocalizerUtil';
 
 interface DeliveredMessageProps {
   isLastDeliveredMessage?: boolean;
+  is1to1Conversation?: boolean;
 }
 
-export const DeliveredMessage = ({isLastDeliveredMessage = false}: DeliveredMessageProps) => {
-  if (!isLastDeliveredMessage) {
+export const DeliveredMessage = ({
+  isLastDeliveredMessage = false,
+  is1to1Conversation = false,
+}: DeliveredMessageProps) => {
+  if (!isLastDeliveredMessage || !is1to1Conversation) {
     return null;
   }
 
