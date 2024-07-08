@@ -2,7 +2,8 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "esModuleInterop": true,
-    "outDir": "lib"
+    "outDir": "lib",
+    "skipLibCheck": true
   },
   "exclude": ["node_modules", "src/test", "src/**/*.test.ts"],
   "include": ["src"]
