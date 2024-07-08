@@ -83,6 +83,8 @@ type ConversationsProps = {
   teamRepository: TeamRepository;
   userRepository: UserRepository;
   inputRef: React.MutableRefObject<HTMLInputElement | null>;
+  isConversationFilterFocused: boolean;
+  setIsConversationFilterFocused: (isFocused: boolean) => void;
 };
 
 const Conversations: React.FC<ConversationsProps> = ({
@@ -94,6 +96,8 @@ const Conversations: React.FC<ConversationsProps> = ({
   propertiesRepository,
   conversationRepository,
   preferenceNotificationRepository,
+  isConversationFilterFocused,
+  setIsConversationFilterFocused,
   listViewModel,
   conversationState = container.resolve(ConversationState),
   teamState = container.resolve(TeamState),
@@ -103,7 +107,6 @@ const Conversations: React.FC<ConversationsProps> = ({
 }) => {
   const {currentTab, status: sidebarStatus, setStatus: setSidebarStatus, setCurrentTab} = useSidebarStore();
   const [conversationsFilter, setConversationsFilter] = useState<string>('');
-  const [isConversationFilterFocused, setIsConversationFilterFocused] = useState(false);
   const {classifiedDomains, isTeam} = useKoSubscribableChildren(teamState, ['classifiedDomains', 'isTeam']);
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
 
@@ -322,7 +325,7 @@ const Conversations: React.FC<ConversationsProps> = ({
             searchValue={conversationsFilter}
             setSearchValue={setConversationsFilter}
             searchInputPlaceholder={searchInputPlaceholder}
-            setIsConversationFilterFocused={setIsConversationFilterFocused}
+            setIsConversationFilterFocused={value => setIsConversationFilterFocused(value)}
             onSearchEnterClick={handleEnterSearchClick}
           />
         }
