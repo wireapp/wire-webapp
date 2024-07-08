@@ -63,4 +63,5 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: eu-west-1
         run: |
-          aws s3 cp ./unit-tests.log s3://wire-webapp/unit-tests-webapp-${{ inputs.commit }}.log
+          TIMESTAMP=$(date -u +'%Y%m%dT%H%M%SZ')
+          aws s3 cp ./unit-tests.log s3://wire-webapp/unit-tests-${TIMESTAMP}-${{ inputs.commit }}.log
