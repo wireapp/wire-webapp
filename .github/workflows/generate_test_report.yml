@@ -50,6 +50,7 @@ jobs:
       - name: Print environment variables
         run: |
           echo -e "COMMIT SHA = ${{ inputs.commit }}" >> ./unit-tests.log
+          echo -e "TEST RUN DATE = $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> ./unit-tests.log
 
       - name: Install AWS CLI
         run: |
