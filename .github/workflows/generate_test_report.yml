@@ -46,9 +46,6 @@ jobs:
         run: |
           set -o pipefail
           yarn test --coverage --coverage_reporters=lcov 2>&1 | tee ./unit-tests.log
-
-      - name: Print environment variables
-        run: |
           echo -e "COMMIT SHA = ${{ inputs.commit }}" >> ./unit-tests.log
           echo -e "TEST RUN DATE = $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> ./unit-tests.log
 
