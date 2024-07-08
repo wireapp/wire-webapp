@@ -12,6 +12,9 @@ jobs:
   generate_test_report:
     runs-on: ubuntu-latest
 
+    env:
+      UNIT_TEST_REPORT_FILE: './unit-tests.log'
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4.1.6
@@ -45,9 +48,9 @@ jobs:
       - name: Test
         run: |
           set -o pipefail
-          yarn test --coverage --coverage_reporters=lcov 2>&1 | tee ./unit-tests.log
-          echo -e "COMMIT SHA = ${{ inputs.commit }}" >> ./unit-tests.log
-          echo -e "TEST RUN DATE = $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> ./unit-tests.log
+          yarn test --coverage --coverage_reporters=lcov 2>&1 | tee ${{ env.UNIT_TEST_REPORT_FILE }}
+          echo -e "COMMIT SHA = ${{ inputs.commit }}" >> ${{ env.UNIT_TEST_REPORT_FILE }}
+          echo -e "TEST RUN DATE = $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> ${{ env.UNIT_TEST_REPORT_FILE }}
 
       - name: Install AWS CLI
         run: |
@@ -61,4 +64,4 @@ jobs:
           AWS_DEFAULT_REGION: eu-west-1
         run: |
           TIMESTAMP=$(date -u +'%Y%m%dT%H%M%SZ')
-          aws s3 cp ./unit-tests.log s3://wire-webapp/unit-tests-${TIMESTAMP}-${{ inputs.commit }}.log
+          aws s3 cp ${{ env.UNIT_TEST_REPORT_FILE }} s3://wire-webapp/unit-tests-${TIMESTAMP}-${{ inputs.commit }}.log
