@@ -62,4 +62,4 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: eu-west-1
         run: |
-          aws s3 cp ${{ env.UNIT_TEST_REPORT_FILE }} s3://your-bucket-name/path/to/unit-tests.log
+          aws s3 cp ./unit-tests.log s3://wire-webapp/unit-tests-${{ inputs.commit }}.log
