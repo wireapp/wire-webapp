@@ -91,7 +91,7 @@ const useSidebarStore = create<SidebarStore>()(
       setCurrentTab: (tab: SidebarTabs) => {
         set({currentTab: tab});
       },
-      status: SidebarStatus.CLOSED,
+      status: SidebarStatus.OPEN,
       setStatus: status => set({status: status}),
     }),
     {
