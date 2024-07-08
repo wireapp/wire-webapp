@@ -1125,15 +1125,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/commons@npm:5.2.8":
-  version: 5.2.8
-  resolution: "@wireapp/commons@npm:5.2.8"
+"@wireapp/commons@npm:5.2.9":
+  version: 5.2.9
+  resolution: "@wireapp/commons@npm:5.2.9"
   dependencies:
     ansi-regex: "npm:5.0.1"
     fs-extra: "npm:11.2.0"
     logdown: "npm:3.3.1"
     platform: "npm:1.3.6"
-  checksum: 10/f36fb6c28a49eae82f2d03518f84ea06f0084ced3903197c0b5e793973b50d85a06ff03cb0dc2e01cece185747b44ce2c03ba4dd9a38c5c6a369c74469acd50a
+  checksum: 10/2e30be417f9c8b77946e5d4fe063bb9838364a2978db85e5670117ceba1ab4cf798107c9e9d8a7636c7e36357ce015c663232d57b10dc67fd975b399c2bea16e
   languageName: node
   linkType: hard
 
@@ -4791,14 +4791,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rimraf@npm:5.0.7":
-  version: 5.0.7
-  resolution: "rimraf@npm:5.0.7"
+"rimraf@npm:5.0.8":
+  version: 5.0.8
+  resolution: "rimraf@npm:5.0.8"
   dependencies:
     glob: "npm:^10.3.7"
   bin:
     rimraf: dist/esm/bin.mjs
-  checksum: 10/1e3cecfe59ee2383dfd9ba5373caeed48ed941318a0360119419b7dffc63115661408b9427f67e1f66b5bbb8855a3953db09e55a7362b3df904a44453dfa22fb
+  checksum: 10/ab8f1bcb49762d16120813a127f90773da657bb5c6f29d3865c1b3c1ceb0d2291cd3e7b439adb7571024be47dce8443b3ffd1b116ec78b6122fca0571da87a79
   languageName: node
   linkType: hard
 
@@ -5314,23 +5314,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:5.5.2":
-  version: 5.5.2
-  resolution: "typescript@npm:5.5.2"
+"typescript@npm:5.5.3":
+  version: 5.5.3
+  resolution: "typescript@npm:5.5.3"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 10/9118b20f248e76b0dbff8737fef65dfa89d02668d4e633d2c5ceac99033a0ca5e8a1c1a53bc94da68e8f67677a88f318663dde859c9e9a09c1e116415daec2ba
+  checksum: 10/11a867312419ed497929aafd2f1d28b2cd41810a5eb6c6e9e169559112e9ea073d681c121a29102e67cd4478d0a4ae37a306a5800f3717f59c4337e6a9bd5e8d
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@npm%3A5.5.2#optional!builtin<compat/typescript>":
-  version: 5.5.2
-  resolution: "typescript@patch:typescript@npm%3A5.5.2#optional!builtin<compat/typescript>::version=5.5.2&hash=5adc0c"
+"typescript@patch:typescript@npm%3A5.5.3#optional!builtin<compat/typescript>":
+  version: 5.5.3
+  resolution: "typescript@patch:typescript@npm%3A5.5.3#optional!builtin<compat/typescript>::version=5.5.3&hash=5adc0c"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 10/28b3de2ddaf63a7620e7ddbe5d377af71ce93ecc558c41bf0e3d88661d8e6e7aa6c7739164fef98055f69819e41faca49252938ef3633a3dff2734cca6a9042e
+  checksum: 10/b61b8bb4b4d6a8a00f9d5f931f8c67070eed6ad11feabf4c41744a326987080bfc806a621596c70fbf2e5974eca3ed65bafeeeb22a078071bdfb51d8abd7c013
   languageName: node
   linkType: hard
 
@@ -5506,7 +5506,7 @@ __metadata:
     "@types/hbs": "npm:4.0.4"
     "@types/jest": "npm:^29.5.12"
     "@types/node": "npm:18.11.18"
-    "@wireapp/commons": "npm:5.2.8"
+    "@wireapp/commons": "npm:5.2.9"
     dotenv: "npm:16.4.5"
     dotenv-extended: "npm:2.9.0"
     express: "npm:4.19.2"
@@ -5524,8 +5524,8 @@ __metadata:
     nocache: "npm:4.0.0"
     opn: "npm:6.0.0"
     pm2: "npm:5.4.1"
-    rimraf: "npm:5.0.7"
-    typescript: "npm:5.5.2"
+    rimraf: "npm:5.0.8"
+    typescript: "npm:5.5.3"
   languageName: unknown
   linkType: soft
 
