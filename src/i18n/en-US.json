@@ -805,6 +805,7 @@
   "index.loginInfo": "Already have an account?",
   "index.ssoLogin": "Log in with SSO",
   "index.welcome": "Welcome to {brandName}",
+  "index.disclaimer": "This is NOT WIRE but an internal testing environment. Authorized for use by Wire employees only. Any public USE is PROHIBITED. The data of the users of this test environment is extensively recorded and analysed. To use the secure messenger Wire, please visit {link}",
   "initDecryption": "Decrypting messages",
   "initEvents": "Loading messages",
   "initProgress": " — {{number1}} of {{number2}}",
