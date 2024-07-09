@@ -287,19 +287,19 @@ jobs:
                 "targets": "[\"wire-webapp-dev\"]"
               },
               "master": {
-                "targets": "[\"wire-webapp-master-al2\"]"
+                "targets": "[\"wire-webapp-main\"]"
               },
               "new-navigation": {
-                "targets": "[\"wire-webapp-edge-al2\"]"
+                "targets": "[\"wire-webapp-edge\"]"
               },
               "production": {
-                "targets": "[\"wire-webapp-prod-al2\"]"
+                "targets": "[\"wire-webapp-prod\"]"
               },
               "release/q1-2024": {
-                "targets": "[\"wire-webapp-mls-al2\"]"
+                "targets": "[\"wire-webapp-mls\"]"
               },
               "staging": {
-                "targets": "[\"wire-webapp-staging-al2\"]"
+                "targets": "[\"wire-webapp-staging\"]"
               }
             }
           export_to: env
