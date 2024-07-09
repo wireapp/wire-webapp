@@ -24,9 +24,8 @@ import {useIntl} from 'react-intl';
 
 import {Button, Input, Loading} from '@wireapp/react-ui-kit';
 
-import {isValidEmail, isValidPhoneNumber, isValidUsername} from 'Util/ValidationUtil';
+import {isValidEmail, isValidUsername} from 'Util/ValidationUtil';
 
-import {Config} from '../../Config';
 import {loginStrings} from '../../strings';
 import {ValidationError} from '../module/action/ValidationError';
 
@@ -93,8 +92,6 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
       loginData.email = localEmail;
     } else if (isValidUsername(localEmail.toLowerCase())) {
       loginData.handle = localEmail.replace('@', '').toLowerCase();
-    } else if (Config.getConfig().FEATURE.ENABLE_PHONE_LOGIN && isValidPhoneNumber(localEmail)) {
-      loginData.phone = localEmail;
     }
     onSubmit(loginData, validationErrors);
   };

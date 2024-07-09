@@ -92,7 +92,6 @@ export class User {
   public readonly managedBy: ko.Observable<string>;
   public readonly mediumPictureResource: ko.Observable<AssetRemoteData>;
   public readonly name: ko.Observable<string>;
-  public readonly phone: ko.Observable<string>;
   public readonly previewPictureResource: ko.Observable<AssetRemoteData>;
   public readonly providerName: ko.Observable<string | undefined> = ko.observable();
   public readonly teamRole: ko.Observable<TEAM_ROLE>;
@@ -148,7 +147,6 @@ export class User {
     this.accent_color = ko.pureComputed(() => User.ACCENT_COLOR[this.accent_id()] || User.ACCENT_COLOR[ACCENT_ID.BLUE]);
 
     this.email = ko.observable();
-    this.phone = ko.observable();
 
     this.name = ko.observable('');
 
@@ -270,7 +268,7 @@ export class User {
   }
 
   hasActivatedIdentity(): boolean {
-    return !!this.email() || !!this.phone() || this.isSingleSignOn;
+    return !!this.email() || this.isSingleSignOn;
   }
 
   removeClient(client_id: string): ClientEntity[] {

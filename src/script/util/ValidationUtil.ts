@@ -17,8 +17,6 @@
  *
  */
 
-import {Config} from '../Config';
-
 export class ValidationUtilError extends Error {
   constructor(message = 'Unknown ValidationUtilError') {
     super();
@@ -35,19 +33,6 @@ export class ValidationUtilError extends Error {
 }
 
 export const isValidUsername = (username: string) => /^@?[a-z_0-9.-]{2,256}$/.test(username);
-
-/**
- * Checks if input has the format of an international phone number
- * @note Begins with + and contains only numbers
- * @param phoneNumber Input
- * @returns `true`, if the input a phone number
- */
-export const isValidPhoneNumber = (phoneNumber: string): boolean => {
-  const allowDebugPhoneNumbers = Config.getConfig().FEATURE.ENABLE_DEBUG;
-  const regularExpression = allowDebugPhoneNumbers ? /^\+[0-9]\d{1,14}$/ : /^\+[1-9]\d{1,14}$/;
-
-  return regularExpression.test(phoneNumber);
-};
 
 export const isValidEmail = (email: string): boolean => {
   const regExp =

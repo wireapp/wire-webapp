@@ -125,7 +125,6 @@ const LoginComponent = ({
     ENABLE_ACCOUNT_REGISTRATION: isAccountRegistrationEnabled,
     ENABLE_DOMAIN_DISCOVERY: isDomainDiscoveryEnabled,
     ENABLE_EXTRA_CLIENT_ENTROPY: isEntropyRequired,
-    ENABLE_PHONE_LOGIN: isPhoneLoginEnabled,
     ENABLE_SSO: isSSOEnabled,
   } = Config.getConfig().FEATURE;
 
@@ -474,16 +473,6 @@ const LoginComponent = ({
                     >
                       {_(loginStrings.forgotPassword)}
                     </Link>
-                    {!embedded && isPhoneLoginEnabled && (
-                      <RouterLink
-                        variant={LinkVariant.PRIMARY}
-                        style={{paddingTop: '12px', textAlign: 'center'}}
-                        to={ROUTE.LOGIN_PHONE}
-                        data-uie-name="go-sign-in-phone"
-                      >
-                        {_(loginStrings.phoneLogin)}
-                      </RouterLink>
-                    )}
                     {embedded && (isDomainDiscoveryEnabled || isSSOEnabled) && (
                       <Button
                         type="button"
