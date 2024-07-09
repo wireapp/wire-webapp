@@ -48,13 +48,15 @@ import {
   videoControlDisabledStyles,
   paginationButtonStyles,
   classifiedBarStyles,
+  paginationWrapperStyles,
+  videoTopBarStyles,
 } from './FullscreenVideoCall.styles';
 import {GroupVideoGrid} from './GroupVideoGrid';
 import {Pagination} from './Pagination';
 
 import type {Call} from '../../calling/Call';
 import {CallingViewMode, CallState, MuteState} from '../../calling/CallState';
-import type {Participant} from '../../calling/Participant';
+import {Participant} from '../../calling/Participant';
 import type {Grid} from '../../calling/videoGridHandler';
 import type {Conversation} from '../../entity/Conversation';
 import {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
@@ -310,7 +312,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
   const horizontalSmBreakpoint = useActiveWindowMatchMedia('max-width: 680px');
   const horizontalXsBreakpoint = useActiveWindowMatchMedia('max-width: 500px');
-  const verticalBreakpoint = useActiveWindowMatchMedia('max-height: 420px');
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent): void => {
@@ -338,44 +339,88 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   return (
     <div className="video-calling-wrapper">
       <div id="video-calling" className="video-calling">
-        <div id="video-title" className="video-title">
-          {horizontalSmBreakpoint && (
-            <IconButton
-              variant={IconButtonVariant.SECONDARY}
-              className=" icon-back"
-              css={{height: '25px', left: '5px', position: 'absolute', top: '10px'}}
-              onClick={minimize}
-            />
-          )}
+        <div css={videoTopBarStyles}>
+          <div id="video-title" className="video-title">
+            {horizontalSmBreakpoint && (
+              <IconButton
+                variant={IconButtonVariant.SECONDARY}
+                className=" icon-back"
+                css={{height: '25px', left: '5px', position: 'absolute', top: '10px'}}
+                onClick={minimize}
+              />
+            )}
 
-          {/* Calling conversation name and duration */}
-          <div
-            className="video-remote-name"
-            aria-label={showAlert ? callGroupStartedAlert : onGoingGroupCallAlert}
-            tabIndex={TabIndex.FOCUSABLE}
-            ref={element => {
-              if (showAlert) {
-                element?.focus();
-              }
-            }}
-            onBlur={() => clearShowAlert()}
-          >
-            <h2 className="video-remote-title">{conversationName}</h2>
-
-            <div data-uie-name="video-timer" className="video-timer label-xs">
-              <Duration startedAt={startedAt} />
-            </div>
-          </div>
-
-          {muteState === MuteState.REMOTE_MUTED && (
+            {/* Calling conversation name and duration */}
             <div
-              className="video-title__info-bar"
-              style={{
-                position: 'absolute',
-                right: '12px',
+              className="video-remote-name"
+              aria-label={showAlert ? callGroupStartedAlert : onGoingGroupCallAlert}
+              tabIndex={TabIndex.FOCUSABLE}
+              ref={element => {
+                if (showAlert) {
+                  element?.focus();
+                }
               }}
+              onBlur={() => clearShowAlert()}
             >
-              {t('muteStateRemoteMute')}
+              <h2 className="video-remote-title">{conversationName}</h2>
+
+              <div data-uie-name="video-timer" className="video-timer label-xs">
+                <Duration startedAt={startedAt} />
+              </div>
+            </div>
+
+            {muteState === MuteState.REMOTE_MUTED && (
+              <div
+                className="video-title__info-bar"
+                style={{
+                  position: 'absolute',
+                  right: '12px',
+                }}
+              >
+                {t('muteStateRemoteMute')}
+              </div>
+            )}
+          </div>
+          {!maximizedParticipant && activeCallViewTab === CallViewTab.ALL && totalPages > 1 && (
+            <div css={paginationWrapperStyles}>
+              <button
+                data-uie-name="pagination-previous"
+                type="button"
+                onClick={() => changePage(currentPage - 1, call)}
+                onKeyDown={event => handleKeyDown(event, () => changePage(currentPage - 1, call))}
+                className="button-reset-default"
+                disabled={currentPage === 0}
+                css={{
+                  ...paginationButtonStyles,
+                  borderBottomRightRadius: 32,
+                  borderTopRightRadius: 32,
+                  left: 0,
+                }}
+              >
+                <Icon.ChevronRight css={{position: 'relative', right: 4, transform: 'rotateY(180deg)'}} />
+              </button>
+
+              <Pagination
+                totalPages={totalPages}
+                currentPage={currentPage}
+                onChangePage={newPage => changePage(newPage, call)}
+              />
+              <button
+                data-uie-name="pagination-next"
+                onClick={() => changePage(currentPage + 1, call)}
+                onKeyDown={event => handleKeyDown(event, () => changePage(currentPage + 1, call))}
+                type="button"
+                className="button-reset-default"
+                disabled={currentPage === totalPages - 1}
+                css={{
+                  ...paginationButtonStyles,
+                  borderBottomLeftRadius: 32,
+                  borderTopLeftRadius: 32,
+                  right: 0,
+                }}
+              >
+                <Icon.ChevronRight css={{left: 4, position: 'relative'}} />
+              </button>
             </div>
           )}
         </div>
@@ -402,53 +447,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                 ...classifiedBarStyles,
               }}
             />
-          )}
-          {!maximizedParticipant && activeCallViewTab === CallViewTab.ALL && totalPages > 1 && (
-            <>
-              {currentPage !== totalPages - 1 && (
-                <button
-                  data-uie-name="pagination-next"
-                  onClick={() => changePage(currentPage + 1, call)}
-                  onKeyDown={event => handleKeyDown(event, () => changePage(currentPage + 1, call))}
-                  type="button"
-                  className="button-reset-default"
-                  css={{
-                    ...paginationButtonStyles,
-                    borderBottomLeftRadius: 32,
-                    borderTopLeftRadius: 32,
-                    right: 0,
-                  }}
-                >
-                  <Icon.ArrowNextIcon css={{left: 4, position: 'relative'}} />
-                </button>
-              )}
-              {currentPage !== 0 && (
-                <button
-                  data-uie-name="pagination-previous"
-                  type="button"
-                  onClick={() => changePage(currentPage - 1, call)}
-                  onKeyDown={event => handleKeyDown(event, () => changePage(currentPage - 1, call))}
-                  className="button-reset-default"
-                  css={{
-                    ...paginationButtonStyles,
-                    borderBottomRightRadius: 32,
-                    borderTopRightRadius: 32,
-                    left: 0,
-                  }}
-                >
-                  <Icon.ArrowNextIcon css={{position: 'relative', right: 4, transform: 'rotate(180deg)'}} />
-                </button>
-              )}
-              {!verticalBreakpoint && (
-                <div className="pagination-wrapper">
-                  <Pagination
-                    totalPages={totalPages}
-                    currentPage={currentPage}
-                    onChangePage={newPage => changePage(newPage, call)}
-                  />
-                </div>
-              )}
-            </>
           )}
         </div>
 
