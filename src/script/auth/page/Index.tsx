@@ -28,6 +28,7 @@ import {UrlUtil} from '@wireapp/commons';
 import {Button, ButtonVariant, ContainerXS, ErrorMessage, Text} from '@wireapp/react-ui-kit';
 
 import {LogoFullIcon} from 'Components/Icon';
+import {Environment} from 'Util/Environment';
 
 import {Page} from './Page';
 
@@ -44,6 +45,8 @@ const IndexComponent = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps
   const {formatMessage: _} = useIntl();
   const navigate = useNavigate();
   const [logoutReason, setLogoutReason] = useState<string>();
+
+  const isProduction = Environment.frontend.isProduction();
 
   useEffect(() => {
     const queryLogoutReason = UrlUtil.getURLParameter(QUERY_KEY.LOGOUT_REASON) || null;
@@ -81,6 +84,24 @@ const IndexComponent = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps
         >
           {_(indexStrings.welcome, {brandName: Config.getConfig().BACKEND_NAME})}
         </Text>
+
+        {!isProduction && (
+          <Text
+            block
+            center
+            style={{fontSize: '0.75rem', fontWeight: 300, marginBottom: '48px'}}
+            data-uie-name="disclaimer"
+          >
+            {_(indexStrings.disclaimer, {
+              link: (
+                <a href="https://app.wire.com" rel="noopener noreferrer">
+                  https://app.wire.com
+                </a>
+              ),
+            })}
+          </Text>
+        )}
+
         {features.ENABLE_ACCOUNT_REGISTRATION && (
           <Button
             type="button"

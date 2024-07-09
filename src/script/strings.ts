@@ -76,6 +76,11 @@ export const indexStrings = defineMessages({
     defaultMessage: 'Welcome to {brandName}',
     id: 'index.welcome',
   },
+  disclaimer: {
+    defaultMessage:
+      'This is NOT WIRE but an internal testing environment. Authorized for use by Wire employees only. Any public USE is PROHIBITED. The data of the users of this test environment is extensively recorded and analysed. To use the secure messenger Wire, please visit {link}',
+    id: 'index.disclaimer',
+  },
 });
 
 export const setAccountTypeStrings = defineMessages({
