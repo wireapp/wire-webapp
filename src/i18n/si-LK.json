@@ -803,6 +803,7 @@
   "index.createAccountForPersonalUse": "පුද්ගලික",
   "index.createPersonalAccount": "පවුලේ අය හා යහළුවන් සමඟ පෞද්ගලික කතාබහට",
   "index.createTeam": "ව්‍යාපාර, ආයතන හා වෘත්තීමය සංවිධාන සඳහා ආරක්‍ෂිත සහයෝගිත්‍වයට",
+  "index.disclaimer": "This is NOT WIRE but an internal testing environment. Authorized for use by Wire employees only. Any public USE is PROHIBITED. The data of the users of this test environment is extensively recorded and analysed. To use the secure messenger Wire, please visit {link}",
   "index.enterprise": "ව්‍යවසාය පිවිසුම",
   "index.goBack": "ආපසු යන්න",
   "index.login": "පිවිසෙන්න",

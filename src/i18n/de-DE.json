@@ -803,6 +803,7 @@
   "index.createAccountForPersonalUse": "Privat",
   "index.createPersonalAccount": "Privat mit Freunden und der Familie chatten",
   "index.createTeam": "Sichere Zusammenarbeit für Unternehmen, Institutionen und Organisationen",
+  "index.disclaimer": "This is NOT WIRE but an internal testing environment. Authorized for use by Wire employees only. Any public USE is PROHIBITED. The data of the users of this test environment is extensively recorded and analysed. To use the secure messenger Wire, please visit {link}",
   "index.enterprise": "Anmeldung für Unternehmen",
   "index.goBack": "Zurück",
   "index.login": "Anmelden",
