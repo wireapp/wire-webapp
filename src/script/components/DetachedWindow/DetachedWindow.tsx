@@ -22,9 +22,11 @@ import {useEffect, useMemo} from 'react';
 import createCache from '@emotion/cache';
 import {CacheProvider} from '@emotion/react';
 import weakMemoize from '@emotion/weak-memoize';
+import {amplify} from 'amplify';
 import {createPortal} from 'react-dom';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useActiveWindow} from 'src/script/hooks/useActiveWindow';
 import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
@@ -88,6 +90,10 @@ export const DetachedWindow = ({
     newWindow.addEventListener('beforeunload', onClose);
     window.addEventListener('beforeunload', onClose);
 
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, () => {
+      newWindow.document.body.className = window.document.body.className;
+    });
+
     onNewWindowOpened?.(newWindow);
 
     return () => {
@@ -95,7 +101,7 @@ export const DetachedWindow = ({
       newWindow.removeEventListener('beforeunload', onClose);
       window.removeEventListener('beforeunload', onClose);
     };
-  }, [height, name, width, onClose, newWindow]);
+  }, [height, name, width, onClose, newWindow, onNewWindowOpened]);
 
   return !newWindow
     ? null
