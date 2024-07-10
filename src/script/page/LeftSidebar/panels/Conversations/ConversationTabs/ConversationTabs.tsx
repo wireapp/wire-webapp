@@ -62,6 +62,10 @@ export const ConversationTabs = ({
     favoriteConversation.hasUnread(),
   ).length;
 
+  const totalUnreadArchivedConversations = archivedConversations.filter(conversation =>
+    conversation.hasUnread(),
+  ).length;
+
   const filterUnreadAndArchivedConversations = (conversation: Conversation) =>
     !conversation.is_archived() && conversation.hasUnread();
 
@@ -107,6 +111,7 @@ export const ConversationTabs = ({
       label: t('conversationFooterArchive'),
       dataUieName: 'go-archive',
       Icon: <Icon.ArchiveIcon />,
+      unreadConversations: totalUnreadArchivedConversations,
     },
   ];
 
