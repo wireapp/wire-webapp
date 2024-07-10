@@ -82,23 +82,19 @@ const TemporaryGuestConversations: React.FC<TemporaryGuestConversations> = ({
         const {conversation} = call;
         return (
           !isCallWindowDetached && (
-            <div key={conversation.id} className="calling-cell">
-              <CallingCell
-                data-uie-name="item-call"
-                data-uie-uid={conversation.id}
-                data-uie-value={conversation.display_name()}
-                call={call}
-                isTemporaryUser
-                isFullUi
-                isSelfVerified={false}
-                callActions={callingViewModel.callActions}
-                callingRepository={callingViewModel.callingRepository}
-                hasAccessToCamera={callingViewModel.hasAccessToCamera()}
-                pushToTalkKey={callingViewModel.propertiesRepository.getPreference(
-                  PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY,
-                )}
-              />
-            </div>
+            <CallingCell
+              key={conversation.id}
+              data-uie-name="item-call"
+              data-uie-uid={conversation.id}
+              data-uie-value={conversation.display_name()}
+              call={call}
+              isTemporaryUser
+              isFullUi
+              callActions={callingViewModel.callActions}
+              callingRepository={callingViewModel.callingRepository}
+              hasAccessToCamera={callingViewModel.hasAccessToCamera()}
+              pushToTalkKey={callingViewModel.propertiesRepository.getPreference(PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY)}
+            />
           )
         );
       })}
