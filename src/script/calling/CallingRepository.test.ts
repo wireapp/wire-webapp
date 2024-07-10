@@ -141,6 +141,7 @@ describe('CallingRepository', () => {
 
       const event: CallingEvent = {
         content: {
+          emojis: [],
           type: CALL_MESSAGE_TYPE.REMOTE_MUTE,
           version: '',
           data: {targets: {[selfUserId.domain]: {[selfUserId.id]: [selfClientId]}}},
@@ -183,6 +184,7 @@ describe('CallingRepository', () => {
 
       const event: CallingEvent = {
         content: {
+          emojis: [],
           type: CALL_MESSAGE_TYPE.REMOTE_MUTE,
           version: '',
           data: {targets: {[selfUserId.domain]: {[selfUserId.id]: [selfClientId]}}},
@@ -227,6 +229,7 @@ describe('CallingRepository', () => {
 
       const event: CallingEvent = {
         content: {
+          emojis: [],
           type: CALL_MESSAGE_TYPE.REMOTE_MUTE,
           version: '',
           data: {targets: {[selfUserId.domain]: {[selfUserId.id]: [someOtherClientId]}}},
