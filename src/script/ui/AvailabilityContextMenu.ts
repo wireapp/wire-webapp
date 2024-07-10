@@ -22,9 +22,27 @@ import {amplify} from 'amplify';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {t} from 'Util/LocalizerUtil';
 
 import {ContextMenuEntry, showContextMenu} from './ContextMenu';
+
+const openSetStatusModal = () => {
+  PrimaryModal.show(PrimaryModal.type.INPUT, {
+    primaryAction: {
+      action: (status: string) => {
+        amplify.publish(WebAppEvents.USER.SET_AVAILABILITY, Availability.Type.NONE, status);
+      },
+      text: t('modalCreateStatus'),
+    },
+    text: {
+      closeBtnLabel: t('modalNewStatusCloseBtn'),
+      input: t('modalCreateStatusPlaceholder'),
+      message: t('modalCreateStatusMessage'),
+      title: t('modalCreateStatusHeadline'),
+    },
+  });
+};
 
 export const AvailabilityContextMenu = {
   show: (event: MouseEvent, elementName: string): void => {
@@ -44,6 +62,14 @@ export const AvailabilityContextMenu = {
       {
         click: () => amplify.publish(WebAppEvents.USER.SET_AVAILABILITY, Availability.Type.AWAY),
         label: t('userAvailabilityAway'),
+      },
+      {
+        click: () => amplify.publish(WebAppEvents.USER.SET_AVAILABILITY, Availability.Type.OFFLINE),
+        label: t('userAvailabilityOffline'),
+      },
+      {
+        click: () => openSetStatusModal(),
+        label: t('userAvailabilitySetStatus'),
       },
     ];
 

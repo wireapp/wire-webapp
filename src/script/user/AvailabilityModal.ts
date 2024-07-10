@@ -71,6 +71,10 @@ export function showAvailabilityModal(availability: Availability.Type): void {
       showModal('hide_available_modal', t('modalAvailabilityAvailableTitle'), t('modalAvailabilityAvailableMessage'));
       break;
     }
+    case Availability.Type.OFFLINE: {
+      showModal('hide_offline_modal', t('modalAvailabilityOfflineTitle'), t('modalAvailabilityOfflineMessage'));
+      break;
+    }
     case Availability.Type.NONE: {
       showModal('hide_none_modal', t('modalAvailabilityNoneTitle'), t('modalAvailabilityNoneMessage'));
     }
