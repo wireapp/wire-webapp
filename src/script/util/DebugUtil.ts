@@ -46,6 +46,7 @@ import {createUuid} from './uuid';
 
 import {CallingRepository} from '../calling/CallingRepository';
 import {CallState} from '../calling/CallState';
+import {Participant} from '../calling/Participant';
 import {ClientRepository} from '../client';
 import {ClientState} from '../client/ClientState';
 import {ConnectionRepository} from '../connection/ConnectionRepository';
@@ -111,6 +112,17 @@ export class DebugUtil {
     this.logger = getLogger('DebugUtil');
 
     keyboardjs.bind(['command+shift+1', 'ctrl+shift+1'], this.toggleDebugUi);
+  }
+
+  addCallParticipants(number: number) {
+    const call = this.callState.activeCalls()[0];
+
+    if (!call) {
+      return;
+    }
+
+    const participants = new Array(number).fill(0).map((_, i) => new Participant(new User(), `some-client-id-${i}`));
+    participants.forEach(participant => call.addParticipant(participant));
   }
 
   /** will print all the ids of entities that show on screen (userIds, conversationIds, messageIds) */
