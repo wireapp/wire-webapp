@@ -3046,6 +3046,17 @@ export class ConversationRepository {
     await this.eventRepository.injectEvent(fileRestrictionMessage);
   }
 
+  async injectUserHasStatusMessage(
+    conversation: Conversation,
+    user: User,
+    isIncoming: boolean,
+    fileExt: string,
+    id = createUuid(),
+  ) {
+    const userHasStatusMessage = EventBuilder.buildUserHasStatus(conversation, user, number);
+    await this.eventRepository.injectEvent(userHasStatusMessage);
+  }
+
   //##############################################################################
   // Event callbacks
   //##############################################################################

@@ -46,6 +46,7 @@ export enum CONVERSATION {
   REACTION = 'conversation.reaction',
   TEAM_MEMBER_LEAVE = 'conversation.team-member-leave',
   UNABLE_TO_DECRYPT = 'conversation.unable-to-decrypt',
+  USER_HAS_TEXT_STATUS = 'conversation.user-has-text-status',
   VERIFICATION = 'conversation.verification',
   FEDERATION_STOP = 'conversation.federation-stop',
   VOICE_CHANNEL_ACTIVATE = 'conversation.voice-channel-activate',

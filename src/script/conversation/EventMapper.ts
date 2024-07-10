@@ -670,6 +670,13 @@ export class EventMapper {
   /**
    * Maps JSON data of local missed message event to message entity.
    */
+  private _mapEventUserHasTextStatusMessages(): UserHasTextStatusMessage {
+    return new UserHasTextStatusMessage();
+  }
+
+  /**
+   * Maps JSON data of local missed message event to message entity.
+   */
   private _mapEventJoinedAfterMLSMigrationFinalisation(): JoinedAfterMLSMigrationFinalisationMessage {
     return new JoinedAfterMLSMigrationFinalisationMessage();
   }

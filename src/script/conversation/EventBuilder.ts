@@ -157,6 +157,7 @@ export type MessageAddEvent = ConversationEvent<
   version?: number;
 };
 export type MissedEvent = BaseEvent & {id: string; type: CONVERSATION.MISSED_MESSAGES};
+export type UserHasStatusEvent = BaseEvent & {id: string; type: CONVERSATION.USER_HAS_TEXT_STATUS};
 export type JoinedAfterMLSMigrationFinalisationEvent = BaseEvent & {
   type: CONVERSATION.JOINED_AFTER_MLS_MIGRATION;
 };
@@ -591,6 +592,20 @@ export const EventBuilder = {
       id: createUuid(),
       time: conversationEntity.getNextIsoDate(currentTimestamp),
       type: ClientEvent.CONVERSATION.MISSED_MESSAGES,
+    };
+  },
+
+  buildUserHasStatus(conversationEntity: Conversation, user: User, currentTimestamp: number): UserHasStatusEvent {
+    return {
+      ...buildQualifiedId(conversationEntity),
+      data: {
+        textStatus: user.textStatus(),
+        name: user.name(),
+      },
+      from: user.id,
+      id: createUuid(),
+      time: conversationEntity.getNextIsoDate(currentTimestamp),
+      type: ClientEvent.CONVERSATION.USER_HAS_TEXT_STATUS,
     };
   },
 
