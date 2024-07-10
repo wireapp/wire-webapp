@@ -131,9 +131,6 @@ export type Env = {
   /** Feature toggle for rendering youtube, vimeo, soundcloud and spotify embeds in the client */
   FEATURE_ENABLE_MEDIA_EMBEDS: string;
 
-  /** Feature toggle for the log in with phone number. Can be set to true or false */
-  FEATURE_ENABLE_PHONE_LOGIN: string;
-
   /** Feature toggle for the log in via Single Sign On. Can be set to true or false */
   FEATURE_ENABLE_SSO: string;
 

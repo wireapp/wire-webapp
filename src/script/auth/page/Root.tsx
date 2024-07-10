@@ -29,7 +29,6 @@ import {ContainerXS, Loading, StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/LocalizerUtil';
 
-import {CheckPassword} from './CheckPassword';
 import {ClientManager} from './ClientManager';
 import {ConversationJoin} from './ConversationJoin';
 import {ConversationJoinInvalid} from './ConversationJoinInvalid';
@@ -41,7 +40,6 @@ import {Index} from './Index';
 import {InitialInvite} from './InitialInvite';
 import {Login} from './Login';
 import {OAuthPermissions} from './OAuthPermissions';
-import {PhoneLogin} from './PhoneLogin';
 import {SetAccountType} from './SetAccountType';
 import {SetEmail} from './SetEmail';
 import {SetEntropyPage} from './SetEntropyPage';
@@ -51,7 +49,6 @@ import {SingleSignOn} from './SingleSignOn';
 import {TeamName} from './TeamName';
 import {VerifyEmailCode} from './VerifyEmailCode';
 import {VerifyEmailLink} from './VerifyEmailLink';
-import {VerifyPhoneCode} from './VerifyPhoneCode';
 
 import {Config} from '../../Config';
 import {mapLanguage, normalizeLanguage} from '../localeConfig';
@@ -157,7 +154,6 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
                   </Title>
                 }
               />
-              <Route path={ROUTE.CHECK_PASSWORD} element={<CheckPassword />} />
               <Route path={ROUTE.CLIENTS} element={<ProtectedClientManager />} />
               <Route path={ROUTE.CONVERSATION_JOIN_INVALID} element={<ConversationJoinInvalid />} />
               <Route path={ROUTE.CONVERSATION_JOIN} element={<ConversationJoin />} />
@@ -175,7 +171,6 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
                   </Title>
                 }
               />
-              <Route path={ROUTE.LOGIN_PHONE} element={<PhoneLogin />} />
               <Route
                 path={ROUTE.SET_ACCOUNT_TYPE}
                 element={
@@ -220,7 +215,6 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
                 />
               </Route>
               <Route path={ROUTE.VERIFY_EMAIL_LINK} element={<VerifyEmailLink />} />
-              <Route path={ROUTE.VERIFY_PHONE_CODE} element={<VerifyPhoneCode />} />
               <Route path={ROUTE.CUSTOM_ENV_REDIRECT} element={<CustomEnvironmentRedirect />} />
               {Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY && (
                 <Route path={ROUTE.SET_ENTROPY} element={<SetEntropyPage />} />

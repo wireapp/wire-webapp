@@ -448,14 +448,6 @@ export const conversationJoinStrings = defineMessages({
 });
 
 export const errorHandlerStrings = defineMessages({
-  [SyntheticErrorLabel.INVALID_PHONE_NUMBER]: {
-    defaultMessage: 'Invalid Phone Number',
-    id: 'authErrorPhoneNumberInvalid',
-  },
-  [SyntheticErrorLabel.FORBIDDEN_PHONE_NUMBER]: {
-    defaultMessage: 'Sorry. This phone number is forbidden.',
-    id: 'authErrorPhoneNumberForbidden',
-  },
   [BackendErrorLabel.NO_CONVERSATION_CODE]: {
     defaultMessage: 'This link is no longer valid. Ask the person who invited you how to join.',
     id: 'BackendError.LABEL.CONVERSATION_CODE_NOT_FOUND',
@@ -479,10 +471,6 @@ export const errorHandlerStrings = defineMessages({
   [BackendErrorLabel.BLACKLISTED_EMAIL]: {
     defaultMessage: 'This email address is not allowed',
     id: 'BackendError.LABEL.BLACKLISTED_EMAIL',
-  },
-  [BackendErrorLabel.BLACKLISTED_PHONE]: {
-    defaultMessage: 'This phone number is not allowed',
-    id: 'BackendError.LABEL.BLACKLISTED_PHONE',
   },
   [BackendErrorLabel.DOMAIN_BLOCKED_FOR_REGISTRATION]: {
     defaultMessage:
@@ -725,10 +713,6 @@ export const loginStrings = defineMessages({
     defaultMessage: 'Password',
     id: 'login.passwordPlaceholder',
   },
-  phoneLogin: {
-    defaultMessage: 'Log in with phone number',
-    id: 'login.phoneLogin',
-  },
   publicComputer: {
     defaultMessage: 'This is a public computer',
     id: 'login.publicComputer',
@@ -788,37 +772,6 @@ export const ssoLoginStrings = defineMessages({
     defaultMessage:
       'If your email matches an enterprise installation of {brandName}, this app will connect to that server.',
     id: 'ssoLogin.subheadEmailEnvironmentSwitchWarning',
-  },
-});
-
-export const phoneLoginStrings = defineMessages({
-  accountCountryCode: {
-    defaultMessage: 'Country Code',
-    id: 'authAccountCountryCode',
-  },
-  errorCountryCodeInvalid: {
-    defaultMessage: 'Invalid Country Code',
-    id: 'authErrorCountryCodeInvalid',
-  },
-  loginHead: {
-    defaultMessage: 'Phone Log in',
-    id: 'authAccountSignInPhone',
-  },
-  verifyCodeChangePhone: {
-    defaultMessage: 'Change phone number',
-    id: 'authVerifyCodeChangePhone',
-  },
-  verifyCodeDescription: {
-    defaultMessage: 'Enter the verification code we sent to {number}.',
-    id: 'authVerifyCodeDescription',
-  },
-  verifyCodeResend: {
-    defaultMessage: 'Resend',
-    id: 'authVerifyCodeResendDetail',
-  },
-  verifyPasswordHeadline: {
-    defaultMessage: 'Enter your password',
-    id: 'authVerifyPasswordHeadline',
   },
 });
 
