@@ -27,6 +27,8 @@ import {StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingContainer} from 'Components/calling/CallingOverlayContainer';
+import {ChooseScreen} from 'Components/calling/ChooseScreen';
+import {useDetachedCallingFeatureState} from 'Components/calling/DetachedCallingCell/DetachedCallingFeature.state';
 import {ErrorFallback} from 'Components/ErrorFallback';
 import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationModal';
 import {LegalHoldModal} from 'Components/Modals/LegalHoldModal/LegalHoldModal';
@@ -45,6 +47,7 @@ import {RootProvider} from './RootProvider';
 import {useAppMainState, ViewType} from './state';
 import {useAppState, ContentState} from './useAppState';
 
+import {CallState, DesktopScreenShareMenu} from '../calling/CallState';
 import {ConversationState} from '../conversation/ConversationState';
 import {User} from '../entity/User';
 import {useActiveWindow} from '../hooks/useActiveWindow';
@@ -70,6 +73,7 @@ interface AppMainProps {
   selfUser: User;
   mainView: MainViewModel;
   conversationState?: ConversationState;
+  callState?: CallState;
   /** will block the user from being able to interact with the application (no notifications and no messages will be shown) */
   locked: boolean;
 }
@@ -79,6 +83,7 @@ export const AppMain: FC<AppMainProps> = ({
   mainView,
   selfUser,
   conversationState = container.resolve(ConversationState),
+  callState = container.resolve(CallState),
   locked,
 }) => {
   const apiContext = app.getAPIContext();
@@ -98,8 +103,16 @@ export const AppMain: FC<AppMainProps> = ({
     'isActivatedAccount',
   ]);
 
+  const {hasAvailableScreensToShare, desktopScreenShareMenu} = useKoSubscribableChildren(callState, [
+    'hasAvailableScreensToShare',
+    'desktopScreenShareMenu',
+  ]);
+
   const teamState = container.resolve(TeamState);
   const userState = container.resolve(UserState);
+
+  const isScreenshareActive =
+    hasAvailableScreensToShare && desktopScreenShareMenu === DesktopScreenShareMenu.MAIN_WINDOW;
 
   const {
     history,
@@ -222,6 +235,8 @@ export const AppMain: FC<AppMainProps> = ({
   const showLeftSidebar = (isMobileView && isMobileLeftSidebarView) || (!isMobileView && !isLeftSidebarHidden);
   const showMainContent = !isMobileView || isMobileCentralColumnView;
 
+  const {isSupported: isDetachedCallingFeatureEnabled} = useDetachedCallingFeatureState();
+
   return (
     <StyledApp
       themeId={THEME_ID.DEFAULT}
@@ -273,11 +288,17 @@ export const AppMain: FC<AppMainProps> = ({
           {!locked && (
             <>
               <FeatureConfigChangeNotifier selfUserId={selfUser.id} teamState={teamState} />
-              <CallingContainer
-                callingRepository={repositories.calling}
-                mediaRepository={repositories.media}
-                toggleScreenshare={mainView.calling.callActions.toggleScreenshare}
-              />
+
+              {/* FIXME: This is a temporary solution to show the calling container in the main app if the detached feature is off */}
+              {!isDetachedCallingFeatureEnabled() && (
+                <CallingContainer
+                  callingRepository={repositories.calling}
+                  mediaRepository={repositories.media}
+                  toggleScreenshare={mainView.calling.callActions.toggleScreenshare}
+                />
+              )}
+
+              {isScreenshareActive && <ChooseScreen choose={repositories.calling.onChooseScreen} />}
 
               <LegalHoldModal
                 selfUser={selfUser}

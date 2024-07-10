@@ -20,7 +20,6 @@
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {Avatar, AVATAR_SIZE, GroupAvatar} from 'Components/Avatar';
-import {useDetachedCallingFeatureState} from 'Components/calling/DetachedCallingCell/DetachedCallingFeature.state';
 import {Duration} from 'Components/calling/Duration';
 import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
@@ -56,7 +55,6 @@ interface CallingHeaderProps {
   startedAt?: number;
   isCbrEnabled: boolean;
   toggleDetachedWindow: () => void;
-  isDetached: boolean;
   isDetachedWindow: boolean;
 }
 
@@ -76,12 +74,8 @@ export const CallingHeader = ({
   startedAt,
   isCbrEnabled,
   toggleDetachedWindow,
-  isDetached,
   isDetachedWindow,
 }: CallingHeaderProps) => {
-  const isDetachedCallingFeatureEnabled = useDetachedCallingFeatureState(state => state.isSupported());
-  const isDetachedWindowActive = isDetachedWindow ? isDetached : true;
-
   return (
     <div css={callingHeaderContainer}>
       <div
@@ -106,7 +100,7 @@ export const CallingHeader = ({
             : `${isOngoing ? `${ongoingCallAlert} ` : ''}${t('accessibility.openConversation', conversationName)}`
         }
       >
-        {isDetachedWindowActive && !isTemporaryUser && (
+        {isDetachedWindow && !isTemporaryUser && (
           <div css={callAvatar}>
             {isGroup && <GroupAvatar users={conversationParticipants} />}
             {!isGroup && !!conversationParticipants.length && (
@@ -126,7 +120,7 @@ export const CallingHeader = ({
 
           {isOngoing && startedAt && (
             <div css={callDescription}>
-              {isDetachedWindow && !isDetached ? (
+              {isDetachedWindow ? (
                 <span data-uie-name="call-lead" aria-label={t('viewingInAnotherWindow')}>
                   {t('viewingInAnotherWindow')}
                 </span>
@@ -136,7 +130,7 @@ export const CallingHeader = ({
                 </span>
               )}
 
-              {isCbrEnabled && isDetachedWindowActive && (
+              {isCbrEnabled && (
                 <span
                   title={t('callStateCbr')}
                   aria-label={t('callStateCbr')}
@@ -151,7 +145,7 @@ export const CallingHeader = ({
         </h2>
       </div>
 
-      {isOngoing && isDetachedCallingFeatureEnabled && (
+      {isOngoing && (
         <div>
           <button css={detachedWindowButton} onClick={toggleDetachedWindow}>
             {isDetachedWindow ? <Icon.CloseDetachedWindowIcon /> : <Icon.OpenDetachedWindowIcon />}

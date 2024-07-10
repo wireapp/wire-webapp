@@ -26,6 +26,7 @@ import {
 } from 'Components/calling/CallingCell/CallingControls/CallingControls.styles';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import * as Icon from 'Components/Icon';
+import {DesktopScreenShareMenu} from 'src/script/calling/CallState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -139,13 +140,13 @@ export const CallingControls = ({
                     'with-tooltip with-tooltip--bottom': disableScreenButton,
                   })}
                   data-tooltip={disableScreenButton ? t('videoCallScreenShareNotSupported') : undefined}
-                  onClick={() => callActions.toggleScreenshare(call)}
+                  onClick={() => callActions.toggleScreenshare(call, DesktopScreenShareMenu.MAIN_WINDOW)}
                   type="button"
                   data-uie-name="do-call-controls-toggle-screenshare"
                   data-uie-value={selfSharesScreen ? 'active' : 'inactive'}
                   data-uie-enabled={disableScreenButton ? 'false' : 'true'}
                   title={t('videoCallOverlayShareScreen')}
-                  disabled={disableScreenButton || isDetachedWindow}
+                  disabled={disableScreenButton}
                 >
                   {selfSharesScreen ? (
                     <Icon.ScreenshareIcon className="small-icon" />
