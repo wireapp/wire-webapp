@@ -148,7 +148,6 @@ entities.clients = {
 entities.user = {
   john_doe: {
     email: 'jd@wire.com',
-    phone: '+49177123456',
     accent_id: 1,
     picture: entities.picture,
     name: 'John Doe',
@@ -158,7 +157,6 @@ entities.user = {
   },
   jane_roe: {
     email: 'jr@wire.com',
-    phone: null,
     accent_id: 1,
     picture: entities.picture,
     name: 'Jane Roe',
