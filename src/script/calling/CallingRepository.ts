@@ -723,6 +723,31 @@ export class CallingRepository {
         return this.processCallingMessage(conversation, event);
       }
 
+      case CALL_MESSAGE_TYPE.EMOJIS: {
+        const call = this.findCall(conversationId);
+        if (!call) {
+          return;
+        }
+
+        const emojis = content.emojis;
+
+        const senderParticipant = call
+          .participants()
+          .find(participant => matchQualifiedIds(participant.user.qualifiedId, userId));
+
+        const id = Math.random().toString(36).substring(2, 9);
+        this.callState.emojis([
+          ...this.callState.emojis(),
+          {id, emoji: emojis[0], left: Math.random() * 500, from: senderParticipant?.user.name() ?? ''},
+        ]);
+
+        setTimeout(() => {
+          this.callState.emojis([...this.callState.emojis().filter(item => item.id !== id)]);
+        }, 4000);
+        // this.muteCall(call, true, MuteState.REMOTE_MUTED);
+        return this.processCallingMessage(conversation, event);
+      }
+
       case CALL_MESSAGE_TYPE.REMOTE_KICK: {
         this.leaveCall(conversationId, LEAVE_CALL_REASON.REMOTE_KICK);
         return this.processCallingMessage(conversation, event);
@@ -1378,9 +1403,29 @@ export class CallingRepository {
     }, {} as QualifiedUserClients);
   };
 
+  readonly sendInCallEmoji = async (emojis: string[], conversationId: QualifiedId, participants: Participant[]) => {
+    const recipients = this.convertParticipantsToCallingMessageRecepients(participants);
+
+    void this.sendCallingMessage(
+      conversationId,
+      {type: CALL_MESSAGE_TYPE.EMOJIS, emojis},
+      {nativePush: false, recipients},
+    );
+
+    const id = Math.random().toString(36).substring(2, 9);
+    this.callState.emojis([
+      ...this.callState.emojis(),
+      {id, emoji: emojis[0], left: Math.random() * 500, from: t('conversationYouAccusative')},
+    ]);
+
+    setTimeout(() => {
+      this.callState.emojis([...this.callState.emojis().filter(item => item.id !== id)]);
+    }, 4000);
+  };
+
   readonly sendModeratorMute = (conversationId: QualifiedId, participants: Participant[]) => {
     const recipients = this.convertParticipantsToCallingMessageRecepients(participants);
-    this.sendCallingMessage(
+    void this.sendCallingMessage(
       conversationId,
       {type: CALL_MESSAGE_TYPE.REMOTE_MUTE, data: {targets: recipients}},
       {nativePush: true, recipients},
@@ -1389,7 +1434,7 @@ export class CallingRepository {
 
   readonly sendModeratorKick = (conversationId: QualifiedId, participants: Participant[]) => {
     const recipients = this.convertParticipantsToCallingMessageRecepients(participants);
-    this.sendCallingMessage(conversationId, {type: CALL_MESSAGE_TYPE.REMOTE_KICK}, {nativePush: true, recipients});
+    void this.sendCallingMessage(conversationId, {type: CALL_MESSAGE_TYPE.REMOTE_KICK}, {nativePush: true, recipients});
   };
 
   private readonly sendSFTRequest = (

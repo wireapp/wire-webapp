@@ -30,6 +30,7 @@ interface CallingRemoteMuteEventContentData {
 
 interface CallingEventContentData {
   [CALL_MESSAGE_TYPE.REMOTE_MUTE]: CallingRemoteMuteEventContentData;
+  [CALL_MESSAGE_TYPE.EMOJIS]: {};
 }
 
 type CallingEventContent = {
@@ -38,6 +39,7 @@ type CallingEventContent = {
         type: EventType;
         version: string;
         data: CallingEventContentData[EventType];
+        emojis: string[];
       }
     : {type: EventType; version: string};
 }[CALL_MESSAGE_TYPE];

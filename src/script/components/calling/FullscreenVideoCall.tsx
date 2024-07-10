@@ -85,14 +85,18 @@ export interface FullscreenVideoCallProps {
   toggleCamera: (call: Call) => void;
   toggleMute: (call: Call, muteState: boolean) => void;
   toggleScreenshare: (call: Call) => void;
+  sendEmoji: (emojis: string[], call: Call) => void;
   videoGrid: Grid;
 }
+
+const EMOJIS_LIST = ['👍', '🎉', '❤️', '😂', '😮', '👏', '🤔', '😢', '👎'];
 
 const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   call,
   canShareScreen,
   conversation,
   isChoosingScreen,
+  sendEmoji,
   isMuted,
   muteState,
   mediaDevicesHandler,
@@ -113,6 +117,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   teamState = container.resolve(TeamState),
   callState = container.resolve(CallState),
 }) => {
+  const [showEmojisBar, setShowEmojisBar] = useState<boolean>(false);
   const selfParticipant = call.getSelfParticipant();
   const {sharesScreen: selfSharesScreen, sharesCamera: selfSharesCamera} = useKoSubscribableChildren(selfParticipant, [
     'sharesScreen',
@@ -150,6 +155,9 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     MediaDeviceType.AUDIO_INPUT,
     MediaDeviceType.AUDIO_OUTPUT,
   ]);
+
+  const {emojis} = useKoSubscribableChildren(callState, ['emojis']);
+
   const [audioOptionsOpen, setAudioOptionsOpen] = useState(false);
   const [videoOptionsOpen, setVideoOptionsOpen] = useState(false);
   const minimize = () => callState.viewMode(CallingViewMode.MINIMIZED);
@@ -423,6 +431,23 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
 
       {!isChoosingScreen && (
         <div id="video-controls" className="video-controls">
+          {showEmojisBar && (
+            <div className="video-controls-emoji-bar">
+              {EMOJIS_LIST.map(emoji => (
+                <button key={emoji} onClick={() => sendEmoji([emoji], call)}>
+                  {emoji}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {emojis.map(({id, emoji, left, from}) => (
+            <div key={id} className="emoji" style={{left}}>
+              <span>{emoji}</span>
+              <span className="emoji-text">{from}</span>
+            </div>
+          ))}
+
           <ul className="video-controls__wrapper">
             {!horizontalSmBreakpoint && (
               <li className="video-controls__item__minimize">
@@ -611,6 +636,21 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                 </button>
               </li>
 
+              <li className="video-controls__item">
+                <button
+                  css={showEmojisBar ? videoControlActiveStyles : videoControlInActiveStyles}
+                  className="video-controls__button"
+                  onClick={() => setShowEmojisBar(prev => !prev)}
+                  type="button"
+                  aria-labelledby="show-emoji-bar"
+                  data-uie-name="do-call-controls-video-call-cancel"
+                >
+                  <Icon.LikeIcon />
+                  <span id="show-emoji-bar" className="video-controls__button__label">
+                    Reactions
+                  </span>
+                </button>
+              </li>
               <li className="video-controls__item">
                 <button
                   className="video-controls__button video-controls__button--red"
