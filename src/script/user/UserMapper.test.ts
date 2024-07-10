@@ -164,6 +164,18 @@ describe('User Mapper', () => {
       expect(updated_user_et.name()).toBe(entities.user.jane_roe.name);
     });
 
+    it('can update the user textStatus', () => {
+      const user_et = new User();
+      user_et.id = entities.user.john_doe.id;
+      const data = {
+        id: entities.user.john_doe.id,
+        text_status: entities.user.jane_roe.text_status,
+      };
+      const updated_user_et = mapper.updateUserFromObject(user_et, data, '');
+
+      expect(updated_user_et.textStatus()).toBe(entities.user.jane_roe.text_status);
+    });
+
     it('can update the user handle', () => {
       const user_et = new User();
       user_et.id = entities.user.john_doe.id;

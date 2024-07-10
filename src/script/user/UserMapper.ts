@@ -95,7 +95,6 @@ export class UserMapper {
     const isSelf = isSelfAPIUser(userData);
     const ssoId = isSelf && userData.sso_id;
     const managedBy = isSelf && userData.managed_by;
-    const phone = isSelf && userData.phone;
 
     const {
       accent_id: accentId,
@@ -110,6 +109,7 @@ export class UserMapper {
       service,
       team: teamId,
       supported_protocols: supportedProtocols,
+      text_status: textStatus,
     } = userData;
 
     if (accentId) {
@@ -163,8 +163,8 @@ export class UserMapper {
       userEntity.name(name.trim());
     }
 
-    if (phone) {
-      userEntity.phone(phone);
+    if (textStatus) {
+      userEntity.textStatus(textStatus.trim());
     }
 
     if (service) {

@@ -165,6 +165,7 @@ entities.user = {
     handle: 'jaro',
     id: '7025598b-ffac-4993-8a81-af3f35b7147f',
     qualified_id: {id: '7025598b-ffac-4993-8a81-af3f35b7147f', domain: ''},
+    text_status: 'I am Jane Roe',
   },
 };
 
