@@ -3046,6 +3046,14 @@ export class ConversationRepository {
     await this.eventRepository.injectEvent(fileRestrictionMessage);
   }
 
+  async injectUserHasStatusMessage(conversation: Conversation, user: User) {
+    if (!conversation.is1to1()) {
+      return;
+    }
+    const userHasStatusMessage = EventBuilder.buildUserHasTextStatus(conversation, user);
+    await this.eventRepository.injectEvent(userHasStatusMessage);
+  }
+
   //##############################################################################
   // Event callbacks
   //##############################################################################
@@ -3383,6 +3391,7 @@ export class ConversationRepository {
       case ClientEvent.CONVERSATION.E2EI_VERIFICATION:
       case ClientEvent.CONVERSATION.VOICE_CHANNEL_ACTIVATE:
       case ClientEvent.CONVERSATION.VOICE_CHANNEL_DEACTIVATE:
+      case ClientEvent.CONVERSATION.USER_HAS_TEXT_STATUS:
         return this.addEventToConversation(conversationEntity, eventJson);
     }
   }

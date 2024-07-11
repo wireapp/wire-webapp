@@ -39,4 +39,5 @@ export enum SystemMessageType {
   MLS_CONVERSATION_RECOVERED = 'mls-conversation-recovered',
   ONE2ONE_MIGRATED_TO_MLS = 'one2one-migrated-to-mls',
   E2EI_VERIFIED = 'e2ei-verified',
+  USER_HAS_TEXT_STATUS = 'user-has-text-status',
 }

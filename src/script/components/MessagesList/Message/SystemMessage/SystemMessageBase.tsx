@@ -27,10 +27,16 @@ import {MessageTime} from '../MessageTime';
 export interface SystemMessageProps {
   message: SystemMessage;
   isSenderNameVisible?: boolean;
+  isTimeVisible?: boolean;
   icon?: ReactNode;
 }
 
-export const SystemMessageBase: React.FC<SystemMessageProps> = ({message, isSenderNameVisible = false, icon}) => {
+export const SystemMessageBase: React.FC<SystemMessageProps> = ({
+  message,
+  isSenderNameVisible = false,
+  isTimeVisible = true,
+  icon,
+}) => {
   const {unsafeSenderName, timestamp} = useKoSubscribableChildren(message, ['unsafeSenderName', 'timestamp']);
 
   return (
@@ -44,9 +50,11 @@ export const SystemMessageBase: React.FC<SystemMessageProps> = ({message, isSend
           )}
         </span>
       </p>
-      <div className="message-body-actions">
-        <MessageTime timestamp={timestamp} data-uie-uid={message.id} data-uie-name="item-message-call-timestamp" />
-      </div>
+      {isTimeVisible && (
+        <div className="message-body-actions">
+          <MessageTime timestamp={timestamp} data-uie-uid={message.id} data-uie-name="item-message-call-timestamp" />
+        </div>
+      )}
     </div>
   );
 };
