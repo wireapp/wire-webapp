@@ -93,8 +93,9 @@ const UserDetailsComponent = ({
         hideAvailabilityStatus
       />
 
-      {!user.textStatus && user.textStatus.length == 0 && (
+      {user.textStatus && (
         <div data-uie-name="user-text-status">
+          <div css={{fontWeight: 'bold', color: 'grey'}}> Status: </div>
           <span>{user.textStatus}</span>
         </div>
       )}

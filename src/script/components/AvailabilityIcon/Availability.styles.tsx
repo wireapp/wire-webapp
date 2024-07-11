@@ -58,3 +58,23 @@ export const AvailabilityIcon: CSSObject = {
   bottom: '-2px',
   right: '-2px',
 };
+
+export const textStatusStyles = (avatarSize: AVATAR_SIZE): CSSObject => {
+  const squareIconSize = getSquareIconSize();
+
+  return {
+    ...CSS_SQUARE(squareIconSize?.[avatarSize] || 8),
+    borderRadius: '50%',
+  };
+};
+
+export const TextStatusIcon: CSSObject = {
+  background: 'var(--app-bg)',
+  border: '2px solid var(--app-bg)',
+  borderRadius: '50%',
+  display: 'grid',
+  placeContent: 'center',
+  position: 'absolute',
+  top: '-2px',
+  right: '-2px',
+};

@@ -55,7 +55,7 @@ let container: HTMLDivElement | undefined;
 let previouslyFocused: HTMLElement;
 let reactRoot: Root;
 
-const cleanUp = () => {
+export const cleanUp = () => {
   const {activeWindow} = useActiveWindowState.getState();
 
   if (container) {

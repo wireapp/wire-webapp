@@ -24,7 +24,7 @@ import {container} from 'tsyringe';
 import {Availability as AvailabilityType} from '@wireapp/protocol-messaging';
 import {COLOR} from '@wireapp/react-ui-kit';
 
-import {AvailabilityIcon} from 'Components/AvailabilityIcon';
+import {AvailabilityIcon, TextStatusIcon} from 'Components/AvailabilityIcon';
 import {useUserName} from 'Components/UserName';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -91,12 +91,14 @@ export const UserAvatar = ({
     previewPictureResource,
     accent_color: accentColor,
     initials,
+    textStatus,
   } = useKoSubscribableChildren(participant, [
     'availability',
     'mediumPictureResource',
     'previewPictureResource',
     'accent_color',
     'initials',
+    'textStatus',
   ]);
 
   const avatarImgAlt = avatarAlt ? avatarAlt : `${t('userProfileImageAlt')} ${name}`;
@@ -137,6 +139,7 @@ export const UserAvatar = ({
       {inTeam && !hideAvailabilityStatus && hasAvailabilityState && (
         <AvailabilityIcon availability={availability} avatarSize={avatarSize} />
       )}
+      {inTeam && textStatus && <TextStatusIcon textStatus={textStatus} avatarSize={avatarSize} />}
     </AvatarWrapper>
   );
 };

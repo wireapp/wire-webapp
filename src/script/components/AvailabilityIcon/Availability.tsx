@@ -22,6 +22,7 @@ import {ReactNode} from 'react';
 import {Availability as AvailabilityProp} from '@wireapp/protocol-messaging';
 
 import {AVATAR_SIZE} from 'Components/Avatar';
+import {TextStatusContextMenu} from 'src/script/ui/TextStatusContextMenu';
 
 import * as styles from './Availability.styles';
 
@@ -64,5 +65,21 @@ interface AvailabilityIconProps {
 export const AvailabilityIcon = ({availability, avatarSize}: AvailabilityIconProps) => (
   <div css={styles.AvailabilityIcon} data-uie-name="status-availability" data-uie-value={availability}>
     {availabilityIconRenderer[availability](avatarSize)}
+  </div>
+);
+
+interface TextStatusIconProps {
+  textStatus: string;
+  avatarSize: AVATAR_SIZE;
+}
+export const TextStatusIcon = ({textStatus, avatarSize}: TextStatusIconProps) => (
+  <div
+    css={styles.TextStatusIcon}
+    data-uie-name="status-text"
+    data-uie-value={textStatus}
+    onDoubleClick={event => TextStatusContextMenu.show(event.nativeEvent, 'left-list-availability-menu', textStatus)}
+    // onMouseLeave={() => TextStatusContextMenu.hide()}
+  >
+    <Icon.MessageIcon data-uie-value="textStatusIcon" css={styles.textStatusStyles(avatarSize)} />
   </div>
 );
