@@ -238,6 +238,10 @@ export class User {
     return !!this.domain;
   }
 
+  get hasTextStatus(): boolean {
+    return this.textStatus && this.textStatus.length > 0;
+  }
+
   /**
    * Returns the fully qualified user ID.
    * @example "@handle@wire.com"

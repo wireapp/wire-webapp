@@ -60,6 +60,7 @@ const UserDetailsComponent = ({
     'expirationText',
     'isAvailable',
     'isBlocked',
+    'textStatus',
   ]);
 
   useEffect(() => {
@@ -91,6 +92,12 @@ const UserDetailsComponent = ({
         style={avatarStyles}
         hideAvailabilityStatus
       />
+
+      {!user.textStatus && user.textStatus.length == 0 && (
+        <div data-uie-name="user-text-status">
+          <span>{user.textStatus}</span>
+        </div>
+      )}
 
       {badge && (
         <div className="panel-participant__label panel-participant__label--external" data-uie-name="status-external">
