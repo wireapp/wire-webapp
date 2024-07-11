@@ -69,7 +69,6 @@ export const LOGOUT_REASON = {
 
 export const ROUTE = {
   AUTHORIZE: '/authorize',
-  CHECK_PASSWORD: '/checkpassword',
   CLIENTS: '/clients',
   CONVERSATION_JOIN: '/join-conversation',
   CONVERSATION_JOIN_INVALID: '/join-conversation-invalid',
@@ -81,7 +80,6 @@ export const ROUTE = {
   INDEX: '/',
   INITIAL_INVITE: '/teaminvite',
   LOGIN: '/login',
-  LOGIN_PHONE: '/phonelogin',
   SET_ACCOUNT_TYPE: '/setaccounttype',
   SET_EMAIL: '/setemail',
   SET_ENTROPY: '/setentropy',
@@ -90,6 +88,5 @@ export const ROUTE = {
   SSO: '/sso',
   VERIFY_EMAIL_CODE: '/verifyemailcode',
   VERIFY_EMAIL_LINK: '/verifyemaillink',
-  VERIFY_PHONE_CODE: '/verifyphonecode',
   E2EI_OAUTH_REDIRECT: '/e2ei-redirect',
 };

@@ -720,7 +720,7 @@ export class App {
 
       const selfUser = this.repository.user['userState'].self();
       if (selfUser) {
-        const cookieLabelKey = this.repository.client.constructCookieLabelKey(selfUser.email() || selfUser.phone());
+        const cookieLabelKey = this.repository.client.constructCookieLabelKey(selfUser.email());
 
         Object.keys(amplify.store()).forEach(keyInAmplifyStore => {
           const isCookieLabelKey = keyInAmplifyStore === cookieLabelKey;

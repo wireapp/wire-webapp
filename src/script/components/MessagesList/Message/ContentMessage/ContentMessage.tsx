@@ -23,7 +23,8 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
 import ko from 'knockout';
 
-import {DeliveredMessage} from 'Components/MessagesList/Message/DeliveredMessage';
+import {OutlineCheck} from '@wireapp/react-ui-kit';
+
 import {ReadIndicator} from 'Components/MessagesList/Message/ReadIndicator';
 import {Conversation} from 'src/script/entity/Conversation';
 import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
@@ -32,6 +33,7 @@ import {useRelativeTimestamp} from 'src/script/hooks/useRelativeTimestamp';
 import {StatusType} from 'src/script/message/StatusType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getMessageAriaLabel} from 'Util/conversationMessages';
+import {t} from 'Util/LocalizerUtil';
 
 import {ContentAsset} from './asset';
 import {deliveredMessageIndicator, messageBodyWrapper, messageEphemeralTimer} from './ContentMessage.styles';
@@ -68,6 +70,7 @@ export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetS
   selfId: QualifiedId;
   isMsgElementsFocusable: boolean;
   onClickReaction: (emoji: string) => void;
+  is1to1?: boolean;
 }
 
 export const ContentMessageComponent = ({
@@ -89,6 +92,7 @@ export const ContentMessageComponent = ({
   isMsgElementsFocusable,
   onClickReaction,
   onClickDetails,
+  is1to1,
 }: ContentMessageProps) => {
   const messageRef = useRef<HTMLDivElement | null>(null);
 
@@ -265,9 +269,19 @@ export const ContentMessageComponent = ({
           )}
         </div>
 
-        <div css={deliveredMessageIndicator}>
-          <DeliveredMessage isLastDeliveredMessage={isLastDeliveredMessage} />
-        </div>
+        {message.expectsReadConfirmation && (
+          <div css={deliveredMessageIndicator}>
+            {is1to1 && isLastDeliveredMessage && (
+              <div
+                data-uie-name="status-message-read-receipt-delivered"
+                title={t('conversationMessageDelivered')}
+                className="delivered-message-icon"
+              >
+                <OutlineCheck />
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {[StatusType.FAILED, StatusType.FEDERATION_ERROR].includes(status) && (

@@ -44,6 +44,7 @@ import {GlobalEventsPlugin} from './plugins/GlobalEventsPlugin';
 import {HistoryPlugin} from './plugins/HistoryPlugin';
 import {findAndTransformEmoji, ReplaceEmojiPlugin} from './plugins/InlineEmojiReplacementPlugin';
 import {MentionsPlugin} from './plugins/MentionsPlugin';
+import {ReplaceCarriageReturnPlugin} from './plugins/ReplaceCarriageReturnPlugin/ReplaceCarriageReturnPlugin';
 import {SendPlugin} from './plugins/SendPlugin';
 import {TextChangePlugin} from './plugins/TextChangePlugin';
 
@@ -166,6 +167,8 @@ export const RichTextEditor = ({
           <HistoryPlugin />
 
           {replaceEmojis && <ReplaceEmojiPlugin />}
+
+          <ReplaceCarriageReturnPlugin />
 
           <PlainTextPlugin
             contentEditable={<ContentEditable className="conversation-input-bar-text" data-uie-name="input-message" />}

@@ -204,6 +204,7 @@ export const MessageWrapper: React.FC<MessageParams> = ({
         isFocused={isFocused}
         isMsgElementsFocusable={isMsgElementsFocusable}
         onClickReaction={handleReactionClick}
+        is1to1={conversation.is1to1()}
       />
     );
   }

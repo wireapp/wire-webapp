@@ -18,7 +18,7 @@
  */
 
 import {ClientType} from '@wireapp/api-client/lib/client/';
-import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
+import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import {RecursivePartial} from '@wireapp/commons/lib/util/TypeUtil';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
@@ -174,49 +174,6 @@ describe('AuthAction', () => {
     expect(store.getActions()).toEqual([AuthActionCreator.failedLogout(backendError)]);
   });
 
-  it('requests phone login code', async () => {
-    const phoneNumber = '+08723568';
-    const expiresIn = 60;
-    const mockedApiClient = {
-      api: {
-        auth: {
-          postLoginSend: () => Promise.resolve({expires_in: expiresIn}),
-        },
-      },
-    };
-
-    const store = mockStoreFactory({
-      apiClient: mockedApiClient,
-    })({});
-    await store.dispatch(actionRoot.authAction.doSendPhoneLoginCode({phone: phoneNumber}));
-
-    expect(store.getActions()).toEqual([
-      AuthActionCreator.startSendPhoneLoginCode(),
-      AuthActionCreator.successfulSendPhoneLoginCode(expiresIn),
-    ]);
-  });
-
-  it('handles failed request for phone login code', async () => {
-    const error = new Error('test error');
-    const phoneNumber = '+08723568';
-    const mockedApiClient = {
-      api: {
-        auth: {
-          postLoginSend: () => Promise.reject(error),
-        },
-      },
-    };
-
-    const store = mockStoreFactory({
-      apiClient: mockedApiClient,
-    })({});
-    await expect(store.dispatch(actionRoot.authAction.doSendPhoneLoginCode({phone: phoneNumber}))).rejects.toThrow();
-    expect(store.getActions()).toEqual([
-      AuthActionCreator.startSendPhoneLoginCode(),
-      AuthActionCreator.failedSendPhoneLoginCode(error),
-    ]);
-  });
-
   it('validates SSO code', async () => {
     const ssoCode = 'wire-uuid';
     const mockedApiClient = {
@@ -231,68 +188,5 @@ describe('AuthAction', () => {
       apiClient: mockedApiClient,
     })({});
     await store.dispatch(actionRoot.authAction.validateSSOCode(ssoCode));
-  });
-
-  it('handles failed request for phone login code (not found)', async () => {
-    const error = {response: {status: HTTP_STATUS.NOT_FOUND}};
-    const expectedNotFoundError = new BackendError('', BackendErrorLabel.NOT_FOUND, HTTP_STATUS.NOT_FOUND);
-    const ssoCode = 'wire-uuid';
-    const mockedApiClient = {
-      api: {
-        auth: {
-          headInitiateLogin: () => Promise.reject(error),
-        },
-      },
-    };
-
-    const store = mockStoreFactory({
-      apiClient: mockedApiClient,
-    })({});
-    await expect(store.dispatch(actionRoot.authAction.validateSSOCode(ssoCode))).rejects.toThrow();
-    expect(store.getActions()).toEqual([AuthActionCreator.failedLogin(expectedNotFoundError)]);
-  });
-
-  it('handles failed request for phone login code (server error)', async () => {
-    const error = {response: {status: HTTP_STATUS.INTERNAL_SERVER_ERROR}};
-    const expectedServerError = new BackendError('', BackendErrorLabel.SERVER_ERROR, HTTP_STATUS.INTERNAL_SERVER_ERROR);
-
-    const ssoCode = 'wire-uuid';
-    const mockedApiClient = {
-      api: {
-        auth: {
-          headInitiateLogin: () => Promise.reject(error),
-        },
-      },
-    };
-
-    const store = mockStoreFactory({
-      apiClient: mockedApiClient,
-    })({});
-    await expect(store.dispatch(actionRoot.authAction.validateSSOCode(ssoCode))).rejects.toThrow();
-    expect(store.getActions()).toEqual([AuthActionCreator.failedLogin(expectedServerError)]);
-  });
-
-  it('handles failed request for phone login code (generic error)', async () => {
-    const error = {response: {status: HTTP_STATUS.FORBIDDEN}};
-    const expectedGenericError = new BackendError(
-      '',
-      SyntheticErrorLabel.SSO_GENERIC_ERROR,
-      HTTP_STATUS.INTERNAL_SERVER_ERROR,
-    );
-
-    const ssoCode = 'wire-uuid';
-    const mockedApiClient = {
-      api: {
-        auth: {
-          headInitiateLogin: () => Promise.reject(error),
-        },
-      },
-    };
-
-    const store = mockStoreFactory({
-      apiClient: mockedApiClient,
-    })({});
-    await expect(store.dispatch(actionRoot.authAction.validateSSOCode(ssoCode))).rejects.toThrow();
-    expect(store.getActions()).toEqual([AuthActionCreator.failedLogin(expectedGenericError)]);
   });
 });

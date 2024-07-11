@@ -19,8 +19,10 @@
 
 import cx from 'classnames';
 
-import {DeliveredMessage} from 'Components/MessagesList/Message/DeliveredMessage';
+import {OutlineCheck} from '@wireapp/react-ui-kit';
+
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {t} from 'Util/LocalizerUtil';
 
 import {ReadReceiptStatus} from './ReadReceiptStatus';
 
@@ -55,8 +57,19 @@ const PingMessage = ({message, is1to1Conversation, isLastDeliveredMessage}: Ping
           <span className="ellipsis">{caption}</span>
         </p>
 
-        <DeliveredMessage isLastDeliveredMessage={isLastDeliveredMessage} />
-        <ReadReceiptStatus message={message} is1to1Conversation={is1to1Conversation} />
+        <div>
+          <ReadReceiptStatus message={message} is1to1Conversation={is1to1Conversation} />
+
+          {message.expectsReadConfirmation && is1to1Conversation && isLastDeliveredMessage && (
+            <div
+              data-uie-name="status-message-read-receipt-delivered"
+              title={t('conversationMessageDelivered')}
+              className="delivered-message-icon"
+            >
+              <OutlineCheck />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
