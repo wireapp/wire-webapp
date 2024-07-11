@@ -24,9 +24,11 @@ import {amplify} from 'amplify';
 import cx from 'classnames';
 
 import {Availability} from '@wireapp/protocol-messaging';
+import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/Icon';
+import {showUserStatusModal} from 'Components/Modals/utils/showUserStatusModal';
 import {CSS_SQUARE} from 'Util/CSSMixin';
 import {t} from 'Util/LocalizerUtil';
 
@@ -34,6 +36,7 @@ import {ContextMenuEntry} from '../../../../../ui/ContextMenu';
 
 interface AvailabilityInputProps {
   availability: Availability.Type;
+  textStatus: string;
 }
 
 const iconStyles: CSSObject = {
@@ -51,7 +54,16 @@ const headerStyles: CSSObject = {
   textAlign: 'center',
 };
 
-const AvailabilityButtons: React.FC<AvailabilityInputProps> = ({availability}) => {
+const centerButton: CSSObject = {
+  lineHeight: '0.875rem',
+  margin: '37px 0 6px',
+  padding: 0,
+  textAlign: 'center',
+  display: 'flex',
+  justifyContent: 'center',
+};
+
+const AvailabilityButtons: React.FC<AvailabilityInputProps> = ({availability}, {textStatus}) => {
   const icons: {
     [key: string]: any;
   } = {
@@ -74,13 +86,6 @@ const AvailabilityButtons: React.FC<AvailabilityInputProps> = ({availability}) =
         css={{...iconStyles, fill: 'var(--red-500)', stroke: 'var(--red-500)'}}
         data-uie-name="status-availability-icon"
         data-uie-value="away"
-      />
-    ),
-    [Availability.Type.OFFLINE]: (
-      <Icon.AvailabilityAwayIcon
-        css={{...iconStyles, fill: 'var(--red-500)', stroke: 'var(--red-500)'}}
-        data-uie-name="status-availability-icon"
-        data-uie-value="offline"
       />
     ),
     [Availability.Type.NONE]: null,
@@ -140,6 +145,16 @@ const AvailabilityButtons: React.FC<AvailabilityInputProps> = ({availability}) =
             </button>
           );
         })}
+      </div>
+      <div css={centerButton}>
+        <Button
+          variant={ButtonVariant.TERTIARY}
+          onClick={() => showUserStatusModal()}
+          data-uie-name="do-set-custom-user-status"
+          type="button"
+        >
+          {textStatus && textStatus.length > 0 ? textStatus : t('userAvailabilitySetStatus')}
+        </Button>
       </div>
     </>
   );
