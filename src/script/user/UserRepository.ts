@@ -98,7 +98,7 @@ function generateQualifiedId(userData: {id: string; qualified_id?: QualifiedId; 
 }
 
 interface UserAvailabilityEvent {
-  data: {availability: Availability.Type};
+  data: {availability: Availability.Type; textStatus?: string};
   from: string;
   fromDomain: string | null;
   type: USER.AVAILABILITY;
@@ -142,6 +142,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
     amplify.subscribe(WebAppEvents.CLIENT.REMOVE, this.removeClientFromUser);
     amplify.subscribe(WebAppEvents.CLIENT.UPDATE, this.updateClientsFromUser);
     amplify.subscribe(WebAppEvents.USER.SET_AVAILABILITY, this.setAvailability);
+    amplify.subscribe(WebAppEvents.USER.SET_TEXT_STATUS, this.setTextStatus);
     amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent);
     amplify.subscribe(WebAppEvents.USER.UPDATE, this.refreshUser);
   }
@@ -164,6 +165,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
         const updates = {
           id: from,
           availability: data.availability,
+          // ...(data.textStatus && {textStatus: data.textStatus}),
         };
         await this.updateUser({id: from, domain: fromDomain ?? ''}, updates);
         break;
@@ -483,17 +485,29 @@ export class UserRepository extends TypedEventEmitter<Events> {
     });
   };
 
-  private readonly setAvailability = async (availability: Availability.Type, status?: string): Promise<void> => {
+  private readonly setAvailability = async (availability: Availability.Type): Promise<void> => {
     const selfUser = this.userState.self();
     if (!selfUser) {
       return;
     }
     const hasAvailabilityChanged = availability !== selfUser.availability();
-    const hasStatusChanged = status !== selfUser.textStatus();
-    if (hasAvailabilityChanged || hasStatusChanged) {
-      await this.updateUser(selfUser.qualifiedId, {availability, textStatus: status});
+    if (hasAvailabilityChanged) {
+      await this.updateUser(selfUser.qualifiedId, {availability});
       amplify.publish(WebAppEvents.TEAM.UPDATE_INFO);
       showAvailabilityModal(availability);
+    }
+  };
+
+  private readonly setTextStatus = async (textStatus?: string): Promise<void> => {
+    const selfUser = this.userState.self();
+    if (!selfUser) {
+      return;
+    }
+
+    const hasStatusChanged = textStatus !== selfUser.textStatus();
+    if (hasStatusChanged) {
+      await this.updateUser(selfUser.qualifiedId, {textStatus});
+      amplify.publish(WebAppEvents.USER.UPDATE, selfUser.qualifiedId);
     }
   };
 

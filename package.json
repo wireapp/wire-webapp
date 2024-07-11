@@ -11,7 +11,7 @@
     "@wireapp/core": "46.0.19",
     "@wireapp/react-ui-kit": "9.21.0",
     "@wireapp/store-engine-dexie": "2.1.10",
-    "@wireapp/webapp-events": "0.22.0",
+    "@wireapp/webapp-events": "file:.yalc/@wireapp/webapp-events",
     "amplify": "https://github.com/wireapp/amplify#head=master",
     "beautiful-react-hooks": "5.0.2",
     "classnames": "2.5.1",

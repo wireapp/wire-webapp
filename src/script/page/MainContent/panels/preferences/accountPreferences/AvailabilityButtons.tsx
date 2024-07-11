@@ -63,7 +63,7 @@ const centerButton: CSSObject = {
   justifyContent: 'center',
 };
 
-const AvailabilityButtons: React.FC<AvailabilityInputProps> = ({availability}, {textStatus}) => {
+const AvailabilityButtons: React.FC<AvailabilityInputProps> = ({availability, textStatus}) => {
   const icons: {
     [key: string]: any;
   } = {

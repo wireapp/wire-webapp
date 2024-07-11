@@ -19,7 +19,7 @@
 
 import {amplify} from 'amplify';
 
-import {Availability} from '@wireapp/protocol-messaging';
+// import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {t} from 'Util/LocalizerUtil';
@@ -30,7 +30,8 @@ export const showUserStatusModal = () => {
   PrimaryModal.show(PrimaryModal.type.INPUT, {
     primaryAction: {
       action: (status: string) => {
-        amplify.publish(WebAppEvents.USER.SET_AVAILABILITY, Availability.Type.NONE, status);
+        amplify.publish(WebAppEvents.USER.SET_TEXT_STATUS, status);
+        // amplify.publish(WebAppEvents.USER.SET_AVAILABILITY, Availability.Type.NONE, status);
       },
       text: t('modalUserStatusBtn'),
     },

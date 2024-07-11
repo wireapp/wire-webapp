@@ -1181,10 +1181,11 @@ export class MessageRepository {
     return deleteCount;
   }
 
-  private readonly sendAvailabilityStatus = async (availability: Availability.Type) => {
+  private readonly sendAvailabilityStatus = async (availability: Availability.Type, status?: string) => {
     const protoAvailability = new Availability({type: protoFromType(availability)});
     const genericMessage = new GenericMessage({
       [GenericMessageType.AVAILABILITY]: protoAvailability,
+      // ...(status && {[GenericMessageType.TEXT]: Text.create({content: status})}),
       messageId: createUuid(),
     });
 

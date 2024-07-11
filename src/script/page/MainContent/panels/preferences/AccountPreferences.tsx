@@ -98,6 +98,7 @@ export const AccountPreferences = ({
     'textStatus',
   ]);
 
+  // console.log('TEXT STATUS: ', textStatus);
   const canEditProfile = managedBy === User.CONFIG.MANAGED_BY.WIRE;
   const isDesktop = Runtime.isDesktopApp();
   const config = Config.getConfig();
@@ -154,7 +155,7 @@ export const AccountPreferences = ({
           </ErrorBoundary>
         </div>
 
-        {isActivatedAccount && isTeam && <AvailabilityButtons availability={availability} />}
+        {isActivatedAccount && isTeam && <AvailabilityButtons availability={availability} textStatus={textStatus} />}
 
         {isActivatedAccount && (
           <div className="preferences-accent-color-picker">
@@ -175,14 +176,6 @@ export const AccountPreferences = ({
           >
             <NameInput canEditProfile={canEditProfile} name={name} userRepository={userRepository} />
 
-            {textStatus && (
-              <AccountInput
-                label={t('preferencesAccountTextStatus')}
-                value={textStatus}
-                readOnly
-                fieldName="textStatus"
-              />
-            )}
             <UsernameInput
               canEditProfile={canEditProfile}
               userRepository={userRepository}

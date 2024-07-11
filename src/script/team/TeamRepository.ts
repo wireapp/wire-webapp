@@ -63,6 +63,7 @@ import {UserState} from '../user/UserState';
 export interface AccountInfo {
   accentID: number;
   availability?: Availability.Type;
+  textStatus?: string;
   name: string;
   picture?: string;
   teamID?: string;
@@ -325,6 +326,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
 
       if (Number(majorVersion) >= 3 && Number(minorVersion) >= 20) {
         accountInfo.availability = this.userState.self().availability();
+        accountInfo.textStatus = this.userState.self().textStatus();
       }
 
       this.logger.log('Publishing account info', accountInfo);
