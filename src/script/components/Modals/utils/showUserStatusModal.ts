@@ -32,7 +32,7 @@ export const showUserStatusModal = () => {
       action: (status: string) => {
         amplify.publish(WebAppEvents.USER.SET_AVAILABILITY, Availability.Type.NONE, status);
       },
-      text: t('modalUserStatus'),
+      text: t('modalUserStatusBtn'),
     },
     text: {
       closeBtnLabel: t('modalUserStatusCloseBtn'),
