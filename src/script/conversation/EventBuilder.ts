@@ -157,7 +157,11 @@ export type MessageAddEvent = ConversationEvent<
   version?: number;
 };
 export type MissedEvent = BaseEvent & {id: string; type: CONVERSATION.MISSED_MESSAGES};
-export type UserHasStatusEvent = BaseEvent & {id: string; type: CONVERSATION.USER_HAS_TEXT_STATUS};
+export type UserHasTextStatusEvent = BaseEvent & {
+  id: string;
+  type: CONVERSATION.USER_HAS_TEXT_STATUS;
+  data: {textStatus: string; name: string};
+};
 export type JoinedAfterMLSMigrationFinalisationEvent = BaseEvent & {
   type: CONVERSATION.JOINED_AFTER_MLS_MIGRATION;
 };
@@ -267,7 +271,8 @@ export type ClientConversationEvent =
   | MLSConversationRecoveredEvent
   | LocationEvent
   | VoiceChannelActivateEvent
-  | VerificationEvent;
+  | VerificationEvent
+  | UserHasTextStatusEvent;
 
 function buildQualifiedId(conversation: QualifiedId | string) {
   const qualifiedId = typeof conversation === 'string' ? {domain: '', id: conversation} : conversation;
@@ -595,7 +600,7 @@ export const EventBuilder = {
     };
   },
 
-  buildUserHasStatus(conversationEntity: Conversation, user: User, currentTimestamp: number): UserHasStatusEvent {
+  buildUserHasTextStatus(conversationEntity: Conversation, user: User): UserHasTextStatusEvent {
     return {
       ...buildQualifiedId(conversationEntity),
       data: {
@@ -604,7 +609,7 @@ export const EventBuilder = {
       },
       from: user.id,
       id: createUuid(),
-      time: conversationEntity.getNextIsoDate(currentTimestamp),
+      time: new Date(conversationEntity.getNextTimestamp()).toISOString(),
       type: ClientEvent.CONVERSATION.USER_HAS_TEXT_STATUS,
     };
   },

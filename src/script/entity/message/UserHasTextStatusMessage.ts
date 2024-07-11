@@ -23,11 +23,12 @@ import {t} from 'Util/LocalizerUtil';
 import {SystemMessage} from './SystemMessage';
 
 export class UserHasTextStatusMessage extends SystemMessage {
-  public readonly message: string;
-
-  constructor() {
+  constructor(
+    public textStatus: string,
+    public userName: string,
+  ) {
     super();
     this.system_message_type = SystemMessageType.USER_HAS_TEXT_STATUS;
-    this.caption = t('conversationUserHasStatusMessages', {status: message});
+    this.caption = t('conversationUserHasStatusMessages', {status: textStatus, user: userName});
   }
 }

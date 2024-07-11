@@ -24,6 +24,7 @@ import cx from 'classnames';
 import {CLEAR_EDITOR_COMMAND, LexicalEditor} from 'lexical';
 import {container} from 'tsyringe';
 
+import {Availability as AvailabilityType} from '@wireapp/protocol-messaging';
 import {useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -352,6 +353,15 @@ export const InputBar = ({
   const handleSendMessage = async () => {
     await conversationRepository.refreshMLSConversationVerificationState(conversation);
     const isE2EIDegraded = conversation.mlsVerificationState() === ConversationVerificationState.DEGRADED;
+
+    // If the user has a status message
+    if (selfUser.textStatus() !== null && selfUser.textStatus() !== undefined && selfUser.textStatus().length > 0) {
+      // And the user is away
+      if (selfUser.availability() === AvailabilityType.Type.AWAY) {
+        // We want to inject a system message to the conversation
+        await conversationRepository.injectUserHasStatusMessage(conversation, selfUser);
+      }
+    }
 
     if (isE2EIDegraded) {
       PrimaryModal.show(PrimaryModal.type.CONFIRM, {

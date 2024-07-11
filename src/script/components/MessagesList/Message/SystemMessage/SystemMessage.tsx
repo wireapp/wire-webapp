@@ -32,6 +32,7 @@ import {ProtocolUpdateMessage} from 'src/script/entity/message/ProtocolUpdateMes
 import {ReceiptModeUpdateMessage} from 'src/script/entity/message/ReceiptModeUpdateMessage';
 import {RenameMessage} from 'src/script/entity/message/RenameMessage';
 import {SystemMessage as SystemMessageEntity} from 'src/script/entity/message/SystemMessage';
+import {UserHasTextStatusMessage} from 'src/script/entity/message/UserHasTextStatusMessage';
 
 import {SystemMessageBase} from './SystemMessageBase';
 
@@ -51,6 +52,22 @@ export const SystemMessage: React.FC<SystemMessageProps> = ({message}) => {
           <div className="message-body font-weight-bold">{message.name}</div>
         </div>
       </>
+    );
+  }
+
+  if (message instanceof UserHasTextStatusMessage) {
+    return (
+      <div
+        style={{
+          border: '1px solid black',
+          borderLeft: 'none',
+          borderRight: 'none',
+          marginTop: '1em',
+          background: 'khaki',
+        }}
+      >
+        <SystemMessageBase message={message} isTimeVisible={false} icon={<Icon.MessageIcon />} />
+      </div>
     );
   }
 

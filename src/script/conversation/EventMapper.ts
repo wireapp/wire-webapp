@@ -38,6 +38,7 @@ import {
   E2EIVerificationEvent,
   MessageAddEvent,
   CompositeMessageAddEvent,
+  UserHasTextStatusEvent,
 } from './EventBuilder';
 
 import {AssetRemoteData} from '../assets/AssetRemoteData';
@@ -75,6 +76,7 @@ import {ReceiptModeUpdateMessage} from '../entity/message/ReceiptModeUpdateMessa
 import {RenameMessage} from '../entity/message/RenameMessage';
 import {Text} from '../entity/message/Text';
 import type {Text as TextAsset} from '../entity/message/Text';
+import {UserHasTextStatusMessage} from '../entity/message/UserHasTextStatusMessage';
 import {VerificationMessage} from '../entity/message/VerificationMessage';
 import {ConversationError} from '../error/ConversationError';
 import {ClientEvent} from '../event/Client';
@@ -393,6 +395,11 @@ export class EventMapper {
         break;
       }
 
+      case ClientEvent.CONVERSATION.USER_HAS_TEXT_STATUS: {
+        messageEntity = this._mapEventUserHasTextStatusMessages(event);
+        break;
+      }
+
       default: {
         const {type, id} = event as LegacyEventRecord;
         this.logger.warn(`Ignored unhandled '${type}' event ${id ? `'${id}' ` : ''}`);
@@ -670,8 +677,8 @@ export class EventMapper {
   /**
    * Maps JSON data of local missed message event to message entity.
    */
-  private _mapEventUserHasTextStatusMessages(): UserHasTextStatusMessage {
-    return new UserHasTextStatusMessage();
+  private _mapEventUserHasTextStatusMessages(event: UserHasTextStatusEvent): UserHasTextStatusMessage {
+    return new UserHasTextStatusMessage(event.data.textStatus, event.data.name);
   }
 
   /**
