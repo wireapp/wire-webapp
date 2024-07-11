@@ -105,6 +105,8 @@ const Conversations: React.FC<ConversationsProps> = ({
   const {classifiedDomains, isTeam} = useKoSubscribableChildren(teamState, ['classifiedDomains', 'isTeam']);
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
 
+  const {isTemporaryGuest} = useKoSubscribableChildren(selfUser, ['isTemporaryGuest']);
+
   const {
     activeConversation,
     unreadConversations,
@@ -326,7 +328,7 @@ const Conversations: React.FC<ConversationsProps> = ({
           />
         }
         hasHeader={!isPreferences}
-        sidebar={sidebar}
+        {...(!isTemporaryGuest && {sidebar})}
         before={callingView}
       >
         {isPreferences ? (
@@ -334,6 +336,9 @@ const Conversations: React.FC<ConversationsProps> = ({
             onPreferenceItemClick={onClickPreferences}
             teamRepository={teamRepository}
             preferenceNotificationRepository={preferenceNotificationRepository}
+            {...(isTemporaryGuest && {
+              onClose: onExitPreferences,
+            })}
           />
         ) : (
           <>
