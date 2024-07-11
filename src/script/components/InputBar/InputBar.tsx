@@ -354,12 +354,21 @@ export const InputBar = ({
     await conversationRepository.refreshMLSConversationVerificationState(conversation);
     const isE2EIDegraded = conversation.mlsVerificationState() === ConversationVerificationState.DEGRADED;
 
-    // If the user has a status message
-    if (selfUser.textStatus() !== null && selfUser.textStatus() !== undefined && selfUser.textStatus().length > 0) {
-      // And the user is away
-      if (selfUser.availability() === AvailabilityType.Type.AWAY) {
-        // We want to inject a system message to the conversation
-        await conversationRepository.injectUserHasStatusMessage(conversation, selfUser);
+    // If the conversation is 1to1
+    if (conversation.is1to1()) {
+      const oppositeUser = conversation.participating_user_ets().find(user => user.id !== selfUser.id);
+      // If the opposite user has a status message
+      if (
+        oppositeUser &&
+        oppositeUser.textStatus() !== null &&
+        oppositeUser.textStatus() !== undefined &&
+        oppositeUser.textStatus().length > 0
+      ) {
+        // And the opposite user is away
+        if (oppositeUser.availability() === AvailabilityType.Type.AWAY) {
+          // We want to inject a system message to the conversation
+          await conversationRepository.injectUserHasStatusMessage(conversation, oppositeUser);
+        }
       }
     }
 
