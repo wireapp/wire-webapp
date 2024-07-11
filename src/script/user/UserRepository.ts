@@ -483,14 +483,15 @@ export class UserRepository extends TypedEventEmitter<Events> {
     });
   };
 
-  private readonly setAvailability = async (availability: Availability.Type): Promise<void> => {
+  private readonly setAvailability = async (availability: Availability.Type, status?: string): Promise<void> => {
     const selfUser = this.userState.self();
     if (!selfUser) {
       return;
     }
     const hasAvailabilityChanged = availability !== selfUser.availability();
-    if (hasAvailabilityChanged) {
-      await this.updateUser(selfUser.qualifiedId, {availability});
+    const hasStatusChanged = status !== selfUser.textStatus();
+    if (hasAvailabilityChanged || hasStatusChanged) {
+      await this.updateUser(selfUser.qualifiedId, {availability, textStatus: status});
       amplify.publish(WebAppEvents.TEAM.UPDATE_INFO);
       showAvailabilityModal(availability);
     }

@@ -76,6 +76,13 @@ const AvailabilityButtons: React.FC<AvailabilityInputProps> = ({availability}) =
         data-uie-value="away"
       />
     ),
+    [Availability.Type.OFFLINE]: (
+      <Icon.AvailabilityAwayIcon
+        css={{...iconStyles, fill: 'var(--red-500)', stroke: 'var(--red-500)'}}
+        data-uie-name="status-availability-icon"
+        data-uie-value="offline"
+      />
+    ),
     [Availability.Type.NONE]: null,
   };
   const entries: ContextMenuEntry[] = [

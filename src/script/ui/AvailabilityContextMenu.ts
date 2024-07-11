@@ -22,6 +22,7 @@ import {amplify} from 'amplify';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {showUserStatusModal} from 'Components/Modals/utils/showUserStatusModal';
 import {t} from 'Util/LocalizerUtil';
 
 import {ContextMenuEntry, showContextMenu} from './ContextMenu';
@@ -44,6 +45,10 @@ export const AvailabilityContextMenu = {
       {
         click: () => amplify.publish(WebAppEvents.USER.SET_AVAILABILITY, Availability.Type.AWAY),
         label: t('userAvailabilityAway'),
+      },
+      {
+        click: () => showUserStatusModal(),
+        label: t('userAvailabilitySetStatus'),
       },
     ];
 

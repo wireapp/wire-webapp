@@ -89,12 +89,13 @@ export const AccountPreferences = ({
   conversationState = container.resolve(ConversationState),
 }: AccountPreferencesProps) => {
   const {isTeam, teamName} = useKoSubscribableChildren(teamState, ['isTeam', 'teamName']);
-  const {name, email, availability, username, managedBy} = useKoSubscribableChildren(selfUser, [
+  const {name, email, availability, username, managedBy, textStatus} = useKoSubscribableChildren(selfUser, [
     'name',
     'email',
     'availability',
     'username',
     'managedBy',
+    'textStatus',
   ]);
 
   const canEditProfile = managedBy === User.CONFIG.MANAGED_BY.WIRE;
@@ -174,6 +175,14 @@ export const AccountPreferences = ({
           >
             <NameInput canEditProfile={canEditProfile} name={name} userRepository={userRepository} />
 
+            {textStatus && (
+              <AccountInput
+                label={t('preferencesAccountTextStatus')}
+                value={textStatus}
+                readOnly
+                fieldName="textStatus"
+              />
+            )}
             <UsernameInput
               canEditProfile={canEditProfile}
               userRepository={userRepository}
