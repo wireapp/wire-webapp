@@ -506,8 +506,8 @@ export class UserRepository extends TypedEventEmitter<Events> {
 
     const hasStatusChanged = textStatus !== selfUser.textStatus();
     if (hasStatusChanged) {
-      await this.updateUser(selfUser.qualifiedId, {textStatus});
-      amplify.publish(WebAppEvents.USER.UPDATE, selfUser.qualifiedId);
+      await this.selfService.putSelf({text_status: textStatus});
+      await this.updateUser(selfUser.qualifiedId, {text_status: textStatus});
     }
   };
 
