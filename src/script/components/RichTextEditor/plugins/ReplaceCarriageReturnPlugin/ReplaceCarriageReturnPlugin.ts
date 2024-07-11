@@ -31,7 +31,7 @@ function replaceCarriageReturnWithLineFeed(input: string) {
     .join('');
 }
 
-export const ReplaceCarriageReturnPlugin = () => {
+export const ReplaceCarriageReturnPlugin = (): null => {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {
