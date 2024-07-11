@@ -39,6 +39,7 @@ import type {ConversationRepository} from '../conversation/ConversationRepositor
 import {ConversationState} from '../conversation/ConversationState';
 import type {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
+import {SidebarTabs, useSidebarStore} from '../page/LeftSidebar/panels/Conversations/state';
 import {PanelState} from '../page/RightSidebar';
 import {useAppMainState} from '../page/state';
 import {ContentState, ListState, useAppState} from '../page/useAppState';
@@ -236,6 +237,9 @@ export class ListViewModel {
 
   openPreferencesAccount = async (): Promise<void> => {
     await this.teamRepository.getTeam();
+
+    const {setCurrentTab} = useSidebarStore.getState();
+    setCurrentTab(SidebarTabs.PREFERENCES);
 
     this.switchList(ListState.PREFERENCES);
     this.contentViewModel.switchContent(ContentState.PREFERENCES_ACCOUNT);
