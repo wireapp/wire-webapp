@@ -125,6 +125,8 @@ export const Conversation = ({
   const {addReadReceiptToBatch} = useReadReceiptSender(repositories.message);
 
   useEffect(() => {
+    // When the component is mounted we want to make sure its conversation entity's last message is marked as visible
+    // not to display the jump to last message button initially
     activeConversation?.isLastMessageVisible(true);
   }, [activeConversation]);
 
