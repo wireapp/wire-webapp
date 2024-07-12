@@ -135,6 +135,9 @@ export const Message = (props: MessageParams & {scrollTo?: ScrollToElement}) => 
     }
   }, [isFocused]);
 
+  // When component is unmounted, it's not visible anymore
+  useEffect(() => onVisibilityLost);
+
   // set message elements focus for non content type mesages
   // some non content type message has interactive element like invite people for member message
   useEffect(() => {
