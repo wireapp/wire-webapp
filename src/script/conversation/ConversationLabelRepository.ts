@@ -225,12 +225,17 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
 
   readonly removeConversationFromLabel = (label: ConversationLabel, removeConversation: Conversation): void => {
     label.conversations(label.conversations().filter(conversation => conversation !== removeConversation));
+
+    const {setCurrentTab} = useSidebarStore.getState();
+
     // Delete folder if it no longer contains any conversation
     if (!label.conversations().length) {
       this.labels.remove(label);
       // switch sidebar to recent tabs
-      const {setCurrentTab} = useSidebarStore.getState();
       setCurrentTab(SidebarTabs.RECENT);
+    } else {
+      // trigger rerender on folders to remove conversation from folder
+      setCurrentTab(SidebarTabs.FOLDER);
     }
     this.saveLabels();
   };
