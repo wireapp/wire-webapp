@@ -17,7 +17,7 @@
  *
  */
 
-import {UIEvent, useCallback, useState} from 'react';
+import {UIEvent, useCallback, useEffect, useState} from 'react';
 
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -123,6 +123,12 @@ export const Conversation = ({
   const smBreakpoint = useMatchMedia('max-width: 640px');
 
   const {addReadReceiptToBatch} = useReadReceiptSender(repositories.message);
+
+  useEffect(() => {
+    // When the component is mounted we want to make sure its conversation entity's last message is marked as visible
+    // not to display the jump to last message button initially
+    activeConversation?.isLastMessageVisible(true);
+  }, [activeConversation]);
 
   const uploadImages = useCallback(
     (images: File[]) => {
