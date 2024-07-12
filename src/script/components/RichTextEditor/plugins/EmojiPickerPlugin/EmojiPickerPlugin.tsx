@@ -181,7 +181,7 @@ export function EmojiPickerPlugin({openStateRef}: Props) {
     const {bottom, left} = getPosition();
 
     return ReactDOM.createPortal(
-      <div className="typeahead-popover emoji-menu">
+      <div data-outside-click-ignore className="typeahead-popover emoji-menu">
         <div className="conversation-input-bar-emoji-list" style={{bottom, left}}>
           {options.map((option: EmojiOption, index) => (
             <EmojiItem
