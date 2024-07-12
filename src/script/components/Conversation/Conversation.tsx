@@ -17,7 +17,7 @@
  *
  */
 
-import {UIEvent, useCallback, useState} from 'react';
+import {UIEvent, useCallback, useEffect, useState} from 'react';
 
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -123,6 +123,10 @@ export const Conversation = ({
   const smBreakpoint = useMatchMedia('max-width: 640px');
 
   const {addReadReceiptToBatch} = useReadReceiptSender(repositories.message);
+
+  useEffect(() => {
+    activeConversation?.isLastMessageVisible(true);
+  }, [activeConversation]);
 
   const uploadImages = useCallback(
     (images: File[]) => {
