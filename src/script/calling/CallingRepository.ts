@@ -23,7 +23,9 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {WebappProperties} from '@wireapp/api-client/lib/user/data';
 import {MessageSendingState} from '@wireapp/core/lib/conversation';
 import {flattenUserMap} from '@wireapp/core/lib/conversation/message/UserClientsUtil';
-import {SubconversationEpochInfoMember} from '@wireapp/core/lib/conversation/SubconversationService/SubconversationService';
+import {
+  SubconversationEpochInfoMember
+} from '@wireapp/core/lib/conversation/SubconversationService/SubconversationService';
 import {TaskScheduler} from '@wireapp/core/lib/util';
 import {constructFullyQualifiedClientId} from '@wireapp/core/lib/util/fullyQualifiedClientIdUtils';
 import {amplify} from 'amplify';
@@ -91,6 +93,8 @@ import * as trackingHelpers from '../tracking/Helpers';
 import {Segmentation} from '../tracking/Segmentation';
 import type {UserRepository} from '../user/UserRepository';
 import {Warnings} from '../view_model/WarningsContainer';
+import {CanvasMediaStreamMixer} from "../media/CanvasMediaStreamMixer";
+import {tr} from "date-fns/locale";
 
 const avsLogger = getLogger('avs');
 
@@ -100,7 +104,7 @@ interface MediaStreamQuery {
   screen?: boolean;
 }
 
-export type QualifiedWcallMember = Omit<WcallMember, 'userid'> & {userId: QualifiedId};
+export type QualifiedWcallMember = Omit<WcallMember, 'userid'> & { userId: QualifiedId };
 
 interface SendMessageTarget {
   clients: WcallClient[];
@@ -117,14 +121,14 @@ interface ActiveSpeakers {
   audio_levels: ActiveSpeaker[];
 }
 
-type Clients = {clientid: string; userid: string}[];
+type Clients = { clientid: string; userid: string }[];
 
 enum CALL_DIRECTION {
   INCOMING = 'incoming',
   OUTGOING = 'outgoing',
 }
 
-type SubconversationData = {epoch: number; secretKey: string; members: SubconversationEpochInfoMember[]};
+type SubconversationData = { epoch: number; secretKey: string; members: SubconversationEpochInfoMember[] };
 
 export class CallingRepository {
   private readonly acceptVersionWarning: (conversationId: QualifiedId) => void;
@@ -136,13 +140,14 @@ export class CallingRepository {
   private isReady: boolean = false;
   /** will cache the query to media stream (in order to avoid asking the system for streams multiple times when we have multiple peers) */
   private mediaStreamQuery?: Promise<MediaStream>;
-  private poorCallQualityUsers: {[conversationId: string]: string[]} = {};
+  private poorCallQualityUsers: { [conversationId: string]: string[] } = {};
   private selfClientId: ClientId | null = null;
   private selfUser: User | null = null;
   private wCall?: Wcall;
   private wUser: number = 0;
   private nextMuteState: MuteState = MuteState.SELF_MUTED;
   private isConferenceCallingSupported = false;
+  private canvasMixer: CanvasMediaStreamMixer;
   /**
    * Keeps track of the size of the avs log once the webapp is initiated. This allows detecting meaningless avs logs (logs that have a length equal to the length when the webapp was initiated)
    */
@@ -172,8 +177,19 @@ export class CallingRepository {
     private readonly core = container.resolve(Core),
   ) {
     this.logger = getLogger('CallingRepository');
-    this.incomingCallCallback = () => {};
+    this.incomingCallCallback = () => {
+    };
     this.callLog = [];
+
+    const image: HTMLImageElement = new Image();
+    image.src = 'https://support.wire.com/hc/theming_assets/01HZM0AJ4452SEZ5BNNBQPQVX9';
+    image.onload = function () {
+      console.log('#####  ######  Image loaded');
+    };
+    setTimeout(() => {
+      this.canvasMixer = new CanvasMediaStreamMixer('canvasOne', image);
+      this.canvasMixer.start();
+    }, 0);
 
     /** {<userId>: <isVerified>} */
     let callParticipants: Record<string, boolean> = {};
@@ -236,7 +252,8 @@ export class CallingRepository {
 
     this.subscribeToEvents();
 
-    this.onChooseScreen = (deviceId: string) => {};
+    this.onChooseScreen = (deviceId: string) => {
+    };
 
     ko.computed(() => {
       const call = this.callState.joinedCall();
@@ -289,7 +306,7 @@ export class CallingRepository {
     this.isSoftLock = value;
   }
 
-  async initAvs(selfUser: User, clientId: ClientId): Promise<{wCall: Wcall; wUser: number}> {
+  async initAvs(selfUser: User, clientId: ClientId): Promise<{ wCall: Wcall; wUser: number }> {
     this.selfUser = selfUser;
     this.selfClientId = clientId;
     const callingInstance = await getAvsInstance();
@@ -365,10 +382,13 @@ export class CallingRepository {
       this.sendSFTRequest, // `sfth`
       this.incomingCall, // `incomingh`,
       this.handleMissedCall, // `missedh`,
-      () => {}, // `answer
-      () => {}, // `estabh`,
+      () => {
+      }, // `answer
+      () => {
+      }, // `estabh`,
       this.callClosed, // `closeh`,
-      () => {}, // `metricsh`,
+      () => {
+      }, // `metricsh`,
       this.requestConfig, // `cfg_reqh`,
       this.audioCbrChanged, // `acbrh`,
       this.videoStateChanged, // `vstateh`,
@@ -904,7 +924,7 @@ export class CallingRepository {
       this.sendCallingEvent(EventName.CALLING.SCREEN_SHARE, call, {
         [Segmentation.SCREEN_SHARE.DIRECTION]: 'outgoing',
         [Segmentation.SCREEN_SHARE.DURATION]:
-          Math.ceil((Date.now() - selfParticipant.startedScreenSharingAt()) / 5000) * 5,
+        Math.ceil((Date.now() - selfParticipant.startedScreenSharingAt()) / 5000) * 5,
       });
       return this.wCall?.setVideoSendState(
         this.wUser,
@@ -922,9 +942,19 @@ export class CallingRepository {
           VIDEO_STATE.STOPPED,
         );
       };
+
+      navigator.mediaDevices.getUserMedia({video: true}).then((streamCam)  => {
+        this.canvasMixer.setSmallStreamVideoElement(streamCam);
+        document.getElementById('canvasOne')?.classList.toggle('displayTop');
+        this.canvasMixer.togglePictureInPicture();
+      });
+
+      this.canvasMixer.setMainStreamVideoElement(mediaStream);
+      const mixedStream = this.canvasMixer.getMixedStream();
+
       const selfParticipant = call.getSelfParticipant();
       selfParticipant.videoState(VIDEO_STATE.SCREENSHARE);
-      selfParticipant.updateMediaStream(mediaStream, true);
+      selfParticipant.updateMediaStream(mixedStream, true);
       this.wCall?.setVideoSendState(
         this.wUser,
         this.serializeQualifiedId(conversation.qualifiedId),
@@ -1487,7 +1517,7 @@ export class CallingRepository {
         this.sendCallingEvent(EventName.CALLING.SCREEN_SHARE, call, {
           [Segmentation.SCREEN_SHARE.DIRECTION]: isSameUser ? CALL_DIRECTION.OUTGOING : CALL_DIRECTION.INCOMING,
           [Segmentation.SCREEN_SHARE.DURATION]:
-            Math.ceil((Date.now() - participant.startedScreenSharingAt()) / 5000) * 5,
+          Math.ceil((Date.now() - participant.startedScreenSharingAt()) / 5000) * 5,
         });
       }
     });
@@ -1680,7 +1710,7 @@ export class CallingRepository {
       return;
     }
 
-    const {members: serializedMembers}: {members: WcallMember[]} = JSON.parse(membersJson);
+    const {members: serializedMembers}: { members: WcallMember[] } = JSON.parse(membersJson);
     const members: QualifiedWcallMember[] = serializedMembers.map(member => ({
       ...member,
       userId: this.parseQualifiedId(member.userid),

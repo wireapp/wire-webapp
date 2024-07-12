@@ -21,6 +21,44 @@
 
     <script src="./min/basicBrowserFeatureCheck.js?v=<%= VERSION %>"></script>
     <script src="./min/checkBrowser.js?v=<%= VERSION %>"></script>
+    <style>
+      .displayTop {
+
+      }
+
+      #smallVideoContainer {
+        height: 100%;
+        display: grid;
+        place-content: center;
+      }
+      .video-js {
+        width: 640px;
+        height: 360px;
+        max-width: 100vw;
+      }
+      .fullpage {
+        height: 100% !important;
+        width: 100% !important;
+      }
+      #smallVideoContainer:not(:has(*))::before {
+        content: "The video is playing in Picture-in-Picture.";
+        color: #39e75f;
+        line-height: 360px;
+        text-align: center;
+      }
+      #smallVideoContainer::after {
+        content: "© copyright Blender Foundation | www.sintel.org";
+        color: #cdcdcd;
+        text-align: center;
+        margin-top: 18px;
+      }
+      /* https://issues.chromium.org/issues/41493667 */
+      @media all and (display-mode: picture-in-picture) {
+        body {
+          background: rgb(32, 33, 36);
+        }
+      }
+    </style>
   </head>
 
   <body>
@@ -72,6 +110,7 @@
             display: block;
           }
 
+
           @keyframes rotation {
             0% {
               transform: rotate(0deg);
@@ -88,6 +127,12 @@
         </div>
     </main>
 
+    <canvas id="canvasOne" >Your browser does not support HTML5 Canvas.</canvas>
+
+    <video id="bigVideo"></video>
+    <div id="videoContainer">
+      <video id="smallVideo" class="video-js"></video>
+    </div>
     <script src="./min/loader.js?v=<%= VERSION %>"></script>
     <script src="./config.js"></script>
     <script src="./min/dexie.js?v=<%= VERSION %>"></script>
