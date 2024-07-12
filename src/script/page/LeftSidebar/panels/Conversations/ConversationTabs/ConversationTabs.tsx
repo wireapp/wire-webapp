@@ -66,6 +66,9 @@ export const ConversationTabs = ({
     conversation.hasUnread(),
   ).length;
 
+  const filterUnreadAndArchivedConversations = (conversation: Conversation) =>
+    !conversation.is_archived() && conversation.hasUnread();
+
   const conversationTabs = [
     {
       type: SidebarTabs.RECENT,
@@ -86,14 +89,14 @@ export const ConversationTabs = ({
       title: t('conversationLabelGroups'),
       dataUieName: 'go-groups-view',
       Icon: <GroupIcon />,
-      unreadConversations: groupConversations.filter(conversation => conversation.hasUnread()).length,
+      unreadConversations: groupConversations.filter(filterUnreadAndArchivedConversations).length,
     },
     {
       type: SidebarTabs.DIRECTS,
       title: t('conversationLabelDirects'),
       dataUieName: 'go-directs-view',
       Icon: <Icon.PeopleIcon />,
-      unreadConversations: directConversations.filter(conversation => conversation.hasUnread()).length,
+      unreadConversations: directConversations.filter(filterUnreadAndArchivedConversations).length,
     },
     {
       type: SidebarTabs.FOLDER,
