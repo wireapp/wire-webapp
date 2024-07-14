@@ -22,7 +22,7 @@
     "@types/npm-registry-package-info": "1.0.4",
     "@types/rimraf": "4.0.5",
     "license-checker": "^25.0.1",
-    "rimraf": "5.0.7",
+    "rimraf": "6.0.1",
     "typescript": "^5.0.4"
   },
   "scripts": {

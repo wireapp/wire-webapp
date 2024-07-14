@@ -9,7 +9,7 @@
   "main": "lib/index",
   "devDependencies": {
     "@types/rimraf": "4.0.5",
-    "rimraf": "5.0.7",
+    "rimraf": "6.0.1",
     "typescript": "^5.0.4"
   },
   "scripts": {
