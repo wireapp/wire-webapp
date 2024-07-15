@@ -17,13 +17,13 @@
  *
  */
 
-import {FEDERATION_EVENT} from '@wireapp/api-client/lib/event';
+import {CONVERSATION_EVENT, FEDERATION_EVENT} from '@wireapp/api-client/lib/event';
 import {container} from 'tsyringe';
 import {debounce} from 'underscore';
 
 import {ConversationState} from 'src/script/conversation/ConversationState';
 import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
-import {EventBuilder} from 'src/script/conversation/EventBuilder';
+import {FederationStopEvent, MemberLeaveEvent} from 'src/script/conversation/EventBuilder';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {ServerTimeHandler} from 'src/script/time/serverTimeHandler';
@@ -33,6 +33,8 @@ import {
   getFederationDeleteEventUpdates,
 } from './ConversationFederationUtils';
 
+import {createBaseEvent} from '../../../conversation/EventNew';
+import {CONVERSATION} from '../../Client';
 import {EventProcessor, IncomingEvent} from '../../EventProcessor';
 import {EventRepository} from '../../EventRepository';
 
@@ -131,7 +133,16 @@ export class FederationEventProcessor implements EventProcessor {
 
   private async insertFederationStopSystemMessage(conversation: Conversation, domains: string[]) {
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const event = EventBuilder.buildFederationStop(conversation, this.selfUser, domains, currentTimestamp);
+    // const event = EventBuilder.buildFederationStop(conversation, this.selfUser, domains, currentTimestamp);
+    const event = createBaseEvent<FederationStopEvent>({
+      conversation,
+      eventType: CONVERSATION.FEDERATION_STOP,
+      additionalData: {
+        domains,
+      },
+      from: this.selfUser.id,
+      timestamp: currentTimestamp,
+    });
     await this.eventRepository.injectEvent(event, EventRepository.SOURCE.INJECTED);
   }
 
@@ -142,12 +153,26 @@ export class FederationEventProcessor implements EventProcessor {
    */
   private async removeMembers(conversation: Conversation, users: User[]) {
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const event = EventBuilder.buildMemberLeave(
+    // const event = EventBuilder.buildMemberLeave(
+    //   conversation,
+    //   users.map(user => user.qualifiedId),
+    //   '',
+    //   currentTimestamp,
+    // );
+
+    const userIds = users.map(user => user.qualifiedId);
+
+    const event = createBaseEvent<MemberLeaveEvent>({
       conversation,
-      users.map(user => user.qualifiedId),
-      '',
-      currentTimestamp,
-    );
+      eventType: CONVERSATION_EVENT.MEMBER_LEAVE,
+      additionalData: {
+        qualified_user_ids: userIds,
+        user_ids: userIds.map(({id}) => id),
+      },
+      from: '',
+      timestamp: currentTimestamp,
+    });
+
     // Injecting the event will trigger all the handlers that will then actually remove the users from the conversation
     await this.eventRepository.injectEvent(event);
   }

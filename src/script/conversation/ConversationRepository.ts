@@ -110,6 +110,7 @@ import {
   OnConversationVerificationStateChange,
 } from './ConversationVerificationStateHandler/shared';
 import {EventMapper} from './EventMapper';
+import {createBaseEvent} from './EventNew';
 import {MessageRepository} from './MessageRepository';
 import {NOTIFICATION_STATE} from './NotificationSetting';
 
@@ -122,6 +123,7 @@ import {ConnectionEntity} from '../connection/ConnectionEntity';
 import {ConnectionRepository} from '../connection/ConnectionRepository';
 import {ConnectionState} from '../connection/ConnectionState';
 import {
+  AllVerifiedEvent,
   AssetAddEvent,
   ButtonActionConfirmationEvent,
   ClientConversationEvent,
@@ -151,6 +153,7 @@ import {isMemberMessage} from '../guards/Message';
 import * as LegalHoldEvaluator from '../legal-hold/LegalHoldEvaluator';
 import {MessageCategory} from '../message/MessageCategory';
 import {SystemMessageType} from '../message/SystemMessageType';
+import {VerificationMessageType} from '../message/VerificationMessageType';
 import {addOtherSelfClientsToMLSConversation} from '../mls';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {SelfRepository} from '../self/SelfRepository';
@@ -926,11 +929,51 @@ export class ConversationRepository {
       conversationEntity.withAllTeamMembers(allTeamMembersParticipate);
     }
 
-    const creationEvent = conversationEntity.isGroup()
-      ? EventBuilder.buildGroupCreation(conversationEntity, isTemporaryGuest, timestamp)
-      : EventBuilder.build1to1Creation(conversationEntity);
+    let creationEventNew;
 
-    await this.eventRepository.injectEvent(creationEvent, eventSource);
+    if (conversationEntity.isGroup()) {
+      const selfUser = conversationEntity.selfUser();
+
+      if (!selfUser) {
+        this.logger.error('Failed to get self user');
+        return;
+      }
+
+      const {creator: creatorId} = conversationEntity;
+      const selfUserId = selfUser.id;
+
+      const userIds = conversationEntity.participating_user_ids().slice();
+      const createdBySelf = creatorId === selfUserId || isTemporaryGuest;
+      if (!createdBySelf) {
+        userIds.push(selfUser.qualifiedId);
+      }
+
+      creationEventNew = createBaseEvent<GroupCreationEvent>({
+        conversation: conversationEntity,
+        eventType: ClientEvent.CONVERSATION.ONE2ONE_CREATION,
+        additionalData: {
+          userIds,
+          name: conversationEntity.name(),
+          allTeamMembers: conversationEntity.withAllTeamMembers(),
+        },
+        from: isTemporaryGuest ? selfUserId : creatorId,
+        timestamp: 0,
+      });
+    } else {
+      creationEventNew = createBaseEvent<OneToOneCreationEvent>({
+        conversation: conversationEntity,
+        eventType: ClientEvent.CONVERSATION.ONE2ONE_CREATION,
+        additionalData: {userIds: conversationEntity.participating_user_ids()},
+        from: conversationEntity.creator,
+        timestamp: 0,
+      });
+    }
+
+    // const creationEvent = conversationEntity.isGroup()
+    //   ? EventBuilder.buildGroupCreation(conversationEntity, isTemporaryGuest, timestamp)
+    //   : EventBuilder.build1to1Creation(conversationEntity);
+
+    await this.eventRepository.injectEvent(creationEventNew, eventSource);
   }
 
   /**
@@ -2304,7 +2347,12 @@ export class ConversationRepository {
   }) => {
     switch (conversationVerificationState) {
       case ConversationVerificationState.VERIFIED:
-        const allVerifiedEvent = EventBuilder.buildAllVerified(conversationEntity);
+        // const allVerifiedEvent = EventBuilder.buildAllVerified(conversationEntity);
+        const allVerifiedEvent = createBaseEvent<AllVerifiedEvent>({
+          conversation: conversationEntity,
+          eventType: ClientEvent.CONVERSATION.VERIFICATION,
+          additionalData: {type: VerificationMessageType.VERIFIED},
+        });
         await this.eventRepository.injectEvent(allVerifiedEvent);
         break;
       case ConversationVerificationState.DEGRADED:
@@ -2640,9 +2688,19 @@ export class ConversationRepository {
       // TODO: Can this even have a response? in the API Client it look like it always returns `void`
       const hasResponse = response?.event;
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
+      // const event = hasResponse
+      //   ? response.event
+      //   : EventBuilder.buildMemberLeave(conversationEntity, [user], this.userState.self().id, currentTimestamp);
+
       const event = hasResponse
         ? response.event
-        : EventBuilder.buildMemberLeave(conversationEntity, [user], this.userState.self().id, currentTimestamp);
+        : createBaseEvent<MemberLeaveEvent>({
+            conversation: conversationEntity,
+            eventType: CONVERSATION_EVENT.MEMBER_LEAVE,
+            additionalData: {qualified_user_ids: [user], user_ids: [user].map(({id}) => id)},
+            from: this.userState.self().id,
+            timestamp: currentTimestamp,
+          });
 
       this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
       return event;

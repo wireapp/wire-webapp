@@ -466,25 +466,6 @@ export const EventBuilder = {
     };
   },
 
-  buildIncomingMessageTooBig(
-    event: ConversationOtrMessageAddEvent,
-    messageError: Error,
-    errorCode: number,
-  ): ErrorEvent {
-    const {qualified_conversation: conversationId, conversation, data: eventData, from, time} = event;
-
-    return {
-      ...buildQualifiedId(conversationId || conversation),
-      data: undefined,
-      error: `${messageError.message} (${eventData.sender})`,
-      error_code: errorCode,
-      from,
-      id: createUuid(),
-      time,
-      type: ClientEvent.CONVERSATION.INCOMING_MESSAGE_TOO_BIG,
-    };
-  },
-
   buildLegalHoldMessage(
     conversationId: QualifiedId,
     userId: QualifiedId,

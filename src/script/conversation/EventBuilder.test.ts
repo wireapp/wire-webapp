@@ -19,7 +19,7 @@
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {EventBuilder} from 'src/script/conversation/EventBuilder';
+import {AllVerifiedEvent, EventBuilder} from 'src/script/conversation/EventBuilder';
 import {EventMapper} from 'src/script/conversation/EventMapper';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
@@ -27,6 +27,8 @@ import {ClientEvent} from 'src/script/event/Client';
 import {SuperType} from 'src/script/message/SuperType';
 import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
 import {createUuid} from 'Util/uuid';
+
+import {createBaseEvent} from './EventNew';
 
 import {VerificationMessage} from '../entity/message/VerificationMessage';
 
@@ -46,7 +48,13 @@ describe('EventBuilder', () => {
   });
 
   it('buildAllVerified', () => {
-    const event = EventBuilder.buildAllVerified(conversation_et);
+    // const event = EventBuilder.buildAllVerified(conversation_et);
+    const event = createBaseEvent<AllVerifiedEvent>({
+      conversation: conversation_et,
+      eventType: ClientEvent.CONVERSATION.VERIFICATION,
+      additionalData: {type: VerificationMessageType.VERIFIED},
+      from: conversation_et.selfUser().id,
+    });
     const messageEntity = event_mapper.mapJsonEvent(event as any, conversation_et) as VerificationMessage;
     expect(messageEntity).toBeDefined();
     expect(messageEntity.super_type).toBe(SuperType.VERIFICATION);
