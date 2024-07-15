@@ -68,7 +68,7 @@ import {ClientId, Participant, UserId} from './Participant';
 
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
-import {isMLSConversation, MLSConversation} from '../conversation/ConversationSelectors';
+import {isGroupMLSConversation, isMLSConversation, MLSConversation} from '../conversation/ConversationSelectors';
 import {ConversationState} from '../conversation/ConversationState';
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
 import {EventBuilder} from '../conversation/EventBuilder';
@@ -128,7 +128,8 @@ type SubconversationData = {epoch: number; secretKey: string; members: Subconver
 
 const shouldUseMLSConferenceCalling = (conversation: Conversation): conversation is MLSConversation => {
   // As of customer request (due to their environment config), we need to treat 1:1 calls as MLS conference calls
-  return isMLSConversation(conversation);
+  //FIXME: this should check for a feature flag
+  return isGroupMLSConversation(conversation) || isMLSConversation(conversation);
 };
 
 export class CallingRepository {
