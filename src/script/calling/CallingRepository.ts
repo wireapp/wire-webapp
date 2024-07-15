@@ -68,7 +68,7 @@ import {ClientId, Participant, UserId} from './Participant';
 
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
-import {isGroupMLSConversation, isMLSConversation, MLSConversation} from '../conversation/ConversationSelectors';
+import {isMLSConversation, MLSConversation} from '../conversation/ConversationSelectors';
 import {ConversationState} from '../conversation/ConversationState';
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
 import {EventBuilder} from '../conversation/EventBuilder';
@@ -125,6 +125,11 @@ enum CALL_DIRECTION {
 }
 
 type SubconversationData = {epoch: number; secretKey: string; members: SubconversationEpochInfoMember[]};
+
+const shouldUseMLSConferenceCalling = (conversation: Conversation): conversation is MLSConversation => {
+  // As of customer request (due to their environment config), we need to treat 1:1 calls as MLS conference calls
+  return isMLSConversation(conversation);
+};
 
 export class CallingRepository {
   private readonly acceptVersionWarning: (conversationId: QualifiedId) => void;
@@ -382,7 +387,7 @@ export class CallingRepository {
     }
     const allClients = await this.core.service!.conversation.fetchAllParticipantsClients(call.conversationId);
 
-    if (!isGroupMLSConversation(conversation)) {
+    if (!shouldUseMLSConferenceCalling(conversation)) {
       const qualifiedClients = flattenUserMap(allClients);
 
       const clients: Clients = flatten(
@@ -740,7 +745,7 @@ export class CallingRepository {
       this.serializeQualifiedId(conversation.qualifiedId),
       this.serializeQualifiedId(userId),
       conversation && isMLSConversation(conversation) ? senderClientId : clientId,
-      conversation && isGroupMLSConversation(conversation) ? CONV_TYPE.CONFERENCE_MLS : CONV_TYPE.CONFERENCE,
+      conversation && shouldUseMLSConferenceCalling(conversation) ? CONV_TYPE.CONFERENCE_MLS : CONV_TYPE.CONFERENCE,
     );
 
     if (res !== 0) {
@@ -766,7 +771,7 @@ export class CallingRepository {
       return CONV_TYPE.ONEONONE;
     }
 
-    if (isGroupMLSConversation(conversation)) {
+    if (shouldUseMLSConferenceCalling(conversation)) {
       return CONV_TYPE.CONFERENCE_MLS;
     }
     return this.supportsConferenceCalling ? CONV_TYPE.CONFERENCE : CONV_TYPE.GROUP;
@@ -826,7 +831,7 @@ export class CallingRepository {
         this.removeCall(call);
       }
 
-      if (isGroupMLSConversation(conversation)) {
+      if (shouldUseMLSConferenceCalling(conversation)) {
         await this.joinMlsConferenceSubconversation(conversation);
       }
 
@@ -958,7 +963,7 @@ export class CallingRepository {
         [Segmentation.CALL.DIRECTION]: this.getCallDirection(call),
       });
 
-      if (!conversation || !isGroupMLSConversation(conversation)) {
+      if (!conversation || !shouldUseMLSConferenceCalling(conversation)) {
         return;
       }
 
@@ -993,7 +998,7 @@ export class CallingRepository {
 
   private readonly updateConferenceSubconversationEpoch = async (conversationId: QualifiedId) => {
     const conversation = this.getConversationById(conversationId);
-    if (!conversation || !isGroupMLSConversation(conversation)) {
+    if (!conversation || !shouldUseMLSConferenceCalling(conversation)) {
       return;
     }
 
@@ -1012,7 +1017,7 @@ export class CallingRepository {
 
   private readonly handleCallParticipantChange = (conversationId: QualifiedId, members: QualifiedWcallMember[]) => {
     const conversation = this.getConversationById(conversationId);
-    if (!conversation || !isGroupMLSConversation(conversation)) {
+    if (!conversation || !shouldUseMLSConferenceCalling(conversation)) {
       return;
     }
 
@@ -1672,7 +1677,7 @@ export class CallingRepository {
 
     const conversation = this.getConversationById(call.conversationId);
 
-    if (conversation && isGroupMLSConversation(conversation)) {
+    if (conversation && shouldUseMLSConferenceCalling(conversation)) {
       const subconversationEpochInfo = await this.subconversationService.getSubconversationEpochInfo(
         conversation.qualifiedId,
         conversation.groupId,
