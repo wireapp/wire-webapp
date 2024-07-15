@@ -29,7 +29,6 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {ButtonGroupTab} from 'Components/calling/ButtonGroup';
 import 'Components/calling/ChooseScreen';
 import {replaceLink, t} from 'Util/LocalizerUtil';
-import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 
@@ -90,7 +89,6 @@ export class CallingViewModel {
   readonly activeCalls: ko.PureComputed<Call[]>;
   readonly callActions: CallActions;
   readonly isSelfVerified: ko.Computed<boolean>;
-  private readonly logger: Logger;
 
   constructor(
     readonly callingRepository: CallingRepository,
@@ -105,7 +103,6 @@ export class CallingViewModel {
     readonly callState = container.resolve(CallState),
     private readonly teamState = container.resolve(TeamState),
   ) {
-    this.logger = getLogger('CallingViewModel');
     this.isSelfVerified = ko.pureComputed(() => selfUser().is_verified());
     this.activeCalls = ko.pureComputed(() =>
       this.callState.calls().filter(call => {
@@ -169,11 +166,7 @@ export class CallingViewModel {
         return;
       }
 
-      const call = await this.mediaDevicesHandler
-        .initializeMediaDevices(false)
-        .then(() => this.callingRepository.startCall(conversation, callType))
-        .catch(error => this.logger.warn('Could not starting call', error));
-
+      const call = await this.callingRepository.startCall(conversation, callType);
       if (!call) {
         return;
       }
@@ -191,10 +184,7 @@ export class CallingViewModel {
         return;
       }
 
-      await this.mediaDevicesHandler
-        .initializeMediaDevices(false)
-        .then(() => this.callingRepository.answerCall(call))
-        .catch(error => this.logger.warn('Could not answer call', error));
+      await this.callingRepository.answerCall(call);
     };
 
     const hasSoundlessCallsEnabled = (): boolean => {

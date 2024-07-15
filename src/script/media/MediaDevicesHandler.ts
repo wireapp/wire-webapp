@@ -153,6 +153,13 @@ export class MediaDevicesHandler {
       audiooutput: this.availableDevices.audiooutput().length,
       videoinput: this.availableDevices.videoinput().length,
     };
+
+    // The device list must be queried once to obtain the device IDs. This way, the frontend knows whether cameras
+    // and microphones exist and can request them specifically during a call. Additionally, the app needs to know
+    // the device IDs; otherwise, we will receive a Media-Query-Constraint error when querying the devices, as we
+    // explicitly query by the device ID.
+    // The false parameter ensures that we only load the list temporarily.
+    this.initializeMediaDevices(false);
   }
 
   public setOnMediaDevicesRefreshHandler(handler: () => void): void {

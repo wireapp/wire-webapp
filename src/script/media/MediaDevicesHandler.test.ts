@@ -222,7 +222,7 @@ describe('MediaDevicesHandler', () => {
       devicesHandler.initializeMediaDevices(true);
 
       setTimeout(() => {
-        expect(enumerateDevicesSpy).toHaveBeenCalledTimes(1);
+        expect(enumerateDevicesSpy).toHaveBeenCalledTimes(2);
         expect(devicesHandler.availableDevices.videoinput()).toEqual(fakeWorldTestSetup.cameras);
         expect(devicesHandler.availableDevices.audiooutput()).toEqual(fakeWorldTestSetup.speakers);
 
@@ -231,7 +231,7 @@ describe('MediaDevicesHandler', () => {
         navigator.mediaDevices!.ondevicechange?.(Event.prototype);
 
         setTimeout(() => {
-          expect(enumerateDevicesSpy).toHaveBeenCalledTimes(2);
+          expect(enumerateDevicesSpy).toHaveBeenCalledTimes(3);
           expect(devicesHandler.availableDevices.videoinput()).toEqual(newCameras);
           expect(devicesHandler.availableDevices.audiooutput()).toEqual([]);
           done();

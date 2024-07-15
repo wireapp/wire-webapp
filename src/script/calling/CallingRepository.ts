@@ -887,7 +887,7 @@ export class CallingRepository {
         selfParticipant.releaseVideoStream(true);
       } else {
         this.mediaDevicesHandler
-          .initializeMediaDevices(true)
+          .initializeMediaDevices(false)
           .then(() => this.warmupMediaStreams(call, false, true))
           .catch(error => this.logger.warn('Failed to start video stream', error));
       }
@@ -1156,7 +1156,14 @@ export class CallingRepository {
 
   private getMediaStream({audio = false, camera = false, screen = false}: MediaStreamQuery, isGroup: boolean) {
     return this.mediaStreamHandler.requestMediaStream(audio, camera, screen, isGroup).then(stream => {
-      return this.mediaDevicesHandler.initializeMediaDevices(camera).then(() => stream);
+      return this.mediaDevicesHandler
+        .initializeMediaDevices(camera)
+        .then(() => {
+          return stream;
+        })
+        .catch(() => {
+          return stream;
+        });
     });
   }
 
