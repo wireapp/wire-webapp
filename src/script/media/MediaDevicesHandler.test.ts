@@ -175,9 +175,6 @@ describe('MediaDevicesHandler', () => {
       );
 
       const devicesHandler = new MediaDevicesHandler();
-      devicesHandler.getMediaDeviceAccessStream = (_: boolean) => {
-        return Promise.resolve(new MediaStream());
-      };
       devicesHandler.initializeMediaDevices(true);
 
       setTimeout(() => {
@@ -196,9 +193,6 @@ describe('MediaDevicesHandler', () => {
       );
 
       const devicesHandler = new MediaDevicesHandler();
-      devicesHandler.getMediaDeviceAccessStream = (_: boolean) => {
-        return Promise.resolve(new MediaStream());
-      };
       devicesHandler.initializeMediaDevices(true);
 
       expect(realWorldTestSetup.cameras.length).toEqual(2);
@@ -225,9 +219,6 @@ describe('MediaDevicesHandler', () => {
       );
 
       const devicesHandler = new MediaDevicesHandler();
-      devicesHandler.getMediaDeviceAccessStream = (_: boolean) => {
-        return Promise.resolve(new MediaStream());
-      };
       devicesHandler.initializeMediaDevices(true);
 
       setTimeout(() => {
@@ -260,9 +251,6 @@ describe('MediaDevicesHandler', () => {
       );
 
       const devicesHandler = new MediaDevicesHandler();
-      devicesHandler.getMediaDeviceAccessStream = (_: boolean) => {
-        return Promise.resolve(new MediaStream());
-      };
       devicesHandler.initializeMediaDevices(true);
 
       setTimeout(() => {
