@@ -169,11 +169,7 @@ export class CallingViewModel {
         return;
       }
 
-      const call = await this.mediaDevicesHandler
-        .initializeMediaDevices(false)
-        .then(() => this.callingRepository.startCall(conversation, callType))
-        .catch(error => this.logger.warn('Could not starting call', error));
-
+      const call = await this.callingRepository.startCall(conversation, callType);
       if (!call) {
         return;
       }
@@ -191,10 +187,7 @@ export class CallingViewModel {
         return;
       }
 
-      await this.mediaDevicesHandler
-        .initializeMediaDevices(false)
-        .then(() => this.callingRepository.answerCall(call))
-        .catch(error => this.logger.warn('Could not answer call', error));
+      await this.callingRepository.answerCall(call);
     };
 
     const hasSoundlessCallsEnabled = (): boolean => {
