@@ -1155,7 +1155,9 @@ export class CallingRepository {
   };
 
   private getMediaStream({audio = false, camera = false, screen = false}: MediaStreamQuery, isGroup: boolean) {
-    return this.mediaStreamHandler.requestMediaStream(audio, camera, screen, isGroup);
+    return this.mediaStreamHandler.requestMediaStream(audio, camera, screen, isGroup).then(stream => {
+      return this.mediaDevicesHandler.initializeMediaDevices(camera).then(() => stream);
+    });
   }
 
   private handleMediaStreamError(call: Call, requestedStreams: MediaStreamQuery, error: Error | unknown): void {

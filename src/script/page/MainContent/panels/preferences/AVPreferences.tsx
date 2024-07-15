@@ -58,7 +58,11 @@ const AVPreferences = ({
   const initializeMediaDevices = async () => {
     setCheckingPermissions(true);
     try {
-      await devicesHandler?.initializeMediaDevices(true);
+      await streamHandler.requestMediaSreamAccess(true).then(stream => {
+        devicesHandler?.initializeMediaDevices().then(() => {
+          stream?.getTracks().forEach(track => track.stop());
+        });
+      });
     } catch (error) {
       logger.warn(`Initialization of media devices failed: ${error.message}`, error);
     } finally {
