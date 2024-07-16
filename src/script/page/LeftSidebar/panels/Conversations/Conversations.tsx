@@ -109,6 +109,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   const [conversationsFilter, setConversationsFilter] = useState<string>('');
   const {classifiedDomains, isTeam} = useKoSubscribableChildren(teamState, ['classifiedDomains', 'isTeam']);
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
+  const {notifications} = useKoSubscribableChildren(preferenceNotificationRepository, ['notifications']);
 
   const {isTemporaryGuest} = useKoSubscribableChildren(selfUser, ['isTemporaryGuest']);
 
@@ -264,6 +265,7 @@ const Conversations: React.FC<ConversationsProps> = ({
           archivedConversations={archivedConversations}
           conversationRepository={conversationRepository}
           onClickPreferences={() => onClickPreferences(ContentState.PREFERENCES_ACCOUNT)}
+          showNotificationsBadge={notifications.length > 0}
         />
       </FadingScrollbar>
 

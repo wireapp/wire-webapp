@@ -184,7 +184,7 @@ export const ConversationTabs = ({
           }}
           conversationTabIndex={1}
           dataUieName="go-preferences"
-          showNotificationBadge={showNotificationsBadge}
+          showNotificationsBadge={showNotificationsBadge}
           isActive={currentTab === SidebarTabs.PREFERENCES}
         />
 
