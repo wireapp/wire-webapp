@@ -886,10 +886,7 @@ export class CallingRepository {
       if (newState === VIDEO_STATE.STOPPED) {
         selfParticipant.releaseVideoStream(true);
       } else {
-        this.mediaDevicesHandler
-          .initializeMediaDevices(false)
-          .then(() => this.warmupMediaStreams(call, false, true))
-          .catch(error => this.logger.warn('Failed to start video stream', error));
+        this.warmupMediaStreams(call, false, true);
       }
     }
     this.wCall?.setVideoSendState(this.wUser, this.serializeQualifiedId(call.conversation.qualifiedId), newState);
