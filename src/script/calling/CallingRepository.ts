@@ -128,8 +128,7 @@ type SubconversationData = {epoch: number; secretKey: string; members: Subconver
 
 const shouldUseMLSConferenceCalling = (conversation: Conversation): conversation is MLSConversation => {
   // As of customer request (due to their environment config), we need to treat 1:1 calls as MLS conference calls
-  //FIXME: this should check for a feature flag
-  return isGroupMLSConversation(conversation) || isMLSConversation(conversation);
+  return isGroupMLSConversation(conversation) || Config.getConfig().FEATURE.USE_MLS_CONFERENCE_FOR_ONEONONE_CALLS;
 };
 
 export class CallingRepository {
@@ -768,13 +767,14 @@ export class CallingRepository {
   //##############################################################################
 
   private getConversationType(conversation: Conversation): CONV_TYPE {
+    if (shouldUseMLSConferenceCalling(conversation)) {
+      return CONV_TYPE.CONFERENCE_MLS;
+    }
+
     if (!conversation.isGroup()) {
       return CONV_TYPE.ONEONONE;
     }
 
-    if (shouldUseMLSConferenceCalling(conversation)) {
-      return CONV_TYPE.CONFERENCE_MLS;
-    }
     return this.supportsConferenceCalling ? CONV_TYPE.CONFERENCE : CONV_TYPE.GROUP;
   }
 
