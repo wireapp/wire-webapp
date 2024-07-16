@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [46.1.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.0.19...@wireapp/core@46.1.0) (2024-07-16)
+
+### Features
+
+* **core:** Add support for InCallEmoji proto message ([#6378](https://github.com/wireapp/wire-web-packages/issues/6378)) ([fcd765e](https://github.com/wireapp/wire-web-packages/commit/fcd765e7cadf13f5f82a89e61d2cd625fa525eee))
+
 ## [46.0.19](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.0.18...@wireapp/core@46.0.19) (2024-07-05)
 
 **Note:** Version bump only for package @wireapp/core
