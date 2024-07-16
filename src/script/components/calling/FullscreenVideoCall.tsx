@@ -20,6 +20,7 @@
 import React, {useState, useEffect} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+import classNames from 'classnames';
 import {container} from 'tsyringe';
 
 import {CALL_TYPE} from '@wireapp/avs';
@@ -85,14 +86,18 @@ export interface FullscreenVideoCallProps {
   toggleCamera: (call: Call) => void;
   toggleMute: (call: Call, muteState: boolean) => void;
   toggleScreenshare: (call: Call) => void;
+  sendEmoji: (emoji: string, call: Call) => void;
   videoGrid: Grid;
 }
+
+const EMOJIS_LIST = ['👍', '🎉', '❤️', '😂', '😮', '👏', '🤔', '😢', '👎'];
 
 const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   call,
   canShareScreen,
   conversation,
   isChoosingScreen,
+  sendEmoji,
   isMuted,
   muteState,
   mediaDevicesHandler,
@@ -113,6 +118,8 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   teamState = container.resolve(TeamState),
   callState = container.resolve(CallState),
 }) => {
+  const [showEmojisBar, setShowEmojisBar] = useState<boolean>(false);
+  const [disabledEmojis, setDisabledEmojis] = useState<string[]>([]);
   const selfParticipant = call.getSelfParticipant();
   const {sharesScreen: selfSharesScreen, sharesCamera: selfSharesCamera} = useKoSubscribableChildren(selfParticipant, [
     'sharesScreen',
@@ -150,6 +157,9 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     MediaDeviceType.AUDIO_INPUT,
     MediaDeviceType.AUDIO_OUTPUT,
   ]);
+
+  const {emojis} = useKoSubscribableChildren(callState, ['emojis']);
+
   const [audioOptionsOpen, setAudioOptionsOpen] = useState(false);
   const [videoOptionsOpen, setVideoOptionsOpen] = useState(false);
   const minimize = () => callState.viewMode(CallingViewMode.MINIMIZED);
@@ -271,6 +281,18 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
       switchCameraInput(camera.id);
     }
   };
+
+  const onEmojiClick = (selectedEmoji: string) => {
+    setDisabledEmojis(prev => [...prev, selectedEmoji]);
+
+    sendEmoji(selectedEmoji, call);
+
+    setTimeout(() => {
+      setDisabledEmojis(prev => [...prev].filter(emoji => emoji !== selectedEmoji));
+    }, 4000);
+  };
+
+  console.info('bardia', {disabledEmojis});
 
   const unreadMessagesCount = useAppState(state => state.unreadMessagesCount);
   const hasUnreadMessages = unreadMessagesCount > 0;
@@ -423,6 +445,31 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
 
       {!isChoosingScreen && (
         <div id="video-controls" className="video-controls">
+          {showEmojisBar && (
+            <div className="video-controls-emoji-bar">
+              {EMOJIS_LIST.map(emoji => {
+                const isDisabled = disabledEmojis.includes(emoji);
+                return (
+                  <button
+                    key={emoji}
+                    disabled={isDisabled}
+                    onClick={() => onEmojiClick(emoji)}
+                    className={classNames({disabled: isDisabled})}
+                  >
+                    {emoji}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {emojis.map(({id, emoji, left, from}) => (
+            <div key={id} className="emoji" style={{left}}>
+              <span>{emoji}</span>
+              <span className="emoji-text">{from}</span>
+            </div>
+          ))}
+
           <ul className="video-controls__wrapper">
             {!horizontalSmBreakpoint && (
               <li className="video-controls__item__minimize">
@@ -611,6 +658,21 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                 </button>
               </li>
 
+              <li className="video-controls__item">
+                <button
+                  css={showEmojisBar ? videoControlActiveStyles : videoControlInActiveStyles}
+                  className="video-controls__button"
+                  onClick={() => setShowEmojisBar(prev => !prev)}
+                  type="button"
+                  aria-labelledby="show-emoji-bar"
+                  data-uie-name="do-call-controls-video-call-cancel"
+                >
+                  <Icon.LikeIcon />
+                  <span id="show-emoji-bar" className="video-controls__button__label">
+                    {t('callReactions')}
+                  </span>
+                </button>
+              </li>
               <li className="video-controls__item">
                 <button
                   className="video-controls__button video-controls__button--red"

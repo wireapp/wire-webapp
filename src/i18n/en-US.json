@@ -327,6 +327,7 @@
   "callStateIncoming": "Calling…",
   "callStateIncomingGroup": "{{user}} is calling",
   "callStateOutgoing": "Ringing…",
+  "callReactions": "Reactions",
   "callWasEndedBecause": "Your call was ended because",
   "callingRestrictedConferenceCallOwnerModalDescription": "Your team is currently on the free Basic plan. Upgrade to Enterprise for access to features such as starting conferences and more. [link]Learn more about {{brandName}} Enterprise[/link]",
   "callingRestrictedConferenceCallOwnerModalTitle": "Upgrade to Enterprise",

@@ -44,9 +44,12 @@ export enum CallingViewMode {
   DETACHED_WINDOW = 'detached-window',
 }
 
+type Emoji = {emoji: string; id: string; left: number; from: string};
+
 @singleton()
 export class CallState {
   public readonly calls: ko.ObservableArray<Call> = ko.observableArray();
+  public readonly emojis: ko.ObservableArray<Emoji> = ko.observableArray<Emoji>([]);
   /** List of calls that can be joined by the user */
   public readonly joinableCalls: ko.PureComputed<Call[]>;
   public readonly acceptedVersionWarnings = ko.observableArray<QualifiedId>();
