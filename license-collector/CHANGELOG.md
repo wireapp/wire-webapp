@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.12.8](https://github.com/wireapp/wire-web-packages/compare/@wireapp/license-collector@0.12.7...@wireapp/license-collector@0.12.8) (2024-07-16)
+
+**Note:** Version bump only for package @wireapp/license-collector
+
 ## [0.12.7](https://github.com/wireapp/wire-web-packages/compare/@wireapp/license-collector@0.12.6...@wireapp/license-collector@0.12.7) (2024-05-21)
 
 **Note:** Version bump only for package @wireapp/license-collector
