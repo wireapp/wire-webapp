@@ -47,3 +47,4 @@ export * from './QuoteContent';
 export * from './ReactionContent';
 export * from './TextContent';
 export * from './TweetContent';
+export * from './InCallEmojiContent';

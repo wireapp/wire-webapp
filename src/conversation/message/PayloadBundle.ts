@@ -69,6 +69,7 @@ export enum PayloadBundleType {
   MLS_WELCOME_MESSAGE = 'PayloadBundleType.MLS_WELCOME',
   PING = 'PayloadBundleType.PING',
   REACTION = 'PayloadBundleType.REACTION',
+  IN_CALL_EMOJI = 'PayloadBundleType.IN_CALL_EMOJI',
   TEAM_CONVERSATION_CREATE = 'PayloadBundleType.TEAM_CONVERSATION_CREATE',
   TEAM_CONVERSATION_DELETE = 'PayloadBundleType.TEAM_CONVERSATION_DELETE',
   TEAM_DELETE = 'PayloadBundleType.TEAM_DELETE',
