@@ -58,6 +58,7 @@ import {getLogger, Logger} from 'Util/Logger';
 import {roundLogarithmic} from 'Util/NumberUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {createUuid} from 'Util/uuid';
 
 import {Call, SerializedConversationId} from './Call';
 import {callingSubscriptions} from './callingSubscriptionsHandler';
@@ -738,7 +739,7 @@ export class CallingRepository {
         const isSelf = matchQualifiedIds(this.selfUser.qualifiedId, userId);
 
         const newEmojis = emojis.map(emoji => {
-          const id = Math.random().toString(36).substring(2, 9);
+          const id = createUuid();
 
           return {
             id: `${Date.now()}-${id}`,
