@@ -104,25 +104,27 @@ const ListWrapper = ({
                 <span>{t('internetConnectionSlow')}</span>
               </p>
             )}
-            {headerElement || (
-              <>
-                <h2 className="left-list-header-text" data-uie-name={headerUieName}>
-                  {header}
-                </h2>
+            <div className="left-list-header-title-wrapper">
+              {headerElement || (
+                <>
+                  <h2 className="left-list-header-text" data-uie-name={headerUieName}>
+                    {header}
+                  </h2>
 
-                {onClose && (
-                  <button
-                    type="button"
-                    className="left-list-header-close-button button-icon-large"
-                    onClick={onClose}
-                    title={t('tooltipSearchClose')}
-                    data-uie-name={`do-close-${id}`}
-                  >
-                    <Icon.CloseIcon />
-                  </button>
-                )}
-              </>
-            )}
+                  {onClose && (
+                    <button
+                      type="button"
+                      className="left-list-header-close-button button-icon-large"
+                      onClick={onClose}
+                      title={t('tooltipSearchClose')}
+                      data-uie-name={`do-close-${id}`}
+                    >
+                      <Icon.CloseIcon />
+                    </button>
+                  )}
+                </>
+              )}
+            </div>
           </header>
         )}
 
