@@ -17,7 +17,7 @@
  *
  */
 
-import {isMediaStreamDeviceError} from './MediaStreamErrorTypes';
+import {isMediaStreamDeviceError, isMediaStreamReadDeviceError} from './MediaStreamErrorTypes';
 
 describe('MediaStreamErrorTypes', () => {
   describe('isMediaStreamDeviceError', () => {
@@ -35,6 +35,24 @@ describe('MediaStreamErrorTypes', () => {
       expect(isMediaStreamDeviceError('TypeError')).toBeFalsy();
       expect(isMediaStreamDeviceError('FooBar')).toBeFalsy();
       expect(isMediaStreamDeviceError('')).toBeFalsy();
+    });
+  });
+
+  describe('isMediaStreamReadDeviceError', () => {
+    it('detects device read errors', () => {
+      expect(isMediaStreamReadDeviceError('NotFoundError')).toBeTruthy();
+      expect(isMediaStreamReadDeviceError('NotAllowedError')).toBeTruthy();
+      expect(isMediaStreamReadDeviceError('NotReadableError')).toBeTruthy();
+    });
+
+    it('recognizes that an error is not a device read error', () => {
+      expect(isMediaStreamReadDeviceError('AbortError')).toBeFalsy();
+      expect(isMediaStreamReadDeviceError('NotSupportedError')).toBeFalsy();
+      expect(isMediaStreamReadDeviceError('OverConstrainedError')).toBeFalsy();
+      expect(isMediaStreamReadDeviceError('SecurityError')).toBeFalsy();
+      expect(isMediaStreamReadDeviceError('TypeError')).toBeFalsy();
+      expect(isMediaStreamReadDeviceError('FooBar')).toBeFalsy();
+      expect(isMediaStreamReadDeviceError('')).toBeFalsy();
     });
   });
 });
