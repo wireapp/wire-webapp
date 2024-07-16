@@ -23,7 +23,7 @@ import {getLogger, Logger} from 'Util/Logger';
 
 import {MediaConstraintsHandler, ScreensharingMethods} from './MediaConstraintsHandler';
 import {MEDIA_STREAM_ERROR} from './MediaStreamError';
-import {MEDIA_STREAM_ERROR_TYPES} from './MediaStreamErrorTypes';
+import {isMediaStreamDeviceError, MEDIA_STREAM_ERROR_TYPES} from './MediaStreamErrorTypes';
 import {MediaType} from './MediaType';
 
 import {MediaError} from '../error/MediaError';
@@ -87,14 +87,7 @@ export class MediaStreamHandler {
         return mediaStream;
       })
       .catch((error: Error) => {
-        const name = error.name as MEDIA_STREAM_ERROR;
-        if (
-          [
-            MEDIA_STREAM_ERROR.NOT_READABLE_ERROR,
-            MEDIA_STREAM_ERROR.NOT_ALLOWED_ERROR,
-            MEDIA_STREAM_ERROR.NOT_FOUND_ERROR,
-          ].includes(name)
-        ) {
+        if (isMediaStreamDeviceError(error.name)) {
           this.schedulePermissionHint(audio, video, screen);
         }
         throw error;
