@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2024 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,7 @@
  *
  */
 
-export * from './AbortReason';
-export * from './AssetService';
-export * from './AssetTransferState';
-export * from './ClientActionType';
-export * from './ConversationService';
-export * from './GenericMessageType';
-export * from './MessageTimer';
-export * from './message/PayloadBundle';
-export * from './message/Message.types';
-export * from './ReactionType';
-export * from './InCallEmojiType';
+/**
+ * example value: {"👍": 2, "😂": 3}
+ */
+export type InCallEmojiType = Record<string, number>;

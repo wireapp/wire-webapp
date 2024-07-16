@@ -39,6 +39,7 @@ import {
   LocationContent,
   ReactionContent,
   TextContent,
+  InCallEmojiContent,
 } from '../content';
 
 export interface TextMessage extends BasePayloadBundle {
@@ -105,6 +106,11 @@ export interface LocationMessage extends BasePayloadBundle {
 export interface ReactionMessage extends BasePayloadBundle {
   content: ReactionContent;
   type: PayloadBundleType.REACTION;
+}
+
+export interface InCallEmojiMessage extends BasePayloadBundle {
+  content: InCallEmojiContent;
+  type: PayloadBundleType.IN_CALL_EMOJI;
 }
 
 export interface ConfirmationMessage extends BasePayloadBundle {

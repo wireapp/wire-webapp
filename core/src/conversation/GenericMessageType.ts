@@ -41,5 +41,6 @@ export enum GenericMessageType {
   LAST_READ = 'lastRead',
   LOCATION = 'location',
   REACTION = 'reaction',
+  IN_CALL_EMOJI = 'inCallEmoji',
   TEXT = 'text',
 }

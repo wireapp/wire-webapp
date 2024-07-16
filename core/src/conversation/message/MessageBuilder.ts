@@ -38,6 +38,7 @@ import {
   MessageEdit,
   MessageHide,
   Reaction,
+  InCallEmoji,
   LastRead,
   Cleared,
   ICalling,
@@ -54,6 +55,7 @@ import {
   FileAssetMetaDataMessage,
   HideMessage,
   ImageAssetMessageOutgoing,
+  InCallEmojiMessage,
   LocationMessage,
   PingMessage,
   ReactionMessage,
@@ -291,6 +293,19 @@ export function buildReactionMessage(payloadBundle: ReactionMessage['content']):
     messageId: createId(),
   });
   return genericMessage;
+}
+
+export function buildInCallEmojiMessage(payloadBundle: InCallEmojiMessage['content']): GenericMessage {
+  const {emojis} = payloadBundle;
+
+  const reaction = InCallEmoji.create({
+    emojis,
+  });
+
+  return GenericMessage.create({
+    [GenericMessageType.IN_CALL_EMOJI]: reaction,
+    messageId: createId(),
+  });
 }
 
 export function buildSessionResetMessage(): GenericMessage {
