@@ -67,6 +67,10 @@ const DataUsageSection: React.FC<DataUsageSectionProps> = ({
 
   const showCountly = !isTeam || (isTeam && isCountlyEnabled);
 
+  if (!showCountly && !isActivatedAccount) {
+    return null;
+  }
+
   return (
     <PreferencesSection hasSeparator title={t('preferencesAccountData')} className="preferences-section-data-usage">
       {showCountly && (
