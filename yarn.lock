@@ -17847,7 +17847,6 @@ __metadata:
     "@types/underscore": "npm:1.11.15"
     "@types/uuid": "npm:10.0.0"
     "@types/webpack-env": "npm:1.18.5"
-    "@wireapp/api-client": "npm:^27.1.0"
     "@wireapp/avs": "npm:9.7.15"
     "@wireapp/commons": "npm:5.2.8"
     "@wireapp/copy-config": "npm:2.2.2"

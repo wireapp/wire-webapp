@@ -6,7 +6,6 @@
     "@lexical/history": "0.16.1",
     "@lexical/react": "0.16.1",
     "@mediapipe/tasks-vision": "0.10.14",
-    "@wireapp/api-client": "^27.1.0",
     "@wireapp/avs": "9.7.15",
     "@wireapp/commons": "5.2.8",
     "@wireapp/core": "46.1.2",
