@@ -445,11 +445,17 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
       {!isChoosingScreen && (
         <div id="video-controls" className="video-controls">
           {showEmojisBar && (
-            <div className="video-controls-emoji-bar" data-uie-name="video-controls-emoji-bar">
+            <div
+              role="toolbar"
+              className="video-controls-emoji-bar"
+              data-uie-name="video-controls-emoji-bar"
+              aria-label={t('callReactionButtonsAriaLabel')}
+            >
               {EMOJIS_LIST.map(emoji => {
                 const isDisabled = disabledEmojis.includes(emoji);
                 return (
                   <button
+                    aria-label={t('callReactionButtonAriaLabel', {emoji})}
                     data-uie-name="video-controls-emoji"
                     data-uie-value={emoji}
                     key={emoji}
@@ -466,15 +472,19 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
 
           {emojis.map(({id, emoji, left, from}) => (
             <div
+              key={id}
+              role="img"
+              className="emoji"
+              aria-label={t('callReactionsAriaLabel', {from, emoji})}
+              style={{left}}
               data-uie-from={from}
               data-uie-value={emoji}
               data-uie-name="flying-emoji"
-              key={id}
-              className="emoji"
-              style={{left}}
             >
-              <span>{emoji}</span>
-              <span className="emoji-text">{from}</span>
+              <span aria-hidden="true">{emoji}</span>
+              <span className="emoji-text" aria-hidden="true">
+                {from}
+              </span>
             </div>
           ))}
 
