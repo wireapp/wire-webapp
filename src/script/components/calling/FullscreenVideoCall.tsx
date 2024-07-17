@@ -465,7 +465,14 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
           )}
 
           {emojis.map(({id, emoji, left, from}) => (
-            <div data-uie-name="flying-emoji" data-uie-value={emoji} key={id} className="emoji" style={{left}}>
+            <div
+              data-uie-from={from}
+              data-uie-value={emoji}
+              data-uie-name="flying-emoji"
+              key={id}
+              className="emoji"
+              style={{left}}
+            >
               <span>{emoji}</span>
               <span className="emoji-text">{from}</span>
             </div>
