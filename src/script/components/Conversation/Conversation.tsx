@@ -115,6 +115,8 @@ export const Conversation = ({
     ],
   );
 
+  const {isTemporaryGuest} = useKoSubscribableChildren(selfUser, ['isTemporaryGuest']);
+
   const inTeam = teamState.isInTeam(selfUser);
 
   const {activeCalls, viewMode} = useKoSubscribableChildren(callState, ['activeCalls', 'viewMode']);
@@ -483,7 +485,7 @@ export const Conversation = ({
             callActions={mainViewModel.calling.callActions}
             openRightSidebar={openRightSidebar}
             isRightSidebarOpen={isRightSidebarOpen}
-            isReadOnlyConversation={isReadOnlyConversation || !isActiveParticipant}
+            isReadOnlyConversation={isReadOnlyConversation || (!isTemporaryGuest && !isActiveParticipant)}
           />
 
           {activeCalls.map(call => {
@@ -538,7 +540,7 @@ export const Conversation = ({
           />
 
           {isConversationLoaded &&
-            (isReadOnlyConversation || !isActiveParticipant ? (
+            (isReadOnlyConversation || (!isTemporaryGuest && !isActiveParticipant) ? (
               <ReadOnlyConversationMessage reloadApp={reloadApp} conversation={activeConversation} />
             ) : (
               <InputBar
