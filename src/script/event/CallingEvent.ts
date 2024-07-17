@@ -19,6 +19,7 @@
 
 import type {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import {InCallEmojiType} from '@wireapp/core/lib/conversation';
 
 import {CALL} from './Client';
 
@@ -30,6 +31,7 @@ interface CallingRemoteMuteEventContentData {
 
 interface CallingEventContentData {
   [CALL_MESSAGE_TYPE.REMOTE_MUTE]: CallingRemoteMuteEventContentData;
+  [CALL_MESSAGE_TYPE.EMOJIS]: {};
 }
 
 type CallingEventContent = {
@@ -38,6 +40,7 @@ type CallingEventContent = {
         type: EventType;
         version: string;
         data: CallingEventContentData[EventType];
+        emojis: InCallEmojiType;
       }
     : {type: EventType; version: string};
 }[CALL_MESSAGE_TYPE];
