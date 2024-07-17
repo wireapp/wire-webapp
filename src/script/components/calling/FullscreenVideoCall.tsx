@@ -445,11 +445,13 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
       {!isChoosingScreen && (
         <div id="video-controls" className="video-controls">
           {showEmojisBar && (
-            <div className="video-controls-emoji-bar">
+            <div className="video-controls-emoji-bar" data-uie-name="video-controls-emoji-bar">
               {EMOJIS_LIST.map(emoji => {
                 const isDisabled = disabledEmojis.includes(emoji);
                 return (
                   <button
+                    data-uie-name="video-controls-emoji"
+                    data-uie-value={emoji}
                     key={emoji}
                     disabled={isDisabled}
                     onClick={() => onEmojiClick(emoji)}
@@ -463,7 +465,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
           )}
 
           {emojis.map(({id, emoji, left, from}) => (
-            <div key={id} className="emoji" style={{left}}>
+            <div data-uie-name="flying-emoji" data-uie-value={emoji} key={id} className="emoji" style={{left}}>
               <span>{emoji}</span>
               <span className="emoji-text">{from}</span>
             </div>
