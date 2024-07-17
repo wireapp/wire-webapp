@@ -262,7 +262,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
 
           {(currentState === PanelState.GUEST_OPTIONS || currentState === PanelState.SERVICES_OPTIONS) && (
             <GuestServicesOptions
-              isPasswordSupported={false} // TODO: change to "core?.backendFeatures.supportsGuestLinksWithPassword" when other clients implement passwords
+              isPasswordSupported={core?.backendFeatures.supportsGuestLinksWithPassword}
               isGuest={currentState === PanelState.GUEST_OPTIONS}
               activeConversation={activeConversation}
               conversationRepository={conversationRepository}
