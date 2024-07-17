@@ -74,13 +74,21 @@ export const DetachedWindow = ({children, name, onClose, width = 600, height = 6
 
     newWindow.document.title = window.document.title;
 
+    const onPageHide = (event: PageTransitionEvent) => {
+      if (event.persisted) {
+        return;
+      }
+      onClose();
+      newWindow.close();
+    };
+
     newWindow.addEventListener('beforeunload', onClose);
-    window.addEventListener('beforeunload', onClose);
+    window.addEventListener('pagehide', onPageHide);
 
     return () => {
       newWindow.close();
       newWindow.removeEventListener('beforeunload', onClose);
-      window.removeEventListener('beforeunload', onClose);
+      window.removeEventListener('pagehide', onPageHide);
     };
   }, [height, name, width, onClose, newWindow]);
 
