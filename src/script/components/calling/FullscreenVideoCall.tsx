@@ -292,8 +292,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     }, 4000);
   };
 
-  console.info('bardia', {disabledEmojis});
-
   const unreadMessagesCount = useAppState(state => state.unreadMessagesCount);
   const hasUnreadMessages = unreadMessagesCount > 0;
 
