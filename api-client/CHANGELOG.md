@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.1.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.0.13...@wireapp/api-client@27.1.0) (2024-07-17)
+
+### Features
+
+* remove improve_wire privacy attribute ([#6380](https://github.com/wireapp/wire-web-packages/issues/6380)) ([e0a054b](https://github.com/wireapp/wire-web-packages/commit/e0a054bf9114ad46aa2373ef22f995499e14dafa))
+
 ## [27.0.13](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.0.12...@wireapp/api-client@27.0.13) (2024-07-16)
 
 **Note:** Version bump only for package @wireapp/api-client
