@@ -144,6 +144,9 @@ export class CallingRepository {
   private wUser: number = 0;
   private nextMuteState: MuteState = MuteState.SELF_MUTED;
   private isConferenceCallingSupported = false;
+
+  static EMOJI_TIME_OUT_DURATION = TIME_IN_MILLIS.SECOND * 4;
+
   /**
    * Keeps track of the size of the avs log once the webapp is initiated. This allows detecting meaningless avs logs (logs that have a length equal to the length when the webapp was initiated)
    */
@@ -756,7 +759,7 @@ export class CallingRepository {
             .emojis()
             .filter(item => !newEmojis.some(newItem => newItem.id === item.id));
           this.callState.emojis(remainingEmojis);
-        }, 4000);
+        }, CallingRepository.EMOJI_TIME_OUT_DURATION);
         break;
       }
 

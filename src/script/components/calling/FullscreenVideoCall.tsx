@@ -29,6 +29,7 @@ import {IconButton, IconButtonVariant, Select, useMatchMedia} from '@wireapp/rea
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import * as Icon from 'Components/Icon';
 import {ConversationClassifiedBar} from 'Components/input/ClassifiedBar';
+import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {isMediaDevice} from 'src/script/guards/MediaDevice';
 import {MediaDeviceType} from 'src/script/media/MediaDeviceType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -289,7 +290,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
 
     setTimeout(() => {
       setDisabledEmojis(prev => [...prev].filter(emoji => emoji !== selectedEmoji));
-    }, 4000);
+    }, CallingRepository.EMOJI_TIME_OUT_DURATION);
   };
 
   const unreadMessagesCount = useAppState(state => state.unreadMessagesCount);
