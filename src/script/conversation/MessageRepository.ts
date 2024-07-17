@@ -26,6 +26,7 @@ import {
   ReactionType,
   GenericMessageType,
   SendResult,
+  InCallEmojiType,
 } from '@wireapp/core/lib/conversation';
 import {
   AudioMetaData,
@@ -1008,6 +1009,12 @@ export class MessageRepository {
     const reaction = MessageBuilder.buildReactionMessage({originalMessageId: messageEntity.id, type: reactions});
 
     return this.sendAndInjectMessage(reaction, conversation);
+  }
+
+  public async sendInCallEmoji(conversation: Conversation, emojis: InCallEmojiType) {
+    const emojisMessage = MessageBuilder.buildInCallEmojiMessage({emojis});
+
+    return this.sendAndInjectMessage(emojisMessage, conversation);
   }
 
   private expectReadReceipt(conversationEntity: Conversation): boolean {
