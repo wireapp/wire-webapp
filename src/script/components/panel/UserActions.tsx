@@ -168,7 +168,7 @@ const UserActions: React.FC<UserActionsProps> = ({
     user.isMe &&
     isSelfActivated &&
     conversation?.isGroup() &&
-    !conversation.removed_from_conversation() &&
+    !conversation.isSelfUserRemoved() &&
     conversationRoleRepository?.canLeaveGroup(conversation)
       ? {
           click: async () => {
@@ -327,7 +327,7 @@ const UserActions: React.FC<UserActionsProps> = ({
   const removeUserFromConversation: MenuItem | undefined =
     isNotMe &&
     conversation &&
-    !conversation.removed_from_conversation() &&
+    !conversation.isSelfUserRemoved() &&
     conversation.participating_user_ids().some(userId => matchQualifiedIds(userId, user)) &&
     conversationRoleRepository?.canRemoveParticipants(conversation)
       ? {
