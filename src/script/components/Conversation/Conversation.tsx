@@ -102,20 +102,18 @@ export const Conversation = ({
     'isFileSharingSendingEnabled',
   ]);
 
-  const {
-    is1to1,
-    isRequest,
-    isReadOnlyConversation,
-    removed_from_conversation: removedFromConversation,
-  } = useKoSubscribableChildren(activeConversation!, [
-    'is1to1',
-    'isRequest',
-    'readOnlyState',
-    'participating_user_ets',
-    'connection',
-    'isReadOnlyConversation',
-    'removed_from_conversation',
-  ]);
+  const {is1to1, isRequest, isReadOnlyConversation, isSelfUserRemoved} = useKoSubscribableChildren(
+    activeConversation!,
+    [
+      'is1to1',
+      'isRequest',
+      'readOnlyState',
+      'participating_user_ets',
+      'connection',
+      'isReadOnlyConversation',
+      'isSelfUserRemoved',
+    ],
+  );
 
   const inTeam = teamState.isInTeam(selfUser);
 
@@ -485,7 +483,7 @@ export const Conversation = ({
             callActions={mainViewModel.calling.callActions}
             openRightSidebar={openRightSidebar}
             isRightSidebarOpen={isRightSidebarOpen}
-            isReadOnlyConversation={isReadOnlyConversation || removedFromConversation}
+            isReadOnlyConversation={isReadOnlyConversation || isSelfUserRemoved}
           />
 
           {activeCalls.map(call => {
@@ -540,7 +538,7 @@ export const Conversation = ({
           />
 
           {isConversationLoaded &&
-            (isReadOnlyConversation || removedFromConversation ? (
+            (isReadOnlyConversation || isSelfUserRemoved ? (
               <ReadOnlyConversationMessage reloadApp={reloadApp} conversation={activeConversation} />
             ) : (
               <InputBar

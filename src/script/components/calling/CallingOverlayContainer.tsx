@@ -135,7 +135,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
 
   const conversation = joinedCall?.conversation;
 
-  if (isDetachedWindow || !joinedCall || !conversation || conversation.removed_from_conversation()) {
+  if (isDetachedWindow || !joinedCall || !conversation || conversation.isSelfUserRemoved()) {
     return null;
   }
 

@@ -75,7 +75,7 @@ const ConversationListCell = ({
     selfUser,
     participating_user_ets: users,
     display_name: displayName,
-    removed_from_conversation: removedFromConversation,
+    isSelfUserRemoved,
     unreadState,
     mutedState,
     isRequest,
@@ -86,7 +86,7 @@ const ConversationListCell = ({
     'selfUser',
     'participating_user_ets',
     'display_name',
-    'removed_from_conversation',
+    'isSelfUserRemoved',
     'unreadState',
     'mutedState',
     'isRequest',
@@ -180,7 +180,7 @@ const ConversationListCell = ({
 
           <div
             className={cx('conversation-list-cell-left', {
-              'conversation-list-cell-left-opaque': removedFromConversation || users.length === 0,
+              'conversation-list-cell-left-opaque': isSelfUserRemoved || users.length === 0,
             })}
           >
             {isGroup && <GroupAvatar className="conversation-list-cell-avatar-arrow" users={users} />}

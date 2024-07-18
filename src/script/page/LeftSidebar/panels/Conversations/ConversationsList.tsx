@@ -87,7 +87,7 @@ export const ConversationsList = ({
     if (!call) {
       return false;
     }
-    return !conversation.removed_from_conversation();
+    return !conversation.isSelfUserRemoved();
   };
 
   const {setCurrentView} = useAppMainState(state => state.responsiveView);

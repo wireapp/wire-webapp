@@ -107,7 +107,7 @@ export class CallingViewModel {
     this.activeCalls = ko.pureComputed(() =>
       this.callState.calls().filter(call => {
         const {conversation} = call;
-        if (!conversation || conversation.removed_from_conversation()) {
+        if (!conversation || conversation.isSelfUserRemoved()) {
           return false;
         }
 
