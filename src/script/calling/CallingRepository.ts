@@ -126,6 +126,8 @@ enum CALL_DIRECTION {
 
 type SubconversationData = {epoch: number; secretKey: string; members: SubconversationEpochInfoMember[]};
 
+//FIXME: This is a temporary solution to enable conference calling for one-on-one calls
+// there will be a feature flag to enable this
 const useConferenceForOneOnOneCalls = true;
 
 export class CallingRepository {
