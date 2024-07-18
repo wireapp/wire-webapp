@@ -128,7 +128,7 @@ type SubconversationData = {epoch: number; secretKey: string; members: Subconver
 
 //FIXME: This is a temporary solution to enable conference calling for one-on-one calls
 // there will be a feature flag to enable this
-const useConferenceForOneOnOneCalls = true;
+const useConferenceForOneOnOneCalls = false;
 
 export class CallingRepository {
   private readonly acceptVersionWarning: (conversationId: QualifiedId) => void;
