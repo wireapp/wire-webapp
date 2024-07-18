@@ -126,9 +126,11 @@ enum CALL_DIRECTION {
 
 type SubconversationData = {epoch: number; secretKey: string; members: SubconversationEpochInfoMember[]};
 
+const useConferenceForOneOnOneCalls = true;
+
 const shouldUseMLSConferenceCalling = (conversation: Conversation): conversation is MLSConversation => {
   // As of customer request (due to their environment config), we need to treat 1:1 calls as MLS conference calls
-  return isGroupMLSConversation(conversation) || Config.getConfig().FEATURE.USE_MLS_CONFERENCE_FOR_ONEONONE_CALLS;
+  return isGroupMLSConversation(conversation) || useConferenceForOneOnOneCalls;
 };
 
 export class CallingRepository {

@@ -66,7 +66,6 @@ export function generateConfig(params: ConfigGeneratorParams, env: Env) {
         : undefined,
       SHOW_LOADING_INFORMATION: env.FEATURE_SHOW_LOADING_INFORMATION == 'true',
       USE_CORE_CRYPTO: env.FEATURE_USE_CORE_CRYPTO == 'true',
-      USE_MLS_CONFERENCE_FOR_ONEONONE_CALLS: env.FEATURE_USE_MLS_CONFERENCE_FOR_ONEONONE_CALLS == 'true',
       MAX_USERS_TO_PING_WITHOUT_ALERT:
         (env.FEATURE_MAX_USERS_TO_PING_WITHOUT_ALERT && Number(env.FEATURE_MAX_USERS_TO_PING_WITHOUT_ALERT)) || 4,
     },
