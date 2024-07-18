@@ -538,7 +538,8 @@ export const Conversation = ({
           />
 
           {isConversationLoaded &&
-            (isReadOnlyConversation || isSelfUserRemoved ? (
+            !isSelfUserRemoved &&
+            (isReadOnlyConversation ? (
               <ReadOnlyConversationMessage reloadApp={reloadApp} conversation={activeConversation} />
             ) : (
               <InputBar
