@@ -264,7 +264,7 @@ export const ContentMessageComponent = ({
               isMessageFocused={msgFocusState}
               handleReactionClick={onClickReaction}
               reactionsTotalCount={reactions.length}
-              isRemovedFromConversation={conversation.removed_from_conversation()}
+              isRemovedFromConversation={conversation.isSelfUserRemoved()}
             />
           )}
         </div>
@@ -308,7 +308,7 @@ export const ContentMessageComponent = ({
           isMessageFocused={msgFocusState}
           onTooltipReactionCountClick={() => onClickReactionDetails(message)}
           onLastReactionKeyEvent={() => setActionMenuVisibility(false)}
-          isRemovedFromConversation={conversation.removed_from_conversation()}
+          isRemovedFromConversation={conversation.isSelfUserRemoved()}
           users={conversation.allUserEntities()}
         />
       )}
