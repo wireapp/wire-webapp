@@ -1563,6 +1563,10 @@ export class CallingRepository {
     call.reason(reason);
   };
 
+  hasActiveCall = (): boolean => {
+    return !!this.callState.joinedCall();
+  };
+
   /*
     Note: This is in sync with our ios code base
     https://github.com/wireapp/wire-ios/blob/cf91b35d6ccbee5f03592f5bb763534341630428/Wire-iOS/Sources/Analytics/AnalyticsCallingTracker.swift#L182-L212

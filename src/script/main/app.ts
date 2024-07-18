@@ -460,6 +460,7 @@ export class App {
       onProgress(25, t('initReceivedUserData'));
       telemetry.addStatistic(AppInitStatisticsValue.CONVERSATIONS, conversations.length, 50);
       this._subscribeToUnloadEvents(selfUser);
+      this._subscribeToBeforeUnload();
 
       await conversationRepository.conversationRoleRepository.loadTeamRoles();
 
@@ -671,6 +672,20 @@ export class App {
       }
 
       this.repository.notification.clearNotifications();
+    });
+  }
+
+  /**
+   * Subscribe to 'beforeunload' to stop calls and disconnect the WebSocket.
+   */
+  private _subscribeToBeforeUnload(): void {
+    window.addEventListener('beforeunload', event => {
+      if (this.repository.calling.hasActiveCall()) {
+        event.preventDefault();
+
+        // Included for legacy support, e.g. Chrome/Edge < 119
+        event.returnValue = true;
+      }
     });
   }
 
