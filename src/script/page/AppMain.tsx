@@ -186,9 +186,8 @@ export const AppMain: FC<AppMainProps> = ({
       window.location.replace(`#/conversation/${conversation}${domain ? `/${domain}` : ''}`);
     }
 
-    repositories.properties.checkPrivacyPermission().then(() => {
-      window.setTimeout(() => repositories.notification.checkPermission(), App.CONFIG.NOTIFICATION_CHECK);
-    });
+    repositories.properties.checkTelemetrySharingPermission();
+    window.setTimeout(() => repositories.notification.checkPermission(), App.CONFIG.NOTIFICATION_CHECK);
 
     //after app is loaded, check mls migration configuration and start migration if needed
     await initialiseMLSMigrationFlow({

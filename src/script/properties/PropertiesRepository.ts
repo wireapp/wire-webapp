@@ -26,15 +26,12 @@ import ko from 'knockout';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {Environment} from 'Util/Environment';
-import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 
 import type {PropertiesService} from './PropertiesService';
 import {PROPERTIES_TYPE} from './PropertiesType';
 
-import {Config} from '../Config';
 import type {User} from '../entity/User';
 import type {SelfService} from '../self/SelfService';
 import {ConsentValue} from '../user/ConsentValue';
@@ -112,51 +109,13 @@ export class PropertiesRepository {
     this.marketingConsent = ko.observable(PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.defaultValue);
   }
 
-  checkPrivacyPermission(): Promise<void> {
-    const isCheckConsentDisabled = !Config.getConfig().FEATURE.CHECK_CONSENT;
+  checkTelemetrySharingPermission(): void {
     const isTelemetryPreferenceSet = this.getPreference(PROPERTIES_TYPE.TELEMETRY_SHARING) !== undefined;
-    const isTeamAccount = !!this.selfUser().teamId;
-    const enableTelemetrySharing = () => {
-      this.savePreference(PROPERTIES_TYPE.TELEMETRY_SHARING, true);
-      this.publishProperties();
-    };
 
-    if (!isTelemetryPreferenceSet && isTeamAccount) {
+    if (!isTelemetryPreferenceSet) {
       this.savePreference(PROPERTIES_TYPE.TELEMETRY_SHARING, true);
       this.publishProperties();
     }
-
-    if (isCheckConsentDisabled || isTelemetryPreferenceSet) {
-      return Promise.resolve();
-    }
-
-    if (isTeamAccount) {
-      return Promise.resolve();
-    }
-
-    return new Promise(resolve => {
-      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-        preventClose: true,
-        primaryAction: {
-          action: () => {
-            enableTelemetrySharing();
-            resolve();
-          },
-          text: t('modalImproveWireAction'),
-        },
-        secondaryAction: {
-          action: () => {
-            this.savePreference(PROPERTIES_TYPE.TELEMETRY_SHARING, false);
-            resolve();
-          },
-          text: t('modalImproveWireSecondary'),
-        },
-        text: {
-          message: t('modalImproveWireMessage', Config.getConfig().BRAND_NAME),
-          title: t('modalImproveWireHeadline', Config.getConfig().BRAND_NAME),
-        },
-      });
-    });
   }
 
   getPreference(propertiesType: string): any {
