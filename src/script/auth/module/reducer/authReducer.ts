@@ -38,13 +38,11 @@ export interface RegistrationDataState {
   locale: string;
   name: string;
   password: string;
-  phone: string;
-  phone_code: string;
   team: TeamData;
   termsAccepted: boolean;
 }
 
-export type LoginDataState = Pick<LoginData, 'clientType' | 'phone'>;
+export type LoginDataState = Pick<LoginData, 'clientType'>;
 
 export type AuthState = {
   readonly account: RegistrationDataState;
@@ -72,8 +70,6 @@ export const initialAuthState: AuthState = {
     locale: null,
     name: null,
     password: null,
-    phone: null,
-    phone_code: null,
     team: null,
     termsAccepted: false,
   },

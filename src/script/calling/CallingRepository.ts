@@ -58,6 +58,7 @@ import {getLogger, Logger} from 'Util/Logger';
 import {roundLogarithmic} from 'Util/NumberUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {createUuid} from 'Util/uuid';
 
 import {Call, SerializedConversationId} from './Call';
 import {callingSubscriptions} from './callingSubscriptionsHandler';
@@ -143,6 +144,9 @@ export class CallingRepository {
   private wUser: number = 0;
   private nextMuteState: MuteState = MuteState.SELF_MUTED;
   private isConferenceCallingSupported = false;
+
+  static EMOJI_TIME_OUT_DURATION = TIME_IN_MILLIS.SECOND * 4;
+
   /**
    * Keeps track of the size of the avs log once the webapp is initiated. This allows detecting meaningless avs logs (logs that have a length equal to the length when the webapp was initiated)
    */
@@ -721,6 +725,42 @@ export class CallingRepository {
 
         this.muteCall(call, true, MuteState.REMOTE_MUTED);
         return this.processCallingMessage(conversation, event);
+      }
+
+      case CALL_MESSAGE_TYPE.EMOJIS: {
+        const call = this.findCall(conversationId);
+        if (!call || !this.selfUser) {
+          return;
+        }
+
+        const senderParticipant = call
+          .participants()
+          .find(participant => matchQualifiedIds(participant.user.qualifiedId, userId));
+
+        const emojis: string[] = Object.entries(content.emojis).flatMap(([key, value]) => Array(value).fill(key));
+
+        const isSelf = matchQualifiedIds(this.selfUser.qualifiedId, userId);
+
+        const newEmojis = emojis.map(emoji => {
+          const id = createUuid();
+
+          return {
+            id: `${Date.now()}-${id}`,
+            emoji,
+            left: Math.random() * 500,
+            from: isSelf ? t('conversationYouAccusative') : senderParticipant?.user.name() ?? '',
+          };
+        });
+
+        this.callState.emojis([...this.callState.emojis(), ...newEmojis]);
+
+        setTimeout(() => {
+          const remainingEmojis = this.callState
+            .emojis()
+            .filter(item => !newEmojis.some(newItem => newItem.id === item.id));
+          this.callState.emojis(remainingEmojis);
+        }, CallingRepository.EMOJI_TIME_OUT_DURATION);
+        break;
       }
 
       case CALL_MESSAGE_TYPE.REMOTE_KICK: {
@@ -1380,9 +1420,13 @@ export class CallingRepository {
     }, {} as QualifiedUserClients);
   };
 
+  readonly sendInCallEmoji = async (emojis: string, call: Call) => {
+    void this.messageRepository.sendInCallEmoji(call.conversation, {[emojis]: 1});
+  };
+
   readonly sendModeratorMute = (conversationId: QualifiedId, participants: Participant[]) => {
     const recipients = this.convertParticipantsToCallingMessageRecepients(participants);
-    this.sendCallingMessage(
+    void this.sendCallingMessage(
       conversationId,
       {type: CALL_MESSAGE_TYPE.REMOTE_MUTE, data: {targets: recipients}},
       {nativePush: true, recipients},
@@ -1391,7 +1435,7 @@ export class CallingRepository {
 
   readonly sendModeratorKick = (conversationId: QualifiedId, participants: Participant[]) => {
     const recipients = this.convertParticipantsToCallingMessageRecepients(participants);
-    this.sendCallingMessage(conversationId, {type: CALL_MESSAGE_TYPE.REMOTE_KICK}, {nativePush: true, recipients});
+    void this.sendCallingMessage(conversationId, {type: CALL_MESSAGE_TYPE.REMOTE_KICK}, {nativePush: true, recipients});
   };
 
   private readonly sendSFTRequest = (

@@ -3161,15 +3161,6 @@ export class ConversationRepository {
           ConversationError.TYPE.CONVERSATION_NOT_FOUND,
         ];
 
-        const isRemovedFromConversation = (error as unknown as BackendError).label === BackendErrorLabel.ACCESS_DENIED;
-        if (isRemovedFromConversation) {
-          const messageText = t('conversationNotFoundMessage');
-          const titleText = t('conversationNotFoundTitle', Config.getConfig().BRAND_NAME);
-
-          this.showModal(messageText, titleText);
-          return;
-        }
-
         if (!ignoredErrorTypes.includes(error.type)) {
           throw error;
         }

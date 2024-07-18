@@ -18,7 +18,7 @@
  */
 
 import type {DomainData} from '@wireapp/api-client/lib/account/DomainData';
-import type {LoginData, RegisterData, SendLoginCode} from '@wireapp/api-client/lib/auth/';
+import type {LoginData, RegisterData} from '@wireapp/api-client/lib/auth/';
 import {VerificationActionType} from '@wireapp/api-client/lib/auth/VerificationActionType';
 import {ClientType} from '@wireapp/api-client/lib/client/';
 import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http';
@@ -126,19 +126,6 @@ export class AuthAction {
           }
           dispatch(AuthActionCreator.failedLogin(error));
         }
-        throw error;
-      }
-    };
-  };
-
-  doSendPhoneLoginCode = (loginRequest: Omit<SendLoginCode, 'voice_call'>): ThunkAction => {
-    return async (dispatch, getState, {apiClient}) => {
-      dispatch(AuthActionCreator.startSendPhoneLoginCode());
-      try {
-        const {expires_in} = await apiClient.api.auth.postLoginSend(loginRequest);
-        dispatch(AuthActionCreator.successfulSendPhoneLoginCode(expires_in));
-      } catch (error) {
-        dispatch(AuthActionCreator.failedSendPhoneLoginCode(error));
         throw error;
       }
     };

@@ -17,7 +17,7 @@
  *
  */
 
-import {UIEvent, useCallback, useState} from 'react';
+import {UIEvent, useCallback, useEffect, useState} from 'react';
 
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -102,14 +102,20 @@ export const Conversation = ({
     'isFileSharingSendingEnabled',
   ]);
 
-  const {is1to1, isRequest, isReadOnlyConversation} = useKoSubscribableChildren(activeConversation!, [
-    'is1to1',
-    'isRequest',
-    'readOnlyState',
-    'participating_user_ets',
-    'connection',
-    'isReadOnlyConversation',
-  ]);
+  const {is1to1, isRequest, isReadOnlyConversation, isActiveParticipant} = useKoSubscribableChildren(
+    activeConversation!,
+    [
+      'is1to1',
+      'isRequest',
+      'readOnlyState',
+      'participating_user_ets',
+      'connection',
+      'isReadOnlyConversation',
+      'isActiveParticipant',
+    ],
+  );
+
+  const {isTemporaryGuest} = useKoSubscribableChildren(selfUser, ['isTemporaryGuest']);
 
   const inTeam = teamState.isInTeam(selfUser);
 
@@ -121,6 +127,12 @@ export const Conversation = ({
   const smBreakpoint = useMatchMedia('max-width: 640px');
 
   const {addReadReceiptToBatch} = useReadReceiptSender(repositories.message);
+
+  useEffect(() => {
+    // When the component is mounted we want to make sure its conversation entity's last message is marked as visible
+    // not to display the jump to last message button initially
+    activeConversation?.isLastMessageVisible(true);
+  }, [activeConversation]);
 
   const uploadImages = useCallback(
     (images: File[]) => {
@@ -471,7 +483,7 @@ export const Conversation = ({
             callActions={mainViewModel.calling.callActions}
             openRightSidebar={openRightSidebar}
             isRightSidebarOpen={isRightSidebarOpen}
-            isReadOnlyConversation={isReadOnlyConversation}
+            isReadOnlyConversation={isReadOnlyConversation || (!isTemporaryGuest && !isActiveParticipant)}
           />
 
           {activeCalls.map(call => {
@@ -521,7 +533,7 @@ export const Conversation = ({
           />
 
           {isConversationLoaded &&
-            (isReadOnlyConversation ? (
+            (isReadOnlyConversation || (!isTemporaryGuest && !isActiveParticipant) ? (
               <ReadOnlyConversationMessage reloadApp={reloadApp} conversation={activeConversation} />
             ) : (
               <InputBar

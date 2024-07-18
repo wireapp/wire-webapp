@@ -48,7 +48,18 @@
 }
 
 .left-list-header-preferences {
+  display: flex;
   min-height: var(--content-title-bar-height);
+  flex-direction: column;
+
+  .left-list-header-close-button {
+    min-width: auto;
+  }
+
+  .left-list-header-title-wrapper {
+    display: flex;
+    align-items: center;
+  }
 }
 
 body.theme-dark {

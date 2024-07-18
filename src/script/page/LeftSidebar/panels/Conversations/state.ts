@@ -97,7 +97,7 @@ const useSidebarStore = create<SidebarStore>()(
     {
       name: 'sidebar-store',
       storage: createJSONStorage(() => localStorage),
-      partialize: state => ({status: state.status}),
+      partialize: state => ({status: state.status, currentTab: state.currentTab}),
     },
   ),
 );

@@ -89,13 +89,12 @@ export const AccountPreferences = ({
   conversationState = container.resolve(ConversationState),
 }: AccountPreferencesProps) => {
   const {isTeam, teamName} = useKoSubscribableChildren(teamState, ['isTeam', 'teamName']);
-  const {name, email, availability, username, managedBy, phone} = useKoSubscribableChildren(selfUser, [
+  const {name, email, availability, username, managedBy} = useKoSubscribableChildren(selfUser, [
     'name',
     'email',
     'availability',
     'username',
     'managedBy',
-    'phone',
   ]);
 
   const canEditProfile = managedBy === User.CONFIG.MANAGED_BY.WIRE;
@@ -185,8 +184,6 @@ export const AccountPreferences = ({
             {email && !selfUser.isNoPasswordSSO && (
               <EmailInput canEditProfile={canEditProfile} email={email} userRepository={userRepository} />
             )}
-
-            {phone && <AccountInput label={t('preferencesAccountPhone')} value={phone} readOnly fieldName="phone" />}
 
             {isTeam && (
               <AccountInput label={t('preferencesAccountTeam')} value={teamName} readOnly fieldName="status-team" />

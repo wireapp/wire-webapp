@@ -83,9 +83,13 @@ type ConversationsProps = {
   searchRepository: SearchRepository;
   teamRepository: TeamRepository;
   userRepository: UserRepository;
+  inputRef: React.MutableRefObject<HTMLInputElement | null>;
+  isConversationFilterFocused: boolean;
+  setIsConversationFilterFocused: (isFocused: boolean) => void;
 };
 
 const Conversations: React.FC<ConversationsProps> = ({
+  inputRef,
   integrationRepository,
   searchRepository,
   teamRepository,
@@ -93,6 +97,8 @@ const Conversations: React.FC<ConversationsProps> = ({
   propertiesRepository,
   conversationRepository,
   preferenceNotificationRepository,
+  isConversationFilterFocused,
+  setIsConversationFilterFocused,
   listViewModel,
   conversationState = container.resolve(ConversationState),
   teamState = container.resolve(TeamState),
@@ -102,10 +108,11 @@ const Conversations: React.FC<ConversationsProps> = ({
 }) => {
   const {currentTab, status: sidebarStatus, setStatus: setSidebarStatus, setCurrentTab} = useSidebarStore();
   const [conversationsFilter, setConversationsFilter] = useState<string>('');
-  const [isConversationFilterFocused, setIsConversationFilterFocused] = useState(false);
   const {classifiedDomains, isTeam} = useKoSubscribableChildren(teamState, ['classifiedDomains', 'isTeam']);
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
   const {notifications} = useKoSubscribableChildren(preferenceNotificationRepository, ['notifications']);
+
+  const {isTemporaryGuest} = useKoSubscribableChildren(selfUser, ['isTemporaryGuest']);
 
   const {
     activeConversation,
@@ -330,6 +337,7 @@ const Conversations: React.FC<ConversationsProps> = ({
         id="conversations"
         headerElement={
           <ConversationHeader
+            ref={inputRef}
             currentFolder={currentFolder}
             currentTab={currentTab}
             selfUser={selfUser}
@@ -337,19 +345,22 @@ const Conversations: React.FC<ConversationsProps> = ({
             searchValue={conversationsFilter}
             setSearchValue={setConversationsFilter}
             searchInputPlaceholder={searchInputPlaceholder}
-            setIsConversationFilterFocused={setIsConversationFilterFocused}
+            setIsConversationFilterFocused={value => setIsConversationFilterFocused(value)}
             onSearchEnterClick={handleEnterSearchClick}
           />
         }
         hasHeader={!isPreferences}
-        sidebar={sidebar}
-        footer={callingView}
+        {...(!isTemporaryGuest && {sidebar})}
+        before={callingView}
       >
         {isPreferences ? (
           <Preferences
             onPreferenceItemClick={onClickPreferences}
             teamRepository={teamRepository}
             preferenceNotificationRepository={preferenceNotificationRepository}
+            {...(isTemporaryGuest && {
+              onClose: onExitPreferences,
+            })}
           />
         ) : (
           <>
