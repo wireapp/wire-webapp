@@ -30,6 +30,7 @@ import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import * as Icon from 'Components/Icon';
 import {ConversationClassifiedBar} from 'Components/input/ClassifiedBar';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
+import {Config} from 'src/script/Config';
 import {isMediaDevice} from 'src/script/guards/MediaDevice';
 import {MediaDeviceType} from 'src/script/media/MediaDeviceType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -676,21 +677,23 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                 </button>
               </li>
 
-              <li className="video-controls__item">
-                <button
-                  css={showEmojisBar ? videoControlActiveStyles : videoControlInActiveStyles}
-                  className="video-controls__button"
-                  onClick={() => setShowEmojisBar(prev => !prev)}
-                  type="button"
-                  aria-labelledby="show-emoji-bar"
-                  data-uie-name="do-call-controls-video-call-cancel"
-                >
-                  <Icon.LikeIcon />
-                  <span id="show-emoji-bar" className="video-controls__button__label">
-                    {t('callReactions')}
-                  </span>
-                </button>
-              </li>
+              {Config.getConfig().FEATURE.ENABLE_IN_CALL_REACTIONS && (
+                <li className="video-controls__item">
+                  <button
+                    css={showEmojisBar ? videoControlActiveStyles : videoControlInActiveStyles}
+                    className="video-controls__button"
+                    onClick={() => setShowEmojisBar(prev => !prev)}
+                    type="button"
+                    aria-labelledby="show-emoji-bar"
+                    data-uie-name="do-call-controls-video-call-cancel"
+                  >
+                    <Icon.LikeIcon />
+                    <span id="show-emoji-bar" className="video-controls__button__label">
+                      {t('callReactions')}
+                    </span>
+                  </button>
+                </li>
+              )}
               <li className="video-controls__item">
                 <button
                   className="video-controls__button video-controls__button--red"

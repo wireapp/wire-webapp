@@ -158,6 +158,9 @@ export type Env = {
   /** Feature toggle to automatically mute when accepting incoming conference calls */
   FEATURE_CONFERENCE_AUTO_MUTE: string;
 
+  /** Feature to enable in call reactions */
+  FEATURE_ENABLE_IN_CALL_REACTIONS: string;
+
   /** Sets the verification ID for Google webmasters */
   GOOGLE_WEBMASTER_ID: string;
 
