@@ -30,6 +30,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import * as Icon from 'Components/Icon';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {ConversationState} from 'src/script/conversation/ConversationState';
+import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/state';
 import {TeamState} from 'src/script/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -141,6 +142,8 @@ const UserActions: React.FC<UserActionsProps> = ({
   ]);
   const isTeamMember = teamState.isInTeam(user);
 
+  const {setCurrentTab: setCurrentSidebarTab} = useSidebarStore();
+
   const has1to1Conversation = conversationState.has1to1ConversationWithUser(user.qualifiedId);
 
   const isNotMe = !user.isMe && isSelfActivated;
@@ -148,6 +151,7 @@ const UserActions: React.FC<UserActionsProps> = ({
   const create1to1Conversation = async (userEntity: User, showConversation: boolean): Promise<void> => {
     const conversationEntity = await actionsViewModel.getOrCreate1to1Conversation(userEntity);
     if (showConversation) {
+      setCurrentSidebarTab(SidebarTabs.RECENT);
       actionsViewModel.open1to1Conversation(conversationEntity);
     }
   };
@@ -288,6 +292,7 @@ const UserActions: React.FC<UserActionsProps> = ({
               // Only open the new conversation if we aren't currently in a conversation context
               await actionsViewModel.open1to1Conversation(savedConversation);
             }
+            setCurrentSidebarTab(SidebarTabs.RECENT);
             onAction(Actions.SEND_REQUEST);
           },
           Icon: Icon.PlusIcon,

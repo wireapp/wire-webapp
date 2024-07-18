@@ -30,6 +30,7 @@ import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {IntegrationRepository} from 'src/script/integration/IntegrationRepository';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
+import {useSidebarStore, SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/state';
 import {UserRepository} from 'src/script/user/UserRepository';
 import {MainViewModel} from 'src/script/view_model/MainViewModel';
 import {t} from 'Util/LocalizerUtil';
@@ -53,7 +54,6 @@ type StartUIProps = {
   integrationRepository: IntegrationRepository;
   isFederated: boolean;
   mainViewModel: MainViewModel;
-  onClose: () => void;
   searchRepository: SearchRepository;
   teamRepository: TeamRepository;
   selfUser: User;
@@ -68,7 +68,6 @@ const enum Tabs {
 }
 
 const StartUI: React.FC<StartUIProps> = ({
-  onClose,
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
   conversationState = container.resolve(ConversationState),
@@ -82,14 +81,8 @@ const StartUI: React.FC<StartUIProps> = ({
   selfUser,
 }) => {
   const brandName = Config.getConfig().BRAND_NAME;
-  const {
-    canInviteTeamMembers,
-    canSearchUnconnectedUsers,
-    canManageServices,
-    canChatWithServices,
-    canCreateGuestRoom,
-    canCreateGroupConversation,
-  } = generatePermissionHelpers(selfUser.teamRole());
+  const {canInviteTeamMembers, canSearchUnconnectedUsers, canManageServices, canChatWithServices} =
+    generatePermissionHelpers(selfUser.teamRole());
 
   useEffect(() => {
     void conversationRepository.loadMissingConversations();
@@ -97,21 +90,19 @@ const StartUI: React.FC<StartUIProps> = ({
 
   const actions = mainViewModel.actions;
   const isTeam = teamState.isTeam();
-  const teamName = teamState.teamName();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState(Tabs.PEOPLE);
+
+  const {setCurrentTab: setCurrentSidebarTab} = useSidebarStore();
 
   const peopleSearchResults = useRef<SearchResultsData | undefined>(undefined);
 
   const openFirstConversation = async (): Promise<void> => {
     if (peopleSearchResults.current) {
-      const {contacts, groups} = peopleSearchResults.current;
+      const {contacts} = peopleSearchResults.current;
       if (contacts.length > 0) {
         return openContact(contacts[0]);
-      }
-      if (groups.length > 0) {
-        return openConversation(groups[0]);
       }
     }
   };
@@ -125,6 +116,7 @@ const StartUI: React.FC<StartUIProps> = ({
     }
 
     const conversationEntity = await actions.getOrCreate1to1Conversation(user);
+    setCurrentSidebarTab(SidebarTabs.RECENT);
     return actions.open1to1Conversation(conversationEntity);
   };
 
@@ -148,7 +140,6 @@ const StartUI: React.FC<StartUIProps> = ({
 
   const openConversation = async (conversation: Conversation): Promise<void> => {
     await actions.openGroupConversation(conversation);
-    onClose();
   };
 
   const before = (
@@ -156,7 +147,7 @@ const StartUI: React.FC<StartUIProps> = ({
       <div className="start-ui-header-user-input" data-uie-name="enter-search">
         <SearchInput
           input={searchQuery}
-          placeholder={t('searchPeoplePlaceholder')}
+          placeholder={t('searchPeopleOnlyPlaceholder')}
           setInput={setSearchQuery}
           onEnter={openFirstConversation}
           forceDark
@@ -209,8 +200,6 @@ const StartUI: React.FC<StartUIProps> = ({
           searchRepository={searchRepository}
           conversationRepository={conversationRepository}
           canInviteTeamMembers={canInviteTeamMembers()}
-          canCreateGroupConversation={canCreateGroupConversation()}
-          canCreateGuestRoom={canCreateGuestRoom()}
           userRepository={userRepository}
           onClickContact={openContact}
           onClickConversation={openConversation}
@@ -237,11 +226,10 @@ const StartUI: React.FC<StartUIProps> = ({
   return (
     <ListWrapper
       id="start-ui"
-      header={teamName}
       headerUieName="status-team-name-search"
-      onClose={onClose}
       before={before}
       footer={footer}
+      hasHeader={false}
     >
       {content}
     </ListWrapper>

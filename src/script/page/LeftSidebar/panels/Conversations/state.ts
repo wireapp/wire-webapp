@@ -18,38 +18,88 @@
  */
 
 import {create} from 'zustand';
+import {persist, createJSONStorage} from 'zustand/middleware';
 
 type FolderState = {
-  expandedFolders: string[];
+  expandedFolder: string;
+  isFoldersTabOpen: boolean;
   isOpen: (folderId: string) => boolean;
   openFolder: (folderId: string) => void;
-  toggleFolder: (folderId: string) => void;
+  closeFolder: () => void;
+  toggleFoldersTab: () => void;
 };
 
-const openFolder = (folderId: string, state: FolderState) => {
-  return {...state, expandedFolders: state.expandedFolders.concat(folderId)};
+const openFolder = (folderId: string, state: FolderState): FolderState => {
+  return {...state, isFoldersTabOpen: true, expandedFolder: folderId};
 };
 
-const closeFolder = (folderId: string, state: FolderState) => {
-  return {...state, expandedFolders: state.expandedFolders.filter(id => id !== folderId)};
+const closeFolder = (state: FolderState): FolderState => {
+  return {...state, expandedFolder: ''};
 };
 
 const useFolderState = create<FolderState>((set, get) => ({
-  expandedFolders: [],
+  expandedFolder: '',
+  isFoldersTabOpen: false,
 
   isOpen: folderId => {
-    return get().expandedFolders.includes(folderId);
+    return get().expandedFolder === folderId;
   },
+
+  toggleFoldersTab: () => set(state => ({...state, isFoldersTabOpen: !state.isFoldersTabOpen})),
 
   openFolder: folderId =>
     set(state => {
-      return get().isOpen(folderId) ? state : openFolder(folderId, state);
+      return openFolder(folderId, state);
     }),
 
-  toggleFolder: folderId =>
+  closeFolder: () =>
     set(state => {
-      return get().isOpen(folderId) ? closeFolder(folderId, state) : openFolder(folderId, state);
+      return closeFolder(state);
     }),
 }));
 
-export {useFolderState};
+export enum SidebarTabs {
+  RECENT,
+  FOLDER,
+  FAVORITES,
+  GROUPS,
+  DIRECTS,
+  ARCHIVES,
+  CONNECT,
+  PREFERENCES,
+}
+
+export const SidebarStatus = {
+  OPEN: 'OPEN',
+  CLOSED: 'CLOSED',
+  AUTO: 'AUTO',
+} as const;
+
+export type SidebarStatus = (typeof SidebarStatus)[keyof typeof SidebarStatus];
+
+export interface SidebarStore {
+  status: SidebarStatus;
+  setStatus: (status: SidebarStatus) => void;
+  currentTab: SidebarTabs;
+  setCurrentTab: (tab: SidebarTabs) => void;
+}
+
+const useSidebarStore = create<SidebarStore>()(
+  persist(
+    set => ({
+      currentTab: SidebarTabs.RECENT,
+      setCurrentTab: (tab: SidebarTabs) => {
+        set({currentTab: tab});
+      },
+      status: SidebarStatus.OPEN,
+      setStatus: status => set({status: status}),
+    }),
+    {
+      name: 'sidebar-store',
+      storage: createJSONStorage(() => localStorage),
+      partialize: state => ({status: state.status, currentTab: state.currentTab}),
+    },
+  ),
+);
+
+export {useFolderState, useSidebarStore};

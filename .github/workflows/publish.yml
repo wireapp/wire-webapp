@@ -61,6 +61,9 @@ jobs:
       - name: Install JS dependencies
         run: yarn --immutable
 
+      - name: Update configuration
+        run: yarn configure
+
       - name: Test
         run: |
           set -o pipefail
@@ -284,13 +287,10 @@ jobs:
           map: |
             {
               "dev": {
-                "targets": "[\"wire-webapp-dev\"]"
+                "targets": "[\"wire-webapp-dev\", \"wire-webapp-edge\"]"
               },
               "master": {
                 "targets": "[\"wire-webapp-main\"]"
-              },
-              "new-navigation": {
-                "targets": "[\"wire-webapp-edge\"]"
               },
               "production": {
                 "targets": "[\"wire-webapp-prod\"]"

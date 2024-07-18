@@ -141,15 +141,15 @@ export const TitleBar: React.FC<TitleBarProps> = ({
   const peopleTooltip = t('tooltipConversationPeople', shortcut);
 
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
-  const mdBreakpoint = useMatchMedia('max-width: 768px');
-  const smBreakpoint = useMatchMedia('max-width: 640px');
+  const mdBreakpoint = useMatchMedia('max-width: 1000px');
+  const smBreakpoint = useMatchMedia('max-width: 720px');
 
   const {close: closeRightSidebar} = useAppMainState(state => state.rightSidebar);
 
   const {setCurrentView: setView} = useAppMainState(state => state.responsiveView);
 
   const setLeftSidebar = () => {
-    setView(ViewType.LEFT_SIDEBAR);
+    setView(ViewType.MOBILE_LEFT_SIDEBAR);
     closeRightSidebar();
   };
 

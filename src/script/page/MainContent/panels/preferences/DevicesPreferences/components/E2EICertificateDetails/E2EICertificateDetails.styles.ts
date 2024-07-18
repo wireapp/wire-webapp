@@ -67,7 +67,7 @@ export const styles: stylesProps = {
     marginBlock: '6px',
   },
   notAvailable: {
-    color: 'var(--gray-70)',
+    color: 'var(--text-input-placeholder)',
   },
   serialNumber: {
     fontSize: 'var(--font-size-medium)',

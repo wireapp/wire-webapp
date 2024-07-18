@@ -26,6 +26,7 @@ import {createPortal} from 'react-dom';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
+import {useActiveWindow} from 'src/script/hooks/useActiveWindow';
 import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
 
 import '../../../style/default.less';
@@ -63,6 +64,8 @@ export const DetachedWindow = ({children, name, onClose, width = 600, height = 6
       `,
     );
   }, [height, name, width]);
+
+  useActiveWindow(newWindow);
 
   useEffect(() => {
     if (!newWindow) {
