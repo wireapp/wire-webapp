@@ -55,6 +55,7 @@ import {CallingViewMode, CallState} from '../../../../calling/CallState';
 import {createLabel} from '../../../../conversation/ConversationLabelRepository';
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
 import {ConversationState} from '../../../../conversation/ConversationState';
+import {Conversation} from '../../../../entity/Conversation';
 import {User} from '../../../../entity/User';
 import {useConversationFocus} from '../../../../hooks/useConversationFocus';
 import {PreferenceNotificationRepository} from '../../../../notification/PreferenceNotificationRepository';
@@ -177,6 +178,20 @@ const Conversations: React.FC<ConversationsProps> = ({
   }
 
   const hasNoConversations = conversations.length + connectRequests.length === 0;
+
+  useEffect(() => {
+    amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, (conversation?: Conversation) => {
+      if (!conversation) {
+        return;
+      }
+
+      const includesConversation = currentTabConversations.includes(conversation);
+
+      if (!includesConversation) {
+        setCurrentTab(SidebarTabs.RECENT);
+      }
+    });
+  }, [currentTabConversations]);
 
   useEffect(() => {
     if (activeConversation && !conversationState.isVisible(activeConversation)) {
