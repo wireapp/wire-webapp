@@ -50,6 +50,7 @@ describe('EventTrackingRepository', () => {
             send: true,
           },
           privacy: {
+            improve_wire: undefined,
             report_errors: undefined,
           },
           sound: {
@@ -58,6 +59,9 @@ describe('EventTrackingRepository', () => {
         },
         version: 1,
       };
+      const privacyPreference = properties.settings.privacy.improve_wire;
+
+      expect(privacyPreference).toBeFalsy();
 
       return testFactory.tracking_repository.init(true).then(() => {
         expect(testFactory.tracking_repository.startErrorReporting).toHaveBeenCalled();

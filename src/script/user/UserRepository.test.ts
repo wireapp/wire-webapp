@@ -106,7 +106,7 @@ describe('UserRepository', () => {
           value: {
             settings: {
               privacy: {
-                telemetry_sharing: true,
+                improve_wire: true,
               },
             },
             version: 1,
@@ -119,7 +119,7 @@ describe('UserRepository', () => {
           value: {
             settings: {
               privacy: {
-                telemetry_sharing: false,
+                improve_wire: false,
               },
             },
             version: 1,

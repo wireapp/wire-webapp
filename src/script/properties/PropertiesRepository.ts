@@ -96,6 +96,7 @@ export class PropertiesRepository {
           send: true,
         },
         privacy: {
+          improve_wire: undefined,
           report_errors: undefined,
           telemetry_sharing: undefined,
         },
@@ -114,10 +115,11 @@ export class PropertiesRepository {
 
   checkPrivacyPermission(): Promise<void> {
     const isCheckConsentDisabled = !Config.getConfig().FEATURE.CHECK_CONSENT;
+    const isPrivacyPreferenceSet = this.getPreference(PROPERTIES_TYPE.PRIVACY) !== undefined;
     const isTelemetryPreferenceSet = this.getPreference(PROPERTIES_TYPE.TELEMETRY_SHARING) !== undefined;
     const isTeamAccount = !!this.selfUser().teamId;
-    const enableTelemetrySharing = () => {
-      this.savePreference(PROPERTIES_TYPE.TELEMETRY_SHARING, true);
+    const enablePrivacy = () => {
+      this.savePreference(PROPERTIES_TYPE.PRIVACY, true);
       this.publishProperties();
     };
 
@@ -126,7 +128,7 @@ export class PropertiesRepository {
       this.publishProperties();
     }
 
-    if (isCheckConsentDisabled || isTelemetryPreferenceSet) {
+    if (isCheckConsentDisabled || isPrivacyPreferenceSet) {
       return Promise.resolve();
     }
 
@@ -139,14 +141,14 @@ export class PropertiesRepository {
         preventClose: true,
         primaryAction: {
           action: () => {
-            enableTelemetrySharing();
+            enablePrivacy();
             resolve();
           },
           text: t('modalImproveWireAction'),
         },
         secondaryAction: {
           action: () => {
-            this.savePreference(PROPERTIES_TYPE.TELEMETRY_SHARING, false);
+            this.savePreference(PROPERTIES_TYPE.PRIVACY, false);
             resolve();
           },
           text: t('modalImproveWireSecondary'),
@@ -216,7 +218,7 @@ export class PropertiesRepository {
 
   private initTemporaryGuestAccount(): Promise<WebappProperties> {
     this.logger.info('Temporary guest user: Using default properties');
-    this.savePreference(PROPERTIES_TYPE.TELEMETRY_SHARING, false);
+    this.savePreference(PROPERTIES_TYPE.PRIVACY, false);
     return Promise.resolve(this.publishProperties());
   }
 
@@ -325,6 +327,9 @@ export class PropertiesRepository {
         break;
       case PROPERTIES_TYPE.PREVIEWS.SEND:
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.PREVIEWS.SEND, updatedPreference);
+        break;
+      case PROPERTIES_TYPE.PRIVACY:
+        amplify.publish(WebAppEvents.PROPERTIES.UPDATE.PRIVACY, updatedPreference);
         break;
       case PROPERTIES_TYPE.TELEMETRY_SHARING:
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.TELEMETRY_SHARING, updatedPreference);
