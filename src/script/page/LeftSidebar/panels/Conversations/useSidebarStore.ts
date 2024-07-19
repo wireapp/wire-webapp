@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2022 Wire Swiss GmbH
+ * Copyright (C) 2024 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,44 +19,6 @@
 
 import {create} from 'zustand';
 import {persist, createJSONStorage} from 'zustand/middleware';
-
-type FolderState = {
-  expandedFolder: string;
-  isFoldersTabOpen: boolean;
-  isOpen: (folderId: string) => boolean;
-  openFolder: (folderId: string) => void;
-  closeFolder: () => void;
-  toggleFoldersTab: () => void;
-};
-
-const openFolder = (folderId: string, state: FolderState): FolderState => {
-  return {...state, isFoldersTabOpen: true, expandedFolder: folderId};
-};
-
-const closeFolder = (state: FolderState): FolderState => {
-  return {...state, expandedFolder: ''};
-};
-
-const useFolderState = create<FolderState>((set, get) => ({
-  expandedFolder: '',
-  isFoldersTabOpen: false,
-
-  isOpen: folderId => {
-    return get().expandedFolder === folderId;
-  },
-
-  toggleFoldersTab: () => set(state => ({...state, isFoldersTabOpen: !state.isFoldersTabOpen})),
-
-  openFolder: folderId =>
-    set(state => {
-      return openFolder(folderId, state);
-    }),
-
-  closeFolder: () =>
-    set(state => {
-      return closeFolder(state);
-    }),
-}));
 
 export enum SidebarTabs {
   RECENT,
@@ -105,4 +67,4 @@ const useSidebarStore = create<SidebarStore>()(
   ),
 );
 
-export {useFolderState, useSidebarStore};
+export {useSidebarStore};

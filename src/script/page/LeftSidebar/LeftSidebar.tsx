@@ -24,7 +24,7 @@ import cx from 'classnames';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/state';
+import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 
 import {Conversations} from './panels/Conversations';
 import {TemporaryGuestConversations} from './panels/TemporaryGuestConversations';

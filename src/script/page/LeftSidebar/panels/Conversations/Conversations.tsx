@@ -49,7 +49,8 @@ import {ConversationsList} from './ConversationsList';
 import {ConversationTabs} from './ConversationTabs';
 import {EmptyConversationList} from './EmptyConversationList';
 import {getTabConversations} from './helpers';
-import {SidebarStatus, SidebarTabs, useFolderState, useSidebarStore} from './state';
+import {useFolderStore} from './useFoldersStore';
+import {SidebarStatus, SidebarTabs, useSidebarStore} from './useSidebarStore';
 
 import {CallingViewMode, CallState} from '../../../../calling/CallState';
 import {createLabel} from '../../../../conversation/ConversationLabelRepository';
@@ -148,7 +149,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   ].includes(currentTab);
 
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
-  const {openFolder, closeFolder, expandedFolder, isFoldersTabOpen, toggleFoldersTab} = useFolderState();
+  const {openFolder, closeFolder, expandedFolder, isFoldersTabOpen, toggleFoldersTab} = useFolderStore();
   const {currentFocus, handleKeyDown, resetConversationFocus} = useConversationFocus(conversations);
 
   const mdBreakpoint = useMatchMedia('(max-width: 1000px)');

@@ -39,7 +39,7 @@ import type {ConversationRepository} from '../conversation/ConversationRepositor
 import {ConversationState} from '../conversation/ConversationState';
 import type {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
-import {SidebarTabs, useSidebarStore} from '../page/LeftSidebar/panels/Conversations/state';
+import {SidebarTabs, useSidebarStore} from '../page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {PanelState} from '../page/RightSidebar';
 import {useAppMainState} from '../page/state';
 import {ContentState, ListState, useAppState} from '../page/useAppState';
