@@ -63,6 +63,13 @@ const useSidebarStore = create<SidebarStore>()(
         status: state.status,
         currentTab: state.currentTab === SidebarTabs.PREFERENCES ? SidebarTabs.RECENT : state.currentTab,
       }),
+      onRehydrateStorage: () => state => {
+        if (!state) {
+          return;
+        }
+
+        state.status = window.matchMedia(`(min-width: 1000px)`).matches ? state.status : SidebarStatus.AUTO;
+      },
     },
   ),
 );
