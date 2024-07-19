@@ -202,6 +202,7 @@ export class EventTrackingRepository {
       device_id: trackingId || this.countlyDeviceId,
       url: 'https://countly.wire.com/',
       use_session_cookie: false,
+      storage: 'localstorage',
     });
 
     this.startProductReportingSession();
