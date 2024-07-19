@@ -35,7 +35,6 @@ import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
 import {TitleBar} from 'Components/TitleBar';
 import {CallingViewMode, CallState} from 'src/script/calling/CallState';
 import {Config} from 'src/script/Config';
-import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/state';
 import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isLastReceivedMessage} from 'Util/conversationMessages';
@@ -134,14 +133,6 @@ export const Conversation = ({
     // not to display the jump to last message button initially
     activeConversation?.isLastMessageVisible(true);
   }, [activeConversation]);
-
-  const {currentTab, setCurrentTab} = useSidebarStore();
-
-  useEffect(() => {
-    if (currentTab === SidebarTabs.PREFERENCES) {
-      setCurrentTab(SidebarTabs.RECENT);
-    }
-  }, []);
 
   const uploadImages = useCallback(
     (images: File[]) => {

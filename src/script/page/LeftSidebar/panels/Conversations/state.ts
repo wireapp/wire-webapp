@@ -97,7 +97,10 @@ const useSidebarStore = create<SidebarStore>()(
     {
       name: 'sidebar-store',
       storage: createJSONStorage(() => localStorage),
-      partialize: state => ({status: state.status, currentTab: state.currentTab}),
+      partialize: state => ({
+        status: state.status,
+        currentTab: state.currentTab === SidebarTabs.PREFERENCES ? SidebarTabs.RECENT : state.currentTab,
+      }),
     },
   ),
 );

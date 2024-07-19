@@ -17,12 +17,11 @@
  *
  */
 
-import {FC, useEffect} from 'react';
+import {FC} from 'react';
 
 import {IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/state';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 
 import {buttonsStyle, contentStyle, titleStyle, wrapperStyle} from './PreferencesPage.styles';
@@ -38,14 +37,6 @@ const PreferencesPage: FC<PreferencesPageProps> = ({title, children}) => {
 
   const {currentView, setCurrentView} = useAppMainState(state => state.responsiveView);
   const isCentralColumn = currentView == ViewType.MOBILE_CENTRAL_COLUMN;
-
-  const {currentTab, setCurrentTab} = useSidebarStore();
-
-  useEffect(() => {
-    if (currentTab !== SidebarTabs.PREFERENCES) {
-      setCurrentTab(SidebarTabs.PREFERENCES);
-    }
-  }, []);
 
   return (
     <div role="tabpanel" aria-labelledby={title} css={wrapperStyle}>
