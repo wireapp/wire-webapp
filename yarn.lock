@@ -9926,12 +9926,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"husky@npm:9.0.11":
-  version: 9.0.11
-  resolution: "husky@npm:9.0.11"
+"husky@npm:9.1.1":
+  version: 9.1.1
+  resolution: "husky@npm:9.1.1"
   bin:
-    husky: bin.mjs
-  checksum: 10/8a9b7cb9dc8494b470b3b47b386e65d579608c6206da80d3cc8b71d10e37947264af3dfe00092368dad9673b51d2a5ee87afb4b2291e77ba9e7ec1ac36e56cd1
+    husky: bin.js
+  checksum: 10/c3be0392071b78c680fc6b9fd7978f52c26e18238a2840c6eabfc0db395e19fcd798da8eff0e31a9e76c479d6019a567d83a8de80f360d28552bc83bd1839b7c
   languageName: node
   linkType: hard
 
@@ -17910,7 +17910,7 @@ __metadata:
     highlight.js: "npm:11.10.0"
     html-webpack-plugin: "npm:5.6.0"
     http-status-codes: "npm:2.3.0"
-    husky: "npm:9.0.11"
+    husky: "npm:9.1.1"
     i18next-scanner: "npm:4.5.0"
     intersection-observer: "npm:0.12.2"
     jest: "npm:29.7.0"
