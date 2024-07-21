@@ -8,7 +8,7 @@
     "@mediapipe/tasks-vision": "0.10.14",
     "@wireapp/avs": "9.7.15",
     "@wireapp/commons": "5.2.10",
-    "@wireapp/core": "46.1.1",
+    "@wireapp/core": "46.1.2",
     "@wireapp/react-ui-kit": "9.21.1",
     "@wireapp/store-engine-dexie": "2.1.11",
     "@wireapp/webapp-events": "0.22.1",
