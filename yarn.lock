@@ -5358,14 +5358,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/store-engine-dexie@npm:2.1.10":
-  version: 2.1.10
-  resolution: "@wireapp/store-engine-dexie@npm:2.1.10"
+"@wireapp/store-engine-dexie@npm:2.1.11":
+  version: 2.1.11
+  resolution: "@wireapp/store-engine-dexie@npm:2.1.11"
   dependencies:
     dexie: "npm:>3.2.0"
   peerDependencies:
     "@wireapp/store-engine": 5.x.x
-  checksum: 10/df825132784930c63b5f27cc188bb509acfcca977ab1dbd66d8068d4bb35a431310702541b9264eb3de332efdcd9953dbb52d283304005168fe78b80ff5b0cb8
+  checksum: 10/c603d83aa4d8533839f5866a3bff64d6ec456e609144ee167f052a43d08c0ce87ae4f523d7a1ba0f900d5b6570b3bbaa17744da521976592b34aaf001fc27a85
   languageName: node
   linkType: hard
 
@@ -17899,7 +17899,7 @@ __metadata:
     "@wireapp/prettier-config": "npm:0.6.4"
     "@wireapp/react-ui-kit": "npm:9.21.0"
     "@wireapp/store-engine": "npm:5.1.6"
-    "@wireapp/store-engine-dexie": "npm:2.1.10"
+    "@wireapp/store-engine-dexie": "npm:2.1.11"
     "@wireapp/webapp-events": "npm:0.22.1"
     amplify: "https://github.com/wireapp/amplify#head=master"
     archiver: "npm:7.0.1"
