@@ -21,7 +21,7 @@ import cx from 'classnames';
 
 import * as Icons from 'Components/Icon';
 import {Config} from 'src/script/Config';
-import {createLabel} from 'src/script/conversation/ConversationLabelRepository';
+import {createLabel, LabelType} from 'src/script/conversation/ConversationLabelRepository';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {Conversation} from 'src/script/entity/Conversation';
 import {useFolderStore} from 'src/script/page/LeftSidebar/panels/Conversations/useFoldersStore';
@@ -71,6 +71,7 @@ export const ConversationFolderTab = ({
   const {labels} = useKoSubscribableChildren(conversationLabelRepository, ['labels']);
 
   const folders = labels
+    .filter(label => label.type !== LabelType.Favorite)
     .map(label => createLabel(label.name, conversationLabelRepository.getLabelConversations(label), label.id))
     .filter(({conversations, name}) => !!conversations().length && !!name);
 
