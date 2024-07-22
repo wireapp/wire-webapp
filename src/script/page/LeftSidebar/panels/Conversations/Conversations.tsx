@@ -151,8 +151,11 @@ const Conversations: React.FC<ConversationsProps> = ({
   const {openFolder, closeFolder, expandedFolder, isFoldersTabOpen, toggleFoldersTab} = useFolderState();
   const {currentFocus, handleKeyDown, resetConversationFocus} = useConversationFocus(conversations);
 
-  const mdBreakpoint = useMatchMedia('(max-width: 1000px)');
-  const isSideBarOpen = sidebarStatus === SidebarStatus.AUTO ? mdBreakpoint : sidebarStatus === SidebarStatus.OPEN;
+  // false when screen is larger than 1000px
+  // true when screen is smaller than 1000px
+  const isScreenLessThanMdBreakpoint = useMatchMedia('(max-width: 1000px)');
+  const isSideBarOpen =
+    sidebarStatus === SidebarStatus.AUTO ? !isScreenLessThanMdBreakpoint : sidebarStatus === SidebarStatus.OPEN;
 
   const {conversations: currentTabConversations, searchInputPlaceholder} = getTabConversations({
     currentTab,
@@ -261,7 +264,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   }
 
   const sidebar = (
-    <nav className="conversations-sidebar" css={conversationsSidebarStyles(mdBreakpoint)}>
+    <nav className="conversations-sidebar" css={conversationsSidebarStyles(isScreenLessThanMdBreakpoint)}>
       <FadingScrollbar className="conversations-sidebar-items" data-is-collapsed={!isSideBarOpen}>
         <UserDetails
           user={selfUser}
@@ -333,7 +336,7 @@ const Conversations: React.FC<ConversationsProps> = ({
 
   return (
     <div className="conversations-wrapper">
-      <div className="conversations-sidebar-spacer" css={conversationsSpacerStyles(mdBreakpoint)} />
+      <div className="conversations-sidebar-spacer" css={conversationsSpacerStyles(isScreenLessThanMdBreakpoint)} />
       <ListWrapper
         id="conversations"
         headerElement={
@@ -378,7 +381,8 @@ const Conversations: React.FC<ConversationsProps> = ({
               />
             )}
 
-            {((showSearchInput && currentTabConversations.length === 0) || hasNoConversations) && (
+            {((showSearchInput && currentTabConversations.length === 0) ||
+              (hasNoConversations && currentTab !== SidebarTabs.ARCHIVES)) && (
               <EmptyConversationList
                 currentTab={currentTab}
                 onChangeTab={changeTab}
