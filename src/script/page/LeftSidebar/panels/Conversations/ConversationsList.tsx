@@ -103,7 +103,7 @@ export const ConversationsList = ({
     if (!call) {
       return false;
     }
-    return !conversation.removed_from_conversation();
+    return !conversation.isSelfUserRemoved();
   };
 
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
@@ -137,14 +137,15 @@ export const ConversationsList = ({
   const isFolderView = currentTab === SidebarTabs.FOLDER;
 
   const getConversationView = () => {
+    const filterByName = (conversation: Conversation) =>
+      conversation.display_name().toLowerCase().includes(conversationsFilter.toLowerCase());
+
     if (isFolderView && currentFolder) {
       return (
         <>
           {currentFolder
             ?.conversations()
-            .filter((conversation: Conversation) =>
-              conversation.display_name().toLowerCase().includes(conversationsFilter.toLowerCase()),
-            )
+            .filter(filterByName)
             .map((conversation, index) => (
               <ConversationListCell key={conversation.id} {...getCommonConversationCellProps(conversation, index)} />
             ))}
@@ -154,7 +155,7 @@ export const ConversationsList = ({
 
     return (
       <>
-        {conversations.map((conversation, index) => (
+        {conversations.filter(filterByName).map((conversation, index) => (
           <ConversationListCell key={conversation.id} {...getCommonConversationCellProps(conversation, index)} />
         ))}
       </>

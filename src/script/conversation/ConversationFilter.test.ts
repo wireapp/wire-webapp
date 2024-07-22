@@ -81,7 +81,7 @@ describe('ConversationFilter', () => {
       expect(conversationEntity['isProteusTeam1to1']()).toBeFalsy();
       expect(conversationEntity.isGroup()).toBeFalsy();
       expect(conversationEntity.participating_user_ids().length).toBe(1);
-      expect(conversationEntity.removed_from_conversation()).toBeFalsy();
+      expect(conversationEntity.isSelfUserRemoved()).toBeFalsy();
       expect(conversationEntity.status()).toBe(ConversationStatus.CURRENT_MEMBER);
       expect(conversationEntity.type()).toBe(CONVERSATION_TYPE.CONNECT);
       expect(conversationEntity.name()).toBe('Florian@Staging11');
@@ -136,7 +136,7 @@ describe('ConversationFilter', () => {
       expect(conversationEntity['isProteusTeam1to1']()).toBeFalsy();
       expect(conversationEntity.isGroup()).toBeFalsy();
       expect(conversationEntity.participating_user_ids().length).toBe(1);
-      expect(conversationEntity.removed_from_conversation()).toBeFalsy();
+      expect(conversationEntity.isSelfUserRemoved()).toBeFalsy();
       expect(conversationEntity.status()).toBe(ConversationStatus.CURRENT_MEMBER);
       expect(conversationEntity.type()).toBe(CONVERSATION_TYPE.ONE_TO_ONE);
       expect(conversationEntity.name()).toBe('Florian@Staging11');

@@ -105,7 +105,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       showNotificationsNothing,
       verification_state: verificationState,
       isGroup,
-      removed_from_conversation: removedFromConversation,
+      isSelfUserRemoved,
       notificationState,
       hasGlobalMessageTimer,
       globalMessageTimer,
@@ -122,7 +122,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       'showNotificationsNothing',
       'verification_state',
       'isGroup',
-      'removed_from_conversation',
+      'isSelfUserRemoved',
       'notificationState',
       'hasGlobalMessageTimer',
       'globalMessageTimer',
@@ -156,7 +156,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
 
     const {teamRole, isActivatedAccount} = useKoSubscribableChildren(selfUser, ['teamRole', 'isActivatedAccount']);
 
-    const isActiveGroupParticipant = isGroup && !removedFromConversation;
+    const isActiveGroupParticipant = isGroup && !isSelfUserRemoved;
 
     const showOptionGuests = isActiveGroupParticipant && !!teamId && roleRepository.canToggleGuests(activeConversation);
     const hasAdvancedNotifications = isMutable && isTeam;
@@ -202,12 +202,12 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
         return isUser ? [user] : [];
       });
 
-      if (!removedFromConversation) {
+      if (!isSelfUserRemoved) {
         return [...filteredUsers, selfUser].sort(sortUsersByPriority);
       }
 
       return filteredUsers;
-    }, [participatingUserEts, removedFromConversation, selfUser]);
+    }, [participatingUserEts, isSelfUserRemoved, selfUser]);
 
     const usersCount = userParticipants.length;
     const exceedsMaxUserCount = usersCount > CONFIG.MAX_USERS_VISIBLE;

@@ -87,8 +87,16 @@ export const DetachedWindow = ({
 
     newWindow.document.title = window.document.title;
 
+    const onPageHide = (event: PageTransitionEvent) => {
+      if (event.persisted) {
+        return;
+      }
+      onClose();
+      newWindow.close();
+    };
+
     newWindow.addEventListener('beforeunload', onClose);
-    window.addEventListener('beforeunload', onClose);
+    window.addEventListener('pagehide', onPageHide);
 
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, () => {
       newWindow.document.body.className = window.document.body.className;
@@ -99,7 +107,7 @@ export const DetachedWindow = ({
     return () => {
       newWindow.close();
       newWindow.removeEventListener('beforeunload', onClose);
-      window.removeEventListener('beforeunload', onClose);
+      window.removeEventListener('pagehide', onPageHide);
     };
   }, [height, name, width, onClose, newWindow, onNewWindowOpened]);
 

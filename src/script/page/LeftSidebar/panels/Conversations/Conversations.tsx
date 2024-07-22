@@ -182,6 +182,20 @@ const Conversations: React.FC<ConversationsProps> = ({
   const hasNoConversations = conversations.length + connectRequests.length === 0;
 
   useEffect(() => {
+    amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, (conversation?: Conversation) => {
+      if (!conversation) {
+        return;
+      }
+
+      const includesConversation = currentTabConversations.includes(conversation);
+
+      if (!includesConversation) {
+        setCurrentTab(SidebarTabs.RECENT);
+      }
+    });
+  }, [currentTabConversations]);
+
+  useEffect(() => {
     if (activeConversation && !conversationState.isVisible(activeConversation)) {
       // If the active conversation is not visible, switch to the recent view
       listViewModel.contentViewModel.loadPreviousContent();

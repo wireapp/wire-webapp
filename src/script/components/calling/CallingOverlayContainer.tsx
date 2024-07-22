@@ -123,15 +123,15 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
 
   const toggleMute = (call: Call, muteState: boolean) => callingRepository.muteCall(call, muteState);
 
-  if (!joinedCall || !joinedCall.conversation || joinedCall.conversation.removed_from_conversation()) {
+  const conversation = joinedCall?.conversation;
+
+  if (!joinedCall || !conversation || conversation.isSelfUserRemoved()) {
     return null;
   }
 
   const toggleDetachedWindowScreenShare = (call: Call) => {
     toggleScreenshare(call, DesktopScreenShareMenu.DETACHED_WINDOW);
   };
-
-  const {conversation} = joinedCall;
 
   const isScreenshareActive =
     hasAvailableScreensToShare && desktopScreenShareMenu === DesktopScreenShareMenu.DETACHED_WINDOW;
