@@ -24,6 +24,5 @@ export interface NewTeamInvitation {
   inviter_name: string;
   locale: string;
   name?: string;
-  phone?: string;
   role: Role;
 }

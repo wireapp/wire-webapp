@@ -76,9 +76,7 @@ export class BackendErrorMapper {
           'The given e-mail address is in use.': new InviteEmailInUseError('The given e-mail address is in use.'),
         },
         [BackendErrorLabel.KEY_EXISTS]: {
-          'The given e-mail address or phone number is in use.': new IdentifierExistsError(
-            'The given e-mail address or phone number is in use.',
-          ),
+          'The given e-mail address is in use.': new IdentifierExistsError('The given e-mail address is in use.'),
         },
       },
       [StatusCode.NOT_FOUND]: {

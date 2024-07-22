@@ -21,10 +21,8 @@ import axios, {AxiosRequestConfig} from 'axios';
 import {StatusCodes as StatusCode} from 'http-status-codes';
 
 import {
-  InvitationInvalidPhoneError,
   InvitationInvalidEmailError,
   InvitationEmailExistsError,
-  InvitationPhoneExistsError,
   InvitationNotFoundError,
   InvitationMultipleError,
 } from './InvitationError';
@@ -139,14 +137,8 @@ export class TeamInvitationAPI {
         case BackendErrorLabel.INVITE_EMAIL_EXISTS: {
           throw new InvitationEmailExistsError(backendError.message);
         }
-        case BackendErrorLabel.BAD_REQUEST: {
-          throw new InvitationInvalidPhoneError(backendError.message);
-        }
         case BackendErrorLabel.INVALID_EMAIL: {
           throw new InvitationInvalidEmailError(backendError.message);
-        }
-        case BackendErrorLabel.PHONE_EXISTS: {
-          throw new InvitationPhoneExistsError(backendError.message);
         }
       }
       throw error;

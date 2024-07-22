@@ -39,14 +39,11 @@ export enum BackendErrorLabel {
 
   // Authentication errors
   BLACKLISTED_EMAIL = 'blacklisted-email',
-  BLACKLISTED_PHONE = 'blacklisted-phone',
   DOMAIN_BLOCKED_FOR_REGISTRATION = 'domain-blocked-for-registration',
   INVALID_CODE = 'invalid-code',
   INVALID_CREDENTIALS = 'invalid-credentials',
   INVALID_EMAIL = 'invalid-email',
   INVALID_INVITATION_CODE = 'invalid-invitation-code',
-  INVALID_PHONE = 'invalid-phone',
-  PHONE_EXISTS = 'phone-exists',
   KEY_EXISTS = 'key-exists',
   MISSING_AUTH = 'missing-auth',
   PASSWORD_EXISTS = 'password-exists',
@@ -135,9 +132,7 @@ export enum BackendErrorLabel {
 
 export enum SyntheticErrorLabel {
   ALREADY_INVITED = 'already-invited',
-  FORBIDDEN_PHONE_NUMBER = 'forbidden-phone-number',
   HANDLE_TOO_SHORT = 'handle-too-short',
-  INVALID_PHONE_NUMBER = 'invalid-phone-number',
   REQUEST_CANCELLED = 'request-cancelled',
   SERVICE_NOT_FOUND = 'service-not-found',
   SSO_GENERIC_ERROR = 'generic-sso-error',

@@ -35,7 +35,6 @@ export class SelfAPI {
     LOCALE: 'locale',
     NAME: 'name',
     PASSWORD: 'password',
-    PHONE: 'phone',
     SUPPORTED_PROTOCOLS: 'supported-protocols',
     SELF: '/self',
   };
@@ -48,19 +47,6 @@ export class SelfAPI {
     const config: AxiosRequestConfig = {
       method: 'delete',
       url: `${SelfAPI.URL.SELF}/${SelfAPI.URL.EMAIL}`,
-    };
-
-    await this.client.sendJSON(config);
-  }
-
-  /**
-   * Remove your phone number.
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/removePhone
-   */
-  public async deletePhone(): Promise<void> {
-    const config: AxiosRequestConfig = {
-      method: 'delete',
-      url: `${SelfAPI.URL.SELF}/${SelfAPI.URL.PHONE}`,
     };
 
     await this.client.sendJSON(config);
@@ -179,21 +165,6 @@ export class SelfAPI {
       data: passwordData,
       method: 'put',
       url: `${SelfAPI.URL.SELF}/${SelfAPI.URL.PASSWORD}`,
-    };
-
-    await this.client.sendJSON(config);
-  }
-
-  /**
-   * Change your phone number.
-   * @param phoneData The new phone number (E.164 format)
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/changePhone
-   */
-  public async putPhone(phoneData: {phone: string}): Promise<void> {
-    const config: AxiosRequestConfig = {
-      data: phoneData,
-      method: 'put',
-      url: `${SelfAPI.URL.SELF}/${SelfAPI.URL.PHONE}`,
     };
 
     await this.client.sendJSON(config);
