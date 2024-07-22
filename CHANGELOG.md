@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [46.1.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.1.2...@wireapp/core@46.1.3) (2024-07-22)
+
+### Bug Fixes
+
+* add ciphersuites param when replacing keys ([#6400](https://github.com/wireapp/wire-web-packages/issues/6400)) ([78e255b](https://github.com/wireapp/wire-web-packages/commit/78e255b4bf5e1e3c15e9b058d0092e8889d21d3c))
+
 ## [46.1.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.1.1...@wireapp/core@46.1.2) (2024-07-17)
 
 **Note:** Version bump only for package @wireapp/core
