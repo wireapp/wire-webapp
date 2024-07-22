@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.23.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.22.1...@wireapp/webapp-events@0.23.0) (2024-07-22)
+
+### Features
+
+* remove phone login ([#6382](https://github.com/wireapp/wire-web-packages/issues/6382)) ([22d5637](https://github.com/wireapp/wire-web-packages/commit/22d56370b213058f9663bb024a0d3daadd01d759))
+
 ## [0.22.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.22.0...@wireapp/webapp-events@0.22.1) (2024-07-16)
 
 **Note:** Version bump only for package @wireapp/webapp-events
