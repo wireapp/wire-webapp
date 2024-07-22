@@ -63,7 +63,7 @@ describe('ConversationsList', () => {
     currentTab = SidebarTabs.DIRECTS;
     connectRequests = [];
     conversationState = {isActiveConversation: ko.observable(false) as any} as ConversationState;
-    callState = {joinableCalls: ko.pureComputed(() => []) as any} as CallState;
+    callState = {joinableCalls: ko.pureComputed(() => [] as any[]) as any} as CallState;
     currentFocus = '';
     currentFolder = {} as ConversationLabel;
     resetConversationFocus = jest.fn();
