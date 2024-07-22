@@ -34,7 +34,7 @@ export enum SidebarTabs {
 export const SidebarStatus = {
   OPEN: 'OPEN',
   CLOSED: 'CLOSED',
-  AUTO: 'AUTO',
+  // AUTO: 'AUTO',
 } as const;
 
 export type SidebarStatus = (typeof SidebarStatus)[keyof typeof SidebarStatus];
@@ -63,13 +63,6 @@ const useSidebarStore = create<SidebarStore>()(
         status: state.status,
         currentTab: state.currentTab === SidebarTabs.PREFERENCES ? SidebarTabs.RECENT : state.currentTab,
       }),
-      onRehydrateStorage: () => state => {
-        if (!state) {
-          return;
-        }
-
-        state.status = window.matchMedia(`(min-width: 1000px)`).matches ? state.status : SidebarStatus.AUTO;
-      },
     },
   ),
 );

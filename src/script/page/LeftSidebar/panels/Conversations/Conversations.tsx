@@ -155,8 +155,13 @@ const Conversations: React.FC<ConversationsProps> = ({
   // false when screen is larger than 1000px
   // true when screen is smaller than 1000px
   const isScreenLessThanMdBreakpoint = useMatchMedia('(max-width: 1000px)');
-  const isSideBarOpen =
-    sidebarStatus === SidebarStatus.AUTO ? !isScreenLessThanMdBreakpoint : sidebarStatus === SidebarStatus.OPEN;
+  const isSideBarOpen = sidebarStatus === SidebarStatus.OPEN;
+
+  useEffect(() => {
+    if (isScreenLessThanMdBreakpoint) {
+      setSidebarStatus(SidebarStatus.CLOSED);
+    }
+  }, [isScreenLessThanMdBreakpoint, setSidebarStatus]);
 
   const {conversations: currentTabConversations, searchInputPlaceholder} = getTabConversations({
     currentTab,

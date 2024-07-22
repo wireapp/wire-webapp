@@ -19,8 +19,6 @@
 
 import cx from 'classnames';
 
-import {useMatchMedia} from '@wireapp/react-ui-kit';
-
 import * as Icons from 'Components/Icon';
 import {Config} from 'src/script/Config';
 import {createLabel} from 'src/script/conversation/ConversationLabelRepository';
@@ -63,9 +61,7 @@ export const ConversationFolderTab = ({
   const {status: sidebarStatus, setStatus: setSidebarStatus} = useSidebarStore();
   const {openFolder, isFoldersTabOpen, toggleFoldersTab, expandedFolder} = useFolderStore();
   const {conversationLabelRepository} = conversationRepository;
-  const isScreenLessThanMdBreakpoint = useMatchMedia('(max-width: 1000px)');
-  const isSideBarOpen =
-    sidebarStatus === SidebarStatus.AUTO ? !isScreenLessThanMdBreakpoint : sidebarStatus === SidebarStatus.OPEN;
+  const isSideBarOpen = sidebarStatus === SidebarStatus.OPEN;
 
   function toggleFolder(folderId: string) {
     openFolder(folderId);
