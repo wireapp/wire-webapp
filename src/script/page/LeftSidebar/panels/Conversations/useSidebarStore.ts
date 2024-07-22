@@ -34,7 +34,6 @@ export enum SidebarTabs {
 export const SidebarStatus = {
   OPEN: 'OPEN',
   CLOSED: 'CLOSED',
-  // AUTO: 'AUTO',
 } as const;
 
 export type SidebarStatus = (typeof SidebarStatus)[keyof typeof SidebarStatus];
