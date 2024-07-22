@@ -4693,24 +4693,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^27.0.7":
-  version: 27.0.7
-  resolution: "@wireapp/api-client@npm:27.0.7"
+"@wireapp/api-client@npm:^27.2.0":
+  version: 27.2.0
+  resolution: "@wireapp/api-client@npm:27.2.0"
   dependencies:
-    "@wireapp/commons": ^5.2.8
-    "@wireapp/priority-queue": ^2.1.6
-    "@wireapp/protocol-messaging": 1.48.0
+    "@wireapp/commons": ^5.2.10
+    "@wireapp/priority-queue": ^2.1.7
+    "@wireapp/protocol-messaging": 1.49.0
     axios: 1.7.2
-    axios-retry: 4.4.0
+    axios-retry: 4.4.1
     http-status-codes: 2.3.0
     logdown: 3.3.1
     pako: 2.1.0
     reconnecting-websocket: 4.4.0
     spark-md5: 3.0.2
     tough-cookie: 4.1.4
-    ws: 8.17.0
+    ws: 8.18.0
     zod: 3.23.8
-  checksum: a1f737399c54f652addf12e38bab8852be0bcbd5bfab90f94daeb0a6abb30e31074ff646a358b7d60463d7bf038b15bee1fa6bb5cf602142a0d89a45a94cfe07
+  checksum: 64e73890e28eb77af891d6c73db58c0f5e2e6484e5569d0e61374766cf93c99eec247fda102944e4baa8d3a0139f016bad8f705f8809fca04da84c43b3856fda
   languageName: node
   linkType: hard
 
@@ -4740,15 +4740,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/commons@npm:^5.2.8":
-  version: 5.2.8
-  resolution: "@wireapp/commons@npm:5.2.8"
+"@wireapp/commons@npm:^5.2.10":
+  version: 5.2.10
+  resolution: "@wireapp/commons@npm:5.2.10"
   dependencies:
     ansi-regex: 5.0.1
     fs-extra: 11.2.0
     logdown: 3.3.1
     platform: 1.3.6
-  checksum: f10cd6f4ef687399a098abcf6734df2271f00f856554068e69fdbaf56e9b7ac08f783c1a86237ca50a716400911670c24379050a3f3a8a14c28ea2fbeb112a2c
+  checksum: f4a0cb043961447b5d511bb30c83ed2a943e2901b7e7068092ffbfd28d52106e92149cbfcbe4d3215530a94d097b05a388a136dd11662e8e3a035922073c5175
   languageName: node
   linkType: hard
 
@@ -4775,20 +4775,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:46.0.14":
-  version: 46.0.14
-  resolution: "@wireapp/core@npm:46.0.14"
+"@wireapp/core@npm:46.2.0":
+  version: 46.2.0
+  resolution: "@wireapp/core@npm:46.2.0"
   dependencies:
-    "@wireapp/api-client": ^27.0.7
-    "@wireapp/commons": ^5.2.8
+    "@wireapp/api-client": ^27.2.0
+    "@wireapp/commons": ^5.2.10
     "@wireapp/core-crypto": 1.0.0-rc.60
     "@wireapp/cryptobox": 12.8.0
-    "@wireapp/priority-queue": ^2.1.6
-    "@wireapp/promise-queue": ^2.3.3
-    "@wireapp/protocol-messaging": 1.48.0
-    "@wireapp/store-engine": 5.1.6
+    "@wireapp/priority-queue": ^2.1.7
+    "@wireapp/promise-queue": ^2.3.5
+    "@wireapp/protocol-messaging": 1.49.0
+    "@wireapp/store-engine": 5.1.7
     axios: 1.7.2
-    bazinga64: ^6.3.5
+    bazinga64: ^6.3.6
     deepmerge-ts: 6.0.0
     hash.js: 1.1.7
     http-status-codes: 2.3.0
@@ -4797,7 +4797,7 @@ __metadata:
     long: ^5.2.0
     uuid: 9.0.1
     zod: 3.23.8
-  checksum: c9c44c99a5f48d75dbfcfbb4252c65dd5a33acbd2a6f1df070de927e921ed622b79c4be565286af1c87ff8afc69858a4b9a5252f1e0f639e3e36f8146a5b25d6
+  checksum: d61c28efa635b2b56dff590a85e1ce037267d8593808ca870830a64cf3a36a2a478640ddd6f4c4e16d8fc325ddef2e9b06f93a2d206ea1f847ff5d86740ab178
   languageName: node
   linkType: hard
 
@@ -4873,17 +4873,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/priority-queue@npm:^2.1.6":
-  version: 2.1.6
-  resolution: "@wireapp/priority-queue@npm:2.1.6"
-  checksum: 3d566d38dd8f286beba9fda4ba123f2f6ac0760ab57a3b7357a98195450b0c1d3aca1fb01bec55197dc97436b586c1aa83c4245a262979c7a9e89ea21e06895e
+"@wireapp/priority-queue@npm:^2.1.7":
+  version: 2.1.7
+  resolution: "@wireapp/priority-queue@npm:2.1.7"
+  checksum: a48635aee43bc2e769bffeaebfc850eadec71d5c3170ba3c5391606c8e3b496702cf774abf6722b73323026d87f0c0ba486861a66ed4f5978820b199bc27655d
   languageName: node
   linkType: hard
 
-"@wireapp/promise-queue@npm:^2.3.3":
-  version: 2.3.3
-  resolution: "@wireapp/promise-queue@npm:2.3.3"
-  checksum: 99b648547365508a721109adb4fa1e8ed97e6e68f8583be2aa025315552840e676b034fa0a2d5e271b06dab998a64ae2e5916c89e06ca614f5157e47d367e8bf
+"@wireapp/promise-queue@npm:^2.3.5":
+  version: 2.3.5
+  resolution: "@wireapp/promise-queue@npm:2.3.5"
+  checksum: c5c3869128d2de0efb32b1dceaa20ad9e0f7ec0e7672494f9fa95a052fbde5fb3adb2a6c9496c82289db987705a339cf56cd18acf78b4b5fff2b0181cd19773b
   languageName: node
   linkType: hard
 
@@ -4899,15 +4899,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/protocol-messaging@npm:1.48.0":
-  version: 1.48.0
-  resolution: "@wireapp/protocol-messaging@npm:1.48.0"
+"@wireapp/protocol-messaging@npm:1.49.0":
+  version: 1.49.0
+  resolution: "@wireapp/protocol-messaging@npm:1.49.0"
   dependencies:
     long: 5.2.0
     protobufjs: 7.2.5
     protobufjs-cli: 1.1.2
     typescript: 4.8.4
-  checksum: bb8929c5395a629b85eeae36dce601cf0b5aa09de11163a31ea2f21cbe843c98d18191a48a8fee4826593e9c76c94a3b4f59c35fee7d3c532c749cc4f1d4cc8c
+  checksum: 9a96a068e265884d8f2e193ddb822c7a08899fa5a6e49e1a2ac433c2b892725d9d3db18aff98e1fefad26d18dc39547bdcc576e0c01f1392659066615d13dae4
   languageName: node
   linkType: hard
 
@@ -4952,10 +4952,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/store-engine@npm:5.1.6":
-  version: 5.1.6
-  resolution: "@wireapp/store-engine@npm:5.1.6"
-  checksum: 1a3bc0ea21622bf160231a21b5a3ebf4258ae7ae4a14de7f1b99c00bd6d626ca6962d7b14e5c97c34ebdd1db22ae91f48a5cc1198dbd17c85ffe0c11828dadd8
+"@wireapp/store-engine@npm:5.1.7":
+  version: 5.1.7
+  resolution: "@wireapp/store-engine@npm:5.1.7"
+  checksum: f560e1da61d96cefe09840fb66e1f064e8e7d69bde52077bc46b9d16d01b40600544895f28c86b23e5e5866c958e0c92af555e56b3c80f1016dd8643710f17d0
   languageName: node
   linkType: hard
 
@@ -5629,14 +5629,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios-retry@npm:4.4.0":
-  version: 4.4.0
-  resolution: "axios-retry@npm:4.4.0"
+"axios-retry@npm:4.4.1":
+  version: 4.4.1
+  resolution: "axios-retry@npm:4.4.1"
   dependencies:
     is-retry-allowed: ^2.2.0
   peerDependencies:
     axios: 0.x || 1.x
-  checksum: 19b005bbd3e956080b27ee54fad658dbf7663fa6e884110a638b9f53db50a34c4870648143c8d9397354fedd0ede920693caa1e7c6a762d9477b4cbb48ca22f2
+  checksum: adfe14197dd004cb11a96df86d69b94757b52d5590a2e488ce6398700a92b284831ac920e3c89e0dc5efdce409760882ea5ff20e9c20dc1e1a366815d3bf6187
   languageName: node
   linkType: hard
 
@@ -5863,10 +5863,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bazinga64@npm:^6.3.5":
-  version: 6.3.5
-  resolution: "bazinga64@npm:6.3.5"
-  checksum: d48ff74c2d849600725067525846f84a4f4bc1b9debe32c3921a9ef721326aa4fd06a354cdc0591d66b44692a7255f94f6dbf5ac1bf66f1a8e1096ee92b5dbd3
+"bazinga64@npm:^6.3.6":
+  version: 6.3.6
+  resolution: "bazinga64@npm:6.3.6"
+  checksum: 3f96c5ebfcb00a5248c754b8a6f5e40c2e8c6c45ae145a3fb2b61621b854e0b2a13ac4a343ee0f184f7ff24933539b031e7e31dfb95e34e29a2971701ec06c83
   languageName: node
   linkType: hard
 
@@ -17508,7 +17508,7 @@ __metadata:
     "@wireapp/avs": 9.6.12
     "@wireapp/commons": 5.2.7
     "@wireapp/copy-config": 2.1.14
-    "@wireapp/core": 46.0.14
+    "@wireapp/core": 46.2.0
     "@wireapp/eslint-config": 3.0.5
     "@wireapp/prettier-config": 0.6.3
     "@wireapp/react-ui-kit": 9.16.4
@@ -17900,9 +17900,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ws@npm:8.17.0":
-  version: 8.17.0
-  resolution: "ws@npm:8.17.0"
+"ws@npm:8.18.0":
+  version: 8.18.0
+  resolution: "ws@npm:8.18.0"
   peerDependencies:
     bufferutil: ^4.0.1
     utf-8-validate: ">=5.0.2"
@@ -17911,7 +17911,7 @@ __metadata:
       optional: true
     utf-8-validate:
       optional: true
-  checksum: 147ef9eab0251364e1d2c55338ad0efb15e6913923ccbfdf20f7a8a6cb8f88432bcd7f4d8f66977135bfad35575644f9983201c1a361019594a4e53977bf6d4e
+  checksum: 91d4d35bc99ff6df483bdf029b9ea4bfd7af1f16fc91231a96777a63d263e1eabf486e13a2353970efc534f9faa43bdbf9ee76525af22f4752cbc5ebda333975
   languageName: node
   linkType: hard
 
