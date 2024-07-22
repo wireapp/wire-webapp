@@ -43,7 +43,7 @@ const getProps = async (conversations: Conversation[] = []) => {
       onChangeTab: () => {},
       Icon: <Icon.FoldersOutline />,
       conversationRepository,
-      unreadConversations: [],
+      unreadConversations: [] as Conversation[],
       dataUieName: 'dataUieName',
     },
     conversationRepository,
