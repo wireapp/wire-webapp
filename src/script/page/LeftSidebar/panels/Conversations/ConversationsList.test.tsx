@@ -27,11 +27,11 @@ import {ConversationRepository} from 'src/script/conversation/ConversationReposi
 import {ConversationState} from 'src/script/conversation/ConversationState';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
+import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {ListViewModel} from 'src/script/view_model/ListViewModel';
 import {TestFactory} from 'test/helper/TestFactory';
 
 import {ConversationsList} from './ConversationsList';
-import {SidebarTabs} from './state';
 
 const create1to1Conversation = (userName: string) => {
   const conversation = new Conversation('id', 'domain', ConversationProtocol.PROTEUS);

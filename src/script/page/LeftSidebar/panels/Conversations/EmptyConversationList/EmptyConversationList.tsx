@@ -22,7 +22,7 @@ import {amplify} from 'amplify';
 import {Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/state';
+import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {t} from 'Util/LocalizerUtil';
 
 import {button, paragraph, paragraphBold, paragraphGray, seperator, wrapper} from './EmptyConversationList.styles';

@@ -26,7 +26,7 @@ import {ConversationListCell} from 'Components/list/ConversationListCell';
 import {Call} from 'src/script/calling/Call';
 import {ConversationLabel, ConversationLabelRepository} from 'src/script/conversation/ConversationLabelRepository';
 import {User} from 'src/script/entity/User';
-import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/state';
+import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isKeyboardEvent} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
