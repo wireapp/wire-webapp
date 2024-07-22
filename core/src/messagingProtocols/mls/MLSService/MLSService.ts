@@ -808,6 +808,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     return this.apiClient.api.client.replaceMLSKeyPackages(
       clientId,
       keyPackages.map(keyPackage => btoa(Converter.arrayBufferViewToBaselineString(keyPackage))),
+      numberToHex(this.config.defaultCiphersuite),
     );
   }
 

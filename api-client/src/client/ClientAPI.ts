@@ -62,7 +62,7 @@ export class ClientAPI {
     PUBLIC_KEYS: 'public-keys',
     NONCE: 'nonce',
     ACCESS_TOKEN: 'access-token',
-  };
+  } as const;
 
   public async postClient(newClient: CreateClientPayload): Promise<RegisteredClient> {
     const config: AxiosRequestConfig = {
@@ -157,11 +157,14 @@ export class ClientAPI {
    * @param {string} clientId The client to upload the key packages for
    * @param {string[]} keyPackages The key packages to upload
    */
-  public async replaceMLSKeyPackages(clientId: string, keyPackages: string[]) {
+  public async replaceMLSKeyPackages(clientId: string, keyPackages: string[], ciphersuites: string) {
     const config: AxiosRequestConfig = {
       data: {key_packages: keyPackages},
       method: 'PUT',
       url: `/${ClientAPI.URL.MLS_CLIENTS}/${ClientAPI.URL.MLS_KEY_PACKAGES}/self/${clientId}`,
+      params: {
+        ciphersuites,
+      },
     };
 
     await this.client.sendJSON<PreKeyBundle>(config, true);
