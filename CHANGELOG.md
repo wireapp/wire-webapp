@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [46.2.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.1.3...@wireapp/core@46.2.0) (2024-07-22)
+
+### Features
+
+* remove phone login ([#6382](https://github.com/wireapp/wire-web-packages/issues/6382)) ([22d5637](https://github.com/wireapp/wire-web-packages/commit/22d56370b213058f9663bb024a0d3daadd01d759))
+
 ## [46.1.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.1.2...@wireapp/core@46.1.3) (2024-07-22)
 
 ### Bug Fixes
