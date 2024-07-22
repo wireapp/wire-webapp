@@ -19,14 +19,12 @@
 
 import {AxiosRequestConfig, AxiosResponse} from 'axios';
 
-import {ForbiddenPhoneNumberError, InvalidPhoneNumberError, PasswordExistsError} from './AuthenticationError';
 import {CookieList} from './CookieList';
-import {LoginCodeResponse} from './LoginCodeResponse';
 import {RegisterData} from './RegisterData';
 
-import {AccessTokenData, LoginData, SendLoginCode} from '../auth/';
+import {AccessTokenData, LoginData} from '../auth/';
 import {ClientType} from '../client/';
-import {BackendError, BackendErrorLabel, HttpClient} from '../http/';
+import {HttpClient} from '../http/';
 import {retrieveCookie, sendRequestWithCookie} from '../shims/node/cookie';
 import {User} from '../user/';
 
@@ -97,42 +95,6 @@ export class AuthAPI {
 
     const response = await this.client.sendJSON<AccessTokenData>(config);
     return retrieveCookie(response);
-  }
-
-  /**
-   * This operation generates and sends a login code. A login code can be used only once and times out after 10
-   * minutes. Only one login code may be pending at a time.
-   * @param loginRequest Phone number to use for login SMS or voice call.
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/tab.html#!/sendLoginCode
-   */
-  public async postLoginSend(loginRequest: SendLoginCode): Promise<LoginCodeResponse> {
-    // https://github.com/zinfra/backend-issues/issues/974
-    const defaultLoginRequest = {force: false};
-    const config: AxiosRequestConfig = {
-      data: {...defaultLoginRequest, ...loginRequest},
-      method: 'post',
-      url: `${AuthAPI.URL.LOGIN}/${AuthAPI.URL.SEND}`,
-    };
-
-    try {
-      const response = await this.client.sendJSON<LoginCodeResponse>(config);
-      return response.data;
-    } catch (error) {
-      const backendError = error as BackendError;
-      switch (backendError.label) {
-        case BackendErrorLabel.BAD_REQUEST: {
-          throw new InvalidPhoneNumberError(backendError.message);
-        }
-        case BackendErrorLabel.INVALID_PHONE:
-        case BackendErrorLabel.UNAUTHORIZED: {
-          throw new ForbiddenPhoneNumberError(backendError.message);
-        }
-        case BackendErrorLabel.PASSWORD_EXISTS: {
-          throw new PasswordExistsError(backendError.message);
-        }
-      }
-      throw error;
-    }
   }
 
   public async postLogout(): Promise<void> {

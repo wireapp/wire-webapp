@@ -27,6 +27,5 @@ export interface Self extends User {
    * then the profile can't be edited via normal means.
    */
   managed_by?: ManagedSource;
-  phone?: string;
   sso_id?: SSOSignature;
 }

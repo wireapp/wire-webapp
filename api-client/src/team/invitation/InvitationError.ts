@@ -35,26 +35,11 @@ export class InvitationInvalidEmailError extends InvitationError {
   }
 }
 
-export class InvitationInvalidPhoneError extends InvitationError {
-  constructor(message: string, label = BackendErrorLabel.INVALID_PHONE, code = StatusCode.BAD_REQUEST) {
-    super(message, label, code);
-    Object.setPrototypeOf(this, new.target.prototype);
-    this.name = 'InvitationInvalidPhoneError';
-  }
-}
 export class InvitationEmailExistsError extends InvitationError {
   constructor(message: string, label = BackendErrorLabel.INVITE_EMAIL_EXISTS, code = StatusCode.BAD_REQUEST) {
     super(message, label, code);
     Object.setPrototypeOf(this, new.target.prototype);
     this.name = 'InvitationEmailExistsError';
-  }
-}
-
-export class InvitationPhoneExistsError extends InvitationError {
-  constructor(message: string, label = BackendErrorLabel.PHONE_EXISTS, code = StatusCode.CONFLICT) {
-    super(message, label, code);
-    Object.setPrototypeOf(this, new.target.prototype);
-    this.name = 'InvitationPhoneExistsError';
   }
 }
 

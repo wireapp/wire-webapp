@@ -30,9 +30,6 @@ export type RegisterData = Pick<User, 'accent_id' | 'assets' | 'email' | 'name'>
   label?: string;
   locale?: string;
   password?: string;
-  phone?: string;
-  /** Phone activation code */
-  phone_code?: string;
   /** Data for new team account creation */
   team?: TeamData;
   /** Team invitation code for joining an existing team. Mutually exclusive with `invitation_code` */

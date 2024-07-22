@@ -34,4 +34,3 @@ export * from './LoginData';
 export * from './PreKey';
 export * from './PreKeyBundle';
 export * from './RegisterData';
-export * from './SendLoginCode';

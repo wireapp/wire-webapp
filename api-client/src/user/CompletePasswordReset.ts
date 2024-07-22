@@ -22,5 +22,4 @@ export interface CompletePasswordReset {
   email?: string;
   key?: string;
   password: string;
-  phone?: string;
 }

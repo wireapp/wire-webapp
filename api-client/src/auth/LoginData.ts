@@ -25,6 +25,5 @@ export interface LoginData {
   email?: string;
   handle?: string;
   password?: number | string;
-  phone?: string;
   verificationCode?: string;
 }

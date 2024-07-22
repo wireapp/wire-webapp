@@ -41,7 +41,4 @@ export interface Activate {
    * account activation
    */
   label?: string;
-
-  /** A known phone number to activate. */
-  phone?: string;
 }

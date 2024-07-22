@@ -251,6 +251,7 @@ export const WebAppEvents = {
     LEGAL_HOLD_REMOVED: 'wire.webapp.user.legal_hold_removed',
     PERSIST: 'wire.webapp.user.persist',
     SET_AVAILABILITY: 'wire.webapp.user.set_availability',
+    SET_TEXT_STATUS: 'wire.webapp.user.set_text_status',
     UNBLOCKED: 'wire.webapp.user.unblocked',
     UPDATE: 'wire.webapp.user.update',
   },

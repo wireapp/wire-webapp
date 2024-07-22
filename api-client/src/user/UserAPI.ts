@@ -125,7 +125,7 @@ export class UserAPI {
   }
 
   /**
-   * Activate (i.e. confirm) an email address or phone number.
+   * Activate (i.e. confirm) an email address.
    * @param activationCode Activation code
    * @param activationKey Activation key
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/activate
@@ -421,7 +421,7 @@ export class UserAPI {
   }
 
   /**
-   * Activate (i.e. confirm) an email address or phone number.
+   * Activate (i.e. confirm) an email address.
    * Note: Activation only succeeds once and the number of failed attempts for a valid key is limited.
    * @param activationData Data to activate an account
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/activate_0
@@ -438,7 +438,7 @@ export class UserAPI {
   }
 
   /**
-   * Send (or resend) an email or phone activation code.
+   * Send (or resend) an email activation code.
    * @param activationCodeData Data to send an activation code
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/sendActivationCode
    */
