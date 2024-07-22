@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [27.1.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.1.0...@wireapp/api-client@27.1.1) (2024-07-22)
+
+### Bug Fixes
+
+* add ciphersuites param when replacing keys ([#6400](https://github.com/wireapp/wire-web-packages/issues/6400)) ([78e255b](https://github.com/wireapp/wire-web-packages/commit/78e255b4bf5e1e3c15e9b058d0092e8889d21d3c))
+
 # [27.1.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.0.13...@wireapp/api-client@27.1.0) (2024-07-17)
 
 ### Features
