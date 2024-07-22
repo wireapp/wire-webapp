@@ -36,9 +36,5 @@ export class LoginSanitizer {
     if (loginData.password) {
       loginData.password = loginData.password.toString();
     }
-
-    if (loginData.phone) {
-      loginData.phone = loginData.phone.toString().replace(nonPrintableCharacters, '');
-    }
   }
 }
