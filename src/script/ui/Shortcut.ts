@@ -77,7 +77,7 @@ const SHORTCUT_MAP: Record<string, Shortcut> = {
       electron: {
         macos: 'command + k',
         menu: true,
-        pc: 'ctrl + alt + k',
+        pc: 'ctrl + k',
       },
       webapp: {
         macos: 'command + k',
