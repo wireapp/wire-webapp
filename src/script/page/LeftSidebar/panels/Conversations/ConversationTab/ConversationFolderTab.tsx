@@ -26,12 +26,12 @@ import {Config} from 'src/script/Config';
 import {createLabel} from 'src/script/conversation/ConversationLabelRepository';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {Conversation} from 'src/script/entity/Conversation';
+import {useFolderStore} from 'src/script/page/LeftSidebar/panels/Conversations/useFoldersStore';
 import {
   SidebarStatus,
   SidebarTabs,
-  useFolderState,
   useSidebarStore,
-} from 'src/script/page/LeftSidebar/panels/Conversations/state';
+} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/ContextMenu';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -61,7 +61,7 @@ export const ConversationFolderTab = ({
   dataUieName,
 }: ConversationFolderTabProps) => {
   const {status: sidebarStatus, setStatus: setSidebarStatus} = useSidebarStore();
-  const {openFolder, isFoldersTabOpen, toggleFoldersTab, expandedFolder} = useFolderState();
+  const {openFolder, isFoldersTabOpen, toggleFoldersTab, expandedFolder} = useFolderStore();
   const {conversationLabelRepository} = conversationRepository;
   const isScreenLessThanMdBreakpoint = useMatchMedia('(max-width: 1000px)');
   const isSideBarOpen =
