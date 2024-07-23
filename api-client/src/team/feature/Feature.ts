@@ -84,9 +84,13 @@ export interface FeatureMLSMigrationConfig extends FeatureConfig {
   finaliseRegardlessAfter?: string;
 }
 
+export interface FeatureConferenceCallingConfig extends FeatureConfig {
+  useSFTForOneToOneCalls?: boolean;
+}
+
 export type FeatureAppLock = Feature<FeatureAppLockConfig>;
 export type FeatureClassifiedDomains = Feature<FeatureClassifiedDomainsConfig>;
-export type FeatureConferenceCalling = FeatureWithoutConfig;
+export type FeatureConferenceCalling = Feature<FeatureConferenceCallingConfig>;
 export type FeatureDigitalSignature = FeatureWithoutConfig;
 export type FeatureConversationGuestLink = FeatureWithoutConfig;
 export type FeatureFileSharing = FeatureWithoutConfig;
