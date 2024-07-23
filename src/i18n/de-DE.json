@@ -324,7 +324,7 @@
   "callParticipants": "{{number}} im Anruf",
   "callReactionButtonAriaLabel": "Select emoji {{emoji}}",
   "callReactionButtonsAriaLabel": "Emoji selection bar",
-  "callReactions": "Reactions",
+  "callReactions": "Reaktionen",
   "callReactionsAriaLabel": "Emoji {{emoji}} from {{from}}",
   "callStateCbr": "Konstante Bitrate",
   "callStateConnecting": "Verbinde…",
