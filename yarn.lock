@@ -4693,24 +4693,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^27.0.9-hotfix.2":
-  version: 27.2.0
-  resolution: "@wireapp/api-client@npm:27.2.0"
+"@wireapp/api-client@npm:27.0.9-hotfix.2":
+  version: 27.0.9-hotfix.2
+  resolution: "@wireapp/api-client@npm:27.0.9-hotfix.2"
   dependencies:
-    "@wireapp/commons": ^5.2.10
-    "@wireapp/priority-queue": ^2.1.7
-    "@wireapp/protocol-messaging": 1.49.0
+    "@wireapp/commons": ^5.2.8
+    "@wireapp/priority-queue": ^2.1.6
+    "@wireapp/protocol-messaging": 1.48.0
     axios: 1.7.2
-    axios-retry: 4.4.1
+    axios-retry: 4.4.0
     http-status-codes: 2.3.0
     logdown: 3.3.1
     pako: 2.1.0
     reconnecting-websocket: 4.4.0
     spark-md5: 3.0.2
     tough-cookie: 4.1.4
-    ws: 8.18.0
+    ws: 8.17.1
     zod: 3.23.8
-  checksum: 64e73890e28eb77af891d6c73db58c0f5e2e6484e5569d0e61374766cf93c99eec247fda102944e4baa8d3a0139f016bad8f705f8809fca04da84c43b3856fda
+  checksum: fa33b277c45295135d4ea8e063474d4d01261d7d254609427f5fa467d6107e91c1f0a89946bbad7e02f1fb1a4836142b07db68d7a104f9ff65f9c79251952393
   languageName: node
   linkType: hard
 
@@ -4740,7 +4740,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/commons@npm:^5.2.10, @wireapp/commons@npm:^5.2.8":
+"@wireapp/commons@npm:^5.2.8":
   version: 5.2.10
   resolution: "@wireapp/commons@npm:5.2.10"
   dependencies:
@@ -4873,7 +4873,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/priority-queue@npm:^2.1.6, @wireapp/priority-queue@npm:^2.1.7":
+"@wireapp/priority-queue@npm:^2.1.6":
   version: 2.1.7
   resolution: "@wireapp/priority-queue@npm:2.1.7"
   checksum: a48635aee43bc2e769bffeaebfc850eadec71d5c3170ba3c5391606c8e3b496702cf774abf6722b73323026d87f0c0ba486861a66ed4f5978820b199bc27655d
@@ -4908,18 +4908,6 @@ __metadata:
     protobufjs-cli: 1.1.2
     typescript: 4.8.4
   checksum: bb8929c5395a629b85eeae36dce601cf0b5aa09de11163a31ea2f21cbe843c98d18191a48a8fee4826593e9c76c94a3b4f59c35fee7d3c532c749cc4f1d4cc8c
-  languageName: node
-  linkType: hard
-
-"@wireapp/protocol-messaging@npm:1.49.0":
-  version: 1.49.0
-  resolution: "@wireapp/protocol-messaging@npm:1.49.0"
-  dependencies:
-    long: 5.2.0
-    protobufjs: 7.2.5
-    protobufjs-cli: 1.1.2
-    typescript: 4.8.4
-  checksum: 9a96a068e265884d8f2e193ddb822c7a08899fa5a6e49e1a2ac433c2b892725d9d3db18aff98e1fefad26d18dc39547bdcc576e0c01f1392659066615d13dae4
   languageName: node
   linkType: hard
 
@@ -5641,14 +5629,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios-retry@npm:4.4.1":
-  version: 4.4.1
-  resolution: "axios-retry@npm:4.4.1"
+"axios-retry@npm:4.4.0":
+  version: 4.4.0
+  resolution: "axios-retry@npm:4.4.0"
   dependencies:
     is-retry-allowed: ^2.2.0
   peerDependencies:
     axios: 0.x || 1.x
-  checksum: adfe14197dd004cb11a96df86d69b94757b52d5590a2e488ce6398700a92b284831ac920e3c89e0dc5efdce409760882ea5ff20e9c20dc1e1a366815d3bf6187
+  checksum: 19b005bbd3e956080b27ee54fad658dbf7663fa6e884110a638b9f53db50a34c4870648143c8d9397354fedd0ede920693caa1e7c6a762d9477b4cbb48ca22f2
   languageName: node
   linkType: hard
 
@@ -17912,9 +17900,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ws@npm:8.18.0":
-  version: 8.18.0
-  resolution: "ws@npm:8.18.0"
+"ws@npm:8.17.1":
+  version: 8.17.1
+  resolution: "ws@npm:8.17.1"
   peerDependencies:
     bufferutil: ^4.0.1
     utf-8-validate: ">=5.0.2"
@@ -17923,7 +17911,7 @@ __metadata:
       optional: true
     utf-8-validate:
       optional: true
-  checksum: 91d4d35bc99ff6df483bdf029b9ea4bfd7af1f16fc91231a96777a63d263e1eabf486e13a2353970efc534f9faa43bdbf9ee76525af22f4752cbc5ebda333975
+  checksum: 442badcce1f1178ec87a0b5372ae2e9771e07c4929a3180321901f226127f252441e8689d765aa5cfba5f50ac60dd830954afc5aeae81609aefa11d3ddf5cecf
   languageName: node
   linkType: hard
 

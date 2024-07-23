@@ -212,6 +212,7 @@
     "translate:merge": "formatjs extract --format './bin/translations_extract_formatter.js' --out-file './src/i18n/en-US.json' './src/script/strings.ts'"
   },
   "resolutions": {
+    "@wireapp/api-client": "27.0.9-hotfix.2",
     "libsodium": "0.7.10",
     "xml2js": "0.5.0",
     "@stablelib/utf8": "1.0.2",
