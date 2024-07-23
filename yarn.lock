@@ -4693,7 +4693,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^27.0.10-hotfix-1.0":
+"@wireapp/api-client@npm:^27.0.9-hotfix.2":
   version: 27.2.0
   resolution: "@wireapp/api-client@npm:27.2.0"
   dependencies:
@@ -4775,11 +4775,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:46.0.17-hotfix-1.0":
-  version: 46.0.17-hotfix-1.0
-  resolution: "@wireapp/core@npm:46.0.17-hotfix-1.0"
+"@wireapp/core@npm:46.0.16-hotfix-1.0":
+  version: 46.0.16-hotfix-1.0
+  resolution: "@wireapp/core@npm:46.0.16-hotfix-1.0"
   dependencies:
-    "@wireapp/api-client": ^27.0.10-hotfix-1.0
+    "@wireapp/api-client": ^27.0.9-hotfix.2
     "@wireapp/commons": ^5.2.8
     "@wireapp/core-crypto": 1.0.0-rc.60
     "@wireapp/cryptobox": 12.8.0
@@ -4797,7 +4797,7 @@ __metadata:
     long: ^5.2.0
     uuid: 9.0.1
     zod: 3.23.8
-  checksum: e8d461866c360fa560e1378c912af66e18e3a25a72efa1d4fea99ac390d0a2ef8d07ee8751d8fc393eba9c18037bc2dfd20c1b5a6fb979e2dbcc7a527b5afd80
+  checksum: f7d2553f307fb9a273fd7c1bc8a6e886c37a55649d45c247dac1145f1cd43597ba1050ebafea867c258ebeb6626f84bbab4ecc5b1edf7f98dbfa41d0c1ee31bf
   languageName: node
   linkType: hard
 
@@ -17520,7 +17520,7 @@ __metadata:
     "@wireapp/avs": 9.6.12
     "@wireapp/commons": 5.2.7
     "@wireapp/copy-config": 2.1.14
-    "@wireapp/core": 46.0.17-hotfix-1.0
+    "@wireapp/core": 46.0.16-hotfix-1.0
     "@wireapp/eslint-config": 3.0.5
     "@wireapp/prettier-config": 0.6.3
     "@wireapp/react-ui-kit": 9.16.4
