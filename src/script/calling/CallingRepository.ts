@@ -1523,7 +1523,7 @@ export class CallingRepository {
       [Segmentation.CALL.AV_SWITCH_TOGGLE]: call.analyticsAvSwitchToggle,
       [Segmentation.CALL.DIRECTION]: this.getCallDirection(call),
       [Segmentation.CALL.DURATION]: Math.ceil((Date.now() - (call.startedAt() || 0)) / 5000) * 5,
-      [Segmentation.CALL.END_REASON]: this.getCallEndReasonText(reason),
+      [Segmentation.CALL.END_REASON]: reason,
       [Segmentation.CALL.REASON]: this.getCallEndReasonText(reason),
       [Segmentation.CALL.PARTICIPANTS]: call.analyticsMaximumParticipants,
       [Segmentation.CALL.SCREEN_SHARE]: call.analyticsScreenSharing,
