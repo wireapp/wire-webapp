@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.3.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.2.0...@wireapp/api-client@27.3.0) (2024-07-23)
+
+### Features
+
+* add flag for 1:1 sft calls ([#6403](https://github.com/wireapp/wire-web-packages/issues/6403)) ([ad86144](https://github.com/wireapp/wire-web-packages/commit/ad86144aef1b2818cf9598d7275d64ac531fe7b1))
+
 # [27.2.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.1.1...@wireapp/api-client@27.2.0) (2024-07-22)
 
 ### Features
