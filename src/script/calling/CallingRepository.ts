@@ -19,6 +19,7 @@
 
 import type {CallConfigData} from '@wireapp/api-client/lib/account/CallConfigData';
 import {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
+import {FEATURE_KEY} from '@wireapp/api-client/lib/team';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {WebappProperties} from '@wireapp/api-client/lib/user/data';
 import {MessageSendingState} from '@wireapp/core/lib/conversation';
@@ -125,10 +126,6 @@ enum CALL_DIRECTION {
 }
 
 type SubconversationData = {epoch: number; secretKey: string; members: SubconversationEpochInfoMember[]};
-
-//FIXME: This is a temporary solution to enable conference calling for one-on-one calls
-// there will be a feature flag to enable this
-const useConferenceForOneOnOneCalls = false;
 
 export class CallingRepository {
   private readonly acceptVersionWarning: (conversationId: QualifiedId) => void;
@@ -766,7 +763,10 @@ export class CallingRepository {
   //##############################################################################
 
   private getConversationType(conversation: Conversation): CONV_TYPE {
-    if (conversation.isGroup() || useConferenceForOneOnOneCalls) {
+    const useSFTForOneToOneCalls =
+      this.teamState.teamFeatures()?.[FEATURE_KEY.CONFERENCE_CALLING]?.config?.useSFTForOneToOneCalls;
+
+    if (conversation.isGroup() || useSFTForOneToOneCalls) {
       if (isMLSConversation(conversation)) {
         return CONV_TYPE.CONFERENCE_MLS;
       }
