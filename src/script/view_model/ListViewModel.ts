@@ -285,12 +285,14 @@ export class ListViewModel {
   };
 
   readonly openConversations = (archive = false): void => {
+    const {currentTab, setCurrentTab} = useSidebarStore.getState();
     const newState = this.isActivatedAccount()
       ? archive
         ? ListState.ARCHIVE
         : ListState.CONVERSATIONS
       : ListState.TEMPORARY_GUEST;
     this.switchList(newState, false);
+    setCurrentTab(archive ? SidebarTabs.ARCHIVES : currentTab);
   };
 
   private readonly hideList = (): void => {
