@@ -60,7 +60,8 @@ const useSidebarStore = create<SidebarStore>()(
       storage: createJSONStorage(() => localStorage),
       partialize: state => ({
         status: state.status,
-        currentTab: state.currentTab === SidebarTabs.PREFERENCES ? SidebarTabs.RECENT : state.currentTab,
+        currentTab:
+          state.currentTab === SidebarTabs.PREFERENCES || SidebarTabs.CONNECT ? SidebarTabs.RECENT : state.currentTab,
       }),
     },
   ),
