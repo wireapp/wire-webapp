@@ -275,7 +275,7 @@ export class ContentViewModel {
     } finally {
       const {currentTab, setCurrentTab} = useSidebarStore.getState();
 
-      if (currentTab === SidebarTabs.PREFERENCES || SidebarTabs.CONNECT) {
+      if ([SidebarTabs.PREFERENCES, SidebarTabs.CONNECT].includes(currentTab)) {
         setCurrentTab(SidebarTabs.RECENT);
       }
     }
