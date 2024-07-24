@@ -370,6 +370,10 @@ export class CallingRepository {
     activeCall?.muteState(isMuted ? this.nextMuteState : MuteState.NOT_MUTED);
   };
 
+  private readonly isMLSConference = (conversation: Conversation): conversation is MLSConversation => {
+    return isMLSConversation(conversation) && this.getConversationType(conversation) === CONV_TYPE.CONFERENCE_MLS;
+  };
+
   public async pushClients(call: Call | undefined = this.callState.joinedCall(), checkMismatch?: boolean) {
     if (!call) {
       return false;
@@ -383,7 +387,7 @@ export class CallingRepository {
     }
     const allClients = await this.core.service!.conversation.fetchAllParticipantsClients(call.conversationId);
 
-    if (this.getConversationType(conversation) !== CONV_TYPE.CONFERENCE_MLS) {
+    if (!this.isMLSConference(conversation)) {
       const qualifiedClients = flattenUserMap(allClients);
 
       const clients: Clients = flatten(
@@ -831,7 +835,7 @@ export class CallingRepository {
         this.removeCall(call);
       }
 
-      if (this.getConversationType(conversation) === CONV_TYPE.CONFERENCE_MLS && isMLSConversation(conversation)) {
+      if (this.isMLSConference(conversation)) {
         await this.joinMlsConferenceSubconversation(conversation);
       }
 
@@ -963,11 +967,7 @@ export class CallingRepository {
         [Segmentation.CALL.DIRECTION]: this.getCallDirection(call),
       });
 
-      if (
-        !conversation ||
-        this.getConversationType(conversation) !== CONV_TYPE.CONFERENCE_MLS ||
-        !isMLSConversation(conversation)
-      ) {
+      if (!conversation || !this.isMLSConference(conversation)) {
         return;
       }
 
@@ -1002,11 +1002,7 @@ export class CallingRepository {
 
   private readonly updateConferenceSubconversationEpoch = async (conversationId: QualifiedId) => {
     const conversation = this.getConversationById(conversationId);
-    if (
-      !conversation ||
-      this.getConversationType(conversation) !== CONV_TYPE.CONFERENCE_MLS ||
-      !isMLSConversation(conversation)
-    ) {
+    if (!conversation || !this.isMLSConference(conversation)) {
       return;
     }
 
@@ -1025,7 +1021,7 @@ export class CallingRepository {
 
   private readonly handleCallParticipantChange = (conversationId: QualifiedId, members: QualifiedWcallMember[]) => {
     const conversation = this.getConversationById(conversationId);
-    if (!conversation || this.getConversationType(conversation) !== CONV_TYPE.CONFERENCE_MLS) {
+    if (!conversation || !this.isMLSConference(conversation)) {
       return;
     }
 
@@ -1685,11 +1681,7 @@ export class CallingRepository {
 
     const conversation = this.getConversationById(call.conversationId);
 
-    if (
-      conversation &&
-      this.getConversationType(conversation) === CONV_TYPE.CONFERENCE_MLS &&
-      isMLSConversation(conversation)
-    ) {
+    if (conversation && this.isMLSConference(conversation)) {
       const subconversationEpochInfo = await this.subconversationService.getSubconversationEpochInfo(
         conversation.qualifiedId,
         conversation.groupId,
