@@ -102,7 +102,6 @@ export const UserAvatar = ({
   const avatarImgAlt = avatarAlt ? avatarAlt : `${t('userProfileImageAlt')} ${name}`;
 
   const hasAvailabilityState = typeof availability === 'number' && availability !== AvailabilityType.Type.NONE;
-  const inTeam = teamState.isInTeam(participant);
 
   return (
     <AvatarWrapper
@@ -134,7 +133,7 @@ export const UserAvatar = ({
 
       {(!isImageGrey || isBlocked) && <AvatarBorder isTransparent={!isBlocked} />}
 
-      {inTeam && !hideAvailabilityStatus && hasAvailabilityState && (
+      {!hideAvailabilityStatus && hasAvailabilityState && (
         <AvailabilityIcon availability={availability} avatarSize={avatarSize} />
       )}
     </AvatarWrapper>

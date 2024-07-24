@@ -26,7 +26,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/Icon';
 import {ConversationLabel} from 'src/script/conversation/ConversationLabelRepository';
-import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/state';
+import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {handleEnterDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 

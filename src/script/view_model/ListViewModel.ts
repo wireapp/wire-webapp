@@ -39,7 +39,7 @@ import type {ConversationRepository} from '../conversation/ConversationRepositor
 import {ConversationState} from '../conversation/ConversationState';
 import type {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
-import {SidebarTabs, useSidebarStore} from '../page/LeftSidebar/panels/Conversations/state';
+import {SidebarTabs, useSidebarStore} from '../page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {PanelState} from '../page/RightSidebar';
 import {useAppMainState} from '../page/state';
 import {ContentState, ListState, useAppState} from '../page/useAppState';
@@ -285,12 +285,14 @@ export class ListViewModel {
   };
 
   readonly openConversations = (archive = false): void => {
+    const {currentTab, setCurrentTab} = useSidebarStore.getState();
     const newState = this.isActivatedAccount()
       ? archive
         ? ListState.ARCHIVE
         : ListState.CONVERSATIONS
       : ListState.TEMPORARY_GUEST;
     this.switchList(newState, false);
+    setCurrentTab(archive ? SidebarTabs.ARCHIVES : currentTab);
   };
 
   private readonly hideList = (): void => {

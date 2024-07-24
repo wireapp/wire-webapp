@@ -17,7 +17,7 @@
  *
  */
 
-import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/state';
+import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {t} from 'Util/LocalizerUtil';
 
 import {Conversation} from '../../../../entity/Conversation';

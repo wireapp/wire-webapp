@@ -22,7 +22,7 @@ import {GroupIcon, InfoIcon, MessageIcon, StarIcon, ExternalLinkIcon} from '@wir
 import * as Icon from 'Components/Icon';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {ConversationFolderTab} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTab/ConversationFolderTab';
-import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/state';
+import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {t} from 'Util/LocalizerUtil';
 
 import {Config} from '../../../../../Config';

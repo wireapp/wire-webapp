@@ -40,6 +40,7 @@ import {Conversation} from '../entity/Conversation';
 import type {Message} from '../entity/message/Message';
 import {ConversationError} from '../error/ConversationError';
 import '../page/LeftSidebar';
+import {SidebarTabs, useSidebarStore} from '../page/LeftSidebar/panels/Conversations/useSidebarStore';
 import '../page/MainContent';
 import {PanelState} from '../page/RightSidebar';
 import {useAppMainState} from '../page/state';
@@ -271,6 +272,12 @@ export class ContentViewModel {
       }
 
       throw error;
+    } finally {
+      const {currentTab, setCurrentTab} = useSidebarStore.getState();
+
+      if ([SidebarTabs.PREFERENCES, SidebarTabs.CONNECT].includes(currentTab)) {
+        setCurrentTab(SidebarTabs.RECENT);
+      }
     }
   };
 

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2022 Wire Swiss GmbH
+ * Copyright (C) 2024 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
  */
 
 import {create} from 'zustand';
-import {persist, createJSONStorage} from 'zustand/middleware';
 
 type FolderState = {
   expandedFolder: string;
@@ -37,7 +36,7 @@ const closeFolder = (state: FolderState): FolderState => {
   return {...state, expandedFolder: ''};
 };
 
-const useFolderState = create<FolderState>((set, get) => ({
+const useFolderStore = create<FolderState>((set, get) => ({
   expandedFolder: '',
   isFoldersTabOpen: false,
 
@@ -58,51 +57,4 @@ const useFolderState = create<FolderState>((set, get) => ({
     }),
 }));
 
-export enum SidebarTabs {
-  RECENT,
-  FOLDER,
-  FAVORITES,
-  GROUPS,
-  DIRECTS,
-  ARCHIVES,
-  CONNECT,
-  PREFERENCES,
-}
-
-export const SidebarStatus = {
-  OPEN: 'OPEN',
-  CLOSED: 'CLOSED',
-  AUTO: 'AUTO',
-} as const;
-
-export type SidebarStatus = (typeof SidebarStatus)[keyof typeof SidebarStatus];
-
-export interface SidebarStore {
-  status: SidebarStatus;
-  setStatus: (status: SidebarStatus) => void;
-  currentTab: SidebarTabs;
-  setCurrentTab: (tab: SidebarTabs) => void;
-}
-
-const useSidebarStore = create<SidebarStore>()(
-  persist(
-    set => ({
-      currentTab: SidebarTabs.RECENT,
-      setCurrentTab: (tab: SidebarTabs) => {
-        set({currentTab: tab});
-      },
-      status: SidebarStatus.OPEN,
-      setStatus: status => set({status: status}),
-    }),
-    {
-      name: 'sidebar-store',
-      storage: createJSONStorage(() => localStorage),
-      partialize: state => ({
-        status: state.status,
-        currentTab: state.currentTab === SidebarTabs.PREFERENCES ? SidebarTabs.RECENT : state.currentTab,
-      }),
-    },
-  ),
-);
-
-export {useFolderState, useSidebarStore};
+export {useFolderStore};

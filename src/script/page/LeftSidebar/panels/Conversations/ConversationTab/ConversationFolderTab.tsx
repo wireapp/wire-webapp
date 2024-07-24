@@ -19,19 +19,17 @@
 
 import cx from 'classnames';
 
-import {useMatchMedia} from '@wireapp/react-ui-kit';
-
 import * as Icons from 'Components/Icon';
 import {Config} from 'src/script/Config';
-import {createLabel} from 'src/script/conversation/ConversationLabelRepository';
+import {createLabel, LabelType} from 'src/script/conversation/ConversationLabelRepository';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {Conversation} from 'src/script/entity/Conversation';
+import {useFolderStore} from 'src/script/page/LeftSidebar/panels/Conversations/useFoldersStore';
 import {
   SidebarStatus,
   SidebarTabs,
-  useFolderState,
   useSidebarStore,
-} from 'src/script/page/LeftSidebar/panels/Conversations/state';
+} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/ContextMenu';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -61,11 +59,9 @@ export const ConversationFolderTab = ({
   dataUieName,
 }: ConversationFolderTabProps) => {
   const {status: sidebarStatus, setStatus: setSidebarStatus} = useSidebarStore();
-  const {openFolder, isFoldersTabOpen, toggleFoldersTab, expandedFolder} = useFolderState();
+  const {openFolder, isFoldersTabOpen, toggleFoldersTab, expandedFolder} = useFolderStore();
   const {conversationLabelRepository} = conversationRepository;
-  const isScreenLessThanMdBreakpoint = useMatchMedia('(max-width: 1000px)');
-  const isSideBarOpen =
-    sidebarStatus === SidebarStatus.AUTO ? !isScreenLessThanMdBreakpoint : sidebarStatus === SidebarStatus.OPEN;
+  const isSideBarOpen = sidebarStatus === SidebarStatus.OPEN;
 
   function toggleFolder(folderId: string) {
     openFolder(folderId);
@@ -75,6 +71,7 @@ export const ConversationFolderTab = ({
   const {labels} = useKoSubscribableChildren(conversationLabelRepository, ['labels']);
 
   const folders = labels
+    .filter(label => label.type !== LabelType.Favorite)
     .map(label => createLabel(label.name, conversationLabelRepository.getLabelConversations(label), label.id))
     .filter(({conversations, name}) => !!conversations().length && !!name);
 
