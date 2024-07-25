@@ -163,6 +163,10 @@ export const TitleBar: React.FC<TitleBarProps> = ({
   );
 
   const showAddParticipant = useCallback(() => {
+    if (is1to1) {
+      return;
+    }
+
     if (!isActiveParticipant) {
       return showDetails(false);
     }
@@ -172,20 +176,18 @@ export const TitleBar: React.FC<TitleBarProps> = ({
     } else {
       amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, 'conversation_details', firstUserEntity);
     }
-  }, [firstUserEntity, isActiveParticipant, isGroup, showDetails]);
+  }, [firstUserEntity, isActiveParticipant, isGroup, showDetails, is1to1]);
 
   useEffect(() => {
     // TODO remove the titlebar for now to ensure that buttons are clickable in macOS wrappers
     window.setTimeout(() => document.querySelector('.titlebar')?.remove(), TIME_IN_MILLIS.SECOND);
 
-    window.setTimeout(() => {
-      amplify.subscribe(WebAppEvents.SHORTCUT.PEOPLE, () => showDetails(false));
-      amplify.subscribe(WebAppEvents.SHORTCUT.ADD_PEOPLE, () => {
-        if (isActivatedAccount) {
-          showAddParticipant();
-        }
-      });
-    }, 50);
+    amplify.subscribe(WebAppEvents.SHORTCUT.PEOPLE, () => showDetails(false));
+    amplify.subscribe(WebAppEvents.SHORTCUT.ADD_PEOPLE, () => {
+      if (isActivatedAccount) {
+        showAddParticipant();
+      }
+    });
 
     return () => {
       amplify.unsubscribeAll(WebAppEvents.SHORTCUT.PEOPLE);
