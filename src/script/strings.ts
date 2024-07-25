@@ -76,6 +76,11 @@ export const indexStrings = defineMessages({
     defaultMessage: 'Welcome to {brandName}',
     id: 'index.welcome',
   },
+  disclaimer: {
+    defaultMessage:
+      'This is NOT WIRE but an internal testing environment. Authorized for use by Wire employees only. Any public USE is PROHIBITED. The data of the users of this test environment is extensively recorded and analysed. To use the secure messenger Wire, please visit {link}',
+    id: 'index.disclaimer',
+  },
 });
 
 export const setAccountTypeStrings = defineMessages({
@@ -375,50 +380,6 @@ export const joinGuestLinkPasswordModalStrings = defineMessages({
   },
 });
 
-export const unsupportedStrings = defineMessages({
-  desktopOnlyMessage: {
-    defaultMessage: 'Please use {brandName} on your desktop app instead.',
-    id: 'unsupported.desktopOnlyMessage',
-  },
-  headlineBrowser: {
-    defaultMessage: 'This browser is not supported.',
-    id: 'unsupported.headlineBrowser',
-  },
-  headlineCookies: {
-    defaultMessage: 'Enable cookies',
-    id: 'unsupported.headlineCookies',
-  },
-  headlineIndexedDb: {
-    defaultMessage: 'Your browser is in private mode',
-    id: 'unsupported.headlineIndexedDb',
-  },
-  subheadBrowser: {
-    defaultMessage:
-      'Download the latest version of <strong>Google Chrome, Mozilla Firefox, Opera</strong> or <strong>Microsoft Edge.</strong>',
-    id: 'unsupported.subheadBrowser',
-  },
-  subheadCookies: {
-    defaultMessage: 'Enable cookies to log in to {brandName}.',
-    id: 'unsupported.subheadCookies',
-  },
-  subheadIndexedDb: {
-    defaultMessage:
-      '{brandName} needs access to local storage to display your messages. Local storage is not available in private mode.',
-    id: 'unsupported.subheadIndexedDb',
-  },
-});
-
-export const unsupportedJoinStrings = defineMessages({
-  unsupportedJoinHeadline: {
-    defaultMessage: 'You have been invited to join a conversation in {brandName}',
-    id: 'conversationJoin.unsupportedJoinHeadline',
-  },
-  unsupportedJoinMobileSubhead: {
-    defaultMessage: 'Open this link on your computer.',
-    id: 'conversationJoin.unsupportedJoinMobileSubhead',
-  },
-});
-
 export const conversationJoinStrings = defineMessages({
   existentAccountJoinWithoutLink: {
     defaultMessage: 'Join the conversation',
@@ -487,14 +448,6 @@ export const conversationJoinStrings = defineMessages({
 });
 
 export const errorHandlerStrings = defineMessages({
-  [SyntheticErrorLabel.INVALID_PHONE_NUMBER]: {
-    defaultMessage: 'Invalid Phone Number',
-    id: 'authErrorPhoneNumberInvalid',
-  },
-  [SyntheticErrorLabel.FORBIDDEN_PHONE_NUMBER]: {
-    defaultMessage: 'Sorry. This phone number is forbidden.',
-    id: 'authErrorPhoneNumberForbidden',
-  },
   [BackendErrorLabel.NO_CONVERSATION_CODE]: {
     defaultMessage: 'This link is no longer valid. Ask the person who invited you how to join.',
     id: 'BackendError.LABEL.CONVERSATION_CODE_NOT_FOUND',
@@ -518,10 +471,6 @@ export const errorHandlerStrings = defineMessages({
   [BackendErrorLabel.BLACKLISTED_EMAIL]: {
     defaultMessage: 'This email address is not allowed',
     id: 'BackendError.LABEL.BLACKLISTED_EMAIL',
-  },
-  [BackendErrorLabel.BLACKLISTED_PHONE]: {
-    defaultMessage: 'This phone number is not allowed',
-    id: 'BackendError.LABEL.BLACKLISTED_PHONE',
   },
   [BackendErrorLabel.DOMAIN_BLOCKED_FOR_REGISTRATION]: {
     defaultMessage:
@@ -764,10 +713,6 @@ export const loginStrings = defineMessages({
     defaultMessage: 'Password',
     id: 'login.passwordPlaceholder',
   },
-  phoneLogin: {
-    defaultMessage: 'Log in with phone number',
-    id: 'login.phoneLogin',
-  },
   publicComputer: {
     defaultMessage: 'This is a public computer',
     id: 'login.publicComputer',
@@ -827,37 +772,6 @@ export const ssoLoginStrings = defineMessages({
     defaultMessage:
       'If your email matches an enterprise installation of {brandName}, this app will connect to that server.',
     id: 'ssoLogin.subheadEmailEnvironmentSwitchWarning',
-  },
-});
-
-export const phoneLoginStrings = defineMessages({
-  accountCountryCode: {
-    defaultMessage: 'Country Code',
-    id: 'authAccountCountryCode',
-  },
-  errorCountryCodeInvalid: {
-    defaultMessage: 'Invalid Country Code',
-    id: 'authErrorCountryCodeInvalid',
-  },
-  loginHead: {
-    defaultMessage: 'Phone Log in',
-    id: 'authAccountSignInPhone',
-  },
-  verifyCodeChangePhone: {
-    defaultMessage: 'Change phone number',
-    id: 'authVerifyCodeChangePhone',
-  },
-  verifyCodeDescription: {
-    defaultMessage: 'Enter the verification code we sent to {number}.',
-    id: 'authVerifyCodeDescription',
-  },
-  verifyCodeResend: {
-    defaultMessage: 'Resend',
-    id: 'authVerifyCodeResendDetail',
-  },
-  verifyPasswordHeadline: {
-    defaultMessage: 'Enter your password',
-    id: 'authVerifyPasswordHeadline',
   },
 });
 

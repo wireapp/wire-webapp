@@ -119,21 +119,15 @@ export const InputBar = ({
     teamState,
     ['classifiedDomains', 'isSelfDeletingMessagesEnabled', 'isFileSharingSendingEnabled'],
   );
-  const {
-    connection,
-    localMessageTimer,
-    messageTimer,
-    hasGlobalMessageTimer,
-    removed_from_conversation: removedFromConversation,
-    is1to1,
-  } = useKoSubscribableChildren(conversation, [
-    'connection',
-    'localMessageTimer',
-    'messageTimer',
-    'hasGlobalMessageTimer',
-    'removed_from_conversation',
-    'is1to1',
-  ]);
+  const {connection, localMessageTimer, messageTimer, hasGlobalMessageTimer, isSelfUserRemoved, is1to1} =
+    useKoSubscribableChildren(conversation, [
+      'connection',
+      'localMessageTimer',
+      'messageTimer',
+      'hasGlobalMessageTimer',
+      'isSelfUserRemoved',
+      'is1to1',
+    ]);
   const {isOutgoingRequest, isIncomingRequest} = useKoSubscribableChildren(connection, [
     'isOutgoingRequest',
     'isIncomingRequest',
@@ -435,39 +429,37 @@ export const InputBar = ({
     });
   };
 
-  const onWindowClick = (event: Event): void =>
-    handleClickOutsideOfInputBar(event, () => {
-      cancelMessageEditing(true);
-      cancelMessageReply();
-    });
-
   useEffect(() => {
     amplify.subscribe(WebAppEvents.CONVERSATION.IMAGE.SEND, uploadImages);
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REPLY, replyMessage);
     amplify.subscribe(WebAppEvents.EXTENSIONS.GIPHY.SEND, sendGiphy);
     amplify.subscribe(WebAppEvents.SHORTCUT.PING, onPingClick);
+    conversation.isTextInputReady(true);
 
     return () => {
       amplify.unsubscribeAll(WebAppEvents.SHORTCUT.PING);
       amplify.unsubscribeAll(WebAppEvents.CONVERSATION.IMAGE.SEND);
       amplify.unsubscribeAll(WebAppEvents.CONVERSATION.MESSAGE.REPLY);
       amplify.unsubscribeAll(WebAppEvents.EXTENSIONS.GIPHY.SEND);
+      conversation.isTextInputReady(false);
     };
   }, []);
 
   const saveDraft = async (editorState: string) => {
-    await saveDraftState(storageRepository, conversation, editorState, replyMessageEntity?.id);
+    await saveDraftState(storageRepository, conversation, editorState, replyMessageEntity?.id, editedMessage?.id);
   };
 
   const loadDraft = async () => {
     const draftState = await loadDraftState(conversation, storageRepository, messageRepository);
 
-    if (draftState.messageReply) {
-      void draftState.messageReply.then(replyEntity => {
-        if (replyEntity?.isReplyable()) {
-          setReplyMessageEntity(replyEntity);
-        }
-      });
+    const reply = draftState.messageReply;
+    if (reply?.isReplyable()) {
+      setReplyMessageEntity(reply);
+    }
+
+    const editedMessage = draftState.editedMessage;
+    if (editedMessage) {
+      setEditedMessage(editedMessage);
     }
 
     return draftState;
@@ -496,6 +488,15 @@ export const InputBar = ({
   }, [replyMessageEntity]);
 
   useEffect(() => {
+    const onWindowClick = (event: Event): void =>
+      handleClickOutsideOfInputBar(event, () => {
+        // We want to add a timeout in case the click happens because the user switched conversation and the component is unmounting.
+        // In this case we want to keep the edited message for this conversation
+        setTimeout(() => {
+          cancelMessageEditing(true);
+          cancelMessageReply();
+        });
+      });
     if (isEditing) {
       window.addEventListener('click', onWindowClick);
 
@@ -505,7 +506,7 @@ export const InputBar = ({
     }
 
     return () => undefined;
-  }, [isEditing]);
+  }, [cancelMessageEditing, cancelMessageReply, isEditing]);
 
   useFilePaste(checkFileSharingPermission(handlePasteFiles));
 
@@ -567,11 +568,16 @@ export const InputBar = ({
           <>
             <div className="controls-left">
               {!!textValue.length && (
-                <Avatar className="cursor-default" participant={selfUser} avatarSize={AVATAR_SIZE.X_SMALL} />
+                <Avatar
+                  className="cursor-default"
+                  participant={selfUser}
+                  avatarSize={AVATAR_SIZE.X_SMALL}
+                  hideAvailabilityStatus
+                />
               )}
             </div>
 
-            {!removedFromConversation && !pastedFile && (
+            {!isSelfUserRemoved && !pastedFile && (
               <RichTextEditor
                 onSetup={lexical => {
                   editorRef.current = lexical;

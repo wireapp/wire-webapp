@@ -139,13 +139,6 @@ export const nameWrapper: CSSObject = {
   paddingRight: '8px',
 };
 
-export const userAvailability: CSSObject = {
-  '.availability-state-label': ellipsis,
-  '.availability-state-icon': {
-    display: 'flex',
-  },
-};
-
 export const userName: CSSObject = {
   maxWidth: '100%',
   whiteSpace: 'nowrap',

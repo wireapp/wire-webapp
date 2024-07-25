@@ -26,7 +26,6 @@ import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
 
-jest.mock('../util/SVGProvider');
 function createMockedURLSearchParams(value: string) {
   return class MockedURLSearchParams extends window.URLSearchParams {
     constructor() {
@@ -46,17 +45,7 @@ describe('CustomEnvironmentRedirect', () => {
     const originalURLSearchParams = window.URLSearchParams;
     window.URLSearchParams = createMockedURLSearchParams(expectedHost);
     spyOn(actionRoot.navigationAction, 'doNavigate').and.returnValue(() => {});
-    mountComponent(
-      <CustomEnvironmentRedirect />,
-      mockStoreFactory()({
-        ...initialRootState,
-        runtimeState: {
-          hasCookieSupport: true,
-          hasIndexedDbSupport: true,
-          isSupportedBrowser: true,
-        },
-      }),
-    );
+    mountComponent(<CustomEnvironmentRedirect />, mockStoreFactory()(initialRootState));
 
     act(() => {
       jest.advanceTimersByTime(1000);

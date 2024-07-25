@@ -21,7 +21,6 @@ import type {ConversationMemberJoinEvent} from '@wireapp/api-client/lib/event/';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {compareTransliteration, sortByPriority} from 'Util/StringUtil';
 
@@ -30,14 +29,11 @@ import type {IntegrationService} from './IntegrationService';
 import {ProviderEntity} from './ProviderEntity';
 import {ServiceEntity} from './ServiceEntity';
 
-import {PrimaryModal} from '../components/Modals/PrimaryModal';
-import {ACCESS_STATE} from '../conversation/AccessState';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConversationState} from '../conversation/ConversationState';
 import {MemberLeaveEvent} from '../conversation/EventBuilder';
 import type {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
-import {ConversationError} from '../error/ConversationError';
 import type {TeamRepository} from '../team/TeamRepository';
 import {TeamState} from '../team/TeamState';
 
@@ -112,14 +108,14 @@ export class IntegrationRepository {
    * @param serviceEntity Service to be added to conversation
    * @param method Method used to add service
    */
-  addService(
+  addServiceToExistingConversation(
     conversationEntity: Conversation,
     serviceEntity: ServiceEntity,
   ): Promise<ConversationMemberJoinEvent | void> {
     const {id: serviceId, name, providerId} = serviceEntity;
     this.logger.info(`Adding service '${name}' to conversation '${conversationEntity.id}'`);
 
-    return this.conversationRepository.addService(conversationEntity, providerId, serviceId);
+    return this.conversationRepository.addServiceToExistingConversation(conversationEntity, {providerId, serviceId});
   }
 
   /**
@@ -129,30 +125,9 @@ export class IntegrationRepository {
    * @returns Resolves when conversation with the integration was created
    */
   async create1to1ConversationWithService(serviceEntity: ServiceEntity): Promise<Conversation> {
-    try {
-      const conversationEntity = await this.conversationRepository.createGroupConversation(
-        [],
-        undefined,
-        ACCESS_STATE.TEAM.GUESTS_SERVICES,
-      );
-
-      if (conversationEntity) {
-        return await this.addService(conversationEntity, serviceEntity).then(() => conversationEntity);
-      }
-
-      throw new ConversationError(
-        ConversationError.TYPE.CONVERSATION_NOT_FOUND,
-        ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
-      );
-    } catch (error) {
-      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-        text: {
-          message: t('modalIntegrationUnavailableMessage'),
-          title: t('modalIntegrationUnavailableHeadline'),
-        },
-      });
-      throw error;
-    }
+    const {id: serviceId, name, providerId} = serviceEntity;
+    this.logger.info(`Creating a conversation with a service '${name}'.'`);
+    return this.conversationRepository.create1to1ConversationWithService({providerId, serviceId});
   }
 
   /**
@@ -167,7 +142,7 @@ export class IntegrationRepository {
         return false;
       }
 
-      const isActiveConversation = !conversationEntity.removed_from_conversation();
+      const isActiveConversation = !conversationEntity.isSelfUserRemoved();
       if (!isActiveConversation) {
         // Disregard conversations that self is no longer part of
         return false;

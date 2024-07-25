@@ -123,11 +123,11 @@ export const MessageWrapper: React.FC<MessageParams> = ({
 
     const isRestrictedFileShare = !teamState.isFileSharingReceivingEnabled();
 
-    const canDelete = message.user().isMe && !conversation.removed_from_conversation() && message.isDeletable();
+    const canDelete = message.user().isMe && !conversation.isSelfUserRemoved() && message.isDeletable();
 
-    const canEdit = message.isEditable() && !conversation.removed_from_conversation();
+    const canEdit = message.isEditable() && !conversation.isSelfUserRemoved();
 
-    const hasDetails = !conversation.is1to1() && !message.isEphemeral() && !conversation.removed_from_conversation();
+    const hasDetails = !conversation.is1to1() && !message.isEphemeral() && !conversation.isSelfUserRemoved();
 
     if (message.isDownloadable() && !isRestrictedFileShare) {
       entries.push({
@@ -204,6 +204,7 @@ export const MessageWrapper: React.FC<MessageParams> = ({
         isFocused={isFocused}
         isMsgElementsFocusable={isMsgElementsFocusable}
         onClickReaction={handleReactionClick}
+        is1to1={conversation.is1to1()}
       />
     );
   }

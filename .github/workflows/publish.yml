@@ -2,7 +2,7 @@ name: Publish
 
 on:
   push:
-    branches: [master, dev, release/*]
+    branches: [master, dev, release/*, new-navigation]
     tags:
       - '*q1-2024*'
       - '*staging*'
@@ -43,7 +43,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 16.x
+          node-version: 18.16.x
           cache: 'yarn'
 
       - name: Set environment variables
@@ -61,15 +61,34 @@ jobs:
       - name: Install JS dependencies
         run: yarn --immutable
 
+      - name: Update configuration
+        run: yarn configure
+
       - name: Test
         run: |
           set -o pipefail
           yarn test --detectOpenHandles=false 2>&1 | tee ${{ env.UNIT_TEST_REPORT_FILE }}
+          echo -e "COMMIT SHA = ${{ github.sha }}" >> ${{env.UNIT_TEST_REPORT_FILE}}
+          echo -e "TEST RUN DATE = $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> ${{env.UNIT_TEST_REPORT_FILE}}
 
       - uses: actions/upload-artifact@v4
         with:
           name: 'unit-tests-report'
           path: ${{env.UNIT_TEST_REPORT_FILE}}
+
+      - name: Install AWS CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y awscli
+
+      - name: Upload unit-tests.log to S3
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: eu-west-1
+        run: |
+          TIMESTAMP=$(date -u +'%Y%m%dT%H%M%SZ')
+          aws s3 cp ${{env.UNIT_TEST_REPORT_FILE}} s3://wire-webapp/unit-tests-${TIMESTAMP}-${{ github.sha }}.log
 
       - name: Build
         run: yarn build:prod
@@ -143,7 +162,7 @@ jobs:
 
           helm repo add charts-webapp s3://public.wire.com/charts-webapp
 
-          if [ "${{github.ref}}" =~ "/refs/tags" ]; then
+          if [[ "${{github.ref}}" =~ "/refs/tags" ]]; then
             chart_version="$(./bin/chart-next-version.sh release)"
           else
             chart_version="$(./bin/chart-next-version.sh prerelease)"
@@ -268,19 +287,19 @@ jobs:
           map: |
             {
               "dev": {
-                "targets": "[\"wire-webapp-dev-al2\", \"wire-webapp-edge-al2\" ]"
+                "targets": "[\"wire-webapp-dev\", \"wire-webapp-edge\"]"
               },
               "master": {
-                "targets": "[\"wire-webapp-master-al2\"]"
+                "targets": "[\"wire-webapp-main\"]"
               },
               "production": {
-                "targets": "[\"wire-webapp-prod-al2\"]"
+                "targets": "[\"wire-webapp-prod\"]"
               },
               "release/q1-2024": {
-                "targets": "[\"wire-webapp-mls-al2\"]"
+                "targets": "[\"wire-webapp-mls\"]"
               },
               "staging": {
-                "targets": "[\"wire-webapp-staging-al2\"]"
+                "targets": "[\"wire-webapp-staging\"]"
               }
             }
           export_to: env

@@ -48,6 +48,7 @@ describe('Conversation', () => {
 
   const first_timestamp = new Date('2017-09-26T09:21:14.225Z').getTime();
   const second_timestamp = new Date('2017-09-26T10:27:18.837Z').getTime();
+  const third_timestamp = new Date('2017-09-26T11:29:21.837Z').getTime();
 
   beforeEach(() => {
     conversation_et = new Conversation();
@@ -717,52 +718,25 @@ describe('Conversation', () => {
     });
   });
 
-  describe('messages_visible', () => {
-    it('should return no messages if conversation ID is empty', () => {
-      expect(conversation_et.id).toBe('');
-      expect(conversation_et.messages_visible().length).toBe(0);
-    });
-
-    it('returns visible unmerged pings', () => {
-      const timestamp = Date.now();
-      conversation_et.id = createUuid();
-
-      const ping_message_1 = new PingMessage();
-      ping_message_1.timestamp(timestamp - 4000);
-      ping_message_1.id = createUuid();
-
-      const ping_message_2 = new PingMessage();
-      ping_message_2.timestamp(timestamp - 2000);
-      ping_message_2.id = createUuid();
-
-      const ping_message_3 = new PingMessage();
-      ping_message_3.timestamp(timestamp);
-      ping_message_3.id = createUuid();
-
-      conversation_et.addMessage(ping_message_1);
-      conversation_et.addMessage(ping_message_2);
-      conversation_et.addMessage(ping_message_3);
-
-      expect(conversation_et.messages_unordered().length).toBe(3);
-      expect(conversation_et.messages().length).toBe(3);
-      expect(conversation_et.messages_visible().length).toBe(3);
-    });
-  });
-
   describe('release', () => {
-    it('should not release messages if conversation has unread messages', () => {
+    it('if there are any incoming messages, they should be moved to regular messages', () => {
       const message_et = new Message(createUuid());
       message_et.timestamp(second_timestamp);
       conversation_et.addMessage(message_et);
       conversation_et.last_read_timestamp(first_timestamp);
 
-      expect(conversation_et.messages().length).toBe(1);
-      expect(conversation_et.unreadState().allEvents.length).toBe(1);
+      const incomingMessage = new Message(createUuid());
+      conversation_et.last_event_timestamp(third_timestamp);
+      conversation_et.addMessage(incomingMessage);
+
+      expect(conversation_et.messages()).toEqual([message_et]);
+      expect(conversation_et.unreadState().allEvents.length).toBe(2);
 
       conversation_et.release();
 
-      expect(conversation_et.messages().length).toBe(1);
-      expect(conversation_et.unreadState().allEvents.length).toBe(1);
+      // Incoming message should be moved to regular messages
+      expect(conversation_et.messages()).toEqual([message_et, incomingMessage]);
+      expect(conversation_et.unreadState().allEvents.length).toBe(2);
     });
 
     it('should release messages if conversation has no unread messages', () => {
@@ -777,7 +751,6 @@ describe('Conversation', () => {
       conversation_et.release();
 
       expect(conversation_et.hasAdditionalMessages()).toBeTruthy();
-      expect(conversation_et.is_loaded()).toBeFalsy();
       expect(conversation_et.messages().length).toBe(0);
       expect(conversation_et.unreadState().allEvents.length).toBe(0);
     });

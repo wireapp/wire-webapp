@@ -31,7 +31,6 @@ import 'src/script/util/test/mock/matchMediaMock';
 import 'src/script/util/test/mock/mediaDevicesMock';
 import 'src/script/util/test/mock/navigatorPermissionsMock';
 import 'src/script/util/test/mock/ResponseMock';
-import 'src/script/util/test/mock/SVGProviderMock';
 import 'src/script/util/test/mock/WebRTCMock';
 import 'src/script/util/test/mock/resizeObserver.mock';
 
@@ -67,6 +66,13 @@ window.z = {userPermission: {}};
 
 window.URL.createObjectURL = jest.fn();
 window.URL.revokeObjectURL = jest.fn();
+
+Object.defineProperty(document, 'elementFromPoint', {
+  writable: true,
+  value: jest.fn().mockImplementation((x, y) => {
+    return null;
+  }),
+});
 
 const testLib = require('@testing-library/react');
 testLib.configure({testIdAttribute: 'data-uie-name'});

@@ -19,7 +19,7 @@
 
 import {FC} from 'react';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
 interface ConversationDetailsBottomActionsProps {
@@ -49,7 +49,7 @@ const ConversationDetailsBottomActions: FC<ConversationDetailsBottomActionsProps
         <li className="conversation-details__devices">
           <button className="panel__action-item" onClick={showDevices} data-uie-name="go-devices" type="button">
             <span className="panel__action-item__icon">
-              <Icon.Devices />
+              <Icon.DevicesIcon />
             </span>
 
             <span className="panel__action-item__text">{t('conversationDetailsActionDevices')}</span>
@@ -68,7 +68,7 @@ const ConversationDetailsBottomActions: FC<ConversationDetailsBottomActionsProps
             type="button"
           >
             <span className="panel__action-item__icon">
-              <Icon.Notification />
+              <Icon.NotificationIcon />
             </span>
 
             <span className="panel__action-item__summary">

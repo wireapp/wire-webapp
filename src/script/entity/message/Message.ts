@@ -71,7 +71,7 @@ export class Message {
   public readonly ephemeral_started: ko.Observable<number>;
   public readonly ephemeral_status: ko.Computed<EphemeralStatusType>;
   public expectsReadConfirmation: boolean;
-  public readonly senderName: ko.PureComputed<string>;
+  public senderName: ko.PureComputed<string>;
   public readonly isObfuscated: ko.PureComputed<boolean>;
   public legalHoldStatus?: LegalHoldStatus;
   public readonly status: ko.Observable<StatusType>;

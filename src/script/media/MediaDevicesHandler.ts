@@ -78,6 +78,8 @@ export class MediaDevicesHandler {
   public currentAvailableDeviceId: CurrentAvailableDeviceId;
   public deviceSupport: DeviceSupport;
   private previousDeviceSupport: PreviousDeviceSupport;
+  private onMediaDevicesRefresh?: () => void;
+  private devicesAreInit = false;
 
   static get CONFIG() {
     return {
@@ -152,19 +154,36 @@ export class MediaDevicesHandler {
       videoinput: this.availableDevices.videoinput().length,
     };
 
-    this.initializeMediaDevices();
+    // The device list must be queried once to obtain the device IDs. This way, the frontend knows whether cameras
+    // and microphones exist and can request them specifically during a call. Additionally, the app needs to know
+    // the device IDs; otherwise, we will receive a Media-Query-Constraint error when querying the devices, as we
+    // explicitly query by the device ID.
+    // The false parameter ensures that we only load the list temporarily.
+    this.initializeMediaDevices(false);
+  }
+
+  public setOnMediaDevicesRefreshHandler(handler: () => void): void {
+    this.onMediaDevicesRefresh = handler;
   }
 
   /**
    * Initialize the list of MediaDevices and subscriptions.
+   * @camera: boolean, Only when the camera is queried can the entire device list be accessed.
+   * @return Promise<void>
    */
-  private initializeMediaDevices(): void {
-    if (Runtime.isSupportingUserMedia()) {
-      this.refreshMediaDevices().then(() => {
+  public async initializeMediaDevices(camera: boolean = false): Promise<void> {
+    if (Runtime.isSupportingUserMedia() && !this.devicesAreInit) {
+      return this.refreshMediaDevices(camera).then(() => {
         this.subscribeToObservables();
         this.subscribeToDevices();
+        // The web browser cannot access the device labels without a camera stream.
+        // The device list is only complete when the camera was initialized.
+        if (camera) {
+          this.devicesAreInit = true;
+        }
       });
     }
+    return Promise.resolve();
   }
 
   /**
@@ -243,9 +262,11 @@ export class MediaDevicesHandler {
 
   /**
    * Update list of available MediaDevices.
+   * @param [camera=false] If `camera=true`, a video track is also created when the device list is read.
+   * This ensures that the video device labels can also be read. This is necessary for initializing the entire device list.
    * @returns Resolves with all MediaDevices when the list has been updated
    */
-  refreshMediaDevices(): Promise<MediaDeviceInfo[]> {
+  public async refreshMediaDevices(camera: boolean = false): Promise<MediaDeviceInfo[]> {
     const setDevices = (type: MediaDeviceType, devices: MediaDeviceInfo[]): void => {
       this.availableDevices[type](devices);
       const currentId = this.currentDeviceId[type];
@@ -265,31 +286,32 @@ export class MediaDevicesHandler {
       }
     };
 
-    return navigator.mediaDevices
-      .enumerateDevices()
-      .catch(error => {
-        this.logger.error(`Failed to update MediaDevice list: ${error.message}`, error);
-        throw error;
-      })
-      .then(mediaDevices => {
-        this.removeAllDevices();
+    try {
+      this.removeAllDevices();
+      const mediaDevices = await this.enumerateMediaDevices(camera);
 
-        if (mediaDevices) {
-          const filteredDevices = this.filterMediaDevices(mediaDevices);
-
-          setDevices(MediaDeviceType.AUDIO_INPUT, filteredDevices.microphones);
-          setDevices(MediaDeviceType.AUDIO_OUTPUT, filteredDevices.speakers);
-          setDevices(MediaDeviceType.VIDEO_INPUT, filteredDevices.cameras);
-          this.previousDeviceSupport = {
-            audioinput: filteredDevices.microphones.length,
-            audiooutput: filteredDevices.speakers.length,
-            videoinput: filteredDevices.cameras.length,
-          };
-          return mediaDevices;
-        }
-
+      if (!mediaDevices) {
         throw new Error('No media devices found');
-      });
+      }
+
+      const {microphones, speakers, cameras} = this.filterMediaDevices(mediaDevices);
+
+      setDevices(MediaDeviceType.AUDIO_INPUT, microphones);
+      setDevices(MediaDeviceType.AUDIO_OUTPUT, speakers);
+      setDevices(MediaDeviceType.VIDEO_INPUT, cameras);
+      this.previousDeviceSupport = {
+        audioinput: microphones.length,
+        audiooutput: speakers.length,
+        videoinput: cameras.length,
+      };
+
+      this.onMediaDevicesRefresh?.();
+
+      return mediaDevices;
+    } catch (error) {
+      this.logger.error(`Failed to update MediaDevice list: ${error instanceof Error ? error.message : ''}`, error);
+      throw error;
+    }
   }
 
   /**
@@ -334,6 +356,34 @@ export class MediaDevicesHandler {
     this.logger.info(`Detected '${screenSources.length}' sources for screen sharing from Electron`);
     this.availableDevices.screeninput(screenSources);
     return screenSources;
+  }
+
+  /**
+   * Enumerates all known Media Devices Infos of a System.
+   * @param forceCamera If `forceCamera=true`, then an audio and video track is created to enforce the device access
+   * permissionm
+   * @returns All enumerated MediaDeviceInfos
+   */
+  private async enumerateMediaDevices(forceCamera: boolean = false): Promise<MediaDeviceInfo[]> {
+    // The browser will set the device labels obtained from navigator.mediaDevices.enumerateDevices() to blank strings
+    // if there is no longer an active MediaStream, even if the application was previously temporarily authorized to
+    // access the devices by calling navigator.mediaDevices.getUserMedia().
+
+    // @TODO: Fix Issue
+    // You can use this method to generate a camera stream even in the audio case. This way, the device labels can be displayed in any case.
+    // const constraints = (forceCamera)? {video: true} : {audio: true};
+    // const mediaPromise = navigator.mediaDevices.getUserMedia(constraints)
+    // return mediaPromise.then(stream => {
+    //   if (!stream) {
+    //     return [];
+    //   }
+    //   return window.navigator.mediaDevices.enumerateDevices().then( devices  => {
+    //     stream.getTracks().forEach((t) => t.stop());
+    //     return devices;
+    //   });
+    // });
+
+    return window.navigator.mediaDevices.enumerateDevices();
   }
 
   /**

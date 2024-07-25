@@ -72,6 +72,20 @@ const createConversation = (
   return conversation;
 };
 
+const mediaDevices = {
+  audioinput: ko.pureComputed(() => 'test'),
+  audiooutput: ko.pureComputed(() => 'test'),
+  screeninput: ko.pureComputed(() => 'test'),
+  videoinput: ko.pureComputed(() => 'test'),
+};
+
+const buildMediaDevicesHandler = () => {
+  return {
+    currentAvailableDeviceId: mediaDevices,
+    setOnMediaDevicesRefreshHandler: jest.fn(),
+  } as unknown as MediaDevicesHandler;
+};
+
 describe('CallingRepository', () => {
   const testFactory = new TestFactory();
   let callingRepository: CallingRepository;
@@ -80,13 +94,6 @@ describe('CallingRepository', () => {
   const selfUser = new User(createUuid());
   selfUser.isMe = true;
   const clientId = createUuid();
-
-  const mediaDevices = {
-    audioinput: ko.pureComputed(() => 'test'),
-    audiooutput: ko.pureComputed(() => 'test'),
-    screeninput: ko.pureComputed(() => 'test'),
-    videoinput: ko.pureComputed(() => 'test'),
-  };
 
   beforeAll(() => {
     return testFactory.exposeCallingActors().then(injectedCallingRepository => {
@@ -118,13 +125,11 @@ describe('CallingRepository', () => {
       const selfClientId = callingRepository['selfClientId']!;
       const call = new Call(
         selfUserId,
-        conversation.qualifiedId,
+        conversation,
         CONV_TYPE.CONFERENCE,
         selfParticipant,
         CALL_TYPE.NORMAL,
-        {
-          currentAvailableDeviceId: mediaDevices,
-        } as unknown as MediaDevicesHandler,
+        buildMediaDevicesHandler(),
       );
 
       conversation.roles({[senderUserId.id]: DefaultConversationRoleName.WIRE_ADMIN});
@@ -136,6 +141,7 @@ describe('CallingRepository', () => {
 
       const event: CallingEvent = {
         content: {
+          emojis: {},
           type: CALL_MESSAGE_TYPE.REMOTE_MUTE,
           version: '',
           data: {targets: {[selfUserId.domain]: {[selfUserId.id]: [selfClientId]}}},
@@ -162,13 +168,11 @@ describe('CallingRepository', () => {
       const selfClientId = callingRepository['selfClientId']!;
       const call = new Call(
         selfUserId,
-        conversation.qualifiedId,
+        conversation,
         CONV_TYPE.CONFERENCE,
         selfParticipant,
         CALL_TYPE.NORMAL,
-        {
-          currentAvailableDeviceId: mediaDevices,
-        } as unknown as MediaDevicesHandler,
+        buildMediaDevicesHandler(),
       );
 
       conversation.roles({[senderUserId.id]: DefaultConversationRoleName.WIRE_MEMBER});
@@ -180,6 +184,7 @@ describe('CallingRepository', () => {
 
       const event: CallingEvent = {
         content: {
+          emojis: {},
           type: CALL_MESSAGE_TYPE.REMOTE_MUTE,
           version: '',
           data: {targets: {[selfUserId.domain]: {[selfUserId.id]: [selfClientId]}}},
@@ -206,13 +211,11 @@ describe('CallingRepository', () => {
 
       const call = new Call(
         selfUserId,
-        conversation.qualifiedId,
+        conversation,
         CONV_TYPE.CONFERENCE,
         selfParticipant,
         CALL_TYPE.NORMAL,
-        {
-          currentAvailableDeviceId: mediaDevices,
-        } as unknown as MediaDevicesHandler,
+        buildMediaDevicesHandler(),
       );
 
       conversation.roles({[senderUserId.id]: DefaultConversationRoleName.WIRE_ADMIN});
@@ -226,6 +229,7 @@ describe('CallingRepository', () => {
 
       const event: CallingEvent = {
         content: {
+          emojis: {},
           type: CALL_MESSAGE_TYPE.REMOTE_MUTE,
           version: '',
           data: {targets: {[selfUserId.domain]: {[selfUserId.id]: [someOtherClientId]}}},
@@ -329,13 +333,11 @@ describe('CallingRepository', () => {
 
       const incomingCall = new Call(
         userId,
-        mlsConversation.qualifiedId,
+        mlsConversation,
         CONV_TYPE.CONFERENCE_MLS,
         selfParticipant,
         CALL_TYPE.NORMAL,
-        {
-          currentAvailableDeviceId: mediaDevices,
-        } as unknown as MediaDevicesHandler,
+        buildMediaDevicesHandler(),
       );
 
       jest.spyOn(callingRepository, 'pushClients').mockResolvedValueOnce(true);
@@ -366,13 +368,11 @@ describe('CallingRepository', () => {
 
       const incomingCall = new Call(
         userId,
-        mlsConversation.qualifiedId,
+        mlsConversation,
         CONV_TYPE.ONEONONE,
         selfParticipant,
         CALL_TYPE.NORMAL,
-        {
-          currentAvailableDeviceId: mediaDevices,
-        } as unknown as MediaDevicesHandler,
+        buildMediaDevicesHandler(),
       );
 
       jest.spyOn(callingRepository, 'pushClients').mockResolvedValueOnce(true);
@@ -390,37 +390,31 @@ describe('CallingRepository', () => {
       const userId = {domain: '', id: ''};
       const incomingCall = new Call(
         userId,
-        createConversation().qualifiedId,
+        createConversation(),
         CONV_TYPE.CONFERENCE,
         selfParticipant,
         CALL_TYPE.NORMAL,
-        {
-          currentAvailableDeviceId: mediaDevices,
-        } as unknown as MediaDevicesHandler,
+        buildMediaDevicesHandler(),
       );
       incomingCall.state(CALL_STATE.INCOMING);
 
       const activeCall = new Call(
         userId,
-        createConversation().qualifiedId,
+        createConversation(),
         CONV_TYPE.CONFERENCE,
         selfParticipant,
         CALL_TYPE.NORMAL,
-        {
-          currentAvailableDeviceId: mediaDevices,
-        } as unknown as MediaDevicesHandler,
+        buildMediaDevicesHandler(),
       );
       activeCall.state(CALL_STATE.MEDIA_ESTAB);
 
       const declinedCall = new Call(
         userId,
-        createConversation().qualifiedId,
+        createConversation(),
         CONV_TYPE.CONFERENCE,
         selfParticipant,
         CALL_TYPE.NORMAL,
-        {
-          currentAvailableDeviceId: mediaDevices,
-        } as unknown as MediaDevicesHandler,
+        buildMediaDevicesHandler(),
       );
       declinedCall.state(CALL_STATE.INCOMING);
       declinedCall.reason(REASON.STILL_ONGOING);
@@ -437,13 +431,11 @@ describe('CallingRepository', () => {
       const userId = {domain: '', id: ''};
       const call = new Call(
         userId,
-        createConversation().qualifiedId,
+        createConversation(),
         CONV_TYPE.CONFERENCE,
         selfParticipant,
         CALL_TYPE.NORMAL,
-        {
-          currentAvailableDeviceId: mediaDevices,
-        } as unknown as MediaDevicesHandler,
+        buildMediaDevicesHandler(),
       );
       const source = new window.RTCAudioSource();
       const audioTrack = source.createTrack();
@@ -467,13 +459,11 @@ describe('CallingRepository', () => {
       const selfParticipant = createSelfParticipant();
       const call = new Call(
         {domain: '', id: ''},
-        createConversation().qualifiedId,
+        createConversation(),
         CONV_TYPE.CONFERENCE,
         selfParticipant,
         CALL_TYPE.NORMAL,
-        {
-          currentAvailableDeviceId: mediaDevices,
-        } as unknown as MediaDevicesHandler,
+        buildMediaDevicesHandler(),
       );
       const source = new window.RTCAudioSource();
       const audioTrack = source.createTrack();
@@ -503,13 +493,11 @@ describe('CallingRepository', () => {
 
       const call = new Call(
         {domain: '', id: ''},
-        createConversation().qualifiedId,
+        createConversation(),
         0,
         selfParticipant,
         CALL_TYPE.NORMAL,
-        {
-          currentAvailableDeviceId: mediaDevices,
-        } as unknown as MediaDevicesHandler,
+        buildMediaDevicesHandler(),
       );
       spyOn(callingRepository['callState'], 'joinedCall').and.returnValue(call);
       callingRepository.stopMediaSource(MediaType.AUDIO);
@@ -526,12 +514,6 @@ describe('CallingRepository', () => {
 });
 
 describe('CallingRepository ISO', () => {
-  const mediaDevices = {
-    audioinput: ko.pureComputed(() => 'test'),
-    audiooutput: ko.pureComputed(() => 'test'),
-    screeninput: ko.pureComputed(() => 'test'),
-    videoinput: ko.pureComputed(() => 'test'),
-  };
   describe('incoming call', () => {
     let avsUser: number;
     let avsCall: Wcall;
@@ -555,9 +537,7 @@ describe('CallingRepository ISO', () => {
         } as any, // EventRepository
         {} as any, // UserRepository
         {} as any, // MediaStreamHandler
-        {
-          currentAvailableDeviceId: mediaDevices,
-        } as unknown as MediaDevicesHandler, // mediaDevicesHandler
+        buildMediaDevicesHandler(), // mediaDevicesHandler
         {
           toServerTimestamp: jest.fn().mockImplementation(() => Date.now()),
         } as any, // ServerTimeHandler
@@ -737,7 +717,7 @@ describe.skip('E2E audio call', () => {
            * Jasmine will eventually timeout if the audio is not flowing after 5s
            */
           client
-            .getStats(call.conversationId)
+            .getStats(call.conversation.qualifiedId)
             ?.then(extractAudioStats)
             .then(audioStats => {
               if (audioStats.length > 0) {

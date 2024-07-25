@@ -17,21 +17,20 @@
  *
  */
 
-import React, {useEffect} from 'react';
+import {useEffect, CSSProperties} from 'react';
 
 import {amplify} from 'amplify';
 import {ErrorBoundary} from 'react-error-boundary';
-import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {ErrorFallback} from 'Components/ErrorFallback';
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {UserClassifiedBar} from 'Components/input/ClassifiedBar';
+import {UserBlockedBadge} from 'Components/UserBlockedBadge/UserBlockedBadge';
 import {UserInfo} from 'Components/UserInfo';
 import {UserVerificationBadges} from 'Components/VerificationBadge';
-import {TeamState} from 'src/script/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -44,25 +43,23 @@ interface UserDetailsProps {
   isGroupAdmin?: boolean;
   isVerified?: boolean;
   participant: User;
-  avatarStyles?: React.CSSProperties;
-  teamState?: TeamState;
+  avatarStyles?: CSSProperties;
 }
 
-const UserDetailsComponent: React.FC<UserDetailsProps> = ({
+const UserDetailsComponent = ({
   badge,
   participant,
   groupId,
   isGroupAdmin,
   avatarStyles,
   classifiedDomains,
-  teamState = container.resolve(TeamState),
-}) => {
+}: UserDetailsProps) => {
   const user = useKoSubscribableChildren(participant, [
-    'isGuest',
     'isDirectGuest',
     'isTemporaryGuest',
     'expirationText',
     'isAvailable',
+    'isBlocked',
   ]);
 
   useEffect(() => {
@@ -73,12 +70,7 @@ const UserDetailsComponent: React.FC<UserDetailsProps> = ({
   return (
     <div className="panel-participant">
       <div className="panel-participant__head">
-        <UserInfo
-          className="panel-participant__head__name"
-          user={participant}
-          dataUieName="status-name"
-          showAvailability={teamState.isInTeam(participant)}
-        >
+        <UserInfo className="panel-participant__head__name" user={participant} dataUieName="status-name">
           <UserVerificationBadges user={participant} groupId={groupId} />
         </UserInfo>
       </div>
@@ -97,25 +89,32 @@ const UserDetailsComponent: React.FC<UserDetailsProps> = ({
         avatarSize={AVATAR_SIZE.X_LARGE}
         data-uie-name="status-profile-picture"
         style={avatarStyles}
+        hideAvailabilityStatus
       />
 
       {badge && (
         <div className="panel-participant__label panel-participant__label--external" data-uie-name="status-external">
-          <Icon.External />
+          <Icon.ExternalIcon />
           <span>{badge}</span>
+        </div>
+      )}
+
+      {user.isBlocked && (
+        <div css={{[':not(:last-child)']: {marginBottom: 8}}}>
+          <UserBlockedBadge />
         </div>
       )}
 
       {participant.isFederated && (
         <div className="panel-participant__label" data-uie-name="status-federated-user">
-          <Icon.Federation />
+          <Icon.FederationIcon />
           <span>{t('conversationFederationIndicator')}</span>
         </div>
       )}
 
       {user.isDirectGuest && user.isAvailable && (
         <div className="panel-participant__label" data-uie-name="status-guest">
-          <Icon.Guest />
+          <Icon.GuestIcon />
           <span>{t('conversationGuestIndicator')}</span>
         </div>
       )}
@@ -128,7 +127,7 @@ const UserDetailsComponent: React.FC<UserDetailsProps> = ({
 
       {isGroupAdmin && (
         <div className="panel-participant__label" data-uie-name="status-admin">
-          <Icon.GroupAdmin />
+          <Icon.GroupAdminIcon />
           <span>{t('conversationDetailsGroupAdmin')}</span>
         </div>
       )}
@@ -136,7 +135,7 @@ const UserDetailsComponent: React.FC<UserDetailsProps> = ({
   );
 };
 
-export const UserDetails: React.FC<UserDetailsProps> = props => {
+export const UserDetails = (props: UserDetailsProps) => {
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
       <UserDetailsComponent {...props} />

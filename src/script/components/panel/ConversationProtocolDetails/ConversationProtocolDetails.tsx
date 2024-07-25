@@ -21,7 +21,8 @@ import React from 'react';
 
 import {CSSObject} from '@emotion/react';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
-import {Ciphersuite} from '@wireapp/core/lib/messagingProtocols/mls';
+
+import {Ciphersuite} from '@wireapp/core';
 
 import {t} from 'Util/LocalizerUtil';
 
@@ -36,7 +37,7 @@ const titleStyles: CSSObject = {
 };
 
 const subTitleStyles: CSSObject = {
-  color: 'var(--gray-70)',
+  color: 'var(--text-input-placeholder)',
   fontSize: '0.75rem',
   fontWeight: 400,
   marginBottom: 16,
@@ -49,7 +50,7 @@ const wrapperStyles: CSSObject = {
   paddingTop: 4,
 };
 
-const ConversationProtocolDetails: React.FC<ConversationProtocolDetailsProps> = ({protocol, cipherSuite}) => (
+export const ConversationProtocolDetails: React.FC<ConversationProtocolDetailsProps> = ({protocol, cipherSuite}) => (
   <div>
     <h3 className="conversation-details__list-head">{t('conversationDetailsProtocolDetails')}</h3>
 
@@ -71,5 +72,3 @@ const ConversationProtocolDetails: React.FC<ConversationProtocolDetailsProps> = 
     </div>
   </div>
 );
-
-export {ConversationProtocolDetails};

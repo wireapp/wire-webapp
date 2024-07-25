@@ -17,19 +17,18 @@
  *
  */
 
-import {useState} from 'react';
-
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {CertificateDetailsModal} from 'Components/Modals/CertificateDetailsModal';
 import {VerificationBadges} from 'Components/VerificationBadge';
 import {E2EIHandler, MLSStatuses, WireIdentity} from 'src/script/E2EIdentity';
+import {useCertificateStatus} from 'src/script/hooks/useCertificateStatus';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 
 import {styles} from './E2EICertificateDetails.styles';
+import {useCertificateDetailsModal} from './useCertificateDetailsModal';
 
 const logger = getLogger('E2EICertificateDetails');
 
@@ -39,15 +38,18 @@ interface E2EICertificateDetailsProps {
 }
 
 export const E2EICertificateDetails = ({identity, isCurrentDevice}: E2EICertificateDetailsProps) => {
-  const [isCertificateDetailsModalOpen, setIsCertificateDetailsModalOpen] = useState(false);
+  const [certificate, status] = useCertificateStatus(identity, isCurrentDevice);
 
-  const certificateState = identity?.status ?? MLSStatuses.NOT_ACTIVATED;
-  const isNotActivated = certificateState === MLSStatuses.NOT_ACTIVATED;
-  const isValid = certificateState === MLSStatuses.VALID;
+  const isActivated = status !== MLSStatuses.NOT_ACTIVATED;
+
+  const isValid = status === MLSStatuses.VALID;
+  const expiresSoon = status === MLSStatuses.EXPIRES_SOON;
+
+  const showModal = useCertificateDetailsModal(certificate ?? '');
 
   const getCertificate = async () => {
     try {
-      await E2EIHandler.getInstance().enroll();
+      await E2EIHandler.getInstance().enroll({resetTimers: true});
     } catch (error) {
       logger.error('Cannot get E2EI instance: ', error);
     }
@@ -57,20 +59,20 @@ export const E2EICertificateDetails = ({identity, isCurrentDevice}: E2EICertific
     <div css={styles.container}>
       <h5 css={styles.title}>{t('E2EI.certificateTitle')}</h5>
 
-      <div data-uie-name="e2ei-identity-status" data-uie-value={certificateState} css={styles.e2eiStatusContainer}>
+      <div data-uie-name="e2ei-identity-status" data-uie-value={status} css={styles.e2eiStatusContainer}>
         <p className="label-1">
           <span>{t('E2EI.status')}</span>
-          <strong css={styles.e2eiStatus(certificateState)}>{t(`E2EI.${certificateState}`)}</strong>
+          <strong css={styles.e2eiStatus(status)}>{t(`E2EI.${status}`)}</strong>
         </p>
 
-        <VerificationBadges MLSStatus={certificateState} context="device" />
+        <VerificationBadges MLSStatus={status} context="device" />
       </div>
 
       <div css={styles.buttonsGroup}>
-        {!isNotActivated && (
+        {isActivated && certificate && (
           <Button
             variant={ButtonVariant.TERTIARY}
-            onClick={() => setIsCertificateDetailsModalOpen(true)}
+            onClick={showModal}
             data-uie-name="show-certificate-details"
             aria-label={t('E2EI.showCertificateDetails')}
             tabIndex={TabIndex.FOCUSABLE}
@@ -79,16 +81,9 @@ export const E2EICertificateDetails = ({identity, isCurrentDevice}: E2EICertific
           </Button>
         )}
 
-        {isCertificateDetailsModalOpen && identity?.certificate && (
-          <CertificateDetailsModal
-            certificate={identity.certificate}
-            onClose={() => setIsCertificateDetailsModalOpen(false)}
-          />
-        )}
-
         {isCurrentDevice && (
           <>
-            {isNotActivated && (
+            {!isActivated && (
               <Button
                 variant={ButtonVariant.TERTIARY}
                 onClick={getCertificate}
@@ -100,7 +95,7 @@ export const E2EICertificateDetails = ({identity, isCurrentDevice}: E2EICertific
               </Button>
             )}
 
-            {identity?.certificate && !isValid && (
+            {((isActivated && !isValid) || expiresSoon) && (
               <Button
                 variant={ButtonVariant.TERTIARY}
                 onClick={getCertificate}

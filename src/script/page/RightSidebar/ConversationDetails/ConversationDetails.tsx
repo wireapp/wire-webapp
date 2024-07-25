@@ -21,11 +21,13 @@ import {forwardRef, useCallback, useEffect, useMemo, useState} from 'react';
 
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+import {amplify} from 'amplify';
 
 import {HideIcon} from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {ConversationProtocolDetails} from 'Components/panel/ConversationProtocolDetails/ConversationProtocolDetails';
 import {EnrichedFields} from 'Components/panel/EnrichedFields';
 import {PanelActions} from 'Components/panel/PanelActions';
@@ -35,6 +37,7 @@ import {ServiceList} from 'Components/ServiceList/ServiceList';
 import {UserList} from 'Components/UserList';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
+import {replaceReactComponents} from 'Util/LocalizerUtil/ReactLocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 import {formatDuration} from 'Util/TimeUtil';
 
@@ -102,7 +105,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       showNotificationsNothing,
       verification_state: verificationState,
       isGroup,
-      removed_from_conversation: removedFromConversation,
+      isSelfUserRemoved,
       notificationState,
       hasGlobalMessageTimer,
       globalMessageTimer,
@@ -119,7 +122,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       'showNotificationsNothing',
       'verification_state',
       'isGroup',
-      'removed_from_conversation',
+      'isSelfUserRemoved',
       'notificationState',
       'hasGlobalMessageTimer',
       'globalMessageTimer',
@@ -153,7 +156,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
 
     const {teamRole, isActivatedAccount} = useKoSubscribableChildren(selfUser, ['teamRole', 'isActivatedAccount']);
 
-    const isActiveGroupParticipant = isGroup && !removedFromConversation;
+    const isActiveGroupParticipant = isGroup && !isSelfUserRemoved;
 
     const showOptionGuests = isActiveGroupParticipant && !!teamId && roleRepository.canToggleGuests(activeConversation);
     const hasAdvancedNotifications = isMutable && isTeam;
@@ -199,12 +202,12 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
         return isUser ? [user] : [];
       });
 
-      if (!removedFromConversation) {
+      if (!isSelfUserRemoved) {
         return [...filteredUsers, selfUser].sort(sortUsersByPriority);
       }
 
       return filteredUsers;
-    }, [participatingUserEts, removedFromConversation, selfUser]);
+    }, [participatingUserEts, isSelfUserRemoved, selfUser]);
 
     const usersCount = userParticipants.length;
     const exceedsMaxUserCount = usersCount > CONFIG.MAX_USERS_VISIBLE;
@@ -230,7 +233,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       const serviceEntity = await integrationRepository.getServiceFromUser(entity);
 
       if (serviceEntity) {
-        togglePanel(PanelState.GROUP_PARTICIPANT_SERVICE, {...serviceEntity, id: entity.id});
+        togglePanel(PanelState.GROUP_PARTICIPANT_SERVICE, serviceEntity);
       }
     };
 
@@ -340,7 +343,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
                     data-uie-name="go-add-people"
                   >
                     <span className="panel__action-item__icon">
-                      <Icon.Plus />
+                      <Icon.PlusIcon />
                     </span>
 
                     <span className="panel__action-item__text">{t('conversationDetailsActionAddParticipants')}</span>
@@ -375,7 +378,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
                         data-uie-name="go-conversation-participants"
                       >
                         <span className="panel__action-item__icon">
-                          <Icon.People />
+                          <Icon.PeopleIcon />
                         </span>
 
                         <span className="panel__action-item__text">
@@ -439,7 +442,9 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
 
               {isSingleUserMode && (
                 <div className="panel__info-item" data-uie-name="label-1to1-read-receipts">
-                  <span className="panel__info-item__icon">{hasReceiptsEnabled ? <Icon.Read /> : <HideIcon />}</span>
+                  <span className="panel__info-item__icon">
+                    {hasReceiptsEnabled ? <Icon.ReadIcon /> : <HideIcon />}
+                  </span>
 
                   <span>
                     <p className="panel__action-item__status-title">
@@ -448,7 +453,26 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
                         : t('conversationDetails1to1ReceiptsHeadDisabled')}
                     </p>
                     <p className="panel__action-item__status">{t('conversationDetails1to1ReceiptsFirst')}</p>
-                    <p className="panel__action-item__status">{t('conversationDetails1to1ReceiptsSecond')}</p>
+                    <p className="panel__action-item__status">
+                      {replaceReactComponents(t('conversationDetails1to1ReceiptsSecond'), [
+                        {
+                          start: '[button]',
+                          end: '[/button]',
+                          render: text => (
+                            <button
+                              className="button-reset-default"
+                              css={{
+                                textDecoration: 'underline',
+                              }}
+                              key={text}
+                              onClick={() => amplify.publish(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT)}
+                            >
+                              {text}
+                            </button>
+                          ),
+                        },
+                      ])}
+                    </p>
                   </span>
                 </div>
               )}

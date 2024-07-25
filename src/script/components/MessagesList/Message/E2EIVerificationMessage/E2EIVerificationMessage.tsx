@@ -19,7 +19,7 @@
 
 import {Link, LinkVariant, MLSVerified} from '@wireapp/react-ui-kit';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
@@ -86,7 +86,7 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
 
   const getCertificate = async () => {
     try {
-      await E2EIHandler.getInstance().enroll();
+      await E2EIHandler.getInstance().enroll({resetTimers: true});
     } catch (error) {
       logger.error('Failed to enroll user certificate: ', error);
     }
@@ -98,7 +98,7 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
         {isVerified ? (
           <MLSVerified data-uie-name="conversation-title-bar-verified-icon" />
         ) : (
-          <Icon.Info css={IconInfo} />
+          <Icon.InfoIcon css={IconInfo} />
         )}
       </div>
 

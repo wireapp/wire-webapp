@@ -23,7 +23,8 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {VerifiedIcon} from 'Components/VerifiedIcon';
+import {VerificationIcon} from 'Components/VerifiedIcon';
+import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {Declension, joinNames, t} from 'Util/LocalizerUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
@@ -46,8 +47,11 @@ const VerificationMessage: React.FC<VerificationMessageProps> = ({message}) => {
     return capitalizeFirstChar(namesString);
   }, [userEntities]);
 
+  const {setCurrentTab} = useSidebarStore();
+
   const showDevice = (): void => {
     const topic = isSelfClient ? WebAppEvents.PREFERENCES.MANAGE_DEVICES : WebAppEvents.SHORTCUT.PEOPLE;
+    setCurrentTab(SidebarTabs.PREFERENCES);
     amplify.publish(topic);
   };
 
@@ -60,7 +64,7 @@ const VerificationMessage: React.FC<VerificationMessageProps> = ({message}) => {
   return (
     <div className="message-header">
       <div className="message-header-icon">
-        <VerifiedIcon isVerified={isTypeVerified} />
+        <VerificationIcon isVerified={isTypeVerified} />
       </div>
       <div
         className="message-header-label message-header-label--verification"

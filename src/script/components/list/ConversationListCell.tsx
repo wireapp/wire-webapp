@@ -30,6 +30,7 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 
 import {Avatar, AVATAR_SIZE, GroupAvatar} from 'Components/Avatar';
+import {UserBlockedBadge} from 'Components/UserBlockedBadge/UserBlockedBadge';
 import {UserInfo} from 'Components/UserInfo';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isKey, isOneOfKeys, KEY} from 'Util/KeyboardUtil';
@@ -71,23 +72,23 @@ const ConversationListCell = ({
   const {
     isGroup,
     is1to1,
-    selfUser,
     participating_user_ets: users,
     display_name: displayName,
-    removed_from_conversation: removedFromConversation,
+    isSelfUserRemoved,
     unreadState,
     mutedState,
     isRequest,
+    isConversationWithBlockedUser,
   } = useKoSubscribableChildren(conversation, [
     'isGroup',
     'is1to1',
-    'selfUser',
     'participating_user_ets',
     'display_name',
-    'removed_from_conversation',
+    'isSelfUserRemoved',
     'unreadState',
     'mutedState',
     'isRequest',
+    'isConversationWithBlockedUser',
   ]);
 
   const isActive = isSelected(conversation);
@@ -177,41 +178,35 @@ const ConversationListCell = ({
 
           <div
             className={cx('conversation-list-cell-left', {
-              'conversation-list-cell-left-opaque': removedFromConversation || users.length === 0,
+              'conversation-list-cell-left-opaque': isSelfUserRemoved || users.length === 0,
             })}
           >
             {isGroup && <GroupAvatar className="conversation-list-cell-avatar-arrow" users={users} />}
 
-            {!isGroup && !!users.length && (
-              <div className="avatar-halo">
-                <Avatar participant={users[0]} avatarSize={AVATAR_SIZE.SMALL} />
-              </div>
-            )}
+            {!isGroup && !!users.length && <Avatar participant={users[0]} avatarSize={AVATAR_SIZE.SMALL} />}
           </div>
 
           <div className="conversation-list-cell-center">
             {is1to1 ? (
-              <UserInfo
-                className="conversation-list-cell-availability"
-                user={conversation.firstUserEntity()!}
-                theme={isActive}
-                dataUieName="status-availability-item"
-                showAvailability={is1to1 && !!selfUser?.teamId}
-              />
+              <UserInfo user={conversation.firstUserEntity()!} isActive={isActive}>
+                {isConversationWithBlockedUser && <UserBlockedBadge />}
+              </UserInfo>
             ) : (
               <span className={cx('conversation-list-cell-name', {'conversation-list-cell-name--active': isActive})}>
                 {displayName}
               </span>
             )}
 
-            <span
-              className={cx('conversation-list-cell-description', {
-                'conversation-list-cell-description--active': isActive,
-              })}
-              data-uie-name="secondary-line"
-            >
-              {cellState.description}
-            </span>
+            {cellState.description && (
+              <span
+                className={cx('conversation-list-cell-description', {
+                  'conversation-list-cell-description--active': isActive,
+                })}
+                data-uie-name="secondary-line"
+              >
+                {cellState.description}
+              </span>
+            )}
           </div>
         </div>
 

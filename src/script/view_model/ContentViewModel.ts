@@ -18,6 +18,7 @@
  */
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
+import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
@@ -39,6 +40,7 @@ import {Conversation} from '../entity/Conversation';
 import type {Message} from '../entity/message/Message';
 import {ConversationError} from '../error/ConversationError';
 import '../page/LeftSidebar';
+import {SidebarTabs, useSidebarStore} from '../page/LeftSidebar/panels/Conversations/useSidebarStore';
 import '../page/MainContent';
 import {PanelState} from '../page/RightSidebar';
 import {useAppMainState} from '../page/state';
@@ -55,8 +57,8 @@ interface ShowConversationOptions {
 }
 
 interface ShowConversationOverload {
-  (conversation: Conversation | undefined, options: ShowConversationOptions): Promise<void>;
-  (conversationId: string, options: ShowConversationOptions, domain: string | null): Promise<void>;
+  (conversation: Conversation | undefined, options?: ShowConversationOptions): Promise<void>;
+  (conversationId: QualifiedId, options?: ShowConversationOptions): Promise<void>;
 }
 
 export class ContentViewModel {
@@ -70,7 +72,6 @@ export class ContentViewModel {
   mainViewModel: MainViewModel;
   previousConversation?: Conversation;
   userRepository: UserRepository;
-  initialMessage?: Message;
 
   get isFederated() {
     return this.mainViewModel.isFederated;
@@ -92,7 +93,7 @@ export class ContentViewModel {
 
     const showMostRecentConversation = () => {
       const mostRecentConversation = this.conversationState.getMostRecentConversation();
-      this.showConversation(mostRecentConversation, {});
+      this.showConversation(mostRecentConversation);
     };
 
     this.userState.connectRequests.subscribe(requests => {
@@ -122,29 +123,20 @@ export class ContentViewModel {
   }
 
   private _shiftContent(hideSidebar: boolean = false): void {
-    const sidebar = document.querySelector(`#${this.sidebarId}`) as HTMLElement | null;
-
-    if (hideSidebar) {
-      if (sidebar) {
-        sidebar.style.visibility = 'hidden';
-      }
-    } else if (sidebar) {
-      sidebar.style.visibility = '';
-    }
+    useAppMainState.getState().leftSidebar.hide(hideSidebar);
   }
 
   private changeConversation(conversationEntity: Conversation, messageEntity?: Message): void {
-    this.initialMessage = messageEntity;
+    conversationEntity.initialMessage(messageEntity);
     this.conversationState.activeConversation(conversationEntity);
   }
 
   private readonly getConversationEntity = async (
-    conversation: Conversation | string,
-    domain: string | null = null,
-  ): Promise<Conversation> => {
+    conversation: Conversation | QualifiedId,
+  ): Promise<Conversation | null> => {
     const conversationEntity = isConversationEntity(conversation)
       ? conversation
-      : await this.conversationRepository.getConversationById({domain: domain || '', id: conversation});
+      : await this.conversationRepository.getConversationById(conversation);
 
     if (!conversationEntity.is1to1()) {
       return conversationEntity;
@@ -219,25 +211,8 @@ export class ContentViewModel {
     );
   }
 
-  private showConversationWithBlockedUserErrorModal(): void {
-    PrimaryModal.show(
-      PrimaryModal.type.ACKNOWLEDGE,
-      {
-        text: {
-          message: t('conversationWithBlockedUserMessage'),
-          title: t('conversationWithBlockedUserTitle'),
-        },
-      },
-      undefined,
-    );
-  }
-
   private isConversationNotFoundError(error: any): boolean {
     return error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
-  }
-
-  private isConversationWithBlockedUserError(error: any): boolean {
-    return error.type === ConversationError.TYPE.CONVERSATION_WITH_BLOCKED_USER;
   }
 
   /**
@@ -250,37 +225,27 @@ export class ContentViewModel {
    * @param domain Domain name
    */
   readonly showConversation: ShowConversationOverload = async (
-    conversation: Conversation | string | undefined,
-    options: ShowConversationOptions,
-    domain: string | null = null,
+    conversation: Conversation | QualifiedId | undefined,
+    options?: ShowConversationOptions,
   ) => {
     const {
       exposeMessage: exposeMessageEntity,
       openFirstSelfMention = false,
       openNotificationSettings = false,
-    } = options;
+    } = options || {};
 
     if (!conversation) {
       return this.handleMissingConversation();
     }
 
     try {
-      const conversationEntity = await this.getConversationEntity(conversation, domain);
-      const isConnectionBlocked = conversationEntity?.connection()?.isBlocked();
+      const conversationEntity = await this.getConversationEntity(conversation);
 
       if (!conversationEntity) {
         this.closeRightSidebar();
         throw new ConversationError(
           ConversationError.TYPE.CONVERSATION_NOT_FOUND,
           ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
-        );
-      }
-
-      if (isConnectionBlocked) {
-        this.closeRightSidebar();
-        throw new ConversationError(
-          ConversationError.TYPE.CONVERSATION_WITH_BLOCKED_USER,
-          ConversationError.MESSAGE.CONVERSATION_WITH_BLOCKED_USER,
         );
       }
 
@@ -306,11 +271,13 @@ export class ContentViewModel {
         return this.showConversationNotFoundErrorModal();
       }
 
-      if (this.isConversationWithBlockedUserError(error)) {
-        return this.showConversationWithBlockedUserErrorModal();
-      }
-
       throw error;
+    } finally {
+      const {currentTab, setCurrentTab} = useSidebarStore.getState();
+
+      if ([SidebarTabs.PREFERENCES, SidebarTabs.CONNECT].includes(currentTab)) {
+        setCurrentTab(SidebarTabs.RECENT);
+      }
     }
   };
 

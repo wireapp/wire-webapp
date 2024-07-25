@@ -21,7 +21,7 @@ import React from 'react';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {copyText} from 'Util/ClipboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -74,7 +74,7 @@ const AccountLink: React.FC<AccountLinkProps> = ({label, value, ...rest}) => {
           onClick={() => copyText(value)}
           className="text-bold-small"
         >
-          <Icon.Copy width="16" height="16" css={{marginRight: '8px'}} />
+          <Icon.CopyIcon width="16" height="16" css={{marginRight: '8px'}} />
           {t('preferencesAccountCopyLink')}
         </Button>
       </div>

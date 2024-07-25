@@ -17,17 +17,20 @@
  *
  */
 
-import React, {useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+import classNames from 'classnames';
 import {container} from 'tsyringe';
 
 import {CALL_TYPE} from '@wireapp/avs';
 import {IconButton, IconButtonVariant, Select, useMatchMedia} from '@wireapp/react-ui-kit';
 
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {ConversationClassifiedBar} from 'Components/input/ClassifiedBar';
+import {CallingRepository} from 'src/script/calling/CallingRepository';
+import {Config} from 'src/script/Config';
 import {isMediaDevice} from 'src/script/guards/MediaDevice';
 import {MediaDeviceType} from 'src/script/media/MediaDeviceType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -48,15 +51,19 @@ import {GroupVideoGrid} from './GroupVideoGrid';
 import {Pagination} from './Pagination';
 
 import type {Call} from '../../calling/Call';
-import {MuteState} from '../../calling/CallState';
+import {CallingViewMode, CallState, MuteState} from '../../calling/CallState';
 import type {Participant} from '../../calling/Participant';
 import type {Grid} from '../../calling/videoGridHandler';
 import type {Conversation} from '../../entity/Conversation';
 import {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
-import type {Multitasking} from '../../notification/NotificationRepository';
 import {useAppState} from '../../page/useAppState';
 import {TeamState} from '../../team/TeamState';
 import {CallViewTab, CallViewTabs} from '../../view_model/CallingViewModel';
+
+enum BlurredBackgroundStatus {
+  OFF = 'bluroff',
+  ON = 'bluron',
+}
 
 export interface FullscreenVideoCallProps {
   activeCallViewTab: string;
@@ -69,35 +76,40 @@ export interface FullscreenVideoCallProps {
   leave: (call: Call) => void;
   maximizedParticipant: Participant | null;
   mediaDevicesHandler: MediaDevicesHandler;
-  multitasking: Multitasking;
   muteState: MuteState;
   setActiveCallViewTab: (tab: CallViewTab) => void;
   setMaximizedParticipant: (call: Call, participant: Participant | null) => void;
   switchCameraInput: (deviceId: string) => void;
   switchMicrophoneInput: (deviceId: string) => void;
   switchSpeakerOutput: (deviceId: string) => void;
+  switchBlurredBackground: (status: boolean) => void;
   teamState?: TeamState;
+  callState?: CallState;
   toggleCamera: (call: Call) => void;
   toggleMute: (call: Call, muteState: boolean) => void;
   toggleScreenshare: (call: Call) => void;
+  sendEmoji: (emoji: string, call: Call) => void;
   videoGrid: Grid;
 }
+
+const EMOJIS_LIST = ['👍', '🎉', '❤️', '😂', '😮', '👏', '🤔', '😢', '👎'];
 
 const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   call,
   canShareScreen,
   conversation,
   isChoosingScreen,
+  sendEmoji,
   isMuted,
   muteState,
   mediaDevicesHandler,
-  multitasking,
   videoGrid,
   maximizedParticipant,
   activeCallViewTab,
   switchCameraInput,
   switchMicrophoneInput,
   switchSpeakerOutput,
+  switchBlurredBackground,
   setMaximizedParticipant,
   setActiveCallViewTab,
   toggleMute,
@@ -106,12 +118,18 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   leave,
   changePage,
   teamState = container.resolve(TeamState),
+  callState = container.resolve(CallState),
 }) => {
+  const [showEmojisBar, setShowEmojisBar] = useState<boolean>(false);
+  const [disabledEmojis, setDisabledEmojis] = useState<string[]>([]);
   const selfParticipant = call.getSelfParticipant();
   const {sharesScreen: selfSharesScreen, sharesCamera: selfSharesCamera} = useKoSubscribableChildren(selfParticipant, [
     'sharesScreen',
     'sharesCamera',
   ]);
+
+  const {blurredVideoStream} = useKoSubscribableChildren(selfParticipant, ['blurredVideoStream']);
+  const hasBlurredBackground = !!blurredVideoStream;
 
   const {
     activeSpeakers,
@@ -141,16 +159,18 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     MediaDeviceType.AUDIO_INPUT,
     MediaDeviceType.AUDIO_OUTPUT,
   ]);
-  const [audioOptionsOpen, setAudioOptionsOpen] = React.useState(false);
-  const [videoOptionsOpen, setVideoOptionsOpen] = React.useState(false);
-  const minimize = () => multitasking.isMinimized(true);
+
+  const {emojis} = useKoSubscribableChildren(callState, ['emojis']);
+
+  const [audioOptionsOpen, setAudioOptionsOpen] = useState(false);
+  const [videoOptionsOpen, setVideoOptionsOpen] = useState(false);
+  const minimize = () => callState.viewMode(CallingViewMode.MINIMIZED);
 
   const showToggleVideo =
     isVideoCallingEnabled &&
     (call.initialType === CALL_TYPE.VIDEO || conversation.supportsVideoCall(call.isConference));
 
   const showSwitchMicrophone = audioinput.length > 1;
-  const showSwitchVideo = videoinput.length > 1;
 
   const audioOptions = [
     {
@@ -190,7 +210,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
       }),
     },
   ];
-  const [selectedAudioOptions, setSelectedAudioOptions] = React.useState(() =>
+  const [selectedAudioOptions, setSelectedAudioOptions] = useState(() =>
     [currentMicrophoneDevice, currentSpeakerDevice].flatMap(
       (device, index) => audioOptions[index].options.find(item => item.id === device) ?? audioOptions[index].options[0],
     ),
@@ -208,6 +228,25 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     switchSpeakerOutput(speaker.id);
   };
 
+  const blurredBackgroundOptions = {
+    label: t('videoCallbackgroundBlurHeadline'),
+    options: [
+      {
+        // Blurring is not possible if webgl context is not available
+        isDisabled: !document.createElement('canvas').getContext('webgl2'),
+        label: t('videoCallbackgroundBlur'),
+        value: BlurredBackgroundStatus.ON,
+        dataUieName: 'blur',
+        id: BlurredBackgroundStatus.ON,
+      },
+      {
+        label: t('videoCallbackgroundNotBlurred'),
+        value: BlurredBackgroundStatus.OFF,
+        dataUieName: 'no-blur',
+        id: BlurredBackgroundStatus.OFF,
+      },
+    ],
+  };
   const videoOptions = [
     {
       label: t('videoCallvideoInputCamera'),
@@ -227,17 +266,32 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
             };
       }),
     },
+    blurredBackgroundOptions,
   ];
 
-  const [selectedVideoOptions, setSelectedVideoOptions] = React.useState(() =>
-    [currentCameraDevice].flatMap(
-      device => videoOptions.flatMap(options => options.options.filter(item => item.id === device)) ?? [],
-    ),
-  );
-  const updateVideoOptions = (selectedOption: string) => {
+  const selectedVideoOptions = [currentCameraDevice, hasBlurredBackground]
+    .flatMap(device => videoOptions.flatMap(options => options.options.filter(item => item.id === device)) ?? [])
+    .concat(hasBlurredBackground ? blurredBackgroundOptions.options[0] : blurredBackgroundOptions.options[1]);
+
+  const updateVideoOptions = (selectedOption: string | BlurredBackgroundStatus) => {
     const camera = videoOptions[0].options.find(item => item.value === selectedOption) ?? selectedVideoOptions[0];
-    setSelectedVideoOptions([camera]);
-    switchCameraInput(camera.id);
+    if (selectedOption === BlurredBackgroundStatus.ON) {
+      switchBlurredBackground(true);
+    } else if (selectedOption === BlurredBackgroundStatus.OFF) {
+      switchBlurredBackground(false);
+    } else {
+      switchCameraInput(camera.id);
+    }
+  };
+
+  const onEmojiClick = (selectedEmoji: string) => {
+    setDisabledEmojis(prev => [...prev, selectedEmoji]);
+
+    sendEmoji(selectedEmoji, call);
+
+    setTimeout(() => {
+      setDisabledEmojis(prev => [...prev].filter(emoji => emoji !== selectedEmoji));
+    }, CallingRepository.EMOJI_TIME_OUT_DURATION);
   };
 
   const unreadMessagesCount = useAppState(state => state.unreadMessagesCount);
@@ -356,7 +410,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   right: 0,
                 }}
               >
-                <Icon.ArrowNext css={{left: 4, position: 'relative'}} />
+                <Icon.ArrowNextIcon css={{left: 4, position: 'relative'}} />
               </button>
             )}
             {currentPage !== 0 && (
@@ -373,7 +427,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   left: 0,
                 }}
               >
-                <Icon.ArrowNext css={{position: 'relative', right: 4, transform: 'rotate(180deg)'}} />
+                <Icon.ArrowNextIcon css={{position: 'relative', right: 4, transform: 'rotate(180deg)'}} />
               </button>
             )}
             {!verticalBreakpoint && (
@@ -391,6 +445,50 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
 
       {!isChoosingScreen && (
         <div id="video-controls" className="video-controls">
+          {showEmojisBar && (
+            <div
+              role="toolbar"
+              className="video-controls-emoji-bar"
+              data-uie-name="video-controls-emoji-bar"
+              aria-label={t('callReactionButtonsAriaLabel')}
+            >
+              {EMOJIS_LIST.map(emoji => {
+                const isDisabled = disabledEmojis.includes(emoji);
+                return (
+                  <button
+                    aria-label={t('callReactionButtonAriaLabel', {emoji})}
+                    data-uie-name="video-controls-emoji"
+                    data-uie-value={emoji}
+                    key={emoji}
+                    disabled={isDisabled}
+                    onClick={() => onEmojiClick(emoji)}
+                    className={classNames({disabled: isDisabled})}
+                  >
+                    {emoji}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {emojis.map(({id, emoji, left, from}) => (
+            <div
+              key={id}
+              role="img"
+              className="emoji"
+              aria-label={t('callReactionsAriaLabel', {from, emoji})}
+              style={{left}}
+              data-uie-from={from}
+              data-uie-value={emoji}
+              data-uie-name="flying-emoji"
+            >
+              <span aria-hidden="true">{emoji}</span>
+              <span className="emoji-text" aria-hidden="true">
+                {from}
+              </span>
+            </div>
+          ))}
+
           <ul className="video-controls__wrapper">
             {!horizontalSmBreakpoint && (
               <li className="video-controls__item__minimize">
@@ -404,14 +502,14 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   data-uie-name="do-call-controls-video-minimize"
                 >
                   {hasUnreadMessages ? (
-                    <Icon.MessageUnread
+                    <Icon.MessageUnreadIcon
                       css={{
                         marginRight: '-2px',
                         marginTop: '-2px',
                       }}
                     />
                   ) : (
-                    <Icon.Message />
+                    <Icon.MessageIcon />
                   )}
                   <span id="minimize-label" className="video-controls__button__label">
                     {t('videoCallOverlayConversations')}
@@ -437,7 +535,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                     {t('videoCallOverlayMicrophone')}
                   </span>
 
-                  {isMuted ? <Icon.MicOff width={16} height={16} /> : <Icon.MicOn width={16} height={16} />}
+                  {isMuted ? <Icon.MicOffIcon width={16} height={16} /> : <Icon.MicOnIcon width={16} height={16} />}
                 </button>
 
                 {showSwitchMicrophone && (
@@ -476,10 +574,10 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                           menuIsOpen
                           wrapperCSS={{marginBottom: 0}}
                         />
-                        <Icon.Chevron css={{height: '16px'}} />
+                        <Icon.ChevronIcon css={{height: '16px'}} />
                       </>
                     ) : (
-                      <Icon.Chevron css={{rotate: '180deg', height: '16px'}} />
+                      <Icon.ChevronIcon css={{rotate: '180deg', height: '16px'}} />
                     )}
                   </button>
                 )}
@@ -500,9 +598,9 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                     data-uie-name="do-call-controls-toggle-video"
                   >
                     {selfSharesCamera ? (
-                      <Icon.Camera width={16} height={16} />
+                      <Icon.CameraIcon width={16} height={16} />
                     ) : (
-                      <Icon.CameraOff width={16} height={16} />
+                      <Icon.CameraOffIcon width={16} height={16} />
                     )}
 
                     <span id="video-label" className="video-controls__button__label">
@@ -510,44 +608,42 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                     </span>
                   </button>
 
-                  {showSwitchVideo && (
-                    <button
-                      className="device-toggle-button"
-                      css={videoOptionsOpen ? videoControlActiveStyles : videoControlInActiveStyles}
-                      onClick={() => setVideoOptionsOpen(prev => !prev)}
-                      onKeyDown={event => handleKeyDown(event, () => setVideoOptionsOpen(prev => !prev))}
-                      onBlur={event => {
-                        if (!event.currentTarget.contains(event.relatedTarget)) {
-                          setVideoOptionsOpen(false);
-                        }
-                      }}
-                    >
-                      {videoOptionsOpen ? (
-                        <>
-                          <Select
-                            // eslint-disable-next-line jsx-a11y/no-autofocus
-                            autoFocus
-                            value={selectedVideoOptions}
-                            onChange={selectedOption => updateVideoOptions(String(selectedOption?.value))}
-                            onKeyDown={event => isEscapeKey(event) && setVideoOptionsOpen(false)}
-                            id="select-camera"
-                            dataUieName="select-camera"
-                            controlShouldRenderValue={false}
-                            isClearable={false}
-                            backspaceRemovesValue={false}
-                            hideSelectedOptions={false}
-                            options={videoOptions}
-                            menuPlacement="top"
-                            menuIsOpen
-                            wrapperCSS={{marginBottom: 0}}
-                          />
-                          <Icon.Chevron css={{height: '16px'}} />
-                        </>
-                      ) : (
-                        <Icon.Chevron css={{rotate: '180deg', height: '16px'}} />
-                      )}
-                    </button>
-                  )}
+                  <button
+                    className="device-toggle-button"
+                    css={videoOptionsOpen ? videoControlActiveStyles : videoControlInActiveStyles}
+                    onClick={() => setVideoOptionsOpen(prev => !prev)}
+                    onKeyDown={event => handleKeyDown(event, () => setVideoOptionsOpen(prev => !prev))}
+                    onBlur={event => {
+                      if (!event.currentTarget.contains(event.relatedTarget)) {
+                        setVideoOptionsOpen(false);
+                      }
+                    }}
+                  >
+                    {videoOptionsOpen ? (
+                      <>
+                        <Select
+                          // eslint-disable-next-line jsx-a11y/no-autofocus
+                          autoFocus
+                          value={selectedVideoOptions}
+                          onChange={selectedOption => updateVideoOptions(String(selectedOption?.value))}
+                          onKeyDown={event => isEscapeKey(event) && setVideoOptionsOpen(false)}
+                          id="select-camera"
+                          dataUieName="select-camera"
+                          controlShouldRenderValue={false}
+                          isClearable={false}
+                          backspaceRemovesValue={false}
+                          hideSelectedOptions={false}
+                          options={videoOptions}
+                          menuPlacement="top"
+                          menuIsOpen
+                          wrapperCSS={{marginBottom: 0}}
+                        />
+                        <Icon.ChevronIcon css={{height: '16px'}} />
+                      </>
+                    ) : (
+                      <Icon.ChevronIcon css={{rotate: '180deg', height: '16px'}} />
+                    )}
+                  </button>
                 </li>
               )}
 
@@ -571,9 +667,9 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   data-uie-name="do-toggle-screen"
                 >
                   {selfSharesScreen ? (
-                    <Icon.Screenshare width={16} height={16} />
+                    <Icon.ScreenshareIcon width={16} height={16} />
                   ) : (
-                    <Icon.ScreenshareOff width={16} height={16} />
+                    <Icon.ScreenshareOffIcon width={16} height={16} />
                   )}
                   <span id="screen-share-label" className="video-controls__button__label">
                     {t('videoCallOverlayShareScreen')}
@@ -581,6 +677,23 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                 </button>
               </li>
 
+              {Config.getConfig().FEATURE.ENABLE_IN_CALL_REACTIONS && (
+                <li className="video-controls__item">
+                  <button
+                    css={showEmojisBar ? videoControlActiveStyles : videoControlInActiveStyles}
+                    className="video-controls__button"
+                    onClick={() => setShowEmojisBar(prev => !prev)}
+                    type="button"
+                    aria-labelledby="show-emoji-bar"
+                    data-uie-name="do-call-controls-video-call-cancel"
+                  >
+                    <Icon.LikeIcon />
+                    <span id="show-emoji-bar" className="video-controls__button__label">
+                      {t('callReactions')}
+                    </span>
+                  </button>
+                </li>
+              )}
               <li className="video-controls__item">
                 <button
                   className="video-controls__button video-controls__button--red"
@@ -590,7 +703,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   aria-labelledby="leave-label"
                   data-uie-name="do-call-controls-video-call-cancel"
                 >
-                  <Icon.Hangup />
+                  <Icon.HangupIcon />
                   <span id="leave-label" className="video-controls__button__label">
                     {t('videoCallOverlayHangUp')}
                   </span>

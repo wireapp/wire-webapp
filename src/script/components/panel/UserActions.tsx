@@ -21,11 +21,16 @@ import React from 'react';
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {ClientMLSError, ClientMLSErrorLabel} from '@wireapp/core/lib/messagingProtocols/mls';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import * as Icon from 'Components/Icon';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {ConversationState} from 'src/script/conversation/ConversationState';
+import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {TeamState} from 'src/script/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -48,6 +53,7 @@ export enum Actions {
   IGNORE_REQUEST = 'UserActions.IGNORE_REQUEST',
   LEAVE = 'UserActions.LEAVE',
   OPEN_CONVERSATION = 'UserActions.OPEN_CONVERSATION',
+  START_CONVERSATION = 'UserActions.START_CONVERSATION',
   OPEN_PROFILE = 'UserActions.OPEN_PROFILE',
   REMOVE = 'UserActions.REMOVE',
   SEND_REQUEST = 'UserActions.SEND_REQUEST',
@@ -61,6 +67,7 @@ export const ActionIdentifier = {
   [Actions.IGNORE_REQUEST]: 'do-ignore-request',
   [Actions.LEAVE]: 'do-leave',
   [Actions.OPEN_CONVERSATION]: 'go-conversation',
+  [Actions.START_CONVERSATION]: 'start-conversation',
   [Actions.OPEN_PROFILE]: 'go-profile',
   [Actions.REMOVE]: 'do-remove',
   [Actions.SEND_REQUEST]: 'do-send-request',
@@ -77,6 +84,7 @@ export interface UserActionsProps {
   user: User;
   isModal?: boolean;
   teamState?: TeamState;
+  conversationState?: ConversationState;
 }
 
 function createPlaceholder1to1Conversation(user: User, selfUser: User) {
@@ -109,6 +117,7 @@ const UserActions: React.FC<UserActionsProps> = ({
   selfUser,
   isModal = false,
   teamState = container.resolve(TeamState),
+  conversationState = container.resolve(ConversationState),
 }) => {
   const {
     isAvailable,
@@ -133,11 +142,16 @@ const UserActions: React.FC<UserActionsProps> = ({
   ]);
   const isTeamMember = teamState.isInTeam(user);
 
+  const {setCurrentTab: setCurrentSidebarTab} = useSidebarStore();
+
+  const has1to1Conversation = conversationState.has1to1ConversationWithUser(user.qualifiedId);
+
   const isNotMe = !user.isMe && isSelfActivated;
 
   const create1to1Conversation = async (userEntity: User, showConversation: boolean): Promise<void> => {
     const conversationEntity = await actionsViewModel.getOrCreate1to1Conversation(userEntity);
     if (showConversation) {
+      setCurrentSidebarTab(SidebarTabs.RECENT);
       actionsViewModel.open1to1Conversation(conversationEntity);
     }
   };
@@ -148,7 +162,7 @@ const UserActions: React.FC<UserActionsProps> = ({
           amplify.publish(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT);
           onAction(Actions.OPEN_PROFILE);
         },
-        icon: 'profile-icon',
+        Icon: Icon.ProfileIcon,
         identifier: ActionIdentifier[Actions.OPEN_PROFILE],
         label: t('groupParticipantActionSelfProfile'),
       }
@@ -158,29 +172,54 @@ const UserActions: React.FC<UserActionsProps> = ({
     user.isMe &&
     isSelfActivated &&
     conversation?.isGroup() &&
-    !conversation.removed_from_conversation() &&
+    !conversation.isSelfUserRemoved() &&
     conversationRoleRepository?.canLeaveGroup(conversation)
       ? {
           click: async () => {
             await actionsViewModel.leaveConversation(conversation);
             onAction(Actions.LEAVE);
           },
-          icon: 'leave-icon',
+          Icon: Icon.LeaveIcon,
           identifier: ActionIdentifier[Actions.LEAVE],
           label: t('groupParticipantActionLeave'),
         }
       : undefined;
 
   const open1To1Conversation: MenuItem | undefined =
-    isNotMe && isAvailable && (isConnected || isTeamMember)
+    isNotMe && isAvailable && (isConnected || isTeamMember) && has1to1Conversation
       ? {
           click: async () => {
             await create1to1Conversation(user, true);
             onAction(Actions.OPEN_CONVERSATION);
           },
-          icon: 'message-icon',
+          Icon: Icon.MessageIcon,
           identifier: ActionIdentifier[Actions.OPEN_CONVERSATION],
           label: t('groupParticipantActionOpenConversation'),
+        }
+      : undefined;
+
+  const start1To1Conversation: MenuItem | undefined =
+    isNotMe && isAvailable && (isConnected || isTeamMember) && !has1to1Conversation
+      ? {
+          click: async () => {
+            try {
+              await create1to1Conversation(user, true);
+              onAction(Actions.START_CONVERSATION);
+            } catch (error) {
+              if (error instanceof ClientMLSError && error.label === ClientMLSErrorLabel.NO_KEY_PACKAGES_AVAILABLE) {
+                return PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
+                  text: {
+                    title: t('modal1To1ConversationCreateErrorNoKeyPackagesHeadline'),
+                    htmlMessage: t('modal1To1ConversationCreateErrorNoKeyPackagesMessage', user.name()),
+                  },
+                });
+              }
+              throw error;
+            }
+          },
+          Icon: Icon.MessageIcon,
+          identifier: ActionIdentifier[Actions.START_CONVERSATION],
+          label: t('groupParticipantActionStartConversation'),
         }
       : undefined;
 
@@ -192,7 +231,7 @@ const UserActions: React.FC<UserActionsProps> = ({
             await create1to1Conversation(user, true);
             onAction(Actions.ACCEPT_REQUEST);
           },
-          icon: 'check-icon',
+          Icon: Icon.CheckIcon,
           identifier: ActionIdentifier[Actions.ACCEPT_REQUEST],
           label: t('groupParticipantActionIncomingRequest'),
         }
@@ -205,7 +244,7 @@ const UserActions: React.FC<UserActionsProps> = ({
             await actionsViewModel.ignoreConnectionRequest(user);
             onAction(Actions.IGNORE_REQUEST);
           },
-          icon: 'close-icon',
+          Icon: Icon.CloseIcon,
           identifier: ActionIdentifier[Actions.IGNORE_REQUEST],
           label: t('groupParticipantActionIgnoreRequest'),
         }
@@ -219,7 +258,7 @@ const UserActions: React.FC<UserActionsProps> = ({
             await create1to1Conversation(user, false);
             onAction(Actions.CANCEL_REQUEST);
           },
-          icon: 'undo-icon',
+          Icon: Icon.UndoIcon,
           identifier: ActionIdentifier[Actions.CANCEL_REQUEST],
           label: t('groupParticipantActionCancelRequest'),
         }
@@ -253,9 +292,10 @@ const UserActions: React.FC<UserActionsProps> = ({
               // Only open the new conversation if we aren't currently in a conversation context
               await actionsViewModel.open1to1Conversation(savedConversation);
             }
+            setCurrentSidebarTab(SidebarTabs.RECENT);
             onAction(Actions.SEND_REQUEST);
           },
-          icon: 'plus-icon',
+          Icon: Icon.PlusIcon,
           identifier: ActionIdentifier[Actions.SEND_REQUEST],
           label: t('groupParticipantActionSendRequest'),
         }
@@ -269,7 +309,7 @@ const UserActions: React.FC<UserActionsProps> = ({
             await create1to1Conversation(user, false);
             onAction(Actions.BLOCK);
           },
-          icon: 'block-icon',
+          Icon: Icon.BlockIcon,
           identifier: ActionIdentifier[Actions.BLOCK],
           label: t('groupParticipantActionBlock'),
         }
@@ -283,7 +323,7 @@ const UserActions: React.FC<UserActionsProps> = ({
             await create1to1Conversation(user, !conversation);
             onAction(Actions.UNBLOCK);
           },
-          icon: 'block-icon',
+          Icon: Icon.BlockIcon,
           identifier: ActionIdentifier[Actions.UNBLOCK],
           label: t('groupParticipantActionUnblock'),
         }
@@ -292,7 +332,7 @@ const UserActions: React.FC<UserActionsProps> = ({
   const removeUserFromConversation: MenuItem | undefined =
     isNotMe &&
     conversation &&
-    !conversation.removed_from_conversation() &&
+    !conversation.isSelfUserRemoved() &&
     conversation.participating_user_ids().some(userId => matchQualifiedIds(userId, user)) &&
     conversationRoleRepository?.canRemoveParticipants(conversation)
       ? {
@@ -300,7 +340,7 @@ const UserActions: React.FC<UserActionsProps> = ({
             await actionsViewModel.removeFromConversation(conversation, user);
             onAction(Actions.REMOVE);
           },
-          icon: 'minus-icon',
+          Icon: Icon.MinusIcon,
           identifier: 'do-remove',
           label: t('groupParticipantActionRemove'),
         }
@@ -310,6 +350,7 @@ const UserActions: React.FC<UserActionsProps> = ({
     openSelfProfile,
     leaveConversation,
     open1To1Conversation,
+    start1To1Conversation,
     acceptConnectionRequest,
     ignoreConnectionRequest,
     cancelConnectionRequest,
@@ -320,7 +361,11 @@ const UserActions: React.FC<UserActionsProps> = ({
   ].filter((item): item is MenuItem => !!item);
 
   return items.length === 1 && isModal ? (
-    <SingleAction item={items[0]} onCancel={onAction} />
+    <SingleAction
+      oneButtonPerRow={items[0].identifier === ActionIdentifier[Actions.START_CONVERSATION]}
+      item={items[0]}
+      onCancel={onAction}
+    />
   ) : (
     <PanelActions items={items} />
   );

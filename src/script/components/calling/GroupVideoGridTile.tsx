@@ -25,7 +25,7 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {VIDEO_STATE} from '@wireapp/avs';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -69,10 +69,15 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
   isMaximized,
   onTileDoubleClick,
 }) => {
-  const {isMuted, videoState, videoStream, isActivelySpeaking, isAudioEstablished} = useKoSubscribableChildren(
-    participant,
-    ['isMuted', 'videoStream', 'isActivelySpeaking', 'videoState', 'isAudioEstablished'],
-  );
+  const {isMuted, videoState, videoStream, blurredVideoStream, isActivelySpeaking, isAudioEstablished} =
+    useKoSubscribableChildren(participant, [
+      'isMuted',
+      'videoStream',
+      'blurredVideoStream',
+      'isActivelySpeaking',
+      'videoState',
+      'isAudioEstablished',
+    ]);
   const {name} = useKoSubscribableChildren(participant?.user, ['name']);
 
   const sharesScreen = videoState === VIDEO_STATE.SCREENSHARE;
@@ -149,7 +154,12 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
           <Video
             autoPlay
             playsInline
-            srcObject={videoStream}
+            /* This is needed to keep playing the video when detached to a new window,
+               only muted video can be played automatically without user interacting with the window first,
+               see https://developer.mozilla.org/en-US/docs/Web/Media/Autoplay_guide.
+            */
+            muted
+            srcObject={blurredVideoStream?.stream ?? videoStream}
             className="group-video-grid__element-video"
             css={{
               objectFit: isMaximized || sharesScreen ? 'contain' : 'cover',
@@ -169,7 +179,11 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
             width: '100%',
           }}
         >
-          <Avatar avatarSize={minimized ? AVATAR_SIZE.MEDIUM : AVATAR_SIZE.LARGE} participant={participant?.user} />
+          <Avatar
+            avatarSize={minimized ? AVATAR_SIZE.MEDIUM : AVATAR_SIZE.LARGE}
+            participant={participant?.user}
+            hideAvailabilityStatus
+          />
         </div>
       )}
 
@@ -188,7 +202,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
 
       {!minimized && isMuted && (
         <span className="group-video-grid__element__label__icon">
-          <Icon.MicOff data-uie-name="mic-icon-off" />
+          <Icon.MicOffIcon data-uie-name="mic-icon-off" />
         </span>
       )}
 

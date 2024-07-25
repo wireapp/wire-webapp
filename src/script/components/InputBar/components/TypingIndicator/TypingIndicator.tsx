@@ -20,7 +20,7 @@
 import {FC} from 'react';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
 import {useTypingIndicatorState} from './TypingIndicator.state';
@@ -57,6 +57,7 @@ const TypingIndicator: FC<TypingIndicatorProps> = ({conversationId}) => {
             participant={user}
             avatarSize={AVATAR_SIZE.XXX_SMALL}
             isResponsive
+            hideAvailabilityStatus
           />
         ))}
       </div>
@@ -87,7 +88,7 @@ const TypingIndicator: FC<TypingIndicatorProps> = ({conversationId}) => {
         <div css={dotOneStyles} />
         <div css={dotTwoStyles} />
         <div css={dotThreeStyles} />
-        <Icon.Edit width={10} height={10} css={editIconStyles} />
+        <Icon.EditIcon width={10} height={10} css={editIconStyles} />
       </div>
     </div>
   );

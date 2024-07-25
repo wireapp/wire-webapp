@@ -37,7 +37,6 @@ import {InternalErrorRoute, NotFoundRoute} from './routes/error/ErrorRoutes';
 import {GoogleWebmasterRoute} from './routes/googlewebmaster/GoogleWebmasterRoute';
 import {RedirectRoutes} from './routes/RedirectRoutes';
 import {Root} from './routes/Root';
-import * as BrowserUtil from './util/BrowserUtil';
 import {replaceHostnameInObject} from './util/hostnameReplacer';
 
 class Server {
@@ -95,9 +94,13 @@ class Server {
       this.app.use(nocache());
     } else {
       this.app.use((req, res, next) => {
+        // If the user agent adds a v param, it means that its requesting a particular version of the file and that could be cached forever since the file will never change.
+        const hasCacheVersionParam = req.query.v && typeof req.query.v === 'string';
+        const oneYear = 31536000;
+        const maxAge = hasCacheVersionParam ? oneYear : this.config.CACHE_DURATION_SECONDS;
         const milliSeconds = 1000;
-        res.header('Cache-Control', `public, max-age=${this.config.CACHE_DURATION_SECONDS}`);
-        res.header('Expires', new Date(Date.now() + this.config.CACHE_DURATION_SECONDS * milliSeconds).toUTCString());
+        res.header('Cache-Control', `public, max-age=${maxAge}`);
+        res.header('Expires', new Date(Date.now() + maxAge * milliSeconds).toUTCString());
         next();
       });
     }
@@ -170,6 +173,7 @@ class Server {
     this.app.use('/proto', express.static(path.join(__dirname, 'static/proto')));
     this.app.use('/style', express.static(path.join(__dirname, 'static/style')));
     this.app.use('/worker', express.static(path.join(__dirname, 'static/worker')));
+    this.app.use('/assets', express.static(path.join(__dirname, 'static/assets')));
 
     this.app.get('/favicon.ico', (_req, res) => res.sendFile(path.join(__dirname, 'static/image/favicon.ico')));
     if (!this.config.DEVELOPMENT) {
@@ -188,16 +192,13 @@ class Server {
         req.path.startsWith('/join') ||
         req.path.startsWith('/auth') ||
         req.path.startsWith('/google') ||
+        req.path.startsWith('/unsupported') ||
         req.path.startsWith('/apple-app-site-association');
 
       if (ignoredPath) {
         return next();
       }
 
-      const userAgent = req.header('User-Agent');
-      if (!BrowserUtil.isSupportedBrowser(userAgent)) {
-        return res.redirect(HTTP_STATUS.MOVED_TEMPORARILY, '/auth/');
-      }
       return next();
     });
   }

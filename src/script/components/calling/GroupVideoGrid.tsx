@@ -23,7 +23,7 @@ import {css} from '@emotion/react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -83,7 +83,12 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
   maximizedParticipant,
   setMaximizedParticipant,
 }) => {
-  const thumbnail = useKoSubscribableChildren(grid.thumbnail, ['hasActiveVideo', 'sharesScreen', 'videoStream']);
+  const thumbnail = useKoSubscribableChildren(grid.thumbnail!, [
+    'hasActiveVideo',
+    'sharesScreen',
+    'videoStream',
+    'blurredVideoStream',
+  ]);
 
   const [rowsAndColumns, setRowsAndColumns] = useState<RowsAndColumns>(calculateRowsAndColumns(grid?.grid.length));
 
@@ -128,7 +133,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
               justifyContent: 'center',
             }}
           >
-            <Icon.Loading
+            <Icon.LoadingIcon
               css={{
                 '> path': {
                   fill: 'var(--main-color)',
@@ -164,15 +169,20 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
             className="group-video__thumbnail-video"
             autoPlay
             playsInline
+            /* This is needed to keep playing the video when detached to a new window,
+               only muted video can be played automatically without user interacting with the window first,
+               see https://developer.mozilla.org/en-US/docs/Web/Media/Autoplay_guide.
+            */
+            muted
             data-uie-name="self-video-thumbnail"
             css={{
               transform: thumbnail.hasActiveVideo && !thumbnail.sharesScreen ? 'rotateY(180deg)' : 'initial',
             }}
-            srcObject={thumbnail.videoStream}
+            srcObject={thumbnail.blurredVideoStream?.stream ?? thumbnail.videoStream}
           />
           {selfIsMuted && !minimized && (
             <span className="group-video-grid__element__label__icon" data-uie-name="status-call-audio-muted">
-              <Icon.MicOff data-uie-name="mic-icon-off" />
+              <Icon.MicOffIcon data-uie-name="mic-icon-off" />
             </span>
           )}
         </GroupVideoThumbnailWrapper>
@@ -190,12 +200,13 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
           >
             {selfIsMuted && !minimized && (
               <span className="group-video-grid__element__label__icon" data-uie-name="status-call-audio-muted">
-                <Icon.MicOff data-uie-name="mic-icon-off" />
+                <Icon.MicOffIcon data-uie-name="mic-icon-off" />
               </span>
             )}
             <Avatar
               avatarSize={minimized ? AVATAR_SIZE.SMALL : AVATAR_SIZE.MEDIUM}
               participant={selfParticipant.user}
+              hideAvailabilityStatus
             />
           </div>
         </GroupVideoThumbnailWrapper>

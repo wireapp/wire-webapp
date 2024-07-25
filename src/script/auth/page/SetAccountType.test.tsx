@@ -25,7 +25,6 @@ import {Config, Configuration} from '../../Config';
 import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
-jest.mock('../util/SVGProvider');
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   Navigate: function Navigate({to}: any) {
@@ -51,17 +50,7 @@ describe('when visiting the set account type page', () => {
     });
 
     it('redirects to the index page', () => {
-      const {getByText} = mountComponent(
-        <SetAccountType />,
-        mockStoreFactory()({
-          ...initialRootState,
-          runtimeState: {
-            hasCookieSupport: true,
-            hasIndexedDbSupport: true,
-            isSupportedBrowser: true,
-          },
-        }),
-      );
+      const {getByText} = mountComponent(<SetAccountType />, mockStoreFactory()(initialRootState));
       const redirect = getByText('Navigate to /');
 
       expect(redirect).not.toBeNull();
@@ -81,51 +70,21 @@ describe('when visiting the set account type page', () => {
     });
 
     it('shows the Wire logo', () => {
-      const {getByTestId} = mountComponent(
-        <SetAccountType />,
-        mockStoreFactory()({
-          ...initialRootState,
-          runtimeState: {
-            hasCookieSupport: true,
-            hasIndexedDbSupport: true,
-            isSupportedBrowser: true,
-          },
-        }),
-      );
+      const {getByTestId} = mountComponent(<SetAccountType />, mockStoreFactory()(initialRootState));
       const logo = getByTestId(logoId);
 
       expect(logo).not.toBeNull();
     });
 
     it('shows an option to create a private account', () => {
-      const {getByTestId} = mountComponent(
-        <SetAccountType />,
-        mockStoreFactory()({
-          ...initialRootState,
-          runtimeState: {
-            hasCookieSupport: true,
-            hasIndexedDbSupport: true,
-            isSupportedBrowser: true,
-          },
-        }),
-      );
+      const {getByTestId} = mountComponent(<SetAccountType />, mockStoreFactory()(initialRootState));
       const personalAccountButton = getByTestId(personalAccountButtonId);
 
       expect(personalAccountButton).not.toBeNull();
     });
 
     it('shows an option to create a team', () => {
-      const {getByTestId} = mountComponent(
-        <SetAccountType />,
-        mockStoreFactory()({
-          ...initialRootState,
-          runtimeState: {
-            hasCookieSupport: true,
-            hasIndexedDbSupport: true,
-            isSupportedBrowser: true,
-          },
-        }),
-      );
+      const {getByTestId} = mountComponent(<SetAccountType />, mockStoreFactory()(initialRootState));
 
       const teamAccountButton = getByTestId(teamAccountButtonId);
       expect(teamAccountButton).not.toBeNull();

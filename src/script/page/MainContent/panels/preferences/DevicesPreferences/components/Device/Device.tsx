@@ -21,7 +21,7 @@ import {MouseEvent, KeyboardEvent} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {DeviceVerificationBadges} from 'Components/VerificationBadge';
 import {WireIdentity} from 'src/script/E2EIdentity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -107,7 +107,7 @@ export const Device = ({device, isSSO, onSelect, onRemove, getDeviceIdentity, de
             onKeyDown={handleKeyPress}
             data-uie-name="do-device-remove"
           >
-            <Icon.Delete />
+            <Icon.DeleteIcon />
           </button>
         )}
 

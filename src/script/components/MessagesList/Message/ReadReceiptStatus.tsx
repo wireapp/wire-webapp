@@ -21,7 +21,7 @@ import {useEffect, useState} from 'react';
 
 import cx from 'classnames';
 
-import {Icon} from 'Components/Icon';
+import {ReadIcon} from 'Components/Icon';
 import {Message} from 'src/script/entity/message/Message';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -29,17 +29,11 @@ import {formatTimeShort} from 'Util/TimeUtil';
 
 export interface ReadReceiptStatusProps {
   is1to1Conversation: boolean;
-  isLastDeliveredMessage: boolean;
   message: Message;
   onClickDetails?: (message: Message) => void;
 }
 
-export const ReadReceiptStatus = ({
-  message,
-  is1to1Conversation,
-  isLastDeliveredMessage,
-  onClickDetails,
-}: ReadReceiptStatusProps) => {
+export const ReadReceiptStatus = ({message, is1to1Conversation, onClickDetails}: ReadReceiptStatusProps) => {
   const [readReceiptText, setReadReceiptText] = useState('');
   const {readReceipts} = useKoSubscribableChildren(message, ['readReceipts']);
 
@@ -50,38 +44,31 @@ export const ReadReceiptStatus = ({
     }
   }, [is1to1Conversation, readReceipts]);
 
-  const showDeliveredMessage = isLastDeliveredMessage && readReceiptText === '';
   const showEyeIndicator = !!readReceiptText;
 
-  return (
-    <>
-      {showDeliveredMessage && (
-        <span className="message-status" data-uie-name="status-message-read-receipt-delivered">
-          {t('conversationMessageDelivered')}
-        </span>
-      )}
+  if (!showEyeIndicator) {
+    return null;
+  }
 
-      {showEyeIndicator && (
-        <button
-          className={cx(
-            'message-status-read',
-            is1to1Conversation && 'message-status-read__one-on-one',
-            !!onClickDetails && 'message-status-read__clickable',
-          )}
-          data-uie-name="status-message-read-receipts"
-          aria-label={t('accessibility.messageDetailsReadReceipts', readReceiptText)}
-          {...(!is1to1Conversation && {
-            onClick: () => {
-              onClickDetails?.(message);
-            },
-          })}
-        >
-          <Icon.Read />
-          <span className="message-status-read__count" data-uie-name="status-message-read-receipt-count">
-            {readReceiptText}
-          </span>
-        </button>
+  return (
+    <button
+      className={cx(
+        'message-status-read',
+        is1to1Conversation && 'message-status-read__one-on-one',
+        !!onClickDetails && 'message-status-read__clickable',
       )}
-    </>
+      data-uie-name="status-message-read-receipts"
+      aria-label={t('accessibility.messageDetailsReadReceipts', readReceiptText)}
+      {...(!is1to1Conversation && {
+        onClick: () => {
+          onClickDetails?.(message);
+        },
+      })}
+    >
+      <ReadIcon />
+      <span className="message-status-read__count" data-uie-name="status-message-read-receipt-count">
+        {readReceiptText}
+      </span>
+    </button>
   );
 };

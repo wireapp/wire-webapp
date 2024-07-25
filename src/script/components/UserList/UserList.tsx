@@ -22,7 +22,7 @@ import {ChangeEvent, useCallback, useState} from 'react';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {collapseButton, collapseIcon} from 'Components/UserList/UserList.styles';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isEnterKey, isSpaceKey} from 'Util/KeyboardUtil';
@@ -102,10 +102,9 @@ export const UserList = ({
 
   const highlightedUserIds = highlightedUsers.map(user => user.id);
   const {is_verified: isSelfVerified} = useKoSubscribableChildren(selfUser, ['is_verified']);
-  const selfInTeam = teamState.isInTeam(selfUser);
 
   // subscribe to roles changes in order to react to them
-  useKoSubscribableChildren(conversation, ['roles']);
+  useKoSubscribableChildren(conversation!, ['roles']);
 
   const isCompactMode = mode === UserlistMode.COMPACT;
   const cssClasses = isCompactMode ? 'search-list-sm' : 'search-list-lg';
@@ -140,7 +139,6 @@ export const UserList = ({
             isSelected={isSelected(user)}
             mode={mode}
             external={teamState.isExternal(user.id)}
-            selfInTeam={selfInTeam}
             isSelfVerified={isSelfVerified}
             onClick={onClickOrKeyPressed}
             onKeyDown={onUserKeyPressed}
@@ -149,7 +147,7 @@ export const UserList = ({
         </li>
       );
     },
-    [highlightedUserIds, isSelectable, isSelfVerified, mode, noSelfInteraction, selectedUsers, selfInTeam, teamState],
+    [highlightedUserIds, isSelectable, isSelfVerified, mode, noSelfInteraction, selectedUsers, teamState],
   );
 
   let content;
@@ -241,7 +239,7 @@ export const UserList = ({
               data-uie-name="do-toggle-selected-search-list"
             >
               <span css={collapseIcon(isSelectedContactsOpen)} aria-hidden="true">
-                <Icon.Disclose width={16} height={16} />
+                <Icon.DiscloseIcon width={16} height={16} />
               </span>
 
               {t('userListSelectedContacts', selectedUsersCount)}
@@ -269,7 +267,7 @@ export const UserList = ({
             data-uie-name="do-toggle-search-list"
           >
             <span css={collapseIcon(isContactsOpen)} aria-hidden="true">
-              <Icon.Disclose width={16} height={16} />
+              <Icon.DiscloseIcon width={16} height={16} />
             </span>
 
             {t('userListContacts')}

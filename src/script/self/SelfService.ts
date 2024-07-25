@@ -78,10 +78,6 @@ export class SelfService {
     return this.apiClient.api.self.putPassword({new_password: newPassword, old_password: oldPassword});
   }
 
-  putSelfPhone(phone: string): Promise<void> {
-    return this.apiClient.api.self.putPhone({phone});
-  }
-
   public async putSupportedProtocols(supportedProtocols: ConversationProtocol[]): Promise<void> {
     return this.coreSelfService.putSupportedProtocols(supportedProtocols);
   }

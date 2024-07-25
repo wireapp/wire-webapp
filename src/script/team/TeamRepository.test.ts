@@ -49,8 +49,9 @@ function buildConnectionRepository() {
   const userRepository = {} as UserRepository;
   const assetRepository = {} as AssetRepository;
   const teamService = new TeamService({} as any);
+  const onMemberDeleted = jest.fn();
   return [
-    new TeamRepository(userRepository, assetRepository, teamService, userState, teamState),
+    new TeamRepository(userRepository, assetRepository, onMemberDeleted, teamService, userState, teamState),
     {userState, teamState, userRepository, assetRepository, teamService},
   ] as const;
 }
@@ -83,6 +84,47 @@ describe('TeamRepository', () => {
 
       expect(team_et.creator).toEqual(team_data.creator);
       expect(team_et.id).toEqual(team_data.id);
+    });
+  });
+
+  describe('initTeam', () => {
+    it('updates team feature config from backend', async () => {
+      const [teamRepo, {teamService, teamState}] = buildConnectionRepository();
+      jest.spyOn(teamService, 'getTeamById').mockResolvedValue(team_metadata);
+      jest.spyOn(teamRepo, 'getSelfMember').mockResolvedValue(new TeamMemberEntity(randomUUID()));
+      jest.spyOn(teamRepo, 'emit');
+
+      const localFeatures = {
+        mls: {
+          config: {supportedProtocols: [ConversationProtocol.PROTEUS]},
+          status: FeatureStatus.ENABLED,
+        },
+      } as FeatureList;
+
+      teamState.teamFeatures(localFeatures);
+
+      const featuresFromBackend = {
+        mls: {
+          config: {supportedProtocols: [ConversationProtocol.PROTEUS, ConversationProtocol.MLS]},
+          status: FeatureStatus.ENABLED,
+        },
+      } as FeatureList;
+
+      jest.spyOn(teamService, 'getAllTeamFeatures').mockResolvedValue(featuresFromBackend);
+
+      teamRepo.on('featureConfigUpdated', update => {
+        expect(update.prevFeatureList).toEqual(localFeatures);
+        expect(update.newFeatureList).toEqual(featuresFromBackend);
+        expect(teamState.teamFeatures()).toEqual(featuresFromBackend);
+      });
+
+      await teamRepo.initTeam();
+
+      expect(teamState.teamFeatures()).toEqual(featuresFromBackend);
+      expect(teamRepo.emit).toHaveBeenCalledWith('featureConfigUpdated', {
+        prevFeatureList: localFeatures,
+        newFeatureList: featuresFromBackend,
+      });
     });
   });
 

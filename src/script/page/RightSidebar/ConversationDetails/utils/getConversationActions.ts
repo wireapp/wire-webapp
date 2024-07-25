@@ -21,6 +21,7 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import * as Icon from 'Components/Icon';
 import {MenuItem} from 'Components/panel/PanelActions';
 import {t} from 'Util/LocalizerUtil';
 
@@ -50,12 +51,12 @@ const getConversationActions = (
   const getNextConversation = () => conversationRepository.getNextConversation(conversationEntity);
   const userPermissions = UserPermission.generatePermissionHelpers(teamRole);
 
-  const allMenuElements = [
+  const allMenuElements: {item: MenuItem; condition: boolean}[] = [
     {
       condition: userPermissions.canCreateGroupConversation() && is1to1Action && !isServiceMode,
       item: {
         click: () => amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, 'conversation_details', userEntity),
-        icon: 'group-icon',
+        Icon: Icon.GroupIcon,
         identifier: 'go-create-group',
         label: t('conversationDetailsActionCreateGroup'),
       },
@@ -64,7 +65,7 @@ const getConversationActions = (
       condition: !conversationEntity.is_archived(),
       item: {
         click: async () => actionsViewModel.archiveConversation(conversationEntity),
-        icon: 'archive-icon',
+        Icon: Icon.ArchiveIcon,
         identifier: 'do-archive',
         label: t('conversationDetailsActionArchive'),
       },
@@ -73,7 +74,7 @@ const getConversationActions = (
       condition: conversationEntity.is_archived(),
       item: {
         click: async () => actionsViewModel.unarchiveConversation(conversationEntity),
-        icon: 'archive-icon',
+        Icon: Icon.ArchiveIcon,
         identifier: 'do-unarchive',
         label: t('conversationsPopoverUnarchive'),
       },
@@ -82,7 +83,7 @@ const getConversationActions = (
       condition: conversationEntity.isRequest(),
       item: {
         click: async () => actionsViewModel.cancelConnectionRequest(userEntity, true, getNextConversation()),
-        icon: 'close-icon',
+        Icon: Icon.CloseIcon,
         identifier: 'do-cancel-request',
         label: t('conversationDetailsActionCancelRequest'),
       },
@@ -91,7 +92,7 @@ const getConversationActions = (
       condition: conversationEntity.isClearable(),
       item: {
         click: () => actionsViewModel.clearConversation(conversationEntity),
-        icon: 'eraser-icon',
+        Icon: Icon.EraserIcon,
         identifier: 'do-clear',
         label: t('conversationDetailsActionClear'),
       },
@@ -99,17 +100,26 @@ const getConversationActions = (
     {
       condition: isSingleUser && (userEntity?.isConnected() || userEntity?.isRequest()),
       item: {
-        click: () => actionsViewModel.blockUser(userEntity, true, getNextConversation()),
-        icon: 'block-icon',
+        click: () => actionsViewModel.blockUser(userEntity),
+        Icon: Icon.BlockIcon,
         identifier: 'do-block',
         label: t('conversationDetailsActionBlock'),
+      },
+    },
+    {
+      condition: isSingleUser && userEntity?.isBlocked(),
+      item: {
+        click: () => actionsViewModel.unblockUser(userEntity),
+        Icon: Icon.BlockIcon,
+        identifier: 'do-unblock',
+        label: t('conversationDetailsActionUnblock'),
       },
     },
     {
       condition: conversationEntity.isLeavable() && roleRepository.canLeaveGroup(conversationEntity),
       item: {
         click: async () => actionsViewModel.leaveConversation(conversationEntity),
-        icon: 'leave-icon',
+        Icon: Icon.LeaveIcon,
         identifier: 'do-leave',
         label: t('conversationDetailsActionLeave'),
       },
@@ -122,7 +132,7 @@ const getConversationActions = (
         conversationEntity.isCreatedBySelf(),
       item: {
         click: async () => actionsViewModel.deleteConversation(conversationEntity),
-        icon: 'delete-icon',
+        Icon: Icon.DeleteIcon,
         identifier: 'do-delete',
         label: t('conversationDetailsActionDelete'),
       },

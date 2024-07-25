@@ -21,7 +21,7 @@ import React from 'react';
 
 import cx from 'classnames';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {t} from 'Util/LocalizerUtil';
 
@@ -83,7 +83,7 @@ const LegalHoldDot: React.FC<LegalHoldDotProps> = ({
           className,
         )}
       >
-        {isPending && <Icon.Pending className="pending-icon" />}
+        {isPending && <Icon.PendingIcon className="pending-icon" />}
       </span>
 
       {showText && <span className="visibility-hidden legal-hold-dot--text">{t('legalHoldHeadline')}</span>}

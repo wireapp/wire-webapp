@@ -46,7 +46,6 @@ const defaultGetConfig = () => ({
     DEFAULT_LOGIN_TEMPORARY_CLIENT: false,
     ENABLE_ACCOUNT_REGISTRATION: true,
     ENABLE_DEBUG: true,
-    ENABLE_PHONE_LOGIN: true,
     ENABLE_SSO: true,
   },
 });

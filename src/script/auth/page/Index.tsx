@@ -19,7 +19,6 @@
 
 import React, {useEffect, useState} from 'react';
 
-import {SVGIcon} from '@wireapp/react-ui-kit/lib/Icon/SVGIcon';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {Navigate, useNavigate} from 'react-router-dom';
@@ -27,6 +26,9 @@ import {AnyAction, Dispatch} from 'redux';
 
 import {UrlUtil} from '@wireapp/commons';
 import {Button, ButtonVariant, ContainerXS, ErrorMessage, Text} from '@wireapp/react-ui-kit';
+
+import {LogoFullIcon} from 'Components/Icon';
+import {Environment} from 'Util/Environment';
 
 import {Page} from './Page';
 
@@ -36,7 +38,6 @@ import {indexStrings, logoutReasonStrings} from '../../strings';
 import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {QUERY_KEY, ROUTE} from '../route';
-import {getSVG} from '../util/SVGProvider';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
@@ -44,6 +45,8 @@ const IndexComponent = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps
   const {formatMessage: _} = useIntl();
   const navigate = useNavigate();
   const [logoutReason, setLogoutReason] = useState<string>();
+
+  const isProduction = Environment.frontend.isProduction();
 
   useEffect(() => {
     const queryLogoutReason = UrlUtil.getURLParameter(QUERY_KEY.LOGOUT_REASON) || null;
@@ -66,16 +69,13 @@ const IndexComponent = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps
   return (
     <Page>
       <ContainerXS centerText verticalCenter style={{width: '380px'}}>
-        <SVGIcon
+        <LogoFullIcon
           aria-hidden="true"
-          scale={1.3}
-          realWidth={78}
-          realHeight={25}
+          width={102}
+          height={33}
           style={{marginBottom: '80px'}}
           data-uie-name="ui-wire-logo"
-        >
-          <g dangerouslySetInnerHTML={{__html: getSVG('logo-full-icon')?.documentElement?.innerHTML}} />
-        </SVGIcon>
+        />
         <Text
           block
           center
@@ -84,6 +84,24 @@ const IndexComponent = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps
         >
           {_(indexStrings.welcome, {brandName: Config.getConfig().BACKEND_NAME})}
         </Text>
+
+        {!isProduction && (
+          <Text
+            block
+            center
+            style={{fontSize: '0.75rem', fontWeight: 300, marginBottom: '48px'}}
+            data-uie-name="disclaimer"
+          >
+            {_(indexStrings.disclaimer, {
+              link: (
+                <a href="https://app.wire.com" rel="noopener noreferrer">
+                  https://app.wire.com
+                </a>
+              ),
+            })}
+          </Text>
+        )}
+
         {features.ENABLE_ACCOUNT_REGISTRATION && (
           <Button
             type="button"

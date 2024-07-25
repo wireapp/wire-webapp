@@ -25,7 +25,6 @@ import {actionRoot} from '../module/action';
 import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
-jest.mock('../util/SVGProvider');
 
 const handleInputId = 'enter-handle';
 const setHandleButtonId = 'do-send-handle';
@@ -34,17 +33,7 @@ describe('SetHandle', () => {
   it('has disabled submit button as long as there is no input', async () => {
     spyOn(actionRoot.selfAction, 'doGetConsents').and.returnValue(() => Promise.resolve());
     spyOn(actionRoot.userAction, 'checkHandles').and.returnValue(() => Promise.resolve());
-    const {getByTestId} = mountComponent(
-      <SetHandle />,
-      mockStoreFactory()({
-        ...initialRootState,
-        runtimeState: {
-          hasCookieSupport: true,
-          hasIndexedDbSupport: true,
-          isSupportedBrowser: true,
-        },
-      }),
-    );
+    const {getByTestId} = mountComponent(<SetHandle />, mockStoreFactory()(initialRootState));
 
     await waitFor(() => getByTestId(handleInputId));
     const handleInput = getByTestId(handleInputId);
@@ -63,17 +52,7 @@ describe('SetHandle', () => {
 
     const handle = 'handle';
 
-    const {getByTestId} = mountComponent(
-      <SetHandle />,
-      mockStoreFactory()({
-        ...initialRootState,
-        runtimeState: {
-          hasCookieSupport: true,
-          hasIndexedDbSupport: true,
-          isSupportedBrowser: true,
-        },
-      }),
-    );
+    const {getByTestId} = mountComponent(<SetHandle />, mockStoreFactory()(initialRootState));
 
     await waitFor(() => getByTestId(handleInputId));
     const handleInput = getByTestId(handleInputId);

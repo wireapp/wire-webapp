@@ -37,8 +37,10 @@ import keyboardjs from 'keyboardjs';
 import {$createTextNode, $getRoot, LexicalEditor} from 'lexical';
 import {container} from 'tsyringe';
 
+import {useDetachedCallingFeatureState} from 'Components/calling/DetachedCallingCell/DetachedCallingFeature.state';
 import {getLogger, Logger} from 'Util/Logger';
 
+import {KEY} from './KeyboardUtil';
 import {TIME_IN_MILLIS} from './TimeUtil';
 import {createUuid} from './uuid';
 
@@ -56,6 +58,8 @@ import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 import {EventRepository} from '../event/EventRepository';
 import {checkVersion} from '../lifecycle/newVersionHandler';
+import {PropertiesRepository} from '../properties/PropertiesRepository';
+import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
 import {EventRecord, StorageRepository, StorageSchemata} from '../storage';
@@ -72,6 +76,7 @@ export class DebugUtil {
   /** Used by QA test automation. */
   public readonly conversationRepository: ConversationRepository;
   private readonly eventRepository: EventRepository;
+  private readonly propertiesRepository: PropertiesRepository;
   private readonly storageRepository: StorageRepository;
   private readonly messageRepository: MessageRepository;
   public readonly $ = jquery;
@@ -92,7 +97,7 @@ export class DebugUtil {
   ) {
     this.Dexie = Dexie;
 
-    const {calling, client, connection, conversation, event, user, storage, message} = repositories;
+    const {calling, client, connection, conversation, event, user, storage, message, properties} = repositories;
     this.callingRepository = calling;
     this.clientRepository = client;
     this.conversationRepository = conversation;
@@ -101,6 +106,7 @@ export class DebugUtil {
     this.storageRepository = storage;
     this.userRepository = user;
     this.messageRepository = message;
+    this.propertiesRepository = properties;
 
     this.logger = getLogger('DebugUtil');
 
@@ -196,6 +202,14 @@ export class DebugUtil {
     if (groupId) {
       return this.core.service?.mls?.renewKeyMaterial(groupId);
     }
+  }
+
+  async enablePushToTalk(key: string | null = KEY.SPACE) {
+    this.propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY, key);
+  }
+
+  async toggleDetachedCallFeature(shouldEnable: boolean = true) {
+    return useDetachedCallingFeatureState.getState().toggle(shouldEnable);
   }
 
   /** Used by QA test automation. */
@@ -412,7 +426,7 @@ export class DebugUtil {
     if (!activeCall) {
       throw new Error('no active call found');
     }
-    return this.callingRepository.getStats(activeCall.conversationId);
+    return this.callingRepository.getStats(activeCall.conversation.qualifiedId);
   }
 
   /** Used by QA test automation. */

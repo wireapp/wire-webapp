@@ -31,23 +31,23 @@ import {Duration} from 'Components/calling/Duration';
 import {GroupVideoGrid} from 'Components/calling/GroupVideoGrid';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {ConversationClassifiedBar} from 'Components/input/ClassifiedBar';
+import {usePushToTalk} from 'src/script/hooks/usePushToTalk/usePushToTalk';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {isEnterKey, KEY} from 'Util/KeyboardUtil';
+import {isEnterKey, isSpaceOrEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {CallParticipantsListItem} from './CallParticipantsListItem';
+import {useDetachedCallingFeatureState} from './DetachedCallingCell/DetachedCallingFeature.state';
 
 import type {Call} from '../../calling/Call';
 import type {CallingRepository} from '../../calling/CallingRepository';
-import {CallState, MuteState} from '../../calling/CallState';
+import {CallingViewMode, CallState, MuteState} from '../../calling/CallState';
 import type {Participant} from '../../calling/Participant';
 import {useVideoGrid} from '../../calling/videoGridHandler';
-import type {Conversation} from '../../entity/Conversation';
-import type {Multitasking} from '../../notification/NotificationRepository';
 import {generateConversationUrl} from '../../router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from '../../router/routerBindings';
 import {TeamState} from '../../team/TeamState';
@@ -55,7 +55,6 @@ import {ContextMenuEntry, showContextMenu} from '../../ui/ContextMenu';
 import {CallActions, CallViewTab} from '../../view_model/CallingViewModel';
 
 interface VideoCallProps {
-  multitasking: Multitasking;
   hasAccessToCamera?: boolean;
   isSelfVerified?: boolean;
   teamState?: TeamState;
@@ -65,11 +64,12 @@ interface AnsweringControlsProps {
   call: Call;
   callActions: CallActions;
   callingRepository: Pick<CallingRepository, 'supportsScreenSharing' | 'sendModeratorMute'>;
-  conversation: Conversation;
+  pushToTalkKey: string | null;
   isFullUi?: boolean;
   callState?: CallState;
   classifiedDomains?: string[];
   isTemporaryUser?: boolean;
+  setMaximizedParticipant?: (participant: Participant | null) => void;
 }
 
 export type CallingCellProps = VideoCallProps & AnsweringControlsProps;
@@ -77,19 +77,20 @@ export type CallingCellProps = VideoCallProps & AnsweringControlsProps;
 type labels = {dataUieName: string; text: string};
 
 const CallingCell: React.FC<CallingCellProps> = ({
-  conversation,
   classifiedDomains,
   isTemporaryUser,
   call,
   callActions,
   isFullUi = false,
-  multitasking,
   hasAccessToCamera,
   isSelfVerified,
   callingRepository,
+  pushToTalkKey,
+  setMaximizedParticipant,
   teamState = container.resolve(TeamState),
   callState = container.resolve(CallState),
 }) => {
+  const {conversation} = call;
   const {reason, state, isCbrEnabled, startedAt, participants, maximizedParticipant, muteState} =
     useKoSubscribableChildren(call, [
       'reason',
@@ -117,7 +118,10 @@ const CallingCell: React.FC<CallingCellProps> = ({
     'roles',
   ]);
 
-  const {isMinimized} = useKoSubscribableChildren(multitasking, ['isMinimized']);
+  const {viewMode} = useKoSubscribableChildren(callState, ['viewMode']);
+  const isFullScreenGrid = viewMode === CallingViewMode.FULL_SCREEN_GRID;
+  const isDetachedWindow = viewMode === CallingViewMode.DETACHED_WINDOW;
+
   const {isVideoCallingEnabled} = useKoSubscribableChildren(teamState, ['isVideoCallingEnabled']);
 
   const {activeCallViewTab} = useKoSubscribableChildren(callState, ['activeCallViewTab']);
@@ -175,12 +179,28 @@ const CallingCell: React.FC<CallingCellProps> = ({
   const [showParticipants, setShowParticipants] = useState(false);
   const isModerator = selfUser && roles[selfUser.id] === DefaultConversationRoleName.WIRE_ADMIN;
 
+  const toggleMute = useCallback(
+    (shouldMute: boolean) => callActions.toggleMute(call, shouldMute),
+    [call, callActions],
+  );
+
+  const isCurrentlyMuted = useCallback(() => {
+    const isMuted = call.muteState() === MuteState.SELF_MUTED;
+    return isMuted;
+  }, [call]);
+
+  usePushToTalk({
+    key: pushToTalkKey,
+    toggleMute,
+    isMuted: isCurrentlyMuted,
+  });
+
   const getParticipantContext = (event: React.MouseEvent<HTMLDivElement>, participant: Participant) => {
     event.preventDefault();
 
-    const muteParticipant = {
+    const muteParticipant: ContextMenuEntry = {
       click: () => callingRepository.sendModeratorMute(conversation.qualifiedId, [participant]),
-      icon: 'mic-off-icon',
+      icon: Icon.MicOffIcon,
       identifier: `moderator-mute-participant`,
       isDisabled: participant.isMuted(),
       label: t('moderatorMenuEntryMute'),
@@ -193,7 +213,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
           participants.filter(p => p !== participant),
         );
       },
-      icon: 'mic-off-icon',
+      icon: Icon.MicOffIcon,
       identifier: 'moderator-mute-others',
       label: t('moderatorMenuEntryMuteAllOthers'),
     };
@@ -202,31 +222,31 @@ const CallingCell: React.FC<CallingCellProps> = ({
     showContextMenu(event, entries, 'participant-moderator-menu');
   };
 
-  const handleMinimizedKeydown = useCallback(
+  const handleMaximizeKeydown = useCallback(
     (event: React.KeyboardEvent<HTMLInputElement>) => {
-      if (!isOngoing) {
+      if (!isOngoing || isDetachedWindow) {
         return;
       }
-      if ([KEY.ENTER, KEY.SPACE].includes(event.key)) {
-        multitasking?.isMinimized(false);
+      if (isSpaceOrEnterKey(event.key)) {
+        callState.viewMode(CallingViewMode.FULL_SCREEN_GRID);
       }
     },
-    [isOngoing, multitasking],
+    [isOngoing, callState],
   );
 
-  const handleMinimizedClick = useCallback(() => {
-    if (!isOngoing) {
+  const handleMaximizeClick = useCallback(() => {
+    if (!isOngoing || isDetachedWindow) {
       return;
     }
-    multitasking?.isMinimized(false);
-  }, [isOngoing, multitasking]);
+    callState.viewMode(CallingViewMode.FULL_SCREEN_GRID);
+  }, [isOngoing, callState]);
 
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
   const {showAlert, clearShowAlert} = useCallAlertState();
 
   const answerCall = () => {
     callActions.answer(call);
-    setCurrentView(ViewType.LEFT_SIDEBAR);
+    setCurrentView(ViewType.MOBILE_LEFT_SIDEBAR);
   };
 
   const answerOrRejectCall = useCallback(
@@ -294,8 +314,18 @@ const CallingCell: React.FC<CallingCellProps> = ({
   const callStartedAlert = isGroup ? callGroupStartedAlert : call1To1StartedAlert;
   const ongoingCallAlert = isGroup ? onGoingGroupCallAlert : onGoingCallAlert;
 
+  const toggleDetachedWindow = () => {
+    if (isDetachedWindow) {
+      callState.viewMode(CallingViewMode.MINIMIZED);
+    } else {
+      callState.viewMode(CallingViewMode.DETACHED_WINDOW);
+    }
+  };
+
+  const isDetachedCallingFeatureEnabled = useDetachedCallingFeatureState(state => state.isSupported());
+
   return (
-    <div className="conversation-calling-cell">
+    <div css={{height: isDetachedWindow ? '100%' : 'auto'}}>
       {isIncoming && (
         <p role="alert" className="visually-hidden">
           {t('callConversationAcceptOrDecline', conversationName)}
@@ -308,6 +338,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
           data-uie-name="item-call"
           data-uie-id={conversation.id}
           data-uie-value={conversation.display_name()}
+          css={{height: isDetachedWindow ? '100%' : 'unset'}}
         >
           {muteState === MuteState.REMOTE_MUTED && isFullUi && (
             <div className="conversation-list-calling-cell__info-bar">{t('muteStateRemoteMute')}</div>
@@ -344,6 +375,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
                   )}
                 </div>
               )}
+
               <h2
                 className={cx('conversation-list-cell-center ', {
                   'conversation-list-cell-center-no-left': isTemporaryUser,
@@ -383,6 +415,16 @@ const CallingCell: React.FC<CallingCellProps> = ({
             </div>
 
             <div className="conversation-list-cell-right">
+              {isOngoing && isDetachedCallingFeatureEnabled && (
+                <button className="call-ui__button" onClick={toggleDetachedWindow}>
+                  {isDetachedWindow ? (
+                    <Icon.CloseIcon className="small-icon" />
+                  ) : (
+                    <Icon.FullscreenIcon className="small-icon" />
+                  )}
+                </button>
+              )}
+
               {(isConnecting || isOngoing) && (
                 <button
                   className="call-ui__button call-ui__button--red"
@@ -391,17 +433,18 @@ const CallingCell: React.FC<CallingCellProps> = ({
                   type="button"
                   data-uie-name="do-call-controls-call-leave"
                 >
-                  <Icon.Hangup className="small-icon" style={{maxWidth: 17}} />
+                  <Icon.HangupIcon className="small-icon" style={{maxWidth: 17}} />
                 </button>
               )}
             </div>
           </div>
 
-          {(isOngoing || selfHasActiveVideo) && isMinimized && !!videoGrid?.grid?.length && isFullUi ? (
+          {(isOngoing || selfHasActiveVideo) && !isFullScreenGrid && !!videoGrid?.grid?.length && isFullUi ? (
             <div
+              css={{flex: isDetachedWindow ? 1 : 'unset'}}
               className="group-video__minimized-wrapper"
-              onClick={handleMinimizedClick}
-              onKeyDown={handleMinimizedKeydown}
+              onClick={handleMaximizeClick}
+              onKeyDown={handleMaximizeKeydown}
               role="button"
               tabIndex={TabIndex.FOCUSABLE}
               aria-label={t('callMaximizeLabel')}
@@ -411,10 +454,12 @@ const CallingCell: React.FC<CallingCellProps> = ({
                 minimized
                 maximizedParticipant={maximizedParticipant}
                 selfParticipant={selfParticipant}
+                setMaximizedParticipant={setMaximizedParticipant}
               />
-              {isOngoing && (
+
+              {isOngoing && !isDetachedWindow && (
                 <div className="group-video__minimized-wrapper__overlay" data-uie-name="do-maximize-call">
-                  <Icon.Fullscreen />
+                  <Icon.FullscreenIcon />
                 </div>
               )}
             </div>
@@ -450,7 +495,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
                       aria-checked={!isMuted}
                       disabled={isConnecting}
                     >
-                      {isMuted ? <Icon.MicOff className="small-icon" /> : <Icon.MicOn className="small-icon" />}
+                      {isMuted ? <Icon.MicOffIcon className="small-icon" /> : <Icon.MicOnIcon className="small-icon" />}
                     </button>
                   </li>
 
@@ -468,9 +513,9 @@ const CallingCell: React.FC<CallingCellProps> = ({
                         data-uie-value={selfSharesCamera ? 'active' : 'inactive'}
                       >
                         {selfSharesCamera ? (
-                          <Icon.Camera className="small-icon" />
+                          <Icon.CameraIcon className="small-icon" />
                         ) : (
-                          <Icon.CameraOff className="small-icon" />
+                          <Icon.CameraOffIcon className="small-icon" />
                         )}
                       </button>
                     </li>
@@ -491,11 +536,12 @@ const CallingCell: React.FC<CallingCellProps> = ({
                         data-uie-value={selfSharesScreen ? 'active' : 'inactive'}
                         data-uie-enabled={disableScreenButton ? 'false' : 'true'}
                         title={t('videoCallOverlayShareScreen')}
+                        disabled={disableScreenButton || isDetachedWindow}
                       >
                         {selfSharesScreen ? (
-                          <Icon.Screenshare className="small-icon" />
+                          <Icon.ScreenshareIcon className="small-icon" />
                         ) : (
-                          <Icon.ScreenshareOff className="small-icon" />
+                          <Icon.ScreenshareOffIcon className="small-icon" />
                         )}
                       </button>
                     </li>
@@ -511,6 +557,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
                     className={cx('call-ui__button call-ui__button--participants', {
                       'call-ui__button--active': showParticipants,
                     })}
+                    disabled={isDetachedWindow}
                     onClick={() => setShowParticipants(prevState => !prevState)}
                     type="button"
                     data-uie-name="do-toggle-participants"
@@ -538,7 +585,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
                     type="button"
                     data-uie-name="do-call-controls-call-decline"
                   >
-                    <Icon.Hangup className="small-icon" style={{maxWidth: 17}} />
+                    <Icon.HangupIcon className="small-icon" style={{maxWidth: 17}} />
                   </button>
                 </li>
               )}
@@ -563,7 +610,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
                       aria-label={t('callAccept')}
                       data-uie-name="do-call-controls-call-accept"
                     >
-                      <Icon.Pickup className="small-icon" />
+                      <Icon.PickupIcon className="small-icon" />
                     </button>
                   )}
                 </li>
@@ -587,7 +634,6 @@ const CallingCell: React.FC<CallingCellProps> = ({
                         <CallParticipantsListItem
                           key={participant.clientId}
                           callParticipant={participant}
-                          selfInTeam={selfUser && teamState.isInTeam(selfUser)}
                           isSelfVerified={isSelfVerified}
                           showContextMenu={!!isModerator}
                           onContextMenu={event => getParticipantContext(event, participant)}

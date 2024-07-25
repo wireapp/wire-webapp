@@ -65,9 +65,6 @@ export enum AUTH_ACTION {
   REGISTER_WIRELESS_START = 'REGISTER_WIRELESS_START',
   REGISTER_WIRELESS_SUCCESS = 'REGISTER_WIRELESS_SUCCESS',
   RESET_LOGIN_DATA = 'RESET_LOGIN_DATA',
-  SEND_PHONE_LOGIN_CODE_FAILED = 'SEND_PHONE_LOGIN_CODE_FAILED',
-  SEND_PHONE_LOGIN_CODE_START = 'SEND_PHONE_LOGIN_CODE_START',
-  SEND_PHONE_LOGIN_CODE_SUCCESS = 'SEND_PHONE_LOGIN_CODE_SUCCESS',
   SEND_OAUTH_CODE_FAILED = 'SEND_OAUTH_CODE_FAILED',
   SEND_OAUTH_CODE_START = 'SEND_OAUTH_CODE_START',
   SEND_OAUTH_CODE_SUCCESS = 'SEND_OAUTH_CODE_SUCCESS',
@@ -85,9 +82,6 @@ export type AuthActions =
   | SendTwoFactorCodeStartAction
   | SendTwoFactorCodeSuccessAction
   | SendTwoFactorCodeFailedAction
-  | SendPhoneLoginCodeStartAction
-  | SendPhoneLoginCodeSuccessAction
-  | SendPhoneLoginCodeFailedAction
   | SendOAuthCodeStartAction
   | SendOAuthCodeSuccessAction
   | SendOAuthCodeFailedAction
@@ -138,20 +132,6 @@ export interface LoginSuccessAction extends AppAction {
 export interface LoginFailedAction extends AppAction {
   readonly error: Error;
   readonly type: AUTH_ACTION.LOGIN_FAILED;
-}
-
-export interface SendPhoneLoginCodeStartAction extends AppAction {
-  readonly type: AUTH_ACTION.SEND_PHONE_LOGIN_CODE_START;
-}
-export interface SendPhoneLoginCodeSuccessAction extends AppAction {
-  readonly payload: {
-    expiresIn: number;
-  };
-  readonly type: AUTH_ACTION.SEND_PHONE_LOGIN_CODE_SUCCESS;
-}
-export interface SendPhoneLoginCodeFailedAction extends AppAction {
-  readonly error: Error;
-  readonly type: AUTH_ACTION.SEND_PHONE_LOGIN_CODE_FAILED;
 }
 
 export interface SendOAuthCodeStartAction extends AppAction {
@@ -333,20 +313,6 @@ export class AuthActionCreator {
   static failedLogin = (error: Error): LoginFailedAction => ({
     error,
     type: AUTH_ACTION.LOGIN_FAILED,
-  });
-
-  static startSendPhoneLoginCode = (): SendPhoneLoginCodeStartAction => ({
-    type: AUTH_ACTION.SEND_PHONE_LOGIN_CODE_START,
-  });
-
-  static successfulSendPhoneLoginCode = (expiresIn: number): SendPhoneLoginCodeSuccessAction => ({
-    payload: {expiresIn},
-    type: AUTH_ACTION.SEND_PHONE_LOGIN_CODE_SUCCESS,
-  });
-
-  static failedSendPhoneLoginCode = (error: Error): SendPhoneLoginCodeFailedAction => ({
-    error,
-    type: AUTH_ACTION.SEND_PHONE_LOGIN_CODE_FAILED,
   });
 
   static startSendOAuthCode = (): SendOAuthCodeStartAction => ({

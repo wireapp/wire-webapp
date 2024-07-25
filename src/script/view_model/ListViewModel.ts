@@ -39,6 +39,7 @@ import type {ConversationRepository} from '../conversation/ConversationRepositor
 import {ConversationState} from '../conversation/ConversationState';
 import type {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
+import {SidebarTabs, useSidebarStore} from '../page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {PanelState} from '../page/RightSidebar';
 import {useAppMainState} from '../page/state';
 import {ContentState, ListState, useAppState} from '../page/useAppState';
@@ -237,6 +238,9 @@ export class ListViewModel {
   openPreferencesAccount = async (): Promise<void> => {
     await this.teamRepository.getTeam();
 
+    const {setCurrentTab} = useSidebarStore.getState();
+    setCurrentTab(SidebarTabs.PREFERENCES);
+
     this.switchList(ListState.PREFERENCES);
     this.contentViewModel.switchContent(ContentState.PREFERENCES_ACCOUNT);
   };
@@ -281,12 +285,14 @@ export class ListViewModel {
   };
 
   readonly openConversations = (archive = false): void => {
+    const {currentTab, setCurrentTab} = useSidebarStore.getState();
     const newState = this.isActivatedAccount()
       ? archive
         ? ListState.ARCHIVE
         : ListState.CONVERSATIONS
       : ListState.TEMPORARY_GUEST;
     this.switchList(newState, false);
+    setCurrentTab(archive ? SidebarTabs.ARCHIVES : currentTab);
   };
 
   private readonly hideList = (): void => {
@@ -374,7 +380,7 @@ export class ListViewModel {
       if (customLabel) {
         entries.push({
           click: () => conversationLabelRepository.removeConversationFromLabel(customLabel, conversationEntity),
-          label: t('conversationsPopoverRemoveFrom', customLabel.name),
+          label: t('conversationsPopoverRemoveFrom', customLabel.name, {}, true),
         });
       }
 
@@ -416,11 +422,17 @@ export class ListViewModel {
     if (!conversationEntity.isGroup()) {
       const userEntity = conversationEntity.firstUserEntity();
       const canBlock = userEntity && (userEntity.isConnected() || userEntity.isRequest());
+      const canUnblock = userEntity && userEntity.isBlocked();
 
       if (canBlock) {
         entries.push({
           click: () => this.clickToBlock(conversationEntity),
           label: t('conversationsPopoverBlock'),
+        });
+      } else if (canUnblock) {
+        entries.push({
+          click: () => this.clickToUnblock(conversationEntity),
+          label: t('conversationsPopoverUnblock'),
         });
       }
     }
@@ -443,9 +455,20 @@ export class ListViewModel {
 
   clickToBlock = async (conversationEntity: Conversation): Promise<void> => {
     const userEntity = conversationEntity.firstUserEntity();
-    const hideConversation = this.shouldHideConversation(conversationEntity);
-    const nextConversationEntity = this.conversationRepository.getNextConversation(conversationEntity);
-    await this.actionsViewModel.blockUser(userEntity, hideConversation, nextConversationEntity);
+
+    if (!userEntity) {
+      return;
+    }
+
+    await this.actionsViewModel.blockUser(userEntity);
+  };
+
+  clickToUnblock = async (conversationEntity: Conversation): Promise<void> => {
+    const userEntity = conversationEntity.firstUserEntity();
+    if (!userEntity) {
+      return;
+    }
+    await this.actionsViewModel.unblockUser(userEntity);
   };
 
   readonly clickToCancelRequest = (conversationEntity: Conversation): void => {

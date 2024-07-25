@@ -28,7 +28,6 @@ import {getLogger, Logger} from 'Util/Logger';
 import {downloadBlob, loadFileBuffer, loadImage} from 'Util/util';
 import {WebWorker} from 'Util/worker';
 
-import {decryptAesAsset} from './AssetCrypto';
 import {AssetRemoteData} from './AssetRemoteData';
 import {AssetService} from './AssetService';
 import {AssetTransferState} from './AssetTransferState';
@@ -47,7 +46,6 @@ interface CompressedImage {
 
 export interface AssetUploadOptions extends AssetOptions {
   domain?: string;
-  expectsReadConfirmation: boolean;
   legalHoldStatus?: LegalHoldStatus;
 }
 
@@ -93,18 +91,11 @@ export class AssetRepository {
 
   public async load(asset: AssetRemoteData): Promise<undefined | Blob> {
     try {
-      let plaintext: ArrayBuffer;
-      const {buffer, mimeType} = await this.loadBuffer(asset);
-      const isEncryptedAsset = !!asset.otrKey && !!asset.sha256;
+      const {response, cancel} = this.loadBuffer(asset);
+      asset.cancelDownload = cancel;
+      const {buffer, mimeType} = await response;
 
-      if (isEncryptedAsset) {
-        const otrKey = asset.otrKey instanceof Uint8Array ? asset.otrKey : Uint8Array.from(Object.values(asset.otrKey));
-        const sha256 = asset.sha256 instanceof Uint8Array ? asset.sha256 : Uint8Array.from(Object.values(asset.sha256));
-        plaintext = await decryptAesAsset(buffer, otrKey.buffer, sha256.buffer);
-      } else {
-        plaintext = buffer;
-      }
-      return new Blob([new Uint8Array(plaintext)], {type: mimeType});
+      return new Blob([new Uint8Array(buffer)], {type: mimeType});
     } catch (error) {
       if (error instanceof Error) {
         const isAssetNotFound = error.message.endsWith(HTTP_STATUS.NOT_FOUND.toString());
@@ -146,11 +137,17 @@ export class AssetRepository {
   }
 
   private loadBuffer(asset: AssetRemoteData) {
-    const request = this.core.service!.asset.downloadAsset(asset.urlData, fraction => {
+    const isEncryptedAsset = !!asset.otrKey && !!asset.sha256;
+    const progressCallback = (fraction: number) => {
       asset.downloadProgress(fraction * 100);
-    });
-    asset.cancelDownload = request.cancel;
-    return request.response;
+    };
+
+    if (!isEncryptedAsset) {
+      return this.core.service!.asset.downloadRawAsset(asset.urlData, progressCallback);
+    }
+    const otrKey = asset.otrKey instanceof Uint8Array ? asset.otrKey : Uint8Array.from(Object.values(asset.otrKey));
+    const sha256 = asset.sha256 instanceof Uint8Array ? asset.sha256 : Uint8Array.from(Object.values(asset.sha256));
+    return this.core.service!.asset.downloadAsset(asset.urlData, otrKey, sha256, progressCallback);
   }
 
   public async download(asset: AssetRemoteData, fileName: string) {
@@ -196,7 +193,6 @@ export class AssetRepository {
     ]);
 
     const options: AssetUploadOptions = {
-      expectsReadConfirmation: false,
       public: true,
       retention: AssetRetentionPolicy.ETERNAL,
     };

@@ -19,7 +19,6 @@
 
 import {useEffect, useState} from 'react';
 
-import {SVGIcon} from '@wireapp/react-ui-kit/lib/Icon/SVGIcon';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
@@ -27,6 +26,7 @@ import {AnyAction, Dispatch} from 'redux';
 import {Runtime, UrlUtil} from '@wireapp/commons';
 import {COLOR, ContainerXS, FlexBox, Text} from '@wireapp/react-ui-kit';
 
+import {LogoIcon} from 'Components/Icon';
 import {afterRender} from 'Util/util';
 
 import {Page} from './Page';
@@ -35,7 +35,6 @@ import {customEnvRedirectStrings} from '../../strings';
 import {actionRoot} from '../module/action';
 import {bindActionCreators} from '../module/reducer';
 import {QUERY_KEY} from '../route';
-import {getSVG} from '../util/SVGProvider';
 
 const REDIRECT_DELAY = 5000;
 const CustomEnvironmentRedirectComponent = ({doNavigate, doSendNavigationEvent}: DispatchProps) => {
@@ -87,9 +86,7 @@ const CustomEnvironmentRedirectComponent = ({doNavigate, doSendNavigationEvent}:
               width: 120,
             }}
           >
-            <SVGIcon aria-hidden="true" color={COLOR.WHITE} realWidth={47} realHeight={38}>
-              <g dangerouslySetInnerHTML={{__html: getSVG('logo-icon')?.documentElement?.innerHTML}} />
-            </SVGIcon>
+            <LogoIcon aria-hidden="true" color={COLOR.WHITE} width={47} height={38} />
             <svg
               aria-hidden="true"
               style={{position: 'absolute'}}

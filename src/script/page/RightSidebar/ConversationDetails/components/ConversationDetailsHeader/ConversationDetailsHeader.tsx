@@ -19,7 +19,7 @@
 
 import {ChangeEvent, FC, KeyboardEvent, useEffect, useRef, useState} from 'react';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {ConversationVerificationBadges} from 'Components/VerificationBadge';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isEnterKey} from 'Util/KeyboardUtil';
@@ -132,7 +132,7 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
                   className="conversation-details__name__edit-icon"
                   aria-label={t('tooltipConversationDetailsRename')}
                 >
-                  <Icon.Edit />
+                  <Icon.EditIcon />
                 </button>
               )}
             </div>

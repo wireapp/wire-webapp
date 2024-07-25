@@ -26,7 +26,7 @@ import {container} from 'tsyringe';
 import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {ModalComponent} from 'Components/ModalComponent';
 import {EnrichedFields} from 'Components/panel/EnrichedFields';
 import {UserActions} from 'Components/panel/UserActions';
@@ -109,7 +109,7 @@ interface UnverifiedUserWarningProps {
 export const UnverifiedUserWarning: React.FC<UnverifiedUserWarningProps> = ({user}) => {
   return (
     <div css={{display: 'flex', color: 'var(--danger-color)', fill: 'var(--danger-color)', margin: '1em 0'}}>
-      <Icon.Info css={{height: '1rem', margin: '0.15em 1em', minWidth: '1rem'}} />
+      <Icon.InfoIcon css={{height: '1rem', margin: '0.15em 1em', minWidth: '1rem'}} />
       <p css={{fontSize: 'var(--font-size-medium)'}}>
         {user ? t('userNotVerified', {user: user.name()}) : t('conversationConnectionVerificationWarning')}
         <Link
@@ -152,6 +152,8 @@ const UserModal: React.FC<UserModalProps> = ({
   ]);
   const isFederated = core.backendFeatures?.isFederated;
 
+  const isSameTeam = user && user.teamId && selfUser.teamId && user.teamId === selfUser.teamId;
+
   useEffect(() => {
     if (userId) {
       userRepository
@@ -191,7 +193,7 @@ const UserModal: React.FC<UserModalProps> = ({
           </h2>
         )}
 
-        <Icon.Close
+        <Icon.CloseIcon
           className="modal__header__button"
           onClick={hide}
           onKeyDown={event => handleKeyDown(event, hide)}
@@ -209,7 +211,7 @@ const UserModal: React.FC<UserModalProps> = ({
 
             <EnrichedFields user={user} showDomain={isFederated} />
 
-            {!isTrusted && <UnverifiedUserWarning user={user} />}
+            {!isTrusted && !isSameTeam && <UnverifiedUserWarning user={user} />}
 
             <UserModalUserActionsSection
               user={user}
@@ -221,7 +223,7 @@ const UserModal: React.FC<UserModalProps> = ({
         )}
         {isShown && !user && !userNotFound && (
           <div className="loading-wrapper">
-            <Icon.Loading aria-hidden="true" />
+            <Icon.LoadingIcon aria-hidden="true" />
           </div>
         )}
 

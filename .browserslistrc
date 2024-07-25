@@ -1,4 +1,3 @@
-chrome >= 51
-firefox >= 60
-edge >= 15
-opera >= 43
+chrome >= 114 and last 1 year and not dead
+firefox >= 113 and last 1 year and not dead
+edge >= 113 and last 1 year and not dead

@@ -26,22 +26,11 @@ import {initialRootState} from '../module/reducer';
 import {initialAuthState} from '../module/reducer/authReducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
-jest.mock('../util/SVGProvider');
 
 describe('when entering a team name', () => {
   describe('the submit button', () => {
     it('is disabled if too few characters are entered', () => {
-      const {getByTestId} = mountComponent(
-        <TeamName />,
-        mockStoreFactory()({
-          ...initialRootState,
-          runtimeState: {
-            hasCookieSupport: true,
-            hasIndexedDbSupport: true,
-            isSupportedBrowser: true,
-          },
-        }),
-      );
+      const {getByTestId} = mountComponent(<TeamName />, mockStoreFactory()(initialRootState));
 
       const teamNameInput = getByTestId('enter-team-name') as HTMLInputElement;
       const nextButton = getByTestId('do-next') as HTMLButtonElement;
@@ -50,17 +39,7 @@ describe('when entering a team name', () => {
     });
 
     it('is enabled when the minimum amount of characters is entered', () => {
-      const {getByTestId} = mountComponent(
-        <TeamName />,
-        mockStoreFactory()({
-          ...initialRootState,
-          runtimeState: {
-            hasCookieSupport: true,
-            hasIndexedDbSupport: true,
-            isSupportedBrowser: true,
-          },
-        }),
-      );
+      const {getByTestId} = mountComponent(<TeamName />, mockStoreFactory()(initialRootState));
       const expectedTeamName = 'M';
 
       const teamNameInput = getByTestId('enter-team-name') as HTMLInputElement;
@@ -72,17 +51,7 @@ describe('when entering a team name', () => {
     });
 
     it('is disabled if previous submit with same value failed', () => {
-      const {getByTestId} = mountComponent(
-        <TeamName />,
-        mockStoreFactory()({
-          ...initialRootState,
-          runtimeState: {
-            hasCookieSupport: true,
-            hasIndexedDbSupport: true,
-            isSupportedBrowser: true,
-          },
-        }),
-      );
+      const {getByTestId} = mountComponent(<TeamName />, mockStoreFactory()(initialRootState));
       const expectedTeamName = 'M';
       const expectedValidTeamName = 'My Team';
 
@@ -114,11 +83,6 @@ describe('when entering a team name', () => {
               },
             },
           },
-          runtimeState: {
-            hasCookieSupport: true,
-            hasIndexedDbSupport: true,
-            isSupportedBrowser: true,
-          },
         }),
       );
 
@@ -129,17 +93,7 @@ describe('when entering a team name', () => {
 
   describe('an error message', () => {
     it('appears if too few characters are entered', () => {
-      const {getByTestId} = mountComponent(
-        <TeamName />,
-        mockStoreFactory()({
-          ...initialRootState,
-          runtimeState: {
-            hasCookieSupport: true,
-            hasIndexedDbSupport: true,
-            isSupportedBrowser: true,
-          },
-        }),
-      );
+      const {getByTestId} = mountComponent(<TeamName />, mockStoreFactory()(initialRootState));
       const expectedTeamName = 'M';
       const nextButton = getByTestId('do-next') as HTMLButtonElement;
       const teamNameInput = getByTestId('enter-team-name') as HTMLInputElement;
@@ -154,17 +108,7 @@ describe('when entering a team name', () => {
     });
 
     it('appears when input gets trimmed', () => {
-      const {getByTestId} = mountComponent(
-        <TeamName />,
-        mockStoreFactory()({
-          ...initialRootState,
-          runtimeState: {
-            hasCookieSupport: true,
-            hasIndexedDbSupport: true,
-            isSupportedBrowser: true,
-          },
-        }),
-      );
+      const {getByTestId} = mountComponent(<TeamName />, mockStoreFactory()(initialRootState));
       const expectedTeamName = '  ';
       const nextButton = getByTestId('do-next') as HTMLButtonElement;
       const teamNameInput = getByTestId('enter-team-name') as HTMLInputElement;

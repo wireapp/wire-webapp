@@ -40,10 +40,10 @@ import {
   useMatchMedia,
 } from '@wireapp/react-ui-kit';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
 import {AssetRepository} from 'src/script/assets/AssetRepository';
-import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
+import {handleEscDown, handleKeyDown} from 'Util/KeyboardUtil';
 import {loadDataUrl} from 'Util/util';
 
 import {
@@ -155,7 +155,7 @@ const OAuthPermissionsComponent = ({
     <Page>
       <ContainerXS centerText verticalCenter css={containerCSS}>
         {!oAuthApp ? (
-          <Icon.Loading width="36" height="36" css={{path: {fill: COLOR_V2.BLUE_DARK_500}}} />
+          <Icon.LoadingIcon width="36" height="36" css={{path: {fill: COLOR_V2.BLUE_DARK_500}}} />
         ) : (
           <>
             <H2 css={headerCSS}>{_(oauthStrings.headline)}</H2>
@@ -213,11 +213,7 @@ const OAuthPermissionsComponent = ({
                 type="button"
                 onClick={onCancel}
                 data-uie-name="do-oauth-cancel"
-                onKeyDown={(event: React.KeyboardEvent) => {
-                  if (event.key === KEY.ESC) {
-                    onCancel();
-                  }
-                }}
+                onKeyDown={event => handleEscDown(event, onCancel)}
               >
                 {_(oauthStrings.cancel)}
               </Button>

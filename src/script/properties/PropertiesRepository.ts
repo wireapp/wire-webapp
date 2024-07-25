@@ -81,6 +81,7 @@ export class PropertiesRepository {
         call: {
           enable_soundless_incoming_calls: false,
           enable_vbr_encoding: true,
+          push_to_talk_key: null,
         },
         emoji: {
           replace_inline: true,
@@ -312,9 +313,6 @@ export class PropertiesRepository {
       case PROPERTIES_TYPE.INTERFACE.THEME:
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, updatedPreference);
         break;
-      case PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS:
-        amplify.publish(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.VIEW_FOLDERS, updatedPreference);
-        break;
       case PROPERTIES_TYPE.EMOJI.REPLACE_INLINE:
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE, updatedPreference);
         break;
@@ -341,6 +339,9 @@ export class PropertiesRepository {
         break;
       case PROPERTIES_TYPE.CALL.ENABLE_SOUNDLESS_INCOMING_CALLS:
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_SOUNDLESS_INCOMING_CALLS, updatedPreference);
+        break;
+      case PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY:
+        amplify.publish(WebAppEvents.PROPERTIES.UPDATE.CALL.PUSH_TO_TALK_KEY, updatedPreference);
         break;
       default:
         throw new Error(`Failed to update preference of unhandled type '${propertiesType}'`);

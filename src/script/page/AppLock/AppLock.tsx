@@ -27,7 +27,7 @@ import {container} from 'tsyringe';
 import {ValidationUtil} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {ModalComponent} from 'Components/ModalComponent';
 import {SIGN_OUT_REASON} from 'src/script/auth/SignOutReason';
 import {ClientRepository} from 'src/script/client';
@@ -274,7 +274,7 @@ const AppLock: React.FC<AppLockProps> = ({
             aria-label={t('modalAppLockSetupCloseBtn')}
           >
             <span className="modal__header__icon" aria-hidden="true">
-              <Icon.Close />
+              <Icon.CloseIcon />
             </span>
           </button>
         )}

@@ -35,7 +35,7 @@ export const KEY = {
   PAGE_UP: 'PageUp',
   SPACE: ' ',
   TAB: 'Tab',
-};
+} as const;
 
 export const isOneOfKeys = (keyboardEvent: KeyboardEvent | ReactKeyboardEvent, expectedKeys: string[] = []) => {
   expectedKeys = expectedKeys.map(key => key.toLowerCase());
@@ -78,30 +78,14 @@ export const isMetaKey = (keyboardEvent: KeyboardEvent): boolean =>
 export const isPasteAction = (keyboardEvent: KeyboardEvent): boolean =>
   isMetaKey(keyboardEvent) && isKey(keyboardEvent, KEY.KEY_V);
 
-export const isRemovalAction = (key: string): boolean => [KEY.BACKSPACE, KEY.DELETE].includes(key);
+const removalKeys: string[] = [KEY.BACKSPACE, KEY.DELETE];
+export const isRemovalAction = (key: string): boolean => removalKeys.includes(key);
 
-type KeyboardHandler = (event: KeyboardEvent) => void;
-
-const escKeyHandlers: KeyboardHandler[] = [];
-
-document.addEventListener('keydown', event => {
-  if (event.key === 'Escape') {
-    escKeyHandlers.forEach(handler => handler(event));
-  }
-});
-
-export const onEscKey = (handler: KeyboardHandler) => escKeyHandlers.push(handler);
-
-export const offEscKey = (handler: KeyboardHandler) => {
-  const index = escKeyHandlers.indexOf(handler);
-  if (index >= 0) {
-    escKeyHandlers.splice(index, 1);
-  }
-};
+export const isSpaceOrEnterKey = (key: string): boolean => key === KEY.SPACE || key === KEY.ENTER;
 
 export const handleKeyDown = (
-  event: React.KeyboardEvent<Element> | KeyboardEvent,
-  callback: (event?: React.KeyboardEvent<Element> | KeyboardEvent) => void,
+  event: ReactKeyboardEvent<Element> | KeyboardEvent,
+  callback: (event?: ReactKeyboardEvent<Element> | KeyboardEvent) => void,
 ) => {
   if (event.key === KEY.ENTER || event.key === KEY.SPACE) {
     callback(event);
@@ -109,9 +93,65 @@ export const handleKeyDown = (
   return true;
 };
 
-export const handleEnterDown = (event: React.KeyboardEvent<HTMLElement> | KeyboardEvent, callback: () => void) => {
+export const handleEnterDown = (event: ReactKeyboardEvent<HTMLElement> | KeyboardEvent, callback: () => void): void => {
   if (event.key === KEY.ENTER) {
     callback();
   }
-  return true;
+};
+
+export const handleEscDown = (event: ReactKeyboardEvent<Element> | KeyboardEvent, callback: () => void): void => {
+  if (event?.key === KEY.ESC) {
+    callback();
+  }
+};
+
+/**
+ * Handles global key press event - calls onPress when the key is pressed and onRelease when the key is released.
+ * @note The onPress is called only once when the key is pressed (it is not called repeatedly when key is held down).
+ * @param key The key to listen to.
+ * @param onPress A function to call when the key is pressed.
+ * @param onRelease A function to call when the key is released.
+ * @returns A function to unsubscribe.
+ */
+export const handleKeyPress = (key: string, {onPress, onRelease}: {onPress: () => void; onRelease: () => void}) => {
+  let isKeyDown = false;
+
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key !== key) {
+      return;
+    }
+
+    // Do nothing if the key press was already registered.
+    if (isKeyDown) {
+      return;
+    }
+
+    isKeyDown = true;
+
+    onPress();
+  };
+
+  const handleKeyUp = (event: KeyboardEvent) => {
+    if (event.key !== key) {
+      return;
+    }
+
+    // If the key was not pressed, we do nothing.
+    if (!isKeyDown) {
+      return;
+    }
+
+    // Release the key.
+    isKeyDown = false;
+
+    onRelease();
+  };
+
+  window.addEventListener('keydown', handleKeyDown);
+  window.addEventListener('keyup', handleKeyUp);
+
+  return () => {
+    window.removeEventListener('keydown', handleKeyDown);
+    window.removeEventListener('keyup', handleKeyUp);
+  };
 };

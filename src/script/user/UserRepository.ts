@@ -52,7 +52,6 @@ import {matchQualifiedIds} from 'Util/QualifiedId';
 import {fixWebsocketString} from 'Util/StringUtil';
 import {isAxiosError, isBackendError} from 'Util/TypePredicateUtil';
 
-import {valueFromType} from './AvailabilityMapper';
 import {showAvailabilityModal} from './AvailabilityModal';
 import {ConsentValue} from './ConsentValue';
 import {UserMapper} from './UserMapper';
@@ -196,6 +195,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
    * @param selfUser the user currently logged in (will be excluded from fetch)
    * @param connections the connection to other users
    * @param conversations the conversation the user is part of (used to compute extra users that are part of those conversations but not directly connected to the user)
+   * @param extraUsers the users that should be loaded additionally
    */
   async loadUsers(
     selfUser: User,
@@ -217,7 +217,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
 
     const dbUsers = await this.userService.loadUserFromDb();
     /* prior to April 2023, we were only storing the availability in the DB, we need to refetch those users */
-    const [localUsers, incompleteUsers] = partition(dbUsers, user => !!user.qualified_id);
+    const [localUsers] = partition(dbUsers, user => !!user.qualified_id);
 
     // We can remove users that are not linked to any "known users" from the local database.
     // Known users are the users that are part of the conversations or the connections (or some extra users)
@@ -235,9 +235,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
     const {found, failed} = await this.fetchRawUsers(usersToFetch, selfUser.domain);
 
     const userWithAvailability = found.map(user => {
-      const availability = incompleteUsers
-        .concat(nonQualifiedUsers)
-        .find(incompleteUser => incompleteUser.id === user.id);
+      const availability = [...dbUsers, ...nonQualifiedUsers].find(userRecord => userRecord.id === user.id);
 
       if (availability) {
         return {availability: availability.availability, ...user};
@@ -384,13 +382,12 @@ export class UserRepository extends TypedEventEmitter<Events> {
       };
     });
 
-    this.logger.log(`Found locally stored clients for '${userIds.length}' users`, recipients);
     const userEntities = await this.getUsersById(userIds);
     userEntities.forEach(userEntity => {
       const clientEntities = recipients[userEntity.id];
       const tooManyClients = clientEntities.length > 8;
       if (tooManyClients) {
-        this.logger.warn(`Found '${clientEntities.length}' clients for '${userEntity.name()}'`);
+        this.logger.debug(`Found '${clientEntities.length}' clients for '${userEntity.name()}'`);
       }
       userEntity.devices(clientEntities);
     });
@@ -492,15 +489,10 @@ export class UserRepository extends TypedEventEmitter<Events> {
       return;
     }
     const hasAvailabilityChanged = availability !== selfUser.availability();
-    const newAvailabilityValue = valueFromType(availability);
     if (hasAvailabilityChanged) {
-      const oldAvailabilityValue = valueFromType(selfUser.availability());
-      this.logger.log(`Availability was changed from '${oldAvailabilityValue}' to '${newAvailabilityValue}'`);
       await this.updateUser(selfUser.qualifiedId, {availability});
       amplify.publish(WebAppEvents.TEAM.UPDATE_INFO);
       showAvailabilityModal(availability);
-    } else {
-      this.logger.log(`Availability was again set to '${newAvailabilityValue}'`);
     }
   };
 
@@ -1050,13 +1042,9 @@ export class UserRepository extends TypedEventEmitter<Events> {
         if (isMarketingConsent) {
           const hasGivenConsent = consentValue === ConsentValue.GIVEN;
           this.propertyRepository.marketingConsent(hasGivenConsent);
-
-          this.logger.log(`Marketing consent retrieved as '${consentValue}'`);
           return;
         }
       }
-
-      this.logger.log(`Marketing consent not set. Defaulting to '${this.propertyRepository.marketingConsent()}'`);
     } catch (error) {
       this.logger.warn(`Failed to retrieve marketing consent: ${error.message || error.code}`, error);
     }

@@ -44,6 +44,7 @@ import {GlobalEventsPlugin} from './plugins/GlobalEventsPlugin';
 import {HistoryPlugin} from './plugins/HistoryPlugin';
 import {findAndTransformEmoji, ReplaceEmojiPlugin} from './plugins/InlineEmojiReplacementPlugin';
 import {MentionsPlugin} from './plugins/MentionsPlugin';
+import {ReplaceCarriageReturnPlugin} from './plugins/ReplaceCarriageReturnPlugin/ReplaceCarriageReturnPlugin';
 import {SendPlugin} from './plugins/SendPlugin';
 import {TextChangePlugin} from './plugins/TextChangePlugin';
 
@@ -93,7 +94,13 @@ const createMentionEntity = (user: Pick<User, 'id' | 'name' | 'domain'>, mention
 };
 
 const parseMentions = (editor: LexicalEditor, textValue: string, mentions: User[]) => {
-  const editorMentions = editor.getEditorState().read(() => $nodesOfType(MentionNode).map(node => node.__value));
+  const editorMentions = editor.getEditorState().read(() =>
+    $nodesOfType(MentionNode)
+      // The nodes given by lexical are not sorted by their position in the text. Instead they are sorted according to the moment they were inserted into the global text.
+      // We need to manually sort the nodes by their position before parsing the mentions in the entire text
+      .sort((m1, m2) => (m1.isBefore(m2) ? -1 : 1))
+      .map(node => node.getValue()),
+  );
   let position = -1;
 
   return editorMentions.flatMap(mention => {
@@ -160,6 +167,8 @@ export const RichTextEditor = ({
           <HistoryPlugin />
 
           {replaceEmojis && <ReplaceEmojiPlugin />}
+
+          <ReplaceCarriageReturnPlugin />
 
           <PlainTextPlugin
             contentEditable={<ContentEditable className="conversation-input-bar-text" data-uie-name="input-message" />}

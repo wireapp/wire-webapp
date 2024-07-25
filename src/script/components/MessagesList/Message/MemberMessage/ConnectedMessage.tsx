@@ -22,7 +22,7 @@ import React from 'react';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {UserClassifiedBar} from 'Components/input/ClassifiedBar';
 import {UnverifiedUserWarning} from 'Components/Modals/UserModal';
 import {User} from 'src/script/entity/User';
@@ -68,6 +68,7 @@ export const ConnectedMessage: React.FC<ConnectedMessageProps> = ({
         participant={user}
         noBadge={isOutgoingRequest}
         className="message-connected-avatar cursor-default"
+        hideAvailabilityStatus
       />
 
       {isOutgoingRequest && (
@@ -96,7 +97,7 @@ export const ConnectedMessage: React.FC<ConnectedMessageProps> = ({
           </div>
           <div className="message-header">
             <div className="message-header-icon message-header-icon--svg text-foreground">
-              <Icon.Info />
+              <Icon.InfoIcon />
             </div>
             <p className="message-header-label">{t('conversationUnverifiedUserWarning')}</p>
           </div>

@@ -21,16 +21,13 @@ import {render} from '@testing-library/react';
 
 import {Runtime} from '@wireapp/commons';
 
-import {ContentViewModel} from 'src/script/view_model/ContentViewModel';
-
 import {Preferences} from './Preferences';
 
 describe('Preferences', () => {
   const defaultParams = {
-    contentViewModel: {} as ContentViewModel,
-    onClose: jest.fn(),
     teamRepository: {getTeam: jest.fn()},
     preferenceNotificationRepository: {getNotifications: jest.fn()},
+    onPreferenceItemClick: jest.fn(),
   };
 
   it('renders the right preferences items', () => {
@@ -44,19 +41,19 @@ describe('Preferences', () => {
     expect(queryByText('preferencesAV')).toBeNull();
   });
 
-  it('renders the about section in a web app', () => {
-    jest.spyOn(Runtime, 'isDesktopApp').mockReturnValue(true);
-    jest.spyOn(Runtime, 'isSupportingLegacyCalling').mockReturnValue(false);
-    const {queryByText} = render(<Preferences {...defaultParams} />);
-    expect(queryByText('preferencesAV')).toBeNull();
-    expect(queryByText('preferencesAbout')).toBeNull();
-  });
-
   it('renders the a/v section in a desktop app', () => {
-    jest.spyOn(Runtime, 'isDesktopApp').mockReturnValue(false);
+    jest.spyOn(Runtime, 'isDesktopApp').mockReturnValue(true);
     jest.spyOn(Runtime, 'isSupportingLegacyCalling').mockReturnValue(true);
     const {queryByText} = render(<Preferences {...defaultParams} />);
     expect(queryByText('preferencesAV')).not.toBeNull();
+    expect(queryByText('preferencesAbout')).not.toBeNull();
+  });
+
+  it('renders the about section in a web app', () => {
+    jest.spyOn(Runtime, 'isDesktopApp').mockReturnValue(false);
+    jest.spyOn(Runtime, 'isSupportingLegacyCalling').mockReturnValue(false);
+    const {queryByText} = render(<Preferences {...defaultParams} />);
+    expect(queryByText('preferencesAV')).toBeNull();
     expect(queryByText('preferencesAbout')).not.toBeNull();
   });
 });

@@ -27,7 +27,7 @@ import {ConnectRequests} from 'Components/ConnectRequests';
 import {Conversation} from 'Components/Conversation';
 import {HistoryExport} from 'Components/HistoryExport';
 import {HistoryImport} from 'Components/HistoryImport';
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {User} from 'src/script/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -103,7 +103,7 @@ const MainContent: FC<MainContentProps> = ({
     return null;
   }
   const {content: contentViewModel} = mainViewModel;
-  const {initialMessage, isFederated, repositories, switchContent} = contentViewModel;
+  const {isFederated, repositories, switchContent} = contentViewModel;
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
@@ -225,7 +225,7 @@ const MainContent: FC<MainContentProps> = ({
             {contentState === ContentState.WATERMARK && (
               <div className="watermark">
                 <span className="absolute-center" aria-hidden="true" data-uie-name="no-conversation">
-                  <Icon.Watermark />
+                  <Icon.WatermarkIcon />
                 </span>
               </div>
             )}
@@ -236,7 +236,6 @@ const MainContent: FC<MainContentProps> = ({
 
             {contentState === ContentState.CONVERSATION && (
               <Conversation
-                initialMessage={initialMessage}
                 teamState={teamState}
                 selfUser={selfUser}
                 isRightSidebarOpen={isRightSidebarOpen}

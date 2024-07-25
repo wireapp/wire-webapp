@@ -24,15 +24,17 @@ import {createRoot, Root} from 'react-dom/client';
 
 import {Availability} from '@wireapp/protocol-messaging';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {IgnoreOutsideClickWrapper} from 'Components/InputBar/util/clickHandlers';
 import {useMessageActionsState} from 'Components/MessagesList/Message/ContentMessage/MessageActions/MessageActions.state';
 import {isEnterKey, isEscapeKey, isKey, isOneOfKeys, isSpaceKey, KEY} from 'Util/KeyboardUtil';
 
+import {useActiveWindowState} from '../hooks/useActiveWindow';
+
 export interface ContextMenuEntry {
   availability?: Availability.Type;
   click?: (event?: MouseEvent) => void;
-  icon?: string;
+  icon?: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   identifier?: string;
   isChecked?: boolean;
   isDisabled?: boolean;
@@ -49,14 +51,16 @@ interface ContextMenuProps {
   resetMenuStates?: () => void;
 }
 
-let container: HTMLDivElement;
+let container: HTMLDivElement | undefined;
 let previouslyFocused: HTMLElement;
 let reactRoot: Root;
 
 const cleanUp = () => {
+  const {activeWindow} = useActiveWindowState.getState();
+
   if (container) {
     reactRoot.unmount();
-    document.body.removeChild(container);
+    activeWindow.document.body.removeChild(container);
     container = undefined;
   }
 };
@@ -72,14 +76,17 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
   posY,
   resetMenuStates,
 }) => {
+  const {activeWindow} = useActiveWindowState();
   const [mainElement, setMainElement] = useState<HTMLUListElement>();
   const [selected, setSelected] = useState<ContextMenuEntry>();
 
   const style = useMemo<React.CSSProperties>(() => {
     const left =
-      mainElement && window.innerWidth - posX < mainElement.offsetWidth ? posX - mainElement.offsetWidth : posX;
+      mainElement && activeWindow.innerWidth - posX < mainElement.offsetWidth ? posX - mainElement.offsetWidth : posX;
     const top = Math.max(
-      mainElement && window.innerHeight - posY < mainElement.offsetHeight ? posY - mainElement.offsetHeight : posY,
+      mainElement && activeWindow.innerHeight - posY < mainElement.offsetHeight
+        ? posY - mainElement.offsetHeight
+        : posY,
       0,
     );
     return {
@@ -96,7 +103,9 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
 
       // context menu options such as 10 seconds etc begings with digit which is an invalid querySelector
       // param append btn- to avoid such errors
-      const selectedButton = document.querySelector(`#${getButtonId(labelWithoutQuotes!)}`) as HTMLButtonElement;
+      const selectedButton = activeWindow.document.querySelector(
+        `#${getButtonId(labelWithoutQuotes!)}`,
+      ) as HTMLButtonElement;
       selectedButton?.focus();
     }
   }, [selected]);
@@ -146,18 +155,18 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
       }
     };
 
-    window.addEventListener('wheel', onWheel);
-    window.addEventListener('keydown', onKeyDown);
-    window.addEventListener('mousedown', onMouseDown);
-    window.addEventListener('resize', cleanUp);
+    activeWindow.addEventListener('wheel', onWheel);
+    activeWindow.addEventListener('keydown', onKeyDown);
+    activeWindow.addEventListener('mousedown', onMouseDown);
+    activeWindow.addEventListener('resize', cleanUp);
 
     return () => {
-      window.removeEventListener('wheel', onWheel);
-      window.removeEventListener('keydown', onKeyDown);
-      window.removeEventListener('mousedown', onMouseDown);
-      window.removeEventListener('resize', cleanUp);
+      activeWindow.removeEventListener('wheel', onWheel);
+      activeWindow.removeEventListener('keydown', onKeyDown);
+      activeWindow.removeEventListener('mousedown', onMouseDown);
+      activeWindow.removeEventListener('resize', cleanUp);
     };
-  }, [mainElement, selected]);
+  }, [mainElement, selected, activeWindow]);
 
   const {handleMenuOpen} = useMessageActionsState();
   const resetMsgMenuStates = (isOutsideClick = false) => {
@@ -176,7 +185,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
         <ul
           className={contextMenuClassName}
           ref={setMainElement}
-          style={{maxHeight: window.innerHeight, ...style}}
+          style={{maxHeight: activeWindow.innerHeight, ...style}}
           role="menu"
         >
           {entries.map((entry, index) =>
@@ -213,10 +222,10 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
                         },
                       })}
                 >
-                  {entry.icon && <Icon name={entry.icon} className={`${contextMenuClassName}__icon`} />}
+                  {entry.icon && <entry.icon className={`${contextMenuClassName}__icon`} />}
                   <span>{entry.label}</span>
                   {entry.isChecked && (
-                    <Icon.Check
+                    <Icon.CheckIcon
                       className={`${contextMenuClassName}__check`}
                       data-uie-name={`${contextMenuClassName}-check`}
                     />
@@ -237,14 +246,15 @@ export const showContextMenu = (
   identifier: string,
   resetMenuStates?: () => void,
 ) => {
+  const {activeWindow} = useActiveWindowState.getState();
   event.preventDefault();
   event.stopPropagation();
 
-  previouslyFocused = document.activeElement as HTMLElement;
+  previouslyFocused = activeWindow.document.activeElement as HTMLElement;
   cleanUp();
 
-  container = document.createElement('div');
-  document.body.appendChild(container);
+  container = activeWindow.document.createElement('div');
+  activeWindow.document.body.appendChild(container);
   reactRoot = createRoot(container);
   reactRoot.render(
     <ContextMenu

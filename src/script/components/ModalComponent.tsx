@@ -17,16 +17,16 @@
  *
  */
 
-import React, {useEffect, useId, useRef, useState, useCallback} from 'react';
+import React, {useEffect, useId, useRef, useState, useCallback, HTMLProps} from 'react';
 
 import {CSSObject} from '@emotion/react';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {noop, preventFocusOutside} from 'Util/util';
 
-import {Icon} from './Icon';
+import {LoadingIcon} from './Icon';
 
-interface ModalComponentProps {
+interface ModalComponentProps extends HTMLProps<HTMLDivElement> {
   children: React.ReactNode;
   isShown: boolean;
   id?: string;
@@ -93,6 +93,7 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
   showLoading = false,
   wrapperCSS,
   children,
+  onKeyDown,
   ...rest
 }) => {
   const [displayNone, setDisplayNone] = useState<boolean>(!isShown);
@@ -154,14 +155,14 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
       {...rest}
     >
       {showLoading ? (
-        <Icon.Loading width="48" height="48" css={{path: {fill: 'var(--modal-bg)'}}} />
+        <LoadingIcon width="48" height="48" css={{path: {fill: 'var(--modal-bg)'}}} />
       ) : (
         <div
           id={trapId}
           onClick={event => event.stopPropagation()}
           role="button"
           tabIndex={TabIndex.UNFOCUSABLE}
-          onKeyDown={event => event.stopPropagation()}
+          onKeyDown={event => (onKeyDown ? onKeyDown(event) : event.stopPropagation())}
           css={{...(hasVisibleClass ? ModalContentVisibleStyles : ModalContentStyles), ...wrapperCSS}}
         >
           {hasVisibleClass ? children : null}

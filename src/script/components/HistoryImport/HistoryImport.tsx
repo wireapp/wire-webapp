@@ -21,7 +21,7 @@ import {useEffect, useState} from 'react';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {LoadingBar} from 'Components/LoadingBar/LoadingBar';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {User} from 'src/script/entity/User';
@@ -224,7 +224,7 @@ const HistoryImport = ({user, backupRepository, file, switchContent}: HistoryImp
 
         {isDone && (
           <div className="history-message">
-            <Icon.Check />
+            <Icon.CheckIcon />
             <h2 className="history-message__headline" data-uie-name="status-history-import-success">
               {t('backupImportSuccessHeadline')}
             </h2>

@@ -26,7 +26,7 @@ import cx from 'classnames';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {CSS_SQUARE} from 'Util/CSSMixin';
 import {t} from 'Util/LocalizerUtil';
 
@@ -56,24 +56,21 @@ const AvailabilityButtons: React.FC<AvailabilityInputProps> = ({availability}) =
     [key: string]: any;
   } = {
     [Availability.Type.AVAILABLE]: (
-      <Icon.AvailabilityAvailable
-        className="availability-state-icon"
+      <Icon.AvailabilityAvailableIcon
         css={{...iconStyles, fill: 'var(--green-500)', stroke: 'var(--green-500)'}}
         data-uie-name="status-availability-icon"
         data-uie-value="available"
       />
     ),
     [Availability.Type.BUSY]: (
-      <Icon.AvailabilityBusy
-        className="availability-state-icon"
+      <Icon.AvailabilityBusyIcon
         css={{...iconStyles, fill: 'var(--amber-500)', stroke: 'var(--amber-500)'}}
         data-uie-name="status-availability-icon"
         data-uie-value="busy"
       />
     ),
     [Availability.Type.AWAY]: (
-      <Icon.AvailabilityAway
-        className="availability-state-icon"
+      <Icon.AvailabilityAwayIcon
         css={{...iconStyles, fill: 'var(--red-500)', stroke: 'var(--red-500)'}}
         data-uie-name="status-availability-icon"
         data-uie-value="away"

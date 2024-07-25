@@ -17,22 +17,22 @@
  *
  */
 
-import React from 'react';
+import React, {MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent} from 'react';
 
 import {css} from '@emotion/react';
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {GroupAvatar, Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {ConversationListCell} from 'Components/list/ConversationListCell';
 import {Call} from 'src/script/calling/Call';
+import {ConversationLabel, ConversationLabelRepository} from 'src/script/conversation/ConversationLabelRepository';
 import {User} from 'src/script/entity/User';
+import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleKeyDown, isKeyboardEvent} from 'Util/KeyboardUtil';
+import {isKeyboardEvent} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
-import {ConversationViewStyle} from './Conversations';
-import {GroupedConversations} from './GroupedConversations';
+import {ConnectionRequests} from './ConnectionRequests';
 
 import {CallState} from '../../../../calling/CallState';
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
@@ -51,23 +51,31 @@ interface ConversationsListProps {
   conversations: Conversation[];
   conversationState: ConversationState;
   listViewModel: ListViewModel;
-  viewStyle: ConversationViewStyle;
+  conversationLabelRepository: ConversationLabelRepository;
+  currentTab: SidebarTabs;
   currentFocus: string;
+  conversationsFilter: string;
+  currentFolder?: ConversationLabel;
   resetConversationFocus: () => void;
   handleArrowKeyDown: (index: number) => (e: React.KeyboardEvent) => void;
+  clearSearchFilter: () => void;
+  isConversationFilterFocused: boolean;
 }
 
 export const ConversationsList = ({
   conversations,
+  conversationsFilter,
   listViewModel,
-  viewStyle,
+  currentTab,
   connectRequests,
   conversationState,
-  conversationRepository,
   callState,
   currentFocus,
+  currentFolder,
   resetConversationFocus,
   handleArrowKeyDown,
+  clearSearchFilter,
+  isConversationFilterFocused,
 }: ConversationsListProps) => {
   const contentState = useAppState(state => state.contentState);
 
@@ -80,117 +88,91 @@ export const ConversationsList = ({
   const answerCall = (conversation: Conversation) => listViewModel.answerCall(conversation);
   const isShowingConnectionRequests = contentState === ContentState.CONNECTION_REQUESTS;
 
-  const hasJoinableCall = (conversation: Conversation) => {
+  const hasJoinableCall = (conversationId: QualifiedId) => {
+    const conversation = conversations.find(conversation =>
+      matchQualifiedIds(conversation.qualifiedId, conversationId),
+    );
+
+    if (!conversation) {
+      return false;
+    }
+
     const call = joinableCalls.find((callInstance: Call) =>
-      matchQualifiedIds(callInstance.conversationId, conversation.qualifiedId),
+      matchQualifiedIds(callInstance.conversation.qualifiedId, conversation.qualifiedId),
     );
     if (!call) {
       return false;
     }
-    return !conversation.removed_from_conversation();
+    return !conversation.isSelfUserRemoved();
   };
 
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
 
   const onConnectionRequestClick = () => {
-    setCurrentView(ViewType.CENTRAL_COLUMN);
+    setCurrentView(ViewType.MOBILE_CENTRAL_COLUMN);
     listViewModel.contentViewModel.switchContent(ContentState.CONNECTION_REQUESTS);
   };
 
-  const conversationView =
-    viewStyle === ConversationViewStyle.RECENT ? (
+  const getCommonConversationCellProps = (conversation: Conversation, index: number) => ({
+    isFocused: !isConversationFilterFocused && currentFocus === conversation.id,
+    handleArrowKeyDown: handleArrowKeyDown(index),
+    resetConversationFocus: resetConversationFocus,
+    dataUieName: 'item-conversation',
+    conversation: conversation,
+    onClick: (event: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>) => {
+      if (isKeyboardEvent(event)) {
+        createNavigateKeyboard(generateConversationUrl(conversation.qualifiedId), true)(event);
+      } else {
+        createNavigate(generateConversationUrl(conversation.qualifiedId))(event);
+      }
+
+      clearSearchFilter();
+    },
+    isSelected: isActiveConversation,
+    onJoinCall: answerCall,
+    rightClick: openContextMenu,
+    showJoinButton: hasJoinableCall(conversation),
+  });
+
+  const isFolderView = currentTab === SidebarTabs.FOLDER;
+
+  const getConversationView = () => {
+    const filterByName = (conversation: Conversation) =>
+      conversation.display_name().toLowerCase().includes(conversationsFilter.toLowerCase());
+
+    if (isFolderView && currentFolder) {
+      return (
+        <>
+          {currentFolder
+            ?.conversations()
+            .filter(filterByName)
+            .map((conversation, index) => (
+              <ConversationListCell key={conversation.id} {...getCommonConversationCellProps(conversation, index)} />
+            ))}
+        </>
+      );
+    }
+
+    return (
       <>
-        {conversations.map((conversation, index) => {
-          return (
-            <ConversationListCell
-              key={conversation.id}
-              isFocused={currentFocus === conversation.id}
-              handleArrowKeyDown={handleArrowKeyDown(index)}
-              resetConversationFocus={resetConversationFocus}
-              dataUieName="item-conversation"
-              conversation={conversation}
-              onClick={event => {
-                if (isKeyboardEvent(event)) {
-                  createNavigateKeyboard(generateConversationUrl(conversation.qualifiedId), true)(event);
-                } else {
-                  createNavigate(generateConversationUrl(conversation.qualifiedId))(event);
-                }
-              }}
-              isSelected={isActiveConversation}
-              onJoinCall={answerCall}
-              rightClick={openContextMenu}
-              showJoinButton={hasJoinableCall(conversation)}
-            />
-          );
-        })}
+        {conversations.filter(filterByName).map((conversation, index) => (
+          <ConversationListCell key={conversation.id} {...getCommonConversationCellProps(conversation, index)} />
+        ))}
       </>
-    ) : (
-      <li tabIndex={TabIndex.UNFOCUSABLE}>
-        <GroupedConversations
-          callState={callState}
-          conversationRepository={conversationRepository}
-          conversationState={conversationState}
-          hasJoinableCall={hasJoinableCall}
-          isSelectedConversation={isActiveConversation}
-          listViewModel={listViewModel}
-          onJoinCall={answerCall}
-        />
-      </li>
     );
+  };
 
-  const isFolderView = viewStyle === ConversationViewStyle.FOLDER;
-  const uieName = isFolderView ? 'folder-view' : 'recent-view';
-
-  const connectionText =
-    connectRequests.length > 1
-      ? t('conversationsConnectionRequestMany', connectRequests.length)
-      : t('conversationsConnectionRequestOne');
-
-  const connectionRequests =
-    connectRequests.length === 0 ? null : (
-      <li tabIndex={TabIndex.UNFOCUSABLE}>
-        <div
-          role="button"
-          tabIndex={TabIndex.FOCUSABLE}
-          className={`conversation-list-cell ${isShowingConnectionRequests ? 'conversation-list-cell-active' : ''}`}
-          onClick={onConnectionRequestClick}
-          onKeyDown={event => handleKeyDown(event, onConnectionRequestClick)}
-        >
-          <div className="conversation-list-cell-left">
-            {connectRequests.length === 1 ? (
-              <div className="avatar-halo">
-                <Avatar participant={connectRequests[0]} avatarSize={AVATAR_SIZE.SMALL} />
-              </div>
-            ) : (
-              <GroupAvatar users={connectRequests} />
-            )}
-          </div>
-
-          <div className="conversation-list-cell-center">
-            <span
-              className={`conversation-list-cell-name ${isShowingConnectionRequests ? 'accent-text' : ''}`}
-              data-uie-name="item-pending-requests"
-            >
-              {connectionText}
-            </span>
-          </div>
-
-          <div className="conversation-list-cell-right">
-            <span
-              className="conversation-list-cell-badge cell-badge-dark icon-pending"
-              data-uie-name="status-pending"
-            />
-          </div>
-        </div>
-      </li>
-    );
   return (
     <>
-      <h2 className="visually-hidden">{t(isFolderView ? 'folderViewTooltip' : 'conversationViewTooltip')}</h2>
+      <h2 className="visually-hidden">{t('conversationViewTooltip')}</h2>
 
-      <ul css={css({margin: 0, paddingLeft: 0})} data-uie-name={uieName}>
-        {connectionRequests}
-        {conversationView}
+      <ul css={css({margin: 0, paddingLeft: 0})} data-uie-name="conversation-view">
+        <ConnectionRequests
+          connectionRequests={connectRequests}
+          onConnectionRequestClick={onConnectionRequestClick}
+          isShowingConnectionRequests={isShowingConnectionRequests}
+        />
+        {getConversationView()}
       </ul>
     </>
   );

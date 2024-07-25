@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useContext, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useContext, useEffect, useMemo, useState} from 'react';
 
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/ConversationReceiptModeUpdateData';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
@@ -30,17 +30,18 @@ import {Button, ButtonVariant, Select} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {ModalComponent} from 'Components/ModalComponent';
 import {SearchInput} from 'Components/SearchInput';
 import {TextInput} from 'Components/TextInput';
 import {BaseToggle} from 'Components/toggle/BaseToggle';
 import {InfoToggle} from 'Components/toggle/InfoToggle';
 import {UserSearchableList} from 'Components/UserSearchableList';
+import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from 'src/script/router/routerBindings';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleEnterDown, isKeyboardEvent, offEscKey, onEscKey} from 'Util/KeyboardUtil';
+import {handleEnterDown, handleEscDown, isKeyboardEvent} from 'Util/KeyboardUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
@@ -135,8 +136,6 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
     setSelectedProtocol(protocolOptions.find(protocol => protocol.value === selectedProtocol.value)!);
   }, [defaultProtocol]);
 
-  const onEscape = () => setIsShown(false);
-
   const stateIsPreferences = groupCreationState === GroupCreationModalState.PREFERENCES;
   const stateIsParticipants = groupCreationState === GroupCreationModalState.PARTICIPANTS;
   const isServicesRoom = accessState === ACCESS_STATE.TEAM.SERVICES;
@@ -144,6 +143,8 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   const isGuestRoom = accessState === ACCESS_STATE.TEAM.GUEST_ROOM;
   const isGuestEnabled = isGuestRoom || isGuestAndServicesRoom;
   const isServicesEnabled = isServicesRoom || isGuestAndServicesRoom;
+
+  const {setCurrentTab: setCurrentSidebarTab} = useSidebarStore();
 
   const contacts = useMemo(() => {
     if (showContacts) {
@@ -162,13 +163,16 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
 
   const filteredContacts = contacts.filter(user => user.isAvailable());
 
-  useEffect(() => {
-    if (stateIsPreferences) {
-      onEscKey(onEscape);
-      return;
-    }
-    offEscKey(onEscape);
-  }, [stateIsPreferences]);
+  const handleEscape = useCallback(
+    (event: React.KeyboardEvent<HTMLElement> | KeyboardEvent): void => {
+      handleEscDown(event, () => {
+        if (stateIsPreferences) {
+          setIsShown(false);
+        }
+      });
+    },
+    [setIsShown, stateIsPreferences],
+  );
 
   useEffect(() => {
     let timerId: number;
@@ -222,6 +226,8 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
             receipt_mode: enableReadReceipts ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF,
           },
         );
+
+        setCurrentSidebarTab(SidebarTabs.RECENT);
 
         if (isKeyboardEvent(event)) {
           createNavigateKeyboard(generateConversationUrl(conversation.qualifiedId), true)(event);
@@ -325,6 +331,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
       isShown={isShown}
       onClosed={onClose}
       data-uie-name="group-creation-label"
+      onKeyDown={stateIsPreferences ? handleEscape : undefined}
     >
       <div className="modal__header modal__header--list">
         {stateIsParticipants && (
@@ -336,7 +343,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
               aria-label={t('accessibility.groupCreationParticipantsActionBack')}
               data-uie-name="go-back"
             >
-              <Icon.ArrowLeft aria-hidden="true" className="modal__header__button" />
+              <Icon.ArrowLeftIcon aria-hidden="true" className="modal__header__button" />
             </button>
 
             <h2 id="group-creation-label" className="modal__header__title" data-uie-name="status-people-selected">
@@ -367,7 +374,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
               aria-label={t('accessibility.groupCreationActionCloseModal')}
               data-uie-name="do-close"
             >
-              <Icon.Close aria-hidden="true" className="modal__header__button" />
+              <Icon.CloseIcon aria-hidden="true" className="modal__header__button" />
             </button>
 
             <h2 id="group-creation-label" className="modal__header__title">

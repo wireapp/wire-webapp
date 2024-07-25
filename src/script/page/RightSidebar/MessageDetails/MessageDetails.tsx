@@ -22,7 +22,7 @@ import {FC, useMemo, useState} from 'react';
 import cx from 'classnames';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {UserList} from 'Components/UserList';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -202,21 +202,21 @@ const MessageDetails: FC<MessageDetailsProps> = ({
 
         {messageState === MESSAGE_STATES.NO_RECEIPTS && (
           <div className="message-details__empty" data-uie-name="message-details-no-receipts-placeholder">
-            <Icon.Read className="message-details__empty__icon" />
+            <Icon.ReadIcon className="message-details__empty__icon" />
             <p className="message-details__empty__text">{t('messageDetailsNoReceipts')}</p>
           </div>
         )}
 
         {messageState === MESSAGE_STATES.NO_REACTIONS && (
           <div className="message-details__empty" data-uie-name="message-details-no-reactions-placeholder">
-            <Icon.Like className="message-details__empty__icon" />
+            <Icon.LikeIcon className="message-details__empty__icon" />
             <p className="message-details__empty__text">{t('messageDetailsNoReactions')}</p>
           </div>
         )}
 
         {messageState === MESSAGE_STATES.RECEIPTS_OFF && (
           <div className="message-details__empty" data-uie-name="message-details-receipts-off-placeholder">
-            <Icon.Read className="message-details__empty__icon" />
+            <Icon.ReadIcon className="message-details__empty__icon" />
             <p className="message-details__empty__text">{t('messageDetailsReceiptsOff')}</p>
           </div>
         )}

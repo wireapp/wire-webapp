@@ -47,6 +47,7 @@ import {useAppState, ContentState} from './useAppState';
 
 import {ConversationState} from '../conversation/ConversationState';
 import {User} from '../entity/User';
+import {useActiveWindow} from '../hooks/useActiveWindow';
 import {useInitializeRootFontSize} from '../hooks/useRootFontSize';
 import {App} from '../main/app';
 import {initialiseMLSMigrationFlow} from '../mls/MLSMigration';
@@ -82,13 +83,13 @@ export const AppMain: FC<AppMainProps> = ({
 }) => {
   const apiContext = app.getAPIContext();
 
+  useActiveWindow(window);
+
   useInitializeRootFontSize();
 
   if (!apiContext) {
     throw new Error('API Context has not been set');
   }
-
-  const contentState = useAppState(state => state.contentState);
 
   const {repository: repositories} = app;
 
@@ -121,14 +122,14 @@ export const AppMain: FC<AppMainProps> = ({
   };
 
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
-  const smBreakpoint = useMatchMedia('max-width: 640px');
-
+  const isMobileView = useMatchMedia('max-width: 720px');
   const {currentView} = useAppMainState(state => state.responsiveView);
-  const isLeftSidebarVisible = currentView == ViewType.LEFT_SIDEBAR;
+  const {isHidden: isLeftSidebarHidden} = useAppMainState(state => state.leftSidebar);
+
+  const isMobileLeftSidebarView = currentView == ViewType.MOBILE_LEFT_SIDEBAR;
+  const isMobileCentralColumnView = currentView == ViewType.MOBILE_CENTRAL_COLUMN;
 
   const initializeApp = async () => {
-    repositories.notification.setContentViewModelStates(contentState, mainView.multitasking);
-
     const showMostRecentConversation = () => {
       const isShowingConversation = useAppState.getState().isShowingConversation();
       if (!isShowingConversation) {
@@ -163,7 +164,7 @@ export const AppMain: FC<AppMainProps> = ({
     configureRoutes({
       '/': showMostRecentConversation,
       '/conversation/:conversationId(/:domain)': (conversationId: string, domain: string = apiContext.domain ?? '') =>
-        mainView.content.showConversation(conversationId, {}, domain),
+        mainView.content.showConversation({id: conversationId, domain}),
       '/preferences/about': () => mainView.list.openPreferencesAbout(),
       '/preferences/account': () => mainView.list.openPreferencesAccount(),
       '/preferences/av': () => mainView.list.openPreferencesAudioVideo(),
@@ -218,6 +219,9 @@ export const AppMain: FC<AppMainProps> = ({
 
   useE2EIFeatureConfigUpdate(repositories.team);
 
+  const showLeftSidebar = (isMobileView && isMobileLeftSidebarView) || (!isMobileView && !isLeftSidebarHidden);
+  const showMainContent = !isMobileView || isMobileCentralColumnView;
+
   return (
     <StyledApp
       themeId={THEME_ID.DEFAULT}
@@ -231,7 +235,7 @@ export const AppMain: FC<AppMainProps> = ({
         <ErrorBoundary FallbackComponent={ErrorFallback}>
           {!locked && (
             <div id="app" className="app">
-              {(!smBreakpoint || isLeftSidebarVisible) && (
+              {showLeftSidebar && (
                 <LeftSidebar
                   listViewModel={mainView.list}
                   selfUser={selfUser}
@@ -239,7 +243,7 @@ export const AppMain: FC<AppMainProps> = ({
                 />
               )}
 
-              {(!smBreakpoint || !isLeftSidebarVisible) && (
+              {showMainContent && (
                 <MainContent
                   selfUser={selfUser}
                   isRightSidebarOpen={!!currentState}
@@ -270,9 +274,9 @@ export const AppMain: FC<AppMainProps> = ({
             <>
               <FeatureConfigChangeNotifier selfUserId={selfUser.id} teamState={teamState} />
               <CallingContainer
-                multitasking={mainView.multitasking}
                 callingRepository={repositories.calling}
                 mediaRepository={repositories.media}
+                toggleScreenshare={mainView.calling.callActions.toggleScreenshare}
               />
 
               <LegalHoldModal

@@ -26,7 +26,7 @@ import {Checkbox, CheckboxLabel, COLOR, Form, Link, Text, Input, Loading} from '
 
 import {CopyToClipboardButton} from 'Components/CopyToClipboardButton';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {ModalComponent} from 'Components/ModalComponent';
 import {PasswordGeneratorButton} from 'Components/PasswordGeneratorButton';
 import {Config} from 'src/script/Config';
@@ -34,9 +34,10 @@ import {isEscapeKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {isValidPassword} from 'Util/StringUtil';
 
+import {MessageContent} from './Content/MessageContent';
 import {guestLinkPasswordInputStyles} from './PrimaryModal.styles';
 import {usePrimaryModalState, showNextModalInQueue, defaultContent, removeCurrentModal} from './PrimaryModalState';
-import {Action, PrimaryModalType} from './PrimaryModalTypes';
+import {ButtonAction, PrimaryModalType} from './PrimaryModalTypes';
 
 export const PrimaryModalComponent: FC = () => {
   const [inputValue, updateInputValue] = useState<string>('');
@@ -55,6 +56,7 @@ export const PrimaryModalComponent: FC = () => {
   const {
     checkboxLabel,
     closeOnConfirm,
+    closeOnSecondaryAction,
     currentType,
     inputPlaceholder,
     message,
@@ -120,7 +122,10 @@ export const PrimaryModalComponent: FC = () => {
     (!isGuestLinkPassword || !!passwordValue.trim().length) &&
     checkGuestLinkPassword(passwordValue, passwordConfirmationValue);
 
-  const isPrimaryActionDisabled = () => {
+  const isPrimaryActionDisabled = (disabled: boolean | undefined) => {
+    if (!!disabled) {
+      return true;
+    }
     if (isConfirm) {
       return false;
     }
@@ -199,16 +204,17 @@ export const PrimaryModalComponent: FC = () => {
   };
 
   const secondaryButtons = secondaryActions
-    .filter((action): action is Action => action !== null && !!action.text)
+    .filter((action): action is ButtonAction => action !== null && !!action.text)
     .map(action => (
       <button
         key={`${action.text}-${action.uieName}`}
         type="button"
-        onClick={doAction(action.action, true, true)}
+        onClick={doAction(action.action, !!closeOnSecondaryAction, true)}
         data-uie-name={action.uieName}
         className={cx('modal__button modal__button--secondary', {
           'modal__button--full': hasMultipleSecondary || allButtonsFullWidth,
         })}
+        disabled={action.disabled || false}
       >
         {action.text}
       </button>
@@ -219,7 +225,7 @@ export const PrimaryModalComponent: FC = () => {
       ref={primaryActionButtonRef}
       type="button"
       onClick={doAction(confirm, !!closeOnConfirm)}
-      disabled={isPrimaryActionDisabled()}
+      disabled={isPrimaryActionDisabled(primaryAction.disabled)}
       className={cx('modal__button modal__button--primary', {
         'modal__button--full': hasMultipleSecondary || allButtonsFullWidth,
       })}
@@ -262,18 +268,13 @@ export const PrimaryModalComponent: FC = () => {
                   aria-label={closeBtnTitle}
                   data-uie-name="do-close"
                 >
-                  <Icon.Close className="modal__header__icon" aria-hidden="true" />
+                  <Icon.CloseIcon className="modal__header__icon" aria-hidden="true" />
                 </button>
               )}
             </div>
 
             <FadingScrollbar className="modal__body">
-              {(messageHtml || message) && (
-                <div className="modal__text" data-uie-name="status-modal-text">
-                  {messageHtml && <p id="modal-description-html" dangerouslySetInnerHTML={{__html: messageHtml}} />}
-                  {message && <p id="modal-description-text">{message}</p>}
-                </div>
-              )}
+              <MessageContent message={message} messageHtml={messageHtml} />
 
               {isGuestLinkPassword && (
                 <PasswordGeneratorButton

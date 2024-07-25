@@ -23,7 +23,7 @@ import cx from 'classnames';
 
 import {Runtime} from '@wireapp/commons';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 import {afterRender} from 'Util/util';
 
@@ -110,7 +110,7 @@ const WarningsContainer: React.FC<WarningProps> = ({onRefresh}) => {
       {visibleWarning === type.REQUEST_MICROPHONE && (
         <div data-uie-name="request-microphone" className="warning-bar warning-bar-feature">
           <div className="warning-bar-message">
-            <Icon.MicOn className="warning-bar-icon" />
+            <Icon.MicOnIcon className="warning-bar-icon" />
             <span dangerouslySetInnerHTML={{__html: t('warningPermissionRequestMicrophone', {}, {icon: ''})}} />
           </div>
           {closeButton}
@@ -284,7 +284,7 @@ const WarningsContainer: React.FC<WarningProps> = ({onRefresh}) => {
         <div data-uie-name="connectivity-reconnect" className="warning-bar warning-bar-connection">
           <div className="warning-bar-message">
             <span>{t('warningConnectivityConnectionLost', brandName)}</span>
-            <Icon.Loading className="warning-bar-spinner" data-uie-name="status-loading" />
+            <Icon.LoadingIcon className="warning-bar-spinner" data-uie-name="status-loading" />
           </div>
         </div>
       )}

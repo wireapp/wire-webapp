@@ -21,7 +21,7 @@ import React from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {UserInfo} from 'Components/UserInfo';
 import {User} from 'src/script/entity/User';
 import {t} from 'Util/LocalizerUtil';
@@ -29,7 +29,6 @@ import {capitalizeFirstChar} from 'Util/StringUtil';
 
 import {
   selfIndicator,
-  userAvailability,
   ellipsis,
   nameWrapper,
   chevronIcon,
@@ -39,7 +38,6 @@ import {
 
 export interface CallParticipantItemContentProps {
   user: User;
-  selfInTeam?: boolean;
   isAudioEstablished: boolean;
   isSelf?: boolean;
   showContextMenu: boolean;
@@ -48,7 +46,6 @@ export interface CallParticipantItemContentProps {
 
 export const CallParticipantItemContent = ({
   user,
-  selfInTeam = false,
   isAudioEstablished,
   isSelf = false,
   showContextMenu,
@@ -60,12 +57,7 @@ export const CallParticipantItemContent = ({
     <div css={wrapper}>
       <div css={contentText}>
         <div css={nameWrapper(isAudioEstablished)}>
-          <UserInfo
-            user={user}
-            css={[userAvailability, ellipsis]}
-            dataUieName="status-name"
-            showAvailability={selfInTeam}
-          />
+          <UserInfo user={user} css={[ellipsis]} dataUieName="status-name" />
 
           {isSelf && <div css={selfIndicator}>{selfString}</div>}
         </div>
@@ -80,7 +72,7 @@ export const CallParticipantItemContent = ({
           type="button"
           data-uie-name="participant-menu-icon"
         >
-          <Icon.Chevron />
+          <Icon.ChevronIcon />
         </button>
       )}
     </div>

@@ -202,6 +202,7 @@ export class EventTrackingRepository {
       device_id: trackingId || this.countlyDeviceId,
       url: 'https://countly.wire.com/',
       use_session_cookie: false,
+      storage: 'localstorage',
     });
 
     this.startProductReportingSession();
@@ -279,7 +280,6 @@ export class EventTrackingRepository {
       Countly.userData.save();
 
       const segmentation = {
-        [Segmentation.COMMON.APP]: EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE,
         [Segmentation.COMMON.APP_VERSION]: Config.getConfig().VERSION,
         [Segmentation.COMMON.DESKTOP_APP]: getPlatform(),
         ...customSegmentations,
