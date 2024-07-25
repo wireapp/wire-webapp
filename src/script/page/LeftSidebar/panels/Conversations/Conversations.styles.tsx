@@ -24,7 +24,7 @@ export const conversationsSpacerStyles = (mdBreakpoint: Boolean): CSSObject => (
 });
 
 export const conversationsSidebarStyles = (mdBreakpoint: Boolean): CSSObject => ({
-  position: mdBreakpoint ? 'fixed' : 'relative',
+  position: mdBreakpoint ? 'absolute' : 'relative',
   zIndex: mdBreakpoint ? '1000' : 'auto',
 });
 
