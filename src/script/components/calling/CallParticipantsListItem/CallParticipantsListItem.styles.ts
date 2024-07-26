@@ -26,7 +26,10 @@ export const callParticipantListItemWrapper = (isLast = false): CSSObject => ({
   '&:hover, &:focus, &:focus-visible': {
     backgroundColor: 'var(--disabled-call-button-bg)',
   },
-  borderBottom: isLast ? 'none' : '1px solid var(--border-color)',
+
+  ...(isLast && {
+    borderRadius: '0 0 8px 8px',
+  }),
 });
 
 const commonIconStyles = {

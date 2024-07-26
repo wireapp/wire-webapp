@@ -62,7 +62,7 @@ import {createUuid} from 'Util/uuid';
 
 import {Call, SerializedConversationId} from './Call';
 import {callingSubscriptions} from './callingSubscriptionsHandler';
-import {CallingViewMode, CallState, MuteState} from './CallState';
+import {CallState, MuteState} from './CallState';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
 import {ClientId, Participant, UserId} from './Participant';
@@ -838,7 +838,6 @@ export class CallingRepository {
   }
 
   async startCall(conversation: Conversation, callType: CALL_TYPE): Promise<void | Call> {
-    this.callState.viewMode(CallingViewMode.MINIMIZED);
     if (!this.selfUser || !this.selfClientId) {
       this.logger.warn(
         `Calling repository is not initialized correctly \n ${JSON.stringify({
@@ -978,7 +977,6 @@ export class CallingRepository {
   };
 
   async answerCall(call: Call, callType?: CALL_TYPE): Promise<void> {
-    this.callState.viewMode(CallingViewMode.MINIMIZED);
     const {conversation} = call;
     try {
       callType ??= call.getSelfParticipant().sharesCamera() ? call.initialType : CALL_TYPE.NORMAL;

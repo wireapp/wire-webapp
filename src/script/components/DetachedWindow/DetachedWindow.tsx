@@ -22,11 +22,9 @@ import {useEffect, useMemo} from 'react';
 import createCache from '@emotion/cache';
 import {CacheProvider} from '@emotion/react';
 import weakMemoize from '@emotion/weak-memoize';
-import {amplify} from 'amplify';
 import {createPortal} from 'react-dom';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useActiveWindow} from 'src/script/hooks/useActiveWindow';
 import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
@@ -39,7 +37,6 @@ interface DetachedWindowProps {
   height?: number;
   onClose: () => void;
   name: string;
-  onNewWindowOpened?: (newWindow: Window) => void;
 }
 
 const memoizedCreateCacheWithContainer = weakMemoize((container: HTMLHeadElement) => {
@@ -47,14 +44,7 @@ const memoizedCreateCacheWithContainer = weakMemoize((container: HTMLHeadElement
   return newCache;
 });
 
-export const DetachedWindow = ({
-  children,
-  name,
-  onClose,
-  width = 600,
-  height = 600,
-  onNewWindowOpened,
-}: DetachedWindowProps) => {
+export const DetachedWindow = ({children, name, onClose, width = 600, height = 600}: DetachedWindowProps) => {
   const newWindow = useMemo(() => {
     const {top, left} = calculateChildWindowPosition(height, width);
 
@@ -98,18 +88,12 @@ export const DetachedWindow = ({
     newWindow.addEventListener('beforeunload', onClose);
     window.addEventListener('pagehide', onPageHide);
 
-    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, () => {
-      newWindow.document.body.className = window.document.body.className;
-    });
-
-    onNewWindowOpened?.(newWindow);
-
     return () => {
       newWindow.close();
       newWindow.removeEventListener('beforeunload', onClose);
       window.removeEventListener('pagehide', onPageHide);
     };
-  }, [height, name, width, onClose, newWindow, onNewWindowOpened]);
+  }, [height, name, width, onClose, newWindow]);
 
   return !newWindow
     ? null
@@ -129,12 +113,8 @@ export const DetachedWindow = ({
  * @param target the target document object
  */
 const copyStyles = (source: Document, target: Document) => {
-  const targetHead = target.head;
-
-  const elements = source.head.querySelectorAll('link, style');
-
-  elements.forEach(htmlElement => {
-    targetHead.insertBefore(htmlElement.cloneNode(true), targetHead.firstChild);
+  source.head.querySelectorAll('link, style').forEach(htmlElement => {
+    target.head.appendChild(htmlElement.cloneNode(true));
   });
 
   target.body.className = source.body.className;

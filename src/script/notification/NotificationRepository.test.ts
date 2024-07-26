@@ -267,7 +267,7 @@ describe('NotificationRepository', () => {
         .then(() => {
           expect(notificationRepository['showNotification']).not.toHaveBeenCalled();
 
-          jest.spyOn(callState, 'viewMode').mockReturnValueOnce(CallingViewMode.DETACHED_WINDOW);
+          jest.spyOn(callState, 'viewMode').mockReturnValueOnce(CallingViewMode.FULL_SCREEN_GRID);
 
           return notificationRepository.notify(message, undefined, conversation);
         })

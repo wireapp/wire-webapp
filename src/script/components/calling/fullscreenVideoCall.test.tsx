@@ -20,6 +20,8 @@
 import {render, waitFor, act} from '@testing-library/react';
 import ko from 'knockout';
 
+import * as uiKit from '@wireapp/react-ui-kit';
+
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {Call} from 'src/script/calling/Call';
 import {Participant} from 'src/script/calling/Participant';
@@ -34,6 +36,8 @@ jest.mock('@wireapp/react-ui-kit', () => ({
   ...(jest.requireActual('@wireapp/react-ui-kit') as any),
   useMatchMedia: jest.fn(),
 }));
+
+const mockedUiKit = uiKit as jest.Mocked<typeof uiKit>;
 
 describe('fullscreenVideoCall', () => {
   const createProps = (): FullscreenVideoCallProps => {
@@ -76,6 +80,15 @@ describe('fullscreenVideoCall', () => {
 
   afterEach(() => jest.useRealTimers());
 
+  it('shows the available screens', () => {
+    mockedUiKit.useMatchMedia.mockReturnValue(false);
+    const props = createProps();
+
+    const {queryByText} = render(withTheme(<FullscreenVideoCall {...props} />));
+
+    expect(queryByText('videoCallOverlayConversations')).not.toBe(null);
+  });
+
   it('shows the calling timer', async () => {
     const props = createProps();
 
@@ -98,9 +111,9 @@ describe('fullscreenVideoCall', () => {
 
   it('has no active speaker toggle for calls with more less than 3 participants', () => {
     const props = createProps();
-    const {queryByTestId} = render(withTheme(<FullscreenVideoCall {...props} />));
+    const {queryByText} = render(withTheme(<FullscreenVideoCall {...props} />));
 
-    expect(queryByTestId('do-call-controls-video-call-view')).toBeNull();
+    expect(queryByText('videoSpeakersTabSpeakers')).toBeNull();
   });
 
   it('resets the maximized participant on active speaker switch', async () => {
@@ -113,15 +126,11 @@ describe('fullscreenVideoCall', () => {
     props.call.addParticipant(new Participant(new User('c'), 'd'));
     props.call.addParticipant(new Participant(new User('e'), 'f'));
 
-    const {getByTestId, getByText} = render(withTheme(<FullscreenVideoCall {...props} />));
-    const callViewToggleButton = getByTestId('do-call-controls-video-call-view');
+    const {getByText} = render(withTheme(<FullscreenVideoCall {...props} />));
+    const speakersButtonLabel = 'videoSpeakersTabSpeakers'.toUpperCase();
+    await waitFor(() => getByText(speakersButtonLabel));
 
-    callViewToggleButton.click();
-
-    await waitFor(() => expect(getByText('videoCallOverlayViewModeLabel')).toBeDefined());
-
-    const viewModeAllSpeakersOption = getByText('videoCallOverlayViewModeSpeakers');
-    viewModeAllSpeakersOption.click();
+    getByText(speakersButtonLabel).click();
 
     expect(setMaximizedSpy).toHaveBeenCalledWith(props.call, null);
   });

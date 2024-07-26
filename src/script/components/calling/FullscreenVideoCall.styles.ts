@@ -27,7 +27,6 @@ export const classifiedBarStyles: CSSObject = {
 export const videoControlActiveStyles = css`
   background-color: var(--main-color);
   border: 1px solid var(--main-color);
-  svg,
   svg > path {
     fill: var(--app-bg-secondary);
   }
@@ -76,30 +75,17 @@ export const paginationButtonStyles: CSSObject = {
     },
     outline: '1px solid var(--accent-color-focus)',
   },
-  ['&:not([disabled]):hover svg > path']: {
+  ['&:hover svg > path']: {
     fill: 'var(--accent-color)',
   },
-  ['&:disabled svg > path']: {
-    fill: 'var(--disabled-call-button-svg)',
-  },
-  display: 'flex',
   alignItems: 'center',
+  backgroundColor: 'var(--app-bg-secondary)',
   cursor: 'pointer',
-  height: '100%',
-};
-
-export const videoTopBarStyles: CSSObject = {
-  display: 'grid',
-  gridTemplateColumns: '1fr auto 1fr',
-  alignItems: 'center',
-  backgroundColor: 'var(--sidebar-bg)',
-};
-
-export const paginationWrapperStyles: CSSObject = {
   display: 'flex',
-  alignItems: 'center',
-  width: 'fit-content',
-  marginLeft: 'auto',
-  padding: '0 20px',
-  gap: '10px',
+  height: 56,
+  justifyContent: 'center',
+  position: 'absolute',
+  top: 'calc(50% - 75px)',
+  width: 56,
+  zIndex: 1,
 };

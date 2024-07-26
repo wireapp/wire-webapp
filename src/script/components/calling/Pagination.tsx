@@ -48,6 +48,7 @@ const Pagination: React.FC<PaginationProps> = ({totalPages, currentPage, onChang
     <div
       css={{
         alignItems: 'center',
+        backgroundColor: 'var(--border-color)',
         borderRadius: 12,
         display: 'flex',
         height: 22,
@@ -71,7 +72,9 @@ const Pagination: React.FC<PaginationProps> = ({totalPages, currentPage, onChang
             css={{
               ...paginationItemStyles,
               '&:focus-visible': {
-                backgroundColor: isCurrentPage ? 'var(--toggle-button-hover-bg)' : 'none',
+                backgroundColor: isCurrentPage
+                  ? 'var(--toggle-button-hover-bg)'
+                  : 'var(--toggle-button-unselected-hover-bg)',
                 border: '1px solid var(--accent-color)',
                 outline: 'none',
               },
@@ -88,7 +91,7 @@ const Pagination: React.FC<PaginationProps> = ({totalPages, currentPage, onChang
                 backgroundColor: isCurrentPage ? 'var(--accent-color)' : 'var(--toggle-button-unselected-bg)',
                 border: '1px solid var(--accent-color)',
               },
-              backgroundColor: isCurrentPage ? 'var(--accent-color)' : 'none',
+              backgroundColor: isCurrentPage ? 'var(--accent-color)' : 'var(--app-bg-secondary)',
               border: isCurrentPage ? 'solid 1px var(--accent-color)' : 'solid 1px var(--foreground)',
             }}
           />

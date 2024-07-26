@@ -126,18 +126,27 @@
     margin: 0;
 
     &__container {
-      height: 100%;
+      max-height: 184px;
       overflow-x: hidden;
+      overflow-y: overlay;
     }
 
     &__wrapper {
-      display: flex;
       overflow: hidden;
-      width: 296px;
-      flex-direction: column;
-      flex-shrink: 0;
-      border-left: 1px solid var(--border-color);
+      max-height: 0;
+      border-radius: 0 0 8px 8px;
       color: var(--background);
+
+      &::before {
+        display: block;
+        border-top: 1px solid var(--border-color);
+        margin: 0;
+        content: '';
+      }
+
+      &--active {
+        max-height: 184px;
+      }
     }
   }
 }
@@ -153,7 +162,7 @@ svg.small-icon {
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
-  margin: 10px 12px 20px;
+  margin: 10px 14px 16px;
   animation: show-call-ui @animation-timing-fast ease-in-out 0s 1;
 
   &.dark-bg {
@@ -201,31 +210,56 @@ svg.small-icon {
 .conversation-list-calling-cell-background {
   display: flex;
   flex-direction: column;
-  padding: 12px 12px 16px;
   border: 1px solid var(--border-color);
   border-radius: 8px;
   background-color: var(--app-bg-secondary);
+}
 
-  .conversation-list-cell-right {
-    padding-right: 0;
+.conversation-list-cell-button::after {
+  display: none;
+}
+
+.conversation-list-calling-cell-controls {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  padding-right: 16px;
+  padding-bottom: 16px;
+  padding-left: 16px;
+  margin-top: 8px;
+
+  &-left,
+  &-right {
+    .list-unstyled;
+    display: flex;
+    margin: 0;
+  }
+}
+
+.conversation-list-calling-cell-controls-item {
+  & + & {
+    margin-left: 8px;
   }
 }
 
 .conversation-list-calling-cell__info-bar {
   .label-small-medium;
   padding: 4px;
+  border-radius: 6px;
   margin: 8px 8px 0;
+  background-color: var(--accent-color);
+  color: var(--app-bg-secondary);
   text-align: center;
 }
 
 @keyframes show-call-ui {
   0% {
-    //max-height: 0;
+    max-height: 0;
     opacity: 0;
     transform: scale(0.9);
   }
   100% {
-    //max-height: 500px;
+    max-height: 500px;
     opacity: 1;
     transform: scale(1);
   }

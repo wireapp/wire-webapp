@@ -20,30 +20,35 @@
 import {container} from 'tsyringe';
 
 import {DetachedWindow} from 'Components/DetachedWindow';
-import {Call} from 'src/script/calling/Call';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
-import {CallState, CallingViewMode, DesktopScreenShareMenu} from 'src/script/calling/CallState';
-import {MediaRepository} from 'src/script/media/MediaRepository';
+import {CallState, CallingViewMode} from 'src/script/calling/CallState';
+import {TeamState} from 'src/script/team/TeamState';
 import {UserState} from 'src/script/user/UserState';
+import {CallActions} from 'src/script/view_model/CallingViewModel';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-import {CallingContainer} from '../CallingOverlayContainer';
+import {CallingCell} from '../CallingCell';
 
 interface DetachedCallingCellProps {
+  callActions: CallActions;
   callingRepository: CallingRepository;
-  mediaRepository: MediaRepository;
-  toggleScreenshare: (call: Call, desktopScreenShareMenu: DesktopScreenShareMenu) => void;
+  pushToTalkKey: string | null;
+  hasAccessToCamera: boolean;
   callState?: CallState;
+  teamState?: TeamState;
   userState?: UserState;
 }
 
 export const DetachedCallingCell = ({
+  callActions,
   callingRepository,
-  mediaRepository,
-  toggleScreenshare,
+  pushToTalkKey,
+  hasAccessToCamera,
   callState = container.resolve(CallState),
+  teamState = container.resolve(TeamState),
   userState = container.resolve(UserState),
 }: DetachedCallingCellProps) => {
+  const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
   const {joinedCall: activeCall, viewMode} = useKoSubscribableChildren(callState, ['joinedCall', 'viewMode']);
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
 
@@ -58,11 +63,17 @@ export const DetachedCallingCell = ({
   }
 
   return (
-    <DetachedWindow name="WIRE_PICTURE_IN_PICTURE_CALL" width={1026} height={829} onClose={closeDetachedWindow}>
-      <CallingContainer
+    <DetachedWindow name="WIRE_PICTURE_IN_PICTURE_CALL" width={290} height={290} onClose={closeDetachedWindow}>
+      <CallingCell
+        classifiedDomains={classifiedDomains}
+        call={activeCall}
+        callActions={callActions}
         callingRepository={callingRepository}
-        mediaRepository={mediaRepository}
-        toggleScreenshare={toggleScreenshare}
+        pushToTalkKey={pushToTalkKey}
+        isFullUi
+        hasAccessToCamera={hasAccessToCamera}
+        isSelfVerified={selfUser.is_verified()}
+        setMaximizedParticipant={participant => activeCall.maximizedParticipant(participant)}
       />
     </DetachedWindow>
   );

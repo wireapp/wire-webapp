@@ -33,7 +33,7 @@ import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
 import {TitleBar} from 'Components/TitleBar';
-import {CallState} from 'src/script/calling/CallState';
+import {CallingViewMode, CallState} from 'src/script/calling/CallState';
 import {Config} from 'src/script/Config';
 import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -117,7 +117,9 @@ export const Conversation = ({
 
   const inTeam = teamState.isInTeam(selfUser);
 
-  const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
+  const {activeCalls, viewMode} = useKoSubscribableChildren(callState, ['activeCalls', 'viewMode']);
+
+  const isCallWindowDetached = viewMode === CallingViewMode.DETACHED_WINDOW;
 
   const [isMsgElementsFocusable, setMsgElementsFocusable] = useState(true);
 
@@ -493,17 +495,22 @@ export const Conversation = ({
               return null;
             }
 
+            if (isCallWindowDetached) {
+              return null;
+            }
+
             return (
-              <CallingCell
-                key={conversation.id}
-                classifiedDomains={classifiedDomains}
-                call={call}
-                callActions={callingViewModel.callActions}
-                callingRepository={callingRepository}
-                pushToTalkKey={callingViewModel.propertiesRepository.getPreference(
-                  PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY,
-                )}
-              />
+              <div className="calling-cell" key={conversation.id}>
+                <CallingCell
+                  classifiedDomains={classifiedDomains}
+                  call={call}
+                  callActions={callingViewModel.callActions}
+                  callingRepository={callingRepository}
+                  pushToTalkKey={callingViewModel.propertiesRepository.getPreference(
+                    PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY,
+                  )}
+                />
+              </div>
             );
           })}
 
