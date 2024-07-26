@@ -17,16 +17,19 @@
  *
  */
 
-import {create} from 'zustand';
+import {CSSObject} from '@emotion/react';
 
-import {Runtime} from '@wireapp/commons';
-
-import {Config} from 'src/script/Config';
-
-type DetachedCallingFeatureState = {
-  isSupported: () => boolean;
+export const cellControlsWrapper: CSSObject = {
+  alignItems: 'center',
+  display: 'flex',
+  justifyContent: 'space-between',
+  width: '100%',
 };
 
-export const useDetachedCallingFeatureState = create<DetachedCallingFeatureState>((set, get) => ({
-  isSupported: () => !Runtime.isDesktopApp() || Config.getDesktopConfig()?.supportsCallingPopoutWindow === true,
-}));
+export const cellControlsList: CSSObject = {
+  display: 'flex',
+  gap: '8px',
+  listStyleType: 'none',
+  margin: 0,
+  padding: 0,
+};

@@ -17,23 +17,38 @@
  *
  */
 
-import React, {Fragment, useEffect} from 'react';
+import React, {Fragment, useCallback, useEffect} from 'react';
 
+import {container} from 'tsyringe';
+
+import {CallState} from 'src/script/calling/CallState';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 export interface Screen {
   id: string;
-  thumbnail: HTMLCanvasElement;
+  thumbnail?: HTMLCanvasElement;
 }
 
 export interface ChooseScreenProps {
-  cancel: () => void;
   choose: (screenId: string) => void;
-  screens: Screen[];
-  windows: Screen[];
+  callState?: CallState;
 }
 
-const ChooseScreen: React.FC<ChooseScreenProps> = ({cancel, choose, screens = [], windows = []}: ChooseScreenProps) => {
+const ChooseScreen: React.FC<ChooseScreenProps> = ({
+  choose,
+  callState = container.resolve(CallState),
+}: ChooseScreenProps) => {
+  const {selectableScreens, selectableWindows} = useKoSubscribableChildren(callState, [
+    'selectableScreens',
+    'selectableWindows',
+  ]);
+
+  const cancel = useCallback(() => {
+    callState.selectableScreens([]);
+    callState.selectableWindows([]);
+  }, [callState]);
+
   useEffect(() => {
     const closeOnEsc = ({key}: KeyboardEvent): void => {
       if (key === 'Escape') {
@@ -56,18 +71,18 @@ const ChooseScreen: React.FC<ChooseScreenProps> = ({cancel, choose, screens = []
         data-uie-name={uieName}
         onClick={() => choose(id)}
       >
-        <img className="choose-screen-list-image" src={thumbnail.toDataURL()} role="presentation" alt="" />
+        <img className="choose-screen-list-image" src={thumbnail?.toDataURL()} role="presentation" alt="" />
       </button>
     ));
 
   return (
     <div className="choose-screen">
       <div className="label-xs text-white">{t('callChooseSharedScreen')}</div>
-      <div className="choose-screen-list">{renderPreviews(screens, 'item-screen')}</div>
-      {windows.length > 0 && (
+      <div className="choose-screen-list">{renderPreviews(selectableScreens, 'item-screen')}</div>
+      {selectableWindows.length > 0 && (
         <Fragment>
           <div className="label-xs text-white">{t('callChooseSharedWindow')}</div>
-          <div className="choose-screen-list">{renderPreviews(windows, 'item-window')}</div>
+          <div className="choose-screen-list">{renderPreviews(selectableWindows, 'item-window')}</div>
         </Fragment>
       )}
       <div id="choose-screen-controls" className="choose-screen-controls">

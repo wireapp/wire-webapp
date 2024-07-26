@@ -17,16 +17,9 @@
  *
  */
 
-import {create} from 'zustand';
+import {CSSObject} from '@emotion/react';
 
-import {Runtime} from '@wireapp/commons';
-
-import {Config} from 'src/script/Config';
-
-type DetachedCallingFeatureState = {
-  isSupported: () => boolean;
+export const labelStyles: CSSObject = {
+  padding: '12px 10px',
+  fontWeight: 'var(--font-weight-semibold)',
 };
-
-export const useDetachedCallingFeatureState = create<DetachedCallingFeatureState>((set, get) => ({
-  isSupported: () => !Runtime.isDesktopApp() || Config.getDesktopConfig()?.supportsCallingPopoutWindow === true,
-}));

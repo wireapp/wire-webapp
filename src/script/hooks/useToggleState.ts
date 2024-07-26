@@ -17,16 +17,10 @@
  *
  */
 
-import {create} from 'zustand';
+import {useCallback, useState} from 'react';
 
-import {Runtime} from '@wireapp/commons';
-
-import {Config} from 'src/script/Config';
-
-type DetachedCallingFeatureState = {
-  isSupported: () => boolean;
+export const useToggleState = (initialState = false) => {
+  const [state, setState] = useState(initialState);
+  const toggle = useCallback(() => setState(currentState => !currentState), []);
+  return [state, toggle] as const;
 };
-
-export const useDetachedCallingFeatureState = create<DetachedCallingFeatureState>((set, get) => ({
-  isSupported: () => !Runtime.isDesktopApp() || Config.getDesktopConfig()?.supportsCallingPopoutWindow === true,
-}));

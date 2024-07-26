@@ -39,9 +39,14 @@ export enum MuteState {
 }
 
 export enum CallingViewMode {
-  FULL_SCREEN_GRID = 'full-screen-grid',
+  DETACHED_WINDOW = 'detached_window',
   MINIMIZED = 'minimized',
-  DETACHED_WINDOW = 'detached-window',
+}
+
+export enum DesktopScreenShareMenu {
+  NONE = 'none',
+  MAIN_WINDOW = 'main_window',
+  DETACHED_WINDOW = 'detached_window',
 }
 
 type Emoji = {emoji: string; id: string; left: number; from: string};
@@ -60,9 +65,10 @@ export class CallState {
   public readonly activeCalls: ko.PureComputed<Call[]>;
   public readonly joinedCall: ko.PureComputed<Call | undefined>;
   public readonly activeCallViewTab = ko.observable(CallViewTab.ALL);
-  readonly isChoosingScreen: ko.PureComputed<boolean>;
+  readonly hasAvailableScreensToShare: ko.PureComputed<boolean>;
   readonly isSpeakersViewActive: ko.PureComputed<boolean>;
   public readonly viewMode = ko.observable<CallingViewMode>(CallingViewMode.MINIMIZED);
+  public readonly desktopScreenShareMenu = ko.observable<DesktopScreenShareMenu>(DesktopScreenShareMenu.NONE);
 
   constructor() {
     this.joinedCall = ko.pureComputed(() => this.calls().find(call => call.state() === CALL_STATE.MEDIA_ESTAB));
@@ -72,7 +78,7 @@ export class CallState {
         call => call.state() === CALL_STATE.INCOMING && call.reason() !== CALL_REASON.ANSWERED_ELSEWHERE,
       ),
     );
-    this.isChoosingScreen = ko.pureComputed(
+    this.hasAvailableScreensToShare = ko.pureComputed(
       () => this.selectableScreens().length > 0 || this.selectableWindows().length > 0,
     );
 
@@ -84,7 +90,7 @@ export class CallState {
     });
     this.isSpeakersViewActive = ko.pureComputed(() => this.activeCallViewTab() === CallViewTab.SPEAKERS);
 
-    this.isChoosingScreen = ko.pureComputed(
+    this.hasAvailableScreensToShare = ko.pureComputed(
       () => this.selectableScreens().length > 0 || this.selectableWindows().length > 0,
     );
   }
