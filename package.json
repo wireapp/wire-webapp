@@ -7,7 +7,7 @@
     "@lexical/react": "0.12.5",
     "@wireapp/avs": "9.6.12",
     "@wireapp/commons": "5.2.7",
-    "@wireapp/core": "46.0.16-hotfix-1.0",
+    "@wireapp/core": "46.0.17-hotfix-1.1",
     "@wireapp/react-ui-kit": "9.16.4",
     "@wireapp/store-engine-dexie": "2.1.8",
     "@wireapp/webapp-events": "0.20.1",
@@ -212,7 +212,7 @@
     "translate:merge": "formatjs extract --format './bin/translations_extract_formatter.js' --out-file './src/i18n/en-US.json' './src/script/strings.ts'"
   },
   "resolutions": {
-    "@wireapp/api-client": "27.0.9-hotfix.2",
+    "@wireapp/api-client": "27.1.0-hotfix-1.0",
     "libsodium": "0.7.10",
     "xml2js": "0.5.0",
     "@stablelib/utf8": "1.0.2",

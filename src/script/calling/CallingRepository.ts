@@ -68,7 +68,7 @@ import {ClientId, Participant, UserId} from './Participant';
 
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
-import {isGroupMLSConversation, isMLSConversation, MLSConversation} from '../conversation/ConversationSelectors';
+import {isMLSConversation, MLSConversation} from '../conversation/ConversationSelectors';
 import {ConversationState} from '../conversation/ConversationState';
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
 import {EventBuilder} from '../conversation/EventBuilder';
@@ -369,6 +369,10 @@ export class CallingRepository {
     activeCall?.muteState(isMuted ? this.nextMuteState : MuteState.NOT_MUTED);
   };
 
+  private readonly isMLSConference = (conversation: Conversation): conversation is MLSConversation => {
+    return isMLSConversation(conversation) && this.getConversationType(conversation) === CONV_TYPE.CONFERENCE_MLS;
+  };
+
   public async pushClients(call: Call | undefined = this.callState.joinedCall(), checkMismatch?: boolean) {
     if (!call) {
       return false;
@@ -382,7 +386,7 @@ export class CallingRepository {
     }
     const allClients = await this.core.service!.conversation.fetchAllParticipantsClients(call.conversationId);
 
-    if (!isGroupMLSConversation(conversation)) {
+    if (!this.isMLSConference(conversation)) {
       const qualifiedClients = flattenUserMap(allClients);
 
       const clients: Clients = flatten(
@@ -740,7 +744,7 @@ export class CallingRepository {
       this.serializeQualifiedId(conversation.qualifiedId),
       this.serializeQualifiedId(userId),
       conversation && isMLSConversation(conversation) ? senderClientId : clientId,
-      conversation && isGroupMLSConversation(conversation) ? CONV_TYPE.CONFERENCE_MLS : CONV_TYPE.CONFERENCE,
+      conversation && this.getConversationType(conversation),
     );
 
     if (res !== 0) {
@@ -762,14 +766,20 @@ export class CallingRepository {
   //##############################################################################
 
   private getConversationType(conversation: Conversation): CONV_TYPE {
-    if (!conversation.isGroup()) {
-      return CONV_TYPE.ONEONONE;
+    //FIXME: Remove this line when the feature flag is available on backend
+    const useSFTForOneToOneCalls = true;
+    // const useSFTForOneToOneCalls =
+    //   this.teamState.teamFeatures()?.[FEATURE_KEY.CONFERENCE_CALLING]?.config?.useSFTForOneToOneCalls;
+
+    if (conversation.isGroup() || useSFTForOneToOneCalls) {
+      if (isMLSConversation(conversation)) {
+        return CONV_TYPE.CONFERENCE_MLS;
+      }
+
+      return this.supportsConferenceCalling ? CONV_TYPE.CONFERENCE : CONV_TYPE.GROUP;
     }
 
-    if (isGroupMLSConversation(conversation)) {
-      return CONV_TYPE.CONFERENCE_MLS;
-    }
-    return this.supportsConferenceCalling ? CONV_TYPE.CONFERENCE : CONV_TYPE.GROUP;
+    return CONV_TYPE.ONEONONE;
   }
 
   async startCall(conversation: Conversation, callType: CALL_TYPE): Promise<void | Call> {
@@ -826,7 +836,7 @@ export class CallingRepository {
         this.removeCall(call);
       }
 
-      if (isGroupMLSConversation(conversation)) {
+      if (this.isMLSConference(conversation)) {
         await this.joinMlsConferenceSubconversation(conversation);
       }
 
@@ -958,7 +968,7 @@ export class CallingRepository {
         [Segmentation.CALL.DIRECTION]: this.getCallDirection(call),
       });
 
-      if (!conversation || !isGroupMLSConversation(conversation)) {
+      if (!conversation || !this.isMLSConference(conversation)) {
         return;
       }
 
@@ -993,7 +1003,7 @@ export class CallingRepository {
 
   private readonly updateConferenceSubconversationEpoch = async (conversationId: QualifiedId) => {
     const conversation = this.getConversationById(conversationId);
-    if (!conversation || !isGroupMLSConversation(conversation)) {
+    if (!conversation || !this.isMLSConference(conversation)) {
       return;
     }
 
@@ -1012,7 +1022,7 @@ export class CallingRepository {
 
   private readonly handleCallParticipantChange = (conversationId: QualifiedId, members: QualifiedWcallMember[]) => {
     const conversation = this.getConversationById(conversationId);
-    if (!conversation || !isGroupMLSConversation(conversation)) {
+    if (!conversation || !this.isMLSConference(conversation)) {
       return;
     }
 
@@ -1672,7 +1682,7 @@ export class CallingRepository {
 
     const conversation = this.getConversationById(call.conversationId);
 
-    if (conversation && isGroupMLSConversation(conversation)) {
+    if (conversation && this.isMLSConference(conversation)) {
       const subconversationEpochInfo = await this.subconversationService.getSubconversationEpochInfo(
         conversation.qualifiedId,
         conversation.groupId,
