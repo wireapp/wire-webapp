@@ -17,16 +17,12 @@
  *
  */
 
-import {create} from 'zustand';
+import {useMatchMedia} from '@wireapp/react-ui-kit';
 
-import {Runtime} from '@wireapp/commons';
+import {useActiveWindowState} from './useActiveWindow';
 
-import {Config} from 'src/script/Config';
+export const useActiveWindowMatchMedia = (mediaQuery: string) => {
+  const {activeWindow} = useActiveWindowState();
 
-type DetachedCallingFeatureState = {
-  isSupported: () => boolean;
+  return useMatchMedia(mediaQuery, activeWindow);
 };
-
-export const useDetachedCallingFeatureState = create<DetachedCallingFeatureState>((set, get) => ({
-  isSupported: () => !Runtime.isDesktopApp() || Config.getDesktopConfig()?.supportsCallingPopoutWindow === true,
-}));

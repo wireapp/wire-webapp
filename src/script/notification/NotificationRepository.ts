@@ -818,7 +818,7 @@ export class NotificationRepository {
     const {contentState} = useAppState.getState();
     const inConversationView = contentState === ContentState.CONVERSATION;
     const inMaximizedCall =
-      !!this.callState.joinedCall() && this.callState.viewMode() === CallingViewMode.FULL_SCREEN_GRID;
+      !!this.callState.joinedCall() && this.callState.viewMode() === CallingViewMode.DETACHED_WINDOW;
 
     const activeConversation = document.hasFocus() && inConversationView && inActiveConversation && !inMaximizedCall;
     const messageFromSelf = messageEntity.user().isMe;

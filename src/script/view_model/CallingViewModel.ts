@@ -36,7 +36,7 @@ import type {AudioRepository} from '../audio/AudioRepository';
 import {AudioType} from '../audio/AudioType';
 import type {Call} from '../calling/Call';
 import {CallingRepository} from '../calling/CallingRepository';
-import {CallingViewMode, CallState} from '../calling/CallState';
+import {CallState, DesktopScreenShareMenu} from '../calling/CallState';
 import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
@@ -65,7 +65,7 @@ export interface CallActions {
   switchScreenInput: (deviceId: string) => void;
   toggleCamera: (call: Call) => void;
   toggleMute: (call: Call, muteState: boolean) => void;
-  toggleScreenshare: (call: Call) => void;
+  toggleScreenshare: (call: Call, desktopScreenShareMenu: DesktopScreenShareMenu) => void;
 }
 
 export enum CallViewTab {
@@ -320,11 +320,12 @@ export class CallingViewModel {
       toggleMute: (call: Call, muteState: boolean) => {
         this.callingRepository.muteCall(call, muteState);
       },
-      toggleScreenshare: async (call: Call): Promise<void> => {
+      toggleScreenshare: async (call, desktopScreenShareMenu): Promise<void> => {
         if (call.getSelfParticipant().sharesScreen()) {
           return this.callingRepository.toggleScreenshare(call);
         }
         const showScreenSelection = (): Promise<void> => {
+          this.callState.desktopScreenShareMenu(desktopScreenShareMenu);
           return new Promise(resolve => {
             this.callingRepository.onChooseScreen = (deviceId: string): void => {
               this.mediaDevicesHandler.currentDeviceId.screeninput(deviceId);
@@ -342,15 +343,9 @@ export class CallingViewModel {
           });
         };
 
-        this.mediaStreamHandler.selectScreenToShare(showScreenSelection).then(() => {
-          const isAudioCall = [CALL_TYPE.NORMAL, CALL_TYPE.FORCED_AUDIO].includes(call.initialType);
-          const isFullScreenVideoCall =
-            call.initialType === CALL_TYPE.VIDEO && this.callState.viewMode() === CallingViewMode.FULL_SCREEN_GRID;
-          if (isAudioCall || isFullScreenVideoCall) {
-            this.callState.viewMode(CallingViewMode.MINIMIZED);
-          }
-          return this.callingRepository.toggleScreenshare(call);
-        });
+        this.mediaStreamHandler
+          .selectScreenToShare(showScreenSelection)
+          .then(() => this.callingRepository.toggleScreenshare(call));
       },
     };
   }

@@ -17,16 +17,20 @@
  *
  */
 
-import {create} from 'zustand';
+import {CallViewTab} from '../view_model/CallingViewModel';
 
-import {Runtime} from '@wireapp/commons';
+interface CallViewOption {
+  label: string;
+  value: CallViewTab;
+}
 
-import {Config} from 'src/script/Config';
-
-type DetachedCallingFeatureState = {
-  isSupported: () => boolean;
+export const isCallViewOption = (option: unknown): option is CallViewOption => {
+  const callViewValues = Object.values(CallViewTab) as string[];
+  return (
+    !!option &&
+    typeof option === 'object' &&
+    'value' in option &&
+    typeof option?.value === 'string' &&
+    callViewValues.includes(option.value)
+  );
 };
-
-export const useDetachedCallingFeatureState = create<DetachedCallingFeatureState>((set, get) => ({
-  isSupported: () => !Runtime.isDesktopApp() || Config.getDesktopConfig()?.supportsCallingPopoutWindow === true,
-}));
