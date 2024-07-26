@@ -324,7 +324,7 @@
   "callParticipants": "{{number}} участника(-ов)",
   "callReactionButtonAriaLabel": "Выбрать смайлик {{emoji}}",
   "callReactionButtonsAriaLabel": "Панель выбора смайликов",
-  "callReactions": "Reactions",
+  "callReactions": "Реакции",
   "callReactionsAriaLabel": "Смайлик {{emoji}} из {{from}}",
   "callStateCbr": "Постоянный битрейт",
   "callStateConnecting": "Подключение…",
