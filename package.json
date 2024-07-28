@@ -68,7 +68,7 @@
     "@faker-js/faker": "8.4.1",
     "@formatjs/cli": "6.2.12",
     "@roamhq/wrtc": "0.8.0",
-    "@testing-library/dom": "^10.3.2",
+    "@testing-library/dom": "^10.4.0",
     "@testing-library/react": "16.0.0",
     "@types/dexie-batch": "0.4.7",
     "@types/eslint": "8.56.5",
