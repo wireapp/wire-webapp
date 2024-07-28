@@ -16856,7 +16856,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"underscore@npm:1.13.6, underscore@npm:~1.13.2":
+"underscore@npm:1.13.7":
+  version: 1.13.7
+  resolution: "underscore@npm:1.13.7"
+  checksum: 10/1ce3368dbe73d1e99678fa5d341a9682bd27316032ad2de7883901918f0f5d50e80320ccc543f53c1862ab057a818abc560462b5f83578afe2dd8dd7f779766c
+  languageName: node
+  linkType: hard
+
+"underscore@npm:~1.13.2":
   version: 1.13.6
   resolution: "underscore@npm:1.13.6"
   checksum: 10/58cf5dc42cb0ac99c146ae4064792c0a2cc84f3a3c4ad88f5082e79057dfdff3371d896d1ec20379e9ece2450d94fa78f2ef5bfefc199ba320653e32c009bd66
@@ -17688,7 +17695,7 @@ __metadata:
     tsc-watch: "npm:6.2.0"
     tsyringe: "npm:4.8.0"
     typescript: "npm:5.5.2"
-    underscore: "npm:1.13.6"
+    underscore: "npm:1.13.7"
     uuid: "npm:10.0.0"
     webgl-utils.js: "npm:1.1.0"
     webpack: "npm:5.93.0"
