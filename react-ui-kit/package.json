@@ -30,7 +30,7 @@
     "@testing-library/react": "16.0.0",
     "@testing-library/user-event": "14.5.2",
     "@types/jest": "^29.2.0",
-    "@types/node": "^20.1.0",
+    "@types/node": "^22.0.0",
     "@types/react": "^18.0.25",
     "@types/react-dom": "^18.0.8",
     "@types/rimraf": "4.0.5",
