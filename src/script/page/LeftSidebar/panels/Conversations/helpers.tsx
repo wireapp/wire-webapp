@@ -19,11 +19,13 @@
 
 import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {t} from 'Util/LocalizerUtil';
+import {replaceAccents} from 'Util/StringUtil';
 
 import {Conversation} from '../../../../entity/Conversation';
 
 interface GetTabConversationsProps {
   currentTab: SidebarTabs;
+
   conversations: Conversation[];
   groupConversations: Conversation[];
   directConversations: Conversation[];
@@ -41,8 +43,12 @@ export function getTabConversations({
   archivedConversations,
   conversationsFilter,
 }: GetTabConversationsProps) {
-  const conversationSearchFilter = (conversation: Conversation) =>
-    conversation.display_name().toLowerCase().includes(conversationsFilter.toLowerCase());
+  const conversationSearchFilter = (conversation: Conversation) => {
+    const filterWord = replaceAccents(conversationsFilter.toLowerCase());
+    const conversationDisplayName = replaceAccents(conversation.display_name().toLowerCase());
+
+    return conversationDisplayName.includes(filterWord);
+  };
 
   const conversationArchivedFilter = (conversation: Conversation) => !archivedConversations.includes(conversation);
 

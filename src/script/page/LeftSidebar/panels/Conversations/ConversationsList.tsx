@@ -137,15 +137,11 @@ export const ConversationsList = ({
   const isFolderView = currentTab === SidebarTabs.FOLDER;
 
   const getConversationView = () => {
-    const filterByName = (conversation: Conversation) =>
-      conversation.display_name().toLowerCase().includes(conversationsFilter.toLowerCase());
-
     if (isFolderView && currentFolder) {
       return (
         <>
           {currentFolder
             ?.conversations()
-            .filter(filterByName)
             .map((conversation, index) => (
               <ConversationListCell key={conversation.id} {...getCommonConversationCellProps(conversation, index)} />
             ))}
@@ -155,7 +151,7 @@ export const ConversationsList = ({
 
     return (
       <>
-        {conversations.filter(filterByName).map((conversation, index) => (
+        {conversations.map((conversation, index) => (
           <ConversationListCell key={conversation.id} {...getCommonConversationCellProps(conversation, index)} />
         ))}
       </>
