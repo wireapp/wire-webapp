@@ -19,12 +19,13 @@
 
 import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {t} from 'Util/LocalizerUtil';
+import {replaceAccents} from 'Util/StringUtil';
 
 import {Conversation} from '../../../../entity/Conversation';
-import {replaceAccents} from 'Util/StringUtil';
 
 interface GetTabConversationsProps {
   currentTab: SidebarTabs;
+
   conversations: Conversation[];
   groupConversations: Conversation[];
   directConversations: Conversation[];
