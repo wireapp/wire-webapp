@@ -41,6 +41,18 @@ import type {ContributedSegmentations, MessageRepository} from '../conversation/
 import {ClientEvent} from '../event/Client';
 import {TeamState} from '../team/TeamState';
 
+export function isCountlyEnabled(): boolean {
+  const allowedBackendUrls = Config.getConfig()
+    .COUNTLY_ALLOWED_BACKEND.split(',')
+    .map(url => url.trim());
+
+  return (
+    !!Config.getConfig().COUNTLY_API_KEY &&
+    allowedBackendUrls.length > 0 &&
+    allowedBackendUrls.includes(Config.getConfig().BACKEND_REST)
+  );
+}
+
 export class EventTrackingRepository {
   private isProductReportingActivated: boolean;
   private sendAppOpenEvent: boolean = true;
@@ -186,7 +198,7 @@ export class EventTrackingRepository {
   }
 
   private async startProductReporting(trackingId?: string): Promise<void> {
-    if (!window.wire.env.COUNTLY_API_KEY || this.isProductReportingActivated) {
+    if (!isCountlyEnabled() || this.isProductReportingActivated) {
       return;
     }
     this.isProductReportingActivated = true;
