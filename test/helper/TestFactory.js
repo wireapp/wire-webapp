@@ -322,7 +322,7 @@ export class TestFactory {
    */
   async exposeTrackingActors() {
     await this.exposeTeamActors();
-    this.tracking_repository = new EventTrackingRepository(this.message_repository, this.user_repository['userState']);
+    this.tracking_repository = new EventTrackingRepository(this.message_repository);
 
     return this.tracking_repository;
   }
