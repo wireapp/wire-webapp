@@ -21,14 +21,10 @@ import {AssetUploadData} from '@wireapp/api-client/lib/asset/';
 import {container} from 'tsyringe';
 
 import {createUuid} from 'Util/uuid';
-import {ValidationUtilError} from 'Util/ValidationUtil';
 
 import {AssetRemoteData} from './AssetRemoteData';
 import {AssetRepository, AssetUploadOptions} from './AssetRepository';
-import {AssetService} from './AssetService';
 
-import {EventMapper} from '../conversation/EventMapper';
-import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
 
 describe('AssetRepository', () => {
@@ -40,19 +36,7 @@ describe('AssetRepository', () => {
 
   beforeEach(async () => {
     core = container.resolve(Core);
-    const mockedAPIClient = {
-      asset: {
-        api: {
-          postAsset: jest.fn().mockImplementation(() =>
-            Promise.resolve({
-              cancel: () => {},
-              response: Promise.resolve({}),
-            }),
-          ),
-        },
-      },
-    } as unknown as APIClient;
-    assetRepository = new AssetRepository(new AssetService(mockedAPIClient), core);
+    assetRepository = new AssetRepository(core);
   });
 
   describe('load unencrypted v1 asset', () => {
@@ -97,98 +81,6 @@ describe('AssetRepository', () => {
       const blob = await assetRepository.load(remote_data);
       expect<void | Blob>(new Blob([video_bytes], {type: video_type})).toEqual(blob);
     });
-  });
-
-  it('detects a malformed asset key', async () => {
-    const event: any = {
-      category: 128,
-      conversation: '61350a90-e522-4ee5-90b7-f55b648e34da',
-      data: {
-        content_length: 73029,
-        content_type: 'image/jpeg',
-        info: {height: 448, name: null, nonce: '51b8e5c5-4088-4177-a5ad-b001fef11eac', tag: 'medium', width: 588},
-        key: '../../../search/contacts',
-        otr_key: {
-          '0': 130,
-          '1': 255,
-          '10': 2,
-          '11': 194,
-          '12': 160,
-          '13': 122,
-          '14': 173,
-          '15': 82,
-          '16': 36,
-          '17': 77,
-          '18': 50,
-          '19': 186,
-          '2': 81,
-          '20': 246,
-          '21': 54,
-          '22': 36,
-          '23': 235,
-          '24': 81,
-          '25': 19,
-          '26': 179,
-          '27': 69,
-          '28': 127,
-          '29': 113,
-          '3': 125,
-          '30': 248,
-          '31': 74,
-          '4': 202,
-          '5': 165,
-          '6': 197,
-          '7': 175,
-          '8': 79,
-          '9': 18,
-        },
-        sha256: {
-          '0': 49,
-          '1': 137,
-          '10': 37,
-          '11': 35,
-          '12': 87,
-          '13': 175,
-          '14': 205,
-          '15': 157,
-          '16': 225,
-          '17': 173,
-          '18': 63,
-          '19': 43,
-          '2': 43,
-          '20': 133,
-          '21': 197,
-          '22': 115,
-          '23': 195,
-          '24': 142,
-          '25': 44,
-          '26': 98,
-          '27': 222,
-          '28': 75,
-          '29': 56,
-          '3': 166,
-          '30': 159,
-          '31': 66,
-          '4': 242,
-          '5': 222,
-          '6': 42,
-          '7': 96,
-          '8': 44,
-          '9': 22,
-        },
-        status: 'uploaded',
-        token: 'hYQytxHS6hSP6DlemD13uQ==&size=100&q=test',
-      },
-      from: '532af01e-1e24-4366-aacf-33b67d4ee376',
-      id: '51b8e5c5-4088-4177-a5ad-b001fef11eac',
-      primary_key: 6,
-      status: 1,
-      time: '2017-08-16T16:13:01.168Z',
-      type: 'conversation.asset-add',
-    };
-
-    const asset_et = new EventMapper()['_mapAssetImage'](event);
-    await expect(assetRepository.generateAssetUrl(asset_et.resource())).rejects.toThrow(ValidationUtilError);
   });
 
   it('keeps track of current uploads and removes it once finished', async () => {
