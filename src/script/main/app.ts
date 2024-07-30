@@ -44,7 +44,6 @@ import {checkIndexedDb} from 'Util/util';
 
 import '../../style/default.less';
 import {AssetRepository} from '../assets/AssetRepository';
-import {AssetService} from '../assets/AssetService';
 import {AudioRepository} from '../audio/AudioRepository';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {URLParameter} from '../auth/URLParameter';
@@ -135,7 +134,6 @@ export class App {
   private isLoggingOut = false;
   logger: Logger;
   service: {
-    asset: AssetService;
     conversation: ConversationService;
     event: EventService;
     integration: IntegrationService;
@@ -307,7 +305,6 @@ export class App {
     const eventService = new EventService();
 
     return {
-      asset: container.resolve(AssetService),
       conversation: new ConversationService(eventService),
       event: eventService,
       integration: new IntegrationService(),
