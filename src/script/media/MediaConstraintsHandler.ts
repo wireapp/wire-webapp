@@ -60,10 +60,10 @@ export class MediaConstraintsHandler {
             },
           },
           DISPLAY_MEDIA: {
-            frameRate: 12,
+            frameRate: 5,
           },
           USER_MEDIA: {
-            frameRate: 12,
+            frameRate: 5,
             mediaSource: 'screen',
           },
         },
