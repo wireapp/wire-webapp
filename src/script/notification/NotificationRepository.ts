@@ -851,10 +851,6 @@ export class NotificationRepository {
    * @param notificationContent Content of notification
    */
   private showNotificationInBrowser(notificationContent: NotificationContent): void {
-    /*
-     * Note: Notification.data is only supported on Chrome.
-     * See https://developer.mozilla.org/en-US/docs/Web/API/Notification/data
-     */
     this.removeReadNotifications();
     const notification: WebappNotifications = new window.Notification(
       notificationContent.title,
