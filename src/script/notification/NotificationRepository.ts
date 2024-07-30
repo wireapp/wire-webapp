@@ -582,7 +582,7 @@ export class NotificationRepository {
     const canShowUserImage = userEntity.previewPictureResource() && !shouldObfuscateSender;
     if (canShowUserImage) {
       try {
-        return await this.assetRepository.generateAssetUrl(userEntity.previewPictureResource());
+        return await this.assetRepository.getObjectUrl(userEntity.previewPictureResource());
       } catch (error) {
         if (error instanceof ValidationUtilError) {
           this.logger.error(`Failed to validate an asset URL: ${error.message}`);
