@@ -110,7 +110,7 @@ export class Conversation {
   public epoch: number = -1;
   public cipherSuite: number = 1;
   // Initial protocol is a protocol that was known by a webapp before any protocol update happened. For newly created conversations it is the same as protocol.
-  public initialProtocol: ConversationProtocol = this.protocol;
+  public initialProtocol: ConversationProtocol;
   public readonly display_name: ko.PureComputed<string>;
   public readonly firstUserEntity: ko.PureComputed<User | undefined>;
   public readonly globalMessageTimer: ko.Observable<number | null>;
@@ -161,7 +161,7 @@ export class Conversation {
   public readonly participating_user_ids: ko.ObservableArray<QualifiedId>;
   public readonly allUserEntities: ko.PureComputed<User[]>;
   public readonly receiptMode: ko.Observable<RECEIPT_MODE>;
-  public readonly removed_from_conversation: ko.PureComputed<boolean>;
+  public readonly isSelfUserRemoved: ko.PureComputed<boolean>;
   public readonly roles: ko.Observable<Record<string, string>>;
   public readonly isLastMessageVisible: ko.Observable<boolean>;
   public readonly selfUser: ko.Observable<User | undefined>;
@@ -198,7 +198,7 @@ export class Conversation {
     this.domain = domain;
 
     this.logger = getLogger(`Conversation (${this.id})`);
-
+    this.initialProtocol = this.protocol;
     this.accessState = ko.observable();
     this.accessCode = ko.observable();
     this.accessCodeHasPassword = ko.observable();
@@ -372,9 +372,7 @@ export class Conversation {
       }
     });
 
-    this.isCreatedBySelf = ko.pureComputed(
-      () => this.selfUser().id === this.creator && !this.removed_from_conversation(),
-    );
+    this.isCreatedBySelf = ko.pureComputed(() => this.selfUser().id === this.creator && !this.isSelfUserRemoved());
 
     this.showNotificationsEverything = ko.pureComputed(() => {
       return this.notificationState() === NOTIFICATION_STATE.EVERYTHING;
@@ -387,13 +385,13 @@ export class Conversation {
     });
 
     this.status = ko.observable(ConversationStatus.CURRENT_MEMBER);
-    this.removed_from_conversation = ko.pureComputed(() => {
+    this.isSelfUserRemoved = ko.pureComputed(() => {
       return this.status() === ConversationStatus.PAST_MEMBER;
     });
-    this.isActiveParticipant = ko.pureComputed(() => !this.removed_from_conversation() && !this.isGuest());
+    this.isActiveParticipant = ko.pureComputed(() => !this.isSelfUserRemoved() && !this.isGuest());
     this.isClearable = ko.pureComputed(() => !this.isRequest() && !this.is_cleared());
-    this.isLeavable = ko.pureComputed(() => this.isGroup() && !this.removed_from_conversation());
-    this.isMutable = ko.pureComputed(() => !this.isRequest() && !this.removed_from_conversation());
+    this.isLeavable = ko.pureComputed(() => this.isGroup() && !this.isSelfUserRemoved());
+    this.isMutable = ko.pureComputed(() => !this.isRequest() && !this.isSelfUserRemoved());
 
     // Messages
     this.localMessageTimer = ko.observable(null);
@@ -791,7 +789,7 @@ export class Conversation {
   }
 
   getNumberOfParticipants(countSelf: boolean = true, countServices: boolean = true): number {
-    const adjustCountForSelf = countSelf && !this.removed_from_conversation() ? 1 : 0;
+    const adjustCountForSelf = countSelf && !this.isSelfUserRemoved() ? 1 : 0;
     const adjustCountForServices = countServices ? 0 : this.getNumberOfServices();
 
     return this.participating_user_ids().length + adjustCountForSelf - adjustCountForServices;

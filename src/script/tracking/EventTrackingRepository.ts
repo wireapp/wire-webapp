@@ -25,7 +25,6 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Environment} from 'Util/Environment';
 import {getLogger, Logger} from 'Util/Logger';
-import {roundLogarithmic} from 'Util/NumberUtil';
 import {loadValue, storeValue, resetStoreValue} from 'Util/StorageUtil';
 import {includesString} from 'Util/StringUtil';
 import {getParameter} from 'Util/UrlUtil';
@@ -41,8 +40,6 @@ import {Config} from '../Config';
 import type {ContributedSegmentations, MessageRepository} from '../conversation/MessageRepository';
 import {ClientEvent} from '../event/Client';
 import {TeamState} from '../team/TeamState';
-import {ROLE as TEAM_ROLE} from '../user/UserPermission';
-import {UserState} from '../user/UserState';
 
 export class EventTrackingRepository {
   private isProductReportingActivated: boolean;
@@ -67,7 +64,6 @@ export class EventTrackingRepository {
 
   constructor(
     private readonly messageRepository: MessageRepository,
-    private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
   ) {
     this.logger = getLogger('EventTrackingRepository');
@@ -202,6 +198,7 @@ export class EventTrackingRepository {
       device_id: trackingId || this.countlyDeviceId,
       url: 'https://countly.wire.com/',
       use_session_cookie: false,
+      storage: 'localstorage',
     });
 
     this.startProductReportingSession();
@@ -249,28 +246,10 @@ export class EventTrackingRepository {
     }
   }
 
-  private getUserType(): 'member' | 'external' | 'wireless' {
-    if (this.userState.self().teamRole() === TEAM_ROLE.PARTNER) {
-      return 'external';
-    }
-
-    if (this.userState.self().isGuest()) {
-      return 'wireless';
-    }
-
-    return 'member';
-  }
-
   private trackProductReportingEvent(eventName: string, customSegmentations?: ContributedSegmentations): void {
     if (this.isProductReportingActivated === true) {
-      const contacts = this.teamState.isTeam() ? this.teamState.teamUsers() : this.userState.connectedUsers();
-      const nbContacts = contacts.filter(userEntity => !userEntity.isService).length;
       const userData = {
         [UserData.IS_TEAM]: this.teamState.isTeam(),
-        [UserData.CONTACTS]: roundLogarithmic(nbContacts, 6),
-        [UserData.TEAM_SIZE]: roundLogarithmic(this.teamState.teamMembers().length, 6),
-        [UserData.TEAM_ID]: this.userState.self().teamId,
-        [UserData.USER_TYPE]: this.getUserType(),
       };
       Object.entries(userData).forEach(entry => {
         const [key, value] = entry;
@@ -279,7 +258,6 @@ export class EventTrackingRepository {
       Countly.userData.save();
 
       const segmentation = {
-        [Segmentation.COMMON.APP]: EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE,
         [Segmentation.COMMON.APP_VERSION]: Config.getConfig().VERSION,
         [Segmentation.COMMON.DESKTOP_APP]: getPlatform(),
         ...customSegmentations,

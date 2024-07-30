@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2022 Wire Swiss GmbH
+ * Copyright (C) 2024 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,36 +20,41 @@
 import {create} from 'zustand';
 
 type FolderState = {
-  expandedFolders: string[];
+  expandedFolder: string;
+  isFoldersTabOpen: boolean;
   isOpen: (folderId: string) => boolean;
   openFolder: (folderId: string) => void;
-  toggleFolder: (folderId: string) => void;
+  closeFolder: () => void;
+  toggleFoldersTab: () => void;
 };
 
-const openFolder = (folderId: string, state: FolderState) => {
-  return {...state, expandedFolders: state.expandedFolders.concat(folderId)};
+const openFolder = (folderId: string, state: FolderState): FolderState => {
+  return {...state, isFoldersTabOpen: true, expandedFolder: folderId};
 };
 
-const closeFolder = (folderId: string, state: FolderState) => {
-  return {...state, expandedFolders: state.expandedFolders.filter(id => id !== folderId)};
+const closeFolder = (state: FolderState): FolderState => {
+  return {...state, expandedFolder: ''};
 };
 
-const useFolderState = create<FolderState>((set, get) => ({
-  expandedFolders: [],
+const useFolderStore = create<FolderState>((set, get) => ({
+  expandedFolder: '',
+  isFoldersTabOpen: false,
 
   isOpen: folderId => {
-    return get().expandedFolders.includes(folderId);
+    return get().expandedFolder === folderId;
   },
+
+  toggleFoldersTab: () => set(state => ({...state, isFoldersTabOpen: !state.isFoldersTabOpen})),
 
   openFolder: folderId =>
     set(state => {
-      return get().isOpen(folderId) ? state : openFolder(folderId, state);
+      return openFolder(folderId, state);
     }),
 
-  toggleFolder: folderId =>
+  closeFolder: () =>
     set(state => {
-      return get().isOpen(folderId) ? closeFolder(folderId, state) : openFolder(folderId, state);
+      return closeFolder(state);
     }),
 }));
 
-export {useFolderState};
+export {useFolderStore};

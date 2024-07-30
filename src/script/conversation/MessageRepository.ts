@@ -26,6 +26,7 @@ import {
   ReactionType,
   GenericMessageType,
   SendResult,
+  InCallEmojiType,
 } from '@wireapp/core/lib/conversation';
 import {
   AudioMetaData,
@@ -489,7 +490,7 @@ export class MessageRepository {
    * @returns Can assets be uploaded
    */
   private canUploadAssetsToConversation(conversationEntity: Conversation) {
-    return !!conversationEntity && !conversationEntity.isRequest() && !conversationEntity.removed_from_conversation();
+    return !!conversationEntity && !conversationEntity.isRequest() && !conversationEntity.isSelfUserRemoved();
   }
 
   /**
@@ -875,7 +876,7 @@ export class MessageRepository {
     reaction: string,
     userId: QualifiedId,
   ) {
-    if (conversationEntity.removed_from_conversation()) {
+    if (conversationEntity.isSelfUserRemoved()) {
       return null;
     }
     const updatedReactions = this.updateUserReactions(message_et.reactions(), userId, reaction);
@@ -1010,6 +1011,12 @@ export class MessageRepository {
     return this.sendAndInjectMessage(reaction, conversation);
   }
 
+  public async sendInCallEmoji(conversation: Conversation, emojis: InCallEmojiType) {
+    const emojisMessage = MessageBuilder.buildInCallEmojiMessage({emojis});
+
+    return this.sendAndInjectMessage(emojisMessage, conversation);
+  }
+
   private expectReadReceipt(conversationEntity: Conversation): boolean {
     if (conversationEntity.is1to1()) {
       return !!this.propertyRepository.receiptMode();
@@ -1127,7 +1134,7 @@ export class MessageRepository {
   }
 
   sendButtonAction(conversation: Conversation, message: CompositeMessage, buttonId: string): void {
-    if (conversation.removed_from_conversation()) {
+    if (conversation.isSelfUserRemoved()) {
       return;
     }
     const senderId = message.qualifiedFrom;

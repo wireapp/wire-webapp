@@ -80,6 +80,7 @@ export async function initializeDataDog(config: Configuration, user: {id?: strin
     sessionSampleRate: 100,
     beforeSend: log => {
       if (log.message.match(/@wireapp\/webapp\/avs/)) {
+        // We filter avs logs as they are very verbose
         return false;
       }
       log.view = {url: '/'};

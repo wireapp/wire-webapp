@@ -304,7 +304,7 @@ const _getStateRemoved = {
     return '';
   },
   icon: () => ConversationStatusIcon.UNREAD_MESSAGES,
-  match: (conversationEntity: Conversation) => conversationEntity.removed_from_conversation(),
+  match: (conversationEntity: Conversation) => conversationEntity.isSelfUserRemoved(),
 };
 
 const _getStateUnreadMessage = {

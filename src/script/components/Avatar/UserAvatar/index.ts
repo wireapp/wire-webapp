@@ -17,4 +17,4 @@
  *
  */
 
-export * from './DeliveredMessage';
+export * from './UserAvatar';

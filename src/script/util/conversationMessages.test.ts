@@ -19,6 +19,8 @@
 
 import {getMessageAriaLabel} from './conversationMessages';
 
+import {Asset} from '../entity/message/Asset';
+
 describe('Conversation messages', () => {
   describe(`Content messages area label by type`, () => {
     const sample1 = {
@@ -38,7 +40,7 @@ describe('Conversation messages', () => {
           size: '',
           text: '',
           type: 'File',
-        },
+        } as unknown as Asset,
       ],
       displayTimestampShort: '5:15 PM',
       senderName: 'Arjita',
@@ -68,7 +70,7 @@ describe('Conversation messages', () => {
           size: '',
           text: '',
           type: 'File',
-        },
+        } as unknown as Asset,
       ],
       displayTimestampShort: '2:15 PM',
       senderName: 'Tim',
@@ -97,7 +99,7 @@ describe('Conversation messages', () => {
           size: '',
           text: 'Hello, this is a text message',
           type: 'Text',
-        },
+        } as unknown as Asset,
       ],
       displayTimestampShort: '10:15 PM',
       senderName: 'Virgil',

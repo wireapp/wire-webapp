@@ -102,10 +102,9 @@ export const UserList = ({
 
   const highlightedUserIds = highlightedUsers.map(user => user.id);
   const {is_verified: isSelfVerified} = useKoSubscribableChildren(selfUser, ['is_verified']);
-  const selfInTeam = teamState.isInTeam(selfUser);
 
   // subscribe to roles changes in order to react to them
-  useKoSubscribableChildren(conversation, ['roles']);
+  useKoSubscribableChildren(conversation!, ['roles']);
 
   const isCompactMode = mode === UserlistMode.COMPACT;
   const cssClasses = isCompactMode ? 'search-list-sm' : 'search-list-lg';
@@ -140,7 +139,6 @@ export const UserList = ({
             isSelected={isSelected(user)}
             mode={mode}
             external={teamState.isExternal(user.id)}
-            selfInTeam={selfInTeam}
             isSelfVerified={isSelfVerified}
             onClick={onClickOrKeyPressed}
             onKeyDown={onUserKeyPressed}
@@ -149,7 +147,7 @@ export const UserList = ({
         </li>
       );
     },
-    [highlightedUserIds, isSelectable, isSelfVerified, mode, noSelfInteraction, selectedUsers, selfInTeam, teamState],
+    [highlightedUserIds, isSelectable, isSelfVerified, mode, noSelfInteraction, selectedUsers, teamState],
   );
 
   let content;

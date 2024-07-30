@@ -27,6 +27,7 @@ import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {UserClassifiedBar} from 'Components/input/ClassifiedBar';
 import {UnverifiedUserWarning} from 'Components/Modals/UserModal';
 import {UserName} from 'Components/UserName';
+import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -67,6 +68,8 @@ export const ConnectRequests = ({
 
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
 
+  const {setCurrentTab: setCurrentSidebarTab} = useSidebarStore();
+
   const scrollToBottom = (behavior: ScrollBehavior = 'auto') => {
     if (connectRequestsRefEnd.current) {
       connectRequestsRefEnd.current.scrollIntoView({behavior});
@@ -104,6 +107,7 @@ export const ConnectRequests = ({
       /**
        * In the connect request view modal, we show an overview of all incoming connection requests. When there are multiple open connection requests, we want that the user sees them all and can accept them one-by-one. When the last open connection request gets accepted, we want the user to switch to this conversation.
        */
+      setCurrentSidebarTab(SidebarTabs.RECENT);
       return actionsViewModel.open1to1Conversation(conversationEntity);
     }
   };
@@ -118,7 +122,7 @@ export const ConnectRequests = ({
                 variant={IconButtonVariant.SECONDARY}
                 className="connect-requests-icon-back icon-back"
                 css={{marginBottom: 0}}
-                onClick={() => setCurrentView(ViewType.LEFT_SIDEBAR)}
+                onClick={() => setCurrentView(ViewType.MOBILE_LEFT_SIDEBAR)}
               />
             </div>
           )}
@@ -145,6 +149,7 @@ export const ConnectRequests = ({
                 avatarSize={AVATAR_SIZE.X_LARGE}
                 noBadge
                 noFilter
+                hideAvailabilityStatus
               />
 
               <UnverifiedUserWarning />

@@ -26,6 +26,7 @@ import {createPortal} from 'react-dom';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
+import {useActiveWindow} from 'src/script/hooks/useActiveWindow';
 import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
 
 import '../../../style/default.less';
@@ -64,6 +65,8 @@ export const DetachedWindow = ({children, name, onClose, width = 600, height = 6
     );
   }, [height, name, width]);
 
+  useActiveWindow(newWindow);
+
   useEffect(() => {
     if (!newWindow) {
       return () => {};
@@ -74,13 +77,21 @@ export const DetachedWindow = ({children, name, onClose, width = 600, height = 6
 
     newWindow.document.title = window.document.title;
 
+    const onPageHide = (event: PageTransitionEvent) => {
+      if (event.persisted) {
+        return;
+      }
+      onClose();
+      newWindow.close();
+    };
+
     newWindow.addEventListener('beforeunload', onClose);
-    window.addEventListener('beforeunload', onClose);
+    window.addEventListener('pagehide', onPageHide);
 
     return () => {
       newWindow.close();
       newWindow.removeEventListener('beforeunload', onClose);
-      window.removeEventListener('beforeunload', onClose);
+      window.removeEventListener('pagehide', onPageHide);
     };
   }, [height, name, width, onClose, newWindow]);
 

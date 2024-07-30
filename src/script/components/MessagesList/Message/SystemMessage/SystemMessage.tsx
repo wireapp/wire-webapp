@@ -35,6 +35,7 @@ import {SystemMessage as SystemMessageEntity} from 'src/script/entity/message/Sy
 
 import {SystemMessageBase} from './SystemMessageBase';
 
+import {messageBodyWrapper} from '../ContentMessage/ContentMessage.styles';
 import {ProtocolUpdateMessage as ProtocolUpdateMessageComponent} from '../ProtocolUpdateMessage';
 
 export interface SystemMessageProps {
@@ -46,7 +47,9 @@ export const SystemMessage: React.FC<SystemMessageProps> = ({message}) => {
     return (
       <>
         <SystemMessageBase message={message} isSenderNameVisible icon={<Icon.EditIcon />} />
-        <div className="message-body font-weight-bold">{message.name}</div>
+        <div css={messageBodyWrapper()}>
+          <div className="message-body font-weight-bold">{message.name}</div>
+        </div>
       </>
     );
   }

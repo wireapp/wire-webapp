@@ -1040,7 +1040,7 @@ export class ConversationRepository {
           await this.addEventsToConversation(events, conversationEntity, {offline: true});
         }
       } catch (error) {
-        this.logger.info(`Could not load unread events for conversation: ${conversationEntity.id}`, error);
+        this.logger.warn(`Could not load unread events for conversation: ${conversationEntity.id}`, error);
       }
       conversationEntity.isLoadingMessages(false);
     }
@@ -1319,7 +1319,7 @@ export class ConversationRepository {
 
     const connection = user.connection();
     if (connection) {
-      this.logger.log(`There's a connection with user ${userId.id}, getting a 1:1 conversation for the connection`);
+      this.logger.debug(`There's a connection with user ${userId.id}, getting a 1:1 conversation for the connection`);
       const conversation = await this.get1to1ConversationForConnection(connection, options);
       // In case we got a conversation back, we make sure the participating user entities are up to date
       return conversation ? this.updateParticipatingUserEntities(conversation) : null;
@@ -1327,7 +1327,7 @@ export class ConversationRepository {
 
     const {protocol, isMLSSupportedByTheOtherUser, isProteusSupportedByTheOtherUser} =
       await this.getProtocolFor1to1Conversation(userId, options.shouldRefreshUser);
-    this.logger.log(
+    this.logger.debug(
       `Protocol for 1:1 conversation with user ${userId.id} is ${protocol}, isMLSSupportedByTheOtherUser: ${isMLSSupportedByTheOtherUser}, isProteusSupportedByTheOtherUser: ${isProteusSupportedByTheOtherUser}`,
     );
 
@@ -1391,7 +1391,7 @@ export class ConversationRepository {
         return false;
       }
 
-      const isActiveConversation = !conversationEntity.removed_from_conversation();
+      const isActiveConversation = !conversationEntity.isSelfUserRemoved();
       if (!isActiveConversation) {
         // Disregard conversations that self is no longer part of
         return false;
@@ -1621,8 +1621,6 @@ export class ConversationRepository {
 
     this.logger.info(`Replacing proteus 1:1 conversation(s) with mls 1:1 conversation ${mlsConversation.id}`);
 
-    this.logger.info('Moving events from proteus 1:1 conversation to MLS 1:1 conversation');
-
     await Promise.allSettled(
       proteusConversations.map(proteusConversation =>
         this.eventService.moveEventsToConversation(proteusConversation.qualifiedId, mlsConversation.qualifiedId),
@@ -1674,7 +1672,7 @@ export class ConversationRepository {
 
     await Promise.allSettled(
       proteusConversations.map(async proteusConversation => {
-        this.logger.info(`Deleting proteus 1:1 conversation ${proteusConversation.id}`);
+        this.logger.debug(`Deleting proteus 1:1 conversation ${proteusConversation.id}`);
         await this.deleteConversationLocally(proteusConversation.qualifiedId, true);
         return this.blacklistConversation(proteusConversation.qualifiedId);
       }),
@@ -1727,7 +1725,7 @@ export class ConversationRepository {
     const isAlreadyEstablished = await this.conversationService.isMLSGroupEstablishedLocally(mlsConversation.groupId);
 
     if (isAlreadyEstablished) {
-      this.logger.info(`MLS 1:1 conversation with user ${otherUserId.id} is already established.`);
+      this.logger.debug(`MLS 1:1 conversation with user ${otherUserId.id} is already established.`);
       return mlsConversation;
     }
 
@@ -1737,7 +1735,7 @@ export class ConversationRepository {
       otherUserId,
     );
 
-    this.logger.info(`MLS 1:1 conversation with user ${otherUserId.id} was established.`);
+    this.logger.debug(`MLS 1:1 conversation with user ${otherUserId.id} was established.`);
 
     const otherMembers = members.others.map(other => ({domain: other.qualified_id?.domain || '', id: other.id}));
 
@@ -1769,13 +1767,13 @@ export class ConversationRepository {
     // A user that has previously sent a connection request will wait for a short period of time before establishing an MLS group.
     // It's very likely that this user will receive a welcome message after the user that has accepted a connection request, establishes an MLS group without any delay.
     if (shouldDelayGroupEstablishment) {
-      this.logger.info(`Delaying MLS 1:1 conversation with user ${otherUserId.id}...`);
+      this.logger.debug(`Delaying MLS 1:1 conversation with user ${otherUserId.id}...`);
       await new Promise(resolve =>
         setTimeout(resolve, ConversationRepository.CONFIG.ESTABLISH_MLS_GROUP_AFTER_CONNECTION_IS_ACCEPTED_DELAY),
       );
     }
 
-    this.logger.info(`Initialising MLS 1:1 conversation with user ${otherUserId.id}...`);
+    this.logger.debug(`Initialising MLS 1:1 conversation with user ${otherUserId.id}...`);
     const mlsConversation = await this.getMLS1to1Conversation(otherUserId);
 
     const otherUser = await this.userRepository.getUserById(otherUserId);
@@ -1798,7 +1796,7 @@ export class ConversationRepository {
       // If group was not yet established, we mark the mls conversation as readonly
       if (!isMLSGroupEstablishedLocally) {
         mlsConversation.readOnlyState(CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_OTHER_UNSUPPORTED_MLS);
-        this.logger.info(
+        this.logger.warn(
           `MLS 1:1 conversation with user ${otherUserId.id} is not supported by the other user, conversation will become readonly`,
         );
       } else {
@@ -1952,7 +1950,7 @@ export class ConversationRepository {
       return conversation;
     }
 
-    this.logger.info(
+    this.logger.debug(
       `Initialising 1:1 conversation ${conversation.id} of type ${conversation.type()} with user ${otherUserId.id}`,
     );
 
@@ -1981,7 +1979,7 @@ export class ConversationRepository {
 
     // For connection request, we simply display proteus conversation of type 3 (connect) it will be displayed as a connection request
     if (connection.isOutgoingRequest()) {
-      this.logger.log(
+      this.logger.debug(
         `Connection request with user ${otherUserId.id}, using proteus conversation ${proteusConversationId.id}`,
       );
       const proteusConversation = localProteusConversation || (await this.fetchConversationById(proteusConversationId));
@@ -2000,7 +1998,7 @@ export class ConversationRepository {
     const isConnectionAccepted = connection.isConnected();
     // If it's accepted, initialise conversation so it's ready to be used
     if (isConnectionAccepted) {
-      this.logger.log(
+      this.logger.debug(
         `Connection with user ${otherUserId.id} is accepted, using protocol ${protocol} for 1:1 conversation`,
       );
       if (protocol === ConversationProtocol.MLS || localMLSConversation) {
@@ -2021,7 +2019,7 @@ export class ConversationRepository {
     // only proteus -> mls migration is supported, never the other way around.
 
     if (localMLSConversation) {
-      this.logger.log(
+      this.logger.debug(
         `Connection with user ${otherUserId.id} is not accepted, using already known MLS 1:1 conversation ${localMLSConversation.id}`,
       );
       return this.initMLS1to1Conversation(otherUserId, {
@@ -2030,7 +2028,7 @@ export class ConversationRepository {
       });
     }
 
-    this.logger.log(
+    this.logger.debug(
       `Connection with user ${otherUserId.id} is not accepted, defaulting to local proteus 1:1 conversation ${proteusConversationId.id}`,
     );
 
@@ -2118,7 +2116,7 @@ export class ConversationRepository {
    * @param connections Connections entities
    */
   private async mapConnections(connections: ConnectionEntity[]): Promise<void> {
-    this.logger.log(`Mapping '${connections.length}' user connection(s) to conversations`, connections);
+    this.logger.debug(`Mapping '${connections.length}' user connection(s) to conversations`, connections);
     for (const connection of connections) {
       try {
         await this.mapConnection(connection);
@@ -2264,7 +2262,7 @@ export class ConversationRepository {
 
     if (this.isBlockingNotificationHandling !== isFetchingFromStream) {
       this.isBlockingNotificationHandling = isFetchingFromStream;
-      this.logger.info(`Block handling of conversation events: ${this.isBlockingNotificationHandling}`);
+      this.logger.debug(`Block handling of conversation events: ${this.isBlockingNotificationHandling}`);
     }
   };
 
@@ -2797,7 +2795,7 @@ export class ConversationRepository {
       .filter(conversation => {
         const conversationInTeam = conversation.teamId === teamId;
         const userIsParticipant = UserFilter.isParticipant(conversation, userId);
-        return conversationInTeam && userIsParticipant && !conversation.removed_from_conversation();
+        return conversationInTeam && userIsParticipant && !conversation.isSelfUserRemoved();
       })
       .map(async conversation => {
         const leaveEvent = EventBuilder.buildTeamMemberLeave(conversation, userEntity, isoDate);
@@ -2858,7 +2856,7 @@ export class ConversationRepository {
 
       const {otr_muted_ref: mutedRef, otr_muted_status: mutedStatus} = payload;
       const logMessage = `Changed notification state of conversation to '${mutedStatus}' on '${mutedRef}'`;
-      this.logger.info(logMessage);
+      this.logger.debug(logMessage);
       return response;
     } catch (error) {
       const log = `Failed to change notification state of conversation '${conversationEntity.id}': ${error.message}`;
@@ -2876,7 +2874,6 @@ export class ConversationRepository {
    */
   public async archiveConversation(conversationEntity: Conversation) {
     await this.toggleArchiveConversation(conversationEntity, true);
-    this.logger.info(`Conversation '${conversationEntity.id}' archived`);
   }
 
   /**
@@ -2889,7 +2886,7 @@ export class ConversationRepository {
    */
   public async unarchiveConversation(conversationEntity: Conversation, forceChange = false, trigger = 'unknown') {
     await this.toggleArchiveConversation(conversationEntity, false, forceChange);
-    this.logger.info(`Conversation '${conversationEntity.id}' unarchived by trigger '${trigger}'`);
+    this.logger.debug(`Conversation '${conversationEntity.id}' unarchived by trigger '${trigger}'`);
   }
 
   public async sendTypingStart(conversationEntity: Conversation) {
@@ -2931,7 +2928,7 @@ export class ConversationRepository {
 
     const conversationId = conversationEntity.qualifiedId;
 
-    const updatePromise = conversationEntity.removed_from_conversation()
+    const updatePromise = conversationEntity.isSelfUserRemoved()
       ? Promise.resolve()
       : this.conversationService.updateMemberProperties(conversationId, payload).catch(error => {
           const logMessage = `Failed to change archived state of '${conversationId}' to '${newState}': ${error.code}`;
@@ -3163,15 +3160,6 @@ export class ConversationRepository {
           ConversationError.TYPE.MESSAGE_NOT_FOUND,
           ConversationError.TYPE.CONVERSATION_NOT_FOUND,
         ];
-
-        const isRemovedFromConversation = (error as unknown as BackendError).label === BackendErrorLabel.ACCESS_DENIED;
-        if (isRemovedFromConversation) {
-          const messageText = t('conversationNotFoundMessage');
-          const titleText = t('conversationNotFoundTitle', Config.getConfig().BRAND_NAME);
-
-          this.showModal(messageText, titleText);
-          return;
-        }
 
         if (!ignoredErrorTypes.includes(error.type)) {
           throw error;
@@ -3458,7 +3446,7 @@ export class ConversationRepository {
   private readonly onMissedEvents = (): void => {
     this.conversationState
       .filteredConversations()
-      .filter(conversationEntity => !conversationEntity.removed_from_conversation() && !conversationEntity.isRequest())
+      .filter(conversationEntity => !conversationEntity.isSelfUserRemoved() && !conversationEntity.isRequest())
       .forEach(conversationEntity => {
         const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
         const missed_event = EventBuilder.buildMissed(conversationEntity, currentTimestamp);
@@ -3907,7 +3895,7 @@ export class ConversationRepository {
       .catch(error => {
         const isNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
         if (!isNotFound) {
-          this.logger.info(`Failed to delete message for conversation '${conversationEntity.id}'`, error);
+          this.logger.warn(`Failed to delete message for conversation '${conversationEntity.id}'`, error);
           throw error;
         }
       });
@@ -3939,7 +3927,7 @@ export class ConversationRepository {
       const conversationEntity = await this.getConversationById({domain: '', id: eventData.conversation_id});
       return await this.messageRepository.deleteMessageById(conversationEntity, eventData.message_id);
     } catch (error) {
-      this.logger.info(
+      this.logger.warn(
         `Failed to delete message '${eventData.message_id}' for conversation '${eventData.conversation_id}'`,
         error,
       );
@@ -4103,7 +4091,7 @@ export class ConversationRepository {
       // TODO(federation) map domain
       this.getConversationById({domain: '', id: messageEntity.conversation_id}).then(conversationEntity => {
         const isPingFromSelf = messageEntity.user().isMe && messageEntity.isPing();
-        const deleteForSelf = isPingFromSelf || conversationEntity.removed_from_conversation();
+        const deleteForSelf = isPingFromSelf || conversationEntity.isSelfUserRemoved();
         if (deleteForSelf) {
           return this.messageRepository.deleteMessage(conversationEntity, messageEntity);
         }

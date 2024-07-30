@@ -37,6 +37,7 @@ import {TextInput} from 'Components/TextInput';
 import {BaseToggle} from 'Components/toggle/BaseToggle';
 import {InfoToggle} from 'Components/toggle/InfoToggle';
 import {UserSearchableList} from 'Components/UserSearchableList';
+import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from 'src/script/router/routerBindings';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -143,6 +144,8 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   const isGuestEnabled = isGuestRoom || isGuestAndServicesRoom;
   const isServicesEnabled = isServicesRoom || isGuestAndServicesRoom;
 
+  const {setCurrentTab: setCurrentSidebarTab} = useSidebarStore();
+
   const contacts = useMemo(() => {
     if (showContacts) {
       if (!isTeam) {
@@ -223,6 +226,8 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
             receipt_mode: enableReadReceipts ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF,
           },
         );
+
+        setCurrentSidebarTab(SidebarTabs.RECENT);
 
         if (isKeyboardEvent(event)) {
           createNavigateKeyboard(generateConversationUrl(conversation.qualifiedId), true)(event);

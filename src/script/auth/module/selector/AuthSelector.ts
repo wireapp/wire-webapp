@@ -38,8 +38,6 @@ const unsetRegistrationData: RegistrationDataState = {
   locale: undefined,
   name: undefined,
   password: undefined,
-  phone: undefined,
-  phone_code: undefined,
   team: undefined,
   termsAccepted: false,
 };

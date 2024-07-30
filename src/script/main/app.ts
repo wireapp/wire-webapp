@@ -372,6 +372,11 @@ export class App {
       onProgress(2.5);
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
 
+      const selfUser = await this.repository.user.getSelf([{position: 'App.initiateSelfUser', vendor: 'webapp'}]);
+
+      await initializeDataDog(this.config, selfUser.qualifiedId);
+      onProgress(5, t('initReceivedSelfUser', selfUser.name()));
+
       try {
         await this.core.init(clientType);
       } catch (error) {
@@ -384,7 +389,7 @@ export class App {
         userRepository.addClientToUser(userId, newClient, true);
       });
 
-      const selfUser = await this.initiateSelfUser();
+      await this.initiateSelfUser(selfUser);
 
       const localClient = await this.core.getLocalClient();
       if (!localClient) {
@@ -402,8 +407,6 @@ export class App {
           return conversation?.groupId;
         },
       });
-
-      await initializeDataDog(this.config, selfUser.qualifiedId);
 
       // Setup all event middleware
       const eventStorageMiddleware = new EventStorageMiddleware(this.service.event, selfUser);
@@ -423,7 +426,6 @@ export class App {
       const federationEventProcessor = new FederationEventProcessor(eventRepository, serverTimeHandler, selfUser);
       eventRepository.setEventProcessors([federationEventProcessor]);
 
-      onProgress(5, t('initReceivedSelfUser', selfUser.name()));
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_SELF_USER);
       const clientEntity = await this._initiateSelfUserClients(selfUser, clientRepository);
       callingRepository.initAvs(selfUser, clientEntity.id);
@@ -458,6 +460,7 @@ export class App {
       onProgress(25, t('initReceivedUserData'));
       telemetry.addStatistic(AppInitStatisticsValue.CONVERSATIONS, conversations.length, 50);
       this._subscribeToUnloadEvents(selfUser);
+      this._subscribeToBeforeUnload();
 
       await conversationRepository.conversationRoleRepository.loadTeamRoles();
 
@@ -612,24 +615,18 @@ export class App {
    * Initiate the self user by getting it from the backend.
    * @returns Resolves with the self user entity
    */
-  private async initiateSelfUser() {
-    const userEntity = await this.repository.user.getSelf([{position: 'App.initiateSelfUser', vendor: 'webapp'}]);
-
-    this.logger.info(`Loaded self user with ID '${userEntity.id}'`);
-
-    if (!userEntity.hasActivatedIdentity()) {
-      this.logger.info('User does not have an activated identity and seems to be a temporary guest');
-
-      if (!userEntity.isTemporaryGuest()) {
+  private async initiateSelfUser(selfUser: User) {
+    if (!selfUser.hasActivatedIdentity()) {
+      if (!selfUser.isTemporaryGuest()) {
         throw new Error('User does not have an activated identity');
       }
     }
 
     container.resolve(StorageService).init(this.core.storage);
-    this.repository.client.init(userEntity);
-    await this.repository.properties.init(userEntity);
+    this.repository.client.init(selfUser);
+    await this.repository.properties.init(selfUser);
 
-    return userEntity;
+    return selfUser;
   }
 
   /**
@@ -663,7 +660,7 @@ export class App {
    */
   private _subscribeToUnloadEvents(selfUser: User): void {
     window.addEventListener('unload', () => {
-      this.logger.info("'window.onunload' was triggered, so we will disconnect from the backend.");
+      this.logger.info("'window.onunload' was triggered, disconnecting from backend.");
       this.repository.event.disconnectWebSocket();
       this.repository.calling.destroy();
 
@@ -675,6 +672,20 @@ export class App {
       }
 
       this.repository.notification.clearNotifications();
+    });
+  }
+
+  /**
+   * Subscribe to 'beforeunload' to stop calls and disconnect the WebSocket.
+   */
+  private _subscribeToBeforeUnload(): void {
+    window.addEventListener('beforeunload', event => {
+      if (this.repository.calling.hasActiveCall()) {
+        event.preventDefault();
+
+        // Included for legacy support, e.g. Chrome/Edge < 119
+        event.returnValue = true;
+      }
     });
   }
 
@@ -724,7 +735,7 @@ export class App {
 
       const selfUser = this.repository.user['userState'].self();
       if (selfUser) {
-        const cookieLabelKey = this.repository.client.constructCookieLabelKey(selfUser.email() || selfUser.phone());
+        const cookieLabelKey = this.repository.client.constructCookieLabelKey(selfUser.email());
 
         Object.keys(amplify.store()).forEach(keyInAmplifyStore => {
           const isCookieLabelKey = keyInAmplifyStore === cookieLabelKey;
@@ -793,7 +804,6 @@ export class App {
    * Refresh the web app or desktop wrapper
    */
   readonly refresh = (): void => {
-    this.logger.info('Refresh to update started');
     if (Runtime.isDesktopApp()) {
       // if we are in a desktop env, we just warn the wrapper that we need to reload. It then decide what should be done
       amplify.publish(WebAppEvents.LIFECYCLE.RESTART);

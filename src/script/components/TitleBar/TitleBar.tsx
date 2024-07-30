@@ -141,15 +141,15 @@ export const TitleBar: React.FC<TitleBarProps> = ({
   const peopleTooltip = t('tooltipConversationPeople', shortcut);
 
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
-  const mdBreakpoint = useMatchMedia('max-width: 768px');
-  const smBreakpoint = useMatchMedia('max-width: 640px');
+  const mdBreakpoint = useMatchMedia('max-width: 1000px');
+  const smBreakpoint = useMatchMedia('max-width: 720px');
 
   const {close: closeRightSidebar} = useAppMainState(state => state.rightSidebar);
 
   const {setCurrentView: setView} = useAppMainState(state => state.responsiveView);
 
   const setLeftSidebar = () => {
-    setView(ViewType.LEFT_SIDEBAR);
+    setView(ViewType.MOBILE_LEFT_SIDEBAR);
     closeRightSidebar();
   };
 
@@ -163,6 +163,10 @@ export const TitleBar: React.FC<TitleBarProps> = ({
   );
 
   const showAddParticipant = useCallback(() => {
+    if (is1to1) {
+      return;
+    }
+
     if (!isActiveParticipant) {
       return showDetails(false);
     }
@@ -172,20 +176,18 @@ export const TitleBar: React.FC<TitleBarProps> = ({
     } else {
       amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, 'conversation_details', firstUserEntity);
     }
-  }, [firstUserEntity, isActiveParticipant, isGroup, showDetails]);
+  }, [firstUserEntity, isActiveParticipant, isGroup, showDetails, is1to1]);
 
   useEffect(() => {
     // TODO remove the titlebar for now to ensure that buttons are clickable in macOS wrappers
     window.setTimeout(() => document.querySelector('.titlebar')?.remove(), TIME_IN_MILLIS.SECOND);
 
-    window.setTimeout(() => {
-      amplify.subscribe(WebAppEvents.SHORTCUT.PEOPLE, () => showDetails(false));
-      amplify.subscribe(WebAppEvents.SHORTCUT.ADD_PEOPLE, () => {
-        if (isActivatedAccount) {
-          showAddParticipant();
-        }
-      });
-    }, 50);
+    amplify.subscribe(WebAppEvents.SHORTCUT.PEOPLE, () => showDetails(false));
+    amplify.subscribe(WebAppEvents.SHORTCUT.ADD_PEOPLE, () => {
+      if (isActivatedAccount) {
+        showAddParticipant();
+      }
+    });
 
     return () => {
       amplify.unsubscribeAll(WebAppEvents.SHORTCUT.PEOPLE);

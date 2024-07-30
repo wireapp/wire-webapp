@@ -72,10 +72,9 @@ const ConversationListCell = ({
   const {
     isGroup,
     is1to1,
-    selfUser,
     participating_user_ets: users,
     display_name: displayName,
-    removed_from_conversation: removedFromConversation,
+    isSelfUserRemoved,
     unreadState,
     mutedState,
     isRequest,
@@ -83,10 +82,9 @@ const ConversationListCell = ({
   } = useKoSubscribableChildren(conversation, [
     'isGroup',
     'is1to1',
-    'selfUser',
     'participating_user_ets',
     'display_name',
-    'removed_from_conversation',
+    'isSelfUserRemoved',
     'unreadState',
     'mutedState',
     'isRequest',
@@ -180,7 +178,7 @@ const ConversationListCell = ({
 
           <div
             className={cx('conversation-list-cell-left', {
-              'conversation-list-cell-left-opaque': removedFromConversation || users.length === 0,
+              'conversation-list-cell-left-opaque': isSelfUserRemoved || users.length === 0,
             })}
           >
             {isGroup && <GroupAvatar className="conversation-list-cell-avatar-arrow" users={users} />}
@@ -190,13 +188,7 @@ const ConversationListCell = ({
 
           <div className="conversation-list-cell-center">
             {is1to1 ? (
-              <UserInfo
-                className="conversation-list-cell-availability"
-                user={conversation.firstUserEntity()!}
-                theme={isActive}
-                dataUieName="status-availability-item"
-                showAvailability={is1to1 && !!selfUser?.teamId}
-              >
+              <UserInfo user={conversation.firstUserEntity()!} isActive={isActive}>
                 {isConversationWithBlockedUser && <UserBlockedBadge />}
               </UserInfo>
             ) : (
@@ -205,14 +197,16 @@ const ConversationListCell = ({
               </span>
             )}
 
-            <span
-              className={cx('conversation-list-cell-description', {
-                'conversation-list-cell-description--active': isActive,
-              })}
-              data-uie-name="secondary-line"
-            >
-              {cellState.description}
-            </span>
+            {cellState.description && (
+              <span
+                className={cx('conversation-list-cell-description', {
+                  'conversation-list-cell-description--active': isActive,
+                })}
+                data-uie-name="secondary-line"
+              >
+                {cellState.description}
+              </span>
+            )}
           </div>
         </div>
 

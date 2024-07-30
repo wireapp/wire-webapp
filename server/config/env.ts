@@ -131,9 +131,6 @@ export type Env = {
   /** Feature toggle for rendering youtube, vimeo, soundcloud and spotify embeds in the client */
   FEATURE_ENABLE_MEDIA_EMBEDS: string;
 
-  /** Feature toggle for the log in with phone number. Can be set to true or false */
-  FEATURE_ENABLE_PHONE_LOGIN: string;
-
   /** Feature toggle for the log in via Single Sign On. Can be set to true or false */
   FEATURE_ENABLE_SSO: string;
 
@@ -145,6 +142,10 @@ export type Env = {
 
   /** Set a default federation domain in case no domain can be found */
   FEATURE_FEDERATION_DOMAIN: string;
+
+  // TODO: remove this when all clients have enabled this feature
+  /** Enable guest link passwords if the feature is enabled on the backend */
+  FEATURE_ENABLE_LINK_PASSWORDS: string;
 
   /** Feature toggle for the log in with a username. Can be set to true or false */
   FEATURE_ENABLE_USERNAME_LOGIN: string;
@@ -160,6 +161,9 @@ export type Env = {
 
   /** Feature toggle to automatically mute when accepting incoming conference calls */
   FEATURE_CONFERENCE_AUTO_MUTE: string;
+
+  /** Feature to enable in call reactions */
+  FEATURE_ENABLE_IN_CALL_REACTIONS: string;
 
   /** Sets the verification ID for Google webmasters */
   GOOGLE_WEBMASTER_ID: string;
@@ -227,6 +231,8 @@ export type Env = {
   /** Sets Support URLs to specific pages */
   URL_SUPPORT_INDEX: string;
 
+  URL_SUPPORT_FOLDERS: string;
+
   URL_SUPPORT_BUG_REPORT: string;
 
   URL_SUPPORT_CALLING: string;
@@ -254,6 +260,8 @@ export type Env = {
   URL_SUPPORT_SCREEN_ACCESS_DENIED: string;
 
   URL_SUPPORT_SYSTEM_KEYCHAIN_ACCESS: string;
+
+  URL_SUPPORT_FAVORITES: string;
 
   URL_LEARN_MORE_ABOUT_GUEST_LINKS: string;
 

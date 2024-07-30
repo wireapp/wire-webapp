@@ -58,6 +58,7 @@ import {getLogger, Logger} from 'Util/Logger';
 import {roundLogarithmic} from 'Util/NumberUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {createUuid} from 'Util/uuid';
 
 import {Call, SerializedConversationId} from './Call';
 import {callingSubscriptions} from './callingSubscriptionsHandler';
@@ -143,6 +144,9 @@ export class CallingRepository {
   private wUser: number = 0;
   private nextMuteState: MuteState = MuteState.SELF_MUTED;
   private isConferenceCallingSupported = false;
+
+  static EMOJI_TIME_OUT_DURATION = TIME_IN_MILLIS.SECOND * 4;
+
   /**
    * Keeps track of the size of the avs log once the webapp is initiated. This allows detecting meaningless avs logs (logs that have a length equal to the length when the webapp was initiated)
    */
@@ -723,6 +727,42 @@ export class CallingRepository {
         return this.processCallingMessage(conversation, event);
       }
 
+      case CALL_MESSAGE_TYPE.EMOJIS: {
+        const call = this.findCall(conversationId);
+        if (!call || !this.selfUser) {
+          return;
+        }
+
+        const senderParticipant = call
+          .participants()
+          .find(participant => matchQualifiedIds(participant.user.qualifiedId, userId));
+
+        const emojis: string[] = Object.entries(content.emojis).flatMap(([key, value]) => Array(value).fill(key));
+
+        const isSelf = matchQualifiedIds(this.selfUser.qualifiedId, userId);
+
+        const newEmojis = emojis.map(emoji => {
+          const id = createUuid();
+
+          return {
+            id: `${Date.now()}-${id}`,
+            emoji,
+            left: Math.random() * 500,
+            from: isSelf ? t('conversationYouAccusative') : senderParticipant?.user.name() ?? '',
+          };
+        });
+
+        this.callState.emojis([...this.callState.emojis(), ...newEmojis]);
+
+        setTimeout(() => {
+          const remainingEmojis = this.callState
+            .emojis()
+            .filter(item => !newEmojis.some(newItem => newItem.id === item.id));
+          this.callState.emojis(remainingEmojis);
+        }, CallingRepository.EMOJI_TIME_OUT_DURATION);
+        break;
+      }
+
       case CALL_MESSAGE_TYPE.REMOTE_KICK: {
         this.leaveCall(conversationId, LEAVE_CALL_REASON.REMOTE_KICK);
         return this.processCallingMessage(conversation, event);
@@ -1152,7 +1192,16 @@ export class CallingRepository {
   };
 
   private getMediaStream({audio = false, camera = false, screen = false}: MediaStreamQuery, isGroup: boolean) {
-    return this.mediaStreamHandler.requestMediaStream(audio, camera, screen, isGroup);
+    return this.mediaStreamHandler.requestMediaStream(audio, camera, screen, isGroup).then(stream => {
+      return this.mediaDevicesHandler
+        .initializeMediaDevices(camera)
+        .then(() => {
+          return stream;
+        })
+        .catch(() => {
+          return stream;
+        });
+    });
   }
 
   private handleMediaStreamError(call: Call, requestedStreams: MediaStreamQuery, error: Error | unknown): void {
@@ -1238,9 +1287,9 @@ export class CallingRepository {
     const {conversation} = call;
 
     if (mediaType === MediaType.AUDIO) {
-      const audioTracks = mediaStream.getAudioTracks().map(track => track.clone());
+      const audioTracks: MediaStreamTrack[] = mediaStream.getAudioTracks();
       if (audioTracks.length > 0) {
-        selfParticipant.setAudioStream(new MediaStream(audioTracks), true);
+        selfParticipant.setAudioStream(new MediaStream([audioTracks[0]]), true);
         this.wCall?.replaceTrack(this.serializeQualifiedId(conversation.qualifiedId), audioTracks[0]);
       }
     }
@@ -1252,10 +1301,10 @@ export class CallingRepository {
         this.wCall?.replaceTrack(this.serializeQualifiedId(conversation.qualifiedId), videoTracks[0]);
         // Remove the previous video stream
         if (updateSelfParticipant) {
-          selfParticipant.setVideoStream(mediaStream, true);
+          selfParticipant.setVideoStream(new MediaStream([videoTracks[0]]), true);
         }
-        return mediaStream;
       }
+      return mediaStream;
     }
   }
 
@@ -1378,9 +1427,13 @@ export class CallingRepository {
     }, {} as QualifiedUserClients);
   };
 
+  readonly sendInCallEmoji = async (emojis: string, call: Call) => {
+    void this.messageRepository.sendInCallEmoji(call.conversation, {[emojis]: 1});
+  };
+
   readonly sendModeratorMute = (conversationId: QualifiedId, participants: Participant[]) => {
     const recipients = this.convertParticipantsToCallingMessageRecepients(participants);
-    this.sendCallingMessage(
+    void this.sendCallingMessage(
       conversationId,
       {type: CALL_MESSAGE_TYPE.REMOTE_MUTE, data: {targets: recipients}},
       {nativePush: true, recipients},
@@ -1389,7 +1442,7 @@ export class CallingRepository {
 
   readonly sendModeratorKick = (conversationId: QualifiedId, participants: Participant[]) => {
     const recipients = this.convertParticipantsToCallingMessageRecepients(participants);
-    this.sendCallingMessage(conversationId, {type: CALL_MESSAGE_TYPE.REMOTE_KICK}, {nativePush: true, recipients});
+    void this.sendCallingMessage(conversationId, {type: CALL_MESSAGE_TYPE.REMOTE_KICK}, {nativePush: true, recipients});
   };
 
   private readonly sendSFTRequest = (
@@ -1508,6 +1561,10 @@ export class CallingRepository {
     call.removeAllAudio();
     selfParticipant.videoState(VIDEO_STATE.STOPPED);
     call.reason(reason);
+  };
+
+  hasActiveCall = (): boolean => {
+    return !!this.callState.joinedCall();
   };
 
   /*
