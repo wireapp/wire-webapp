@@ -97,7 +97,7 @@ describe('getTabConversations', () => {
     expect(filteredConversations[0].display_name()).toEqual('Tim');
   });
 
-  it('should skip conversation dispaly names with umlaut characters', () => {
+  it('should ignore special characters when filtering conversations', () => {
     const {conversations: filteredConversations} = runTest(SidebarTabs.RECENT, 'web team');
 
     expect(filteredConversations[0].display_name()).toEqual('Wêb Têam');
