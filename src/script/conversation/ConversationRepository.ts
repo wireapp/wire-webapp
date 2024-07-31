@@ -1443,6 +1443,8 @@ export class ConversationRepository {
   }) => {
     const {key, code, domain} = event.detail;
 
+    const resolvedDomain = domain ?? this.userState.self()?.domain ?? 'wire.com';
+
     const showNoConversationModal = () => {
       const titleText = t('modalConversationJoinNotFoundHeadline');
       const messageText = t('modalConversationJoinNotFoundMessage');
@@ -1461,7 +1463,7 @@ export class ConversationRepository {
         has_password: hasPassword,
       } = await this.conversationService.getConversationJoin(key, code);
       const knownConversation = this.conversationState.findConversation({
-        domain: domain ?? this.userState.self()?.domain ?? 'wire.com',
+        domain: resolvedDomain,
         id: conversationId,
       });
       if (knownConversation?.status() === ConversationStatus.CURRENT_MEMBER) {
@@ -1475,7 +1477,7 @@ export class ConversationRepository {
             try {
               const response = await this.conversationService.postConversationJoin(key, code, password);
               const conversationEntity = await this.getConversationById({
-                domain: domain ?? this.userState.self()?.domain ?? 'wire.com',
+                domain: resolvedDomain,
                 id: conversationId,
               });
               if (response) {
