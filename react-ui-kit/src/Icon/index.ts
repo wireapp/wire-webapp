@@ -37,6 +37,7 @@ export * from './DownloadIcon';
 export * from './EditDocumentIcon';
 export * from './EditIcon';
 export * from './EnterIcon';
+export * from './EmojiIcon';
 export * from './ErrorIcon';
 export * from './ExternalLinkIcon';
 export * from './FileIcon';
