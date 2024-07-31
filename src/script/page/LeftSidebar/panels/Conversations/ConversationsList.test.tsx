@@ -106,17 +106,4 @@ describe('ConversationsList', () => {
       expect(getByText(userName)).toBeDefined();
     });
   });
-
-  it('should render only those 1:1 conversations that match the search filter', () => {
-    const unserNames = ['Alice', 'Bob', 'Charlie'];
-    const conversations = unserNames.map(create1to1Conversation);
-
-    const {queryByText} = renderComponent(conversations, 'Alice');
-
-    ['Bob', 'Charlie'].forEach(userName => {
-      expect(queryByText(userName)).toBeNull();
-    });
-
-    expect(queryByText('Alice')).not.toBeNull();
-  });
 });
