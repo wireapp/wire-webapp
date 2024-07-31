@@ -72,7 +72,7 @@ export class AssetRepository {
     return this.core.service!.asset;
   }
 
-  async getObjectUrl(asset: AssetRemoteData): Promise<string | undefined> {
+  async getObjectUrl(asset: AssetRemoteData): Promise<string> {
     const objectUrl = getAssetUrl(asset.identifier);
     if (objectUrl) {
       return objectUrl;

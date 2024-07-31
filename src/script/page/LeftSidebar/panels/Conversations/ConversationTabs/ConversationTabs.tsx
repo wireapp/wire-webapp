@@ -17,13 +17,15 @@
  *
  */
 
-import {GroupIcon, InfoIcon, MessageIcon, StarIcon, ExternalLinkIcon} from '@wireapp/react-ui-kit';
+import {GroupIcon, InfoIcon, MessageIcon, StarIcon, ExternalLinkIcon, Tooltip} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {ConversationFolderTab} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTab/ConversationFolderTab';
 import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
-import {t} from 'Util/LocalizerUtil';
+import {replaceLink, t} from 'Util/LocalizerUtil';
+
+import {footerDisclaimer, footerDisclaimerEllipsis} from './ConversationTabs.styles';
 
 import {Config} from '../../../../../Config';
 import {Conversation} from '../../../../../entity/Conversation';
@@ -115,6 +117,8 @@ export const ConversationTabs = ({
     },
   ];
 
+  const replaceWireLink = replaceLink('https://app.wire.com', '', '');
+
   return (
     <>
       <div
@@ -173,6 +177,31 @@ export const ConversationTabs = ({
         aria-owns="tab-1 tab-2"
         className="conversations-sidebar-list-footer"
       >
+        <div css={footerDisclaimer}>
+          <Tooltip
+            body={
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: t(
+                    'conversationInternalEnvironmentDisclaimer',
+                    {url: 'https://app.wire.com'},
+                    replaceWireLink,
+                  ),
+                }}
+              />
+            }
+          >
+            <Icon.InfoIcon css={{fill: 'var(--amber-500)'}} />
+          </Tooltip>
+
+          <div
+            css={footerDisclaimerEllipsis}
+            dangerouslySetInnerHTML={{
+              __html: t('conversationInternalEnvironmentDisclaimer', {url: 'https://app.wire.com'}, replaceWireLink),
+            }}
+          />
+        </div>
+
         <ConversationTab
           title={t('preferencesHeadline', Shortcut.getShortcutTooltip(ShortcutType.START))}
           label={t('preferencesHeadline')}
