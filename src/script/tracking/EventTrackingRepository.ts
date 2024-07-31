@@ -42,9 +42,10 @@ import {ClientEvent} from '../event/Client';
 import {TeamState} from '../team/TeamState';
 
 export function isCountlyEnabled(): boolean {
-  const allowedBackendUrls = Config.getConfig()
-    .COUNTLY_ALLOWED_BACKEND.split(',')
-    .map(url => url.trim());
+  const allowedBackendUrls =
+    Config.getConfig()
+      .COUNTLY_ALLOWED_BACKEND?.split(',')
+      .map(url => url.trim()) || [];
 
   return (
     !!Config.getConfig().COUNTLY_API_KEY &&
