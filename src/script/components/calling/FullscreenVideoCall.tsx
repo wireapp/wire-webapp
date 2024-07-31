@@ -25,7 +25,7 @@ import classNames from 'classnames';
 import {container} from 'tsyringe';
 
 import {CALL_TYPE} from '@wireapp/avs';
-import {GridIcon, IconButton, IconButtonVariant, Select} from '@wireapp/react-ui-kit';
+import {EmojiIcon, GridIcon, IconButton, IconButtonVariant, Select} from '@wireapp/react-ui-kit';
 
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import * as Icon from 'Components/Icon';
@@ -750,7 +750,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                         aria-labelledby="show-emoji-bar"
                         data-uie-name="do-call-controls-video-call-cancel"
                       >
-                        <Icon.LikeIcon />
+                        <EmojiIcon />
                         <span id="show-emoji-bar" className="video-controls__button__label">
                           {t('callReactions')}
                         </span>
