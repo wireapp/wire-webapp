@@ -93,7 +93,9 @@ export class MediaConstraintsHandler {
         },
         VIDEO: {
           [VIDEO_QUALITY_MODE.FULL_HD]: {
-            frameRate: 30,
+            frameRate: 15,
+            height: 1080,
+            width: 1920,
           },
           [VIDEO_QUALITY_MODE.GROUP]: {
             frameRate: 15,
@@ -102,6 +104,8 @@ export class MediaConstraintsHandler {
           },
           [VIDEO_QUALITY_MODE.HD]: {
             frameRate: 15,
+            height: 720,
+            width: 1280,
           },
           [VIDEO_QUALITY_MODE.MOBILE]: {
             frameRate: 15,
