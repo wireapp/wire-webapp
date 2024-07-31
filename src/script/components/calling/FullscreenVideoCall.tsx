@@ -471,32 +471,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
 
         {!isChoosingScreen && (
           <div id="video-controls" className="video-controls">
-            {showEmojisBar && (
-              <div
-                role="toolbar"
-                className="video-controls-emoji-bar"
-                data-uie-name="video-controls-emoji-bar"
-                aria-label={t('callReactionButtonsAriaLabel')}
-              >
-                {EMOJIS_LIST.map(emoji => {
-                  const isDisabled = disabledEmojis.includes(emoji);
-                  return (
-                    <button
-                      aria-label={t('callReactionButtonAriaLabel', {emoji})}
-                      data-uie-name="video-controls-emoji"
-                      data-uie-value={emoji}
-                      key={emoji}
-                      disabled={isDisabled}
-                      onClick={() => onEmojiClick(emoji)}
-                      className={classNames({disabled: isDisabled})}
-                    >
-                      {emoji}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-
             {emojis.map(({id, emoji, left, from}) => (
               <div
                 key={id}
@@ -680,24 +654,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   </button>
                 </li>
 
-                {Config.getConfig().FEATURE.ENABLE_IN_CALL_REACTIONS && (
-                  <li className="video-controls__item">
-                    <button
-                      css={showEmojisBar ? videoControlActiveStyles : videoControlInActiveStyles}
-                      className="video-controls__button"
-                      onClick={() => setShowEmojisBar(prev => !prev)}
-                      type="button"
-                      aria-labelledby="show-emoji-bar"
-                      data-uie-name="do-call-controls-video-call-cancel"
-                    >
-                      <Icon.LikeIcon />
-                      <span id="show-emoji-bar" className="video-controls__button__label">
-                        {t('callReactions')}
-                      </span>
-                    </button>
-                  </li>
-                )}
-
                 <li className="video-controls__item">
                   <button
                     className="video-controls__button video-controls__button--red"
@@ -756,6 +712,48 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                           menuCSS={{right: 0, bottom: 10}}
                         />
                         <GridIcon width={16} height={16} />
+                      </button>
+                    </li>
+                  )}
+                  {Config.getConfig().FEATURE.ENABLE_IN_CALL_REACTIONS && (
+                    <li className="video-controls__item">
+                      {showEmojisBar && (
+                        <div
+                          role="toolbar"
+                          className="video-controls-emoji-bar"
+                          data-uie-name="video-controls-emoji-bar"
+                          aria-label={t('callReactionButtonsAriaLabel')}
+                        >
+                          {EMOJIS_LIST.map(emoji => {
+                            const isDisabled = disabledEmojis.includes(emoji);
+                            return (
+                              <button
+                                aria-label={t('callReactionButtonAriaLabel', {emoji})}
+                                data-uie-name="video-controls-emoji"
+                                data-uie-value={emoji}
+                                key={emoji}
+                                disabled={isDisabled}
+                                onClick={() => onEmojiClick(emoji)}
+                                className={classNames({disabled: isDisabled})}
+                              >
+                                {emoji}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+                      <button
+                        css={showEmojisBar ? videoControlActiveStyles : videoControlInActiveStyles}
+                        className="video-controls__button video-controls__button--small"
+                        onClick={() => setShowEmojisBar(prev => !prev)}
+                        type="button"
+                        aria-labelledby="show-emoji-bar"
+                        data-uie-name="do-call-controls-video-call-cancel"
+                      >
+                        <Icon.LikeIcon />
+                        <span id="show-emoji-bar" className="video-controls__button__label">
+                          {t('callReactions')}
+                        </span>
                       </button>
                     </li>
                   )}

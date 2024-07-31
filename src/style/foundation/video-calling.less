@@ -137,13 +137,29 @@
 
   .video-controls-emoji-bar {
     position: absolute;
-    top: -50px;
+    bottom: 120%;
     left: 50%;
-    display: flex;
+    display: grid;
+    padding: 0.4rem;
     border-radius: 1rem;
-    background-color: rgba(255, 255, 255, 0.7);
-    gap: 1rem;
+    background-color: #fff;
+    box-shadow: 0px 7px 15px 0 #0000004d;
+    gap: 0.5rem;
+    grid-template-columns: repeat(3, 1fr);
     transform: translateX(-50%);
+
+    &::after {
+      position: absolute;
+      bottom: -0.5rem;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-top: 0.5rem solid #fff;
+      border-right: 0.5rem solid transparent;
+      border-left: 0.5rem solid transparent;
+      content: '';
+      transform: translateX(-50%);
+    }
 
     button {
       .button-reset-default;
