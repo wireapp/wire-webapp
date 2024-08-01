@@ -133,7 +133,7 @@ describe('NotificationRepository', () => {
     document.hasFocus = () => false;
     notificationRepository.updatePermissionState(PermissionStatusState.GRANTED);
     spyOn(Runtime, 'isSupportingNotifications').and.returnValue(true);
-    spyOn(notificationRepository['assetRepository'], 'generateAssetUrl').and.returnValue(
+    spyOn(notificationRepository['assetRepository'], 'getObjectUrl').and.returnValue(
       Promise.resolve('/image/logo/notification.png'),
     );
 
