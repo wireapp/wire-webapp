@@ -57,7 +57,7 @@ import {GroupVideoGrid} from './GroupVideoGrid';
 import {Pagination} from './Pagination';
 
 import type {Call} from '../../calling/Call';
-import {CallingViewMode, CallState, MuteState} from '../../calling/CallState';
+import {CallState, MuteState} from '../../calling/CallState';
 import {Participant} from '../../calling/Participant';
 import type {Grid} from '../../calling/videoGridHandler';
 import type {Conversation} from '../../entity/Conversation';
@@ -172,7 +172,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
 
   const [audioOptionsOpen, setAudioOptionsOpen] = useState(false);
   const [videoOptionsOpen, setVideoOptionsOpen] = useState(false);
-  const minimize = () => callState.viewMode(CallingViewMode.MINIMIZED);
+  const minimize = () => callState.setViewModeMinimized();
 
   const [isParticipantsListOpen, toggleParticipantsList] = useToggleState(false);
   const [isCallViewOpen, toggleCallView] = useToggleState(false);

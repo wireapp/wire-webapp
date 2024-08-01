@@ -70,10 +70,10 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
 
   useEffect(() => {
     if (currentCallState === CALL_STATE.MEDIA_ESTAB && joinedCall?.initialType === CALL_TYPE.VIDEO) {
-      callState.viewMode(CallingViewMode.DETACHED_WINDOW);
+      void callState.setViewModeDetached();
     }
     if (currentCallState === undefined) {
-      callState.viewMode(CallingViewMode.MINIMIZED);
+      void callState.setViewModeMinimized();
     }
   }, [currentCallState]);
 

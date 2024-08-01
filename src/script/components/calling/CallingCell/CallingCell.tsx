@@ -165,7 +165,7 @@ export const CallingCell = ({
         return;
       }
       if (isSpaceOrEnterKey(event.key)) {
-        callState.viewMode(CallingViewMode.DETACHED_WINDOW);
+        void callState.setViewModeDetached();
       }
     },
     [isOngoing, callState],
@@ -175,7 +175,7 @@ export const CallingCell = ({
     if (!isOngoing) {
       return;
     }
-    callState.viewMode(CallingViewMode.DETACHED_WINDOW);
+    void callState.setViewModeDetached();
   }, [isOngoing, callState]);
 
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
@@ -249,7 +249,11 @@ export const CallingCell = ({
   });
 
   const toggleDetachedWindow = () => {
-    callState.viewMode(isDetachedWindow ? CallingViewMode.MINIMIZED : CallingViewMode.DETACHED_WINDOW);
+    if (isDetachedWindow) {
+      void callState.setViewModeMinimized();
+      return;
+    }
+    void callState.setViewModeDetached();
   };
 
   return (

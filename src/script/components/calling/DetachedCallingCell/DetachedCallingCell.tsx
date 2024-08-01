@@ -49,16 +49,12 @@ export const DetachedCallingCell = ({
 
   const isDetachedWindow = viewMode === CallingViewMode.DETACHED_WINDOW;
 
-  const closeDetachedWindow = () => {
-    callState.viewMode(CallingViewMode.MINIMIZED);
-  };
-
   if (!activeCall || !isDetachedWindow || !selfUser) {
     return null;
   }
 
   return (
-    <DetachedWindow name="WIRE_PICTURE_IN_PICTURE_CALL" width={1026} height={829} onClose={closeDetachedWindow}>
+    <DetachedWindow callState={callState}>
       <CallingContainer
         callingRepository={callingRepository}
         mediaRepository={mediaRepository}

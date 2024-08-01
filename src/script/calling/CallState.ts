@@ -18,12 +18,16 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {amplify} from 'amplify';
 import ko from 'knockout';
 import {singleton} from 'tsyringe';
 
 import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
 import {matchQualifiedIds} from 'Util/QualifiedId';
+import {copyStyles} from 'Util/renderElement';
 
 import {Call} from './Call';
 
@@ -51,6 +55,27 @@ export enum DesktopScreenShareMenu {
 
 type Emoji = {emoji: string; id: string; left: number; from: string};
 
+declare global {
+  interface Document {
+    readonly pictureInPictureEnabled: boolean;
+    exitPictureInPicture(): Promise<void>;
+  }
+
+  interface DocumentPictureInPicture {
+    window: Window | null;
+    requestWindow(options?: {width?: number; height?: number}): Promise<DocumentPictureInPictureWindow>;
+  }
+
+  interface DocumentPictureInPictureWindow extends Window {
+    resizeTo(width: number, height: number): void;
+    close(): void;
+  }
+
+  interface Window {
+    documentPictureInPicture?: DocumentPictureInPicture;
+  }
+}
+
 @singleton()
 export class CallState {
   public readonly calls: ko.ObservableArray<Call> = ko.observableArray();
@@ -68,6 +93,7 @@ export class CallState {
   readonly hasAvailableScreensToShare: ko.PureComputed<boolean>;
   readonly isSpeakersViewActive: ko.PureComputed<boolean>;
   public readonly viewMode = ko.observable<CallingViewMode>(CallingViewMode.MINIMIZED);
+  public readonly detachedWindow = ko.observable<Window | null>(null);
   public readonly desktopScreenShareMenu = ko.observable<DesktopScreenShareMenu>(DesktopScreenShareMenu.NONE);
 
   constructor() {
@@ -93,5 +119,83 @@ export class CallState {
     this.hasAvailableScreensToShare = ko.pureComputed(
       () => this.selectableScreens().length > 0 || this.selectableWindows().length > 0,
     );
+  }
+
+  onPageHide = (event: PageTransitionEvent) => {
+    if (event.persisted) {
+      return;
+    }
+
+    this.detachedWindow()?.close();
+  };
+
+  handleThemeUpdateEvent = () => {
+    const detachedWindow = this.detachedWindow();
+    if (detachedWindow) {
+      detachedWindow.document.body.className = window.document.body.className;
+    }
+  };
+
+  closeDetachedWindow = () => {
+    amplify.unsubscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, this.handleThemeUpdateEvent);
+    this.viewMode(CallingViewMode.MINIMIZED);
+  };
+
+  setViewModeMinimized = () => {
+    this.closeDetachedWindow();
+    this.detachedWindow()?.close();
+  };
+
+  async setViewModeDetached(
+    detachedViewModeOptions: {name: string; height: number; width: number} = {
+      name: 'WIRE_PICTURE_IN_PICTURE_CALL',
+      width: 1026,
+      height: 829,
+    },
+  ) {
+    const {name, width, height} = detachedViewModeOptions;
+    if ('documentPictureInPicture' in window && window.documentPictureInPicture) {
+      const detachedWindow = await window.documentPictureInPicture.requestWindow({height, width});
+
+      this.detachedWindow(detachedWindow);
+    } else {
+      const {top, left} = calculateChildWindowPosition(height, width);
+
+      const detachedWindow = window.open(
+        '',
+        name,
+        `
+        width=${width}
+        height=${height},
+        top=${top},
+        left=${left}
+        location=no,
+        menubar=no,
+        resizable=no,
+        status=no,
+        toolbar=no,
+      `,
+      );
+
+      this.detachedWindow(detachedWindow);
+    }
+
+    const detachedWindow = this.detachedWindow();
+    if (!detachedWindow) {
+      return;
+    }
+
+    // New window is not opened on the same domain (it's about:blank), so we cannot use any of the dom loaded events to copy the styles.
+    setTimeout(() => copyStyles(window.document, detachedWindow.document), 0);
+
+    detachedWindow.document.title = window.document.title;
+
+    detachedWindow.addEventListener('beforeunload', this.closeDetachedWindow);
+    detachedWindow.addEventListener('pagehide', this.closeDetachedWindow);
+    window.addEventListener('pagehide', this.onPageHide);
+
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, this.handleThemeUpdateEvent);
+
+    this.viewMode(CallingViewMode.DETACHED_WINDOW);
   }
 }
