@@ -23,6 +23,7 @@ import * as Icon from 'Components/Icon';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {ConversationFolderTab} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTab/ConversationFolderTab';
 import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
+import {isDataDogEnabled} from 'Util/DataDog';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 
 import {footerDisclaimer, footerDisclaimerEllipsis} from './ConversationTabs.styles';
@@ -177,30 +178,32 @@ export const ConversationTabs = ({
         aria-owns="tab-1 tab-2"
         className="conversations-sidebar-list-footer"
       >
-        <div css={footerDisclaimer}>
-          <Tooltip
-            body={
-              <div
-                dangerouslySetInnerHTML={{
-                  __html: t(
-                    'conversationInternalEnvironmentDisclaimer',
-                    {url: 'https://app.wire.com'},
-                    replaceWireLink,
-                  ),
-                }}
-              />
-            }
-          >
-            <Icon.InfoIcon css={{fill: 'var(--amber-500)'}} />
-          </Tooltip>
+        {isDataDogEnabled() && (
+          <div css={footerDisclaimer}>
+            <Tooltip
+              body={
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: t(
+                      'conversationInternalEnvironmentDisclaimer',
+                      {url: 'https://app.wire.com'},
+                      replaceWireLink,
+                    ),
+                  }}
+                />
+              }
+            >
+              <Icon.InfoIcon css={{fill: 'var(--amber-500)'}} />
+            </Tooltip>
 
-          <div
-            css={footerDisclaimerEllipsis}
-            dangerouslySetInnerHTML={{
-              __html: t('conversationInternalEnvironmentDisclaimer', {url: 'https://app.wire.com'}, replaceWireLink),
-            }}
-          />
-        </div>
+            <div
+              css={footerDisclaimerEllipsis}
+              dangerouslySetInnerHTML={{
+                __html: t('conversationInternalEnvironmentDisclaimer', {url: 'https://app.wire.com'}, replaceWireLink),
+              }}
+            />
+          </div>
+        )}
 
         <ConversationTab
           title={t('preferencesHeadline', Shortcut.getShortcutTooltip(ShortcutType.START))}
