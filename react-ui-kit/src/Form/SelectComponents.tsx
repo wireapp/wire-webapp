@@ -46,7 +46,7 @@ export const SelectContainer = (props: ContainerProps) => {
 };
 
 export const isGroup = (options: OptionsOrGroups<Option, GroupBase<Option>>): options is GroupBase<Option>[] => {
-  return options.length > 0 && 'options' in options[0];
+  return options?.length > 0 && 'options' in options[0];
 };
 
 export const DropdownIndicator = (props: DropdownIndicatorProps) => {

@@ -15,11 +15,14 @@ exports[`<Tooltip /> renders correctly 1`] = `
         class="emotion-0"
       >
         <div
-          body="[object Object]"
           data-testid="tooltip-wrapper"
           role="presentation"
         >
-          Hover Me
+          <div
+            id="childrenElement"
+          >
+            Hover Me
+          </div>
         </div>
       </div>
     </div>
@@ -35,11 +38,14 @@ exports[`<Tooltip /> renders correctly 1`] = `
       class="emotion-0"
     >
       <div
-        body="[object Object]"
         data-testid="tooltip-wrapper"
         role="presentation"
       >
-        Hover Me
+        <div
+          id="childrenElement"
+        >
+          Hover Me
+        </div>
       </div>
     </div>
   </div>,

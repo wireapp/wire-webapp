@@ -71,38 +71,11 @@ const tooltipStyle: (theme: Theme) => CSSObject = theme => ({
   },
 });
 
-interface PortalProps {
-  children: ReactNode;
-  bounding?: DOMRect;
-  selector?: string;
+interface TooltipArrowProps {
+  wrapperRect: DOMRect;
 }
 
-const PortalComponent = ({children, bounding, selector = '#wire-app'}: PortalProps) => {
-  const [isTouchingTop, setIsTouchingTop] = useState(false);
-  const targetElement = document.querySelector(selector);
-
-  if (!targetElement) {
-    return null;
-  }
-
-  const tooltipRef = (element: HTMLDivElement) => {
-    if (!bounding || !element) {
-      return;
-    }
-
-    const isTouchingTopEdge = bounding.y <= element.clientHeight + paddingDistance * 2;
-    setIsTouchingTop(isTouchingTopEdge);
-
-    const elementWidth = (element.scrollWidth - bounding.width) / 2;
-    element.style.left = `${bounding.x - elementWidth}px`;
-
-    if (isTouchingTopEdge) {
-      element.style.top = `${bounding.y + bounding.height}px`;
-    } else {
-      element.style.top = `${bounding.y - element.clientHeight}px`;
-    }
-  };
-
+const TooltipArrow = ({wrapperRect}: TooltipArrowProps) => {
   const tooltipArrowRef = (element: HTMLDivElement) => {
     if (!element) {
       return;
@@ -114,8 +87,65 @@ const PortalComponent = ({children, bounding, selector = '#wire-app'}: PortalPro
       return;
     }
 
-    const parentElementRect = parentElement.getBoundingClientRect();
-    element.style.left = `${parentElementRect.width / 2 - paddingDistance}px`;
+    const tooltipRect = parentElement.getBoundingClientRect();
+
+    const isTouchingLeftEdge = wrapperRect.x <= tooltipRect.width / 2 + paddingDistance * 2;
+    const isTouchingRightEdge = wrapperRect.left + tooltipRect.width / 2 + paddingDistance * 2 >= window.innerWidth;
+
+    if (isTouchingLeftEdge) {
+      element.style.left = `${wrapperRect.left - paddingDistance}px`;
+    } else if (isTouchingRightEdge) {
+      const calculateX = window.innerWidth - wrapperRect.right - paddingDistance;
+      element.style.right = `${calculateX}px`;
+    } else {
+      element.style.left = `50%`;
+      element.style.transform = `translateX(-50%)`;
+    }
+  };
+
+  return <div ref={tooltipArrowRef} className="tooltip-arrow" />;
+};
+
+interface PortalProps {
+  children: ReactNode;
+  wrapperRect?: DOMRect;
+  selector?: string;
+}
+
+const PortalComponent = ({children, wrapperRect, selector = '#wire-app'}: PortalProps) => {
+  const [isTouchingTop, setIsTouchingTop] = useState(false);
+  const targetElement = document.querySelector(selector);
+
+  if (!targetElement || !wrapperRect) {
+    return null;
+  }
+
+  const tooltipRef = (element: HTMLDivElement) => {
+    if (!element) {
+      return;
+    }
+
+    const tooltipRect = element.getBoundingClientRect();
+    const isTouchingTopEdge = wrapperRect.y <= tooltipRect.height + paddingDistance * 2;
+    setIsTouchingTop(isTouchingTopEdge);
+
+    const isTouchingLeftEdge = wrapperRect.x <= tooltipRect.width / 2 + paddingDistance * 2;
+    const isTouchingRightEdge = wrapperRect.left + tooltipRect.width / 2 + paddingDistance * 2 >= window.innerWidth;
+
+    if (isTouchingLeftEdge) {
+      element.style.left = `${paddingDistance}px`;
+    } else if (isTouchingRightEdge) {
+      element.style.right = `${paddingDistance}px`;
+    } else {
+      const elementWidth = (element.scrollWidth - wrapperRect.width) / 2;
+      element.style.left = `${wrapperRect.x - elementWidth}px`;
+    }
+
+    if (isTouchingTopEdge) {
+      element.style.top = `${wrapperRect.y + wrapperRect.height}px`;
+    } else {
+      element.style.top = `${wrapperRect.y - element.clientHeight}px`;
+    }
   };
 
   return createPortal(
@@ -125,7 +155,7 @@ const PortalComponent = ({children, bounding, selector = '#wire-app'}: PortalPro
       css={(theme: Theme) => tooltipStyle(theme)}
       data-position={isTouchingTop ? 'bottom' : 'top'}
     >
-      <div ref={tooltipArrowRef} className="tooltip-arrow" />
+      <TooltipArrow wrapperRect={wrapperRect} />
 
       <div className="tooltip-content" data-testid="tooltip-content">
         {children}
@@ -140,18 +170,19 @@ interface TooltipProps<T = HTMLDivElement> extends HTMLProps<T> {
   selector?: string;
 }
 
-const filterTooltipProps = (props: TooltipProps) => filterProps(props, ['body']);
+const filterTooltipProps = (props: TooltipProps) => filterProps(props, ['body', 'selector']);
 
 export const Tooltip = ({children, ...props}: TooltipProps) => {
   const [isHovered, setIsHovered] = useState(false);
-  const boundingRectRef = useRef<DOMRect>();
+  const wrapperRectRef = useRef<DOMRect>();
+
   const filteredProps = filterTooltipProps(props);
   const {body, selector = '#wire-app'} = props;
 
-  const onElementEnter = (event: MouseEvent | FocusEvent) => {
-    const boundingRect = event.currentTarget.getBoundingClientRect();
+  const onElementEnter = ({currentTarget}: MouseEvent | FocusEvent) => {
+    const wrapperRect = currentTarget.getBoundingClientRect();
     setIsHovered(true);
-    boundingRectRef.current = boundingRect;
+    wrapperRectRef.current = wrapperRect;
   };
 
   const onElementLeave = () => setIsHovered(false);
@@ -159,17 +190,18 @@ export const Tooltip = ({children, ...props}: TooltipProps) => {
   return (
     <div
       role="presentation"
-      {...filteredProps}
       data-testid="tooltip-wrapper"
       onMouseEnter={onElementEnter}
       onMouseLeave={onElementLeave}
       onFocus={onElementEnter}
       onBlur={onElementLeave}
-      {...props}
+      style={{width: 'max-content'}}
+      {...filteredProps}
     >
-      {children}
+      <div id="childrenElement">{children}</div>
+
       {isHovered && (
-        <PortalComponent bounding={boundingRectRef.current} selector={selector}>
+        <PortalComponent wrapperRect={wrapperRectRef.current} selector={selector}>
           {body}
         </PortalComponent>
       )}
