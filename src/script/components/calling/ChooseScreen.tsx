@@ -22,13 +22,9 @@ import {Fragment, useCallback, useEffect} from 'react';
 import {container} from 'tsyringe';
 
 import {CallState} from 'src/script/calling/CallState';
+import {ElectronDesktopCapturerSource} from 'src/script/media/MediaDevicesHandler';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
-
-export interface Screen {
-  id: string;
-  thumbnail?: HTMLCanvasElement;
-}
 
 export interface ChooseScreenProps {
   choose: (screenId: string) => void;
@@ -59,7 +55,7 @@ function ChooseScreen({choose, callState = container.resolve(CallState)}: Choose
     };
   }, [cancel]);
 
-  const renderPreviews = (list: Screen[], uieName: string) =>
+  const renderPreviews = (list: ElectronDesktopCapturerSource[], uieName: string) =>
     list.map(({id, thumbnail}) => (
       <button
         type="button"
@@ -68,7 +64,7 @@ function ChooseScreen({choose, callState = container.resolve(CallState)}: Choose
         data-uie-name={uieName}
         onClick={() => choose(id)}
       >
-        <img className="choose-screen-list-image" src={thumbnail?.toDataURL()} role="presentation" alt="" />
+        <img className="choose-screen-list-image" src={thumbnail.toDataURL()} role="presentation" alt="" />
       </button>
     ));
 
