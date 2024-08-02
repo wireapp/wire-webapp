@@ -258,6 +258,8 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     switchSpeakerOutput(speaker.id);
   };
 
+  const isBlurredBackgroundEnabled = Boolean(Config.getConfig().FEATURE.ENABLE_BLUR_BACKGROUND);
+
   const blurredBackgroundOptions = {
     label: t('videoCallbackgroundBlurHeadline'),
     options: [
@@ -277,6 +279,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
       },
     ],
   };
+
   const videoOptions = [
     {
       label: t('videoCallvideoInputCamera'),
@@ -296,7 +299,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
             };
       }),
     },
-    blurredBackgroundOptions,
+    ...(isBlurredBackgroundEnabled ? [blurredBackgroundOptions] : []),
   ];
 
   const selectedVideoOptions = [currentCameraDevice, hasBlurredBackground]

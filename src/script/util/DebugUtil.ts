@@ -199,6 +199,10 @@ export class DebugUtil {
     );
   }
 
+  enableCameraBlur(flag: boolean) {
+    return this.callingRepository.switchVideoBackgroundBlur(flag);
+  }
+
   reconnectWebSocket({dryRun} = {dryRun: false}) {
     return this.eventRepository.connectWebSocket(this.core, () => {}, dryRun);
   }
