@@ -17,7 +17,7 @@
  *
  */
 
-import React, {Fragment, useCallback, useEffect} from 'react';
+import {Fragment, useCallback, useEffect} from 'react';
 
 import {container} from 'tsyringe';
 
@@ -35,10 +35,7 @@ export interface ChooseScreenProps {
   callState?: CallState;
 }
 
-const ChooseScreen: React.FC<ChooseScreenProps> = ({
-  choose,
-  callState = container.resolve(CallState),
-}: ChooseScreenProps) => {
+function ChooseScreen({choose, callState = container.resolve(CallState)}: ChooseScreenProps) {
   const {selectableScreens, selectableWindows} = useKoSubscribableChildren(callState, [
     'selectableScreens',
     'selectableWindows',
@@ -95,6 +92,6 @@ const ChooseScreen: React.FC<ChooseScreenProps> = ({
       </div>
     </div>
   );
-};
+}
 
 export {ChooseScreen};
