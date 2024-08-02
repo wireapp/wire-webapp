@@ -818,7 +818,7 @@ export class NotificationRepository {
     const {contentState} = useAppState.getState();
     const inConversationView = contentState === ContentState.CONVERSATION;
     const inMaximizedCall =
-      !!this.callState.joinedCall() && this.callState.viewMode() === CallingViewMode.FULL_SCREEN_GRID;
+      !!this.callState.joinedCall() && this.callState.viewMode() === CallingViewMode.DETACHED_WINDOW;
 
     const activeConversation = document.hasFocus() && inConversationView && inActiveConversation && !inMaximizedCall;
     const messageFromSelf = messageEntity.user().isMe;
@@ -863,7 +863,7 @@ export class NotificationRepository {
     notification.onclick = () => {
       amplify.publish(WebAppEvents.NOTIFICATION.CLICK);
       window.focus();
-      this.callState.viewMode(CallingViewMode.MINIMIZED);
+      void this.callState.setViewModeMinimized();
       notificationContent.trigger();
 
       this.logger.info(`Notification for ${messageInfo} in '${conversationId?.id || conversationId}' closed by click.`);

@@ -17,26 +17,23 @@
  *
  */
 
-import {useEffect, useMemo} from 'react';
-
 import createCache from '@emotion/cache';
 import {CacheProvider} from '@emotion/react';
 import weakMemoize from '@emotion/weak-memoize';
 import {createPortal} from 'react-dom';
+import {container} from 'tsyringe';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
+import {CallState} from 'src/script/calling/CallState';
 import {useActiveWindow} from 'src/script/hooks/useActiveWindow';
-import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import '../../../style/default.less';
 
 interface DetachedWindowProps {
   children: React.ReactNode;
-  width?: number;
-  height?: number;
-  onClose: () => void;
-  name: string;
+  callState?: CallState;
 }
 
 const memoizedCreateCacheWithContainer = weakMemoize((container: HTMLHeadElement) => {
@@ -44,79 +41,21 @@ const memoizedCreateCacheWithContainer = weakMemoize((container: HTMLHeadElement
   return newCache;
 });
 
-export const DetachedWindow = ({children, name, onClose, width = 600, height = 600}: DetachedWindowProps) => {
-  const newWindow = useMemo(() => {
-    const {top, left} = calculateChildWindowPosition(height, width);
+export const DetachedWindow = ({children, callState = container.resolve(CallState)}: DetachedWindowProps) => {
+  const {detachedWindow} = useKoSubscribableChildren(callState, ['detachedWindow']);
 
-    return window.open(
-      '',
-      name,
-      `
-        width=${width}
-        height=${height},
-        top=${top},
-        left=${left}
-        location=no,
-        menubar=no,
-        resizable=no,
-        status=no,
-        toolbar=no,
-      `,
-    );
-  }, [height, name, width]);
+  useActiveWindow(detachedWindow);
 
-  useActiveWindow(newWindow);
+  if (!detachedWindow) {
+    return null;
+  }
 
-  useEffect(() => {
-    if (!newWindow) {
-      return () => {};
-    }
-
-    //New window is not opened on the same domain (it's about:blank), so we cannot use any of the dom loaded events to copy the styles.
-    setTimeout(() => copyStyles(window.document, newWindow.document), 0);
-
-    newWindow.document.title = window.document.title;
-
-    const onPageHide = (event: PageTransitionEvent) => {
-      if (event.persisted) {
-        return;
-      }
-      onClose();
-      newWindow.close();
-    };
-
-    newWindow.addEventListener('beforeunload', onClose);
-    window.addEventListener('pagehide', onPageHide);
-
-    return () => {
-      newWindow.close();
-      newWindow.removeEventListener('beforeunload', onClose);
-      window.removeEventListener('pagehide', onPageHide);
-    };
-  }, [height, name, width, onClose, newWindow]);
-
-  return !newWindow
-    ? null
-    : createPortal(
-        <CacheProvider value={memoizedCreateCacheWithContainer(newWindow.document.head)}>
-          <StyledApp id="detached-window" themeId={THEME_ID.DEFAULT} style={{height: '100%'}}>
-            {children}
-          </StyledApp>
-        </CacheProvider>,
-        newWindow.document.body,
-      );
-};
-
-/**
- *  Copy styles from one document to another - link, style elements and body element class names.
- * @param source the source document object
- * @param target the target document object
- */
-const copyStyles = (source: Document, target: Document) => {
-  source.head.querySelectorAll('link, style').forEach(htmlElement => {
-    target.head.appendChild(htmlElement.cloneNode(true));
-  });
-
-  target.body.className = source.body.className;
-  target.body.style.height = '100%';
+  return createPortal(
+    <CacheProvider value={memoizedCreateCacheWithContainer(detachedWindow.document.head)}>
+      <StyledApp id="detached-window" themeId={THEME_ID.DEFAULT} style={{height: '100%'}}>
+        {children}
+      </StyledApp>
+    </CacheProvider>,
+    detachedWindow.document.body,
+  );
 };

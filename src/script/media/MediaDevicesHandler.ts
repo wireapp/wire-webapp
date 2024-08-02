@@ -69,6 +69,7 @@ export interface ElectronDesktopCapturerSource {
   display_id: string;
   id: string;
   name: string;
+  thumbnail: HTMLCanvasElement;
 }
 
 export class MediaDevicesHandler {

@@ -838,6 +838,7 @@ export class CallingRepository {
   }
 
   async startCall(conversation: Conversation, callType: CALL_TYPE): Promise<void | Call> {
+    void this.callState.setViewModeMinimized();
     if (!this.selfUser || !this.selfClientId) {
       this.logger.warn(
         `Calling repository is not initialized correctly \n ${JSON.stringify({
@@ -977,6 +978,7 @@ export class CallingRepository {
   };
 
   async answerCall(call: Call, callType?: CALL_TYPE): Promise<void> {
+    void this.callState.setViewModeMinimized();
     const {conversation} = call;
     try {
       callType ??= call.getSelfParticipant().sharesCamera() ? call.initialType : CALL_TYPE.NORMAL;
@@ -1489,6 +1491,8 @@ export class CallingRepository {
     if (!call) {
       return;
     }
+
+    void this.callState.setViewModeMinimized();
 
     // There's nothing we need to do for non-mls calls
     if (call.conversationType === CONV_TYPE.CONFERENCE_MLS) {
