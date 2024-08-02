@@ -27,7 +27,7 @@ export const footerDisclaimer: CSSObject = {
 };
 
 export const footerDisclaimerEllipsis: CSSObject = {
-  color: 'var(--gray-70)',
+  color: 'var(--text-input-placeholder)',
   fontSize: '0.75rem',
   fontWeight: '400',
   lineHeight: '14px',
