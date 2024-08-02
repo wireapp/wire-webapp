@@ -17,11 +17,16 @@
  *
  */
 
-import {Configuration} from '../Config';
+import {Config, Configuration} from '../Config';
 
 const uuidRegex = /([a-z\d]{8})-([a-z\d]{4})-([a-z\d]{4})-([a-z\d]{4})-([a-z\d]{12})/gim;
 
 let isDataDogInitialized = false;
+
+export const isDataDogEnabled = () => {
+  const config = Config.getConfig();
+  return !!(config.dataDog?.applicationId && config.dataDog?.clientToken);
+};
 
 export async function initializeDataDog(config: Configuration, user: {id?: string; domain: string}) {
   if (isDataDogInitialized) {

@@ -477,6 +477,7 @@
   "conversationGroupEmptyMessage": "You are not part of any group conversation yet.",
   "conversationGuestIndicator": "අමුත්තා",
   "conversationImageAssetRestricted": "රූප ලැබීම වළක්වා ඇත",
+  "conversationInternalEnvironmentDisclaimer": "This is NOT WIRE but an internal testing environment. Authorized for use by Wire employees only. Any public USE is PROHIBITED. The data of the users of this test environment is extensively recorded and analysed. To use the secure messenger Wire, please visit [link]{{url}}[/link]",
   "conversationJoin.existentAccountJoinInBrowser": "අතිරික්සුවෙන් එක්වන්න",
   "conversationJoin.existentAccountJoinWithoutLink": "සංවාදයට එක්වන්න",
   "conversationJoin.existentAccountUserName": "{selfName} ලෙස ඔබ ඇතුළු වී ඇත",
