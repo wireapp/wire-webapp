@@ -23,6 +23,7 @@ import ko from 'knockout';
 import {singleton} from 'tsyringe';
 
 import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
+import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
@@ -134,13 +135,14 @@ export class CallState {
   };
 
   closeDetachedWindow = () => {
+    this.detachedWindow(null);
     amplify.unsubscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, this.handleThemeUpdateEvent);
     this.viewMode(CallingViewMode.MINIMIZED);
   };
 
   setViewModeMinimized = () => {
-    this.closeDetachedWindow();
     this.detachedWindow()?.close();
+    this.closeDetachedWindow();
   };
 
   async setViewModeDetached(
@@ -150,8 +152,9 @@ export class CallState {
       height: 829,
     },
   ) {
+    const isDesktop = Runtime.isDesktopApp();
     const {name, width, height} = detachedViewModeOptions;
-    if ('documentPictureInPicture' in window && window.documentPictureInPicture) {
+    if ('documentPictureInPicture' in window && window.documentPictureInPicture && !isDesktop) {
       const detachedWindow = await window.documentPictureInPicture.requestWindow({height, width});
 
       this.detachedWindow(detachedWindow);
