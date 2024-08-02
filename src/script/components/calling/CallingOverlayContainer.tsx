@@ -84,6 +84,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
   const {clearShowAlert} = useCallAlertState();
 
   const leave = (call: Call) => {
+    callState.setViewModeMinimized();
     callingRepository.leaveCall(call.conversation.qualifiedId, LEAVE_CALL_REASON.MANUAL_LEAVE_BY_UI_CLICK);
     callState.activeCallViewTab(CallViewTab.ALL);
     call.maximizedParticipant(null);
