@@ -4202,6 +4202,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@remix-run/router@npm:1.19.0":
+  version: 1.19.0
+  resolution: "@remix-run/router@npm:1.19.0"
+  checksum: 10/13a881fc47ca3571dcad298f6f19218c84f09f0dda38695d874a9fb1b496e42b6b37b777169d283cd1f5098a1470fa76c5143c53eb5a4078202bd12ea1541d29
+  languageName: node
+  linkType: hard
+
 "@roamhq/wrtc-darwin-arm64@npm:0.8.0":
   version: 0.8.0
   resolution: "@roamhq/wrtc-darwin-arm64@npm:0.8.0"
@@ -15086,16 +15093,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-router-dom@npm:6.25.1":
-  version: 6.25.1
-  resolution: "react-router-dom@npm:6.25.1"
+"react-router-dom@npm:6.26.0":
+  version: 6.26.0
+  resolution: "react-router-dom@npm:6.26.0"
   dependencies:
-    "@remix-run/router": "npm:1.18.0"
-    react-router: "npm:6.25.1"
+    "@remix-run/router": "npm:1.19.0"
+    react-router: "npm:6.26.0"
   peerDependencies:
     react: ">=16.8"
     react-dom: ">=16.8"
-  checksum: 10/583a0907156f8f0687817e2cd6fa2678284729fc9cf883acb0bc0a4ade1f76fc68dd771258f6b30a2fdc378a5608b973f7ecb1f7fc752295ad4eba8b2f156a82
+  checksum: 10/be433029a0759d5faa2cd2cb28dd3c88106cdb46042c2e804e301aefad3db17aa9021b4e3d533e0fdcde5767ed0e1d296c04fecbc3e41231c3d8be9cc307018a
   languageName: node
   linkType: hard
 
@@ -15107,6 +15114,17 @@ __metadata:
   peerDependencies:
     react: ">=16.8"
   checksum: 10/3bfb9754cff279cabcb247f13e66315d02333dae7e251fa8975d0e5cf68ee61793ad040594d2d490a5c995efc542739e7ef80462a69bd3209f64c69086fc7786
+  languageName: node
+  linkType: hard
+
+"react-router@npm:6.26.0":
+  version: 6.26.0
+  resolution: "react-router@npm:6.26.0"
+  dependencies:
+    "@remix-run/router": "npm:1.19.0"
+  peerDependencies:
+    react: ">=16.8"
+  checksum: 10/d0c79a0f95a88730c0d2bfd098da9d6bdd4d7f08d4e1ddd152b5d013d3c01064afdd6fed57d4d3fa50c42c412e6d00e9217b2abd6cdbf4aaf810b7c33e728400
   languageName: node
   linkType: hard
 
@@ -18081,7 +18099,7 @@ __metadata:
     react-intl: "npm:6.6.8"
     react-redux: "npm:9.1.2"
     react-router: "npm:6.25.1"
-    react-router-dom: "npm:6.25.1"
+    react-router-dom: "npm:6.26.0"
     react-transition-group: "npm:4.4.5"
     redux: "npm:5.0.1"
     redux-logdown: "npm:1.0.4"
