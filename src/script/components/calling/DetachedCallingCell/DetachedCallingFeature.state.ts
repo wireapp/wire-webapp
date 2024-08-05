@@ -21,15 +21,18 @@ import {create} from 'zustand';
 
 import {Runtime} from '@wireapp/commons';
 
+import {Config} from 'src/script/Config';
+
 type DetachedCallingFeatureState = {
-  isEnabled: boolean;
   isSupported: () => boolean;
-  toggle: (shouldEnable: boolean) => void;
 };
 
-//TODO: This is a temporary solution for PoC to enable detached calling cell feature
-export const useDetachedCallingFeatureState = create<DetachedCallingFeatureState>((set, get) => ({
-  isEnabled: false,
-  isSupported: () => !Runtime.isDesktopApp() && get().isEnabled,
-  toggle: shouldOpen => set({isEnabled: shouldOpen}),
+export const useDetachedCallingFeatureState = create<DetachedCallingFeatureState>(() => ({
+  isSupported: () => {
+    if (Runtime.isDesktopApp()) {
+      return Config.getDesktopConfig()?.supportsCallingPopoutWindow === true;
+    }
+
+    return true;
+  },
 }));

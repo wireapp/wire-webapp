@@ -26,10 +26,10 @@ import {container} from 'tsyringe';
 import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {isCountlyEnabled} from 'src/script/tracking/EventTrackingRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import {Config} from '../../../../../Config';
 import {PropertiesRepository} from '../../../../../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../../../../../properties/PropertiesType';
 import {TeamState} from '../../../../../team/TeamState';
@@ -55,7 +55,6 @@ const DataUsageSection: React.FC<DataUsageSectionProps> = ({
 
   const {marketingConsent} = useKoSubscribableChildren(propertiesRepository, ['marketingConsent']);
   const {isTeam} = useKoSubscribableChildren(teamState, ['isTeam']);
-  const isCountlyEnabled = !!Config.getConfig().COUNTLY_API_KEY;
 
   useEffect(() => {
     const updateProperties = ({settings}: WebappProperties): void => {

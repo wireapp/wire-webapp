@@ -55,6 +55,8 @@ export class ConversationState {
   public readonly visibleConversations: ko.PureComputed<Conversation[]>;
   public readonly filteredConversations: ko.PureComputed<Conversation[]>;
   public readonly archivedConversations: ko.PureComputed<Conversation[]>;
+  public readonly groupConversations: ko.PureComputed<Conversation[]>;
+  public readonly directConversations: ko.PureComputed<Conversation[]>;
   public readonly selfProteusConversation: ko.PureComputed<Conversation | undefined>;
   public readonly selfMLSConversation: ko.PureComputed<MLSConversation | undefined>;
   public readonly unreadConversations: ko.PureComputed<Conversation[]>;
@@ -100,6 +102,17 @@ export class ConversationState {
 
     this.archivedConversations = ko.pureComputed(() => {
       return this.sortedConversations().filter(conversation => conversation.is_archived());
+    });
+
+    this.groupConversations = ko.pureComputed(() => {
+      return this.sortedConversations().filter(conversation => conversation.isGroup());
+    });
+
+    this.directConversations = ko.pureComputed(() => {
+      return this.sortedConversations().filter(
+        conversation =>
+          conversation.is1to1() && (conversation.firstUserEntity()?.isAvailable() || conversation.hasContentMessages()),
+      );
     });
 
     this.filteredConversations = ko.pureComputed(() => {

@@ -77,11 +77,6 @@ export const nameWrapper = (isAudioEstablished: boolean): CSSObject => ({
 export const userAvailability: CSSObject = {
   maxWidth: '100%',
   whiteSpace: 'nowrap',
-
-  '.availability-state-label': ellipsis,
-  '.availability-state-icon': {
-    display: 'flex',
-  },
 };
 
 export const userName: CSSObject = {

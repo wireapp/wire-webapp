@@ -22,6 +22,7 @@ import React from 'react';
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import * as Icon from 'Components/Icon';
 import {ModalComponent} from 'Components/ModalComponent';
+import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {renderElement} from 'Util/renderElement';
@@ -44,8 +45,11 @@ const ServiceModal: React.FC<ServiceModalProps> = ({
   actionsViewModel,
   onClose,
 }) => {
+  const {setCurrentTab: setCurrentSidebarTab} = useSidebarStore();
+
   const onOpenService = () => {
     onClose?.();
+    setCurrentSidebarTab(SidebarTabs.RECENT);
     actionsViewModel.open1to1ConversationWithService(service);
   };
 

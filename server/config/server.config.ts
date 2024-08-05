@@ -99,6 +99,7 @@ export function generateConfig(params: ConfigGeneratorParams, env: Env) {
     BACKEND_REST: urls.api,
     BACKEND_WS: urls.ws,
     DEVELOPMENT: nodeEnv === 'development',
+    DEVELOPMENT_ENABLE_TLS: urls.base.startsWith('https://'),
     ENFORCE_HTTPS: env.ENFORCE_HTTPS != 'false',
     ENVIRONMENT: nodeEnv,
     GOOGLE_WEBMASTER_ID: env.GOOGLE_WEBMASTER_ID,

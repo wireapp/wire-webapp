@@ -27,6 +27,8 @@ import {StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingContainer} from 'Components/calling/CallingOverlayContainer';
+import {ChooseScreen} from 'Components/calling/ChooseScreen';
+import {useDetachedCallingFeatureState} from 'Components/calling/DetachedCallingCell/DetachedCallingFeature.state';
 import {ErrorFallback} from 'Components/ErrorFallback';
 import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationModal';
 import {LegalHoldModal} from 'Components/Modals/LegalHoldModal/LegalHoldModal';
@@ -45,8 +47,10 @@ import {RootProvider} from './RootProvider';
 import {useAppMainState, ViewType} from './state';
 import {useAppState, ContentState} from './useAppState';
 
+import {CallState, DesktopScreenShareMenu} from '../calling/CallState';
 import {ConversationState} from '../conversation/ConversationState';
 import {User} from '../entity/User';
+import {useActiveWindow} from '../hooks/useActiveWindow';
 import {useInitializeRootFontSize} from '../hooks/useRootFontSize';
 import {App} from '../main/app';
 import {initialiseMLSMigrationFlow} from '../mls/MLSMigration';
@@ -69,6 +73,7 @@ interface AppMainProps {
   selfUser: User;
   mainView: MainViewModel;
   conversationState?: ConversationState;
+  callState?: CallState;
   /** will block the user from being able to interact with the application (no notifications and no messages will be shown) */
   locked: boolean;
 }
@@ -78,9 +83,12 @@ export const AppMain: FC<AppMainProps> = ({
   mainView,
   selfUser,
   conversationState = container.resolve(ConversationState),
+  callState = container.resolve(CallState),
   locked,
 }) => {
   const apiContext = app.getAPIContext();
+
+  useActiveWindow(window);
 
   useInitializeRootFontSize();
 
@@ -95,8 +103,16 @@ export const AppMain: FC<AppMainProps> = ({
     'isActivatedAccount',
   ]);
 
+  const {hasAvailableScreensToShare, desktopScreenShareMenu} = useKoSubscribableChildren(callState, [
+    'hasAvailableScreensToShare',
+    'desktopScreenShareMenu',
+  ]);
+
   const teamState = container.resolve(TeamState);
   const userState = container.resolve(UserState);
+
+  const isScreenshareActive =
+    hasAvailableScreensToShare && desktopScreenShareMenu === DesktopScreenShareMenu.MAIN_WINDOW;
 
   const {
     history,
@@ -119,10 +135,12 @@ export const AppMain: FC<AppMainProps> = ({
   };
 
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
-  const smBreakpoint = useMatchMedia('max-width: 640px');
-
+  const isMobileView = useMatchMedia('max-width: 720px');
   const {currentView} = useAppMainState(state => state.responsiveView);
-  const isLeftSidebarVisible = currentView == ViewType.LEFT_SIDEBAR;
+  const {isHidden: isLeftSidebarHidden} = useAppMainState(state => state.leftSidebar);
+
+  const isMobileLeftSidebarView = currentView == ViewType.MOBILE_LEFT_SIDEBAR;
+  const isMobileCentralColumnView = currentView == ViewType.MOBILE_CENTRAL_COLUMN;
 
   const initializeApp = async () => {
     const showMostRecentConversation = () => {
@@ -213,6 +231,11 @@ export const AppMain: FC<AppMainProps> = ({
 
   useE2EIFeatureConfigUpdate(repositories.team);
 
+  const showLeftSidebar = (isMobileView && isMobileLeftSidebarView) || (!isMobileView && !isLeftSidebarHidden);
+  const showMainContent = !isMobileView || isMobileCentralColumnView;
+
+  const {isSupported: isDetachedCallingFeatureEnabled} = useDetachedCallingFeatureState();
+
   return (
     <StyledApp
       themeId={THEME_ID.DEFAULT}
@@ -226,7 +249,7 @@ export const AppMain: FC<AppMainProps> = ({
         <ErrorBoundary FallbackComponent={ErrorFallback}>
           {!locked && (
             <div id="app" className="app">
-              {(!smBreakpoint || isLeftSidebarVisible) && (
+              {showLeftSidebar && (
                 <LeftSidebar
                   listViewModel={mainView.list}
                   selfUser={selfUser}
@@ -234,7 +257,7 @@ export const AppMain: FC<AppMainProps> = ({
                 />
               )}
 
-              {(!smBreakpoint || !isLeftSidebarVisible) && (
+              {showMainContent && (
                 <MainContent
                   selfUser={selfUser}
                   isRightSidebarOpen={!!currentState}
@@ -264,11 +287,16 @@ export const AppMain: FC<AppMainProps> = ({
           {!locked && (
             <>
               <FeatureConfigChangeNotifier selfUserId={selfUser.id} teamState={teamState} />
-              <CallingContainer
-                callingRepository={repositories.calling}
-                mediaRepository={repositories.media}
-                toggleScreenshare={mainView.calling.callActions.toggleScreenshare}
-              />
+
+              {!isDetachedCallingFeatureEnabled() && (
+                <CallingContainer
+                  callingRepository={repositories.calling}
+                  mediaRepository={repositories.media}
+                  toggleScreenshare={mainView.calling.callActions.toggleScreenshare}
+                />
+              )}
+
+              {isScreenshareActive && <ChooseScreen choose={repositories.calling.onChooseScreen} />}
 
               <LegalHoldModal
                 selfUser={selfUser}

@@ -838,6 +838,7 @@ export class CallingRepository {
   }
 
   async startCall(conversation: Conversation, callType: CALL_TYPE): Promise<void | Call> {
+    void this.callState.setViewModeMinimized();
     if (!this.selfUser || !this.selfClientId) {
       this.logger.warn(
         `Calling repository is not initialized correctly \n ${JSON.stringify({
@@ -977,6 +978,7 @@ export class CallingRepository {
   };
 
   async answerCall(call: Call, callType?: CALL_TYPE): Promise<void> {
+    void this.callState.setViewModeMinimized();
     const {conversation} = call;
     try {
       callType ??= call.getSelfParticipant().sharesCamera() ? call.initialType : CALL_TYPE.NORMAL;
@@ -1192,7 +1194,16 @@ export class CallingRepository {
   };
 
   private getMediaStream({audio = false, camera = false, screen = false}: MediaStreamQuery, isGroup: boolean) {
-    return this.mediaStreamHandler.requestMediaStream(audio, camera, screen, isGroup);
+    return this.mediaStreamHandler.requestMediaStream(audio, camera, screen, isGroup).then(stream => {
+      return this.mediaDevicesHandler
+        .initializeMediaDevices(camera)
+        .then(() => {
+          return stream;
+        })
+        .catch(() => {
+          return stream;
+        });
+    });
   }
 
   private handleMediaStreamError(call: Call, requestedStreams: MediaStreamQuery, error: Error | unknown): void {
@@ -1481,6 +1492,8 @@ export class CallingRepository {
       return;
     }
 
+    void this.callState.setViewModeMinimized();
+
     // There's nothing we need to do for non-mls calls
     if (call.conversationType === CONV_TYPE.CONFERENCE_MLS) {
       await this.leaveMLSConference(conversationId);
@@ -1552,6 +1565,10 @@ export class CallingRepository {
     call.removeAllAudio();
     selfParticipant.videoState(VIDEO_STATE.STOPPED);
     call.reason(reason);
+  };
+
+  hasActiveCall = (): boolean => {
+    return !!this.callState.joinedCall();
   };
 
   /*

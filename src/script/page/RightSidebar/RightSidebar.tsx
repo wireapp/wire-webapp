@@ -25,6 +25,7 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {Config} from 'src/script/Config';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {AddParticipants} from './AddParticipants';
@@ -262,7 +263,10 @@ const RightSidebar: FC<RightSidebarProps> = ({
 
           {(currentState === PanelState.GUEST_OPTIONS || currentState === PanelState.SERVICES_OPTIONS) && (
             <GuestServicesOptions
-              isPasswordSupported={false} // TODO: change to "core?.backendFeatures.supportsGuestLinksWithPassword" when other clients implement passwords
+              isPasswordSupported={
+                // TODO: remove this flag when all clients have enabled this feature
+                Config.getConfig().FEATURE.ENABLE_LINK_PASSWORDS && core?.backendFeatures.supportsGuestLinksWithPassword
+              }
               isGuest={currentState === PanelState.GUEST_OPTIONS}
               activeConversation={activeConversation}
               conversationRepository={conversationRepository}

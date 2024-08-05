@@ -44,7 +44,6 @@ import {checkIndexedDb} from 'Util/util';
 
 import '../../style/default.less';
 import {AssetRepository} from '../assets/AssetRepository';
-import {AssetService} from '../assets/AssetService';
 import {AudioRepository} from '../audio/AudioRepository';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {URLParameter} from '../auth/URLParameter';
@@ -135,7 +134,6 @@ export class App {
   private isLoggingOut = false;
   logger: Logger;
   service: {
-    asset: AssetService;
     conversation: ConversationService;
     event: EventService;
     integration: IntegrationService;
@@ -307,7 +305,6 @@ export class App {
     const eventService = new EventService();
 
     return {
-      asset: container.resolve(AssetService),
       conversation: new ConversationService(eventService),
       event: eventService,
       integration: new IntegrationService(),
@@ -460,6 +457,7 @@ export class App {
       onProgress(25, t('initReceivedUserData'));
       telemetry.addStatistic(AppInitStatisticsValue.CONVERSATIONS, conversations.length, 50);
       this._subscribeToUnloadEvents(selfUser);
+      this._subscribeToBeforeUnload();
 
       await conversationRepository.conversationRoleRepository.loadTeamRoles();
 
@@ -671,6 +669,20 @@ export class App {
       }
 
       this.repository.notification.clearNotifications();
+    });
+  }
+
+  /**
+   * Subscribe to 'beforeunload' to stop calls and disconnect the WebSocket.
+   */
+  private _subscribeToBeforeUnload(): void {
+    window.addEventListener('beforeunload', event => {
+      if (this.repository.calling.hasActiveCall()) {
+        event.preventDefault();
+
+        // Included for legacy support, e.g. Chrome/Edge < 119
+        event.returnValue = true;
+      }
     });
   }
 

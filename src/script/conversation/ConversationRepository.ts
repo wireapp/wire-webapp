@@ -1391,7 +1391,7 @@ export class ConversationRepository {
         return false;
       }
 
-      const isActiveConversation = !conversationEntity.removed_from_conversation();
+      const isActiveConversation = !conversationEntity.isSelfUserRemoved();
       if (!isActiveConversation) {
         // Disregard conversations that self is no longer part of
         return false;
@@ -1438,8 +1438,12 @@ export class ConversationRepository {
    *
    * @param event Custom event containing join key/code
    */
-  private readonly onConversationJoin = async (event: {detail: {code: string; key: string; domain?: string}}) => {
+  private readonly onConversationJoin = async (event: {
+    detail: {code: string; key: string; domain?: string | null};
+  }) => {
     const {key, code, domain} = event.detail;
+
+    const resolvedDomain = domain ?? this.userState.self()?.domain ?? 'wire.com';
 
     const showNoConversationModal = () => {
       const titleText = t('modalConversationJoinNotFoundHeadline');
@@ -1458,7 +1462,10 @@ export class ConversationRepository {
         name: conversationName,
         has_password: hasPassword,
       } = await this.conversationService.getConversationJoin(key, code);
-      const knownConversation = this.conversationState.findConversation({domain: null, id: conversationId});
+      const knownConversation = this.conversationState.findConversation({
+        domain: resolvedDomain,
+        id: conversationId,
+      });
       if (knownConversation?.status() === ConversationStatus.CURRENT_MEMBER) {
         amplify.publish(WebAppEvents.CONVERSATION.SHOW, knownConversation, {});
         return;
@@ -1470,7 +1477,7 @@ export class ConversationRepository {
             try {
               const response = await this.conversationService.postConversationJoin(key, code, password);
               const conversationEntity = await this.getConversationById({
-                domain: domain ?? this.userState.self().domain,
+                domain: resolvedDomain,
                 id: conversationId,
               });
               if (response) {
@@ -2795,7 +2802,7 @@ export class ConversationRepository {
       .filter(conversation => {
         const conversationInTeam = conversation.teamId === teamId;
         const userIsParticipant = UserFilter.isParticipant(conversation, userId);
-        return conversationInTeam && userIsParticipant && !conversation.removed_from_conversation();
+        return conversationInTeam && userIsParticipant && !conversation.isSelfUserRemoved();
       })
       .map(async conversation => {
         const leaveEvent = EventBuilder.buildTeamMemberLeave(conversation, userEntity, isoDate);
@@ -2928,7 +2935,7 @@ export class ConversationRepository {
 
     const conversationId = conversationEntity.qualifiedId;
 
-    const updatePromise = conversationEntity.removed_from_conversation()
+    const updatePromise = conversationEntity.isSelfUserRemoved()
       ? Promise.resolve()
       : this.conversationService.updateMemberProperties(conversationId, payload).catch(error => {
           const logMessage = `Failed to change archived state of '${conversationId}' to '${newState}': ${error.code}`;
@@ -3446,7 +3453,7 @@ export class ConversationRepository {
   private readonly onMissedEvents = (): void => {
     this.conversationState
       .filteredConversations()
-      .filter(conversationEntity => !conversationEntity.removed_from_conversation() && !conversationEntity.isRequest())
+      .filter(conversationEntity => !conversationEntity.isSelfUserRemoved() && !conversationEntity.isRequest())
       .forEach(conversationEntity => {
         const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
         const missed_event = EventBuilder.buildMissed(conversationEntity, currentTimestamp);
@@ -4091,7 +4098,7 @@ export class ConversationRepository {
       // TODO(federation) map domain
       this.getConversationById({domain: '', id: messageEntity.conversation_id}).then(conversationEntity => {
         const isPingFromSelf = messageEntity.user().isMe && messageEntity.isPing();
-        const deleteForSelf = isPingFromSelf || conversationEntity.removed_from_conversation();
+        const deleteForSelf = isPingFromSelf || conversationEntity.isSelfUserRemoved();
         if (deleteForSelf) {
           return this.messageRepository.deleteMessage(conversationEntity, messageEntity);
         }
