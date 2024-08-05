@@ -1294,10 +1294,10 @@ export class CallingRepository {
         this.wCall?.replaceTrack(this.serializeQualifiedId(conversation.qualifiedId), videoTracks[0]);
         // Remove the previous video stream
         if (updateSelfParticipant) {
-          selfParticipant.setVideoStream(new MediaStream([videoTracks[0]]), true);
+          selfParticipant.setVideoStream(mediaStream, true);
         }
+        return mediaStream;
       }
-      return mediaStream;
     }
   }
 
