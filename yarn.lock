@@ -4714,10 +4714,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/avs@npm:9.6.12":
-  version: 9.6.12
-  resolution: "@wireapp/avs@npm:9.6.12"
-  checksum: 3aec85fa8f5577319e70f5459145759573f377681fda15a944d32ed32fcc23a07782289781dc75e2a30a0da2f0670efe49d64892925c24f4e94bd39a1523e36d
+"@wireapp/avs@npm:9.6.15":
+  version: 9.6.15
+  resolution: "@wireapp/avs@npm:9.6.15"
+  checksum: 29b953560a06afa3fe6761cdb28b606c3629d47c4ea8148f36042848f631bf2b4d0e873ae947b92cd54b2e5229a2101e1df795ee7cdac8a645ab1c73ebe076eb
   languageName: node
   linkType: hard
 
@@ -17505,7 +17505,7 @@ __metadata:
     "@types/speakingurl": 13.0.6
     "@types/underscore": 1.11.15
     "@types/webpack-env": 1.18.4
-    "@wireapp/avs": 9.6.12
+    "@wireapp/avs": 9.6.15
     "@wireapp/commons": 5.2.7
     "@wireapp/copy-config": 2.1.14
     "@wireapp/core": 46.0.17-hotfix-1.1
