@@ -29,17 +29,3 @@ export const MEDIA_STREAM_ERROR_TYPES = {
   ],
   PERMISSION: [MEDIA_STREAM_ERROR.NOT_ALLOWED_ERROR, MEDIA_STREAM_ERROR.SECURITY_ERROR],
 };
-
-export function isMediaStreamDeviceError(errorStr: string): boolean {
-  return MEDIA_STREAM_ERROR_TYPES.DEVICE.filter(errorType => errorType == errorStr).length > 0;
-}
-
-export function isMediaStreamReadDeviceError(errorStr: string): boolean {
-  return (
-    [
-      MEDIA_STREAM_ERROR.NOT_READABLE_ERROR,
-      MEDIA_STREAM_ERROR.NOT_ALLOWED_ERROR,
-      MEDIA_STREAM_ERROR.NOT_FOUND_ERROR,
-    ].filter(errorType => errorType == errorStr).length > 0
-  );
-}
