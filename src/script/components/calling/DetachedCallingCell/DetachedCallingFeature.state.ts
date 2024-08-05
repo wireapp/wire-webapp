@@ -27,6 +27,12 @@ type DetachedCallingFeatureState = {
   isSupported: () => boolean;
 };
 
-export const useDetachedCallingFeatureState = create<DetachedCallingFeatureState>((set, get) => ({
-  isSupported: () => !Runtime.isDesktopApp() || Config.getDesktopConfig()?.supportsCallingPopoutWindow === true,
+export const useDetachedCallingFeatureState = create<DetachedCallingFeatureState>(() => ({
+  isSupported: () => {
+    if (Runtime.isDesktopApp()) {
+      return Config.getDesktopConfig()?.supportsCallingPopoutWindow === true;
+    }
+
+    return true;
+  },
 }));

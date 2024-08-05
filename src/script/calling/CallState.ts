@@ -26,6 +26,7 @@ import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {useDetachedCallingFeatureState} from 'Components/calling/DetachedCallingCell/DetachedCallingFeature.state';
 import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {copyStyles} from 'Util/renderElement';
@@ -44,6 +45,7 @@ export enum MuteState {
 }
 
 export enum CallingViewMode {
+  FULL_SCREEN = 'fullscreen',
   DETACHED_WINDOW = 'detached_window',
   MINIMIZED = 'minimized',
 }
@@ -141,8 +143,19 @@ export class CallState {
   };
 
   setViewModeMinimized = () => {
+    const isDetachedWindowSupported = useDetachedCallingFeatureState.getState().isSupported();
+
+    if (!isDetachedWindowSupported) {
+      this.viewMode(CallingViewMode.MINIMIZED);
+      return;
+    }
+
     this.detachedWindow()?.close();
     this.closeDetachedWindow();
+  };
+
+  setViewModeFullScreen = () => {
+    this.viewMode(CallingViewMode.FULL_SCREEN);
   };
 
   async setViewModeDetached(
@@ -152,6 +165,13 @@ export class CallState {
       height: 829,
     },
   ) {
+    const isDetachedWindowSupported = useDetachedCallingFeatureState.getState().isSupported();
+
+    if (!isDetachedWindowSupported) {
+      this.setViewModeFullScreen();
+      return;
+    }
+
     const isDesktop = Runtime.isDesktopApp();
     const {name, width, height} = detachedViewModeOptions;
     if ('documentPictureInPicture' in window && window.documentPictureInPicture && !isDesktop) {
