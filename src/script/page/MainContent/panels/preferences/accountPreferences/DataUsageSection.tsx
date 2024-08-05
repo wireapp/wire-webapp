@@ -49,7 +49,6 @@ const DataUsageSection: React.FC<DataUsageSectionProps> = ({
   isActivatedAccount,
   teamState = container.resolve(TeamState),
 }) => {
-  const [optionPrivacy, setOptionPrivacy] = useState(propertiesRepository.properties.settings.privacy.improve_wire);
   const [optionTelemetry, setOptionTelemetry] = useState(
     propertiesRepository.properties.settings.privacy.telemetry_sharing,
   );
@@ -59,31 +58,21 @@ const DataUsageSection: React.FC<DataUsageSectionProps> = ({
 
   useEffect(() => {
     const updateProperties = ({settings}: WebappProperties): void => {
-      setOptionPrivacy(settings.privacy.improve_wire);
       setOptionTelemetry(settings.privacy.telemetry_sharing);
     };
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, updateProperties);
     return () => amplify.unsubscribe(WebAppEvents.PROPERTIES.UPDATED, updateProperties);
   }, []);
 
+  const showCountly = !isTeam || (isTeam && isCountlyEnabled);
+
+  if (!showCountly && !isActivatedAccount) {
+    return null;
+  }
+
   return (
     <PreferencesSection hasSeparator title={t('preferencesAccountData')} className="preferences-section-data-usage">
-      <>
-        <Checkbox
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            const isChecked = event.target.checked;
-            propertiesRepository.savePreference(PROPERTIES_TYPE.PRIVACY, isChecked);
-            setOptionPrivacy(isChecked);
-          }}
-          checked={optionPrivacy}
-          data-uie-name="status-preference-privacy"
-        >
-          <CheckboxLabel htmlFor="status-preference-privacy">{t('preferencesAccountDataCheckbox')}</CheckboxLabel>
-        </Checkbox>
-        <p className="preferences-detail preferences-detail-intended">{t('preferencesAccountDataDetail', brandName)}</p>
-      </>
-
-      {isTeam && isCountlyEnabled() && (
+      {showCountly && (
         <div className="checkbox-margin">
           <Checkbox
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -106,9 +95,9 @@ const DataUsageSection: React.FC<DataUsageSectionProps> = ({
       {isActivatedAccount && (
         <div className="checkbox-margin">
           <Checkbox
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            onChange={async (event: React.ChangeEvent<HTMLInputElement>) => {
               const isChecked = event.target.checked;
-              propertiesRepository.updateProperty(
+              await propertiesRepository.updateProperty(
                 PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.key,
                 isChecked ? ConsentValue.GIVEN : ConsentValue.NOT_GIVEN,
               );

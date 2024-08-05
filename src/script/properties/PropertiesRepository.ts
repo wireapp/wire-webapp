@@ -26,15 +26,12 @@ import ko from 'knockout';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {Environment} from 'Util/Environment';
-import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 
 import type {PropertiesService} from './PropertiesService';
 import {PROPERTIES_TYPE} from './PropertiesType';
 
-import {Config} from '../Config';
 import type {User} from '../entity/User';
 import type {SelfService} from '../self/SelfService';
 import {ConsentValue} from '../user/ConsentValue';
@@ -96,7 +93,6 @@ export class PropertiesRepository {
           send: true,
         },
         privacy: {
-          improve_wire: undefined,
           report_errors: undefined,
           telemetry_sharing: undefined,
         },
@@ -113,52 +109,13 @@ export class PropertiesRepository {
     this.marketingConsent = ko.observable(PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.defaultValue);
   }
 
-  checkPrivacyPermission(): Promise<void> {
-    const isCheckConsentDisabled = !Config.getConfig().FEATURE.CHECK_CONSENT;
-    const isPrivacyPreferenceSet = this.getPreference(PROPERTIES_TYPE.PRIVACY) !== undefined;
+  checkTelemetrySharingPermission(): void {
     const isTelemetryPreferenceSet = this.getPreference(PROPERTIES_TYPE.TELEMETRY_SHARING) !== undefined;
-    const isTeamAccount = !!this.selfUser().teamId;
-    const enablePrivacy = () => {
-      this.savePreference(PROPERTIES_TYPE.PRIVACY, true);
-      this.publishProperties();
-    };
 
-    if (!isTelemetryPreferenceSet && isTeamAccount) {
+    if (!isTelemetryPreferenceSet) {
       this.savePreference(PROPERTIES_TYPE.TELEMETRY_SHARING, true);
       this.publishProperties();
     }
-
-    if (isCheckConsentDisabled || isPrivacyPreferenceSet) {
-      return Promise.resolve();
-    }
-
-    if (isTeamAccount) {
-      return Promise.resolve();
-    }
-
-    return new Promise(resolve => {
-      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-        preventClose: true,
-        primaryAction: {
-          action: () => {
-            enablePrivacy();
-            resolve();
-          },
-          text: t('modalImproveWireAction'),
-        },
-        secondaryAction: {
-          action: () => {
-            this.savePreference(PROPERTIES_TYPE.PRIVACY, false);
-            resolve();
-          },
-          text: t('modalImproveWireSecondary'),
-        },
-        text: {
-          message: t('modalImproveWireMessage', Config.getConfig().BRAND_NAME),
-          title: t('modalImproveWireHeadline', Config.getConfig().BRAND_NAME),
-        },
-      });
-    });
   }
 
   getPreference(propertiesType: string): any {
@@ -218,7 +175,7 @@ export class PropertiesRepository {
 
   private initTemporaryGuestAccount(): Promise<WebappProperties> {
     this.logger.info('Temporary guest user: Using default properties');
-    this.savePreference(PROPERTIES_TYPE.PRIVACY, false);
+    this.savePreference(PROPERTIES_TYPE.TELEMETRY_SHARING, false);
     return Promise.resolve(this.publishProperties());
   }
 
@@ -324,9 +281,6 @@ export class PropertiesRepository {
         break;
       case PROPERTIES_TYPE.PREVIEWS.SEND:
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.PREVIEWS.SEND, updatedPreference);
-        break;
-      case PROPERTIES_TYPE.PRIVACY:
-        amplify.publish(WebAppEvents.PROPERTIES.UPDATE.PRIVACY, updatedPreference);
         break;
       case PROPERTIES_TYPE.TELEMETRY_SHARING:
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.TELEMETRY_SHARING, updatedPreference);
