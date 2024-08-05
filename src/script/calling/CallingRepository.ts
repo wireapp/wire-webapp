@@ -1280,9 +1280,9 @@ export class CallingRepository {
     const {conversation} = call;
 
     if (mediaType === MediaType.AUDIO) {
-      const audioTracks: MediaStreamTrack[] = mediaStream.getAudioTracks();
+      const audioTracks = mediaStream.getAudioTracks().map(track => track.clone());
       if (audioTracks.length > 0) {
-        selfParticipant.setAudioStream(new MediaStream([audioTracks[0]]), true);
+        selfParticipant.setAudioStream(new MediaStream(audioTracks), true);
         this.wCall?.replaceTrack(this.serializeQualifiedId(conversation.qualifiedId), audioTracks[0]);
       }
     }
@@ -1294,10 +1294,10 @@ export class CallingRepository {
         this.wCall?.replaceTrack(this.serializeQualifiedId(conversation.qualifiedId), videoTracks[0]);
         // Remove the previous video stream
         if (updateSelfParticipant) {
-          selfParticipant.setVideoStream(new MediaStream([videoTracks[0]]), true);
+          selfParticipant.setVideoStream(mediaStream, true);
         }
+        return mediaStream;
       }
-      return mediaStream;
     }
   }
 
