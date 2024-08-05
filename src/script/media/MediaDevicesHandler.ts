@@ -80,7 +80,6 @@ export class MediaDevicesHandler {
   public deviceSupport: DeviceSupport;
   private previousDeviceSupport: PreviousDeviceSupport;
   private onMediaDevicesRefresh?: () => void;
-  private devicesAreInit = false;
 
   static get CONFIG() {
     return {
@@ -155,12 +154,7 @@ export class MediaDevicesHandler {
       videoinput: this.availableDevices.videoinput().length,
     };
 
-    // The device list must be queried once to obtain the device IDs. This way, the frontend knows whether cameras
-    // and microphones exist and can request them specifically during a call. Additionally, the app needs to know
-    // the device IDs; otherwise, we will receive a Media-Query-Constraint error when querying the devices, as we
-    // explicitly query by the device ID.
-    // The false parameter ensures that we only load the list temporarily.
-    this.initializeMediaDevices(false);
+    this.initializeMediaDevices();
   }
 
   public setOnMediaDevicesRefreshHandler(handler: () => void): void {
@@ -169,22 +163,14 @@ export class MediaDevicesHandler {
 
   /**
    * Initialize the list of MediaDevices and subscriptions.
-   * @camera: boolean, Only when the camera is queried can the entire device list be accessed.
-   * @return Promise<void>
    */
-  public async initializeMediaDevices(camera: boolean = false): Promise<void> {
-    if (Runtime.isSupportingUserMedia() && !this.devicesAreInit) {
-      return this.refreshMediaDevices(camera).then(() => {
+  private initializeMediaDevices(): void {
+    if (Runtime.isSupportingUserMedia()) {
+      this.refreshMediaDevices().then(() => {
         this.subscribeToObservables();
         this.subscribeToDevices();
-        // The web browser cannot access the device labels without a camera stream.
-        // The device list is only complete when the camera was initialized.
-        if (camera) {
-          this.devicesAreInit = true;
-        }
       });
     }
-    return Promise.resolve();
   }
 
   /**
@@ -263,11 +249,9 @@ export class MediaDevicesHandler {
 
   /**
    * Update list of available MediaDevices.
-   * @param [camera=false] If `camera=true`, a video track is also created when the device list is read.
-   * This ensures that the video device labels can also be read. This is necessary for initializing the entire device list.
    * @returns Resolves with all MediaDevices when the list has been updated
    */
-  public async refreshMediaDevices(camera: boolean = false): Promise<MediaDeviceInfo[]> {
+  public async refreshMediaDevices(): Promise<MediaDeviceInfo[]> {
     const setDevices = (type: MediaDeviceType, devices: MediaDeviceInfo[]): void => {
       this.availableDevices[type](devices);
       const currentId = this.currentDeviceId[type];
@@ -289,7 +273,7 @@ export class MediaDevicesHandler {
 
     try {
       this.removeAllDevices();
-      const mediaDevices = await this.enumerateMediaDevices(camera);
+      const mediaDevices = await navigator.mediaDevices.enumerateDevices();
 
       if (!mediaDevices) {
         throw new Error('No media devices found');
@@ -357,34 +341,6 @@ export class MediaDevicesHandler {
     this.logger.info(`Detected '${screenSources.length}' sources for screen sharing from Electron`);
     this.availableDevices.screeninput(screenSources);
     return screenSources;
-  }
-
-  /**
-   * Enumerates all known Media Devices Infos of a System.
-   * @param forceCamera If `forceCamera=true`, then an audio and video track is created to enforce the device access
-   * permissionm
-   * @returns All enumerated MediaDeviceInfos
-   */
-  private async enumerateMediaDevices(forceCamera: boolean = false): Promise<MediaDeviceInfo[]> {
-    // The browser will set the device labels obtained from navigator.mediaDevices.enumerateDevices() to blank strings
-    // if there is no longer an active MediaStream, even if the application was previously temporarily authorized to
-    // access the devices by calling navigator.mediaDevices.getUserMedia().
-
-    // @TODO: Fix Issue
-    // You can use this method to generate a camera stream even in the audio case. This way, the device labels can be displayed in any case.
-    // const constraints = (forceCamera)? {video: true} : {audio: true};
-    // const mediaPromise = navigator.mediaDevices.getUserMedia(constraints)
-    // return mediaPromise.then(stream => {
-    //   if (!stream) {
-    //     return [];
-    //   }
-    //   return window.navigator.mediaDevices.enumerateDevices().then( devices  => {
-    //     stream.getTracks().forEach((t) => t.stop());
-    //     return devices;
-    //   });
-    // });
-
-    return window.navigator.mediaDevices.enumerateDevices();
   }
 
   /**
