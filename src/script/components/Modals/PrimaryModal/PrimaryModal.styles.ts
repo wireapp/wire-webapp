@@ -29,3 +29,7 @@ export const guestLinkPasswordInputStyles: CSSObject = {
     '&:focus': {border: '1px solid var(--accent-color)'},
   },
 };
+
+export const guestLinkPasswordErrorMessageStyles: CSSObject = {
+  marginBottom: 18,
+};

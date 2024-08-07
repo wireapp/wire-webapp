@@ -22,7 +22,7 @@ import {FC, FormEvent, MouseEvent, useState, useRef, ChangeEvent, useEffect} fro
 import cx from 'classnames';
 
 import {ValidationUtil} from '@wireapp/commons';
-import {Checkbox, CheckboxLabel, COLOR, Form, Link, Text, Input, Loading} from '@wireapp/react-ui-kit';
+import {Checkbox, CheckboxLabel, COLOR, Form, Link, Text, Input, Loading, ErrorMessage} from '@wireapp/react-ui-kit';
 
 import {CopyToClipboardButton} from 'Components/CopyToClipboardButton';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
@@ -35,7 +35,7 @@ import {t} from 'Util/LocalizerUtil';
 import {isValidPassword} from 'Util/StringUtil';
 
 import {MessageContent} from './Content/MessageContent';
-import {guestLinkPasswordInputStyles} from './PrimaryModal.styles';
+import {guestLinkPasswordInputStyles, guestLinkPasswordErrorMessageStyles} from './PrimaryModal.styles';
 import {usePrimaryModalState, showNextModalInQueue, defaultContent, removeCurrentModal} from './PrimaryModalState';
 import {ButtonAction, PrimaryModalType} from './PrimaryModalTypes';
 
@@ -53,6 +53,9 @@ export const PrimaryModalComponent: FC = () => {
   const currentId = usePrimaryModalState(state => state.currentModalId);
   const primaryActionButtonRef = useRef<HTMLButtonElement>(null);
   const isModalVisible = currentId !== null;
+  const passwordValueRef = useRef<HTMLInputElement>(null);
+  const [isFormSubmitted, setIsFormSubmitted] = useState(false);
+
   const {
     checkboxLabel,
     closeOnConfirm,
@@ -96,6 +99,7 @@ export const PrimaryModalComponent: FC = () => {
     showNextModalInQueue();
     setPasswordConfirmationValue('');
     setDidCopyPassword(false);
+    setIsFormSubmitted(false);
   };
 
   const isPasswordOptional = () => {
@@ -129,7 +133,7 @@ export const PrimaryModalComponent: FC = () => {
     if (isConfirm) {
       return false;
     }
-    return (!inputActionEnabled || !passwordGuestLinkActionEnabled) && !actionEnabled;
+    return !inputActionEnabled && !actionEnabled;
   };
 
   const doAction =
@@ -140,6 +144,13 @@ export const PrimaryModalComponent: FC = () => {
       if (!skipValidation && !inputActionEnabled) {
         return;
       }
+
+      // prevent from submit when validation not passed
+      if (!skipValidation && isGuestLinkPassword && !checkGuestLinkPassword(passwordValue, passwordConfirmationValue)) {
+        setIsFormSubmitted(true);
+        return;
+      }
+
       if (typeof action === 'function') {
         action();
       }
@@ -238,6 +249,15 @@ export const PrimaryModalComponent: FC = () => {
 
   const buttons = primaryBtnFirst ? [primaryButton, ...secondaryButtons] : [...secondaryButtons, primaryButton];
 
+  const guestLinkPasswordErrorMessage =
+    isFormSubmitted && !passwordValueRef.current?.validity.valid ? (
+      <ErrorMessage data-uie-name="primary-modals-error-message" css={guestLinkPasswordErrorMessageStyles}>
+        {t('modalGuestLinkJoinHelperText', {
+          minPasswordLength: Config.getConfig().MINIMUM_PASSWORD_LENGTH.toString(),
+        })}
+      </ErrorMessage>
+    ) : undefined;
+
   return (
     <div
       id="modals"
@@ -282,6 +302,7 @@ export const PrimaryModalComponent: FC = () => {
                   onGeneratePassword={password => {
                     setPasswordValue(password);
                     setPasswordConfirmationValue(password);
+                    setIsFormSubmitted(false);
                   }}
                 />
               )}
@@ -295,6 +316,7 @@ export const PrimaryModalComponent: FC = () => {
                 >
                   <Input
                     name="guest-link-password"
+                    data-uie-name="guest-link-password"
                     required
                     wrapperCSS={guestLinkPasswordInputStyles}
                     placeholder={t('modalGuestLinkJoinPlaceholder')}
@@ -307,10 +329,15 @@ export const PrimaryModalComponent: FC = () => {
                     type="password"
                     autoComplete="off"
                     value={passwordValue}
+                    ref={passwordValueRef}
                     onChange={event => setPasswordValue(event.currentTarget.value)}
+                    pattern={ValidationUtil.getNewPasswordPattern(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH)}
+                    markInvalid={isFormSubmitted && !passwordValueRef.current?.validity.valid}
+                    error={guestLinkPasswordErrorMessage}
                   />
                   <Input
                     name="guest-link-password-confirm"
+                    data-uie-name="guest-link-password-confirm"
                     required
                     wrapperCSS={guestLinkPasswordInputStyles}
                     placeholder={t('modalGuestLinkJoinConfirmPlaceholder')}
@@ -321,6 +348,7 @@ export const PrimaryModalComponent: FC = () => {
                     autoComplete="off"
                     value={passwordConfirmationValue}
                     onChange={event => setPasswordConfirmationValue(event.currentTarget.value)}
+                    markInvalid={isFormSubmitted && !checkGuestLinkPassword(passwordValue, passwordConfirmationValue)}
                   />
                 </Form>
               )}
