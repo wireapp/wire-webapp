@@ -77,31 +77,91 @@ describe('MediaConstraintsHandler', () => {
   });
 
   describe('getScreenStreamConstraints', () => {
-    it('returns constraints to get the screen stream if browser supports getDisplayMedia', () => {
+    it('returns constraints to get the screen stream if browser supports getDisplayMedia in conference call', () => {
       const constraintsHandler = createConstraintsHandler();
 
-      const constraints = constraintsHandler.getScreenStreamConstraints(ScreensharingMethods.DISPLAY_MEDIA) as any;
+      const constraints: MediaStreamConstraints | undefined = constraintsHandler.getScreenStreamConstraints(
+        ScreensharingMethods.DISPLAY_MEDIA,
+        true,
+      );
 
-      expect(constraints.audio).toBe(false);
-      expect(constraints.video.height).toBeUndefined();
+      expect(constraints?.audio).toBe(false);
+      expect((constraints?.video as MediaTrackConstraints).height).toEqual(
+        jasmine.objectContaining({ideal: jasmine.any(Number), max: jasmine.any(Number)}),
+      );
+      expect((constraints?.video as MediaTrackConstraints).frameRate).toEqual(jasmine.any(Number));
     });
 
-    it('returns constraints to get the screen stream if browser uses desktopCapturer', () => {
+    it('returns constraints to get the screen stream if browser supports getDisplayMedia in one to one call', () => {
       const constraintsHandler = createConstraintsHandler();
 
-      const constraints = constraintsHandler.getScreenStreamConstraints(ScreensharingMethods.DESKTOP_CAPTURER) as any;
+      const constraints: MediaStreamConstraints | undefined = constraintsHandler.getScreenStreamConstraints(
+        ScreensharingMethods.DISPLAY_MEDIA,
+        false,
+      );
 
-      expect(constraints.audio).toBe(false);
-      expect(constraints.video.mandatory).toEqual({chromeMediaSource: 'desktop', chromeMediaSourceId: 'camera'});
+      expect(constraints?.audio).toBe(false);
+      expect((constraints?.video as MediaTrackConstraints).height).toBeUndefined();
+      expect((constraints?.video as MediaTrackConstraints).frameRate).toEqual(jasmine.any(Number));
     });
 
-    it('returns constraints to get the screen stream if browser uses getUserMedia', () => {
+    it('returns constraints to get the screen stream if browser uses desktopCapturer in conference call', () => {
       const constraintsHandler = createConstraintsHandler();
 
-      const constraints = constraintsHandler.getScreenStreamConstraints(ScreensharingMethods.USER_MEDIA) as any;
+      const constraints: MediaStreamConstraints | undefined = constraintsHandler.getScreenStreamConstraints(
+        ScreensharingMethods.DESKTOP_CAPTURER,
+        true,
+      );
 
-      expect(constraints.audio).toBe(false);
-      expect(constraints.video).toEqual(
+      expect(constraints?.audio).toBe(false);
+      expect((constraints?.video as MediaTrackConstraintsExt).mandatory).toEqual(
+        jasmine.objectContaining({maxHeight: jasmine.any(Number), minHeight: jasmine.any(Number)}),
+      );
+    });
+
+    it('returns constraints to get the screen stream if browser uses desktopCapturer in one to one call', () => {
+      const constraintsHandler = createConstraintsHandler();
+
+      const constraints: MediaStreamConstraints | undefined = constraintsHandler.getScreenStreamConstraints(
+        ScreensharingMethods.DESKTOP_CAPTURER,
+        false,
+      );
+
+      expect(constraints?.audio).toBe(false);
+      expect((constraints?.video as MediaTrackConstraintsExt).mandatory).toEqual({
+        chromeMediaSource: 'desktop',
+        chromeMediaSourceId: 'camera',
+      });
+    });
+
+    it('returns constraints to get the screen stream if browser uses getUserMedia in conference call', () => {
+      const constraintsHandler = createConstraintsHandler();
+
+      const constraints: MediaStreamConstraints | undefined = constraintsHandler.getScreenStreamConstraints(
+        ScreensharingMethods.USER_MEDIA,
+        true,
+      );
+
+      expect(constraints?.audio).toBe(false);
+      expect(constraints?.video as MediaTrackConstraints).toEqual(
+        jasmine.objectContaining({
+          frameRate: jasmine.any(Number),
+          height: {exact: jasmine.any(Number)},
+          mediaSource: 'screen',
+        }),
+      );
+    });
+
+    it('returns constraints to get the screen stream if browser uses getUserMedia in one to one call', () => {
+      const constraintsHandler = createConstraintsHandler();
+
+      const constraints: MediaStreamConstraints | undefined = constraintsHandler.getScreenStreamConstraints(
+        ScreensharingMethods.USER_MEDIA,
+        false,
+      );
+
+      expect(constraints?.audio).toBe(false);
+      expect(constraints?.video as MediaTrackConstraints).toEqual(
         jasmine.objectContaining({
           frameRate: jasmine.any(Number),
           mediaSource: 'screen',
@@ -132,3 +192,7 @@ describe('MediaConstraintsHandler', () => {
     });
   });
 });
+
+type MediaTrackConstraintsExt = MediaTrackConstraints & {
+  mandatory: {chromeMediaSource: string; chromeMediaSourceId?: string; maxHeight?: number; minHeight?: number};
+};
