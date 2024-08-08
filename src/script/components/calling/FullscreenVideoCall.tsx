@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 
 import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation/';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
@@ -40,7 +40,6 @@ import {MediaDeviceType} from 'src/script/media/MediaDeviceType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, isEscapeKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
-import {preventFocusOutside} from 'Util/util';
 
 import {CallingParticipantList} from './CallingCell/CallIngParticipantList';
 import {Duration} from './Duration';
@@ -334,17 +333,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
   const horizontalSmBreakpoint = useActiveWindowMatchMedia('max-width: 680px');
   const horizontalXsBreakpoint = useActiveWindowMatchMedia('max-width: 500px');
-
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent): void => {
-      event.preventDefault();
-      preventFocusOutside(event, 'video-calling');
-    };
-    document.addEventListener('keydown', onKeyDown);
-    return () => {
-      document.removeEventListener('keydown', onKeyDown);
-    };
-  }, []);
 
   const callGroupStartedAlert = t(isGroupCall ? 'startedVideoGroupCallingAlert' : 'startedVideoCallingAlert', {
     conversationName,
