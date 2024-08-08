@@ -39,8 +39,12 @@ export interface SingleActionProps {
 const SingleAction = ({item, onCancel, oneButtonPerRow = false}: SingleActionProps) => {
   return (
     <FlexBox
-      flexWrap={oneButtonPerRow ? 'wrap-reverse' : 'nowrap'}
-      css={{rowGap: '8px'}}
+      css={{
+        rowGap: 8,
+        columnGap: 16,
+        flexDirection: oneButtonPerRow ? 'column-reverse' : 'row',
+        flexWrap: 'wrap-reverse',
+      }}
       justify="space-evenly"
       className="modal__buttons"
     >
@@ -48,11 +52,11 @@ const SingleAction = ({item, onCancel, oneButtonPerRow = false}: SingleActionPro
         variant={ButtonVariant.SECONDARY}
         onClick={onCancel}
         data-uie-name="do-close"
-        css={singleActionButtonStyle}
+        css={singleActionButtonStyle(oneButtonPerRow)}
       >
         {t('modalConfirmSecondary')}
       </Button>
-      <Button onClick={item.click} data-uie-name={item.identifier} css={singleActionButtonStyle}>
+      <Button onClick={item.click} data-uie-name={item.identifier} css={singleActionButtonStyle(oneButtonPerRow)}>
         {item.label}
       </Button>
     </FlexBox>
