@@ -347,6 +347,7 @@ export class CallingRepository {
     wCall.setReqClientsHandler(wUser, this.requestClients);
     wCall.setReqNewEpochHandler(wUser, this.requestNewEpoch);
     wCall.setActiveSpeakerHandler(wUser, this.updateActiveSpeakers);
+    // wCall.setGroupChangedHandler(wUser, (a, b) => console.log('vir GroupChange called', a, b));
 
     return wUser;
   }
@@ -985,6 +986,20 @@ export class CallingRepository {
     return this.conversationState.findConversation(conversationId);
   }
 
+  private readonly leave1on1MLSConference = async (conversationId: QualifiedId) => {
+    const groupId = await this.subconversationService.getSubconversationGroupId(conversationId, 'conference');
+    const subconversationEpochInfo = await this.subconversationService.getSubconversationEpochInfo(
+      conversationId,
+      groupId,
+    );
+    console.log('vir epoch', subconversationEpochInfo?.epoch);
+    await this.apiClient.api.conversation.deleteSubconversation(conversationId, 'conference', {
+      groupId: groupId,
+      epoch: 0,
+    });
+    callingSubscriptions.removeCall(conversationId);
+  };
+
   private readonly leaveMLSConference = async (conversationId: QualifiedId) => {
     await this.subconversationService.leaveConferenceSubconversation(conversationId);
     callingSubscriptions.removeCall(conversationId);
@@ -1021,6 +1036,7 @@ export class CallingRepository {
   };
 
   private readonly handleCallParticipantChange = (conversationId: QualifiedId, members: QualifiedWcallMember[]) => {
+    console.log('vir', 'singular');
     const conversation = this.getConversationById(conversationId);
     if (!conversation || !this.isMLSConference(conversation)) {
       return;
@@ -1047,6 +1063,10 @@ export class CallingRepository {
       // If there is already a task for the client, don't overwrite it
       if (TaskScheduler.hasActiveTask(key)) {
         continue;
+      }
+
+      if (conversation.is1to1()) {
+        this.handleEmpty1on1(conversationId, members);
       }
 
       // otherwise, remove the client from subconversation if it won't establish their audio state in 3 mins timeout
@@ -1105,6 +1125,7 @@ export class CallingRepository {
   }
 
   readonly leaveCall = (conversationId: QualifiedId, reason: LEAVE_CALL_REASON): void => {
+    console.log('vir', 'leavin cause', reason);
     this.logger.info(`Ending call with reason ${reason} \n Stack trace: `, new Error().stack);
     const conversationIdStr = this.serializeQualifiedId(conversationId);
     delete this.poorCallQualityUsers[conversationIdStr];
@@ -1410,16 +1431,22 @@ export class CallingRepository {
     Warnings.hideWarning(Warnings.TYPE.CALL_QUALITY_POOR);
     const conversationId = this.parseQualifiedId(convId);
     const call = this.findCall(conversationId);
+    const conversation = this.getConversationById(conversationId);
     if (!call) {
       return;
     }
 
     // There's nothing we need to do for non-mls calls
     if (call.conversationType === CONV_TYPE.CONFERENCE_MLS) {
-      await this.leaveMLSConference(conversationId);
+      if (!conversation?.is1to1()) {
+        await this.leaveMLSConference(conversationId);
+      } else {
+        await this.leave1on1MLSConference(conversationId);
+      }
     }
 
     if (reason === REASON.NORMAL) {
+      console.log('vir', 'waddup');
       this.callState.selectableScreens([]);
       this.callState.selectableWindows([]);
     }
@@ -1471,6 +1498,10 @@ export class CallingRepository {
         });
       }
     });
+
+    if (stillActiveState) {
+      console.log('vir', 'still active');
+    }
 
     if (!stillActiveState.includes(reason)) {
       this.injectDeactivateEvent(
@@ -1617,6 +1648,17 @@ export class CallingRepository {
     members.forEach(member => call.getParticipant(member.userId, member.clientid)?.videoState(member.vrecv));
   }
 
+  private handleEmpty1on1(conversationId: QualifiedId, members: QualifiedWcallMember[]): void {
+    const otherActiveClients = members.filter(
+      member => member.aestab === AUDIO_STATE.ESTABLISHED && member.userId.id !== this.selfUser?.id,
+    );
+    if (!otherActiveClients.length) {
+      this.leaveCall(conversationId, LEAVE_CALL_REASON.USER_MANUALY_LEFT_CONVERSATION);
+      void this.leave1on1MLSConference(conversationId);
+      console.log('vir', 'hi');
+    }
+  }
+
   private updateParticipantAudioState(call: Call, members: QualifiedWcallMember[]): void {
     members.forEach(member =>
       call
@@ -1653,6 +1695,7 @@ export class CallingRepository {
   }
 
   private readonly handleCallParticipantChanges = (convId: SerializedConversationId, membersJson: string) => {
+    console.log('vir', 'changed plural', membersJson);
     const conversationId = this.parseQualifiedId(convId);
     const call = this.findCall(conversationId);
 
