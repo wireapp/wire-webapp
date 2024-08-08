@@ -35,7 +35,7 @@ import {t} from 'Util/LocalizerUtil';
 import {isValidPassword} from 'Util/StringUtil';
 
 import {MessageContent} from './Content/MessageContent';
-import {guestLinkPasswordInputStyles, guestLinkPasswordErrorMessageStyles} from './PrimaryModal.styles';
+import {guestLinkPasswordErrorMessageStyles} from './PrimaryModal.styles';
 import {usePrimaryModalState, showNextModalInQueue, defaultContent, removeCurrentModal} from './PrimaryModalState';
 import {ButtonAction, PrimaryModalType} from './PrimaryModalTypes';
 
@@ -122,9 +122,10 @@ export const PrimaryModalComponent: FC = () => {
   const actionEnabled = isPasswordRequired ? isPasswordOptional() : true;
   const inputActionEnabled = !isInput || !!inputValue.trim().length;
 
+  const areGuestLinkPasswordsValid = checkGuestLinkPassword(passwordValue, passwordConfirmationValue);
+
   const passwordGuestLinkActionEnabled =
-    (!isGuestLinkPassword || !!passwordValue.trim().length) &&
-    checkGuestLinkPassword(passwordValue, passwordConfirmationValue);
+    (!isGuestLinkPassword || !!passwordValue.trim().length) && areGuestLinkPasswordsValid;
 
   const isPrimaryActionDisabled = (disabled: boolean | undefined) => {
     if (!!disabled) {
@@ -146,7 +147,7 @@ export const PrimaryModalComponent: FC = () => {
       }
 
       // prevent from submit when validation not passed
-      if (!skipValidation && isGuestLinkPassword && !checkGuestLinkPassword(passwordValue, passwordConfirmationValue)) {
+      if (!skipValidation && isGuestLinkPassword && !areGuestLinkPasswordsValid) {
         setIsFormSubmitted(true);
         return;
       }
@@ -248,15 +249,15 @@ export const PrimaryModalComponent: FC = () => {
   );
 
   const buttons = primaryBtnFirst ? [primaryButton, ...secondaryButtons] : [...secondaryButtons, primaryButton];
+  const isPasswordFieldValid = isFormSubmitted && !passwordValueRef.current?.validity.valid;
 
-  const guestLinkPasswordErrorMessage =
-    isFormSubmitted && !passwordValueRef.current?.validity.valid ? (
-      <ErrorMessage data-uie-name="primary-modals-error-message" css={guestLinkPasswordErrorMessageStyles}>
-        {t('modalGuestLinkJoinHelperText', {
-          minPasswordLength: Config.getConfig().MINIMUM_PASSWORD_LENGTH.toString(),
-        })}
-      </ErrorMessage>
-    ) : undefined;
+  const guestLinkPasswordErrorMessage = isPasswordFieldValid ? (
+    <ErrorMessage data-uie-name="primary-modals-error-message" css={guestLinkPasswordErrorMessageStyles}>
+      {t('modalGuestLinkJoinHelperText', {
+        minPasswordLength: Config.getConfig().MINIMUM_PASSWORD_LENGTH.toString(),
+      })}
+    </ErrorMessage>
+  ) : undefined;
 
   return (
     <div
@@ -318,7 +319,6 @@ export const PrimaryModalComponent: FC = () => {
                     name="guest-link-password"
                     data-uie-name="guest-link-password"
                     required
-                    wrapperCSS={guestLinkPasswordInputStyles}
                     placeholder={t('modalGuestLinkJoinPlaceholder')}
                     label={t('modalGuestLinkJoinLabel')}
                     helperText={t('modalGuestLinkJoinHelperText', {
@@ -332,14 +332,13 @@ export const PrimaryModalComponent: FC = () => {
                     ref={passwordValueRef}
                     onChange={event => setPasswordValue(event.currentTarget.value)}
                     pattern={ValidationUtil.getNewPasswordPattern(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH)}
-                    markInvalid={isFormSubmitted && !passwordValueRef.current?.validity.valid}
+                    markInvalid={isPasswordFieldValid}
                     error={guestLinkPasswordErrorMessage}
                   />
                   <Input
                     name="guest-link-password-confirm"
                     data-uie-name="guest-link-password-confirm"
                     required
-                    wrapperCSS={guestLinkPasswordInputStyles}
                     placeholder={t('modalGuestLinkJoinConfirmPlaceholder')}
                     label={t('modalGuestLinkJoinConfirmLabel')}
                     className="modal__input"
@@ -348,7 +347,7 @@ export const PrimaryModalComponent: FC = () => {
                     autoComplete="off"
                     value={passwordConfirmationValue}
                     onChange={event => setPasswordConfirmationValue(event.currentTarget.value)}
-                    markInvalid={isFormSubmitted && !checkGuestLinkPassword(passwordValue, passwordConfirmationValue)}
+                    markInvalid={isFormSubmitted && !areGuestLinkPasswordsValid}
                   />
                 </Form>
               )}
