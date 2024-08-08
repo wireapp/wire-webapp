@@ -347,7 +347,6 @@ export class CallingRepository {
     wCall.setReqClientsHandler(wUser, this.requestClients);
     wCall.setReqNewEpochHandler(wUser, this.requestNewEpoch);
     wCall.setActiveSpeakerHandler(wUser, this.updateActiveSpeakers);
-    // wCall.setGroupChangedHandler(wUser, (a, b) => console.log('vir GroupChange called', a, b));
 
     return wUser;
   }
@@ -992,12 +991,25 @@ export class CallingRepository {
       conversationId,
       groupId,
     );
-    console.log('vir epoch', subconversationEpochInfo?.epoch);
-    await this.apiClient.api.conversation.deleteSubconversation(conversationId, 'conference', {
-      groupId: groupId,
-      epoch: 0,
-    });
+    const doesGroupExistLocally = await this.subconversationService.mlsService.conversationExists(groupId);
+
+    const conversationIdStr = this.serializeQualifiedId(conversationId);
+    this.wCall?.end(this.wUser, conversationIdStr);
     callingSubscriptions.removeCall(conversationId);
+    if (!doesGroupExistLocally) {
+      return this.subconversationService.clearSubconversationGroupId(conversationId, 'conference');
+    }
+    try {
+      await this.apiClient.api.conversation.deleteSubconversation(conversationId, 'conference', {
+        groupId: groupId,
+        epoch: subconversationEpochInfo?.epoch,
+      });
+    } catch (error) {
+      this.logger.error('Failed to delete subconversation', error);
+    }
+
+    await this.subconversationService.mlsService.wipeConversation(groupId);
+    await this.subconversationService.clearSubconversationGroupId(conversationId, 'conference');
   };
 
   private readonly leaveMLSConference = async (conversationId: QualifiedId) => {
@@ -1036,7 +1048,6 @@ export class CallingRepository {
   };
 
   private readonly handleCallParticipantChange = (conversationId: QualifiedId, members: QualifiedWcallMember[]) => {
-    console.log('vir', 'singular');
     const conversation = this.getConversationById(conversationId);
     if (!conversation || !this.isMLSConference(conversation)) {
       return;
@@ -1065,7 +1076,7 @@ export class CallingRepository {
         continue;
       }
 
-      if (conversation.is1to1()) {
+      if (conversation.is1to1() && !isSelfClient) {
         this.handleEmpty1on1(conversationId, members);
       }
 
@@ -1125,7 +1136,6 @@ export class CallingRepository {
   }
 
   readonly leaveCall = (conversationId: QualifiedId, reason: LEAVE_CALL_REASON): void => {
-    console.log('vir', 'leavin cause', reason);
     this.logger.info(`Ending call with reason ${reason} \n Stack trace: `, new Error().stack);
     const conversationIdStr = this.serializeQualifiedId(conversationId);
     delete this.poorCallQualityUsers[conversationIdStr];
@@ -1446,7 +1456,6 @@ export class CallingRepository {
     }
 
     if (reason === REASON.NORMAL) {
-      console.log('vir', 'waddup');
       this.callState.selectableScreens([]);
       this.callState.selectableWindows([]);
     }
@@ -1498,10 +1507,6 @@ export class CallingRepository {
         });
       }
     });
-
-    if (stillActiveState) {
-      console.log('vir', 'still active');
-    }
 
     if (!stillActiveState.includes(reason)) {
       this.injectDeactivateEvent(
@@ -1653,9 +1658,7 @@ export class CallingRepository {
       member => member.aestab === AUDIO_STATE.ESTABLISHED && member.userId.id !== this.selfUser?.id,
     );
     if (!otherActiveClients.length) {
-      this.leaveCall(conversationId, LEAVE_CALL_REASON.USER_MANUALY_LEFT_CONVERSATION);
       void this.leave1on1MLSConference(conversationId);
-      console.log('vir', 'hi');
     }
   }
 
@@ -1695,7 +1698,6 @@ export class CallingRepository {
   }
 
   private readonly handleCallParticipantChanges = (convId: SerializedConversationId, membersJson: string) => {
-    console.log('vir', 'changed plural', membersJson);
     const conversationId = this.parseQualifiedId(convId);
     const call = this.findCall(conversationId);
 
