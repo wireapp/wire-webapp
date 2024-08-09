@@ -3,6 +3,9 @@ name: 'CodeQL'
 on:
   schedule:
     - cron: '0 10 * * MON'
+  pull_request:
+    # we want to run the CI on every PR targetting those branches
+    branches: [master, dev, release/*]
 
 permissions:
   contents: read
