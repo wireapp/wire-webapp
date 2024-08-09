@@ -986,30 +986,11 @@ export class CallingRepository {
   }
 
   private readonly leave1on1MLSConference = async (conversationId: QualifiedId) => {
-    const groupId = await this.subconversationService.getSubconversationGroupId(conversationId, 'conference');
-    const subconversationEpochInfo = await this.subconversationService.getSubconversationEpochInfo(
-      conversationId,
-      groupId,
-    );
-    const doesGroupExistLocally = await this.subconversationService.mlsService.conversationExists(groupId);
+    await this.subconversationService.leave1on1ConferenceSubconversation(conversationId);
 
     const conversationIdStr = this.serializeQualifiedId(conversationId);
     this.wCall?.end(this.wUser, conversationIdStr);
     callingSubscriptions.removeCall(conversationId);
-    if (!doesGroupExistLocally) {
-      return this.subconversationService.clearSubconversationGroupId(conversationId, 'conference');
-    }
-    try {
-      await this.apiClient.api.conversation.deleteSubconversation(conversationId, 'conference', {
-        groupId: groupId,
-        epoch: subconversationEpochInfo?.epoch,
-      });
-    } catch (error) {
-      this.logger.error('Failed to delete subconversation', error);
-    }
-
-    await this.subconversationService.mlsService.wipeConversation(groupId);
-    await this.subconversationService.clearSubconversationGroupId(conversationId, 'conference');
   };
 
   private readonly leaveMLSConference = async (conversationId: QualifiedId) => {
@@ -1074,10 +1055,6 @@ export class CallingRepository {
       // If there is already a task for the client, don't overwrite it
       if (TaskScheduler.hasActiveTask(key)) {
         continue;
-      }
-
-      if (conversation.is1to1() && !isSelfClient) {
-        this.handleEmpty1on1(conversationId, members);
       }
 
       // otherwise, remove the client from subconversation if it won't establish their audio state in 3 mins timeout
@@ -1653,15 +1630,6 @@ export class CallingRepository {
     members.forEach(member => call.getParticipant(member.userId, member.clientid)?.videoState(member.vrecv));
   }
 
-  private handleEmpty1on1(conversationId: QualifiedId, members: QualifiedWcallMember[]): void {
-    const otherActiveClients = members.filter(
-      member => member.aestab === AUDIO_STATE.ESTABLISHED && member.userId.id !== this.selfUser?.id,
-    );
-    if (!otherActiveClients.length) {
-      void this.leave1on1MLSConference(conversationId);
-    }
-  }
-
   private updateParticipantAudioState(call: Call, members: QualifiedWcallMember[]): void {
     members.forEach(member =>
       call
@@ -1711,11 +1679,41 @@ export class CallingRepository {
       userId: this.parseQualifiedId(member.userid),
     }));
 
+    this.handleOneToOneMlsCallParticipantLeave(conversationId, members);
     this.updateParticipantList(call, members);
     this.updateParticipantMutedState(call, members);
     this.updateParticipantVideoState(call, members);
     this.updateParticipantAudioState(call, members);
     this.handleCallParticipantChange(conversationId, members);
+  };
+
+  private readonly handleOneToOneMlsCallParticipantLeave = (
+    conversationId: QualifiedId,
+    members: QualifiedWcallMember[],
+  ) => {
+    const conversation = this.getConversationById(conversationId);
+    const call = this.findCall(conversationId);
+
+    const [, nextOtherMember] = members;
+
+    if (!conversation || !this.isMLSConference(conversation) || !conversation?.is1to1() || !call || !nextOtherMember) {
+      return;
+    }
+
+    const currentOtherParticipant = call
+      .participants()
+      .find(participant => matchQualifiedIds(nextOtherMember.userId, participant.user.qualifiedId));
+
+    if (!currentOtherParticipant) {
+      return;
+    }
+
+    const isCurrentlyEstablished = currentOtherParticipant.isAudioEstablished();
+    const {aestab: newEstablishedStatus} = nextOtherMember;
+
+    if (isCurrentlyEstablished && newEstablishedStatus === AUDIO_STATE.CONNECTING) {
+      void this.leave1on1MLSConference(conversationId);
+    }
   };
 
   private readonly requestClients = async (wUser: number, convId: SerializedConversationId, __: number) => {
