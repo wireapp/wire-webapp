@@ -97,6 +97,7 @@ export class CallState {
   readonly isSpeakersViewActive: ko.PureComputed<boolean>;
   public readonly viewMode = ko.observable<CallingViewMode>(CallingViewMode.MINIMIZED);
   public readonly detachedWindow = ko.observable<Window | null>(null);
+  public readonly detachedWindowCallQualifiedId = ko.observable<QualifiedId | null>(null);
   public readonly desktopScreenShareMenu = ko.observable<DesktopScreenShareMenu>(DesktopScreenShareMenu.NONE);
 
   constructor() {
@@ -138,6 +139,7 @@ export class CallState {
 
   closeDetachedWindow = () => {
     this.detachedWindow(null);
+    this.detachedWindowCallQualifiedId(null);
     amplify.unsubscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, this.handleThemeUpdateEvent);
     this.viewMode(CallingViewMode.MINIMIZED);
   };
@@ -199,6 +201,8 @@ export class CallState {
 
       this.detachedWindow(detachedWindow);
     }
+
+    this.detachedWindowCallQualifiedId(this.joinedCall()?.conversation.qualifiedId ?? null);
 
     const detachedWindow = this.detachedWindow();
     if (!detachedWindow) {

@@ -1483,7 +1483,14 @@ export class CallingRepository {
       return;
     }
 
-    void this.callState.setViewModeMinimized();
+    if (
+      matchQualifiedIds(
+        call.conversation.qualifiedId,
+        this.callState.detachedWindowCallQualifiedId() ?? {id: '', domain: ''},
+      )
+    ) {
+      void this.callState.setViewModeMinimized();
+    }
 
     // There's nothing we need to do for non-mls calls
     if (call.conversationType === CONV_TYPE.CONFERENCE_MLS) {
