@@ -78,6 +78,8 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
   private allLabeledConversations: ko.Computed<Conversation[]>;
   private logger: Logger;
 
+  static LocalStorageKey = 'CONVERSATION_LABEL_REPOSITORY_PROPERTIES';
+
   constructor(
     private readonly allConversations: ko.ObservableArray<Conversation>,
     private readonly conversations: ko.PureComputed<Conversation[]>,
@@ -103,6 +105,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
       name,
       type,
     }));
+
     return {labels: labelJson};
   };
 
@@ -121,20 +124,37 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
         type,
       }),
     );
+
     this.labels(labels);
   };
 
   readonly saveLabels = () => {
-    this.propertiesService.putPropertiesByKey(propertiesKey, this.marshal());
+    const values = this.marshal();
+    void this.propertiesService.putPropertiesByKey(propertiesKey, values);
+    this.persistValues();
   };
 
   loadLabels = async () => {
     try {
+      const values = localStorage.getItem(ConversationLabelRepository.LocalStorageKey);
+
+      if (values) {
+        this.unmarshal(JSON.parse(values));
+        this.saveLabels();
+        return;
+      }
+
       const labelProperties = await this.propertiesService.getPropertiesByKey(propertiesKey);
       this.unmarshal(labelProperties);
+      this.persistValues();
     } catch (error) {
       this.logger.warn(`No labels were loaded: ${error.message}`);
     }
+  };
+
+  private persistValues = () => {
+    const values = this.marshal();
+    localStorage.setItem(ConversationLabelRepository.LocalStorageKey, JSON.stringify(values));
   };
 
   readonly onUserEvent = (event: any) => {
