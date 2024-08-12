@@ -985,6 +985,14 @@ export class CallingRepository {
     return this.conversationState.findConversation(conversationId);
   }
 
+  private readonly leave1on1MLSConference = async (conversationId: QualifiedId) => {
+    await this.subconversationService.leave1on1ConferenceSubconversation(conversationId);
+
+    const conversationIdStr = this.serializeQualifiedId(conversationId);
+    this.wCall?.end(this.wUser, conversationIdStr);
+    callingSubscriptions.removeCall(conversationId);
+  };
+
   private readonly leaveMLSConference = async (conversationId: QualifiedId) => {
     await this.subconversationService.leaveConferenceSubconversation(conversationId);
     callingSubscriptions.removeCall(conversationId);
@@ -1410,13 +1418,18 @@ export class CallingRepository {
     Warnings.hideWarning(Warnings.TYPE.CALL_QUALITY_POOR);
     const conversationId = this.parseQualifiedId(convId);
     const call = this.findCall(conversationId);
+    const conversation = this.getConversationById(conversationId);
     if (!call) {
       return;
     }
 
     // There's nothing we need to do for non-mls calls
     if (call.conversationType === CONV_TYPE.CONFERENCE_MLS) {
-      await this.leaveMLSConference(conversationId);
+      if (!conversation?.is1to1()) {
+        await this.leaveMLSConference(conversationId);
+      } else {
+        await this.leave1on1MLSConference(conversationId);
+      }
     }
 
     if (reason === REASON.NORMAL) {
@@ -1666,11 +1679,49 @@ export class CallingRepository {
       userId: this.parseQualifiedId(member.userid),
     }));
 
+    this.handleOneToOneMlsCallParticipantLeave(conversationId, members);
     this.updateParticipantList(call, members);
     this.updateParticipantMutedState(call, members);
     this.updateParticipantVideoState(call, members);
     this.updateParticipantAudioState(call, members);
     this.handleCallParticipantChange(conversationId, members);
+  };
+
+  private readonly handleOneToOneMlsCallParticipantLeave = (
+    conversationId: QualifiedId,
+    members: QualifiedWcallMember[],
+  ) => {
+    const conversation = this.getConversationById(conversationId);
+    const call = this.findCall(conversationId);
+
+    if (!conversation || !this.isMLSConference(conversation) || !conversation?.is1to1() || !call) {
+      return;
+    }
+
+    const selfParticipant = call.getSelfParticipant();
+
+    const nextOtherParticipant = members.find(
+      participant => !matchQualifiedIds(participant.userId, selfParticipant.user.qualifiedId),
+    );
+
+    if (!nextOtherParticipant) {
+      return;
+    }
+
+    const currentOtherParticipant = call
+      .participants()
+      .find(participant => matchQualifiedIds(nextOtherParticipant.userId, participant.user.qualifiedId));
+
+    if (!currentOtherParticipant) {
+      return;
+    }
+
+    const isCurrentlyEstablished = currentOtherParticipant.isAudioEstablished();
+    const {aestab: newEstablishedStatus} = nextOtherParticipant;
+
+    if (isCurrentlyEstablished && newEstablishedStatus === AUDIO_STATE.CONNECTING) {
+      void this.leave1on1MLSConference(conversationId);
+    }
   };
 
   private readonly requestClients = async (wUser: number, convId: SerializedConversationId, __: number) => {
