@@ -199,9 +199,11 @@ export const WebAppEvents = {
       PREVIEWS: {
         SEND: 'wire.webapp.properties.update.previews.send',
       },
-      PRIVACY: 'wire.webapp.properties.update.privacy',
+      PRIVACY: {
+        TELEMETRY_SHARING: 'wire.webapp.properties.update.privacy.telemetry_sharing',
+        MARKETING_CONSENT: 'wire.webapp.properties.update.privacy.marketing_consent',
+      },
       SOUND_ALERTS: 'wire.webapp.properties.update.sound_alerts',
-      TELEMETRY_SHARING: 'wire.webapp.properties.update.telemetry_sharing',
     },
     UPDATED: 'wire.webapp.properties.updated',
   },
