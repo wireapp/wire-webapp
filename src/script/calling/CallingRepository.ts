@@ -1694,22 +1694,30 @@ export class CallingRepository {
     const conversation = this.getConversationById(conversationId);
     const call = this.findCall(conversationId);
 
-    const [, nextOtherMember] = members;
+    if (!conversation || !this.isMLSConference(conversation) || !conversation?.is1to1() || !call) {
+      return;
+    }
 
-    if (!conversation || !this.isMLSConference(conversation) || !conversation?.is1to1() || !call || !nextOtherMember) {
+    const selfParticipant = call.getSelfParticipant();
+
+    const nextOtherParticipant = members.find(
+      participant => !matchQualifiedIds(participant.userId, selfParticipant.user.qualifiedId),
+    );
+
+    if (!nextOtherParticipant) {
       return;
     }
 
     const currentOtherParticipant = call
       .participants()
-      .find(participant => matchQualifiedIds(nextOtherMember.userId, participant.user.qualifiedId));
+      .find(participant => matchQualifiedIds(nextOtherParticipant.userId, participant.user.qualifiedId));
 
     if (!currentOtherParticipant) {
       return;
     }
 
     const isCurrentlyEstablished = currentOtherParticipant.isAudioEstablished();
-    const {aestab: newEstablishedStatus} = nextOtherMember;
+    const {aestab: newEstablishedStatus} = nextOtherParticipant;
 
     if (isCurrentlyEstablished && newEstablishedStatus === AUDIO_STATE.CONNECTING) {
       void this.leave1on1MLSConference(conversationId);
