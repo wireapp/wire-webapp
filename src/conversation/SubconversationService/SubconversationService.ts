@@ -151,6 +151,46 @@ export class SubconversationService extends TypedEventEmitter<Events> {
     await this.clearSubconversationGroupId(conversationId, SUBCONVERSATION_ID.CONFERENCE);
   }
 
+  /**
+   * Short term solution to an issues with 1:1 MLS call, see
+   * https://wearezeta.atlassian.net/wiki/spaces/PAD/pages/1314750477/2024-07-29+1+1+calls+over+SFT#Do-not-leave-the-subconversation
+   * Will delete a conference subconversation when hanging up on a 1:1 call instead of leaving.
+   *
+   * @param conversationId Id of the parent conversation which subconversation we want to leave
+   */
+  public async leave1on1ConferenceSubconversation(conversationId: QualifiedId): Promise<void> {
+    const subconversationGroupId = await this.getSubconversationGroupId(conversationId, SUBCONVERSATION_ID.CONFERENCE);
+
+    if (!subconversationGroupId) {
+      return;
+    }
+
+    const doesGroupExistLocally = await this.mlsService.conversationExists(subconversationGroupId);
+    if (!doesGroupExistLocally) {
+      // If the subconversation was known by a client but is does not exist locally, we can remove it from the store.
+      return this.clearSubconversationGroupId(conversationId, SUBCONVERSATION_ID.CONFERENCE);
+    }
+
+    try {
+      const epochInfo = await this.getSubconversationEpochInfo(conversationId, subconversationGroupId);
+
+      if (!epochInfo) {
+        throw new Error('Failed to get epoch info for conference subconversation');
+      }
+      await this.apiClient.api.conversation.deleteSubconversation(conversationId, SUBCONVERSATION_ID.CONFERENCE, {
+        groupId: subconversationGroupId,
+        epoch: epochInfo.epoch,
+      });
+    } catch (error) {
+      this.logger.error(`Failed to delete conference subconversation:`, error);
+    }
+
+    await this.mlsService.wipeConversation(subconversationGroupId);
+
+    // once we've deleted the subconversation, we can remove it from the store
+    await this.clearSubconversationGroupId(conversationId, SUBCONVERSATION_ID.CONFERENCE);
+  }
+
   public async leaveStaleConferenceSubconversations(): Promise<void> {
     const conversationIds = await this.getAllGroupIdsBySubconversationId(SUBCONVERSATION_ID.CONFERENCE);
 
