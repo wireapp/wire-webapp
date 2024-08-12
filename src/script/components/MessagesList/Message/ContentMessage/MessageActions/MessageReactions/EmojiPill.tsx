@@ -78,20 +78,30 @@ export const EmojiPill = ({
 
   const conversationReactionCaption = () => {
     if (emojiCount > MAX_USER_NAMES_TO_SHOW) {
-      return t('conversationLikesCaptionPluralMoreThan2', {
-        number: (emojiCount - MAX_USER_NAMES_TO_SHOW).toString(),
-        userNames: reactingUserNames.join(', '),
-      });
+      return t(
+        'conversationLikesCaptionPluralMoreThan2',
+        {
+          number: (emojiCount - MAX_USER_NAMES_TO_SHOW).toString(),
+          userNames: reactingUserNames.join(', '),
+        },
+        {},
+        true,
+      );
     }
 
     if (emojiCount === MAX_USER_NAMES_TO_SHOW) {
-      return t('conversationLikesCaptionPlural', {
-        firstUser: reactingUserNames[0],
-        secondUser: reactingUserNames[1],
-      });
+      return t(
+        'conversationLikesCaptionPlural',
+        {
+          firstUser: reactingUserNames[0],
+          secondUser: reactingUserNames[1],
+        },
+        {},
+        true,
+      );
     }
 
-    return t('conversationLikesCaptionSingular', {userName: reactingUserNames?.[0] || ''});
+    return t('conversationLikesCaptionSingular', {userName: reactingUserNames?.[0] || ''}, {}, true);
   };
 
   const caption = conversationReactionCaption();
