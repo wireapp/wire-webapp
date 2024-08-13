@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.23.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.23.0...@wireapp/react-ui-kit@9.23.1) (2024-08-13)
+
+### Reverts
+
+* Revert "chore: Publish [skip ci]" (#6450) ([a822cc9](https://github.com/wireapp/wire-web-packages/commit/a822cc90c5295543f780dec06ad12ceab06c6882)), closes [#6450](https://github.com/wireapp/wire-web-packages/issues/6450)
+
 # [9.23.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.22.0...@wireapp/react-ui-kit@9.23.0) (2024-08-01)
 
 ### Features

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.24.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.23.0...@wireapp/webapp-events@0.24.0) (2024-08-13)
+
+### Features
+
+* **privacy:** streamline the structure of privacy related events ([#6451](https://github.com/wireapp/wire-web-packages/issues/6451)) ([b0a1bb5](https://github.com/wireapp/wire-web-packages/commit/b0a1bb536fadbbef37693d3ae9deec31055f1cd4))
+
 # [0.23.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.22.1...@wireapp/webapp-events@0.23.0) (2024-07-22)
 
 ### Features

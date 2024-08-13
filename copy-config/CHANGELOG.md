@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.2.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/copy-config@2.2.3...@wireapp/copy-config@2.2.4) (2024-08-13)
+
+### Reverts
+
+* Revert "chore: Publish [skip ci]" (#6450) ([a822cc9](https://github.com/wireapp/wire-web-packages/commit/a822cc90c5295543f780dec06ad12ceab06c6882)), closes [#6450](https://github.com/wireapp/wire-web-packages/issues/6450)
+
 ## [2.2.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/copy-config@2.2.2...@wireapp/copy-config@2.2.3) (2024-07-16)
 
 **Note:** Version bump only for package @wireapp/copy-config
