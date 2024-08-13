@@ -372,7 +372,7 @@ export class App {
       const selfUser = await this.repository.user.getSelf([{position: 'App.initiateSelfUser', vendor: 'webapp'}]);
 
       await initializeDataDog(this.config, selfUser.qualifiedId);
-      onProgress(5, t('initReceivedSelfUser', selfUser.name()));
+      onProgress(5, t('initReceivedSelfUser', selfUser.name(), {}, true));
 
       try {
         await this.core.init(clientType);
