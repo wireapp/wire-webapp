@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [46.2.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.2.2...@wireapp/core@46.2.3) (2024-08-13)
+
+### Bug Fixes
+
+* handle leaving a 1:1 call over SFT [WPB-7151] ([#6434](https://github.com/wireapp/wire-web-packages/issues/6434)) ([5ace70c](https://github.com/wireapp/wire-web-packages/commit/5ace70c59a81dc0c07b6c9c7cf32df1f0f8274b2))
+
+### Reverts
+
+* Revert "chore: Publish [skip ci]" (#6450) ([a822cc9](https://github.com/wireapp/wire-web-packages/commit/a822cc90c5295543f780dec06ad12ceab06c6882)), closes [#6450](https://github.com/wireapp/wire-web-packages/issues/6450)
+
 ## [46.2.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.2.1...@wireapp/core@46.2.2) (2024-07-31)
 
 **Note:** Version bump only for package @wireapp/core
