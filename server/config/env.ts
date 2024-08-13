@@ -146,10 +146,6 @@ export type Env = {
   /** Set a default federation domain in case no domain can be found */
   FEATURE_FEDERATION_DOMAIN: string;
 
-  // TODO: remove this when all clients have enabled this feature
-  /** Enable guest link passwords if the feature is enabled on the backend */
-  FEATURE_ENABLE_LINK_PASSWORDS: string;
-
   /** Feature toggle for the log in with a username. Can be set to true or false */
   FEATURE_ENABLE_USERNAME_LOGIN: string;
 
