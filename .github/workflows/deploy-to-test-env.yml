@@ -8,7 +8,6 @@ on:
         required: true
         type: choice
         options:
-          - wire-webapp-main
           - wire-webapp-qa
           - wire-webapp-mls
 
