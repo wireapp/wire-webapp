@@ -501,7 +501,7 @@ export class App {
       onProgress(97.5, t('initUpdatedFromNotifications', this.config.BRAND_NAME));
 
       const clientEntities = await clientRepository.updateClientsForSelf();
-      await eventTrackerRepository.init(propertiesRepository.properties.settings.privacy.telemetry_sharing);
+      await eventTrackerRepository.init(propertiesRepository.getUserConsentStatus().isTelemetryConsentGiven);
 
       onProgress(99);
 

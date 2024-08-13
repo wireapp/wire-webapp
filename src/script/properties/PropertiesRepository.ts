@@ -30,10 +30,11 @@ import {Environment} from 'Util/Environment';
 import {getLogger, Logger} from 'Util/Logger';
 
 import type {PropertiesService} from './PropertiesService';
-import {PROPERTIES_TYPE} from './PropertiesType';
+import {PROPERTIES_TYPE, UserConsentStatus} from './PropertiesType';
 
 import type {User} from '../entity/User';
 import type {SelfService} from '../self/SelfService';
+import {isCountlyEnabledAtCurrentEnvironment} from '../tracking/Countly.helpers';
 import {ConsentValue} from '../user/ConsentValue';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from '../user/TypingIndicatorMode';
 
@@ -43,7 +44,7 @@ export class PropertiesRepository {
     return {
       WEBAPP_ACCOUNT_SETTINGS: 'webapp',
       WIRE_MARKETING_CONSENT: {
-        defaultValue: ConsentValue.NOT_GIVEN,
+        defaultValue: false,
         key: 'WIRE_MARKETING_CONSENT',
       },
       WIRE_RECEIPT_MODE: {
@@ -64,7 +65,6 @@ export class PropertiesRepository {
   private readonly selfService: SelfService;
   private readonly selfUser: ko.Observable<User>;
   public properties: WebappProperties;
-  public readonly marketingConsent: ko.Observable<ConsentValue | boolean>;
 
   constructor(propertiesService: PropertiesService, selfService: SelfService) {
     this.propertiesService = propertiesService;
@@ -72,7 +72,6 @@ export class PropertiesRepository {
     this.logger = getLogger('PropertiesRepository');
 
     this.properties = {
-      contact_import: {},
       enable_debugging: false,
       settings: {
         call: {
@@ -93,8 +92,8 @@ export class PropertiesRepository {
           send: true,
         },
         privacy: {
-          report_errors: undefined,
           telemetry_sharing: undefined,
+          marketing_consent: PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.defaultValue,
         },
         sound: {
           alerts: AudioPreference.ALL,
@@ -102,18 +101,48 @@ export class PropertiesRepository {
       },
       version: 1,
     };
+
     this.selfUser = ko.observable();
     this.receiptMode = ko.observable(PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.defaultValue);
     this.typingIndicatorMode = ko.observable(PropertiesRepository.CONFIG.WIRE_TYPING_INDICATOR_MODE.defaultValue);
     /** @type {ko.Observable<ConsentValue | boolean>} */
-    this.marketingConsent = ko.observable(PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.defaultValue);
+  }
+
+  public getUserConsentStatus() {
+    // set default
+    let userConsentStatus = UserConsentStatus.ALL_DENIED;
+
+    const marketingConsent = this.properties.settings.privacy.marketing_consent;
+
+    // check if the user has allowed marketing
+    if (!!marketingConsent) {
+      userConsentStatus = UserConsentStatus.MARKETING_GRANTED;
+    }
+
+    // check if the user has allowed tracking
+    if (!!this.properties.settings.privacy.telemetry_sharing) {
+      if (!!marketingConsent) {
+        userConsentStatus = UserConsentStatus.ALL_GRANTED;
+      } else {
+        userConsentStatus = UserConsentStatus.TRACKING_GRANTED;
+      }
+    }
+    // return the correct status
+    return {
+      isMarketingConsentGiven:
+        userConsentStatus === UserConsentStatus.MARKETING_GRANTED ||
+        userConsentStatus === UserConsentStatus.ALL_GRANTED,
+      isTelemetryConsentGiven:
+        userConsentStatus === UserConsentStatus.TRACKING_GRANTED || userConsentStatus === UserConsentStatus.ALL_GRANTED,
+      isCountlyEnabledAtCurrentEnvironment: isCountlyEnabledAtCurrentEnvironment(),
+    };
   }
 
   checkTelemetrySharingPermission(): void {
-    const isTelemetryPreferenceSet = this.getPreference(PROPERTIES_TYPE.TELEMETRY_SHARING) !== undefined;
+    const isTelemetryPreferenceSet = this.getPreference(PROPERTIES_TYPE.PRIVACY.TELEMETRY_SHARING) !== undefined;
 
     if (!isTelemetryPreferenceSet) {
-      this.savePreference(PROPERTIES_TYPE.TELEMETRY_SHARING, true);
+      this.savePreference(PROPERTIES_TYPE.PRIVACY.TELEMETRY_SHARING, true);
       this.publishProperties();
     }
   }
@@ -175,7 +204,7 @@ export class PropertiesRepository {
 
   private initTemporaryGuestAccount(): Promise<WebappProperties> {
     this.logger.info('Temporary guest user: Using default properties');
-    this.savePreference(PROPERTIES_TYPE.TELEMETRY_SHARING, false);
+    this.savePreference(PROPERTIES_TYPE.PRIVACY.TELEMETRY_SHARING, false);
     return Promise.resolve(this.publishProperties());
   }
 
@@ -192,7 +221,7 @@ export class PropertiesRepository {
         ? this.savePreferenceTemporaryGuestAccount(propertiesType, updatedPreference)
         : this.savePreferenceActivatedAccount(propertiesType, updatedPreference);
 
-      savePromise.then(() => this.publishPropertyUpdate(propertiesType, updatedPreference));
+      void savePromise.then(() => this.publishPropertyUpdate(propertiesType, updatedPreference));
     }
   }
 
@@ -221,7 +250,8 @@ export class PropertiesRepository {
         }
         break;
       case PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.key:
-        this.marketingConsent(value);
+        this.properties.settings.privacy.marketing_consent = value;
+        this.publishPropertyUpdate(PROPERTIES_TYPE.PRIVACY.MARKETING_CONSENT, value);
         break;
       case PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key:
         this.receiptMode(value);
@@ -282,8 +312,11 @@ export class PropertiesRepository {
       case PROPERTIES_TYPE.PREVIEWS.SEND:
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.PREVIEWS.SEND, updatedPreference);
         break;
-      case PROPERTIES_TYPE.TELEMETRY_SHARING:
-        amplify.publish(WebAppEvents.PROPERTIES.UPDATE.TELEMETRY_SHARING, updatedPreference);
+      case PROPERTIES_TYPE.PRIVACY.TELEMETRY_SHARING:
+        amplify.publish(WebAppEvents.PROPERTIES.UPDATE.PRIVACY.TELEMETRY_SHARING, updatedPreference);
+        break;
+      case PROPERTIES_TYPE.PRIVACY.MARKETING_CONSENT:
+        amplify.publish(WebAppEvents.PROPERTIES.UPDATE.PRIVACY.MARKETING_CONSENT, updatedPreference);
         break;
       case PROPERTIES_TYPE.SOUND_ALERTS:
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.SOUND_ALERTS, updatedPreference);
