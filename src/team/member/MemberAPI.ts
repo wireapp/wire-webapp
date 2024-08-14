@@ -160,7 +160,7 @@ export class MemberAPI {
 
     const handleRequest = async (): Promise<MemberCSVResponse> => {
       try {
-        const response = await this.client.sendRequest<ArrayBuffer>(config, true);
+        const response = await this.client.sendRequest<ArrayBuffer>(config);
         return {
           buffer: response.data,
           mimeType: response.headers['content-type'],

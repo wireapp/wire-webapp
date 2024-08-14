@@ -215,7 +215,7 @@ export class AssetAPI {
 
     const handleRequest = async (): Promise<AssetResponse> => {
       try {
-        const response = await this.client.sendRequest<ArrayBuffer>(config, true);
+        const response = await this.client.sendRequest<ArrayBuffer>(config);
         return {
           buffer: response.data,
           mimeType: response.headers['content-type'],
@@ -266,7 +266,7 @@ export class AssetAPI {
 
     const handleRequest = async (): Promise<AssetResponse> => {
       try {
-        const response = await this.client.sendRequest<ArrayBuffer>(config, true);
+        const response = await this.client.sendRequest<ArrayBuffer>(config);
         return {
           buffer: response.data,
           mimeType: response.headers['content-type'],
