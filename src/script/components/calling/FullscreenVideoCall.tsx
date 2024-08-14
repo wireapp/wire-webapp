@@ -669,6 +669,11 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   {participants.length > 2 && (
                     <li className="video-controls__item">
                       <button
+                        onBlur={event => {
+                          if (!event.currentTarget.contains(event.relatedTarget) && isCallViewOpen) {
+                            toggleCallView();
+                          }
+                        }}
                         className="video-controls__button video-controls__button--small"
                         onClick={toggleCallView}
                         onKeyDown={event => handleKeyDown(event, toggleCallView)}
@@ -737,6 +742,11 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                         css={showEmojisBar ? videoControlActiveStyles : videoControlInActiveStyles}
                         className="video-controls__button video-controls__button--small"
                         onClick={() => setShowEmojisBar(prev => !prev)}
+                        onBlur={event => {
+                          if (!event.currentTarget.contains(event.relatedTarget)) {
+                            setShowEmojisBar(false);
+                          }
+                        }}
                         type="button"
                         aria-labelledby="show-emoji-bar"
                         data-uie-name="do-call-controls-video-call-cancel"
