@@ -684,29 +684,31 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                         aria-checked={!isMuted}
                         title={t('videoCallOverlayChangeViewMode')}
                       >
-                        <Select
-                          // eslint-disable-next-line jsx-a11y/no-autofocus
-                          autoFocus
-                          value={selectedCallViewOption}
-                          id="select-call-view"
-                          dataUieName="select-call-view"
-                          controlShouldRenderValue={false}
-                          isClearable={false}
-                          backspaceRemovesValue={false}
-                          hideSelectedOptions={false}
-                          options={callViewOptions}
-                          onChange={selectedOption => {
-                            if (isCallViewOption(selectedOption)) {
-                              setActiveCallViewTab(selectedOption.value);
-                              setMaximizedParticipant(call, null);
-                            }
-                          }}
-                          onKeyDown={event => isEscapeKey(event) && setAudioOptionsOpen(false)}
-                          menuPlacement="top"
-                          menuIsOpen={isCallViewOpen}
-                          wrapperCSS={{marginBottom: 0, width: 0, height: 0}}
-                          menuCSS={{right: 0, bottom: 10}}
-                        />
+                        {isCallViewOpen && (
+                          <Select
+                            // eslint-disable-next-line jsx-a11y/no-autofocus
+                            autoFocus
+                            value={selectedCallViewOption}
+                            id="select-call-view"
+                            dataUieName="select-call-view"
+                            controlShouldRenderValue={false}
+                            isClearable={false}
+                            backspaceRemovesValue={false}
+                            hideSelectedOptions={false}
+                            options={callViewOptions}
+                            onChange={selectedOption => {
+                              if (isCallViewOption(selectedOption)) {
+                                setActiveCallViewTab(selectedOption.value);
+                                setMaximizedParticipant(call, null);
+                              }
+                            }}
+                            onKeyDown={event => isEscapeKey(event) && setAudioOptionsOpen(false)}
+                            menuPlacement="top"
+                            menuIsOpen={isCallViewOpen}
+                            wrapperCSS={{marginBottom: 0, width: 0, height: 0}}
+                            menuCSS={{right: 0, bottom: 10}}
+                          />
+                        )}
                         <GridIcon width={16} height={16} />
                       </button>
                     </li>
@@ -739,6 +741,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                         </div>
                       )}
                       <button
+                        title={t('callReactions')}
                         css={showEmojisBar ? videoControlActiveStyles : videoControlInActiveStyles}
                         className="video-controls__button video-controls__button--small"
                         onClick={() => setShowEmojisBar(prev => !prev)}
@@ -747,9 +750,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                         data-uie-name="do-call-controls-video-call-cancel"
                       >
                         <EmojiIcon />
-                        <span id="show-emoji-bar" className="video-controls__button__label">
-                          {t('callReactions')}
-                        </span>
                       </button>
                     </li>
                   )}
