@@ -130,25 +130,15 @@ export class HttpClient extends EventEmitter {
     }
   }
 
-  public async _sendRequest<T>(
-    config: AxiosRequestConfig,
-    tokenAsParam = false,
-    isFirstTry = true,
-  ): Promise<AxiosResponse<T>> {
+  public async _sendRequest<T>(config: AxiosRequestConfig, isFirstTry = true): Promise<AxiosResponse<T>> {
     if (this.accessTokenStore.accessToken) {
+      // TODO: remove tokenAsParam
       const {token_type, access_token} = this.accessTokenStore.accessToken;
 
-      if (tokenAsParam) {
-        config.params = {
-          ...config.params,
-          access_token,
-        };
-      } else {
-        config.headers = {
-          ...config.headers,
-          Authorization: `${token_type} ${access_token}`,
-        };
-      }
+      config.headers = {
+        ...config.headers,
+        Authorization: `${token_type} ${access_token}`,
+      };
     }
 
     try {
@@ -170,7 +160,7 @@ export class HttpClient extends EventEmitter {
         config['axios-retry'] = {
           retries: 0,
         };
-        return this._sendRequest<T>(config, tokenAsParam, false);
+        return this._sendRequest<T>(config, false);
       };
 
       const hasAccessToken = !!this.accessTokenStore?.accessToken;
@@ -280,12 +270,11 @@ export class HttpClient extends EventEmitter {
 
   public async sendRequest<T>(
     config: AxiosRequestConfig,
-    tokenAsParam: boolean = false,
     isSynchronousRequest: boolean = false,
   ): Promise<AxiosResponse<T>> {
     const promise = isSynchronousRequest
-      ? this.requestQueue.add(() => this._sendRequest<T>(config, tokenAsParam))
-      : this._sendRequest<T>(config, tokenAsParam);
+      ? this.requestQueue.add(() => this._sendRequest<T>(config))
+      : this._sendRequest<T>(config);
 
     try {
       return await promise;
@@ -295,7 +284,7 @@ export class HttpClient extends EventEmitter {
       const isTooManyRequestsError = axios.isAxiosError(error) && error.response?.status === 420;
 
       if (isTooManyRequestsError) {
-        return this.backOffQueue.add(() => this._sendRequest<T>(config, tokenAsParam));
+        return this.backOffQueue.add(() => this._sendRequest<T>(config));
       }
 
       throw error;
@@ -318,7 +307,7 @@ export class HttpClient extends EventEmitter {
       'Content-Encoding': shouldGzipData ? 'gzip' : config.headers?.['Content-Encoding'],
     };
 
-    return this.sendRequest<T>(config, false, isSynchronousRequest);
+    return this.sendRequest<T>(config, isSynchronousRequest);
   }
 
   public sendXML<T>(config: AxiosRequestConfig): Promise<AxiosResponse<T>> {
@@ -326,7 +315,7 @@ export class HttpClient extends EventEmitter {
       ...config.headers,
       'Content-Type': ContentType.APPLICATION_XML,
     };
-    return this.sendRequest<T>(config, false, false);
+    return this.sendRequest<T>(config, false);
   }
 
   public sendProtocolBuffer<T>(
@@ -337,7 +326,7 @@ export class HttpClient extends EventEmitter {
       ...config.headers,
       'Content-Type': ContentType.APPLICATION_PROTOBUF,
     };
-    return this.sendRequest<T>(config, false, isSynchronousRequest);
+    return this.sendRequest<T>(config, isSynchronousRequest);
   }
 
   public sendProtocolMls<T>(
@@ -348,6 +337,6 @@ export class HttpClient extends EventEmitter {
       ...config.headers,
       'Content-Type': ContentType.MESSAGES_MLS,
     };
-    return this.sendRequest<T>(config, false, isSynchronousRequest);
+    return this.sendRequest<T>(config, isSynchronousRequest);
   }
 }
