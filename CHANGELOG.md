@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [27.3.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.3.2...@wireapp/api-client@27.3.3) (2024-08-14)
+
+### Bug Fixes
+
+* use of Auth header to pass access-token instead of query param ([#6452](https://github.com/wireapp/wire-web-packages/issues/6452)) ([c392ebd](https://github.com/wireapp/wire-web-packages/commit/c392ebd396d9058e9b8d40691d15065d88a92111))
+
 ## [27.3.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.3.1...@wireapp/api-client@27.3.2) (2024-08-13)
 
 ### Reverts
