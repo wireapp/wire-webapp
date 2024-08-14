@@ -106,7 +106,7 @@
     "cross-env": "7.0.3",
     "css-loader": "7.1.2",
     "cssnano": "7.0.5",
-    "dexie": "4.0.8",
+    "dexie": "4.0.7",
     "dotenv": "16.4.5",
     "dpdm": "3.14.0",
     "eslint": "8.57.0",
