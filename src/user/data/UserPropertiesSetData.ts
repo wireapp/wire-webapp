@@ -52,7 +52,7 @@ export interface WebappProperties {
       send: boolean;
     };
     privacy: {
-      report_errors?: boolean;
+      marketing_consent?: boolean;
       telemetry_sharing?: boolean;
     };
     sound: {
