@@ -87,6 +87,9 @@ export class TeamService {
         },
         [FEATURE_KEY.CONFERENCE_CALLING]: {
           status: FeatureStatus.ENABLED,
+          config: {
+            useSFTForOneToOneCalls: false,
+          },
         },
         [FEATURE_KEY.DIGITAL_SIGNATURES]: {
           status: FeatureStatus.ENABLED,
