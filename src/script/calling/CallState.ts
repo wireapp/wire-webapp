@@ -23,7 +23,6 @@ import ko from 'knockout';
 import {singleton} from 'tsyringe';
 
 import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
-import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useDetachedCallingFeatureState} from 'Components/calling/DetachedCallingCell/DetachedCallingFeature.state';
@@ -57,27 +56,6 @@ export enum DesktopScreenShareMenu {
 }
 
 type Emoji = {emoji: string; id: string; left: number; from: string};
-
-declare global {
-  interface Document {
-    readonly pictureInPictureEnabled: boolean;
-    exitPictureInPicture(): Promise<void>;
-  }
-
-  interface DocumentPictureInPicture {
-    window: Window | null;
-    requestWindow(options?: {width?: number; height?: number}): Promise<DocumentPictureInPictureWindow>;
-  }
-
-  interface DocumentPictureInPictureWindow extends Window {
-    resizeTo(width: number, height: number): void;
-    close(): void;
-  }
-
-  interface Window {
-    documentPictureInPicture?: DocumentPictureInPicture;
-  }
-}
 
 @singleton()
 export class CallState {
@@ -174,37 +152,29 @@ export class CallState {
       return;
     }
 
-    const isDesktop = Runtime.isDesktopApp();
     const {name, width, height} = detachedViewModeOptions;
-    if ('documentPictureInPicture' in window && window.documentPictureInPicture && !isDesktop) {
-      const detachedWindow = await window.documentPictureInPicture.requestWindow({height, width});
+    const {top, left} = calculateChildWindowPosition(height, width);
 
-      this.detachedWindow(detachedWindow);
-    } else {
-      const {top, left} = calculateChildWindowPosition(height, width);
-
-      const detachedWindow = window.open(
-        '',
-        name,
-        `
+    const detachedWindow = window.open(
+      '',
+      name,
+      `
         width=${width}
         height=${height},
         top=${top},
         left=${left}
         location=no,
         menubar=no,
-        resizable=no,
+        resizable=yes,
         status=no,
         toolbar=no,
       `,
-      );
+    );
 
-      this.detachedWindow(detachedWindow);
-    }
+    this.detachedWindow(detachedWindow);
 
     this.detachedWindowCallQualifiedId(this.joinedCall()?.conversation.qualifiedId ?? null);
 
-    const detachedWindow = this.detachedWindow();
     if (!detachedWindow) {
       return;
     }
