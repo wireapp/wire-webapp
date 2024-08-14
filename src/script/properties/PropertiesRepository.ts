@@ -93,7 +93,7 @@ export class PropertiesRepository {
           send: true,
         },
         privacy: {
-          report_errors: undefined,
+          marketing_consent: undefined,
           telemetry_sharing: undefined,
         },
         sound: {

@@ -86,6 +86,7 @@ export class TeamService {
           status: FeatureStatus.DISABLED,
         },
         [FEATURE_KEY.CONFERENCE_CALLING]: {
+          config: {},
           status: FeatureStatus.ENABLED,
         },
         [FEATURE_KEY.DIGITAL_SIGNATURES]: {

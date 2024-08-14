@@ -53,6 +53,7 @@ describe('FeatureConfigChangeNotifier', () => {
       config: {enforcedTimeoutSeconds: 0},
     },
     [FEATURE_KEY.CONFERENCE_CALLING]: {
+      config: {},
       status: FeatureStatus.DISABLED,
     },
     [FEATURE_KEY.CONVERSATION_GUEST_LINKS]: {
