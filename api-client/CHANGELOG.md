@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.4.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.3.3...@wireapp/api-client@27.4.0) (2024-08-14)
+
+### Features
+
+* replace error_reporting with marketing_consent ([#6453](https://github.com/wireapp/wire-web-packages/issues/6453)) ([5e0e643](https://github.com/wireapp/wire-web-packages/commit/5e0e64313e3abe21372596f3c79679b3562ebeee))
+
 ## [27.3.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.3.2...@wireapp/api-client@27.3.3) (2024-08-14)
 
 ### Bug Fixes
