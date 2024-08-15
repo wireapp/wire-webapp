@@ -31,6 +31,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isKeyboardEvent} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
+import {replaceAccents} from 'Util/StringUtil';
 
 import {ConnectionRequests} from './ConnectionRequests';
 
@@ -138,10 +139,18 @@ export const ConversationsList = ({
 
   const getConversationView = () => {
     if (isFolderView && currentFolder) {
+      const conversationSearchFilter = (conversation: Conversation) => {
+        const filterWord = replaceAccents(conversationsFilter.toLowerCase());
+        const conversationDisplayName = replaceAccents(conversation.display_name().toLowerCase());
+
+        return conversationDisplayName.includes(filterWord);
+      };
+
       return (
         <>
           {currentFolder
             ?.conversations()
+            .filter(conversationSearchFilter)
             .map((conversation, index) => (
               <ConversationListCell key={conversation.id} {...getCommonConversationCellProps(conversation, index)} />
             ))}
