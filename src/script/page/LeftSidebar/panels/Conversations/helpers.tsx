@@ -61,14 +61,14 @@ export function getTabConversations({
 
   if (currentTab === SidebarTabs.GROUPS) {
     return {
-      conversations: groupConversations.filter(conversationArchivedFilter, conversationSearchFilter),
+      conversations: groupConversations.filter(conversationArchivedFilter).filter(conversationSearchFilter),
       searchInputPlaceholder: t('searchGroupConversations'),
     };
   }
 
   if (currentTab === SidebarTabs.DIRECTS) {
     return {
-      conversations: directConversations.filter(conversationArchivedFilter, conversationSearchFilter),
+      conversations: directConversations.filter(conversationArchivedFilter).filter(conversationSearchFilter),
       searchInputPlaceholder: t('searchDirectConversations'),
     };
   }
