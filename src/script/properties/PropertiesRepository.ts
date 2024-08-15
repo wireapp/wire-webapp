@@ -109,25 +109,20 @@ export class PropertiesRepository {
   }
 
   public getUserConsentStatus() {
-    // set default
+    const {
+      privacy: {marketing_consent: marketingConsent, telemetry_sharing: telemetryConsent},
+    } = this.properties.settings;
+
     let userConsentStatus = UserConsentStatus.ALL_DENIED;
 
-    const marketingConsent = this.properties.settings.privacy.marketing_consent;
-
-    // check if the user has allowed marketing
-    if (!!marketingConsent) {
+    if (marketingConsent && telemetryConsent) {
+      userConsentStatus = UserConsentStatus.ALL_GRANTED;
+    } else if (marketingConsent) {
       userConsentStatus = UserConsentStatus.MARKETING_GRANTED;
+    } else if (telemetryConsent) {
+      userConsentStatus = UserConsentStatus.TRACKING_GRANTED;
     }
 
-    // check if the user has allowed tracking
-    if (!!this.properties.settings.privacy.telemetry_sharing) {
-      if (!!marketingConsent) {
-        userConsentStatus = UserConsentStatus.ALL_GRANTED;
-      } else {
-        userConsentStatus = UserConsentStatus.TRACKING_GRANTED;
-      }
-    }
-    // return the correct status
     return {
       userConsentStatus,
       isMarketingConsentGiven:
