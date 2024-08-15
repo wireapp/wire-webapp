@@ -129,6 +129,7 @@ export class PropertiesRepository {
     }
     // return the correct status
     return {
+      userConsentStatus,
       isMarketingConsentGiven:
         userConsentStatus === UserConsentStatus.MARKETING_GRANTED ||
         userConsentStatus === UserConsentStatus.ALL_GRANTED,
