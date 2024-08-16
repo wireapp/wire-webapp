@@ -74,6 +74,7 @@ import {USER} from '../event/Client';
 import {EventRepository} from '../event/EventRepository';
 import type {EventSource} from '../event/EventSource';
 import type {PropertiesRepository} from '../properties/PropertiesRepository';
+import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 import type {SelfService} from '../self/SelfService';
 import {UserRecord} from '../storage';
 import {TeamState} from '../team/TeamState';
@@ -868,7 +869,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
    */
   public readonly refreshAllKnownUsers = async (): Promise<void> => {
     const userIds = this.userState.users().map(user => user.qualifiedId);
-    await this.refreshUsers(userIds);
+    void this.refreshUsers(userIds);
   };
 
   /**
@@ -1030,7 +1031,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
   private async initMarketingConsent(): Promise<void> {
     if (!Config.getConfig().FEATURE.CHECK_CONSENT) {
       this.logger.warn(
-        `Consent check feature is disabled. Defaulting to '${this.propertyRepository.marketingConsent()}'`,
+        `Consent check feature is disabled. Defaulting to '${this.propertyRepository.getPreference(PROPERTIES_TYPE.PRIVACY.MARKETING_CONSENT)}'`,
       );
       return;
     }
@@ -1041,7 +1042,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
         const isMarketingConsent = consentType === ConsentType.MARKETING;
         if (isMarketingConsent) {
           const hasGivenConsent = consentValue === ConsentValue.GIVEN;
-          this.propertyRepository.marketingConsent(hasGivenConsent);
+          await this.propertyRepository.updateProperty(PROPERTIES_TYPE.PRIVACY.MARKETING_CONSENT, hasGivenConsent);
           return;
         }
       }

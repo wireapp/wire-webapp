@@ -30,6 +30,7 @@ import {includesString} from 'Util/StringUtil';
 import {getParameter} from 'Util/UrlUtil';
 import {createUuid} from 'Util/uuid';
 
+import {isCountlyEnabledAtCurrentEnvironment} from './Countly.helpers';
 import {EventName} from './EventName';
 import {getPlatform} from './Helpers';
 import {Segmentation} from './Segmentation';
@@ -40,19 +41,6 @@ import {Config} from '../Config';
 import type {ContributedSegmentations, MessageRepository} from '../conversation/MessageRepository';
 import {ClientEvent} from '../event/Client';
 import {TeamState} from '../team/TeamState';
-
-export function isCountlyEnabled(): boolean {
-  const allowedBackendUrls =
-    Config.getConfig()
-      .COUNTLY_ALLOWED_BACKEND?.split(',')
-      .map(url => url.trim()) || [];
-
-  return (
-    !!Config.getConfig().COUNTLY_API_KEY &&
-    allowedBackendUrls.length > 0 &&
-    allowedBackendUrls.includes(Config.getConfig().BACKEND_REST)
-  );
-}
 
 export class EventTrackingRepository {
   private isProductReportingActivated: boolean;
@@ -86,14 +74,14 @@ export class EventTrackingRepository {
     amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent);
   }
 
-  readonly onUserEvent = (eventJson: any, source: EventSource) => {
+  public readonly onUserEvent = (eventJson: any, source: EventSource) => {
     const type = eventJson.type;
     if (type === ClientEvent.USER.DATA_TRANSFER && this.teamState.isTeam()) {
-      this.migrateDeviceId(eventJson.data.trackingIdentifier);
+      void this.migrateDeviceId(eventJson.data.trackingIdentifier);
     }
   };
 
-  migrateDeviceId = async (newId: string) => {
+  public migrateDeviceId = async (newId: string) => {
     try {
       let stopOnFinish = false;
       if (!this.isProductReportingActivated) {
@@ -113,7 +101,7 @@ export class EventTrackingRepository {
     }
   };
 
-  async init(telemetrySharing: boolean | undefined): Promise<void> {
+  async init(isTelemtryConsentGiven: boolean): Promise<void> {
     const previousCountlyDeviceId = loadValue<string>(
       EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_DEVICE_ID_LOCAL_STORAGE_KEY,
     );
@@ -126,7 +114,7 @@ export class EventTrackingRepository {
 
     if (unsyncedCountlyDeviceId) {
       try {
-        this.messageRepository.sendCountlySync(this.countlyDeviceId);
+        await this.messageRepository.sendCountlySync(this.countlyDeviceId);
         resetStoreValue(EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_UNSYNCED_DEVICE_ID_LOCAL_STORAGE_KEY);
       } catch (error) {
         this.logger.warn(`Failed to send new countly tracking id to other devices ${error}`);
@@ -138,8 +126,10 @@ export class EventTrackingRepository {
       const notMigratedCountlyTrackingId = loadValue<string>(
         EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_FAILED_TO_MIGRATE_DEVICE_ID,
       );
-      if (notMigratedCountlyTrackingId) {
-        this.migrateDeviceId(notMigratedCountlyTrackingId);
+
+      // Migrate the device id if it has not been migrated yet and it is different from the previous one
+      if (!!notMigratedCountlyTrackingId && notMigratedCountlyTrackingId !== previousCountlyDeviceId) {
+        await this.migrateDeviceId(notMigratedCountlyTrackingId);
       }
       if (!hasAtLeastSyncedOnce) {
         try {
@@ -162,7 +152,7 @@ export class EventTrackingRepository {
         this.countlyDeviceId,
       );
       try {
-        this.messageRepository.sendCountlySync(this.countlyDeviceId);
+        await this.messageRepository.sendCountlySync(this.countlyDeviceId);
       } catch (error) {
         this.logger.warn(`Failed to send new countly tracking id to other devices ${error}`);
         storeValue(EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_UNSYNCED_DEVICE_ID_LOCAL_STORAGE_KEY, true);
@@ -173,19 +163,16 @@ export class EventTrackingRepository {
     if (!isTeam) {
       return; // Countly should not be enabled for non-team users
     }
-    let enableTelemetrySharing = true;
-    if (typeof telemetrySharing === 'boolean') {
-      enableTelemetrySharing = telemetrySharing;
-    }
-    this.logger.info(`Initialize analytics and error reporting: ${enableTelemetrySharing}`);
 
-    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.TELEMETRY_SHARING, this.toggleCountly);
-    this.toggleCountly(telemetrySharing);
+    this.logger.info(`Initialize analytics and error reporting: ${isTelemtryConsentGiven}`);
+
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.PRIVACY.TELEMETRY_SHARING, this.toggleCountly);
+    await this.toggleCountly(isTelemtryConsentGiven);
   }
 
-  private readonly toggleCountly = (isEnabled: boolean) => {
+  private readonly toggleCountly = async (isEnabled: boolean) => {
     if (isEnabled && this.isDomainAllowedForAnalytics()) {
-      this.startProductReporting();
+      await this.startProductReporting();
     } else {
       this.stopProductReporting();
     }
@@ -199,7 +186,7 @@ export class EventTrackingRepository {
   }
 
   private async startProductReporting(trackingId?: string): Promise<void> {
-    if (!isCountlyEnabled() || this.isProductReportingActivated) {
+    if (!isCountlyEnabledAtCurrentEnvironment() || this.isProductReportingActivated) {
       return;
     }
     this.isProductReportingActivated = true;
