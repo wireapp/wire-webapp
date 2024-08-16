@@ -96,7 +96,7 @@ export class EventTrackingRepository {
         this.stopProductReporting();
       }
     } catch (error) {
-      this.logger.warn(`adrian Failed to send new countly tracking id to other devices ${error}`);
+      this.logger.warn(`Failed to send new countly tracking id to other devices ${error}`);
       storeValue(EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_FAILED_TO_MIGRATE_DEVICE_ID, newId);
     }
   };
