@@ -19,18 +19,12 @@
 
 import {Config} from '../Config';
 
-let isCountlyEnabled: boolean | null = null;
 export function isCountlyEnabledAtCurrentEnvironment(): boolean {
-  if (isCountlyEnabled === null) {
-    const allowedBackendUrls =
-      Config.getConfig()
-        .COUNTLY_ALLOWED_BACKEND?.split(',')
-        .map(url => url.trim()) || [];
+  const {COUNTLY_API_KEY, COUNTLY_ALLOWED_BACKEND, BACKEND_REST} = Config.getConfig();
 
-    isCountlyEnabled =
-      !!Config.getConfig().COUNTLY_API_KEY &&
-      allowedBackendUrls.length > 0 &&
-      allowedBackendUrls.includes(Config.getConfig().BACKEND_REST);
-  }
-  return !!isCountlyEnabled;
+  const allowedBackendUrls = COUNTLY_ALLOWED_BACKEND.split(',').map(url => url.trim()) || [];
+  const isCountlyEnabled =
+    !!COUNTLY_API_KEY && allowedBackendUrls.length > 0 && allowedBackendUrls.includes(BACKEND_REST);
+
+  return isCountlyEnabled;
 }
