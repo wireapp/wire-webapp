@@ -40,7 +40,7 @@ interface DataUsageSectionProps {
   teamState?: TeamState;
 }
 
-const DataUsageSection: React.FC<DataUsageSectionProps> = ({propertiesRepository, brandName, isActivatedAccount}) => {
+const DataUsageSection = ({propertiesRepository, brandName, isActivatedAccount}: DataUsageSectionProps) => {
   const [optionTelemetry, setOptionTelemetry] = useState(
     propertiesRepository.properties.settings.privacy.telemetry_sharing,
   );
