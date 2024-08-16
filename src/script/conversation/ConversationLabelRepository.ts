@@ -129,17 +129,17 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
   };
 
   readonly saveLabels = () => {
-    const values = this.marshal();
-    void this.propertiesService.putPropertiesByKey(propertiesKey, values);
+    const conversationLabelJson = this.marshal();
+    void this.propertiesService.putPropertiesByKey(propertiesKey, conversationLabelJson);
     this.persistValues();
   };
 
   loadLabels = async () => {
     try {
-      const values = localStorage.getItem(ConversationLabelRepository.LocalStorageKey);
+      const conversationLabelJson = localStorage.getItem(ConversationLabelRepository.LocalStorageKey);
 
-      if (values) {
-        this.unmarshal(JSON.parse(values));
+      if (conversationLabelJson) {
+        this.unmarshal(JSON.parse(conversationLabelJson));
         this.saveLabels();
         return;
       }
