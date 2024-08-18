@@ -5499,11 +5499,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/copy-config@npm:2.2.3":
-  version: 2.2.3
-  resolution: "@wireapp/copy-config@npm:2.2.3"
+"@wireapp/copy-config@npm:2.2.5":
+  version: 2.2.5
+  resolution: "@wireapp/copy-config@npm:2.2.5"
   dependencies:
-    axios: "npm:1.7.2"
+    axios: "npm:1.7.4"
     copy: "npm:0.3.2"
     cosmiconfig: "npm:9.0.0"
     fs-extra: "npm:11.2.0"
@@ -5512,7 +5512,7 @@ __metadata:
     rimraf: "npm:6.0.1"
   bin:
     copy-config: lib/cli.js
-  checksum: 10/661bfadd3e5d917bd7e7605b9f93d31345504b6ee7210136e735103e0c7f81af8a6bad765bc2811fae1e402ce50f8924fbc85d60fa84604b9ccfbd924bf0a6b6
+  checksum: 10/462a1f959cdd847a5ab4792465356dc834b45599937d97f451f104aed61d2e1bfec68de12d3f624485428fde261d40e0e2ca30c684d34ede876db08e832f66b9
   languageName: node
   linkType: hard
 
@@ -6362,17 +6362,6 @@ __metadata:
   peerDependencies:
     axios: 0.x || 1.x
   checksum: 10/39ed05248757387a44dde94255df8ad54088aece50574c6ce9a1cd02b9e40252f7390285cea54ded04e33a3a549e462d5bdacc8d3178221b7cd40e8aff09ba46
-  languageName: node
-  linkType: hard
-
-"axios@npm:1.7.2":
-  version: 1.7.2
-  resolution: "axios@npm:1.7.2"
-  dependencies:
-    follow-redirects: "npm:^1.15.6"
-    form-data: "npm:^4.0.0"
-    proxy-from-env: "npm:^1.1.0"
-  checksum: 10/6ae80dda9736bb4762ce717f1a26ff997d94672d3a5799ad9941c24d4fb019c1dff45be8272f08d1975d7950bac281f3ba24aff5ecd49ef5a04d872ec428782f
   languageName: node
   linkType: hard
 
@@ -18044,7 +18033,7 @@ __metadata:
     "@types/webpack-env": "npm:1.18.5"
     "@wireapp/avs": "npm:9.8.14"
     "@wireapp/commons": "npm:5.2.10"
-    "@wireapp/copy-config": "npm:2.2.3"
+    "@wireapp/copy-config": "npm:2.2.5"
     "@wireapp/core": "npm:46.2.5"
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/prettier-config": "npm:0.6.4"
