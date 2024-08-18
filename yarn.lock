@@ -12200,12 +12200,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"libsodium-wrappers@npm:0.7.14":
-  version: 0.7.14
-  resolution: "libsodium-wrappers@npm:0.7.14"
+"libsodium-wrappers@npm:0.7.15":
+  version: 0.7.15
+  resolution: "libsodium-wrappers@npm:0.7.15"
   dependencies:
-    libsodium: "npm:^0.7.14"
-  checksum: 10/8ff3ac4efb78196712c192ad87c607619f92b30ab2da45f48cba1441796a8a585bc6f05a48d121cf0bcd6dd060725e5ca3a9658d1fb65f3af6a07e030e79d3e9
+    libsodium: "npm:^0.7.15"
+  checksum: 10/a97e72da2de9b9294df35aaa053c7943b7eab0e805e5c4cbdc37bd7190221875b57d485f41595b217e80cbe44f96033a756ea12bc6214d3710b2be3d16ac1f9b
   languageName: node
   linkType: hard
 
@@ -18077,7 +18077,7 @@ __metadata:
     less: "npm:4.2.0"
     less-loader: "npm:12.2.0"
     lexical: "npm:0.17.0"
-    libsodium-wrappers: "npm:0.7.14"
+    libsodium-wrappers: "npm:0.7.15"
     linkify-it: "npm:5.0.0"
     lint-staged: "npm:15.2.9"
     long: "npm:5.2.3"
