@@ -332,6 +332,7 @@
   "callStateIncomingGroup": "{{user}} is calling",
   "callStateOutgoing": "Zvonjenje…",
   "callWasEndedBecause": "Your call was ended because",
+  "callingPopOutWindowTitle": "{{brandName}} Call",
   "callingRestrictedConferenceCallOwnerModalDescription": "Your team is currently on the free Basic plan. Upgrade to Enterprise for access to features such as starting conferences and more. [link]Learn more about {{brandName}} Enterprise[/link]",
   "callingRestrictedConferenceCallOwnerModalTitle": "Upgrade to Enterprise",
   "callingRestrictedConferenceCallOwnerModalUpgradeButton": "Upgrade now",

@@ -332,6 +332,7 @@
   "callStateIncomingGroup": "{{user}} අමතමින්",
   "callStateOutgoing": "නාද වෙමින්…",
   "callWasEndedBecause": "ඔබගේ ඇමතුම අවසන් වුණි මන්ද",
+  "callingPopOutWindowTitle": "{{brandName}} Call",
   "callingRestrictedConferenceCallOwnerModalDescription": "ඔබගේ කණ්ඩායම දැනට මූලික නොමිලේ සැලසුමෙහි සිටියි. සම්මන්ත්‍රණ ඇරඹීමට සහ වෙනත් විශේෂාංග සඳහා ප්‍රවේශයට ව්‍යවසාය වෙත උත්ශ්‍රේණි කරන්න. [link]{{brandName}} ව්‍යවසාය[/link] ගැන තව දැනගන්න",
   "callingRestrictedConferenceCallOwnerModalTitle": "ව්‍යවසාය වෙත උත්ශ්‍රේණිය",
   "callingRestrictedConferenceCallOwnerModalUpgradeButton": "උත්ශ්‍රේණි කරන්න",
