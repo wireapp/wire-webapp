@@ -17,22 +17,14 @@
  *
  */
 
-import {create} from 'zustand';
-
 import {Runtime} from '@wireapp/commons';
 
-import {Config} from 'src/script/Config';
+import {Config} from '../Config';
 
-type DetachedCallingFeatureState = {
-  isSupported: () => boolean;
+export const isDetachedCallingFeatureEnabled = () => {
+  if (Runtime.isDesktopApp()) {
+    return Config.getDesktopConfig()?.supportsCallingPopoutWindow === true;
+  }
+
+  return true;
 };
-
-export const useDetachedCallingFeatureState = create<DetachedCallingFeatureState>(() => ({
-  isSupported: () => {
-    if (Runtime.isDesktopApp()) {
-      return Config.getDesktopConfig()?.supportsCallingPopoutWindow === true;
-    }
-
-    return true;
-  },
-}));

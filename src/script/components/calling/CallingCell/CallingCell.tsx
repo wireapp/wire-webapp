@@ -165,7 +165,7 @@ export const CallingCell = ({
         return;
       }
       if (isSpaceOrEnterKey(event.key)) {
-        void callState.setViewModeDetached();
+        void callState.setViewModeFullScreen();
       }
     },
     [isOngoing, callState],
@@ -175,7 +175,7 @@ export const CallingCell = ({
     if (!isOngoing) {
       return;
     }
-    void callState.setViewModeDetached();
+    void callState.setViewModeFullScreen();
   }, [isOngoing, callState]);
 
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
