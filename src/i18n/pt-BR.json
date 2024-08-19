@@ -332,6 +332,7 @@
   "callStateIncomingGroup": "{{user}} está chamando",
   "callStateOutgoing": "Tocando…",
   "callWasEndedBecause": "Sua chamada foi encerrada porque",
+  "callingPopOutWindowTitle": "{{brandName}} Call",
   "callingRestrictedConferenceCallOwnerModalDescription": "Sua equipe está atualmente no plano Básico gratuito. Atualize para o plano Empresarial para ter acesso a recursos como o início de conferências e muito mais. [link]Saiba mais sobre o {{brandName}} Empresarial[/link]",
   "callingRestrictedConferenceCallOwnerModalTitle": "Atualizar para o plano Empresarial",
   "callingRestrictedConferenceCallOwnerModalUpgradeButton": "Atualizar agora",
