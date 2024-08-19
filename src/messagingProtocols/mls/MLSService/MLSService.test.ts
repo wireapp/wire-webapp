@@ -280,7 +280,6 @@ describe('MLSService', () => {
       [Ciphersuite.MLS_256_DHKEMP521_AES256GCM_SHA512_P521],
       [Ciphersuite.MLS_256_DHKEMX448_CHACHA20POLY1305_SHA512_Ed448],
       [Ciphersuite.MLS_256_DHKEMP384_AES256GCM_SHA384_P384],
-      [Ciphersuite.MLS_128_X25519KYBER768DRAFT00_AES128GCM_SHA256_Ed25519],
     ])('always return false for empty mls_public_keys (%d)', async ciphersuite => {
       const [mlsService] = await createMLSService();
 
@@ -306,7 +305,6 @@ describe('MLSService', () => {
       [Ciphersuite.MLS_256_DHKEMP521_AES256GCM_SHA512_P521, 'ecdsa_secp521r1_sha512'],
       [Ciphersuite.MLS_256_DHKEMX448_CHACHA20POLY1305_SHA512_Ed448, 'ed448'],
       [Ciphersuite.MLS_256_DHKEMP384_AES256GCM_SHA384_P384, 'ecdsa_secp384r1_sha384'],
-      [Ciphersuite.MLS_128_X25519KYBER768DRAFT00_AES128GCM_SHA256_Ed25519, 'ed25519'],
     ])(
       'returns true if there is a signature corresponding to the ciphersuite used (%d, %s)',
       async (ciphersuite, signatureAlgo) => {
@@ -335,7 +333,6 @@ describe('MLSService', () => {
       [Ciphersuite.MLS_256_DHKEMP521_AES256GCM_SHA512_P521, 'ed448'],
       [Ciphersuite.MLS_256_DHKEMX448_CHACHA20POLY1305_SHA512_Ed448, 'p256'],
       [Ciphersuite.MLS_256_DHKEMP384_AES256GCM_SHA384_P384, 'p256'],
-      [Ciphersuite.MLS_128_X25519KYBER768DRAFT00_AES128GCM_SHA256_Ed25519, 'p384'],
     ])(
       'returns false if there is a signature not corresponding to the ciphersuite used (%d, %s)',
       async (ciphersuite, signatureAlgo) => {

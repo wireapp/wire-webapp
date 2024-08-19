@@ -52,7 +52,6 @@ const ciphersuiteSignatureAlgorithmMap: Record<Ciphersuite, MLSPublicKeyAlgorith
   [Ciphersuite.MLS_256_DHKEMX448_CHACHA20POLY1305_SHA512_Ed448]: MLSPublicKeyAlgorithmKeys.ED448,
   [Ciphersuite.MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519]: MLSPublicKeyAlgorithmKeys.ED25519,
   [Ciphersuite.MLS_128_DHKEMX25519_CHACHA20POLY1305_SHA256_Ed25519]: MLSPublicKeyAlgorithmKeys.ED25519,
-  [Ciphersuite.MLS_128_X25519KYBER768DRAFT00_AES128GCM_SHA256_Ed25519]: MLSPublicKeyAlgorithmKeys.ED25519,
 };
 
 export const getSignatureAlgorithmForCiphersuite = (ciphersuite: Ciphersuite): MLSPublicKeyAlgorithmKeys => {
