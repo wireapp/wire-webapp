@@ -339,6 +339,7 @@
   "callingRestrictedConferenceCallPersonalModalTitle": "Feature unavailable",
   "callingRestrictedConferenceCallTeamMemberModalDescription": "To start a conference call, your team needs to upgrade to the Enterprise plan.",
   "callingRestrictedConferenceCallTeamMemberModalTitle": "Feature unavailable",
+  "callingPopOutWindowTitle": "{{brandName}} Call",
   "cameraStatusOff": "off",
   "cameraStatusOn": "on",
   "chooseHandle.handlePlaceholder": "Username",
