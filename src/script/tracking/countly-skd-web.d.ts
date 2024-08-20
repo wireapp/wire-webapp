@@ -17,28 +17,62 @@
  *
  */
 
-declare module 'countly-sdk-web' {
-  export interface UserData {
-    set_once: (keyValues: {[key: string]: any}) => void;
+import {Segmentation} from './Segmentation';
+
+import type {ContributedSegmentations} from '../conversation/MessageRepository';
+
+type Keys = keyof typeof Segmentation;
+type Values = (typeof Segmentation)[Keys];
+
+export interface UserData {
+  set_once: (keyValues: {[key: string]: any}) => void;
+  set: (key: string, value: any) => void;
+  increment: (key: string) => void;
+  incrementBy: (key: string, value: number) => void;
+  save: () => void;
+}
+
+export interface CountlyEvent {
+  key: string;
+  count?: number;
+  sum?: number;
+  dur?: number;
+  segmentation?: ContributedSegmentations | Values;
+}
+
+export interface Countly {
+  init: (config: any) => Countly;
+  debug: boolean;
+
+  opt_out: () => void;
+  opt_in: () => void;
+
+  begin_session: (noHeartBeat?: boolean) => void;
+  end_session: () => void;
+
+  track_pageview: (page: string) => void;
+  track_clicks: () => void;
+
+  storage: 'localstorage' | 'cookie';
+  use_session_cookie: boolean;
+
+  /* APM tracking, provided by the countly plugin script countly_boomerang.js
+   Does not come with the countly.min.js script and has to be loaded separately
+   Relies on the boomerang.min.js script and the countly.min.js script
+   */
+  track_performance: () => void;
+
+  add_event: (event: CountlyEvent) => void;
+  userData: {
     set: (key: string, value: any) => void;
-    increment: (key: string) => void;
-    incrementBy: (key: string, value: number) => void;
     save: () => void;
-  }
+  };
+  change_id: (newId: string, merge?: boolean) => void;
+}
 
-  export interface Countly {
-    q: any[];
-    app_key: string;
-    url: string;
-    init(conf?: {app_key?: string; [key: string]: any}): Countly;
-    end_session(): void;
-    begin_session(): void;
-    change_id(newId: string, merge: boolean): void;
-    userData: UserData;
-    add_event: (eventData: any) => void;
+declare global {
+  interface Window {
+    // Countly is a global object provided by the countly.min.js script
+    Countly: Countly;
   }
-
-  const Countly: Countly;
-  // eslint-disable-next-line import/no-default-export
-  export default Countly;
 }

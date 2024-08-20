@@ -18,7 +18,6 @@
  */
 
 import {amplify} from 'amplify';
-import Countly from 'countly-sdk-web';
 import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -30,6 +29,7 @@ import {includesString} from 'Util/StringUtil';
 import {getParameter} from 'Util/UrlUtil';
 import {createUuid} from 'Util/uuid';
 
+import {Countly} from './countly-skd-web';
 import {isCountlyEnabledAtCurrentEnvironment} from './Countly.helpers';
 import {EventName} from './EventName';
 import {getPlatform} from './Helpers';
@@ -48,6 +48,7 @@ export class EventTrackingRepository {
   private countlyDeviceId: string;
   private readonly logger: Logger;
   isErrorReportingActivated: boolean;
+  private countly: Countly | undefined;
 
   static get CONFIG() {
     return {
@@ -88,7 +89,7 @@ export class EventTrackingRepository {
         await this.startProductReporting(this.countlyDeviceId);
         stopOnFinish = true;
       }
-      Countly.change_id(newId, true);
+      this.countly?.change_id(newId, true);
       storeValue(EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_DEVICE_ID_LOCAL_STORAGE_KEY, newId);
       this.logger.info(`Countly tracking id has been changed from ${this.countlyDeviceId} to ${newId}`);
       this.countlyDeviceId = newId;
@@ -186,12 +187,17 @@ export class EventTrackingRepository {
   }
 
   private async startProductReporting(trackingId?: string): Promise<void> {
+    // This is a global object provided by the countly.min.js script
+    if (!window?.Countly) {
+      return;
+    }
+
     if (!isCountlyEnabledAtCurrentEnvironment() || this.isProductReportingActivated) {
       return;
     }
     this.isProductReportingActivated = true;
 
-    Countly.init({
+    this.countly = window.Countly.init({
       app_key: window.wire.env.COUNTLY_API_KEY,
       app_version: Config.getConfig().VERSION,
       debug: !Environment.frontend.isProduction(),
@@ -220,7 +226,7 @@ export class EventTrackingRepository {
 
   private readonly stopProductReportingSession = (): void => {
     if (this.isProductReportingActivated === true) {
-      Countly.end_session();
+      this.countly?.end_session();
     }
   };
 
@@ -238,7 +244,9 @@ export class EventTrackingRepository {
 
   private startProductReportingSession(): void {
     if (this.isProductReportingActivated === true) {
-      Countly.begin_session();
+      this.countly?.begin_session();
+      // enable APM
+      this.countly?.track_performance();
       if (this.sendAppOpenEvent) {
         this.sendAppOpenEvent = false;
         this.trackProductReportingEvent(EventName.APP_OPEN);
@@ -253,9 +261,9 @@ export class EventTrackingRepository {
       };
       Object.entries(userData).forEach(entry => {
         const [key, value] = entry;
-        Countly.userData.set(key, value);
+        this.countly?.userData.set(key, value);
       });
-      Countly.userData.save();
+      this.countly?.userData.save();
 
       const segmentation = {
         [Segmentation.COMMON.APP_VERSION]: Config.getConfig().VERSION,
@@ -263,7 +271,7 @@ export class EventTrackingRepository {
         ...customSegmentations,
       };
 
-      Countly.add_event({
+      this.countly?.add_event({
         key: eventName,
         segmentation,
       });

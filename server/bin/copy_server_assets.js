@@ -24,9 +24,20 @@ const path = require('path');
 
 const srcFolder = '../';
 const distFolder = '../dist/';
+const npmModulesFolder = '../../node_modules/';
 
 const assetFolders = ['.ebextensions/', 'robots/', 'templates/', 'certificate'];
 
 assetFolders.forEach(assetFolder => {
   fs.copySync(path.resolve(__dirname, srcFolder, assetFolder), path.resolve(__dirname, distFolder, assetFolder));
 });
+
+// copy countly.min.js and the official countly boomerang plugin
+fs.copySync(
+  path.resolve(__dirname, npmModulesFolder, 'countly-sdk-web/lib/countly.min.js'),
+  path.resolve(__dirname, distFolder, 'libs/countly/countly.min.js'),
+);
+fs.copySync(
+  path.resolve(__dirname, npmModulesFolder, 'countly-sdk-web/plugin/boomerang'),
+  path.resolve(__dirname, distFolder, 'libs/countly'),
+);
