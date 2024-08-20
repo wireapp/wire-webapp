@@ -332,7 +332,7 @@
   "callStateIncomingGroup": "{{user}} ruft an",
   "callStateOutgoing": "Klingeln…",
   "callWasEndedBecause": "Ihr Anruf wurde beendet, weil",
-  "callingPopOutWindowTitle": "{{brandName}} Call",
+  "callingPopOutWindowTitle": "{{brandName}} Anruf",
   "callingRestrictedConferenceCallOwnerModalDescription": "Ihr Team nutzt derzeit das kostenlose Basis-Abo. Upgraden Sie auf Enterprise für den Zugriff auf weitere Funktionen wie das Starten von Telefonkonferenzen. [link]Erfahren Sie mehr über {{brandName}} Enterprise[/link]",
   "callingRestrictedConferenceCallOwnerModalTitle": "Auf Enterprise upgraden",
   "callingRestrictedConferenceCallOwnerModalUpgradeButton": "Jetzt upgraden",

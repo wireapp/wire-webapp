@@ -332,7 +332,7 @@
   "callStateIncomingGroup": "{{user}} вызывает",
   "callStateOutgoing": "Вызываем…",
   "callWasEndedBecause": "Ваш звонок был завершен, поскольку",
-  "callingPopOutWindowTitle": "{{brandName}} Call",
+  "callingPopOutWindowTitle": "Звонок {{brandName}}",
   "callingRestrictedConferenceCallOwnerModalDescription": "В настоящее время ваша команда использует бесплатный тарифный план Basic. Перейдите на тарифный план Enterprise, чтобы получить доступ к таким возможностям, как проведение конференций и многим другим. [link]Узнать больше об {{brandName}} Enterprise[/link]",
   "callingRestrictedConferenceCallOwnerModalTitle": "Перейти на Enterprise",
   "callingRestrictedConferenceCallOwnerModalUpgradeButton": "Перейти сейчас",
