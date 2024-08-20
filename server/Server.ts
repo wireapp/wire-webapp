@@ -67,6 +67,7 @@ class Server {
     this.initStaticRoutes();
     this.initWebpack();
     this.initSiteMap(this.config);
+    this.app.use('/libs', express.static(path.join(__dirname, 'libs')));
     this.app.use(Root());
     this.app.use(HealthCheckRoute());
     this.app.use(ConfigRoute(this.config, this.clientConfig));
