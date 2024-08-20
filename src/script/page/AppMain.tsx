@@ -28,7 +28,6 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingContainer} from 'Components/calling/CallingOverlayContainer';
 import {ChooseScreen} from 'Components/calling/ChooseScreen';
-import {useDetachedCallingFeatureState} from 'Components/calling/DetachedCallingCell/DetachedCallingFeature.state';
 import {ErrorFallback} from 'Components/ErrorFallback';
 import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationModal';
 import {LegalHoldModal} from 'Components/Modals/LegalHoldModal/LegalHoldModal';
@@ -47,7 +46,7 @@ import {RootProvider} from './RootProvider';
 import {useAppMainState, ViewType} from './state';
 import {useAppState, ContentState} from './useAppState';
 
-import {CallState, DesktopScreenShareMenu} from '../calling/CallState';
+import {CallingViewMode, CallState, DesktopScreenShareMenu} from '../calling/CallState';
 import {ConversationState} from '../conversation/ConversationState';
 import {User} from '../entity/User';
 import {useActiveWindow} from '../hooks/useActiveWindow';
@@ -103,9 +102,10 @@ export const AppMain: FC<AppMainProps> = ({
     'isActivatedAccount',
   ]);
 
-  const {hasAvailableScreensToShare, desktopScreenShareMenu} = useKoSubscribableChildren(callState, [
+  const {hasAvailableScreensToShare, desktopScreenShareMenu, viewMode} = useKoSubscribableChildren(callState, [
     'hasAvailableScreensToShare',
     'desktopScreenShareMenu',
+    'viewMode',
   ]);
 
   const teamState = container.resolve(TeamState);
@@ -234,8 +234,6 @@ export const AppMain: FC<AppMainProps> = ({
   const showLeftSidebar = (isMobileView && isMobileLeftSidebarView) || (!isMobileView && !isLeftSidebarHidden);
   const showMainContent = !isMobileView || isMobileCentralColumnView;
 
-  const {isSupported: isDetachedCallingFeatureEnabled} = useDetachedCallingFeatureState();
-
   return (
     <StyledApp
       themeId={THEME_ID.DEFAULT}
@@ -288,7 +286,7 @@ export const AppMain: FC<AppMainProps> = ({
             <>
               <FeatureConfigChangeNotifier selfUserId={selfUser.id} teamState={teamState} />
 
-              {!isDetachedCallingFeatureEnabled() && (
+              {viewMode === CallingViewMode.FULL_SCREEN && (
                 <CallingContainer
                   callingRepository={repositories.calling}
                   mediaRepository={repositories.media}

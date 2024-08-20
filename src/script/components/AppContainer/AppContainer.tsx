@@ -25,12 +25,12 @@ import {container} from 'tsyringe';
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
 import {DetachedCallingCell} from 'Components/calling/DetachedCallingCell';
-import {useDetachedCallingFeatureState} from 'Components/calling/DetachedCallingCell/DetachedCallingFeature.state';
 import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
 import {SIGN_OUT_REASON} from 'src/script/auth/SignOutReason';
 import {useAppSoftLock} from 'src/script/hooks/useAppSoftLock';
 import {useSingleInstance} from 'src/script/hooks/useSingleInstance';
 import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
+import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
 
 import {useAccentColor} from './hooks/useAccentColor';
 import {useTheme} from './hooks/useTheme';
@@ -84,7 +84,6 @@ export const AppContainer: FC<AppProps> = ({config, clientType}) => {
   const {repository: repositories} = app;
 
   const {softLockEnabled} = useAppSoftLock(repositories.calling, repositories.notification);
-  const {isSupported: isDetachedCallingFeatureEnabled} = useDetachedCallingFeatureState();
 
   if (hasOtherInstance) {
     app.redirectToLogin(SIGN_OUT_REASON.MULTIPLE_TABS);

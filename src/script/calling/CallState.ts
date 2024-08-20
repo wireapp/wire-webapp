@@ -25,8 +25,8 @@ import {singleton} from 'tsyringe';
 import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {useDetachedCallingFeatureState} from 'Components/calling/DetachedCallingCell/DetachedCallingFeature.state';
 import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
+import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
 import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {copyStyles} from 'Util/renderElement';
@@ -124,7 +124,7 @@ export class CallState {
   };
 
   setViewModeMinimized = () => {
-    const isDetachedWindowSupported = useDetachedCallingFeatureState.getState().isSupported();
+    const isDetachedWindowSupported = isDetachedCallingFeatureEnabled();
 
     if (!isDetachedWindowSupported) {
       this.viewMode(CallingViewMode.MINIMIZED);
@@ -146,9 +146,7 @@ export class CallState {
       height: 829,
     },
   ) {
-    const isDetachedWindowSupported = useDetachedCallingFeatureState.getState().isSupported();
-
-    if (!isDetachedWindowSupported) {
+    if (!isDetachedCallingFeatureEnabled()) {
       this.setViewModeFullScreen();
       return;
     }

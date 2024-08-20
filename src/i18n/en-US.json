@@ -1519,6 +1519,7 @@
   "videoCallOverlayCamera": "Camera",
   "videoCallOverlayChangeViewMode": "Change view mode",
   "videoCallOverlayCloseFullScreen": "Go back to minimized view",
+  "videoCallOverlayOpenPopupWindow": "Open popup view",
   "videoCallOverlayConversations": "Conversations",
   "videoCallOverlayFitVideoLabel": "Double-click to view full screen",
   "videoCallOverlayFitVideoLabelGoBack": "Double-click to show all participants",

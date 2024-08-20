@@ -22,6 +22,7 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {Avatar, AVATAR_SIZE, GroupAvatar} from 'Components/Avatar';
 import {Duration} from 'Components/calling/Duration';
 import * as Icon from 'Components/Icon';
+import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
 import {t} from 'Util/LocalizerUtil';
 
 import {
@@ -145,7 +146,7 @@ export const CallingHeader = ({
         </h2>
       </div>
 
-      {isOngoing && (
+      {isDetachedCallingFeatureEnabled() && isOngoing && (
         <div>
           <button css={detachedWindowButton} onClick={toggleDetachedWindow}>
             {isDetachedWindow ? <Icon.CloseDetachedWindowIcon /> : <Icon.OpenDetachedWindowIcon />}

@@ -38,6 +38,7 @@ import {useActiveWindowMatchMedia} from 'src/script/hooks/useActiveWindowMatchMe
 import {useToggleState} from 'src/script/hooks/useToggleState';
 import {MediaDeviceType} from 'src/script/media/MediaDeviceType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
 import {handleKeyDown, isEscapeKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -56,7 +57,7 @@ import {GroupVideoGrid} from './GroupVideoGrid';
 import {Pagination} from './Pagination';
 
 import type {Call} from '../../calling/Call';
-import {CallState, MuteState} from '../../calling/CallState';
+import {CallingViewMode, CallState, MuteState} from '../../calling/CallState';
 import {Participant} from '../../calling/Participant';
 import type {Grid} from '../../calling/videoGridHandler';
 import type {Conversation} from '../../entity/Conversation';
@@ -167,11 +168,12 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   ]);
 
   const {selfUser, roles} = useKoSubscribableChildren(conversation, ['selfUser', 'roles']);
-  const {emojis} = useKoSubscribableChildren(callState, ['emojis']);
+  const {emojis, viewMode} = useKoSubscribableChildren(callState, ['emojis', 'viewMode']);
 
   const [audioOptionsOpen, setAudioOptionsOpen] = useState(false);
   const [videoOptionsOpen, setVideoOptionsOpen] = useState(false);
   const minimize = () => callState.setViewModeMinimized();
+  const openPopup = () => callState.setViewModeDetached();
 
   const [isParticipantsListOpen, toggleParticipantsList] = useToggleState(false);
   const [isCallViewOpen, toggleCallView] = useToggleState(false);
@@ -494,6 +496,19 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   >
                     <Icon.CloseDetachedWindowIcon />
                   </button>
+                  {isDetachedCallingFeatureEnabled() && viewMode !== CallingViewMode.DETACHED_WINDOW && (
+                    <button
+                      className="video-controls__button video-controls__button--small"
+                      css={videoControlInActiveStyles}
+                      onClick={openPopup}
+                      onKeyDown={event => handleKeyDown(event, () => openPopup())}
+                      type="button"
+                      data-uie-name="do-call-controls-video-minimize"
+                      title={t('videoCallOverlayOpenPopupWindow')}
+                    >
+                      <Icon.OpenDetachedWindowIcon />
+                    </button>
+                  )}
                 </li>
               )}
               <div className="video-controls__centered-items">
