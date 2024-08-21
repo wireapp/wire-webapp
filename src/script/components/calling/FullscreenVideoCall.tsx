@@ -50,6 +50,7 @@ import {
   videoControlDisabledStyles,
   paginationButtonStyles,
   classifiedBarStyles,
+  headerActionsWrapperStyles,
   paginationWrapperStyles,
   videoTopBarStyles,
 } from './FullscreenVideoCall.styles';
@@ -393,48 +394,65 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
               </div>
             )}
           </div>
-          {!maximizedParticipant && activeCallViewTab === CallViewTab.ALL && totalPages > 1 && (
-            <div css={paginationWrapperStyles}>
-              <button
-                data-uie-name="pagination-previous"
-                type="button"
-                onClick={() => changePage(currentPage - 1, call)}
-                onKeyDown={event => handleKeyDown(event, () => changePage(currentPage - 1, call))}
-                className="button-reset-default"
-                disabled={currentPage === 0}
-                css={{
-                  ...paginationButtonStyles,
-                  borderBottomRightRadius: 32,
-                  borderTopRightRadius: 32,
-                  left: 0,
-                }}
-              >
-                <Icon.ChevronRight css={{position: 'relative', right: 4, transform: 'rotateY(180deg)'}} />
-              </button>
+          <div css={headerActionsWrapperStyles}>
+            {!maximizedParticipant && activeCallViewTab === CallViewTab.ALL && totalPages > 1 && (
+              <div css={paginationWrapperStyles}>
+                <button
+                  data-uie-name="pagination-previous"
+                  type="button"
+                  onClick={() => changePage(currentPage - 1, call)}
+                  onKeyDown={event => handleKeyDown(event, () => changePage(currentPage - 1, call))}
+                  className="button-reset-default"
+                  disabled={currentPage === 0}
+                  css={{
+                    ...paginationButtonStyles,
+                    borderBottomRightRadius: 32,
+                    borderTopRightRadius: 32,
+                    left: 0,
+                  }}
+                >
+                  <Icon.ChevronRight css={{position: 'relative', right: 4, transform: 'rotateY(180deg)'}} />
+                </button>
 
-              <Pagination
-                totalPages={totalPages}
-                currentPage={currentPage}
-                onChangePage={newPage => changePage(newPage, call)}
-              />
+                <Pagination
+                  totalPages={totalPages}
+                  currentPage={currentPage}
+                  onChangePage={newPage => changePage(newPage, call)}
+                />
+                <button
+                  data-uie-name="pagination-next"
+                  onClick={() => changePage(currentPage + 1, call)}
+                  onKeyDown={event => handleKeyDown(event, () => changePage(currentPage + 1, call))}
+                  type="button"
+                  className="button-reset-default"
+                  disabled={currentPage === totalPages - 1}
+                  css={{
+                    ...paginationButtonStyles,
+                    borderBottomLeftRadius: 32,
+                    borderTopLeftRadius: 32,
+                    right: 0,
+                    marginRight: 14,
+                  }}
+                >
+                  <Icon.ChevronRight css={{left: 4, position: 'relative'}} />
+                </button>
+              </div>
+            )}
+
+            {isDetachedCallingFeatureEnabled() && viewMode !== CallingViewMode.DETACHED_WINDOW && (
               <button
-                data-uie-name="pagination-next"
-                onClick={() => changePage(currentPage + 1, call)}
-                onKeyDown={event => handleKeyDown(event, () => changePage(currentPage + 1, call))}
+                className="video-controls__button video-controls__button--small"
+                css={videoControlInActiveStyles}
+                onClick={openPopup}
+                onKeyDown={event => handleKeyDown(event, () => openPopup())}
                 type="button"
-                className="button-reset-default"
-                disabled={currentPage === totalPages - 1}
-                css={{
-                  ...paginationButtonStyles,
-                  borderBottomLeftRadius: 32,
-                  borderTopLeftRadius: 32,
-                  right: 0,
-                }}
+                data-uie-name="do-call-controls-video-minimize"
+                title={t('videoCallOverlayOpenPopupWindow')}
               >
-                <Icon.ChevronRight css={{left: 4, position: 'relative'}} />
+                <Icon.OpenDetachedWindowIcon />
               </button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         <div id="video-element-remote" className="video-element-remote">
@@ -494,21 +512,12 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                     data-uie-name="do-call-controls-video-minimize"
                     title={t('videoCallOverlayCloseFullScreen')}
                   >
-                    <Icon.CloseDetachedWindowIcon />
+                    {viewMode === CallingViewMode.DETACHED_WINDOW ? (
+                      <Icon.CloseDetachedWindowIcon />
+                    ) : (
+                      <Icon.MessageIcon />
+                    )}
                   </button>
-                  {isDetachedCallingFeatureEnabled() && viewMode !== CallingViewMode.DETACHED_WINDOW && (
-                    <button
-                      className="video-controls__button video-controls__button--small"
-                      css={videoControlInActiveStyles}
-                      onClick={openPopup}
-                      onKeyDown={event => handleKeyDown(event, () => openPopup())}
-                      type="button"
-                      data-uie-name="do-call-controls-video-minimize"
-                      title={t('videoCallOverlayOpenPopupWindow')}
-                    >
-                      <Icon.OpenDetachedWindowIcon />
-                    </button>
-                  )}
                 </li>
               )}
               <div className="video-controls__centered-items">
