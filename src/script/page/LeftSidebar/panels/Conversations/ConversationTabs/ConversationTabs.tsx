@@ -26,7 +26,7 @@ import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useS
 import {isDataDogEnabled} from 'Util/DataDog';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 
-import {footerDisclaimer, footerDisclaimerEllipsis} from './ConversationTabs.styles';
+import {footerDisclaimer, footerDisclaimerEllipsis, iconStyle} from './ConversationTabs.styles';
 
 import {Config} from '../../../../../Config';
 import {Conversation} from '../../../../../entity/Conversation';
@@ -194,7 +194,7 @@ export const ConversationTabs = ({
                 />
               }
             >
-              <Icon.InfoIcon css={{fill: 'var(--amber-500)'}} />
+              <Icon.ExclamationMark css={iconStyle} />
             </Tooltip>
 
             <div

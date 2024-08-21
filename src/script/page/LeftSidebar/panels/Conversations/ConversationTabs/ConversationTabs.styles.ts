@@ -47,3 +47,9 @@ export const footerDisclaimerEllipsis: CSSObject = {
     display: 'none',
   },
 };
+
+export const iconStyle: CSSObject = {
+  path: {
+    fill: 'var(--amber-500)',
+  },
+};
