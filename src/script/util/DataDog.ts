@@ -56,7 +56,7 @@ export async function initializeDataDog(config: Configuration, user: {id?: strin
     clientToken,
     site: 'datadoghq.eu',
     service: 'web-internal',
-    env: config.ENVIRONMENT,
+    env: config.FEATURE?.DATADOG_ENVIRONMENT || config.ENVIRONMENT,
     version: config.VERSION,
   };
 
