@@ -23,10 +23,17 @@ export const footerDisclaimer: CSSObject = {
   display: 'grid',
   gap: '10px',
   gridTemplateColumns: '1fr auto',
+  marginBottom: '4px',
   padding: '8px',
+
+  '.footer-disclaimer-tooltip': {
+    alignItems: 'center',
+    display: 'flex',
+  },
 };
 
 export const footerDisclaimerEllipsis: CSSObject = {
+  alignSelf: 'center',
   color: 'var(--text-input-placeholder)',
   fontSize: '0.75rem',
   fontWeight: '400',

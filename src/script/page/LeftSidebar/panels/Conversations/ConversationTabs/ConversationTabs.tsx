@@ -181,6 +181,7 @@ export const ConversationTabs = ({
         {isDataDogEnabled() && (
           <div css={footerDisclaimer}>
             <Tooltip
+              className="footer-disclaimer-tooltip"
               body={
                 <div
                   dangerouslySetInnerHTML={{
