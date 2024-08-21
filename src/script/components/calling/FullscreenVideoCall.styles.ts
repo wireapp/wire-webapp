@@ -93,13 +93,19 @@ export const videoTopBarStyles: CSSObject = {
   gridTemplateColumns: '1fr auto 1fr',
   alignItems: 'center',
   backgroundColor: 'var(--sidebar-bg)',
+  padding: '4px 0px',
+};
+
+export const headerActionsWrapperStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  width: 'fit-content',
+  marginLeft: 'auto',
+  padding: '0 6px',
 };
 
 export const paginationWrapperStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
-  width: 'fit-content',
-  marginLeft: 'auto',
-  padding: '0 20px',
   gap: '10px',
 };
