@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.23.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.23.1...@wireapp/react-ui-kit@9.23.2) (2024-08-22)
+
+### Bug Fixes
+
+* **react-ui-kit:** Remove wrapper with id for Tooltip children element ([#6467](https://github.com/wireapp/wire-web-packages/issues/6467)) ([68c5c88](https://github.com/wireapp/wire-web-packages/commit/68c5c880b272147a7fe68bdcb020a6e10fbea167))
+
 ## [9.23.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.23.0...@wireapp/react-ui-kit@9.23.1) (2024-08-13)
 
 ### Reverts
