@@ -25,11 +25,11 @@ export const footerDisclaimer: CSSObject = {
   gridTemplateColumns: '1fr auto',
   marginBottom: '4px',
   padding: '8px',
+};
 
-  '.footer-disclaimer-tooltip': {
-    alignItems: 'center',
-    display: 'flex',
-  },
+export const footerDisclaimerTooltip: CSSObject = {
+  alignItems: 'center',
+  display: 'flex',
 };
 
 export const footerDisclaimerEllipsis: CSSObject = {
