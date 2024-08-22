@@ -369,7 +369,14 @@ export class App {
       onProgress(2.5);
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
 
-      const selfUser = await this.repository.user.getSelf([{position: 'App.initiateSelfUser', vendor: 'webapp'}]);
+      let selfUser: User;
+
+      try {
+        selfUser = await this.repository.user.getSelf([{position: 'App.initiateSelfUser', vendor: 'webapp'}]);
+      } catch (error) {
+        await this.logout(SIGN_OUT_REASON.SESSION_EXPIRED, false);
+        return undefined;
+      }
 
       await initializeDataDog(this.config, selfUser.qualifiedId);
       onProgress(5, t('initReceivedSelfUser', selfUser.name(), {}, true));
