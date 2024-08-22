@@ -198,7 +198,7 @@ export const Tooltip = ({children, ...props}: TooltipProps) => {
       style={{width: 'max-content'}}
       {...filteredProps}
     >
-      <div id="childrenElement">{children}</div>
+      {children}
 
       {isHovered && (
         <PortalComponent wrapperRect={wrapperRectRef.current} selector={selector}>
