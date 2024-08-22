@@ -321,4 +321,5 @@ export type Env = {
 
   DATADOG_APPLICATION_ID?: string;
   DATADOG_CLIENT_TOKEN?: string;
+  FEATURE_DATADOG_ENVIRONMENT?: string;
 };
