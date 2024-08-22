@@ -23,10 +23,17 @@ export const footerDisclaimer: CSSObject = {
   display: 'grid',
   gap: '10px',
   gridTemplateColumns: '1fr auto',
+  marginBottom: '4px',
   padding: '8px',
 };
 
+export const footerDisclaimerTooltip: CSSObject = {
+  alignItems: 'center',
+  display: 'flex',
+};
+
 export const footerDisclaimerEllipsis: CSSObject = {
+  alignSelf: 'center',
   color: 'var(--text-input-placeholder)',
   fontSize: '0.75rem',
   fontWeight: '400',
@@ -38,5 +45,11 @@ export const footerDisclaimerEllipsis: CSSObject = {
 
   '.conversations-sidebar .conversations-sidebar-items[data-is-collapsed=true] &': {
     display: 'none',
+  },
+};
+
+export const iconStyle: CSSObject = {
+  path: {
+    fill: 'var(--amber-500)',
   },
 };
