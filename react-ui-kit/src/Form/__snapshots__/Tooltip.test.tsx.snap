@@ -18,11 +18,7 @@ exports[`<Tooltip /> renders correctly 1`] = `
           data-testid="tooltip-wrapper"
           role="presentation"
         >
-          <div
-            id="childrenElement"
-          >
-            Hover Me
-          </div>
+          Hover Me
         </div>
       </div>
     </div>
@@ -41,11 +37,7 @@ exports[`<Tooltip /> renders correctly 1`] = `
         data-testid="tooltip-wrapper"
         role="presentation"
       >
-        <div
-          id="childrenElement"
-        >
-          Hover Me
-        </div>
+        Hover Me
       </div>
     </div>
   </div>,
