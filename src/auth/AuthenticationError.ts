@@ -90,3 +90,11 @@ export class PasswordExistsError extends AuthenticationError {
     this.name = 'PasswordExistsError';
   }
 }
+
+export class MissingCookieAndTokenError extends AuthenticationError {
+  constructor(message: string, label = BackendErrorLabel.INVALID_CREDENTIALS, code = StatusCode.FORBIDDEN) {
+    super(message, label, code);
+    Object.setPrototypeOf(this, new.target.prototype);
+    this.name = 'MissingCookieAndTokenError';
+  }
+}
