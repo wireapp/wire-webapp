@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [27.4.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.4.0...@wireapp/api-client@27.4.1) (2024-08-23)
+
+### Bug Fixes
+
+* force logout when zuid cookie is missing [WPB-10717] ([#6468](https://github.com/wireapp/wire-web-packages/issues/6468)) ([504fd85](https://github.com/wireapp/wire-web-packages/commit/504fd85eccc17e8fbd287a320682496fb18fb799))
+
 # [27.4.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.3.3...@wireapp/api-client@27.4.0) (2024-08-14)
 
 ### Features
