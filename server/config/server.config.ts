@@ -42,7 +42,7 @@ const defaultCSP = {
   imgSrc: ["'self'", 'blob:', 'data:', 'https://*.giphy.com'],
   manifestSrc: ["'self'"],
   mediaSrc: ["'self'", 'blob:', 'data:'],
-  scriptSrc: ["'self'", "'unsafe-eval'"],
+  scriptSrc: ["'self'", "'unsafe-eval', 'nonce-countly'"],
   styleSrc: ["'self'", "'unsafe-inline'"],
   workerSrc: ["'self'", 'blob:'],
 };
