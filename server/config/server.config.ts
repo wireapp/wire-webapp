@@ -19,6 +19,7 @@
 
 import fs from 'fs-extra';
 import logdown from 'logdown';
+import {v4 as uuidv4} from 'uuid';
 
 import path from 'path';
 
@@ -68,7 +69,21 @@ function parseCommaSeparatedList(list: string = ''): string[] {
   return cleanedList.split(',');
 }
 
-function mergedCSP({urls}: ConfigGeneratorParams, env: Record<string, string>): Record<string, Iterable<string>> {
+// create random nonce for CSP headers with 256 bits of entropy
+function generateCSPNonce() {
+  const uuid = uuidv4();
+
+  return {
+    value: uuid,
+    cspString: `'nonce-${uuid}'`,
+  };
+}
+
+function mergedCSP(
+  {urls}: ConfigGeneratorParams,
+  env: Record<string, string>,
+  countlyCSPNonce: string,
+): Record<string, Iterable<string>> {
   const objectSrc = parseCommaSeparatedList(env.CSP_EXTRA_OBJECT_SRC);
   const csp = {
     connectSrc: [...defaultCSP.connectSrc, urls.api, urls.ws, ...parseCommaSeparatedList(env.CSP_EXTRA_CONNECT_SRC)],
@@ -79,7 +94,7 @@ function mergedCSP({urls}: ConfigGeneratorParams, env: Record<string, string>): 
     manifestSrc: [...defaultCSP.manifestSrc, ...parseCommaSeparatedList(env.CSP_EXTRA_MANIFEST_SRC)],
     mediaSrc: [...defaultCSP.mediaSrc, ...parseCommaSeparatedList(env.CSP_EXTRA_MEDIA_SRC)],
     objectSrc: objectSrc.length > 0 ? objectSrc : ["'none'"],
-    scriptSrc: [...defaultCSP.scriptSrc, ...parseCommaSeparatedList(env.CSP_EXTRA_SCRIPT_SRC)],
+    scriptSrc: [...defaultCSP.scriptSrc, ...parseCommaSeparatedList(env.CSP_EXTRA_SCRIPT_SRC), countlyCSPNonce],
     styleSrc: [...defaultCSP.styleSrc, ...parseCommaSeparatedList(env.CSP_EXTRA_STYLE_SRC)],
     workerSrc: [...defaultCSP.workerSrc, ...parseCommaSeparatedList(env.CSP_EXTRA_WORKER_SRC)],
   };
@@ -89,13 +104,14 @@ function mergedCSP({urls}: ConfigGeneratorParams, env: Record<string, string>): 
 }
 
 export function generateConfig(params: ConfigGeneratorParams, env: Env) {
+  const countlyCSPNonce = generateCSPNonce();
   const {commit, version, urls, env: nodeEnv} = params;
   return {
     APP_BASE: urls.base,
     COMMIT: commit,
     VERSION: version,
     CACHE_DURATION_SECONDS: 300,
-    CSP: mergedCSP(params, env),
+    CSP: mergedCSP(params, env, countlyCSPNonce.cspString),
     BACKEND_REST: urls.api,
     BACKEND_WS: urls.ws,
     DEVELOPMENT: nodeEnv === 'development',
@@ -115,6 +131,8 @@ export function generateConfig(params: ConfigGeneratorParams, env: Env) {
       ALLOWED_HOSTS: ['app.wire.com'],
       DISALLOW: readFile(ROBOTS_DISALLOW_FILE, 'User-agent: *\r\nDisallow: /'),
     },
+    COUNTLY_API_KEY: env.COUNTLY_API_KEY || '',
+    COUNTLY_NONCE: countlyCSPNonce.value,
     SSL_CERTIFICATE_KEY_PATH:
       env.SSL_CERTIFICATE_KEY_PATH || path.join(__dirname, '../certificate/development-key.pem'),
     SSL_CERTIFICATE_PATH: env.SSL_CERTIFICATE_PATH || path.join(__dirname, '../certificate/development-cert.pem'),
