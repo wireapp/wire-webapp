@@ -94,7 +94,7 @@ function mergedCSP(
     manifestSrc: [...defaultCSP.manifestSrc, ...parseCommaSeparatedList(env.CSP_EXTRA_MANIFEST_SRC)],
     mediaSrc: [...defaultCSP.mediaSrc, ...parseCommaSeparatedList(env.CSP_EXTRA_MEDIA_SRC)],
     objectSrc: objectSrc.length > 0 ? objectSrc : ["'none'"],
-    scriptSrc: [...defaultCSP.scriptSrc, ...parseCommaSeparatedList(env.CSP_EXTRA_SCRIPT_SRC), `${countlyCSPNonce}`],
+    scriptSrc: [...defaultCSP.scriptSrc, ...parseCommaSeparatedList(env.CSP_EXTRA_SCRIPT_SRC), countlyCSPNonce],
     styleSrc: [...defaultCSP.styleSrc, ...parseCommaSeparatedList(env.CSP_EXTRA_STYLE_SRC)],
     workerSrc: [...defaultCSP.workerSrc, ...parseCommaSeparatedList(env.CSP_EXTRA_WORKER_SRC)],
   };
