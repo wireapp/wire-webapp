@@ -81,6 +81,11 @@ export class EventTrackingRepository {
   };
 
   public migrateDeviceId = async (newId: string) => {
+    if (!window.Countly) {
+      this.logger.warn('Countly is not available');
+      return;
+    }
+
     try {
       let stopOnFinish = false;
       if (!this.isProductReportingActivated) {
@@ -182,6 +187,11 @@ export class EventTrackingRepository {
   private async startProductReporting(trackingId?: string): Promise<void> {
     // This is a global object provided by the countly.min.js script
 
+    if (!window.Countly) {
+      this.logger.warn('Countly is not available');
+      return;
+    }
+
     if (!isCountlyEnabledAtCurrentEnvironment() || this.isProductReportingActivated) {
       return;
     }
@@ -213,6 +223,11 @@ export class EventTrackingRepository {
   }
 
   private readonly stopProductReportingSession = (): void => {
+    if (!window.Countly) {
+      this.logger.warn('Countly is not available');
+      return;
+    }
+
     if (this.isProductReportingActivated === true) {
       window.Countly.end_session();
     }
@@ -231,6 +246,11 @@ export class EventTrackingRepository {
   }
 
   private startProductReportingSession(): void {
+    if (!window.Countly) {
+      this.logger.warn('Countly is not available');
+      return;
+    }
+
     if (this.isProductReportingActivated === true) {
       window.Countly.begin_session();
       // enable APM
@@ -243,6 +263,11 @@ export class EventTrackingRepository {
   }
 
   private trackProductReportingEvent(eventName: string, customSegmentations?: ContributedSegmentations): void {
+    if (!window.Countly) {
+      this.logger.warn('Countly is not available');
+      return;
+    }
+
     if (this.isProductReportingActivated === true) {
       const userData = {
         [UserData.IS_TEAM]: this.teamState.isTeam(),

@@ -25,7 +25,7 @@
     <script src='./libs/countly/boomerang.min.js?v=<%= VERSION %>' type='text/javascript'></script>
     <script src='./libs/countly/countly.min.js?v=<%= VERSION %>' type='text/javascript'></script>
     <script src='./libs/countly/countly_boomerang.js?v=<%= VERSION %>' type='text/javascript'></script>
-    <script type='text/javascript' nonce="countly">
+    <script type='text/javascript' nonce="<%= COUNTLY_NONCE %>">
       Countly.init({
         debug:false,
         app_key:"<%= COUNTLY_API_KEY %>",
