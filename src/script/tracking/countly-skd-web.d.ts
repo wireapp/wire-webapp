@@ -47,12 +47,16 @@ export interface Countly {
   opt_out: () => void;
   opt_in: () => void;
 
+  enable_offline_mode: () => void;
+  disable_offline_mode: (userId: string) => void;
+
   begin_session: (noHeartBeat?: boolean) => void;
   end_session: () => void;
 
   track_pageview: (page: string) => void;
   track_clicks: () => void;
 
+  app_version: string;
   storage: 'localstorage' | 'cookie';
   use_session_cookie: boolean;
 
@@ -67,6 +71,8 @@ export interface Countly {
     set: (key: string, value: any) => void;
     save: () => void;
   };
+
+  get_device_id: () => string;
   change_id: (newId: string, merge?: boolean) => void;
 }
 

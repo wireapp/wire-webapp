@@ -25,6 +25,16 @@
     <script src='./libs/countly/boomerang.min.js?v=<%= VERSION %>' type='text/javascript'></script>
     <script src='./libs/countly/countly.min.js?v=<%= VERSION %>' type='text/javascript'></script>
     <script src='./libs/countly/countly_boomerang.js?v=<%= VERSION %>' type='text/javascript'></script>
+    <script type='text/javascript' nonce="countly">
+      Countly.init({
+        debug:false,
+        app_key:"<%= COUNTLY_API_KEY %>",
+        url: "https://countly.wire.com/",
+        offline_mode: true,
+        use_session_cookie: false,
+        storage: 'localstorage'
+      });
+    </script>
   </head>
 
   <body>

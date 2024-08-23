@@ -213,6 +213,7 @@ class Server {
       APP_BASE: this.config.APP_BASE,
       OPEN_GRAPH: this.config.OPEN_GRAPH,
       VERSION: this.config.VERSION,
+      COUNTLY_API_KEY: this.config.COUNTLY_API_KEY,
     };
   }
 

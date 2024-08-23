@@ -45,6 +45,7 @@ const templateParameters = {
   OPEN_GRAPH_TITLE: serverConfig.OPEN_GRAPH.TITLE,
   OPEN_GRAPH_DESCRIPTION: serverConfig.OPEN_GRAPH.DESCRIPTION,
   OPEN_GRAPH_IMAGE_URL: serverConfig.OPEN_GRAPH.IMAGE_URL,
+  COUNTLY_API_KEY: serverConfig.COUNTLY_API_KEY,
 };
 
 module.exports = {

@@ -115,6 +115,7 @@ export function generateConfig(params: ConfigGeneratorParams, env: Env) {
       ALLOWED_HOSTS: ['app.wire.com'],
       DISALLOW: readFile(ROBOTS_DISALLOW_FILE, 'User-agent: *\r\nDisallow: /'),
     },
+    COUNTLY_API_KEY: env.COUNTLY_API_KEY || '',
     SSL_CERTIFICATE_KEY_PATH:
       env.SSL_CERTIFICATE_KEY_PATH || path.join(__dirname, '../certificate/development-key.pem'),
     SSL_CERTIFICATE_PATH: env.SSL_CERTIFICATE_PATH || path.join(__dirname, '../certificate/development-cert.pem'),
