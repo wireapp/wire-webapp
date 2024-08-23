@@ -19,8 +19,8 @@
 
 import fs from 'fs-extra';
 import logdown from 'logdown';
+import {v4 as uuidv4} from 'uuid';
 
-import crypto from 'crypto';
 import path from 'path';
 
 import {ConfigGeneratorParams} from './config.types';
@@ -71,17 +71,11 @@ function parseCommaSeparatedList(list: string = ''): string[] {
 
 // create random nonce for CSP headers with 256 bits of entropy
 function generateCSPNonce() {
-  const current_date = new Date().valueOf().toString();
-  const random = Math.random().toString();
-  crypto
-    .createHash('sha1')
-    .update(current_date + random)
-    .digest('hex');
-  const arr = Array.from(current_date).join('');
+  const uuid = uuidv4();
 
   return {
-    value: arr,
-    cspString: `'nonce-${arr}'`,
+    value: uuid,
+    cspString: `'nonce-${uuid}'`,
   };
 }
 
