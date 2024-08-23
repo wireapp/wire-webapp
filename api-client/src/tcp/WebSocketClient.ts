@@ -24,7 +24,7 @@ import {EventEmitter} from 'events';
 
 import {ReconnectingWebsocket, WEBSOCKET_STATE} from './ReconnectingWebsocket';
 
-import {InvalidTokenError, MissingCookieError} from '../auth/';
+import {InvalidTokenError, MissingCookieAndTokenError, MissingCookieError} from '../auth/';
 import {HttpClient, NetworkError} from '../http/';
 import {Notification} from '../notification/';
 
@@ -167,7 +167,11 @@ export class WebSocketClient extends EventEmitter {
     } catch (error) {
       if (error instanceof NetworkError) {
         this.logger.warn(error);
-      } else if (error instanceof InvalidTokenError || error instanceof MissingCookieError) {
+      } else if (
+        error instanceof InvalidTokenError ||
+        error instanceof MissingCookieError ||
+        error instanceof MissingCookieAndTokenError
+      ) {
         // On invalid cookie the application is supposed to logout.
         this.logger.warn(
           `[WebSocket] Cannot renew access token because cookie/token is invalid: ${error.message}`,

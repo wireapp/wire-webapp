@@ -32,6 +32,7 @@ import {
   AccessTokenStore,
   AuthAPI,
   InvalidTokenError,
+  MissingCookieAndTokenError,
   MissingCookieError,
   TokenExpiredError,
 } from '../auth/';
@@ -181,7 +182,11 @@ export class HttpClient extends EventEmitter {
           return retryWithTokenRefresh();
         }
 
-        if (mappedError instanceof InvalidTokenError || mappedError instanceof MissingCookieError) {
+        if (
+          mappedError instanceof InvalidTokenError ||
+          mappedError instanceof MissingCookieError ||
+          mappedError instanceof MissingCookieAndTokenError
+        ) {
           // On invalid cookie the application is supposed to logout.
           this.logger.warn(
             `Cannot renew access token for "${config.method}" request to "${config.url}" because cookie/token is invalid: ${mappedError.message}`,
