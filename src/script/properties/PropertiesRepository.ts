@@ -26,7 +26,10 @@ import ko from 'knockout';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 import {Environment} from 'Util/Environment';
+import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 
 import type {PropertiesService} from './PropertiesService';
@@ -138,8 +141,24 @@ export class PropertiesRepository {
     const isTelemetryPreferenceSet = this.getPreference(PROPERTIES_TYPE.PRIVACY.TELEMETRY_SHARING) !== undefined;
 
     if (!isTelemetryPreferenceSet) {
-      this.savePreference(PROPERTIES_TYPE.PRIVACY.TELEMETRY_SHARING, true);
-      this.publishProperties();
+      PrimaryModal.show(PrimaryModalType.CONFIRM, {
+        text: {title: t('dataSharingModalTitle'), message: t('dataSharingModalDescription')},
+        primaryAction: {
+          text: t('dataSharingModalAgree'),
+          action: () => {
+            this.savePreference(PROPERTIES_TYPE.PRIVACY.TELEMETRY_SHARING, true);
+            this.publishProperties();
+          },
+        },
+        secondaryAction: {
+          text: t('dataSharingModalDecline'),
+          action: () => {
+            this.savePreference(PROPERTIES_TYPE.PRIVACY.TELEMETRY_SHARING, false);
+            this.publishProperties();
+          },
+        },
+        closeOnSecondaryAction: true,
+      });
     }
   }
 
