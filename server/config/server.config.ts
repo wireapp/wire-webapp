@@ -19,7 +19,6 @@
 
 import fs from 'fs-extra';
 import logdown from 'logdown';
-import {v4 as uuidv4} from 'uuid';
 
 import path from 'path';
 
@@ -69,15 +68,11 @@ function parseCommaSeparatedList(list: string = ''): string[] {
   return cleanedList.split(',');
 }
 
-// create random nonce for CSP headers with 256 bits of entropy
-function generateCSPNonce() {
-  const uuid = uuidv4();
-
-  return {
-    value: uuid,
-    cspString: `'nonce-${uuid}'`,
-  };
-}
+// This is a constant that is used to use as CSP nonce for the countly script
+const COUNTLY_NONCE = {
+  value: '36f73136-20aa-4c87-aff4-667cdc814d98',
+  cspString: "'nonce-36f73136-20aa-4c87-aff4-667cdc814d98'",
+};
 
 function mergedCSP(
   {urls}: ConfigGeneratorParams,
@@ -104,14 +99,13 @@ function mergedCSP(
 }
 
 export function generateConfig(params: ConfigGeneratorParams, env: Env) {
-  const countlyCSPNonce = generateCSPNonce();
   const {commit, version, urls, env: nodeEnv} = params;
   return {
     APP_BASE: urls.base,
     COMMIT: commit,
     VERSION: version,
     CACHE_DURATION_SECONDS: 300,
-    CSP: mergedCSP(params, env, countlyCSPNonce.cspString),
+    CSP: mergedCSP(params, env, COUNTLY_NONCE.cspString),
     BACKEND_REST: urls.api,
     BACKEND_WS: urls.ws,
     DEVELOPMENT: nodeEnv === 'development',
@@ -132,7 +126,7 @@ export function generateConfig(params: ConfigGeneratorParams, env: Env) {
       DISALLOW: readFile(ROBOTS_DISALLOW_FILE, 'User-agent: *\r\nDisallow: /'),
     },
     COUNTLY_API_KEY: env.COUNTLY_API_KEY || '',
-    COUNTLY_NONCE: countlyCSPNonce.value,
+    COUNTLY_NONCE: COUNTLY_NONCE.value,
     SSL_CERTIFICATE_KEY_PATH:
       env.SSL_CERTIFICATE_KEY_PATH || path.join(__dirname, '../certificate/development-key.pem'),
     SSL_CERTIFICATE_PATH: env.SSL_CERTIFICATE_PATH || path.join(__dirname, '../certificate/development-cert.pem'),
