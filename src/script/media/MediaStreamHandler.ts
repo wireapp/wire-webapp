@@ -87,10 +87,10 @@ export class MediaStreamHandler {
         return mediaStream;
       })
       .catch((error: Error) => {
-        if (isMediaStreamReadDeviceError(error.name)) {
-          this.schedulePermissionHint(audio, video, screen);
+        if (!isMediaStreamReadDeviceError(error.name)) {
+          throw error;
         }
-        throw error;
+        this.schedulePermissionHint(audio, video, screen);
       });
   }
 
