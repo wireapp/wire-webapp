@@ -60,21 +60,20 @@ export const CallParticipantItemContent = ({
           <UserInfo user={user} css={[ellipsis]} dataUieName="status-name" />
 
           {isSelf && <div css={selfIndicator}>{selfString}</div>}
+          {isAudioEstablished && showContextMenu && (
+            <button
+              data-hoverClass="chevron-icon"
+              tabIndex={TabIndex.UNFOCUSABLE}
+              css={chevronIcon}
+              onClick={onDropdownClick}
+              type="button"
+              data-uie-name="participant-menu-icon"
+            >
+              <Icon.ChevronIcon />
+            </button>
+          )}
         </div>
       </div>
-
-      {isAudioEstablished && showContextMenu && (
-        <button
-          data-hoverClass="chevron-icon"
-          tabIndex={TabIndex.UNFOCUSABLE}
-          css={chevronIcon}
-          onClick={onDropdownClick}
-          type="button"
-          data-uie-name="participant-menu-icon"
-        >
-          <Icon.ChevronIcon />
-        </button>
-      )}
     </div>
   );
 };
