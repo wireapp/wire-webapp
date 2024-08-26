@@ -78,7 +78,7 @@ export class MediaStreamHandler {
    * track is enough to enforce the general permissions.
    * @returns Promise with active MediaStream
    */
-  requestMediaSreamAccess(video: boolean): Promise<MediaStream> {
+  requestMediaStreamAccess(video: boolean): Promise<MediaStream> {
     const audio = true;
     const screen = false;
     return window.navigator.mediaDevices

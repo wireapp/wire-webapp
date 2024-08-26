@@ -58,7 +58,7 @@ const AVPreferences = ({
   const initializeMediaDevices = async () => {
     setCheckingPermissions(true);
     try {
-      await streamHandler.requestMediaSreamAccess(true).then(stream => {
+      await streamHandler.requestMediaStreamAccess(true).then(stream => {
         devicesHandler?.initializeMediaDevices().then(() => {
           stream?.getTracks().forEach(track => track.stop());
         });
