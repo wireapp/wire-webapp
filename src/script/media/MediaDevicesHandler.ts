@@ -365,7 +365,7 @@ export class MediaDevicesHandler {
    * permissionm
    * @returns All enumerated MediaDeviceInfos
    */
-  private async enumerateMediaDevices(forceCamera: boolean = false): Promise<MediaDeviceInfo[]> {
+  private async enumerateMediaDevices(forceCamera = false): Promise<MediaDeviceInfo[]> {
     // The browser will set the device labels obtained from navigator.mediaDevices.enumerateDevices() to blank strings
     // if there is no longer an active MediaStream, even if the application was previously temporarily authorized to
     // access the devices by calling navigator.mediaDevices.getUserMedia().
