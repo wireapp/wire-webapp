@@ -682,6 +682,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   </button>
                 </li>
               </div>
+
               {!horizontalXsBreakpoint && (
                 <div
                   css={{
@@ -698,7 +699,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                             toggleCallView();
                           }
                         }}
-                        className="video-controls__button video-controls__button--small"
+                        className="video-controls__button video-controls__button--small video-controls__view-mode"
                         onClick={toggleCallView}
                         onKeyDown={event => handleKeyDown(event, toggleCallView)}
                         css={isCallViewOpen ? videoControlActiveStyles : videoControlInActiveStyles}
@@ -737,6 +738,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                       </button>
                     </li>
                   )}
+
                   {Config.getConfig().FEATURE.ENABLE_IN_CALL_REACTIONS && (
                     <li className="video-controls__item">
                       {showEmojisBar && (
