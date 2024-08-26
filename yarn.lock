@@ -5191,6 +5191,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/uuid@npm:^10.0.0":
+  version: 10.0.0
+  resolution: "@types/uuid@npm:10.0.0"
+  checksum: 10/e3958f8b0fe551c86c14431f5940c3470127293280830684154b91dc7eb3514aeb79fe3216968833cf79d4d1c67f580f054b5be2cd562bebf4f728913e73e944
+  languageName: node
+  linkType: hard
+
 "@types/webpack-env@npm:1.18.5":
   version: 1.18.5
   resolution: "@types/webpack-env@npm:1.18.5"
@@ -18196,6 +18203,7 @@ __metadata:
     "@types/sinon": "npm:17.0.3"
     "@types/speakingurl": "npm:13.0.6"
     "@types/underscore": "npm:1.11.15"
+    "@types/uuid": "npm:^10.0.0"
     "@types/webpack-env": "npm:1.18.5"
     "@wireapp/avs": "npm:9.9.3"
     "@wireapp/commons": "npm:5.2.10"

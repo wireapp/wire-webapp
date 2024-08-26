@@ -93,6 +93,7 @@
     "@types/sinon": "17.0.3",
     "@types/speakingurl": "13.0.6",
     "@types/underscore": "1.11.15",
+    "@types/uuid": "^10.0.0",
     "@types/webpack-env": "1.18.5",
     "@wireapp/copy-config": "2.2.5",
     "@wireapp/eslint-config": "3.0.7",
