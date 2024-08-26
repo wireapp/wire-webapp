@@ -31,7 +31,7 @@ export const MEDIA_STREAM_ERROR_TYPES = {
 };
 
 export function isMediaStreamDeviceError(errorStr: string): boolean {
-  return MEDIA_STREAM_ERROR_TYPES.DEVICE.filter(errorType => errorType == errorStr).length > 0;
+  return MEDIA_STREAM_ERROR_TYPES.DEVICE.includes(errorStr);
 }
 
 export function isMediaStreamReadDeviceError(errorStr: string): boolean {
