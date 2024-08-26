@@ -33,6 +33,7 @@ import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {sortByPriority} from 'Util/StringUtil';
 import {isBackendError} from 'Util/TypePredicateUtil';
 
+import {GroupList} from './components/GroupList';
 import {TopPeople} from './components/TopPeople';
 
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
@@ -45,7 +46,7 @@ import {TeamRepository} from '../../../../team/TeamRepository';
 import {TeamState} from '../../../../team/TeamState';
 import {UserState} from '../../../../user/UserState';
 
-export type SearchResultsData = {contacts: User[]; others: User[]};
+export type SearchResultsData = {contacts: User[]; others: User[]; groups: Conversation[]};
 
 interface PeopleTabProps {
   canInviteTeamMembers: boolean;
@@ -117,7 +118,7 @@ export const PeopleTab = ({
     return contacts.filter(user => user.isAvailable());
   };
 
-  const [results, setResults] = useState<SearchResultsData>({contacts: getLocalUsers(), others: []});
+  const [results, setResults] = useState<SearchResultsData>({contacts: getLocalUsers(), others: [], groups: []});
   const searchOnFederatedDomain = () => '';
   const hasResults = results.contacts.length + results.others.length > 0;
 
@@ -162,9 +163,9 @@ export const PeopleTab = ({
   useDebounce(
     async () => {
       setHasFederationError(false);
-      const {query} = searchRepository.normalizeQuery(searchQuery);
+      const {query, isHandleQuery} = searchRepository.normalizeQuery(searchQuery);
       if (!query) {
-        setResults({contacts: getLocalUsers(), others: []});
+        setResults({contacts: getLocalUsers(), others: [], groups: []});
         onSearchResults(undefined);
         return;
       }
@@ -181,6 +182,7 @@ export const PeopleTab = ({
       const localSearchResults: SearchResultsData = {
         contacts: filteredResults,
         others: [],
+        groups: conversationRepository.getGroupsByName(query, isHandleQuery),
       };
       setResults(localSearchResults);
       onSearchResults(localSearchResults);
@@ -311,6 +313,14 @@ export const PeopleTab = ({
                 users={results.contacts}
                 selfUser={selfUser}
               />
+            </div>
+          </div>
+        )}
+        {Boolean(results.groups.length) && (
+          <div className="start-ui-groups">
+            <h3 className="start-ui-list-header">{isTeam ? t('searchTeamGroups') : t('searchGroups')}</h3>
+            <div className="group-list">
+              <GroupList groups={results.groups} click={onClickConversation} />
             </div>
           </div>
         )}

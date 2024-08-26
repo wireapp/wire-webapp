@@ -1390,6 +1390,7 @@
   "searchOtherDomainFederation": "Connect with other domain",
   "searchOthers": "Connect",
   "searchOthersFederation": "Connect with {{domainName}}",
+  "searchTeamGroups": "Team conversations",
   "searchPeople": "People",
   "searchPeopleOnlyPlaceholder": "Search people",
   "searchPeoplePlaceholder": "Search for people and conversations",
