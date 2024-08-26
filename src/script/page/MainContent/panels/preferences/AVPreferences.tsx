@@ -17,12 +17,9 @@
  *
  */
 
-import {useEffect, useState} from 'react';
-
 import {MediaDeviceType} from 'src/script/media/MediaDeviceType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
-import {getLogger} from 'Util/Logger';
 
 import {AudioOutPreferences} from './avPreferences/AudioOutPreferences';
 import {CallOptions} from './avPreferences/CallOptions';
@@ -32,10 +29,9 @@ import {SaveCallLogs} from './avPreferences/SaveCallLogs';
 import {PreferencesPage} from './components/PreferencesPage';
 
 import type {CallingRepository} from '../../../../calling/CallingRepository';
+import {useInitializeMediaDevices} from '../../../../hooks/useInitializeMediaDevices';
 import type {MediaRepository} from '../../../../media/MediaRepository';
 import type {PropertiesRepository} from '../../../../properties/PropertiesRepository';
-
-const logger = getLogger('AVPreferences');
 
 interface AVPreferencesProps {
   callingRepository: CallingRepository;
@@ -48,47 +44,28 @@ const AVPreferences = ({
   propertiesRepository,
   callingRepository,
 }: AVPreferencesProps) => {
-  const [isCheckingPermissions, setCheckingPermissions] = useState(false);
   const deviceSupport = useKoSubscribableChildren(devicesHandler?.deviceSupport, [
     MediaDeviceType.AUDIO_INPUT,
     MediaDeviceType.AUDIO_OUTPUT,
     MediaDeviceType.VIDEO_INPUT,
   ]);
-
-  const initializeMediaDevices = async () => {
-    setCheckingPermissions(true);
-    try {
-      await streamHandler.requestMediaStreamAccess(true).then(stream => {
-        devicesHandler?.initializeMediaDevices().then(() => {
-          stream?.getTracks().forEach(track => track.stop());
-        });
-      });
-    } catch (error) {
-      logger.warn(`Initialization of media devices failed: ${error.message}`, error);
-    } finally {
-      setCheckingPermissions(false);
-    }
-  };
-
-  useEffect(() => {
-    initializeMediaDevices();
-  }, []);
+  const {isMediaDevicesAreInitialized} = useInitializeMediaDevices(devicesHandler, streamHandler);
 
   return (
     <PreferencesPage title={t('preferencesAV')}>
-      {isCheckingPermissions && (
+      {isMediaDevicesAreInitialized && (
         <div className="preferences-av-spinner-select">
           <div className="icon-spinner spin accent-text"></div>
         </div>
       )}
-      {!isCheckingPermissions && deviceSupport.audioinput && (
+      {!isMediaDevicesAreInitialized && deviceSupport.audioinput && (
         <MicrophonePreferences
           {...{devicesHandler, streamHandler}}
           refreshStream={() => callingRepository.refreshAudioInput()}
         />
       )}
-      {!isCheckingPermissions && deviceSupport.audiooutput && <AudioOutPreferences {...{devicesHandler}} />}
-      {!isCheckingPermissions && deviceSupport.videoinput && (
+      {!isMediaDevicesAreInitialized && deviceSupport.audiooutput && <AudioOutPreferences {...{devicesHandler}} />}
+      {!isMediaDevicesAreInitialized && deviceSupport.videoinput && (
         <CameraPreferences
           {...{devicesHandler, streamHandler}}
           refreshStream={() => callingRepository.refreshVideoInput()}
