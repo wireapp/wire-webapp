@@ -83,9 +83,7 @@ export class MediaStreamHandler {
     const screen = false;
     return window.navigator.mediaDevices
       .getUserMedia({audio, video})
-      .then((mediaStream: MediaStream) => {
-        return mediaStream;
-      })
+      .then((mediaStream: MediaStream) => mediaStream)
       .catch((error: Error) => {
         if (!isMediaStreamReadDeviceError(error.name)) {
           throw error;
