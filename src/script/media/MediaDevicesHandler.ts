@@ -267,7 +267,7 @@ export class MediaDevicesHandler {
    * This ensures that the video device labels can also be read. This is necessary for initializing the entire device list.
    * @returns Resolves with all MediaDevices when the list has been updated
    */
-  public async refreshMediaDevices(camera: boolean = false): Promise<MediaDeviceInfo[]> {
+  public async refreshMediaDevices(camera = false): Promise<MediaDeviceInfo[]> {
     const setDevices = (type: MediaDeviceType, devices: MediaDeviceInfo[]): void => {
       this.availableDevices[type](devices);
       const currentId = this.currentDeviceId[type];
