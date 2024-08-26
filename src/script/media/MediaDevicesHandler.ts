@@ -172,7 +172,7 @@ export class MediaDevicesHandler {
    * @camera: boolean, Only when the camera is queried can the entire device list be accessed.
    * @return Promise<void>
    */
-  public async initializeMediaDevices(camera: boolean = false): Promise<void> {
+  public async initializeMediaDevices(camera = false): Promise<void> {
     if (Runtime.isSupportingUserMedia() && !this.devicesAreInit) {
       return this.refreshMediaDevices(camera).then(() => {
         this.subscribeToObservables();
