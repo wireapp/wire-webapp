@@ -316,13 +316,9 @@ export const PeopleTab = ({
             </div>
           </div>
         )}
-        {results.groups.length > 0 && (
+        {Boolean(results.groups.length) && (
           <div className="start-ui-groups">
-            {isTeam ? (
-              <h3 className="start-ui-list-header">{t('searchTeamGroups')}</h3>
-            ) : (
-              <h3 className="start-ui-list-header">{t('searchGroups')}</h3>
-            )}
+            <h3 className="start-ui-list-header">{isTeam ? t('searchTeamGroups') : t('searchGroups')}</h3>
             <div className="group-list">
               <GroupList groups={results.groups} click={onClickConversation} />
             </div>
