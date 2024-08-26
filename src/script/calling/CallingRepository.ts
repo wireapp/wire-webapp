@@ -1197,12 +1197,8 @@ export class CallingRepository {
     return this.mediaStreamHandler.requestMediaStream(audio, camera, screen, isGroup).then(stream => {
       return this.mediaDevicesHandler
         .initializeMediaDevices(camera)
-        .then(() => {
-          return stream;
-        })
-        .catch(() => {
-          return stream;
-        });
+        .then(() => stream)
+        .catch(() => stream);
     });
   }
 
