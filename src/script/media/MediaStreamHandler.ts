@@ -78,17 +78,15 @@ export class MediaStreamHandler {
    * track is enough to enforce the general permissions.
    * @returns Promise with active MediaStream
    */
-  requestMediaStreamAccess(video: boolean): Promise<MediaStream> {
-    const audio = true;
-    const screen = false;
+  requestMediaStreamAccess(video: boolean): Promise<void | MediaStream> {
     return window.navigator.mediaDevices
-      .getUserMedia({audio, video})
+      .getUserMedia({audio: true, video})
       .then((mediaStream: MediaStream) => mediaStream)
       .catch((error: Error) => {
         if (!isMediaStreamReadDeviceError(error.name)) {
           throw error;
         }
-        this.schedulePermissionHint(audio, video, screen);
+        this.schedulePermissionHint(true, video, false);
       });
   }
 
