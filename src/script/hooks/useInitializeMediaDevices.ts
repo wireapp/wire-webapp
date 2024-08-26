@@ -32,10 +32,10 @@ export const useInitializeMediaDevices = (devicesHandler: MediaDevicesHandler, s
   const initializeMediaDevices = async () => {
     setCheckingPermissions(true);
     try {
-      await streamHandler.requestMediaStreamAccess(true).then(stream => {
+      await streamHandler.requestMediaStreamAccess(true).then((stream: MediaStream | void) => {
         devicesHandler?.initializeMediaDevices().then(() => {
-          if (stream !== undefined) {
-            stream?.getTracks().forEach(track => track.stop());
+          if (stream) {
+            stream.getTracks().forEach(track => track.stop());
           }
         });
       });
