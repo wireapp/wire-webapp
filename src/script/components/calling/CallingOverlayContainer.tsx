@@ -52,13 +52,16 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
   toggleScreenshare,
 }) => {
   const {devicesHandler: mediaDevicesHandler} = mediaRepository;
-  const {viewMode} = useKoSubscribableChildren(callState, ['viewMode']);
-  const isFullScreenOrDetached = [CallingViewMode.DETACHED_WINDOW, CallingViewMode.FULL_SCREEN].includes(viewMode);
+  const {activeCallViewTab, joinedCall, hasAvailableScreensToShare, desktopScreenShareMenu, viewMode} =
+    useKoSubscribableChildren(callState, [
+      'activeCallViewTab',
+      'joinedCall',
+      'hasAvailableScreensToShare',
+      'desktopScreenShareMenu',
+      'viewMode',
+    ]);
 
-  const {activeCallViewTab, joinedCall, hasAvailableScreensToShare, desktopScreenShareMenu} = useKoSubscribableChildren(
-    callState,
-    ['activeCallViewTab', 'joinedCall', 'hasAvailableScreensToShare', 'desktopScreenShareMenu'],
-  );
+  const isFullScreenOrDetached = [CallingViewMode.DETACHED_WINDOW, CallingViewMode.FULL_SCREEN].includes(viewMode);
 
   const {
     maximizedParticipant,
@@ -130,7 +133,10 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     return null;
   }
 
-  const toggleDetachedWindowScreenShare = (call: Call) => {
+  const toggleScreenShare = (call: Call) => {
+    if (viewMode === CallingViewMode.DETACHED_WINDOW) {
+      callState.setViewModeMinimized();
+    }
     toggleScreenshare(call, DesktopScreenShareMenu.DETACHED_WINDOW);
   };
 
@@ -162,7 +168,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
           setActiveCallViewTab={setActiveCallViewTab}
           toggleMute={toggleMute}
           toggleCamera={toggleCamera}
-          toggleScreenshare={toggleDetachedWindowScreenShare}
+          toggleScreenshare={toggleScreenShare}
           leave={leave}
           changePage={changePage}
         />
