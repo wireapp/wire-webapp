@@ -102,6 +102,9 @@ export type Env = {
    */
   FEATURE_ENABLE_ACCOUNT_REGISTRATION_ACCEPT_TERMS_AND_PRIVACY_POLICY: string;
 
+  /** Feature toggle to blur the background during video call */
+  FEATURE_ENABLE_BLUR_BACKGROUND: string;
+
   /** Feature toggle for debug utils. Can be set to true or false */
   FEATURE_ENABLE_DEBUG: string;
 
