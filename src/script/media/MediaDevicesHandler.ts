@@ -289,7 +289,7 @@ export class MediaDevicesHandler {
 
     try {
       this.removeAllDevices();
-      const mediaDevices = await this.enumerateMediaDevices(camera);
+      const mediaDevices = await window.navigator.mediaDevices.enumerateDevices();
 
       if (!mediaDevices) {
         throw new Error('No media devices found');
@@ -357,34 +357,6 @@ export class MediaDevicesHandler {
     this.logger.info(`Detected '${screenSources.length}' sources for screen sharing from Electron`);
     this.availableDevices.screeninput(screenSources);
     return screenSources;
-  }
-
-  /**
-   * Enumerates all known Media Devices Infos of a System.
-   * @param forceCamera If `forceCamera=true`, then an audio and video track is created to enforce the device access
-   * permissionm
-   * @returns All enumerated MediaDeviceInfos
-   */
-  private async enumerateMediaDevices(forceCamera = false): Promise<MediaDeviceInfo[]> {
-    // The browser will set the device labels obtained from navigator.mediaDevices.enumerateDevices() to blank strings
-    // if there is no longer an active MediaStream, even if the application was previously temporarily authorized to
-    // access the devices by calling navigator.mediaDevices.getUserMedia().
-
-    // @TODO: Fix Issue
-    // You can use this method to generate a camera stream even in the audio case. This way, the device labels can be displayed in any case.
-    // const constraints = (forceCamera)? {video: true} : {audio: true};
-    // const mediaPromise = navigator.mediaDevices.getUserMedia(constraints)
-    // return mediaPromise.then(stream => {
-    //   if (!stream) {
-    //     return [];
-    //   }
-    //   return window.navigator.mediaDevices.enumerateDevices().then( devices  => {
-    //     stream.getTracks().forEach((t) => t.stop());
-    //     return devices;
-    //   });
-    // });
-
-    return window.navigator.mediaDevices.enumerateDevices();
   }
 
   /**
