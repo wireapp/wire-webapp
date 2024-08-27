@@ -80,6 +80,7 @@ export class MediaDevicesHandler {
   public deviceSupport: DeviceSupport;
   private previousDeviceSupport: PreviousDeviceSupport;
   private onMediaDevicesRefresh?: () => void;
+  private devicesAreInit = false;
 
   static get CONFIG() {
     return {
@@ -154,7 +155,12 @@ export class MediaDevicesHandler {
       videoinput: this.availableDevices.videoinput().length,
     };
 
-    this.initializeMediaDevices();
+    // The device list must be queried once to obtain the device IDs. This way, the frontend knows whether cameras
+    // and microphones exist and can request them specifically during a call. Additionally, the app needs to know
+    // the device IDs; otherwise, we will receive a Media-Query-Constraint error when querying the devices, as we
+    // explicitly query by the device ID.
+    // The false parameter ensures that we only load the list temporarily.
+    this.initializeMediaDevices(false);
   }
 
   public setOnMediaDevicesRefreshHandler(handler: () => void): void {
@@ -163,14 +169,22 @@ export class MediaDevicesHandler {
 
   /**
    * Initialize the list of MediaDevices and subscriptions.
+   * @camera: boolean, Only when the camera is queried can the entire device list be accessed.
+   * @return Promise<void>
    */
-  private initializeMediaDevices(): void {
-    if (Runtime.isSupportingUserMedia()) {
-      this.refreshMediaDevices().then(() => {
+  public async initializeMediaDevices(camera = false): Promise<void> {
+    if (Runtime.isSupportingUserMedia() && !this.devicesAreInit) {
+      return this.refreshMediaDevices(camera).then(() => {
         this.subscribeToObservables();
         this.subscribeToDevices();
+        // The web browser cannot access the device labels without a camera stream.
+        // The device list is only complete when the camera was initialized.
+        if (camera) {
+          this.devicesAreInit = true;
+        }
       });
     }
+    return Promise.resolve();
   }
 
   /**
@@ -249,9 +263,11 @@ export class MediaDevicesHandler {
 
   /**
    * Update list of available MediaDevices.
+   * @param [camera=false] If `camera=true`, a video track is also created when the device list is read.
+   * This ensures that the video device labels can also be read. This is necessary for initializing the entire device list.
    * @returns Resolves with all MediaDevices when the list has been updated
    */
-  public async refreshMediaDevices(): Promise<MediaDeviceInfo[]> {
+  public async refreshMediaDevices(camera = false): Promise<MediaDeviceInfo[]> {
     const setDevices = (type: MediaDeviceType, devices: MediaDeviceInfo[]): void => {
       this.availableDevices[type](devices);
       const currentId = this.currentDeviceId[type];
@@ -273,7 +289,7 @@ export class MediaDevicesHandler {
 
     try {
       this.removeAllDevices();
-      const mediaDevices = await navigator.mediaDevices.enumerateDevices();
+      const mediaDevices = await window.navigator.mediaDevices.enumerateDevices();
 
       if (!mediaDevices) {
         throw new Error('No media devices found');

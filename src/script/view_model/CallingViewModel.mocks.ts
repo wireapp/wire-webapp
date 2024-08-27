@@ -28,6 +28,7 @@ import {Call} from '../calling/Call';
 import {CallingRepository} from '../calling/CallingRepository';
 import {CallState} from '../calling/CallState';
 import {Conversation} from '../entity/Conversation';
+import {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import {Core} from '../service/CoreSingleton';
 
 export const mockCallingRepository = {
@@ -44,6 +45,10 @@ export const mockCallingRepository = {
   supportsConferenceCalling: true,
 } as unknown as CallingRepository;
 
+export const mockMediaDevicesHandler = {
+  initializeMediaDevices: jest.fn(() => Promise.resolve()),
+} as unknown as MediaDevicesHandler;
+
 export const callState = new CallState();
 
 export function buildCall(conversation: Conversation, convType = CONV_TYPE.ONEONONE) {
@@ -57,7 +62,7 @@ export function buildCallingViewModel() {
   const callingViewModel = new CallingViewModel(
     mockCallingRepository,
     {} as any,
-    {} as any,
+    mockMediaDevicesHandler,
     {} as any,
     {} as any,
     {} as any,

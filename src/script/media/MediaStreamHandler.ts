@@ -23,7 +23,7 @@ import {getLogger, Logger} from 'Util/Logger';
 
 import {MediaConstraintsHandler, ScreensharingMethods} from './MediaConstraintsHandler';
 import {MEDIA_STREAM_ERROR} from './MediaStreamError';
-import {MEDIA_STREAM_ERROR_TYPES} from './MediaStreamErrorTypes';
+import {isMediaStreamReadDeviceError, MEDIA_STREAM_ERROR_TYPES} from './MediaStreamErrorTypes';
 import {MediaType} from './MediaType';
 
 import {MediaError} from '../error/MediaError';
@@ -70,6 +70,24 @@ export class MediaStreamHandler {
         ? new MediaError(MediaError.TYPE.MEDIA_STREAM_PERMISSION, MediaError.MESSAGE.MEDIA_STREAM_PERMISSION)
         : error;
     }
+  }
+
+  /**
+   * The method creates a media stream to enforce access rights to the camera and the microphone. If access is not possible, it starts a user pop-up
+   * @param video When `video=true` then the camera is also addressed. In many cases this is not necessary, because one
+   * track is enough to enforce the general permissions.
+   * @returns Promise with active MediaStream
+   */
+  requestMediaStreamAccess(video: boolean): Promise<MediaStream | void> {
+    return window.navigator.mediaDevices
+      .getUserMedia({audio: true, video})
+      .then((mediaStream: MediaStream) => mediaStream)
+      .catch((error: Error) => {
+        if (!isMediaStreamReadDeviceError(error.name)) {
+          throw error;
+        }
+        this.schedulePermissionHint(true, video, false);
+      });
   }
 
   selectScreenToShare(showScreenSelection: () => Promise<void>): Promise<void> {
