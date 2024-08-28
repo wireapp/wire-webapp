@@ -165,6 +165,7 @@ module.exports = {
         {from: `assets`, to: `${dist}/assets`},
         {from: 'src/page/basicBrowserFeatureCheck.js', to: `${dist}/min/`},
         {from: 'src/page/loader.js', to: `${dist}/min/`},
+        {from: 'src/page/countlyBoomerangCustom.js', to: `${dist}/min/`},
       ],
     }),
     new webpack.IgnorePlugin({resourceRegExp: /.*\.wasm/}),
