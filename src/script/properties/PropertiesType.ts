@@ -44,7 +44,7 @@ enum PROPERTIES {
 }
 
 enum PRIVACY {
-  TELEMETRY_SHARING = 'settings.privacy.telemetry_sharing',
+  TELEMETRY_SHARING = 'settings.privacy.telemetry_data_sharing',
   MARKETING_CONSENT = 'settings.privacy.marketing_consent',
 }
 

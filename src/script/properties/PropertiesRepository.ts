@@ -26,7 +26,11 @@ import ko from 'knockout';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
+import {Config} from 'src/script/Config';
 import {Environment} from 'Util/Environment';
+import {replaceLink, t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 
 import type {PropertiesService} from './PropertiesService';
@@ -137,9 +141,27 @@ export class PropertiesRepository {
   checkTelemetrySharingPermission(): void {
     const isTelemetryPreferenceSet = this.getPreference(PROPERTIES_TYPE.PRIVACY.TELEMETRY_SHARING) !== undefined;
 
-    if (!isTelemetryPreferenceSet) {
-      this.savePreference(PROPERTIES_TYPE.PRIVACY.TELEMETRY_SHARING, true);
+    const toggleTelemetrySharing = (value: boolean) => {
+      this.savePreference(PROPERTIES_TYPE.PRIVACY.TELEMETRY_SHARING, value);
       this.publishProperties();
+    };
+
+    if (!isTelemetryPreferenceSet) {
+      PrimaryModal.show(PrimaryModalType.CONFIRM, {
+        text: {
+          title: t('dataSharingModalTitle'),
+          htmlMessage: t('dataSharingModalDescription', {}, replaceLink(Config.getConfig().URL.PRIVACY_POLICY)),
+        },
+        primaryAction: {
+          text: t('dataSharingModalAgree'),
+          action: () => toggleTelemetrySharing(true),
+        },
+        secondaryAction: {
+          text: t('dataSharingModalDecline'),
+          action: () => toggleTelemetrySharing(false),
+        },
+        closeOnSecondaryAction: true,
+      });
     }
   }
 
