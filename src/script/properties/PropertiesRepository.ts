@@ -139,6 +139,10 @@ export class PropertiesRepository {
   }
 
   checkTelemetrySharingPermission(): void {
+    if (!isCountlyEnabledAtCurrentEnvironment()) {
+      return;
+    }
+
     const isTelemetryPreferenceSet = this.getPreference(PROPERTIES_TYPE.PRIVACY.TELEMETRY_SHARING) !== undefined;
 
     const toggleTelemetrySharing = (value: boolean) => {
