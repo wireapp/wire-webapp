@@ -28,8 +28,9 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
+import {Config} from 'src/script/Config';
 import {Environment} from 'Util/Environment';
-import {t} from 'Util/LocalizerUtil';
+import {replaceLink, t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 
 import type {PropertiesService} from './PropertiesService';
@@ -142,7 +143,10 @@ export class PropertiesRepository {
 
     if (!isTelemetryPreferenceSet) {
       PrimaryModal.show(PrimaryModalType.CONFIRM, {
-        text: {title: t('dataSharingModalTitle'), message: t('dataSharingModalDescription')},
+        text: {
+          title: t('dataSharingModalTitle'),
+          htmlMessage: t('dataSharingModalDescription', {}, replaceLink(Config.getConfig().URL.PRIVACY_POLICY)),
+        },
         primaryAction: {
           text: t('dataSharingModalAgree'),
           action: () => {
