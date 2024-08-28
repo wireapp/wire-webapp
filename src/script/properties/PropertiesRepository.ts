@@ -141,6 +141,11 @@ export class PropertiesRepository {
   checkTelemetrySharingPermission(): void {
     const isTelemetryPreferenceSet = this.getPreference(PROPERTIES_TYPE.PRIVACY.TELEMETRY_SHARING) !== undefined;
 
+    const toggleTelemetrySharing = (value: boolean) => {
+      this.savePreference(PROPERTIES_TYPE.PRIVACY.TELEMETRY_SHARING, value);
+      this.publishProperties();
+    };
+
     if (!isTelemetryPreferenceSet) {
       PrimaryModal.show(PrimaryModalType.CONFIRM, {
         text: {
@@ -149,17 +154,11 @@ export class PropertiesRepository {
         },
         primaryAction: {
           text: t('dataSharingModalAgree'),
-          action: () => {
-            this.savePreference(PROPERTIES_TYPE.PRIVACY.TELEMETRY_SHARING, true);
-            this.publishProperties();
-          },
+          action: () => toggleTelemetrySharing(true),
         },
         secondaryAction: {
           text: t('dataSharingModalDecline'),
-          action: () => {
-            this.savePreference(PROPERTIES_TYPE.PRIVACY.TELEMETRY_SHARING, false);
-            this.publishProperties();
-          },
+          action: () => toggleTelemetrySharing(false),
         },
         closeOnSecondaryAction: true,
       });
