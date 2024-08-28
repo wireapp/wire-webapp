@@ -1301,11 +1301,6 @@ export class CallingRepository {
     }
   }
 
-  hasActiveCall(): boolean {
-    const call = this.callState.joinedCall();
-    return !!call;
-  }
-
   hasActiveCameraStream(): boolean {
     const call = this.callState.joinedCall();
     if (!call) {
