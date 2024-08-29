@@ -62,6 +62,7 @@ const AVPreferences = ({
         <MicrophonePreferences
           {...{devicesHandler, streamHandler}}
           refreshStream={() => callingRepository.refreshAudioInput()}
+          hasActiveCall={callingRepository.hasActiveCall()}
         />
       )}
       {!isMediaDevicesAreInitialized && deviceSupport.audiooutput && <AudioOutPreferences {...{devicesHandler}} />}
