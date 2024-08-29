@@ -4870,15 +4870,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/jquery@npm:3.5.30":
-  version: 3.5.30
-  resolution: "@types/jquery@npm:3.5.30"
-  dependencies:
-    "@types/sizzle": "npm:*"
-  checksum: 10/5287586be022bfe85d411733b35f8f0ae8577c4afb5a94ff0e157d2c1036e10adfdd15ed80becb06f01647c39be5dbb24a45cba10db3fa6304eb442fa509321e
-  languageName: node
-  linkType: hard
-
 "@types/js-cookie@npm:3.0.6":
   version: 3.0.6
   resolution: "@types/js-cookie@npm:3.0.6"
@@ -11869,13 +11860,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jquery@npm:3.7.1":
-  version: 3.7.1
-  resolution: "jquery@npm:3.7.1"
-  checksum: 10/17be9929f5fa37697d9848284f0d108c543318ef79ec794e130cd0c49f6c050d60c803a69e8cfa16fa19f5ff7cdb814a6905cceab0831186560c65ed113cd579
-  languageName: node
-  linkType: hard
-
 "js-cookie@npm:3.0.5":
   version: 3.0.5
   resolution: "js-cookie@npm:3.0.5"
@@ -18185,7 +18169,6 @@ __metadata:
     "@types/fs-extra": "npm:11.0.4"
     "@types/generate-changelog": "npm:1.8.3"
     "@types/jest": "npm:29.5.12"
-    "@types/jquery": "npm:3.5.30"
     "@types/js-cookie": "npm:3.0.6"
     "@types/jsdom": "npm:21.1.7"
     "@types/keyboardjs": "npm:2.5.3"
@@ -18251,7 +18234,6 @@ __metadata:
     jest-jasmine2: "npm:29.7.0"
     jest-transform-stub: "npm:2.0.0"
     jimp: "npm:0.22.12"
-    jquery: "npm:3.7.1"
     js-cookie: "npm:3.0.5"
     jsdom-worker: "npm:0.3.0"
     jszip: "npm:3.10.1"

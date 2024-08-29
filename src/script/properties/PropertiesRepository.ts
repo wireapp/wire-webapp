@@ -21,7 +21,6 @@ import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {ConsentType} from '@wireapp/api-client/lib/self/';
 import {AudioPreference, NotificationPreference, WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
-import jquery from 'jquery';
 import ko from 'knockout';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -29,6 +28,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 import {Config} from 'src/script/Config';
+import {deepMerge} from 'Util/deepMerge';
 import {Environment} from 'Util/Environment';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
@@ -193,7 +193,7 @@ export class PropertiesRepository {
     return this.propertiesService
       .getPropertiesByKey(PropertiesRepository.CONFIG.WEBAPP_ACCOUNT_SETTINGS)
       .then(properties => {
-        jquery.extend(true, this.properties, properties);
+        deepMerge(this.properties, properties);
       })
       .catch(() => {
         this.logger.warn(
