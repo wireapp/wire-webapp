@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.5.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.4.1...@wireapp/api-client@27.5.0) (2024-08-29)
+
+### Features
+
+* **api-client:** Update telemetry key name in webapp properties (WPB-9972) ([#6485](https://github.com/wireapp/wire-web-packages/issues/6485)) ([a2f9e59](https://github.com/wireapp/wire-web-packages/commit/a2f9e590fd55d7eecdcefad7be09b7a18015d15d))
+
 ## [27.4.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.4.0...@wireapp/api-client@27.4.1) (2024-08-23)
 
 ### Bug Fixes
