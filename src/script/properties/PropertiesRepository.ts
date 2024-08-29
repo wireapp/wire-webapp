@@ -139,34 +139,32 @@ export class PropertiesRepository {
   }
 
   checkTelemetrySharingPermission(): void {
-    if (!isCountlyEnabledAtCurrentEnvironment()) {
+    const isTelemetryPreferenceSet = this.getPreference(PROPERTIES_TYPE.PRIVACY.TELEMETRY_SHARING) !== undefined;
+
+    if (!isCountlyEnabledAtCurrentEnvironment() || isTelemetryPreferenceSet) {
       return;
     }
-
-    const isTelemetryPreferenceSet = this.getPreference(PROPERTIES_TYPE.PRIVACY.TELEMETRY_SHARING) !== undefined;
 
     const toggleTelemetrySharing = (value: boolean) => {
       this.savePreference(PROPERTIES_TYPE.PRIVACY.TELEMETRY_SHARING, value);
       this.publishProperties();
     };
 
-    if (!isTelemetryPreferenceSet) {
-      PrimaryModal.show(PrimaryModalType.CONFIRM, {
-        text: {
-          title: t('dataSharingModalTitle'),
-          htmlMessage: t('dataSharingModalDescription', {}, replaceLink(Config.getConfig().URL.PRIVACY_POLICY)),
-        },
-        primaryAction: {
-          text: t('dataSharingModalAgree'),
-          action: () => toggleTelemetrySharing(true),
-        },
-        secondaryAction: {
-          text: t('dataSharingModalDecline'),
-          action: () => toggleTelemetrySharing(false),
-        },
-        closeOnSecondaryAction: true,
-      });
-    }
+    PrimaryModal.show(PrimaryModalType.CONFIRM, {
+      text: {
+        title: t('dataSharingModalTitle'),
+        htmlMessage: t('dataSharingModalDescription', {}, replaceLink(Config.getConfig().URL.PRIVACY_POLICY)),
+      },
+      primaryAction: {
+        text: t('dataSharingModalAgree'),
+        action: () => toggleTelemetrySharing(true),
+      },
+      secondaryAction: {
+        text: t('dataSharingModalDecline'),
+        action: () => toggleTelemetrySharing(false),
+      },
+      closeOnSecondaryAction: true,
+    });
   }
 
   getPreference(propertiesType: string): any {
