@@ -67,7 +67,7 @@ export class PropertiesRepository {
   public readonly receiptMode: ko.Observable<RECEIPT_MODE>;
   public readonly typingIndicatorMode: ko.Observable<CONVERSATION_TYPING_INDICATOR_MODE>;
   private readonly selfService: SelfService;
-  private readonly selfUser: ko.Observable<User>;
+  private readonly selfUser: ko.Observable<User | undefined>;
   public properties: WebappProperties;
 
   constructor(propertiesService: PropertiesService, selfService: SelfService) {
@@ -96,7 +96,7 @@ export class PropertiesRepository {
           send: true,
         },
         privacy: {
-          telemetry_sharing: undefined,
+          telemetry_data_sharing: undefined,
           marketing_consent: PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.defaultValue,
         },
         sound: {
@@ -114,7 +114,7 @@ export class PropertiesRepository {
 
   public getUserConsentStatus() {
     const {
-      privacy: {marketing_consent: marketingConsent, telemetry_sharing: telemetryConsent},
+      privacy: {marketing_consent: marketingConsent, telemetry_data_sharing: telemetryConsent},
     } = this.properties.settings;
 
     let userConsentStatus = UserConsentStatus.ALL_DENIED;
@@ -186,7 +186,7 @@ export class PropertiesRepository {
   init(selfUserEntity: User): Promise<void> | Promise<WebappProperties> {
     this.selfUser(selfUserEntity);
 
-    return this.selfUser().isTemporaryGuest() ? this.initTemporaryGuestAccount() : this.initActivatedAccount();
+    return this.selfUser()?.isTemporaryGuest() ? this.initTemporaryGuestAccount() : this.initActivatedAccount();
   }
 
   private fetchWebAppAccountSettings(): Promise<void> {
@@ -237,7 +237,7 @@ export class PropertiesRepository {
     if (updatedPreference !== this.getPreference(propertiesType)) {
       this.setPreference(propertiesType, updatedPreference);
 
-      const savePromise = this.selfUser().isTemporaryGuest()
+      const savePromise = this.selfUser()?.isTemporaryGuest()
         ? this.savePreferenceTemporaryGuestAccount(propertiesType, updatedPreference)
         : this.savePreferenceActivatedAccount(propertiesType, updatedPreference);
 
