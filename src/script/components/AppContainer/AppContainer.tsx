@@ -26,6 +26,7 @@ import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
 import {DetachedCallingCell} from 'Components/calling/DetachedCallingCell';
 import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
+import {QualityFeedbackModal} from 'Components/Modals/QualityFeedbackModal';
 import {SIGN_OUT_REASON} from 'src/script/auth/SignOutReason';
 import {useAppSoftLock} from 'src/script/hooks/useAppSoftLock';
 import {useSingleInstance} from 'src/script/hooks/useSingleInstance';
@@ -97,8 +98,10 @@ export const AppContainer: FC<AppProps> = ({config, clientType}) => {
           return <AppMain app={app} selfUser={selfUser} mainView={mainView} locked={softLockEnabled} />;
         }}
       </AppLoader>
+
       <StyledApp themeId={THEME_ID.DEFAULT} css={{backgroundColor: 'unset', height: '100%'}}>
         <PrimaryModalComponent />
+        <QualityFeedbackModal />
       </StyledApp>
 
       {isDetachedCallingFeatureEnabled() && (
