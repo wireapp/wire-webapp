@@ -32,7 +32,13 @@ Plugin being used - RT, AutoXHR, Continuity, NavigationTiming, ResourceTiming
 (function cly_load_track_performance() {
   // will be used to trim UUIDs from URLs for network traces
   function trimUUIDFromURL(url) {
-    return url.replace(/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/g, '#id#');
+    const removedUUIDUrl = url.replace(
+      /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/g,
+      '#id#',
+    );
+    const removedHexadecimalIdUrl = removedUUIDUrl.replace(/[0-9a-fA-F]{32}/g, '#id#');
+
+    return removedHexadecimalIdUrl;
   }
 
   if (typeof window === 'undefined') {
