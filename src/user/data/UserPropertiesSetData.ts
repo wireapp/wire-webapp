@@ -53,7 +53,7 @@ export interface WebappProperties {
     };
     privacy: {
       marketing_consent?: boolean;
-      telemetry_sharing?: boolean;
+      telemetry_data_sharing?: boolean;
     };
     sound: {
       alerts: AudioPreference;
