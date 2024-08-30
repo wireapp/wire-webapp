@@ -9,7 +9,7 @@ COPY /.env.defaults .
 ENV NODE_PATH=/node_modules
 ENV PATH=$PATH:/node_modules/.bin
 
-RUN yarn
+RUN yarn workspaces focus --production
 
 EXPOSE 8080
 
