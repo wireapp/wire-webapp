@@ -45,5 +45,6 @@
     "clean": "rimraf ./dist/",
     "start:prod": "pm2 start \"./index.js\" --name \"Webapp\" && pm2 logs",
     "test": "jest"
-  }
+  },
+  "packageManager": "yarn@4.4.1"
 }
