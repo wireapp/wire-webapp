@@ -68,7 +68,7 @@
     "@formatjs/cli": "6.2.12",
     "@roamhq/wrtc": "0.8.0",
     "@testing-library/dom": "^10.4.0",
-    "@testing-library/react": "16.0.0",
+    "@testing-library/react": "16.0.1",
     "@types/dexie-batch": "0.4.7",
     "@types/eslint": "8.56.5",
     "@types/fs-extra": "11.0.4",
