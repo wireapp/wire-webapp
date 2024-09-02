@@ -193,6 +193,7 @@
     "prettier": "prettier --ignore-path .prettierignore \"**/*.{json,md,yml}\"",
     "release:staging": "git checkout dev && git pull && ts-node ./bin/release_tag.ts staging",
     "release:production": "git checkout master && git pull && ts-node ./bin/release_tag.ts production",
+    "release:custom": "npx ts-node ./bin/release_tag.ts",
     "start": "yarn build:server && yarn watch:server",
     "watch:server": "tsc-watch -P server/tsconfig.json --onSuccess \"yarn start:server:dev\"",
     "start:server:dev": "cross-env NODE_ENV=development node ./server/dist/index.js",
