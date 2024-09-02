@@ -30,7 +30,7 @@ import * as Icon from 'Components/Icon';
 import {ModalComponent} from 'Components/ModalComponent';
 import {PasswordGeneratorButton} from 'Components/PasswordGeneratorButton';
 import {Config} from 'src/script/Config';
-import {isEscapeKey} from 'Util/KeyboardUtil';
+import {isEnterKey, isEscapeKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {isValidPassword} from 'Util/StringUtil';
 
@@ -197,16 +197,21 @@ export const PrimaryModalComponent: FC = () => {
       modalRef.current?.focus();
     }
 
-    const handleEscape = (event: KeyboardEvent) => {
+    const onKeyPress = (event: KeyboardEvent) => {
       if (isEscapeKey(event) && isModalVisible) {
         removeCurrentModal();
         closeAction();
       }
+
+      if (isEnterKey(event) && primaryAction?.autoFocus) {
+        primaryAction?.action?.();
+        removeCurrentModal();
+      }
     };
 
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
-  }, [isModalVisible]);
+    document.addEventListener('keypress', onKeyPress);
+    return () => document.removeEventListener('keypress', onKeyPress);
+  }, [isModalVisible, primaryAction]);
 
   const closeAction = () => {
     if (hasPasswordWithRules) {

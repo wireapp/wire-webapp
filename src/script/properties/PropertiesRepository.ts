@@ -158,6 +158,7 @@ export class PropertiesRepository {
       primaryAction: {
         text: t('dataSharingModalAgree'),
         action: () => toggleTelemetrySharing(true),
+        autoFocus: true,
       },
       secondaryAction: {
         text: t('dataSharingModalDecline'),

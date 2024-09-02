@@ -23,6 +23,7 @@ import {ClientNotificationData} from '../../../notification/PreferenceNotificati
 
 export interface ButtonAction {
   action?: Function;
+  autoFocus?: true;
   uieName?: string;
   text?: React.ReactNode;
   disabled?: boolean;
