@@ -34,6 +34,7 @@ const DEV_ENVIRONMENT_IDENTIFIERS = {
   INTERNAL: 'internal',
   LINK: 'wire.link',
   LOCAL: 'local.',
+  STAGING: 'staging',
 } as const;
 
 const getElectronVersion = (userAgent: string): string => {
@@ -50,6 +51,7 @@ export const getWebEnvironment = () => {
   const appBase = window.wire.env.APP_BASE;
   const environment = {
     isEdge: false,
+    isStaging: false,
     isDev: false,
     isInternal: false,
     isLinked: false,
@@ -64,6 +66,9 @@ export const getWebEnvironment = () => {
   } else if (appBase.includes(DEV_ENVIRONMENT_IDENTIFIERS.EDGE)) {
     environment.isEdge = true;
     environment.name = 'Edge Environment';
+  } else if (appBase.includes(DEV_ENVIRONMENT_IDENTIFIERS.STAGING)) {
+    environment.isStaging = true;
+    environment.name = 'Staging Environment';
   } else if (appBase.includes(DEV_ENVIRONMENT_IDENTIFIERS.DEV)) {
     environment.isDev = true;
     environment.name = 'Dev Environment';

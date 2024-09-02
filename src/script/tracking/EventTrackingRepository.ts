@@ -73,8 +73,8 @@ export class EventTrackingRepository {
     this.isProductReportingActivated = false;
     amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent);
 
-    const {isDev, isEdge, isInternal, isLocalhost, name} = getWebEnvironment();
-    if (isDev || isEdge || isInternal || isLocalhost) {
+    const {isDev, isEdge, isInternal, isLocalhost, isStaging, name} = getWebEnvironment();
+    if (isDev || isEdge || isInternal || isLocalhost || isStaging) {
       this.forceActivateErrorReporting = true;
       this.logger.warn(`Error reporting is forced to be activated on this environment: ${name}`);
     }

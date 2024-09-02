@@ -22,9 +22,9 @@ import {getWebEnvironment} from 'Util/Environment';
 import {Config} from '../Config';
 
 export function isCountlyEnabledAtCurrentEnvironment(): boolean {
-  const {isDev, isEdge, isInternal, isLocalhost} = getWebEnvironment();
+  const {isDev, isEdge, isInternal, isLocalhost, isStaging} = getWebEnvironment();
 
-  if (isDev || isEdge || isInternal || isLocalhost) {
+  if (isDev || isEdge || isInternal || isLocalhost || isStaging) {
     return true;
   }
 
