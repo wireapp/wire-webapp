@@ -715,14 +715,18 @@ export class Conversation {
       }
 
       const {contentState} = useAppState.getState();
-      if (this.hasLastReceivedMessageLoaded() && contentState !== ContentState.COLLECTION) {
+
+      // When the search tab is active, push message to incomming message and update the timestamps
+      if (contentState === ContentState.COLLECTION) {
+        this.incomingMessages.push(messageEntity);
+        this.updateTimestamps(messageEntity);
+      } else if (this.hasLastReceivedMessageLoaded()) {
         this.updateTimestamps(messageEntity);
         this.incomingMessages.remove(({id}) => messageEntity.id === id);
         // If the last received message is currently in memory, we can add this message to the displayed messages
         this.messages_unordered.push(messageEntity);
       } else {
-        // If the conversation is not loaded or the search page is active
-        // we will add this message to the incoming messages (but not to the messages displayed)
+        // If the conversation is not loaded, we will add this message to the incoming messages (but not to the messages displayed)
         this.incomingMessages.push(messageEntity);
       }
       amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.ADDED, messageEntity);
@@ -916,7 +920,7 @@ export class Conversation {
     return this.messages().find(
       message =>
         // Deleted message should be ignored since they might have a timestamp in the past (the timestamp of a delete message is the timestamp of the message that was deleted)
-        !isDeleteMessage(message),
+        !isDeleteMessage(message) && message.timestamp(),
     );
   }
 
