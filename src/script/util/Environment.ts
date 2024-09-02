@@ -60,7 +60,7 @@ export const getWebEnvironment = () => {
     name: '',
   };
 
-  if (appBase.includes(DEV_ENVIRONMENT_IDENTIFIERS.LOCAL || isLocalhost())) {
+  if (appBase.includes(DEV_ENVIRONMENT_IDENTIFIERS.LOCAL) || isLocalhost()) {
     environment.isLocalhost = true;
     environment.name = 'Localhost';
   } else if (appBase.includes(DEV_ENVIRONMENT_IDENTIFIERS.EDGE)) {
