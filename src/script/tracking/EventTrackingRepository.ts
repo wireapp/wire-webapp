@@ -22,7 +22,7 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Environment} from 'Util/Environment';
+import {Environment, getWebEnvironment} from 'Util/Environment';
 import {getLogger, Logger} from 'Util/Logger';
 import {loadValue, storeValue, resetStoreValue} from 'Util/StorageUtil';
 import {includesString} from 'Util/StringUtil';
@@ -47,6 +47,7 @@ export class EventTrackingRepository {
   private countlyDeviceId: string;
   private readonly logger: Logger;
   isErrorReportingActivated: boolean;
+  private forceActivateErrorReporting: boolean = false;
 
   static get CONFIG() {
     return {
@@ -71,6 +72,12 @@ export class EventTrackingRepository {
     this.isErrorReportingActivated = false;
     this.isProductReportingActivated = false;
     amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent);
+
+    const {isDev, isEdge, isInternal, isLocalhost, name} = getWebEnvironment();
+    if (isDev || isEdge || isInternal || isLocalhost) {
+      this.forceActivateErrorReporting = true;
+      this.logger.warn(`Error reporting is forced to be activated on this environment: ${name}`);
+    }
   }
 
   public readonly onUserEvent = (eventJson: any, source: EventSource) => {
@@ -163,10 +170,12 @@ export class EventTrackingRepository {
       }
     }
 
-    this.logger.info(`Initialize analytics and error reporting: ${isTelemtryConsentGiven}`);
+    const isConsentGiven = isTelemtryConsentGiven || this.forceActivateErrorReporting;
+
+    this.logger.info(`Initialize analytics and error reporting: ${isConsentGiven}`);
 
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.PRIVACY.TELEMETRY_SHARING, this.toggleCountly);
-    await this.toggleCountly(isTelemtryConsentGiven);
+    await this.toggleCountly(isConsentGiven);
   }
 
   private readonly toggleCountly = async (isEnabled: boolean) => {
@@ -178,6 +187,10 @@ export class EventTrackingRepository {
   };
 
   private stopProductReporting(): void {
+    if (this.forceActivateErrorReporting) {
+      return;
+    }
+
     this.logger.debug('Analytics was disabled due to user preferences');
     this.isProductReportingActivated = false;
     this.stopProductReportingSession();
@@ -228,6 +241,11 @@ export class EventTrackingRepository {
       return;
     }
 
+    if (this.forceActivateErrorReporting) {
+      this.logger.warn('Countly can not be disabled on this environment');
+      return;
+    }
+
     if (this.isProductReportingActivated === true) {
       window.Countly.end_session();
     }
@@ -251,7 +269,7 @@ export class EventTrackingRepository {
       return;
     }
 
-    if (this.isProductReportingActivated === true) {
+    if (this.isProductReportingActivated === true || this.forceActivateErrorReporting) {
       window.Countly.begin_session();
       // enable APM
       window.Countly.track_performance();
@@ -268,7 +286,7 @@ export class EventTrackingRepository {
       return;
     }
 
-    if (this.isProductReportingActivated === true) {
+    if (this.isProductReportingActivated === true || this.forceActivateErrorReporting) {
       const userData = {
         [UserData.IS_TEAM]: this.teamState.isTeam(),
       };

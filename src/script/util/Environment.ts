@@ -28,6 +28,14 @@ const APP_ENV = {
   VIRTUAL_HOST: 'wire.ms', // The domain "wire.ms" is our virtual host for testing contact uploads
 };
 
+const DEV_ENVIRONMENT_IDENTIFIERS = {
+  EDGE: 'edge',
+  DEV: 'dev',
+  INTERNAL: 'internal',
+  LINK: 'wire.link',
+  LOCAL: 'local.',
+} as const;
+
 const getElectronVersion = (userAgent: string): string => {
   // [match, version]
   const [, electronVersion] = /Wire(?:Internal)?\/(\S+)/i.exec(userAgent) || [];
@@ -37,6 +45,40 @@ const getElectronVersion = (userAgent: string): string => {
 const isLocalhost = (): boolean => [APP_ENV.LOCALHOST, APP_ENV.VIRTUAL_HOST].includes(window.location.hostname);
 const isProduction = (): boolean => {
   return window.wire.env.ENVIRONMENT === BackendEnvironment.PRODUCTION;
+};
+export const getWebEnvironment = () => {
+  const appBase = window.wire.env.APP_BASE;
+  const environment = {
+    isEdge: false,
+    isDev: false,
+    isInternal: false,
+    isLinked: false,
+    isLocalhost: false,
+    isProduction: false,
+    name: '',
+  };
+
+  if (appBase.includes(DEV_ENVIRONMENT_IDENTIFIERS.LOCAL || isLocalhost())) {
+    environment.isLocalhost = true;
+    environment.name = 'Localhost';
+  } else if (appBase.includes(DEV_ENVIRONMENT_IDENTIFIERS.EDGE)) {
+    environment.isEdge = true;
+    environment.name = 'Edge Environment';
+  } else if (appBase.includes(DEV_ENVIRONMENT_IDENTIFIERS.DEV)) {
+    environment.isDev = true;
+    environment.name = 'Dev Environment';
+  } else if (appBase.includes(DEV_ENVIRONMENT_IDENTIFIERS.INTERNAL)) {
+    environment.isInternal = true;
+    environment.name = 'Internal Environment';
+  } else if (appBase.includes(DEV_ENVIRONMENT_IDENTIFIERS.LINK)) {
+    environment.isLinked = true;
+    environment.name = 'Linked Environment';
+  } else if (isProduction()) {
+    environment.isProduction = true;
+    environment.name = 'Production Environment';
+  }
+
+  return environment;
 };
 
 interface Environment {

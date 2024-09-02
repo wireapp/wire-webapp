@@ -17,9 +17,17 @@
  *
  */
 
+import {getWebEnvironment} from 'Util/Environment';
+
 import {Config} from '../Config';
 
 export function isCountlyEnabledAtCurrentEnvironment(): boolean {
+  const {isDev, isEdge, isInternal, isLocalhost} = getWebEnvironment();
+
+  if (isDev || isEdge || isInternal || isLocalhost) {
+    return true;
+  }
+
   const {COUNTLY_API_KEY, COUNTLY_ALLOWED_BACKEND, BACKEND_REST} = Config.getConfig();
 
   const allowedBackendUrls = COUNTLY_ALLOWED_BACKEND.split(',').map(url => url.trim()) || [];
