@@ -17,22 +17,27 @@
  *
  */
 
-import {getWebEnvironment} from 'Util/Environment';
-
-import {Config} from '../Config';
-
-export function isCountlyEnabledAtCurrentEnvironment(): boolean {
-  const {isDev, isEdge, isInternal, isLocalhost, isStaging} = getWebEnvironment();
-
-  if (isDev || isEdge || isInternal || isLocalhost || isStaging) {
-    return true;
+export const deepMerge = <T>(target: T, ...sources: Partial<T>[]): T => {
+  if (!sources.length) {
+    return target;
   }
 
-  const {COUNTLY_API_KEY, COUNTLY_ALLOWED_BACKEND, BACKEND_REST} = Config.getConfig();
+  const source = sources.shift();
 
-  const allowedBackendUrls = COUNTLY_ALLOWED_BACKEND.split(',').map(url => url.trim()) || [];
-  const isCountlyEnabled =
-    !!COUNTLY_API_KEY && allowedBackendUrls.length > 0 && allowedBackendUrls.includes(BACKEND_REST);
+  if (typeof target === 'object' && target !== null && typeof source === 'object' && source !== null) {
+    for (const key in source) {
+      if (source.hasOwnProperty(key)) {
+        if (typeof source[key] === 'object' && source[key] !== null) {
+          if (!target[key]) {
+            (target as any)[key] = Array.isArray(source[key]) ? [] : {};
+          }
+          deepMerge((target as any)[key], source[key]);
+        } else {
+          (target as any)[key] = source[key];
+        }
+      }
+    }
+  }
 
-  return isCountlyEnabled;
-}
+  return deepMerge(target, ...sources);
+};

@@ -24,6 +24,7 @@ import {ConversationRepository} from 'src/script/conversation/ConversationReposi
 import {ConversationFolderTab} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTab/ConversationFolderTab';
 import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {isDataDogEnabled} from 'Util/DataDog';
+import {getWebEnvironment} from 'Util/Environment';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 
 import {
@@ -183,7 +184,7 @@ export const ConversationTabs = ({
         aria-owns="tab-1 tab-2"
         className="conversations-sidebar-list-footer"
       >
-        {isDataDogEnabled() && (
+        {!getWebEnvironment().isProduction && isDataDogEnabled() && (
           <div css={footerDisclaimer}>
             <Tooltip
               css={footerDisclaimerTooltip}

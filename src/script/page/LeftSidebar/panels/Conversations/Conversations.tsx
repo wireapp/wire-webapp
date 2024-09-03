@@ -357,7 +357,7 @@ const Conversations: React.FC<ConversationsProps> = ({
         }
         hasHeader={!isPreferences}
         {...(!isTemporaryGuest && {sidebar})}
-        before={callingView}
+        footer={callingView}
       >
         {isPreferences ? (
           <Preferences

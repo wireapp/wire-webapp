@@ -33,6 +33,7 @@ import 'src/script/util/test/mock/navigatorPermissionsMock';
 import 'src/script/util/test/mock/ResponseMock';
 import 'src/script/util/test/mock/WebRTCMock';
 import 'src/script/util/test/mock/resizeObserver.mock';
+import 'src/script/util/test/mock/wireEnvMock';
 
 import encoding from 'text-encoding';
 
@@ -52,15 +53,6 @@ jest.mock('axios', () => {
 
 window.TextEncoder = encoding.TextEncoder;
 window.TextDecoder = encoding.TextDecoder;
-
-window.wire = {
-  env: {
-    BACKEND_REST: 'https://test.wire.link',
-    FEATURE: {},
-    URL: {SUPPORT: {}},
-    NEW_PASSWORD_MINIMUM_LENGTH: 8,
-  },
-};
 
 window.z = {userPermission: {}};
 
