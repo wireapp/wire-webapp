@@ -100,7 +100,12 @@ const AddParticipants: FC<AddParticipantsProps> = ({
     'isTeamOnly',
     'participating_user_ids',
   ]);
-  const {isTeam, teamMembers, teamUsers} = useKoSubscribableChildren(teamState, ['isTeam', 'teamMembers', 'teamUsers']);
+  const {isTeam, teamMembers, teamUsers, isMLSEnabled} = useKoSubscribableChildren(teamState, [
+    'isTeam',
+    'teamMembers',
+    'teamUsers',
+    'isMLSEnabled',
+  ]);
   const {connectedUsers} = useKoSubscribableChildren(userState, ['connectedUsers']);
   const {teamRole} = useKoSubscribableChildren(selfUser, ['teamRole']);
   const {services} = useKoSubscribableChildren(integrationRepository, ['services']);
@@ -200,7 +205,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
           placeholder={t('addParticipantsSearchPlaceholder')}
         />
 
-        {showIntegrations && (
+        {showIntegrations && !isMLSEnabled && (
           <div className="panel__tabs">
             <div
               role="button"
