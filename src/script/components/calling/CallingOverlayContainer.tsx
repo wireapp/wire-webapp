@@ -21,8 +21,6 @@ import React, {Fragment, useEffect} from 'react';
 
 import {container} from 'tsyringe';
 
-import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
-
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
@@ -72,9 +70,6 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
   const isMuted = muteState !== MuteState.NOT_MUTED;
 
   useEffect(() => {
-    if (currentCallState === CALL_STATE.MEDIA_ESTAB && joinedCall?.initialType === CALL_TYPE.VIDEO) {
-      void callState.setViewModeDetached();
-    }
     if (currentCallState === undefined) {
       void callState.setViewModeMinimized();
     }
