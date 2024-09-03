@@ -45,10 +45,11 @@ const getElectronVersion = (userAgent: string): string => {
 
 const isLocalhost = (): boolean => [APP_ENV.LOCALHOST, APP_ENV.VIRTUAL_HOST].includes(window.location.hostname);
 const isProduction = (): boolean => {
-  return window.wire.env.ENVIRONMENT === BackendEnvironment.PRODUCTION;
+  return Config.getConfig().ENVIRONMENT === BackendEnvironment.PRODUCTION;
 };
 export const getWebEnvironment = () => {
-  const appBase = window.wire.env.APP_BASE;
+  const {APP_BASE} = Config.getConfig();
+
   const environment = {
     isEdge: false,
     isStaging: false,
@@ -60,22 +61,22 @@ export const getWebEnvironment = () => {
     name: '',
   };
 
-  if (appBase.includes(DEV_ENVIRONMENT_IDENTIFIERS.LOCAL) || isLocalhost()) {
+  if (APP_BASE.includes(DEV_ENVIRONMENT_IDENTIFIERS.LOCAL) || isLocalhost()) {
     environment.isLocalhost = true;
     environment.name = 'Localhost';
-  } else if (appBase.includes(DEV_ENVIRONMENT_IDENTIFIERS.EDGE)) {
+  } else if (APP_BASE.includes(DEV_ENVIRONMENT_IDENTIFIERS.EDGE)) {
     environment.isEdge = true;
     environment.name = 'Edge Environment';
-  } else if (appBase.includes(DEV_ENVIRONMENT_IDENTIFIERS.STAGING)) {
+  } else if (APP_BASE.includes(DEV_ENVIRONMENT_IDENTIFIERS.STAGING)) {
     environment.isStaging = true;
     environment.name = 'Staging Environment';
-  } else if (appBase.includes(DEV_ENVIRONMENT_IDENTIFIERS.DEV)) {
+  } else if (APP_BASE.includes(DEV_ENVIRONMENT_IDENTIFIERS.DEV)) {
     environment.isDev = true;
     environment.name = 'Dev Environment';
-  } else if (appBase.includes(DEV_ENVIRONMENT_IDENTIFIERS.INTERNAL)) {
+  } else if (APP_BASE.includes(DEV_ENVIRONMENT_IDENTIFIERS.INTERNAL)) {
     environment.isInternal = true;
     environment.name = 'Internal Environment';
-  } else if (appBase.includes(DEV_ENVIRONMENT_IDENTIFIERS.LINK)) {
+  } else if (APP_BASE.includes(DEV_ENVIRONMENT_IDENTIFIERS.LINK)) {
     environment.isLinked = true;
     environment.name = 'Linked Environment';
   } else if (isProduction()) {
