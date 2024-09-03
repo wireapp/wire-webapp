@@ -42,7 +42,7 @@ interface DataUsageSectionProps {
 
 const DataUsageSection = ({propertiesRepository, brandName, isActivatedAccount}: DataUsageSectionProps) => {
   const [optionTelemetry, setOptionTelemetry] = useState(
-    propertiesRepository.properties.settings.privacy.telemetry_sharing,
+    propertiesRepository.properties.settings.privacy.telemetry_data_sharing,
   );
   const [optionMarketingSharing, setOptionMarketingSharing] = useState(
     propertiesRepository.properties.settings.privacy.marketing_consent,
@@ -50,7 +50,7 @@ const DataUsageSection = ({propertiesRepository, brandName, isActivatedAccount}:
 
   useEffect(() => {
     const updateProperties = ({settings}: WebappProperties): void => {
-      setOptionTelemetry(settings.privacy.telemetry_sharing);
+      setOptionTelemetry(settings.privacy.telemetry_data_sharing);
       setOptionMarketingSharing(settings.privacy.marketing_consent);
     };
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, updateProperties);

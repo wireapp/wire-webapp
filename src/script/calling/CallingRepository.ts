@@ -1285,7 +1285,7 @@ export class CallingRepository {
     const {conversation} = call;
 
     if (mediaType === MediaType.AUDIO) {
-      const audioTracks = mediaStream.getAudioTracks().map(track => track.clone());
+      const audioTracks = mediaStream.getAudioTracks();
       if (audioTracks.length > 0) {
         selfParticipant.setAudioStream(new MediaStream(audioTracks), true);
         this.wCall?.replaceTrack(this.serializeQualifiedId(conversation.qualifiedId), audioTracks[0]);

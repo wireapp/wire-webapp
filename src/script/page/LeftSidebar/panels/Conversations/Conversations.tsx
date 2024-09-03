@@ -209,20 +209,6 @@ const Conversations: React.FC<ConversationsProps> = ({
   }, [activeConversation, conversationState, listViewModel.contentViewModel, conversations.length]);
 
   useEffect(() => {
-    amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, (conversation?: Conversation) => {
-      if (!conversation) {
-        return;
-      }
-
-      const includesConversation = currentTabConversations.includes(conversation);
-
-      if (!includesConversation) {
-        setCurrentTab(SidebarTabs.RECENT);
-      }
-    });
-  }, [currentTabConversations]);
-
-  useEffect(() => {
     if (!activeConversation) {
       return () => {};
     }
@@ -371,7 +357,7 @@ const Conversations: React.FC<ConversationsProps> = ({
         }
         hasHeader={!isPreferences}
         {...(!isTemporaryGuest && {sidebar})}
-        before={callingView}
+        footer={callingView}
       >
         {isPreferences ? (
           <Preferences
