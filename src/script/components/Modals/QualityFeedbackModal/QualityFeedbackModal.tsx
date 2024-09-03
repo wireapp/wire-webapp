@@ -19,10 +19,14 @@
 
 import React, {useState} from 'react';
 
+import {amplify} from 'amplify';
+
 import {Button, ButtonVariant, Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ModalComponent} from 'Components/ModalComponent';
 import {StringIdentifer, t} from 'Util/LocalizerUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {
   buttonStyle,
@@ -34,6 +38,10 @@ import {
   title,
   wrapper,
 } from './QualityFeedbackModal.styles';
+
+import {CallingRepository} from '../../../calling/CallingRepository';
+import {EventName} from '../../../tracking/EventName';
+import {Segmentation} from '../../../tracking/Segmentation';
 
 type RatingListItem = {
   value: number;
@@ -48,19 +56,39 @@ const ratingListItems: RatingListItem[] = [
   {value: 5, headingTranslationKey: 'qualityFeedback.excellent'},
 ];
 
-interface QualityFeedbackModalProps {}
+const MUTE_INTERVAL_DAYS = 3;
+// @ts-ignore
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const CALL_SURVEY_MUTE_INTERVAL = TIME_IN_MILLIS.DAY * MUTE_INTERVAL_DAYS;
 
-export const QualityFeedbackModal = ({}: QualityFeedbackModalProps) => {
+interface QualityFeedbackModalProps {
+  callingRepository: CallingRepository;
+}
+
+export const QualityFeedbackModal = ({callingRepository}: QualityFeedbackModalProps) => {
   const [isChecked, setIsChecked] = useState(false);
 
+  const handleCloseModal = () => {};
+
+  const sendQualityFeedback = (score: number) => {
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.QUALITY_REVIEW, {
+      [Segmentation.CALL.SCORE]: score,
+      [Segmentation.CALL.QUALITY_REVIEW_LABEL]: 'answered',
+    });
+
+    handleCloseModal();
+  };
+
+  const skipQualityFeedback = () => {
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.QUALITY_REVIEW, {
+      [Segmentation.CALL.QUALITY_REVIEW_LABEL]: 'dismissed',
+    });
+
+    handleCloseModal();
+  };
+
   return (
-    <ModalComponent
-      isShown
-      // onBgClick={onClose}
-      // onClosed={onClose}
-      data-uie-name="modal-call-quality-feedback"
-      className="quality-feedback"
-    >
+    <ModalComponent isShown data-uie-name="modal-call-quality-feedback" className="quality-feedback">
       <div css={wrapper}>
         <h2 css={title}>{t('qualityFeedback.heading')}</h2>
 
@@ -72,7 +100,16 @@ export const QualityFeedbackModal = ({}: QualityFeedbackModalProps) => {
               {ratingItem?.headingTranslationKey && (
                 <div css={ratingItemHeading}>{t(ratingItem.headingTranslationKey)}</div>
               )}
-              <button css={ratingItemBubble}>{ratingItem.value}</button>
+              <Button
+                variant={ButtonVariant.TERTIARY}
+                type="button"
+                onClick={() => sendQualityFeedback(ratingItem.value)}
+                data-uie-name="go-rate-call-quality-feedback"
+                data-uie-value={ratingItem.value}
+                css={ratingItemBubble}
+              >
+                {ratingItem.value}
+              </Button>
             </li>
           ))}
         </ul>
@@ -81,7 +118,7 @@ export const QualityFeedbackModal = ({}: QualityFeedbackModalProps) => {
           <Button
             variant={ButtonVariant.TERTIARY}
             type="button"
-            onClick={() => {}}
+            onClick={skipQualityFeedback}
             data-uie-name="go-skip-call-quality-feedback"
             css={buttonStyle}
           >

@@ -29,6 +29,7 @@ export const EventName = {
     JOINED_CALL: 'calling.joined_call',
     RECEIVED_CALL: 'calling.received_call',
     SCREEN_SHARE: 'calling.screen_share',
+    QUALITY_REVIEW: 'calling.call_quality_review',
   },
   CONTRIBUTED: 'contributed',
   E2EE: {

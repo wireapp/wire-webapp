@@ -24,11 +24,15 @@ export const wrapper: CSSObject = {
 };
 
 export const title: CSSObject = {
+  fontSize: 'var(--line-height-lg)',
   marginBottom: '16px',
+  textAlign: 'center',
 };
 
 export const description: CSSObject = {
+  fontSize: 'var(--font-size-base)',
   marginBottom: '32px',
+  textAlign: 'center',
 };
 
 export const ratingList: CSSObject = {
@@ -54,7 +58,6 @@ export const ratingItemBubble: CSSObject = {
   height: '56px',
   width: '56px',
 
-  background: 'transparent',
   border: '1px solid var(--gray-40)',
   borderRadius: '50%',
 
@@ -67,5 +70,8 @@ export const buttonWrapper: CSSObject = {
 };
 
 export const buttonStyle: CSSObject = {
+  fontSize: 'var(--font-size-base)',
+  fontWeight: 'var(--font-weight-semibold)',
+  height: '56px',
   width: '100%',
 };
