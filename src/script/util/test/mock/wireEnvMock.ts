@@ -17,22 +17,21 @@
  *
  */
 
-import {getWebEnvironment} from 'Util/Environment';
+import {ClientConfig} from 'server/config';
+import {WireModule} from 'src/types/Wire.types';
 
-import {Config} from '../Config';
+const wire: WireModule = {
+  app: {} as any,
+  env: {
+    APP_BASE: 'https://app.wire.com',
+    BACKEND_REST: 'https://test.wire.link',
+    FEATURE: {},
+    URL: {SUPPORT: {}},
+    NEW_PASSWORD_MINIMUM_LENGTH: 8,
+  } as ClientConfig,
+};
 
-export function isCountlyEnabledAtCurrentEnvironment(): boolean {
-  const {isDev, isEdge, isInternal, isLocalhost, isStaging} = getWebEnvironment();
-
-  if (isDev || isEdge || isInternal || isLocalhost || isStaging) {
-    return true;
-  }
-
-  const {COUNTLY_API_KEY, COUNTLY_ALLOWED_BACKEND, BACKEND_REST} = Config.getConfig();
-
-  const allowedBackendUrls = COUNTLY_ALLOWED_BACKEND.split(',').map(url => url.trim()) || [];
-  const isCountlyEnabled =
-    !!COUNTLY_API_KEY && allowedBackendUrls.length > 0 && allowedBackendUrls.includes(BACKEND_REST);
-
-  return isCountlyEnabled;
-}
+Object.defineProperty(window, 'wire', {
+  value: wire,
+  writable: true,
+});
