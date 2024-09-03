@@ -23,7 +23,7 @@ import {ClientNotificationData} from '../../../notification/PreferenceNotificati
 
 export interface ButtonAction {
   action?: Function;
-  autoFocus?: true;
+  runActionOnEnterClick?: Boolean;
   uieName?: string;
   text?: React.ReactNode;
   disabled?: boolean;

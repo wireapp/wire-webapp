@@ -203,7 +203,7 @@ export const PrimaryModalComponent: FC = () => {
         closeAction();
       }
 
-      if (isEnterKey(event) && primaryAction?.autoFocus) {
+      if (isEnterKey(event) && primaryAction?.runActionOnEnterClick) {
         primaryAction?.action?.();
         removeCurrentModal();
       }
