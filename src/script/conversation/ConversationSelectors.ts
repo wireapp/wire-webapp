@@ -22,6 +22,7 @@ import {
   CONVERSATION_TYPE,
   ConversationProtocol,
   Conversation as BackendConversation,
+  MLS1on1Conversation,
 } from '@wireapp/api-client/lib/conversation/';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
@@ -43,6 +44,10 @@ export function isMixedConversation(conversation: Conversation): conversation is
 }
 
 export function isMLSConversation(conversation: Conversation): conversation is MLSConversation {
+  return !!conversation.groupId && conversation.protocol === ConversationProtocol.MLS;
+}
+
+export function isMLS1on1Conversation(conversation: Conversation): conversation is MLS1on1Conversation {
   return !!conversation.groupId && conversation.protocol === ConversationProtocol.MLS;
 }
 
