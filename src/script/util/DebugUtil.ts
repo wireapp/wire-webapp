@@ -63,6 +63,7 @@ import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
 import {EventRecord, StorageRepository, StorageSchemata} from '../storage';
 import {TeamState} from '../team/TeamState';
+import {disableForcedErrorReporting} from '../tracking/Countly.helpers';
 import {UserRepository} from '../user/UserRepository';
 import {UserState} from '../user/UserState';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
@@ -544,5 +545,10 @@ export class DebugUtil {
       },
       EventRepository.SOURCE.WEB_SOCKET,
     );
+  }
+
+  // Used by QA test automation, allows to disable or enable the forced error reporting
+  disableForcedErrorReporting() {
+    return disableForcedErrorReporting();
   }
 }

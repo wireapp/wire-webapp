@@ -25,7 +25,7 @@ import {amplify} from 'amplify';
 import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {getWebEnvironment} from 'Util/Environment';
+import {getForcedErrorReportingStatus} from 'src/script/tracking/Countly.helpers';
 import {t} from 'Util/LocalizerUtil';
 
 import {PropertiesRepository} from '../../../../../properties/PropertiesRepository';
@@ -64,7 +64,7 @@ const DataUsageSection = ({propertiesRepository, brandName, isActivatedAccount}:
     return null;
   }
 
-  const {isProduction} = getWebEnvironment();
+  const forceErrorReporting = getForcedErrorReportingStatus();
 
   return (
     <PreferencesSection hasSeparator title={t('preferencesAccountData')} className="preferences-section-data-usage">
@@ -76,9 +76,9 @@ const DataUsageSection = ({propertiesRepository, brandName, isActivatedAccount}:
               propertiesRepository.savePreference(PROPERTIES_TYPE.PRIVACY.TELEMETRY_SHARING, isChecked);
               setOptionTelemetry(isChecked);
             }}
-            checked={isProduction ? optionTelemetry : true}
+            checked={forceErrorReporting ? true : optionTelemetry}
             data-uie-name="status-preference-telemetry"
-            disabled={!isProduction}
+            disabled={forceErrorReporting}
           >
             <CheckboxLabel htmlFor="status-preference-telemetry">
               {t('preferencesAccountDataTelemetryCheckbox')}
