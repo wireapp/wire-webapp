@@ -22,7 +22,7 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Environment} from 'Util/Environment';
+import {getWebEnvironment} from 'Util/Environment';
 import {getLogger, Logger} from 'Util/Logger';
 import {loadValue, storeValue, resetStoreValue} from 'Util/StorageUtil';
 import {includesString} from 'Util/StringUtil';
@@ -44,6 +44,31 @@ import {Config} from '../Config';
 import type {ContributedSegmentations, MessageRepository} from '../conversation/MessageRepository';
 import {ClientEvent} from '../event/Client';
 import {TeamState} from '../team/TeamState';
+
+const CountlyConsentFeatures = [
+  'sessions',
+  'events',
+  'views',
+  'scrolls',
+  'clicks',
+  'forms',
+  'crashes',
+  'attribution',
+  'users',
+  'star-rating',
+  'feedback',
+  'location',
+  'remote-config',
+  'apm',
+];
+
+const isCountlyLoaded = () => {
+  const loaded = !!window.Countly && !!window.Countly.q;
+  if (!loaded) {
+    console.warn('Countly is not available');
+  }
+  return loaded;
+};
 
 export class EventTrackingRepository {
   private isProductReportingActivated: boolean;
@@ -75,6 +100,7 @@ export class EventTrackingRepository {
     this.isErrorReportingActivated = false;
     this.isProductReportingActivated = false;
     amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent);
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.PRIVACY.TELEMETRY_SHARING, this.toggleCountly);
     initForcedErrorReporting();
   }
 
@@ -86,7 +112,7 @@ export class EventTrackingRepository {
   };
 
   public migrateDeviceId = async (newId: string) => {
-    if (!window.Countly) {
+    if (!isCountlyLoaded()) {
       this.logger.warn('Countly is not available');
       return;
     }
@@ -97,7 +123,7 @@ export class EventTrackingRepository {
         await this.startProductReporting(this.countlyDeviceId);
         stopOnFinish = true;
       }
-      window.Countly.change_id(newId, true);
+      window.Countly.q.push(['change_id', newId]);
       storeValue(EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_DEVICE_ID_LOCAL_STORAGE_KEY, newId);
       this.logger.info(`Countly tracking id has been changed from ${this.countlyDeviceId} to ${newId}`);
       this.countlyDeviceId = newId;
@@ -176,10 +202,12 @@ export class EventTrackingRepository {
     await this.toggleCountly(isConsentGiven);
   }
 
-  private readonly toggleCountly = async (isEnabled: boolean) => {
+  public readonly toggleCountly = async (isEnabled: boolean) => {
     if (isEnabled && this.isDomainAllowedForAnalytics()) {
+      window.Countly.q.push(['add_consent', CountlyConsentFeatures]);
       await this.startProductReporting();
     } else {
+      window.Countly.q.push(['remove_consent', CountlyConsentFeatures]);
       this.stopProductReporting();
     }
   };
@@ -197,9 +225,7 @@ export class EventTrackingRepository {
 
   private async startProductReporting(trackingId?: string): Promise<void> {
     // This is a global object provided by the countly.min.js script
-
-    if (!window.Countly) {
-      this.logger.warn('Countly is not available');
+    if (!isCountlyLoaded()) {
       return;
     }
 
@@ -208,13 +234,16 @@ export class EventTrackingRepository {
     }
     this.isProductReportingActivated = true;
 
+    const {isProduction} = getWebEnvironment();
+
     // Add Parameters to previous Countly object
+
     window.Countly.app_version = Config.getConfig().VERSION;
-    window.Countly.debug = !Environment.frontend.isProduction();
-    window.Countly.use_session_cookie = false;
-    window.Countly.storage = 'localstorage';
-    window.Countly.disable_offline_mode(trackingId || this.countlyDeviceId);
-    window.Countly.change_id(trackingId || this.countlyDeviceId, true);
+    window.Countly.debug = !isProduction;
+
+    const device_id = trackingId || this.countlyDeviceId;
+    window.Countly.q.push(['change_id', device_id]);
+    window.Countly.q.push(['disable_offline_mode', device_id]);
 
     this.startProductReportingSession();
     this.subscribeToProductEvents();
@@ -234,8 +263,7 @@ export class EventTrackingRepository {
   }
 
   private readonly stopProductReportingSession = (): void => {
-    if (!window.Countly) {
-      this.logger.warn('Countly is not available');
+    if (!isCountlyLoaded()) {
       return;
     }
 
@@ -245,7 +273,7 @@ export class EventTrackingRepository {
     }
 
     if (this.isProductReportingActivated === true) {
-      window.Countly.end_session();
+      window.Countly.q.push(['end_session']);
     }
   };
 
@@ -262,15 +290,14 @@ export class EventTrackingRepository {
   }
 
   private startProductReportingSession(): void {
-    if (!window.Countly) {
-      this.logger.warn('Countly is not available');
+    if (!isCountlyLoaded()) {
       return;
     }
 
     if (this.isProductReportingActivated === true || getForcedErrorReportingStatus()) {
-      window.Countly.begin_session();
+      window.Countly.q.push(['begin_session']);
       // enable APM
-      window.Countly.track_performance();
+      window.Countly.q.push(['track_performance']);
       if (this.sendAppOpenEvent) {
         this.sendAppOpenEvent = false;
         this.trackProductReportingEvent(EventName.APP_OPEN);
@@ -279,8 +306,7 @@ export class EventTrackingRepository {
   }
 
   private trackProductReportingEvent(eventName: string, customSegmentations?: ContributedSegmentations): void {
-    if (!window.Countly) {
-      this.logger.warn('Countly is not available');
+    if (!isCountlyLoaded()) {
       return;
     }
 
@@ -290,9 +316,10 @@ export class EventTrackingRepository {
       };
       Object.entries(userData).forEach(entry => {
         const [key, value] = entry;
-        window.Countly.userData.set(key, value);
+        window.Countly.q.push(['userData.set', key, value]);
       });
-      window.Countly.userData.save();
+
+      window.Countly.q.push(['userData.save']);
 
       const segmentation = {
         [Segmentation.COMMON.APP_VERSION]: Config.getConfig().VERSION,
@@ -300,10 +327,13 @@ export class EventTrackingRepository {
         ...customSegmentations,
       };
 
-      window.Countly.add_event({
-        key: eventName,
-        segmentation,
-      });
+      window.Countly.q.push([
+        'add_event',
+        {
+          key: eventName,
+          segmentation,
+        },
+      ]);
 
       // NOTE: This log is required by QA
       this.logger.log(`Reporting custom data for product event ${eventName}@${JSON.stringify(userData)}`);

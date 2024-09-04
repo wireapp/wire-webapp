@@ -41,6 +41,8 @@ export interface CountlyEvent {
 }
 
 export interface Countly {
+  q: any[];
+
   init: (config: any) => Countly;
   debug: boolean;
 
