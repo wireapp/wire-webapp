@@ -79,8 +79,6 @@ export const QualityFeedbackModal = ({userState = container.resolve(UserState)}:
       const dateUntilShowModal = new Date(currentDate.getTime() + CALL_SURVEY_MUTE_INTERVAL);
       currentStorageData[selfUser.id] = isChecked ? null : dateUntilShowModal;
 
-      // console.log('[QualityFeedbackModal.tsx] przemvs selfUser', selfUser);
-
       localStorage.setItem(CALL_QUALITY_FEEDBACK_KEY, JSON.stringify(currentStorageData));
     } catch (error) {
       logger.warn(`No labels were loaded: ${(error as Error).message}`);

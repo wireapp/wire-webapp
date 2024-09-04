@@ -21,13 +21,18 @@ import {render, fireEvent, act} from '@testing-library/react';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {CALL_QUALITY_FEEDBACK_KEY} from 'Components/Modals/QualityFeedbackModal/constants';
+import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
 
 import {QualityFeedbackModal} from './QualityFeedbackModal';
 
 import {withIntl, withTheme} from '../../../auth/util/test/TestUtil';
 import {User} from '../../../entity/User';
+import {EventName} from '../../../tracking/EventName';
+import {Segmentation} from '../../../tracking/Segmentation';
 import {UserState} from '../../../user/UserState';
 
 jest.mock('../../../tracking/Countly.helpers', () => ({
@@ -39,7 +44,7 @@ describe('QualityFeedbackModal', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    jest.spyOn(container.resolve(UserState), 'self').mockReturnValue(user);
+    spyOn(container.resolve(UserState), 'self').and.returnValue(user);
   });
 
   it('should not render if qualityFeedBackModalShown is false', () => {
@@ -67,11 +72,19 @@ describe('QualityFeedbackModal', () => {
       useCallAlertState.getState().toggleQualityFeedbackModal(true);
     });
 
+    spyOn(amplify, 'publish').and.returnValue({
+      eventKey: WebAppEvents.ANALYTICS.EVENT,
+      type: EventName.CALLING.QUALITY_REVIEW,
+      value: {
+        [Segmentation.CALL.QUALITY_REVIEW_LABEL]: RatingListLabel.DISMISSED,
+      },
+    });
+
     fireEvent.click(getByText('qualityFeedback.skip'));
 
-    // expect(amplify.publish).toHaveBeenCalledWith(WebAppEvents.ANALYTICS.EVENT, {
-    //   [EventName.CALLING.QUALITY_REVIEW]: 'DISMISSED',
-    // });
+    expect(amplify.publish).toHaveBeenCalledWith(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.QUALITY_REVIEW, {
+      [Segmentation.CALL.QUALITY_REVIEW_LABEL]: RatingListLabel.DISMISSED,
+    });
 
     expect(useCallAlertState.getState().qualityFeedBackModalShown).toBe(false);
   });
@@ -79,19 +92,25 @@ describe('QualityFeedbackModal', () => {
   it('should send quality feedback and close modal on rating click', () => {
     const {getByText} = render(withTheme(withIntl(<QualityFeedbackModal />)));
 
-    const {toggleQualityFeedbackModal} = useCallAlertState.getState();
-    toggleQualityFeedbackModal(true);
+    act(() => {
+      useCallAlertState.getState().toggleQualityFeedbackModal(true);
+    });
+
+    spyOn(amplify, 'publish').and.returnValue({
+      eventKey: WebAppEvents.ANALYTICS.EVENT,
+      type: EventName.CALLING.QUALITY_REVIEW,
+      value: {
+        [Segmentation.CALL.SCORE]: 5,
+        [Segmentation.CALL.QUALITY_REVIEW_LABEL]: RatingListLabel.ANSWERED,
+      },
+    });
 
     fireEvent.click(getByText('5'));
 
-    expect(amplify.publish).toHaveBeenCalledWith(
-      expect.any(String),
-      expect.any(String),
-      expect.objectContaining({
-        'CALL.SCORE': 5,
-        'CALL.QUALITY_REVIEW_LABEL': 'ANSWERED',
-      }),
-    );
+    expect(amplify.publish).toHaveBeenCalledWith(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.QUALITY_REVIEW, {
+      [Segmentation.CALL.SCORE]: 5,
+      [Segmentation.CALL.QUALITY_REVIEW_LABEL]: RatingListLabel.ANSWERED,
+    });
 
     expect(useCallAlertState.getState().qualityFeedBackModalShown).toBe(false);
   });
@@ -109,7 +128,6 @@ describe('QualityFeedbackModal', () => {
 
     act(() => {
       const storedData = JSON.parse(localStorage.getItem(CALL_QUALITY_FEEDBACK_KEY) || '{}');
-      // console.log('[QualityFeedbackModal.test.tsx] przemvs storedData', storedData);
       expect(storedData['userId']).toBeNull();
     });
   });
