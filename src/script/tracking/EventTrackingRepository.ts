@@ -22,14 +22,18 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Environment, getWebEnvironment} from 'Util/Environment';
+import {Environment} from 'Util/Environment';
 import {getLogger, Logger} from 'Util/Logger';
 import {loadValue, storeValue, resetStoreValue} from 'Util/StorageUtil';
 import {includesString} from 'Util/StringUtil';
 import {getParameter} from 'Util/UrlUtil';
 import {createUuid} from 'Util/uuid';
 
-import {isCountlyEnabledAtCurrentEnvironment} from './Countly.helpers';
+import {
+  getForcedErrorReportingStatus,
+  initForcedErrorReporting,
+  isCountlyEnabledAtCurrentEnvironment,
+} from './Countly.helpers';
 import {EventName} from './EventName';
 import {getPlatform} from './Helpers';
 import {Segmentation} from './Segmentation';
@@ -47,7 +51,6 @@ export class EventTrackingRepository {
   private countlyDeviceId: string;
   private readonly logger: Logger;
   isErrorReportingActivated: boolean;
-  private forceActivateErrorReporting: boolean = false;
 
   static get CONFIG() {
     return {
@@ -72,12 +75,7 @@ export class EventTrackingRepository {
     this.isErrorReportingActivated = false;
     this.isProductReportingActivated = false;
     amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent);
-
-    const {isDev, isEdge, isInternal, isLocalhost, isStaging, name} = getWebEnvironment();
-    if (isDev || isEdge || isInternal || isLocalhost || isStaging) {
-      this.forceActivateErrorReporting = true;
-      this.logger.warn(`Error reporting is forced to be activated on this environment: ${name}`);
-    }
+    initForcedErrorReporting();
   }
 
   public readonly onUserEvent = (eventJson: any, source: EventSource) => {
@@ -170,7 +168,7 @@ export class EventTrackingRepository {
       }
     }
 
-    const isConsentGiven = isTelemtryConsentGiven || this.forceActivateErrorReporting;
+    const isConsentGiven = isTelemtryConsentGiven || getForcedErrorReportingStatus();
 
     this.logger.info(`Initialize analytics and error reporting: ${isConsentGiven}`);
 
@@ -187,7 +185,7 @@ export class EventTrackingRepository {
   };
 
   private stopProductReporting(): void {
-    if (this.forceActivateErrorReporting) {
+    if (getForcedErrorReportingStatus()) {
       return;
     }
 
@@ -241,7 +239,7 @@ export class EventTrackingRepository {
       return;
     }
 
-    if (this.forceActivateErrorReporting) {
+    if (getForcedErrorReportingStatus()) {
       this.logger.warn('Countly can not be disabled on this environment');
       return;
     }
@@ -269,7 +267,7 @@ export class EventTrackingRepository {
       return;
     }
 
-    if (this.isProductReportingActivated === true || this.forceActivateErrorReporting) {
+    if (this.isProductReportingActivated === true || getForcedErrorReportingStatus()) {
       window.Countly.begin_session();
       // enable APM
       window.Countly.track_performance();
@@ -286,7 +284,7 @@ export class EventTrackingRepository {
       return;
     }
 
-    if (this.isProductReportingActivated === true || this.forceActivateErrorReporting) {
+    if (this.isProductReportingActivated === true || getForcedErrorReportingStatus()) {
       const userData = {
         [UserData.IS_TEAM]: this.teamState.isTeam(),
       };
