@@ -58,7 +58,6 @@ export const ratingItemBubble: CSSObject = {
   height: '56px',
   width: '56px',
 
-  border: '1px solid var(--gray-40)',
   borderRadius: '50%',
 
   fontSize: 'var(--font-size-base)',

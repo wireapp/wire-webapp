@@ -24,11 +24,19 @@ type CallAlertState = {
   isGroupCall: boolean;
   showStartedCallAlert: (isGroupCall: boolean, isVideoCall?: boolean) => void;
   clearShowAlert: () => void;
+  qualityFeedBackModalShown: boolean;
+  toggleQualityFeedbackModal: (isVisible: boolean) => void;
 };
 
 const useCallAlertState = create<CallAlertState>((set, get) => ({
   showAlert: false,
   isGroupCall: false,
+  qualityFeedBackModalShown: false,
+  toggleQualityFeedbackModal: isVisible =>
+    set(state => ({
+      ...state,
+      qualityFeedBackModalShown: isVisible,
+    })),
   showStartedCallAlert: (isGroupCall = false, isVideoCall = false) =>
     set(state => ({
       ...state,

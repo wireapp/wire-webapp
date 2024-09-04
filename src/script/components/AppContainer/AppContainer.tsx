@@ -101,7 +101,7 @@ export const AppContainer: FC<AppProps> = ({config, clientType}) => {
 
       <StyledApp themeId={THEME_ID.DEFAULT} css={{backgroundColor: 'unset', height: '100%'}}>
         <PrimaryModalComponent />
-        <QualityFeedbackModal callingRepository={app.repository.calling} />
+        <QualityFeedbackModal />
       </StyledApp>
 
       {isDetachedCallingFeatureEnabled() && (

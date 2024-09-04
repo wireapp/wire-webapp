@@ -20,14 +20,19 @@
 import React, {useState} from 'react';
 
 import {amplify} from 'amplify';
+import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {ModalComponent} from 'Components/ModalComponent';
-import {StringIdentifer, t} from 'Util/LocalizerUtil';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {t} from 'Util/LocalizerUtil';
+import {getLogger} from 'Util/Logger';
 
+import {CALL_QUALITY_FEEDBACK_KEY, CALL_SURVEY_MUTE_INTERVAL, ratingListItems} from './constants';
 import {
   buttonStyle,
   buttonWrapper,
@@ -39,41 +44,55 @@ import {
   wrapper,
 } from './QualityFeedbackModal.styles';
 
-import {CallingRepository} from '../../../calling/CallingRepository';
 import {EventName} from '../../../tracking/EventName';
 import {Segmentation} from '../../../tracking/Segmentation';
+import {UserState} from '../../../user/UserState';
 
-type RatingListItem = {
-  value: number;
-  headingTranslationKey?: StringIdentifer;
-};
-
-const ratingListItems: RatingListItem[] = [
-  {value: 1, headingTranslationKey: 'qualityFeedback.bad'},
-  {value: 2},
-  {value: 3, headingTranslationKey: 'qualityFeedback.fair'},
-  {value: 4},
-  {value: 5, headingTranslationKey: 'qualityFeedback.excellent'},
-];
-
-const MUTE_INTERVAL_DAYS = 3;
-// @ts-ignore
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const CALL_SURVEY_MUTE_INTERVAL = TIME_IN_MILLIS.DAY * MUTE_INTERVAL_DAYS;
+const logger = getLogger('CallQualityFeedback');
 
 interface QualityFeedbackModalProps {
-  callingRepository: CallingRepository;
+  userState?: UserState;
 }
 
-export const QualityFeedbackModal = ({callingRepository}: QualityFeedbackModalProps) => {
+export const QualityFeedbackModal = ({userState = container.resolve(UserState)}: QualityFeedbackModalProps) => {
   const [isChecked, setIsChecked] = useState(false);
 
-  const handleCloseModal = () => {};
+  const {toggleQualityFeedbackModal, qualityFeedBackModalShown} = useCallAlertState();
+
+  const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
+
+  if (!qualityFeedBackModalShown) {
+    return null;
+  }
+
+  const handleCloseModal = () => {
+    if (!selfUser) {
+      toggleQualityFeedbackModal(false);
+      return;
+    }
+
+    try {
+      const qualityFeedbackStorage = localStorage.getItem(CALL_QUALITY_FEEDBACK_KEY);
+      const currentStorageData = qualityFeedbackStorage ? JSON.parse(qualityFeedbackStorage) : {};
+
+      const currentDate = new Date();
+      const dateUntilShowModal = new Date(currentDate.getTime() + CALL_SURVEY_MUTE_INTERVAL);
+      currentStorageData[selfUser.id] = isChecked ? null : dateUntilShowModal;
+
+      // console.log('[QualityFeedbackModal.tsx] przemvs selfUser', selfUser);
+
+      localStorage.setItem(CALL_QUALITY_FEEDBACK_KEY, JSON.stringify(currentStorageData));
+    } catch (error) {
+      logger.warn(`No labels were loaded: ${(error as Error).message}`);
+    } finally {
+      toggleQualityFeedbackModal(false);
+    }
+  };
 
   const sendQualityFeedback = (score: number) => {
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.QUALITY_REVIEW, {
       [Segmentation.CALL.SCORE]: score,
-      [Segmentation.CALL.QUALITY_REVIEW_LABEL]: 'answered',
+      [Segmentation.CALL.QUALITY_REVIEW_LABEL]: RatingListLabel.ANSWERED,
     });
 
     handleCloseModal();
@@ -81,7 +100,7 @@ export const QualityFeedbackModal = ({callingRepository}: QualityFeedbackModalPr
 
   const skipQualityFeedback = () => {
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.QUALITY_REVIEW, {
-      [Segmentation.CALL.QUALITY_REVIEW_LABEL]: 'dismissed',
+      [Segmentation.CALL.QUALITY_REVIEW_LABEL]: RatingListLabel.DISMISSED,
     });
 
     handleCloseModal();

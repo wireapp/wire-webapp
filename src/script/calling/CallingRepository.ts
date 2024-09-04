@@ -52,6 +52,8 @@ import {
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {useCallAlertState} from 'Components/calling/useCallAlertState';
+import {CALL_QUALITY_FEEDBACK_KEY} from 'Components/Modals/QualityFeedbackModal/constants';
 import {flatten} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
@@ -87,6 +89,7 @@ import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
 import {TeamState} from '../team/TeamState';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
+import {isCountlyEnabledAtCurrentEnvironment} from '../tracking/Countly.helpers';
 import {EventName} from '../tracking/EventName';
 import * as trackingHelpers from '../tracking/Helpers';
 import {Segmentation} from '../tracking/Segmentation';
@@ -1170,6 +1173,29 @@ export class CallingRepository {
     const conversationIdStr = this.serializeQualifiedId(conversationId);
     delete this.poorCallQualityUsers[conversationIdStr];
     this.wCall?.end(this.wUser, conversationIdStr);
+
+    if (isCountlyEnabledAtCurrentEnvironment() && this.selfUser) {
+      const {toggleQualityFeedbackModal} = useCallAlertState.getState();
+
+      try {
+        const qualityFeedbackStorage = localStorage.getItem(CALL_QUALITY_FEEDBACK_KEY);
+        const currentStorageData = qualityFeedbackStorage ? JSON.parse(qualityFeedbackStorage) : {};
+        const currentUserDate = currentStorageData?.[this.selfUser.id];
+        const currentDate = new Date().toISOString();
+
+        if (typeof currentUserDate === 'undefined') {
+          toggleQualityFeedbackModal(true);
+          return;
+        }
+
+        if (currentUserDate !== null && currentDate >= currentUserDate) {
+          toggleQualityFeedbackModal(true);
+        }
+      } catch (error) {
+        this.logger.warn(`Storage data can't found: ${(error as Error).message}`);
+        toggleQualityFeedbackModal(true);
+      }
+    }
   };
 
   muteCall(call: Call, shouldMute: boolean, reason?: MuteState): void {
