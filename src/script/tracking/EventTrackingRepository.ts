@@ -202,7 +202,7 @@ export class EventTrackingRepository {
     await this.toggleCountly(isConsentGiven);
   }
 
-  public readonly toggleCountly = async (isEnabled: boolean) => {
+  private readonly toggleCountly = async (isEnabled: boolean) => {
     if (isEnabled && this.isDomainAllowedForAnalytics()) {
       window.Countly.q.push(['add_consent', CountlyConsentFeatures]);
       await this.startProductReporting();
