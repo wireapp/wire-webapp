@@ -89,7 +89,6 @@ import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
 import {TeamState} from '../team/TeamState';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
-import {isCountlyEnabledAtCurrentEnvironment} from '../tracking/Countly.helpers';
 import {EventName} from '../tracking/EventName';
 import * as trackingHelpers from '../tracking/Helpers';
 import {Segmentation} from '../tracking/Segmentation';
@@ -1174,7 +1173,7 @@ export class CallingRepository {
     delete this.poorCallQualityUsers[conversationIdStr];
     this.wCall?.end(this.wUser, conversationIdStr);
 
-    if (isCountlyEnabledAtCurrentEnvironment() && this.selfUser) {
+    if (this.selfUser) {
       const {toggleQualityFeedbackModal} = useCallAlertState.getState();
 
       try {
@@ -1183,12 +1182,7 @@ export class CallingRepository {
         const currentUserDate = currentStorageData?.[this.selfUser.id];
         const currentDate = new Date().toISOString();
 
-        if (typeof currentUserDate === 'undefined') {
-          toggleQualityFeedbackModal(true);
-          return;
-        }
-
-        if (currentUserDate !== null && currentDate >= currentUserDate) {
+        if (typeof currentUserDate === 'undefined' || (currentUserDate !== null && currentDate >= currentUserDate)) {
           toggleQualityFeedbackModal(true);
         }
       } catch (error) {

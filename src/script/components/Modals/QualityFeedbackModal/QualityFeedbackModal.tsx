@@ -56,9 +56,7 @@ interface QualityFeedbackModalProps {
 
 export const QualityFeedbackModal = ({userState = container.resolve(UserState)}: QualityFeedbackModalProps) => {
   const [isChecked, setIsChecked] = useState(false);
-
   const {toggleQualityFeedbackModal, qualityFeedBackModalShown} = useCallAlertState();
-
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
 
   if (!qualityFeedBackModalShown) {
@@ -74,11 +72,10 @@ export const QualityFeedbackModal = ({userState = container.resolve(UserState)}:
     try {
       const qualityFeedbackStorage = localStorage.getItem(CALL_QUALITY_FEEDBACK_KEY);
       const currentStorageData = qualityFeedbackStorage ? JSON.parse(qualityFeedbackStorage) : {};
-
       const currentDate = new Date();
       const dateUntilShowModal = new Date(currentDate.getTime() + CALL_SURVEY_MUTE_INTERVAL);
-      currentStorageData[selfUser.id] = isChecked ? null : dateUntilShowModal;
 
+      currentStorageData[selfUser.id] = isChecked ? null : dateUntilShowModal;
       localStorage.setItem(CALL_QUALITY_FEEDBACK_KEY, JSON.stringify(currentStorageData));
     } catch (error) {
       logger.warn(`No labels were loaded: ${(error as Error).message}`);
@@ -146,11 +143,11 @@ export const QualityFeedbackModal = ({userState = container.resolve(UserState)}:
         <div>
           <Checkbox
             checked={isChecked}
-            data-uie-name="modal-option-checkbox"
-            id="clear-data-checkbox"
+            data-uie-name="do-not-ask-again-checkbox"
+            id="do-not-ask-again-checkbox"
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => setIsChecked(event.target.checked)}
           >
-            <CheckboxLabel className="label-xs" htmlFor="clear-data-checkbox">
+            <CheckboxLabel className="label-xs" htmlFor="do-not-ask-again-checkbox">
               {t('qualityFeedback.doNotAskAgain')}
             </CheckboxLabel>
           </Checkbox>
