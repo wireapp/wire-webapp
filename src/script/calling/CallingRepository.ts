@@ -1168,28 +1168,36 @@ export class CallingRepository {
     this.wCall?.requestVideoStreams(this.wUser, convId, VSTREAMS.LIST, JSON.stringify(payload));
   }
 
+  readonly showCallQualityFeedbackModal = (): void => {
+    if (!this.selfUser) {
+      return;
+    }
+
+    const {setQualityFeedbackModalShown} = useCallAlertState.getState();
+
+    try {
+      const qualityFeedbackStorage = localStorage.getItem(CALL_QUALITY_FEEDBACK_KEY);
+      const currentStorageData = qualityFeedbackStorage ? JSON.parse(qualityFeedbackStorage) : {};
+      const currentUserDate = currentStorageData?.[this.selfUser.id];
+      const currentDate = new Date().toISOString();
+
+      if (typeof currentUserDate === 'undefined' || (currentUserDate !== null && currentDate >= currentUserDate)) {
+        setQualityFeedbackModalShown(true);
+      }
+    } catch (error) {
+      this.logger.warn(`Storage data can't found: ${(error as Error).message}`);
+      setQualityFeedbackModalShown(true);
+    }
+  };
+
   readonly leaveCall = (conversationId: QualifiedId, reason: LEAVE_CALL_REASON): void => {
     this.logger.info(`Ending call with reason ${reason} \n Stack trace: `, new Error().stack);
     const conversationIdStr = this.serializeQualifiedId(conversationId);
     delete this.poorCallQualityUsers[conversationIdStr];
     this.wCall?.end(this.wUser, conversationIdStr);
 
-    if (isCountlyEnabledAtCurrentEnvironment() && this.selfUser) {
-      const {setQualityFeedbackModalShown} = useCallAlertState.getState();
-
-      try {
-        const qualityFeedbackStorage = localStorage.getItem(CALL_QUALITY_FEEDBACK_KEY);
-        const currentStorageData = qualityFeedbackStorage ? JSON.parse(qualityFeedbackStorage) : {};
-        const currentUserDate = currentStorageData?.[this.selfUser.id];
-        const currentDate = new Date().toISOString();
-
-        if (typeof currentUserDate === 'undefined' || (currentUserDate !== null && currentDate >= currentUserDate)) {
-          setQualityFeedbackModalShown(true);
-        }
-      } catch (error) {
-        this.logger.warn(`Storage data can't found: ${(error as Error).message}`);
-        setQualityFeedbackModalShown(true);
-      }
+    if (isCountlyEnabledAtCurrentEnvironment()) {
+      this.showCallQualityFeedbackModal();
     }
   };
 
