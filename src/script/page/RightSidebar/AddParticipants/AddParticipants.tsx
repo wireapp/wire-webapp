@@ -19,6 +19,7 @@
 
 import {FC, useMemo, useState} from 'react';
 
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 
@@ -134,7 +135,14 @@ const AddParticipants: FC<AddParticipantsProps> = ({
     const isService = !!firstUserEntity?.isService;
     const allowIntegrations = isGroup || isService;
 
-    return isTeam && allowIntegrations && inTeam && !isTeamOnly && isServicesEnabled;
+    return (
+      isTeam &&
+      allowIntegrations &&
+      inTeam &&
+      !isTeamOnly &&
+      isServicesEnabled &&
+      activeConversation.protocol !== ConversationProtocol.MLS
+    );
   }, [firstUserEntity?.isService, inTeam, isGroup, isGuestAndServicesRoom, isServicesRoom, isTeam, isTeamOnly]);
 
   const manageServicesUrl = getManageServicesUrl('client_landing');
