@@ -28,6 +28,7 @@ import {UrlUtil} from '@wireapp/commons';
 import {Button, ButtonVariant, ContainerXS, ErrorMessage, Text} from '@wireapp/react-ui-kit';
 
 import {LogoFullIcon} from 'Components/Icon';
+import {isDataDogEnabled} from 'Util/DataDog';
 import {getWebEnvironment} from 'Util/Environment';
 
 import {Page} from './Page';
@@ -83,7 +84,7 @@ const IndexComponent = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps
           {_(indexStrings.welcome, {brandName: Config.getConfig().BACKEND_NAME})}
         </Text>
 
-        {!getWebEnvironment().isProduction && (
+        {!getWebEnvironment().isProduction && isDataDogEnabled() && (
           <Text
             block
             center
