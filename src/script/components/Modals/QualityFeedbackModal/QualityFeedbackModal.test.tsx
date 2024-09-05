@@ -48,8 +48,8 @@ describe('QualityFeedbackModal', () => {
   });
 
   it('should not render if qualityFeedBackModalShown is false', () => {
-    const {toggleQualityFeedbackModal} = useCallAlertState.getState();
-    toggleQualityFeedbackModal(false);
+    const {setQualityFeedbackModalShown} = useCallAlertState.getState();
+    setQualityFeedbackModalShown(false);
 
     const {container} = render(<QualityFeedbackModal />);
     expect(container.firstChild).toBeNull();
@@ -59,7 +59,7 @@ describe('QualityFeedbackModal', () => {
     render(withTheme(withIntl(<QualityFeedbackModal />)));
 
     act(() => {
-      useCallAlertState.getState().toggleQualityFeedbackModal(true);
+      useCallAlertState.getState().setQualityFeedbackModalShown(true);
     });
 
     expect(useCallAlertState.getState().qualityFeedBackModalShown).toBe(true);
@@ -69,7 +69,7 @@ describe('QualityFeedbackModal', () => {
     const {getByText} = render(withTheme(withIntl(<QualityFeedbackModal />)));
 
     act(() => {
-      useCallAlertState.getState().toggleQualityFeedbackModal(true);
+      useCallAlertState.getState().setQualityFeedbackModalShown(true);
     });
 
     spyOn(amplify, 'publish').and.returnValue({
@@ -93,7 +93,7 @@ describe('QualityFeedbackModal', () => {
     const {getByText} = render(withTheme(withIntl(<QualityFeedbackModal />)));
 
     act(() => {
-      useCallAlertState.getState().toggleQualityFeedbackModal(true);
+      useCallAlertState.getState().setQualityFeedbackModalShown(true);
     });
 
     spyOn(amplify, 'publish').and.returnValue({
@@ -119,7 +119,7 @@ describe('QualityFeedbackModal', () => {
     const {getByText} = render(withTheme(withIntl(<QualityFeedbackModal />)));
 
     act(() => {
-      useCallAlertState.getState().toggleQualityFeedbackModal(true);
+      useCallAlertState.getState().setQualityFeedbackModalShown(true);
     });
 
     const checkbox = getByText('qualityFeedback.doNotAskAgain');

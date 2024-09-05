@@ -56,7 +56,7 @@ interface QualityFeedbackModalProps {
 
 export const QualityFeedbackModal = ({userState = container.resolve(UserState)}: QualityFeedbackModalProps) => {
   const [isChecked, setIsChecked] = useState(false);
-  const {toggleQualityFeedbackModal, qualityFeedBackModalShown} = useCallAlertState();
+  const {setQualityFeedbackModalShown, qualityFeedBackModalShown} = useCallAlertState();
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
 
   if (!qualityFeedBackModalShown) {
@@ -65,7 +65,7 @@ export const QualityFeedbackModal = ({userState = container.resolve(UserState)}:
 
   const handleCloseModal = () => {
     if (!selfUser) {
-      toggleQualityFeedbackModal(false);
+      setQualityFeedbackModalShown(false);
       return;
     }
 
@@ -80,7 +80,7 @@ export const QualityFeedbackModal = ({userState = container.resolve(UserState)}:
     } catch (error) {
       logger.warn(`No labels were loaded: ${(error as Error).message}`);
     } finally {
-      toggleQualityFeedbackModal(false);
+      setQualityFeedbackModalShown(false);
     }
   };
 

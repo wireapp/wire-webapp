@@ -89,6 +89,7 @@ import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
 import {TeamState} from '../team/TeamState';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
+import {isCountlyEnabledAtCurrentEnvironment} from '../tracking/Countly.helpers';
 import {EventName} from '../tracking/EventName';
 import * as trackingHelpers from '../tracking/Helpers';
 import {Segmentation} from '../tracking/Segmentation';
@@ -1173,8 +1174,8 @@ export class CallingRepository {
     delete this.poorCallQualityUsers[conversationIdStr];
     this.wCall?.end(this.wUser, conversationIdStr);
 
-    if (this.selfUser) {
-      const {toggleQualityFeedbackModal} = useCallAlertState.getState();
+    if (isCountlyEnabledAtCurrentEnvironment() && this.selfUser) {
+      const {setQualityFeedbackModalShown} = useCallAlertState.getState();
 
       try {
         const qualityFeedbackStorage = localStorage.getItem(CALL_QUALITY_FEEDBACK_KEY);
@@ -1183,11 +1184,11 @@ export class CallingRepository {
         const currentDate = new Date().toISOString();
 
         if (typeof currentUserDate === 'undefined' || (currentUserDate !== null && currentDate >= currentUserDate)) {
-          toggleQualityFeedbackModal(true);
+          setQualityFeedbackModalShown(true);
         }
       } catch (error) {
         this.logger.warn(`Storage data can't found: ${(error as Error).message}`);
-        toggleQualityFeedbackModal(true);
+        setQualityFeedbackModalShown(true);
       }
     }
   };
