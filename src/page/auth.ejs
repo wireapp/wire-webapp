@@ -37,11 +37,11 @@
       Countly.debug = false;
       Countly.require_consent = true;
 
-      Countly.init();
-
       Countly.q.push(['track_sessions']);
       Countly.q.push(['track_pageview']);
       Countly.q.push(['track_performance']);
+      
+      Countly.init();
     </script>
   </head>
 
