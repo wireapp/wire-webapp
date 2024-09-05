@@ -19,6 +19,7 @@
 
 import {FC, useMemo, useState} from 'react';
 
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 
@@ -100,12 +101,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
     'isTeamOnly',
     'participating_user_ids',
   ]);
-  const {isTeam, teamMembers, teamUsers, isMLSEnabled} = useKoSubscribableChildren(teamState, [
-    'isTeam',
-    'teamMembers',
-    'teamUsers',
-    'isMLSEnabled',
-  ]);
+  const {isTeam, teamMembers, teamUsers} = useKoSubscribableChildren(teamState, ['isTeam', 'teamMembers', 'teamUsers']);
   const {connectedUsers} = useKoSubscribableChildren(userState, ['connectedUsers']);
   const {teamRole} = useKoSubscribableChildren(selfUser, ['teamRole']);
   const {services} = useKoSubscribableChildren(integrationRepository, ['services']);
@@ -139,7 +135,14 @@ const AddParticipants: FC<AddParticipantsProps> = ({
     const isService = !!firstUserEntity?.isService;
     const allowIntegrations = isGroup || isService;
 
-    return isTeam && allowIntegrations && inTeam && !isTeamOnly && isServicesEnabled;
+    return (
+      isTeam &&
+      allowIntegrations &&
+      inTeam &&
+      !isTeamOnly &&
+      isServicesEnabled &&
+      activeConversation.protocol !== ConversationProtocol.MLS
+    );
   }, [firstUserEntity?.isService, inTeam, isGroup, isGuestAndServicesRoom, isServicesRoom, isTeam, isTeamOnly]);
 
   const manageServicesUrl = getManageServicesUrl('client_landing');
@@ -205,7 +208,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
           placeholder={t('addParticipantsSearchPlaceholder')}
         />
 
-        {showIntegrations && !isMLSEnabled && (
+        {showIntegrations && (
           <div className="panel__tabs">
             <div
               role="button"
