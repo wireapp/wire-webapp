@@ -91,6 +91,9 @@ export const userHandle = (isSideBarOpen: boolean): CSSObject => ({
   fontWeight: 'var(--font-weight-regular)',
   lineHeight: 'var(--line-height-md)',
   gridArea: 'userHandle',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+  overflow: 'hidden',
 });
 
 export const legalHold: CSSObject = {
