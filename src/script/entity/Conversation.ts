@@ -920,6 +920,17 @@ export class Conversation {
     return this.messages().find(
       message =>
         // Deleted message should be ignored since they might have a timestamp in the past (the timestamp of a delete message is the timestamp of the message that was deleted)
+        !isDeleteMessage(message),
+    );
+  }
+
+  /**
+   * Get the oldest loaded message of the conversation with timestamp.
+   */
+  getOldestMessageWithTimestamp(): Message | undefined {
+    return this.messages().find(
+      message =>
+        // Deleted message should be ignored since they might have a timestamp in the past (the timestamp of a delete message is the timestamp of the message that was deleted)
         !isDeleteMessage(message) && message.timestamp(),
     );
   }
