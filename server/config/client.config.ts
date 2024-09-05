@@ -23,12 +23,12 @@ import {Env} from './env';
 export function generateConfig(params: ConfigGeneratorParams, env: Env) {
   const {urls, version, env: nodeEnv} = params;
   return {
-    APP_BASE: urls.base,
+    APP_BASE: urls.base ?? '',
     ANALYTICS_API_KEY: env.ANALYTICS_API_KEY,
     APP_NAME: env.APP_NAME ?? 'Wire',
     BACKEND_NAME: env.BACKEND_NAME,
-    BACKEND_REST: urls.api,
-    BACKEND_WS: urls.ws,
+    BACKEND_REST: urls.api ?? '',
+    BACKEND_WS: urls.ws ?? '',
     BRAND_NAME: env.BRAND_NAME,
     COUNTLY_API_KEY: env.COUNTLY_API_KEY,
     COUNTLY_ALLOWED_BACKEND: env.COUNTLY_ALLOWED_BACKEND ?? '',
