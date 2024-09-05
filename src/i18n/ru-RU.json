@@ -1531,7 +1531,7 @@
   "videoCallOverlayHideParticipantsList": "Скрыть список участников",
   "videoCallOverlayMicrophone": "Микрофон",
   "videoCallOverlayOpenFullScreen": "Открыть вызов в полноэкранном режиме",
-  "videoCallOverlayOpenPopupWindow": "Открыть в отдельном окне",
+  "videoCallOverlayOpenPopupWindow": "Open in new window",
   "videoCallOverlayParticipantsListLabel": "Участники ({{count}})",
   "videoCallOverlayShareScreen": "Поделиться экраном",
   "videoCallOverlayShowParticipantsList": "Показать список участников",

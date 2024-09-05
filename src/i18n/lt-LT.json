@@ -1531,7 +1531,7 @@
   "videoCallOverlayHideParticipantsList": "Hide participants list",
   "videoCallOverlayMicrophone": "Microphone",
   "videoCallOverlayOpenFullScreen": "Open the call in full screen",
-  "videoCallOverlayOpenPopupWindow": "Open popup view",
+  "videoCallOverlayOpenPopupWindow": "Open in new window",
   "videoCallOverlayParticipantsListLabel": "Participants ({{count}})",
   "videoCallOverlayShareScreen": "Siųsti ekrano vaizdą",
   "videoCallOverlayShowParticipantsList": "Show participants list",
