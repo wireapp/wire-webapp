@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation/';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
@@ -41,6 +41,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
 import {handleKeyDown, isEscapeKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
+import {preventFocusOutside} from 'Util/util';
 
 import {CallingParticipantList} from './CallingCell/CallIngParticipantList';
 import {Duration} from './Duration';
@@ -179,6 +180,23 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   const [isParticipantsListOpen, toggleParticipantsList] = useToggleState(false);
   const [isCallViewOpen, toggleCallView] = useToggleState(false);
 
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent): void => {
+      if (viewMode !== CallingViewMode.FULL_SCREEN) {
+        return;
+      }
+
+      event.preventDefault();
+      preventFocusOutside(event, 'video-calling');
+    };
+
+    document.addEventListener('keydown', onKeyDown);
+
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [viewMode]);
+
   const showToggleVideo =
     isVideoCallingEnabled &&
     (call.initialType === CALL_TYPE.VIDEO || conversation.supportsVideoCall(call.isConference));
@@ -242,11 +260,13 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
       }),
     },
   ];
+
   const [selectedAudioOptions, setSelectedAudioOptions] = useState(() =>
     [currentMicrophoneDevice, currentSpeakerDevice].flatMap(
       (device, index) => audioOptions[index].options.find(item => item.id === device) ?? audioOptions[index].options[0],
     ),
   );
+
   const updateAudioOptions = (selectedOption: string, input: boolean) => {
     const microphone = input
       ? audioOptions[0].options.find(item => item.value === selectedOption) ?? selectedAudioOptions[0]
