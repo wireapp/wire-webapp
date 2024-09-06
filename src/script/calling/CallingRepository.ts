@@ -1992,8 +1992,8 @@ export class CallingRepository {
       .forEach(participant => participant.videoState(state));
   };
 
-  private readonly metricsReceived = (_: string, metrics_json: string) => {
-    this.logger.info('Calling metrics:', metrics_json);
+  private readonly metricsReceived = (_: string, metrics: string) => {
+    this.logger.info('Calling metrics:', metrics);
   };
 
   private readonly sendCallingEvent = (
