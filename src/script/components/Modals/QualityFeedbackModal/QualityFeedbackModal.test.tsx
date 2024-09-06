@@ -56,7 +56,7 @@ describe('QualityFeedbackModal', () => {
       useCallAlertState.getState().setQualityFeedbackModalShown(false);
     });
 
-    expect(useCallAlertState.getState().qualityFeedBackModalShown).toBe(false);
+    expect(useCallAlertState.getState().qualityFeedbackModalShown).toBe(false);
   });
 
   it('should render correctly when qualityFeedBackModalShown is true', () => {
@@ -66,7 +66,7 @@ describe('QualityFeedbackModal', () => {
       useCallAlertState.getState().setQualityFeedbackModalShown(true);
     });
 
-    expect(useCallAlertState.getState().qualityFeedBackModalShown).toBe(true);
+    expect(useCallAlertState.getState().qualityFeedbackModalShown).toBe(true);
   });
 
   it('should close modal on skip', () => {
@@ -90,7 +90,7 @@ describe('QualityFeedbackModal', () => {
       [Segmentation.CALL.QUALITY_REVIEW_LABEL]: RatingListLabel.DISMISSED,
     });
 
-    expect(useCallAlertState.getState().qualityFeedBackModalShown).toBe(false);
+    expect(useCallAlertState.getState().qualityFeedbackModalShown).toBe(false);
   });
 
   it('should send quality feedback and close modal on rating click', () => {
@@ -116,7 +116,7 @@ describe('QualityFeedbackModal', () => {
       [Segmentation.CALL.QUALITY_REVIEW_LABEL]: RatingListLabel.ANSWERED,
     });
 
-    expect(useCallAlertState.getState().qualityFeedBackModalShown).toBe(false);
+    expect(useCallAlertState.getState().qualityFeedbackModalShown).toBe(false);
   });
 
   it('should store the doNotAskAgain state in localStorage', () => {

@@ -54,10 +54,10 @@ export const QualityFeedbackModal = () => {
   const userState = container.resolve(UserState);
 
   const [isChecked, setIsChecked] = useState(false);
-  const {setQualityFeedbackModalShown, qualityFeedBackModalShown} = useCallAlertState();
+  const {setQualityFeedbackModalShown, qualityFeedbackModalShown} = useCallAlertState();
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
 
-  if (!qualityFeedBackModalShown) {
+  if (!qualityFeedbackModalShown) {
     return null;
   }
 
@@ -101,7 +101,7 @@ export const QualityFeedbackModal = () => {
 
   return (
     <ModalComponent
-      isShown={qualityFeedBackModalShown}
+      isShown={qualityFeedbackModalShown}
       data-uie-name="modal-call-quality-feedback"
       className="quality-feedback"
     >
