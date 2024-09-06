@@ -17,9 +17,37 @@
  *
  */
 
+import {getWebEnvironment} from 'Util/Environment';
+import {getLogger, Logger} from 'Util/Logger';
+
 import {Config} from '../Config';
 
+const logger: Logger = getLogger('CountlyHelpers');
+
+// This variable is used to force the activation of error reporting on specific environments
+let forceActivateErrorReporting: boolean = false;
+
+// This method is used by QA to disable the forced activation for testing purposes
+export const disableForcedErrorReporting = (): void => {
+  forceActivateErrorReporting = false;
+};
+export const getForcedErrorReportingStatus = (): boolean => forceActivateErrorReporting;
+
+// Init the forced activation of error reporting based on the environment
+export const initForcedErrorReporting = () => {
+  const {isDev, isEdge, isInternal, isLocalhost, isStaging, name} = getWebEnvironment();
+
+  if (isDev || isEdge || isInternal || isLocalhost || isStaging) {
+    forceActivateErrorReporting = true;
+    logger.warn(`Error reporting is forced to be activated on this environment: ${name}`);
+  }
+};
+
 export function isCountlyEnabledAtCurrentEnvironment(): boolean {
+  if (forceActivateErrorReporting) {
+    return true;
+  }
+
   const {COUNTLY_API_KEY, COUNTLY_ALLOWED_BACKEND, BACKEND_REST} = Config.getConfig();
 
   const allowedBackendUrls = COUNTLY_ALLOWED_BACKEND.split(',').map(url => url.trim()) || [];

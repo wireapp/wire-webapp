@@ -26,15 +26,22 @@
     <script src='./libs/countly/countly.min.js?v=<%= VERSION %>' type='text/javascript'></script>
     <script src='./min/countlyBoomerangCustom.js?v=<%= VERSION %>' type='text/javascript'></script>
     <script type='text/javascript' nonce="<%= COUNTLY_NONCE %>">
-      Countly.init({
-        debug: false,
-        app_key:"<%= COUNTLY_API_KEY %>",
-        url: "https://countly.wire.com/",
-        offline_mode: true,
-        use_session_cookie: false,
-        storage: 'localstorage'
-      });
-      Countly.track_performance();
+      var Countly = Countly || {};
+      Countly.q = Countly.q || [];
+
+      Countly.app_key = "<%= COUNTLY_API_KEY %>";
+      Countly.url = "https://countly.wire.com/";
+      Countly.offline_mode = true;
+      Countly.use_session_cookie = false;
+      Countly.storage = 'localstorage';
+      Countly.debug = false;
+      Countly.require_consent = true;
+
+      Countly.q.push(['track_sessions']);
+      Countly.q.push(['track_pageview']);
+      Countly.q.push(['track_performance']);
+
+      Countly.init();
     </script>
   </head>
 

@@ -855,7 +855,7 @@ export class ConversationRepository {
   public async getPrecedingMessages(conversationEntity: Conversation): Promise<ContentMessage[]> {
     conversationEntity.isLoadingMessages(true);
 
-    const firstMessageEntity = conversationEntity.getOldestMessage();
+    const firstMessageEntity = conversationEntity.getOldestMessageWithTimestamp();
     const upperBound =
       firstMessageEntity && firstMessageEntity.timestamp()
         ? new Date(firstMessageEntity.timestamp())

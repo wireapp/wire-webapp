@@ -92,7 +92,6 @@ Plugin being used - RT, AutoXHR, Continuity, NavigationTiming, ResourceTiming
         BOOMR.subscribe('before_beacon', function (beaconData) {
           self._internals.log('[INFO]', 'Boomerang, before_beacon:', JSON.stringify(beaconData, null, 2));
           var trace = {};
-          console.log('boomr trace device', beaconData);
           if (beaconData['rt.start'] !== 'manual' && !beaconData['http.initiator'] && beaconData['rt.quit'] !== '') {
             trace.type = 'device';
             trace.apm_metrics = {};

@@ -205,6 +205,11 @@ svg.small-icon {
   border: 1px solid var(--border-color);
   border-radius: 8px;
   background-color: var(--app-bg-secondary);
+  box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.29);
+
+  body.theme-dark & {
+    box-shadow: 0 2px 6px 0 rgba(255, 255, 255, 0.1);
+  }
 
   .conversation-list-cell-right {
     padding-right: 0;
