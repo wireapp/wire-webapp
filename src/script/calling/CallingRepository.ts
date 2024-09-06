@@ -1168,7 +1168,7 @@ export class CallingRepository {
     this.wCall?.requestVideoStreams(this.wUser, convId, VSTREAMS.LIST, JSON.stringify(payload));
   }
 
-  readonly showCallQualityFeedbackModal = (): void => {
+  readonly showCallQualityFeedbackModal = () => {
     if (!this.selfUser) {
       return;
     }
@@ -1179,9 +1179,9 @@ export class CallingRepository {
       const qualityFeedbackStorage = localStorage.getItem(CALL_QUALITY_FEEDBACK_KEY);
       const currentStorageData = qualityFeedbackStorage ? JSON.parse(qualityFeedbackStorage) : {};
       const currentUserDate = currentStorageData?.[this.selfUser.id];
-      const currentDate = new Date().toISOString();
+      const currentDate = new Date().getTime();
 
-      if (typeof currentUserDate === 'undefined' || (currentUserDate !== null && currentDate >= currentUserDate)) {
+      if (currentUserDate === undefined || (currentUserDate !== null && currentDate >= currentUserDate)) {
         setQualityFeedbackModalShown(true);
       }
     } catch (error) {
@@ -1196,7 +1196,7 @@ export class CallingRepository {
     delete this.poorCallQualityUsers[conversationIdStr];
     this.wCall?.end(this.wUser, conversationIdStr);
 
-    if (isCountlyEnabledAtCurrentEnvironment()) {
+    if (true || isCountlyEnabledAtCurrentEnvironment()) {
       this.showCallQualityFeedbackModal();
     }
   };

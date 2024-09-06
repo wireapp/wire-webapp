@@ -50,11 +50,9 @@ import {UserState} from '../../../user/UserState';
 
 const logger = getLogger('CallQualityFeedback');
 
-interface QualityFeedbackModalProps {
-  userState?: UserState;
-}
+export const QualityFeedbackModal = () => {
+  const userState = container.resolve(UserState);
 
-export const QualityFeedbackModal = ({userState = container.resolve(UserState)}: QualityFeedbackModalProps) => {
   const [isChecked, setIsChecked] = useState(false);
   const {setQualityFeedbackModalShown, qualityFeedBackModalShown} = useCallAlertState();
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
@@ -75,7 +73,7 @@ export const QualityFeedbackModal = ({userState = container.resolve(UserState)}:
       const currentDate = new Date();
       const dateUntilShowModal = new Date(currentDate.getTime() + CALL_SURVEY_MUTE_INTERVAL);
 
-      currentStorageData[selfUser.id] = isChecked ? null : dateUntilShowModal;
+      currentStorageData[selfUser.id] = isChecked ? null : dateUntilShowModal.getTime();
       localStorage.setItem(CALL_QUALITY_FEEDBACK_KEY, JSON.stringify(currentStorageData));
     } catch (error) {
       logger.warn(`No labels were loaded: ${(error as Error).message}`);
@@ -102,7 +100,11 @@ export const QualityFeedbackModal = ({userState = container.resolve(UserState)}:
   };
 
   return (
-    <ModalComponent isShown data-uie-name="modal-call-quality-feedback" className="quality-feedback">
+    <ModalComponent
+      isShown={qualityFeedBackModalShown}
+      data-uie-name="modal-call-quality-feedback"
+      className="quality-feedback"
+    >
       <div css={wrapper}>
         <h2 css={title}>{t('qualityFeedback.heading')}</h2>
 

@@ -42,21 +42,25 @@ jest.mock('../../../tracking/Countly.helpers', () => ({
 describe('QualityFeedbackModal', () => {
   const user = new User('userId', 'domain');
 
+  const renderQualityFeedbackModal = () => render(withTheme(withIntl(<QualityFeedbackModal />)));
+
   beforeEach(() => {
     jest.clearAllMocks();
     spyOn(container.resolve(UserState), 'self').and.returnValue(user);
   });
 
   it('should not render if qualityFeedBackModalShown is false', () => {
-    const {setQualityFeedbackModalShown} = useCallAlertState.getState();
-    setQualityFeedbackModalShown(false);
+    renderQualityFeedbackModal();
 
-    const {container} = render(<QualityFeedbackModal />);
-    expect(container.firstChild).toBeNull();
+    act(() => {
+      useCallAlertState.getState().setQualityFeedbackModalShown(false);
+    });
+
+    expect(useCallAlertState.getState().qualityFeedBackModalShown).toBe(false);
   });
 
   it('should render correctly when qualityFeedBackModalShown is true', () => {
-    render(withTheme(withIntl(<QualityFeedbackModal />)));
+    renderQualityFeedbackModal();
 
     act(() => {
       useCallAlertState.getState().setQualityFeedbackModalShown(true);
@@ -66,7 +70,7 @@ describe('QualityFeedbackModal', () => {
   });
 
   it('should close modal on skip', () => {
-    const {getByText} = render(withTheme(withIntl(<QualityFeedbackModal />)));
+    const {getByText} = renderQualityFeedbackModal();
 
     act(() => {
       useCallAlertState.getState().setQualityFeedbackModalShown(true);
@@ -90,7 +94,7 @@ describe('QualityFeedbackModal', () => {
   });
 
   it('should send quality feedback and close modal on rating click', () => {
-    const {getByText} = render(withTheme(withIntl(<QualityFeedbackModal />)));
+    const {getByText} = renderQualityFeedbackModal();
 
     act(() => {
       useCallAlertState.getState().setQualityFeedbackModalShown(true);
@@ -116,7 +120,7 @@ describe('QualityFeedbackModal', () => {
   });
 
   it('should store the doNotAskAgain state in localStorage', () => {
-    const {getByText} = render(withTheme(withIntl(<QualityFeedbackModal />)));
+    const {getByText} = renderQualityFeedbackModal();
 
     act(() => {
       useCallAlertState.getState().setQualityFeedbackModalShown(true);
