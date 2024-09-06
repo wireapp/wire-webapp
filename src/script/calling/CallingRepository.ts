@@ -372,7 +372,7 @@ export class CallingRepository {
       () => {}, // `answer
       () => {}, // `estabh`,
       this.callClosed, // `closeh`,
-      () => {}, // `metricsh`,
+      this.metricsReceived, // `metricsh`,
       this.requestConfig, // `cfg_reqh`,
       this.audioCbrChanged, // `acbrh`,
       this.videoStateChanged, // `vstateh`,
@@ -1990,6 +1990,10 @@ export class CallingRepository {
       .participants()
       .filter(participant => participant.doesMatchIds(userId, clientId))
       .forEach(participant => participant.videoState(state));
+  };
+
+  private readonly metricsReceived = (_: string, metrics_json: string) => {
+    this.logger.info('Calling metrics:', metrics_json);
   };
 
   private readonly sendCallingEvent = (
