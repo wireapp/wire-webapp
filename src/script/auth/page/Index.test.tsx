@@ -36,8 +36,10 @@ jest.mock('react-router-dom', () => ({
 
 describe('when visiting the index page', () => {
   let configSpy: jest.SpyInstance;
+
   beforeEach(() => {
     configSpy = jest.spyOn(Config, 'getConfig').mockReturnValue({
+      APP_BASE: 'https://app.wire.com',
       BACKEND_NAME: 'mybrand',
       FEATURE: {
         ENABLE_ACCOUNT_REGISTRATION: true,
@@ -81,7 +83,9 @@ describe('when visiting the index page', () => {
 
   it('shows the welcome text with custom backend name', () => {
     const customBackendName = 'Test';
+
     configSpy.mockReturnValue({
+      APP_BASE: 'https://app.wire.com',
       BACKEND_NAME: customBackendName,
       FEATURE: {
         ENABLE_ACCOUNT_REGISTRATION: true,
@@ -111,6 +115,7 @@ describe('when visiting the index page', () => {
 
   it('navigates to SSO login page when clicking SSO login button', async () => {
     configSpy.mockReturnValue({
+      APP_BASE: 'https://app.wire.com',
       FEATURE: {
         ENABLE_DOMAIN_DISCOVERY: true,
         ENABLE_SSO: true,
@@ -152,6 +157,7 @@ describe('when visiting the index page', () => {
   describe('and the account registration is enabled', () => {
     beforeEach(() => {
       configSpy.mockReturnValue({
+        APP_BASE: 'https://app.wire.com',
         FEATURE: {
           ENABLE_ACCOUNT_REGISTRATION: true,
         },
@@ -182,6 +188,7 @@ describe('when visiting the index page', () => {
   describe('and SSO & domain discovery is disabled', () => {
     beforeEach(() => {
       configSpy.mockReturnValue({
+        APP_BASE: 'https://app.wire.com',
         FEATURE: {
           ENABLE_DOMAIN_DISCOVERY: false,
           ENABLE_SSO: false,
@@ -199,6 +206,7 @@ describe('when visiting the index page', () => {
   describe('and SSO, domain discovery & account registration is disabled', () => {
     beforeEach(() => {
       configSpy.mockReturnValue({
+        APP_BASE: 'https://app.wire.com',
         FEATURE: {
           ENABLE_ACCOUNT_REGISTRATION: false,
           ENABLE_DOMAIN_DISCOVERY: false,
