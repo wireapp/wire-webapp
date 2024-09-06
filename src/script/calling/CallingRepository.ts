@@ -1196,7 +1196,7 @@ export class CallingRepository {
     delete this.poorCallQualityUsers[conversationIdStr];
     this.wCall?.end(this.wUser, conversationIdStr);
 
-    if (true || isCountlyEnabledAtCurrentEnvironment()) {
+    if (isCountlyEnabledAtCurrentEnvironment()) {
       this.showCallQualityFeedbackModal();
     }
   };

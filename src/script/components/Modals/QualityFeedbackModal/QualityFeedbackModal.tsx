@@ -100,11 +100,7 @@ export const QualityFeedbackModal = () => {
   };
 
   return (
-    <ModalComponent
-      isShown={qualityFeedbackModalShown}
-      data-uie-name="modal-call-quality-feedback"
-      className="quality-feedback"
-    >
+    <ModalComponent isShown data-uie-name="modal-call-quality-feedback" className="quality-feedback">
       <div css={wrapper}>
         <h2 css={title}>{t('qualityFeedback.heading')}</h2>
 

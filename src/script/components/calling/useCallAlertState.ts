@@ -35,7 +35,7 @@ const useCallAlertState = create<CallAlertState>((set, get) => ({
   setQualityFeedbackModalShown: isVisible =>
     set(state => ({
       ...state,
-      qualityFeedBackModalShown: isVisible,
+      qualityFeedbackModalShown: isVisible,
     })),
   showStartedCallAlert: (isGroupCall = false, isVideoCall = false) =>
     set(state => ({

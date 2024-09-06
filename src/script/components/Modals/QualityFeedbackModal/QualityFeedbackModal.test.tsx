@@ -40,16 +40,15 @@ jest.mock('../../../tracking/Countly.helpers', () => ({
 }));
 
 describe('QualityFeedbackModal', () => {
-  const user = new User('userId', 'domain');
-
   const renderQualityFeedbackModal = () => render(withTheme(withIntl(<QualityFeedbackModal />)));
+  const user = new User('userId', 'domain');
 
   beforeEach(() => {
     jest.clearAllMocks();
     spyOn(container.resolve(UserState), 'self').and.returnValue(user);
   });
 
-  it('should not render if qualityFeedBackModalShown is false', () => {
+  it('should not render if qualityFeedbackModalShown is false', () => {
     renderQualityFeedbackModal();
 
     act(() => {
@@ -59,7 +58,7 @@ describe('QualityFeedbackModal', () => {
     expect(useCallAlertState.getState().qualityFeedbackModalShown).toBe(false);
   });
 
-  it('should render correctly when qualityFeedBackModalShown is true', () => {
+  it('should render correctly when qualityFeedbackModalShown is true', () => {
     renderQualityFeedbackModal();
 
     act(() => {
