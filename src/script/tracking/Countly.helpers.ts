@@ -50,7 +50,7 @@ export function isCountlyEnabledAtCurrentEnvironment(): boolean {
 
   const {COUNTLY_API_KEY, COUNTLY_ALLOWED_BACKEND, BACKEND_REST} = Config.getConfig();
 
-  const allowedBackendUrls = COUNTLY_ALLOWED_BACKEND.split(',').map(url => url.trim()) || [];
+  const allowedBackendUrls = COUNTLY_ALLOWED_BACKEND?.split(',').map(url => url.trim()) || [];
   const isCountlyEnabled =
     !!COUNTLY_API_KEY && allowedBackendUrls.length > 0 && allowedBackendUrls.includes(BACKEND_REST);
 

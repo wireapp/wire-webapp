@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2024 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,22 +17,14 @@
  *
  */
 
-/**
- * Definition of events used for user analytics (defined by Business Intelligence Team)
- */
-export const EventName = {
-  APP_OPEN: 'app.open',
-  CALLING: {
-    ENDED_CALL: 'calling.ended_call',
-    ESTABLISHED_CALL: 'calling.established_call',
-    INITIATED_CALL: 'calling.initiated_call',
-    JOINED_CALL: 'calling.joined_call',
-    RECEIVED_CALL: 'calling.received_call',
-    SCREEN_SHARE: 'calling.screen_share',
-    QUALITY_REVIEW: 'calling.call_quality_review',
-  },
-  CONTRIBUTED: 'contributed',
-  E2EE: {
-    FAILED_MESSAGE_DECRYPTION: 'e2ee.failed_message_decryption',
-  },
+import {StringIdentifer} from 'Util/LocalizerUtil';
+
+export type RatingListItem = {
+  value: number;
+  headingTranslationKey?: StringIdentifer;
 };
+
+export enum RatingListLabel {
+  ANSWERED = 'answered',
+  DISMISSED = 'dismissed',
+}

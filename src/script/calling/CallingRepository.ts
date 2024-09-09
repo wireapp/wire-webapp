@@ -52,6 +52,8 @@ import {
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {useCallAlertState} from 'Components/calling/useCallAlertState';
+import {CALL_QUALITY_FEEDBACK_KEY} from 'Components/Modals/QualityFeedbackModal/constants';
 import {flatten} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
@@ -87,6 +89,7 @@ import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
 import {TeamState} from '../team/TeamState';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
+import {isCountlyEnabledAtCurrentEnvironment} from '../tracking/Countly.helpers';
 import {EventName} from '../tracking/EventName';
 import * as trackingHelpers from '../tracking/Helpers';
 import {Segmentation} from '../tracking/Segmentation';
@@ -1165,11 +1168,37 @@ export class CallingRepository {
     this.wCall?.requestVideoStreams(this.wUser, convId, VSTREAMS.LIST, JSON.stringify(payload));
   }
 
+  readonly showCallQualityFeedbackModal = () => {
+    if (!this.selfUser) {
+      return;
+    }
+
+    const {setQualityFeedbackModalShown} = useCallAlertState.getState();
+
+    try {
+      const qualityFeedbackStorage = localStorage.getItem(CALL_QUALITY_FEEDBACK_KEY);
+      const currentStorageData = qualityFeedbackStorage ? JSON.parse(qualityFeedbackStorage) : {};
+      const currentUserDate = currentStorageData?.[this.selfUser.id];
+      const currentDate = new Date().getTime();
+
+      if (currentUserDate === undefined || (currentUserDate !== null && currentDate >= currentUserDate)) {
+        setQualityFeedbackModalShown(true);
+      }
+    } catch (error) {
+      this.logger.warn(`Storage data can't found: ${(error as Error).message}`);
+      setQualityFeedbackModalShown(true);
+    }
+  };
+
   readonly leaveCall = (conversationId: QualifiedId, reason: LEAVE_CALL_REASON): void => {
     this.logger.info(`Ending call with reason ${reason} \n Stack trace: `, new Error().stack);
     const conversationIdStr = this.serializeQualifiedId(conversationId);
     delete this.poorCallQualityUsers[conversationIdStr];
     this.wCall?.end(this.wUser, conversationIdStr);
+
+    if (isCountlyEnabledAtCurrentEnvironment()) {
+      this.showCallQualityFeedbackModal();
+    }
   };
 
   muteCall(call: Call, shouldMute: boolean, reason?: MuteState): void {

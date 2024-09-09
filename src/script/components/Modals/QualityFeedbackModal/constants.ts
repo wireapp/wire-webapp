@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2024 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,22 +17,19 @@
  *
  */
 
-/**
- * Definition of events used for user analytics (defined by Business Intelligence Team)
- */
-export const EventName = {
-  APP_OPEN: 'app.open',
-  CALLING: {
-    ENDED_CALL: 'calling.ended_call',
-    ESTABLISHED_CALL: 'calling.established_call',
-    INITIATED_CALL: 'calling.initiated_call',
-    JOINED_CALL: 'calling.joined_call',
-    RECEIVED_CALL: 'calling.received_call',
-    SCREEN_SHARE: 'calling.screen_share',
-    QUALITY_REVIEW: 'calling.call_quality_review',
-  },
-  CONTRIBUTED: 'contributed',
-  E2EE: {
-    FAILED_MESSAGE_DECRYPTION: 'e2ee.failed_message_decryption',
-  },
-};
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+
+import {RatingListItem} from './typings';
+
+export const ratingListItems: RatingListItem[] = [
+  {value: 1, headingTranslationKey: 'qualityFeedback.bad'},
+  {value: 2},
+  {value: 3, headingTranslationKey: 'qualityFeedback.fair'},
+  {value: 4},
+  {value: 5, headingTranslationKey: 'qualityFeedback.excellent'},
+];
+
+const MUTE_INTERVAL_DAYS = 3;
+export const CALL_SURVEY_MUTE_INTERVAL = TIME_IN_MILLIS.DAY * MUTE_INTERVAL_DAYS;
+
+export const CALL_QUALITY_FEEDBACK_KEY = 'CALL_QUALITY_FEEDBACK';
