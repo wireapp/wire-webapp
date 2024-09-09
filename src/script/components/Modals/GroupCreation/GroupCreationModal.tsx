@@ -186,16 +186,6 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
     };
   }, [stateIsParticipants]);
 
-  useEffect(() => {
-    if (selectedProtocol.value === ConversationProtocol.MLS && isServicesEnabled) {
-      clickOnToggleServicesMode();
-    }
-
-    if (selectedProtocol.value === ConversationProtocol.PROTEUS && !isServicesEnabled) {
-      clickOnToggleServicesMode();
-    }
-  }, [selectedProtocol]);
-
   if (!mainViewModel) {
     return null;
   }
