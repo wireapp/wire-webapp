@@ -19,6 +19,7 @@
 
 import {forwardRef, useCallback, useEffect, useMemo, useState} from 'react';
 
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {amplify} from 'amplify';
@@ -164,7 +165,10 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
     const showOptionTimedMessages =
       isActiveGroupParticipant && roleRepository.canToggleTimeout(activeConversation) && isSelfDeletingMessagesEnabled;
     const showOptionServices =
-      isActiveGroupParticipant && !!teamId && roleRepository.canToggleGuests(activeConversation);
+      isActiveGroupParticipant &&
+      !!teamId &&
+      roleRepository.canToggleGuests(activeConversation) &&
+      activeConversation.protocol !== ConversationProtocol.MLS;
     const showOptionReadReceipts = !!teamId && roleRepository.canToggleReadReceipts(activeConversation);
 
     const showSectionOptions =
