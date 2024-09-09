@@ -1169,7 +1169,7 @@ export class CallingRepository {
   }
 
   readonly showCallQualityFeedbackModal = () => {
-    if (!this.selfUser) {
+    if (!this.selfUser || !this.hasActiveCall()) {
       return;
     }
 
@@ -1191,14 +1191,14 @@ export class CallingRepository {
   };
 
   readonly leaveCall = (conversationId: QualifiedId, reason: LEAVE_CALL_REASON): void => {
+    if (isCountlyEnabledAtCurrentEnvironment()) {
+      this.showCallQualityFeedbackModal();
+    }
+
     this.logger.info(`Ending call with reason ${reason} \n Stack trace: `, new Error().stack);
     const conversationIdStr = this.serializeQualifiedId(conversationId);
     delete this.poorCallQualityUsers[conversationIdStr];
     this.wCall?.end(this.wUser, conversationIdStr);
-
-    if (isCountlyEnabledAtCurrentEnvironment()) {
-      this.showCallQualityFeedbackModal();
-    }
   };
 
   muteCall(call: Call, shouldMute: boolean, reason?: MuteState): void {
