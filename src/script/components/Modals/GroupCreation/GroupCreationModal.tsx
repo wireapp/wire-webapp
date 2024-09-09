@@ -26,7 +26,7 @@ import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {Button, ButtonVariant, Select} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, Option, Select} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
@@ -306,6 +306,21 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
     setNameError('');
   };
 
+  const onProtocolChange = (option: Option | null) => {
+    if (!isProtocolOption(option)) {
+      return;
+    }
+
+    setSelectedProtocol(option);
+
+    if (
+      (selectedProtocol.value === ConversationProtocol.MLS && isServicesEnabled) ||
+      (selectedProtocol.value === ConversationProtocol.PROTEUS && !isServicesEnabled)
+    ) {
+      clickOnToggleServicesMode();
+    }
+  };
+
   const groupNameLength = groupName.length;
 
   const hasNameError = nameError.length > 0;
@@ -511,11 +526,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                   <>
                     <Select
                       id="select-protocol"
-                      onChange={option => {
-                        if (isProtocolOption(option)) {
-                          setSelectedProtocol(option);
-                        }
-                      }}
+                      onChange={onProtocolChange}
                       dataUieName="select-protocol"
                       options={protocolOptions}
                       value={selectedProtocol}
