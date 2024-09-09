@@ -186,6 +186,16 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
     };
   }, [stateIsParticipants]);
 
+  useEffect(() => {
+    if (selectedProtocol.value === ConversationProtocol.MLS && isServicesEnabled) {
+      clickOnToggleServicesMode();
+    }
+
+    if (selectedProtocol.value === ConversationProtocol.PROTEUS && !isServicesEnabled) {
+      clickOnToggleServicesMode();
+    }
+  }, [selectedProtocol]);
+
   if (!mainViewModel) {
     return null;
   }
@@ -476,16 +486,18 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                   toggleName={t('guestOptionsTitle')}
                   toggleId="guests"
                 />
-                <BaseToggle
-                  className="modal-style"
-                  isChecked={isServicesEnabled}
-                  setIsChecked={clickOnToggleServicesMode}
-                  extendedInfo
-                  extendedInfoText={t('servicesRoomToggleInfoExtended')}
-                  infoText={t('servicesRoomToggleInfo')}
-                  toggleName={t('servicesOptionsTitle')}
-                  toggleId="services"
-                />
+                {selectedProtocol.value !== ConversationProtocol.MLS && (
+                  <BaseToggle
+                    className="modal-style"
+                    isChecked={isServicesEnabled}
+                    setIsChecked={clickOnToggleServicesMode}
+                    extendedInfo
+                    extendedInfoText={t('servicesRoomToggleInfoExtended')}
+                    infoText={t('servicesRoomToggleInfo')}
+                    toggleName={t('servicesOptionsTitle')}
+                    toggleId="services"
+                  />
+                )}
                 <InfoToggle
                   className="modal-style"
                   dataUieName="read-receipts"
