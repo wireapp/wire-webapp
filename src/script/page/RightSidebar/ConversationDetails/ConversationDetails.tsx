@@ -19,7 +19,6 @@
 
 import {forwardRef, useCallback, useEffect, useMemo, useState} from 'react';
 
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {amplify} from 'amplify';
@@ -36,6 +35,7 @@ import {ServiceDetails} from 'Components/panel/ServiceDetails';
 import {UserDetails} from 'Components/panel/UserDetails';
 import {ServiceList} from 'Components/ServiceList/ServiceList';
 import {UserList} from 'Components/UserList';
+import {isMLSConversation} from 'src/script/conversation/ConversationSelectors';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {replaceReactComponents} from 'Util/LocalizerUtil/ReactLocalizerUtil';
@@ -168,7 +168,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       isActiveGroupParticipant &&
       !!teamId &&
       roleRepository.canToggleGuests(activeConversation) &&
-      activeConversation.protocol !== ConversationProtocol.MLS;
+      !isMLSConversation(activeConversation);
     const showOptionReadReceipts = !!teamId && roleRepository.canToggleReadReceipts(activeConversation);
 
     const showSectionOptions =
