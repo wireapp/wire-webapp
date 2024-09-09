@@ -304,8 +304,8 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
     setSelectedProtocol(option);
 
     if (
-      (selectedProtocol.value === ConversationProtocol.MLS && isServicesEnabled) ||
-      (selectedProtocol.value === ConversationProtocol.PROTEUS && !isServicesEnabled)
+      (option.value === ConversationProtocol.MLS && isServicesEnabled) ||
+      (option.value === ConversationProtocol.PROTEUS && !isServicesEnabled)
     ) {
       clickOnToggleServicesMode();
     }
