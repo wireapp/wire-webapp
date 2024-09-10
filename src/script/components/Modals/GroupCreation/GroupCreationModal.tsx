@@ -26,7 +26,7 @@ import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {Button, ButtonVariant, Select} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, Option, Select} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
@@ -296,6 +296,21 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
     setNameError('');
   };
 
+  const onProtocolChange = (option: Option | null) => {
+    if (!isProtocolOption(option)) {
+      return;
+    }
+
+    setSelectedProtocol(option);
+
+    if (
+      (option.value === ConversationProtocol.MLS && isServicesEnabled) ||
+      (option.value === ConversationProtocol.PROTEUS && !isServicesEnabled)
+    ) {
+      clickOnToggleServicesMode();
+    }
+  };
+
   const groupNameLength = groupName.length;
 
   const hasNameError = nameError.length > 0;
@@ -476,16 +491,18 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                   toggleName={t('guestOptionsTitle')}
                   toggleId="guests"
                 />
-                <BaseToggle
-                  className="modal-style"
-                  isChecked={isServicesEnabled}
-                  setIsChecked={clickOnToggleServicesMode}
-                  extendedInfo
-                  extendedInfoText={t('servicesRoomToggleInfoExtended')}
-                  infoText={t('servicesRoomToggleInfo')}
-                  toggleName={t('servicesOptionsTitle')}
-                  toggleId="services"
-                />
+                {selectedProtocol.value !== ConversationProtocol.MLS && (
+                  <BaseToggle
+                    className="modal-style"
+                    isChecked={isServicesEnabled}
+                    setIsChecked={clickOnToggleServicesMode}
+                    extendedInfo
+                    extendedInfoText={t('servicesRoomToggleInfoExtended')}
+                    infoText={t('servicesRoomToggleInfo')}
+                    toggleName={t('servicesOptionsTitle')}
+                    toggleId="services"
+                  />
+                )}
                 <InfoToggle
                   className="modal-style"
                   dataUieName="read-receipts"
@@ -499,11 +516,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                   <>
                     <Select
                       id="select-protocol"
-                      onChange={option => {
-                        if (isProtocolOption(option)) {
-                          setSelectedProtocol(option);
-                        }
-                      }}
+                      onChange={onProtocolChange}
                       dataUieName="select-protocol"
                       options={protocolOptions}
                       value={selectedProtocol}
