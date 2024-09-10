@@ -173,6 +173,17 @@ export class EventRepository {
   });
 
   /**
+   * Import events coming from an external source. This is only useful useful for profiling or debugging.
+   *
+   * @param events decrypted events
+   */
+  async importEvents(events: [HandledEventPayload]) {
+    for await (const event of events) {
+      await this.handleIncomingEvent(event, NotificationSource.NOTIFICATION_STREAM);
+    }
+  }
+
+  /**
    * connects to the websocket with the given account
    *
    * @param account the account to connect to
