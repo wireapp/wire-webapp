@@ -17,15 +17,17 @@
  *
  */
 
-import {useState, useEffect} from 'react';
+import {useState, useEffect, useRef} from 'react';
 
 import {Input, Switch} from '@wireapp/react-ui-kit';
 
 import {Config, Configuration} from 'src/script/Config';
+import {useClickOutside} from 'src/script/hooks/useClickOutside';
 
 export function ConfigToolbar() {
   const [showConfig, setShowConfig] = useState(false);
   const [configFeaturesState, setConfigFeaturesState] = useState<Configuration['FEATURE']>(Config.getConfig().FEATURE);
+  const wrapperRef = useRef(null);
 
   // Toggle config tool on 'cmd/ctrl + shift + 2'
   useEffect(() => {
@@ -107,12 +109,15 @@ export function ConfigToolbar() {
     });
   };
 
+  useClickOutside(wrapperRef, () => setShowConfig(false));
+
   if (!showConfig) {
     return null;
   }
 
   return (
     <div
+      ref={wrapperRef}
       style={{
         position: 'fixed',
         top: 0,
