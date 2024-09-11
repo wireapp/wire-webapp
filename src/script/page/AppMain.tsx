@@ -34,6 +34,7 @@ import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationM
 import {LegalHoldModal} from 'Components/Modals/LegalHoldModal/LegalHoldModal';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showUserModal, UserModal} from 'Components/Modals/UserModal';
+import {Config} from 'src/script/Config';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {AppLock} from './AppLock';
@@ -246,7 +247,7 @@ export const AppMain: FC<AppMainProps> = ({
       {!locked && <WindowTitleUpdater />}
       <RootProvider value={mainView}>
         <ErrorBoundary FallbackComponent={ErrorFallback}>
-          <ConfigToolbar />
+          {Config.getConfig().FEATURE.ENABLE_DEBUG && <ConfigToolbar />}
           {!locked && (
             <div id="app" className="app">
               {showLeftSidebar && (
