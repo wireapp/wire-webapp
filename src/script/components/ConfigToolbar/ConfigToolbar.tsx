@@ -25,7 +25,7 @@ import {Config, Configuration} from 'src/script/Config';
 
 export function ConfigToolbar() {
   const [showConfig, setShowConfig] = useState(false);
-  const [configState, setConfigState] = useState<Configuration>(Config.getConfig());
+  const [configFeaturesState, setConfigFeaturesState] = useState<Configuration['FEATURE']>(Config.getConfig().FEATURE);
 
   // Toggle config tool on 'cmd/ctrl + shift + 2'
   useEffect(() => {
@@ -51,10 +51,10 @@ export function ConfigToolbar() {
       }
     };
 
-    const updatedConfig = {...configState};
+    const updatedConfig = {...configFeaturesState};
     updateConfig(updatedConfig, path.split('.'));
-    setConfigState(updatedConfig);
-    Config._dangerouslySetConfigForDebug(updatedConfig);
+    setConfigFeaturesState(updatedConfig);
+    Config._dangerouslySetConfigFeaturesForDebug(updatedConfig);
   };
 
   const renderInput = (value: string | boolean | string[] | number | object | null, path: string) => {
@@ -130,7 +130,7 @@ export function ConfigToolbar() {
         Caution: Modifying these settings can affect the behavior of the application. Ensure you understand the
         implications of each change before proceeding. Changes may cause unexpected behavior.
       </h4>
-      <div>{renderConfig(configState)}</div>
+      <div>{renderConfig(configFeaturesState)}</div>
     </div>
   );
 }
