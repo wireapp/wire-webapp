@@ -130,7 +130,7 @@ export function ConfigToolbar() {
         Caution: Modifying these settings can affect the behavior of the application. Ensure you understand the
         implications of each change before proceeding. Changes may cause unexpected behavior.
       </h4>
-      <form>{renderConfig(configState)}</form>
+      <div>{renderConfig(configState)}</div>
     </div>
   );
 }
