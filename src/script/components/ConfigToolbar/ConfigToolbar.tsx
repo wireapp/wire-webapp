@@ -128,6 +128,7 @@ export function ConfigToolbar() {
         padding: '20px',
         overflow: 'auto',
         zIndex: 100000000,
+        boxShadow: '3px 1px 6px 1px #000',
       }}
     >
       <h3>Configuration Tool</h3>
