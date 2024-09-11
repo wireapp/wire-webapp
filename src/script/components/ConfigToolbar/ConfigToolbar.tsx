@@ -19,7 +19,7 @@
 
 import {useState, useEffect, useRef} from 'react';
 
-import {Input, Switch} from '@wireapp/react-ui-kit';
+import {Button, Input, Switch} from '@wireapp/react-ui-kit';
 
 import {Config, Configuration} from 'src/script/Config';
 import {useClickOutside} from 'src/script/hooks/useClickOutside';
@@ -137,6 +137,10 @@ export function ConfigToolbar() {
         implications of each change before proceeding. Changes may cause unexpected behavior.
       </h4>
       <div>{renderConfig(configFeaturesState)}</div>
+      <h3>Debug Functions</h3>
+      <Button onClick={() => window.wire?.app?.debug?.reconnectWebSocket()}>reconnectWebSocket</Button>
+      <Button onClick={() => window.wire?.app?.debug?.enablePushToTalk()}>enablePushToTalk</Button>
+      <Button onClick={() => window.wire?.app?.debug?.enablePushToTalk(null)}>disablePushToTalk</Button>
     </div>
   );
 }
