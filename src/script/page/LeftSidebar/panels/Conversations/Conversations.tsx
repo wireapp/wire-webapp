@@ -398,7 +398,6 @@ const Conversations: React.FC<ConversationsProps> = ({
                 currentFolder={currentFolder}
                 conversationLabelRepository={conversationLabelRepository}
                 callState={callState}
-                currentTab={currentTab}
                 currentFocus={currentFocus}
                 listViewModel={listViewModel}
                 connectRequests={connectRequests}

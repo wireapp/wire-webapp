@@ -27,7 +27,6 @@ import {ConversationRepository} from 'src/script/conversation/ConversationReposi
 import {ConversationState} from 'src/script/conversation/ConversationState';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
-import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {ListViewModel} from 'src/script/view_model/ListViewModel';
 import {TestFactory} from 'test/helper/TestFactory';
 
@@ -48,7 +47,6 @@ const create1to1Conversation = (userName: string) => {
 
 describe('ConversationsList', () => {
   let listViewModel: ListViewModel;
-  let currentTab: SidebarTabs;
   let connectRequests: User[];
   let conversationState: ConversationState;
   let callState: CallState;
@@ -64,7 +62,6 @@ describe('ConversationsList', () => {
 
   beforeEach(async () => {
     listViewModel = {} as ListViewModel;
-    currentTab = SidebarTabs.DIRECTS;
     connectRequests = [];
     conversationState = {isActiveConversation: ko.observable(false) as any} as ConversationState;
     callState = {joinableCalls: ko.pureComputed(() => [] as any[]) as any} as CallState;
@@ -88,7 +85,6 @@ describe('ConversationsList', () => {
         conversations={conversations}
         conversationsFilter={searchFilter}
         listViewModel={listViewModel}
-        currentTab={currentTab}
         connectRequests={connectRequests}
         conversationState={conversationState}
         callState={callState}

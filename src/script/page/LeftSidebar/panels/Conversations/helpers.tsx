@@ -92,3 +92,10 @@ export function getTabConversations({
     searchInputPlaceholder: '',
   };
 }
+
+export const conversationSearchFilter = (filter: string) => (conversation: Conversation) => {
+  const filterWord = replaceAccents(filter.toLowerCase());
+  const conversationDisplayName = replaceAccents(conversation.display_name().toLowerCase());
+
+  return conversationDisplayName.includes(filterWord);
+};
