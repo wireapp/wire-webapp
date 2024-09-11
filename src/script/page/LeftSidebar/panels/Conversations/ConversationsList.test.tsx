@@ -33,6 +33,9 @@ import {TestFactory} from 'test/helper/TestFactory';
 
 import {ConversationsList} from './ConversationsList';
 
+import {SearchRepository} from '../../../../search/SearchRepository';
+import {UserRepository} from '../../../../user/UserRepository';
+
 const create1to1Conversation = (userName: string) => {
   const conversation = new Conversation('id', 'domain', ConversationProtocol.PROTEUS);
   const user = new User('id', 'domain');
@@ -57,6 +60,7 @@ describe('ConversationsList', () => {
   let isConversationFilterFocused: boolean;
   let conversationLabelRepository: ConversationLabelRepository;
   let conversationRepository: ConversationRepository;
+  let searchRepository: SearchRepository;
 
   beforeEach(async () => {
     listViewModel = {} as ListViewModel;
@@ -73,6 +77,7 @@ describe('ConversationsList', () => {
 
     const testFactory = new TestFactory();
     conversationRepository = await testFactory.exposeConversationActors();
+    searchRepository = new SearchRepository({} as UserRepository);
   });
 
   const renderComponent = (conversations: Conversation[], searchFilter: string = '') =>
@@ -93,6 +98,9 @@ describe('ConversationsList', () => {
         handleArrowKeyDown={handleArrowKeyDown}
         clearSearchFilter={clearSearchFilter}
         isConversationFilterFocused={isConversationFilterFocused}
+        favoriteConversations={[]}
+        archivedConversations={[]}
+        searchRepository={searchRepository}
       />,
     );
 
