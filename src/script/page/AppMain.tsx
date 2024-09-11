@@ -28,6 +28,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingContainer} from 'Components/calling/CallingOverlayContainer';
 import {ChooseScreen} from 'Components/calling/ChooseScreen';
+import {ConfigToolbar} from 'Components/ConfigToolbar/ConfigToolbar';
 import {ErrorFallback} from 'Components/ErrorFallback';
 import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationModal';
 import {LegalHoldModal} from 'Components/Modals/LegalHoldModal/LegalHoldModal';
@@ -245,6 +246,7 @@ export const AppMain: FC<AppMainProps> = ({
       {!locked && <WindowTitleUpdater />}
       <RootProvider value={mainView}>
         <ErrorBoundary FallbackComponent={ErrorFallback}>
+          <ConfigToolbar />
           {!locked && (
             <div id="app" className="app">
               {showLeftSidebar && (

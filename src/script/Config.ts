@@ -33,7 +33,7 @@ export const ACCENT_ID = {
   TURQUOISE: 6,
 };
 
-const config = {
+let config = {
   ...env,
   APP_INSTANCE_ID: createUuid(),
   FEATURE: {
@@ -94,6 +94,9 @@ export type Configuration = typeof config;
 const Config = {
   getConfig: () => {
     return config;
+  },
+  _dangerouslySetConfigForDebug: (newConfig: Configuration) => {
+    config = newConfig;
   },
   getDesktopConfig: () => {
     if (!Runtime.isDesktopApp) {
