@@ -34,6 +34,7 @@ import {matchQualifiedIds} from 'Util/QualifiedId';
 import {replaceAccents} from 'Util/StringUtil';
 
 import {ConnectionRequests} from './ConnectionRequests';
+import {headingTitle} from './ConversationsList.styles';
 
 import {CallState} from '../../../../calling/CallState';
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
@@ -41,6 +42,7 @@ import {ConversationState} from '../../../../conversation/ConversationState';
 import {Conversation} from '../../../../entity/Conversation';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from '../../../../router/routerBindings';
+import {SearchRepository} from '../../../../search/SearchRepository';
 import {ListViewModel} from '../../../../view_model/ListViewModel';
 import {useAppMainState, ViewType} from '../../../state';
 import {ContentState, useAppState} from '../../../useAppState';
@@ -49,6 +51,7 @@ interface ConversationsListProps {
   callState: CallState;
   connectRequests: User[];
   conversationRepository: ConversationRepository;
+  searchRepository: SearchRepository;
   conversations: Conversation[];
   conversationState: ConversationState;
   listViewModel: ListViewModel;
@@ -61,11 +64,15 @@ interface ConversationsListProps {
   handleArrowKeyDown: (index: number) => (e: React.KeyboardEvent) => void;
   clearSearchFilter: () => void;
   isConversationFilterFocused: boolean;
+  favoriteConversations: Conversation[];
+  archivedConversations: Conversation[];
 }
 
 export const ConversationsList = ({
   conversations,
   conversationsFilter,
+  conversationRepository,
+  searchRepository,
   listViewModel,
   currentTab,
   connectRequests,
@@ -77,6 +84,8 @@ export const ConversationsList = ({
   handleArrowKeyDown,
   clearSearchFilter,
   isConversationFilterFocused,
+  favoriteConversations,
+  archivedConversations,
 }: ConversationsListProps) => {
   const contentState = useAppState(state => state.contentState);
 
@@ -136,16 +145,20 @@ export const ConversationsList = ({
   });
 
   const isFolderView = currentTab === SidebarTabs.FOLDER;
+  const isFavoritesView = currentTab === SidebarTabs.FAVORITES;
+  const isGroupsView = currentTab === SidebarTabs.GROUPS;
+  const isDirectsView = currentTab === SidebarTabs.DIRECTS;
+  const isArchivesView = currentTab === SidebarTabs.ARCHIVES;
+
+  const conversationSearchFilter = (conversation: Conversation) => {
+    const filterWord = replaceAccents(conversationsFilter.toLowerCase());
+    const conversationDisplayName = replaceAccents(conversation.display_name().toLowerCase());
+
+    return conversationDisplayName.includes(filterWord);
+  };
 
   const getConversationView = () => {
     if (isFolderView && currentFolder) {
-      const conversationSearchFilter = (conversation: Conversation) => {
-        const filterWord = replaceAccents(conversationsFilter.toLowerCase());
-        const conversationDisplayName = replaceAccents(conversation.display_name().toLowerCase());
-
-        return conversationDisplayName.includes(filterWord);
-      };
-
       return (
         <>
           {currentFolder
@@ -167,18 +180,62 @@ export const ConversationsList = ({
     );
   };
 
+  const getFilteredGroupConversations = () => {
+    const {query, isHandleQuery} = searchRepository.normalizeQuery(conversationsFilter);
+    let filteredGroupConversations = conversationRepository.getGroupsByName(query, isHandleQuery);
+
+    if (isFavoritesView) {
+      filteredGroupConversations = favoriteConversations.filter(item => filteredGroupConversations.includes(item));
+    }
+
+    if (isArchivesView) {
+      filteredGroupConversations = archivedConversations.filter(item => filteredGroupConversations.includes(item));
+    }
+
+    if (isFolderView && currentFolder) {
+      filteredGroupConversations =
+        currentFolder?.conversations()?.filter(item => filteredGroupConversations.includes(item)) || [];
+    }
+
+    if (!isArchivesView) {
+      filteredGroupConversations = filteredGroupConversations.filter(item => !archivedConversations.includes(item));
+    }
+
+    if (!filteredGroupConversations.length) {
+      return null;
+    }
+
+    return (
+      <div>
+        <h3 css={headingTitle}>{t('searchGroups')}</h3>
+
+        <ul css={css({margin: 0, paddingLeft: 0})} data-uie-name="conversation-view">
+          {filteredGroupConversations.map((conversation, index) => (
+            <>
+              <ConversationListCell key={conversation.id} {...getCommonConversationCellProps(conversation, index)} />
+            </>
+          ))}
+        </ul>
+      </div>
+    );
+  };
+
   return (
     <>
       <h2 className="visually-hidden">{t('conversationViewTooltip')}</h2>
 
-      <ul css={css({margin: 0, paddingLeft: 0})} data-uie-name="conversation-view">
-        <ConnectionRequests
-          connectionRequests={connectRequests}
-          onConnectionRequestClick={onConnectionRequestClick}
-          isShowingConnectionRequests={isShowingConnectionRequests}
-        />
-        {getConversationView()}
-      </ul>
+      <div>
+        <ul css={css({margin: 0, paddingLeft: 0})} data-uie-name="conversation-view">
+          <ConnectionRequests
+            connectionRequests={connectRequests}
+            onConnectionRequestClick={onConnectionRequestClick}
+            isShowingConnectionRequests={isShowingConnectionRequests}
+          />
+          {getConversationView()}
+        </ul>
+      </div>
+
+      {conversationsFilter && !isGroupsView && !isDirectsView && getFilteredGroupConversations()}
     </>
   );
 };

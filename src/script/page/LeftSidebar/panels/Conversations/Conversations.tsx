@@ -409,6 +409,9 @@ const Conversations: React.FC<ConversationsProps> = ({
                 resetConversationFocus={resetConversationFocus}
                 clearSearchFilter={clearConversationFilter}
                 isConversationFilterFocused={isConversationFilterFocused}
+                searchRepository={searchRepository}
+                favoriteConversations={favoriteConversations}
+                archivedConversations={archivedConversations}
               />
             )}
           </>

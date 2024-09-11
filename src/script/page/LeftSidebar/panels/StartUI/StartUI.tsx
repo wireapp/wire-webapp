@@ -26,7 +26,6 @@ import {showInviteModal} from 'Components/Modals/InviteModal';
 import {showServiceModal} from 'Components/Modals/ServiceModal';
 import {showUserModal} from 'Components/Modals/UserModal';
 import {SearchInput} from 'Components/SearchInput';
-import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {IntegrationRepository} from 'src/script/integration/IntegrationRepository';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
@@ -139,10 +138,6 @@ const StartUI: React.FC<StartUIProps> = ({
 
   const openInviteModal = () => showInviteModal({selfUser});
 
-  const openConversation = async (conversation: Conversation): Promise<void> => {
-    await actions.openGroupConversation(conversation);
-  };
-
   const before = (
     <div id="start-ui-header" className={cx('start-ui-header', {'start-ui-header-integrations': isTeam})}>
       <div className="start-ui-header-user-input" data-uie-name="enter-search">
@@ -203,7 +198,6 @@ const StartUI: React.FC<StartUIProps> = ({
           canInviteTeamMembers={canInviteTeamMembers()}
           userRepository={userRepository}
           onClickContact={openContact}
-          onClickConversation={openConversation}
           onClickUser={openOther}
           onSearchResults={searchResult => (peopleSearchResults.current = searchResult)}
         />

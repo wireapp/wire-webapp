@@ -25,7 +25,6 @@ import {partition} from 'underscore';
 
 import * as Icon from 'Components/Icon';
 import {UserList, UserlistMode} from 'Components/UserList';
-import {Conversation} from 'src/script/entity/Conversation';
 import {UserRepository} from 'src/script/user/UserRepository';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
@@ -33,7 +32,6 @@ import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {sortByPriority} from 'Util/StringUtil';
 import {isBackendError} from 'Util/TypePredicateUtil';
 
-import {GroupList} from './components/GroupList';
 import {TopPeople} from './components/TopPeople';
 
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
@@ -46,7 +44,7 @@ import {TeamRepository} from '../../../../team/TeamRepository';
 import {TeamState} from '../../../../team/TeamState';
 import {UserState} from '../../../../user/UserState';
 
-export type SearchResultsData = {contacts: User[]; others: User[]; groups: Conversation[]};
+export type SearchResultsData = {contacts: User[]; others: User[]};
 
 interface PeopleTabProps {
   canInviteTeamMembers: boolean;
@@ -56,7 +54,6 @@ interface PeopleTabProps {
   isFederated: boolean;
   isTeam: boolean;
   onClickContact: (user: User) => void;
-  onClickConversation: (conversation: Conversation) => void;
   onClickUser: (user: User) => void;
   onSearchResults: (results: SearchResultsData | undefined) => void;
   searchQuery: string;
@@ -83,7 +80,6 @@ export const PeopleTab = ({
   conversationRepository,
   userRepository,
   onClickContact,
-  onClickConversation,
   onClickUser,
   onSearchResults,
 }: PeopleTabProps) => {
@@ -118,7 +114,7 @@ export const PeopleTab = ({
     return contacts.filter(user => user.isAvailable());
   };
 
-  const [results, setResults] = useState<SearchResultsData>({contacts: getLocalUsers(), others: [], groups: []});
+  const [results, setResults] = useState<SearchResultsData>({contacts: getLocalUsers(), others: []});
   const searchOnFederatedDomain = () => '';
   const hasResults = results.contacts.length + results.others.length > 0;
 
@@ -163,9 +159,9 @@ export const PeopleTab = ({
   useDebounce(
     async () => {
       setHasFederationError(false);
-      const {query, isHandleQuery} = searchRepository.normalizeQuery(searchQuery);
+      const {query} = searchRepository.normalizeQuery(searchQuery);
       if (!query) {
-        setResults({contacts: getLocalUsers(), others: [], groups: []});
+        setResults({contacts: getLocalUsers(), others: []});
         onSearchResults(undefined);
         return;
       }
@@ -182,7 +178,6 @@ export const PeopleTab = ({
       const localSearchResults: SearchResultsData = {
         contacts: filteredResults,
         others: [],
-        groups: conversationRepository.getGroupsByName(query, isHandleQuery),
       };
       setResults(localSearchResults);
       onSearchResults(localSearchResults);
@@ -316,14 +311,7 @@ export const PeopleTab = ({
             </div>
           </div>
         )}
-        {Boolean(results.groups.length) && (
-          <div className="start-ui-groups">
-            <h3 className="start-ui-list-header">{isTeam ? t('searchTeamGroups') : t('searchGroups')}</h3>
-            <div className="group-list">
-              <GroupList groups={results.groups} click={onClickConversation} />
-            </div>
-          </div>
-        )}
+
         {results.others.length > 0 && (
           <div className="others">
             <h3 className="start-ui-list-header">
