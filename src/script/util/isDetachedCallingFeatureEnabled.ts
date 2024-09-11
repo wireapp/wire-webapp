@@ -22,5 +22,9 @@ import {Runtime} from '@wireapp/commons';
 import {Config} from '../Config';
 
 export const isDetachedCallingFeatureEnabled = () => {
+  if (!Config.getConfig().FEATURE.ENABLE_DETACHED_CALLING_WINDOW) {
+    return false;
+  }
+
   return Runtime.isDesktopApp() ? Boolean(Config.getDesktopConfig()?.supportsCallingPopoutWindow) : true;
 };
