@@ -27,11 +27,13 @@ import {ConversationRepository} from 'src/script/conversation/ConversationReposi
 import {ConversationState} from 'src/script/conversation/ConversationState';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
-import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {ListViewModel} from 'src/script/view_model/ListViewModel';
 import {TestFactory} from 'test/helper/TestFactory';
 
 import {ConversationsList} from './ConversationsList';
+
+import {SearchRepository} from '../../../../search/SearchRepository';
+import {UserRepository} from '../../../../user/UserRepository';
 
 const create1to1Conversation = (userName: string) => {
   const conversation = new Conversation('id', 'domain', ConversationProtocol.PROTEUS);
@@ -45,7 +47,6 @@ const create1to1Conversation = (userName: string) => {
 
 describe('ConversationsList', () => {
   let listViewModel: ListViewModel;
-  let currentTab: SidebarTabs;
   let connectRequests: User[];
   let conversationState: ConversationState;
   let callState: CallState;
@@ -57,10 +58,10 @@ describe('ConversationsList', () => {
   let isConversationFilterFocused: boolean;
   let conversationLabelRepository: ConversationLabelRepository;
   let conversationRepository: ConversationRepository;
+  let searchRepository: SearchRepository;
 
   beforeEach(async () => {
     listViewModel = {} as ListViewModel;
-    currentTab = SidebarTabs.DIRECTS;
     connectRequests = [];
     conversationState = {isActiveConversation: ko.observable(false) as any} as ConversationState;
     callState = {joinableCalls: ko.pureComputed(() => [] as any[]) as any} as CallState;
@@ -73,6 +74,7 @@ describe('ConversationsList', () => {
 
     const testFactory = new TestFactory();
     conversationRepository = await testFactory.exposeConversationActors();
+    searchRepository = new SearchRepository({} as UserRepository);
   });
 
   const renderComponent = (conversations: Conversation[], searchFilter: string = '') =>
@@ -83,7 +85,6 @@ describe('ConversationsList', () => {
         conversations={conversations}
         conversationsFilter={searchFilter}
         listViewModel={listViewModel}
-        currentTab={currentTab}
         connectRequests={connectRequests}
         conversationState={conversationState}
         callState={callState}
@@ -93,6 +94,9 @@ describe('ConversationsList', () => {
         handleArrowKeyDown={handleArrowKeyDown}
         clearSearchFilter={clearSearchFilter}
         isConversationFilterFocused={isConversationFilterFocused}
+        favoriteConversations={[]}
+        archivedConversations={[]}
+        searchRepository={searchRepository}
       />,
     );
 
