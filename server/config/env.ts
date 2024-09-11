@@ -165,7 +165,7 @@ export type Env = {
   FEATURE_ENABLE_IN_CALL_REACTIONS: string;
 
   /** Feature to enable calling popout window */
-  ENABLE_DETACHED_CALLING_WINDOW: string;
+  FEATURE_ENABLE_DETACHED_CALLING_WINDOW: string;
 
   /** Sets the verification ID for Google webmasters */
   GOOGLE_WEBMASTER_ID: string;
