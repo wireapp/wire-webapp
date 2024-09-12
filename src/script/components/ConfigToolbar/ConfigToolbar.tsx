@@ -92,14 +92,7 @@ export function ConfigToolbar() {
   const renderConfig = (configObj: object, parentPath: string = '') => {
     const entries = Object.entries(configObj);
 
-    // Separate the FEATURE key and other keys
-    const featureEntry = entries.find(([key]) => key === 'FEATURE');
-    const otherEntries = entries.filter(([key]) => key !== 'FEATURE');
-
-    // Put FEATURE key first, followed by other keys
-    const sortedEntries = featureEntry ? [featureEntry, ...otherEntries] : otherEntries;
-
-    return sortedEntries.map(([key, value]) => {
+    return entries.map(([key, value]) => {
       const path = parentPath ? `${parentPath}.${key}` : key;
       return (
         <div key={path} style={{marginBottom: '10px'}}>
