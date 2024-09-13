@@ -25,6 +25,8 @@ import {Config, Configuration} from 'src/script/Config';
 import {useClickOutside} from 'src/script/hooks/useClickOutside';
 import {isMetaKey} from 'Util/KeyboardUtil';
 
+import {wrapperStyles} from './ConfigToolbar.styles';
+
 export function ConfigToolbar() {
   const [showConfig, setShowConfig] = useState(false);
   const [configFeaturesState, setConfigFeaturesState] = useState<Configuration['FEATURE']>(Config.getConfig().FEATURE);
@@ -110,21 +112,7 @@ export function ConfigToolbar() {
   }
 
   return (
-    <div
-      ref={wrapperRef}
-      style={{
-        position: 'fixed',
-        top: 0,
-        right: 0,
-        width: '400px',
-        height: '100vh',
-        backgroundColor: '#f4f4f4',
-        padding: '20px',
-        overflow: 'auto',
-        zIndex: 100000000,
-        boxShadow: '3px 1px 6px 1px #000',
-      }}
-    >
+    <div ref={wrapperRef} css={wrapperStyles}>
       <h3>Configuration Tool</h3>
       <h4 style={{color: 'red', fontWeight: 'bold'}}>
         Caution: Modifying these settings can affect the behavior of the application. Ensure you understand the
