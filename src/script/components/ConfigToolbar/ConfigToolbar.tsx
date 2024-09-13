@@ -19,11 +19,12 @@
 
 import {useState, useEffect, useRef} from 'react';
 
+import keyboardjs from 'keyboardjs';
+
 import {Button, Input, Switch} from '@wireapp/react-ui-kit';
 
 import {Config, Configuration} from 'src/script/Config';
 import {useClickOutside} from 'src/script/hooks/useClickOutside';
-import {isMetaKey} from 'Util/KeyboardUtil';
 
 import {wrapperStyles} from './ConfigToolbar.styles';
 
@@ -34,15 +35,14 @@ export function ConfigToolbar() {
 
   // Toggle config tool on 'cmd/ctrl + shift + 2'
   useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (isMetaKey(event) && event.shiftKey && event.key === '2') {
-        setShowConfig(prev => !prev);
-      }
+    const handleKeyDown = () => {
+      setShowConfig(prev => !prev);
     };
 
-    window.addEventListener('keydown', handleKeyDown);
+    keyboardjs.bind(['command+shift+2', 'ctrl+shift+2'], handleKeyDown);
+
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
+      keyboardjs.unbind(['command+shift+2', 'ctrl+shift+2'], handleKeyDown);
     };
   }, []);
 
