@@ -80,22 +80,18 @@ describe('CallParticipantsListItem', () => {
     expect(getByTestId('element-avatar-user')).toBeDefined();
   });
 
-  it('should render participant user name and availability status', () => {
+  it('should render participant user name', () => {
     const participantName = 'John Doe';
     const participant = createMockParticipant({
       name: participantName,
-      availability: Availability.Type.AVAILABLE,
       isSelfUser: false,
     });
 
-    const {getByTestId, getByText} = render(
-      <CallParticipantsListItem showContextMenu onContextMenu={jest.fn()} callParticipant={participant} selfInTeam />,
+    const {getByText} = render(
+      <CallParticipantsListItem showContextMenu onContextMenu={jest.fn()} callParticipant={participant} />,
     );
 
     expect(getByText(participantName)).toBeDefined();
-
-    const availabilityElement = getByTestId('status-availability-icon');
-    expect(availabilityElement.dataset.uieValue).toEqual('available');
   });
 
   it('should mark user as self if relevant', () => {

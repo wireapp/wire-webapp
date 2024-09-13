@@ -68,7 +68,17 @@ function parseCommaSeparatedList(list: string = ''): string[] {
   return cleanedList.split(',');
 }
 
-function mergedCSP({urls}: ConfigGeneratorParams, env: Record<string, string>): Record<string, Iterable<string>> {
+// This is a constant that is used to use as CSP nonce for the countly script
+const COUNTLY_NONCE = {
+  value: '36f73136-20aa-4c87-aff4-667cdc814d98',
+  cspString: "'nonce-36f73136-20aa-4c87-aff4-667cdc814d98'",
+};
+
+function mergedCSP(
+  {urls}: ConfigGeneratorParams,
+  env: Record<string, string>,
+  countlyCSPNonce: string,
+): Record<string, Iterable<string>> {
   const objectSrc = parseCommaSeparatedList(env.CSP_EXTRA_OBJECT_SRC);
   const csp = {
     connectSrc: [...defaultCSP.connectSrc, urls.api, urls.ws, ...parseCommaSeparatedList(env.CSP_EXTRA_CONNECT_SRC)],
@@ -79,7 +89,7 @@ function mergedCSP({urls}: ConfigGeneratorParams, env: Record<string, string>): 
     manifestSrc: [...defaultCSP.manifestSrc, ...parseCommaSeparatedList(env.CSP_EXTRA_MANIFEST_SRC)],
     mediaSrc: [...defaultCSP.mediaSrc, ...parseCommaSeparatedList(env.CSP_EXTRA_MEDIA_SRC)],
     objectSrc: objectSrc.length > 0 ? objectSrc : ["'none'"],
-    scriptSrc: [...defaultCSP.scriptSrc, ...parseCommaSeparatedList(env.CSP_EXTRA_SCRIPT_SRC)],
+    scriptSrc: [...defaultCSP.scriptSrc, ...parseCommaSeparatedList(env.CSP_EXTRA_SCRIPT_SRC), countlyCSPNonce],
     styleSrc: [...defaultCSP.styleSrc, ...parseCommaSeparatedList(env.CSP_EXTRA_STYLE_SRC)],
     workerSrc: [...defaultCSP.workerSrc, ...parseCommaSeparatedList(env.CSP_EXTRA_WORKER_SRC)],
   };
@@ -95,10 +105,11 @@ export function generateConfig(params: ConfigGeneratorParams, env: Env) {
     COMMIT: commit,
     VERSION: version,
     CACHE_DURATION_SECONDS: 300,
-    CSP: mergedCSP(params, env),
+    CSP: mergedCSP(params, env, COUNTLY_NONCE.cspString),
     BACKEND_REST: urls.api,
     BACKEND_WS: urls.ws,
     DEVELOPMENT: nodeEnv === 'development',
+    DEVELOPMENT_ENABLE_TLS: urls.base.startsWith('https://'),
     ENFORCE_HTTPS: env.ENFORCE_HTTPS != 'false',
     ENVIRONMENT: nodeEnv,
     GOOGLE_WEBMASTER_ID: env.GOOGLE_WEBMASTER_ID,
@@ -114,6 +125,8 @@ export function generateConfig(params: ConfigGeneratorParams, env: Env) {
       ALLOWED_HOSTS: ['app.wire.com'],
       DISALLOW: readFile(ROBOTS_DISALLOW_FILE, 'User-agent: *\r\nDisallow: /'),
     },
+    COUNTLY_API_KEY: env.COUNTLY_API_KEY || '',
+    COUNTLY_NONCE: COUNTLY_NONCE.value,
     SSL_CERTIFICATE_KEY_PATH:
       env.SSL_CERTIFICATE_KEY_PATH || path.join(__dirname, '../certificate/development-key.pem'),
     SSL_CERTIFICATE_PATH: env.SSL_CERTIFICATE_PATH || path.join(__dirname, '../certificate/development-cert.pem'),

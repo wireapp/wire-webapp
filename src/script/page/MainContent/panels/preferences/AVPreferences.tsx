@@ -29,6 +29,7 @@ import {SaveCallLogs} from './avPreferences/SaveCallLogs';
 import {PreferencesPage} from './components/PreferencesPage';
 
 import type {CallingRepository} from '../../../../calling/CallingRepository';
+import {useInitializeMediaDevices} from '../../../../hooks/useInitializeMediaDevices';
 import type {MediaRepository} from '../../../../media/MediaRepository';
 import type {PropertiesRepository} from '../../../../properties/PropertiesRepository';
 
@@ -48,17 +49,24 @@ const AVPreferences = ({
     MediaDeviceType.AUDIO_OUTPUT,
     MediaDeviceType.VIDEO_INPUT,
   ]);
+  const {isMediaDevicesAreInitialized} = useInitializeMediaDevices(devicesHandler, streamHandler);
 
   return (
     <PreferencesPage title={t('preferencesAV')}>
-      {deviceSupport.audioinput && (
+      {isMediaDevicesAreInitialized && (
+        <div className="preferences-av-spinner-select">
+          <div className="icon-spinner spin accent-text"></div>
+        </div>
+      )}
+      {!isMediaDevicesAreInitialized && deviceSupport.audioinput && (
         <MicrophonePreferences
           {...{devicesHandler, streamHandler}}
           refreshStream={() => callingRepository.refreshAudioInput()}
+          hasActiveCall={callingRepository.hasActiveCall()}
         />
       )}
-      {deviceSupport.audiooutput && <AudioOutPreferences {...{devicesHandler}} />}
-      {deviceSupport.videoinput && (
+      {!isMediaDevicesAreInitialized && deviceSupport.audiooutput && <AudioOutPreferences {...{devicesHandler}} />}
+      {!isMediaDevicesAreInitialized && deviceSupport.videoinput && (
         <CameraPreferences
           {...{devicesHandler, streamHandler}}
           refreshStream={() => callingRepository.refreshVideoInput()}

@@ -25,18 +25,16 @@ import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {User} from '../../../../../entity/User';
+import {ContentState, useAppState} from '../../../../useAppState';
 
 interface ConnectionRequestsProps {
   connectionRequests: User[];
-  isShowingConnectionRequests?: boolean;
   onConnectionRequestClick: () => void;
 }
 
-export const ConnectionRequests = ({
-  connectionRequests,
-  isShowingConnectionRequests = false,
-  onConnectionRequestClick,
-}: ConnectionRequestsProps) => {
+export const ConnectionRequests = ({connectionRequests, onConnectionRequestClick}: ConnectionRequestsProps) => {
+  const contentState = useAppState(state => state.contentState);
+  const isShowingConnectionRequests = contentState === ContentState.CONNECTION_REQUESTS;
   const connectionRequestsCount = connectionRequests.length;
 
   if (connectionRequestsCount === 0) {

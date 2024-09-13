@@ -67,6 +67,7 @@ const MentionSuggestionsItemComponent: React.ForwardRefRenderFunction<HTMLDivEle
         participant={suggestion}
         avatarSize={AVATAR_SIZE.XXX_SMALL}
         className="mention-suggestion-list__item__avatar"
+        hideAvailabilityStatus
       />
       <div className="mention-suggestion-list__item__name" data-uie-name="status-name">
         {name}

@@ -71,6 +71,20 @@ const SHORTCUT_MAP: Record<string, Shortcut> = {
       },
     },
   },
+  [ShortcutType.SEARCH]: {
+    event: WebAppEvents.SHORTCUT.SEARCH,
+    shortcut: {
+      electron: {
+        macos: 'command + k',
+        menu: true,
+        pc: 'ctrl + k',
+      },
+      webapp: {
+        macos: 'command + k',
+        pc: 'ctrl + alt + k',
+      },
+    },
+  },
   [ShortcutType.PREV]: {
     event: WebAppEvents.SHORTCUT.PREV,
     shortcut: {

@@ -25,8 +25,8 @@ import {Message} from '../entity/message/Message';
 import {User} from '../entity/User';
 
 export enum ViewType {
-  CENTRAL_COLUMN = 0,
-  LEFT_SIDEBAR = 1,
+  MOBILE_CENTRAL_COLUMN = 0,
+  MOBILE_LEFT_SIDEBAR = 1,
 }
 
 type RightSidebarParams = {
@@ -54,11 +54,15 @@ type AppMainState = {
     lastViewedMessageDetailsEntity: Message | null;
     updateEntity: (entity: RightSidebarParams['entity']) => void;
   };
+  leftSidebar: {
+    isHidden: boolean;
+    hide: (shouldHide: boolean) => void;
+  };
 };
 
 const useAppMainState = create<AppMainState>((set, get) => ({
   responsiveView: {
-    currentView: ViewType.LEFT_SIDEBAR,
+    currentView: ViewType.MOBILE_LEFT_SIDEBAR,
     setCurrentView: (view: ViewType) =>
       set(state => ({...state, responsiveView: {...state.responsiveView, currentView: view}})),
   },
@@ -117,6 +121,11 @@ const useAppMainState = create<AppMainState>((set, get) => ({
     isAddMode: false,
     updateEntity: (entity: RightSidebarParams['entity']) =>
       set(state => ({...state, rightSidebar: {...state.rightSidebar, entity}})),
+  },
+  leftSidebar: {
+    isHidden: false,
+    hide: (shouldHide: boolean) =>
+      set(state => ({...state, leftSidebar: {...state.leftSidebar, isHidden: shouldHide}})),
   },
 }));
 

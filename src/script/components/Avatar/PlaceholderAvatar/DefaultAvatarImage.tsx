@@ -42,7 +42,7 @@ export function DefaultAvatarImageSmall({diameter}: {diameter: number}) {
 
 export function DefaultAvatarImageLarge({diameter}: {diameter: number}) {
   return (
-    <svg width={diameter} height={diameter} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg width={diameter} height={diameter} viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path
         d="M100.381 200c55.228 0 100-44.772 100-100s-44.772-100-100-100c-55.229 0-100 44.772-100 100s44.771 100 100 100Z"
         fill="#fff"

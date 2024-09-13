@@ -20,6 +20,7 @@
 export enum ShortcutType {
   ADD_PEOPLE = 'add_people',
   ARCHIVE = 'archive',
+  SEARCH = 'search',
   NEXT = 'next',
   NOTIFICATIONS = 'notifications',
   PEOPLE = 'people',

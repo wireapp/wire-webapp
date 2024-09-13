@@ -26,10 +26,12 @@ import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
 import {DetachedCallingCell} from 'Components/calling/DetachedCallingCell';
 import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
+import {QualityFeedbackModal} from 'Components/Modals/QualityFeedbackModal';
 import {SIGN_OUT_REASON} from 'src/script/auth/SignOutReason';
 import {useAppSoftLock} from 'src/script/hooks/useAppSoftLock';
 import {useSingleInstance} from 'src/script/hooks/useSingleInstance';
 import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
+import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
 
 import {useAccentColor} from './hooks/useAccentColor';
 import {useTheme} from './hooks/useTheme';
@@ -96,16 +98,19 @@ export const AppContainer: FC<AppProps> = ({config, clientType}) => {
           return <AppMain app={app} selfUser={selfUser} mainView={mainView} locked={softLockEnabled} />;
         }}
       </AppLoader>
+
       <StyledApp themeId={THEME_ID.DEFAULT} css={{backgroundColor: 'unset', height: '100%'}}>
         <PrimaryModalComponent />
+        <QualityFeedbackModal />
       </StyledApp>
 
-      <DetachedCallingCell
-        callActions={mainView.calling.callActions}
-        callingRepository={app.repository.calling}
-        pushToTalkKey={repositories.properties.getPreference(PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY)}
-        hasAccessToCamera={mainView.calling.hasAccessToCamera()}
-      />
+      {isDetachedCallingFeatureEnabled() && (
+        <DetachedCallingCell
+          callingRepository={app.repository.calling}
+          mediaRepository={app.repository.media}
+          toggleScreenshare={mainView.calling.callActions.toggleScreenshare}
+        />
+      )}
     </>
   );
 };

@@ -119,21 +119,15 @@ export const InputBar = ({
     teamState,
     ['classifiedDomains', 'isSelfDeletingMessagesEnabled', 'isFileSharingSendingEnabled'],
   );
-  const {
-    connection,
-    localMessageTimer,
-    messageTimer,
-    hasGlobalMessageTimer,
-    removed_from_conversation: removedFromConversation,
-    is1to1,
-  } = useKoSubscribableChildren(conversation, [
-    'connection',
-    'localMessageTimer',
-    'messageTimer',
-    'hasGlobalMessageTimer',
-    'removed_from_conversation',
-    'is1to1',
-  ]);
+  const {connection, localMessageTimer, messageTimer, hasGlobalMessageTimer, isSelfUserRemoved, is1to1} =
+    useKoSubscribableChildren(conversation, [
+      'connection',
+      'localMessageTimer',
+      'messageTimer',
+      'hasGlobalMessageTimer',
+      'isSelfUserRemoved',
+      'is1to1',
+    ]);
   const {isOutgoingRequest, isIncomingRequest} = useKoSubscribableChildren(connection, [
     'isOutgoingRequest',
     'isIncomingRequest',
@@ -574,11 +568,16 @@ export const InputBar = ({
           <>
             <div className="controls-left">
               {!!textValue.length && (
-                <Avatar className="cursor-default" participant={selfUser} avatarSize={AVATAR_SIZE.X_SMALL} />
+                <Avatar
+                  className="cursor-default"
+                  participant={selfUser}
+                  avatarSize={AVATAR_SIZE.X_SMALL}
+                  hideAvailabilityStatus
+                />
               )}
             </div>
 
-            {!removedFromConversation && !pastedFile && (
+            {!isSelfUserRemoved && !pastedFile && (
               <RichTextEditor
                 onSetup={lexical => {
                   editorRef.current = lexical;

@@ -60,9 +60,7 @@ const DetailViewModalFooter: FC<DetailViewModalFooterProps> = ({
   messageRepository,
   selfId,
 }) => {
-  const {removed_from_conversation: isRemovedFromConversation} = useKoSubscribableChildren(conversationEntity, [
-    'removed_from_conversation',
-  ]);
+  const {isSelfUserRemoved} = useKoSubscribableChildren(conversationEntity, ['isSelfUserRemoved']);
   const [currentMsgActionName, setCurrentMsgAction] = useState('');
   const wrapperRef = useRef<HTMLDivElement>(null);
   const isMsgReactable = messageEntity.isReactable();
@@ -116,7 +114,7 @@ const DetailViewModalFooter: FC<DetailViewModalFooterProps> = ({
 
   return (
     <footer className="detail-view-footer">
-      {isMsgReactable && !isRemovedFromConversation && (
+      {isMsgReactable && !isSelfUserRemoved && (
         <div ref={wrapperRef} style={{display: 'flex'}}>
           <MessageReactions
             messageFocusedTabIndex={TabIndex.FOCUSABLE}
@@ -128,7 +126,7 @@ const DetailViewModalFooter: FC<DetailViewModalFooterProps> = ({
             toggleActiveMenu={toggleActiveMenu}
             handleKeyDown={handleKeyDown}
           />
-          {messageEntity.isReplyable() && !isRemovedFromConversation && (
+          {messageEntity.isReplyable() && !isSelfUserRemoved && (
             <ReplyButton
               actionId={MESSAGE_REPLY_ID}
               currentMsgActionName={currentMsgActionName}

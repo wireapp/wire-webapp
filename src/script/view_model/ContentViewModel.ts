@@ -40,6 +40,7 @@ import {Conversation} from '../entity/Conversation';
 import type {Message} from '../entity/message/Message';
 import {ConversationError} from '../error/ConversationError';
 import '../page/LeftSidebar';
+import {SidebarTabs, useSidebarStore} from '../page/LeftSidebar/panels/Conversations/useSidebarStore';
 import '../page/MainContent';
 import {PanelState} from '../page/RightSidebar';
 import {useAppMainState} from '../page/state';
@@ -122,15 +123,7 @@ export class ContentViewModel {
   }
 
   private _shiftContent(hideSidebar: boolean = false): void {
-    const sidebar = document.querySelector(`#${this.sidebarId}`) as HTMLElement | null;
-
-    if (hideSidebar) {
-      if (sidebar) {
-        sidebar.style.visibility = 'hidden';
-      }
-    } else if (sidebar) {
-      sidebar.style.visibility = '';
-    }
+    useAppMainState.getState().leftSidebar.hide(hideSidebar);
   }
 
   private changeConversation(conversationEntity: Conversation, messageEntity?: Message): void {
@@ -279,6 +272,12 @@ export class ContentViewModel {
       }
 
       throw error;
+    } finally {
+      const {currentTab, setCurrentTab} = useSidebarStore.getState();
+
+      if ([SidebarTabs.PREFERENCES, SidebarTabs.CONNECT].includes(currentTab)) {
+        setCurrentTab(SidebarTabs.RECENT);
+      }
     }
   };
 

@@ -42,7 +42,7 @@ export const getActiveConversationsWithUsers = ({
   return conversationState
     .filteredConversations()
     .map((conversationEntity: Conversation) => {
-      if (!conversationEntity.removed_from_conversation()) {
+      if (!conversationEntity.isSelfUserRemoved()) {
         const userIdsInConversation = conversationEntity.participating_user_ids().concat(userState.self().qualifiedId);
         const matchingUserIds = userIdsInConversation.filter(userIdInConversation =>
           userIds.find(userId => matchQualifiedIds(userId, userIdInConversation)),

@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, HTMLProps, MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent} from 'react';
+import {HTMLProps, MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent} from 'react';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, isKeyboardEvent} from 'Util/KeyboardUtil';
@@ -79,9 +79,10 @@ export interface AvatarProps extends HTMLProps<HTMLDivElement> {
   noFilter?: boolean;
   isResponsive?: boolean;
   onAvatarClick?: (participant: User | ServiceEntity) => void;
+  hideAvailabilityStatus?: boolean;
 }
 
-const Avatar: FC<AvatarProps> = ({
+const Avatar = ({
   avatarSize = AVATAR_SIZE.LARGE,
   noBadge = false,
   noFilter = false,
@@ -89,7 +90,7 @@ const Avatar: FC<AvatarProps> = ({
   participant,
   isResponsive = false,
   ...props
-}) => {
+}: AvatarProps) => {
   const handleAvatarInteraction = (
     event: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>,
   ) => {

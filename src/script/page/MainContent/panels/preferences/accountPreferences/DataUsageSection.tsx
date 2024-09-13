@@ -21,15 +21,13 @@ import React, {useEffect, useState} from 'react';
 
 import {WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
-import {container} from 'tsyringe';
 
 import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {getForcedErrorReportingStatus} from 'src/script/tracking/Countly.helpers';
 import {t} from 'Util/LocalizerUtil';
 
-import {Config} from '../../../../../Config';
 import {PropertiesRepository} from '../../../../../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../../../../../properties/PropertiesType';
 import {TeamState} from '../../../../../team/TeamState';
@@ -43,57 +41,44 @@ interface DataUsageSectionProps {
   teamState?: TeamState;
 }
 
-const DataUsageSection: React.FC<DataUsageSectionProps> = ({
-  propertiesRepository,
-  brandName,
-  isActivatedAccount,
-  teamState = container.resolve(TeamState),
-}) => {
-  const [optionPrivacy, setOptionPrivacy] = useState(propertiesRepository.properties.settings.privacy.improve_wire);
+const DataUsageSection = ({propertiesRepository, brandName, isActivatedAccount}: DataUsageSectionProps) => {
   const [optionTelemetry, setOptionTelemetry] = useState(
-    propertiesRepository.properties.settings.privacy.telemetry_sharing,
+    propertiesRepository.properties.settings.privacy.telemetry_data_sharing,
   );
-
-  const {marketingConsent} = useKoSubscribableChildren(propertiesRepository, ['marketingConsent']);
-  const {isTeam} = useKoSubscribableChildren(teamState, ['isTeam']);
-  const isCountlyEnabled = !!Config.getConfig().COUNTLY_API_KEY;
+  const [optionMarketingSharing, setOptionMarketingSharing] = useState(
+    propertiesRepository.properties.settings.privacy.marketing_consent,
+  );
 
   useEffect(() => {
     const updateProperties = ({settings}: WebappProperties): void => {
-      setOptionPrivacy(settings.privacy.improve_wire);
-      setOptionTelemetry(settings.privacy.telemetry_sharing);
+      setOptionTelemetry(settings.privacy.telemetry_data_sharing);
+      setOptionMarketingSharing(settings.privacy.marketing_consent);
     };
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, updateProperties);
     return () => amplify.unsubscribe(WebAppEvents.PROPERTIES.UPDATED, updateProperties);
   }, []);
 
+  const {isCountlyEnabledAtCurrentEnvironment} = propertiesRepository.getUserConsentStatus();
+
+  if (!isCountlyEnabledAtCurrentEnvironment && !isActivatedAccount) {
+    return null;
+  }
+
+  const forceErrorReporting = getForcedErrorReportingStatus();
+
   return (
     <PreferencesSection hasSeparator title={t('preferencesAccountData')} className="preferences-section-data-usage">
-      <>
-        <Checkbox
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            const isChecked = event.target.checked;
-            propertiesRepository.savePreference(PROPERTIES_TYPE.PRIVACY, isChecked);
-            setOptionPrivacy(isChecked);
-          }}
-          checked={optionPrivacy}
-          data-uie-name="status-preference-privacy"
-        >
-          <CheckboxLabel htmlFor="status-preference-privacy">{t('preferencesAccountDataCheckbox')}</CheckboxLabel>
-        </Checkbox>
-        <p className="preferences-detail preferences-detail-intended">{t('preferencesAccountDataDetail', brandName)}</p>
-      </>
-
-      {isTeam && isCountlyEnabled && (
+      {isCountlyEnabledAtCurrentEnvironment && (
         <div className="checkbox-margin">
           <Checkbox
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               const isChecked = event.target.checked;
-              propertiesRepository.savePreference(PROPERTIES_TYPE.TELEMETRY_SHARING, isChecked);
+              propertiesRepository.savePreference(PROPERTIES_TYPE.PRIVACY.TELEMETRY_SHARING, isChecked);
               setOptionTelemetry(isChecked);
             }}
-            checked={optionTelemetry}
+            checked={forceErrorReporting ? true : optionTelemetry}
             data-uie-name="status-preference-telemetry"
+            disabled={forceErrorReporting}
           >
             <CheckboxLabel htmlFor="status-preference-telemetry">
               {t('preferencesAccountDataTelemetryCheckbox')}
@@ -107,14 +92,16 @@ const DataUsageSection: React.FC<DataUsageSectionProps> = ({
       {isActivatedAccount && (
         <div className="checkbox-margin">
           <Checkbox
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            onChange={async (event: React.ChangeEvent<HTMLInputElement>) => {
               const isChecked = event.target.checked;
-              propertiesRepository.updateProperty(
+              await propertiesRepository.updateProperty(
                 PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.key,
                 isChecked ? ConsentValue.GIVEN : ConsentValue.NOT_GIVEN,
               );
+              propertiesRepository.savePreference(PROPERTIES_TYPE.PRIVACY.MARKETING_CONSENT, isChecked);
+              setOptionMarketingSharing(isChecked);
             }}
-            checked={!!marketingConsent}
+            checked={optionMarketingSharing}
             data-uie-name="status-preference-marketing"
           >
             <CheckboxLabel htmlFor="status-preference-marketing">

@@ -52,12 +52,15 @@ import {
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {useCallAlertState} from 'Components/calling/useCallAlertState';
+import {CALL_QUALITY_FEEDBACK_KEY} from 'Components/Modals/QualityFeedbackModal/constants';
 import {flatten} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {roundLogarithmic} from 'Util/NumberUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {createUuid} from 'Util/uuid';
 
 import {Call, SerializedConversationId} from './Call';
 import {callingSubscriptions} from './callingSubscriptionsHandler';
@@ -86,6 +89,7 @@ import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
 import {TeamState} from '../team/TeamState';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
+import {isCountlyEnabledAtCurrentEnvironment} from '../tracking/Countly.helpers';
 import {EventName} from '../tracking/EventName';
 import * as trackingHelpers from '../tracking/Helpers';
 import {Segmentation} from '../tracking/Segmentation';
@@ -143,6 +147,9 @@ export class CallingRepository {
   private wUser: number = 0;
   private nextMuteState: MuteState = MuteState.SELF_MUTED;
   private isConferenceCallingSupported = false;
+
+  static EMOJI_TIME_OUT_DURATION = TIME_IN_MILLIS.SECOND * 4;
+
   /**
    * Keeps track of the size of the avs log once the webapp is initiated. This allows detecting meaningless avs logs (logs that have a length equal to the length when the webapp was initiated)
    */
@@ -368,7 +375,7 @@ export class CallingRepository {
       () => {}, // `answer
       () => {}, // `estabh`,
       this.callClosed, // `closeh`,
-      () => {}, // `metricsh`,
+      this.metricsReceived, // `metricsh`,
       this.requestConfig, // `cfg_reqh`,
       this.audioCbrChanged, // `acbrh`,
       this.videoStateChanged, // `vstateh`,
@@ -723,6 +730,42 @@ export class CallingRepository {
         return this.processCallingMessage(conversation, event);
       }
 
+      case CALL_MESSAGE_TYPE.EMOJIS: {
+        const call = this.findCall(conversationId);
+        if (!call || !this.selfUser) {
+          return;
+        }
+
+        const senderParticipant = call
+          .participants()
+          .find(participant => matchQualifiedIds(participant.user.qualifiedId, userId));
+
+        const emojis: string[] = Object.entries(content.emojis).flatMap(([key, value]) => Array(value).fill(key));
+
+        const isSelf = matchQualifiedIds(this.selfUser.qualifiedId, userId);
+
+        const newEmojis = emojis.map(emoji => {
+          const id = createUuid();
+
+          return {
+            id: `${Date.now()}-${id}`,
+            emoji,
+            left: Math.random() * 500,
+            from: isSelf ? t('conversationYouAccusative') : senderParticipant?.user.name() ?? '',
+          };
+        });
+
+        this.callState.emojis([...this.callState.emojis(), ...newEmojis]);
+
+        setTimeout(() => {
+          const remainingEmojis = this.callState
+            .emojis()
+            .filter(item => !newEmojis.some(newItem => newItem.id === item.id));
+          this.callState.emojis(remainingEmojis);
+        }, CallingRepository.EMOJI_TIME_OUT_DURATION);
+        break;
+      }
+
       case CALL_MESSAGE_TYPE.REMOTE_KICK: {
         this.leaveCall(conversationId, LEAVE_CALL_REASON.REMOTE_KICK);
         return this.processCallingMessage(conversation, event);
@@ -798,6 +841,7 @@ export class CallingRepository {
   }
 
   async startCall(conversation: Conversation, callType: CALL_TYPE): Promise<void | Call> {
+    void this.callState.setViewModeMinimized();
     if (!this.selfUser || !this.selfClientId) {
       this.logger.warn(
         `Calling repository is not initialized correctly \n ${JSON.stringify({
@@ -937,6 +981,7 @@ export class CallingRepository {
   };
 
   async answerCall(call: Call, callType?: CALL_TYPE): Promise<void> {
+    void this.callState.setViewModeMinimized();
     const {conversation} = call;
     try {
       callType ??= call.getSelfParticipant().sharesCamera() ? call.initialType : CALL_TYPE.NORMAL;
@@ -1123,7 +1168,33 @@ export class CallingRepository {
     this.wCall?.requestVideoStreams(this.wUser, convId, VSTREAMS.LIST, JSON.stringify(payload));
   }
 
+  readonly showCallQualityFeedbackModal = () => {
+    if (!this.selfUser || !this.hasActiveCall()) {
+      return;
+    }
+
+    const {setQualityFeedbackModalShown} = useCallAlertState.getState();
+
+    try {
+      const qualityFeedbackStorage = localStorage.getItem(CALL_QUALITY_FEEDBACK_KEY);
+      const currentStorageData = qualityFeedbackStorage ? JSON.parse(qualityFeedbackStorage) : {};
+      const currentUserDate = currentStorageData?.[this.selfUser.id];
+      const currentDate = new Date().getTime();
+
+      if (currentUserDate === undefined || (currentUserDate !== null && currentDate >= currentUserDate)) {
+        setQualityFeedbackModalShown(true);
+      }
+    } catch (error) {
+      this.logger.warn(`Storage data can't found: ${(error as Error).message}`);
+      setQualityFeedbackModalShown(true);
+    }
+  };
+
   readonly leaveCall = (conversationId: QualifiedId, reason: LEAVE_CALL_REASON): void => {
+    if (isCountlyEnabledAtCurrentEnvironment()) {
+      this.showCallQualityFeedbackModal();
+    }
+
     this.logger.info(`Ending call with reason ${reason} \n Stack trace: `, new Error().stack);
     const conversationIdStr = this.serializeQualifiedId(conversationId);
     delete this.poorCallQualityUsers[conversationIdStr];
@@ -1152,7 +1223,12 @@ export class CallingRepository {
   };
 
   private getMediaStream({audio = false, camera = false, screen = false}: MediaStreamQuery, isGroup: boolean) {
-    return this.mediaStreamHandler.requestMediaStream(audio, camera, screen, isGroup);
+    return this.mediaStreamHandler.requestMediaStream(audio, camera, screen, isGroup).then(stream => {
+      return this.mediaDevicesHandler
+        .initializeMediaDevices(camera)
+        .then(() => stream)
+        .catch(() => stream);
+    });
   }
 
   private handleMediaStreamError(call: Call, requestedStreams: MediaStreamQuery, error: Error | unknown): void {
@@ -1238,9 +1314,9 @@ export class CallingRepository {
     const {conversation} = call;
 
     if (mediaType === MediaType.AUDIO) {
-      const audioTracks: MediaStreamTrack[] = mediaStream.getAudioTracks();
+      const audioTracks = mediaStream.getAudioTracks();
       if (audioTracks.length > 0) {
-        selfParticipant.setAudioStream(new MediaStream([audioTracks[0]]), true);
+        selfParticipant.setAudioStream(new MediaStream(audioTracks), true);
         this.wCall?.replaceTrack(this.serializeQualifiedId(conversation.qualifiedId), audioTracks[0]);
       }
     }
@@ -1252,10 +1328,10 @@ export class CallingRepository {
         this.wCall?.replaceTrack(this.serializeQualifiedId(conversation.qualifiedId), videoTracks[0]);
         // Remove the previous video stream
         if (updateSelfParticipant) {
-          selfParticipant.setVideoStream(new MediaStream([videoTracks[0]]), true);
+          selfParticipant.setVideoStream(mediaStream, true);
         }
+        return mediaStream;
       }
-      return mediaStream;
     }
   }
 
@@ -1378,9 +1454,13 @@ export class CallingRepository {
     }, {} as QualifiedUserClients);
   };
 
+  readonly sendInCallEmoji = async (emojis: string, call: Call) => {
+    void this.messageRepository.sendInCallEmoji(call.conversation, {[emojis]: 1});
+  };
+
   readonly sendModeratorMute = (conversationId: QualifiedId, participants: Participant[]) => {
     const recipients = this.convertParticipantsToCallingMessageRecepients(participants);
-    this.sendCallingMessage(
+    void this.sendCallingMessage(
       conversationId,
       {type: CALL_MESSAGE_TYPE.REMOTE_MUTE, data: {targets: recipients}},
       {nativePush: true, recipients},
@@ -1389,7 +1469,7 @@ export class CallingRepository {
 
   readonly sendModeratorKick = (conversationId: QualifiedId, participants: Participant[]) => {
     const recipients = this.convertParticipantsToCallingMessageRecepients(participants);
-    this.sendCallingMessage(conversationId, {type: CALL_MESSAGE_TYPE.REMOTE_KICK}, {nativePush: true, recipients});
+    void this.sendCallingMessage(conversationId, {type: CALL_MESSAGE_TYPE.REMOTE_KICK}, {nativePush: true, recipients});
   };
 
   private readonly sendSFTRequest = (
@@ -1435,6 +1515,15 @@ export class CallingRepository {
     const call = this.findCall(conversationId);
     if (!call) {
       return;
+    }
+
+    if (
+      matchQualifiedIds(
+        call.conversation.qualifiedId,
+        this.callState.detachedWindowCallQualifiedId() ?? {id: '', domain: ''},
+      )
+    ) {
+      void this.callState.setViewModeMinimized();
     }
 
     // There's nothing we need to do for non-mls calls
@@ -1508,6 +1597,10 @@ export class CallingRepository {
     call.removeAllAudio();
     selfParticipant.videoState(VIDEO_STATE.STOPPED);
     call.reason(reason);
+  };
+
+  hasActiveCall = (): boolean => {
+    return !!this.callState.joinedCall();
   };
 
   /*
@@ -1926,6 +2019,10 @@ export class CallingRepository {
       .participants()
       .filter(participant => participant.doesMatchIds(userId, clientId))
       .forEach(participant => participant.videoState(state));
+  };
+
+  private readonly metricsReceived = (_: string, metrics: string) => {
+    this.logger.info('Calling metrics:', metrics);
   };
 
   private readonly sendCallingEvent = (

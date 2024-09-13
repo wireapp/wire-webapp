@@ -23,6 +23,7 @@ export const listWrapper = ({isHighlighted = false, noUnderline = false, noInter
   position: 'relative',
   display: 'block',
   margin: '1px',
+  alignItems: 'center',
 
   '&:hover, &:focus, &:focus-visible': {
     background: 'var(--app-bg-secondary)',
@@ -137,13 +138,6 @@ export const nameWrapper: CSSObject = {
   overflow: 'hidden',
   width: '100%',
   paddingRight: '8px',
-};
-
-export const userAvailability: CSSObject = {
-  '.availability-state-label': ellipsis,
-  '.availability-state-icon': {
-    display: 'flex',
-  },
 };
 
 export const userName: CSSObject = {

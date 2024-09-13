@@ -17,11 +17,10 @@
  *
  */
 
-import React, {useEffect} from 'react';
+import {useEffect, CSSProperties} from 'react';
 
 import {amplify} from 'amplify';
 import {ErrorBoundary} from 'react-error-boundary';
-import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -32,7 +31,6 @@ import {UserClassifiedBar} from 'Components/input/ClassifiedBar';
 import {UserBlockedBadge} from 'Components/UserBlockedBadge/UserBlockedBadge';
 import {UserInfo} from 'Components/UserInfo';
 import {UserVerificationBadges} from 'Components/VerificationBadge';
-import {TeamState} from 'src/script/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -45,21 +43,18 @@ interface UserDetailsProps {
   isGroupAdmin?: boolean;
   isVerified?: boolean;
   participant: User;
-  avatarStyles?: React.CSSProperties;
-  teamState?: TeamState;
+  avatarStyles?: CSSProperties;
 }
 
-const UserDetailsComponent: React.FC<UserDetailsProps> = ({
+const UserDetailsComponent = ({
   badge,
   participant,
   groupId,
   isGroupAdmin,
   avatarStyles,
   classifiedDomains,
-  teamState = container.resolve(TeamState),
-}) => {
+}: UserDetailsProps) => {
   const user = useKoSubscribableChildren(participant, [
-    'isGuest',
     'isDirectGuest',
     'isTemporaryGuest',
     'expirationText',
@@ -75,12 +70,7 @@ const UserDetailsComponent: React.FC<UserDetailsProps> = ({
   return (
     <div className="panel-participant">
       <div className="panel-participant__head">
-        <UserInfo
-          className="panel-participant__head__name"
-          user={participant}
-          dataUieName="status-name"
-          showAvailability={teamState.isInTeam(participant)}
-        >
+        <UserInfo className="panel-participant__head__name" user={participant} dataUieName="status-name">
           <UserVerificationBadges user={participant} groupId={groupId} />
         </UserInfo>
       </div>
@@ -99,6 +89,7 @@ const UserDetailsComponent: React.FC<UserDetailsProps> = ({
         avatarSize={AVATAR_SIZE.X_LARGE}
         data-uie-name="status-profile-picture"
         style={avatarStyles}
+        hideAvailabilityStatus
       />
 
       {badge && (
@@ -144,7 +135,7 @@ const UserDetailsComponent: React.FC<UserDetailsProps> = ({
   );
 };
 
-export const UserDetails: React.FC<UserDetailsProps> = props => {
+export const UserDetails = (props: UserDetailsProps) => {
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
       <UserDetailsComponent {...props} />

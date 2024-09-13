@@ -142,7 +142,7 @@ export class IntegrationRepository {
         return false;
       }
 
-      const isActiveConversation = !conversationEntity.removed_from_conversation();
+      const isActiveConversation = !conversationEntity.isSelfUserRemoved();
       if (!isActiveConversation) {
         // Disregard conversations that self is no longer part of
         return false;

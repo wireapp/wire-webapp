@@ -28,7 +28,6 @@ import {createUuid} from 'Util/uuid';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
 import {AssetRepository} from '../../assets/AssetRepository';
-import {AssetService} from '../../assets/AssetService';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
 import {MessageRepository} from '../../conversation/MessageRepository';
 import {Conversation} from '../../entity/Conversation';
@@ -71,7 +70,7 @@ describe('InputBar', () => {
   let propertiesRepository: PropertiesRepository;
 
   const getDefaultProps = () => ({
-    assetRepository: new AssetRepository(new AssetService()),
+    assetRepository: new AssetRepository(),
     conversation: new Conversation(createUuid()),
     conversationRepository: {
       sendTypingStart: jest.fn(),

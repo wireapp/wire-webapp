@@ -25,6 +25,8 @@ export const jumpToLastMessageButtonStyles: CSSObject = {
   height: '40px',
   borderRadius: '100%',
   bottom: '56px',
+  marginBottom: '10px',
+  zIndex: 1,
 
   '@media (max-width: 768px)': {
     bottom: '100px',

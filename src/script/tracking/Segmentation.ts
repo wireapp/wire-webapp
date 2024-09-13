@@ -26,11 +26,12 @@ export const Segmentation = {
     PARTICIPANTS: 'call_participants',
     REASON: 'reason', // This has to be in sync with ios
     SCREEN_SHARE: 'call_screen_share',
+    SCORE: 'score',
+    QUALITY_REVIEW_LABEL: 'label',
     SETUP_TIME: 'call_setup_time',
     VIDEO: 'call_video',
   },
   COMMON: {
-    APP: 'app_name',
     APP_VERSION: 'app_version',
     DESKTOP_APP: 'app_desktop_app',
   },

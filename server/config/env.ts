@@ -102,6 +102,9 @@ export type Env = {
    */
   FEATURE_ENABLE_ACCOUNT_REGISTRATION_ACCEPT_TERMS_AND_PRIVACY_POLICY: string;
 
+  /** Feature toggle to blur the background during video call */
+  FEATURE_ENABLE_BLUR_BACKGROUND: string;
+
   /** Feature toggle for debug utils. Can be set to true or false */
   FEATURE_ENABLE_DEBUG: string;
 
@@ -158,6 +161,12 @@ export type Env = {
   /** Feature toggle to automatically mute when accepting incoming conference calls */
   FEATURE_CONFERENCE_AUTO_MUTE: string;
 
+  /** Feature to enable in call reactions */
+  FEATURE_ENABLE_IN_CALL_REACTIONS: string;
+
+  /** Feature to enable calling popout window */
+  FEATURE_ENABLE_DETACHED_CALLING_WINDOW: string;
+
   /** Sets the verification ID for Google webmasters */
   GOOGLE_WEBMASTER_ID: string;
 
@@ -172,6 +181,12 @@ export type Env = {
 
   /** Sets the Countly product reporting API key */
   COUNTLY_API_KEY: string;
+
+  /** Countly allow list for backend urls
+   * Multiple entries separated by comma, e.g. "https://nginz-https.anta.wire.link, https://nginz-https.diya.wire.link, https://prod-nginz-https.wire.com"
+   * Used to disable countly tracking on on-prem instances
+   */
+  COUNTLY_ALLOWED_BACKEND: string;
 
   /** Open graph header description */
   OPEN_GRAPH_DESCRIPTION: string;
@@ -224,6 +239,8 @@ export type Env = {
   /** Sets Support URLs to specific pages */
   URL_SUPPORT_INDEX: string;
 
+  URL_SUPPORT_FOLDERS: string;
+
   URL_SUPPORT_BUG_REPORT: string;
 
   URL_SUPPORT_CALLING: string;
@@ -251,6 +268,8 @@ export type Env = {
   URL_SUPPORT_SCREEN_ACCESS_DENIED: string;
 
   URL_SUPPORT_SYSTEM_KEYCHAIN_ACCESS: string;
+
+  URL_SUPPORT_FAVORITES: string;
 
   URL_LEARN_MORE_ABOUT_GUEST_LINKS: string;
 
@@ -310,4 +329,5 @@ export type Env = {
 
   DATADOG_APPLICATION_ID?: string;
   DATADOG_CLIENT_TOKEN?: string;
+  FEATURE_DATADOG_ENVIRONMENT?: string;
 };

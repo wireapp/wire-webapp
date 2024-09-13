@@ -67,6 +67,7 @@ class Server {
     this.initStaticRoutes();
     this.initWebpack();
     this.initSiteMap(this.config);
+    this.app.use('/libs', express.static(path.join(__dirname, 'libs')));
     this.app.use(Root());
     this.app.use(HealthCheckRoute());
     this.app.use(ConfigRoute(this.config, this.clientConfig));
@@ -212,6 +213,8 @@ class Server {
       APP_BASE: this.config.APP_BASE,
       OPEN_GRAPH: this.config.OPEN_GRAPH,
       VERSION: this.config.VERSION,
+      COUNTLY_API_KEY: this.config.COUNTLY_API_KEY,
+      COUNTLY_NONCE: this.config.COUNTLY_NONCE,
     };
   }
 
@@ -236,7 +239,7 @@ class Server {
       if (this.server) {
         reject('Server is already running.');
       } else if (this.config.PORT_HTTP) {
-        if (this.config.DEVELOPMENT) {
+        if (this.config.DEVELOPMENT && this.config.DEVELOPMENT_ENABLE_TLS) {
           const options = {
             cert: fs.readFileSync(this.config.SSL_CERTIFICATE_PATH),
             key: fs.readFileSync(this.config.SSL_CERTIFICATE_KEY_PATH),

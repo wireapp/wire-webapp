@@ -241,14 +241,14 @@ describe('ConversationMapper', () => {
       const selfStatus: Partial<SelfStatusUpdateDatabaseData> = {status: ConversationStatus.PAST_MEMBER};
       const updatedConversationEntity = ConversationMapper.updateSelfStatus(conversationEntity, selfStatus);
 
-      expect(updatedConversationEntity.removed_from_conversation()).toBeTruthy();
+      expect(updatedConversationEntity.isSelfUserRemoved()).toBeTruthy();
     });
 
     it('can update the self status if the user joins a conversation', () => {
       const selfStatus: Partial<SelfStatusUpdateDatabaseData> = {status: ConversationStatus.CURRENT_MEMBER};
       const updatedConversationEntity = ConversationMapper.updateSelfStatus(conversationEntity, selfStatus);
 
-      expect(updatedConversationEntity.removed_from_conversation()).toBeFalsy();
+      expect(updatedConversationEntity.isSelfUserRemoved()).toBeFalsy();
     });
 
     it('can update the self status with last event timestamp', () => {

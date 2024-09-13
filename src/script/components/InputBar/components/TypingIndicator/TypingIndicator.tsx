@@ -57,6 +57,7 @@ const TypingIndicator: FC<TypingIndicatorProps> = ({conversationId}) => {
             participant={user}
             avatarSize={AVATAR_SIZE.XXX_SMALL}
             isResponsive
+            hideAvailabilityStatus
           />
         ))}
       </div>

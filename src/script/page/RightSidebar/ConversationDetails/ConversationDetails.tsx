@@ -35,6 +35,7 @@ import {ServiceDetails} from 'Components/panel/ServiceDetails';
 import {UserDetails} from 'Components/panel/UserDetails';
 import {ServiceList} from 'Components/ServiceList/ServiceList';
 import {UserList} from 'Components/UserList';
+import {isMLSConversation} from 'src/script/conversation/ConversationSelectors';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {replaceReactComponents} from 'Util/LocalizerUtil/ReactLocalizerUtil';
@@ -105,7 +106,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       showNotificationsNothing,
       verification_state: verificationState,
       isGroup,
-      removed_from_conversation: removedFromConversation,
+      isSelfUserRemoved,
       notificationState,
       hasGlobalMessageTimer,
       globalMessageTimer,
@@ -122,7 +123,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       'showNotificationsNothing',
       'verification_state',
       'isGroup',
-      'removed_from_conversation',
+      'isSelfUserRemoved',
       'notificationState',
       'hasGlobalMessageTimer',
       'globalMessageTimer',
@@ -156,7 +157,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
 
     const {teamRole, isActivatedAccount} = useKoSubscribableChildren(selfUser, ['teamRole', 'isActivatedAccount']);
 
-    const isActiveGroupParticipant = isGroup && !removedFromConversation;
+    const isActiveGroupParticipant = isGroup && !isSelfUserRemoved;
 
     const showOptionGuests = isActiveGroupParticipant && !!teamId && roleRepository.canToggleGuests(activeConversation);
     const hasAdvancedNotifications = isMutable && isTeam;
@@ -164,7 +165,10 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
     const showOptionTimedMessages =
       isActiveGroupParticipant && roleRepository.canToggleTimeout(activeConversation) && isSelfDeletingMessagesEnabled;
     const showOptionServices =
-      isActiveGroupParticipant && !!teamId && roleRepository.canToggleGuests(activeConversation);
+      isActiveGroupParticipant &&
+      !!teamId &&
+      roleRepository.canToggleGuests(activeConversation) &&
+      !isMLSConversation(activeConversation);
     const showOptionReadReceipts = !!teamId && roleRepository.canToggleReadReceipts(activeConversation);
 
     const showSectionOptions =
@@ -202,12 +206,12 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
         return isUser ? [user] : [];
       });
 
-      if (!removedFromConversation) {
+      if (!isSelfUserRemoved) {
         return [...filteredUsers, selfUser].sort(sortUsersByPriority);
       }
 
       return filteredUsers;
-    }, [participatingUserEts, removedFromConversation, selfUser]);
+    }, [participatingUserEts, isSelfUserRemoved, selfUser]);
 
     const usersCount = userParticipants.length;
     const exceedsMaxUserCount = usersCount > CONFIG.MAX_USERS_VISIBLE;

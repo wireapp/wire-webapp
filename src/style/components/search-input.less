@@ -19,7 +19,6 @@
 
 .search-outer {
   overflow: hidden;
-  padding: 0 12px;
 }
 
 .user-list-light {
@@ -69,9 +68,11 @@
 }
 
 .search-inner > input {
+  .label-1;
+
   width: 100%;
   min-width: 65px;
-  height: 48px;
+  height: 32px;
   flex: 1 1;
   padding: 0 0 0 40px;
   border: 1px solid var(--text-input-border);
@@ -79,11 +80,7 @@
   appearance: none;
   background: var(--text-input-background);
   color: currentColor;
-  font-size: @font-size-base;
-  line-height: @line-height-lg;
   outline: none;
-
-  .text-light;
 
   &:invalid {
     box-shadow: none;
@@ -134,7 +131,6 @@ body.theme-dark {
 .search-icon {
   position: absolute;
   z-index: 1;
-  top: 11px;
   left: 16px;
   height: @avatar-diameter-xs;
   line-height: @avatar-diameter-xs;
@@ -142,6 +138,7 @@ body.theme-dark {
 
 .search-input-cancel {
   position: absolute;
+  top: 50%;
   right: 16px;
   bottom: 17px;
   display: flex;
@@ -154,6 +151,7 @@ body.theme-dark {
   border-radius: 50%;
   margin: 0;
   background: var(--text-input-color);
+  transform: translateY(-50%);
 }
 
 .search-input-selected {

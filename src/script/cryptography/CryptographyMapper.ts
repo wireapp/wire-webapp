@@ -49,8 +49,10 @@ import {
   Quote,
   Reaction,
   Text,
+  InCallEmoji,
 } from '@wireapp/protocol-messaging';
 
+import {CALL_MESSAGE_TYPE} from 'src/script/calling/enum/CallMessageType';
 import {getLogger, Logger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {base64ToArray, arrayToBase64} from 'Util/util';
@@ -211,6 +213,11 @@ export class CryptographyMapper {
 
       case GenericMessageType.REACTION: {
         specificContent = this._mapReaction(genericMessage.reaction as Reaction);
+        break;
+      }
+
+      case GenericMessageType.IN_CALL_EMOJI: {
+        specificContent = this._mapInCallEmoji(genericMessage.inCallEmoji as InCallEmoji);
         break;
       }
 
@@ -545,6 +552,16 @@ export class CryptographyMapper {
         reaction: reaction.emoji,
       },
       type: ClientEvent.CONVERSATION.REACTION,
+    };
+  }
+
+  private _mapInCallEmoji(emojis: InCallEmoji) {
+    return {
+      content: {
+        emojis: emojis.emojis,
+        type: CALL_MESSAGE_TYPE.EMOJIS,
+      },
+      type: ClientEvent.CALL.IN_CALL_EMOJI,
     };
   }
 

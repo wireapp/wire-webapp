@@ -133,7 +133,7 @@ describe('NotificationRepository', () => {
     document.hasFocus = () => false;
     notificationRepository.updatePermissionState(PermissionStatusState.GRANTED);
     spyOn(Runtime, 'isSupportingNotifications').and.returnValue(true);
-    spyOn(notificationRepository['assetRepository'], 'generateAssetUrl').and.returnValue(
+    spyOn(notificationRepository['assetRepository'], 'getObjectUrl').and.returnValue(
       Promise.resolve('/image/logo/notification.png'),
     );
 
@@ -267,7 +267,7 @@ describe('NotificationRepository', () => {
         .then(() => {
           expect(notificationRepository['showNotification']).not.toHaveBeenCalled();
 
-          jest.spyOn(callState, 'viewMode').mockReturnValueOnce(CallingViewMode.FULL_SCREEN_GRID);
+          jest.spyOn(callState, 'viewMode').mockReturnValueOnce(CallingViewMode.DETACHED_WINDOW);
 
           return notificationRepository.notify(message, undefined, conversation);
         })

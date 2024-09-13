@@ -54,6 +54,7 @@ describe('FeatureConfigChangeNotifier', () => {
     },
     [FEATURE_KEY.CONFERENCE_CALLING]: {
       status: FeatureStatus.DISABLED,
+      config: {},
     },
     [FEATURE_KEY.CONVERSATION_GUEST_LINKS]: {
       status: FeatureStatus.DISABLED,

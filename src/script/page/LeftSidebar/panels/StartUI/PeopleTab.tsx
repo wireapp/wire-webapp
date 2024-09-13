@@ -20,15 +20,11 @@
 import {useEffect, useRef, useState} from 'react';
 
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
-import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {partition} from 'underscore';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import * as Icon from 'Components/Icon';
 import {UserList, UserlistMode} from 'Components/UserList';
-import {Conversation} from 'src/script/entity/Conversation';
 import {UserRepository} from 'src/script/user/UserRepository';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
@@ -36,7 +32,6 @@ import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {sortByPriority} from 'Util/StringUtil';
 import {isBackendError} from 'Util/TypePredicateUtil';
 
-import {GroupList} from './components/GroupList';
 import {TopPeople} from './components/TopPeople';
 
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
@@ -49,11 +44,9 @@ import {TeamRepository} from '../../../../team/TeamRepository';
 import {TeamState} from '../../../../team/TeamState';
 import {UserState} from '../../../../user/UserState';
 
-export type SearchResultsData = {contacts: User[]; groups: Conversation[]; others: User[]};
+export type SearchResultsData = {contacts: User[]; others: User[]};
 
 interface PeopleTabProps {
-  canCreateGroupConversation: boolean;
-  canCreateGuestRoom: boolean;
   canInviteTeamMembers: boolean;
   canSearchUnconnectedUsers: boolean;
   conversationRepository: ConversationRepository;
@@ -61,7 +54,6 @@ interface PeopleTabProps {
   isFederated: boolean;
   isTeam: boolean;
   onClickContact: (user: User) => void;
-  onClickConversation: (conversation: Conversation) => void;
   onClickUser: (user: User) => void;
   onSearchResults: (results: SearchResultsData | undefined) => void;
   searchQuery: string;
@@ -83,14 +75,11 @@ export const PeopleTab = ({
   selfUser,
   canInviteTeamMembers,
   canSearchUnconnectedUsers,
-  canCreateGroupConversation,
-  canCreateGuestRoom,
   conversationState,
   searchRepository,
   conversationRepository,
   userRepository,
   onClickContact,
-  onClickConversation,
   onClickUser,
   onSearchResults,
 }: PeopleTabProps) => {
@@ -125,9 +114,9 @@ export const PeopleTab = ({
     return contacts.filter(user => user.isAvailable());
   };
 
-  const [results, setResults] = useState<SearchResultsData>({contacts: getLocalUsers(), groups: [], others: []});
+  const [results, setResults] = useState<SearchResultsData>({contacts: getLocalUsers(), others: []});
   const searchOnFederatedDomain = () => '';
-  const hasResults = results.contacts.length + results.groups.length + results.others.length > 0;
+  const hasResults = results.contacts.length + results.others.length > 0;
 
   const manageTeamUrl = getManageTeamUrl('client_landing');
 
@@ -170,9 +159,9 @@ export const PeopleTab = ({
   useDebounce(
     async () => {
       setHasFederationError(false);
-      const {query, isHandleQuery} = searchRepository.normalizeQuery(searchQuery);
+      const {query} = searchRepository.normalizeQuery(searchQuery);
       if (!query) {
-        setResults({contacts: getLocalUsers(), groups: [], others: []});
+        setResults({contacts: getLocalUsers(), others: []});
         onSearchResults(undefined);
         return;
       }
@@ -188,7 +177,6 @@ export const PeopleTab = ({
 
       const localSearchResults: SearchResultsData = {
         contacts: filteredResults,
-        groups: conversationRepository.getGroupsByName(query, isHandleQuery),
         others: [],
       };
       setResults(localSearchResults);
@@ -261,40 +249,6 @@ export const PeopleTab = ({
                 </button>
               </li>
             )}
-            {canCreateGroupConversation && (
-              <li className="left-list-item">
-                <button
-                  className="left-list-item-button"
-                  type="button"
-                  onClick={() => amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, 'start_ui')}
-                  data-uie-name="go-create-group"
-                >
-                  <span className="left-column-icon">
-                    <Icon.GroupIcon />
-                  </span>
-                  <span className="column-center">{t('searchCreateGroup')}</span>
-                </button>
-              </li>
-            )}
-            {canCreateGuestRoom && (
-              <li className="left-list-item">
-                <button
-                  className="left-list-item-button"
-                  type="button"
-                  onClick={() =>
-                    conversationRepository.createGuestRoom().then(conversation => {
-                      amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversation, {});
-                    })
-                  }
-                  data-uie-name="do-create-guest-room"
-                >
-                  <span className="left-column-icon">
-                    <Icon.GuestIcon />
-                  </span>
-                  <span className="column-center">{t('searchCreateGuestRoom')}</span>
-                </button>
-              </li>
-            )}
           </ul>
           {topPeople.length > 0 && (
             <div className="start-ui-list-top-people" data-uie-name="status-top-people">
@@ -357,18 +311,7 @@ export const PeopleTab = ({
             </div>
           </div>
         )}
-        {results.groups.length > 0 && (
-          <div className="start-ui-groups">
-            {isTeam ? (
-              <h3 className="start-ui-list-header">{t('searchTeamGroups')}</h3>
-            ) : (
-              <h3 className="start-ui-list-header">{t('searchGroups')}</h3>
-            )}
-            <div className="group-list">
-              <GroupList groups={results.groups} click={onClickConversation} />
-            </div>
-          </div>
-        )}
+
         {results.others.length > 0 && (
           <div className="others">
             <h3 className="start-ui-list-header">

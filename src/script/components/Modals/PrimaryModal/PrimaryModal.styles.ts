@@ -19,13 +19,6 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const guestLinkPasswordInputStyles: CSSObject = {
-  flexDirection: 'column',
-  input: {
-    borderRadius: 12,
-    border: '1px solid var(--button-tertiary-border)',
-    boxShadow: 'none !important',
-    '&:hover': {boxShadow: 'none'},
-    '&:focus': {border: '1px solid var(--accent-color)'},
-  },
+export const guestLinkPasswordErrorMessageStyles: CSSObject = {
+  marginBottom: 18,
 };

@@ -68,6 +68,7 @@ export const ConnectedMessage: React.FC<ConnectedMessageProps> = ({
         participant={user}
         noBadge={isOutgoingRequest}
         className="message-connected-avatar cursor-default"
+        hideAvailabilityStatus
       />
 
       {isOutgoingRequest && (

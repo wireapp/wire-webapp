@@ -128,7 +128,7 @@ export class ActionsViewModel {
           text: t('modalConnectCancelSecondary'),
         },
         text: {
-          message: t('modalConnectCancelMessage', userEntity.name()),
+          message: t('modalConnectCancelMessage', userEntity.name(), {}, true),
           title: t('modalConnectCancelHeadline'),
         },
       });
