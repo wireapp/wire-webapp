@@ -25,7 +25,7 @@ export const wrapperStyles: CSSObject = {
   right: 0,
   width: '400px',
   height: '100vh',
-  backgroundColor: '#f4f4f4',
+  backgroundColor: 'var(--sidebar-bg)',
   padding: '20px',
   overflow: 'auto',
   zIndex: 100000000,
