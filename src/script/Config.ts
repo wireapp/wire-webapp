@@ -95,6 +95,9 @@ const Config = {
   getConfig: () => {
     return config;
   },
+  _dangerouslySetConfigFeaturesForDebug: (newConfigFeatures: Configuration['FEATURE']) => {
+    (config.FEATURE as unknown) = newConfigFeatures;
+  },
   getDesktopConfig: () => {
     if (!Runtime.isDesktopApp) {
       return undefined;
