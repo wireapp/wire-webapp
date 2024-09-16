@@ -426,7 +426,7 @@ describe('ConversationService', () => {
 
       expect(mlsService.wipeConversation).toHaveBeenCalledWith(mockGroupId);
       expect(mlsService.register1to1Conversation).toHaveBeenCalledTimes(1);
-      expect(mlsService.register1to1Conversation).toHaveBeenCalledWith(mockGroupId, otherUserId, selfUser);
+      expect(mlsService.register1to1Conversation).toHaveBeenCalledWith(mockGroupId, otherUserId, selfUser, undefined);
       expect(conversationService.joinByExternalCommit).not.toHaveBeenCalled();
       expect(establishedConversation.epoch).toEqual(updatedEpoch);
     });
@@ -477,7 +477,7 @@ describe('ConversationService', () => {
 
       expect(mlsService.wipeConversation).toHaveBeenCalledWith(mockGroupId);
       expect(mlsService.register1to1Conversation).toHaveBeenCalledTimes(2);
-      expect(mlsService.register1to1Conversation).toHaveBeenCalledWith(mockGroupId, otherUserId, selfUser);
+      expect(mlsService.register1to1Conversation).toHaveBeenCalledWith(mockGroupId, otherUserId, selfUser, undefined);
       expect(conversationService.joinByExternalCommit).not.toHaveBeenCalled();
       expect(establishedConversation.epoch).toEqual(updatedEpoch);
     });

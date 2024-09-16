@@ -17,7 +17,7 @@
  *
  */
 
-import type {ClaimedKeyPackages, RegisteredClient} from '@wireapp/api-client/lib/client';
+import type {ClaimedKeyPackages, MLSPublicKeyRecord, RegisteredClient} from '@wireapp/api-client/lib/client';
 import {PostMlsMessageResponse, SUBCONVERSATION_ID} from '@wireapp/api-client/lib/conversation';
 import {ConversationMLSMessageAddEvent, ConversationMLSWelcomeEvent} from '@wireapp/api-client/lib/event';
 import {BackendError, StatusCode} from '@wireapp/api-client/lib/http';
@@ -471,7 +471,11 @@ export class MLSService extends TypedEventEmitter<Events> {
    * @param groupId the id of the group to create inside of coreCrypto
    * @param parentGroupId in case the conversation is a subconversation, the id of the parent conversation
    */
-  public async registerEmptyConversation(groupId: string, parentGroupId?: string): Promise<void> {
+  public async registerEmptyConversation(
+    groupId: string,
+    parentGroupId?: string,
+    removalKeyFor1to1Signature?: MLSPublicKeyRecord,
+  ): Promise<void> {
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
 
     let externalSenders: Uint8Array[] = [];
@@ -481,7 +485,8 @@ export class MLSService extends TypedEventEmitter<Events> {
     } else {
       const mlsKeys = (await this.apiClient.api.client.getPublicKeys()).removal;
       const ciphersuiteSignature = getSignatureAlgorithmForCiphersuite(this.config.defaultCiphersuite);
-      const removalKeyForSignature = mlsKeys[ciphersuiteSignature];
+      const removalKeyForSignature =
+        removalKeyFor1to1Signature?.[ciphersuiteSignature] ?? mlsKeys[ciphersuiteSignature];
       if (!removalKeyForSignature) {
         throw new Error(
           `Cannot create conversation: No backend removal key found for the signature ${ciphersuiteSignature}`,
@@ -559,9 +564,10 @@ export class MLSService extends TypedEventEmitter<Events> {
     groupId: string,
     userId: QualifiedId,
     selfUser: {user: QualifiedId; client: string},
+    removalKeyFor1to1Signature?: MLSPublicKeyRecord,
   ): Promise<PostMlsMessageResponse & {failures: AddUsersFailure[]}> {
     try {
-      await this.registerEmptyConversation(groupId);
+      await this.registerEmptyConversation(groupId, undefined, removalKeyFor1to1Signature);
 
       // We fist fetch key packages for the user we want to add
       const {keyPackages: otherUserKeyPackages, failures: otherUserKeysClaimingFailures} =
