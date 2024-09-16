@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [46.4.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.3.2...@wireapp/core@46.4.0) (2024-09-16)
+
+### Features
+
+* establish 1on1 mls conversation with new removal key [WPB-10744] ([#6502](https://github.com/wireapp/wire-web-packages/issues/6502)) ([5ff3cf7](https://github.com/wireapp/wire-web-packages/commit/5ff3cf78edd144de2c3418c58340eee4b4614390))
+
 ## [46.3.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.3.1...@wireapp/core@46.3.2) (2024-08-29)
 
 **Note:** Version bump only for package @wireapp/core
