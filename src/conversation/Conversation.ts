@@ -19,6 +19,7 @@
 
 import {RECEIPT_MODE} from './data';
 
+import {MLSPublicKeyRecord} from '../client';
 import {QualifiedId} from '../user';
 
 import {ConversationMembers, ConversationProtocol} from './';
@@ -106,4 +107,19 @@ export interface MLSConversation extends Conversation {
   epoch: number;
   cipher_suite: number;
   protocol: ConversationProtocol.MLS;
+}
+
+export interface MLS1to1Conversation {
+  conversation: MLSConversation;
+  public_keys?: {
+    removal: MLSPublicKeyRecord;
+  };
+}
+
+export function isMLS1to1Conversation(response: unknown): response is MLS1to1Conversation {
+  if (typeof response === 'object' && response !== null && 'conversation' in response && 'public_keys' in response) {
+    return true;
+  }
+
+  return false;
 }

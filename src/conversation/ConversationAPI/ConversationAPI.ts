@@ -31,6 +31,7 @@ import {
   JoinConversationByCodePayload,
   Member,
   MessageSendingStatus,
+  MLS1to1Conversation,
   MLSConversation,
   NewConversation,
   QualifiedConversationIds,
@@ -420,13 +421,13 @@ export class ConversationAPI {
    * Get a MLS 1:1-conversation with a given user.
    * @param userId - qualified user id
    */
-  public async getMLS1to1Conversation({domain, id}: QualifiedId): Promise<MLSConversation> {
+  public async getMLS1to1Conversation({domain, id}: QualifiedId): Promise<MLS1to1Conversation | MLSConversation> {
     const config: AxiosRequestConfig = {
       method: 'get',
       url: `${ConversationAPI.URL.CONVERSATIONS}/${ConversationAPI.URL.ONE_2_ONE}/${domain}/${id}`,
     };
 
-    const response = await this.client.sendJSON<MLSConversation>(config);
+    const response = await this.client.sendJSON<MLS1to1Conversation | MLSConversation>(config);
     return response.data;
   }
 
