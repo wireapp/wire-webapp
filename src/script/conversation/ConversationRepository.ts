@@ -25,7 +25,6 @@ import {
   NewConversation,
   MessageSendingStatus,
   RemoteConversations,
-  MLS1on1Conversation,
 } from '@wireapp/api-client/lib/conversation';
 import {MemberLeaveReason, ConversationReceiptModeUpdateData} from '@wireapp/api-client/lib/conversation/data';
 import {CONVERSATION_TYPING} from '@wireapp/api-client/lib/conversation/data/ConversationTypingData';
@@ -92,7 +91,6 @@ import {
   ProteusConversation,
   isConnectionRequestConversation,
   isBackendProteus1to1Conversation,
-  isMLS1on1Conversation,
 } from './ConversationSelectors';
 import {ConversationService} from './ConversationService';
 import {ConversationState} from './ConversationState';
@@ -1558,7 +1556,7 @@ export class ConversationRepository {
    * @param otherUserId - id of the other user
    * @returns MLS conversation entity
    */
-  private readonly getMLS1to1Conversation = async (otherUserId: QualifiedId): Promise<MLS1on1Conversation> => {
+  private readonly getMLS1to1Conversation = async (otherUserId: QualifiedId): Promise<MLSConversation> => {
     const localMLSConversation = this.conversationState.findMLS1to1Conversation(otherUserId);
 
     if (localMLSConversation) {
@@ -1574,11 +1572,11 @@ export class ConversationRepository {
    * @param otherUserId - id of the other user
    * @returns MLS conversation entity
    */
-  private readonly fetchMLS1to1Conversation = async (otherUserId: QualifiedId): Promise<MLS1on1Conversation> => {
-    const remoteConversation = await this.conversationService.getMLS1to1Conversation(otherUserId);
+  private readonly fetchMLS1to1Conversation = async (otherUserId: QualifiedId): Promise<MLSConversation> => {
+    const {conversation: remoteConversation} = await this.conversationService.getMLS1to1Conversation(otherUserId);
     const [conversation] = this.mapConversations([remoteConversation]);
 
-    if (!isMLS1on1Conversation(conversation)) {
+    if (!isMLSConversation(conversation)) {
       throw new Error('Conversation is not MLS');
     }
 
