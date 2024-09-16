@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.6.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.5.0...@wireapp/api-client@27.6.0) (2024-09-16)
+
+### Features
+
+* establish 1on1 mls conversation with new removal key [WPB-10744] ([#6502](https://github.com/wireapp/wire-web-packages/issues/6502)) ([5ff3cf7](https://github.com/wireapp/wire-web-packages/commit/5ff3cf78edd144de2c3418c58340eee4b4614390))
+
 # [27.5.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.4.1...@wireapp/api-client@27.5.0) (2024-08-29)
 
 ### Features
