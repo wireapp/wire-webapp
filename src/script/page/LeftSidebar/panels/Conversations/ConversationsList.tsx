@@ -33,6 +33,7 @@ import {matchQualifiedIds} from 'Util/QualifiedId';
 import {ConnectionRequests} from './ConnectionRequests';
 import {ConversationView} from './ConversationView';
 import {FilteredGroupConversations} from './FilteredGroupConversations';
+import {scrollToConversation} from './helpers';
 
 import {CallState} from '../../../../calling/CallState';
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
@@ -121,6 +122,10 @@ export const ConversationsList = ({
         createNavigate(generateConversationUrl(conversation.qualifiedId))(event);
       }
 
+      setTimeout(() => {
+        scrollToConversation(event.target as HTMLElement);
+      }, 300);
+
       clearSearchFilter();
     },
     isSelected: isActiveConversation,
@@ -153,6 +158,7 @@ export const ConversationsList = ({
         <FilteredGroupConversations
           archivedConversations={archivedConversations}
           conversationRepository={conversationRepository}
+          conversations={conversations}
           conversationsFilter={conversationsFilter}
           currentFolder={currentFolder}
           favoriteConversations={favoriteConversations}
