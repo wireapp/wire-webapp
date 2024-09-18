@@ -17,7 +17,7 @@
  *
  */
 
-import React, {MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent} from 'react';
+import React, {MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent, useEffect} from 'react';
 
 import {css} from '@emotion/react';
 
@@ -88,6 +88,7 @@ export const ConversationsList = ({
   const {currentTab} = useSidebarStore();
 
   const {joinableCalls} = useKoSubscribableChildren(callState, ['joinableCalls']);
+  const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
 
   const isActiveConversation = (conversation: Conversation) => conversationState.isActiveConversation(conversation);
 
@@ -122,10 +123,6 @@ export const ConversationsList = ({
         createNavigate(generateConversationUrl(conversation.qualifiedId))(event);
       }
 
-      setTimeout(() => {
-        scrollToConversation(event.target as HTMLElement);
-      }, 300);
-
       clearSearchFilter();
     },
     isSelected: isActiveConversation,
@@ -133,6 +130,17 @@ export const ConversationsList = ({
     rightClick: openContextMenu,
     showJoinButton: hasJoinableCall(conversation),
   });
+
+  useEffect(() => {
+    if (!activeConversation) {
+      return;
+    }
+
+    const element = document.querySelector<HTMLElement>(`[data-uie-uid="${activeConversation.id}"]`);
+    if (element) {
+      scrollToConversation(element);
+    }
+  }, [activeConversation?.id]);
 
   return (
     <>
