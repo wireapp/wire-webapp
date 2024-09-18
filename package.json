@@ -94,6 +94,7 @@
     "@types/uuid": "^10.0.0",
     "@types/webpack-env": "1.18.5",
     "@wireapp/copy-config": "2.2.7",
+    "@types/wicg-file-system-access": "^2023.10.5",
     "@wireapp/eslint-config": "3.0.7",
     "@wireapp/prettier-config": "0.6.4",
     "@wireapp/store-engine": "5.1.8",

@@ -37,5 +37,6 @@
     "target": "ESNext",
     "strict": true
   },
+  "types": ["@types/wicg-file-system-access"],
   "exclude": ["node_modules", "server/", "src/sw.js", "src/worker/"]
 }
