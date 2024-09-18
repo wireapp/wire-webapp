@@ -5031,9 +5031,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:27.1.0-hotfix-1.0":
-  version: 27.1.0-hotfix-1.0
-  resolution: "@wireapp/api-client@npm:27.1.0-hotfix-1.0"
+"@wireapp/api-client@npm:27.1.0-hotfix-1.6":
+  version: 27.1.0-hotfix-1.6
+  resolution: "@wireapp/api-client@npm:27.1.0-hotfix-1.6"
   dependencies:
     "@wireapp/commons": ^5.2.8
     "@wireapp/priority-queue": ^2.1.6
@@ -5048,7 +5048,7 @@ __metadata:
     tough-cookie: 4.1.4
     ws: 8.17.1
     zod: 3.23.8
-  checksum: dc119718f533ffc1e62b2eba4953ad87ab16937dc1703ad6d01e100702014ef9d0319fc3fa5600307a81bc60e1d136436ed0061d3f4ae62106c783882424634f
+  checksum: 67cd6dc7c69c9ca8ed64bf10f29d6990449f89515fcada30685f20fad494683da709c423e9f0b5846f8173aacd0252ecd40573340f14401dda9f594ca4097c75
   languageName: node
   linkType: hard
 
@@ -5113,11 +5113,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:46.1.0-hotfix-1.5":
-  version: 46.1.0-hotfix-1.5
-  resolution: "@wireapp/core@npm:46.1.0-hotfix-1.5"
+"@wireapp/core@npm:46.1.0-hotfix-1.7":
+  version: 46.1.0-hotfix-1.7
+  resolution: "@wireapp/core@npm:46.1.0-hotfix-1.7"
   dependencies:
-    "@wireapp/api-client": ^27.1.0-hotfix-1.5
+    "@wireapp/api-client": ^27.1.0-hotfix-1.6
     "@wireapp/commons": ^5.2.8
     "@wireapp/core-crypto": 1.0.2
     "@wireapp/cryptobox": 12.8.0
@@ -5135,7 +5135,7 @@ __metadata:
     long: ^5.2.0
     uuid: 9.0.1
     zod: 3.23.8
-  checksum: d92b90a98f489bff0c7ad1db1b873ed0bad5e7ab33dcce813f584a9be220421ed3eb359c68fc15ce18a42443ad412f1fad9e0663389b2f0f8349fbdaca876d0d
+  checksum: be7fda878e279ded238b15810d6cbbec0e8f613e6e8fc8efa1c75d9547eb5113872f639aa99f30668ebfc94495594ad737eecc0a8f491ff2b8b397ddbc6837fb
   languageName: node
   linkType: hard
 
@@ -7594,24 +7594,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dexie@npm:3.2.4":
-  version: 3.2.4
-  resolution: "dexie@npm:3.2.4"
-  checksum: 4e5294a954118b6862c864b8c3970904a1733daebcd919488624520696411e2e81ed1bceeac3634c5c15a21e37ce4b8502ed41c4edfbc5ba3f5925c34d56497b
-  languageName: node
-  linkType: hard
-
-"dexie@npm:^3.2.0":
-  version: 3.2.7
-  resolution: "dexie@npm:3.2.7"
-  checksum: 257504ed23cea2e5ed5c18a17a031c0a44aff70c5b3d6a63536b544cec9027c4c492a608165d5e7a44a104570c92dec2aa59c7bcec0c65f52000f979e1193dfd
-  languageName: node
-  linkType: hard
-
-"dexie@npm:latest":
-  version: 4.0.8
-  resolution: "dexie@npm:4.0.8"
-  checksum: 156e0809d5102ec0522cdee473c842e2d8c5a9b91d92792c8a17829953317f11370b34bc2418a66c5c4dec7f99306a6ae8a53d02f530af85f98d8803965bc6bb
+"dexie@npm:3.2.0":
+  version: 3.2.0
+  resolution: "dexie@npm:3.2.0"
+  checksum: 59b6fd600ad23fab57d70ed86e97b0c16a4ca570e7aa4556a9e6ad1fe594bd539d9ab9315b64d5523864fc8f89e26f371d98cf72d4a13ae77068825d1e09ed57
   languageName: node
   linkType: hard
 
@@ -17928,7 +17914,7 @@ __metadata:
     "@wireapp/avs": 9.6.16
     "@wireapp/commons": 5.2.7
     "@wireapp/copy-config": 2.1.14
-    "@wireapp/core": 46.1.0-hotfix-1.5
+    "@wireapp/core": 46.1.0-hotfix-1.7
     "@wireapp/eslint-config": 3.0.5
     "@wireapp/prettier-config": 0.6.3
     "@wireapp/react-ui-kit": 9.16.4
