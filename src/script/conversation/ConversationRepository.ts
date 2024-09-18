@@ -1573,7 +1573,7 @@ export class ConversationRepository {
    * @returns MLS conversation entity
    */
   private readonly fetchMLS1to1Conversation = async (otherUserId: QualifiedId): Promise<MLSConversation> => {
-    const remoteConversation = await this.conversationService.getMLS1to1Conversation(otherUserId);
+    const {conversation: remoteConversation} = await this.conversationService.getMLS1to1Conversation(otherUserId);
     const [conversation] = this.mapConversations([remoteConversation]);
 
     if (!isMLSConversation(conversation)) {

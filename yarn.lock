@@ -4693,9 +4693,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:27.1.0-hotfix-1.0":
-  version: 27.1.0-hotfix-1.0
-  resolution: "@wireapp/api-client@npm:27.1.0-hotfix-1.0"
+"@wireapp/api-client@npm:27.1.0-hotfix-1.6":
+  version: 27.1.0-hotfix-1.6
+  resolution: "@wireapp/api-client@npm:27.1.0-hotfix-1.6"
   dependencies:
     "@wireapp/commons": ^5.2.8
     "@wireapp/priority-queue": ^2.1.6
@@ -4710,7 +4710,7 @@ __metadata:
     tough-cookie: 4.1.4
     ws: 8.17.1
     zod: 3.23.8
-  checksum: dc119718f533ffc1e62b2eba4953ad87ab16937dc1703ad6d01e100702014ef9d0319fc3fa5600307a81bc60e1d136436ed0061d3f4ae62106c783882424634f
+  checksum: 67cd6dc7c69c9ca8ed64bf10f29d6990449f89515fcada30685f20fad494683da709c423e9f0b5846f8173aacd0252ecd40573340f14401dda9f594ca4097c75
   languageName: node
   linkType: hard
 
@@ -4775,11 +4775,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:46.1.0-hotfix-1.0":
-  version: 46.1.0-hotfix-1.0
-  resolution: "@wireapp/core@npm:46.1.0-hotfix-1.0"
+"@wireapp/core@npm:46.1.0-hotfix-1.7":
+  version: 46.1.0-hotfix-1.7
+  resolution: "@wireapp/core@npm:46.1.0-hotfix-1.7"
   dependencies:
-    "@wireapp/api-client": ^27.1.0-hotfix-1.0
+    "@wireapp/api-client": ^27.1.0-hotfix-1.6
     "@wireapp/commons": ^5.2.8
     "@wireapp/core-crypto": 1.0.2
     "@wireapp/cryptobox": 12.8.0
@@ -4797,7 +4797,7 @@ __metadata:
     long: ^5.2.0
     uuid: 9.0.1
     zod: 3.23.8
-  checksum: 276a6edc57c72f9b912cc292745400d97d0c881bd5b9af833f8d298ba8a48c9ad0e8ab5647e40c749a6ef93994682bab60b2b6f74285d24625f025c6423ddd5c
+  checksum: be7fda878e279ded238b15810d6cbbec0e8f613e6e8fc8efa1c75d9547eb5113872f639aa99f30668ebfc94495594ad737eecc0a8f491ff2b8b397ddbc6837fb
   languageName: node
   linkType: hard
 
@@ -17508,7 +17508,7 @@ __metadata:
     "@wireapp/avs": 9.6.18
     "@wireapp/commons": 5.2.7
     "@wireapp/copy-config": 2.1.14
-    "@wireapp/core": 46.1.0-hotfix-1.0
+    "@wireapp/core": 46.1.0-hotfix-1.7
     "@wireapp/eslint-config": 3.0.5
     "@wireapp/prettier-config": 0.6.3
     "@wireapp/react-ui-kit": 9.16.4
