@@ -17,7 +17,7 @@
  *
  */
 
-import React, {MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent} from 'react';
+import React, {MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent, useEffect} from 'react';
 
 import {css} from '@emotion/react';
 
@@ -33,6 +33,7 @@ import {matchQualifiedIds} from 'Util/QualifiedId';
 import {ConnectionRequests} from './ConnectionRequests';
 import {ConversationView} from './ConversationView';
 import {FilteredGroupConversations} from './FilteredGroupConversations';
+import {scrollToConversation} from './helpers';
 
 import {CallState} from '../../../../calling/CallState';
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
@@ -87,6 +88,7 @@ export const ConversationsList = ({
   const {currentTab} = useSidebarStore();
 
   const {joinableCalls} = useKoSubscribableChildren(callState, ['joinableCalls']);
+  const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
 
   const isActiveConversation = (conversation: Conversation) => conversationState.isActiveConversation(conversation);
 
@@ -129,6 +131,17 @@ export const ConversationsList = ({
     showJoinButton: hasJoinableCall(conversation),
   });
 
+  useEffect(() => {
+    if (!activeConversation) {
+      return;
+    }
+
+    const element = document.querySelector<HTMLElement>(`[data-uie-uid="${activeConversation.id}"]`);
+    if (element) {
+      scrollToConversation(element);
+    }
+  }, [activeConversation?.id]);
+
   return (
     <>
       <h2 className="visually-hidden">{t('conversationViewTooltip')}</h2>
@@ -153,6 +166,7 @@ export const ConversationsList = ({
         <FilteredGroupConversations
           archivedConversations={archivedConversations}
           conversationRepository={conversationRepository}
+          conversations={conversations}
           conversationsFilter={conversationsFilter}
           currentFolder={currentFolder}
           favoriteConversations={favoriteConversations}

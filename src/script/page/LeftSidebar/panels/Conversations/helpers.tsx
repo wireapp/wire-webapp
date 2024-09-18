@@ -99,3 +99,16 @@ export const conversationSearchFilter = (filter: string) => (conversation: Conve
 
   return conversationDisplayName.includes(filterWord);
 };
+
+export const scrollToConversation = (element: HTMLElement) => {
+  const rect = element.getBoundingClientRect();
+  const isVisible =
+    rect.top >= 0 &&
+    rect.left >= 0 &&
+    rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+    rect.right <= (window.innerWidth || document.documentElement.clientWidth);
+
+  if (!isVisible) {
+    element.scrollIntoView();
+  }
+};

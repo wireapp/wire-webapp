@@ -32,6 +32,7 @@ import {SidebarTabs, useSidebarStore} from '../useSidebarStore';
 interface FilteredGroupConversationsProps {
   archivedConversations: Conversation[];
   conversationsFilter?: string;
+  conversations: Conversation[];
   conversationRepository: ConversationRepository;
   currentFolder?: ConversationLabel;
   favoriteConversations: Conversation[];
@@ -42,6 +43,7 @@ interface FilteredGroupConversationsProps {
 export const FilteredGroupConversations = ({
   archivedConversations,
   conversationRepository,
+  conversations,
   conversationsFilter = '',
   currentFolder,
   favoriteConversations,
@@ -74,7 +76,7 @@ export const FilteredGroupConversations = ({
       filteredGroup = filteredGroup.filter(item => !archivedConversations.includes(item));
     }
 
-    return filteredGroup;
+    return filteredGroup.filter(item => !conversations.includes(item));
   };
 
   const filteredGroupConversations = getFilteredGroupConversations();
