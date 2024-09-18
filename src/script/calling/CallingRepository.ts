@@ -1073,7 +1073,7 @@ export class CallingRepository {
   }
 
   private readonly leave1on1MLSConference = async (conversationId: QualifiedId) => {
-    await this.subconversationService.leave1on1ConferenceSubconversation(conversationId);
+    await this.subconversationService.leaveConferenceSubconversation(conversationId);
 
     const conversationIdStr = this.serializeQualifiedId(conversationId);
     this.wCall?.end(this.wUser, conversationIdStr);
