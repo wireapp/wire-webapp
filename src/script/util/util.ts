@@ -336,3 +336,16 @@ export class InitializationEventLogger {
     this.timestamp = Date.now(); // Reset the timestamp after logging
   }
 }
+
+export enum AppInitializationStep {
+  AppInitialize = 'app-initialize',
+  UserInitialize = 'user-initialize',
+  SetupEventProcessors = 'setup-event-processors',
+  ValidatedClient = 'validated-client',
+  ConversationsLoaded = 'conversations-loaded',
+  UserDataLoaded = 'user-data-loaded',
+  DecryptionCompleted = 'decryption-completed',
+  SetupMLS = 'setup-mls',
+  ClientsUpdated = 'clients-updated',
+  AppInitCompleted = 'app-init-completed',
+}
