@@ -40,7 +40,7 @@ import {getLogger, Logger} from 'Util/Logger';
 import {includesString} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {appendParameter} from 'Util/UrlUtil';
-import {checkIndexedDb} from 'Util/util';
+import {checkIndexedDb, InitializationEventLogger} from 'Util/util';
 
 import '../../style/default.less';
 import {AssetRepository} from '../assets/AssetRepository';
@@ -372,6 +372,8 @@ export class App {
       const selfUser = await this.repository.user.getSelf([{position: 'App.initiateSelfUser', vendor: 'webapp'}]);
 
       await initializeDataDog(this.config, selfUser.qualifiedId);
+      const eventLogger = new InitializationEventLogger(selfUser.id);
+      eventLogger.log('app-initialize');
       onProgress(5, t('initReceivedSelfUser', selfUser.name(), {}, true));
 
       try {
@@ -387,7 +389,7 @@ export class App {
       });
 
       await this.initiateSelfUser(selfUser);
-
+      eventLogger.log('user-initialize');
       const localClient = await this.core.getLocalClient();
       if (!localClient) {
         throw new ClientError(CLIENT_ERROR_TYPE.NO_VALID_CLIENT, 'Client has been deleted on backend');
@@ -422,14 +424,14 @@ export class App {
       // Setup all the event processors
       const federationEventProcessor = new FederationEventProcessor(eventRepository, serverTimeHandler, selfUser);
       eventRepository.setEventProcessors([federationEventProcessor]);
-
+      eventLogger.log('setup-event-processors');
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_SELF_USER);
       const clientEntity = await this._initiateSelfUserClients(selfUser, clientRepository);
       callingRepository.initAvs(selfUser, clientEntity.id);
       onProgress(7.5, t('initValidatedClient'));
       telemetry.timeStep(AppInitTimingsStep.VALIDATED_CLIENT);
       telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity.type ?? clientType);
-
+      eventLogger.log('validated-client');
       onProgress(10);
       telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
@@ -440,7 +442,7 @@ export class App {
       telemetry.addStatistic(AppInitStatisticsValue.CONNECTIONS, connections.length, 50);
 
       const conversations = await conversationRepository.loadConversations(connections);
-
+      eventLogger.log('conversations-loaded');
       // We load all the users the self user is connected with
       await userRepository.loadUsers(selfUser, connections, conversations, teamMembers);
 
@@ -458,6 +460,7 @@ export class App {
       telemetry.addStatistic(AppInitStatisticsValue.CONVERSATIONS, conversations.length, 50);
       this._subscribeToUnloadEvents(selfUser);
       this._subscribeToBeforeUnload();
+      eventLogger.log('user-data-loaded');
 
       await conversationRepository.conversationRoleRepository.loadTeamRoles();
 
@@ -471,9 +474,9 @@ export class App {
         totalNotifications = total;
         onProgress(25 + 50 * (done / total), `${baseMessage}${extraInfo}`);
       });
+      eventLogger.log('decryption-completed', {count: totalNotifications});
 
       await conversationRepository.init1To1Conversations(connections, conversations);
-
       if (this.core.hasMLSDevice) {
         //add the potential `self` and `team` conversations
         await initialiseSelfAndTeamConversations(conversations, selfUser, clientEntity.id, this.core);
@@ -495,16 +498,19 @@ export class App {
         });
       }
 
+      eventLogger.log('setup-mls');
       telemetry.timeStep(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
       telemetry.addStatistic(AppInitStatisticsValue.NOTIFICATIONS, totalNotifications, 100);
-
       onProgress(97.5, t('initUpdatedFromNotifications', this.config.BRAND_NAME));
 
       const clientEntities = await clientRepository.updateClientsForSelf();
-      await eventTrackerRepository.init(propertiesRepository.getUserConsentStatus().isTelemetryConsentGiven);
+
+      // not waiting for promise to unblock app initialization
+      void eventTrackerRepository.init(propertiesRepository.getUserConsentStatus().isTelemetryConsentGiven);
 
       onProgress(99);
 
+      eventLogger.log('clients-updated', {count: clientEntities.length});
       telemetry.addStatistic(AppInitStatisticsValue.CLIENTS, clientEntities.length);
       telemetry.timeStep(AppInitTimingsStep.APP_PRE_LOADED);
 
@@ -531,6 +537,7 @@ export class App {
       await e2eiHandler?.startTimers();
       this.logger.info(`App version ${Environment.version()} loaded in ${Date.now() - startTime}ms`);
 
+      eventLogger.log('app-init-completed');
       return selfUser;
     } catch (error) {
       if (error instanceof BaseError) {
