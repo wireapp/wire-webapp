@@ -636,7 +636,7 @@ describe('ConversationRepository', () => {
 
       jest
         .spyOn(conversationRepository['conversationService'], 'getMLS1to1Conversation')
-        .mockResolvedValueOnce(mls1to1ConversationResponse);
+        .mockResolvedValueOnce({conversation: mls1to1ConversationResponse});
 
       jest
         .spyOn(conversationRepository['conversationService'], 'isMLSGroupEstablishedLocally')
@@ -694,8 +694,7 @@ describe('ConversationRepository', () => {
 
       jest
         .spyOn(conversationRepository['conversationService'], 'getMLS1to1Conversation')
-        .mockResolvedValueOnce(mls1to1ConversationResponse);
-
+        .mockResolvedValueOnce({conversation: mls1to1ConversationResponse});
       jest
         .spyOn(conversationRepository['conversationService'], 'isMLSGroupEstablishedLocally')
         .mockResolvedValueOnce(false);
@@ -779,8 +778,7 @@ describe('ConversationRepository', () => {
 
       jest
         .spyOn(conversationRepository['conversationService'], 'getMLS1to1Conversation')
-        .mockResolvedValueOnce(mls1to1ConversationResponse);
-
+        .mockResolvedValueOnce({conversation: mls1to1ConversationResponse});
       jest
         .spyOn(conversationRepository['conversationService'], 'isMLSGroupEstablishedLocally')
         .mockResolvedValueOnce(false);
@@ -846,7 +844,7 @@ describe('ConversationRepository', () => {
 
       jest
         .spyOn(conversationRepository['conversationService'], 'getMLS1to1Conversation')
-        .mockResolvedValueOnce(mls1to1ConversationResponse);
+        .mockResolvedValueOnce({conversation: mls1to1ConversationResponse});
 
       jest
         .spyOn(conversationRepository['conversationService'], 'isMLSGroupEstablishedLocally')
@@ -869,7 +867,7 @@ describe('ConversationRepository', () => {
 
       jest
         .spyOn(conversationRepository['conversationService'], 'getMLS1to1Conversation')
-        .mockResolvedValueOnce(establishedMls1to1ConversationResponse);
+        .mockResolvedValueOnce({conversation: establishedMls1to1ConversationResponse});
       jest
         .spyOn(container.resolve(Core).service!.conversation, 'establishMLS1to1Conversation')
         .mockResolvedValueOnce(establishedMls1to1ConversationResponse);
@@ -918,7 +916,7 @@ describe('ConversationRepository', () => {
 
       jest
         .spyOn(conversationRepository['conversationService'], 'getMLS1to1Conversation')
-        .mockResolvedValueOnce(establishedMls1to1ConversationResponse);
+        .mockResolvedValueOnce({conversation: establishedMls1to1ConversationResponse});
       jest
         .spyOn(container.resolve(Core).service!.conversation, 'establishMLS1to1Conversation')
         .mockResolvedValueOnce(establishedMls1to1ConversationResponse);
@@ -1145,7 +1143,7 @@ describe('ConversationRepository', () => {
 
       jest
         .spyOn(conversationRepository['conversationService'], 'getMLS1to1Conversation')
-        .mockResolvedValueOnce(mls1to1ConversationResponse);
+        .mockResolvedValueOnce({conversation: mls1to1ConversationResponse});
 
       jest
         .spyOn(conversationRepository['conversationService'], 'isMLSGroupEstablishedLocally')
