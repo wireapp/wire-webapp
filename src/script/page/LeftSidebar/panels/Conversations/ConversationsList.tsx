@@ -17,7 +17,7 @@
  *
  */
 
-import React, {MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent, useEffect} from 'react';
+import React, {MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent, useRef, useEffect} from 'react';
 
 import {css} from '@emotion/react';
 
@@ -87,8 +87,9 @@ export const ConversationsList = ({
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
   const {currentTab} = useSidebarStore();
 
+  const clickedFilteredConversation = useRef<Conversation | null>(null);
+
   const {joinableCalls} = useKoSubscribableChildren(callState, ['joinableCalls']);
-  const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
 
   const isActiveConversation = (conversation: Conversation) => conversationState.isActiveConversation(conversation);
 
@@ -124,6 +125,7 @@ export const ConversationsList = ({
       }
 
       clearSearchFilter();
+      clickedFilteredConversation.current = conversation;
     },
     isSelected: isActiveConversation,
     onJoinCall: answerCall,
@@ -132,15 +134,15 @@ export const ConversationsList = ({
   });
 
   useEffect(() => {
-    if (!activeConversation) {
-      return;
-    }
+    if (clickedFilteredConversation.current) {
+      const element = document.querySelector<HTMLElement>(`[data-uie-uid="${clickedFilteredConversation.current.id}"]`);
+      if (element) {
+        scrollToConversation(element);
+      }
 
-    const element = document.querySelector<HTMLElement>(`[data-uie-uid="${activeConversation.id}"]`);
-    if (element) {
-      scrollToConversation(element);
+      clickedFilteredConversation.current = null;
     }
-  }, [activeConversation?.id]);
+  });
 
   return (
     <>

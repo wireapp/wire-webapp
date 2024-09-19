@@ -109,6 +109,6 @@ export const scrollToConversation = (element: HTMLElement) => {
     rect.right <= (window.innerWidth || document.documentElement.clientWidth);
 
   if (!isVisible) {
-    element.scrollIntoView();
+    element.scrollIntoView({behavior: 'instant', block: 'center', inline: 'nearest'});
   }
 };
