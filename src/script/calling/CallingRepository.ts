@@ -19,6 +19,7 @@
 
 import type {CallConfigData} from '@wireapp/api-client/lib/account/CallConfigData';
 import {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
+import {FEATURE_KEY} from '@wireapp/api-client/lib/team';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {WebappProperties} from '@wireapp/api-client/lib/user/data';
 import {MessageSendingState} from '@wireapp/core/lib/conversation';
@@ -846,10 +847,8 @@ export class CallingRepository {
   //##############################################################################
 
   private getConversationType(conversation: Conversation): CONV_TYPE {
-    //FIXME: Remove this line when the feature flag is available on backend
-    const useSFTForOneToOneCalls = true;
-    // const useSFTForOneToOneCalls =
-    //   this.teamState.teamFeatures()?.[FEATURE_KEY.CONFERENCE_CALLING]?.config?.useSFTForOneToOneCalls;
+    const useSFTForOneToOneCalls =
+      this.teamState.teamFeatures()?.[FEATURE_KEY.CONFERENCE_CALLING]?.config?.useSFTForOneToOneCalls;
 
     if (conversation.isGroup() || useSFTForOneToOneCalls) {
       if (isMLSConversation(conversation)) {
