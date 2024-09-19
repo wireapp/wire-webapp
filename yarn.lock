@@ -5563,14 +5563,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^27.5.0":
-  version: 27.5.0
-  resolution: "@wireapp/api-client@npm:27.5.0"
+"@wireapp/api-client@npm:^27.6.0":
+  version: 27.6.0
+  resolution: "@wireapp/api-client@npm:27.6.0"
   dependencies:
     "@wireapp/commons": "npm:^5.2.10"
     "@wireapp/priority-queue": "npm:^2.1.8"
-    "@wireapp/protocol-messaging": "npm:1.49.0"
-    axios: "npm:1.7.5"
+    "@wireapp/protocol-messaging": "npm:1.50.0"
+    axios: "npm:1.7.7"
     axios-retry: "npm:4.5.0"
     http-status-codes: "npm:2.3.0"
     logdown: "npm:3.3.1"
@@ -5580,7 +5580,7 @@ __metadata:
     tough-cookie: "npm:4.1.4"
     ws: "npm:8.18.0"
     zod: "npm:3.23.8"
-  checksum: 10/0e361751f4836d5a8c3608cc8b5c859fc0bde442d8e660e0a74e38565a6d23c34d67ad4f54e7f12ce6a5717af665b89539e206bd0d64d1c8e99fcb39e949dc56
+  checksum: 10/91811a1634c6bde4b6776e4be658d4168dc6abc8a295414ad8630248edb00d424883c3c646a29f728b15988662ee4b517465c6d4e785a91a9d271a4cacb6c9b5
   languageName: node
   linkType: hard
 
@@ -5634,19 +5634,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:46.3.2":
-  version: 46.3.2
-  resolution: "@wireapp/core@npm:46.3.2"
+"@wireapp/core@npm:46.4.0":
+  version: 46.4.0
+  resolution: "@wireapp/core@npm:46.4.0"
   dependencies:
-    "@wireapp/api-client": "npm:^27.5.0"
+    "@wireapp/api-client": "npm:^27.6.0"
     "@wireapp/commons": "npm:^5.2.10"
     "@wireapp/core-crypto": "npm:1.0.2"
     "@wireapp/cryptobox": "npm:12.8.0"
     "@wireapp/priority-queue": "npm:^2.1.8"
     "@wireapp/promise-queue": "npm:^2.3.5"
-    "@wireapp/protocol-messaging": "npm:1.49.0"
+    "@wireapp/protocol-messaging": "npm:1.50.0"
     "@wireapp/store-engine": "npm:5.1.8"
-    axios: "npm:1.7.5"
+    axios: "npm:1.7.7"
     bazinga64: "npm:^6.3.8"
     deepmerge-ts: "npm:6.0.0"
     hash.js: "npm:1.1.7"
@@ -5656,7 +5656,7 @@ __metadata:
     long: "npm:^5.2.0"
     uuid: "npm:9.0.1"
     zod: "npm:3.23.8"
-  checksum: 10/739405f76898fb8f14eaaafcdd67bebb012d91a9dde2e84b1c0bba99a8336a5abe1048a9aebd04d1ef22956b295a563588d9345394384de351152088094a2a25
+  checksum: 10/6f1d5f177c4c0af706676bdd59c2279dc1a26ed885d800563200c0532cbe85a47ebc698f94e101ec7727a7d4c32bc79f87fb5aea387b41ee00c68ef70a7b67cf
   languageName: node
   linkType: hard
 
@@ -5758,15 +5758,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/protocol-messaging@npm:1.49.0":
-  version: 1.49.0
-  resolution: "@wireapp/protocol-messaging@npm:1.49.0"
+"@wireapp/protocol-messaging@npm:1.50.0":
+  version: 1.50.0
+  resolution: "@wireapp/protocol-messaging@npm:1.50.0"
   dependencies:
     long: "npm:5.2.0"
     protobufjs: "npm:7.2.5"
     protobufjs-cli: "npm:1.1.2"
     typescript: "npm:4.8.4"
-  checksum: 10/664cd77ca91340b3d0b2a01bde851dddef306fd2f6a591a15922b4c56e6d2248ba4d7ae52cd6d07c81794fd6a822e39b910eb9941d4b27a7ae20ec062a728403
+  checksum: 10/a3e006f067a035e8adbbfa7f3c164a4c20966ffcf4579847aba27fdedea4aa683e5a8e67b48d7640710b49aed7c8982bca64ace550e9d1fef1e550663c7e3c74
   languageName: node
   linkType: hard
 
@@ -6484,6 +6484,17 @@ __metadata:
     form-data: "npm:^4.0.0"
     proxy-from-env: "npm:^1.1.0"
   checksum: 10/6cbcfe943a84089f420a900a3a3aeb54ee94dcc9c2b81b150434896357be5d1079eff0b1bbb628597371e79f896b1bc5776df04184756ba99656ff31df9a75bf
+  languageName: node
+  linkType: hard
+
+"axios@npm:1.7.7":
+  version: 1.7.7
+  resolution: "axios@npm:1.7.7"
+  dependencies:
+    follow-redirects: "npm:^1.15.6"
+    form-data: "npm:^4.0.0"
+    proxy-from-env: "npm:^1.1.0"
+  checksum: 10/7f875ea13b9298cd7b40fd09985209f7a38d38321f1118c701520939de2f113c4ba137832fe8e3f811f99a38e12c8225481011023209a77b0c0641270e20cde1
   languageName: node
   linkType: hard
 
@@ -18180,7 +18191,7 @@ __metadata:
     "@wireapp/avs": "npm:9.9.3"
     "@wireapp/commons": "npm:5.2.10"
     "@wireapp/copy-config": "npm:2.2.6"
-    "@wireapp/core": "npm:46.3.2"
+    "@wireapp/core": "npm:46.4.0"
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/prettier-config": "npm:0.6.4"
     "@wireapp/react-ui-kit": "npm:9.23.3"
