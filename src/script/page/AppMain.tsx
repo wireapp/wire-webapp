@@ -316,6 +316,8 @@ export const AppMain: FC<AppMainProps> = ({
           <GroupCreationModal userState={userState} teamState={teamState} />
         </ErrorBoundary>
       </RootProvider>
+
+      <div id="app-notification"></div>
     </StyledApp>
   );
 };
