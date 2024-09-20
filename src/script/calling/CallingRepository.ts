@@ -1072,6 +1072,10 @@ export class CallingRepository {
   }
 
   private readonly leave1on1MLSConference = async (conversationId: QualifiedId) => {
+  if (isCountlyEnabledAtCurrentEnvironment()) {
+      this.showCallQualityFeedbackModal();
+    }
+    
     await this.subconversationService.leaveConferenceSubconversation(conversationId);
 
     const conversationIdStr = this.serializeQualifiedId(conversationId);
