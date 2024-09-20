@@ -25,6 +25,7 @@ import {container} from 'tsyringe';
 import {Button, ButtonVariant, Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {showAppNotification} from 'Components/AppNotification';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {ModalComponent} from 'Components/ModalComponent';
 import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
@@ -75,8 +76,9 @@ export const QualityFeedbackModal = () => {
 
       currentStorageData[selfUser.id] = isChecked ? null : dateUntilShowModal.getTime();
       localStorage.setItem(CALL_QUALITY_FEEDBACK_KEY, JSON.stringify(currentStorageData));
+      showAppNotification(t('qualityFeedback.notificationSubmitted'));
     } catch (error) {
-      logger.warn(`No labels were loaded: ${(error as Error).message}`);
+      logger.warn(`Can't send feedback: ${(error as Error).message}`);
     } finally {
       setQualityFeedbackModalShown(false);
     }

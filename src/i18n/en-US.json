@@ -1349,6 +1349,7 @@
   "qualityFeedback.fair": "Fair",
   "qualityFeedback.heading": "Call Quality Feedback",
   "qualityFeedback.skip": "Skip",
+  "qualityFeedback.notificationSubmitted": "Your feedback has been submitted. Thank you!",
   "readReceiptsToggleInfo": "When this is on, people can see when their messages in this conversation are read.",
   "readReceiptsToggleName": "Read receipts",
   "receiptToggleInfo": "When this is on, people can see when their messages in this conversation are read.",
