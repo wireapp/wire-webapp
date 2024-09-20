@@ -1348,6 +1348,7 @@
   "qualityFeedback.excellent": "Sehr Gut",
   "qualityFeedback.fair": "Befriedigend",
   "qualityFeedback.heading": "Rückmeldung zur Anrufqualität",
+  "qualityFeedback.notificationSubmitted": "Your feedback has been submitted. Thank you!",
   "qualityFeedback.skip": "Überspringen",
   "readReceiptsToggleInfo": "Wenn diese Option aktiviert ist, können Sender sehen, wenn ihre Nachrichten gelesen werden.",
   "readReceiptsToggleName": "Lesebestätigungen",
