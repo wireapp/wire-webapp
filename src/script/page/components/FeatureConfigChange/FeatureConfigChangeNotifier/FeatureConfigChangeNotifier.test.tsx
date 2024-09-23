@@ -53,8 +53,8 @@ describe('FeatureConfigChangeNotifier', () => {
       config: {enforcedTimeoutSeconds: 0},
     },
     [FEATURE_KEY.CONFERENCE_CALLING]: {
+      config: {useSFTForOneToOneCalls: false},
       status: FeatureStatus.DISABLED,
-      config: {},
     },
     [FEATURE_KEY.CONVERSATION_GUEST_LINKS]: {
       status: FeatureStatus.DISABLED,
