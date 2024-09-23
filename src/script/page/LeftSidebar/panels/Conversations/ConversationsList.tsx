@@ -62,7 +62,6 @@ interface ConversationsListProps {
   isConversationFilterFocused: boolean;
   favoriteConversations: Conversation[];
   archivedConversations: Conversation[];
-  hasEmptyConversationsList: boolean;
 }
 
 export const ConversationsList = ({
@@ -82,7 +81,6 @@ export const ConversationsList = ({
   isConversationFilterFocused,
   favoriteConversations,
   archivedConversations,
-  hasEmptyConversationsList,
 }: ConversationsListProps) => {
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
   const {currentTab} = useSidebarStore();

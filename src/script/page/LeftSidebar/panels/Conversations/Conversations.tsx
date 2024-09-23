@@ -413,7 +413,6 @@ const Conversations: React.FC<ConversationsProps> = ({
                 searchRepository={searchRepository}
                 favoriteConversations={favoriteConversations}
                 archivedConversations={archivedConversations}
-                hasEmptyConversationsList={hasEmptyConversationsList}
               />
             )}
           </>
