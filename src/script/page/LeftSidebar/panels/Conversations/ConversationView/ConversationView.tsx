@@ -41,15 +41,30 @@ export const ConversationView = ({
   const isFolderView = currentTab === SidebarTabs.FOLDER;
 
   if (isFolderView && currentFolder) {
-    return currentFolder
-      ?.conversations()
-      .filter(conversationSearchFilter(conversationsFilter))
-      .map((conversation, index) => (
-        <ConversationListCell key={conversation.id} {...getCommonConversationCellProps(conversation, index)} />
-      ));
+    const filteredConversations = currentFolder?.conversations().filter(conversationSearchFilter(conversationsFilter));
+
+    if (!filteredConversations.length) {
+      return null;
+    }
+
+    return (
+      <ul css={{margin: 0, paddingLeft: 0}} data-uie-name="conversation-view">
+        {filteredConversations.map((conversation, index) => (
+          <ConversationListCell key={conversation.id} {...getCommonConversationCellProps(conversation, index)} />
+        ))}
+      </ul>
+    );
   }
 
-  return conversations.map((conversation, index) => (
-    <ConversationListCell key={conversation.id} {...getCommonConversationCellProps(conversation, index)} />
-  ));
+  if (!conversations.length) {
+    return null;
+  }
+
+  return (
+    <ul css={{margin: 0, paddingLeft: 0}} data-uie-name="conversation-view">
+      {conversations.map((conversation, index) => (
+        <ConversationListCell key={conversation.id} {...getCommonConversationCellProps(conversation, index)} />
+      ))}
+    </ul>
+  );
 };

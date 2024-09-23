@@ -19,8 +19,6 @@
 
 import React, {MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent, useRef, useEffect} from 'react';
 
-import {css} from '@emotion/react';
-
 import {Call} from 'src/script/calling/Call';
 import {ConversationLabel, ConversationLabelRepository} from 'src/script/conversation/ConversationLabelRepository';
 import {User} from 'src/script/entity/User';
@@ -64,6 +62,7 @@ interface ConversationsListProps {
   isConversationFilterFocused: boolean;
   favoriteConversations: Conversation[];
   archivedConversations: Conversation[];
+  hasEmptyConversationsList: boolean;
 }
 
 export const ConversationsList = ({
@@ -83,6 +82,7 @@ export const ConversationsList = ({
   isConversationFilterFocused,
   favoriteConversations,
   archivedConversations,
+  hasEmptyConversationsList,
 }: ConversationsListProps) => {
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
   const {currentTab} = useSidebarStore();
@@ -148,21 +148,14 @@ export const ConversationsList = ({
     <>
       <h2 className="visually-hidden">{t('conversationViewTooltip')}</h2>
 
-      <div>
-        <ul css={css({margin: 0, paddingLeft: 0})} data-uie-name="conversation-view">
-          <ConnectionRequests
-            connectionRequests={connectRequests}
-            onConnectionRequestClick={onConnectionRequestClick}
-          />
+      <ConnectionRequests connectionRequests={connectRequests} onConnectionRequestClick={onConnectionRequestClick} />
 
-          <ConversationView
-            conversations={conversations}
-            conversationsFilter={conversationsFilter}
-            currentFolder={currentFolder}
-            getCommonConversationCellProps={getCommonConversationCellProps}
-          />
-        </ul>
-      </div>
+      <ConversationView
+        conversations={conversations}
+        conversationsFilter={conversationsFilter}
+        currentFolder={currentFolder}
+        getCommonConversationCellProps={getCommonConversationCellProps}
+      />
 
       {conversationsFilter && ![SidebarTabs.DIRECTS, SidebarTabs.GROUPS].includes(currentTab) && (
         <FilteredGroupConversations

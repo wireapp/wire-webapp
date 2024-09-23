@@ -86,14 +86,18 @@ export const FilteredGroupConversations = ({
   }
 
   return (
-    <div>
+    <>
       <h3 css={headingTitle}>{t('searchGroups')}</h3>
 
-      <ul css={css({margin: 0, paddingLeft: 0})} data-uie-name="conversation-view">
+      <ul
+        css={css({margin: 0, paddingLeft: 0})}
+        data-uie-name="filtered-conversation-view"
+        className="filtered-conversations"
+      >
         {filteredGroupConversations.map((conversation, index) => (
           <ConversationListCell key={conversation.id} {...getCommonConversationCellProps(conversation, index)} />
         ))}
       </ul>
-    </div>
+    </>
   );
 };

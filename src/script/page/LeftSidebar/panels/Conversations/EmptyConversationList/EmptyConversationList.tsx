@@ -49,7 +49,7 @@ export const EmptyConversationList = ({currentTab, onChangeTab, searchValue = ''
 
   if (currentTab === SidebarTabs.RECENT || currentTab === SidebarTabs.FOLDER) {
     return (
-      <div css={wrapper}>
+      <div css={wrapper} className="empty-conversations-list">
         <div>
           <p css={paragraph}>{searchValue ? t('searchConversationsNoResult') : t('conversationAllWelcomeMessage')}</p>
 
@@ -72,7 +72,7 @@ export const EmptyConversationList = ({currentTab, onChangeTab, searchValue = ''
 
   if (currentTab === SidebarTabs.FAVORITES) {
     return (
-      <div css={wrapper}>
+      <div css={wrapper} className="empty-conversations-list">
         <div>
           <p css={paragraph}>
             {searchValue ? t('searchConversationsNoResult') : t('conversationFavoritesTabEmptyMessage')}
@@ -93,7 +93,7 @@ export const EmptyConversationList = ({currentTab, onChangeTab, searchValue = ''
 
   if (currentTab === SidebarTabs.GROUPS) {
     return (
-      <div css={wrapper}>
+      <div css={wrapper} className="empty-conversations-list">
         <div>
           <p css={paragraph}>{searchValue ? t('searchConversationsNoResult') : t('conversationGroupEmptyMessage')}</p>
 
@@ -116,7 +116,7 @@ export const EmptyConversationList = ({currentTab, onChangeTab, searchValue = ''
 
   if (currentTab === SidebarTabs.DIRECTS) {
     return (
-      <div css={wrapper}>
+      <div css={wrapper} className="empty-conversations-list">
         <div>
           <p css={paragraph}>
             {searchValue
@@ -132,7 +132,7 @@ export const EmptyConversationList = ({currentTab, onChangeTab, searchValue = ''
 
   if (currentTab === SidebarTabs.ARCHIVES) {
     return (
-      <div css={wrapper}>
+      <div css={wrapper} className="empty-conversations-list">
         <div>
           {searchValue && <p css={paragraph}>{t('searchConversationsNoResult')}</p>}
 

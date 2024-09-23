@@ -186,6 +186,9 @@ const Conversations: React.FC<ConversationsProps> = ({
   }
 
   const hasNoConversations = conversations.length + connectRequests.length === 0;
+  const hasEmptyConversationsList =
+    (showSearchInput && currentTabConversations.length === 0) ||
+    (hasNoConversations && currentTab !== SidebarTabs.ARCHIVES);
 
   useEffect(() => {
     amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, (conversation?: Conversation) => {
@@ -383,8 +386,7 @@ const Conversations: React.FC<ConversationsProps> = ({
               />
             )}
 
-            {((showSearchInput && currentTabConversations.length === 0) ||
-              (hasNoConversations && currentTab !== SidebarTabs.ARCHIVES)) && (
+            {hasEmptyConversationsList && (
               <EmptyConversationList
                 currentTab={currentTab}
                 onChangeTab={changeTab}
@@ -411,6 +413,7 @@ const Conversations: React.FC<ConversationsProps> = ({
                 searchRepository={searchRepository}
                 favoriteConversations={favoriteConversations}
                 archivedConversations={archivedConversations}
+                hasEmptyConversationsList={hasEmptyConversationsList}
               />
             )}
           </>
