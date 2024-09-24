@@ -29,3 +29,8 @@ export const headingTitle: CSSObject = {
   marginBottom: '0',
   borderBottom: '1px solid var(--border-color)',
 };
+
+export const conversationsList: CSSObject = {
+  margin: 0,
+  paddingLeft: 0,
+};

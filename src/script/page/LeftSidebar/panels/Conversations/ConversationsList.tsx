@@ -19,8 +19,7 @@
 
 import React, {MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent, useRef, useEffect} from 'react';
 
-import {css} from '@emotion/react';
-
+import {ConversationListCell} from 'Components/list/ConversationListCell';
 import {Call} from 'src/script/calling/Call';
 import {ConversationLabel, ConversationLabelRepository} from 'src/script/conversation/ConversationLabelRepository';
 import {User} from 'src/script/entity/User';
@@ -31,9 +30,9 @@ import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {ConnectionRequests} from './ConnectionRequests';
-import {ConversationView} from './ConversationView';
+import {conversationsList} from './ConversationsList.styles';
 import {FilteredGroupConversations} from './FilteredGroupConversations';
-import {scrollToConversation} from './helpers';
+import {conversationSearchFilter, scrollToConversation} from './helpers';
 
 import {CallState} from '../../../../calling/CallState';
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
@@ -144,25 +143,22 @@ export const ConversationsList = ({
     }
   });
 
+  const isFolderView = currentTab === SidebarTabs.FOLDER;
+  const filteredConversations =
+    (isFolderView && currentFolder?.conversations().filter(conversationSearchFilter(conversationsFilter))) || [];
+  const conversationsToDisplay = filteredConversations.length ? filteredConversations : conversations;
+
   return (
     <>
       <h2 className="visually-hidden">{t('conversationViewTooltip')}</h2>
 
-      <div>
-        <ul css={css({margin: 0, paddingLeft: 0})} data-uie-name="conversation-view">
-          <ConnectionRequests
-            connectionRequests={connectRequests}
-            onConnectionRequestClick={onConnectionRequestClick}
-          />
+      <ConnectionRequests connectionRequests={connectRequests} onConnectionRequestClick={onConnectionRequestClick} />
 
-          <ConversationView
-            conversations={conversations}
-            conversationsFilter={conversationsFilter}
-            currentFolder={currentFolder}
-            getCommonConversationCellProps={getCommonConversationCellProps}
-          />
-        </ul>
-      </div>
+      <ul css={conversationsList} data-uie-name="conversation-view">
+        {conversationsToDisplay.map((conversation, index) => (
+          <ConversationListCell key={conversation.id} {...getCommonConversationCellProps(conversation, index)} />
+        ))}
+      </ul>
 
       {conversationsFilter && ![SidebarTabs.DIRECTS, SidebarTabs.GROUPS].includes(currentTab) && (
         <FilteredGroupConversations
