@@ -17,8 +17,6 @@
  *
  */
 
-import {css} from '@emotion/react';
-
 import {ConversationListCell, ConversationListCellProps} from 'Components/list/ConversationListCell';
 import {t} from 'Util/LocalizerUtil';
 
@@ -26,7 +24,7 @@ import {ConversationLabel} from '../../../../../conversation/ConversationLabelRe
 import {ConversationRepository} from '../../../../../conversation/ConversationRepository';
 import {Conversation} from '../../../../../entity/Conversation';
 import {SearchRepository} from '../../../../../search/SearchRepository';
-import {headingTitle} from '../ConversationsList.styles';
+import {conversationsList, headingTitle} from '../ConversationsList.styles';
 import {SidebarTabs, useSidebarStore} from '../useSidebarStore';
 
 interface FilteredGroupConversationsProps {
@@ -89,11 +87,7 @@ export const FilteredGroupConversations = ({
     <>
       <h3 css={headingTitle}>{t('searchGroups')}</h3>
 
-      <ul
-        css={css({margin: 0, paddingLeft: 0})}
-        data-uie-name="filtered-conversation-view"
-        className="filtered-conversations"
-      >
+      <ul css={conversationsList} data-uie-name="filtered-conversation-view" className="filtered-conversations">
         {filteredGroupConversations.map((conversation, index) => (
           <ConversationListCell key={conversation.id} {...getCommonConversationCellProps(conversation, index)} />
         ))}

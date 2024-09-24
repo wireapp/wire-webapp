@@ -19,47 +19,14 @@
 
 import {ConversationListCell, ConversationListCellProps} from 'Components/list/ConversationListCell';
 
-import {ConversationLabel} from '../../../../../conversation/ConversationLabelRepository';
 import {Conversation} from '../../../../../entity/Conversation';
-import {conversationSearchFilter} from '../helpers';
-import {SidebarTabs, useSidebarStore} from '../useSidebarStore';
 
 interface ConversationViewProps {
   conversations: Conversation[];
-  conversationsFilter?: string;
-  currentFolder?: ConversationLabel;
   getCommonConversationCellProps: (conversation: Conversation, index: number) => ConversationListCellProps;
 }
 
-export const ConversationView = ({
-  conversations,
-  conversationsFilter = '',
-  currentFolder,
-  getCommonConversationCellProps,
-}: ConversationViewProps) => {
-  const {currentTab} = useSidebarStore();
-  const isFolderView = currentTab === SidebarTabs.FOLDER;
-
-  if (isFolderView && currentFolder) {
-    const filteredConversations = currentFolder?.conversations().filter(conversationSearchFilter(conversationsFilter));
-
-    if (!filteredConversations.length) {
-      return null;
-    }
-
-    return (
-      <ul css={{margin: 0, paddingLeft: 0}} data-uie-name="conversation-view">
-        {filteredConversations.map((conversation, index) => (
-          <ConversationListCell key={conversation.id} {...getCommonConversationCellProps(conversation, index)} />
-        ))}
-      </ul>
-    );
-  }
-
-  if (!conversations.length) {
-    return null;
-  }
-
+export const ConversationView = ({conversations, getCommonConversationCellProps}: ConversationViewProps) => {
   return (
     <ul css={{margin: 0, paddingLeft: 0}} data-uie-name="conversation-view">
       {conversations.map((conversation, index) => (
