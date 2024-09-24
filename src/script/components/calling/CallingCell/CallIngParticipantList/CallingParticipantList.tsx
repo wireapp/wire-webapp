@@ -75,7 +75,7 @@ export const CallingParticipantList = ({
     };
 
     const entries: ContextMenuEntry[] = [muteOthers].concat(!participant.user.isMe ? muteParticipant : []);
-    showContextMenu(event, entries, 'participant-moderator-menu');
+    showContextMenu({event, entries, identifier: 'participant-moderator-menu'});
   };
 
   return (

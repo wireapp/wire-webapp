@@ -444,7 +444,7 @@ export class ListViewModel {
       });
     }
 
-    showContextMenu(event, entries, 'conversation-list-options-menu');
+    showContextMenu({event, entries, identifier: 'conversation-list-options-menu'});
   };
 
   readonly clickToArchive = (conversationEntity = this.conversationState.activeConversation()): void => {

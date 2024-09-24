@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {ReactNode, useEffect, useMemo, useRef, useState} from 'react';
 
 import cx from 'classnames';
 import {createRoot, Root} from 'react-dom/client';
@@ -46,6 +46,7 @@ export interface ContextMenuEntry {
 interface ContextMenuProps {
   defaultIdentifier?: string;
   entries: ContextMenuEntry[];
+  placeholder?: ReactNode;
   posX: number;
   posY: number;
   resetMenuStates?: () => void;
@@ -75,9 +76,11 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
   posX,
   posY,
   resetMenuStates,
+  placeholder,
 }) => {
   const {activeWindow} = useActiveWindowState();
   const [mainElement, setMainElement] = useState<HTMLUListElement>();
+  const placeholderElement = useRef<HTMLDivElement>(null);
   const [selected, setSelected] = useState<ContextMenuEntry>();
 
   const style = useMemo<React.CSSProperties>(() => {
@@ -92,9 +95,9 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
     return {
       left,
       top,
-      visibility: mainElement ? 'unset' : 'hidden',
+      visibility: mainElement || placeholderElement ? 'unset' : 'hidden',
     };
-  }, [mainElement]);
+  }, [mainElement, placeholderElement]);
 
   useEffect(() => {
     if (selected) {
@@ -148,7 +151,10 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
     };
 
     const onMouseDown = (event: MouseEvent): void => {
-      const isOutsideClick = mainElement && !mainElement.contains(event.target as Node);
+      const isOutsideClick = entries.length
+        ? mainElement && !mainElement.contains(event.target as Node)
+        : placeholderElement && !placeholderElement.current?.contains(event.target as Node);
+
       if (isOutsideClick) {
         cleanUp();
         resetMsgMenuStates(isOutsideClick);
@@ -182,70 +188,83 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
   return (
     <IgnoreOutsideClickWrapper>
       <div className="overlay">
-        <ul
-          className={contextMenuClassName}
-          ref={setMainElement}
-          style={{maxHeight: activeWindow.innerHeight, ...style}}
-          role="menu"
-        >
-          {entries.map((entry, index) =>
-            entry.isSeparator ? (
-              <li key={`${index}`} className={`${contextMenuClassName}__separator`} />
-            ) : (
-              <li
-                key={`${index}`}
-                className={cx(`${contextMenuClassName}__item`, {
-                  [`${contextMenuClassName}__item--checked`]: entry.isChecked,
-                  [`${contextMenuClassName}__item--disabled`]: entry.isDisabled,
-                  selected: entry === selected,
-                })}
-                role="menuitem"
-                aria-haspopup="true"
-              >
-                <button
-                  id={getButtonId(entry.label!)}
-                  className={`${contextMenuClassName}__button`}
-                  type="button"
-                  data-uie-name={entry.identifier || defaultIdentifier}
-                  title={entry.title || entry.label}
-                  {...(entry.isDisabled
-                    ? undefined
-                    : {
-                        onClick: event => {
-                          event.preventDefault();
-                          cleanUp();
-                          resetMsgMenuStates();
-                          entry.click?.(event.nativeEvent);
-                        },
-                        onMouseEnter: () => {
-                          setSelected(undefined);
-                        },
-                      })}
+        {entries.length ? (
+          <ul
+            className={contextMenuClassName}
+            ref={setMainElement}
+            style={{maxHeight: activeWindow.innerHeight, ...style}}
+            role="menu"
+          >
+            {entries.map((entry, index) =>
+              entry.isSeparator ? (
+                <li key={`${index}`} className={`${contextMenuClassName}__separator`} />
+              ) : (
+                <li
+                  key={`${index}`}
+                  className={cx(`${contextMenuClassName}__item`, {
+                    [`${contextMenuClassName}__item--checked`]: entry.isChecked,
+                    [`${contextMenuClassName}__item--disabled`]: entry.isDisabled,
+                    selected: entry === selected,
+                  })}
+                  role="menuitem"
+                  aria-haspopup="true"
                 >
-                  {entry.icon && <entry.icon className={`${contextMenuClassName}__icon`} />}
-                  <span>{entry.label}</span>
-                  {entry.isChecked && (
-                    <Icon.CheckIcon
-                      className={`${contextMenuClassName}__check`}
-                      data-uie-name={`${contextMenuClassName}-check`}
-                    />
-                  )}
-                </button>
-              </li>
-            ),
-          )}
-        </ul>
+                  <button
+                    id={getButtonId(entry.label!)}
+                    className={`${contextMenuClassName}__button`}
+                    type="button"
+                    data-uie-name={entry.identifier || defaultIdentifier}
+                    title={entry.title || entry.label}
+                    {...(entry.isDisabled
+                      ? undefined
+                      : {
+                          onClick: event => {
+                            event.preventDefault();
+                            cleanUp();
+                            resetMsgMenuStates();
+                            entry.click?.(event.nativeEvent);
+                          },
+                          onMouseEnter: () => {
+                            setSelected(undefined);
+                          },
+                        })}
+                  >
+                    {entry.icon && <entry.icon className={`${contextMenuClassName}__icon`} />}
+                    <span>{entry.label}</span>
+                    {entry.isChecked && (
+                      <Icon.CheckIcon
+                        className={`${contextMenuClassName}__check`}
+                        data-uie-name={`${contextMenuClassName}-check`}
+                      />
+                    )}
+                  </button>
+                </li>
+              ),
+            )}
+          </ul>
+        ) : (
+          <div ref={placeholderElement} className={`${contextMenuClassName}__placeholder`} style={style}>
+            {placeholder}
+          </div>
+        )}
       </div>
     </IgnoreOutsideClickWrapper>
   );
 };
 
-export const showContextMenu = (
-  event: MouseEvent | React.MouseEvent,
-  entries: ContextMenuEntry[],
-  identifier: string,
-  resetMenuStates?: () => void,
-) => {
+export const showContextMenu = ({
+  entries,
+  event,
+  identifier,
+  placeholder,
+  resetMenuStates,
+}: {
+  event: MouseEvent | React.MouseEvent;
+  entries: ContextMenuEntry[];
+  identifier: string;
+  resetMenuStates?: () => void;
+  placeholder?: ReactNode;
+}) => {
   const {activeWindow} = useActiveWindowState.getState();
   event.preventDefault();
   event.stopPropagation();
@@ -263,6 +282,7 @@ export const showContextMenu = (
       posX={event.clientX}
       posY={event.clientY}
       resetMenuStates={resetMenuStates}
+      placeholder={placeholder}
     />,
   );
 };

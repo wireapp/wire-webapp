@@ -17,6 +17,8 @@
  *
  */
 
+import {useMemo} from 'react';
+
 import cx from 'classnames';
 
 import * as Icons from 'Components/Icon';
@@ -58,7 +60,7 @@ export const ConversationFolderTab = ({
   unreadConversations = [],
   dataUieName,
 }: ConversationFolderTabProps) => {
-  const {status: sidebarStatus, setStatus: setSidebarStatus} = useSidebarStore();
+  const {status: sidebarStatus} = useSidebarStore();
   const {openFolder, isFoldersTabOpen, toggleFoldersTab, expandedFolder} = useFolderStore();
   const {conversationLabelRepository} = conversationRepository;
   const isSideBarOpen = sidebarStatus === SidebarStatus.OPEN;
@@ -75,6 +77,18 @@ export const ConversationFolderTab = ({
     .map(label => createLabel(label.name, conversationLabelRepository.getLabelConversations(label), label.id))
     .filter(({conversations, name}) => !!conversations().length && !!name);
 
+  const placeholder = useMemo(
+    () => (
+      <div className="conversations-sidebar-folders--empty">
+        {t('conversationFoldersEmptyText')}
+        <a href={Config.getConfig().URL.SUPPORT.FOLDERS} target="_blank" rel="noreferrer">
+          {t('conversationFoldersEmptyTextLearnMore')}
+        </a>
+      </div>
+    ),
+    [],
+  );
+
   function openFoldersContextMenu(event: React.MouseEvent<HTMLButtonElement>) {
     const entries: ContextMenuEntry[] = folders.map(folder => ({
       click: () => {
@@ -90,7 +104,7 @@ export const ConversationFolderTab = ({
     event.clientX = boundingRect.right + 4;
     event.clientY = boundingRect.top;
 
-    showContextMenu(event, entries, 'navigation-folders-menu');
+    showContextMenu({event, entries, identifier: 'navigation-folders-menu', placeholder});
   }
 
   function handleToggleFoldersTab(event: React.MouseEvent<HTMLButtonElement>) {
@@ -99,14 +113,7 @@ export const ConversationFolderTab = ({
       return;
     }
 
-    if (folders.length === 0) {
-      setSidebarStatus(SidebarStatus.OPEN);
-      return;
-    }
-
-    if (folders.length !== 0) {
-      openFoldersContextMenu(event);
-    }
+    openFoldersContextMenu(event);
   }
 
   function getTotalUnreadConversationMessages(conversations: Conversation[]) {
@@ -132,6 +139,7 @@ export const ConversationFolderTab = ({
         onClick={handleToggleFoldersTab}
         title={title}
         data-uie-name={dataUieName}
+        css={{...(!isSideBarOpen && {padding: '8px 2px 8px 6px'})}}
       >
         <span className="conversations-sidebar-btn--text-wrapper">
           {Icon}
@@ -141,14 +149,7 @@ export const ConversationFolderTab = ({
       </button>
       <div className={cx('conversations-sidebar-folders', {active: isFoldersTabOpen})}>
         <div className="conversations-sidebar-folders--inner-wrapper" data-uie-name="folder-list">
-          {folders.length === 0 && (
-            <div className="conversations-sidebar-folders--empty">
-              {t('conversationFoldersEmptyText')}
-              <a href={Config.getConfig().URL.SUPPORT.FOLDERS} target="_blank" rel="noreferrer">
-                {t('conversationFoldersEmptyTextLearnMore')}
-              </a>
-            </div>
-          )}
+          {folders.length === 0 && placeholder}
           {folders.map(folder => {
             const unreadCount = getTotalUnreadConversationMessages(folder.conversations());
             const isActive = folder.id === expandedFolder;

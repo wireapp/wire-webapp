@@ -53,5 +53,5 @@ export const showLabelContextMenu = (
     : [noLabels];
 
   const entries: ContextMenuEntry[] = [newLabel, separator, ...namedLabels];
-  showContextMenu(event, entries, 'conversation-label-context-menu');
+  showContextMenu({event, entries, identifier: 'conversation-label-context-menu'});
 };
