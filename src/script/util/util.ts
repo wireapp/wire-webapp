@@ -327,25 +327,27 @@ export class InitializationEventLogger {
   }
 
   log(step: string, options = {}) {
-    this.logger.info('Performance tracking', {
-      user_id: this.userId,
-      step,
-      duration: Date.now() - this.timestamp,
-      ...options,
+    this.logger.info('Performance tracking: ', {
+      appInitialization: {
+        user_id: this.userId,
+        step,
+        duration: Date.now() - this.timestamp,
+        ...options,
+      },
     });
     this.timestamp = Date.now(); // Reset the timestamp after logging
   }
 }
 
 export enum AppInitializationStep {
-  AppInitialize = 'app-initialize',
-  UserInitialize = 'user-initialize',
-  SetupEventProcessors = 'setup-event-processors',
-  ValidatedClient = 'validated-client',
-  ConversationsLoaded = 'conversations-loaded',
-  UserDataLoaded = 'user-data-loaded',
-  DecryptionCompleted = 'decryption-completed',
-  SetupMLS = 'setup-mls',
-  ClientsUpdated = 'clients-updated',
-  AppInitCompleted = 'app-init-completed',
+  AppInitialize = 'AppInitialize',
+  UserInitialize = 'UserInitialize',
+  SetupEventProcessors = 'SetupEventProcessors',
+  ValidatedClient = 'ValidatedClient',
+  ConversationsLoaded = 'ConversationsLoaded',
+  UserDataLoaded = 'UserDataLoaded',
+  DecryptionCompleted = 'DecryptionCompleted',
+  SetupMLS = 'SetupMls',
+  ClientsUpdated = 'ClientsUpdated',
+  AppInitCompleted = 'AppInitCompleted',
 }
