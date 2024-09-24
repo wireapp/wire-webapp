@@ -174,8 +174,8 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
 
   const [audioOptionsOpen, setAudioOptionsOpen] = useState(false);
   const [videoOptionsOpen, setVideoOptionsOpen] = useState(false);
-  const minimize = () => callState.setViewModeMinimized();
-  const openPopup = () => callState.setViewModeDetached();
+  const minimize = () => callingRepository.setViewModeMinimized();
+  const openPopup = () => callingRepository.setViewModeDetached();
 
   const [isParticipantsListOpen, toggleParticipantsList] = useToggleState(false);
   const [isCallViewOpen, toggleCallView] = useToggleState(false);

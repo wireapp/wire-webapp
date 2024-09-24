@@ -1549,6 +1549,7 @@
   "videoCallParticipantConnecting": "Connecting...",
   "videoCallPaused": "Video paused",
   "videoCallScreenShareNotSupported": "Screen sharing is not supported in this browser",
+  "videoCallScreenShareEnded": "Your screen share has ended.",
   "videoCallaudioInputMicrophone": "Microphone",
   "videoCallaudioOutputSpeaker": "Speaker",
   "videoCallbackgroundBlur": "Blur my background",
