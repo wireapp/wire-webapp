@@ -1,10 +1,12 @@
-# This job will automatically create a cherry pick PR from any release/* branch to the dev branch
+# This job will automatically create a cherry-pick PR from any release/* or master branch to the dev branch.
+# This job will not run if the push/PR is from the dev branch itself.
 # It allows the dev branch to stay up-to-date with fixes made to specific release branches
 name: Cherry pick to dev
 on:
   push:
     branches:
-      - release/*
+      - 'release/*'
+      - 'master'
 
 permissions:
   pull-requests: write
@@ -12,6 +14,7 @@ permissions:
 
 jobs:
   cherry_pick:
+    if: github.event.pull_request.head.ref != 'dev'
     runs-on: ubuntu-latest
     steps:
       - name: checkout
