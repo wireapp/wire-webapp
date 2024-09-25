@@ -19,15 +19,18 @@
 
 // default
 .button {
-  .button-large; // default size is large
   .label-bold-xs;
   display: inline-block;
+
+  width: var(--button-width);
+  height: var(--button-height);
   padding: 0 16px;
   border: var(--button-border-size) solid transparent;
   border-radius: var(--button-border-radius);
   background-color: var(--accent-color);
   color: #fff;
   cursor: pointer;
+  line-height: calc(var(--button-height) - var(--button-border-size) * 2);
   text-align: center;
   text-decoration: none;
   user-select: none;
@@ -70,19 +73,12 @@
     }
   }
 
-  // sizes
-  &.button-large {
-    width: var(--button-width);
-    height: var(--button-height);
-    line-height: (var(--button-height) - var(--button-border-size) * 2);
-  }
-
   &.button-small,
   &.button-medium {
     width: var(--button-medium-width);
     min-width: var(--button-medium-width);
     height: var(--button-medium-sm-height);
-    line-height: (var(--button-medium-sm-height) - var(--button-border-size) * 2);
+    line-height: calc(var(--button-medium-sm-height) - var(--button-border-size) * 2);
   }
 
   // expansion
