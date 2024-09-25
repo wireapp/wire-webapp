@@ -39,7 +39,7 @@
     position: absolute;
     right: 0;
     bottom: 0;
-    left: @left-list-item-left-width;
+    left: var(--left-list-item-left-width);
     height: 1px;
     background-color: #fff;
     content: '';
@@ -74,7 +74,7 @@
 .conversation-list-cell-left {
   .flex-center;
 
-  width: @left-list-item-left-width;
+  width: var(--left-list-item-left-width);
   flex: 0 0 auto;
 }
 
@@ -160,7 +160,7 @@ body.theme-dark {
     border-left: 4px solid transparent;
     content: '';
     opacity: 0;
-    transition: opacity @animation-timing-slow @ease-out-quart @animation-timing-faster + 0.05;
+    transition: opacity var(--animation-timing-slow) var(--ease-out-quart) var(--animation-timing-faster) + 0.05;
 
     .conversation-list-cell:hover &,
     :focus-visible & {

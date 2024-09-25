@@ -21,7 +21,7 @@
   position: relative;
   display: flex;
   width: 100%;
-  min-height: @conversation-input-min-height;
+  min-height: var(--conversation-input-min-height);
   box-sizing: content-box;
   flex-direction: column;
 
@@ -35,7 +35,7 @@
     &--editing,
     &--editing .editor-container {
       background-color: var(--text-input-editing);
-      transition: background-color @animation-timing-faster @ease-in-quad;
+      transition: background-color var(--animation-timing-faster) var(--ease-in-quad);
     }
   }
 }
@@ -52,16 +52,16 @@
   .reset-textarea;
 
   width: 100%;
-  max-width: @conversation-max-width;
+  max-width: var(--conversation-max-width);
   height: auto;
-  min-height: @conversation-input-line-height;
-  max-height: @conversation-input-max-height;
+  min-height: var(--conversation-input-line-height);
+  max-height: var(--conversation-input-max-height);
   flex: 1 1;
-  margin-top: calc((@conversation-input-min-height - @conversation-input-line-height) / 2);
-  margin-bottom: calc((@conversation-input-min-height - @conversation-input-line-height) / 2);
+  margin-top: calc((var(--conversation-input-min-height) - var(--conversation-input-line-height)) / 2);
+  margin-bottom: calc((var(--conversation-input-min-height) - var(--conversation-input-line-height)) / 2);
   background-color: transparent;
   font-weight: inherit;
-  line-height: @conversation-input-line-height;
+  line-height: var(--conversation-input-line-height);
   overflow-x: hidden;
   overflow-y: auto;
   text-rendering: optimizeLegibility;
@@ -90,8 +90,8 @@
 .controls-left {
   .flex-center;
 
-  width: @conversation-message-sender-width;
-  height: @conversation-input-min-height;
+  width: var(--conversation-message-sender-width);
+  height: var(--conversation-input-min-height);
 }
 
 .controls-center {
@@ -204,10 +204,10 @@
   .full-screen;
 
   display: flex;
-  animation-duration: @animation-timing-slow;
+  animation-duration: var(--animation-timing-slow);
   animation-fill-mode: forwards;
   animation-name: paste-fade-in;
-  animation-timing-function: @ease-out-expo;
+  animation-timing-function: var(--ease-out-expo);
   background-color: var(--input-bar-bg);
   opacity: 0;
 }
@@ -320,7 +320,7 @@
 
   &__message {
     overflow: hidden;
-    max-width: @conversation-message-max-width;
+    max-width: var(--conversation-message-max-width);
     margin-top: 4px;
     font-size: var(--font-size-medium);
     font-weight: var(--font-weight-regular);

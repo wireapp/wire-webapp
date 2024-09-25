@@ -47,7 +47,7 @@
     transition-delay: 0.35s;
     transition-duration: 0.55s;
     transition-property: opacity;
-    transition-timing-function: @ease-out-quart;
+    transition-timing-function: var(--ease-out-quart);
   }
 
   .modal-header {
@@ -60,7 +60,7 @@
       transition-delay: 0s;
       transition-duration: 0.35s;
       transition-property: opacity;
-      transition-timing-function: @ease-out-quart;
+      transition-timing-function: var(--ease-out-quart);
     }
 
     .modal-content {
@@ -113,7 +113,7 @@
       }
 
       &:not(:last-child) {
-        border-bottom: 1px solid @separator-color;
+        border-bottom: 1px solid var(--separator-color);
       }
     }
   }
@@ -197,7 +197,7 @@
   transition-delay: 0s, 0s;
   transition-duration: 0.35s, 0.35s;
   transition-property: transform, opacity;
-  transition-timing-function: @ease-in-expo, @ease-in-expo;
+  transition-timing-function: var(--ease-in-expo), var(--ease-in-expo);
 }
 
 .modal-content-anim-open {
@@ -206,7 +206,7 @@
   transition-delay: 0.15s, 0.15s;
   transition-duration: 0.55s, 0.55s;
   transition-property: transform, opacity;
-  transition-timing-function: @ease-out-expo, @ease-out-expo;
+  transition-timing-function: var(--ease-out-expo), var(--ease-out-expo);
 }
 
 .modal {
@@ -221,11 +221,11 @@
     opacity: 0;
     overflow-x: hidden;
     overflow-y: auto;
-    transition: opacity 0.15s @ease-out-quart;
+    transition: opacity 0.15s var(--ease-out-quart);
 
     &--visible {
       opacity: 1;
-      transition: opacity 0.25s @ease-out-quart;
+      transition: opacity 0.25s var(--ease-out-quart);
     }
   }
   &__loading {
@@ -255,7 +255,7 @@
     border: var(--gray-10);
     border-radius: 4px;
     margin: auto;
-    animation: scaleIn 0.35s @ease-out-quart;
+    animation: scaleIn 0.35s var(--ease-out-quart);
     background-color: var(--white);
     cursor: default;
     font-size: var(--font-size-base);
@@ -263,7 +263,7 @@
     overflow-y: hidden;
 
     transform: scale(0.8);
-    transition: transform 0.35s @ease-out-quart;
+    transition: transform 0.35s var(--ease-out-quart);
 
     &__device-list {
       .label-xs;
