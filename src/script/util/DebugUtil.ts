@@ -27,9 +27,10 @@ import {
   CONVERSATION_EVENT,
   USER_EVENT,
 } from '@wireapp/api-client/lib/event/';
-import type {Notification} from '@wireapp/api-client/lib/notification/';
+import type {Notification, NotificationList} from '@wireapp/api-client/lib/notification/';
 import {FeatureStatus} from '@wireapp/api-client/lib/team/feature/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import {NotificationSource} from '@wireapp/core/lib/notification';
 import {DatabaseKeys} from '@wireapp/core/lib/notification/NotificationDatabaseRepository';
 import Dexie from 'dexie';
 import keyboardjs from 'keyboardjs';
@@ -110,6 +111,35 @@ export class DebugUtil {
     this.logger = getLogger('DebugUtil');
 
     keyboardjs.bind(['command+shift+1', 'ctrl+shift+1'], this.toggleDebugUi);
+  }
+
+  async importEvents() {
+    try {
+      const [fileHandle] = await window.showOpenFilePicker();
+      const file = await fileHandle.getFile();
+      const data = await file.text();
+      const notificationResponse: NotificationList = JSON.parse(data);
+      const startTime = performance.now();
+
+      for (const notification of notificationResponse.notifications) {
+        const events = this.core.service.notification.handleNotification(
+          notification,
+          NotificationSource.NOTIFICATION_STREAM,
+          false,
+        );
+
+        for await (const event of events) {
+          await this.eventRepository.importEvents([event]);
+        }
+      }
+
+      const endTime = performance.now();
+      this.logger.info(
+        `Importing ${notificationResponse.notifications.length} event(s) took ${endTime - startTime} milliseconds`,
+      );
+    } catch (error) {
+      this.logger.error(`Failed to import events: ${error}`);
+    }
   }
 
   addCallParticipants(number: number) {

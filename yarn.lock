@@ -5170,6 +5170,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/wicg-file-system-access@npm:^2023.10.5":
+  version: 2023.10.5
+  resolution: "@types/wicg-file-system-access@npm:2023.10.5"
+  checksum: 10/f161b76d0c53b3e72238acf7ed5af3893018a845cd9e0a507394ba219607808d34957f6247e1ef091a8ea9131495dca8f12804c6bd75c5c34bf0b990f561be57
+  languageName: node
+  linkType: hard
+
 "@types/yargs-parser@npm:*":
   version: 21.0.1
   resolution: "@types/yargs-parser@npm:21.0.1"
@@ -18177,6 +18184,7 @@ __metadata:
     "@types/underscore": "npm:1.11.15"
     "@types/uuid": "npm:^10.0.0"
     "@types/webpack-env": "npm:1.18.5"
+    "@types/wicg-file-system-access": "npm:^2023.10.5"
     "@wireapp/avs": "npm:9.9.3"
     "@wireapp/commons": "npm:5.2.10"
     "@wireapp/copy-config": "npm:2.2.7"
