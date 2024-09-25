@@ -104,7 +104,7 @@
 
   .panel__content,
   .panel__footer {
-    transform: translateX(@panel-width);
+    transform: translateX(var(--panel-width));
   }
 }
 
@@ -140,7 +140,7 @@
 
   .panel__content,
   .panel__footer {
-    transform: translateX(-@panel-width);
+    transform: translateX(-var(--panel-width));
     transition: transform var(--animation-timing-fast) var(--ease-out-quart);
   }
 }
@@ -152,7 +152,7 @@
 
   .panel__content,
   .panel__footer {
-    transform: translateX(-@panel-width);
+    transform: translateX(-var(--panel-width));
   }
 }
 
@@ -188,7 +188,7 @@
 
   .panel__content,
   .panel__footer {
-    transform: translateX(@panel-width);
+    transform: translateX(var(--panel-width));
     transition: transform var(--animation-timing-fast) var(--ease-out-quart);
   }
 }

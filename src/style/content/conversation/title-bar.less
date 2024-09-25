@@ -17,8 +17,6 @@
  *
  */
 
-@button-group-width: 128px;
-
 #show-participants {
   min-width: 0; //needed for the truncation of long titles to work properly in flex-boxes
 }
@@ -79,10 +77,10 @@ body.theme-dark {
 .conversation-title-bar-icons,
 .conversation-title-bar-library {
   display: flex;
-  min-width: @button-group-width;
+  min-width: 128px;
   height: 100%;
   align-items: center;
-  @media (min-width: calc(@screen-sm-min * 2)) and (max-width: @screen-md-min) {
+  @media (min-width: 640px) and (max-width: 768px) {
     min-width: 0;
   }
 }

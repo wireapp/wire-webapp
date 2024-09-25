@@ -25,12 +25,11 @@
 
 * {
   --scrollbar-color: @gray-60;
-  @scrollbar-size: 7px;
   scrollbar-color: var(--scrollbar-color) transparent;
   scrollbar-width: thin;
   &::-webkit-scrollbar {
-    width: @scrollbar-size;
-    height: @scrollbar-size;
+    width: var(--scrollbar-size);
+    height: var(--scrollbar-size);
   }
 
   &::-webkit-scrollbar-track {
@@ -38,7 +37,7 @@
   }
 
   &::-webkit-scrollbar-thumb {
-    border-radius: @scrollbar-size;
+    border-radius: var(--scrollbar-size);
     background-color: var(--scrollbar-color);
     transition: background-color 1s;
   }
