@@ -17,8 +17,6 @@
  *
  */
 
-@play-button-size: 32px;
-
 @keyframes loading {
   to {
     transform: rotate(360deg);
@@ -146,7 +144,7 @@
     }
 
     &__play-button {
-      .circle(@play-button-size);
+      .circle(var(--play-button-size));
       .text-foreground;
 
       position: relative;
@@ -154,7 +152,7 @@
       margin: auto;
       background-color: white;
       font-size: var(--font-size-base);
-      line-height: @play-button-size;
+      line-height: var(--play-button-size);
       text-align: center;
     }
 

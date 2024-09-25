@@ -91,15 +91,9 @@
 @ars-font-path: '../font/';
 
 body {
+  // Fonts
   --font-family-base: emoji, BlinkMacSystemFont, -apple-system, Helvetica Neue, Arial, sans-serif;
   --font-family-ephemeral: Redacted Script;
-
-  --line-height-xs: 0.6875rem;
-  --line-height-sm: 1rem;
-  --line-height-md: 1.25rem;
-  --line-height-lg: 1.5rem;
-  --line-height-xl: 2rem;
-  --line-height-xxl: 4rem;
 
   --font-size-xxs: 0.5rem;
   --font-size-xsmall: 0.6875rem;
@@ -111,14 +105,19 @@ body {
   --font-size-xxl: 2rem;
   --font-size-xxxl: 3.5rem;
 
-  --font-weight-bold: 700;
-  --font-weight-semibold: 600;
-  --font-weight-medium: 500;
-  --font-weight-regular: 400; // font-weight-xs should this this
   --font-weight-light: 300;
-}
+  --font-weight-regular: 400; // font-weight-xs should this this
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
 
-body {
+  --line-height-xs: 0.6875rem;
+  --line-height-sm: 1rem;
+  --line-height-md: 1.25rem;
+  --line-height-lg: 1.5rem;
+  --line-height-xl: 2rem;
+  --line-height-xxl: 4rem;
+
   // Icons
   --icon-size-sm: 1rem;
   --icon-size-md: 2rem;
@@ -134,14 +133,11 @@ body {
   // Buttons
   --button-border-radius: 4px;
   --button-border-size: 1px;
-
   --button-height: 40px;
   --button-width: 192px;
-
   --button-medium-height: 32px;
   --button-medium-sm-height: 28px;
   --button-medium-width: 108px;
-
   --button-round-size: 28px;
   --button-round-size-xs: 28px;
   --button-round-size-sm: 32px;
@@ -151,22 +147,30 @@ body {
 
   // Framework
   --teams-width: 78px;
-
   --conversation-list-width: 320px;
-
   --right-width: 304px;
   --panel-content-min-height: 150px;
-}
+  --panel-width: 304px;
+  --badge-height: 24px;
 
-body {
+  --delivered-state-width: 56px;
+
+  // Start UI
+  --start-ui-search-bar-offset: 88px;
+
+  // Margins
+  --offscreen-left: -9999px;
+
+  // Warnings
+  --warning-bar-feature-height: 64px;
+  --warning-bar-connection-height: 32px;
+
   --preferences-width: 560px;
 
-  @media (max-width: @screen-lg-min) {
+  @media (max-width: 960px) {
     --preferences-width: 100%;
   }
-}
 
-body {
   // Left list
   --left-list-header-height: 45px;
   --left-list-item-height: 48px;
@@ -190,30 +194,7 @@ body {
 
   // Modal
   --modal-padding: 24px;
-}
 
-// ----------------------------------------------------------------------------
-// Z-Indexes
-// ----------------------------------------------------------------------------
-@z-index-level-0: 0;
-@z-index-level-1: 10;
-@z-index-level-2: 100;
-@z-index-level-3: 1000;
-@z-index-level-4: 10000;
-@z-index-level-5: 100000;
-@z-index-level-6: 1000000;
-@z-index-level-7: 10000000;
-
-@z-index-badge: @z-index-level-2;
-@z-index-panel: @z-index-level-3;
-@z-index-bubble: @z-index-level-3;
-@z-index-video: @z-index-level-4;
-@z-index-choosescreen: @z-index-level-5;
-@z-index-context: @z-index-level-5;
-@z-index-warnings: @z-index-level-6;
-@z-index-modal: @z-index-level-7;
-
-body {
   // Avatar
   --avatar-diameter-xl: 200px;
   --avatar-initials-xl: var(--font-size-xxl);
@@ -239,26 +220,12 @@ body {
   // Bubble
   --bubble-width: 306px;
   --bubble-height: 440px;
-}
 
-// ----------------------------------------------------------------------------
-// Media queries breakpoints
-// ----------------------------------------------------------------------------
-@screen-sm-min: 320px;
-@screen-sm: 480px;
-@screen-md-min: 768px;
-@screen-lg-min: 960px;
+  // Media queries
+  --screen-sm-min: 320px;
+  --screen-sm: 480px;
+  --screen-md-min: 768px;
 
-@screen-height-sm: 420px;
-
-@call-ui-sm: 680px;
-@call-ui-xs: 500px;
-
-// So media queries don't overlap when required, provide a maximum
-@screen-sm-max: @screen-md-min - 1;
-@screen-md-max: @screen-lg-min - 1;
-
-body {
   //Animations
   // for slower animation use n * slower
   --animation-timing-faster: 0.15s;
@@ -276,18 +243,48 @@ body {
   --ease-out-back: cubic-bezier(0.175, 0.885, 0.32, 1.275);
   --ease-in-out-expo: cubic-bezier(1, 0, 0, 1);
   --ease-in-out-quart: cubic-bezier(0.77, 0, 0.175, 1);
+
+  // Collection
+  --collection-image-size: 110px;
+  --collection-images-per-row: 6;
+  --collection-images-padding: 3px;
+  --collection-max-section-width: 696px;
+
+  // Scrollbar
+  --scrollbar-size: 7px;
+
+  // Media Button
+  --media-button-size: 32px;
+  --media-button-size-lg: 64px;
+
+  // Link Preview
+  --link-preview-height: 5.5rem;
+
+  // Video
+  --play-button-size: 32px;
+
+  // Input Level
+  --input-level-bullet-size: 16px;
+  --input-level-bullet-size-sm: 12px;
 }
 
-body {
-  --delivered-state-width: 56px;
+// ----------------------------------------------------------------------------
+// Z-Indexes
+// ----------------------------------------------------------------------------
+@z-index-level-0: 0;
+@z-index-level-1: 10;
+@z-index-level-2: 100;
+@z-index-level-3: 1000;
+@z-index-level-4: 10000;
+@z-index-level-5: 100000;
+@z-index-level-6: 1000000;
+@z-index-level-7: 10000000;
 
-  // Start UI
-  --start-ui-search-bar-offset: 88px;
-
-  // Margins
-  --offscreen-left: -9999px;
-
-  // Warnings
-  --warning-bar-feature-height: 64px;
-  --warning-bar-connection-height: 32px;
-}
+@z-index-badge: @z-index-level-2;
+@z-index-panel: @z-index-level-3;
+@z-index-bubble: @z-index-level-3;
+@z-index-video: @z-index-level-4;
+@z-index-choosescreen: @z-index-level-5;
+@z-index-context: @z-index-level-5;
+@z-index-warnings: @z-index-level-6;
+@z-index-modal: @z-index-level-7;

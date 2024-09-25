@@ -17,8 +17,6 @@
  *
  */
 
-@panel-width: 304px;
-
 .with-separators {
   position: relative;
   &::before {
@@ -75,7 +73,7 @@
     &--move-in--left {
       & .panel__content,
       & .panel__footer {
-        transform: translateX(@panel-width);
+        transform: translateX(var(--panel-width));
       }
     }
 
@@ -83,7 +81,7 @@
     &--move-in--right {
       & .panel__content,
       & .panel__footer {
-        transform: translateX(-@panel-width);
+        transform: translateX(-var(--panel-width));
       }
     }
 
@@ -91,7 +89,7 @@
     &--move-in--right {
       position: absolute;
       top: 0;
-      width: @panel-width;
+      width: var(--panel-width);
 
       & .panel__header {
         animation: var(--animation-timing-fast) var(--ease-out-expo) headerfadein;
@@ -107,14 +105,14 @@
     &--move-in--left {
       & .panel__content,
       & .panel__footer {
-        right: @panel-width;
+        right: var(--panel-width);
       }
     }
 
     &--move-in--right {
       & .panel__content,
       & .panel__footer {
-        right: -@panel-width;
+        right: -var(--panel-width);
       }
     }
   }
@@ -122,7 +120,7 @@
   &__content {
     position: relative;
     display: flex;
-    width: @panel-width;
+    width: var(--panel-width);
     min-height: var(--panel-content-min-height);
     flex-direction: column;
     overflow-x: hidden;
