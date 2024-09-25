@@ -114,26 +114,30 @@ export class DebugUtil {
   }
 
   async importEvents() {
-    const [fileHandle] = await window.showOpenFilePicker();
-    const file = await fileHandle.getFile();
-    const data = await file.text();
-    const notificationResponse: NotificationList = JSON.parse(data);
-    const startTime = performance.now();
+    try {
+      const [fileHandle] = await window.showOpenFilePicker();
+      const file = await fileHandle.getFile();
+      const data = await file.text();
+      const notificationResponse: NotificationList = JSON.parse(data);
+      const startTime = performance.now();
 
-    for (const notification of notificationResponse.notifications) {
-      for await (const event of this.core.service.notification.handleNotification(
-        notification,
-        NotificationSource.NOTIFICATION_STREAM,
-        false,
-      )) {
-        await this.eventRepository.importEvents([event]);
+      for (const notification of notificationResponse.notifications) {
+        for await (const event of this.core.service.notification.handleNotification(
+          notification,
+          NotificationSource.NOTIFICATION_STREAM,
+          false,
+        )) {
+          await this.eventRepository.importEvents([event]);
+        }
       }
-    }
 
-    const endTime = performance.now();
-    this.logger.info(
-      `Importing ${notificationResponse.notifications.length} event(s) took ${endTime - startTime} milliseconds`,
-    );
+      const endTime = performance.now();
+      this.logger.info(
+        `Importing ${notificationResponse.notifications.length} event(s) took ${endTime - startTime} milliseconds`,
+      );
+    } catch (error) {
+      this.logger.error(`Failed to import events: ${error}`);
+    }
   }
 
   addCallParticipants(number: number) {
