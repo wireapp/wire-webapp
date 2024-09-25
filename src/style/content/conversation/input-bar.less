@@ -264,9 +264,9 @@
   border-radius: 8px;
   background-color: var(--modal-bg);
   box-shadow: 0 8px 30px 0 rgba(0, 0, 0, 0.08);
-  font-size: @font-size-small;
-  font-weight: @font-weight-regular;
-  line-height: @line-height-xl;
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-xl);
 }
 
 .input-bar__reply {
@@ -307,8 +307,8 @@
   &__sender-name {
     display: flex;
     align-items: center;
-    font-size: @font-size-small;
-    font-weight: @font-weight-bold;
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-bold);
 
     .edit-icon {
       width: 8px;
@@ -322,8 +322,8 @@
     overflow: hidden;
     max-width: @conversation-message-max-width;
     margin-top: 4px;
-    font-size: @font-size-medium;
-    font-weight: @font-weight-regular;
+    font-size: var(--font-size-medium);
+    font-weight: var(--font-weight-regular);
     text-overflow: ellipsis;
     white-space: nowrap;
 
@@ -364,7 +364,7 @@
     }
 
     & + span {
-      font-size: @font-size-xsmall;
+      font-size: var(--font-size-xsmall);
       text-transform: uppercase;
     }
   }

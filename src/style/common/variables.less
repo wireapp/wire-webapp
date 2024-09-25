@@ -90,31 +90,10 @@
 // ----------------------------------------------------------------------------
 @ars-font-path: '../font/';
 
-@font-family-base:
-  emoji,
-  BlinkMacSystemFont,
-  -apple-system,
-  Helvetica Neue,
-  Arial,
-  sans-serif;
-@font-family-ephemeral: Redacted Script;
-
-@font-size-xxs: 0.5rem;
-@font-size-xs: 0.6875rem;
-@font-size-sm: 1rem;
-@font-size-md: 1.25rem;
-@font-size-lg: 1.5rem;
-@font-size-xl: 2rem;
-@font-size-xxl: 3.5rem;
-
-@font-size-xsmall: 0.6875rem;
-@font-size-small: 0.75rem;
-@font-size-medium: 0.875rem;
-@font-size-base: 1rem;
-@font-size-large: 1.25rem;
-@font-size-xlarge: 1.5rem;
-
 body {
+  --font-family-base: emoji, BlinkMacSystemFont, -apple-system, Helvetica Neue, Arial, sans-serif;
+  --font-family-ephemeral: Redacted Script;
+
   --line-height-xs: 0.6875rem;
   --line-height-sm: 1rem;
   --line-height-md: 1.25rem;
@@ -122,12 +101,15 @@ body {
   --line-height-xl: 2rem;
   --line-height-xxl: 4rem;
 
+  --font-size-xxs: 0.5rem;
   --font-size-xsmall: 0.6875rem;
   --font-size-small: 0.75rem;
   --font-size-medium: 0.875rem;
   --font-size-base: 1rem;
   --font-size-large: 1.25rem;
   --font-size-xlarge: 1.5rem;
+  --font-size-xxl: 2rem;
+  --font-size-xxxl: 3.5rem;
 
   --font-weight-bold: 700;
   --font-weight-semibold: 600;
@@ -135,19 +117,6 @@ body {
   --font-weight-regular: 400; // font-weight-xs should this this
   --font-weight-light: 300;
 }
-
-@line-height-xs: var(--line-height-xs);
-@line-height-sm: var(--line-height-sm);
-@line-height-md: var(--line-height-md);
-@line-height-lg: var(--line-height-lg);
-@line-height-xl: var(--line-height-xl);
-@line-height-xxl: var(--line-height-xxl);
-
-@font-weight-bold: var(--font-weight-bold);
-@font-weight-semibold: var(--font-weight-semibold);
-@font-weight-medium: var(--font-weight-medium);
-@font-weight-regular: var(--font-weight-regular);
-@font-weight-light: var(--font-weight-light);
 
 // ----------------------------------------------------------------------------
 // Icons
@@ -249,7 +218,7 @@ body {
 // ----------------------------------------------------------------------------
 @conversation-input-min-height: 56px;
 @conversation-input-max-height: 200px;
-@conversation-input-line-height: @line-height-lg;
+@conversation-input-line-height: var(--line-height-lg);
 
 // ----------------------------------------------------------------------------
 // Content Title Bar
@@ -298,25 +267,25 @@ body {
 }
 
 @avatar-diameter-xl: 200px;
-@avatar-initials-xl: @font-size-xl;
+@avatar-initials-xl: var(--font-size-xxl);
 
 @avatar-diameter-l: 72px;
-@avatar-initials-l: @font-size-lg;
+@avatar-initials-l: var(--font-size-xlarge);
 
 @avatar-diameter-m: var(--avatar-diameter-m);
-@avatar-initials-m: @font-size-sm;
+@avatar-initials-m: var(--font-size-base);
 
 @avatar-diameter-s: 28px;
-@avatar-initials-s: @font-size-xs;
+@avatar-initials-s: var(--font-size-xsmall);
 
 @avatar-diameter-xs: 24px;
-@avatar-initials-xs: @font-size-xs;
+@avatar-initials-xs: var(--font-size-xsmall);
 
 @avatar-diameter-xxs: 20px;
-@avatar-initials-xxs: @font-size-xs;
+@avatar-initials-xxs: var(--font-size-xsmall);
 
 @avatar-diameter-xxxs: 16px;
-@avatar-initials-xxxs: @font-size-xxs;
+@avatar-initials-xxxs: var(--font-size-xxs);
 
 // ----------------------------------------------------------------------------
 // Bubble
