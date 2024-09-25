@@ -342,7 +342,7 @@ export class CallingRepository {
   private configureCallingApi(wCall: Wcall): Wcall {
     wCall.setLogHandler(this.avsLogHandler);
 
-    const avsEnv = Runtime.isFirefox() ? AVS_ENV.FIREFOX : AVS_ENV.DEFAULT;
+    const avsEnv = Runtime.isFirefox() || Runtime.isSafari() ? AVS_ENV.FIREFOX : AVS_ENV.DEFAULT;
     wCall.init(avsEnv);
     wCall.setUserMediaHandler(this.getCallMediaStream);
     wCall.setAudioStreamHandler(this.updateCallAudioStreams);
@@ -2031,7 +2031,7 @@ export class CallingRepository {
       const user = this.userRepository.findUserById(userId);
       if (user) {
         participant = new Participant(user, remoteClientId);
-        call.addParticipant(participant);
+        call?.addParticipant(participant);
       }
     }
 
