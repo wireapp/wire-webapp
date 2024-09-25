@@ -60,6 +60,18 @@
         height: 16px;
       }
 
+      .conversations-sidebar-btn .folder-icon {
+        display: flex;
+        align-items: center;
+
+        svg:last-child {
+          width: 7px;
+          height: 7px;
+          margin-left: 2px;
+          transform: rotate(-90deg);
+        }
+      }
+
       .folders-open-indicator,
       .external-link-icon {
         display: none;
@@ -142,15 +154,16 @@
   transition: grid-template-rows 0.3s ease-in-out;
 
   &.active {
-    padding: 0.5rem 0;
+    padding-bottom: 0.5rem;
     grid-template-rows: 1fr;
   }
 
   &--empty {
     display: flex;
     flex-direction: column;
-    font-size: 14px;
+    font-size: 0.75rem;
     font-weight: 400;
+    line-height: 0.875rem;
   }
 
   &--inner-wrapper {
@@ -159,7 +172,7 @@
     flex-direction: column;
     align-items: start;
     justify-content: center;
-    padding: 0 0.5rem;
+    padding: 0 0.5rem 0 2rem;
     gap: 4px;
   }
 

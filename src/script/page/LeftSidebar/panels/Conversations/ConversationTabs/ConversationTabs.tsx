@@ -33,6 +33,7 @@ import {
   footerDisclaimerTooltip,
   iconStyle,
 } from './ConversationTabs.styles';
+import {FolderIcon} from './FolderIcon';
 
 import {Config} from '../../../../../Config';
 import {Conversation} from '../../../../../entity/Conversation';
@@ -111,7 +112,7 @@ export const ConversationTabs = ({
       type: SidebarTabs.FOLDER,
       title: t('folderViewTooltip'),
       dataUieName: 'go-folders-view',
-      Icon: <Icon.FoldersOutline />,
+      Icon: <FolderIcon />,
       unreadConversations: totalUnreadConversations,
     },
     {
