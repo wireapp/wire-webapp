@@ -82,7 +82,7 @@
     .text-medium;
 
     .mention-at-sign {
-      font-size: @font-size-medium;
+      font-size: var(--font-size-medium);
     }
 
     &.self-mention {
@@ -188,8 +188,8 @@
   display: flex;
   min-width: 0; // fixes ellipsis not working with flexbox (FF)
   align-items: center;
-  font-size: @font-size-small;
-  font-weight: @font-weight-regular;
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-regular);
   white-space: normal;
 
   &:has(.delivered-message-icon) {
@@ -207,18 +207,18 @@
   }
 
   .message-header-plain-sender-name {
-    font-weight: @font-weight-bold;
+    font-weight: var(--font-weight-bold);
   }
 
   .message-header-sender-name {
-    font-weight: @font-weight-bold;
+    font-weight: var(--font-weight-bold);
     text-transform: capitalize;
   }
 
   .system-message-caption {
     & > a {
       color: inherit;
-      font-weight: @font-weight-bold;
+      font-weight: var(--font-weight-bold);
       text-decoration: underline;
     }
   }
@@ -231,7 +231,7 @@
   &__learn-more {
     color: var(--accent-color);
     cursor: pointer;
-    font-weight: @font-weight-bold;
+    font-weight: var(--font-weight-bold);
     text-transform: uppercase;
 
     &::before {
@@ -254,7 +254,7 @@
 
 .message-header-label-icon {
   margin-left: 8px;
-  font-size: @font-size-xxs;
+  font-size: var(--font-size-xxs);
 }
 
 .message-header-icon-guest,
@@ -304,7 +304,7 @@
 
     display: inline;
     min-width: 0;
-    line-height: @line-height-lg;
+    line-height: var(--line-height-lg);
     white-space: pre-wrap;
     word-wrap: break-word;
 
@@ -332,9 +332,9 @@
 
   .md-heading {
     margin: 4px 0 8px;
-    font-size: @font-size-md;
-    font-weight: @font-weight-bold;
-    line-height: @line-height-lg;
+    font-size: var(--font-size-large);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-lg);
 
     & + br {
       display: none;
@@ -482,8 +482,8 @@
 
 .message-services-warning {
   color: @w-red;
-  font-size: @font-size-small;
-  font-weight: @font-weight-regular;
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-regular);
 }
 
 // MEMBER MESSAGE
@@ -502,7 +502,7 @@
 .message-connected-header {
   padding: 0;
   margin: 0;
-  font-size: @font-size-lg;
+  font-size: var(--font-size-xlarge);
   font-weight: normal;
   line-height: 2.625rem;
   text-align: center;
@@ -529,15 +529,15 @@
 .message-member-footer {
   padding-top: 16px;
   margin-left: var(--conversation-message-sender-width);
-  font-size: @font-size-small;
-  font-weight: @font-weight-regular;
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-regular);
 }
 
 .message-group-creation-header-name {
   padding: 0;
   margin: 8px 0;
-  font-size: @font-size-lg;
-  font-weight: @font-weight-bold;
+  font-size: var(--font-size-xlarge);
+  font-weight: var(--font-weight-bold);
 }
 
 .message-group-creation-header-button {
@@ -547,21 +547,21 @@
   margin-top: 16px;
   background-color: @separator-color;
   cursor: pointer;
-  font-size: @font-size-medium;
-  font-weight: @font-weight-bold;
-  line-height: @line-height-sm;
+  font-size: var(--font-size-medium);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-sm);
 }
 
 .message-member-footer-message {
-  font-weight: @font-weight-regular;
-  line-height: @line-height-sm;
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-sm);
 }
 
 .message-member-footer-description {
   margin-top: 8px;
   color: var(--background-fade-40);
-  font-weight: @font-weight-regular;
-  line-height: @line-height-sm;
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-sm);
 }
 
 // PING MESSAGE
@@ -671,7 +671,7 @@
 
 .message-header-decrypt-reset-session-action {
   height: 12px;
-  font-size: @font-size-xsmall;
+  font-size: var(--font-size-xsmall);
 }
 
 .message-header-decrypt-reset-session-spinner {
@@ -716,7 +716,7 @@
 // TODO make generic class
 .ephemeral-message-obfuscated {
   color: var(--accent-color);
-  font-family: @font-family-ephemeral;
+  font-family: var(--font-family-ephemeral);
 }
 
 .ephemeral-asset-expired {
@@ -787,7 +787,7 @@
 .system-message-caption {
   & > a {
     color: inherit;
-    font-weight: @font-weight-bold;
+    font-weight: var(--font-weight-bold);
     text-decoration: underline;
   }
 }

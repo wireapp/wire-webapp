@@ -32,9 +32,9 @@
   box-shadow:
     0 0 1px 0 fade(#000, 8%),
     0 8px 24px 0 fade(#000, 16%);
-  font-size: @font-size-small;
-  font-weight: @font-weight-regular;
-  line-height: @line-height-xl;
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-xl);
   overflow-y: auto;
   &__item {
     display: flex;
@@ -68,7 +68,7 @@
     }
 
     &--checked {
-      font-weight: @font-weight-bold;
+      font-weight: var(--font-weight-bold);
     }
   }
   &__button {

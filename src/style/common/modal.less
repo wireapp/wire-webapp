@@ -86,7 +86,7 @@
       position: absolute;
       top: 24px;
       right: 24px;
-      font-weight: @font-weight-bold;
+      font-weight: var(--font-weight-bold);
     }
 
     @media (max-width: 600px) {
@@ -99,14 +99,14 @@
       .text-center;
 
       position: relative;
-      margin-bottom: @line-height-lg;
-      line-height: @line-height-lg;
+      margin-bottom: var(--line-height-lg);
+      line-height: var(--line-height-lg);
     }
 
     section {
       display: flex;
       padding-bottom: 24px;
-      font-size: @font-size-xs;
+      font-size: var(--font-size-xsmall);
 
       &:not(:first-child) {
         padding-top: 24px;
@@ -137,14 +137,14 @@
   .modal-title {
     padding-right: 48px;
     margin-bottom: 16px;
-    font-weight: @font-weight-bold;
-    line-height: @line-height-lg;
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-lg);
   }
 
   .modal-text {
     padding-right: 32px;
     margin-bottom: 16px;
-    line-height: @line-height-lg;
+    line-height: var(--line-height-lg);
     overflow-wrap: break-word;
   }
 
@@ -258,7 +258,7 @@
     animation: scaleIn 0.35s @ease-out-quart;
     background-color: var(--white);
     cursor: default;
-    font-size: @font-size-base;
+    font-size: var(--font-size-base);
     justify-self: center;
     overflow-y: hidden;
 
@@ -269,7 +269,7 @@
       .label-xs;
 
       margin-bottom: 16px;
-      line-height: @line-height-sm;
+      line-height: var(--line-height-sm);
 
       & div:nth-of-type(even) {
         margin-bottom: 16px;
@@ -401,7 +401,7 @@
 
   &__title {
     margin: 8px 0;
-    font-weight: @font-weight-bold;
+    font-weight: var(--font-weight-bold);
   }
 
   &__message {
@@ -459,21 +459,21 @@
   &__info {
     margin: 8px 0 24px;
     color: var(--gray-80);
-    font-size: @font-size-small;
-    line-height: @line-height-xs;
+    font-size: var(--font-size-small);
+    line-height: var(--line-height-xs);
   }
 
   &__cta {
     margin: 32px 0;
     color: @w-blue;
     cursor: pointer;
-    font-size: @font-size-xs;
-    font-weight: @font-weight-bold;
+    font-size: var(--font-size-xsmall);
+    font-weight: var(--font-weight-bold);
     white-space: nowrap;
 
     &--input {
       margin: 8px 0;
-      font-weight: @font-weight-regular;
+      font-weight: var(--font-weight-regular);
       text-align: right;
     }
   }
@@ -507,20 +507,20 @@ body.theme-dark {
     }
     &__header {
       margin-bottom: 32px;
-      font-size: @font-size-md;
+      font-size: var(--font-size-large);
       text-transform: initial;
     }
 
     &__label {
       margin-bottom: 0;
-      font-size: @font-size-xs;
+      font-size: var(--font-size-xsmall);
     }
     &__cta {
       margin: 32px 0;
       color: @w-blue;
       cursor: pointer;
-      font-size: @font-size-sm;
-      font-weight: @font-weight-bold;
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-bold);
       text-align: center;
       white-space: nowrap;
     }
@@ -531,9 +531,9 @@ body.theme-dark {
     &__passcode__info {
       margin: 2px 0;
       color: var(--foreground);
-      font-size: @font-size-xs;
+      font-size: var(--font-size-xsmall);
       font-weight: 600;
-      line-height: @line-height-sm;
+      line-height: var(--line-height-sm);
       &:before {
         position: relative;
         top: 2px;

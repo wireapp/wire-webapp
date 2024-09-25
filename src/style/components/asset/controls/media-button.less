@@ -42,7 +42,7 @@
   background-color: fade(#000, 40%);
   color: #fff;
   cursor: pointer;
-  font-size: @font-size-sm;
+  font-size: var(--font-size-base);
   line-height: @media-button-size;
   text-align: center;
 
@@ -91,7 +91,7 @@
   .media-button-lg & {
     .circle(@media-button-size-lg);
 
-    font-size: @font-size-xl;
+    font-size: var(--font-size-xxl);
     line-height: @media-button-size-lg;
 
     & circle {
