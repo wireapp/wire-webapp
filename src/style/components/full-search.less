@@ -39,15 +39,15 @@
       position: absolute;
       right: 0;
       bottom: 0;
-      left: @conversation-message-sender-width;
+      left: var(--conversation-message-sender-width);
       height: 1px;
-      background-color: @separator-color;
+      background-color: var(--separator-color);
       content: '';
     }
     &__avatar {
       .flex-center;
 
-      width: @conversation-message-sender-width;
+      width: var(--conversation-message-sender-width);
       flex: 0 0 auto;
       color: var(--foreground);
     }

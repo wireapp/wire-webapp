@@ -33,7 +33,7 @@
     height: 100%;
     align-items: center;
     pointer-events: none;
-    transition: opacity @animation-timing-faster;
+    transition: opacity var(--animation-timing-faster);
 
     svg {
       width: 12px;
@@ -120,7 +120,7 @@
 }
 
 .preferences-account-picture-button {
-  .square(@avatar-diameter-xl);
+  .square(var(--avatar-diameter-xl));
 
   position: relative;
   display: inline-block;
@@ -148,7 +148,7 @@
 
   > input {
     position: absolute;
-    left: @offscreen-left;
+    left: var(--offscreen-left);
   }
 
   &.loading {
@@ -160,7 +160,7 @@
   cursor: pointer;
   > input {
     position: absolute;
-    left: @offscreen-left;
+    left: var(--offscreen-left);
   }
 }
 

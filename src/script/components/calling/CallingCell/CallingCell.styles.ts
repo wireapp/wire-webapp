@@ -34,7 +34,7 @@ export const callingContainer: CSSObject = {
   flexDirection: 'column',
   flexShrink: '0',
   padding: '10px 12px 20px',
-  animation: 'show-call-ui @animation-timing-fast ease-in-out 0s 1',
+  animation: 'show-call-ui var(--animation-timing-fast) ease-in-out 0s 1',
 };
 
 export const infoBar: CSSObject = {

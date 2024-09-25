@@ -19,22 +19,25 @@
 
 // default
 .button {
-  .button-large; // default size is large
   .label-bold-xs;
   display: inline-block;
+
+  width: var(--button-width);
+  height: var(--button-height);
   padding: 0 16px;
-  border: @button-border-size solid transparent;
-  border-radius: @button-border-radius;
+  border: var(--button-border-size) solid transparent;
+  border-radius: var(--button-border-radius);
   background-color: var(--accent-color);
   color: #fff;
   cursor: pointer;
+  line-height: calc(var(--button-height) - var(--button-border-size) * 2);
   text-align: center;
   text-decoration: none;
   user-select: none;
 
   > input {
     position: absolute;
-    left: @offscreen-left;
+    left: var(--offscreen-left);
   }
 
   // types
@@ -70,19 +73,12 @@
     }
   }
 
-  // sizes
-  &.button-large {
-    width: @button-width;
-    height: @button-height;
-    line-height: (@button-height - @button-border-size * 2);
-  }
-
   &.button-small,
   &.button-medium {
-    width: @button-medium-width;
-    min-width: @button-medium-width;
-    height: @button-medium-sm-height;
-    line-height: (@button-medium-sm-height - @button-border-size * 2);
+    width: var(--button-medium-width);
+    min-width: var(--button-medium-width);
+    height: var(--button-medium-sm-height);
+    line-height: calc(var(--button-medium-sm-height) - var(--button-border-size) * 2);
   }
 
   // expansion

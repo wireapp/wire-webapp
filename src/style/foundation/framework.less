@@ -29,7 +29,7 @@
   .left-column {
     position: relative;
     display: flex;
-    min-width: @conversation-list-width;
+    min-width: var(--conversation-list-width);
     flex: 0 0 auto;
     border-right: 1px solid var(--border-color);
     background-color: var(--sidebar-bg);
@@ -42,7 +42,7 @@
     }
 
     .team-mode & {
-      width: @conversation-list-width + @teams-width;
+      width: calc(var(--conversation-list-width) + var(--teams-width));
     }
   }
 
@@ -65,11 +65,11 @@
     #conversation-title-bar,
     #message-list {
       width: 100%;
-      transition: width @animation-timing-fast @ease-out-quart;
+      transition: width var(--animation-timing-fast) var(--ease-out-quart);
 
       @media (min-width: 1000px) {
         &.is-right-panel-open {
-          width: calc(100% - @right-width);
+          width: calc(100% - var(--right-width));
         }
       }
     }
@@ -81,7 +81,7 @@
     right: 0;
     right: 0;
     overflow: hidden;
-    width: @right-width;
+    width: var(--right-width);
     //width: 0;
     height: 100vh;
     max-height: 100%;
