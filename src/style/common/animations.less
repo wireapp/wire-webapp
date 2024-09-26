@@ -140,7 +140,7 @@
 
   .panel__content,
   .panel__footer {
-    transform: translateX(-var(--panel-width));
+    transform: translateX(calc(var(--panel-width) * -1));
     transition: transform var(--animation-timing-fast) var(--ease-out-quart);
   }
 }
@@ -152,7 +152,7 @@
 
   .panel__content,
   .panel__footer {
-    transform: translateX(-var(--panel-width));
+    transform: translateX(calc(var(--panel-width) * -1));
   }
 }
 
