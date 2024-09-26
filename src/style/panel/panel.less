@@ -81,7 +81,7 @@
     &--move-in--right {
       & .panel__content,
       & .panel__footer {
-        transform: translateX(-var(--panel-width));
+        transform: translateX(calc(var(--panel-width) * -1));
       }
     }
 
@@ -112,7 +112,7 @@
     &--move-in--right {
       & .panel__content,
       & .panel__footer {
-        right: -var(--panel-width);
+        right: calc(var(--panel-width) * -1);
       }
     }
   }
