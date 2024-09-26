@@ -86,7 +86,7 @@ export const ConversationsList = ({
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
   const {currentTab} = useSidebarStore();
 
-  const clickedFilteredConversation = useRef<Conversation | null>(null);
+  const clickedFilteredConversation = useRef<HTMLElement | null>(null);
 
   const {joinableCalls} = useKoSubscribableChildren(callState, ['joinableCalls']);
 
@@ -124,7 +124,10 @@ export const ConversationsList = ({
       }
 
       clearSearchFilter();
-      clickedFilteredConversation.current = conversation;
+
+      clickedFilteredConversation.current = document.querySelector<HTMLElement>(
+        `.conversation-list-cell[data-uie-uid="${conversation.id}"]`,
+      );
     },
     isSelected: isActiveConversation,
     onJoinCall: answerCall,
@@ -134,11 +137,7 @@ export const ConversationsList = ({
 
   useEffect(() => {
     if (clickedFilteredConversation.current) {
-      const element = document.querySelector<HTMLElement>(`[data-uie-uid="${clickedFilteredConversation.current.id}"]`);
-      if (element) {
-        scrollToConversation(element);
-      }
-
+      scrollToConversation(clickedFilteredConversation.current);
       clickedFilteredConversation.current = null;
     }
   });

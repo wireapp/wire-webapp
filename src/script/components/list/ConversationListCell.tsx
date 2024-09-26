@@ -155,92 +155,95 @@ const ConversationListCell = ({
   }, [isFocused]);
 
   return (
-    <li onContextMenu={openContextMenu}>
+    <li
+      onContextMenu={openContextMenu}
+      data-uie-name={dataUieName}
+      data-uie-uid={conversation.id}
+      data-uie-value={displayName}
+      data-uie-status={isActive ? 'active' : 'inactive'}
+      className={cx('conversation-list-cell', {'conversation-list-cell--active': isActive})}
+    >
       <div
-        data-uie-name={dataUieName}
-        data-uie-uid={conversation.id}
-        data-uie-value={displayName}
-        data-uie-status={isActive ? 'active' : 'inactive'}
-        className={cx('conversation-list-cell', {'conversation-list-cell--active': isActive})}
+        role="button"
+        ref={conversationRef}
+        className="conversation-list-cell-main-button"
+        onClick={event => {
+          event.stopPropagation();
+          event.preventDefault();
+          onClick(event);
+        }}
+        onKeyDown={handleDivKeyDown}
+        data-uie-name="go-open-conversation"
+        tabIndex={isFocused ? TabIndex.FOCUSABLE : TabIndex.UNFOCUSABLE}
+        aria-label={t('accessibility.openConversation', displayName)}
+        aria-describedby={contextMenuKeyboardShortcut}
       >
+        <span id={contextMenuKeyboardShortcut} aria-label={t('accessibility.conversationOptionsMenuAccessKey')} />
+
         <div
-          role="button"
-          ref={conversationRef}
-          className="conversation-list-cell-main-button"
-          onClick={onClick}
-          onKeyDown={handleDivKeyDown}
-          data-uie-name="go-open-conversation"
-          tabIndex={isFocused ? TabIndex.FOCUSABLE : TabIndex.UNFOCUSABLE}
-          aria-label={t('accessibility.openConversation', displayName)}
-          aria-describedby={contextMenuKeyboardShortcut}
+          className={cx('conversation-list-cell-left', {
+            'conversation-list-cell-left-opaque': isSelfUserRemoved || users.length === 0,
+          })}
         >
-          <span id={contextMenuKeyboardShortcut} aria-label={t('accessibility.conversationOptionsMenuAccessKey')} />
+          {isGroup && <GroupAvatar className="conversation-list-cell-avatar-arrow" users={users} />}
 
-          <div
-            className={cx('conversation-list-cell-left', {
-              'conversation-list-cell-left-opaque': isSelfUserRemoved || users.length === 0,
-            })}
-          >
-            {isGroup && <GroupAvatar className="conversation-list-cell-avatar-arrow" users={users} />}
-
-            {!isGroup && !!users.length && <Avatar participant={users[0]} avatarSize={AVATAR_SIZE.SMALL} />}
-          </div>
-
-          <div className="conversation-list-cell-center">
-            {is1to1 ? (
-              <UserInfo user={conversation.firstUserEntity()!} isActive={isActive}>
-                {isConversationWithBlockedUser && <UserBlockedBadge />}
-              </UserInfo>
-            ) : (
-              <span className={cx('conversation-list-cell-name', {'conversation-list-cell-name--active': isActive})}>
-                {displayName}
-              </span>
-            )}
-
-            {cellState.description && (
-              <span
-                className={cx('conversation-list-cell-description', {
-                  'conversation-list-cell-description--active': isActive,
-                })}
-                data-uie-name="secondary-line"
-              >
-                {cellState.description}
-              </span>
-            )}
-          </div>
+          {!isGroup && !!users.length && <Avatar participant={users[0]} avatarSize={AVATAR_SIZE.SMALL} />}
         </div>
 
-        <div className="conversation-list-cell-right">
-          <button
-            ref={contextMenuRef}
-            className={cx('conversation-list-cell-context-menu', {
-              'conversation-list-cell-context-menu--active': isActive,
-            })}
-            data-uie-name="go-options"
-            aria-label={t('accessibility.conversationOptionsMenu')}
-            type="button"
-            tabIndex={focusContextMenu && isFocused ? TabIndex.FOCUSABLE : TabIndex.UNFOCUSABLE}
-            aria-haspopup="true"
-            onClick={event => {
-              event.stopPropagation();
-              rightClick(conversation, event.nativeEvent);
-            }}
-            onKeyDown={handleContextKeyDown}
-          />
+        <div className="conversation-list-cell-center">
+          {is1to1 ? (
+            <UserInfo user={conversation.firstUserEntity()!} isActive={isActive}>
+              {isConversationWithBlockedUser && <UserBlockedBadge />}
+            </UserInfo>
+          ) : (
+            <span className={cx('conversation-list-cell-name', {'conversation-list-cell-name--active': isActive})}>
+              {displayName}
+            </span>
+          )}
 
-          {!showJoinButton && <ConversationListCellStatusIcon conversation={conversation} />}
-
-          {showJoinButton && (
-            <button
-              onClick={onClickJoinCall}
-              type="button"
-              className="call-ui__button call-ui__button--green call-ui__button--join"
-              data-uie-name="do-call-controls-call-join"
+          {cellState.description && (
+            <span
+              className={cx('conversation-list-cell-description', {
+                'conversation-list-cell-description--active': isActive,
+              })}
+              data-uie-name="secondary-line"
             >
-              {t('callJoin')}
-            </button>
+              {cellState.description}
+            </span>
           )}
         </div>
+      </div>
+
+      <div className="conversation-list-cell-right">
+        <button
+          ref={contextMenuRef}
+          className={cx('conversation-list-cell-context-menu', {
+            'conversation-list-cell-context-menu--active': isActive,
+          })}
+          data-uie-name="go-options"
+          aria-label={t('accessibility.conversationOptionsMenu')}
+          type="button"
+          tabIndex={focusContextMenu && isFocused ? TabIndex.FOCUSABLE : TabIndex.UNFOCUSABLE}
+          aria-haspopup="true"
+          onClick={event => {
+            event.stopPropagation();
+            rightClick(conversation, event.nativeEvent);
+          }}
+          onKeyDown={handleContextKeyDown}
+        />
+
+        {!showJoinButton && <ConversationListCellStatusIcon conversation={conversation} />}
+
+        {showJoinButton && (
+          <button
+            onClick={onClickJoinCall}
+            type="button"
+            className="call-ui__button call-ui__button--green call-ui__button--join"
+            data-uie-name="do-call-controls-call-join"
+          >
+            {t('callJoin')}
+          </button>
+        )}
       </div>
     </li>
   );
