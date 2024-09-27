@@ -187,6 +187,8 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
       }
 
       event.preventDefault();
+      event.stopPropagation();
+
       preventFocusOutside(event, 'video-calling');
     };
 
