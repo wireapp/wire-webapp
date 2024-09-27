@@ -17,7 +17,7 @@
  *
  */
 
-import React, {MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent, useRef, useEffect} from 'react';
+import React, {MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent, useEffect, useState} from 'react';
 
 import {ConversationListCell} from 'Components/list/ConversationListCell';
 import {Call} from 'src/script/calling/Call';
@@ -86,7 +86,7 @@ export const ConversationsList = ({
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
   const {currentTab} = useSidebarStore();
 
-  const clickedFilteredConversation = useRef<HTMLElement | null>(null);
+  const [clickedFilteredConversation, setClickedFilteredConversation] = useState<HTMLElement | null>(null);
 
   const {joinableCalls} = useKoSubscribableChildren(callState, ['joinableCalls']);
 
@@ -124,10 +124,7 @@ export const ConversationsList = ({
       }
 
       clearSearchFilter();
-
-      clickedFilteredConversation.current = document.querySelector<HTMLElement>(
-        `.conversation-list-cell[data-uie-uid="${conversation.id}"]`,
-      );
+      setClickedFilteredConversation(event.currentTarget);
     },
     isSelected: isActiveConversation,
     onJoinCall: answerCall,
@@ -136,11 +133,11 @@ export const ConversationsList = ({
   });
 
   useEffect(() => {
-    if (clickedFilteredConversation.current) {
-      scrollToConversation(clickedFilteredConversation.current);
-      clickedFilteredConversation.current = null;
+    if (!conversationsFilter && clickedFilteredConversation) {
+      scrollToConversation(clickedFilteredConversation);
+      setClickedFilteredConversation(null);
     }
-  });
+  }, [conversationsFilter, clickedFilteredConversation]);
 
   const isFolderView = currentTab === SidebarTabs.FOLDER;
   const filteredConversations =
