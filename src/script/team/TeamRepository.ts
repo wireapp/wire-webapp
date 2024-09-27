@@ -237,7 +237,8 @@ export class TeamRepository extends TypedEventEmitter<Events> {
   };
 
   filterRemoteDomainUsers(users: User[]): User[] {
-    const isMLS = this.getTeamSupportedProtocols().includes(ConversationProtocol.MLS);
+    const isMLS = this.teamState.teamFeatures()?.mls?.config.defaultProtocol === ConversationProtocol.MLS;
+
     if (isMLS) {
       return users;
     }
