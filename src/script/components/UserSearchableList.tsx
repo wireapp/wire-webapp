@@ -94,11 +94,9 @@ export const UserSearchableList: React.FC<UserListProps> = ({
 
       // We shouldn't show any members that have the 'external' role and are not already locally known.
       const nonExternalMembers = await teamRepository.filterExternals(uniqueMembers);
-      if (!filterRemoteTeamUsers) {
-        setRemoteTeamMembers(nonExternalMembers);
-        return;
-      }
-      setRemoteTeamMembers(teamRepository.filterRemoteDomainUsers(nonExternalMembers));
+      setRemoteTeamMembers(
+        filterRemoteTeamUsers ? teamRepository.filterRemoteDomainUsers(nonExternalMembers) : nonExternalMembers,
+      );
     }, 300),
     [],
   );
