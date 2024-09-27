@@ -25,11 +25,20 @@ import classNames from 'classnames';
 import {container} from 'tsyringe';
 
 import {CALL_TYPE} from '@wireapp/avs';
-import {EmojiIcon, GridIcon, IconButton, IconButtonVariant, Select} from '@wireapp/react-ui-kit';
+import {
+  Checkbox,
+  CheckboxLabel,
+  EmojiIcon,
+  GridIcon,
+  IconButton,
+  IconButtonVariant,
+  Select,
+} from '@wireapp/react-ui-kit';
 
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import * as Icon from 'Components/Icon';
 import {ConversationClassifiedBar} from 'Components/input/ClassifiedBar';
+import {ModalComponent} from 'Components/ModalComponent';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {Config} from 'src/script/Config';
 import {isCallViewOption} from 'src/script/guards/CallView';
@@ -102,6 +111,8 @@ export interface FullscreenVideoCallProps {
 
 const EMOJIS_LIST = ['👍', '🎉', '❤️', '😂', '😮', '👏', '🤔', '😢', '👎'];
 
+const LOCAL_STORAGE_KEY_FOR_SCREEN_SHARING_CONFIRM_MODAL = 'DO_NOT_ASK_AGAIN_FOR_SCREEN_SHARING_CONFIRM_MODAL';
+
 const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   call,
   canShareScreen,
@@ -129,6 +140,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   teamState = container.resolve(TeamState),
   callState = container.resolve(CallState),
 }) => {
+  const [isConfirmCloseModalOpen, setIsConfirmCloseModalOpen] = useState<boolean>(false);
   const [showEmojisBar, setShowEmojisBar] = useState<boolean>(false);
   const [disabledEmojis, setDisabledEmojis] = useState<string[]>([]);
   const selfParticipant = call.getSelfParticipant();
@@ -170,11 +182,27 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   ]);
 
   const {selfUser, roles} = useKoSubscribableChildren(conversation, ['selfUser', 'roles']);
-  const {emojis, viewMode} = useKoSubscribableChildren(callState, ['emojis', 'viewMode']);
+  const {emojis, viewMode, isScreenSharingSourceFromDetachedWindow} = useKoSubscribableChildren(callState, [
+    'emojis',
+    'viewMode',
+    'isScreenSharingSourceFromDetachedWindow',
+  ]);
 
   const [audioOptionsOpen, setAudioOptionsOpen] = useState(false);
   const [videoOptionsOpen, setVideoOptionsOpen] = useState(false);
-  const minimize = () => callingRepository.setViewModeMinimized();
+
+  const minimize = () => {
+    const isSharingScreen = call?.getSelfParticipant().sharesScreen();
+
+    const hasAlreadyConfirmed = localStorage.getItem(LOCAL_STORAGE_KEY_FOR_SCREEN_SHARING_CONFIRM_MODAL) === 'true';
+
+    if (isSharingScreen && isScreenSharingSourceFromDetachedWindow && !hasAlreadyConfirmed) {
+      setIsConfirmCloseModalOpen(true);
+      return;
+    }
+
+    callingRepository.setViewModeMinimized();
+  };
   const openPopup = () => callingRepository.setViewModeDetached();
 
   const [isParticipantsListOpen, toggleParticipantsList] = useToggleState(false);
@@ -466,7 +494,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                 onClick={openPopup}
                 onKeyDown={event => handleKeyDown(event, () => openPopup())}
                 type="button"
-                data-uie-name="do-call-controls-video-minimize"
+                data-uie-name="do-call-controls-video-maximize"
                 title={t('videoCallOverlayOpenPopupWindow')}
               >
                 <Icon.OpenDetachedWindowIcon />
@@ -835,6 +863,72 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
           showParticipants={true}
         />
       )}
+      <ModalComponent
+        isShown={isConfirmCloseModalOpen}
+        onClosed={() => setIsConfirmCloseModalOpen(false)}
+        onBgClick={() => setIsConfirmCloseModalOpen(false)}
+        data-uie-name="confirm-close-with-active-screen-share-modal"
+        wrapperCSS={{borderRadius: 10, width: 328}}
+      >
+        {isConfirmCloseModalOpen && (
+          <>
+            <div className="modal__header" data-uie-name="status-modal-title">
+              <h2 className="text-medium" id="modal-title">
+                {t('videoCallScreenShareEndConfirm')}
+              </h2>
+            </div>
+
+            <div className="modal__body">
+              <div id="modal-description-text">{t('videoCallScreenShareEndConfirmDescription')}</div>
+              <Checkbox
+                wrapperCSS={{marginTop: 16}}
+                data-uie-name="do-not-ask-again-checkbox"
+                id="do-not-ask-again-checkbox"
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                  localStorage.setItem(
+                    LOCAL_STORAGE_KEY_FOR_SCREEN_SHARING_CONFIRM_MODAL,
+                    event.target.checked.toString(),
+                  )
+                }
+              >
+                <CheckboxLabel className="label-xs" htmlFor="do-not-ask-again-checkbox">
+                  {t('qualityFeedback.doNotAskAgain')}
+                </CheckboxLabel>
+              </Checkbox>
+              <div className="modal__buttons">
+                <button
+                  key="cancel"
+                  type="button"
+                  onClick={() => setIsConfirmCloseModalOpen(false)}
+                  data-uie-name="do-close"
+                  className="modal__button modal__button--secondary"
+                >
+                  {t('modalConfirmSecondary')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => callingRepository.setViewModeMinimized()}
+                  className="modal__button modal__button--primary"
+                  data-uie-name="do-action"
+                  key="modal-primary-button"
+                >
+                  {t('modalAcknowledgeAction')}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              className="modal__header__button"
+              onClick={() => setIsConfirmCloseModalOpen(false)}
+              aria-label={'closeBtnTitle'}
+              data-uie-name="do-close"
+            >
+              <Icon.CloseIcon className="modal__header__icon" aria-hidden="true" />
+            </button>
+          </>
+        )}
+      </ModalComponent>
     </div>
   );
 };

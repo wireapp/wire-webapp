@@ -1550,6 +1550,8 @@
   "videoCallPaused": "Video paused",
   "videoCallScreenShareNotSupported": "Screen sharing is not supported in this browser",
   "videoCallScreenShareEnded": "Your screen share has ended.",
+  "videoCallScreenShareEndConfirm": "End screen share",
+  "videoCallScreenShareEndConfirmDescription": "If you minimize the window, your screen share will end.",
   "videoCallaudioInputMicrophone": "Microphone",
   "videoCallaudioOutputSpeaker": "Speaker",
   "videoCallbackgroundBlur": "Blur my background",
