@@ -248,6 +248,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
               selfUser={selfUser}
               isSelectable
               allowRemoteSearch
+              filterRemoteTeamUsers
             />
           )}
 
