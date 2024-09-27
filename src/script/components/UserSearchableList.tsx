@@ -92,7 +92,8 @@ export const UserSearchableList: React.FC<UserListProps> = ({
 
       // We shouldn't show any members that have the 'external' role and are not already locally known.
       const nonExternalMembers = await teamRepository.filterExternals(uniqueMembers);
-      setRemoteTeamMembers(nonExternalMembers);
+      const nonRemoteDomainMembers = teamRepository.filterRemoteDomainUsers(nonExternalMembers);
+      setRemoteTeamMembers(nonRemoteDomainMembers);
     }, 300),
     [],
   );
@@ -116,13 +117,13 @@ export const UserSearchableList: React.FC<UserListProps> = ({
     }
 
     if (!selfFirst) {
-      setFilteredUsers(results);
+      setFilteredUsers(teamRepository.filterRemoteDomainUsers(results));
       return;
     }
 
     // make sure the self user is the first one in the list
     const [selfUser, otherUsers] = partition(results, user => user.isMe);
-    setFilteredUsers(selfUser.concat(otherUsers));
+    setFilteredUsers(teamRepository.filterRemoteDomainUsers(selfUser.concat(otherUsers)));
   }, [filter, users.length]);
 
   const foundUserEntities = () => {

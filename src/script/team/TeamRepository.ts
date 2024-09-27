@@ -236,6 +236,21 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     await this.updateTeamMembersByIds(selfTeamId, newTeamMemberIds, true);
   };
 
+  filterRemoteDomainUsers(users: User[]): User[] {
+    const isMLS = this.getTeamSupportedProtocols().includes(ConversationProtocol.MLS);
+    if (isMLS) {
+      return users;
+    }
+    const domain = this.userState.self()?.domain ?? this.teamState.teamDomain();
+    return users.filter(user => {
+      if (user.domain !== domain) {
+        this.logger.log(`Filtering out user ${user.id} because of domain mismatch, current protocol is not MLS`);
+        return false;
+      }
+      return true;
+    });
+  }
+
   async filterExternals(users: User[]): Promise<User[]> {
     const teamId = this.teamState.team()?.id;
     if (!teamId) {
