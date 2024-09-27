@@ -54,10 +54,12 @@ export type UserListProps = React.ComponentProps<typeof UserList> & {
   excludeUsers?: QualifiedId[];
   /** will do an extra request to the server when user types in (otherwise will only lookup given local users) */
   allowRemoteSearch?: boolean;
+  filterRemoteTeamUsers?: boolean;
 };
 
 export const UserSearchableList: React.FC<UserListProps> = ({
   onUpdateSelectedUsers,
+  filterRemoteTeamUsers = false,
   dataUieName = '',
   filter = '',
   highlightedUsers,
@@ -92,8 +94,11 @@ export const UserSearchableList: React.FC<UserListProps> = ({
 
       // We shouldn't show any members that have the 'external' role and are not already locally known.
       const nonExternalMembers = await teamRepository.filterExternals(uniqueMembers);
-      const nonRemoteDomainMembers = teamRepository.filterRemoteDomainUsers(nonExternalMembers);
-      setRemoteTeamMembers(nonRemoteDomainMembers);
+      if (!filterRemoteTeamUsers) {
+        setRemoteTeamMembers(nonExternalMembers);
+        return;
+      }
+      setRemoteTeamMembers(teamRepository.filterRemoteDomainUsers(nonExternalMembers));
     }, 300),
     [],
   );
@@ -117,13 +122,15 @@ export const UserSearchableList: React.FC<UserListProps> = ({
     }
 
     if (!selfFirst) {
-      setFilteredUsers(teamRepository.filterRemoteDomainUsers(results));
+      setFilteredUsers(filterRemoteTeamUsers ? teamRepository.filterRemoteDomainUsers(results) : results);
       return;
     }
 
     // make sure the self user is the first one in the list
     const [selfUser, otherUsers] = partition(results, user => user.isMe);
-    setFilteredUsers(teamRepository.filterRemoteDomainUsers(selfUser.concat(otherUsers)));
+
+    const concatUsers = selfUser.concat(otherUsers);
+    setFilteredUsers(filterRemoteTeamUsers ? teamRepository.filterRemoteDomainUsers(concatUsers) : concatUsers);
   }, [filter, users.length]);
 
   const foundUserEntities = () => {
