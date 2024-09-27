@@ -22,9 +22,7 @@
     <script src="./min/basicBrowserFeatureCheck.js?v=<%= VERSION %>"></script>
     <script src="./min/checkBrowser.js?v=<%= VERSION %>"></script>
 
-    <script src='./libs/countly/boomerang.min.js?v=<%= VERSION %>' type='text/javascript'></script>
     <script src='./libs/countly/countly.min.js?v=<%= VERSION %>' type='text/javascript'></script>
-    <script src='./min/countlyBoomerangCustom.js?v=<%= VERSION %>' type='text/javascript'></script>
     <script type='text/javascript' nonce="<%= COUNTLY_NONCE %>">
       var Countly = Countly || {};
       Countly.q = Countly.q || [];
@@ -39,7 +37,6 @@
 
       Countly.q.push(['track_sessions']);
       Countly.q.push(['track_pageview']);
-      Countly.q.push(['track_performance']);
 
       Countly.init();
     </script>

@@ -296,8 +296,6 @@ export class EventTrackingRepository {
 
     if (this.isProductReportingActivated === true || getForcedErrorReportingStatus()) {
       window.Countly.q.push(['begin_session']);
-      // enable APM
-      window.Countly.q.push(['track_performance']);
       if (this.sendAppOpenEvent) {
         this.sendAppOpenEvent = false;
         this.trackProductReportingEvent(EventName.APP_OPEN);
