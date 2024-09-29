@@ -2842,10 +2842,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"helmet@npm:7.1.0":
-  version: 7.1.0
-  resolution: "helmet@npm:7.1.0"
-  checksum: 10/aa13b0907d9d31b65e4ec73093b58d7e94e83c06818cc06869f5eb95d205574a14f01ed71cadfac4a68b736a1a6d7ef2290f3f6ef77ac664c7e75b8f9eddf88c
+"helmet@npm:8.0.0":
+  version: 8.0.0
+  resolution: "helmet@npm:8.0.0"
+  checksum: 10/cf30579d1dbd095e301458265fb6b3446d1ee0598c99b5e946afda8a72c035a6a7ebf2176168d5ca2541e6e522a88fb58d06f0eeec4ab378646960de9aea6584
   languageName: node
   linkType: hard
 
@@ -5686,7 +5686,7 @@ __metadata:
     fs-extra: "npm:11.2.0"
     geolite2: "npm:1.3.0"
     hbs: "npm:4.2.0"
-    helmet: "npm:7.1.0"
+    helmet: "npm:8.0.0"
     http-proxy-middleware: "npm:3.0.2"
     http-status-codes: "npm:2.3.0"
     jest: "npm:29.7.0"
