@@ -86,7 +86,7 @@ export const ConversationsList = ({
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
   const {currentTab} = useSidebarStore();
 
-  const [clickedFilteredConversation, setClickedFilteredConversation] = useState<HTMLElement | null>(null);
+  const [clickedFilteredConversationId, setClickedFilteredConversationId] = useState<string | null>(null);
 
   const {joinableCalls} = useKoSubscribableChildren(callState, ['joinableCalls']);
 
@@ -124,7 +124,7 @@ export const ConversationsList = ({
       }
 
       clearSearchFilter();
-      setClickedFilteredConversation(event.currentTarget);
+      setClickedFilteredConversationId(conversation.id);
     },
     isSelected: isActiveConversation,
     onJoinCall: answerCall,
@@ -133,11 +133,11 @@ export const ConversationsList = ({
   });
 
   useEffect(() => {
-    if (!conversationsFilter && clickedFilteredConversation) {
-      scrollToConversation(clickedFilteredConversation);
-      setClickedFilteredConversation(null);
+    if (!conversationsFilter && clickedFilteredConversationId) {
+      scrollToConversation(clickedFilteredConversationId);
+      setClickedFilteredConversationId(null);
     }
-  }, [conversationsFilter, clickedFilteredConversation]);
+  }, [conversationsFilter, clickedFilteredConversationId]);
 
   const isFolderView = currentTab === SidebarTabs.FOLDER;
   const filteredConversations =

@@ -100,15 +100,26 @@ export const conversationSearchFilter = (filter: string) => (conversation: Conve
   return conversationDisplayName.includes(filterWord);
 };
 
-export const scrollToConversation = (element: HTMLElement) => {
-  const rect = element.getBoundingClientRect();
-  const isVisible =
-    rect.top >= 0 &&
-    rect.left >= 0 &&
-    rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-    rect.right <= (window.innerWidth || document.documentElement.clientWidth);
+export const scrollToConversation = (conversationId: string) => {
+  const timeout = setTimeout(() => {
+    const element = document.querySelector<HTMLElement>(`.conversation-list-cell[data-uie-uid="${conversationId}"]`);
 
-  if (!isVisible) {
-    element.scrollIntoView({behavior: 'instant', block: 'center', inline: 'nearest'});
-  }
+    if (!element) {
+      return;
+    }
+
+    const rect = element.getBoundingClientRect();
+
+    const isVisible =
+      rect.top >= 0 &&
+      rect.left >= 0 &&
+      rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+      rect.right <= (window.innerWidth || document.documentElement.clientWidth);
+
+    if (!isVisible) {
+      element.scrollIntoView({behavior: 'instant', block: 'center', inline: 'nearest'});
+    }
+
+    clearTimeout(timeout);
+  }, 1);
 };
