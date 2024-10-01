@@ -17,7 +17,7 @@
  *
  */
 
-import React, {KeyboardEvent as ReactKeyBoardEvent, useEffect, useRef, useState} from 'react';
+import React, {KeyboardEvent as ReactKeyBoardEvent, useEffect, useState} from 'react';
 
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
@@ -107,7 +107,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   userState = container.resolve(UserState),
   selfUser,
 }) => {
-  const conversationListRef = useRef<HTMLElement | null>(null);
+  const [conversationListRef, setConversationListRef] = useState<HTMLElement | null>(null);
 
   const {currentTab, status: sidebarStatus, setStatus: setSidebarStatus, setCurrentTab} = useSidebarStore();
   const [conversationsFilter, setConversationsFilter] = useState<string>('');
@@ -344,7 +344,7 @@ const Conversations: React.FC<ConversationsProps> = ({
 
   const onSearch = (searchValue: string) => {
     setConversationsFilter(searchValue);
-    conversationListRef.current?.scrollTo(0, 0);
+    conversationListRef?.scrollTo(0, 0);
   };
 
   return (
@@ -366,7 +366,7 @@ const Conversations: React.FC<ConversationsProps> = ({
             onSearchEnterClick={handleEnterSearchClick}
           />
         }
-        ref={conversationListRef}
+        setConversationListRef={setConversationListRef}
         hasHeader={!isPreferences}
         {...(!isTemporaryGuest && {sidebar})}
         footer={callingView}
