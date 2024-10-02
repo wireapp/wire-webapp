@@ -27,7 +27,7 @@
       var Countly = Countly || {};
       Countly.q = Countly.q || [];
 
-      if (!window.wire.env.COUNTLY_API_KEY) {
+      if (window.wire.env.COUNTLY_API_KEY) {
         Countly.app_key = window.wire.env.COUNTLY_API_KEY;
         Countly.url = "https://countly.wire.com/";
         Countly.offline_mode = true;
