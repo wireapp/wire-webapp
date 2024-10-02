@@ -48,7 +48,7 @@ import {
 import {ConversationsList} from './ConversationsList';
 import {ConversationTabs} from './ConversationTabs';
 import {EmptyConversationList} from './EmptyConversationList';
-import {getTabConversations} from './helpers';
+import {getTabConversations, scrollToConversation} from './helpers';
 import {useFolderStore} from './useFoldersStore';
 import {SidebarStatus, SidebarTabs, useSidebarStore} from './useSidebarStore';
 
@@ -107,6 +107,8 @@ const Conversations: React.FC<ConversationsProps> = ({
   userState = container.resolve(UserState),
   selfUser,
 }) => {
+  const [conversationListRef, setConversationListRef] = useState<HTMLElement | null>(null);
+
   const {currentTab, status: sidebarStatus, setStatus: setSidebarStatus, setCurrentTab} = useSidebarStore();
   const [conversationsFilter, setConversationsFilter] = useState<string>('');
   const {classifiedDomains, isTeam} = useKoSubscribableChildren(teamState, ['classifiedDomains', 'isTeam']);
@@ -336,7 +338,13 @@ const Conversations: React.FC<ConversationsProps> = ({
     if (firstFoundConversation) {
       createNavigateKeyboard(generateConversationUrl(firstFoundConversation.qualifiedId), true)(event);
       setConversationsFilter('');
+      scrollToConversation(firstFoundConversation.id);
     }
+  };
+
+  const onSearch = (searchValue: string) => {
+    setConversationsFilter(searchValue);
+    conversationListRef?.scrollTo(0, 0);
   };
 
   return (
@@ -352,12 +360,13 @@ const Conversations: React.FC<ConversationsProps> = ({
             selfUser={selfUser}
             showSearchInput={(showSearchInput && currentTabConversations.length !== 0) || !!conversationsFilter}
             searchValue={conversationsFilter}
-            setSearchValue={setConversationsFilter}
+            setSearchValue={onSearch}
             searchInputPlaceholder={searchInputPlaceholder}
             setIsConversationFilterFocused={value => setIsConversationFilterFocused(value)}
             onSearchEnterClick={handleEnterSearchClick}
           />
         }
+        setConversationListRef={setConversationListRef}
         hasHeader={!isPreferences}
         {...(!isTemporaryGuest && {sidebar})}
         footer={callingView}

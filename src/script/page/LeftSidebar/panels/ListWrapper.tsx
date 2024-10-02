@@ -56,6 +56,8 @@ interface LeftListWrapperProps {
   id: string;
   onClose?: () => void;
   hasHeader?: boolean;
+  conversationsFilter?: string;
+  setConversationListRef?: (element: HTMLElement) => void;
 }
 
 const ListWrapper = ({
@@ -69,6 +71,7 @@ const ListWrapper = ({
   footer,
   before,
   headerUieName,
+  setConversationListRef,
 }: LeftListWrapperProps) => {
   const calculateBorders = throttle((element: HTMLElement) => {
     window.requestAnimationFrame(() => {
@@ -86,6 +89,9 @@ const ListWrapper = ({
     if (!element) {
       return;
     }
+
+    setConversationListRef?.(element);
+
     calculateBorders(element);
     element.addEventListener('scroll', () => calculateBorders(element));
   }
