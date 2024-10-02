@@ -27,18 +27,20 @@
       var Countly = Countly || {};
       Countly.q = Countly.q || [];
 
-      Countly.app_key = "<%= COUNTLY_API_KEY %>";
-      Countly.url = "https://countly.wire.com/";
-      Countly.offline_mode = true;
-      Countly.use_session_cookie = false;
-      Countly.storage = 'localstorage';
-      Countly.debug = false;
-      Countly.require_consent = true;
+      if (!window.wire.env.COUNTLY_API_KEY) {
+        Countly.app_key = window.wire.env.COUNTLY_API_KEY;
+        Countly.url = "https://countly.wire.com/";
+        Countly.offline_mode = true;
+        Countly.use_session_cookie = false;
+        Countly.storage = 'localstorage';
+        Countly.debug = false;
+        Countly.require_consent = true;
 
-      Countly.q.push(['track_sessions']);
-      Countly.q.push(['track_pageview']);
-      
-      Countly.init();
+        Countly.q.push(['track_sessions']);
+        Countly.q.push(['track_pageview']);
+
+        Countly.init();
+      }
     </script>
   </head>
 
