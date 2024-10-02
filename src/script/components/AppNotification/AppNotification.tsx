@@ -69,12 +69,7 @@ export const AppNotification = ({
     <div css={{...wrapper, top: isAnimated && !isClosing ? '50px' : '0', opacity: !isAnimated || isClosing ? 0 : 1}}>
       <div css={content}>{message}</div>
 
-      <button
-        css={buttonStyles}
-        onClick={() => {
-          onClose();
-        }}
-      >
+      <button css={buttonStyles} onClick={onClose}>
         <Icon.CloseIcon css={closeIcon} />
       </button>
     </div>
