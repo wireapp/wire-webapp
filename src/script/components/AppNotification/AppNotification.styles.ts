@@ -23,7 +23,7 @@ export const wrapper: CSSObject = {
   alignItems: 'center',
   backgroundColor: 'var(--main-color)',
   borderRadius: '8px',
-  boxShadow: '0px 2px 16px 0px var(--background-fade-16)',
+  boxShadow: '0 2px 16px 0 var(--background-fade-16)',
   display: 'flex',
   gap: '16px',
   padding: '8px 16px',
@@ -34,10 +34,15 @@ export const wrapper: CSSObject = {
   translate: '-50% 0',
   transition: 'top 0.3s, opacity 0.3s',
   zIndex: '99',
+
+  'body.theme-dark &': {
+    backgroundColor: 'var(--gray-80)',
+    boxShadow: '0 2px 16px 0 rgba(151, 151, 151, 0.12)',
+  },
 };
 
 export const content: CSSObject = {
-  color: 'var(--app-bg-secondary)',
+  color: 'var(--white)',
   fontSize: 'var(--font-size-base)',
   fontWeight: 'var(--font-weight-regular)',
   lineHeight: 'var(--line-height-lg)',
@@ -46,6 +51,7 @@ export const content: CSSObject = {
 export const buttonStyles: CSSObject = {
   background: 'transparent',
   border: 'none',
+  padding: 0,
 
   display: 'flex',
   alignItems: 'center',
@@ -53,5 +59,5 @@ export const buttonStyles: CSSObject = {
 };
 
 export const closeIcon: CSSObject = {
-  fill: 'var(--app-bg-secondary)',
+  fill: 'var(--white)',
 };
