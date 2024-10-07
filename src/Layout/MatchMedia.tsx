@@ -35,11 +35,13 @@ export const useMatchMedia = (query: Query, customWindowObj?: Window) => {
 
   const [isMatching, setIsMatching] = useState(matchMedia.matches);
 
-  const updateMatching = (event: MediaQueryListEvent) => {
+  const updateMatching = (event: MediaQueryListEvent | MediaQueryList) => {
     setIsMatching(event.matches);
   };
 
   useEffect(() => {
+    // update isMatching when matchMedia (or customWindowObj) change
+    updateMatching(matchMedia);
     matchMedia.addEventListener('change', updateMatching);
     return () => matchMedia.removeEventListener('change', updateMatching);
   }, [matchMedia]);
