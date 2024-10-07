@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.23.5](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.23.4...@wireapp/react-ui-kit@9.23.5) (2024-10-07)
+
+### Bug Fixes
+
+* isMatching not updating in useMatchMedia ([#6574](https://github.com/wireapp/wire-web-packages/issues/6574)) ([903d5e2](https://github.com/wireapp/wire-web-packages/commit/903d5e29cfbf01fbbcad25a77b4121c69c478997))
+
 ## [9.23.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.23.3...@wireapp/react-ui-kit@9.23.4) (2024-09-16)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
