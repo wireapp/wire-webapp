@@ -17,12 +17,13 @@
  *
  */
 
-import {useMatchMedia} from '@wireapp/react-ui-kit';
+import React, {useContext} from 'react';
 
-import {useWindow} from 'Components/calling/useWindow';
+const WindowContext = React.createContext<Window>(window);
 
-export const useActiveWindowMatchMedia = (mediaQuery: string) => {
-  const activeWindow = useWindow();
+export const WindowContextProvider = WindowContext.Provider;
 
-  return useMatchMedia(mediaQuery, activeWindow);
+export const useWindow = () => {
+  const currentWindow = useContext(WindowContext);
+  return currentWindow;
 };

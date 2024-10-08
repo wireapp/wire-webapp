@@ -534,20 +534,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/helper-module-transforms@npm:^7.25.7":
-  version: 7.25.7
-  resolution: "@babel/helper-module-transforms@npm:7.25.7"
-  dependencies:
-    "@babel/helper-module-imports": "npm:^7.25.7"
-    "@babel/helper-simple-access": "npm:^7.25.7"
-    "@babel/helper-validator-identifier": "npm:^7.25.7"
-    "@babel/traverse": "npm:^7.25.7"
-  peerDependencies:
-    "@babel/core": ^7.0.0
-  checksum: 10/480309b1272ceaa985de1393f0e4c41aede0d5921ca644cec5aeaf43c8e4192b6dd56a58ef6d7e9acd02a43184ab45d3b241fc8c3a0a00f9dbb30235fd8a1181
-  languageName: node
-  linkType: hard
-
 "@babel/helper-optimise-call-expression@npm:^7.24.7":
   version: 7.24.7
   resolution: "@babel/helper-optimise-call-expression@npm:7.24.7"
@@ -6047,9 +6033,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/react-ui-kit@npm:9.23.4":
-  version: 9.23.4
-  resolution: "@wireapp/react-ui-kit@npm:9.23.4"
+"@wireapp/react-ui-kit@npm:9.23.5":
+  version: 9.23.5
+  resolution: "@wireapp/react-ui-kit@npm:9.23.5"
   dependencies:
     "@types/color": "npm:3.0.6"
     color: "npm:4.2.3"
@@ -6064,7 +6050,7 @@ __metadata:
   peerDependenciesMeta:
     "@types/react":
       optional: true
-  checksum: 10/4d196d887e165810ae010dc213713b0b41a5d2f38e2a2eef01398c2099e9b14154615e66c872b17b6e3960c71cab8c205fa646b1fc137b61e97aaaef99968dfe
+  checksum: 10/d5ca64c81371eb9623959e25b6c9ff84863b26a378f8f9af317f5a2607f4ee7327042966f08c98c9b4f3deadb848de728b8f7ede3c05f15f5e2972cdf21ba70e
   languageName: node
   linkType: hard
 
@@ -18498,7 +18484,7 @@ __metadata:
     "@wireapp/core": "npm:46.4.0"
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/prettier-config": "npm:0.6.4"
-    "@wireapp/react-ui-kit": "npm:9.23.4"
+    "@wireapp/react-ui-kit": "npm:9.23.5"
     "@wireapp/store-engine": "npm:5.1.8"
     "@wireapp/store-engine-dexie": "npm:2.1.12"
     "@wireapp/webapp-events": "npm:0.24.0"
