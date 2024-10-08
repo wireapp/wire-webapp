@@ -263,6 +263,8 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       }
     }, [firstParticipant]);
 
+    const {isBlocked: isParticipantBlocked} = useKoSubscribableChildren(firstParticipant!, ['isBlocked']);
+
     const conversationActions = getConversationActions(
       activeConversation,
       actionsViewModel,
@@ -270,6 +272,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       teamRole,
       isServiceMode,
       isTeam,
+      isParticipantBlocked,
     );
 
     useEffect(() => {

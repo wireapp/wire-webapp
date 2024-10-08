@@ -37,6 +37,7 @@ const getConversationActions = (
   teamRole: UserPermission.ROLE,
   isServiceMode: boolean = false,
   isTeam: boolean = false,
+  isParticipantBlocked: boolean = false,
 ): MenuItem[] => {
   if (!conversationEntity) {
     return [];
@@ -98,7 +99,7 @@ const getConversationActions = (
       },
     },
     {
-      condition: isSingleUser && (userEntity?.isConnected() || userEntity?.isRequest()),
+      condition: isSingleUser && (userEntity?.isConnected() || userEntity?.isRequest()) && !isParticipantBlocked,
       item: {
         click: () => actionsViewModel.blockUser(userEntity),
         Icon: Icon.BlockIcon,
@@ -107,7 +108,7 @@ const getConversationActions = (
       },
     },
     {
-      condition: isSingleUser && userEntity?.isBlocked(),
+      condition: isSingleUser && isParticipantBlocked,
       item: {
         click: () => actionsViewModel.unblockUser(userEntity),
         Icon: Icon.BlockIcon,
