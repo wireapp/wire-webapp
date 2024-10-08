@@ -224,7 +224,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
 
     const toggleMute = () => actionsViewModel.toggleMuteConversation(activeConversation);
 
-    const openParticipantDevices = () => togglePanel(PanelState.PARTICIPANT_DEVICES, firstParticipant, false, 'left');
+    const openParticipantDevices = () => togglePanel(PanelState.PARTICIPANT_DEVICES, firstParticipant!, false, 'left');
 
     const updateConversationName = (conversationName: string) =>
       conversationRepository.renameConversation(activeConversation, conversationName);
@@ -250,7 +250,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
 
     const isSingleUserMode = is1to1 || isRequest;
 
-    const isServiceMode = isSingleUserMode && firstParticipant.isService;
+    const isServiceMode = isSingleUserMode && firstParticipant!.isService;
 
     const getService = useCallback(async () => {
       if (firstParticipant) {
@@ -281,7 +281,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
 
     useEffect(() => {
       if (team.id && isSingleUserMode) {
-        teamRepository.updateTeamMembersByIds(team.id, [firstParticipant.id], true);
+        teamRepository.updateTeamMembersByIds(team.id, [firstParticipant!.id], true);
       }
     }, [firstParticipant, isSingleUserMode, team, teamRepository]);
 
