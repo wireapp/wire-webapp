@@ -265,15 +265,15 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
 
     const {isBlocked: isParticipantBlocked} = useKoSubscribableChildren(firstParticipant!, ['isBlocked']);
 
-    const conversationActions = getConversationActions(
-      activeConversation,
+    const conversationActions = getConversationActions({
+      conversationEntity: activeConversation,
       actionsViewModel,
       conversationRepository,
       teamRole,
       isServiceMode,
       isTeam,
       isParticipantBlocked,
-    );
+    });
 
     useEffect(() => {
       conversationRepository.refreshUnavailableParticipants(activeConversation);
