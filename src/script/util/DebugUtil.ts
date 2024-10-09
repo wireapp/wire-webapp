@@ -584,6 +584,6 @@ export class DebugUtil {
   }
 
   renderAppNotification(message?: string) {
-    showAppNotification(message ?? 'Test notification');
+    showAppNotification(message || 'Test notification');
   }
 }
