@@ -35,6 +35,8 @@ import {Call} from './Call';
 
 import {Config} from '../Config';
 import type {ElectronDesktopCapturerSource} from '../media/MediaDevicesHandler';
+import {EventName} from '../tracking/EventName';
+import {Segmentation} from '../tracking/Segmentation';
 import {CallViewTab} from '../view_model/CallingViewModel';
 
 export enum MuteState {
@@ -78,6 +80,7 @@ export class CallState {
   public readonly detachedWindow = ko.observable<Window | null>(null);
   public readonly detachedWindowCallQualifiedId = ko.observable<QualifiedId | null>(null);
   public readonly desktopScreenShareMenu = ko.observable<DesktopScreenShareMenu>(DesktopScreenShareMenu.NONE);
+  private currentViewMode = this.viewMode();
 
   constructor() {
     this.joinedCall = ko.pureComputed(() => this.calls().find(call => call.state() === CALL_STATE.MEDIA_ESTAB));
@@ -99,6 +102,16 @@ export class CallState {
     this.hasAvailableScreensToShare = ko.pureComputed(
       () => this.selectableScreens().length > 0 || this.selectableWindows().length > 0,
     );
+
+    // Capture the viewMode value before change
+    this.viewMode.subscribe(newVal => (this.currentViewMode = newVal), this, 'beforeChange');
+
+    this.viewMode.subscribe(() => {
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.UI.CALLING_UI_SIZE, {
+        [Segmentation.CALLING_UI_SIZE.FROM]: this.currentViewMode,
+        [Segmentation.CALLING_UI_SIZE.TO]: this.viewMode(),
+      });
+    });
   }
 
   onPageHide = (event: PageTransitionEvent) => {

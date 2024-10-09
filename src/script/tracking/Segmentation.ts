@@ -55,4 +55,8 @@ export const Segmentation = {
     DIRECTION: 'screen_share_direction',
     DURATION: 'screen_share_duration',
   },
+  CALLING_UI_SIZE: {
+    FROM: 'from',
+    TO: 'to',
+  },
 };

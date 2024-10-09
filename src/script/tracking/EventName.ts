@@ -35,4 +35,7 @@ export const EventName = {
   E2EE: {
     FAILED_MESSAGE_DECRYPTION: 'e2ee.failed_message_decryption',
   },
+  UI: {
+    CALLING_UI_SIZE: 'ui.calling_ui_size',
+  },
 };
