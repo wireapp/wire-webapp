@@ -35,6 +35,7 @@ import {useAppMainState, ViewType} from 'src/script/page/state';
 import {ContentState, ListState} from 'src/script/page/useAppState';
 import {SearchRepository} from 'src/script/search/SearchRepository';
 import {TeamRepository} from 'src/script/team/TeamRepository';
+import {EventName} from 'src/script/tracking/EventName';
 import {UserRepository} from 'src/script/user/UserRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
@@ -161,6 +162,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   useEffect(() => {
     if (isScreenLessThanMdBreakpoint) {
       setSidebarStatus(SidebarStatus.CLOSED);
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.UI.SIDEBAR_COLLAPSE);
     }
   }, [isScreenLessThanMdBreakpoint, setSidebarStatus]);
 
@@ -185,6 +187,10 @@ const Conversations: React.FC<ConversationsProps> = ({
     }
 
     setSidebarStatus(isSideBarOpen ? SidebarStatus.CLOSED : SidebarStatus.OPEN);
+    amplify.publish(
+      WebAppEvents.ANALYTICS.EVENT,
+      isSideBarOpen ? EventName.UI.SIDEBAR_COLLAPSE : EventName.UI.SIDEBAR_UNCOLLAPSE,
+    );
   }
 
   const hasNoConversations = conversations.length + connectRequests.length === 0;
