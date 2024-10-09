@@ -37,6 +37,7 @@ import keyboardjs from 'keyboardjs';
 import {$createTextNode, $getRoot, LexicalEditor} from 'lexical';
 import {container} from 'tsyringe';
 
+import {showAppNotification} from 'Components/AppNotification';
 import {getLogger, Logger} from 'Util/Logger';
 
 import {KEY} from './KeyboardUtil';
@@ -580,5 +581,9 @@ export class DebugUtil {
   // Used by QA test automation, allows to disable or enable the forced error reporting
   disableForcedErrorReporting() {
     return disableForcedErrorReporting();
+  }
+
+  renderAppNotification(message?: string) {
+    showAppNotification(message ?? 'Test notification');
   }
 }

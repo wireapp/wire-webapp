@@ -33,7 +33,7 @@ export const wrapper: CSSObject = {
   left: '50%',
   translate: '-50% 0',
   transition: 'top 0.3s, opacity 0.3s',
-  zIndex: '99',
+  zIndex: '99999',
 
   'body.theme-dark &': {
     backgroundColor: 'var(--gray-80)',
