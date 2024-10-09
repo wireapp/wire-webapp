@@ -37,5 +37,7 @@ export const EventName = {
   },
   UI: {
     CALLING_UI_SIZE: 'ui.calling_ui_size',
+    SIDEBAR_COLLAPSE: 'ui.sidebar_collapse',
+    SIDEBAR_UNCOLLAPSE: 'ui.sidebar_uncollapse',
   },
 };

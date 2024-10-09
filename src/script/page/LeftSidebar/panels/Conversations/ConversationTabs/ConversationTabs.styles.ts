@@ -20,9 +20,8 @@
 import {CSSObject} from '@emotion/react';
 
 export const footerDisclaimer: CSSObject = {
-  display: 'grid',
+  display: 'flex',
   gap: '10px',
-  gridTemplateColumns: '1fr auto',
   marginBottom: '4px',
   padding: '8px',
 };
