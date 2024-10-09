@@ -28,6 +28,7 @@ import {UserState} from 'src/script/user/UserState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {CallingContainer} from '../CallingOverlayContainer';
+import {WindowContextProvider} from '../useWindow';
 
 interface DetachedCallingCellProps {
   callingRepository: CallingRepository;
@@ -44,7 +45,11 @@ export const DetachedCallingCell = ({
   callState = container.resolve(CallState),
   userState = container.resolve(UserState),
 }: DetachedCallingCellProps) => {
-  const {joinedCall: activeCall, viewMode} = useKoSubscribableChildren(callState, ['joinedCall', 'viewMode']);
+  const {
+    joinedCall: activeCall,
+    viewMode,
+    detachedWindow,
+  } = useKoSubscribableChildren(callState, ['joinedCall', 'viewMode', 'detachedWindow']);
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
 
   const isDetachedWindow = viewMode === CallingViewMode.DETACHED_WINDOW;
@@ -55,11 +60,13 @@ export const DetachedCallingCell = ({
 
   return (
     <DetachedWindow callState={callState}>
-      <CallingContainer
-        callingRepository={callingRepository}
-        mediaRepository={mediaRepository}
-        toggleScreenshare={toggleScreenshare}
-      />
+      <WindowContextProvider value={detachedWindow || window}>
+        <CallingContainer
+          callingRepository={callingRepository}
+          mediaRepository={mediaRepository}
+          toggleScreenshare={toggleScreenshare}
+        />
+      </WindowContextProvider>
     </DetachedWindow>
   );
 };
