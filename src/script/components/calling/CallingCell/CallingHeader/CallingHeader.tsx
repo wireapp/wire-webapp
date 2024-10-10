@@ -19,6 +19,8 @@
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
+import {IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
+
 import {Avatar, AVATAR_SIZE, GroupAvatar} from 'Components/Avatar';
 import {Duration} from 'Components/calling/Duration';
 import * as Icon from 'Components/Icon';
@@ -148,9 +150,14 @@ export const CallingHeader = ({
 
       {isDetachedCallingFeatureEnabled() && isOngoing && (
         <div>
-          <button css={detachedWindowButton} onClick={toggleDetachedWindow}>
+          <IconButton
+            variant={IconButtonVariant.SECONDARY}
+            title={t('videoCallOverlayOpenPopupWindow')}
+            css={detachedWindowButton}
+            onClick={toggleDetachedWindow}
+          >
             {isDetachedWindow ? <Icon.CloseDetachedWindowIcon /> : <Icon.OpenDetachedWindowIcon />}
-          </button>
+          </IconButton>
         </div>
       )}
     </div>
