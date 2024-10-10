@@ -19,6 +19,8 @@
 
 import getSlug from 'speakingurl';
 
+import crypto from 'crypto';
+
 import {randomElement} from 'Util/ArrayUtil';
 
 import type {User} from '../entity/User';
@@ -219,6 +221,12 @@ const accentsMap: Record<string, string> = {
  */
 export const replaceAccents = (text: string) => getSlug(text, {custom: accentsMap, uric: true});
 
+const getRandomInt = (max: number) => {
+  const array = new Uint32Array(1);
+  crypto.getRandomValues(array);
+  return array[0] % max;
+};
+
 /**
  * generate a random password
  * @param passwordLength the desired length of the password
@@ -240,14 +248,14 @@ export const generateRandomPassword = (passwordLength: number = 8): string => {
 
   // Add one random lowercase letter, one random uppercase letter, one random number, and one random special character to the password
   let password = '';
-  password += lowercaseChars[Math.floor(Math.random() * lowercaseChars.length)];
-  password += uppercaseChars[Math.floor(Math.random() * uppercaseChars.length)];
-  password += numericChars[Math.floor(Math.random() * numericChars.length)];
-  password += specialChars[Math.floor(Math.random() * specialChars.length)];
+  password += lowercaseChars[getRandomInt(lowercaseChars.length)];
+  password += uppercaseChars[getRandomInt(uppercaseChars.length)];
+  password += numericChars[getRandomInt(numericChars.length)];
+  password += specialChars[getRandomInt(specialChars.length)];
 
   // Add additional random characters to the password using all possible characters
   for (let i = 0; i < additionalChars; i++) {
-    password += allChars[Math.floor(Math.random() * allChars.length)];
+    password += allChars[getRandomInt(allChars.length)];
   }
 
   // Shuffle the characters of the password randomly to make it more secure
