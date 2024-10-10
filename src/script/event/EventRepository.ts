@@ -401,7 +401,8 @@ export class EventRepository {
     if (decryptionError) {
       this.logger.warn(`Decryption Error: '${event.type}'`, {
         decryptionError: {
-          event,
+          eventType: event.type,
+          date: event.time,
           code: decryptionError.code,
           message: decryptionError.message,
         },
