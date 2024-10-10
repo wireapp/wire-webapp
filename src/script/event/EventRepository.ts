@@ -400,11 +400,10 @@ export class EventRepository {
   ): Promise<IncomingEvent | undefined> {
     if (decryptionError) {
       this.logger.warn(`Decryption Error: '${event.type}'`, {
-        decryptionError: {
-          event,
-          code: decryptionError.code,
-          message: decryptionError.message,
-        },
+        eventType: event.type,
+        date: event.time,
+        code: decryptionError.code,
+        message: decryptionError.message,
       });
 
       const ignoredCodes = [
