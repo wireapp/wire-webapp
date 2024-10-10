@@ -30,14 +30,25 @@ import {Conversation} from '../../../../entity/Conversation';
 import * as UserPermission from '../../../../user/UserPermission';
 import {ActionsViewModel} from '../../../../view_model/ActionsViewModel';
 
-const getConversationActions = (
-  conversationEntity: Conversation,
-  actionsViewModel: ActionsViewModel,
-  conversationRepository: ConversationRepository,
-  teamRole: UserPermission.ROLE,
-  isServiceMode: boolean = false,
-  isTeam: boolean = false,
-): MenuItem[] => {
+interface GetConversationActionsParams {
+  conversationEntity: Conversation;
+  actionsViewModel: ActionsViewModel;
+  conversationRepository: ConversationRepository;
+  teamRole: UserPermission.ROLE;
+  isServiceMode?: boolean;
+  isTeam?: boolean;
+  isParticipantBlocked?: boolean;
+}
+
+const getConversationActions = ({
+  conversationEntity,
+  actionsViewModel,
+  conversationRepository,
+  teamRole,
+  isServiceMode = false,
+  isTeam = false,
+  isParticipantBlocked = false,
+}: GetConversationActionsParams): MenuItem[] => {
   if (!conversationEntity) {
     return [];
   }
@@ -82,7 +93,12 @@ const getConversationActions = (
     {
       condition: conversationEntity.isRequest(),
       item: {
-        click: async () => actionsViewModel.cancelConnectionRequest(userEntity, true, getNextConversation()),
+        click: async () => {
+          if (!userEntity) {
+            return;
+          }
+          void actionsViewModel.cancelConnectionRequest(userEntity, true, getNextConversation());
+        },
         Icon: Icon.CloseIcon,
         identifier: 'do-cancel-request',
         label: t('conversationDetailsActionCancelRequest'),
@@ -98,18 +114,28 @@ const getConversationActions = (
       },
     },
     {
-      condition: isSingleUser && (userEntity?.isConnected() || userEntity?.isRequest()),
+      condition: isSingleUser && Boolean(userEntity?.isConnected() || userEntity?.isRequest()),
       item: {
-        click: () => actionsViewModel.blockUser(userEntity),
+        click: () => {
+          if (!userEntity) {
+            return;
+          }
+          void actionsViewModel.blockUser(userEntity);
+        },
         Icon: Icon.BlockIcon,
         identifier: 'do-block',
         label: t('conversationDetailsActionBlock'),
       },
     },
     {
-      condition: isSingleUser && userEntity?.isBlocked(),
+      condition: isSingleUser && isParticipantBlocked,
       item: {
-        click: () => actionsViewModel.unblockUser(userEntity),
+        click: () => {
+          if (!userEntity) {
+            return;
+          }
+          void actionsViewModel.unblockUser(userEntity);
+        },
         Icon: Icon.BlockIcon,
         identifier: 'do-unblock',
         label: t('conversationDetailsActionUnblock'),
