@@ -399,22 +399,34 @@ export class EventRepository {
     {decryptedData, decryptionError}: Pick<HandledEventPayload, 'decryptedData' | 'decryptionError'>,
   ): Promise<IncomingEvent | undefined> {
     if (decryptionError) {
-      this.logger.warn(`Decryption Error: (${decryptionError.code}) ${decryptionError.message}`, decryptionError);
+      this.logger.warn(`Decryption Error:`, {
+        decryptionError: {
+          event,
+          code: decryptionError.code,
+          message: decryptionError.message,
+        },
+      });
+
       const ignoredCodes = [
         208, // Outated event decyption error (see https://github.com/wireapp/wire-web-core/blob/5c8c56097eadfa55e79856cd6745087f0fd12e24/packages/proteus/README.md#decryption-errors)
         209, // Duplicate event decryption error (see https://github.com/wireapp/wire-web-core/blob/5c8c56097eadfa55e79856cd6745087f0fd12e24/packages/proteus/README.md#decryption-errors)
       ];
+
       if (decryptionError.code && ignoredCodes.includes(decryptionError.code)) {
         return undefined;
       }
+
       amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.E2EE.FAILED_MESSAGE_DECRYPTION, {
         cause: decryptionError.code,
       });
+
       return EventBuilder.buildUnableToDecrypt(event, decryptionError);
     }
+
     if (decryptedData) {
       return await new CryptographyMapper().mapGenericMessage(decryptedData, event);
     }
+
     return undefined;
   }
 
