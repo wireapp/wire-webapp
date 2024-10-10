@@ -68,6 +68,25 @@ exports[`"Input" renders 1`] = `
   box-shadow: 0 0 0 1px #dce0e3;
 }
 
+.emotion-3:-webkit-autofill {
+  box-shadow: 0 0 0 1px #dce0e3,0 0 0 24px #e7f0fa inset;
+  -webkit-text-fill-color: rgb(29, 30, 31);
+}
+
+.emotion-3:-webkit-autofill:hover {
+  box-shadow: 0 0 0 1px var(--text-input-border-hover),0 0 0 24px #e7f0fa inset;
+}
+
+.emotion-3:-webkit-autofill:focus-visible,
+.emotion-3:-webkit-autofill:focus,
+.emotion-3:-webkit-autofill:active {
+  box-shadow: 0 0 0 1px #0667c8,0 0 0 24px #e7f0fa inset;
+}
+
+.emotion-3:-webkit-autofill:invalid:not(:focus, :hover) {
+  box-shadow: 0 0 0 1px #dce0e3,0 0 0 24px #e7f0fa inset;
+}
+
 <div
   className="emotion-0"
 >
@@ -147,6 +166,21 @@ exports[`"Input" renders as disabled 1`] = `
 
 .emotion-3:invalid:not(:focus, :hover) {
   box-shadow: 0 0 0 1px #dce0e3;
+}
+
+.emotion-3:-webkit-autofill {
+  box-shadow: 0 0 0 1px #dce0e3,0 0 0 24px #e7f0fa inset;
+  -webkit-text-fill-color: rgb(29, 30, 31);
+}
+
+.emotion-3:-webkit-autofill:focus-visible,
+.emotion-3:-webkit-autofill:focus,
+.emotion-3:-webkit-autofill:active {
+  box-shadow: 0 0 0 1px #0667c8,0 0 0 24px #e7f0fa inset;
+}
+
+.emotion-3:-webkit-autofill:invalid:not(:focus, :hover) {
+  box-shadow: 0 0 0 1px #dce0e3,0 0 0 24px #e7f0fa inset;
 }
 
 <div
@@ -229,6 +263,21 @@ exports[`"Input" renders as invalid 1`] = `
 .emotion-3:focus,
 .emotion-3:active {
   box-shadow: 0 0 0 1px #0667c8;
+}
+
+.emotion-3:-webkit-autofill {
+  box-shadow: 0 0 0 1px #dce0e3,0 0 0 24px #e7f0fa inset;
+  -webkit-text-fill-color: rgb(29, 30, 31);
+}
+
+.emotion-3:-webkit-autofill:hover {
+  box-shadow: 0 0 0 1px var(--text-input-border-hover),0 0 0 24px #e7f0fa inset;
+}
+
+.emotion-3:-webkit-autofill:focus-visible,
+.emotion-3:-webkit-autofill:focus,
+.emotion-3:-webkit-autofill:active {
+  box-shadow: 0 0 0 1px #0667c8,0 0 0 24px #e7f0fa inset;
 }
 
 <div
@@ -314,6 +363,25 @@ exports[`"Input" renders with placeholderTextTransform 1`] = `
 
 .emotion-3:invalid:not(:focus, :hover) {
   box-shadow: 0 0 0 1px #dce0e3;
+}
+
+.emotion-3:-webkit-autofill {
+  box-shadow: 0 0 0 1px #dce0e3,0 0 0 24px #e7f0fa inset;
+  -webkit-text-fill-color: rgb(29, 30, 31);
+}
+
+.emotion-3:-webkit-autofill:hover {
+  box-shadow: 0 0 0 1px var(--text-input-border-hover),0 0 0 24px #e7f0fa inset;
+}
+
+.emotion-3:-webkit-autofill:focus-visible,
+.emotion-3:-webkit-autofill:focus,
+.emotion-3:-webkit-autofill:active {
+  box-shadow: 0 0 0 1px #0667c8,0 0 0 24px #e7f0fa inset;
+}
+
+.emotion-3:-webkit-autofill:invalid:not(:focus, :hover) {
+  box-shadow: 0 0 0 1px #dce0e3,0 0 0 24px #e7f0fa inset;
 }
 
 <div

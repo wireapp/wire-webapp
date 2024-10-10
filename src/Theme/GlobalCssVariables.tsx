@@ -55,6 +55,7 @@ const light: () => CSSObject = () => ({
   '--text-input-placeholder': COLOR_V2.GRAY_70,
   '--text-input-disabled': COLOR_V2.GRAY_20,
   '--text-input-label': COLOR_V2.GRAY_80,
+  '--text-input-autocomplete-background': COLOR_V2.BLUE_LIGHT_50,
 
   // Select
   '--select-focused-description': COLOR_V2.WHITE,
@@ -104,6 +105,7 @@ const dark: () => CSSObject = () => ({
   '--text-input-placeholder': COLOR_V2.GRAY_60,
   '--text-input-disabled': COLOR_V2.GRAY_100,
   '--text-input-label': COLOR_V2.GRAY_40,
+  '--text-input-autocomplete-background': COLOR_V2.BLUE_LIGHT_900,
 
   // Select
   '--select-focused-description': COLOR_V2.GRAY_40,
