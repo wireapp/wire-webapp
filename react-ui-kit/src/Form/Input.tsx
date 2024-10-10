@@ -52,6 +52,13 @@ export const inputStyle: <T>(theme: Theme, props: InputProps<T>, hasError?: bool
     textTransform: placeholderTextTransform,
   };
 
+  const defaultBoxShadow = `0 0 0 1px ${theme.Select.borderColor}`;
+  const hoverBoxShadow = `0 0 0 1px ${theme.Input.borderHover}`;
+  const activeBoxShadow = `0 0 0 1px ${theme.general.primaryColor}`;
+  // The autocomplete box shadow is used as a workaround for the autofill background color
+  // The value (24px) is hardcoded to match the input background
+  const autocompleteBoxShadow = `0 0 0 24px ${theme.Input.backgroundAutocomplete} inset`;
+
   return {
     '&::-moz-placeholder': {
       ...placeholderStyle,
@@ -64,20 +71,35 @@ export const inputStyle: <T>(theme: Theme, props: InputProps<T>, hasError?: bool
       ...placeholderStyle,
     },
     '&:hover': {
-      boxShadow: !disabled && `0 0 0 1px ${theme.Input.borderHover}`,
+      boxShadow: !disabled && hoverBoxShadow,
     },
     '&:focus-visible, &:focus, &:active': {
-      boxShadow: `0 0 0 1px ${theme.general.primaryColor}`,
+      boxShadow: activeBoxShadow,
     },
     '&:invalid:not(:focus, :hover)': !markInvalid
       ? {
-          boxShadow: `0 0 0 1px ${theme.Select.borderColor}`,
+          boxShadow: defaultBoxShadow,
         }
       : {},
+    '&:-webkit-autofill': {
+      boxShadow: `${defaultBoxShadow}, ${autocompleteBoxShadow}`,
+      '-webkit-text-fill-color': theme.general.color,
+      '&:hover': {
+        boxShadow: !disabled && `${hoverBoxShadow}, ${autocompleteBoxShadow}`,
+      },
+      '&:focus-visible, &:focus, &:active': {
+        boxShadow: `${activeBoxShadow}, ${autocompleteBoxShadow}`,
+      },
+      '&:invalid:not(:focus, :hover)': !markInvalid
+        ? {
+            boxShadow: `${defaultBoxShadow}, ${autocompleteBoxShadow}`,
+          }
+        : {},
+    },
     background: disabled ? theme.Input.backgroundColorDisabled : theme.Input.backgroundColor,
     border: 'none',
     borderRadius: '12px',
-    boxShadow: markInvalid ? `0 0 0 1px ${theme.general.dangerColor}` : `0 0 0 1px ${theme.Select.borderColor}`,
+    boxShadow: markInvalid ? `0 0 0 1px ${theme.general.dangerColor}` : defaultBoxShadow,
     caretColor: theme.general.primaryColor,
     color: theme.general.color,
     fontWeight: 400,

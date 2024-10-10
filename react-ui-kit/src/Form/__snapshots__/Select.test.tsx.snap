@@ -66,6 +66,25 @@ exports[`"Select" renders 1`] = `
   box-shadow: 0 0 0 1px #dce0e3;
 }
 
+.emotion-2>div>div[class$="-Control"]:-webkit-autofill {
+  box-shadow: 0 0 0 1px #dce0e3,0 0 0 24px #e7f0fa inset;
+  -webkit-text-fill-color: rgb(29, 30, 31);
+}
+
+.emotion-2>div>div[class$="-Control"]:-webkit-autofill:hover {
+  box-shadow: 0 0 0 1px var(--text-input-border-hover),0 0 0 24px #e7f0fa inset;
+}
+
+.emotion-2>div>div[class$="-Control"]:-webkit-autofill:focus-visible,
+.emotion-2>div>div[class$="-Control"]:-webkit-autofill:focus,
+.emotion-2>div>div[class$="-Control"]:-webkit-autofill:active {
+  box-shadow: 0 0 0 1px #0667c8,0 0 0 24px #e7f0fa inset;
+}
+
+.emotion-2>div>div[class$="-Control"]:-webkit-autofill:invalid:not(:focus, :hover) {
+  box-shadow: 0 0 0 1px #dce0e3,0 0 0 24px #e7f0fa inset;
+}
+
 .emotion-2>div>div[class$="-Control"]:focus:visible,
 .emotion-2>div>div[class$="-Control"] active {
   box-shadow: 0 0 0 1px #0667c8;
@@ -359,6 +378,21 @@ exports[`"Select" renders as disabled 1`] = `
   box-shadow: 0 0 0 1px #dce0e3;
 }
 
+.emotion-2>div>div[class$="-Control"]:-webkit-autofill {
+  box-shadow: 0 0 0 1px #dce0e3,0 0 0 24px #e7f0fa inset;
+  -webkit-text-fill-color: rgb(29, 30, 31);
+}
+
+.emotion-2>div>div[class$="-Control"]:-webkit-autofill:focus-visible,
+.emotion-2>div>div[class$="-Control"]:-webkit-autofill:focus,
+.emotion-2>div>div[class$="-Control"]:-webkit-autofill:active {
+  box-shadow: 0 0 0 1px #0667c8,0 0 0 24px #e7f0fa inset;
+}
+
+.emotion-2>div>div[class$="-Control"]:-webkit-autofill:invalid:not(:focus, :hover) {
+  box-shadow: 0 0 0 1px #dce0e3,0 0 0 24px #e7f0fa inset;
+}
+
 .emotion-2>div {
   padding: 0;
   height: auto;
@@ -650,6 +684,21 @@ exports[`"Select" renders as invalid 1`] = `
 .emotion-2>div>div[class$="-Control"]:focus,
 .emotion-2>div>div[class$="-Control"]:active {
   box-shadow: 0 0 0 1px #0667c8;
+}
+
+.emotion-2>div>div[class$="-Control"]:-webkit-autofill {
+  box-shadow: 0 0 0 1px #dce0e3,0 0 0 24px #e7f0fa inset;
+  -webkit-text-fill-color: rgb(29, 30, 31);
+}
+
+.emotion-2>div>div[class$="-Control"]:-webkit-autofill:hover {
+  box-shadow: 0 0 0 1px var(--text-input-border-hover),0 0 0 24px #e7f0fa inset;
+}
+
+.emotion-2>div>div[class$="-Control"]:-webkit-autofill:focus-visible,
+.emotion-2>div>div[class$="-Control"]:-webkit-autofill:focus,
+.emotion-2>div>div[class$="-Control"]:-webkit-autofill:active {
+  box-shadow: 0 0 0 1px #0667c8,0 0 0 24px #e7f0fa inset;
 }
 
 .emotion-2>div>div[class$="-Control"]:focus:visible,

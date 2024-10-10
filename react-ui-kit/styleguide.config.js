@@ -33,7 +33,6 @@ module.exports = {
       components: 'src/Form/**/*.tsx',
       ignore: [
         'src/Form/ShakeBox.tsx',
-        'src/Form/Input.tsx',
         'src/Form/InputBlock.tsx',
         'src/Form/RoundIconButton.tsx',
         'src/Form/InputSubmitCombo.tsx',

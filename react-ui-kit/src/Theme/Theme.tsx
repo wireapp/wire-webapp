@@ -101,6 +101,7 @@ export interface Theme extends ETheme {
   Input: {
     backgroundColor: string;
     backgroundColorDisabled: string;
+    backgroundAutocomplete: string;
     placeholderColor: string;
     labelColor: string;
     borderHover: string;
@@ -165,6 +166,7 @@ export const themes: {[themeId in THEME_ID]: Theme} = {
     Input: {
       backgroundColor: 'var(--text-input-background)',
       backgroundColorDisabled: 'var(--text-input-disabled)',
+      backgroundAutocomplete: 'var(--text-input-autocomplete-background)',
       labelColor: 'var(--text-input-label)',
       placeholderColor: 'var(--text-input-placeholder)',
       borderHover: 'var(--text-input-border-hover)',
@@ -240,6 +242,7 @@ export const themes: {[themeId in THEME_ID]: Theme} = {
     Input: {
       backgroundColor: COLOR.WHITE,
       backgroundColorDisabled: COLOR_V2.GRAY_20,
+      backgroundAutocomplete: COLOR_V2.BLUE_LIGHT_50,
       placeholderColor: COLOR.GRAY_DARKEN_24,
       labelColor: COLOR_V2.GRAY_80,
       borderHover: 'var(--text-input-border-hover)',
@@ -315,6 +318,7 @@ export const themes: {[themeId in THEME_ID]: Theme} = {
     Input: {
       backgroundColor: COLOR.BLACK_LIGHTEN_24,
       backgroundColorDisabled: COLOR.GRAY_100,
+      backgroundAutocomplete: COLOR_V2.BLUE_LIGHT_900,
       placeholderColor: COLOR.GRAY_LIGHTEN_88,
       labelColor: COLOR_V2.GRAY_40,
       borderHover: 'var(--text-input-border-hover)',
