@@ -28,6 +28,7 @@ import {Runtime} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {TERMINATION_REASON} from 'src/script/calling/enum/TerminationReason';
 import {ConnectionMapper} from 'src/script/connection/ConnectionMapper';
 import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
@@ -74,6 +75,7 @@ function buildNotificationRepository() {
     {} as any,
     new PermissionRepository(),
     new AudioRepository(),
+    {} as CallingRepository,
     userState,
     container.resolve(ConversationState),
     container.resolve(CallState),

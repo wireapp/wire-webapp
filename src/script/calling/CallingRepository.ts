@@ -53,19 +53,23 @@ import {
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {showAppNotification} from 'Components/AppNotification';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {CALL_QUALITY_FEEDBACK_KEY} from 'Components/Modals/QualityFeedbackModal/constants';
 import {flatten} from 'Util/ArrayUtil';
+import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
+import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {roundLogarithmic} from 'Util/NumberUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
+import {copyStyles} from 'Util/renderElement';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {createUuid} from 'Util/uuid';
 
 import {Call, SerializedConversationId} from './Call';
 import {callingSubscriptions} from './callingSubscriptionsHandler';
-import {CallState, MuteState} from './CallState';
+import {CallingViewMode, CallState, MuteState} from './CallState';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
 import {ClientId, Participant, UserId} from './Participant';
@@ -862,7 +866,7 @@ export class CallingRepository {
   }
 
   async startCall(conversation: Conversation, callType: CALL_TYPE): Promise<void | Call> {
-    void this.callState.setViewModeMinimized();
+    void this.setViewModeMinimized();
     if (!this.selfUser || !this.selfClientId) {
       this.logger.warn(
         `Calling repository is not initialized correctly \n ${JSON.stringify({
@@ -1001,8 +1005,109 @@ export class CallingRepository {
     }
   };
 
+  onPageHide = (event: PageTransitionEvent) => {
+    if (event.persisted) {
+      return;
+    }
+
+    this.callState.detachedWindow()?.close();
+  };
+
+  handleThemeUpdateEvent = () => {
+    const detachedWindow = this.callState.detachedWindow();
+    if (detachedWindow) {
+      detachedWindow.document.body.className = window.document.body.className;
+    }
+  };
+
+  closeDetachedWindow = () => {
+    this.callState.detachedWindow(null);
+    this.callState.detachedWindowCallQualifiedId(null);
+    amplify.unsubscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, this.handleThemeUpdateEvent);
+    this.callState.viewMode(CallingViewMode.MINIMIZED);
+
+    const joinedCall = this.callState.joinedCall();
+    const isSharingScreen = joinedCall?.getSelfParticipant().sharesScreen();
+    const isScreenSharingSourceFromDetachedWindow = this.callState.isScreenSharingSourceFromDetachedWindow();
+
+    if (joinedCall && isSharingScreen && isScreenSharingSourceFromDetachedWindow) {
+      this.callState.isScreenSharingSourceFromDetachedWindow(false);
+      void this.toggleScreenshare(joinedCall);
+      showAppNotification(t('videoCallScreenShareEnded'));
+    }
+  };
+
+  setViewModeMinimized = () => {
+    const isDetachedWindowSupported = isDetachedCallingFeatureEnabled();
+
+    if (!isDetachedWindowSupported) {
+      this.callState.viewMode(CallingViewMode.MINIMIZED);
+      return;
+    }
+
+    this.callState.detachedWindow()?.close();
+    this.closeDetachedWindow();
+  };
+
+  setViewModeFullScreen = () => {
+    this.callState.viewMode(CallingViewMode.FULL_SCREEN);
+  };
+
+  async setViewModeDetached(
+    detachedViewModeOptions: {name: string; height: number; width: number} = {
+      name: 'WIRE_PICTURE_IN_PICTURE_CALL',
+      width: 1026,
+      height: 829,
+    },
+  ) {
+    if (!isDetachedCallingFeatureEnabled()) {
+      this.setViewModeFullScreen();
+      return;
+    }
+
+    const {name, width, height} = detachedViewModeOptions;
+    const {top, left} = calculateChildWindowPosition(height, width);
+
+    const detachedWindow = window.open(
+      '',
+      name,
+      `
+        width=${width}
+        height=${height},
+        top=${top},
+        left=${left}
+        location=no,
+        menubar=no,
+        resizable=yes,
+        status=no,
+        toolbar=no,
+      `,
+    );
+
+    this.callState.detachedWindow(detachedWindow);
+
+    this.callState.detachedWindowCallQualifiedId(this.callState.joinedCall()?.conversation.qualifiedId ?? null);
+
+    if (!detachedWindow) {
+      return;
+    }
+
+    // New window is not opened on the same domain (it's about:blank), so we cannot use any of the dom loaded events to copy the styles.
+    setTimeout(() => copyStyles(window.document, detachedWindow.document), 0);
+
+    detachedWindow.document.title = t('callingPopOutWindowTitle', {brandName: Config.getConfig().BRAND_NAME});
+
+    detachedWindow.addEventListener('beforeunload', this.closeDetachedWindow);
+    detachedWindow.addEventListener('pagehide', this.closeDetachedWindow);
+    window.addEventListener('pagehide', this.onPageHide);
+
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, this.handleThemeUpdateEvent);
+
+    this.callState.viewMode(CallingViewMode.DETACHED_WINDOW);
+  }
+
   async answerCall(call: Call, callType?: CALL_TYPE): Promise<void> {
-    void this.callState.setViewModeMinimized();
+    void this.setViewModeMinimized();
     const {conversation} = call;
     try {
       callType ??= call.getSelfParticipant().sharesCamera() ? call.initialType : CALL_TYPE.NORMAL;
@@ -1562,7 +1667,7 @@ export class CallingRepository {
         },
       )
     ) {
-      void this.callState.setViewModeMinimized();
+      void this.setViewModeMinimized();
     }
 
     // There's nothing we need to do for non-mls calls

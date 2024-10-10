@@ -27,6 +27,7 @@ import {Runtime} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {Declension, t, getUserName} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {getRenderedTextContent} from 'Util/messageRenderer';
@@ -119,6 +120,7 @@ export class NotificationRepository {
     conversationRepository: ConversationRepository,
     permissionRepository: PermissionRepository,
     private readonly audioRepository: AudioRepository,
+    private readonly callingRepository: CallingRepository,
     private readonly userState = container.resolve(UserState),
     private readonly conversationState = container.resolve(ConversationState),
     private readonly callState = container.resolve(CallState),
@@ -863,7 +865,7 @@ export class NotificationRepository {
     notification.onclick = () => {
       amplify.publish(WebAppEvents.NOTIFICATION.CLICK);
       window.focus();
-      void this.callState.setViewModeMinimized();
+      void this.callingRepository.setViewModeMinimized();
       notificationContent.trigger();
 
       this.logger.info(`Notification for ${messageInfo} in '${conversationId?.id || conversationId}' closed by click.`);
