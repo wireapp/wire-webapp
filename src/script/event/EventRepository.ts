@@ -399,7 +399,7 @@ export class EventRepository {
     {decryptedData, decryptionError}: Pick<HandledEventPayload, 'decryptedData' | 'decryptionError'>,
   ): Promise<IncomingEvent | undefined> {
     if (decryptionError) {
-      this.logger.warn(`Decryption Error:`, {
+      this.logger.warn(`Decryption Error: '${event.type}'`, {
         decryptionError: {
           event,
           code: decryptionError.code,
