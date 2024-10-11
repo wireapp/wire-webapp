@@ -1539,7 +1539,7 @@
   "videoCallOverlayHideParticipantsList": "Teilnehmerliste ausblenden",
   "videoCallOverlayMicrophone": "Mikrofon",
   "videoCallOverlayOpenFullScreen": "Open the call in full screen",
-  "videoCallOverlayOpenPopupWindow": "Open in a new window",
+  "videoCallOverlayOpenPopupWindow": "In neuem Fenster öffnen",
   "videoCallOverlayParticipantsListLabel": "Teilnehmer ({{count}})",
   "videoCallOverlayShareScreen": "Bildschirm teilen",
   "videoCallOverlayShowParticipantsList": "Teilnehmerliste anzeigen",
