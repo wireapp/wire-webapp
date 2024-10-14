@@ -288,6 +288,7 @@ export class App {
       repositories.conversation,
       repositories.permission,
       repositories.audio,
+      repositories.calling,
     );
     repositories.preferenceNotification = new PreferenceNotificationRepository(repositories.user['userState'].self);
 
