@@ -54,7 +54,7 @@ interface VideoCallProps {
 interface AnsweringControlsProps {
   call: Call;
   callActions: CallActions;
-  callingRepository: Pick<CallingRepository, 'supportsScreenSharing'>;
+  callingRepository: CallingRepository;
   pushToTalkKey: string | null;
   isFullUi?: boolean;
   callState?: CallState;
@@ -165,18 +165,18 @@ export const CallingCell = ({
         return;
       }
       if (isSpaceOrEnterKey(event.key)) {
-        void callState.setViewModeFullScreen();
+        void callingRepository.setViewModeFullScreen();
       }
     },
-    [isOngoing, callState],
+    [isOngoing, callingRepository],
   );
 
   const handleMaximizeClick = useCallback(() => {
     if (!isOngoing) {
       return;
     }
-    void callState.setViewModeFullScreen();
-  }, [isOngoing, callState]);
+    void callingRepository.setViewModeFullScreen();
+  }, [isOngoing, callingRepository]);
 
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
   const {showAlert, clearShowAlert} = useCallAlertState();
@@ -250,10 +250,10 @@ export const CallingCell = ({
 
   const toggleDetachedWindow = () => {
     if (isDetachedWindow) {
-      void callState.setViewModeMinimized();
+      void callingRepository.setViewModeMinimized();
       return;
     }
-    void callState.setViewModeDetached();
+    void callingRepository.setViewModeDetached();
   };
 
   return (

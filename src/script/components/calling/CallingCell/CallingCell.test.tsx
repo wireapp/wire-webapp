@@ -68,7 +68,7 @@ const createProps = async () => {
   return {
     call: createCall(CALL_STATE.MEDIA_ESTAB),
     callActions: {} as CallActions,
-    callingRepository: mockCallingRepository,
+    callingRepository: mockCallingRepository as CallingRepository,
     pushToTalkKey: null,
     conversation,
     hasAccessToCamera: true,

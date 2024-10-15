@@ -25,11 +25,7 @@ import {singleton} from 'tsyringe';
 import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
-import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
-import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
-import {copyStyles} from 'Util/renderElement';
 
 import {Call} from './Call';
 
@@ -78,6 +74,7 @@ export class CallState {
   readonly isSpeakersViewActive: ko.PureComputed<boolean>;
   public readonly viewMode = ko.observable<CallingViewMode>(CallingViewMode.MINIMIZED);
   public readonly detachedWindow = ko.observable<Window | null>(null);
+  public readonly isScreenSharingSourceFromDetachedWindow = ko.observable<boolean>(false);
   public readonly detachedWindowCallQualifiedId = ko.observable<QualifiedId | null>(null);
   public readonly desktopScreenShareMenu = ko.observable<DesktopScreenShareMenu>(DesktopScreenShareMenu.NONE);
   private currentViewMode = this.viewMode();
@@ -112,96 +109,5 @@ export class CallState {
         [Segmentation.CALLING_UI_SIZE.TO]: this.viewMode(),
       });
     });
-  }
-
-  onPageHide = (event: PageTransitionEvent) => {
-    if (event.persisted) {
-      return;
-    }
-
-    this.detachedWindow()?.close();
-  };
-
-  handleThemeUpdateEvent = () => {
-    const detachedWindow = this.detachedWindow();
-    if (detachedWindow) {
-      detachedWindow.document.body.className = window.document.body.className;
-    }
-  };
-
-  closeDetachedWindow = () => {
-    this.detachedWindow(null);
-    this.detachedWindowCallQualifiedId(null);
-    amplify.unsubscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, this.handleThemeUpdateEvent);
-    this.viewMode(CallingViewMode.MINIMIZED);
-  };
-
-  setViewModeMinimized = () => {
-    const isDetachedWindowSupported = isDetachedCallingFeatureEnabled();
-
-    if (!isDetachedWindowSupported) {
-      this.viewMode(CallingViewMode.MINIMIZED);
-      return;
-    }
-
-    this.detachedWindow()?.close();
-    this.closeDetachedWindow();
-  };
-
-  setViewModeFullScreen = () => {
-    this.viewMode(CallingViewMode.FULL_SCREEN);
-  };
-
-  async setViewModeDetached(
-    detachedViewModeOptions: {name: string; height: number; width: number} = {
-      name: 'WIRE_PICTURE_IN_PICTURE_CALL',
-      width: 1026,
-      height: 829,
-    },
-  ) {
-    if (!isDetachedCallingFeatureEnabled()) {
-      this.setViewModeFullScreen();
-      return;
-    }
-
-    const {name, width, height} = detachedViewModeOptions;
-    const {top, left} = calculateChildWindowPosition(height, width);
-
-    const detachedWindow = window.open(
-      '',
-      name,
-      `
-        width=${width}
-        height=${height},
-        top=${top},
-        left=${left}
-        location=no,
-        menubar=no,
-        resizable=yes,
-        status=no,
-        toolbar=no,
-      `,
-    );
-
-    this.detachedWindow(detachedWindow);
-
-    this.detachedWindowCallQualifiedId(this.joinedCall()?.conversation.qualifiedId ?? null);
-
-    if (!detachedWindow) {
-      return;
-    }
-
-    // New window is not opened on the same domain (it's about:blank), so we cannot use any of the dom loaded events to copy the styles.
-    setTimeout(() => copyStyles(window.document, detachedWindow.document), 0);
-
-    detachedWindow.document.title = t('callingPopOutWindowTitle', {brandName: Config.getConfig().BRAND_NAME});
-
-    detachedWindow.addEventListener('beforeunload', this.closeDetachedWindow);
-    detachedWindow.addEventListener('pagehide', this.closeDetachedWindow);
-    window.addEventListener('pagehide', this.onPageHide);
-
-    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, this.handleThemeUpdateEvent);
-
-    this.viewMode(CallingViewMode.DETACHED_WINDOW);
   }
 }
