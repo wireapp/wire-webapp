@@ -18,10 +18,12 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {amplify} from 'amplify';
 import ko from 'knockout';
 import {singleton} from 'tsyringe';
 
 import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
