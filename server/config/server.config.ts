@@ -126,7 +126,6 @@ export function generateConfig(params: ConfigGeneratorParams, env: Env) {
       DISALLOW: readFile(ROBOTS_DISALLOW_FILE, 'User-agent: *\r\nDisallow: /'),
     },
     COUNTLY_API_KEY: env.COUNTLY_API_KEY || '',
-    COUNTLY_ENABLE_LOGGING: env.COUNTLY_ENABLE_LOGGING == 'true',
     COUNTLY_NONCE: COUNTLY_NONCE.value,
     SSL_CERTIFICATE_KEY_PATH:
       env.SSL_CERTIFICATE_KEY_PATH || path.join(__dirname, '../certificate/development-key.pem'),
