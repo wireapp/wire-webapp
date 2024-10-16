@@ -24,8 +24,8 @@ import {APIClient} from '@wireapp/api-client';
 export class NotificationBackendRepository {
   constructor(private readonly apiClient: APIClient) {}
 
-  public async getAllNotifications(clientId?: string, lastNotificationId?: string) {
-    return this.apiClient.api.notification.getAllNotifications(clientId, lastNotificationId);
+  public async getAllNotifications(clientId?: string, lastNotificationId?: string, abortController?: AbortController) {
+    return this.apiClient.api.notification.getAllNotifications(clientId, lastNotificationId, abortController);
   }
 
   public getLastNotification(clientId?: string): Promise<Notification> {
