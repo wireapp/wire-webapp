@@ -85,13 +85,9 @@ type ConversationsProps = {
   searchRepository: SearchRepository;
   teamRepository: TeamRepository;
   userRepository: UserRepository;
-  inputRef: React.MutableRefObject<HTMLInputElement | null>;
-  isConversationFilterFocused: boolean;
-  setIsConversationFilterFocused: (isFocused: boolean) => void;
 };
 
 const Conversations: React.FC<ConversationsProps> = ({
-  inputRef,
   integrationRepository,
   searchRepository,
   teamRepository,
@@ -99,8 +95,6 @@ const Conversations: React.FC<ConversationsProps> = ({
   propertiesRepository,
   conversationRepository,
   preferenceNotificationRepository,
-  isConversationFilterFocused,
-  setIsConversationFilterFocused,
   listViewModel,
   conversationState = container.resolve(ConversationState),
   teamState = container.resolve(TeamState),
@@ -353,6 +347,11 @@ const Conversations: React.FC<ConversationsProps> = ({
     conversationListRef?.scrollTo(0, 0);
   };
 
+  const jumpToRecentSearch = () => {
+    switchList(ListState.CONVERSATIONS);
+    setCurrentTab(SidebarTabs.RECENT);
+  };
+
   return (
     <div className="conversations-wrapper">
       <div className="conversations-sidebar-spacer" css={conversationsSpacerStyles(isScreenLessThanMdBreakpoint)} />
@@ -360,7 +359,6 @@ const Conversations: React.FC<ConversationsProps> = ({
         id="conversations"
         headerElement={
           <ConversationHeader
-            ref={inputRef}
             currentFolder={currentFolder}
             currentTab={currentTab}
             selfUser={selfUser}
@@ -368,8 +366,8 @@ const Conversations: React.FC<ConversationsProps> = ({
             searchValue={conversationsFilter}
             setSearchValue={onSearch}
             searchInputPlaceholder={searchInputPlaceholder}
-            setIsConversationFilterFocused={value => setIsConversationFilterFocused(value)}
             onSearchEnterClick={handleEnterSearchClick}
+            jumpToRecentSearch={jumpToRecentSearch}
           />
         }
         setConversationListRef={setConversationListRef}
@@ -424,7 +422,6 @@ const Conversations: React.FC<ConversationsProps> = ({
                 conversationRepository={conversationRepository}
                 resetConversationFocus={resetConversationFocus}
                 clearSearchFilter={clearConversationFilter}
-                isConversationFilterFocused={isConversationFilterFocused}
                 searchRepository={searchRepository}
                 favoriteConversations={favoriteConversations}
                 archivedConversations={archivedConversations}
