@@ -182,6 +182,9 @@ export type Env = {
   /** Sets the Countly product reporting API key */
   COUNTLY_API_KEY: string;
 
+  /** Enables logging for Countly */
+  COUNTLY_ENABLE_LOGGING: string;
+
   /** Countly allow list for backend urls
    * Multiple entries separated by comma, e.g. "https://nginz-https.anta.wire.link, https://nginz-https.diya.wire.link, https://prod-nginz-https.wire.com"
    * Used to disable countly tracking on on-prem instances

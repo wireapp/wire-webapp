@@ -214,6 +214,7 @@ class Server {
       OPEN_GRAPH: this.config.OPEN_GRAPH,
       VERSION: this.config.VERSION,
       COUNTLY_API_KEY: this.config.COUNTLY_API_KEY,
+      COUNTLY_ENABLE_LOGGING: this.config.COUNTLY_ENABLE_LOGGING,
       COUNTLY_NONCE: this.config.COUNTLY_NONCE,
     };
   }
