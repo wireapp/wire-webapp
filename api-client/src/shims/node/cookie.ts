@@ -63,5 +63,5 @@ export const sendRequestWithCookie = async <T>(
     config.headers.set('Cookie', `zuid=${cookie.zuid}`);
     config.withCredentials = true;
   }
-  return client._sendRequest<T>(config);
+  return client._sendRequest<T>({config});
 };

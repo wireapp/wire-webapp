@@ -8,7 +8,6 @@
   ],
   "main": "lib/index",
   "devDependencies": {
-    "@types/rimraf": "4.0.5",
     "rimraf": "6.0.1",
     "typescript": "^5.0.4"
   },
@@ -18,5 +17,5 @@
     "dist": "yarn build",
     "test": "exit 0"
   },
-  "version": "0.24.0"
+  "version": "0.24.2"
 }

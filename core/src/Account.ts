@@ -32,7 +32,7 @@ import {SUBCONVERSATION_ID} from '@wireapp/api-client/lib/conversation';
 import * as Events from '@wireapp/api-client/lib/event';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 import {Notification} from '@wireapp/api-client/lib/notification/';
-import {AbortHandler, WebSocketClient} from '@wireapp/api-client/lib/tcp/';
+import {WebSocketClient} from '@wireapp/api-client/lib/tcp/';
 import {WEBSOCKET_STATE} from '@wireapp/api-client/lib/tcp/ReconnectingWebsocket';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
@@ -635,7 +635,7 @@ export class Account extends TypedEventEmitter<Events> {
       return onMissedNotifications(notificationId);
     };
 
-    const processNotificationStream = async (abortHandler: AbortHandler) => {
+    const processNotificationStream = async (abortHandler: AbortController) => {
       // Lock websocket in order to buffer any message that arrives while we handle the notification stream
       this.apiClient.transport.ws.lock();
       pauseMessageSending();
@@ -653,7 +653,7 @@ export class Account extends TypedEventEmitter<Events> {
       );
       this.logger.info(`Finished processing notifications ${JSON.stringify(results)}`, results);
 
-      if (abortHandler.isAborted()) {
+      if (abortHandler.signal.aborted) {
         this.logger.warn('Ending connection process as websocket was closed');
         return;
       }
@@ -666,6 +666,7 @@ export class Account extends TypedEventEmitter<Events> {
       resumeMessageSending();
       resumeRejoiningMLSConversations();
     };
+
     this.apiClient.connect(processNotificationStream);
 
     return () => {
