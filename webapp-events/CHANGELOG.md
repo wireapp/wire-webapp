@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.24.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.24.0...@wireapp/webapp-events@0.24.3) (2024-10-16)
+
+### Bug Fixes
+
+* **core, api-client:** Add abort controller to notifications api call (WPB-11013) ([#6577](https://github.com/wireapp/wire-web-packages/issues/6577)) ([3a5a308](https://github.com/wireapp/wire-web-packages/commit/3a5a30820ae03d589019ffe99f5b4587cf0e52f3))
+
 # [0.24.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.23.0...@wireapp/webapp-events@0.24.0) (2024-08-13)
 
 ### Features

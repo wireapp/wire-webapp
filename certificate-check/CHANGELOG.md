@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.18](https://github.com/wireapp/wire-web-packages/compare/@wireapp/certificate-check@0.7.15...@wireapp/certificate-check@0.7.18) (2024-10-16)
+
+### Bug Fixes
+
+* **core, api-client:** Add abort controller to notifications api call (WPB-11013) ([#6577](https://github.com/wireapp/wire-web-packages/issues/6577)) ([3a5a308](https://github.com/wireapp/wire-web-packages/commit/3a5a30820ae03d589019ffe99f5b4587cf0e52f3))
+
 ## [0.7.15](https://github.com/wireapp/wire-web-packages/compare/@wireapp/certificate-check@0.7.14...@wireapp/certificate-check@0.7.15) (2024-07-31)
 
 **Note:** Version bump only for package @wireapp/certificate-check

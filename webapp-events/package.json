@@ -17,5 +17,5 @@
     "dist": "yarn build",
     "test": "exit 0"
   },
-  "version": "0.24.2"
+  "version": "0.24.3"
 }

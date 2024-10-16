@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.3.8](https://github.com/wireapp/wire-web-packages/compare/@wireapp/promise-queue@2.3.5...@wireapp/promise-queue@2.3.8) (2024-10-16)
+
+### Bug Fixes
+
+* **core, api-client:** Add abort controller to notifications api call (WPB-11013) ([#6577](https://github.com/wireapp/wire-web-packages/issues/6577)) ([3a5a308](https://github.com/wireapp/wire-web-packages/commit/3a5a30820ae03d589019ffe99f5b4587cf0e52f3))
+
 ## [2.3.5](https://github.com/wireapp/wire-web-packages/compare/@wireapp/promise-queue@2.3.4...@wireapp/promise-queue@2.3.5) (2024-07-16)
 
 **Note:** Version bump only for package @wireapp/promise-queue
