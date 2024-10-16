@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.24.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.23.6...@wireapp/react-ui-kit@9.24.0) (2024-10-16)
+
+### Bug Fixes
+
+* **core, api-client:** Add abort controller to notifications api call (WPB-11013) ([#6577](https://github.com/wireapp/wire-web-packages/issues/6577)) ([3a5a308](https://github.com/wireapp/wire-web-packages/commit/3a5a30820ae03d589019ffe99f5b4587cf0e52f3))
+
+### Features
+
+* **react-ui-kit:** add focus for switch button ([#6578](https://github.com/wireapp/wire-web-packages/issues/6578)) ([6f20b51](https://github.com/wireapp/wire-web-packages/commit/6f20b51cc77deb86df895831631d0a61b8d17fb7))
+
 ## [9.23.6](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.23.5...@wireapp/react-ui-kit@9.23.6) (2024-10-10)
 
 ### Bug Fixes
