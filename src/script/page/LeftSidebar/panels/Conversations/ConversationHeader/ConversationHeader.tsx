@@ -17,7 +17,7 @@
  *
  */
 
-import {forwardRef, KeyboardEvent, useCallback, useEffect, useRef} from 'react';
+import {forwardRef, KeyboardEvent, useEffect, useRef} from 'react';
 
 import {amplify} from 'amplify';
 
@@ -86,18 +86,18 @@ export const ConversationHeaderComponent = ({
     handleEnterDown(event, () => onSearchEnterClick(event));
   };
 
-  const onSearchShortcut = useCallback(() => {
-    jumpToRecentSearch();
-    inputRef.current?.focus();
-  }, [jumpToRecentSearch]);
-
   useEffect(() => {
+    const onSearchShortcut = () => {
+      jumpToRecentSearch();
+      inputRef.current?.focus();
+    };
+
     amplify.subscribe(WebAppEvents.SHORTCUT.SEARCH, onSearchShortcut);
 
     return () => {
       amplify.unsubscribe(WebAppEvents.SHORTCUT.SEARCH, onSearchShortcut);
     };
-  }, [onSearchShortcut]);
+  }, [jumpToRecentSearch]);
 
   return (
     <>
