@@ -109,13 +109,21 @@ export class EventTrackingRepository {
   public readonly onUserEvent = (eventJson: any, source: EventSource) => {
     const type = eventJson.type;
     if (type === ClientEvent.USER.DATA_TRANSFER && this.teamState.isTeam()) {
-      void this.migrateDeviceId(eventJson.data.trackingIdentifier);
+      this.countlyLogger.info('Received data transfer event with new countly tracking id', eventJson.data);
+      if (!!eventJson.data.trackingIdentifier && eventJson.data.trackingIdentifier !== this.countlyDeviceId) {
+        void this.migrateDeviceId(eventJson.data.trackingIdentifier);
+      }
     }
   };
 
   public migrateDeviceId = async (newId: string) => {
     if (!isCountlyLoaded()) {
       this.countlyLogger.warn('Countly is not available');
+      return;
+    }
+
+    if (!newId || !newId.length) {
+      this.countlyLogger.warn('New countly tracking id is not defined');
       return;
     }
 
