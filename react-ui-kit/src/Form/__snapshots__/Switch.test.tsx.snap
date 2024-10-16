@@ -8,7 +8,7 @@ exports[`"Switch" renders (dark theme) 1`] = `
 }
 
 .emotion-1 {
-  display: inline-block;
+  display: grid;
   position: relative;
   text-align: left;
   -webkit-user-select: none;
@@ -20,7 +20,13 @@ exports[`"Switch" renders (dark theme) 1`] = `
 }
 
 .emotion-2 {
-  display: none;
+  height: 0;
+  width: 0;
+  opacity: 0;
+}
+
+.emotion-2:focus+label {
+  outline: 1px solid #043e78;
 }
 
 .emotion-3 {
@@ -89,6 +95,7 @@ exports[`"Switch" renders (dark theme) 1`] = `
       className="emotion-2"
       id="3"
       onChange={[Function]}
+      onKeyDown={[Function]}
       type="checkbox"
     />
     <label
@@ -114,7 +121,7 @@ exports[`"Switch" renders checked 1`] = `
 }
 
 .emotion-1 {
-  display: inline-block;
+  display: grid;
   position: relative;
   text-align: left;
   -webkit-user-select: none;
@@ -126,7 +133,13 @@ exports[`"Switch" renders checked 1`] = `
 }
 
 .emotion-2 {
-  display: none;
+  height: 0;
+  width: 0;
+  opacity: 0;
+}
+
+.emotion-2:focus+label {
+  outline: 1px solid #043e78;
 }
 
 .emotion-3 {
@@ -195,6 +208,7 @@ exports[`"Switch" renders checked 1`] = `
       className="emotion-2"
       id="2"
       onChange={[Function]}
+      onKeyDown={[Function]}
       type="checkbox"
     />
     <label
@@ -220,7 +234,7 @@ exports[`"Switch" renders disabled 1`] = `
 }
 
 .emotion-1 {
-  display: inline-block;
+  display: grid;
   position: relative;
   text-align: left;
   -webkit-user-select: none;
@@ -232,7 +246,13 @@ exports[`"Switch" renders disabled 1`] = `
 }
 
 .emotion-2 {
-  display: none;
+  height: 0;
+  width: 0;
+  opacity: 0;
+}
+
+.emotion-2:focus+label {
+  outline: 1px solid #043e78;
 }
 
 .emotion-3 {
@@ -302,6 +322,7 @@ exports[`"Switch" renders disabled 1`] = `
       disabled={true}
       id="4"
       onChange={[Function]}
+      onKeyDown={[Function]}
       type="checkbox"
     />
     <label
@@ -327,7 +348,7 @@ exports[`"Switch" renders unchecked 1`] = `
 }
 
 .emotion-1 {
-  display: inline-block;
+  display: grid;
   position: relative;
   text-align: left;
   -webkit-user-select: none;
@@ -339,7 +360,13 @@ exports[`"Switch" renders unchecked 1`] = `
 }
 
 .emotion-2 {
-  display: none;
+  height: 0;
+  width: 0;
+  opacity: 0;
+}
+
+.emotion-2:focus+label {
+  outline: 1px solid #043e78;
 }
 
 .emotion-3 {
@@ -408,6 +435,7 @@ exports[`"Switch" renders unchecked 1`] = `
       className="emotion-2"
       id="1"
       onChange={[Function]}
+      onKeyDown={[Function]}
       type="checkbox"
     />
     <label

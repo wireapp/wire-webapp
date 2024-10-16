@@ -17,9 +17,10 @@
  *
  */
 
-import {Fragment} from 'react';
+import {forwardRef} from 'react';
 
 import {InputProps} from './Input';
+import {inputStyles, labelStyles, loadingStyles, switchDotStyles, switchStyles, wrapperStyles} from './Switch.styles';
 
 import {COLOR} from '../Identity';
 import {Loading} from '../Misc';
@@ -38,111 +39,57 @@ export interface SwitchProps<T = HTMLInputElement> extends InputProps<T> {
   dataUieName?: string;
 }
 
-export const Switch = ({
-  id = Math.random().toString(),
-  checked,
-  onToggle = () => {},
-  showLoading,
-  disabled,
-  loadingColor = COLOR.BLUE,
-  activatedColor = COLOR.BLUE,
-  deactivatedColor = '#d2d2d2',
-  name,
-  dataUieName,
-}: SwitchProps) => (
-  <div
-    css={{
-      display: 'inline-block',
-      position: 'relative',
-      textAlign: 'left',
-      userSelect: 'none',
-      verticalAlign: 'middle',
-      width: '42px',
-    }}
-  >
-    <Fragment>
+export const Switch = forwardRef<HTMLInputElement, SwitchProps>(
+  (
+    {
+      id = Math.random().toString(),
+      checked,
+      onToggle = () => {},
+      showLoading,
+      disabled,
+      loadingColor = COLOR.BLUE,
+      activatedColor = COLOR.BLUE,
+      deactivatedColor = '#d2d2d2',
+      name,
+      dataUieName,
+    },
+    ref,
+  ) => (
+    <div css={wrapperStyles}>
       <input
+        ref={ref}
         id={id}
         checked={checked}
         disabled={disabled}
         name={name}
         onChange={event => onToggle(event.target.checked)}
+        onKeyDown={event => {
+          if (event.key == 'Enter') {
+            onToggle(!(event.target as HTMLInputElement).checked);
+          }
+        }}
         type="checkbox"
-        css={{display: 'none'}}
+        css={inputStyles}
         data-uie-name={dataUieName}
       />
-      <label
-        htmlFor={id}
-        css={{
-          borderRadius: '20px',
-          cursor: disabled || showLoading ? '' : 'pointer',
-          display: 'block',
-          margin: 0,
-          overflow: 'hidden',
-        }}
-      >
+      <label htmlFor={id} css={labelStyles(disabled, showLoading)}>
         <span
-          css={{
-            ['&:after']: {
-              content: '" "',
-              paddingRight: '10px',
-              textAlign: 'right',
-            },
-            ['&:before']: {
-              content: '" "',
-              paddingLeft: '10px',
-            },
-            ['&:before, &:after']: {
-              backgroundColor:
-                disabled || showLoading
-                  ? COLOR.tint(checked ? activatedColor : deactivatedColor, 0.4)
-                  : checked
-                    ? activatedColor
-                    : deactivatedColor,
-              boxSizing: 'border-box',
-              display: 'block',
-              float: 'left',
-              height: '25px',
-              lineHeight: '1.5625rem',
-              padding: 0,
-              width: '50%',
-            },
-            display: 'block',
-            marginLeft: checked ? 0 : '-100%',
-            transition: 'margin 0.1s ease-in 0s',
-            width: '200%',
-          }}
+          css={switchStyles({
+            disabled,
+            showLoading,
+            checked,
+            activatedColor,
+            deactivatedColor,
+          })}
         />
         {showLoading ? (
-          <Loading
-            size={21}
-            color={loadingColor}
-            style={{
-              display: 'block',
-              margin: '2px',
-              position: 'absolute',
-            }}
-          />
+          <Loading size={21} color={loadingColor} css={loadingStyles} />
         ) : (
-          <span
-            css={{
-              background: COLOR.WHITE,
-              borderRadius: '100%',
-              bottom: 0,
-              boxShadow: '0px 0px 2px -1px gray',
-              display: 'block',
-              height: '23px',
-              margin: '1px',
-              opacity: disabled ? 0.7 : undefined,
-              position: 'absolute',
-              right: checked ? '0px' : '17px',
-              top: 0,
-              transition: 'all 0.15s ease-in 0s',
-              width: '23px',
-            }}
-          />
+          <span css={switchDotStyles(disabled, checked)} />
         )}
       </label>
-    </Fragment>
-  </div>
+    </div>
+  ),
 );
+
+Switch.displayName = 'Switch';
