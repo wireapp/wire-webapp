@@ -55,7 +55,6 @@ describe('ConversationsList', () => {
   let resetConversationFocus: jest.Mock;
   let handleArrowKeyDown: jest.Mock;
   let clearSearchFilter: jest.Mock;
-  let isConversationFilterFocused: boolean;
   let conversationLabelRepository: ConversationLabelRepository;
   let conversationRepository: ConversationRepository;
   let searchRepository: SearchRepository;
@@ -70,7 +69,6 @@ describe('ConversationsList', () => {
     resetConversationFocus = jest.fn();
     handleArrowKeyDown = jest.fn();
     clearSearchFilter = jest.fn();
-    isConversationFilterFocused = false;
 
     const testFactory = new TestFactory();
     conversationRepository = await testFactory.exposeConversationActors();
@@ -93,7 +91,6 @@ describe('ConversationsList', () => {
         resetConversationFocus={resetConversationFocus}
         handleArrowKeyDown={handleArrowKeyDown}
         clearSearchFilter={clearSearchFilter}
-        isConversationFilterFocused={isConversationFilterFocused}
         favoriteConversations={[]}
         archivedConversations={[]}
         searchRepository={searchRepository}

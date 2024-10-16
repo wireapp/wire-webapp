@@ -60,7 +60,6 @@ interface ConversationsListProps {
   resetConversationFocus: () => void;
   handleArrowKeyDown: (index: number) => (e: React.KeyboardEvent) => void;
   clearSearchFilter: () => void;
-  isConversationFilterFocused: boolean;
   favoriteConversations: Conversation[];
   archivedConversations: Conversation[];
 }
@@ -79,7 +78,6 @@ export const ConversationsList = ({
   resetConversationFocus,
   handleArrowKeyDown,
   clearSearchFilter,
-  isConversationFilterFocused,
   favoriteConversations,
   archivedConversations,
 }: ConversationsListProps) => {
@@ -111,7 +109,7 @@ export const ConversationsList = ({
   };
 
   const getCommonConversationCellProps = (conversation: Conversation, index: number) => ({
-    isFocused: !isConversationFilterFocused && currentFocus === conversation.id,
+    isFocused: !conversationsFilter && currentFocus === conversation.id,
     handleArrowKeyDown: handleArrowKeyDown(index),
     resetConversationFocus: resetConversationFocus,
     dataUieName: 'item-conversation',
