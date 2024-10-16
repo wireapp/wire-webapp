@@ -42,17 +42,7 @@ export interface WebSocketClient {
   on(event: TOPIC.ON_STATE_CHANGE, listener: (state: WEBSOCKET_STATE) => void): this;
 }
 
-export class AbortHandler {
-  private aborted = false;
-
-  abort = () => {
-    this.aborted = true;
-  };
-
-  isAborted = () => this.aborted;
-}
-
-export type OnConnect = (abortHandler: AbortHandler) => Promise<void>;
+export type OnConnect = (abortHandler: AbortController) => Promise<void>;
 
 export class WebSocketClient extends EventEmitter {
   private clientId?: string;
@@ -64,7 +54,7 @@ export class WebSocketClient extends EventEmitter {
   public client: HttpClient;
   private isSocketLocked: boolean;
   private bufferedMessages: string[];
-  private abortHandler?: AbortHandler;
+  private abortHandler?: AbortController;
 
   public static readonly TOPIC = TOPIC;
 
@@ -146,7 +136,7 @@ export class WebSocketClient extends EventEmitter {
     this.socket.setOnOpen(() => {
       this.onOpen();
       if (onConnect) {
-        this.abortHandler = new AbortHandler();
+        this.abortHandler = new AbortController();
         void onConnect(this.abortHandler);
       }
     });

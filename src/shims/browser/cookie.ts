@@ -26,4 +26,4 @@ export const retrieveCookie = (response: AxiosResponse<AccessTokenData>): Promis
   Promise.resolve(response.data);
 
 export const sendRequestWithCookie = <T>(client: HttpClient, config: AxiosRequestConfig): Promise<AxiosResponse<T>> =>
-  client._sendRequest<T>(config);
+  client._sendRequest<T>({config});

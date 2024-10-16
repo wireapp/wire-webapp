@@ -46,6 +46,12 @@ enum TOPIC {
   ON_INVALID_TOKEN = 'HttpClient.TOPIC.ON_INVALID_TOKEN',
 }
 
+type SendRequest = {
+  config: AxiosRequestConfig;
+  isFirstTry?: boolean;
+  abortController?: AbortController;
+};
+
 export interface HttpClient {
   on(event: TOPIC.ON_CONNECTION_STATE_CHANGE, listener: (state: ConnectionState) => void): this;
 
@@ -131,7 +137,7 @@ export class HttpClient extends EventEmitter {
     }
   }
 
-  public async _sendRequest<T>(config: AxiosRequestConfig, isFirstTry = true): Promise<AxiosResponse<T>> {
+  public async _sendRequest<T>({config, isFirstTry = true, abortController}: SendRequest): Promise<AxiosResponse<T>> {
     if (this.accessTokenStore.accessToken) {
       // TODO: remove tokenAsParam
       const {token_type, access_token} = this.accessTokenStore.accessToken;
@@ -145,6 +151,7 @@ export class HttpClient extends EventEmitter {
     try {
       const response = await this.client.request<T>({
         ...config,
+        signal: abortController?.signal,
         // We want to prefix all urls, except the ones with cookies which are attached to unprefixed urls
         url: config.withCredentials ? config.url : `${this.versionPrefix}${config.url}`,
         maxBodyLength: FILE_SIZE_100_MB,
@@ -161,7 +168,7 @@ export class HttpClient extends EventEmitter {
         config['axios-retry'] = {
           retries: 0,
         };
-        return this._sendRequest<T>(config, false);
+        return this._sendRequest<T>({config, isFirstTry: false, abortController});
       };
 
       const hasAccessToken = !!this.accessTokenStore?.accessToken;
@@ -276,10 +283,11 @@ export class HttpClient extends EventEmitter {
   public async sendRequest<T>(
     config: AxiosRequestConfig,
     isSynchronousRequest: boolean = false,
+    abortController?: AbortController,
   ): Promise<AxiosResponse<T>> {
     const promise = isSynchronousRequest
-      ? this.requestQueue.add(() => this._sendRequest<T>(config))
-      : this._sendRequest<T>(config);
+      ? this.requestQueue.add(() => this._sendRequest<T>({config, abortController}))
+      : this._sendRequest<T>({config, abortController});
 
     try {
       return await promise;
@@ -289,14 +297,18 @@ export class HttpClient extends EventEmitter {
       const isTooManyRequestsError = axios.isAxiosError(error) && error.response?.status === 420;
 
       if (isTooManyRequestsError) {
-        return this.backOffQueue.add(() => this._sendRequest<T>(config));
+        return this.backOffQueue.add(() => this._sendRequest<T>({config, abortController}));
       }
 
       throw error;
     }
   }
 
-  public sendJSON<T>(config: AxiosRequestConfig, isSynchronousRequest: boolean = false): Promise<AxiosResponse<T>> {
+  public sendJSON<T>(
+    config: AxiosRequestConfig,
+    isSynchronousRequest: boolean = false,
+    abortController?: AbortController,
+  ): Promise<AxiosResponse<T>> {
     const shouldGzipData =
       process.env.NODE_ENV !== 'test' &&
       !!config.data &&
@@ -312,7 +324,7 @@ export class HttpClient extends EventEmitter {
       'Content-Encoding': shouldGzipData ? 'gzip' : config.headers?.['Content-Encoding'],
     };
 
-    return this.sendRequest<T>(config, isSynchronousRequest);
+    return this.sendRequest(config, isSynchronousRequest, abortController);
   }
 
   public sendXML<T>(config: AxiosRequestConfig): Promise<AxiosResponse<T>> {

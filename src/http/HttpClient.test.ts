@@ -56,7 +56,7 @@ describe('HttpClient', () => {
         return Promise.resolve(mockedAccessTokenStore.accessToken!);
       };
 
-      await client._sendRequest({method: 'GET', baseURL: testConfig.urls.rest, url: AuthAPI.URL.ACCESS});
+      await client._sendRequest({config: {method: 'GET', baseURL: testConfig.urls.rest, url: AuthAPI.URL.ACCESS}});
     });
 
     it('does not retry on 403 invalid token', async () => {
@@ -73,7 +73,7 @@ describe('HttpClient', () => {
       let backendError;
 
       try {
-        await client._sendRequest({method: 'GET', baseURL: testConfig.urls.rest, url: AuthAPI.URL.ACCESS});
+        await client._sendRequest({config: {method: 'GET', baseURL: testConfig.urls.rest, url: AuthAPI.URL.ACCESS}});
         throw new Error('Should not resolve');
       } catch (error) {
         backendError = error;
@@ -97,7 +97,7 @@ describe('HttpClient', () => {
     };
     let backendError;
     try {
-      await client._sendRequest({method: 'GET', baseURL: testConfig.urls.rest, url: AuthAPI.URL.ACCESS});
+      await client._sendRequest({config: {method: 'GET', baseURL: testConfig.urls.rest, url: AuthAPI.URL.ACCESS}});
       throw new Error('Should not resolve');
     } catch (error) {
       backendError = error;
