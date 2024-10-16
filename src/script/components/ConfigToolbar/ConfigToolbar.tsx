@@ -20,10 +20,12 @@
 import {useState, useEffect, useRef} from 'react';
 
 import keyboardjs from 'keyboardjs';
+import {container} from 'tsyringe';
 
 import {Button, Input, Switch} from '@wireapp/react-ui-kit';
 
 import {Config, Configuration} from 'src/script/Config';
+import {ConversationState} from 'src/script/conversation/ConversationState';
 import {useClickOutside} from 'src/script/hooks/useClickOutside';
 
 import {wrapperStyles} from './ConfigToolbar.styles';
@@ -31,6 +33,9 @@ import {wrapperStyles} from './ConfigToolbar.styles';
 export function ConfigToolbar() {
   const [showConfig, setShowConfig] = useState(false);
   const [configFeaturesState, setConfigFeaturesState] = useState<Configuration['FEATURE']>(Config.getConfig().FEATURE);
+  const [intervalId, setIntervalId] = useState<number | null>(null); // For managing setInterval
+  const messageCountRef = useRef<number>(0); // For the message count
+  const [prefix, setPrefix] = useState('Message -'); // Prefix input
   const wrapperRef = useRef(null);
 
   // Toggle config tool on 'cmd/ctrl + shift + 2'
@@ -45,6 +50,54 @@ export function ConfigToolbar() {
       keyboardjs.unbind(['command+shift+2', 'ctrl+shift+2'], handleKeyDown);
     };
   }, []);
+
+  const startSendingMessages = () => {
+    if (intervalId) {
+      return;
+    }
+
+    let isRequestInProgress = false;
+
+    const id = window.setInterval(async () => {
+      if (isRequestInProgress) {
+        return;
+      }
+
+      const conversationState = container.resolve(ConversationState);
+      const activeConversation = conversationState?.activeConversation();
+      if (!activeConversation) {
+        return;
+      }
+
+      isRequestInProgress = true;
+
+      try {
+        await window.wire.app.repository.message.sendTextWithLinkPreview(
+          activeConversation,
+          `${prefix} ${messageCountRef.current}`,
+          [],
+          undefined,
+        );
+
+        messageCountRef.current++;
+      } catch (error) {
+        console.error('Error sending message:', error);
+      } finally {
+        isRequestInProgress = false;
+      }
+    }, 100);
+
+    setIntervalId(id);
+  };
+
+  // Stop sending messages and reset the counter
+  const stopSendingMessages = () => {
+    if (intervalId) {
+      clearInterval(intervalId);
+      setIntervalId(null);
+      messageCountRef.current = 0;
+    }
+  };
 
   // Update the config state when form input changes
   const handleChange = (path: string, value: string | boolean | string[]) => {
@@ -119,10 +172,21 @@ export function ConfigToolbar() {
         implications of each change before proceeding. Changes may cause unexpected behavior.
       </h4>
       <div>{renderConfig(configFeaturesState)}</div>
+
       <h3>Debug Functions</h3>
       <Button onClick={() => window.wire?.app?.debug?.reconnectWebSocket()}>reconnectWebSocket</Button>
       <Button onClick={() => window.wire?.app?.debug?.enablePushToTalk()}>enablePushToTalk</Button>
       <Button onClick={() => window.wire?.app?.debug?.enablePushToTalk(null)}>disablePushToTalk</Button>
+
+      <h3>Message Automation</h3>
+      <Input
+        type="text"
+        value={prefix}
+        onChange={event => setPrefix(event.currentTarget.value)}
+        placeholder="Prefix for the messages"
+      />
+      <Button onClick={startSendingMessages}>Send Incremented Messages</Button>
+      <Button onClick={stopSendingMessages}>Stop Sending Messages</Button>
     </div>
   );
 }
