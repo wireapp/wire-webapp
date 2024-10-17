@@ -436,7 +436,12 @@ export const EventBuilder = {
       type: ClientEvent.CONVERSATION.FILE_TYPE_RESTRICTED,
     };
   },
-
+  /*
+   * Alex Ishenko
+   * TODO: create buildThreadCreation
+   * that will create thread using newly added
+   * type: ClientEvent.CONVERSATION.THREAD_CREATION, from @wireapp/api-client/lib/conversation/Conversation.d.ts
+   */
   buildGroupCreation(
     conversationEntity: Conversation,
     isTemporaryGuest: boolean = false,

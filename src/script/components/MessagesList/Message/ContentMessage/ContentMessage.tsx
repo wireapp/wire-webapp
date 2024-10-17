@@ -66,6 +66,16 @@ export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetS
   message: ContentMessage;
   onClickButton: (message: CompositeMessage, buttonId: string) => void;
   onRetry: (message: ContentMessage) => void;
+  /*
+  * Alex Ishenko
+  * This is the quotedMessage functionality,
+  * TODO: we will need to refactor this adding OR replacing current functionality
+  * currently message can have a quotedMessage wich is a link to a parent message
+  * but for threads we will need a link to a Conversation
+  * may be this will be a replacement for a quotedMessage
+  * may be this will be a separate functionality see more in feature-threads.md
+  * this anyway will trigger some changes in other files which are handling adding message
+  */
   quotedMessage?: ContentMessage;
   selfId: QualifiedId;
   isMsgElementsFocusable: boolean;
