@@ -238,7 +238,7 @@ export class EventTrackingRepository {
     this.unsubscribeFromProductTrackingEvents();
   }
 
-  private async startProductReporting(trackingId?: string): Promise<void> {
+  private async startProductReporting(trackingId: string = ''): Promise<void> {
     // This is a global object provided by the countly.min.js script
     if (!isCountlyLoaded()) {
       this.countlyLogger.warn('Countly is not available');
@@ -253,23 +253,27 @@ export class EventTrackingRepository {
 
     // Add Parameters to previous Countly object
 
-    const {COUNTLY_ENABLE_LOGGING, VERSION} = Config.getConfig();
+    const {COUNTLY_ENABLE_LOGGING, VERSION, COUNTLY_API_KEY} = Config.getConfig();
 
     // Initialize Countly if it is not initialized yet
     if (!this.countlyInitialized) {
       window.Countly.app_version = VERSION;
+      window.Countly.app_key = COUNTLY_API_KEY;
       window.Countly.debug = COUNTLY_ENABLE_LOGGING;
+      window.Countly.url = 'https://countly.wire.com/';
       window.Countly.init();
-      this.countlyInitialized = true;
       this.countlyLogger.info(
         'Countly has been initialized with version',
         VERSION,
-        'and logging',
+        ', logging',
         COUNTLY_ENABLE_LOGGING,
+        'and app_key',
+        COUNTLY_API_KEY,
       );
+      this.countlyInitialized = true;
     }
 
-    const device_id = trackingId || this.countlyDeviceId;
+    const device_id = Boolean(trackingId.length) ? trackingId : this.countlyDeviceId;
     window.Countly.q.push(['change_id', device_id]);
     window.Countly.q.push(['disable_offline_mode', device_id]);
     this.countlyLogger.info(`Countly tracking id is now ${device_id}`);
