@@ -90,10 +90,10 @@ export const inlineReplacements: Emoticon[] = [
     ],
   },
   {
-    name: 'frowning',
-    emoji: '😦',
+    name: 'slight frown',
+    emoji: '🙁',
     tags: [],
-    description: 'frowning face with open mouth',
+    description: 'slightly frowning face',
     emoticons: [':(', ':[', ':-(', ':-[', '=(', '=[', '=-(', '=-['],
   },
   {
