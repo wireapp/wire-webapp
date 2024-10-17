@@ -261,6 +261,10 @@ export class EventTrackingRepository {
       window.Countly.app_key = COUNTLY_API_KEY;
       window.Countly.debug = COUNTLY_ENABLE_LOGGING;
       window.Countly.url = 'https://countly.wire.com/';
+      if (!COUNTLY_API_KEY.length) {
+        this.countlyLogger.error('Countly API key is not defined in the environment');
+        return;
+      }
       window.Countly.init();
       this.countlyLogger.info(
         'Countly has been initialized with version',
