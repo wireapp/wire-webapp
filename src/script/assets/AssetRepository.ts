@@ -37,6 +37,7 @@ import {FileAsset} from '../entity/message/FileAsset';
 import type {User} from '../entity/User';
 import {Core} from '../service/CoreSingleton';
 import {TeamState} from '../team/TeamState';
+import {stripImageExifData} from '../util/ImageUtil';
 
 interface CompressedImage {
   compressedBytes: Uint8Array;
@@ -160,9 +161,11 @@ export class AssetRepository {
     mediumImageKey: {domain?: string; key: string};
     previewImageKey: {domain?: string; key: string};
   }> {
+    const strippedImage = await stripImageExifData(image);
+
     const [{compressedBytes: previewImage}, {compressedBytes: mediumImage}] = await Promise.all([
-      this.compressImage(image),
-      this.compressImage(image, true),
+      this.compressImage(strippedImage),
+      this.compressImage(strippedImage, true),
     ]);
 
     const options: AssetUploadOptions = {
