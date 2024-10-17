@@ -35,6 +35,10 @@ describe('MediaDevicesHandler', () => {
    * - 2 cameras
    * - 3 microphones
    * - 4 speakers
+   *
+   * However the devices which look like duplicates in fact refer to different
+   * settings a user can make in the operation system, so we shouldn't filter
+   * them.
    */
   const realWorldTestSetup = {
     microphones: [
@@ -150,7 +154,7 @@ describe('MediaDevicesHandler', () => {
     enumerateDevicesSpy = spyOn(window.navigator.mediaDevices, 'enumerateDevices');
   });
   describe('refreshMediaDevices', () => {
-    it('filters duplicate microphones and keeps the ones marked with "communications"', done => {
+    it('does not filter duplicate microphones', done => {
       enumerateDevicesSpy.and.returnValue(
         Promise.resolve([
           {
@@ -178,12 +182,12 @@ describe('MediaDevicesHandler', () => {
       devicesHandler.initializeMediaDevices(true);
 
       setTimeout(() => {
-        expect(devicesHandler.availableDevices.audioinput().length).toEqual(1);
+        expect(devicesHandler.availableDevices.audioinput().length).toEqual(3);
         done();
       });
     });
 
-    it('filters duplicate speakers', done => {
+    it('does not filter duplicate speakers', done => {
       enumerateDevicesSpy.and.returnValue(
         Promise.resolve([
           ...realWorldTestSetup.cameras,
@@ -201,8 +205,8 @@ describe('MediaDevicesHandler', () => {
 
       setTimeout(() => {
         expect(devicesHandler.availableDevices.videoinput().length).toEqual(2);
-        expect(devicesHandler.availableDevices.audioinput().length).toEqual(3);
-        expect(devicesHandler.availableDevices.audiooutput().length).toEqual(4);
+        expect(devicesHandler.availableDevices.audioinput().length).toEqual(5);
+        expect(devicesHandler.availableDevices.audiooutput().length).toEqual(7);
         done();
       });
     });
