@@ -234,30 +234,12 @@ export class MediaDevicesHandler {
       device => device.kind === MediaDeviceType.VIDEO_INPUT,
     );
 
-    /*
-     * On Windows the same device can be listed multiple times with different group ids ("default", "communications", etc.).
-     * In such a scenario, the device listed as "communications" device is preferred for conferencing calls, so we filter its duplicates.
-     */
     const microphones = mediaDevices.filter(device => device.kind === MediaDeviceType.AUDIO_INPUT);
-    const dedupedMicrophones = microphones.reduce<Record<string, MediaDeviceInfo>>((microphoneList, microphone) => {
-      if (!microphoneList.hasOwnProperty(microphone.deviceId) || microphone.deviceId === 'communications') {
-        microphoneList[microphone.groupId] = microphone;
-      }
-      return microphoneList;
-    }, {});
-
     const speakers = mediaDevices.filter(device => device.kind === MediaDeviceType.AUDIO_OUTPUT);
-    const dedupedSpeakers = speakers.reduce<Record<string, MediaDeviceInfo>>((speakerList, speaker) => {
-      if (!speakerList.hasOwnProperty(speaker.deviceId) || speaker.deviceId === 'communications') {
-        speakerList[speaker.groupId] = speaker;
-      }
-      return speakerList;
-    }, {});
-
     return {
       cameras: videoInputDevices,
-      microphones: Object.values(dedupedMicrophones),
-      speakers: Object.values(dedupedSpeakers),
+      microphones: microphones,
+      speakers: speakers,
     };
   }
 
