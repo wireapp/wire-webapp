@@ -75,6 +75,7 @@ export class EventTrackingRepository {
   private countlyDeviceId: string;
   private readonly logger: Logger;
   private readonly countlyLogger: Logger;
+  private countlyInitialized: boolean;
   isErrorReportingActivated: boolean;
 
   static get CONFIG() {
@@ -97,6 +98,7 @@ export class EventTrackingRepository {
   ) {
     this.logger = getLogger('EventTrackingRepository');
     this.countlyLogger = getLogger('Countly');
+    this.countlyInitialized = false;
 
     this.isErrorReportingActivated = false;
     this.isProductReportingActivated = false;
@@ -253,8 +255,19 @@ export class EventTrackingRepository {
 
     const {COUNTLY_ENABLE_LOGGING, VERSION} = Config.getConfig();
 
-    window.Countly.app_version = VERSION;
-    window.Countly.debug = COUNTLY_ENABLE_LOGGING;
+    // Initialize Countly if it is not initialized yet
+    if (!this.countlyInitialized) {
+      window.Countly.app_version = VERSION;
+      window.Countly.debug = COUNTLY_ENABLE_LOGGING;
+      window.Countly.init();
+      this.countlyInitialized = true;
+      this.countlyLogger.info(
+        'Countly has been initialized with version',
+        VERSION,
+        'and logging',
+        COUNTLY_ENABLE_LOGGING,
+      );
+    }
 
     const device_id = trackingId || this.countlyDeviceId;
     window.Countly.q.push(['change_id', device_id]);
