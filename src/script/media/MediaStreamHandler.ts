@@ -167,7 +167,7 @@ export class MediaStreamHandler {
     const detachedWindow = callState.detachedWindow();
     const isInDetachedMode = callState.viewMode() === CallingViewMode.DETACHED_WINDOW;
     const useDetachedWindowForScreenSharingSource =
-      screen === true && video === false && isInDetachedMode && detachedWindow !== null;
+      screen && !video && isInDetachedMode && detachedWindow !== null;
 
     if (useDetachedWindowForScreenSharingSource) {
       callState.isScreenSharingSourceFromDetachedWindow(true);
