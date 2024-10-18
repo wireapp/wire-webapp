@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, FormEvent, MouseEvent, useState, useRef, ChangeEvent, useEffect} from 'react';
+import {FC, FormEvent, MouseEvent, useState, useRef, ChangeEvent, useEffect, useMemo} from 'react';
 
 import cx from 'classnames';
 
@@ -55,7 +55,7 @@ export const PrimaryModalComponent: FC = () => {
   const isModalVisible = currentId !== null;
   const passwordValueRef = useRef<HTMLInputElement>(null);
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
-  const [isBackupPasswordInvalid, setIsBackupPasswordInvalid] = useState(false);
+  const isBackupPasswordValid = useMemo(() => passwordInput && isValidPassword(passwordInput), [passwordInput]);
 
   const {
     checkboxLabel,
@@ -147,8 +147,8 @@ export const PrimaryModalComponent: FC = () => {
         return;
       }
 
-      if (hasPasswordWithRules && !isValidPassword(passwordInput)) {
-        setIsBackupPasswordInvalid(true);
+      if (hasPasswordWithRules && !isBackupPasswordValid) {
+        setIsFormSubmitted(true);
         return;
       }
 
@@ -449,17 +449,15 @@ export const PrimaryModalComponent: FC = () => {
                     placeholder={inputPlaceholder}
                     required
                     data-uie-name="backup-password"
-                    markInvalid={isBackupPasswordInvalid}
+                    markInvalid={isFormSubmitted && !isBackupPasswordValid}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                       updatePasswordWithRules(event.target.value);
-                      if (isBackupPasswordInvalid) {
-                        setIsBackupPasswordInvalid(false);
-                      }
                     }}
                     autoComplete="password"
                     pattern=".{2,64}"
                     helperText={backupPasswordHint}
-                    error={isBackupPasswordInvalid ? <ErrorMessage>{backupPasswordHint}</ErrorMessage> : undefined}
+                    {...(isFormSubmitted &&
+                      !isBackupPasswordValid && {error: <ErrorMessage>{backupPasswordHint}</ErrorMessage>})}
                   />
                 </form>
               )}
