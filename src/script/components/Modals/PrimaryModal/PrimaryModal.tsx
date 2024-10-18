@@ -452,7 +452,9 @@ export const PrimaryModalComponent: FC = () => {
                     markInvalid={isBackupPasswordInvalid}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                       updatePasswordWithRules(event.target.value);
-                      setIsBackupPasswordInvalid(false);
+                      if (isBackupPasswordInvalid) {
+                        setIsBackupPasswordInvalid(false);
+                      }
                     }}
                     autoComplete="password"
                     pattern=".{2,64}"
