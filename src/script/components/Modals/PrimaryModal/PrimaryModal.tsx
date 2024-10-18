@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, FormEvent, MouseEvent, useState, useRef, ChangeEvent, useEffect} from 'react';
+import {FC, FormEvent, MouseEvent, useState, useRef, ChangeEvent, useEffect, useMemo} from 'react';
 
 import cx from 'classnames';
 
@@ -55,6 +55,7 @@ export const PrimaryModalComponent: FC = () => {
   const isModalVisible = currentId !== null;
   const passwordValueRef = useRef<HTMLInputElement>(null);
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
+  const isBackupPasswordValid = useMemo(() => passwordInput && isValidPassword(passwordInput), [passwordInput]);
 
   const {
     checkboxLabel,
@@ -143,6 +144,11 @@ export const PrimaryModalComponent: FC = () => {
       event.preventDefault();
 
       if (!skipValidation && !inputActionEnabled) {
+        return;
+      }
+
+      if (hasPasswordWithRules && !isBackupPasswordValid) {
+        setIsFormSubmitted(true);
         return;
       }
 
@@ -263,6 +269,10 @@ export const PrimaryModalComponent: FC = () => {
       })}
     </ErrorMessage>
   ) : undefined;
+
+  const backupPasswordHint = t('backupPasswordHint', {
+    minPasswordLength: Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH.toString(),
+  });
 
   return (
     <div
@@ -439,14 +449,15 @@ export const PrimaryModalComponent: FC = () => {
                     placeholder={inputPlaceholder}
                     required
                     data-uie-name="backup-password"
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                      updatePasswordWithRules(event.target.value)
-                    }
+                    markInvalid={isFormSubmitted && !isBackupPasswordValid}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                      updatePasswordWithRules(event.target.value);
+                    }}
                     autoComplete="password"
                     pattern=".{2,64}"
-                    helperText={t('backupPasswordHint', {
-                      minPasswordLength: Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH.toString(),
-                    })}
+                    helperText={backupPasswordHint}
+                    {...(isFormSubmitted &&
+                      !isBackupPasswordValid && {error: <ErrorMessage>{backupPasswordHint}</ErrorMessage>})}
                   />
                 </form>
               )}
