@@ -19,8 +19,6 @@
 
 import React from 'react';
 
-import {listCSS} from './PanelActions.styles';
-
 export interface MenuItem {
   click: () => void;
   Icon: React.FC<React.SVGProps<SVGSVGElement>>;
@@ -32,24 +30,17 @@ export interface PanelActionsProps {
   items: MenuItem[];
 }
 
-const PanelActions: React.FC<PanelActionsProps> = ({items}) => {
-  return (
-    <ul css={listCSS}>
-      {items.map(({click, identifier, Icon, label}) => (
-        <li key={identifier}>
-          <button className="panel__action-item" onClick={click} data-uie-name={identifier} type="button">
-            <span className="panel__action-item__icon">
-              <Icon />
-            </span>
+export const PanelActions = ({items}: PanelActionsProps) =>
+  items.map(({click, identifier, Icon, label}) => (
+    <li key={identifier}>
+      <button className="panel__action-item" onClick={click} data-uie-name={identifier} type="button">
+        <span className="panel__action-item__icon">
+          <Icon />
+        </span>
 
-            <span data-uie-name={`${identifier}-item-text`} className="panel__action-item__text">
-              {label}
-            </span>
-          </button>
-        </li>
-      ))}
-    </ul>
-  );
-};
-
-export {PanelActions};
+        <span data-uie-name={`${identifier}-item-text`} className="panel__action-item__text">
+          {label}
+        </span>
+      </button>
+    </li>
+  ));

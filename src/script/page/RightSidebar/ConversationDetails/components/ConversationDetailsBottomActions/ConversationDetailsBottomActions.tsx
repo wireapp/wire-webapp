@@ -17,8 +17,6 @@
  *
  */
 
-import {FC} from 'react';
-
 import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
@@ -30,13 +28,13 @@ interface ConversationDetailsBottomActionsProps {
   notificationStatusText?: string;
 }
 
-const ConversationDetailsBottomActions: FC<ConversationDetailsBottomActionsProps> = ({
+const ConversationDetailsBottomActions = ({
   isDeviceActionEnabled = false,
   showDevices,
   showNotifications,
   showOptionNotifications1To1 = false,
   notificationStatusText = '',
-}) => {
+}: ConversationDetailsBottomActionsProps) => {
   const renderConversationDetailsActions = showOptionNotifications1To1 || isDeviceActionEnabled;
 
   if (!renderConversationDetailsActions) {

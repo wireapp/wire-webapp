@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2024 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,27 +17,4 @@
  *
  */
 
-.user-list-wrapper,
-.service-list {
-  display: block;
-
-  .user-list {
-    &__no-results {
-      .text-center;
-
-      margin: 106px 18px;
-      line-height: var(--line-height-lg);
-      white-space: pre;
-    }
-
-    &__header {
-      .panel-header;
-    }
-
-    &__no-admin {
-      margin: 8px 16px;
-      color: #c0c0c0;
-      font-size: var(--font-size-xsmall);
-    }
-  }
-}
+export * from './ConversationDetailsParticipants';
