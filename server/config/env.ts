@@ -191,6 +191,9 @@ export type Env = {
    */
   COUNTLY_ALLOWED_BACKEND: string;
 
+  /** Disabling enforcing Countly */
+  DISABLE_ENFORCE_COUNTLY: string;
+
   /** Open graph header description */
   OPEN_GRAPH_DESCRIPTION: string;
 
