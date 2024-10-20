@@ -6247,10 +6247,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/store-engine@npm:5.1.8":
-  version: 5.1.8
-  resolution: "@wireapp/store-engine@npm:5.1.8"
-  checksum: 10/4b5414975f07979c5e2de2ebd19fffba3ccf341b959cb7fafcb28085a392b1a3dcfc447a32874dcbe228545267b08cc338b239e5b0230759a4756069a6ee5309
+"@wireapp/store-engine@npm:5.1.11":
+  version: 5.1.11
+  resolution: "@wireapp/store-engine@npm:5.1.11"
+  checksum: 10/8259d645ff0a20fed754ce009c05e4d2390230da26d4822423745af81fc02ba7930d1e9b8cbb2264d85184dc0456cfc4ab77f2259ac8a66771052acd52750cac
   languageName: node
   linkType: hard
 
@@ -18714,7 +18714,7 @@ __metadata:
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/prettier-config": "npm:0.6.4"
     "@wireapp/react-ui-kit": "npm:9.23.6"
-    "@wireapp/store-engine": "npm:5.1.8"
+    "@wireapp/store-engine": "npm:5.1.11"
     "@wireapp/store-engine-dexie": "npm:2.1.12"
     "@wireapp/webapp-events": "npm:0.24.0"
     amplify: "https://github.com/wireapp/amplify#head=master"
