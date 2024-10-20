@@ -6027,9 +6027,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/copy-config@npm:2.2.7":
-  version: 2.2.7
-  resolution: "@wireapp/copy-config@npm:2.2.7"
+"@wireapp/copy-config@npm:2.2.10":
+  version: 2.2.10
+  resolution: "@wireapp/copy-config@npm:2.2.10"
   dependencies:
     axios: "npm:1.7.7"
     copy: "npm:0.3.2"
@@ -6040,7 +6040,7 @@ __metadata:
     rimraf: "npm:6.0.1"
   bin:
     copy-config: lib/cli.js
-  checksum: 10/21f7b9ba07e27a929a7599ced6ab7d2ea0579f061babefcab2cefd2478216e3108b435cf08c7c502dd8848a40848a7d127ef6e3a4f87efeef5c1e1df664ea627
+  checksum: 10/c106cc32478b7a9034939cee16f72b8120ea9c06ed7d714da6ad58b6e150911dfa670d7ae5f3d4cb0fb92d305fab284d37c95c87a6e44c37fe22c8ea90f5f013
   languageName: node
   linkType: hard
 
@@ -18690,7 +18690,7 @@ __metadata:
     "@types/wicg-file-system-access": "npm:^2023.10.5"
     "@wireapp/avs": "npm:9.9.8"
     "@wireapp/commons": "npm:5.2.13"
-    "@wireapp/copy-config": "npm:2.2.7"
+    "@wireapp/copy-config": "npm:2.2.10"
     "@wireapp/core": "npm:46.4.2"
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/prettier-config": "npm:0.6.4"
