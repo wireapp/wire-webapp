@@ -10,7 +10,7 @@
     "@wireapp/commons": "5.2.13",
     "@wireapp/core": "46.4.2",
     "@wireapp/react-ui-kit": "9.24.0",
-    "@wireapp/store-engine-dexie": "2.1.12",
+    "@wireapp/store-engine-dexie": "2.1.15",
     "@wireapp/webapp-events": "0.24.3",
     "amplify": "https://github.com/wireapp/amplify#head=master",
     "beautiful-react-hooks": "5.0.2",
