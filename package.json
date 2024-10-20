@@ -97,7 +97,7 @@
     "@wireapp/copy-config": "2.2.7",
     "@wireapp/eslint-config": "3.0.7",
     "@wireapp/prettier-config": "0.6.4",
-    "@wireapp/store-engine": "5.1.8",
+    "@wireapp/store-engine": "5.1.11",
     "archiver": "7.0.1",
     "autoprefixer": "10.4.20",
     "babel-loader": "9.2.1",
