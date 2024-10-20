@@ -10858,9 +10858,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"i18next-scanner@npm:4.5.0":
-  version: 4.5.0
-  resolution: "i18next-scanner@npm:4.5.0"
+"i18next-scanner@npm:4.6.0":
+  version: 4.6.0
+  resolution: "i18next-scanner@npm:4.6.0"
   dependencies:
     acorn: "npm:^8.0.4"
     acorn-jsx: "npm:^5.3.1"
@@ -10883,7 +10883,7 @@ __metadata:
     vinyl-fs: "npm:^4.0.0"
   bin:
     i18next-scanner: bin/cli.js
-  checksum: 10/b6031f4f4c3031b4f9a86e28155a6ac77cf95dde45b11680eb42e2a331924a3367657aea202a7071156b8a5a546b5bc98decc66d46f3b65b878fdff7e16905df
+  checksum: 10/51673170adad6a664bd9b9757dcc54a6fffe7f1e4338de3dcc5de1fbc8d8af87223ece393f9d7c2c579c3efe24525203a8d8f60c2107adfe3d1e3dced92bd21c
   languageName: node
   linkType: hard
 
@@ -18745,7 +18745,7 @@ __metadata:
     html-webpack-plugin: "npm:5.6.0"
     http-status-codes: "npm:2.3.0"
     husky: "npm:9.1.6"
-    i18next-scanner: "npm:4.5.0"
+    i18next-scanner: "npm:4.6.0"
     intersection-observer: "npm:0.12.2"
     jest: "npm:29.7.0"
     jest-canvas-mock: "npm:2.5.2"
