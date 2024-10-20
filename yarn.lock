@@ -5552,10 +5552,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/underscore@npm:1.11.15":
-  version: 1.11.15
-  resolution: "@types/underscore@npm:1.11.15"
-  checksum: 10/5a9c262566551f61744e066d33578c0fad1139c2d5314ed77a8f867487a6d7dd18616f32df4c605070fbd569b942c6d2c083be9f9ae649f41a562b52812b06be
+"@types/underscore@npm:1.13.0":
+  version: 1.13.0
+  resolution: "@types/underscore@npm:1.13.0"
+  checksum: 10/938a6a0a878ce108046601a7cceeec9870428cc565a0c6d7891b7ad39e7570f1f75a1c02bf81baf23c7c7948ef0693d00ccd1a8e05894a52fed4c584a4b7172e
   languageName: node
   linkType: hard
 
@@ -18703,7 +18703,7 @@ __metadata:
     "@types/seedrandom": "npm:3.0.8"
     "@types/sinon": "npm:17.0.3"
     "@types/speakingurl": "npm:13.0.6"
-    "@types/underscore": "npm:1.11.15"
+    "@types/underscore": "npm:1.13.0"
     "@types/uuid": "npm:^10.0.0"
     "@types/webpack-env": "npm:1.18.5"
     "@types/wicg-file-system-access": "npm:^2023.10.5"
