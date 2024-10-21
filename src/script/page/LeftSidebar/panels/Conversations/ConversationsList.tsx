@@ -154,18 +154,19 @@ export const ConversationsList = ({
         ))}
       </ul>
 
-      {conversationsFilter && ![SidebarTabs.DIRECTS, SidebarTabs.GROUPS].includes(currentTab) && (
-        <FilteredGroupConversations
-          archivedConversations={archivedConversations}
-          conversationRepository={conversationRepository}
-          conversations={conversations}
-          conversationsFilter={conversationsFilter}
-          currentFolder={currentFolder}
-          favoriteConversations={favoriteConversations}
-          getCommonConversationCellProps={getCommonConversationCellProps}
-          searchRepository={searchRepository}
-        />
-      )}
+      {conversationsFilter &&
+        ![SidebarTabs.DIRECTS, SidebarTabs.GROUPS, SidebarTabs.FAVORITES].includes(currentTab) && (
+          <FilteredGroupConversations
+            archivedConversations={archivedConversations}
+            conversationRepository={conversationRepository}
+            conversations={conversations}
+            conversationsFilter={conversationsFilter}
+            currentFolder={currentFolder}
+            favoriteConversations={favoriteConversations}
+            getCommonConversationCellProps={getCommonConversationCellProps}
+            searchRepository={searchRepository}
+          />
+        )}
     </>
   );
 };
