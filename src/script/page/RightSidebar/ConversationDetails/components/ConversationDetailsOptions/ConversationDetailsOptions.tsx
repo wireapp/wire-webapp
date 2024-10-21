@@ -17,50 +17,117 @@
  *
  */
 
-import {FC} from 'react';
-
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/';
+import {amplify} from 'amplify';
+
+import {HideIcon} from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/Icon';
+import {PanelActions} from 'Components/panel/PanelActions';
 import {ReceiptModeToggle} from 'Components/toggle/ReceiptModeToggle';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
+import {replaceReactComponents} from 'Util/LocalizerUtil/ReactLocalizerUtil';
 
 import {ConversationDetailsOption} from './ConversationDetailsOption';
 
+import {ConversationRepository} from '../../../../../conversation/ConversationRepository';
+import {ConversationRoleRepository} from '../../../../../conversation/ConversationRoleRepository';
+import {isMLSConversation} from '../../../../../conversation/ConversationSelectors';
 import {Conversation} from '../../../../../entity/Conversation';
+import {User} from '../../../../../entity/User';
+import {TeamState} from '../../../../../team/TeamState';
+import {ActionsViewModel} from '../../../../../view_model/ActionsViewModel';
 import {PanelEntity, PanelState} from '../../../RightSidebar';
+import {getConversationActions} from '../../utils/getConversationActions';
+import {ConversationDetailsBottomActions} from '../ConversationDetailsBottomActions';
 
 interface ConversationDetailsOptionsProps {
+  actionsViewModel: ActionsViewModel;
   activeConversation: Conversation;
-  togglePanel: (state: PanelState, entity: PanelEntity, addMode?: boolean) => void;
-  receiptMode: RECEIPT_MODE;
+  conversationRepository: ConversationRepository;
+  togglePanel: (state: PanelState, entity: PanelEntity, addMode?: boolean, direction?: 'left' | 'right') => void;
   guestOptionsText: string;
   notificationStatusText: string;
+  roleRepository: ConversationRoleRepository;
   servicesOptionsText: string;
   timedMessagesText: string;
-  showOptionGuests: boolean;
-  showOptionNotificationsGroup: boolean;
-  showOptionReadReceipts: boolean;
-  showOptionServices: boolean;
-  showOptionTimedMessages: boolean;
+  selfUser: User;
+  teamState: TeamState;
   updateConversationReceiptMode: (receiptMode: RECEIPT_MODE) => void;
 }
 
-const ConversationDetailsOptions: FC<ConversationDetailsOptionsProps> = ({
+const ConversationDetailsOptions = ({
+  actionsViewModel,
   activeConversation,
+  conversationRepository,
   togglePanel,
-  receiptMode,
   guestOptionsText,
   notificationStatusText,
+  roleRepository,
+  selfUser,
   servicesOptionsText,
-  showOptionGuests,
-  showOptionNotificationsGroup,
-  showOptionReadReceipts,
-  showOptionServices,
-  showOptionTimedMessages,
   timedMessagesText,
+  teamState,
   updateConversationReceiptMode,
-}) => {
+}: ConversationDetailsOptionsProps) => {
+  const {
+    isMutable,
+    isGroup,
+    receiptMode,
+    is1to1,
+    isRequest,
+    isSelfUserRemoved,
+    firstUserEntity: firstParticipant,
+  } = useKoSubscribableChildren(activeConversation, [
+    'isMutable',
+    'isGroup',
+    'receiptMode',
+    'is1to1',
+    'isRequest',
+    'isSelfUserRemoved',
+    'firstUserEntity',
+  ]);
+  const {isSelfDeletingMessagesEnabled, isTeam} = useKoSubscribableChildren(teamState, [
+    'isSelfDeletingMessagesEnabled',
+    'isTeam',
+  ]);
+  const {isActivatedAccount, teamRole} = useKoSubscribableChildren(selfUser, ['isActivatedAccount', 'teamRole']);
+  const {isBlocked: isParticipantBlocked} = useKoSubscribableChildren(firstParticipant!, ['isBlocked']);
+
+  const teamId = activeConversation.teamId;
+
+  const isSingleUserMode = is1to1 || isRequest;
+  const isServiceMode = isSingleUserMode && firstParticipant!.isService;
+
+  const conversationActions = getConversationActions({
+    conversationEntity: activeConversation,
+    actionsViewModel,
+    conversationRepository,
+    teamRole,
+    isServiceMode,
+    isTeam,
+    isParticipantBlocked,
+  });
+
+  const isActiveGroupParticipant = isGroup && !isSelfUserRemoved;
+
+  const showOptionGuests = isActiveGroupParticipant && !!teamId && roleRepository.canToggleGuests(activeConversation);
+  const hasAdvancedNotifications = isMutable && isTeam;
+  const showOptionNotificationsGroup = hasAdvancedNotifications && isGroup;
+  const showOptionTimedMessages =
+    isActiveGroupParticipant && roleRepository.canToggleTimeout(activeConversation) && isSelfDeletingMessagesEnabled;
+  const showOptionServices =
+    isActiveGroupParticipant &&
+    !!teamId &&
+    roleRepository.canToggleGuests(activeConversation) &&
+    !isMLSConversation(activeConversation);
+  const showOptionNotifications1To1 = hasAdvancedNotifications && !isGroup;
+  const showOptionReadReceipts = !!teamId && roleRepository.canToggleReadReceipts(activeConversation);
+
+  const hasReceiptsEnabled = conversationRepository.expectReadReceipt(activeConversation);
+
   const openNotificationsPanel = () => togglePanel(PanelState.NOTIFICATIONS, activeConversation);
 
   const openTimedMessagePanel = () => togglePanel(PanelState.TIMED_MESSAGES, activeConversation);
@@ -69,9 +136,13 @@ const ConversationDetailsOptions: FC<ConversationDetailsOptionsProps> = ({
 
   const openServicePanel = () => togglePanel(PanelState.SERVICES_OPTIONS, activeConversation);
 
+  const showNotifications = () => togglePanel(PanelState.NOTIFICATIONS, activeConversation);
+
+  const openParticipantDevices = () => togglePanel(PanelState.PARTICIPANT_DEVICES, firstParticipant!, false, 'left');
+
   return (
-    <>
-      <h3 className="conversation-details__list-head">{t('conversationDetailsOptions')}</h3>
+    <div className="conversation-details__options">
+      {isGroup && <h3 className="conversation-details__list-head">{t('conversationDetailsOptions')}</h3>}
 
       <ul>
         {showOptionNotificationsGroup && (
@@ -127,8 +198,63 @@ const ConversationDetailsOptions: FC<ConversationDetailsOptionsProps> = ({
             <ReceiptModeToggle receiptMode={receiptMode} onReceiptModeChanged={updateConversationReceiptMode} />
           </li>
         )}
+
+        {isActivatedAccount && (
+          <>
+            <ConversationDetailsBottomActions
+              isDeviceActionEnabled={
+                !!(
+                  isSingleUserMode &&
+                  firstParticipant &&
+                  (firstParticipant.isConnected() || teamState.isInTeam(firstParticipant))
+                )
+              }
+              showDevices={openParticipantDevices}
+              showNotifications={showNotifications}
+              notificationStatusText={notificationStatusText}
+              showOptionNotifications1To1={showOptionNotifications1To1}
+            />
+
+            {isSingleUserMode && (
+              <div className="panel__info-item" data-uie-name="label-1to1-read-receipts">
+                <span className="panel__info-item__icon">{hasReceiptsEnabled ? <Icon.ReadIcon /> : <HideIcon />}</span>
+
+                <span>
+                  <p className="panel__action-item__status-title">
+                    {hasReceiptsEnabled
+                      ? t('conversationDetails1to1ReceiptsHeadEnabled')
+                      : t('conversationDetails1to1ReceiptsHeadDisabled')}
+                  </p>
+                  <p className="panel__action-item__status">{t('conversationDetails1to1ReceiptsFirst')}</p>
+                  <p className="panel__action-item__status">
+                    {replaceReactComponents(t('conversationDetails1to1ReceiptsSecond'), [
+                      {
+                        start: '[button]',
+                        end: '[/button]',
+                        render: text => (
+                          <button
+                            className="button-reset-default"
+                            css={{
+                              textDecoration: 'underline',
+                            }}
+                            key={text}
+                            onClick={() => amplify.publish(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT)}
+                          >
+                            {text}
+                          </button>
+                        ),
+                      },
+                    ])}
+                  </p>
+                </span>
+              </div>
+            )}
+
+            <PanelActions items={conversationActions} />
+          </>
+        )}
       </ul>
-    </>
+    </div>
   );
 };
 
