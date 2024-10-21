@@ -55,7 +55,7 @@ export const PrimaryModalComponent: FC = () => {
   const isModalVisible = currentId !== null;
   const passwordValueRef = useRef<HTMLInputElement>(null);
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
-  const isBackupPasswordValid = useMemo(() => passwordInput && isValidPassword(passwordInput), [passwordInput]);
+  const isBackupPasswordValid = useMemo(() => passwordInput === '' || isValidPassword(passwordInput), [passwordInput]);
 
   const {
     checkboxLabel,
