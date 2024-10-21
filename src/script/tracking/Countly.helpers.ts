@@ -35,10 +35,10 @@ export const getForcedErrorReportingStatus = (): boolean => forceActivateErrorRe
 
 // Init the forced activation of error reporting based on the environment
 export const initForcedErrorReporting = () => {
-  const {COUNTLY_ENABLE_LOGGING} = Config.getConfig();
-  const {isDev, isEdge, isInternal, isLocalhost, isStaging, name} = getWebEnvironment();
+  const {COUNTLY_ENABLE_LOGGING, COUNTLY_FORCE_REPORTING} = Config.getConfig();
+  const {name} = getWebEnvironment();
 
-  if (isDev || isEdge || isInternal || isLocalhost || isStaging) {
+  if (COUNTLY_FORCE_REPORTING) {
     forceActivateErrorReporting = true;
     logger.warn(
       `Error reporting is forced to be activated on this environment: ${name}. Countly logging is ${COUNTLY_ENABLE_LOGGING ? 'enabled' : 'disabled'}`,

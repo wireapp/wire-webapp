@@ -185,6 +185,9 @@ export type Env = {
   /** Enables logging for Countly */
   COUNTLY_ENABLE_LOGGING: string;
 
+  /** Force Countly reporting (only to be used on internal environments) */
+  COUNTLY_FORCE_REPORTING: string;
+
   /** Countly allow list for backend urls
    * Multiple entries separated by comma, e.g. "https://nginz-https.anta.wire.link, https://nginz-https.diya.wire.link, https://prod-nginz-https.wire.com"
    * Used to disable countly tracking on on-prem instances
