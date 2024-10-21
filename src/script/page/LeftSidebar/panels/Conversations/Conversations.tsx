@@ -47,6 +47,7 @@ import {
   conversationsSidebarHandleIconStyles,
 } from './Conversations.styles';
 import {ConversationsList} from './ConversationsList';
+import {headingTitle} from './ConversationsList.styles';
 import {ConversationTabs} from './ConversationTabs';
 import {EmptyConversationList} from './EmptyConversationList';
 import {getTabConversations, scrollToConversation} from './helpers';
@@ -406,6 +407,8 @@ const Conversations: React.FC<ConversationsProps> = ({
                 searchValue={conversationsFilter}
               />
             )}
+
+            {conversationsFilter && !hasEmptyConversationsList && <h3 css={headingTitle}>Conversation names</h3>}
 
             {showSearchInput && (
               <ConversationsList

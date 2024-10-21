@@ -20,7 +20,7 @@
 import {CSSObject} from '@emotion/react';
 
 export const headingTitle: CSSObject = {
-  color: 'var(--main-color)',
+  color: 'var(--text-input-label)',
   fontSize: 'var(--font-size-small)',
   fontWeight: 'var(--font-weight-semibold)',
   paddingBottom: '4px',
@@ -28,6 +28,7 @@ export const headingTitle: CSSObject = {
   marginTop: '16px',
   marginBottom: '0',
   borderBottom: '1px solid var(--border-color)',
+  textTransform: 'uppercase',
 };
 
 export const conversationsList: CSSObject = {
