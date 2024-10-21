@@ -3080,7 +3080,18 @@ export class ConversationRepository {
       case ClientEvent.CONVERSATION.MESSAGE_DELETE:
         extra.deletedMessage = event.data.message_id;
     }
-    this.logger.info(logMessage, {time, from, type, qualified_conversation, ...extra});
+
+    const eventDate = new Date(time);
+    const currentTime = new Date();
+
+    this.logger.info(logMessage, {
+      time,
+      from,
+      type,
+      qualified_conversation,
+      duration: currentTime.getTime() - eventDate.getTime(),
+      ...extra,
+    });
   }
 
   /**
