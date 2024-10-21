@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.7.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.6.2...@wireapp/api-client@27.7.0) (2024-10-21)
+
+### Features
+
+* **user-migration:** add accept invitation call in apiClient [WPB-11128] ([#6610](https://github.com/wireapp/wire-web-packages/issues/6610)) ([5b9a94f](https://github.com/wireapp/wire-web-packages/commit/5b9a94f57f002a10ceefb5c06a711ed98700daef))
+
 ## [27.6.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.6.0...@wireapp/api-client@27.6.2) (2024-10-16)
 
 ### Bug Fixes
