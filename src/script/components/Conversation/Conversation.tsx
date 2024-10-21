@@ -76,7 +76,14 @@ interface ConversationProps {
 }
 
 const CONFIG = Config.getConfig();
-
+/*
+ * Alex Ishenko
+ * This file is responsible for represenation of all kinds of conversations,
+ * This file will require 2 different major updates
+ * TODO: 1. change display of messages with threads so that user can see other users who participating in a thread, number of messages, link to open thread
+ * TODO: 2. This component will be responsible for displaying thread conversation itself. add relevant to thread functionality such as changing header maybe displaying entire original message, but it's debbatable
+ * TODO: split this into smaller parts
+ */
 export const Conversation = ({
   teamState,
   selfUser,

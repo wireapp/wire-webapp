@@ -134,7 +134,10 @@ export const setLocale = (newLocale: string): void => {
 export const setStrings = (newStrings: typeof strings): void => {
   strings = newStrings;
 };
-
+/*
+ * Alex Ishenko
+ * TODO: add all relevant translations and new strings
+ */
 export function t(
   identifier: StringIdentifer,
   substitutions?: Substitutes,

@@ -32,6 +32,10 @@ export enum CONVERSATION {
   DELETE_EVERYWHERE = 'conversation.delete-everywhere',
   FILE_TYPE_RESTRICTED = 'conversation.file-type-restricted',
   GROUP_CREATION = 'conversation.group-creation',
+  /*
+   * Alex Ishenko
+   * TODO: add THREAD_CREATION
+   */
   INCOMING_MESSAGE_TOO_BIG = 'conversation.incoming-message-too-big',
   KNOCK = 'conversation.knock',
   LEGAL_HOLD_UPDATE = 'conversation.legal-hold-update',
