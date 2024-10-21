@@ -37,6 +37,7 @@ export class TeamInvitationAPI {
     INFO: 'info',
     INVITATIONS: 'invitations',
     EMAIL: 'by-email',
+    ACCEPT: 'accept',
   };
 
   constructor(private readonly client: HttpClient) {}
@@ -152,6 +153,17 @@ export class TeamInvitationAPI {
         code: invitationCode,
       },
       url: `${TeamAPI.URL.TEAMS}/${TeamInvitationAPI.URL.INVITATIONS}/${TeamInvitationAPI.URL.INFO}`,
+    };
+
+    const response = await this.client.sendJSON<TeamInvitation>(config);
+    return response.data;
+  }
+
+  public async acceptInvitation(payload: {code: string; password: string}): Promise<TeamInvitation> {
+    const config: AxiosRequestConfig = {
+      data: payload,
+      method: 'post',
+      url: `${TeamAPI.URL.TEAMS}/${TeamInvitationAPI.URL.INVITATIONS}/${TeamInvitationAPI.URL.ACCEPT}`,
     };
 
     const response = await this.client.sendJSON<TeamInvitation>(config);
