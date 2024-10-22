@@ -36,7 +36,7 @@ export const conversationsList: CSSObject = {
   paddingLeft: 0,
 };
 
-export const paragraph: CSSObject = {
+export const noResultsMessage: CSSObject = {
   marginTop: '16px',
   marginBottom: '40px',
   lineHeight: 'var(--line-height-md)',

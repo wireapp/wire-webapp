@@ -30,7 +30,7 @@ import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {ConnectionRequests} from './ConnectionRequests';
-import {conversationsList, headingTitle, paragraph} from './ConversationsList.styles';
+import {conversationsList, headingTitle, noResultsMessage} from './ConversationsList.styles';
 import {conversationSearchFilter, scrollToConversation} from './helpers';
 
 import {CallState} from '../../../../calling/CallState';
@@ -146,7 +146,7 @@ export const ConversationsList = ({
       {conversationsFilter && !isEmpty && <h3 css={headingTitle}>{t('searchConversationNames')}</h3>}
 
       {conversations.length === 0 && groupParticipantsConversations.length > 0 && (
-        <p css={paragraph}>{t('searchConversationsNoResult')}</p>
+        <p css={noResultsMessage}>{t('searchConversationsNoResult')}</p>
       )}
 
       <ul css={conversationsList} data-uie-name="conversation-view">
