@@ -43,7 +43,7 @@ import {conversationsSpacerStyles} from './Conversations.styles';
 import {ConversationSidebar} from './ConversationSidebar/ConversationSidebar';
 import {ConversationsList} from './ConversationsList';
 import {EmptyConversationList} from './EmptyConversationList';
-import {getFilteredGroupConversations} from './getFilteredGroupConversations';
+import {getGroupParticipantsConversations} from './getGroupParticipantsConversation';
 import {getTabConversations, scrollToConversation} from './helpers';
 import {useFolderStore} from './useFoldersStore';
 import {SidebarStatus, SidebarTabs, useSidebarStore} from './useSidebarStore';
@@ -168,7 +168,7 @@ const Conversations: React.FC<ConversationsProps> = ({
     .map(label => createLabel(label.name, conversationLabelRepository.getLabelConversations(label), label.id))
     .find(folder => folder.id === expandedFolder);
 
-  const filteredGroupConversations = getFilteredGroupConversations({
+  const groupParticipantsConversations = getGroupParticipantsConversations({
     currentTab,
     conversationRepository,
     searchRepository,
@@ -179,14 +179,14 @@ const Conversations: React.FC<ConversationsProps> = ({
     archivedConversations,
   });
 
-  const isFilteredGroupConversationsVisible =
+  const isGroupParticipantsVisible =
     !!conversationsFilter &&
     ![SidebarTabs.DIRECTS, SidebarTabs.GROUPS, SidebarTabs.FAVORITES].includes(currentTab) &&
-    filteredGroupConversations.length > 0;
+    groupParticipantsConversations.length > 0;
 
   const hasNoConversations = conversations.length + connectRequests.length === 0;
   const hasEmptyConversationsList =
-    !isFilteredGroupConversationsVisible &&
+    !isGroupParticipantsVisible &&
     ((showSearchInput && currentTabConversations.length === 0) ||
       (hasNoConversations && currentTab !== SidebarTabs.ARCHIVES));
 
@@ -401,8 +401,8 @@ const Conversations: React.FC<ConversationsProps> = ({
                 resetConversationFocus={resetConversationFocus}
                 clearSearchFilter={clearConversationFilter}
                 isEmpty={hasEmptyConversationsList}
-                filteredGroupConversations={filteredGroupConversations}
-                filterGroupVisible={isFilteredGroupConversationsVisible}
+                groupParticipantsConversations={groupParticipantsConversations}
+                isGroupParticipantsVisible={isGroupParticipantsVisible}
               />
             )}
           </>

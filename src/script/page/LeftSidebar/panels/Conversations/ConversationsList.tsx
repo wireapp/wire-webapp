@@ -55,8 +55,8 @@ interface ConversationsListProps {
   resetConversationFocus: () => void;
   handleArrowKeyDown: (index: number) => (e: React.KeyboardEvent) => void;
   clearSearchFilter: () => void;
-  filteredGroupConversations: Conversation[];
-  filterGroupVisible: boolean;
+  groupParticipantsConversations: Conversation[];
+  isGroupParticipantsVisible: boolean;
   isEmpty: boolean;
 }
 
@@ -72,8 +72,8 @@ export const ConversationsList = ({
   resetConversationFocus,
   handleArrowKeyDown,
   clearSearchFilter,
-  filteredGroupConversations,
-  filterGroupVisible,
+  groupParticipantsConversations,
+  isGroupParticipantsVisible,
   isEmpty,
 }: ConversationsListProps) => {
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
@@ -143,11 +143,11 @@ export const ConversationsList = ({
 
       <ConnectionRequests connectionRequests={connectRequests} onConnectionRequestClick={onConnectionRequestClick} />
 
-      {conversationsFilter && ((isEmpty && filterGroupVisible) || !isEmpty) && (
-        <h3 css={headingTitle}>Conversation names</h3>
-      )}
+      {conversationsFilter && !isEmpty && <h3 css={headingTitle}>{t('searchConversationNames')}</h3>}
 
-      {conversations.length === 0 && filterGroupVisible && <p css={paragraph}>{t('searchConversationsNoResult')}</p>}
+      {conversations.length === 0 && groupParticipantsConversations.length > 0 && (
+        <p css={paragraph}>{t('searchConversationsNoResult')}</p>
+      )}
 
       <ul css={conversationsList} data-uie-name="conversation-view">
         {conversationsToDisplay.map((conversation, index) => (
@@ -155,12 +155,15 @@ export const ConversationsList = ({
         ))}
       </ul>
 
-      {filterGroupVisible && (
+      {isGroupParticipantsVisible && (
         <>
-          <h3 css={headingTitle}>{t('searchGroups')}</h3>
-
-          <ul css={conversationsList} data-uie-name="filtered-conversation-view" className="filtered-conversations">
-            {filteredGroupConversations.map((conversation, index) => (
+          <h3 css={headingTitle}>{t('searchGroupParticipants')}</h3>
+          <ul
+            css={conversationsList}
+            data-uie-name="group-participants-conversations-view"
+            className="group-participants-conversations"
+          >
+            {groupParticipantsConversations.map((conversation, index) => (
               <ConversationListCell key={conversation.id} {...getCommonConversationCellProps(conversation, index)} />
             ))}
           </ul>

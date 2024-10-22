@@ -24,7 +24,7 @@ import {SearchRepository} from 'src/script/search/SearchRepository';
 
 import {SidebarTabs} from './useSidebarStore';
 
-type GetFilteredGroupConversationsParams = {
+type GetGroupParticipantsConversationsParams = {
   currentTab: SidebarTabs;
   conversationRepository: ConversationRepository;
   searchRepository: SearchRepository;
@@ -35,7 +35,7 @@ type GetFilteredGroupConversationsParams = {
   archivedConversations: Conversation[];
 };
 
-export const getFilteredGroupConversations = ({
+export const getGroupParticipantsConversations = ({
   currentTab,
   conversationRepository,
   searchRepository,
@@ -44,7 +44,7 @@ export const getFilteredGroupConversations = ({
   conversations,
   currentFolder,
   archivedConversations,
-}: GetFilteredGroupConversationsParams) => {
+}: GetGroupParticipantsConversationsParams) => {
   const isFavoritesView = currentTab === SidebarTabs.FAVORITES;
   const isArchivesView = currentTab === SidebarTabs.ARCHIVES;
   const isFolderView = currentTab === SidebarTabs.FOLDER;

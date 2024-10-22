@@ -79,8 +79,8 @@ describe('ConversationsList', () => {
         resetConversationFocus={resetConversationFocus}
         handleArrowKeyDown={handleArrowKeyDown}
         clearSearchFilter={clearSearchFilter}
-        filteredGroupConversations={[]}
-        filterGroupVisible={false}
+        groupParticipantsConversations={[]}
+        isGroupParticipantsVisible={false}
         isEmpty={false}
       />,
     );
