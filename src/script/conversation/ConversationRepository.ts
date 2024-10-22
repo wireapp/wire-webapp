@@ -3057,7 +3057,7 @@ export class ConversationRepository {
   // Event callbacks
   //##############################################################################
 
-  private logConversationEvent(event: IncomingEvent, source: EventSource) {
+  private logConversationEvent(event: IncomingEvent, source: EventSource, duration: number) {
     if (event.type === CONVERSATION_EVENT.TYPING) {
       // Prevent logging typing events
       return;
@@ -3081,15 +3081,12 @@ export class ConversationRepository {
         extra.deletedMessage = event.data.message_id;
     }
 
-    const eventDate = new Date(time);
-    const currentTime = new Date();
-
     this.logger.info(logMessage, {
       time,
       from,
       type,
       qualified_conversation,
-      duration: currentTime.getTime() - eventDate.getTime(),
+      duration,
       ...extra,
     });
   }
@@ -3101,9 +3098,14 @@ export class ConversationRepository {
    * @param source Source of event
    * @returns Resolves when event was handled
    */
-  private readonly onConversationEvent = (event: IncomingEvent, source = EventRepository.SOURCE.STREAM) => {
-    this.logConversationEvent(event, source);
-    return this.handleConversationEvent(event, source);
+  private readonly onConversationEvent = async (event: IncomingEvent, source = EventRepository.SOURCE.STREAM) => {
+    const start = performance.now();
+    const handledConversations = await this.handleConversationEvent(event, source);
+    const duration = performance.now() - start;
+
+    this.logConversationEvent(event, source, duration);
+
+    return handledConversations;
   };
 
   private handleConversationEvent(
