@@ -23,17 +23,12 @@ import ko from 'knockout';
 
 import {CallState} from 'src/script/calling/CallState';
 import {ConversationLabel, ConversationLabelRepository} from 'src/script/conversation/ConversationLabelRepository';
-import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {ConversationState} from 'src/script/conversation/ConversationState';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {ListViewModel} from 'src/script/view_model/ListViewModel';
-import {TestFactory} from 'test/helper/TestFactory';
 
 import {ConversationsList} from './ConversationsList';
-
-import {SearchRepository} from '../../../../search/SearchRepository';
-import {UserRepository} from '../../../../user/UserRepository';
 
 const create1to1Conversation = (userName: string) => {
   const conversation = new Conversation('id', 'domain', ConversationProtocol.PROTEUS);
@@ -56,8 +51,6 @@ describe('ConversationsList', () => {
   let handleArrowKeyDown: jest.Mock;
   let clearSearchFilter: jest.Mock;
   let conversationLabelRepository: ConversationLabelRepository;
-  let conversationRepository: ConversationRepository;
-  let searchRepository: SearchRepository;
 
   beforeEach(async () => {
     listViewModel = {} as ListViewModel;
@@ -69,17 +62,12 @@ describe('ConversationsList', () => {
     resetConversationFocus = jest.fn();
     handleArrowKeyDown = jest.fn();
     clearSearchFilter = jest.fn();
-
-    const testFactory = new TestFactory();
-    conversationRepository = await testFactory.exposeConversationActors();
-    searchRepository = new SearchRepository({} as UserRepository);
   });
 
   const renderComponent = (conversations: Conversation[], searchFilter: string = '') =>
     render(
       <ConversationsList
         conversationLabelRepository={conversationLabelRepository}
-        conversationRepository={conversationRepository}
         conversations={conversations}
         conversationsFilter={searchFilter}
         listViewModel={listViewModel}
@@ -91,9 +79,9 @@ describe('ConversationsList', () => {
         resetConversationFocus={resetConversationFocus}
         handleArrowKeyDown={handleArrowKeyDown}
         clearSearchFilter={clearSearchFilter}
-        favoriteConversations={[]}
-        archivedConversations={[]}
-        searchRepository={searchRepository}
+        filteredGroupConversations={[]}
+        filterGroupVisible={false}
+        isEmpty={false}
       />,
     );
 

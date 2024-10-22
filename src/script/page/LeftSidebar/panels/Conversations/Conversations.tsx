@@ -42,8 +42,8 @@ import {ConversationHeader} from './ConversationHeader';
 import {conversationsSpacerStyles} from './Conversations.styles';
 import {ConversationSidebar} from './ConversationSidebar/ConversationSidebar';
 import {ConversationsList} from './ConversationsList';
-import {headingTitle} from './ConversationsList.styles';
 import {EmptyConversationList} from './EmptyConversationList';
+import {getFilteredGroupConversations} from './getFilteredGroupConversations';
 import {getTabConversations, scrollToConversation} from './helpers';
 import {useFolderStore} from './useFoldersStore';
 import {SidebarStatus, SidebarTabs, useSidebarStore} from './useSidebarStore';
@@ -168,6 +168,28 @@ const Conversations: React.FC<ConversationsProps> = ({
     .map(label => createLabel(label.name, conversationLabelRepository.getLabelConversations(label), label.id))
     .find(folder => folder.id === expandedFolder);
 
+  const filteredGroupConversations = getFilteredGroupConversations({
+    currentTab,
+    conversationRepository,
+    searchRepository,
+    conversationsFilter,
+    favoriteConversations,
+    conversations: currentTabConversations,
+    currentFolder,
+    archivedConversations,
+  });
+
+  const isFilteredGroupConversationsVisible =
+    !!conversationsFilter &&
+    ![SidebarTabs.DIRECTS, SidebarTabs.GROUPS, SidebarTabs.FAVORITES].includes(currentTab) &&
+    filteredGroupConversations.length > 0;
+
+  const hasNoConversations = conversations.length + connectRequests.length === 0;
+  const hasEmptyConversationsList =
+    !isFilteredGroupConversationsVisible &&
+    ((showSearchInput && currentTabConversations.length === 0) ||
+      (hasNoConversations && currentTab !== SidebarTabs.ARCHIVES));
+
   function toggleSidebar() {
     if (isFoldersTabOpen) {
       toggleFoldersTab();
@@ -179,11 +201,6 @@ const Conversations: React.FC<ConversationsProps> = ({
       isSideBarOpen ? EventName.UI.SIDEBAR_COLLAPSE : EventName.UI.SIDEBAR_UNCOLLAPSE,
     );
   }
-
-  const hasNoConversations = conversations.length + connectRequests.length === 0;
-  const hasEmptyConversationsList =
-    (showSearchInput && currentTabConversations.length === 0) ||
-    (hasNoConversations && currentTab !== SidebarTabs.ARCHIVES);
 
   useEffect(() => {
     amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, (conversation?: Conversation) => {
@@ -361,8 +378,6 @@ const Conversations: React.FC<ConversationsProps> = ({
               />
             )}
 
-            {conversationsFilter && <h3 css={headingTitle}>Conversation names</h3>}
-
             {hasEmptyConversationsList && (
               <EmptyConversationList
                 currentTab={currentTab}
@@ -383,12 +398,11 @@ const Conversations: React.FC<ConversationsProps> = ({
                 handleArrowKeyDown={handleKeyDown}
                 conversationState={conversationState}
                 conversations={currentTabConversations}
-                conversationRepository={conversationRepository}
                 resetConversationFocus={resetConversationFocus}
                 clearSearchFilter={clearConversationFilter}
-                searchRepository={searchRepository}
-                favoriteConversations={favoriteConversations}
-                archivedConversations={archivedConversations}
+                isEmpty={hasEmptyConversationsList}
+                filteredGroupConversations={filteredGroupConversations}
+                filterGroupVisible={isFilteredGroupConversationsVisible}
               />
             )}
           </>

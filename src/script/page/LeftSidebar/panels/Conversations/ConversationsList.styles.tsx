@@ -35,3 +35,11 @@ export const conversationsList: CSSObject = {
   margin: 0,
   paddingLeft: 0,
 };
+
+export const paragraph: CSSObject = {
+  marginTop: '16px',
+  marginBottom: '40px',
+  lineHeight: 'var(--line-height-md)',
+  letterSpacing: '0.05px',
+  textAlign: 'center',
+};
