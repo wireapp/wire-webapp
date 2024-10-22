@@ -20,7 +20,9 @@
 import {ChevronIcon, IconButton} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {ContentState} from 'src/script/page/useAppState';
+import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
+import {ConversationState} from 'src/script/conversation/ConversationState';
+import {Conversation} from 'src/script/entity/Conversation';
 
 import {
   conversationsSidebarHandleStyles,
@@ -28,27 +30,28 @@ import {
   conversationsSidebarHandleIconStyles,
 } from './ConversationSidebar.styles';
 
+import {User} from '../../../../../entity/User';
 import {UserDetails} from '../../../UserDetails';
 import {ConversationTabs} from '../ConversationTabs';
+import {SidebarTabs} from '../useSidebarStore';
 
 type ConversationSidebarProps = {
   isOpen: boolean;
   toggleOpen: () => void;
   isScreenLessThanMdBreakpoint: boolean;
-
-  selfUser: any;
-  conversationState: any;
-  isTeam: any;
-  changeTab: any;
-  currentTab: any;
-  groupConversations: any;
-  directConversations: any;
-  unreadConversations: any;
-  favoriteConversations: any;
-  archivedConversations: any;
-  conversationRepository: any;
-  onClickPreferences: any;
-  showNotificationsBadge: any;
+  selfUser: User;
+  conversationState: ConversationState;
+  isTeam: boolean;
+  changeTab: (nextTab: SidebarTabs, folderId?: string) => void;
+  currentTab: SidebarTabs;
+  groupConversations: Conversation[];
+  directConversations: Conversation[];
+  unreadConversations: Conversation[];
+  favoriteConversations: Conversation[];
+  archivedConversations: Conversation[];
+  conversationRepository: ConversationRepository;
+  onClickPreferences: () => void;
+  showNotificationsBadge: boolean;
 };
 
 export const ConversationSidebar = ({
@@ -88,7 +91,7 @@ export const ConversationSidebar = ({
           favoriteConversations={favoriteConversations}
           archivedConversations={archivedConversations}
           conversationRepository={conversationRepository}
-          onClickPreferences={() => onClickPreferences(ContentState.PREFERENCES_ACCOUNT)}
+          onClickPreferences={onClickPreferences}
           showNotificationsBadge={showNotificationsBadge}
         />
       </FadingScrollbar>
