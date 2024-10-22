@@ -17,7 +17,7 @@
  *
  */
 
-import React, {ComponentProps} from 'react';
+import React from 'react';
 
 import {act, render} from '@testing-library/react';
 import {observable} from 'knockout';
@@ -32,7 +32,7 @@ import {TestFactory} from 'test/helper/TestFactory';
 
 import {Conversations} from './';
 
-const defaultParams: Omit<ComponentProps<typeof Conversations>, 'conversationRepository' | 'searchRepository'> = {
+const defaultParams: Omit<React.ComponentProps<typeof Conversations>, 'conversationRepository' | 'searchRepository'> = {
   listViewModel: {
     switchList: jest.fn(),
     contentViewModel: {
