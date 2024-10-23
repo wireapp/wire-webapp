@@ -743,7 +743,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                     marginRight: 10,
                   }}
                 >
-                  {(participants.length > 2 || true) && (
+                  {participants.length > 2 && (
                     <li className="video-controls__item">
                       <button
                         onBlur={event => {
