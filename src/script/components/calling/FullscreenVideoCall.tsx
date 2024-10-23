@@ -739,9 +739,11 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                     ...(!horizontalSmBreakpoint && {minWidth: '157px'}),
                     display: 'flex',
                     justifyContent: 'flex-end',
+                    gap: 10,
+                    marginRight: 10,
                   }}
                 >
-                  {participants.length > 2 && (
+                  {(participants.length > 2 || true) && (
                     <li className="video-controls__item">
                       <button
                         onBlur={event => {
@@ -749,10 +751,9 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                             toggleCallView();
                           }
                         }}
-                        className="video-controls__button video-controls__button--small video-controls__view-mode"
+                        className={classNames('video-controls__button_primary', {active: isCallViewOpen})}
                         onClick={toggleCallView}
                         onKeyDown={event => handleKeyDown(event, toggleCallView)}
-                        css={isCallViewOpen ? videoControlActiveStyles : videoControlInActiveStyles}
                         type="button"
                         data-uie-name="do-call-controls-video-call-view"
                         role="switch"
@@ -818,8 +819,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                       )}
                       <button
                         title={t('callReactions')}
-                        css={showEmojisBar ? videoControlActiveStyles : videoControlInActiveStyles}
-                        className="video-controls__button video-controls__button--small"
+                        className={classNames('video-controls__button_primary', {active: showEmojisBar})}
                         onClick={() => setShowEmojisBar(prev => !prev)}
                         type="button"
                         aria-labelledby="show-emoji-bar"
@@ -831,11 +831,10 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   )}
                   <li className="video-controls__item">
                     <button
-                      className="video-controls__button video-controls__button--small"
                       data-uie-value={isParticipantsListOpen ? 'active' : 'inactive'}
                       onClick={toggleParticipantsList}
                       onKeyDown={event => handleKeyDown(event, toggleParticipantsList)}
-                      css={isParticipantsListOpen ? videoControlActiveStyles : videoControlInActiveStyles}
+                      className={classNames('video-controls__button_primary', {active: isParticipantsListOpen})}
                       type="button"
                       data-uie-name="do-toggle-call-participants-list"
                       role="switch"
