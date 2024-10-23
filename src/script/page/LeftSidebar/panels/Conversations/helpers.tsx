@@ -17,9 +17,10 @@
  *
  */
 
-import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {t} from 'Util/LocalizerUtil';
 import {replaceAccents} from 'Util/StringUtil';
+
+import {SidebarTabs} from './useSidebarStore';
 
 import {Conversation} from '../../../../entity/Conversation';
 

@@ -30,17 +30,14 @@ import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {ConnectionRequests} from './ConnectionRequests';
-import {conversationsList} from './ConversationsList.styles';
-import {FilteredGroupConversations} from './FilteredGroupConversations';
+import {conversationsList, headingTitle, noResultsMessage} from './ConversationsList.styles';
 import {conversationSearchFilter, scrollToConversation} from './helpers';
 
 import {CallState} from '../../../../calling/CallState';
-import {ConversationRepository} from '../../../../conversation/ConversationRepository';
 import {ConversationState} from '../../../../conversation/ConversationState';
 import {Conversation} from '../../../../entity/Conversation';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from '../../../../router/routerBindings';
-import {SearchRepository} from '../../../../search/SearchRepository';
 import {ListViewModel} from '../../../../view_model/ListViewModel';
 import {useAppMainState, ViewType} from '../../../state';
 import {ContentState} from '../../../useAppState';
@@ -48,8 +45,6 @@ import {ContentState} from '../../../useAppState';
 interface ConversationsListProps {
   callState: CallState;
   connectRequests: User[];
-  conversationRepository: ConversationRepository;
-  searchRepository: SearchRepository;
   conversations: Conversation[];
   conversationState: ConversationState;
   listViewModel: ListViewModel;
@@ -60,15 +55,14 @@ interface ConversationsListProps {
   resetConversationFocus: () => void;
   handleArrowKeyDown: (index: number) => (e: React.KeyboardEvent) => void;
   clearSearchFilter: () => void;
-  favoriteConversations: Conversation[];
-  archivedConversations: Conversation[];
+  groupParticipantsConversations: Conversation[];
+  isGroupParticipantsVisible: boolean;
+  isEmpty: boolean;
 }
 
 export const ConversationsList = ({
   conversations,
   conversationsFilter,
-  conversationRepository,
-  searchRepository,
   listViewModel,
   connectRequests,
   conversationState,
@@ -78,8 +72,9 @@ export const ConversationsList = ({
   resetConversationFocus,
   handleArrowKeyDown,
   clearSearchFilter,
-  favoriteConversations,
-  archivedConversations,
+  groupParticipantsConversations,
+  isGroupParticipantsVisible,
+  isEmpty,
 }: ConversationsListProps) => {
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
   const {currentTab} = useSidebarStore();
@@ -148,23 +143,31 @@ export const ConversationsList = ({
 
       <ConnectionRequests connectionRequests={connectRequests} onConnectionRequestClick={onConnectionRequestClick} />
 
+      {conversationsFilter && !isEmpty && <h3 css={headingTitle}>{t('searchConversationNames')}</h3>}
+
+      {conversations.length === 0 && groupParticipantsConversations.length > 0 && (
+        <p css={noResultsMessage}>{t('searchConversationsNoResult')}</p>
+      )}
+
       <ul css={conversationsList} data-uie-name="conversation-view">
         {conversationsToDisplay.map((conversation, index) => (
           <ConversationListCell key={conversation.id} {...getCommonConversationCellProps(conversation, index)} />
         ))}
       </ul>
 
-      {conversationsFilter && ![SidebarTabs.DIRECTS, SidebarTabs.GROUPS].includes(currentTab) && (
-        <FilteredGroupConversations
-          archivedConversations={archivedConversations}
-          conversationRepository={conversationRepository}
-          conversations={conversations}
-          conversationsFilter={conversationsFilter}
-          currentFolder={currentFolder}
-          favoriteConversations={favoriteConversations}
-          getCommonConversationCellProps={getCommonConversationCellProps}
-          searchRepository={searchRepository}
-        />
+      {isGroupParticipantsVisible && (
+        <>
+          <h3 css={headingTitle}>{t('searchGroupParticipants')}</h3>
+          <ul
+            css={conversationsList}
+            data-uie-name="group-participants-conversations-view"
+            className="group-participants-conversations"
+          >
+            {groupParticipantsConversations.map((conversation, index) => (
+              <ConversationListCell key={conversation.id} {...getCommonConversationCellProps(conversation, index)} />
+            ))}
+          </ul>
+        </>
       )}
     </>
   );

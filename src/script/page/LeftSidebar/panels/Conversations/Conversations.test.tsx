@@ -23,41 +23,51 @@ import {act, render} from '@testing-library/react';
 import {observable} from 'knockout';
 
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {User} from 'src/script/entity/User';
 import {ListState} from 'src/script/page/useAppState';
+import {SearchRepository} from 'src/script/search/SearchRepository';
+import {UserRepository} from 'src/script/user/UserRepository';
+import {TestFactory} from 'test/helper/TestFactory';
 
 import {Conversations} from './';
 
+const defaultParams: Omit<React.ComponentProps<typeof Conversations>, 'conversationRepository' | 'searchRepository'> = {
+  listViewModel: {
+    switchList: jest.fn(),
+    contentViewModel: {
+      loadPreviousContent: jest.fn(),
+      switchContent: jest.fn(),
+    },
+  } as any,
+  preferenceNotificationRepository: {notifications: observable([])} as any,
+  propertiesRepository: {getPreference: jest.fn(), savePreference: jest.fn()} as any,
+  selfUser: new User(),
+  integrationRepository: {integrations: observable([])} as any,
+  teamRepository: {getTeam: jest.fn()} as any,
+  userRepository: {users: observable([])} as any,
+};
+
 describe('Conversations', () => {
-  const defaultParams: React.ComponentProps<typeof Conversations> = {
-    conversationRepository: {
-      conversationLabelRepository: {
-        addEventListener: jest.fn(),
-        removeEventListener: jest.fn(),
-        getFavorites: jest.fn().mockReturnValue([]),
-        getLabels: jest.fn().mockReturnValue([]),
-        getLabelConversations: jest.fn().mockReturnValue([]),
-        labels: [],
-      },
-    } as any,
-    listViewModel: {
-      switchList: jest.fn(),
-      contentViewModel: {
-        loadPreviousContent: jest.fn(),
-        switchContent: jest.fn(),
-      },
-    } as any,
-    preferenceNotificationRepository: {notifications: observable([])} as any,
-    propertiesRepository: {getPreference: jest.fn(), savePreference: jest.fn()} as any,
-    selfUser: new User(),
-    integrationRepository: {integrations: observable([])} as any,
-    searchRepository: {search: jest.fn()} as any,
-    teamRepository: {getTeam: jest.fn()} as any,
-    userRepository: {users: observable([])} as any,
-  };
+  let conversationRepository: ConversationRepository;
+  let searchRepository: SearchRepository;
+
+  beforeEach(async () => {
+    const testFactory = new TestFactory();
+    conversationRepository = await testFactory.exposeConversationActors();
+    searchRepository = new SearchRepository({} as UserRepository);
+  });
 
   it('Opens preferences when clicked', () => {
-    const {getByTitle} = render(withTheme(<Conversations {...defaultParams} />));
+    const {getByTitle} = render(
+      withTheme(
+        <Conversations
+          {...defaultParams}
+          searchRepository={searchRepository}
+          conversationRepository={conversationRepository}
+        />,
+      ),
+    );
     const openPrefButton = getByTitle('preferencesHeadline');
     act(() => {
       openPrefButton.click();
