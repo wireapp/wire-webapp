@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.25.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.24.1...@wireapp/react-ui-kit@9.25.0) (2024-10-24)
+
+### Features
+
+* Add help icon ([#6613](https://github.com/wireapp/wire-web-packages/issues/6613)) ([9dd2fdd](https://github.com/wireapp/wire-web-packages/commit/9dd2fdd61c95de2f5cbdc4e09144ae3f9bfcfb5e))
+
 ## [9.24.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.24.0...@wireapp/react-ui-kit@9.24.1) (2024-10-21)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
