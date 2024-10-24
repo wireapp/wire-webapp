@@ -47,7 +47,6 @@ import {formatBytes, incomingCssClass, removeAnimationsClass} from 'Util/util';
 
 import {useReadReceiptSender} from './hooks/useReadReceipt';
 import {ReadOnlyConversationMessage} from './ReadOnlyConversationMessage';
-import {checkFileSharingPermission} from './utils/checkFileSharingPermission';
 
 import {ConversationState} from '../../conversation/ConversationState';
 import {Conversation as ConversationEntity} from '../../entity/Conversation';
@@ -97,10 +96,7 @@ export const Conversation = ({
   const conversationState = container.resolve(ConversationState);
   const callState = container.resolve(CallState);
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
-  const {classifiedDomains} = useKoSubscribableChildren(teamState, [
-    'classifiedDomains',
-    'isFileSharingSendingEnabled',
-  ]);
+  const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
 
   const {is1to1, isRequest, isReadOnlyConversation, isSelfUserRemoved} = useKoSubscribableChildren(
     activeConversation!,
@@ -465,7 +461,7 @@ export const Conversation = ({
 
   return (
     <DropFileArea
-      onFileDropped={checkFileSharingPermission(uploadDroppedFiles)}
+      onFileDropped={uploadDroppedFiles}
       id="conversation"
       className={cx('conversation', {[incomingCssClass]: isConversationLoaded, loading: !isConversationLoaded})}
       ref={removeAnimationsClass}

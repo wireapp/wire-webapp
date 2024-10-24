@@ -121,15 +121,13 @@ export const MessageWrapper: React.FC<MessageParams> = ({
   const contextMenuEntries = ko.pureComputed(() => {
     const entries: ContextMenuEntry[] = [];
 
-    const isRestrictedFileShare = !teamState.isFileSharingReceivingEnabled();
-
     const canDelete = message.user().isMe && !conversation.isSelfUserRemoved() && message.isDeletable();
 
     const canEdit = message.isEditable() && !conversation.isSelfUserRemoved();
 
     const hasDetails = !conversation.is1to1() && !message.isEphemeral() && !conversation.isSelfUserRemoved();
 
-    if (message.isDownloadable() && !isRestrictedFileShare) {
+    if (message.isDownloadable()) {
       entries.push({
         click: () => message.download(container.resolve(AssetRepository)),
         label: t('conversationContextMenuDownload'),
@@ -143,7 +141,7 @@ export const MessageWrapper: React.FC<MessageParams> = ({
       });
     }
 
-    if (message.isCopyable() && !isRestrictedFileShare) {
+    if (message.isCopyable()) {
       entries.push({
         click: () => message.copy(),
         label: t('conversationContextMenuCopy'),

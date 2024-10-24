@@ -40,8 +40,6 @@ export class TeamState {
   public readonly teamFeatures: ko.Observable<FeatureList | undefined>;
   public readonly classifiedDomains: ko.PureComputed<string[] | undefined>;
   public readonly isConferenceCallingEnabled: ko.PureComputed<boolean>;
-  public readonly isFileSharingSendingEnabled: ko.PureComputed<boolean>;
-  public readonly isFileSharingReceivingEnabled: ko.PureComputed<boolean>;
   public readonly isVideoCallingEnabled: ko.PureComputed<boolean>;
   public readonly isMLSEnabled: ko.PureComputed<boolean>;
   public readonly isProtocolToggleEnabledForUser: ko.PureComputed<boolean>;
@@ -79,15 +77,6 @@ export class TeamState {
     });
 
     this.supportsLegalHold = ko.observable(false);
-
-    this.isFileSharingSendingEnabled = ko.pureComputed(() => {
-      const status = this.teamFeatures()?.fileSharing?.status;
-      return status ? status === FeatureStatus.ENABLED : true;
-    });
-    this.isFileSharingReceivingEnabled = ko.pureComputed(() => {
-      const status = this.teamFeatures()?.fileSharing?.status;
-      return status ? status === FeatureStatus.ENABLED : true;
-    });
 
     this.classifiedDomains = ko.pureComputed(() => {
       return this.teamFeatures()?.classifiedDomains?.status === FeatureStatus.ENABLED

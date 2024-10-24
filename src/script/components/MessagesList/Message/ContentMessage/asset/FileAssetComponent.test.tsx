@@ -18,7 +18,6 @@
  */
 
 import {render} from '@testing-library/react';
-import ko from 'knockout';
 
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {FileAsset} from 'src/script/entity/message/FileAsset';
@@ -40,9 +39,7 @@ describe('FileAssetComponent', () => {
     return message;
   }
 
-  const teamState = {
-    isFileSharingReceivingEnabled: ko.pureComputed(() => true),
-  } as TeamState;
+  const teamState = {} as TeamState;
 
   it('renders file uploads', () => {
     const props = {

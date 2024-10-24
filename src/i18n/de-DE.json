@@ -522,8 +522,6 @@
   "conversationMemberWereRemoved": "{{users}} wurden aus der Unterhaltung entfernt",
   "conversationMessageDelivered": "Zugestellt",
   "conversationMissedMessages": "Sie haben dieses Gerät eine Zeit lang nicht benutzt. Einige Nachrichten werden hier möglicherweise nicht angezeigt.",
-  "conversationModalRestrictedFileSharingDescription": "Diese Datei konnte aufgrund von Einschränkungen bei der Dateifreigabe nicht geteilt werden.",
-  "conversationModalRestrictedFileSharingHeadline": "Einschränkungen beim Teilen von Dateien",
   "conversationMultipleMembersRemovedMissingLegalHoldConsent": "{{users}} wurden aus dieser Unterhaltung entfernt, da die gesetzliche Aufbewahrung aktiviert wurde. [link]Mehr erfahren[/link]",
   "conversationMultipleMembersRemovedMissingLegalHoldConsentMore": "{{users}} und {{count}} weitere wurden aus dieser Unterhaltung entfernt, da die gesetzliche Aufbewahrung aktiviert wurde. [link]Mehr erfahren[/link]",
   "conversationNewConversation": "Kommunikation in Wire ist immer Ende-zu-Ende verschlüsselt. Alles, was Sie in dieser Unterhaltung senden und empfangen, ist nur für Sie und Ihren Kontakt zugänglich.",

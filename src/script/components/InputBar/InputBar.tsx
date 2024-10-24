@@ -28,7 +28,6 @@ import {useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import {checkFileSharingPermission} from 'Components/Conversation/utils/checkFileSharingPermission';
 import {ConversationClassifiedBar} from 'Components/input/ClassifiedBar';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
@@ -115,10 +114,10 @@ export const InputBar = ({
   uploadImages,
   uploadFiles,
 }: InputBarProps) => {
-  const {classifiedDomains, isSelfDeletingMessagesEnabled, isFileSharingSendingEnabled} = useKoSubscribableChildren(
-    teamState,
-    ['classifiedDomains', 'isSelfDeletingMessagesEnabled', 'isFileSharingSendingEnabled'],
-  );
+  const {classifiedDomains, isSelfDeletingMessagesEnabled} = useKoSubscribableChildren(teamState, [
+    'classifiedDomains',
+    'isSelfDeletingMessagesEnabled',
+  ]);
   const {connection, localMessageTimer, messageTimer, hasGlobalMessageTimer, isSelfUserRemoved, is1to1} =
     useKoSubscribableChildren(conversation, [
       'connection',
@@ -508,7 +507,7 @@ export const InputBar = ({
     return () => undefined;
   }, [cancelMessageEditing, cancelMessageReply, isEditing]);
 
-  useFilePaste(checkFileSharingPermission(handlePasteFiles));
+  useFilePaste(handlePasteFiles);
 
   const sendImageOnEnterClick = (event: KeyboardEvent) => {
     if (event.key === KEY.ENTER && !event.shiftKey && !event.altKey && !event.metaKey) {
@@ -530,7 +529,7 @@ export const InputBar = ({
 
   const controlButtonsProps = {
     conversation: conversation,
-    disableFilesharing: !isFileSharingSendingEnabled,
+    disableFilesharing: false,
     disablePing: pingDisabled,
     input: textValue,
     isEditing: isEditing,

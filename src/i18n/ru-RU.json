@@ -522,8 +522,6 @@
   "conversationMemberWereRemoved": "{{users}} были удалены из беседы",
   "conversationMessageDelivered": "Доставлено",
   "conversationMissedMessages": "Вы не использовали это устройство продолжительное время. Некоторые сообщения могут не отображаться.",
-  "conversationModalRestrictedFileSharingDescription": "Этим файлом нельзя поделиться из-за ограничений на совместное использование файлов.",
-  "conversationModalRestrictedFileSharingHeadline": "Ограничения на обмен файлами",
   "conversationMultipleMembersRemovedMissingLegalHoldConsent": "{{users}} были удалены из этой беседы, поскольку были активированы юридические ограничения. [link]Подробнее[/link]",
   "conversationMultipleMembersRemovedMissingLegalHoldConsentMore": "{{users}} и еще {{count}} были удалены из этой беседы, поскольку были активированы юридические ограничения. [link]Подробнее[/link]",
   "conversationNewConversation": "Общение в Wire всегда защищено сквозным шифрованием. Отправляемые и получаемые сообщения доступны только вам и вашему собеседнику.",

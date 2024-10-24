@@ -522,8 +522,6 @@
   "conversationMemberWereRemoved": "{{users}} සංවාදයෙන් ඉවත් කර ඇත",
   "conversationMessageDelivered": "බාර දුනි",
   "conversationMissedMessages": "ඔබ යම් කාලයක් මෙම උපාංගය භාවිතා කර නැත. ඇතැම් පණිවිඩ මෙහි නොපෙන්වයි.",
-  "conversationModalRestrictedFileSharingDescription": "ඔබගේ ගොනු බෙදාගැනීමේ සීමා හේතුවෙන් මෙම ගොනුව බෙදා ගැනීමට නොහැකි විය.",
-  "conversationModalRestrictedFileSharingHeadline": "ගොනු බෙදාගැනීමේ සීමා",
   "conversationMultipleMembersRemovedMissingLegalHoldConsent": "නෛතික රැඳවුම ක්‍රියාත්මක වූ හෙයින් {{users}} මෙම සංවාදයෙන් ඉවත් කෙරිණි. [link]තව දැනගන්න[/link]",
   "conversationMultipleMembersRemovedMissingLegalHoldConsentMore": "නෛතික රැඳවුම ක්‍රියාත්මක වූ හෙයින් {{users}} හා තවත් {{count}} දෙනෙක් මෙම සංවාදයෙන් ඉවත් කෙරිණි. [link]තව දැනගන්න[/link]",
   "conversationNewConversation": "වයර් සන්නිවේදනය සෑම විටම අන්ත සංකේතිතයි. මෙම සංවාදයේ ඔබ යවන සහ ලැබෙන සෑම දෙයක්ම ඔබට සහ ඔබගේ සබඳතාවට පමණක් ප්‍රවේශ වීමට හැකිය.",

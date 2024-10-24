@@ -522,8 +522,6 @@
   "conversationMemberWereRemoved": "{{users}} were removed from the conversation",
   "conversationMessageDelivered": "Delivered",
   "conversationMissedMessages": "आपने कुछ समय के लिए इस यंत्र का उपयोग नहीं किया है| कुछ संदेश शायद यहां दिखाई नहीं दे|",
-  "conversationModalRestrictedFileSharingDescription": "This file could not be shared due to your file sharing restrictions.",
-  "conversationModalRestrictedFileSharingHeadline": "File sharing restrictions",
   "conversationMultipleMembersRemovedMissingLegalHoldConsent": "{{users}} were removed from this conversation because legal hold has been activated. [link]Learn more[/link]",
   "conversationMultipleMembersRemovedMissingLegalHoldConsentMore": "{{users}} and {{count}} more were removed from this conversation because legal hold has been activated. [link]Learn more[/link]",
   "conversationNewConversation": "Communication in Wire is always end-to-end encrypted. Everything you send and receive in this conversation is only accessible to you and your contact.",

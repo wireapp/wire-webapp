@@ -20,9 +20,7 @@
 import React from 'react';
 
 import cx from 'classnames';
-import {container} from 'tsyringe';
 
-import {RestrictedFile} from 'Components/asset/RestrictedFile';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -45,18 +43,12 @@ export interface FileAssetProps {
   isFocusable?: boolean;
 }
 
-const FileAsset: React.FC<FileAssetProps> = ({
-  message,
-  hasHeader = false,
-  teamState = container.resolve(TeamState),
-  isFocusable = true,
-}) => {
+const FileAsset: React.FC<FileAssetProps> = ({message, hasHeader = false, isFocusable = true}) => {
   const asset = message.getFirstAsset() as FileAssetType;
 
   const {transferState, downloadAsset, uploadProgress, cancelUpload} = useAssetTransfer(message);
   const {isObfuscated} = useKoSubscribableChildren(message, ['isObfuscated']);
   const {downloadProgress} = useKoSubscribableChildren(asset, ['downloadProgress']);
-  const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isFocusable);
 
   const fileName = trimFileExtension(asset.file_name);
@@ -91,71 +83,67 @@ const FileAsset: React.FC<FileAssetProps> = ({
     <div className="file-asset" data-uie-name="file-asset" data-uie-value={asset.file_name}>
       {hasHeader && <AssetHeader message={message} />}
 
-      {isFileSharingReceivingEnabled ? (
-        <div
-          className={cx('file', {
-            'cursor-pointer': isUploaded,
-          })}
-          data-uie-name="file"
-          data-uie-value={asset.file_name}
-          role="button"
-          tabIndex={messageFocusedTabIndex}
-          aria-label={`${t('conversationContextMenuDownload')} ${fileName}.${fileExtension}`}
-          onClick={onDownloadAsset}
-          onKeyDown={event => handleKeyDown(event, onDownloadAsset)}
-        >
-          {isPendingUpload ? (
-            <div className="asset-placeholder loading-dots" />
-          ) : (
-            <>
-              {isUploaded && (
-                <div className="file__icon icon-file" data-uie-name="file-icon">
-                  <span className="file__icon__ext icon-view" />
-                </div>
-              )}
-
-              {isDownloading && (
-                <AssetLoader loadProgress={downloadProgress || 0} onCancel={() => asset.cancelDownload()} />
-              )}
-
-              {isUploading && <AssetLoader loadProgress={uploadProgress || 0} onCancel={() => cancelUpload()} />}
-
-              {(isFailedUpload || isFailedDownloadingDecrypt || isFailedDownloadingHash) && (
-                <div className="media-button media-button-error" />
-              )}
-
-              <div className="file__desc">
-                <p className="label-bold-xs ellipsis" data-uie-name="file-name">
-                  {fileName}
-                </p>
-                <ul className="file__desc__meta label-xs text-foreground">
-                  <li className="label-nocase-xs" data-uie-name="file-size">
-                    {formattedFileSize}
-                  </li>
-
-                  {fileExtension && <li data-uie-name="file-type">{fileExtension}</li>}
-
-                  {isUploading && <li data-uie-name="file-status">{t('conversationAssetUploading')}</li>}
-
-                  {isFailedUpload && <li data-uie-name="file-status">{t('conversationAssetUploadFailed')}</li>}
-
-                  {isDownloading && <li data-uie-name="file-status">{t('conversationAssetDownloading')}</li>}
-
-                  {isFailedDownloadingDecrypt && (
-                    <li data-uie-name="file-status">{t('conversationAssetFailedDecryptDownloading')}</li>
-                  )}
-
-                  {isFailedDownloadingHash && (
-                    <li data-uie-name="file-status">{t('conversationAssetFailedHashDownloading')}</li>
-                  )}
-                </ul>
+      <div
+        className={cx('file', {
+          'cursor-pointer': isUploaded,
+        })}
+        data-uie-name="file"
+        data-uie-value={asset.file_name}
+        role="button"
+        tabIndex={messageFocusedTabIndex}
+        aria-label={`${t('conversationContextMenuDownload')} ${fileName}.${fileExtension}`}
+        onClick={onDownloadAsset}
+        onKeyDown={event => handleKeyDown(event, onDownloadAsset)}
+      >
+        {isPendingUpload ? (
+          <div className="asset-placeholder loading-dots" />
+        ) : (
+          <>
+            {isUploaded && (
+              <div className="file__icon icon-file" data-uie-name="file-icon">
+                <span className="file__icon__ext icon-view" />
               </div>
-            </>
-          )}
-        </div>
-      ) : (
-        <RestrictedFile asset={asset} />
-      )}
+            )}
+
+            {isDownloading && (
+              <AssetLoader loadProgress={downloadProgress || 0} onCancel={() => asset.cancelDownload()} />
+            )}
+
+            {isUploading && <AssetLoader loadProgress={uploadProgress || 0} onCancel={() => cancelUpload()} />}
+
+            {(isFailedUpload || isFailedDownloadingDecrypt || isFailedDownloadingHash) && (
+              <div className="media-button media-button-error" />
+            )}
+
+            <div className="file__desc">
+              <p className="label-bold-xs ellipsis" data-uie-name="file-name">
+                {fileName}
+              </p>
+              <ul className="file__desc__meta label-xs text-foreground">
+                <li className="label-nocase-xs" data-uie-name="file-size">
+                  {formattedFileSize}
+                </li>
+
+                {fileExtension && <li data-uie-name="file-type">{fileExtension}</li>}
+
+                {isUploading && <li data-uie-name="file-status">{t('conversationAssetUploading')}</li>}
+
+                {isFailedUpload && <li data-uie-name="file-status">{t('conversationAssetUploadFailed')}</li>}
+
+                {isDownloading && <li data-uie-name="file-status">{t('conversationAssetDownloading')}</li>}
+
+                {isFailedDownloadingDecrypt && (
+                  <li data-uie-name="file-status">{t('conversationAssetFailedDecryptDownloading')}</li>
+                )}
+
+                {isFailedDownloadingHash && (
+                  <li data-uie-name="file-status">{t('conversationAssetFailedHashDownloading')}</li>
+                )}
+              </ul>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 };

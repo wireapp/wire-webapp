@@ -20,9 +20,7 @@
 import React, {useEffect, useState} from 'react';
 
 import cx from 'classnames';
-import {container} from 'tsyringe';
 
-import {RestrictedAudio} from 'Components/asset/RestrictedAudio';
 import * as Icon from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getLogger} from 'Util/Logger';
@@ -38,7 +36,6 @@ import {AssetUrl, useAssetTransfer} from './useAssetTransfer';
 import {AssetTransferState} from '../../../../../assets/AssetTransferState';
 import type {ContentMessage} from '../../../../../entity/message/ContentMessage';
 import type {FileAsset} from '../../../../../entity/message/FileAsset';
-import {TeamState} from '../../../../../team/TeamState';
 
 const logger = getLogger('AudioAssetComponent');
 
@@ -47,20 +44,12 @@ export interface AudioAssetProps {
   /* Does the asset have a visible header? */
   hasHeader?: boolean;
   message: ContentMessage;
-  teamState?: TeamState;
   isFocusable?: boolean;
 }
 
-export const AudioAsset: React.FC<AudioAssetProps> = ({
-  message,
-  className,
-  hasHeader = false,
-  teamState = container.resolve(TeamState),
-  isFocusable = true,
-}) => {
+export const AudioAsset: React.FC<AudioAssetProps> = ({message, className, hasHeader = false, isFocusable = true}) => {
   const asset = message.getFirstAsset() as FileAsset;
   const [audioElement, setAudioElement] = useEffectRef<HTMLMediaElement>();
-  const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
   const {isObfuscated} = useKoSubscribableChildren(message, ['isObfuscated']);
   const {transferState, uploadProgress, cancelUpload, getAssetUrl} = useAssetTransfer(message);
   const [audioTime, setAudioTime] = useState<number>(asset?.meta?.duration || 0);
@@ -107,46 +96,38 @@ export const AudioAsset: React.FC<AudioAssetProps> = ({
               <AssetHeader message={message} />
             </div>
           )}
-          {isFileSharingReceivingEnabled ? (
-            <>
-              {transferState === AssetTransferState.UPLOAD_PENDING && (
-                <div className="asset-placeholder loading-dots" />
-              )}
-              {transferState !== AssetTransferState.UPLOAD_PENDING && (
-                <div className="audio-controls">
-                  <MediaButton
-                    mediaElement={audioElement}
-                    asset={asset}
-                    play={onPlayButtonClicked}
-                    pause={onPauseButtonClicked}
-                    cancel={cancelUpload}
-                    transferState={transferState}
-                    uploadProgress={uploadProgress}
-                    isFocusable={isFocusable}
-                  />
+          {transferState === AssetTransferState.UPLOAD_PENDING && <div className="asset-placeholder loading-dots" />}
+          {transferState !== AssetTransferState.UPLOAD_PENDING && (
+            <div className="audio-controls">
+              <MediaButton
+                mediaElement={audioElement}
+                asset={asset}
+                play={onPlayButtonClicked}
+                pause={onPauseButtonClicked}
+                cancel={cancelUpload}
+                transferState={transferState}
+                uploadProgress={uploadProgress}
+                isFocusable={isFocusable}
+              />
 
-                  {transferState !== AssetTransferState.UPLOADING && audioElement && (
-                    <>
-                      <span className="audio-controls-time label-xs" data-uie-name="status-audio-time">
-                        {formatSeconds(audioTime)}
-                      </span>
-                      {showLoudnessPreview ? (
-                        <AudioSeekBar audioElement={audioElement} asset={asset} disabled={!audioSrc} />
-                      ) : (
-                        <SeekBar
-                          dark
-                          mediaElement={audioElement}
-                          disabled={!audioSrc}
-                          data-uie-name="status-audio-seekbar"
-                        />
-                      )}
-                    </>
+              {transferState !== AssetTransferState.UPLOADING && audioElement && (
+                <>
+                  <span className="audio-controls-time label-xs" data-uie-name="status-audio-time">
+                    {formatSeconds(audioTime)}
+                  </span>
+                  {showLoudnessPreview ? (
+                    <AudioSeekBar audioElement={audioElement} asset={asset} disabled={!audioSrc} />
+                  ) : (
+                    <SeekBar
+                      dark
+                      mediaElement={audioElement}
+                      disabled={!audioSrc}
+                      data-uie-name="status-audio-seekbar"
+                    />
                   )}
-                </div>
+                </>
               )}
-            </>
-          ) : (
-            <RestrictedAudio />
+            </div>
           )}
         </>
       ) : (

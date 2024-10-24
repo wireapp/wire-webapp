@@ -21,11 +21,9 @@ import React, {useCallback, useEffect, useState} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
-import {container} from 'tsyringe';
 
 import {useTimeout} from '@wireapp/react-ui-kit';
 
-import {RestrictedVideo} from 'Components/asset/RestrictedVideo';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatSeconds} from 'Util/TimeUtil';
@@ -39,22 +37,15 @@ import {AssetRepository} from '../../../../../assets/AssetRepository';
 import {AssetTransferState} from '../../../../../assets/AssetTransferState';
 import type {ContentMessage} from '../../../../../entity/message/ContentMessage';
 import type {FileAsset} from '../../../../../entity/message/FileAsset';
-import {TeamState} from '../../../../../team/TeamState';
 
 interface VideoAssetProps {
   assetRepository?: AssetRepository;
   isQuote?: boolean;
   message: ContentMessage;
-  teamState?: TeamState;
   isFocusable?: boolean;
 }
 
-const VideoAsset: React.FC<VideoAssetProps> = ({
-  message,
-  isQuote,
-  teamState = container.resolve(TeamState),
-  isFocusable = true,
-}) => {
+const VideoAsset: React.FC<VideoAssetProps> = ({message, isQuote, isFocusable = true}) => {
   const asset = message.getFirstAsset() as FileAsset;
   const {isObfuscated} = useKoSubscribableChildren(message, ['isObfuscated']);
   const {preview_resource: assetPreviewResource} = useKoSubscribableChildren(asset, ['preview_resource']);
@@ -64,7 +55,6 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
   const [videoSrc, setVideoSrc] = useState<AssetUrl>();
   const [videoElement, setVideoElement] = useEffectRef<HTMLVideoElement>();
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
-  const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
   const [displaySmall, setDisplaySmall] = useState(!!isQuote);
   const {transferState, isUploading, isPendingUpload, uploadProgress, cancelUpload, getAssetUrl} =
     useAssetTransfer(message);
@@ -74,8 +64,8 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
   const {removeTimeout, startTimeout} = useTimeout(hideControlsCallback, 2000);
 
   useEffect(() => {
-    if (assetPreviewResource && isFileSharingReceivingEnabled) {
-      getAssetUrl(assetPreviewResource).then(setVideoPreview);
+    if (assetPreviewResource) {
+      void getAssetUrl(assetPreviewResource).then(setVideoPreview);
     }
     return () => {
       videoPreview?.dispose();
@@ -84,25 +74,24 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
   }, []);
 
   const onPlayButtonClicked = async (): Promise<void> => {
-    if (isFileSharingReceivingEnabled) {
-      setDisplaySmall(false);
+    setDisplaySmall(false);
 
-      if (videoSrc && videoElement) {
-        videoElement.play();
-      } else {
-        asset.status(AssetTransferState.DOWNLOADING);
-
-        try {
-          const url = await getAssetUrl(asset.original_resource());
-          setVideoSrc(url);
-          setIsVideoLoaded(true);
-        } catch (error) {
-          console.error('Failed to load video asset ', error);
-        }
-
-        asset.status(AssetTransferState.UPLOADED);
-      }
+    if (videoSrc && videoElement) {
+      void videoElement.play();
+      return;
     }
+
+    asset.status(AssetTransferState.DOWNLOADING);
+
+    try {
+      const url = await getAssetUrl(asset.original_resource());
+      setVideoSrc(url);
+      setIsVideoLoaded(true);
+    } catch (error) {
+      console.error('Failed to load video asset ', error);
+    }
+
+    asset.status(AssetTransferState.UPLOADED);
   };
 
   const onPauseButtonClicked = (): void => {
@@ -134,85 +123,76 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
 
   return !isObfuscated ? (
     <div className="video-asset" data-uie-name="video-asset" data-uie-value={asset.file_name}>
-      {!isFileSharingReceivingEnabled ? (
-        <RestrictedVideo />
-      ) : (
-        <>
-          <div
-            className={cx('video-asset__container', {'video-asset__container--small': displaySmall})}
-            onPointerLeave={startTimeout}
-            onPointerEnter={() => {
-              removeTimeout();
-              setHideControls(false);
-            }}
-          >
-            <video
-              ref={setVideoElement}
-              playsInline
-              src={videoSrc?.url}
-              poster={videoPreview?.url}
-              onError={event => {
-                setVideoPlaybackError(true);
-                console.error('Video cannot be played', event);
-              }}
-              onPlaying={onVideoPlaying}
-              onTimeUpdate={syncVideoTimeRest}
-              onLoadedMetadata={syncVideoTimeRest}
-              className={cx({hidden: isUploading})}
-              style={{backgroundColor: videoPreview ? '#000' : ''}}
-              tabIndex={TabIndex.UNFOCUSABLE}
-            />
-            {videoPlaybackError ? (
-              <div className="video-asset__playback-error label-xs">{t('conversationPlaybackError')}</div>
+      <div
+        className={cx('video-asset__container', {'video-asset__container--small': displaySmall})}
+        onPointerLeave={startTimeout}
+        onPointerEnter={() => {
+          removeTimeout();
+          setHideControls(false);
+        }}
+      >
+        <video
+          ref={setVideoElement}
+          playsInline
+          src={videoSrc?.url}
+          poster={videoPreview?.url}
+          onError={event => {
+            setVideoPlaybackError(true);
+            console.error('Video cannot be played', event);
+          }}
+          onPlaying={onVideoPlaying}
+          onTimeUpdate={syncVideoTimeRest}
+          onLoadedMetadata={syncVideoTimeRest}
+          className={cx({hidden: isUploading})}
+          style={{backgroundColor: videoPreview ? '#000' : ''}}
+          tabIndex={TabIndex.UNFOCUSABLE}
+        />
+        {videoPlaybackError ? (
+          <div className="video-asset__playback-error label-xs">{t('conversationPlaybackError')}</div>
+        ) : (
+          <>
+            {isPendingUpload ? (
+              <div className="asset-placeholder loading-dots" />
             ) : (
-              <>
-                {isPendingUpload ? (
-                  <div className="asset-placeholder loading-dots" />
-                ) : (
-                  <div
-                    className={cx('video-asset__controls', {
-                      'video-asset__controls--hidden': isVideoLoaded && hideControls,
-                    })}
-                  >
-                    <div className="video-asset__controls-center">
-                      <MediaButton
-                        mediaElement={videoElement}
-                        large={!displaySmall}
-                        asset={asset}
-                        play={onPlayButtonClicked}
-                        pause={onPauseButtonClicked}
-                        cancel={() => (isUploading ? cancelUpload() : asset.cancelDownload())}
-                        transferState={transferState}
-                        uploadProgress={uploadProgress}
-                        isFocusable={isFocusable}
-                      />
-                    </div>
+              <div
+                className={cx('video-asset__controls', {
+                  'video-asset__controls--hidden': isVideoLoaded && hideControls,
+                })}
+              >
+                <div className="video-asset__controls-center">
+                  <MediaButton
+                    mediaElement={videoElement}
+                    large={!displaySmall}
+                    asset={asset}
+                    play={onPlayButtonClicked}
+                    pause={onPauseButtonClicked}
+                    cancel={() => (isUploading ? cancelUpload() : asset.cancelDownload())}
+                    transferState={transferState}
+                    uploadProgress={uploadProgress}
+                    isFocusable={isFocusable}
+                  />
+                </div>
 
-                    {isVideoLoaded && videoElement && (
-                      <div className="video-asset__controls__bottom">
-                        <SeekBar
-                          className="video-asset__controls__bottom__seekbar"
-                          data-uie-name="status-video-seekbar"
-                          mediaElement={videoElement}
-                          isFocusable={isFocusable}
-                        />
-                        <span
-                          className="video-asset__controls__bottom__time label-xs"
-                          data-uie-name="status-video-time"
-                        >
-                          {formatSeconds(videoTimeRest)}
-                        </span>
-                      </div>
-                    )}
+                {isVideoLoaded && videoElement && (
+                  <div className="video-asset__controls__bottom">
+                    <SeekBar
+                      className="video-asset__controls__bottom__seekbar"
+                      data-uie-name="status-video-seekbar"
+                      mediaElement={videoElement}
+                      isFocusable={isFocusable}
+                    />
+                    <span className="video-asset__controls__bottom__time label-xs" data-uie-name="status-video-time">
+                      {formatSeconds(videoTimeRest)}
+                    </span>
                   </div>
                 )}
-              </>
+              </div>
             )}
-          </div>
+          </>
+        )}
+      </div>
 
-          <div className="video-asset__container__sizer"></div>
-        </>
-      )}
+      <div className="video-asset__container__sizer"></div>
     </div>
   ) : null;
 };

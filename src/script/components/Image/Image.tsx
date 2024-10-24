@@ -26,7 +26,6 @@ import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {getImageStyle, getWrapperStyles} from './Image.styles';
-import {RestrictedImage} from './RestrictedImage';
 
 import {AssetRemoteData} from '../../assets/AssetRemoteData';
 import {Config} from '../../Config';
@@ -75,10 +74,8 @@ export const Image = ({
 
   const {getAssetUrl} = useAssetTransfer();
 
-  const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
-
   useEffect(() => {
-    if (!imageUrl && isInViewport && image && isFileSharingReceivingEnabled) {
+    if (!imageUrl && isInViewport && image) {
       void (async () => {
         try {
           const allowedImageTypes = [
@@ -96,7 +93,7 @@ export const Image = ({
         }
       })();
     }
-  }, [imageUrl, isInViewport, image, isFileSharingReceivingEnabled, getAssetUrl]);
+  }, [imageUrl, isInViewport, image, getAssetUrl]);
 
   useEffect(() => {
     return () => {
@@ -104,10 +101,6 @@ export const Image = ({
       imageUrl?.dispose();
     };
   }, [imageUrl]);
-
-  if (!isFileSharingReceivingEnabled) {
-    return <RestrictedImage className={className} showMessage={!isQuote} isSmall={isQuote} />;
-  }
 
   const dummyImageUrl = `data:image/svg+xml;utf8,<svg aria-hidden="true" xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1' width='${imageSizes?.width}' height='${imageSizes?.height}'></svg>`;
   const assetUrl = imageUrl?.url || dummyImageUrl;
