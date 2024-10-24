@@ -74,6 +74,9 @@ export const iconButtonStyle: <T>(theme: Theme, props: IconButtonProps<T>) => CS
       },
       '&:focus': {
         borderColor: theme.IconButton.focusBorderColor,
+        svg: {
+          fill: theme.IconButton.focusBorderColor,
+        },
       },
       '&:active': {
         backgroundColor: theme.IconButton.activePrimaryBgColor,
