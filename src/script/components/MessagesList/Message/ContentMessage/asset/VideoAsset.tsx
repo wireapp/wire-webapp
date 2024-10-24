@@ -42,7 +42,7 @@ import {AssetUrl, useAssetTransfer} from './useAssetTransfer';
 import {AssetRepository} from '../../../../../assets/AssetRepository';
 import {AssetTransferState} from '../../../../../assets/AssetTransferState';
 import type {ContentMessage} from '../../../../../entity/message/ContentMessage';
-import {FileAsset as FileAssetType} from '../../../../../entity/message/FileAsset';
+import type {FileAsset as FileAssetType} from '../../../../../entity/message/FileAsset';
 import {TeamState} from '../../../../../team/TeamState';
 
 interface VideoAssetProps {
