@@ -89,8 +89,8 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
     };
   }, []);
 
-  // Initial check if video is supported with `canPlayType` method.
-  // It's not 100% reliable, but it's synchorous, which is helpful for initial rendering.
+  // Initial check if video is supported with `canPlayType` method, which checks for MIME type, e.g. 'video/mp4' or 'video/mov'.
+  // It's not 100% reliable (e.g. doesn't check codecs), but it's synchorous, which is helpful for initial rendering.
   const isVideoMimeTypeSupported = (mimeType: string): boolean => {
     const video = document.createElement('video');
     const canPlay = video.canPlayType(mimeType) !== '';
@@ -104,7 +104,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
   };
 
   // Advanced check for video playability.
-  // It's more reliable can `canPlayType`, but it's async, so it's not suitable for initial rendering.
+  // It's more reliable than `canPlayType`, but it's async, so it's not suitable for initial rendering.
   // It's used when user tries to play the video.
   const isVideoPlayable = async (url: string): Promise<boolean> => {
     const video = document.createElement('video');
