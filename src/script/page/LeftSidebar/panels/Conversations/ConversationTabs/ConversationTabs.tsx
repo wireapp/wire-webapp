@@ -239,7 +239,7 @@ export const ConversationTabs = ({
           data-uie-name="go-people"
         >
           <span className="conversations-sidebar-btn--text-wrapper">
-            <SupportIcon />
+            <SupportIcon viewBox="0 0 16 16" />
             <span className="conversations-sidebar-btn--text">{t('preferencesAboutSupport')}</span>
             <ExternalLinkIcon className="external-link-icon" />
           </span>
