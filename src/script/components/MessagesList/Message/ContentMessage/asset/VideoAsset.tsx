@@ -104,7 +104,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
   };
 
   // Advanced check for video playability.
-  // It's more reliable than `canPlayType`, but it's async, so it's not suitable for initial rendering.
+  // It's more reliable than `isVideoMimeTypeSupported` (e.g. checks for codecs), but it's async, so it's not suitable for initial rendering.
   // It's used when user tries to play the video.
   const isVideoPlayable = async (url: string): Promise<boolean> => {
     const video = document.createElement('video');
