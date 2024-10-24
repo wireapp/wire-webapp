@@ -68,14 +68,7 @@ export class Asset {
   }
 
   isVideo(): boolean {
-    const is_video_asset = this.type === AssetType.FILE && this.file_type?.startsWith('video');
-    if (is_video_asset) {
-      const can_play = document.createElement('video').canPlayType(this.file_type);
-      if (can_play !== '') {
-        return true;
-      }
-    }
-    return false;
+    return this.type === AssetType.FILE && !!this.file_type?.startsWith('video');
   }
 
   isAudio(): boolean {
