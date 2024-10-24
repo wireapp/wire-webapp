@@ -40,4 +40,12 @@ export const EventName = {
     SIDEBAR_COLLAPSE: 'ui.sidebar_collapse',
     SIDEBAR_UNCOLLAPSE: 'ui.sidebar_uncollapse',
   },
+  MESSAGES: {
+    VIDEO: {
+      PLAY_SUCCESS: 'messages.video.play_success',
+      PLAY_FAILED: 'messages.video.play_failed',
+      UNSUPPORTED_MIME_TYPE: 'messages.video.unsupported_mime_type',
+      UNPLAYABLE_ERROR: 'messages.video.unplayable_error',
+    },
+  },
 };
