@@ -23,7 +23,7 @@ jobs:
         run: npm install
 
       - name: Run update script
-        run: node bin/update_copyright.js
+        run: node bin/update_copyright_year.js
 
       - name: Set up Git
         run: |
