@@ -1,0 +1,51 @@
+name: Update Copyright Year
+
+on:
+  schedule:
+    # Run at 00:00 UTC on January 1st every year
+    - cron: '0 0 1 1 *'
+  workflow_dispatch: # Allows manual triggering if needed
+
+jobs:
+  update-copyright:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run update script
+        run: node bin/update_copyright.js
+
+      - name: Set up Git
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Checkout base branch
+        run: |
+          git checkout dev
+          git pull origin dev
+          git checkout -b update-copyright-${{ github.run_id }}
+
+      - name: Commit and push changes
+        run: |
+          git add .
+          git commit -m "chore: update copyright year" || echo "No changes to commit"
+          git push origin update-copyright-${{ github.run_id }}
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          branch: update-copyright-${{ github.run_id }}
+          title: 'Update copyright year'
+          body: ''
+          labels: 'automation'
