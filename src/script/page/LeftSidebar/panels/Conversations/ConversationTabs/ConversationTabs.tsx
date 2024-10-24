@@ -17,7 +17,7 @@
  *
  */
 
-import {GroupIcon, InfoIcon, MessageIcon, StarIcon, ExternalLinkIcon, Tooltip} from '@wireapp/react-ui-kit';
+import {GroupIcon, HelpIcon, MessageIcon, StarIcon, ExternalLinkIcon, Tooltip} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
@@ -239,7 +239,7 @@ export const ConversationTabs = ({
           data-uie-name="go-people"
         >
           <span className="conversations-sidebar-btn--text-wrapper">
-            <InfoIcon />
+            <HelpIcon />
             <span className="conversations-sidebar-btn--text">{t('preferencesAboutSupport')}</span>
             <ExternalLinkIcon className="external-link-icon" />
           </span>
