@@ -429,10 +429,6 @@ export class ConversationMapper {
       }
     });
 
-    if (typeof localConversationData.receipt_mode === 'number') {
-      updates.receipt_mode = localConversationData.receipt_mode;
-    }
-
     const mergedConversation: ConversationDatabaseData = {...localConversationData, ...updates};
 
     const isGroup = type === CONVERSATION_TYPE.REGULAR;
