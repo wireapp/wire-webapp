@@ -64,7 +64,7 @@
     "@babel/preset-react": "7.25.7",
     "@babel/preset-typescript": "7.25.7",
     "@emotion/eslint-plugin": "11.11.0",
-    "@faker-js/faker": "9.0.3",
+    "@faker-js/faker": "9.1.0",
     "@formatjs/cli": "6.3.5",
     "@roamhq/wrtc": "0.8.0",
     "@testing-library/dom": "^10.4.0",
