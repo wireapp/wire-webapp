@@ -10725,9 +10725,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"html-webpack-plugin@npm:5.6.2":
-  version: 5.6.2
-  resolution: "html-webpack-plugin@npm:5.6.2"
+"html-webpack-plugin@npm:5.6.3":
+  version: 5.6.3
+  resolution: "html-webpack-plugin@npm:5.6.3"
   dependencies:
     "@types/html-minifier-terser": "npm:^6.0.0"
     html-minifier-terser: "npm:^6.0.2"
@@ -10742,7 +10742,7 @@ __metadata:
       optional: true
     webpack:
       optional: true
-  checksum: 10/ab04cd2ac138a9c2b4b9cbe347704d59ea94c54ee279c9e16aeb5d432813bc44a6b0539acebe3a1eddb87f79dbe1f8e2b365faef2624a88457ffcac4122a85ba
+  checksum: 10/fd2bf1ac04823526c8b609555d027b38b9d61b4ba9f5c8116a37cc6b62d5b86cab1f478616e8c5344fee13663d2566f5c470c66265ecb1e9574dc38d0459889d
   languageName: node
   linkType: hard
 
@@ -18723,7 +18723,7 @@ __metadata:
     fake-indexeddb: "npm:6.0.0"
     generate-changelog: "npm:1.8.0"
     highlight.js: "npm:11.10.0"
-    html-webpack-plugin: "npm:5.6.2"
+    html-webpack-plugin: "npm:5.6.3"
     http-status-codes: "npm:2.3.0"
     husky: "npm:9.1.6"
     i18next-scanner: "npm:4.6.0"
