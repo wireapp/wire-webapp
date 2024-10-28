@@ -305,6 +305,7 @@ export function buildInCallEmojiMessage(payloadBundle: InCallEmojiMessage['conte
   return GenericMessage.create({
     [GenericMessageType.IN_CALL_EMOJI]: reaction,
     messageId: createId(),
+    unknownStrategy: GenericMessage.UnknownStrategy.IGNORE,
   });
 }
 
