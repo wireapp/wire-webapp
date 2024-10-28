@@ -163,6 +163,15 @@ const getConversationActions = ({
         label: t('conversationDetailsActionDelete'),
       },
     },
+    {
+      condition: conversationEntity.isGroup() && conversationEntity.isSelfUserRemoved(),
+      item: {
+        click: async () => actionsViewModel.removeConversation(conversationEntity),
+        Icon: Icon.CloseIcon,
+        identifier: 'do-remove',
+        label: t('conversationDetailsActionRemove'),
+      },
+    },
   ];
 
   return allMenuElements.filter(menuElement => menuElement.condition).map(menuElement => menuElement.item);
