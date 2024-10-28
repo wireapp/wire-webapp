@@ -38,7 +38,7 @@ import {
   iconStyle,
 } from './ConversationTabs.styles';
 import {FolderIcon} from './FolderIcon';
-import {TeamUpgradeBanner} from './TeamUpgradeBanner';
+import {TeamCreationBanner} from './TeamCreation/TeamCreationBanner';
 
 import {Config} from '../../../../../Config';
 import {Conversation} from '../../../../../entity/Conversation';
@@ -193,7 +193,7 @@ export const ConversationTabs = ({
         aria-owns="tab-1 tab-2"
         className="conversations-sidebar-list-footer"
       >
-        {!teamState.isInTeam(selfUser) && <TeamUpgradeBanner />}
+        {!teamState.isInTeam(selfUser) && <TeamCreationBanner />}
 
         {!getWebEnvironment().isProduction && isDataDogEnabled() && (
           <div css={footerDisclaimer}>

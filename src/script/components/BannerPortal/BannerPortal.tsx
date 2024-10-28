@@ -39,8 +39,8 @@ export const BannerPortal = ({
 
   const {activeWindow} = useActiveWindowState.getState();
 
-  const handleClickOutside = (event: any) => {
-    if (bannerRef && !bannerRef.contains(event.target)) {
+  const handleClickOutside = (event: MouseEvent) => {
+    if (bannerRef && !bannerRef.contains(event.target as Node)) {
       onClose();
     }
   };

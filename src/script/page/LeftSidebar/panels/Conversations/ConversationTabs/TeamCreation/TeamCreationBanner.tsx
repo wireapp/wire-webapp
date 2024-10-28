@@ -19,22 +19,32 @@
 
 import {useState} from 'react';
 
-import {CSSObject} from '@emotion/react';
-
 import {Button, ButtonVariant, IconButton} from '@wireapp/react-ui-kit';
 
 import {BannerPortal} from 'Components/BannerPortal/BannerPortal';
 import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
-import {useSidebarStore} from '../useSidebarStore';
+import {
+  iconButtonCss,
+  teamUpgradeBannerButtonCss,
+  teamUpgradeBannerContainerCss,
+  teamUpgradeBannerContentCss,
+  teamUpgradeBannerHeaderCss,
+} from './TeamCreation.styles';
+
+import {useSidebarStore} from '../../useSidebarStore';
 
 const Banner = () => {
   return (
     <div css={teamUpgradeBannerContainerCss}>
       <Icon.InfoIcon />
-      <span css={teamUpgradeBannerHeaderCss}>{t('teamUpgradeBannerHeader')}</span>
-      <div css={teamUpgradeBannerContentCss}>{t('teamUpgradeBannerContent')}</div>
+      <span className="heading-h4" css={teamUpgradeBannerHeaderCss}>
+        {t('teamUpgradeBannerHeader')}
+      </span>
+      <div className="subline" css={teamUpgradeBannerContentCss}>
+        {t('teamUpgradeBannerContent')}
+      </div>
       <Button css={teamUpgradeBannerButtonCss} variant={ButtonVariant.SECONDARY}>
         {t('teamUpgradeBannerButtonText')}
       </Button>
@@ -42,7 +52,7 @@ const Banner = () => {
   );
 };
 
-export const TeamUpgradeBanner = () => {
+export const TeamCreationBanner = () => {
   const [isBannerVisible, setIsBannerVisible] = useState(false);
   const [position, setPosition] = useState<{x?: number; y?: number}>({});
   const {status: sidebarStatus} = useSidebarStore();
@@ -73,40 +83,4 @@ export const TeamUpgradeBanner = () => {
       )}
     </>
   );
-};
-
-const teamUpgradeBannerContainerCss: CSSObject = {
-  border: '1px solid var(--accent-color-500)',
-  padding: '0.5rem',
-  background: 'var(--accent-color-50)',
-  borderRadius: '0.5rem',
-  maxWidth: '13rem',
-  minWidth: '12.5rem',
-};
-
-const teamUpgradeBannerHeaderCss: CSSObject = {
-  fontSize: '.75rem',
-  lineHeight: '.875rem',
-  fontWeight: 'bold',
-  marginLeft: '0.5rem',
-  verticalAlign: 'text-top',
-};
-
-const teamUpgradeBannerContentCss: CSSObject = {
-  fontSize: '.75rem',
-  lineHeight: '.875rem',
-  marginBottom: '0.5rem',
-};
-
-const teamUpgradeBannerButtonCss: CSSObject = {
-  margin: 0,
-  height: '2.1rem',
-  fontSize: '0.875rem',
-  padding: '0.25rem 0.5rem',
-  borderRadius: '12px',
-};
-
-const iconButtonCss: CSSObject = {
-  width: '2rem',
-  marginBottom: '0.5rem',
 };
