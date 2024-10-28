@@ -43,6 +43,7 @@ import {
   LOG_LEVEL,
   QUALITY,
   REASON,
+  RESOLUTION,
   STATE as CALL_STATE,
   VIDEO_STATE,
   VSTREAMS,
@@ -256,6 +257,7 @@ export class CallingRepository {
 
     this.onChooseScreen = (deviceId: string) => {};
 
+    // Request the video streams whenever the mode changes to active speaker
     ko.computed(() => {
       const call = this.callState.joinedCall();
       if (!call) {
@@ -263,8 +265,34 @@ export class CallingRepository {
       }
       const isSpeakersViewActive = this.callState.isSpeakersViewActive();
       if (isSpeakersViewActive) {
-        this.requestVideoStreams(call.conversation.qualifiedId, call.activeSpeakers());
+        const videoQuality = call.activeSpeakers().length > 3 ? RESOLUTION.LOW : RESOLUTION.HIGH;
+        this.requestVideoStreams(call.conversation.qualifiedId, call.activeSpeakers(), videoQuality);
       }
+    });
+
+    // Request the video streams whenever toggle display maximised Participant.
+    ko.computed(() => {
+      const call = this.callState.joinedCall();
+      if (!call) {
+        return;
+      }
+      const maximizedParticipant = call.maximizedParticipant();
+      if (maximizedParticipant !== null) {
+        this.requestVideoStreams(call.conversation.qualifiedId, [maximizedParticipant], RESOLUTION.HIGH);
+      }
+      // else {
+      //   this.requestCurrentPageVideoStreams(call);
+      // }
+    });
+
+    // Request the video streams whenever toggle the view mode.
+    ko.computed(() => {
+      const call = this.callState.joinedCall();
+      if (!call) {
+        return;
+      }
+      this.callState.viewMode();
+      this.requestCurrentPageVideoStreams(call);
     });
   }
 
@@ -1282,24 +1310,35 @@ export class CallingRepository {
     this.wCall?.reject(this.wUser, this.serializeQualifiedId(conversationId));
   }
 
+  /**
+   * This methode spams request video stream messages. I assumed this was to ensure that when a client mutes or
+   * unmutes its video it is displayed correctly.
+   * @param call
+   * @param newPage
+   */
   changeCallPage(call: Call, newPage: number): void {
     call.currentPage(newPage);
-    if (!this.callState.isSpeakersViewActive()) {
+    if (!this.callState.isSpeakersViewActive() && !this.callState.isMaximisedViewActive()) {
       this.requestCurrentPageVideoStreams(call);
     }
   }
 
   requestCurrentPageVideoStreams(call: Call): void {
     const currentPageParticipants = call.pages()[call.currentPage()];
-    this.requestVideoStreams(call.conversation.qualifiedId, currentPageParticipants);
+    let videoQuality: RESOLUTION = RESOLUTION.LOW;
+    if (this.callState.viewMode() !== CallingViewMode.MINIMIZED && currentPageParticipants.length > 3) {
+      videoQuality = RESOLUTION.HIGH;
+    }
+    this.requestVideoStreams(call.conversation.qualifiedId, currentPageParticipants, videoQuality);
   }
 
-  requestVideoStreams(conversationId: QualifiedId, participants: Participant[]) {
+  requestVideoStreams(conversationId: QualifiedId, participants: Participant[], videoQuality: RESOLUTION) {
     const convId = this.serializeQualifiedId(conversationId);
     const payload = {
       clients: participants.map(participant => ({
         clientid: participant.clientId,
         userid: this.serializeQualifiedId(participant.user.qualifiedId),
+        quality: videoQuality,
       })),
       convid: convId,
     };
