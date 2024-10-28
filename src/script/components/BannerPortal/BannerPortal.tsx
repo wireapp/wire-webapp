@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode, useEffect, useState} from 'react';
+import {ReactNode, useEffect, useRef} from 'react';
 
 import {CSSObject} from '@emotion/react';
 import {createPortal} from 'react-dom';
@@ -35,28 +35,35 @@ export const BannerPortal = ({
   positionY?: number;
   children: ReactNode;
 }) => {
-  const [bannerRef, setBannerRef] = useState<HTMLDivElement | null>();
+  const bannerRef = useRef<HTMLDivElement | null>(null);
 
   const {activeWindow} = useActiveWindowState.getState();
 
-  const handleClickOutside = (event: MouseEvent) => {
-    if (bannerRef && !bannerRef.contains(event.target as Node)) {
-      onClose();
-    }
-  };
-
   useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (bannerRef.current && !bannerRef.current.contains(event.target as Node)) {
+        onClose();
+      }
+    };
+
     activeWindow.document.addEventListener('mousedown', handleClickOutside);
     return () => {
       activeWindow.document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [handleClickOutside]);
+  }, [activeWindow.document, onClose]);
 
-  const top = positionY - (bannerRef?.clientHeight || 0);
-  const left = positionX;
+  const updateRef = (element: HTMLDivElement) => {
+    bannerRef.current = element;
+
+    if (!element) {
+      return;
+    }
+
+    element.style.top = `${positionY - element.clientHeight}px`;
+  };
 
   return createPortal(
-    <div ref={setBannerRef} css={{...portalContainerCss, top, left}}>
+    <div ref={updateRef} css={{...portalContainerCss, left: positionX}}>
       {children}
     </div>,
     activeWindow.document.body,
