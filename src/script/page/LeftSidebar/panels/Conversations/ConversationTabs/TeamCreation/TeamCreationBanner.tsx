@@ -57,7 +57,7 @@ const PADDING_Y = 34;
 
 export const TeamCreationBanner = () => {
   const [isBannerVisible, setIsBannerVisible] = useState(false);
-  const [position, setPosition] = useState<{x?: number; y?: number}>({});
+  const [position, setPosition] = useState<{x: number; y: number}>({x: 0, y: 0});
   const {status: sidebarStatus} = useSidebarStore();
   const clickHandler = (event: React.MouseEvent<HTMLButtonElement>) => {
     setIsBannerVisible(true);
@@ -77,8 +77,8 @@ export const TeamCreationBanner = () => {
       {isBannerVisible && (
         <BannerPortal
           // Position + padding
-          positionX={(position.x || 0) + PADDING_X}
-          positionY={(position.y || 0) + PADDING_Y}
+          positionX={position.x + PADDING_X}
+          positionY={position.y + PADDING_Y}
           onClose={() => setIsBannerVisible(false)}
         >
           <Banner />
