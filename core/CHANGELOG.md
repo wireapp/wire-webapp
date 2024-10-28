@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [46.5.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.4.3...@wireapp/core@46.5.0) (2024-10-28)
+
+### Features
+
+* Add unknown strategy to in call reactions message (WPB-11750) ([#6634](https://github.com/wireapp/wire-web-packages/issues/6634)) ([ec937fb](https://github.com/wireapp/wire-web-packages/commit/ec937fb98095b53428244189cb315a6e52d740b4))
+
 ## [46.4.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.4.2...@wireapp/core@46.4.3) (2024-10-21)
 
 **Note:** Version bump only for package @wireapp/core
