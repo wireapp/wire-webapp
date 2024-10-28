@@ -19,22 +19,20 @@
 
 import {ReactNode, useEffect, useRef} from 'react';
 
-import {CSSObject} from '@emotion/react';
 import {createPortal} from 'react-dom';
 
 import {useActiveWindowState} from 'src/script/hooks/useActiveWindow';
 
-export const BannerPortal = ({
-  onClose,
-  positionX = 0,
-  positionY = 0,
-  children,
-}: {
+import {portalContainerCss} from './BannerPortal.styles';
+
+interface Props {
   onClose: () => void;
   positionX?: number;
   positionY?: number;
   children: ReactNode;
-}) => {
+}
+
+export const BannerPortal = ({onClose, positionX = 0, positionY = 0, children}: Props) => {
   const bannerRef = useRef<HTMLDivElement | null>(null);
 
   const {activeWindow} = useActiveWindowState.getState();
@@ -68,11 +66,4 @@ export const BannerPortal = ({
     </div>,
     activeWindow.document.body,
   );
-};
-
-const portalContainerCss: CSSObject = {
-  zIndex: 1000,
-  position: 'fixed',
-  boxShadow: '0px 0px 12px 0px var(--background-fade-32)',
-  borderRadius: '0.5rem',
 };
