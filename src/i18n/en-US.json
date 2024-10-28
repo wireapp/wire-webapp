@@ -1586,5 +1586,8 @@
   "wireLinux": "{{brandName}} for Linux",
   "wireMacos": "{{brandName}} for macOS",
   "wireWindows": "{{brandName}} for Windows",
-  "wire_for_web": "{{brandName}} for Web"
+  "wire_for_web": "{{brandName}} for Web",
+  "teamUpgradeBannerHeader": "Enjoy benefits of a team",
+  "teamUpgradeBannerContent": "Explore extra features for free with the same level of security.",
+  "teamUpgradeBannerButtonText": "Create Wire Team"
 }
