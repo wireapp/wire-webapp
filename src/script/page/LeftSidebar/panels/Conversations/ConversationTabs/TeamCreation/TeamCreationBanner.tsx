@@ -33,7 +33,7 @@ import {
   teamUpgradeBannerHeaderCss,
 } from './TeamCreation.styles';
 
-import {useSidebarStore} from '../../useSidebarStore';
+import {SidebarStatus, useSidebarStore} from '../../useSidebarStore';
 
 const Banner = () => {
   return (
@@ -52,6 +52,9 @@ const Banner = () => {
   );
 };
 
+const PADDING_X = 40;
+const PADDING_Y = 34;
+
 export const TeamCreationBanner = () => {
   const [isBannerVisible, setIsBannerVisible] = useState(false);
   const [position, setPosition] = useState<{x?: number; y?: number}>({});
@@ -62,7 +65,7 @@ export const TeamCreationBanner = () => {
     setPosition({x: rect.x, y: rect.y});
   };
 
-  if (sidebarStatus === 'OPEN') {
+  if (sidebarStatus === SidebarStatus.OPEN) {
     return <Banner />;
   }
 
@@ -74,8 +77,8 @@ export const TeamCreationBanner = () => {
       {isBannerVisible && (
         <BannerPortal
           // Position + padding
-          positionX={(position.x || 0) + 40}
-          positionY={(position.y || 0) + 34}
+          positionX={(position.x || 0) + PADDING_X}
+          positionY={(position.y || 0) + PADDING_Y}
           onClose={() => setIsBannerVisible(false)}
         >
           <Banner />
