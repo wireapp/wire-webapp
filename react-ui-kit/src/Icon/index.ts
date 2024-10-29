@@ -68,6 +68,8 @@ export * from './PingIcon';
 export * from './PlaneIcon';
 export * from './PlusIcon';
 export * from './ProfileIcon';
+export * from './RaiseHandIcon';
+export * from './RaiseHandOffIcon';
 export * from './RecordIcon';
 export * from './RecordBoldIcon';
 export * from './RecordPendingIcon';
