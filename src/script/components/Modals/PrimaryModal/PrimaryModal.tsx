@@ -266,7 +266,7 @@ export const PrimaryModalComponent: FC = () => {
       isShown={isModalVisible}
       onClose={onModalHidden}
       onBgClick={onBgClick}
-      modalUie={modalUie}
+      dataUieName={modalUie}
     >
       <PrimaryModalHeader
         titleText={titleText}

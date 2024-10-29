@@ -25,12 +25,19 @@ interface PrimaryModalShellProps {
   title: string;
   isShown: boolean;
   children: ReactNode;
-  modalUie: string;
+  dataUieName: string;
   onClose: () => void;
   onBgClick: () => void;
 }
 
-export const PrimaryModalShell = ({isShown, title, modalUie, children, onClose, onBgClick}: PrimaryModalShellProps) => {
+export const PrimaryModalShell = ({
+  isShown,
+  title,
+  dataUieName,
+  children,
+  onClose,
+  onBgClick,
+}: PrimaryModalShellProps) => {
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -49,7 +56,7 @@ export const PrimaryModalShell = ({isShown, title, modalUie, children, onClose, 
       tabIndex={-1}
       ref={modalRef}
     >
-      <ModalComponent isShown={isShown} onClosed={onClose} onBgClick={onBgClick} data-uie-name={modalUie}>
+      <ModalComponent isShown={isShown} onClosed={onClose} onBgClick={onBgClick} data-uie-name={dataUieName}>
         {isShown && children}
       </ModalComponent>
     </div>
