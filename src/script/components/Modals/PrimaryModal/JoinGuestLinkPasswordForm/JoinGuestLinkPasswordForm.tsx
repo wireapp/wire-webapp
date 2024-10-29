@@ -17,6 +17,8 @@
  *
  */
 
+import type {FormEvent} from 'react';
+
 import {COLOR, Form, Link, Text} from '@wireapp/react-ui-kit';
 
 import {Config} from 'src/script/Config';
@@ -25,7 +27,7 @@ import {t} from 'Util/LocalizerUtil';
 import {label, input, link, linkText} from './JoinGuestLinkPasswordForm.styles';
 
 interface JoinGuestLinkPasswordFormProps {
-  onSubmit: () => void;
+  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   inputValue: string;
   onInputChange: (value: string) => void;
 }

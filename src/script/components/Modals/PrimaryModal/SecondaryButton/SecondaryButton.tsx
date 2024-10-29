@@ -17,12 +17,12 @@
  *
  */
 
-import type {ReactNode} from 'react';
+import type {ReactNode, MouseEvent} from 'react';
 
 import cx from 'classnames';
 
 interface SecondaryButtonProps {
-  onClick: () => void;
+  onClick: (event: MouseEvent<HTMLButtonElement>) => void;
   disabled?: boolean;
   children: ReactNode;
   fullWidth: boolean;

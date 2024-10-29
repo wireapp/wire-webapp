@@ -17,8 +17,10 @@
  *
  */
 
+import type {FormEvent} from 'react';
+
 interface PasswordFormProps {
-  onSubmit: () => void;
+  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   inputPlaceholder: string;
   inputValue: string;
   onInputChange: (value: string) => void;

@@ -145,7 +145,7 @@ export const PrimaryModalComponent: FC = () => {
     return !inputActionEnabled && !actionEnabled;
   };
 
-  const doAction =
+  const performAction =
     (action?: Function, closeAfter = true, skipValidation = false) =>
     (event: FormEvent<HTMLFormElement> | MouseEvent<HTMLButtonElement>) => {
       event.preventDefault();
@@ -203,13 +203,6 @@ export const PrimaryModalComponent: FC = () => {
 
   const secondaryActions = Array.isArray(secondaryAction) ? secondaryAction : [secondaryAction];
 
-  const closeAction = () => {
-    if (hasPasswordWithRules) {
-      const [closeAction] = secondaryActions;
-      closeAction?.action?.();
-    }
-  };
-
   useEffect(() => {
     const onKeyPress = (event: KeyboardEvent) => {
       if (isEscapeKey(event) && isModalVisible) {
@@ -227,12 +220,19 @@ export const PrimaryModalComponent: FC = () => {
     return () => document.removeEventListener('keypress', onKeyPress);
   }, [primaryAction, isModalVisible]);
 
+  const closeAction = () => {
+    if (hasPasswordWithRules) {
+      const [closeAction] = secondaryActions;
+      closeAction?.action?.();
+    }
+  };
+
   const secondaryButtons = secondaryActions
     .filter((action): action is ButtonAction => action !== null && !!action.text)
     .map(action => (
       <SecondaryButton
         key={`${action.text}-${action.uieName}`}
-        onClick={() => doAction(action.action, !!closeOnSecondaryAction, true)}
+        onClick={performAction(action.action, !!closeOnSecondaryAction, true)}
         disabled={action.disabled}
         fullWidth={hasMultipleSecondary || allButtonsFullWidth}
         uieName={action.uieName}
@@ -245,7 +245,7 @@ export const PrimaryModalComponent: FC = () => {
     <PrimaryButton
       key={`modal-primary-button`}
       ref={primaryActionButtonRef}
-      onClick={() => doAction(confirm, !!closeOnConfirm)}
+      onClick={performAction(confirm, !!closeOnConfirm)}
       disabled={isPrimaryActionDisabled(primaryAction.disabled)}
       fullWidth={hasMultipleSecondary || allButtonsFullWidth}
     >
@@ -279,7 +279,7 @@ export const PrimaryModalComponent: FC = () => {
 
         {isGuestLinkPassword && (
           <GuestLinkPasswordForm
-            onSubmit={() => doAction(confirm, !!closeOnConfirm)}
+            onSubmit={performAction(confirm, !!closeOnConfirm)}
             onGeneratePassword={password => {
               setPasswordValue(password);
               setPasswordConfirmationValue(password);
@@ -307,7 +307,7 @@ export const PrimaryModalComponent: FC = () => {
 
         {isPassword && (
           <PasswordForm
-            onSubmit={() => doAction(confirm, !!closeOnConfirm)}
+            onSubmit={performAction(confirm, !!closeOnConfirm)}
             inputPlaceholder={inputPlaceholder}
             inputValue={passwordValue}
             onInputChange={setPasswordValue}
@@ -316,7 +316,7 @@ export const PrimaryModalComponent: FC = () => {
 
         {isJoinGuestLinkPassword && (
           <JoinGuestLinkPasswordForm
-            onSubmit={() => doAction(confirm, !!closeOnConfirm)}
+            onSubmit={performAction(confirm, !!closeOnConfirm)}
             inputValue={passwordValue}
             onInputChange={setPasswordValue}
           />
@@ -324,7 +324,7 @@ export const PrimaryModalComponent: FC = () => {
 
         {hasPasswordWithRules && (
           <PasswordAdvancedSecurityForm
-            onSubmit={() => doAction(confirm, !!closeOnConfirm)}
+            onSubmit={performAction(confirm, !!closeOnConfirm)}
             inputValue={passwordInput}
             inputPlaceholder={inputPlaceholder}
             isInputInvalid={isFormSubmitted && !isBackupPasswordValid}
@@ -337,7 +337,7 @@ export const PrimaryModalComponent: FC = () => {
 
         {isInput && (
           <InputForm
-            onSubmit={() => doAction(confirm, !!closeOnConfirm)}
+            onSubmit={performAction(confirm, !!closeOnConfirm)}
             inputValue={inputValue}
             inputPlaceholder={inputPlaceholder}
             onInputChange={updateInputValue}

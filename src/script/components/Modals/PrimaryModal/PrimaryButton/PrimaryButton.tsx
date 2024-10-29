@@ -17,12 +17,12 @@
  *
  */
 
-import {forwardRef, ReactNode} from 'react';
+import {forwardRef, ReactNode, MouseEvent} from 'react';
 
 import cx from 'classnames';
 
 interface PrimaryButtonProps {
-  onClick: () => void;
+  onClick: (event: MouseEvent<HTMLButtonElement>) => void;
   disabled: boolean;
   fullWidth: boolean;
   children: ReactNode;

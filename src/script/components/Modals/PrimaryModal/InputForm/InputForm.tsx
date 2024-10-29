@@ -17,8 +17,10 @@
  *
  */
 
+import type {FormEvent} from 'react';
+
 interface InputFormProps {
-  onSubmit: () => void;
+  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   inputValue: string;
   inputPlaceholder: string;
   onInputChange: (value: string) => void;

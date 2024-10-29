@@ -17,6 +17,8 @@
  *
  */
 
+import type {FormEvent} from 'react';
+
 import {ValidationUtil} from '@wireapp/commons';
 import {Form, Input, ErrorMessage} from '@wireapp/react-ui-kit';
 
@@ -27,7 +29,7 @@ import {t} from 'Util/LocalizerUtil';
 import {errorMessage} from './GuestLinkPasswordForm.styles';
 
 interface GuestLinkPasswordFormProps {
-  onSubmit: () => void;
+  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   onGeneratePassword: (password: string) => void;
   passwordValue: string;
   passwordValueRef: React.RefObject<HTMLInputElement>;

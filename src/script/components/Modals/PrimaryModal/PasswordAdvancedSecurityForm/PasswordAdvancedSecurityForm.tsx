@@ -17,12 +17,12 @@
  *
  */
 
-import type {ReactElement, ChangeEvent} from 'react';
+import type {ReactElement, ChangeEvent, FormEvent} from 'react';
 
 import {Input} from '@wireapp/react-ui-kit';
 
 interface PasswordAdvancedSecurityFormProps {
-  onSubmit: () => void;
+  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   inputValue: string;
   inputPlaceholder: string;
   isInputInvalid: boolean;
