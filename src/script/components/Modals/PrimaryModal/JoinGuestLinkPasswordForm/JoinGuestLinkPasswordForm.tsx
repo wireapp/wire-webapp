@@ -22,13 +22,19 @@ import {COLOR, Form, Link, Text} from '@wireapp/react-ui-kit';
 import {Config} from 'src/script/Config';
 import {t} from 'Util/LocalizerUtil';
 
-interface JoinGuesLinkPasswordFormProps {
+import {label, input, link, linkText} from './JoinGuestLinkPasswordForm.styles';
+
+interface JoinGuestLinkPasswordFormProps {
   onFormSubmit: () => void;
   inputValue: string;
   onInputChange: (value: string) => void;
 }
 
-export const JoinGuesLinkPasswordForm = ({onFormSubmit, inputValue, onInputChange}: JoinGuesLinkPasswordFormProps) => {
+export const JoinGuestLinkPasswordForm = ({
+  onFormSubmit,
+  inputValue,
+  onInputChange,
+}: JoinGuestLinkPasswordFormProps) => {
   return (
     <Form
       name="guest-password-join-form"
@@ -36,25 +42,12 @@ export const JoinGuesLinkPasswordForm = ({onFormSubmit, inputValue, onInputChang
       onSubmit={onFormSubmit}
       autoComplete="off"
     >
-      <label
-        style={{
-          fontSize: '0.875rem',
-          fontWeight: 400,
-          lineHeight: '1rem',
-          color: 'var(--text-input-label)',
-          marginBottom: 2,
-        }}
-        htmlFor="modal_pswd"
-      >
+      <label css={label} htmlFor="modal_pswd">
         {t('guestLinkPasswordModal.passwordInputLabel')}
       </label>
 
       <input
-        style={{
-          boxShadow: '0 0 0 1px var(--text-input-border)',
-          borderRadius: 12,
-          margin: 0,
-        }}
+        css={input}
         id="modal_pswd"
         className="modal__input"
         type="password"
@@ -63,8 +56,8 @@ export const JoinGuesLinkPasswordForm = ({onFormSubmit, inputValue, onInputChang
         onChange={event => onInputChange(event.target.value)}
       />
 
-      <Link style={{marginTop: 24}} href={Config.getConfig().URL.SUPPORT.LEARN_MORE_ABOUT_GUEST_LINKS} target="_blank">
-        <Text block color={COLOR.BLUE} style={{textDecoration: 'underline', marginBottom: 24}}>
+      <Link css={link} href={Config.getConfig().URL.SUPPORT.LEARN_MORE_ABOUT_GUEST_LINKS} target="_blank">
+        <Text block color={COLOR.BLUE} css={linkText}>
           {t('guestLinkPasswordModal.learnMoreLink')}
         </Text>
       </Link>
