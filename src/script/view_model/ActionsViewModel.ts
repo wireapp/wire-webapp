@@ -303,22 +303,18 @@ export class ActionsViewModel {
   };
 
   readonly deleteConversation = (conversationEntity: Conversation): Promise<void> => {
-    if (conversationEntity && conversationEntity.isCreatedBySelf()) {
-      return new Promise(() => {
-        PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-          primaryAction: {
-            action: () => this.conversationRepository.deleteConversation(conversationEntity),
-            text: t('modalConversationDeleteGroupAction'),
-          },
-          text: {
-            message: t('modalConversationDeleteGroupMessage'),
-            title: t('modalConversationDeleteGroupHeadline', conversationEntity.display_name()),
-          },
-        });
+    return new Promise(() => {
+      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
+        primaryAction: {
+          action: () => this.conversationRepository.deleteConversation(conversationEntity),
+          text: t('modalConversationDeleteGroupAction'),
+        },
+        text: {
+          message: t('modalConversationDeleteGroupMessage'),
+          title: t('modalConversationDeleteGroupHeadline', conversationEntity.display_name()),
+        },
       });
-    }
-
-    return Promise.reject();
+    });
   };
 
   getConversationById = async (conversation: QualifiedId): Promise<Conversation> => {
