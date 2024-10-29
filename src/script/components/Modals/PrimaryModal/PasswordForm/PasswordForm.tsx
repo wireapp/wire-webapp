@@ -18,15 +18,15 @@
  */
 
 interface PasswordFormProps {
-  onFormSubmit: () => void;
+  onSubmit: () => void;
   inputPlaceholder: string;
   inputValue: string;
   onInputChange: (value: string) => void;
 }
 
-export const PasswordForm = ({onFormSubmit, inputPlaceholder, inputValue, onInputChange}: PasswordFormProps) => {
+export const PasswordForm = ({onSubmit, inputPlaceholder, inputValue, onInputChange}: PasswordFormProps) => {
   return (
-    <form onSubmit={onFormSubmit}>
+    <form onSubmit={onSubmit}>
       <label htmlFor="modal_pswd" className="visually-hidden">
         {inputPlaceholder}
       </label>

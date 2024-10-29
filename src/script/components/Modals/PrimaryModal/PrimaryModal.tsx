@@ -308,7 +308,7 @@ export const PrimaryModalComponent: FC = () => {
 
         {isPassword && (
           <PasswordForm
-            onFormSubmit={() => doAction(confirm, !!closeOnConfirm)}
+            onSubmit={() => doAction(confirm, !!closeOnConfirm)}
             inputPlaceholder={inputPlaceholder}
             inputValue={passwordValue}
             onInputChange={setPasswordValue}
