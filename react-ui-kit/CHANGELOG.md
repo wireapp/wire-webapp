@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.26.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.25.1...@wireapp/react-ui-kit@9.26.0) (2024-10-29)
+
+### Features
+
+* Add raise hand icons ([#6635](https://github.com/wireapp/wire-web-packages/issues/6635)) ([eea3b1b](https://github.com/wireapp/wire-web-packages/commit/eea3b1b50829ca428265608cb6b0a47b25dd7881))
+
 ## [9.25.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.25.0...@wireapp/react-ui-kit@9.25.1) (2024-10-28)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
