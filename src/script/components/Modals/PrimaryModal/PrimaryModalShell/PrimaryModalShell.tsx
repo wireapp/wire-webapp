@@ -50,7 +50,7 @@ export const PrimaryModalShell = ({isShown, title, modalUie, children, onClose, 
       ref={modalRef}
     >
       <ModalComponent isShown={isShown} onClosed={onClose} onBgClick={onBgClick} data-uie-name={modalUie}>
-        {isShown ? children : undefined}
+        {isShown && children}
       </ModalComponent>
     </div>
   );
