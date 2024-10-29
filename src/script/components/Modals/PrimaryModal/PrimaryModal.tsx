@@ -33,7 +33,7 @@ import {CheckboxOption} from './CheckboxOption/CheckboxOption';
 import {MessageContent} from './Content/MessageContent';
 import {GuestLinkPasswordForm} from './GuestLinkPasswordForm/GuestLinkPasswordForm';
 import {InputForm} from './InputForm/InputForm';
-import {JoinGuestLinkPasswordFormProps} from './JoinGuestLinkPasswordForm/JoinGuestLinkPasswordForm';
+import {JoinGuestLinkPasswordForm} from './JoinGuestLinkPasswordForm/JoinGuestLinkPasswordForm';
 import {PasswordAdvancedSecurityForm} from './PasswordAdvancedSecurityForm/PasswordAdvancedSecurityForm';
 import {PasswordForm} from './PasswordForm/PasswordForm';
 import {PrimaryButton} from './PrimaryButton/PrimaryButton';
@@ -316,8 +316,8 @@ export const PrimaryModalComponent: FC = () => {
         )}
 
         {isJoinGuestLinkPassword && (
-          <JoinGuestLinkPasswordFormProps
-            onFormSubmit={() => doAction(confirm, !!closeOnConfirm)}
+          <JoinGuestLinkPasswordForm
+            onSubmit={() => doAction(confirm, !!closeOnConfirm)}
             inputValue={passwordValue}
             onInputChange={setPasswordValue}
           />

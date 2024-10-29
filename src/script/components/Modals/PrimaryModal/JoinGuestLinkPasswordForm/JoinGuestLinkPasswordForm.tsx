@@ -25,21 +25,17 @@ import {t} from 'Util/LocalizerUtil';
 import {label, input, link, linkText} from './JoinGuestLinkPasswordForm.styles';
 
 interface JoinGuestLinkPasswordFormProps {
-  onFormSubmit: () => void;
+  onSubmit: () => void;
   inputValue: string;
   onInputChange: (value: string) => void;
 }
 
-export const JoinGuestLinkPasswordForm = ({
-  onFormSubmit,
-  inputValue,
-  onInputChange,
-}: JoinGuestLinkPasswordFormProps) => {
+export const JoinGuestLinkPasswordForm = ({onSubmit, inputValue, onInputChange}: JoinGuestLinkPasswordFormProps) => {
   return (
     <Form
       name="guest-password-join-form"
       data-uie-name="guest-password-join-form"
-      onSubmit={onFormSubmit}
+      onSubmit={onSubmit}
       autoComplete="off"
     >
       <label css={label} htmlFor="modal_pswd">
