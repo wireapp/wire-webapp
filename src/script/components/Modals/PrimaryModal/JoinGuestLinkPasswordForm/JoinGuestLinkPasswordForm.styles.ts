@@ -20,9 +20,9 @@
 import {CSSObject} from '@emotion/react';
 
 export const label: CSSObject = {
-  fontSize: '0.875rem',
-  fontWeight: 400,
-  lineHeight: '1rem',
+  fontSize: 'var(--font-size-medium)',
+  fontWeight: 'var(--font-weight-regular)',
+  lineHeight: 'var(--line-height-sm)',
   color: 'var(--text-input-label)',
   marginBottom: 2,
 };
