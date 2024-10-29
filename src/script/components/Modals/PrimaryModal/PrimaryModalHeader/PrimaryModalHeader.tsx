@@ -31,11 +31,9 @@ interface ModalHeaderProps {
 export const PrimaryModalHeader = ({titleText, closeAction, closeBtnTitle, hideCloseBtn}: ModalHeaderProps) => {
   return (
     <div className="modal__header" data-uie-name="status-modal-title">
-      {titleText && (
-        <h2 className="modal__header__title" id="modal-title">
-          {titleText}
-        </h2>
-      )}
+      <h2 className="modal__header__title" id="modal-title">
+        {titleText}
+      </h2>
       {!hideCloseBtn && (
         <button
           type="button"
