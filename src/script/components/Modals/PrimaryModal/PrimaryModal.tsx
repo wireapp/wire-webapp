@@ -230,16 +230,15 @@ export const PrimaryModalComponent: FC = () => {
   const secondaryButtons = secondaryActions
     .filter((action): action is ButtonAction => action !== null && !!action.text)
     .map(action => (
-      <>
-        <SecondaryButton
-          onClick={() => doAction(action.action, !!closeOnSecondaryAction, true)}
-          disabled={action.disabled}
-          fullWidth={hasMultipleSecondary || allButtonsFullWidth}
-          uieName={action.uieName}
-        >
-          {action.text}
-        </SecondaryButton>
-      </>
+      <SecondaryButton
+        key={`${action.text}-${action.uieName}`}
+        onClick={() => doAction(action.action, !!closeOnSecondaryAction, true)}
+        disabled={action.disabled}
+        fullWidth={hasMultipleSecondary || allButtonsFullWidth}
+        uieName={action.uieName}
+      >
+        {action.text}
+      </SecondaryButton>
     ));
 
   const primaryButton = !!primaryAction?.text && (
