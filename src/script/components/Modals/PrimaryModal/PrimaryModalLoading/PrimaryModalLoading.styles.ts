@@ -17,14 +17,11 @@
  *
  */
 
-import {Loading} from '@wireapp/react-ui-kit';
+import {CSSObject} from '@emotion/react';
 
-import {wrapper} from './PrimaryModalLoading.styles';
-
-export const PrimaryModalLoading = () => {
-  return (
-    <div css={wrapper}>
-      <Loading />
-    </div>
-  );
+export const wrapper: CSSObject = {
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  margin: '1.5rem 0 2rem 0',
 };
