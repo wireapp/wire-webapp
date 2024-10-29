@@ -24,7 +24,7 @@ import {PasswordGeneratorButton} from 'Components/PasswordGeneratorButton';
 import {Config} from 'src/script/Config';
 import {t} from 'Util/LocalizerUtil';
 
-import {guestLinkPasswordErrorMessageStyles} from '../PrimaryModal.styles';
+import {errorMessage} from './GuestLinkPasswordForm.styles';
 
 interface GuestLinkPasswordFormProps {
   onSubmit: () => void;
@@ -102,7 +102,7 @@ export const GuestLinkPasswordForm = ({
 
 const GuestLinkPasswordModalErrorMessage = () => {
   return (
-    <ErrorMessage data-uie-name="primary-modals-error-message" css={guestLinkPasswordErrorMessageStyles}>
+    <ErrorMessage data-uie-name="primary-modals-error-message" css={errorMessage}>
       {t('modalGuestLinkJoinHelperText', {
         minPasswordLength: Config.getConfig().MINIMUM_PASSWORD_LENGTH.toString(),
       })}
