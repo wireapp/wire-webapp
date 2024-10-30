@@ -93,6 +93,7 @@ export const ConversationSidebar = ({
           conversationRepository={conversationRepository}
           onClickPreferences={onClickPreferences}
           showNotificationsBadge={showNotificationsBadge}
+          selfUser={selfUser}
         />
       </FadingScrollbar>
 

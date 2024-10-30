@@ -22,7 +22,7 @@ import React, {useLayoutEffect, useRef, useEffect} from 'react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
 
-import {InViewport} from 'Components/utils/InViewport';
+import {InViewport} from 'Components/InViewport';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getAllFocusableElements, setElementsTabIndex} from 'Util/focusUtil';

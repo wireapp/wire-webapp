@@ -23,6 +23,7 @@ import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import * as Icon from 'Components/Icon';
+import {InViewport} from 'Components/InViewport';
 import {collapseButton, collapseIcon} from 'Components/UserList/UserList.styles';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isEnterKey, isSpaceKey} from 'Util/KeyboardUtil';
@@ -35,7 +36,6 @@ import {ConversationState} from '../../conversation/ConversationState';
 import type {Conversation} from '../../entity/Conversation';
 import type {User} from '../../entity/User';
 import {TeamState} from '../../team/TeamState';
-import {InViewport} from '../utils/InViewport';
 
 export enum UserlistMode {
   COMPACT = 'UserlistMode.COMPACT',

@@ -17,7 +17,7 @@
  *
  */
 
-import {VerificationBadges} from 'Components/VerificationBadge';
+import {VerificationBadges} from 'Components/Badge';
 import {t} from 'Util/LocalizerUtil';
 import {splitFingerprint} from 'Util/StringUtil';
 import {formatTimestamp} from 'Util/TimeUtil';

@@ -437,6 +437,7 @@
   "conversationDetailsActionDevices": "Devices",
   "conversationDetailsActionGuestOptions": "Guests",
   "conversationDetailsActionLeave": "Leave group",
+  "conversationDetailsActionRemove": "Remove group",
   "conversationDetailsActionNotifications": "Notifications",
   "conversationDetailsActionServicesOptions": "Services",
   "conversationDetailsActionTimedMessages": "Self-deleting messages",
@@ -1058,6 +1059,9 @@
   "modalConversationRemoveGuestsOrServicesAction": "Disable",
   "modalConversationRemoveHeadline": "Remove?",
   "modalConversationRemoveMessage": "{{user}} won’t be able to send or receive messages in this conversation.",
+  "modalConversationRemoveGroupAction": "Remove",
+  "modalConversationRemoveGroupHeadline": "Remove group conversation?",
+  "modalConversationRemoveGroupMessage": "This will delete the group on this device. There is no option to restore the content.",
   "modalConversationRemoveServicesHeadline": "Disable services access?",
   "modalConversationRemoveServicesMessage": "Current services will be removed from the conversation. New services will not be allowed.",
   "modalConversationRevokeLinkAction": "Revoke link",
@@ -1586,5 +1590,8 @@
   "wireLinux": "{{brandName}} for Linux",
   "wireMacos": "{{brandName}} for macOS",
   "wireWindows": "{{brandName}} for Windows",
-  "wire_for_web": "{{brandName}} for Web"
+  "wire_for_web": "{{brandName}} for Web",
+  "teamUpgradeBannerHeader": "Enjoy benefits of a team",
+  "teamUpgradeBannerContent": "Explore extra features for free with the same level of security.",
+  "teamUpgradeBannerButtonText": "Create Wire Team"
 }

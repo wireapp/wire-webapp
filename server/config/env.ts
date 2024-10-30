@@ -167,6 +167,9 @@ export type Env = {
   /** Feature to enable calling popout window */
   FEATURE_ENABLE_DETACHED_CALLING_WINDOW: string;
 
+  /** Feature to enable team creation flow for individual users */
+  FEATURE_ENABLE_TEAM_CREATION: string;
+
   /** Sets the verification ID for Google webmasters */
   GOOGLE_WEBMASTER_ID: string;
 

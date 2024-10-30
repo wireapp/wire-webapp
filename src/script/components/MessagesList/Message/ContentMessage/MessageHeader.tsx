@@ -20,8 +20,8 @@
 import {Tooltip} from '@wireapp/react-ui-kit';
 
 import {AVATAR_SIZE, Avatar} from 'Components/Avatar';
+import {UserBlockedBadge} from 'Components/Badge';
 import * as Icon from 'Components/Icon';
-import {UserBlockedBadge} from 'Components/UserBlockedBadge/UserBlockedBadge';
 import {UserName} from 'Components/UserName';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {DeleteMessage} from 'src/script/entity/message/DeleteMessage';

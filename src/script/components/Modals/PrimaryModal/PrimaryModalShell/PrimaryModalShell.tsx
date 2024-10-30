@@ -19,7 +19,7 @@
 
 import {ReactNode, useEffect, useRef} from 'react';
 
-import {ModalComponent} from 'Components/ModalComponent';
+import {ModalComponent} from 'Components/Modals/ModalComponent';
 
 interface PrimaryModalShellProps {
   title: string;
