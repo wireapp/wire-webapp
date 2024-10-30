@@ -22,9 +22,9 @@ import {CONVERSATION_TYPE, ConversationProtocol} from '@wireapp/api-client/lib/c
 
 import {randomUUID} from 'crypto';
 
+import {ClientEntity} from 'Repositories/client/ClientEntity';
+import {ClientState} from 'Repositories/client/ClientState';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {ClientEntity} from 'src/script/client/ClientEntity';
-import {ClientState} from 'src/script/client/ClientState';
 import {ConversationState} from 'src/script/conversation/ConversationState';
 import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
 import {User} from 'src/script/entity/User';

@@ -51,7 +51,7 @@ import {container} from 'tsyringe';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {ClientEntity} from 'src/script/client/ClientEntity';
+import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {Config} from 'src/script/Config';
 import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
 import {ConversationDatabaseData, ConversationMapper} from 'src/script/conversation/ConversationMapper';

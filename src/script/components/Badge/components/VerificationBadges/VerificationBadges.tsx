@@ -34,7 +34,7 @@ import {
   Tooltip,
 } from '@wireapp/react-ui-kit';
 
-import {ClientEntity} from 'src/script/client';
+import {ClientEntity} from 'Repositories/client';
 import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
 import {checkUserHandle} from 'src/script/conversation/ConversationVerificationStateHandler';
 import {MLSStatuses, WireIdentity} from 'src/script/E2EIdentity/E2EIdentityVerification';

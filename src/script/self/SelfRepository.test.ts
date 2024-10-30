@@ -23,13 +23,13 @@ import {FeatureList, FeatureStatus} from '@wireapp/api-client/lib/team';
 import {FEATURE_KEY} from '@wireapp/api-client/lib/team/feature';
 import {container} from 'tsyringe';
 
+import {ClientEntity} from 'Repositories/client';
 import {TestFactory} from 'test/helper/TestFactory';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {SelfRepository} from './SelfRepository';
 import * as SelfSupportedProtocols from './SelfSupportedProtocols/SelfSupportedProtocols';
 
-import {ClientEntity} from '../client';
 import {Core} from '../service/CoreSingleton';
 
 const testFactory = new TestFactory();

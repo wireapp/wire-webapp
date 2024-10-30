@@ -17,13 +17,13 @@
  *
  */
 
+import {MLSPublicKeys} from 'Repositories/client';
 import {MLSStatuses, WireIdentity} from 'src/script/E2EIdentity';
 import {t} from 'Util/LocalizerUtil';
 import {splitFingerprint} from 'Util/StringUtil';
 
 import {styles} from './MLSDeviceDetails.styles';
 
-import {MLSPublicKeys} from '../../../../../../../client';
 import {E2EICertificateDetails} from '../E2EICertificateDetails';
 import {FormattedId} from '../FormattedId';
 

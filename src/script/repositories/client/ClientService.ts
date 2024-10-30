@@ -21,10 +21,10 @@ import type {RegisteredClient, QualifiedUserClientMap, ClientCapabilityData} fro
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
-import {APIClient} from '../service/APIClientSingleton';
-import type {ClientRecord} from '../storage';
-import {StorageService} from '../storage';
-import {StorageSchemata} from '../storage/StorageSchemata';
+import {APIClient} from '../../service/APIClientSingleton';
+import type {ClientRecord} from '../../storage';
+import {StorageService} from '../../storage';
+import {StorageSchemata} from '../../storage/StorageSchemata';
 
 export class ClientService {
   private readonly CLIENT_STORE_NAME: string;
