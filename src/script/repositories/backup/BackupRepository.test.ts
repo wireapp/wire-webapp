@@ -34,11 +34,11 @@ import {BackupService} from './BackupService';
 import {CancelError, DifferentAccountError, IncompatiblePlatformError} from './Error';
 import {handleZipEvent} from './zipWorker';
 
-import {User} from '../entity/User';
-import {ClientEvent} from '../event/Client';
-import {DatabaseTypes, createStorageEngine} from '../service/StoreEngineProvider';
-import {StorageService} from '../storage';
-import {StorageSchemata} from '../storage/StorageSchemata';
+import {User} from '../../entity/User';
+import {ClientEvent} from '../../event/Client';
+import {DatabaseTypes, createStorageEngine} from '../../service/StoreEngineProvider';
+import {StorageService} from '../../storage';
+import {StorageSchemata} from '../../storage/StorageSchemata';
 
 const conversationId = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a';
 

@@ -21,13 +21,13 @@ import {container} from 'tsyringe';
 
 import type {AssetRepository} from 'Repositories/assets/AssetRepository';
 import type {AudioRepository} from 'Repositories/audio/AudioRepository';
+import type {BackupRepository} from 'Repositories/backup/BackupRepository';
 
 import {ActionsViewModel} from './ActionsViewModel';
 import {CallingViewModel} from './CallingViewModel';
 import {ContentViewModel} from './ContentViewModel';
 import {ListViewModel} from './ListViewModel';
 
-import type {BackupRepository} from '../backup/BackupRepository';
 import type {CallingRepository} from '../calling/CallingRepository';
 import type {ClientRepository} from '../client';
 import type {ConnectionRepository} from '../connection/ConnectionRepository';
