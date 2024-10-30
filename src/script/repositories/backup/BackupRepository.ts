@@ -40,13 +40,13 @@ import {
 } from './Error';
 import {preprocessConversations, preprocessEvents, preprocessUsers} from './recordPreprocessors';
 
-import type {ConversationRepository} from '../conversation/ConversationRepository';
-import {isReadableConversation} from '../conversation/ConversationSelectors';
-import type {Conversation} from '../entity/Conversation';
-import {User} from '../entity/User';
-import {EventRecord, UserRecord} from '../storage';
-import {ConversationRecord} from '../storage/record/ConversationRecord';
-import {StorageSchemata} from '../storage/StorageSchemata';
+import type {ConversationRepository} from '../../conversation/ConversationRepository';
+import {isReadableConversation} from '../../conversation/ConversationSelectors';
+import type {Conversation} from '../../entity/Conversation';
+import {User} from '../../entity/User';
+import {EventRecord, UserRecord} from '../../storage';
+import {ConversationRecord} from '../../storage/record/ConversationRecord';
+import {StorageSchemata} from '../../storage/StorageSchemata';
 
 interface Metadata {
   client_id: string;
