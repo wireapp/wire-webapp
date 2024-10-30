@@ -19,7 +19,7 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const label: CSSObject = {
+export const labelStyles: CSSObject = {
   fontSize: 'var(--font-size-medium)',
   fontWeight: 'var(--font-weight-regular)',
   lineHeight: 'var(--line-height-sm)',
@@ -27,17 +27,17 @@ export const label: CSSObject = {
   marginBottom: 2,
 };
 
-export const input: CSSObject = {
+export const inputStyles: CSSObject = {
   boxShadow: '0 0 0 1px var(--text-input-border)',
   borderRadius: 12,
   margin: 0,
 };
 
-export const link: CSSObject = {
+export const linkStyles: CSSObject = {
   marginTop: 24,
 };
 
-export const linkText: CSSObject = {
+export const linkTextStyles: CSSObject = {
   textDecoration: 'underline',
   marginBottom: 24,
 };
