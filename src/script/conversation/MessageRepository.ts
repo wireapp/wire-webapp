@@ -53,6 +53,8 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {buildMetadata, ImageMetadata, isAudio, isImage, isVideo} from 'Repositories/assets/AssetMetaDataBuilder';
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
+import {AudioRepository} from 'Repositories/audio/AudioRepository';
+import {AudioType} from 'Repositories/audio/AudioType';
 import {
   cancelSendingLinkPreview,
   clearLinkPreviewSendingState,
@@ -77,8 +79,6 @@ import {ConversationVerificationState} from './ConversationVerificationState';
 import {EventMapper} from './EventMapper';
 import {getLinkPreviewFromString} from './linkPreviews';
 
-import {AudioRepository} from '../audio/AudioRepository';
-import {AudioType} from '../audio/AudioType';
 import {ClientState} from '../client/ClientState';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {EventBuilder} from '../conversation/EventBuilder';

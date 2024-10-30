@@ -28,9 +28,9 @@ import {Logger, getLogger} from 'Util/Logger';
 import {AudioPlayingType} from './AudioPlayingType';
 import {AudioType} from './AudioType';
 
-import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
-import {MediaDevicesHandler} from '../media/MediaDevicesHandler';
-import {MediaDeviceType} from '../media/MediaDeviceType';
+import {NOTIFICATION_HANDLING_STATE} from '../../event/NotificationHandlingState';
+import {MediaDevicesHandler} from '../../media/MediaDevicesHandler';
+import {MediaDeviceType} from '../../media/MediaDeviceType';
 
 enum AUDIO_PLAY_PERMISSION {
   ALLOWED = 0,
