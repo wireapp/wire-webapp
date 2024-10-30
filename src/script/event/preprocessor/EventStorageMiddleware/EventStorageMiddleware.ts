@@ -20,7 +20,7 @@
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 import {container} from 'tsyringe';
 
-import {ConversationState} from 'src/script/conversation/ConversationState';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {User} from 'src/script/entity/User';
 import {UserFilter} from 'src/script/user/UserFilter';
 import {matchQualifiedIds} from 'Util/QualifiedId';

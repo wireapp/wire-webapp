@@ -29,7 +29,7 @@ import {
   MemberLeaveEvent,
   MessageAddEvent,
   ReactionEvent,
-} from 'src/script/conversation/EventBuilder';
+} from 'Repositories/conversation/EventBuilder';
 import {Conversation} from 'src/script/entity/Conversation';
 import {CONVERSATION} from 'src/script/event/Client';
 import {createUuid} from 'Util/uuid';

@@ -20,12 +20,12 @@
 import {CONVERSATION_EVENT, ConversationMemberJoinEvent} from '@wireapp/api-client/lib/event/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {MemberJoinEvent, OneToOneCreationEvent} from 'src/script/conversation/EventBuilder';
+import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {MemberJoinEvent, OneToOneCreationEvent} from 'Repositories/conversation/EventBuilder';
 import {User} from 'src/script/entity/User';
 import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
-import type {ConversationRepository} from '../../conversation/ConversationRepository';
 import type {UserRepository} from '../../user/UserRepository';
 import {ClientEvent} from '../Client';
 import {EventMiddleware, IncomingEvent} from '../EventProcessor';

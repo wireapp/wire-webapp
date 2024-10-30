@@ -28,20 +28,20 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ButtonGroupTab} from 'Components/calling/ButtonGroup';
 import 'Components/calling/ChooseScreen';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {AudioRepository} from 'Repositories/audio/AudioRepository';
 import {AudioType} from 'Repositories/audio/AudioType';
 import type {Call} from 'Repositories/calling/Call';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {CallState, DesktopScreenShareMenu} from 'Repositories/calling/CallState';
 import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/LeaveCallReason';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 
-import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
-import {ConversationState} from '../conversation/ConversationState';
-import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
 import type {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
 import type {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../media/MediaDevicesHandler';

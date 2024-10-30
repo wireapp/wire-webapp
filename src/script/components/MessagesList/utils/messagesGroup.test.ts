@@ -19,7 +19,7 @@
 
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 
-import {EventMapper} from 'src/script/conversation/EventMapper';
+import {EventMapper} from 'Repositories/conversation/EventMapper';
 import {Conversation} from 'src/script/entity/Conversation';
 import {Message} from 'src/script/entity/message/Message';
 import {createGroupCreationEvent, createMessageAddEvent} from 'test/helper/EventGenerator';

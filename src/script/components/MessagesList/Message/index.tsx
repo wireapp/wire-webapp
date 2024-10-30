@@ -23,6 +23,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
 
 import {InViewport} from 'Components/InViewport';
+import type {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getAllFocusableElements, setElementsTabIndex} from 'Util/focusUtil';
@@ -33,7 +34,6 @@ import {MessageWrapper} from './MessageWrapper';
 import {ScrollToElement} from './types';
 import {useMessageFocusedTabIndex} from './util';
 
-import type {MessageRepository} from '../../../conversation/MessageRepository';
 import type {Conversation} from '../../../entity/Conversation';
 import type {ContentMessage} from '../../../entity/message/ContentMessage';
 import type {DecryptErrorMessage} from '../../../entity/message/DecryptErrorMessage';

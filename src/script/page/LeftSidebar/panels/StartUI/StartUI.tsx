@@ -26,6 +26,8 @@ import {showInviteModal} from 'Components/Modals/InviteModal';
 import {showServiceModal} from 'Components/Modals/ServiceModal';
 import {showUserModal} from 'Components/Modals/UserModal';
 import {SearchInput} from 'Components/SearchInput';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {User} from 'src/script/entity/User';
 import {IntegrationRepository} from 'src/script/integration/IntegrationRepository';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
@@ -38,8 +40,6 @@ import {PeopleTab, SearchResultsData} from './PeopleTab';
 import {ServicesTab} from './ServicesTab';
 
 import {Config} from '../../../../Config';
-import {ConversationRepository} from '../../../../conversation/ConversationRepository';
-import {ConversationState} from '../../../../conversation/ConversationState';
 import {SearchRepository} from '../../../../search/SearchRepository';
 import {TeamRepository} from '../../../../team/TeamRepository';
 import {TeamState} from '../../../../team/TeamState';

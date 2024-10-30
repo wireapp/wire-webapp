@@ -30,13 +30,13 @@ import * as Icon from 'Components/Icon';
 import {SearchInput} from 'Components/SearchInput';
 import {ServiceList} from 'Components/ServiceList/ServiceList';
 import {UserSearchableList} from 'Components/UserSearchableList';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
-import {ConversationRepository} from '../../../conversation/ConversationRepository';
 import {Conversation} from '../../../entity/Conversation';
 import {User} from '../../../entity/User';
 import {getManageServicesUrl} from '../../../externalRoute';

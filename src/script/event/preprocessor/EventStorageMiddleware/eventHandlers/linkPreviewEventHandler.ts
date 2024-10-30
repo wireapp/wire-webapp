@@ -17,7 +17,7 @@
  *
  */
 
-import {MessageAddEvent} from 'src/script/conversation/EventBuilder';
+import {MessageAddEvent} from 'Repositories/conversation/EventBuilder';
 import {categoryFromEvent} from 'src/script/message/MessageCategorization';
 import {StoredEvent} from 'src/script/storage';
 

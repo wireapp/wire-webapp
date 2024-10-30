@@ -17,7 +17,7 @@
  *
  */
 
-import {MessageAddEvent} from 'src/script/conversation/EventBuilder';
+import {MessageAddEvent} from 'Repositories/conversation/EventBuilder';
 import {StoredEvent} from 'src/script/storage';
 
 export function getCommonMessageUpdates(originalEvent: StoredEvent<MessageAddEvent>, newEvent: MessageAddEvent) {

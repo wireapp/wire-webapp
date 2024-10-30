@@ -23,9 +23,9 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/Icon';
 import {MenuItem} from 'Components/panel/PanelActions';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {t} from 'Util/LocalizerUtil';
 
-import {ConversationRepository} from '../../../../conversation/ConversationRepository';
 import {Conversation} from '../../../../entity/Conversation';
 import * as UserPermission from '../../../../user/UserPermission';
 import {ActionsViewModel} from '../../../../view_model/ActionsViewModel';

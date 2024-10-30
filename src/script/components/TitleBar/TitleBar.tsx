@@ -32,6 +32,7 @@ import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import * as Icon from 'Components/Icon';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {CallState} from 'Repositories/calling/CallState';
+import {ConversationFilter} from 'Repositories/conversation/ConversationFilter';
 import {User} from 'src/script/entity/User';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {ContentState} from 'src/script/page/useAppState';
@@ -41,7 +42,6 @@ import {StringIdentifer, t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
-import {ConversationFilter} from '../../conversation/ConversationFilter';
 import {Conversation} from '../../entity/Conversation';
 import {RightSidebarParams} from '../../page/AppMain';
 import {PanelState} from '../../page/RightSidebar/RightSidebar';

@@ -20,6 +20,8 @@
 import type Dexie from 'dexie';
 import {omit} from 'underscore';
 
+import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {isReadableConversation} from 'Repositories/conversation/ConversationSelectors';
 import {chunk} from 'Util/ArrayUtil';
 import {Logger, getLogger} from 'Util/Logger';
 import {constructUserPrimaryKey} from 'Util/StorageUtil';
@@ -40,8 +42,6 @@ import {
 } from './Error';
 import {preprocessConversations, preprocessEvents, preprocessUsers} from './recordPreprocessors';
 
-import type {ConversationRepository} from '../../conversation/ConversationRepository';
-import {isReadableConversation} from '../../conversation/ConversationSelectors';
 import type {Conversation} from '../../entity/Conversation';
 import {User} from '../../entity/User';
 import {EventRecord, UserRecord} from '../../storage';

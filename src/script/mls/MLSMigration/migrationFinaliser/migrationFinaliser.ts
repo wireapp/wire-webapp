@@ -19,7 +19,11 @@
 
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 
-import {MixedConversation, isMLSConversation, isMixedConversation} from 'src/script/conversation/ConversationSelectors';
+import {
+  MixedConversation,
+  isMLSConversation,
+  isMixedConversation,
+} from 'Repositories/conversation/ConversationSelectors';
 import {Conversation} from 'src/script/entity/Conversation';
 
 import {MLSMigrationStatus} from '../migrationStatus';

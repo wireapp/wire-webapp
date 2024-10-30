@@ -55,7 +55,13 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {showAppNotification} from 'Components/AppNotification';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {CALL_QUALITY_FEEDBACK_KEY} from 'Components/Modals/QualityFeedbackModal/constants';
+import {isMLSConversation, MLSConversation} from 'Repositories/conversation/ConversationSelectors';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
+import {EventBuilder} from 'Repositories/conversation/EventBuilder';
+import {CONSENT_TYPE, MessageRepository, MessageSendingOptions} from 'Repositories/conversation/MessageRepository';
 import {flatten} from 'Util/ArrayUtil';
 import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
@@ -74,13 +80,7 @@ import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
 import {ClientId, Participant, UserId} from './Participant';
 
-import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {Config} from '../../Config';
-import {isMLSConversation, MLSConversation} from '../../conversation/ConversationSelectors';
-import {ConversationState} from '../../conversation/ConversationState';
-import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
-import {EventBuilder} from '../../conversation/EventBuilder';
-import {CONSENT_TYPE, MessageRepository, MessageSendingOptions} from '../../conversation/MessageRepository';
 import {Conversation} from '../../entity/Conversation';
 import type {User} from '../../entity/User';
 import {NoAudioInputError} from '../../error/NoAudioInputError';
