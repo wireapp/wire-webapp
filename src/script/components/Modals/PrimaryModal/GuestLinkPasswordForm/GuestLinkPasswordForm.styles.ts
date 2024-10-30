@@ -19,6 +19,6 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const errorMessage: CSSObject = {
+export const errorMessageStyles: CSSObject = {
   marginBottom: 18,
 };
