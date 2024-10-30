@@ -109,7 +109,15 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
   const isVideoPlayable = async (url: string): Promise<boolean> => {
     const video = document.createElement('video');
     return new Promise<boolean>(resolve => {
-      video.onloadedmetadata = () => resolve(true);
+      video.onloadedmetadata = () => {
+        // Detects is the video track is properly available.
+        // If these dimensions are 0, typically the video track can't be properly decoded/rendered.
+        if (video.videoWidth === 0 || video.videoHeight === 0) {
+          resolve(false);
+          return;
+        }
+        resolve(true);
+      };
       video.onerror = () => resolve(false);
       video.src = url;
     });

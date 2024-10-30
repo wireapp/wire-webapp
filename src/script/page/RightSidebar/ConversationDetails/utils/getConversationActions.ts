@@ -151,16 +151,21 @@ const getConversationActions = ({
       },
     },
     {
-      condition:
-        !isSingleUser &&
-        isTeam &&
-        roleRepository.canDeleteGroup(conversationEntity) &&
-        conversationEntity.isCreatedBySelf(),
+      condition: !isSingleUser && isTeam && roleRepository.canDeleteGroup(conversationEntity),
       item: {
-        click: async () => actionsViewModel.deleteConversation(conversationEntity),
+        click: () => actionsViewModel.deleteConversation(conversationEntity),
         Icon: Icon.DeleteIcon,
         identifier: 'do-delete',
         label: t('conversationDetailsActionDelete'),
+      },
+    },
+    {
+      condition: conversationEntity.isGroup() && conversationEntity.isSelfUserRemoved(),
+      item: {
+        click: () => actionsViewModel.removeConversation(conversationEntity),
+        Icon: Icon.CloseIcon,
+        identifier: 'do-remove',
+        label: t('conversationDetailsActionRemove'),
       },
     },
   ];
