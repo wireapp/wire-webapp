@@ -33,8 +33,8 @@ import {ConnectionRepository} from './ConnectionRepository';
 import {ConnectionService} from './ConnectionService';
 import {ConnectionState} from './ConnectionState';
 
-import {Conversation} from '../entity/Conversation';
-import {UserRepository} from '../user/UserRepository';
+import {Conversation} from '../../entity/Conversation';
+import {UserRepository} from '../../user/UserRepository';
 
 function buildConnectionRepository() {
   const connectionState = new ConnectionState();

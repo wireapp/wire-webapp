@@ -27,12 +27,12 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal, removeCurrentModal, usePrimaryModalState} from 'Components/Modals/PrimaryModal';
 import type {ClientEntity} from 'Repositories/client';
+import type {ConnectionRepository} from 'Repositories/connection/ConnectionRepository';
 import {t} from 'Util/LocalizerUtil';
 import {isBackendError} from 'Util/TypePredicateUtil';
 
 import type {MainViewModel} from './MainViewModel';
 
-import type {ConnectionRepository} from '../connection/ConnectionRepository';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import type {MessageRepository} from '../conversation/MessageRepository';
 import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';

@@ -25,8 +25,8 @@ import ko from 'knockout';
 import {container} from 'tsyringe';
 
 import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
+import {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
 import {ConversationRoleRepository} from 'src/script/conversation/ConversationRoleRepository';
 import {ConversationState} from 'src/script/conversation/ConversationState';
 import {Conversation} from 'src/script/entity/Conversation';

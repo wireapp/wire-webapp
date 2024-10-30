@@ -21,7 +21,7 @@ import type {Connection, ConnectionStatus} from '@wireapp/api-client/lib/connect
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
-import {APIClient} from '../service/APIClientSingleton';
+import {APIClient} from '../../service/APIClientSingleton';
 
 export class ConnectionService {
   constructor(private readonly apiClient = container.resolve(APIClient)) {}

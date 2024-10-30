@@ -43,13 +43,13 @@ import {CallState} from 'Repositories/calling/CallState';
 import {Participant} from 'Repositories/calling/Participant';
 import {ClientRepository} from 'Repositories/client';
 import {ClientState} from 'Repositories/client/ClientState';
+import {ConnectionRepository} from 'Repositories/connection/ConnectionRepository';
 import {getLogger, Logger} from 'Util/Logger';
 
 import {KEY} from './KeyboardUtil';
 import {TIME_IN_MILLIS} from './TimeUtil';
 import {createUuid} from './uuid';
 
-import {ConnectionRepository} from '../connection/ConnectionRepository';
 import {ConversationRepository} from '../conversation/ConversationRepository';
 import {isMLSCapableConversation} from '../conversation/ConversationSelectors';
 import {ConversationState} from '../conversation/ConversationState';
