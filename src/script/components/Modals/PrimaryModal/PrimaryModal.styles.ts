@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2024 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,8 @@
  *
  */
 
-import {Loading} from '@wireapp/react-ui-kit';
+import {CSSObject} from '@emotion/react';
 
-import {wrapperStyles} from './PrimaryModalLoading.styles';
-
-export const PrimaryModalLoading = () => {
-  return (
-    <div css={wrapperStyles}>
-      <Loading />
-    </div>
-  );
+export const guestLinkPasswordErrorMessageStyles: CSSObject = {
+  marginBottom: 18,
 };
