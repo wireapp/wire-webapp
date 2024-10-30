@@ -321,23 +321,19 @@ export class ActionsViewModel {
     return Promise.reject();
   };
 
-  readonly removeConversation = (conversationEntity: Conversation): Promise<void> => {
+  readonly removeConversation = (conversationEntity: Conversation) => {
     if (conversationEntity.isGroup() && conversationEntity.isSelfUserRemoved()) {
-      return new Promise(() => {
-        PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-          primaryAction: {
-            action: () => this.conversationRepository.deleteConversationLocally(conversationEntity, true),
-            text: t('modalConversationRemoveGroupAction'),
-          },
-          text: {
-            message: t('modalConversationRemoveGroupMessage'),
-            title: t('modalConversationRemoveGroupHeadline'),
-          },
-        });
+      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
+        primaryAction: {
+          action: () => this.conversationRepository.deleteConversationLocally(conversationEntity, true),
+          text: t('modalConversationRemoveGroupAction'),
+        },
+        text: {
+          message: t('modalConversationRemoveGroupMessage'),
+          title: t('modalConversationRemoveGroupHeadline'),
+        },
       });
     }
-
-    return Promise.reject();
   };
 
   getConversationById = async (conversation: QualifiedId): Promise<Conversation> => {

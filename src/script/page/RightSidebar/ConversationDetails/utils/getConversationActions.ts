@@ -166,7 +166,7 @@ const getConversationActions = ({
     {
       condition: conversationEntity.isGroup() && conversationEntity.isSelfUserRemoved(),
       item: {
-        click: async () => actionsViewModel.removeConversation(conversationEntity),
+        click: () => actionsViewModel.removeConversation(conversationEntity),
         Icon: Icon.CloseIcon,
         identifier: 'do-remove',
         label: t('conversationDetailsActionRemove'),
