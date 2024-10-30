@@ -29,8 +29,8 @@ import {handleLinkPreviewEvent, handleEditEvent, handleAssetEvent, handleReactio
 import {EventValidationError} from './eventHandlers/EventValidationError';
 import {HandledEvents, DBOperation} from './types';
 
-import {isEventRecordFailed, isEventRecordWithFederationError} from '../../../message/StatusType';
-import type {EventRecord} from '../../../storage';
+import {isEventRecordFailed, isEventRecordWithFederationError} from '../../../../message/StatusType';
+import type {EventRecord} from '../../../../storage';
 import {CONVERSATION} from '../../Client';
 import {EventMiddleware, IncomingEvent} from '../../EventProcessor';
 import {EventService} from '../../EventService';

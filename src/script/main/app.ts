@@ -17,16 +17,15 @@
  *
  */
 
-// Polyfill for "tsyringe" dependency injection
-// eslint-disable-next-line import/order
-import 'core-js/full/reflect';
-
 import {Context} from '@wireapp/api-client/lib/auth';
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
 import {EVENTS as CoreEvents} from '@wireapp/core/lib/Account';
 import {amplify} from 'amplify';
 import platform from 'platform';
 import {container} from 'tsyringe';
+// Polyfill for "tsyringe" dependency injection
+// eslint-disable-next-line import/order
+import 'core-js/full/reflect';
 
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -49,6 +48,15 @@ import {OnConversationE2EIVerificationStateChange} from 'Repositories/conversati
 import {EventBuilder} from 'Repositories/conversation/EventBuilder';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
+import {EventRepository} from 'Repositories/event/EventRepository';
+import {EventService} from 'Repositories/event/EventService';
+import {NotificationService} from 'Repositories/event/NotificationService';
+import {EventStorageMiddleware} from 'Repositories/event/preprocessor/EventStorageMiddleware';
+import {QuotedMessageMiddleware} from 'Repositories/event/preprocessor/QuoteDecoderMiddleware';
+import {ReceiptsMiddleware} from 'Repositories/event/preprocessor/ReceiptsMiddleware';
+import {RepliesUpdaterMiddleware} from 'Repositories/event/preprocessor/RepliesUpdaterMiddleware';
+import {ServiceMiddleware} from 'Repositories/event/preprocessor/ServiceMiddleware';
+import {FederationEventProcessor} from 'Repositories/event/processor/FederationEventProcessor';
 import {GiphyRepository} from 'Repositories/giphy/GiphyRepository';
 import {GiphyService} from 'Repositories/giphy/GiphyService';
 import {initializeDataDog} from 'Util/DataDog';
@@ -72,15 +80,6 @@ import {AuthError} from '../error/AuthError';
 import {BaseError} from '../error/BaseError';
 import {ClientError, CLIENT_ERROR_TYPE} from '../error/ClientError';
 import {TeamError} from '../error/TeamError';
-import {EventRepository} from '../event/EventRepository';
-import {EventService} from '../event/EventService';
-import {NotificationService} from '../event/NotificationService';
-import {EventStorageMiddleware} from '../event/preprocessor/EventStorageMiddleware';
-import {QuotedMessageMiddleware} from '../event/preprocessor/QuoteDecoderMiddleware';
-import {ReceiptsMiddleware} from '../event/preprocessor/ReceiptsMiddleware';
-import {RepliesUpdaterMiddleware} from '../event/preprocessor/RepliesUpdaterMiddleware';
-import {ServiceMiddleware} from '../event/preprocessor/ServiceMiddleware';
-import {FederationEventProcessor} from '../event/processor/FederationEventProcessor';
 import {externalUrl} from '../externalRoute';
 import {IntegrationRepository} from '../integration/IntegrationRepository';
 import {IntegrationService} from '../integration/IntegrationService';

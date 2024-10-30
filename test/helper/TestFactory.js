@@ -42,10 +42,10 @@ import {ConversationService} from 'Repositories/conversation/ConversationService
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
+import {EventRepository} from 'Repositories/event/EventRepository';
+import {EventService} from 'Repositories/event/EventService';
+import {NotificationService} from 'Repositories/event/NotificationService';
 import {User} from 'src/script/entity/User';
-import {EventRepository} from 'src/script/event/EventRepository';
-import {EventService} from 'src/script/event/EventService';
-import {NotificationService} from 'src/script/event/NotificationService';
 import {MediaRepository} from 'src/script/media/MediaRepository';
 import {PermissionRepository} from 'src/script/permission/PermissionRepository';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';

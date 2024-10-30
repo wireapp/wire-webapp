@@ -38,6 +38,8 @@ import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
+import {EventSource} from 'Repositories/event/EventSource';
+import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
@@ -51,8 +53,6 @@ import {TeamService} from './TeamService';
 import {TeamState} from './TeamState';
 
 import {User} from '../entity/User';
-import {EventSource} from '../event/EventSource';
-import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {IntegrationMapper} from '../integration/IntegrationMapper';
 import {ServiceEntity} from '../integration/ServiceEntity';
 import {MLSMigrationStatus, getMLSMigrationStatus} from '../mls/MLSMigration/migrationStatus';

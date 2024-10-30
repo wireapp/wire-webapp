@@ -29,13 +29,13 @@ import {getLogger, Logger} from 'Util/Logger';
 
 import {ClientEvent, CONVERSATION as CLIENT_CONVERSATION_EVENT} from './Client';
 
-import {BaseError, BASE_ERROR_TYPE} from '../error/BaseError';
-import {ConversationError} from '../error/ConversationError';
-import {StorageError} from '../error/StorageError';
-import {categoryFromEvent} from '../message/MessageCategorization';
-import {MessageCategory} from '../message/MessageCategory';
-import {StorageService, DatabaseListenerCallback, LegacyEventRecord, EventRecord} from '../storage';
-import {StorageSchemata} from '../storage/StorageSchemata';
+import {BaseError, BASE_ERROR_TYPE} from '../../error/BaseError';
+import {ConversationError} from '../../error/ConversationError';
+import {StorageError} from '../../error/StorageError';
+import {categoryFromEvent} from '../../message/MessageCategorization';
+import {MessageCategory} from '../../message/MessageCategory';
+import {StorageService, DatabaseListenerCallback, LegacyEventRecord, EventRecord} from '../../storage';
+import {StorageSchemata} from '../../storage/StorageSchemata';
 
 export type Includes = {includeFrom: boolean; includeTo: boolean};
 type DexieCollection = Dexie.Collection<any, any>;

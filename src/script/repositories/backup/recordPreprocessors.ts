@@ -17,7 +17,8 @@
  *
  */
 
-import {ClientEvent} from '../../event/Client';
+import {ClientEvent} from 'Repositories/event/Client';
+
 import {ConversationRecord, EventRecord, UserRecord} from '../../storage';
 
 export function preprocessEvents(events: EventRecord[]): EventRecord[] {

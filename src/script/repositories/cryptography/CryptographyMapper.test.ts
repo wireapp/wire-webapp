@@ -38,8 +38,8 @@ import {
   Text,
 } from '@wireapp/protocol-messaging';
 
+import {ClientEvent} from 'Repositories/event/Client';
 import {CryptographyError} from 'src/script/error/CryptographyError';
-import {ClientEvent} from 'src/script/event/Client';
 import {arrayToBase64} from 'Util/util';
 import {createUuid} from 'Util/uuid';
 

@@ -28,6 +28,7 @@ import type {ConnectionRepository} from 'Repositories/connection/ConnectionRepos
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import type {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import type {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
+import type {EventRepository} from 'Repositories/event/EventRepository';
 import type {GiphyRepository} from 'Repositories/giphy/GiphyRepository';
 
 import {ActionsViewModel} from './ActionsViewModel';
@@ -35,7 +36,6 @@ import {CallingViewModel} from './CallingViewModel';
 import {ContentViewModel} from './ContentViewModel';
 import {ListViewModel} from './ListViewModel';
 
-import type {EventRepository} from '../event/EventRepository';
 import type {IntegrationRepository} from '../integration/IntegrationRepository';
 import type {MediaRepository} from '../media/MediaRepository';
 import type {NotificationRepository} from '../notification/NotificationRepository';

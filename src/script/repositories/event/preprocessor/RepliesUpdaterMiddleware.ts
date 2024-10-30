@@ -20,8 +20,8 @@
 import {DeleteEvent, MessageAddEvent} from 'Repositories/conversation/EventBuilder';
 import {getLogger, Logger} from 'Util/Logger';
 
-import {QuoteEntity} from '../../message/QuoteEntity';
-import {StoredEvent} from '../../storage/record/EventRecord';
+import {QuoteEntity} from '../../../message/QuoteEntity';
+import {StoredEvent} from '../../../storage/record/EventRecord';
 import {ClientEvent} from '../Client';
 import {EventMiddleware, IncomingEvent} from '../EventProcessor';
 import type {EventService} from '../EventService';

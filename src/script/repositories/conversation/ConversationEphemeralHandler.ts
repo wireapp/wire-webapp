@@ -22,6 +22,7 @@ import ko from 'knockout';
 
 import {Article, LinkPreview} from '@wireapp/protocol-messaging';
 
+import type {EventService} from 'Repositories/event/EventService';
 import {getLogger, Logger} from 'Util/Logger';
 import {clamp} from 'Util/NumberUtil';
 import {obfuscate} from 'Util/StringUtil';
@@ -36,7 +37,6 @@ import type {ContentMessage} from '../../entity/message/ContentMessage';
 import {MediumImage} from '../../entity/message/MediumImage';
 import type {Message} from '../../entity/message/Message';
 import {Text} from '../../entity/message/Text';
-import type {EventService} from '../../event/EventService';
 import {EphemeralStatusType} from '../../message/EphemeralStatusType';
 import {StatusType} from '../../message/StatusType';
 import type {EventRecord} from '../../storage';

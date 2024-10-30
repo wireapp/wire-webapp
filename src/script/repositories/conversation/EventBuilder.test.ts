@@ -19,9 +19,9 @@
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 
+import {ClientEvent} from 'Repositories/event/Client';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
-import {ClientEvent} from 'src/script/event/Client';
 import {SuperType} from 'src/script/message/SuperType';
 import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
 import {createUuid} from 'Util/uuid';
