@@ -30,10 +30,6 @@ import {container} from 'tsyringe';
 import {CONV_TYPE, CALL_TYPE, STATE as CALL_STATE, REASON, Wcall} from '@wireapp/avs';
 import {Runtime} from '@wireapp/commons';
 
-import {Call} from 'src/script/calling/Call';
-import {CallingRepository} from 'src/script/calling/CallingRepository';
-import {CallState, MuteState} from 'src/script/calling/CallState';
-import {Participant} from 'src/script/calling/Participant';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {EventRepository} from 'src/script/event/EventRepository';
@@ -42,14 +38,18 @@ import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 import {TestFactory} from 'test/helper/TestFactory';
 import {createUuid} from 'Util/uuid';
 
+import {Call} from './Call';
+import {CallingRepository} from './CallingRepository';
+import {CallState, MuteState} from './CallState';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
+import {Participant} from './Participant';
 
-import {CallingEvent} from '../event/CallingEvent';
-import {CALL} from '../event/Client';
-import {MediaDevicesHandler} from '../media/MediaDevicesHandler';
-import {Core} from '../service/CoreSingleton';
-import {UserRepository} from '../user/UserRepository';
+import {CallingEvent} from '../../event/CallingEvent';
+import {CALL} from '../../event/Client';
+import {MediaDevicesHandler} from '../../media/MediaDevicesHandler';
+import {Core} from '../../service/CoreSingleton';
+import {UserRepository} from '../../user/UserRepository';
 
 const createSelfParticipant = () => {
   const selfUser = new User();

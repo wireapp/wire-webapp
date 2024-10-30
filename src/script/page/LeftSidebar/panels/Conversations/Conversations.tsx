@@ -25,6 +25,7 @@ import {container} from 'tsyringe';
 import {useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {CallState} from 'Repositories/calling/CallState';
 import {IntegrationRepository} from 'src/script/integration/IntegrationRepository';
 import {Preferences} from 'src/script/page/LeftSidebar/panels/Preferences';
 import {StartUI} from 'src/script/page/LeftSidebar/panels/StartUI';
@@ -48,7 +49,6 @@ import {getTabConversations, scrollToConversation} from './helpers';
 import {useFolderStore} from './useFoldersStore';
 import {SidebarStatus, SidebarTabs, useSidebarStore} from './useSidebarStore';
 
-import {CallState} from '../../../../calling/CallState';
 import {createLabel} from '../../../../conversation/ConversationLabelRepository';
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
 import {ConversationState} from '../../../../conversation/ConversationState';

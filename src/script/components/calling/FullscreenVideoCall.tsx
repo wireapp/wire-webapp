@@ -39,7 +39,11 @@ import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import * as Icon from 'Components/Icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {CallingRepository} from 'src/script/calling/CallingRepository';
+import type {Call} from 'Repositories/calling/Call';
+import {CallingRepository} from 'Repositories/calling/CallingRepository';
+import {CallingViewMode, CallState, MuteState} from 'Repositories/calling/CallState';
+import {Participant} from 'Repositories/calling/Participant';
+import type {Grid} from 'Repositories/calling/videoGridHandler';
 import {Config} from 'src/script/Config';
 import {isCallViewOption} from 'src/script/guards/CallView';
 import {isMediaDevice} from 'src/script/guards/MediaDevice';
@@ -67,10 +71,6 @@ import {
 import {GroupVideoGrid} from './GroupVideoGrid';
 import {Pagination} from './Pagination';
 
-import type {Call} from '../../calling/Call';
-import {CallingViewMode, CallState, MuteState} from '../../calling/CallState';
-import {Participant} from '../../calling/Participant';
-import type {Grid} from '../../calling/videoGridHandler';
 import type {Conversation} from '../../entity/Conversation';
 import {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
 import {TeamState} from '../../team/TeamState';

@@ -24,8 +24,8 @@ import {VIDEO_STATE} from '@wireapp/avs';
 
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
-import {User} from '../entity/User';
-import {applyBlur} from '../media/VideoBackgroundBlur';
+import {User} from '../../entity/User';
+import {applyBlur} from '../../media/VideoBackgroundBlur';
 
 export type UserId = string;
 export type ClientId = string;

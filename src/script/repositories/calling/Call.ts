@@ -29,9 +29,9 @@ import {sortUsersByPriority} from 'Util/StringUtil';
 import {MuteState} from './CallState';
 import type {ClientId, Participant} from './Participant';
 
-import {Config} from '../Config';
-import {Conversation} from '../entity/Conversation';
-import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
+import {Config} from '../../Config';
+import {Conversation} from '../../entity/Conversation';
+import type {MediaDevicesHandler} from '../../media/MediaDevicesHandler';
 
 export type SerializedConversationId = string;
 

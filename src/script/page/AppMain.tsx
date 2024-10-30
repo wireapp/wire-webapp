@@ -34,6 +34,7 @@ import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationM
 import {LegalHoldModal} from 'Components/Modals/LegalHoldModal/LegalHoldModal';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showUserModal, UserModal} from 'Components/Modals/UserModal';
+import {CallingViewMode, CallState, DesktopScreenShareMenu} from 'Repositories/calling/CallState';
 import {Config} from 'src/script/Config';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
@@ -48,7 +49,6 @@ import {RootProvider} from './RootProvider';
 import {useAppMainState, ViewType} from './state';
 import {useAppState, ContentState} from './useAppState';
 
-import {CallingViewMode, CallState, DesktopScreenShareMenu} from '../calling/CallState';
 import {ConversationState} from '../conversation/ConversationState';
 import {User} from '../entity/User';
 import {useActiveWindow} from '../hooks/useActiveWindow';
