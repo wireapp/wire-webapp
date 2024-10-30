@@ -243,7 +243,7 @@ export const PrimaryModalComponent: FC = () => {
 
   const primaryButton = !!primaryAction?.text && (
     <PrimaryButton
-      key={`modal-primary-button`}
+      key="modal-primary-button"
       ref={primaryActionButtonRef}
       onClick={performAction(confirm, !!closeOnConfirm)}
       disabled={isPrimaryActionDisabled(primaryAction.disabled)}
