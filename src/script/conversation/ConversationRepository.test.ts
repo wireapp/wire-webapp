@@ -52,8 +52,9 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {ClientEntity} from 'Repositories/client/ClientEntity';
+import {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';
+import {ConnectionRepository} from 'Repositories/connection/ConnectionRepository';
 import {Config} from 'src/script/Config';
-import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
 import {ConversationDatabaseData, ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
 import {DeleteEvent, EventBuilder, MessageHiddenEvent} from 'src/script/conversation/EventBuilder';
@@ -82,7 +83,6 @@ import {MessageRepository} from './MessageRepository';
 import {entities, payload} from '../../../test/api/payloads';
 import {TestFactory} from '../../../test/helper/TestFactory';
 import {generateUser} from '../../../test/helper/UserGenerator';
-import {ConnectionRepository} from '../connection/ConnectionRepository';
 import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
 import {EventService} from '../event/EventService';
 import {SelfRepository} from '../self/SelfRepository';

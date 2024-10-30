@@ -62,6 +62,9 @@ import {TYPING_TIMEOUT, useTypingIndicatorState} from 'Components/InputBar/compo
 import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/LeaveCallReason';
+import {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';
+import {ConnectionRepository} from 'Repositories/connection/ConnectionRepository';
+import {ConnectionState} from 'Repositories/connection/ConnectionState';
 import {getNextItem} from 'Util/ArrayUtil';
 import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/FileTypeUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
@@ -118,9 +121,6 @@ import {NOTIFICATION_STATE} from './NotificationSetting';
 
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
-import {ConnectionEntity} from '../connection/ConnectionEntity';
-import {ConnectionRepository} from '../connection/ConnectionRepository';
-import {ConnectionState} from '../connection/ConnectionState';
 import {
   AssetAddEvent,
   ButtonActionConfirmationEvent,

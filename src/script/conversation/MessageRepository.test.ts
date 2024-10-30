@@ -29,7 +29,7 @@ import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {AudioRepository} from 'Repositories/audio/AudioRepository';
 import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {ClientState} from 'Repositories/client/ClientState';
-import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
+import {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
 import {Conversation} from 'src/script/entity/Conversation';
 import {Message} from 'src/script/entity/message/Message';
