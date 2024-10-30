@@ -19,11 +19,11 @@
 
 import {Loading} from '@wireapp/react-ui-kit';
 
-import {wrapper} from './PrimaryModalLoading.styles';
+import {wrapperStyles} from './PrimaryModalLoading.styles';
 
 export const PrimaryModalLoading = () => {
   return (
-    <div css={wrapper}>
+    <div css={wrapperStyles}>
       <Loading />
     </div>
   );

@@ -19,7 +19,7 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const wrapper: CSSObject = {
+export const wrapperStyles: CSSObject = {
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
