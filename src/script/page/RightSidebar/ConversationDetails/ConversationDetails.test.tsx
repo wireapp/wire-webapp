@@ -26,15 +26,20 @@ import {createUuid} from 'Util/uuid';
 import {ConversationDetails} from './ConversationDetails';
 
 import {TestFactory} from '../../../../../test/helper/TestFactory';
+import {ConnectionRepository} from '../../../connection/ConnectionRepository';
 import {ConversationRepository} from '../../../conversation/ConversationRepository';
 import {ConversationRoleRepository} from '../../../conversation/ConversationRoleRepository';
+import {MessageRepository} from '../../../conversation/MessageRepository';
 import {User} from '../../../entity/User';
 import {IntegrationRepository} from '../../../integration/IntegrationRepository';
 import {SearchRepository} from '../../../search/SearchRepository';
+import {SelfRepository} from '../../../self/SelfRepository';
 import {TeamEntity} from '../../../team/TeamEntity';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {TeamState} from '../../../team/TeamState';
+import {UserState} from '../../../user/UserState';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
+import {MainViewModel} from '../../../view_model/MainViewModel';
 
 jest.mock('Components/panel/EnrichedFields', () => ({
   useEnrichedFields: () => [],
@@ -75,17 +80,15 @@ const getDefaultParams = () => {
   const selfUserMock = new User(createUuid());
 
   return {
-    actionsViewModel: {
-      archiveConversation: async (activeConversation: Conversation) => Promise.resolve(),
-      blockUser: async (userEntity: User, hideConversation?: boolean, nextConversationEntity?: Conversation) =>
-        Promise.resolve(),
-      cancelConnectionRequest: (userEntity: User, hideConversation?: boolean, nextConversationEntity?: Conversation) =>
-        Promise.resolve(),
-      clearConversation: (activeConversation: Conversation) => {},
-      deleteConversation: async (activeConversation: Conversation) => Promise.resolve(),
-      leaveConversation: async (activeConversation: Conversation) => Promise.resolve(),
-      toggleMuteConversation: (conversationEntity: Conversation) => {},
-    } as ActionsViewModel,
+    actionsViewModel: new ActionsViewModel(
+      {} as SelfRepository,
+      {} as ConnectionRepository,
+      conversationRepository,
+      {} as IntegrationRepository,
+      {} as MessageRepository,
+      {} as UserState,
+      {} as MainViewModel,
+    ),
     conversationRepository: {
       expectReadReceipt: () => true,
       getNextConversation: () => Promise.resolve(new Conversation()),
