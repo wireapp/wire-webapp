@@ -30,6 +30,7 @@ import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import type {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
@@ -43,7 +44,6 @@ import {ClientState} from './ClientState';
 import {isClientMLSCapable, wasClientActiveWithinLast4Weeks} from './ClientUtils';
 
 import {SIGN_OUT_REASON} from '../../auth/SignOutReason';
-import type {CryptographyRepository} from '../../cryptography/CryptographyRepository';
 import type {User} from '../../entity/User';
 import {ClientError} from '../../error/ClientError';
 import {Core} from '../../service/CoreSingleton';

@@ -25,8 +25,8 @@ import {randomUUID} from 'crypto';
 import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {ClientState} from 'Repositories/client/ClientState';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
 import {User} from 'src/script/entity/User';
 import {createUuid} from 'Util/uuid';
 

@@ -25,7 +25,7 @@ import {container} from 'tsyringe';
 import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {ClientState} from 'Repositories/client/ClientState';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
+import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {useUserIdentity} from 'src/script/hooks/useDeviceIdentities';

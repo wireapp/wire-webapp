@@ -25,11 +25,11 @@ import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {ClientRepository} from 'Repositories/client';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
+import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
 
 import {LegalHoldModal, LegalHoldModalType} from './LegalHoldModal';
 
 import {TestFactory} from '../../../../../test/helper/TestFactory';
-import {CryptographyRepository} from '../../../cryptography/CryptographyRepository';
 import {Conversation} from '../../../entity/Conversation';
 import {User} from '../../../entity/User';
 import {SearchRepository} from '../../../search/SearchRepository';

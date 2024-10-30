@@ -41,7 +41,7 @@ import {ConversationRepository} from 'Repositories/conversation/ConversationRepo
 import {ConversationService} from 'Repositories/conversation/ConversationService';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
+import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
 import {User} from 'src/script/entity/User';
 import {EventRepository} from 'src/script/event/EventRepository';
 import {EventService} from 'src/script/event/EventService';
