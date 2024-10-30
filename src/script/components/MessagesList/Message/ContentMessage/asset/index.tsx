@@ -20,6 +20,7 @@
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
 
+import {AssetType} from 'Repositories/assets/AssetType';
 import {Asset} from 'src/script/entity/message/Asset';
 import type {FileAsset as FileAssetType} from 'src/script/entity/message/FileAsset';
 import type {Location} from 'src/script/entity/message/Location';
@@ -39,7 +40,6 @@ import {TextMessageRenderer} from './TextMessageRenderer';
 import {VideoAsset} from './VideoAsset';
 
 import {MessageActions} from '../..';
-import {AssetType} from '../../../../../assets/AssetType';
 import {Button} from '../../../../../entity/message/Button';
 import {CompositeMessage} from '../../../../../entity/message/CompositeMessage';
 import {ContentMessage} from '../../../../../entity/message/ContentMessage';

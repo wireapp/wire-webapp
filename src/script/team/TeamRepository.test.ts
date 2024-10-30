@@ -22,6 +22,7 @@ import {FeatureList, FeatureStatus} from '@wireapp/api-client/lib/team/feature/'
 
 import {randomUUID} from 'crypto';
 
+import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {User} from 'src/script/entity/User';
 import {TeamRepository} from 'src/script/team/TeamRepository';
 import {TeamState} from 'src/script/team/TeamState';
@@ -31,7 +32,6 @@ import {TeamEntity} from './TeamEntity';
 import {TeamMemberEntity} from './TeamMemberEntity';
 import {TeamService} from './TeamService';
 
-import {AssetRepository} from '../assets/AssetRepository';
 import {ROLE} from '../user/UserPermission';
 import {UserRepository} from '../user/UserRepository';
 

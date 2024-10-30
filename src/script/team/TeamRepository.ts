@@ -37,6 +37,7 @@ import {Runtime, TypedEventEmitter} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
@@ -49,7 +50,6 @@ import {TeamMemberEntity} from './TeamMemberEntity';
 import {TeamService} from './TeamService';
 import {TeamState} from './TeamState';
 
-import {AssetRepository} from '../assets/AssetRepository';
 import {User} from '../entity/User';
 import {EventSource} from '../event/EventSource';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';

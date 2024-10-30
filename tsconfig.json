@@ -30,6 +30,7 @@
       "Hooks/*": ["./src/script/hooks/*"],
       "I18n/*": ["./src/i18n/*"],
       "Resource/*": ["./resource/*"],
+      "Repositories/*": ["./src/script/repositories/*"],
       "Util/*": ["./src/script/util/*"]
     },
     "skipLibCheck": true,

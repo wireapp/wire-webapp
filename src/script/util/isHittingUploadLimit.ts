@@ -17,9 +17,9 @@
  *
  */
 
+import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {t} from 'Util/LocalizerUtil';
 
-import {AssetRepository} from '../assets/AssetRepository';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 
 const CONCURRENT_UPLOAD_LIMIT = 10;

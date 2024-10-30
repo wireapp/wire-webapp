@@ -32,12 +32,12 @@ import {AssetRemoteData} from './AssetRemoteData';
 import {AssetTransferState} from './AssetTransferState';
 import {getAssetUrl, setAssetUrl} from './AssetURLCache';
 
-import {Conversation} from '../entity/Conversation';
-import {FileAsset} from '../entity/message/FileAsset';
-import type {User} from '../entity/User';
-import {Core} from '../service/CoreSingleton';
-import {TeamState} from '../team/TeamState';
-import {stripImageExifData} from '../util/ImageUtil';
+import {Conversation} from '../../entity/Conversation';
+import {FileAsset} from '../../entity/message/FileAsset';
+import type {User} from '../../entity/User';
+import {Core} from '../../service/CoreSingleton';
+import {TeamState} from '../../team/TeamState';
+import {stripImageExifData} from '../../util/ImageUtil';
 
 interface CompressedImage {
   compressedBytes: Uint8Array;

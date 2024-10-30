@@ -21,6 +21,7 @@ import type {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 
+import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {copyText} from 'Util/ClipboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatLocale, formatTimeShort} from 'Util/TimeUtil';
@@ -31,7 +32,6 @@ import type {MediumImage} from './MediumImage';
 import {Message} from './Message';
 import {Text as TextAsset} from './Text';
 
-import {AssetRepository} from '../../assets/AssetRepository';
 import type {QuoteEntity} from '../../message/QuoteEntity';
 import {SuperType} from '../../message/SuperType';
 import {ReactionMap, ReadReceipt} from '../../storage';

@@ -28,7 +28,7 @@ import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/'
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {AssetRepository} from 'src/script/assets/AssetRepository';
+import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {ClientRepository} from 'src/script/client/ClientRepository';

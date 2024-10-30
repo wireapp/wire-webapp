@@ -52,12 +52,12 @@ import {
   InCallEmoji,
 } from '@wireapp/protocol-messaging';
 
+import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
 import {CALL_MESSAGE_TYPE} from 'src/script/calling/enum/CallMessageType';
 import {getLogger, Logger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {base64ToArray, arrayToBase64} from 'Util/util';
 
-import {AssetTransferState} from '../assets/AssetTransferState';
 import {ConversationEphemeralHandler} from '../conversation/ConversationEphemeralHandler';
 import {MessageAddEvent} from '../conversation/EventBuilder';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';

@@ -19,7 +19,8 @@
 
 import ko from 'knockout';
 
-import {AssetRemoteData} from '../assets/AssetRemoteData';
+import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
+
 import {assetV3} from '../util/ValidationUtil';
 
 export class TeamEntity {

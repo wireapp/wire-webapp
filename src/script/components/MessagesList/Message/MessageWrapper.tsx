@@ -27,6 +27,7 @@ import {container} from 'tsyringe';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {E2EIVerificationMessage} from 'Components/MessagesList/Message/E2EIVerificationMessage';
+import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {OutgoingQuote} from 'src/script/conversation/MessageRepository';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {Text} from 'src/script/entity/message/Text';
@@ -49,7 +50,6 @@ import {PingMessage} from './PingMessage';
 import {SystemMessage} from './SystemMessage';
 import {VerificationMessage} from './VerificationMessage';
 
-import {AssetRepository} from '../../../assets/AssetRepository';
 import {Conversation} from '../../../entity/Conversation';
 import {CompositeMessage} from '../../../entity/message/CompositeMessage';
 import {TeamState} from '../../../team/TeamState';
