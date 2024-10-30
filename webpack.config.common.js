@@ -190,6 +190,7 @@ module.exports = {
   resolve: {
     alias: {
       Components: path.resolve(srcScript, 'components'),
+      Hooks: path.resolve(srcScript, 'hooks'),
       I18n: path.resolve(SRC_PATH, 'i18n'),
       Resource: path.resolve(ROOT_PATH, 'resource'),
       Util: path.resolve(srcScript, 'util'),

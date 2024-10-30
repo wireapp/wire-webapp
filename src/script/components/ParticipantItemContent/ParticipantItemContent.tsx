@@ -21,10 +21,9 @@ import React from 'react';
 
 import ko from 'knockout';
 
+import {UserBlockedBadge, UserVerificationBadges} from 'Components/Badge';
 import * as Icon from 'Components/Icon';
-import {UserBlockedBadge} from 'Components/UserBlockedBadge/UserBlockedBadge';
 import {UserInfo} from 'Components/UserInfo';
-import {UserVerificationBadges} from 'Components/VerificationBadge';
 import {User} from 'src/script/entity/User';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';

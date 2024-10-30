@@ -21,8 +21,8 @@ import {MouseEvent, KeyboardEvent} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
+import {DeviceVerificationBadges} from 'Components/Badge';
 import * as Icon from 'Components/Icon';
-import {DeviceVerificationBadges} from 'Components/VerificationBadge';
 import {WireIdentity} from 'src/script/E2EIdentity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';

@@ -35,7 +35,7 @@ import {createUuid} from 'Util/uuid';
 
 import {CallingCell, CallingCellProps} from './CallingCell';
 
-jest.mock('Components/utils/InViewport', () => ({
+jest.mock('Components/InViewport', () => ({
   InViewport: ({onVisible, children}: {onVisible: () => void; children: any}) => {
     setTimeout(onVisible);
     return <div>{children}</div>;

@@ -36,9 +36,9 @@ import {
 } from '@wireapp/react-ui-kit';
 
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
+import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import * as Icon from 'Components/Icon';
-import {ConversationClassifiedBar} from 'Components/input/ClassifiedBar';
-import {ModalComponent} from 'Components/ModalComponent';
+import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {Config} from 'src/script/Config';
 import {isCallViewOption} from 'src/script/guards/CallView';

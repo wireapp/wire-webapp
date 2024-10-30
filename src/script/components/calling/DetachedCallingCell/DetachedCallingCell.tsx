@@ -19,13 +19,14 @@
 
 import {container} from 'tsyringe';
 
-import {DetachedWindow} from 'Components/DetachedWindow';
 import {Call} from 'src/script/calling/Call';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {CallState, CallingViewMode, DesktopScreenShareMenu} from 'src/script/calling/CallState';
 import {MediaRepository} from 'src/script/media/MediaRepository';
 import {UserState} from 'src/script/user/UserState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+
+import {DetachedWindow} from './components/DetachedWindow';
 
 import {CallingContainer} from '../CallingOverlayContainer';
 import {WindowContextProvider} from '../useWindow';

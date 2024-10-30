@@ -27,7 +27,7 @@ import {Checkbox, CheckboxLabel, COLOR, Form, Link, Text, Input, Loading, ErrorM
 import {CopyToClipboardButton} from 'Components/CopyToClipboardButton';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import * as Icon from 'Components/Icon';
-import {ModalComponent} from 'Components/ModalComponent';
+import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {PasswordGeneratorButton} from 'Components/PasswordGeneratorButton';
 import {Config} from 'src/script/Config';
 import {isEnterKey, isEscapeKey} from 'Util/KeyboardUtil';
