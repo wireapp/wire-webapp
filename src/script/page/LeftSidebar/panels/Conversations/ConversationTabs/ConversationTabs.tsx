@@ -87,6 +87,8 @@ export const ConversationTabs = ({
   const filterUnreadAndArchivedConversations = (conversation: Conversation) =>
     !conversation.is_archived() && conversation.hasUnread();
 
+  const isTeamCreationEnabled = Config.getConfig().FEATURE.ENABLE_TEAM_CREATION;
+
   const conversationTabs = [
     {
       type: SidebarTabs.RECENT,
@@ -193,7 +195,7 @@ export const ConversationTabs = ({
         aria-owns="tab-1 tab-2"
         className="conversations-sidebar-list-footer"
       >
-        {!teamState.isInTeam(selfUser) && <TeamCreationBanner />}
+        {isTeamCreationEnabled && !teamState.isInTeam(selfUser) && <TeamCreationBanner />}
 
         {!getWebEnvironment().isProduction && isDataDogEnabled() && (
           <div css={footerDisclaimer}>
