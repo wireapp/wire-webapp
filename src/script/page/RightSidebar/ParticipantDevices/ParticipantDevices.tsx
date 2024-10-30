@@ -20,7 +20,8 @@
 import {FC} from 'react';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {UserDevices, UserDevicesState, useUserDevicesHistory} from 'Components/UserDevices';
+import {UserDevices, UserDevicesState} from 'Components/UserDevices';
+import {useUserDevicesHistory} from 'Hooks/useUserDevicesHistory';
 import {t} from 'Util/LocalizerUtil';
 
 import type {User} from '../../../entity/User';
