@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode} from 'react';
+import {ReactNode, useEffect, useRef} from 'react';
 
 import {ModalComponent} from 'Components/ModalComponent';
 
@@ -38,6 +38,14 @@ export const PrimaryModalShell = ({
   onClose,
   onBgClick,
 }: PrimaryModalShellProps) => {
+  const modalsRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (isShown) {
+      modalsRef.current?.focus();
+    }
+  }, [isShown]);
+
   return (
     <div
       id="modals"
@@ -46,7 +54,7 @@ export const PrimaryModalShell = ({
       aria-modal="true"
       aria-label={title}
       tabIndex={-1}
-      ref={ref => isShown && ref?.focus()}
+      ref={modalsRef}
     >
       <ModalComponent isShown={isShown} onClosed={onClose} onBgClick={onBgClick} data-uie-name={dataUieName}>
         {isShown && children}
