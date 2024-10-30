@@ -302,18 +302,16 @@ export class ActionsViewModel {
     });
   };
 
-  readonly deleteConversation = (conversationEntity: Conversation): Promise<void> => {
-    return new Promise(() => {
-      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-        primaryAction: {
-          action: () => this.conversationRepository.deleteConversation(conversationEntity),
-          text: t('modalConversationDeleteGroupAction'),
-        },
-        text: {
-          message: t('modalConversationDeleteGroupMessage'),
-          title: t('modalConversationDeleteGroupHeadline', conversationEntity.display_name()),
-        },
-      });
+  readonly deleteConversation = (conversationEntity: Conversation) => {
+    PrimaryModal.show(PrimaryModal.type.CONFIRM, {
+      primaryAction: {
+        action: () => this.conversationRepository.deleteConversation(conversationEntity),
+        text: t('modalConversationDeleteGroupAction'),
+      },
+      text: {
+        message: t('modalConversationDeleteGroupMessage'),
+        title: t('modalConversationDeleteGroupHeadline', conversationEntity.display_name()),
+      },
     });
   };
 
