@@ -29,6 +29,7 @@ import ko from 'knockout';
 import {container} from 'tsyringe';
 
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
+import {AudioRepository} from 'Repositories/audio/AudioRepository';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {ClientRepository} from 'src/script/client/ClientRepository';
@@ -66,7 +67,6 @@ import {UserState} from 'src/script/user/UserState';
 
 import {entities} from '../api/payloads';
 import {SelfRepository} from 'src/script/self/SelfRepository';
-import {AudioRepository} from 'src/script/audio/AudioRepository';
 
 export class TestFactory {
   constructor() {
