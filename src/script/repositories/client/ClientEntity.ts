@@ -24,7 +24,7 @@ import {splitFingerprint} from 'Util/StringUtil';
 
 import {ClientMapper} from './ClientMapper';
 
-import {ClientRecord} from '../storage';
+import {ClientRecord} from '../../storage';
 
 export enum MLSPublicKeys {
   ED25519 = 'ed25519',

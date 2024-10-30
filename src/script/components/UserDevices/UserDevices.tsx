@@ -21,6 +21,7 @@ import {useEffect, useMemo, useState} from 'react';
 
 import {ClientClassification} from '@wireapp/api-client/lib/client/';
 
+import {ClientRepository, ClientEntity} from 'Repositories/client';
 import {partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
@@ -32,7 +33,6 @@ import {NoDevicesFound} from './components/NoDevicesFound';
 import {SelfFingerprint} from './components/SelfFingerprint';
 import {FIND_MODE, UserDevicesState} from './UserDevices.types';
 
-import {ClientRepository, ClientEntity} from '../../client';
 import {MessageRepository} from '../../conversation/MessageRepository';
 import {CryptographyRepository} from '../../cryptography/CryptographyRepository';
 import {User} from '../../entity/User';

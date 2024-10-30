@@ -22,7 +22,8 @@ import React, {useEffect, useState} from 'react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
-import {ClientEntity} from 'src/script/client/ClientEntity';
+import {ClientEntity} from 'Repositories/client/ClientEntity';
+import {ClientState} from 'Repositories/client/ClientState';
 import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
@@ -34,7 +35,6 @@ import {DetailedDevice} from './components/DetailedDevice';
 import {Device} from './components/Device';
 import {DeviceDetailsPreferences} from './components/DeviceDetailsPreferences';
 
-import {ClientState} from '../../../../../client/ClientState';
 import {ConversationState} from '../../../../../conversation/ConversationState';
 import {PreferencesPage} from '../components/PreferencesPage';
 
