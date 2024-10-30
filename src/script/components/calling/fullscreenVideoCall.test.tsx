@@ -20,10 +20,10 @@
 import {render, waitFor, act} from '@testing-library/react';
 import ko from 'knockout';
 
+import {Call} from 'Repositories/calling/Call';
+import {Participant} from 'Repositories/calling/Participant';
+import {Grid} from 'Repositories/calling/videoGridHandler';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {Call} from 'src/script/calling/Call';
-import {Participant} from 'src/script/calling/Participant';
-import {Grid} from 'src/script/calling/videoGridHandler';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {MediaDevicesHandler} from 'src/script/media/MediaDevicesHandler';

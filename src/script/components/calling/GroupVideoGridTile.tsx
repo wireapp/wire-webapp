@@ -26,13 +26,12 @@ import {VIDEO_STATE} from '@wireapp/avs';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import * as Icon from 'Components/Icon';
+import type {Participant} from 'Repositories/calling/Participant';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {Video} from './Video';
-
-import type {Participant} from '../../calling/Participant';
 
 export interface GroupVideoGridTileProps {
   isMaximized: boolean;

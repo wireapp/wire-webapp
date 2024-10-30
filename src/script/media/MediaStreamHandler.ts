@@ -21,7 +21,7 @@ import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
 
-import {CallingViewMode, CallState} from 'src/script/calling/CallState';
+import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
 import {getLogger, Logger} from 'Util/Logger';
 
 import {MediaConstraintsHandler, ScreensharingMethods} from './MediaConstraintsHandler';

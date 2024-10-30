@@ -50,6 +50,7 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {Config} from 'src/script/Config';
 import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
@@ -81,7 +82,6 @@ import {MessageRepository} from './MessageRepository';
 import {entities, payload} from '../../../test/api/payloads';
 import {TestFactory} from '../../../test/helper/TestFactory';
 import {generateUser} from '../../../test/helper/UserGenerator';
-import {CallingRepository} from '../calling/CallingRepository';
 import {ConnectionRepository} from '../connection/ConnectionRepository';
 import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
 import {EventService} from '../event/EventService';

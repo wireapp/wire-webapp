@@ -20,11 +20,11 @@
 import {CALL_TYPE, STATE} from '@wireapp/avs';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/LeaveCallReason';
 import {createUuid} from 'Util/uuid';
 
 import {buildCall, buildCallingViewModel, callState, mockCallingRepository} from './CallingViewModel.mocks';
 
-import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
 import {Conversation} from '../entity/Conversation';
 
 describe('CallingViewModel', () => {

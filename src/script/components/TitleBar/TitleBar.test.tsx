@@ -27,12 +27,12 @@ import * as uiKit from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {TitleBar} from 'Components/TitleBar';
+import {CallingRepository} from 'Repositories/calling/CallingRepository';
+import {CallState} from 'Repositories/calling/CallState';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {ContentState} from 'src/script/page/useAppState';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
-import {CallingRepository} from '../../calling/CallingRepository';
-import {CallState} from '../../calling/CallState';
 import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
 import {Conversation} from '../../entity/Conversation';
 import {User} from '../../entity/User';

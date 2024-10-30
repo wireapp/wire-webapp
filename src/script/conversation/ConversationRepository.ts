@@ -60,6 +60,8 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {TYPING_TIMEOUT, useTypingIndicatorState} from 'Components/InputBar/components/TypingIndicator';
 import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
+import {CallingRepository} from 'Repositories/calling/CallingRepository';
+import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/LeaveCallReason';
 import {getNextItem} from 'Util/ArrayUtil';
 import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/FileTypeUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
@@ -114,8 +116,6 @@ import {EventMapper} from './EventMapper';
 import {MessageRepository} from './MessageRepository';
 import {NOTIFICATION_STATE} from './NotificationSetting';
 
-import {CallingRepository} from '../calling/CallingRepository';
-import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
 import {ConnectionEntity} from '../connection/ConnectionEntity';

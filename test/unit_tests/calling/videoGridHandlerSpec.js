@@ -20,9 +20,9 @@
 import {CONV_TYPE, CALL_TYPE, VIDEO_STATE} from '@wireapp/avs';
 import ko from 'knockout';
 
-import {Call} from 'src/script/calling/Call';
-import {Participant} from 'src/script/calling/Participant';
-import {getGrid} from 'src/script/calling/videoGridHandler';
+import {Call} from 'Repositories/calling/Call';
+import {Participant} from 'Repositories/calling/Participant';
+import {getGrid} from 'Repositories/calling/videoGridHandler';
 import {User} from 'src/script/entity/User';
 describe('videoGridHandler', () => {
   let participants;
