@@ -321,6 +321,23 @@ export class ActionsViewModel {
     return Promise.reject();
   };
 
+  readonly removeConversation = (conversationEntity: Conversation) => {
+    if (!conversationEntity.isGroup() || !conversationEntity.isSelfUserRemoved()) {
+      return;
+    }
+
+    PrimaryModal.show(PrimaryModal.type.CONFIRM, {
+      primaryAction: {
+        action: () => this.conversationRepository.deleteConversationLocally(conversationEntity, true),
+        text: t('modalConversationRemoveGroupAction'),
+      },
+      text: {
+        message: t('modalConversationRemoveGroupMessage'),
+        title: t('modalConversationRemoveGroupHeadline'),
+      },
+    });
+  };
+
   getConversationById = async (conversation: QualifiedId): Promise<Conversation> => {
     return this.conversationRepository.getConversationById(conversation);
   };

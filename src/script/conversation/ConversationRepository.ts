@@ -1127,7 +1127,7 @@ export class ConversationRepository {
     }
   }
 
-  private readonly deleteConversationLocally = async (conversationId: QualifiedId, skipNotification: boolean) => {
+  public readonly deleteConversationLocally = async (conversationId: QualifiedId, skipNotification: boolean) => {
     const conversationEntity = this.conversationState.findConversation(conversationId);
     if (!conversationEntity) {
       return;
