@@ -265,7 +265,8 @@ export class CallingRepository {
       }
       const isSpeakersViewActive = this.callState.isSpeakersViewActive();
       if (isSpeakersViewActive) {
-        const videoQuality = call.activeSpeakers().length > 3 ? RESOLUTION.LOW : RESOLUTION.HIGH;
+        const videoQuality = call.activeSpeakers().length > 2 ? RESOLUTION.LOW : RESOLUTION.HIGH;
+
         this.requestVideoStreams(call.conversation.qualifiedId, call.activeSpeakers(), videoQuality);
       }
     });
@@ -279,20 +280,9 @@ export class CallingRepository {
       const maximizedParticipant = call.maximizedParticipant();
       if (maximizedParticipant !== null) {
         this.requestVideoStreams(call.conversation.qualifiedId, [maximizedParticipant], RESOLUTION.HIGH);
+      } else {
+        this.requestCurrentPageVideoStreams(call);
       }
-      // else {
-      //   this.requestCurrentPageVideoStreams(call);
-      // }
-    });
-
-    // Request the video streams whenever toggle the view mode.
-    ko.computed(() => {
-      const call = this.callState.joinedCall();
-      if (!call) {
-        return;
-      }
-      this.callState.viewMode();
-      this.requestCurrentPageVideoStreams(call);
     });
   }
 
@@ -1325,10 +1315,7 @@ export class CallingRepository {
 
   requestCurrentPageVideoStreams(call: Call): void {
     const currentPageParticipants = call.pages()[call.currentPage()];
-    let videoQuality: RESOLUTION = RESOLUTION.LOW;
-    if (this.callState.viewMode() !== CallingViewMode.MINIMIZED && currentPageParticipants.length > 3) {
-      videoQuality = RESOLUTION.HIGH;
-    }
+    const videoQuality: RESOLUTION = RESOLUTION.LOW;
     this.requestVideoStreams(call.conversation.qualifiedId, currentPageParticipants, videoQuality);
   }
 
@@ -1677,7 +1664,12 @@ export class CallingRepository {
   private readonly requestConfig = () => {
     const _requestConfig = async () => {
       const limit = Runtime.isFirefox() ? CallingRepository.CONFIG.MAX_FIREFOX_TURN_COUNT : undefined;
-      const config = await this.fetchConfig(limit);
+      const config = (await this.fetchConfig(limit)) as any;
+
+      // @TODO: Change this before review and merge in dev branch
+      config.sft_servers = [{urls: ['https://sft01.avs.zinfra.io']}];
+      config.sft_servers_all = [{urls: ['https://sft01.avs.zinfra.io']}];
+
       this.wCall?.configUpdate(this.wUser, 0, JSON.stringify(config));
     };
     _requestConfig().catch(error => {

@@ -18,9 +18,10 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import ko, {observable, pureComputed} from 'knockout';
+import ko, {computed, observable, pureComputed} from 'knockout';
 
 import {VIDEO_STATE} from '@wireapp/avs';
+import * as avsTrackLogger from '@wireapp/avs-debugger';
 
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
@@ -66,6 +67,17 @@ export class Participant {
     });
     this.isSendingVideo = pureComputed(() => {
       return this.videoState() !== VIDEO_STATE.STOPPED;
+    });
+
+    computed(() => {
+      const stream = this.videoStream();
+
+      if (stream && stream.getVideoTracks().length > 0) {
+        if (avsTrackLogger.hasTrack(this.user.id)) {
+          avsTrackLogger.removeTrack(this.user.id);
+        }
+        avsTrackLogger.addTrack(this.user.id, this.user.name(), stream.getVideoTracks()[0]);
+      }
     });
   }
 
@@ -141,6 +153,9 @@ export class Participant {
         track.stop();
       }
       mediaStream.removeTrack(track);
+      if (track.kind == 'video' && avsTrackLogger.hasTrack(this.user.id)) {
+        avsTrackLogger.removeTrack(this.user.id);
+      }
     });
   }
 }
