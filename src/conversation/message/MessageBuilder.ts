@@ -42,6 +42,7 @@ import {
   LastRead,
   Cleared,
   ICalling,
+  InCallHandRaise,
 } from '@wireapp/protocol-messaging';
 
 import {
@@ -56,6 +57,7 @@ import {
   HideMessage,
   ImageAssetMessageOutgoing,
   InCallEmojiMessage,
+  InCallHandRaiseMessage,
   LocationMessage,
   PingMessage,
   ReactionMessage,
@@ -304,6 +306,20 @@ export function buildInCallEmojiMessage(payloadBundle: InCallEmojiMessage['conte
 
   return GenericMessage.create({
     [GenericMessageType.IN_CALL_EMOJI]: reaction,
+    messageId: createId(),
+    unknownStrategy: GenericMessage.UnknownStrategy.IGNORE,
+  });
+}
+
+export function buildInCallHandRaiseMessage(payloadBundle: InCallHandRaiseMessage['content']): GenericMessage {
+  const {isHandUp} = payloadBundle;
+
+  const handRaise = InCallHandRaise.create({
+    isHandUp,
+  });
+
+  return GenericMessage.create({
+    [GenericMessageType.IN_CALL_HAND_RAISE]: handRaise,
     messageId: createId(),
     unknownStrategy: GenericMessage.UnknownStrategy.IGNORE,
   });
