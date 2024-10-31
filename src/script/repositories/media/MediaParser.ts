@@ -26,7 +26,7 @@ import {getLinksFromHtml} from 'Util/UrlUtil';
 
 import {MediaEmbeds} from './MediaEmbeds';
 
-import {Config} from '../Config';
+import {Config} from '../../Config';
 
 export class MediaParser {
   showEmbed: boolean;

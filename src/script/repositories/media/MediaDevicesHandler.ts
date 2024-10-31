@@ -26,7 +26,7 @@ import {loadValue, storeValue} from 'Util/StorageUtil';
 
 import {MediaDeviceType} from './MediaDeviceType';
 
-import {isMediaDevice} from '../guards/MediaDevice';
+import {isMediaDevice} from '../../guards/MediaDevice';
 
 declare global {
   interface Window {
