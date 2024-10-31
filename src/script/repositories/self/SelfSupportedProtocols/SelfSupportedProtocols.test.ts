@@ -27,7 +27,7 @@ import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {evaluateSelfSupportedProtocols} from './SelfSupportedProtocols';
 
-import * as mlsSupport from '../../mls/isMLSSupportedByEnvironment';
+import * as mlsSupport from '../../../mls/isMLSSupportedByEnvironment';
 
 const testFactory = new TestFactory();
 

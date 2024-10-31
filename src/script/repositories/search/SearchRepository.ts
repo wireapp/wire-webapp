@@ -29,11 +29,11 @@ import {
   transliterationIndex,
 } from 'Util/StringUtil';
 
-import type {User} from '../entity/User';
-import {APIClient} from '../service/APIClientSingleton';
-import {Core} from '../service/CoreSingleton';
-import {validateHandle} from '../user/UserHandleGenerator';
-import type {UserRepository} from '../user/UserRepository';
+import type {User} from '../../entity/User';
+import {APIClient} from '../../service/APIClientSingleton';
+import {Core} from '../../service/CoreSingleton';
+import {validateHandle} from '../../user/UserHandleGenerator';
+import type {UserRepository} from '../../user/UserRepository';
 
 const CONFIG = {
   MAX_DIRECTORY_RESULTS: 30,

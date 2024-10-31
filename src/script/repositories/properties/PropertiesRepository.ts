@@ -27,6 +27,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
+import type {SelfService} from 'Repositories/self/SelfService';
 import {Config} from 'src/script/Config';
 import {deepMerge} from 'Util/deepMerge';
 import {Environment} from 'Util/Environment';
@@ -37,7 +38,6 @@ import type {PropertiesService} from './PropertiesService';
 import {PROPERTIES_TYPE, UserConsentStatus} from './PropertiesType';
 
 import type {User} from '../../entity/User';
-import type {SelfService} from '../../self/SelfService';
 import {isCountlyEnabledAtCurrentEnvironment} from '../../tracking/Countly.helpers';
 import {ConsentValue} from '../../user/ConsentValue';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from '../../user/TypingIndicatorMode';

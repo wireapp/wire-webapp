@@ -46,12 +46,12 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
 import type {EventService} from 'Repositories/event/EventService';
+import {search as fullTextSearch} from 'Repositories/search/FullTextSearch';
 
 import {MLSCapableConversation} from './ConversationSelectors';
 
 import type {Conversation as ConversationEntity} from '../../entity/Conversation';
 import {MessageCategory} from '../../message/MessageCategory';
-import {search as fullTextSearch} from '../../search/FullTextSearch';
 import {APIClient} from '../../service/APIClientSingleton';
 import {Core} from '../../service/CoreSingleton';
 import {StorageService} from '../../storage';

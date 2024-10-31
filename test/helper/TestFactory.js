@@ -49,9 +49,10 @@ import {MediaRepository} from 'Repositories/media/MediaRepository';
 import {PermissionRepository} from 'Repositories/permission/PermissionRepository';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {PropertiesService} from 'Repositories/properties/PropertiesService';
+import {SearchRepository} from 'Repositories/search/SearchRepository';
+import {SelfService} from 'Repositories/self/SelfService';
+import {SelfRepository} from 'Repositories/self/SelfRepository';
 import {User} from 'src/script/entity/User';
-import {SearchRepository} from 'src/script/search/SearchRepository';
-import {SelfService} from 'src/script/self/SelfService';
 import {Core} from 'src/script/service/CoreSingleton';
 import {createStorageEngine, DatabaseTypes} from 'src/script/service/StoreEngineProvider';
 import {StorageService} from 'src/script/storage';
@@ -66,7 +67,6 @@ import {UserService} from 'src/script/user/UserService';
 import {UserState} from 'src/script/user/UserState';
 
 import {entities} from '../api/payloads';
-import {SelfRepository} from 'src/script/self/SelfRepository';
 
 export class TestFactory {
   constructor() {

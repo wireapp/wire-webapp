@@ -19,7 +19,7 @@
 
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {PropertiesService} from 'Repositories/properties/PropertiesService';
-import {SelfService} from 'src/script/self/SelfService';
+import {SelfService} from 'Repositories/self/SelfService';
 
 describe('PropertiesRepository', () => {
   let propertiesRepository = undefined;

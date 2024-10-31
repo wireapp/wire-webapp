@@ -67,6 +67,9 @@ import {PreferenceNotificationRepository} from 'Repositories/notification/Prefer
 import {PermissionRepository} from 'Repositories/permission/PermissionRepository';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {PropertiesService} from 'Repositories/properties/PropertiesService';
+import {SearchRepository} from 'Repositories/search/SearchRepository';
+import {SelfRepository} from 'Repositories/self/SelfRepository';
+import {SelfService} from 'Repositories/self/SelfService';
 import {initializeDataDog} from 'Util/DataDog';
 import {DebugUtil} from 'Util/DebugUtil';
 import {Environment} from 'Util/Environment';
@@ -94,9 +97,6 @@ import {initMLSGroupConversations, initialiseSelfAndTeamConversations} from '../
 import {joinConversationsAfterMigrationFinalisation} from '../mls/MLSMigration/migrationFinaliser';
 import {configureDownloadPath} from '../page/components/FeatureConfigChange/FeatureConfigChangeHandler/Features/downloadPath';
 import {configureE2EI} from '../page/components/FeatureConfigChange/FeatureConfigChangeHandler/Features/E2EIdentity';
-import {SearchRepository} from '../search/SearchRepository';
-import {SelfRepository} from '../self/SelfRepository';
-import {SelfService} from '../self/SelfService';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
 import {StorageKey, StorageRepository, StorageService} from '../storage';
