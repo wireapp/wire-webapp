@@ -40,6 +40,8 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {EventSource} from 'Repositories/event/EventSource';
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
+import {IntegrationMapper} from 'Repositories/integration/IntegrationMapper';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
@@ -53,8 +55,6 @@ import {TeamService} from './TeamService';
 import {TeamState} from './TeamState';
 
 import {User} from '../entity/User';
-import {IntegrationMapper} from '../integration/IntegrationMapper';
-import {ServiceEntity} from '../integration/ServiceEntity';
 import {MLSMigrationStatus, getMLSMigrationStatus} from '../mls/MLSMigration/migrationStatus';
 import {ROLE, ROLE as TEAM_ROLE, roleFromTeamPermissions} from '../user/UserPermission';
 import {UserRepository} from '../user/UserRepository';

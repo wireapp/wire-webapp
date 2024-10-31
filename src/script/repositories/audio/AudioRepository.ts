@@ -24,13 +24,12 @@ import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
+import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+import {MediaDeviceType} from 'Repositories/media/MediaDeviceType';
 import {Logger, getLogger} from 'Util/Logger';
 
 import {AudioPlayingType} from './AudioPlayingType';
 import {AudioType} from './AudioType';
-
-import {MediaDevicesHandler} from '../../media/MediaDevicesHandler';
-import {MediaDeviceType} from '../../media/MediaDeviceType';
 
 enum AUDIO_PLAY_PERMISSION {
   ALLOWED = 0,

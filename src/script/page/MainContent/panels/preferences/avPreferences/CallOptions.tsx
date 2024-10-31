@@ -25,10 +25,10 @@ import {amplify} from 'amplify';
 import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import type {MediaConstraintsHandler} from 'Repositories/media/MediaConstraintsHandler';
 import {t} from 'Util/LocalizerUtil';
 
 import {Config} from '../../../../../Config';
-import type {MediaConstraintsHandler} from '../../../../../media/MediaConstraintsHandler';
 import type {PropertiesRepository} from '../../../../../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../../../../../properties/PropertiesType';
 import {PreferencesSection} from '../components/PreferencesSection';
