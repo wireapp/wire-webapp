@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.8.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.7.1...@wireapp/api-client@27.8.0) (2024-10-31)
+
+### Features
+
+* **core:** Add support for InCallHandRaise proto message ([#6636](https://github.com/wireapp/wire-web-packages/issues/6636)) ([ef65020](https://github.com/wireapp/wire-web-packages/commit/ef650200a80dab60d9b08afaa810bc1be95535af))
+
 ## [27.7.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.7.0...@wireapp/api-client@27.7.1) (2024-10-28)
 
 **Note:** Version bump only for package @wireapp/api-client
