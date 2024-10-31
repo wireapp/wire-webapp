@@ -20,7 +20,7 @@
 import {ConversationEvent} from '@wireapp/api-client/lib/event';
 
 import {ClientConversationEvent} from 'Repositories/conversation/EventBuilder';
-import {EventRecord} from 'src/script/storage';
+import {EventRecord} from 'Repositories/storage';
 
 import {IdentifiedUpdatePayload} from '../../EventService';
 

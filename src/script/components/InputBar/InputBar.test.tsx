@@ -28,6 +28,7 @@ import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository
 import {PropertiesService} from 'Repositories/properties/PropertiesService';
 import {SearchRepository} from 'Repositories/search/SearchRepository';
 import {SelfService} from 'Repositories/self/SelfService';
+import {StorageRepository} from 'Repositories/storage';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {Config} from 'src/script/Config';
 import {createUuid} from 'Util/uuid';
@@ -35,7 +36,6 @@ import {createUuid} from 'Util/uuid';
 import {TestFactory} from '../../../../test/helper/TestFactory';
 import {Conversation} from '../../entity/Conversation';
 import {User} from '../../entity/User';
-import {StorageRepository} from '../../storage';
 import {TeamState} from '../../team/TeamState';
 
 const testFactory = new TestFactory();

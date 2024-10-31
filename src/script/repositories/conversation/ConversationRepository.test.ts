@@ -59,12 +59,12 @@ import {EventRepository} from 'Repositories/event/EventRepository';
 import {EventService} from 'Repositories/event/EventService';
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
 import {SelfRepository} from 'Repositories/self/SelfRepository';
+import {LegacyEventRecord, StorageSchemata, StorageService} from 'Repositories/storage';
 import {Config} from 'src/script/Config';
 import {Conversation} from 'src/script/entity/Conversation';
 import {Message} from 'src/script/entity/message/Message';
 import {User} from 'src/script/entity/User';
 import {ConversationError} from 'src/script/error/ConversationError';
-import {StorageSchemata} from 'src/script/storage/StorageSchemata';
 import {
   generateConversation as _generateConversation,
   generateAPIConversation,
@@ -87,7 +87,6 @@ import {entities, payload} from '../../../../test/api/payloads';
 import {TestFactory} from '../../../../test/helper/TestFactory';
 import {generateUser} from '../../../../test/helper/UserGenerator';
 import {Core} from '../../service/CoreSingleton';
-import {LegacyEventRecord, StorageService} from '../../storage';
 import {TeamRepository} from '../../team/TeamRepository';
 import {TeamState} from '../../team/TeamState';
 import {UserRepository} from '../../user/UserRepository';

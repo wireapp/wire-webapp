@@ -47,6 +47,7 @@ import {container} from 'tsyringe';
 
 import type {EventService} from 'Repositories/event/EventService';
 import {search as fullTextSearch} from 'Repositories/search/FullTextSearch';
+import {ConversationRecord, StorageSchemata, StorageService} from 'Repositories/storage';
 
 import {MLSCapableConversation} from './ConversationSelectors';
 
@@ -54,9 +55,6 @@ import type {Conversation as ConversationEntity} from '../../entity/Conversation
 import {MessageCategory} from '../../message/MessageCategory';
 import {APIClient} from '../../service/APIClientSingleton';
 import {Core} from '../../service/CoreSingleton';
-import {StorageService} from '../../storage';
-import {ConversationRecord} from '../../storage/record/ConversationRecord';
-import {StorageSchemata} from '../../storage/StorageSchemata';
 
 export class ConversationService {
   private readonly eventService: EventService;

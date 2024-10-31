@@ -18,8 +18,8 @@
  */
 
 import {MessageAddEvent} from 'Repositories/conversation/EventBuilder';
+import {StoredEvent} from 'Repositories/storage';
 import {EventError} from 'src/script/error/EventError';
-import {StoredEvent} from 'src/script/storage';
 
 import {getCommonMessageUpdates} from './getCommonMessageUpdates';
 

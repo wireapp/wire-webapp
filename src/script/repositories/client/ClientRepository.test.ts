@@ -22,6 +22,7 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {Runtime} from '@wireapp/commons';
 
+import {ClientRecord} from 'Repositories/storage';
 import {User} from 'src/script/entity/User';
 import {ClientError} from 'src/script/error/ClientError';
 
@@ -29,7 +30,6 @@ import {ClientRepository, ClientMapper, ClientEntity} from './.';
 
 import {entities} from '../../../../test/api/payloads';
 import {TestFactory} from '../../../../test/helper/TestFactory';
-import {ClientRecord} from '../../storage/record/ClientRecord';
 
 describe('ClientRepository', () => {
   const testFactory = new TestFactory();

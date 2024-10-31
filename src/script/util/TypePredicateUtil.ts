@@ -21,10 +21,11 @@ import {RegisteredClient} from '@wireapp/api-client/lib/client';
 import type {BackendError} from '@wireapp/api-client/lib/http';
 import {AxiosError} from 'axios';
 
+import {ClientRecord} from 'Repositories/storage';
+
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 import {isObject} from '../guards/common';
-import {ClientRecord} from '../storage/record/ClientRecord';
 
 export function isAxiosError<T>(errorCandidate: any): errorCandidate is AxiosError<T> {
   return errorCandidate && errorCandidate.isAxiosError === true;
