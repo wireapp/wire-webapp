@@ -32,16 +32,16 @@ import type {EventRepository} from 'Repositories/event/EventRepository';
 import type {GiphyRepository} from 'Repositories/giphy/GiphyRepository';
 import type {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
 import type {MediaRepository} from 'Repositories/media/MediaRepository';
+import type {NotificationRepository} from 'Repositories/notification/NotificationRepository';
+import type {PreferenceNotificationRepository} from 'Repositories/notification/PreferenceNotificationRepository';
+import type {PermissionRepository} from 'Repositories/permission/PermissionRepository';
+import type {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 
 import {ActionsViewModel} from './ActionsViewModel';
 import {CallingViewModel} from './CallingViewModel';
 import {ContentViewModel} from './ContentViewModel';
 import {ListViewModel} from './ListViewModel';
 
-import type {NotificationRepository} from '../notification/NotificationRepository';
-import type {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
-import type {PermissionRepository} from '../permission/PermissionRepository';
-import type {PropertiesRepository} from '../properties/PropertiesRepository';
 import type {SearchRepository} from '../search/SearchRepository';
 import type {SelfRepository} from '../self/SelfRepository';
 import {Core} from '../service/CoreSingleton';

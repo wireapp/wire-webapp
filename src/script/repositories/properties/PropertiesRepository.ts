@@ -36,11 +36,11 @@ import {getLogger, Logger} from 'Util/Logger';
 import type {PropertiesService} from './PropertiesService';
 import {PROPERTIES_TYPE, UserConsentStatus} from './PropertiesType';
 
-import type {User} from '../entity/User';
-import type {SelfService} from '../self/SelfService';
-import {isCountlyEnabledAtCurrentEnvironment} from '../tracking/Countly.helpers';
-import {ConsentValue} from '../user/ConsentValue';
-import {CONVERSATION_TYPING_INDICATOR_MODE} from '../user/TypingIndicatorMode';
+import type {User} from '../../entity/User';
+import type {SelfService} from '../../self/SelfService';
+import {isCountlyEnabledAtCurrentEnvironment} from '../../tracking/Countly.helpers';
+import {ConsentValue} from '../../user/ConsentValue';
+import {CONVERSATION_TYPING_INDICATOR_MODE} from '../../user/TypingIndicatorMode';
 
 export class PropertiesRepository {
   // Value names are specified by the protocol but key names can be changed.

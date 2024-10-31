@@ -55,6 +55,8 @@ import {flattenUserClientsQualifiedIds} from 'Repositories/conversation/userClie
 import {USER} from 'Repositories/event/Client';
 import {EventRepository} from 'Repositories/event/EventRepository';
 import type {EventSource} from 'Repositories/event/EventSource';
+import type {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
 import {chunk, partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
@@ -73,8 +75,6 @@ import {Config} from '../Config';
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 import {UserError} from '../error/UserError';
-import type {PropertiesRepository} from '../properties/PropertiesRepository';
-import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 import type {SelfService} from '../self/SelfService';
 import {UserRecord} from '../storage';
 import {TeamState} from '../team/TeamState';

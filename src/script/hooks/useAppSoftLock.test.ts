@@ -20,12 +20,12 @@
 import {renderHook, waitFor} from '@testing-library/react';
 
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
+import {NotificationRepository} from 'Repositories/notification/NotificationRepository';
 
 import {useAppSoftLock} from './useAppSoftLock';
 
 import {E2EIHandler} from '../E2EIdentity';
 import {isFreshMLSSelfClient} from '../E2EIdentity/E2EIdentityVerification';
-import {NotificationRepository} from '../notification/NotificationRepository';
 
 const isFreshMLSSelfClientMock = isFreshMLSSelfClient as jest.MockedFn<typeof isFreshMLSSelfClient>;
 const E2EIHandlerMock = E2EIHandler as jest.Mocked<typeof E2EIHandler>;

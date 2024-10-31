@@ -38,9 +38,9 @@ import {ConversationRepository} from 'Repositories/conversation/ConversationRepo
 import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
 import {MessageRepository, OutgoingQuote} from 'Repositories/conversation/MessageRepository';
 import {EventRepository} from 'Repositories/event/EventRepository';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
 import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
-import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
-import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from 'src/script/user/TypingIndicatorMode';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {KEY} from 'Util/KeyboardUtil';

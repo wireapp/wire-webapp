@@ -33,6 +33,7 @@ import {ClientRepository} from 'Repositories/client';
 import {ClientMapper} from 'Repositories/client/ClientMapper';
 import {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';
 import {EventRepository} from 'Repositories/event/EventRepository';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {entities} from 'test/api/payloads';
 import {TestFactory} from 'test/helper/TestFactory';
 import {generateAPIUser} from 'test/helper/UserGenerator';
@@ -44,7 +45,6 @@ import {UserService} from './UserService';
 import {UserState} from './UserState';
 
 import {User} from '../entity/User';
-import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {SelfService} from '../self/SelfService';
 import {TeamState} from '../team/TeamState';
 import {serverTimeHandler} from '../time/serverTimeHandler';

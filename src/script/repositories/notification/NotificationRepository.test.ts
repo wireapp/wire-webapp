@@ -38,6 +38,8 @@ import {ConversationMapper} from 'Repositories/conversation/ConversationMapper';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting';
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
+import {PermissionRepository} from 'Repositories/permission/PermissionRepository';
+import {PermissionStatusState} from 'Repositories/permission/PermissionStatusState';
 import {Conversation} from 'src/script/entity/Conversation';
 import {CallMessage} from 'src/script/entity/message/CallMessage';
 import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
@@ -56,7 +58,6 @@ import {MentionEntity} from 'src/script/message/MentionEntity';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import {ContentState, useAppState} from 'src/script/page/useAppState';
-import {PermissionStatusState} from 'src/script/permission/PermissionStatusState';
 import {entities, payload} from 'test/api/payloads';
 import {t} from 'Util/LocalizerUtil';
 import {truncate} from 'Util/StringUtil';
@@ -64,10 +65,9 @@ import {createUuid} from 'Util/uuid';
 
 import {NotificationRepository} from './NotificationRepository';
 
-import {Message} from '../entity/message/Message';
-import {PermissionRepository} from '../permission/PermissionRepository';
-import {UserMapper} from '../user/UserMapper';
-import {UserState} from '../user/UserState';
+import {Message} from '../../entity/message/Message';
+import {UserMapper} from '../../user/UserMapper';
+import {UserState} from '../../user/UserState';
 
 function buildNotificationRepository() {
   const userState = container.resolve(UserState);

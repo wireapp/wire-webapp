@@ -49,6 +49,8 @@ import {isMLSCapableConversation} from 'Repositories/conversation/ConversationSe
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import type {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {EventRepository} from 'Repositories/event/EventRepository';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
 import {getLogger, Logger} from 'Util/Logger';
 
 import {KEY} from './KeyboardUtil';
@@ -59,8 +61,6 @@ import {E2EIHandler} from '../E2EIdentity';
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 import {checkVersion} from '../lifecycle/newVersionHandler';
-import {PropertiesRepository} from '../properties/PropertiesRepository';
-import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
 import {EventRecord, StorageRepository, StorageSchemata} from '../storage';

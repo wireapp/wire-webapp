@@ -36,7 +36,7 @@
     - 'src/script/repositories/calling/.*'
 'comp: preferences':
   files:
-    - 'src/script/properties/.*'
+    - 'src/script/repositories/properties/.*'
 'comp: infrastructure':
   files:
     - '.elasticbeanstalk'
