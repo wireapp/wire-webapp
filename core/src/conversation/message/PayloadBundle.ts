@@ -70,6 +70,7 @@ export enum PayloadBundleType {
   PING = 'PayloadBundleType.PING',
   REACTION = 'PayloadBundleType.REACTION',
   IN_CALL_EMOJI = 'PayloadBundleType.IN_CALL_EMOJI',
+  IN_CALL_HAND_RAISE = 'PayloadBundleType.IN_CALL_HAND_RAISE',
   TEAM_CONVERSATION_CREATE = 'PayloadBundleType.TEAM_CONVERSATION_CREATE',
   TEAM_CONVERSATION_DELETE = 'PayloadBundleType.TEAM_CONVERSATION_DELETE',
   TEAM_DELETE = 'PayloadBundleType.TEAM_DELETE',
