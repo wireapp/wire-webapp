@@ -22,7 +22,7 @@ import {container} from 'tsyringe';
 import {Call} from 'Repositories/calling/Call';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {CallState, CallingViewMode, DesktopScreenShareMenu} from 'Repositories/calling/CallState';
-import {MediaRepository} from 'src/script/media/MediaRepository';
+import {MediaRepository} from 'Repositories/media/MediaRepository';
 import {UserState} from 'src/script/user/UserState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 

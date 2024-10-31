@@ -22,6 +22,7 @@ import ko from 'knockout';
 
 import {CALL_TYPE, CONV_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 
+import type {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {chunk, getDifference, partition} from 'Util/ArrayUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {sortUsersByPriority} from 'Util/StringUtil';
@@ -31,7 +32,6 @@ import type {ClientId, Participant} from './Participant';
 
 import {Config} from '../../Config';
 import {Conversation} from '../../entity/Conversation';
-import type {MediaDevicesHandler} from '../../media/MediaDevicesHandler';
 
 export type SerializedConversationId = string;
 

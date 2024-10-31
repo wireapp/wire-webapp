@@ -24,7 +24,7 @@ import cx from 'classnames';
 
 import {InViewport} from 'Components/InViewport';
 import type {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {ServiceEntity} from 'src/script/integration/ServiceEntity';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getAllFocusableElements, setElementsTabIndex} from 'Util/focusUtil';
 import {isTabKey} from 'Util/KeyboardUtil';

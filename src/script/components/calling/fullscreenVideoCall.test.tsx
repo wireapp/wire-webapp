@@ -23,10 +23,10 @@ import ko from 'knockout';
 import {Call} from 'Repositories/calling/Call';
 import {Participant} from 'Repositories/calling/Participant';
 import {Grid} from 'Repositories/calling/videoGridHandler';
+import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
-import {MediaDevicesHandler} from 'src/script/media/MediaDevicesHandler';
 
 import {FullscreenVideoCall, FullscreenVideoCallProps} from './FullscreenVideoCall';
 

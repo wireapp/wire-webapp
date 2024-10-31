@@ -37,6 +37,7 @@ import {SendMessageButton} from 'Components/RichTextEditor/components/SendMessag
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
 import {MessageRepository, OutgoingQuote} from 'Repositories/conversation/MessageRepository';
+import {EventRepository} from 'Repositories/event/EventRepository';
 import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
@@ -62,7 +63,6 @@ import {Conversation} from '../../entity/Conversation';
 import {ContentMessage} from '../../entity/message/ContentMessage';
 import {User} from '../../entity/User';
 import {ConversationError} from '../../error/ConversationError';
-import {EventRepository} from '../../event/EventRepository';
 import {MentionEntity} from '../../message/MentionEntity';
 import {MessageHasher} from '../../message/MessageHasher';
 import {QuoteEntity} from '../../message/QuoteEntity';

@@ -48,12 +48,12 @@ import {NOTIFICATION_HANDLING_STATE} from './NotificationHandlingState';
 import type {NotificationService} from './NotificationService';
 import {EventValidationError} from './preprocessor/EventStorageMiddleware/eventHandlers/EventValidationError';
 
-import {CryptographyError} from '../error/CryptographyError';
-import {EventError} from '../error/EventError';
-import type {ServerTimeHandler} from '../time/serverTimeHandler';
-import {EventName} from '../tracking/EventName';
-import {UserState} from '../user/UserState';
-import {Warnings} from '../view_model/WarningsContainer';
+import {CryptographyError} from '../../error/CryptographyError';
+import {EventError} from '../../error/EventError';
+import type {ServerTimeHandler} from '../../time/serverTimeHandler';
+import {EventName} from '../../tracking/EventName';
+import {UserState} from '../../user/UserState';
+import {Warnings} from '../../view_model/WarningsContainer';
 
 export class EventRepository {
   logger: Logger;

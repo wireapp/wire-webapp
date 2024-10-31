@@ -45,10 +45,11 @@ import type {
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
+import type {EventService} from 'Repositories/event/EventService';
+
 import {MLSCapableConversation} from './ConversationSelectors';
 
 import type {Conversation as ConversationEntity} from '../../entity/Conversation';
-import type {EventService} from '../../event/EventService';
 import {MessageCategory} from '../../message/MessageCategory';
 import {search as fullTextSearch} from '../../search/FullTextSearch';
 import {APIClient} from '../../service/APIClientSingleton';

@@ -30,10 +30,13 @@ import {container} from 'tsyringe';
 import {CONV_TYPE, CALL_TYPE, STATE as CALL_STATE, REASON, Wcall} from '@wireapp/avs';
 import {Runtime} from '@wireapp/commons';
 
+import {CallingEvent} from 'Repositories/event/CallingEvent';
+import {CALL} from 'Repositories/event/Client';
+import {EventRepository} from 'Repositories/event/EventRepository';
+import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+import {MediaType} from 'Repositories/media/MediaType';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
-import {EventRepository} from 'src/script/event/EventRepository';
-import {MediaType} from 'src/script/media/MediaType';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 import {TestFactory} from 'test/helper/TestFactory';
 import {createUuid} from 'Util/uuid';
@@ -45,9 +48,6 @@ import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
 import {Participant} from './Participant';
 
-import {CallingEvent} from '../../event/CallingEvent';
-import {CALL} from '../../event/Client';
-import {MediaDevicesHandler} from '../../media/MediaDevicesHandler';
 import {Core} from '../../service/CoreSingleton';
 import {UserRepository} from '../../user/UserRepository';
 

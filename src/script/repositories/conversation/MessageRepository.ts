@@ -59,6 +59,10 @@ import {AudioType} from 'Repositories/audio/AudioType';
 import {ClientState} from 'Repositories/client/ClientState';
 import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
 import {PROTO_MESSAGE_TYPE} from 'Repositories/cryptography/ProtoMessageType';
+import {EventRepository} from 'Repositories/event/EventRepository';
+import {EventService} from 'Repositories/event/EventService';
+import {EventTypeHandling} from 'Repositories/event/EventTypeHandling';
+import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
 import {
   cancelSendingLinkPreview,
   clearLinkPreviewSendingState,
@@ -91,10 +95,6 @@ import {FileAsset} from '../../entity/message/FileAsset';
 import {Message} from '../../entity/message/Message';
 import {User} from '../../entity/User';
 import {ConversationError} from '../../error/ConversationError';
-import {EventRepository} from '../../event/EventRepository';
-import {EventService} from '../../event/EventService';
-import {EventTypeHandling} from '../../event/EventTypeHandling';
-import {NOTIFICATION_HANDLING_STATE} from '../../event/NotificationHandlingState';
 import {showLegalHoldWarningModal} from '../../legal-hold/LegalHoldWarning';
 import {MentionEntity} from '../../message/MentionEntity';
 import {QuoteEntity} from '../../message/QuoteEntity';

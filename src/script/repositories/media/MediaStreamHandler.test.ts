@@ -17,13 +17,13 @@
  *
  */
 
-import {MediaConstraintsHandler} from 'src/script/media/MediaConstraintsHandler';
-import {MediaStreamHandler} from 'src/script/media/MediaStreamHandler';
 import {PermissionRepository} from 'src/script/permission/PermissionRepository';
 
+import {MediaConstraintsHandler} from './MediaConstraintsHandler';
 import {CurrentAvailableDeviceId} from './MediaDevicesHandler';
+import {MediaStreamHandler} from './MediaStreamHandler';
 
-import {UserState} from '../user/UserState';
+import {UserState} from '../../user/UserState';
 
 describe('MediaStreamHandler', () => {
   let streamHandler: MediaStreamHandler;

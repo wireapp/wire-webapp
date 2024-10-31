@@ -25,12 +25,12 @@ import {singleton} from 'tsyringe';
 import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import type {ElectronDesktopCapturerSource} from 'Repositories/media/MediaDevicesHandler';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {Call} from './Call';
 
 import {Config} from '../../Config';
-import type {ElectronDesktopCapturerSource} from '../../media/MediaDevicesHandler';
 import {EventName} from '../../tracking/EventName';
 import {Segmentation} from '../../tracking/Segmentation';
 import {CallViewTab} from '../../view_model/CallingViewModel';
