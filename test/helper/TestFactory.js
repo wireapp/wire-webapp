@@ -45,8 +45,8 @@ import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepo
 import {EventRepository} from 'Repositories/event/EventRepository';
 import {EventService} from 'Repositories/event/EventService';
 import {NotificationService} from 'Repositories/event/NotificationService';
+import {MediaRepository} from 'Repositories/media/MediaRepository';
 import {User} from 'src/script/entity/User';
-import {MediaRepository} from 'src/script/media/MediaRepository';
 import {PermissionRepository} from 'src/script/permission/PermissionRepository';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {PropertiesService} from 'src/script/properties/PropertiesService';

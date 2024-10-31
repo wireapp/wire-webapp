@@ -22,10 +22,10 @@ import ko, {observable, pureComputed} from 'knockout';
 
 import {VIDEO_STATE} from '@wireapp/avs';
 
+import {applyBlur} from 'Repositories/media/VideoBackgroundBlur';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {User} from '../../entity/User';
-import {applyBlur} from '../../media/VideoBackgroundBlur';
 
 export type UserId = string;
 export type ClientId = string;

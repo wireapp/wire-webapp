@@ -28,12 +28,12 @@ import {CallingViewMode, CallState, DesktopScreenShareMenu, MuteState} from 'Rep
 import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/LeaveCallReason';
 import {Participant} from 'Repositories/calling/Participant';
 import {useVideoGrid} from 'Repositories/calling/videoGridHandler';
+import {MediaRepository} from 'Repositories/media/MediaRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {ChooseScreen} from './ChooseScreen';
 import {FullscreenVideoCall} from './FullscreenVideoCall';
 
-import {MediaRepository} from '../../media/MediaRepository';
 import {CallViewTab} from '../../view_model/CallingViewModel';
 
 export interface CallingContainerProps {

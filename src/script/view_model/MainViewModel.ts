@@ -31,13 +31,13 @@ import type {CryptographyRepository} from 'Repositories/cryptography/Cryptograph
 import type {EventRepository} from 'Repositories/event/EventRepository';
 import type {GiphyRepository} from 'Repositories/giphy/GiphyRepository';
 import type {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
+import type {MediaRepository} from 'Repositories/media/MediaRepository';
 
 import {ActionsViewModel} from './ActionsViewModel';
 import {CallingViewModel} from './CallingViewModel';
 import {ContentViewModel} from './ContentViewModel';
 import {ListViewModel} from './ListViewModel';
 
-import type {MediaRepository} from '../media/MediaRepository';
 import type {NotificationRepository} from '../notification/NotificationRepository';
 import type {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
 import type {PermissionRepository} from '../permission/PermissionRepository';
