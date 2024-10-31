@@ -20,9 +20,10 @@
 import {GiphyResult} from '@wireapp/api-client/lib/giphy/GiphyResult';
 import {container} from 'tsyringe';
 
-import {GiphyRepository} from 'src/script/extension/GiphyRepository';
-import {GiphyService} from 'src/script/extension/GiphyService';
 import {APIClient} from 'src/script/service/APIClientSingleton';
+
+import {GiphyRepository} from './GiphyRepository';
+import {GiphyService} from './GiphyService';
 
 const randomFooGiphyResponse = {
   data: {
