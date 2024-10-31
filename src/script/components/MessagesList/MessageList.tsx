@@ -27,13 +27,13 @@ import {JumpToLastMessageButton} from 'Components/MessagesList/JumpToLastMessage
 import {filterMessages} from 'Components/MessagesList/utils/messagesFilter';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {DecryptErrorMessage} from 'src/script/entity/message/DecryptErrorMessage';
 import {MemberMessage} from 'src/script/entity/message/MemberMessage';
 import {Message as MessageEntity} from 'src/script/entity/message/Message';
 import {User} from 'src/script/entity/User';
 import {useRoveFocus} from 'src/script/hooks/useRoveFocus';
-import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isLastReceivedMessage} from 'Util/conversationMessages';
 import {onHitTopOrBottom} from 'Util/DOM/onHitTopOrBottom';

@@ -21,10 +21,10 @@ import type {Picture as APIClientPicture} from '@wireapp/api-client/lib/self/';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {UserAsset as APIClientUserAsset} from '@wireapp/api-client/lib/user/';
 
-import {AssetRemoteData} from './AssetRemoteData';
+import type {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 
 import type {User} from '../../entity/User';
-import type {ServiceEntity} from '../../integration/ServiceEntity';
+import {AssetRemoteData} from './AssetRemoteData';
 
 export type MappedAsset = {[index: string]: AssetRemoteData};
 

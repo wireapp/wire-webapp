@@ -30,7 +30,7 @@ import {CallState} from 'Repositories/calling/CallState';
 import {createLabel} from 'Repositories/conversation/ConversationLabelRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {IntegrationRepository} from 'src/script/integration/IntegrationRepository';
+import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
 import {Preferences} from 'src/script/page/LeftSidebar/panels/Preferences';
 import {StartUI} from 'src/script/page/LeftSidebar/panels/StartUI';
 import {ANIMATED_PAGE_TRANSITION_DURATION} from 'src/script/page/MainContent';

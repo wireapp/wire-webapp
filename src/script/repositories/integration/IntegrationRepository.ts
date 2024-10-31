@@ -32,10 +32,10 @@ import type {IntegrationService} from './IntegrationService';
 import {ProviderEntity} from './ProviderEntity';
 import {ServiceEntity} from './ServiceEntity';
 
-import type {Conversation} from '../entity/Conversation';
-import type {User} from '../entity/User';
-import type {TeamRepository} from '../team/TeamRepository';
-import {TeamState} from '../team/TeamState';
+import type {Conversation} from '../../entity/Conversation';
+import type {User} from '../../entity/User';
+import type {TeamRepository} from '../../team/TeamRepository';
+import {TeamState} from '../../team/TeamState';
 
 export class IntegrationRepository {
   private readonly logger: Logger;
