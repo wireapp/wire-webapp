@@ -49,6 +49,7 @@ export class Call {
   public readonly state: ko.Observable<CALL_STATE> = ko.observable(CALL_STATE.UNKNOWN);
   public readonly muteState: ko.Observable<MuteState> = ko.observable(MuteState.NOT_MUTED);
   public readonly participants: ko.ObservableArray<Participant>;
+  public readonly handRaisedParticipants: ko.PureComputed<Participant[]>;
   public readonly selfClientId: ClientId;
   public readonly initialType: CALL_TYPE;
   public readonly isCbrEnabled: ko.Observable<boolean> = ko.observable(
@@ -90,6 +91,9 @@ export class Call {
     this.initialType = callType;
     this.selfClientId = selfParticipant?.clientId;
     this.participants = ko.observableArray([selfParticipant]);
+    this.handRaisedParticipants = ko.pureComputed(() =>
+      this.participants().filter(participant => participant.isHandUp()),
+    );
     this.activeAudioOutput = this.mediaDevicesHandler.currentAvailableDeviceId.audiooutput();
     this.mediaDevicesHandler.currentAvailableDeviceId.audiooutput.subscribe((newActiveAudioOutput: string) => {
       this.activeAudioOutput = newActiveAudioOutput;

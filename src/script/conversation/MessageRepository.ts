@@ -1017,6 +1017,12 @@ export class MessageRepository {
     return this.sendAndInjectMessage(emojisMessage, conversation);
   }
 
+  public async sendInCallHandRaised(conversation: Conversation, isHandUp: boolean) {
+    const handRaiseMessage = MessageBuilder.buildInCallHandRaiseMessage({isHandUp: isHandUp});
+
+    return this.sendAndInjectMessage(handRaiseMessage, conversation);
+  }
+
   private expectReadReceipt(conversationEntity: Conversation): boolean {
     if (conversationEntity.is1to1()) {
       return !!this.propertyRepository.receiptMode();

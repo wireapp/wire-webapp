@@ -40,6 +40,7 @@ interface CallingParticipantListProps {
   isModerator?: boolean;
   isSelfVerified?: boolean;
   participants: Participant[];
+  handRaisedParticipants: Participant[];
   showParticipants?: boolean;
 }
 
@@ -49,6 +50,7 @@ export const CallingParticipantList = ({
   isModerator,
   isSelfVerified,
   participants,
+  handRaisedParticipants,
   showParticipants,
 }: CallingParticipantListProps) => {
   const getParticipantContext = (event: React.MouseEvent<HTMLDivElement>, participant: Participant) => {
@@ -78,30 +80,50 @@ export const CallingParticipantList = ({
     showContextMenu({event, entries, identifier: 'participant-moderator-menu'});
   };
 
+  const participantsList = participants
+    .slice()
+    .sort((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user));
+
+  const handRaisedParticipantsList = handRaisedParticipants
+    .slice()
+    .sort((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user));
+
   return (
     <div
       className={cx('call-ui__participant-list__wrapper', {
         'call-ui__participant-list__wrapper--active': showParticipants,
       })}
     >
-      <p css={labelStyles}>{t('videoCallOverlayParticipantsListLabel', participants.length)}</p>
       <FadingScrollbar className="call-ui__participant-list__container">
+        <p css={labelStyles}>{t('videoCallOverlayParticipantsWithRaisedHandListLabel', participants.length)}</p>
         <ul className="call-ui__participant-list" data-uie-name="list-call-ui-participants">
-          {participants
-            .slice()
-            .sort((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user))
-            .map((participant, index, participantsArray) => (
-              <li key={participant.clientId} className="call-ui__participant-list__participant">
-                <CallParticipantsListItem
-                  key={participant.clientId}
-                  callParticipant={participant}
-                  isSelfVerified={isSelfVerified}
-                  showContextMenu={!!isModerator}
-                  onContextMenu={event => getParticipantContext(event, participant)}
-                  isLast={participantsArray.length === index}
-                />
-              </li>
-            ))}
+          {handRaisedParticipantsList.map((participant, index, participantsArray) => (
+            <li key={participant.clientId} className="call-ui__participant-list__participant">
+              <CallParticipantsListItem
+                key={participant.clientId}
+                callParticipant={participant}
+                isSelfVerified={isSelfVerified}
+                showContextMenu={!!isModerator}
+                onContextMenu={event => getParticipantContext(event, participant)}
+                isLast={participantsArray.length === index}
+              />
+            </li>
+          ))}
+        </ul>
+        <p css={labelStyles}>{t('videoCallOverlayParticipantsListLabel', participants.length)}</p>
+        <ul className="call-ui__participant-list" data-uie-name="list-call-ui-participants">
+          {participantsList.map((participant, index, participantsArray) => (
+            <li key={participant.clientId} className="call-ui__participant-list__participant">
+              <CallParticipantsListItem
+                key={participant.clientId}
+                callParticipant={participant}
+                isSelfVerified={isSelfVerified}
+                showContextMenu={!!isModerator}
+                onContextMenu={event => getParticipantContext(event, participant)}
+                isLast={participantsArray.length === index}
+              />
+            </li>
+          ))}
         </ul>
       </FadingScrollbar>
     </div>

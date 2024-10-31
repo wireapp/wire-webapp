@@ -33,6 +33,8 @@ import {
   IconButton,
   IconButtonVariant,
   Select,
+  RaiseHandIcon,
+  RaiseHandOffIcon,
 } from '@wireapp/react-ui-kit';
 
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
@@ -106,6 +108,7 @@ export interface FullscreenVideoCallProps {
   toggleMute: (call: Call, muteState: boolean) => void;
   toggleScreenshare: (call: Call) => void;
   sendEmoji: (emoji: string, call: Call) => void;
+  sendHandRaised: (isHandUp: boolean, call: Call) => void;
   videoGrid: Grid;
 }
 
@@ -137,6 +140,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   toggleScreenshare,
   leave,
   changePage,
+  sendHandRaised,
   teamState = container.resolve(TeamState),
   callState = container.resolve(CallState),
 }) => {
@@ -158,8 +162,19 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     pages: callPages,
     startedAt,
     participants,
-  } = useKoSubscribableChildren(call, ['activeSpeakers', 'currentPage', 'pages', 'startedAt', 'participants']);
-  const {display_name: conversationName} = useKoSubscribableChildren(conversation, ['display_name']);
+    handRaisedParticipants,
+  } = useKoSubscribableChildren(call, [
+    'activeSpeakers',
+    'currentPage',
+    'pages',
+    'startedAt',
+    'participants',
+    'handRaisedParticipants',
+  ]);
+  const {display_name: conversationName, is1to1: is1to1Conversation} = useKoSubscribableChildren(conversation, [
+    'display_name',
+    'is1to1',
+  ]);
   const {isVideoCallingEnabled, classifiedDomains} = useKoSubscribableChildren(teamState, [
     'isVideoCallingEnabled',
     'classifiedDomains',
@@ -205,8 +220,14 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   };
   const openPopup = () => callingRepository.setViewModeDetached();
 
-  const [isParticipantsListOpen, toggleParticipantsList] = useToggleState(false);
   const [isCallViewOpen, toggleCallView] = useToggleState(false);
+  const [isHandRaised, setIsHandRaised] = useState(false);
+  const [isParticipantsListOpen, toggleParticipantsList] = useToggleState(false);
+
+  function toggleIsHandRaised(currentIsHandRaised: boolean) {
+    setIsHandRaised(!currentIsHandRaised);
+    sendHandRaised(!currentIsHandRaised, call);
+  }
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent): void => {
@@ -398,6 +419,8 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   });
 
   const isModerator = selfUser && roles[selfUser.id] === DefaultConversationRoleName.WIRE_ADMIN;
+
+  const totalHandRaisedParticipants = handRaisedParticipants.length;
 
   return (
     <div className="video-calling-wrapper">
@@ -790,6 +813,35 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                     </li>
                   )}
 
+                  {Config.getConfig().FEATURE.ENABLE_IN_CALL_HAND_RAISE && !is1to1Conversation && (
+                    <li className="video-controls__item">
+                      <button
+                        data-uie-value={isHandRaised ? 'active' : 'inactive'}
+                        onClick={() => toggleIsHandRaised(isHandRaised)}
+                        onKeyDown={event => handleKeyDown(event, () => toggleIsHandRaised(isHandRaised))}
+                        className={classNames('video-controls__button_primary', {active: isHandRaised})}
+                        type="button"
+                        data-uie-name="do-toggle-hand-raise"
+                        role="switch"
+                        aria-checked={isHandRaised}
+                        title={
+                          isHandRaised
+                            ? t('videoCallOverlayHideParticipantsList')
+                            : t('videoCallOverlayShowParticipantsList')
+                        }
+                      >
+                        {isHandRaised ? (
+                          <RaiseHandOffIcon width={16} height={16} />
+                        ) : (
+                          <RaiseHandIcon width={16} height={16} />
+                        )}
+                        {totalHandRaisedParticipants > 0 && (
+                          <span className="video-controls__button_badge">{totalHandRaisedParticipants}</span>
+                        )}
+                      </button>
+                    </li>
+                  )}
+
                   {Config.getConfig().FEATURE.ENABLE_IN_CALL_REACTIONS && (
                     <li className="video-controls__item">
                       {showEmojisBar && (
@@ -856,6 +908,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
       </div>
       {isParticipantsListOpen && (
         <CallingParticipantList
+          handRaisedParticipants={handRaisedParticipants}
           callingRepository={callingRepository}
           conversation={conversation}
           participants={participants}

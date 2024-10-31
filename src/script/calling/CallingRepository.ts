@@ -703,6 +703,7 @@ export class CallingRepository {
       this.logger.warn(`Unable to find a conversation with id of ${conversationId.id}@${conversationId.domain}`);
       return;
     }
+
     switch (content.type) {
       case CALL_MESSAGE_TYPE.CONFKEY: {
         if (source !== EventRepository.SOURCE.STREAM) {
@@ -784,6 +785,39 @@ export class CallingRepository {
             .filter(item => !newEmojis.some(newItem => newItem.id === item.id));
           this.callState.emojis(remainingEmojis);
         }, CallingRepository.EMOJI_TIME_OUT_DURATION);
+        break;
+      }
+
+      case CALL_MESSAGE_TYPE.HAND_RAISED: {
+        const call = this.findCall(conversationId);
+        if (!call || !this.selfUser) {
+          this.logger.info('Ignored hand raise event because no active call was found');
+          return;
+        }
+        const participant = call
+          .participants()
+          .find(participant => matchQualifiedIds(participant.user.qualifiedId, userId));
+
+        if (!participant) {
+          this.logger.info('Ignored hand raise event because no active participant was found');
+          return;
+        }
+
+        const isSelf = matchQualifiedIds(this.selfUser.qualifiedId, userId);
+
+        const {isHandUp} = content;
+        participant.isHandUp(isHandUp);
+
+        const name = participant.user.name();
+        const handUpMessage = isSelf
+          ? t('videoCallParticipantRaisedSelfHandUp')
+          : t('videoCallParticipantRaisedTheirHandUp', {name});
+        const handDownMessage = isSelf
+          ? t('videoCallParticipantRaisedSelfHandDown')
+          : t('videoCallParticipantRaisedTheirHandDown', {name});
+
+        showAppNotification(isHandUp ? handUpMessage : handDownMessage);
+
         break;
       }
 
@@ -1596,6 +1630,10 @@ export class CallingRepository {
     void this.messageRepository.sendInCallEmoji(call.conversation, {
       [emojis]: 1,
     });
+  };
+
+  readonly sendInCallHandRaised = async (isHandUp: boolean, call: Call) => {
+    void this.messageRepository.sendInCallHandRaised(call.conversation, isHandUp);
   };
 
   readonly sendModeratorMute = (conversationId: QualifiedId, participants: Participant[]) => {
