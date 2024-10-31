@@ -15,7 +15,7 @@
   "dependencies": {
     "@wireapp/commons": "workspace:^",
     "@wireapp/priority-queue": "workspace:^",
-    "@wireapp/protocol-messaging": "1.50.0",
+    "@wireapp/protocol-messaging": "1.51.0",
     "axios": "1.7.7",
     "axios-retry": "4.5.0",
     "http-status-codes": "2.3.0",
