@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [46.6.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.5.0...@wireapp/core@46.6.0) (2024-10-31)
+
+### Features
+
+* **core:** Add support for InCallHandRaise proto message ([#6636](https://github.com/wireapp/wire-web-packages/issues/6636)) ([ef65020](https://github.com/wireapp/wire-web-packages/commit/ef650200a80dab60d9b08afaa810bc1be95535af))
+
 # [46.5.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.4.3...@wireapp/core@46.5.0) (2024-10-28)
 
 ### Features
