@@ -21,9 +21,9 @@ import {FEDERATION_EVENT} from '@wireapp/api-client/lib/event';
 import {container} from 'tsyringe';
 import {debounce} from 'underscore';
 
-import {ConversationState} from 'src/script/conversation/ConversationState';
-import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
-import {EventBuilder} from 'src/script/conversation/EventBuilder';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {ConversationStatus} from 'Repositories/conversation/ConversationStatus';
+import {EventBuilder} from 'Repositories/conversation/EventBuilder';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {ServerTimeHandler} from 'src/script/time/serverTimeHandler';

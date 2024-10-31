@@ -54,12 +54,12 @@ import {
 
 import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
 import {CALL_MESSAGE_TYPE} from 'Repositories/calling/enum/CallMessageType';
+import {ConversationEphemeralHandler} from 'Repositories/conversation/ConversationEphemeralHandler';
+import {MessageAddEvent} from 'Repositories/conversation/EventBuilder';
 import {getLogger, Logger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {base64ToArray, arrayToBase64} from 'Util/util';
 
-import {ConversationEphemeralHandler} from '../conversation/ConversationEphemeralHandler';
-import {MessageAddEvent} from '../conversation/EventBuilder';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {CryptographyError} from '../error/CryptographyError';
 import {ClientEvent, CONVERSATION} from '../event/Client';

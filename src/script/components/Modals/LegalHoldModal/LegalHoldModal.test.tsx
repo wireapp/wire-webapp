@@ -23,12 +23,12 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {ClientRepository} from 'Repositories/client';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 
 import {LegalHoldModal, LegalHoldModalType} from './LegalHoldModal';
 
 import {TestFactory} from '../../../../../test/helper/TestFactory';
-import {ConversationRepository} from '../../../conversation/ConversationRepository';
-import {MessageRepository} from '../../../conversation/MessageRepository';
 import {CryptographyRepository} from '../../../cryptography/CryptographyRepository';
 import {Conversation} from '../../../entity/Conversation';
 import {User} from '../../../entity/User';

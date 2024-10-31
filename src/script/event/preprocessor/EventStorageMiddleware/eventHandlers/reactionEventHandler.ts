@@ -17,7 +17,7 @@
  *
  */
 
-import {MessageAddEvent, ReactionEvent} from 'src/script/conversation/EventBuilder';
+import {MessageAddEvent, ReactionEvent} from 'Repositories/conversation/EventBuilder';
 import {StoredEvent} from 'src/script/storage';
 import {addReaction, userReactionMapToReactionMap} from 'Util/ReactionUtil';
 

@@ -17,9 +17,9 @@
  *
  */
 
-import {Segmentation} from './Segmentation';
+import type {ContributedSegmentations} from 'Repositories/conversation/MessageRepository';
 
-import type {ContributedSegmentations} from '../conversation/MessageRepository';
+import {Segmentation} from './Segmentation';
 
 type Keys = keyof typeof Segmentation;
 type Values = (typeof Segmentation)[Keys];

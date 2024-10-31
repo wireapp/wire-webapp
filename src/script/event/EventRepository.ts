@@ -31,6 +31,7 @@ import {container} from 'tsyringe';
 import {Account, ConnectionState, ProcessedEventPayload} from '@wireapp/core';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {ClientConversationEvent, EventBuilder} from 'Repositories/conversation/EventBuilder';
 import {getLogger, Logger} from 'Util/Logger';
 import {queue} from 'Util/PromiseQueue';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -46,7 +47,6 @@ import {NOTIFICATION_HANDLING_STATE} from './NotificationHandlingState';
 import type {NotificationService} from './NotificationService';
 import {EventValidationError} from './preprocessor/EventStorageMiddleware/eventHandlers/EventValidationError';
 
-import {ClientConversationEvent, EventBuilder} from '../conversation/EventBuilder';
 import {CryptographyMapper} from '../cryptography/CryptographyMapper';
 import {CryptographyError} from '../error/CryptographyError';
 import {EventError} from '../error/EventError';

@@ -17,7 +17,8 @@
  *
  */
 
-import {MessageRepository} from '../../../conversation/MessageRepository';
+import {MessageRepository} from 'Repositories/conversation/MessageRepository';
+
 import {Conversation} from '../../../entity/Conversation';
 import {ContentMessage} from '../../../entity/message/ContentMessage';
 import {StorageKey, StorageRepository} from '../../../storage';

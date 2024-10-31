@@ -30,9 +30,9 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {LegalHoldStatus} from '@wireapp/core/lib/conversation/content';
 
 import {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';
-import {ConversationDatabaseData, ConversationMapper} from 'src/script/conversation/ConversationMapper';
-import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
-import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
+import {ConversationDatabaseData, ConversationMapper} from 'Repositories/conversation/ConversationMapper';
+import {ConversationStatus} from 'Repositories/conversation/ConversationStatus';
+import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {createUuid} from 'Util/uuid';

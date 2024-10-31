@@ -35,8 +35,8 @@ import {
 } from '@wireapp/react-ui-kit';
 
 import {ClientEntity} from 'Repositories/client';
-import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
-import {checkUserHandle} from 'src/script/conversation/ConversationVerificationStateHandler';
+import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
+import {checkUserHandle} from 'Repositories/conversation/ConversationVerificationStateHandler';
 import {MLSStatuses, WireIdentity} from 'src/script/E2EIdentity/E2EIdentityVerification';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';

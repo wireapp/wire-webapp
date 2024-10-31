@@ -24,12 +24,12 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 
 import {Config} from '../../Config';
-import {ConversationState} from '../../conversation/ConversationState';
 import {NOTIFICATION_HANDLING_STATE} from '../../event/NotificationHandlingState';
 import {UserState} from '../../user/UserState';
 import {ContentState, useAppState} from '../useAppState';

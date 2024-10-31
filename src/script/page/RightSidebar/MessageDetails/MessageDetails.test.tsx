@@ -20,13 +20,13 @@
 import {render, waitFor} from '@testing-library/react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'src/script/entity/Conversation';
 import {createUuid} from 'Util/uuid';
 
 import {MessageDetails} from './MessageDetails';
 
 import {TestFactory} from '../../../../../test/helper/TestFactory';
-import {ConversationRepository} from '../../../conversation/ConversationRepository';
 import {ContentMessage} from '../../../entity/message/ContentMessage';
 import {User} from '../../../entity/User';
 import {SearchRepository} from '../../../search/SearchRepository';

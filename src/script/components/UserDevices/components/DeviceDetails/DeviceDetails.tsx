@@ -26,7 +26,9 @@ import {container} from 'tsyringe';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import type {ClientRepository, ClientEntity} from 'Repositories/client';
-import {isMLSConversation} from 'src/script/conversation/ConversationSelectors';
+import {isMLSConversation} from 'Repositories/conversation/ConversationSelectors';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
+import type {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {WireIdentity} from 'src/script/E2EIdentity';
 import {MLSDeviceDetails} from 'src/script/page/MainContent/panels/preferences/DevicesPreferences/components/MLSDeviceDetails';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -35,8 +37,6 @@ import type {Logger} from 'Util/Logger';
 import {splitFingerprint} from 'Util/StringUtil';
 
 import {Config} from '../../../../Config';
-import {ConversationState} from '../../../../conversation/ConversationState';
-import type {MessageRepository} from '../../../../conversation/MessageRepository';
 import type {CryptographyRepository} from '../../../../cryptography/CryptographyRepository';
 import type {User} from '../../../../entity/User';
 import {MotionDuration} from '../../../../motion/MotionDuration';

@@ -25,7 +25,7 @@ import {CircleCloseIcon, IconButton, Input, SearchIcon} from '@wireapp/react-ui-
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/Icon';
-import {ConversationLabel} from 'src/script/conversation/ConversationLabelRepository';
+import {ConversationLabel} from 'Repositories/conversation/ConversationLabelRepository';
 import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {handleEnterDown, handleEscDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
