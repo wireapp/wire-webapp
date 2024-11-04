@@ -151,7 +151,11 @@ const getConversationActions = ({
       },
     },
     {
-      condition: !isSingleUser && isTeam && roleRepository.canDeleteGroup(conversationEntity),
+      condition:
+        !isSingleUser &&
+        isTeam &&
+        roleRepository.canDeleteGroup(conversationEntity) &&
+        !conversationEntity.isSelfUserRemoved(),
       item: {
         click: () => actionsViewModel.deleteConversation(conversationEntity),
         Icon: Icon.DeleteIcon,
