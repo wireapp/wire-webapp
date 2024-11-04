@@ -26,13 +26,13 @@ import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import type {ElectronDesktopCapturerSource} from 'Repositories/media/MediaDevicesHandler';
+import {EventName} from 'Repositories/tracking/EventName';
+import {Segmentation} from 'Repositories/tracking/Segmentation';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {Call} from './Call';
 
 import {Config} from '../../Config';
-import {EventName} from '../../tracking/EventName';
-import {Segmentation} from '../../tracking/Segmentation';
 import {CallViewTab} from '../../view_model/CallingViewModel';
 
 export enum MuteState {

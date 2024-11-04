@@ -71,6 +71,7 @@ import {SearchRepository} from 'Repositories/search/SearchRepository';
 import {SelfRepository} from 'Repositories/self/SelfRepository';
 import {SelfService} from 'Repositories/self/SelfService';
 import {StorageKey, StorageRepository, StorageService} from 'Repositories/storage';
+import {EventTrackingRepository} from 'Repositories/tracking/EventTrackingRepository';
 import {initializeDataDog} from 'Util/DataDog';
 import {DebugUtil} from 'Util/DebugUtil';
 import {Environment} from 'Util/Environment';
@@ -105,7 +106,6 @@ import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsVal
 import {AppInitTelemetry} from '../telemetry/app_init/AppInitTelemetry';
 import {AppInitTimingsStep} from '../telemetry/app_init/AppInitTimingsStep';
 import {serverTimeHandler} from '../time/serverTimeHandler';
-import {EventTrackingRepository} from '../tracking/EventTrackingRepository';
 import {WindowHandler} from '../ui/WindowHandler';
 import {UserRepository} from '../user/UserRepository';
 import {UserService} from '../user/UserService';

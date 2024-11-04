@@ -40,9 +40,9 @@ import {getPlatform} from './Helpers';
 import {Segmentation} from './Segmentation';
 import {UserData} from './UserData';
 
-import {URLParameter} from '../auth/URLParameter';
-import {Config} from '../Config';
-import {TeamState} from '../team/TeamState';
+import {URLParameter} from '../../auth/URLParameter';
+import {Config} from '../../Config';
+import {TeamState} from '../../team/TeamState';
 
 const CountlyConsentFeatures = [
   'sessions',
