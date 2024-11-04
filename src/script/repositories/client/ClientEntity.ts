@@ -20,11 +20,10 @@
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
 import ko from 'knockout';
 
+import {ClientRecord} from 'Repositories/storage';
 import {splitFingerprint} from 'Util/StringUtil';
 
 import {ClientMapper} from './ClientMapper';
-
-import {ClientRecord} from '../../storage';
 
 export enum MLSPublicKeys {
   ED25519 = 'ed25519',

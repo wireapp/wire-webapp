@@ -22,6 +22,7 @@ import {omit} from 'underscore';
 
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {isReadableConversation} from 'Repositories/conversation/ConversationSelectors';
+import {ConversationRecord, EventRecord, StorageSchemata, UserRecord} from 'Repositories/storage';
 import {chunk} from 'Util/ArrayUtil';
 import {Logger, getLogger} from 'Util/Logger';
 import {constructUserPrimaryKey} from 'Util/StorageUtil';
@@ -44,9 +45,6 @@ import {preprocessConversations, preprocessEvents, preprocessUsers} from './reco
 
 import type {Conversation} from '../../entity/Conversation';
 import {User} from '../../entity/User';
-import {EventRecord, UserRecord} from '../../storage';
-import {ConversationRecord} from '../../storage/record/ConversationRecord';
-import {StorageSchemata} from '../../storage/StorageSchemata';
 
 interface Metadata {
   client_id: string;

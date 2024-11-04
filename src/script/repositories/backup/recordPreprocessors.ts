@@ -18,8 +18,7 @@
  */
 
 import {ClientEvent} from 'Repositories/event/Client';
-
-import {ConversationRecord, EventRecord, UserRecord} from '../../storage';
+import {ConversationRecord, EventRecord, UserRecord} from 'Repositories/storage';
 
 export function preprocessEvents(events: EventRecord[]): EventRecord[] {
   // The verification message are not relevant for a new device (no conversation can be verified on a new device).

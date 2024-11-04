@@ -21,6 +21,7 @@ import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 import {container} from 'tsyringe';
 
 import {ConversationState} from 'Repositories/conversation/ConversationState';
+import type {EventRecord} from 'Repositories/storage';
 import {User} from 'src/script/entity/User';
 import {UserFilter} from 'src/script/user/UserFilter';
 import {matchQualifiedIds} from 'Util/QualifiedId';
@@ -30,7 +31,6 @@ import {EventValidationError} from './eventHandlers/EventValidationError';
 import {HandledEvents, DBOperation} from './types';
 
 import {isEventRecordFailed, isEventRecordWithFederationError} from '../../../../message/StatusType';
-import type {EventRecord} from '../../../../storage';
 import {CONVERSATION} from '../../Client';
 import {EventMiddleware, IncomingEvent} from '../../EventProcessor';
 import {EventService} from '../../EventService';

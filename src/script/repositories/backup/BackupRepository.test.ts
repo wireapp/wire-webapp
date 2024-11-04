@@ -22,6 +22,7 @@ import {container} from 'tsyringe';
 import {omit} from 'underscore';
 
 import {ClientEvent} from 'Repositories/event/Client';
+import {StorageSchemata, StorageService} from 'Repositories/storage';
 import {generateConversation} from 'test/helper/ConversationGenerator';
 import {TestFactory} from 'test/helper/TestFactory';
 import {generateAPIUser} from 'test/helper/UserGenerator';
@@ -37,8 +38,6 @@ import {handleZipEvent} from './zipWorker';
 
 import {User} from '../../entity/User';
 import {DatabaseTypes, createStorageEngine} from '../../service/StoreEngineProvider';
-import {StorageService} from '../../storage';
-import {StorageSchemata} from '../../storage/StorageSchemata';
 
 const conversationId = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a';
 

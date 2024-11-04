@@ -20,8 +20,8 @@
 import {render, fireEvent} from '@testing-library/react';
 import ko from 'knockout';
 
+import {ReadReceipt} from 'Repositories/storage';
 import {Message as MessageEntity} from 'src/script/entity/message/Message';
-import {ReadReceipt} from 'src/script/storage';
 import {formatTimeShort} from 'Util/TimeUtil';
 
 import {ReadReceiptStatus} from './ReadReceiptStatus';

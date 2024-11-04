@@ -26,16 +26,16 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {CALL_QUALITY_FEEDBACK_KEY} from 'Components/Modals/QualityFeedbackModal/constants';
 import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
+import {EventName} from 'Repositories/tracking/EventName';
+import {Segmentation} from 'Repositories/tracking/Segmentation';
 
 import {QualityFeedbackModal} from './QualityFeedbackModal';
 
 import {withIntl, withTheme} from '../../../auth/util/test/TestUtil';
 import {User} from '../../../entity/User';
-import {EventName} from '../../../tracking/EventName';
-import {Segmentation} from '../../../tracking/Segmentation';
 import {UserState} from '../../../user/UserState';
 
-jest.mock('../../../tracking/Countly.helpers', () => ({
+jest.mock('Repositories/tracking/Countly.helpers', () => ({
   isCountlyEnabledAtCurrentEnvironment: () => true,
 }));
 

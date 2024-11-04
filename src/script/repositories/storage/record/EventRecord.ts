@@ -24,7 +24,7 @@ import type {ReactionType} from '@wireapp/core/lib/conversation/';
 
 import {ClientConversationEvent} from 'Repositories/conversation/EventBuilder';
 
-import {StatusType} from '../../message/StatusType';
+import {StatusType} from '../../../message/StatusType';
 
 export interface ReadReceipt {
   domain?: string;

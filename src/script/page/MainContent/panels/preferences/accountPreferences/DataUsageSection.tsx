@@ -27,7 +27,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
-import {getForcedErrorReportingStatus} from 'src/script/tracking/Countly.helpers';
+import {getForcedErrorReportingStatus} from 'Repositories/tracking/Countly.helpers';
 import {t} from 'Util/LocalizerUtil';
 
 import {TeamState} from '../../../../../team/TeamState';
