@@ -17,7 +17,6 @@
  *
  */
 
-import type Dexie from 'dexie';
 import {omit} from 'underscore';
 
 import {chunk} from 'Util/ArrayUtil';
@@ -38,7 +37,6 @@ import {
   InvalidMetaDataError,
   InvalidPassword,
 } from './Error';
-import {preprocessConversations, preprocessEvents, preprocessUsers} from './recordPreprocessors';
 
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import {isReadableConversation} from '../conversation/ConversationSelectors';
@@ -47,6 +45,18 @@ import {User} from '../entity/User';
 import {EventRecord, UserRecord} from '../storage';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {StorageSchemata} from '../storage/StorageSchemata';
+
+/* eslint-disable */
+import {com} from 'kalium-backup';
+import MPBackupImporter = com.wire.backup.ingest.MPBackupImporter;
+import MPBackup = com.wire.backup.MPBackup;
+import BackupImportResult = com.wire.backup.ingest.BackupImportResult;
+import MPBackupExporter = com.wire.backup.dump.MPBackupExporter;
+import BackupQualifiedId = com.wire.backup.data.BackupQualifiedId;
+import BackupMessage = com.wire.backup.data.BackupMessage;
+import BackupMessageContent = com.wire.backup.data.BackupMessageContent;
+import BackupDateTime = com.wire.backup.data.BackupDateTime;
+/* eslint-enable */
 
 interface Metadata {
   client_id: string;
@@ -141,60 +151,32 @@ export class BackupRepository {
   }
 
   private async _exportHistory(progressCallback: ProgressCallback) {
-    const [conversationTable, eventsTable, usersTable] = this.backupService.getTables();
-    const tableData: Record<string, any[]> = {};
+    const backupExporter = new MPBackupExporter(new BackupQualifiedId('selfUserId', 'selfUserDomain'));
 
-    function streamProgress<T>(dataProcessor: (data: T[]) => T[]) {
-      return (data: T[]) => {
-        progressCallback(data.length);
-        return dataProcessor(data);
-      };
-    }
+    // TODO: Map all conversations, users and messages.
+    //       Currently hardcoded as an example
+    backupExporter.addMessage(
+      new BackupMessage(
+        'backedUpMessageId',
+        new BackupQualifiedId('conversationId', 'conversationDomain'),
+        new BackupQualifiedId('senderUserId', 'senderUserDomain'),
+        'senderClientId',
+        new BackupDateTime(new Date(2024, 10, 3, 12, 30, 0, 0)), // eslint-disable-line
+        new BackupMessageContent.Text('Hello world!'),
+      ),
+    );
 
-    const conversationsData = await this.exportTable(conversationTable, streamProgress(preprocessConversations));
-    tableData[StorageSchemata.OBJECT_STORE.CONVERSATIONS] = conversationsData;
-
-    const eventsData = await this.exportTable(eventsTable, streamProgress(preprocessEvents));
-    tableData[StorageSchemata.OBJECT_STORE.EVENTS] = eventsData;
-
-    const usersData = await this.exportTable(usersTable, streamProgress(preprocessUsers));
-    tableData[StorageSchemata.OBJECT_STORE.USERS] = usersData;
-
-    return tableData;
-  }
-
-  private async exportTable<T>(table: Dexie.Table<T, unknown>, preprocessor: (tableRows: T[]) => T[]): Promise<any[]> {
-    const tableData: T[] = [];
-
-    await this.backupService.exportTable(table, tableRows => {
-      if (this.canceled) {
-        throw new CancelError();
-      }
-      const processedData = preprocessor(tableRows);
-      tableData.push(...processedData);
-    });
-    return tableData;
+    return backupExporter.serialize();
   }
   private async compressHistoryFiles(
     user: User,
-    clientId: string,
-    exportedData: Record<string, any>,
+    clientId: string, // TODO: Add clientId to metadata
+    exportedData: Int8Array,
     password: string,
   ): Promise<Blob> {
-    const metaData = this.createMetaData(user, clientId);
-
     const files: Record<string, Uint8Array> = {};
 
-    const stringifiedMetadata = JSON.stringify(metaData, null, 2);
-    const encodedMetadata = new TextEncoder().encode(stringifiedMetadata);
-
-    for (const tableName in exportedData) {
-      const stringifiedData = JSON.stringify(exportedData[tableName]);
-      const encodedData = new TextEncoder().encode(stringifiedData);
-      const fileName = `${tableName}.json`;
-      files[fileName] = encodedData;
-    }
-    files[Filename.METADATA] = encodedMetadata;
+    files[MPBackup.ZIP_ENTRY_DATA] = new Uint8Array(exportedData.buffer, 0, exportedData.byteLength);
 
     if (password) {
       return this.createEncryptedBackup(files, user, password);
@@ -308,6 +290,34 @@ export class BackupRepository {
       throw new ImportError(files.error as unknown as string);
     }
 
+    // Check for Multiplatform backup
+    if (files[MPBackup.ZIP_ENTRY_DATA]) {
+      // It's multiplatform!
+      const backupImporter = new MPBackupImporter('wire.com');
+      const backupRawData = files[MPBackup.ZIP_ENTRY_DATA];
+
+      const result = backupImporter.import(new Int8Array(backupRawData.buffer));
+      if (result instanceof BackupImportResult.Success) {
+        console.log(`SUCCESSFUL BACKUP IMPORT: ${result.backupData}`); // eslint-disable-line
+        result.backupData.messages.forEach(message => {
+          console.log(`IMPORTED MESSAGE: ${message.toString()}`) // eslint-disable-line
+          // TODO: Import messages.
+          //       Convert messages to EventRecord or whatever else needed in order to insert them into the local DB
+        });
+        result.backupData.conversations.forEach(conversation => {
+          console.log(`IMPORTED CONVERSATION: ${conversation.toString()}`) // eslint-disable-line
+          // TODO: Import conversations
+        });
+        result.backupData.users.forEach(user => {
+          console.log(`IMPORTED USER: ${user.toString()}`) // eslint-disable-line
+          // TODO: Import users
+        });
+      } else {
+        console.log(`ERROR DURING BACKUP IMPORT: ${result}`); // eslint-disable-line
+        throw new IncompatibleBackupError('Incompatible Multiplatform backup');
+      }
+      return;
+    }
     if (!files[Filename.METADATA]) {
       throw new InvalidMetaDataError();
     }

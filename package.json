@@ -27,6 +27,7 @@
     "jimp": "0.22.12",
     "js-cookie": "3.0.5",
     "jszip": "3.10.1",
+    "kalium-backup": "./TEMP-crossplatform-backup",
     "keyboardjs": "2.7.0",
     "knockout": "3.5.1",
     "lexical": "0.19.0",
