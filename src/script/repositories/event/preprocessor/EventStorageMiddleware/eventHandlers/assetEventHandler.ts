@@ -21,7 +21,7 @@ import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 
 import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
 import {AssetAddEvent} from 'Repositories/conversation/EventBuilder';
-import {StoredEvent} from 'src/script/storage';
+import {StoredEvent} from 'Repositories/storage';
 
 import {EventValidationError} from './EventValidationError';
 

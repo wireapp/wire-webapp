@@ -22,6 +22,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
+import {ReactionMap, ReadReceipt} from 'Repositories/storage';
 import {copyText} from 'Util/ClipboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatLocale, formatTimeShort} from 'Util/TimeUtil';
@@ -34,7 +35,6 @@ import {Text as TextAsset} from './Text';
 
 import type {QuoteEntity} from '../../message/QuoteEntity';
 import {SuperType} from '../../message/SuperType';
-import {ReactionMap, ReadReceipt} from '../../storage';
 
 export class ContentMessage extends Message {
   public readonly assets: ko.ObservableArray<Asset | FileAsset | TextAsset | MediumImage> = ko.observableArray();

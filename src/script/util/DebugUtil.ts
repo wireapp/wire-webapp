@@ -51,6 +51,8 @@ import type {MessageRepository} from 'Repositories/conversation/MessageRepositor
 import {EventRepository} from 'Repositories/event/EventRepository';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
+import {EventRecord, StorageRepository, StorageSchemata} from 'Repositories/storage';
+import {disableForcedErrorReporting} from 'Repositories/tracking/Countly.helpers';
 import {getLogger, Logger} from 'Util/Logger';
 
 import {KEY} from './KeyboardUtil';
@@ -63,9 +65,7 @@ import {User} from '../entity/User';
 import {checkVersion} from '../lifecycle/newVersionHandler';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
-import {EventRecord, StorageRepository, StorageSchemata} from '../storage';
 import {TeamState} from '../team/TeamState';
-import {disableForcedErrorReporting} from '../tracking/Countly.helpers';
 import {UserRepository} from '../user/UserRepository';
 import {UserState} from '../user/UserState';
 import {ViewModelRepositories} from '../view_model/MainViewModel';

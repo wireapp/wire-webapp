@@ -25,6 +25,13 @@ import {container} from 'tsyringe';
 import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 
 import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
+import {
+  StorageService,
+  StorageSchemata,
+  DatabaseListenerCallback,
+  LegacyEventRecord,
+  EventRecord,
+} from 'Repositories/storage';
 import {getLogger, Logger} from 'Util/Logger';
 
 import {ClientEvent, CONVERSATION as CLIENT_CONVERSATION_EVENT} from './Client';
@@ -34,8 +41,6 @@ import {ConversationError} from '../../error/ConversationError';
 import {StorageError} from '../../error/StorageError';
 import {categoryFromEvent} from '../../message/MessageCategorization';
 import {MessageCategory} from '../../message/MessageCategory';
-import {StorageService, DatabaseListenerCallback, LegacyEventRecord, EventRecord} from '../../storage';
-import {StorageSchemata} from '../../storage/StorageSchemata';
 
 export type Includes = {includeFrom: boolean; includeTo: boolean};
 type DexieCollection = Dexie.Collection<any, any>;

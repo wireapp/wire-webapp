@@ -20,7 +20,7 @@
 import {getWebEnvironment} from 'Util/Environment';
 import {getLogger, Logger} from 'Util/Logger';
 
-import {Config} from '../Config';
+import {Config} from '../../Config';
 
 const logger: Logger = getLogger('CountlyHelpers');
 

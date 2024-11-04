@@ -31,6 +31,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
+import {ClientRecord, StorageKey} from 'Repositories/storage';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
@@ -47,8 +48,6 @@ import {SIGN_OUT_REASON} from '../../auth/SignOutReason';
 import type {User} from '../../entity/User';
 import {ClientError} from '../../error/ClientError';
 import {Core} from '../../service/CoreSingleton';
-import {ClientRecord} from '../../storage';
-import {StorageKey} from '../../storage/StorageKey';
 
 export type UserClientEntityMap = {[userId: string]: ClientEntity[]};
 export type QualifiedUserClientEntityMap = {[domain: string]: UserClientEntityMap};

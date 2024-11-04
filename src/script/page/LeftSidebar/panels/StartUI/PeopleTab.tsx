@@ -25,8 +25,10 @@ import {partition} from 'underscore';
 
 import * as Icon from 'Components/Icon';
 import {UserList, UserlistMode} from 'Components/UserList';
+import {useDebounce} from 'Hooks/useDebounce';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {SearchRepository} from 'Repositories/search/SearchRepository';
 import {UserRepository} from 'src/script/user/UserRepository';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
@@ -38,8 +40,6 @@ import {TopPeople} from './components/TopPeople';
 
 import {User} from '../../../../entity/User';
 import {getManageTeamUrl} from '../../../../externalRoute';
-import {useDebounce} from '../../../../hooks/useDebounce';
-import {SearchRepository} from '../../../../search/SearchRepository';
 import {TeamRepository} from '../../../../team/TeamRepository';
 import {TeamState} from '../../../../team/TeamState';
 import {UserState} from '../../../../user/UserState';

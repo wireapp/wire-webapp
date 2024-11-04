@@ -23,10 +23,10 @@ import {act, render} from '@testing-library/react';
 import {observable} from 'knockout';
 
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {SearchRepository} from 'Repositories/search/SearchRepository';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {User} from 'src/script/entity/User';
 import {ListState} from 'src/script/page/useAppState';
-import {SearchRepository} from 'src/script/search/SearchRepository';
 import {UserRepository} from 'src/script/user/UserRepository';
 import {TestFactory} from 'test/helper/TestFactory';
 

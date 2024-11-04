@@ -36,19 +36,19 @@ import type {NotificationRepository} from 'Repositories/notification/Notificatio
 import type {PreferenceNotificationRepository} from 'Repositories/notification/PreferenceNotificationRepository';
 import type {PermissionRepository} from 'Repositories/permission/PermissionRepository';
 import type {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import type {SearchRepository} from 'Repositories/search/SearchRepository';
+import type {SelfRepository} from 'Repositories/self/SelfRepository';
+import type {StorageRepository} from 'Repositories/storage';
+import type {EventTrackingRepository} from 'Repositories/tracking/EventTrackingRepository';
 
 import {ActionsViewModel} from './ActionsViewModel';
 import {CallingViewModel} from './CallingViewModel';
 import {ContentViewModel} from './ContentViewModel';
 import {ListViewModel} from './ListViewModel';
 
-import type {SearchRepository} from '../search/SearchRepository';
-import type {SelfRepository} from '../self/SelfRepository';
 import {Core} from '../service/CoreSingleton';
-import type {StorageRepository} from '../storage';
 import type {TeamRepository} from '../team/TeamRepository';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
-import type {EventTrackingRepository} from '../tracking/EventTrackingRepository';
 import type {UserRepository} from '../user/UserRepository';
 import {UserState} from '../user/UserState';
 
