@@ -20,10 +20,10 @@
 import {render, waitFor} from '@testing-library/react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
+import {TeamState} from 'Repositories/team/TeamState';
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {User} from 'src/script/entity/User';
 import {Core} from 'src/script/service/CoreSingleton';
-import {TeamState} from 'src/script/team/TeamState';
 
 import {UserModal, UserModalProps} from './UserModal';
 import {showUserModal} from './UserModal.state';

@@ -23,10 +23,10 @@ import {GroupIcon, MessageIcon, StarIcon, ExternalLinkIcon, Tooltip, SupportIcon
 
 import * as Icon from 'Components/Icon';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {TeamState} from 'Repositories/team/TeamState';
 import {User} from 'src/script/entity/User';
 import {ConversationFolderTab} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTab/ConversationFolderTab';
 import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
-import {TeamState} from 'src/script/team/TeamState';
 import {isDataDogEnabled} from 'Util/DataDog';
 import {getWebEnvironment} from 'Util/Environment';
 import {replaceLink, t} from 'Util/LocalizerUtil';

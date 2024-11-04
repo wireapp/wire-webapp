@@ -27,9 +27,9 @@ import {Call} from 'Repositories/calling/Call';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {Participant} from 'Repositories/calling/Participant';
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+import {TeamState} from 'Repositories/team/TeamState';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
-import {TeamState} from 'src/script/team/TeamState';
 import {CallActions} from 'src/script/view_model/CallingViewModel';
 import {createUuid} from 'Util/uuid';
 

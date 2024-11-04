@@ -28,6 +28,7 @@ import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {TeamState} from 'Repositories/team/TeamState';
 import {AppLockState} from 'Repositories/user/AppLockState';
 import {FEATURES, hasAccessToFeature} from 'Repositories/user/UserPermission';
 import {UserRepository} from 'Repositories/user/UserRepository';
@@ -36,7 +37,6 @@ import {t} from 'Util/LocalizerUtil';
 
 import {User} from '../../../../../entity/User';
 import {externalUrl, getManageTeamUrl} from '../../../../../externalRoute';
-import {TeamState} from '../../../../../team/TeamState';
 import {PreferencesSection} from '../components/PreferencesSection';
 
 interface AccountSecuritySectionProps {

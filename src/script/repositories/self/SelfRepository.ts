@@ -28,6 +28,11 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ClientEntity, ClientRepository} from 'Repositories/client';
 import {EventSource} from 'Repositories/event/EventSource';
+import {
+  FeatureUpdateType,
+  detectTeamFeatureUpdate,
+} from 'Repositories/team/TeamFeatureConfigChangeDetector/TeamFeatureConfigChangeDetector';
+import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {UserState} from 'Repositories/user/UserState';
 import {Logger, getLogger} from 'Util/Logger';
@@ -37,11 +42,6 @@ import {SelfService} from './SelfService';
 import {evaluateSelfSupportedProtocols} from './SelfSupportedProtocols/SelfSupportedProtocols';
 
 import {Core} from '../../service/CoreSingleton';
-import {
-  FeatureUpdateType,
-  detectTeamFeatureUpdate,
-} from '../../team/TeamFeatureConfigChangeDetector/TeamFeatureConfigChangeDetector';
-import {TeamRepository} from '../../team/TeamRepository';
 
 type Events = {selfSupportedProtocolsUpdated: ConversationProtocol[]};
 

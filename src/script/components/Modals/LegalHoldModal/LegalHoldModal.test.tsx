@@ -27,6 +27,7 @@ import {ConversationRepository} from 'Repositories/conversation/ConversationRepo
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
 import {SearchRepository} from 'Repositories/search/SearchRepository';
+import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {UserRepository} from 'Repositories/user/UserRepository';
 
 import {LegalHoldModal, LegalHoldModalType} from './LegalHoldModal';
@@ -34,7 +35,6 @@ import {LegalHoldModal, LegalHoldModalType} from './LegalHoldModal';
 import {TestFactory} from '../../../../../test/helper/TestFactory';
 import {Conversation} from '../../../entity/Conversation';
 import {User} from '../../../entity/User';
-import {TeamRepository} from '../../../team/TeamRepository';
 
 const userRepository = {} as UserRepository;
 const testFactory = new TestFactory();

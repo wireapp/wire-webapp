@@ -29,10 +29,10 @@ import * as Icon from 'Components/Icon';
 import {Call} from 'Repositories/calling/Call';
 import {DesktopScreenShareMenu} from 'Repositories/calling/CallState';
 import {Participant} from 'Repositories/calling/Participant';
+import {TeamState} from 'Repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import {TeamState} from '../../../../team/TeamState';
 import {CallActions} from '../../../../view_model/CallingViewModel';
 
 interface CallingControlsProps {

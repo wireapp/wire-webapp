@@ -39,6 +39,7 @@ import type {PropertiesRepository} from 'Repositories/properties/PropertiesRepos
 import type {SearchRepository} from 'Repositories/search/SearchRepository';
 import type {SelfRepository} from 'Repositories/self/SelfRepository';
 import type {StorageRepository} from 'Repositories/storage';
+import type {TeamRepository} from 'Repositories/team/TeamRepository';
 import type {EventTrackingRepository} from 'Repositories/tracking/EventTrackingRepository';
 import type {UserRepository} from 'Repositories/user/UserRepository';
 import {UserState} from 'Repositories/user/UserState';
@@ -49,7 +50,6 @@ import {ContentViewModel} from './ContentViewModel';
 import {ListViewModel} from './ListViewModel';
 
 import {Core} from '../service/CoreSingleton';
-import type {TeamRepository} from '../team/TeamRepository';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 
 export interface ViewModelRepositories {

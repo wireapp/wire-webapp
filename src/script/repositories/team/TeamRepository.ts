@@ -57,8 +57,8 @@ import {TeamMemberEntity} from './TeamMemberEntity';
 import {TeamService} from './TeamService';
 import {TeamState} from './TeamState';
 
-import {User} from '../entity/User';
-import {MLSMigrationStatus, getMLSMigrationStatus} from '../mls/MLSMigration/migrationStatus';
+import {User} from '../../entity/User';
+import {MLSMigrationStatus, getMLSMigrationStatus} from '../../mls/MLSMigration/migrationStatus';
 
 export interface AccountInfo {
   accentID: number;

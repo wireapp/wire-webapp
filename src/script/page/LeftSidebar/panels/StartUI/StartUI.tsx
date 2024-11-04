@@ -31,6 +31,8 @@ import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {SearchRepository} from 'Repositories/search/SearchRepository';
+import {TeamRepository} from 'Repositories/team/TeamRepository';
+import {TeamState} from 'Repositories/team/TeamState';
 import {generatePermissionHelpers} from 'Repositories/user/UserPermission';
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {UserState} from 'Repositories/user/UserState';
@@ -43,8 +45,6 @@ import {PeopleTab, SearchResultsData} from './PeopleTab';
 import {ServicesTab} from './ServicesTab';
 
 import {Config} from '../../../../Config';
-import {TeamRepository} from '../../../../team/TeamRepository';
-import {TeamState} from '../../../../team/TeamState';
 import {ListWrapper} from '../ListWrapper';
 
 type StartUIProps = {
