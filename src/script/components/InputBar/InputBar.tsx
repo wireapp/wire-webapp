@@ -38,9 +38,11 @@ import {ConversationRepository} from 'Repositories/conversation/ConversationRepo
 import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
 import {MessageRepository, OutgoingQuote} from 'Repositories/conversation/MessageRepository';
 import {EventRepository} from 'Repositories/event/EventRepository';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
+import {SearchRepository} from 'Repositories/search/SearchRepository';
+import {StorageRepository} from 'Repositories/storage';
 import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
-import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
-import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from 'src/script/user/TypingIndicatorMode';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {KEY} from 'Util/KeyboardUtil';
@@ -67,8 +69,6 @@ import {MentionEntity} from '../../message/MentionEntity';
 import {MessageHasher} from '../../message/MessageHasher';
 import {QuoteEntity} from '../../message/QuoteEntity';
 import {useAppMainState} from '../../page/state';
-import {SearchRepository} from '../../search/SearchRepository';
-import {StorageRepository} from '../../storage';
 import {TeamState} from '../../team/TeamState';
 
 const CONFIG = {

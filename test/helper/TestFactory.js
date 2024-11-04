@@ -46,27 +46,26 @@ import {EventRepository} from 'Repositories/event/EventRepository';
 import {EventService} from 'Repositories/event/EventService';
 import {NotificationService} from 'Repositories/event/NotificationService';
 import {MediaRepository} from 'Repositories/media/MediaRepository';
+import {PermissionRepository} from 'Repositories/permission/PermissionRepository';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {PropertiesService} from 'Repositories/properties/PropertiesService';
+import {SearchRepository} from 'Repositories/search/SearchRepository';
+import {SelfService} from 'Repositories/self/SelfService';
+import {SelfRepository} from 'Repositories/self/SelfRepository';
+import {StorageRepository, StorageService} from 'Repositories/storage';
+import {EventTrackingRepository} from 'Repositories/tracking/EventTrackingRepository';
 import {User} from 'src/script/entity/User';
-import {PermissionRepository} from 'src/script/permission/PermissionRepository';
-import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
-import {PropertiesService} from 'src/script/properties/PropertiesService';
-import {SearchRepository} from 'src/script/search/SearchRepository';
-import {SelfService} from 'src/script/self/SelfService';
 import {Core} from 'src/script/service/CoreSingleton';
 import {createStorageEngine, DatabaseTypes} from 'src/script/service/StoreEngineProvider';
-import {StorageService} from 'src/script/storage';
-import {StorageRepository} from 'src/script/storage/StorageRepository';
 import {TeamRepository} from 'src/script/team/TeamRepository';
 import {TeamService} from 'src/script/team/TeamService';
 import {TeamState} from 'src/script/team/TeamState';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
-import {EventTrackingRepository} from 'src/script/tracking/EventTrackingRepository';
 import {UserRepository} from 'src/script/user/UserRepository';
 import {UserService} from 'src/script/user/UserService';
 import {UserState} from 'src/script/user/UserState';
 
 import {entities} from '../api/payloads';
-import {SelfRepository} from 'src/script/self/SelfRepository';
 
 export class TestFactory {
   constructor() {

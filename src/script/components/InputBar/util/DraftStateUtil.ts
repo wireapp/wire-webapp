@@ -18,10 +18,10 @@
  */
 
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
+import {StorageKey, StorageRepository} from 'Repositories/storage';
 
 import {Conversation} from '../../../entity/Conversation';
 import {ContentMessage} from '../../../entity/message/ContentMessage';
-import {StorageKey, StorageRepository} from '../../../storage';
 
 export interface DraftState {
   editorState: string | null;

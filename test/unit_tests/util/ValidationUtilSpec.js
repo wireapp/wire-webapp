@@ -147,7 +147,7 @@ describe('ValidationUtil', () => {
     });
 
     it('detects a invalid API path', async () => {
-      const path = '../../../search/contacts';
+      const path = '../../../repositories/search/contacts';
 
       expect(() => {
         isValidApiPath(path);

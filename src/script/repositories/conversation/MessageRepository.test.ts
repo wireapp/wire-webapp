@@ -33,6 +33,8 @@ import {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';
 import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
 import {EventRepository} from 'Repositories/event/EventRepository';
 import {EventService} from 'Repositories/event/EventService';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {ReactionMap} from 'Repositories/storage';
 import {Conversation} from 'src/script/entity/Conversation';
 import {Message} from 'src/script/entity/message/Message';
 import {Text} from 'src/script/entity/message/Text';
@@ -47,8 +49,6 @@ import {MessageRepository} from './MessageRepository';
 
 import {ContentMessage} from '../../entity/message/ContentMessage';
 import {StatusType} from '../../message/StatusType';
-import {PropertiesRepository} from '../../properties/PropertiesRepository';
-import {ReactionMap} from '../../storage';
 import {TeamState} from '../../team/TeamState';
 import {ServerTimeHandler, serverTimeHandler} from '../../time/serverTimeHandler';
 import {UserRepository} from '../../user/UserRepository';

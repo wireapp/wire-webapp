@@ -22,6 +22,9 @@ import {container} from 'tsyringe';
 import {Runtime} from '@wireapp/commons';
 
 import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
+import type {PermissionRepository} from 'Repositories/permission/PermissionRepository';
+import {PermissionStatusState} from 'Repositories/permission/PermissionStatusState';
+import {PermissionType} from 'Repositories/permission/PermissionType';
 import {getLogger, Logger} from 'Util/Logger';
 
 import {MediaConstraintsHandler, ScreensharingMethods} from './MediaConstraintsHandler';
@@ -32,9 +35,6 @@ import {MediaType} from './MediaType';
 import {MediaError} from '../../error/MediaError';
 import {NoAudioInputError} from '../../error/NoAudioInputError';
 import {PermissionError} from '../../error/PermissionError';
-import type {PermissionRepository} from '../../permission/PermissionRepository';
-import {PermissionStatusState} from '../../permission/PermissionStatusState';
-import {PermissionType} from '../../permission/PermissionType';
 import {Warnings} from '../../view_model/WarningsContainer';
 
 export class MediaStreamHandler {

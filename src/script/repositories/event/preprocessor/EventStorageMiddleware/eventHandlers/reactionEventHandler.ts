@@ -18,7 +18,7 @@
  */
 
 import {MessageAddEvent, ReactionEvent} from 'Repositories/conversation/EventBuilder';
-import {StoredEvent} from 'src/script/storage';
+import {StoredEvent} from 'Repositories/storage';
 import {addReaction, userReactionMapToReactionMap} from 'Util/ReactionUtil';
 
 import {EventValidationError} from './EventValidationError';

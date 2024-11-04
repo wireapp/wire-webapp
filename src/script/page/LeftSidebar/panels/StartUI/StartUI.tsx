@@ -30,6 +30,7 @@ import {ConversationRepository} from 'Repositories/conversation/ConversationRepo
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {SearchRepository} from 'Repositories/search/SearchRepository';
 import {User} from 'src/script/entity/User';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {UserRepository} from 'src/script/user/UserRepository';
@@ -40,7 +41,6 @@ import {PeopleTab, SearchResultsData} from './PeopleTab';
 import {ServicesTab} from './ServicesTab';
 
 import {Config} from '../../../../Config';
-import {SearchRepository} from '../../../../search/SearchRepository';
 import {TeamRepository} from '../../../../team/TeamRepository';
 import {TeamState} from '../../../../team/TeamState';
 import {generatePermissionHelpers} from '../../../../user/UserPermission';

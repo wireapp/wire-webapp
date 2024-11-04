@@ -33,6 +33,7 @@ import type {Asset, LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
 import {ClientEvent, CONVERSATION} from 'Repositories/event/Client';
+import {ReactionMap, ReadReceipt, UserReactionMap} from 'Repositories/storage';
 import {createUuid} from 'Util/uuid';
 
 import type {Conversation} from '../../entity/Conversation';
@@ -41,7 +42,6 @@ import type {User} from '../../entity/User';
 import {E2EIVerificationMessageType} from '../../message/E2EIVerificationMessageType';
 import {StatusType} from '../../message/StatusType';
 import {VerificationMessageType} from '../../message/VerificationMessageType';
-import {ReactionMap, ReadReceipt, UserReactionMap} from '../../storage';
 
 export interface BaseEvent {
   conversation: string;

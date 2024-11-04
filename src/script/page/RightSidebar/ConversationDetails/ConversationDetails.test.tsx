@@ -25,6 +25,8 @@ import {ConversationRepository} from 'Repositories/conversation/ConversationRepo
 import {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
+import {SearchRepository} from 'Repositories/search/SearchRepository';
+import {SelfRepository} from 'Repositories/self/SelfRepository';
 import {Conversation} from 'src/script/entity/Conversation';
 import {createUuid} from 'Util/uuid';
 
@@ -32,8 +34,6 @@ import {ConversationDetails} from './ConversationDetails';
 
 import {TestFactory} from '../../../../../test/helper/TestFactory';
 import {User} from '../../../entity/User';
-import {SearchRepository} from '../../../search/SearchRepository';
-import {SelfRepository} from '../../../self/SelfRepository';
 import {TeamEntity} from '../../../team/TeamEntity';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {TeamState} from '../../../team/TeamState';

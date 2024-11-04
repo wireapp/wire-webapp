@@ -21,11 +21,10 @@ import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import type {User as APIClientUser, QualifiedHandle, QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
+import {StorageSchemata, StorageService, UserRecord} from 'Repositories/storage';
+
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
-import {UserRecord} from '../storage';
-import {StorageSchemata} from '../storage/StorageSchemata';
-import {StorageService} from '../storage/StorageService';
 import {constructUserPrimaryKey} from '../util/StorageUtil';
 
 export class UserService {

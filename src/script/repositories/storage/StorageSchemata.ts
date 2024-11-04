@@ -23,7 +23,7 @@ import {base64ToArray} from 'Util/util';
 
 import {ConversationRecord} from './record';
 
-import {categoryFromEvent} from '../message/MessageCategorization';
+import {categoryFromEvent} from '../../message/MessageCategorization';
 
 interface DexieSchema {
   schema: Record<string, string>;

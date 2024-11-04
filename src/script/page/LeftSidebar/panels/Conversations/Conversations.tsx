@@ -31,14 +31,16 @@ import {createLabel} from 'Repositories/conversation/ConversationLabelRepository
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
+import {PreferenceNotificationRepository} from 'Repositories/notification/PreferenceNotificationRepository';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {SearchRepository} from 'Repositories/search/SearchRepository';
+import {EventName} from 'Repositories/tracking/EventName';
 import {Preferences} from 'src/script/page/LeftSidebar/panels/Preferences';
 import {StartUI} from 'src/script/page/LeftSidebar/panels/StartUI';
 import {ANIMATED_PAGE_TRANSITION_DURATION} from 'src/script/page/MainContent';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {ContentState, ListState} from 'src/script/page/useAppState';
-import {SearchRepository} from 'src/script/search/SearchRepository';
 import {TeamRepository} from 'src/script/team/TeamRepository';
-import {EventName} from 'src/script/tracking/EventName';
 import {UserRepository} from 'src/script/user/UserRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
@@ -55,8 +57,6 @@ import {SidebarStatus, SidebarTabs, useSidebarStore} from './useSidebarStore';
 
 import type {Conversation} from '../../../../entity/Conversation';
 import {User} from '../../../../entity/User';
-import {PreferenceNotificationRepository} from '../../../../notification/PreferenceNotificationRepository';
-import {PropertiesRepository} from '../../../../properties/PropertiesRepository';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
 import {createNavigateKeyboard} from '../../../../router/routerBindings';
 import {TeamState} from '../../../../team/TeamState';

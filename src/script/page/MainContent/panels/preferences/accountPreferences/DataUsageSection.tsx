@@ -25,11 +25,11 @@ import {amplify} from 'amplify';
 import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {getForcedErrorReportingStatus} from 'src/script/tracking/Countly.helpers';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
+import {getForcedErrorReportingStatus} from 'Repositories/tracking/Countly.helpers';
 import {t} from 'Util/LocalizerUtil';
 
-import {PropertiesRepository} from '../../../../../properties/PropertiesRepository';
-import {PROPERTIES_TYPE} from '../../../../../properties/PropertiesType';
 import {TeamState} from '../../../../../team/TeamState';
 import {ConsentValue} from '../../../../../user/ConsentValue';
 import {PreferencesSection} from '../components/PreferencesSection';

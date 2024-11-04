@@ -23,8 +23,8 @@ import type {Consent, Self} from '@wireapp/api-client/lib/self/';
 import type {UserUpdate} from '@wireapp/api-client/lib/user/';
 import {container} from 'tsyringe';
 
-import {APIClient} from '../service/APIClientSingleton';
-import {Core} from '../service/CoreSingleton';
+import {APIClient} from '../../service/APIClientSingleton';
+import {Core} from '../../service/CoreSingleton';
 
 export class SelfService {
   constructor(

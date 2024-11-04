@@ -27,11 +27,11 @@ import {groupBy} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import type {ClientEntity} from 'Repositories/client/ClientEntity';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {loadValue, resetStoreValue, storeValue} from 'Util/StorageUtil';
 
-import type {User} from '../entity/User';
-import {PropertiesRepository} from '../properties/PropertiesRepository';
+import type {User} from '../../entity/User';
 
 export type ClientNotificationData = {
   domain?: string;
