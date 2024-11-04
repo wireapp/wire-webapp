@@ -27,6 +27,7 @@ export enum QueryKeys {
   MOBILE_UP = 'mobileUp',
   TABLET = 'tablet',
   TABLET_DOWN = 'tabletDown',
+  TABLET_SM_DOWN = 'tabletSMDown',
   TABLET_UP = 'tabletUp',
 }
 
@@ -40,10 +41,11 @@ export const QUERY: QueryMap = {
   [QueryKeys.MOBILE_UP]: `min-width: ${WIDTH.MOBILE}px`,
   [QueryKeys.TABLET]: `min-width: ${WIDTH.TABLET_MIN}px) and (max-width: ${WIDTH.TABLET_MAX}px`,
   [QueryKeys.TABLET_DOWN]: `max-width: ${WIDTH.TABLET_MAX}px`,
+  [QueryKeys.TABLET_SM_DOWN]: `max-width: ${WIDTH.TABLET_SM_MAX}px`,
   [QueryKeys.TABLET_UP]: `min-width: ${WIDTH.TABLET_MIN}px`,
 };
 
-export const media = Object.entries(QUERY).reduce<QueryMap | {}>(
+export const media = Object.entries(QUERY).reduce<QueryMap>(
   (accumulator, [key, value]) => ({...accumulator, [key]: `@media (${value})`}),
-  {},
+  {} as QueryMap,
 );

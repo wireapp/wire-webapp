@@ -54,7 +54,7 @@ export const menuSubLinkStyle: <T>(theme: Theme, props: MenuSubLinkProps<T>) => 
     fontWeight: '400 !important',
     maxWidth: '480px',
     padding: '8px 24px',
-    textTransform: 'none !important',
+    textTransform: 'none',
   },
 });
 
