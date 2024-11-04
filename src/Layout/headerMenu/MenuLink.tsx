@@ -65,7 +65,7 @@ export const menuLinkStyle: <T>(theme: Theme, props: MenuLinkProps<T>) => CSSObj
     fontWeight: 400,
     maxWidth: '480px',
     padding: '8px 24px',
-    textTransform: 'none !important',
+    textTransform: 'none',
   },
   border: button ? '1px solid rgb(219, 226, 231)' : undefined,
   borderRadius: button ? '4px' : undefined,
