@@ -29,7 +29,8 @@ import {useDebounce} from 'Hooks/useDebounce';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {SearchRepository} from 'Repositories/search/SearchRepository';
-import {UserRepository} from 'src/script/user/UserRepository';
+import {UserRepository} from 'Repositories/user/UserRepository';
+import {UserState} from 'Repositories/user/UserState';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
@@ -42,7 +43,6 @@ import {User} from '../../../../entity/User';
 import {getManageTeamUrl} from '../../../../externalRoute';
 import {TeamRepository} from '../../../../team/TeamRepository';
 import {TeamState} from '../../../../team/TeamState';
-import {UserState} from '../../../../user/UserState';
 
 export type SearchResultsData = {contacts: User[]; others: User[]};
 

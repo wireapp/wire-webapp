@@ -70,6 +70,9 @@ import {UserType} from 'Repositories/tracking/attribute';
 import {EventName} from 'Repositories/tracking/EventName';
 import * as trackingHelpers from 'Repositories/tracking/Helpers';
 import {Segmentation} from 'Repositories/tracking/Segmentation';
+import {protoFromType} from 'Repositories/user/AvailabilityMapper';
+import {UserRepository} from 'Repositories/user/UserRepository';
+import {UserState} from 'Repositories/user/UserState';
 import {
   cancelSendingLinkPreview,
   clearLinkPreviewSendingState,
@@ -109,9 +112,6 @@ import {StatusType} from '../../message/StatusType';
 import {Core} from '../../service/CoreSingleton';
 import {TeamState} from '../../team/TeamState';
 import {ServerTimeHandler} from '../../time/serverTimeHandler';
-import {protoFromType} from '../../user/AvailabilityMapper';
-import {UserRepository} from '../../user/UserRepository';
-import {UserState} from '../../user/UserState';
 
 export interface MessageSendingOptions {
   /** Send native push notification for message. Default is `true`. */

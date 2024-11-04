@@ -31,6 +31,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {EventRepository} from 'Repositories/event/EventRepository';
 import type {EventSource} from 'Repositories/event/EventSource';
+import type {UserRepository} from 'Repositories/user/UserRepository';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
@@ -46,7 +47,6 @@ import type {Conversation} from '../../entity/Conversation';
 import {MemberMessage} from '../../entity/message/MemberMessage';
 import type {User} from '../../entity/User';
 import {SystemMessageType} from '../../message/SystemMessageType';
-import type {UserRepository} from '../../user/UserRepository';
 
 export class ConnectionRepository {
   private readonly connectionService: ConnectionService;

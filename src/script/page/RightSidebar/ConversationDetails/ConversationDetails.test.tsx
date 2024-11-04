@@ -27,6 +27,7 @@ import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
 import {SearchRepository} from 'Repositories/search/SearchRepository';
 import {SelfRepository} from 'Repositories/self/SelfRepository';
+import {UserState} from 'Repositories/user/UserState';
 import {Conversation} from 'src/script/entity/Conversation';
 import {createUuid} from 'Util/uuid';
 
@@ -37,7 +38,6 @@ import {User} from '../../../entity/User';
 import {TeamEntity} from '../../../team/TeamEntity';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {TeamState} from '../../../team/TeamState';
-import {UserState} from '../../../user/UserState';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {MainViewModel} from '../../../view_model/MainViewModel';
 

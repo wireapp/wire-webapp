@@ -26,13 +26,13 @@ import * as Icon from 'Components/Icon';
 import {ServiceDetails} from 'Components/panel/ServiceDetails';
 import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {generatePermissionHelpers} from 'Repositories/user/UserPermission';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {Conversation} from '../../../entity/Conversation';
 import {User} from '../../../entity/User';
-import {generatePermissionHelpers} from '../../../user/UserPermission';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {PanelHeader} from '../PanelHeader';
 

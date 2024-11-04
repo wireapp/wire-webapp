@@ -27,6 +27,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {UserState} from 'Repositories/user/UserState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {AddParticipants} from './AddParticipants';
@@ -48,7 +49,6 @@ import {isUserEntity, isUserServiceEntity} from '../../guards/Panel';
 import {isServiceEntity} from '../../guards/Service';
 import {Core} from '../../service/CoreSingleton';
 import {TeamState} from '../../team/TeamState';
-import {UserState} from '../../user/UserState';
 import {ActionsViewModel} from '../../view_model/ActionsViewModel';
 import {ViewModelRepositories} from '../../view_model/MainViewModel';
 import {RightSidebarParams} from '../AppMain';

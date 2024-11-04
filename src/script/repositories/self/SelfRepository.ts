@@ -28,6 +28,8 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ClientEntity, ClientRepository} from 'Repositories/client';
 import {EventSource} from 'Repositories/event/EventSource';
+import {UserRepository} from 'Repositories/user/UserRepository';
+import {UserState} from 'Repositories/user/UserState';
 import {Logger, getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
@@ -40,8 +42,6 @@ import {
   detectTeamFeatureUpdate,
 } from '../../team/TeamFeatureConfigChangeDetector/TeamFeatureConfigChangeDetector';
 import {TeamRepository} from '../../team/TeamRepository';
-import {UserRepository} from '../../user/UserRepository';
-import {UserState} from '../../user/UserState';
 
 type Events = {selfSupportedProtocolsUpdated: ConversationProtocol[]};
 

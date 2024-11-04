@@ -22,8 +22,8 @@ import {container} from 'tsyringe';
 
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import type {EventRecord} from 'Repositories/storage';
+import {UserFilter} from 'Repositories/user/UserFilter';
 import {User} from 'src/script/entity/User';
-import {UserFilter} from 'src/script/user/UserFilter';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {handleLinkPreviewEvent, handleEditEvent, handleAssetEvent, handleReactionEvent} from './eventHandlers';

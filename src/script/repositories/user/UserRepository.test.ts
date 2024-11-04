@@ -45,9 +45,9 @@ import {UserRepository} from './UserRepository';
 import {UserService} from './UserService';
 import {UserState} from './UserState';
 
-import {User} from '../entity/User';
-import {TeamState} from '../team/TeamState';
-import {serverTimeHandler} from '../time/serverTimeHandler';
+import {User} from '../../entity/User';
+import {TeamState} from '../../team/TeamState';
+import {serverTimeHandler} from '../../time/serverTimeHandler';
 
 const testFactory = new TestFactory();
 async function buildUserRepository() {

@@ -34,6 +34,8 @@ import {ConversationRepository} from 'Repositories/conversation/ConversationRepo
 import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {SearchRepository} from 'Repositories/search/SearchRepository';
+import {generatePermissionHelpers} from 'Repositories/user/UserPermission';
+import {UserState} from 'Repositories/user/UserState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -45,8 +47,6 @@ import {User} from '../../../entity/User';
 import {getManageServicesUrl} from '../../../externalRoute';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {TeamState} from '../../../team/TeamState';
-import {generatePermissionHelpers} from '../../../user/UserPermission';
-import {UserState} from '../../../user/UserState';
 import {PanelHeader} from '../PanelHeader';
 import {PanelEntity, PanelState} from '../RightSidebar';
 

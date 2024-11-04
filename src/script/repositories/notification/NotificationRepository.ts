@@ -40,6 +40,7 @@ import {ConversationState} from 'Repositories/conversation/ConversationState';
 import type {PermissionRepository} from 'Repositories/permission/PermissionRepository';
 import {PermissionStatusState} from 'Repositories/permission/PermissionStatusState';
 import {PermissionType} from 'Repositories/permission/PermissionType';
+import {UserState} from 'Repositories/user/UserState';
 import {Declension, t, getUserName} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {getRenderedTextContent} from 'Util/messageRenderer';
@@ -62,7 +63,6 @@ import type {User} from '../../entity/User';
 import {SuperType} from '../../message/SuperType';
 import {SystemMessageType} from '../../message/SystemMessageType';
 import {ContentState, useAppState} from '../../page/useAppState';
-import {UserState} from '../../user/UserState';
 import {Warnings} from '../../view_model/WarningsContainer';
 
 type NotificationData = {conversationId?: QualifiedId; messageId?: string; messageType: string};

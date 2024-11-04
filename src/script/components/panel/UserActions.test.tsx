@@ -28,12 +28,12 @@ import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal
 import {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';
 import {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {UserState} from 'Repositories/user/UserState';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {TeamEntity} from 'src/script/team/TeamEntity';
 import {TeamState} from 'src/script/team/TeamState';
-import {UserState} from 'src/script/user/UserState';
 import {ActionsViewModel} from 'src/script/view_model/ActionsViewModel';
 import {noop} from 'Util/util';
 

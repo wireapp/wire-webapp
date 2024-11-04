@@ -23,9 +23,9 @@ import {container} from 'tsyringe';
 
 import {StorageSchemata, StorageService, UserRecord} from 'Repositories/storage';
 
-import {APIClient} from '../service/APIClientSingleton';
-import {Core} from '../service/CoreSingleton';
-import {constructUserPrimaryKey} from '../util/StorageUtil';
+import {APIClient} from '../../service/APIClientSingleton';
+import {Core} from '../../service/CoreSingleton';
+import {constructUserPrimaryKey} from '../../util/StorageUtil';
 
 export class UserService {
   private readonly USER_STORE_NAME: string;

@@ -19,8 +19,8 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
+import {UserState} from 'Repositories/user/UserState';
 import {Conversation} from 'src/script/entity/Conversation';
-import {UserState} from 'src/script/user/UserState';
 import {Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 

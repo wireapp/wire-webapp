@@ -22,6 +22,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {SearchRepository} from 'Repositories/search/SearchRepository';
+import {UserRepository} from 'Repositories/user/UserRepository';
 import {Conversation} from 'src/script/entity/Conversation';
 import {createUuid} from 'Util/uuid';
 
@@ -31,7 +32,6 @@ import {TestFactory} from '../../../../../test/helper/TestFactory';
 import {ContentMessage} from '../../../entity/message/ContentMessage';
 import {User} from '../../../entity/User';
 import {TeamRepository} from '../../../team/TeamRepository';
-import {UserRepository} from '../../../user/UserRepository';
 
 const testFactory = new TestFactory();
 let conversationRepository: ConversationRepository;

@@ -42,8 +42,8 @@ import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository
 import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
 import {SearchRepository} from 'Repositories/search/SearchRepository';
 import {StorageRepository} from 'Repositories/storage';
+import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/TypingIndicatorMode';
 import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
-import {CONVERSATION_TYPING_INDICATOR_MODE} from 'src/script/user/TypingIndicatorMode';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';

@@ -43,6 +43,7 @@ import type {PermissionRepository} from 'Repositories/permission/PermissionRepos
 import {PermissionStatusState} from 'Repositories/permission/PermissionStatusState';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
+import {ROLE} from 'Repositories/user/UserPermission';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
@@ -52,7 +53,6 @@ import type {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
 import type {TeamRepository} from '../team/TeamRepository';
 import {TeamState} from '../team/TeamState';
-import {ROLE} from '../user/UserPermission';
 
 export interface CallActions {
   answer: (call: Call) => Promise<void>;

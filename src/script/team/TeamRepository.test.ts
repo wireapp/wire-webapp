@@ -23,17 +23,16 @@ import {FeatureList, FeatureStatus} from '@wireapp/api-client/lib/team/feature/'
 import {randomUUID} from 'crypto';
 
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
+import {ROLE} from 'Repositories/user/UserPermission';
+import {UserRepository} from 'Repositories/user/UserRepository';
+import {UserState} from 'Repositories/user/UserState';
 import {User} from 'src/script/entity/User';
 import {TeamRepository} from 'src/script/team/TeamRepository';
 import {TeamState} from 'src/script/team/TeamState';
-import {UserState} from 'src/script/user/UserState';
 
 import {TeamEntity} from './TeamEntity';
 import {TeamMemberEntity} from './TeamMemberEntity';
 import {TeamService} from './TeamService';
-
-import {ROLE} from '../user/UserPermission';
-import {UserRepository} from '../user/UserRepository';
 
 function buildConnectionRepository() {
   const team = new TeamEntity(randomUUID());

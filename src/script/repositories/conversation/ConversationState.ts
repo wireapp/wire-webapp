@@ -21,6 +21,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
 
+import {UserState} from 'Repositories/user/UserState';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {sortGroupsByLastEvent} from 'Util/util';
 
@@ -37,7 +38,6 @@ import {
 import {Conversation} from '../../entity/Conversation';
 import {User} from '../../entity/User';
 import {TeamState} from '../../team/TeamState';
-import {UserState} from '../../user/UserState';
 
 @singleton()
 export class ConversationState {
