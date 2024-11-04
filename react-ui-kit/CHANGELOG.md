@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.26.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.26.0...@wireapp/react-ui-kit@9.26.1) (2024-11-04)
+
+### Bug Fixes
+
+* button disabled styles and add media query const [WBP-11269] ([#6648](https://github.com/wireapp/wire-web-packages/issues/6648)) ([43a567c](https://github.com/wireapp/wire-web-packages/commit/43a567c335d7de7076c0355e68ee6e473fb0e067))
+
 # [9.26.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.25.1...@wireapp/react-ui-kit@9.26.0) (2024-10-29)
 
 ### Features
