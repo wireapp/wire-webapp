@@ -52,7 +52,7 @@ export const Success = ({onSuccess, teamName, userName}: StepProps) => {
       </ul>
 
       <div className="modal__buttons" css={modalButtonsCss}>
-        <Button variant={ButtonVariant.SECONDARY} css={buttonCss} onClick={onSuccess} data-uie-name="do-close">
+        <Button variant={ButtonVariant.SECONDARY} css={buttonCss} onClick={onSuccess}>
           {t('teamCreationBackToWire')}
         </Button>
         {manageTeamUrl && (
