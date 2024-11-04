@@ -19,9 +19,7 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {COLOR_V2} from '@wireapp/react-ui-kit';
-
-export const tabletMediaQuery = '@media (max-width: 720px)';
+import {media} from '@wireapp/react-ui-kit';
 
 export const teamUpgradeBannerContainerCss: CSSObject = {
   border: '1px solid var(--accent-color-500)',
@@ -66,7 +64,7 @@ export const teamCreationModalWrapperCss: CSSObject = {
   margin: '1rem',
   paddingBottom: '5.5rem',
   maxHeight: 'unset',
-  [tabletMediaQuery]: {
+  [media.tabletSMDown]: {
     height: 'auto',
     paddingBottom: '0',
   },
@@ -76,7 +74,7 @@ export const teamCreationModalBodyCss: CSSObject = {
   padding: '0 3.5rem',
   margin: 'auto 0',
 
-  [tabletMediaQuery]: {
+  [media.tabletSMDown]: {
     padding: '0 1rem',
     margin: 'auto 0',
   },
@@ -101,8 +99,4 @@ export const confirmLeaveModalButtonsCss: CSSObject = {
 export const buttonCss: CSSObject = {
   width: '100%',
   margin: 0,
-  ':disabled': {
-    background: COLOR_V2.GRAY_60,
-    cursor: 'not-allowed',
-  },
 };

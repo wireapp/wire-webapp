@@ -19,9 +19,7 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {BASE_DARK_COLOR, BASE_LIGHT_COLOR, COLOR_V2} from '@wireapp/react-ui-kit';
-
-import {tabletMediaQuery} from '../TeamCreation.styles';
+import {COLOR_V2, media} from '@wireapp/react-ui-kit';
 
 export const forgotPasswordCss: CSSObject = {
   textAlign: 'right',
@@ -47,7 +45,7 @@ export const modalButtonsCss: CSSObject = {
   position: 'absolute',
   gap: '0.75rem',
   margin: '1.5rem 3.5rem',
-  [tabletMediaQuery]: {
+  [media.tabletSMDown]: {
     margin: '1rem 0',
     flexDirection: 'column',
     position: 'unset',
@@ -87,9 +85,8 @@ export const termsCheckboxWrapperCss: CSSObject = {
 };
 
 export const checkIconCss: CSSObject = {
-  width: 20,
-  fill: BASE_LIGHT_COLOR.GREEN,
-  'body.theme-dark &': {
-    fill: BASE_DARK_COLOR.GREEN,
-  },
+  height: 24,
+  minWidth: 20,
+  alignSelf: 'start',
+  fill: 'var(--success-color)',
 };

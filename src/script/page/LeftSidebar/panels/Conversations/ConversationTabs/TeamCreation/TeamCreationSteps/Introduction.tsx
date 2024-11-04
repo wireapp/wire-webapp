@@ -17,7 +17,7 @@
  *
  */
 
-import {Button, Link} from '@wireapp/react-ui-kit';
+import {Button, CheckRoundIcon, Link} from '@wireapp/react-ui-kit';
 
 import {Config} from 'src/script/Config';
 import {t} from 'Util/LocalizerUtil';
@@ -31,7 +31,6 @@ import {
   modalButtonsCss,
 } from './TeamCreationSteps.styles';
 
-import {CheckIcon} from '../CheckIcon';
 import {buttonCss} from '../TeamCreation.styles';
 
 const featuresList = [
@@ -53,9 +52,8 @@ export const Introduction = ({onNextStep}: StepProps) => {
       </p>
       {featuresList.map(listItem => (
         <div css={introItemCss} key={listItem}>
-          <div css={checkIconCss}>
-            <CheckIcon />
-          </div>
+          <CheckRoundIcon css={checkIconCss} />
+
           <span
             dangerouslySetInnerHTML={{
               __html: listItem,
