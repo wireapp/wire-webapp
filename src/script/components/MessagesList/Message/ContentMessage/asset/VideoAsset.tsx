@@ -30,7 +30,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {RestrictedVideo} from 'Components/asset/RestrictedVideo';
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
-import {EventName} from 'src/script/tracking/EventName';
+import {EventName} from 'Repositories/tracking/EventName';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatSeconds} from 'Util/TimeUtil';

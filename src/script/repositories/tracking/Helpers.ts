@@ -21,8 +21,8 @@ import {Runtime} from '@wireapp/commons';
 
 import {ConversationType, UserType, PlatformType} from './attribute';
 
-import {Conversation} from '../entity/Conversation';
-import type {User} from '../entity/User';
+import {Conversation} from '../../entity/Conversation';
+import type {User} from '../../entity/User';
 
 export interface GuestAttributes {
   is_allow_guests: boolean;
