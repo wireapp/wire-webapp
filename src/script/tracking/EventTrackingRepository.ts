@@ -20,6 +20,7 @@
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
+import {WireTelementary, TelemetryConsentFeatures} from '@wireapp/telemetry';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {getLogger, Logger} from 'Util/Logger';
@@ -44,7 +45,7 @@ import type {ContributedSegmentations, MessageRepository} from '../conversation/
 import {ClientEvent} from '../event/Client';
 import {TeamState} from '../team/TeamState';
 
-const CountlyConsentFeatures = [
+const telementaryConsentFeatures: Array<TelemetryConsentFeatures> = [
   'sessions',
   'events',
   'views',
@@ -61,22 +62,15 @@ const CountlyConsentFeatures = [
   'apm',
 ];
 
-const isCountlyLoaded = () => {
-  const loaded = !!window.Countly && !!window.Countly.q;
-  if (!loaded) {
-    console.warn('Countly is not available');
-  }
-  return loaded;
-};
-
 export class EventTrackingRepository {
-  private isProductReportingActivated: boolean;
+  private isProductReportingActivated: boolean = false;
   private sendAppOpenEvent: boolean = true;
   private countlyDeviceId: string;
-  private readonly logger: Logger;
-  private readonly countlyLogger: Logger;
-  private countlyInitialized: boolean;
-  isErrorReportingActivated: boolean;
+  private readonly logger: Logger = getLogger('EventTrackingRepository');
+  private readonly telemetryLogger: Logger = getLogger('Countly');
+  private telemetryInitialized: boolean = false;
+  private telementary = new WireTelementary();
+  isErrorReportingActivated: boolean = false;
 
   static get CONFIG() {
     return {
@@ -96,12 +90,6 @@ export class EventTrackingRepository {
     private readonly messageRepository: MessageRepository,
     private readonly teamState = container.resolve(TeamState),
   ) {
-    this.logger = getLogger('EventTrackingRepository');
-    this.countlyLogger = getLogger('Countly');
-    this.countlyInitialized = false;
-
-    this.isErrorReportingActivated = false;
-    this.isProductReportingActivated = false;
     amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent);
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.PRIVACY.TELEMETRY_SHARING, this.toggleCountly);
     initForcedErrorReporting();
@@ -111,7 +99,7 @@ export class EventTrackingRepository {
   public readonly onUserEvent = (eventJson: any, source: EventSource) => {
     const type = eventJson.type;
     if (type === ClientEvent.USER.DATA_TRANSFER && this.teamState.isTeam()) {
-      this.countlyLogger.info('Received data transfer event with new countly tracking id', eventJson.data);
+      this.telemetryLogger.info('Received data transfer event with new countly tracking id', eventJson.data);
       if (!!eventJson.data.trackingIdentifier && eventJson.data.trackingIdentifier !== this.countlyDeviceId) {
         void this.migrateDeviceId(eventJson.data.trackingIdentifier);
       }
@@ -119,13 +107,13 @@ export class EventTrackingRepository {
   };
 
   public migrateDeviceId = async (newId: string) => {
-    if (!isCountlyLoaded()) {
-      this.countlyLogger.warn('Countly is not available');
+    if (!this.telementary.isLoaded()) {
+      this.telemetryLogger.warn('Countly is not available');
       return;
     }
 
     if (!newId || !newId.length) {
-      this.countlyLogger.warn('New countly tracking id is not defined');
+      this.telemetryLogger.warn('New countly tracking id is not defined');
       return;
     }
 
@@ -135,15 +123,15 @@ export class EventTrackingRepository {
         await this.startProductReporting(this.countlyDeviceId);
         stopOnFinish = true;
       }
-      window.Countly.q.push(['change_id', newId]);
+      this.telementary.changeDeviceId(newId);
       storeValue(EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_DEVICE_ID_LOCAL_STORAGE_KEY, newId);
-      this.countlyLogger.info(`Countly tracking id has been changed from ${this.countlyDeviceId} to ${newId}`);
+      this.telemetryLogger.info(`Countly tracking id has been changed from ${this.countlyDeviceId} to ${newId}`);
       this.countlyDeviceId = newId;
       if (stopOnFinish) {
         this.stopProductReporting();
       }
     } catch (error) {
-      this.countlyLogger.warn(`Failed to send new countly tracking id to other devices ${error}`);
+      this.telemetryLogger.warn(`Failed to send new countly tracking id to other devices ${error}`);
       storeValue(EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_FAILED_TO_MIGRATE_DEVICE_ID, newId);
     }
   };
@@ -164,7 +152,7 @@ export class EventTrackingRepository {
         await this.messageRepository.sendCountlySync(this.countlyDeviceId);
         resetStoreValue(EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_UNSYNCED_DEVICE_ID_LOCAL_STORAGE_KEY);
       } catch (error) {
-        this.countlyLogger.warn(`Failed to send new countly tracking id to other devices ${error}`);
+        this.telemetryLogger.warn(`Failed to send new countly tracking id to other devices ${error}`);
       }
     }
 
@@ -201,7 +189,7 @@ export class EventTrackingRepository {
       try {
         await this.messageRepository.sendCountlySync(this.countlyDeviceId);
       } catch (error) {
-        this.countlyLogger.warn(`Failed to send new countly tracking id to other devices ${error}`);
+        this.telemetryLogger.warn(`Failed to send new countly tracking id to other devices ${error}`);
         storeValue(EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_UNSYNCED_DEVICE_ID_LOCAL_STORAGE_KEY, true);
       }
     }
@@ -216,12 +204,12 @@ export class EventTrackingRepository {
 
   private readonly toggleCountly = async (isEnabled: boolean) => {
     if (isEnabled && this.isDomainAllowedForAnalytics()) {
-      window.Countly.q.push(['add_consent', CountlyConsentFeatures]);
-      this.countlyLogger.info('Consent was given due to user preferences');
+      this.telementary.addConsentFeatures(telementaryConsentFeatures);
+      this.telemetryLogger.info('Consent was given due to user preferences');
       await this.startProductReporting();
     } else {
-      window.Countly.q.push(['remove_consent', CountlyConsentFeatures]);
-      this.countlyLogger.info('Consent was removed due to user preferences');
+      this.telementary.removeConsentFeatures(telementaryConsentFeatures);
+      this.telemetryLogger.info('Consent was removed due to user preferences');
       this.stopProductReporting();
     }
   };
@@ -239,16 +227,15 @@ export class EventTrackingRepository {
   }
 
   private async startProductReporting(trackingId: string = ''): Promise<void> {
-    // This is a global object provided by the countly.min.js script
-    if (!isCountlyLoaded()) {
-      this.countlyLogger.warn('Countly is not available');
+    if (!this.telementary.isLoaded()) {
       return;
     }
 
     if (!isCountlyEnabledAtCurrentEnvironment() || this.isProductReportingActivated) {
-      this.countlyLogger.warn('Countly is not enabled at this environment');
+      this.telemetryLogger.warn('Countly is not enabled at this environment');
       return;
     }
+
     this.isProductReportingActivated = true;
 
     // Add Parameters to previous Countly object
@@ -256,17 +243,22 @@ export class EventTrackingRepository {
     const {COUNTLY_ENABLE_LOGGING, VERSION, COUNTLY_API_KEY} = Config.getConfig();
 
     // Initialize Countly if it is not initialized yet
-    if (!this.countlyInitialized) {
-      window.Countly.app_version = VERSION;
-      window.Countly.app_key = COUNTLY_API_KEY;
-      window.Countly.debug = COUNTLY_ENABLE_LOGGING;
-      window.Countly.url = 'https://countly.wire.com/';
+    if (!this.telemetryInitialized) {
+      this.telementary.init({
+        appVersion: VERSION,
+        countly: {
+          appKey: COUNTLY_API_KEY,
+          enableLogging: COUNTLY_ENABLE_LOGGING,
+          backendURL: 'https://countly.wire.com/',
+        },
+      });
+
       if (!COUNTLY_API_KEY.length) {
-        this.countlyLogger.error('Countly API key is not defined in the environment');
+        this.telemetryLogger.error('Countly API key is not defined in the environment');
         return;
       }
-      window.Countly.init();
-      this.countlyLogger.info(
+
+      this.telemetryLogger.info(
         'Countly has been initialized with version',
         VERSION,
         ', logging',
@@ -274,13 +266,16 @@ export class EventTrackingRepository {
         'and app_key',
         COUNTLY_API_KEY,
       );
-      this.countlyInitialized = true;
+
+      this.telemetryInitialized = true;
     }
 
     const device_id = Boolean(trackingId.length) ? trackingId : this.countlyDeviceId;
-    window.Countly.q.push(['change_id', device_id]);
-    window.Countly.q.push(['disable_offline_mode', device_id]);
-    this.countlyLogger.info(`Countly tracking id is now ${device_id}`);
+
+    this.telementary.changeDeviceId(device_id);
+    this.telementary.disableOfflineModeForDevice(device_id);
+
+    this.telemetryLogger.info(`Countly tracking id is now ${device_id}`);
 
     this.startProductReportingSession();
     this.subscribeToProductEvents();
@@ -301,18 +296,18 @@ export class EventTrackingRepository {
   }
 
   private readonly stopProductReportingSession = (): void => {
-    if (!isCountlyLoaded()) {
-      this.countlyLogger.warn('Countly is not available');
+    if (!this.telementary.isLoaded()) {
+      this.telemetryLogger.warn('Countly is not available');
       return;
     }
 
     if (getForcedErrorReportingStatus()) {
-      this.countlyLogger.warn('Countly can not be disabled on this environment');
+      this.telemetryLogger.warn('Countly can not be disabled on this environment');
       return;
     }
 
     if (this.isProductReportingActivated === true) {
-      window.Countly.q.push(['end_session']);
+      this.telementary.endSession();
     }
   };
 
@@ -329,24 +324,24 @@ export class EventTrackingRepository {
   }
 
   private startProductReportingSession(): void {
-    if (!isCountlyLoaded()) {
-      this.countlyLogger.warn('Countly is not available');
+    if (!this.telementary.isLoaded()) {
+      this.telemetryLogger.warn('Countly is not available');
       return;
     }
 
     if (this.isProductReportingActivated === true || getForcedErrorReportingStatus()) {
-      window.Countly.q.push(['begin_session']);
+      this.telementary.beginSession();
       if (this.sendAppOpenEvent) {
         this.sendAppOpenEvent = false;
         this.trackProductReportingEvent(EventName.APP_OPEN);
       }
-      this.countlyLogger.info('Countly session has been started');
+      this.telemetryLogger.info('Countly session has been started');
     }
   }
 
   private trackProductReportingEvent(eventName: string, customSegmentations?: ContributedSegmentations): void {
-    if (!isCountlyLoaded()) {
-      this.countlyLogger.warn('Countly is not available');
+    if (!this.telementary.isLoaded()) {
+      this.telemetryLogger.warn('Countly is not available');
       return;
     }
 
@@ -354,13 +349,10 @@ export class EventTrackingRepository {
       const userData = {
         [UserData.IS_TEAM]: this.teamState.isTeam(),
       };
-      Object.entries(userData).forEach(entry => {
-        const [key, value] = entry;
-        window.Countly.q.push(['userData.set', key, value]);
-      });
 
-      window.Countly.q.push(['userData.save']);
-      this.countlyLogger.info(`Reporting user data for product event ${eventName}@${JSON.stringify(userData)}`);
+      this.telementary.setUserData(userData);
+
+      this.telemetryLogger.info(`Reporting user data for product event ${eventName}@${JSON.stringify(userData)}`);
 
       const segmentation = {
         [Segmentation.COMMON.APP_VERSION]: Config.getConfig().VERSION,
@@ -368,14 +360,9 @@ export class EventTrackingRepository {
         ...customSegmentations,
       };
 
-      window.Countly.q.push([
-        'add_event',
-        {
-          key: eventName,
-          segmentation,
-        },
-      ]);
-      this.countlyLogger.info(`Reporting product event ${eventName}@${JSON.stringify(segmentation)}`);
+      this.telementary.trackEvent(eventName, segmentation);
+
+      this.telemetryLogger.info(`Reporting product event ${eventName}@${JSON.stringify(segmentation)}`);
 
       // NOTE: This log is required by QA
       this.logger.log(`Reporting custom data for product event ${eventName}@${JSON.stringify(userData)}`);
