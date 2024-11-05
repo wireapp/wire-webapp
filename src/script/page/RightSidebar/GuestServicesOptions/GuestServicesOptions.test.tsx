@@ -20,15 +20,15 @@
 import {render, waitFor} from '@testing-library/react';
 import ko from 'knockout';
 
+import {ACCESS_STATE} from 'Repositories/conversation/AccessState';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {TeamRepository} from 'Repositories/team/TeamRepository';
+import {TeamState} from 'Repositories/team/TeamState';
 import {Conversation} from 'src/script/entity/Conversation';
 
 import {GuestServicesOptions} from './GuestServicesOptions';
 
 import {TestFactory} from '../../../../../test/helper/TestFactory';
-import {ACCESS_STATE} from '../../../conversation/AccessState';
-import {ConversationRepository} from '../../../conversation/ConversationRepository';
-import {TeamRepository} from '../../../team/TeamRepository';
-import {TeamState} from '../../../team/TeamState';
 
 const testFactory = new TestFactory();
 let conversationRepository: ConversationRepository;

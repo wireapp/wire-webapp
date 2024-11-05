@@ -25,7 +25,9 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/Icon';
 import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
-import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
+import {AssetRepository} from 'Repositories/assets/AssetRepository';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate} from 'src/script/router/routerBindings';
@@ -37,8 +39,6 @@ import {CollectionSection} from './CollectionSection';
 import {FullSearch} from './FullSearch';
 import {Category, isOfCategory} from './utils';
 
-import {AssetRepository} from '../../../../assets/AssetRepository';
-import {MessageRepository} from '../../../../conversation/MessageRepository';
 import {Conversation} from '../../../../entity/Conversation';
 import {User} from '../../../../entity/User';
 import {MessageCategory} from '../../../../message/MessageCategory';

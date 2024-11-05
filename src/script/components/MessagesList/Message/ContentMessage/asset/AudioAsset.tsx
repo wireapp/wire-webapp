@@ -24,6 +24,8 @@ import {container} from 'tsyringe';
 
 import {RestrictedAudio} from 'Components/asset/RestrictedAudio';
 import * as Icon from 'Components/Icon';
+import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
+import {TeamState} from 'Repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getLogger} from 'Util/Logger';
 import {formatSeconds} from 'Util/TimeUtil';
@@ -35,10 +37,8 @@ import {MediaButton} from './controls/MediaButton';
 import {SeekBar} from './controls/SeekBar';
 import {AssetUrl, useAssetTransfer} from './useAssetTransfer';
 
-import {AssetTransferState} from '../../../../../assets/AssetTransferState';
 import type {ContentMessage} from '../../../../../entity/message/ContentMessage';
 import type {FileAsset} from '../../../../../entity/message/FileAsset';
-import {TeamState} from '../../../../../team/TeamState';
 
 const logger = getLogger('AudioAssetComponent');
 

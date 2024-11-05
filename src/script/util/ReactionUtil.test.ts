@@ -17,12 +17,11 @@
  *
  */
 
+import {ReactionMap} from 'Repositories/storage';
 import {generateQualifiedId} from 'test/helper/UserGenerator';
 
 import {addReaction, userReactionMapToReactionMap} from './ReactionUtil';
 import {createUuid} from './uuid';
-
-import {ReactionMap} from '../storage';
 
 describe('ReactionUtil', () => {
   describe('userReactionMapToReactionMap', () => {

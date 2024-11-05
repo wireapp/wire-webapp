@@ -21,6 +21,7 @@ import {isValid} from 'date-fns';
 import {escape} from 'underscore';
 import {create} from 'zustand';
 
+import {ClientNotificationData} from 'Repositories/notification/PreferenceNotificationRepository';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {formatLocale} from 'Util/TimeUtil';
@@ -38,7 +39,6 @@ import {
 } from './PrimaryModalTypes';
 
 import {Config} from '../../../Config';
-import {ClientNotificationData} from '../../../notification/PreferenceNotificationRepository';
 
 type PrimaryModalState = {
   errorMessage: string | null;

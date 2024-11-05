@@ -23,9 +23,9 @@ import {container} from 'tsyringe';
 
 import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {t} from 'Util/LocalizerUtil';
 
-import {ConversationState} from '../../../conversation/ConversationState';
 import {LegalHoldMessage as LegalHoldMessageEntity} from '../../../entity/message/LegalHoldMessage';
 
 export interface LegalHoldMessageProps {

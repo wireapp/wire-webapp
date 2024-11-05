@@ -23,9 +23,10 @@ import {randomUUID} from 'crypto';
 
 import {Account} from '@wireapp/core';
 
+import {MLSConversation} from 'Repositories/conversation/ConversationSelectors';
+
 import {initMLSGroupConversations, initialiseSelfAndTeamConversations} from './MLSConversations';
 
-import {MLSConversation} from '../conversation/ConversationSelectors';
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 

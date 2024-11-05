@@ -17,7 +17,7 @@
  *
  */
 
-import {ENCRYPTED_BACKUP_FORMAT} from '../backup/BackUpHeader';
+import {ENCRYPTED_BACKUP_FORMAT} from 'Repositories/backup/BackUpHeader';
 
 export const checkBackupEncryption = async (data: ArrayBuffer | Blob): Promise<boolean> => {
   const fileBytes = await getFileBytes(data);

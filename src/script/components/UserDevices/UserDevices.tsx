@@ -21,6 +21,10 @@ import {useEffect, useMemo, useState} from 'react';
 
 import {ClientClassification} from '@wireapp/api-client/lib/client/';
 
+import {useUserIdentity} from 'Hooks/useDeviceIdentities';
+import {ClientRepository, ClientEntity} from 'Repositories/client';
+import {MessageRepository} from 'Repositories/conversation/MessageRepository';
+import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
 import {partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
@@ -32,11 +36,7 @@ import {NoDevicesFound} from './components/NoDevicesFound';
 import {SelfFingerprint} from './components/SelfFingerprint';
 import {FIND_MODE, UserDevicesState} from './UserDevices.types';
 
-import {ClientRepository, ClientEntity} from '../../client';
-import {MessageRepository} from '../../conversation/MessageRepository';
-import {CryptographyRepository} from '../../cryptography/CryptographyRepository';
 import {User} from '../../entity/User';
-import {useUserIdentity} from '../../hooks/useDeviceIdentities';
 
 export interface UserDevicesHistoryEntry {
   headline: string;

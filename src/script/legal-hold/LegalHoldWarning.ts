@@ -20,10 +20,10 @@
 import {amplify} from 'amplify';
 
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
 import {t} from 'Util/LocalizerUtil';
 
-import {PrimaryModal} from '../components/Modals/PrimaryModal';
-import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
 import type {Conversation} from '../entity/Conversation';
 import {ConversationError} from '../error/ConversationError';
 import {OPEN_CONVERSATION_DETAILS} from '../page/RightSidebar/RightSidebar';

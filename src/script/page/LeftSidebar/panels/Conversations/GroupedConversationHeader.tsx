@@ -22,9 +22,8 @@ import React, {useEffect, useState} from 'react';
 import cx from 'classnames';
 
 import * as Icon from 'Components/Icon';
+import type {ConversationLabel} from 'Repositories/conversation/ConversationLabelRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-
-import type {ConversationLabel} from '../../../../conversation/ConversationLabelRepository';
 
 export interface GroupedConversationHeaderProps {
   conversationLabel: ConversationLabel;

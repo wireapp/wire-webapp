@@ -26,7 +26,13 @@ import {UserVerificationBadges} from 'Components/Badge';
 import {ErrorFallback} from 'Components/ErrorFallback';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {useEnrichedFields} from 'Components/panel/EnrichedFields';
-import {ConversationState} from 'src/script/conversation/ConversationState';
+import {ClientRepository} from 'Repositories/client';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {TeamState} from 'Repositories/team/TeamState';
+import {RichProfileRepository} from 'Repositories/user/RichProfileRepository';
+import type {UserRepository} from 'Repositories/user/UserRepository';
 import {ContentState} from 'src/script/page/useAppState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -47,14 +53,8 @@ import {UsernameInput} from './accountPreferences/UsernameInput';
 import {PreferencesPage} from './components/PreferencesPage';
 import {PreferencesSection} from './components/PreferencesSection';
 
-import {ClientRepository} from '../../../../client';
 import {Config} from '../../../../Config';
-import {ConversationRepository} from '../../../../conversation/ConversationRepository';
 import {User} from '../../../../entity/User';
-import {PropertiesRepository} from '../../../../properties/PropertiesRepository';
-import {TeamState} from '../../../../team/TeamState';
-import {RichProfileRepository} from '../../../../user/RichProfileRepository';
-import type {UserRepository} from '../../../../user/UserRepository';
 import {AccentColorPicker} from '../../../AccentColorPicker';
 
 interface AccountPreferencesProps {

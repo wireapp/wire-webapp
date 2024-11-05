@@ -19,7 +19,7 @@
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {ReactionMap} from 'src/script/storage';
+import {ReactionMap} from 'Repositories/storage';
 import {getEmojiUnicode} from 'Util/EmojiUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 

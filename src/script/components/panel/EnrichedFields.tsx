@@ -22,12 +22,12 @@ import React, {useEffect, useState} from 'react';
 import type {RichInfoField} from '@wireapp/api-client/lib/user/RichInfo';
 import {container} from 'tsyringe';
 
+import {RichProfileRepository} from 'Repositories/user/RichProfileRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {noop} from 'Util/util';
 
 import type {User} from '../../entity/User';
-import {RichProfileRepository} from '../../user/RichProfileRepository';
 
 export interface EnrichedFieldsProps {
   onFieldsLoaded?: (richFields: RichInfoField[]) => void;

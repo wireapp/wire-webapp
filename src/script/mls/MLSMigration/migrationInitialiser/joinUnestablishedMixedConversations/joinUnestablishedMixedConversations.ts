@@ -21,7 +21,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {Account} from '@wireapp/core';
 
-import {isMixedConversation, MixedConversation} from 'src/script/conversation/ConversationSelectors';
+import {isMixedConversation, MixedConversation} from 'Repositories/conversation/ConversationSelectors';
 import {Conversation} from 'src/script/entity/Conversation';
 import {initMLSGroupConversation} from 'src/script/mls/MLSConversations';
 

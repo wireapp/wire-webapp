@@ -19,11 +19,11 @@
 
 import ko from 'knockout';
 
+import type {TERMINATION_REASON} from 'Repositories/calling/enum/TerminationReason';
 import {t} from 'Util/LocalizerUtil';
 
 import {Message} from './Message';
 
-import type {TERMINATION_REASON} from '../../calling/enum/TerminationReason';
 import {CALL_MESSAGE_TYPE} from '../../message/CallMessageType';
 import {SuperType} from '../../message/SuperType';
 

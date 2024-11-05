@@ -28,7 +28,10 @@ import {Button, ButtonVariant, useTimeout} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {RestrictedVideo} from 'Components/asset/RestrictedVideo';
-import {EventName} from 'src/script/tracking/EventName';
+import {AssetRepository} from 'Repositories/assets/AssetRepository';
+import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
+import {TeamState} from 'Repositories/team/TeamState';
+import {EventName} from 'Repositories/tracking/EventName';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatSeconds} from 'Util/TimeUtil';
@@ -39,11 +42,8 @@ import {SeekBar} from './controls/SeekBar';
 import {FileAsset} from './FileAssetComponent';
 import {AssetUrl, useAssetTransfer} from './useAssetTransfer';
 
-import {AssetRepository} from '../../../../../assets/AssetRepository';
-import {AssetTransferState} from '../../../../../assets/AssetTransferState';
 import type {ContentMessage} from '../../../../../entity/message/ContentMessage';
 import type {FileAsset as FileAssetType} from '../../../../../entity/message/FileAsset';
-import {TeamState} from '../../../../../team/TeamState';
 
 interface VideoAssetProps {
   assetRepository?: AssetRepository;

@@ -22,11 +22,11 @@ import React, {useEffect, useState} from 'react';
 import cx from 'classnames';
 
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
+import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {noop} from 'Util/util';
 
-import {AssetTransferState} from '../../../../../../assets/AssetTransferState';
 import type {FileAsset} from '../../../../../../entity/message/FileAsset';
 import {AssetLoader} from '../AssetLoader';
 

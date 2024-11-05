@@ -17,9 +17,9 @@
  *
  */
 
-import {Asset} from './Asset';
+import {AssetType} from 'Repositories/assets/AssetType';
 
-import {AssetType} from '../../assets/AssetType';
+import {Asset} from './Asset';
 
 export class Button extends Asset {
   constructor(id?: string, text: string = '') {

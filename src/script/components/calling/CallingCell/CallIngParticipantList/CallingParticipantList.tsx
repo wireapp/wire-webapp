@@ -24,13 +24,13 @@ import cx from 'classnames';
 import {CallParticipantsListItem} from 'Components/calling/CallParticipantsListItem';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import * as Icon from 'Components/Icon';
+import {CallingRepository} from 'Repositories/calling/CallingRepository';
+import {Participant} from 'Repositories/calling/Participant';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {labelStyles} from './CallingParticipantList.styles';
 
-import {CallingRepository} from '../../../../calling/CallingRepository';
-import {Participant} from '../../../../calling/Participant';
 import {Conversation} from '../../../../entity/Conversation';
 import {ContextMenuEntry, showContextMenu} from '../../../../ui/ContextMenu';
 

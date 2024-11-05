@@ -25,7 +25,7 @@ import {
 } from '@wireapp/api-client/lib/conversation';
 import {container} from 'tsyringe';
 
-import {ConversationDatabaseData, ConversationMapper} from 'src/script/conversation/ConversationMapper';
+import {ConversationDatabaseData, ConversationMapper} from 'Repositories/conversation/ConversationMapper';
 import {User} from 'src/script/entity/User';
 import {Core} from 'src/script/service/CoreSingleton';
 import {createUuid} from 'Util/uuid';

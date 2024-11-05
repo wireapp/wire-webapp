@@ -27,6 +27,8 @@ import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {UserClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import {UnverifiedUserWarning} from 'Components/Modals/UserModal';
 import {UserName} from 'Components/UserName';
+import {TeamState} from 'Repositories/team/TeamState';
+import {UserState} from 'Repositories/user/UserState';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -34,8 +36,6 @@ import {t} from 'Util/LocalizerUtil';
 
 import {User} from '../../entity/User';
 import {RootContext} from '../../page/RootProvider';
-import {TeamState} from '../../team/TeamState';
-import {UserState} from '../../user/UserState';
 
 interface ConnectRequestsProps {
   readonly userState: UserState;

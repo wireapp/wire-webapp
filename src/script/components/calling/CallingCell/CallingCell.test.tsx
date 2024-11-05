@@ -23,13 +23,13 @@ import {act} from 'react-dom/test-utils';
 
 import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 
-import {Call} from 'src/script/calling/Call';
-import {CallingRepository} from 'src/script/calling/CallingRepository';
-import {Participant} from 'src/script/calling/Participant';
+import {Call} from 'Repositories/calling/Call';
+import {CallingRepository} from 'Repositories/calling/CallingRepository';
+import {Participant} from 'Repositories/calling/Participant';
+import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+import {TeamState} from 'Repositories/team/TeamState';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
-import {MediaDevicesHandler} from 'src/script/media/MediaDevicesHandler';
-import {TeamState} from 'src/script/team/TeamState';
 import {CallActions} from 'src/script/view_model/CallingViewModel';
 import {createUuid} from 'Util/uuid';
 

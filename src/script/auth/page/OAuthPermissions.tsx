@@ -41,8 +41,8 @@ import {
 } from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
-import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
-import {AssetRepository} from 'src/script/assets/AssetRepository';
+import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
+import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {handleEscDown, handleKeyDown} from 'Util/KeyboardUtil';
 import {loadDataUrl} from 'Util/util';
 

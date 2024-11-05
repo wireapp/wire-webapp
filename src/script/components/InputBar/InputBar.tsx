@@ -34,11 +34,17 @@ import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
 import {RichTextContent, RichTextEditor} from 'Components/RichTextEditor';
 import {SendMessageButton} from 'Components/RichTextEditor/components/SendMessageButton';
-import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
+import {MessageRepository, OutgoingQuote} from 'Repositories/conversation/MessageRepository';
+import {EventRepository} from 'Repositories/event/EventRepository';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
+import {SearchRepository} from 'Repositories/search/SearchRepository';
+import {StorageRepository} from 'Repositories/storage';
+import {TeamState} from 'Repositories/team/TeamState';
+import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/TypingIndicatorMode';
 import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
-import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
-import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
-import {CONVERSATION_TYPING_INDICATOR_MODE} from 'src/script/user/TypingIndicatorMode';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -56,20 +62,14 @@ import {handleClickOutsideOfInputBar, IgnoreOutsideClickWrapper} from './util/cl
 import {loadDraftState, saveDraftState} from './util/DraftStateUtil';
 
 import {Config} from '../../Config';
-import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
-import {MessageRepository, OutgoingQuote} from '../../conversation/MessageRepository';
 import {Conversation} from '../../entity/Conversation';
 import {ContentMessage} from '../../entity/message/ContentMessage';
 import {User} from '../../entity/User';
 import {ConversationError} from '../../error/ConversationError';
-import {EventRepository} from '../../event/EventRepository';
 import {MentionEntity} from '../../message/MentionEntity';
 import {MessageHasher} from '../../message/MessageHasher';
 import {QuoteEntity} from '../../message/QuoteEntity';
 import {useAppMainState} from '../../page/state';
-import {SearchRepository} from '../../search/SearchRepository';
-import {StorageRepository} from '../../storage';
-import {TeamState} from '../../team/TeamState';
 
 const CONFIG = {
   ...Config.getConfig(),

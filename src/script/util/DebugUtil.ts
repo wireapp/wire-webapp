@@ -38,36 +38,36 @@ import {$createTextNode, $getRoot, LexicalEditor} from 'lexical';
 import {container} from 'tsyringe';
 
 import {showAppNotification} from 'Components/AppNotification';
+import {CallingRepository} from 'Repositories/calling/CallingRepository';
+import {CallState} from 'Repositories/calling/CallState';
+import {Participant} from 'Repositories/calling/Participant';
+import {ClientRepository} from 'Repositories/client';
+import {ClientState} from 'Repositories/client/ClientState';
+import {ConnectionRepository} from 'Repositories/connection/ConnectionRepository';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {isMLSCapableConversation} from 'Repositories/conversation/ConversationSelectors';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
+import type {MessageRepository} from 'Repositories/conversation/MessageRepository';
+import {EventRepository} from 'Repositories/event/EventRepository';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
+import {EventRecord, StorageRepository, StorageSchemata} from 'Repositories/storage';
+import {TeamState} from 'Repositories/team/TeamState';
+import {disableForcedErrorReporting} from 'Repositories/tracking/Countly.helpers';
+import {UserRepository} from 'Repositories/user/UserRepository';
+import {UserState} from 'Repositories/user/UserState';
 import {getLogger, Logger} from 'Util/Logger';
 
 import {KEY} from './KeyboardUtil';
 import {TIME_IN_MILLIS} from './TimeUtil';
 import {createUuid} from './uuid';
 
-import {CallingRepository} from '../calling/CallingRepository';
-import {CallState} from '../calling/CallState';
-import {Participant} from '../calling/Participant';
-import {ClientRepository} from '../client';
-import {ClientState} from '../client/ClientState';
-import {ConnectionRepository} from '../connection/ConnectionRepository';
-import {ConversationRepository} from '../conversation/ConversationRepository';
-import {isMLSCapableConversation} from '../conversation/ConversationSelectors';
-import {ConversationState} from '../conversation/ConversationState';
-import type {MessageRepository} from '../conversation/MessageRepository';
 import {E2EIHandler} from '../E2EIdentity';
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
-import {EventRepository} from '../event/EventRepository';
 import {checkVersion} from '../lifecycle/newVersionHandler';
-import {PropertiesRepository} from '../properties/PropertiesRepository';
-import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
-import {EventRecord, StorageRepository, StorageSchemata} from '../storage';
-import {TeamState} from '../team/TeamState';
-import {disableForcedErrorReporting} from '../tracking/Countly.helpers';
-import {UserRepository} from '../user/UserRepository';
-import {UserState} from '../user/UserState';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
 
 export class DebugUtil {

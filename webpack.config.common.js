@@ -193,6 +193,7 @@ module.exports = {
       Hooks: path.resolve(srcScript, 'hooks'),
       I18n: path.resolve(SRC_PATH, 'i18n'),
       Resource: path.resolve(ROOT_PATH, 'resource'),
+      Repositories: path.resolve(srcScript, 'repositories'),
       Util: path.resolve(srcScript, 'util'),
       src: path.resolve(ROOT_PATH, 'src'),
       test: path.resolve(ROOT_PATH, 'test'),

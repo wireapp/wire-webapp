@@ -17,7 +17,7 @@
  *
  */
 
-import {ClientEntity} from 'src/script/client/ClientEntity';
+import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {ACCENT_ID} from 'src/script/Config';
 
 import {User} from './User';

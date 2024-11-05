@@ -22,7 +22,7 @@ import React from 'react';
 import {CallingCell} from 'Components/calling/CallingCell';
 import * as Icon from 'Components/Icon';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
+import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 

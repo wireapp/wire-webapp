@@ -25,7 +25,8 @@ import {Button, ButtonVariant, FlexBox} from '@wireapp/react-ui-kit';
 
 import {LoadingBar} from 'Components/LoadingBar/LoadingBar';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {ClientState} from 'src/script/client/ClientState';
+import {CancelError} from 'Repositories/backup/Error';
+import {ClientState} from 'Repositories/client/ClientState';
 import {User} from 'src/script/entity/User';
 import {ContentState} from 'src/script/page/useAppState';
 import {t} from 'Util/LocalizerUtil';
@@ -33,7 +34,6 @@ import {getLogger} from 'Util/Logger';
 import {getCurrentDate} from 'Util/TimeUtil';
 import {downloadBlob} from 'Util/util';
 
-import {CancelError} from '../../backup/Error';
 import {Config} from '../../Config';
 import {RootContext} from '../../page/RootProvider';
 

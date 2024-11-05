@@ -21,7 +21,7 @@ import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 
 import {Account} from '@wireapp/core';
 
-import {MLSConversation, isMLSConversation} from 'src/script/conversation/ConversationSelectors';
+import {MLSConversation, isMLSConversation} from 'Repositories/conversation/ConversationSelectors';
 import {Conversation} from 'src/script/entity/Conversation';
 import {initMLSGroupConversations} from 'src/script/mls/MLSConversations';
 

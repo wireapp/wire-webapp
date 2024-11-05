@@ -20,14 +20,14 @@
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 
+import {AssetType} from 'Repositories/assets/AssetType';
+import {containsOnlyLink} from 'Repositories/conversation/linkPreviews/helpers';
+import {mediaParser} from 'Repositories/media/MediaParser';
 import {renderMessage} from 'Util/messageRenderer';
 
 import {Asset} from './Asset';
 import type {LinkPreview} from './LinkPreview';
 
-import {AssetType} from '../../assets/AssetType';
-import {containsOnlyLink} from '../../conversation/linkPreviews/helpers';
-import {mediaParser} from '../../media/MediaParser';
 import type {MentionEntity} from '../../message/MentionEntity';
 
 export class Text extends Asset {

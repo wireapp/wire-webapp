@@ -25,6 +25,10 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {TeamState} from 'Repositories/team/TeamState';
+import {UserState} from 'Repositories/user/UserState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {AddParticipants} from './AddParticipants';
@@ -38,17 +42,13 @@ import {Notifications} from './Notifications';
 import {ParticipantDevices} from './ParticipantDevices';
 import {TimedMessages} from './TimedMessages';
 
-import {ConversationState} from '../../conversation/ConversationState';
 import {Conversation} from '../../entity/Conversation';
 import {Message} from '../../entity/message/Message';
 import {User} from '../../entity/User';
 import {isReadableMessage} from '../../guards/Message';
 import {isUserEntity, isUserServiceEntity} from '../../guards/Panel';
 import {isServiceEntity} from '../../guards/Service';
-import {ServiceEntity} from '../../integration/ServiceEntity';
 import {Core} from '../../service/CoreSingleton';
-import {TeamState} from '../../team/TeamState';
-import {UserState} from '../../user/UserState';
 import {ActionsViewModel} from '../../view_model/ActionsViewModel';
 import {ViewModelRepositories} from '../../view_model/MainViewModel';
 import {RightSidebarParams} from '../AppMain';

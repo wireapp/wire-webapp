@@ -24,6 +24,14 @@ import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 import * as Icon from 'Components/Icon';
 import {LoadingBar} from 'Components/LoadingBar/LoadingBar';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {BackupRepository} from 'Repositories/backup/BackupRepository';
+import {
+  CancelError,
+  DifferentAccountError,
+  IncompatibleBackupError,
+  IncompatibleBackupFormatError,
+  InvalidPassword,
+} from 'Repositories/backup/Error';
 import {User} from 'src/script/entity/User';
 import {ContentState} from 'src/script/page/useAppState';
 import {checkBackupEncryption} from 'Util/BackupUtil';
@@ -33,14 +41,6 @@ import {loadFileBuffer} from 'Util/util';
 
 import {BackupFileUpload} from './BackupFileUpload';
 
-import {BackupRepository} from '../../backup/BackupRepository';
-import {
-  CancelError,
-  DifferentAccountError,
-  IncompatibleBackupError,
-  IncompatibleBackupFormatError,
-  InvalidPassword,
-} from '../../backup/Error';
 import {Config} from '../../Config';
 import {MotionDuration} from '../../motion/MotionDuration';
 

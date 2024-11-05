@@ -26,9 +26,9 @@ import {Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
 import {getUserName} from 'Components/UserName';
+import {UserState} from 'Repositories/user/UserState';
 import {Config} from 'src/script/Config';
 import {User} from 'src/script/entity/User';
-import {UserState} from 'src/script/user/UserState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';

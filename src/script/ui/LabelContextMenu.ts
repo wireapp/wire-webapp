@@ -18,11 +18,11 @@
  */
 
 import {PlusIcon} from 'Components/Icon';
+import type {ConversationLabelRepository} from 'Repositories/conversation/ConversationLabelRepository';
 import {t} from 'Util/LocalizerUtil';
 
 import {ContextMenuEntry, showContextMenu} from './ContextMenu';
 
-import type {ConversationLabelRepository} from '../conversation/ConversationLabelRepository';
 import type {Conversation} from '../entity/Conversation';
 
 export const showLabelContextMenu = (
