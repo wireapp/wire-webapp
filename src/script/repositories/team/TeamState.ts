@@ -27,8 +27,8 @@ import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {TeamEntity} from './TeamEntity';
 
-import {Conversation} from '../entity/Conversation';
-import {User} from '../entity/User';
+import {Conversation} from '../../entity/Conversation';
+import {User} from '../../entity/User';
 
 @singleton()
 export class TeamState {

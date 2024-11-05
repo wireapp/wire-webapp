@@ -30,6 +30,7 @@ import {ClientRepository} from 'Repositories/client';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {TeamState} from 'Repositories/team/TeamState';
 import {RichProfileRepository} from 'Repositories/user/RichProfileRepository';
 import type {UserRepository} from 'Repositories/user/UserRepository';
 import {ContentState} from 'src/script/page/useAppState';
@@ -54,7 +55,6 @@ import {PreferencesSection} from './components/PreferencesSection';
 
 import {Config} from '../../../../Config';
 import {User} from '../../../../entity/User';
-import {TeamState} from '../../../../team/TeamState';
 import {AccentColorPicker} from '../../../AccentColorPicker';
 
 interface AccountPreferencesProps {

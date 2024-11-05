@@ -27,12 +27,12 @@ import {ROLE} from 'Repositories/user/UserPermission';
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {UserState} from 'Repositories/user/UserState';
 import {User} from 'src/script/entity/User';
-import {TeamRepository} from 'src/script/team/TeamRepository';
-import {TeamState} from 'src/script/team/TeamState';
 
 import {TeamEntity} from './TeamEntity';
 import {TeamMemberEntity} from './TeamMemberEntity';
+import {TeamRepository} from './TeamRepository';
 import {TeamService} from './TeamService';
+import {TeamState} from './TeamState';
 
 function buildConnectionRepository() {
   const team = new TeamEntity(randomUUID());

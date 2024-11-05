@@ -59,6 +59,7 @@ import type {PropertiesRepository} from 'Repositories/properties/PropertiesRepos
 import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
 import type {SelfService} from 'Repositories/self/SelfService';
 import {UserRecord} from 'Repositories/storage';
+import {TeamState} from 'Repositories/team/TeamState';
 import {chunk, partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
@@ -77,7 +78,6 @@ import {Config} from '../../Config';
 import {Conversation} from '../../entity/Conversation';
 import {User} from '../../entity/User';
 import {UserError} from '../../error/UserError';
-import {TeamState} from '../../team/TeamState';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
 
 type GetUserOptions = {

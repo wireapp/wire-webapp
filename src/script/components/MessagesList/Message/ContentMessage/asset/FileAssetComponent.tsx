@@ -24,6 +24,7 @@ import {container} from 'tsyringe';
 
 import {RestrictedFile} from 'Components/asset/RestrictedFile';
 import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
+import {TeamState} from 'Repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -35,7 +36,6 @@ import {useAssetTransfer} from './useAssetTransfer';
 
 import type {ContentMessage} from '../../../../../entity/message/ContentMessage';
 import type {FileAsset as FileAssetType} from '../../../../../entity/message/FileAsset';
-import {TeamState} from '../../../../../team/TeamState';
 import {useMessageFocusedTabIndex} from '../../util';
 
 export interface FileAssetProps {

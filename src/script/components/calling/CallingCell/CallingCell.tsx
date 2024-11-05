@@ -31,19 +31,19 @@ import {GroupVideoGrid} from 'Components/calling/GroupVideoGrid';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import * as Icon from 'Components/Icon';
+import {usePushToTalk} from 'Hooks/usePushToTalk/usePushToTalk';
 import type {Call} from 'Repositories/calling/Call';
 import type {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {CallingViewMode, CallState, MuteState} from 'Repositories/calling/CallState';
 import type {Participant} from 'Repositories/calling/Participant';
 import {useVideoGrid} from 'Repositories/calling/videoGridHandler';
-import {usePushToTalk} from 'src/script/hooks/usePushToTalk/usePushToTalk';
+import {TeamState} from 'Repositories/team/TeamState';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isEnterKey, isSpaceOrEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {generateConversationUrl} from '../../../router/routeGenerator';
-import {TeamState} from '../../../team/TeamState';
 import {CallActions, CallViewTab} from '../../../view_model/CallingViewModel';
 
 interface VideoCallProps {

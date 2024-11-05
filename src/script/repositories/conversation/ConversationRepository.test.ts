@@ -60,6 +60,8 @@ import {EventService} from 'Repositories/event/EventService';
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
 import {SelfRepository} from 'Repositories/self/SelfRepository';
 import {LegacyEventRecord, StorageSchemata, StorageService} from 'Repositories/storage';
+import {TeamRepository} from 'Repositories/team/TeamRepository';
+import {TeamState} from 'Repositories/team/TeamState';
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {UserState} from 'Repositories/user/UserState';
 import {Config} from 'src/script/Config';
@@ -89,8 +91,6 @@ import {entities, payload} from '../../../../test/api/payloads';
 import {TestFactory} from '../../../../test/helper/TestFactory';
 import {generateUser} from '../../../../test/helper/UserGenerator';
 import {Core} from '../../service/CoreSingleton';
-import {TeamRepository} from '../../team/TeamRepository';
-import {TeamState} from '../../team/TeamState';
 
 function buildConversationRepository() {
   const teamState = new TeamState();
