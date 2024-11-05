@@ -75,7 +75,7 @@ describe('TeamCreationModal', () => {
     expect(getByText(getStepString(1))).toBeTruthy();
   });
 
-  it('navigates to success page after providing team name', () => {
+  it('navigates to confirm page after providing team name', () => {
     const {getByTestId, getByText} = renderTeamCreationModal();
 
     expect(getByText(getStepString(1))).toBeTruthy();
