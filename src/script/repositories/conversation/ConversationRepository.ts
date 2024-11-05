@@ -75,6 +75,11 @@ import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository
 import {SelfRepository} from 'Repositories/self/SelfRepository';
 import type {EventRecord} from 'Repositories/storage';
 import {ConversationRecord} from 'Repositories/storage';
+import {TeamRepository} from 'Repositories/team/TeamRepository';
+import {TeamState} from 'Repositories/team/TeamState';
+import {UserFilter} from 'Repositories/user/UserFilter';
+import {UserRepository} from 'Repositories/user/UserRepository';
+import {UserState} from 'Repositories/user/UserState';
 import {getNextItem} from 'Util/ArrayUtil';
 import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/FileTypeUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
@@ -157,12 +162,7 @@ import {MessageCategory} from '../../message/MessageCategory';
 import {SystemMessageType} from '../../message/SystemMessageType';
 import {addOtherSelfClientsToMLSConversation} from '../../mls';
 import {Core} from '../../service/CoreSingleton';
-import {TeamRepository} from '../../team/TeamRepository';
-import {TeamState} from '../../team/TeamState';
 import {ServerTimeHandler} from '../../time/serverTimeHandler';
-import {UserFilter} from '../../user/UserFilter';
-import {UserRepository} from '../../user/UserRepository';
-import {UserState} from '../../user/UserState';
 
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {rejectFn: (error: ConversationError) => void; resolveFn: (conversation: Conversation) => void};

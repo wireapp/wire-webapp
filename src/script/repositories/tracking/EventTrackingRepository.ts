@@ -24,6 +24,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import type {ContributedSegmentations, MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {ClientEvent} from 'Repositories/event/Client';
+import {TeamState} from 'Repositories/team/TeamState';
 import {getLogger, Logger} from 'Util/Logger';
 import {loadValue, storeValue, resetStoreValue} from 'Util/StorageUtil';
 import {includesString} from 'Util/StringUtil';
@@ -42,7 +43,6 @@ import {UserData} from './UserData';
 
 import {URLParameter} from '../../auth/URLParameter';
 import {Config} from '../../Config';
-import {TeamState} from '../../team/TeamState';
 
 const CountlyConsentFeatures = [
   'sessions',

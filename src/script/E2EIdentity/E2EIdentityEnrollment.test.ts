@@ -25,8 +25,8 @@ import {container} from 'tsyringe';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {UserState} from 'Repositories/user/UserState';
 import {Core} from 'src/script/service/CoreSingleton';
-import {UserState} from 'src/script/user/UserState';
 import * as util from 'Util/util';
 
 import {E2EIHandler} from './E2EIdentityEnrollment';

@@ -18,12 +18,11 @@
  */
 
 import {PermissionRepository} from 'Repositories/permission/PermissionRepository';
+import {UserState} from 'Repositories/user/UserState';
 
 import {MediaConstraintsHandler} from './MediaConstraintsHandler';
 import {CurrentAvailableDeviceId} from './MediaDevicesHandler';
 import {MediaStreamHandler} from './MediaStreamHandler';
-
-import {UserState} from '../../user/UserState';
 
 describe('MediaStreamHandler', () => {
   let streamHandler: MediaStreamHandler;

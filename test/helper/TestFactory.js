@@ -53,17 +53,17 @@ import {SearchRepository} from 'Repositories/search/SearchRepository';
 import {SelfService} from 'Repositories/self/SelfService';
 import {SelfRepository} from 'Repositories/self/SelfRepository';
 import {StorageRepository, StorageService} from 'Repositories/storage';
+import {TeamRepository} from 'Repositories/team/TeamRepository';
+import {TeamService} from 'Repositories/team/TeamService';
+import {TeamState} from 'Repositories/team/TeamState';
 import {EventTrackingRepository} from 'Repositories/tracking/EventTrackingRepository';
+import {UserRepository} from 'Repositories/user/UserRepository';
+import {UserService} from 'Repositories/user/UserService';
+import {UserState} from 'Repositories/user/UserState';
 import {User} from 'src/script/entity/User';
 import {Core} from 'src/script/service/CoreSingleton';
 import {createStorageEngine, DatabaseTypes} from 'src/script/service/StoreEngineProvider';
-import {TeamRepository} from 'src/script/team/TeamRepository';
-import {TeamService} from 'src/script/team/TeamService';
-import {TeamState} from 'src/script/team/TeamState';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
-import {UserRepository} from 'src/script/user/UserRepository';
-import {UserService} from 'src/script/user/UserService';
-import {UserState} from 'src/script/user/UserState';
 
 import {entities} from '../api/payloads';
 

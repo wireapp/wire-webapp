@@ -44,6 +44,8 @@ import {
   toggleFeature,
 } from 'Repositories/conversation/ConversationAccessPermission';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {TeamState} from 'Repositories/team/TeamState';
+import {UserState} from 'Repositories/user/UserState';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from 'src/script/router/routerBindings';
@@ -56,8 +58,6 @@ import {Config} from '../../../Config';
 import {User} from '../../../entity/User';
 import {isProtocolOption, ProtocolOption} from '../../../guards/Protocol';
 import {RootContext} from '../../../page/RootProvider';
-import {TeamState} from '../../../team/TeamState';
-import {UserState} from '../../../user/UserState';
 import {PrimaryModal} from '../PrimaryModal';
 
 interface GroupCreationModalProps {

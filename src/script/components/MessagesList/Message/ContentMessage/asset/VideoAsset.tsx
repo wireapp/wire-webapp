@@ -30,6 +30,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {RestrictedVideo} from 'Components/asset/RestrictedVideo';
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
+import {TeamState} from 'Repositories/team/TeamState';
 import {EventName} from 'Repositories/tracking/EventName';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -43,7 +44,6 @@ import {AssetUrl, useAssetTransfer} from './useAssetTransfer';
 
 import type {ContentMessage} from '../../../../../entity/message/ContentMessage';
 import type {FileAsset as FileAssetType} from '../../../../../entity/message/FileAsset';
-import {TeamState} from '../../../../../team/TeamState';
 
 interface VideoAssetProps {
   assetRepository?: AssetRepository;

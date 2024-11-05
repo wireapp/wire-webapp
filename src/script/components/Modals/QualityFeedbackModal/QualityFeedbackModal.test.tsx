@@ -28,12 +28,12 @@ import {CALL_QUALITY_FEEDBACK_KEY} from 'Components/Modals/QualityFeedbackModal/
 import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
 import {EventName} from 'Repositories/tracking/EventName';
 import {Segmentation} from 'Repositories/tracking/Segmentation';
+import {UserState} from 'Repositories/user/UserState';
 
 import {QualityFeedbackModal} from './QualityFeedbackModal';
 
 import {withIntl, withTheme} from '../../../auth/util/test/TestUtil';
 import {User} from '../../../entity/User';
-import {UserState} from '../../../user/UserState';
 
 jest.mock('Repositories/tracking/Countly.helpers', () => ({
   isCountlyEnabledAtCurrentEnvironment: () => true,

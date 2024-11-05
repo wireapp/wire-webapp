@@ -24,6 +24,7 @@ import cx from 'classnames';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {UserRepository} from 'Repositories/user/UserRepository';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
@@ -34,7 +35,6 @@ import {FileInput} from './FileInput';
 import {Config} from '../../../../../Config';
 import {User} from '../../../../../entity/User';
 import {UserError} from '../../../../../error/UserError';
-import {UserRepository} from '../../../../../user/UserRepository';
 
 interface AvatarInputProps {
   isActivatedAccount: boolean;

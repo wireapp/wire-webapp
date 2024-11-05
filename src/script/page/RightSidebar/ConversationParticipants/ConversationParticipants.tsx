@@ -24,6 +24,7 @@ import {SearchInput} from 'Components/SearchInput';
 import {UserSearchableList} from 'Components/UserSearchableList';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {SearchRepository} from 'Repositories/search/SearchRepository';
+import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
@@ -31,7 +32,6 @@ import {sortUsersByPriority} from 'Util/StringUtil';
 import {Conversation} from '../../../entity/Conversation';
 import {User} from '../../../entity/User';
 import {isServiceEntity} from '../../../guards/Service';
-import {TeamRepository} from '../../../team/TeamRepository';
 import {PanelHeader} from '../PanelHeader';
 import {PanelEntity, PanelState} from '../RightSidebar';
 

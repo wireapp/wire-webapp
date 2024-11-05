@@ -35,6 +35,9 @@ import {EventRepository} from 'Repositories/event/EventRepository';
 import {EventService} from 'Repositories/event/EventService';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {ReactionMap} from 'Repositories/storage';
+import {TeamState} from 'Repositories/team/TeamState';
+import {UserRepository} from 'Repositories/user/UserRepository';
+import {UserState} from 'Repositories/user/UserState';
 import {Conversation} from 'src/script/entity/Conversation';
 import {Message} from 'src/script/entity/message/Message';
 import {Text} from 'src/script/entity/message/Text';
@@ -49,10 +52,7 @@ import {MessageRepository} from './MessageRepository';
 
 import {ContentMessage} from '../../entity/message/ContentMessage';
 import {StatusType} from '../../message/StatusType';
-import {TeamState} from '../../team/TeamState';
 import {ServerTimeHandler, serverTimeHandler} from '../../time/serverTimeHandler';
-import {UserRepository} from '../../user/UserRepository';
-import {UserState} from '../../user/UserState';
 
 const selfUser = new User('selfid', '');
 selfUser.isMe = true;

@@ -24,6 +24,8 @@ import {container} from 'tsyringe';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {MemberLeaveEvent} from 'Repositories/conversation/EventBuilder';
+import type {TeamRepository} from 'Repositories/team/TeamRepository';
+import {TeamState} from 'Repositories/team/TeamState';
 import {getLogger, Logger} from 'Util/Logger';
 import {compareTransliteration, sortByPriority} from 'Util/StringUtil';
 
@@ -34,8 +36,6 @@ import {ServiceEntity} from './ServiceEntity';
 
 import type {Conversation} from '../../entity/Conversation';
 import type {User} from '../../entity/User';
-import type {TeamRepository} from '../../team/TeamRepository';
-import {TeamState} from '../../team/TeamState';
 
 export class IntegrationRepository {
   private readonly logger: Logger;

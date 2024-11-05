@@ -19,9 +19,9 @@
 
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {EventBuilder} from 'Repositories/conversation/EventBuilder';
+import {UserRepository} from 'Repositories/user/UserRepository';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
-import {UserRepository} from 'src/script/user/UserRepository';
 import {createUuid} from 'Util/uuid';
 
 import {ServiceMiddleware} from './ServiceMiddleware';

@@ -23,9 +23,9 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {UserState} from 'Repositories/user/UserState';
 import {Conversation} from 'src/script/entity/Conversation';
 import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
-import {UserState} from 'src/script/user/UserState';
 import {getLogger, Logger} from 'Util/Logger';
 
 import {isMixedConversation, isProteusConversation} from '../../ConversationSelectors';

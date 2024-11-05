@@ -34,14 +34,16 @@ import {IntegrationRepository} from 'Repositories/integration/IntegrationReposit
 import {PreferenceNotificationRepository} from 'Repositories/notification/PreferenceNotificationRepository';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {SearchRepository} from 'Repositories/search/SearchRepository';
+import {TeamRepository} from 'Repositories/team/TeamRepository';
+import {TeamState} from 'Repositories/team/TeamState';
 import {EventName} from 'Repositories/tracking/EventName';
+import {UserRepository} from 'Repositories/user/UserRepository';
+import {UserState} from 'Repositories/user/UserState';
 import {Preferences} from 'src/script/page/LeftSidebar/panels/Preferences';
 import {StartUI} from 'src/script/page/LeftSidebar/panels/StartUI';
 import {ANIMATED_PAGE_TRANSITION_DURATION} from 'src/script/page/MainContent';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {ContentState, ListState} from 'src/script/page/useAppState';
-import {TeamRepository} from 'src/script/team/TeamRepository';
-import {UserRepository} from 'src/script/user/UserRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {ConversationCallingView} from './ConversationCallingView/ConversationCallingView';
@@ -59,8 +61,6 @@ import type {Conversation} from '../../../../entity/Conversation';
 import {User} from '../../../../entity/User';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
 import {createNavigateKeyboard} from '../../../../router/routerBindings';
-import {TeamState} from '../../../../team/TeamState';
-import {UserState} from '../../../../user/UserState';
 import {ListViewModel} from '../../../../view_model/ListViewModel';
 import {ListWrapper} from '../ListWrapper';
 

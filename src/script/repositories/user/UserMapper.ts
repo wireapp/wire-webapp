@@ -23,9 +23,9 @@ import {getLogger, Logger} from 'Util/Logger';
 
 import {isSelfAPIUser} from './UserGuards';
 
-import {User} from '../entity/User';
-import type {ServerTimeHandler} from '../time/serverTimeHandler';
-import '../view_model/bindings/CommonBindings';
+import {User} from '../../entity/User';
+import type {ServerTimeHandler} from '../../time/serverTimeHandler';
+import '../../view_model/bindings/CommonBindings';
 
 export class UserMapper {
   private readonly logger: Logger;

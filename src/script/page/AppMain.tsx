@@ -38,6 +38,9 @@ import {useActiveWindow} from 'Hooks/useActiveWindow';
 import {useInitializeRootFontSize} from 'Hooks/useRootFontSize';
 import {CallingViewMode, CallState, DesktopScreenShareMenu} from 'Repositories/calling/CallState';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {TeamState} from 'Repositories/team/TeamState';
+import {showInitialModal} from 'Repositories/user/AvailabilityModal';
+import {UserState} from 'Repositories/user/UserState';
 import {Config} from 'src/script/Config';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
@@ -57,9 +60,6 @@ import {App} from '../main/app';
 import {initialiseMLSMigrationFlow} from '../mls/MLSMigration';
 import {generateConversationUrl} from '../router/routeGenerator';
 import {configureRoutes, navigate} from '../router/Router';
-import {TeamState} from '../team/TeamState';
-import {showInitialModal} from '../user/AvailabilityModal';
-import {UserState} from '../user/UserState';
 import {MainViewModel} from '../view_model/MainViewModel';
 import {WarningsContainer} from '../view_model/WarningsContainer/WarningsContainer';
 

@@ -32,14 +32,14 @@ import {BaseToggle} from 'Components/toggle/BaseToggle';
 import {ACCESS_STATE} from 'Repositories/conversation/AccessState';
 import {teamPermissionsForAccessState} from 'Repositories/conversation/ConversationAccessPermission';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {TeamState} from 'src/script/team/TeamState';
+import {TeamRepository} from 'Repositories/team/TeamRepository';
+import {TeamState} from 'Repositories/team/TeamState';
 import {copyText} from 'Util/ClipboardUtil';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {Config} from '../../../../../Config';
 import {Conversation} from '../../../../../entity/Conversation';
-import {TeamRepository} from '../../../../../team/TeamRepository';
 
 const COPY_LINK_CONFIRM_DURATION = 1500;
 

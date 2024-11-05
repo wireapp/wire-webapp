@@ -42,8 +42,9 @@ import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository
 import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
 import {SearchRepository} from 'Repositories/search/SearchRepository';
 import {StorageRepository} from 'Repositories/storage';
+import {TeamState} from 'Repositories/team/TeamState';
+import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/TypingIndicatorMode';
 import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
-import {CONVERSATION_TYPING_INDICATOR_MODE} from 'src/script/user/TypingIndicatorMode';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -69,7 +70,6 @@ import {MentionEntity} from '../../message/MentionEntity';
 import {MessageHasher} from '../../message/MessageHasher';
 import {QuoteEntity} from '../../message/QuoteEntity';
 import {useAppMainState} from '../../page/state';
-import {TeamState} from '../../team/TeamState';
 
 const CONFIG = {
   ...Config.getConfig(),

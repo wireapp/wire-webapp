@@ -21,7 +21,7 @@ import type {PermissionsData} from '@wireapp/api-client/lib/team/member/Permissi
 
 import {capitalizeFirstChar} from 'Util/StringUtil';
 
-import {TeamError} from '../error/TeamError';
+import {TeamError} from '../../error/TeamError';
 
 /**
  * Enum for various team permissions.

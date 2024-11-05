@@ -31,6 +31,7 @@ import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
 import {EventName} from 'Repositories/tracking/EventName';
 import {Segmentation} from 'Repositories/tracking/Segmentation';
+import {UserState} from 'Repositories/user/UserState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
@@ -46,8 +47,6 @@ import {
   title,
   wrapper,
 } from './QualityFeedbackModal.styles';
-
-import {UserState} from '../../../user/UserState';
 
 const logger = getLogger('CallQualityFeedback');
 

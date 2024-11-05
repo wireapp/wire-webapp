@@ -52,7 +52,10 @@ import {EventRepository} from 'Repositories/event/EventRepository';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
 import {EventRecord, StorageRepository, StorageSchemata} from 'Repositories/storage';
+import {TeamState} from 'Repositories/team/TeamState';
 import {disableForcedErrorReporting} from 'Repositories/tracking/Countly.helpers';
+import {UserRepository} from 'Repositories/user/UserRepository';
+import {UserState} from 'Repositories/user/UserState';
 import {getLogger, Logger} from 'Util/Logger';
 
 import {KEY} from './KeyboardUtil';
@@ -65,9 +68,6 @@ import {User} from '../entity/User';
 import {checkVersion} from '../lifecycle/newVersionHandler';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
-import {TeamState} from '../team/TeamState';
-import {UserRepository} from '../user/UserRepository';
-import {UserState} from '../user/UserState';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
 
 export class DebugUtil {

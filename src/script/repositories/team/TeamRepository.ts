@@ -42,6 +42,9 @@ import {EventSource} from 'Repositories/event/EventSource';
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
 import {IntegrationMapper} from 'Repositories/integration/IntegrationMapper';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {ROLE, ROLE as TEAM_ROLE, roleFromTeamPermissions} from 'Repositories/user/UserPermission';
+import {UserRepository} from 'Repositories/user/UserRepository';
+import {UserState} from 'Repositories/user/UserState';
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
@@ -54,11 +57,8 @@ import {TeamMemberEntity} from './TeamMemberEntity';
 import {TeamService} from './TeamService';
 import {TeamState} from './TeamState';
 
-import {User} from '../entity/User';
-import {MLSMigrationStatus, getMLSMigrationStatus} from '../mls/MLSMigration/migrationStatus';
-import {ROLE, ROLE as TEAM_ROLE, roleFromTeamPermissions} from '../user/UserPermission';
-import {UserRepository} from '../user/UserRepository';
-import {UserState} from '../user/UserState';
+import {User} from '../../entity/User';
+import {MLSMigrationStatus, getMLSMigrationStatus} from '../../mls/MLSMigration/migrationStatus';
 
 export interface AccountInfo {
   accentID: number;

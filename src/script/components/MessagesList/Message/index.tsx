@@ -25,6 +25,7 @@ import cx from 'classnames';
 import {InViewport} from 'Components/InViewport';
 import type {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {TeamState} from 'Repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getAllFocusableElements, setElementsTabIndex} from 'Util/focusUtil';
 import {isTabKey} from 'Util/KeyboardUtil';
@@ -40,7 +41,6 @@ import type {DecryptErrorMessage} from '../../../entity/message/DecryptErrorMess
 import type {MemberMessage as MemberMessageEntity} from '../../../entity/message/MemberMessage';
 import {Message as BaseMessage} from '../../../entity/message/Message';
 import type {User} from '../../../entity/User';
-import {TeamState} from '../../../team/TeamState';
 
 export interface MessageActions {
   onClickAvatar: (user: User | ServiceEntity) => void;

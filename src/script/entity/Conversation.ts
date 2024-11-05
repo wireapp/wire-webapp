@@ -45,6 +45,7 @@ import {ConversationStatus} from 'Repositories/conversation/ConversationStatus';
 import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
 import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting';
 import {ConversationRecord} from 'Repositories/storage';
+import {TeamState} from 'Repositories/team/TeamState';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
@@ -61,7 +62,6 @@ import {ConversationError} from '../error/ConversationError';
 import {isContentMessage, isDeleteMessage} from '../guards/Message';
 import {StatusType} from '../message/StatusType';
 import {ContentState, useAppState} from '../page/useAppState';
-import {TeamState} from '../team/TeamState';
 
 interface UnreadState {
   allEvents: Message[];
