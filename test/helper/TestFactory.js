@@ -29,7 +29,6 @@ import ko from 'knockout';
 import {container} from 'tsyringe';
 
 import {AssetRepository} from 'src/script/assets/AssetRepository';
-import {AssetService} from 'src/script/assets/AssetService';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {ClientRepository} from 'src/script/client/ClientRepository';
@@ -151,7 +150,7 @@ export class TestFactory {
    */
   async exposeUserActors() {
     await this.exposeClientActors();
-    this.assetRepository = new AssetRepository(new AssetService());
+    this.assetRepository = new AssetRepository();
 
     this.connection_service = new ConnectionService();
     this.user_service = new UserService(this.storage_service);
@@ -322,7 +321,7 @@ export class TestFactory {
    */
   async exposeTrackingActors() {
     await this.exposeTeamActors();
-    this.tracking_repository = new EventTrackingRepository(this.message_repository, this.user_repository['userState']);
+    this.tracking_repository = new EventTrackingRepository(this.message_repository);
 
     return this.tracking_repository;
   }

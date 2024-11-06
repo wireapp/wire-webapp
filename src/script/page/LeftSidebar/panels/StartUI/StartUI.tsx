@@ -26,7 +26,6 @@ import {showInviteModal} from 'Components/Modals/InviteModal';
 import {showServiceModal} from 'Components/Modals/ServiceModal';
 import {showUserModal} from 'Components/Modals/UserModal';
 import {SearchInput} from 'Components/SearchInput';
-import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {IntegrationRepository} from 'src/script/integration/IntegrationRepository';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
@@ -90,6 +89,7 @@ const StartUI: React.FC<StartUIProps> = ({
 
   const actions = mainViewModel.actions;
   const isTeam = teamState.isTeam();
+  const isMLSEnabled = teamState.isMLSEnabled();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState(Tabs.PEOPLE);
@@ -138,10 +138,6 @@ const StartUI: React.FC<StartUIProps> = ({
 
   const openInviteModal = () => showInviteModal({selfUser});
 
-  const openConversation = async (conversation: Conversation): Promise<void> => {
-    await actions.openGroupConversation(conversation);
-  };
-
   const before = (
     <div id="start-ui-header" className={cx('start-ui-header', {'start-ui-header-integrations': isTeam})}>
       <div className="start-ui-header-user-input" data-uie-name="enter-search">
@@ -153,7 +149,7 @@ const StartUI: React.FC<StartUIProps> = ({
           forceDark
         />
       </div>
-      {isTeam && canChatWithServices() && (
+      {isTeam && canChatWithServices() && !isMLSEnabled && (
         <ul className="start-ui-list-tabs">
           <li className={`start-ui-list-tab ${activeTab === Tabs.PEOPLE ? 'active' : ''}`}>
             <button
@@ -202,7 +198,6 @@ const StartUI: React.FC<StartUIProps> = ({
           canInviteTeamMembers={canInviteTeamMembers()}
           userRepository={userRepository}
           onClickContact={openContact}
-          onClickConversation={openConversation}
           onClickUser={openOther}
           onSearchResults={searchResult => (peopleSearchResults.current = searchResult)}
         />

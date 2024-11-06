@@ -17,8 +17,6 @@
  *
  */
 
-import jquery from 'jquery';
-
 import {includesString} from 'Util/StringUtil';
 
 export const appendParameter = (url: string, parameter: string) => {
@@ -100,8 +98,15 @@ export const getLinksFromHtml = <T extends HTMLElement>(html: string): T[] => {
   const anchorTags = new RegExp(/<a[\s]+([^>]+)>((?:.(?!\<\/a\>))*.)<\/a>/, 'g');
   const links = html.match(anchorTags);
 
-  const hasLinks = links?.length;
-  return hasLinks ? links.map(element => jquery<T>(element)[0]) : [];
+  return links?.length
+    ? links.map(element => {
+        const container = document.createElement('div');
+        container.innerHTML = element.trim();
+
+        // Extract the first child, which should be the anchor element
+        return container.firstElementChild as T;
+      })
+    : [];
 };
 
 /**

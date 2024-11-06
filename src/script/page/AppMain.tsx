@@ -27,11 +27,14 @@ import {StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingContainer} from 'Components/calling/CallingOverlayContainer';
+import {ChooseScreen} from 'Components/calling/ChooseScreen';
+import {ConfigToolbar} from 'Components/ConfigToolbar/ConfigToolbar';
 import {ErrorFallback} from 'Components/ErrorFallback';
 import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationModal';
 import {LegalHoldModal} from 'Components/Modals/LegalHoldModal/LegalHoldModal';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showUserModal, UserModal} from 'Components/Modals/UserModal';
+import {Config} from 'src/script/Config';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {AppLock} from './AppLock';
@@ -45,6 +48,7 @@ import {RootProvider} from './RootProvider';
 import {useAppMainState, ViewType} from './state';
 import {useAppState, ContentState} from './useAppState';
 
+import {CallingViewMode, CallState, DesktopScreenShareMenu} from '../calling/CallState';
 import {ConversationState} from '../conversation/ConversationState';
 import {User} from '../entity/User';
 import {useActiveWindow} from '../hooks/useActiveWindow';
@@ -70,6 +74,7 @@ interface AppMainProps {
   selfUser: User;
   mainView: MainViewModel;
   conversationState?: ConversationState;
+  callState?: CallState;
   /** will block the user from being able to interact with the application (no notifications and no messages will be shown) */
   locked: boolean;
 }
@@ -79,6 +84,7 @@ export const AppMain: FC<AppMainProps> = ({
   mainView,
   selfUser,
   conversationState = container.resolve(ConversationState),
+  callState = container.resolve(CallState),
   locked,
 }) => {
   const apiContext = app.getAPIContext();
@@ -98,8 +104,17 @@ export const AppMain: FC<AppMainProps> = ({
     'isActivatedAccount',
   ]);
 
+  const {hasAvailableScreensToShare, desktopScreenShareMenu, viewMode} = useKoSubscribableChildren(callState, [
+    'hasAvailableScreensToShare',
+    'desktopScreenShareMenu',
+    'viewMode',
+  ]);
+
   const teamState = container.resolve(TeamState);
   const userState = container.resolve(UserState);
+
+  const isScreenshareActive =
+    hasAvailableScreensToShare && desktopScreenShareMenu === DesktopScreenShareMenu.MAIN_WINDOW;
 
   const {
     history,
@@ -191,9 +206,8 @@ export const AppMain: FC<AppMainProps> = ({
       window.location.replace(`#/conversation/${conversation}${domain ? `/${domain}` : ''}`);
     }
 
-    repositories.properties.checkPrivacyPermission().then(() => {
-      window.setTimeout(() => repositories.notification.checkPermission(), App.CONFIG.NOTIFICATION_CHECK);
-    });
+    repositories.properties.checkTelemetrySharingPermission();
+    window.setTimeout(() => repositories.notification.checkPermission(), App.CONFIG.NOTIFICATION_CHECK);
 
     //after app is loaded, check mls migration configuration and start migration if needed
     await initialiseMLSMigrationFlow({
@@ -233,6 +247,7 @@ export const AppMain: FC<AppMainProps> = ({
       {!locked && <WindowTitleUpdater />}
       <RootProvider value={mainView}>
         <ErrorBoundary FallbackComponent={ErrorFallback}>
+          {Config.getConfig().FEATURE.ENABLE_DEBUG && <ConfigToolbar />}
           {!locked && (
             <div id="app" className="app">
               {showLeftSidebar && (
@@ -273,11 +288,16 @@ export const AppMain: FC<AppMainProps> = ({
           {!locked && (
             <>
               <FeatureConfigChangeNotifier selfUserId={selfUser.id} teamState={teamState} />
-              <CallingContainer
-                callingRepository={repositories.calling}
-                mediaRepository={repositories.media}
-                toggleScreenshare={mainView.calling.callActions.toggleScreenshare}
-              />
+
+              {viewMode === CallingViewMode.FULL_SCREEN && (
+                <CallingContainer
+                  callingRepository={repositories.calling}
+                  mediaRepository={repositories.media}
+                  toggleScreenshare={mainView.calling.callActions.toggleScreenshare}
+                />
+              )}
+
+              {isScreenshareActive && <ChooseScreen choose={repositories.calling.onChooseScreen} />}
 
               <LegalHoldModal
                 selfUser={selfUser}
@@ -296,6 +316,8 @@ export const AppMain: FC<AppMainProps> = ({
           <GroupCreationModal userState={userState} teamState={teamState} />
         </ErrorBoundary>
       </RootProvider>
+
+      <div id="app-notification"></div>
     </StyledApp>
   );
 };

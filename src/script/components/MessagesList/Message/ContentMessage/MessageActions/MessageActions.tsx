@@ -102,7 +102,7 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
           setCurrentMsgAction(selectedMsgActionName);
           handleMenuOpen(true);
           const newEvent = setContextMenuPosition(event);
-          showContextMenu(newEvent, menuEntries, 'message-options-menu');
+          showContextMenu({event: newEvent, entries: menuEntries, identifier: 'message-options-menu'});
         }
       } else if (!event.shiftKey && isTabKey(event) && !reactionsTotalCount) {
         // if there's no reaction then on tab from context menu hide the message actions menu
@@ -127,7 +127,12 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
       } else if (selectedMsgActionName) {
         setCurrentMsgAction(selectedMsgActionName);
         handleMenuOpen(true);
-        showContextMenu(event, menuEntries, 'message-options-menu', resetActionMenuStates);
+        showContextMenu({
+          event,
+          entries: menuEntries,
+          identifier: 'message-options-menu',
+          resetMenuStates: resetActionMenuStates,
+        });
       }
     },
     [currentMsgActionName, handleMenuOpen, menuEntries],

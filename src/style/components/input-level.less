@@ -17,9 +17,6 @@
  *
  */
 
-@input-level-bullet-size: 16px;
-@input-level-bullet-size-sm: 12px;
-
 .input-level {
   display: flex;
   justify-content: space-between;
@@ -27,21 +24,21 @@
   list-style: none;
 
   &__bullet {
-    .circle(@input-level-bullet-size);
+    .circle(var(--input-level-bullet-size));
 
-    border: 1px solid @separator-color;
-    border-radius: @input-level-bullet-size / 2;
+    border: 1px solid var(--separator-color);
+    border-radius: calc(var(--input-level-bullet-size) / 2);
     background-color: #fff;
     transition: all 0.16s;
 
-    @media (max-width: calc(@conversation-list-width + @screen-sm)) {
-      .circle(@input-level-bullet-size-sm);
+    @media (max-width: 800px) {
+      .circle(var(--input-level-bullet-size-sm));
     }
-    @media (max-width: calc(@screen-sm-min * 2)) {
-      .circle(@input-level-bullet-size);
+    @media (max-width: 640px) {
+      .circle(var(--input-level-bullet-size));
     }
-    @media (max-width: @screen-sm) {
-      .circle(@input-level-bullet-size-sm);
+    @media (max-width: 480px) {
+      .circle(var(--input-level-bullet-size-sm));
     }
 
     &--active {
@@ -49,7 +46,7 @@
     }
 
     &--disabled {
-      background-color: @separator-color;
+      background-color: var(--separator-color);
     }
   }
 }

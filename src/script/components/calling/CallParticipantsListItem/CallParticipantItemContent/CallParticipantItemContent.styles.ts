@@ -29,7 +29,7 @@ export const chevronIcon: CSSObject = {
   justifyContent: 'center',
   opacity: '0',
   transition: 'opacity 0.25s ease-in-out',
-  width: '16px',
+  minWidth: '16px',
   svg: {
     width: '8px',
     path: {

@@ -22,10 +22,10 @@ import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
 
+import {UserVerificationBadges} from 'Components/Badge';
 import {ErrorFallback} from 'Components/ErrorFallback';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {useEnrichedFields} from 'Components/panel/EnrichedFields';
-import {UserVerificationBadges} from 'Components/VerificationBadge';
 import {ConversationState} from 'src/script/conversation/ConversationState';
 import {ContentState} from 'src/script/page/useAppState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';

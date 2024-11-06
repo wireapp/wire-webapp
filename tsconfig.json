@@ -27,6 +27,7 @@
     "outDir": "src/script/auth",
     "paths": {
       "Components/*": ["./src/script/components/*"],
+      "Hooks/*": ["./src/script/hooks/*"],
       "I18n/*": ["./src/i18n/*"],
       "Resource/*": ["./resource/*"],
       "Util/*": ["./src/script/util/*"]
@@ -37,5 +38,6 @@
     "target": "ESNext",
     "strict": true
   },
+  "types": ["@types/wicg-file-system-access"],
   "exclude": ["node_modules", "server/", "src/sw.js", "src/worker/"]
 }

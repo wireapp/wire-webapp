@@ -35,6 +35,10 @@ updates:
 
     ignore:
       - dependency-name: '@wireapp/avs'
+      # Wait until we have next release with wasm folder
+      - dependency-name: '@mediapipe/tasks-vision'
+        versions:
+          - '0.10.16'
 
   # Server dependencies
   - package-ecosystem: npm

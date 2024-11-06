@@ -39,18 +39,20 @@
       position: absolute;
       right: 0;
       bottom: 0;
-      left: @conversation-message-sender-width;
+      left: var(--conversation-message-sender-width);
       height: 1px;
-      background-color: @separator-color;
+      background-color: var(--separator-color);
       content: '';
     }
+
     &__avatar {
       .flex-center;
 
-      width: @conversation-message-sender-width;
+      width: var(--conversation-message-sender-width);
       flex: 0 0 auto;
       color: var(--foreground);
     }
+
     &__content {
       display: flex;
       overflow: hidden;
@@ -63,22 +65,23 @@
         .label-nocase-xs;
 
         color: var(--foreground);
-        line-height: @line-height-sm;
+        line-height: var(--line-height-sm);
       }
       &__text {
-        line-height: @line-height-lg;
+        line-height: var(--line-height-lg);
         white-space: nowrap;
       }
     }
   }
+
   &__marked {
     background-color: var(--accent-color-fade-24);
     color: var(--background);
   }
+
   &__no-result {
     width: 100%;
-    margin: 0;
-    margin-top: 80px;
+    margin: 80px 0 0;
     text-align: center;
   }
 }

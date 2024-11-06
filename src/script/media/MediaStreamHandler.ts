@@ -17,8 +17,11 @@
  *
  */
 
+import {container} from 'tsyringe';
+
 import {Runtime} from '@wireapp/commons';
 
+import {CallingViewMode, CallState} from 'src/script/calling/CallState';
 import {getLogger, Logger} from 'Util/Logger';
 
 import {MediaConstraintsHandler, ScreensharingMethods} from './MediaConstraintsHandler';
@@ -78,19 +81,15 @@ export class MediaStreamHandler {
    * track is enough to enforce the general permissions.
    * @returns Promise with active MediaStream
    */
-  requestMediaSreamAccess(video: boolean): Promise<MediaStream> {
-    const audio = true;
-    const screen = false;
+  requestMediaStreamAccess(video: boolean): Promise<MediaStream | void> {
     return window.navigator.mediaDevices
-      .getUserMedia({audio, video})
-      .then((mediaStream: MediaStream) => {
-        return mediaStream;
-      })
+      .getUserMedia({audio: true, video})
+      .then((mediaStream: MediaStream) => mediaStream)
       .catch((error: Error) => {
-        if (isMediaStreamReadDeviceError(error.name)) {
-          this.schedulePermissionHint(audio, video, screen);
+        if (!isMediaStreamReadDeviceError(error.name)) {
+          throw error;
         }
-        throw error;
+        this.schedulePermissionHint(true, video, false);
       });
   }
 
@@ -163,13 +162,25 @@ export class MediaStreamHandler {
       this.schedulePermissionHint(audio, video, screen);
     }
 
+    const callState = container.resolve(CallState);
+
+    const detachedWindow = callState.detachedWindow();
+    const isInDetachedMode = callState.viewMode() === CallingViewMode.DETACHED_WINDOW;
+    const useDetachedWindowForScreenSharingSource = screen && !video && isInDetachedMode && detachedWindow !== null;
+
+    if (useDetachedWindowForScreenSharingSource) {
+      callState.isScreenSharingSourceFromDetachedWindow(true);
+    }
+
+    const windowToUse = useDetachedWindowForScreenSharingSource ? detachedWindow : window;
+
     const supportsGetDisplayMedia = screen && this.screensharingMethod === ScreensharingMethods.DISPLAY_MEDIA;
     const mediaAPI = supportsGetDisplayMedia
-      ? navigator.mediaDevices.getDisplayMedia
-      : navigator.mediaDevices.getUserMedia;
+      ? windowToUse.navigator.mediaDevices.getDisplayMedia
+      : windowToUse.navigator.mediaDevices.getUserMedia;
 
     return mediaAPI
-      .call(navigator.mediaDevices, mediaConstraints)
+      .call(windowToUse.navigator.mediaDevices, mediaConstraints)
       .then((mediaStream: MediaStream) => {
         this.clearPermissionRequestHint(audio, video, screen);
         return mediaStream;

@@ -23,13 +23,10 @@ import ko from 'knockout';
 
 import {CallState} from 'src/script/calling/CallState';
 import {ConversationLabel, ConversationLabelRepository} from 'src/script/conversation/ConversationLabelRepository';
-import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {ConversationState} from 'src/script/conversation/ConversationState';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
-import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {ListViewModel} from 'src/script/view_model/ListViewModel';
-import {TestFactory} from 'test/helper/TestFactory';
 
 import {ConversationsList} from './ConversationsList';
 
@@ -45,7 +42,6 @@ const create1to1Conversation = (userName: string) => {
 
 describe('ConversationsList', () => {
   let listViewModel: ListViewModel;
-  let currentTab: SidebarTabs;
   let connectRequests: User[];
   let conversationState: ConversationState;
   let callState: CallState;
@@ -54,13 +50,10 @@ describe('ConversationsList', () => {
   let resetConversationFocus: jest.Mock;
   let handleArrowKeyDown: jest.Mock;
   let clearSearchFilter: jest.Mock;
-  let isConversationFilterFocused: boolean;
   let conversationLabelRepository: ConversationLabelRepository;
-  let conversationRepository: ConversationRepository;
 
   beforeEach(async () => {
     listViewModel = {} as ListViewModel;
-    currentTab = SidebarTabs.DIRECTS;
     connectRequests = [];
     conversationState = {isActiveConversation: ko.observable(false) as any} as ConversationState;
     callState = {joinableCalls: ko.pureComputed(() => [] as any[]) as any} as CallState;
@@ -69,21 +62,15 @@ describe('ConversationsList', () => {
     resetConversationFocus = jest.fn();
     handleArrowKeyDown = jest.fn();
     clearSearchFilter = jest.fn();
-    isConversationFilterFocused = false;
-
-    const testFactory = new TestFactory();
-    conversationRepository = await testFactory.exposeConversationActors();
   });
 
   const renderComponent = (conversations: Conversation[], searchFilter: string = '') =>
     render(
       <ConversationsList
         conversationLabelRepository={conversationLabelRepository}
-        conversationRepository={conversationRepository}
         conversations={conversations}
         conversationsFilter={searchFilter}
         listViewModel={listViewModel}
-        currentTab={currentTab}
         connectRequests={connectRequests}
         conversationState={conversationState}
         callState={callState}
@@ -92,7 +79,9 @@ describe('ConversationsList', () => {
         resetConversationFocus={resetConversationFocus}
         handleArrowKeyDown={handleArrowKeyDown}
         clearSearchFilter={clearSearchFilter}
-        isConversationFilterFocused={isConversationFilterFocused}
+        groupParticipantsConversations={[]}
+        isGroupParticipantsVisible={false}
+        isEmpty={false}
       />,
     );
 
@@ -105,18 +94,5 @@ describe('ConversationsList', () => {
     unserNames.forEach(userName => {
       expect(getByText(userName)).toBeDefined();
     });
-  });
-
-  it('should render only those 1:1 conversations that match the search filter', () => {
-    const unserNames = ['Alice', 'Bob', 'Charlie'];
-    const conversations = unserNames.map(create1to1Conversation);
-
-    const {queryByText} = renderComponent(conversations, 'Alice');
-
-    ['Bob', 'Charlie'].forEach(userName => {
-      expect(queryByText(userName)).toBeNull();
-    });
-
-    expect(queryByText('Alice')).not.toBeNull();
   });
 });

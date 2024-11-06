@@ -21,6 +21,20 @@
 
     <script src="../min/basicBrowserFeatureCheck.js?v=<%= VERSION %>"></script>
     <script src="../min/checkBrowser.js?v=<%= VERSION %>"></script>
+
+    <script src='../libs/countly/countly.min.js?v=<%= VERSION %>' type='text/javascript'></script>
+    <script type='text/javascript' nonce="<%= COUNTLY_NONCE %>">
+      var Countly = Countly || {};
+      Countly.q = Countly.q || [];
+
+      Countly.offline_mode = true;
+      Countly.use_session_cookie = false;
+      Countly.storage = 'localstorage';
+      Countly.require_consent = true;
+
+      Countly.q.push(['track_sessions']);
+      Countly.q.push(['track_pageview']);
+    </script>
   </head>
 
   <body>

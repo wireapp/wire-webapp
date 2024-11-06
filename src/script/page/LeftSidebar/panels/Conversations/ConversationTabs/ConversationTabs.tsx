@@ -17,13 +17,28 @@
  *
  */
 
-import {GroupIcon, InfoIcon, MessageIcon, StarIcon, ExternalLinkIcon} from '@wireapp/react-ui-kit';
+import {container} from 'tsyringe';
+
+import {GroupIcon, MessageIcon, StarIcon, ExternalLinkIcon, Tooltip, SupportIcon} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
+import {User} from 'src/script/entity/User';
 import {ConversationFolderTab} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTab/ConversationFolderTab';
 import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
-import {t} from 'Util/LocalizerUtil';
+import {TeamState} from 'src/script/team/TeamState';
+import {isDataDogEnabled} from 'Util/DataDog';
+import {getWebEnvironment} from 'Util/Environment';
+import {replaceLink, t} from 'Util/LocalizerUtil';
+
+import {
+  footerDisclaimer,
+  footerDisclaimerEllipsis,
+  footerDisclaimerTooltip,
+  iconStyle,
+} from './ConversationTabs.styles';
+import {FolderIcon} from './FolderIcon';
+import {TeamCreationBanner} from './TeamCreation/TeamCreationBanner';
 
 import {Config} from '../../../../../Config';
 import {Conversation} from '../../../../../entity/Conversation';
@@ -42,6 +57,7 @@ interface ConversationTabsProps {
   currentTab: SidebarTabs;
   onClickPreferences: () => void;
   showNotificationsBadge?: boolean;
+  selfUser: User;
 }
 
 export const ConversationTabs = ({
@@ -55,7 +71,9 @@ export const ConversationTabs = ({
   currentTab,
   onClickPreferences,
   showNotificationsBadge = false,
+  selfUser,
 }: ConversationTabsProps) => {
+  const teamState = container.resolve(TeamState);
   const totalUnreadConversations = unreadConversations.length;
 
   const totalUnreadFavoriteConversations = favoriteConversations.filter(favoriteConversation =>
@@ -68,6 +86,8 @@ export const ConversationTabs = ({
 
   const filterUnreadAndArchivedConversations = (conversation: Conversation) =>
     !conversation.is_archived() && conversation.hasUnread();
+
+  const isTeamCreationEnabled = Config.getConfig().FEATURE.ENABLE_TEAM_CREATION;
 
   const conversationTabs = [
     {
@@ -102,7 +122,7 @@ export const ConversationTabs = ({
       type: SidebarTabs.FOLDER,
       title: t('folderViewTooltip'),
       dataUieName: 'go-folders-view',
-      Icon: <Icon.FoldersOutline />,
+      Icon: <FolderIcon />,
       unreadConversations: totalUnreadConversations,
     },
     {
@@ -114,6 +134,8 @@ export const ConversationTabs = ({
       unreadConversations: totalUnreadArchivedConversations,
     },
   ];
+
+  const replaceWireLink = replaceLink('https://app.wire.com', '', '');
 
   return (
     <>
@@ -173,6 +195,36 @@ export const ConversationTabs = ({
         aria-owns="tab-1 tab-2"
         className="conversations-sidebar-list-footer"
       >
+        {isTeamCreationEnabled && !teamState.isInTeam(selfUser) && <TeamCreationBanner />}
+
+        {!getWebEnvironment().isProduction && isDataDogEnabled() && (
+          <div css={footerDisclaimer}>
+            <Tooltip
+              css={footerDisclaimerTooltip}
+              body={
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: t(
+                      'conversationInternalEnvironmentDisclaimer',
+                      {url: 'https://app.wire.com'},
+                      replaceWireLink,
+                    ),
+                  }}
+                />
+              }
+            >
+              <Icon.ExclamationMark css={iconStyle} />
+            </Tooltip>
+
+            <div
+              css={footerDisclaimerEllipsis}
+              dangerouslySetInnerHTML={{
+                __html: t('conversationInternalEnvironmentDisclaimer', {url: 'https://app.wire.com'}, replaceWireLink),
+              }}
+            />
+          </div>
+        )}
+
         <ConversationTab
           title={t('preferencesHeadline', Shortcut.getShortcutTooltip(ShortcutType.START))}
           label={t('preferencesHeadline')}
@@ -199,7 +251,7 @@ export const ConversationTabs = ({
           data-uie-name="go-people"
         >
           <span className="conversations-sidebar-btn--text-wrapper">
-            <InfoIcon />
+            <SupportIcon viewBox="0 0 16 16" />
             <span className="conversations-sidebar-btn--text">{t('preferencesAboutSupport')}</span>
             <ExternalLinkIcon className="external-link-icon" />
           </span>

@@ -23,7 +23,7 @@
 .preferences-av-spinner-select {
   display: flex;
 
-  width: @icon-size-sm;
+  width: var(--icon-size-sm);
   height: 150px;
   align-items: center;
   justify-content: center;
@@ -32,8 +32,8 @@
 }
 
 .preferences-av-spinner {
-  width: @icon-size-sm;
-  height: @icon-size-sm;
+  width: var(--icon-size-sm);
+  height: var(--icon-size-sm);
   margin: 0 auto;
 }
 
@@ -64,7 +64,7 @@
   border-radius: 12px;
   background: var(--white);
   color: var(--black);
-  font-size: @font-size-sm;
+  font-size: var(--font-size-base);
   outline: none;
 
   option {
@@ -110,7 +110,7 @@ body.theme-dark {
   align-items: center;
   justify-content: center;
   background-color: var(--foreground-fade-16);
-  font-size: @font-size-small;
+  font-size: var(--font-size-small);
   font-weight: 600;
   text-align: center;
 
@@ -118,9 +118,9 @@ body.theme-dark {
     padding: 4px 16px;
     border-radius: 4px;
     margin-top: 16px;
-    background-color: @separator-color;
+    background-color: var(--separator-color);
     cursor: pointer;
-    font-size: @font-size-medium;
+    font-size: var(--font-size-medium);
     font-weight: 600;
   }
 }

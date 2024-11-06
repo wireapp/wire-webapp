@@ -69,6 +69,7 @@ export interface ElectronDesktopCapturerSource {
   display_id: string;
   id: string;
   name: string;
+  thumbnail: HTMLCanvasElement;
 }
 
 export class MediaDevicesHandler {
@@ -171,7 +172,7 @@ export class MediaDevicesHandler {
    * @camera: boolean, Only when the camera is queried can the entire device list be accessed.
    * @return Promise<void>
    */
-  public async initializeMediaDevices(camera: boolean = false): Promise<void> {
+  public async initializeMediaDevices(camera = false): Promise<void> {
     if (Runtime.isSupportingUserMedia() && !this.devicesAreInit) {
       return this.refreshMediaDevices(camera).then(() => {
         this.subscribeToObservables();
@@ -233,30 +234,12 @@ export class MediaDevicesHandler {
       device => device.kind === MediaDeviceType.VIDEO_INPUT,
     );
 
-    /*
-     * On Windows the same device can be listed multiple times with different group ids ("default", "communications", etc.).
-     * In such a scenario, the device listed as "communications" device is preferred for conferencing calls, so we filter its duplicates.
-     */
     const microphones = mediaDevices.filter(device => device.kind === MediaDeviceType.AUDIO_INPUT);
-    const dedupedMicrophones = microphones.reduce<Record<string, MediaDeviceInfo>>((microphoneList, microphone) => {
-      if (!microphoneList.hasOwnProperty(microphone.deviceId) || microphone.deviceId === 'communications') {
-        microphoneList[microphone.groupId] = microphone;
-      }
-      return microphoneList;
-    }, {});
-
     const speakers = mediaDevices.filter(device => device.kind === MediaDeviceType.AUDIO_OUTPUT);
-    const dedupedSpeakers = speakers.reduce<Record<string, MediaDeviceInfo>>((speakerList, speaker) => {
-      if (!speakerList.hasOwnProperty(speaker.deviceId) || speaker.deviceId === 'communications') {
-        speakerList[speaker.groupId] = speaker;
-      }
-      return speakerList;
-    }, {});
-
     return {
       cameras: videoInputDevices,
-      microphones: Object.values(dedupedMicrophones),
-      speakers: Object.values(dedupedSpeakers),
+      microphones: microphones,
+      speakers: speakers,
     };
   }
 
@@ -266,7 +249,7 @@ export class MediaDevicesHandler {
    * This ensures that the video device labels can also be read. This is necessary for initializing the entire device list.
    * @returns Resolves with all MediaDevices when the list has been updated
    */
-  public async refreshMediaDevices(camera: boolean = false): Promise<MediaDeviceInfo[]> {
+  public async refreshMediaDevices(camera = false): Promise<MediaDeviceInfo[]> {
     const setDevices = (type: MediaDeviceType, devices: MediaDeviceInfo[]): void => {
       this.availableDevices[type](devices);
       const currentId = this.currentDeviceId[type];
@@ -288,7 +271,7 @@ export class MediaDevicesHandler {
 
     try {
       this.removeAllDevices();
-      const mediaDevices = await this.enumerateMediaDevices(camera);
+      const mediaDevices = await window.navigator.mediaDevices.enumerateDevices();
 
       if (!mediaDevices) {
         throw new Error('No media devices found');
@@ -356,34 +339,6 @@ export class MediaDevicesHandler {
     this.logger.info(`Detected '${screenSources.length}' sources for screen sharing from Electron`);
     this.availableDevices.screeninput(screenSources);
     return screenSources;
-  }
-
-  /**
-   * Enumerates all known Media Devices Infos of a System.
-   * @param forceCamera If `forceCamera=true`, then an audio and video track is created to enforce the device access
-   * permissionm
-   * @returns All enumerated MediaDeviceInfos
-   */
-  private async enumerateMediaDevices(forceCamera: boolean = false): Promise<MediaDeviceInfo[]> {
-    // The browser will set the device labels obtained from navigator.mediaDevices.enumerateDevices() to blank strings
-    // if there is no longer an active MediaStream, even if the application was previously temporarily authorized to
-    // access the devices by calling navigator.mediaDevices.getUserMedia().
-
-    // @TODO: Fix Issue
-    // You can use this method to generate a camera stream even in the audio case. This way, the device labels can be displayed in any case.
-    // const constraints = (forceCamera)? {video: true} : {audio: true};
-    // const mediaPromise = navigator.mediaDevices.getUserMedia(constraints)
-    // return mediaPromise.then(stream => {
-    //   if (!stream) {
-    //     return [];
-    //   }
-    //   return window.navigator.mediaDevices.enumerateDevices().then( devices  => {
-    //     stream.getTracks().forEach((t) => t.stop());
-    //     return devices;
-    //   });
-    // });
-
-    return window.navigator.mediaDevices.enumerateDevices();
   }
 
   /**

@@ -17,7 +17,7 @@
  *
  */
 
-import {forwardRef, ForwardRefRenderFunction, KeyboardEvent} from 'react';
+import {forwardRef, KeyboardEvent, useEffect, useRef} from 'react';
 
 import {amplify} from 'amplify';
 
@@ -27,7 +27,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import * as Icon from 'Components/Icon';
 import {ConversationLabel} from 'src/script/conversation/ConversationLabelRepository';
 import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
-import {handleEnterDown} from 'Util/KeyboardUtil';
+import {handleEnterDown, handleEscDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {
@@ -51,24 +51,23 @@ interface ConversationHeaderProps {
   setSearchValue: (searchValue: string) => void;
   searchInputPlaceholder: string;
   currentFolder?: ConversationLabel;
-  setIsConversationFilterFocused: (isFocused: boolean) => void;
   onSearchEnterClick: (event: KeyboardEvent<HTMLInputElement>) => void;
+  jumpToRecentSearch: () => void;
 }
 
-export const ConversationHeaderComponent: ForwardRefRenderFunction<HTMLInputElement, ConversationHeaderProps> = (
-  {
-    currentTab,
-    selfUser,
-    showSearchInput = false,
-    searchValue = '',
-    setSearchValue,
-    currentFolder,
-    searchInputPlaceholder,
-    setIsConversationFilterFocused,
-    onSearchEnterClick,
-  },
-  inputRef,
-) => {
+export const ConversationHeaderComponent = ({
+  currentTab,
+  selfUser,
+  showSearchInput = false,
+  searchValue = '',
+  setSearchValue,
+  currentFolder,
+  searchInputPlaceholder,
+  onSearchEnterClick,
+  jumpToRecentSearch,
+}: ConversationHeaderProps) => {
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
   const {canCreateGroupConversation} = generatePermissionHelpers(selfUser.teamRole());
   const isFolderView = currentTab === SidebarTabs.FOLDER;
 
@@ -83,15 +82,22 @@ export const ConversationHeaderComponent: ForwardRefRenderFunction<HTMLInputElem
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Escape') {
-      setSearchValue('');
-    }
-
-    handleEnterDown(event, () => {
-      onSearchEnterClick(event);
-      setIsConversationFilterFocused(false);
-    });
+    handleEscDown(event, () => setSearchValue(''));
+    handleEnterDown(event, () => onSearchEnterClick(event));
   };
+
+  useEffect(() => {
+    const onSearchShortcut = () => {
+      jumpToRecentSearch();
+      inputRef.current?.focus();
+    };
+
+    amplify.subscribe(WebAppEvents.SHORTCUT.SEARCH, onSearchShortcut);
+
+    return () => {
+      amplify.unsubscribe(WebAppEvents.SHORTCUT.SEARCH, onSearchShortcut);
+    };
+  }, [jumpToRecentSearch]);
 
   return (
     <>
@@ -118,8 +124,6 @@ export const ConversationHeaderComponent: ForwardRefRenderFunction<HTMLInputElem
           ref={inputRef}
           className="label-1"
           value={searchValue}
-          onFocus={() => setIsConversationFilterFocused(true)}
-          onBlur={() => setIsConversationFilterFocused(false)}
           onChange={event => setSearchValue(event.currentTarget.value)}
           startContent={<SearchIcon width={14} height={14} css={searchIconStyles} />}
           endContent={

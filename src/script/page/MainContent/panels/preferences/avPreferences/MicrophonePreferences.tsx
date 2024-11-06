@@ -40,12 +40,14 @@ interface MicrophonePreferencesProps {
   devicesHandler: MediaDevicesHandler;
   refreshStream: () => Promise<MediaStream>;
   streamHandler: MediaStreamHandler;
+  hasActiveCall: boolean;
 }
 
 const MicrophonePreferences: React.FC<MicrophonePreferencesProps> = ({
   devicesHandler,
   streamHandler,
   refreshStream,
+  hasActiveCall,
 }) => {
   const [isRequesting, setIsRequesting] = useState(false);
   const [stream, setStream] = useState<MediaStream>();
@@ -78,7 +80,7 @@ const MicrophonePreferences: React.FC<MicrophonePreferencesProps> = ({
 
   useEffect(
     () => () => {
-      if (stream) {
+      if (stream && !hasActiveCall) {
         streamHandler.releaseTracksFromStream(stream);
       }
     },

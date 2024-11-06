@@ -29,7 +29,6 @@ import {downloadBlob, loadFileBuffer, loadImage} from 'Util/util';
 import {WebWorker} from 'Util/worker';
 
 import {AssetRemoteData} from './AssetRemoteData';
-import {AssetService} from './AssetService';
 import {AssetTransferState} from './AssetTransferState';
 import {getAssetUrl, setAssetUrl} from './AssetURLCache';
 
@@ -38,6 +37,7 @@ import {FileAsset} from '../entity/message/FileAsset';
 import type {User} from '../entity/User';
 import {Core} from '../service/CoreSingleton';
 import {TeamState} from '../team/TeamState';
+import {stripImageExifData} from '../util/ImageUtil';
 
 interface CompressedImage {
   compressedBytes: Uint8Array;
@@ -61,7 +61,6 @@ export class AssetRepository {
   logger: Logger;
 
   constructor(
-    private readonly assetService = container.resolve(AssetService),
     private readonly core = container.resolve(Core),
     private readonly teamState = container.resolve(TeamState),
   ) {
@@ -72,7 +71,7 @@ export class AssetRepository {
     return this.core.service!.asset;
   }
 
-  async getObjectUrl(asset: AssetRemoteData): Promise<string | undefined> {
+  async getObjectUrl(asset: AssetRemoteData): Promise<string> {
     const objectUrl = getAssetUrl(asset.identifier);
     if (objectUrl) {
       return objectUrl;
@@ -108,31 +107,6 @@ export class AssetRepository {
         }
       }
       return undefined;
-    }
-  }
-
-  public generateAssetUrl(asset: AssetRemoteData) {
-    switch (asset.urlData.version) {
-      case 3:
-        return this.assetService.generateAssetUrlV3(
-          asset.urlData.assetKey,
-          asset.urlData.assetToken,
-          asset.urlData.forceCaching,
-        );
-      case 2:
-        return this.assetService.generateAssetUrlV2(
-          asset.urlData.assetId,
-          asset.urlData.conversationId,
-          asset.urlData.forceCaching,
-        );
-      case 1:
-        return this.assetService.generateAssetUrl(
-          asset.urlData.assetId,
-          asset.urlData.conversationId,
-          asset.urlData.forceCaching,
-        );
-      default:
-        throw Error('Cannot map URL data.');
     }
   }
 
@@ -187,9 +161,11 @@ export class AssetRepository {
     mediumImageKey: {domain?: string; key: string};
     previewImageKey: {domain?: string; key: string};
   }> {
+    const strippedImage = await stripImageExifData(image);
+
     const [{compressedBytes: previewImage}, {compressedBytes: mediumImage}] = await Promise.all([
-      this.compressImage(image),
-      this.compressImage(image, true),
+      this.compressImage(strippedImage),
+      this.compressImage(strippedImage, true),
     ]);
 
     const options: AssetUploadOptions = {

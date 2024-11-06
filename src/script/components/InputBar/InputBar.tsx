@@ -28,8 +28,8 @@ import {useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import {checkFileSharingPermission} from 'Components/Conversation/utils/checkFileSharingPermission';
-import {ConversationClassifiedBar} from 'Components/input/ClassifiedBar';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
 import {RichTextContent, RichTextEditor} from 'Components/RichTextEditor';

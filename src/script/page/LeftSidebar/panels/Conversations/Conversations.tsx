@@ -22,11 +22,9 @@ import React, {KeyboardEvent as ReactKeyBoardEvent, useEffect, useState} from 'r
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import {ChevronIcon, IconButton, useMatchMedia} from '@wireapp/react-ui-kit';
+import {useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {CallingCell} from 'Components/calling/CallingCell';
-import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {IntegrationRepository} from 'src/script/integration/IntegrationRepository';
 import {Preferences} from 'src/script/page/LeftSidebar/panels/Preferences';
 import {StartUI} from 'src/script/page/LeftSidebar/panels/StartUI';
@@ -35,39 +33,35 @@ import {useAppMainState, ViewType} from 'src/script/page/state';
 import {ContentState, ListState} from 'src/script/page/useAppState';
 import {SearchRepository} from 'src/script/search/SearchRepository';
 import {TeamRepository} from 'src/script/team/TeamRepository';
+import {EventName} from 'src/script/tracking/EventName';
 import {UserRepository} from 'src/script/user/UserRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
+import {ConversationCallingView} from './ConversationCallingView/ConversationCallingView';
 import {ConversationHeader} from './ConversationHeader';
-import {
-  conversationsSpacerStyles,
-  conversationsSidebarStyles,
-  conversationsSidebarHandleStyles,
-  conversationsSidebarHandleIconStyles,
-} from './Conversations.styles';
+import {conversationsSpacerStyles} from './Conversations.styles';
+import {ConversationSidebar} from './ConversationSidebar/ConversationSidebar';
 import {ConversationsList} from './ConversationsList';
-import {ConversationTabs} from './ConversationTabs';
 import {EmptyConversationList} from './EmptyConversationList';
-import {getTabConversations} from './helpers';
+import {getGroupParticipantsConversations} from './getGroupParticipantsConversation';
+import {getTabConversations, scrollToConversation} from './helpers';
 import {useFolderStore} from './useFoldersStore';
 import {SidebarStatus, SidebarTabs, useSidebarStore} from './useSidebarStore';
 
-import {CallingViewMode, CallState} from '../../../../calling/CallState';
+import {CallState} from '../../../../calling/CallState';
 import {createLabel} from '../../../../conversation/ConversationLabelRepository';
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
 import {ConversationState} from '../../../../conversation/ConversationState';
-import {Conversation} from '../../../../entity/Conversation';
+import type {Conversation} from '../../../../entity/Conversation';
 import {User} from '../../../../entity/User';
 import {useConversationFocus} from '../../../../hooks/useConversationFocus';
 import {PreferenceNotificationRepository} from '../../../../notification/PreferenceNotificationRepository';
 import {PropertiesRepository} from '../../../../properties/PropertiesRepository';
-import {PROPERTIES_TYPE} from '../../../../properties/PropertiesType';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
 import {createNavigateKeyboard} from '../../../../router/routerBindings';
 import {TeamState} from '../../../../team/TeamState';
 import {UserState} from '../../../../user/UserState';
 import {ListViewModel} from '../../../../view_model/ListViewModel';
-import {UserDetails} from '../../UserDetails';
 import {ListWrapper} from '../ListWrapper';
 
 type ConversationsProps = {
@@ -84,13 +78,9 @@ type ConversationsProps = {
   searchRepository: SearchRepository;
   teamRepository: TeamRepository;
   userRepository: UserRepository;
-  inputRef: React.MutableRefObject<HTMLInputElement | null>;
-  isConversationFilterFocused: boolean;
-  setIsConversationFilterFocused: (isFocused: boolean) => void;
 };
 
 const Conversations: React.FC<ConversationsProps> = ({
-  inputRef,
   integrationRepository,
   searchRepository,
   teamRepository,
@@ -98,8 +88,6 @@ const Conversations: React.FC<ConversationsProps> = ({
   propertiesRepository,
   conversationRepository,
   preferenceNotificationRepository,
-  isConversationFilterFocused,
-  setIsConversationFilterFocused,
   listViewModel,
   conversationState = container.resolve(ConversationState),
   teamState = container.resolve(TeamState),
@@ -107,6 +95,8 @@ const Conversations: React.FC<ConversationsProps> = ({
   userState = container.resolve(UserState),
   selfUser,
 }) => {
+  const [conversationListRef, setConversationListRef] = useState<HTMLElement | null>(null);
+
   const {currentTab, status: sidebarStatus, setStatus: setSidebarStatus, setCurrentTab} = useSidebarStore();
   const [conversationsFilter, setConversationsFilter] = useState<string>('');
   const {classifiedDomains, isTeam} = useKoSubscribableChildren(teamState, ['classifiedDomains', 'isTeam']);
@@ -130,9 +120,8 @@ const Conversations: React.FC<ConversationsProps> = ({
     'unreadConversations',
     'visibleConversations',
   ]);
-  const {activeCalls, viewMode} = useKoSubscribableChildren(callState, ['activeCalls', 'viewMode']);
 
-  const isCallWindowDetached = viewMode === CallingViewMode.DETACHED_WINDOW;
+  const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
 
   const {conversationLabelRepository} = conversationRepository;
   const favoriteConversations = conversationLabelRepository.getFavorites(conversations);
@@ -160,6 +149,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   useEffect(() => {
     if (isScreenLessThanMdBreakpoint) {
       setSidebarStatus(SidebarStatus.CLOSED);
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.UI.SIDEBAR_COLLAPSE);
     }
   }, [isScreenLessThanMdBreakpoint, setSidebarStatus]);
 
@@ -178,15 +168,39 @@ const Conversations: React.FC<ConversationsProps> = ({
     .map(label => createLabel(label.name, conversationLabelRepository.getLabelConversations(label), label.id))
     .find(folder => folder.id === expandedFolder);
 
+  const groupParticipantsConversations = getGroupParticipantsConversations({
+    currentTab,
+    conversationRepository,
+    searchRepository,
+    conversationsFilter,
+    favoriteConversations,
+    conversations: currentTabConversations,
+    currentFolder,
+    archivedConversations,
+  });
+
+  const isGroupParticipantsVisible =
+    !!conversationsFilter &&
+    ![SidebarTabs.DIRECTS, SidebarTabs.GROUPS, SidebarTabs.FAVORITES].includes(currentTab) &&
+    groupParticipantsConversations.length > 0;
+
+  const hasNoConversations = conversations.length + connectRequests.length === 0;
+  const hasEmptyConversationsList =
+    !isGroupParticipantsVisible &&
+    ((showSearchInput && currentTabConversations.length === 0) ||
+      (hasNoConversations && currentTab !== SidebarTabs.ARCHIVES));
+
   function toggleSidebar() {
     if (isFoldersTabOpen) {
       toggleFoldersTab();
     }
 
     setSidebarStatus(isSideBarOpen ? SidebarStatus.CLOSED : SidebarStatus.OPEN);
+    amplify.publish(
+      WebAppEvents.ANALYTICS.EVENT,
+      isSideBarOpen ? EventName.UI.SIDEBAR_COLLAPSE : EventName.UI.SIDEBAR_UNCOLLAPSE,
+    );
   }
-
-  const hasNoConversations = conversations.length + connectRequests.length === 0;
 
   useEffect(() => {
     amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, (conversation?: Conversation) => {
@@ -269,75 +283,24 @@ const Conversations: React.FC<ConversationsProps> = ({
     }, ANIMATED_PAGE_TRANSITION_DURATION + 1);
   }
 
-  const sidebar = (
-    <nav className="conversations-sidebar" css={conversationsSidebarStyles(isScreenLessThanMdBreakpoint)}>
-      <FadingScrollbar className="conversations-sidebar-items" data-is-collapsed={!isSideBarOpen}>
-        <UserDetails
-          user={selfUser}
-          groupId={conversationState.selfMLSConversation()?.groupId}
-          isTeam={isTeam}
-          isSideBarOpen={isSideBarOpen}
-        />
-
-        <ConversationTabs
-          onChangeTab={changeTab}
-          currentTab={currentTab}
-          groupConversations={groupConversations}
-          directConversations={directConversations}
-          unreadConversations={unreadConversations}
-          favoriteConversations={favoriteConversations}
-          archivedConversations={archivedConversations}
-          conversationRepository={conversationRepository}
-          onClickPreferences={() => onClickPreferences(ContentState.PREFERENCES_ACCOUNT)}
-          showNotificationsBadge={notifications.length > 0}
-        />
-      </FadingScrollbar>
-
-      <IconButton
-        css={conversationsSidebarHandleStyles(isSideBarOpen)}
-        className="conversations-sidebar-handle"
-        onClick={toggleSidebar}
-      >
-        <ChevronIcon css={conversationsSidebarHandleIconStyles} />
-      </IconButton>
-    </nav>
-  );
-
-  const callingView = (
-    <>
-      {activeCalls.map(call => {
-        const {conversation} = call;
-        const callingViewModel = listViewModel.callingViewModel;
-        const {callingRepository} = callingViewModel;
-
-        return (
-          conversation &&
-          !isCallWindowDetached && (
-            <div className="calling-cell" key={conversation.id}>
-              <CallingCell
-                classifiedDomains={classifiedDomains}
-                call={call}
-                callActions={callingViewModel.callActions}
-                callingRepository={callingRepository}
-                pushToTalkKey={propertiesRepository.getPreference(PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY)}
-                isFullUi
-                hasAccessToCamera={callingViewModel.hasAccessToCamera()}
-                isSelfVerified={selfUser.is_verified()}
-              />
-            </div>
-          )
-        );
-      })}
-    </>
-  );
-
   const handleEnterSearchClick = (event: ReactKeyBoardEvent<HTMLDivElement>) => {
     const firstFoundConversation = currentTabConversations?.[0];
 
     if (firstFoundConversation) {
       createNavigateKeyboard(generateConversationUrl(firstFoundConversation.qualifiedId), true)(event);
       setConversationsFilter('');
+      scrollToConversation(firstFoundConversation.id);
     }
+  };
+
+  const onSearch = (searchValue: string) => {
+    setConversationsFilter(searchValue);
+    conversationListRef?.scrollTo(0, 0);
+  };
+
+  const jumpToRecentSearch = () => {
+    switchList(ListState.CONVERSATIONS);
+    setCurrentTab(SidebarTabs.RECENT);
   };
 
   return (
@@ -347,21 +310,49 @@ const Conversations: React.FC<ConversationsProps> = ({
         id="conversations"
         headerElement={
           <ConversationHeader
-            ref={inputRef}
             currentFolder={currentFolder}
             currentTab={currentTab}
             selfUser={selfUser}
             showSearchInput={(showSearchInput && currentTabConversations.length !== 0) || !!conversationsFilter}
             searchValue={conversationsFilter}
-            setSearchValue={setConversationsFilter}
+            setSearchValue={onSearch}
             searchInputPlaceholder={searchInputPlaceholder}
-            setIsConversationFilterFocused={value => setIsConversationFilterFocused(value)}
             onSearchEnterClick={handleEnterSearchClick}
+            jumpToRecentSearch={jumpToRecentSearch}
           />
         }
+        setConversationListRef={setConversationListRef}
         hasHeader={!isPreferences}
-        {...(!isTemporaryGuest && {sidebar})}
-        before={callingView}
+        sidebar={
+          !isTemporaryGuest && (
+            <ConversationSidebar
+              isOpen={isSideBarOpen}
+              toggleOpen={toggleSidebar}
+              isScreenLessThanMdBreakpoint={isScreenLessThanMdBreakpoint}
+              selfUser={selfUser}
+              conversationState={conversationState}
+              isTeam={isTeam}
+              changeTab={changeTab}
+              currentTab={currentTab}
+              groupConversations={groupConversations}
+              directConversations={directConversations}
+              unreadConversations={unreadConversations}
+              favoriteConversations={favoriteConversations}
+              archivedConversations={archivedConversations}
+              conversationRepository={conversationRepository}
+              onClickPreferences={() => onClickPreferences(ContentState.PREFERENCES_ACCOUNT)}
+              showNotificationsBadge={notifications.length > 0}
+            />
+          )
+        }
+        footer={
+          <ConversationCallingView
+            activeCalls={activeCalls}
+            listViewModel={listViewModel}
+            classifiedDomains={classifiedDomains}
+            propertiesRepository={propertiesRepository}
+          />
+        }
       >
         {isPreferences ? (
           <Preferences
@@ -387,8 +378,7 @@ const Conversations: React.FC<ConversationsProps> = ({
               />
             )}
 
-            {((showSearchInput && currentTabConversations.length === 0) ||
-              (hasNoConversations && currentTab !== SidebarTabs.ARCHIVES)) && (
+            {hasEmptyConversationsList && (
               <EmptyConversationList
                 currentTab={currentTab}
                 onChangeTab={changeTab}
@@ -402,17 +392,17 @@ const Conversations: React.FC<ConversationsProps> = ({
                 currentFolder={currentFolder}
                 conversationLabelRepository={conversationLabelRepository}
                 callState={callState}
-                currentTab={currentTab}
                 currentFocus={currentFocus}
                 listViewModel={listViewModel}
                 connectRequests={connectRequests}
                 handleArrowKeyDown={handleKeyDown}
                 conversationState={conversationState}
                 conversations={currentTabConversations}
-                conversationRepository={conversationRepository}
                 resetConversationFocus={resetConversationFocus}
                 clearSearchFilter={clearConversationFilter}
-                isConversationFilterFocused={isConversationFilterFocused}
+                isEmpty={hasEmptyConversationsList}
+                groupParticipantsConversations={groupParticipantsConversations}
+                isGroupParticipantsVisible={isGroupParticipantsVisible}
               />
             )}
           </>

@@ -23,6 +23,7 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {Runtime} from '@wireapp/commons';
 
 import {isTabKey} from './KeyboardUtil';
+import {getLogger} from './Logger';
 
 import {Config} from '../Config';
 import type {Conversation} from '../entity/Conversation';
@@ -316,3 +317,37 @@ export const removeAnimationsClass = (element: HTMLElement | null) => {
     });
   }
 };
+
+export class InitializationEventLogger {
+  private logger = getLogger('AppInitialization');
+  private timestamp: number;
+
+  constructor(private userId: string) {
+    this.timestamp = Date.now();
+  }
+
+  log(step: string, options = {}) {
+    this.logger.info('Performance tracking: ', {
+      appInitialization: {
+        user_id: this.userId,
+        step,
+        duration: Date.now() - this.timestamp,
+        ...options,
+      },
+    });
+    this.timestamp = Date.now(); // Reset the timestamp after logging
+  }
+}
+
+export enum AppInitializationStep {
+  AppInitialize = 'AppInitialize',
+  UserInitialize = 'UserInitialize',
+  SetupEventProcessors = 'SetupEventProcessors',
+  ValidatedClient = 'ValidatedClient',
+  ConversationsLoaded = 'ConversationsLoaded',
+  UserDataLoaded = 'UserDataLoaded',
+  DecryptionCompleted = 'DecryptionCompleted',
+  SetupMLS = 'SetupMls',
+  ClientsUpdated = 'ClientsUpdated',
+  AppInitCompleted = 'AppInitCompleted',
+}

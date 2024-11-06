@@ -855,7 +855,7 @@ export class ConversationRepository {
   public async getPrecedingMessages(conversationEntity: Conversation): Promise<ContentMessage[]> {
     conversationEntity.isLoadingMessages(true);
 
-    const firstMessageEntity = conversationEntity.getOldestMessage();
+    const firstMessageEntity = conversationEntity.getOldestMessageWithTimestamp();
     const upperBound =
       firstMessageEntity && firstMessageEntity.timestamp()
         ? new Date(firstMessageEntity.timestamp())
@@ -1127,7 +1127,7 @@ export class ConversationRepository {
     }
   }
 
-  private readonly deleteConversationLocally = async (conversationId: QualifiedId, skipNotification: boolean) => {
+  public readonly deleteConversationLocally = async (conversationId: QualifiedId, skipNotification: boolean) => {
     const conversationEntity = this.conversationState.findConversation(conversationId);
     if (!conversationEntity) {
       return;
@@ -1438,8 +1438,12 @@ export class ConversationRepository {
    *
    * @param event Custom event containing join key/code
    */
-  private readonly onConversationJoin = async (event: {detail: {code: string; key: string; domain?: string}}) => {
+  private readonly onConversationJoin = async (event: {
+    detail: {code: string; key: string; domain?: string | null};
+  }) => {
     const {key, code, domain} = event.detail;
+
+    const resolvedDomain = domain ?? this.userState.self()?.domain ?? 'wire.com';
 
     const showNoConversationModal = () => {
       const titleText = t('modalConversationJoinNotFoundHeadline');
@@ -1458,7 +1462,10 @@ export class ConversationRepository {
         name: conversationName,
         has_password: hasPassword,
       } = await this.conversationService.getConversationJoin(key, code);
-      const knownConversation = this.conversationState.findConversation({domain: null, id: conversationId});
+      const knownConversation = this.conversationState.findConversation({
+        domain: resolvedDomain,
+        id: conversationId,
+      });
       if (knownConversation?.status() === ConversationStatus.CURRENT_MEMBER) {
         amplify.publish(WebAppEvents.CONVERSATION.SHOW, knownConversation, {});
         return;
@@ -1470,7 +1477,7 @@ export class ConversationRepository {
             try {
               const response = await this.conversationService.postConversationJoin(key, code, password);
               const conversationEntity = await this.getConversationById({
-                domain: domain ?? this.userState.self().domain,
+                domain: resolvedDomain,
                 id: conversationId,
               });
               if (response) {
@@ -1582,7 +1589,7 @@ export class ConversationRepository {
    * @returns MLS conversation entity
    */
   private readonly fetchMLS1to1Conversation = async (otherUserId: QualifiedId): Promise<MLSConversation> => {
-    const remoteConversation = await this.conversationService.getMLS1to1Conversation(otherUserId);
+    const {conversation: remoteConversation} = await this.conversationService.getMLS1to1Conversation(otherUserId);
     const [conversation] = this.mapConversations([remoteConversation]);
 
     if (!isMLSConversation(conversation)) {
@@ -3050,7 +3057,7 @@ export class ConversationRepository {
   // Event callbacks
   //##############################################################################
 
-  private logConversationEvent(event: IncomingEvent, source: EventSource) {
+  private logConversationEvent(event: IncomingEvent, source: EventSource, duration: number) {
     if (event.type === CONVERSATION_EVENT.TYPING) {
       // Prevent logging typing events
       return;
@@ -3073,7 +3080,15 @@ export class ConversationRepository {
       case ClientEvent.CONVERSATION.MESSAGE_DELETE:
         extra.deletedMessage = event.data.message_id;
     }
-    this.logger.info(logMessage, {time, from, type, qualified_conversation, ...extra});
+
+    this.logger.info(logMessage, {
+      time,
+      from,
+      type,
+      qualified_conversation,
+      duration,
+      ...extra,
+    });
   }
 
   /**
@@ -3083,9 +3098,14 @@ export class ConversationRepository {
    * @param source Source of event
    * @returns Resolves when event was handled
    */
-  private readonly onConversationEvent = (event: IncomingEvent, source = EventRepository.SOURCE.STREAM) => {
-    this.logConversationEvent(event, source);
-    return this.handleConversationEvent(event, source);
+  private readonly onConversationEvent = async (event: IncomingEvent, source = EventRepository.SOURCE.STREAM) => {
+    const start = performance.now();
+    const handledConversations = await this.handleConversationEvent(event, source);
+    const duration = performance.now() - start;
+
+    this.logConversationEvent(event, source, duration);
+
+    return handledConversations;
   };
 
   private handleConversationEvent(

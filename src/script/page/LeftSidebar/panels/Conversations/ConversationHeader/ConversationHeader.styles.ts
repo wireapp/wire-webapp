@@ -36,6 +36,7 @@ export const label: CSSObject = {
   textOverflow: 'ellipsis',
   overflow: 'hidden',
   whiteSpace: 'nowrap',
+  flex: 1,
 };
 
 export const button: CSSObject = {

@@ -89,7 +89,7 @@
       margin-left: 7px;
       background: transparent;
       opacity: 0;
-      transition: opacity @animation-timing-faster @ease-in-quart;
+      transition: opacity var(--animation-timing-faster) var(--ease-in-quart);
 
       &:focus {
         opacity: 1;
@@ -136,8 +136,8 @@
   &__group-size-info {
     margin: 8px 0 0;
     color: var(--foreground);
-    font-size: @font-size-xs;
-    line-height: @line-height-sm;
+    font-size: var(--font-size-xsmall);
+    line-height: var(--line-height-sm);
   }
 
   &__bottom-actions {

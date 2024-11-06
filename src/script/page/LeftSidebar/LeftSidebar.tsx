@@ -17,17 +17,15 @@
  *
  */
 
-import React, {useEffect, useRef, useState} from 'react';
+import {useEffect} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
-
 import {Conversations} from './panels/Conversations';
-import {TemporaryGuestConversations} from './panels/TemporaryGuestConversations';
+import {TemporaryGuestConversations} from './panels/TemporatyGuestConversations';
 
 import {User} from '../../entity/User';
 import {ListViewModel} from '../../view_model/ListViewModel';
@@ -39,53 +37,28 @@ type LeftSidebarProps = {
   isActivatedAccount: boolean;
 };
 
-const LeftSidebar: React.FC<LeftSidebarProps> = ({listViewModel, selfUser, isActivatedAccount}) => {
+const LeftSidebar = ({listViewModel, selfUser, isActivatedAccount}: LeftSidebarProps) => {
   const {conversationRepository, propertiesRepository} = listViewModel;
   const repositories = listViewModel.contentViewModel.repositories;
-  const inputRef = useRef<HTMLInputElement | null>(null);
 
-  const [isConversationFilterFocused, setIsConversationFilterFocused] = useState<boolean>(false);
   const listState = useAppState(state => state.listState);
-
-  const switchList = (list: ListState) => listViewModel.switchList(list);
-
-  const {setCurrentTab} = useSidebarStore();
 
   useEffect(() => {
     function openCreateGroupModal() {
       amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, 'conversation_details');
     }
 
-    async function jumpToRecentSearch() {
-      switchList(ListState.CONVERSATIONS);
-
-      setCurrentTab(SidebarTabs.RECENT);
-      setIsConversationFilterFocused(true);
-    }
-
     amplify.subscribe(WebAppEvents.SHORTCUT.START, openCreateGroupModal);
-
-    amplify.subscribe(WebAppEvents.SHORTCUT.SEARCH, jumpToRecentSearch);
 
     return () => {
       amplify.unsubscribe(WebAppEvents.SHORTCUT.START, openCreateGroupModal);
-      amplify.unsubscribe(WebAppEvents.SHORTCUT.SEARCH, jumpToRecentSearch);
     };
   }, []);
-
-  useEffect(() => {
-    if (isConversationFilterFocused) {
-      inputRef.current?.focus();
-    }
-  }, [inputRef, isConversationFilterFocused]);
 
   return (
     <aside id="left-column" className={cx('left-column', {'left-column--light-theme': !isActivatedAccount})}>
       {[ListState.CONVERSATIONS, ListState.START_UI, ListState.PREFERENCES, ListState.ARCHIVE].includes(listState) && (
         <Conversations
-          inputRef={inputRef}
-          isConversationFilterFocused={isConversationFilterFocused}
-          setIsConversationFilterFocused={setIsConversationFilterFocused}
           selfUser={selfUser}
           listViewModel={listViewModel}
           searchRepository={repositories.search}

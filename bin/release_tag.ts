@@ -36,10 +36,12 @@ const filename = path.basename(__filename);
 const stage = process.argv[2];
 const usageText = `Usage: ${filename} [-h|--help] <staging|production> <commitId>`;
 
+const exec = (command: string): string => execSync(command, {stdio: 'pipe'}).toString().trim();
+
 let commitId = process.argv[3];
 let target = '';
 let commitMessage = '';
-let branch = '';
+let branch = exec('git rev-parse --abbrev-ref HEAD');
 const isDryRun = process.argv.includes('--dry-run');
 
 const logger = logdown(filename, {
@@ -47,8 +49,6 @@ const logger = logdown(filename, {
   markdown: false,
 });
 logger.state.isEnabled = true;
-
-const exec = (command: string): string => execSync(command, {stdio: 'pipe'}).toString().trim();
 
 if (isDryRun) {
   logger.info('Note: Dry run enabled.');
@@ -61,12 +61,10 @@ switch (stage) {
     process.exit();
   }
   case DeploymentStage.PRODUCTION: {
-    branch = 'master';
     target = stage;
     break;
   }
   case DeploymentStage.STAGING: {
-    branch = 'dev';
     target = stage;
     break;
   }
@@ -117,6 +115,15 @@ const ask = (questionToAsk: string): Promise<string> => {
 };
 
 (async () => {
+  if (branch !== 'master' && target === DeploymentStage.PRODUCTION) {
+    const answer = await ask(
+      `⚠️  You are about to release a commit from branch "${branch}" to production. ARE YOU SURE?? [yes/no] `,
+    );
+    if (answer !== 'yes') {
+      logger.info('Aborting.');
+      process.exit();
+    }
+  }
   const answer = await ask(
     `ℹ️  The commit "${commitMessage}" will be released with tag "${tagName}". Continue? [yes/no] `,
   );

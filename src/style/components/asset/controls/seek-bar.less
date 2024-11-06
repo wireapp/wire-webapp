@@ -24,7 +24,7 @@
   appearance: none;
   background-color: var(--accent-color);
   opacity: 0;
-  transition: opacity @animation-timing-slow ease-in-out;
+  transition: opacity var(--animation-timing-slow) ease-in-out;
 }
 
 .thumb(@rules) {
@@ -37,11 +37,6 @@
   &::-ms-thumb {
     @rules();
   }
-}
-
-seek-bar {
-  display: block;
-  width: 100%;
 }
 
 .seek-bar {

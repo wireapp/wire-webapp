@@ -25,18 +25,16 @@ import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {User} from '../../../../../entity/User';
+import {ContentState, useAppState} from '../../../../useAppState';
 
 interface ConnectionRequestsProps {
   connectionRequests: User[];
-  isShowingConnectionRequests?: boolean;
   onConnectionRequestClick: () => void;
 }
 
-export const ConnectionRequests = ({
-  connectionRequests,
-  isShowingConnectionRequests = false,
-  onConnectionRequestClick,
-}: ConnectionRequestsProps) => {
+export const ConnectionRequests = ({connectionRequests, onConnectionRequestClick}: ConnectionRequestsProps) => {
+  const contentState = useAppState(state => state.contentState);
+  const isShowingConnectionRequests = contentState === ContentState.CONNECTION_REQUESTS;
   const connectionRequestsCount = connectionRequests.length;
 
   if (connectionRequestsCount === 0) {
@@ -49,39 +47,44 @@ export const ConnectionRequests = ({
       : t('conversationsConnectionRequestOne');
 
   return (
-    <li tabIndex={TabIndex.UNFOCUSABLE} data-uie-name="connection-requests">
-      <div
-        role="button"
-        tabIndex={TabIndex.FOCUSABLE}
-        className={cx('conversation-list-cell', {
-          'conversation-list-cell--active': isShowingConnectionRequests,
-        })}
-        onClick={onConnectionRequestClick}
-        onKeyDown={event => handleKeyDown(event, onConnectionRequestClick)}
-      >
-        <div className="conversation-list-cell-left">
-          {connectionRequestsCount === 1 ? (
-            <Avatar participant={connectionRequests[0]} avatarSize={AVATAR_SIZE.SMALL} />
-          ) : (
-            <GroupAvatar users={connectionRequests} />
-          )}
-        </div>
+    <ul css={{margin: 0, paddingLeft: 0}} data-uie-name="connection-requests">
+      <li tabIndex={TabIndex.UNFOCUSABLE} data-uie-name="connection-request">
+        <div
+          role="button"
+          tabIndex={TabIndex.FOCUSABLE}
+          className={cx('conversation-list-cell', {
+            'conversation-list-cell--active': isShowingConnectionRequests,
+          })}
+          onClick={onConnectionRequestClick}
+          onKeyDown={event => handleKeyDown(event, onConnectionRequestClick)}
+        >
+          <div className="conversation-list-cell-left">
+            {connectionRequestsCount === 1 ? (
+              <Avatar participant={connectionRequests[0]} avatarSize={AVATAR_SIZE.SMALL} />
+            ) : (
+              <GroupAvatar users={connectionRequests} />
+            )}
+          </div>
 
-        <div className="conversation-list-cell-center">
-          <span
-            className={cx('conversation-list-cell-name', {
-              'conversation-list-cell-name--active': isShowingConnectionRequests,
-            })}
-            data-uie-name="item-pending-requests"
-          >
-            {connectionText}
-          </span>
-        </div>
+          <div className="conversation-list-cell-center">
+            <span
+              className={cx('conversation-list-cell-name', {
+                'conversation-list-cell-name--active': isShowingConnectionRequests,
+              })}
+              data-uie-name="item-pending-requests"
+            >
+              {connectionText}
+            </span>
+          </div>
 
-        <div className="conversation-list-cell-right">
-          <span className="conversation-list-cell-badge cell-badge-dark icon-pending" data-uie-name="status-pending" />
+          <div className="conversation-list-cell-right">
+            <span
+              className="conversation-list-cell-badge cell-badge-dark icon-pending"
+              data-uie-name="status-pending"
+            />
+          </div>
         </div>
-      </div>
-    </li>
+      </li>
+    </ul>
   );
 };

@@ -25,7 +25,6 @@ import {partition} from 'underscore';
 
 import * as Icon from 'Components/Icon';
 import {UserList, UserlistMode} from 'Components/UserList';
-import {Conversation} from 'src/script/entity/Conversation';
 import {UserRepository} from 'src/script/user/UserRepository';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
@@ -55,7 +54,6 @@ interface PeopleTabProps {
   isFederated: boolean;
   isTeam: boolean;
   onClickContact: (user: User) => void;
-  onClickConversation: (conversation: Conversation) => void;
   onClickUser: (user: User) => void;
   onSearchResults: (results: SearchResultsData | undefined) => void;
   searchQuery: string;
@@ -82,7 +80,6 @@ export const PeopleTab = ({
   conversationRepository,
   userRepository,
   onClickContact,
-  onClickConversation,
   onClickUser,
   onSearchResults,
 }: PeopleTabProps) => {
@@ -314,6 +311,7 @@ export const PeopleTab = ({
             </div>
           </div>
         )}
+
         {results.others.length > 0 && (
           <div className="others">
             <h3 className="start-ui-list-header">

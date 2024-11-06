@@ -18,9 +18,5 @@
  */
 
 export const UserData = {
-  CONTACTS: 'user_contacts',
   IS_TEAM: 'team_is_team',
-  TEAM_ID: 'team_team_id',
-  TEAM_SIZE: 'team_team_size',
-  USER_TYPE: 'team_user_type',
 };

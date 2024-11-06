@@ -26,6 +26,8 @@ export const Segmentation = {
     PARTICIPANTS: 'call_participants',
     REASON: 'reason', // This has to be in sync with ios
     SCREEN_SHARE: 'call_screen_share',
+    SCORE: 'score',
+    QUALITY_REVIEW_LABEL: 'label',
     SETUP_TIME: 'call_setup_time',
     VIDEO: 'call_video',
   },
@@ -52,5 +54,9 @@ export const Segmentation = {
   SCREEN_SHARE: {
     DIRECTION: 'screen_share_direction',
     DURATION: 'screen_share_duration',
+  },
+  CALLING_UI_SIZE: {
+    FROM: 'from',
+    TO: 'to',
   },
 };

@@ -40,7 +40,7 @@
     overflow: hidden;
     height: 168px;
     border-radius: 8px;
-    margin: 8px;
+    margin-bottom: 8px;
 
     &--no-camera-access {
       display: flex;
@@ -48,7 +48,7 @@
       justify-content: center;
       background-color: var(--foreground-fade-16);
       color: var(--background);
-      font-size: @font-size-small;
+      font-size: var(--font-size-small);
       font-weight: 600;
       text-align: center;
       text-transform: uppercase;
@@ -68,7 +68,7 @@
       color: var(--white);
       cursor: pointer;
       opacity: 0;
-      transition: opacity @animation-timing-fast @ease-out-quart;
+      transition: opacity var(--animation-timing-fast) var(--ease-out-quart);
 
       body.theme-dark {
         background-color: var(--background-fade-40);
@@ -213,8 +213,8 @@
         z-index: 1;
         max-width: 50%;
         color: #fff;
-        font-size: @font-size-medium;
-        font-weight: @font-weight-bold;
+        font-size: var(--font-size-medium);
+        font-weight: var(--font-weight-bold);
         text-align: center;
       }
 

@@ -17,13 +17,9 @@
  *
  */
 
-device-card,
 .device-card {
   position: relative;
   display: flex;
-}
-
-.device-card {
   flex-grow: 1;
   align-items: center;
 
@@ -48,7 +44,7 @@ device-card,
   &__info {
     width: 100%;
     padding-right: 16px;
-    line-height: @line-height-sm;
+    line-height: var(--line-height-sm);
   }
 
   &__name {
@@ -63,7 +59,7 @@ device-card,
   &__label,
   &__model {
     font-size: var(--font-size-medium);
-    font-weight: @font-weight-bold;
+    font-weight: var(--font-weight-bold);
     line-height: var(--line-height-md);
   }
 

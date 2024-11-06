@@ -21,7 +21,7 @@
   position: relative;
   display: flex;
   width: 100%;
-  min-height: @conversation-input-min-height;
+  min-height: var(--conversation-input-min-height);
   box-sizing: content-box;
   flex-direction: column;
 
@@ -35,7 +35,7 @@
     &--editing,
     &--editing .editor-container {
       background-color: var(--text-input-editing);
-      transition: background-color @animation-timing-faster @ease-in-quad;
+      transition: background-color var(--animation-timing-faster) var(--ease-in-quad);
     }
   }
 }
@@ -52,16 +52,16 @@
   .reset-textarea;
 
   width: 100%;
-  max-width: @conversation-max-width;
+  max-width: var(--conversation-max-width);
   height: auto;
-  min-height: @conversation-input-line-height;
-  max-height: @conversation-input-max-height;
+  min-height: var(--conversation-input-line-height);
+  max-height: var(--conversation-input-max-height);
   flex: 1 1;
-  margin-top: calc((@conversation-input-min-height - @conversation-input-line-height) / 2);
-  margin-bottom: calc((@conversation-input-min-height - @conversation-input-line-height) / 2);
+  margin-top: calc((var(--conversation-input-min-height) - var(--conversation-input-line-height)) / 2);
+  margin-bottom: calc((var(--conversation-input-min-height) - var(--conversation-input-line-height)) / 2);
   background-color: transparent;
   font-weight: inherit;
-  line-height: @conversation-input-line-height;
+  line-height: var(--conversation-input-line-height);
   overflow-x: hidden;
   overflow-y: auto;
   text-rendering: optimizeLegibility;
@@ -90,8 +90,8 @@
 .controls-left {
   .flex-center;
 
-  width: @conversation-message-sender-width;
-  height: @conversation-input-min-height;
+  width: var(--conversation-message-sender-width);
+  height: var(--conversation-input-min-height);
 }
 
 .controls-center {
@@ -124,7 +124,7 @@
 
   display: flex;
 
-  @media (max-width: @screen-md-min) {
+  @media (max-width: 768px) {
     width: 75px;
     margin-bottom: 5px;
   }
@@ -204,10 +204,10 @@
   .full-screen;
 
   display: flex;
-  animation-duration: @animation-timing-slow;
+  animation-duration: var(--animation-timing-slow);
   animation-fill-mode: forwards;
   animation-name: paste-fade-in;
-  animation-timing-function: @ease-out-expo;
+  animation-timing-function: var(--ease-out-expo);
   background-color: var(--input-bar-bg);
   opacity: 0;
 }
@@ -264,15 +264,15 @@
   border-radius: 8px;
   background-color: var(--modal-bg);
   box-shadow: 0 8px 30px 0 rgba(0, 0, 0, 0.08);
-  font-size: @font-size-small;
-  font-weight: @font-weight-regular;
-  line-height: @line-height-xl;
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-xl);
 }
 
 .input-bar__reply {
   display: flex;
   width: 100%;
-  padding: 12px 16px 0 30px;
+  padding: 12px 16px 10px 30px;
   animation: reply-box 0.15s ease-out;
   background-color: var(--input-bar-bg);
   fill: var(--main-color);
@@ -287,6 +287,7 @@
     display: flex;
     overflow: hidden;
     max-width: 640px;
+    margin-right: 40px;
     margin-left: 28px;
     font-weight: 400;
   }
@@ -306,8 +307,8 @@
   &__sender-name {
     display: flex;
     align-items: center;
-    font-size: @font-size-small;
-    font-weight: @font-weight-bold;
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-bold);
 
     .edit-icon {
       width: 8px;
@@ -319,10 +320,10 @@
 
   &__message {
     overflow: hidden;
-    max-width: @conversation-message-max-width;
+    max-width: var(--conversation-message-max-width);
     margin-top: 4px;
-    font-size: @font-size-medium;
-    font-weight: @font-weight-regular;
+    font-size: var(--font-size-medium);
+    font-weight: var(--font-weight-regular);
     text-overflow: ellipsis;
     white-space: nowrap;
 
@@ -363,7 +364,7 @@
     }
 
     & + span {
-      font-size: @font-size-xsmall;
+      font-size: var(--font-size-xsmall);
       text-transform: uppercase;
     }
   }

@@ -25,11 +25,11 @@
 
 .location-asset-icon {
   position: absolute;
-  left: -@conversation-message-sender-width;
-  width: @conversation-message-sender-width;
+  left: calc(var(--conversation-message-sender-width) * -1);
+  width: var(--conversation-message-sender-width);
   text-align: center;
 }
 
 .location-asset-title {
-  font-weight: @font-weight-bold;
+  font-weight: var(--font-weight-bold);
 }

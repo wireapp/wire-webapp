@@ -22,6 +22,7 @@ import React from 'react';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {Avatar, AVATAR_SIZE, GroupAvatar} from 'Components/Avatar';
+import {listWrapper} from 'Components/ParticipantItemContent/ParticipantItem.styles';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 
@@ -57,10 +58,14 @@ const GroupListItem: React.FC<GroupListItemProps> = ({click, group}) => {
       onClick={onClick}
       onKeyDown={event => handleKeyDown(event, onClick)}
       data-uie-value={displayName}
+      css={listWrapper({})}
     >
       <div className="search-list-item-image">
-        {is1to1 && <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={participatingUserEts[0]} />}
-        {!is1to1 && <GroupAvatar users={participatingUserEts} />}
+        {is1to1 ? (
+          <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={participatingUserEts[0]} css={{margin: '0 16px'}} />
+        ) : (
+          <GroupAvatar users={participatingUserEts} css={{margin: '0 16px'}} />
+        )}
       </div>
       <div className="search-list-item-header">{displayName}</div>
     </div>

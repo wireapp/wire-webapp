@@ -27,17 +27,17 @@ import {
   CONVERSATION_EVENT,
   USER_EVENT,
 } from '@wireapp/api-client/lib/event/';
-import type {Notification} from '@wireapp/api-client/lib/notification/';
+import type {Notification, NotificationList} from '@wireapp/api-client/lib/notification/';
 import {FeatureStatus} from '@wireapp/api-client/lib/team/feature/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import {NotificationSource} from '@wireapp/core/lib/notification';
 import {DatabaseKeys} from '@wireapp/core/lib/notification/NotificationDatabaseRepository';
 import Dexie from 'dexie';
-import jquery from 'jquery';
 import keyboardjs from 'keyboardjs';
 import {$createTextNode, $getRoot, LexicalEditor} from 'lexical';
 import {container} from 'tsyringe';
 
-import {useDetachedCallingFeatureState} from 'Components/calling/DetachedCallingCell/DetachedCallingFeature.state';
+import {showAppNotification} from 'Components/AppNotification';
 import {getLogger, Logger} from 'Util/Logger';
 
 import {KEY} from './KeyboardUtil';
@@ -46,6 +46,7 @@ import {createUuid} from './uuid';
 
 import {CallingRepository} from '../calling/CallingRepository';
 import {CallState} from '../calling/CallState';
+import {Participant} from '../calling/Participant';
 import {ClientRepository} from '../client';
 import {ClientState} from '../client/ClientState';
 import {ConnectionRepository} from '../connection/ConnectionRepository';
@@ -64,6 +65,7 @@ import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
 import {EventRecord, StorageRepository, StorageSchemata} from '../storage';
 import {TeamState} from '../team/TeamState';
+import {disableForcedErrorReporting} from '../tracking/Countly.helpers';
 import {UserRepository} from '../user/UserRepository';
 import {UserState} from '../user/UserState';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
@@ -79,7 +81,6 @@ export class DebugUtil {
   private readonly propertiesRepository: PropertiesRepository;
   private readonly storageRepository: StorageRepository;
   private readonly messageRepository: MessageRepository;
-  public readonly $ = jquery;
   /** Used by QA test automation. */
   public readonly userRepository: UserRepository;
   /** Used by QA test automation. */
@@ -111,6 +112,46 @@ export class DebugUtil {
     this.logger = getLogger('DebugUtil');
 
     keyboardjs.bind(['command+shift+1', 'ctrl+shift+1'], this.toggleDebugUi);
+  }
+
+  async importEvents() {
+    try {
+      const [fileHandle] = await window.showOpenFilePicker();
+      const file = await fileHandle.getFile();
+      const data = await file.text();
+      const notificationResponse: NotificationList = JSON.parse(data);
+      const startTime = performance.now();
+
+      for (const notification of notificationResponse.notifications) {
+        const events = this.core.service.notification.handleNotification(
+          notification,
+          NotificationSource.NOTIFICATION_STREAM,
+          false,
+        );
+
+        for await (const event of events) {
+          await this.eventRepository.importEvents([event]);
+        }
+      }
+
+      const endTime = performance.now();
+      this.logger.info(
+        `Importing ${notificationResponse.notifications.length} event(s) took ${endTime - startTime} milliseconds`,
+      );
+    } catch (error) {
+      this.logger.error(`Failed to import events: ${error}`);
+    }
+  }
+
+  addCallParticipants(number: number) {
+    const call = this.callState.activeCalls()[0];
+
+    if (!call) {
+      return;
+    }
+
+    const participants = new Array(number).fill(0).map((_, i) => new Participant(new User(), `some-client-id-${i}`));
+    participants.forEach(participant => call.addParticipant(participant));
   }
 
   /** will print all the ids of entities that show on screen (userIds, conversationIds, messageIds) */
@@ -210,10 +251,6 @@ export class DebugUtil {
 
   async enablePushToTalk(key: string | null = KEY.SPACE) {
     this.propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY, key);
-  }
-
-  async toggleDetachedCallFeature(shouldEnable: boolean = true) {
-    return useDetachedCallingFeatureState.getState().toggle(shouldEnable);
   }
 
   /** Used by QA test automation. */
@@ -539,5 +576,14 @@ export class DebugUtil {
       },
       EventRepository.SOURCE.WEB_SOCKET,
     );
+  }
+
+  // Used by QA test automation, allows to disable or enable the forced error reporting
+  disableForcedErrorReporting() {
+    return disableForcedErrorReporting();
+  }
+
+  renderAppNotification(message?: string) {
+    showAppNotification(message || 'Test notification');
   }
 }

@@ -32,7 +32,7 @@
 
   input[type='checkbox'] {
     position: absolute;
-    left: @offscreen-left;
+    left: var(--offscreen-left);
     opacity: 0;
 
     &:focus-visible + label {
@@ -86,7 +86,7 @@
       color: var(--white);
       content: '\e102';
       font-family: 'Wire' !important;
-      font-size: @font-size-medium;
+      font-size: var(--font-size-medium);
       line-height: 1;
       opacity: 0;
     }
@@ -98,7 +98,7 @@
 
     > div {
       color: var(--main-color) !important;
-      line-height: @line-height-sm;
+      line-height: var(--line-height-sm);
     }
   }
 }

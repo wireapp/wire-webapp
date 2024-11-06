@@ -21,12 +21,12 @@
 .input-box {
   display: block;
   width: 100%;
-  height: @button-height;
+  height: var(--button-height);
   padding: 0 16px;
-  border-radius: @button-border-radius;
+  border-radius: var(--button-border-radius);
   margin-bottom: 8px;
   color: #fff;
-  line-height: @button-height;
+  line-height: var(--button-height);
   outline: 0;
 
   &::-ms-clear {
@@ -72,9 +72,9 @@
     position: absolute;
     top: 0;
     right: 0;
-    width: @button-height;
-    height: @button-height;
-    line-height: @button-height;
+    width: var(--button-height);
+    height: var(--button-height);
+    line-height: var(--button-height);
     pointer-events: none;
     text-align: center;
   }

@@ -17,13 +17,16 @@
  *
  */
 
-import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {t} from 'Util/LocalizerUtil';
+import {replaceAccents} from 'Util/StringUtil';
+
+import {SidebarTabs} from './useSidebarStore';
 
 import {Conversation} from '../../../../entity/Conversation';
 
 interface GetTabConversationsProps {
   currentTab: SidebarTabs;
+
   conversations: Conversation[];
   groupConversations: Conversation[];
   directConversations: Conversation[];
@@ -41,8 +44,12 @@ export function getTabConversations({
   archivedConversations,
   conversationsFilter,
 }: GetTabConversationsProps) {
-  const conversationSearchFilter = (conversation: Conversation) =>
-    conversation.display_name().toLowerCase().includes(conversationsFilter.toLowerCase());
+  const conversationSearchFilter = (conversation: Conversation) => {
+    const filterWord = replaceAccents(conversationsFilter.toLowerCase());
+    const conversationDisplayName = replaceAccents(conversation.display_name().toLowerCase());
+
+    return conversationDisplayName.includes(filterWord);
+  };
 
   const conversationArchivedFilter = (conversation: Conversation) => !archivedConversations.includes(conversation);
 
@@ -55,14 +62,14 @@ export function getTabConversations({
 
   if (currentTab === SidebarTabs.GROUPS) {
     return {
-      conversations: groupConversations.filter(conversationArchivedFilter, conversationSearchFilter),
+      conversations: groupConversations.filter(conversationArchivedFilter).filter(conversationSearchFilter),
       searchInputPlaceholder: t('searchGroupConversations'),
     };
   }
 
   if (currentTab === SidebarTabs.DIRECTS) {
     return {
-      conversations: directConversations.filter(conversationArchivedFilter, conversationSearchFilter),
+      conversations: directConversations.filter(conversationArchivedFilter).filter(conversationSearchFilter),
       searchInputPlaceholder: t('searchDirectConversations'),
     };
   }
@@ -86,3 +93,30 @@ export function getTabConversations({
     searchInputPlaceholder: '',
   };
 }
+
+export const conversationSearchFilter = (filter: string) => (conversation: Conversation) => {
+  const filterWord = replaceAccents(filter.toLowerCase());
+  const conversationDisplayName = replaceAccents(conversation.display_name().toLowerCase());
+
+  return conversationDisplayName.includes(filterWord);
+};
+
+export const scrollToConversation = (conversationId: string) => {
+  const element = document.querySelector<HTMLElement>(`.conversation-list-cell[data-uie-uid="${conversationId}"]`);
+
+  if (!element) {
+    return;
+  }
+
+  const rect = element.getBoundingClientRect();
+
+  const isVisible =
+    rect.top >= 0 &&
+    rect.left >= 0 &&
+    rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+    rect.right <= (window.innerWidth || document.documentElement.clientWidth);
+
+  if (!isVisible) {
+    element.scrollIntoView({behavior: 'instant', block: 'center', inline: 'nearest'});
+  }
+};

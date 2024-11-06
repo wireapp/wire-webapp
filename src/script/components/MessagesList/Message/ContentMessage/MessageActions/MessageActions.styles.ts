@@ -34,7 +34,7 @@ export const messageBodyActions: CSSObject = {
   right: '-40px',
   top: '-34px',
   userSelect: 'none',
-  '@media (max-width: @screen-md-min)': {
+  '@media (max-width: 768px)': {
     height: '45px',
     flexDirection: 'column',
   },

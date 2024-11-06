@@ -146,10 +146,6 @@ export type Env = {
   /** Set a default federation domain in case no domain can be found */
   FEATURE_FEDERATION_DOMAIN: string;
 
-  // TODO: remove this when all clients have enabled this feature
-  /** Enable guest link passwords if the feature is enabled on the backend */
-  FEATURE_ENABLE_LINK_PASSWORDS: string;
-
   /** Feature toggle for the log in with a username. Can be set to true or false */
   FEATURE_ENABLE_USERNAME_LOGIN: string;
 
@@ -168,6 +164,15 @@ export type Env = {
   /** Feature to enable in call reactions */
   FEATURE_ENABLE_IN_CALL_REACTIONS: string;
 
+  /** Feature to enable remove conversation locally */
+  FEATURE_ENABLE_REMOVE_GROUP_CONVERSATION: string;
+
+  /** Feature to enable calling popout window */
+  FEATURE_ENABLE_DETACHED_CALLING_WINDOW: string;
+
+  /** Feature to enable team creation flow for individual users */
+  FEATURE_ENABLE_TEAM_CREATION: string;
+
   /** Sets the verification ID for Google webmasters */
   GOOGLE_WEBMASTER_ID: string;
 
@@ -182,6 +187,18 @@ export type Env = {
 
   /** Sets the Countly product reporting API key */
   COUNTLY_API_KEY: string;
+
+  /** Enables logging for Countly */
+  COUNTLY_ENABLE_LOGGING: string;
+
+  /** Force Countly reporting (only to be used on internal environments) */
+  COUNTLY_FORCE_REPORTING: string;
+
+  /** Countly allow list for backend urls
+   * Multiple entries separated by comma, e.g. "https://nginz-https.anta.wire.link, https://nginz-https.diya.wire.link, https://prod-nginz-https.wire.com"
+   * Used to disable countly tracking on on-prem instances
+   */
+  COUNTLY_ALLOWED_BACKEND: string;
 
   /** Open graph header description */
   OPEN_GRAPH_DESCRIPTION: string;
@@ -324,4 +341,5 @@ export type Env = {
 
   DATADOG_APPLICATION_ID?: string;
   DATADOG_CLIENT_TOKEN?: string;
+  FEATURE_DATADOG_ENVIRONMENT?: string;
 };

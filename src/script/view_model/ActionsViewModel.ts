@@ -128,7 +128,7 @@ export class ActionsViewModel {
           text: t('modalConnectCancelSecondary'),
         },
         text: {
-          message: t('modalConnectCancelMessage', userEntity.name()),
+          message: t('modalConnectCancelMessage', userEntity.name(), {}, true),
           title: t('modalConnectCancelHeadline'),
         },
       });
@@ -302,23 +302,34 @@ export class ActionsViewModel {
     });
   };
 
-  readonly deleteConversation = (conversationEntity: Conversation): Promise<void> => {
-    if (conversationEntity && conversationEntity.isCreatedBySelf()) {
-      return new Promise(() => {
-        PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-          primaryAction: {
-            action: () => this.conversationRepository.deleteConversation(conversationEntity),
-            text: t('modalConversationDeleteGroupAction'),
-          },
-          text: {
-            message: t('modalConversationDeleteGroupMessage'),
-            title: t('modalConversationDeleteGroupHeadline', conversationEntity.display_name()),
-          },
-        });
-      });
+  readonly deleteConversation = (conversationEntity: Conversation) => {
+    PrimaryModal.show(PrimaryModal.type.CONFIRM, {
+      primaryAction: {
+        action: () => this.conversationRepository.deleteConversation(conversationEntity),
+        text: t('modalConversationDeleteGroupAction'),
+      },
+      text: {
+        message: t('modalConversationDeleteGroupMessage'),
+        title: t('modalConversationDeleteGroupHeadline', conversationEntity.display_name()),
+      },
+    });
+  };
+
+  readonly removeConversation = (conversationEntity: Conversation) => {
+    if (!conversationEntity.isGroup() || !conversationEntity.isSelfUserRemoved()) {
+      return;
     }
 
-    return Promise.reject();
+    PrimaryModal.show(PrimaryModal.type.CONFIRM, {
+      primaryAction: {
+        action: () => this.conversationRepository.deleteConversationLocally(conversationEntity, true),
+        text: t('modalConversationRemoveGroupAction'),
+      },
+      text: {
+        message: t('modalConversationRemoveGroupMessage'),
+        title: t('modalConversationRemoveGroupHeadline'),
+      },
+    });
   };
 
   getConversationById = async (conversation: QualifiedId): Promise<Conversation> => {

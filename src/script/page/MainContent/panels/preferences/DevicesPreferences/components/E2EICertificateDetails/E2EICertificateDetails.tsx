@@ -21,7 +21,7 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {VerificationBadges} from 'Components/VerificationBadge';
+import {VerificationBadges} from 'Components/Badge';
 import {E2EIHandler, MLSStatuses, WireIdentity} from 'src/script/E2EIdentity';
 import {useCertificateStatus} from 'src/script/hooks/useCertificateStatus';
 import {t} from 'Util/LocalizerUtil';

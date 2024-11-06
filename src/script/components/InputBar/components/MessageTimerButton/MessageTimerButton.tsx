@@ -74,7 +74,7 @@ const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({
   // Click on ephemeral button
   const onClick = (event: React.MouseEvent<HTMLSpanElement>): void => {
     const entries = setEntries();
-    showContextMenu(event, entries, 'message-timer-menu');
+    showContextMenu({event, entries, identifier: 'message-timer-menu'});
   };
 
   if (!isSelfDeletingMessagesEnabled) {
@@ -85,7 +85,7 @@ const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({
     if (isSpaceOrEnterKey(event.key)) {
       const newEvent = setContextMenuPosition(event);
       const entries = setEntries();
-      showContextMenu(newEvent, entries, 'message-timer-menu');
+      showContextMenu({event: newEvent, entries, identifier: 'message-timer-menu'});
     }
   };
 

@@ -23,14 +23,14 @@
 // <div class="button-round icon-plus"></div>
 //
 .button-round {
-  .circle(@button-round-size);
+  .circle(var(--button-round-size));
 
   position: relative;
   display: inline-block;
   border: 1px solid var(--background-fade-40);
   color: var(--background);
   cursor: pointer;
-  line-height: @button-round-size - 2px;
+  line-height: calc(var(--button-round-size) - 2px);
   text-align: center;
   user-select: none;
 
@@ -73,7 +73,7 @@
 .button-round-color() {
   border: none;
   color: #fff;
-  line-height: @button-round-size;
+  line-height: var(--button-round-size);
   &.toggled {
     background: #fff;
   }
@@ -200,13 +200,13 @@
 // <div class="button-round button-round-lg icon-plus"></div>
 //
 .button-round-md {
-  .square(@button-round-size-md);
+  .square(var(--button-round-size-md));
 
-  line-height: @button-round-size-md;
+  line-height: var(--button-round-size-md);
 }
 
 .button-round-lg {
-  .square(@button-round-size-lg);
+  .square(var(--button-round-size-lg));
 
-  line-height: @button-round-size-lg;
+  line-height: var(--button-round-size-lg);
 }

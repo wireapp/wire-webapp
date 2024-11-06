@@ -1,9 +1,9 @@
 .message-quote {
   position: relative;
-  max-width: calc(@conversation-max-width - @conversation-message-sender-width - 16px);
+  max-width: calc(var(--conversation-max-width) - var(--conversation-message-sender-width) - 16px);
   padding-left: 16px;
   margin-bottom: 10px;
-  font-size: @font-size-medium;
+  font-size: var(--font-size-medium);
   line-height: 1.5em;
 
   button {
@@ -35,8 +35,8 @@
   &__sender {
     margin-bottom: 4px;
     cursor: pointer;
-    font-size: @font-size-small;
-    font-weight: @font-weight-bold;
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-bold);
 
     svg {
       width: 8px;
@@ -61,7 +61,7 @@
     }
 
     &--large {
-      font-size: @font-size-xl;
+      font-size: var(--font-size-xxl);
     }
 
     &--full {
@@ -85,8 +85,8 @@
       display: block;
       color: var(--accent-color-500);
       cursor: pointer;
-      font-size: @font-size-small;
-      font-weight: @font-weight-regular;
+      font-size: var(--font-size-small);
+      font-weight: var(--font-weight-regular);
       user-select: none;
 
       .disclose-icon {
@@ -116,8 +116,8 @@
     display: block;
     margin-top: 4px;
     cursor: pointer;
-    font-size: @font-size-small;
-    font-weight: @font-weight-regular;
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-regular);
     opacity: 0.4;
 
     &:hover {
@@ -130,6 +130,6 @@
   }
 
   .message-mention {
-    font-size: @font-size-medium;
+    font-size: var(--font-size-medium);
   }
 }

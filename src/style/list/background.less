@@ -34,9 +34,9 @@
 
 .background {
   background-color: fade(#000, 88%);
-  transition-duration: @animation-timing-slow;
+  transition-duration: var(--animation-timing-slow);
   transition-property: opacity;
-  transition-timing-function: @ease-out-quart;
+  transition-timing-function: var(--ease-out-quart);
 
   &--white {
     background-color: var(--app-bg);

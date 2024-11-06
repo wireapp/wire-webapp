@@ -29,9 +29,23 @@ export const EventName = {
     JOINED_CALL: 'calling.joined_call',
     RECEIVED_CALL: 'calling.received_call',
     SCREEN_SHARE: 'calling.screen_share',
+    QUALITY_REVIEW: 'calling.call_quality_review',
   },
   CONTRIBUTED: 'contributed',
   E2EE: {
     FAILED_MESSAGE_DECRYPTION: 'e2ee.failed_message_decryption',
+  },
+  UI: {
+    CALLING_UI_SIZE: 'ui.calling_ui_size',
+    SIDEBAR_COLLAPSE: 'ui.sidebar_collapse',
+    SIDEBAR_UNCOLLAPSE: 'ui.sidebar_uncollapse',
+  },
+  MESSAGES: {
+    VIDEO: {
+      PLAY_SUCCESS: 'messages.video.play_success',
+      PLAY_FAILED: 'messages.video.play_failed',
+      UNSUPPORTED_MIME_TYPE: 'messages.video.unsupported_mime_type',
+      UNPLAYABLE_ERROR: 'messages.video.unplayable_error',
+    },
   },
 };
