@@ -126,6 +126,8 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       'firstUserEntity',
     ]);
 
+    const {isTemporaryGuest} = useKoSubscribableChildren(firstParticipant!, ['isTemporaryGuest']);
+
     const {isTeam, classifiedDomains, team, isSelfDeletingMessagesEnforced, getEnforcedSelfDeletingMessagesTimeout} =
       useKoSubscribableChildren(teamState, [
         'isTeam',
@@ -262,7 +264,11 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
                 classifiedDomains={classifiedDomains}
               />
 
-              <EnrichedFields user={firstParticipant} showDomain={isFederated} />
+              <EnrichedFields
+                user={firstParticipant}
+                showDomain={isFederated}
+                showAvailability={isTeam && !isTemporaryGuest && teamState.isInTeam(firstParticipant)}
+              />
             </>
           )}
 
