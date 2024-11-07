@@ -25,9 +25,10 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import * as Icon from 'Components/Icon';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
-import {ModalComponent} from 'Components/ModalComponent';
-import {useUserDevicesHistory, UserDevicesState, UserDevices} from 'Components/UserDevices';
+import {ModalComponent} from 'Components/Modals/ModalComponent';
+import {UserDevicesState, UserDevices} from 'Components/UserDevices';
 import {UserSearchableList} from 'Components/UserSearchableList';
+import {useUserDevicesHistory} from 'Hooks/useUserDevicesHistory';
 import {handleEnterDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 

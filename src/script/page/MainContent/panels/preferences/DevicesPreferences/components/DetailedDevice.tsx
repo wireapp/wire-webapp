@@ -19,7 +19,7 @@
 
 import React from 'react';
 
-import {DeviceVerificationBadges} from 'Components/VerificationBadge';
+import {DeviceVerificationBadges} from 'Components/Badge';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {WireIdentity} from 'src/script/E2EIdentity';
 

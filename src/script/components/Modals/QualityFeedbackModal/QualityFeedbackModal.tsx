@@ -27,7 +27,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {showAppNotification} from 'Components/AppNotification';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
-import {ModalComponent} from 'Components/ModalComponent';
+import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';

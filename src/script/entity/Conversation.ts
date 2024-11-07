@@ -373,7 +373,7 @@ export class Conversation {
       }
     });
 
-    this.isCreatedBySelf = ko.pureComputed(() => this.selfUser().id === this.creator && !this.isSelfUserRemoved());
+    this.isCreatedBySelf = ko.pureComputed(() => this.selfUser()?.id === this.creator && !this.isSelfUserRemoved());
 
     this.showNotificationsEverything = ko.pureComputed(() => {
       return this.notificationState() === NOTIFICATION_STATE.EVERYTHING;

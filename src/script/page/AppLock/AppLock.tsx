@@ -28,7 +28,7 @@ import {ValidationUtil} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/Icon';
-import {ModalComponent} from 'Components/ModalComponent';
+import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {SIGN_OUT_REASON} from 'src/script/auth/SignOutReason';
 import {ClientRepository} from 'src/script/client';
 import {ClientState} from 'src/script/client/ClientState';

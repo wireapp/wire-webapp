@@ -27,7 +27,7 @@ import {MediumImage} from 'src/script/entity/message/MediumImage';
 
 import {ImageAsset, ImageAssetProps} from './ImageAsset';
 
-jest.mock('Components/utils/InViewport', () => ({
+jest.mock('Components/InViewport', () => ({
   InViewport: ({onVisible, children}: {onVisible: () => void; children: any}) => {
     setTimeout(onVisible);
     return <div>{children}</div>;

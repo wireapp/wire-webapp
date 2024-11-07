@@ -19,8 +19,8 @@
 
 import {ChangeEvent, FC, KeyboardEvent, useEffect, useRef, useState} from 'react';
 
+import {ConversationVerificationBadges} from 'Components/Badge';
 import * as Icon from 'Components/Icon';
-import {ConversationVerificationBadges} from 'Components/VerificationBadge';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';

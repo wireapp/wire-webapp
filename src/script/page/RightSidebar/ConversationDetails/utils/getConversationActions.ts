@@ -25,6 +25,7 @@ import * as Icon from 'Components/Icon';
 import {MenuItem} from 'Components/panel/PanelActions';
 import {t} from 'Util/LocalizerUtil';
 
+import {Config} from '../../../../Config';
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
 import {Conversation} from '../../../../entity/Conversation';
 import * as UserPermission from '../../../../user/UserPermission';
@@ -155,12 +156,24 @@ const getConversationActions = ({
         !isSingleUser &&
         isTeam &&
         roleRepository.canDeleteGroup(conversationEntity) &&
-        conversationEntity.isCreatedBySelf(),
+        !conversationEntity.isSelfUserRemoved(),
       item: {
-        click: async () => actionsViewModel.deleteConversation(conversationEntity),
+        click: () => actionsViewModel.deleteConversation(conversationEntity),
         Icon: Icon.DeleteIcon,
         identifier: 'do-delete',
         label: t('conversationDetailsActionDelete'),
+      },
+    },
+    {
+      condition:
+        conversationEntity.isGroup() &&
+        conversationEntity.isSelfUserRemoved() &&
+        Config.getConfig().FEATURE.ENABLE_REMOVE_GROUP_CONVERSATION,
+      item: {
+        click: () => actionsViewModel.removeConversation(conversationEntity),
+        Icon: Icon.CloseIcon,
+        identifier: 'do-remove',
+        label: t('conversationDetailsActionRemove'),
       },
     },
   ];

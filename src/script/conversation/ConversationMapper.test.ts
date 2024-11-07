@@ -694,15 +694,16 @@ describe('ConversationMapper', () => {
       expect(merged_conversation.last_server_timestamp).toBe(localData.last_event_timestamp);
     });
 
-    it('prefers local data over remote data when mapping the read receipts value', () => {
+    it('prefers remote data over remote data when mapping the read receipts value', () => {
       const localReceiptMode = 0;
-      const [localData, remoteData] = getDataWithReadReceiptMode(localReceiptMode, 1);
+      const remoteReceiptMode = 1;
+      const [localData, remoteData] = getDataWithReadReceiptMode(localReceiptMode, remoteReceiptMode);
       const [mergedConversation] = ConversationMapper.mergeConversations(
         [localData] as ConversationDatabaseData[],
         {found: [remoteData]} as RemoteConversations,
       );
 
-      expect(mergedConversation.receipt_mode).toBe(localReceiptMode);
+      expect(mergedConversation.receipt_mode).toBe(remoteReceiptMode);
     });
 
     it('uses the remote receipt mode when there is no local receipt mode', () => {

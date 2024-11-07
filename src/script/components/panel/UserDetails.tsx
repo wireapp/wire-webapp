@@ -25,12 +25,11 @@ import {ErrorBoundary} from 'react-error-boundary';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {UserBlockedBadge, UserVerificationBadges} from 'Components/Badge';
+import {UserClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import {ErrorFallback} from 'Components/ErrorFallback';
 import * as Icon from 'Components/Icon';
-import {UserClassifiedBar} from 'Components/input/ClassifiedBar';
-import {UserBlockedBadge} from 'Components/UserBlockedBadge/UserBlockedBadge';
 import {UserInfo} from 'Components/UserInfo';
-import {UserVerificationBadges} from 'Components/VerificationBadge';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 

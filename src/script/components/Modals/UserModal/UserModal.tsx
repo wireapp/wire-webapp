@@ -27,7 +27,7 @@ import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import * as Icon from 'Components/Icon';
-import {ModalComponent} from 'Components/ModalComponent';
+import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {EnrichedFields} from 'Components/panel/EnrichedFields';
 import {UserActions} from 'Components/panel/UserActions';
 import {UserDetails} from 'Components/panel/UserDetails';
@@ -145,11 +145,12 @@ const UserModal: React.FC<UserModalProps> = ({
     onClose?.();
     resetState();
   };
-  const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
-  const {is_trusted: isTrusted, isActivatedAccount} = useKoSubscribableChildren(selfUser, [
-    'is_trusted',
-    'isActivatedAccount',
-  ]);
+  const {classifiedDomains, isTeam} = useKoSubscribableChildren(teamState, ['classifiedDomains', 'isTeam']);
+  const {
+    is_trusted: isTrusted,
+    isActivatedAccount,
+    isTemporaryGuest,
+  } = useKoSubscribableChildren(selfUser, ['is_trusted', 'isActivatedAccount', 'isTemporaryGuest']);
   const isFederated = core.backendFeatures?.isFederated;
 
   const isSameTeam = user && user.teamId && selfUser.teamId && user.teamId === selfUser.teamId;
@@ -209,7 +210,11 @@ const UserModal: React.FC<UserModalProps> = ({
           <>
             <UserDetails participant={user} classifiedDomains={classifiedDomains} />
 
-            <EnrichedFields user={user} showDomain={isFederated} />
+            <EnrichedFields
+              user={user}
+              showDomain={isFederated}
+              showAvailability={isTeam && !isTemporaryGuest && teamState.isInTeam(user)}
+            />
 
             {!isTrusted && !isSameTeam && <UnverifiedUserWarning user={user} />}
 
