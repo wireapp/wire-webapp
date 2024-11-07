@@ -5996,10 +5996,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/avs@npm:9.10.16":
-  version: 9.10.16
-  resolution: "@wireapp/avs@npm:9.10.16"
-  checksum: 10/2ed7b43e5be5bfadfb8eb870cdfc2a758f835e87304e7c445114580831b63e720c6a96e12db7addd90b8581c2ffc424b1e65987ea4c34d9e19bb45aa5ba3701f
+"@wireapp/avs-debugger@npm:0.0.3":
+  version: 0.0.3
+  resolution: "@wireapp/avs-debugger@npm:0.0.3"
+  dependencies:
+    debug: "npm:^4.3.5"
+    uuid: "npm:^10.0.0"
+    webrtc-internals: "npm:^0.0.8"
+  checksum: 10/5c34e06788efff9ffa15e0775b5e31da4ed2d2156c4acd3a61e23795546bdd79d5838b6e1235e6e25e76db0e2e088e4ccc04e8ea70528d24da9437c344a315eb
+  languageName: node
+  linkType: hard
+
+"@wireapp/avs@npm:10.0.1":
+  version: 10.0.1
+  resolution: "@wireapp/avs@npm:10.0.1"
+  checksum: 10/d77a92c36f3168a48069fb189d283213635ca222b90246713722095794d98cd4ea148ebba22c08b5ab4bf5674bcef450fcbd56cd49294d30f49f528b37e2a623
   languageName: node
   linkType: hard
 
@@ -18186,6 +18197,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"uuid@npm:^10.0.0":
+  version: 10.0.0
+  resolution: "uuid@npm:10.0.0"
+  bin:
+    uuid: dist/bin/uuid
+  checksum: 10/35aa60614811a201ff90f8ca5e9ecb7076a75c3821e17f0f5ff72d44e36c2d35fcbc2ceee9c4ac7317f4cc41895da30e74f3885e30313bee48fda6338f250538
+  languageName: node
+  linkType: hard
+
 "v8-compile-cache-lib@npm:^3.0.1":
   version: 3.0.1
   resolution: "v8-compile-cache-lib@npm:3.0.1"
@@ -18488,6 +18508,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"webrtc-internals@npm:^0.0.8":
+  version: 0.0.8
+  resolution: "webrtc-internals@npm:0.0.8"
+  checksum: 10/df26c0d602c1807ba33d1ef53d363ad3acbcb854438257efd1dac33511cfedbdf23b94b2afee534a9e8b277d23b395cbe6b06bc0d293cec38391ed8e3d9e2490
+  languageName: node
+  linkType: hard
+
 "whatwg-encoding@npm:^2.0.0":
   version: 2.0.0
   resolution: "whatwg-encoding@npm:2.0.0"
@@ -18695,7 +18722,8 @@ __metadata:
     "@types/uuid": "npm:^10.0.0"
     "@types/webpack-env": "npm:1.18.5"
     "@types/wicg-file-system-access": "npm:^2023.10.5"
-    "@wireapp/avs": "npm:9.10.16"
+    "@wireapp/avs": "npm:10.0.1"
+    "@wireapp/avs-debugger": "npm:0.0.3"
     "@wireapp/commons": "npm:5.2.13"
     "@wireapp/copy-config": "npm:2.2.10"
     "@wireapp/core": "npm:46.6.0"
