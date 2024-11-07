@@ -59,4 +59,18 @@ export const Segmentation = {
     FROM: 'from',
     TO: 'to',
   },
+  BACKUP_CREATION: {
+    PASSWORD: 'password',
+    PASSWORD_MULTIPLE_ATTEMPTS: 'password_multiple_attempts',
+    CREATION_DURATION: 'creation_duration',
+    CANCELLATION_STEP: {
+      DURING_BACKUP: 'during_backup',
+      BEFORE_BACKUP: 'before_backup',
+    },
+  },
+  GENERAL: {
+    STEP: 'step',
+    YES: 'yes',
+    NO: 'no',
+  },
 };

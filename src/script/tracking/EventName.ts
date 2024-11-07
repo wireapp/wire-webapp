@@ -48,4 +48,8 @@ export const EventName = {
       UNPLAYABLE_ERROR: 'messages.video.unplayable_error',
     },
   },
+  HISTORY: {
+    BACKUP_CREATED: 'history.backup_created',
+    BACKUP_CANCELLED: 'history.backup_cancelled',
+  },
 };
