@@ -24,7 +24,6 @@ import 'core-js/full/reflect';
 import {ClientType} from '@wireapp/api-client/lib/client/';
 import {createRoot} from 'react-dom/client';
 
-import * as avslogger from '@wireapp/avs-debugger';
 import {Runtime} from '@wireapp/commons';
 
 import {AppContainer} from 'Components/AppContainer/AppContainer';
@@ -37,9 +36,6 @@ import {doRedirect} from './app';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {Config} from '../Config';
 import {StorageKey} from '../storage';
-
-// @TODO move this under a feature flag
-avslogger.initTrackDebugger();
 
 document.addEventListener('DOMContentLoaded', async () => {
   const config = Config.getConfig();

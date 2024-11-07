@@ -51,6 +51,7 @@ import {
   WcallClient,
   WcallMember,
 } from '@wireapp/avs';
+import * as avsTrackLogger from '@wireapp/avs-debugger';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -1204,6 +1205,7 @@ export class CallingRepository {
     const conversationIdStr = this.serializeQualifiedId(conversationId);
     this.wCall?.end(this.wUser, conversationIdStr);
     callingSubscriptions.removeCall(conversationId);
+    avsTrackLogger.reset();
   };
 
   private readonly leaveMLSConference = async (conversationId: QualifiedId) => {
@@ -1363,6 +1365,7 @@ export class CallingRepository {
     const conversationIdStr = this.serializeQualifiedId(conversationId);
     delete this.poorCallQualityUsers[conversationIdStr];
     this.wCall?.end(this.wUser, conversationIdStr);
+    avsTrackLogger.reset();
   };
 
   muteCall(call: Call, shouldMute: boolean, reason?: MuteState): void {
@@ -1664,12 +1667,7 @@ export class CallingRepository {
   private readonly requestConfig = () => {
     const _requestConfig = async () => {
       const limit = Runtime.isFirefox() ? CallingRepository.CONFIG.MAX_FIREFOX_TURN_COUNT : undefined;
-      const config = (await this.fetchConfig(limit)) as any;
-
-      // @TODO: Change this before review and merge in dev branch
-      config.sft_servers = [{urls: ['https://sft01.avs.zinfra.io']}];
-      config.sft_servers_all = [{urls: ['https://sft01.avs.zinfra.io']}];
-
+      const config = await this.fetchConfig(limit);
       this.wCall?.configUpdate(this.wUser, 0, JSON.stringify(config));
     };
     _requestConfig().catch(error => {
@@ -2278,6 +2276,8 @@ export class CallingRepository {
     this.callState
       .calls()
       .forEach((call: Call) => this.wCall?.end(this.wUser, this.serializeQualifiedId(call.conversation.qualifiedId)));
+
+    avsTrackLogger.reset();
     this.wCall?.destroy(this.wUser);
   }
 

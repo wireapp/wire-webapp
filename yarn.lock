@@ -6001,21 +6001,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/avs-debugger@file:../wire-avs-debugger::locator=wire-webapp%40workspace%3A.":
-  version: 1.0.0
-  resolution: "@wireapp/avs-debugger@file:../wire-avs-debugger#../wire-avs-debugger::hash=8f6cf0&locator=wire-webapp%40workspace%3A."
+"@wireapp/avs-debugger@npm:0.0.3":
+  version: 0.0.3
+  resolution: "@wireapp/avs-debugger@npm:0.0.3"
   dependencies:
     debug: "npm:^4.3.5"
     uuid: "npm:^10.0.0"
     webrtc-internals: "npm:^0.0.8"
-  checksum: 10/e77c0745612859a32211f57db75e6c3810bbdff856a6502237be5296c2b873d6aef35ed9abfd736ffe2826d5ae61e060200a921536eb88bd870b98e687af8203
+  checksum: 10/5c34e06788efff9ffa15e0775b5e31da4ed2d2156c4acd3a61e23795546bdd79d5838b6e1235e6e25e76db0e2e088e4ccc04e8ea70528d24da9437c344a315eb
   languageName: node
   linkType: hard
 
-"@wireapp/avs@file:../wire-avs/build/dist/wasm::locator=wire-webapp%40workspace%3A.":
-  version: 0.0.0
-  resolution: "@wireapp/avs@file:../wire-avs/build/dist/wasm#../wire-avs/build/dist/wasm::hash=bab486&locator=wire-webapp%40workspace%3A."
-  checksum: 10/98a927e46c643b22596b6cd1580e56977b5af315ad1a54f23fa2f008e7b8cf5fbfc8239166ec067afd69a184c70542a5365a02f1db34b335044f563ae9c70870
+"@wireapp/avs@npm:10.0.1":
+  version: 10.0.1
+  resolution: "@wireapp/avs@npm:10.0.1"
+  checksum: 10/d77a92c36f3168a48069fb189d283213635ca222b90246713722095794d98cd4ea148ebba22c08b5ab4bf5674bcef450fcbd56cd49294d30f49f528b37e2a623
   languageName: node
   linkType: hard
 
@@ -18706,8 +18706,8 @@ __metadata:
     "@types/uuid": "npm:^10.0.0"
     "@types/webpack-env": "npm:1.18.5"
     "@types/wicg-file-system-access": "npm:^2023.10.5"
-    "@wireapp/avs": "file:../wire-avs/build/dist/wasm"
-    "@wireapp/avs-debugger": "file:../wire-avs-debugger"
+    "@wireapp/avs": "npm:10.0.1"
+    "@wireapp/avs-debugger": "npm:0.0.3"
     "@wireapp/commons": "npm:5.2.13"
     "@wireapp/copy-config": "npm:2.2.10"
     "@wireapp/core": "npm:46.4.2"
