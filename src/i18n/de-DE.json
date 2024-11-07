@@ -553,7 +553,6 @@
   "conversationSendPastedFile": "Bild eingefügt am {{date}}",
   "conversationServicesWarning": "Dienste haben Zugriff auf den Inhalt dieser Unterhaltung",
   "conversationSomeone": "Jemand",
-  "conversationStartNewConversation": "Beginnen Sie eine neue Unterhaltung",
   "conversationTeamLeft": "[bold]{{name}}[/bold] wurde aus dem Team entfernt",
   "conversationToday": "Heute",
   "conversationTweetAuthor": " auf Twitter",
