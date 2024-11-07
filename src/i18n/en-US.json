@@ -555,7 +555,7 @@
   "conversationSendPastedFile": "Pasted image at {{date}}",
   "conversationServicesWarning": "Services have access to the content of this conversation",
   "conversationSomeone": "Someone",
-  "conversationStartNewConversation": "Start a new conversation",
+  "conversationStartNewConversation": "Create a Group",
   "conversationTeamLeft": "[bold]{{name}}[/bold] was removed from the team",
   "conversationToday": "today",
   "conversationTweetAuthor": " on Twitter",

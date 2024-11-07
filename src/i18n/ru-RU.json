@@ -553,7 +553,6 @@
   "conversationSendPastedFile": "Изображение добавлено {{date}}",
   "conversationServicesWarning": "Сервисы имеют доступ к содержимому этой беседы",
   "conversationSomeone": "Кто-то",
-  "conversationStartNewConversation": "Начать новую беседу",
   "conversationTeamLeft": "[bold]{{name}}[/bold] был удален из команды",
   "conversationToday": "сегодня",
   "conversationTweetAuthor": " в Twitter",
