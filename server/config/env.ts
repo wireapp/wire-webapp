@@ -164,6 +164,9 @@ export type Env = {
   /** Feature to enable in call reactions */
   FEATURE_ENABLE_IN_CALL_REACTIONS: string;
 
+  /** Feature to enable remove conversation locally */
+  FEATURE_ENABLE_REMOVE_GROUP_CONVERSATION: string;
+
   /** Feature to enable calling popout window */
   FEATURE_ENABLE_DETACHED_CALLING_WINDOW: string;
 
