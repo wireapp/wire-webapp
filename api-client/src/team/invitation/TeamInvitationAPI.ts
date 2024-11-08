@@ -26,6 +26,7 @@ import {
   InvitationNotFoundError,
   InvitationMultipleError,
 } from './InvitationError';
+import {TeamMigrationPayload} from './TeamMigrationPayload';
 
 import {HttpClient, BackendErrorLabel, BackendError} from '../../http/';
 import {NewTeamInvitation, TeamInvitation, TeamInvitationChunk} from '../invitation/';
@@ -38,6 +39,7 @@ export class TeamInvitationAPI {
     INVITATIONS: 'invitations',
     EMAIL: 'by-email',
     ACCEPT: 'accept',
+    UPGRADE_PERSONAL_TO_TEAM: 'upgrade-personal-to-team',
   };
 
   constructor(private readonly client: HttpClient) {}
@@ -164,6 +166,22 @@ export class TeamInvitationAPI {
       data: payload,
       method: 'post',
       url: `${TeamAPI.URL.TEAMS}/${TeamInvitationAPI.URL.INVITATIONS}/${TeamInvitationAPI.URL.ACCEPT}`,
+    };
+
+    const response = await this.client.sendJSON<TeamInvitation>(config);
+    return response.data;
+  }
+
+  public async upgradePersonalToTeamUser({
+    iconKey,
+    icon = 'default',
+    name,
+    currency,
+  }: TeamMigrationPayload): Promise<TeamInvitation> {
+    const config: AxiosRequestConfig = {
+      data: {icon_key: iconKey, icon, name, currency},
+      method: 'post',
+      url: `/${TeamInvitationAPI.URL.UPGRADE_PERSONAL_TO_TEAM}`,
     };
 
     const response = await this.client.sendJSON<TeamInvitation>(config);
