@@ -501,6 +501,8 @@
   "conversationJoin.namePlaceholder": "Your name",
   "conversationJoin.noAccountHead": "Don't have an account?",
   "conversationJoin.subhead": "Join conversation as temporary guest (access expires after 24 hours)",
+  "conversationJoin.termsAcceptanceText": "I accept",
+  "conversationJoin.termsLink": "{brandName}’s Terms of Use",
   "conversationJoinedAfterMLSMigrationFinalisation": "You haven’t updated this device for a while. In the meantime, the standard messaging protocol changed from Proteus to Messaging Layer Security (MLS). Due to this change, some messages may not appear here. [link]Learn more about MLS[/link]",
   "conversationJustNow": "剛剛",
   "conversationLabelDirects": "1:1 Conversations",
