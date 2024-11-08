@@ -51,7 +51,7 @@ import {VerifyEmailCode} from './VerifyEmailCode';
 import {VerifyEmailLink} from './VerifyEmailLink';
 
 import {Config} from '../../Config';
-import {mapLanguage, normalizeLanguage} from '../localeConfig';
+import {DEFAULT_LANGUAGE, mapLanguage, normalizeLanguage} from '../localeConfig';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
@@ -96,7 +96,9 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
   }, []);
 
   const loadLanguage = (language: string) => {
-    return require(`I18n/${mapLanguage(language)}.json`);
+    const defaultLanguage = require(`I18n/${DEFAULT_LANGUAGE}.json`);
+    const userLanguage = require(`I18n/${mapLanguage(language)}.json`);
+    return {...defaultLanguage, ...userLanguage};
   };
 
   const navigate = (route: string): null => {

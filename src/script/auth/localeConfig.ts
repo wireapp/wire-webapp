@@ -25,7 +25,7 @@ import {QUERY_KEY} from './route';
 import {supportedLocales as Locales} from './supportedLocales';
 
 const DEFAULT_CURRENCY = SupportedCurrency.EUR;
-const DEFAULT_LANGUAGE = 'en-US';
+export const DEFAULT_LANGUAGE = 'en-US';
 
 function getLocale(): string {
   return mapLanguage(navigator.languages?.length ? navigator.languages[0] : navigator.language);
