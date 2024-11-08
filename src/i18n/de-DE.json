@@ -501,6 +501,8 @@
   "conversationJoin.namePlaceholder": "Ihr Name",
   "conversationJoin.noAccountHead": "Sie haben kein Benutzerkonto? ",
   "conversationJoin.subhead": "Nehmen Sie als temporärer Gast an der Unterhaltung teil (Zugang verfällt nach 24 Stunden)",
+  "conversationJoin.termsAcceptanceText": "I accept",
+  "conversationJoin.termsLink": "{brandName}’s Terms of Use",
   "conversationJoinedAfterMLSMigrationFinalisation": "Sie haben dieses Gerät schon seit einiger Zeit nicht mehr aktualisiert. In der Zwischenzeit wurde das Standard-Nachrichtenprotokoll von Proteus auf Messaging-Layer-Security (MLS) umgestellt. Aufgrund dieser Änderung werden einige Nachrichten hier möglicherweise nicht angezeigt. [link]Erfahren Sie mehr über MLS[/link]",
   "conversationJustNow": "Gerade eben",
   "conversationLabelDirects": "1:1 Unterhaltungen",
