@@ -94,10 +94,10 @@ import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
 import {TeamState} from '../team/TeamState';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
-import {isCountlyEnabledAtCurrentEnvironment} from '../tracking/Countly.helpers';
 import {EventName} from '../tracking/EventName';
 import * as trackingHelpers from '../tracking/Helpers';
 import {Segmentation} from '../tracking/Segmentation';
+import {isTelemetryEnabledAtCurrentEnvironment} from '../tracking/Telemetry.helpers';
 import type {UserRepository} from '../user/UserRepository';
 import {Warnings} from '../view_model/WarningsContainer';
 
@@ -1177,7 +1177,7 @@ export class CallingRepository {
   }
 
   private readonly leave1on1MLSConference = async (conversationId: QualifiedId) => {
-    if (isCountlyEnabledAtCurrentEnvironment()) {
+    if (isTelemetryEnabledAtCurrentEnvironment()) {
       this.showCallQualityFeedbackModal();
     }
 
@@ -1329,7 +1329,7 @@ export class CallingRepository {
   };
 
   readonly leaveCall = (conversationId: QualifiedId, reason: LEAVE_CALL_REASON): void => {
-    if (isCountlyEnabledAtCurrentEnvironment()) {
+    if (isTelemetryEnabledAtCurrentEnvironment()) {
       this.showCallQualityFeedbackModal();
     }
 

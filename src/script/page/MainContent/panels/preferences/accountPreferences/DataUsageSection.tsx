@@ -25,7 +25,7 @@ import {amplify} from 'amplify';
 import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {getForcedErrorReportingStatus} from 'src/script/tracking/Countly.helpers';
+import {getForcedErrorReportingStatus} from 'src/script/tracking/Telemetry.helpers';
 import {t} from 'Util/LocalizerUtil';
 
 import {PropertiesRepository} from '../../../../../properties/PropertiesRepository';
@@ -58,9 +58,9 @@ const DataUsageSection = ({propertiesRepository, brandName, isActivatedAccount}:
     return () => amplify.unsubscribe(WebAppEvents.PROPERTIES.UPDATED, updateProperties);
   }, []);
 
-  const {isCountlyEnabledAtCurrentEnvironment} = propertiesRepository.getUserConsentStatus();
+  const {isTelemetryEnabledAtCurrentEnvironment} = propertiesRepository.getUserConsentStatus();
 
-  if (!isCountlyEnabledAtCurrentEnvironment && !isActivatedAccount) {
+  if (!isTelemetryEnabledAtCurrentEnvironment && !isActivatedAccount) {
     return null;
   }
 
@@ -68,7 +68,7 @@ const DataUsageSection = ({propertiesRepository, brandName, isActivatedAccount}:
 
   return (
     <PreferencesSection hasSeparator title={t('preferencesAccountData')} className="preferences-section-data-usage">
-      {isCountlyEnabledAtCurrentEnvironment && (
+      {isTelemetryEnabledAtCurrentEnvironment && (
         <div className="checkbox-margin">
           <Checkbox
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {

@@ -35,8 +35,8 @@ import {EventName} from '../../../tracking/EventName';
 import {Segmentation} from '../../../tracking/Segmentation';
 import {UserState} from '../../../user/UserState';
 
-jest.mock('../../../tracking/Countly.helpers', () => ({
-  isCountlyEnabledAtCurrentEnvironment: () => true,
+jest.mock('../../../tracking/Telemetry.helpers', () => ({
+  isTelemetryEnabledAtCurrentEnvironment: () => true,
 }));
 
 describe('QualityFeedbackModal', () => {
