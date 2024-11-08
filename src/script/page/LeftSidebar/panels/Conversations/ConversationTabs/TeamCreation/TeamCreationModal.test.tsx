@@ -101,9 +101,6 @@ describe('TeamCreationModal', () => {
     expect(getByText(getStepString(3))).toBeTruthy();
     fireEvent.click(getByTestId(testIdentifiers.doAcceptTerms));
     fireEvent.click(getByTestId(testIdentifiers.doAcceptMigration));
-    fireEvent.change(getByTestId(testIdentifiers.enterPassword), {
-      target: {value: 'test'},
-    });
 
     fireEvent.click(getByTestId(testIdentifiers.doCreateTeam));
 
