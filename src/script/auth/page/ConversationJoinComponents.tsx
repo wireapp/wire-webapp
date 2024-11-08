@@ -210,7 +210,7 @@ const GuestLoginColumn = ({
                           color: 'var(--accent-color)',
                         }}
                       >
-                        {_({id: 'conversationJoin.termsLink'})}
+                        {_({id: 'conversationJoin.termsLink'}, {brandName: Config.getConfig().BRAND_NAME})}
                       </span>
                     </Link>
                     .
