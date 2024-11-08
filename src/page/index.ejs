@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <!-- Wire, Copyright (C) 2022 Wire Swiss GmbH -->
 <!-- <%= VERSION %> -->
 <html id="wire-main-app">
@@ -22,84 +22,73 @@
     <script src="./min/basicBrowserFeatureCheck.js?v=<%= VERSION %>"></script>
     <script src="./min/checkBrowser.js?v=<%= VERSION %>"></script>
 
-    <script src='./libs/countly/countly.min.js?v=<%= VERSION %>' type='text/javascript'></script>
-    <script type='text/javascript' nonce="<%= COUNTLY_NONCE %>">
-      var Countly = Countly || {};
-      Countly.q = Countly.q || [];
-
-      Countly.offline_mode = true;
-      Countly.use_session_cookie = false;
-      Countly.storage = 'localstorage';
-      Countly.require_consent = true;
-
-      Countly.q.push(['track_sessions']);
-      Countly.q.push(['track_pageview']);
-    </script>
+    <script src="./libs/wire/telemetry/embed.js"></script>
   </head>
 
   <body>
     <main id="wire-app">
-        <style>
-          body {
-            margin: 0;
-          }
+      <style>
+        body {
+          margin: 0;
+        }
 
-          #loader-root {
-            align-items: center;
-            background-color: #fafafa;
-            color: #676b71;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            justify-content: center;
-            position: absolute;
-            width: 100%;
-          }
+        #loader-root {
+          align-items: center;
+          background-color: #fafafa;
+          color: #676b71;
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+          justify-content: center;
+          position: absolute;
+          width: 100%;
+        }
 
-          .loading-spinner {
-            width: 24px;
-            height: 24px;
-            border: 3px solid #000;
-            border-bottom-color: transparent;
-            border-radius: 50%;
-            display: inline-block;
-            box-sizing: border-box;
-            animation: rotation 1s linear infinite;
-          }
+        .loading-spinner {
+          width: 24px;
+          height: 24px;
+          border: 3px solid #000;
+          border-bottom-color: transparent;
+          border-radius: 50%;
+          display: inline-block;
+          box-sizing: border-box;
+          animation: rotation 1s linear infinite;
+        }
 
-          #loading-message {
-            display: none;
-            margin-top: 20px;
-            padding-inline: 16px;
-          }
+        #loading-message {
+          display: none;
+          margin-top: 20px;
+          padding-inline: 16px;
+        }
 
-          #loading-message p {
-            color: #676B71;
-            font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji";
-            font-size: 12px;
-            line-height: 14px;
-            margin: 0;
-            text-align: center;
-          }
+        #loading-message p {
+          color: #676b71;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif, 'Apple Color Emoji',
+            'Segoe UI Emoji';
+          font-size: 12px;
+          line-height: 14px;
+          margin: 0;
+          text-align: center;
+        }
 
-          #loading-message.visible {
-            display: block;
-          }
+        #loading-message.visible {
+          display: block;
+        }
 
-          @keyframes rotation {
-            0% {
-              transform: rotate(0deg);
-            }
-            100% {
-              transform: rotate(360deg);
-            }
+        @keyframes rotation {
+          0% {
+            transform: rotate(0deg);
           }
-        </style>
+          100% {
+            transform: rotate(360deg);
+          }
+        }
+      </style>
 
-        <div id="loader-root">
-            <div class="loading-spinner"></div>
-            <div id="loading-message"></div>
-        </div>
+      <div id="loader-root">
+        <div class="loading-spinner"></div>
+        <div id="loading-message"></div>
+      </div>
     </main>
 
     <script src="./min/loader.js?v=<%= VERSION %>"></script>
