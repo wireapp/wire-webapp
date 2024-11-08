@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.9.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.8.1...@wireapp/api-client@27.9.0) (2024-11-08)
+
+### Features
+
+* add upgrade to personal user api call [WPB-11269] ([#6650](https://github.com/wireapp/wire-web-packages/issues/6650)) ([f102f6e](https://github.com/wireapp/wire-web-packages/commit/f102f6e61a40ae680d6ca4f270f83600e412ce29))
+
 ## [27.8.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.8.0...@wireapp/api-client@27.8.1) (2024-11-04)
 
 **Note:** Version bump only for package @wireapp/api-client
