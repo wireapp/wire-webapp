@@ -357,7 +357,10 @@ export class EventTrackingRepository {
         ...customSegmentations,
       };
 
-      telemetry.trackEvent(eventName, segmentation);
+      telemetry.trackEvent({
+        name: eventName,
+        segmentation,
+      });
 
       this.telemetryLogger.info(`Reporting product event ${eventName}@${JSON.stringify(segmentation)}`);
 
