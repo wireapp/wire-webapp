@@ -6230,6 +6230,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@wireapp/telemetry@file:.yalc/@wireapp/telemetry::locator=wire-webapp%40workspace%3A.":
+  version: 0.0.1
+  resolution: "@wireapp/telemetry@file:.yalc/@wireapp/telemetry#.yalc/@wireapp/telemetry::hash=4b0e8a&locator=wire-webapp%40workspace%3A."
+  dependencies:
+    countly-sdk-web: "npm:24.4.1"
+  checksum: 10/65a90192db1d94b8578342da3cf8d868dbc0ddc8e119d9c5b0023a8212c43177acc7ec8a6ffcaa105216734e98436843d6572bcb59ad393dd5c708491a776e23
+  languageName: node
+  linkType: hard
+
 "@wireapp/webapp-events@npm:0.24.3":
   version: 0.24.3
   resolution: "@wireapp/webapp-events@npm:0.24.3"
@@ -18704,6 +18713,7 @@ __metadata:
     "@wireapp/react-ui-kit": "npm:9.26.0"
     "@wireapp/store-engine": "npm:5.1.11"
     "@wireapp/store-engine-dexie": "npm:2.1.15"
+    "@wireapp/telemetry": "file:.yalc/@wireapp/telemetry"
     "@wireapp/webapp-events": "npm:0.24.3"
     amplify: "https://github.com/wireapp/amplify#head=master"
     archiver: "npm:7.0.1"
@@ -18714,7 +18724,6 @@ __metadata:
     classnames: "npm:2.5.1"
     copy-webpack-plugin: "npm:12.0.2"
     core-js: "npm:3.39.0"
-    countly-sdk-web: "npm:24.4.1"
     cross-env: "npm:7.0.3"
     css-loader: "npm:7.1.2"
     cssnano: "npm:7.0.6"
