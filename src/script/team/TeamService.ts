@@ -70,8 +70,7 @@ export class TeamService {
   }
 
   async upgradePersonalToTeamUser(payload: TeamMigrationPayload) {
-    //return this.apiClient.api.teams.invitation.upgradePersonalToTeamUser(payload);
-    return Promise.resolve();
+    return this.apiClient.api.teams.invitation.upgradePersonalToTeamUser(payload);
   }
 
   getAllTeamFeatures(): Promise<FeatureList> {

@@ -21,9 +21,8 @@ import {useState} from 'react';
 
 import {container} from 'tsyringe';
 
-import {Button, ButtonVariant, Checkbox, ErrorMessage, Input, Link} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, Checkbox, ErrorMessage, Link} from '@wireapp/react-ui-kit';
 
-import {EXTERNAL_ROUTE} from 'src/script/auth/externalRoute';
 import {Config} from 'src/script/Config';
 import {TeamService} from 'src/script/team/TeamService';
 import {t} from 'Util/LocalizerUtil';
@@ -31,7 +30,6 @@ import {t} from 'Util/LocalizerUtil';
 import {StepProps} from './StepProps';
 import {
   listCss,
-  forgotPasswordCss,
   modalButtonsCss,
   termsCheckboxLabelCss,
   termsOfUseLinkCss,
@@ -46,11 +44,15 @@ const confirmationList = [
   t('teamCreationConfirmListItem3'),
 ];
 
+const errorTextMap = {
+  'user-already-in-a-team': t('teamCreationAlreadyInTeamError'),
+  'not-found': t('teamCreationUserNotFoundError'),
+};
+
 export const Confirmation = ({onPreviousStep, onNextStep, teamName}: StepProps) => {
-  const [password, setPassword] = useState('');
   const [isMigrationAccepted, setIsMigrationAccepted] = useState(false);
   const [isTermOfUseAccepted, setIsTermOfUseAccepted] = useState(false);
-  const [hasError, setHasError] = useState(false);
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const teamService = container.resolve(TeamService);
 
@@ -61,8 +63,10 @@ export const Confirmation = ({onPreviousStep, onNextStep, teamName}: StepProps) 
         name: teamName,
       });
       onNextStep();
-    } catch {
-      setHasError(true);
+    } catch (error: any) {
+      if ('label' in error) {
+        setError(errorTextMap[error.label as keyof typeof errorTextMap]);
+      }
     } finally {
       setLoading(false);
     }
@@ -80,26 +84,6 @@ export const Confirmation = ({onPreviousStep, onNextStep, teamName}: StepProps) 
           </li>
         ))}
       </ul>
-
-      <Input
-        label={t('teamCreationConfirmPassInputLabel')}
-        id="password-login"
-        name="password-login"
-        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-          setPassword(event.target.value);
-        }}
-        value={password}
-        type="password"
-        placeholder={t('login.passwordPlaceholder')}
-        pattern={'.{1,1024}'}
-        required
-        data-uie-name="enter-password"
-      />
-      <div css={forgotPasswordCss}>
-        <Link href={EXTERNAL_ROUTE.WIRE_ACCOUNT_PASSWORD_RESET} target="_blank" data-uie-name="go-forgot-password">
-          {t('login.forgotPassword')}
-        </Link>
-      </div>
       <div>
         <Checkbox
           checked={isMigrationAccepted}
@@ -131,7 +115,7 @@ export const Confirmation = ({onPreviousStep, onNextStep, teamName}: StepProps) 
         </Checkbox>
       </div>
 
-      {hasError && <ErrorMessage>{t('teamCreationConfirmError')}</ErrorMessage>}
+      {error && <ErrorMessage>{error}</ErrorMessage>}
 
       <div className="modal__buttons" css={modalButtonsCss}>
         <Button data-uie-name="do-go-back" onClick={onPreviousStep} variant={ButtonVariant.SECONDARY} css={buttonCss}>
@@ -139,7 +123,7 @@ export const Confirmation = ({onPreviousStep, onNextStep, teamName}: StepProps) 
         </Button>
         <Button
           data-uie-name="do-create-team"
-          disabled={!password || !isMigrationAccepted || !isTermOfUseAccepted}
+          disabled={!isMigrationAccepted || !isTermOfUseAccepted}
           css={buttonCss}
           onClick={onSubmit}
           showLoading={loading}

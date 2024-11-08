@@ -19,16 +19,7 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {COLOR_V2, media} from '@wireapp/react-ui-kit';
-
-export const forgotPasswordCss: CSSObject = {
-  textAlign: 'right',
-  marginTop: '-1rem',
-  marginBottom: 'var(--font-size-small)',
-  '& a:link': {
-    color: COLOR_V2.GRAY_60,
-  },
-};
+import {media} from '@wireapp/react-ui-kit';
 
 export const termsCheckboxLabelCss: CSSObject = {
   fontSize: 'var(--font-size-small)',

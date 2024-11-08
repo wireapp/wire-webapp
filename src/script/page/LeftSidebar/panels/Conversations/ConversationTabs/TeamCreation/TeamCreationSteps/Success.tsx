@@ -19,7 +19,7 @@
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {getManageTeamUrl} from 'src/script/externalRoute';
+import {Config} from 'src/script/Config';
 import {t} from 'Util/LocalizerUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 
@@ -29,7 +29,10 @@ import {listCss, modalButtonsCss, successStepSubHeaderCss} from './TeamCreationS
 import {buttonCss} from '../TeamCreation.styles';
 
 export const Success = ({onSuccess, teamName, userName}: StepProps) => {
-  const manageTeamUrl = getManageTeamUrl();
+  const handleOpenTeamsClick = () => {
+    safeWindowOpen(Config.getConfig().URL.TEAMS_BASE);
+    onSuccess();
+  };
 
   return (
     <>
@@ -55,11 +58,9 @@ export const Success = ({onSuccess, teamName, userName}: StepProps) => {
         <Button variant={ButtonVariant.SECONDARY} css={buttonCss} onClick={onSuccess}>
           {t('teamCreationBackToWire')}
         </Button>
-        {manageTeamUrl && (
-          <Button data-uie-name="do-open-team-management" onClick={() => safeWindowOpen(manageTeamUrl)} css={buttonCss}>
-            {t('teamCreationOpenTeamManagement')}
-          </Button>
-        )}
+        <Button data-uie-name="do-open-team-management" onClick={handleOpenTeamsClick} css={buttonCss}>
+          {t('teamCreationOpenTeamManagement')}
+        </Button>
       </div>
     </>
   );

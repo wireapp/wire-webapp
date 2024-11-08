@@ -20,6 +20,8 @@
 import {useState} from 'react';
 
 import {User} from 'src/script/entity/User';
+import {TeamRepository} from 'src/script/team/TeamRepository';
+import {UserRepository} from 'src/script/user/UserRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {ConfirmLeaveModal} from './ConfirmLeaveModal';
@@ -28,16 +30,22 @@ import {TeamCreationModal} from './TeamCreationModal';
 
 interface Props {
   selfUser: User;
+  teamRepository: TeamRepository;
+  userRepository: UserRepository;
 }
 
-export const TeamCreation = ({selfUser}: Props) => {
+export const TeamCreation = ({selfUser, userRepository, teamRepository}: Props) => {
   const [isTeamCreationModalVisible, setIsTeamCreationModalVisible] = useState(false);
   const [isLeaveConfirmModalVisible, setIsLeaveConfirmModalVisible] = useState(false);
   const {name} = useKoSubscribableChildren(selfUser, ['name']);
 
-  const modalCloseHandler = () => {
+  const modalCloseHandler = async () => {
     setIsTeamCreationModalVisible(false);
     setIsLeaveConfirmModalVisible(false);
+
+    // updating cache (selfUser and team data)
+    await userRepository.getSelf();
+    await teamRepository.getTeam();
   };
 
   const modalOpenHandler = () => {
