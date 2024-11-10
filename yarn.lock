@@ -4683,6 +4683,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@remix-run/router@npm:1.21.0":
+  version: 1.21.0
+  resolution: "@remix-run/router@npm:1.21.0"
+  checksum: 10/cf0fb69d19c1b79095ff67c59cea89086f3982a9a54c8a993818a60fc76e0ebab5a8db647c1a96a662729fad8e806ddd0a96622adf473f5a9f0b99998b2dbad4
+  languageName: node
+  linkType: hard
+
 "@roamhq/wrtc-darwin-arm64@npm:0.8.0":
   version: 0.8.0
   resolution: "@roamhq/wrtc-darwin-arm64@npm:0.8.0"
@@ -15746,6 +15753,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-router@npm:6.28.0":
+  version: 6.28.0
+  resolution: "react-router@npm:6.28.0"
+  dependencies:
+    "@remix-run/router": "npm:1.21.0"
+  peerDependencies:
+    react: ">=16.8"
+  checksum: 10/f021a644513144884a567d9c2dcc432e8e3233f931378c219c5a3b5b842340f0faca86225a708bafca1e9010965afe1a7dada28aef5b7b6138c885c0552d9a7d
+  languageName: node
+  linkType: hard
+
 "react-select@npm:5.7.7":
   version: 5.7.7
   resolution: "react-select@npm:5.7.7"
@@ -18772,7 +18790,7 @@ __metadata:
     react-error-boundary: "npm:4.1.2"
     react-intl: "npm:6.8.5"
     react-redux: "npm:9.1.2"
-    react-router: "npm:6.27.0"
+    react-router: "npm:6.28.0"
     react-router-dom: "npm:6.27.0"
     react-transition-group: "npm:4.4.5"
     redux: "npm:5.0.1"
