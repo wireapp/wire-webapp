@@ -3383,9 +3383,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@formatjs/cli@npm:6.3.6":
-  version: 6.3.6
-  resolution: "@formatjs/cli@npm:6.3.6"
+"@formatjs/cli@npm:6.3.8":
+  version: 6.3.8
+  resolution: "@formatjs/cli@npm:6.3.8"
   peerDependencies:
     "@glimmer/env": ^0.1.7
     "@glimmer/reference": ^0.91.1 || ^0.92.0
@@ -3414,7 +3414,7 @@ __metadata:
       optional: true
   bin:
     formatjs: bin/formatjs
-  checksum: 10/7f6f82784f7f4de555aa6f9a26b534b3598aab6ee4cb91030f1d1c2d3b4d91b5a3ac829a1c3ccfd98a734f9732e784480292f7296eb7e28d3a71d873441361f1
+  checksum: 10/da66cc5ccea9ec7c2896174c48b624342b986caf6ec5f910ce1dd53128ecee2be683d2a323c7d74af013e36754b917225c9094bea8bcf5b0a8a04e34ba533521
   languageName: node
   linkType: hard
 
@@ -18663,7 +18663,7 @@ __metadata:
     "@emotion/eslint-plugin": "npm:11.11.0"
     "@emotion/react": "npm:11.11.4"
     "@faker-js/faker": "npm:9.1.0"
-    "@formatjs/cli": "npm:6.3.6"
+    "@formatjs/cli": "npm:6.3.8"
     "@lexical/history": "npm:0.20.0"
     "@lexical/react": "npm:0.20.0"
     "@mediapipe/tasks-vision": "npm:0.10.17"
