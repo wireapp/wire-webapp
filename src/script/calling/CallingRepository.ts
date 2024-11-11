@@ -51,7 +51,7 @@ import {
   WcallClient,
   WcallMember,
 } from '@wireapp/avs';
-import * as avsTrackLogger from '@wireapp/avs-debugger';
+import {AvsDebugger} from '@wireapp/avs-debugger';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -1205,7 +1205,7 @@ export class CallingRepository {
     const conversationIdStr = this.serializeQualifiedId(conversationId);
     this.wCall?.end(this.wUser, conversationIdStr);
     callingSubscriptions.removeCall(conversationId);
-    avsTrackLogger.reset();
+    AvsDebugger.reset();
   };
 
   private readonly leaveMLSConference = async (conversationId: QualifiedId) => {
@@ -1317,12 +1317,16 @@ export class CallingRepository {
 
   requestCurrentPageVideoStreams(call: Call): void {
     const currentPageParticipants = call.pages()[call.currentPage()];
+    if (currentPageParticipants === undefined) {
+      return;
+    }
     const videoQuality: RESOLUTION = RESOLUTION.LOW;
     this.requestVideoStreams(call.conversation.qualifiedId, currentPageParticipants, videoQuality);
   }
 
   requestVideoStreams(conversationId: QualifiedId, participants: Participant[], videoQuality: RESOLUTION) {
     const convId = this.serializeQualifiedId(conversationId);
+
     const payload = {
       clients: participants.map(participant => ({
         clientid: participant.clientId,
@@ -1365,7 +1369,7 @@ export class CallingRepository {
     const conversationIdStr = this.serializeQualifiedId(conversationId);
     delete this.poorCallQualityUsers[conversationIdStr];
     this.wCall?.end(this.wUser, conversationIdStr);
-    avsTrackLogger.reset();
+    AvsDebugger.reset();
   };
 
   muteCall(call: Call, shouldMute: boolean, reason?: MuteState): void {
@@ -2277,7 +2281,7 @@ export class CallingRepository {
       .calls()
       .forEach((call: Call) => this.wCall?.end(this.wUser, this.serializeQualifiedId(call.conversation.qualifiedId)));
 
-    avsTrackLogger.reset();
+    AvsDebugger.reset();
     this.wCall?.destroy(this.wUser);
   }
 

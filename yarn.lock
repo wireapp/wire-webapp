@@ -5996,14 +5996,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/avs-debugger@npm:0.0.3":
-  version: 0.0.3
-  resolution: "@wireapp/avs-debugger@npm:0.0.3"
+"@wireapp/avs-debugger@npm:0.0.5":
+  version: 0.0.5
+  resolution: "@wireapp/avs-debugger@npm:0.0.5"
   dependencies:
     debug: "npm:^4.3.5"
     uuid: "npm:^10.0.0"
     webrtc-internals: "npm:^0.0.8"
-  checksum: 10/5c34e06788efff9ffa15e0775b5e31da4ed2d2156c4acd3a61e23795546bdd79d5838b6e1235e6e25e76db0e2e088e4ccc04e8ea70528d24da9437c344a315eb
+  checksum: 10/0ca37f7af760eab50c16ffafb964901190e4a4ed50d8ff3db8f3a1af25265c2534a1683cce2a52076c3b6994ad90e6e46c8b30845ba12d0c0f7a929f5f5d99de
   languageName: node
   linkType: hard
 
@@ -18723,7 +18723,7 @@ __metadata:
     "@types/webpack-env": "npm:1.18.5"
     "@types/wicg-file-system-access": "npm:^2023.10.5"
     "@wireapp/avs": "npm:10.0.1"
-    "@wireapp/avs-debugger": "npm:0.0.3"
+    "@wireapp/avs-debugger": "npm:0.0.5"
     "@wireapp/commons": "npm:5.2.13"
     "@wireapp/copy-config": "npm:2.2.10"
     "@wireapp/core": "npm:46.6.0"

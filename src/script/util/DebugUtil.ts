@@ -37,7 +37,7 @@ import keyboardjs from 'keyboardjs';
 import {$createTextNode, $getRoot, LexicalEditor} from 'lexical';
 import {container} from 'tsyringe';
 
-import * as avsDebugger from '@wireapp/avs-debugger';
+import {AvsDebugger} from '@wireapp/avs-debugger';
 
 import {showAppNotification} from 'Components/AppNotification';
 import {getStorage} from 'Util/localStorage';
@@ -272,9 +272,9 @@ export class DebugUtil {
       return false;
     }
     if (enable) {
-      avsDebugger.initTrackDebugger();
+      AvsDebugger.initTrackDebugger();
     } else {
-      avsDebugger.destructTrackDebugger();
+      AvsDebugger.destructTrackDebugger();
     }
 
     storage.setItem('avs-debugger-enabled', `${enable}`);

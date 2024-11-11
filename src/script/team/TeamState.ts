@@ -117,7 +117,9 @@ export class TeamState {
       () => this.teamFeatures()?.mls?.config.protocolToggleUsers.includes(this.userState.self().id) ?? false,
     );
 
-    this.isConferenceCallingEnabled = ko.pureComputed(() => true);
+    this.isConferenceCallingEnabled = ko.pureComputed(
+      () => this.teamFeatures()?.conferenceCalling?.status === FeatureStatus.ENABLED,
+    );
     this.isGuestLinkEnabled = ko.pureComputed(
       () => this.teamFeatures()?.conversationGuestLinks?.status === FeatureStatus.ENABLED,
     );
