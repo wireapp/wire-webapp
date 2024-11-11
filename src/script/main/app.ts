@@ -405,7 +405,7 @@ export class App {
           hideSecondary: true,
           primaryAction: {
             action: async () => {
-              await this.logout(SIGN_OUT_REASON.APP_INIT, false);
+              await this.logout(SIGN_OUT_REASON.CLIENT_REMOVED, false);
             },
             text: t('modalAccountLogoutAction'),
           },
