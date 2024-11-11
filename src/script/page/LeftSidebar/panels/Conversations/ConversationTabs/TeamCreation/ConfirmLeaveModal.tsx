@@ -60,7 +60,6 @@ export const ConfirmLeaveModal = ({isShown, onClose, onLeave}: Props) => {
     <ModalComponent
       isShown={isShown}
       onBgClick={closeHandler}
-      onClosed={closeHandler}
       data-uie-name="confirm-leave-modal"
       wrapperCSS={confirmLeaveModalWrapperCss}
     >
