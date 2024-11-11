@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import React, {useState} from 'react';
 
 import {useIntl} from 'react-intl';
 
@@ -35,9 +35,11 @@ import {
   Muted,
   Form,
   Input,
-  InputBlock,
   Loading,
+  Checkbox,
 } from '@wireapp/react-ui-kit';
+
+import {Config} from 'src/script/Config';
 
 import {conversationJoinStrings} from '../../strings';
 import {parseValidationErrors, parseError} from '../util/errorUtil';
@@ -147,6 +149,7 @@ const GuestLoginColumn = ({
   error,
 }: GuestLoginColumnProps) => {
   const {formatMessage: _} = useIntl();
+  const [isTermOfUseAccepted, setIsTermOfUseAccepted] = useState(false);
 
   return (
     <Container centerText verticalCenter style={{width: '100%'}}>
@@ -164,22 +167,55 @@ const GuestLoginColumn = ({
               <H2 center>{_(conversationJoinStrings.noAccountHead)}</H2>
               <Muted>{_(conversationJoinStrings.subhead)}</Muted>
               <Form style={{marginTop: 30}}>
-                <InputBlock>
-                  <Input
-                    id="enter-name"
-                    name="name"
-                    autoComplete="username"
-                    value={enteredName}
-                    ref={nameInput}
-                    onChange={onNameChange}
-                    placeholder={_(conversationJoinStrings.namePlaceholder)}
-                    maxLength={64}
-                    minLength={2}
-                    pattern=".{2,64}"
-                    required
-                    data-uie-name="enter-name"
-                  />
-                </InputBlock>
+                <Input
+                  id="enter-name"
+                  name="name"
+                  autoComplete="username"
+                  value={enteredName}
+                  ref={nameInput}
+                  onChange={onNameChange}
+                  placeholder={_(conversationJoinStrings.namePlaceholder)}
+                  maxLength={64}
+                  minLength={2}
+                  pattern=".{2,64}"
+                  required
+                  data-uie-name="enter-name"
+                  wrapperCSS={{marginBottom: 0}}
+                />
+
+                <Checkbox
+                  checked={isTermOfUseAccepted}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    setIsTermOfUseAccepted(event.target.checked);
+                  }}
+                  id="do-accept-terms"
+                  data-uie-name="do-accept-terms"
+                  wrapperCSS={{
+                    margin: '1rem 0',
+                  }}
+                >
+                  <span className="subline">
+                    {_({id: 'conversationJoin.termsAcceptanceText'})}{' '}
+                    <Link
+                      href={Config.getConfig().URL.TERMS_OF_USE_TEAMS}
+                      css={{
+                        textTransform: 'none',
+                        fontSize: 'var(--font-size-base)',
+                        fontWeight: 'var(--font-weight-regular)',
+                      }}
+                      targetBlank
+                    >
+                      <span
+                        css={{
+                          color: 'var(--accent-color)',
+                        }}
+                      >
+                        {_({id: 'conversationJoin.termsLink'}, {brandName: Config.getConfig().BRAND_NAME})}
+                      </span>
+                    </Link>
+                    .
+                  </span>
+                </Checkbox>
                 {error ? parseValidationErrors(error) : parseError(conversationError)}
                 {isSubmitingName ? (
                   <Loading size={32} />
@@ -187,7 +223,7 @@ const GuestLoginColumn = ({
                   <Button
                     block
                     type="submit"
-                    disabled={!enteredName || !isValidName || isSubmitingName}
+                    disabled={!enteredName || !isValidName || isSubmitingName || !isTermOfUseAccepted}
                     formNoValidate
                     onClick={checkNameValidity}
                     aria-label={_(conversationJoinStrings.joinButton)}

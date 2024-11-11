@@ -184,7 +184,7 @@ export const PrimaryModalComponent: FC = () => {
       [PrimaryModalType.PASSWORD]: () => action(passwordValue),
       [PrimaryModalType.GUEST_LINK_PASSWORD]: () => action(passwordValue, didCopyPassword),
       [PrimaryModalType.JOIN_GUEST_LINK_PASSWORD]: () => action(passwordValue),
-      [PrimaryModalType.PASSWORD_ADVANCED_SECURITY]: () => action(passwordInput),
+      [PrimaryModalType.PASSWORD_ADVANCED_SECURITY]: () => action(passwordInput, isFormSubmitted),
     };
 
     if (Object.keys(actions).includes(content?.currentType ?? '')) {
