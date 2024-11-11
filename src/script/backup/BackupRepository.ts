@@ -37,6 +37,7 @@ import {
   InvalidMetaDataError,
   InvalidPassword,
 } from './Error';
+import {preprocessConversations, preprocessUsers, preprocessEvents} from './recordPreprocessors';
 
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import {isReadableConversation} from '../conversation/ConversationSelectors';
@@ -54,8 +55,18 @@ import BackupImportResult = com.wire.backup.ingest.BackupImportResult;
 import MPBackupExporter = com.wire.backup.dump.MPBackupExporter;
 import BackupQualifiedId = com.wire.backup.data.BackupQualifiedId;
 import BackupMessage = com.wire.backup.data.BackupMessage;
+import BackupUser = com.wire.backup.data.BackupUser;
+import BackUpConversation = com.wire.backup.data.BackupConversation;
 import BackupMessageContent = com.wire.backup.data.BackupMessageContent;
 import BackupDateTime = com.wire.backup.data.BackupDateTime;
+import Dexie from 'dexie';
+import {
+  ConversationTableSchema,
+  ConversationTablesSchema,
+  EventTableSchema,
+  UsersTablesSchema,
+  UserTableSchema,
+} from './TableData.schema';
 /* eslint-enable */
 
 interface Metadata {
@@ -150,21 +161,94 @@ export class BackupRepository {
     }
   }
 
-  private async _exportHistory(progressCallback: ProgressCallback) {
-    const backupExporter = new MPBackupExporter(new BackupQualifiedId('selfUserId', 'selfUserDomain'));
+  private async exportTable<T>(table: Dexie.Table<T, unknown>, preprocessor: (tableRows: T[]) => T[]): Promise<any[]> {
+    const tableData: T[] = [];
 
-    // TODO: Map all conversations, users and messages.
-    //       Currently hardcoded as an example
-    backupExporter.addMessage(
-      new BackupMessage(
-        'backedUpMessageId',
-        new BackupQualifiedId('conversationId', 'conversationDomain'),
-        new BackupQualifiedId('senderUserId', 'senderUserDomain'),
-        'senderClientId',
-        new BackupDateTime(new Date(2024, 10, 3, 12, 30, 0, 0)), // eslint-disable-line
-        new BackupMessageContent.Text('Hello world!'),
+    await this.backupService.exportTable(table, tableRows => {
+      if (this.canceled) {
+        throw new CancelError();
+      }
+      const processedData = preprocessor(tableRows);
+      tableData.push(...processedData);
+    });
+    return tableData;
+  }
+
+  private async _exportHistory(progressCallback: ProgressCallback) {
+    const [conversationTable, eventsTable, usersTable] = this.backupService.getTables();
+    const backupExporter = new MPBackupExporter(new BackupQualifiedId('selfUserId', 'selfUserDomain'));
+    function streamProgress<T>(dataProcessor: (data: T[]) => T[]) {
+      return (data: T[]) => {
+        progressCallback(data.length);
+        return dataProcessor(data);
+      };
+    }
+
+    // Taking care of conversations
+    const conversationsData = ConversationTableSchema.parse(
+      await this.exportTable(conversationTable, streamProgress(preprocessConversations)),
+    );
+    conversationsData.forEach(conversationData =>
+      backupExporter.addConversation(
+        new BackUpConversation(
+          new BackupQualifiedId(conversationData.id, conversationData.domain),
+          conversationData.name ?? '',
+        ),
       ),
     );
+
+    // Taking care of users
+    const usersData = UserTableSchema.parse(await this.exportTable(usersTable, streamProgress(preprocessUsers)));
+    usersData.forEach(userData =>
+      backupExporter.addUser(
+        new BackupUser(
+          new BackupQualifiedId(userData.qualified_id.id, userData.qualified_id.domain),
+          userData.name,
+          userData.handle,
+        ),
+      ),
+    );
+
+    // Taking care of events
+    const eventsData = EventTableSchema.parse(await this.exportTable(eventsTable, streamProgress(preprocessEvents)));
+    eventsData.forEach(eventData => {
+      // ToDo: Add support for other types of messages and different types of content. Also figure out which fields are required.
+      if (!eventData.id) {
+        // eslint-disable-next-line no-console
+        console.log('Event without id', eventData);
+        return;
+      }
+      if (!eventData.qualified_conversation.id) {
+        // eslint-disable-next-line no-console
+        console.log('Event without conversation id', eventData);
+        return;
+      }
+      if (!eventData.qualified_from?.id) {
+        // eslint-disable-next-line no-console
+        console.log('Event without from id', eventData);
+        return;
+      }
+      if (!eventData.from_client_id) {
+        // eslint-disable-next-line no-console
+        console.log('Event without from_client_id', eventData);
+        return;
+      }
+      if (!eventData.data.content) {
+        // eslint-disable-next-line no-console
+        console.log('Event without content', eventData);
+        return;
+      }
+      backupExporter.addMessage(
+        new BackupMessage(
+          eventData.id,
+          new BackupQualifiedId(eventData.qualified_conversation.id, eventData.qualified_conversation.domain),
+          new BackupQualifiedId(eventData.qualified_from.id, eventData.qualified_from.domain),
+          eventData.from_client_id,
+          new BackupDateTime(new Date(eventData.time)),
+          new BackupMessageContent.Text(eventData.data.content),
+        ),
+      );
+    });
 
     return backupExporter.serialize();
   }
@@ -300,16 +384,16 @@ export class BackupRepository {
       if (result instanceof BackupImportResult.Success) {
         console.log(`SUCCESSFUL BACKUP IMPORT: ${result.backupData}`); // eslint-disable-line
         result.backupData.messages.forEach(message => {
-          console.log(`IMPORTED MESSAGE: ${message.toString()}`) // eslint-disable-line
+          console.log(`IMPORTED MESSAGE: ${message.toString()}`); // eslint-disable-line
           // TODO: Import messages.
           //       Convert messages to EventRecord or whatever else needed in order to insert them into the local DB
         });
         result.backupData.conversations.forEach(conversation => {
-          console.log(`IMPORTED CONVERSATION: ${conversation.toString()}`) // eslint-disable-line
+          console.log(`IMPORTED CONVERSATION: ${conversation.toString()}`); // eslint-disable-line
           // TODO: Import conversations
         });
         result.backupData.users.forEach(user => {
-          console.log(`IMPORTED USER: ${user.toString()}`) // eslint-disable-line
+          console.log(`IMPORTED USER: ${user.toString()}`); // eslint-disable-line
           // TODO: Import users
         });
       } else {
