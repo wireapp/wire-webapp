@@ -41,7 +41,7 @@ const stepMap = {
   [Step.Form]: Form,
   [Step.Confirmation]: Confirmation,
   [Step.Success]: Success,
-};
+} as const;
 
 interface Props {
   onClose: () => void;
