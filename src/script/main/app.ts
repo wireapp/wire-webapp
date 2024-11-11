@@ -396,7 +396,25 @@ export class App {
         throw new ClientError(CLIENT_ERROR_TYPE.NO_VALID_CLIENT, 'Client has been deleted on backend');
       }
       const {features: teamFeatures, members: teamMembers} = await teamRepository.initTeam(selfUser.teamId);
-      await this.core.initClient(localClient, getClientMLSConfig(teamFeatures));
+      try {
+        await this.core.initClient(localClient, getClientMLSConfig(teamFeatures));
+      } catch (error) {
+        PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
+          hideCloseBtn: true,
+          preventClose: true,
+          hideSecondary: true,
+          primaryAction: {
+            action: async () => {
+              await this.logout(SIGN_OUT_REASON.APP_INIT, false);
+            },
+            text: t('modalAccountLogoutAction'),
+          },
+          text: {
+            title: t('unknownApplicationErrorTitle'),
+            message: t('modalUnableToReceiveMessages'),
+          },
+        });
+      }
 
       const e2eiHandler = await configureE2EI(teamFeatures);
       configureDownloadPath(teamFeatures);
