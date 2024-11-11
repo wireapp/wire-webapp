@@ -22,6 +22,7 @@ import {Role} from '../member';
 export interface TeamInvitation {
   created_at: string;
   created_by: string;
+  created_by_email: string;
   email: string;
   id: string;
   name?: string;
