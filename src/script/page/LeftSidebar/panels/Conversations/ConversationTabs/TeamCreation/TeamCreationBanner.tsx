@@ -35,7 +35,7 @@ import {
 
 import {SidebarStatus, useSidebarStore} from '../../useSidebarStore';
 
-const Banner = () => {
+const Banner = ({onClick}: {onClick: () => void}) => {
   return (
     <div css={teamUpgradeBannerContainerCss}>
       <Icon.InfoIcon />
@@ -45,7 +45,7 @@ const Banner = () => {
       <div className="subline" css={teamUpgradeBannerContentCss}>
         {t('teamUpgradeBannerContent')}
       </div>
-      <Button css={teamUpgradeBannerButtonCss} variant={ButtonVariant.SECONDARY}>
+      <Button css={teamUpgradeBannerButtonCss} variant={ButtonVariant.SECONDARY} onClick={onClick}>
         {t('teamUpgradeBannerButtonText')}
       </Button>
     </div>
@@ -55,7 +55,7 @@ const Banner = () => {
 const PADDING_X = 40;
 const PADDING_Y = 34;
 
-export const TeamCreationBanner = () => {
+export const TeamCreationBanner = ({onClick}: {onClick: () => void}) => {
   const [isBannerVisible, setIsBannerVisible] = useState(false);
   const [position, setPosition] = useState<{x: number; y: number}>({x: 0, y: 0});
   const {status: sidebarStatus} = useSidebarStore();
@@ -65,8 +65,13 @@ export const TeamCreationBanner = () => {
     setPosition({x: rect.x, y: rect.y});
   };
 
+  const bannerBtnClickHandler = () => {
+    setIsBannerVisible(false);
+    onClick();
+  };
+
   if (sidebarStatus === SidebarStatus.OPEN) {
-    return <Banner />;
+    return <Banner onClick={bannerBtnClickHandler} />;
   }
 
   return (
@@ -81,7 +86,7 @@ export const TeamCreationBanner = () => {
           positionY={position.y + PADDING_Y}
           onClose={() => setIsBannerVisible(false)}
         >
-          <Banner />
+          <Banner onClick={bannerBtnClickHandler} />
         </BannerPortal>
       )}
     </>

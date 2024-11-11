@@ -342,6 +342,8 @@ const Conversations: React.FC<ConversationsProps> = ({
               conversationRepository={conversationRepository}
               onClickPreferences={() => onClickPreferences(ContentState.PREFERENCES_ACCOUNT)}
               showNotificationsBadge={notifications.length > 0}
+              userRepository={userRepository}
+              teamRepository={teamRepository}
             />
           )
         }
