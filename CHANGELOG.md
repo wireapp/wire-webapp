@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.10.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.9.0...@wireapp/api-client@27.10.0) (2024-11-11)
+
+### Features
+
+* **team-inv-info:** add created_by_email in TeamInvitation type [WPB-12142] ([#6662](https://github.com/wireapp/wire-web-packages/issues/6662)) ([042bb15](https://github.com/wireapp/wire-web-packages/commit/042bb15250dc862f243607c47df42f1e5b92c610))
+
 # [27.9.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.8.1...@wireapp/api-client@27.9.0) (2024-11-08)
 
 ### Features
