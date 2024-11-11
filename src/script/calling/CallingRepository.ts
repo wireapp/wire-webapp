@@ -2201,7 +2201,7 @@ export class CallingRepository {
       call.analyticsScreenSharing = true;
     }
 
-    if (call.state() === CALL_STATE.MEDIA_ESTAB && isSameUser && !selfParticipant.sharesScreen()) {
+    if (call.state() !== CALL_STATE.MEDIA_ESTAB && isSameUser && !selfParticipant.sharesScreen()) {
       selfParticipant.releaseVideoStream(true);
     }
 
