@@ -2169,6 +2169,7 @@ export class CallingRepository {
     if (!call) {
       return;
     }
+
     const participant = call.getParticipant(userId, clientId);
     if (!participant) {
       return;
@@ -2199,10 +2200,6 @@ export class CallingRepository {
 
     if (state === VIDEO_STATE.SCREENSHARE) {
       call.analyticsScreenSharing = true;
-    }
-
-    if (call.state() !== CALL_STATE.MEDIA_ESTAB && isSameUser && !selfParticipant.sharesScreen()) {
-      selfParticipant.releaseVideoStream(true);
     }
 
     call
