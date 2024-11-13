@@ -60,6 +60,7 @@ const tooltipStyle: (theme: Theme) => CSSObject = theme => ({
     fontWeight: 400,
     padding: `${paddingDistance}px 8px`,
     textAlign: 'center',
+    overflowWrap: 'break-word',
   },
 
   '.tooltip-arrow': {
