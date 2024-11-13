@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.26.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.26.1...@wireapp/react-ui-kit@9.26.2) (2024-11-13)
+
+### Bug Fixes
+
+* **react-ui-kit:** fix content inside tooltip [WPB-11596] ([#6664](https://github.com/wireapp/wire-web-packages/issues/6664)) ([38b2f38](https://github.com/wireapp/wire-web-packages/commit/38b2f3862a3baddf83226b44be1ad7fe63366602))
+
 ## [9.26.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.26.0...@wireapp/react-ui-kit@9.26.1) (2024-11-04)
 
 ### Bug Fixes
