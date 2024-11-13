@@ -911,7 +911,7 @@
   "modalAccountLeaveGuestRoomHeadline": "Leave the guest room?",
   "modalAccountLeaveGuestRoomMessage": "Conversation history will be deleted. To keep it, create an account next time.",
   "modalAccountLogoutAction": "Log out",
-  "modalUnableToReceiveMessages": "You can’t receive messages at the moment. Please log out and log in again directly to resolve this case. Back up your history on another device so you don’t miss any messages.",
+  "modalUnableToReceiveMessages": "You can’t receive messages at the moment. Please log out and log in again directly to resolve this case.",
   "modalAccountLogoutHeadline": "Clear Data?",
   "modalAccountLogoutOption": "Delete all your personal information and conversations on this device.",
   "modalAccountNewDevicesFrom": "From:",
