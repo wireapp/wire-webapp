@@ -17,7 +17,7 @@
  *
  */
 
-import {ChangeEvent, useCallback, useState} from 'react';
+import {ChangeEvent, useCallback, useMemo, useState} from 'react';
 
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -96,9 +96,12 @@ export const UserList = ({
 }: UserListProps) => {
   const [maxShownUsers, setMaxShownUsers] = useState(USER_CHUNK_SIZE);
 
+  // filter out deleted users
+  const filteredUsers = useMemo(() => users.filter(user => !user.isDeleted), [users]);
+
   const [expandedFolders, setExpandedFolders] = useState<UserListSections[]>([UserListSections.CONTACTS]);
 
-  const hasMoreUsers = !truncate && users.length > maxShownUsers;
+  const hasMoreUsers = !truncate && filteredUsers.length > maxShownUsers;
 
   const highlightedUserIds = highlightedUsers.map(user => user.id);
   const {is_verified: isSelfVerified} = useKoSubscribableChildren(selfUser, ['is_verified']);
@@ -159,7 +162,7 @@ export const UserList = ({
     let adminCount = 0;
     let memberCount = 0;
 
-    users.forEach((userEntity: User) => {
+    filteredUsers.forEach((userEntity: User) => {
       if (userEntity.isService) {
         return;
       }
@@ -213,7 +216,7 @@ export const UserList = ({
       </>
     );
   } else {
-    const truncatedUsers = truncate ? users.slice(0, reducedUserCount) : users;
+    const truncatedUsers = truncate ? filteredUsers.slice(0, reducedUserCount) : filteredUsers;
     const isSelected = (userEntity: User): boolean =>
       isSelectable && !!selectedUsers?.some(user => user.id === userEntity.id);
 
