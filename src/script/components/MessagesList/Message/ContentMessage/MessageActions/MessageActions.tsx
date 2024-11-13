@@ -152,6 +152,11 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
     [currentMsgActionName, handleMenuOpen],
   );
 
+  /*
+   * Alex Ishenko
+   * This is the reply functionality,
+   * TODO: we need "Reply in Thread" button which will create a new converstaion
+   */
   const handleMessageReply = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
       toggleActiveMenu(event);

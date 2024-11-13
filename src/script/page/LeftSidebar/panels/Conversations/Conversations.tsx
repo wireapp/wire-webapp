@@ -79,7 +79,11 @@ type ConversationsProps = {
   teamRepository: TeamRepository;
   userRepository: UserRepository;
 };
-
+/*
+ * Alex Ishenko
+ * TODO: split this into smaller parts
+ * TODO: add relevant to threads functionality such as displaying threads
+ */
 const Conversations: React.FC<ConversationsProps> = ({
   integrationRepository,
   searchRepository,

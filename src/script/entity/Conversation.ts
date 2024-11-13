@@ -83,6 +83,10 @@ enum TIMESTAMP_TYPE {
   MUTED = 'mutedTimestamp',
 }
 
+/*
+ * Alex Ishenko
+ * Wow!
+ */
 export class Conversation {
   private readonly teamState: TeamState;
   public readonly archivedState: ko.Observable<boolean>;
@@ -172,6 +176,11 @@ export class Conversation {
   public readonly showNotificationsNothing: ko.PureComputed<boolean>;
   public status: ko.Observable<ConversationStatus>;
   public teamId: string;
+  /*
+   * Alex Ishenko
+   * TODO: add new CONVERSATION_TYPE called THREAD
+   * node_modules/@wireapp/api-client/lib/conversation/Conversation.d.ts
+   */
   public readonly type: ko.Observable<CONVERSATION_TYPE>;
   public readonly unreadState: ko.PureComputed<UnreadState>;
   public readonly verification_state = ko.observable(ConversationVerificationState.UNVERIFIED);
@@ -182,6 +191,12 @@ export class Conversation {
   public accessModes?: CONVERSATION_ACCESS[];
   public accessRole?: CONVERSATION_LEGACY_ACCESS_ROLE | CONVERSATION_ACCESS_ROLE[];
   public domain: string;
+  /*
+   * Alex Ishenko
+   * TODO: Add some more properties depends on feature requirements. for example link to message
+   * May be name and/or display_name are enough to display the proper header for a thread, may be not
+   * this may cause also adding relevant functionality in other places and affect API
+   */
 
   static get TIMESTAMP_TYPE(): typeof TIMESTAMP_TYPE {
     return TIMESTAMP_TYPE;

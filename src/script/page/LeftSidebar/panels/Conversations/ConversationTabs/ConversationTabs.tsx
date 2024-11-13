@@ -121,6 +121,10 @@ export const ConversationTabs = ({
       Icon: <GroupIcon />,
       unreadConversations: groupConversations.filter(filterUnreadAndArchivedConversations).length,
     },
+    /*
+     * Alex Ishenko
+     * TODO: Add menu item for threads
+     */
     {
       type: SidebarTabs.DIRECTS,
       title: t('conversationLabelDirects'),
