@@ -96,6 +96,7 @@ const checkBrowser = (): void => {
     console.error("This browser doesn't support cookies to run the Wire app!");
     return;
   }
+  // Skip the mobile browser check for OAuth
   if (isOauth()) {
     return;
   }
