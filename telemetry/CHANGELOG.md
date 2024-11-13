@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.0.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/telemetry@0.2.0...@wireapp/telemetry@0.0.1) (2024-11-13)
+
+### Bug Fixes
+
+* **telemetry:** version ([#6663](https://github.com/wireapp/wire-web-packages/issues/6663)) ([5f5c982](https://github.com/wireapp/wire-web-packages/commit/5f5c982f395c309211f9652b92728cea67515cda))
+
 # 0.2.0 (2024-11-12)
 
 ### Features
