@@ -99,12 +99,13 @@ const checkBrowser = (): void => {
   if (isOauth()) {
     return;
   }
-  if (!('RTCPeerConnection' in window)) {
+  const isMobile = window.matchMedia('(any-pointer:coarse)').matches;
+  if (!('RTCPeerConnection' in window) || isMobile) {
     location.href = '/unsupported/';
     console.error("This browser doesn't support RTC to run the Wire app!");
     return;
   }
-  supportsIndexDB()
+  void supportsIndexDB()
     .catch(() => false)
     .then(res => {
       if (!res) {
