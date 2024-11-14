@@ -45,23 +45,6 @@ import type {ContributedSegmentations, MessageRepository} from '../conversation/
 import {ClientEvent} from '../event/Client';
 import {TeamState} from '../team/TeamState';
 
-const telementaryConsentFeatures: Array<telemetry.TelemetryConsentFeatures> = [
-  'sessions',
-  'events',
-  'views',
-  'scrolls',
-  'clicks',
-  'forms',
-  'crashes',
-  'attribution',
-  'users',
-  'star-rating',
-  'feedback',
-  'location',
-  'remote-config',
-  'apm',
-];
-
 export class EventTrackingRepository {
   private isProductReportingActivated: boolean = false;
   private sendAppOpenEvent: boolean = true;
@@ -203,11 +186,11 @@ export class EventTrackingRepository {
 
   private readonly toggleTelemetry = async (isEnabled: boolean) => {
     if (isEnabled && this.isDomainAllowedForAnalytics()) {
-      telemetry.addConsentFeatures(telementaryConsentFeatures);
+      telemetry.addAllConsentFeatures();
       this.telemetryLogger.info('Consent was given due to user preferences');
       await this.startProductReporting();
     } else {
-      telemetry.removeConsentFeatures(telementaryConsentFeatures);
+      telemetry.removeAllConsentFeatures();
       this.telemetryLogger.info('Consent was removed due to user preferences');
       this.stopProductReporting();
     }
