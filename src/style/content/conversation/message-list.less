@@ -357,8 +357,10 @@
   cursor: pointer;
 
   &--no-image {
-    background-color: var(--foreground-fade-8);
-    cursor: default;
+    .message-asset & {
+      background-color: var(--foreground-fade-8);
+      cursor: default;
+    }
   }
 
   .image-icon svg {
