@@ -67,6 +67,7 @@ class Server {
     this.initStaticRoutes();
     this.initWebpack();
     this.initSiteMap(this.config);
+    // eslint-disable-next-line import/no-named-as-default-member
     this.app.use('/libs', express.static(path.join(__dirname, 'libs')));
     this.app.use(Root());
     this.app.use(HealthCheckRoute());
