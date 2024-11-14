@@ -102,7 +102,7 @@ export const ContentMessageComponent = ({
   const {
     senderName,
     timestamp,
-    ephemeral_caption: ephemeralCaption,
+    ephemeralCaption,
     ephemeral_status,
     assets,
     was_edited,
@@ -114,7 +114,7 @@ export const ContentMessageComponent = ({
   } = useKoSubscribableChildren(message, [
     'senderName',
     'timestamp',
-    'ephemeral_caption',
+    'ephemeralCaption',
     'ephemeral_status',
     'assets',
     'was_edited',
