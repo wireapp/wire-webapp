@@ -223,11 +223,7 @@ export class BackupRepository {
         console.log('Event without conversation id', eventData);
         return;
       }
-      if (!eventData.qualified_from?.id) {
-        // eslint-disable-next-line no-console
-        console.log('Event without from id', eventData);
-        return;
-      }
+
       if (!eventData.from_client_id) {
         // eslint-disable-next-line no-console
         console.log('Event without from_client_id', eventData);
@@ -242,7 +238,8 @@ export class BackupRepository {
         new BackupMessage(
           eventData.id,
           new BackupQualifiedId(eventData.qualified_conversation.id, eventData.qualified_conversation.domain),
-          new BackupQualifiedId(eventData.qualified_from.id, eventData.qualified_from.domain),
+          // this needs to be optional for message type 16 (self messages)
+          new BackupQualifiedId(eventData.qualified_from?.id ?? '', eventData.qualified_from?.domain ?? ''),
           eventData.from_client_id,
           new BackupDateTime(new Date(eventData.time)),
           new BackupMessageContent.Text(eventData.data.content),
