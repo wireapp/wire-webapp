@@ -575,9 +575,9 @@ export class UserRepository extends TypedEventEmitter<Events> {
   }
 
   // Replaces a deleted user name ("default") with the name from the local database.
-  private replaceDefaultUserName(apiUsers: APIClientUser[], dbUsers: UserRecord[]): UserRecord[] {
+  private replaceDeletedUserName(apiUsers: APIClientUser[], dbUsers: UserRecord[]): UserRecord[] {
     return apiUsers.map(user => {
-      if (user.name !== 'default') {
+      if (!user.deleted) {
         return user;
       }
 
@@ -615,7 +615,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
       return new User(userId.id, userId.domain);
     });
 
-    const users = this.replaceDefaultUserName(found, dbUsers);
+    const users = this.replaceDeletedUserName(found, dbUsers);
 
     const mappedUsers = this.userMapper.mapUsersFromJson(users, selfDomain).concat(failedToLoad);
 
