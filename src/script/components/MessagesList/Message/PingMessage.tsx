@@ -36,7 +36,12 @@ export interface PingMessageProps {
   onClickDetails: (message: Message) => void;
 }
 
-const PingMessage = ({message, is1to1Conversation, isLastDeliveredMessage, onClickDetails}: PingMessageProps) => {
+export const PingMessage = ({
+  message,
+  is1to1Conversation,
+  isLastDeliveredMessage,
+  onClickDetails,
+}: PingMessageProps) => {
   const {unsafeSenderName, caption, ephemeralCaption, isObfuscated, iconClasses} = useKoSubscribableChildren(message, [
     'unsafeSenderName',
     'caption',
@@ -50,6 +55,7 @@ const PingMessage = ({message, is1to1Conversation, isLastDeliveredMessage, onCli
       <div className="message-header-icon">
         <div className={cx('icon-ping', iconClasses)} />
       </div>
+
       <div
         className={cx('message-header-label message-header-ping', {
           'ephemeral-message-obfuscated': isObfuscated,
@@ -57,31 +63,29 @@ const PingMessage = ({message, is1to1Conversation, isLastDeliveredMessage, onCli
         title={ephemeralCaption}
         data-uie-name="element-message-ping-text"
       >
-        <p className="message-header-label__multiline">
-          <span className="message-header-sender-name">{unsafeSenderName}</span>
-          <span className="ellipsis">{caption}</span>
-        </p>
+        <div className="message-header-content">
+          <p className="message-header-label__multiline message-ping__content">
+            <span className="message-header-sender-name">{unsafeSenderName}</span>
+            <span className="ellipsis">{caption}</span>
+          </p>
 
-        <div>
           <ReadReceiptStatus
             message={message}
             is1to1Conversation={is1to1Conversation}
             onClickDetails={onClickDetails}
           />
-
-          {message.expectsReadConfirmation && is1to1Conversation && isLastDeliveredMessage && (
-            <div
-              data-uie-name="status-message-read-receipt-delivered"
-              title={t('conversationMessageDelivered')}
-              className="delivered-message-icon"
-            >
-              <OutlineCheck />
-            </div>
-          )}
         </div>
+
+        {message.expectsReadConfirmation && is1to1Conversation && isLastDeliveredMessage && (
+          <div
+            data-uie-name="status-message-read-receipt-delivered"
+            title={t('conversationMessageDelivered')}
+            className="delivered-message-icon"
+          >
+            <OutlineCheck />
+          </div>
+        )}
       </div>
     </div>
   );
 };
-
-export {PingMessage};
