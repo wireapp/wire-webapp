@@ -21,8 +21,9 @@ import {useState} from 'react';
 
 import {container} from 'tsyringe';
 
-import {Button, ButtonVariant, Checkbox, ErrorMessage, Link} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, Checkbox, Link} from '@wireapp/react-ui-kit';
 
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {Config} from 'src/script/Config';
 import {TeamService} from 'src/script/team/TeamService';
 import {t} from 'Util/LocalizerUtil';
@@ -44,15 +45,11 @@ const confirmationList = [
   t('teamCreationConfirmListItem3'),
 ];
 
-const errorTextMap = {
-  'user-already-in-a-team': t('teamCreationAlreadyInTeamError'),
-  'not-found': t('teamCreationUserNotFoundError'),
-};
+const alreadyPartOfTeamErrorCode = 403;
 
-export const Confirmation = ({onPreviousStep, onNextStep, teamName}: StepProps) => {
+export const Confirmation = ({onPreviousStep, onNextStep, teamName, goToFirstStep, onSuccess}: StepProps) => {
   const [isMigrationAccepted, setIsMigrationAccepted] = useState(false);
   const [isTermOfUseAccepted, setIsTermOfUseAccepted] = useState(false);
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const teamService = container.resolve(TeamService);
 
@@ -64,8 +61,30 @@ export const Confirmation = ({onPreviousStep, onNextStep, teamName}: StepProps) 
       });
       onNextStep();
     } catch (error: any) {
-      if ('label' in error) {
-        setError(errorTextMap[error.label as keyof typeof errorTextMap]);
+      if (error.code === alreadyPartOfTeamErrorCode) {
+        PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
+          primaryAction: {
+            action: onSuccess,
+            text: t('teamCreationAlreadyInTeamErrorActionText'),
+          },
+          close: onSuccess,
+          text: {
+            message: t('teamCreationAlreadyInTeamErrorMessage'),
+            title: t('teamCreationAlreadyInTeamErrorTitle'),
+          },
+        });
+      } else {
+        PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
+          primaryAction: {
+            action: goToFirstStep,
+            text: t('teamCreationGeneralErrorActionText'),
+          },
+          close: goToFirstStep,
+          text: {
+            message: t('teamCreationGeneralErrorMessage'),
+            title: t('teamCreationGeneralErrorTitle'),
+          },
+        });
       }
     } finally {
       setLoading(false);
@@ -114,8 +133,6 @@ export const Confirmation = ({onPreviousStep, onNextStep, teamName}: StepProps) 
           </span>
         </Checkbox>
       </div>
-
-      {error && <ErrorMessage>{error}</ErrorMessage>}
 
       <div className="modal__buttons" css={modalButtonsCss}>
         <Button data-uie-name="do-go-back" onClick={onPreviousStep} variant={ButtonVariant.SECONDARY} css={buttonCss}>
