@@ -49,7 +49,13 @@ export const ConfirmLeaveModal = ({isShown, onClose, onLeave}: Props) => {
         <h2 className="modal__header__title" data-uie-name="confirm-leave-modal-title">
           {t('teamCreationLeaveModalTitle')}
         </h2>
-        <button type="button" className="modal__header__button" onClick={onClose} data-uie-name="do-close">
+        <button
+          type="button"
+          className="modal__header__button"
+          onClick={onClose}
+          data-uie-name="do-close"
+          aria-label={t('teamCreationLeaveModalCloseLabel')}
+        >
           <Icon.CloseIcon />
         </button>
       </div>

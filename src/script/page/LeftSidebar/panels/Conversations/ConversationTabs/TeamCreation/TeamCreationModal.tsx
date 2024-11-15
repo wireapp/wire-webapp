@@ -43,6 +43,13 @@ const stepMap = {
   [Step.Success]: Success,
 } as const;
 
+const stepCloseButtonLabelMap = {
+  [Step.Introduction]: t('teamCreationIntroCloseLabel'),
+  [Step.Form]: t('teamCreationCreateTeamCloseLabel'),
+  [Step.Confirmation]: t('teamCreationConfirmCloseLabel'),
+  [Step.Success]: t('teamCreationSuccessCloseLabel'),
+} as const;
+
 interface Props {
   onClose: () => void;
   onSuccess: () => void;
@@ -86,7 +93,13 @@ export const TeamCreationModal = ({onClose, onSuccess, userName}: Props) => {
           {t('teamCreationTitle')}
         </h2>
 
-        <button type="button" className="modal__header__button" onClick={modalOnClose} data-uie-name="do-close">
+        <button
+          type="button"
+          className="modal__header__button"
+          onClick={modalOnClose}
+          data-uie-name="do-close"
+          aria-label={stepCloseButtonLabelMap[currentStep]}
+        >
           <Icon.CloseIcon />
         </button>
       </div>
