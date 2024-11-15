@@ -49,6 +49,13 @@ const stepMap = {
   [Step.Success]: Success,
 } as const;
 
+const stepCloseButtonLabelMap = {
+  [Step.Introduction]: t('teamCreationIntroCloseLabel'),
+  [Step.Form]: t('teamCreationCreateTeamCloseLabel'),
+  [Step.Confirmation]: t('teamCreationConfirmCloseLabel'),
+  [Step.Success]: t('teamCreationSuccessCloseLabel'),
+} as const;
+
 const segmentationModalStepMap = {
   [Step.Introduction]: Segmentation.TEAM_CREATION_STEP.MODAL_DISCLAIMERS,
   [Step.Form]: Segmentation.TEAM_CREATION_STEP.MODAL_TEAM_NAME,
@@ -129,7 +136,13 @@ export const TeamCreationModal = ({onClose, onSuccess, userName}: Props) => {
           {t('teamCreationTitle')}
         </h2>
 
-        <button type="button" className="modal__header__button" onClick={closeModalHandler} data-uie-name="do-close">
+        <button
+          type="button"
+          className="modal__header__button"
+          onClick={closeModalHandler}
+          data-uie-name="do-close"
+          aria-label={stepCloseButtonLabelMap[currentStep]}
+        >
           <Icon.CloseIcon />
         </button>
       </div>
