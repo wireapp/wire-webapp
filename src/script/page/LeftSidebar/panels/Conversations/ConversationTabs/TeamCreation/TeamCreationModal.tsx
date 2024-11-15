@@ -17,10 +17,16 @@
  *
  */
 
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
+
+import {amplify} from 'amplify';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/Icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
+import {EventName} from 'src/script/tracking/EventName';
+import {Segmentation} from 'src/script/tracking/Segmentation';
 import {t} from 'Util/LocalizerUtil';
 
 import {teamCreationModalBodyCss, teamCreationModalWrapperCss} from './TeamCreation.styles';
@@ -50,6 +56,12 @@ const stepCloseButtonLabelMap = {
   [Step.Success]: t('teamCreationSuccessCloseLabel'),
 } as const;
 
+const segmentationModalStepMap = {
+  [Step.Introduction]: Segmentation.TEAM_CREATION_STEP.MODAL_DISCLAIMERS,
+  [Step.Form]: Segmentation.TEAM_CREATION_STEP.MODAL_TEAM_NAME,
+  [Step.Confirmation]: Segmentation.TEAM_CREATION_STEP.MODAL_CONFIRMATION,
+} as const;
+
 interface Props {
   onClose: () => void;
   onSuccess: () => void;
@@ -63,22 +75,53 @@ export const TeamCreationModal = ({onClose, onSuccess, userName}: Props) => {
 
   const nextStepHandler = () => {
     const currentStepIndex = stepsSequence.indexOf(currentStep);
-    setCurrentStep(stepsSequence[currentStepIndex + 1] as Step);
+    const step = stepsSequence[currentStepIndex + 1] as Step;
+    setCurrentStep(step);
+
+    if (step != Step.Success) {
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.USER.PERSONAL_TEAM_CREATION.FLOW_STARTED, {
+        step: segmentationModalStepMap[step],
+      });
+    }
   };
 
   const previousStepHandler = () => {
     const currentStepIndex = stepsSequence.indexOf(currentStep);
-    setCurrentStep(stepsSequence[currentStepIndex - 1] as Step);
+    const step = stepsSequence[currentStepIndex - 1] as Step;
+    setCurrentStep(step);
+
+    if (step != Step.Success) {
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.USER.PERSONAL_TEAM_CREATION.FLOW_STARTED, {
+        step: segmentationModalStepMap[step],
+      });
+    }
+  };
+
+  const closeModalHandler = () => {
+    if (currentStep === Step.Success) {
+      onSuccess();
+      return;
+    }
+
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.USER.PERSONAL_TEAM_CREATION.FLOW_STOPPED, {
+      step: segmentationModalStepMap[currentStep],
+    });
+    onClose();
   };
 
   const StepBody = stepMap[currentStep];
-  const modalOnClose = currentStep === Step.Success ? onSuccess : onClose;
+
+  useEffect(() => {
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.USER.PERSONAL_TEAM_CREATION.FLOW_STARTED, {
+      step: Segmentation.TEAM_CREATION_STEP.MODAL_DISCLAIMERS,
+    });
+  }, []);
 
   return (
     <ModalComponent
       isShown
-      onBgClick={modalOnClose}
-      onClosed={modalOnClose}
+      onBgClick={closeModalHandler}
+      onClosed={closeModalHandler}
       data-uie-name="team-creation-modal"
       wrapperCSS={teamCreationModalWrapperCss}
     >
@@ -96,7 +139,7 @@ export const TeamCreationModal = ({onClose, onSuccess, userName}: Props) => {
         <button
           type="button"
           className="modal__header__button"
-          onClick={modalOnClose}
+          onClick={closeModalHandler}
           data-uie-name="do-close"
           aria-label={stepCloseButtonLabelMap[currentStep]}
         >

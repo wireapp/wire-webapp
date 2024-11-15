@@ -17,9 +17,14 @@
  *
  */
 
+import {amplify} from 'amplify';
+
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Config} from 'src/script/Config';
+import {EventName} from 'src/script/tracking/EventName';
+import {Segmentation} from 'src/script/tracking/Segmentation';
 import {t} from 'Util/LocalizerUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 
@@ -31,6 +36,16 @@ import {buttonCss} from '../TeamCreation.styles';
 export const Success = ({onSuccess, teamName, userName}: StepProps) => {
   const handleOpenTeamsClick = () => {
     safeWindowOpen(Config.getConfig().URL.TEAMS_BASE);
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.USER.PERSONAL_TEAM_CREATION.FLOW_COMPLETED, {
+      step: Segmentation.TEAM_CREATION_STEP.MODAL_OPEN_TM_CLICKED,
+    });
+    onSuccess();
+  };
+
+  const successHandler = () => {
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.USER.PERSONAL_TEAM_CREATION.FLOW_COMPLETED, {
+      step: Segmentation.TEAM_CREATION_STEP.MODAL_BACK_TO_WIRE_CLICKED,
+    });
     onSuccess();
   };
 
@@ -55,7 +70,7 @@ export const Success = ({onSuccess, teamName, userName}: StepProps) => {
       </ul>
 
       <div className="modal__buttons" css={modalButtonsCss}>
-        <Button variant={ButtonVariant.SECONDARY} css={buttonCss} onClick={onSuccess}>
+        <Button variant={ButtonVariant.SECONDARY} css={buttonCss} onClick={successHandler}>
           {t('teamCreationBackToWire')}
         </Button>
         <Button data-uie-name="do-open-team-management" onClick={handleOpenTeamsClick} css={buttonCss}>

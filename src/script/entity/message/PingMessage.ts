@@ -24,10 +24,12 @@ import {t} from 'Util/LocalizerUtil';
 import {Message} from './Message';
 
 import {SuperType} from '../../message/SuperType';
+import {ReactionMap} from '../../storage';
 
 export class PingMessage extends Message {
   public readonly caption: ko.PureComputed<string>;
-  public readonly get_icon_classes: ko.PureComputed<string>;
+  public readonly iconClasses: ko.PureComputed<string>;
+  readonly reactions = ko.observable<ReactionMap>([]);
 
   constructor() {
     super();
@@ -35,13 +37,10 @@ export class PingMessage extends Message {
 
     this.caption = ko.pureComputed(() => (this.user().isMe ? t('conversationPingYou') : t('conversationPing')));
 
-    this.get_icon_classes = ko.pureComputed(() => {
-      const show_ping_animation = Date.now() - this.timestamp() < 2000;
-      let css_classes = this.accent_color();
-      if (show_ping_animation) {
-        css_classes += ' ping-animation ping-animation-soft';
-      }
-      return css_classes;
+    this.iconClasses = ko.pureComputed(() => {
+      const showPingAnimation = Date.now() - this.timestamp() < 2000;
+      const cssClasses = this.accent_color();
+      return showPingAnimation ? `${cssClasses} ping-animation ping-animation-soft` : cssClasses;
     });
   }
 }

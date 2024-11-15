@@ -73,4 +73,15 @@ export const Segmentation = {
     YES: 'yes',
     NO: 'no',
   },
+  TEAM_CREATION_STEP: {
+    CLICKED_CREATE_TEAM: 'clicked_create_team',
+    CLICKED_DISMISS_CTA: 'clicked_dismiss_cta',
+    MODAL_DISCLAIMERS: 'modal_disclaimers',
+    MODAL_TEAM_NAME: 'modal_team_name',
+    MODAL_CONFIRMATION: 'modal_confirmation',
+    MODAL_LEAVE_CLICKED: 'modal_leave_clicked',
+    MODAL_CONTINUE_CLICKED: 'modal_continue_clicked',
+    MODAL_BACK_TO_WIRE_CLICKED: 'modal_back_to_wire_clicked',
+    MODAL_OPEN_TM_CLICKED: 'modal_open_tm_clicked',
+  },
 };
