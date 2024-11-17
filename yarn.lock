@@ -17654,9 +17654,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tsc-watch@npm:6.2.0":
-  version: 6.2.0
-  resolution: "tsc-watch@npm:6.2.0"
+"tsc-watch@npm:6.2.1":
+  version: 6.2.1
+  resolution: "tsc-watch@npm:6.2.1"
   dependencies:
     cross-spawn: "npm:^7.0.3"
     node-cleanup: "npm:^2.1.2"
@@ -17666,7 +17666,7 @@ __metadata:
     typescript: "*"
   bin:
     tsc-watch: dist/lib/tsc-watch.js
-  checksum: 10/53a81d3c77f71e40a54179b5a7f25e06d0a2fc0a59f9a6406a04e187751baa1995b6854cb6e0881519c8139c6cbd40c140bc862d7aed4cf9474a827c39567157
+  checksum: 10/ba6dfa6cb9fd2a28e892e5a51a2027166cab7f83c7921e7d7b189014e0ea10eebdc39304800d589871765ff2328178c322696e5dc504b0025a2d112a95c8b51b
   languageName: node
   linkType: hard
 
@@ -18790,7 +18790,7 @@ __metadata:
     switch-path: "npm:1.2.0"
     text-encoding: "npm:0.7.0"
     ts-node: "npm:10.9.2"
-    tsc-watch: "npm:6.2.0"
+    tsc-watch: "npm:6.2.1"
     tsyringe: "npm:4.8.0"
     typescript: "npm:5.5.2"
     underscore: "npm:1.13.7"
