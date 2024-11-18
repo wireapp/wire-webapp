@@ -67,6 +67,7 @@ class Server {
     this.initStaticRoutes();
     this.initWebpack();
     this.initSiteMap(this.config);
+    // eslint-disable-next-line import/no-named-as-default-member
     this.app.use('/libs', express.static(path.join(__dirname, 'libs')));
     this.app.use(Root());
     this.app.use(HealthCheckRoute());
@@ -166,15 +167,12 @@ class Server {
   private initStaticRoutes() {
     this.app.use(RedirectRoutes(this.config, this.clientConfig));
 
-    this.app.use('/audio', express.static(path.join(__dirname, 'static/audio')));
-    this.app.use('/ext', express.static(path.join(__dirname, 'static/ext')));
-    this.app.use('/font', express.static(path.join(__dirname, 'static/font')));
-    this.app.use('/image', express.static(path.join(__dirname, 'static/image')));
-    this.app.use('/min', express.static(path.join(__dirname, 'static/min')));
-    this.app.use('/proto', express.static(path.join(__dirname, 'static/proto')));
-    this.app.use('/style', express.static(path.join(__dirname, 'static/style')));
-    this.app.use('/worker', express.static(path.join(__dirname, 'static/worker')));
-    this.app.use('/assets', express.static(path.join(__dirname, 'static/assets')));
+    const staticRoutes = ['audio', 'ext', 'font', 'image', 'min', 'proto', 'style', 'worker', 'assets'];
+
+    staticRoutes.forEach(route => {
+      // eslint-disable-next-line import/no-named-as-default-member
+      this.app.use(`/${route}`, express.static(path.join(__dirname, `static/${route}`)));
+    });
 
     this.app.get('/favicon.ico', (_req, res) => res.sendFile(path.join(__dirname, 'static/image/favicon.ico')));
     if (!this.config.DEVELOPMENT) {

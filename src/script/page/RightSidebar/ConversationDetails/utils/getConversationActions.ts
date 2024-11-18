@@ -25,6 +25,7 @@ import * as Icon from 'Components/Icon';
 import {MenuItem} from 'Components/panel/PanelActions';
 import {t} from 'Util/LocalizerUtil';
 
+import {Config} from '../../../../Config';
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
 import {Conversation} from '../../../../entity/Conversation';
 import * as UserPermission from '../../../../user/UserPermission';
@@ -164,7 +165,10 @@ const getConversationActions = ({
       },
     },
     {
-      condition: conversationEntity.isGroup() && conversationEntity.isSelfUserRemoved(),
+      condition:
+        conversationEntity.isGroup() &&
+        conversationEntity.isSelfUserRemoved() &&
+        Config.getConfig().FEATURE.ENABLE_REMOVE_GROUP_CONVERSATION,
       item: {
         click: () => actionsViewModel.removeConversation(conversationEntity),
         Icon: Icon.CloseIcon,

@@ -225,7 +225,6 @@ export class PropertiesRepository {
 
   private initTemporaryGuestAccount(): Promise<WebappProperties> {
     this.logger.info('Temporary guest user: Using default properties');
-    this.savePreference(PROPERTIES_TYPE.PRIVACY.TELEMETRY_SHARING, false);
     return Promise.resolve(this.publishProperties());
   }
 

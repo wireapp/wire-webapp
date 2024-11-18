@@ -19,6 +19,8 @@
 
 import {CSSObject} from '@emotion/react';
 
+import {media} from '@wireapp/react-ui-kit';
+
 export const teamUpgradeBannerContainerCss: CSSObject = {
   border: '1px solid var(--accent-color-500)',
   padding: '0.5rem',
@@ -54,4 +56,47 @@ export const teamUpgradeBannerButtonCss: CSSObject = {
 export const iconButtonCss: CSSObject = {
   width: '2rem',
   marginBottom: '0.5rem',
+};
+
+export const teamCreationModalWrapperCss: CSSObject = {
+  height: '42.5rem',
+  width: '49rem',
+  margin: '1rem',
+  paddingBottom: '5.5rem',
+  maxHeight: 'unset',
+  [media.tabletSMDown]: {
+    height: 'auto',
+    paddingBottom: '0',
+  },
+};
+
+export const teamCreationModalBodyCss: CSSObject = {
+  padding: '0 3.5rem',
+  margin: 'auto 0',
+
+  [media.tabletSMDown]: {
+    padding: '0 1rem',
+    margin: 'auto 0',
+  },
+};
+
+export const confirmLeaveModalWrapperCss: CSSObject = {
+  height: '18.5rem',
+  width: '20rem',
+  margin: '1rem',
+};
+
+export const confirmLeaveModalBodyCss: CSSObject = {
+  padding: '0 1.5rem',
+};
+
+export const confirmLeaveModalButtonsCss: CSSObject = {
+  position: 'absolute',
+  gap: '0.75rem',
+  flexDirection: 'column',
+};
+
+export const buttonCss: CSSObject = {
+  width: '100%',
+  margin: 0,
 };
