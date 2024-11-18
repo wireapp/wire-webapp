@@ -906,6 +906,7 @@
   "modalAccountCreateMessage": "通过创建一个帐户，你将失去群内的对话历史记录。",
   "modalAccountDeletionAction": "删除",
   "modalAccountDeletionHeadline": "删除账户",
+  "modalAccountDeletionMessage": "We will send you an email. Follow the link to delete your account permanently.",
   "modalAccountLeaveGuestRoomAction": "退出",
   "modalAccountLeaveGuestRoomHeadline": "离开房间？",
   "modalAccountLeaveGuestRoomMessage": "对话历史记录将被删除。要保留它，下次创建一个帐户。",

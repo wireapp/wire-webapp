@@ -906,6 +906,7 @@
   "modalAccountCreateMessage": "Prin crearea unui cont vei pierde istoricul conversațiilor din această cameră de oaspeți.",
   "modalAccountDeletionAction": "Șterge",
   "modalAccountDeletionHeadline": "Șterge contul",
+  "modalAccountDeletionMessage": "We will send you an email. Follow the link to delete your account permanently.",
   "modalAccountLeaveGuestRoomAction": "Ieși",
   "modalAccountLeaveGuestRoomHeadline": "Ieși din camera de oaspeți?",
   "modalAccountLeaveGuestRoomMessage": "Istoricul conversațiilor va fi șters. Poți păstra istoricul doar prin crearea unui cont.",

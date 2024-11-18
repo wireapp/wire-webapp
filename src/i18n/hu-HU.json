@@ -906,6 +906,7 @@
   "modalAccountCreateMessage": "Ha létrehozol egy fiókot, akkor elveszted a beszélgetés előzményit ebben a vendégszobában.",
   "modalAccountDeletionAction": "Törlés",
   "modalAccountDeletionHeadline": "Fiók törlése",
+  "modalAccountDeletionMessage": "We will send you an email. Follow the link to delete your account permanently.",
   "modalAccountLeaveGuestRoomAction": "Kilépés",
   "modalAccountLeaveGuestRoomHeadline": "Elhagyod a vendégszobát?",
   "modalAccountLeaveGuestRoomMessage": "A beszélgetés előzményei törlődnek. Ha meg szeretnéd tartani, inkább legközelebb hozz létre egy fiókot.",

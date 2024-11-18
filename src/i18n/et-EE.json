@@ -906,6 +906,7 @@
   "modalAccountCreateMessage": "Luues konto, kaotad sa vestlusajaloo selles külalistetoas.",
   "modalAccountDeletionAction": "Kustuta",
   "modalAccountDeletionHeadline": "Kustuta konto",
+  "modalAccountDeletionMessage": "We will send you an email. Follow the link to delete your account permanently.",
   "modalAccountLeaveGuestRoomAction": "Lahku",
   "modalAccountLeaveGuestRoomHeadline": "Lahkud külalistetoast?",
   "modalAccountLeaveGuestRoomMessage": "Vestlusajalugu kustutatakse. Selle säilitamiseks loo järgmine kord konto.",

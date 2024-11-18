@@ -906,6 +906,7 @@
   "modalAccountCreateMessage": "Створивши акаунт, ви втратите історію розмов у цій гостьовій кімнаті.",
   "modalAccountDeletionAction": "Видалити",
   "modalAccountDeletionHeadline": "Видалити акаунт",
+  "modalAccountDeletionMessage": "We will send you an email. Follow the link to delete your account permanently.",
   "modalAccountLeaveGuestRoomAction": "Вийти з розмови",
   "modalAccountLeaveGuestRoomHeadline": "Вийти з гостьової кімнати?",
   "modalAccountLeaveGuestRoomMessage": "Історію розмови буде видалено. Створіть акаунт, щоб зберегти її наступного разу.",
