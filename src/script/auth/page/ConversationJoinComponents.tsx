@@ -19,8 +19,6 @@
 
 import React, {useState} from 'react';
 
-import {useIntl} from 'react-intl';
-
 import {
   useMatchMedia,
   QUERY,
@@ -145,7 +143,6 @@ const GuestLoginColumn = ({
   conversationError,
   error,
 }: GuestLoginColumnProps) => {
-  const {formatMessage: _} = useIntl();
   const [isTermOfUseAccepted, setIsTermOfUseAccepted] = useState(false);
 
   return (
@@ -192,7 +189,7 @@ const GuestLoginColumn = ({
                   }}
                 >
                   <span className="subline">
-                    {_({id: 'conversationJoin.termsAcceptanceText'})}{' '}
+                    {t('conversationJoin.termsAcceptanceText')}{' '}
                     <Link
                       href={Config.getConfig().URL.TERMS_OF_USE_TEAMS}
                       css={{
@@ -207,7 +204,7 @@ const GuestLoginColumn = ({
                           color: 'var(--accent-color)',
                         }}
                       >
-                        {_({id: 'conversationJoin.termsLink'}, {brandName: Config.getConfig().BRAND_NAME})}
+                        {t('conversationJoin.termsLink', {brandName: Config.getConfig().BRAND_NAME})}
                       </span>
                     </Link>
                     .
