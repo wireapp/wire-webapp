@@ -155,6 +155,7 @@ export const TeamCreationModal = ({onClose, onSuccess, userName}: Props) => {
           onNextStep={nextStepHandler}
           onPreviousStep={previousStepHandler}
           onSuccess={onSuccess}
+          goToFirstStep={() => setCurrentStep(Step.Introduction)}
         />
       </div>
     </ModalComponent>
