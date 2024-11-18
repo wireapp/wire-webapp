@@ -100,7 +100,8 @@ const EnrichedFields = ({
     return null;
   }
 
-  const shouldShowAvailability = showAvailability && ![undefined, Availability.Type.NONE].includes(availability);
+  const shouldShowAvailability =
+    showAvailability && availability !== undefined && availability !== Availability.Type.NONE;
 
   return (
     <div className="enriched-fields">
