@@ -42,10 +42,10 @@ import {
   RoundIconButton,
 } from '@wireapp/react-ui-kit';
 
+import {t} from 'Util/LocalizerUtil';
 import {isBackendError} from 'Util/TypePredicateUtil';
 
 import {Config} from '../../Config';
-import {loginStrings, logoutReasonStrings, ssoLoginStrings} from '../../strings';
 import {JoinGuestLinkPasswordModal} from '../component/JoinGuestLinkPasswordModal';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {ValidationError} from '../module/action/ValidationError';
@@ -54,6 +54,7 @@ import * as AuthSelector from '../module/selector/AuthSelector';
 import * as ConversationSelector from '../module/selector/ConversationSelector';
 import {QUERY_KEY, ROUTE} from '../route';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
+import {logoutReasonStrings} from '../util/logoutUtil';
 import {getSearchParams} from '../util/urlUtil';
 
 export interface SingleSignOnFormProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -289,8 +290,8 @@ const SingleSignOnFormComponent = ({
     : ValidationError.FIELD.SSO_CODE.name;
 
   const inputPlaceholder = enableDomainDiscovery
-    ? ssoLoginStrings.codeOrMailInputPlaceholder
-    : ssoLoginStrings.codeInputPlaceholder;
+    ? t('ssoLogin.codeOrMailInputPlaceholder')
+    : t('ssoLogin.codeInputPlaceholder');
 
   const inputPattern = enableDomainDiscovery
     ? `(${SSO_CODE_PREFIX_REGEX}${PATTERN.UUID_V4}|${PATTERN.EMAIL})`
@@ -349,7 +350,7 @@ const SingleSignOnFormComponent = ({
         ) : logoutReason ? (
           <ErrorMessage data-uie-name="status-logout-reason">
             <FormattedMessage
-              {...logoutReasonStrings[logoutReason]}
+              id={logoutReasonStrings[logoutReason]}
               values={{
                 newline: <br />,
               }}
@@ -370,7 +371,7 @@ const SingleSignOnFormComponent = ({
             aligncenter
             style={{justifyContent: 'center', marginTop: '36px'}}
           >
-            <CheckboxLabel htmlFor="">{_(loginStrings.publicComputer)}</CheckboxLabel>
+            <CheckboxLabel htmlFor="">{t('login.publicComputer')}</CheckboxLabel>
           </Checkbox>
         )}
       </Form>

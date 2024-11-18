@@ -40,8 +40,8 @@ import {
 } from '@wireapp/react-ui-kit';
 
 import {Config} from 'src/script/Config';
+import {t} from 'Util/LocalizerUtil';
 
-import {conversationJoinStrings} from '../../strings';
 import {parseValidationErrors, parseError} from '../util/errorUtil';
 
 interface IsLoggedInColumnProps {
@@ -90,7 +90,6 @@ const Separator = () => {
 };
 
 const IsLoggedInColumn = ({handleLogout, handleSubmit, selfName}: IsLoggedInColumnProps) => {
-  const {formatMessage: _} = useIntl();
   return (
     <Container centerText verticalCenter style={{width: '100%', display: 'flex'}}>
       <Columns style={{justifyContent: 'center'}}>
@@ -105,20 +104,18 @@ const IsLoggedInColumn = ({handleLogout, handleSubmit, selfName}: IsLoggedInColu
             }}
           >
             <>
-              <H2 center>{_(conversationJoinStrings.existentAccountJoinInBrowser)}</H2>
-              <Muted style={{marginBottom: '1rem'}}>
-                {_(conversationJoinStrings.existentAccountUserName, {selfName})}
-              </Muted>
+              <H2 center>{t('conversationJoin.existentAccountJoinInBrowser')}</H2>
+              <Muted style={{marginBottom: '1rem'}}>{t('conversationJoin.existentAccountUserName', {selfName})}</Muted>
 
               <Button
                 block
                 type="submit"
                 formNoValidate
                 onClick={() => handleSubmit()}
-                aria-label={_(conversationJoinStrings.join)}
+                aria-label={t('conversationJoin.join')}
                 data-uie-name="do-join-as-member"
               >
-                {_(conversationJoinStrings.join)}
+                {t('conversationJoin.join')}
               </Button>
               <Link
                 variant={LinkVariant.PRIMARY}
@@ -128,7 +125,7 @@ const IsLoggedInColumn = ({handleLogout, handleSubmit, selfName}: IsLoggedInColu
                 style={{fontSize: '1rem'}}
                 data-uie-name="go-logout"
               >
-                {_(conversationJoinStrings.joinWithOtherAccount)}
+                {t('conversationJoin.joinWithOtherAccount')}
               </Link>
             </>
           </ContainerXS>
@@ -164,8 +161,8 @@ const GuestLoginColumn = ({
             }}
           >
             <>
-              <H2 center>{_(conversationJoinStrings.noAccountHead)}</H2>
-              <Muted>{_(conversationJoinStrings.subhead)}</Muted>
+              <H2 center>{t('conversationJoin.noAccountHead')}</H2>
+              <Muted>{t('conversationJoin.subhead')}</Muted>
               <Form style={{marginTop: 30}}>
                 <Input
                   id="enter-name"
@@ -174,7 +171,7 @@ const GuestLoginColumn = ({
                   value={enteredName}
                   ref={nameInput}
                   onChange={onNameChange}
-                  placeholder={_(conversationJoinStrings.namePlaceholder)}
+                  placeholder={t('conversationJoin.namePlaceholder')}
                   maxLength={64}
                   minLength={2}
                   pattern=".{2,64}"
@@ -226,10 +223,10 @@ const GuestLoginColumn = ({
                     disabled={!enteredName || !isValidName || isSubmitingName || !isTermOfUseAccepted}
                     formNoValidate
                     onClick={checkNameValidity}
-                    aria-label={_(conversationJoinStrings.joinButton)}
+                    aria-label={t('conversationJoin.joinButton')}
                     data-uie-name="do-join-as-guest"
                   >
-                    {_(conversationJoinStrings.joinButton)}
+                    {t('conversationJoin.joinButton')}
                   </Button>
                 )}
               </Form>

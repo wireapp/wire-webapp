@@ -19,7 +19,6 @@
 
 import React, {useRef, useState} from 'react';
 
-import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {Navigate, useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
@@ -27,10 +26,11 @@ import {AnyAction, Dispatch} from 'redux';
 import {ValidationUtil} from '@wireapp/commons';
 import {Button, ContainerXS, Form, H1, Input, Small} from '@wireapp/react-ui-kit';
 
+import {t} from 'Util/LocalizerUtil';
+
 import {Page} from './Page';
 
 import {Config} from '../../Config';
-import {accountFormStrings, setPasswordStrings} from '../../strings';
 import {Exception} from '../component/Exception';
 import {actionRoot} from '../module/action';
 import {ValidationError} from '../module/action/ValidationError';
@@ -46,8 +46,6 @@ const SetPasswordComponent = ({
   doSetPassword,
   isFetching,
 }: Props & ConnectedProps & DispatchProps) => {
-  const {formatMessage: _} = useIntl();
-
   const passwordInput = useRef<HTMLInputElement>();
   const [error, setError] = useState();
   const [isValidPassword, setIsValidPassword] = useState(true);
@@ -87,11 +85,11 @@ const SetPasswordComponent = ({
         style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
       >
         <Form onSubmit={onSetPassword}>
-          <H1 center>{_(setPasswordStrings.headline)}</H1>
+          <H1 center>{t('setPassword.headline')}</H1>
           <Input
             autoComplete="new-password"
             name="password"
-            placeholder={_(setPasswordStrings.passwordPlaceholder)}
+            placeholder={t('setPassword.passwordPlaceholder')}
             type="password"
             markInvalid={!isValidPassword}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -113,7 +111,7 @@ const SetPasswordComponent = ({
             }}
             data-uie-name="element-password-help"
           >
-            {_(accountFormStrings.passwordHelp, {minPasswordLength: Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH})}
+            {t('accountForm.passwordHelp', {minPasswordLength: String(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH)})}
           </Small>
           {!error ? <>&nbsp;</> : <Exception errors={[error]} />}
           <Button
@@ -124,7 +122,7 @@ const SetPasswordComponent = ({
             type="submit"
             data-uie-name="do-set-password"
           >
-            {_(setPasswordStrings.button)}
+            {t('setPassword.button')}
           </Button>
         </Form>
       </ContainerXS>

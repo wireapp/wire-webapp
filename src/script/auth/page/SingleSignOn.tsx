@@ -22,7 +22,6 @@ import React, {useRef, useState} from 'react';
 import {BackendError, SyntheticErrorLabel} from '@wireapp/api-client/lib/http';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS, StatusCodes} from 'http-status-codes';
-import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {useParams} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
@@ -45,13 +44,13 @@ import {
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
+import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 
 import {Page} from './Page';
 import {SingleSignOnForm} from './SingleSignOnForm';
 
 import {Config} from '../../Config';
-import {ssoLoginStrings} from '../../strings';
 import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
 import {RouterLink} from '../component/RouterLink';
 import {RootState, bindActionCreators} from '../module/reducer';
@@ -63,7 +62,6 @@ type Props = React.HTMLAttributes<HTMLDivElement>;
 const logger = getLogger('SingleSignOn');
 
 const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
-  const {formatMessage: _} = useIntl();
   const ssoWindowRef = useRef<Window>();
   const params = useParams<{code?: string}>();
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
@@ -203,7 +201,7 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
               color={COLOR.WHITE}
               data-uie-name="status-overlay-description"
             >
-              {_(ssoLoginStrings.overlayDescription)}
+              {t('ssoLogin.overlayDescription')}
             </Text>
             <Link
               block
@@ -219,7 +217,7 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
               onClick={focusChildWindow}
               data-uie-name="do-focus-child-window"
             >
-              {_(ssoLoginStrings.overlayFocusLink)}
+              {t('ssoLogin.overlayFocusLink')}
             </Link>
           </Container>
         </Overlay>
@@ -243,20 +241,20 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
               style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
             >
               <div>
-                <H1 center>{_(ssoLoginStrings.headline)}</H1>
+                <H1 center>{t('ssoLogin.headline')}</H1>
                 {Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ? (
                   <>
                     <Muted center style={{display: 'block'}} data-uie-name="status-email-or-sso-code">
-                      {_(ssoLoginStrings.subheadCodeOrEmail)}
+                      {t('ssoLogin.subheadCodeOrEmail')}
                     </Muted>
                     <Muted center style={{display: 'block'}} data-uie-name="status-email-environment-switch-warning">
-                      {_(ssoLoginStrings.subheadEmailEnvironmentSwitchWarning, {
+                      {t('ssoLogin.subheadEmailEnvironmentSwitchWarning', {
                         brandName: Config.getConfig().BRAND_NAME,
                       })}
                     </Muted>
                   </>
                 ) : (
-                  <Muted data-uie-name="status-sso-code">{_(ssoLoginStrings.subheadCode)}</Muted>
+                  <Muted data-uie-name="status-sso-code">{t('ssoLogin.subheadCode')}</Muted>
                 )}
                 <SingleSignOnForm doLogin={handleSSOWindow} initialCode={params.code} />
               </div>

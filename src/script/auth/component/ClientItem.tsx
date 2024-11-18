@@ -21,7 +21,6 @@ import React, {useEffect, useState} from 'react';
 
 import {RegisteredClient} from '@wireapp/api-client/lib/client/index';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
-import {useIntl} from 'react-intl';
 
 import {
   COLOR,
@@ -41,7 +40,6 @@ import {isEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {splitFingerprint} from 'Util/StringUtil';
 
-import {clientItemStrings} from '../../strings';
 import {ValidationError} from '../module/action/ValidationError';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 
@@ -55,7 +53,6 @@ export interface Props extends React.HTMLProps<HTMLDivElement> {
 }
 
 const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, requirePassword}: Props) => {
-  const {formatMessage: _} = useIntl();
   const passwordInput = React.useRef<HTMLInputElement>(null);
 
   const CONFIG = {
@@ -311,7 +308,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
                     label={t('modalAccountRemoveDevicePlaceholder')}
                     onChange={onPasswordChange}
                     pattern=".{1,1024}"
-                    placeholder={_(clientItemStrings.passwordPlaceholder)}
+                    placeholder={t('clientItem.passwordPlaceholder')}
                     required
                     type="password"
                     value={password}
