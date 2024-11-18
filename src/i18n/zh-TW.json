@@ -906,7 +906,6 @@
   "modalAccountCreateMessage": "By creating an account you will lose the conversation history in this guest room.",
   "modalAccountDeletionAction": "刪除",
   "modalAccountDeletionHeadline": "刪除帳號",
-  "modalAccountDeletionMessage": "我們將透過電子郵件或手機簡訊發送連結給您。請點擊連結來永久刪除您的帳號。",
   "modalAccountLeaveGuestRoomAction": "離開",
   "modalAccountLeaveGuestRoomHeadline": "Leave the guest room?",
   "modalAccountLeaveGuestRoomMessage": "Conversation history will be deleted. To keep it, create an account next time.",

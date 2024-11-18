@@ -906,7 +906,6 @@
   "modalAccountCreateMessage": "Wenn Sie ein Benutzerkonto erstellen, verlieren Sie den Gesprächsverlauf dieses Gästebereichs.",
   "modalAccountDeletionAction": "Löschen",
   "modalAccountDeletionHeadline": "Benutzerkonto löschen",
-  "modalAccountDeletionMessage": "Wir senden Ihnen eine Nachricht per E-Mail oder SMS. Folgen Sie dem Link, um Ihr Konto endgültig zu löschen.",
   "modalAccountLeaveGuestRoomAction": "Verlassen",
   "modalAccountLeaveGuestRoomHeadline": "Gästebereich verlassen?",
   "modalAccountLeaveGuestRoomMessage": "Der Gesprächsverlauf wird gelöscht. Um ihn zu behalten, erstellen Sie beim nächsten Mal ein Benutzerkonto.",

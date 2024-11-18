@@ -906,7 +906,6 @@
   "modalAccountCreateMessage": "بإنشائك حسابًا، ستفقد تاريخ المحادثة في غرفة الضيوف.",
   "modalAccountDeletionAction": "حذف",
   "modalAccountDeletionHeadline": "حذف الحساب",
-  "modalAccountDeletionMessage": "سنرسل لك رسالة عبر البريد الإلكتروني أو في رسالة قصيرة. اتبع الرابط لحذف حسابك إلى الأبد.",
   "modalAccountLeaveGuestRoomAction": "غادر",
   "modalAccountLeaveGuestRoomHeadline": "غادر غرفة الضيوف؟",
   "modalAccountLeaveGuestRoomMessage": "تاريخ المحادثة سيُحذف. للاحتفاظ به، أنشئ حسابًا المرة القادمة.",

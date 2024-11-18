@@ -906,7 +906,6 @@
   "modalAccountCreateMessage": "By creating an account you will lose the conversation history in this guest room.",
   "modalAccountDeletionAction": "Smazat",
   "modalAccountDeletionHeadline": "Smazat účet",
-  "modalAccountDeletionMessage": "Obdržíte od nás zprávu přes email nebo SMS. Pro trvalé smazání svého účtu otevřete zaslaný odkaz.",
   "modalAccountLeaveGuestRoomAction": "Odejít",
   "modalAccountLeaveGuestRoomHeadline": "Leave the guest room?",
   "modalAccountLeaveGuestRoomMessage": "Conversation history will be deleted. To keep it, create an account next time.",

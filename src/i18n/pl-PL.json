@@ -906,7 +906,6 @@
   "modalAccountCreateMessage": "By creating an account you will lose the conversation history in this guest room.",
   "modalAccountDeletionAction": "Usuń",
   "modalAccountDeletionHeadline": "Usuń konto",
-  "modalAccountDeletionMessage": "Wyślemy wiadomość poprzez e-mail lub SMS. Proszę użyć tego odnośnika, żeby trwale usunąć konto.",
   "modalAccountLeaveGuestRoomAction": "Opuść",
   "modalAccountLeaveGuestRoomHeadline": "Opuść pokój gości.",
   "modalAccountLeaveGuestRoomMessage": "Historia konwersacji zostanie usunięta. Żeby ją zatrzymać, następnym razem utwórz konto.",

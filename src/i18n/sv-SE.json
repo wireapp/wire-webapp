@@ -906,7 +906,6 @@
   "modalAccountCreateMessage": "Genom att skapa ett konto så kommer du att förlora konversationens historik i det här gästrummet.",
   "modalAccountDeletionAction": "Radera",
   "modalAccountDeletionHeadline": "Radera konto",
-  "modalAccountDeletionMessage": "Vi kommer att skicka ett meddelande via e-post eller SMS. Följ länken för att ta bort ditt konto permanent.",
   "modalAccountLeaveGuestRoomAction": "Lämna",
   "modalAccountLeaveGuestRoomHeadline": "Lämna gästrummet?",
   "modalAccountLeaveGuestRoomMessage": "Konversationens historik kommer att raderas. Skapa ett konto nästa gång för att behålla den.",

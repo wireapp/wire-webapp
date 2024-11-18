@@ -906,7 +906,6 @@
   "modalAccountCreateMessage": "By creating an account you will lose the conversation history in this guest room.",
   "modalAccountDeletionAction": "Poista",
   "modalAccountDeletionHeadline": "Poista tili",
-  "modalAccountDeletionMessage": "Lähetämme viestin sähköpostina tai tekstiviestinä. Paina viestissä olevaa linkkiä poistaaksesi tilisi lopullisesti.",
   "modalAccountLeaveGuestRoomAction": "Poistu",
   "modalAccountLeaveGuestRoomHeadline": "Leave the guest room?",
   "modalAccountLeaveGuestRoomMessage": "Conversation history will be deleted. To keep it, create an account next time.",
