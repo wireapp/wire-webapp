@@ -19,6 +19,7 @@
 
 import {useState} from 'react';
 
+import {StatusCodes} from 'http-status-codes';
 import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, Checkbox, Link} from '@wireapp/react-ui-kit';
@@ -45,8 +46,6 @@ const confirmationList = [
   t('teamCreationConfirmListItem3'),
 ];
 
-const alreadyPartOfTeamErrorCode = 403;
-
 export const Confirmation = ({onPreviousStep, onNextStep, teamName, goToFirstStep, onSuccess}: StepProps) => {
   const [isMigrationAccepted, setIsMigrationAccepted] = useState(false);
   const [isTermOfUseAccepted, setIsTermOfUseAccepted] = useState(false);
@@ -61,7 +60,7 @@ export const Confirmation = ({onPreviousStep, onNextStep, teamName, goToFirstSte
       });
       onNextStep();
     } catch (error: any) {
-      if (error.code === alreadyPartOfTeamErrorCode) {
+      if (error.code === StatusCodes.FORBIDDEN) {
         PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
           primaryAction: {
             action: onSuccess,
