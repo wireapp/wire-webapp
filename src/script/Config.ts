@@ -74,6 +74,9 @@ const config = {
   /** measured in pixel */
   SCROLL_TO_LAST_MESSAGE_THRESHOLD: 100,
 
+  /** min supported api version for team creation */
+  MIN_TEAM_CREATION_SUPPORTED_API_VERSION: 7,
+
   /** Image MIME types */
   ALLOWED_IMAGE_TYPES: ['image/bmp', 'image/gif', 'image/jpeg', 'image/jpg', 'image/png'],
 

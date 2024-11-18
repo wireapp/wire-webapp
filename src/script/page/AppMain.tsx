@@ -23,7 +23,7 @@ import {amplify} from 'amplify';
 import {ErrorBoundary} from 'react-error-boundary';
 import {container} from 'tsyringe';
 
-import {StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
+import {QUERY, StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingContainer} from 'Components/calling/CallingOverlayContainer';
@@ -137,7 +137,7 @@ export const AppMain: FC<AppMainProps> = ({
   };
 
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
-  const isMobileView = useMatchMedia('max-width: 720px');
+  const isMobileView = useMatchMedia(QUERY.tabletSMDown);
   const {currentView} = useAppMainState(state => state.responsiveView);
   const {isHidden: isLeftSidebarHidden} = useAppMainState(state => state.leftSidebar);
 

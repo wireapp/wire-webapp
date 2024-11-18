@@ -20,17 +20,15 @@
 import {CSSObject} from '@emotion/react';
 
 export const jumpToLastMessageButtonStyles: CSSObject = {
-  position: 'absolute',
+  position: 'sticky',
   right: '10px',
   height: '40px',
   borderRadius: '100%',
-  bottom: '56px',
-  marginBottom: '10px',
+  bottom: '10px',
+  marginLeft: 'auto',
+  marginTop: '-40px',
+  marginBottom: 0,
   zIndex: 1,
-
-  '@media (max-width: 768px)': {
-    bottom: '100px',
-  },
 };
 
 export const jumpToLastMessageChevronStyles: CSSObject = {
