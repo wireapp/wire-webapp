@@ -23,7 +23,7 @@ import {ClientType} from '@wireapp/api-client/lib/client/index';
 import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http';
 import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
 import {isValidEmail, PATTERN} from '@wireapp/commons/lib/util/ValidationUtil';
-import {FormattedMessage, useIntl} from 'react-intl';
+import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
 import {Navigate, useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
@@ -42,7 +42,7 @@ import {
   RoundIconButton,
 } from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/LocalizerUtil';
+import {StringIdentifer, t} from 'Util/LocalizerUtil';
 import {isBackendError} from 'Util/TypePredicateUtil';
 
 import {Config} from '../../Config';
@@ -84,7 +84,6 @@ const SingleSignOnFormComponent = ({
   const codeOrMailInput = useRef<HTMLInputElement>();
   const [codeOrMail, setCodeOrMail] = useState('');
   const [disableInput, setDisableInput] = useState(false);
-  const {formatMessage: _} = useIntl();
   const navigate = useNavigate();
   const [clientType, setClientType] = useState<ClientType | null>(null);
   const [ssoError, setSsoError] = useState<BackendError | null>(null);
@@ -326,7 +325,7 @@ const SingleSignOnFormComponent = ({
               onChange={onCodeChange}
               ref={codeOrMailInput}
               markInvalid={!isCodeOrMailInputValid}
-              placeholder={_(inputPlaceholder)}
+              placeholder={t(inputPlaceholder as StringIdentifer)}
               value={codeOrMail}
               autoComplete="section-login sso-code"
               maxLength={1024}
