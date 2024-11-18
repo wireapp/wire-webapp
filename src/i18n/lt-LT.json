@@ -906,6 +906,7 @@
   "modalAccountCreateMessage": "Sukūrę paskyrą prarasite bendravimo praeitį šiame svečių kambaryje.",
   "modalAccountDeletionAction": "Ištrinti",
   "modalAccountDeletionHeadline": "Ištrinti paskyrą",
+  "modalAccountDeletionMessage": "We will send you an email. Follow the link to delete your account permanently.",
   "modalAccountLeaveGuestRoomAction": "Išeiti",
   "modalAccountLeaveGuestRoomHeadline": "Išeiti iš svečių kambario?",
   "modalAccountLeaveGuestRoomMessage": "Bendravimo praeitis bus ištrinta. Norėdami išsaugoti, kitą kartą susikurkite paskyrą.",

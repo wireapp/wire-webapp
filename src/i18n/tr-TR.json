@@ -906,6 +906,7 @@
   "modalAccountCreateMessage": "Bir hesap oluşturarak, bu misafir odasındaki konuşma geçmişini kaybedeceksiniz.",
   "modalAccountDeletionAction": "Sil",
   "modalAccountDeletionHeadline": "Hesabı Sil",
+  "modalAccountDeletionMessage": "We will send you an email. Follow the link to delete your account permanently.",
   "modalAccountLeaveGuestRoomAction": "Ayrıl",
   "modalAccountLeaveGuestRoomHeadline": "Misafir odasından ayrılmak istiyor musun?",
   "modalAccountLeaveGuestRoomMessage": "Konuşma geçmişi silinecek. Saklamak için bir dahaki sefere bir hesap oluşturun.",
