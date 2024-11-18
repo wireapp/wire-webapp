@@ -23,7 +23,6 @@ import {LoginData} from '@wireapp/api-client/lib/auth';
 import {ClientType} from '@wireapp/api-client/lib/client/index';
 import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
 import {StatusCodes} from 'http-status-codes';
-import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
@@ -105,7 +104,6 @@ const LoginComponent = ({
   embedded,
 }: Props & ConnectedProps & DispatchProps) => {
   const logger = getLogger('Login');
-  const {formatMessage: _} = useIntl();
   const navigate = useNavigate();
   const [conversationCode, setConversationCode] = useState<string | null>(null);
   const [conversationKey, setConversationKey] = useState<string | null>(null);
@@ -424,7 +422,7 @@ const LoginComponent = ({
                         css={{marginTop: 65}}
                         onClick={() => handleSubmit({...twoFactorLoginData, verificationCode}, [])}
                       >
-                        {_({id: 'login.submitTwoFactorButton'})}
+                        {t('login.submitTwoFactorButton')}
                       </Button>
                     </FlexBox>
                   </div>
