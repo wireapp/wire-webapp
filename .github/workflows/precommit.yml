@@ -6,12 +6,11 @@ on:
     branches: [dev]
 
 concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: false
+  group: precommit-deploy
+  cancel-in-progress: true
 
 jobs:
-  production-deploy:
-    if: github.event_name == 'pull_request' && github.event.action == 'opened' && github.actor != 'dependabot[bot]' && github.event.pull_request.additions > 100
+  procommit-deploy:
     runs-on: buildjet-8vcpu-ubuntu-2204
 
     env:
@@ -32,17 +31,34 @@ jobs:
       - name: Install JS dependencies
         run: yarn --immutable
 
+      - name: Fetch PR details
+        id: pr_details
+        uses: octokit/request-action@v2.x
+        with:
+          route: GET /repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check total additions
+        id: check_additions
+        run: |
+          echo "${{ steps.pr_details.outputs.data }}" | jq '.additions' > total_additions.txt
+          total_additions=$(cat total_additions.txt)
+          echo "Total additions: $total_additions"
+          echo "::set-output name=total_additions::$total_additions"
+
       - name: Deploy to precommit environment
+        if: ${{ steps.check_additions.outputs.total_additions > 100 && github.actor != 'dependabot[bot]' }}
         uses: einaregilsson/beanstalk-deploy@v22
         with:
-          application_name: ${{env.AWS_APPLICATION_NAME}}
-          aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
-          aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
-          deployment_package: ${{env.AWS_BUILD_ZIP_PATH}}
+          application_name: ${{ env.AWS_APPLICATION_NAME }}
+          aws_access_key: ${{ secrets.WEBTEAM_AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY }}
+          deployment_package: ${{ env.AWS_BUILD_ZIP_PATH }}
           environment_name: wire-webapp-precommit
           region: eu-central-1
           use_existing_version_if_available: true
-          version_description: ${{github.sha}}
-          version_label: ${{github.run_id}}
+          version_description: ${{ github.sha }}
+          version_label: ${{ github.run_id }}
           wait_for_deployment: false
-          wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}
+          wait_for_environment_recovery: ${{ env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS }}
