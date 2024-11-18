@@ -65,6 +65,7 @@ export const ConversationDetailsParticipants = ({
               showEmptyAdmin
               selfUser={selfUser}
               noSelfInteraction
+              filterDeletedUsers={false}
             />
           </div>
 
