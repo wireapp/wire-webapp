@@ -46,6 +46,7 @@ describe('PingMessage', () => {
       isMessageFocused: true,
       is1to1Conversation: false,
       isLastDeliveredMessage: false,
+      onClickDetails: jest.fn(),
       message: createPingMessage({
         caption: ko.pureComputed(() => 'caption'),
         unsafeSenderName: ko.pureComputed(() => 'sender'),

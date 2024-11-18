@@ -583,7 +583,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
 
       const localUser = dbUsers.find(dbUser => dbUser.id === user.id);
 
-      if (localUser) {
+      if (localUser && localUser.name) {
         return {
           ...user,
           name: localUser.name,

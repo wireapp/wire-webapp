@@ -24,6 +24,8 @@ import {useIntl} from 'react-intl';
 
 import {Button, COLOR, Container, ErrorMessage, Form, H2, Input, Link, Modal, Text} from '@wireapp/react-ui-kit';
 
+import {t} from 'Util/LocalizerUtil';
+
 import {Config} from '../../Config';
 import {joinGuestLinkPasswordModalStrings} from '../../strings';
 
@@ -62,8 +64,8 @@ const JoinGuestLinkPasswordModal: React.FC<JoinGuestLinkPasswordModalProps> = ({
       <Container style={{maxWidth: '400px'}}>
         <H2 style={{whiteSpace: 'break-spaces', fontWeight: 500, marginTop: '10px', textAlign: 'center'}}>
           {conversationName
-            ? _(joinGuestLinkPasswordModalStrings.headline, {conversationName})
-            : _(joinGuestLinkPasswordModalStrings.headlineDefault)}
+            ? t('guestLinkPasswordModal.headline', {conversationName})
+            : t('guestLinkPasswordModal.headlineDefault')}
         </H2>
         <Text block fontSize="var(--font-size-base)" style={{marginBottom: 24}}>
           {_(joinGuestLinkPasswordModalStrings.description)}

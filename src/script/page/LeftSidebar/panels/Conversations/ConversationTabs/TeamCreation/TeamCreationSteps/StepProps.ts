@@ -24,4 +24,5 @@ export interface StepProps {
   teamName: string;
   setTeamName: (teamName: string) => void;
   userName: string;
+  goToFirstStep: () => void;
 }

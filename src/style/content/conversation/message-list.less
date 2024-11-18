@@ -19,6 +19,7 @@
 
 // MEMBER LIST
 .message-list {
+  position: relative;
   overflow: auto;
   flex: 1 1;
 }
@@ -182,6 +183,11 @@
   width: var(--delivered-state-width);
   align-items: center;
   justify-content: center;
+}
+
+.message-header-content {
+  display: flex;
+  align-items: center;
 }
 
 .message-header-label {
@@ -357,8 +363,10 @@
   cursor: pointer;
 
   &--no-image {
-    background-color: var(--foreground-fade-8);
-    cursor: default;
+    .message-asset & {
+      background-color: var(--foreground-fade-8);
+      cursor: default;
+    }
   }
 
   .image-icon svg {
