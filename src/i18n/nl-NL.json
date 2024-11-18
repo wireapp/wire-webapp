@@ -906,7 +906,6 @@
   "modalAccountCreateMessage": "By creating an account you will lose the conversation history in this guest room.",
   "modalAccountDeletionAction": "Verwijderen",
   "modalAccountDeletionHeadline": "Verwijder account",
-  "modalAccountDeletionMessage": "We vesturen je een bericht via email of SMS. Volg de instructies op in de link om je account te verwijderen.",
   "modalAccountLeaveGuestRoomAction": "Verlaten",
   "modalAccountLeaveGuestRoomHeadline": "Leave the guest room?",
   "modalAccountLeaveGuestRoomMessage": "Conversation history will be deleted. To keep it, create an account next time.",

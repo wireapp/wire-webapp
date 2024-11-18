@@ -906,7 +906,6 @@
   "modalAccountCreateMessage": "Ако отворите рачун, изгубит ћете историју разговора у овој соби за госте.",
   "modalAccountDeletionAction": "Обриши",
   "modalAccountDeletionHeadline": "Обриши налог",
-  "modalAccountDeletionMessage": "Послаћемо поруку путем е-поште или СМС-а. Следите везу у њој за трајно брисање вашег налога.",
   "modalAccountLeaveGuestRoomAction": "Напусти",
   "modalAccountLeaveGuestRoomHeadline": "Напустити гостинску собу?",
   "modalAccountLeaveGuestRoomMessage": "Историја разговора биће избрисана. Да бисте га задржали, отворите налог следећи пут.",

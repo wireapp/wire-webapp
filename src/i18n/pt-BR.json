@@ -906,7 +906,6 @@
   "modalAccountCreateMessage": "Criando uma conta você vai perder o histórico da conversa nesse sala de convidados.",
   "modalAccountDeletionAction": "Excluir",
   "modalAccountDeletionHeadline": "Excluir conta",
-  "modalAccountDeletionMessage": "Nós enviaremos uma mensagem via e-mail ou SMS. Siga o link para excluir permanentemente a sua conta.",
   "modalAccountLeaveGuestRoomAction": "Sair",
   "modalAccountLeaveGuestRoomHeadline": "Sair da sala de convidados?",
   "modalAccountLeaveGuestRoomMessage": "Histórico da conversa será deletada. Para continuar, crie uma conta na próxima vez.",

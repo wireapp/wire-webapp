@@ -906,7 +906,6 @@
   "modalAccountCreateMessage": "Stvaranjem računa izgubiti će te svu povijest razgovora iz ove sobe za goste.",
   "modalAccountDeletionAction": "Obriši",
   "modalAccountDeletionHeadline": "Brisanje računa",
-  "modalAccountDeletionMessage": "Poslati ćemo Vam poslati poruku putem e-maila ili SMS-a. Slijedite link za trajno brisanje računa.",
   "modalAccountLeaveGuestRoomAction": "Izađi",
   "modalAccountLeaveGuestRoomHeadline": "Napusti sobu za goste?",
   "modalAccountLeaveGuestRoomMessage": "Povijest razgovora će biti izbrisana. Da bi ste je sačuvali, stvorite račun idući put.",

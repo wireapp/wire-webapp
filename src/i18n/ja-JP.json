@@ -906,7 +906,6 @@
   "modalAccountCreateMessage": "アカウントを作成することによって、このゲストルームで会話の履歴は失われます。",
   "modalAccountDeletionAction": "削除",
   "modalAccountDeletionHeadline": "アカウントを削除",
-  "modalAccountDeletionMessage": "EメールまたはSMSを送信します。リンクに従ってあなたのアカウントを削除してください",
   "modalAccountLeaveGuestRoomAction": "退室",
   "modalAccountLeaveGuestRoomHeadline": "ゲストルームを退出しますか？",
   "modalAccountLeaveGuestRoomMessage": "会話履歴は削除されます。会話履歴を保存するには、次回アカウントを作成してください。",

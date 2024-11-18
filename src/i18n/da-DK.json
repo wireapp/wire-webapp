@@ -906,7 +906,6 @@
   "modalAccountCreateMessage": "Ved at oprette en konto vil du miste samtaleoversigten i dette gæsterum.",
   "modalAccountDeletionAction": "Slet",
   "modalAccountDeletionHeadline": "Slet konto",
-  "modalAccountDeletionMessage": "Vi vil sende dig en besked via email eller SMS. Følg linket for at permanent slette din konto.",
   "modalAccountLeaveGuestRoomAction": "Forlad",
   "modalAccountLeaveGuestRoomHeadline": "Forlade gæsterummet?",
   "modalAccountLeaveGuestRoomMessage": "Samtaleoversigten vil blive slettet. For at beholde det, oprett en konto næste gang.",
