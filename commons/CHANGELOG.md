@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.3.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/commons@5.2.13...@wireapp/commons@5.3.0) (2024-11-19)
+
+### Features
+
+* **commons:** Add support for plain text logging ([#6678](https://github.com/wireapp/wire-web-packages/issues/6678)) ([60a0595](https://github.com/wireapp/wire-web-packages/commit/60a0595113cf1162ef93ca57f03997ab45440faf))
+
 ## [5.2.13](https://github.com/wireapp/wire-web-packages/compare/@wireapp/commons@5.2.10...@wireapp/commons@5.2.13) (2024-10-16)
 
 ### Bug Fixes
