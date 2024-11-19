@@ -114,6 +114,7 @@ export class ProteusService {
         this.logger.info(`Successfully migrated from cryptobox to corecrypto (took ${Date.now() - startTime}ms).`);
       } catch (error) {
         this.logger.error('Client was not able to perform DB migration: ', error);
+        throw error;
       }
     }
     const backendPrekeys = await this.apiClient.api.client.getClientPreKeys(context.clientId ?? '');
