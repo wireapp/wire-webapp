@@ -1320,7 +1320,7 @@ export class CallingRepository {
     if (currentPageParticipants === undefined) {
       return;
     }
-    const videoQuality: RESOLUTION = RESOLUTION.LOW;
+    const videoQuality: RESOLUTION = currentPageParticipants.length <= 2 ? RESOLUTION.HIGH : RESOLUTION.LOW;
     this.requestVideoStreams(call.conversation.qualifiedId, currentPageParticipants, videoQuality);
   }
 
