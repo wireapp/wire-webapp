@@ -32,6 +32,7 @@ export interface LoggerOptions {
   logFilePath?: string;
   namespace?: string;
   separator?: string;
+  plaintext?: boolean;
 }
 
 export class LogFactory {
@@ -94,6 +95,7 @@ export class LogFactory {
       logFilePath: '',
       namespace: '',
       separator: '::',
+      plaintext: false,
     };
     const config: LoggerOptions = {...defaults, ...options};
 
@@ -106,6 +108,7 @@ export class LogFactory {
     const logger = logdown(loggerName, {
       logger: console,
       markdown: false,
+      plaintext: config.plaintext,
       prefixColor: config.color,
     });
 
