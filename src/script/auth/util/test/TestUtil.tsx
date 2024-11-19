@@ -35,6 +35,7 @@ import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 import {User} from 'src/script/entity/User';
 import {createUuid} from 'Util/uuid';
 
+import {mapLanguage} from '../../localeConfig';
 import {Api, RootState} from '../../module/reducer';
 
 const withStore = (
@@ -44,7 +45,15 @@ const withStore = (
 
 const withRouter = (component: React.ReactNode) => <Router>{component}</Router>;
 
-export const withIntl = (component: React.ReactNode) => <IntlProvider locale="en">{component}</IntlProvider>;
+const loadLanguage = (language: string) => {
+  return require(`I18n/${mapLanguage(language)}.json`);
+};
+
+export const withIntl = (component: React.ReactNode) => (
+  <IntlProvider locale="en" messages={loadLanguage('en-US')}>
+    {component}
+  </IntlProvider>
+);
 
 export const withTheme = (component: React.ReactNode) => <StyledApp themeId={THEME_ID.DEFAULT}>{component}</StyledApp>;
 
