@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [46.7.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.6.3...@wireapp/core@46.7.0) (2024-11-19)
+
+### Features
+
+* Throw error on crypto box migration failure ([#6661](https://github.com/wireapp/wire-web-packages/issues/6661)) ([6d1111e](https://github.com/wireapp/wire-web-packages/commit/6d1111e454165fdde8a35e8a7c07ef804db21102))
+
 ## [46.6.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.6.2...@wireapp/core@46.6.3) (2024-11-11)
 
 **Note:** Version bump only for package @wireapp/core
