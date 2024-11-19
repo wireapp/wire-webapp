@@ -48,7 +48,8 @@ jobs:
           echo "total_additions=$total_additions" >> $GITHUB_ENV
 
       - name: Deploy to precommit environment
-        if: ${{ steps.check_additions.outputs.total_additions > 100 && github.actor != 'dependabot[bot]' }}
+        id: deploy
+        if: ${{ env.total_additions > 100 && github.actor != 'dependabot[bot]' }}
         uses: einaregilsson/beanstalk-deploy@v22
         with:
           application_name: ${{ env.AWS_APPLICATION_NAME }}
@@ -62,3 +63,21 @@ jobs:
           version_label: ${{ github.run_id }}
           wait_for_deployment: false
           wait_for_environment_recovery: ${{ env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS }}
+
+      - name: Deployment Status
+        if: ${{ always() }}
+        run: |
+          if [[ "${{ steps.deploy.outcome }}" == "success" ]]; then
+            echo "✅ Deployment completed successfully"
+          elif [[ "${{ steps.deploy.outcome }}" == "skipped" ]]; then
+            if [[ "${{ env.total_additions }}" -le 100 ]]; then
+              echo "⏭️ Deployment was skipped: PR has ${{ env.total_additions }} additions (threshold: 100)"
+            elif [[ "${{ github.actor }}" == "dependabot[bot]" ]]; then
+              echo "⏭️ Deployment was skipped: PR is from dependabot"
+            else
+              echo "⏭️ Deployment was skipped"
+            fi
+          else
+            echo "❌ Deployment failed"
+            exit 1
+          fi
