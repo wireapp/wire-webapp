@@ -71,6 +71,7 @@ export interface UserListProps {
   users: User[];
   isSelectable?: boolean;
   selfUser: User;
+  filterDeletedUsers?: boolean;
 }
 
 export const UserList = ({
@@ -93,11 +94,15 @@ export const UserList = ({
   isSelectable = false,
   onSelectUser,
   selfUser,
+  filterDeletedUsers = true,
 }: UserListProps) => {
   const [maxShownUsers, setMaxShownUsers] = useState(USER_CHUNK_SIZE);
 
   // filter out deleted users
-  const filteredUsers = useMemo(() => users.filter(user => !user.isDeleted), [users]);
+  const filteredUsers = useMemo(
+    () => (filterDeletedUsers ? users.filter(user => !user.isDeleted) : users),
+    [users, filterDeletedUsers],
+  );
 
   const [expandedFolders, setExpandedFolders] = useState<UserListSections[]>([UserListSections.CONTACTS]);
 
