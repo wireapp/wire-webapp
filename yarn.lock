@@ -6072,9 +6072,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:46.6.3":
-  version: 46.6.3
-  resolution: "@wireapp/core@npm:46.6.3"
+"@wireapp/core@npm:46.7.0":
+  version: 46.7.0
+  resolution: "@wireapp/core@npm:46.7.0"
   dependencies:
     "@wireapp/api-client": "npm:^27.10.0"
     "@wireapp/commons": "npm:^5.2.13"
@@ -6094,7 +6094,7 @@ __metadata:
     long: "npm:^5.2.0"
     uuid: "npm:9.0.1"
     zod: "npm:3.23.8"
-  checksum: 10/14cb4ea7a0ba3c786242efb04d4630d5877334489dacec8e811b73555f69e5ef20f8e18a07d4bba375890561bcf8d7bb61c131289b7896e323d9da893f259a4c
+  checksum: 10/623e70bf787a22b3782fa3556e2563fc13ef37f9706f85048e0158b132e3738e027b523893138cc1b9fcf01decc54de51acac0ed7ad8ca16e91af5faec64b992
   languageName: node
   linkType: hard
 
@@ -8043,13 +8043,13 @@ __metadata:
   linkType: hard
 
 "cross-spawn@npm:^7.0.0, cross-spawn@npm:^7.0.1, cross-spawn@npm:^7.0.2, cross-spawn@npm:^7.0.3":
-  version: 7.0.5
-  resolution: "cross-spawn@npm:7.0.5"
+  version: 7.0.3
+  resolution: "cross-spawn@npm:7.0.3"
   dependencies:
     path-key: "npm:^3.1.0"
     shebang-command: "npm:^2.0.0"
     which: "npm:^2.0.1"
-  checksum: 10/c95062469d4bdbc1f099454d01c0e77177a3733012d41bf907a71eb8d22d2add43b5adf6a0a14ef4e7feaf804082714d6c262ef4557a1c480b86786c120d18e2
+  checksum: 10/e1a13869d2f57d974de0d9ef7acbf69dc6937db20b918525a01dacb5032129bd552d290d886d981e99f1b624cb03657084cc87bd40f115c07ecf376821c729ce
   languageName: node
   linkType: hard
 
@@ -18753,7 +18753,7 @@ __metadata:
     "@wireapp/avs": "npm:9.10.16"
     "@wireapp/commons": "npm:5.2.13"
     "@wireapp/copy-config": "npm:2.2.10"
-    "@wireapp/core": "npm:46.6.3"
+    "@wireapp/core": "npm:46.7.0"
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/prettier-config": "npm:0.6.4"
     "@wireapp/react-ui-kit": "npm:9.26.2"
