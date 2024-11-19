@@ -26,7 +26,10 @@ import {ConversationRepository} from 'src/script/conversation/ConversationReposi
 import {User} from 'src/script/entity/User';
 import {ConversationFolderTab} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTab/ConversationFolderTab';
 import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
+import {Core} from 'src/script/service/CoreSingleton';
+import {TeamRepository} from 'src/script/team/TeamRepository';
 import {TeamState} from 'src/script/team/TeamState';
+import {UserRepository} from 'src/script/user/UserRepository';
 import {isDataDogEnabled} from 'Util/DataDog';
 import {getWebEnvironment} from 'Util/Environment';
 import {replaceLink, t} from 'Util/LocalizerUtil';
@@ -38,7 +41,7 @@ import {
   iconStyle,
 } from './ConversationTabs.styles';
 import {FolderIcon} from './FolderIcon';
-import {TeamCreationBanner} from './TeamCreation/TeamCreationBanner';
+import {TeamCreation} from './TeamCreation/TeamCreation';
 
 import {Config} from '../../../../../Config';
 import {Conversation} from '../../../../../entity/Conversation';
@@ -58,6 +61,8 @@ interface ConversationTabsProps {
   onClickPreferences: () => void;
   showNotificationsBadge?: boolean;
   selfUser: User;
+  teamRepository: TeamRepository;
+  userRepository: UserRepository;
 }
 
 export const ConversationTabs = ({
@@ -72,7 +77,10 @@ export const ConversationTabs = ({
   onClickPreferences,
   showNotificationsBadge = false,
   selfUser,
+  userRepository,
+  teamRepository,
 }: ConversationTabsProps) => {
+  const core = container.resolve(Core);
   const teamState = container.resolve(TeamState);
   const totalUnreadConversations = unreadConversations.length;
 
@@ -87,7 +95,9 @@ export const ConversationTabs = ({
   const filterUnreadAndArchivedConversations = (conversation: Conversation) =>
     !conversation.is_archived() && conversation.hasUnread();
 
-  const isTeamCreationEnabled = Config.getConfig().FEATURE.ENABLE_TEAM_CREATION;
+  const isTeamCreationEnabled =
+    Config.getConfig().FEATURE.ENABLE_TEAM_CREATION &&
+    core.backendFeatures.version >= Config.getConfig().MIN_TEAM_CREATION_SUPPORTED_API_VERSION;
 
   const conversationTabs = [
     {
@@ -195,7 +205,9 @@ export const ConversationTabs = ({
         aria-owns="tab-1 tab-2"
         className="conversations-sidebar-list-footer"
       >
-        {isTeamCreationEnabled && !teamState.isInTeam(selfUser) && <TeamCreationBanner />}
+        {isTeamCreationEnabled && !teamState.isInTeam(selfUser) && (
+          <TeamCreation teamRepository={teamRepository} userRepository={userRepository} selfUser={selfUser} />
+        )}
 
         {!getWebEnvironment().isProduction && isDataDogEnabled() && (
           <div css={footerDisclaimer}>

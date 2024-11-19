@@ -217,18 +217,6 @@ export class UserRepository extends TypedEventEmitter<Events> {
     const nonQualifiedUsers = await this.userService.clearNonQualifiedUsers();
 
     const dbUsers = await this.userService.loadUserFromDb();
-    /* prior to April 2023, we were only storing the availability in the DB, we need to refetch those users */
-    const [localUsers] = partition(dbUsers, user => !!user.qualified_id);
-
-    // We can remove users that are not linked to any "known users" from the local database.
-    // Known users are the users that are part of the conversations or the connections (or some extra users)
-    const orphanUsers = localUsers.filter(
-      localUser => !users.find(user => matchQualifiedIds(user, localUser.qualified_id)),
-    );
-
-    for (const orphanUser of orphanUsers) {
-      await this.userService.removeUserFromDb(orphanUser.qualified_id);
-    }
 
     // The self user doesn't need to be re-fetched
     const usersToFetch = users.filter(user => !matchQualifiedIds(selfUser.qualifiedId, user));
@@ -586,7 +574,27 @@ export class UserRepository extends TypedEventEmitter<Events> {
     );
   }
 
-  private mapUserResponse(found: APIClientUser[], failed: QualifiedId[], dbUsers?: UserRecord[]): User[] {
+  // Replaces a deleted user name ("default") with the name from the local database.
+  private restoreDeletedUserNames(apiUsers: APIClientUser[], dbUsers: UserRecord[]): UserRecord[] {
+    return apiUsers.map(user => {
+      if (!user.deleted) {
+        return user;
+      }
+
+      const localUser = dbUsers.find(dbUser => dbUser.id === user.id);
+
+      if (localUser && localUser.name) {
+        return {
+          ...user,
+          name: localUser.name,
+        };
+      }
+
+      return user;
+    });
+  }
+
+  private mapUserResponse(found: APIClientUser[], failed: QualifiedId[], dbUsers: UserRecord[]): User[] {
     const selfUser = this.userState.self();
 
     if (!selfUser) {
@@ -607,7 +615,10 @@ export class UserRepository extends TypedEventEmitter<Events> {
       return new User(userId.id, userId.domain);
     });
 
-    const mappedUsers = this.userMapper.mapUsersFromJson(found, selfDomain).concat(failedToLoad);
+    const users = this.restoreDeletedUserNames(found, dbUsers);
+
+    const mappedUsers = this.userMapper.mapUsersFromJson(users, selfDomain).concat(failedToLoad);
+
     if (this.teamState.isTeam()) {
       this.mapGuestStatus(mappedUsers);
     }
@@ -622,7 +633,9 @@ export class UserRepository extends TypedEventEmitter<Events> {
    */
   private async fetchUsers(userIds: QualifiedId[]): Promise<User[]> {
     const {found, failed} = await this.fetchRawUsers(userIds, this.userState.self().domain);
-    const users = this.mapUserResponse(found, failed);
+    const dbUsers = await this.userService.loadUserFromDb();
+    const users = this.mapUserResponse(found, failed, dbUsers);
+
     let fetchedUserEntities = this.saveUsers(users);
     // If there is a difference then we most likely have a case with a suspended user
     const isAllUserIds = userIds.length === fetchedUserEntities.length;

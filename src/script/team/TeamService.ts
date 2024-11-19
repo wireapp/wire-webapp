@@ -20,6 +20,7 @@
 import type {ConversationRolesList} from '@wireapp/api-client/lib/conversation/ConversationRole';
 import type {FeatureList} from '@wireapp/api-client/lib/team/feature/';
 import {FeatureStatus, FEATURE_KEY} from '@wireapp/api-client/lib/team/feature/';
+import {TeamMigrationPayload} from '@wireapp/api-client/lib/team/invitation/TeamMigrationPayload';
 import type {LegalHoldMemberData} from '@wireapp/api-client/lib/team/legalhold/';
 import type {MemberData, Members} from '@wireapp/api-client/lib/team/member/';
 import type {Services} from '@wireapp/api-client/lib/team/service/';
@@ -66,6 +67,10 @@ export class TeamService {
   async conversationHasGuestLink(conversationId: string): Promise<boolean> {
     const {status} = await this.apiClient.api.conversation.getConversationGuestLinkFeature(conversationId);
     return status === 'enabled';
+  }
+
+  async upgradePersonalToTeamUser(payload: TeamMigrationPayload) {
+    return this.apiClient.api.teams.invitation.upgradePersonalToTeamUser(payload);
   }
 
   getAllTeamFeatures(): Promise<FeatureList> {
