@@ -225,7 +225,7 @@ const AccountFormComponent = ({account, ...props}: Props & ConnectedProps & Disp
           }}
           data-uie-name="element-password-help"
         >
-          {t('accountForm.passwordHelp', Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH)}
+          {t('accountForm.passwordHelp', {minPasswordLength: String(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH)})}
         </Small>
 
         <Exception errors={[props.authError, ...validationErrors]} />
