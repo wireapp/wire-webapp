@@ -42,7 +42,7 @@ import {
   RoundIconButton,
 } from '@wireapp/react-ui-kit';
 
-import {StringIdentifer, t} from 'Util/LocalizerUtil';
+import {t} from 'Util/LocalizerUtil';
 import {isBackendError} from 'Util/TypePredicateUtil';
 
 import {Config} from '../../Config';
@@ -325,7 +325,7 @@ const SingleSignOnFormComponent = ({
               onChange={onCodeChange}
               ref={codeOrMailInput}
               markInvalid={!isCodeOrMailInputValid}
-              placeholder={t(inputPlaceholder as StringIdentifer)}
+              placeholder={inputPlaceholder}
               value={codeOrMail}
               autoComplete="section-login sso-code"
               maxLength={1024}
