@@ -39,13 +39,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Check total additions
+      - name: Check total PR additions
         id: check_additions
         run: |
-          echo "${{ steps.pr_details.outputs.data }}" | jq '.additions' > total_additions.txt
-          total_additions=$(cat total_additions.txt)
+          # Parse the JSON response directly without storing in file
+          total_additions=$(echo '${{ fromJSON(steps.pr_details.outputs.data).additions }}')
           echo "Total additions: $total_additions"
-          echo "::set-output name=total_additions::$total_additions"
+          echo "total_additions=$total_additions" >> $GITHUB_ENV
 
       - name: Deploy to precommit environment
         if: ${{ steps.check_additions.outputs.total_additions > 100 && github.actor != 'dependabot[bot]' }}
