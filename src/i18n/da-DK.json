@@ -1125,6 +1125,7 @@
   "modalServiceUnavailableMessage": "Tjenesten er utilgængelig i øjeblikket.",
   "modalSessionResetHeadline": "Sessionen er blevet nulstillet",
   "modalSessionResetMessage": "If the problem is not resolved, [link]contact[/link] us.",
+  "modalUnableToReceiveMessages": "You can’t receive messages at the moment. Please log out and log in again directly to resolve this case.",
   "modalUploadContactsAction": "Prøv igen",
   "modalUploadContactsMessage": "Vi har ikke modtaget dine oplysninger. Venligst prøv at importere dine kontakter igen.",
   "modalUserBlockAction": "Blokér",

@@ -1125,6 +1125,7 @@
   "modalServiceUnavailableMessage": "現在、サービスはご利用いただけません。",
   "modalSessionResetHeadline": "このセッションはリセットされました",
   "modalSessionResetMessage": "もし問題が解決しない場合は、[link]連絡先[/link]に知らせてください。",
+  "modalUnableToReceiveMessages": "You can’t receive messages at the moment. Please log out and log in again directly to resolve this case.",
   "modalUploadContactsAction": "もう一度試す",
   "modalUploadContactsMessage": "あなたの情報を受信していません。連絡先を再度インポートしてください。",
   "modalUserBlockAction": "ブロック",

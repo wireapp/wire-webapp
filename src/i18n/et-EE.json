@@ -1125,6 +1125,7 @@
   "modalServiceUnavailableMessage": "Teenus pole hetkel saadaval.",
   "modalSessionResetHeadline": "Sessioon on lähtestatud",
   "modalSessionResetMessage": "If the problem is not resolved, [link]contact[/link] us.",
+  "modalUnableToReceiveMessages": "You can’t receive messages at the moment. Please log out and log in again directly to resolve this case.",
   "modalUploadContactsAction": "Proovi uuesti",
   "modalUploadContactsMessage": "Me ei saanud sinu infot kätte. Palun proovi uuesti kontakte importida.",
   "modalUserBlockAction": "Blokeeri",

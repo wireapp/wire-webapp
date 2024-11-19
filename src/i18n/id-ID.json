@@ -1125,6 +1125,7 @@
   "modalServiceUnavailableMessage": "The service is unavailable at the moment.",
   "modalSessionResetHeadline": "Sesi telah diulang",
   "modalSessionResetMessage": "If the problem is not resolved, [link]contact[/link] us.",
+  "modalUnableToReceiveMessages": "You can’t receive messages at the moment. Please log out and log in again directly to resolve this case.",
   "modalUploadContactsAction": "Coba lagi",
   "modalUploadContactsMessage": "Kami tidak menerima informasi Anda. Silakan coba mengimpor kontak Anda lagi.",
   "modalUserBlockAction": "Blokir",

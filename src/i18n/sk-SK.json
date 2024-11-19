@@ -1125,6 +1125,7 @@
   "modalServiceUnavailableMessage": "The service is unavailable at the moment.",
   "modalSessionResetHeadline": "Relácia bola obnovená",
   "modalSessionResetMessage": "If the problem is not resolved, [link]contact[/link] us.",
+  "modalUnableToReceiveMessages": "You can’t receive messages at the moment. Please log out and log in again directly to resolve this case.",
   "modalUploadContactsAction": "Skúsiť znova",
   "modalUploadContactsMessage": "Neprijali sme Vaše informácie. Skúste prosím znovu importovať Vaše kontakty.",
   "modalUserBlockAction": "Blokovať",
