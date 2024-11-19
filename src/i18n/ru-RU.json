@@ -1125,6 +1125,7 @@
   "modalServiceUnavailableMessage": "В данный момент этот сервис недоступен.",
   "modalSessionResetHeadline": "Сессия была сброшена",
   "modalSessionResetMessage": "Если проблема не решена, [link]свяжитесь[/link] с нами.",
+  "modalUnableToReceiveMessages": "You can’t receive messages at the moment. Please log out and log in again directly to resolve this case.",
   "modalUploadContactsAction": "Повторить",
   "modalUploadContactsMessage": "Мы не получили вашу информацию. Повторите попытку импорта своих контактов.",
   "modalUserBlockAction": "Заблокировать",

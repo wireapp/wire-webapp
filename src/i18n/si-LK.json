@@ -1125,6 +1125,7 @@
   "modalServiceUnavailableMessage": "සේවාව මේ මොහොතේ නොතිබේ.",
   "modalSessionResetHeadline": "වාරය නැවත සකස් කර ඇත",
   "modalSessionResetMessage": "ගැටලුව නොවිසඳුනේ නම්, අප [link]අමතන්න/link].",
+  "modalUnableToReceiveMessages": "You can’t receive messages at the moment. Please log out and log in again directly to resolve this case.",
   "modalUploadContactsAction": "නැවත",
   "modalUploadContactsMessage": "ඔබගේ තොරතුරු අපට ලැබුණේ නැත. කරුණාකර යළි ඔබගේ සබඳතා ආයාත කිරීමට උත්සාහ කරන්න.",
   "modalUserBlockAction": "අවහිර කරන්න.",

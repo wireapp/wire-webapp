@@ -1125,6 +1125,7 @@
   "modalServiceUnavailableMessage": "The service is unavailable at the moment.",
   "modalSessionResetHeadline": "Session已被重設",
   "modalSessionResetMessage": "If the problem is not resolved, [link]contact[/link] us.",
+  "modalUnableToReceiveMessages": "You can’t receive messages at the moment. Please log out and log in again directly to resolve this case.",
   "modalUploadContactsAction": "再試一次",
   "modalUploadContactsMessage": "我們沒有收到您的資訊，請試著再次匯入您的連絡人。",
   "modalUserBlockAction": "封鎖",

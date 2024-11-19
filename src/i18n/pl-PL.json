@@ -1125,6 +1125,7 @@
   "modalServiceUnavailableMessage": "The service is unavailable at the moment.",
   "modalSessionResetHeadline": "Sesja została zresetowana",
   "modalSessionResetMessage": "If the problem is not resolved, [link]contact[/link] us.",
+  "modalUnableToReceiveMessages": "You can’t receive messages at the moment. Please log out and log in again directly to resolve this case.",
   "modalUploadContactsAction": "Spróbuj ponownie",
   "modalUploadContactsMessage": "Nie otrzymaliśmy Twoich informacji. Spróbuj ponownie zaimportować swoje kontakty.",
   "modalUserBlockAction": "Zablokuj",

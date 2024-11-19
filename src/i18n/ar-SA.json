@@ -1125,6 +1125,7 @@
   "modalServiceUnavailableMessage": "هذه الخدمة غير متاحة حاليا.",
   "modalSessionResetHeadline": "تم إعادة تعيين الجلسة",
   "modalSessionResetMessage": "If the problem is not resolved, [link]contact[/link] us.",
+  "modalUnableToReceiveMessages": "You can’t receive messages at the moment. Please log out and log in again directly to resolve this case.",
   "modalUploadContactsAction": "حاول مرة أخرى",
   "modalUploadContactsMessage": "لم نستقبل أيّة معلومات. من فضلك حاول استيراد جهات اتصالك مرة أخرى.",
   "modalUserBlockAction": "حظر \n",

@@ -1125,6 +1125,7 @@
   "modalServiceUnavailableMessage": "The service is unavailable at the moment.",
   "modalSessionResetHeadline": "Η περίοδος λειτουργίας σύνδεσης έχει επαναφερθεί",
   "modalSessionResetMessage": "If the problem is not resolved, [link]contact[/link] us.",
+  "modalUnableToReceiveMessages": "You can’t receive messages at the moment. Please log out and log in again directly to resolve this case.",
   "modalUploadContactsAction": "Προσπαθήστε ξανά",
   "modalUploadContactsMessage": "Δεν λάβαμε πληροφορίες σας. Παρακαλούμε προσπαθήστε ξανά να εισάγετε τις επαφές σας.",
   "modalUserBlockAction": "Αποκλεισμός",

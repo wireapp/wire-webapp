@@ -1125,6 +1125,7 @@
   "modalServiceUnavailableMessage": "A szolgáltatás jelenleg nem elérhető.",
   "modalSessionResetHeadline": "A munkamenet alaphelyzetbe állítva",
   "modalSessionResetMessage": "Ha a probléma nem oldódik meg, [link]lépjen kapcsolatba velünk.[/link].",
+  "modalUnableToReceiveMessages": "You can’t receive messages at the moment. Please log out and log in again directly to resolve this case.",
   "modalUploadContactsAction": "Újra próbálás",
   "modalUploadContactsMessage": "Nem kaptuk meg az adataidat. Kérjük, próbáld meg újra a névjegyek importálását.",
   "modalUserBlockAction": "Tiltás",

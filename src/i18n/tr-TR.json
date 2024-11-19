@@ -1125,6 +1125,7 @@
   "modalServiceUnavailableMessage": "Hizmet şu anda kullanılamıyor.",
   "modalSessionResetHeadline": "Oturum sıfırlandı",
   "modalSessionResetMessage": "Sorun çözülmediyse, [link] bize [/link] ulaşın.",
+  "modalUnableToReceiveMessages": "You can’t receive messages at the moment. Please log out and log in again directly to resolve this case.",
   "modalUploadContactsAction": "Tekrar deneyin",
   "modalUploadContactsMessage": "Bilgilerinzi alamadık. Lütfen kişileriniz yeniden içe aktarmayı deneyin.",
   "modalUserBlockAction": "Engelle",

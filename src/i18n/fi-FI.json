@@ -1125,6 +1125,7 @@
   "modalServiceUnavailableMessage": "The service is unavailable at the moment.",
   "modalSessionResetHeadline": "Istunto on nollattu",
   "modalSessionResetMessage": "If the problem is not resolved, [link]contact[/link] us.",
+  "modalUnableToReceiveMessages": "You can’t receive messages at the moment. Please log out and log in again directly to resolve this case.",
   "modalUploadContactsAction": "Yritä uudelleen",
   "modalUploadContactsMessage": "Emme vastaanottaneet tietojasi. Ole hyvä ja yritä tuoda kontaktisi uudelleen.",
   "modalUserBlockAction": "Estä",

@@ -1125,6 +1125,7 @@
   "modalServiceUnavailableMessage": "Paslauga šiuo metu negalima.",
   "modalSessionResetHeadline": "Seansas buvo atstatytas",
   "modalSessionResetMessage": "Jei problema neišspręsta, [link]susisiekite[/link] su mumis.",
+  "modalUnableToReceiveMessages": "You can’t receive messages at the moment. Please log out and log in again directly to resolve this case.",
   "modalUploadContactsAction": "Bandyti dar kartą",
   "modalUploadContactsMessage": "Mes negavome jūsų informacijos. Bandykite importuoti savo kontaktus dar kartą.",
   "modalUserBlockAction": "Užblokuoti",
