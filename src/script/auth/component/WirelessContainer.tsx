@@ -65,7 +65,6 @@ const WirelessContainer: React.FC<Props> = ({showCookiePolicyBanner, onCookiePol
               data-uie-name="go-privacy"
             >
               <FormattedMessage
-                defaultMessage="We use cookies to personalize your experience on our website. By continuing to use the website, you agree to the use of cookies.{newline}Further information on cookies can be found in our <strong>privacy policy</strong>."
                 id="cookiePolicyStrings.bannerText"
                 values={{
                   newline: <br />,
