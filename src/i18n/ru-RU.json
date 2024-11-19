@@ -906,7 +906,7 @@
   "modalAccountCreateMessage": "Создав учетную запись, вы потеряете историю бесед в этой гостевой комнате.",
   "modalAccountDeletionAction": "Удалить",
   "modalAccountDeletionHeadline": "Удаление аккаунта",
-  "modalAccountDeletionMessage": "We will send you an email. Follow the link to delete your account permanently.",
+  "modalAccountDeletionMessage": "Мы отправим вам email. Перейдите по ссылке, чтобы удалить свой аккаунт навсегда.",
   "modalAccountLeaveGuestRoomAction": "Покинуть",
   "modalAccountLeaveGuestRoomHeadline": "Покинуть гостевую комнату?",
   "modalAccountLeaveGuestRoomMessage": "История беседы будет удалена. В следующий раз создайте учетную запись, если хотите чтобы она сохранялась.",
