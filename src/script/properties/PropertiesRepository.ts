@@ -38,7 +38,7 @@ import {PROPERTIES_TYPE, UserConsentStatus} from './PropertiesType';
 
 import type {User} from '../entity/User';
 import type {SelfService} from '../self/SelfService';
-import {isCountlyEnabledAtCurrentEnvironment} from '../tracking/Countly.helpers';
+import {isTelemetryEnabledAtCurrentEnvironment} from '../tracking/Telemetry.helpers';
 import {ConsentValue} from '../user/ConsentValue';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from '../user/TypingIndicatorMode';
 
@@ -134,14 +134,14 @@ export class PropertiesRepository {
         userConsentStatus === UserConsentStatus.ALL_GRANTED,
       isTelemetryConsentGiven:
         userConsentStatus === UserConsentStatus.TRACKING_GRANTED || userConsentStatus === UserConsentStatus.ALL_GRANTED,
-      isCountlyEnabledAtCurrentEnvironment: isCountlyEnabledAtCurrentEnvironment(),
+      isTelemetryEnabledAtCurrentEnvironment: isTelemetryEnabledAtCurrentEnvironment(),
     };
   }
 
   checkTelemetrySharingPermission(): void {
     const isTelemetryPreferenceSet = this.getPreference(PROPERTIES_TYPE.PRIVACY.TELEMETRY_SHARING) !== undefined;
 
-    if (!isCountlyEnabledAtCurrentEnvironment() || isTelemetryPreferenceSet) {
+    if (!isTelemetryEnabledAtCurrentEnvironment() || isTelemetryPreferenceSet) {
       return;
     }
 

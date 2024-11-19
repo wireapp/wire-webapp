@@ -6256,6 +6256,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@wireapp/telemetry@npm:0.1.2":
+  version: 0.1.2
+  resolution: "@wireapp/telemetry@npm:0.1.2"
+  dependencies:
+    countly-sdk-web: "npm:24.4.1"
+  checksum: 10/f40e140e79559f459fa757ed4de89ee5803ece19d0370a19587011f13c67278162abcf20dfc86ea9915b3dd52c6f0d9091ca0cdd968de004eeb0f550b6c3a21a
+  languageName: node
+  linkType: hard
+
 "@wireapp/webapp-events@npm:0.24.3":
   version: 0.24.3
   resolution: "@wireapp/webapp-events@npm:0.24.3"
@@ -7971,10 +7980,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"countly-sdk-web@npm:24.11.0":
-  version: 24.11.0
-  resolution: "countly-sdk-web@npm:24.11.0"
-  checksum: 10/d2466a826d7f7e8ee2f4730119dcf6e4ffef4e92de6f563f0e9b6f8ef876afd98aa12b23f41136d1f30e35d8c7729fd1bd472e30190745213156d8d989e071b2
+"countly-sdk-web@npm:24.4.1":
+  version: 24.4.1
+  resolution: "countly-sdk-web@npm:24.4.1"
+  checksum: 10/666bb58adcde8bcc0df08347eef3ecaf276f5e6fe3255ebbba6958b2648fedc8c8b0086f9622dacc21d82501cd5a4a814c342baad50b5add347bf473be4c676e
   languageName: node
   linkType: hard
 
@@ -18750,6 +18759,7 @@ __metadata:
     "@wireapp/react-ui-kit": "npm:9.26.2"
     "@wireapp/store-engine": "npm:5.1.11"
     "@wireapp/store-engine-dexie": "npm:2.1.15"
+    "@wireapp/telemetry": "npm:0.1.2"
     "@wireapp/webapp-events": "npm:0.24.3"
     amplify: "https://github.com/wireapp/amplify#head=master"
     archiver: "npm:7.0.1"
@@ -18760,7 +18770,6 @@ __metadata:
     classnames: "npm:2.5.1"
     copy-webpack-plugin: "npm:12.0.2"
     core-js: "npm:3.39.0"
-    countly-sdk-web: "npm:24.11.0"
     cross-env: "npm:7.0.3"
     css-loader: "npm:7.1.2"
     cssnano: "npm:7.0.6"

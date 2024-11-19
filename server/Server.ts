@@ -211,7 +211,6 @@ class Server {
       APP_BASE: this.config.APP_BASE,
       OPEN_GRAPH: this.config.OPEN_GRAPH,
       VERSION: this.config.VERSION,
-      COUNTLY_NONCE: this.config.COUNTLY_NONCE,
     };
   }
 
