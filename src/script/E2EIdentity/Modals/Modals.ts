@@ -80,16 +80,20 @@ export const getModalOptions = ({
       </svg>
   </div>
   `;
+
+  const gracePeriodOverParagraph = t('acme.settingsChanged.gracePeriodOver.paragraph', undefined, {
+    br: '<br>',
+    ...replaceLearnMore,
+  });
+
+  const settingsChangedParagraph = t('acme.settingsChanged.paragraph', undefined, {br: '<br>', ...replaceLearnMore});
+
   switch (type) {
     case ModalType.ENROLL:
       options = {
         text: {
           closeBtnLabel: t('acme.settingsChanged.button.close'),
-          htmlMessage: extraParams?.isGracePeriodOver
-            ? // @ts-expect-error: the "url" should be provided
-              t('acme.settingsChanged.gracePeriodOver.paragraph', undefined, {br: '<br>', ...replaceLearnMore})
-            : // @ts-expect-error: the "url" should be provided
-              t('acme.settingsChanged.paragraph', undefined, {br: '<br>', ...replaceLearnMore}),
+          htmlMessage: extraParams?.isGracePeriodOver ? gracePeriodOverParagraph : settingsChangedParagraph,
           title: t('acme.settingsChanged.headline.alt'),
         },
         primaryAction: {
