@@ -1649,7 +1649,6 @@ declare module 'I18n/en-US.json' {
     wireMacos: `{brandName} for macOS`;
     wireWindows: `{brandName} for Windows`;
     wire_for_web: `{brandName} for Web`;
-    testSiema: `hello {there}`;
   };
   export default translations;
 }
