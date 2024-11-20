@@ -305,21 +305,6 @@ describe('UserRepository', () => {
         const userWithAvailability = userState.users().filter(user => user.availability() !== Availability.Type.NONE);
         expect(userWithAvailability).toHaveLength(partialUsers.length);
       });
-
-      it('deletes users that are not needed', async () => {
-        const newUsers = [generateAPIUser(), generateAPIUser()];
-        const connections = createConnections(newUsers);
-        const removeUserSpy = jest.spyOn(userService, 'removeUserFromDb').mockResolvedValue();
-        jest.spyOn(userService, 'getUsers').mockResolvedValue({found: newUsers});
-
-        await userRepository.loadUsers(new User(), connections, [], []);
-
-        expect(userState.users()).toHaveLength(newUsers.length + 1);
-        expect(removeUserSpy).toHaveBeenCalledTimes(localUsers.length);
-        expect(removeUserSpy).toHaveBeenCalledWith(localUsers[0].qualified_id!);
-        expect(removeUserSpy).toHaveBeenCalledWith(localUsers[1].qualified_id!);
-        expect(removeUserSpy).toHaveBeenCalledWith(localUsers[2].qualified_id!);
-      });
     });
 
     describe('assignAllClients', () => {

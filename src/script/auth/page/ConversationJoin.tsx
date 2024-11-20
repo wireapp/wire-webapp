@@ -21,7 +21,6 @@ import React, {useEffect, useState} from 'react';
 
 import type {RegisterData} from '@wireapp/api-client/lib/auth';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
-import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {Navigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
@@ -29,6 +28,7 @@ import {AnyAction, Dispatch} from 'redux';
 import {UrlUtil} from '@wireapp/commons';
 import {Column, Columns, H1, Muted} from '@wireapp/react-ui-kit';
 
+import {t} from 'Util/LocalizerUtil';
 import {noop} from 'Util/util';
 
 import {GuestLoginColumn, IsLoggedInColumn, Separator} from './ConversationJoinComponents';
@@ -38,7 +38,6 @@ import {Login} from './Login';
 import {Page} from './Page';
 
 import {Config} from '../../Config';
-import {conversationJoinStrings} from '../../strings';
 import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
 import {JoinGuestLinkPasswordModal} from '../component/JoinGuestLinkPasswordModal';
 import {WirelessContainer} from '../component/WirelessContainer';
@@ -74,7 +73,6 @@ const ConversationJoinComponent = ({
   doGetAllClients,
 }: Props & ConnectedProps & DispatchProps) => {
   const nameInput = React.useRef<HTMLInputElement>(null);
-  const {formatMessage: _} = useIntl();
 
   const conversationHasPassword = conversationInfo?.has_password;
 
@@ -270,11 +268,11 @@ const ConversationJoinComponent = ({
         <AppAlreadyOpen />
         <div style={{display: 'flex', alignItems: 'center', flexDirection: 'column', marginBottom: '2rem'}}>
           <H1 style={{fontWeight: 500, marginTop: '0', marginBottom: '1rem'}} data-uie-name="status-join-headline">
-            {_(conversationJoinStrings.mainHeadline)}
+            {t('conversationJoin.mainHeadline')}
           </H1>
           {!isWirePublicInstance && (
             <Muted data-uie-name="status-join-subhead">
-              {_(conversationJoinStrings.headline, {domain: window.location.hostname})}
+              {t('conversationJoin.headline', {domain: window.location.hostname})}
             </Muted>
           )}
         </div>

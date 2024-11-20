@@ -19,10 +19,15 @@
 
 import {useState} from 'react';
 
+import {amplify} from 'amplify';
+
 import {Button, ButtonVariant, IconButton} from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {BannerPortal} from 'Components/BannerPortal/BannerPortal';
 import * as Icon from 'Components/Icon';
+import {EventName} from 'src/script/tracking/EventName';
+import {Segmentation} from 'src/script/tracking/Segmentation';
 import {t} from 'Util/LocalizerUtil';
 
 import {
@@ -63,11 +68,22 @@ export const TeamCreationBanner = ({onClick}: {onClick: () => void}) => {
     setIsBannerVisible(true);
     const rect = event.currentTarget.getBoundingClientRect();
     setPosition({x: rect.x, y: rect.y});
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.UI.CLICKED.SETTINGS_MIGRATION);
   };
 
   const bannerBtnClickHandler = () => {
     setIsBannerVisible(false);
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.UI.CLICKED.PERSONAL_MIGRATION_CTA, {
+      step: Segmentation.TEAM_CREATION_STEP.CLICKED_CREATE_TEAM,
+    });
     onClick();
+  };
+
+  const portalCloseHandler = () => {
+    setIsBannerVisible(false);
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.UI.CLICKED.PERSONAL_MIGRATION_CTA, {
+      step: Segmentation.TEAM_CREATION_STEP.CLICKED_DISMISS_CTA,
+    });
   };
 
   if (sidebarStatus === SidebarStatus.OPEN) {
@@ -84,7 +100,7 @@ export const TeamCreationBanner = ({onClick}: {onClick: () => void}) => {
           // Position + padding
           positionX={position.x + PADDING_X}
           positionY={position.y + PADDING_Y}
-          onClose={() => setIsBannerVisible(false)}
+          onClose={portalCloseHandler}
         >
           <Banner onClick={bannerBtnClickHandler} />
         </BannerPortal>

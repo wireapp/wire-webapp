@@ -359,8 +359,8 @@ export const MessagesList: FC<MessagesListParams> = ({
             });
           })}
         </div>
+        <JumpToLastMessageButton onGoToLastMessage={jumpToLastMessage} conversation={conversation} />
       </FadingScrollbar>
-      <JumpToLastMessageButton onGoToLastMessage={jumpToLastMessage} conversation={conversation} />
     </>
   );
 };

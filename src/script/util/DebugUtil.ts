@@ -68,7 +68,7 @@ import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
 import {EventRecord, StorageRepository, StorageSchemata} from '../storage';
 import {TeamState} from '../team/TeamState';
-import {disableForcedErrorReporting} from '../tracking/Countly.helpers';
+import {disableForcedErrorReporting} from '../tracking/Telemetry.helpers';
 import {UserRepository} from '../user/UserRepository';
 import {UserState} from '../user/UserState';
 import {ViewModelRepositories} from '../view_model/MainViewModel';

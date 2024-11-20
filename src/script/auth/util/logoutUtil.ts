@@ -17,12 +17,11 @@
  *
  */
 
-export interface StepProps {
-  onNextStep: () => void;
-  onPreviousStep: () => void;
-  onSuccess: () => void;
-  teamName: string;
-  setTeamName: (teamName: string) => void;
-  userName: string;
-  goToFirstStep: () => void;
-}
+import {LOGOUT_REASON} from '../route';
+
+export const logoutReasonStrings = {
+  [LOGOUT_REASON.ACCOUNT_REMOVED]: 'LOGOUT_REASON.ACCOUNT_REMOVED',
+  [LOGOUT_REASON.CLIENT_REMOVED]: 'LOGOUT_REASON.CLIENT_REMOVED',
+  [LOGOUT_REASON.NO_APP_CONFIG]: 'LOGOUT_REASON.NO_APP_CONFIG',
+  [LOGOUT_REASON.SESSION_EXPIRED]: 'LOGOUT_REASON.SESSION_EXPIRED',
+};

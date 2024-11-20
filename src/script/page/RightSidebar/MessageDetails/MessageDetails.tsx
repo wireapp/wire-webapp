@@ -187,6 +187,7 @@ const MessageDetails: FC<MessageDetailsProps> = ({
               noUnderline
               conversationRepository={conversationRepository}
               onClick={onParticipantClick}
+              filterDeletedUsers={false}
             />
           </div>
         )}

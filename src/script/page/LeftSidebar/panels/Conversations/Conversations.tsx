@@ -17,7 +17,7 @@
  *
  */
 
-import React, {KeyboardEvent as ReactKeyBoardEvent, useEffect, useState} from 'react';
+import React, {KeyboardEvent as ReactKeyBoardEvent, useEffect, useRef, useState} from 'react';
 
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
@@ -96,6 +96,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   selfUser,
 }) => {
   const [conversationListRef, setConversationListRef] = useState<HTMLElement | null>(null);
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
 
   const {currentTab, status: sidebarStatus, setStatus: setSidebarStatus, setCurrentTab} = useSidebarStore();
   const [conversationsFilter, setConversationsFilter] = useState<string>('');
@@ -319,6 +320,7 @@ const Conversations: React.FC<ConversationsProps> = ({
             searchInputPlaceholder={searchInputPlaceholder}
             onSearchEnterClick={handleEnterSearchClick}
             jumpToRecentSearch={jumpToRecentSearch}
+            searchInputRef={searchInputRef}
           />
         }
         setConversationListRef={setConversationListRef}
@@ -405,6 +407,7 @@ const Conversations: React.FC<ConversationsProps> = ({
                 isEmpty={hasEmptyConversationsList}
                 groupParticipantsConversations={groupParticipantsConversations}
                 isGroupParticipantsVisible={isGroupParticipantsVisible}
+                searchInputRef={searchInputRef}
               />
             )}
           </>
