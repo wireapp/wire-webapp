@@ -21,6 +21,8 @@ const webpack = require('webpack');
 
 const path = require('path');
 
+const spawn = require('cross-spawn');
+
 const commonConfig = require('./webpack.config.common');
 
 const srcScript = 'src/script/';
@@ -32,28 +34,24 @@ const updateTranslationTypesPlugin = {
       const translationsFilePath = path.resolve(__dirname, 'src/i18n/en-US.json');
 
       if (!changedFiles.includes(translationsFilePath)) {
-        return;
+        return callback();
       }
 
       console.log('Translations file changed. Generating types...');
 
-      const {exec} = require('child_process');
-
-      exec('yarn run translate:generate-types', (error, _, stderr) => {
-        if (error) {
-          console.error(`Error running script: ${error.message}`);
-          return;
-        }
-        if (stderr) {
-          console.error(`Script error output:\n${stderr}`);
-        }
+      const process = spawn('yarn', ['run', 'translate:generate-types'], {
+        stdio: 'inherit',
       });
 
-      callback();
+      process.on('close', code => {
+        if (code !== 0) {
+          console.error(`Translation type generation failed with code ${code}`);
+        }
+        callback();
+      });
     });
   },
 };
-
 module.exports = {
   ...commonConfig,
   devtool: 'eval-source-map',
