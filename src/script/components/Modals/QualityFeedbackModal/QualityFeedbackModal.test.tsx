@@ -26,6 +26,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {CALL_QUALITY_FEEDBACK_KEY} from 'Components/Modals/QualityFeedbackModal/constants';
 import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
+import {t} from 'Util/LocalizerUtil';
 
 import {QualityFeedbackModal} from './QualityFeedbackModal';
 
@@ -83,7 +84,7 @@ describe('QualityFeedbackModal', () => {
       },
     });
 
-    fireEvent.click(getByText('qualityFeedback.skip'));
+    fireEvent.click(getByText(t('qualityFeedback.skip')));
 
     expect(amplify.publish).toHaveBeenCalledWith(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.QUALITY_REVIEW, {
       [Segmentation.CALL.QUALITY_REVIEW_LABEL]: RatingListLabel.DISMISSED,
@@ -125,7 +126,7 @@ describe('QualityFeedbackModal', () => {
       useCallAlertState.getState().setQualityFeedbackModalShown(true);
     });
 
-    const checkbox = getByText('qualityFeedback.doNotAskAgain');
+    const checkbox = getByText(t('qualityFeedback.doNotAskAgain'));
     fireEvent.click(checkbox);
     fireEvent.click(getByText('5'));
 

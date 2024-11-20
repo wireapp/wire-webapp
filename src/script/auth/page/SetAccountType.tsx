@@ -19,7 +19,6 @@
 
 import React from 'react';
 
-import {useIntl} from 'react-intl';
 import {Navigate} from 'react-router-dom';
 
 import {Runtime} from '@wireapp/commons';
@@ -38,10 +37,11 @@ import {
   Text,
 } from '@wireapp/react-ui-kit';
 
+import {t} from 'Util/LocalizerUtil';
+
 import {Page} from './Page';
 
 import {Config} from '../../Config';
-import {setAccountTypeStrings} from '../../strings';
 import {RouterLink} from '../component/RouterLink';
 import {ROUTE} from '../route';
 import {pathWithParams} from '../util/urlUtil';
@@ -49,11 +49,10 @@ import {pathWithParams} from '../util/urlUtil';
 type Props = React.HTMLProps<HTMLDivElement>;
 
 const SetAccountType = ({}: Props) => {
-  const {formatMessage: _} = useIntl();
   const isMacOsWrapper = Runtime.isDesktopApp() && Runtime.isMacOS();
 
   const backArrow = (
-    <RouterLink to={ROUTE.INDEX} data-uie-name="go-index" aria-label={_(setAccountTypeStrings.goBack)}>
+    <RouterLink to={ROUTE.INDEX} data-uie-name="go-index" aria-label={t('index.goBack')}>
       <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
     </RouterLink>
   );
@@ -106,7 +105,7 @@ const SetAccountType = ({}: Props) => {
                     <ProfileIcon height={31} width={31} color={'white'} />
                   </div>
                   <Bold fontSize="24px" color={COLOR.LINK}>
-                    {_(setAccountTypeStrings.createAccountForPersonalUse)}
+                    {t('index.createAccountForPersonalUse')}
                   </Bold>
                   <br />
                   <Text
@@ -119,7 +118,7 @@ const SetAccountType = ({}: Props) => {
                       marginTop: 8,
                     }}
                   >
-                    {_(setAccountTypeStrings.createPersonalAccount)}
+                    {t('index.createPersonalAccount')}
                   </Text>
                 </RouterLink>
               </Column>
@@ -138,7 +137,7 @@ const SetAccountType = ({}: Props) => {
                     <TeamIcon height={31} width={31} color={'white'} />
                   </div>
                   <Bold fontSize="24px" color={COLOR.LINK}>
-                    {_(setAccountTypeStrings.createAccountForOrganizations)}
+                    {t('index.createAccountForOrganizations')}
                   </Bold>
                   <br />
                   <Text
@@ -151,7 +150,7 @@ const SetAccountType = ({}: Props) => {
                       marginTop: 8,
                     }}
                   >
-                    {_(setAccountTypeStrings.createTeam)}
+                    {t('index.createTeam')}
                   </Text>
                 </Link>
               </Column>

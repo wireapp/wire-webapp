@@ -29,7 +29,7 @@ describe('LocalizerUtil', () => {
     });
 
     it('can replace placeholders in localized strings using shorthand string version', () => {
-      setStrings({en: {hey: 'Hey {{name}}'}});
+      setStrings({en: {hey: 'Hey {name}'}});
 
       const result = t('hey', 'Tod');
 
@@ -37,21 +37,21 @@ describe('LocalizerUtil', () => {
     });
 
     it('can replace placeholders in localized strings using shorthand number version', () => {
-      setStrings({en: {text: 'Number {{name}} is alive'}});
+      setStrings({en: {text: 'Number {name} is alive'}});
       const result = t('text', 5);
 
       expect(result).toBe('Number 5 is alive');
     });
 
     it('can replace placeholders in localized strings using an object', () => {
-      setStrings({en: {hey: 'Hey {{name}}'}});
+      setStrings({en: {hey: 'Hey {name}'}});
       const result = t('hey', {name: 'Tod'});
 
       expect(result).toBe('Hey Tod');
     });
 
     it('can replace placeholders in localized strings using a more complex object', () => {
-      setStrings({en: {greeting: '{{greeting}} {{name}}'}});
+      setStrings({en: {greeting: '{greeting} {name}'}});
 
       const result = t('greeting', {greeting: 'Hey', name: 'Tod'});
 
@@ -59,7 +59,7 @@ describe('LocalizerUtil', () => {
     });
 
     it('can replace duplicate placeholders in localized strings using a more complex object', () => {
-      setStrings({en: {greeting: '{{greeting}} {{greeting}} {{name}}'}});
+      setStrings({en: {greeting: '{greeting} {greeting} {name}'}});
       const result = t('greeting', {greeting: 'Hey', name: 'Tod'});
 
       expect(result).toBe('Hey Hey Tod');
@@ -95,7 +95,7 @@ describe('LocalizerUtil', () => {
     it('escapes raw substitutions string or number', () => {
       setStrings({
         en: {
-          test: '<scri>alert("{{userName}}")</scri>',
+          test: '<scri>alert("{userName}")</scri>',
         },
       });
 
@@ -110,9 +110,9 @@ describe('LocalizerUtil', () => {
     it('escapes substitutions object', () => {
       setStrings({
         en: {
-          test1: '<scri>alert("{{user}}")</scri>',
-          test2: '{{user}} {{user}} {{user}} Batman!',
-          test3: 'Hello {{user}}, you are {{status}}',
+          test1: '<scri>alert("{user}")</scri>',
+          test2: '{user} {user} {user} Batman!',
+          test3: 'Hello {user}, you are {status}',
         },
       });
 
@@ -130,7 +130,7 @@ describe('LocalizerUtil', () => {
     it(`doesn't escape substitutions when it should skip the escaping`, () => {
       setStrings({
         en: {
-          test: 'Hello {{user}}',
+          test: 'Hello {user}',
         },
       });
 
@@ -145,7 +145,7 @@ describe('LocalizerUtil', () => {
       setStrings({
         en: {
           test1: '[user]Felix[/user]',
-          test2: '[user]{{user}}[user]',
+          test2: '[user]{user}[user]',
         },
       });
 

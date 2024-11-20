@@ -120,8 +120,8 @@ export const LocalizerUtil = {
     };
 
     const substitutedEscaped = skipEscape
-      ? replaceSubstitute(value, /{{(.+?)}}/g, substitutions)
-      : replaceSubstituteEscaped(value, /{{(.+?)}}/g, substitutions);
+      ? replaceSubstitute(value, /{(.+?)}/g, substitutions)
+      : replaceSubstituteEscaped(value, /{(.+?)}/g, substitutions);
 
     return replaceSubstitute(substitutedEscaped, /\[(.+?)\]/g, replaceDangerously);
   },

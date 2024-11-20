@@ -19,31 +19,31 @@
 
 import React from 'react';
 
-import {FormattedMessage, useIntl} from 'react-intl';
+import {FormattedMessage} from 'react-intl';
 
 import {ContainerXS, H2, Text} from '@wireapp/react-ui-kit';
 
+import {t} from 'Util/LocalizerUtil';
+
 import {Config} from '../../Config';
-import {conversationJoinStrings} from '../../strings';
 import {WirelessContainer} from '../component/WirelessContainer';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
 const ConversationJoinInvalid = ({}: Props) => {
-  const {formatMessage: _} = useIntl();
   return (
     <WirelessContainer>
       <ContainerXS style={{margin: 'auto 0'}}>
         <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} data-uie-name="status-invalid-headline">
           <FormattedMessage
-            {...conversationJoinStrings.invalidHeadline}
+            id="conversationJoin.invalidHeadline"
             values={{
               brandName: Config.getConfig().BRAND_NAME,
             }}
           />
         </H2>
         <Text style={{fontSize: '1rem', marginTop: '10px'}} data-uie-name="status-invalid-text">
-          {_(conversationJoinStrings.invalidSubhead)}
+          {t('conversationJoin.invalidSubhead')}
         </Text>
       </ContainerXS>
     </WirelessContainer>
@@ -51,15 +51,14 @@ const ConversationJoinInvalid = ({}: Props) => {
 };
 
 const ConversationJoinFull = ({}: Props) => {
-  const {formatMessage: _} = useIntl();
   return (
     <WirelessContainer>
       <ContainerXS style={{margin: 'auto 0'}}>
         <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} data-uie-name="status-full-headline">
-          <FormattedMessage {...conversationJoinStrings.fullConversationHeadline} />
+          <FormattedMessage id="conversationJoin.fullConversationHeadline" />
         </H2>
         <Text style={{fontSize: '1rem', marginTop: '10px'}} data-uie-name="status-full-text">
-          {_(conversationJoinStrings.fullConversationSubhead)}
+          {t('conversationJoin.fullConversationSubhead')}
         </Text>
       </ContainerXS>
     </WirelessContainer>
