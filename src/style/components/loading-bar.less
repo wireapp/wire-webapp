@@ -17,6 +17,20 @@
  *
  */
 
+.uploading-asset {
+  margin-top: 8px;
+
+  .progress-bar {
+    @rotation: 127deg;
+    @size: 14px;
+    @rotatedSize: (abs(cos(@rotation)) + abs(sin(@rotation))) * @size;
+    height: 8px;
+
+    margin-left: 0;
+    background-size: @rotatedSize 8px;
+  }
+}
+
 .progress-console {
   overflow: hidden;
   height: 14px;

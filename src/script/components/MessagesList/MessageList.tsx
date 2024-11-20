@@ -24,6 +24,7 @@ import cx from 'classnames';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {JumpToLastMessageButton} from 'Components/MessagesList/JumpToLastMessageButton';
+import {UploadAssets} from 'Components/MessagesList/UploadAssets';
 import {filterMessages} from 'Components/MessagesList/utils/messagesFilter';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
@@ -45,9 +46,11 @@ import {ScrollToElement} from './Message/types';
 import {groupMessagesBySenderAndTime, isMarker} from './utils/messagesGroup';
 import {updateScroll, FocusedElement} from './utils/scrollUpdater';
 
+import {AssetRepository} from '../../assets/AssetRepository';
 import {Conversation} from '../../entity/Conversation';
 
 interface MessagesListParams {
+  assetRepository: AssetRepository;
   cancelConnectionRequest: (message: MemberMessage) => void;
   conversation: Conversation;
   conversationRepository: ConversationRepository;
@@ -74,6 +77,7 @@ interface MessagesListParams {
 }
 
 export const MessagesList: FC<MessagesListParams> = ({
+  assetRepository,
   conversation,
   selfUser,
   conversationRepository,
@@ -358,6 +362,8 @@ export const MessagesList: FC<MessagesListParams> = ({
               );
             });
           })}
+
+          <UploadAssets assetRepository={assetRepository} />
         </div>
       </FadingScrollbar>
       <JumpToLastMessageButton onGoToLastMessage={jumpToLastMessage} conversation={conversation} />

@@ -21,12 +21,12 @@ import {ConversationProtocol, MessageSendingStatus, QualifiedUserClients} from '
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import {QualifiedId, RequestCancellationError} from '@wireapp/api-client/lib/user';
 import {
+  GenericMessageType,
+  InCallEmojiType,
   MessageSendingState,
   MessageTargetMode,
   ReactionType,
-  GenericMessageType,
   SendResult,
-  InCallEmojiType,
 } from '@wireapp/core/lib/conversation';
 import {
   AudioMetaData,
@@ -509,18 +509,26 @@ export class MessageRepository {
     originalId?: string,
   ): Promise<EventRecord | void> {
     const uploadStarted = Date.now();
+    const beforeUnload = (event: Event) => {
+      event.preventDefault();
+    };
 
-    const {id, state} = await this.sendAssetMetadata(conversation, file, asImage, originalId);
-    if (state === SendAndInjectSendingState.FAILED) {
-      await this.storeFileInDb(conversation, id, file);
-      return;
-    }
-    if (state === MessageSendingState.CANCELED) {
-      // The user has canceled the upload, no need to do anything else
-      return;
-    }
+    window.addEventListener('beforeunload', beforeUnload);
+    const {messageId} = await this.createAssetMetadata(file, asImage, originalId);
+
     try {
-      await this.sendAssetRemotedata(conversation, file, id, asImage);
+      const {state} = await this.sendAssetRemotedata(conversation, file, messageId, asImage);
+
+      if (state === SendAndInjectSendingState.FAILED) {
+        await this.storeFileInDb(conversation, messageId, file);
+        return;
+      }
+
+      if (state === MessageSendingState.CANCELED) {
+        // The user has canceled the upload, no need to do anything else
+        return;
+      }
+
       const uploadDuration = (Date.now() - uploadStarted) / TIME_IN_MILLIS.SECOND;
       this.logger.info(`Finished to upload asset for conversation'${conversation.id} in ${uploadDuration}`);
     } catch (error) {
@@ -531,9 +539,11 @@ export class MessageRepository {
         `Failed to upload asset for conversation '${conversation.id}': ${(error as Error).message}`,
         error,
       );
-      const messageEntity = await this.getMessageInConversationById(conversation, id);
+      const messageEntity = await this.getMessageInConversationById(conversation, messageId);
       await this.sendAssetUploadFailed(conversation, messageEntity.id);
       return this.updateMessageAsUploadFailed(messageEntity);
+    } finally {
+      window.removeEventListener('beforeunload', beforeUnload);
     }
   }
 
@@ -618,6 +628,7 @@ export class MessageRepository {
       asset: asset,
       expectsReadConfirmation: this.expectReadReceipt(conversation),
     };
+
     const assetMessage = metadata
       ? MessageBuilder.buildImageMessage(
           {
@@ -637,14 +648,9 @@ export class MessageRepository {
   }
 
   /**
-   * Send asset metadata message to specified conversation.
+   * Create asset metadata message to specified conversation.
    */
-  private async sendAssetMetadata(
-    conversation: Conversation,
-    file: File | Blob,
-    allowImageDetection?: boolean,
-    originalId?: string,
-  ) {
+  private async createAssetMetadata(file: File | Blob, allowImageDetection?: boolean, originalId?: string) {
     let metadata;
     try {
       metadata = await buildMetadata(file);
@@ -664,7 +670,8 @@ export class MessageRepository {
       meta.image = metadata as ImageMetaData;
     }
     const message = MessageBuilder.buildFileMetaDataMessage({metaData: meta as FileMetaDataContent}, originalId);
-    return this.sendAndInjectMessage(message, conversation, {enableEphemeral: true});
+    this.assetRepository.addToProcessQueue(message);
+    return message;
   }
 
   /**
