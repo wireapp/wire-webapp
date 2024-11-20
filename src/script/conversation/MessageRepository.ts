@@ -457,7 +457,7 @@ export class MessageRepository {
     }
 
     const blob = await loadUrlBlob(url);
-    const textMessage = t('extensionsGiphyMessage', tag, {}, true);
+    const textMessage = t('extensionsGiphyMessage', {tag: tag as string | number}, {}, true);
     this.sendText({conversation: conversationEntity, message: textMessage, quote: quoteEntity});
     return this.uploadImages(conversationEntity, [blob]);
   }
@@ -720,9 +720,11 @@ export class MessageRepository {
 
     const baseTitle =
       users.length > 1
-        ? t('modalConversationNewDeviceHeadlineMany', titleSubstitutions)
-        : t('modalConversationNewDeviceHeadlineOne', titleSubstitutions);
-    const titleString = users[0].isMe ? t('modalConversationNewDeviceHeadlineYou', titleSubstitutions) : baseTitle;
+        ? t('modalConversationNewDeviceHeadlineMany', {users: titleSubstitutions})
+        : t('modalConversationNewDeviceHeadlineOne', {user: titleSubstitutions});
+    const titleString = users[0].isMe
+      ? t('modalConversationNewDeviceHeadlineYou', {user: titleSubstitutions})
+      : baseTitle;
 
     return new Promise(resolve => {
       const options = {

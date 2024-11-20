@@ -86,8 +86,14 @@ export const getModalOptions = ({
         text: {
           closeBtnLabel: t('acme.settingsChanged.button.close'),
           htmlMessage: extraParams?.isGracePeriodOver
-            ? t('acme.settingsChanged.gracePeriodOver.paragraph', {}, {br: '<br>', ...replaceLearnMore})
-            : t('acme.settingsChanged.paragraph', {}, {br: '<br>', ...replaceLearnMore}),
+            ? // @ts-expect-error
+              // the "url" should be provided
+              // TODO: check it when changing this code
+              t('acme.settingsChanged.gracePeriodOver.paragraph', undefined, {br: '<br>', ...replaceLearnMore})
+            : // @ts-expect-error
+              // the "url" should be provided
+              // TODO: check it when changing this code
+              t('acme.settingsChanged.paragraph', undefined, {br: '<br>', ...replaceLearnMore}),
           title: t('acme.settingsChanged.headline.alt'),
         },
         primaryAction: {
@@ -109,8 +115,14 @@ export const getModalOptions = ({
         text: {
           closeBtnLabel: t('acme.renewCertificate.button.close'),
           htmlMessage: extraParams?.isGracePeriodOver
-            ? t('acme.renewCertificate.gracePeriodOver.paragraph')
-            : t('acme.renewCertificate.paragraph'),
+            ? // @ts-expect-error
+              // the "url" should be provided
+              // TODO: check it when changing this code
+              t('acme.renewCertificate.gracePeriodOver.paragraph')
+            : // @ts-expect-error
+              // the "url" should be provided
+              // TODO: check it when changing this code
+              t('acme.renewCertificate.paragraph'),
           title: t('acme.renewCertificate.headline.alt'),
         },
         primaryAction: {
@@ -148,7 +160,10 @@ export const getModalOptions = ({
       options = {
         text: {
           closeBtnLabel: t('acme.settingsChanged.button.close'),
-          htmlMessage: t('acme.remindLater.paragraph', extraParams?.delayTime),
+          // @ts-expect-error
+          // the "url" should be provided
+          // TODO: check it when changing this code
+          htmlMessage: t('acme.remindLater.paragraph', {delayTime: extraParams?.delayTime}),
           title: t('acme.settingsChanged.headline.alt'),
         },
         primaryAction: {
@@ -166,8 +181,8 @@ export const getModalOptions = ({
         text: {
           closeBtnLabel: t('acme.error.button.close'),
           htmlMessage: extraParams?.isGracePeriodOver
-            ? t('acme.error.gracePeriod.paragraph', {}, {br: '<br>'})
-            : t('acme.error.paragraph', {}, {br: '<br>'}),
+            ? t('acme.error.gracePeriod.paragraph', undefined, {br: '<br>'})
+            : t('acme.error.paragraph', undefined, {br: '<br>'}),
           title: t('acme.error.headline'),
         },
         primaryAction: {
@@ -199,6 +214,9 @@ export const getModalOptions = ({
         text: {
           closeBtnLabel: t('acme.done.button.close'),
           htmlMessage: `<div style="text-align: center">${svgHtml}${
+            // @ts-expect-error
+            // the "url" should be provided
+            // TODO: check it when changing this code
             extraParams?.isRenewal ? t('acme.renewal.done.paragraph') : t('acme.done.paragraph')
           }</div>`,
           title: extraParams?.isRenewal ? t('acme.renewal.done.headline') : t('acme.done.headline'),

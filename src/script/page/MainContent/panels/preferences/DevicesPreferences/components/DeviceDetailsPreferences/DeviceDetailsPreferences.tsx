@@ -114,7 +114,7 @@ export const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
             </label>
           </div>
 
-          <p className="paragraph-body-1">{t('preferencesDevicesFingerprintDetail', brandName)}</p>
+          <p className="paragraph-body-1">{t('preferencesDevicesFingerprintDetail', {brandName})}</p>
         </fieldset>
 
         <section className="preferences-section">

@@ -214,7 +214,7 @@ const StartUI: React.FC<StartUIProps> = ({
   const footer = !isTeam ? (
     <button className="start-ui-import" onClick={openInviteModal} data-uie-name="show-invite-modal">
       <span className="icon-invite start-ui-import-icon"></span>
-      <span>{t('searchInvite', brandName)}</span>
+      <span>{t('searchInvite', {brandName})}</span>
     </button>
   ) : undefined;
 

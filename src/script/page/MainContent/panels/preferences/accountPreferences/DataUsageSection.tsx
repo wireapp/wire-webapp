@@ -85,7 +85,7 @@ const DataUsageSection = ({propertiesRepository, brandName, isActivatedAccount}:
             </CheckboxLabel>
           </Checkbox>
           <p className="preferences-detail preferences-detail-intended">
-            {t('preferencesAccountDataTelemetry', brandName)}
+            {t('preferencesAccountDataTelemetry', {brandName})}
           </p>
         </div>
       )}
@@ -109,7 +109,7 @@ const DataUsageSection = ({propertiesRepository, brandName, isActivatedAccount}:
             </CheckboxLabel>
           </Checkbox>
           <p className="preferences-detail preferences-detail-intended">
-            {t('preferencesAccountMarketingConsentDetail', brandName)}
+            {t('preferencesAccountMarketingConsentDetail', {brandName})}
           </p>
         </div>
       )}

@@ -329,14 +329,10 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
             <div className="modal__text" data-uie-name="status-modal-text">
               <p
                 dangerouslySetInnerHTML={{
-                  __html: t(
-                    'legalHoldModalText',
-                    {},
-                    {
-                      br: '<br>',
-                      fingerprint: `<span class="legal-hold-modal__fingerprint" data-uie-name="status-modal-fingerprint">${fingerprint}</span>`,
-                    },
-                  ),
+                  __html: t('legalHoldModalText', undefined, {
+                    br: '<br>',
+                    fingerprint: `<span class="legal-hold-modal__fingerprint" data-uie-name="status-modal-fingerprint">${fingerprint}</span>`,
+                  }),
                 }}
               />
 

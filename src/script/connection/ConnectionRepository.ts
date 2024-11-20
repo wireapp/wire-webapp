@@ -209,7 +209,7 @@ export class ConnectionRepository {
             );
             PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
               text: {
-                htmlMessage: t('modalUserCannotSendConnectionLegalHoldMessage', {}, replaceLinkLegalHold),
+                htmlMessage: t('modalUserCannotSendConnectionLegalHoldMessage', undefined, replaceLinkLegalHold),
                 title: t('modalUserCannotConnectHeadline'),
               },
             });
@@ -219,7 +219,7 @@ export class ConnectionRepository {
           case BackendErrorLabel.FEDERATION_NOT_ALLOWED: {
             PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
               text: {
-                htmlMessage: t('modalUserCannotSendConnectionNotFederatingMessage', userEntity.name()),
+                htmlMessage: t('modalUserCannotSendConnectionNotFederatingMessage', {username: userEntity.name()}),
                 title: t('modalUserCannotConnectHeadline'),
               },
             });

@@ -363,7 +363,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
 
             <h2 id="group-creation-label" className="modal__header__title" data-uie-name="status-people-selected">
               {selectedContacts.length
-                ? t('groupCreationParticipantsHeaderWithCounter', selectedContacts.length)
+                ? t('groupCreationParticipantsHeaderWithCounter', {number: selectedContacts.length})
                 : t('groupCreationParticipantsHeader')}
             </h2>
 
@@ -479,7 +479,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                   style={{visibility: hasNameError ? 'hidden' : 'visible'}}
                   data-uie-name="status-group-size-info"
                 >
-                  {t('groupSizeInfo', maxSize)}
+                  {t('groupSizeInfo', {count: maxSize})}
                 </p>
                 <hr className="group-creation__modal__separator" />
                 <BaseToggle

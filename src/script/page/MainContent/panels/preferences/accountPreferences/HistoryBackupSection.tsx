@@ -57,7 +57,7 @@ const HistoryBackupSection: FC<HistoryBackupSectionProps> = ({brandName, importF
         {t('preferencesOptionsBackupExportHeadline')}
       </Button>
       <p id="preferences-history-describe-1" className="preferences-detail">
-        {t('preferencesOptionsBackupExportSecondary', brandName)}
+        {t('preferencesOptionsBackupExportSecondary', {brandName})}
       </p>
       <BackupFileUpload
         onFileChange={handleFileChange}

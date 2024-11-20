@@ -315,7 +315,9 @@ export const PeopleTab = ({
         {results.others.length > 0 && (
           <div className="others">
             <h3 className="start-ui-list-header">
-              {searchOnFederatedDomain() ? t('searchOthersFederation', searchOnFederatedDomain()) : t('searchOthers')}
+              {searchOnFederatedDomain()
+                ? t('searchOthersFederation', {domainName: searchOnFederatedDomain()})
+                : t('searchOthers')}
             </h3>
             <div className="search-list-theme-black">
               <UserList

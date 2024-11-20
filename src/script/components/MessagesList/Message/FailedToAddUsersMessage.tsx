@@ -108,25 +108,58 @@ const MessageDetails = ({failure, isMessageFocused, allUsers}: MessageDetailsPro
     </>
   );
 
+  const getText = () => {
+    if (baseTranslationKey === 'failedToAddParticipantsSingularDetails') {
+      if (translationLabel === 'OfflineBackend') {
+        return t(`failedToAddParticipantsSingularDetailsOfflineBackend`, {
+          name: getUserName(users[0]),
+          domain: domainStr as string,
+        });
+      }
+
+      return t(`failedToAddParticipantsSingularDetails${translationLabel}`, {
+        name: getUserName(users[0]),
+      });
+    }
+
+    if (baseTranslationKey === 'failedToAddParticipantsPluralDetails') {
+      if (translationLabel === 'OfflineBackend') {
+        return t(`failedToAddParticipantsPluralDetailsOfflineBackend`, {
+          name: getUserName(users[0]),
+          names: users
+            .slice(1)
+            .map(user => getUserName(user))
+            .join(', '),
+          domain: domainStr as string,
+        });
+      }
+
+      return t(`failedToAddParticipantsPluralDetails${translationLabel}`, {
+        name: getUserName(users[0]),
+        names: users
+          .slice(1)
+          .map(user => getUserName(user))
+          .join(', '),
+      });
+    }
+  };
+
+  const text = getText();
+
   return (
     <p
       data-uie-name="multi-user-not-added-details"
       data-uie-value={domainStr}
       style={{lineHeight: 'var(--line-height-sm)'}}
     >
-      <span
-        css={warning}
-        dangerouslySetInnerHTML={{
-          __html: t(`${baseTranslationKey}${translationLabel}`, {
-            name: getUserName(users[0]),
-            names: users
-              .slice(1)
-              .map(user => getUserName(user))
-              .join(', '),
-            ...(domainStr && {domain: domainStr}),
-          }),
-        }}
-      />
+      {text && (
+        <span
+          css={warning}
+          dangerouslySetInnerHTML={{
+            __html: text,
+          }}
+        />
+      )}
       {learnMoreLink}
     </p>
   );
