@@ -25,6 +25,35 @@ const commonConfig = require('./webpack.config.common');
 
 const srcScript = 'src/script/';
 
+const updateTranslationTypesPlugin = {
+  apply: compiler => {
+    compiler.hooks.watchRun.tapAsync('TranslationWatcher', (compiler, callback) => {
+      const changedFiles = Array.from(compiler.modifiedFiles || new Set());
+      const translationsFilePath = path.resolve(__dirname, 'src/i18n/en-US.json');
+
+      if (!changedFiles.includes(translationsFilePath)) {
+        return;
+      }
+
+      console.log('Translations file changed. Generating types...');
+
+      const {exec} = require('child_process');
+
+      exec('yarn run translate:generate-types', (error, _, stderr) => {
+        if (error) {
+          console.error(`Error running script: ${error.message}`);
+          return;
+        }
+        if (stderr) {
+          console.error(`Script error output:\n${stderr}`);
+        }
+      });
+
+      callback();
+    });
+  },
+};
+
 module.exports = {
   ...commonConfig,
   devtool: 'eval-source-map',
@@ -34,7 +63,7 @@ module.exports = {
     auth: ['webpack-hot-middleware/client', path.resolve(__dirname, srcScript, 'auth/main.tsx')],
   },
   mode: 'development',
-  plugins: [...commonConfig.plugins, new webpack.HotModuleReplacementPlugin()],
+  plugins: [...commonConfig.plugins, new webpack.HotModuleReplacementPlugin(), updateTranslationTypesPlugin],
   snapshot: {
     // This will make sure that changes in the node_modules will be detected and recompiled automatically (when using yalc for example)
     managedPaths: [],

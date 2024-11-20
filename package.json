@@ -102,6 +102,7 @@
     "autoprefixer": "10.4.20",
     "babel-loader": "9.2.1",
     "babel-plugin-transform-import-meta": "2.2.1",
+    "child_process": "^1.0.2",
     "cross-env": "7.0.3",
     "css-loader": "7.1.2",
     "cssnano": "7.0.6",
@@ -193,7 +194,7 @@
     "release:staging": "git checkout dev && git pull && ts-node ./bin/release_tag.ts staging",
     "release:production": "git checkout master && git pull && ts-node ./bin/release_tag.ts production",
     "release:custom": "npx ts-node ./bin/release_tag.ts",
-    "start": "yarn build:server && yarn watch:server",
+    "start": "yarn build:server && yarn translate:generate-types && yarn watch:server",
     "watch:server": "tsc-watch -P server/tsconfig.json --onSuccess \"yarn start:server:dev\"",
     "start:server:dev": "cross-env NODE_ENV=development node ./server/dist/index.js",
     "stylelint": "prettier --ignore-path .prettierignore --write \"**/*.less\" && stylelint --ignore-path .gitignore \"**/*.less\"",
@@ -202,7 +203,9 @@
     "test:server": "cd server && yarn test",
     "test:types": "tsc --project tsconfig.build.json --noEmit && cd server && tsc --noEmit",
     "translate:extract": "i18next-scanner 'src/{page,script}/**/*.{js,html,htm}'",
-    "translate:merge": "formatjs extract --format './bin/translations_extract_formatter.js' --out-file './src/i18n/en-US.json'"
+    "translate:merge": "formatjs extract --format './bin/translations_extract_formatter.js' --out-file './src/i18n/en-US.json'",
+    "translate:generate-types": "node ./bin/transalations_generate_types.js",
+    "typecheck": "tsc --noEmit"
   },
   "resolutions": {
     "libsodium": "0.7.10",

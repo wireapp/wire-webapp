@@ -7530,6 +7530,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"child_process@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "child_process@npm:1.0.2"
+  checksum: 10/bd814d82bc8c6e85ed6fb157878978121cd03b5296c09f6135fa3d081fd9a6a617a6d509c50397711df713af403331241a9c0397a7fad30672051485e156c2a1
+  languageName: node
+  linkType: hard
+
 "chownr@npm:^2.0.0":
   version: 2.0.0
   resolution: "chownr@npm:2.0.0"
@@ -18767,6 +18774,7 @@ __metadata:
     babel-loader: "npm:9.2.1"
     babel-plugin-transform-import-meta: "npm:2.2.1"
     beautiful-react-hooks: "npm:5.0.2"
+    child_process: "npm:^1.0.2"
     classnames: "npm:2.5.1"
     copy-webpack-plugin: "npm:12.0.2"
     core-js: "npm:3.39.0"
