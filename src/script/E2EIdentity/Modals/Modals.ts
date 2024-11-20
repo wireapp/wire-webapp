@@ -86,13 +86,9 @@ export const getModalOptions = ({
         text: {
           closeBtnLabel: t('acme.settingsChanged.button.close'),
           htmlMessage: extraParams?.isGracePeriodOver
-            ? // @ts-expect-error
-              // the "url" should be provided
-              // TODO: check it when changing this code
+            ? // @ts-expect-error: the "url" should be provided
               t('acme.settingsChanged.gracePeriodOver.paragraph', undefined, {br: '<br>', ...replaceLearnMore})
-            : // @ts-expect-error
-              // the "url" should be provided
-              // TODO: check it when changing this code
+            : // @ts-expect-error: the "url" should be provided
               t('acme.settingsChanged.paragraph', undefined, {br: '<br>', ...replaceLearnMore}),
           title: t('acme.settingsChanged.headline.alt'),
         },

@@ -123,7 +123,7 @@ describe('ConversationCellState', () => {
         expected: {
           description: `${t('conversationsSecondaryLineSummaryMentions', {number: 2})}, ${t(
             'conversationsSecondaryLineSummaryMissedCalls',
-            2,
+            {number: 2},
           )}, ${t('conversationsSecondaryLineSummaryPings', {number: 2})}, ${t('conversationsSecondaryLineSummaryMessages', {number: 2})}`,
           icon: ConversationStatusIcon.UNREAD_MENTION,
         },

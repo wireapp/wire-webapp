@@ -250,7 +250,7 @@ export const UserList = ({
                 <Icon.DiscloseIcon width={16} height={16} />
               </span>
 
-              {t('userListSelectedContacts', {count: selectedUsersCount})}
+              {t('userListSelectedContacts', {selectedContacts: selectedUsersCount})}
             </button>
 
             <ul

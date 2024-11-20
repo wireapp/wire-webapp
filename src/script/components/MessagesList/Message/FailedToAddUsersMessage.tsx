@@ -108,7 +108,7 @@ const MessageDetails = ({failure, isMessageFocused, allUsers}: MessageDetailsPro
     </>
   );
 
-  const getText = () => {
+  const getText = (): string => {
     if (baseTranslationKey === 'failedToAddParticipantsSingularDetails') {
       if (translationLabel === 'OfflineBackend') {
         return t(`failedToAddParticipantsSingularDetailsOfflineBackend`, {
@@ -142,6 +142,8 @@ const MessageDetails = ({failure, isMessageFocused, allUsers}: MessageDetailsPro
           .join(', '),
       });
     }
+
+    return '';
   };
 
   const text = getText();
