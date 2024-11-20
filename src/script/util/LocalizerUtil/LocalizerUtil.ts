@@ -37,9 +37,9 @@ type SubstitutionsFor<Id extends string> = {
   [Key in ExtractSubstitutionKeys<Id>]: string | number;
 };
 
-type Substitutions<Id extends StringIdentifier> = SubstitutionsFor<TranslationStrings[Id]>;
+type Substitutions<Id extends StringIdentifer> = SubstitutionsFor<TranslationStrings[Id]>;
 
-export type StringIdentifier = keyof TranslationStrings;
+export type StringIdentifer = keyof TranslationStrings;
 
 export const DEFAULT_LOCALE = 'en';
 
@@ -66,7 +66,7 @@ export const getUserName = (userEntity: User, declension?: string, bypassSanitiz
 const isStringOrNumber = (toTest: any): toTest is string | number =>
   typeof toTest === 'string' || typeof toTest === 'number';
 
-const replaceSubstituteEscaped = <Id extends StringIdentifier>(
+const replaceSubstituteEscaped = <Id extends StringIdentifer>(
   string: string,
   regex: RegExp | string,
   substitutes?: Substitutions<Id> | Record<string, string>,
@@ -79,7 +79,7 @@ const replaceSubstituteEscaped = <Id extends StringIdentifier>(
   );
 };
 
-const replaceSubstitute = <Id extends StringIdentifier>(
+const replaceSubstitute = <Id extends StringIdentifer>(
   string: string,
   regex: RegExp | string,
   substitutes?: Substitutions<Id> | Record<string, string>,
@@ -123,7 +123,7 @@ export const LocalizerUtil = {
     return userNames.join(', ');
   },
 
-  translate: <Id extends StringIdentifier>(
+  translate: <Id extends StringIdentifer>(
     identifier: Id,
     ...args: ExtractSubstitutionKeys<TranslationStrings[Id]> extends never
       ? [substitutions?: undefined, dangerousSubstitutions?: Record<string, string>, skipEscape?: boolean]
@@ -162,7 +162,7 @@ export const setStrings = (newStrings: typeof strings): void => {
   strings = newStrings;
 };
 
-export const t = <Id extends StringIdentifier>(
+export const t = <Id extends StringIdentifer>(
   identifier: Id,
   ...args: ExtractSubstitutionKeys<TranslationStrings[Id]> extends never
     ? [substitutions?: undefined, dangerousSubstitutions?: Record<string, string>, skipEscape?: boolean]

@@ -17,7 +17,6 @@ function generateTypeDefinition(jsonPath, outputPath) {
   content += '  const translations: {\n';
 
   for (const [key, value] of Object.entries(json)) {
-    // Use template literal type for better handling of special characters
     content += `    '${key}': \`${escapeString(value)}\`;\n`;
   }
 
