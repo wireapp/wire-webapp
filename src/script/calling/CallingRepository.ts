@@ -967,31 +967,23 @@ export class CallingRepository {
   toggleScreenshare = async (call: Call): Promise<void> => {
     const {conversation} = call;
 
+    // The screen share was stopped by the user through the application. We clean up the state and stop the screen share
+    // video track. Note that stopping a track does not trigger an "ended" event.
     const selfParticipant = call.getSelfParticipant();
     if (selfParticipant.sharesScreen()) {
-      selfParticipant.videoState(VIDEO_STATE.STOPPED);
-      this.sendCallingEvent(EventName.CALLING.SCREEN_SHARE, call, {
-        [Segmentation.SCREEN_SHARE.DIRECTION]: 'outgoing',
-        [Segmentation.SCREEN_SHARE.DURATION]:
-          Math.ceil((Date.now() - selfParticipant.startedScreenSharingAt()) / 5000) * 5,
-      });
-      return this.wCall?.setVideoSendState(
-        this.wUser,
-        this.serializeQualifiedId(conversation.qualifiedId),
-        VIDEO_STATE.STOPPED,
-      );
+      this.stopScreenShare(selfParticipant, conversation, call);
+      return;
     }
+
     try {
       const mediaStream = await this.getMediaStream({audio: true, screen: true}, call.isGroupOrConference);
-      // https://stackoverflow.com/a/25179198/451634
+
+      // If the screen share is stopped by the os system or the browser, an "ended" event is triggered. We listen for
+      // this event to clean up the screen share state in this case.
       mediaStream.getVideoTracks()[0].onended = () => {
-        this.wCall?.setVideoSendState(
-          this.wUser,
-          this.serializeQualifiedId(conversation.qualifiedId),
-          VIDEO_STATE.STOPPED,
-        );
+        this.stopScreenShare(selfParticipant, conversation, call);
       };
-      const selfParticipant = call.getSelfParticipant();
+
       selfParticipant.videoState(VIDEO_STATE.SCREENSHARE);
       selfParticipant.updateMediaStream(mediaStream, true);
       this.wCall?.setVideoSendState(
@@ -1004,6 +996,28 @@ export class CallingRepository {
       this.logger.info('Failed to get screen sharing stream', error);
     }
   };
+
+  /**
+   * This method ends the screen share regardless of the event that triggered it.
+   * There are two ways to end a screen share: one by clicking the Applications button, and the other by stopping it
+   * through the os system ore browser's sharing option.
+   */
+  private stopScreenShare(selfParticipant: Participant, conversation: Conversation, call: Call): void {
+    selfParticipant.videoState(VIDEO_STATE.STOPPED);
+    selfParticipant.releaseVideoStream(true);
+
+    this.sendCallingEvent(EventName.CALLING.SCREEN_SHARE, call, {
+      [Segmentation.SCREEN_SHARE.DIRECTION]: 'outgoing',
+      [Segmentation.SCREEN_SHARE.DURATION]:
+        Math.ceil((Date.now() - selfParticipant.startedScreenSharingAt()) / 5000) * 5,
+    });
+
+    return this.wCall?.setVideoSendState(
+      this.wUser,
+      this.serializeQualifiedId(conversation.qualifiedId),
+      VIDEO_STATE.STOPPED,
+    );
+  }
 
   onPageHide = (event: PageTransitionEvent) => {
     if (event.persisted) {
@@ -2201,6 +2215,10 @@ export class CallingRepository {
     if (state === VIDEO_STATE.SCREENSHARE) {
       call.analyticsScreenSharing = true;
     }
+
+    // if (call.state() === CALL_STATE.MEDIA_ESTAB && isSameUser && !selfParticipant.sharesScreen()) {
+    //   selfParticipant.releaseVideoStream(true);
+    // }
 
     call
       .participants()
