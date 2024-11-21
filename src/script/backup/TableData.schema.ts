@@ -21,7 +21,7 @@ import zod from 'zod';
 
 const ConversationSchema = zod.object({
   accessModes: zod.array(zod.string()),
-  accessRole: zod.array(zod.any()),
+  accessRole: zod.array(zod.any()).optional(),
   accessRoleV2: zod.string().optional(),
   archived_state: zod.boolean(),
   archived_timestamp: zod.number(),
@@ -32,7 +32,7 @@ const ConversationSchema = zod.object({
   id: zod.string(),
   last_event_timestamp: zod.number(),
   last_server_timestamp: zod.number(),
-  message_timer: zod.string().nullable(),
+  message_timer: zod.string().nullable().optional(),
   muted_state: zod.number().nullable(),
   muted_timestamp: zod.number(),
   name: zod.string().nullable(),
@@ -50,7 +50,7 @@ export type ConversationTable = zod.infer<typeof ConversationTableSchema>;
 const UserSchema = zod.object({
   accent_id: zod.number(),
   assets: zod.array(zod.any()),
-  handle: zod.string(),
+  handle: zod.string().optional(),
   id: zod.string(),
   legalhold_status: zod.string(),
   name: zod.string(),
@@ -68,24 +68,26 @@ export type UserTable = zod.infer<typeof UserTableSchema>;
 const EventSchema = zod.object({
   category: zod.number().int().optional(),
   conversation: zod.string().min(1, 'Conversation is required'),
-  data: zod.object({
-    content: zod.string().optional(),
-    mentions: zod.array(zod.string()).optional(),
-    previews: zod.array(zod.string()).optional(),
-    expects_read_confirmation: zod.boolean().default(false),
-    legal_hold_status: zod.number().int().optional(),
-  }),
+  data: zod
+    .object({
+      content: zod.string().optional(),
+      mentions: zod.array(zod.string()).optional(),
+      previews: zod.array(zod.string()).optional(),
+      expects_read_confirmation: zod.boolean().default(false),
+      legal_hold_status: zod.number().int().optional(),
+    })
+    .optional(),
   from: zod.string().optional(),
   from_client_id: zod.string().optional(),
   id: zod.string().optional(),
   primary_key: zod.number().int().positive('Primary key must be a positive integer'),
   qualified_conversation: zod.object({
-    domain: zod.string().min(1, 'Domain is required'),
+    domain: zod.string().optional(),
     id: zod.string().min(1, 'Conversation ID is required'),
   }),
   qualified_from: zod
     .object({
-      domain: zod.string().min(1, 'Domain is required'),
+      domain: zod.string().optional(),
       id: zod.string().min(1, 'User ID is required'),
     })
     .optional(),

@@ -24,6 +24,7 @@ import {Logger, getLogger} from 'Util/Logger';
 import {constructUserPrimaryKey} from 'Util/StorageUtil';
 import {WebWorker} from 'Util/worker';
 
+import {ProgressCallback, Filename, FileDescriptor} from './Backup.types';
 import {BackUpHeader, ERROR_TYPES} from './BackUpHeader';
 import {BackupService} from './BackupService';
 import {
@@ -33,11 +34,10 @@ import {
   ImportError,
   IncompatibleBackupError,
   IncompatibleBackupFormatError,
-  IncompatiblePlatformError,
-  InvalidMetaDataError,
   InvalidPassword,
 } from './Error';
-import {preprocessConversations, preprocessUsers, preprocessEvents} from './recordPreprocessors';
+import {importLegacyBackupToDatabase} from './LegacyBackup.helper';
+import {exportMPBHistoryFromDatabase, importMPBHistoryToDatabase, isMPBackup, MPBackup} from './MPBackup.helper';
 
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import {isReadableConversation} from '../conversation/ConversationSelectors';
@@ -47,60 +47,7 @@ import {EventRecord, UserRecord} from '../storage';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {StorageSchemata} from '../storage/StorageSchemata';
 
-/* eslint-disable */
-import {com} from 'kalium-backup';
-import MPBackupImporter = com.wire.backup.ingest.MPBackupImporter;
-import MPBackup = com.wire.backup.MPBackup;
-import BackupImportResult = com.wire.backup.ingest.BackupImportResult;
-import MPBackupExporter = com.wire.backup.dump.MPBackupExporter;
-import BackupQualifiedId = com.wire.backup.data.BackupQualifiedId;
-import BackupMessage = com.wire.backup.data.BackupMessage;
-import BackupUser = com.wire.backup.data.BackupUser;
-import BackUpConversation = com.wire.backup.data.BackupConversation;
-import BackupMessageContent = com.wire.backup.data.BackupMessageContent;
-import BackupDateTime = com.wire.backup.data.BackupDateTime;
-import Dexie from 'dexie';
-import {
-  ConversationTableSchema,
-  ConversationTablesSchema,
-  EventTableSchema,
-  UsersTablesSchema,
-  UserTableSchema,
-} from './TableData.schema';
 /* eslint-enable */
-
-interface Metadata {
-  client_id: string;
-  creation_time: string;
-  platform: 'Web';
-  user_handle: string;
-  user_id: string;
-  user_name: string;
-  version: number;
-}
-
-type ProgressCallback = (done: number) => void;
-
-export type FileDescriptor =
-  | {
-      entities: UserRecord[];
-      filename: Filename.USERS;
-    }
-  | {
-      entities: EventRecord[];
-      filename: Filename.EVENTS;
-    }
-  | {
-      entities: ConversationRecord[];
-      filename: Filename.CONVERSATIONS;
-    };
-
-export enum Filename {
-  CONVERSATIONS = 'conversations.json',
-  EVENTS = 'events.json',
-  USERS = 'users.json',
-  METADATA = 'export.json',
-}
 
 const UINT8ARRAY_FIELDS = ['otr_key', 'sha256'];
 
@@ -124,18 +71,6 @@ export class BackupRepository {
     this.canceled = true;
   }
 
-  public createMetaData(user: User, clientId: string): Metadata {
-    return {
-      client_id: clientId,
-      creation_time: new Date().toISOString(),
-      platform: 'Web',
-      user_handle: user.username(),
-      user_id: user.id,
-      user_name: user.name(),
-      version: this.backupService.getDatabaseVersion(),
-    };
-  }
-
   /**
    * Gather needed data for the export and generates the history
    *
@@ -151,7 +86,11 @@ export class BackupRepository {
     this.canceled = false;
 
     try {
-      const exportedData = await this._exportHistory(progressCallback);
+      const exportedData = await exportMPBHistoryFromDatabase({
+        progressCallback,
+        user,
+        backupService: this.backupService,
+      });
       return await this.compressHistoryFiles(user, clientId, exportedData, password);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : error;
@@ -161,94 +100,6 @@ export class BackupRepository {
     }
   }
 
-  private async exportTable<T>(table: Dexie.Table<T, unknown>, preprocessor: (tableRows: T[]) => T[]): Promise<any[]> {
-    const tableData: T[] = [];
-
-    await this.backupService.exportTable(table, tableRows => {
-      if (this.canceled) {
-        throw new CancelError();
-      }
-      const processedData = preprocessor(tableRows);
-      tableData.push(...processedData);
-    });
-    return tableData;
-  }
-
-  private async _exportHistory(progressCallback: ProgressCallback) {
-    const [conversationTable, eventsTable, usersTable] = this.backupService.getTables();
-    const backupExporter = new MPBackupExporter(new BackupQualifiedId('selfUserId', 'selfUserDomain'));
-    function streamProgress<T>(dataProcessor: (data: T[]) => T[]) {
-      return (data: T[]) => {
-        progressCallback(data.length);
-        return dataProcessor(data);
-      };
-    }
-
-    // Taking care of conversations
-    const conversationsData = ConversationTableSchema.parse(
-      await this.exportTable(conversationTable, streamProgress(preprocessConversations)),
-    );
-    conversationsData.forEach(conversationData =>
-      backupExporter.addConversation(
-        new BackUpConversation(
-          new BackupQualifiedId(conversationData.id, conversationData.domain),
-          conversationData.name ?? '',
-        ),
-      ),
-    );
-
-    // Taking care of users
-    const usersData = UserTableSchema.parse(await this.exportTable(usersTable, streamProgress(preprocessUsers)));
-    usersData.forEach(userData =>
-      backupExporter.addUser(
-        new BackupUser(
-          new BackupQualifiedId(userData.qualified_id.id, userData.qualified_id.domain),
-          userData.name,
-          userData.handle,
-        ),
-      ),
-    );
-
-    // Taking care of events
-    const eventsData = EventTableSchema.parse(await this.exportTable(eventsTable, streamProgress(preprocessEvents)));
-    eventsData.forEach(eventData => {
-      // ToDo: Add support for other types of messages and different types of content. Also figure out which fields are required.
-      if (!eventData.id) {
-        // eslint-disable-next-line no-console
-        console.log('Event without id', eventData);
-        return;
-      }
-      if (!eventData.qualified_conversation.id) {
-        // eslint-disable-next-line no-console
-        console.log('Event without conversation id', eventData);
-        return;
-      }
-
-      if (!eventData.from_client_id) {
-        // eslint-disable-next-line no-console
-        console.log('Event without from_client_id', eventData);
-        return;
-      }
-      if (!eventData.data.content) {
-        // eslint-disable-next-line no-console
-        console.log('Event without content', eventData);
-        return;
-      }
-      backupExporter.addMessage(
-        new BackupMessage(
-          eventData.id,
-          new BackupQualifiedId(eventData.qualified_conversation.id, eventData.qualified_conversation.domain),
-          // this needs to be optional for message type 16 (self messages)
-          new BackupQualifiedId(eventData.qualified_from?.id ?? '', eventData.qualified_from?.domain ?? ''),
-          eventData.from_client_id,
-          new BackupDateTime(new Date(eventData.time)),
-          new BackupMessageContent.Text(eventData.data.content),
-        ),
-      );
-    });
-
-    return backupExporter.serialize();
-  }
   private async compressHistoryFiles(
     user: User,
     clientId: string, // TODO: Add clientId to metadata
@@ -353,6 +204,8 @@ export class BackupRepository {
   ): Promise<void> {
     this.canceled = false;
     let files;
+    let fileDescriptors: FileDescriptor[];
+    let archiveVersion: number;
 
     if (password) {
       files = await this.createDecryptedBackup(data, user, password);
@@ -372,52 +225,32 @@ export class BackupRepository {
     }
 
     // Check for Multiplatform backup
-    if (files[MPBackup.ZIP_ENTRY_DATA]) {
-      // It's multiplatform!
-      const backupImporter = new MPBackupImporter('wire.com');
-      const backupRawData = files[MPBackup.ZIP_ENTRY_DATA];
-
-      const result = backupImporter.import(new Int8Array(backupRawData.buffer));
-      if (result instanceof BackupImportResult.Success) {
-        console.log(`SUCCESSFUL BACKUP IMPORT: ${result.backupData}`); // eslint-disable-line
-        result.backupData.messages.forEach(message => {
-          console.log(`IMPORTED MESSAGE: ${message.toString()}`); // eslint-disable-line
-          // TODO: Import messages.
-          //       Convert messages to EventRecord or whatever else needed in order to insert them into the local DB
-        });
-        result.backupData.conversations.forEach(conversation => {
-          console.log(`IMPORTED CONVERSATION: ${conversation.toString()}`); // eslint-disable-line
-          // TODO: Import conversations
-        });
-        result.backupData.users.forEach(user => {
-          console.log(`IMPORTED USER: ${user.toString()}`); // eslint-disable-line
-          // TODO: Import users
-        });
-      } else {
-        console.log(`ERROR DURING BACKUP IMPORT: ${result}`); // eslint-disable-line
-        throw new IncompatibleBackupError('Incompatible Multiplatform backup');
-      }
-      return;
-    }
-    if (!files[Filename.METADATA]) {
-      throw new InvalidMetaDataError();
-    }
-
-    const archiveVersion = await this.verifyMetadata(user, files);
-    const fileDescriptors = Object.entries(files)
-      .filter(([filename]) => filename !== Filename.METADATA)
-      .map(([filename, content]) => {
-        const data = new TextDecoder().decode(content);
-        const entities = JSON.parse(data);
-        return {
-          entities,
-          filename,
-        } as FileDescriptor;
+    if (isMPBackup(files)) {
+      // Import Multiplatform backup
+      const mpbData = await importMPBHistoryToDatabase({
+        backupService: this.backupService,
+        progressCallback,
+        fileData: files,
+        user,
       });
+      fileDescriptors = mpbData.fileDescriptors;
+      archiveVersion = mpbData.archiveVersion;
+    } else {
+      // Import legacy backup
+      const legacyData = await importLegacyBackupToDatabase({
+        backupService: this.backupService,
+        fileData: files,
+        progressCallback,
+        user,
+      });
+      fileDescriptors = legacyData.fileDescriptors;
+      archiveVersion = legacyData.archiveVersion;
+    }
 
     const nbEntities = fileDescriptors.reduce((acc, {entities}) => acc + entities.length, 0);
     initCallback(nbEntities);
 
+    console.log('AW Importing history data', fileDescriptors);
     await this.importHistoryData(archiveVersion, fileDescriptors, progressCallback);
   }
 
@@ -570,34 +403,6 @@ export class BackupRepository {
       });
     }
     return omit(entity, 'primary_key');
-  }
-
-  private async verifyMetadata(user: User, files: Record<string, Uint8Array>): Promise<number> {
-    const rawData = files[Filename.METADATA];
-    const metaData = new TextDecoder().decode(rawData);
-    const parsedMetaData = JSON.parse(metaData);
-    const archiveVersion = this._verifyMetadata(user, parsedMetaData);
-    this.logger.debug('Validated metadata during history import', files);
-    return archiveVersion;
-  }
-
-  private _verifyMetadata(user: User, archiveMetadata: Metadata): number {
-    const localMetadata = this.createMetaData(user, '');
-    const isExpectedUserId = archiveMetadata.user_id === localMetadata.user_id;
-    if (!isExpectedUserId) {
-      const fromUserId = archiveMetadata.user_id;
-      const toUserId = localMetadata.user_id;
-      const message = `History from user "${fromUserId}" cannot be restored for user "${toUserId}".`;
-      throw new DifferentAccountError(message);
-    }
-
-    const isExpectedPlatform = archiveMetadata.platform === localMetadata.platform;
-    if (!isExpectedPlatform) {
-      const message = `History created from "${archiveMetadata.platform}" device cannot be imported`;
-      throw new IncompatiblePlatformError(message);
-    }
-
-    return archiveMetadata.version;
   }
 
   private mapDecodingError(decodingError: string) {
