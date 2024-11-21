@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode, useEffect, useRef} from 'react';
+import {ReactNode, useRef} from 'react';
 
 import {createPortal} from 'react-dom';
 
@@ -37,19 +37,6 @@ export const BannerPortal = ({onClose, positionX = 0, positionY = 0, children}: 
 
   const {activeWindow} = useActiveWindowState.getState();
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (bannerRef.current && !bannerRef.current.contains(event.target as Node)) {
-        onClose();
-      }
-    };
-
-    activeWindow.document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      activeWindow.document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [activeWindow.document, onClose]);
-
   const updateRef = (element: HTMLDivElement) => {
     bannerRef.current = element;
 
@@ -61,7 +48,7 @@ export const BannerPortal = ({onClose, positionX = 0, positionY = 0, children}: 
   };
 
   return createPortal(
-    <div ref={updateRef} css={{...portalContainerCss, left: positionX}}>
+    <div ref={updateRef} onMouseLeave={onClose} css={{...portalContainerCss, left: positionX}}>
       {children}
     </div>,
     activeWindow.document.body,

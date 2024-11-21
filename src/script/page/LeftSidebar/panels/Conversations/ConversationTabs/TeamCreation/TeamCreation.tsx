@@ -25,6 +25,7 @@ import {UserRepository} from 'src/script/user/UserRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {ConfirmLeaveModal} from './ConfirmLeaveModal';
+import {TeamCreationAccountHeader} from './TeamCreationAccountHeader';
 import {TeamCreationBanner} from './TeamCreationBanner';
 import {TeamCreationModal} from './TeamCreationModal';
 
@@ -32,9 +33,10 @@ interface Props {
   selfUser: User;
   teamRepository: TeamRepository;
   userRepository: UserRepository;
+  isAccountPage?: boolean;
 }
 
-export const TeamCreation = ({selfUser, userRepository, teamRepository}: Props) => {
+export const TeamCreation = ({selfUser, userRepository, teamRepository, isAccountPage = false}: Props) => {
   const [isTeamCreationModalVisible, setIsTeamCreationModalVisible] = useState(false);
   const [isLeaveConfirmModalVisible, setIsLeaveConfirmModalVisible] = useState(false);
   const {name} = useKoSubscribableChildren(selfUser, ['name']);
@@ -54,7 +56,11 @@ export const TeamCreation = ({selfUser, userRepository, teamRepository}: Props) 
 
   return (
     <>
-      <TeamCreationBanner onClick={modalOpenHandler} />
+      {isAccountPage ? (
+        <TeamCreationAccountHeader onClick={modalOpenHandler} />
+      ) : (
+        <TeamCreationBanner onClick={modalOpenHandler} />
+      )}
       {isTeamCreationModalVisible && (
         <TeamCreationModal
           userName={name}
