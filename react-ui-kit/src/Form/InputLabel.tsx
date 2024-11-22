@@ -37,6 +37,8 @@ const InputLabel: FC<InputLabelProps> = ({htmlFor, markInvalid, isRequired, chil
       fontWeight: 400,
       lineHeight: '1rem',
       color: markInvalid ? COLOR_V2.RED_LIGHT_500 : theme.Input.labelColor,
+      marginBottom: '2px',
+      display: 'block',
     })}
     {...props}
   >
