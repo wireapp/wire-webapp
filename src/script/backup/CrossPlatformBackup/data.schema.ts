@@ -20,7 +20,7 @@
 import zod from 'zod';
 
 const ConversationSchema = zod.object({
-  accessModes: zod.array(zod.string()),
+  accessModes: zod.array(zod.string()).optional(),
   accessRole: zod.array(zod.any()).optional(),
   accessRoleV2: zod.string().optional(),
   archived_state: zod.boolean(),
@@ -41,7 +41,7 @@ const ConversationSchema = zod.object({
   receipt_mode: zod.number().nullable(),
   roles: zod.object({}).passthrough(),
   status: zod.number(),
-  team_id: zod.string().nullable(),
+  team_id: zod.string().nullable().optional(),
   type: zod.number(),
 });
 export const ConversationTableSchema = zod.array(ConversationSchema);
@@ -68,15 +68,7 @@ export type UserTable = zod.infer<typeof UserTableSchema>;
 const EventSchema = zod.object({
   category: zod.number().int().optional(),
   conversation: zod.string().min(1, 'Conversation is required'),
-  data: zod
-    .object({
-      content: zod.string().optional(),
-      mentions: zod.array(zod.string()).optional(),
-      previews: zod.array(zod.string()).optional(),
-      expects_read_confirmation: zod.boolean().default(false),
-      legal_hold_status: zod.number().int().optional(),
-    })
-    .optional(),
+  data: zod.any(),
   from: zod.string().optional(),
   from_client_id: zod.string().optional(),
   id: zod.string().optional(),
@@ -97,3 +89,17 @@ const EventSchema = zod.object({
 });
 export const EventTableSchema = zod.array(EventSchema);
 export type EventTable = zod.infer<typeof EventTableSchema>;
+
+export const AssetContentSchema = zod.object({
+  content_length: zod.number(),
+  content_type: zod.string(),
+  domain: zod.string().optional(),
+  expects_read_confirmation: zod.boolean(),
+  info: zod.any(),
+  key: zod.string(),
+  legal_hold_status: zod.number(),
+  otr_key: zod.record(zod.string(), zod.number()),
+  sha256: zod.record(zod.string(), zod.number()),
+  status: zod.string().optional(),
+  token: zod.string().optional(),
+});

@@ -212,7 +212,6 @@ export const renderMessage = (message: string, selfId?: QualifiedId, mentionEnti
     return self.renderToken(tokens, idx, options);
   };
 
-  console.log('mentionlessText', mentionlessText);
   const tokens = markdownit.parse(mentionlessText, {});
   mentionlessText = markdownit.renderer.render(tokens, (markdownit as MarkdownItWithOptions).options, {});
   // Remove <br> and \n if it is the last thing in a message

@@ -27,6 +27,7 @@ import {WebWorker} from 'Util/worker';
 import {ProgressCallback, Filename, FileDescriptor} from './Backup.types';
 import {BackUpHeader, ERROR_TYPES} from './BackUpHeader';
 import {BackupService} from './BackupService';
+import {exportMPBHistoryFromDatabase, importMPBHistoryToDatabase, isMPBackup, MPBackup} from './CrossPlatformBackup';
 import {
   CancelError,
   DifferentAccountError,
@@ -37,7 +38,6 @@ import {
   InvalidPassword,
 } from './Error';
 import {importLegacyBackupToDatabase} from './LegacyBackup.helper';
-import {exportMPBHistoryFromDatabase, importMPBHistoryToDatabase, isMPBackup, MPBackup} from './MPBackup.helper';
 
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import {isReadableConversation} from '../conversation/ConversationSelectors';
@@ -250,7 +250,7 @@ export class BackupRepository {
     const nbEntities = fileDescriptors.reduce((acc, {entities}) => acc + entities.length, 0);
     initCallback(nbEntities);
 
-    console.log('AW Importing history data', fileDescriptors);
+    this.logger.log('AW Importing history data', fileDescriptors);
     await this.importHistoryData(archiveVersion, fileDescriptors, progressCallback);
   }
 

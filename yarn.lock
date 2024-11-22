@@ -12628,7 +12628,7 @@ __metadata:
 
 "kalium-backup@file:./TEMP-crossplatform-backup::locator=wire-webapp%40workspace%3A.":
   version: 0.0.1-SNAPSHOT
-  resolution: "kalium-backup@file:./TEMP-crossplatform-backup#./TEMP-crossplatform-backup::hash=b22789&locator=wire-webapp%40workspace%3A."
+  resolution: "kalium-backup@file:./TEMP-crossplatform-backup#./TEMP-crossplatform-backup::hash=d5f28e&locator=wire-webapp%40workspace%3A."
   dependencies:
     "@js-joda/core": "npm:3.2.0"
     abort-controller: "npm:3.0.0"
@@ -12637,7 +12637,7 @@ __metadata:
     node-fetch: "npm:2.6.7"
     protobufjs: "npm:^7.3.2"
     ws: "npm:8.5.0"
-  checksum: 10/9e57943b025372d01a7aa83be5b57a28443cf9fdf344a8c9a0c6f3460154ad430df1648e85f64a40750237fdedebf38c5df2a5cc8285ec0f413030cfde766a8b
+  checksum: 10/55fe6081482322f35f9c7b0a281058948c96917f029d05f30f2efdf6bd16347d91f7958d37ce5e5d5812dbb4ae91f546963466d4902892a2f5556a9533884e3d
   languageName: node
   linkType: hard
 
