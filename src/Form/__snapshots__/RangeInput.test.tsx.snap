@@ -12,6 +12,8 @@ exports[`"RangeInput" matches snapshot 1`] = `
   font-weight: 400;
   line-height: 1rem;
   color: #54585f;
+  margin-bottom: 2px;
+  display: block;
 }
 
 .emotion-4 {
