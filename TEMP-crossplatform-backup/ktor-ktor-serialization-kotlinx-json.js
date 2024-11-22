@@ -31,7 +31,7 @@
   //region block: imports
   var Unit_getInstance = kotlin_kotlin.$_$.k5;
   var VOID = kotlin_kotlin.$_$.f;
-  var Json = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_json.$_$.r;
+  var Json = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_json.$_$.s;
   //endregion
   //region block: pre-declaration
   //endregion

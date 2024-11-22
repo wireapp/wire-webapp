@@ -44,20 +44,20 @@
   var classMeta = kotlin_kotlin.$_$.ta;
   var VOID = kotlin_kotlin.$_$.f;
   var getStringHashCode = kotlin_kotlin.$_$.eb;
-  var THROW_CCE = kotlin_kotlin.$_$.rg;
+  var THROW_CCE = kotlin_kotlin.$_$.qg;
   var hashCode = kotlin_kotlin.$_$.fb;
   var equals = kotlin_kotlin.$_$.xa;
   var Regex_init_$Create$ = kotlin_kotlin.$_$.d1;
   var substringBefore = kotlin_kotlin.$_$.xe;
   var substringAfterLast = kotlin_kotlin.$_$.ue;
   var split = kotlin_kotlin.$_$.qe;
-  var THROW_IAE = kotlin_kotlin.$_$.sg;
+  var THROW_IAE = kotlin_kotlin.$_$.rg;
   var enumEntries = kotlin_kotlin.$_$.ia;
   var Unit_getInstance = kotlin_kotlin.$_$.k5;
   var Enum = kotlin_kotlin.$_$.eg;
   var objectCreate = kotlin_kotlin.$_$.bc;
   var Logger = kotlin_co_touchlab_kermit.$_$.a;
-  var noWhenBranchMatchedException = kotlin_kotlin.$_$.ph;
+  var noWhenBranchMatchedException = kotlin_kotlin.$_$.oh;
   var Severity_Verbose_getInstance = kotlin_co_touchlab_kermit_core.$_$.i;
   var Severity_Debug_getInstance = kotlin_co_touchlab_kermit_core.$_$.f;
   var Severity_Info_getInstance = kotlin_co_touchlab_kermit_core.$_$.h;
@@ -266,6 +266,8 @@
   var ApplicationFlow_CALLING_instance;
   var ApplicationFlow_ASSETS_instance;
   var ApplicationFlow_LOCAL_STORAGE_instance;
+  var ApplicationFlow_ANALYTICS_instance;
+  var ApplicationFlow_CONVERSATIONS_FOLDERS_instance;
   function values() {
     return [
       ApplicationFlow_SYNC_getInstance(),
@@ -280,6 +282,8 @@
       ApplicationFlow_CALLING_getInstance(),
       ApplicationFlow_ASSETS_getInstance(),
       ApplicationFlow_LOCAL_STORAGE_getInstance(),
+      ApplicationFlow_ANALYTICS_getInstance(),
+      ApplicationFlow_CONVERSATIONS_FOLDERS_getInstance(),
     ];
   }
   function valueOf(value) {
@@ -308,6 +312,10 @@
         return ApplicationFlow_ASSETS_getInstance();
       case 'LOCAL_STORAGE':
         return ApplicationFlow_LOCAL_STORAGE_getInstance();
+      case 'ANALYTICS':
+        return ApplicationFlow_ANALYTICS_getInstance();
+      case 'CONVERSATIONS_FOLDERS':
+        return ApplicationFlow_CONVERSATIONS_FOLDERS_getInstance();
       default:
         ApplicationFlow_initEntries();
         THROW_IAE('No enum constant value.');
@@ -334,6 +342,8 @@
     ApplicationFlow_CALLING_instance = new ApplicationFlow('CALLING', 9);
     ApplicationFlow_ASSETS_instance = new ApplicationFlow('ASSETS', 10);
     ApplicationFlow_LOCAL_STORAGE_instance = new ApplicationFlow('LOCAL_STORAGE', 11);
+    ApplicationFlow_ANALYTICS_instance = new ApplicationFlow('ANALYTICS', 12);
+    ApplicationFlow_CONVERSATIONS_FOLDERS_instance = new ApplicationFlow('CONVERSATIONS_FOLDERS', 13);
   }
   var $ENTRIES;
   function ApplicationFlow(name, ordinal) {
@@ -386,6 +396,14 @@
   function ApplicationFlow_LOCAL_STORAGE_getInstance() {
     ApplicationFlow_initEntries();
     return ApplicationFlow_LOCAL_STORAGE_instance;
+  }
+  function ApplicationFlow_ANALYTICS_getInstance() {
+    ApplicationFlow_initEntries();
+    return ApplicationFlow_ANALYTICS_instance;
+  }
+  function ApplicationFlow_CONVERSATIONS_FOLDERS_getInstance() {
+    ApplicationFlow_initEntries();
+    return ApplicationFlow_CONVERSATIONS_FOLDERS_instance;
   }
   function _get_config__hi7kzb($this) {
     return $this.config_1;

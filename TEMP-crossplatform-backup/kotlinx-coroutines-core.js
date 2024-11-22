@@ -25,7 +25,7 @@
   //region block: imports
   var imul = Math.imul;
   var protoOf = kotlin_kotlin.$_$.dc;
-  var THROW_CCE = kotlin_kotlin.$_$.rg;
+  var THROW_CCE = kotlin_kotlin.$_$.qg;
   var Unit_getInstance = kotlin_kotlin.$_$.k5;
   var Continuation = kotlin_kotlin.$_$.x9;
   var classMeta = kotlin_kotlin.$_$.ta;
@@ -39,9 +39,10 @@
   var isInterface = kotlin_kotlin.$_$.pb;
   var intercepted = kotlin_kotlin.$_$.r9;
   var interfaceMeta = kotlin_kotlin.$_$.gb;
+  var UnsupportedOperationException_init_$Create$ = kotlin_kotlin.$_$.m2;
   var toString = kotlin_kotlin.$_$.ic;
   var IllegalStateException_init_$Create$ = kotlin_kotlin.$_$.w1;
-  var toString_0 = kotlin_kotlin.$_$.xh;
+  var toString_0 = kotlin_kotlin.$_$.wh;
   var atomic$int$1 = kotlin_org_jetbrains_kotlinx_atomicfu.$_$.e;
   var atomic$ref$1 = kotlin_org_jetbrains_kotlinx_atomicfu.$_$.d;
   var objectMeta = kotlin_kotlin.$_$.cc;
@@ -60,24 +61,24 @@
   var Key = kotlin_kotlin.$_$.ca;
   var Element = kotlin_kotlin.$_$.ba;
   var RuntimeException_init_$Create$ = kotlin_kotlin.$_$.j2;
-  var addSuppressed = kotlin_kotlin.$_$.eh;
+  var addSuppressed = kotlin_kotlin.$_$.dh;
   var getStringHashCode = kotlin_kotlin.$_$.eb;
   var CancellationException_init_$Create$_0 = kotlin_kotlin.$_$.c1;
-  var THROW_IAE = kotlin_kotlin.$_$.sg;
+  var THROW_IAE = kotlin_kotlin.$_$.rg;
   var enumEntries = kotlin_kotlin.$_$.ia;
   var Enum = kotlin_kotlin.$_$.eg;
   var startCoroutine = kotlin_kotlin.$_$.ha;
-  var noWhenBranchMatchedException = kotlin_kotlin.$_$.ph;
+  var noWhenBranchMatchedException = kotlin_kotlin.$_$.oh;
   var Long = kotlin_kotlin.$_$.kg;
   var Companion_getInstance = kotlin_kotlin.$_$.e5;
   var ArrayDeque_init_$Create$ = kotlin_kotlin.$_$.k;
-  var RuntimeException = kotlin_kotlin.$_$.qg;
+  var RuntimeException = kotlin_kotlin.$_$.pg;
   var RuntimeException_init_$Init$ = kotlin_kotlin.$_$.i2;
   var captureStack = kotlin_kotlin.$_$.na;
   var Error_0 = kotlin_kotlin.$_$.fg;
   var Error_init_$Init$ = kotlin_kotlin.$_$.j1;
   var StringBuilder_init_$Create$ = kotlin_kotlin.$_$.f1;
-  var throwUninitializedPropertyAccessException = kotlin_kotlin.$_$.uh;
+  var throwUninitializedPropertyAccessException = kotlin_kotlin.$_$.th;
   var ArrayList_init_$Create$ = kotlin_kotlin.$_$.l;
   var CancellationException = kotlin_kotlin.$_$.o9;
   var ArrayList = kotlin_kotlin.$_$.n5;
@@ -91,14 +92,13 @@
   var anyToString = kotlin_kotlin.$_$.ka;
   var Companion_getInstance_0 = kotlin_kotlin.$_$.f5;
   var _Result___init__impl__xyqfz8 = kotlin_kotlin.$_$.b3;
-  var createFailure = kotlin_kotlin.$_$.hh;
+  var createFailure = kotlin_kotlin.$_$.gh;
   var SuspendFunction1 = kotlin_kotlin.$_$.fa;
-  var UnsupportedOperationException = kotlin_kotlin.$_$.dh;
+  var UnsupportedOperationException = kotlin_kotlin.$_$.ch;
   var objectCreate = kotlin_kotlin.$_$.bc;
   var CancellationException_init_$Init$ = kotlin_kotlin.$_$.z;
-  var UnsupportedOperationException_init_$Create$ = kotlin_kotlin.$_$.m2;
   var atomicfu$AtomicRefArray$ofNulls = kotlin_org_jetbrains_kotlinx_atomicfu.$_$.a;
-  var ensureNotNull = kotlin_kotlin.$_$.ih;
+  var ensureNotNull = kotlin_kotlin.$_$.hh;
   var toLong = kotlin_kotlin.$_$.gc;
   var IllegalArgumentException_init_$Create$ = kotlin_kotlin.$_$.r1;
   var atomic$long$1 = kotlin_org_jetbrains_kotlinx_atomicfu.$_$.c;
@@ -114,7 +114,7 @@
   var NoSuchElementException_init_$Init$ = kotlin_kotlin.$_$.d2;
   var fillArrayVal = kotlin_kotlin.$_$.za;
   var IntCompanionObject_getInstance = kotlin_kotlin.$_$.w4;
-  var throwKotlinNothingValueException = kotlin_kotlin.$_$.th;
+  var throwKotlinNothingValueException = kotlin_kotlin.$_$.sh;
   var Exception = kotlin_kotlin.$_$.gg;
   var Exception_init_$Init$ = kotlin_kotlin.$_$.k1;
   var toLongOrNull = kotlin_kotlin.$_$.if;
@@ -221,10 +221,9 @@
     return $super === VOID ? this.cancel_e74who_k$(cause) : $super.cancel_e74who_k$.call(this, cause);
   }
   setMetadataFor(CancellableContinuation, 'CancellableContinuation', interfaceMeta, VOID, [Continuation]);
-  setMetadataFor(CancelHandlerBase, 'CancelHandlerBase', classMeta);
   setMetadataFor(NotCompleted, 'NotCompleted', interfaceMeta);
-  setMetadataFor(CancelHandler, 'CancelHandler', classMeta, CancelHandlerBase, [CancelHandlerBase, NotCompleted]);
-  setMetadataFor(DisposeOnCancel, 'DisposeOnCancel', classMeta, CancelHandler);
+  setMetadataFor(CancelHandler, 'CancelHandler', interfaceMeta, VOID, [NotCompleted]);
+  setMetadataFor(DisposeOnCancel, 'DisposeOnCancel', classMeta, VOID, [CancelHandler]);
   setMetadataFor(Runnable, 'Runnable', interfaceMeta);
   setMetadataFor(SchedulerTask, 'SchedulerTask', classMeta, VOID, [Runnable]);
   setMetadataFor(DispatchedTask, 'DispatchedTask', classMeta, SchedulerTask);
@@ -236,10 +235,12 @@
     CoroutineStackFrame,
     Waiter,
   ]);
+  setMetadataFor(UserSupplied, 'UserSupplied', classMeta, VOID, [CancelHandler]);
   setMetadataFor(Active, 'Active', objectMeta, VOID, [NotCompleted]);
   setMetadataFor(CompletedContinuation, 'CompletedContinuation', classMeta);
-  setMetadataFor(InvokeOnCancel, 'InvokeOnCancel', classMeta, CancelHandler);
   setMetadataFor(CompletableJob, 'CompletableJob', interfaceMeta, VOID, [Job], VOID, VOID, VOID, [0]);
+  setMetadataFor(InternalCompletionHandler, 'InternalCompletionHandler', interfaceMeta);
+  setMetadataFor(UserSupplied_0, 'UserSupplied', classMeta, VOID, [InternalCompletionHandler]);
   setMetadataFor(CompletedExceptionally, 'CompletedExceptionally', classMeta);
   setMetadataFor(CancelledContinuation, 'CancelledContinuation', classMeta, CompletedExceptionally);
   setMetadataFor(CompletedWithCancellation, 'CompletedWithCancellation', classMeta);
@@ -281,9 +282,9 @@
   setMetadataFor(LinkedListNode, 'LinkedListNode', classMeta, VOID, [DisposableHandle], LinkedListNode);
   setMetadataFor(LinkedListHead, 'LinkedListHead', classMeta, LinkedListNode, VOID, LinkedListHead);
   setMetadataFor(NodeList, 'NodeList', classMeta, LinkedListHead, [LinkedListHead, Incomplete], NodeList);
-  setMetadataFor(CompletionHandlerBase, 'CompletionHandlerBase', classMeta, LinkedListNode);
-  setMetadataFor(JobNode, 'JobNode', classMeta, CompletionHandlerBase, [
-    CompletionHandlerBase,
+  setMetadataFor(JobNode, 'JobNode', classMeta, LinkedListNode, [
+    LinkedListNode,
+    InternalCompletionHandler,
     DisposableHandle,
     Incomplete,
   ]);
@@ -478,7 +479,7 @@
     SelectImplementation,
     'SelectImplementation',
     classMeta,
-    CancelHandler,
+    VOID,
     [CancelHandler, SelectBuilder, SelectInstanceInternal],
     VOID,
     VOID,
@@ -527,7 +528,7 @@
     VOID,
     [1],
   );
-  setMetadataFor(ClearTimeout, 'ClearTimeout', classMeta, CancelHandler, [CancelHandler, DisposableHandle]);
+  setMetadataFor(ClearTimeout, 'ClearTimeout', classMeta, VOID, [CancelHandler, DisposableHandle]);
   setMetadataFor(WindowClearTimeout, 'WindowClearTimeout', classMeta, ClearTimeout);
   setMetadataFor(
     WindowDispatcher,
@@ -751,10 +752,7 @@
   }
   function CancellableContinuation() {}
   function disposeOnCancellation(_this__u8e3s4, handle) {
-    // Inline function 'kotlinx.coroutines.asHandler' call
-    // Inline function 'kotlin.js.asDynamic' call
-    var tmp$ret$1 = new DisposeOnCancel(handle);
-    return _this__u8e3s4.invokeOnCancellation_kffkqp_k$(tmp$ret$1);
+    return invokeOnCancellation(_this__u8e3s4, new DisposeOnCancel(handle));
   }
   function suspendCancellableCoroutineReusable(block, $completion) {
     // Inline function 'kotlinx.coroutines.suspendCancellableCoroutineReusable.<anonymous>' call
@@ -772,18 +770,26 @@
     }
     return cancellable.getResult_clfhg3_k$();
   }
+  function invokeOnCancellation(_this__u8e3s4, handler) {
+    var tmp;
+    if (_this__u8e3s4 instanceof CancellableContinuationImpl) {
+      _this__u8e3s4.invokeOnCancellationInternal_gcimbo_k$(handler);
+      tmp = Unit_getInstance();
+    } else {
+      throw UnsupportedOperationException_init_$Create$(
+        'third-party implementation of CancellableContinuation is not supported',
+      );
+    }
+    return tmp;
+  }
   function _get_handle__ls055p($this) {
     return $this.handle_1;
   }
   function DisposeOnCancel(handle) {
-    CancelHandler.call(this);
     this.handle_1 = handle;
   }
   protoOf(DisposeOnCancel).invoke_py2q9a_k$ = function (cause) {
     return this.handle_1.dispose_3nnxhr_k$();
-  };
-  protoOf(DisposeOnCancel).invoke = function (cause) {
-    return this.invoke_py2q9a_k$(cause);
   };
   protoOf(DisposeOnCancel).toString = function () {
     return 'DisposeOnCancel[' + this.handle_1 + ']';
@@ -882,7 +888,7 @@
   function callCancelHandler($this, handler, cause) {
     var tmp;
     try {
-      invokeIt(handler, cause);
+      handler.invoke_py2q9a_k$(cause);
       tmp = Unit_getInstance();
     } catch ($p) {
       var tmp_0;
@@ -989,10 +995,7 @@
       tmp = tmp0_elvis_lhs;
     }
     var parent = tmp;
-    // Inline function 'kotlinx.coroutines.asHandler' call
-    // Inline function 'kotlin.js.asDynamic' call
-    var tmp$ret$1 = new ChildContinuation($this);
-    var handle = parent.invokeOnCompletion$default_1v3utx_k$(true, VOID, tmp$ret$1);
+    var handle = invokeOnCompletion(parent, true, VOID, new ChildContinuation($this));
     $this._parentHandle_1.atomicfu$compareAndSet(null, handle);
     return handle;
   }
@@ -1007,7 +1010,7 @@
         if ($this._state_1.atomicfu$compareAndSet(state, handler)) return Unit_getInstance();
       } else {
         var tmp;
-        if (state instanceof CancelHandler) {
+        if (!(state == null) ? isInterface(state, CancelHandler) : false) {
           tmp = true;
         } else {
           tmp = state instanceof Segment;
@@ -1022,8 +1025,8 @@
             if (state instanceof CancelledContinuation) {
               var tmp1_safe_receiver = state instanceof CompletedExceptionally ? state : null;
               var cause = tmp1_safe_receiver == null ? null : tmp1_safe_receiver.get_cause_iplhs0_k$();
-              if (handler instanceof CancelHandler) {
-                $this.callCancelHandler_llz4b6_k$(handler, cause);
+              if (isInterface(handler, CancelHandler)) {
+                $this.callCancelHandler_e6l0np_k$(handler, cause);
               } else {
                 var segment = handler instanceof Segment ? handler : THROW_CCE();
                 callSegmentOnCancellation($this, segment, cause);
@@ -1036,16 +1039,16 @@
                 multipleHandlersError($this, handler, state);
               }
               if (handler instanceof Segment) return Unit_getInstance();
-              if (!(handler instanceof CancelHandler)) THROW_CCE();
+              if (!isInterface(handler, CancelHandler)) THROW_CCE();
               if (state.get_cancelled_ge9r54_k$()) {
-                $this.callCancelHandler_llz4b6_k$(handler, state.cancelCause_1);
+                $this.callCancelHandler_e6l0np_k$(handler, state.cancelCause_1);
                 return Unit_getInstance();
               }
-              var update = state.copy$default_agfz8q_k$(VOID, handler);
+              var update = state.copy$default_wexsgh_k$(VOID, handler);
               if ($this._state_1.atomicfu$compareAndSet(state, update)) return Unit_getInstance();
             } else {
               if (handler instanceof Segment) return Unit_getInstance();
-              if (!(handler instanceof CancelHandler)) THROW_CCE();
+              if (!isInterface(handler, CancelHandler)) THROW_CCE();
               var update_0 = new CompletedContinuation(state, handler);
               if ($this._state_1.atomicfu$compareAndSet(state, update_0)) return Unit_getInstance();
             }
@@ -1062,15 +1065,6 @@
       ', already has ' +
       toString_0(state);
     throw IllegalStateException_init_$Create$(toString(message));
-  }
-  function makeCancelHandler($this, handler) {
-    var tmp;
-    if (handler instanceof CancelHandler) {
-      tmp = handler;
-    } else {
-      tmp = new InvokeOnCancel(handler);
-    }
-    return tmp;
   }
   function dispatchResume($this, mode) {
     if (tryResume($this)) return Unit_getInstance();
@@ -1091,7 +1085,7 @@
         if (!(onCancellation == null)) {
           tmp_1 = true;
         } else {
-          tmp_1 = state instanceof CancelHandler;
+          tmp_1 = isInterface(state, CancelHandler);
         }
         if (tmp_1) {
           tmp_0 = true;
@@ -1101,7 +1095,7 @@
         if (tmp_0) {
           tmp = new CompletedContinuation(
             proposedUpdate,
-            state instanceof CancelHandler ? state : null,
+            isInterface(state, CancelHandler) ? state : null,
             onCancellation,
             idempotent,
           );
@@ -1294,7 +1288,7 @@
               var message_0 = 'Must be called at most once';
               throw IllegalStateException_init_$Create$(toString(message_0));
             }
-            var update = state.copy$default_agfz8q_k$(VOID, VOID, VOID, VOID, cause);
+            var update = state.copy$default_wexsgh_k$(VOID, VOID, VOID, VOID, cause);
             if (this._state_1.atomicfu$compareAndSet(state, update)) {
               state.invokeHandlers_17pdpa_k$(this, cause);
               return Unit_getInstance();
@@ -1320,7 +1314,7 @@
         var state = this_0.get_kotlinx$atomicfu$value_vi2am5_k$();
         if (!(!(state == null) ? isInterface(state, NotCompleted) : false)) return false;
         var tmp;
-        if (state instanceof CancelHandler) {
+        if (!(state == null) ? isInterface(state, CancelHandler) : false) {
           tmp = true;
         } else {
           tmp = state instanceof Segment;
@@ -1329,8 +1323,8 @@
         if (!this._state_1.atomicfu$compareAndSet(state, update)) {
           break $l$block;
         }
-        if (state instanceof CancelHandler) {
-          this.callCancelHandler_llz4b6_k$(state, cause);
+        if (isInterface(state, CancelHandler)) {
+          this.callCancelHandler_e6l0np_k$(state, cause);
         } else {
           if (state instanceof Segment) {
             callSegmentOnCancellation(this, state, cause);
@@ -1347,10 +1341,10 @@
     this.cancel_e74who_k$(cause);
     detachChildIfNonResuable(this);
   };
-  protoOf(CancellableContinuationImpl).callCancelHandler_llz4b6_k$ = function (handler, cause) {
+  protoOf(CancellableContinuationImpl).callCancelHandler_e6l0np_k$ = function (handler, cause) {
     var tmp;
     try {
-      handler.invoke(cause);
+      handler.invoke_py2q9a_k$(cause);
       tmp = Unit_getInstance();
     } catch ($p) {
       var tmp_0;
@@ -1462,8 +1456,10 @@
     invokeOnCancellationImpl(this, segment);
   };
   protoOf(CancellableContinuationImpl).invokeOnCancellation_kffkqp_k$ = function (handler) {
-    var cancelHandler = makeCancelHandler(this, handler);
-    invokeOnCancellationImpl(this, cancelHandler);
+    return invokeOnCancellation(this, new UserSupplied(handler));
+  };
+  protoOf(CancellableContinuationImpl).invokeOnCancellationInternal_gcimbo_k$ = function (handler) {
+    return invokeOnCancellationImpl(this, handler);
   };
   protoOf(CancellableContinuationImpl).detachChild_qd9itj_k$ = function () {
     var tmp0_elvis_lhs = _get_parentHandle__f8dcex(this);
@@ -1551,9 +1547,19 @@
     return 'CancellableContinuation';
   };
   function NotCompleted() {}
-  function CancelHandler() {
-    CancelHandlerBase.call(this);
+  function _get_handler__z70553($this) {
+    return $this.handler_1;
   }
+  function UserSupplied(handler) {
+    this.handler_1 = handler;
+  }
+  protoOf(UserSupplied).invoke_py2q9a_k$ = function (cause) {
+    this.handler_1(cause);
+  };
+  protoOf(UserSupplied).toString = function () {
+    return 'CancelHandler.UserSupplied[' + get_classSimpleName(this.handler_1) + '@' + get_hexAddress(this) + ']';
+  };
+  function CancelHandler() {}
   function decisionAndIndex(decision, index) {
     _init_properties_CancellableContinuationImpl_kt__6rrtdd();
     return ((decision << _get_DECISION_SHIFT_$accessor$2jt7ek_1tkg2i()) + index) | 0;
@@ -1612,7 +1618,7 @@
     else {
       // Inline function 'kotlin.let' call
       // Inline function 'kotlin.contracts.contract' call
-      cont.callCancelHandler_llz4b6_k$(tmp0_safe_receiver, cause);
+      cont.callCancelHandler_e6l0np_k$(tmp0_safe_receiver, cause);
     }
     var tmp1_safe_receiver = this.onCancellation_1;
     if (tmp1_safe_receiver == null) null;
@@ -1637,7 +1643,7 @@
   protoOf(CompletedContinuation).component5_7eebs8_k$ = function () {
     return this.cancelCause_1;
   };
-  protoOf(CompletedContinuation).copy_3f7b1f_k$ = function (
+  protoOf(CompletedContinuation).copy_nkyq0u_k$ = function (
     result,
     cancelHandler,
     onCancellation,
@@ -1646,7 +1652,7 @@
   ) {
     return new CompletedContinuation(result, cancelHandler, onCancellation, idempotentResume, cancelCause);
   };
-  protoOf(CompletedContinuation).copy$default_agfz8q_k$ = function (
+  protoOf(CompletedContinuation).copy$default_wexsgh_k$ = function (
     result,
     cancelHandler,
     onCancellation,
@@ -1660,8 +1666,8 @@
     idempotentResume = idempotentResume === VOID ? this.idempotentResume_1 : idempotentResume;
     cancelCause = cancelCause === VOID ? this.cancelCause_1 : cancelCause;
     return $super === VOID
-      ? this.copy_3f7b1f_k$(result, cancelHandler, onCancellation, idempotentResume, cancelCause)
-      : $super.copy_3f7b1f_k$.call(this, result, cancelHandler, onCancellation, idempotentResume, cancelCause);
+      ? this.copy_nkyq0u_k$(result, cancelHandler, onCancellation, idempotentResume, cancelCause)
+      : $super.copy_nkyq0u_k$.call(this, result, cancelHandler, onCancellation, idempotentResume, cancelCause);
   };
   protoOf(CompletedContinuation).toString = function () {
     return (
@@ -1713,22 +1719,6 @@
     return RESUMED;
   }
   var RESUMED;
-  function _get_handler__z70553($this) {
-    return $this.handler_1;
-  }
-  function InvokeOnCancel(handler) {
-    CancelHandler.call(this);
-    this.handler_1 = handler;
-  }
-  protoOf(InvokeOnCancel).invoke_py2q9a_k$ = function (cause) {
-    this.handler_1(cause);
-  };
-  protoOf(InvokeOnCancel).invoke = function (cause) {
-    return this.invoke_py2q9a_k$(cause);
-  };
-  protoOf(InvokeOnCancel).toString = function () {
-    return 'InvokeOnCancel[' + get_classSimpleName(this.handler_1) + '@' + get_hexAddress(this) + ']';
-  };
   function get_DECISION_SHIFT() {
     return DECISION_SHIFT;
   }
@@ -1749,6 +1739,21 @@
     }
   }
   function CompletableJob() {}
+  function _get_handler__z70553_0($this) {
+    return $this.handler_1;
+  }
+  function UserSupplied_0(handler) {
+    this.handler_1 = handler;
+  }
+  protoOf(UserSupplied_0).invoke_py2q9a_k$ = function (cause) {
+    this.handler_1(cause);
+  };
+  protoOf(UserSupplied_0).toString = function () {
+    return (
+      'InternalCompletionHandler.UserSupplied[' + get_classSimpleName(this.handler_1) + '@' + get_hexAddress(this) + ']'
+    );
+  };
+  function InternalCompletionHandler() {}
   function _get__handled__q1dawe($this) {
     return $this._handled_1;
   }
@@ -2356,6 +2361,21 @@
       ensureActive_0(tmp0_safe_receiver);
     }
   }
+  function invokeOnCompletion(_this__u8e3s4, onCancelling, invokeImmediately, handler) {
+    onCancelling = onCancelling === VOID ? false : onCancelling;
+    invokeImmediately = invokeImmediately === VOID ? true : invokeImmediately;
+    var tmp;
+    if (_this__u8e3s4 instanceof JobSupport) {
+      tmp = _this__u8e3s4.invokeOnCompletionInternal_odyg4h_k$(onCancelling, invokeImmediately, handler);
+    } else {
+      tmp = _this__u8e3s4.invokeOnCompletion_sct3wq_k$(
+        onCancelling,
+        invokeImmediately,
+        InternalCompletionHandler$invoke$ref(handler),
+      );
+    }
+    return tmp;
+  }
   function ensureActive_0(_this__u8e3s4) {
     if (!_this__u8e3s4.get_isActive_quafmh_k$()) throw _this__u8e3s4.getCancellationException_8i1q6u_k$();
   }
@@ -2377,6 +2397,14 @@
       tmp = tmp0_elvis_lhs;
     }
     return tmp;
+  }
+  function InternalCompletionHandler$invoke$ref($boundThis) {
+    var l = function (p0) {
+      $boundThis.invoke_py2q9a_k$(p0);
+      return Unit_getInstance();
+    };
+    l.callableName = 'invoke';
+    return l;
   }
   function get_COMPLETING_ALREADY() {
     _init_properties_JobSupport_kt__68f172();
@@ -2467,7 +2495,7 @@
     return get_DEBUG() ? this.getString_gb1pt9_k$('Active') : protoOf(LinkedListHead).toString.call(this);
   };
   function JobNode() {
-    CompletionHandlerBase.call(this);
+    LinkedListNode.call(this);
   }
   protoOf(JobNode).set_job_f7gwn8_k$ = function (_set____db54di) {
     this.job_1 = _set____db54di;
@@ -2486,7 +2514,7 @@
     return null;
   };
   protoOf(JobNode).dispose_3nnxhr_k$ = function () {
-    return this.get_job_18j2r0_k$().removeNode_a91gpb_k$(this);
+    return this.get_job_18j2r0_k$().removeNode_11m6yw_k$(this);
   };
   protoOf(JobNode).toString = function () {
     return (
@@ -2684,7 +2712,7 @@
     var cause = tmp1_safe_receiver == null ? null : tmp1_safe_receiver.get_cause_iplhs0_k$();
     if (state instanceof JobNode) {
       try {
-        state.invoke(cause);
+        state.invoke_py2q9a_k$(cause);
       } catch ($p) {
         if ($p instanceof Error) {
           var ex = $p;
@@ -2714,7 +2742,7 @@
         // Inline function 'kotlinx.coroutines.JobSupport.notifyHandlers.<anonymous>' call
         var node = cur;
         try {
-          node.invoke(cause);
+          node.invoke_py2q9a_k$(cause);
         } catch ($p) {
           if ($p instanceof Error) {
             var ex = $p;
@@ -2771,7 +2799,7 @@
         // Inline function 'kotlinx.coroutines.JobSupport.notifyHandlers.<anonymous>' call
         var node = cur;
         try {
-          node.invoke(cause);
+          node.invoke_py2q9a_k$(cause);
         } catch ($p) {
           if ($p instanceof Error) {
             var ex = $p;
@@ -2889,10 +2917,7 @@
     var cancellable = new CancellableContinuationImpl(intercepted($completion), get_MODE_CANCELLABLE());
     cancellable.initCancellability_shqc60_k$();
     // Inline function 'kotlinx.coroutines.JobSupport.joinSuspend.<anonymous>' call
-    // Inline function 'kotlinx.coroutines.asHandler' call
-    // Inline function 'kotlin.js.asDynamic' call
-    var tmp$ret$1 = new ResumeOnCompletion(cancellable);
-    disposeOnCancellation(cancellable, $this.invokeOnCompletion_n6cffu_k$(tmp$ret$1));
+    disposeOnCancellation(cancellable, invokeOnCompletion($this, VOID, VOID, new ResumeOnCompletion(cancellable)));
     return cancellable.getResult_clfhg3_k$();
   }
   function registerSelectForOnJoin($this, select, ignoredParam) {
@@ -2900,10 +2925,7 @@
       select.selectInRegistrationPhase_ldg7ua_k$(Unit_getInstance());
       return Unit_getInstance();
     }
-    // Inline function 'kotlinx.coroutines.asHandler' call
-    // Inline function 'kotlin.js.asDynamic' call
-    var tmp$ret$1 = new SelectOnJoinCompletionHandler($this, select);
-    var disposableHandle = $this.invokeOnCompletion_n6cffu_k$(tmp$ret$1);
+    var disposableHandle = invokeOnCompletion($this, VOID, VOID, new SelectOnJoinCompletionHandler($this, select));
     select.disposeOnCompletion_1gln1w_k$(disposableHandle);
   }
   function SelectOnJoinCompletionHandler($outer, select) {
@@ -2913,9 +2935,6 @@
   }
   protoOf(SelectOnJoinCompletionHandler).invoke_py2q9a_k$ = function (cause) {
     this.select_1.trySelect_fbege0_k$(this.$this_1, Unit_getInstance());
-  };
-  protoOf(SelectOnJoinCompletionHandler).invoke = function (cause) {
-    return this.invoke_py2q9a_k$(cause);
   };
   function cancelMakeCompleting($this, cause) {
     // Inline function 'kotlinx.coroutines.JobSupport.loopOnState' call
@@ -3186,20 +3205,21 @@
     var proposedUpdate_0 = proposedUpdate;
     $l$1: do {
       $l$0: do {
-        var tmp = child_0.childJob_1;
-        // Inline function 'kotlinx.coroutines.asHandler' call
-        // Inline function 'kotlin.js.asDynamic' call
-        var tmp$ret$1 = new ChildCompletion($this_0, state_0, child_0, proposedUpdate_0);
-        var handle = tmp.invokeOnCompletion$default_1v3utx_k$(VOID, false, tmp$ret$1);
+        var handle = invokeOnCompletion(
+          child_0.childJob_1,
+          VOID,
+          false,
+          new ChildCompletion($this_0, state_0, child_0, proposedUpdate_0),
+        );
         if (!(handle === NonDisposableHandle_getInstance())) return true;
         var tmp0_elvis_lhs = nextChild(child_0, $this_0);
-        var tmp_0;
+        var tmp;
         if (tmp0_elvis_lhs == null) {
           return false;
         } else {
-          tmp_0 = tmp0_elvis_lhs;
+          tmp = tmp0_elvis_lhs;
         }
-        var nextChild_0 = tmp_0;
+        var nextChild_0 = tmp;
         $this_0 = $this_0;
         state_0 = state_0;
         child_0 = nextChild_0;
@@ -3387,9 +3407,6 @@
   protoOf(ChildCompletion).invoke_py2q9a_k$ = function (cause) {
     continueCompleting(this.parent_1, this.state_1, this.child_1, this.proposedUpdate_1);
   };
-  protoOf(ChildCompletion).invoke = function (cause) {
-    return this.invoke_py2q9a_k$(cause);
-  };
   function AwaitContinuation(delegate, job) {
     CancellableContinuationImpl.call(this, delegate, get_MODE_CANCELLABLE());
     this.job_1 = job;
@@ -3415,10 +3432,7 @@
     // Inline function 'kotlinx.coroutines.JobSupport.awaitSuspend.<anonymous>' call
     var cont = new AwaitContinuation(intercepted($completion), $this);
     cont.initCancellability_shqc60_k$();
-    // Inline function 'kotlinx.coroutines.asHandler' call
-    // Inline function 'kotlin.js.asDynamic' call
-    var tmp$ret$1 = new ResumeAwaitOnCompletion(cont);
-    disposeOnCancellation(cont, $this.invokeOnCompletion_n6cffu_k$(tmp$ret$1));
+    disposeOnCancellation(cont, invokeOnCompletion($this, VOID, VOID, new ResumeAwaitOnCompletion(cont)));
     return cont.getResult_clfhg3_k$();
   }
   function onAwaitInternalRegFunc($this, select, ignoredParam) {
@@ -3437,10 +3451,7 @@
       }
       if (startInternal($this, state) >= 0) break $l$loop;
     }
-    // Inline function 'kotlinx.coroutines.asHandler' call
-    // Inline function 'kotlin.js.asDynamic' call
-    var tmp$ret$1 = new SelectOnAwaitCompletionHandler($this, select);
-    var disposableHandle = $this.invokeOnCompletion_n6cffu_k$(tmp$ret$1);
+    var disposableHandle = invokeOnCompletion($this, VOID, VOID, new SelectOnAwaitCompletionHandler($this, select));
     select.disposeOnCompletion_1gln1w_k$(disposableHandle);
   }
   function onAwaitInternalProcessResFunc($this, ignoredParam, result) {
@@ -3462,9 +3473,6 @@
     }
     var result = tmp;
     this.select_1.trySelect_fbege0_k$(this.$this_1, result);
-  };
-  protoOf(SelectOnAwaitCompletionHandler).invoke = function (cause) {
-    return this.invoke_py2q9a_k$(cause);
   };
   function JobSupport$registerSelectForOnJoin$ref() {
     var l = function (p0, p1, p2) {
@@ -3789,14 +3797,17 @@
     return tmp;
   };
   protoOf(JobSupport).invokeOnCompletion_n6cffu_k$ = function (handler) {
-    return this.invokeOnCompletion_sct3wq_k$(false, true, handler);
+    return this.invokeOnCompletionInternal_odyg4h_k$(false, true, new UserSupplied_0(handler));
   };
   protoOf(JobSupport).invokeOnCompletion_sct3wq_k$ = function (onCancelling, invokeImmediately, handler) {
+    return this.invokeOnCompletionInternal_odyg4h_k$(onCancelling, invokeImmediately, new UserSupplied_0(handler));
+  };
+  protoOf(JobSupport).invokeOnCompletionInternal_odyg4h_k$ = function (onCancelling, invokeImmediately, handler) {
     var node = makeNode(this, handler, onCancelling);
     // Inline function 'kotlinx.coroutines.JobSupport.loopOnState' call
     while (true) {
       $l$block: {
-        // Inline function 'kotlinx.coroutines.JobSupport.invokeOnCompletion.<anonymous>' call
+        // Inline function 'kotlinx.coroutines.JobSupport.invokeOnCompletionInternal.<anonymous>' call
         var state = this.get_state_iypx7s_k$();
         if (state instanceof Empty) {
           if (state.isActive_1) {
@@ -3829,7 +3840,6 @@
                   tmp_1 = true;
                 } else {
                   var tmp_2;
-                  // Inline function 'kotlinx.coroutines.isHandlerOf' call
                   if (handler instanceof ChildHandleNode) {
                     tmp_2 = !state.get_isCompleting_vi2bwp_k$();
                   } else {
@@ -3848,7 +3858,7 @@
               }
               if (!(rootCause == null)) {
                 if (invokeImmediately) {
-                  invokeIt(handler, rootCause);
+                  handler.invoke_py2q9a_k$(rootCause);
                 }
                 return handle;
               } else {
@@ -3858,7 +3868,7 @@
           } else {
             if (invokeImmediately) {
               var tmp1_safe_receiver = state instanceof CompletedExceptionally ? state : null;
-              invokeIt(handler, tmp1_safe_receiver == null ? null : tmp1_safe_receiver.get_cause_iplhs0_k$());
+              handler.invoke_py2q9a_k$(tmp1_safe_receiver == null ? null : tmp1_safe_receiver.get_cause_iplhs0_k$());
             }
             return NonDisposableHandle_getInstance();
           }
@@ -3879,7 +3889,7 @@
     var tmp = JobSupport$registerSelectForOnJoin$ref();
     return new SelectClause0Impl(this, typeof tmp === 'function' ? tmp : THROW_CCE());
   };
-  protoOf(JobSupport).removeNode_a91gpb_k$ = function (node) {
+  protoOf(JobSupport).removeNode_11m6yw_k$ = function (node) {
     // Inline function 'kotlinx.coroutines.JobSupport.loopOnState' call
     while (true) {
       // Inline function 'kotlinx.coroutines.JobSupport.removeNode.<anonymous>' call
@@ -4043,10 +4053,7 @@
     return sequence(JobSupport$_get_children_$slambda_k839f8_0(this, null));
   };
   protoOf(JobSupport).attachChild_314ws0_k$ = function (child) {
-    // Inline function 'kotlinx.coroutines.asHandler' call
-    // Inline function 'kotlin.js.asDynamic' call
-    var tmp$ret$1 = new ChildHandleNode(child);
-    var tmp = this.invokeOnCompletion$default_1v3utx_k$(true, VOID, tmp$ret$1);
+    var tmp = invokeOnCompletion(this, true, VOID, new ChildHandleNode(child));
     return isInterface(tmp, ChildHandle) ? tmp : THROW_CCE();
   };
   protoOf(JobSupport).handleOnCompletionException_wdvdfx_k$ = function (exception) {
@@ -4170,13 +4177,10 @@
   protoOf(ChildHandleNode).invoke_py2q9a_k$ = function (cause) {
     return this.childJob_1.parentCancelled_ev6cqi_k$(this.get_job_18j2r0_k$());
   };
-  protoOf(ChildHandleNode).invoke = function (cause) {
-    return this.invoke_py2q9a_k$(cause);
-  };
   protoOf(ChildHandleNode).childCancelled_hsnipy_k$ = function (cause) {
     return this.get_job_18j2r0_k$().childCancelled_hsnipy_k$(cause);
   };
-  function _get_handler__z70553_0($this) {
+  function _get_handler__z70553_1($this) {
     return $this.handler_1;
   }
   function _get__invoked__yhwoci($this) {
@@ -4188,12 +4192,11 @@
     this._invoked_1 = atomic$int$1(0);
   }
   protoOf(InvokeOnCancelling).invoke_py2q9a_k$ = function (cause) {
-    if (this._invoked_1.atomicfu$compareAndSet(0, 1)) this.handler_1(cause);
+    if (this._invoked_1.atomicfu$compareAndSet(0, 1)) {
+      this.handler_1.invoke_py2q9a_k$(cause);
+    }
   };
-  protoOf(InvokeOnCancelling).invoke = function (cause) {
-    return this.invoke_py2q9a_k$(cause);
-  };
-  function _get_handler__z70553_1($this) {
+  function _get_handler__z70553_2($this) {
     return $this.handler_1;
   }
   function InvokeOnCompletion(handler) {
@@ -4201,10 +4204,7 @@
     this.handler_1 = handler;
   }
   protoOf(InvokeOnCompletion).invoke_py2q9a_k$ = function (cause) {
-    return this.handler_1(cause);
-  };
-  protoOf(InvokeOnCompletion).invoke = function (cause) {
-    return this.invoke_py2q9a_k$(cause);
+    return this.handler_1.invoke_py2q9a_k$(cause);
   };
   function _get_continuation__y3gzck_1($this) {
     return $this.continuation_1;
@@ -4221,9 +4221,6 @@
     var tmp$ret$0 = _Result___init__impl__xyqfz8(Unit_getInstance());
     this_0.resumeWith_dtxwbr_k$(tmp$ret$0);
     return Unit_getInstance();
-  };
-  protoOf(ResumeOnCompletion).invoke = function (cause) {
-    return this.invoke_py2q9a_k$(cause);
   };
   function unboxState(_this__u8e3s4) {
     _init_properties_JobSupport_kt__68f172();
@@ -4260,9 +4257,6 @@
       this_1.resumeWith_dtxwbr_k$(tmp$ret$2);
     }
   };
-  protoOf(ResumeAwaitOnCompletion).invoke = function (cause) {
-    return this.invoke_py2q9a_k$(cause);
-  };
   function IncompleteStateBox(state) {
     this.state_1 = state;
   }
@@ -4280,9 +4274,6 @@
     this.child_1.parentCancelled_c5s5ig_k$(
       this.child_1.getContinuationCancellationCause_3nurbc_k$(this.get_job_18j2r0_k$()),
     );
-  };
-  protoOf(ChildContinuation).invoke = function (cause) {
-    return this.invoke_py2q9a_k$(cause);
   };
   function handlesException($this) {
     var tmp = $this.get_parentHandle_gmoqez_k$();
@@ -5203,6 +5194,64 @@
   protoOf(SendBroadcast).invokeOnCancellation_9j58v1_k$ = function (segment, index) {
     this.$$delegate_0__1.invokeOnCancellation_9j58v1_k$(segment, index);
   };
+  function sendImpl($this, element, waiter, onRendezvousOrBuffered, onSuspend, onClosed, onNoWaiterSuspend) {
+    var segment = $this.sendSegment_1.get_kotlinx$atomicfu$value_vi2am5_k$();
+    $l$loop_0: while (true) {
+      var sendersAndCloseStatusCur = $this.sendersAndCloseStatus_1.atomicfu$getAndIncrement$long();
+      // Inline function 'kotlinx.coroutines.channels.sendersCounter' call
+      var s = sendersAndCloseStatusCur.and_4spn93_k$(new Long(-1, 268435455));
+      var closed = _get_isClosedForSend0__kxgf9m(sendersAndCloseStatusCur, $this);
+      // Inline function 'kotlin.Long.div' call
+      var other = get_SEGMENT_SIZE();
+      var id = s.div_jun7gj_k$(toLong(other));
+      // Inline function 'kotlin.Long.rem' call
+      var other_0 = get_SEGMENT_SIZE();
+      var i = s.rem_bsnl9o_k$(toLong(other_0)).toInt_1tsl84_k$();
+      if (!segment.get_id_kntnx8_k$().equals(id)) {
+        var tmp0_elvis_lhs = findSegmentSend($this, id, segment);
+        var tmp;
+        if (tmp0_elvis_lhs == null) {
+          var tmp_0;
+          if (closed) {
+            return onClosed();
+          } else {
+            continue $l$loop_0;
+          }
+        } else {
+          tmp = tmp0_elvis_lhs;
+        }
+        segment = tmp;
+      }
+      var tmp1_subject = updateCellSend($this, segment, i, element, s, waiter, closed);
+      if (tmp1_subject === _get_RESULT_RENDEZVOUS_$accessor$yt74tm_3irwt8_0()) {
+        segment.cleanPrev_rn0kss_k$();
+        return onRendezvousOrBuffered();
+      } else if (tmp1_subject === _get_RESULT_BUFFERED_$accessor$yt74tm_quor5m_0()) {
+        return onRendezvousOrBuffered();
+      } else if (tmp1_subject === _get_RESULT_SUSPEND_$accessor$yt74tm_cjypnf_0()) {
+        if (closed) {
+          segment.onSlotCleaned_do6lqz_k$();
+          return onClosed();
+        }
+        var tmp2_safe_receiver = (!(waiter == null) ? isInterface(waiter, Waiter) : false) ? waiter : null;
+        if (tmp2_safe_receiver == null) null;
+        else {
+          prepareSenderForSuspension(tmp2_safe_receiver, $this, segment, i);
+        }
+        return onSuspend(segment, i);
+      } else if (tmp1_subject === _get_RESULT_CLOSED_$accessor$yt74tm_10v48j_0()) {
+        if (s.compareTo_9jj042_k$($this.get_receiversCounter_b035j5_k$()) < 0) {
+          segment.cleanPrev_rn0kss_k$();
+        }
+        return onClosed();
+      } else if (tmp1_subject === _get_RESULT_FAILED_$accessor$yt74tm_vo1zj0_0()) {
+        segment.cleanPrev_rn0kss_k$();
+        continue $l$loop_0;
+      } else if (tmp1_subject === _get_RESULT_SUSPEND_NO_WAITER_$accessor$yt74tm_cvzv8m()) {
+        return onNoWaiterSuspend(segment, i, element, s);
+      }
+    }
+  }
   function sendImplOnNoWaiter($this, segment, index, element, s, waiter, onRendezvousOrBuffered, onClosed) {
     var tmp0_subject = updateCellSend($this, segment, index, element, s, waiter, false);
     if (tmp0_subject === _get_RESULT_RENDEZVOUS_$accessor$yt74tm_3irwt8_0()) {
@@ -7945,70 +7994,77 @@
     }
     return cancellable.getResult_clfhg3_k$();
   };
-  protoOf(BufferedChannel).sendImpl_6v1fea_k$ = function (
-    element,
-    waiter,
-    onRendezvousOrBuffered,
-    onSuspend,
-    onClosed,
-    onNoWaiterSuspend,
-  ) {
-    var segment = this.sendSegment_1.get_kotlinx$atomicfu$value_vi2am5_k$();
-    $l$loop_0: while (true) {
-      var sendersAndCloseStatusCur = this.sendersAndCloseStatus_1.atomicfu$getAndIncrement$long();
-      // Inline function 'kotlinx.coroutines.channels.sendersCounter' call
-      var s = sendersAndCloseStatusCur.and_4spn93_k$(new Long(-1, 268435455));
-      var closed = _get_isClosedForSend0__kxgf9m(sendersAndCloseStatusCur, this);
-      // Inline function 'kotlin.Long.div' call
-      var other = get_SEGMENT_SIZE();
-      var id = s.div_jun7gj_k$(toLong(other));
-      // Inline function 'kotlin.Long.rem' call
-      var other_0 = get_SEGMENT_SIZE();
-      var i = s.rem_bsnl9o_k$(toLong(other_0)).toInt_1tsl84_k$();
-      if (!segment.get_id_kntnx8_k$().equals(id)) {
-        var tmp0_elvis_lhs = findSegmentSend(this, id, segment);
-        var tmp;
-        if (tmp0_elvis_lhs == null) {
-          var tmp_0;
-          if (closed) {
-            return onClosed();
+  protoOf(BufferedChannel).trySendDropOldest_sx2u86_k$ = function (element) {
+    var tmp$ret$3;
+    $l$block: {
+      // Inline function 'kotlinx.coroutines.channels.BufferedChannel.sendImpl' call
+      var waiter = get_BUFFERED();
+      var segment = this.sendSegment_1.get_kotlinx$atomicfu$value_vi2am5_k$();
+      $l$loop_0: while (true) {
+        var sendersAndCloseStatusCur = this.sendersAndCloseStatus_1.atomicfu$getAndIncrement$long();
+        // Inline function 'kotlinx.coroutines.channels.sendersCounter' call
+        var s = sendersAndCloseStatusCur.and_4spn93_k$(new Long(-1, 268435455));
+        var closed = _get_isClosedForSend0__kxgf9m(sendersAndCloseStatusCur, this);
+        // Inline function 'kotlin.Long.div' call
+        var other = get_SEGMENT_SIZE();
+        var id = s.div_jun7gj_k$(toLong(other));
+        // Inline function 'kotlin.Long.rem' call
+        var other_0 = get_SEGMENT_SIZE();
+        var i = s.rem_bsnl9o_k$(toLong(other_0)).toInt_1tsl84_k$();
+        if (!segment.get_id_kntnx8_k$().equals(id)) {
+          var tmp0_elvis_lhs = findSegmentSend(this, id, segment);
+          var tmp;
+          if (tmp0_elvis_lhs == null) {
+            var tmp_0;
+            if (closed) {
+              return Companion_getInstance_1().closed_xuwu5z_k$(this.get_sendException_qpq1ry_k$());
+            } else {
+              continue $l$loop_0;
+            }
           } else {
-            continue $l$loop_0;
+            tmp = tmp0_elvis_lhs;
           }
-        } else {
-          tmp = tmp0_elvis_lhs;
+          segment = tmp;
         }
-        segment = tmp;
-      }
-      var tmp1_subject = updateCellSend(this, segment, i, element, s, waiter, closed);
-      if (tmp1_subject === _get_RESULT_RENDEZVOUS_$accessor$yt74tm_3irwt8_0()) {
-        segment.cleanPrev_rn0kss_k$();
-        return onRendezvousOrBuffered();
-      } else if (tmp1_subject === _get_RESULT_BUFFERED_$accessor$yt74tm_quor5m_0()) {
-        return onRendezvousOrBuffered();
-      } else if (tmp1_subject === _get_RESULT_SUSPEND_$accessor$yt74tm_cjypnf_0()) {
-        if (closed) {
-          segment.onSlotCleaned_do6lqz_k$();
-          return onClosed();
-        }
-        var tmp2_safe_receiver = (!(waiter == null) ? isInterface(waiter, Waiter) : false) ? waiter : null;
-        if (tmp2_safe_receiver == null) null;
-        else {
-          prepareSenderForSuspension(tmp2_safe_receiver, this, segment, i);
-        }
-        return onSuspend(segment, i);
-      } else if (tmp1_subject === _get_RESULT_CLOSED_$accessor$yt74tm_10v48j_0()) {
-        if (s.compareTo_9jj042_k$(this.get_receiversCounter_b035j5_k$()) < 0) {
+        var tmp1_subject = updateCellSend(this, segment, i, element, s, waiter, closed);
+        if (tmp1_subject === _get_RESULT_RENDEZVOUS_$accessor$yt74tm_3irwt8_0()) {
           segment.cleanPrev_rn0kss_k$();
+          return Companion_getInstance_1().success_tizbw6_k$(Unit_getInstance());
+        } else if (tmp1_subject === _get_RESULT_BUFFERED_$accessor$yt74tm_quor5m_0()) {
+          return Companion_getInstance_1().success_tizbw6_k$(Unit_getInstance());
+        } else if (tmp1_subject === _get_RESULT_SUSPEND_$accessor$yt74tm_cjypnf_0()) {
+          if (closed) {
+            segment.onSlotCleaned_do6lqz_k$();
+            return Companion_getInstance_1().closed_xuwu5z_k$(this.get_sendException_qpq1ry_k$());
+          }
+          var tmp2_safe_receiver = (!(waiter == null) ? isInterface(waiter, Waiter) : false) ? waiter : null;
+          if (tmp2_safe_receiver == null) null;
+          else {
+            prepareSenderForSuspension(tmp2_safe_receiver, this, segment, i);
+          }
+          // Inline function 'kotlin.Long.plus' call
+          // Inline function 'kotlin.Long.times' call
+          var this_0 = segment.get_id_kntnx8_k$();
+          var other_1 = get_SEGMENT_SIZE();
+          var tmp$ret$5 = this_0.times_nfzjiw_k$(toLong(other_1)).plus_r93sks_k$(toLong(i));
+          this.dropFirstElementUntilTheSpecifiedCellIsInTheBuffer_gc2gkg_k$(tmp$ret$5);
+          return Companion_getInstance_1().success_tizbw6_k$(Unit_getInstance());
+        } else if (tmp1_subject === _get_RESULT_CLOSED_$accessor$yt74tm_10v48j_0()) {
+          if (s.compareTo_9jj042_k$(this.get_receiversCounter_b035j5_k$()) < 0) {
+            segment.cleanPrev_rn0kss_k$();
+          }
+          return Companion_getInstance_1().closed_xuwu5z_k$(this.get_sendException_qpq1ry_k$());
+        } else if (tmp1_subject === _get_RESULT_FAILED_$accessor$yt74tm_vo1zj0_0()) {
+          segment.cleanPrev_rn0kss_k$();
+          continue $l$loop_0;
+        } else if (tmp1_subject === _get_RESULT_SUSPEND_NO_WAITER_$accessor$yt74tm_cvzv8m()) {
+          // Inline function 'kotlinx.coroutines.channels.BufferedChannel.sendImpl.<anonymous>' call
+          var message = 'unexpected';
+          throw IllegalStateException_init_$Create$(toString(message));
         }
-        return onClosed();
-      } else if (tmp1_subject === _get_RESULT_FAILED_$accessor$yt74tm_vo1zj0_0()) {
-        segment.cleanPrev_rn0kss_k$();
-        continue $l$loop_0;
-      } else if (tmp1_subject === _get_RESULT_SUSPEND_NO_WAITER_$accessor$yt74tm_cvzv8m()) {
-        return onNoWaiterSuspend(segment, i, element, s);
       }
     }
+    return tmp$ret$3;
   };
   protoOf(BufferedChannel).shouldSendSuspend_te8nq7_k$ = function () {
     return shouldSendSuspend(this, this.sendersAndCloseStatus_1.get_kotlinx$atomicfu$value_vi2am5_k$());
@@ -11824,9 +11880,7 @@
         var curState = this_0.get_kotlinx$atomicfu$value_vi2am5_k$();
         if (curState === get_STATE_REG()) {
           if ($this.state_1.atomicfu$compareAndSet(curState, cancellable)) {
-            // Inline function 'kotlinx.coroutines.asHandler' call
-            // Inline function 'kotlin.js.asDynamic' call
-            cancellable.invokeOnCancellation_kffkqp_k$($this);
+            invokeOnCancellation(cancellable, $this);
             break $l$block_0;
           }
         } else {
@@ -12275,7 +12329,6 @@
     while (true);
   };
   function SelectImplementation(context) {
-    CancelHandler.call(this);
     this.context_1 = context;
     this.state_1 = atomic$ref$1(get_STATE_REG());
     this.clauses_1 = ArrayList_init_$Create$(2);
@@ -12411,9 +12464,6 @@
     }
     this.internalResult_1 = get_NO_RESULT();
     this.clauses_1 = null;
-  };
-  protoOf(SelectImplementation).invoke = function (cause) {
-    return this.invoke_py2q9a_k$(cause);
   };
   var TrySelectDetailedResult_SUCCESSFUL_instance;
   var TrySelectDetailedResult_REREGISTER_instance;
@@ -12630,25 +12680,6 @@
       SEGMENT_SIZE_0 = systemProp('kotlinx.coroutines.semaphore.segmentSize', 16);
     }
   }
-  function CompletionHandlerBase() {
-    LinkedListNode.call(this);
-  }
-  function invokeIt(_this__u8e3s4, cause) {
-    if (typeof _this__u8e3s4 === 'function') _this__u8e3s4(cause);
-    else {
-      // Inline function 'kotlin.js.asDynamic' call
-      _this__u8e3s4.invoke(cause);
-    }
-  }
-  function get_asHandler(_this__u8e3s4) {
-    // Inline function 'kotlin.js.asDynamic' call
-    return _this__u8e3s4;
-  }
-  function get_asHandler_0(_this__u8e3s4) {
-    // Inline function 'kotlin.js.asDynamic' call
-    return _this__u8e3s4;
-  }
-  function CancelHandlerBase() {}
   function toDebugString(_this__u8e3s4) {
     return toString(_this__u8e3s4);
   }
@@ -13079,10 +13110,7 @@
       SetTimeoutBasedDispatcher$scheduleResumeAfterDelay$lambda(continuation, this),
       delayToInt(timeMillis),
     );
-    // Inline function 'kotlinx.coroutines.asHandler' call
-    // Inline function 'kotlin.js.asDynamic' call
-    var tmp$ret$1 = new ClearTimeout(handle);
-    continuation.invokeOnCancellation_kffkqp_k$(tmp$ret$1);
+    invokeOnCancellation(continuation, new ClearTimeout(handle));
   };
   function _set_scheduled__8qlfaw($this, _set____db54di) {
     $this.scheduled_1 = _set____db54di;
@@ -13292,10 +13320,7 @@
       WindowDispatcher$scheduleResumeAfterDelay$lambda(continuation, this),
       delayToInt(timeMillis),
     );
-    // Inline function 'kotlinx.coroutines.asHandler' call
-    // Inline function 'kotlin.js.asDynamic' call
-    var tmp$ret$1 = new WindowClearTimeout(this, handle);
-    continuation.invokeOnCancellation_kffkqp_k$(tmp$ret$1);
+    invokeOnCancellation(continuation, new WindowClearTimeout(this, handle));
   };
   protoOf(WindowDispatcher).invokeOnTimeout_x4e3ys_k$ = function (timeMillis, block, context) {
     var handle = w3cSetTimeout_0(this.window_1, Runnable$run$ref(block), delayToInt(timeMillis));
@@ -13305,7 +13330,6 @@
     return coerceIn(timeMillis, new Long(0, 0), new Long(2147483647, 0)).toInt_1tsl84_k$();
   }
   function ClearTimeout(handle) {
-    CancelHandler.call(this);
     this.handle_1 = handle;
   }
   protoOf(ClearTimeout).get_handle_e5p7ht_k$ = function () {
@@ -13316,9 +13340,6 @@
   };
   protoOf(ClearTimeout).invoke_py2q9a_k$ = function (cause) {
     this.dispose_3nnxhr_k$();
-  };
-  protoOf(ClearTimeout).invoke = function (cause) {
-    return this.invoke_py2q9a_k$(cause);
   };
   protoOf(ClearTimeout).toString = function () {
     return 'ClearTimeout[' + this.handle_1 + ']';

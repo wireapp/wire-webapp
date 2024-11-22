@@ -3,6 +3,7 @@
     define([
       'exports',
       './kotlin-kotlin-stdlib.js',
+      './kotlinx-serialization-kotlinx-serialization-core.js',
       './kalium-protobuf.js',
       './Kotlin-DateTime-library-kotlinx-datetime.js',
       './pbandk-pbandk-runtime.js',
@@ -11,6 +12,7 @@
     factory(
       module.exports,
       require('./kotlin-kotlin-stdlib.js'),
+      require('./kotlinx-serialization-kotlinx-serialization-core.js'),
       require('./kalium-protobuf.js'),
       require('./Kotlin-DateTime-library-kotlinx-datetime.js'),
       require('./pbandk-pbandk-runtime.js'),
@@ -19,6 +21,11 @@
     if (typeof this['kotlin-kotlin-stdlib'] === 'undefined') {
       throw new Error(
         "Error loading module 'com.wire:backup'. Its dependency 'kotlin-kotlin-stdlib' was not found. Please, check whether 'kotlin-kotlin-stdlib' is loaded prior to 'com.wire:backup'.",
+      );
+    }
+    if (typeof this['kotlinx-serialization-kotlinx-serialization-core'] === 'undefined') {
+      throw new Error(
+        "Error loading module 'com.wire:backup'. Its dependency 'kotlinx-serialization-kotlinx-serialization-core' was not found. Please, check whether 'kotlinx-serialization-kotlinx-serialization-core' is loaded prior to 'com.wire:backup'.",
       );
     }
     if (typeof this['kalium-protobuf'] === 'undefined') {
@@ -39,6 +46,7 @@
     root['com.wire:backup'] = factory(
       typeof this['com.wire:backup'] === 'undefined' ? {} : this['com.wire:backup'],
       this['kotlin-kotlin-stdlib'],
+      this['kotlinx-serialization-kotlinx-serialization-core'],
       this['kalium-protobuf'],
       this['Kotlin-DateTime-library-kotlinx-datetime'],
       this['pbandk-pbandk-runtime'],
@@ -49,6 +57,7 @@
   function (
     _,
     kotlin_kotlin,
+    kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core,
     kotlin_com_wire_protobuf,
     kotlin_org_jetbrains_kotlinx_kotlinx_datetime,
     kotlin_pro_streem_pbandk_pbandk_runtime,
@@ -60,53 +69,88 @@
     var objectMeta = kotlin_kotlin.$_$.cc;
     var setMetadataFor = kotlin_kotlin.$_$.ec;
     var defineProp = kotlin_kotlin.$_$.va;
+    var toList = kotlin_kotlin.$_$.f9;
     var classMeta = kotlin_kotlin.$_$.ta;
+    var split = kotlin_kotlin.$_$.qe;
+    var PluginGeneratedSerialDescriptor = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.g2;
+    var StringSerializer_getInstance = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.s;
+    var UnknownFieldException_init_$Create$ = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.e;
+    var THROW_CCE = kotlin_kotlin.$_$.qg;
+    var typeParametersSerializers = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.y1;
+    var GeneratedSerializer = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.z1;
     var VOID = kotlin_kotlin.$_$.f;
+    var throwMissingFieldException = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.k2;
+    var objectCreate = kotlin_kotlin.$_$.bc;
     var getStringHashCode = kotlin_kotlin.$_$.eb;
-    var THROW_CCE = kotlin_kotlin.$_$.rg;
     var hashCode = kotlin_kotlin.$_$.fb;
     var equals = kotlin_kotlin.$_$.xa;
-    var ExportedQualifiedId = kotlin_com_wire_protobuf.$_$.g;
+    var THROW_IAE = kotlin_kotlin.$_$.rg;
+    var enumEntries = kotlin_kotlin.$_$.ia;
+    var Unit_getInstance = kotlin_kotlin.$_$.k5;
+    var Enum = kotlin_kotlin.$_$.eg;
+    var getKClassFromExpression = kotlin_kotlin.$_$.c;
+    var contentEquals = kotlin_kotlin.$_$.r6;
+    var contentHashCode = kotlin_kotlin.$_$.s6;
+    var toString = kotlin_kotlin.$_$.ic;
+    var getNumberHashCode = kotlin_kotlin.$_$.cb;
+    var ExportedQualifiedId = kotlin_com_wire_protobuf.$_$.l;
     var ArrayList_init_$Create$ = kotlin_kotlin.$_$.m;
     var System_getInstance = kotlin_org_jetbrains_kotlinx_kotlinx_datetime.$_$.b;
     var BackupInfo = kotlin_com_wire_protobuf.$_$.b;
     var collectionSizeOrDefault = kotlin_kotlin.$_$.p6;
     var ArrayList_init_$Create$_0 = kotlin_kotlin.$_$.l;
-    var ExportedConversation = kotlin_com_wire_protobuf.$_$.d;
-    var noWhenBranchMatchedException = kotlin_kotlin.$_$.ph;
-    var ExportedText = kotlin_com_wire_protobuf.$_$.h;
-    var Text = kotlin_com_wire_protobuf.$_$.e;
-    var ExportedMessage = kotlin_com_wire_protobuf.$_$.f;
-    var ExportUser = kotlin_com_wire_protobuf.$_$.c;
     var BackupData = kotlin_com_wire_protobuf.$_$.a;
     var encodeToByteArray = kotlin_pro_streem_pbandk_pbandk_runtime.$_$.x;
     var toHexString = kotlin_kotlin.$_$.ff;
     var println = kotlin_kotlin.$_$.ja;
-    var Companion_getInstance = kotlin_com_wire_protobuf.$_$.i;
+    var Companion_getInstance = kotlin_com_wire_protobuf.$_$.n;
     var decodeFromByteArray = kotlin_pro_streem_pbandk_pbandk_runtime.$_$.w;
+    var printStackTrace = kotlin_kotlin.$_$.qh;
+    var noWhenBranchMatchedException = kotlin_kotlin.$_$.oh;
+    var IllegalArgumentException_init_$Create$ = kotlin_kotlin.$_$.r1;
+    var Location = kotlin_com_wire_protobuf.$_$.i;
+    var UNRECOGNIZED = kotlin_com_wire_protobuf.$_$.f;
+    var BACKUP_AES_GCM_getInstance = kotlin_com_wire_protobuf.$_$.p;
+    var BACKUP_AES_CBC_getInstance = kotlin_com_wire_protobuf.$_$.o;
+    var Asset = kotlin_com_wire_protobuf.$_$.h;
+    var Text = kotlin_com_wire_protobuf.$_$.j;
+    var ExportUser = kotlin_com_wire_protobuf.$_$.c;
+    var ExportedLocation = kotlin_com_wire_protobuf.$_$.g;
+    var ExportedText = kotlin_com_wire_protobuf.$_$.m;
+    var toLong = kotlin_kotlin.$_$.gc;
+    var ByteArr = kotlin_pro_streem_pbandk_pbandk_runtime.$_$.d;
+    var ExportedAsset = kotlin_com_wire_protobuf.$_$.d;
+    var ExportedMessage = kotlin_com_wire_protobuf.$_$.k;
+    var ExportedConversation = kotlin_com_wire_protobuf.$_$.e;
     var copyToArray = kotlin_kotlin.$_$.h7;
-    var NotImplementedError = kotlin_kotlin.$_$.mg;
-    var printStackTrace = kotlin_kotlin.$_$.rh;
-    var Exception = kotlin_kotlin.$_$.gg;
     var numberToLong = kotlin_kotlin.$_$.ac;
     //endregion
     //region block: pre-declaration
     setMetadataFor(MPBackup, 'MPBackup', objectMeta);
     setMetadataFor(BackupData_0, 'BackupData', classMeta);
-    setMetadataFor(BackupQualifiedId, 'BackupQualifiedId', classMeta);
+    setMetadataFor(Companion, 'Companion', objectMeta);
+    setMetadataFor($serializer, '$serializer', objectMeta, VOID, [GeneratedSerializer]);
+    setMetadataFor(BackupQualifiedId, 'BackupQualifiedId', classMeta, VOID, VOID, VOID, VOID, {
+      0: $serializer_getInstance,
+    });
     setMetadataFor(BackupUser, 'BackupUser', classMeta);
     setMetadataFor(BackupConversation, 'BackupConversation', classMeta);
     setMetadataFor(BackupMessage, 'BackupMessage', classMeta);
+    setMetadataFor(EncryptionAlgorithm, 'EncryptionAlgorithm', classMeta, Enum);
     setMetadataFor(BackupMessageContent, 'BackupMessageContent', classMeta);
     setMetadataFor(Text_0, 'Text', classMeta, BackupMessageContent);
-    setMetadataFor(Asset, 'Asset', classMeta, BackupMessageContent);
+    setMetadataFor(Asset_0, 'Asset', classMeta, BackupMessageContent);
+    setMetadataFor(Location_0, 'Location', classMeta, BackupMessageContent);
     setMetadataFor(BackupMetadata, 'BackupMetadata', classMeta);
-    setMetadataFor(MPBackupExporter, 'MPBackupExporter', classMeta);
+    setMetadataFor(CommonMPBackupExporter, 'CommonMPBackupExporter', classMeta);
     setMetadataFor(BackupImportResult, 'BackupImportResult', classMeta);
     setMetadataFor(ParsingFailure, 'ParsingFailure', objectMeta, BackupImportResult);
     setMetadataFor(Success, 'Success', classMeta, BackupImportResult);
-    setMetadataFor(MPBackupImporter, 'MPBackupImporter', classMeta);
+    setMetadataFor(CommonMPBackupImporter, 'CommonMPBackupImporter', classMeta);
+    setMetadataFor(MPBackupMapper, 'MPBackupMapper', classMeta, VOID, VOID, MPBackupMapper);
     setMetadataFor(BackupDateTime, 'BackupDateTime', classMeta);
+    setMetadataFor(MPBackupExporter, 'MPBackupExporter', classMeta, CommonMPBackupExporter);
+    setMetadataFor(MPBackupImporter, 'MPBackupImporter', classMeta, CommonMPBackupImporter, VOID, MPBackupImporter);
     //endregion
     function MPBackup() {
       MPBackup_instance = this;
@@ -138,7 +182,120 @@
     protoOf(BackupData_0).get_messages_vl21at_k$ = function () {
       return this.messages;
     };
+    protoOf(BackupData_0).get_userList_ytdm1e_k$ = function () {
+      return toList(this.users);
+    };
+    protoOf(BackupData_0).get_conversationList_mdhg96_k$ = function () {
+      return toList(this.conversations);
+    };
+    protoOf(BackupData_0).get_messageList_jrlt0_k$ = function () {
+      return toList(this.messages);
+    };
+    function _get_QUALIFIED_ID_COMPONENT_COUNT__l1996p($this) {
+      return $this.QUALIFIED_ID_COMPONENT_COUNT_1;
+    }
+    function Companion() {
+      Companion_instance = this;
+      this.QUALIFIED_ID_COMPONENT_COUNT_1 = 2;
+    }
+    protoOf(Companion).fromEncodedString = function (id) {
+      var components = split(id, ['@']);
+      if (!(components.get_size_woubt6_k$() === 2)) return null;
+      return new BackupQualifiedId(components.get_c1px32_k$(0), components.get_c1px32_k$(1));
+    };
+    protoOf(Companion).serializer_9w0wvi_k$ = function () {
+      return $serializer_getInstance();
+    };
+    var Companion_instance;
+    function Companion_getInstance_0() {
+      if (Companion_instance == null) new Companion();
+      return Companion_instance;
+    }
+    function $serializer() {
+      $serializer_instance = this;
+      var tmp0_serialDesc = new PluginGeneratedSerialDescriptor('com.wire.backup.data.BackupQualifiedId', this, 2);
+      tmp0_serialDesc.addElement_5pzumi_k$('id', false);
+      tmp0_serialDesc.addElement_5pzumi_k$('domain', false);
+      this.descriptor_1 = tmp0_serialDesc;
+    }
+    protoOf($serializer).get_descriptor_wjt6a0_k$ = function () {
+      return this.descriptor_1;
+    };
+    protoOf($serializer).childSerializers_5ghqw5_k$ = function () {
+      // Inline function 'kotlin.arrayOf' call
+      // Inline function 'kotlin.js.unsafeCast' call
+      // Inline function 'kotlin.js.asDynamic' call
+      return [StringSerializer_getInstance(), StringSerializer_getInstance()];
+    };
+    protoOf($serializer).deserialize_sy6x50_k$ = function (decoder) {
+      var tmp0_desc = this.descriptor_1;
+      var tmp1_flag = true;
+      var tmp2_index = 0;
+      var tmp3_bitMask0 = 0;
+      var tmp4_local0 = null;
+      var tmp5_local1 = null;
+      var tmp6_input = decoder.beginStructure_yljocp_k$(tmp0_desc);
+      if (tmp6_input.decodeSequentially_xlblqy_k$()) {
+        tmp4_local0 = tmp6_input.decodeStringElement_3oenpg_k$(tmp0_desc, 0);
+        tmp3_bitMask0 = tmp3_bitMask0 | 1;
+        tmp5_local1 = tmp6_input.decodeStringElement_3oenpg_k$(tmp0_desc, 1);
+        tmp3_bitMask0 = tmp3_bitMask0 | 2;
+      } else
+        while (tmp1_flag) {
+          tmp2_index = tmp6_input.decodeElementIndex_bstkhp_k$(tmp0_desc);
+          switch (tmp2_index) {
+            case -1:
+              tmp1_flag = false;
+              break;
+            case 0:
+              tmp4_local0 = tmp6_input.decodeStringElement_3oenpg_k$(tmp0_desc, 0);
+              tmp3_bitMask0 = tmp3_bitMask0 | 1;
+              break;
+            case 1:
+              tmp5_local1 = tmp6_input.decodeStringElement_3oenpg_k$(tmp0_desc, 1);
+              tmp3_bitMask0 = tmp3_bitMask0 | 2;
+              break;
+            default:
+              throw UnknownFieldException_init_$Create$(tmp2_index);
+          }
+        }
+      tmp6_input.endStructure_1xqz0n_k$(tmp0_desc);
+      return BackupQualifiedId_init_$Create$(tmp3_bitMask0, tmp4_local0, tmp5_local1, null);
+    };
+    protoOf($serializer).serialize_oac2io_k$ = function (encoder, value) {
+      var tmp0_desc = this.descriptor_1;
+      var tmp1_output = encoder.beginStructure_yljocp_k$(tmp0_desc);
+      tmp1_output.encodeStringElement_1n5wu2_k$(tmp0_desc, 0, value.id);
+      tmp1_output.encodeStringElement_1n5wu2_k$(tmp0_desc, 1, value.domain);
+      tmp1_output.endStructure_1xqz0n_k$(tmp0_desc);
+    };
+    protoOf($serializer).serialize_5ase3y_k$ = function (encoder, value) {
+      return this.serialize_oac2io_k$(encoder, value instanceof BackupQualifiedId ? value : THROW_CCE());
+    };
+    var $serializer_instance;
+    function $serializer_getInstance() {
+      if ($serializer_instance == null) new $serializer();
+      return $serializer_instance;
+    }
+    function BackupQualifiedId_init_$Init$(seen1, id, domain, serializationConstructorMarker, $this) {
+      if (!(3 === (3 & seen1))) {
+        throwMissingFieldException(seen1, 3, $serializer_getInstance().descriptor_1);
+      }
+      $this.id = id;
+      $this.domain = domain;
+      return $this;
+    }
+    function BackupQualifiedId_init_$Create$(seen1, id, domain, serializationConstructorMarker) {
+      return BackupQualifiedId_init_$Init$(
+        seen1,
+        id,
+        domain,
+        serializationConstructorMarker,
+        objectCreate(protoOf(BackupQualifiedId)),
+      );
+    }
     function BackupQualifiedId(id, domain) {
+      Companion_getInstance_0();
       this.id = id;
       this.domain = domain;
     }
@@ -147,6 +304,9 @@
     };
     protoOf(BackupQualifiedId).get_domain_ch74y5_k$ = function () {
       return this.domain;
+    };
+    protoOf(BackupQualifiedId).toString = function () {
+      return this.id + '@' + this.domain;
     };
     protoOf(BackupQualifiedId).component1_7eebsc_k$ = function () {
       return this.id;
@@ -161,9 +321,6 @@
       id = id === VOID ? this.id : id;
       domain = domain === VOID ? this.domain : domain;
       return this.copy_plwnsl_k$(id, domain);
-    };
-    protoOf(BackupQualifiedId).toString = function () {
-      return 'BackupQualifiedId(id=' + this.id + ', domain=' + this.domain + ')';
     };
     protoOf(BackupQualifiedId).hashCode = function () {
       var result = getStringHashCode(this.id);
@@ -377,6 +534,46 @@
       if (!equals(this.content, tmp0_other_with_cast.content)) return false;
       return true;
     };
+    var EncryptionAlgorithm_AES_GCM_instance;
+    var EncryptionAlgorithm_AES_CBC_instance;
+    function values() {
+      return [EncryptionAlgorithm_AES_GCM_getInstance(), EncryptionAlgorithm_AES_CBC_getInstance()];
+    }
+    function valueOf(value) {
+      switch (value) {
+        case 'AES_GCM':
+          return EncryptionAlgorithm_AES_GCM_getInstance();
+        case 'AES_CBC':
+          return EncryptionAlgorithm_AES_CBC_getInstance();
+        default:
+          EncryptionAlgorithm_initEntries();
+          THROW_IAE('No enum constant value.');
+          break;
+      }
+    }
+    function get_entries() {
+      if ($ENTRIES == null) $ENTRIES = enumEntries(values());
+      return $ENTRIES;
+    }
+    var EncryptionAlgorithm_entriesInitialized;
+    function EncryptionAlgorithm_initEntries() {
+      if (EncryptionAlgorithm_entriesInitialized) return Unit_getInstance();
+      EncryptionAlgorithm_entriesInitialized = true;
+      EncryptionAlgorithm_AES_GCM_instance = new EncryptionAlgorithm('AES_GCM', 0);
+      EncryptionAlgorithm_AES_CBC_instance = new EncryptionAlgorithm('AES_CBC', 1);
+    }
+    var $ENTRIES;
+    function EncryptionAlgorithm(name, ordinal) {
+      Enum.call(this, name, ordinal);
+    }
+    function EncryptionAlgorithm_AES_GCM_getInstance() {
+      EncryptionAlgorithm_initEntries();
+      return EncryptionAlgorithm_AES_GCM_instance;
+    }
+    function EncryptionAlgorithm_AES_CBC_getInstance() {
+      EncryptionAlgorithm_initEntries();
+      return EncryptionAlgorithm_AES_CBC_instance;
+    }
     function Text_0(text) {
       BackupMessageContent.call(this);
       this.text = text;
@@ -407,47 +604,239 @@
       if (!(this.text === tmp0_other_with_cast.text)) return false;
       return true;
     };
-    function Asset(TODO) {
+    function Asset_0(mimeType, size, name, otrKey, sha256, assetId, assetToken, assetDomain, encryption) {
       BackupMessageContent.call(this);
-      this.TODO = TODO;
+      this.mimeType = mimeType;
+      this.size = size;
+      this.name = name;
+      this.otrKey = otrKey;
+      this.sha256 = sha256;
+      this.assetId = assetId;
+      this.assetToken = assetToken;
+      this.assetDomain = assetDomain;
+      this.encryption = encryption;
     }
-    protoOf(Asset).get_TODO_wo9ymn_k$ = function () {
-      return this.TODO;
+    protoOf(Asset_0).get_mimeType_g7ccbb_k$ = function () {
+      return this.mimeType;
     };
-    protoOf(Asset).component1_7eebsc_k$ = function () {
-      return this.TODO;
+    protoOf(Asset_0).get_size_woubt6_k$ = function () {
+      return this.size;
     };
-    protoOf(Asset).copy_a35qlh_k$ = function (TODO) {
-      return new Asset(TODO);
+    protoOf(Asset_0).get_name_woqyms_k$ = function () {
+      return this.name;
     };
-    protoOf(Asset).copy = function (TODO, $super) {
-      TODO = TODO === VOID ? this.TODO : TODO;
-      return this.copy_a35qlh_k$(TODO);
+    protoOf(Asset_0).get_otrKey_hriosb_k$ = function () {
+      return this.otrKey;
     };
-    protoOf(Asset).toString = function () {
-      return 'Asset(TODO=' + this.TODO + ')';
+    protoOf(Asset_0).get_sha256_jgs8q8_k$ = function () {
+      return this.sha256;
     };
-    protoOf(Asset).hashCode = function () {
-      return getStringHashCode(this.TODO);
+    protoOf(Asset_0).get_assetId_ae1upq_k$ = function () {
+      return this.assetId;
     };
-    protoOf(Asset).equals = function (other) {
+    protoOf(Asset_0).get_assetToken_evm1rm_k$ = function () {
+      return this.assetToken;
+    };
+    protoOf(Asset_0).get_assetDomain_rgmfl7_k$ = function () {
+      return this.assetDomain;
+    };
+    protoOf(Asset_0).get_encryption_pua0p8_k$ = function () {
+      return this.encryption;
+    };
+    protoOf(Asset_0).equals = function (other) {
       if (this === other) return true;
-      if (!(other instanceof Asset)) return false;
-      var tmp0_other_with_cast = other instanceof Asset ? other : THROW_CCE();
-      if (!(this.TODO === tmp0_other_with_cast.TODO)) return false;
+      if (other == null ? true : !getKClassFromExpression(this).equals(getKClassFromExpression(other))) return false;
+      if (!(other instanceof Asset_0)) THROW_CCE();
+      if (!contentEquals(this.otrKey, other.otrKey)) return false;
+      if (!contentEquals(this.sha256, other.sha256)) return false;
+      if (!(this.assetId === other.assetId)) return false;
+      if (!(this.assetToken == other.assetToken)) return false;
+      if (!(this.assetDomain == other.assetDomain)) return false;
+      if (!equals(this.encryption, other.encryption)) return false;
+      return true;
+    };
+    protoOf(Asset_0).hashCode = function () {
+      var result = contentHashCode(this.otrKey);
+      result = (imul(31, result) + contentHashCode(this.sha256)) | 0;
+      result = (imul(31, result) + getStringHashCode(this.assetId)) | 0;
+      var tmp = imul(31, result);
+      var tmp0_safe_receiver = this.assetToken;
+      var tmp1_elvis_lhs = tmp0_safe_receiver == null ? null : getStringHashCode(tmp0_safe_receiver);
+      result = (tmp + (tmp1_elvis_lhs == null ? 0 : tmp1_elvis_lhs)) | 0;
+      var tmp_0 = imul(31, result);
+      var tmp2_safe_receiver = this.assetDomain;
+      var tmp3_elvis_lhs = tmp2_safe_receiver == null ? null : getStringHashCode(tmp2_safe_receiver);
+      result = (tmp_0 + (tmp3_elvis_lhs == null ? 0 : tmp3_elvis_lhs)) | 0;
+      var tmp_1 = imul(31, result);
+      var tmp4_safe_receiver = this.encryption;
+      var tmp5_elvis_lhs = tmp4_safe_receiver == null ? null : tmp4_safe_receiver.hashCode();
+      result = (tmp_1 + (tmp5_elvis_lhs == null ? 0 : tmp5_elvis_lhs)) | 0;
+      return result;
+    };
+    protoOf(Asset_0).component1_7eebsc_k$ = function () {
+      return this.mimeType;
+    };
+    protoOf(Asset_0).component2_7eebsb_k$ = function () {
+      return this.size;
+    };
+    protoOf(Asset_0).component3_7eebsa_k$ = function () {
+      return this.name;
+    };
+    protoOf(Asset_0).component4_7eebs9_k$ = function () {
+      return this.otrKey;
+    };
+    protoOf(Asset_0).component5_7eebs8_k$ = function () {
+      return this.sha256;
+    };
+    protoOf(Asset_0).component6_7eebs7_k$ = function () {
+      return this.assetId;
+    };
+    protoOf(Asset_0).component7_7eebs6_k$ = function () {
+      return this.assetToken;
+    };
+    protoOf(Asset_0).component8_7eebs5_k$ = function () {
+      return this.assetDomain;
+    };
+    protoOf(Asset_0).component9_7eebs4_k$ = function () {
+      return this.encryption;
+    };
+    protoOf(Asset_0).copy_fwyscx_k$ = function (
+      mimeType,
+      size,
+      name,
+      otrKey,
+      sha256,
+      assetId,
+      assetToken,
+      assetDomain,
+      encryption,
+    ) {
+      return new Asset_0(mimeType, size, name, otrKey, sha256, assetId, assetToken, assetDomain, encryption);
+    };
+    protoOf(Asset_0).copy = function (
+      mimeType,
+      size,
+      name,
+      otrKey,
+      sha256,
+      assetId,
+      assetToken,
+      assetDomain,
+      encryption,
+      $super,
+    ) {
+      mimeType = mimeType === VOID ? this.mimeType : mimeType;
+      size = size === VOID ? this.size : size;
+      name = name === VOID ? this.name : name;
+      otrKey = otrKey === VOID ? this.otrKey : otrKey;
+      sha256 = sha256 === VOID ? this.sha256 : sha256;
+      assetId = assetId === VOID ? this.assetId : assetId;
+      assetToken = assetToken === VOID ? this.assetToken : assetToken;
+      assetDomain = assetDomain === VOID ? this.assetDomain : assetDomain;
+      encryption = encryption === VOID ? this.encryption : encryption;
+      return this.copy_fwyscx_k$(mimeType, size, name, otrKey, sha256, assetId, assetToken, assetDomain, encryption);
+    };
+    protoOf(Asset_0).toString = function () {
+      return (
+        'Asset(mimeType=' +
+        this.mimeType +
+        ', size=' +
+        this.size +
+        ', name=' +
+        this.name +
+        ', otrKey=' +
+        toString(this.otrKey) +
+        ', sha256=' +
+        toString(this.sha256) +
+        ', assetId=' +
+        this.assetId +
+        ', assetToken=' +
+        this.assetToken +
+        ', assetDomain=' +
+        this.assetDomain +
+        ', encryption=' +
+        this.encryption +
+        ')'
+      );
+    };
+    function Location_0(longitude, latitude, name, zoom) {
+      BackupMessageContent.call(this);
+      this.longitude = longitude;
+      this.latitude = latitude;
+      this.name = name;
+      this.zoom = zoom;
+    }
+    protoOf(Location_0).get_longitude_asb1fq_k$ = function () {
+      return this.longitude;
+    };
+    protoOf(Location_0).get_latitude_feukvp_k$ = function () {
+      return this.latitude;
+    };
+    protoOf(Location_0).get_name_woqyms_k$ = function () {
+      return this.name;
+    };
+    protoOf(Location_0).get_zoom_woywws_k$ = function () {
+      return this.zoom;
+    };
+    protoOf(Location_0).component1_7eebsc_k$ = function () {
+      return this.longitude;
+    };
+    protoOf(Location_0).component2_7eebsb_k$ = function () {
+      return this.latitude;
+    };
+    protoOf(Location_0).component3_7eebsa_k$ = function () {
+      return this.name;
+    };
+    protoOf(Location_0).component4_7eebs9_k$ = function () {
+      return this.zoom;
+    };
+    protoOf(Location_0).copy_f0zysj_k$ = function (longitude, latitude, name, zoom) {
+      return new Location_0(longitude, latitude, name, zoom);
+    };
+    protoOf(Location_0).copy = function (longitude, latitude, name, zoom, $super) {
+      longitude = longitude === VOID ? this.longitude : longitude;
+      latitude = latitude === VOID ? this.latitude : latitude;
+      name = name === VOID ? this.name : name;
+      zoom = zoom === VOID ? this.zoom : zoom;
+      return this.copy_f0zysj_k$(longitude, latitude, name, zoom);
+    };
+    protoOf(Location_0).toString = function () {
+      return (
+        'Location(longitude=' +
+        this.longitude +
+        ', latitude=' +
+        this.latitude +
+        ', name=' +
+        this.name +
+        ', zoom=' +
+        this.zoom +
+        ')'
+      );
+    };
+    protoOf(Location_0).hashCode = function () {
+      var result = getNumberHashCode(this.longitude);
+      result = (imul(result, 31) + getNumberHashCode(this.latitude)) | 0;
+      result = (imul(result, 31) + (this.name == null ? 0 : getStringHashCode(this.name))) | 0;
+      result = (imul(result, 31) + (this.zoom == null ? 0 : this.zoom)) | 0;
+      return result;
+    };
+    protoOf(Location_0).equals = function (other) {
+      if (this === other) return true;
+      if (!(other instanceof Location_0)) return false;
+      var tmp0_other_with_cast = other instanceof Location_0 ? other : THROW_CCE();
+      if (!equals(this.longitude, tmp0_other_with_cast.longitude)) return false;
+      if (!equals(this.latitude, tmp0_other_with_cast.latitude)) return false;
+      if (!(this.name == tmp0_other_with_cast.name)) return false;
+      if (!(this.zoom == tmp0_other_with_cast.zoom)) return false;
       return true;
     };
     function BackupMessageContent() {}
-    function BackupMetadata(platform, version, userId, creationTime, clientId) {
-      this.platform = platform;
+    function BackupMetadata(version, userId, creationTime, clientId) {
       this.version = version;
       this.userId = userId;
       this.creationTime = creationTime;
       this.clientId = clientId;
     }
-    protoOf(BackupMetadata).get_platform_ssr7o_k$ = function () {
-      return this.platform;
-    };
     protoOf(BackupMetadata).get_version_72w4j3_k$ = function () {
       return this.version;
     };
@@ -461,36 +850,30 @@
       return this.clientId;
     };
     protoOf(BackupMetadata).component1_7eebsc_k$ = function () {
-      return this.platform;
-    };
-    protoOf(BackupMetadata).component2_7eebsb_k$ = function () {
       return this.version;
     };
-    protoOf(BackupMetadata).component3_7eebsa_k$ = function () {
+    protoOf(BackupMetadata).component2_7eebsb_k$ = function () {
       return this.userId;
     };
-    protoOf(BackupMetadata).component4_7eebs9_k$ = function () {
+    protoOf(BackupMetadata).component3_7eebsa_k$ = function () {
       return this.creationTime;
     };
-    protoOf(BackupMetadata).component5_7eebs8_k$ = function () {
+    protoOf(BackupMetadata).component4_7eebs9_k$ = function () {
       return this.clientId;
     };
-    protoOf(BackupMetadata).copy_dbcwem_k$ = function (platform, version, userId, creationTime, clientId) {
-      return new BackupMetadata(platform, version, userId, creationTime, clientId);
+    protoOf(BackupMetadata).copy_ra46ma_k$ = function (version, userId, creationTime, clientId) {
+      return new BackupMetadata(version, userId, creationTime, clientId);
     };
-    protoOf(BackupMetadata).copy = function (platform, version, userId, creationTime, clientId, $super) {
-      platform = platform === VOID ? this.platform : platform;
+    protoOf(BackupMetadata).copy = function (version, userId, creationTime, clientId, $super) {
       version = version === VOID ? this.version : version;
       userId = userId === VOID ? this.userId : userId;
       creationTime = creationTime === VOID ? this.creationTime : creationTime;
       clientId = clientId === VOID ? this.clientId : clientId;
-      return this.copy_dbcwem_k$(platform, version, userId, creationTime, clientId);
+      return this.copy_ra46ma_k$(version, userId, creationTime, clientId);
     };
     protoOf(BackupMetadata).toString = function () {
       return (
-        'BackupMetadata(platform=' +
-        this.platform +
-        ', version=' +
+        'BackupMetadata(version=' +
         this.version +
         ', userId=' +
         this.userId +
@@ -502,8 +885,7 @@
       );
     };
     protoOf(BackupMetadata).hashCode = function () {
-      var result = getStringHashCode(this.platform);
-      result = (imul(result, 31) + getStringHashCode(this.version)) | 0;
+      var result = getStringHashCode(this.version);
       result = (imul(result, 31) + this.userId.hashCode()) | 0;
       result = (imul(result, 31) + this.creationTime.hashCode()) | 0;
       result = (imul(result, 31) + (this.clientId == null ? 0 : getStringHashCode(this.clientId))) | 0;
@@ -513,21 +895,23 @@
       if (this === other) return true;
       if (!(other instanceof BackupMetadata)) return false;
       var tmp0_other_with_cast = other instanceof BackupMetadata ? other : THROW_CCE();
-      if (!(this.platform === tmp0_other_with_cast.platform)) return false;
       if (!(this.version === tmp0_other_with_cast.version)) return false;
       if (!this.userId.equals(tmp0_other_with_cast.userId)) return false;
       if (!this.creationTime.equals(tmp0_other_with_cast.creationTime)) return false;
       if (!(this.clientId == tmp0_other_with_cast.clientId)) return false;
       return true;
     };
-    function isWebBackup(_this__u8e3s4) {
-      return _this__u8e3s4.platform === 'Web';
-    }
     function toProtoModel(_this__u8e3s4) {
       return new ExportedQualifiedId(_this__u8e3s4.id, _this__u8e3s4.domain);
     }
     function toModel(_this__u8e3s4) {
       return new BackupQualifiedId(_this__u8e3s4.value, _this__u8e3s4.domain);
+    }
+    function _get_selfUserId__8ett09($this) {
+      return $this.selfUserId_1;
+    }
+    function _get_mapper__jdtnva($this) {
+      return $this.mapper_1;
     }
     function _get_allUsers__iaoa84($this) {
       return $this.allUsers_1;
@@ -538,8 +922,9 @@
     function _get_allMessages__lmzu3o($this) {
       return $this.allMessages_1;
     }
-    function MPBackupExporter(selfUserId) {
-      this.selfUserId = selfUserId;
+    function CommonMPBackupExporter(selfUserId) {
+      this.selfUserId_1 = selfUserId;
+      this.mapper_1 = new MPBackupMapper();
       var tmp = this;
       // Inline function 'kotlin.collections.mutableListOf' call
       tmp.allUsers_1 = ArrayList_init_$Create$();
@@ -550,23 +935,20 @@
       // Inline function 'kotlin.collections.mutableListOf' call
       tmp_1.allMessages_1 = ArrayList_init_$Create$();
     }
-    protoOf(MPBackupExporter).get_selfUserId_vigw8r_k$ = function () {
-      return this.selfUserId;
-    };
-    protoOf(MPBackupExporter).addUser = function (user) {
+    protoOf(CommonMPBackupExporter).addUser = function (user) {
       this.allUsers_1.add_utx5q5_k$(user);
     };
-    protoOf(MPBackupExporter).addConversation = function (conversation) {
+    protoOf(CommonMPBackupExporter).addConversation = function (conversation) {
       this.allConversations_1.add_utx5q5_k$(conversation);
     };
-    protoOf(MPBackupExporter).addMessage = function (message) {
+    protoOf(CommonMPBackupExporter).addMessage = function (message) {
       this.allMessages_1.add_utx5q5_k$(message);
     };
-    protoOf(MPBackupExporter).serialize = function () {
+    protoOf(CommonMPBackupExporter).serialize = function () {
       var tmp = new BackupInfo(
         'Common',
         '1.0',
-        toProtoModel(this.selfUserId),
+        toProtoModel(this.selfUserId_1),
         System_getInstance().now_2cba_k$().toEpochMilliseconds_82cfls_k$(),
         'lol',
       );
@@ -577,8 +959,8 @@
       var tmp0_iterator = this_0.iterator_jk1svi_k$();
       while (tmp0_iterator.hasNext_bitz1p_k$()) {
         var item = tmp0_iterator.next_20eer_k$();
-        // Inline function 'com.wire.backup.dump.MPBackupExporter.serialize.<anonymous>' call
-        var tmp$ret$0 = new ExportedConversation(toProtoModel(item.id), item.name);
+        // Inline function 'com.wire.backup.dump.CommonMPBackupExporter.serialize.<anonymous>' call
+        var tmp$ret$0 = this.mapper_1.mapConversationToProtobuf_sjz8yk_k$(item);
         destination.add_utx5q5_k$(tmp$ret$0);
       }
       var tmp_0 = destination;
@@ -589,27 +971,11 @@
       var tmp0_iterator_0 = this_1.iterator_jk1svi_k$();
       while (tmp0_iterator_0.hasNext_bitz1p_k$()) {
         var item_0 = tmp0_iterator_0.next_20eer_k$();
-        // Inline function 'com.wire.backup.dump.MPBackupExporter.serialize.<anonymous>' call
-        var tmp_1 = item_0.id;
-        var tmp_2 = toLongMilliseconds(item_0.creationDate);
-        var tmp_3 = toProtoModel(item_0.senderUserId);
-        var tmp_4 = item_0.senderClientId;
-        var tmp_5 = toProtoModel(item_0.conversationId);
-        var content = item_0.content;
-        var tmp_6;
-        if (content instanceof Asset) {
-          tmp_6 = new Text(new ExportedText('FAKE ASSET'));
-        } else {
-          if (content instanceof Text_0) {
-            tmp_6 = new Text(new ExportedText(content.text));
-          } else {
-            noWhenBranchMatchedException();
-          }
-        }
-        var tmp$ret$3 = new ExportedMessage(tmp_1, tmp_2, tmp_3, tmp_4, tmp_5, tmp_6);
+        // Inline function 'com.wire.backup.dump.CommonMPBackupExporter.serialize.<anonymous>' call
+        var tmp$ret$3 = this.mapper_1.mapMessageToProtobuf_a1fp5o_k$(item_0);
         destination_0.add_utx5q5_k$(tmp$ret$3);
       }
-      var tmp_7 = destination_0;
+      var tmp_1 = destination_0;
       // Inline function 'kotlin.collections.map' call
       var this_2 = this.allUsers_1;
       // Inline function 'kotlin.collections.mapTo' call
@@ -617,16 +983,16 @@
       var tmp0_iterator_1 = this_2.iterator_jk1svi_k$();
       while (tmp0_iterator_1.hasNext_bitz1p_k$()) {
         var item_1 = tmp0_iterator_1.next_20eer_k$();
-        // Inline function 'com.wire.backup.dump.MPBackupExporter.serialize.<anonymous>' call
-        var tmp$ret$6 = new ExportUser(toProtoModel(item_1.id), item_1.name, item_1.handle);
+        // Inline function 'com.wire.backup.dump.CommonMPBackupExporter.serialize.<anonymous>' call
+        var tmp$ret$6 = this.mapper_1.mapUserToProtobuf_k4zmp8_k$(item_1);
         destination_1.add_utx5q5_k$(tmp$ret$6);
       }
-      var backupData = new BackupData(tmp, tmp_0, tmp_7, destination_1);
+      var backupData = new BackupData(tmp, tmp_0, tmp_1, destination_1);
       // Inline function 'kotlin.also' call
       var this_3 = encodeToByteArray(backupData);
       // Inline function 'kotlin.contracts.contract' call
-      // Inline function 'com.wire.backup.dump.MPBackupExporter.serialize.<anonymous>' call
-      println('!!!BACKUP: ' + toHexString(this_3));
+      // Inline function 'com.wire.backup.dump.CommonMPBackupExporter.serialize.<anonymous>' call
+      println('XPlatform Backup POC. Exported data bytes: ' + toHexString(this_3));
       return this_3;
     };
     function ParsingFailure() {
@@ -681,106 +1047,225 @@
       return true;
     };
     function BackupImportResult() {}
-    function MPBackupImporter(selfUserDomain) {
-      this.selfUserDomain = selfUserDomain;
+    function _get_mapper__jdtnva_0($this) {
+      return $this.mapper_1;
     }
-    protoOf(MPBackupImporter).get_selfUserDomain_nzmq5g_k$ = function () {
-      return this.selfUserDomain;
-    };
-    protoOf(MPBackupImporter).import = function (data) {
+    function CommonMPBackupImporter() {
+      this.mapper_1 = new MPBackupMapper();
+    }
+    protoOf(CommonMPBackupImporter).importBackup = function (data) {
       var tmp;
       try {
-        println('!!!BACKUP: ' + toHexString(data));
-        // Inline function 'kotlin.run' call
-        // Inline function 'kotlin.contracts.contract' call
-        // Inline function 'com.wire.backup.ingest.MPBackupImporter.import.<anonymous>' call
-        var $this$run = decodeFromByteArray(Companion_getInstance(), data);
-        var tmp_0 = new BackupMetadata(
-          $this$run.info.platform,
-          $this$run.info.version,
-          toModel($this$run.info.userId),
-          BackupDateTime_0($this$run.info.creationTime),
-          $this$run.info.clientId,
+        println('XPlatform Backup POC. Imported data bytes: ' + toHexString(data));
+        tmp = new Success(
+          this.mapper_1.fromProtoToBackupModel_fbxycs_k$(decodeFromByteArray(Companion_getInstance(), data)),
         );
-        // Inline function 'kotlin.collections.toTypedArray' call
-        // Inline function 'kotlin.collections.map' call
-        var this_0 = $this$run.users;
-        // Inline function 'kotlin.collections.mapTo' call
-        var destination = ArrayList_init_$Create$_0(collectionSizeOrDefault(this_0, 10));
-        var tmp0_iterator = this_0.iterator_jk1svi_k$();
-        while (tmp0_iterator.hasNext_bitz1p_k$()) {
-          var item = tmp0_iterator.next_20eer_k$();
-          // Inline function 'com.wire.backup.ingest.MPBackupImporter.import.<anonymous>.<anonymous>' call
-          var tmp$ret$0 = new BackupUser(toModel(item.id), item.name, item.handle);
-          destination.add_utx5q5_k$(tmp$ret$0);
+      } catch ($p) {
+        var tmp_0;
+        if ($p instanceof Error) {
+          var e = $p;
+          printStackTrace(e);
+          println(e);
+          tmp_0 = ParsingFailure_getInstance();
+        } else {
+          throw $p;
         }
-        var tmp_1 = copyToArray(destination);
-        // Inline function 'kotlin.collections.toTypedArray' call
-        // Inline function 'kotlin.collections.map' call
-        var this_1 = $this$run.conversations;
-        // Inline function 'kotlin.collections.mapTo' call
-        var destination_0 = ArrayList_init_$Create$_0(collectionSizeOrDefault(this_1, 10));
-        var tmp0_iterator_0 = this_1.iterator_jk1svi_k$();
-        while (tmp0_iterator_0.hasNext_bitz1p_k$()) {
-          var item_0 = tmp0_iterator_0.next_20eer_k$();
-          // Inline function 'com.wire.backup.ingest.MPBackupImporter.import.<anonymous>.<anonymous>' call
-          var tmp$ret$4 = new BackupConversation(toModel(item_0.id), item_0.name);
-          destination_0.add_utx5q5_k$(tmp$ret$4);
-        }
-        var tmp_2 = copyToArray(destination_0);
-        // Inline function 'kotlin.collections.toTypedArray' call
-        // Inline function 'kotlin.collections.map' call
-        var this_2 = $this$run.messages;
-        // Inline function 'kotlin.collections.mapTo' call
-        var destination_1 = ArrayList_init_$Create$_0(collectionSizeOrDefault(this_2, 10));
-        var tmp0_iterator_1 = this_2.iterator_jk1svi_k$();
-        while (tmp0_iterator_1.hasNext_bitz1p_k$()) {
-          var item_1 = tmp0_iterator_1.next_20eer_k$();
-          // Inline function 'com.wire.backup.ingest.MPBackupImporter.import.<anonymous>.<anonymous>' call
-          var proContent = item_1.content;
-          var tmp_3;
-          if (proContent instanceof Text) {
-            tmp_3 = new Text_0(proContent.get_value_j01efc_k$().content);
+        tmp = tmp_0;
+      }
+      return tmp;
+    };
+    function fromMessageProtoToBackupModel($this, message) {
+      var protoContent = message.content;
+      var tmp;
+      if (protoContent instanceof Text) {
+        tmp = new Text_0(protoContent.get_value_j01efc_k$().content);
+      } else {
+        if (protoContent instanceof Asset) {
+          var tmp_0 = protoContent.get_value_j01efc_k$().mimetype;
+          var tmp_1 = protoContent.get_value_j01efc_k$().get_protoSize_1ekskg_k$();
+          var tmp_2 = protoContent.get_value_j01efc_k$().name;
+          var tmp_3 = protoContent.get_value_j01efc_k$().otrKey.array;
+          var tmp_4 = protoContent.get_value_j01efc_k$().sha256.array;
+          var tmp_5 = protoContent.get_value_j01efc_k$().assetId;
+          var tmp_6 = protoContent.get_value_j01efc_k$().assetToken;
+          var tmp_7 = protoContent.get_value_j01efc_k$().assetDomain;
+          var tmp0_safe_receiver = protoContent.get_value_j01efc_k$().encryption;
+          var tmp_8;
+          if (tmp0_safe_receiver == null) {
+            tmp_8 = null;
           } else {
-            if (proContent == null) {
-              throw new NotImplementedError();
+            // Inline function 'kotlin.let' call
+            // Inline function 'kotlin.contracts.contract' call
+            // Inline function 'com.wire.backup.ingest.MPBackupMapper.fromMessageProtoToBackupModel.<anonymous>' call
+            var tmp_9;
+            if (tmp0_safe_receiver.equals(BACKUP_AES_CBC_getInstance())) {
+              tmp_9 = EncryptionAlgorithm_AES_CBC_getInstance();
+            } else {
+              if (tmp0_safe_receiver.equals(BACKUP_AES_GCM_getInstance())) {
+                tmp_9 = EncryptionAlgorithm_AES_GCM_getInstance();
+              } else {
+                if (tmp0_safe_receiver instanceof UNRECOGNIZED) {
+                  tmp_9 = null;
+                } else {
+                  noWhenBranchMatchedException();
+                }
+              }
+            }
+            tmp_8 = tmp_9;
+          }
+          tmp = new Asset_0(tmp_0, tmp_1, tmp_2, tmp_3, tmp_4, tmp_5, tmp_6, tmp_7, tmp_8);
+        } else {
+          if (protoContent instanceof Location) {
+            tmp = new Location_0(
+              protoContent.get_value_j01efc_k$().longitude,
+              protoContent.get_value_j01efc_k$().latitude,
+              protoContent.get_value_j01efc_k$().name,
+              protoContent.get_value_j01efc_k$().zoom,
+            );
+          } else {
+            if (protoContent == null) {
+              throw IllegalArgumentException_init_$Create$('Message content cannot be null!');
             } else {
               noWhenBranchMatchedException();
             }
           }
-          var content = tmp_3;
-          var tmp$ret$8 = new BackupMessage(
-            item_1.id,
-            toModel(item_1.conversationId),
-            toModel(item_1.senderUserId),
-            item_1.senderClientId,
-            BackupDateTime_0(item_1.timeIso),
-            content,
-          );
-          destination_1.add_utx5q5_k$(tmp$ret$8);
         }
-        var tmp$ret$11 = copyToArray(destination_1);
-        var tmp$ret$13 = new BackupData_0(tmp_0, tmp_1, tmp_2, tmp$ret$11);
-        tmp = new Success(tmp$ret$13);
-      } catch ($p) {
-        var tmp_4;
-        if ($p instanceof Exception) {
-          var e = $p;
-          printStackTrace(e);
-          println(e);
-          tmp_4 = ParsingFailure_getInstance();
-        } else {
-          throw $p;
-        }
-        tmp = tmp_4;
       }
-      return tmp;
+      var content = tmp;
+      return new BackupMessage(
+        message.id,
+        toModel(message.conversationId),
+        toModel(message.senderUserId),
+        message.senderClientId,
+        BackupDateTime_0(message.timeIso),
+        content,
+      );
+    }
+    function fromConversationProtoToBackupModel($this, conversation) {
+      return new BackupConversation(toModel(conversation.id), conversation.name);
+    }
+    function fromUserProtoToBackupModel($this, user) {
+      return new BackupUser(toModel(user.id), user.name, user.handle);
+    }
+    function MPBackupMapper() {}
+    protoOf(MPBackupMapper).mapUserToProtobuf_k4zmp8_k$ = function (it) {
+      return new ExportUser(toProtoModel(it.id), it.name, it.handle);
+    };
+    protoOf(MPBackupMapper).mapMessageToProtobuf_a1fp5o_k$ = function (it) {
+      var tmp = it.id;
+      var tmp_0 = toLongMilliseconds(it.creationDate);
+      var tmp_1 = toProtoModel(it.senderUserId);
+      var tmp_2 = it.senderClientId;
+      var tmp_3 = toProtoModel(it.conversationId);
+      var content = it.content;
+      var tmp_4;
+      if (content instanceof Asset_0) {
+        var tmp_5 = content.mimeType;
+        var tmp_6 = toLong(content.size);
+        var tmp_7 = content.name;
+        var tmp_8 = new ByteArr(content.otrKey);
+        var tmp_9 = new ByteArr(content.sha256);
+        var tmp_10 = content.assetId;
+        var tmp_11 = content.assetToken;
+        var tmp_12 = content.assetDomain;
+        var tmp0_subject = content.encryption;
+        var tmp_13;
+        switch (tmp0_subject == null ? -1 : tmp0_subject.get_ordinal_ip24qg_k$()) {
+          case 0:
+            tmp_13 = BACKUP_AES_GCM_getInstance();
+            break;
+          case 1:
+            tmp_13 = BACKUP_AES_CBC_getInstance();
+            break;
+          case -1:
+            tmp_13 = null;
+            break;
+          default:
+            noWhenBranchMatchedException();
+            break;
+        }
+        tmp_4 = new Asset(new ExportedAsset(tmp_5, tmp_6, tmp_7, tmp_8, tmp_9, tmp_10, tmp_11, tmp_12, tmp_13));
+      } else {
+        if (content instanceof Text_0) {
+          tmp_4 = new Text(new ExportedText(content.text));
+        } else {
+          if (content instanceof Location_0) {
+            tmp_4 = new Location(new ExportedLocation(content.longitude, content.latitude, content.name, content.zoom));
+          } else {
+            noWhenBranchMatchedException();
+          }
+        }
+      }
+      return new ExportedMessage(tmp, tmp_0, tmp_1, tmp_2, tmp_3, tmp_4);
+    };
+    protoOf(MPBackupMapper).mapConversationToProtobuf_sjz8yk_k$ = function (it) {
+      return new ExportedConversation(toProtoModel(it.id), it.name);
+    };
+    protoOf(MPBackupMapper).fromProtoToBackupModel_fbxycs_k$ = function (protobufData) {
+      // Inline function 'kotlin.run' call
+      // Inline function 'kotlin.contracts.contract' call
+      // Inline function 'com.wire.backup.ingest.MPBackupMapper.fromProtoToBackupModel.<anonymous>' call
+      var tmp = new BackupMetadata(
+        protobufData.info.version,
+        toModel(protobufData.info.userId),
+        BackupDateTime_0(protobufData.info.creationTime),
+        protobufData.info.clientId,
+      );
+      // Inline function 'kotlin.collections.toTypedArray' call
+      // Inline function 'kotlin.collections.map' call
+      var this_0 = protobufData.users;
+      // Inline function 'kotlin.collections.mapTo' call
+      var destination = ArrayList_init_$Create$_0(collectionSizeOrDefault(this_0, 10));
+      var tmp0_iterator = this_0.iterator_jk1svi_k$();
+      while (tmp0_iterator.hasNext_bitz1p_k$()) {
+        var item = tmp0_iterator.next_20eer_k$();
+        // Inline function 'com.wire.backup.ingest.MPBackupMapper.fromProtoToBackupModel.<anonymous>.<anonymous>' call
+        var tmp$ret$0 = fromUserProtoToBackupModel(this, item);
+        destination.add_utx5q5_k$(tmp$ret$0);
+      }
+      var tmp_0 = copyToArray(destination);
+      // Inline function 'kotlin.collections.toTypedArray' call
+      // Inline function 'kotlin.collections.map' call
+      var this_1 = protobufData.conversations;
+      // Inline function 'kotlin.collections.mapTo' call
+      var destination_0 = ArrayList_init_$Create$_0(collectionSizeOrDefault(this_1, 10));
+      var tmp0_iterator_0 = this_1.iterator_jk1svi_k$();
+      while (tmp0_iterator_0.hasNext_bitz1p_k$()) {
+        var item_0 = tmp0_iterator_0.next_20eer_k$();
+        // Inline function 'com.wire.backup.ingest.MPBackupMapper.fromProtoToBackupModel.<anonymous>.<anonymous>' call
+        var tmp$ret$4 = fromConversationProtoToBackupModel(this, item_0);
+        destination_0.add_utx5q5_k$(tmp$ret$4);
+      }
+      var tmp_1 = copyToArray(destination_0);
+      // Inline function 'kotlin.collections.toTypedArray' call
+      // Inline function 'kotlin.collections.map' call
+      var this_2 = protobufData.messages;
+      // Inline function 'kotlin.collections.mapTo' call
+      var destination_1 = ArrayList_init_$Create$_0(collectionSizeOrDefault(this_2, 10));
+      var tmp0_iterator_1 = this_2.iterator_jk1svi_k$();
+      while (tmp0_iterator_1.hasNext_bitz1p_k$()) {
+        var item_1 = tmp0_iterator_1.next_20eer_k$();
+        // Inline function 'com.wire.backup.ingest.MPBackupMapper.fromProtoToBackupModel.<anonymous>.<anonymous>' call
+        var tmp$ret$8 = fromMessageProtoToBackupModel(this, item_1);
+        destination_1.add_utx5q5_k$(tmp$ret$8);
+      }
+      var tmp$ret$11 = copyToArray(destination_1);
+      return new BackupData_0(tmp, tmp_0, tmp_1, tmp$ret$11);
     };
     function BackupDateTime(date) {
       this.date = date;
     }
     protoOf(BackupDateTime).get_date_wokkxj_k$ = function () {
       return this.date;
+    };
+    protoOf(BackupDateTime).equals = function (other) {
+      if (this === other) return true;
+      if (other == null ? true : !(this.constructor == other.constructor)) return false;
+      if (!(other instanceof BackupDateTime)) THROW_CCE();
+      return toLongMilliseconds(this).equals(toLongMilliseconds(other));
+    };
+    protoOf(BackupDateTime).hashCode = function () {
+      return hashCode(this.date);
     };
     protoOf(BackupDateTime).component1_7eebsc_k$ = function () {
       return this.date;
@@ -795,22 +1280,26 @@
     protoOf(BackupDateTime).toString = function () {
       return 'BackupDateTime(date=' + this.date + ')';
     };
-    protoOf(BackupDateTime).hashCode = function () {
-      return hashCode(this.date);
-    };
-    protoOf(BackupDateTime).equals = function (other) {
-      if (this === other) return true;
-      if (!(other instanceof BackupDateTime)) return false;
-      var tmp0_other_with_cast = other instanceof BackupDateTime ? other : THROW_CCE();
-      if (!equals(this.date, tmp0_other_with_cast.date)) return false;
-      return true;
-    };
-    function BackupDateTime_0(timestamp) {
-      return new BackupDateTime(new Date(timestamp));
+    function BackupDateTime_0(timestampMillis) {
+      return new BackupDateTime(new Date(timestampMillis));
     }
     function toLongMilliseconds(_this__u8e3s4) {
       return numberToLong(_this__u8e3s4.date.getTime());
     }
+    function MPBackupExporter(selfUserId) {
+      CommonMPBackupExporter.call(this, selfUserId);
+    }
+    function MPBackupImporter() {
+      CommonMPBackupImporter.call(this);
+    }
+    //region block: post-declaration
+    defineProp(protoOf(BackupData_0), 'userList', protoOf(BackupData_0).get_userList_ytdm1e_k$);
+    defineProp(protoOf(BackupData_0), 'conversationList', protoOf(BackupData_0).get_conversationList_mdhg96_k$);
+    defineProp(protoOf(BackupData_0), 'messageList', protoOf(BackupData_0).get_messageList_jrlt0_k$);
+    protoOf($serializer).typeParametersSerializers_fr94fx_k$ = typeParametersSerializers;
+    defineProp(protoOf(EncryptionAlgorithm), 'name', protoOf(EncryptionAlgorithm).get_name_woqyms_k$);
+    defineProp(protoOf(EncryptionAlgorithm), 'ordinal', protoOf(EncryptionAlgorithm).get_ordinal_ip24qg_k$);
+    //endregion
     //region block: exports
     function $jsExportAll$(_) {
       var $com = _.com || (_.com = {});
@@ -823,12 +1312,27 @@
       var $com$wire$backup$data = $com$wire$backup.data || ($com$wire$backup.data = {});
       $com$wire$backup$data.BackupData = BackupData_0;
       $com$wire$backup$data.BackupQualifiedId = BackupQualifiedId;
+      defineProp($com$wire$backup$data.BackupQualifiedId, 'Companion', Companion_getInstance_0);
       $com$wire$backup$data.BackupUser = BackupUser;
       $com$wire$backup$data.BackupConversation = BackupConversation;
       $com$wire$backup$data.BackupMessage = BackupMessage;
       $com$wire$backup$data.BackupMessageContent = BackupMessageContent;
       $com$wire$backup$data.BackupMessageContent.Text = Text_0;
-      $com$wire$backup$data.BackupMessageContent.Asset = Asset;
+      $com$wire$backup$data.BackupMessageContent.Asset = Asset_0;
+      $com$wire$backup$data.BackupMessageContent.Asset.EncryptionAlgorithm = EncryptionAlgorithm;
+      $com$wire$backup$data.BackupMessageContent.Asset.EncryptionAlgorithm.values = values;
+      $com$wire$backup$data.BackupMessageContent.Asset.EncryptionAlgorithm.valueOf = valueOf;
+      defineProp(
+        $com$wire$backup$data.BackupMessageContent.Asset.EncryptionAlgorithm,
+        'AES_GCM',
+        EncryptionAlgorithm_AES_GCM_getInstance,
+      );
+      defineProp(
+        $com$wire$backup$data.BackupMessageContent.Asset.EncryptionAlgorithm,
+        'AES_CBC',
+        EncryptionAlgorithm_AES_CBC_getInstance,
+      );
+      $com$wire$backup$data.BackupMessageContent.Location = Location_0;
       var $com = _.com || (_.com = {});
       var $com$wire = $com.wire || ($com.wire = {});
       var $com$wire$backup = $com$wire.backup || ($com$wire.backup = {});
@@ -838,7 +1342,7 @@
       var $com$wire = $com.wire || ($com.wire = {});
       var $com$wire$backup = $com$wire.backup || ($com$wire.backup = {});
       var $com$wire$backup$dump = $com$wire$backup.dump || ($com$wire$backup.dump = {});
-      $com$wire$backup$dump.MPBackupExporter = MPBackupExporter;
+      $com$wire$backup$dump.CommonMPBackupExporter = CommonMPBackupExporter;
       var $com = _.com || (_.com = {});
       var $com$wire = $com.wire || ($com.wire = {});
       var $com$wire$backup = $com$wire.backup || ($com$wire.backup = {});
@@ -850,12 +1354,22 @@
       var $com$wire = $com.wire || ($com.wire = {});
       var $com$wire$backup = $com$wire.backup || ($com$wire.backup = {});
       var $com$wire$backup$ingest = $com$wire$backup.ingest || ($com$wire$backup.ingest = {});
-      $com$wire$backup$ingest.MPBackupImporter = MPBackupImporter;
+      $com$wire$backup$ingest.CommonMPBackupImporter = CommonMPBackupImporter;
       var $com = _.com || (_.com = {});
       var $com$wire = $com.wire || ($com.wire = {});
       var $com$wire$backup = $com$wire.backup || ($com$wire.backup = {});
       var $com$wire$backup$data = $com$wire$backup.data || ($com$wire$backup.data = {});
       $com$wire$backup$data.BackupDateTime = BackupDateTime;
+      var $com = _.com || (_.com = {});
+      var $com$wire = $com.wire || ($com.wire = {});
+      var $com$wire$backup = $com$wire.backup || ($com$wire.backup = {});
+      var $com$wire$backup$dump = $com$wire$backup.dump || ($com$wire$backup.dump = {});
+      $com$wire$backup$dump.MPBackupExporter = MPBackupExporter;
+      var $com = _.com || (_.com = {});
+      var $com$wire = $com.wire || ($com.wire = {});
+      var $com$wire$backup = $com$wire.backup || ($com$wire.backup = {});
+      var $com$wire$backup$ingest = $com$wire$backup.ingest || ($com$wire$backup.ingest = {});
+      $com$wire$backup$ingest.MPBackupImporter = MPBackupImporter;
     }
     $jsExportAll$(_);
     kotlin_pro_streem_pbandk_pbandk_runtime.$jsExportAll$(_);

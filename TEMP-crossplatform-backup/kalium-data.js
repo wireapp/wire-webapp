@@ -57,23 +57,25 @@
     //region block: imports
     var imul = Math.imul;
     var setOf = kotlin_kotlin.$_$.w8;
-    var getStringHashCode = kotlin_kotlin.$_$.eb;
-    var THROW_CCE = kotlin_kotlin.$_$.rg;
     var protoOf = kotlin_kotlin.$_$.dc;
-    var classMeta = kotlin_kotlin.$_$.ta;
-    var setMetadataFor = kotlin_kotlin.$_$.ec;
     var objectMeta = kotlin_kotlin.$_$.cc;
-    var PluginGeneratedSerialDescriptor = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.g2;
+    var setMetadataFor = kotlin_kotlin.$_$.ec;
+    var InlineClassDescriptor = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.a2;
     var StringSerializer_getInstance = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.s;
-    var UnknownFieldException_init_$Create$ = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.e;
+    var THROW_CCE = kotlin_kotlin.$_$.qg;
     var typeParametersSerializers = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.y1;
     var GeneratedSerializer = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.z1;
     var VOID = kotlin_kotlin.$_$.f;
+    var getStringHashCode = kotlin_kotlin.$_$.eb;
+    var classMeta = kotlin_kotlin.$_$.ta;
+    var PluginGeneratedSerialDescriptor = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.g2;
+    var UnknownFieldException_init_$Create$ = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.e;
     var throwMissingFieldException = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.k2;
     var objectCreate = kotlin_kotlin.$_$.bc;
     var charSequenceLength = kotlin_kotlin.$_$.ra;
     var obfuscateId = kotlin_com_wire_logger.$_$.b;
     var obfuscateDomain = kotlin_com_wire_logger.$_$.a;
+    var isBlank = kotlin_kotlin.$_$.wd;
     var _Char___init__impl__6a9atx = kotlin_kotlin.$_$.t2;
     var Regex_init_$Create$ = kotlin_kotlin.$_$.d1;
     var SerializersModuleBuilder = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.n2;
@@ -81,76 +83,75 @@
     var PolymorphicModuleBuilder = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.m2;
     var get_nullable = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.w;
     var LinkedHashMapSerializer = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.c2;
-    var IntSerializer_getInstance = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.q;
+    var SealedClassSerializer_init_$Create$ = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.b;
     var equals = kotlin_kotlin.$_$.xa;
     var hashCode = kotlin_kotlin.$_$.fb;
-    var SealedClassSerializer_init_$Create$ = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.b;
+    var LazyThreadSafetyMode_PUBLICATION_getInstance = kotlin_kotlin.$_$.j;
+    var lazy = kotlin_kotlin.$_$.mh;
     var SerializerFactory = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.h2;
     var ObjectSerializer_init_$Create$ = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.a;
-    var interfaceMeta = kotlin_kotlin.$_$.gb;
-    var LazyThreadSafetyMode_PUBLICATION_getInstance = kotlin_kotlin.$_$.j;
-    var lazy = kotlin_kotlin.$_$.nh;
     var ArrayListSerializer = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.w1;
     var BooleanSerializer_getInstance = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.p;
     var getBooleanHashCode = kotlin_kotlin.$_$.bb;
+    var IntSerializer_getInstance = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.q;
     var LongSerializer_getInstance = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.r;
-    var toString = kotlin_kotlin.$_$.xh;
+    var toString = kotlin_kotlin.$_$.wh;
     var JsonObjectSerializer_getInstance = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_json.$_$.d;
     //endregion
     //region block: pre-declaration
-    setMetadataFor(PlainId, 'PlainId', classMeta);
     setMetadataFor(Companion, 'Companion', objectMeta);
     setMetadataFor($serializer, '$serializer', objectMeta, VOID, [GeneratedSerializer]);
-    setMetadataFor(QualifiedID, 'QualifiedID', classMeta, VOID, VOID, VOID, VOID, {0: $serializer_getInstance});
+    setMetadataFor(PlainId, 'PlainId', classMeta, VOID, VOID, VOID, VOID, {0: $serializer_getInstance});
     setMetadataFor(Companion_0, 'Companion', objectMeta);
     setMetadataFor($serializer_0, '$serializer', objectMeta, VOID, [GeneratedSerializer]);
+    setMetadataFor(QualifiedID, 'QualifiedID', classMeta, VOID, VOID, VOID, VOID, {0: $serializer_getInstance_0});
     setMetadataFor(Companion_1, 'Companion', objectMeta);
     setMetadataFor($serializer_1, '$serializer', objectMeta, VOID, [GeneratedSerializer]);
     setMetadataFor(Companion_2, 'Companion', objectMeta);
     setMetadataFor($serializer_2, '$serializer', objectMeta, VOID, [GeneratedSerializer]);
     setMetadataFor(Companion_3, 'Companion', objectMeta);
     setMetadataFor($serializer_3, '$serializer', objectMeta, VOID, [GeneratedSerializer]);
-    setMetadataFor(WebEventContent, 'WebEventContent', interfaceMeta, VOID, VOID, VOID, VOID, {
+    setMetadataFor(Companion_4, 'Companion', objectMeta);
+    setMetadataFor($serializer_4, '$serializer', objectMeta, VOID, [GeneratedSerializer]);
+    setMetadataFor(WebEventContent, 'WebEventContent', classMeta, VOID, VOID, VOID, VOID, {0: Companion_getInstance_6});
+    setMetadataFor(Conversation, 'Conversation', classMeta, WebEventContent, VOID, VOID, VOID, {
       0: Companion_getInstance_5,
     });
-    setMetadataFor(Conversation, 'Conversation', interfaceMeta, VOID, [WebEventContent], VOID, VOID, {
-      0: Companion_getInstance_4,
-    });
-    setMetadataFor(NewGroup, 'NewGroup', classMeta, VOID, [Conversation], VOID, VOID, {0: $serializer_getInstance_0});
-    setMetadataFor(TextMessage, 'TextMessage', classMeta, VOID, [Conversation], VOID, VOID, {
-      0: $serializer_getInstance_1,
-    });
-    setMetadataFor(AssetMessage, 'AssetMessage', classMeta, VOID, [Conversation], VOID, VOID, {
+    setMetadataFor(NewGroup, 'NewGroup', classMeta, Conversation, VOID, VOID, VOID, {0: $serializer_getInstance_1});
+    setMetadataFor(TextMessage, 'TextMessage', classMeta, Conversation, VOID, VOID, VOID, {
       0: $serializer_getInstance_2,
     });
-    setMetadataFor(KnockMessage, 'KnockMessage', classMeta, VOID, [Conversation], VOID, VOID, {
+    setMetadataFor(AssetMessage, 'AssetMessage', classMeta, Conversation, VOID, VOID, VOID, {
       0: $serializer_getInstance_3,
     });
-    setMetadataFor(Companion_4, 'Companion', objectMeta, VOID, [SerializerFactory]);
-    setMetadataFor(Unknown, 'Unknown', objectMeta, VOID, [WebEventContent, SerializerFactory], VOID, VOID, {
-      0: Unknown_getInstance,
-    });
-    setMetadataFor(Companion_5, 'Companion', objectMeta, VOID, [SerializerFactory]);
-    setMetadataFor(Companion_6, 'Companion', objectMeta);
-    setMetadataFor($serializer_4, '$serializer', objectMeta, VOID, [GeneratedSerializer]);
-    setMetadataFor(WebGroupMembers, 'WebGroupMembers', classMeta, VOID, VOID, VOID, VOID, {
+    setMetadataFor(KnockMessage, 'KnockMessage', classMeta, Conversation, VOID, VOID, VOID, {
       0: $serializer_getInstance_4,
     });
+    setMetadataFor(Companion_5, 'Companion', objectMeta, VOID, [SerializerFactory]);
+    setMetadataFor(Unknown, 'Unknown', objectMeta, WebEventContent, [WebEventContent, SerializerFactory], VOID, VOID, {
+      0: Unknown_getInstance,
+    });
+    setMetadataFor(Companion_6, 'Companion', objectMeta, VOID, [SerializerFactory]);
     setMetadataFor(Companion_7, 'Companion', objectMeta);
     setMetadataFor($serializer_5, '$serializer', objectMeta, VOID, [GeneratedSerializer]);
-    setMetadataFor(WebTextData, 'WebTextData', classMeta, VOID, VOID, VOID, VOID, {0: $serializer_getInstance_5});
+    setMetadataFor(WebGroupMembers, 'WebGroupMembers', classMeta, VOID, VOID, VOID, VOID, {
+      0: $serializer_getInstance_5,
+    });
     setMetadataFor(Companion_8, 'Companion', objectMeta);
     setMetadataFor($serializer_6, '$serializer', objectMeta, VOID, [GeneratedSerializer]);
-    setMetadataFor(WebAssetData, 'WebAssetData', classMeta, VOID, VOID, VOID, VOID, {0: $serializer_getInstance_6});
+    setMetadataFor(WebTextData, 'WebTextData', classMeta, VOID, VOID, VOID, VOID, {0: $serializer_getInstance_6});
     setMetadataFor(Companion_9, 'Companion', objectMeta);
     setMetadataFor($serializer_7, '$serializer', objectMeta, VOID, [GeneratedSerializer]);
-    setMetadataFor(WebKnockData, 'WebKnockData', classMeta, VOID, VOID, VOID, VOID, {0: $serializer_getInstance_7});
+    setMetadataFor(WebAssetData, 'WebAssetData', classMeta, VOID, VOID, VOID, VOID, {0: $serializer_getInstance_7});
     setMetadataFor(Companion_10, 'Companion', objectMeta);
     setMetadataFor($serializer_8, '$serializer', objectMeta, VOID, [GeneratedSerializer]);
-    setMetadataFor(WebAssetInfo, 'WebAssetInfo', classMeta, VOID, VOID, VOID, VOID, {0: $serializer_getInstance_8});
+    setMetadataFor(WebKnockData, 'WebKnockData', classMeta, VOID, VOID, VOID, VOID, {0: $serializer_getInstance_8});
     setMetadataFor(Companion_11, 'Companion', objectMeta);
     setMetadataFor($serializer_9, '$serializer', objectMeta, VOID, [GeneratedSerializer]);
-    setMetadataFor(WebAssetMeta, 'WebAssetMeta', classMeta, VOID, VOID, VOID, VOID, {0: $serializer_getInstance_9});
+    setMetadataFor(WebAssetInfo, 'WebAssetInfo', classMeta, VOID, VOID, VOID, VOID, {0: $serializer_getInstance_9});
+    setMetadataFor(Companion_12, 'Companion', objectMeta);
+    setMetadataFor($serializer_10, '$serializer', objectMeta, VOID, [GeneratedSerializer]);
+    setMetadataFor(WebAssetMeta, 'WebAssetMeta', classMeta, VOID, VOID, VOID, VOID, {0: $serializer_getInstance_10});
     //endregion
     function get_SUPPORTED_IMAGE_ASSET_MIME_TYPES() {
       _init_properties_Asset_kt__hhbibm();
@@ -191,6 +192,53 @@
     function _PlainId___get_value__impl__923p0o($this) {
       return $this;
     }
+    function Companion() {
+      Companion_instance = this;
+    }
+    protoOf(Companion).serializer_9w0wvi_k$ = function () {
+      return $serializer_getInstance();
+    };
+    var Companion_instance;
+    function Companion_getInstance() {
+      if (Companion_instance == null) new Companion();
+      return Companion_instance;
+    }
+    function $serializer() {
+      $serializer_instance = this;
+      var tmp0_serialDesc = new InlineClassDescriptor('com.wire.kalium.logic.data.id.PlainId', this);
+      tmp0_serialDesc.addElement_5pzumi_k$('value', false);
+      this.descriptor_1 = tmp0_serialDesc;
+    }
+    protoOf($serializer).get_descriptor_wjt6a0_k$ = function () {
+      return this.descriptor_1;
+    };
+    protoOf($serializer).childSerializers_5ghqw5_k$ = function () {
+      // Inline function 'kotlin.arrayOf' call
+      // Inline function 'kotlin.js.unsafeCast' call
+      // Inline function 'kotlin.js.asDynamic' call
+      return [StringSerializer_getInstance()];
+    };
+    protoOf($serializer).deserialize_n07psx_k$ = function (decoder) {
+      return _PlainId___init__impl__gjhl8(decoder.decodeInline_ux3vza_k$(this.descriptor_1).decodeString_x3hxsx_k$());
+    };
+    protoOf($serializer).deserialize_sy6x50_k$ = function (decoder) {
+      return new PlainId(this.deserialize_n07psx_k$(decoder));
+    };
+    protoOf($serializer).serialize_mzgvag_k$ = function (encoder, value) {
+      var tmp0_inlineEncoder = encoder.encodeInline_wxp5pu_k$(this.descriptor_1);
+      if (tmp0_inlineEncoder == null) null;
+      else {
+        tmp0_inlineEncoder.encodeString_424b5v_k$(_PlainId___get_value__impl__923p0o(value));
+      }
+    };
+    protoOf($serializer).serialize_5ase3y_k$ = function (encoder, value) {
+      return this.serialize_mzgvag_k$(encoder, value instanceof PlainId ? value.value_1 : THROW_CCE());
+    };
+    var $serializer_instance;
+    function $serializer_getInstance() {
+      if ($serializer_instance == null) new $serializer();
+      return $serializer_instance;
+    }
     function PlainId__toString_impl_olb7yc($this) {
       return 'PlainId(value=' + $this + ')';
     }
@@ -203,6 +251,7 @@
       return true;
     }
     function PlainId(value) {
+      Companion_getInstance();
       this.value_1 = value;
     }
     protoOf(PlainId).toString = function () {
@@ -219,34 +268,34 @@
       return FEDERATION_REGEX;
     }
     var FEDERATION_REGEX;
-    function Companion() {
-      Companion_instance = this;
+    function Companion_0() {
+      Companion_instance_0 = this;
     }
-    protoOf(Companion).serializer_9w0wvi_k$ = function () {
-      return $serializer_getInstance();
+    protoOf(Companion_0).serializer_9w0wvi_k$ = function () {
+      return $serializer_getInstance_0();
     };
-    var Companion_instance;
-    function Companion_getInstance() {
-      if (Companion_instance == null) new Companion();
-      return Companion_instance;
+    var Companion_instance_0;
+    function Companion_getInstance_0() {
+      if (Companion_instance_0 == null) new Companion_0();
+      return Companion_instance_0;
     }
-    function $serializer() {
-      $serializer_instance = this;
+    function $serializer_0() {
+      $serializer_instance_0 = this;
       var tmp0_serialDesc = new PluginGeneratedSerialDescriptor('com.wire.kalium.logic.data.id.QualifiedID', this, 2);
       tmp0_serialDesc.addElement_5pzumi_k$('id', false);
       tmp0_serialDesc.addElement_5pzumi_k$('domain', false);
       this.descriptor_1 = tmp0_serialDesc;
     }
-    protoOf($serializer).get_descriptor_wjt6a0_k$ = function () {
+    protoOf($serializer_0).get_descriptor_wjt6a0_k$ = function () {
       return this.descriptor_1;
     };
-    protoOf($serializer).childSerializers_5ghqw5_k$ = function () {
+    protoOf($serializer_0).childSerializers_5ghqw5_k$ = function () {
       // Inline function 'kotlin.arrayOf' call
       // Inline function 'kotlin.js.unsafeCast' call
       // Inline function 'kotlin.js.asDynamic' call
       return [StringSerializer_getInstance(), StringSerializer_getInstance()];
     };
-    protoOf($serializer).deserialize_sy6x50_k$ = function (decoder) {
+    protoOf($serializer_0).deserialize_sy6x50_k$ = function (decoder) {
       var tmp0_desc = this.descriptor_1;
       var tmp1_flag = true;
       var tmp2_index = 0;
@@ -281,24 +330,24 @@
       tmp6_input.endStructure_1xqz0n_k$(tmp0_desc);
       return QualifiedID_init_$Create$(tmp3_bitMask0, tmp4_local0, tmp5_local1, null);
     };
-    protoOf($serializer).serialize_4ngydm_k$ = function (encoder, value) {
+    protoOf($serializer_0).serialize_4ngydm_k$ = function (encoder, value) {
       var tmp0_desc = this.descriptor_1;
       var tmp1_output = encoder.beginStructure_yljocp_k$(tmp0_desc);
       tmp1_output.encodeStringElement_1n5wu2_k$(tmp0_desc, 0, value.value_1);
       tmp1_output.encodeStringElement_1n5wu2_k$(tmp0_desc, 1, value.domain_1);
       tmp1_output.endStructure_1xqz0n_k$(tmp0_desc);
     };
-    protoOf($serializer).serialize_5ase3y_k$ = function (encoder, value) {
+    protoOf($serializer_0).serialize_5ase3y_k$ = function (encoder, value) {
       return this.serialize_4ngydm_k$(encoder, value instanceof QualifiedID ? value : THROW_CCE());
     };
-    var $serializer_instance;
-    function $serializer_getInstance() {
-      if ($serializer_instance == null) new $serializer();
-      return $serializer_instance;
+    var $serializer_instance_0;
+    function $serializer_getInstance_0() {
+      if ($serializer_instance_0 == null) new $serializer_0();
+      return $serializer_instance_0;
     }
     function QualifiedID_init_$Init$(seen1, value, domain, serializationConstructorMarker, $this) {
       if (!(3 === (3 & seen1))) {
-        throwMissingFieldException(seen1, 3, $serializer_getInstance().descriptor_1);
+        throwMissingFieldException(seen1, 3, $serializer_getInstance_0().descriptor_1);
       }
       $this.value_1 = value;
       $this.domain_1 = domain;
@@ -314,7 +363,7 @@
       );
     }
     function QualifiedID(value, domain) {
-      Companion_getInstance();
+      Companion_getInstance_0();
       this.value_1 = value;
       this.domain_1 = domain;
     }
@@ -348,6 +397,12 @@
     };
     protoOf(QualifiedID).toPlainID_dua4p1_k$ = function () {
       return _PlainId___init__impl__gjhl8(this.value_1);
+    };
+    protoOf(QualifiedID).equalsIgnoringBlankDomain_ybqmlz_k$ = function (other) {
+      if (isBlank(this.domain_1) ? true : isBlank(other.domain_1)) {
+        return this.value_1 === other.value_1;
+      }
+      return this.equals(other);
     };
     protoOf(QualifiedID).component1_7eebsc_k$ = function () {
       return this.value_1;
@@ -414,240 +469,8 @@
         webEventContentSerializationModule = builder.build_1k0s4u_k$();
       }
     }
-    function Companion_0() {
-      Companion_instance_0 = this;
-    }
-    protoOf(Companion_0).serializer_9w0wvi_k$ = function () {
-      return $serializer_getInstance_0();
-    };
-    var Companion_instance_0;
-    function Companion_getInstance_0() {
-      if (Companion_instance_0 == null) new Companion_0();
-      return Companion_instance_0;
-    }
-    function $serializer_0() {
-      $serializer_instance_0 = this;
-      var tmp0_serialDesc = new PluginGeneratedSerialDescriptor('conversation.group-creation', this, 6);
-      tmp0_serialDesc.addElement_5pzumi_k$('qualified_conversation', false);
-      tmp0_serialDesc.addElement_5pzumi_k$('conversation', false);
-      tmp0_serialDesc.addElement_5pzumi_k$('qualified_from', false);
-      tmp0_serialDesc.addElement_5pzumi_k$('from', false);
-      tmp0_serialDesc.addElement_5pzumi_k$('data', false);
-      tmp0_serialDesc.addElement_5pzumi_k$('time', false);
-      this.descriptor_1 = tmp0_serialDesc;
-    }
-    protoOf($serializer_0).get_descriptor_wjt6a0_k$ = function () {
-      return this.descriptor_1;
-    };
-    protoOf($serializer_0).childSerializers_5ghqw5_k$ = function () {
-      // Inline function 'kotlin.arrayOf' call
-      // Inline function 'kotlin.js.unsafeCast' call
-      // Inline function 'kotlin.js.asDynamic' call
-      return [
-        $serializer_getInstance(),
-        StringSerializer_getInstance(),
-        get_nullable($serializer_getInstance()),
-        StringSerializer_getInstance(),
-        $serializer_getInstance_4(),
-        StringSerializer_getInstance(),
-      ];
-    };
-    protoOf($serializer_0).deserialize_sy6x50_k$ = function (decoder) {
-      var tmp0_desc = this.descriptor_1;
-      var tmp1_flag = true;
-      var tmp2_index = 0;
-      var tmp3_bitMask0 = 0;
-      var tmp4_local0 = null;
-      var tmp5_local1 = null;
-      var tmp6_local2 = null;
-      var tmp7_local3 = null;
-      var tmp8_local4 = null;
-      var tmp9_local5 = null;
-      var tmp10_input = decoder.beginStructure_yljocp_k$(tmp0_desc);
-      if (tmp10_input.decodeSequentially_xlblqy_k$()) {
-        tmp4_local0 = tmp10_input.decodeSerializableElement_uahnnv_k$(
-          tmp0_desc,
-          0,
-          $serializer_getInstance(),
-          tmp4_local0,
-        );
-        tmp3_bitMask0 = tmp3_bitMask0 | 1;
-        tmp5_local1 = tmp10_input.decodeStringElement_3oenpg_k$(tmp0_desc, 1);
-        tmp3_bitMask0 = tmp3_bitMask0 | 2;
-        tmp6_local2 = tmp10_input.decodeNullableSerializableElement_k2y6ab_k$(
-          tmp0_desc,
-          2,
-          $serializer_getInstance(),
-          tmp6_local2,
-        );
-        tmp3_bitMask0 = tmp3_bitMask0 | 4;
-        tmp7_local3 = tmp10_input.decodeStringElement_3oenpg_k$(tmp0_desc, 3);
-        tmp3_bitMask0 = tmp3_bitMask0 | 8;
-        tmp8_local4 = tmp10_input.decodeSerializableElement_uahnnv_k$(
-          tmp0_desc,
-          4,
-          $serializer_getInstance_4(),
-          tmp8_local4,
-        );
-        tmp3_bitMask0 = tmp3_bitMask0 | 16;
-        tmp9_local5 = tmp10_input.decodeStringElement_3oenpg_k$(tmp0_desc, 5);
-        tmp3_bitMask0 = tmp3_bitMask0 | 32;
-      } else
-        while (tmp1_flag) {
-          tmp2_index = tmp10_input.decodeElementIndex_bstkhp_k$(tmp0_desc);
-          switch (tmp2_index) {
-            case -1:
-              tmp1_flag = false;
-              break;
-            case 0:
-              tmp4_local0 = tmp10_input.decodeSerializableElement_uahnnv_k$(
-                tmp0_desc,
-                0,
-                $serializer_getInstance(),
-                tmp4_local0,
-              );
-              tmp3_bitMask0 = tmp3_bitMask0 | 1;
-              break;
-            case 1:
-              tmp5_local1 = tmp10_input.decodeStringElement_3oenpg_k$(tmp0_desc, 1);
-              tmp3_bitMask0 = tmp3_bitMask0 | 2;
-              break;
-            case 2:
-              tmp6_local2 = tmp10_input.decodeNullableSerializableElement_k2y6ab_k$(
-                tmp0_desc,
-                2,
-                $serializer_getInstance(),
-                tmp6_local2,
-              );
-              tmp3_bitMask0 = tmp3_bitMask0 | 4;
-              break;
-            case 3:
-              tmp7_local3 = tmp10_input.decodeStringElement_3oenpg_k$(tmp0_desc, 3);
-              tmp3_bitMask0 = tmp3_bitMask0 | 8;
-              break;
-            case 4:
-              tmp8_local4 = tmp10_input.decodeSerializableElement_uahnnv_k$(
-                tmp0_desc,
-                4,
-                $serializer_getInstance_4(),
-                tmp8_local4,
-              );
-              tmp3_bitMask0 = tmp3_bitMask0 | 16;
-              break;
-            case 5:
-              tmp9_local5 = tmp10_input.decodeStringElement_3oenpg_k$(tmp0_desc, 5);
-              tmp3_bitMask0 = tmp3_bitMask0 | 32;
-              break;
-            default:
-              throw UnknownFieldException_init_$Create$(tmp2_index);
-          }
-        }
-      tmp10_input.endStructure_1xqz0n_k$(tmp0_desc);
-      return NewGroup_init_$Create$(
-        tmp3_bitMask0,
-        tmp4_local0,
-        tmp5_local1,
-        tmp6_local2,
-        tmp7_local3,
-        tmp8_local4,
-        tmp9_local5,
-        null,
-      );
-    };
-    protoOf($serializer_0).serialize_efyvdh_k$ = function (encoder, value) {
-      var tmp0_desc = this.descriptor_1;
-      var tmp1_output = encoder.beginStructure_yljocp_k$(tmp0_desc);
-      tmp1_output.encodeSerializableElement_isqxcl_k$(
-        tmp0_desc,
-        0,
-        $serializer_getInstance(),
-        value.qualifiedConversation_1,
-      );
-      tmp1_output.encodeStringElement_1n5wu2_k$(tmp0_desc, 1, value.conversation_1);
-      tmp1_output.encodeNullableSerializableElement_5lquiv_k$(
-        tmp0_desc,
-        2,
-        $serializer_getInstance(),
-        value.qualifiedFrom_1,
-      );
-      tmp1_output.encodeStringElement_1n5wu2_k$(tmp0_desc, 3, value.from_1);
-      tmp1_output.encodeSerializableElement_isqxcl_k$(tmp0_desc, 4, $serializer_getInstance_4(), value.members_1);
-      tmp1_output.encodeStringElement_1n5wu2_k$(tmp0_desc, 5, value.time_1);
-      tmp1_output.endStructure_1xqz0n_k$(tmp0_desc);
-    };
-    protoOf($serializer_0).serialize_5ase3y_k$ = function (encoder, value) {
-      return this.serialize_efyvdh_k$(encoder, value instanceof NewGroup ? value : THROW_CCE());
-    };
-    var $serializer_instance_0;
-    function $serializer_getInstance_0() {
-      if ($serializer_instance_0 == null) new $serializer_0();
-      return $serializer_instance_0;
-    }
-    function NewGroup_init_$Init$(
-      seen1,
-      qualifiedConversation,
-      conversation,
-      qualifiedFrom,
-      from,
-      members,
-      time,
-      serializationConstructorMarker,
-      $this,
-    ) {
-      if (!(63 === (63 & seen1))) {
-        throwMissingFieldException(seen1, 63, $serializer_getInstance_0().descriptor_1);
-      }
-      $this.qualifiedConversation_1 = qualifiedConversation;
-      $this.conversation_1 = conversation;
-      $this.qualifiedFrom_1 = qualifiedFrom;
-      $this.from_1 = from;
-      $this.members_1 = members;
-      $this.time_1 = time;
-      return $this;
-    }
-    function NewGroup_init_$Create$(
-      seen1,
-      qualifiedConversation,
-      conversation,
-      qualifiedFrom,
-      from,
-      members,
-      time,
-      serializationConstructorMarker,
-    ) {
-      return NewGroup_init_$Init$(
-        seen1,
-        qualifiedConversation,
-        conversation,
-        qualifiedFrom,
-        from,
-        members,
-        time,
-        serializationConstructorMarker,
-        objectCreate(protoOf(NewGroup)),
-      );
-    }
-    function _get_$childSerializers__r2zwns($this) {
-      return $this.$childSerializers_1;
-    }
     function Companion_1() {
       Companion_instance_1 = this;
-      var tmp = this;
-      // Inline function 'kotlin.arrayOf' call
-      // Inline function 'kotlin.js.unsafeCast' call
-      // Inline function 'kotlin.js.asDynamic' call
-      tmp.$childSerializers_1 = [
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        new LinkedHashMapSerializer(StringSerializer_getInstance(), StringSerializer_getInstance()),
-        null,
-      ];
     }
     protoOf(Companion_1).serializer_9w0wvi_k$ = function () {
       return $serializer_getInstance_1();
@@ -659,38 +482,27 @@
     }
     function $serializer_1() {
       $serializer_instance_1 = this;
-      var tmp0_serialDesc = new PluginGeneratedSerialDescriptor('conversation.message-add', this, 10);
+      var tmp0_serialDesc = new PluginGeneratedSerialDescriptor('conversation.group-creation', this, 5);
       tmp0_serialDesc.addElement_5pzumi_k$('qualified_conversation', false);
-      tmp0_serialDesc.addElement_5pzumi_k$('conversation', false);
       tmp0_serialDesc.addElement_5pzumi_k$('qualified_from', false);
       tmp0_serialDesc.addElement_5pzumi_k$('from', false);
-      tmp0_serialDesc.addElement_5pzumi_k$('from_client_id', false);
-      tmp0_serialDesc.addElement_5pzumi_k$('time', false);
-      tmp0_serialDesc.addElement_5pzumi_k$('id', false);
       tmp0_serialDesc.addElement_5pzumi_k$('data', false);
-      tmp0_serialDesc.addElement_5pzumi_k$('reactions', false);
-      tmp0_serialDesc.addElement_5pzumi_k$('category', false);
+      tmp0_serialDesc.addElement_5pzumi_k$('time', false);
       this.descriptor_1 = tmp0_serialDesc;
     }
     protoOf($serializer_1).get_descriptor_wjt6a0_k$ = function () {
       return this.descriptor_1;
     };
     protoOf($serializer_1).childSerializers_5ghqw5_k$ = function () {
-      var tmp0_cached = Companion_getInstance_1().$childSerializers_1;
       // Inline function 'kotlin.arrayOf' call
       // Inline function 'kotlin.js.unsafeCast' call
       // Inline function 'kotlin.js.asDynamic' call
       return [
-        $serializer_getInstance(),
-        StringSerializer_getInstance(),
-        get_nullable($serializer_getInstance()),
-        StringSerializer_getInstance(),
-        get_nullable(StringSerializer_getInstance()),
-        StringSerializer_getInstance(),
+        $serializer_getInstance_0(),
+        get_nullable($serializer_getInstance_0()),
         StringSerializer_getInstance(),
         $serializer_getInstance_5(),
-        get_nullable(tmp0_cached[8]),
-        get_nullable(IntSerializer_getInstance()),
+        StringSerializer_getInstance(),
       ];
     };
     protoOf($serializer_1).deserialize_sy6x50_k$ = function (decoder) {
@@ -703,266 +515,160 @@
       var tmp6_local2 = null;
       var tmp7_local3 = null;
       var tmp8_local4 = null;
-      var tmp9_local5 = null;
-      var tmp10_local6 = null;
-      var tmp11_local7 = null;
-      var tmp12_local8 = null;
-      var tmp13_local9 = null;
-      var tmp14_input = decoder.beginStructure_yljocp_k$(tmp0_desc);
-      var tmp15_cached = Companion_getInstance_1().$childSerializers_1;
-      if (tmp14_input.decodeSequentially_xlblqy_k$()) {
-        tmp4_local0 = tmp14_input.decodeSerializableElement_uahnnv_k$(
+      var tmp9_input = decoder.beginStructure_yljocp_k$(tmp0_desc);
+      if (tmp9_input.decodeSequentially_xlblqy_k$()) {
+        tmp4_local0 = tmp9_input.decodeSerializableElement_uahnnv_k$(
           tmp0_desc,
           0,
-          $serializer_getInstance(),
+          $serializer_getInstance_0(),
           tmp4_local0,
         );
         tmp3_bitMask0 = tmp3_bitMask0 | 1;
-        tmp5_local1 = tmp14_input.decodeStringElement_3oenpg_k$(tmp0_desc, 1);
+        tmp5_local1 = tmp9_input.decodeNullableSerializableElement_k2y6ab_k$(
+          tmp0_desc,
+          1,
+          $serializer_getInstance_0(),
+          tmp5_local1,
+        );
         tmp3_bitMask0 = tmp3_bitMask0 | 2;
-        tmp6_local2 = tmp14_input.decodeNullableSerializableElement_k2y6ab_k$(
-          tmp0_desc,
-          2,
-          $serializer_getInstance(),
-          tmp6_local2,
-        );
+        tmp6_local2 = tmp9_input.decodeStringElement_3oenpg_k$(tmp0_desc, 2);
         tmp3_bitMask0 = tmp3_bitMask0 | 4;
-        tmp7_local3 = tmp14_input.decodeStringElement_3oenpg_k$(tmp0_desc, 3);
-        tmp3_bitMask0 = tmp3_bitMask0 | 8;
-        tmp8_local4 = tmp14_input.decodeNullableSerializableElement_k2y6ab_k$(
+        tmp7_local3 = tmp9_input.decodeSerializableElement_uahnnv_k$(
           tmp0_desc,
-          4,
-          StringSerializer_getInstance(),
-          tmp8_local4,
-        );
-        tmp3_bitMask0 = tmp3_bitMask0 | 16;
-        tmp9_local5 = tmp14_input.decodeStringElement_3oenpg_k$(tmp0_desc, 5);
-        tmp3_bitMask0 = tmp3_bitMask0 | 32;
-        tmp10_local6 = tmp14_input.decodeStringElement_3oenpg_k$(tmp0_desc, 6);
-        tmp3_bitMask0 = tmp3_bitMask0 | 64;
-        tmp11_local7 = tmp14_input.decodeSerializableElement_uahnnv_k$(
-          tmp0_desc,
-          7,
+          3,
           $serializer_getInstance_5(),
-          tmp11_local7,
+          tmp7_local3,
         );
-        tmp3_bitMask0 = tmp3_bitMask0 | 128;
-        tmp12_local8 = tmp14_input.decodeNullableSerializableElement_k2y6ab_k$(
-          tmp0_desc,
-          8,
-          tmp15_cached[8],
-          tmp12_local8,
-        );
-        tmp3_bitMask0 = tmp3_bitMask0 | 256;
-        tmp13_local9 = tmp14_input.decodeNullableSerializableElement_k2y6ab_k$(
-          tmp0_desc,
-          9,
-          IntSerializer_getInstance(),
-          tmp13_local9,
-        );
-        tmp3_bitMask0 = tmp3_bitMask0 | 512;
+        tmp3_bitMask0 = tmp3_bitMask0 | 8;
+        tmp8_local4 = tmp9_input.decodeStringElement_3oenpg_k$(tmp0_desc, 4);
+        tmp3_bitMask0 = tmp3_bitMask0 | 16;
       } else
         while (tmp1_flag) {
-          tmp2_index = tmp14_input.decodeElementIndex_bstkhp_k$(tmp0_desc);
+          tmp2_index = tmp9_input.decodeElementIndex_bstkhp_k$(tmp0_desc);
           switch (tmp2_index) {
             case -1:
               tmp1_flag = false;
               break;
             case 0:
-              tmp4_local0 = tmp14_input.decodeSerializableElement_uahnnv_k$(
+              tmp4_local0 = tmp9_input.decodeSerializableElement_uahnnv_k$(
                 tmp0_desc,
                 0,
-                $serializer_getInstance(),
+                $serializer_getInstance_0(),
                 tmp4_local0,
               );
               tmp3_bitMask0 = tmp3_bitMask0 | 1;
               break;
             case 1:
-              tmp5_local1 = tmp14_input.decodeStringElement_3oenpg_k$(tmp0_desc, 1);
+              tmp5_local1 = tmp9_input.decodeNullableSerializableElement_k2y6ab_k$(
+                tmp0_desc,
+                1,
+                $serializer_getInstance_0(),
+                tmp5_local1,
+              );
               tmp3_bitMask0 = tmp3_bitMask0 | 2;
               break;
             case 2:
-              tmp6_local2 = tmp14_input.decodeNullableSerializableElement_k2y6ab_k$(
-                tmp0_desc,
-                2,
-                $serializer_getInstance(),
-                tmp6_local2,
-              );
+              tmp6_local2 = tmp9_input.decodeStringElement_3oenpg_k$(tmp0_desc, 2);
               tmp3_bitMask0 = tmp3_bitMask0 | 4;
               break;
             case 3:
-              tmp7_local3 = tmp14_input.decodeStringElement_3oenpg_k$(tmp0_desc, 3);
+              tmp7_local3 = tmp9_input.decodeSerializableElement_uahnnv_k$(
+                tmp0_desc,
+                3,
+                $serializer_getInstance_5(),
+                tmp7_local3,
+              );
               tmp3_bitMask0 = tmp3_bitMask0 | 8;
               break;
             case 4:
-              tmp8_local4 = tmp14_input.decodeNullableSerializableElement_k2y6ab_k$(
-                tmp0_desc,
-                4,
-                StringSerializer_getInstance(),
-                tmp8_local4,
-              );
+              tmp8_local4 = tmp9_input.decodeStringElement_3oenpg_k$(tmp0_desc, 4);
               tmp3_bitMask0 = tmp3_bitMask0 | 16;
-              break;
-            case 5:
-              tmp9_local5 = tmp14_input.decodeStringElement_3oenpg_k$(tmp0_desc, 5);
-              tmp3_bitMask0 = tmp3_bitMask0 | 32;
-              break;
-            case 6:
-              tmp10_local6 = tmp14_input.decodeStringElement_3oenpg_k$(tmp0_desc, 6);
-              tmp3_bitMask0 = tmp3_bitMask0 | 64;
-              break;
-            case 7:
-              tmp11_local7 = tmp14_input.decodeSerializableElement_uahnnv_k$(
-                tmp0_desc,
-                7,
-                $serializer_getInstance_5(),
-                tmp11_local7,
-              );
-              tmp3_bitMask0 = tmp3_bitMask0 | 128;
-              break;
-            case 8:
-              tmp12_local8 = tmp14_input.decodeNullableSerializableElement_k2y6ab_k$(
-                tmp0_desc,
-                8,
-                tmp15_cached[8],
-                tmp12_local8,
-              );
-              tmp3_bitMask0 = tmp3_bitMask0 | 256;
-              break;
-            case 9:
-              tmp13_local9 = tmp14_input.decodeNullableSerializableElement_k2y6ab_k$(
-                tmp0_desc,
-                9,
-                IntSerializer_getInstance(),
-                tmp13_local9,
-              );
-              tmp3_bitMask0 = tmp3_bitMask0 | 512;
               break;
             default:
               throw UnknownFieldException_init_$Create$(tmp2_index);
           }
         }
-      tmp14_input.endStructure_1xqz0n_k$(tmp0_desc);
-      return TextMessage_init_$Create$(
+      tmp9_input.endStructure_1xqz0n_k$(tmp0_desc);
+      return NewGroup_init_$Create$(
         tmp3_bitMask0,
         tmp4_local0,
         tmp5_local1,
         tmp6_local2,
         tmp7_local3,
         tmp8_local4,
-        tmp9_local5,
-        tmp10_local6,
-        tmp11_local7,
-        tmp12_local8,
-        tmp13_local9,
         null,
       );
     };
-    protoOf($serializer_1).serialize_6682i8_k$ = function (encoder, value) {
+    protoOf($serializer_1).serialize_efyvdh_k$ = function (encoder, value) {
       var tmp0_desc = this.descriptor_1;
       var tmp1_output = encoder.beginStructure_yljocp_k$(tmp0_desc);
-      var tmp2_cached = Companion_getInstance_1().$childSerializers_1;
       tmp1_output.encodeSerializableElement_isqxcl_k$(
         tmp0_desc,
         0,
-        $serializer_getInstance(),
+        $serializer_getInstance_0(),
         value.qualifiedConversation_1,
       );
-      tmp1_output.encodeStringElement_1n5wu2_k$(tmp0_desc, 1, value.conversation_1);
       tmp1_output.encodeNullableSerializableElement_5lquiv_k$(
         tmp0_desc,
-        2,
-        $serializer_getInstance(),
+        1,
+        $serializer_getInstance_0(),
         value.qualifiedFrom_1,
       );
-      tmp1_output.encodeStringElement_1n5wu2_k$(tmp0_desc, 3, value.from_1);
-      tmp1_output.encodeNullableSerializableElement_5lquiv_k$(
-        tmp0_desc,
-        4,
-        StringSerializer_getInstance(),
-        value.fromClientId_1,
-      );
-      tmp1_output.encodeStringElement_1n5wu2_k$(tmp0_desc, 5, value.time_1);
-      tmp1_output.encodeStringElement_1n5wu2_k$(tmp0_desc, 6, value.id_1);
-      tmp1_output.encodeSerializableElement_isqxcl_k$(tmp0_desc, 7, $serializer_getInstance_5(), value.data_1);
-      tmp1_output.encodeNullableSerializableElement_5lquiv_k$(tmp0_desc, 8, tmp2_cached[8], value.reactions_1);
-      tmp1_output.encodeNullableSerializableElement_5lquiv_k$(
-        tmp0_desc,
-        9,
-        IntSerializer_getInstance(),
-        value.category_1,
-      );
+      tmp1_output.encodeStringElement_1n5wu2_k$(tmp0_desc, 2, value.from_1);
+      tmp1_output.encodeSerializableElement_isqxcl_k$(tmp0_desc, 3, $serializer_getInstance_5(), value.members_1);
+      tmp1_output.encodeStringElement_1n5wu2_k$(tmp0_desc, 4, value.time_1);
       tmp1_output.endStructure_1xqz0n_k$(tmp0_desc);
     };
     protoOf($serializer_1).serialize_5ase3y_k$ = function (encoder, value) {
-      return this.serialize_6682i8_k$(encoder, value instanceof TextMessage ? value : THROW_CCE());
+      return this.serialize_efyvdh_k$(encoder, value instanceof NewGroup ? value : THROW_CCE());
     };
     var $serializer_instance_1;
     function $serializer_getInstance_1() {
       if ($serializer_instance_1 == null) new $serializer_1();
       return $serializer_instance_1;
     }
-    function TextMessage_init_$Init$(
+    function NewGroup_init_$Init$(
       seen1,
       qualifiedConversation,
-      conversation,
       qualifiedFrom,
       from,
-      fromClientId,
+      members,
       time,
-      id,
-      data,
-      reactions,
-      category,
       serializationConstructorMarker,
       $this,
     ) {
-      if (!(1023 === (1023 & seen1))) {
-        throwMissingFieldException(seen1, 1023, $serializer_getInstance_1().descriptor_1);
+      if (!(31 === (31 & seen1))) {
+        throwMissingFieldException(seen1, 31, $serializer_getInstance_1().descriptor_1);
       }
+      Conversation_init_$Init$(seen1, serializationConstructorMarker, $this);
       $this.qualifiedConversation_1 = qualifiedConversation;
-      $this.conversation_1 = conversation;
       $this.qualifiedFrom_1 = qualifiedFrom;
       $this.from_1 = from;
-      $this.fromClientId_1 = fromClientId;
+      $this.members_1 = members;
       $this.time_1 = time;
-      $this.id_1 = id;
-      $this.data_1 = data;
-      $this.reactions_1 = reactions;
-      $this.category_1 = category;
       return $this;
     }
-    function TextMessage_init_$Create$(
+    function NewGroup_init_$Create$(
       seen1,
       qualifiedConversation,
-      conversation,
       qualifiedFrom,
       from,
-      fromClientId,
+      members,
       time,
-      id,
-      data,
-      reactions,
-      category,
       serializationConstructorMarker,
     ) {
-      return TextMessage_init_$Init$(
+      return NewGroup_init_$Init$(
         seen1,
         qualifiedConversation,
-        conversation,
         qualifiedFrom,
         from,
-        fromClientId,
+        members,
         time,
-        id,
-        data,
-        reactions,
-        category,
         serializationConstructorMarker,
-        objectCreate(protoOf(TextMessage)),
+        objectCreate(protoOf(NewGroup)),
       );
     }
-    function _get_$childSerializers__r2zwns_0($this) {
+    function _get_$childSerializers__r2zwns($this) {
       return $this.$childSerializers_1;
     }
     function Companion_2() {
@@ -972,7 +678,6 @@
       // Inline function 'kotlin.js.unsafeCast' call
       // Inline function 'kotlin.js.asDynamic' call
       tmp.$childSerializers_1 = [
-        null,
         null,
         null,
         null,
@@ -993,9 +698,8 @@
     }
     function $serializer_2() {
       $serializer_instance_2 = this;
-      var tmp0_serialDesc = new PluginGeneratedSerialDescriptor('conversation.asset-add', this, 9);
+      var tmp0_serialDesc = new PluginGeneratedSerialDescriptor('conversation.message-add', this, 8);
       tmp0_serialDesc.addElement_5pzumi_k$('qualified_conversation', false);
-      tmp0_serialDesc.addElement_5pzumi_k$('conversation', false);
       tmp0_serialDesc.addElement_5pzumi_k$('qualified_from', false);
       tmp0_serialDesc.addElement_5pzumi_k$('from', false);
       tmp0_serialDesc.addElement_5pzumi_k$('from_client_id', false);
@@ -1014,15 +718,14 @@
       // Inline function 'kotlin.js.unsafeCast' call
       // Inline function 'kotlin.js.asDynamic' call
       return [
-        $serializer_getInstance(),
-        StringSerializer_getInstance(),
-        get_nullable($serializer_getInstance()),
+        $serializer_getInstance_0(),
+        get_nullable($serializer_getInstance_0()),
         StringSerializer_getInstance(),
         get_nullable(StringSerializer_getInstance()),
         StringSerializer_getInstance(),
         StringSerializer_getInstance(),
         $serializer_getInstance_6(),
-        get_nullable(tmp0_cached[8]),
+        get_nullable(tmp0_cached[7]),
       ];
     };
     protoOf($serializer_2).deserialize_sy6x50_k$ = function (decoder) {
@@ -1038,127 +741,120 @@
       var tmp9_local5 = null;
       var tmp10_local6 = null;
       var tmp11_local7 = null;
-      var tmp12_local8 = null;
-      var tmp13_input = decoder.beginStructure_yljocp_k$(tmp0_desc);
-      var tmp14_cached = Companion_getInstance_2().$childSerializers_1;
-      if (tmp13_input.decodeSequentially_xlblqy_k$()) {
-        tmp4_local0 = tmp13_input.decodeSerializableElement_uahnnv_k$(
+      var tmp12_input = decoder.beginStructure_yljocp_k$(tmp0_desc);
+      var tmp13_cached = Companion_getInstance_2().$childSerializers_1;
+      if (tmp12_input.decodeSequentially_xlblqy_k$()) {
+        tmp4_local0 = tmp12_input.decodeSerializableElement_uahnnv_k$(
           tmp0_desc,
           0,
-          $serializer_getInstance(),
+          $serializer_getInstance_0(),
           tmp4_local0,
         );
         tmp3_bitMask0 = tmp3_bitMask0 | 1;
-        tmp5_local1 = tmp13_input.decodeStringElement_3oenpg_k$(tmp0_desc, 1);
+        tmp5_local1 = tmp12_input.decodeNullableSerializableElement_k2y6ab_k$(
+          tmp0_desc,
+          1,
+          $serializer_getInstance_0(),
+          tmp5_local1,
+        );
         tmp3_bitMask0 = tmp3_bitMask0 | 2;
-        tmp6_local2 = tmp13_input.decodeNullableSerializableElement_k2y6ab_k$(
-          tmp0_desc,
-          2,
-          $serializer_getInstance(),
-          tmp6_local2,
-        );
+        tmp6_local2 = tmp12_input.decodeStringElement_3oenpg_k$(tmp0_desc, 2);
         tmp3_bitMask0 = tmp3_bitMask0 | 4;
-        tmp7_local3 = tmp13_input.decodeStringElement_3oenpg_k$(tmp0_desc, 3);
-        tmp3_bitMask0 = tmp3_bitMask0 | 8;
-        tmp8_local4 = tmp13_input.decodeNullableSerializableElement_k2y6ab_k$(
+        tmp7_local3 = tmp12_input.decodeNullableSerializableElement_k2y6ab_k$(
           tmp0_desc,
-          4,
+          3,
           StringSerializer_getInstance(),
-          tmp8_local4,
+          tmp7_local3,
         );
+        tmp3_bitMask0 = tmp3_bitMask0 | 8;
+        tmp8_local4 = tmp12_input.decodeStringElement_3oenpg_k$(tmp0_desc, 4);
         tmp3_bitMask0 = tmp3_bitMask0 | 16;
-        tmp9_local5 = tmp13_input.decodeStringElement_3oenpg_k$(tmp0_desc, 5);
+        tmp9_local5 = tmp12_input.decodeStringElement_3oenpg_k$(tmp0_desc, 5);
         tmp3_bitMask0 = tmp3_bitMask0 | 32;
-        tmp10_local6 = tmp13_input.decodeStringElement_3oenpg_k$(tmp0_desc, 6);
+        tmp10_local6 = tmp12_input.decodeSerializableElement_uahnnv_k$(
+          tmp0_desc,
+          6,
+          $serializer_getInstance_6(),
+          tmp10_local6,
+        );
         tmp3_bitMask0 = tmp3_bitMask0 | 64;
-        tmp11_local7 = tmp13_input.decodeSerializableElement_uahnnv_k$(
+        tmp11_local7 = tmp12_input.decodeNullableSerializableElement_k2y6ab_k$(
           tmp0_desc,
           7,
-          $serializer_getInstance_6(),
+          tmp13_cached[7],
           tmp11_local7,
         );
         tmp3_bitMask0 = tmp3_bitMask0 | 128;
-        tmp12_local8 = tmp13_input.decodeNullableSerializableElement_k2y6ab_k$(
-          tmp0_desc,
-          8,
-          tmp14_cached[8],
-          tmp12_local8,
-        );
-        tmp3_bitMask0 = tmp3_bitMask0 | 256;
       } else
         while (tmp1_flag) {
-          tmp2_index = tmp13_input.decodeElementIndex_bstkhp_k$(tmp0_desc);
+          tmp2_index = tmp12_input.decodeElementIndex_bstkhp_k$(tmp0_desc);
           switch (tmp2_index) {
             case -1:
               tmp1_flag = false;
               break;
             case 0:
-              tmp4_local0 = tmp13_input.decodeSerializableElement_uahnnv_k$(
+              tmp4_local0 = tmp12_input.decodeSerializableElement_uahnnv_k$(
                 tmp0_desc,
                 0,
-                $serializer_getInstance(),
+                $serializer_getInstance_0(),
                 tmp4_local0,
               );
               tmp3_bitMask0 = tmp3_bitMask0 | 1;
               break;
             case 1:
-              tmp5_local1 = tmp13_input.decodeStringElement_3oenpg_k$(tmp0_desc, 1);
+              tmp5_local1 = tmp12_input.decodeNullableSerializableElement_k2y6ab_k$(
+                tmp0_desc,
+                1,
+                $serializer_getInstance_0(),
+                tmp5_local1,
+              );
               tmp3_bitMask0 = tmp3_bitMask0 | 2;
               break;
             case 2:
-              tmp6_local2 = tmp13_input.decodeNullableSerializableElement_k2y6ab_k$(
-                tmp0_desc,
-                2,
-                $serializer_getInstance(),
-                tmp6_local2,
-              );
+              tmp6_local2 = tmp12_input.decodeStringElement_3oenpg_k$(tmp0_desc, 2);
               tmp3_bitMask0 = tmp3_bitMask0 | 4;
               break;
             case 3:
-              tmp7_local3 = tmp13_input.decodeStringElement_3oenpg_k$(tmp0_desc, 3);
+              tmp7_local3 = tmp12_input.decodeNullableSerializableElement_k2y6ab_k$(
+                tmp0_desc,
+                3,
+                StringSerializer_getInstance(),
+                tmp7_local3,
+              );
               tmp3_bitMask0 = tmp3_bitMask0 | 8;
               break;
             case 4:
-              tmp8_local4 = tmp13_input.decodeNullableSerializableElement_k2y6ab_k$(
-                tmp0_desc,
-                4,
-                StringSerializer_getInstance(),
-                tmp8_local4,
-              );
+              tmp8_local4 = tmp12_input.decodeStringElement_3oenpg_k$(tmp0_desc, 4);
               tmp3_bitMask0 = tmp3_bitMask0 | 16;
               break;
             case 5:
-              tmp9_local5 = tmp13_input.decodeStringElement_3oenpg_k$(tmp0_desc, 5);
+              tmp9_local5 = tmp12_input.decodeStringElement_3oenpg_k$(tmp0_desc, 5);
               tmp3_bitMask0 = tmp3_bitMask0 | 32;
               break;
             case 6:
-              tmp10_local6 = tmp13_input.decodeStringElement_3oenpg_k$(tmp0_desc, 6);
+              tmp10_local6 = tmp12_input.decodeSerializableElement_uahnnv_k$(
+                tmp0_desc,
+                6,
+                $serializer_getInstance_6(),
+                tmp10_local6,
+              );
               tmp3_bitMask0 = tmp3_bitMask0 | 64;
               break;
             case 7:
-              tmp11_local7 = tmp13_input.decodeSerializableElement_uahnnv_k$(
+              tmp11_local7 = tmp12_input.decodeNullableSerializableElement_k2y6ab_k$(
                 tmp0_desc,
                 7,
-                $serializer_getInstance_6(),
+                tmp13_cached[7],
                 tmp11_local7,
               );
               tmp3_bitMask0 = tmp3_bitMask0 | 128;
-              break;
-            case 8:
-              tmp12_local8 = tmp13_input.decodeNullableSerializableElement_k2y6ab_k$(
-                tmp0_desc,
-                8,
-                tmp14_cached[8],
-                tmp12_local8,
-              );
-              tmp3_bitMask0 = tmp3_bitMask0 | 256;
               break;
             default:
               throw UnknownFieldException_init_$Create$(tmp2_index);
           }
         }
-      tmp13_input.endStructure_1xqz0n_k$(tmp0_desc);
-      return AssetMessage_init_$Create$(
+      tmp12_input.endStructure_1xqz0n_k$(tmp0_desc);
+      return TextMessage_init_$Create$(
         tmp3_bitMask0,
         tmp4_local0,
         tmp5_local1,
@@ -1168,52 +864,49 @@
         tmp9_local5,
         tmp10_local6,
         tmp11_local7,
-        tmp12_local8,
         null,
       );
     };
-    protoOf($serializer_2).serialize_aalcpp_k$ = function (encoder, value) {
+    protoOf($serializer_2).serialize_6682i8_k$ = function (encoder, value) {
       var tmp0_desc = this.descriptor_1;
       var tmp1_output = encoder.beginStructure_yljocp_k$(tmp0_desc);
       var tmp2_cached = Companion_getInstance_2().$childSerializers_1;
       tmp1_output.encodeSerializableElement_isqxcl_k$(
         tmp0_desc,
         0,
-        $serializer_getInstance(),
+        $serializer_getInstance_0(),
         value.qualifiedConversation_1,
       );
-      tmp1_output.encodeStringElement_1n5wu2_k$(tmp0_desc, 1, value.conversation_1);
       tmp1_output.encodeNullableSerializableElement_5lquiv_k$(
         tmp0_desc,
-        2,
-        $serializer_getInstance(),
+        1,
+        $serializer_getInstance_0(),
         value.qualifiedFrom_1,
       );
-      tmp1_output.encodeStringElement_1n5wu2_k$(tmp0_desc, 3, value.from_1);
+      tmp1_output.encodeStringElement_1n5wu2_k$(tmp0_desc, 2, value.from_1);
       tmp1_output.encodeNullableSerializableElement_5lquiv_k$(
         tmp0_desc,
-        4,
+        3,
         StringSerializer_getInstance(),
         value.fromClientId_1,
       );
-      tmp1_output.encodeStringElement_1n5wu2_k$(tmp0_desc, 5, value.time_1);
-      tmp1_output.encodeStringElement_1n5wu2_k$(tmp0_desc, 6, value.id_1);
-      tmp1_output.encodeSerializableElement_isqxcl_k$(tmp0_desc, 7, $serializer_getInstance_6(), value.data_1);
-      tmp1_output.encodeNullableSerializableElement_5lquiv_k$(tmp0_desc, 8, tmp2_cached[8], value.reactions_1);
+      tmp1_output.encodeStringElement_1n5wu2_k$(tmp0_desc, 4, value.time_1);
+      tmp1_output.encodeStringElement_1n5wu2_k$(tmp0_desc, 5, value.id_1);
+      tmp1_output.encodeSerializableElement_isqxcl_k$(tmp0_desc, 6, $serializer_getInstance_6(), value.data_1);
+      tmp1_output.encodeNullableSerializableElement_5lquiv_k$(tmp0_desc, 7, tmp2_cached[7], value.reactions_1);
       tmp1_output.endStructure_1xqz0n_k$(tmp0_desc);
     };
     protoOf($serializer_2).serialize_5ase3y_k$ = function (encoder, value) {
-      return this.serialize_aalcpp_k$(encoder, value instanceof AssetMessage ? value : THROW_CCE());
+      return this.serialize_6682i8_k$(encoder, value instanceof TextMessage ? value : THROW_CCE());
     };
     var $serializer_instance_2;
     function $serializer_getInstance_2() {
       if ($serializer_instance_2 == null) new $serializer_2();
       return $serializer_instance_2;
     }
-    function AssetMessage_init_$Init$(
+    function TextMessage_init_$Init$(
       seen1,
       qualifiedConversation,
-      conversation,
       qualifiedFrom,
       from,
       fromClientId,
@@ -1224,11 +917,11 @@
       serializationConstructorMarker,
       $this,
     ) {
-      if (!(511 === (511 & seen1))) {
-        throwMissingFieldException(seen1, 511, $serializer_getInstance_2().descriptor_1);
+      if (!(255 === (255 & seen1))) {
+        throwMissingFieldException(seen1, 255, $serializer_getInstance_2().descriptor_1);
       }
+      Conversation_init_$Init$(seen1, serializationConstructorMarker, $this);
       $this.qualifiedConversation_1 = qualifiedConversation;
-      $this.conversation_1 = conversation;
       $this.qualifiedFrom_1 = qualifiedFrom;
       $this.from_1 = from;
       $this.fromClientId_1 = fromClientId;
@@ -1238,10 +931,9 @@
       $this.reactions_1 = reactions;
       return $this;
     }
-    function AssetMessage_init_$Create$(
+    function TextMessage_init_$Create$(
       seen1,
       qualifiedConversation,
-      conversation,
       qualifiedFrom,
       from,
       fromClientId,
@@ -1251,10 +943,9 @@
       reactions,
       serializationConstructorMarker,
     ) {
-      return AssetMessage_init_$Init$(
+      return TextMessage_init_$Init$(
         seen1,
         qualifiedConversation,
-        conversation,
         qualifiedFrom,
         from,
         fromClientId,
@@ -1263,11 +954,28 @@
         data,
         reactions,
         serializationConstructorMarker,
-        objectCreate(protoOf(AssetMessage)),
+        objectCreate(protoOf(TextMessage)),
       );
+    }
+    function _get_$childSerializers__r2zwns_0($this) {
+      return $this.$childSerializers_1;
     }
     function Companion_3() {
       Companion_instance_3 = this;
+      var tmp = this;
+      // Inline function 'kotlin.arrayOf' call
+      // Inline function 'kotlin.js.unsafeCast' call
+      // Inline function 'kotlin.js.asDynamic' call
+      tmp.$childSerializers_1 = [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        new LinkedHashMapSerializer(StringSerializer_getInstance(), StringSerializer_getInstance()),
+      ];
     }
     protoOf(Companion_3).serializer_9w0wvi_k$ = function () {
       return $serializer_getInstance_3();
@@ -1279,33 +987,34 @@
     }
     function $serializer_3() {
       $serializer_instance_3 = this;
-      var tmp0_serialDesc = new PluginGeneratedSerialDescriptor('conversation.knock', this, 8);
+      var tmp0_serialDesc = new PluginGeneratedSerialDescriptor('conversation.asset-add', this, 8);
       tmp0_serialDesc.addElement_5pzumi_k$('qualified_conversation', false);
-      tmp0_serialDesc.addElement_5pzumi_k$('conversation', false);
       tmp0_serialDesc.addElement_5pzumi_k$('qualified_from', false);
       tmp0_serialDesc.addElement_5pzumi_k$('from', false);
       tmp0_serialDesc.addElement_5pzumi_k$('from_client_id', false);
       tmp0_serialDesc.addElement_5pzumi_k$('time', false);
       tmp0_serialDesc.addElement_5pzumi_k$('id', false);
       tmp0_serialDesc.addElement_5pzumi_k$('data', false);
+      tmp0_serialDesc.addElement_5pzumi_k$('reactions', false);
       this.descriptor_1 = tmp0_serialDesc;
     }
     protoOf($serializer_3).get_descriptor_wjt6a0_k$ = function () {
       return this.descriptor_1;
     };
     protoOf($serializer_3).childSerializers_5ghqw5_k$ = function () {
+      var tmp0_cached = Companion_getInstance_3().$childSerializers_1;
       // Inline function 'kotlin.arrayOf' call
       // Inline function 'kotlin.js.unsafeCast' call
       // Inline function 'kotlin.js.asDynamic' call
       return [
-        $serializer_getInstance(),
+        $serializer_getInstance_0(),
+        get_nullable($serializer_getInstance_0()),
         StringSerializer_getInstance(),
-        get_nullable($serializer_getInstance()),
-        StringSerializer_getInstance(),
-        StringSerializer_getInstance(),
+        get_nullable(StringSerializer_getInstance()),
         StringSerializer_getInstance(),
         StringSerializer_getInstance(),
         $serializer_getInstance_7(),
+        get_nullable(tmp0_cached[7]),
       ];
     };
     protoOf($serializer_3).deserialize_sy6x50_k$ = function (decoder) {
@@ -1322,35 +1031,46 @@
       var tmp10_local6 = null;
       var tmp11_local7 = null;
       var tmp12_input = decoder.beginStructure_yljocp_k$(tmp0_desc);
+      var tmp13_cached = Companion_getInstance_3().$childSerializers_1;
       if (tmp12_input.decodeSequentially_xlblqy_k$()) {
         tmp4_local0 = tmp12_input.decodeSerializableElement_uahnnv_k$(
           tmp0_desc,
           0,
-          $serializer_getInstance(),
+          $serializer_getInstance_0(),
           tmp4_local0,
         );
         tmp3_bitMask0 = tmp3_bitMask0 | 1;
-        tmp5_local1 = tmp12_input.decodeStringElement_3oenpg_k$(tmp0_desc, 1);
-        tmp3_bitMask0 = tmp3_bitMask0 | 2;
-        tmp6_local2 = tmp12_input.decodeNullableSerializableElement_k2y6ab_k$(
+        tmp5_local1 = tmp12_input.decodeNullableSerializableElement_k2y6ab_k$(
           tmp0_desc,
-          2,
-          $serializer_getInstance(),
-          tmp6_local2,
+          1,
+          $serializer_getInstance_0(),
+          tmp5_local1,
         );
+        tmp3_bitMask0 = tmp3_bitMask0 | 2;
+        tmp6_local2 = tmp12_input.decodeStringElement_3oenpg_k$(tmp0_desc, 2);
         tmp3_bitMask0 = tmp3_bitMask0 | 4;
-        tmp7_local3 = tmp12_input.decodeStringElement_3oenpg_k$(tmp0_desc, 3);
+        tmp7_local3 = tmp12_input.decodeNullableSerializableElement_k2y6ab_k$(
+          tmp0_desc,
+          3,
+          StringSerializer_getInstance(),
+          tmp7_local3,
+        );
         tmp3_bitMask0 = tmp3_bitMask0 | 8;
         tmp8_local4 = tmp12_input.decodeStringElement_3oenpg_k$(tmp0_desc, 4);
         tmp3_bitMask0 = tmp3_bitMask0 | 16;
         tmp9_local5 = tmp12_input.decodeStringElement_3oenpg_k$(tmp0_desc, 5);
         tmp3_bitMask0 = tmp3_bitMask0 | 32;
-        tmp10_local6 = tmp12_input.decodeStringElement_3oenpg_k$(tmp0_desc, 6);
+        tmp10_local6 = tmp12_input.decodeSerializableElement_uahnnv_k$(
+          tmp0_desc,
+          6,
+          $serializer_getInstance_7(),
+          tmp10_local6,
+        );
         tmp3_bitMask0 = tmp3_bitMask0 | 64;
-        tmp11_local7 = tmp12_input.decodeSerializableElement_uahnnv_k$(
+        tmp11_local7 = tmp12_input.decodeNullableSerializableElement_k2y6ab_k$(
           tmp0_desc,
           7,
-          $serializer_getInstance_7(),
+          tmp13_cached[7],
           tmp11_local7,
         );
         tmp3_bitMask0 = tmp3_bitMask0 | 128;
@@ -1365,26 +1085,31 @@
               tmp4_local0 = tmp12_input.decodeSerializableElement_uahnnv_k$(
                 tmp0_desc,
                 0,
-                $serializer_getInstance(),
+                $serializer_getInstance_0(),
                 tmp4_local0,
               );
               tmp3_bitMask0 = tmp3_bitMask0 | 1;
               break;
             case 1:
-              tmp5_local1 = tmp12_input.decodeStringElement_3oenpg_k$(tmp0_desc, 1);
+              tmp5_local1 = tmp12_input.decodeNullableSerializableElement_k2y6ab_k$(
+                tmp0_desc,
+                1,
+                $serializer_getInstance_0(),
+                tmp5_local1,
+              );
               tmp3_bitMask0 = tmp3_bitMask0 | 2;
               break;
             case 2:
-              tmp6_local2 = tmp12_input.decodeNullableSerializableElement_k2y6ab_k$(
-                tmp0_desc,
-                2,
-                $serializer_getInstance(),
-                tmp6_local2,
-              );
+              tmp6_local2 = tmp12_input.decodeStringElement_3oenpg_k$(tmp0_desc, 2);
               tmp3_bitMask0 = tmp3_bitMask0 | 4;
               break;
             case 3:
-              tmp7_local3 = tmp12_input.decodeStringElement_3oenpg_k$(tmp0_desc, 3);
+              tmp7_local3 = tmp12_input.decodeNullableSerializableElement_k2y6ab_k$(
+                tmp0_desc,
+                3,
+                StringSerializer_getInstance(),
+                tmp7_local3,
+              );
               tmp3_bitMask0 = tmp3_bitMask0 | 8;
               break;
             case 4:
@@ -1396,14 +1121,19 @@
               tmp3_bitMask0 = tmp3_bitMask0 | 32;
               break;
             case 6:
-              tmp10_local6 = tmp12_input.decodeStringElement_3oenpg_k$(tmp0_desc, 6);
+              tmp10_local6 = tmp12_input.decodeSerializableElement_uahnnv_k$(
+                tmp0_desc,
+                6,
+                $serializer_getInstance_7(),
+                tmp10_local6,
+              );
               tmp3_bitMask0 = tmp3_bitMask0 | 64;
               break;
             case 7:
-              tmp11_local7 = tmp12_input.decodeSerializableElement_uahnnv_k$(
+              tmp11_local7 = tmp12_input.decodeNullableSerializableElement_k2y6ab_k$(
                 tmp0_desc,
                 7,
-                $serializer_getInstance_7(),
+                tmp13_cached[7],
                 tmp11_local7,
               );
               tmp3_bitMask0 = tmp3_bitMask0 | 128;
@@ -1413,7 +1143,7 @@
           }
         }
       tmp12_input.endStructure_1xqz0n_k$(tmp0_desc);
-      return KnockMessage_init_$Create$(
+      return AssetMessage_init_$Create$(
         tmp3_bitMask0,
         tmp4_local0,
         tmp5_local1,
@@ -1426,41 +1156,279 @@
         null,
       );
     };
-    protoOf($serializer_3).serialize_y9cnb3_k$ = function (encoder, value) {
+    protoOf($serializer_3).serialize_aalcpp_k$ = function (encoder, value) {
       var tmp0_desc = this.descriptor_1;
       var tmp1_output = encoder.beginStructure_yljocp_k$(tmp0_desc);
+      var tmp2_cached = Companion_getInstance_3().$childSerializers_1;
       tmp1_output.encodeSerializableElement_isqxcl_k$(
         tmp0_desc,
         0,
-        $serializer_getInstance(),
+        $serializer_getInstance_0(),
         value.qualifiedConversation_1,
       );
-      tmp1_output.encodeStringElement_1n5wu2_k$(tmp0_desc, 1, value.conversation_1);
       tmp1_output.encodeNullableSerializableElement_5lquiv_k$(
         tmp0_desc,
-        2,
-        $serializer_getInstance(),
+        1,
+        $serializer_getInstance_0(),
         value.qualifiedFrom_1,
       );
-      tmp1_output.encodeStringElement_1n5wu2_k$(tmp0_desc, 3, value.from_1);
-      tmp1_output.encodeStringElement_1n5wu2_k$(tmp0_desc, 4, value.fromClientId_1);
-      tmp1_output.encodeStringElement_1n5wu2_k$(tmp0_desc, 5, value.time_1);
-      tmp1_output.encodeStringElement_1n5wu2_k$(tmp0_desc, 6, value.id_1);
-      tmp1_output.encodeSerializableElement_isqxcl_k$(tmp0_desc, 7, $serializer_getInstance_7(), value.data_1);
+      tmp1_output.encodeStringElement_1n5wu2_k$(tmp0_desc, 2, value.from_1);
+      tmp1_output.encodeNullableSerializableElement_5lquiv_k$(
+        tmp0_desc,
+        3,
+        StringSerializer_getInstance(),
+        value.fromClientId_1,
+      );
+      tmp1_output.encodeStringElement_1n5wu2_k$(tmp0_desc, 4, value.time_1);
+      tmp1_output.encodeStringElement_1n5wu2_k$(tmp0_desc, 5, value.id_1);
+      tmp1_output.encodeSerializableElement_isqxcl_k$(tmp0_desc, 6, $serializer_getInstance_7(), value.data_1);
+      tmp1_output.encodeNullableSerializableElement_5lquiv_k$(tmp0_desc, 7, tmp2_cached[7], value.reactions_1);
       tmp1_output.endStructure_1xqz0n_k$(tmp0_desc);
     };
     protoOf($serializer_3).serialize_5ase3y_k$ = function (encoder, value) {
-      return this.serialize_y9cnb3_k$(encoder, value instanceof KnockMessage ? value : THROW_CCE());
+      return this.serialize_aalcpp_k$(encoder, value instanceof AssetMessage ? value : THROW_CCE());
     };
     var $serializer_instance_3;
     function $serializer_getInstance_3() {
       if ($serializer_instance_3 == null) new $serializer_3();
       return $serializer_instance_3;
     }
+    function AssetMessage_init_$Init$(
+      seen1,
+      qualifiedConversation,
+      qualifiedFrom,
+      from,
+      fromClientId,
+      time,
+      id,
+      data,
+      reactions,
+      serializationConstructorMarker,
+      $this,
+    ) {
+      if (!(255 === (255 & seen1))) {
+        throwMissingFieldException(seen1, 255, $serializer_getInstance_3().descriptor_1);
+      }
+      Conversation_init_$Init$(seen1, serializationConstructorMarker, $this);
+      $this.qualifiedConversation_1 = qualifiedConversation;
+      $this.qualifiedFrom_1 = qualifiedFrom;
+      $this.from_1 = from;
+      $this.fromClientId_1 = fromClientId;
+      $this.time_1 = time;
+      $this.id_1 = id;
+      $this.data_1 = data;
+      $this.reactions_1 = reactions;
+      return $this;
+    }
+    function AssetMessage_init_$Create$(
+      seen1,
+      qualifiedConversation,
+      qualifiedFrom,
+      from,
+      fromClientId,
+      time,
+      id,
+      data,
+      reactions,
+      serializationConstructorMarker,
+    ) {
+      return AssetMessage_init_$Init$(
+        seen1,
+        qualifiedConversation,
+        qualifiedFrom,
+        from,
+        fromClientId,
+        time,
+        id,
+        data,
+        reactions,
+        serializationConstructorMarker,
+        objectCreate(protoOf(AssetMessage)),
+      );
+    }
+    function Companion_4() {
+      Companion_instance_4 = this;
+    }
+    protoOf(Companion_4).serializer_9w0wvi_k$ = function () {
+      return $serializer_getInstance_4();
+    };
+    var Companion_instance_4;
+    function Companion_getInstance_4() {
+      if (Companion_instance_4 == null) new Companion_4();
+      return Companion_instance_4;
+    }
+    function $serializer_4() {
+      $serializer_instance_4 = this;
+      var tmp0_serialDesc = new PluginGeneratedSerialDescriptor('conversation.knock', this, 7);
+      tmp0_serialDesc.addElement_5pzumi_k$('qualified_conversation', false);
+      tmp0_serialDesc.addElement_5pzumi_k$('qualified_from', false);
+      tmp0_serialDesc.addElement_5pzumi_k$('from', false);
+      tmp0_serialDesc.addElement_5pzumi_k$('from_client_id', false);
+      tmp0_serialDesc.addElement_5pzumi_k$('time', false);
+      tmp0_serialDesc.addElement_5pzumi_k$('id', false);
+      tmp0_serialDesc.addElement_5pzumi_k$('data', false);
+      this.descriptor_1 = tmp0_serialDesc;
+    }
+    protoOf($serializer_4).get_descriptor_wjt6a0_k$ = function () {
+      return this.descriptor_1;
+    };
+    protoOf($serializer_4).childSerializers_5ghqw5_k$ = function () {
+      // Inline function 'kotlin.arrayOf' call
+      // Inline function 'kotlin.js.unsafeCast' call
+      // Inline function 'kotlin.js.asDynamic' call
+      return [
+        $serializer_getInstance_0(),
+        get_nullable($serializer_getInstance_0()),
+        StringSerializer_getInstance(),
+        StringSerializer_getInstance(),
+        StringSerializer_getInstance(),
+        StringSerializer_getInstance(),
+        $serializer_getInstance_8(),
+      ];
+    };
+    protoOf($serializer_4).deserialize_sy6x50_k$ = function (decoder) {
+      var tmp0_desc = this.descriptor_1;
+      var tmp1_flag = true;
+      var tmp2_index = 0;
+      var tmp3_bitMask0 = 0;
+      var tmp4_local0 = null;
+      var tmp5_local1 = null;
+      var tmp6_local2 = null;
+      var tmp7_local3 = null;
+      var tmp8_local4 = null;
+      var tmp9_local5 = null;
+      var tmp10_local6 = null;
+      var tmp11_input = decoder.beginStructure_yljocp_k$(tmp0_desc);
+      if (tmp11_input.decodeSequentially_xlblqy_k$()) {
+        tmp4_local0 = tmp11_input.decodeSerializableElement_uahnnv_k$(
+          tmp0_desc,
+          0,
+          $serializer_getInstance_0(),
+          tmp4_local0,
+        );
+        tmp3_bitMask0 = tmp3_bitMask0 | 1;
+        tmp5_local1 = tmp11_input.decodeNullableSerializableElement_k2y6ab_k$(
+          tmp0_desc,
+          1,
+          $serializer_getInstance_0(),
+          tmp5_local1,
+        );
+        tmp3_bitMask0 = tmp3_bitMask0 | 2;
+        tmp6_local2 = tmp11_input.decodeStringElement_3oenpg_k$(tmp0_desc, 2);
+        tmp3_bitMask0 = tmp3_bitMask0 | 4;
+        tmp7_local3 = tmp11_input.decodeStringElement_3oenpg_k$(tmp0_desc, 3);
+        tmp3_bitMask0 = tmp3_bitMask0 | 8;
+        tmp8_local4 = tmp11_input.decodeStringElement_3oenpg_k$(tmp0_desc, 4);
+        tmp3_bitMask0 = tmp3_bitMask0 | 16;
+        tmp9_local5 = tmp11_input.decodeStringElement_3oenpg_k$(tmp0_desc, 5);
+        tmp3_bitMask0 = tmp3_bitMask0 | 32;
+        tmp10_local6 = tmp11_input.decodeSerializableElement_uahnnv_k$(
+          tmp0_desc,
+          6,
+          $serializer_getInstance_8(),
+          tmp10_local6,
+        );
+        tmp3_bitMask0 = tmp3_bitMask0 | 64;
+      } else
+        while (tmp1_flag) {
+          tmp2_index = tmp11_input.decodeElementIndex_bstkhp_k$(tmp0_desc);
+          switch (tmp2_index) {
+            case -1:
+              tmp1_flag = false;
+              break;
+            case 0:
+              tmp4_local0 = tmp11_input.decodeSerializableElement_uahnnv_k$(
+                tmp0_desc,
+                0,
+                $serializer_getInstance_0(),
+                tmp4_local0,
+              );
+              tmp3_bitMask0 = tmp3_bitMask0 | 1;
+              break;
+            case 1:
+              tmp5_local1 = tmp11_input.decodeNullableSerializableElement_k2y6ab_k$(
+                tmp0_desc,
+                1,
+                $serializer_getInstance_0(),
+                tmp5_local1,
+              );
+              tmp3_bitMask0 = tmp3_bitMask0 | 2;
+              break;
+            case 2:
+              tmp6_local2 = tmp11_input.decodeStringElement_3oenpg_k$(tmp0_desc, 2);
+              tmp3_bitMask0 = tmp3_bitMask0 | 4;
+              break;
+            case 3:
+              tmp7_local3 = tmp11_input.decodeStringElement_3oenpg_k$(tmp0_desc, 3);
+              tmp3_bitMask0 = tmp3_bitMask0 | 8;
+              break;
+            case 4:
+              tmp8_local4 = tmp11_input.decodeStringElement_3oenpg_k$(tmp0_desc, 4);
+              tmp3_bitMask0 = tmp3_bitMask0 | 16;
+              break;
+            case 5:
+              tmp9_local5 = tmp11_input.decodeStringElement_3oenpg_k$(tmp0_desc, 5);
+              tmp3_bitMask0 = tmp3_bitMask0 | 32;
+              break;
+            case 6:
+              tmp10_local6 = tmp11_input.decodeSerializableElement_uahnnv_k$(
+                tmp0_desc,
+                6,
+                $serializer_getInstance_8(),
+                tmp10_local6,
+              );
+              tmp3_bitMask0 = tmp3_bitMask0 | 64;
+              break;
+            default:
+              throw UnknownFieldException_init_$Create$(tmp2_index);
+          }
+        }
+      tmp11_input.endStructure_1xqz0n_k$(tmp0_desc);
+      return KnockMessage_init_$Create$(
+        tmp3_bitMask0,
+        tmp4_local0,
+        tmp5_local1,
+        tmp6_local2,
+        tmp7_local3,
+        tmp8_local4,
+        tmp9_local5,
+        tmp10_local6,
+        null,
+      );
+    };
+    protoOf($serializer_4).serialize_y9cnb3_k$ = function (encoder, value) {
+      var tmp0_desc = this.descriptor_1;
+      var tmp1_output = encoder.beginStructure_yljocp_k$(tmp0_desc);
+      tmp1_output.encodeSerializableElement_isqxcl_k$(
+        tmp0_desc,
+        0,
+        $serializer_getInstance_0(),
+        value.qualifiedConversation_1,
+      );
+      tmp1_output.encodeNullableSerializableElement_5lquiv_k$(
+        tmp0_desc,
+        1,
+        $serializer_getInstance_0(),
+        value.qualifiedFrom_1,
+      );
+      tmp1_output.encodeStringElement_1n5wu2_k$(tmp0_desc, 2, value.from_1);
+      tmp1_output.encodeStringElement_1n5wu2_k$(tmp0_desc, 3, value.fromClientId_1);
+      tmp1_output.encodeStringElement_1n5wu2_k$(tmp0_desc, 4, value.time_1);
+      tmp1_output.encodeStringElement_1n5wu2_k$(tmp0_desc, 5, value.id_1);
+      tmp1_output.encodeSerializableElement_isqxcl_k$(tmp0_desc, 6, $serializer_getInstance_8(), value.data_1);
+      tmp1_output.endStructure_1xqz0n_k$(tmp0_desc);
+    };
+    protoOf($serializer_4).serialize_5ase3y_k$ = function (encoder, value) {
+      return this.serialize_y9cnb3_k$(encoder, value instanceof KnockMessage ? value : THROW_CCE());
+    };
+    var $serializer_instance_4;
+    function $serializer_getInstance_4() {
+      if ($serializer_instance_4 == null) new $serializer_4();
+      return $serializer_instance_4;
+    }
     function KnockMessage_init_$Init$(
       seen1,
       qualifiedConversation,
-      conversation,
       qualifiedFrom,
       from,
       fromClientId,
@@ -1470,11 +1438,11 @@
       serializationConstructorMarker,
       $this,
     ) {
-      if (!(255 === (255 & seen1))) {
-        throwMissingFieldException(seen1, 255, $serializer_getInstance_3().descriptor_1);
+      if (!(127 === (127 & seen1))) {
+        throwMissingFieldException(seen1, 127, $serializer_getInstance_4().descriptor_1);
       }
+      Conversation_init_$Init$(seen1, serializationConstructorMarker, $this);
       $this.qualifiedConversation_1 = qualifiedConversation;
-      $this.conversation_1 = conversation;
       $this.qualifiedFrom_1 = qualifiedFrom;
       $this.from_1 = from;
       $this.fromClientId_1 = fromClientId;
@@ -1486,7 +1454,6 @@
     function KnockMessage_init_$Create$(
       seen1,
       qualifiedConversation,
-      conversation,
       qualifiedFrom,
       from,
       fromClientId,
@@ -1498,7 +1465,6 @@
       return KnockMessage_init_$Init$(
         seen1,
         qualifiedConversation,
-        conversation,
         qualifiedFrom,
         from,
         fromClientId,
@@ -1509,10 +1475,40 @@
         objectCreate(protoOf(KnockMessage)),
       );
     }
-    function NewGroup(qualifiedConversation, conversation, qualifiedFrom, from, members, time) {
-      Companion_getInstance_0();
+    function _get_$cachedSerializer__te6jhj($this) {
+      return $this.$cachedSerializer$delegate_1.get_value_j01efc_k$();
+    }
+    function WebEventContent$Conversation$Companion$_anonymous__trxmmz() {
+      var tmp = getKClass(Conversation);
+      // Inline function 'kotlin.arrayOf' call
+      // Inline function 'kotlin.js.unsafeCast' call
+      // Inline function 'kotlin.js.asDynamic' call
+      var tmp_0 = [getKClass(AssetMessage), getKClass(KnockMessage), getKClass(NewGroup), getKClass(TextMessage)];
+      // Inline function 'kotlin.arrayOf' call
+      // Inline function 'kotlin.js.unsafeCast' call
+      // Inline function 'kotlin.js.asDynamic' call
+      var tmp_1 = [
+        $serializer_getInstance_3(),
+        $serializer_getInstance_4(),
+        $serializer_getInstance_1(),
+        $serializer_getInstance_2(),
+      ];
+      // Inline function 'kotlin.arrayOf' call
+      // Inline function 'kotlin.js.unsafeCast' call
+      // Inline function 'kotlin.js.asDynamic' call
+      var tmp$ret$8 = [];
+      return SealedClassSerializer_init_$Create$(
+        'com.wire.kalium.logic.data.web.WebEventContent.Conversation',
+        tmp,
+        tmp_0,
+        tmp_1,
+        tmp$ret$8,
+      );
+    }
+    function NewGroup(qualifiedConversation, qualifiedFrom, from, members, time) {
+      Companion_getInstance_1();
+      Conversation.call(this);
       this.qualifiedConversation_1 = qualifiedConversation;
-      this.conversation_1 = conversation;
       this.qualifiedFrom_1 = qualifiedFrom;
       this.from_1 = from;
       this.members_1 = members;
@@ -1520,9 +1516,6 @@
     }
     protoOf(NewGroup).get_qualifiedConversation_iu3gmi_k$ = function () {
       return this.qualifiedConversation_1;
-    };
-    protoOf(NewGroup).get_conversation_gs8dl8_k$ = function () {
-      return this.conversation_1;
     };
     protoOf(NewGroup).get_qualifiedFrom_aop3nn_k$ = function () {
       return this.qualifiedFrom_1;
@@ -1540,33 +1533,22 @@
       return this.qualifiedConversation_1;
     };
     protoOf(NewGroup).component2_7eebsb_k$ = function () {
-      return this.conversation_1;
-    };
-    protoOf(NewGroup).component3_7eebsa_k$ = function () {
       return this.qualifiedFrom_1;
     };
-    protoOf(NewGroup).component4_7eebs9_k$ = function () {
+    protoOf(NewGroup).component3_7eebsa_k$ = function () {
       return this.from_1;
     };
-    protoOf(NewGroup).component5_7eebs8_k$ = function () {
+    protoOf(NewGroup).component4_7eebs9_k$ = function () {
       return this.members_1;
     };
-    protoOf(NewGroup).component6_7eebs7_k$ = function () {
+    protoOf(NewGroup).component5_7eebs8_k$ = function () {
       return this.time_1;
     };
-    protoOf(NewGroup).copy_1gp9p_k$ = function (
-      qualifiedConversation,
-      conversation,
-      qualifiedFrom,
-      from,
-      members,
-      time,
-    ) {
-      return new NewGroup(qualifiedConversation, conversation, qualifiedFrom, from, members, time);
+    protoOf(NewGroup).copy_z0d4et_k$ = function (qualifiedConversation, qualifiedFrom, from, members, time) {
+      return new NewGroup(qualifiedConversation, qualifiedFrom, from, members, time);
     };
-    protoOf(NewGroup).copy$default_g63tu5_k$ = function (
+    protoOf(NewGroup).copy$default_jj4tke_k$ = function (
       qualifiedConversation,
-      conversation,
       qualifiedFrom,
       from,
       members,
@@ -1574,21 +1556,18 @@
       $super,
     ) {
       qualifiedConversation = qualifiedConversation === VOID ? this.qualifiedConversation_1 : qualifiedConversation;
-      conversation = conversation === VOID ? this.conversation_1 : conversation;
       qualifiedFrom = qualifiedFrom === VOID ? this.qualifiedFrom_1 : qualifiedFrom;
       from = from === VOID ? this.from_1 : from;
       members = members === VOID ? this.members_1 : members;
       time = time === VOID ? this.time_1 : time;
       return $super === VOID
-        ? this.copy_1gp9p_k$(qualifiedConversation, conversation, qualifiedFrom, from, members, time)
-        : $super.copy_1gp9p_k$.call(this, qualifiedConversation, conversation, qualifiedFrom, from, members, time);
+        ? this.copy_z0d4et_k$(qualifiedConversation, qualifiedFrom, from, members, time)
+        : $super.copy_z0d4et_k$.call(this, qualifiedConversation, qualifiedFrom, from, members, time);
     };
     protoOf(NewGroup).toString = function () {
       return (
         'NewGroup(qualifiedConversation=' +
         this.qualifiedConversation_1 +
-        ', conversation=' +
-        this.conversation_1 +
         ', qualifiedFrom=' +
         this.qualifiedFrom_1 +
         ', from=' +
@@ -1602,7 +1581,6 @@
     };
     protoOf(NewGroup).hashCode = function () {
       var result = this.qualifiedConversation_1.hashCode();
-      result = (imul(result, 31) + getStringHashCode(this.conversation_1)) | 0;
       result = (imul(result, 31) + (this.qualifiedFrom_1 == null ? 0 : this.qualifiedFrom_1.hashCode())) | 0;
       result = (imul(result, 31) + getStringHashCode(this.from_1)) | 0;
       result = (imul(result, 31) + this.members_1.hashCode()) | 0;
@@ -1614,28 +1592,16 @@
       if (!(other instanceof NewGroup)) return false;
       var tmp0_other_with_cast = other instanceof NewGroup ? other : THROW_CCE();
       if (!this.qualifiedConversation_1.equals(tmp0_other_with_cast.qualifiedConversation_1)) return false;
-      if (!(this.conversation_1 === tmp0_other_with_cast.conversation_1)) return false;
       if (!equals(this.qualifiedFrom_1, tmp0_other_with_cast.qualifiedFrom_1)) return false;
       if (!(this.from_1 === tmp0_other_with_cast.from_1)) return false;
       if (!this.members_1.equals(tmp0_other_with_cast.members_1)) return false;
       if (!(this.time_1 === tmp0_other_with_cast.time_1)) return false;
       return true;
     };
-    function TextMessage(
-      qualifiedConversation,
-      conversation,
-      qualifiedFrom,
-      from,
-      fromClientId,
-      time,
-      id,
-      data,
-      reactions,
-      category,
-    ) {
-      Companion_getInstance_1();
+    function TextMessage(qualifiedConversation, qualifiedFrom, from, fromClientId, time, id, data, reactions) {
+      Companion_getInstance_2();
+      Conversation.call(this);
       this.qualifiedConversation_1 = qualifiedConversation;
-      this.conversation_1 = conversation;
       this.qualifiedFrom_1 = qualifiedFrom;
       this.from_1 = from;
       this.fromClientId_1 = fromClientId;
@@ -1643,13 +1609,9 @@
       this.id_1 = id;
       this.data_1 = data;
       this.reactions_1 = reactions;
-      this.category_1 = category;
     }
     protoOf(TextMessage).get_qualifiedConversation_iu3gmi_k$ = function () {
       return this.qualifiedConversation_1;
-    };
-    protoOf(TextMessage).get_conversation_gs8dl8_k$ = function () {
-      return this.conversation_1;
     };
     protoOf(TextMessage).get_qualifiedFrom_aop3nn_k$ = function () {
       return this.qualifiedFrom_1;
@@ -1672,42 +1634,32 @@
     protoOf(TextMessage).get_reactions_a22x4v_k$ = function () {
       return this.reactions_1;
     };
-    protoOf(TextMessage).get_category_uyv41l_k$ = function () {
-      return this.category_1;
-    };
     protoOf(TextMessage).component1_7eebsc_k$ = function () {
       return this.qualifiedConversation_1;
     };
     protoOf(TextMessage).component2_7eebsb_k$ = function () {
-      return this.conversation_1;
-    };
-    protoOf(TextMessage).component3_7eebsa_k$ = function () {
       return this.qualifiedFrom_1;
     };
-    protoOf(TextMessage).component4_7eebs9_k$ = function () {
+    protoOf(TextMessage).component3_7eebsa_k$ = function () {
       return this.from_1;
     };
-    protoOf(TextMessage).component5_7eebs8_k$ = function () {
+    protoOf(TextMessage).component4_7eebs9_k$ = function () {
       return this.fromClientId_1;
     };
-    protoOf(TextMessage).component6_7eebs7_k$ = function () {
+    protoOf(TextMessage).component5_7eebs8_k$ = function () {
       return this.time_1;
     };
-    protoOf(TextMessage).component7_7eebs6_k$ = function () {
+    protoOf(TextMessage).component6_7eebs7_k$ = function () {
       return this.id_1;
     };
-    protoOf(TextMessage).component8_7eebs5_k$ = function () {
+    protoOf(TextMessage).component7_7eebs6_k$ = function () {
       return this.data_1;
     };
-    protoOf(TextMessage).component9_7eebs4_k$ = function () {
+    protoOf(TextMessage).component8_7eebs5_k$ = function () {
       return this.reactions_1;
     };
-    protoOf(TextMessage).component10_gazzfo_k$ = function () {
-      return this.category_1;
-    };
-    protoOf(TextMessage).copy_ypur19_k$ = function (
+    protoOf(TextMessage).copy_m4os62_k$ = function (
       qualifiedConversation,
-      conversation,
       qualifiedFrom,
       from,
       fromClientId,
@@ -1715,24 +1667,11 @@
       id,
       data,
       reactions,
-      category,
     ) {
-      return new TextMessage(
-        qualifiedConversation,
-        conversation,
-        qualifiedFrom,
-        from,
-        fromClientId,
-        time,
-        id,
-        data,
-        reactions,
-        category,
-      );
+      return new TextMessage(qualifiedConversation, qualifiedFrom, from, fromClientId, time, id, data, reactions);
     };
-    protoOf(TextMessage).copy$default_sxp22m_k$ = function (
+    protoOf(TextMessage).copy$default_eb6jjf_k$ = function (
       qualifiedConversation,
-      conversation,
       qualifiedFrom,
       from,
       fromClientId,
@@ -1740,11 +1679,9 @@
       id,
       data,
       reactions,
-      category,
       $super,
     ) {
       qualifiedConversation = qualifiedConversation === VOID ? this.qualifiedConversation_1 : qualifiedConversation;
-      conversation = conversation === VOID ? this.conversation_1 : conversation;
       qualifiedFrom = qualifiedFrom === VOID ? this.qualifiedFrom_1 : qualifiedFrom;
       from = from === VOID ? this.from_1 : from;
       fromClientId = fromClientId === VOID ? this.fromClientId_1 : fromClientId;
@@ -1752,24 +1689,11 @@
       id = id === VOID ? this.id_1 : id;
       data = data === VOID ? this.data_1 : data;
       reactions = reactions === VOID ? this.reactions_1 : reactions;
-      category = category === VOID ? this.category_1 : category;
       return $super === VOID
-        ? this.copy_ypur19_k$(
-            qualifiedConversation,
-            conversation,
-            qualifiedFrom,
-            from,
-            fromClientId,
-            time,
-            id,
-            data,
-            reactions,
-            category,
-          )
-        : $super.copy_ypur19_k$.call(
+        ? this.copy_m4os62_k$(qualifiedConversation, qualifiedFrom, from, fromClientId, time, id, data, reactions)
+        : $super.copy_m4os62_k$.call(
             this,
             qualifiedConversation,
-            conversation,
             qualifiedFrom,
             from,
             fromClientId,
@@ -1777,15 +1701,12 @@
             id,
             data,
             reactions,
-            category,
           );
     };
     protoOf(TextMessage).toString = function () {
       return (
         'TextMessage(qualifiedConversation=' +
         this.qualifiedConversation_1 +
-        ', conversation=' +
-        this.conversation_1 +
         ', qualifiedFrom=' +
         this.qualifiedFrom_1 +
         ', from=' +
@@ -1800,14 +1721,11 @@
         this.data_1 +
         ', reactions=' +
         this.reactions_1 +
-        ', category=' +
-        this.category_1 +
         ')'
       );
     };
     protoOf(TextMessage).hashCode = function () {
       var result = this.qualifiedConversation_1.hashCode();
-      result = (imul(result, 31) + getStringHashCode(this.conversation_1)) | 0;
       result = (imul(result, 31) + (this.qualifiedFrom_1 == null ? 0 : this.qualifiedFrom_1.hashCode())) | 0;
       result = (imul(result, 31) + getStringHashCode(this.from_1)) | 0;
       result = (imul(result, 31) + (this.fromClientId_1 == null ? 0 : getStringHashCode(this.fromClientId_1))) | 0;
@@ -1815,7 +1733,6 @@
       result = (imul(result, 31) + getStringHashCode(this.id_1)) | 0;
       result = (imul(result, 31) + this.data_1.hashCode()) | 0;
       result = (imul(result, 31) + (this.reactions_1 == null ? 0 : hashCode(this.reactions_1))) | 0;
-      result = (imul(result, 31) + (this.category_1 == null ? 0 : this.category_1)) | 0;
       return result;
     };
     protoOf(TextMessage).equals = function (other) {
@@ -1823,7 +1740,6 @@
       if (!(other instanceof TextMessage)) return false;
       var tmp0_other_with_cast = other instanceof TextMessage ? other : THROW_CCE();
       if (!this.qualifiedConversation_1.equals(tmp0_other_with_cast.qualifiedConversation_1)) return false;
-      if (!(this.conversation_1 === tmp0_other_with_cast.conversation_1)) return false;
       if (!equals(this.qualifiedFrom_1, tmp0_other_with_cast.qualifiedFrom_1)) return false;
       if (!(this.from_1 === tmp0_other_with_cast.from_1)) return false;
       if (!(this.fromClientId_1 == tmp0_other_with_cast.fromClientId_1)) return false;
@@ -1831,23 +1747,12 @@
       if (!(this.id_1 === tmp0_other_with_cast.id_1)) return false;
       if (!this.data_1.equals(tmp0_other_with_cast.data_1)) return false;
       if (!equals(this.reactions_1, tmp0_other_with_cast.reactions_1)) return false;
-      if (!(this.category_1 == tmp0_other_with_cast.category_1)) return false;
       return true;
     };
-    function AssetMessage(
-      qualifiedConversation,
-      conversation,
-      qualifiedFrom,
-      from,
-      fromClientId,
-      time,
-      id,
-      data,
-      reactions,
-    ) {
-      Companion_getInstance_2();
+    function AssetMessage(qualifiedConversation, qualifiedFrom, from, fromClientId, time, id, data, reactions) {
+      Companion_getInstance_3();
+      Conversation.call(this);
       this.qualifiedConversation_1 = qualifiedConversation;
-      this.conversation_1 = conversation;
       this.qualifiedFrom_1 = qualifiedFrom;
       this.from_1 = from;
       this.fromClientId_1 = fromClientId;
@@ -1858,9 +1763,6 @@
     }
     protoOf(AssetMessage).get_qualifiedConversation_iu3gmi_k$ = function () {
       return this.qualifiedConversation_1;
-    };
-    protoOf(AssetMessage).get_conversation_gs8dl8_k$ = function () {
-      return this.conversation_1;
     };
     protoOf(AssetMessage).get_qualifiedFrom_aop3nn_k$ = function () {
       return this.qualifiedFrom_1;
@@ -1887,32 +1789,28 @@
       return this.qualifiedConversation_1;
     };
     protoOf(AssetMessage).component2_7eebsb_k$ = function () {
-      return this.conversation_1;
-    };
-    protoOf(AssetMessage).component3_7eebsa_k$ = function () {
       return this.qualifiedFrom_1;
     };
-    protoOf(AssetMessage).component4_7eebs9_k$ = function () {
+    protoOf(AssetMessage).component3_7eebsa_k$ = function () {
       return this.from_1;
     };
-    protoOf(AssetMessage).component5_7eebs8_k$ = function () {
+    protoOf(AssetMessage).component4_7eebs9_k$ = function () {
       return this.fromClientId_1;
     };
-    protoOf(AssetMessage).component6_7eebs7_k$ = function () {
+    protoOf(AssetMessage).component5_7eebs8_k$ = function () {
       return this.time_1;
     };
-    protoOf(AssetMessage).component7_7eebs6_k$ = function () {
+    protoOf(AssetMessage).component6_7eebs7_k$ = function () {
       return this.id_1;
     };
-    protoOf(AssetMessage).component8_7eebs5_k$ = function () {
+    protoOf(AssetMessage).component7_7eebs6_k$ = function () {
       return this.data_1;
     };
-    protoOf(AssetMessage).component9_7eebs4_k$ = function () {
+    protoOf(AssetMessage).component8_7eebs5_k$ = function () {
       return this.reactions_1;
     };
-    protoOf(AssetMessage).copy_bztjuf_k$ = function (
+    protoOf(AssetMessage).copy_f5to07_k$ = function (
       qualifiedConversation,
-      conversation,
       qualifiedFrom,
       from,
       fromClientId,
@@ -1921,21 +1819,10 @@
       data,
       reactions,
     ) {
-      return new AssetMessage(
-        qualifiedConversation,
-        conversation,
-        qualifiedFrom,
-        from,
-        fromClientId,
-        time,
-        id,
-        data,
-        reactions,
-      );
+      return new AssetMessage(qualifiedConversation, qualifiedFrom, from, fromClientId, time, id, data, reactions);
     };
-    protoOf(AssetMessage).copy$default_6t0ii6_k$ = function (
+    protoOf(AssetMessage).copy$default_wpmvkj_k$ = function (
       qualifiedConversation,
-      conversation,
       qualifiedFrom,
       from,
       fromClientId,
@@ -1946,7 +1833,6 @@
       $super,
     ) {
       qualifiedConversation = qualifiedConversation === VOID ? this.qualifiedConversation_1 : qualifiedConversation;
-      conversation = conversation === VOID ? this.conversation_1 : conversation;
       qualifiedFrom = qualifiedFrom === VOID ? this.qualifiedFrom_1 : qualifiedFrom;
       from = from === VOID ? this.from_1 : from;
       fromClientId = fromClientId === VOID ? this.fromClientId_1 : fromClientId;
@@ -1955,21 +1841,10 @@
       data = data === VOID ? this.data_1 : data;
       reactions = reactions === VOID ? this.reactions_1 : reactions;
       return $super === VOID
-        ? this.copy_bztjuf_k$(
-            qualifiedConversation,
-            conversation,
-            qualifiedFrom,
-            from,
-            fromClientId,
-            time,
-            id,
-            data,
-            reactions,
-          )
-        : $super.copy_bztjuf_k$.call(
+        ? this.copy_f5to07_k$(qualifiedConversation, qualifiedFrom, from, fromClientId, time, id, data, reactions)
+        : $super.copy_f5to07_k$.call(
             this,
             qualifiedConversation,
-            conversation,
             qualifiedFrom,
             from,
             fromClientId,
@@ -1983,8 +1858,6 @@
       return (
         'AssetMessage(qualifiedConversation=' +
         this.qualifiedConversation_1 +
-        ', conversation=' +
-        this.conversation_1 +
         ', qualifiedFrom=' +
         this.qualifiedFrom_1 +
         ', from=' +
@@ -2004,7 +1877,6 @@
     };
     protoOf(AssetMessage).hashCode = function () {
       var result = this.qualifiedConversation_1.hashCode();
-      result = (imul(result, 31) + getStringHashCode(this.conversation_1)) | 0;
       result = (imul(result, 31) + (this.qualifiedFrom_1 == null ? 0 : this.qualifiedFrom_1.hashCode())) | 0;
       result = (imul(result, 31) + getStringHashCode(this.from_1)) | 0;
       result = (imul(result, 31) + (this.fromClientId_1 == null ? 0 : getStringHashCode(this.fromClientId_1))) | 0;
@@ -2019,7 +1891,6 @@
       if (!(other instanceof AssetMessage)) return false;
       var tmp0_other_with_cast = other instanceof AssetMessage ? other : THROW_CCE();
       if (!this.qualifiedConversation_1.equals(tmp0_other_with_cast.qualifiedConversation_1)) return false;
-      if (!(this.conversation_1 === tmp0_other_with_cast.conversation_1)) return false;
       if (!equals(this.qualifiedFrom_1, tmp0_other_with_cast.qualifiedFrom_1)) return false;
       if (!(this.from_1 === tmp0_other_with_cast.from_1)) return false;
       if (!(this.fromClientId_1 == tmp0_other_with_cast.fromClientId_1)) return false;
@@ -2029,10 +1900,10 @@
       if (!equals(this.reactions_1, tmp0_other_with_cast.reactions_1)) return false;
       return true;
     };
-    function KnockMessage(qualifiedConversation, conversation, qualifiedFrom, from, fromClientId, time, id, data) {
-      Companion_getInstance_3();
+    function KnockMessage(qualifiedConversation, qualifiedFrom, from, fromClientId, time, id, data) {
+      Companion_getInstance_4();
+      Conversation.call(this);
       this.qualifiedConversation_1 = qualifiedConversation;
-      this.conversation_1 = conversation;
       this.qualifiedFrom_1 = qualifiedFrom;
       this.from_1 = from;
       this.fromClientId_1 = fromClientId;
@@ -2042,9 +1913,6 @@
     }
     protoOf(KnockMessage).get_qualifiedConversation_iu3gmi_k$ = function () {
       return this.qualifiedConversation_1;
-    };
-    protoOf(KnockMessage).get_conversation_gs8dl8_k$ = function () {
-      return this.conversation_1;
     };
     protoOf(KnockMessage).get_qualifiedFrom_aop3nn_k$ = function () {
       return this.qualifiedFrom_1;
@@ -2068,29 +1936,25 @@
       return this.qualifiedConversation_1;
     };
     protoOf(KnockMessage).component2_7eebsb_k$ = function () {
-      return this.conversation_1;
-    };
-    protoOf(KnockMessage).component3_7eebsa_k$ = function () {
       return this.qualifiedFrom_1;
     };
-    protoOf(KnockMessage).component4_7eebs9_k$ = function () {
+    protoOf(KnockMessage).component3_7eebsa_k$ = function () {
       return this.from_1;
     };
-    protoOf(KnockMessage).component5_7eebs8_k$ = function () {
+    protoOf(KnockMessage).component4_7eebs9_k$ = function () {
       return this.fromClientId_1;
     };
-    protoOf(KnockMessage).component6_7eebs7_k$ = function () {
+    protoOf(KnockMessage).component5_7eebs8_k$ = function () {
       return this.time_1;
     };
-    protoOf(KnockMessage).component7_7eebs6_k$ = function () {
+    protoOf(KnockMessage).component6_7eebs7_k$ = function () {
       return this.id_1;
     };
-    protoOf(KnockMessage).component8_7eebs5_k$ = function () {
+    protoOf(KnockMessage).component7_7eebs6_k$ = function () {
       return this.data_1;
     };
-    protoOf(KnockMessage).copy_2iome7_k$ = function (
+    protoOf(KnockMessage).copy_hs0yzl_k$ = function (
       qualifiedConversation,
-      conversation,
       qualifiedFrom,
       from,
       fromClientId,
@@ -2098,11 +1962,10 @@
       id,
       data,
     ) {
-      return new KnockMessage(qualifiedConversation, conversation, qualifiedFrom, from, fromClientId, time, id, data);
+      return new KnockMessage(qualifiedConversation, qualifiedFrom, from, fromClientId, time, id, data);
     };
-    protoOf(KnockMessage).copy$default_eoc4hd_k$ = function (
+    protoOf(KnockMessage).copy$default_5limgk_k$ = function (
       qualifiedConversation,
-      conversation,
       qualifiedFrom,
       from,
       fromClientId,
@@ -2112,7 +1975,6 @@
       $super,
     ) {
       qualifiedConversation = qualifiedConversation === VOID ? this.qualifiedConversation_1 : qualifiedConversation;
-      conversation = conversation === VOID ? this.conversation_1 : conversation;
       qualifiedFrom = qualifiedFrom === VOID ? this.qualifiedFrom_1 : qualifiedFrom;
       from = from === VOID ? this.from_1 : from;
       fromClientId = fromClientId === VOID ? this.fromClientId_1 : fromClientId;
@@ -2120,25 +1982,13 @@
       id = id === VOID ? this.id_1 : id;
       data = data === VOID ? this.data_1 : data;
       return $super === VOID
-        ? this.copy_2iome7_k$(qualifiedConversation, conversation, qualifiedFrom, from, fromClientId, time, id, data)
-        : $super.copy_2iome7_k$.call(
-            this,
-            qualifiedConversation,
-            conversation,
-            qualifiedFrom,
-            from,
-            fromClientId,
-            time,
-            id,
-            data,
-          );
+        ? this.copy_hs0yzl_k$(qualifiedConversation, qualifiedFrom, from, fromClientId, time, id, data)
+        : $super.copy_hs0yzl_k$.call(this, qualifiedConversation, qualifiedFrom, from, fromClientId, time, id, data);
     };
     protoOf(KnockMessage).toString = function () {
       return (
         'KnockMessage(qualifiedConversation=' +
         this.qualifiedConversation_1 +
-        ', conversation=' +
-        this.conversation_1 +
         ', qualifiedFrom=' +
         this.qualifiedFrom_1 +
         ', from=' +
@@ -2156,7 +2006,6 @@
     };
     protoOf(KnockMessage).hashCode = function () {
       var result = this.qualifiedConversation_1.hashCode();
-      result = (imul(result, 31) + getStringHashCode(this.conversation_1)) | 0;
       result = (imul(result, 31) + (this.qualifiedFrom_1 == null ? 0 : this.qualifiedFrom_1.hashCode())) | 0;
       result = (imul(result, 31) + getStringHashCode(this.from_1)) | 0;
       result = (imul(result, 31) + getStringHashCode(this.fromClientId_1)) | 0;
@@ -2170,7 +2019,6 @@
       if (!(other instanceof KnockMessage)) return false;
       var tmp0_other_with_cast = other instanceof KnockMessage ? other : THROW_CCE();
       if (!this.qualifiedConversation_1.equals(tmp0_other_with_cast.qualifiedConversation_1)) return false;
-      if (!(this.conversation_1 === tmp0_other_with_cast.conversation_1)) return false;
       if (!equals(this.qualifiedFrom_1, tmp0_other_with_cast.qualifiedFrom_1)) return false;
       if (!(this.from_1 === tmp0_other_with_cast.from_1)) return false;
       if (!(this.fromClientId_1 === tmp0_other_with_cast.fromClientId_1)) return false;
@@ -2179,45 +2027,31 @@
       if (!this.data_1.equals(tmp0_other_with_cast.data_1)) return false;
       return true;
     };
-    function Companion_4() {
-      Companion_instance_4 = this;
+    function Companion_5() {
+      Companion_instance_5 = this;
+      var tmp = this;
+      var tmp_0 = LazyThreadSafetyMode_PUBLICATION_getInstance();
+      tmp.$cachedSerializer$delegate_1 = lazy(tmp_0, WebEventContent$Conversation$Companion$_anonymous__trxmmz);
     }
-    protoOf(Companion_4).serializer_9w0wvi_k$ = function () {
-      var tmp = getKClass(Conversation);
-      // Inline function 'kotlin.arrayOf' call
-      // Inline function 'kotlin.js.unsafeCast' call
-      // Inline function 'kotlin.js.asDynamic' call
-      var tmp_0 = [getKClass(AssetMessage), getKClass(KnockMessage), getKClass(NewGroup), getKClass(TextMessage)];
-      // Inline function 'kotlin.arrayOf' call
-      // Inline function 'kotlin.js.unsafeCast' call
-      // Inline function 'kotlin.js.asDynamic' call
-      var tmp_1 = [
-        $serializer_getInstance_2(),
-        $serializer_getInstance_3(),
-        $serializer_getInstance_0(),
-        $serializer_getInstance_1(),
-      ];
-      // Inline function 'kotlin.arrayOf' call
-      // Inline function 'kotlin.js.unsafeCast' call
-      // Inline function 'kotlin.js.asDynamic' call
-      var tmp$ret$8 = [];
-      return SealedClassSerializer_init_$Create$(
-        'com.wire.kalium.logic.data.web.WebEventContent.Conversation',
-        tmp,
-        tmp_0,
-        tmp_1,
-        tmp$ret$8,
-      );
+    protoOf(Companion_5).serializer_9w0wvi_k$ = function () {
+      return _get_$cachedSerializer__te6jhj(this);
     };
-    protoOf(Companion_4).serializer_nv39qc_k$ = function (typeParamsSerializers) {
+    protoOf(Companion_5).serializer_nv39qc_k$ = function (typeParamsSerializers) {
       return this.serializer_9w0wvi_k$();
     };
-    var Companion_instance_4;
-    function Companion_getInstance_4() {
-      if (Companion_instance_4 == null) new Companion_4();
-      return Companion_instance_4;
+    var Companion_instance_5;
+    function Companion_getInstance_5() {
+      if (Companion_instance_5 == null) new Companion_5();
+      return Companion_instance_5;
     }
-    function _get_$cachedSerializer__te6jhj($this) {
+    function Conversation_init_$Init$(seen1, serializationConstructorMarker, $this) {
+      WebEventContent_init_$Init$(seen1, serializationConstructorMarker, $this);
+      return $this;
+    }
+    function Conversation_init_$Create$(seen1, serializationConstructorMarker) {
+      return Conversation_init_$Init$(seen1, serializationConstructorMarker, objectCreate(protoOf(Conversation)));
+    }
+    function _get_$cachedSerializer__te6jhj_0($this) {
       return $this.$cachedSerializer$delegate_1.get_value_j01efc_k$();
     }
     function WebEventContent$Unknown$_anonymous__vow65a() {
@@ -2228,40 +2062,10 @@
       var tmp$ret$2 = [];
       return ObjectSerializer_init_$Create$('unknown', tmp, tmp$ret$2);
     }
-    function Conversation() {}
-    function Unknown() {
-      Unknown_instance = this;
-      var tmp = this;
-      var tmp_0 = LazyThreadSafetyMode_PUBLICATION_getInstance();
-      tmp.$cachedSerializer$delegate_1 = lazy(tmp_0, WebEventContent$Unknown$_anonymous__vow65a);
+    function _get_$cachedSerializer__te6jhj_1($this) {
+      return $this.$cachedSerializer$delegate_1.get_value_j01efc_k$();
     }
-    protoOf(Unknown).toString = function () {
-      return 'Unknown';
-    };
-    protoOf(Unknown).hashCode = function () {
-      return -1162690872;
-    };
-    protoOf(Unknown).equals = function (other) {
-      if (this === other) return true;
-      if (!(other instanceof Unknown)) return false;
-      other instanceof Unknown || THROW_CCE();
-      return true;
-    };
-    protoOf(Unknown).serializer_9w0wvi_k$ = function () {
-      return _get_$cachedSerializer__te6jhj(this);
-    };
-    protoOf(Unknown).serializer_nv39qc_k$ = function (typeParamsSerializers) {
-      return this.serializer_9w0wvi_k$();
-    };
-    var Unknown_instance;
-    function Unknown_getInstance() {
-      if (Unknown_instance == null) new Unknown();
-      return Unknown_instance;
-    }
-    function Companion_5() {
-      Companion_instance_5 = this;
-    }
-    protoOf(Companion_5).serializer_9w0wvi_k$ = function () {
+    function WebEventContent$Companion$_anonymous__7jme4() {
       var tmp = getKClass(WebEventContent);
       // Inline function 'kotlin.arrayOf' call
       // Inline function 'kotlin.js.unsafeCast' call
@@ -2274,10 +2078,10 @@
         getKClass(Unknown),
       ];
       // Inline function 'kotlin.arrayOf' call
-      var tmp_1 = $serializer_getInstance_2();
-      var tmp_2 = $serializer_getInstance_3();
-      var tmp_3 = $serializer_getInstance_0();
-      var tmp_4 = $serializer_getInstance_1();
+      var tmp_1 = $serializer_getInstance_3();
+      var tmp_2 = $serializer_getInstance_4();
+      var tmp_3 = $serializer_getInstance_1();
+      var tmp_4 = $serializer_getInstance_2();
       var tmp_5 = Unknown_getInstance();
       // Inline function 'kotlin.arrayOf' call
       // Inline function 'kotlin.js.unsafeCast' call
@@ -2297,37 +2101,88 @@
         tmp_6,
         tmp$ret$11,
       );
+    }
+    function Conversation() {
+      Companion_getInstance_5();
+      WebEventContent.call(this);
+    }
+    function Unknown() {
+      Unknown_instance = this;
+      WebEventContent.call(this);
+      var tmp = this;
+      var tmp_0 = LazyThreadSafetyMode_PUBLICATION_getInstance();
+      tmp.$cachedSerializer$delegate_1 = lazy(tmp_0, WebEventContent$Unknown$_anonymous__vow65a);
+    }
+    protoOf(Unknown).toString = function () {
+      return 'Unknown';
     };
-    protoOf(Companion_5).serializer_nv39qc_k$ = function (typeParamsSerializers) {
+    protoOf(Unknown).hashCode = function () {
+      return -1162690872;
+    };
+    protoOf(Unknown).equals = function (other) {
+      if (this === other) return true;
+      if (!(other instanceof Unknown)) return false;
+      other instanceof Unknown || THROW_CCE();
+      return true;
+    };
+    protoOf(Unknown).serializer_9w0wvi_k$ = function () {
+      return _get_$cachedSerializer__te6jhj_0(this);
+    };
+    protoOf(Unknown).serializer_nv39qc_k$ = function (typeParamsSerializers) {
       return this.serializer_9w0wvi_k$();
     };
-    var Companion_instance_5;
-    function Companion_getInstance_5() {
-      if (Companion_instance_5 == null) new Companion_5();
-      return Companion_instance_5;
-    }
-    function WebEventContent() {}
-    function _get_$childSerializers__r2zwns_1($this) {
-      return $this.$childSerializers_1;
+    var Unknown_instance;
+    function Unknown_getInstance() {
+      if (Unknown_instance == null) new Unknown();
+      return Unknown_instance;
     }
     function Companion_6() {
       Companion_instance_6 = this;
       var tmp = this;
-      // Inline function 'kotlin.arrayOf' call
-      // Inline function 'kotlin.js.unsafeCast' call
-      // Inline function 'kotlin.js.asDynamic' call
-      tmp.$childSerializers_1 = [null, null, new ArrayListSerializer($serializer_getInstance())];
+      var tmp_0 = LazyThreadSafetyMode_PUBLICATION_getInstance();
+      tmp.$cachedSerializer$delegate_1 = lazy(tmp_0, WebEventContent$Companion$_anonymous__7jme4);
     }
     protoOf(Companion_6).serializer_9w0wvi_k$ = function () {
-      return $serializer_getInstance_4();
+      return _get_$cachedSerializer__te6jhj_1(this);
+    };
+    protoOf(Companion_6).serializer_nv39qc_k$ = function (typeParamsSerializers) {
+      return this.serializer_9w0wvi_k$();
     };
     var Companion_instance_6;
     function Companion_getInstance_6() {
       if (Companion_instance_6 == null) new Companion_6();
       return Companion_instance_6;
     }
-    function $serializer_4() {
-      $serializer_instance_4 = this;
+    function WebEventContent_init_$Init$(seen1, serializationConstructorMarker, $this) {
+      return $this;
+    }
+    function WebEventContent_init_$Create$(seen1, serializationConstructorMarker) {
+      return WebEventContent_init_$Init$(seen1, serializationConstructorMarker, objectCreate(protoOf(WebEventContent)));
+    }
+    function WebEventContent() {
+      Companion_getInstance_6();
+    }
+    function _get_$childSerializers__r2zwns_1($this) {
+      return $this.$childSerializers_1;
+    }
+    function Companion_7() {
+      Companion_instance_7 = this;
+      var tmp = this;
+      // Inline function 'kotlin.arrayOf' call
+      // Inline function 'kotlin.js.unsafeCast' call
+      // Inline function 'kotlin.js.asDynamic' call
+      tmp.$childSerializers_1 = [null, null, new ArrayListSerializer($serializer_getInstance_0())];
+    }
+    protoOf(Companion_7).serializer_9w0wvi_k$ = function () {
+      return $serializer_getInstance_5();
+    };
+    var Companion_instance_7;
+    function Companion_getInstance_7() {
+      if (Companion_instance_7 == null) new Companion_7();
+      return Companion_instance_7;
+    }
+    function $serializer_5() {
+      $serializer_instance_5 = this;
       var tmp0_serialDesc = new PluginGeneratedSerialDescriptor(
         'com.wire.kalium.logic.data.web.WebGroupMembers',
         this,
@@ -2338,17 +2193,17 @@
       tmp0_serialDesc.addElement_5pzumi_k$('userIds', false);
       this.descriptor_1 = tmp0_serialDesc;
     }
-    protoOf($serializer_4).get_descriptor_wjt6a0_k$ = function () {
+    protoOf($serializer_5).get_descriptor_wjt6a0_k$ = function () {
       return this.descriptor_1;
     };
-    protoOf($serializer_4).childSerializers_5ghqw5_k$ = function () {
-      var tmp0_cached = Companion_getInstance_6().$childSerializers_1;
+    protoOf($serializer_5).childSerializers_5ghqw5_k$ = function () {
+      var tmp0_cached = Companion_getInstance_7().$childSerializers_1;
       // Inline function 'kotlin.arrayOf' call
       // Inline function 'kotlin.js.unsafeCast' call
       // Inline function 'kotlin.js.asDynamic' call
       return [BooleanSerializer_getInstance(), StringSerializer_getInstance(), tmp0_cached[2]];
     };
-    protoOf($serializer_4).deserialize_sy6x50_k$ = function (decoder) {
+    protoOf($serializer_5).deserialize_sy6x50_k$ = function (decoder) {
       var tmp0_desc = this.descriptor_1;
       var tmp1_flag = true;
       var tmp2_index = 0;
@@ -2357,7 +2212,7 @@
       var tmp5_local1 = null;
       var tmp6_local2 = null;
       var tmp7_input = decoder.beginStructure_yljocp_k$(tmp0_desc);
-      var tmp8_cached = Companion_getInstance_6().$childSerializers_1;
+      var tmp8_cached = Companion_getInstance_7().$childSerializers_1;
       if (tmp7_input.decodeSequentially_xlblqy_k$()) {
         tmp4_local0 = tmp7_input.decodeBooleanElement_vuyhtj_k$(tmp0_desc, 0);
         tmp3_bitMask0 = tmp3_bitMask0 | 1;
@@ -2391,26 +2246,26 @@
       tmp7_input.endStructure_1xqz0n_k$(tmp0_desc);
       return WebGroupMembers_init_$Create$(tmp3_bitMask0, tmp4_local0, tmp5_local1, tmp6_local2, null);
     };
-    protoOf($serializer_4).serialize_lz5b4q_k$ = function (encoder, value) {
+    protoOf($serializer_5).serialize_lz5b4q_k$ = function (encoder, value) {
       var tmp0_desc = this.descriptor_1;
       var tmp1_output = encoder.beginStructure_yljocp_k$(tmp0_desc);
-      var tmp2_cached = Companion_getInstance_6().$childSerializers_1;
+      var tmp2_cached = Companion_getInstance_7().$childSerializers_1;
       tmp1_output.encodeBooleanElement_ydht7q_k$(tmp0_desc, 0, value.allTeamMembers_1);
       tmp1_output.encodeStringElement_1n5wu2_k$(tmp0_desc, 1, value.name_1);
       tmp1_output.encodeSerializableElement_isqxcl_k$(tmp0_desc, 2, tmp2_cached[2], value.userIds_1);
       tmp1_output.endStructure_1xqz0n_k$(tmp0_desc);
     };
-    protoOf($serializer_4).serialize_5ase3y_k$ = function (encoder, value) {
+    protoOf($serializer_5).serialize_5ase3y_k$ = function (encoder, value) {
       return this.serialize_lz5b4q_k$(encoder, value instanceof WebGroupMembers ? value : THROW_CCE());
     };
-    var $serializer_instance_4;
-    function $serializer_getInstance_4() {
-      if ($serializer_instance_4 == null) new $serializer_4();
-      return $serializer_instance_4;
+    var $serializer_instance_5;
+    function $serializer_getInstance_5() {
+      if ($serializer_instance_5 == null) new $serializer_5();
+      return $serializer_instance_5;
     }
     function WebGroupMembers_init_$Init$(seen1, allTeamMembers, name, userIds, serializationConstructorMarker, $this) {
       if (!(7 === (7 & seen1))) {
-        throwMissingFieldException(seen1, 7, $serializer_getInstance_4().descriptor_1);
+        throwMissingFieldException(seen1, 7, $serializer_getInstance_5().descriptor_1);
       }
       $this.allTeamMembers_1 = allTeamMembers;
       $this.name_1 = name;
@@ -2428,7 +2283,7 @@
       );
     }
     function WebGroupMembers(allTeamMembers, name, userIds) {
-      Companion_getInstance_6();
+      Companion_getInstance_7();
       this.allTeamMembers_1 = allTeamMembers;
       this.name_1 = name;
       this.userIds_1 = userIds;
@@ -2488,29 +2343,29 @@
       if (!equals(this.userIds_1, tmp0_other_with_cast.userIds_1)) return false;
       return true;
     };
-    function Companion_7() {
-      Companion_instance_7 = this;
+    function Companion_8() {
+      Companion_instance_8 = this;
     }
-    protoOf(Companion_7).serializer_9w0wvi_k$ = function () {
-      return $serializer_getInstance_5();
+    protoOf(Companion_8).serializer_9w0wvi_k$ = function () {
+      return $serializer_getInstance_6();
     };
-    var Companion_instance_7;
-    function Companion_getInstance_7() {
-      if (Companion_instance_7 == null) new Companion_7();
-      return Companion_instance_7;
+    var Companion_instance_8;
+    function Companion_getInstance_8() {
+      if (Companion_instance_8 == null) new Companion_8();
+      return Companion_instance_8;
     }
-    function $serializer_5() {
-      $serializer_instance_5 = this;
+    function $serializer_6() {
+      $serializer_instance_6 = this;
       var tmp0_serialDesc = new PluginGeneratedSerialDescriptor('com.wire.kalium.logic.data.web.WebTextData', this, 3);
       tmp0_serialDesc.addElement_5pzumi_k$('content', false);
       tmp0_serialDesc.addElement_5pzumi_k$('expects_read_confirmation', false);
       tmp0_serialDesc.addElement_5pzumi_k$('legal_hold_status', false);
       this.descriptor_1 = tmp0_serialDesc;
     }
-    protoOf($serializer_5).get_descriptor_wjt6a0_k$ = function () {
+    protoOf($serializer_6).get_descriptor_wjt6a0_k$ = function () {
       return this.descriptor_1;
     };
-    protoOf($serializer_5).childSerializers_5ghqw5_k$ = function () {
+    protoOf($serializer_6).childSerializers_5ghqw5_k$ = function () {
       // Inline function 'kotlin.arrayOf' call
       // Inline function 'kotlin.js.unsafeCast' call
       // Inline function 'kotlin.js.asDynamic' call
@@ -2520,7 +2375,7 @@
         get_nullable(IntSerializer_getInstance()),
       ];
     };
-    protoOf($serializer_5).deserialize_sy6x50_k$ = function (decoder) {
+    protoOf($serializer_6).deserialize_sy6x50_k$ = function (decoder) {
       var tmp0_desc = this.descriptor_1;
       var tmp1_flag = true;
       var tmp2_index = 0;
@@ -2582,7 +2437,7 @@
       tmp7_input.endStructure_1xqz0n_k$(tmp0_desc);
       return WebTextData_init_$Create$(tmp3_bitMask0, tmp4_local0, tmp5_local1, tmp6_local2, null);
     };
-    protoOf($serializer_5).serialize_y77v31_k$ = function (encoder, value) {
+    protoOf($serializer_6).serialize_y77v31_k$ = function (encoder, value) {
       var tmp0_desc = this.descriptor_1;
       var tmp1_output = encoder.beginStructure_yljocp_k$(tmp0_desc);
       tmp1_output.encodeStringElement_1n5wu2_k$(tmp0_desc, 0, value.text_1);
@@ -2600,13 +2455,13 @@
       );
       tmp1_output.endStructure_1xqz0n_k$(tmp0_desc);
     };
-    protoOf($serializer_5).serialize_5ase3y_k$ = function (encoder, value) {
+    protoOf($serializer_6).serialize_5ase3y_k$ = function (encoder, value) {
       return this.serialize_y77v31_k$(encoder, value instanceof WebTextData ? value : THROW_CCE());
     };
-    var $serializer_instance_5;
-    function $serializer_getInstance_5() {
-      if ($serializer_instance_5 == null) new $serializer_5();
-      return $serializer_instance_5;
+    var $serializer_instance_6;
+    function $serializer_getInstance_6() {
+      if ($serializer_instance_6 == null) new $serializer_6();
+      return $serializer_instance_6;
     }
     function WebTextData_init_$Init$(
       seen1,
@@ -2617,7 +2472,7 @@
       $this,
     ) {
       if (!(7 === (7 & seen1))) {
-        throwMissingFieldException(seen1, 7, $serializer_getInstance_5().descriptor_1);
+        throwMissingFieldException(seen1, 7, $serializer_getInstance_6().descriptor_1);
       }
       $this.text_1 = text;
       $this.expectsReadConfirmation_1 = expectsReadConfirmation;
@@ -2641,7 +2496,7 @@
       );
     }
     function WebTextData(text, expectsReadConfirmation, legalHoldStatus) {
-      Companion_getInstance_7();
+      Companion_getInstance_8();
       this.text_1 = text;
       this.expectsReadConfirmation_1 = expectsReadConfirmation;
       this.legalHoldStatus_1 = legalHoldStatus;
@@ -2708,8 +2563,8 @@
     function _get_$childSerializers__r2zwns_2($this) {
       return $this.$childSerializers_1;
     }
-    function Companion_8() {
-      Companion_instance_8 = this;
+    function Companion_9() {
+      Companion_instance_9 = this;
       var tmp = this;
       // Inline function 'kotlin.arrayOf' call
       // Inline function 'kotlin.js.unsafeCast' call
@@ -2729,16 +2584,16 @@
         null,
       ];
     }
-    protoOf(Companion_8).serializer_9w0wvi_k$ = function () {
-      return $serializer_getInstance_6();
+    protoOf(Companion_9).serializer_9w0wvi_k$ = function () {
+      return $serializer_getInstance_7();
     };
-    var Companion_instance_8;
-    function Companion_getInstance_8() {
-      if (Companion_instance_8 == null) new Companion_8();
-      return Companion_instance_8;
+    var Companion_instance_9;
+    function Companion_getInstance_9() {
+      if (Companion_instance_9 == null) new Companion_9();
+      return Companion_instance_9;
     }
-    function $serializer_6() {
-      $serializer_instance_6 = this;
+    function $serializer_7() {
+      $serializer_instance_7 = this;
       var tmp0_serialDesc = new PluginGeneratedSerialDescriptor(
         'com.wire.kalium.logic.data.web.WebAssetData',
         this,
@@ -2758,11 +2613,11 @@
       tmp0_serialDesc.addElement_5pzumi_k$('meta', false);
       this.descriptor_1 = tmp0_serialDesc;
     }
-    protoOf($serializer_6).get_descriptor_wjt6a0_k$ = function () {
+    protoOf($serializer_7).get_descriptor_wjt6a0_k$ = function () {
       return this.descriptor_1;
     };
-    protoOf($serializer_6).childSerializers_5ghqw5_k$ = function () {
-      var tmp0_cached = Companion_getInstance_8().$childSerializers_1;
+    protoOf($serializer_7).childSerializers_5ghqw5_k$ = function () {
+      var tmp0_cached = Companion_getInstance_9().$childSerializers_1;
       // Inline function 'kotlin.arrayOf' call
       // Inline function 'kotlin.js.unsafeCast' call
       // Inline function 'kotlin.js.asDynamic' call
@@ -2771,17 +2626,17 @@
         get_nullable(StringSerializer_getInstance()),
         get_nullable(StringSerializer_getInstance()),
         BooleanSerializer_getInstance(),
-        get_nullable($serializer_getInstance_8()),
+        get_nullable($serializer_getInstance_9()),
         get_nullable(StringSerializer_getInstance()),
         IntSerializer_getInstance(),
         get_nullable(tmp0_cached[7]),
         get_nullable(tmp0_cached[8]),
         get_nullable(StringSerializer_getInstance()),
         get_nullable(StringSerializer_getInstance()),
-        get_nullable($serializer_getInstance_9()),
+        get_nullable($serializer_getInstance_10()),
       ];
     };
-    protoOf($serializer_6).deserialize_sy6x50_k$ = function (decoder) {
+    protoOf($serializer_7).deserialize_sy6x50_k$ = function (decoder) {
       var tmp0_desc = this.descriptor_1;
       var tmp1_flag = true;
       var tmp2_index = 0;
@@ -2799,7 +2654,7 @@
       var tmp14_local10 = null;
       var tmp15_local11 = null;
       var tmp16_input = decoder.beginStructure_yljocp_k$(tmp0_desc);
-      var tmp17_cached = Companion_getInstance_8().$childSerializers_1;
+      var tmp17_cached = Companion_getInstance_9().$childSerializers_1;
       if (tmp16_input.decodeSequentially_xlblqy_k$()) {
         tmp4_local0 = tmp16_input.decodeNullableSerializableElement_k2y6ab_k$(
           tmp0_desc,
@@ -2827,7 +2682,7 @@
         tmp8_local4 = tmp16_input.decodeNullableSerializableElement_k2y6ab_k$(
           tmp0_desc,
           4,
-          $serializer_getInstance_8(),
+          $serializer_getInstance_9(),
           tmp8_local4,
         );
         tmp3_bitMask0 = tmp3_bitMask0 | 16;
@@ -2871,7 +2726,7 @@
         tmp15_local11 = tmp16_input.decodeNullableSerializableElement_k2y6ab_k$(
           tmp0_desc,
           11,
-          $serializer_getInstance_9(),
+          $serializer_getInstance_10(),
           tmp15_local11,
         );
         tmp3_bitMask0 = tmp3_bitMask0 | 2048;
@@ -2917,7 +2772,7 @@
               tmp8_local4 = tmp16_input.decodeNullableSerializableElement_k2y6ab_k$(
                 tmp0_desc,
                 4,
-                $serializer_getInstance_8(),
+                $serializer_getInstance_9(),
                 tmp8_local4,
               );
               tmp3_bitMask0 = tmp3_bitMask0 | 16;
@@ -2975,7 +2830,7 @@
               tmp15_local11 = tmp16_input.decodeNullableSerializableElement_k2y6ab_k$(
                 tmp0_desc,
                 11,
-                $serializer_getInstance_9(),
+                $serializer_getInstance_10(),
                 tmp15_local11,
               );
               tmp3_bitMask0 = tmp3_bitMask0 | 2048;
@@ -3002,10 +2857,10 @@
         null,
       );
     };
-    protoOf($serializer_6).serialize_ec8xw8_k$ = function (encoder, value) {
+    protoOf($serializer_7).serialize_ec8xw8_k$ = function (encoder, value) {
       var tmp0_desc = this.descriptor_1;
       var tmp1_output = encoder.beginStructure_yljocp_k$(tmp0_desc);
-      var tmp2_cached = Companion_getInstance_8().$childSerializers_1;
+      var tmp2_cached = Companion_getInstance_9().$childSerializers_1;
       tmp1_output.encodeNullableSerializableElement_5lquiv_k$(
         tmp0_desc,
         0,
@@ -3025,7 +2880,7 @@
         value.domain_1,
       );
       tmp1_output.encodeBooleanElement_ydht7q_k$(tmp0_desc, 3, value.expectsReadConfirmation_1);
-      tmp1_output.encodeNullableSerializableElement_5lquiv_k$(tmp0_desc, 4, $serializer_getInstance_8(), value.info_1);
+      tmp1_output.encodeNullableSerializableElement_5lquiv_k$(tmp0_desc, 4, $serializer_getInstance_9(), value.info_1);
       tmp1_output.encodeNullableSerializableElement_5lquiv_k$(
         tmp0_desc,
         5,
@@ -3047,16 +2902,21 @@
         StringSerializer_getInstance(),
         value.token_1,
       );
-      tmp1_output.encodeNullableSerializableElement_5lquiv_k$(tmp0_desc, 11, $serializer_getInstance_9(), value.meta_1);
+      tmp1_output.encodeNullableSerializableElement_5lquiv_k$(
+        tmp0_desc,
+        11,
+        $serializer_getInstance_10(),
+        value.meta_1,
+      );
       tmp1_output.endStructure_1xqz0n_k$(tmp0_desc);
     };
-    protoOf($serializer_6).serialize_5ase3y_k$ = function (encoder, value) {
+    protoOf($serializer_7).serialize_5ase3y_k$ = function (encoder, value) {
       return this.serialize_ec8xw8_k$(encoder, value instanceof WebAssetData ? value : THROW_CCE());
     };
-    var $serializer_instance_6;
-    function $serializer_getInstance_6() {
-      if ($serializer_instance_6 == null) new $serializer_6();
-      return $serializer_instance_6;
+    var $serializer_instance_7;
+    function $serializer_getInstance_7() {
+      if ($serializer_instance_7 == null) new $serializer_7();
+      return $serializer_instance_7;
     }
     function WebAssetData_init_$Init$(
       seen1,
@@ -3076,7 +2936,7 @@
       $this,
     ) {
       if (!(4095 === (4095 & seen1))) {
-        throwMissingFieldException(seen1, 4095, $serializer_getInstance_6().descriptor_1);
+        throwMissingFieldException(seen1, 4095, $serializer_getInstance_7().descriptor_1);
       }
       $this.contentLength_1 = contentLength;
       $this.contentType_1 = contentType;
@@ -3140,7 +3000,7 @@
       token,
       meta,
     ) {
-      Companion_getInstance_8();
+      Companion_getInstance_9();
       this.contentLength_1 = contentLength;
       this.contentType_1 = contentType;
       this.domain_1 = domain;
@@ -3376,34 +3236,34 @@
       if (!equals(this.meta_1, tmp0_other_with_cast.meta_1)) return false;
       return true;
     };
-    function Companion_9() {
-      Companion_instance_9 = this;
+    function Companion_10() {
+      Companion_instance_10 = this;
     }
-    protoOf(Companion_9).serializer_9w0wvi_k$ = function () {
-      return $serializer_getInstance_7();
+    protoOf(Companion_10).serializer_9w0wvi_k$ = function () {
+      return $serializer_getInstance_8();
     };
-    var Companion_instance_9;
-    function Companion_getInstance_9() {
-      if (Companion_instance_9 == null) new Companion_9();
-      return Companion_instance_9;
+    var Companion_instance_10;
+    function Companion_getInstance_10() {
+      if (Companion_instance_10 == null) new Companion_10();
+      return Companion_instance_10;
     }
-    function $serializer_7() {
-      $serializer_instance_7 = this;
+    function $serializer_8() {
+      $serializer_instance_8 = this;
       var tmp0_serialDesc = new PluginGeneratedSerialDescriptor('com.wire.kalium.logic.data.web.WebKnockData', this, 2);
       tmp0_serialDesc.addElement_5pzumi_k$('expects_read_confirmation', false);
       tmp0_serialDesc.addElement_5pzumi_k$('legal_hold_status', false);
       this.descriptor_1 = tmp0_serialDesc;
     }
-    protoOf($serializer_7).get_descriptor_wjt6a0_k$ = function () {
+    protoOf($serializer_8).get_descriptor_wjt6a0_k$ = function () {
       return this.descriptor_1;
     };
-    protoOf($serializer_7).childSerializers_5ghqw5_k$ = function () {
+    protoOf($serializer_8).childSerializers_5ghqw5_k$ = function () {
       // Inline function 'kotlin.arrayOf' call
       // Inline function 'kotlin.js.unsafeCast' call
       // Inline function 'kotlin.js.asDynamic' call
       return [BooleanSerializer_getInstance(), IntSerializer_getInstance()];
     };
-    protoOf($serializer_7).deserialize_sy6x50_k$ = function (decoder) {
+    protoOf($serializer_8).deserialize_sy6x50_k$ = function (decoder) {
       var tmp0_desc = this.descriptor_1;
       var tmp1_flag = true;
       var tmp2_index = 0;
@@ -3438,20 +3298,20 @@
       tmp6_input.endStructure_1xqz0n_k$(tmp0_desc);
       return WebKnockData_init_$Create$(tmp3_bitMask0, tmp4_local0, tmp5_local1, null);
     };
-    protoOf($serializer_7).serialize_ke0qc_k$ = function (encoder, value) {
+    protoOf($serializer_8).serialize_ke0qc_k$ = function (encoder, value) {
       var tmp0_desc = this.descriptor_1;
       var tmp1_output = encoder.beginStructure_yljocp_k$(tmp0_desc);
       tmp1_output.encodeBooleanElement_ydht7q_k$(tmp0_desc, 0, value.expectsReadConfirmation_1);
       tmp1_output.encodeIntElement_krhhce_k$(tmp0_desc, 1, value.legalHoldStatus_1);
       tmp1_output.endStructure_1xqz0n_k$(tmp0_desc);
     };
-    protoOf($serializer_7).serialize_5ase3y_k$ = function (encoder, value) {
+    protoOf($serializer_8).serialize_5ase3y_k$ = function (encoder, value) {
       return this.serialize_ke0qc_k$(encoder, value instanceof WebKnockData ? value : THROW_CCE());
     };
-    var $serializer_instance_7;
-    function $serializer_getInstance_7() {
-      if ($serializer_instance_7 == null) new $serializer_7();
-      return $serializer_instance_7;
+    var $serializer_instance_8;
+    function $serializer_getInstance_8() {
+      if ($serializer_instance_8 == null) new $serializer_8();
+      return $serializer_instance_8;
     }
     function WebKnockData_init_$Init$(
       seen1,
@@ -3461,7 +3321,7 @@
       $this,
     ) {
       if (!(3 === (3 & seen1))) {
-        throwMissingFieldException(seen1, 3, $serializer_getInstance_7().descriptor_1);
+        throwMissingFieldException(seen1, 3, $serializer_getInstance_8().descriptor_1);
       }
       $this.expectsReadConfirmation_1 = expectsReadConfirmation;
       $this.legalHoldStatus_1 = legalHoldStatus;
@@ -3482,7 +3342,7 @@
       );
     }
     function WebKnockData(expectsReadConfirmation, legalHoldStatus) {
-      Companion_getInstance_9();
+      Companion_getInstance_10();
       this.expectsReadConfirmation_1 = expectsReadConfirmation;
       this.legalHoldStatus_1 = legalHoldStatus;
     }
@@ -3531,19 +3391,19 @@
       if (!(this.legalHoldStatus_1 === tmp0_other_with_cast.legalHoldStatus_1)) return false;
       return true;
     };
-    function Companion_10() {
-      Companion_instance_10 = this;
+    function Companion_11() {
+      Companion_instance_11 = this;
     }
-    protoOf(Companion_10).serializer_9w0wvi_k$ = function () {
-      return $serializer_getInstance_8();
+    protoOf(Companion_11).serializer_9w0wvi_k$ = function () {
+      return $serializer_getInstance_9();
     };
-    var Companion_instance_10;
-    function Companion_getInstance_10() {
-      if (Companion_instance_10 == null) new Companion_10();
-      return Companion_instance_10;
+    var Companion_instance_11;
+    function Companion_getInstance_11() {
+      if (Companion_instance_11 == null) new Companion_11();
+      return Companion_instance_11;
     }
-    function $serializer_8() {
-      $serializer_instance_8 = this;
+    function $serializer_9() {
+      $serializer_instance_9 = this;
       var tmp0_serialDesc = new PluginGeneratedSerialDescriptor('com.wire.kalium.logic.data.web.WebAssetInfo', this, 4);
       tmp0_serialDesc.addElement_5pzumi_k$('height', false);
       tmp0_serialDesc.addElement_5pzumi_k$('name', false);
@@ -3551,10 +3411,10 @@
       tmp0_serialDesc.addElement_5pzumi_k$('width', false);
       this.descriptor_1 = tmp0_serialDesc;
     }
-    protoOf($serializer_8).get_descriptor_wjt6a0_k$ = function () {
+    protoOf($serializer_9).get_descriptor_wjt6a0_k$ = function () {
       return this.descriptor_1;
     };
-    protoOf($serializer_8).childSerializers_5ghqw5_k$ = function () {
+    protoOf($serializer_9).childSerializers_5ghqw5_k$ = function () {
       // Inline function 'kotlin.arrayOf' call
       // Inline function 'kotlin.js.unsafeCast' call
       // Inline function 'kotlin.js.asDynamic' call
@@ -3565,7 +3425,7 @@
         get_nullable(StringSerializer_getInstance()),
       ];
     };
-    protoOf($serializer_8).deserialize_sy6x50_k$ = function (decoder) {
+    protoOf($serializer_9).deserialize_sy6x50_k$ = function (decoder) {
       var tmp0_desc = this.descriptor_1;
       var tmp1_flag = true;
       var tmp2_index = 0;
@@ -3654,7 +3514,7 @@
       tmp8_input.endStructure_1xqz0n_k$(tmp0_desc);
       return WebAssetInfo_init_$Create$(tmp3_bitMask0, tmp4_local0, tmp5_local1, tmp6_local2, tmp7_local3, null);
     };
-    protoOf($serializer_8).serialize_vm425o_k$ = function (encoder, value) {
+    protoOf($serializer_9).serialize_vm425o_k$ = function (encoder, value) {
       var tmp0_desc = this.descriptor_1;
       var tmp1_output = encoder.beginStructure_yljocp_k$(tmp0_desc);
       tmp1_output.encodeNullableSerializableElement_5lquiv_k$(
@@ -3683,17 +3543,17 @@
       );
       tmp1_output.endStructure_1xqz0n_k$(tmp0_desc);
     };
-    protoOf($serializer_8).serialize_5ase3y_k$ = function (encoder, value) {
+    protoOf($serializer_9).serialize_5ase3y_k$ = function (encoder, value) {
       return this.serialize_vm425o_k$(encoder, value instanceof WebAssetInfo ? value : THROW_CCE());
     };
-    var $serializer_instance_8;
-    function $serializer_getInstance_8() {
-      if ($serializer_instance_8 == null) new $serializer_8();
-      return $serializer_instance_8;
+    var $serializer_instance_9;
+    function $serializer_getInstance_9() {
+      if ($serializer_instance_9 == null) new $serializer_9();
+      return $serializer_instance_9;
     }
     function WebAssetInfo_init_$Init$(seen1, height, name, tag, width, serializationConstructorMarker, $this) {
       if (!(15 === (15 & seen1))) {
-        throwMissingFieldException(seen1, 15, $serializer_getInstance_8().descriptor_1);
+        throwMissingFieldException(seen1, 15, $serializer_getInstance_9().descriptor_1);
       }
       $this.height_1 = height;
       $this.name_1 = name;
@@ -3713,7 +3573,7 @@
       );
     }
     function WebAssetInfo(height, name, tag, width) {
-      Companion_getInstance_10();
+      Companion_getInstance_11();
       this.height_1 = height;
       this.name_1 = name;
       this.tag_1 = tag;
@@ -3785,34 +3645,34 @@
       if (!(this.width_1 == tmp0_other_with_cast.width_1)) return false;
       return true;
     };
-    function Companion_11() {
-      Companion_instance_11 = this;
+    function Companion_12() {
+      Companion_instance_12 = this;
     }
-    protoOf(Companion_11).serializer_9w0wvi_k$ = function () {
-      return $serializer_getInstance_9();
+    protoOf(Companion_12).serializer_9w0wvi_k$ = function () {
+      return $serializer_getInstance_10();
     };
-    var Companion_instance_11;
-    function Companion_getInstance_11() {
-      if (Companion_instance_11 == null) new Companion_11();
-      return Companion_instance_11;
+    var Companion_instance_12;
+    function Companion_getInstance_12() {
+      if (Companion_instance_12 == null) new Companion_12();
+      return Companion_instance_12;
     }
-    function $serializer_9() {
-      $serializer_instance_9 = this;
+    function $serializer_10() {
+      $serializer_instance_10 = this;
       var tmp0_serialDesc = new PluginGeneratedSerialDescriptor('com.wire.kalium.logic.data.web.WebAssetMeta', this, 2);
       tmp0_serialDesc.addElement_5pzumi_k$('duration', false);
       tmp0_serialDesc.addElement_5pzumi_k$('loudness', false);
       this.descriptor_1 = tmp0_serialDesc;
     }
-    protoOf($serializer_9).get_descriptor_wjt6a0_k$ = function () {
+    protoOf($serializer_10).get_descriptor_wjt6a0_k$ = function () {
       return this.descriptor_1;
     };
-    protoOf($serializer_9).childSerializers_5ghqw5_k$ = function () {
+    protoOf($serializer_10).childSerializers_5ghqw5_k$ = function () {
       // Inline function 'kotlin.arrayOf' call
       // Inline function 'kotlin.js.unsafeCast' call
       // Inline function 'kotlin.js.asDynamic' call
       return [get_nullable(LongSerializer_getInstance()), get_nullable(JsonObjectSerializer_getInstance())];
     };
-    protoOf($serializer_9).deserialize_sy6x50_k$ = function (decoder) {
+    protoOf($serializer_10).deserialize_sy6x50_k$ = function (decoder) {
       var tmp0_desc = this.descriptor_1;
       var tmp1_flag = true;
       var tmp2_index = 0;
@@ -3867,7 +3727,7 @@
       tmp6_input.endStructure_1xqz0n_k$(tmp0_desc);
       return WebAssetMeta_init_$Create$(tmp3_bitMask0, tmp4_local0, tmp5_local1, null);
     };
-    protoOf($serializer_9).serialize_3q7737_k$ = function (encoder, value) {
+    protoOf($serializer_10).serialize_3q7737_k$ = function (encoder, value) {
       var tmp0_desc = this.descriptor_1;
       var tmp1_output = encoder.beginStructure_yljocp_k$(tmp0_desc);
       tmp1_output.encodeNullableSerializableElement_5lquiv_k$(
@@ -3884,17 +3744,17 @@
       );
       tmp1_output.endStructure_1xqz0n_k$(tmp0_desc);
     };
-    protoOf($serializer_9).serialize_5ase3y_k$ = function (encoder, value) {
+    protoOf($serializer_10).serialize_5ase3y_k$ = function (encoder, value) {
       return this.serialize_3q7737_k$(encoder, value instanceof WebAssetMeta ? value : THROW_CCE());
     };
-    var $serializer_instance_9;
-    function $serializer_getInstance_9() {
-      if ($serializer_instance_9 == null) new $serializer_9();
-      return $serializer_instance_9;
+    var $serializer_instance_10;
+    function $serializer_getInstance_10() {
+      if ($serializer_instance_10 == null) new $serializer_10();
+      return $serializer_instance_10;
     }
     function WebAssetMeta_init_$Init$(seen1, duration, loudness, serializationConstructorMarker, $this) {
       if (!(3 === (3 & seen1))) {
-        throwMissingFieldException(seen1, 3, $serializer_getInstance_9().descriptor_1);
+        throwMissingFieldException(seen1, 3, $serializer_getInstance_10().descriptor_1);
       }
       $this.duration_1 = duration;
       $this.loudness_1 = loudness;
@@ -3910,7 +3770,7 @@
       );
     }
     function WebAssetMeta(duration, loudness) {
-      Companion_getInstance_11();
+      Companion_getInstance_12();
       this.duration_1 = duration;
       this.loudness_1 = loudness;
     }
@@ -3964,6 +3824,7 @@
     protoOf($serializer_7).typeParametersSerializers_fr94fx_k$ = typeParametersSerializers;
     protoOf($serializer_8).typeParametersSerializers_fr94fx_k$ = typeParametersSerializers;
     protoOf($serializer_9).typeParametersSerializers_fr94fx_k$ = typeParametersSerializers;
+    protoOf($serializer_10).typeParametersSerializers_fr94fx_k$ = typeParametersSerializers;
     //endregion
     //region block: init
     VALUE_DOMAIN_SEPARATOR = _Char___init__impl__6a9atx(64);

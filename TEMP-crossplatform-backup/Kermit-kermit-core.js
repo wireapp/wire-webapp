@@ -27,12 +27,12 @@
   var charSequenceLength = kotlin_kotlin.$_$.ra;
   var objectMeta = kotlin_kotlin.$_$.cc;
   var getStringHashCode = kotlin_kotlin.$_$.eb;
-  var THROW_CCE = kotlin_kotlin.$_$.rg;
-  var THROW_IAE = kotlin_kotlin.$_$.sg;
+  var THROW_CCE = kotlin_kotlin.$_$.qg;
+  var THROW_IAE = kotlin_kotlin.$_$.rg;
   var enumEntries = kotlin_kotlin.$_$.ia;
   var Enum = kotlin_kotlin.$_$.eg;
   var objectCreate = kotlin_kotlin.$_$.bc;
-  var stackTraceToString = kotlin_kotlin.$_$.sh;
+  var stackTraceToString = kotlin_kotlin.$_$.rh;
   //endregion
   //region block: pre-declaration
   setMetadataFor(BaseLogger, 'BaseLogger', classMeta);

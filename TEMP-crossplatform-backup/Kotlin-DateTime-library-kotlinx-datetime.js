@@ -63,7 +63,7 @@
     var Long = kotlin_kotlin.$_$.kg;
     var STRING_getInstance = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.h;
     var PrimitiveSerialDescriptor = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.e1;
-    var THROW_CCE = kotlin_kotlin.$_$.rg;
+    var THROW_CCE = kotlin_kotlin.$_$.qg;
     var KSerializer = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.s2;
     var _Char___init__impl__6a9atx = kotlin_kotlin.$_$.t2;
     var indexOf = kotlin_kotlin.$_$.vd;
@@ -166,14 +166,14 @@
     function DateTimeFormatException() {
       captureStack(this, DateTimeFormatException);
     }
-    function get_DISTANT_FUTURE_SECONDS() {
-      return DISTANT_FUTURE_SECONDS;
-    }
-    var DISTANT_FUTURE_SECONDS;
     function get_DISTANT_PAST_SECONDS() {
       return DISTANT_PAST_SECONDS;
     }
     var DISTANT_PAST_SECONDS;
+    function get_DISTANT_FUTURE_SECONDS() {
+      return DISTANT_FUTURE_SECONDS;
+    }
+    var DISTANT_FUTURE_SECONDS;
     function get_NANOS_PER_MILLI() {
       return NANOS_PER_MILLI;
     }
@@ -505,8 +505,8 @@
       return _this__u8e3s4.name == name;
     }
     //region block: init
-    DISTANT_FUTURE_SECONDS = new Long(1151527680, 720);
     DISTANT_PAST_SECONDS = new Long(-931914497, -750);
+    DISTANT_FUTURE_SECONDS = new Long(1151527680, 720);
     NANOS_PER_MILLI = 1000000;
     MILLIS_PER_ONE = 1000;
     NANOS_PER_ONE = 1000000000;

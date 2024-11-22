@@ -1916,6 +1916,22 @@ export declare namespace pbandk.wkt {
   function orDefaultForBytesValue(_this_: Nullable<pbandk.wkt.BytesValue>): pbandk.wkt.BytesValue;
 }
 export declare namespace com.wire.kalium.protobuf.backup {
+  abstract class ExportedEncryptionAlgorithm /* implements pbandk.Message.Enum */ {
+    protected constructor(value: number, name?: Nullable<string>);
+    equals(other: Nullable<any>): boolean;
+    hashCode(): number;
+    toString(): string;
+    static get BACKUP_AES_CBC(): {} & com.wire.kalium.protobuf.backup.ExportedEncryptionAlgorithm;
+    static get BACKUP_AES_GCM(): {} & com.wire.kalium.protobuf.backup.ExportedEncryptionAlgorithm;
+    static get Companion(): {
+      get values(): any /* kotlin.collections.List<com.wire.kalium.protobuf.backup.ExportedEncryptionAlgorithm> */;
+    } & any /* pbandk.Message.Enum.Companion<com.wire.kalium.protobuf.backup.ExportedEncryptionAlgorithm> */;
+  }
+  namespace ExportedEncryptionAlgorithm {
+    class UNRECOGNIZED extends com.wire.kalium.protobuf.backup.ExportedEncryptionAlgorithm {
+      constructor(value: number);
+    }
+  }
   class BackupData /* implements pbandk.Message */ {
     constructor(
       info: com.wire.kalium.protobuf.backup.BackupInfo,
@@ -2041,6 +2057,8 @@ export declare namespace com.wire.kalium.protobuf.backup {
     get conversationId(): com.wire.kalium.protobuf.backup.ExportedQualifiedId;
     get content(): Nullable<com.wire.kalium.protobuf.backup.ExportedMessage.Content<any /*UnknownType **/>>;
     get text(): Nullable<com.wire.kalium.protobuf.backup.ExportedText>;
+    get asset(): Nullable<com.wire.kalium.protobuf.backup.ExportedAsset>;
+    get location(): Nullable<com.wire.kalium.protobuf.backup.ExportedLocation>;
     copy(
       id?: string,
       timeIso?: any /* kotlin.Long */,
@@ -2064,6 +2082,14 @@ export declare namespace com.wire.kalium.protobuf.backup {
         .Content<com.wire.kalium.protobuf.backup.ExportedText> {
         constructor(text: com.wire.kalium.protobuf.backup.ExportedText);
       }
+      class Asset extends com.wire.kalium.protobuf.backup.ExportedMessage
+        .Content<com.wire.kalium.protobuf.backup.ExportedAsset> {
+        constructor(asset: com.wire.kalium.protobuf.backup.ExportedAsset);
+      }
+      class Location extends com.wire.kalium.protobuf.backup.ExportedMessage
+        .Content<com.wire.kalium.protobuf.backup.ExportedLocation> {
+        constructor(location: com.wire.kalium.protobuf.backup.ExportedLocation);
+      }
     }
   }
   class ExportedText /* implements pbandk.Message */ {
@@ -2077,6 +2103,69 @@ export declare namespace com.wire.kalium.protobuf.backup {
     hashCode(): number;
     equals(other: Nullable<any>): boolean;
     static get Companion(): {} & any /* pbandk.Message.Companion<com.wire.kalium.protobuf.backup.ExportedText> */;
+  }
+  class ExportedAsset /* implements pbandk.Message */ {
+    constructor(
+      mimetype: string,
+      size: any /* kotlin.Long */,
+      name: Nullable<string> | undefined,
+      otrKey: pbandk.ByteArr,
+      sha256: pbandk.ByteArr,
+      assetId: string,
+      assetToken?: Nullable<string>,
+      assetDomain?: Nullable<string>,
+      encryption?: Nullable<com.wire.kalium.protobuf.backup.ExportedEncryptionAlgorithm>,
+      unknownFields?: any /* kotlin.collections.Map<number, pbandk.UnknownField> */,
+    );
+    get mimetype(): string;
+    get size(): any /* kotlin.Long */;
+    get name(): Nullable<string>;
+    get otrKey(): pbandk.ByteArr;
+    get sha256(): pbandk.ByteArr;
+    get assetId(): string;
+    get assetToken(): Nullable<string>;
+    get assetDomain(): Nullable<string>;
+    get encryption(): Nullable<com.wire.kalium.protobuf.backup.ExportedEncryptionAlgorithm>;
+    copy(
+      mimetype?: string,
+      size?: any /* kotlin.Long */,
+      name?: Nullable<string>,
+      otrKey?: pbandk.ByteArr,
+      sha256?: pbandk.ByteArr,
+      assetId?: string,
+      assetToken?: Nullable<string>,
+      assetDomain?: Nullable<string>,
+      encryption?: Nullable<com.wire.kalium.protobuf.backup.ExportedEncryptionAlgorithm>,
+      unknownFields?: any /* kotlin.collections.Map<number, pbandk.UnknownField> */,
+    ): com.wire.kalium.protobuf.backup.ExportedAsset;
+    toString(): string;
+    hashCode(): number;
+    equals(other: Nullable<any>): boolean;
+    static get Companion(): {} & any /* pbandk.Message.Companion<com.wire.kalium.protobuf.backup.ExportedAsset> */;
+  }
+  class ExportedLocation /* implements pbandk.Message */ {
+    constructor(
+      longitude: number,
+      latitude: number,
+      name?: Nullable<string>,
+      zoom?: Nullable<number>,
+      unknownFields?: any /* kotlin.collections.Map<number, pbandk.UnknownField> */,
+    );
+    get longitude(): number;
+    get latitude(): number;
+    get name(): Nullable<string>;
+    get zoom(): Nullable<number>;
+    copy(
+      longitude?: number,
+      latitude?: number,
+      name?: Nullable<string>,
+      zoom?: Nullable<number>,
+      unknownFields?: any /* kotlin.collections.Map<number, pbandk.UnknownField> */,
+    ): com.wire.kalium.protobuf.backup.ExportedLocation;
+    toString(): string;
+    hashCode(): number;
+    equals(other: Nullable<any>): boolean;
+    static get Companion(): {} & any /* pbandk.Message.Companion<com.wire.kalium.protobuf.backup.ExportedLocation> */;
   }
 }
 export declare namespace com.wire.kalium.protobuf.messages {
@@ -2128,13 +2217,32 @@ export declare namespace com.wire.kalium.protobuf.messages {
       constructor(value: number);
     }
   }
+  abstract class UnknownStrategy /* implements pbandk.Message.Enum */ {
+    protected constructor(value: number, name?: Nullable<string>);
+    equals(other: Nullable<any>): boolean;
+    hashCode(): number;
+    toString(): string;
+    static get IGNORE(): {} & com.wire.kalium.protobuf.messages.UnknownStrategy;
+    static get DISCARD_AND_WARN(): {} & com.wire.kalium.protobuf.messages.UnknownStrategy;
+    static get WARN_USER_ALLOW_RETRY(): {} & com.wire.kalium.protobuf.messages.UnknownStrategy;
+    static get Companion(): {
+      get values(): any /* kotlin.collections.List<com.wire.kalium.protobuf.messages.UnknownStrategy> */;
+    } & any /* pbandk.Message.Enum.Companion<com.wire.kalium.protobuf.messages.UnknownStrategy> */;
+  }
+  namespace UnknownStrategy {
+    class UNRECOGNIZED extends com.wire.kalium.protobuf.messages.UnknownStrategy {
+      constructor(value: number);
+    }
+  }
   class GenericMessage /* implements pbandk.Message */ {
     constructor(
       messageId: string,
+      unknownStrategy?: Nullable<com.wire.kalium.protobuf.messages.UnknownStrategy>,
       content?: Nullable<com.wire.kalium.protobuf.messages.GenericMessage.Content<any /*UnknownType **/>>,
       unknownFields?: any /* kotlin.collections.Map<number, pbandk.UnknownField> */,
     );
     get messageId(): string;
+    get unknownStrategy(): Nullable<com.wire.kalium.protobuf.messages.UnknownStrategy>;
     get content(): Nullable<com.wire.kalium.protobuf.messages.GenericMessage.Content<any /*UnknownType **/>>;
     get text(): Nullable<com.wire.kalium.protobuf.messages.Text>;
     get image(): Nullable<com.wire.kalium.protobuf.messages.ImageAsset>;
@@ -2159,6 +2267,7 @@ export declare namespace com.wire.kalium.protobuf.messages {
     get dataTransfer(): Nullable<com.wire.kalium.protobuf.messages.DataTransfer>;
     copy(
       messageId?: string,
+      unknownStrategy?: Nullable<com.wire.kalium.protobuf.messages.UnknownStrategy>,
       content?: Nullable<com.wire.kalium.protobuf.messages.GenericMessage.Content<any /*UnknownType **/>>,
       unknownFields?: any /* kotlin.collections.Map<number, pbandk.UnknownField> */,
     ): com.wire.kalium.protobuf.messages.GenericMessage;
@@ -3695,15 +3804,21 @@ export declare namespace com.wire.backup.data {
     get users(): Array<com.wire.backup.data.BackupUser>;
     get conversations(): Array<com.wire.backup.data.BackupConversation>;
     get messages(): Array<com.wire.backup.data.BackupMessage>;
+    get userList(): any /* kotlin.collections.List<com.wire.backup.data.BackupUser> */;
+    get conversationList(): any /* kotlin.collections.List<com.wire.backup.data.BackupConversation> */;
+    get messageList(): any /* kotlin.collections.List<com.wire.backup.data.BackupMessage> */;
   }
   class BackupQualifiedId {
     constructor(id: string, domain: string);
     get id(): string;
     get domain(): string;
-    copy(id?: string, domain?: string): com.wire.backup.data.BackupQualifiedId;
     toString(): string;
+    copy(id?: string, domain?: string): com.wire.backup.data.BackupQualifiedId;
     hashCode(): number;
     equals(other: Nullable<any>): boolean;
+    static get Companion(): {
+      fromEncodedString(id: string): Nullable<com.wire.backup.data.BackupQualifiedId>;
+    };
   }
   class BackupUser {
     constructor(id: com.wire.backup.data.BackupQualifiedId, name: string, handle: string);
@@ -3764,9 +3879,70 @@ export declare namespace com.wire.backup.data {
       equals(other: Nullable<any>): boolean;
     }
     class Asset extends com.wire.backup.data.BackupMessageContent {
-      constructor(TODO: string);
-      get TODO(): string;
-      copy(TODO?: string): com.wire.backup.data.BackupMessageContent.Asset;
+      constructor(
+        mimeType: string,
+        size: number,
+        name: Nullable<string>,
+        otrKey: Int8Array,
+        sha256: Int8Array,
+        assetId: string,
+        assetToken: Nullable<string>,
+        assetDomain: Nullable<string>,
+        encryption: Nullable<com.wire.backup.data.BackupMessageContent.Asset.EncryptionAlgorithm>,
+      );
+      get mimeType(): string;
+      get size(): number;
+      get name(): Nullable<string>;
+      get otrKey(): Int8Array;
+      get sha256(): Int8Array;
+      get assetId(): string;
+      get assetToken(): Nullable<string>;
+      get assetDomain(): Nullable<string>;
+      get encryption(): Nullable<com.wire.backup.data.BackupMessageContent.Asset.EncryptionAlgorithm>;
+      equals(other: Nullable<any>): boolean;
+      hashCode(): number;
+      copy(
+        mimeType?: string,
+        size?: number,
+        name?: Nullable<string>,
+        otrKey?: Int8Array,
+        sha256?: Int8Array,
+        assetId?: string,
+        assetToken?: Nullable<string>,
+        assetDomain?: Nullable<string>,
+        encryption?: Nullable<com.wire.backup.data.BackupMessageContent.Asset.EncryptionAlgorithm>,
+      ): com.wire.backup.data.BackupMessageContent.Asset;
+      toString(): string;
+    }
+    namespace Asset {
+      abstract class EncryptionAlgorithm {
+        private constructor();
+        static get AES_GCM(): com.wire.backup.data.BackupMessageContent.Asset.EncryptionAlgorithm & {
+          get name(): 'AES_GCM';
+          get ordinal(): 0;
+        };
+        static get AES_CBC(): com.wire.backup.data.BackupMessageContent.Asset.EncryptionAlgorithm & {
+          get name(): 'AES_CBC';
+          get ordinal(): 1;
+        };
+        static values(): Array<com.wire.backup.data.BackupMessageContent.Asset.EncryptionAlgorithm>;
+        static valueOf(value: string): com.wire.backup.data.BackupMessageContent.Asset.EncryptionAlgorithm;
+        get name(): 'AES_GCM' | 'AES_CBC';
+        get ordinal(): 0 | 1;
+      }
+    }
+    class Location extends com.wire.backup.data.BackupMessageContent {
+      constructor(longitude: number, latitude: number, name: Nullable<string>, zoom: Nullable<number>);
+      get longitude(): number;
+      get latitude(): number;
+      get name(): Nullable<string>;
+      get zoom(): Nullable<number>;
+      copy(
+        longitude?: number,
+        latitude?: number,
+        name?: Nullable<string>,
+        zoom?: Nullable<number>,
+      ): com.wire.backup.data.BackupMessageContent.Location;
       toString(): string;
       hashCode(): number;
       equals(other: Nullable<any>): boolean;
@@ -3776,19 +3952,16 @@ export declare namespace com.wire.backup.data {
 export declare namespace com.wire.backup.data {
   class BackupMetadata {
     constructor(
-      platform: string,
       version: string,
       userId: com.wire.backup.data.BackupQualifiedId,
       creationTime: com.wire.backup.data.BackupDateTime,
       clientId: Nullable<string>,
     );
-    get platform(): string;
     get version(): string;
     get userId(): com.wire.backup.data.BackupQualifiedId;
     get creationTime(): com.wire.backup.data.BackupDateTime;
     get clientId(): Nullable<string>;
     copy(
-      platform?: string,
       version?: string,
       userId?: com.wire.backup.data.BackupQualifiedId,
       creationTime?: com.wire.backup.data.BackupDateTime,
@@ -3800,9 +3973,8 @@ export declare namespace com.wire.backup.data {
   }
 }
 export declare namespace com.wire.backup.dump {
-  class MPBackupExporter {
+  abstract class CommonMPBackupExporter {
     constructor(selfUserId: com.wire.backup.data.BackupQualifiedId);
-    get selfUserId(): com.wire.backup.data.BackupQualifiedId;
     addUser(user: com.wire.backup.data.BackupUser): void;
     addConversation(conversation: com.wire.backup.data.BackupConversation): void;
     addMessage(message: com.wire.backup.data.BackupMessage): void;
@@ -3830,20 +4002,29 @@ export declare namespace com.wire.backup.ingest {
   }
 }
 export declare namespace com.wire.backup.ingest {
-  class MPBackupImporter {
-    constructor(selfUserDomain: string);
-    get selfUserDomain(): string;
-    import(data: Int8Array): com.wire.backup.ingest.BackupImportResult;
+  abstract class CommonMPBackupImporter {
+    constructor();
+    importBackup(data: Int8Array): com.wire.backup.ingest.BackupImportResult;
   }
 }
 export declare namespace com.wire.backup.data {
   class BackupDateTime {
     constructor(date: Date);
     get date(): Date;
+    equals(other: Nullable<any>): boolean;
+    hashCode(): number;
     copy(date?: Date): com.wire.backup.data.BackupDateTime;
     toString(): string;
-    hashCode(): number;
-    equals(other: Nullable<any>): boolean;
+  }
+}
+export declare namespace com.wire.backup.dump {
+  class MPBackupExporter extends com.wire.backup.dump.CommonMPBackupExporter {
+    constructor(selfUserId: com.wire.backup.data.BackupQualifiedId);
+  }
+}
+export declare namespace com.wire.backup.ingest {
+  class MPBackupImporter extends com.wire.backup.ingest.CommonMPBackupImporter {
+    constructor();
   }
 }
 export as namespace com_wire_backup;

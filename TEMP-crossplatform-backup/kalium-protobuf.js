@@ -24,36 +24,45 @@
   'use strict';
   //region block: imports
   var imul = Math.imul;
+  var listOf = kotlin_kotlin.$_$.g8;
+  var protoOf = kotlin_kotlin.$_$.dc;
+  var objectMeta = kotlin_kotlin.$_$.cc;
+  var setMetadataFor = kotlin_kotlin.$_$.ec;
+  var classMeta = kotlin_kotlin.$_$.ta;
+  var lazy = kotlin_kotlin.$_$.nh;
+  var IllegalArgumentException_init_$Create$ = kotlin_kotlin.$_$.r1;
+  var defineProp = kotlin_kotlin.$_$.va;
+  var Companion = kotlin_pro_streem_pbandk_pbandk_runtime.$_$.q;
+  var VOID = kotlin_kotlin.$_$.f;
+  var Enum = kotlin_pro_streem_pbandk_pbandk_runtime.$_$.r;
   var getKClass = kotlin_kotlin.$_$.d;
   var checkBuilderCapacity = kotlin_kotlin.$_$.n6;
   var ArrayList_init_$Create$ = kotlin_kotlin.$_$.l;
   var Message = kotlin_pro_streem_pbandk_pbandk_runtime.$_$.f;
-  var VOID = kotlin_kotlin.$_$.f;
   var FieldDescriptor = kotlin_pro_streem_pbandk_pbandk_runtime.$_$.o;
   var Repeated = kotlin_pro_streem_pbandk_pbandk_runtime.$_$.n;
   var MessageDescriptor = kotlin_pro_streem_pbandk_pbandk_runtime.$_$.u;
-  var protoOf = kotlin_kotlin.$_$.dc;
-  var Companion = kotlin_pro_streem_pbandk_pbandk_runtime.$_$.p;
-  var objectMeta = kotlin_kotlin.$_$.cc;
-  var setMetadataFor = kotlin_kotlin.$_$.ec;
+  var Companion_0 = kotlin_pro_streem_pbandk_pbandk_runtime.$_$.p;
   var get_protoSize = kotlin_pro_streem_pbandk_pbandk_runtime.$_$.t;
   var emptyList = kotlin_kotlin.$_$.j7;
   var emptyMap = kotlin_kotlin.$_$.k7;
-  var lazy = kotlin_kotlin.$_$.oh;
   var hashCode = kotlin_kotlin.$_$.fb;
-  var THROW_CCE = kotlin_kotlin.$_$.rg;
+  var THROW_CCE = kotlin_kotlin.$_$.qg;
   var equals = kotlin_kotlin.$_$.xa;
   var Message_0 = kotlin_pro_streem_pbandk_pbandk_runtime.$_$.v;
-  var classMeta = kotlin_kotlin.$_$.ta;
   var String_0 = kotlin_pro_streem_pbandk_pbandk_runtime.$_$.l;
   var Int64 = kotlin_pro_streem_pbandk_pbandk_runtime.$_$.k;
   var getStringHashCode = kotlin_kotlin.$_$.eb;
   var OneOf = kotlin_pro_streem_pbandk_pbandk_runtime.$_$.s;
-  var defineProp = kotlin_kotlin.$_$.va;
+  var Bytes = kotlin_pro_streem_pbandk_pbandk_runtime.$_$.h;
+  var Enum_0 = kotlin_pro_streem_pbandk_pbandk_runtime.$_$.e;
+  var Float = kotlin_pro_streem_pbandk_pbandk_runtime.$_$.i;
+  var Int32 = kotlin_pro_streem_pbandk_pbandk_runtime.$_$.j;
+  var getNumberHashCode = kotlin_kotlin.$_$.cb;
   var plus = kotlin_kotlin.$_$.q8;
   var plus_0 = kotlin_kotlin.$_$.m8;
   var Companion_getInstance = kotlin_pro_streem_pbandk_pbandk_runtime.$_$.b;
-  var ensureNotNull = kotlin_kotlin.$_$.ih;
+  var ensureNotNull = kotlin_kotlin.$_$.hh;
   var Companion_getInstance_0 = kotlin_pro_streem_pbandk_pbandk_runtime.$_$.c;
   var Unit_getInstance = kotlin_kotlin.$_$.k5;
   var init = kotlin_pro_streem_pbandk_pbandk_runtime.$_$.a;
@@ -61,57 +70,65 @@
   var isInterface = kotlin_kotlin.$_$.pb;
   var addAll = kotlin_kotlin.$_$.h6;
   var Long = kotlin_kotlin.$_$.kg;
+  var ByteArr = kotlin_pro_streem_pbandk_pbandk_runtime.$_$.d;
   var KProperty1 = kotlin_kotlin.$_$.wc;
   var getPropertyCallableRef = kotlin_kotlin.$_$.db;
   var KProperty0 = kotlin_kotlin.$_$.vc;
-  var listOf = kotlin_kotlin.$_$.f8;
-  var IllegalArgumentException_init_$Create$ = kotlin_kotlin.$_$.r1;
-  var Companion_0 = kotlin_pro_streem_pbandk_pbandk_runtime.$_$.q;
-  var Enum = kotlin_pro_streem_pbandk_pbandk_runtime.$_$.r;
-  var listOf_0 = kotlin_kotlin.$_$.g8;
-  var Enum_0 = kotlin_pro_streem_pbandk_pbandk_runtime.$_$.e;
+  var listOf_0 = kotlin_kotlin.$_$.f8;
   var Bool = kotlin_pro_streem_pbandk_pbandk_runtime.$_$.g;
   var getBooleanHashCode = kotlin_kotlin.$_$.bb;
-  var Int32 = kotlin_pro_streem_pbandk_pbandk_runtime.$_$.j;
-  var Bytes = kotlin_pro_streem_pbandk_pbandk_runtime.$_$.h;
-  var Float = kotlin_pro_streem_pbandk_pbandk_runtime.$_$.i;
-  var getNumberHashCode = kotlin_kotlin.$_$.cb;
   var UInt64 = kotlin_pro_streem_pbandk_pbandk_runtime.$_$.m;
-  var toString = kotlin_kotlin.$_$.xh;
-  var ByteArr = kotlin_pro_streem_pbandk_pbandk_runtime.$_$.d;
+  var toString = kotlin_kotlin.$_$.wh;
   //endregion
   //region block: pre-declaration
+  setMetadataFor(ExportedEncryptionAlgorithm, 'ExportedEncryptionAlgorithm', classMeta, VOID, [Enum]);
+  setMetadataFor(BACKUP_AES_CBC, 'BACKUP_AES_CBC', objectMeta, ExportedEncryptionAlgorithm);
+  setMetadataFor(BACKUP_AES_GCM, 'BACKUP_AES_GCM', objectMeta, ExportedEncryptionAlgorithm);
+  setMetadataFor(UNRECOGNIZED, 'UNRECOGNIZED', classMeta, ExportedEncryptionAlgorithm);
   setMetadataFor(Companion_1, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Companion_2, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(BackupData, 'BackupData', classMeta, VOID, [Message_0]);
-  setMetadataFor(Companion_2, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Companion_3, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(BackupInfo, 'BackupInfo', classMeta, VOID, [Message_0]);
-  setMetadataFor(Companion_3, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Companion_4, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(ExportUser, 'ExportUser', classMeta, VOID, [Message_0]);
-  setMetadataFor(Companion_4, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Companion_5, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(ExportedQualifiedId, 'ExportedQualifiedId', classMeta, VOID, [Message_0]);
-  setMetadataFor(Companion_5, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Companion_6, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(ExportedConversation, 'ExportedConversation', classMeta, VOID, [Message_0]);
   setMetadataFor(Content, 'Content', classMeta, OneOf);
   setMetadataFor(Text, 'Text', classMeta, Content);
-  setMetadataFor(Companion_6, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Asset, 'Asset', classMeta, Content);
+  setMetadataFor(Location, 'Location', classMeta, Content);
+  setMetadataFor(Companion_7, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(ExportedMessage, 'ExportedMessage', classMeta, VOID, [Message_0]);
-  setMetadataFor(Companion_7, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Companion_8, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(ExportedText, 'ExportedText', classMeta, VOID, [Message_0]);
+  setMetadataFor(Companion_9, 'Companion', objectMeta, VOID, [Companion_0]);
+  setMetadataFor(ExportedAsset, 'ExportedAsset', classMeta, VOID, [Message_0]);
+  setMetadataFor(Companion_10, 'Companion', objectMeta, VOID, [Companion_0]);
+  setMetadataFor(ExportedLocation, 'ExportedLocation', classMeta, VOID, [Message_0]);
   setMetadataFor(ClientAction, 'ClientAction', classMeta, VOID, [Enum]);
   setMetadataFor(RESET_SESSION, 'RESET_SESSION', objectMeta, ClientAction);
-  setMetadataFor(UNRECOGNIZED, 'UNRECOGNIZED', classMeta, ClientAction);
-  setMetadataFor(Companion_8, 'Companion', objectMeta, VOID, [Companion_0]);
+  setMetadataFor(UNRECOGNIZED_0, 'UNRECOGNIZED', classMeta, ClientAction);
+  setMetadataFor(Companion_11, 'Companion', objectMeta, VOID, [Companion]);
   setMetadataFor(EncryptionAlgorithm, 'EncryptionAlgorithm', classMeta, VOID, [Enum]);
   setMetadataFor(AES_CBC, 'AES_CBC', objectMeta, EncryptionAlgorithm);
   setMetadataFor(AES_GCM, 'AES_GCM', objectMeta, EncryptionAlgorithm);
-  setMetadataFor(UNRECOGNIZED_0, 'UNRECOGNIZED', classMeta, EncryptionAlgorithm);
-  setMetadataFor(Companion_9, 'Companion', objectMeta, VOID, [Companion_0]);
+  setMetadataFor(UNRECOGNIZED_1, 'UNRECOGNIZED', classMeta, EncryptionAlgorithm);
+  setMetadataFor(Companion_12, 'Companion', objectMeta, VOID, [Companion]);
   setMetadataFor(LegalHoldStatus, 'LegalHoldStatus', classMeta, VOID, [Enum]);
   setMetadataFor(UNKNOWN, 'UNKNOWN', objectMeta, LegalHoldStatus);
   setMetadataFor(DISABLED, 'DISABLED', objectMeta, LegalHoldStatus);
   setMetadataFor(ENABLED, 'ENABLED', objectMeta, LegalHoldStatus);
-  setMetadataFor(UNRECOGNIZED_1, 'UNRECOGNIZED', classMeta, LegalHoldStatus);
-  setMetadataFor(Companion_10, 'Companion', objectMeta, VOID, [Companion_0]);
+  setMetadataFor(UNRECOGNIZED_2, 'UNRECOGNIZED', classMeta, LegalHoldStatus);
+  setMetadataFor(Companion_13, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(UnknownStrategy, 'UnknownStrategy', classMeta, VOID, [Enum]);
+  setMetadataFor(IGNORE, 'IGNORE', objectMeta, UnknownStrategy);
+  setMetadataFor(DISCARD_AND_WARN, 'DISCARD_AND_WARN', objectMeta, UnknownStrategy);
+  setMetadataFor(WARN_USER_ALLOW_RETRY, 'WARN_USER_ALLOW_RETRY', objectMeta, UnknownStrategy);
+  setMetadataFor(UNRECOGNIZED_3, 'UNRECOGNIZED', classMeta, UnknownStrategy);
+  setMetadataFor(Companion_14, 'Companion', objectMeta, VOID, [Companion]);
   setMetadataFor(Content_0, 'Content', classMeta, OneOf);
   setMetadataFor(Text_0, 'Text', classMeta, Content_0);
   setMetadataFor(Image, 'Image', classMeta, Content_0);
@@ -121,9 +138,9 @@
   setMetadataFor(External, 'External', classMeta, Content_0);
   setMetadataFor(ClientAction_0, 'ClientAction', classMeta, Content_0, VOID, ClientAction_0);
   setMetadataFor(Calling, 'Calling', classMeta, Content_0);
-  setMetadataFor(Asset, 'Asset', classMeta, Content_0);
+  setMetadataFor(Asset_0, 'Asset', classMeta, Content_0);
   setMetadataFor(Hidden, 'Hidden', classMeta, Content_0);
-  setMetadataFor(Location, 'Location', classMeta, Content_0);
+  setMetadataFor(Location_0, 'Location', classMeta, Content_0);
   setMetadataFor(Deleted, 'Deleted', classMeta, Content_0);
   setMetadataFor(Edited, 'Edited', classMeta, Content_0);
   setMetadataFor(Confirmation, 'Confirmation', classMeta, Content_0);
@@ -134,85 +151,85 @@
   setMetadataFor(ButtonAction, 'ButtonAction', classMeta, Content_0);
   setMetadataFor(ButtonActionConfirmation, 'ButtonActionConfirmation', classMeta, Content_0);
   setMetadataFor(DataTransfer, 'DataTransfer', classMeta, Content_0);
-  setMetadataFor(Companion_11, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Companion_15, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(GenericMessage, 'GenericMessage', classMeta, VOID, [Message_0]);
-  setMetadataFor(Companion_12, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Companion_16, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(QualifiedUserId, 'QualifiedUserId', classMeta, VOID, [Message_0]);
-  setMetadataFor(Companion_13, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Companion_17, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(QualifiedConversationId, 'QualifiedConversationId', classMeta, VOID, [Message_0]);
   setMetadataFor(Content_1, 'Content', classMeta, OneOf);
   setMetadataFor(Text_1, 'Text', classMeta, Content_1);
   setMetadataFor(Button, 'Button', classMeta, Content_1);
-  setMetadataFor(Companion_14, 'Companion', objectMeta, VOID, [Companion]);
-  setMetadataFor(Companion_15, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Companion_18, 'Companion', objectMeta, VOID, [Companion_0]);
+  setMetadataFor(Companion_19, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(Item, 'Item', classMeta, VOID, [Message_0], Item);
   setMetadataFor(Composite_0, 'Composite', classMeta, VOID, [Message_0], Composite_0);
-  setMetadataFor(Companion_16, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Companion_20, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(Button_0, 'Button', classMeta, VOID, [Message_0]);
-  setMetadataFor(Companion_17, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Companion_21, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(ButtonAction_0, 'ButtonAction', classMeta, VOID, [Message_0]);
-  setMetadataFor(Companion_18, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Companion_22, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(ButtonActionConfirmation_0, 'ButtonActionConfirmation', classMeta, VOID, [Message_0]);
   setMetadataFor(Type, 'Type', classMeta, VOID, [Enum]);
   setMetadataFor(NONE, 'NONE', objectMeta, Type);
   setMetadataFor(AVAILABLE, 'AVAILABLE', objectMeta, Type);
   setMetadataFor(AWAY, 'AWAY', objectMeta, Type);
   setMetadataFor(BUSY, 'BUSY', objectMeta, Type);
-  setMetadataFor(UNRECOGNIZED_2, 'UNRECOGNIZED', classMeta, Type);
-  setMetadataFor(Companion_19, 'Companion', objectMeta, VOID, [Companion_0]);
-  setMetadataFor(Companion_20, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(UNRECOGNIZED_4, 'UNRECOGNIZED', classMeta, Type);
+  setMetadataFor(Companion_23, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Companion_24, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(Availability_0, 'Availability', classMeta, VOID, [Message_0]);
   setMetadataFor(Content_2, 'Content', classMeta, OneOf);
   setMetadataFor(Text_2, 'Text', classMeta, Content_2);
   setMetadataFor(Image_0, 'Image', classMeta, Content_2);
   setMetadataFor(Knock_0, 'Knock', classMeta, Content_2);
-  setMetadataFor(Asset_0, 'Asset', classMeta, Content_2);
-  setMetadataFor(Location_0, 'Location', classMeta, Content_2);
-  setMetadataFor(Companion_21, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Asset_1, 'Asset', classMeta, Content_2);
+  setMetadataFor(Location_1, 'Location', classMeta, Content_2);
+  setMetadataFor(Companion_25, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(Ephemeral_0, 'Ephemeral', classMeta, VOID, [Message_0]);
-  setMetadataFor(Companion_22, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Companion_26, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(Text_3, 'Text', classMeta, VOID, [Message_0]);
-  setMetadataFor(Companion_23, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Companion_27, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(Knock_1, 'Knock', classMeta, VOID, [Message_0]);
   setMetadataFor(Preview, 'Preview', classMeta, OneOf);
   setMetadataFor(Article, 'Article', classMeta, Preview);
   setMetadataFor(MetaData, 'MetaData', classMeta, OneOf);
   setMetadataFor(Tweet, 'Tweet', classMeta, MetaData);
-  setMetadataFor(Companion_24, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Companion_28, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(LinkPreview, 'LinkPreview', classMeta, VOID, [Message_0]);
-  setMetadataFor(Companion_25, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Companion_29, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(Tweet_0, 'Tweet', classMeta, VOID, [Message_0], Tweet_0);
-  setMetadataFor(Companion_26, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Companion_30, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(Article_0, 'Article', classMeta, VOID, [Message_0]);
   setMetadataFor(MentionType, 'MentionType', classMeta, OneOf);
   setMetadataFor(UserId, 'UserId', classMeta, MentionType, VOID, UserId);
-  setMetadataFor(Companion_27, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Companion_31, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(Mention, 'Mention', classMeta, VOID, [Message_0]);
-  setMetadataFor(Companion_28, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Companion_32, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(LastRead_0, 'LastRead', classMeta, VOID, [Message_0]);
-  setMetadataFor(Companion_29, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Companion_33, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(Cleared_0, 'Cleared', classMeta, VOID, [Message_0]);
-  setMetadataFor(Companion_30, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Companion_34, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(MessageHide, 'MessageHide', classMeta, VOID, [Message_0]);
-  setMetadataFor(Companion_31, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Companion_35, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(MessageDelete, 'MessageDelete', classMeta, VOID, [Message_0]);
   setMetadataFor(Content_3, 'Content', classMeta, OneOf);
   setMetadataFor(Text_4, 'Text', classMeta, Content_3);
   setMetadataFor(Composite_1, 'Composite', classMeta, Content_3);
-  setMetadataFor(Companion_32, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Companion_36, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(MessageEdit, 'MessageEdit', classMeta, VOID, [Message_0]);
-  setMetadataFor(Companion_33, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Companion_37, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(Quote, 'Quote', classMeta, VOID, [Message_0]);
   setMetadataFor(Type_0, 'Type', classMeta, VOID, [Enum]);
   setMetadataFor(DELIVERED, 'DELIVERED', objectMeta, Type_0);
   setMetadataFor(READ, 'READ', objectMeta, Type_0);
-  setMetadataFor(UNRECOGNIZED_3, 'UNRECOGNIZED', classMeta, Type_0);
-  setMetadataFor(Companion_34, 'Companion', objectMeta, VOID, [Companion_0]);
-  setMetadataFor(Companion_35, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(UNRECOGNIZED_5, 'UNRECOGNIZED', classMeta, Type_0);
+  setMetadataFor(Companion_38, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Companion_39, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(Confirmation_0, 'Confirmation', classMeta, VOID, [Message_0]);
-  setMetadataFor(Companion_36, 'Companion', objectMeta, VOID, [Companion]);
-  setMetadataFor(Location_1, 'Location', classMeta, VOID, [Message_0]);
-  setMetadataFor(Companion_37, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Companion_40, 'Companion', objectMeta, VOID, [Companion_0]);
+  setMetadataFor(Location_2, 'Location', classMeta, VOID, [Message_0]);
+  setMetadataFor(Companion_41, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(ImageAsset, 'ImageAsset', classMeta, VOID, [Message_0]);
   setMetadataFor(Status, 'Status', classMeta, OneOf);
   setMetadataFor(NotUploaded, 'NotUploaded', classMeta, Status, VOID, NotUploaded);
@@ -220,85 +237,85 @@
   setMetadataFor(NotUploaded_0, 'NotUploaded', classMeta, VOID, [Enum]);
   setMetadataFor(CANCELLED, 'CANCELLED', objectMeta, NotUploaded_0);
   setMetadataFor(FAILED, 'FAILED', objectMeta, NotUploaded_0);
-  setMetadataFor(UNRECOGNIZED_4, 'UNRECOGNIZED', classMeta, NotUploaded_0);
-  setMetadataFor(Companion_38, 'Companion', objectMeta, VOID, [Companion_0]);
+  setMetadataFor(UNRECOGNIZED_6, 'UNRECOGNIZED', classMeta, NotUploaded_0);
+  setMetadataFor(Companion_42, 'Companion', objectMeta, VOID, [Companion]);
   setMetadataFor(MetaData_0, 'MetaData', classMeta, OneOf);
   setMetadataFor(Image_1, 'Image', classMeta, MetaData_0);
   setMetadataFor(Video, 'Video', classMeta, MetaData_0);
   setMetadataFor(Audio, 'Audio', classMeta, MetaData_0);
-  setMetadataFor(Companion_39, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Companion_43, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(MetaData_1, 'MetaData', classMeta, OneOf);
   setMetadataFor(Image_2, 'Image', classMeta, MetaData_1);
-  setMetadataFor(Companion_40, 'Companion', objectMeta, VOID, [Companion]);
-  setMetadataFor(Companion_41, 'Companion', objectMeta, VOID, [Companion]);
-  setMetadataFor(Companion_42, 'Companion', objectMeta, VOID, [Companion]);
-  setMetadataFor(Companion_43, 'Companion', objectMeta, VOID, [Companion]);
-  setMetadataFor(Companion_44, 'Companion', objectMeta, VOID, [Companion]);
-  setMetadataFor(Companion_45, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Companion_44, 'Companion', objectMeta, VOID, [Companion_0]);
+  setMetadataFor(Companion_45, 'Companion', objectMeta, VOID, [Companion_0]);
+  setMetadataFor(Companion_46, 'Companion', objectMeta, VOID, [Companion_0]);
+  setMetadataFor(Companion_47, 'Companion', objectMeta, VOID, [Companion_0]);
+  setMetadataFor(Companion_48, 'Companion', objectMeta, VOID, [Companion_0]);
+  setMetadataFor(Companion_49, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(Original, 'Original', classMeta, VOID, [Message_0]);
   setMetadataFor(Preview_0, 'Preview', classMeta, VOID, [Message_0]);
   setMetadataFor(ImageMetaData, 'ImageMetaData', classMeta, VOID, [Message_0]);
   setMetadataFor(VideoMetaData, 'VideoMetaData', classMeta, VOID, [Message_0], VideoMetaData);
   setMetadataFor(AudioMetaData, 'AudioMetaData', classMeta, VOID, [Message_0], AudioMetaData);
   setMetadataFor(RemoteData, 'RemoteData', classMeta, VOID, [Message_0]);
-  setMetadataFor(Asset_1, 'Asset', classMeta, VOID, [Message_0], Asset_1);
-  setMetadataFor(Companion_46, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Asset_2, 'Asset', classMeta, VOID, [Message_0], Asset_2);
+  setMetadataFor(Companion_50, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(External_0, 'External', classMeta, VOID, [Message_0]);
-  setMetadataFor(Companion_47, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Companion_51, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(Reaction_0, 'Reaction', classMeta, VOID, [Message_0]);
-  setMetadataFor(Companion_48, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Companion_52, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(Calling_0, 'Calling', classMeta, VOID, [Message_0]);
-  setMetadataFor(Companion_49, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Companion_53, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(DataTransfer_0, 'DataTransfer', classMeta, VOID, [Message_0], DataTransfer_0);
-  setMetadataFor(Companion_50, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Companion_54, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(TrackingIdentifier, 'TrackingIdentifier', classMeta, VOID, [Message_0]);
   setMetadataFor(GroupInfoType, 'GroupInfoType', classMeta, VOID, [Enum]);
   setMetadataFor(PUBLIC_GROUP_STATE, 'PUBLIC_GROUP_STATE', objectMeta, GroupInfoType);
   setMetadataFor(GROUP_INFO, 'GROUP_INFO', objectMeta, GroupInfoType);
   setMetadataFor(GROUP_INFO_JWE, 'GROUP_INFO_JWE', objectMeta, GroupInfoType);
-  setMetadataFor(UNRECOGNIZED_5, 'UNRECOGNIZED', classMeta, GroupInfoType);
-  setMetadataFor(Companion_51, 'Companion', objectMeta, VOID, [Companion_0]);
+  setMetadataFor(UNRECOGNIZED_7, 'UNRECOGNIZED', classMeta, GroupInfoType);
+  setMetadataFor(Companion_55, 'Companion', objectMeta, VOID, [Companion]);
   setMetadataFor(RatchetTreeType, 'RatchetTreeType', classMeta, VOID, [Enum]);
   setMetadataFor(FULL, 'FULL', objectMeta, RatchetTreeType);
   setMetadataFor(DELTA, 'DELTA', objectMeta, RatchetTreeType);
   setMetadataFor(REFERENCE, 'REFERENCE', objectMeta, RatchetTreeType);
-  setMetadataFor(UNRECOGNIZED_6, 'UNRECOGNIZED', classMeta, RatchetTreeType);
-  setMetadataFor(Companion_52, 'Companion', objectMeta, VOID, [Companion_0]);
-  setMetadataFor(Companion_53, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(UNRECOGNIZED_8, 'UNRECOGNIZED', classMeta, RatchetTreeType);
+  setMetadataFor(Companion_56, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Companion_57, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(GroupInfoBundle, 'GroupInfoBundle', classMeta, VOID, [Message_0]);
-  setMetadataFor(Companion_54, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Companion_58, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(CommitBundle, 'CommitBundle', classMeta, VOID, [Message_0]);
   setMetadataFor(Priority, 'Priority', classMeta, VOID, [Enum]);
   setMetadataFor(LOW_PRIORITY, 'LOW_PRIORITY', objectMeta, Priority);
   setMetadataFor(HIGH_PRIORITY, 'HIGH_PRIORITY', objectMeta, Priority);
-  setMetadataFor(UNRECOGNIZED_7, 'UNRECOGNIZED', classMeta, Priority);
-  setMetadataFor(Companion_55, 'Companion', objectMeta, VOID, [Companion_0]);
-  setMetadataFor(Companion_56, 'Companion', objectMeta, VOID, [Companion]);
-  setMetadataFor(UserId_0, 'UserId', classMeta, VOID, [Message_0]);
-  setMetadataFor(Companion_57, 'Companion', objectMeta, VOID, [Companion]);
-  setMetadataFor(QualifiedUserId_0, 'QualifiedUserId', classMeta, VOID, [Message_0]);
-  setMetadataFor(Companion_58, 'Companion', objectMeta, VOID, [Companion]);
-  setMetadataFor(ClientId, 'ClientId', classMeta, VOID, [Message_0]);
+  setMetadataFor(UNRECOGNIZED_9, 'UNRECOGNIZED', classMeta, Priority);
   setMetadataFor(Companion_59, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Companion_60, 'Companion', objectMeta, VOID, [Companion_0]);
+  setMetadataFor(UserId_0, 'UserId', classMeta, VOID, [Message_0]);
+  setMetadataFor(Companion_61, 'Companion', objectMeta, VOID, [Companion_0]);
+  setMetadataFor(QualifiedUserId_0, 'QualifiedUserId', classMeta, VOID, [Message_0]);
+  setMetadataFor(Companion_62, 'Companion', objectMeta, VOID, [Companion_0]);
+  setMetadataFor(ClientId, 'ClientId', classMeta, VOID, [Message_0]);
+  setMetadataFor(Companion_63, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(ClientEntry, 'ClientEntry', classMeta, VOID, [Message_0]);
-  setMetadataFor(Companion_60, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Companion_64, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(UserEntry, 'UserEntry', classMeta, VOID, [Message_0]);
-  setMetadataFor(Companion_61, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Companion_65, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(QualifiedUserEntry, 'QualifiedUserEntry', classMeta, VOID, [Message_0]);
-  setMetadataFor(Companion_62, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Companion_66, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(NewOtrMessage, 'NewOtrMessage', classMeta, VOID, [Message_0]);
   setMetadataFor(ClientMismatchStrategy, 'ClientMismatchStrategy', classMeta, OneOf);
   setMetadataFor(ReportAll, 'ReportAll', classMeta, ClientMismatchStrategy);
   setMetadataFor(IgnoreAll, 'IgnoreAll', classMeta, ClientMismatchStrategy);
   setMetadataFor(ReportOnly, 'ReportOnly', classMeta, ClientMismatchStrategy);
   setMetadataFor(IgnoreOnly, 'IgnoreOnly', classMeta, ClientMismatchStrategy);
-  setMetadataFor(Companion_63, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Companion_67, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(QualifiedNewOtrMessage, 'QualifiedNewOtrMessage', classMeta, VOID, [Message_0]);
-  setMetadataFor(Companion_64, 'Companion', objectMeta, VOID, [Companion]);
-  setMetadataFor(Companion_65, 'Companion', objectMeta, VOID, [Companion]);
-  setMetadataFor(Companion_66, 'Companion', objectMeta, VOID, [Companion]);
-  setMetadataFor(Companion_67, 'Companion', objectMeta, VOID, [Companion]);
-  setMetadataFor(Companion_68, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Companion_68, 'Companion', objectMeta, VOID, [Companion_0]);
+  setMetadataFor(Companion_69, 'Companion', objectMeta, VOID, [Companion_0]);
+  setMetadataFor(Companion_70, 'Companion', objectMeta, VOID, [Companion_0]);
+  setMetadataFor(Companion_71, 'Companion', objectMeta, VOID, [Companion_0]);
+  setMetadataFor(Companion_72, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(ReportAll_0, 'ReportAll', classMeta, VOID, [Message_0], ReportAll_0);
   setMetadataFor(IgnoreAll_0, 'IgnoreAll', classMeta, VOID, [Message_0], IgnoreAll_0);
   setMetadataFor(ReportOnly_0, 'ReportOnly', classMeta, VOID, [Message_0], ReportOnly_0);
@@ -311,11 +328,127 @@
     [Message_0],
     ClientMismatchStrategy_0,
   );
-  setMetadataFor(Companion_69, 'Companion', objectMeta, VOID, [Companion]);
+  setMetadataFor(Companion_73, 'Companion', objectMeta, VOID, [Companion_0]);
   setMetadataFor(OtrAssetMeta, 'OtrAssetMeta', classMeta, VOID, [Message_0]);
   //endregion
+  function ExportedEncryptionAlgorithm$Companion$values$delegate$lambda() {
+    return listOf([BACKUP_AES_CBC_getInstance(), BACKUP_AES_GCM_getInstance()]);
+  }
+  function BACKUP_AES_CBC() {
+    BACKUP_AES_CBC_instance = this;
+    ExportedEncryptionAlgorithm.call(this, 0, 'BACKUP_AES_CBC');
+  }
+  var BACKUP_AES_CBC_instance;
+  function BACKUP_AES_CBC_getInstance() {
+    if (BACKUP_AES_CBC_instance == null) new BACKUP_AES_CBC();
+    return BACKUP_AES_CBC_instance;
+  }
+  function BACKUP_AES_GCM() {
+    BACKUP_AES_GCM_instance = this;
+    ExportedEncryptionAlgorithm.call(this, 1, 'BACKUP_AES_GCM');
+  }
+  var BACKUP_AES_GCM_instance;
+  function BACKUP_AES_GCM_getInstance() {
+    if (BACKUP_AES_GCM_instance == null) new BACKUP_AES_GCM();
+    return BACKUP_AES_GCM_instance;
+  }
+  function UNRECOGNIZED(value) {
+    ExportedEncryptionAlgorithm.call(this, value);
+  }
   function Companion_1() {
     Companion_instance = this;
+    var tmp = this;
+    tmp.values$delegate_1 = lazy(ExportedEncryptionAlgorithm$Companion$values$delegate$lambda);
+  }
+  protoOf(Companion_1).get_values_ksazhn_k$ = function () {
+    // Inline function 'kotlin.getValue' call
+    var this_0 = this.values$delegate_1;
+    values$factory();
+    return this_0.get_value_j01efc_k$();
+  };
+  protoOf(Companion_1).fromValue_lljhin_k$ = function (value) {
+    var tmp$ret$1;
+    $l$block: {
+      // Inline function 'kotlin.collections.firstOrNull' call
+      var tmp0_iterator = this.values.iterator_jk1svi_k$();
+      while (tmp0_iterator.hasNext_bitz1p_k$()) {
+        var element = tmp0_iterator.next_20eer_k$();
+        // Inline function 'com.wire.kalium.protobuf.backup.Companion.fromValue.<anonymous>' call
+        if (element.get_value_j01efc_k$() === value) {
+          tmp$ret$1 = element;
+          break $l$block;
+        }
+      }
+      tmp$ret$1 = null;
+    }
+    var tmp0_elvis_lhs = tmp$ret$1;
+    return tmp0_elvis_lhs == null ? new UNRECOGNIZED(value) : tmp0_elvis_lhs;
+  };
+  protoOf(Companion_1).fromName_z4ts05_k$ = function (name) {
+    var tmp$ret$1;
+    $l$block: {
+      // Inline function 'kotlin.collections.firstOrNull' call
+      var tmp0_iterator = this.values.iterator_jk1svi_k$();
+      while (tmp0_iterator.hasNext_bitz1p_k$()) {
+        var element = tmp0_iterator.next_20eer_k$();
+        // Inline function 'com.wire.kalium.protobuf.backup.Companion.fromName.<anonymous>' call
+        if (element.get_name_woqyms_k$() === name) {
+          tmp$ret$1 = element;
+          break $l$block;
+        }
+      }
+      tmp$ret$1 = null;
+    }
+    var tmp0_elvis_lhs = tmp$ret$1;
+    var tmp;
+    if (tmp0_elvis_lhs == null) {
+      throw IllegalArgumentException_init_$Create$('No ExportedEncryptionAlgorithm with name: ' + name);
+    } else {
+      tmp = tmp0_elvis_lhs;
+    }
+    return tmp;
+  };
+  var Companion_instance;
+  function Companion_getInstance_1() {
+    if (Companion_instance == null) new Companion_1();
+    return Companion_instance;
+  }
+  function ExportedEncryptionAlgorithm(value, name) {
+    Companion_getInstance_1();
+    name = name === VOID ? null : name;
+    this.value_1 = value;
+    this.name_1 = name;
+  }
+  protoOf(ExportedEncryptionAlgorithm).get_value_j01efc_k$ = function () {
+    return this.value_1;
+  };
+  protoOf(ExportedEncryptionAlgorithm).get_name_woqyms_k$ = function () {
+    return this.name_1;
+  };
+  protoOf(ExportedEncryptionAlgorithm).equals = function (other) {
+    var tmp;
+    if (other instanceof ExportedEncryptionAlgorithm) {
+      tmp = other.get_value_j01efc_k$() === this.get_value_j01efc_k$();
+    } else {
+      tmp = false;
+    }
+    return tmp;
+  };
+  protoOf(ExportedEncryptionAlgorithm).hashCode = function () {
+    return this.get_value_j01efc_k$();
+  };
+  protoOf(ExportedEncryptionAlgorithm).toString = function () {
+    var tmp0_elvis_lhs = this.get_name_woqyms_k$();
+    return (
+      'ExportedEncryptionAlgorithm.' +
+      (tmp0_elvis_lhs == null ? 'UNRECOGNIZED' : tmp0_elvis_lhs) +
+      '(value=' +
+      this.get_value_j01efc_k$() +
+      ')'
+    );
+  };
+  function Companion_2() {
+    Companion_instance_0 = this;
     var tmp = this;
     var tmp_0 = getKClass(BackupData);
     // Inline function 'kotlin.collections.buildList' call
@@ -327,12 +460,12 @@
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.backup.Companion.descriptor.<anonymous>' call
     var tmp0_messageDescriptor = descriptor$factory(this);
-    var tmp1_type = new Message(Companion_getInstance_2());
+    var tmp1_type = new Message(Companion_getInstance_3());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp0_messageDescriptor, 'info', 1, tmp1_type, info$factory(), VOID, 'info'),
     );
     var tmp2_messageDescriptor = descriptor$factory_0(this);
-    var tmp3_type = new Repeated(new Message(Companion_getInstance_5()));
+    var tmp3_type = new Repeated(new Message(Companion_getInstance_6()));
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
         tmp2_messageDescriptor,
@@ -345,28 +478,28 @@
       ),
     );
     var tmp4_messageDescriptor = descriptor$factory_1(this);
-    var tmp5_type = new Repeated(new Message(Companion_getInstance_6()));
+    var tmp5_type = new Repeated(new Message(Companion_getInstance_7()));
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp4_messageDescriptor, 'messages', 3, tmp5_type, messages$factory(), VOID, 'messages'),
     );
     var tmp6_messageDescriptor = descriptor$factory_2(this);
-    var tmp7_type = new Repeated(new Message(Companion_getInstance_3()));
+    var tmp7_type = new Repeated(new Message(Companion_getInstance_4()));
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp6_messageDescriptor, 'users', 4, tmp7_type, users$factory(), VOID, 'users'),
     );
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('BackupData', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_1).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl(Companion_getInstance_1(), u);
+  protoOf(Companion_2).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl(Companion_getInstance_2(), u);
   };
-  protoOf(Companion_1).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_2).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance;
-  function Companion_getInstance_1() {
-    if (Companion_instance == null) new Companion_1();
-    return Companion_instance;
+  var Companion_instance_0;
+  function Companion_getInstance_2() {
+    if (Companion_instance_0 == null) new Companion_2();
+    return Companion_instance_0;
   }
   function BackupData$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -374,7 +507,7 @@
     };
   }
   function BackupData(info, conversations, messages, users, unknownFields) {
-    Companion_getInstance_1();
+    Companion_getInstance_2();
     conversations = conversations === VOID ? emptyList() : conversations;
     messages = messages === VOID ? emptyList() : messages;
     users = users === VOID ? emptyList() : users;
@@ -406,7 +539,7 @@
     return protoMergeImpl(this, other);
   };
   protoOf(BackupData).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_1().descriptor_1;
+    return Companion_getInstance_2().descriptor_1;
   };
   protoOf(BackupData).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
@@ -474,8 +607,8 @@
     if (!equals(this.unknownFields_1, tmp0_other_with_cast.unknownFields_1)) return false;
     return true;
   };
-  function Companion_2() {
-    Companion_instance_0 = this;
+  function Companion_3() {
+    Companion_instance_1 = this;
     var tmp = this;
     var tmp_0 = getKClass(BackupInfo);
     // Inline function 'kotlin.collections.buildList' call
@@ -497,7 +630,7 @@
       new FieldDescriptor(tmp2_messageDescriptor, 'version', 2, tmp3_type, version$factory(), VOID, 'version'),
     );
     var tmp4_messageDescriptor = descriptor$factory_5(this);
-    var tmp5_type = new Message(Companion_getInstance_4());
+    var tmp5_type = new Message(Companion_getInstance_5());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp4_messageDescriptor, 'userId', 3, tmp5_type, userId$factory(), VOID, 'userId'),
     );
@@ -522,16 +655,16 @@
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('BackupInfo', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_2).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_0(Companion_getInstance_2(), u);
+  protoOf(Companion_3).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_0(Companion_getInstance_3(), u);
   };
-  protoOf(Companion_2).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_3).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_0;
-  function Companion_getInstance_2() {
-    if (Companion_instance_0 == null) new Companion_2();
-    return Companion_instance_0;
+  var Companion_instance_1;
+  function Companion_getInstance_3() {
+    if (Companion_instance_1 == null) new Companion_3();
+    return Companion_instance_1;
   }
   function BackupInfo$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -539,7 +672,7 @@
     };
   }
   function BackupInfo(platform, version, userId, creationTime, clientId, unknownFields) {
-    Companion_getInstance_2();
+    Companion_getInstance_3();
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
     this.platform = platform;
     this.version = version;
@@ -572,7 +705,7 @@
     return protoMergeImpl_0(this, other);
   };
   protoOf(BackupInfo).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_2().descriptor_1;
+    return Companion_getInstance_3().descriptor_1;
   };
   protoOf(BackupInfo).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
@@ -648,8 +781,8 @@
     if (!equals(this.unknownFields_1, tmp0_other_with_cast.unknownFields_1)) return false;
     return true;
   };
-  function Companion_3() {
-    Companion_instance_1 = this;
+  function Companion_4() {
+    Companion_instance_2 = this;
     var tmp = this;
     var tmp_0 = getKClass(ExportUser);
     // Inline function 'kotlin.collections.buildList' call
@@ -661,7 +794,7 @@
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.backup.Companion.descriptor.<anonymous>' call
     var tmp0_messageDescriptor = descriptor$factory_8(this);
-    var tmp1_type = new Message(Companion_getInstance_4());
+    var tmp1_type = new Message(Companion_getInstance_5());
     this_0.add_utx5q5_k$(new FieldDescriptor(tmp0_messageDescriptor, 'id', 1, tmp1_type, id$factory(), VOID, 'id'));
     var tmp2_messageDescriptor = descriptor$factory_9(this);
     var tmp3_type = new String_0(true);
@@ -676,16 +809,16 @@
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('ExportUser', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_3).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_1(Companion_getInstance_3(), u);
+  protoOf(Companion_4).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_1(Companion_getInstance_4(), u);
   };
-  protoOf(Companion_3).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_4).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_1;
-  function Companion_getInstance_3() {
-    if (Companion_instance_1 == null) new Companion_3();
-    return Companion_instance_1;
+  var Companion_instance_2;
+  function Companion_getInstance_4() {
+    if (Companion_instance_2 == null) new Companion_4();
+    return Companion_instance_2;
   }
   function ExportUser$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -693,7 +826,7 @@
     };
   }
   function ExportUser(id, name, handle, unknownFields) {
-    Companion_getInstance_3();
+    Companion_getInstance_4();
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
     this.id = id;
     this.name = name;
@@ -718,7 +851,7 @@
     return protoMergeImpl_1(this, other);
   };
   protoOf(ExportUser).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_3().descriptor_1;
+    return Companion_getInstance_4().descriptor_1;
   };
   protoOf(ExportUser).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
@@ -778,8 +911,8 @@
     if (!equals(this.unknownFields_1, tmp0_other_with_cast.unknownFields_1)) return false;
     return true;
   };
-  function Companion_4() {
-    Companion_instance_2 = this;
+  function Companion_5() {
+    Companion_instance_3 = this;
     var tmp = this;
     var tmp_0 = getKClass(ExportedQualifiedId);
     // Inline function 'kotlin.collections.buildList' call
@@ -803,16 +936,16 @@
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('ExportedQualifiedId', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_4).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_2(Companion_getInstance_4(), u);
+  protoOf(Companion_5).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_2(Companion_getInstance_5(), u);
   };
-  protoOf(Companion_4).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_5).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_2;
-  function Companion_getInstance_4() {
-    if (Companion_instance_2 == null) new Companion_4();
-    return Companion_instance_2;
+  var Companion_instance_3;
+  function Companion_getInstance_5() {
+    if (Companion_instance_3 == null) new Companion_5();
+    return Companion_instance_3;
   }
   function ExportedQualifiedId$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -820,7 +953,7 @@
     };
   }
   function ExportedQualifiedId(value, domain, unknownFields) {
-    Companion_getInstance_4();
+    Companion_getInstance_5();
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
     this.value = value;
     this.domain = domain;
@@ -841,7 +974,7 @@
     return protoMergeImpl_2(this, other);
   };
   protoOf(ExportedQualifiedId).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_4().descriptor_1;
+    return Companion_getInstance_5().descriptor_1;
   };
   protoOf(ExportedQualifiedId).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
@@ -893,8 +1026,8 @@
     if (!equals(this.unknownFields_1, tmp0_other_with_cast.unknownFields_1)) return false;
     return true;
   };
-  function Companion_5() {
-    Companion_instance_3 = this;
+  function Companion_6() {
+    Companion_instance_4 = this;
     var tmp = this;
     var tmp_0 = getKClass(ExportedConversation);
     // Inline function 'kotlin.collections.buildList' call
@@ -906,7 +1039,7 @@
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.backup.Companion.descriptor.<anonymous>' call
     var tmp0_messageDescriptor = descriptor$factory_13(this);
-    var tmp1_type = new Message(Companion_getInstance_4());
+    var tmp1_type = new Message(Companion_getInstance_5());
     this_0.add_utx5q5_k$(new FieldDescriptor(tmp0_messageDescriptor, 'id', 1, tmp1_type, id$factory_0(), VOID, 'id'));
     var tmp2_messageDescriptor = descriptor$factory_14(this);
     var tmp3_type = new String_0(true);
@@ -916,16 +1049,16 @@
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('ExportedConversation', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_5).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_3(Companion_getInstance_5(), u);
+  protoOf(Companion_6).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_3(Companion_getInstance_6(), u);
   };
-  protoOf(Companion_5).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_6).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_3;
-  function Companion_getInstance_5() {
-    if (Companion_instance_3 == null) new Companion_5();
-    return Companion_instance_3;
+  var Companion_instance_4;
+  function Companion_getInstance_6() {
+    if (Companion_instance_4 == null) new Companion_6();
+    return Companion_instance_4;
   }
   function ExportedConversation$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -933,7 +1066,7 @@
     };
   }
   function ExportedConversation(id, name, unknownFields) {
-    Companion_getInstance_5();
+    Companion_getInstance_6();
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
     this.id = id;
     this.name = name;
@@ -954,7 +1087,7 @@
     return protoMergeImpl_3(this, other);
   };
   protoOf(ExportedConversation).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_5().descriptor_1;
+    return Companion_getInstance_6().descriptor_1;
   };
   protoOf(ExportedConversation).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
@@ -1003,19 +1136,25 @@
   function Text(text) {
     Content.call(this, text);
   }
+  function Asset(asset) {
+    Content.call(this, asset);
+  }
+  function Location(location) {
+    Content.call(this, location);
+  }
   function Content(value) {
     OneOf.call(this, value);
   }
-  function Companion_6() {
-    Companion_instance_4 = this;
+  function Companion_7() {
+    Companion_instance_5 = this;
     var tmp = this;
     var tmp_0 = getKClass(ExportedMessage);
     // Inline function 'kotlin.collections.buildList' call
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'kotlin.collections.buildListInternal' call
-    checkBuilderCapacity(6);
+    checkBuilderCapacity(8);
     // Inline function 'kotlin.apply' call
-    var this_0 = ArrayList_init_$Create$(6);
+    var this_0 = ArrayList_init_$Create$(8);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.backup.Companion.descriptor.<anonymous>' call
     var tmp0_messageDescriptor = descriptor$factory_15(this);
@@ -1027,7 +1166,7 @@
       new FieldDescriptor(tmp2_messageDescriptor, 'time_iso', 2, tmp3_type, timeIso$factory(), VOID, 'timeIso'),
     );
     var tmp4_messageDescriptor = descriptor$factory_17(this);
-    var tmp5_type = new Message(Companion_getInstance_4());
+    var tmp5_type = new Message(Companion_getInstance_5());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
         tmp4_messageDescriptor,
@@ -1053,7 +1192,7 @@
       ),
     );
     var tmp8_messageDescriptor = descriptor$factory_19(this);
-    var tmp9_type = new Message(Companion_getInstance_4());
+    var tmp9_type = new Message(Companion_getInstance_5());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
         tmp8_messageDescriptor,
@@ -1066,23 +1205,33 @@
       ),
     );
     var tmp10_messageDescriptor = descriptor$factory_20(this);
-    var tmp11_type = new Message(Companion_getInstance_7());
+    var tmp11_type = new Message(Companion_getInstance_8());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp10_messageDescriptor, 'text', 6, tmp11_type, text$factory(), true, 'text'),
+    );
+    var tmp12_messageDescriptor = descriptor$factory_21(this);
+    var tmp13_type = new Message(Companion_getInstance_9());
+    this_0.add_utx5q5_k$(
+      new FieldDescriptor(tmp12_messageDescriptor, 'asset', 7, tmp13_type, asset$factory(), true, 'asset'),
+    );
+    var tmp14_messageDescriptor = descriptor$factory_22(this);
+    var tmp15_type = new Message(Companion_getInstance_10());
+    this_0.add_utx5q5_k$(
+      new FieldDescriptor(tmp14_messageDescriptor, 'location', 8, tmp15_type, location$factory(), true, 'location'),
     );
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('ExportedMessage', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_6).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_4(Companion_getInstance_6(), u);
+  protoOf(Companion_7).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_4(Companion_getInstance_7(), u);
   };
-  protoOf(Companion_6).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_7).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_4;
-  function Companion_getInstance_6() {
-    if (Companion_instance_4 == null) new Companion_6();
-    return Companion_instance_4;
+  var Companion_instance_5;
+  function Companion_getInstance_7() {
+    if (Companion_instance_5 == null) new Companion_7();
+    return Companion_instance_5;
   }
   function ExportedMessage$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -1090,7 +1239,7 @@
     };
   }
   function ExportedMessage(id, timeIso, senderUserId, senderClientId, conversationId, content, unknownFields) {
-    Companion_getInstance_6();
+    Companion_getInstance_7();
     content = content === VOID ? null : content;
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
     this.id = id;
@@ -1129,11 +1278,21 @@
     var tmp0_safe_receiver = tmp instanceof Text ? tmp : null;
     return tmp0_safe_receiver == null ? null : tmp0_safe_receiver.get_value_j01efc_k$();
   };
+  protoOf(ExportedMessage).get_asset_iotcjr_k$ = function () {
+    var tmp = this.content;
+    var tmp0_safe_receiver = tmp instanceof Asset ? tmp : null;
+    return tmp0_safe_receiver == null ? null : tmp0_safe_receiver.get_value_j01efc_k$();
+  };
+  protoOf(ExportedMessage).get_location_d3s02_k$ = function () {
+    var tmp = this.content;
+    var tmp0_safe_receiver = tmp instanceof Location ? tmp : null;
+    return tmp0_safe_receiver == null ? null : tmp0_safe_receiver.get_value_j01efc_k$();
+  };
   protoOf(ExportedMessage).plus_fj0q1z_k$ = function (other) {
     return protoMergeImpl_4(this, other);
   };
   protoOf(ExportedMessage).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_6().descriptor_1;
+    return Companion_getInstance_7().descriptor_1;
   };
   protoOf(ExportedMessage).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
@@ -1234,8 +1393,8 @@
     if (!equals(this.unknownFields_1, tmp0_other_with_cast.unknownFields_1)) return false;
     return true;
   };
-  function Companion_7() {
-    Companion_instance_5 = this;
+  function Companion_8() {
+    Companion_instance_6 = this;
     var tmp = this;
     var tmp_0 = getKClass(ExportedText);
     // Inline function 'kotlin.collections.buildList' call
@@ -1246,7 +1405,7 @@
     var this_0 = ArrayList_init_$Create$(1);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.backup.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_21(this);
+    var tmp0_messageDescriptor = descriptor$factory_23(this);
     var tmp1_type = new String_0(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp0_messageDescriptor, 'content', 1, tmp1_type, content$factory(), VOID, 'content'),
@@ -1254,16 +1413,16 @@
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('ExportedText', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_7).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_5(Companion_getInstance_7(), u);
+  protoOf(Companion_8).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_5(Companion_getInstance_8(), u);
   };
-  protoOf(Companion_7).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_8).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_5;
-  function Companion_getInstance_7() {
-    if (Companion_instance_5 == null) new Companion_7();
-    return Companion_instance_5;
+  var Companion_instance_6;
+  function Companion_getInstance_8() {
+    if (Companion_instance_6 == null) new Companion_8();
+    return Companion_instance_6;
   }
   function ExportedText$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -1271,7 +1430,7 @@
     };
   }
   function ExportedText(content, unknownFields) {
-    Companion_getInstance_7();
+    Companion_getInstance_8();
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
     this.content = content;
     this.unknownFields_1 = unknownFields;
@@ -1288,7 +1447,7 @@
     return protoMergeImpl_5(this, other);
   };
   protoOf(ExportedText).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_7().descriptor_1;
+    return Companion_getInstance_8().descriptor_1;
   };
   protoOf(ExportedText).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
@@ -1323,6 +1482,475 @@
     if (!(other instanceof ExportedText)) return false;
     var tmp0_other_with_cast = other instanceof ExportedText ? other : THROW_CCE();
     if (!(this.content === tmp0_other_with_cast.content)) return false;
+    if (!equals(this.unknownFields_1, tmp0_other_with_cast.unknownFields_1)) return false;
+    return true;
+  };
+  function Companion_9() {
+    Companion_instance_7 = this;
+    var tmp = this;
+    var tmp_0 = getKClass(ExportedAsset);
+    // Inline function 'kotlin.collections.buildList' call
+    // Inline function 'kotlin.contracts.contract' call
+    // Inline function 'kotlin.collections.buildListInternal' call
+    checkBuilderCapacity(9);
+    // Inline function 'kotlin.apply' call
+    var this_0 = ArrayList_init_$Create$(9);
+    // Inline function 'kotlin.contracts.contract' call
+    // Inline function 'com.wire.kalium.protobuf.backup.Companion.descriptor.<anonymous>' call
+    var tmp0_messageDescriptor = descriptor$factory_24(this);
+    var tmp1_type = new String_0(true);
+    this_0.add_utx5q5_k$(
+      new FieldDescriptor(tmp0_messageDescriptor, 'mimetype', 1, tmp1_type, mimetype$factory(), VOID, 'mimetype'),
+    );
+    var tmp2_messageDescriptor = descriptor$factory_25(this);
+    var tmp3_type = new Int64(true);
+    this_0.add_utx5q5_k$(
+      new FieldDescriptor(tmp2_messageDescriptor, 'size', 2, tmp3_type, size$factory(), VOID, 'size'),
+    );
+    var tmp4_messageDescriptor = descriptor$factory_26(this);
+    var tmp5_type = new String_0(true);
+    this_0.add_utx5q5_k$(
+      new FieldDescriptor(tmp4_messageDescriptor, 'name', 3, tmp5_type, name$factory_1(), VOID, 'name'),
+    );
+    var tmp6_messageDescriptor = descriptor$factory_27(this);
+    var tmp7_type = new Bytes(true);
+    this_0.add_utx5q5_k$(
+      new FieldDescriptor(tmp6_messageDescriptor, 'otr_key', 4, tmp7_type, otrKey$factory(), VOID, 'otrKey'),
+    );
+    var tmp8_messageDescriptor = descriptor$factory_28(this);
+    var tmp9_type = new Bytes(true);
+    this_0.add_utx5q5_k$(
+      new FieldDescriptor(tmp8_messageDescriptor, 'sha256', 5, tmp9_type, sha256$factory(), VOID, 'sha256'),
+    );
+    var tmp10_messageDescriptor = descriptor$factory_29(this);
+    var tmp11_type = new String_0(true);
+    this_0.add_utx5q5_k$(
+      new FieldDescriptor(tmp10_messageDescriptor, 'asset_id', 6, tmp11_type, assetId$factory(), VOID, 'assetId'),
+    );
+    var tmp12_messageDescriptor = descriptor$factory_30(this);
+    var tmp13_type = new String_0(true);
+    this_0.add_utx5q5_k$(
+      new FieldDescriptor(
+        tmp12_messageDescriptor,
+        'asset_token',
+        7,
+        tmp13_type,
+        assetToken$factory(),
+        VOID,
+        'assetToken',
+      ),
+    );
+    var tmp14_messageDescriptor = descriptor$factory_31(this);
+    var tmp15_type = new String_0(true);
+    this_0.add_utx5q5_k$(
+      new FieldDescriptor(
+        tmp14_messageDescriptor,
+        'asset_domain',
+        8,
+        tmp15_type,
+        assetDomain$factory(),
+        VOID,
+        'assetDomain',
+      ),
+    );
+    var tmp16_messageDescriptor = descriptor$factory_32(this);
+    var tmp17_type = new Enum_0(Companion_getInstance_1(), true);
+    this_0.add_utx5q5_k$(
+      new FieldDescriptor(
+        tmp16_messageDescriptor,
+        'encryption',
+        9,
+        tmp17_type,
+        encryption$factory(),
+        VOID,
+        'encryption',
+      ),
+    );
+    var tmp$ret$2 = this_0.build_1k0s4u_k$();
+    tmp.descriptor_1 = new MessageDescriptor('ExportedAsset', tmp_0, this, tmp$ret$2);
+  }
+  protoOf(Companion_9).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_6(Companion_getInstance_9(), u);
+  };
+  protoOf(Companion_9).get_descriptor_wjt6a0_k$ = function () {
+    return this.descriptor_1;
+  };
+  var Companion_instance_7;
+  function Companion_getInstance_9() {
+    if (Companion_instance_7 == null) new Companion_9();
+    return Companion_instance_7;
+  }
+  function ExportedAsset$protoSize$delegate$lambda(this$0) {
+    return function () {
+      return get_protoSize.call(this$0);
+    };
+  }
+  function ExportedAsset(
+    mimetype,
+    size,
+    name,
+    otrKey,
+    sha256,
+    assetId,
+    assetToken,
+    assetDomain,
+    encryption,
+    unknownFields,
+  ) {
+    Companion_getInstance_9();
+    name = name === VOID ? null : name;
+    assetToken = assetToken === VOID ? null : assetToken;
+    assetDomain = assetDomain === VOID ? null : assetDomain;
+    encryption = encryption === VOID ? null : encryption;
+    unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
+    this.mimetype = mimetype;
+    this.size = size;
+    this.name = name;
+    this.otrKey = otrKey;
+    this.sha256 = sha256;
+    this.assetId = assetId;
+    this.assetToken = assetToken;
+    this.assetDomain = assetDomain;
+    this.encryption = encryption;
+    this.unknownFields_1 = unknownFields;
+    var tmp = this;
+    tmp.protoSize$delegate_1 = lazy(ExportedAsset$protoSize$delegate$lambda(this));
+  }
+  protoOf(ExportedAsset).get_mimetype_g7wrw7_k$ = function () {
+    return this.mimetype;
+  };
+  protoOf(ExportedAsset).get_size_woubt6_k$ = function () {
+    return this.size;
+  };
+  protoOf(ExportedAsset).get_name_woqyms_k$ = function () {
+    return this.name;
+  };
+  protoOf(ExportedAsset).get_otrKey_hriosb_k$ = function () {
+    return this.otrKey;
+  };
+  protoOf(ExportedAsset).get_sha256_jgs8q8_k$ = function () {
+    return this.sha256;
+  };
+  protoOf(ExportedAsset).get_assetId_ae1upq_k$ = function () {
+    return this.assetId;
+  };
+  protoOf(ExportedAsset).get_assetToken_evm1rm_k$ = function () {
+    return this.assetToken;
+  };
+  protoOf(ExportedAsset).get_assetDomain_rgmfl7_k$ = function () {
+    return this.assetDomain;
+  };
+  protoOf(ExportedAsset).get_encryption_pua0p8_k$ = function () {
+    return this.encryption;
+  };
+  protoOf(ExportedAsset).get_unknownFields_kpu7i2_k$ = function () {
+    return this.unknownFields_1;
+  };
+  protoOf(ExportedAsset).plus_fj0q1z_k$ = function (other) {
+    return protoMergeImpl_6(this, other);
+  };
+  protoOf(ExportedAsset).get_descriptor_wjt6a0_k$ = function () {
+    return Companion_getInstance_9().descriptor_1;
+  };
+  protoOf(ExportedAsset).get_protoSize_1ekskg_k$ = function () {
+    // Inline function 'kotlin.getValue' call
+    var this_0 = this.protoSize$delegate_1;
+    protoSize$factory_6();
+    return this_0.get_value_j01efc_k$();
+  };
+  protoOf(ExportedAsset).component1_7eebsc_k$ = function () {
+    return this.mimetype;
+  };
+  protoOf(ExportedAsset).component2_7eebsb_k$ = function () {
+    return this.size;
+  };
+  protoOf(ExportedAsset).component3_7eebsa_k$ = function () {
+    return this.name;
+  };
+  protoOf(ExportedAsset).component4_7eebs9_k$ = function () {
+    return this.otrKey;
+  };
+  protoOf(ExportedAsset).component5_7eebs8_k$ = function () {
+    return this.sha256;
+  };
+  protoOf(ExportedAsset).component6_7eebs7_k$ = function () {
+    return this.assetId;
+  };
+  protoOf(ExportedAsset).component7_7eebs6_k$ = function () {
+    return this.assetToken;
+  };
+  protoOf(ExportedAsset).component8_7eebs5_k$ = function () {
+    return this.assetDomain;
+  };
+  protoOf(ExportedAsset).component9_7eebs4_k$ = function () {
+    return this.encryption;
+  };
+  protoOf(ExportedAsset).component10_gazzfo_k$ = function () {
+    return this.unknownFields_1;
+  };
+  protoOf(ExportedAsset).copy_gruee6_k$ = function (
+    mimetype,
+    size,
+    name,
+    otrKey,
+    sha256,
+    assetId,
+    assetToken,
+    assetDomain,
+    encryption,
+    unknownFields,
+  ) {
+    return new ExportedAsset(
+      mimetype,
+      size,
+      name,
+      otrKey,
+      sha256,
+      assetId,
+      assetToken,
+      assetDomain,
+      encryption,
+      unknownFields,
+    );
+  };
+  protoOf(ExportedAsset).copy = function (
+    mimetype,
+    size,
+    name,
+    otrKey,
+    sha256,
+    assetId,
+    assetToken,
+    assetDomain,
+    encryption,
+    unknownFields,
+    $super,
+  ) {
+    mimetype = mimetype === VOID ? this.mimetype : mimetype;
+    size = size === VOID ? this.size : size;
+    name = name === VOID ? this.name : name;
+    otrKey = otrKey === VOID ? this.otrKey : otrKey;
+    sha256 = sha256 === VOID ? this.sha256 : sha256;
+    assetId = assetId === VOID ? this.assetId : assetId;
+    assetToken = assetToken === VOID ? this.assetToken : assetToken;
+    assetDomain = assetDomain === VOID ? this.assetDomain : assetDomain;
+    encryption = encryption === VOID ? this.encryption : encryption;
+    unknownFields = unknownFields === VOID ? this.unknownFields_1 : unknownFields;
+    return this.copy_gruee6_k$(
+      mimetype,
+      size,
+      name,
+      otrKey,
+      sha256,
+      assetId,
+      assetToken,
+      assetDomain,
+      encryption,
+      unknownFields,
+    );
+  };
+  protoOf(ExportedAsset).toString = function () {
+    return (
+      'ExportedAsset(mimetype=' +
+      this.mimetype +
+      ', size=' +
+      this.size.toString() +
+      ', name=' +
+      this.name +
+      ', otrKey=' +
+      this.otrKey +
+      ', sha256=' +
+      this.sha256 +
+      ', assetId=' +
+      this.assetId +
+      ', assetToken=' +
+      this.assetToken +
+      ', assetDomain=' +
+      this.assetDomain +
+      ', encryption=' +
+      this.encryption +
+      ', unknownFields=' +
+      this.unknownFields_1 +
+      ')'
+    );
+  };
+  protoOf(ExportedAsset).hashCode = function () {
+    var result = getStringHashCode(this.mimetype);
+    result = (imul(result, 31) + this.size.hashCode()) | 0;
+    result = (imul(result, 31) + (this.name == null ? 0 : getStringHashCode(this.name))) | 0;
+    result = (imul(result, 31) + this.otrKey.hashCode()) | 0;
+    result = (imul(result, 31) + this.sha256.hashCode()) | 0;
+    result = (imul(result, 31) + getStringHashCode(this.assetId)) | 0;
+    result = (imul(result, 31) + (this.assetToken == null ? 0 : getStringHashCode(this.assetToken))) | 0;
+    result = (imul(result, 31) + (this.assetDomain == null ? 0 : getStringHashCode(this.assetDomain))) | 0;
+    result = (imul(result, 31) + (this.encryption == null ? 0 : this.encryption.hashCode())) | 0;
+    result = (imul(result, 31) + hashCode(this.unknownFields_1)) | 0;
+    return result;
+  };
+  protoOf(ExportedAsset).equals = function (other) {
+    if (this === other) return true;
+    if (!(other instanceof ExportedAsset)) return false;
+    var tmp0_other_with_cast = other instanceof ExportedAsset ? other : THROW_CCE();
+    if (!(this.mimetype === tmp0_other_with_cast.mimetype)) return false;
+    if (!this.size.equals(tmp0_other_with_cast.size)) return false;
+    if (!(this.name == tmp0_other_with_cast.name)) return false;
+    if (!this.otrKey.equals(tmp0_other_with_cast.otrKey)) return false;
+    if (!this.sha256.equals(tmp0_other_with_cast.sha256)) return false;
+    if (!(this.assetId === tmp0_other_with_cast.assetId)) return false;
+    if (!(this.assetToken == tmp0_other_with_cast.assetToken)) return false;
+    if (!(this.assetDomain == tmp0_other_with_cast.assetDomain)) return false;
+    if (!equals(this.encryption, tmp0_other_with_cast.encryption)) return false;
+    if (!equals(this.unknownFields_1, tmp0_other_with_cast.unknownFields_1)) return false;
+    return true;
+  };
+  function Companion_10() {
+    Companion_instance_8 = this;
+    var tmp = this;
+    var tmp_0 = getKClass(ExportedLocation);
+    // Inline function 'kotlin.collections.buildList' call
+    // Inline function 'kotlin.contracts.contract' call
+    // Inline function 'kotlin.collections.buildListInternal' call
+    checkBuilderCapacity(4);
+    // Inline function 'kotlin.apply' call
+    var this_0 = ArrayList_init_$Create$(4);
+    // Inline function 'kotlin.contracts.contract' call
+    // Inline function 'com.wire.kalium.protobuf.backup.Companion.descriptor.<anonymous>' call
+    var tmp0_messageDescriptor = descriptor$factory_33(this);
+    var tmp1_type = new Float(true);
+    this_0.add_utx5q5_k$(
+      new FieldDescriptor(tmp0_messageDescriptor, 'longitude', 1, tmp1_type, longitude$factory(), VOID, 'longitude'),
+    );
+    var tmp2_messageDescriptor = descriptor$factory_34(this);
+    var tmp3_type = new Float(true);
+    this_0.add_utx5q5_k$(
+      new FieldDescriptor(tmp2_messageDescriptor, 'latitude', 2, tmp3_type, latitude$factory(), VOID, 'latitude'),
+    );
+    var tmp4_messageDescriptor = descriptor$factory_35(this);
+    var tmp5_type = new String_0(true);
+    this_0.add_utx5q5_k$(
+      new FieldDescriptor(tmp4_messageDescriptor, 'name', 3, tmp5_type, name$factory_2(), VOID, 'name'),
+    );
+    var tmp6_messageDescriptor = descriptor$factory_36(this);
+    var tmp7_type = new Int32(true);
+    this_0.add_utx5q5_k$(
+      new FieldDescriptor(tmp6_messageDescriptor, 'zoom', 4, tmp7_type, zoom$factory(), VOID, 'zoom'),
+    );
+    var tmp$ret$2 = this_0.build_1k0s4u_k$();
+    tmp.descriptor_1 = new MessageDescriptor('ExportedLocation', tmp_0, this, tmp$ret$2);
+  }
+  protoOf(Companion_10).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_7(Companion_getInstance_10(), u);
+  };
+  protoOf(Companion_10).get_descriptor_wjt6a0_k$ = function () {
+    return this.descriptor_1;
+  };
+  var Companion_instance_8;
+  function Companion_getInstance_10() {
+    if (Companion_instance_8 == null) new Companion_10();
+    return Companion_instance_8;
+  }
+  function ExportedLocation$protoSize$delegate$lambda(this$0) {
+    return function () {
+      return get_protoSize.call(this$0);
+    };
+  }
+  function ExportedLocation(longitude, latitude, name, zoom, unknownFields) {
+    Companion_getInstance_10();
+    name = name === VOID ? null : name;
+    zoom = zoom === VOID ? null : zoom;
+    unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
+    this.longitude = longitude;
+    this.latitude = latitude;
+    this.name = name;
+    this.zoom = zoom;
+    this.unknownFields_1 = unknownFields;
+    var tmp = this;
+    tmp.protoSize$delegate_1 = lazy(ExportedLocation$protoSize$delegate$lambda(this));
+  }
+  protoOf(ExportedLocation).get_longitude_asb1fq_k$ = function () {
+    return this.longitude;
+  };
+  protoOf(ExportedLocation).get_latitude_feukvp_k$ = function () {
+    return this.latitude;
+  };
+  protoOf(ExportedLocation).get_name_woqyms_k$ = function () {
+    return this.name;
+  };
+  protoOf(ExportedLocation).get_zoom_woywws_k$ = function () {
+    return this.zoom;
+  };
+  protoOf(ExportedLocation).get_unknownFields_kpu7i2_k$ = function () {
+    return this.unknownFields_1;
+  };
+  protoOf(ExportedLocation).plus_fj0q1z_k$ = function (other) {
+    return protoMergeImpl_7(this, other);
+  };
+  protoOf(ExportedLocation).get_descriptor_wjt6a0_k$ = function () {
+    return Companion_getInstance_10().descriptor_1;
+  };
+  protoOf(ExportedLocation).get_protoSize_1ekskg_k$ = function () {
+    // Inline function 'kotlin.getValue' call
+    var this_0 = this.protoSize$delegate_1;
+    protoSize$factory_7();
+    return this_0.get_value_j01efc_k$();
+  };
+  protoOf(ExportedLocation).component1_7eebsc_k$ = function () {
+    return this.longitude;
+  };
+  protoOf(ExportedLocation).component2_7eebsb_k$ = function () {
+    return this.latitude;
+  };
+  protoOf(ExportedLocation).component3_7eebsa_k$ = function () {
+    return this.name;
+  };
+  protoOf(ExportedLocation).component4_7eebs9_k$ = function () {
+    return this.zoom;
+  };
+  protoOf(ExportedLocation).component5_7eebs8_k$ = function () {
+    return this.unknownFields_1;
+  };
+  protoOf(ExportedLocation).copy_qdh5sw_k$ = function (longitude, latitude, name, zoom, unknownFields) {
+    return new ExportedLocation(longitude, latitude, name, zoom, unknownFields);
+  };
+  protoOf(ExportedLocation).copy = function (longitude, latitude, name, zoom, unknownFields, $super) {
+    longitude = longitude === VOID ? this.longitude : longitude;
+    latitude = latitude === VOID ? this.latitude : latitude;
+    name = name === VOID ? this.name : name;
+    zoom = zoom === VOID ? this.zoom : zoom;
+    unknownFields = unknownFields === VOID ? this.unknownFields_1 : unknownFields;
+    return this.copy_qdh5sw_k$(longitude, latitude, name, zoom, unknownFields);
+  };
+  protoOf(ExportedLocation).toString = function () {
+    return (
+      'ExportedLocation(longitude=' +
+      this.longitude +
+      ', latitude=' +
+      this.latitude +
+      ', name=' +
+      this.name +
+      ', zoom=' +
+      this.zoom +
+      ', unknownFields=' +
+      this.unknownFields_1 +
+      ')'
+    );
+  };
+  protoOf(ExportedLocation).hashCode = function () {
+    var result = getNumberHashCode(this.longitude);
+    result = (imul(result, 31) + getNumberHashCode(this.latitude)) | 0;
+    result = (imul(result, 31) + (this.name == null ? 0 : getStringHashCode(this.name))) | 0;
+    result = (imul(result, 31) + (this.zoom == null ? 0 : this.zoom)) | 0;
+    result = (imul(result, 31) + hashCode(this.unknownFields_1)) | 0;
+    return result;
+  };
+  protoOf(ExportedLocation).equals = function (other) {
+    if (this === other) return true;
+    if (!(other instanceof ExportedLocation)) return false;
+    var tmp0_other_with_cast = other instanceof ExportedLocation ? other : THROW_CCE();
+    if (!equals(this.longitude, tmp0_other_with_cast.longitude)) return false;
+    if (!equals(this.latitude, tmp0_other_with_cast.latitude)) return false;
+    if (!(this.name == tmp0_other_with_cast.name)) return false;
+    if (!(this.zoom == tmp0_other_with_cast.zoom)) return false;
     if (!equals(this.unknownFields_1, tmp0_other_with_cast.unknownFields_1)) return false;
     return true;
   };
@@ -1541,8 +2169,36 @@
           _this__u8e3s4.content.get_value_j01efc_k$().plus_fj0q1z_k$(plus.content.get_value_j01efc_k$()),
         );
       } else {
-        var tmp0_elvis_lhs = plus.content;
-        tmp_2 = tmp0_elvis_lhs == null ? _this__u8e3s4.content : tmp0_elvis_lhs;
+        var tmp_6;
+        var tmp_7 = _this__u8e3s4.content;
+        if (tmp_7 instanceof Asset) {
+          var tmp_8 = plus.content;
+          tmp_6 = tmp_8 instanceof Asset;
+        } else {
+          tmp_6 = false;
+        }
+        if (tmp_6) {
+          tmp_2 = new Asset(
+            _this__u8e3s4.content.get_value_j01efc_k$().plus_fj0q1z_k$(plus.content.get_value_j01efc_k$()),
+          );
+        } else {
+          var tmp_9;
+          var tmp_10 = _this__u8e3s4.content;
+          if (tmp_10 instanceof Location) {
+            var tmp_11 = plus.content;
+            tmp_9 = tmp_11 instanceof Location;
+          } else {
+            tmp_9 = false;
+          }
+          if (tmp_9) {
+            tmp_2 = new Location(
+              _this__u8e3s4.content.get_value_j01efc_k$().plus_fj0q1z_k$(plus.content.get_value_j01efc_k$()),
+            );
+          } else {
+            var tmp0_elvis_lhs = plus.content;
+            tmp_2 = tmp0_elvis_lhs == null ? _this__u8e3s4.content : tmp0_elvis_lhs;
+          }
+        }
       }
       tmp = tmp0_safe_receiver.copy(
         VOID,
@@ -1614,6 +2270,126 @@
       throw Companion_getInstance().missingRequiredField('content');
     }
     return new ExportedText(ensureNotNull(content._v), unknownFields);
+  }
+  function protoMergeImpl_6(_this__u8e3s4, plus) {
+    var tmp0_safe_receiver = plus instanceof ExportedAsset ? plus : null;
+    var tmp;
+    if (tmp0_safe_receiver == null) {
+      tmp = null;
+    } else {
+      // Inline function 'kotlin.let' call
+      // Inline function 'kotlin.contracts.contract' call
+      // Inline function 'com.wire.kalium.protobuf.backup.protoMergeImpl.<anonymous>' call
+      var tmp0_elvis_lhs = plus.name;
+      var tmp_0 = tmp0_elvis_lhs == null ? _this__u8e3s4.name : tmp0_elvis_lhs;
+      var tmp1_elvis_lhs = plus.assetToken;
+      var tmp_1 = tmp1_elvis_lhs == null ? _this__u8e3s4.assetToken : tmp1_elvis_lhs;
+      var tmp2_elvis_lhs = plus.assetDomain;
+      var tmp_2 = tmp2_elvis_lhs == null ? _this__u8e3s4.assetDomain : tmp2_elvis_lhs;
+      var tmp3_elvis_lhs = plus.encryption;
+      tmp = tmp0_safe_receiver.copy(
+        VOID,
+        VOID,
+        tmp_0,
+        VOID,
+        VOID,
+        VOID,
+        tmp_1,
+        tmp_2,
+        tmp3_elvis_lhs == null ? _this__u8e3s4.encryption : tmp3_elvis_lhs,
+        plus_0(_this__u8e3s4.unknownFields_1, plus.get_unknownFields_kpu7i2_k$()),
+      );
+    }
+    var tmp1_elvis_lhs_0 = tmp;
+    return tmp1_elvis_lhs_0 == null ? _this__u8e3s4 : tmp1_elvis_lhs_0;
+  }
+  function decodeWithImpl_6(_this__u8e3s4, u) {
+    var mimetype = {_v: null};
+    var size = {_v: null};
+    var name = {_v: null};
+    var otrKey = {_v: null};
+    var sha256 = {_v: null};
+    var assetId = {_v: null};
+    var assetToken = {_v: null};
+    var assetDomain = {_v: null};
+    var encryption = {_v: null};
+    var unknownFields = u.readMessage_fttc7y_k$(
+      _this__u8e3s4,
+      decodeWithImpl$lambda_6(mimetype, size, name, otrKey, sha256, assetId, assetToken, assetDomain, encryption),
+    );
+    if (mimetype._v == null) {
+      throw Companion_getInstance().missingRequiredField('mimetype');
+    }
+    if (size._v == null) {
+      throw Companion_getInstance().missingRequiredField('size');
+    }
+    if (otrKey._v == null) {
+      throw Companion_getInstance().missingRequiredField('otr_key');
+    }
+    if (sha256._v == null) {
+      throw Companion_getInstance().missingRequiredField('sha256');
+    }
+    if (assetId._v == null) {
+      throw Companion_getInstance().missingRequiredField('asset_id');
+    }
+    return new ExportedAsset(
+      ensureNotNull(mimetype._v),
+      ensureNotNull(size._v),
+      name._v,
+      ensureNotNull(otrKey._v),
+      ensureNotNull(sha256._v),
+      ensureNotNull(assetId._v),
+      assetToken._v,
+      assetDomain._v,
+      encryption._v,
+      unknownFields,
+    );
+  }
+  function protoMergeImpl_7(_this__u8e3s4, plus) {
+    var tmp0_safe_receiver = plus instanceof ExportedLocation ? plus : null;
+    var tmp;
+    if (tmp0_safe_receiver == null) {
+      tmp = null;
+    } else {
+      // Inline function 'kotlin.let' call
+      // Inline function 'kotlin.contracts.contract' call
+      // Inline function 'com.wire.kalium.protobuf.backup.protoMergeImpl.<anonymous>' call
+      var tmp0_elvis_lhs = plus.name;
+      var tmp_0 = tmp0_elvis_lhs == null ? _this__u8e3s4.name : tmp0_elvis_lhs;
+      var tmp1_elvis_lhs = plus.zoom;
+      tmp = tmp0_safe_receiver.copy(
+        VOID,
+        VOID,
+        tmp_0,
+        tmp1_elvis_lhs == null ? _this__u8e3s4.zoom : tmp1_elvis_lhs,
+        plus_0(_this__u8e3s4.unknownFields_1, plus.get_unknownFields_kpu7i2_k$()),
+      );
+    }
+    var tmp1_elvis_lhs_0 = tmp;
+    return tmp1_elvis_lhs_0 == null ? _this__u8e3s4 : tmp1_elvis_lhs_0;
+  }
+  function decodeWithImpl_7(_this__u8e3s4, u) {
+    var longitude = {_v: null};
+    var latitude = {_v: null};
+    var name = {_v: null};
+    var zoom = {_v: null};
+    var unknownFields = u.readMessage_fttc7y_k$(
+      _this__u8e3s4,
+      decodeWithImpl$lambda_7(longitude, latitude, name, zoom),
+    );
+    if (longitude._v == null) {
+      throw Companion_getInstance().missingRequiredField('longitude');
+    }
+    if (latitude._v == null) {
+      throw Companion_getInstance().missingRequiredField('latitude');
+    }
+    return new ExportedLocation(
+      ensureNotNull(longitude._v),
+      ensureNotNull(latitude._v),
+      name._v,
+      zoom._v,
+      unknownFields,
+    );
   }
   function decodeWithImpl$lambda($info, $conversations, $messages, $users) {
     return function (_fieldNumber, _fieldValue) {
@@ -1777,6 +2553,14 @@
           $content._v = new Text(_fieldValue instanceof ExportedText ? _fieldValue : THROW_CCE());
           tmp = Unit_getInstance();
           break;
+        case 7:
+          $content._v = new Asset(_fieldValue instanceof ExportedAsset ? _fieldValue : THROW_CCE());
+          tmp = Unit_getInstance();
+          break;
+        case 8:
+          $content._v = new Location(_fieldValue instanceof ExportedLocation ? _fieldValue : THROW_CCE());
+          tmp = Unit_getInstance();
+          break;
       }
       return Unit_getInstance();
     };
@@ -1790,6 +2574,95 @@
       }
       return Unit_getInstance();
     };
+  }
+  function decodeWithImpl$lambda_6(
+    $mimetype,
+    $size,
+    $name,
+    $otrKey,
+    $sha256,
+    $assetId,
+    $assetToken,
+    $assetDomain,
+    $encryption,
+  ) {
+    return function (_fieldNumber, _fieldValue) {
+      var tmp;
+      switch (_fieldNumber) {
+        case 1:
+          $mimetype._v = typeof _fieldValue === 'string' ? _fieldValue : THROW_CCE();
+          tmp = Unit_getInstance();
+          break;
+        case 2:
+          $size._v = _fieldValue instanceof Long ? _fieldValue : THROW_CCE();
+          tmp = Unit_getInstance();
+          break;
+        case 3:
+          $name._v = typeof _fieldValue === 'string' ? _fieldValue : THROW_CCE();
+          tmp = Unit_getInstance();
+          break;
+        case 4:
+          $otrKey._v = _fieldValue instanceof ByteArr ? _fieldValue : THROW_CCE();
+          tmp = Unit_getInstance();
+          break;
+        case 5:
+          $sha256._v = _fieldValue instanceof ByteArr ? _fieldValue : THROW_CCE();
+          tmp = Unit_getInstance();
+          break;
+        case 6:
+          $assetId._v = typeof _fieldValue === 'string' ? _fieldValue : THROW_CCE();
+          tmp = Unit_getInstance();
+          break;
+        case 7:
+          $assetToken._v = typeof _fieldValue === 'string' ? _fieldValue : THROW_CCE();
+          tmp = Unit_getInstance();
+          break;
+        case 8:
+          $assetDomain._v = typeof _fieldValue === 'string' ? _fieldValue : THROW_CCE();
+          tmp = Unit_getInstance();
+          break;
+        case 9:
+          $encryption._v = _fieldValue instanceof ExportedEncryptionAlgorithm ? _fieldValue : THROW_CCE();
+          tmp = Unit_getInstance();
+          break;
+      }
+      return Unit_getInstance();
+    };
+  }
+  function decodeWithImpl$lambda_7($longitude, $latitude, $name, $zoom) {
+    return function (_fieldNumber, _fieldValue) {
+      var tmp;
+      switch (_fieldNumber) {
+        case 1:
+          $longitude._v = typeof _fieldValue === 'number' ? _fieldValue : THROW_CCE();
+          tmp = Unit_getInstance();
+          break;
+        case 2:
+          $latitude._v = typeof _fieldValue === 'number' ? _fieldValue : THROW_CCE();
+          tmp = Unit_getInstance();
+          break;
+        case 3:
+          $name._v = typeof _fieldValue === 'string' ? _fieldValue : THROW_CCE();
+          tmp = Unit_getInstance();
+          break;
+        case 4:
+          $zoom._v = typeof _fieldValue === 'number' ? _fieldValue : THROW_CCE();
+          tmp = Unit_getInstance();
+          break;
+      }
+      return Unit_getInstance();
+    };
+  }
+  function values$factory() {
+    return getPropertyCallableRef(
+      'values',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.values;
+      },
+      null,
+    );
   }
   function protoSize$factory() {
     return getPropertyCallableRef(
@@ -2341,6 +3214,50 @@
       null,
     );
   }
+  function descriptor$factory_21($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function asset$factory() {
+    return getPropertyCallableRef(
+      'asset',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.asset;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_22($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function location$factory() {
+    return getPropertyCallableRef(
+      'location',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.location;
+      },
+      null,
+    );
+  }
   function protoSize$factory_5() {
     return getPropertyCallableRef(
       'protoSize',
@@ -2352,7 +3269,7 @@
       null,
     );
   }
-  function descriptor$factory_21($b0) {
+  function descriptor$factory_23($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -2374,8 +3291,316 @@
       null,
     );
   }
+  function protoSize$factory_6() {
+    return getPropertyCallableRef(
+      'protoSize',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.get_protoSize_1ekskg_k$();
+      },
+      null,
+    );
+  }
+  function descriptor$factory_24($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function mimetype$factory() {
+    return getPropertyCallableRef(
+      'mimetype',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.mimetype;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_25($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function size$factory() {
+    return getPropertyCallableRef(
+      'size',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.size;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_26($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function name$factory_1() {
+    return getPropertyCallableRef(
+      'name',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.name;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_27($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function otrKey$factory() {
+    return getPropertyCallableRef(
+      'otrKey',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.otrKey;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_28($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function sha256$factory() {
+    return getPropertyCallableRef(
+      'sha256',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.sha256;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_29($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function assetId$factory() {
+    return getPropertyCallableRef(
+      'assetId',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.assetId;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_30($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function assetToken$factory() {
+    return getPropertyCallableRef(
+      'assetToken',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.assetToken;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_31($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function assetDomain$factory() {
+    return getPropertyCallableRef(
+      'assetDomain',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.assetDomain;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_32($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function encryption$factory() {
+    return getPropertyCallableRef(
+      'encryption',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.encryption;
+      },
+      null,
+    );
+  }
+  function protoSize$factory_7() {
+    return getPropertyCallableRef(
+      'protoSize',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.get_protoSize_1ekskg_k$();
+      },
+      null,
+    );
+  }
+  function descriptor$factory_33($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function longitude$factory() {
+    return getPropertyCallableRef(
+      'longitude',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.longitude;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_34($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function latitude$factory() {
+    return getPropertyCallableRef(
+      'latitude',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.latitude;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_35($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function name$factory_2() {
+    return getPropertyCallableRef(
+      'name',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.name;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_36($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function zoom$factory() {
+    return getPropertyCallableRef(
+      'zoom',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.zoom;
+      },
+      null,
+    );
+  }
   function ClientAction$Companion$values$delegate$lambda() {
-    return listOf(RESET_SESSION_getInstance());
+    return listOf_0(RESET_SESSION_getInstance());
   }
   function RESET_SESSION() {
     RESET_SESSION_instance = this;
@@ -2386,21 +3611,21 @@
     if (RESET_SESSION_instance == null) new RESET_SESSION();
     return RESET_SESSION_instance;
   }
-  function UNRECOGNIZED(value) {
+  function UNRECOGNIZED_0(value) {
     ClientAction.call(this, value);
   }
-  function Companion_8() {
-    Companion_instance_6 = this;
+  function Companion_11() {
+    Companion_instance_9 = this;
     var tmp = this;
     tmp.values$delegate_1 = lazy(ClientAction$Companion$values$delegate$lambda);
   }
-  protoOf(Companion_8).get_values_ksazhn_k$ = function () {
+  protoOf(Companion_11).get_values_ksazhn_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.values$delegate_1;
-    values$factory();
+    values$factory_0();
     return this_0.get_value_j01efc_k$();
   };
-  protoOf(Companion_8).fromValue_lljhin_k$ = function (value) {
+  protoOf(Companion_11).fromValue_lljhin_k$ = function (value) {
     var tmp$ret$1;
     $l$block: {
       // Inline function 'kotlin.collections.firstOrNull' call
@@ -2416,9 +3641,9 @@
       tmp$ret$1 = null;
     }
     var tmp0_elvis_lhs = tmp$ret$1;
-    return tmp0_elvis_lhs == null ? new UNRECOGNIZED(value) : tmp0_elvis_lhs;
+    return tmp0_elvis_lhs == null ? new UNRECOGNIZED_0(value) : tmp0_elvis_lhs;
   };
-  protoOf(Companion_8).fromName_z4ts05_k$ = function (name) {
+  protoOf(Companion_11).fromName_z4ts05_k$ = function (name) {
     var tmp$ret$1;
     $l$block: {
       // Inline function 'kotlin.collections.firstOrNull' call
@@ -2442,13 +3667,13 @@
     }
     return tmp;
   };
-  var Companion_instance_6;
-  function Companion_getInstance_8() {
-    if (Companion_instance_6 == null) new Companion_8();
-    return Companion_instance_6;
+  var Companion_instance_9;
+  function Companion_getInstance_11() {
+    if (Companion_instance_9 == null) new Companion_11();
+    return Companion_instance_9;
   }
   function ClientAction(value, name) {
-    Companion_getInstance_8();
+    Companion_getInstance_11();
     name = name === VOID ? null : name;
     this.value_1 = value;
     this.name_1 = name;
@@ -2482,7 +3707,7 @@
     );
   };
   function EncryptionAlgorithm$Companion$values$delegate$lambda() {
-    return listOf_0([AES_CBC_getInstance(), AES_GCM_getInstance()]);
+    return listOf([AES_CBC_getInstance(), AES_GCM_getInstance()]);
   }
   function AES_CBC() {
     AES_CBC_instance = this;
@@ -2502,21 +3727,21 @@
     if (AES_GCM_instance == null) new AES_GCM();
     return AES_GCM_instance;
   }
-  function UNRECOGNIZED_0(value) {
+  function UNRECOGNIZED_1(value) {
     EncryptionAlgorithm.call(this, value);
   }
-  function Companion_9() {
-    Companion_instance_7 = this;
+  function Companion_12() {
+    Companion_instance_10 = this;
     var tmp = this;
     tmp.values$delegate_1 = lazy(EncryptionAlgorithm$Companion$values$delegate$lambda);
   }
-  protoOf(Companion_9).get_values_ksazhn_k$ = function () {
+  protoOf(Companion_12).get_values_ksazhn_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.values$delegate_1;
-    values$factory_0();
+    values$factory_1();
     return this_0.get_value_j01efc_k$();
   };
-  protoOf(Companion_9).fromValue_lljhin_k$ = function (value) {
+  protoOf(Companion_12).fromValue_lljhin_k$ = function (value) {
     var tmp$ret$1;
     $l$block: {
       // Inline function 'kotlin.collections.firstOrNull' call
@@ -2532,9 +3757,9 @@
       tmp$ret$1 = null;
     }
     var tmp0_elvis_lhs = tmp$ret$1;
-    return tmp0_elvis_lhs == null ? new UNRECOGNIZED_0(value) : tmp0_elvis_lhs;
+    return tmp0_elvis_lhs == null ? new UNRECOGNIZED_1(value) : tmp0_elvis_lhs;
   };
-  protoOf(Companion_9).fromName_z4ts05_k$ = function (name) {
+  protoOf(Companion_12).fromName_z4ts05_k$ = function (name) {
     var tmp$ret$1;
     $l$block: {
       // Inline function 'kotlin.collections.firstOrNull' call
@@ -2558,13 +3783,13 @@
     }
     return tmp;
   };
-  var Companion_instance_7;
-  function Companion_getInstance_9() {
-    if (Companion_instance_7 == null) new Companion_9();
-    return Companion_instance_7;
+  var Companion_instance_10;
+  function Companion_getInstance_12() {
+    if (Companion_instance_10 == null) new Companion_12();
+    return Companion_instance_10;
   }
   function EncryptionAlgorithm(value, name) {
-    Companion_getInstance_9();
+    Companion_getInstance_12();
     name = name === VOID ? null : name;
     this.value_1 = value;
     this.name_1 = name;
@@ -2598,7 +3823,7 @@
     );
   };
   function LegalHoldStatus$Companion$values$delegate$lambda() {
-    return listOf_0([UNKNOWN_getInstance(), DISABLED_getInstance(), ENABLED_getInstance()]);
+    return listOf([UNKNOWN_getInstance(), DISABLED_getInstance(), ENABLED_getInstance()]);
   }
   function UNKNOWN() {
     UNKNOWN_instance = this;
@@ -2627,21 +3852,21 @@
     if (ENABLED_instance == null) new ENABLED();
     return ENABLED_instance;
   }
-  function UNRECOGNIZED_1(value) {
+  function UNRECOGNIZED_2(value) {
     LegalHoldStatus.call(this, value);
   }
-  function Companion_10() {
-    Companion_instance_8 = this;
+  function Companion_13() {
+    Companion_instance_11 = this;
     var tmp = this;
     tmp.values$delegate_1 = lazy(LegalHoldStatus$Companion$values$delegate$lambda);
   }
-  protoOf(Companion_10).get_values_ksazhn_k$ = function () {
+  protoOf(Companion_13).get_values_ksazhn_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.values$delegate_1;
-    values$factory_1();
+    values$factory_2();
     return this_0.get_value_j01efc_k$();
   };
-  protoOf(Companion_10).fromValue_lljhin_k$ = function (value) {
+  protoOf(Companion_13).fromValue_lljhin_k$ = function (value) {
     var tmp$ret$1;
     $l$block: {
       // Inline function 'kotlin.collections.firstOrNull' call
@@ -2657,9 +3882,9 @@
       tmp$ret$1 = null;
     }
     var tmp0_elvis_lhs = tmp$ret$1;
-    return tmp0_elvis_lhs == null ? new UNRECOGNIZED_1(value) : tmp0_elvis_lhs;
+    return tmp0_elvis_lhs == null ? new UNRECOGNIZED_2(value) : tmp0_elvis_lhs;
   };
-  protoOf(Companion_10).fromName_z4ts05_k$ = function (name) {
+  protoOf(Companion_13).fromName_z4ts05_k$ = function (name) {
     var tmp$ret$1;
     $l$block: {
       // Inline function 'kotlin.collections.firstOrNull' call
@@ -2683,13 +3908,13 @@
     }
     return tmp;
   };
-  var Companion_instance_8;
-  function Companion_getInstance_10() {
-    if (Companion_instance_8 == null) new Companion_10();
-    return Companion_instance_8;
+  var Companion_instance_11;
+  function Companion_getInstance_13() {
+    if (Companion_instance_11 == null) new Companion_13();
+    return Companion_instance_11;
   }
   function LegalHoldStatus(value, name) {
-    Companion_getInstance_10();
+    Companion_getInstance_13();
     name = name === VOID ? null : name;
     this.value_1 = value;
     this.name_1 = name;
@@ -2722,6 +3947,131 @@
       ')'
     );
   };
+  function UnknownStrategy$Companion$values$delegate$lambda() {
+    return listOf([IGNORE_getInstance(), DISCARD_AND_WARN_getInstance(), WARN_USER_ALLOW_RETRY_getInstance()]);
+  }
+  function IGNORE() {
+    IGNORE_instance = this;
+    UnknownStrategy.call(this, 0, 'IGNORE');
+  }
+  var IGNORE_instance;
+  function IGNORE_getInstance() {
+    if (IGNORE_instance == null) new IGNORE();
+    return IGNORE_instance;
+  }
+  function DISCARD_AND_WARN() {
+    DISCARD_AND_WARN_instance = this;
+    UnknownStrategy.call(this, 1, 'DISCARD_AND_WARN');
+  }
+  var DISCARD_AND_WARN_instance;
+  function DISCARD_AND_WARN_getInstance() {
+    if (DISCARD_AND_WARN_instance == null) new DISCARD_AND_WARN();
+    return DISCARD_AND_WARN_instance;
+  }
+  function WARN_USER_ALLOW_RETRY() {
+    WARN_USER_ALLOW_RETRY_instance = this;
+    UnknownStrategy.call(this, 2, 'WARN_USER_ALLOW_RETRY');
+  }
+  var WARN_USER_ALLOW_RETRY_instance;
+  function WARN_USER_ALLOW_RETRY_getInstance() {
+    if (WARN_USER_ALLOW_RETRY_instance == null) new WARN_USER_ALLOW_RETRY();
+    return WARN_USER_ALLOW_RETRY_instance;
+  }
+  function UNRECOGNIZED_3(value) {
+    UnknownStrategy.call(this, value);
+  }
+  function Companion_14() {
+    Companion_instance_12 = this;
+    var tmp = this;
+    tmp.values$delegate_1 = lazy(UnknownStrategy$Companion$values$delegate$lambda);
+  }
+  protoOf(Companion_14).get_values_ksazhn_k$ = function () {
+    // Inline function 'kotlin.getValue' call
+    var this_0 = this.values$delegate_1;
+    values$factory_3();
+    return this_0.get_value_j01efc_k$();
+  };
+  protoOf(Companion_14).fromValue_lljhin_k$ = function (value) {
+    var tmp$ret$1;
+    $l$block: {
+      // Inline function 'kotlin.collections.firstOrNull' call
+      var tmp0_iterator = this.values.iterator_jk1svi_k$();
+      while (tmp0_iterator.hasNext_bitz1p_k$()) {
+        var element = tmp0_iterator.next_20eer_k$();
+        // Inline function 'com.wire.kalium.protobuf.messages.Companion.fromValue.<anonymous>' call
+        if (element.get_value_j01efc_k$() === value) {
+          tmp$ret$1 = element;
+          break $l$block;
+        }
+      }
+      tmp$ret$1 = null;
+    }
+    var tmp0_elvis_lhs = tmp$ret$1;
+    return tmp0_elvis_lhs == null ? new UNRECOGNIZED_3(value) : tmp0_elvis_lhs;
+  };
+  protoOf(Companion_14).fromName_z4ts05_k$ = function (name) {
+    var tmp$ret$1;
+    $l$block: {
+      // Inline function 'kotlin.collections.firstOrNull' call
+      var tmp0_iterator = this.values.iterator_jk1svi_k$();
+      while (tmp0_iterator.hasNext_bitz1p_k$()) {
+        var element = tmp0_iterator.next_20eer_k$();
+        // Inline function 'com.wire.kalium.protobuf.messages.Companion.fromName.<anonymous>' call
+        if (element.get_name_woqyms_k$() === name) {
+          tmp$ret$1 = element;
+          break $l$block;
+        }
+      }
+      tmp$ret$1 = null;
+    }
+    var tmp0_elvis_lhs = tmp$ret$1;
+    var tmp;
+    if (tmp0_elvis_lhs == null) {
+      throw IllegalArgumentException_init_$Create$('No UnknownStrategy with name: ' + name);
+    } else {
+      tmp = tmp0_elvis_lhs;
+    }
+    return tmp;
+  };
+  var Companion_instance_12;
+  function Companion_getInstance_14() {
+    if (Companion_instance_12 == null) new Companion_14();
+    return Companion_instance_12;
+  }
+  function UnknownStrategy(value, name) {
+    Companion_getInstance_14();
+    name = name === VOID ? null : name;
+    this.value_1 = value;
+    this.name_1 = name;
+  }
+  protoOf(UnknownStrategy).get_value_j01efc_k$ = function () {
+    return this.value_1;
+  };
+  protoOf(UnknownStrategy).get_name_woqyms_k$ = function () {
+    return this.name_1;
+  };
+  protoOf(UnknownStrategy).equals = function (other) {
+    var tmp;
+    if (other instanceof UnknownStrategy) {
+      tmp = other.get_value_j01efc_k$() === this.get_value_j01efc_k$();
+    } else {
+      tmp = false;
+    }
+    return tmp;
+  };
+  protoOf(UnknownStrategy).hashCode = function () {
+    return this.get_value_j01efc_k$();
+  };
+  protoOf(UnknownStrategy).toString = function () {
+    var tmp0_elvis_lhs = this.get_name_woqyms_k$();
+    return (
+      'UnknownStrategy.' +
+      (tmp0_elvis_lhs == null ? 'UNRECOGNIZED' : tmp0_elvis_lhs) +
+      '(value=' +
+      this.get_value_j01efc_k$() +
+      ')'
+    );
+  };
   function Text_0(text) {
     Content_0.call(this, text);
   }
@@ -2741,19 +4091,19 @@
     Content_0.call(this, external);
   }
   function ClientAction_0(clientAction) {
-    clientAction = clientAction === VOID ? Companion_getInstance_8().fromValue_lljhin_k$(0) : clientAction;
+    clientAction = clientAction === VOID ? Companion_getInstance_11().fromValue_lljhin_k$(0) : clientAction;
     Content_0.call(this, clientAction);
   }
   function Calling(calling) {
     Content_0.call(this, calling);
   }
-  function Asset(asset) {
+  function Asset_0(asset) {
     Content_0.call(this, asset);
   }
   function Hidden(hidden) {
     Content_0.call(this, hidden);
   }
-  function Location(location) {
+  function Location_0(location) {
     Content_0.call(this, location);
   }
   function Deleted(deleted) {
@@ -2789,55 +4139,55 @@
   function Content_0(value) {
     OneOf.call(this, value);
   }
-  function Companion_11() {
-    Companion_instance_9 = this;
+  function Companion_15() {
+    Companion_instance_13 = this;
     var tmp = this;
     var tmp_0 = getKClass(GenericMessage);
     // Inline function 'kotlin.collections.buildList' call
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'kotlin.collections.buildListInternal' call
-    checkBuilderCapacity(22);
+    checkBuilderCapacity(23);
     // Inline function 'kotlin.apply' call
-    var this_0 = ArrayList_init_$Create$(22);
+    var this_0 = ArrayList_init_$Create$(23);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.messages.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_22(this);
+    var tmp0_messageDescriptor = descriptor$factory_37(this);
     var tmp1_type = new String_0(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp0_messageDescriptor, 'message_id', 1, tmp1_type, messageId$factory(), VOID, 'messageId'),
     );
-    var tmp2_messageDescriptor = descriptor$factory_23(this);
-    var tmp3_type = new Message(Companion_getInstance_22());
+    var tmp2_messageDescriptor = descriptor$factory_38(this);
+    var tmp3_type = new Message(Companion_getInstance_26());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp2_messageDescriptor, 'text', 2, tmp3_type, text$factory_0(), true, 'text'),
     );
-    var tmp4_messageDescriptor = descriptor$factory_24(this);
-    var tmp5_type = new Message(Companion_getInstance_37());
+    var tmp4_messageDescriptor = descriptor$factory_39(this);
+    var tmp5_type = new Message(Companion_getInstance_41());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp4_messageDescriptor, 'image', 3, tmp5_type, image$factory(), true, 'image'),
     );
-    var tmp6_messageDescriptor = descriptor$factory_25(this);
-    var tmp7_type = new Message(Companion_getInstance_23());
+    var tmp6_messageDescriptor = descriptor$factory_40(this);
+    var tmp7_type = new Message(Companion_getInstance_27());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp6_messageDescriptor, 'knock', 4, tmp7_type, knock$factory(), true, 'knock'),
     );
-    var tmp8_messageDescriptor = descriptor$factory_26(this);
-    var tmp9_type = new Message(Companion_getInstance_28());
+    var tmp8_messageDescriptor = descriptor$factory_41(this);
+    var tmp9_type = new Message(Companion_getInstance_32());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp8_messageDescriptor, 'lastRead', 6, tmp9_type, lastRead$factory(), true, 'lastRead'),
     );
-    var tmp10_messageDescriptor = descriptor$factory_27(this);
-    var tmp11_type = new Message(Companion_getInstance_29());
+    var tmp10_messageDescriptor = descriptor$factory_42(this);
+    var tmp11_type = new Message(Companion_getInstance_33());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp10_messageDescriptor, 'cleared', 7, tmp11_type, cleared$factory(), true, 'cleared'),
     );
-    var tmp12_messageDescriptor = descriptor$factory_28(this);
-    var tmp13_type = new Message(Companion_getInstance_46());
+    var tmp12_messageDescriptor = descriptor$factory_43(this);
+    var tmp13_type = new Message(Companion_getInstance_50());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp12_messageDescriptor, 'external', 8, tmp13_type, external$factory(), true, 'external'),
     );
-    var tmp14_messageDescriptor = descriptor$factory_29(this);
-    var tmp15_type = new Enum_0(Companion_getInstance_8(), true);
+    var tmp14_messageDescriptor = descriptor$factory_44(this);
+    var tmp15_type = new Enum_0(Companion_getInstance_11(), true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
         tmp14_messageDescriptor,
@@ -2849,38 +4199,38 @@
         'clientAction',
       ),
     );
-    var tmp16_messageDescriptor = descriptor$factory_30(this);
-    var tmp17_type = new Message(Companion_getInstance_48());
+    var tmp16_messageDescriptor = descriptor$factory_45(this);
+    var tmp17_type = new Message(Companion_getInstance_52());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp16_messageDescriptor, 'calling', 10, tmp17_type, calling$factory(), true, 'calling'),
     );
-    var tmp18_messageDescriptor = descriptor$factory_31(this);
-    var tmp19_type = new Message(Companion_getInstance_45());
+    var tmp18_messageDescriptor = descriptor$factory_46(this);
+    var tmp19_type = new Message(Companion_getInstance_49());
     this_0.add_utx5q5_k$(
-      new FieldDescriptor(tmp18_messageDescriptor, 'asset', 11, tmp19_type, asset$factory(), true, 'asset'),
+      new FieldDescriptor(tmp18_messageDescriptor, 'asset', 11, tmp19_type, asset$factory_0(), true, 'asset'),
     );
-    var tmp20_messageDescriptor = descriptor$factory_32(this);
-    var tmp21_type = new Message(Companion_getInstance_30());
+    var tmp20_messageDescriptor = descriptor$factory_47(this);
+    var tmp21_type = new Message(Companion_getInstance_34());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp20_messageDescriptor, 'hidden', 12, tmp21_type, hidden$factory(), true, 'hidden'),
     );
-    var tmp22_messageDescriptor = descriptor$factory_33(this);
-    var tmp23_type = new Message(Companion_getInstance_36());
+    var tmp22_messageDescriptor = descriptor$factory_48(this);
+    var tmp23_type = new Message(Companion_getInstance_40());
     this_0.add_utx5q5_k$(
-      new FieldDescriptor(tmp22_messageDescriptor, 'location', 13, tmp23_type, location$factory(), true, 'location'),
+      new FieldDescriptor(tmp22_messageDescriptor, 'location', 13, tmp23_type, location$factory_0(), true, 'location'),
     );
-    var tmp24_messageDescriptor = descriptor$factory_34(this);
-    var tmp25_type = new Message(Companion_getInstance_31());
+    var tmp24_messageDescriptor = descriptor$factory_49(this);
+    var tmp25_type = new Message(Companion_getInstance_35());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp24_messageDescriptor, 'deleted', 14, tmp25_type, deleted$factory(), true, 'deleted'),
     );
-    var tmp26_messageDescriptor = descriptor$factory_35(this);
-    var tmp27_type = new Message(Companion_getInstance_32());
+    var tmp26_messageDescriptor = descriptor$factory_50(this);
+    var tmp27_type = new Message(Companion_getInstance_36());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp26_messageDescriptor, 'edited', 15, tmp27_type, edited$factory(), true, 'edited'),
     );
-    var tmp28_messageDescriptor = descriptor$factory_36(this);
-    var tmp29_type = new Message(Companion_getInstance_35());
+    var tmp28_messageDescriptor = descriptor$factory_51(this);
+    var tmp29_type = new Message(Companion_getInstance_39());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
         tmp28_messageDescriptor,
@@ -2892,18 +4242,18 @@
         'confirmation',
       ),
     );
-    var tmp30_messageDescriptor = descriptor$factory_37(this);
-    var tmp31_type = new Message(Companion_getInstance_47());
+    var tmp30_messageDescriptor = descriptor$factory_52(this);
+    var tmp31_type = new Message(Companion_getInstance_51());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp30_messageDescriptor, 'reaction', 17, tmp31_type, reaction$factory(), true, 'reaction'),
     );
-    var tmp32_messageDescriptor = descriptor$factory_38(this);
-    var tmp33_type = new Message(Companion_getInstance_21());
+    var tmp32_messageDescriptor = descriptor$factory_53(this);
+    var tmp33_type = new Message(Companion_getInstance_25());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp32_messageDescriptor, 'ephemeral', 18, tmp33_type, ephemeral$factory(), true, 'ephemeral'),
     );
-    var tmp34_messageDescriptor = descriptor$factory_39(this);
-    var tmp35_type = new Message(Companion_getInstance_20());
+    var tmp34_messageDescriptor = descriptor$factory_54(this);
+    var tmp35_type = new Message(Companion_getInstance_24());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
         tmp34_messageDescriptor,
@@ -2915,13 +4265,13 @@
         'availability',
       ),
     );
-    var tmp36_messageDescriptor = descriptor$factory_40(this);
-    var tmp37_type = new Message(Companion_getInstance_15());
+    var tmp36_messageDescriptor = descriptor$factory_55(this);
+    var tmp37_type = new Message(Companion_getInstance_19());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp36_messageDescriptor, 'composite', 20, tmp37_type, composite$factory(), true, 'composite'),
     );
-    var tmp38_messageDescriptor = descriptor$factory_41(this);
-    var tmp39_type = new Message(Companion_getInstance_17());
+    var tmp38_messageDescriptor = descriptor$factory_56(this);
+    var tmp39_type = new Message(Companion_getInstance_21());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
         tmp38_messageDescriptor,
@@ -2933,8 +4283,8 @@
         'buttonAction',
       ),
     );
-    var tmp40_messageDescriptor = descriptor$factory_42(this);
-    var tmp41_type = new Message(Companion_getInstance_18());
+    var tmp40_messageDescriptor = descriptor$factory_57(this);
+    var tmp41_type = new Message(Companion_getInstance_22());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
         tmp40_messageDescriptor,
@@ -2946,8 +4296,8 @@
         'buttonActionConfirmation',
       ),
     );
-    var tmp42_messageDescriptor = descriptor$factory_43(this);
-    var tmp43_type = new Message(Companion_getInstance_49());
+    var tmp42_messageDescriptor = descriptor$factory_58(this);
+    var tmp43_type = new Message(Companion_getInstance_53());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
         tmp42_messageDescriptor,
@@ -2959,30 +4309,45 @@
         'dataTransfer',
       ),
     );
+    var tmp44_messageDescriptor = descriptor$factory_59(this);
+    var tmp45_type = new Enum_0(Companion_getInstance_14(), true);
+    this_0.add_utx5q5_k$(
+      new FieldDescriptor(
+        tmp44_messageDescriptor,
+        'unknownStrategy',
+        24,
+        tmp45_type,
+        unknownStrategy$factory(),
+        VOID,
+        'unknownStrategy',
+      ),
+    );
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('GenericMessage', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_11).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_6(Companion_getInstance_11(), u);
+  protoOf(Companion_15).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_8(Companion_getInstance_15(), u);
   };
-  protoOf(Companion_11).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_15).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_9;
-  function Companion_getInstance_11() {
-    if (Companion_instance_9 == null) new Companion_11();
-    return Companion_instance_9;
+  var Companion_instance_13;
+  function Companion_getInstance_15() {
+    if (Companion_instance_13 == null) new Companion_15();
+    return Companion_instance_13;
   }
   function GenericMessage$protoSize$delegate$lambda(this$0) {
     return function () {
       return get_protoSize.call(this$0);
     };
   }
-  function GenericMessage(messageId, content, unknownFields) {
-    Companion_getInstance_11();
+  function GenericMessage(messageId, unknownStrategy, content, unknownFields) {
+    Companion_getInstance_15();
+    unknownStrategy = unknownStrategy === VOID ? null : unknownStrategy;
     content = content === VOID ? null : content;
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
     this.messageId = messageId;
+    this.unknownStrategy = unknownStrategy;
     this.content = content;
     this.unknownFields_1 = unknownFields;
     var tmp = this;
@@ -2990,6 +4355,9 @@
   }
   protoOf(GenericMessage).get_messageId_fato9z_k$ = function () {
     return this.messageId;
+  };
+  protoOf(GenericMessage).get_unknownStrategy_4zqx3g_k$ = function () {
+    return this.unknownStrategy;
   };
   protoOf(GenericMessage).get_content_h02jrk_k$ = function () {
     return this.content;
@@ -3039,7 +4407,7 @@
   };
   protoOf(GenericMessage).get_asset_iotcjr_k$ = function () {
     var tmp = this.content;
-    var tmp0_safe_receiver = tmp instanceof Asset ? tmp : null;
+    var tmp0_safe_receiver = tmp instanceof Asset_0 ? tmp : null;
     return tmp0_safe_receiver == null ? null : tmp0_safe_receiver.get_value_j01efc_k$();
   };
   protoOf(GenericMessage).get_hidden_e9x67n_k$ = function () {
@@ -3049,7 +4417,7 @@
   };
   protoOf(GenericMessage).get_location_d3s02_k$ = function () {
     var tmp = this.content;
-    var tmp0_safe_receiver = tmp instanceof Location ? tmp : null;
+    var tmp0_safe_receiver = tmp instanceof Location_0 ? tmp : null;
     return tmp0_safe_receiver == null ? null : tmp0_safe_receiver.get_value_j01efc_k$();
   };
   protoOf(GenericMessage).get_deleted_qwnqy8_k$ = function () {
@@ -3103,39 +4471,45 @@
     return tmp0_safe_receiver == null ? null : tmp0_safe_receiver.get_value_j01efc_k$();
   };
   protoOf(GenericMessage).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_6(this, other);
+    return protoMergeImpl_8(this, other);
   };
   protoOf(GenericMessage).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_11().descriptor_1;
+    return Companion_getInstance_15().descriptor_1;
   };
   protoOf(GenericMessage).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_6();
+    protoSize$factory_8();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(GenericMessage).component1_7eebsc_k$ = function () {
     return this.messageId;
   };
   protoOf(GenericMessage).component2_7eebsb_k$ = function () {
-    return this.content;
+    return this.unknownStrategy;
   };
   protoOf(GenericMessage).component3_7eebsa_k$ = function () {
+    return this.content;
+  };
+  protoOf(GenericMessage).component4_7eebs9_k$ = function () {
     return this.unknownFields_1;
   };
-  protoOf(GenericMessage).copy_2rpehv_k$ = function (messageId, content, unknownFields) {
-    return new GenericMessage(messageId, content, unknownFields);
+  protoOf(GenericMessage).copy_z3ggzy_k$ = function (messageId, unknownStrategy, content, unknownFields) {
+    return new GenericMessage(messageId, unknownStrategy, content, unknownFields);
   };
-  protoOf(GenericMessage).copy = function (messageId, content, unknownFields, $super) {
+  protoOf(GenericMessage).copy = function (messageId, unknownStrategy, content, unknownFields, $super) {
     messageId = messageId === VOID ? this.messageId : messageId;
+    unknownStrategy = unknownStrategy === VOID ? this.unknownStrategy : unknownStrategy;
     content = content === VOID ? this.content : content;
     unknownFields = unknownFields === VOID ? this.unknownFields_1 : unknownFields;
-    return this.copy_2rpehv_k$(messageId, content, unknownFields);
+    return this.copy_z3ggzy_k$(messageId, unknownStrategy, content, unknownFields);
   };
   protoOf(GenericMessage).toString = function () {
     return (
       'GenericMessage(messageId=' +
       this.messageId +
+      ', unknownStrategy=' +
+      this.unknownStrategy +
       ', content=' +
       this.content +
       ', unknownFields=' +
@@ -3145,6 +4519,7 @@
   };
   protoOf(GenericMessage).hashCode = function () {
     var result = getStringHashCode(this.messageId);
+    result = (imul(result, 31) + (this.unknownStrategy == null ? 0 : this.unknownStrategy.hashCode())) | 0;
     result = (imul(result, 31) + (this.content == null ? 0 : this.content.hashCode())) | 0;
     result = (imul(result, 31) + hashCode(this.unknownFields_1)) | 0;
     return result;
@@ -3154,12 +4529,13 @@
     if (!(other instanceof GenericMessage)) return false;
     var tmp0_other_with_cast = other instanceof GenericMessage ? other : THROW_CCE();
     if (!(this.messageId === tmp0_other_with_cast.messageId)) return false;
+    if (!equals(this.unknownStrategy, tmp0_other_with_cast.unknownStrategy)) return false;
     if (!equals(this.content, tmp0_other_with_cast.content)) return false;
     if (!equals(this.unknownFields_1, tmp0_other_with_cast.unknownFields_1)) return false;
     return true;
   };
-  function Companion_12() {
-    Companion_instance_10 = this;
+  function Companion_16() {
+    Companion_instance_14 = this;
     var tmp = this;
     var tmp_0 = getKClass(QualifiedUserId);
     // Inline function 'kotlin.collections.buildList' call
@@ -3170,10 +4546,10 @@
     var this_0 = ArrayList_init_$Create$(2);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.messages.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_44(this);
+    var tmp0_messageDescriptor = descriptor$factory_60(this);
     var tmp1_type = new String_0(true);
     this_0.add_utx5q5_k$(new FieldDescriptor(tmp0_messageDescriptor, 'id', 1, tmp1_type, id$factory_2(), VOID, 'id'));
-    var tmp2_messageDescriptor = descriptor$factory_45(this);
+    var tmp2_messageDescriptor = descriptor$factory_61(this);
     var tmp3_type = new String_0(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp2_messageDescriptor, 'domain', 2, tmp3_type, domain$factory_0(), VOID, 'domain'),
@@ -3181,16 +4557,16 @@
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('QualifiedUserId', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_12).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_7(Companion_getInstance_12(), u);
+  protoOf(Companion_16).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_9(Companion_getInstance_16(), u);
   };
-  protoOf(Companion_12).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_16).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_10;
-  function Companion_getInstance_12() {
-    if (Companion_instance_10 == null) new Companion_12();
-    return Companion_instance_10;
+  var Companion_instance_14;
+  function Companion_getInstance_16() {
+    if (Companion_instance_14 == null) new Companion_16();
+    return Companion_instance_14;
   }
   function QualifiedUserId$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -3198,7 +4574,7 @@
     };
   }
   function QualifiedUserId(id, domain, unknownFields) {
-    Companion_getInstance_12();
+    Companion_getInstance_16();
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
     this.id = id;
     this.domain = domain;
@@ -3216,15 +4592,15 @@
     return this.unknownFields_1;
   };
   protoOf(QualifiedUserId).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_7(this, other);
+    return protoMergeImpl_9(this, other);
   };
   protoOf(QualifiedUserId).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_12().descriptor_1;
+    return Companion_getInstance_16().descriptor_1;
   };
   protoOf(QualifiedUserId).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_7();
+    protoSize$factory_9();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(QualifiedUserId).component1_7eebsc_k$ = function () {
@@ -3265,8 +4641,8 @@
     if (!equals(this.unknownFields_1, tmp0_other_with_cast.unknownFields_1)) return false;
     return true;
   };
-  function Companion_13() {
-    Companion_instance_11 = this;
+  function Companion_17() {
+    Companion_instance_15 = this;
     var tmp = this;
     var tmp_0 = getKClass(QualifiedConversationId);
     // Inline function 'kotlin.collections.buildList' call
@@ -3277,10 +4653,10 @@
     var this_0 = ArrayList_init_$Create$(2);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.messages.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_46(this);
+    var tmp0_messageDescriptor = descriptor$factory_62(this);
     var tmp1_type = new String_0(true);
     this_0.add_utx5q5_k$(new FieldDescriptor(tmp0_messageDescriptor, 'id', 1, tmp1_type, id$factory_3(), VOID, 'id'));
-    var tmp2_messageDescriptor = descriptor$factory_47(this);
+    var tmp2_messageDescriptor = descriptor$factory_63(this);
     var tmp3_type = new String_0(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp2_messageDescriptor, 'domain', 2, tmp3_type, domain$factory_1(), VOID, 'domain'),
@@ -3288,16 +4664,16 @@
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('QualifiedConversationId', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_13).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_8(Companion_getInstance_13(), u);
+  protoOf(Companion_17).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_10(Companion_getInstance_17(), u);
   };
-  protoOf(Companion_13).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_17).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_11;
-  function Companion_getInstance_13() {
-    if (Companion_instance_11 == null) new Companion_13();
-    return Companion_instance_11;
+  var Companion_instance_15;
+  function Companion_getInstance_17() {
+    if (Companion_instance_15 == null) new Companion_17();
+    return Companion_instance_15;
   }
   function QualifiedConversationId$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -3305,7 +4681,7 @@
     };
   }
   function QualifiedConversationId(id, domain, unknownFields) {
-    Companion_getInstance_13();
+    Companion_getInstance_17();
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
     this.id = id;
     this.domain = domain;
@@ -3323,15 +4699,15 @@
     return this.unknownFields_1;
   };
   protoOf(QualifiedConversationId).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_8(this, other);
+    return protoMergeImpl_10(this, other);
   };
   protoOf(QualifiedConversationId).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_13().descriptor_1;
+    return Companion_getInstance_17().descriptor_1;
   };
   protoOf(QualifiedConversationId).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_8();
+    protoSize$factory_10();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(QualifiedConversationId).component1_7eebsc_k$ = function () {
@@ -3393,8 +4769,8 @@
   function Content_1(value) {
     OneOf.call(this, value);
   }
-  function Companion_14() {
-    Companion_instance_12 = this;
+  function Companion_18() {
+    Companion_instance_16 = this;
     var tmp = this;
     tmp.defaultInstance$delegate_1 = lazy(Composite$Item$Companion$defaultInstance$delegate$lambda);
     var tmp_0 = this;
@@ -3407,43 +4783,43 @@
     var this_0 = ArrayList_init_$Create$(2);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.messages.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_51(this);
-    var tmp1_type = new Message(Companion_getInstance_22());
+    var tmp0_messageDescriptor = descriptor$factory_67(this);
+    var tmp1_type = new Message(Companion_getInstance_26());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp0_messageDescriptor, 'text', 1, tmp1_type, text$factory_1(), true, 'text'),
     );
-    var tmp2_messageDescriptor = descriptor$factory_52(this);
-    var tmp3_type = new Message(Companion_getInstance_16());
+    var tmp2_messageDescriptor = descriptor$factory_68(this);
+    var tmp3_type = new Message(Companion_getInstance_20());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp2_messageDescriptor, 'button', 2, tmp3_type, button$factory(), true, 'button'),
     );
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp_0.descriptor_1 = new MessageDescriptor('Composite.Item', tmp_1, this, tmp$ret$2);
   }
-  protoOf(Companion_14).get_defaultInstance_axha8d_k$ = function () {
+  protoOf(Companion_18).get_defaultInstance_axha8d_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.defaultInstance$delegate_1;
     defaultInstance$factory_0();
     return this_0.get_value_j01efc_k$();
   };
-  protoOf(Companion_14).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_10(Companion_getInstance_14(), u);
+  protoOf(Companion_18).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_12(Companion_getInstance_18(), u);
   };
-  protoOf(Companion_14).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_18).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_12;
-  function Companion_getInstance_14() {
-    if (Companion_instance_12 == null) new Companion_14();
-    return Companion_instance_12;
+  var Companion_instance_16;
+  function Companion_getInstance_18() {
+    if (Companion_instance_16 == null) new Companion_18();
+    return Companion_instance_16;
   }
   function Composite$Item$protoSize$delegate$lambda(this$0) {
     return function () {
       return get_protoSize.call(this$0);
     };
   }
-  function Companion_15() {
-    Companion_instance_13 = this;
+  function Companion_19() {
+    Companion_instance_17 = this;
     var tmp = this;
     tmp.defaultInstance$delegate_1 = lazy(Composite$Companion$defaultInstance$delegate$lambda);
     var tmp_0 = this;
@@ -3456,12 +4832,12 @@
     var this_0 = ArrayList_init_$Create$(3);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.messages.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_48(this);
-    var tmp1_type = new Repeated(new Message(Companion_getInstance_14()));
+    var tmp0_messageDescriptor = descriptor$factory_64(this);
+    var tmp1_type = new Repeated(new Message(Companion_getInstance_18()));
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp0_messageDescriptor, 'items', 1, tmp1_type, items$factory(), VOID, 'items'),
     );
-    var tmp2_messageDescriptor = descriptor$factory_49(this);
+    var tmp2_messageDescriptor = descriptor$factory_65(this);
     var tmp3_type = new Bool(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
@@ -3474,8 +4850,8 @@
         'expectsReadConfirmation',
       ),
     );
-    var tmp4_messageDescriptor = descriptor$factory_50(this);
-    var tmp5_type = new Enum_0(Companion_getInstance_10(), true);
+    var tmp4_messageDescriptor = descriptor$factory_66(this);
+    var tmp5_type = new Enum_0(Companion_getInstance_13(), true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
         tmp4_messageDescriptor,
@@ -3490,25 +4866,25 @@
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp_0.descriptor_1 = new MessageDescriptor('Composite', tmp_1, this, tmp$ret$2);
   }
-  protoOf(Companion_15).get_defaultInstance_axha8d_k$ = function () {
+  protoOf(Companion_19).get_defaultInstance_axha8d_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.defaultInstance$delegate_1;
     defaultInstance$factory();
     return this_0.get_value_j01efc_k$();
   };
-  protoOf(Companion_15).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_9(Companion_getInstance_15(), u);
+  protoOf(Companion_19).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_11(Companion_getInstance_19(), u);
   };
-  protoOf(Companion_15).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_19).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_13;
-  function Companion_getInstance_15() {
-    if (Companion_instance_13 == null) new Companion_15();
-    return Companion_instance_13;
+  var Companion_instance_17;
+  function Companion_getInstance_19() {
+    if (Companion_instance_17 == null) new Companion_19();
+    return Companion_instance_17;
   }
   function Item(content, unknownFields) {
-    Companion_getInstance_14();
+    Companion_getInstance_18();
     content = content === VOID ? null : content;
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
     this.content = content;
@@ -3533,15 +4909,15 @@
     return tmp0_safe_receiver == null ? null : tmp0_safe_receiver.get_value_j01efc_k$();
   };
   protoOf(Item).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_10(this, other);
+    return protoMergeImpl_12(this, other);
   };
   protoOf(Item).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_14().descriptor_1;
+    return Companion_getInstance_18().descriptor_1;
   };
   protoOf(Item).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_10();
+    protoSize$factory_12();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(Item).component1_7eebsc_k$ = function () {
@@ -3580,7 +4956,7 @@
     };
   }
   function Composite_0(items, expectsReadConfirmation, legalHoldStatus, unknownFields) {
-    Companion_getInstance_15();
+    Companion_getInstance_19();
     items = items === VOID ? emptyList() : items;
     expectsReadConfirmation = expectsReadConfirmation === VOID ? null : expectsReadConfirmation;
     legalHoldStatus = legalHoldStatus === VOID ? null : legalHoldStatus;
@@ -3605,15 +4981,15 @@
     return this.unknownFields_1;
   };
   protoOf(Composite_0).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_9(this, other);
+    return protoMergeImpl_11(this, other);
   };
   protoOf(Composite_0).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_15().descriptor_1;
+    return Companion_getInstance_19().descriptor_1;
   };
   protoOf(Composite_0).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_9();
+    protoSize$factory_11();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(Composite_0).component1_7eebsc_k$ = function () {
@@ -3671,8 +5047,8 @@
     if (!equals(this.unknownFields_1, tmp0_other_with_cast.unknownFields_1)) return false;
     return true;
   };
-  function Companion_16() {
-    Companion_instance_14 = this;
+  function Companion_20() {
+    Companion_instance_18 = this;
     var tmp = this;
     var tmp_0 = getKClass(Button_0);
     // Inline function 'kotlin.collections.buildList' call
@@ -3683,27 +5059,27 @@
     var this_0 = ArrayList_init_$Create$(2);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.messages.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_53(this);
+    var tmp0_messageDescriptor = descriptor$factory_69(this);
     var tmp1_type = new String_0(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp0_messageDescriptor, 'text', 1, tmp1_type, text$factory_2(), VOID, 'text'),
     );
-    var tmp2_messageDescriptor = descriptor$factory_54(this);
+    var tmp2_messageDescriptor = descriptor$factory_70(this);
     var tmp3_type = new String_0(true);
     this_0.add_utx5q5_k$(new FieldDescriptor(tmp2_messageDescriptor, 'id', 2, tmp3_type, id$factory_4(), VOID, 'id'));
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('Button', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_16).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_11(Companion_getInstance_16(), u);
+  protoOf(Companion_20).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_13(Companion_getInstance_20(), u);
   };
-  protoOf(Companion_16).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_20).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_14;
-  function Companion_getInstance_16() {
-    if (Companion_instance_14 == null) new Companion_16();
-    return Companion_instance_14;
+  var Companion_instance_18;
+  function Companion_getInstance_20() {
+    if (Companion_instance_18 == null) new Companion_20();
+    return Companion_instance_18;
   }
   function Button$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -3711,7 +5087,7 @@
     };
   }
   function Button_0(text, id, unknownFields) {
-    Companion_getInstance_16();
+    Companion_getInstance_20();
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
     this.text = text;
     this.id = id;
@@ -3729,15 +5105,15 @@
     return this.unknownFields_1;
   };
   protoOf(Button_0).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_11(this, other);
+    return protoMergeImpl_13(this, other);
   };
   protoOf(Button_0).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_16().descriptor_1;
+    return Companion_getInstance_20().descriptor_1;
   };
   protoOf(Button_0).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_11();
+    protoSize$factory_13();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(Button_0).component1_7eebsc_k$ = function () {
@@ -3776,8 +5152,8 @@
     if (!equals(this.unknownFields_1, tmp0_other_with_cast.unknownFields_1)) return false;
     return true;
   };
-  function Companion_17() {
-    Companion_instance_15 = this;
+  function Companion_21() {
+    Companion_instance_19 = this;
     var tmp = this;
     var tmp_0 = getKClass(ButtonAction_0);
     // Inline function 'kotlin.collections.buildList' call
@@ -3788,12 +5164,12 @@
     var this_0 = ArrayList_init_$Create$(2);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.messages.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_55(this);
+    var tmp0_messageDescriptor = descriptor$factory_71(this);
     var tmp1_type = new String_0(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp0_messageDescriptor, 'button_id', 1, tmp1_type, buttonId$factory(), VOID, 'buttonId'),
     );
-    var tmp2_messageDescriptor = descriptor$factory_56(this);
+    var tmp2_messageDescriptor = descriptor$factory_72(this);
     var tmp3_type = new String_0(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
@@ -3809,16 +5185,16 @@
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('ButtonAction', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_17).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_12(Companion_getInstance_17(), u);
+  protoOf(Companion_21).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_14(Companion_getInstance_21(), u);
   };
-  protoOf(Companion_17).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_21).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_15;
-  function Companion_getInstance_17() {
-    if (Companion_instance_15 == null) new Companion_17();
-    return Companion_instance_15;
+  var Companion_instance_19;
+  function Companion_getInstance_21() {
+    if (Companion_instance_19 == null) new Companion_21();
+    return Companion_instance_19;
   }
   function ButtonAction$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -3826,7 +5202,7 @@
     };
   }
   function ButtonAction_0(buttonId, referenceMessageId, unknownFields) {
-    Companion_getInstance_17();
+    Companion_getInstance_21();
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
     this.buttonId = buttonId;
     this.referenceMessageId = referenceMessageId;
@@ -3844,15 +5220,15 @@
     return this.unknownFields_1;
   };
   protoOf(ButtonAction_0).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_12(this, other);
+    return protoMergeImpl_14(this, other);
   };
   protoOf(ButtonAction_0).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_17().descriptor_1;
+    return Companion_getInstance_21().descriptor_1;
   };
   protoOf(ButtonAction_0).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_12();
+    protoSize$factory_14();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(ButtonAction_0).component1_7eebsc_k$ = function () {
@@ -3899,8 +5275,8 @@
     if (!equals(this.unknownFields_1, tmp0_other_with_cast.unknownFields_1)) return false;
     return true;
   };
-  function Companion_18() {
-    Companion_instance_16 = this;
+  function Companion_22() {
+    Companion_instance_20 = this;
     var tmp = this;
     var tmp_0 = getKClass(ButtonActionConfirmation_0);
     // Inline function 'kotlin.collections.buildList' call
@@ -3911,7 +5287,7 @@
     var this_0 = ArrayList_init_$Create$(2);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.messages.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_57(this);
+    var tmp0_messageDescriptor = descriptor$factory_73(this);
     var tmp1_type = new String_0(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
@@ -3924,7 +5300,7 @@
         'referenceMessageId',
       ),
     );
-    var tmp2_messageDescriptor = descriptor$factory_58(this);
+    var tmp2_messageDescriptor = descriptor$factory_74(this);
     var tmp3_type = new String_0(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp2_messageDescriptor, 'button_id', 2, tmp3_type, buttonId$factory_0(), VOID, 'buttonId'),
@@ -3932,16 +5308,16 @@
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('ButtonActionConfirmation', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_18).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_13(Companion_getInstance_18(), u);
+  protoOf(Companion_22).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_15(Companion_getInstance_22(), u);
   };
-  protoOf(Companion_18).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_22).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_16;
-  function Companion_getInstance_18() {
-    if (Companion_instance_16 == null) new Companion_18();
-    return Companion_instance_16;
+  var Companion_instance_20;
+  function Companion_getInstance_22() {
+    if (Companion_instance_20 == null) new Companion_22();
+    return Companion_instance_20;
   }
   function ButtonActionConfirmation$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -3949,7 +5325,7 @@
     };
   }
   function ButtonActionConfirmation_0(referenceMessageId, buttonId, unknownFields) {
-    Companion_getInstance_18();
+    Companion_getInstance_22();
     buttonId = buttonId === VOID ? null : buttonId;
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
     this.referenceMessageId = referenceMessageId;
@@ -3968,15 +5344,15 @@
     return this.unknownFields_1;
   };
   protoOf(ButtonActionConfirmation_0).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_13(this, other);
+    return protoMergeImpl_15(this, other);
   };
   protoOf(ButtonActionConfirmation_0).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_18().descriptor_1;
+    return Companion_getInstance_22().descriptor_1;
   };
   protoOf(ButtonActionConfirmation_0).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_13();
+    protoSize$factory_15();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(ButtonActionConfirmation_0).component1_7eebsc_k$ = function () {
@@ -4024,7 +5400,7 @@
     return true;
   };
   function Availability$Type$Companion$values$delegate$lambda() {
-    return listOf_0([NONE_getInstance(), AVAILABLE_getInstance(), AWAY_getInstance(), BUSY_getInstance()]);
+    return listOf([NONE_getInstance(), AVAILABLE_getInstance(), AWAY_getInstance(), BUSY_getInstance()]);
   }
   function NONE() {
     NONE_instance = this;
@@ -4062,21 +5438,21 @@
     if (BUSY_instance == null) new BUSY();
     return BUSY_instance;
   }
-  function UNRECOGNIZED_2(value) {
+  function UNRECOGNIZED_4(value) {
     Type.call(this, value);
   }
-  function Companion_19() {
-    Companion_instance_17 = this;
+  function Companion_23() {
+    Companion_instance_21 = this;
     var tmp = this;
     tmp.values$delegate_1 = lazy(Availability$Type$Companion$values$delegate$lambda);
   }
-  protoOf(Companion_19).get_values_ksazhn_k$ = function () {
+  protoOf(Companion_23).get_values_ksazhn_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.values$delegate_1;
-    values$factory_2();
+    values$factory_4();
     return this_0.get_value_j01efc_k$();
   };
-  protoOf(Companion_19).fromValue_lljhin_k$ = function (value) {
+  protoOf(Companion_23).fromValue_lljhin_k$ = function (value) {
     var tmp$ret$1;
     $l$block: {
       // Inline function 'kotlin.collections.firstOrNull' call
@@ -4092,9 +5468,9 @@
       tmp$ret$1 = null;
     }
     var tmp0_elvis_lhs = tmp$ret$1;
-    return tmp0_elvis_lhs == null ? new UNRECOGNIZED_2(value) : tmp0_elvis_lhs;
+    return tmp0_elvis_lhs == null ? new UNRECOGNIZED_4(value) : tmp0_elvis_lhs;
   };
-  protoOf(Companion_19).fromName_z4ts05_k$ = function (name) {
+  protoOf(Companion_23).fromName_z4ts05_k$ = function (name) {
     var tmp$ret$1;
     $l$block: {
       // Inline function 'kotlin.collections.firstOrNull' call
@@ -4118,13 +5494,13 @@
     }
     return tmp;
   };
-  var Companion_instance_17;
-  function Companion_getInstance_19() {
-    if (Companion_instance_17 == null) new Companion_19();
-    return Companion_instance_17;
+  var Companion_instance_21;
+  function Companion_getInstance_23() {
+    if (Companion_instance_21 == null) new Companion_23();
+    return Companion_instance_21;
   }
-  function Companion_20() {
-    Companion_instance_18 = this;
+  function Companion_24() {
+    Companion_instance_22 = this;
     var tmp = this;
     var tmp_0 = getKClass(Availability_0);
     // Inline function 'kotlin.collections.buildList' call
@@ -4135,27 +5511,27 @@
     var this_0 = ArrayList_init_$Create$(1);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.messages.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_59(this);
-    var tmp1_type = new Enum_0(Companion_getInstance_19(), true);
+    var tmp0_messageDescriptor = descriptor$factory_75(this);
+    var tmp1_type = new Enum_0(Companion_getInstance_23(), true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp0_messageDescriptor, 'type', 1, tmp1_type, type$factory(), VOID, 'type'),
     );
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('Availability', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_20).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_14(Companion_getInstance_20(), u);
+  protoOf(Companion_24).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_16(Companion_getInstance_24(), u);
   };
-  protoOf(Companion_20).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_24).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_18;
-  function Companion_getInstance_20() {
-    if (Companion_instance_18 == null) new Companion_20();
-    return Companion_instance_18;
+  var Companion_instance_22;
+  function Companion_getInstance_24() {
+    if (Companion_instance_22 == null) new Companion_24();
+    return Companion_instance_22;
   }
   function Type(value, name) {
-    Companion_getInstance_19();
+    Companion_getInstance_23();
     name = name === VOID ? null : name;
     this.value_1 = value;
     this.name_1 = name;
@@ -4194,7 +5570,7 @@
     };
   }
   function Availability_0(type, unknownFields) {
-    Companion_getInstance_20();
+    Companion_getInstance_24();
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
     this.type = type;
     this.unknownFields_1 = unknownFields;
@@ -4208,15 +5584,15 @@
     return this.unknownFields_1;
   };
   protoOf(Availability_0).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_14(this, other);
+    return protoMergeImpl_16(this, other);
   };
   protoOf(Availability_0).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_20().descriptor_1;
+    return Companion_getInstance_24().descriptor_1;
   };
   protoOf(Availability_0).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_14();
+    protoSize$factory_16();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(Availability_0).component1_7eebsc_k$ = function () {
@@ -4258,17 +5634,17 @@
   function Knock_0(knock) {
     Content_2.call(this, knock);
   }
-  function Asset_0(asset) {
+  function Asset_1(asset) {
     Content_2.call(this, asset);
   }
-  function Location_0(location) {
+  function Location_1(location) {
     Content_2.call(this, location);
   }
   function Content_2(value) {
     OneOf.call(this, value);
   }
-  function Companion_21() {
-    Companion_instance_19 = this;
+  function Companion_25() {
+    Companion_instance_23 = this;
     var tmp = this;
     var tmp_0 = getKClass(Ephemeral_0);
     // Inline function 'kotlin.collections.buildList' call
@@ -4279,7 +5655,7 @@
     var this_0 = ArrayList_init_$Create$(6);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.messages.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_60(this);
+    var tmp0_messageDescriptor = descriptor$factory_76(this);
     var tmp1_type = new Int64(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
@@ -4292,44 +5668,44 @@
         'expireAfterMillis',
       ),
     );
-    var tmp2_messageDescriptor = descriptor$factory_61(this);
-    var tmp3_type = new Message(Companion_getInstance_22());
+    var tmp2_messageDescriptor = descriptor$factory_77(this);
+    var tmp3_type = new Message(Companion_getInstance_26());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp2_messageDescriptor, 'text', 2, tmp3_type, text$factory_3(), true, 'text'),
     );
-    var tmp4_messageDescriptor = descriptor$factory_62(this);
-    var tmp5_type = new Message(Companion_getInstance_37());
+    var tmp4_messageDescriptor = descriptor$factory_78(this);
+    var tmp5_type = new Message(Companion_getInstance_41());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp4_messageDescriptor, 'image', 3, tmp5_type, image$factory_0(), true, 'image'),
     );
-    var tmp6_messageDescriptor = descriptor$factory_63(this);
-    var tmp7_type = new Message(Companion_getInstance_23());
+    var tmp6_messageDescriptor = descriptor$factory_79(this);
+    var tmp7_type = new Message(Companion_getInstance_27());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp6_messageDescriptor, 'knock', 4, tmp7_type, knock$factory_0(), true, 'knock'),
     );
-    var tmp8_messageDescriptor = descriptor$factory_64(this);
-    var tmp9_type = new Message(Companion_getInstance_45());
+    var tmp8_messageDescriptor = descriptor$factory_80(this);
+    var tmp9_type = new Message(Companion_getInstance_49());
     this_0.add_utx5q5_k$(
-      new FieldDescriptor(tmp8_messageDescriptor, 'asset', 5, tmp9_type, asset$factory_0(), true, 'asset'),
+      new FieldDescriptor(tmp8_messageDescriptor, 'asset', 5, tmp9_type, asset$factory_1(), true, 'asset'),
     );
-    var tmp10_messageDescriptor = descriptor$factory_65(this);
-    var tmp11_type = new Message(Companion_getInstance_36());
+    var tmp10_messageDescriptor = descriptor$factory_81(this);
+    var tmp11_type = new Message(Companion_getInstance_40());
     this_0.add_utx5q5_k$(
-      new FieldDescriptor(tmp10_messageDescriptor, 'location', 6, tmp11_type, location$factory_0(), true, 'location'),
+      new FieldDescriptor(tmp10_messageDescriptor, 'location', 6, tmp11_type, location$factory_1(), true, 'location'),
     );
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('Ephemeral', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_21).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_15(Companion_getInstance_21(), u);
+  protoOf(Companion_25).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_17(Companion_getInstance_25(), u);
   };
-  protoOf(Companion_21).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_25).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_19;
-  function Companion_getInstance_21() {
-    if (Companion_instance_19 == null) new Companion_21();
-    return Companion_instance_19;
+  var Companion_instance_23;
+  function Companion_getInstance_25() {
+    if (Companion_instance_23 == null) new Companion_25();
+    return Companion_instance_23;
   }
   function Ephemeral$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -4337,7 +5713,7 @@
     };
   }
   function Ephemeral_0(expireAfterMillis, content, unknownFields) {
-    Companion_getInstance_21();
+    Companion_getInstance_25();
     content = content === VOID ? null : content;
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
     this.expireAfterMillis = expireAfterMillis;
@@ -4372,24 +5748,24 @@
   };
   protoOf(Ephemeral_0).get_asset_iotcjr_k$ = function () {
     var tmp = this.content;
-    var tmp0_safe_receiver = tmp instanceof Asset_0 ? tmp : null;
+    var tmp0_safe_receiver = tmp instanceof Asset_1 ? tmp : null;
     return tmp0_safe_receiver == null ? null : tmp0_safe_receiver.get_value_j01efc_k$();
   };
   protoOf(Ephemeral_0).get_location_d3s02_k$ = function () {
     var tmp = this.content;
-    var tmp0_safe_receiver = tmp instanceof Location_0 ? tmp : null;
+    var tmp0_safe_receiver = tmp instanceof Location_1 ? tmp : null;
     return tmp0_safe_receiver == null ? null : tmp0_safe_receiver.get_value_j01efc_k$();
   };
   protoOf(Ephemeral_0).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_15(this, other);
+    return protoMergeImpl_17(this, other);
   };
   protoOf(Ephemeral_0).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_21().descriptor_1;
+    return Companion_getInstance_25().descriptor_1;
   };
   protoOf(Ephemeral_0).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_15();
+    protoSize$factory_17();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(Ephemeral_0).component1_7eebsc_k$ = function () {
@@ -4436,8 +5812,8 @@
     if (!equals(this.unknownFields_1, tmp0_other_with_cast.unknownFields_1)) return false;
     return true;
   };
-  function Companion_22() {
-    Companion_instance_20 = this;
+  function Companion_26() {
+    Companion_instance_24 = this;
     var tmp = this;
     var tmp_0 = getKClass(Text_3);
     // Inline function 'kotlin.collections.buildList' call
@@ -4448,13 +5824,13 @@
     var this_0 = ArrayList_init_$Create$(6);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.messages.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_66(this);
+    var tmp0_messageDescriptor = descriptor$factory_82(this);
     var tmp1_type = new String_0(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp0_messageDescriptor, 'content', 1, tmp1_type, content$factory_0(), VOID, 'content'),
     );
-    var tmp2_messageDescriptor = descriptor$factory_67(this);
-    var tmp3_type = new Repeated(new Message(Companion_getInstance_24()));
+    var tmp2_messageDescriptor = descriptor$factory_83(this);
+    var tmp3_type = new Repeated(new Message(Companion_getInstance_28()));
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
         tmp2_messageDescriptor,
@@ -4466,17 +5842,17 @@
         'linkPreview',
       ),
     );
-    var tmp4_messageDescriptor = descriptor$factory_68(this);
-    var tmp5_type = new Repeated(new Message(Companion_getInstance_27()));
+    var tmp4_messageDescriptor = descriptor$factory_84(this);
+    var tmp5_type = new Repeated(new Message(Companion_getInstance_31()));
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp4_messageDescriptor, 'mentions', 4, tmp5_type, mentions$factory(), VOID, 'mentions'),
     );
-    var tmp6_messageDescriptor = descriptor$factory_69(this);
-    var tmp7_type = new Message(Companion_getInstance_33());
+    var tmp6_messageDescriptor = descriptor$factory_85(this);
+    var tmp7_type = new Message(Companion_getInstance_37());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp6_messageDescriptor, 'quote', 5, tmp7_type, quote$factory(), VOID, 'quote'),
     );
-    var tmp8_messageDescriptor = descriptor$factory_70(this);
+    var tmp8_messageDescriptor = descriptor$factory_86(this);
     var tmp9_type = new Bool(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
@@ -4489,8 +5865,8 @@
         'expectsReadConfirmation',
       ),
     );
-    var tmp10_messageDescriptor = descriptor$factory_71(this);
-    var tmp11_type = new Enum_0(Companion_getInstance_10(), true);
+    var tmp10_messageDescriptor = descriptor$factory_87(this);
+    var tmp11_type = new Enum_0(Companion_getInstance_13(), true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
         tmp10_messageDescriptor,
@@ -4505,16 +5881,16 @@
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('Text', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_22).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_16(Companion_getInstance_22(), u);
+  protoOf(Companion_26).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_18(Companion_getInstance_26(), u);
   };
-  protoOf(Companion_22).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_26).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_20;
-  function Companion_getInstance_22() {
-    if (Companion_instance_20 == null) new Companion_22();
-    return Companion_instance_20;
+  var Companion_instance_24;
+  function Companion_getInstance_26() {
+    if (Companion_instance_24 == null) new Companion_26();
+    return Companion_instance_24;
   }
   function Text$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -4522,7 +5898,7 @@
     };
   }
   function Text_3(content, linkPreview, mentions, quote, expectsReadConfirmation, legalHoldStatus, unknownFields) {
-    Companion_getInstance_22();
+    Companion_getInstance_26();
     linkPreview = linkPreview === VOID ? emptyList() : linkPreview;
     mentions = mentions === VOID ? emptyList() : mentions;
     quote = quote === VOID ? null : quote;
@@ -4561,15 +5937,15 @@
     return this.unknownFields_1;
   };
   protoOf(Text_3).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_16(this, other);
+    return protoMergeImpl_18(this, other);
   };
   protoOf(Text_3).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_22().descriptor_1;
+    return Companion_getInstance_26().descriptor_1;
   };
   protoOf(Text_3).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_16();
+    protoSize$factory_18();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(Text_3).component1_7eebsc_k$ = function () {
@@ -4676,8 +6052,8 @@
     if (!equals(this.unknownFields_1, tmp0_other_with_cast.unknownFields_1)) return false;
     return true;
   };
-  function Companion_23() {
-    Companion_instance_21 = this;
+  function Companion_27() {
+    Companion_instance_25 = this;
     var tmp = this;
     var tmp_0 = getKClass(Knock_1);
     // Inline function 'kotlin.collections.buildList' call
@@ -4688,12 +6064,12 @@
     var this_0 = ArrayList_init_$Create$(3);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.messages.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_72(this);
+    var tmp0_messageDescriptor = descriptor$factory_88(this);
     var tmp1_type = new Bool(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp0_messageDescriptor, 'hot_knock', 1, tmp1_type, hotKnock$factory(), VOID, 'hotKnock'),
     );
-    var tmp2_messageDescriptor = descriptor$factory_73(this);
+    var tmp2_messageDescriptor = descriptor$factory_89(this);
     var tmp3_type = new Bool(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
@@ -4706,8 +6082,8 @@
         'expectsReadConfirmation',
       ),
     );
-    var tmp4_messageDescriptor = descriptor$factory_74(this);
-    var tmp5_type = new Enum_0(Companion_getInstance_10(), true);
+    var tmp4_messageDescriptor = descriptor$factory_90(this);
+    var tmp5_type = new Enum_0(Companion_getInstance_13(), true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
         tmp4_messageDescriptor,
@@ -4722,16 +6098,16 @@
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('Knock', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_23).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_17(Companion_getInstance_23(), u);
+  protoOf(Companion_27).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_19(Companion_getInstance_27(), u);
   };
-  protoOf(Companion_23).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_27).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_21;
-  function Companion_getInstance_23() {
-    if (Companion_instance_21 == null) new Companion_23();
-    return Companion_instance_21;
+  var Companion_instance_25;
+  function Companion_getInstance_27() {
+    if (Companion_instance_25 == null) new Companion_27();
+    return Companion_instance_25;
   }
   function Knock$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -4739,7 +6115,7 @@
     };
   }
   function Knock_1(hotKnock, expectsReadConfirmation, legalHoldStatus, unknownFields) {
-    Companion_getInstance_23();
+    Companion_getInstance_27();
     expectsReadConfirmation = expectsReadConfirmation === VOID ? null : expectsReadConfirmation;
     legalHoldStatus = legalHoldStatus === VOID ? null : legalHoldStatus;
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
@@ -4763,15 +6139,15 @@
     return this.unknownFields_1;
   };
   protoOf(Knock_1).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_17(this, other);
+    return protoMergeImpl_19(this, other);
   };
   protoOf(Knock_1).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_23().descriptor_1;
+    return Companion_getInstance_27().descriptor_1;
   };
   protoOf(Knock_1).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_17();
+    protoSize$factory_19();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(Knock_1).component1_7eebsc_k$ = function () {
@@ -4841,8 +6217,8 @@
   function MetaData(value) {
     OneOf.call(this, value);
   }
-  function Companion_24() {
-    Companion_instance_22 = this;
+  function Companion_28() {
+    Companion_instance_26 = this;
     var tmp = this;
     var tmp_0 = getKClass(LinkPreview);
     // Inline function 'kotlin.collections.buildList' call
@@ -4853,20 +6229,20 @@
     var this_0 = ArrayList_init_$Create$(8);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.messages.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_75(this);
+    var tmp0_messageDescriptor = descriptor$factory_91(this);
     var tmp1_type = new String_0(true);
     this_0.add_utx5q5_k$(new FieldDescriptor(tmp0_messageDescriptor, 'url', 1, tmp1_type, url$factory(), VOID, 'url'));
-    var tmp2_messageDescriptor = descriptor$factory_76(this);
+    var tmp2_messageDescriptor = descriptor$factory_92(this);
     var tmp3_type = new Int32(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp2_messageDescriptor, 'url_offset', 2, tmp3_type, urlOffset$factory(), VOID, 'urlOffset'),
     );
-    var tmp4_messageDescriptor = descriptor$factory_77(this);
-    var tmp5_type = new Message(Companion_getInstance_26());
+    var tmp4_messageDescriptor = descriptor$factory_93(this);
+    var tmp5_type = new Message(Companion_getInstance_30());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp4_messageDescriptor, 'article', 3, tmp5_type, article$factory(), true, 'article'),
     );
-    var tmp6_messageDescriptor = descriptor$factory_78(this);
+    var tmp6_messageDescriptor = descriptor$factory_94(this);
     var tmp7_type = new String_0(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
@@ -4879,39 +6255,39 @@
         'permanentUrl',
       ),
     );
-    var tmp8_messageDescriptor = descriptor$factory_79(this);
+    var tmp8_messageDescriptor = descriptor$factory_95(this);
     var tmp9_type = new String_0(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp8_messageDescriptor, 'title', 6, tmp9_type, title$factory(), VOID, 'title'),
     );
-    var tmp10_messageDescriptor = descriptor$factory_80(this);
+    var tmp10_messageDescriptor = descriptor$factory_96(this);
     var tmp11_type = new String_0(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp10_messageDescriptor, 'summary', 7, tmp11_type, summary$factory(), VOID, 'summary'),
     );
-    var tmp12_messageDescriptor = descriptor$factory_81(this);
-    var tmp13_type = new Message(Companion_getInstance_45());
+    var tmp12_messageDescriptor = descriptor$factory_97(this);
+    var tmp13_type = new Message(Companion_getInstance_49());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp12_messageDescriptor, 'image', 8, tmp13_type, image$factory_1(), VOID, 'image'),
     );
-    var tmp14_messageDescriptor = descriptor$factory_82(this);
-    var tmp15_type = new Message(Companion_getInstance_25());
+    var tmp14_messageDescriptor = descriptor$factory_98(this);
+    var tmp15_type = new Message(Companion_getInstance_29());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp14_messageDescriptor, 'tweet', 9, tmp15_type, tweet$factory(), true, 'tweet'),
     );
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('LinkPreview', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_24).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_18(Companion_getInstance_24(), u);
+  protoOf(Companion_28).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_20(Companion_getInstance_28(), u);
   };
-  protoOf(Companion_24).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_28).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_22;
-  function Companion_getInstance_24() {
-    if (Companion_instance_22 == null) new Companion_24();
-    return Companion_instance_22;
+  var Companion_instance_26;
+  function Companion_getInstance_28() {
+    if (Companion_instance_26 == null) new Companion_28();
+    return Companion_instance_26;
   }
   function LinkPreview$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -4919,7 +6295,7 @@
     };
   }
   function LinkPreview(url, urlOffset, permanentUrl, title, summary, image, preview, metaData, unknownFields) {
-    Companion_getInstance_24();
+    Companion_getInstance_28();
     permanentUrl = permanentUrl === VOID ? null : permanentUrl;
     title = title === VOID ? null : title;
     summary = summary === VOID ? null : summary;
@@ -4977,15 +6353,15 @@
     return tmp0_safe_receiver == null ? null : tmp0_safe_receiver.get_value_j01efc_k$();
   };
   protoOf(LinkPreview).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_18(this, other);
+    return protoMergeImpl_20(this, other);
   };
   protoOf(LinkPreview).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_24().descriptor_1;
+    return Companion_getInstance_28().descriptor_1;
   };
   protoOf(LinkPreview).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_18();
+    protoSize$factory_20();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(LinkPreview).component1_7eebsc_k$ = function () {
@@ -5104,8 +6480,8 @@
   function Tweet$Companion$defaultInstance$delegate$lambda() {
     return new Tweet_0();
   }
-  function Companion_25() {
-    Companion_instance_23 = this;
+  function Companion_29() {
+    Companion_instance_27 = this;
     var tmp = this;
     tmp.defaultInstance$delegate_1 = lazy(Tweet$Companion$defaultInstance$delegate$lambda);
     var tmp_0 = this;
@@ -5118,12 +6494,12 @@
     var this_0 = ArrayList_init_$Create$(2);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.messages.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_83(this);
+    var tmp0_messageDescriptor = descriptor$factory_99(this);
     var tmp1_type = new String_0(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp0_messageDescriptor, 'author', 1, tmp1_type, author$factory(), VOID, 'author'),
     );
-    var tmp2_messageDescriptor = descriptor$factory_84(this);
+    var tmp2_messageDescriptor = descriptor$factory_100(this);
     var tmp3_type = new String_0(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp2_messageDescriptor, 'username', 2, tmp3_type, username$factory(), VOID, 'username'),
@@ -5131,22 +6507,22 @@
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp_0.descriptor_1 = new MessageDescriptor('Tweet', tmp_1, this, tmp$ret$2);
   }
-  protoOf(Companion_25).get_defaultInstance_axha8d_k$ = function () {
+  protoOf(Companion_29).get_defaultInstance_axha8d_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.defaultInstance$delegate_1;
     defaultInstance$factory_1();
     return this_0.get_value_j01efc_k$();
   };
-  protoOf(Companion_25).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_19(Companion_getInstance_25(), u);
+  protoOf(Companion_29).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_21(Companion_getInstance_29(), u);
   };
-  protoOf(Companion_25).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_29).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_23;
-  function Companion_getInstance_25() {
-    if (Companion_instance_23 == null) new Companion_25();
-    return Companion_instance_23;
+  var Companion_instance_27;
+  function Companion_getInstance_29() {
+    if (Companion_instance_27 == null) new Companion_29();
+    return Companion_instance_27;
   }
   function Tweet$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -5154,7 +6530,7 @@
     };
   }
   function Tweet_0(author, username, unknownFields) {
-    Companion_getInstance_25();
+    Companion_getInstance_29();
     author = author === VOID ? null : author;
     username = username === VOID ? null : username;
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
@@ -5174,15 +6550,15 @@
     return this.unknownFields_1;
   };
   protoOf(Tweet_0).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_19(this, other);
+    return protoMergeImpl_21(this, other);
   };
   protoOf(Tweet_0).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_25().descriptor_1;
+    return Companion_getInstance_29().descriptor_1;
   };
   protoOf(Tweet_0).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_19();
+    protoSize$factory_21();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(Tweet_0).component1_7eebsc_k$ = function () {
@@ -5223,8 +6599,8 @@
     if (!equals(this.unknownFields_1, tmp0_other_with_cast.unknownFields_1)) return false;
     return true;
   };
-  function Companion_26() {
-    Companion_instance_24 = this;
+  function Companion_30() {
+    Companion_instance_28 = this;
     var tmp = this;
     var tmp_0 = getKClass(Article_0);
     // Inline function 'kotlin.collections.buildList' call
@@ -5235,7 +6611,7 @@
     var this_0 = ArrayList_init_$Create$(4);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.messages.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_85(this);
+    var tmp0_messageDescriptor = descriptor$factory_101(this);
     var tmp1_type = new String_0(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
@@ -5248,34 +6624,34 @@
         'permanentUrl',
       ),
     );
-    var tmp2_messageDescriptor = descriptor$factory_86(this);
+    var tmp2_messageDescriptor = descriptor$factory_102(this);
     var tmp3_type = new String_0(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp2_messageDescriptor, 'title', 2, tmp3_type, title$factory_0(), VOID, 'title'),
     );
-    var tmp4_messageDescriptor = descriptor$factory_87(this);
+    var tmp4_messageDescriptor = descriptor$factory_103(this);
     var tmp5_type = new String_0(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp4_messageDescriptor, 'summary', 3, tmp5_type, summary$factory_0(), VOID, 'summary'),
     );
-    var tmp6_messageDescriptor = descriptor$factory_88(this);
-    var tmp7_type = new Message(Companion_getInstance_45());
+    var tmp6_messageDescriptor = descriptor$factory_104(this);
+    var tmp7_type = new Message(Companion_getInstance_49());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp6_messageDescriptor, 'image', 4, tmp7_type, image$factory_2(), VOID, 'image'),
     );
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('Article', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_26).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_20(Companion_getInstance_26(), u);
+  protoOf(Companion_30).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_22(Companion_getInstance_30(), u);
   };
-  protoOf(Companion_26).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_30).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_24;
-  function Companion_getInstance_26() {
-    if (Companion_instance_24 == null) new Companion_26();
-    return Companion_instance_24;
+  var Companion_instance_28;
+  function Companion_getInstance_30() {
+    if (Companion_instance_28 == null) new Companion_30();
+    return Companion_instance_28;
   }
   function Article$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -5283,7 +6659,7 @@
     };
   }
   function Article_0(permanentUrl, title, summary, image, unknownFields) {
-    Companion_getInstance_26();
+    Companion_getInstance_30();
     title = title === VOID ? null : title;
     summary = summary === VOID ? null : summary;
     image = image === VOID ? null : image;
@@ -5312,15 +6688,15 @@
     return this.unknownFields_1;
   };
   protoOf(Article_0).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_20(this, other);
+    return protoMergeImpl_22(this, other);
   };
   protoOf(Article_0).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_26().descriptor_1;
+    return Companion_getInstance_30().descriptor_1;
   };
   protoOf(Article_0).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_20();
+    protoSize$factory_22();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(Article_0).component1_7eebsc_k$ = function () {
@@ -5390,8 +6766,8 @@
   function MentionType(value) {
     OneOf.call(this, value);
   }
-  function Companion_27() {
-    Companion_instance_25 = this;
+  function Companion_31() {
+    Companion_instance_29 = this;
     var tmp = this;
     var tmp_0 = getKClass(Mention);
     // Inline function 'kotlin.collections.buildList' call
@@ -5402,23 +6778,23 @@
     var this_0 = ArrayList_init_$Create$(4);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.messages.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_89(this);
+    var tmp0_messageDescriptor = descriptor$factory_105(this);
     var tmp1_type = new Int32(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp0_messageDescriptor, 'start', 1, tmp1_type, start$factory(), VOID, 'start'),
     );
-    var tmp2_messageDescriptor = descriptor$factory_90(this);
+    var tmp2_messageDescriptor = descriptor$factory_106(this);
     var tmp3_type = new Int32(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp2_messageDescriptor, 'length', 2, tmp3_type, length$factory(), VOID, 'length'),
     );
-    var tmp4_messageDescriptor = descriptor$factory_91(this);
+    var tmp4_messageDescriptor = descriptor$factory_107(this);
     var tmp5_type = new String_0(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp4_messageDescriptor, 'user_id', 3, tmp5_type, userId$factory_0(), true, 'userId'),
     );
-    var tmp6_messageDescriptor = descriptor$factory_92(this);
-    var tmp7_type = new Message(Companion_getInstance_12());
+    var tmp6_messageDescriptor = descriptor$factory_108(this);
+    var tmp7_type = new Message(Companion_getInstance_16());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
         tmp6_messageDescriptor,
@@ -5433,16 +6809,16 @@
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('Mention', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_27).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_21(Companion_getInstance_27(), u);
+  protoOf(Companion_31).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_23(Companion_getInstance_31(), u);
   };
-  protoOf(Companion_27).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_31).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_25;
-  function Companion_getInstance_27() {
-    if (Companion_instance_25 == null) new Companion_27();
-    return Companion_instance_25;
+  var Companion_instance_29;
+  function Companion_getInstance_31() {
+    if (Companion_instance_29 == null) new Companion_31();
+    return Companion_instance_29;
   }
   function Mention$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -5450,7 +6826,7 @@
     };
   }
   function Mention(start, length, qualifiedUserId, mentionType, unknownFields) {
-    Companion_getInstance_27();
+    Companion_getInstance_31();
     qualifiedUserId = qualifiedUserId === VOID ? null : qualifiedUserId;
     mentionType = mentionType === VOID ? null : mentionType;
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
@@ -5483,15 +6859,15 @@
     return tmp0_safe_receiver == null ? null : tmp0_safe_receiver.get_value_j01efc_k$();
   };
   protoOf(Mention).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_21(this, other);
+    return protoMergeImpl_23(this, other);
   };
   protoOf(Mention).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_27().descriptor_1;
+    return Companion_getInstance_31().descriptor_1;
   };
   protoOf(Mention).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_21();
+    protoSize$factory_23();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(Mention).component1_7eebsc_k$ = function () {
@@ -5554,8 +6930,8 @@
     if (!equals(this.unknownFields_1, tmp0_other_with_cast.unknownFields_1)) return false;
     return true;
   };
-  function Companion_28() {
-    Companion_instance_26 = this;
+  function Companion_32() {
+    Companion_instance_30 = this;
     var tmp = this;
     var tmp_0 = getKClass(LastRead_0);
     // Inline function 'kotlin.collections.buildList' call
@@ -5566,7 +6942,7 @@
     var this_0 = ArrayList_init_$Create$(3);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.messages.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_93(this);
+    var tmp0_messageDescriptor = descriptor$factory_109(this);
     var tmp1_type = new String_0(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
@@ -5579,7 +6955,7 @@
         'conversationId',
       ),
     );
-    var tmp2_messageDescriptor = descriptor$factory_94(this);
+    var tmp2_messageDescriptor = descriptor$factory_110(this);
     var tmp3_type = new Int64(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
@@ -5592,8 +6968,8 @@
         'lastReadTimestamp',
       ),
     );
-    var tmp4_messageDescriptor = descriptor$factory_95(this);
-    var tmp5_type = new Message(Companion_getInstance_13());
+    var tmp4_messageDescriptor = descriptor$factory_111(this);
+    var tmp5_type = new Message(Companion_getInstance_17());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
         tmp4_messageDescriptor,
@@ -5608,16 +6984,16 @@
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('LastRead', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_28).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_22(Companion_getInstance_28(), u);
+  protoOf(Companion_32).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_24(Companion_getInstance_32(), u);
   };
-  protoOf(Companion_28).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_32).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_26;
-  function Companion_getInstance_28() {
-    if (Companion_instance_26 == null) new Companion_28();
-    return Companion_instance_26;
+  var Companion_instance_30;
+  function Companion_getInstance_32() {
+    if (Companion_instance_30 == null) new Companion_32();
+    return Companion_instance_30;
   }
   function LastRead$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -5625,7 +7001,7 @@
     };
   }
   function LastRead_0(conversationId, lastReadTimestamp, qualifiedConversationId, unknownFields) {
-    Companion_getInstance_28();
+    Companion_getInstance_32();
     qualifiedConversationId = qualifiedConversationId === VOID ? null : qualifiedConversationId;
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
     this.conversationId = conversationId;
@@ -5648,15 +7024,15 @@
     return this.unknownFields_1;
   };
   protoOf(LastRead_0).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_22(this, other);
+    return protoMergeImpl_24(this, other);
   };
   protoOf(LastRead_0).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_28().descriptor_1;
+    return Companion_getInstance_32().descriptor_1;
   };
   protoOf(LastRead_0).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_22();
+    protoSize$factory_24();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(LastRead_0).component1_7eebsc_k$ = function () {
@@ -5723,8 +7099,8 @@
     if (!equals(this.unknownFields_1, tmp0_other_with_cast.unknownFields_1)) return false;
     return true;
   };
-  function Companion_29() {
-    Companion_instance_27 = this;
+  function Companion_33() {
+    Companion_instance_31 = this;
     var tmp = this;
     var tmp_0 = getKClass(Cleared_0);
     // Inline function 'kotlin.collections.buildList' call
@@ -5735,7 +7111,7 @@
     var this_0 = ArrayList_init_$Create$(3);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.messages.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_96(this);
+    var tmp0_messageDescriptor = descriptor$factory_112(this);
     var tmp1_type = new String_0(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
@@ -5748,7 +7124,7 @@
         'conversationId',
       ),
     );
-    var tmp2_messageDescriptor = descriptor$factory_97(this);
+    var tmp2_messageDescriptor = descriptor$factory_113(this);
     var tmp3_type = new Int64(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
@@ -5761,8 +7137,8 @@
         'clearedTimestamp',
       ),
     );
-    var tmp4_messageDescriptor = descriptor$factory_98(this);
-    var tmp5_type = new Message(Companion_getInstance_13());
+    var tmp4_messageDescriptor = descriptor$factory_114(this);
+    var tmp5_type = new Message(Companion_getInstance_17());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
         tmp4_messageDescriptor,
@@ -5777,16 +7153,16 @@
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('Cleared', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_29).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_23(Companion_getInstance_29(), u);
+  protoOf(Companion_33).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_25(Companion_getInstance_33(), u);
   };
-  protoOf(Companion_29).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_33).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_27;
-  function Companion_getInstance_29() {
-    if (Companion_instance_27 == null) new Companion_29();
-    return Companion_instance_27;
+  var Companion_instance_31;
+  function Companion_getInstance_33() {
+    if (Companion_instance_31 == null) new Companion_33();
+    return Companion_instance_31;
   }
   function Cleared$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -5794,7 +7170,7 @@
     };
   }
   function Cleared_0(conversationId, clearedTimestamp, qualifiedConversationId, unknownFields) {
-    Companion_getInstance_29();
+    Companion_getInstance_33();
     qualifiedConversationId = qualifiedConversationId === VOID ? null : qualifiedConversationId;
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
     this.conversationId = conversationId;
@@ -5817,15 +7193,15 @@
     return this.unknownFields_1;
   };
   protoOf(Cleared_0).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_23(this, other);
+    return protoMergeImpl_25(this, other);
   };
   protoOf(Cleared_0).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_29().descriptor_1;
+    return Companion_getInstance_33().descriptor_1;
   };
   protoOf(Cleared_0).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_23();
+    protoSize$factory_25();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(Cleared_0).component1_7eebsc_k$ = function () {
@@ -5892,8 +7268,8 @@
     if (!equals(this.unknownFields_1, tmp0_other_with_cast.unknownFields_1)) return false;
     return true;
   };
-  function Companion_30() {
-    Companion_instance_28 = this;
+  function Companion_34() {
+    Companion_instance_32 = this;
     var tmp = this;
     var tmp_0 = getKClass(MessageHide);
     // Inline function 'kotlin.collections.buildList' call
@@ -5904,7 +7280,7 @@
     var this_0 = ArrayList_init_$Create$(3);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.messages.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_99(this);
+    var tmp0_messageDescriptor = descriptor$factory_115(this);
     var tmp1_type = new String_0(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
@@ -5917,13 +7293,13 @@
         'conversationId',
       ),
     );
-    var tmp2_messageDescriptor = descriptor$factory_100(this);
+    var tmp2_messageDescriptor = descriptor$factory_116(this);
     var tmp3_type = new String_0(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp2_messageDescriptor, 'message_id', 2, tmp3_type, messageId$factory_0(), VOID, 'messageId'),
     );
-    var tmp4_messageDescriptor = descriptor$factory_101(this);
-    var tmp5_type = new Message(Companion_getInstance_13());
+    var tmp4_messageDescriptor = descriptor$factory_117(this);
+    var tmp5_type = new Message(Companion_getInstance_17());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
         tmp4_messageDescriptor,
@@ -5938,16 +7314,16 @@
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('MessageHide', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_30).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_24(Companion_getInstance_30(), u);
+  protoOf(Companion_34).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_26(Companion_getInstance_34(), u);
   };
-  protoOf(Companion_30).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_34).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_28;
-  function Companion_getInstance_30() {
-    if (Companion_instance_28 == null) new Companion_30();
-    return Companion_instance_28;
+  var Companion_instance_32;
+  function Companion_getInstance_34() {
+    if (Companion_instance_32 == null) new Companion_34();
+    return Companion_instance_32;
   }
   function MessageHide$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -5955,7 +7331,7 @@
     };
   }
   function MessageHide(conversationId, messageId, qualifiedConversationId, unknownFields) {
-    Companion_getInstance_30();
+    Companion_getInstance_34();
     qualifiedConversationId = qualifiedConversationId === VOID ? null : qualifiedConversationId;
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
     this.conversationId = conversationId;
@@ -5978,15 +7354,15 @@
     return this.unknownFields_1;
   };
   protoOf(MessageHide).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_24(this, other);
+    return protoMergeImpl_26(this, other);
   };
   protoOf(MessageHide).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_30().descriptor_1;
+    return Companion_getInstance_34().descriptor_1;
   };
   protoOf(MessageHide).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_24();
+    protoSize$factory_26();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(MessageHide).component1_7eebsc_k$ = function () {
@@ -6042,8 +7418,8 @@
     if (!equals(this.unknownFields_1, tmp0_other_with_cast.unknownFields_1)) return false;
     return true;
   };
-  function Companion_31() {
-    Companion_instance_29 = this;
+  function Companion_35() {
+    Companion_instance_33 = this;
     var tmp = this;
     var tmp_0 = getKClass(MessageDelete);
     // Inline function 'kotlin.collections.buildList' call
@@ -6054,7 +7430,7 @@
     var this_0 = ArrayList_init_$Create$(1);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.messages.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_102(this);
+    var tmp0_messageDescriptor = descriptor$factory_118(this);
     var tmp1_type = new String_0(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp0_messageDescriptor, 'message_id', 1, tmp1_type, messageId$factory_1(), VOID, 'messageId'),
@@ -6062,16 +7438,16 @@
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('MessageDelete', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_31).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_25(Companion_getInstance_31(), u);
+  protoOf(Companion_35).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_27(Companion_getInstance_35(), u);
   };
-  protoOf(Companion_31).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_35).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_29;
-  function Companion_getInstance_31() {
-    if (Companion_instance_29 == null) new Companion_31();
-    return Companion_instance_29;
+  var Companion_instance_33;
+  function Companion_getInstance_35() {
+    if (Companion_instance_33 == null) new Companion_35();
+    return Companion_instance_33;
   }
   function MessageDelete$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -6079,7 +7455,7 @@
     };
   }
   function MessageDelete(messageId, unknownFields) {
-    Companion_getInstance_31();
+    Companion_getInstance_35();
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
     this.messageId = messageId;
     this.unknownFields_1 = unknownFields;
@@ -6093,15 +7469,15 @@
     return this.unknownFields_1;
   };
   protoOf(MessageDelete).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_25(this, other);
+    return protoMergeImpl_27(this, other);
   };
   protoOf(MessageDelete).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_31().descriptor_1;
+    return Companion_getInstance_35().descriptor_1;
   };
   protoOf(MessageDelete).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_25();
+    protoSize$factory_27();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(MessageDelete).component1_7eebsc_k$ = function () {
@@ -6143,8 +7519,8 @@
   function Content_3(value) {
     OneOf.call(this, value);
   }
-  function Companion_32() {
-    Companion_instance_30 = this;
+  function Companion_36() {
+    Companion_instance_34 = this;
     var tmp = this;
     var tmp_0 = getKClass(MessageEdit);
     // Inline function 'kotlin.collections.buildList' call
@@ -6155,7 +7531,7 @@
     var this_0 = ArrayList_init_$Create$(3);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.messages.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_103(this);
+    var tmp0_messageDescriptor = descriptor$factory_119(this);
     var tmp1_type = new String_0(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
@@ -6168,29 +7544,29 @@
         'replacingMessageId',
       ),
     );
-    var tmp2_messageDescriptor = descriptor$factory_104(this);
-    var tmp3_type = new Message(Companion_getInstance_22());
+    var tmp2_messageDescriptor = descriptor$factory_120(this);
+    var tmp3_type = new Message(Companion_getInstance_26());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp2_messageDescriptor, 'text', 2, tmp3_type, text$factory_4(), true, 'text'),
     );
-    var tmp4_messageDescriptor = descriptor$factory_105(this);
-    var tmp5_type = new Message(Companion_getInstance_15());
+    var tmp4_messageDescriptor = descriptor$factory_121(this);
+    var tmp5_type = new Message(Companion_getInstance_19());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp4_messageDescriptor, 'composite', 3, tmp5_type, composite$factory_0(), true, 'composite'),
     );
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('MessageEdit', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_32).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_26(Companion_getInstance_32(), u);
+  protoOf(Companion_36).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_28(Companion_getInstance_36(), u);
   };
-  protoOf(Companion_32).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_36).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_30;
-  function Companion_getInstance_32() {
-    if (Companion_instance_30 == null) new Companion_32();
-    return Companion_instance_30;
+  var Companion_instance_34;
+  function Companion_getInstance_36() {
+    if (Companion_instance_34 == null) new Companion_36();
+    return Companion_instance_34;
   }
   function MessageEdit$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -6198,7 +7574,7 @@
     };
   }
   function MessageEdit(replacingMessageId, content, unknownFields) {
-    Companion_getInstance_32();
+    Companion_getInstance_36();
     content = content === VOID ? null : content;
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
     this.replacingMessageId = replacingMessageId;
@@ -6227,15 +7603,15 @@
     return tmp0_safe_receiver == null ? null : tmp0_safe_receiver.get_value_j01efc_k$();
   };
   protoOf(MessageEdit).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_26(this, other);
+    return protoMergeImpl_28(this, other);
   };
   protoOf(MessageEdit).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_32().descriptor_1;
+    return Companion_getInstance_36().descriptor_1;
   };
   protoOf(MessageEdit).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_26();
+    protoSize$factory_28();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(MessageEdit).component1_7eebsc_k$ = function () {
@@ -6282,8 +7658,8 @@
     if (!equals(this.unknownFields_1, tmp0_other_with_cast.unknownFields_1)) return false;
     return true;
   };
-  function Companion_33() {
-    Companion_instance_31 = this;
+  function Companion_37() {
+    Companion_instance_35 = this;
     var tmp = this;
     var tmp_0 = getKClass(Quote);
     // Inline function 'kotlin.collections.buildList' call
@@ -6294,7 +7670,7 @@
     var this_0 = ArrayList_init_$Create$(2);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.messages.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_106(this);
+    var tmp0_messageDescriptor = descriptor$factory_122(this);
     var tmp1_type = new String_0(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
@@ -6307,7 +7683,7 @@
         'quotedMessageId',
       ),
     );
-    var tmp2_messageDescriptor = descriptor$factory_107(this);
+    var tmp2_messageDescriptor = descriptor$factory_123(this);
     var tmp3_type = new Bytes(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
@@ -6323,16 +7699,16 @@
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('Quote', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_33).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_27(Companion_getInstance_33(), u);
+  protoOf(Companion_37).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_29(Companion_getInstance_37(), u);
   };
-  protoOf(Companion_33).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_37).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_31;
-  function Companion_getInstance_33() {
-    if (Companion_instance_31 == null) new Companion_33();
-    return Companion_instance_31;
+  var Companion_instance_35;
+  function Companion_getInstance_37() {
+    if (Companion_instance_35 == null) new Companion_37();
+    return Companion_instance_35;
   }
   function Quote$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -6340,7 +7716,7 @@
     };
   }
   function Quote(quotedMessageId, quotedMessageSha256, unknownFields) {
-    Companion_getInstance_33();
+    Companion_getInstance_37();
     quotedMessageSha256 = quotedMessageSha256 === VOID ? null : quotedMessageSha256;
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
     this.quotedMessageId = quotedMessageId;
@@ -6359,15 +7735,15 @@
     return this.unknownFields_1;
   };
   protoOf(Quote).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_27(this, other);
+    return protoMergeImpl_29(this, other);
   };
   protoOf(Quote).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_33().descriptor_1;
+    return Companion_getInstance_37().descriptor_1;
   };
   protoOf(Quote).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_27();
+    protoSize$factory_29();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(Quote).component1_7eebsc_k$ = function () {
@@ -6415,7 +7791,7 @@
     return true;
   };
   function Confirmation$Type$Companion$values$delegate$lambda() {
-    return listOf_0([DELIVERED_getInstance(), READ_getInstance()]);
+    return listOf([DELIVERED_getInstance(), READ_getInstance()]);
   }
   function DELIVERED() {
     DELIVERED_instance = this;
@@ -6435,21 +7811,21 @@
     if (READ_instance == null) new READ();
     return READ_instance;
   }
-  function UNRECOGNIZED_3(value) {
+  function UNRECOGNIZED_5(value) {
     Type_0.call(this, value);
   }
-  function Companion_34() {
-    Companion_instance_32 = this;
+  function Companion_38() {
+    Companion_instance_36 = this;
     var tmp = this;
     tmp.values$delegate_1 = lazy(Confirmation$Type$Companion$values$delegate$lambda);
   }
-  protoOf(Companion_34).get_values_ksazhn_k$ = function () {
+  protoOf(Companion_38).get_values_ksazhn_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.values$delegate_1;
-    values$factory_3();
+    values$factory_5();
     return this_0.get_value_j01efc_k$();
   };
-  protoOf(Companion_34).fromValue_lljhin_k$ = function (value) {
+  protoOf(Companion_38).fromValue_lljhin_k$ = function (value) {
     var tmp$ret$1;
     $l$block: {
       // Inline function 'kotlin.collections.firstOrNull' call
@@ -6465,9 +7841,9 @@
       tmp$ret$1 = null;
     }
     var tmp0_elvis_lhs = tmp$ret$1;
-    return tmp0_elvis_lhs == null ? new UNRECOGNIZED_3(value) : tmp0_elvis_lhs;
+    return tmp0_elvis_lhs == null ? new UNRECOGNIZED_5(value) : tmp0_elvis_lhs;
   };
-  protoOf(Companion_34).fromName_z4ts05_k$ = function (name) {
+  protoOf(Companion_38).fromName_z4ts05_k$ = function (name) {
     var tmp$ret$1;
     $l$block: {
       // Inline function 'kotlin.collections.firstOrNull' call
@@ -6491,13 +7867,13 @@
     }
     return tmp;
   };
-  var Companion_instance_32;
-  function Companion_getInstance_34() {
-    if (Companion_instance_32 == null) new Companion_34();
-    return Companion_instance_32;
+  var Companion_instance_36;
+  function Companion_getInstance_38() {
+    if (Companion_instance_36 == null) new Companion_38();
+    return Companion_instance_36;
   }
-  function Companion_35() {
-    Companion_instance_33 = this;
+  function Companion_39() {
+    Companion_instance_37 = this;
     var tmp = this;
     var tmp_0 = getKClass(Confirmation_0);
     // Inline function 'kotlin.collections.buildList' call
@@ -6508,7 +7884,7 @@
     var this_0 = ArrayList_init_$Create$(3);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.messages.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_108(this);
+    var tmp0_messageDescriptor = descriptor$factory_124(this);
     var tmp1_type = new String_0(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
@@ -6521,12 +7897,12 @@
         'firstMessageId',
       ),
     );
-    var tmp2_messageDescriptor = descriptor$factory_109(this);
-    var tmp3_type = new Enum_0(Companion_getInstance_34(), true);
+    var tmp2_messageDescriptor = descriptor$factory_125(this);
+    var tmp3_type = new Enum_0(Companion_getInstance_38(), true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp2_messageDescriptor, 'type', 2, tmp3_type, type$factory_0(), VOID, 'type'),
     );
-    var tmp4_messageDescriptor = descriptor$factory_110(this);
+    var tmp4_messageDescriptor = descriptor$factory_126(this);
     var tmp5_type = new Repeated(new String_0());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
@@ -6542,19 +7918,19 @@
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('Confirmation', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_35).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_28(Companion_getInstance_35(), u);
+  protoOf(Companion_39).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_30(Companion_getInstance_39(), u);
   };
-  protoOf(Companion_35).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_39).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_33;
-  function Companion_getInstance_35() {
-    if (Companion_instance_33 == null) new Companion_35();
-    return Companion_instance_33;
+  var Companion_instance_37;
+  function Companion_getInstance_39() {
+    if (Companion_instance_37 == null) new Companion_39();
+    return Companion_instance_37;
   }
   function Type_0(value, name) {
-    Companion_getInstance_34();
+    Companion_getInstance_38();
     name = name === VOID ? null : name;
     this.value_1 = value;
     this.name_1 = name;
@@ -6593,7 +7969,7 @@
     };
   }
   function Confirmation_0(type, firstMessageId, moreMessageIds, unknownFields) {
-    Companion_getInstance_35();
+    Companion_getInstance_39();
     moreMessageIds = moreMessageIds === VOID ? emptyList() : moreMessageIds;
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
     this.type = type;
@@ -6616,15 +7992,15 @@
     return this.unknownFields_1;
   };
   protoOf(Confirmation_0).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_28(this, other);
+    return protoMergeImpl_30(this, other);
   };
   protoOf(Confirmation_0).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_35().descriptor_1;
+    return Companion_getInstance_39().descriptor_1;
   };
   protoOf(Confirmation_0).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_28();
+    protoSize$factory_30();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(Confirmation_0).component1_7eebsc_k$ = function () {
@@ -6679,10 +8055,10 @@
     if (!equals(this.unknownFields_1, tmp0_other_with_cast.unknownFields_1)) return false;
     return true;
   };
-  function Companion_36() {
-    Companion_instance_34 = this;
+  function Companion_40() {
+    Companion_instance_38 = this;
     var tmp = this;
-    var tmp_0 = getKClass(Location_1);
+    var tmp_0 = getKClass(Location_2);
     // Inline function 'kotlin.collections.buildList' call
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'kotlin.collections.buildListInternal' call
@@ -6691,27 +8067,27 @@
     var this_0 = ArrayList_init_$Create$(6);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.messages.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_111(this);
+    var tmp0_messageDescriptor = descriptor$factory_127(this);
     var tmp1_type = new Float(true);
     this_0.add_utx5q5_k$(
-      new FieldDescriptor(tmp0_messageDescriptor, 'longitude', 1, tmp1_type, longitude$factory(), VOID, 'longitude'),
+      new FieldDescriptor(tmp0_messageDescriptor, 'longitude', 1, tmp1_type, longitude$factory_0(), VOID, 'longitude'),
     );
-    var tmp2_messageDescriptor = descriptor$factory_112(this);
+    var tmp2_messageDescriptor = descriptor$factory_128(this);
     var tmp3_type = new Float(true);
     this_0.add_utx5q5_k$(
-      new FieldDescriptor(tmp2_messageDescriptor, 'latitude', 2, tmp3_type, latitude$factory(), VOID, 'latitude'),
+      new FieldDescriptor(tmp2_messageDescriptor, 'latitude', 2, tmp3_type, latitude$factory_0(), VOID, 'latitude'),
     );
-    var tmp4_messageDescriptor = descriptor$factory_113(this);
+    var tmp4_messageDescriptor = descriptor$factory_129(this);
     var tmp5_type = new String_0(true);
     this_0.add_utx5q5_k$(
-      new FieldDescriptor(tmp4_messageDescriptor, 'name', 3, tmp5_type, name$factory_1(), VOID, 'name'),
+      new FieldDescriptor(tmp4_messageDescriptor, 'name', 3, tmp5_type, name$factory_3(), VOID, 'name'),
     );
-    var tmp6_messageDescriptor = descriptor$factory_114(this);
+    var tmp6_messageDescriptor = descriptor$factory_130(this);
     var tmp7_type = new Int32(true);
     this_0.add_utx5q5_k$(
-      new FieldDescriptor(tmp6_messageDescriptor, 'zoom', 4, tmp7_type, zoom$factory(), VOID, 'zoom'),
+      new FieldDescriptor(tmp6_messageDescriptor, 'zoom', 4, tmp7_type, zoom$factory_0(), VOID, 'zoom'),
     );
-    var tmp8_messageDescriptor = descriptor$factory_115(this);
+    var tmp8_messageDescriptor = descriptor$factory_131(this);
     var tmp9_type = new Bool(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
@@ -6724,8 +8100,8 @@
         'expectsReadConfirmation',
       ),
     );
-    var tmp10_messageDescriptor = descriptor$factory_116(this);
-    var tmp11_type = new Enum_0(Companion_getInstance_10(), true);
+    var tmp10_messageDescriptor = descriptor$factory_132(this);
+    var tmp11_type = new Enum_0(Companion_getInstance_13(), true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
         tmp10_messageDescriptor,
@@ -6740,24 +8116,24 @@
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('Location', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_36).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_29(Companion_getInstance_36(), u);
+  protoOf(Companion_40).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_31(Companion_getInstance_40(), u);
   };
-  protoOf(Companion_36).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_40).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_34;
-  function Companion_getInstance_36() {
-    if (Companion_instance_34 == null) new Companion_36();
-    return Companion_instance_34;
+  var Companion_instance_38;
+  function Companion_getInstance_40() {
+    if (Companion_instance_38 == null) new Companion_40();
+    return Companion_instance_38;
   }
   function Location$protoSize$delegate$lambda(this$0) {
     return function () {
       return get_protoSize.call(this$0);
     };
   }
-  function Location_1(longitude, latitude, name, zoom, expectsReadConfirmation, legalHoldStatus, unknownFields) {
-    Companion_getInstance_36();
+  function Location_2(longitude, latitude, name, zoom, expectsReadConfirmation, legalHoldStatus, unknownFields) {
+    Companion_getInstance_40();
     name = name === VOID ? null : name;
     zoom = zoom === VOID ? null : zoom;
     expectsReadConfirmation = expectsReadConfirmation === VOID ? null : expectsReadConfirmation;
@@ -6773,61 +8149,61 @@
     var tmp = this;
     tmp.protoSize$delegate_1 = lazy(Location$protoSize$delegate$lambda(this));
   }
-  protoOf(Location_1).get_longitude_asb1fq_k$ = function () {
+  protoOf(Location_2).get_longitude_asb1fq_k$ = function () {
     return this.longitude;
   };
-  protoOf(Location_1).get_latitude_feukvp_k$ = function () {
+  protoOf(Location_2).get_latitude_feukvp_k$ = function () {
     return this.latitude;
   };
-  protoOf(Location_1).get_name_woqyms_k$ = function () {
+  protoOf(Location_2).get_name_woqyms_k$ = function () {
     return this.name;
   };
-  protoOf(Location_1).get_zoom_woywws_k$ = function () {
+  protoOf(Location_2).get_zoom_woywws_k$ = function () {
     return this.zoom;
   };
-  protoOf(Location_1).get_expectsReadConfirmation_i6xil8_k$ = function () {
+  protoOf(Location_2).get_expectsReadConfirmation_i6xil8_k$ = function () {
     return this.expectsReadConfirmation;
   };
-  protoOf(Location_1).get_legalHoldStatus_nngzep_k$ = function () {
+  protoOf(Location_2).get_legalHoldStatus_nngzep_k$ = function () {
     return this.legalHoldStatus;
   };
-  protoOf(Location_1).get_unknownFields_kpu7i2_k$ = function () {
+  protoOf(Location_2).get_unknownFields_kpu7i2_k$ = function () {
     return this.unknownFields_1;
   };
-  protoOf(Location_1).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_29(this, other);
+  protoOf(Location_2).plus_fj0q1z_k$ = function (other) {
+    return protoMergeImpl_31(this, other);
   };
-  protoOf(Location_1).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_36().descriptor_1;
+  protoOf(Location_2).get_descriptor_wjt6a0_k$ = function () {
+    return Companion_getInstance_40().descriptor_1;
   };
-  protoOf(Location_1).get_protoSize_1ekskg_k$ = function () {
+  protoOf(Location_2).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_29();
+    protoSize$factory_31();
     return this_0.get_value_j01efc_k$();
   };
-  protoOf(Location_1).component1_7eebsc_k$ = function () {
+  protoOf(Location_2).component1_7eebsc_k$ = function () {
     return this.longitude;
   };
-  protoOf(Location_1).component2_7eebsb_k$ = function () {
+  protoOf(Location_2).component2_7eebsb_k$ = function () {
     return this.latitude;
   };
-  protoOf(Location_1).component3_7eebsa_k$ = function () {
+  protoOf(Location_2).component3_7eebsa_k$ = function () {
     return this.name;
   };
-  protoOf(Location_1).component4_7eebs9_k$ = function () {
+  protoOf(Location_2).component4_7eebs9_k$ = function () {
     return this.zoom;
   };
-  protoOf(Location_1).component5_7eebs8_k$ = function () {
+  protoOf(Location_2).component5_7eebs8_k$ = function () {
     return this.expectsReadConfirmation;
   };
-  protoOf(Location_1).component6_7eebs7_k$ = function () {
+  protoOf(Location_2).component6_7eebs7_k$ = function () {
     return this.legalHoldStatus;
   };
-  protoOf(Location_1).component7_7eebs6_k$ = function () {
+  protoOf(Location_2).component7_7eebs6_k$ = function () {
     return this.unknownFields_1;
   };
-  protoOf(Location_1).copy_sscpwu_k$ = function (
+  protoOf(Location_2).copy_sscpwu_k$ = function (
     longitude,
     latitude,
     name,
@@ -6836,9 +8212,9 @@
     legalHoldStatus,
     unknownFields,
   ) {
-    return new Location_1(longitude, latitude, name, zoom, expectsReadConfirmation, legalHoldStatus, unknownFields);
+    return new Location_2(longitude, latitude, name, zoom, expectsReadConfirmation, legalHoldStatus, unknownFields);
   };
-  protoOf(Location_1).copy = function (
+  protoOf(Location_2).copy = function (
     longitude,
     latitude,
     name,
@@ -6865,7 +8241,7 @@
       unknownFields,
     );
   };
-  protoOf(Location_1).toString = function () {
+  protoOf(Location_2).toString = function () {
     return (
       'Location(longitude=' +
       this.longitude +
@@ -6884,7 +8260,7 @@
       ')'
     );
   };
-  protoOf(Location_1).hashCode = function () {
+  protoOf(Location_2).hashCode = function () {
     var result = getNumberHashCode(this.longitude);
     result = (imul(result, 31) + getNumberHashCode(this.latitude)) | 0;
     result = (imul(result, 31) + (this.name == null ? 0 : getStringHashCode(this.name))) | 0;
@@ -6897,10 +8273,10 @@
     result = (imul(result, 31) + hashCode(this.unknownFields_1)) | 0;
     return result;
   };
-  protoOf(Location_1).equals = function (other) {
+  protoOf(Location_2).equals = function (other) {
     if (this === other) return true;
-    if (!(other instanceof Location_1)) return false;
-    var tmp0_other_with_cast = other instanceof Location_1 ? other : THROW_CCE();
+    if (!(other instanceof Location_2)) return false;
+    var tmp0_other_with_cast = other instanceof Location_2 ? other : THROW_CCE();
     if (!equals(this.longitude, tmp0_other_with_cast.longitude)) return false;
     if (!equals(this.latitude, tmp0_other_with_cast.latitude)) return false;
     if (!(this.name == tmp0_other_with_cast.name)) return false;
@@ -6910,8 +8286,8 @@
     if (!equals(this.unknownFields_1, tmp0_other_with_cast.unknownFields_1)) return false;
     return true;
   };
-  function Companion_37() {
-    Companion_instance_35 = this;
+  function Companion_41() {
+    Companion_instance_39 = this;
     var tmp = this;
     var tmp_0 = getKClass(ImageAsset);
     // Inline function 'kotlin.collections.buildList' call
@@ -6922,20 +8298,20 @@
     var this_0 = ArrayList_init_$Create$(11);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.messages.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_117(this);
+    var tmp0_messageDescriptor = descriptor$factory_133(this);
     var tmp1_type = new String_0(true);
     this_0.add_utx5q5_k$(new FieldDescriptor(tmp0_messageDescriptor, 'tag', 1, tmp1_type, tag$factory(), VOID, 'tag'));
-    var tmp2_messageDescriptor = descriptor$factory_118(this);
+    var tmp2_messageDescriptor = descriptor$factory_134(this);
     var tmp3_type = new Int32(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp2_messageDescriptor, 'width', 2, tmp3_type, width$factory(), VOID, 'width'),
     );
-    var tmp4_messageDescriptor = descriptor$factory_119(this);
+    var tmp4_messageDescriptor = descriptor$factory_135(this);
     var tmp5_type = new Int32(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp4_messageDescriptor, 'height', 3, tmp5_type, height$factory(), VOID, 'height'),
     );
-    var tmp6_messageDescriptor = descriptor$factory_120(this);
+    var tmp6_messageDescriptor = descriptor$factory_136(this);
     var tmp7_type = new Int32(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
@@ -6948,7 +8324,7 @@
         'originalWidth',
       ),
     );
-    var tmp8_messageDescriptor = descriptor$factory_121(this);
+    var tmp8_messageDescriptor = descriptor$factory_137(this);
     var tmp9_type = new Int32(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
@@ -6961,49 +8337,49 @@
         'originalHeight',
       ),
     );
-    var tmp10_messageDescriptor = descriptor$factory_122(this);
+    var tmp10_messageDescriptor = descriptor$factory_138(this);
     var tmp11_type = new String_0(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp10_messageDescriptor, 'mime_type', 6, tmp11_type, mimeType$factory(), VOID, 'mimeType'),
     );
-    var tmp12_messageDescriptor = descriptor$factory_123(this);
+    var tmp12_messageDescriptor = descriptor$factory_139(this);
     var tmp13_type = new Int32(true);
     this_0.add_utx5q5_k$(
-      new FieldDescriptor(tmp12_messageDescriptor, 'size', 7, tmp13_type, size$factory(), VOID, 'size'),
+      new FieldDescriptor(tmp12_messageDescriptor, 'size', 7, tmp13_type, size$factory_0(), VOID, 'size'),
     );
-    var tmp14_messageDescriptor = descriptor$factory_124(this);
+    var tmp14_messageDescriptor = descriptor$factory_140(this);
     var tmp15_type = new Bytes(true);
     this_0.add_utx5q5_k$(
-      new FieldDescriptor(tmp14_messageDescriptor, 'otr_key', 8, tmp15_type, otrKey$factory(), VOID, 'otrKey'),
+      new FieldDescriptor(tmp14_messageDescriptor, 'otr_key', 8, tmp15_type, otrKey$factory_0(), VOID, 'otrKey'),
     );
-    var tmp16_messageDescriptor = descriptor$factory_125(this);
+    var tmp16_messageDescriptor = descriptor$factory_141(this);
     var tmp17_type = new Bytes(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp16_messageDescriptor, 'mac_key', 9, tmp17_type, macKey$factory(), VOID, 'macKey'),
     );
-    var tmp18_messageDescriptor = descriptor$factory_126(this);
+    var tmp18_messageDescriptor = descriptor$factory_142(this);
     var tmp19_type = new Bytes(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp18_messageDescriptor, 'mac', 10, tmp19_type, mac$factory(), VOID, 'mac'),
     );
-    var tmp20_messageDescriptor = descriptor$factory_127(this);
+    var tmp20_messageDescriptor = descriptor$factory_143(this);
     var tmp21_type = new Bytes(true);
     this_0.add_utx5q5_k$(
-      new FieldDescriptor(tmp20_messageDescriptor, 'sha256', 11, tmp21_type, sha256$factory(), VOID, 'sha256'),
+      new FieldDescriptor(tmp20_messageDescriptor, 'sha256', 11, tmp21_type, sha256$factory_0(), VOID, 'sha256'),
     );
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('ImageAsset', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_37).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_30(Companion_getInstance_37(), u);
+  protoOf(Companion_41).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_32(Companion_getInstance_41(), u);
   };
-  protoOf(Companion_37).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_41).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_35;
-  function Companion_getInstance_37() {
-    if (Companion_instance_35 == null) new Companion_37();
-    return Companion_instance_35;
+  var Companion_instance_39;
+  function Companion_getInstance_41() {
+    if (Companion_instance_39 == null) new Companion_41();
+    return Companion_instance_39;
   }
   function ImageAsset$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -7024,7 +8400,7 @@
     sha256,
     unknownFields,
   ) {
-    Companion_getInstance_37();
+    Companion_getInstance_41();
     otrKey = otrKey === VOID ? null : otrKey;
     macKey = macKey === VOID ? null : macKey;
     mac = mac === VOID ? null : mac;
@@ -7082,15 +8458,15 @@
     return this.unknownFields_1;
   };
   protoOf(ImageAsset).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_30(this, other);
+    return protoMergeImpl_32(this, other);
   };
   protoOf(ImageAsset).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_37().descriptor_1;
+    return Companion_getInstance_41().descriptor_1;
   };
   protoOf(ImageAsset).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_30();
+    protoSize$factory_32();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(ImageAsset).component1_7eebsc_k$ = function () {
@@ -7263,17 +8639,17 @@
     return true;
   };
   function NotUploaded(notUploaded) {
-    notUploaded = notUploaded === VOID ? Companion_getInstance_38().fromValue_lljhin_k$(0) : notUploaded;
+    notUploaded = notUploaded === VOID ? Companion_getInstance_42().fromValue_lljhin_k$(0) : notUploaded;
     Status.call(this, notUploaded);
   }
   function Uploaded(uploaded) {
     Status.call(this, uploaded);
   }
   function Asset$Companion$defaultInstance$delegate$lambda() {
-    return new Asset_1();
+    return new Asset_2();
   }
   function Asset$NotUploaded$Companion$values$delegate$lambda() {
-    return listOf_0([CANCELLED_getInstance(), FAILED_getInstance()]);
+    return listOf([CANCELLED_getInstance(), FAILED_getInstance()]);
   }
   function CANCELLED() {
     CANCELLED_instance = this;
@@ -7293,21 +8669,21 @@
     if (FAILED_instance == null) new FAILED();
     return FAILED_instance;
   }
-  function UNRECOGNIZED_4(value) {
+  function UNRECOGNIZED_6(value) {
     NotUploaded_0.call(this, value);
   }
-  function Companion_38() {
-    Companion_instance_36 = this;
+  function Companion_42() {
+    Companion_instance_40 = this;
     var tmp = this;
     tmp.values$delegate_1 = lazy(Asset$NotUploaded$Companion$values$delegate$lambda);
   }
-  protoOf(Companion_38).get_values_ksazhn_k$ = function () {
+  protoOf(Companion_42).get_values_ksazhn_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.values$delegate_1;
-    values$factory_4();
+    values$factory_6();
     return this_0.get_value_j01efc_k$();
   };
-  protoOf(Companion_38).fromValue_lljhin_k$ = function (value) {
+  protoOf(Companion_42).fromValue_lljhin_k$ = function (value) {
     var tmp$ret$1;
     $l$block: {
       // Inline function 'kotlin.collections.firstOrNull' call
@@ -7323,9 +8699,9 @@
       tmp$ret$1 = null;
     }
     var tmp0_elvis_lhs = tmp$ret$1;
-    return tmp0_elvis_lhs == null ? new UNRECOGNIZED_4(value) : tmp0_elvis_lhs;
+    return tmp0_elvis_lhs == null ? new UNRECOGNIZED_6(value) : tmp0_elvis_lhs;
   };
-  protoOf(Companion_38).fromName_z4ts05_k$ = function (name) {
+  protoOf(Companion_42).fromName_z4ts05_k$ = function (name) {
     var tmp$ret$1;
     $l$block: {
       // Inline function 'kotlin.collections.firstOrNull' call
@@ -7349,10 +8725,10 @@
     }
     return tmp;
   };
-  var Companion_instance_36;
-  function Companion_getInstance_38() {
-    if (Companion_instance_36 == null) new Companion_38();
-    return Companion_instance_36;
+  var Companion_instance_40;
+  function Companion_getInstance_42() {
+    if (Companion_instance_40 == null) new Companion_42();
+    return Companion_instance_40;
   }
   function Image_1(image) {
     MetaData_0.call(this, image);
@@ -7366,8 +8742,8 @@
   function MetaData_0(value) {
     OneOf.call(this, value);
   }
-  function Companion_39() {
-    Companion_instance_37 = this;
+  function Companion_43() {
+    Companion_instance_41 = this;
     var tmp = this;
     var tmp_0 = getKClass(Original);
     // Inline function 'kotlin.collections.buildList' call
@@ -7378,42 +8754,42 @@
     var this_0 = ArrayList_init_$Create$(8);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.messages.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_134(this);
+    var tmp0_messageDescriptor = descriptor$factory_150(this);
     var tmp1_type = new String_0(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp0_messageDescriptor, 'mime_type', 1, tmp1_type, mimeType$factory_0(), VOID, 'mimeType'),
     );
-    var tmp2_messageDescriptor = descriptor$factory_135(this);
+    var tmp2_messageDescriptor = descriptor$factory_151(this);
     var tmp3_type = new UInt64(true);
     this_0.add_utx5q5_k$(
-      new FieldDescriptor(tmp2_messageDescriptor, 'size', 2, tmp3_type, size$factory_0(), VOID, 'size'),
+      new FieldDescriptor(tmp2_messageDescriptor, 'size', 2, tmp3_type, size$factory_1(), VOID, 'size'),
     );
-    var tmp4_messageDescriptor = descriptor$factory_136(this);
+    var tmp4_messageDescriptor = descriptor$factory_152(this);
     var tmp5_type = new String_0(true);
     this_0.add_utx5q5_k$(
-      new FieldDescriptor(tmp4_messageDescriptor, 'name', 3, tmp5_type, name$factory_2(), VOID, 'name'),
+      new FieldDescriptor(tmp4_messageDescriptor, 'name', 3, tmp5_type, name$factory_4(), VOID, 'name'),
     );
-    var tmp6_messageDescriptor = descriptor$factory_137(this);
-    var tmp7_type = new Message(Companion_getInstance_41());
+    var tmp6_messageDescriptor = descriptor$factory_153(this);
+    var tmp7_type = new Message(Companion_getInstance_45());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp6_messageDescriptor, 'image', 4, tmp7_type, image$factory_3(), true, 'image'),
     );
-    var tmp8_messageDescriptor = descriptor$factory_138(this);
-    var tmp9_type = new Message(Companion_getInstance_42());
+    var tmp8_messageDescriptor = descriptor$factory_154(this);
+    var tmp9_type = new Message(Companion_getInstance_46());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp8_messageDescriptor, 'video', 5, tmp9_type, video$factory(), true, 'video'),
     );
-    var tmp10_messageDescriptor = descriptor$factory_139(this);
-    var tmp11_type = new Message(Companion_getInstance_43());
+    var tmp10_messageDescriptor = descriptor$factory_155(this);
+    var tmp11_type = new Message(Companion_getInstance_47());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp10_messageDescriptor, 'audio', 6, tmp11_type, audio$factory(), true, 'audio'),
     );
-    var tmp12_messageDescriptor = descriptor$factory_140(this);
+    var tmp12_messageDescriptor = descriptor$factory_156(this);
     var tmp13_type = new String_0(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp12_messageDescriptor, 'source', 7, tmp13_type, source$factory(), VOID, 'source'),
     );
-    var tmp14_messageDescriptor = descriptor$factory_141(this);
+    var tmp14_messageDescriptor = descriptor$factory_157(this);
     var tmp15_type = new String_0(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp14_messageDescriptor, 'caption', 8, tmp15_type, caption$factory(), VOID, 'caption'),
@@ -7421,16 +8797,16 @@
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('Asset.Original', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_39).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_32(Companion_getInstance_39(), u);
+  protoOf(Companion_43).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_34(Companion_getInstance_43(), u);
   };
-  protoOf(Companion_39).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_43).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_37;
-  function Companion_getInstance_39() {
-    if (Companion_instance_37 == null) new Companion_39();
-    return Companion_instance_37;
+  var Companion_instance_41;
+  function Companion_getInstance_43() {
+    if (Companion_instance_41 == null) new Companion_43();
+    return Companion_instance_41;
   }
   function Asset$Original$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -7443,8 +8819,8 @@
   function MetaData_1(value) {
     OneOf.call(this, value);
   }
-  function Companion_40() {
-    Companion_instance_38 = this;
+  function Companion_44() {
+    Companion_instance_42 = this;
     var tmp = this;
     var tmp_0 = getKClass(Preview_0);
     // Inline function 'kotlin.collections.buildList' call
@@ -7455,47 +8831,47 @@
     var this_0 = ArrayList_init_$Create$(4);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.messages.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_142(this);
+    var tmp0_messageDescriptor = descriptor$factory_158(this);
     var tmp1_type = new String_0(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp0_messageDescriptor, 'mime_type', 1, tmp1_type, mimeType$factory_1(), VOID, 'mimeType'),
     );
-    var tmp2_messageDescriptor = descriptor$factory_143(this);
+    var tmp2_messageDescriptor = descriptor$factory_159(this);
     var tmp3_type = new UInt64(true);
     this_0.add_utx5q5_k$(
-      new FieldDescriptor(tmp2_messageDescriptor, 'size', 2, tmp3_type, size$factory_1(), VOID, 'size'),
+      new FieldDescriptor(tmp2_messageDescriptor, 'size', 2, tmp3_type, size$factory_2(), VOID, 'size'),
     );
-    var tmp4_messageDescriptor = descriptor$factory_144(this);
-    var tmp5_type = new Message(Companion_getInstance_44());
+    var tmp4_messageDescriptor = descriptor$factory_160(this);
+    var tmp5_type = new Message(Companion_getInstance_48());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp4_messageDescriptor, 'remote', 3, tmp5_type, remote$factory(), VOID, 'remote'),
     );
-    var tmp6_messageDescriptor = descriptor$factory_145(this);
-    var tmp7_type = new Message(Companion_getInstance_41());
+    var tmp6_messageDescriptor = descriptor$factory_161(this);
+    var tmp7_type = new Message(Companion_getInstance_45());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp6_messageDescriptor, 'image', 4, tmp7_type, image$factory_4(), true, 'image'),
     );
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('Asset.Preview', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_40).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_33(Companion_getInstance_40(), u);
+  protoOf(Companion_44).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_35(Companion_getInstance_44(), u);
   };
-  protoOf(Companion_40).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_44).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_38;
-  function Companion_getInstance_40() {
-    if (Companion_instance_38 == null) new Companion_40();
-    return Companion_instance_38;
+  var Companion_instance_42;
+  function Companion_getInstance_44() {
+    if (Companion_instance_42 == null) new Companion_44();
+    return Companion_instance_42;
   }
   function Asset$Preview$protoSize$delegate$lambda(this$0) {
     return function () {
       return get_protoSize.call(this$0);
     };
   }
-  function Companion_41() {
-    Companion_instance_39 = this;
+  function Companion_45() {
+    Companion_instance_43 = this;
     var tmp = this;
     var tmp_0 = getKClass(ImageMetaData);
     // Inline function 'kotlin.collections.buildList' call
@@ -7506,17 +8882,17 @@
     var this_0 = ArrayList_init_$Create$(3);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.messages.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_146(this);
+    var tmp0_messageDescriptor = descriptor$factory_162(this);
     var tmp1_type = new Int32(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp0_messageDescriptor, 'width', 1, tmp1_type, width$factory_0(), VOID, 'width'),
     );
-    var tmp2_messageDescriptor = descriptor$factory_147(this);
+    var tmp2_messageDescriptor = descriptor$factory_163(this);
     var tmp3_type = new Int32(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp2_messageDescriptor, 'height', 2, tmp3_type, height$factory_0(), VOID, 'height'),
     );
-    var tmp4_messageDescriptor = descriptor$factory_148(this);
+    var tmp4_messageDescriptor = descriptor$factory_164(this);
     var tmp5_type = new String_0(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp4_messageDescriptor, 'tag', 3, tmp5_type, tag$factory_0(), VOID, 'tag'),
@@ -7524,16 +8900,16 @@
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('Asset.ImageMetaData', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_41).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_34(Companion_getInstance_41(), u);
+  protoOf(Companion_45).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_36(Companion_getInstance_45(), u);
   };
-  protoOf(Companion_41).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_45).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_39;
-  function Companion_getInstance_41() {
-    if (Companion_instance_39 == null) new Companion_41();
-    return Companion_instance_39;
+  var Companion_instance_43;
+  function Companion_getInstance_45() {
+    if (Companion_instance_43 == null) new Companion_45();
+    return Companion_instance_43;
   }
   function Asset$ImageMetaData$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -7543,8 +8919,8 @@
   function Asset$VideoMetaData$Companion$defaultInstance$delegate$lambda() {
     return new VideoMetaData();
   }
-  function Companion_42() {
-    Companion_instance_40 = this;
+  function Companion_46() {
+    Companion_instance_44 = this;
     var tmp = this;
     tmp.defaultInstance$delegate_1 = lazy(Asset$VideoMetaData$Companion$defaultInstance$delegate$lambda);
     var tmp_0 = this;
@@ -7557,17 +8933,17 @@
     var this_0 = ArrayList_init_$Create$(3);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.messages.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_149(this);
+    var tmp0_messageDescriptor = descriptor$factory_165(this);
     var tmp1_type = new Int32(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp0_messageDescriptor, 'width', 1, tmp1_type, width$factory_1(), VOID, 'width'),
     );
-    var tmp2_messageDescriptor = descriptor$factory_150(this);
+    var tmp2_messageDescriptor = descriptor$factory_166(this);
     var tmp3_type = new Int32(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp2_messageDescriptor, 'height', 2, tmp3_type, height$factory_1(), VOID, 'height'),
     );
-    var tmp4_messageDescriptor = descriptor$factory_151(this);
+    var tmp4_messageDescriptor = descriptor$factory_167(this);
     var tmp5_type = new UInt64(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
@@ -7583,22 +8959,22 @@
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp_0.descriptor_1 = new MessageDescriptor('Asset.VideoMetaData', tmp_1, this, tmp$ret$2);
   }
-  protoOf(Companion_42).get_defaultInstance_axha8d_k$ = function () {
+  protoOf(Companion_46).get_defaultInstance_axha8d_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.defaultInstance$delegate_1;
     defaultInstance$factory_3();
     return this_0.get_value_j01efc_k$();
   };
-  protoOf(Companion_42).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_35(Companion_getInstance_42(), u);
+  protoOf(Companion_46).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_37(Companion_getInstance_46(), u);
   };
-  protoOf(Companion_42).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_46).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_40;
-  function Companion_getInstance_42() {
-    if (Companion_instance_40 == null) new Companion_42();
-    return Companion_instance_40;
+  var Companion_instance_44;
+  function Companion_getInstance_46() {
+    if (Companion_instance_44 == null) new Companion_46();
+    return Companion_instance_44;
   }
   function Asset$VideoMetaData$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -7608,8 +8984,8 @@
   function Asset$AudioMetaData$Companion$defaultInstance$delegate$lambda() {
     return new AudioMetaData();
   }
-  function Companion_43() {
-    Companion_instance_41 = this;
+  function Companion_47() {
+    Companion_instance_45 = this;
     var tmp = this;
     tmp.defaultInstance$delegate_1 = lazy(Asset$AudioMetaData$Companion$defaultInstance$delegate$lambda);
     var tmp_0 = this;
@@ -7622,7 +8998,7 @@
     var this_0 = ArrayList_init_$Create$(2);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.messages.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_152(this);
+    var tmp0_messageDescriptor = descriptor$factory_168(this);
     var tmp1_type = new UInt64(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
@@ -7635,7 +9011,7 @@
         'durationInMillis',
       ),
     );
-    var tmp2_messageDescriptor = descriptor$factory_153(this);
+    var tmp2_messageDescriptor = descriptor$factory_169(this);
     var tmp3_type = new Bytes(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
@@ -7651,30 +9027,30 @@
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp_0.descriptor_1 = new MessageDescriptor('Asset.AudioMetaData', tmp_1, this, tmp$ret$2);
   }
-  protoOf(Companion_43).get_defaultInstance_axha8d_k$ = function () {
+  protoOf(Companion_47).get_defaultInstance_axha8d_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.defaultInstance$delegate_1;
     defaultInstance$factory_4();
     return this_0.get_value_j01efc_k$();
   };
-  protoOf(Companion_43).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_36(Companion_getInstance_43(), u);
+  protoOf(Companion_47).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_38(Companion_getInstance_47(), u);
   };
-  protoOf(Companion_43).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_47).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_41;
-  function Companion_getInstance_43() {
-    if (Companion_instance_41 == null) new Companion_43();
-    return Companion_instance_41;
+  var Companion_instance_45;
+  function Companion_getInstance_47() {
+    if (Companion_instance_45 == null) new Companion_47();
+    return Companion_instance_45;
   }
   function Asset$AudioMetaData$protoSize$delegate$lambda(this$0) {
     return function () {
       return get_protoSize.call(this$0);
     };
   }
-  function Companion_44() {
-    Companion_instance_42 = this;
+  function Companion_48() {
+    Companion_instance_46 = this;
     var tmp = this;
     var tmp_0 = getKClass(RemoteData);
     // Inline function 'kotlin.collections.buildList' call
@@ -7685,22 +9061,22 @@
     var this_0 = ArrayList_init_$Create$(6);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.messages.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_154(this);
+    var tmp0_messageDescriptor = descriptor$factory_170(this);
     var tmp1_type = new Bytes(true);
     this_0.add_utx5q5_k$(
-      new FieldDescriptor(tmp0_messageDescriptor, 'otr_key', 1, tmp1_type, otrKey$factory_0(), VOID, 'otrKey'),
+      new FieldDescriptor(tmp0_messageDescriptor, 'otr_key', 1, tmp1_type, otrKey$factory_1(), VOID, 'otrKey'),
     );
-    var tmp2_messageDescriptor = descriptor$factory_155(this);
+    var tmp2_messageDescriptor = descriptor$factory_171(this);
     var tmp3_type = new Bytes(true);
     this_0.add_utx5q5_k$(
-      new FieldDescriptor(tmp2_messageDescriptor, 'sha256', 2, tmp3_type, sha256$factory_0(), VOID, 'sha256'),
+      new FieldDescriptor(tmp2_messageDescriptor, 'sha256', 2, tmp3_type, sha256$factory_1(), VOID, 'sha256'),
     );
-    var tmp4_messageDescriptor = descriptor$factory_156(this);
+    var tmp4_messageDescriptor = descriptor$factory_172(this);
     var tmp5_type = new String_0(true);
     this_0.add_utx5q5_k$(
-      new FieldDescriptor(tmp4_messageDescriptor, 'asset_id', 3, tmp5_type, assetId$factory(), VOID, 'assetId'),
+      new FieldDescriptor(tmp4_messageDescriptor, 'asset_id', 3, tmp5_type, assetId$factory_0(), VOID, 'assetId'),
     );
-    var tmp6_messageDescriptor = descriptor$factory_157(this);
+    var tmp6_messageDescriptor = descriptor$factory_173(this);
     var tmp7_type = new String_0(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
@@ -7708,17 +9084,25 @@
         'asset_token',
         5,
         tmp7_type,
-        assetToken$factory(),
+        assetToken$factory_0(),
         VOID,
         'assetToken',
       ),
     );
-    var tmp8_messageDescriptor = descriptor$factory_158(this);
-    var tmp9_type = new Enum_0(Companion_getInstance_9(), true);
+    var tmp8_messageDescriptor = descriptor$factory_174(this);
+    var tmp9_type = new Enum_0(Companion_getInstance_12(), true);
     this_0.add_utx5q5_k$(
-      new FieldDescriptor(tmp8_messageDescriptor, 'encryption', 6, tmp9_type, encryption$factory(), VOID, 'encryption'),
+      new FieldDescriptor(
+        tmp8_messageDescriptor,
+        'encryption',
+        6,
+        tmp9_type,
+        encryption$factory_0(),
+        VOID,
+        'encryption',
+      ),
     );
-    var tmp10_messageDescriptor = descriptor$factory_159(this);
+    var tmp10_messageDescriptor = descriptor$factory_175(this);
     var tmp11_type = new String_0(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
@@ -7726,7 +9110,7 @@
         'asset_domain',
         7,
         tmp11_type,
-        assetDomain$factory(),
+        assetDomain$factory_0(),
         VOID,
         'assetDomain',
       ),
@@ -7734,16 +9118,16 @@
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('Asset.RemoteData', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_44).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_37(Companion_getInstance_44(), u);
+  protoOf(Companion_48).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_39(Companion_getInstance_48(), u);
   };
-  protoOf(Companion_44).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_48).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_42;
-  function Companion_getInstance_44() {
-    if (Companion_instance_42 == null) new Companion_44();
-    return Companion_instance_42;
+  var Companion_instance_46;
+  function Companion_getInstance_48() {
+    if (Companion_instance_46 == null) new Companion_48();
+    return Companion_instance_46;
   }
   function Asset$RemoteData$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -7753,12 +9137,12 @@
   function Status(value) {
     OneOf.call(this, value);
   }
-  function Companion_45() {
-    Companion_instance_43 = this;
+  function Companion_49() {
+    Companion_instance_47 = this;
     var tmp = this;
     tmp.defaultInstance$delegate_1 = lazy(Asset$Companion$defaultInstance$delegate$lambda);
     var tmp_0 = this;
-    var tmp_1 = getKClass(Asset_1);
+    var tmp_1 = getKClass(Asset_2);
     // Inline function 'kotlin.collections.buildList' call
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'kotlin.collections.buildListInternal' call
@@ -7767,13 +9151,13 @@
     var this_0 = ArrayList_init_$Create$(6);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.messages.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_128(this);
-    var tmp1_type = new Message(Companion_getInstance_39());
+    var tmp0_messageDescriptor = descriptor$factory_144(this);
+    var tmp1_type = new Message(Companion_getInstance_43());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp0_messageDescriptor, 'original', 1, tmp1_type, original$factory(), VOID, 'original'),
     );
-    var tmp2_messageDescriptor = descriptor$factory_129(this);
-    var tmp3_type = new Enum_0(Companion_getInstance_38(), true);
+    var tmp2_messageDescriptor = descriptor$factory_145(this);
+    var tmp3_type = new Enum_0(Companion_getInstance_42(), true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
         tmp2_messageDescriptor,
@@ -7785,17 +9169,17 @@
         'notUploaded',
       ),
     );
-    var tmp4_messageDescriptor = descriptor$factory_130(this);
-    var tmp5_type = new Message(Companion_getInstance_44());
+    var tmp4_messageDescriptor = descriptor$factory_146(this);
+    var tmp5_type = new Message(Companion_getInstance_48());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp4_messageDescriptor, 'uploaded', 4, tmp5_type, uploaded$factory(), true, 'uploaded'),
     );
-    var tmp6_messageDescriptor = descriptor$factory_131(this);
-    var tmp7_type = new Message(Companion_getInstance_40());
+    var tmp6_messageDescriptor = descriptor$factory_147(this);
+    var tmp7_type = new Message(Companion_getInstance_44());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp6_messageDescriptor, 'preview', 5, tmp7_type, preview$factory(), VOID, 'preview'),
     );
-    var tmp8_messageDescriptor = descriptor$factory_132(this);
+    var tmp8_messageDescriptor = descriptor$factory_148(this);
     var tmp9_type = new Bool(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
@@ -7808,8 +9192,8 @@
         'expectsReadConfirmation',
       ),
     );
-    var tmp10_messageDescriptor = descriptor$factory_133(this);
-    var tmp11_type = new Enum_0(Companion_getInstance_10(), true);
+    var tmp10_messageDescriptor = descriptor$factory_149(this);
+    var tmp11_type = new Enum_0(Companion_getInstance_13(), true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
         tmp10_messageDescriptor,
@@ -7824,25 +9208,25 @@
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp_0.descriptor_1 = new MessageDescriptor('Asset', tmp_1, this, tmp$ret$2);
   }
-  protoOf(Companion_45).get_defaultInstance_axha8d_k$ = function () {
+  protoOf(Companion_49).get_defaultInstance_axha8d_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.defaultInstance$delegate_1;
     defaultInstance$factory_2();
     return this_0.get_value_j01efc_k$();
   };
-  protoOf(Companion_45).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_31(Companion_getInstance_45(), u);
+  protoOf(Companion_49).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_33(Companion_getInstance_49(), u);
   };
-  protoOf(Companion_45).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_49).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_43;
-  function Companion_getInstance_45() {
-    if (Companion_instance_43 == null) new Companion_45();
-    return Companion_instance_43;
+  var Companion_instance_47;
+  function Companion_getInstance_49() {
+    if (Companion_instance_47 == null) new Companion_49();
+    return Companion_instance_47;
   }
   function NotUploaded_0(value, name) {
-    Companion_getInstance_38();
+    Companion_getInstance_42();
     name = name === VOID ? null : name;
     this.value_1 = value;
     this.name_1 = name;
@@ -7876,7 +9260,7 @@
     );
   };
   function Original(mimeType, size, name, source, caption, metaData, unknownFields) {
-    Companion_getInstance_39();
+    Companion_getInstance_43();
     name = name === VOID ? null : name;
     source = source === VOID ? null : source;
     caption = caption === VOID ? null : caption;
@@ -7929,15 +9313,15 @@
     return tmp0_safe_receiver == null ? null : tmp0_safe_receiver.get_value_j01efc_k$();
   };
   protoOf(Original).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_32(this, other);
+    return protoMergeImpl_34(this, other);
   };
   protoOf(Original).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_39().descriptor_1;
+    return Companion_getInstance_43().descriptor_1;
   };
   protoOf(Original).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_32();
+    protoSize$factory_34();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(Original).component1_7eebsc_k$ = function () {
@@ -8017,7 +9401,7 @@
     return true;
   };
   function Preview_0(mimeType, size, remote, metaData, unknownFields) {
-    Companion_getInstance_40();
+    Companion_getInstance_44();
     remote = remote === VOID ? null : remote;
     metaData = metaData === VOID ? null : metaData;
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
@@ -8050,15 +9434,15 @@
     return tmp0_safe_receiver == null ? null : tmp0_safe_receiver.get_value_j01efc_k$();
   };
   protoOf(Preview_0).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_33(this, other);
+    return protoMergeImpl_35(this, other);
   };
   protoOf(Preview_0).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_40().descriptor_1;
+    return Companion_getInstance_44().descriptor_1;
   };
   protoOf(Preview_0).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_33();
+    protoSize$factory_35();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(Preview_0).component1_7eebsc_k$ = function () {
@@ -8122,7 +9506,7 @@
     return true;
   };
   function ImageMetaData(width, height, tag, unknownFields) {
-    Companion_getInstance_41();
+    Companion_getInstance_45();
     tag = tag === VOID ? null : tag;
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
     this.width = width;
@@ -8145,15 +9529,15 @@
     return this.unknownFields_1;
   };
   protoOf(ImageMetaData).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_34(this, other);
+    return protoMergeImpl_36(this, other);
   };
   protoOf(ImageMetaData).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_41().descriptor_1;
+    return Companion_getInstance_45().descriptor_1;
   };
   protoOf(ImageMetaData).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_34();
+    protoSize$factory_36();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(ImageMetaData).component1_7eebsc_k$ = function () {
@@ -8209,7 +9593,7 @@
     return true;
   };
   function VideoMetaData(width, height, durationInMillis, unknownFields) {
-    Companion_getInstance_42();
+    Companion_getInstance_46();
     width = width === VOID ? null : width;
     height = height === VOID ? null : height;
     durationInMillis = durationInMillis === VOID ? null : durationInMillis;
@@ -8234,15 +9618,15 @@
     return this.unknownFields_1;
   };
   protoOf(VideoMetaData).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_35(this, other);
+    return protoMergeImpl_37(this, other);
   };
   protoOf(VideoMetaData).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_42().descriptor_1;
+    return Companion_getInstance_46().descriptor_1;
   };
   protoOf(VideoMetaData).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_35();
+    protoSize$factory_37();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(VideoMetaData).component1_7eebsc_k$ = function () {
@@ -8298,7 +9682,7 @@
     return true;
   };
   function AudioMetaData(durationInMillis, normalizedLoudness, unknownFields) {
-    Companion_getInstance_43();
+    Companion_getInstance_47();
     durationInMillis = durationInMillis === VOID ? null : durationInMillis;
     normalizedLoudness = normalizedLoudness === VOID ? null : normalizedLoudness;
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
@@ -8318,15 +9702,15 @@
     return this.unknownFields_1;
   };
   protoOf(AudioMetaData).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_36(this, other);
+    return protoMergeImpl_38(this, other);
   };
   protoOf(AudioMetaData).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_43().descriptor_1;
+    return Companion_getInstance_47().descriptor_1;
   };
   protoOf(AudioMetaData).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_36();
+    protoSize$factory_38();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(AudioMetaData).component1_7eebsc_k$ = function () {
@@ -8374,7 +9758,7 @@
     return true;
   };
   function RemoteData(otrKey, sha256, assetId, assetToken, assetDomain, encryption, unknownFields) {
-    Companion_getInstance_44();
+    Companion_getInstance_48();
     assetId = assetId === VOID ? null : assetId;
     assetToken = assetToken === VOID ? null : assetToken;
     assetDomain = assetDomain === VOID ? null : assetDomain;
@@ -8412,15 +9796,15 @@
     return this.unknownFields_1;
   };
   protoOf(RemoteData).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_37(this, other);
+    return protoMergeImpl_39(this, other);
   };
   protoOf(RemoteData).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_44().descriptor_1;
+    return Companion_getInstance_48().descriptor_1;
   };
   protoOf(RemoteData).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_37();
+    protoSize$factory_39();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(RemoteData).component1_7eebsc_k$ = function () {
@@ -8521,8 +9905,8 @@
       return get_protoSize.call(this$0);
     };
   }
-  function Asset_1(original, preview, expectsReadConfirmation, legalHoldStatus, status, unknownFields) {
-    Companion_getInstance_45();
+  function Asset_2(original, preview, expectsReadConfirmation, legalHoldStatus, status, unknownFields) {
+    Companion_getInstance_49();
     original = original === VOID ? null : original;
     preview = preview === VOID ? null : preview;
     expectsReadConfirmation = expectsReadConfirmation === VOID ? null : expectsReadConfirmation;
@@ -8538,65 +9922,65 @@
     var tmp = this;
     tmp.protoSize$delegate_1 = lazy(Asset$protoSize$delegate$lambda(this));
   }
-  protoOf(Asset_1).get_original_8zw1nq_k$ = function () {
+  protoOf(Asset_2).get_original_8zw1nq_k$ = function () {
     return this.original;
   };
-  protoOf(Asset_1).get_preview_3zvuox_k$ = function () {
+  protoOf(Asset_2).get_preview_3zvuox_k$ = function () {
     return this.preview;
   };
-  protoOf(Asset_1).get_expectsReadConfirmation_i6xil8_k$ = function () {
+  protoOf(Asset_2).get_expectsReadConfirmation_i6xil8_k$ = function () {
     return this.expectsReadConfirmation;
   };
-  protoOf(Asset_1).get_legalHoldStatus_nngzep_k$ = function () {
+  protoOf(Asset_2).get_legalHoldStatus_nngzep_k$ = function () {
     return this.legalHoldStatus;
   };
-  protoOf(Asset_1).get_status_jnf6d7_k$ = function () {
+  protoOf(Asset_2).get_status_jnf6d7_k$ = function () {
     return this.status;
   };
-  protoOf(Asset_1).get_unknownFields_kpu7i2_k$ = function () {
+  protoOf(Asset_2).get_unknownFields_kpu7i2_k$ = function () {
     return this.unknownFields_1;
   };
-  protoOf(Asset_1).get_notUploaded_oca97a_k$ = function () {
+  protoOf(Asset_2).get_notUploaded_oca97a_k$ = function () {
     var tmp = this.status;
     var tmp0_safe_receiver = tmp instanceof NotUploaded ? tmp : null;
     return tmp0_safe_receiver == null ? null : tmp0_safe_receiver.get_value_j01efc_k$();
   };
-  protoOf(Asset_1).get_uploaded_5xryzb_k$ = function () {
+  protoOf(Asset_2).get_uploaded_5xryzb_k$ = function () {
     var tmp = this.status;
     var tmp0_safe_receiver = tmp instanceof Uploaded ? tmp : null;
     return tmp0_safe_receiver == null ? null : tmp0_safe_receiver.get_value_j01efc_k$();
   };
-  protoOf(Asset_1).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_31(this, other);
+  protoOf(Asset_2).plus_fj0q1z_k$ = function (other) {
+    return protoMergeImpl_33(this, other);
   };
-  protoOf(Asset_1).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_45().descriptor_1;
+  protoOf(Asset_2).get_descriptor_wjt6a0_k$ = function () {
+    return Companion_getInstance_49().descriptor_1;
   };
-  protoOf(Asset_1).get_protoSize_1ekskg_k$ = function () {
+  protoOf(Asset_2).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_31();
+    protoSize$factory_33();
     return this_0.get_value_j01efc_k$();
   };
-  protoOf(Asset_1).component1_7eebsc_k$ = function () {
+  protoOf(Asset_2).component1_7eebsc_k$ = function () {
     return this.original;
   };
-  protoOf(Asset_1).component2_7eebsb_k$ = function () {
+  protoOf(Asset_2).component2_7eebsb_k$ = function () {
     return this.preview;
   };
-  protoOf(Asset_1).component3_7eebsa_k$ = function () {
+  protoOf(Asset_2).component3_7eebsa_k$ = function () {
     return this.expectsReadConfirmation;
   };
-  protoOf(Asset_1).component4_7eebs9_k$ = function () {
+  protoOf(Asset_2).component4_7eebs9_k$ = function () {
     return this.legalHoldStatus;
   };
-  protoOf(Asset_1).component5_7eebs8_k$ = function () {
+  protoOf(Asset_2).component5_7eebs8_k$ = function () {
     return this.status;
   };
-  protoOf(Asset_1).component6_7eebs7_k$ = function () {
+  protoOf(Asset_2).component6_7eebs7_k$ = function () {
     return this.unknownFields_1;
   };
-  protoOf(Asset_1).copy_vs465z_k$ = function (
+  protoOf(Asset_2).copy_vs465z_k$ = function (
     original,
     preview,
     expectsReadConfirmation,
@@ -8604,9 +9988,9 @@
     status,
     unknownFields,
   ) {
-    return new Asset_1(original, preview, expectsReadConfirmation, legalHoldStatus, status, unknownFields);
+    return new Asset_2(original, preview, expectsReadConfirmation, legalHoldStatus, status, unknownFields);
   };
-  protoOf(Asset_1).copy = function (
+  protoOf(Asset_2).copy = function (
     original,
     preview,
     expectsReadConfirmation,
@@ -8623,7 +10007,7 @@
     unknownFields = unknownFields === VOID ? this.unknownFields_1 : unknownFields;
     return this.copy_vs465z_k$(original, preview, expectsReadConfirmation, legalHoldStatus, status, unknownFields);
   };
-  protoOf(Asset_1).toString = function () {
+  protoOf(Asset_2).toString = function () {
     return (
       'Asset(original=' +
       this.original +
@@ -8640,7 +10024,7 @@
       ')'
     );
   };
-  protoOf(Asset_1).hashCode = function () {
+  protoOf(Asset_2).hashCode = function () {
     var result = this.original == null ? 0 : this.original.hashCode();
     result = (imul(result, 31) + (this.preview == null ? 0 : this.preview.hashCode())) | 0;
     result =
@@ -8652,10 +10036,10 @@
     result = (imul(result, 31) + hashCode(this.unknownFields_1)) | 0;
     return result;
   };
-  protoOf(Asset_1).equals = function (other) {
+  protoOf(Asset_2).equals = function (other) {
     if (this === other) return true;
-    if (!(other instanceof Asset_1)) return false;
-    var tmp0_other_with_cast = other instanceof Asset_1 ? other : THROW_CCE();
+    if (!(other instanceof Asset_2)) return false;
+    var tmp0_other_with_cast = other instanceof Asset_2 ? other : THROW_CCE();
     if (!equals(this.original, tmp0_other_with_cast.original)) return false;
     if (!equals(this.preview, tmp0_other_with_cast.preview)) return false;
     if (!(this.expectsReadConfirmation == tmp0_other_with_cast.expectsReadConfirmation)) return false;
@@ -8664,8 +10048,8 @@
     if (!equals(this.unknownFields_1, tmp0_other_with_cast.unknownFields_1)) return false;
     return true;
   };
-  function Companion_46() {
-    Companion_instance_44 = this;
+  function Companion_50() {
+    Companion_instance_48 = this;
     var tmp = this;
     var tmp_0 = getKClass(External_0);
     // Inline function 'kotlin.collections.buildList' call
@@ -8676,25 +10060,25 @@
     var this_0 = ArrayList_init_$Create$(3);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.messages.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_160(this);
+    var tmp0_messageDescriptor = descriptor$factory_176(this);
     var tmp1_type = new Bytes(true);
     this_0.add_utx5q5_k$(
-      new FieldDescriptor(tmp0_messageDescriptor, 'otr_key', 1, tmp1_type, otrKey$factory_1(), VOID, 'otrKey'),
+      new FieldDescriptor(tmp0_messageDescriptor, 'otr_key', 1, tmp1_type, otrKey$factory_2(), VOID, 'otrKey'),
     );
-    var tmp2_messageDescriptor = descriptor$factory_161(this);
+    var tmp2_messageDescriptor = descriptor$factory_177(this);
     var tmp3_type = new Bytes(true);
     this_0.add_utx5q5_k$(
-      new FieldDescriptor(tmp2_messageDescriptor, 'sha256', 2, tmp3_type, sha256$factory_1(), VOID, 'sha256'),
+      new FieldDescriptor(tmp2_messageDescriptor, 'sha256', 2, tmp3_type, sha256$factory_2(), VOID, 'sha256'),
     );
-    var tmp4_messageDescriptor = descriptor$factory_162(this);
-    var tmp5_type = new Enum_0(Companion_getInstance_9(), true);
+    var tmp4_messageDescriptor = descriptor$factory_178(this);
+    var tmp5_type = new Enum_0(Companion_getInstance_12(), true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
         tmp4_messageDescriptor,
         'encryption',
         3,
         tmp5_type,
-        encryption$factory_0(),
+        encryption$factory_1(),
         VOID,
         'encryption',
       ),
@@ -8702,16 +10086,16 @@
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('External', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_46).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_38(Companion_getInstance_46(), u);
+  protoOf(Companion_50).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_40(Companion_getInstance_50(), u);
   };
-  protoOf(Companion_46).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_50).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_44;
-  function Companion_getInstance_46() {
-    if (Companion_instance_44 == null) new Companion_46();
-    return Companion_instance_44;
+  var Companion_instance_48;
+  function Companion_getInstance_50() {
+    if (Companion_instance_48 == null) new Companion_50();
+    return Companion_instance_48;
   }
   function External$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -8719,7 +10103,7 @@
     };
   }
   function External_0(otrKey, sha256, encryption, unknownFields) {
-    Companion_getInstance_46();
+    Companion_getInstance_50();
     sha256 = sha256 === VOID ? null : sha256;
     encryption = encryption === VOID ? null : encryption;
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
@@ -8743,15 +10127,15 @@
     return this.unknownFields_1;
   };
   protoOf(External_0).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_38(this, other);
+    return protoMergeImpl_40(this, other);
   };
   protoOf(External_0).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_46().descriptor_1;
+    return Companion_getInstance_50().descriptor_1;
   };
   protoOf(External_0).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_38();
+    protoSize$factory_40();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(External_0).component1_7eebsc_k$ = function () {
@@ -8806,8 +10190,8 @@
     if (!equals(this.unknownFields_1, tmp0_other_with_cast.unknownFields_1)) return false;
     return true;
   };
-  function Companion_47() {
-    Companion_instance_45 = this;
+  function Companion_51() {
+    Companion_instance_49 = this;
     var tmp = this;
     var tmp_0 = getKClass(Reaction_0);
     // Inline function 'kotlin.collections.buildList' call
@@ -8818,18 +10202,18 @@
     var this_0 = ArrayList_init_$Create$(3);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.messages.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_163(this);
+    var tmp0_messageDescriptor = descriptor$factory_179(this);
     var tmp1_type = new String_0(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp0_messageDescriptor, 'emoji', 1, tmp1_type, emoji$factory(), VOID, 'emoji'),
     );
-    var tmp2_messageDescriptor = descriptor$factory_164(this);
+    var tmp2_messageDescriptor = descriptor$factory_180(this);
     var tmp3_type = new String_0(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp2_messageDescriptor, 'message_id', 2, tmp3_type, messageId$factory_2(), VOID, 'messageId'),
     );
-    var tmp4_messageDescriptor = descriptor$factory_165(this);
-    var tmp5_type = new Enum_0(Companion_getInstance_10(), true);
+    var tmp4_messageDescriptor = descriptor$factory_181(this);
+    var tmp5_type = new Enum_0(Companion_getInstance_13(), true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
         tmp4_messageDescriptor,
@@ -8844,16 +10228,16 @@
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('Reaction', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_47).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_39(Companion_getInstance_47(), u);
+  protoOf(Companion_51).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_41(Companion_getInstance_51(), u);
   };
-  protoOf(Companion_47).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_51).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_45;
-  function Companion_getInstance_47() {
-    if (Companion_instance_45 == null) new Companion_47();
-    return Companion_instance_45;
+  var Companion_instance_49;
+  function Companion_getInstance_51() {
+    if (Companion_instance_49 == null) new Companion_51();
+    return Companion_instance_49;
   }
   function Reaction$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -8861,7 +10245,7 @@
     };
   }
   function Reaction_0(emoji, messageId, legalHoldStatus, unknownFields) {
-    Companion_getInstance_47();
+    Companion_getInstance_51();
     emoji = emoji === VOID ? null : emoji;
     legalHoldStatus = legalHoldStatus === VOID ? null : legalHoldStatus;
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
@@ -8885,15 +10269,15 @@
     return this.unknownFields_1;
   };
   protoOf(Reaction_0).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_39(this, other);
+    return protoMergeImpl_41(this, other);
   };
   protoOf(Reaction_0).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_47().descriptor_1;
+    return Companion_getInstance_51().descriptor_1;
   };
   protoOf(Reaction_0).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_39();
+    protoSize$factory_41();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(Reaction_0).component1_7eebsc_k$ = function () {
@@ -8948,8 +10332,8 @@
     if (!equals(this.unknownFields_1, tmp0_other_with_cast.unknownFields_1)) return false;
     return true;
   };
-  function Companion_48() {
-    Companion_instance_46 = this;
+  function Companion_52() {
+    Companion_instance_50 = this;
     var tmp = this;
     var tmp_0 = getKClass(Calling_0);
     // Inline function 'kotlin.collections.buildList' call
@@ -8960,13 +10344,13 @@
     var this_0 = ArrayList_init_$Create$(2);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.messages.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_166(this);
+    var tmp0_messageDescriptor = descriptor$factory_182(this);
     var tmp1_type = new String_0(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp0_messageDescriptor, 'content', 1, tmp1_type, content$factory_1(), VOID, 'content'),
     );
-    var tmp2_messageDescriptor = descriptor$factory_167(this);
-    var tmp3_type = new Message(Companion_getInstance_13());
+    var tmp2_messageDescriptor = descriptor$factory_183(this);
+    var tmp3_type = new Message(Companion_getInstance_17());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
         tmp2_messageDescriptor,
@@ -8981,16 +10365,16 @@
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('Calling', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_48).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_40(Companion_getInstance_48(), u);
+  protoOf(Companion_52).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_42(Companion_getInstance_52(), u);
   };
-  protoOf(Companion_48).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_52).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_46;
-  function Companion_getInstance_48() {
-    if (Companion_instance_46 == null) new Companion_48();
-    return Companion_instance_46;
+  var Companion_instance_50;
+  function Companion_getInstance_52() {
+    if (Companion_instance_50 == null) new Companion_52();
+    return Companion_instance_50;
   }
   function Calling$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -8998,7 +10382,7 @@
     };
   }
   function Calling_0(content, qualifiedConversationId, unknownFields) {
-    Companion_getInstance_48();
+    Companion_getInstance_52();
     qualifiedConversationId = qualifiedConversationId === VOID ? null : qualifiedConversationId;
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
     this.content = content;
@@ -9017,15 +10401,15 @@
     return this.unknownFields_1;
   };
   protoOf(Calling_0).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_40(this, other);
+    return protoMergeImpl_42(this, other);
   };
   protoOf(Calling_0).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_48().descriptor_1;
+    return Companion_getInstance_52().descriptor_1;
   };
   protoOf(Calling_0).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_40();
+    protoSize$factory_42();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(Calling_0).component1_7eebsc_k$ = function () {
@@ -9076,8 +10460,8 @@
   function DataTransfer$Companion$defaultInstance$delegate$lambda() {
     return new DataTransfer_0();
   }
-  function Companion_49() {
-    Companion_instance_47 = this;
+  function Companion_53() {
+    Companion_instance_51 = this;
     var tmp = this;
     tmp.defaultInstance$delegate_1 = lazy(DataTransfer$Companion$defaultInstance$delegate$lambda);
     var tmp_0 = this;
@@ -9090,8 +10474,8 @@
     var this_0 = ArrayList_init_$Create$(1);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.messages.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_168(this);
-    var tmp1_type = new Message(Companion_getInstance_50());
+    var tmp0_messageDescriptor = descriptor$factory_184(this);
+    var tmp1_type = new Message(Companion_getInstance_54());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
         tmp0_messageDescriptor,
@@ -9106,22 +10490,22 @@
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp_0.descriptor_1 = new MessageDescriptor('DataTransfer', tmp_1, this, tmp$ret$2);
   }
-  protoOf(Companion_49).get_defaultInstance_axha8d_k$ = function () {
+  protoOf(Companion_53).get_defaultInstance_axha8d_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.defaultInstance$delegate_1;
     defaultInstance$factory_5();
     return this_0.get_value_j01efc_k$();
   };
-  protoOf(Companion_49).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_41(Companion_getInstance_49(), u);
+  protoOf(Companion_53).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_43(Companion_getInstance_53(), u);
   };
-  protoOf(Companion_49).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_53).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_47;
-  function Companion_getInstance_49() {
-    if (Companion_instance_47 == null) new Companion_49();
-    return Companion_instance_47;
+  var Companion_instance_51;
+  function Companion_getInstance_53() {
+    if (Companion_instance_51 == null) new Companion_53();
+    return Companion_instance_51;
   }
   function DataTransfer$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -9129,7 +10513,7 @@
     };
   }
   function DataTransfer_0(trackingIdentifier, unknownFields) {
-    Companion_getInstance_49();
+    Companion_getInstance_53();
     trackingIdentifier = trackingIdentifier === VOID ? null : trackingIdentifier;
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
     this.trackingIdentifier = trackingIdentifier;
@@ -9144,15 +10528,15 @@
     return this.unknownFields_1;
   };
   protoOf(DataTransfer_0).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_41(this, other);
+    return protoMergeImpl_43(this, other);
   };
   protoOf(DataTransfer_0).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_49().descriptor_1;
+    return Companion_getInstance_53().descriptor_1;
   };
   protoOf(DataTransfer_0).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_41();
+    protoSize$factory_43();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(DataTransfer_0).component1_7eebsc_k$ = function () {
@@ -9187,8 +10571,8 @@
     if (!equals(this.unknownFields_1, tmp0_other_with_cast.unknownFields_1)) return false;
     return true;
   };
-  function Companion_50() {
-    Companion_instance_48 = this;
+  function Companion_54() {
+    Companion_instance_52 = this;
     var tmp = this;
     var tmp_0 = getKClass(TrackingIdentifier);
     // Inline function 'kotlin.collections.buildList' call
@@ -9199,7 +10583,7 @@
     var this_0 = ArrayList_init_$Create$(1);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.messages.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_169(this);
+    var tmp0_messageDescriptor = descriptor$factory_185(this);
     var tmp1_type = new String_0(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp0_messageDescriptor, 'identifier', 1, tmp1_type, identifier$factory(), VOID, 'identifier'),
@@ -9207,16 +10591,16 @@
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('TrackingIdentifier', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_50).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_42(Companion_getInstance_50(), u);
+  protoOf(Companion_54).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_44(Companion_getInstance_54(), u);
   };
-  protoOf(Companion_50).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_54).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_48;
-  function Companion_getInstance_50() {
-    if (Companion_instance_48 == null) new Companion_50();
-    return Companion_instance_48;
+  var Companion_instance_52;
+  function Companion_getInstance_54() {
+    if (Companion_instance_52 == null) new Companion_54();
+    return Companion_instance_52;
   }
   function TrackingIdentifier$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -9224,7 +10608,7 @@
     };
   }
   function TrackingIdentifier(identifier, unknownFields) {
-    Companion_getInstance_50();
+    Companion_getInstance_54();
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
     this.identifier = identifier;
     this.unknownFields_1 = unknownFields;
@@ -9238,15 +10622,15 @@
     return this.unknownFields_1;
   };
   protoOf(TrackingIdentifier).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_42(this, other);
+    return protoMergeImpl_44(this, other);
   };
   protoOf(TrackingIdentifier).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_50().descriptor_1;
+    return Companion_getInstance_54().descriptor_1;
   };
   protoOf(TrackingIdentifier).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_42();
+    protoSize$factory_44();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(TrackingIdentifier).component1_7eebsc_k$ = function () {
@@ -9280,27 +10664,27 @@
     return true;
   };
   function orDefaultForComposite(_this__u8e3s4) {
-    return _this__u8e3s4 == null ? Companion_getInstance_15().defaultInstance : _this__u8e3s4;
+    return _this__u8e3s4 == null ? Companion_getInstance_19().defaultInstance : _this__u8e3s4;
   }
   function orDefaultForCompositeItem(_this__u8e3s4) {
-    return _this__u8e3s4 == null ? Companion_getInstance_14().defaultInstance : _this__u8e3s4;
+    return _this__u8e3s4 == null ? Companion_getInstance_18().defaultInstance : _this__u8e3s4;
   }
   function orDefaultForTweet(_this__u8e3s4) {
-    return _this__u8e3s4 == null ? Companion_getInstance_25().defaultInstance : _this__u8e3s4;
+    return _this__u8e3s4 == null ? Companion_getInstance_29().defaultInstance : _this__u8e3s4;
   }
   function orDefaultForAsset(_this__u8e3s4) {
-    return _this__u8e3s4 == null ? Companion_getInstance_45().defaultInstance : _this__u8e3s4;
-  }
-  function orDefaultForAssetVideoMetaData(_this__u8e3s4) {
-    return _this__u8e3s4 == null ? Companion_getInstance_42().defaultInstance : _this__u8e3s4;
-  }
-  function orDefaultForAssetAudioMetaData(_this__u8e3s4) {
-    return _this__u8e3s4 == null ? Companion_getInstance_43().defaultInstance : _this__u8e3s4;
-  }
-  function orDefaultForDataTransfer(_this__u8e3s4) {
     return _this__u8e3s4 == null ? Companion_getInstance_49().defaultInstance : _this__u8e3s4;
   }
-  function protoMergeImpl_6(_this__u8e3s4, plus) {
+  function orDefaultForAssetVideoMetaData(_this__u8e3s4) {
+    return _this__u8e3s4 == null ? Companion_getInstance_46().defaultInstance : _this__u8e3s4;
+  }
+  function orDefaultForAssetAudioMetaData(_this__u8e3s4) {
+    return _this__u8e3s4 == null ? Companion_getInstance_47().defaultInstance : _this__u8e3s4;
+  }
+  function orDefaultForDataTransfer(_this__u8e3s4) {
+    return _this__u8e3s4 == null ? Companion_getInstance_53().defaultInstance : _this__u8e3s4;
+  }
+  function protoMergeImpl_8(_this__u8e3s4, plus) {
     var tmp0_safe_receiver = plus instanceof GenericMessage ? plus : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -9309,293 +10693,295 @@
       // Inline function 'kotlin.let' call
       // Inline function 'kotlin.contracts.contract' call
       // Inline function 'com.wire.kalium.protobuf.messages.protoMergeImpl.<anonymous>' call
-      var tmp_0;
+      var tmp0_elvis_lhs = plus.unknownStrategy;
+      var tmp_0 = tmp0_elvis_lhs == null ? _this__u8e3s4.unknownStrategy : tmp0_elvis_lhs;
       var tmp_1;
-      var tmp_2 = _this__u8e3s4.content;
-      if (tmp_2 instanceof Text_0) {
-        var tmp_3 = plus.content;
-        tmp_1 = tmp_3 instanceof Text_0;
+      var tmp_2;
+      var tmp_3 = _this__u8e3s4.content;
+      if (tmp_3 instanceof Text_0) {
+        var tmp_4 = plus.content;
+        tmp_2 = tmp_4 instanceof Text_0;
       } else {
-        tmp_1 = false;
+        tmp_2 = false;
       }
-      if (tmp_1) {
-        tmp_0 = new Text_0(
+      if (tmp_2) {
+        tmp_1 = new Text_0(
           _this__u8e3s4.content.get_value_j01efc_k$().plus_fj0q1z_k$(plus.content.get_value_j01efc_k$()),
         );
       } else {
-        var tmp_4;
-        var tmp_5 = _this__u8e3s4.content;
-        if (tmp_5 instanceof Image) {
-          var tmp_6 = plus.content;
-          tmp_4 = tmp_6 instanceof Image;
+        var tmp_5;
+        var tmp_6 = _this__u8e3s4.content;
+        if (tmp_6 instanceof Image) {
+          var tmp_7 = plus.content;
+          tmp_5 = tmp_7 instanceof Image;
         } else {
-          tmp_4 = false;
+          tmp_5 = false;
         }
-        if (tmp_4) {
-          tmp_0 = new Image(
+        if (tmp_5) {
+          tmp_1 = new Image(
             _this__u8e3s4.content.get_value_j01efc_k$().plus_fj0q1z_k$(plus.content.get_value_j01efc_k$()),
           );
         } else {
-          var tmp_7;
-          var tmp_8 = _this__u8e3s4.content;
-          if (tmp_8 instanceof Knock) {
-            var tmp_9 = plus.content;
-            tmp_7 = tmp_9 instanceof Knock;
+          var tmp_8;
+          var tmp_9 = _this__u8e3s4.content;
+          if (tmp_9 instanceof Knock) {
+            var tmp_10 = plus.content;
+            tmp_8 = tmp_10 instanceof Knock;
           } else {
-            tmp_7 = false;
+            tmp_8 = false;
           }
-          if (tmp_7) {
-            tmp_0 = new Knock(
+          if (tmp_8) {
+            tmp_1 = new Knock(
               _this__u8e3s4.content.get_value_j01efc_k$().plus_fj0q1z_k$(plus.content.get_value_j01efc_k$()),
             );
           } else {
-            var tmp_10;
-            var tmp_11 = _this__u8e3s4.content;
-            if (tmp_11 instanceof LastRead) {
-              var tmp_12 = plus.content;
-              tmp_10 = tmp_12 instanceof LastRead;
+            var tmp_11;
+            var tmp_12 = _this__u8e3s4.content;
+            if (tmp_12 instanceof LastRead) {
+              var tmp_13 = plus.content;
+              tmp_11 = tmp_13 instanceof LastRead;
             } else {
-              tmp_10 = false;
+              tmp_11 = false;
             }
-            if (tmp_10) {
-              tmp_0 = new LastRead(
+            if (tmp_11) {
+              tmp_1 = new LastRead(
                 _this__u8e3s4.content.get_value_j01efc_k$().plus_fj0q1z_k$(plus.content.get_value_j01efc_k$()),
               );
             } else {
-              var tmp_13;
-              var tmp_14 = _this__u8e3s4.content;
-              if (tmp_14 instanceof Cleared) {
-                var tmp_15 = plus.content;
-                tmp_13 = tmp_15 instanceof Cleared;
+              var tmp_14;
+              var tmp_15 = _this__u8e3s4.content;
+              if (tmp_15 instanceof Cleared) {
+                var tmp_16 = plus.content;
+                tmp_14 = tmp_16 instanceof Cleared;
               } else {
-                tmp_13 = false;
+                tmp_14 = false;
               }
-              if (tmp_13) {
-                tmp_0 = new Cleared(
+              if (tmp_14) {
+                tmp_1 = new Cleared(
                   _this__u8e3s4.content.get_value_j01efc_k$().plus_fj0q1z_k$(plus.content.get_value_j01efc_k$()),
                 );
               } else {
-                var tmp_16;
-                var tmp_17 = _this__u8e3s4.content;
-                if (tmp_17 instanceof External) {
-                  var tmp_18 = plus.content;
-                  tmp_16 = tmp_18 instanceof External;
+                var tmp_17;
+                var tmp_18 = _this__u8e3s4.content;
+                if (tmp_18 instanceof External) {
+                  var tmp_19 = plus.content;
+                  tmp_17 = tmp_19 instanceof External;
                 } else {
-                  tmp_16 = false;
+                  tmp_17 = false;
                 }
-                if (tmp_16) {
-                  tmp_0 = new External(
+                if (tmp_17) {
+                  tmp_1 = new External(
                     _this__u8e3s4.content.get_value_j01efc_k$().plus_fj0q1z_k$(plus.content.get_value_j01efc_k$()),
                   );
                 } else {
-                  var tmp_19;
-                  var tmp_20 = _this__u8e3s4.content;
-                  if (tmp_20 instanceof Calling) {
-                    var tmp_21 = plus.content;
-                    tmp_19 = tmp_21 instanceof Calling;
+                  var tmp_20;
+                  var tmp_21 = _this__u8e3s4.content;
+                  if (tmp_21 instanceof Calling) {
+                    var tmp_22 = plus.content;
+                    tmp_20 = tmp_22 instanceof Calling;
                   } else {
-                    tmp_19 = false;
+                    tmp_20 = false;
                   }
-                  if (tmp_19) {
-                    tmp_0 = new Calling(
+                  if (tmp_20) {
+                    tmp_1 = new Calling(
                       _this__u8e3s4.content.get_value_j01efc_k$().plus_fj0q1z_k$(plus.content.get_value_j01efc_k$()),
                     );
                   } else {
-                    var tmp_22;
-                    var tmp_23 = _this__u8e3s4.content;
-                    if (tmp_23 instanceof Asset) {
-                      var tmp_24 = plus.content;
-                      tmp_22 = tmp_24 instanceof Asset;
+                    var tmp_23;
+                    var tmp_24 = _this__u8e3s4.content;
+                    if (tmp_24 instanceof Asset_0) {
+                      var tmp_25 = plus.content;
+                      tmp_23 = tmp_25 instanceof Asset_0;
                     } else {
-                      tmp_22 = false;
+                      tmp_23 = false;
                     }
-                    if (tmp_22) {
-                      tmp_0 = new Asset(
+                    if (tmp_23) {
+                      tmp_1 = new Asset_0(
                         _this__u8e3s4.content.get_value_j01efc_k$().plus_fj0q1z_k$(plus.content.get_value_j01efc_k$()),
                       );
                     } else {
-                      var tmp_25;
-                      var tmp_26 = _this__u8e3s4.content;
-                      if (tmp_26 instanceof Hidden) {
-                        var tmp_27 = plus.content;
-                        tmp_25 = tmp_27 instanceof Hidden;
+                      var tmp_26;
+                      var tmp_27 = _this__u8e3s4.content;
+                      if (tmp_27 instanceof Hidden) {
+                        var tmp_28 = plus.content;
+                        tmp_26 = tmp_28 instanceof Hidden;
                       } else {
-                        tmp_25 = false;
+                        tmp_26 = false;
                       }
-                      if (tmp_25) {
-                        tmp_0 = new Hidden(
+                      if (tmp_26) {
+                        tmp_1 = new Hidden(
                           _this__u8e3s4.content
                             .get_value_j01efc_k$()
                             .plus_fj0q1z_k$(plus.content.get_value_j01efc_k$()),
                         );
                       } else {
-                        var tmp_28;
-                        var tmp_29 = _this__u8e3s4.content;
-                        if (tmp_29 instanceof Location) {
-                          var tmp_30 = plus.content;
-                          tmp_28 = tmp_30 instanceof Location;
+                        var tmp_29;
+                        var tmp_30 = _this__u8e3s4.content;
+                        if (tmp_30 instanceof Location_0) {
+                          var tmp_31 = plus.content;
+                          tmp_29 = tmp_31 instanceof Location_0;
                         } else {
-                          tmp_28 = false;
+                          tmp_29 = false;
                         }
-                        if (tmp_28) {
-                          tmp_0 = new Location(
+                        if (tmp_29) {
+                          tmp_1 = new Location_0(
                             _this__u8e3s4.content
                               .get_value_j01efc_k$()
                               .plus_fj0q1z_k$(plus.content.get_value_j01efc_k$()),
                           );
                         } else {
-                          var tmp_31;
-                          var tmp_32 = _this__u8e3s4.content;
-                          if (tmp_32 instanceof Deleted) {
-                            var tmp_33 = plus.content;
-                            tmp_31 = tmp_33 instanceof Deleted;
+                          var tmp_32;
+                          var tmp_33 = _this__u8e3s4.content;
+                          if (tmp_33 instanceof Deleted) {
+                            var tmp_34 = plus.content;
+                            tmp_32 = tmp_34 instanceof Deleted;
                           } else {
-                            tmp_31 = false;
+                            tmp_32 = false;
                           }
-                          if (tmp_31) {
-                            tmp_0 = new Deleted(
+                          if (tmp_32) {
+                            tmp_1 = new Deleted(
                               _this__u8e3s4.content
                                 .get_value_j01efc_k$()
                                 .plus_fj0q1z_k$(plus.content.get_value_j01efc_k$()),
                             );
                           } else {
-                            var tmp_34;
-                            var tmp_35 = _this__u8e3s4.content;
-                            if (tmp_35 instanceof Edited) {
-                              var tmp_36 = plus.content;
-                              tmp_34 = tmp_36 instanceof Edited;
+                            var tmp_35;
+                            var tmp_36 = _this__u8e3s4.content;
+                            if (tmp_36 instanceof Edited) {
+                              var tmp_37 = plus.content;
+                              tmp_35 = tmp_37 instanceof Edited;
                             } else {
-                              tmp_34 = false;
+                              tmp_35 = false;
                             }
-                            if (tmp_34) {
-                              tmp_0 = new Edited(
+                            if (tmp_35) {
+                              tmp_1 = new Edited(
                                 _this__u8e3s4.content
                                   .get_value_j01efc_k$()
                                   .plus_fj0q1z_k$(plus.content.get_value_j01efc_k$()),
                               );
                             } else {
-                              var tmp_37;
-                              var tmp_38 = _this__u8e3s4.content;
-                              if (tmp_38 instanceof Confirmation) {
-                                var tmp_39 = plus.content;
-                                tmp_37 = tmp_39 instanceof Confirmation;
+                              var tmp_38;
+                              var tmp_39 = _this__u8e3s4.content;
+                              if (tmp_39 instanceof Confirmation) {
+                                var tmp_40 = plus.content;
+                                tmp_38 = tmp_40 instanceof Confirmation;
                               } else {
-                                tmp_37 = false;
+                                tmp_38 = false;
                               }
-                              if (tmp_37) {
-                                tmp_0 = new Confirmation(
+                              if (tmp_38) {
+                                tmp_1 = new Confirmation(
                                   _this__u8e3s4.content
                                     .get_value_j01efc_k$()
                                     .plus_fj0q1z_k$(plus.content.get_value_j01efc_k$()),
                                 );
                               } else {
-                                var tmp_40;
-                                var tmp_41 = _this__u8e3s4.content;
-                                if (tmp_41 instanceof Reaction) {
-                                  var tmp_42 = plus.content;
-                                  tmp_40 = tmp_42 instanceof Reaction;
+                                var tmp_41;
+                                var tmp_42 = _this__u8e3s4.content;
+                                if (tmp_42 instanceof Reaction) {
+                                  var tmp_43 = plus.content;
+                                  tmp_41 = tmp_43 instanceof Reaction;
                                 } else {
-                                  tmp_40 = false;
+                                  tmp_41 = false;
                                 }
-                                if (tmp_40) {
-                                  tmp_0 = new Reaction(
+                                if (tmp_41) {
+                                  tmp_1 = new Reaction(
                                     _this__u8e3s4.content
                                       .get_value_j01efc_k$()
                                       .plus_fj0q1z_k$(plus.content.get_value_j01efc_k$()),
                                   );
                                 } else {
-                                  var tmp_43;
-                                  var tmp_44 = _this__u8e3s4.content;
-                                  if (tmp_44 instanceof Ephemeral) {
-                                    var tmp_45 = plus.content;
-                                    tmp_43 = tmp_45 instanceof Ephemeral;
+                                  var tmp_44;
+                                  var tmp_45 = _this__u8e3s4.content;
+                                  if (tmp_45 instanceof Ephemeral) {
+                                    var tmp_46 = plus.content;
+                                    tmp_44 = tmp_46 instanceof Ephemeral;
                                   } else {
-                                    tmp_43 = false;
+                                    tmp_44 = false;
                                   }
-                                  if (tmp_43) {
-                                    tmp_0 = new Ephemeral(
+                                  if (tmp_44) {
+                                    tmp_1 = new Ephemeral(
                                       _this__u8e3s4.content
                                         .get_value_j01efc_k$()
                                         .plus_fj0q1z_k$(plus.content.get_value_j01efc_k$()),
                                     );
                                   } else {
-                                    var tmp_46;
-                                    var tmp_47 = _this__u8e3s4.content;
-                                    if (tmp_47 instanceof Availability) {
-                                      var tmp_48 = plus.content;
-                                      tmp_46 = tmp_48 instanceof Availability;
+                                    var tmp_47;
+                                    var tmp_48 = _this__u8e3s4.content;
+                                    if (tmp_48 instanceof Availability) {
+                                      var tmp_49 = plus.content;
+                                      tmp_47 = tmp_49 instanceof Availability;
                                     } else {
-                                      tmp_46 = false;
+                                      tmp_47 = false;
                                     }
-                                    if (tmp_46) {
-                                      tmp_0 = new Availability(
+                                    if (tmp_47) {
+                                      tmp_1 = new Availability(
                                         _this__u8e3s4.content
                                           .get_value_j01efc_k$()
                                           .plus_fj0q1z_k$(plus.content.get_value_j01efc_k$()),
                                       );
                                     } else {
-                                      var tmp_49;
-                                      var tmp_50 = _this__u8e3s4.content;
-                                      if (tmp_50 instanceof Composite) {
-                                        var tmp_51 = plus.content;
-                                        tmp_49 = tmp_51 instanceof Composite;
+                                      var tmp_50;
+                                      var tmp_51 = _this__u8e3s4.content;
+                                      if (tmp_51 instanceof Composite) {
+                                        var tmp_52 = plus.content;
+                                        tmp_50 = tmp_52 instanceof Composite;
                                       } else {
-                                        tmp_49 = false;
+                                        tmp_50 = false;
                                       }
-                                      if (tmp_49) {
-                                        tmp_0 = new Composite(
+                                      if (tmp_50) {
+                                        tmp_1 = new Composite(
                                           _this__u8e3s4.content
                                             .get_value_j01efc_k$()
                                             .plus_fj0q1z_k$(plus.content.get_value_j01efc_k$()),
                                         );
                                       } else {
-                                        var tmp_52;
-                                        var tmp_53 = _this__u8e3s4.content;
-                                        if (tmp_53 instanceof ButtonAction) {
-                                          var tmp_54 = plus.content;
-                                          tmp_52 = tmp_54 instanceof ButtonAction;
+                                        var tmp_53;
+                                        var tmp_54 = _this__u8e3s4.content;
+                                        if (tmp_54 instanceof ButtonAction) {
+                                          var tmp_55 = plus.content;
+                                          tmp_53 = tmp_55 instanceof ButtonAction;
                                         } else {
-                                          tmp_52 = false;
+                                          tmp_53 = false;
                                         }
-                                        if (tmp_52) {
-                                          tmp_0 = new ButtonAction(
+                                        if (tmp_53) {
+                                          tmp_1 = new ButtonAction(
                                             _this__u8e3s4.content
                                               .get_value_j01efc_k$()
                                               .plus_fj0q1z_k$(plus.content.get_value_j01efc_k$()),
                                           );
                                         } else {
-                                          var tmp_55;
-                                          var tmp_56 = _this__u8e3s4.content;
-                                          if (tmp_56 instanceof ButtonActionConfirmation) {
-                                            var tmp_57 = plus.content;
-                                            tmp_55 = tmp_57 instanceof ButtonActionConfirmation;
+                                          var tmp_56;
+                                          var tmp_57 = _this__u8e3s4.content;
+                                          if (tmp_57 instanceof ButtonActionConfirmation) {
+                                            var tmp_58 = plus.content;
+                                            tmp_56 = tmp_58 instanceof ButtonActionConfirmation;
                                           } else {
-                                            tmp_55 = false;
+                                            tmp_56 = false;
                                           }
-                                          if (tmp_55) {
-                                            tmp_0 = new ButtonActionConfirmation(
+                                          if (tmp_56) {
+                                            tmp_1 = new ButtonActionConfirmation(
                                               _this__u8e3s4.content
                                                 .get_value_j01efc_k$()
                                                 .plus_fj0q1z_k$(plus.content.get_value_j01efc_k$()),
                                             );
                                           } else {
-                                            var tmp_58;
-                                            var tmp_59 = _this__u8e3s4.content;
-                                            if (tmp_59 instanceof DataTransfer) {
-                                              var tmp_60 = plus.content;
-                                              tmp_58 = tmp_60 instanceof DataTransfer;
+                                            var tmp_59;
+                                            var tmp_60 = _this__u8e3s4.content;
+                                            if (tmp_60 instanceof DataTransfer) {
+                                              var tmp_61 = plus.content;
+                                              tmp_59 = tmp_61 instanceof DataTransfer;
                                             } else {
-                                              tmp_58 = false;
+                                              tmp_59 = false;
                                             }
-                                            if (tmp_58) {
-                                              tmp_0 = new DataTransfer(
+                                            if (tmp_59) {
+                                              tmp_1 = new DataTransfer(
                                                 _this__u8e3s4.content
                                                   .get_value_j01efc_k$()
                                                   .plus_fj0q1z_k$(plus.content.get_value_j01efc_k$()),
                                               );
                                             } else {
-                                              var tmp0_elvis_lhs = plus.content;
-                                              tmp_0 = tmp0_elvis_lhs == null ? _this__u8e3s4.content : tmp0_elvis_lhs;
+                                              var tmp1_elvis_lhs = plus.content;
+                                              tmp_1 = tmp1_elvis_lhs == null ? _this__u8e3s4.content : tmp1_elvis_lhs;
                                             }
                                           }
                                         }
@@ -9619,22 +11005,27 @@
       tmp = tmp0_safe_receiver.copy(
         VOID,
         tmp_0,
+        tmp_1,
         plus_0(_this__u8e3s4.unknownFields_1, plus.get_unknownFields_kpu7i2_k$()),
       );
     }
-    var tmp1_elvis_lhs = tmp;
-    return tmp1_elvis_lhs == null ? _this__u8e3s4 : tmp1_elvis_lhs;
+    var tmp1_elvis_lhs_0 = tmp;
+    return tmp1_elvis_lhs_0 == null ? _this__u8e3s4 : tmp1_elvis_lhs_0;
   }
-  function decodeWithImpl_6(_this__u8e3s4, u) {
+  function decodeWithImpl_8(_this__u8e3s4, u) {
     var messageId = {_v: null};
+    var unknownStrategy = {_v: null};
     var content = {_v: null};
-    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_6(messageId, content));
+    var unknownFields = u.readMessage_fttc7y_k$(
+      _this__u8e3s4,
+      decodeWithImpl$lambda_8(messageId, content, unknownStrategy),
+    );
     if (messageId._v == null) {
       throw Companion_getInstance().missingRequiredField('message_id');
     }
-    return new GenericMessage(ensureNotNull(messageId._v), content._v, unknownFields);
+    return new GenericMessage(ensureNotNull(messageId._v), unknownStrategy._v, content._v, unknownFields);
   }
-  function protoMergeImpl_7(_this__u8e3s4, plus) {
+  function protoMergeImpl_9(_this__u8e3s4, plus) {
     var tmp0_safe_receiver = plus instanceof QualifiedUserId ? plus : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -9652,10 +11043,10 @@
     var tmp1_elvis_lhs = tmp;
     return tmp1_elvis_lhs == null ? _this__u8e3s4 : tmp1_elvis_lhs;
   }
-  function decodeWithImpl_7(_this__u8e3s4, u) {
+  function decodeWithImpl_9(_this__u8e3s4, u) {
     var id = {_v: null};
     var domain = {_v: null};
-    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_7(id, domain));
+    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_9(id, domain));
     if (id._v == null) {
       throw Companion_getInstance().missingRequiredField('id');
     }
@@ -9664,7 +11055,7 @@
     }
     return new QualifiedUserId(ensureNotNull(id._v), ensureNotNull(domain._v), unknownFields);
   }
-  function protoMergeImpl_8(_this__u8e3s4, plus) {
+  function protoMergeImpl_10(_this__u8e3s4, plus) {
     var tmp0_safe_receiver = plus instanceof QualifiedConversationId ? plus : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -9682,10 +11073,10 @@
     var tmp1_elvis_lhs = tmp;
     return tmp1_elvis_lhs == null ? _this__u8e3s4 : tmp1_elvis_lhs;
   }
-  function decodeWithImpl_8(_this__u8e3s4, u) {
+  function decodeWithImpl_10(_this__u8e3s4, u) {
     var id = {_v: null};
     var domain = {_v: null};
-    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_8(id, domain));
+    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_10(id, domain));
     if (id._v == null) {
       throw Companion_getInstance().missingRequiredField('id');
     }
@@ -9694,7 +11085,7 @@
     }
     return new QualifiedConversationId(ensureNotNull(id._v), ensureNotNull(domain._v), unknownFields);
   }
-  function protoMergeImpl_9(_this__u8e3s4, plus_1) {
+  function protoMergeImpl_11(_this__u8e3s4, plus_1) {
     var tmp0_safe_receiver = plus_1 instanceof Composite_0 ? plus_1 : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -9717,13 +11108,13 @@
     var tmp1_elvis_lhs_0 = tmp;
     return tmp1_elvis_lhs_0 == null ? _this__u8e3s4 : tmp1_elvis_lhs_0;
   }
-  function decodeWithImpl_9(_this__u8e3s4, u) {
+  function decodeWithImpl_11(_this__u8e3s4, u) {
     var items = {_v: null};
     var expectsReadConfirmation = {_v: null};
     var legalHoldStatus = {_v: null};
     var unknownFields = u.readMessage_fttc7y_k$(
       _this__u8e3s4,
-      decodeWithImpl$lambda_9(items, expectsReadConfirmation, legalHoldStatus),
+      decodeWithImpl$lambda_11(items, expectsReadConfirmation, legalHoldStatus),
     );
     return new Composite_0(
       Companion_getInstance_0().fixed(items._v),
@@ -9732,7 +11123,7 @@
       unknownFields,
     );
   }
-  function protoMergeImpl_10(_this__u8e3s4, plus) {
+  function protoMergeImpl_12(_this__u8e3s4, plus) {
     var tmp0_safe_receiver = plus instanceof Item ? plus : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -9777,12 +11168,12 @@
     var tmp1_elvis_lhs = tmp;
     return tmp1_elvis_lhs == null ? _this__u8e3s4 : tmp1_elvis_lhs;
   }
-  function decodeWithImpl_10(_this__u8e3s4, u) {
+  function decodeWithImpl_12(_this__u8e3s4, u) {
     var content = {_v: null};
-    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_10(content));
+    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_12(content));
     return new Item(content._v, unknownFields);
   }
-  function protoMergeImpl_11(_this__u8e3s4, plus) {
+  function protoMergeImpl_13(_this__u8e3s4, plus) {
     var tmp0_safe_receiver = plus instanceof Button_0 ? plus : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -9800,10 +11191,10 @@
     var tmp1_elvis_lhs = tmp;
     return tmp1_elvis_lhs == null ? _this__u8e3s4 : tmp1_elvis_lhs;
   }
-  function decodeWithImpl_11(_this__u8e3s4, u) {
+  function decodeWithImpl_13(_this__u8e3s4, u) {
     var text = {_v: null};
     var id = {_v: null};
-    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_11(text, id));
+    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_13(text, id));
     if (text._v == null) {
       throw Companion_getInstance().missingRequiredField('text');
     }
@@ -9812,7 +11203,7 @@
     }
     return new Button_0(ensureNotNull(text._v), ensureNotNull(id._v), unknownFields);
   }
-  function protoMergeImpl_12(_this__u8e3s4, plus) {
+  function protoMergeImpl_14(_this__u8e3s4, plus) {
     var tmp0_safe_receiver = plus instanceof ButtonAction_0 ? plus : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -9830,10 +11221,10 @@
     var tmp1_elvis_lhs = tmp;
     return tmp1_elvis_lhs == null ? _this__u8e3s4 : tmp1_elvis_lhs;
   }
-  function decodeWithImpl_12(_this__u8e3s4, u) {
+  function decodeWithImpl_14(_this__u8e3s4, u) {
     var buttonId = {_v: null};
     var referenceMessageId = {_v: null};
-    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_12(buttonId, referenceMessageId));
+    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_14(buttonId, referenceMessageId));
     if (buttonId._v == null) {
       throw Companion_getInstance().missingRequiredField('button_id');
     }
@@ -9842,7 +11233,7 @@
     }
     return new ButtonAction_0(ensureNotNull(buttonId._v), ensureNotNull(referenceMessageId._v), unknownFields);
   }
-  function protoMergeImpl_13(_this__u8e3s4, plus) {
+  function protoMergeImpl_15(_this__u8e3s4, plus) {
     var tmp0_safe_receiver = plus instanceof ButtonActionConfirmation_0 ? plus : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -9861,16 +11252,16 @@
     var tmp1_elvis_lhs = tmp;
     return tmp1_elvis_lhs == null ? _this__u8e3s4 : tmp1_elvis_lhs;
   }
-  function decodeWithImpl_13(_this__u8e3s4, u) {
+  function decodeWithImpl_15(_this__u8e3s4, u) {
     var referenceMessageId = {_v: null};
     var buttonId = {_v: null};
-    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_13(referenceMessageId, buttonId));
+    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_15(referenceMessageId, buttonId));
     if (referenceMessageId._v == null) {
       throw Companion_getInstance().missingRequiredField('reference_message_id');
     }
     return new ButtonActionConfirmation_0(ensureNotNull(referenceMessageId._v), buttonId._v, unknownFields);
   }
-  function protoMergeImpl_14(_this__u8e3s4, plus) {
+  function protoMergeImpl_16(_this__u8e3s4, plus) {
     var tmp0_safe_receiver = plus instanceof Availability_0 ? plus : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -9884,15 +11275,15 @@
     var tmp1_elvis_lhs = tmp;
     return tmp1_elvis_lhs == null ? _this__u8e3s4 : tmp1_elvis_lhs;
   }
-  function decodeWithImpl_14(_this__u8e3s4, u) {
+  function decodeWithImpl_16(_this__u8e3s4, u) {
     var type = {_v: null};
-    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_14(type));
+    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_16(type));
     if (type._v == null) {
       throw Companion_getInstance().missingRequiredField('type');
     }
     return new Availability_0(ensureNotNull(type._v), unknownFields);
   }
-  function protoMergeImpl_15(_this__u8e3s4, plus) {
+  function protoMergeImpl_17(_this__u8e3s4, plus) {
     var tmp0_safe_receiver = plus instanceof Ephemeral_0 ? plus : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -9943,27 +11334,27 @@
           } else {
             var tmp_10;
             var tmp_11 = _this__u8e3s4.content;
-            if (tmp_11 instanceof Asset_0) {
+            if (tmp_11 instanceof Asset_1) {
               var tmp_12 = plus.content;
-              tmp_10 = tmp_12 instanceof Asset_0;
+              tmp_10 = tmp_12 instanceof Asset_1;
             } else {
               tmp_10 = false;
             }
             if (tmp_10) {
-              tmp_0 = new Asset_0(
+              tmp_0 = new Asset_1(
                 _this__u8e3s4.content.get_value_j01efc_k$().plus_fj0q1z_k$(plus.content.get_value_j01efc_k$()),
               );
             } else {
               var tmp_13;
               var tmp_14 = _this__u8e3s4.content;
-              if (tmp_14 instanceof Location_0) {
+              if (tmp_14 instanceof Location_1) {
                 var tmp_15 = plus.content;
-                tmp_13 = tmp_15 instanceof Location_0;
+                tmp_13 = tmp_15 instanceof Location_1;
               } else {
                 tmp_13 = false;
               }
               if (tmp_13) {
-                tmp_0 = new Location_0(
+                tmp_0 = new Location_1(
                   _this__u8e3s4.content.get_value_j01efc_k$().plus_fj0q1z_k$(plus.content.get_value_j01efc_k$()),
                 );
               } else {
@@ -9983,16 +11374,16 @@
     var tmp1_elvis_lhs = tmp;
     return tmp1_elvis_lhs == null ? _this__u8e3s4 : tmp1_elvis_lhs;
   }
-  function decodeWithImpl_15(_this__u8e3s4, u) {
+  function decodeWithImpl_17(_this__u8e3s4, u) {
     var expireAfterMillis = {_v: null};
     var content = {_v: null};
-    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_15(expireAfterMillis, content));
+    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_17(expireAfterMillis, content));
     if (expireAfterMillis._v == null) {
       throw Companion_getInstance().missingRequiredField('expire_after_millis');
     }
     return new Ephemeral_0(ensureNotNull(expireAfterMillis._v), content._v, unknownFields);
   }
-  function protoMergeImpl_16(_this__u8e3s4, plus_1) {
+  function protoMergeImpl_18(_this__u8e3s4, plus_1) {
     var tmp0_safe_receiver = plus_1 instanceof Text_3 ? plus_1 : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -10022,7 +11413,7 @@
     var tmp1_elvis_lhs_0 = tmp;
     return tmp1_elvis_lhs_0 == null ? _this__u8e3s4 : tmp1_elvis_lhs_0;
   }
-  function decodeWithImpl_16(_this__u8e3s4, u) {
+  function decodeWithImpl_18(_this__u8e3s4, u) {
     var content = {_v: null};
     var linkPreview = {_v: null};
     var mentions = {_v: null};
@@ -10031,7 +11422,7 @@
     var legalHoldStatus = {_v: null};
     var unknownFields = u.readMessage_fttc7y_k$(
       _this__u8e3s4,
-      decodeWithImpl$lambda_16(content, linkPreview, mentions, quote, expectsReadConfirmation, legalHoldStatus),
+      decodeWithImpl$lambda_18(content, linkPreview, mentions, quote, expectsReadConfirmation, legalHoldStatus),
     );
     if (content._v == null) {
       throw Companion_getInstance().missingRequiredField('content');
@@ -10046,7 +11437,7 @@
       unknownFields,
     );
   }
-  function protoMergeImpl_17(_this__u8e3s4, plus) {
+  function protoMergeImpl_19(_this__u8e3s4, plus) {
     var tmp0_safe_receiver = plus instanceof Knock_1 ? plus : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -10068,20 +11459,20 @@
     var tmp1_elvis_lhs_0 = tmp;
     return tmp1_elvis_lhs_0 == null ? _this__u8e3s4 : tmp1_elvis_lhs_0;
   }
-  function decodeWithImpl_17(_this__u8e3s4, u) {
+  function decodeWithImpl_19(_this__u8e3s4, u) {
     var hotKnock = {_v: null};
     var expectsReadConfirmation = {_v: null};
     var legalHoldStatus = {_v: null};
     var unknownFields = u.readMessage_fttc7y_k$(
       _this__u8e3s4,
-      decodeWithImpl$lambda_17(hotKnock, expectsReadConfirmation, legalHoldStatus),
+      decodeWithImpl$lambda_19(hotKnock, expectsReadConfirmation, legalHoldStatus),
     );
     if (hotKnock._v == null) {
       throw Companion_getInstance().missingRequiredField('hot_knock');
     }
     return new Knock_1(ensureNotNull(hotKnock._v), expectsReadConfirmation._v, legalHoldStatus._v, unknownFields);
   }
-  function protoMergeImpl_18(_this__u8e3s4, plus) {
+  function protoMergeImpl_20(_this__u8e3s4, plus) {
     var tmp0_safe_receiver = plus instanceof LinkPreview ? plus : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -10149,7 +11540,7 @@
     var tmp1_elvis_lhs_0 = tmp;
     return tmp1_elvis_lhs_0 == null ? _this__u8e3s4 : tmp1_elvis_lhs_0;
   }
-  function decodeWithImpl_18(_this__u8e3s4, u) {
+  function decodeWithImpl_20(_this__u8e3s4, u) {
     var url = {_v: null};
     var urlOffset = {_v: null};
     var permanentUrl = {_v: null};
@@ -10160,7 +11551,7 @@
     var metaData = {_v: null};
     var unknownFields = u.readMessage_fttc7y_k$(
       _this__u8e3s4,
-      decodeWithImpl$lambda_18(url, urlOffset, preview, permanentUrl, title, summary, image, metaData),
+      decodeWithImpl$lambda_20(url, urlOffset, preview, permanentUrl, title, summary, image, metaData),
     );
     if (url._v == null) {
       throw Companion_getInstance().missingRequiredField('url');
@@ -10180,7 +11571,7 @@
       unknownFields,
     );
   }
-  function protoMergeImpl_19(_this__u8e3s4, plus) {
+  function protoMergeImpl_21(_this__u8e3s4, plus) {
     var tmp0_safe_receiver = plus instanceof Tweet_0 ? plus : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -10201,13 +11592,13 @@
     var tmp1_elvis_lhs_0 = tmp;
     return tmp1_elvis_lhs_0 == null ? _this__u8e3s4 : tmp1_elvis_lhs_0;
   }
-  function decodeWithImpl_19(_this__u8e3s4, u) {
+  function decodeWithImpl_21(_this__u8e3s4, u) {
     var author = {_v: null};
     var username = {_v: null};
-    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_19(author, username));
+    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_21(author, username));
     return new Tweet_0(author._v, username._v, unknownFields);
   }
-  function protoMergeImpl_20(_this__u8e3s4, plus) {
+  function protoMergeImpl_22(_this__u8e3s4, plus) {
     var tmp0_safe_receiver = plus instanceof Article_0 ? plus : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -10233,21 +11624,21 @@
     var tmp1_elvis_lhs_0 = tmp;
     return tmp1_elvis_lhs_0 == null ? _this__u8e3s4 : tmp1_elvis_lhs_0;
   }
-  function decodeWithImpl_20(_this__u8e3s4, u) {
+  function decodeWithImpl_22(_this__u8e3s4, u) {
     var permanentUrl = {_v: null};
     var title = {_v: null};
     var summary = {_v: null};
     var image = {_v: null};
     var unknownFields = u.readMessage_fttc7y_k$(
       _this__u8e3s4,
-      decodeWithImpl$lambda_20(permanentUrl, title, summary, image),
+      decodeWithImpl$lambda_22(permanentUrl, title, summary, image),
     );
     if (permanentUrl._v == null) {
       throw Companion_getInstance().missingRequiredField('permanent_url');
     }
     return new Article_0(ensureNotNull(permanentUrl._v), title._v, summary._v, image._v, unknownFields);
   }
-  function protoMergeImpl_21(_this__u8e3s4, plus) {
+  function protoMergeImpl_23(_this__u8e3s4, plus) {
     var tmp0_safe_receiver = plus instanceof Mention ? plus : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -10272,14 +11663,14 @@
     var tmp1_elvis_lhs_0 = tmp;
     return tmp1_elvis_lhs_0 == null ? _this__u8e3s4 : tmp1_elvis_lhs_0;
   }
-  function decodeWithImpl_21(_this__u8e3s4, u) {
+  function decodeWithImpl_23(_this__u8e3s4, u) {
     var start = {_v: null};
     var length = {_v: null};
     var qualifiedUserId = {_v: null};
     var mentionType = {_v: null};
     var unknownFields = u.readMessage_fttc7y_k$(
       _this__u8e3s4,
-      decodeWithImpl$lambda_21(start, length, mentionType, qualifiedUserId),
+      decodeWithImpl$lambda_23(start, length, mentionType, qualifiedUserId),
     );
     if (start._v == null) {
       throw Companion_getInstance().missingRequiredField('start');
@@ -10295,94 +11686,8 @@
       unknownFields,
     );
   }
-  function protoMergeImpl_22(_this__u8e3s4, plus) {
-    var tmp0_safe_receiver = plus instanceof LastRead_0 ? plus : null;
-    var tmp;
-    if (tmp0_safe_receiver == null) {
-      tmp = null;
-    } else {
-      // Inline function 'kotlin.let' call
-      // Inline function 'kotlin.contracts.contract' call
-      // Inline function 'com.wire.kalium.protobuf.messages.protoMergeImpl.<anonymous>' call
-      var tmp0_safe_receiver_0 = _this__u8e3s4.qualifiedConversationId;
-      var tmp1_elvis_lhs =
-        tmp0_safe_receiver_0 == null ? null : tmp0_safe_receiver_0.plus_fj0q1z_k$(plus.qualifiedConversationId);
-      tmp = tmp0_safe_receiver.copy(
-        VOID,
-        VOID,
-        tmp1_elvis_lhs == null ? plus.qualifiedConversationId : tmp1_elvis_lhs,
-        plus_0(_this__u8e3s4.unknownFields_1, plus.get_unknownFields_kpu7i2_k$()),
-      );
-    }
-    var tmp1_elvis_lhs_0 = tmp;
-    return tmp1_elvis_lhs_0 == null ? _this__u8e3s4 : tmp1_elvis_lhs_0;
-  }
-  function decodeWithImpl_22(_this__u8e3s4, u) {
-    var conversationId = {_v: null};
-    var lastReadTimestamp = {_v: null};
-    var qualifiedConversationId = {_v: null};
-    var unknownFields = u.readMessage_fttc7y_k$(
-      _this__u8e3s4,
-      decodeWithImpl$lambda_22(conversationId, lastReadTimestamp, qualifiedConversationId),
-    );
-    if (conversationId._v == null) {
-      throw Companion_getInstance().missingRequiredField('conversation_id');
-    }
-    if (lastReadTimestamp._v == null) {
-      throw Companion_getInstance().missingRequiredField('last_read_timestamp');
-    }
-    return new LastRead_0(
-      ensureNotNull(conversationId._v),
-      ensureNotNull(lastReadTimestamp._v),
-      qualifiedConversationId._v,
-      unknownFields,
-    );
-  }
-  function protoMergeImpl_23(_this__u8e3s4, plus) {
-    var tmp0_safe_receiver = plus instanceof Cleared_0 ? plus : null;
-    var tmp;
-    if (tmp0_safe_receiver == null) {
-      tmp = null;
-    } else {
-      // Inline function 'kotlin.let' call
-      // Inline function 'kotlin.contracts.contract' call
-      // Inline function 'com.wire.kalium.protobuf.messages.protoMergeImpl.<anonymous>' call
-      var tmp0_safe_receiver_0 = _this__u8e3s4.qualifiedConversationId;
-      var tmp1_elvis_lhs =
-        tmp0_safe_receiver_0 == null ? null : tmp0_safe_receiver_0.plus_fj0q1z_k$(plus.qualifiedConversationId);
-      tmp = tmp0_safe_receiver.copy(
-        VOID,
-        VOID,
-        tmp1_elvis_lhs == null ? plus.qualifiedConversationId : tmp1_elvis_lhs,
-        plus_0(_this__u8e3s4.unknownFields_1, plus.get_unknownFields_kpu7i2_k$()),
-      );
-    }
-    var tmp1_elvis_lhs_0 = tmp;
-    return tmp1_elvis_lhs_0 == null ? _this__u8e3s4 : tmp1_elvis_lhs_0;
-  }
-  function decodeWithImpl_23(_this__u8e3s4, u) {
-    var conversationId = {_v: null};
-    var clearedTimestamp = {_v: null};
-    var qualifiedConversationId = {_v: null};
-    var unknownFields = u.readMessage_fttc7y_k$(
-      _this__u8e3s4,
-      decodeWithImpl$lambda_23(conversationId, clearedTimestamp, qualifiedConversationId),
-    );
-    if (conversationId._v == null) {
-      throw Companion_getInstance().missingRequiredField('conversation_id');
-    }
-    if (clearedTimestamp._v == null) {
-      throw Companion_getInstance().missingRequiredField('cleared_timestamp');
-    }
-    return new Cleared_0(
-      ensureNotNull(conversationId._v),
-      ensureNotNull(clearedTimestamp._v),
-      qualifiedConversationId._v,
-      unknownFields,
-    );
-  }
   function protoMergeImpl_24(_this__u8e3s4, plus) {
-    var tmp0_safe_receiver = plus instanceof MessageHide ? plus : null;
+    var tmp0_safe_receiver = plus instanceof LastRead_0 ? plus : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
       tmp = null;
@@ -10405,11 +11710,97 @@
   }
   function decodeWithImpl_24(_this__u8e3s4, u) {
     var conversationId = {_v: null};
+    var lastReadTimestamp = {_v: null};
+    var qualifiedConversationId = {_v: null};
+    var unknownFields = u.readMessage_fttc7y_k$(
+      _this__u8e3s4,
+      decodeWithImpl$lambda_24(conversationId, lastReadTimestamp, qualifiedConversationId),
+    );
+    if (conversationId._v == null) {
+      throw Companion_getInstance().missingRequiredField('conversation_id');
+    }
+    if (lastReadTimestamp._v == null) {
+      throw Companion_getInstance().missingRequiredField('last_read_timestamp');
+    }
+    return new LastRead_0(
+      ensureNotNull(conversationId._v),
+      ensureNotNull(lastReadTimestamp._v),
+      qualifiedConversationId._v,
+      unknownFields,
+    );
+  }
+  function protoMergeImpl_25(_this__u8e3s4, plus) {
+    var tmp0_safe_receiver = plus instanceof Cleared_0 ? plus : null;
+    var tmp;
+    if (tmp0_safe_receiver == null) {
+      tmp = null;
+    } else {
+      // Inline function 'kotlin.let' call
+      // Inline function 'kotlin.contracts.contract' call
+      // Inline function 'com.wire.kalium.protobuf.messages.protoMergeImpl.<anonymous>' call
+      var tmp0_safe_receiver_0 = _this__u8e3s4.qualifiedConversationId;
+      var tmp1_elvis_lhs =
+        tmp0_safe_receiver_0 == null ? null : tmp0_safe_receiver_0.plus_fj0q1z_k$(plus.qualifiedConversationId);
+      tmp = tmp0_safe_receiver.copy(
+        VOID,
+        VOID,
+        tmp1_elvis_lhs == null ? plus.qualifiedConversationId : tmp1_elvis_lhs,
+        plus_0(_this__u8e3s4.unknownFields_1, plus.get_unknownFields_kpu7i2_k$()),
+      );
+    }
+    var tmp1_elvis_lhs_0 = tmp;
+    return tmp1_elvis_lhs_0 == null ? _this__u8e3s4 : tmp1_elvis_lhs_0;
+  }
+  function decodeWithImpl_25(_this__u8e3s4, u) {
+    var conversationId = {_v: null};
+    var clearedTimestamp = {_v: null};
+    var qualifiedConversationId = {_v: null};
+    var unknownFields = u.readMessage_fttc7y_k$(
+      _this__u8e3s4,
+      decodeWithImpl$lambda_25(conversationId, clearedTimestamp, qualifiedConversationId),
+    );
+    if (conversationId._v == null) {
+      throw Companion_getInstance().missingRequiredField('conversation_id');
+    }
+    if (clearedTimestamp._v == null) {
+      throw Companion_getInstance().missingRequiredField('cleared_timestamp');
+    }
+    return new Cleared_0(
+      ensureNotNull(conversationId._v),
+      ensureNotNull(clearedTimestamp._v),
+      qualifiedConversationId._v,
+      unknownFields,
+    );
+  }
+  function protoMergeImpl_26(_this__u8e3s4, plus) {
+    var tmp0_safe_receiver = plus instanceof MessageHide ? plus : null;
+    var tmp;
+    if (tmp0_safe_receiver == null) {
+      tmp = null;
+    } else {
+      // Inline function 'kotlin.let' call
+      // Inline function 'kotlin.contracts.contract' call
+      // Inline function 'com.wire.kalium.protobuf.messages.protoMergeImpl.<anonymous>' call
+      var tmp0_safe_receiver_0 = _this__u8e3s4.qualifiedConversationId;
+      var tmp1_elvis_lhs =
+        tmp0_safe_receiver_0 == null ? null : tmp0_safe_receiver_0.plus_fj0q1z_k$(plus.qualifiedConversationId);
+      tmp = tmp0_safe_receiver.copy(
+        VOID,
+        VOID,
+        tmp1_elvis_lhs == null ? plus.qualifiedConversationId : tmp1_elvis_lhs,
+        plus_0(_this__u8e3s4.unknownFields_1, plus.get_unknownFields_kpu7i2_k$()),
+      );
+    }
+    var tmp1_elvis_lhs_0 = tmp;
+    return tmp1_elvis_lhs_0 == null ? _this__u8e3s4 : tmp1_elvis_lhs_0;
+  }
+  function decodeWithImpl_26(_this__u8e3s4, u) {
+    var conversationId = {_v: null};
     var messageId = {_v: null};
     var qualifiedConversationId = {_v: null};
     var unknownFields = u.readMessage_fttc7y_k$(
       _this__u8e3s4,
-      decodeWithImpl$lambda_24(conversationId, messageId, qualifiedConversationId),
+      decodeWithImpl$lambda_26(conversationId, messageId, qualifiedConversationId),
     );
     if (conversationId._v == null) {
       throw Companion_getInstance().missingRequiredField('conversation_id');
@@ -10424,7 +11815,7 @@
       unknownFields,
     );
   }
-  function protoMergeImpl_25(_this__u8e3s4, plus) {
+  function protoMergeImpl_27(_this__u8e3s4, plus) {
     var tmp0_safe_receiver = plus instanceof MessageDelete ? plus : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -10438,15 +11829,15 @@
     var tmp1_elvis_lhs = tmp;
     return tmp1_elvis_lhs == null ? _this__u8e3s4 : tmp1_elvis_lhs;
   }
-  function decodeWithImpl_25(_this__u8e3s4, u) {
+  function decodeWithImpl_27(_this__u8e3s4, u) {
     var messageId = {_v: null};
-    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_25(messageId));
+    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_27(messageId));
     if (messageId._v == null) {
       throw Companion_getInstance().missingRequiredField('message_id');
     }
     return new MessageDelete(ensureNotNull(messageId._v), unknownFields);
   }
-  function protoMergeImpl_26(_this__u8e3s4, plus) {
+  function protoMergeImpl_28(_this__u8e3s4, plus) {
     var tmp0_safe_receiver = plus instanceof MessageEdit ? plus : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -10495,16 +11886,16 @@
     var tmp1_elvis_lhs = tmp;
     return tmp1_elvis_lhs == null ? _this__u8e3s4 : tmp1_elvis_lhs;
   }
-  function decodeWithImpl_26(_this__u8e3s4, u) {
+  function decodeWithImpl_28(_this__u8e3s4, u) {
     var replacingMessageId = {_v: null};
     var content = {_v: null};
-    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_26(replacingMessageId, content));
+    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_28(replacingMessageId, content));
     if (replacingMessageId._v == null) {
       throw Companion_getInstance().missingRequiredField('replacing_message_id');
     }
     return new MessageEdit(ensureNotNull(replacingMessageId._v), content._v, unknownFields);
   }
-  function protoMergeImpl_27(_this__u8e3s4, plus) {
+  function protoMergeImpl_29(_this__u8e3s4, plus) {
     var tmp0_safe_receiver = plus instanceof Quote ? plus : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -10523,19 +11914,19 @@
     var tmp1_elvis_lhs = tmp;
     return tmp1_elvis_lhs == null ? _this__u8e3s4 : tmp1_elvis_lhs;
   }
-  function decodeWithImpl_27(_this__u8e3s4, u) {
+  function decodeWithImpl_29(_this__u8e3s4, u) {
     var quotedMessageId = {_v: null};
     var quotedMessageSha256 = {_v: null};
     var unknownFields = u.readMessage_fttc7y_k$(
       _this__u8e3s4,
-      decodeWithImpl$lambda_27(quotedMessageId, quotedMessageSha256),
+      decodeWithImpl$lambda_29(quotedMessageId, quotedMessageSha256),
     );
     if (quotedMessageId._v == null) {
       throw Companion_getInstance().missingRequiredField('quoted_message_id');
     }
     return new Quote(ensureNotNull(quotedMessageId._v), quotedMessageSha256._v, unknownFields);
   }
-  function protoMergeImpl_28(_this__u8e3s4, plus_1) {
+  function protoMergeImpl_30(_this__u8e3s4, plus_1) {
     var tmp0_safe_receiver = plus_1 instanceof Confirmation_0 ? plus_1 : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -10554,13 +11945,13 @@
     var tmp1_elvis_lhs = tmp;
     return tmp1_elvis_lhs == null ? _this__u8e3s4 : tmp1_elvis_lhs;
   }
-  function decodeWithImpl_28(_this__u8e3s4, u) {
+  function decodeWithImpl_30(_this__u8e3s4, u) {
     var type = {_v: null};
     var firstMessageId = {_v: null};
     var moreMessageIds = {_v: null};
     var unknownFields = u.readMessage_fttc7y_k$(
       _this__u8e3s4,
-      decodeWithImpl$lambda_28(firstMessageId, type, moreMessageIds),
+      decodeWithImpl$lambda_30(firstMessageId, type, moreMessageIds),
     );
     if (type._v == null) {
       throw Companion_getInstance().missingRequiredField('type');
@@ -10575,8 +11966,8 @@
       unknownFields,
     );
   }
-  function protoMergeImpl_29(_this__u8e3s4, plus) {
-    var tmp0_safe_receiver = plus instanceof Location_1 ? plus : null;
+  function protoMergeImpl_31(_this__u8e3s4, plus) {
+    var tmp0_safe_receiver = plus instanceof Location_2 ? plus : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
       tmp = null;
@@ -10604,7 +11995,7 @@
     var tmp1_elvis_lhs_0 = tmp;
     return tmp1_elvis_lhs_0 == null ? _this__u8e3s4 : tmp1_elvis_lhs_0;
   }
-  function decodeWithImpl_29(_this__u8e3s4, u) {
+  function decodeWithImpl_31(_this__u8e3s4, u) {
     var longitude = {_v: null};
     var latitude = {_v: null};
     var name = {_v: null};
@@ -10613,7 +12004,7 @@
     var legalHoldStatus = {_v: null};
     var unknownFields = u.readMessage_fttc7y_k$(
       _this__u8e3s4,
-      decodeWithImpl$lambda_29(longitude, latitude, name, zoom, expectsReadConfirmation, legalHoldStatus),
+      decodeWithImpl$lambda_31(longitude, latitude, name, zoom, expectsReadConfirmation, legalHoldStatus),
     );
     if (longitude._v == null) {
       throw Companion_getInstance().missingRequiredField('longitude');
@@ -10621,7 +12012,7 @@
     if (latitude._v == null) {
       throw Companion_getInstance().missingRequiredField('latitude');
     }
-    return new Location_1(
+    return new Location_2(
       ensureNotNull(longitude._v),
       ensureNotNull(latitude._v),
       name._v,
@@ -10631,7 +12022,7 @@
       unknownFields,
     );
   }
-  function protoMergeImpl_30(_this__u8e3s4, plus) {
+  function protoMergeImpl_32(_this__u8e3s4, plus) {
     var tmp0_safe_receiver = plus instanceof ImageAsset ? plus : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -10665,7 +12056,7 @@
     var tmp1_elvis_lhs_0 = tmp;
     return tmp1_elvis_lhs_0 == null ? _this__u8e3s4 : tmp1_elvis_lhs_0;
   }
-  function decodeWithImpl_30(_this__u8e3s4, u) {
+  function decodeWithImpl_32(_this__u8e3s4, u) {
     var tag = {_v: null};
     var width = {_v: null};
     var height = {_v: null};
@@ -10679,7 +12070,7 @@
     var sha256 = {_v: null};
     var unknownFields = u.readMessage_fttc7y_k$(
       _this__u8e3s4,
-      decodeWithImpl$lambda_30(
+      decodeWithImpl$lambda_32(
         tag,
         width,
         height,
@@ -10729,8 +12120,8 @@
       unknownFields,
     );
   }
-  function protoMergeImpl_31(_this__u8e3s4, plus) {
-    var tmp0_safe_receiver = plus instanceof Asset_1 ? plus : null;
+  function protoMergeImpl_33(_this__u8e3s4, plus) {
+    var tmp0_safe_receiver = plus instanceof Asset_2 ? plus : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
       tmp = null;
@@ -10777,7 +12168,7 @@
     var tmp1_elvis_lhs_0 = tmp;
     return tmp1_elvis_lhs_0 == null ? _this__u8e3s4 : tmp1_elvis_lhs_0;
   }
-  function decodeWithImpl_31(_this__u8e3s4, u) {
+  function decodeWithImpl_33(_this__u8e3s4, u) {
     var original = {_v: null};
     var preview = {_v: null};
     var expectsReadConfirmation = {_v: null};
@@ -10785,9 +12176,9 @@
     var status = {_v: null};
     var unknownFields = u.readMessage_fttc7y_k$(
       _this__u8e3s4,
-      decodeWithImpl$lambda_31(original, status, preview, expectsReadConfirmation, legalHoldStatus),
+      decodeWithImpl$lambda_33(original, status, preview, expectsReadConfirmation, legalHoldStatus),
     );
-    return new Asset_1(
+    return new Asset_2(
       original._v,
       preview._v,
       expectsReadConfirmation._v,
@@ -10796,7 +12187,7 @@
       unknownFields,
     );
   }
-  function protoMergeImpl_32(_this__u8e3s4, plus) {
+  function protoMergeImpl_34(_this__u8e3s4, plus) {
     var tmp0_safe_receiver = plus instanceof Original ? plus : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -10869,7 +12260,7 @@
     var tmp1_elvis_lhs_0 = tmp;
     return tmp1_elvis_lhs_0 == null ? _this__u8e3s4 : tmp1_elvis_lhs_0;
   }
-  function decodeWithImpl_32(_this__u8e3s4, u) {
+  function decodeWithImpl_34(_this__u8e3s4, u) {
     var mimeType = {_v: null};
     var size = {_v: null};
     var name = {_v: null};
@@ -10878,7 +12269,7 @@
     var metaData = {_v: null};
     var unknownFields = u.readMessage_fttc7y_k$(
       _this__u8e3s4,
-      decodeWithImpl$lambda_32(mimeType, size, name, metaData, source, caption),
+      decodeWithImpl$lambda_34(mimeType, size, name, metaData, source, caption),
     );
     if (mimeType._v == null) {
       throw Companion_getInstance().missingRequiredField('mime_type');
@@ -10896,7 +12287,7 @@
       unknownFields,
     );
   }
-  function protoMergeImpl_33(_this__u8e3s4, plus) {
+  function protoMergeImpl_35(_this__u8e3s4, plus) {
     var tmp0_safe_receiver = plus instanceof Preview_0 ? plus : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -10936,14 +12327,14 @@
     var tmp1_elvis_lhs_0 = tmp;
     return tmp1_elvis_lhs_0 == null ? _this__u8e3s4 : tmp1_elvis_lhs_0;
   }
-  function decodeWithImpl_33(_this__u8e3s4, u) {
+  function decodeWithImpl_35(_this__u8e3s4, u) {
     var mimeType = {_v: null};
     var size = {_v: null};
     var remote = {_v: null};
     var metaData = {_v: null};
     var unknownFields = u.readMessage_fttc7y_k$(
       _this__u8e3s4,
-      decodeWithImpl$lambda_33(mimeType, size, remote, metaData),
+      decodeWithImpl$lambda_35(mimeType, size, remote, metaData),
     );
     if (mimeType._v == null) {
       throw Companion_getInstance().missingRequiredField('mime_type');
@@ -10953,7 +12344,7 @@
     }
     return new Preview_0(ensureNotNull(mimeType._v), ensureNotNull(size._v), remote._v, metaData._v, unknownFields);
   }
-  function protoMergeImpl_34(_this__u8e3s4, plus) {
+  function protoMergeImpl_36(_this__u8e3s4, plus) {
     var tmp0_safe_receiver = plus instanceof ImageMetaData ? plus : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -10973,11 +12364,11 @@
     var tmp1_elvis_lhs = tmp;
     return tmp1_elvis_lhs == null ? _this__u8e3s4 : tmp1_elvis_lhs;
   }
-  function decodeWithImpl_34(_this__u8e3s4, u) {
+  function decodeWithImpl_36(_this__u8e3s4, u) {
     var width = {_v: null};
     var height = {_v: null};
     var tag = {_v: null};
-    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_34(width, height, tag));
+    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_36(width, height, tag));
     if (width._v == null) {
       throw Companion_getInstance().missingRequiredField('width');
     }
@@ -10986,7 +12377,7 @@
     }
     return new ImageMetaData(ensureNotNull(width._v), ensureNotNull(height._v), tag._v, unknownFields);
   }
-  function protoMergeImpl_35(_this__u8e3s4, plus) {
+  function protoMergeImpl_37(_this__u8e3s4, plus) {
     var tmp0_safe_receiver = plus instanceof VideoMetaData ? plus : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -11010,17 +12401,17 @@
     var tmp1_elvis_lhs_0 = tmp;
     return tmp1_elvis_lhs_0 == null ? _this__u8e3s4 : tmp1_elvis_lhs_0;
   }
-  function decodeWithImpl_35(_this__u8e3s4, u) {
+  function decodeWithImpl_37(_this__u8e3s4, u) {
     var width = {_v: null};
     var height = {_v: null};
     var durationInMillis = {_v: null};
     var unknownFields = u.readMessage_fttc7y_k$(
       _this__u8e3s4,
-      decodeWithImpl$lambda_35(width, height, durationInMillis),
+      decodeWithImpl$lambda_37(width, height, durationInMillis),
     );
     return new VideoMetaData(width._v, height._v, durationInMillis._v, unknownFields);
   }
-  function protoMergeImpl_36(_this__u8e3s4, plus) {
+  function protoMergeImpl_38(_this__u8e3s4, plus) {
     var tmp0_safe_receiver = plus instanceof AudioMetaData ? plus : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -11041,16 +12432,16 @@
     var tmp1_elvis_lhs_0 = tmp;
     return tmp1_elvis_lhs_0 == null ? _this__u8e3s4 : tmp1_elvis_lhs_0;
   }
-  function decodeWithImpl_36(_this__u8e3s4, u) {
+  function decodeWithImpl_38(_this__u8e3s4, u) {
     var durationInMillis = {_v: null};
     var normalizedLoudness = {_v: null};
     var unknownFields = u.readMessage_fttc7y_k$(
       _this__u8e3s4,
-      decodeWithImpl$lambda_36(durationInMillis, normalizedLoudness),
+      decodeWithImpl$lambda_38(durationInMillis, normalizedLoudness),
     );
     return new AudioMetaData(durationInMillis._v, normalizedLoudness._v, unknownFields);
   }
-  function protoMergeImpl_37(_this__u8e3s4, plus) {
+  function protoMergeImpl_39(_this__u8e3s4, plus) {
     var tmp0_safe_receiver = plus instanceof RemoteData ? plus : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -11079,7 +12470,7 @@
     var tmp1_elvis_lhs_0 = tmp;
     return tmp1_elvis_lhs_0 == null ? _this__u8e3s4 : tmp1_elvis_lhs_0;
   }
-  function decodeWithImpl_37(_this__u8e3s4, u) {
+  function decodeWithImpl_39(_this__u8e3s4, u) {
     var otrKey = {_v: null};
     var sha256 = {_v: null};
     var assetId = {_v: null};
@@ -11088,7 +12479,7 @@
     var encryption = {_v: null};
     var unknownFields = u.readMessage_fttc7y_k$(
       _this__u8e3s4,
-      decodeWithImpl$lambda_37(otrKey, sha256, assetId, assetToken, encryption, assetDomain),
+      decodeWithImpl$lambda_39(otrKey, sha256, assetId, assetToken, encryption, assetDomain),
     );
     if (otrKey._v == null) {
       throw Companion_getInstance().missingRequiredField('otr_key');
@@ -11106,7 +12497,7 @@
       unknownFields,
     );
   }
-  function protoMergeImpl_38(_this__u8e3s4, plus) {
+  function protoMergeImpl_40(_this__u8e3s4, plus) {
     var tmp0_safe_receiver = plus instanceof External_0 ? plus : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -11128,17 +12519,17 @@
     var tmp1_elvis_lhs_0 = tmp;
     return tmp1_elvis_lhs_0 == null ? _this__u8e3s4 : tmp1_elvis_lhs_0;
   }
-  function decodeWithImpl_38(_this__u8e3s4, u) {
+  function decodeWithImpl_40(_this__u8e3s4, u) {
     var otrKey = {_v: null};
     var sha256 = {_v: null};
     var encryption = {_v: null};
-    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_38(otrKey, sha256, encryption));
+    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_40(otrKey, sha256, encryption));
     if (otrKey._v == null) {
       throw Companion_getInstance().missingRequiredField('otr_key');
     }
     return new External_0(ensureNotNull(otrKey._v), sha256._v, encryption._v, unknownFields);
   }
-  function protoMergeImpl_39(_this__u8e3s4, plus) {
+  function protoMergeImpl_41(_this__u8e3s4, plus) {
     var tmp0_safe_receiver = plus instanceof Reaction_0 ? plus : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -11160,20 +12551,20 @@
     var tmp1_elvis_lhs_0 = tmp;
     return tmp1_elvis_lhs_0 == null ? _this__u8e3s4 : tmp1_elvis_lhs_0;
   }
-  function decodeWithImpl_39(_this__u8e3s4, u) {
+  function decodeWithImpl_41(_this__u8e3s4, u) {
     var emoji = {_v: null};
     var messageId = {_v: null};
     var legalHoldStatus = {_v: null};
     var unknownFields = u.readMessage_fttc7y_k$(
       _this__u8e3s4,
-      decodeWithImpl$lambda_39(emoji, messageId, legalHoldStatus),
+      decodeWithImpl$lambda_41(emoji, messageId, legalHoldStatus),
     );
     if (messageId._v == null) {
       throw Companion_getInstance().missingRequiredField('message_id');
     }
     return new Reaction_0(emoji._v, ensureNotNull(messageId._v), legalHoldStatus._v, unknownFields);
   }
-  function protoMergeImpl_40(_this__u8e3s4, plus) {
+  function protoMergeImpl_42(_this__u8e3s4, plus) {
     var tmp0_safe_receiver = plus instanceof Calling_0 ? plus : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -11194,19 +12585,19 @@
     var tmp1_elvis_lhs_0 = tmp;
     return tmp1_elvis_lhs_0 == null ? _this__u8e3s4 : tmp1_elvis_lhs_0;
   }
-  function decodeWithImpl_40(_this__u8e3s4, u) {
+  function decodeWithImpl_42(_this__u8e3s4, u) {
     var content = {_v: null};
     var qualifiedConversationId = {_v: null};
     var unknownFields = u.readMessage_fttc7y_k$(
       _this__u8e3s4,
-      decodeWithImpl$lambda_40(content, qualifiedConversationId),
+      decodeWithImpl$lambda_42(content, qualifiedConversationId),
     );
     if (content._v == null) {
       throw Companion_getInstance().missingRequiredField('content');
     }
     return new Calling_0(ensureNotNull(content._v), qualifiedConversationId._v, unknownFields);
   }
-  function protoMergeImpl_41(_this__u8e3s4, plus) {
+  function protoMergeImpl_43(_this__u8e3s4, plus) {
     var tmp0_safe_receiver = plus instanceof DataTransfer_0 ? plus : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -11226,12 +12617,12 @@
     var tmp1_elvis_lhs_0 = tmp;
     return tmp1_elvis_lhs_0 == null ? _this__u8e3s4 : tmp1_elvis_lhs_0;
   }
-  function decodeWithImpl_41(_this__u8e3s4, u) {
+  function decodeWithImpl_43(_this__u8e3s4, u) {
     var trackingIdentifier = {_v: null};
-    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_41(trackingIdentifier));
+    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_43(trackingIdentifier));
     return new DataTransfer_0(trackingIdentifier._v, unknownFields);
   }
-  function protoMergeImpl_42(_this__u8e3s4, plus) {
+  function protoMergeImpl_44(_this__u8e3s4, plus) {
     var tmp0_safe_receiver = plus instanceof TrackingIdentifier ? plus : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -11245,15 +12636,15 @@
     var tmp1_elvis_lhs = tmp;
     return tmp1_elvis_lhs == null ? _this__u8e3s4 : tmp1_elvis_lhs;
   }
-  function decodeWithImpl_42(_this__u8e3s4, u) {
+  function decodeWithImpl_44(_this__u8e3s4, u) {
     var identifier = {_v: null};
-    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_42(identifier));
+    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_44(identifier));
     if (identifier._v == null) {
       throw Companion_getInstance().missingRequiredField('identifier');
     }
     return new TrackingIdentifier(ensureNotNull(identifier._v), unknownFields);
   }
-  function decodeWithImpl$lambda_6($messageId, $content) {
+  function decodeWithImpl$lambda_8($messageId, $content, $unknownStrategy) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       switch (_fieldNumber) {
@@ -11294,7 +12685,7 @@
           tmp = Unit_getInstance();
           break;
         case 11:
-          $content._v = new Asset(_fieldValue instanceof Asset_1 ? _fieldValue : THROW_CCE());
+          $content._v = new Asset_0(_fieldValue instanceof Asset_2 ? _fieldValue : THROW_CCE());
           tmp = Unit_getInstance();
           break;
         case 12:
@@ -11302,7 +12693,7 @@
           tmp = Unit_getInstance();
           break;
         case 13:
-          $content._v = new Location(_fieldValue instanceof Location_1 ? _fieldValue : THROW_CCE());
+          $content._v = new Location_0(_fieldValue instanceof Location_2 ? _fieldValue : THROW_CCE());
           tmp = Unit_getInstance();
           break;
         case 14:
@@ -11347,11 +12738,15 @@
           $content._v = new DataTransfer(_fieldValue instanceof DataTransfer_0 ? _fieldValue : THROW_CCE());
           tmp = Unit_getInstance();
           break;
+        case 24:
+          $unknownStrategy._v = _fieldValue instanceof UnknownStrategy ? _fieldValue : THROW_CCE();
+          tmp = Unit_getInstance();
+          break;
       }
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_7($id, $domain) {
+  function decodeWithImpl$lambda_9($id, $domain) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       if (_fieldNumber === 1) {
@@ -11364,7 +12759,7 @@
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_8($id, $domain) {
+  function decodeWithImpl$lambda_10($id, $domain) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       if (_fieldNumber === 1) {
@@ -11377,7 +12772,7 @@
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_9($items, $expectsReadConfirmation, $legalHoldStatus) {
+  function decodeWithImpl$lambda_11($items, $expectsReadConfirmation, $legalHoldStatus) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       switch (_fieldNumber) {
@@ -11409,7 +12804,7 @@
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_10($content) {
+  function decodeWithImpl$lambda_12($content) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       if (_fieldNumber === 1) {
@@ -11422,7 +12817,7 @@
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_11($text, $id) {
+  function decodeWithImpl$lambda_13($text, $id) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       if (_fieldNumber === 1) {
@@ -11435,7 +12830,7 @@
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_12($buttonId, $referenceMessageId) {
+  function decodeWithImpl$lambda_14($buttonId, $referenceMessageId) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       if (_fieldNumber === 1) {
@@ -11448,7 +12843,7 @@
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_13($referenceMessageId, $buttonId) {
+  function decodeWithImpl$lambda_15($referenceMessageId, $buttonId) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       if (_fieldNumber === 1) {
@@ -11461,7 +12856,7 @@
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_14($type) {
+  function decodeWithImpl$lambda_16($type) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       if (_fieldNumber === 1) {
@@ -11471,7 +12866,7 @@
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_15($expireAfterMillis, $content) {
+  function decodeWithImpl$lambda_17($expireAfterMillis, $content) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       switch (_fieldNumber) {
@@ -11492,18 +12887,18 @@
           tmp = Unit_getInstance();
           break;
         case 5:
-          $content._v = new Asset_0(_fieldValue instanceof Asset_1 ? _fieldValue : THROW_CCE());
+          $content._v = new Asset_1(_fieldValue instanceof Asset_2 ? _fieldValue : THROW_CCE());
           tmp = Unit_getInstance();
           break;
         case 6:
-          $content._v = new Location_0(_fieldValue instanceof Location_1 ? _fieldValue : THROW_CCE());
+          $content._v = new Location_1(_fieldValue instanceof Location_2 ? _fieldValue : THROW_CCE());
           tmp = Unit_getInstance();
           break;
       }
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_16(
+  function decodeWithImpl$lambda_18(
     $content,
     $linkPreview,
     $mentions,
@@ -11566,7 +12961,7 @@
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_17($hotKnock, $expectsReadConfirmation, $legalHoldStatus) {
+  function decodeWithImpl$lambda_19($hotKnock, $expectsReadConfirmation, $legalHoldStatus) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       switch (_fieldNumber) {
@@ -11586,7 +12981,7 @@
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_18($url, $urlOffset, $preview, $permanentUrl, $title, $summary, $image, $metaData) {
+  function decodeWithImpl$lambda_20($url, $urlOffset, $preview, $permanentUrl, $title, $summary, $image, $metaData) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       switch (_fieldNumber) {
@@ -11615,7 +13010,7 @@
           tmp = Unit_getInstance();
           break;
         case 8:
-          $image._v = _fieldValue instanceof Asset_1 ? _fieldValue : THROW_CCE();
+          $image._v = _fieldValue instanceof Asset_2 ? _fieldValue : THROW_CCE();
           tmp = Unit_getInstance();
           break;
         case 9:
@@ -11626,7 +13021,7 @@
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_19($author, $username) {
+  function decodeWithImpl$lambda_21($author, $username) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       if (_fieldNumber === 1) {
@@ -11639,7 +13034,7 @@
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_20($permanentUrl, $title, $summary, $image) {
+  function decodeWithImpl$lambda_22($permanentUrl, $title, $summary, $image) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       switch (_fieldNumber) {
@@ -11656,14 +13051,14 @@
           tmp = Unit_getInstance();
           break;
         case 4:
-          $image._v = _fieldValue instanceof Asset_1 ? _fieldValue : THROW_CCE();
+          $image._v = _fieldValue instanceof Asset_2 ? _fieldValue : THROW_CCE();
           tmp = Unit_getInstance();
           break;
       }
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_21($start, $length, $mentionType, $qualifiedUserId) {
+  function decodeWithImpl$lambda_23($start, $length, $mentionType, $qualifiedUserId) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       switch (_fieldNumber) {
@@ -11687,7 +13082,7 @@
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_22($conversationId, $lastReadTimestamp, $qualifiedConversationId) {
+  function decodeWithImpl$lambda_24($conversationId, $lastReadTimestamp, $qualifiedConversationId) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       switch (_fieldNumber) {
@@ -11707,7 +13102,7 @@
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_23($conversationId, $clearedTimestamp, $qualifiedConversationId) {
+  function decodeWithImpl$lambda_25($conversationId, $clearedTimestamp, $qualifiedConversationId) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       switch (_fieldNumber) {
@@ -11727,7 +13122,7 @@
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_24($conversationId, $messageId, $qualifiedConversationId) {
+  function decodeWithImpl$lambda_26($conversationId, $messageId, $qualifiedConversationId) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       switch (_fieldNumber) {
@@ -11747,7 +13142,7 @@
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_25($messageId) {
+  function decodeWithImpl$lambda_27($messageId) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       if (_fieldNumber === 1) {
@@ -11757,7 +13152,7 @@
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_26($replacingMessageId, $content) {
+  function decodeWithImpl$lambda_28($replacingMessageId, $content) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       switch (_fieldNumber) {
@@ -11777,7 +13172,7 @@
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_27($quotedMessageId, $quotedMessageSha256) {
+  function decodeWithImpl$lambda_29($quotedMessageId, $quotedMessageSha256) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       if (_fieldNumber === 1) {
@@ -11790,7 +13185,7 @@
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_28($firstMessageId, $type, $moreMessageIds) {
+  function decodeWithImpl$lambda_30($firstMessageId, $type, $moreMessageIds) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       switch (_fieldNumber) {
@@ -11822,7 +13217,7 @@
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_29($longitude, $latitude, $name, $zoom, $expectsReadConfirmation, $legalHoldStatus) {
+  function decodeWithImpl$lambda_31($longitude, $latitude, $name, $zoom, $expectsReadConfirmation, $legalHoldStatus) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       switch (_fieldNumber) {
@@ -11854,7 +13249,7 @@
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_30(
+  function decodeWithImpl$lambda_32(
     $tag,
     $width,
     $height,
@@ -11918,7 +13313,7 @@
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_31($original, $status, $preview, $expectsReadConfirmation, $legalHoldStatus) {
+  function decodeWithImpl$lambda_33($original, $status, $preview, $expectsReadConfirmation, $legalHoldStatus) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       switch (_fieldNumber) {
@@ -11950,7 +13345,7 @@
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_32($mimeType, $size, $name, $metaData, $source, $caption) {
+  function decodeWithImpl$lambda_34($mimeType, $size, $name, $metaData, $source, $caption) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       switch (_fieldNumber) {
@@ -11990,7 +13385,7 @@
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_33($mimeType, $size, $remote, $metaData) {
+  function decodeWithImpl$lambda_35($mimeType, $size, $remote, $metaData) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       switch (_fieldNumber) {
@@ -12014,7 +13409,7 @@
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_34($width, $height, $tag) {
+  function decodeWithImpl$lambda_36($width, $height, $tag) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       switch (_fieldNumber) {
@@ -12034,7 +13429,7 @@
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_35($width, $height, $durationInMillis) {
+  function decodeWithImpl$lambda_37($width, $height, $durationInMillis) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       switch (_fieldNumber) {
@@ -12054,7 +13449,7 @@
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_36($durationInMillis, $normalizedLoudness) {
+  function decodeWithImpl$lambda_38($durationInMillis, $normalizedLoudness) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       if (_fieldNumber === 1) {
@@ -12067,7 +13462,7 @@
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_37($otrKey, $sha256, $assetId, $assetToken, $encryption, $assetDomain) {
+  function decodeWithImpl$lambda_39($otrKey, $sha256, $assetId, $assetToken, $encryption, $assetDomain) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       switch (_fieldNumber) {
@@ -12099,7 +13494,7 @@
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_38($otrKey, $sha256, $encryption) {
+  function decodeWithImpl$lambda_40($otrKey, $sha256, $encryption) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       switch (_fieldNumber) {
@@ -12119,7 +13514,7 @@
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_39($emoji, $messageId, $legalHoldStatus) {
+  function decodeWithImpl$lambda_41($emoji, $messageId, $legalHoldStatus) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       switch (_fieldNumber) {
@@ -12139,7 +13534,7 @@
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_40($content, $qualifiedConversationId) {
+  function decodeWithImpl$lambda_42($content, $qualifiedConversationId) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       if (_fieldNumber === 1) {
@@ -12152,7 +13547,7 @@
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_41($trackingIdentifier) {
+  function decodeWithImpl$lambda_43($trackingIdentifier) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       if (_fieldNumber === 1) {
@@ -12162,7 +13557,7 @@
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_42($identifier) {
+  function decodeWithImpl$lambda_44($identifier) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       if (_fieldNumber === 1) {
@@ -12171,17 +13566,6 @@
       }
       return Unit_getInstance();
     };
-  }
-  function values$factory() {
-    return getPropertyCallableRef(
-      'values',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.values;
-      },
-      null,
-    );
   }
   function values$factory_0() {
     return getPropertyCallableRef(
@@ -12205,7 +13589,29 @@
       null,
     );
   }
-  function protoSize$factory_6() {
+  function values$factory_2() {
+    return getPropertyCallableRef(
+      'values',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.values;
+      },
+      null,
+    );
+  }
+  function values$factory_3() {
+    return getPropertyCallableRef(
+      'values',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.values;
+      },
+      null,
+    );
+  }
+  function protoSize$factory_8() {
     return getPropertyCallableRef(
       'protoSize',
       1,
@@ -12216,7 +13622,7 @@
       null,
     );
   }
-  function descriptor$factory_22($b0) {
+  function descriptor$factory_37($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -12238,7 +13644,7 @@
       null,
     );
   }
-  function descriptor$factory_23($b0) {
+  function descriptor$factory_38($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -12260,7 +13666,7 @@
       null,
     );
   }
-  function descriptor$factory_24($b0) {
+  function descriptor$factory_39($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -12282,7 +13688,7 @@
       null,
     );
   }
-  function descriptor$factory_25($b0) {
+  function descriptor$factory_40($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -12304,7 +13710,7 @@
       null,
     );
   }
-  function descriptor$factory_26($b0) {
+  function descriptor$factory_41($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -12326,7 +13732,7 @@
       null,
     );
   }
-  function descriptor$factory_27($b0) {
+  function descriptor$factory_42($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -12348,7 +13754,7 @@
       null,
     );
   }
-  function descriptor$factory_28($b0) {
+  function descriptor$factory_43($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -12370,7 +13776,7 @@
       null,
     );
   }
-  function descriptor$factory_29($b0) {
+  function descriptor$factory_44($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -12392,7 +13798,7 @@
       null,
     );
   }
-  function descriptor$factory_30($b0) {
+  function descriptor$factory_45($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -12414,7 +13820,7 @@
       null,
     );
   }
-  function descriptor$factory_31($b0) {
+  function descriptor$factory_46($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -12425,7 +13831,7 @@
       null,
     );
   }
-  function asset$factory() {
+  function asset$factory_0() {
     return getPropertyCallableRef(
       'asset',
       1,
@@ -12436,7 +13842,7 @@
       null,
     );
   }
-  function descriptor$factory_32($b0) {
+  function descriptor$factory_47($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -12458,7 +13864,7 @@
       null,
     );
   }
-  function descriptor$factory_33($b0) {
+  function descriptor$factory_48($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -12469,7 +13875,7 @@
       null,
     );
   }
-  function location$factory() {
+  function location$factory_0() {
     return getPropertyCallableRef(
       'location',
       1,
@@ -12480,7 +13886,7 @@
       null,
     );
   }
-  function descriptor$factory_34($b0) {
+  function descriptor$factory_49($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -12502,7 +13908,7 @@
       null,
     );
   }
-  function descriptor$factory_35($b0) {
+  function descriptor$factory_50($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -12524,7 +13930,7 @@
       null,
     );
   }
-  function descriptor$factory_36($b0) {
+  function descriptor$factory_51($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -12546,7 +13952,7 @@
       null,
     );
   }
-  function descriptor$factory_37($b0) {
+  function descriptor$factory_52($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -12568,7 +13974,7 @@
       null,
     );
   }
-  function descriptor$factory_38($b0) {
+  function descriptor$factory_53($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -12590,7 +13996,7 @@
       null,
     );
   }
-  function descriptor$factory_39($b0) {
+  function descriptor$factory_54($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -12612,7 +14018,7 @@
       null,
     );
   }
-  function descriptor$factory_40($b0) {
+  function descriptor$factory_55($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -12634,7 +14040,7 @@
       null,
     );
   }
-  function descriptor$factory_41($b0) {
+  function descriptor$factory_56($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -12656,7 +14062,7 @@
       null,
     );
   }
-  function descriptor$factory_42($b0) {
+  function descriptor$factory_57($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -12678,7 +14084,7 @@
       null,
     );
   }
-  function descriptor$factory_43($b0) {
+  function descriptor$factory_58($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -12700,7 +14106,29 @@
       null,
     );
   }
-  function protoSize$factory_7() {
+  function descriptor$factory_59($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function unknownStrategy$factory() {
+    return getPropertyCallableRef(
+      'unknownStrategy',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.unknownStrategy;
+      },
+      null,
+    );
+  }
+  function protoSize$factory_9() {
     return getPropertyCallableRef(
       'protoSize',
       1,
@@ -12711,7 +14139,7 @@
       null,
     );
   }
-  function descriptor$factory_44($b0) {
+  function descriptor$factory_60($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -12733,7 +14161,7 @@
       null,
     );
   }
-  function descriptor$factory_45($b0) {
+  function descriptor$factory_61($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -12755,7 +14183,7 @@
       null,
     );
   }
-  function protoSize$factory_8() {
+  function protoSize$factory_10() {
     return getPropertyCallableRef(
       'protoSize',
       1,
@@ -12766,7 +14194,7 @@
       null,
     );
   }
-  function descriptor$factory_46($b0) {
+  function descriptor$factory_62($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -12788,7 +14216,7 @@
       null,
     );
   }
-  function descriptor$factory_47($b0) {
+  function descriptor$factory_63($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -12810,7 +14238,7 @@
       null,
     );
   }
-  function protoSize$factory_9() {
+  function protoSize$factory_11() {
     return getPropertyCallableRef(
       'protoSize',
       1,
@@ -12821,7 +14249,7 @@
       null,
     );
   }
-  function descriptor$factory_48($b0) {
+  function descriptor$factory_64($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -12843,7 +14271,7 @@
       null,
     );
   }
-  function descriptor$factory_49($b0) {
+  function descriptor$factory_65($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -12865,7 +14293,7 @@
       null,
     );
   }
-  function descriptor$factory_50($b0) {
+  function descriptor$factory_66($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -12898,7 +14326,7 @@
       null,
     );
   }
-  function protoSize$factory_10() {
+  function protoSize$factory_12() {
     return getPropertyCallableRef(
       'protoSize',
       1,
@@ -12909,7 +14337,7 @@
       null,
     );
   }
-  function descriptor$factory_51($b0) {
+  function descriptor$factory_67($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -12931,7 +14359,7 @@
       null,
     );
   }
-  function descriptor$factory_52($b0) {
+  function descriptor$factory_68($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -12964,7 +14392,7 @@
       null,
     );
   }
-  function protoSize$factory_11() {
+  function protoSize$factory_13() {
     return getPropertyCallableRef(
       'protoSize',
       1,
@@ -12975,7 +14403,7 @@
       null,
     );
   }
-  function descriptor$factory_53($b0) {
+  function descriptor$factory_69($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -12997,7 +14425,7 @@
       null,
     );
   }
-  function descriptor$factory_54($b0) {
+  function descriptor$factory_70($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -13019,7 +14447,7 @@
       null,
     );
   }
-  function protoSize$factory_12() {
+  function protoSize$factory_14() {
     return getPropertyCallableRef(
       'protoSize',
       1,
@@ -13030,7 +14458,7 @@
       null,
     );
   }
-  function descriptor$factory_55($b0) {
+  function descriptor$factory_71($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -13052,7 +14480,7 @@
       null,
     );
   }
-  function descriptor$factory_56($b0) {
+  function descriptor$factory_72($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -13074,7 +14502,7 @@
       null,
     );
   }
-  function protoSize$factory_13() {
+  function protoSize$factory_15() {
     return getPropertyCallableRef(
       'protoSize',
       1,
@@ -13085,7 +14513,7 @@
       null,
     );
   }
-  function descriptor$factory_57($b0) {
+  function descriptor$factory_73($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -13107,7 +14535,7 @@
       null,
     );
   }
-  function descriptor$factory_58($b0) {
+  function descriptor$factory_74($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -13129,414 +14557,7 @@
       null,
     );
   }
-  function protoSize$factory_14() {
-    return getPropertyCallableRef(
-      'protoSize',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.get_protoSize_1ekskg_k$();
-      },
-      null,
-    );
-  }
-  function descriptor$factory_59($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function type$factory() {
-    return getPropertyCallableRef(
-      'type',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.type;
-      },
-      null,
-    );
-  }
-  function values$factory_2() {
-    return getPropertyCallableRef(
-      'values',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.values;
-      },
-      null,
-    );
-  }
-  function protoSize$factory_15() {
-    return getPropertyCallableRef(
-      'protoSize',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.get_protoSize_1ekskg_k$();
-      },
-      null,
-    );
-  }
-  function descriptor$factory_60($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function expireAfterMillis$factory() {
-    return getPropertyCallableRef(
-      'expireAfterMillis',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.expireAfterMillis;
-      },
-      null,
-    );
-  }
-  function descriptor$factory_61($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function text$factory_3() {
-    return getPropertyCallableRef(
-      'text',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.text;
-      },
-      null,
-    );
-  }
-  function descriptor$factory_62($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function image$factory_0() {
-    return getPropertyCallableRef(
-      'image',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.image;
-      },
-      null,
-    );
-  }
-  function descriptor$factory_63($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function knock$factory_0() {
-    return getPropertyCallableRef(
-      'knock',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.knock;
-      },
-      null,
-    );
-  }
-  function descriptor$factory_64($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function asset$factory_0() {
-    return getPropertyCallableRef(
-      'asset',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.asset;
-      },
-      null,
-    );
-  }
-  function descriptor$factory_65($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function location$factory_0() {
-    return getPropertyCallableRef(
-      'location',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.location;
-      },
-      null,
-    );
-  }
   function protoSize$factory_16() {
-    return getPropertyCallableRef(
-      'protoSize',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.get_protoSize_1ekskg_k$();
-      },
-      null,
-    );
-  }
-  function descriptor$factory_66($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function content$factory_0() {
-    return getPropertyCallableRef(
-      'content',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.content;
-      },
-      null,
-    );
-  }
-  function descriptor$factory_67($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function linkPreview$factory() {
-    return getPropertyCallableRef(
-      'linkPreview',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.linkPreview;
-      },
-      null,
-    );
-  }
-  function descriptor$factory_68($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function mentions$factory() {
-    return getPropertyCallableRef(
-      'mentions',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.mentions;
-      },
-      null,
-    );
-  }
-  function descriptor$factory_69($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function quote$factory() {
-    return getPropertyCallableRef(
-      'quote',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.quote;
-      },
-      null,
-    );
-  }
-  function descriptor$factory_70($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function expectsReadConfirmation$factory_0() {
-    return getPropertyCallableRef(
-      'expectsReadConfirmation',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.expectsReadConfirmation;
-      },
-      null,
-    );
-  }
-  function descriptor$factory_71($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function legalHoldStatus$factory_0() {
-    return getPropertyCallableRef(
-      'legalHoldStatus',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.legalHoldStatus;
-      },
-      null,
-    );
-  }
-  function protoSize$factory_17() {
-    return getPropertyCallableRef(
-      'protoSize',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.get_protoSize_1ekskg_k$();
-      },
-      null,
-    );
-  }
-  function descriptor$factory_72($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function hotKnock$factory() {
-    return getPropertyCallableRef(
-      'hotKnock',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.hotKnock;
-      },
-      null,
-    );
-  }
-  function descriptor$factory_73($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function expectsReadConfirmation$factory_1() {
-    return getPropertyCallableRef(
-      'expectsReadConfirmation',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.expectsReadConfirmation;
-      },
-      null,
-    );
-  }
-  function descriptor$factory_74($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function legalHoldStatus$factory_1() {
-    return getPropertyCallableRef(
-      'legalHoldStatus',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.legalHoldStatus;
-      },
-      null,
-    );
-  }
-  function protoSize$factory_18() {
     return getPropertyCallableRef(
       'protoSize',
       1,
@@ -13558,6 +14579,413 @@
       null,
     );
   }
+  function type$factory() {
+    return getPropertyCallableRef(
+      'type',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.type;
+      },
+      null,
+    );
+  }
+  function values$factory_4() {
+    return getPropertyCallableRef(
+      'values',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.values;
+      },
+      null,
+    );
+  }
+  function protoSize$factory_17() {
+    return getPropertyCallableRef(
+      'protoSize',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.get_protoSize_1ekskg_k$();
+      },
+      null,
+    );
+  }
+  function descriptor$factory_76($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function expireAfterMillis$factory() {
+    return getPropertyCallableRef(
+      'expireAfterMillis',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.expireAfterMillis;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_77($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function text$factory_3() {
+    return getPropertyCallableRef(
+      'text',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.text;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_78($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function image$factory_0() {
+    return getPropertyCallableRef(
+      'image',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.image;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_79($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function knock$factory_0() {
+    return getPropertyCallableRef(
+      'knock',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.knock;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_80($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function asset$factory_1() {
+    return getPropertyCallableRef(
+      'asset',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.asset;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_81($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function location$factory_1() {
+    return getPropertyCallableRef(
+      'location',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.location;
+      },
+      null,
+    );
+  }
+  function protoSize$factory_18() {
+    return getPropertyCallableRef(
+      'protoSize',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.get_protoSize_1ekskg_k$();
+      },
+      null,
+    );
+  }
+  function descriptor$factory_82($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function content$factory_0() {
+    return getPropertyCallableRef(
+      'content',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.content;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_83($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function linkPreview$factory() {
+    return getPropertyCallableRef(
+      'linkPreview',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.linkPreview;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_84($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function mentions$factory() {
+    return getPropertyCallableRef(
+      'mentions',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.mentions;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_85($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function quote$factory() {
+    return getPropertyCallableRef(
+      'quote',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.quote;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_86($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function expectsReadConfirmation$factory_0() {
+    return getPropertyCallableRef(
+      'expectsReadConfirmation',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.expectsReadConfirmation;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_87($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function legalHoldStatus$factory_0() {
+    return getPropertyCallableRef(
+      'legalHoldStatus',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.legalHoldStatus;
+      },
+      null,
+    );
+  }
+  function protoSize$factory_19() {
+    return getPropertyCallableRef(
+      'protoSize',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.get_protoSize_1ekskg_k$();
+      },
+      null,
+    );
+  }
+  function descriptor$factory_88($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function hotKnock$factory() {
+    return getPropertyCallableRef(
+      'hotKnock',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.hotKnock;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_89($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function expectsReadConfirmation$factory_1() {
+    return getPropertyCallableRef(
+      'expectsReadConfirmation',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.expectsReadConfirmation;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_90($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function legalHoldStatus$factory_1() {
+    return getPropertyCallableRef(
+      'legalHoldStatus',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.legalHoldStatus;
+      },
+      null,
+    );
+  }
+  function protoSize$factory_20() {
+    return getPropertyCallableRef(
+      'protoSize',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.get_protoSize_1ekskg_k$();
+      },
+      null,
+    );
+  }
+  function descriptor$factory_91($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
   function url$factory() {
     return getPropertyCallableRef(
       'url',
@@ -13569,7 +14997,7 @@
       null,
     );
   }
-  function descriptor$factory_76($b0) {
+  function descriptor$factory_92($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -13591,7 +15019,7 @@
       null,
     );
   }
-  function descriptor$factory_77($b0) {
+  function descriptor$factory_93($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -13613,7 +15041,7 @@
       null,
     );
   }
-  function descriptor$factory_78($b0) {
+  function descriptor$factory_94($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -13635,7 +15063,7 @@
       null,
     );
   }
-  function descriptor$factory_79($b0) {
+  function descriptor$factory_95($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -13657,7 +15085,7 @@
       null,
     );
   }
-  function descriptor$factory_80($b0) {
+  function descriptor$factory_96($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -13679,7 +15107,7 @@
       null,
     );
   }
-  function descriptor$factory_81($b0) {
+  function descriptor$factory_97($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -13701,7 +15129,7 @@
       null,
     );
   }
-  function descriptor$factory_82($b0) {
+  function descriptor$factory_98($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -13723,7 +15151,7 @@
       null,
     );
   }
-  function protoSize$factory_19() {
+  function protoSize$factory_21() {
     return getPropertyCallableRef(
       'protoSize',
       1,
@@ -13734,7 +15162,7 @@
       null,
     );
   }
-  function descriptor$factory_83($b0) {
+  function descriptor$factory_99($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -13756,7 +15184,7 @@
       null,
     );
   }
-  function descriptor$factory_84($b0) {
+  function descriptor$factory_100($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -13789,7 +15217,7 @@
       null,
     );
   }
-  function protoSize$factory_20() {
+  function protoSize$factory_22() {
     return getPropertyCallableRef(
       'protoSize',
       1,
@@ -13800,7 +15228,7 @@
       null,
     );
   }
-  function descriptor$factory_85($b0) {
+  function descriptor$factory_101($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -13822,7 +15250,7 @@
       null,
     );
   }
-  function descriptor$factory_86($b0) {
+  function descriptor$factory_102($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -13844,7 +15272,7 @@
       null,
     );
   }
-  function descriptor$factory_87($b0) {
+  function descriptor$factory_103($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -13866,7 +15294,7 @@
       null,
     );
   }
-  function descriptor$factory_88($b0) {
+  function descriptor$factory_104($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -13888,7 +15316,7 @@
       null,
     );
   }
-  function protoSize$factory_21() {
+  function protoSize$factory_23() {
     return getPropertyCallableRef(
       'protoSize',
       1,
@@ -13899,7 +15327,7 @@
       null,
     );
   }
-  function descriptor$factory_89($b0) {
+  function descriptor$factory_105($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -13921,7 +15349,7 @@
       null,
     );
   }
-  function descriptor$factory_90($b0) {
+  function descriptor$factory_106($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -13943,7 +15371,7 @@
       null,
     );
   }
-  function descriptor$factory_91($b0) {
+  function descriptor$factory_107($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -13965,7 +15393,7 @@
       null,
     );
   }
-  function descriptor$factory_92($b0) {
+  function descriptor$factory_108($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -13987,7 +15415,7 @@
       null,
     );
   }
-  function protoSize$factory_22() {
+  function protoSize$factory_24() {
     return getPropertyCallableRef(
       'protoSize',
       1,
@@ -13998,7 +15426,7 @@
       null,
     );
   }
-  function descriptor$factory_93($b0) {
+  function descriptor$factory_109($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -14020,7 +15448,7 @@
       null,
     );
   }
-  function descriptor$factory_94($b0) {
+  function descriptor$factory_110($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -14042,7 +15470,7 @@
       null,
     );
   }
-  function descriptor$factory_95($b0) {
+  function descriptor$factory_111($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -14064,7 +15492,7 @@
       null,
     );
   }
-  function protoSize$factory_23() {
+  function protoSize$factory_25() {
     return getPropertyCallableRef(
       'protoSize',
       1,
@@ -14075,7 +15503,7 @@
       null,
     );
   }
-  function descriptor$factory_96($b0) {
+  function descriptor$factory_112($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -14097,7 +15525,7 @@
       null,
     );
   }
-  function descriptor$factory_97($b0) {
+  function descriptor$factory_113($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -14119,7 +15547,7 @@
       null,
     );
   }
-  function descriptor$factory_98($b0) {
+  function descriptor$factory_114($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -14141,7 +15569,7 @@
       null,
     );
   }
-  function protoSize$factory_24() {
+  function protoSize$factory_26() {
     return getPropertyCallableRef(
       'protoSize',
       1,
@@ -14152,7 +15580,7 @@
       null,
     );
   }
-  function descriptor$factory_99($b0) {
+  function descriptor$factory_115($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -14174,7 +15602,7 @@
       null,
     );
   }
-  function descriptor$factory_100($b0) {
+  function descriptor$factory_116($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -14196,7 +15624,7 @@
       null,
     );
   }
-  function descriptor$factory_101($b0) {
+  function descriptor$factory_117($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -14218,7 +15646,7 @@
       null,
     );
   }
-  function protoSize$factory_25() {
+  function protoSize$factory_27() {
     return getPropertyCallableRef(
       'protoSize',
       1,
@@ -14229,7 +15657,7 @@
       null,
     );
   }
-  function descriptor$factory_102($b0) {
+  function descriptor$factory_118($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -14251,7 +15679,7 @@
       null,
     );
   }
-  function protoSize$factory_26() {
+  function protoSize$factory_28() {
     return getPropertyCallableRef(
       'protoSize',
       1,
@@ -14262,7 +15690,7 @@
       null,
     );
   }
-  function descriptor$factory_103($b0) {
+  function descriptor$factory_119($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -14284,7 +15712,7 @@
       null,
     );
   }
-  function descriptor$factory_104($b0) {
+  function descriptor$factory_120($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -14306,7 +15734,7 @@
       null,
     );
   }
-  function descriptor$factory_105($b0) {
+  function descriptor$factory_121($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -14328,7 +15756,7 @@
       null,
     );
   }
-  function protoSize$factory_27() {
+  function protoSize$factory_29() {
     return getPropertyCallableRef(
       'protoSize',
       1,
@@ -14339,7 +15767,7 @@
       null,
     );
   }
-  function descriptor$factory_106($b0) {
+  function descriptor$factory_122($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -14361,7 +15789,7 @@
       null,
     );
   }
-  function descriptor$factory_107($b0) {
+  function descriptor$factory_123($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -14383,7 +15811,7 @@
       null,
     );
   }
-  function protoSize$factory_28() {
+  function protoSize$factory_30() {
     return getPropertyCallableRef(
       'protoSize',
       1,
@@ -14394,7 +15822,7 @@
       null,
     );
   }
-  function descriptor$factory_108($b0) {
+  function descriptor$factory_124($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -14416,7 +15844,7 @@
       null,
     );
   }
-  function descriptor$factory_109($b0) {
+  function descriptor$factory_125($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -14438,7 +15866,7 @@
       null,
     );
   }
-  function descriptor$factory_110($b0) {
+  function descriptor$factory_126($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -14460,7 +15888,7 @@
       null,
     );
   }
-  function values$factory_3() {
+  function values$factory_5() {
     return getPropertyCallableRef(
       'values',
       1,
@@ -14471,7 +15899,7 @@
       null,
     );
   }
-  function protoSize$factory_29() {
+  function protoSize$factory_31() {
     return getPropertyCallableRef(
       'protoSize',
       1,
@@ -14482,7 +15910,7 @@
       null,
     );
   }
-  function descriptor$factory_111($b0) {
+  function descriptor$factory_127($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -14493,7 +15921,7 @@
       null,
     );
   }
-  function longitude$factory() {
+  function longitude$factory_0() {
     return getPropertyCallableRef(
       'longitude',
       1,
@@ -14504,7 +15932,7 @@
       null,
     );
   }
-  function descriptor$factory_112($b0) {
+  function descriptor$factory_128($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -14515,7 +15943,7 @@
       null,
     );
   }
-  function latitude$factory() {
+  function latitude$factory_0() {
     return getPropertyCallableRef(
       'latitude',
       1,
@@ -14526,7 +15954,7 @@
       null,
     );
   }
-  function descriptor$factory_113($b0) {
+  function descriptor$factory_129($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -14537,7 +15965,7 @@
       null,
     );
   }
-  function name$factory_1() {
+  function name$factory_3() {
     return getPropertyCallableRef(
       'name',
       1,
@@ -14548,7 +15976,7 @@
       null,
     );
   }
-  function descriptor$factory_114($b0) {
+  function descriptor$factory_130($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -14559,7 +15987,7 @@
       null,
     );
   }
-  function zoom$factory() {
+  function zoom$factory_0() {
     return getPropertyCallableRef(
       'zoom',
       1,
@@ -14570,7 +15998,7 @@
       null,
     );
   }
-  function descriptor$factory_115($b0) {
+  function descriptor$factory_131($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -14592,7 +16020,7 @@
       null,
     );
   }
-  function descriptor$factory_116($b0) {
+  function descriptor$factory_132($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -14614,7 +16042,7 @@
       null,
     );
   }
-  function protoSize$factory_30() {
+  function protoSize$factory_32() {
     return getPropertyCallableRef(
       'protoSize',
       1,
@@ -14625,7 +16053,7 @@
       null,
     );
   }
-  function descriptor$factory_117($b0) {
+  function descriptor$factory_133($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -14647,7 +16075,7 @@
       null,
     );
   }
-  function descriptor$factory_118($b0) {
+  function descriptor$factory_134($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -14669,7 +16097,7 @@
       null,
     );
   }
-  function descriptor$factory_119($b0) {
+  function descriptor$factory_135($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -14691,7 +16119,7 @@
       null,
     );
   }
-  function descriptor$factory_120($b0) {
+  function descriptor$factory_136($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -14713,7 +16141,7 @@
       null,
     );
   }
-  function descriptor$factory_121($b0) {
+  function descriptor$factory_137($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -14735,7 +16163,7 @@
       null,
     );
   }
-  function descriptor$factory_122($b0) {
+  function descriptor$factory_138($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -14757,7 +16185,7 @@
       null,
     );
   }
-  function descriptor$factory_123($b0) {
+  function descriptor$factory_139($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -14768,7 +16196,7 @@
       null,
     );
   }
-  function size$factory() {
+  function size$factory_0() {
     return getPropertyCallableRef(
       'size',
       1,
@@ -14779,7 +16207,7 @@
       null,
     );
   }
-  function descriptor$factory_124($b0) {
+  function descriptor$factory_140($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -14790,7 +16218,7 @@
       null,
     );
   }
-  function otrKey$factory() {
+  function otrKey$factory_0() {
     return getPropertyCallableRef(
       'otrKey',
       1,
@@ -14801,7 +16229,7 @@
       null,
     );
   }
-  function descriptor$factory_125($b0) {
+  function descriptor$factory_141($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -14823,7 +16251,7 @@
       null,
     );
   }
-  function descriptor$factory_126($b0) {
+  function descriptor$factory_142($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -14845,7 +16273,7 @@
       null,
     );
   }
-  function descriptor$factory_127($b0) {
+  function descriptor$factory_143($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -14856,7 +16284,7 @@
       null,
     );
   }
-  function sha256$factory() {
+  function sha256$factory_0() {
     return getPropertyCallableRef(
       'sha256',
       1,
@@ -14867,7 +16295,7 @@
       null,
     );
   }
-  function protoSize$factory_31() {
+  function protoSize$factory_33() {
     return getPropertyCallableRef(
       'protoSize',
       1,
@@ -14878,7 +16306,7 @@
       null,
     );
   }
-  function descriptor$factory_128($b0) {
+  function descriptor$factory_144($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -14900,7 +16328,7 @@
       null,
     );
   }
-  function descriptor$factory_129($b0) {
+  function descriptor$factory_145($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -14922,7 +16350,7 @@
       null,
     );
   }
-  function descriptor$factory_130($b0) {
+  function descriptor$factory_146($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -14944,7 +16372,7 @@
       null,
     );
   }
-  function descriptor$factory_131($b0) {
+  function descriptor$factory_147($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -14966,7 +16394,7 @@
       null,
     );
   }
-  function descriptor$factory_132($b0) {
+  function descriptor$factory_148($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -14988,7 +16416,7 @@
       null,
     );
   }
-  function descriptor$factory_133($b0) {
+  function descriptor$factory_149($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -15021,7 +16449,7 @@
       null,
     );
   }
-  function values$factory_4() {
+  function values$factory_6() {
     return getPropertyCallableRef(
       'values',
       1,
@@ -15032,7 +16460,7 @@
       null,
     );
   }
-  function protoSize$factory_32() {
+  function protoSize$factory_34() {
     return getPropertyCallableRef(
       'protoSize',
       1,
@@ -15043,7 +16471,7 @@
       null,
     );
   }
-  function descriptor$factory_134($b0) {
+  function descriptor$factory_150($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -15065,194 +16493,7 @@
       null,
     );
   }
-  function descriptor$factory_135($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function size$factory_0() {
-    return getPropertyCallableRef(
-      'size',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.size;
-      },
-      null,
-    );
-  }
-  function descriptor$factory_136($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function name$factory_2() {
-    return getPropertyCallableRef(
-      'name',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.name;
-      },
-      null,
-    );
-  }
-  function descriptor$factory_137($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function image$factory_3() {
-    return getPropertyCallableRef(
-      'image',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.image;
-      },
-      null,
-    );
-  }
-  function descriptor$factory_138($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function video$factory() {
-    return getPropertyCallableRef(
-      'video',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.video;
-      },
-      null,
-    );
-  }
-  function descriptor$factory_139($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function audio$factory() {
-    return getPropertyCallableRef(
-      'audio',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.audio;
-      },
-      null,
-    );
-  }
-  function descriptor$factory_140($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function source$factory() {
-    return getPropertyCallableRef(
-      'source',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.source;
-      },
-      null,
-    );
-  }
-  function descriptor$factory_141($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function caption$factory() {
-    return getPropertyCallableRef(
-      'caption',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.caption;
-      },
-      null,
-    );
-  }
-  function protoSize$factory_33() {
-    return getPropertyCallableRef(
-      'protoSize',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.get_protoSize_1ekskg_k$();
-      },
-      null,
-    );
-  }
-  function descriptor$factory_142($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function mimeType$factory_1() {
-    return getPropertyCallableRef(
-      'mimeType',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.mimeType;
-      },
-      null,
-    );
-  }
-  function descriptor$factory_143($b0) {
+  function descriptor$factory_151($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -15274,7 +16515,194 @@
       null,
     );
   }
-  function descriptor$factory_144($b0) {
+  function descriptor$factory_152($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function name$factory_4() {
+    return getPropertyCallableRef(
+      'name',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.name;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_153($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function image$factory_3() {
+    return getPropertyCallableRef(
+      'image',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.image;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_154($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function video$factory() {
+    return getPropertyCallableRef(
+      'video',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.video;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_155($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function audio$factory() {
+    return getPropertyCallableRef(
+      'audio',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.audio;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_156($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function source$factory() {
+    return getPropertyCallableRef(
+      'source',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.source;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_157($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function caption$factory() {
+    return getPropertyCallableRef(
+      'caption',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.caption;
+      },
+      null,
+    );
+  }
+  function protoSize$factory_35() {
+    return getPropertyCallableRef(
+      'protoSize',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.get_protoSize_1ekskg_k$();
+      },
+      null,
+    );
+  }
+  function descriptor$factory_158($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function mimeType$factory_1() {
+    return getPropertyCallableRef(
+      'mimeType',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.mimeType;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_159($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function size$factory_2() {
+    return getPropertyCallableRef(
+      'size',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.size;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_160($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -15296,7 +16724,7 @@
       null,
     );
   }
-  function descriptor$factory_145($b0) {
+  function descriptor$factory_161($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -15318,7 +16746,7 @@
       null,
     );
   }
-  function protoSize$factory_34() {
+  function protoSize$factory_36() {
     return getPropertyCallableRef(
       'protoSize',
       1,
@@ -15329,7 +16757,7 @@
       null,
     );
   }
-  function descriptor$factory_146($b0) {
+  function descriptor$factory_162($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -15351,7 +16779,7 @@
       null,
     );
   }
-  function descriptor$factory_147($b0) {
+  function descriptor$factory_163($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -15373,7 +16801,7 @@
       null,
     );
   }
-  function descriptor$factory_148($b0) {
+  function descriptor$factory_164($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -15395,7 +16823,7 @@
       null,
     );
   }
-  function protoSize$factory_35() {
+  function protoSize$factory_37() {
     return getPropertyCallableRef(
       'protoSize',
       1,
@@ -15406,7 +16834,7 @@
       null,
     );
   }
-  function descriptor$factory_149($b0) {
+  function descriptor$factory_165($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -15428,7 +16856,7 @@
       null,
     );
   }
-  function descriptor$factory_150($b0) {
+  function descriptor$factory_166($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -15450,7 +16878,7 @@
       null,
     );
   }
-  function descriptor$factory_151($b0) {
+  function descriptor$factory_167($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -15483,7 +16911,7 @@
       null,
     );
   }
-  function protoSize$factory_36() {
+  function protoSize$factory_38() {
     return getPropertyCallableRef(
       'protoSize',
       1,
@@ -15494,7 +16922,7 @@
       null,
     );
   }
-  function descriptor$factory_152($b0) {
+  function descriptor$factory_168($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -15516,7 +16944,7 @@
       null,
     );
   }
-  function descriptor$factory_153($b0) {
+  function descriptor$factory_169($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -15549,7 +16977,7 @@
       null,
     );
   }
-  function protoSize$factory_37() {
+  function protoSize$factory_39() {
     return getPropertyCallableRef(
       'protoSize',
       1,
@@ -15560,150 +16988,7 @@
       null,
     );
   }
-  function descriptor$factory_154($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function otrKey$factory_0() {
-    return getPropertyCallableRef(
-      'otrKey',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.otrKey;
-      },
-      null,
-    );
-  }
-  function descriptor$factory_155($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function sha256$factory_0() {
-    return getPropertyCallableRef(
-      'sha256',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.sha256;
-      },
-      null,
-    );
-  }
-  function descriptor$factory_156($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function assetId$factory() {
-    return getPropertyCallableRef(
-      'assetId',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.assetId;
-      },
-      null,
-    );
-  }
-  function descriptor$factory_157($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function assetToken$factory() {
-    return getPropertyCallableRef(
-      'assetToken',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.assetToken;
-      },
-      null,
-    );
-  }
-  function descriptor$factory_158($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function encryption$factory() {
-    return getPropertyCallableRef(
-      'encryption',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.encryption;
-      },
-      null,
-    );
-  }
-  function descriptor$factory_159($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function assetDomain$factory() {
-    return getPropertyCallableRef(
-      'assetDomain',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.assetDomain;
-      },
-      null,
-    );
-  }
-  function protoSize$factory_38() {
-    return getPropertyCallableRef(
-      'protoSize',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.get_protoSize_1ekskg_k$();
-      },
-      null,
-    );
-  }
-  function descriptor$factory_160($b0) {
+  function descriptor$factory_170($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -15725,7 +17010,7 @@
       null,
     );
   }
-  function descriptor$factory_161($b0) {
+  function descriptor$factory_171($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -15747,7 +17032,51 @@
       null,
     );
   }
-  function descriptor$factory_162($b0) {
+  function descriptor$factory_172($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function assetId$factory_0() {
+    return getPropertyCallableRef(
+      'assetId',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.assetId;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_173($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function assetToken$factory_0() {
+    return getPropertyCallableRef(
+      'assetToken',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.assetToken;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_174($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -15769,7 +17098,29 @@
       null,
     );
   }
-  function protoSize$factory_39() {
+  function descriptor$factory_175($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function assetDomain$factory_0() {
+    return getPropertyCallableRef(
+      'assetDomain',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.assetDomain;
+      },
+      null,
+    );
+  }
+  function protoSize$factory_40() {
     return getPropertyCallableRef(
       'protoSize',
       1,
@@ -15780,7 +17131,84 @@
       null,
     );
   }
-  function descriptor$factory_163($b0) {
+  function descriptor$factory_176($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function otrKey$factory_2() {
+    return getPropertyCallableRef(
+      'otrKey',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.otrKey;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_177($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function sha256$factory_2() {
+    return getPropertyCallableRef(
+      'sha256',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.sha256;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_178($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function encryption$factory_1() {
+    return getPropertyCallableRef(
+      'encryption',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.encryption;
+      },
+      null,
+    );
+  }
+  function protoSize$factory_41() {
+    return getPropertyCallableRef(
+      'protoSize',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.get_protoSize_1ekskg_k$();
+      },
+      null,
+    );
+  }
+  function descriptor$factory_179($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -15802,7 +17230,7 @@
       null,
     );
   }
-  function descriptor$factory_164($b0) {
+  function descriptor$factory_180($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -15824,7 +17252,7 @@
       null,
     );
   }
-  function descriptor$factory_165($b0) {
+  function descriptor$factory_181($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -15846,7 +17274,7 @@
       null,
     );
   }
-  function protoSize$factory_40() {
+  function protoSize$factory_42() {
     return getPropertyCallableRef(
       'protoSize',
       1,
@@ -15857,7 +17285,7 @@
       null,
     );
   }
-  function descriptor$factory_166($b0) {
+  function descriptor$factory_182($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -15879,7 +17307,7 @@
       null,
     );
   }
-  function descriptor$factory_167($b0) {
+  function descriptor$factory_183($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -15901,7 +17329,7 @@
       null,
     );
   }
-  function protoSize$factory_41() {
+  function protoSize$factory_43() {
     return getPropertyCallableRef(
       'protoSize',
       1,
@@ -15912,7 +17340,7 @@
       null,
     );
   }
-  function descriptor$factory_168($b0) {
+  function descriptor$factory_184($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -15945,7 +17373,7 @@
       null,
     );
   }
-  function protoSize$factory_42() {
+  function protoSize$factory_44() {
     return getPropertyCallableRef(
       'protoSize',
       1,
@@ -15956,7 +17384,7 @@
       null,
     );
   }
-  function descriptor$factory_169($b0) {
+  function descriptor$factory_185($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -15979,7 +17407,7 @@
     );
   }
   function GroupInfoType$Companion$values$delegate$lambda() {
-    return listOf_0([PUBLIC_GROUP_STATE_getInstance(), GROUP_INFO_getInstance(), GROUP_INFO_JWE_getInstance()]);
+    return listOf([PUBLIC_GROUP_STATE_getInstance(), GROUP_INFO_getInstance(), GROUP_INFO_JWE_getInstance()]);
   }
   function PUBLIC_GROUP_STATE() {
     PUBLIC_GROUP_STATE_instance = this;
@@ -16008,21 +17436,21 @@
     if (GROUP_INFO_JWE_instance == null) new GROUP_INFO_JWE();
     return GROUP_INFO_JWE_instance;
   }
-  function UNRECOGNIZED_5(value) {
+  function UNRECOGNIZED_7(value) {
     GroupInfoType.call(this, value);
   }
-  function Companion_51() {
-    Companion_instance_49 = this;
+  function Companion_55() {
+    Companion_instance_53 = this;
     var tmp = this;
     tmp.values$delegate_1 = lazy(GroupInfoType$Companion$values$delegate$lambda);
   }
-  protoOf(Companion_51).get_values_ksazhn_k$ = function () {
+  protoOf(Companion_55).get_values_ksazhn_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.values$delegate_1;
-    values$factory_5();
+    values$factory_7();
     return this_0.get_value_j01efc_k$();
   };
-  protoOf(Companion_51).fromValue_lljhin_k$ = function (value) {
+  protoOf(Companion_55).fromValue_lljhin_k$ = function (value) {
     var tmp$ret$1;
     $l$block: {
       // Inline function 'kotlin.collections.firstOrNull' call
@@ -16038,9 +17466,9 @@
       tmp$ret$1 = null;
     }
     var tmp0_elvis_lhs = tmp$ret$1;
-    return tmp0_elvis_lhs == null ? new UNRECOGNIZED_5(value) : tmp0_elvis_lhs;
+    return tmp0_elvis_lhs == null ? new UNRECOGNIZED_7(value) : tmp0_elvis_lhs;
   };
-  protoOf(Companion_51).fromName_z4ts05_k$ = function (name) {
+  protoOf(Companion_55).fromName_z4ts05_k$ = function (name) {
     var tmp$ret$1;
     $l$block: {
       // Inline function 'kotlin.collections.firstOrNull' call
@@ -16064,13 +17492,13 @@
     }
     return tmp;
   };
-  var Companion_instance_49;
-  function Companion_getInstance_51() {
-    if (Companion_instance_49 == null) new Companion_51();
-    return Companion_instance_49;
+  var Companion_instance_53;
+  function Companion_getInstance_55() {
+    if (Companion_instance_53 == null) new Companion_55();
+    return Companion_instance_53;
   }
   function GroupInfoType(value, name) {
-    Companion_getInstance_51();
+    Companion_getInstance_55();
     name = name === VOID ? null : name;
     this.value_1 = value;
     this.name_1 = name;
@@ -16104,7 +17532,7 @@
     );
   };
   function RatchetTreeType$Companion$values$delegate$lambda() {
-    return listOf_0([FULL_getInstance(), DELTA_getInstance(), REFERENCE_getInstance()]);
+    return listOf([FULL_getInstance(), DELTA_getInstance(), REFERENCE_getInstance()]);
   }
   function FULL() {
     FULL_instance = this;
@@ -16133,21 +17561,21 @@
     if (REFERENCE_instance == null) new REFERENCE();
     return REFERENCE_instance;
   }
-  function UNRECOGNIZED_6(value) {
+  function UNRECOGNIZED_8(value) {
     RatchetTreeType.call(this, value);
   }
-  function Companion_52() {
-    Companion_instance_50 = this;
+  function Companion_56() {
+    Companion_instance_54 = this;
     var tmp = this;
     tmp.values$delegate_1 = lazy(RatchetTreeType$Companion$values$delegate$lambda);
   }
-  protoOf(Companion_52).get_values_ksazhn_k$ = function () {
+  protoOf(Companion_56).get_values_ksazhn_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.values$delegate_1;
-    values$factory_6();
+    values$factory_8();
     return this_0.get_value_j01efc_k$();
   };
-  protoOf(Companion_52).fromValue_lljhin_k$ = function (value) {
+  protoOf(Companion_56).fromValue_lljhin_k$ = function (value) {
     var tmp$ret$1;
     $l$block: {
       // Inline function 'kotlin.collections.firstOrNull' call
@@ -16163,9 +17591,9 @@
       tmp$ret$1 = null;
     }
     var tmp0_elvis_lhs = tmp$ret$1;
-    return tmp0_elvis_lhs == null ? new UNRECOGNIZED_6(value) : tmp0_elvis_lhs;
+    return tmp0_elvis_lhs == null ? new UNRECOGNIZED_8(value) : tmp0_elvis_lhs;
   };
-  protoOf(Companion_52).fromName_z4ts05_k$ = function (name) {
+  protoOf(Companion_56).fromName_z4ts05_k$ = function (name) {
     var tmp$ret$1;
     $l$block: {
       // Inline function 'kotlin.collections.firstOrNull' call
@@ -16189,13 +17617,13 @@
     }
     return tmp;
   };
-  var Companion_instance_50;
-  function Companion_getInstance_52() {
-    if (Companion_instance_50 == null) new Companion_52();
-    return Companion_instance_50;
+  var Companion_instance_54;
+  function Companion_getInstance_56() {
+    if (Companion_instance_54 == null) new Companion_56();
+    return Companion_instance_54;
   }
   function RatchetTreeType(value, name) {
-    Companion_getInstance_52();
+    Companion_getInstance_56();
     name = name === VOID ? null : name;
     this.value_1 = value;
     this.name_1 = name;
@@ -16228,8 +17656,8 @@
       ')'
     );
   };
-  function Companion_53() {
-    Companion_instance_51 = this;
+  function Companion_57() {
+    Companion_instance_55 = this;
     var tmp = this;
     var tmp_0 = getKClass(GroupInfoBundle);
     // Inline function 'kotlin.collections.buildList' call
@@ -16240,8 +17668,8 @@
     var this_0 = ArrayList_init_$Create$(3);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.mls.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_170(this);
-    var tmp1_type = new Enum_0(Companion_getInstance_51(), true);
+    var tmp0_messageDescriptor = descriptor$factory_186(this);
+    var tmp1_type = new Enum_0(Companion_getInstance_55(), true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
         tmp0_messageDescriptor,
@@ -16253,8 +17681,8 @@
         'groupInfoType',
       ),
     );
-    var tmp2_messageDescriptor = descriptor$factory_171(this);
-    var tmp3_type = new Enum_0(Companion_getInstance_52(), true);
+    var tmp2_messageDescriptor = descriptor$factory_187(this);
+    var tmp3_type = new Enum_0(Companion_getInstance_56(), true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
         tmp2_messageDescriptor,
@@ -16266,7 +17694,7 @@
         'ratchetTreeType',
       ),
     );
-    var tmp4_messageDescriptor = descriptor$factory_172(this);
+    var tmp4_messageDescriptor = descriptor$factory_188(this);
     var tmp5_type = new Bytes(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp4_messageDescriptor, 'group_info', 3, tmp5_type, groupInfo$factory(), VOID, 'groupInfo'),
@@ -16274,16 +17702,16 @@
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('mls.GroupInfoBundle', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_53).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_43(Companion_getInstance_53(), u);
+  protoOf(Companion_57).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_45(Companion_getInstance_57(), u);
   };
-  protoOf(Companion_53).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_57).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_51;
-  function Companion_getInstance_53() {
-    if (Companion_instance_51 == null) new Companion_53();
-    return Companion_instance_51;
+  var Companion_instance_55;
+  function Companion_getInstance_57() {
+    if (Companion_instance_55 == null) new Companion_57();
+    return Companion_instance_55;
   }
   function GroupInfoBundle$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -16291,7 +17719,7 @@
     };
   }
   function GroupInfoBundle(groupInfoType, ratchetTreeType, groupInfo, unknownFields) {
-    Companion_getInstance_53();
+    Companion_getInstance_57();
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
     this.groupInfoType = groupInfoType;
     this.ratchetTreeType = ratchetTreeType;
@@ -16313,15 +17741,15 @@
     return this.unknownFields_1;
   };
   protoOf(GroupInfoBundle).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_43(this, other);
+    return protoMergeImpl_45(this, other);
   };
   protoOf(GroupInfoBundle).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_53().descriptor_1;
+    return Companion_getInstance_57().descriptor_1;
   };
   protoOf(GroupInfoBundle).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_43();
+    protoSize$factory_45();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(GroupInfoBundle).component1_7eebsc_k$ = function () {
@@ -16376,8 +17804,8 @@
     if (!equals(this.unknownFields_1, tmp0_other_with_cast.unknownFields_1)) return false;
     return true;
   };
-  function Companion_54() {
-    Companion_instance_52 = this;
+  function Companion_58() {
+    Companion_instance_56 = this;
     var tmp = this;
     var tmp_0 = getKClass(CommitBundle);
     // Inline function 'kotlin.collections.buildList' call
@@ -16388,18 +17816,18 @@
     var this_0 = ArrayList_init_$Create$(3);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.mls.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_173(this);
+    var tmp0_messageDescriptor = descriptor$factory_189(this);
     var tmp1_type = new Bytes(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp0_messageDescriptor, 'commit', 1, tmp1_type, commit$factory(), VOID, 'commit'),
     );
-    var tmp2_messageDescriptor = descriptor$factory_174(this);
+    var tmp2_messageDescriptor = descriptor$factory_190(this);
     var tmp3_type = new Bytes(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp2_messageDescriptor, 'welcome', 2, tmp3_type, welcome$factory(), VOID, 'welcome'),
     );
-    var tmp4_messageDescriptor = descriptor$factory_175(this);
-    var tmp5_type = new Message(Companion_getInstance_53());
+    var tmp4_messageDescriptor = descriptor$factory_191(this);
+    var tmp5_type = new Message(Companion_getInstance_57());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
         tmp4_messageDescriptor,
@@ -16414,16 +17842,16 @@
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('mls.CommitBundle', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_54).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_44(Companion_getInstance_54(), u);
+  protoOf(Companion_58).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_46(Companion_getInstance_58(), u);
   };
-  protoOf(Companion_54).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_58).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_52;
-  function Companion_getInstance_54() {
-    if (Companion_instance_52 == null) new Companion_54();
-    return Companion_instance_52;
+  var Companion_instance_56;
+  function Companion_getInstance_58() {
+    if (Companion_instance_56 == null) new Companion_58();
+    return Companion_instance_56;
   }
   function CommitBundle$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -16431,7 +17859,7 @@
     };
   }
   function CommitBundle(commit, welcome, groupInfoBundle, unknownFields) {
-    Companion_getInstance_54();
+    Companion_getInstance_58();
     welcome = welcome === VOID ? null : welcome;
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
     this.commit = commit;
@@ -16454,15 +17882,15 @@
     return this.unknownFields_1;
   };
   protoOf(CommitBundle).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_44(this, other);
+    return protoMergeImpl_46(this, other);
   };
   protoOf(CommitBundle).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_54().descriptor_1;
+    return Companion_getInstance_58().descriptor_1;
   };
   protoOf(CommitBundle).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_44();
+    protoSize$factory_46();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(CommitBundle).component1_7eebsc_k$ = function () {
@@ -16517,7 +17945,7 @@
     if (!equals(this.unknownFields_1, tmp0_other_with_cast.unknownFields_1)) return false;
     return true;
   };
-  function protoMergeImpl_43(_this__u8e3s4, plus) {
+  function protoMergeImpl_45(_this__u8e3s4, plus) {
     var tmp0_safe_receiver = plus instanceof GroupInfoBundle ? plus : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -16536,13 +17964,13 @@
     var tmp1_elvis_lhs = tmp;
     return tmp1_elvis_lhs == null ? _this__u8e3s4 : tmp1_elvis_lhs;
   }
-  function decodeWithImpl_43(_this__u8e3s4, u) {
+  function decodeWithImpl_45(_this__u8e3s4, u) {
     var groupInfoType = {_v: null};
     var ratchetTreeType = {_v: null};
     var groupInfo = {_v: null};
     var unknownFields = u.readMessage_fttc7y_k$(
       _this__u8e3s4,
-      decodeWithImpl$lambda_43(groupInfoType, ratchetTreeType, groupInfo),
+      decodeWithImpl$lambda_45(groupInfoType, ratchetTreeType, groupInfo),
     );
     if (groupInfoType._v == null) {
       throw Companion_getInstance().missingRequiredField('group_info_type');
@@ -16560,7 +17988,7 @@
       unknownFields,
     );
   }
-  function protoMergeImpl_44(_this__u8e3s4, plus) {
+  function protoMergeImpl_46(_this__u8e3s4, plus) {
     var tmp0_safe_receiver = plus instanceof CommitBundle ? plus : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -16580,13 +18008,13 @@
     var tmp1_elvis_lhs = tmp;
     return tmp1_elvis_lhs == null ? _this__u8e3s4 : tmp1_elvis_lhs;
   }
-  function decodeWithImpl_44(_this__u8e3s4, u) {
+  function decodeWithImpl_46(_this__u8e3s4, u) {
     var commit = {_v: null};
     var welcome = {_v: null};
     var groupInfoBundle = {_v: null};
     var unknownFields = u.readMessage_fttc7y_k$(
       _this__u8e3s4,
-      decodeWithImpl$lambda_44(commit, welcome, groupInfoBundle),
+      decodeWithImpl$lambda_46(commit, welcome, groupInfoBundle),
     );
     if (commit._v == null) {
       throw Companion_getInstance().missingRequiredField('commit');
@@ -16596,7 +18024,7 @@
     }
     return new CommitBundle(ensureNotNull(commit._v), welcome._v, ensureNotNull(groupInfoBundle._v), unknownFields);
   }
-  function decodeWithImpl$lambda_43($groupInfoType, $ratchetTreeType, $groupInfo) {
+  function decodeWithImpl$lambda_45($groupInfoType, $ratchetTreeType, $groupInfo) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       switch (_fieldNumber) {
@@ -16616,7 +18044,7 @@
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_44($commit, $welcome, $groupInfoBundle) {
+  function decodeWithImpl$lambda_46($commit, $welcome, $groupInfoBundle) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       switch (_fieldNumber) {
@@ -16636,7 +18064,7 @@
       return Unit_getInstance();
     };
   }
-  function values$factory_5() {
+  function values$factory_7() {
     return getPropertyCallableRef(
       'values',
       1,
@@ -16647,7 +18075,7 @@
       null,
     );
   }
-  function values$factory_6() {
+  function values$factory_8() {
     return getPropertyCallableRef(
       'values',
       1,
@@ -16658,7 +18086,7 @@
       null,
     );
   }
-  function protoSize$factory_43() {
+  function protoSize$factory_45() {
     return getPropertyCallableRef(
       'protoSize',
       1,
@@ -16669,7 +18097,7 @@
       null,
     );
   }
-  function descriptor$factory_170($b0) {
+  function descriptor$factory_186($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -16691,7 +18119,7 @@
       null,
     );
   }
-  function descriptor$factory_171($b0) {
+  function descriptor$factory_187($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -16713,7 +18141,7 @@
       null,
     );
   }
-  function descriptor$factory_172($b0) {
+  function descriptor$factory_188($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -16735,7 +18163,7 @@
       null,
     );
   }
-  function protoSize$factory_44() {
+  function protoSize$factory_46() {
     return getPropertyCallableRef(
       'protoSize',
       1,
@@ -16746,7 +18174,7 @@
       null,
     );
   }
-  function descriptor$factory_173($b0) {
+  function descriptor$factory_189($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -16768,7 +18196,7 @@
       null,
     );
   }
-  function descriptor$factory_174($b0) {
+  function descriptor$factory_190($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -16790,7 +18218,7 @@
       null,
     );
   }
-  function descriptor$factory_175($b0) {
+  function descriptor$factory_191($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -16813,7 +18241,7 @@
     );
   }
   function Priority$Companion$values$delegate$lambda() {
-    return listOf_0([LOW_PRIORITY_getInstance(), HIGH_PRIORITY_getInstance()]);
+    return listOf([LOW_PRIORITY_getInstance(), HIGH_PRIORITY_getInstance()]);
   }
   function LOW_PRIORITY() {
     LOW_PRIORITY_instance = this;
@@ -16833,21 +18261,21 @@
     if (HIGH_PRIORITY_instance == null) new HIGH_PRIORITY();
     return HIGH_PRIORITY_instance;
   }
-  function UNRECOGNIZED_7(value) {
+  function UNRECOGNIZED_9(value) {
     Priority.call(this, value);
   }
-  function Companion_55() {
-    Companion_instance_53 = this;
+  function Companion_59() {
+    Companion_instance_57 = this;
     var tmp = this;
     tmp.values$delegate_1 = lazy(Priority$Companion$values$delegate$lambda);
   }
-  protoOf(Companion_55).get_values_ksazhn_k$ = function () {
+  protoOf(Companion_59).get_values_ksazhn_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.values$delegate_1;
-    values$factory_7();
+    values$factory_9();
     return this_0.get_value_j01efc_k$();
   };
-  protoOf(Companion_55).fromValue_lljhin_k$ = function (value) {
+  protoOf(Companion_59).fromValue_lljhin_k$ = function (value) {
     var tmp$ret$1;
     $l$block: {
       // Inline function 'kotlin.collections.firstOrNull' call
@@ -16863,9 +18291,9 @@
       tmp$ret$1 = null;
     }
     var tmp0_elvis_lhs = tmp$ret$1;
-    return tmp0_elvis_lhs == null ? new UNRECOGNIZED_7(value) : tmp0_elvis_lhs;
+    return tmp0_elvis_lhs == null ? new UNRECOGNIZED_9(value) : tmp0_elvis_lhs;
   };
-  protoOf(Companion_55).fromName_z4ts05_k$ = function (name) {
+  protoOf(Companion_59).fromName_z4ts05_k$ = function (name) {
     var tmp$ret$1;
     $l$block: {
       // Inline function 'kotlin.collections.firstOrNull' call
@@ -16889,13 +18317,13 @@
     }
     return tmp;
   };
-  var Companion_instance_53;
-  function Companion_getInstance_55() {
-    if (Companion_instance_53 == null) new Companion_55();
-    return Companion_instance_53;
+  var Companion_instance_57;
+  function Companion_getInstance_59() {
+    if (Companion_instance_57 == null) new Companion_59();
+    return Companion_instance_57;
   }
   function Priority(value, name) {
-    Companion_getInstance_55();
+    Companion_getInstance_59();
     name = name === VOID ? null : name;
     this.value_1 = value;
     this.name_1 = name;
@@ -16928,8 +18356,8 @@
       ')'
     );
   };
-  function Companion_56() {
-    Companion_instance_54 = this;
+  function Companion_60() {
+    Companion_instance_58 = this;
     var tmp = this;
     var tmp_0 = getKClass(UserId_0);
     // Inline function 'kotlin.collections.buildList' call
@@ -16940,7 +18368,7 @@
     var this_0 = ArrayList_init_$Create$(1);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.otr.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_176(this);
+    var tmp0_messageDescriptor = descriptor$factory_192(this);
     var tmp1_type = new Bytes(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp0_messageDescriptor, 'uuid', 1, tmp1_type, uuid$factory(), VOID, 'uuid'),
@@ -16948,16 +18376,16 @@
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('proteus.UserId', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_56).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_45(Companion_getInstance_56(), u);
+  protoOf(Companion_60).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_47(Companion_getInstance_60(), u);
   };
-  protoOf(Companion_56).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_60).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_54;
-  function Companion_getInstance_56() {
-    if (Companion_instance_54 == null) new Companion_56();
-    return Companion_instance_54;
+  var Companion_instance_58;
+  function Companion_getInstance_60() {
+    if (Companion_instance_58 == null) new Companion_60();
+    return Companion_instance_58;
   }
   function UserId$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -16965,7 +18393,7 @@
     };
   }
   function UserId_0(uuid, unknownFields) {
-    Companion_getInstance_56();
+    Companion_getInstance_60();
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
     this.uuid = uuid;
     this.unknownFields_1 = unknownFields;
@@ -16979,15 +18407,15 @@
     return this.unknownFields_1;
   };
   protoOf(UserId_0).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_45(this, other);
+    return protoMergeImpl_47(this, other);
   };
   protoOf(UserId_0).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_56().descriptor_1;
+    return Companion_getInstance_60().descriptor_1;
   };
   protoOf(UserId_0).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_45();
+    protoSize$factory_47();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(UserId_0).component1_7eebsc_k$ = function () {
@@ -17020,8 +18448,8 @@
     if (!equals(this.unknownFields_1, tmp0_other_with_cast.unknownFields_1)) return false;
     return true;
   };
-  function Companion_57() {
-    Companion_instance_55 = this;
+  function Companion_61() {
+    Companion_instance_59 = this;
     var tmp = this;
     var tmp_0 = getKClass(QualifiedUserId_0);
     // Inline function 'kotlin.collections.buildList' call
@@ -17032,10 +18460,10 @@
     var this_0 = ArrayList_init_$Create$(2);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.otr.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_177(this);
+    var tmp0_messageDescriptor = descriptor$factory_193(this);
     var tmp1_type = new String_0(true);
     this_0.add_utx5q5_k$(new FieldDescriptor(tmp0_messageDescriptor, 'id', 1, tmp1_type, id$factory_5(), VOID, 'id'));
-    var tmp2_messageDescriptor = descriptor$factory_178(this);
+    var tmp2_messageDescriptor = descriptor$factory_194(this);
     var tmp3_type = new String_0(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp2_messageDescriptor, 'domain', 2, tmp3_type, domain$factory_2(), VOID, 'domain'),
@@ -17043,16 +18471,16 @@
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('proteus.QualifiedUserId', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_57).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_46(Companion_getInstance_57(), u);
+  protoOf(Companion_61).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_48(Companion_getInstance_61(), u);
   };
-  protoOf(Companion_57).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_61).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_55;
-  function Companion_getInstance_57() {
-    if (Companion_instance_55 == null) new Companion_57();
-    return Companion_instance_55;
+  var Companion_instance_59;
+  function Companion_getInstance_61() {
+    if (Companion_instance_59 == null) new Companion_61();
+    return Companion_instance_59;
   }
   function QualifiedUserId$protoSize$delegate$lambda_0(this$0) {
     return function () {
@@ -17060,7 +18488,7 @@
     };
   }
   function QualifiedUserId_0(id, domain, unknownFields) {
-    Companion_getInstance_57();
+    Companion_getInstance_61();
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
     this.id = id;
     this.domain = domain;
@@ -17078,15 +18506,15 @@
     return this.unknownFields_1;
   };
   protoOf(QualifiedUserId_0).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_46(this, other);
+    return protoMergeImpl_48(this, other);
   };
   protoOf(QualifiedUserId_0).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_57().descriptor_1;
+    return Companion_getInstance_61().descriptor_1;
   };
   protoOf(QualifiedUserId_0).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_46();
+    protoSize$factory_48();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(QualifiedUserId_0).component1_7eebsc_k$ = function () {
@@ -17127,8 +18555,8 @@
     if (!equals(this.unknownFields_1, tmp0_other_with_cast.unknownFields_1)) return false;
     return true;
   };
-  function Companion_58() {
-    Companion_instance_56 = this;
+  function Companion_62() {
+    Companion_instance_60 = this;
     var tmp = this;
     var tmp_0 = getKClass(ClientId);
     // Inline function 'kotlin.collections.buildList' call
@@ -17139,7 +18567,7 @@
     var this_0 = ArrayList_init_$Create$(1);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.otr.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_179(this);
+    var tmp0_messageDescriptor = descriptor$factory_195(this);
     var tmp1_type = new UInt64(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp0_messageDescriptor, 'client', 1, tmp1_type, client$factory(), VOID, 'client'),
@@ -17147,16 +18575,16 @@
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('proteus.ClientId', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_58).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_47(Companion_getInstance_58(), u);
+  protoOf(Companion_62).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_49(Companion_getInstance_62(), u);
   };
-  protoOf(Companion_58).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_62).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_56;
-  function Companion_getInstance_58() {
-    if (Companion_instance_56 == null) new Companion_58();
-    return Companion_instance_56;
+  var Companion_instance_60;
+  function Companion_getInstance_62() {
+    if (Companion_instance_60 == null) new Companion_62();
+    return Companion_instance_60;
   }
   function ClientId$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -17164,7 +18592,7 @@
     };
   }
   function ClientId(client, unknownFields) {
-    Companion_getInstance_58();
+    Companion_getInstance_62();
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
     this.client = client;
     this.unknownFields_1 = unknownFields;
@@ -17178,15 +18606,15 @@
     return this.unknownFields_1;
   };
   protoOf(ClientId).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_47(this, other);
+    return protoMergeImpl_49(this, other);
   };
   protoOf(ClientId).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_58().descriptor_1;
+    return Companion_getInstance_62().descriptor_1;
   };
   protoOf(ClientId).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_47();
+    protoSize$factory_49();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(ClientId).component1_7eebsc_k$ = function () {
@@ -17219,8 +18647,8 @@
     if (!equals(this.unknownFields_1, tmp0_other_with_cast.unknownFields_1)) return false;
     return true;
   };
-  function Companion_59() {
-    Companion_instance_57 = this;
+  function Companion_63() {
+    Companion_instance_61 = this;
     var tmp = this;
     var tmp_0 = getKClass(ClientEntry);
     // Inline function 'kotlin.collections.buildList' call
@@ -17231,12 +18659,12 @@
     var this_0 = ArrayList_init_$Create$(2);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.otr.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_180(this);
-    var tmp1_type = new Message(Companion_getInstance_58());
+    var tmp0_messageDescriptor = descriptor$factory_196(this);
+    var tmp1_type = new Message(Companion_getInstance_62());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp0_messageDescriptor, 'client', 1, tmp1_type, client$factory_0(), VOID, 'client'),
     );
-    var tmp2_messageDescriptor = descriptor$factory_181(this);
+    var tmp2_messageDescriptor = descriptor$factory_197(this);
     var tmp3_type = new Bytes(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp2_messageDescriptor, 'text', 2, tmp3_type, text$factory_5(), VOID, 'text'),
@@ -17244,16 +18672,16 @@
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('proteus.ClientEntry', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_59).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_48(Companion_getInstance_59(), u);
+  protoOf(Companion_63).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_50(Companion_getInstance_63(), u);
   };
-  protoOf(Companion_59).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_63).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_57;
-  function Companion_getInstance_59() {
-    if (Companion_instance_57 == null) new Companion_59();
-    return Companion_instance_57;
+  var Companion_instance_61;
+  function Companion_getInstance_63() {
+    if (Companion_instance_61 == null) new Companion_63();
+    return Companion_instance_61;
   }
   function ClientEntry$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -17261,7 +18689,7 @@
     };
   }
   function ClientEntry(client, text, unknownFields) {
-    Companion_getInstance_59();
+    Companion_getInstance_63();
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
     this.client = client;
     this.text = text;
@@ -17279,15 +18707,15 @@
     return this.unknownFields_1;
   };
   protoOf(ClientEntry).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_48(this, other);
+    return protoMergeImpl_50(this, other);
   };
   protoOf(ClientEntry).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_59().descriptor_1;
+    return Companion_getInstance_63().descriptor_1;
   };
   protoOf(ClientEntry).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_48();
+    protoSize$factory_50();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(ClientEntry).component1_7eebsc_k$ = function () {
@@ -17328,8 +18756,8 @@
     if (!equals(this.unknownFields_1, tmp0_other_with_cast.unknownFields_1)) return false;
     return true;
   };
-  function Companion_60() {
-    Companion_instance_58 = this;
+  function Companion_64() {
+    Companion_instance_62 = this;
     var tmp = this;
     var tmp_0 = getKClass(UserEntry);
     // Inline function 'kotlin.collections.buildList' call
@@ -17340,29 +18768,29 @@
     var this_0 = ArrayList_init_$Create$(2);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.otr.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_182(this);
-    var tmp1_type = new Message(Companion_getInstance_56());
+    var tmp0_messageDescriptor = descriptor$factory_198(this);
+    var tmp1_type = new Message(Companion_getInstance_60());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp0_messageDescriptor, 'user', 1, tmp1_type, user$factory(), VOID, 'user'),
     );
-    var tmp2_messageDescriptor = descriptor$factory_183(this);
-    var tmp3_type = new Repeated(new Message(Companion_getInstance_59()));
+    var tmp2_messageDescriptor = descriptor$factory_199(this);
+    var tmp3_type = new Repeated(new Message(Companion_getInstance_63()));
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp2_messageDescriptor, 'clients', 2, tmp3_type, clients$factory(), VOID, 'clients'),
     );
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('proteus.UserEntry', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_60).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_49(Companion_getInstance_60(), u);
+  protoOf(Companion_64).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_51(Companion_getInstance_64(), u);
   };
-  protoOf(Companion_60).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_64).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_58;
-  function Companion_getInstance_60() {
-    if (Companion_instance_58 == null) new Companion_60();
-    return Companion_instance_58;
+  var Companion_instance_62;
+  function Companion_getInstance_64() {
+    if (Companion_instance_62 == null) new Companion_64();
+    return Companion_instance_62;
   }
   function UserEntry$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -17370,7 +18798,7 @@
     };
   }
   function UserEntry(user, clients, unknownFields) {
-    Companion_getInstance_60();
+    Companion_getInstance_64();
     clients = clients === VOID ? emptyList() : clients;
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
     this.user = user;
@@ -17389,15 +18817,15 @@
     return this.unknownFields_1;
   };
   protoOf(UserEntry).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_49(this, other);
+    return protoMergeImpl_51(this, other);
   };
   protoOf(UserEntry).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_60().descriptor_1;
+    return Companion_getInstance_64().descriptor_1;
   };
   protoOf(UserEntry).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_49();
+    protoSize$factory_51();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(UserEntry).component1_7eebsc_k$ = function () {
@@ -17438,8 +18866,8 @@
     if (!equals(this.unknownFields_1, tmp0_other_with_cast.unknownFields_1)) return false;
     return true;
   };
-  function Companion_61() {
-    Companion_instance_59 = this;
+  function Companion_65() {
+    Companion_instance_63 = this;
     var tmp = this;
     var tmp_0 = getKClass(QualifiedUserEntry);
     // Inline function 'kotlin.collections.buildList' call
@@ -17450,29 +18878,29 @@
     var this_0 = ArrayList_init_$Create$(2);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.otr.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_184(this);
+    var tmp0_messageDescriptor = descriptor$factory_200(this);
     var tmp1_type = new String_0(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp0_messageDescriptor, 'domain', 1, tmp1_type, domain$factory_3(), VOID, 'domain'),
     );
-    var tmp2_messageDescriptor = descriptor$factory_185(this);
-    var tmp3_type = new Repeated(new Message(Companion_getInstance_60()));
+    var tmp2_messageDescriptor = descriptor$factory_201(this);
+    var tmp3_type = new Repeated(new Message(Companion_getInstance_64()));
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp2_messageDescriptor, 'entries', 2, tmp3_type, entries$factory(), VOID, 'entries'),
     );
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('proteus.QualifiedUserEntry', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_61).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_50(Companion_getInstance_61(), u);
+  protoOf(Companion_65).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_52(Companion_getInstance_65(), u);
   };
-  protoOf(Companion_61).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_65).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_59;
-  function Companion_getInstance_61() {
-    if (Companion_instance_59 == null) new Companion_61();
-    return Companion_instance_59;
+  var Companion_instance_63;
+  function Companion_getInstance_65() {
+    if (Companion_instance_63 == null) new Companion_65();
+    return Companion_instance_63;
   }
   function QualifiedUserEntry$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -17480,7 +18908,7 @@
     };
   }
   function QualifiedUserEntry(domain, entries, unknownFields) {
-    Companion_getInstance_61();
+    Companion_getInstance_65();
     entries = entries === VOID ? emptyList() : entries;
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
     this.domain = domain;
@@ -17499,15 +18927,15 @@
     return this.unknownFields_1;
   };
   protoOf(QualifiedUserEntry).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_50(this, other);
+    return protoMergeImpl_52(this, other);
   };
   protoOf(QualifiedUserEntry).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_61().descriptor_1;
+    return Companion_getInstance_65().descriptor_1;
   };
   protoOf(QualifiedUserEntry).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_50();
+    protoSize$factory_52();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(QualifiedUserEntry).component1_7eebsc_k$ = function () {
@@ -17554,8 +18982,8 @@
     if (!equals(this.unknownFields_1, tmp0_other_with_cast.unknownFields_1)) return false;
     return true;
   };
-  function Companion_62() {
-    Companion_instance_60 = this;
+  function Companion_66() {
+    Companion_instance_64 = this;
     var tmp = this;
     var tmp_0 = getKClass(NewOtrMessage);
     // Inline function 'kotlin.collections.buildList' call
@@ -17566,17 +18994,17 @@
     var this_0 = ArrayList_init_$Create$(7);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.otr.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_186(this);
-    var tmp1_type = new Message(Companion_getInstance_58());
+    var tmp0_messageDescriptor = descriptor$factory_202(this);
+    var tmp1_type = new Message(Companion_getInstance_62());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp0_messageDescriptor, 'sender', 1, tmp1_type, sender$factory(), VOID, 'sender'),
     );
-    var tmp2_messageDescriptor = descriptor$factory_187(this);
-    var tmp3_type = new Repeated(new Message(Companion_getInstance_60()));
+    var tmp2_messageDescriptor = descriptor$factory_203(this);
+    var tmp3_type = new Repeated(new Message(Companion_getInstance_64()));
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp2_messageDescriptor, 'recipients', 2, tmp3_type, recipients$factory(), VOID, 'recipients'),
     );
-    var tmp4_messageDescriptor = descriptor$factory_188(this);
+    var tmp4_messageDescriptor = descriptor$factory_204(this);
     var tmp5_type = new Bool(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
@@ -17589,13 +19017,13 @@
         'nativePush',
       ),
     );
-    var tmp6_messageDescriptor = descriptor$factory_189(this);
+    var tmp6_messageDescriptor = descriptor$factory_205(this);
     var tmp7_type = new Bytes(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp6_messageDescriptor, 'blob', 4, tmp7_type, blob$factory(), VOID, 'blob'),
     );
-    var tmp8_messageDescriptor = descriptor$factory_190(this);
-    var tmp9_type = new Enum_0(Companion_getInstance_55(), true);
+    var tmp8_messageDescriptor = descriptor$factory_206(this);
+    var tmp9_type = new Enum_0(Companion_getInstance_59(), true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
         tmp8_messageDescriptor,
@@ -17607,13 +19035,13 @@
         'nativePriority',
       ),
     );
-    var tmp10_messageDescriptor = descriptor$factory_191(this);
+    var tmp10_messageDescriptor = descriptor$factory_207(this);
     var tmp11_type = new Bool(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp10_messageDescriptor, 'transient', 6, tmp11_type, transient$factory(), VOID, 'transient'),
     );
-    var tmp12_messageDescriptor = descriptor$factory_192(this);
-    var tmp13_type = new Repeated(new Message(Companion_getInstance_56()));
+    var tmp12_messageDescriptor = descriptor$factory_208(this);
+    var tmp13_type = new Repeated(new Message(Companion_getInstance_60()));
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
         tmp12_messageDescriptor,
@@ -17628,16 +19056,16 @@
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('proteus.NewOtrMessage', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_62).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_51(Companion_getInstance_62(), u);
+  protoOf(Companion_66).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_53(Companion_getInstance_66(), u);
   };
-  protoOf(Companion_62).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_66).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_60;
-  function Companion_getInstance_62() {
-    if (Companion_instance_60 == null) new Companion_62();
-    return Companion_instance_60;
+  var Companion_instance_64;
+  function Companion_getInstance_66() {
+    if (Companion_instance_64 == null) new Companion_66();
+    return Companion_instance_64;
   }
   function NewOtrMessage$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -17654,7 +19082,7 @@
     reportMissing,
     unknownFields,
   ) {
-    Companion_getInstance_62();
+    Companion_getInstance_66();
     recipients = recipients === VOID ? emptyList() : recipients;
     nativePush = nativePush === VOID ? null : nativePush;
     blob = blob === VOID ? null : blob;
@@ -17698,15 +19126,15 @@
     return this.unknownFields_1;
   };
   protoOf(NewOtrMessage).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_51(this, other);
+    return protoMergeImpl_53(this, other);
   };
   protoOf(NewOtrMessage).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_62().descriptor_1;
+    return Companion_getInstance_66().descriptor_1;
   };
   protoOf(NewOtrMessage).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_51();
+    protoSize$factory_53();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(NewOtrMessage).component1_7eebsc_k$ = function () {
@@ -17845,8 +19273,8 @@
   function ClientMismatchStrategy(value) {
     OneOf.call(this, value);
   }
-  function Companion_63() {
-    Companion_instance_61 = this;
+  function Companion_67() {
+    Companion_instance_65 = this;
     var tmp = this;
     var tmp_0 = getKClass(QualifiedNewOtrMessage);
     // Inline function 'kotlin.collections.buildList' call
@@ -17857,13 +19285,13 @@
     var this_0 = ArrayList_init_$Create$(10);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.otr.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_193(this);
-    var tmp1_type = new Message(Companion_getInstance_58());
+    var tmp0_messageDescriptor = descriptor$factory_209(this);
+    var tmp1_type = new Message(Companion_getInstance_62());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp0_messageDescriptor, 'sender', 1, tmp1_type, sender$factory_0(), VOID, 'sender'),
     );
-    var tmp2_messageDescriptor = descriptor$factory_194(this);
-    var tmp3_type = new Repeated(new Message(Companion_getInstance_61()));
+    var tmp2_messageDescriptor = descriptor$factory_210(this);
+    var tmp3_type = new Repeated(new Message(Companion_getInstance_65()));
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
         tmp2_messageDescriptor,
@@ -17875,7 +19303,7 @@
         'recipients',
       ),
     );
-    var tmp4_messageDescriptor = descriptor$factory_195(this);
+    var tmp4_messageDescriptor = descriptor$factory_211(this);
     var tmp5_type = new Bool(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
@@ -17888,13 +19316,13 @@
         'nativePush',
       ),
     );
-    var tmp6_messageDescriptor = descriptor$factory_196(this);
+    var tmp6_messageDescriptor = descriptor$factory_212(this);
     var tmp7_type = new Bytes(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp6_messageDescriptor, 'blob', 4, tmp7_type, blob$factory_0(), VOID, 'blob'),
     );
-    var tmp8_messageDescriptor = descriptor$factory_197(this);
-    var tmp9_type = new Enum_0(Companion_getInstance_55(), true);
+    var tmp8_messageDescriptor = descriptor$factory_213(this);
+    var tmp9_type = new Enum_0(Companion_getInstance_59(), true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
         tmp8_messageDescriptor,
@@ -17906,7 +19334,7 @@
         'nativePriority',
       ),
     );
-    var tmp10_messageDescriptor = descriptor$factory_198(this);
+    var tmp10_messageDescriptor = descriptor$factory_214(this);
     var tmp11_type = new Bool(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
@@ -17919,18 +19347,18 @@
         'transient',
       ),
     );
-    var tmp12_messageDescriptor = descriptor$factory_199(this);
-    var tmp13_type = new Message(Companion_getInstance_64());
+    var tmp12_messageDescriptor = descriptor$factory_215(this);
+    var tmp13_type = new Message(Companion_getInstance_68());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp12_messageDescriptor, 'report_all', 7, tmp13_type, reportAll$factory(), true, 'reportAll'),
     );
-    var tmp14_messageDescriptor = descriptor$factory_200(this);
-    var tmp15_type = new Message(Companion_getInstance_65());
+    var tmp14_messageDescriptor = descriptor$factory_216(this);
+    var tmp15_type = new Message(Companion_getInstance_69());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp14_messageDescriptor, 'ignore_all', 8, tmp15_type, ignoreAll$factory(), true, 'ignoreAll'),
     );
-    var tmp16_messageDescriptor = descriptor$factory_201(this);
-    var tmp17_type = new Message(Companion_getInstance_66());
+    var tmp16_messageDescriptor = descriptor$factory_217(this);
+    var tmp17_type = new Message(Companion_getInstance_70());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
         tmp16_messageDescriptor,
@@ -17942,8 +19370,8 @@
         'reportOnly',
       ),
     );
-    var tmp18_messageDescriptor = descriptor$factory_202(this);
-    var tmp19_type = new Message(Companion_getInstance_67());
+    var tmp18_messageDescriptor = descriptor$factory_218(this);
+    var tmp19_type = new Message(Companion_getInstance_71());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
         tmp18_messageDescriptor,
@@ -17958,16 +19386,16 @@
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('proteus.QualifiedNewOtrMessage', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_63).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_52(Companion_getInstance_63(), u);
+  protoOf(Companion_67).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_54(Companion_getInstance_67(), u);
   };
-  protoOf(Companion_63).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_67).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_61;
-  function Companion_getInstance_63() {
-    if (Companion_instance_61 == null) new Companion_63();
-    return Companion_instance_61;
+  var Companion_instance_65;
+  function Companion_getInstance_67() {
+    if (Companion_instance_65 == null) new Companion_67();
+    return Companion_instance_65;
   }
   function QualifiedNewOtrMessage$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -17984,7 +19412,7 @@
     clientMismatchStrategy,
     unknownFields,
   ) {
-    Companion_getInstance_63();
+    Companion_getInstance_67();
     recipients = recipients === VOID ? emptyList() : recipients;
     nativePush = nativePush === VOID ? null : nativePush;
     blob = blob === VOID ? null : blob;
@@ -18048,15 +19476,15 @@
     return tmp0_safe_receiver == null ? null : tmp0_safe_receiver.get_value_j01efc_k$();
   };
   protoOf(QualifiedNewOtrMessage).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_52(this, other);
+    return protoMergeImpl_54(this, other);
   };
   protoOf(QualifiedNewOtrMessage).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_63().descriptor_1;
+    return Companion_getInstance_67().descriptor_1;
   };
   protoOf(QualifiedNewOtrMessage).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_52();
+    protoSize$factory_54();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(QualifiedNewOtrMessage).component1_7eebsc_k$ = function () {
@@ -18187,8 +19615,8 @@
   function ClientMismatchStrategy$ReportAll$Companion$defaultInstance$delegate$lambda() {
     return new ReportAll_0();
   }
-  function Companion_64() {
-    Companion_instance_62 = this;
+  function Companion_68() {
+    Companion_instance_66 = this;
     var tmp = this;
     tmp.defaultInstance$delegate_1 = lazy(ClientMismatchStrategy$ReportAll$Companion$defaultInstance$delegate$lambda);
     var tmp_0 = this;
@@ -18203,22 +19631,22 @@
     var tmp$ret$3 = ArrayList_init_$Create$(0).build_1k0s4u_k$();
     tmp_0.descriptor_1 = new MessageDescriptor('proteus.ClientMismatchStrategy.ReportAll', tmp_1, this, tmp$ret$3);
   }
-  protoOf(Companion_64).get_defaultInstance_axha8d_k$ = function () {
+  protoOf(Companion_68).get_defaultInstance_axha8d_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.defaultInstance$delegate_1;
     defaultInstance$factory_7();
     return this_0.get_value_j01efc_k$();
   };
-  protoOf(Companion_64).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_54(Companion_getInstance_64(), u);
+  protoOf(Companion_68).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_56(Companion_getInstance_68(), u);
   };
-  protoOf(Companion_64).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_68).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_62;
-  function Companion_getInstance_64() {
-    if (Companion_instance_62 == null) new Companion_64();
-    return Companion_instance_62;
+  var Companion_instance_66;
+  function Companion_getInstance_68() {
+    if (Companion_instance_66 == null) new Companion_68();
+    return Companion_instance_66;
   }
   function ClientMismatchStrategy$ReportAll$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -18228,8 +19656,8 @@
   function ClientMismatchStrategy$IgnoreAll$Companion$defaultInstance$delegate$lambda() {
     return new IgnoreAll_0();
   }
-  function Companion_65() {
-    Companion_instance_63 = this;
+  function Companion_69() {
+    Companion_instance_67 = this;
     var tmp = this;
     tmp.defaultInstance$delegate_1 = lazy(ClientMismatchStrategy$IgnoreAll$Companion$defaultInstance$delegate$lambda);
     var tmp_0 = this;
@@ -18244,22 +19672,22 @@
     var tmp$ret$3 = ArrayList_init_$Create$(0).build_1k0s4u_k$();
     tmp_0.descriptor_1 = new MessageDescriptor('proteus.ClientMismatchStrategy.IgnoreAll', tmp_1, this, tmp$ret$3);
   }
-  protoOf(Companion_65).get_defaultInstance_axha8d_k$ = function () {
+  protoOf(Companion_69).get_defaultInstance_axha8d_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.defaultInstance$delegate_1;
     defaultInstance$factory_8();
     return this_0.get_value_j01efc_k$();
   };
-  protoOf(Companion_65).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_55(Companion_getInstance_65(), u);
+  protoOf(Companion_69).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_57(Companion_getInstance_69(), u);
   };
-  protoOf(Companion_65).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_69).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_63;
-  function Companion_getInstance_65() {
-    if (Companion_instance_63 == null) new Companion_65();
-    return Companion_instance_63;
+  var Companion_instance_67;
+  function Companion_getInstance_69() {
+    if (Companion_instance_67 == null) new Companion_69();
+    return Companion_instance_67;
   }
   function ClientMismatchStrategy$IgnoreAll$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -18269,8 +19697,8 @@
   function ClientMismatchStrategy$ReportOnly$Companion$defaultInstance$delegate$lambda() {
     return new ReportOnly_0();
   }
-  function Companion_66() {
-    Companion_instance_64 = this;
+  function Companion_70() {
+    Companion_instance_68 = this;
     var tmp = this;
     tmp.defaultInstance$delegate_1 = lazy(ClientMismatchStrategy$ReportOnly$Companion$defaultInstance$delegate$lambda);
     var tmp_0 = this;
@@ -18283,30 +19711,30 @@
     var this_0 = ArrayList_init_$Create$(1);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.otr.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_203(this);
-    var tmp1_type = new Repeated(new Message(Companion_getInstance_57()));
+    var tmp0_messageDescriptor = descriptor$factory_219(this);
+    var tmp1_type = new Repeated(new Message(Companion_getInstance_61()));
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp0_messageDescriptor, 'user_ids', 1, tmp1_type, userIds$factory(), VOID, 'userIds'),
     );
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp_0.descriptor_1 = new MessageDescriptor('proteus.ClientMismatchStrategy.ReportOnly', tmp_1, this, tmp$ret$2);
   }
-  protoOf(Companion_66).get_defaultInstance_axha8d_k$ = function () {
+  protoOf(Companion_70).get_defaultInstance_axha8d_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.defaultInstance$delegate_1;
     defaultInstance$factory_9();
     return this_0.get_value_j01efc_k$();
   };
-  protoOf(Companion_66).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_56(Companion_getInstance_66(), u);
+  protoOf(Companion_70).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_58(Companion_getInstance_70(), u);
   };
-  protoOf(Companion_66).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_70).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_64;
-  function Companion_getInstance_66() {
-    if (Companion_instance_64 == null) new Companion_66();
-    return Companion_instance_64;
+  var Companion_instance_68;
+  function Companion_getInstance_70() {
+    if (Companion_instance_68 == null) new Companion_70();
+    return Companion_instance_68;
   }
   function ClientMismatchStrategy$ReportOnly$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -18316,8 +19744,8 @@
   function ClientMismatchStrategy$IgnoreOnly$Companion$defaultInstance$delegate$lambda() {
     return new IgnoreOnly_0();
   }
-  function Companion_67() {
-    Companion_instance_65 = this;
+  function Companion_71() {
+    Companion_instance_69 = this;
     var tmp = this;
     tmp.defaultInstance$delegate_1 = lazy(ClientMismatchStrategy$IgnoreOnly$Companion$defaultInstance$delegate$lambda);
     var tmp_0 = this;
@@ -18330,38 +19758,38 @@
     var this_0 = ArrayList_init_$Create$(1);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.otr.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_204(this);
-    var tmp1_type = new Repeated(new Message(Companion_getInstance_57()));
+    var tmp0_messageDescriptor = descriptor$factory_220(this);
+    var tmp1_type = new Repeated(new Message(Companion_getInstance_61()));
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp0_messageDescriptor, 'user_ids', 1, tmp1_type, userIds$factory_0(), VOID, 'userIds'),
     );
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp_0.descriptor_1 = new MessageDescriptor('proteus.ClientMismatchStrategy.IgnoreOnly', tmp_1, this, tmp$ret$2);
   }
-  protoOf(Companion_67).get_defaultInstance_axha8d_k$ = function () {
+  protoOf(Companion_71).get_defaultInstance_axha8d_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.defaultInstance$delegate_1;
     defaultInstance$factory_10();
     return this_0.get_value_j01efc_k$();
   };
-  protoOf(Companion_67).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_57(Companion_getInstance_67(), u);
+  protoOf(Companion_71).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_59(Companion_getInstance_71(), u);
   };
-  protoOf(Companion_67).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_71).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_65;
-  function Companion_getInstance_67() {
-    if (Companion_instance_65 == null) new Companion_67();
-    return Companion_instance_65;
+  var Companion_instance_69;
+  function Companion_getInstance_71() {
+    if (Companion_instance_69 == null) new Companion_71();
+    return Companion_instance_69;
   }
   function ClientMismatchStrategy$IgnoreOnly$protoSize$delegate$lambda(this$0) {
     return function () {
       return get_protoSize.call(this$0);
     };
   }
-  function Companion_68() {
-    Companion_instance_66 = this;
+  function Companion_72() {
+    Companion_instance_70 = this;
     var tmp = this;
     tmp.defaultInstance$delegate_1 = lazy(ClientMismatchStrategy$Companion$defaultInstance$delegate$lambda);
     var tmp_0 = this;
@@ -18376,25 +19804,25 @@
     var tmp$ret$3 = ArrayList_init_$Create$(0).build_1k0s4u_k$();
     tmp_0.descriptor_1 = new MessageDescriptor('proteus.ClientMismatchStrategy', tmp_1, this, tmp$ret$3);
   }
-  protoOf(Companion_68).get_defaultInstance_axha8d_k$ = function () {
+  protoOf(Companion_72).get_defaultInstance_axha8d_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.defaultInstance$delegate_1;
     defaultInstance$factory_6();
     return this_0.get_value_j01efc_k$();
   };
-  protoOf(Companion_68).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_53(Companion_getInstance_68(), u);
+  protoOf(Companion_72).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_55(Companion_getInstance_72(), u);
   };
-  protoOf(Companion_68).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_72).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_66;
-  function Companion_getInstance_68() {
-    if (Companion_instance_66 == null) new Companion_68();
-    return Companion_instance_66;
+  var Companion_instance_70;
+  function Companion_getInstance_72() {
+    if (Companion_instance_70 == null) new Companion_72();
+    return Companion_instance_70;
   }
   function ReportAll_0(unknownFields) {
-    Companion_getInstance_64();
+    Companion_getInstance_68();
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
     this.unknownFields_1 = unknownFields;
     var tmp = this;
@@ -18404,15 +19832,15 @@
     return this.unknownFields_1;
   };
   protoOf(ReportAll_0).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_54(this, other);
+    return protoMergeImpl_56(this, other);
   };
   protoOf(ReportAll_0).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_64().descriptor_1;
+    return Companion_getInstance_68().descriptor_1;
   };
   protoOf(ReportAll_0).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_54();
+    protoSize$factory_56();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(ReportAll_0).component1_7eebsc_k$ = function () {
@@ -18439,7 +19867,7 @@
     return true;
   };
   function IgnoreAll_0(unknownFields) {
-    Companion_getInstance_65();
+    Companion_getInstance_69();
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
     this.unknownFields_1 = unknownFields;
     var tmp = this;
@@ -18449,15 +19877,15 @@
     return this.unknownFields_1;
   };
   protoOf(IgnoreAll_0).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_55(this, other);
+    return protoMergeImpl_57(this, other);
   };
   protoOf(IgnoreAll_0).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_65().descriptor_1;
+    return Companion_getInstance_69().descriptor_1;
   };
   protoOf(IgnoreAll_0).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_55();
+    protoSize$factory_57();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(IgnoreAll_0).component1_7eebsc_k$ = function () {
@@ -18484,7 +19912,7 @@
     return true;
   };
   function ReportOnly_0(userIds, unknownFields) {
-    Companion_getInstance_66();
+    Companion_getInstance_70();
     userIds = userIds === VOID ? emptyList() : userIds;
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
     this.userIds = userIds;
@@ -18499,15 +19927,15 @@
     return this.unknownFields_1;
   };
   protoOf(ReportOnly_0).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_56(this, other);
+    return protoMergeImpl_58(this, other);
   };
   protoOf(ReportOnly_0).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_66().descriptor_1;
+    return Companion_getInstance_70().descriptor_1;
   };
   protoOf(ReportOnly_0).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_56();
+    protoSize$factory_58();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(ReportOnly_0).component1_7eebsc_k$ = function () {
@@ -18541,7 +19969,7 @@
     return true;
   };
   function IgnoreOnly_0(userIds, unknownFields) {
-    Companion_getInstance_67();
+    Companion_getInstance_71();
     userIds = userIds === VOID ? emptyList() : userIds;
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
     this.userIds = userIds;
@@ -18556,15 +19984,15 @@
     return this.unknownFields_1;
   };
   protoOf(IgnoreOnly_0).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_57(this, other);
+    return protoMergeImpl_59(this, other);
   };
   protoOf(IgnoreOnly_0).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_67().descriptor_1;
+    return Companion_getInstance_71().descriptor_1;
   };
   protoOf(IgnoreOnly_0).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_57();
+    protoSize$factory_59();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(IgnoreOnly_0).component1_7eebsc_k$ = function () {
@@ -18603,7 +20031,7 @@
     };
   }
   function ClientMismatchStrategy_0(unknownFields) {
-    Companion_getInstance_68();
+    Companion_getInstance_72();
     unknownFields = unknownFields === VOID ? emptyMap() : unknownFields;
     this.unknownFields_1 = unknownFields;
     var tmp = this;
@@ -18613,15 +20041,15 @@
     return this.unknownFields_1;
   };
   protoOf(ClientMismatchStrategy_0).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_53(this, other);
+    return protoMergeImpl_55(this, other);
   };
   protoOf(ClientMismatchStrategy_0).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_68().descriptor_1;
+    return Companion_getInstance_72().descriptor_1;
   };
   protoOf(ClientMismatchStrategy_0).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_53();
+    protoSize$factory_55();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(ClientMismatchStrategy_0).component1_7eebsc_k$ = function () {
@@ -18647,8 +20075,8 @@
     if (!equals(this.unknownFields_1, tmp0_other_with_cast.unknownFields_1)) return false;
     return true;
   };
-  function Companion_69() {
-    Companion_instance_67 = this;
+  function Companion_73() {
+    Companion_instance_71 = this;
     var tmp = this;
     var tmp_0 = getKClass(OtrAssetMeta);
     // Inline function 'kotlin.collections.buildList' call
@@ -18659,13 +20087,13 @@
     var this_0 = ArrayList_init_$Create$(4);
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'com.wire.kalium.protobuf.otr.Companion.descriptor.<anonymous>' call
-    var tmp0_messageDescriptor = descriptor$factory_205(this);
-    var tmp1_type = new Message(Companion_getInstance_58());
+    var tmp0_messageDescriptor = descriptor$factory_221(this);
+    var tmp1_type = new Message(Companion_getInstance_62());
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp0_messageDescriptor, 'sender', 1, tmp1_type, sender$factory_1(), VOID, 'sender'),
     );
-    var tmp2_messageDescriptor = descriptor$factory_206(this);
-    var tmp3_type = new Repeated(new Message(Companion_getInstance_60()));
+    var tmp2_messageDescriptor = descriptor$factory_222(this);
+    var tmp3_type = new Repeated(new Message(Companion_getInstance_64()));
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
         tmp2_messageDescriptor,
@@ -18677,12 +20105,12 @@
         'recipients',
       ),
     );
-    var tmp4_messageDescriptor = descriptor$factory_207(this);
+    var tmp4_messageDescriptor = descriptor$factory_223(this);
     var tmp5_type = new Bool(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(tmp4_messageDescriptor, 'isInline', 3, tmp5_type, isInline$factory(), VOID, 'isInline'),
     );
-    var tmp6_messageDescriptor = descriptor$factory_208(this);
+    var tmp6_messageDescriptor = descriptor$factory_224(this);
     var tmp7_type = new Bool(true);
     this_0.add_utx5q5_k$(
       new FieldDescriptor(
@@ -18698,16 +20126,16 @@
     var tmp$ret$2 = this_0.build_1k0s4u_k$();
     tmp.descriptor_1 = new MessageDescriptor('proteus.OtrAssetMeta', tmp_0, this, tmp$ret$2);
   }
-  protoOf(Companion_69).decodeWith_xpfz54_k$ = function (u) {
-    return decodeWithImpl_58(Companion_getInstance_69(), u);
+  protoOf(Companion_73).decodeWith_xpfz54_k$ = function (u) {
+    return decodeWithImpl_60(Companion_getInstance_73(), u);
   };
-  protoOf(Companion_69).get_descriptor_wjt6a0_k$ = function () {
+  protoOf(Companion_73).get_descriptor_wjt6a0_k$ = function () {
     return this.descriptor_1;
   };
-  var Companion_instance_67;
-  function Companion_getInstance_69() {
-    if (Companion_instance_67 == null) new Companion_69();
-    return Companion_instance_67;
+  var Companion_instance_71;
+  function Companion_getInstance_73() {
+    if (Companion_instance_71 == null) new Companion_73();
+    return Companion_instance_71;
   }
   function OtrAssetMeta$protoSize$delegate$lambda(this$0) {
     return function () {
@@ -18715,7 +20143,7 @@
     };
   }
   function OtrAssetMeta(sender, recipients, isInline, nativePush, unknownFields) {
-    Companion_getInstance_69();
+    Companion_getInstance_73();
     recipients = recipients === VOID ? emptyList() : recipients;
     isInline = isInline === VOID ? null : isInline;
     nativePush = nativePush === VOID ? null : nativePush;
@@ -18744,15 +20172,15 @@
     return this.unknownFields_1;
   };
   protoOf(OtrAssetMeta).plus_fj0q1z_k$ = function (other) {
-    return protoMergeImpl_58(this, other);
+    return protoMergeImpl_60(this, other);
   };
   protoOf(OtrAssetMeta).get_descriptor_wjt6a0_k$ = function () {
-    return Companion_getInstance_69().descriptor_1;
+    return Companion_getInstance_73().descriptor_1;
   };
   protoOf(OtrAssetMeta).get_protoSize_1ekskg_k$ = function () {
     // Inline function 'kotlin.getValue' call
     var this_0 = this.protoSize$delegate_1;
-    protoSize$factory_58();
+    protoSize$factory_60();
     return this_0.get_value_j01efc_k$();
   };
   protoOf(OtrAssetMeta).component1_7eebsc_k$ = function () {
@@ -18816,21 +20244,21 @@
     return true;
   };
   function orDefaultForClientMismatchStrategy(_this__u8e3s4) {
-    return _this__u8e3s4 == null ? Companion_getInstance_68().defaultInstance : _this__u8e3s4;
+    return _this__u8e3s4 == null ? Companion_getInstance_72().defaultInstance : _this__u8e3s4;
   }
   function orDefaultForClientMismatchStrategyReportAll(_this__u8e3s4) {
-    return _this__u8e3s4 == null ? Companion_getInstance_64().defaultInstance : _this__u8e3s4;
+    return _this__u8e3s4 == null ? Companion_getInstance_68().defaultInstance : _this__u8e3s4;
   }
   function orDefaultForClientMismatchStrategyIgnoreAll(_this__u8e3s4) {
-    return _this__u8e3s4 == null ? Companion_getInstance_65().defaultInstance : _this__u8e3s4;
+    return _this__u8e3s4 == null ? Companion_getInstance_69().defaultInstance : _this__u8e3s4;
   }
   function orDefaultForClientMismatchStrategyReportOnly(_this__u8e3s4) {
-    return _this__u8e3s4 == null ? Companion_getInstance_66().defaultInstance : _this__u8e3s4;
+    return _this__u8e3s4 == null ? Companion_getInstance_70().defaultInstance : _this__u8e3s4;
   }
   function orDefaultForClientMismatchStrategyIgnoreOnly(_this__u8e3s4) {
-    return _this__u8e3s4 == null ? Companion_getInstance_67().defaultInstance : _this__u8e3s4;
+    return _this__u8e3s4 == null ? Companion_getInstance_71().defaultInstance : _this__u8e3s4;
   }
-  function protoMergeImpl_45(_this__u8e3s4, plus) {
+  function protoMergeImpl_47(_this__u8e3s4, plus) {
     var tmp0_safe_receiver = plus instanceof UserId_0 ? plus : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -18844,15 +20272,15 @@
     var tmp1_elvis_lhs = tmp;
     return tmp1_elvis_lhs == null ? _this__u8e3s4 : tmp1_elvis_lhs;
   }
-  function decodeWithImpl_45(_this__u8e3s4, u) {
+  function decodeWithImpl_47(_this__u8e3s4, u) {
     var uuid = {_v: null};
-    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_45(uuid));
+    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_47(uuid));
     if (uuid._v == null) {
       throw Companion_getInstance().missingRequiredField('uuid');
     }
     return new UserId_0(ensureNotNull(uuid._v), unknownFields);
   }
-  function protoMergeImpl_46(_this__u8e3s4, plus) {
+  function protoMergeImpl_48(_this__u8e3s4, plus) {
     var tmp0_safe_receiver = plus instanceof QualifiedUserId_0 ? plus : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -18870,10 +20298,10 @@
     var tmp1_elvis_lhs = tmp;
     return tmp1_elvis_lhs == null ? _this__u8e3s4 : tmp1_elvis_lhs;
   }
-  function decodeWithImpl_46(_this__u8e3s4, u) {
+  function decodeWithImpl_48(_this__u8e3s4, u) {
     var id = {_v: null};
     var domain = {_v: null};
-    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_46(id, domain));
+    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_48(id, domain));
     if (id._v == null) {
       throw Companion_getInstance().missingRequiredField('id');
     }
@@ -18882,7 +20310,7 @@
     }
     return new QualifiedUserId_0(ensureNotNull(id._v), ensureNotNull(domain._v), unknownFields);
   }
-  function protoMergeImpl_47(_this__u8e3s4, plus) {
+  function protoMergeImpl_49(_this__u8e3s4, plus) {
     var tmp0_safe_receiver = plus instanceof ClientId ? plus : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -18896,15 +20324,15 @@
     var tmp1_elvis_lhs = tmp;
     return tmp1_elvis_lhs == null ? _this__u8e3s4 : tmp1_elvis_lhs;
   }
-  function decodeWithImpl_47(_this__u8e3s4, u) {
+  function decodeWithImpl_49(_this__u8e3s4, u) {
     var client = {_v: null};
-    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_47(client));
+    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_49(client));
     if (client._v == null) {
       throw Companion_getInstance().missingRequiredField('client');
     }
     return new ClientId(ensureNotNull(client._v), unknownFields);
   }
-  function protoMergeImpl_48(_this__u8e3s4, plus) {
+  function protoMergeImpl_50(_this__u8e3s4, plus) {
     var tmp0_safe_receiver = plus instanceof ClientEntry ? plus : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -18922,10 +20350,10 @@
     var tmp1_elvis_lhs = tmp;
     return tmp1_elvis_lhs == null ? _this__u8e3s4 : tmp1_elvis_lhs;
   }
-  function decodeWithImpl_48(_this__u8e3s4, u) {
+  function decodeWithImpl_50(_this__u8e3s4, u) {
     var client = {_v: null};
     var text = {_v: null};
-    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_48(client, text));
+    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_50(client, text));
     if (client._v == null) {
       throw Companion_getInstance().missingRequiredField('client');
     }
@@ -18934,7 +20362,7 @@
     }
     return new ClientEntry(ensureNotNull(client._v), ensureNotNull(text._v), unknownFields);
   }
-  function protoMergeImpl_49(_this__u8e3s4, plus_1) {
+  function protoMergeImpl_51(_this__u8e3s4, plus_1) {
     var tmp0_safe_receiver = plus_1 instanceof UserEntry ? plus_1 : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -18952,16 +20380,16 @@
     var tmp1_elvis_lhs = tmp;
     return tmp1_elvis_lhs == null ? _this__u8e3s4 : tmp1_elvis_lhs;
   }
-  function decodeWithImpl_49(_this__u8e3s4, u) {
+  function decodeWithImpl_51(_this__u8e3s4, u) {
     var user = {_v: null};
     var clients = {_v: null};
-    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_49(user, clients));
+    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_51(user, clients));
     if (user._v == null) {
       throw Companion_getInstance().missingRequiredField('user');
     }
     return new UserEntry(ensureNotNull(user._v), Companion_getInstance_0().fixed(clients._v), unknownFields);
   }
-  function protoMergeImpl_50(_this__u8e3s4, plus_1) {
+  function protoMergeImpl_52(_this__u8e3s4, plus_1) {
     var tmp0_safe_receiver = plus_1 instanceof QualifiedUserEntry ? plus_1 : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -18979,16 +20407,16 @@
     var tmp1_elvis_lhs = tmp;
     return tmp1_elvis_lhs == null ? _this__u8e3s4 : tmp1_elvis_lhs;
   }
-  function decodeWithImpl_50(_this__u8e3s4, u) {
+  function decodeWithImpl_52(_this__u8e3s4, u) {
     var domain = {_v: null};
     var entries = {_v: null};
-    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_50(domain, entries));
+    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_52(domain, entries));
     if (domain._v == null) {
       throw Companion_getInstance().missingRequiredField('domain');
     }
     return new QualifiedUserEntry(ensureNotNull(domain._v), Companion_getInstance_0().fixed(entries._v), unknownFields);
   }
-  function protoMergeImpl_51(_this__u8e3s4, plus_1) {
+  function protoMergeImpl_53(_this__u8e3s4, plus_1) {
     var tmp0_safe_receiver = plus_1 instanceof NewOtrMessage ? plus_1 : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -19020,7 +20448,7 @@
     var tmp1_elvis_lhs_0 = tmp;
     return tmp1_elvis_lhs_0 == null ? _this__u8e3s4 : tmp1_elvis_lhs_0;
   }
-  function decodeWithImpl_51(_this__u8e3s4, u) {
+  function decodeWithImpl_53(_this__u8e3s4, u) {
     var sender = {_v: null};
     var recipients = {_v: null};
     var nativePush = {_v: null};
@@ -19030,7 +20458,7 @@
     var reportMissing = {_v: null};
     var unknownFields = u.readMessage_fttc7y_k$(
       _this__u8e3s4,
-      decodeWithImpl$lambda_51(sender, recipients, nativePush, blob, nativePriority, transient, reportMissing),
+      decodeWithImpl$lambda_53(sender, recipients, nativePush, blob, nativePriority, transient, reportMissing),
     );
     if (sender._v == null) {
       throw Companion_getInstance().missingRequiredField('sender');
@@ -19046,7 +20474,7 @@
       unknownFields,
     );
   }
-  function protoMergeImpl_52(_this__u8e3s4, plus_1) {
+  function protoMergeImpl_54(_this__u8e3s4, plus_1) {
     var tmp0_safe_receiver = plus_1 instanceof QualifiedNewOtrMessage ? plus_1 : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -19146,7 +20574,7 @@
     var tmp1_elvis_lhs_0 = tmp;
     return tmp1_elvis_lhs_0 == null ? _this__u8e3s4 : tmp1_elvis_lhs_0;
   }
-  function decodeWithImpl_52(_this__u8e3s4, u) {
+  function decodeWithImpl_54(_this__u8e3s4, u) {
     var sender = {_v: null};
     var recipients = {_v: null};
     var nativePush = {_v: null};
@@ -19156,7 +20584,7 @@
     var clientMismatchStrategy = {_v: null};
     var unknownFields = u.readMessage_fttc7y_k$(
       _this__u8e3s4,
-      decodeWithImpl$lambda_52(sender, recipients, nativePush, blob, nativePriority, transient, clientMismatchStrategy),
+      decodeWithImpl$lambda_54(sender, recipients, nativePush, blob, nativePriority, transient, clientMismatchStrategy),
     );
     if (sender._v == null) {
       throw Companion_getInstance().missingRequiredField('sender');
@@ -19172,44 +20600,8 @@
       unknownFields,
     );
   }
-  function protoMergeImpl_53(_this__u8e3s4, plus) {
-    var tmp0_safe_receiver = plus instanceof ClientMismatchStrategy_0 ? plus : null;
-    var tmp;
-    if (tmp0_safe_receiver == null) {
-      tmp = null;
-    } else {
-      // Inline function 'kotlin.let' call
-      // Inline function 'kotlin.contracts.contract' call
-      // Inline function 'com.wire.kalium.protobuf.otr.protoMergeImpl.<anonymous>' call
-      tmp = tmp0_safe_receiver.copy(plus_0(_this__u8e3s4.unknownFields_1, plus.get_unknownFields_kpu7i2_k$()));
-    }
-    var tmp1_elvis_lhs = tmp;
-    return tmp1_elvis_lhs == null ? _this__u8e3s4 : tmp1_elvis_lhs;
-  }
-  function decodeWithImpl_53(_this__u8e3s4, u) {
-    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_53);
-    return new ClientMismatchStrategy_0(unknownFields);
-  }
-  function protoMergeImpl_54(_this__u8e3s4, plus) {
-    var tmp0_safe_receiver = plus instanceof ReportAll_0 ? plus : null;
-    var tmp;
-    if (tmp0_safe_receiver == null) {
-      tmp = null;
-    } else {
-      // Inline function 'kotlin.let' call
-      // Inline function 'kotlin.contracts.contract' call
-      // Inline function 'com.wire.kalium.protobuf.otr.protoMergeImpl.<anonymous>' call
-      tmp = tmp0_safe_receiver.copy(plus_0(_this__u8e3s4.unknownFields_1, plus.get_unknownFields_kpu7i2_k$()));
-    }
-    var tmp1_elvis_lhs = tmp;
-    return tmp1_elvis_lhs == null ? _this__u8e3s4 : tmp1_elvis_lhs;
-  }
-  function decodeWithImpl_54(_this__u8e3s4, u) {
-    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_54);
-    return new ReportAll_0(unknownFields);
-  }
   function protoMergeImpl_55(_this__u8e3s4, plus) {
-    var tmp0_safe_receiver = plus instanceof IgnoreAll_0 ? plus : null;
+    var tmp0_safe_receiver = plus instanceof ClientMismatchStrategy_0 ? plus : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
       tmp = null;
@@ -19224,9 +20616,45 @@
   }
   function decodeWithImpl_55(_this__u8e3s4, u) {
     var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_55);
+    return new ClientMismatchStrategy_0(unknownFields);
+  }
+  function protoMergeImpl_56(_this__u8e3s4, plus) {
+    var tmp0_safe_receiver = plus instanceof ReportAll_0 ? plus : null;
+    var tmp;
+    if (tmp0_safe_receiver == null) {
+      tmp = null;
+    } else {
+      // Inline function 'kotlin.let' call
+      // Inline function 'kotlin.contracts.contract' call
+      // Inline function 'com.wire.kalium.protobuf.otr.protoMergeImpl.<anonymous>' call
+      tmp = tmp0_safe_receiver.copy(plus_0(_this__u8e3s4.unknownFields_1, plus.get_unknownFields_kpu7i2_k$()));
+    }
+    var tmp1_elvis_lhs = tmp;
+    return tmp1_elvis_lhs == null ? _this__u8e3s4 : tmp1_elvis_lhs;
+  }
+  function decodeWithImpl_56(_this__u8e3s4, u) {
+    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_56);
+    return new ReportAll_0(unknownFields);
+  }
+  function protoMergeImpl_57(_this__u8e3s4, plus) {
+    var tmp0_safe_receiver = plus instanceof IgnoreAll_0 ? plus : null;
+    var tmp;
+    if (tmp0_safe_receiver == null) {
+      tmp = null;
+    } else {
+      // Inline function 'kotlin.let' call
+      // Inline function 'kotlin.contracts.contract' call
+      // Inline function 'com.wire.kalium.protobuf.otr.protoMergeImpl.<anonymous>' call
+      tmp = tmp0_safe_receiver.copy(plus_0(_this__u8e3s4.unknownFields_1, plus.get_unknownFields_kpu7i2_k$()));
+    }
+    var tmp1_elvis_lhs = tmp;
+    return tmp1_elvis_lhs == null ? _this__u8e3s4 : tmp1_elvis_lhs;
+  }
+  function decodeWithImpl_57(_this__u8e3s4, u) {
+    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_57);
     return new IgnoreAll_0(unknownFields);
   }
-  function protoMergeImpl_56(_this__u8e3s4, plus_1) {
+  function protoMergeImpl_58(_this__u8e3s4, plus_1) {
     var tmp0_safe_receiver = plus_1 instanceof ReportOnly_0 ? plus_1 : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -19243,12 +20671,12 @@
     var tmp1_elvis_lhs = tmp;
     return tmp1_elvis_lhs == null ? _this__u8e3s4 : tmp1_elvis_lhs;
   }
-  function decodeWithImpl_56(_this__u8e3s4, u) {
+  function decodeWithImpl_58(_this__u8e3s4, u) {
     var userIds = {_v: null};
-    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_56(userIds));
+    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_58(userIds));
     return new ReportOnly_0(Companion_getInstance_0().fixed(userIds._v), unknownFields);
   }
-  function protoMergeImpl_57(_this__u8e3s4, plus_1) {
+  function protoMergeImpl_59(_this__u8e3s4, plus_1) {
     var tmp0_safe_receiver = plus_1 instanceof IgnoreOnly_0 ? plus_1 : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -19265,12 +20693,12 @@
     var tmp1_elvis_lhs = tmp;
     return tmp1_elvis_lhs == null ? _this__u8e3s4 : tmp1_elvis_lhs;
   }
-  function decodeWithImpl_57(_this__u8e3s4, u) {
+  function decodeWithImpl_59(_this__u8e3s4, u) {
     var userIds = {_v: null};
-    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_57(userIds));
+    var unknownFields = u.readMessage_fttc7y_k$(_this__u8e3s4, decodeWithImpl$lambda_59(userIds));
     return new IgnoreOnly_0(Companion_getInstance_0().fixed(userIds._v), unknownFields);
   }
-  function protoMergeImpl_58(_this__u8e3s4, plus_1) {
+  function protoMergeImpl_60(_this__u8e3s4, plus_1) {
     var tmp0_safe_receiver = plus_1 instanceof OtrAssetMeta ? plus_1 : null;
     var tmp;
     if (tmp0_safe_receiver == null) {
@@ -19295,14 +20723,14 @@
     var tmp1_elvis_lhs_0 = tmp;
     return tmp1_elvis_lhs_0 == null ? _this__u8e3s4 : tmp1_elvis_lhs_0;
   }
-  function decodeWithImpl_58(_this__u8e3s4, u) {
+  function decodeWithImpl_60(_this__u8e3s4, u) {
     var sender = {_v: null};
     var recipients = {_v: null};
     var isInline = {_v: null};
     var nativePush = {_v: null};
     var unknownFields = u.readMessage_fttc7y_k$(
       _this__u8e3s4,
-      decodeWithImpl$lambda_58(sender, recipients, isInline, nativePush),
+      decodeWithImpl$lambda_60(sender, recipients, isInline, nativePush),
     );
     if (sender._v == null) {
       throw Companion_getInstance().missingRequiredField('sender');
@@ -19315,7 +20743,7 @@
       unknownFields,
     );
   }
-  function decodeWithImpl$lambda_45($uuid) {
+  function decodeWithImpl$lambda_47($uuid) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       if (_fieldNumber === 1) {
@@ -19325,7 +20753,7 @@
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_46($id, $domain) {
+  function decodeWithImpl$lambda_48($id, $domain) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       if (_fieldNumber === 1) {
@@ -19338,7 +20766,7 @@
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_47($client) {
+  function decodeWithImpl$lambda_49($client) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       if (_fieldNumber === 1) {
@@ -19348,7 +20776,7 @@
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_48($client, $text) {
+  function decodeWithImpl$lambda_50($client, $text) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       if (_fieldNumber === 1) {
@@ -19361,7 +20789,7 @@
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_49($user, $clients) {
+  function decodeWithImpl$lambda_51($user, $clients) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       if (_fieldNumber === 1) {
@@ -19382,7 +20810,7 @@
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_50($domain, $entries) {
+  function decodeWithImpl$lambda_52($domain, $entries) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       if (_fieldNumber === 1) {
@@ -19403,7 +20831,7 @@
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_51(
+  function decodeWithImpl$lambda_53(
     $sender,
     $recipients,
     $nativePush,
@@ -19471,7 +20899,7 @@
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_52(
+  function decodeWithImpl$lambda_54(
     $sender,
     $recipients,
     $nativePush,
@@ -19539,16 +20967,16 @@
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_53(_anonymous_parameter_0__qggqh8, _anonymous_parameter_1__qggqgd) {
-    return Unit_getInstance();
-  }
-  function decodeWithImpl$lambda_54(_anonymous_parameter_0__qggqh8, _anonymous_parameter_1__qggqgd) {
-    return Unit_getInstance();
-  }
   function decodeWithImpl$lambda_55(_anonymous_parameter_0__qggqh8, _anonymous_parameter_1__qggqgd) {
     return Unit_getInstance();
   }
-  function decodeWithImpl$lambda_56($userIds) {
+  function decodeWithImpl$lambda_56(_anonymous_parameter_0__qggqh8, _anonymous_parameter_1__qggqgd) {
+    return Unit_getInstance();
+  }
+  function decodeWithImpl$lambda_57(_anonymous_parameter_0__qggqh8, _anonymous_parameter_1__qggqgd) {
+    return Unit_getInstance();
+  }
+  function decodeWithImpl$lambda_58($userIds) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       if (_fieldNumber === 1) {
@@ -19566,7 +20994,7 @@
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_57($userIds) {
+  function decodeWithImpl$lambda_59($userIds) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       if (_fieldNumber === 1) {
@@ -19584,7 +21012,7 @@
       return Unit_getInstance();
     };
   }
-  function decodeWithImpl$lambda_58($sender, $recipients, $isInline, $nativePush) {
+  function decodeWithImpl$lambda_60($sender, $recipients, $isInline, $nativePush) {
     return function (_fieldNumber, _fieldValue) {
       var tmp;
       switch (_fieldNumber) {
@@ -19620,7 +21048,7 @@
       return Unit_getInstance();
     };
   }
-  function values$factory_7() {
+  function values$factory_9() {
     return getPropertyCallableRef(
       'values',
       1,
@@ -19631,7 +21059,7 @@
       null,
     );
   }
-  function protoSize$factory_45() {
+  function protoSize$factory_47() {
     return getPropertyCallableRef(
       'protoSize',
       1,
@@ -19642,7 +21070,7 @@
       null,
     );
   }
-  function descriptor$factory_176($b0) {
+  function descriptor$factory_192($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -19664,425 +21092,7 @@
       null,
     );
   }
-  function protoSize$factory_46() {
-    return getPropertyCallableRef(
-      'protoSize',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.get_protoSize_1ekskg_k$();
-      },
-      null,
-    );
-  }
-  function descriptor$factory_177($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function id$factory_5() {
-    return getPropertyCallableRef(
-      'id',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.id;
-      },
-      null,
-    );
-  }
-  function descriptor$factory_178($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function domain$factory_2() {
-    return getPropertyCallableRef(
-      'domain',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.domain;
-      },
-      null,
-    );
-  }
-  function protoSize$factory_47() {
-    return getPropertyCallableRef(
-      'protoSize',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.get_protoSize_1ekskg_k$();
-      },
-      null,
-    );
-  }
-  function descriptor$factory_179($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function client$factory() {
-    return getPropertyCallableRef(
-      'client',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.client;
-      },
-      null,
-    );
-  }
   function protoSize$factory_48() {
-    return getPropertyCallableRef(
-      'protoSize',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.get_protoSize_1ekskg_k$();
-      },
-      null,
-    );
-  }
-  function descriptor$factory_180($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function client$factory_0() {
-    return getPropertyCallableRef(
-      'client',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.client;
-      },
-      null,
-    );
-  }
-  function descriptor$factory_181($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function text$factory_5() {
-    return getPropertyCallableRef(
-      'text',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.text;
-      },
-      null,
-    );
-  }
-  function protoSize$factory_49() {
-    return getPropertyCallableRef(
-      'protoSize',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.get_protoSize_1ekskg_k$();
-      },
-      null,
-    );
-  }
-  function descriptor$factory_182($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function user$factory() {
-    return getPropertyCallableRef(
-      'user',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.user;
-      },
-      null,
-    );
-  }
-  function descriptor$factory_183($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function clients$factory() {
-    return getPropertyCallableRef(
-      'clients',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.clients;
-      },
-      null,
-    );
-  }
-  function protoSize$factory_50() {
-    return getPropertyCallableRef(
-      'protoSize',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.get_protoSize_1ekskg_k$();
-      },
-      null,
-    );
-  }
-  function descriptor$factory_184($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function domain$factory_3() {
-    return getPropertyCallableRef(
-      'domain',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.domain;
-      },
-      null,
-    );
-  }
-  function descriptor$factory_185($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function entries$factory() {
-    return getPropertyCallableRef(
-      'entries',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.entries;
-      },
-      null,
-    );
-  }
-  function protoSize$factory_51() {
-    return getPropertyCallableRef(
-      'protoSize',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.get_protoSize_1ekskg_k$();
-      },
-      null,
-    );
-  }
-  function descriptor$factory_186($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function sender$factory() {
-    return getPropertyCallableRef(
-      'sender',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.sender;
-      },
-      null,
-    );
-  }
-  function descriptor$factory_187($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function recipients$factory() {
-    return getPropertyCallableRef(
-      'recipients',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.recipients;
-      },
-      null,
-    );
-  }
-  function descriptor$factory_188($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function nativePush$factory() {
-    return getPropertyCallableRef(
-      'nativePush',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.nativePush;
-      },
-      null,
-    );
-  }
-  function descriptor$factory_189($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function blob$factory() {
-    return getPropertyCallableRef(
-      'blob',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.blob;
-      },
-      null,
-    );
-  }
-  function descriptor$factory_190($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function nativePriority$factory() {
-    return getPropertyCallableRef(
-      'nativePriority',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.nativePriority;
-      },
-      null,
-    );
-  }
-  function descriptor$factory_191($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function transient$factory() {
-    return getPropertyCallableRef(
-      'transient',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.transient;
-      },
-      null,
-    );
-  }
-  function descriptor$factory_192($b0) {
-    return getPropertyCallableRef(
-      'descriptor',
-      0,
-      KProperty0,
-      function () {
-        return $b0.descriptor_1;
-      },
-      null,
-    );
-  }
-  function reportMissing$factory() {
-    return getPropertyCallableRef(
-      'reportMissing',
-      1,
-      KProperty1,
-      function (receiver) {
-        return receiver.reportMissing;
-      },
-      null,
-    );
-  }
-  function protoSize$factory_52() {
     return getPropertyCallableRef(
       'protoSize',
       1,
@@ -20104,6 +21114,424 @@
       null,
     );
   }
+  function id$factory_5() {
+    return getPropertyCallableRef(
+      'id',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.id;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_194($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function domain$factory_2() {
+    return getPropertyCallableRef(
+      'domain',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.domain;
+      },
+      null,
+    );
+  }
+  function protoSize$factory_49() {
+    return getPropertyCallableRef(
+      'protoSize',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.get_protoSize_1ekskg_k$();
+      },
+      null,
+    );
+  }
+  function descriptor$factory_195($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function client$factory() {
+    return getPropertyCallableRef(
+      'client',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.client;
+      },
+      null,
+    );
+  }
+  function protoSize$factory_50() {
+    return getPropertyCallableRef(
+      'protoSize',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.get_protoSize_1ekskg_k$();
+      },
+      null,
+    );
+  }
+  function descriptor$factory_196($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function client$factory_0() {
+    return getPropertyCallableRef(
+      'client',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.client;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_197($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function text$factory_5() {
+    return getPropertyCallableRef(
+      'text',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.text;
+      },
+      null,
+    );
+  }
+  function protoSize$factory_51() {
+    return getPropertyCallableRef(
+      'protoSize',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.get_protoSize_1ekskg_k$();
+      },
+      null,
+    );
+  }
+  function descriptor$factory_198($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function user$factory() {
+    return getPropertyCallableRef(
+      'user',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.user;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_199($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function clients$factory() {
+    return getPropertyCallableRef(
+      'clients',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.clients;
+      },
+      null,
+    );
+  }
+  function protoSize$factory_52() {
+    return getPropertyCallableRef(
+      'protoSize',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.get_protoSize_1ekskg_k$();
+      },
+      null,
+    );
+  }
+  function descriptor$factory_200($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function domain$factory_3() {
+    return getPropertyCallableRef(
+      'domain',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.domain;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_201($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function entries$factory() {
+    return getPropertyCallableRef(
+      'entries',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.entries;
+      },
+      null,
+    );
+  }
+  function protoSize$factory_53() {
+    return getPropertyCallableRef(
+      'protoSize',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.get_protoSize_1ekskg_k$();
+      },
+      null,
+    );
+  }
+  function descriptor$factory_202($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function sender$factory() {
+    return getPropertyCallableRef(
+      'sender',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.sender;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_203($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function recipients$factory() {
+    return getPropertyCallableRef(
+      'recipients',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.recipients;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_204($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function nativePush$factory() {
+    return getPropertyCallableRef(
+      'nativePush',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.nativePush;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_205($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function blob$factory() {
+    return getPropertyCallableRef(
+      'blob',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.blob;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_206($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function nativePriority$factory() {
+    return getPropertyCallableRef(
+      'nativePriority',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.nativePriority;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_207($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function transient$factory() {
+    return getPropertyCallableRef(
+      'transient',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.transient;
+      },
+      null,
+    );
+  }
+  function descriptor$factory_208($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
+  function reportMissing$factory() {
+    return getPropertyCallableRef(
+      'reportMissing',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.reportMissing;
+      },
+      null,
+    );
+  }
+  function protoSize$factory_54() {
+    return getPropertyCallableRef(
+      'protoSize',
+      1,
+      KProperty1,
+      function (receiver) {
+        return receiver.get_protoSize_1ekskg_k$();
+      },
+      null,
+    );
+  }
+  function descriptor$factory_209($b0) {
+    return getPropertyCallableRef(
+      'descriptor',
+      0,
+      KProperty0,
+      function () {
+        return $b0.descriptor_1;
+      },
+      null,
+    );
+  }
   function sender$factory_0() {
     return getPropertyCallableRef(
       'sender',
@@ -20115,7 +21543,7 @@
       null,
     );
   }
-  function descriptor$factory_194($b0) {
+  function descriptor$factory_210($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -20137,7 +21565,7 @@
       null,
     );
   }
-  function descriptor$factory_195($b0) {
+  function descriptor$factory_211($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -20159,7 +21587,7 @@
       null,
     );
   }
-  function descriptor$factory_196($b0) {
+  function descriptor$factory_212($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -20181,7 +21609,7 @@
       null,
     );
   }
-  function descriptor$factory_197($b0) {
+  function descriptor$factory_213($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -20203,7 +21631,7 @@
       null,
     );
   }
-  function descriptor$factory_198($b0) {
+  function descriptor$factory_214($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -20225,7 +21653,7 @@
       null,
     );
   }
-  function descriptor$factory_199($b0) {
+  function descriptor$factory_215($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -20247,7 +21675,7 @@
       null,
     );
   }
-  function descriptor$factory_200($b0) {
+  function descriptor$factory_216($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -20269,7 +21697,7 @@
       null,
     );
   }
-  function descriptor$factory_201($b0) {
+  function descriptor$factory_217($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -20291,7 +21719,7 @@
       null,
     );
   }
-  function descriptor$factory_202($b0) {
+  function descriptor$factory_218($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -20313,7 +21741,7 @@
       null,
     );
   }
-  function protoSize$factory_53() {
+  function protoSize$factory_55() {
     return getPropertyCallableRef(
       'protoSize',
       1,
@@ -20335,7 +21763,7 @@
       null,
     );
   }
-  function protoSize$factory_54() {
+  function protoSize$factory_56() {
     return getPropertyCallableRef(
       'protoSize',
       1,
@@ -20357,7 +21785,7 @@
       null,
     );
   }
-  function protoSize$factory_55() {
+  function protoSize$factory_57() {
     return getPropertyCallableRef(
       'protoSize',
       1,
@@ -20379,7 +21807,7 @@
       null,
     );
   }
-  function protoSize$factory_56() {
+  function protoSize$factory_58() {
     return getPropertyCallableRef(
       'protoSize',
       1,
@@ -20390,7 +21818,7 @@
       null,
     );
   }
-  function descriptor$factory_203($b0) {
+  function descriptor$factory_219($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -20423,7 +21851,7 @@
       null,
     );
   }
-  function protoSize$factory_57() {
+  function protoSize$factory_59() {
     return getPropertyCallableRef(
       'protoSize',
       1,
@@ -20434,7 +21862,7 @@
       null,
     );
   }
-  function descriptor$factory_204($b0) {
+  function descriptor$factory_220($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -20467,7 +21895,7 @@
       null,
     );
   }
-  function protoSize$factory_58() {
+  function protoSize$factory_60() {
     return getPropertyCallableRef(
       'protoSize',
       1,
@@ -20478,7 +21906,7 @@
       null,
     );
   }
-  function descriptor$factory_205($b0) {
+  function descriptor$factory_221($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -20500,7 +21928,7 @@
       null,
     );
   }
-  function descriptor$factory_206($b0) {
+  function descriptor$factory_222($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -20522,7 +21950,7 @@
       null,
     );
   }
-  function descriptor$factory_207($b0) {
+  function descriptor$factory_223($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -20544,7 +21972,7 @@
       null,
     );
   }
-  function descriptor$factory_208($b0) {
+  function descriptor$factory_224($b0) {
     return getPropertyCallableRef(
       'descriptor',
       0,
@@ -20567,10 +21995,14 @@
     );
   }
   //region block: post-declaration
+  defineProp(protoOf(Companion_1), 'values', protoOf(Companion_1).get_values_ksazhn_k$);
   defineProp(protoOf(ExportedMessage), 'text', protoOf(ExportedMessage).get_text_wouvsm_k$);
-  defineProp(protoOf(Companion_8), 'values', protoOf(Companion_8).get_values_ksazhn_k$);
-  defineProp(protoOf(Companion_9), 'values', protoOf(Companion_9).get_values_ksazhn_k$);
-  defineProp(protoOf(Companion_10), 'values', protoOf(Companion_10).get_values_ksazhn_k$);
+  defineProp(protoOf(ExportedMessage), 'asset', protoOf(ExportedMessage).get_asset_iotcjr_k$);
+  defineProp(protoOf(ExportedMessage), 'location', protoOf(ExportedMessage).get_location_d3s02_k$);
+  defineProp(protoOf(Companion_11), 'values', protoOf(Companion_11).get_values_ksazhn_k$);
+  defineProp(protoOf(Companion_12), 'values', protoOf(Companion_12).get_values_ksazhn_k$);
+  defineProp(protoOf(Companion_13), 'values', protoOf(Companion_13).get_values_ksazhn_k$);
+  defineProp(protoOf(Companion_14), 'values', protoOf(Companion_14).get_values_ksazhn_k$);
   defineProp(protoOf(GenericMessage), 'text', protoOf(GenericMessage).get_text_wouvsm_k$);
   defineProp(protoOf(GenericMessage), 'image', protoOf(GenericMessage).get_image_it3i2a_k$);
   defineProp(protoOf(GenericMessage), 'knock', protoOf(GenericMessage).get_knock_iu80iz_k$);
@@ -20596,11 +22028,11 @@
     protoOf(GenericMessage).get_buttonActionConfirmation_pvbmee_k$,
   );
   defineProp(protoOf(GenericMessage), 'dataTransfer', protoOf(GenericMessage).get_dataTransfer_ncqosi_k$);
-  defineProp(protoOf(Companion_14), 'defaultInstance', protoOf(Companion_14).get_defaultInstance_axha8d_k$);
-  defineProp(protoOf(Companion_15), 'defaultInstance', protoOf(Companion_15).get_defaultInstance_axha8d_k$);
+  defineProp(protoOf(Companion_18), 'defaultInstance', protoOf(Companion_18).get_defaultInstance_axha8d_k$);
+  defineProp(protoOf(Companion_19), 'defaultInstance', protoOf(Companion_19).get_defaultInstance_axha8d_k$);
   defineProp(protoOf(Item), 'text', protoOf(Item).get_text_wouvsm_k$);
   defineProp(protoOf(Item), 'button', protoOf(Item).get_button_bmjiuz_k$);
-  defineProp(protoOf(Companion_19), 'values', protoOf(Companion_19).get_values_ksazhn_k$);
+  defineProp(protoOf(Companion_23), 'values', protoOf(Companion_23).get_values_ksazhn_k$);
   defineProp(protoOf(Ephemeral_0), 'text', protoOf(Ephemeral_0).get_text_wouvsm_k$);
   defineProp(protoOf(Ephemeral_0), 'image', protoOf(Ephemeral_0).get_image_it3i2a_k$);
   defineProp(protoOf(Ephemeral_0), 'knock', protoOf(Ephemeral_0).get_knock_iu80iz_k$);
@@ -20608,34 +22040,34 @@
   defineProp(protoOf(Ephemeral_0), 'location', protoOf(Ephemeral_0).get_location_d3s02_k$);
   defineProp(protoOf(LinkPreview), 'article', protoOf(LinkPreview).get_article_auhgc3_k$);
   defineProp(protoOf(LinkPreview), 'tweet', protoOf(LinkPreview).get_tweet_izbpe0_k$);
-  defineProp(protoOf(Companion_25), 'defaultInstance', protoOf(Companion_25).get_defaultInstance_axha8d_k$);
+  defineProp(protoOf(Companion_29), 'defaultInstance', protoOf(Companion_29).get_defaultInstance_axha8d_k$);
   defineProp(protoOf(Mention), 'userId', protoOf(Mention).get_userId_kl13yn_k$);
   defineProp(protoOf(MessageEdit), 'text', protoOf(MessageEdit).get_text_wouvsm_k$);
   defineProp(protoOf(MessageEdit), 'composite', protoOf(MessageEdit).get_composite_emurz6_k$);
-  defineProp(protoOf(Companion_34), 'values', protoOf(Companion_34).get_values_ksazhn_k$);
   defineProp(protoOf(Companion_38), 'values', protoOf(Companion_38).get_values_ksazhn_k$);
-  defineProp(protoOf(Companion_42), 'defaultInstance', protoOf(Companion_42).get_defaultInstance_axha8d_k$);
-  defineProp(protoOf(Companion_43), 'defaultInstance', protoOf(Companion_43).get_defaultInstance_axha8d_k$);
-  defineProp(protoOf(Companion_45), 'defaultInstance', protoOf(Companion_45).get_defaultInstance_axha8d_k$);
+  defineProp(protoOf(Companion_42), 'values', protoOf(Companion_42).get_values_ksazhn_k$);
+  defineProp(protoOf(Companion_46), 'defaultInstance', protoOf(Companion_46).get_defaultInstance_axha8d_k$);
+  defineProp(protoOf(Companion_47), 'defaultInstance', protoOf(Companion_47).get_defaultInstance_axha8d_k$);
+  defineProp(protoOf(Companion_49), 'defaultInstance', protoOf(Companion_49).get_defaultInstance_axha8d_k$);
   defineProp(protoOf(Original), 'image', protoOf(Original).get_image_it3i2a_k$);
   defineProp(protoOf(Original), 'video', protoOf(Original).get_video_j06c0i_k$);
   defineProp(protoOf(Original), 'audio', protoOf(Original).get_audio_ioubhp_k$);
   defineProp(protoOf(Preview_0), 'image', protoOf(Preview_0).get_image_it3i2a_k$);
-  defineProp(protoOf(Asset_1), 'notUploaded', protoOf(Asset_1).get_notUploaded_oca97a_k$);
-  defineProp(protoOf(Asset_1), 'uploaded', protoOf(Asset_1).get_uploaded_5xryzb_k$);
-  defineProp(protoOf(Companion_49), 'defaultInstance', protoOf(Companion_49).get_defaultInstance_axha8d_k$);
-  defineProp(protoOf(Companion_51), 'values', protoOf(Companion_51).get_values_ksazhn_k$);
-  defineProp(protoOf(Companion_52), 'values', protoOf(Companion_52).get_values_ksazhn_k$);
+  defineProp(protoOf(Asset_2), 'notUploaded', protoOf(Asset_2).get_notUploaded_oca97a_k$);
+  defineProp(protoOf(Asset_2), 'uploaded', protoOf(Asset_2).get_uploaded_5xryzb_k$);
+  defineProp(protoOf(Companion_53), 'defaultInstance', protoOf(Companion_53).get_defaultInstance_axha8d_k$);
   defineProp(protoOf(Companion_55), 'values', protoOf(Companion_55).get_values_ksazhn_k$);
+  defineProp(protoOf(Companion_56), 'values', protoOf(Companion_56).get_values_ksazhn_k$);
+  defineProp(protoOf(Companion_59), 'values', protoOf(Companion_59).get_values_ksazhn_k$);
   defineProp(protoOf(QualifiedNewOtrMessage), 'reportAll', protoOf(QualifiedNewOtrMessage).get_reportAll_2o54is_k$);
   defineProp(protoOf(QualifiedNewOtrMessage), 'ignoreAll', protoOf(QualifiedNewOtrMessage).get_ignoreAll_fuvwli_k$);
   defineProp(protoOf(QualifiedNewOtrMessage), 'reportOnly', protoOf(QualifiedNewOtrMessage).get_reportOnly_brjtl5_k$);
   defineProp(protoOf(QualifiedNewOtrMessage), 'ignoreOnly', protoOf(QualifiedNewOtrMessage).get_ignoreOnly_5m2bx5_k$);
-  defineProp(protoOf(Companion_64), 'defaultInstance', protoOf(Companion_64).get_defaultInstance_axha8d_k$);
-  defineProp(protoOf(Companion_65), 'defaultInstance', protoOf(Companion_65).get_defaultInstance_axha8d_k$);
-  defineProp(protoOf(Companion_66), 'defaultInstance', protoOf(Companion_66).get_defaultInstance_axha8d_k$);
-  defineProp(protoOf(Companion_67), 'defaultInstance', protoOf(Companion_67).get_defaultInstance_axha8d_k$);
   defineProp(protoOf(Companion_68), 'defaultInstance', protoOf(Companion_68).get_defaultInstance_axha8d_k$);
+  defineProp(protoOf(Companion_69), 'defaultInstance', protoOf(Companion_69).get_defaultInstance_axha8d_k$);
+  defineProp(protoOf(Companion_70), 'defaultInstance', protoOf(Companion_70).get_defaultInstance_axha8d_k$);
+  defineProp(protoOf(Companion_71), 'defaultInstance', protoOf(Companion_71).get_defaultInstance_axha8d_k$);
+  defineProp(protoOf(Companion_72), 'defaultInstance', protoOf(Companion_72).get_defaultInstance_axha8d_k$);
   //endregion
   //region block: exports
   function $jsExportAll$(_) {
@@ -20644,22 +22076,41 @@
     var $com$wire$kalium = $com$wire.kalium || ($com$wire.kalium = {});
     var $com$wire$kalium$protobuf = $com$wire$kalium.protobuf || ($com$wire$kalium.protobuf = {});
     var $com$wire$kalium$protobuf$backup = $com$wire$kalium$protobuf.backup || ($com$wire$kalium$protobuf.backup = {});
+    $com$wire$kalium$protobuf$backup.ExportedEncryptionAlgorithm = ExportedEncryptionAlgorithm;
+    defineProp(
+      $com$wire$kalium$protobuf$backup.ExportedEncryptionAlgorithm,
+      'BACKUP_AES_CBC',
+      BACKUP_AES_CBC_getInstance,
+    );
+    defineProp(
+      $com$wire$kalium$protobuf$backup.ExportedEncryptionAlgorithm,
+      'BACKUP_AES_GCM',
+      BACKUP_AES_GCM_getInstance,
+    );
+    $com$wire$kalium$protobuf$backup.ExportedEncryptionAlgorithm.UNRECOGNIZED = UNRECOGNIZED;
+    defineProp($com$wire$kalium$protobuf$backup.ExportedEncryptionAlgorithm, 'Companion', Companion_getInstance_1);
     $com$wire$kalium$protobuf$backup.BackupData = BackupData;
-    defineProp($com$wire$kalium$protobuf$backup.BackupData, 'Companion', Companion_getInstance_1);
+    defineProp($com$wire$kalium$protobuf$backup.BackupData, 'Companion', Companion_getInstance_2);
     $com$wire$kalium$protobuf$backup.BackupInfo = BackupInfo;
-    defineProp($com$wire$kalium$protobuf$backup.BackupInfo, 'Companion', Companion_getInstance_2);
+    defineProp($com$wire$kalium$protobuf$backup.BackupInfo, 'Companion', Companion_getInstance_3);
     $com$wire$kalium$protobuf$backup.ExportUser = ExportUser;
-    defineProp($com$wire$kalium$protobuf$backup.ExportUser, 'Companion', Companion_getInstance_3);
+    defineProp($com$wire$kalium$protobuf$backup.ExportUser, 'Companion', Companion_getInstance_4);
     $com$wire$kalium$protobuf$backup.ExportedQualifiedId = ExportedQualifiedId;
-    defineProp($com$wire$kalium$protobuf$backup.ExportedQualifiedId, 'Companion', Companion_getInstance_4);
+    defineProp($com$wire$kalium$protobuf$backup.ExportedQualifiedId, 'Companion', Companion_getInstance_5);
     $com$wire$kalium$protobuf$backup.ExportedConversation = ExportedConversation;
-    defineProp($com$wire$kalium$protobuf$backup.ExportedConversation, 'Companion', Companion_getInstance_5);
+    defineProp($com$wire$kalium$protobuf$backup.ExportedConversation, 'Companion', Companion_getInstance_6);
     $com$wire$kalium$protobuf$backup.ExportedMessage = ExportedMessage;
     $com$wire$kalium$protobuf$backup.ExportedMessage.Content = Content;
     $com$wire$kalium$protobuf$backup.ExportedMessage.Content.Text = Text;
-    defineProp($com$wire$kalium$protobuf$backup.ExportedMessage, 'Companion', Companion_getInstance_6);
+    $com$wire$kalium$protobuf$backup.ExportedMessage.Content.Asset = Asset;
+    $com$wire$kalium$protobuf$backup.ExportedMessage.Content.Location = Location;
+    defineProp($com$wire$kalium$protobuf$backup.ExportedMessage, 'Companion', Companion_getInstance_7);
     $com$wire$kalium$protobuf$backup.ExportedText = ExportedText;
-    defineProp($com$wire$kalium$protobuf$backup.ExportedText, 'Companion', Companion_getInstance_7);
+    defineProp($com$wire$kalium$protobuf$backup.ExportedText, 'Companion', Companion_getInstance_8);
+    $com$wire$kalium$protobuf$backup.ExportedAsset = ExportedAsset;
+    defineProp($com$wire$kalium$protobuf$backup.ExportedAsset, 'Companion', Companion_getInstance_9);
+    $com$wire$kalium$protobuf$backup.ExportedLocation = ExportedLocation;
+    defineProp($com$wire$kalium$protobuf$backup.ExportedLocation, 'Companion', Companion_getInstance_10);
     var $com = _.com || (_.com = {});
     var $com$wire = $com.wire || ($com.wire = {});
     var $com$wire$kalium = $com$wire.kalium || ($com$wire.kalium = {});
@@ -20668,19 +22119,29 @@
       $com$wire$kalium$protobuf.messages || ($com$wire$kalium$protobuf.messages = {});
     $com$wire$kalium$protobuf$messages.ClientAction = ClientAction;
     defineProp($com$wire$kalium$protobuf$messages.ClientAction, 'RESET_SESSION', RESET_SESSION_getInstance);
-    $com$wire$kalium$protobuf$messages.ClientAction.UNRECOGNIZED = UNRECOGNIZED;
-    defineProp($com$wire$kalium$protobuf$messages.ClientAction, 'Companion', Companion_getInstance_8);
+    $com$wire$kalium$protobuf$messages.ClientAction.UNRECOGNIZED = UNRECOGNIZED_0;
+    defineProp($com$wire$kalium$protobuf$messages.ClientAction, 'Companion', Companion_getInstance_11);
     $com$wire$kalium$protobuf$messages.EncryptionAlgorithm = EncryptionAlgorithm;
     defineProp($com$wire$kalium$protobuf$messages.EncryptionAlgorithm, 'AES_CBC', AES_CBC_getInstance);
     defineProp($com$wire$kalium$protobuf$messages.EncryptionAlgorithm, 'AES_GCM', AES_GCM_getInstance);
-    $com$wire$kalium$protobuf$messages.EncryptionAlgorithm.UNRECOGNIZED = UNRECOGNIZED_0;
-    defineProp($com$wire$kalium$protobuf$messages.EncryptionAlgorithm, 'Companion', Companion_getInstance_9);
+    $com$wire$kalium$protobuf$messages.EncryptionAlgorithm.UNRECOGNIZED = UNRECOGNIZED_1;
+    defineProp($com$wire$kalium$protobuf$messages.EncryptionAlgorithm, 'Companion', Companion_getInstance_12);
     $com$wire$kalium$protobuf$messages.LegalHoldStatus = LegalHoldStatus;
     defineProp($com$wire$kalium$protobuf$messages.LegalHoldStatus, 'UNKNOWN', UNKNOWN_getInstance);
     defineProp($com$wire$kalium$protobuf$messages.LegalHoldStatus, 'DISABLED', DISABLED_getInstance);
     defineProp($com$wire$kalium$protobuf$messages.LegalHoldStatus, 'ENABLED', ENABLED_getInstance);
-    $com$wire$kalium$protobuf$messages.LegalHoldStatus.UNRECOGNIZED = UNRECOGNIZED_1;
-    defineProp($com$wire$kalium$protobuf$messages.LegalHoldStatus, 'Companion', Companion_getInstance_10);
+    $com$wire$kalium$protobuf$messages.LegalHoldStatus.UNRECOGNIZED = UNRECOGNIZED_2;
+    defineProp($com$wire$kalium$protobuf$messages.LegalHoldStatus, 'Companion', Companion_getInstance_13);
+    $com$wire$kalium$protobuf$messages.UnknownStrategy = UnknownStrategy;
+    defineProp($com$wire$kalium$protobuf$messages.UnknownStrategy, 'IGNORE', IGNORE_getInstance);
+    defineProp($com$wire$kalium$protobuf$messages.UnknownStrategy, 'DISCARD_AND_WARN', DISCARD_AND_WARN_getInstance);
+    defineProp(
+      $com$wire$kalium$protobuf$messages.UnknownStrategy,
+      'WARN_USER_ALLOW_RETRY',
+      WARN_USER_ALLOW_RETRY_getInstance,
+    );
+    $com$wire$kalium$protobuf$messages.UnknownStrategy.UNRECOGNIZED = UNRECOGNIZED_3;
+    defineProp($com$wire$kalium$protobuf$messages.UnknownStrategy, 'Companion', Companion_getInstance_14);
     $com$wire$kalium$protobuf$messages.GenericMessage = GenericMessage;
     $com$wire$kalium$protobuf$messages.GenericMessage.Content = Content_0;
     $com$wire$kalium$protobuf$messages.GenericMessage.Content.Text = Text_0;
@@ -20691,9 +22152,9 @@
     $com$wire$kalium$protobuf$messages.GenericMessage.Content.External = External;
     $com$wire$kalium$protobuf$messages.GenericMessage.Content.ClientAction = ClientAction_0;
     $com$wire$kalium$protobuf$messages.GenericMessage.Content.Calling = Calling;
-    $com$wire$kalium$protobuf$messages.GenericMessage.Content.Asset = Asset;
+    $com$wire$kalium$protobuf$messages.GenericMessage.Content.Asset = Asset_0;
     $com$wire$kalium$protobuf$messages.GenericMessage.Content.Hidden = Hidden;
-    $com$wire$kalium$protobuf$messages.GenericMessage.Content.Location = Location;
+    $com$wire$kalium$protobuf$messages.GenericMessage.Content.Location = Location_0;
     $com$wire$kalium$protobuf$messages.GenericMessage.Content.Deleted = Deleted;
     $com$wire$kalium$protobuf$messages.GenericMessage.Content.Edited = Edited;
     $com$wire$kalium$protobuf$messages.GenericMessage.Content.Confirmation = Confirmation;
@@ -20704,123 +22165,123 @@
     $com$wire$kalium$protobuf$messages.GenericMessage.Content.ButtonAction = ButtonAction;
     $com$wire$kalium$protobuf$messages.GenericMessage.Content.ButtonActionConfirmation = ButtonActionConfirmation;
     $com$wire$kalium$protobuf$messages.GenericMessage.Content.DataTransfer = DataTransfer;
-    defineProp($com$wire$kalium$protobuf$messages.GenericMessage, 'Companion', Companion_getInstance_11);
+    defineProp($com$wire$kalium$protobuf$messages.GenericMessage, 'Companion', Companion_getInstance_15);
     $com$wire$kalium$protobuf$messages.QualifiedUserId = QualifiedUserId;
-    defineProp($com$wire$kalium$protobuf$messages.QualifiedUserId, 'Companion', Companion_getInstance_12);
+    defineProp($com$wire$kalium$protobuf$messages.QualifiedUserId, 'Companion', Companion_getInstance_16);
     $com$wire$kalium$protobuf$messages.QualifiedConversationId = QualifiedConversationId;
-    defineProp($com$wire$kalium$protobuf$messages.QualifiedConversationId, 'Companion', Companion_getInstance_13);
+    defineProp($com$wire$kalium$protobuf$messages.QualifiedConversationId, 'Companion', Companion_getInstance_17);
     $com$wire$kalium$protobuf$messages.Composite = Composite_0;
-    defineProp($com$wire$kalium$protobuf$messages.Composite, 'Companion', Companion_getInstance_15);
+    defineProp($com$wire$kalium$protobuf$messages.Composite, 'Companion', Companion_getInstance_19);
     $com$wire$kalium$protobuf$messages.Composite.Item = Item;
     $com$wire$kalium$protobuf$messages.Composite.Item.Content = Content_1;
     $com$wire$kalium$protobuf$messages.Composite.Item.Content.Text = Text_1;
     $com$wire$kalium$protobuf$messages.Composite.Item.Content.Button = Button;
-    defineProp($com$wire$kalium$protobuf$messages.Composite.Item, 'Companion', Companion_getInstance_14);
+    defineProp($com$wire$kalium$protobuf$messages.Composite.Item, 'Companion', Companion_getInstance_18);
     $com$wire$kalium$protobuf$messages.Button = Button_0;
-    defineProp($com$wire$kalium$protobuf$messages.Button, 'Companion', Companion_getInstance_16);
+    defineProp($com$wire$kalium$protobuf$messages.Button, 'Companion', Companion_getInstance_20);
     $com$wire$kalium$protobuf$messages.ButtonAction = ButtonAction_0;
-    defineProp($com$wire$kalium$protobuf$messages.ButtonAction, 'Companion', Companion_getInstance_17);
+    defineProp($com$wire$kalium$protobuf$messages.ButtonAction, 'Companion', Companion_getInstance_21);
     $com$wire$kalium$protobuf$messages.ButtonActionConfirmation = ButtonActionConfirmation_0;
-    defineProp($com$wire$kalium$protobuf$messages.ButtonActionConfirmation, 'Companion', Companion_getInstance_18);
+    defineProp($com$wire$kalium$protobuf$messages.ButtonActionConfirmation, 'Companion', Companion_getInstance_22);
     $com$wire$kalium$protobuf$messages.Availability = Availability_0;
-    defineProp($com$wire$kalium$protobuf$messages.Availability, 'Companion', Companion_getInstance_20);
+    defineProp($com$wire$kalium$protobuf$messages.Availability, 'Companion', Companion_getInstance_24);
     $com$wire$kalium$protobuf$messages.Availability.Type = Type;
     defineProp($com$wire$kalium$protobuf$messages.Availability.Type, 'NONE', NONE_getInstance);
     defineProp($com$wire$kalium$protobuf$messages.Availability.Type, 'AVAILABLE', AVAILABLE_getInstance);
     defineProp($com$wire$kalium$protobuf$messages.Availability.Type, 'AWAY', AWAY_getInstance);
     defineProp($com$wire$kalium$protobuf$messages.Availability.Type, 'BUSY', BUSY_getInstance);
-    $com$wire$kalium$protobuf$messages.Availability.Type.UNRECOGNIZED = UNRECOGNIZED_2;
-    defineProp($com$wire$kalium$protobuf$messages.Availability.Type, 'Companion', Companion_getInstance_19);
+    $com$wire$kalium$protobuf$messages.Availability.Type.UNRECOGNIZED = UNRECOGNIZED_4;
+    defineProp($com$wire$kalium$protobuf$messages.Availability.Type, 'Companion', Companion_getInstance_23);
     $com$wire$kalium$protobuf$messages.Ephemeral = Ephemeral_0;
     $com$wire$kalium$protobuf$messages.Ephemeral.Content = Content_2;
     $com$wire$kalium$protobuf$messages.Ephemeral.Content.Text = Text_2;
     $com$wire$kalium$protobuf$messages.Ephemeral.Content.Image = Image_0;
     $com$wire$kalium$protobuf$messages.Ephemeral.Content.Knock = Knock_0;
-    $com$wire$kalium$protobuf$messages.Ephemeral.Content.Asset = Asset_0;
-    $com$wire$kalium$protobuf$messages.Ephemeral.Content.Location = Location_0;
-    defineProp($com$wire$kalium$protobuf$messages.Ephemeral, 'Companion', Companion_getInstance_21);
+    $com$wire$kalium$protobuf$messages.Ephemeral.Content.Asset = Asset_1;
+    $com$wire$kalium$protobuf$messages.Ephemeral.Content.Location = Location_1;
+    defineProp($com$wire$kalium$protobuf$messages.Ephemeral, 'Companion', Companion_getInstance_25);
     $com$wire$kalium$protobuf$messages.Text = Text_3;
-    defineProp($com$wire$kalium$protobuf$messages.Text, 'Companion', Companion_getInstance_22);
+    defineProp($com$wire$kalium$protobuf$messages.Text, 'Companion', Companion_getInstance_26);
     $com$wire$kalium$protobuf$messages.Knock = Knock_1;
-    defineProp($com$wire$kalium$protobuf$messages.Knock, 'Companion', Companion_getInstance_23);
+    defineProp($com$wire$kalium$protobuf$messages.Knock, 'Companion', Companion_getInstance_27);
     $com$wire$kalium$protobuf$messages.LinkPreview = LinkPreview;
     $com$wire$kalium$protobuf$messages.LinkPreview.Preview = Preview;
     $com$wire$kalium$protobuf$messages.LinkPreview.Preview.Article = Article;
     $com$wire$kalium$protobuf$messages.LinkPreview.MetaData = MetaData;
     $com$wire$kalium$protobuf$messages.LinkPreview.MetaData.Tweet = Tweet;
-    defineProp($com$wire$kalium$protobuf$messages.LinkPreview, 'Companion', Companion_getInstance_24);
+    defineProp($com$wire$kalium$protobuf$messages.LinkPreview, 'Companion', Companion_getInstance_28);
     $com$wire$kalium$protobuf$messages.Tweet = Tweet_0;
-    defineProp($com$wire$kalium$protobuf$messages.Tweet, 'Companion', Companion_getInstance_25);
+    defineProp($com$wire$kalium$protobuf$messages.Tweet, 'Companion', Companion_getInstance_29);
     $com$wire$kalium$protobuf$messages.Article = Article_0;
-    defineProp($com$wire$kalium$protobuf$messages.Article, 'Companion', Companion_getInstance_26);
+    defineProp($com$wire$kalium$protobuf$messages.Article, 'Companion', Companion_getInstance_30);
     $com$wire$kalium$protobuf$messages.Mention = Mention;
     $com$wire$kalium$protobuf$messages.Mention.MentionType = MentionType;
     $com$wire$kalium$protobuf$messages.Mention.MentionType.UserId = UserId;
-    defineProp($com$wire$kalium$protobuf$messages.Mention, 'Companion', Companion_getInstance_27);
+    defineProp($com$wire$kalium$protobuf$messages.Mention, 'Companion', Companion_getInstance_31);
     $com$wire$kalium$protobuf$messages.LastRead = LastRead_0;
-    defineProp($com$wire$kalium$protobuf$messages.LastRead, 'Companion', Companion_getInstance_28);
+    defineProp($com$wire$kalium$protobuf$messages.LastRead, 'Companion', Companion_getInstance_32);
     $com$wire$kalium$protobuf$messages.Cleared = Cleared_0;
-    defineProp($com$wire$kalium$protobuf$messages.Cleared, 'Companion', Companion_getInstance_29);
+    defineProp($com$wire$kalium$protobuf$messages.Cleared, 'Companion', Companion_getInstance_33);
     $com$wire$kalium$protobuf$messages.MessageHide = MessageHide;
-    defineProp($com$wire$kalium$protobuf$messages.MessageHide, 'Companion', Companion_getInstance_30);
+    defineProp($com$wire$kalium$protobuf$messages.MessageHide, 'Companion', Companion_getInstance_34);
     $com$wire$kalium$protobuf$messages.MessageDelete = MessageDelete;
-    defineProp($com$wire$kalium$protobuf$messages.MessageDelete, 'Companion', Companion_getInstance_31);
+    defineProp($com$wire$kalium$protobuf$messages.MessageDelete, 'Companion', Companion_getInstance_35);
     $com$wire$kalium$protobuf$messages.MessageEdit = MessageEdit;
     $com$wire$kalium$protobuf$messages.MessageEdit.Content = Content_3;
     $com$wire$kalium$protobuf$messages.MessageEdit.Content.Text = Text_4;
     $com$wire$kalium$protobuf$messages.MessageEdit.Content.Composite = Composite_1;
-    defineProp($com$wire$kalium$protobuf$messages.MessageEdit, 'Companion', Companion_getInstance_32);
+    defineProp($com$wire$kalium$protobuf$messages.MessageEdit, 'Companion', Companion_getInstance_36);
     $com$wire$kalium$protobuf$messages.Quote = Quote;
-    defineProp($com$wire$kalium$protobuf$messages.Quote, 'Companion', Companion_getInstance_33);
+    defineProp($com$wire$kalium$protobuf$messages.Quote, 'Companion', Companion_getInstance_37);
     $com$wire$kalium$protobuf$messages.Confirmation = Confirmation_0;
-    defineProp($com$wire$kalium$protobuf$messages.Confirmation, 'Companion', Companion_getInstance_35);
+    defineProp($com$wire$kalium$protobuf$messages.Confirmation, 'Companion', Companion_getInstance_39);
     $com$wire$kalium$protobuf$messages.Confirmation.Type = Type_0;
     defineProp($com$wire$kalium$protobuf$messages.Confirmation.Type, 'DELIVERED', DELIVERED_getInstance);
     defineProp($com$wire$kalium$protobuf$messages.Confirmation.Type, 'READ', READ_getInstance);
-    $com$wire$kalium$protobuf$messages.Confirmation.Type.UNRECOGNIZED = UNRECOGNIZED_3;
-    defineProp($com$wire$kalium$protobuf$messages.Confirmation.Type, 'Companion', Companion_getInstance_34);
-    $com$wire$kalium$protobuf$messages.Location = Location_1;
-    defineProp($com$wire$kalium$protobuf$messages.Location, 'Companion', Companion_getInstance_36);
+    $com$wire$kalium$protobuf$messages.Confirmation.Type.UNRECOGNIZED = UNRECOGNIZED_5;
+    defineProp($com$wire$kalium$protobuf$messages.Confirmation.Type, 'Companion', Companion_getInstance_38);
+    $com$wire$kalium$protobuf$messages.Location = Location_2;
+    defineProp($com$wire$kalium$protobuf$messages.Location, 'Companion', Companion_getInstance_40);
     $com$wire$kalium$protobuf$messages.ImageAsset = ImageAsset;
-    defineProp($com$wire$kalium$protobuf$messages.ImageAsset, 'Companion', Companion_getInstance_37);
-    $com$wire$kalium$protobuf$messages.Asset = Asset_1;
+    defineProp($com$wire$kalium$protobuf$messages.ImageAsset, 'Companion', Companion_getInstance_41);
+    $com$wire$kalium$protobuf$messages.Asset = Asset_2;
     $com$wire$kalium$protobuf$messages.Asset.Status = Status;
     $com$wire$kalium$protobuf$messages.Asset.Status.NotUploaded = NotUploaded;
     $com$wire$kalium$protobuf$messages.Asset.Status.Uploaded = Uploaded;
-    defineProp($com$wire$kalium$protobuf$messages.Asset, 'Companion', Companion_getInstance_45);
+    defineProp($com$wire$kalium$protobuf$messages.Asset, 'Companion', Companion_getInstance_49);
     $com$wire$kalium$protobuf$messages.Asset.NotUploaded = NotUploaded_0;
     defineProp($com$wire$kalium$protobuf$messages.Asset.NotUploaded, 'CANCELLED', CANCELLED_getInstance);
     defineProp($com$wire$kalium$protobuf$messages.Asset.NotUploaded, 'FAILED', FAILED_getInstance);
-    $com$wire$kalium$protobuf$messages.Asset.NotUploaded.UNRECOGNIZED = UNRECOGNIZED_4;
-    defineProp($com$wire$kalium$protobuf$messages.Asset.NotUploaded, 'Companion', Companion_getInstance_38);
+    $com$wire$kalium$protobuf$messages.Asset.NotUploaded.UNRECOGNIZED = UNRECOGNIZED_6;
+    defineProp($com$wire$kalium$protobuf$messages.Asset.NotUploaded, 'Companion', Companion_getInstance_42);
     $com$wire$kalium$protobuf$messages.Asset.Original = Original;
     $com$wire$kalium$protobuf$messages.Asset.Original.MetaData = MetaData_0;
     $com$wire$kalium$protobuf$messages.Asset.Original.MetaData.Image = Image_1;
     $com$wire$kalium$protobuf$messages.Asset.Original.MetaData.Video = Video;
     $com$wire$kalium$protobuf$messages.Asset.Original.MetaData.Audio = Audio;
-    defineProp($com$wire$kalium$protobuf$messages.Asset.Original, 'Companion', Companion_getInstance_39);
+    defineProp($com$wire$kalium$protobuf$messages.Asset.Original, 'Companion', Companion_getInstance_43);
     $com$wire$kalium$protobuf$messages.Asset.Preview = Preview_0;
     $com$wire$kalium$protobuf$messages.Asset.Preview.MetaData = MetaData_1;
     $com$wire$kalium$protobuf$messages.Asset.Preview.MetaData.Image = Image_2;
-    defineProp($com$wire$kalium$protobuf$messages.Asset.Preview, 'Companion', Companion_getInstance_40);
+    defineProp($com$wire$kalium$protobuf$messages.Asset.Preview, 'Companion', Companion_getInstance_44);
     $com$wire$kalium$protobuf$messages.Asset.ImageMetaData = ImageMetaData;
-    defineProp($com$wire$kalium$protobuf$messages.Asset.ImageMetaData, 'Companion', Companion_getInstance_41);
+    defineProp($com$wire$kalium$protobuf$messages.Asset.ImageMetaData, 'Companion', Companion_getInstance_45);
     $com$wire$kalium$protobuf$messages.Asset.VideoMetaData = VideoMetaData;
-    defineProp($com$wire$kalium$protobuf$messages.Asset.VideoMetaData, 'Companion', Companion_getInstance_42);
+    defineProp($com$wire$kalium$protobuf$messages.Asset.VideoMetaData, 'Companion', Companion_getInstance_46);
     $com$wire$kalium$protobuf$messages.Asset.AudioMetaData = AudioMetaData;
-    defineProp($com$wire$kalium$protobuf$messages.Asset.AudioMetaData, 'Companion', Companion_getInstance_43);
+    defineProp($com$wire$kalium$protobuf$messages.Asset.AudioMetaData, 'Companion', Companion_getInstance_47);
     $com$wire$kalium$protobuf$messages.Asset.RemoteData = RemoteData;
-    defineProp($com$wire$kalium$protobuf$messages.Asset.RemoteData, 'Companion', Companion_getInstance_44);
+    defineProp($com$wire$kalium$protobuf$messages.Asset.RemoteData, 'Companion', Companion_getInstance_48);
     $com$wire$kalium$protobuf$messages.External = External_0;
-    defineProp($com$wire$kalium$protobuf$messages.External, 'Companion', Companion_getInstance_46);
+    defineProp($com$wire$kalium$protobuf$messages.External, 'Companion', Companion_getInstance_50);
     $com$wire$kalium$protobuf$messages.Reaction = Reaction_0;
-    defineProp($com$wire$kalium$protobuf$messages.Reaction, 'Companion', Companion_getInstance_47);
+    defineProp($com$wire$kalium$protobuf$messages.Reaction, 'Companion', Companion_getInstance_51);
     $com$wire$kalium$protobuf$messages.Calling = Calling_0;
-    defineProp($com$wire$kalium$protobuf$messages.Calling, 'Companion', Companion_getInstance_48);
+    defineProp($com$wire$kalium$protobuf$messages.Calling, 'Companion', Companion_getInstance_52);
     $com$wire$kalium$protobuf$messages.DataTransfer = DataTransfer_0;
-    defineProp($com$wire$kalium$protobuf$messages.DataTransfer, 'Companion', Companion_getInstance_49);
+    defineProp($com$wire$kalium$protobuf$messages.DataTransfer, 'Companion', Companion_getInstance_53);
     $com$wire$kalium$protobuf$messages.TrackingIdentifier = TrackingIdentifier;
-    defineProp($com$wire$kalium$protobuf$messages.TrackingIdentifier, 'Companion', Companion_getInstance_50);
+    defineProp($com$wire$kalium$protobuf$messages.TrackingIdentifier, 'Companion', Companion_getInstance_54);
     $com$wire$kalium$protobuf$messages.orDefaultForComposite = orDefaultForComposite;
     $com$wire$kalium$protobuf$messages.orDefaultForCompositeItem = orDefaultForCompositeItem;
     $com$wire$kalium$protobuf$messages.orDefaultForTweet = orDefaultForTweet;
@@ -20837,18 +22298,18 @@
     defineProp($com$wire$kalium$protobuf$mls.GroupInfoType, 'PUBLIC_GROUP_STATE', PUBLIC_GROUP_STATE_getInstance);
     defineProp($com$wire$kalium$protobuf$mls.GroupInfoType, 'GROUP_INFO', GROUP_INFO_getInstance);
     defineProp($com$wire$kalium$protobuf$mls.GroupInfoType, 'GROUP_INFO_JWE', GROUP_INFO_JWE_getInstance);
-    $com$wire$kalium$protobuf$mls.GroupInfoType.UNRECOGNIZED = UNRECOGNIZED_5;
-    defineProp($com$wire$kalium$protobuf$mls.GroupInfoType, 'Companion', Companion_getInstance_51);
+    $com$wire$kalium$protobuf$mls.GroupInfoType.UNRECOGNIZED = UNRECOGNIZED_7;
+    defineProp($com$wire$kalium$protobuf$mls.GroupInfoType, 'Companion', Companion_getInstance_55);
     $com$wire$kalium$protobuf$mls.RatchetTreeType = RatchetTreeType;
     defineProp($com$wire$kalium$protobuf$mls.RatchetTreeType, 'FULL', FULL_getInstance);
     defineProp($com$wire$kalium$protobuf$mls.RatchetTreeType, 'DELTA', DELTA_getInstance);
     defineProp($com$wire$kalium$protobuf$mls.RatchetTreeType, 'REFERENCE', REFERENCE_getInstance);
-    $com$wire$kalium$protobuf$mls.RatchetTreeType.UNRECOGNIZED = UNRECOGNIZED_6;
-    defineProp($com$wire$kalium$protobuf$mls.RatchetTreeType, 'Companion', Companion_getInstance_52);
+    $com$wire$kalium$protobuf$mls.RatchetTreeType.UNRECOGNIZED = UNRECOGNIZED_8;
+    defineProp($com$wire$kalium$protobuf$mls.RatchetTreeType, 'Companion', Companion_getInstance_56);
     $com$wire$kalium$protobuf$mls.GroupInfoBundle = GroupInfoBundle;
-    defineProp($com$wire$kalium$protobuf$mls.GroupInfoBundle, 'Companion', Companion_getInstance_53);
+    defineProp($com$wire$kalium$protobuf$mls.GroupInfoBundle, 'Companion', Companion_getInstance_57);
     $com$wire$kalium$protobuf$mls.CommitBundle = CommitBundle;
-    defineProp($com$wire$kalium$protobuf$mls.CommitBundle, 'Companion', Companion_getInstance_54);
+    defineProp($com$wire$kalium$protobuf$mls.CommitBundle, 'Companion', Companion_getInstance_58);
     var $com = _.com || (_.com = {});
     var $com$wire = $com.wire || ($com.wire = {});
     var $com$wire$kalium = $com$wire.kalium || ($com$wire.kalium = {});
@@ -20857,41 +22318,41 @@
     $com$wire$kalium$protobuf$otr.Priority = Priority;
     defineProp($com$wire$kalium$protobuf$otr.Priority, 'LOW_PRIORITY', LOW_PRIORITY_getInstance);
     defineProp($com$wire$kalium$protobuf$otr.Priority, 'HIGH_PRIORITY', HIGH_PRIORITY_getInstance);
-    $com$wire$kalium$protobuf$otr.Priority.UNRECOGNIZED = UNRECOGNIZED_7;
-    defineProp($com$wire$kalium$protobuf$otr.Priority, 'Companion', Companion_getInstance_55);
+    $com$wire$kalium$protobuf$otr.Priority.UNRECOGNIZED = UNRECOGNIZED_9;
+    defineProp($com$wire$kalium$protobuf$otr.Priority, 'Companion', Companion_getInstance_59);
     $com$wire$kalium$protobuf$otr.UserId = UserId_0;
-    defineProp($com$wire$kalium$protobuf$otr.UserId, 'Companion', Companion_getInstance_56);
+    defineProp($com$wire$kalium$protobuf$otr.UserId, 'Companion', Companion_getInstance_60);
     $com$wire$kalium$protobuf$otr.QualifiedUserId = QualifiedUserId_0;
-    defineProp($com$wire$kalium$protobuf$otr.QualifiedUserId, 'Companion', Companion_getInstance_57);
+    defineProp($com$wire$kalium$protobuf$otr.QualifiedUserId, 'Companion', Companion_getInstance_61);
     $com$wire$kalium$protobuf$otr.ClientId = ClientId;
-    defineProp($com$wire$kalium$protobuf$otr.ClientId, 'Companion', Companion_getInstance_58);
+    defineProp($com$wire$kalium$protobuf$otr.ClientId, 'Companion', Companion_getInstance_62);
     $com$wire$kalium$protobuf$otr.ClientEntry = ClientEntry;
-    defineProp($com$wire$kalium$protobuf$otr.ClientEntry, 'Companion', Companion_getInstance_59);
+    defineProp($com$wire$kalium$protobuf$otr.ClientEntry, 'Companion', Companion_getInstance_63);
     $com$wire$kalium$protobuf$otr.UserEntry = UserEntry;
-    defineProp($com$wire$kalium$protobuf$otr.UserEntry, 'Companion', Companion_getInstance_60);
+    defineProp($com$wire$kalium$protobuf$otr.UserEntry, 'Companion', Companion_getInstance_64);
     $com$wire$kalium$protobuf$otr.QualifiedUserEntry = QualifiedUserEntry;
-    defineProp($com$wire$kalium$protobuf$otr.QualifiedUserEntry, 'Companion', Companion_getInstance_61);
+    defineProp($com$wire$kalium$protobuf$otr.QualifiedUserEntry, 'Companion', Companion_getInstance_65);
     $com$wire$kalium$protobuf$otr.NewOtrMessage = NewOtrMessage;
-    defineProp($com$wire$kalium$protobuf$otr.NewOtrMessage, 'Companion', Companion_getInstance_62);
+    defineProp($com$wire$kalium$protobuf$otr.NewOtrMessage, 'Companion', Companion_getInstance_66);
     $com$wire$kalium$protobuf$otr.QualifiedNewOtrMessage = QualifiedNewOtrMessage;
     $com$wire$kalium$protobuf$otr.QualifiedNewOtrMessage.ClientMismatchStrategy = ClientMismatchStrategy;
     $com$wire$kalium$protobuf$otr.QualifiedNewOtrMessage.ClientMismatchStrategy.ReportAll = ReportAll;
     $com$wire$kalium$protobuf$otr.QualifiedNewOtrMessage.ClientMismatchStrategy.IgnoreAll = IgnoreAll;
     $com$wire$kalium$protobuf$otr.QualifiedNewOtrMessage.ClientMismatchStrategy.ReportOnly = ReportOnly;
     $com$wire$kalium$protobuf$otr.QualifiedNewOtrMessage.ClientMismatchStrategy.IgnoreOnly = IgnoreOnly;
-    defineProp($com$wire$kalium$protobuf$otr.QualifiedNewOtrMessage, 'Companion', Companion_getInstance_63);
+    defineProp($com$wire$kalium$protobuf$otr.QualifiedNewOtrMessage, 'Companion', Companion_getInstance_67);
     $com$wire$kalium$protobuf$otr.ClientMismatchStrategy = ClientMismatchStrategy_0;
-    defineProp($com$wire$kalium$protobuf$otr.ClientMismatchStrategy, 'Companion', Companion_getInstance_68);
+    defineProp($com$wire$kalium$protobuf$otr.ClientMismatchStrategy, 'Companion', Companion_getInstance_72);
     $com$wire$kalium$protobuf$otr.ClientMismatchStrategy.ReportAll = ReportAll_0;
-    defineProp($com$wire$kalium$protobuf$otr.ClientMismatchStrategy.ReportAll, 'Companion', Companion_getInstance_64);
+    defineProp($com$wire$kalium$protobuf$otr.ClientMismatchStrategy.ReportAll, 'Companion', Companion_getInstance_68);
     $com$wire$kalium$protobuf$otr.ClientMismatchStrategy.IgnoreAll = IgnoreAll_0;
-    defineProp($com$wire$kalium$protobuf$otr.ClientMismatchStrategy.IgnoreAll, 'Companion', Companion_getInstance_65);
+    defineProp($com$wire$kalium$protobuf$otr.ClientMismatchStrategy.IgnoreAll, 'Companion', Companion_getInstance_69);
     $com$wire$kalium$protobuf$otr.ClientMismatchStrategy.ReportOnly = ReportOnly_0;
-    defineProp($com$wire$kalium$protobuf$otr.ClientMismatchStrategy.ReportOnly, 'Companion', Companion_getInstance_66);
+    defineProp($com$wire$kalium$protobuf$otr.ClientMismatchStrategy.ReportOnly, 'Companion', Companion_getInstance_70);
     $com$wire$kalium$protobuf$otr.ClientMismatchStrategy.IgnoreOnly = IgnoreOnly_0;
-    defineProp($com$wire$kalium$protobuf$otr.ClientMismatchStrategy.IgnoreOnly, 'Companion', Companion_getInstance_67);
+    defineProp($com$wire$kalium$protobuf$otr.ClientMismatchStrategy.IgnoreOnly, 'Companion', Companion_getInstance_71);
     $com$wire$kalium$protobuf$otr.OtrAssetMeta = OtrAssetMeta;
-    defineProp($com$wire$kalium$protobuf$otr.OtrAssetMeta, 'Companion', Companion_getInstance_69);
+    defineProp($com$wire$kalium$protobuf$otr.OtrAssetMeta, 'Companion', Companion_getInstance_73);
     $com$wire$kalium$protobuf$otr.orDefaultForClientMismatchStrategy = orDefaultForClientMismatchStrategy;
     $com$wire$kalium$protobuf$otr.orDefaultForClientMismatchStrategyReportAll =
       orDefaultForClientMismatchStrategyReportAll;
@@ -20908,12 +22369,19 @@
   _.$_$.a = BackupData;
   _.$_$.b = BackupInfo;
   _.$_$.c = ExportUser;
-  _.$_$.d = ExportedConversation;
-  _.$_$.e = Text;
-  _.$_$.f = ExportedMessage;
-  _.$_$.g = ExportedQualifiedId;
-  _.$_$.h = ExportedText;
-  _.$_$.i = Companion_getInstance_1;
+  _.$_$.d = ExportedAsset;
+  _.$_$.e = ExportedConversation;
+  _.$_$.f = UNRECOGNIZED;
+  _.$_$.g = ExportedLocation;
+  _.$_$.h = Asset;
+  _.$_$.i = Location;
+  _.$_$.j = Text;
+  _.$_$.k = ExportedMessage;
+  _.$_$.l = ExportedQualifiedId;
+  _.$_$.m = ExportedText;
+  _.$_$.n = Companion_getInstance_2;
+  _.$_$.o = BACKUP_AES_CBC_getInstance;
+  _.$_$.p = BACKUP_AES_GCM_getInstance;
   //endregion
   return _;
 });

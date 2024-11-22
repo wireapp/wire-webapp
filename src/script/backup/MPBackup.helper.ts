@@ -35,49 +35,53 @@ import {preprocessConversations, preprocessUsers, preprocessEvents} from './reco
 import {ConversationTableSchema, UserTableSchema, EventTableSchema} from './TableData.schema';
 
 import {User} from '../entity/User';
-import { BackupService } from './BackupService';
+import {BackupService} from './BackupService';
 import Dexie from 'dexie';
-import { ConversationRecord, EventRecord, UserRecord } from '../storage';
-import { IncompatibleBackupError } from './Error';
-import { getLogger } from 'Util/Logger';
+import {ConversationRecord, EventRecord, UserRecord} from '../storage';
+import {IncompatibleBackupError} from './Error';
+import {getLogger} from 'Util/Logger';
 
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 
-export {MPBackup}
+export {MPBackup};
 
 const logger = getLogger('wire:backup:MPBackup');
 
 /**
  * Check if the data is a Multi-Platform backup
- * @param data 
- * @returns 
+ * @param data
+ * @returns
  */
 export const isMPBackup = (data: FileData): boolean => !!data[MPBackup.ZIP_ENTRY_DATA];
 
 interface ExportTableParams<T> {
-    backupService: BackupService;
-    table: Dexie.Table<T>;
-    preprocessor: (tableRows: any[]) => any[];
+  backupService: BackupService;
+  table: Dexie.Table<T>;
+  preprocessor: (tableRows: any[]) => any[];
 }
 const exportTable = async <T>({backupService, preprocessor, table}: ExportTableParams<T>) => {
-    const tableData: T[] = [];
+  const tableData: T[] = [];
 
-    await backupService.exportTable(table, tableRows => {
-      const processedData = preprocessor(tableRows);
-      tableData.push(...processedData);
-    });
-    return tableData;
-  }
+  await backupService.exportTable(table, tableRows => {
+    const processedData = preprocessor(tableRows);
+    tableData.push(...processedData);
+  });
+  return tableData;
+};
 
 interface ExportHistoryFromDatabaseParams {
-    backupService: BackupService;
-    progressCallback: ProgressCallback;
-    user: User;
+  backupService: BackupService;
+  progressCallback: ProgressCallback;
+  user: User;
 }
 /**
  * Export the history from the database to a Multi-Platform backup
- */  
-export const exportMPBHistoryFromDatabase = async ({backupService, progressCallback, user}: ExportHistoryFromDatabaseParams): Promise<Int8Array> => {
+ */
+export const exportMPBHistoryFromDatabase = async ({
+  backupService,
+  progressCallback,
+  user,
+}: ExportHistoryFromDatabaseParams): Promise<Int8Array> => {
   const [conversationTable, eventsTable, usersTable] = backupService.getTables();
   const backupExporter = new MPBackupExporter(new BackupQualifiedId(user.id, user.domain));
   function streamProgress<T>(dataProcessor: (data: T[]) => T[]) {
@@ -89,7 +93,11 @@ export const exportMPBHistoryFromDatabase = async ({backupService, progressCallb
 
   // Taking care of conversations
   const conversationsData = ConversationTableSchema.parse(
-    await exportTable<ConversationRecord>({backupService, table: conversationTable, preprocessor: streamProgress(preprocessConversations)}),
+    await exportTable<ConversationRecord>({
+      backupService,
+      table: conversationTable,
+      preprocessor: streamProgress(preprocessConversations),
+    }),
   );
   conversationsData.forEach(conversationData =>
     backupExporter.addConversation(
@@ -101,7 +109,9 @@ export const exportMPBHistoryFromDatabase = async ({backupService, progressCallb
   );
 
   // Taking care of users
-  const usersData = UserTableSchema.parse(await exportTable<UserRecord>({backupService, table: usersTable, preprocessor: streamProgress(preprocessUsers)}));
+  const usersData = UserTableSchema.parse(
+    await exportTable<UserRecord>({backupService, table: usersTable, preprocessor: streamProgress(preprocessUsers)}),
+  );
   usersData.forEach(userData =>
     backupExporter.addUser(
       new BackupUser(
@@ -113,7 +123,9 @@ export const exportMPBHistoryFromDatabase = async ({backupService, progressCallb
   );
 
   // Taking care of events
-  const eventsData = EventTableSchema.parse(await exportTable<EventRecord>({backupService, table: eventsTable, preprocessor: streamProgress(preprocessEvents)}));
+  const eventsData = EventTableSchema.parse(
+    await exportTable<EventRecord>({backupService, table: eventsTable, preprocessor: streamProgress(preprocessEvents)}),
+  );
   eventsData.forEach(eventData => {
     // ToDo: Add support for other types of messages and different types of content. Also figure out which fields are required.
     if (!eventData.id) {
@@ -131,11 +143,15 @@ export const exportMPBHistoryFromDatabase = async ({backupService, progressCallb
       logger.log('Event without content', eventData);
       return;
     }
-    if(eventData.type !== 'conversation.message-add') {
+    if (eventData.type !== 'conversation.message-add') {
       // eslint-disable-next-line no-console
       logger.log('Only exporting conversation.message-add events for now', eventData);
       return;
     }
+
+    // new BackupMessageContent.Asset(
+    //   "image/jpeg", 4232, "somePicture.jpg", otrKeyGoesHere,
+    // )
 
     backupExporter.addMessage(
       new BackupMessage(
@@ -154,50 +170,55 @@ export const exportMPBHistoryFromDatabase = async ({backupService, progressCallb
 };
 
 interface ImportHistoryToDatabaseParams {
-    user: User;
-    backupService: BackupService;
-     fileData: FileData;
-    progressCallback: ProgressCallback;
+  user: User;
+  backupService: BackupService;
+  fileData: FileData;
+  progressCallback: ProgressCallback;
 }
 /**
  * Imports the history from a Multi-Platform backup to the Database
- */  
-export const importMPBHistoryToDatabase = async ({backupService, fileData, progressCallback, user}: ImportHistoryToDatabaseParams): Promise<{
+ */
+export const importMPBHistoryToDatabase = async ({
+  backupService,
+  fileData,
+  progressCallback,
+  user,
+}: ImportHistoryToDatabaseParams): Promise<{
   archiveVersion: number;
   fileDescriptors: FileDescriptor[];
 }> => {
-      const backupImporter = new MPBackupImporter(user.domain);
-      const backupRawData = fileData[MPBackup.ZIP_ENTRY_DATA];
-      const FileDescriptor: FileDescriptor[] = [];
+  const backupImporter = new MPBackupImporter();
+  const backupRawData = fileData[MPBackup.ZIP_ENTRY_DATA];
+  const FileDescriptor: FileDescriptor[] = [];
 
-      const result = backupImporter.import(new Int8Array(backupRawData.buffer));
-      if (result instanceof BackupImportResult.Success) {
-        logger.log(`SUCCESSFUL BACKUP IMPORT: ${result.backupData}`); // eslint-disable-line
-        const eventRecords: EventRecord[] = [];
-        result.backupData.messages.forEach(message => {
-          logger.log(`IMPORTED MESSAGE: ${message.toString()}`); // eslint-disable-line
-          const eventRecord = mapEventRecord(message);
-          if(eventRecord) {
-            eventRecords.push(eventRecord);
-          }
-        });
-        result.backupData.conversations.forEach(conversation => {
-          logger.log(`IMPORTED CONVERSATION: ${conversation.toString()}`); // eslint-disable-line
-          // TODO: Import conversations
-        });
-        result.backupData.users.forEach(user => {
-          logger.log(`IMPORTED USER: ${user.toString()}`); // eslint-disable-line
-          // TODO: Import users
-        });
-
-        logger.log(`IMPORTED ${eventRecords.length} EVENTS`); // eslint-disable-line
-        FileDescriptor.push({entities: eventRecords, filename: Filename.EVENTS});
-      } else {
-        logger.log(`ERROR DURING BACKUP IMPORT: ${result}`); // eslint-disable-line
-        throw new IncompatibleBackupError('Incompatible Multiplatform backup');
+  const result = backupImporter.importBackup(new Int8Array(backupRawData.buffer));
+  if (result instanceof BackupImportResult.Success) {
+    logger.log(`SUCCESSFUL BACKUP IMPORT: ${result.backupData}`); // eslint-disable-line
+    const eventRecords: EventRecord[] = [];
+    result.backupData.messages.forEach(message => {
+      logger.log(`IMPORTED MESSAGE: ${message.toString()}`); // eslint-disable-line
+      const eventRecord = mapEventRecord(message);
+      if (eventRecord) {
+        eventRecords.push(eventRecord);
       }
+    });
+    result.backupData.conversations.forEach(conversation => {
+      logger.log(`IMPORTED CONVERSATION: ${conversation.toString()}`); // eslint-disable-line
+      // TODO: Import conversations
+    });
+    result.backupData.users.forEach(user => {
+      logger.log(`IMPORTED USER: ${user.toString()}`); // eslint-disable-line
+      // TODO: Import users
+    });
 
-      return {archiveVersion: 0, fileDescriptors: FileDescriptor};
+    logger.log(`IMPORTED ${eventRecords.length} EVENTS`); // eslint-disable-line
+    FileDescriptor.push({entities: eventRecords, filename: Filename.EVENTS});
+  } else {
+    logger.log(`ERROR DURING BACKUP IMPORT: ${result}`); // eslint-disable-line
+    throw new IncompatibleBackupError('Incompatible Multiplatform backup');
+  }
+
+  return {archiveVersion: 0, fileDescriptors: FileDescriptor};
 };
 
 /**
@@ -247,7 +268,7 @@ export const importMPBHistoryToDatabase = async ({backupService, fileData, progr
         },
     ],
     "receipt_mode": 1,
-    "roles": {    
+    "roles": {
         "0281c0d1-a37b-490e-ab89-4846f12069ed": "wire_admin",
         "033a62f6-5add-4a68-a4a8-846f8fa423a9": "wire_admin",
     },
@@ -267,9 +288,7 @@ export const importMPBHistoryToDatabase = async ({backupService, fileData, progr
     "message_timer": null
 }
  */
-const mapConversationRecord = ({id, name}: BackUpConversation): ConversationRecord => {
- 
-}
+const mapConversationRecord = ({id, name}: BackUpConversation): ConversationRecord => {};
 
 /**
  * Example Entry:
@@ -303,11 +322,10 @@ const mapConversationRecord = ({id, name}: BackUpConversation): ConversationReco
   "team": "e1684e2f-39d8-4caf-8e11-0da24a46280b"
 }
  */
-const mapUserRecord = ({id, name, handle}: BackupUser): UserRecord => {}
+const mapUserRecord = ({id, name, handle}: BackupUser): UserRecord => {};
 
-
-/**       
- * Example Entry:        
+/**
+ * Example Entry:
 {
   "conversation": "b38da255-dbe9-4898-9be8-c4d9a70b853d",
   "from": "033a62f6-5add-4a68-a4a8-846f8fa423a9",
@@ -331,44 +349,51 @@ const mapUserRecord = ({id, name, handle}: BackupUser): UserRecord => {}
   },
   "type": "conversation.message-add",
   "category": 16,
-  "primary_key": 50126         
+  "primary_key": 50126
 }
 */
-const isTextContent = (content: BackupMessageContent): content is BackupMessageContent.Text => content instanceof BackupMessageContent.Text;
+const isTextContent = (content: BackupMessageContent): content is BackupMessageContent.Text =>
+  content instanceof BackupMessageContent.Text;
 
 const mapEventRecord = (message: BackupMessage): EventRecord | null => {
-
-  if(isTextContent(message.content)) {
+  if (isTextContent(message.content)) {
     return mapMessageAddEventRecord(message);
   }
-  
-  return null;
-}
 
-const mapMessageAddEventRecord = ({id, content, conversationId, creationDate, senderClientId, senderUserId }: BackupMessage): EventRecord => ({
-  "conversation": conversationId.id,
-  "from": senderUserId.id,
-  "from_client_id": senderClientId,
-  "id": id,
-  "qualified_conversation": {
-      "domain": conversationId.domain,
-      "id": conversationId.id
+  return null;
+};
+
+const mapMessageAddEventRecord = ({
+  id,
+  content,
+  conversationId,
+  creationDate,
+  senderClientId,
+  senderUserId,
+}: BackupMessage): EventRecord => ({
+  conversation: conversationId.id,
+  from: senderUserId.id,
+  from_client_id: senderClientId,
+  id: id,
+  qualified_conversation: {
+    domain: conversationId.domain,
+    id: conversationId.id,
   },
-  "qualified_from": {
-      "domain": senderUserId.domain,
-      "id": senderUserId.id
+  qualified_from: {
+    domain: senderUserId.domain,
+    id: senderUserId.id,
   },
-  "time": creationDate.date.toISOString(),
-  "data": {
-      "content": isTextContent(content) ? content.text : '',
-      "mentions": [],
-      "previews": [],
-      "expects_read_confirmation": true,
-      "legal_hold_status": 1
+  time: creationDate.date.toISOString(),
+  data: {
+    content: isTextContent(content) ? content.text : '',
+    mentions: [],
+    previews: [],
+    expects_read_confirmation: true,
+    legal_hold_status: 1,
   },
-  "type": 'conversation.message-add',
+  type: 'conversation.message-add',
   // What is this?
-  "category": 16,
+  category: 16,
   // What is this?
-  "primary_key": undefined
-})
+  primary_key: undefined,
+});
