@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.26.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.26.2...@wireapp/react-ui-kit@9.26.3) (2024-11-22)
+
+### Bug Fixes
+
+* updated input label spacing ([#6679](https://github.com/wireapp/wire-web-packages/issues/6679)) ([f6632af](https://github.com/wireapp/wire-web-packages/commit/f6632af7a9f4e5eb252e51a3674e60d28ab7953e))
+
 ## [9.26.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.26.1...@wireapp/react-ui-kit@9.26.2) (2024-11-13)
 
 ### Bug Fixes
