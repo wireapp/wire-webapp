@@ -37,6 +37,7 @@ const mapCommonMessageFields = ({
   creationDate,
   senderClientId,
   senderUserId,
+  webPrimaryKey,
 }: BackupMessage): CommonMessageFields => ({
   conversation: conversationId.id.toString(),
   from: senderUserId.id.toString(),

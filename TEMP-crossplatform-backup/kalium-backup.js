@@ -425,13 +425,15 @@
       if (!(this.name === tmp0_other_with_cast.name)) return false;
       return true;
     };
-    function BackupMessage(id, conversationId, senderUserId, senderClientId, creationDate, content) {
+    function BackupMessage(id, conversationId, senderUserId, senderClientId, creationDate, content, webPrimaryKey) {
+      webPrimaryKey = webPrimaryKey === VOID ? null : webPrimaryKey;
       this.id = id;
       this.conversationId = conversationId;
       this.senderUserId = senderUserId;
       this.senderClientId = senderClientId;
       this.creationDate = creationDate;
       this.content = content;
+      this.webPrimaryKey = webPrimaryKey;
     }
     protoOf(BackupMessage).get_id_kntnx8_k$ = function () {
       return this.id;
@@ -451,6 +453,9 @@
     protoOf(BackupMessage).get_content_h02jrk_k$ = function () {
       return this.content;
     };
+    protoOf(BackupMessage).get_webPrimaryKey_3vqzpk_k$ = function () {
+      return this.webPrimaryKey;
+    };
     protoOf(BackupMessage).component1_7eebsc_k$ = function () {
       return this.id;
     };
@@ -469,15 +474,19 @@
     protoOf(BackupMessage).component6_7eebs7_k$ = function () {
       return this.content;
     };
-    protoOf(BackupMessage).copy_gmp0uw_k$ = function (
+    protoOf(BackupMessage).component7_7eebs6_k$ = function () {
+      return this.webPrimaryKey;
+    };
+    protoOf(BackupMessage).copy_jnjgel_k$ = function (
       id,
       conversationId,
       senderUserId,
       senderClientId,
       creationDate,
       content,
+      webPrimaryKey,
     ) {
-      return new BackupMessage(id, conversationId, senderUserId, senderClientId, creationDate, content);
+      return new BackupMessage(id, conversationId, senderUserId, senderClientId, creationDate, content, webPrimaryKey);
     };
     protoOf(BackupMessage).copy = function (
       id,
@@ -486,6 +495,7 @@
       senderClientId,
       creationDate,
       content,
+      webPrimaryKey,
       $super,
     ) {
       id = id === VOID ? this.id : id;
@@ -494,7 +504,16 @@
       senderClientId = senderClientId === VOID ? this.senderClientId : senderClientId;
       creationDate = creationDate === VOID ? this.creationDate : creationDate;
       content = content === VOID ? this.content : content;
-      return this.copy_gmp0uw_k$(id, conversationId, senderUserId, senderClientId, creationDate, content);
+      webPrimaryKey = webPrimaryKey === VOID ? this.webPrimaryKey : webPrimaryKey;
+      return this.copy_jnjgel_k$(
+        id,
+        conversationId,
+        senderUserId,
+        senderClientId,
+        creationDate,
+        content,
+        webPrimaryKey,
+      );
     };
     protoOf(BackupMessage).toString = function () {
       return (
@@ -510,6 +529,8 @@
         this.creationDate +
         ', content=' +
         this.content +
+        ', webPrimaryKey=' +
+        this.webPrimaryKey +
         ')'
       );
     };
@@ -520,6 +541,7 @@
       result = (imul(result, 31) + getStringHashCode(this.senderClientId)) | 0;
       result = (imul(result, 31) + this.creationDate.hashCode()) | 0;
       result = (imul(result, 31) + hashCode(this.content)) | 0;
+      result = (imul(result, 31) + (this.webPrimaryKey == null ? 0 : this.webPrimaryKey)) | 0;
       return result;
     };
     protoOf(BackupMessage).equals = function (other) {
@@ -532,6 +554,7 @@
       if (!(this.senderClientId === tmp0_other_with_cast.senderClientId)) return false;
       if (!this.creationDate.equals(tmp0_other_with_cast.creationDate)) return false;
       if (!equals(this.content, tmp0_other_with_cast.content)) return false;
+      if (!(this.webPrimaryKey == tmp0_other_with_cast.webPrimaryKey)) return false;
       return true;
     };
     var EncryptionAlgorithm_AES_GCM_instance;
@@ -1132,13 +1155,20 @@
         }
       }
       var content = tmp;
+      var tmp_10 = message.id;
+      var tmp_11 = toModel(message.conversationId);
+      var tmp_12 = toModel(message.senderUserId);
+      var tmp_13 = message.senderClientId;
+      var tmp_14 = BackupDateTime_0(message.timeIso);
+      var tmp1_safe_receiver = message.webPk;
       return new BackupMessage(
-        message.id,
-        toModel(message.conversationId),
-        toModel(message.senderUserId),
-        message.senderClientId,
-        BackupDateTime_0(message.timeIso),
+        tmp_10,
+        tmp_11,
+        tmp_12,
+        tmp_13,
+        tmp_14,
         content,
+        tmp1_safe_receiver == null ? null : tmp1_safe_receiver.toInt_1tsl84_k$(),
       );
     }
     function fromConversationProtoToBackupModel($this, conversation) {
@@ -1152,51 +1182,62 @@
       return new ExportUser(toProtoModel(it.id), it.name, it.handle);
     };
     protoOf(MPBackupMapper).mapMessageToProtobuf_a1fp5o_k$ = function (it) {
-      var tmp = it.id;
-      var tmp_0 = toLongMilliseconds(it.creationDate);
-      var tmp_1 = toProtoModel(it.senderUserId);
-      var tmp_2 = it.senderClientId;
-      var tmp_3 = toProtoModel(it.conversationId);
+      var tmp2_id = it.id;
+      var tmp3_timeIso = toLongMilliseconds(it.creationDate);
+      var tmp4_senderUserId = toProtoModel(it.senderUserId);
+      var tmp5_senderClientId = it.senderClientId;
+      var tmp6_conversationId = toProtoModel(it.conversationId);
       var content = it.content;
-      var tmp_4;
+      var tmp;
       if (content instanceof Asset_0) {
-        var tmp_5 = content.mimeType;
-        var tmp_6 = toLong(content.size);
-        var tmp_7 = content.name;
-        var tmp_8 = new ByteArr(content.otrKey);
-        var tmp_9 = new ByteArr(content.sha256);
-        var tmp_10 = content.assetId;
-        var tmp_11 = content.assetToken;
-        var tmp_12 = content.assetDomain;
-        var tmp0_subject = content.encryption;
-        var tmp_13;
-        switch (tmp0_subject == null ? -1 : tmp0_subject.get_ordinal_ip24qg_k$()) {
+        var tmp_0 = content.mimeType;
+        var tmp_1 = toLong(content.size);
+        var tmp_2 = content.name;
+        var tmp_3 = new ByteArr(content.otrKey);
+        var tmp_4 = new ByteArr(content.sha256);
+        var tmp_5 = content.assetId;
+        var tmp_6 = content.assetToken;
+        var tmp_7 = content.assetDomain;
+        var tmp1_subject = content.encryption;
+        var tmp_8;
+        switch (tmp1_subject == null ? -1 : tmp1_subject.get_ordinal_ip24qg_k$()) {
           case 0:
-            tmp_13 = BACKUP_AES_GCM_getInstance();
+            tmp_8 = BACKUP_AES_GCM_getInstance();
             break;
           case 1:
-            tmp_13 = BACKUP_AES_CBC_getInstance();
+            tmp_8 = BACKUP_AES_CBC_getInstance();
             break;
           case -1:
-            tmp_13 = null;
+            tmp_8 = null;
             break;
           default:
             noWhenBranchMatchedException();
             break;
         }
-        tmp_4 = new Asset(new ExportedAsset(tmp_5, tmp_6, tmp_7, tmp_8, tmp_9, tmp_10, tmp_11, tmp_12, tmp_13));
+        tmp = new Asset(new ExportedAsset(tmp_0, tmp_1, tmp_2, tmp_3, tmp_4, tmp_5, tmp_6, tmp_7, tmp_8));
       } else {
         if (content instanceof Text_0) {
-          tmp_4 = new Text(new ExportedText(content.text));
+          tmp = new Text(new ExportedText(content.text));
         } else {
           if (content instanceof Location_0) {
-            tmp_4 = new Location(new ExportedLocation(content.longitude, content.latitude, content.name, content.zoom));
+            tmp = new Location(new ExportedLocation(content.longitude, content.latitude, content.name, content.zoom));
           } else {
             noWhenBranchMatchedException();
           }
         }
       }
-      return new ExportedMessage(tmp, tmp_0, tmp_1, tmp_2, tmp_3, tmp_4);
+      var tmp7_content = tmp;
+      var tmp0_safe_receiver = it.webPrimaryKey;
+      var tmp8_webPk = tmp0_safe_receiver == null ? null : toLong(tmp0_safe_receiver);
+      return new ExportedMessage(
+        tmp2_id,
+        tmp3_timeIso,
+        tmp4_senderUserId,
+        tmp5_senderClientId,
+        tmp6_conversationId,
+        tmp8_webPk,
+        tmp7_content,
+      );
     };
     protoOf(MPBackupMapper).mapConversationToProtobuf_sjz8yk_k$ = function (it) {
       return new ExportedConversation(toProtoModel(it.id), it.name);

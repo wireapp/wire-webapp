@@ -2047,6 +2047,7 @@ export declare namespace com.wire.kalium.protobuf.backup {
       senderUserId: com.wire.kalium.protobuf.backup.ExportedQualifiedId,
       senderClientId: string,
       conversationId: com.wire.kalium.protobuf.backup.ExportedQualifiedId,
+      webPk?: Nullable<any> /* Nullable<kotlin.Long> */,
       content?: Nullable<com.wire.kalium.protobuf.backup.ExportedMessage.Content<any /*UnknownType **/>>,
       unknownFields?: any /* kotlin.collections.Map<number, pbandk.UnknownField> */,
     );
@@ -2055,6 +2056,7 @@ export declare namespace com.wire.kalium.protobuf.backup {
     get senderUserId(): com.wire.kalium.protobuf.backup.ExportedQualifiedId;
     get senderClientId(): string;
     get conversationId(): com.wire.kalium.protobuf.backup.ExportedQualifiedId;
+    get webPk(): Nullable<any> /* Nullable<kotlin.Long> */;
     get content(): Nullable<com.wire.kalium.protobuf.backup.ExportedMessage.Content<any /*UnknownType **/>>;
     get text(): Nullable<com.wire.kalium.protobuf.backup.ExportedText>;
     get asset(): Nullable<com.wire.kalium.protobuf.backup.ExportedAsset>;
@@ -2065,6 +2067,7 @@ export declare namespace com.wire.kalium.protobuf.backup {
       senderUserId?: com.wire.kalium.protobuf.backup.ExportedQualifiedId,
       senderClientId?: string,
       conversationId?: com.wire.kalium.protobuf.backup.ExportedQualifiedId,
+      webPk?: Nullable<any> /* Nullable<kotlin.Long> */,
       content?: Nullable<com.wire.kalium.protobuf.backup.ExportedMessage.Content<any /*UnknownType **/>>,
       unknownFields?: any /* kotlin.collections.Map<number, pbandk.UnknownField> */,
     ): com.wire.kalium.protobuf.backup.ExportedMessage;
@@ -3847,6 +3850,7 @@ export declare namespace com.wire.backup.data {
       senderClientId: string,
       creationDate: com.wire.backup.data.BackupDateTime,
       content: com.wire.backup.data.BackupMessageContent,
+      webPrimaryKey?: Nullable<number>,
     );
     get id(): string;
     get conversationId(): com.wire.backup.data.BackupQualifiedId;
@@ -3854,6 +3858,8 @@ export declare namespace com.wire.backup.data {
     get senderClientId(): string;
     get creationDate(): com.wire.backup.data.BackupDateTime;
     get content(): com.wire.backup.data.BackupMessageContent;
+    /** @deprecated Used only by the Webteam in order to simplify debugging */
+    get webPrimaryKey(): Nullable<number>;
     copy(
       id?: string,
       conversationId?: com.wire.backup.data.BackupQualifiedId,
@@ -3861,6 +3867,7 @@ export declare namespace com.wire.backup.data {
       senderClientId?: string,
       creationDate?: com.wire.backup.data.BackupDateTime,
       content?: com.wire.backup.data.BackupMessageContent,
+      webPrimaryKey?: Nullable<number>,
     ): com.wire.backup.data.BackupMessage;
     toString(): string;
     hashCode(): number;
