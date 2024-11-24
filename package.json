@@ -7,7 +7,7 @@
     "@lexical/react": "0.20.0",
     "@mediapipe/tasks-vision": "0.10.18",
     "@wireapp/avs": "9.10.16",
-    "@wireapp/commons": "5.2.13",
+    "@wireapp/commons": "5.3.0",
     "@wireapp/core": "46.7.1",
     "@wireapp/react-ui-kit": "9.26.2",
     "@wireapp/store-engine-dexie": "2.1.15",
