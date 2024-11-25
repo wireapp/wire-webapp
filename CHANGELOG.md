@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.27.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.26.3...@wireapp/react-ui-kit@9.27.0) (2024-11-25)
+
+### Features
+
+* **core:** Uploading assets improvements ([#6691](https://github.com/wireapp/wire-web-packages/issues/6691)) ([16fdb59](https://github.com/wireapp/wire-web-packages/commit/16fdb599951853345edeeae9c854c27be8e9bf97))
+
 ## [9.26.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.26.2...@wireapp/react-ui-kit@9.26.3) (2024-11-22)
 
 ### Bug Fixes
