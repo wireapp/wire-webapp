@@ -40,6 +40,7 @@ updates:
         versions:
           - '0.10.16'
       - dependency-name: '@types/node'
+      - dependency-name: 'typescript'
 
   # Server dependencies
   - package-ecosystem: npm
@@ -56,6 +57,7 @@ updates:
       - dependency-name: geolite2
         versions:
           - '>= 2.a'
+      - dependency-name: 'typescript'
       - dependency-name: '@types/node'
 
   # Github actions
