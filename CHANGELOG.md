@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [46.8.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.7.1...@wireapp/core@46.8.0) (2024-11-25)
+
+### Features
+
+* **core:** Uploading assets improvements ([#6691](https://github.com/wireapp/wire-web-packages/issues/6691)) ([16fdb59](https://github.com/wireapp/wire-web-packages/commit/16fdb599951853345edeeae9c854c27be8e9bf97))
+
 ## [46.7.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.7.0...@wireapp/core@46.7.1) (2024-11-19)
 
 **Note:** Version bump only for package @wireapp/core
