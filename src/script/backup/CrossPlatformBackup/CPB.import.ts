@@ -19,7 +19,7 @@
 
 import {MPBackup, MPBackupImporter, BackupImportResult} from './CPB.library';
 import {ImportHistoryToDatabaseParams} from './CPB.types';
-import {mapEventRecord} from './importMappers/eventRecord';
+import {mapEventRecord} from './importMappers/mapEventRecord';
 
 import {EventRecord} from '../../storage';
 import {FileDescriptor, Filename} from '../Backup.types';

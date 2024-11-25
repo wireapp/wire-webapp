@@ -135,7 +135,7 @@ export const exportCPBHistoryFromDatabase = async ({
       eventData.qualified_conversation.domain ?? '',
     );
     const senderUserId = new BackupQualifiedId(
-      eventData.qualified_from?.id ?? '',
+      eventData.qualified_from?.id ?? eventData.from ?? '',
       eventData.qualified_from?.domain ?? '',
     );
     const senderClientId = eventData.from_client_id ?? '';

@@ -17,5 +17,6 @@
  *
  */
 
-export * from './conversationRecord';
-export * from './eventRecord';
+export * from './mapConversationRecord';
+export * from './mapEventRecord';
+export * from './mapUserRecord';

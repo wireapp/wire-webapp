@@ -25,11 +25,16 @@ import {BackupMessageContent, BackupMessage} from '../CPB.library';
 
 // Type definition for common message fields
 type CommonMessageFields = Required<
-  Pick<
-    EventRecord,
-    'conversation' | 'from' | 'id' | 'qualified_conversation' | 'qualified_from' | 'time' | 'primary_key'
-  > & {from_client_id: string}
->;
+  Pick<EventRecord, 'conversation' | 'id' | 'qualified_conversation' | 'time' | 'primary_key'>
+> & {
+  from_client_id: string;
+  from: string;
+  qualified_from: {
+    domain: string;
+    id: string;
+  };
+};
+
 // Helper function to map common message fields
 const mapCommonMessageFields = ({
   id,
@@ -38,22 +43,25 @@ const mapCommonMessageFields = ({
   senderClientId,
   senderUserId,
   webPrimaryKey,
-}: BackupMessage): CommonMessageFields => ({
-  conversation: conversationId.id.toString(),
-  from: senderUserId.id.toString(),
-  id: id.toString() as string,
-  from_client_id: senderClientId.toString(),
-  qualified_conversation: {
-    domain: conversationId.domain.toString(),
-    id: conversationId.id.toString(),
-  },
-  qualified_from: {
-    domain: senderUserId.domain.toString(),
-    id: senderUserId.id.toString(),
-  },
-  time: creationDate.date.toISOString(),
-  primary_key: webPrimaryKey?.toString() ?? '',
-});
+}: BackupMessage): CommonMessageFields => {
+  const common = {
+    conversation: conversationId.id.toString(),
+    id: id.toString() as string,
+    from_client_id: senderClientId.toString(),
+    qualified_conversation: {
+      domain: conversationId.domain.toString(),
+      id: conversationId.id.toString(),
+    },
+    from: senderUserId.id.toString(),
+    qualified_from: {
+      domain: senderUserId.domain.toString(),
+      id: senderUserId.id.toString(),
+    },
+    time: creationDate.date.toISOString(),
+    primary_key: webPrimaryKey?.toString() ?? '',
+  };
+  return common;
+};
 
 // Helper function to transform an Int8Array to an object
 const transformArrayToObject = (array: Int8Array): {[key: number]: number} => {
@@ -94,6 +102,14 @@ const mapAssetMessageToEventRecord = (message: AssetBackupMessage): EventRecord 
   data: {
     content_length: message.content.size.toString(),
     content_type: message.content.mimeType.toString(),
+
+    // lets hardcode the values for now
+    info: {
+      name: message.content.name?.toString() ?? '',
+      height: 423,
+      width: 657,
+      tag: 'medium',
+    },
     /*
     info: {
       name: null,
