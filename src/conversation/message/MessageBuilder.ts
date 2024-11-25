@@ -123,7 +123,7 @@ export function buildFileDataMessage(
   payloadBundle: FileAssetMessage['content'],
   messageId: string = createId(),
 ): GenericMessage {
-  const {asset, expectsReadConfirmation, legalHoldStatus} = payloadBundle;
+  const {asset, expectsReadConfirmation, legalHoldStatus, metaData} = payloadBundle;
 
   const remoteData = Asset.RemoteData.create({
     assetId: asset.key,
@@ -133,10 +133,20 @@ export function buildFileDataMessage(
     assetDomain: asset.domain,
   });
 
+  const original = Asset.Original.create({
+    audio: metaData.audio,
+    mimeType: metaData.type,
+    name: metaData.name,
+    size: metaData.length,
+    video: metaData.video,
+    image: metaData.image,
+  });
+
   const assetMessage = Asset.create({
     expectsReadConfirmation,
     legalHoldStatus,
     uploaded: remoteData,
+    original,
   });
 
   assetMessage.status = AssetTransferState.UPLOADED;
