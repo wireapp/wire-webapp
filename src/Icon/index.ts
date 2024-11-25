@@ -107,3 +107,13 @@ export * from './CertificateRevoked';
 export * from './ExpiresSoon';
 export * from './MLSVerified';
 export * from './ProteusVerified';
+
+export * from './BoldIcon';
+export * from './ItalicIcon';
+export * from './StrikethroughIcon';
+export * from './UnderlineIcon';
+export * from './BulletListIcon';
+export * from './NumberedListIcon';
+export * from './MarkdownIcon';
+export * from './HeadingIcon';
+export * from './CodeIcon';

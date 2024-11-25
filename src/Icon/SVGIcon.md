@@ -89,6 +89,15 @@ import {
   VerificationShieldIcon,
   WireIcon,
   OutlineCheck,
+  BoldIcon,
+  ItalicIcon,
+  StrikethroughIcon,
+  UnderlineIcon,
+  BulletListIcon,
+  NumberedListIcon,
+  MarkdownIcon,
+  HeadingIcon,
+  CodeIcon,
 } from '@wireapp/react-ui-kit';
 
 const icons = [
@@ -165,6 +174,15 @@ const icons = [
   VerificationShieldIcon,
   WireIcon,
   OutlineCheck,
+  BoldIcon,
+  ItalicIcon,
+  StrikethroughIcon,
+  UnderlineIcon,
+  BulletListIcon,
+  NumberedListIcon,
+  MarkdownIcon,
+  HeadingIcon,
+  CodeIcon,
 ];
 
 const brandIcons = [
