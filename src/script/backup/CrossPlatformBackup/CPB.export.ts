@@ -64,9 +64,9 @@ const exportTable = async <T>({backupService, preprocessor, table}: ExportTableP
 };
 
 /**
- * Export the history from the database to a Multi-Platform backup
+ * Export the history from the database to a Cross-Platform backup
  */
-export const exportMPBHistoryFromDatabase = async ({
+export const exportCPBHistoryFromDatabase = async ({
   backupService,
   progressCallback,
   user,
@@ -128,11 +128,6 @@ export const exportMPBHistoryFromDatabase = async ({
       CPBLogger.log('Event without id', eventData);
       return;
     }
-    if (!eventData.qualified_conversation.id) {
-      // eslint-disable-next-line no-console
-      CPBLogger.log('Event without conversation id', eventData);
-      return;
-    }
 
     const id = eventData.id;
     const conversationId = new BackupQualifiedId(
@@ -145,6 +140,8 @@ export const exportMPBHistoryFromDatabase = async ({
     );
     const senderClientId = eventData.from_client_id ?? '';
     const creationDate = new BackupDateTime(new Date(eventData.time));
+    // for debugging purposes
+    const webPrimaryKey = eventData.primary_key;
 
     if (isAssetAddEvent(type)) {
       const {success, error, data} = AssetContentSchema.safeParse(eventData.data);
@@ -165,14 +162,14 @@ export const exportMPBHistoryFromDatabase = async ({
         null,
       );
       backupExporter.addMessage(
-        new BackupMessage(id, conversationId, senderUserId, senderClientId, creationDate, asset),
+        new BackupMessage(id, conversationId, senderUserId, senderClientId, creationDate, asset, webPrimaryKey),
       );
     }
 
     if (isMessageAddEvent(type) && eventData.data?.content) {
       const text = new BackupMessageContent.Text(eventData.data.content);
       backupExporter.addMessage(
-        new BackupMessage(id, conversationId, senderUserId, senderClientId, creationDate, text),
+        new BackupMessage(id, conversationId, senderUserId, senderClientId, creationDate, text, webPrimaryKey),
       );
     }
   });

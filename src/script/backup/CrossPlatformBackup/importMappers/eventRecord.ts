@@ -52,7 +52,7 @@ const mapCommonMessageFields = ({
     id: senderUserId.id.toString(),
   },
   time: creationDate.date.toISOString(),
-  primary_key: '',
+  primary_key: webPrimaryKey?.toString() ?? '',
 });
 
 // Helper function to transform an Int8Array to an object

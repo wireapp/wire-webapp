@@ -27,7 +27,7 @@ import {WebWorker} from 'Util/worker';
 import {ProgressCallback, Filename, FileDescriptor} from './Backup.types';
 import {BackUpHeader, ERROR_TYPES} from './BackUpHeader';
 import {BackupService} from './BackupService';
-import {exportMPBHistoryFromDatabase, importMPBHistoryToDatabase, isMPBackup, MPBackup} from './CrossPlatformBackup';
+import {exportCPBHistoryFromDatabase, importMPBHistoryToDatabase, isMPBackup, MPBackup} from './CrossPlatformBackup';
 import {
   CancelError,
   DifferentAccountError,
@@ -86,7 +86,7 @@ export class BackupRepository {
     this.canceled = false;
 
     try {
-      const exportedData = await exportMPBHistoryFromDatabase({
+      const exportedData = await exportCPBHistoryFromDatabase({
         progressCallback,
         user,
         backupService: this.backupService,
