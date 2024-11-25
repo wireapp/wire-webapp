@@ -70,9 +70,9 @@ describe('replaceReactComponents', () => {
 
   it('replaces literal strings with a component', () => {
     const username = 'Patryk';
-    const result = replaceReactComponents('Hello {{username}}!', [
+    const result = replaceReactComponents('Hello {username}!', [
       {
-        exactMatch: '{{username}}',
+        exactMatch: '{username}',
         render: () => <strong>{username}</strong>,
       },
     ]);
@@ -83,9 +83,9 @@ describe('replaceReactComponents', () => {
 
   it('replaces literal strings with a string', () => {
     const username = 'Przemek';
-    const result = replaceReactComponents('Hello {{username}}!', [
+    const result = replaceReactComponents('Hello {username}!', [
       {
-        exactMatch: '{{username}}',
+        exactMatch: '{username}',
         render: () => username,
       },
     ]);
@@ -99,13 +99,13 @@ describe('replaceReactComponents', () => {
   it('replaces multiple literal strings', () => {
     const username1 = 'John';
     const username2 = 'Jerry';
-    const result = replaceReactComponents(`Hello {{username1}} and {{username2}}, my name is also {{username1}}!`, [
+    const result = replaceReactComponents(`Hello {username1} and {username2}, my name is also {username1}!`, [
       {
-        exactMatch: '{{username1}}',
+        exactMatch: '{username1}',
         render: () => <u>{username1}</u>,
       },
       {
-        exactMatch: '{{username2}}',
+        exactMatch: '{username2}',
         render: () => <u>{username2}</u>,
       },
     ]);
@@ -119,14 +119,14 @@ describe('replaceReactComponents', () => {
   it('replaces components and literal strings at the same time', () => {
     const username1 = 'Tom';
     const username2 = 'Tim';
-    const result = replaceReactComponents(`Hello [bold]${username1}[/bold] and {{username2}}!`, [
+    const result = replaceReactComponents(`Hello [bold]${username1}[/bold] and {username2}!`, [
       {
         start: '[bold]',
         end: '[/bold]',
         render: text => <strong>{text}</strong>,
       },
       {
-        exactMatch: '{{username2}}',
+        exactMatch: '{username2}',
         render: () => <u>{username2}</u>,
       },
     ]);
@@ -140,18 +140,18 @@ describe('replaceReactComponents', () => {
   it('replaces literal string inside of a component', () => {
     const username = 'Jake';
     const username2 = 'Marco';
-    const result = replaceReactComponents(`Hello [bold]{{username}}[/bold], [bold]Paul[/bold] and {{username2}}!`, [
+    const result = replaceReactComponents(`Hello [bold]{username}[/bold], [bold]Paul[/bold] and {username2}!`, [
       {
         start: '[bold]',
         end: '[/bold]',
         render: text => <strong>{text}</strong>,
       },
       {
-        exactMatch: '{{username}}',
+        exactMatch: '{username}',
         render: () => <u>{username}</u>,
       },
       {
-        exactMatch: '{{username2}}',
+        exactMatch: '{username2}',
         render: () => <u>{username2}</u>,
       },
     ]);

@@ -19,7 +19,6 @@
 
 import React from 'react';
 
-import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
@@ -27,10 +26,11 @@ import {AnyAction, Dispatch} from 'redux';
 import {Runtime} from '@wireapp/commons';
 import {ArrowIcon, COLOR, Column, Columns, Container, ContainerXS, H1, IsMobile} from '@wireapp/react-ui-kit';
 
+import {t} from 'Util/LocalizerUtil';
+
 import {Page} from './Page';
 
 import {Config} from '../../Config';
-import {createPersonalAccountStrings} from '../../strings';
 import {AccountForm} from '../component/AccountForm';
 import {RouterLink} from '../component/RouterLink';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
@@ -45,7 +45,7 @@ const CreatePersonalAccountComponent = ({
   enterPersonalCreationFlow,
 }: Props & ConnectedProps & DispatchProps) => {
   const navigate = useNavigate();
-  const {formatMessage: _} = useIntl();
+
   const isMacOsWrapper = Runtime.isDesktopApp() && Runtime.isMacOS();
   React.useEffect(() => {
     enterPersonalCreationFlow();
@@ -57,7 +57,7 @@ const CreatePersonalAccountComponent = ({
       verticalCenter
       style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 428}}
     >
-      <H1 center>{_(createPersonalAccountStrings.headLine)}</H1>
+      <H1 center>{t('createPersonalAccount.headLine')}</H1>
       <AccountForm
         onSubmit={() => {
           if (Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY) {
@@ -66,7 +66,7 @@ const CreatePersonalAccountComponent = ({
             navigate(ROUTE.VERIFY_EMAIL_CODE);
           }
         }}
-        submitText={_(createPersonalAccountStrings.submitButton)}
+        submitText={t('createPersonalAccount.nextButton')}
       />
     </ContainerXS>
   );
@@ -74,7 +74,7 @@ const CreatePersonalAccountComponent = ({
     <RouterLink
       to={isMacOsWrapper ? ROUTE.INDEX : ROUTE.SET_ACCOUNT_TYPE}
       data-uie-name="go-index"
-      aria-label={_(createPersonalAccountStrings.goBack)}
+      aria-label={t('createPersonalAccount.goBack')}
     >
       <ArrowIcon aria-hidden="true" direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
     </RouterLink>

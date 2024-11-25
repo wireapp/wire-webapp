@@ -19,7 +19,6 @@
 
 import React, {useEffect, useRef, useState} from 'react';
 
-import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
@@ -42,12 +41,12 @@ import {
   RoundIconButton,
 } from '@wireapp/react-ui-kit';
 
+import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 
 import {Page} from './Page';
 
 import {addLocaleToUrl} from '../../externalRoute';
-import {teamNameStrings} from '../../strings';
 import {RouterLink} from '../component/RouterLink';
 import {EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
@@ -68,7 +67,6 @@ const TeamNameComponent = ({
 }: Props & ConnectedProps & DispatchProps) => {
   const logger = getLogger('TeamName');
 
-  const {formatMessage: _} = useIntl();
   const navigate = useNavigate();
   const [enteredTeamName, setEnteredTeamName] = useState(teamName || '');
   const [error, setError] = useState<ValidationError | null>(null);
@@ -144,8 +142,8 @@ const TeamNameComponent = ({
               style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
             >
               <div>
-                <H1 center>{_(teamNameStrings.headline)}</H1>
-                <Muted>{_(teamNameStrings.subhead)}</Muted>
+                <H1 center>{t('teamName.headline')}</H1>
+                <Muted>{t('teamName.subhead')}</Muted>
                 <Form style={{marginTop: 30}}>
                   <InputBlock>
                     <InputSubmitCombo>
@@ -154,7 +152,7 @@ const TeamNameComponent = ({
                         value={enteredTeamName}
                         ref={teamNameInput}
                         onChange={onTeamNameChange}
-                        placeholder={_(teamNameStrings.teamNamePlaceholder)}
+                        placeholder={t('teamName.teamNamePlaceholder')}
                         pattern=".{2,256}"
                         maxLength={256}
                         minLength={2}
@@ -181,7 +179,7 @@ const TeamNameComponent = ({
                   target="_blank"
                   data-uie-name="go-what-is"
                 >
-                  {_(teamNameStrings.whatIsWireTeamsLink)}
+                  {t('teamName.whatIsWireTeamsLink')}
                 </Link>
               </div>
             </ContainerXS>

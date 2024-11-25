@@ -17,10 +17,11 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {LOGOUT_REASON} from '../route';
 
-export const portalContainerCss: CSSObject = {
-  zIndex: 1000,
-  position: 'fixed',
-  borderRadius: '0.5rem',
+export const logoutReasonStrings = {
+  [LOGOUT_REASON.ACCOUNT_REMOVED]: 'LOGOUT_REASON.ACCOUNT_REMOVED',
+  [LOGOUT_REASON.CLIENT_REMOVED]: 'LOGOUT_REASON.CLIENT_REMOVED',
+  [LOGOUT_REASON.NO_APP_CONFIG]: 'LOGOUT_REASON.NO_APP_CONFIG',
+  [LOGOUT_REASON.SESSION_EXPIRED]: 'LOGOUT_REASON.SESSION_EXPIRED',
 };

@@ -19,15 +19,15 @@
 
 import React from 'react';
 
-import {useIntl} from 'react-intl';
 import {useNavigate} from 'react-router-dom';
 
 import {ArrowIcon, COLOR, Column, Columns, Container, ContainerXS, H1, IsMobile} from '@wireapp/react-ui-kit';
 
+import {t} from 'Util/LocalizerUtil';
+
 import {Page} from './Page';
 
 import {Config} from '../../../script/Config';
-import {createAccountStrings} from '../../strings';
 import {AccountForm} from '../component/AccountForm';
 import {RouterLink} from '../component/RouterLink';
 import {ROUTE} from '../route';
@@ -35,7 +35,6 @@ import {ROUTE} from '../route';
 type Props = React.HTMLProps<HTMLDivElement>;
 
 const CreateAccount = ({}: Props) => {
-  const {formatMessage: _} = useIntl();
   const navigate = useNavigate();
   const backArrow = (
     <RouterLink to={ROUTE.CREATE_TEAM} data-uie-name="go-register-team">
@@ -60,7 +59,7 @@ const CreateAccount = ({}: Props) => {
               centerText
               style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 428}}
             >
-              <H1 center>{_(createAccountStrings.headLine)}</H1>
+              <H1 center>{t('createAccount.headLine')}</H1>
               <AccountForm
                 onSubmit={() => {
                   if (Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY) {
@@ -69,7 +68,7 @@ const CreateAccount = ({}: Props) => {
                     navigate(ROUTE.VERIFY_EMAIL_CODE);
                   }
                 }}
-                submitText={_(createAccountStrings.submitButton)}
+                submitText={t('createAccount.nextButton')}
               />
             </ContainerXS>
           </Column>

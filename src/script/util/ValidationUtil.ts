@@ -17,6 +17,8 @@
  *
  */
 
+import {ValidationError} from '../auth/module/action/ValidationError';
+
 export class ValidationUtilError extends Error {
   constructor(message = 'Unknown ValidationUtilError') {
     super();
@@ -92,4 +94,14 @@ export const assetV3 = (assetKey: string, assetToken?: string): true => {
     throw new ValidationUtilError('Invalid asset token');
   }
   return true;
+};
+
+export const validationErrorStrings = {
+  [ValidationError.FIELD.NAME.PATTERN_MISMATCH]: 'ValidationError.FIELD.NAME.PATTERN_MISMATCH',
+  [ValidationError.FIELD.NAME.VALUE_MISSING]: 'ValidationError.FIELD.NAME.VALUE_MISSING',
+  [ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH]: 'ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH',
+  [ValidationError.FIELD.PASSWORD_LOGIN.PATTERN_MISMATCH]: 'ValidationError.FIELD.PASSWORD_LOGIN.PATTERN_MISMATCH',
+  [ValidationError.FIELD.SSO_CODE.PATTERN_MISMATCH]: 'ValidationError.FIELD.SSO_CODE.PATTERN_MISMATCH',
+  [ValidationError.FIELD.SSO_EMAIL_CODE.PATTERN_MISMATCH]: 'ValidationError.FIELD.SSO_EMAIL_CODE.PATTERN_MISMATCH',
+  [ValidationError.FIELD.EMAIL.TYPE_MISMATCH]: 'ValidationError.FIELD.EMAIL.TYPE_MISMATCH',
 };
