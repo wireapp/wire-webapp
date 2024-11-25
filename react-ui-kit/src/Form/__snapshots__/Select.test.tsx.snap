@@ -233,7 +233,7 @@ exports[`"Select" renders 1`] = `
     data-uie-name="test"
   >
     <div
-      className=" emotion-2"
+      className="emotion-2"
       id="test"
       onKeyDown={[Function]}
     >
@@ -251,15 +251,15 @@ exports[`"Select" renders 1`] = `
           className="emotion-3"
         />
         <div
-          className=" emotion-5"
+          className="emotion-5"
           onMouseDown={[Function]}
           onTouchEnd={[Function]}
         >
           <div
-            className=" emotion-6"
+            className="emotion-6"
           >
             <div
-              className=" emotion-7"
+              className="emotion-7"
               id="react-select-2-placeholder"
             >
               Select...
@@ -284,14 +284,14 @@ exports[`"Select" renders 1`] = `
             />
           </div>
           <div
-            className=" emotion-9"
+            className="emotion-9"
           >
             <span
-              className=" emotion-10"
+              className="emotion-10"
             />
             <div
               aria-hidden="true"
-              className=" emotion-11"
+              className="emotion-11"
               onMouseDown={[Function]}
               onTouchEnd={[Function]}
             >
@@ -540,7 +540,7 @@ exports[`"Select" renders as disabled 1`] = `
     data-uie-name="test"
   >
     <div
-      className=" emotion-2"
+      className="emotion-2"
       id="test"
       onKeyDown={[Function]}
     >
@@ -559,15 +559,15 @@ exports[`"Select" renders as disabled 1`] = `
         />
         <div
           aria-disabled={true}
-          className=" emotion-5"
+          className="emotion-5"
           onMouseDown={[Function]}
           onTouchEnd={[Function]}
         >
           <div
-            className=" emotion-6"
+            className="emotion-6"
           >
             <div
-              className=" emotion-7"
+              className="emotion-7"
               id="react-select-3-placeholder"
             >
               Select...
@@ -592,14 +592,14 @@ exports[`"Select" renders as disabled 1`] = `
             />
           </div>
           <div
-            className=" emotion-9"
+            className="emotion-9"
           >
             <span
-              className=" emotion-10"
+              className="emotion-10"
             />
             <div
               aria-hidden="true"
-              className=" emotion-11"
+              className="emotion-11"
               onMouseDown={[Function]}
               onTouchEnd={[Function]}
             >
@@ -849,7 +849,7 @@ exports[`"Select" renders as invalid 1`] = `
     data-uie-name="test"
   >
     <div
-      className=" emotion-2"
+      className="emotion-2"
       id="test"
       onKeyDown={[Function]}
     >
@@ -867,15 +867,15 @@ exports[`"Select" renders as invalid 1`] = `
           className="emotion-3"
         />
         <div
-          className=" emotion-5"
+          className="emotion-5"
           onMouseDown={[Function]}
           onTouchEnd={[Function]}
         >
           <div
-            className=" emotion-6"
+            className="emotion-6"
           >
             <div
-              className=" emotion-7"
+              className="emotion-7"
               id="react-select-4-placeholder"
             >
               Select...
@@ -900,14 +900,14 @@ exports[`"Select" renders as invalid 1`] = `
             />
           </div>
           <div
-            className=" emotion-9"
+            className="emotion-9"
           >
             <span
-              className=" emotion-10"
+              className="emotion-10"
             />
             <div
               aria-hidden="true"
-              className=" emotion-11"
+              className="emotion-11"
               onMouseDown={[Function]}
               onTouchEnd={[Function]}
             >
