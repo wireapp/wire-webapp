@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.28.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.27.0...@wireapp/react-ui-kit@9.28.0) (2024-11-25)
+
+### Features
+
+* **react-ui-kit:** add rich text editor icons ([#6694](https://github.com/wireapp/wire-web-packages/issues/6694)) ([84c5a18](https://github.com/wireapp/wire-web-packages/commit/84c5a185b13d7e1ee1a604475112f98318d3e3bb))
+
 # [9.27.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.26.3...@wireapp/react-ui-kit@9.27.0) (2024-11-25)
 
 ### Features
