@@ -49,7 +49,7 @@ export const UploadAssets = ({assetRepository, conversationId}: Props) => {
     <div css={uploadAssetsContainer} data-uie-name="upload-assets">
       {processQueue.map((processingMessage, key) => {
         const processingAsset = uploadProgressQueue.find(
-          mess => mess.messageId === processingMessage.message.messageId,
+          message => message.messageId === processingMessage.message.messageId,
         );
 
         if (!processingAsset) {

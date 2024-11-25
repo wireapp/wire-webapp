@@ -36,9 +36,6 @@ export const UploadAssetItem = ({assetRepository, message}: Props) => {
   const [uploadProgress, setUploadProgress] = useState<number>(0);
 
   useEffect(() => {
-    if (!message) {
-      return () => {};
-    }
     const progressSubscribable = assetRepository.getUploadProgress(message.messageId);
     setUploadProgress(progressSubscribable());
     const subscription = progressSubscribable.subscribe(value => setUploadProgress(value));
