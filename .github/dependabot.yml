@@ -39,6 +39,7 @@ updates:
       - dependency-name: '@mediapipe/tasks-vision'
         versions:
           - '0.10.16'
+      - dependency-name: 'typescript'
 
   # Server dependencies
   - package-ecosystem: npm
@@ -58,6 +59,7 @@ updates:
       - dependency-name: '@types/node'
         versions:
           - '>= 13.a'
+      - dependency-name: 'typescript'
 
   # Github actions
   - package-ecosystem: 'github-actions'
