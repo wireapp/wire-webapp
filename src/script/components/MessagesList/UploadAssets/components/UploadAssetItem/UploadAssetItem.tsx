@@ -39,7 +39,7 @@ export const UploadAssetItem = ({assetRepository, message}: Props) => {
     if (!message) {
       return () => {};
     }
-    const progressSubscribable = assetRepository.getUploadProgress(message?.messageId);
+    const progressSubscribable = assetRepository.getUploadProgress(message.messageId);
     setUploadProgress(progressSubscribable());
     const subscription = progressSubscribable.subscribe(value => setUploadProgress(value));
     return () => {
@@ -48,7 +48,7 @@ export const UploadAssetItem = ({assetRepository, message}: Props) => {
   }, [assetRepository, message]);
 
   return (
-    <div>
+    <div data-uie-name="upload-asset-item" data-uie-value={message.messageId}>
       <span css={uploadingProgressText}>
         Uploading {message.asset?.original?.name || ''} - {Math.trunc(uploadProgress)}%
       </span>

@@ -60,7 +60,7 @@ export class AssetRepository {
   readonly uploadCancelTokens: {[messageId: string]: () => void} = {};
   logger: Logger;
 
-  processQueue: ko.ObservableArray<GenericMessage> = ko.observableArray();
+  processQueue: ko.ObservableArray<{message: GenericMessage; conversationId: string}> = ko.observableArray();
 
   constructor(
     private readonly core = container.resolve(Core),
@@ -73,12 +73,12 @@ export class AssetRepository {
     return this.core.service!.asset;
   }
 
-  public addToProcessQueue(message: GenericMessage) {
-    this.processQueue.push(message);
+  public addToProcessQueue(message: GenericMessage, conversationId: string) {
+    this.processQueue.push({message, conversationId});
   }
 
   public removeFromProcessQueue(messageId: string) {
-    this.processQueue(this.processQueue().filter(queueItem => queueItem.messageId !== messageId));
+    this.processQueue(this.processQueue().filter(queueItem => queueItem.message.messageId !== messageId));
   }
 
   async getObjectUrl(asset: AssetRemoteData): Promise<string> {

@@ -363,7 +363,7 @@ export const MessagesList: FC<MessagesListParams> = ({
             });
           })}
 
-          <UploadAssets assetRepository={assetRepository} />
+          <UploadAssets assetRepository={assetRepository} conversationId={conversation.id} />
         </div>
       </FadingScrollbar>
       <JumpToLastMessageButton onGoToLastMessage={jumpToLastMessage} conversation={conversation} />

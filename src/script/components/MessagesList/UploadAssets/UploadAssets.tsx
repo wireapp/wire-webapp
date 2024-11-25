@@ -26,28 +26,37 @@ import {AssetRepository} from '../../../assets/AssetRepository';
 
 interface Props {
   assetRepository: AssetRepository;
+  conversationId: string;
 }
 
-export const UploadAssets = ({assetRepository}: Props) => {
+export const UploadAssets = ({assetRepository, conversationId}: Props) => {
   const {processQueue, uploadProgressQueue} = useKoSubscribableChildren(assetRepository, [
     'processQueue',
     'uploadProgressQueue',
   ]);
 
-  if (!processQueue.length) {
+  if (!processQueue?.length) {
+    return null;
+  }
+
+  const currentConversationProcessQueue = processQueue.filter(item => item.conversationId === conversationId);
+
+  if (!currentConversationProcessQueue.length) {
     return null;
   }
 
   return (
-    <div css={uploadAssetsContainer}>
+    <div css={uploadAssetsContainer} data-uie-name="upload-assets">
       {processQueue.map((processingMessage, key) => {
-        const processingAsset = uploadProgressQueue.find(mess => mess.messageId === processingMessage.messageId);
+        const processingAsset = uploadProgressQueue.find(
+          mess => mess.messageId === processingMessage.message.messageId,
+        );
 
         if (!processingAsset) {
           return null;
         }
 
-        return <UploadAssetItem assetRepository={assetRepository} message={processingMessage} key={key} />;
+        return <UploadAssetItem assetRepository={assetRepository} message={processingMessage.message} key={key} />;
       })}
     </div>
   );

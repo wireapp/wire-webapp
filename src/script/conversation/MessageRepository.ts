@@ -514,10 +514,11 @@ export class MessageRepository {
     };
 
     window.addEventListener('beforeunload', beforeUnload);
-    const {messageId} = await this.createAssetMetadata(file, asImage, originalId);
+    const {message, metaData} = await this.createAssetMetadata(conversation, file, asImage, originalId);
+    const {messageId} = message;
 
     try {
-      const {state} = await this.sendAssetRemotedata(conversation, file, messageId, asImage);
+      const {state} = await this.sendAssetRemotedata(conversation, file, messageId, asImage, metaData);
 
       if (state === SendAndInjectSendingState.FAILED) {
         await this.storeFileInDb(conversation, messageId, file);
@@ -612,7 +613,47 @@ export class MessageRepository {
     return this.eventService.updateEventAsUploadFailed(message_et.primary_key, reason);
   }
 
-  private async sendAssetRemotedata(conversation: Conversation, file: Blob, messageId: string, asImage: boolean) {
+  /**
+   * Create asset metadata message to specified conversation.
+   */
+  private async createAssetMetadata(
+    conversation: Conversation,
+    file: File | Blob,
+    allowImageDetection?: boolean,
+    originalId?: string,
+  ) {
+    let metadata;
+    try {
+      metadata = await buildMetadata(file);
+    } catch (error) {
+      const logMessage = `Couldn't render asset preview from metadata. Asset might be corrupt: ${
+        (error as Error).message
+      }`;
+      this.logger.warn(logMessage, error);
+    }
+
+    const meta = {length: file.size, name: (file as File).name, type: file.type} as Partial<FileMetaDataContent>;
+
+    if (isAudio(file)) {
+      meta.audio = metadata as AudioMetaData;
+    } else if (isVideo(file)) {
+      meta.video = metadata as VideoMetaData;
+    } else if (allowImageDetection && isImage(file)) {
+      meta.image = metadata as ImageMetaData;
+    }
+
+    const message = MessageBuilder.buildFileMetaDataMessage({metaData: meta as FileMetaDataContent}, originalId);
+    this.assetRepository.addToProcessQueue(message, conversation.id);
+    return {message, metaData: meta as FileMetaDataContent};
+  }
+
+  private async sendAssetRemotedata(
+    conversation: Conversation,
+    file: Blob,
+    messageId: string,
+    asImage: boolean,
+    meta: FileMetaDataContent,
+  ) {
     const retention = this.assetRepository.getAssetRetention(this.userState.self(), conversation);
     const options = {
       legalHoldStatus: conversation.legalHoldStatus(),
@@ -639,39 +680,14 @@ export class MessageRepository {
         )
       : MessageBuilder.buildFileDataMessage(
           {
+            metaData: meta,
             ...commonMessageData,
             file: {data: Buffer.from(await file.arrayBuffer())},
           },
           messageId,
         );
-    return this.sendAndInjectMessage(assetMessage, conversation, {enableEphemeral: true, syncTimestamp: false});
-  }
 
-  /**
-   * Create asset metadata message to specified conversation.
-   */
-  private async createAssetMetadata(file: File | Blob, allowImageDetection?: boolean, originalId?: string) {
-    let metadata;
-    try {
-      metadata = await buildMetadata(file);
-    } catch (error) {
-      const logMessage = `Couldn't render asset preview from metadata. Asset might be corrupt: ${
-        (error as Error).message
-      }`;
-      this.logger.warn(logMessage, error);
-    }
-    const meta = {length: file.size, name: (file as File).name, type: file.type} as Partial<FileMetaDataContent>;
-
-    if (isAudio(file)) {
-      meta.audio = metadata as AudioMetaData;
-    } else if (isVideo(file)) {
-      meta.video = metadata as VideoMetaData;
-    } else if (allowImageDetection && isImage(file)) {
-      meta.image = metadata as ImageMetaData;
-    }
-    const message = MessageBuilder.buildFileMetaDataMessage({metaData: meta as FileMetaDataContent}, originalId);
-    this.assetRepository.addToProcessQueue(message);
-    return message;
+    return this.sendAndInjectMessage(assetMessage, conversation, {enableEphemeral: true});
   }
 
   /**
