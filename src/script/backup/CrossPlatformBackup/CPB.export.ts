@@ -160,6 +160,7 @@ export const exportCPBHistoryFromDatabase = async ({
         data.token,
         data.domain,
         null,
+        null, // todo map this guy here to AssetMetadata
       );
       backupExporter.addMessage(
         new BackupMessage(id, conversationId, senderUserId, senderClientId, creationDate, asset, webPrimaryKey),

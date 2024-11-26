@@ -87,13 +87,14 @@
     var THROW_IAE = kotlin_kotlin.$_$.rg;
     var enumEntries = kotlin_kotlin.$_$.ia;
     var Unit_getInstance = kotlin_kotlin.$_$.k5;
+    var toString = kotlin_kotlin.$_$.wh;
+    var toString_0 = kotlin_kotlin.$_$.ic;
     var Enum = kotlin_kotlin.$_$.eg;
     var getKClassFromExpression = kotlin_kotlin.$_$.c;
     var contentEquals = kotlin_kotlin.$_$.r6;
     var contentHashCode = kotlin_kotlin.$_$.s6;
-    var toString = kotlin_kotlin.$_$.ic;
     var getNumberHashCode = kotlin_kotlin.$_$.cb;
-    var ExportedQualifiedId = kotlin_com_wire_protobuf.$_$.l;
+    var ExportedQualifiedId = kotlin_com_wire_protobuf.$_$.q;
     var ArrayList_init_$Create$ = kotlin_kotlin.$_$.m;
     var System_getInstance = kotlin_org_jetbrains_kotlinx_kotlinx_datetime.$_$.b;
     var BackupInfo = kotlin_com_wire_protobuf.$_$.b;
@@ -103,25 +104,31 @@
     var encodeToByteArray = kotlin_pro_streem_pbandk_pbandk_runtime.$_$.x;
     var toHexString = kotlin_kotlin.$_$.ff;
     var println = kotlin_kotlin.$_$.ja;
-    var Companion_getInstance = kotlin_com_wire_protobuf.$_$.n;
+    var Companion_getInstance = kotlin_com_wire_protobuf.$_$.t;
     var decodeFromByteArray = kotlin_pro_streem_pbandk_pbandk_runtime.$_$.w;
     var printStackTrace = kotlin_kotlin.$_$.qh;
     var noWhenBranchMatchedException = kotlin_kotlin.$_$.oh;
     var IllegalArgumentException_init_$Create$ = kotlin_kotlin.$_$.r1;
-    var Location = kotlin_com_wire_protobuf.$_$.i;
-    var UNRECOGNIZED = kotlin_com_wire_protobuf.$_$.f;
-    var BACKUP_AES_GCM_getInstance = kotlin_com_wire_protobuf.$_$.p;
-    var BACKUP_AES_CBC_getInstance = kotlin_com_wire_protobuf.$_$.o;
-    var Asset = kotlin_com_wire_protobuf.$_$.h;
-    var Text = kotlin_com_wire_protobuf.$_$.j;
+    var Location = kotlin_com_wire_protobuf.$_$.n;
+    var UNRECOGNIZED = kotlin_com_wire_protobuf.$_$.j;
+    var BACKUP_AES_GCM_getInstance = kotlin_com_wire_protobuf.$_$.v;
+    var BACKUP_AES_CBC_getInstance = kotlin_com_wire_protobuf.$_$.u;
+    var Video = kotlin_com_wire_protobuf.$_$.f;
+    var Image = kotlin_com_wire_protobuf.$_$.e;
+    var Audio = kotlin_com_wire_protobuf.$_$.d;
+    var Asset = kotlin_com_wire_protobuf.$_$.m;
+    var Text = kotlin_com_wire_protobuf.$_$.o;
     var ExportUser = kotlin_com_wire_protobuf.$_$.c;
-    var ExportedLocation = kotlin_com_wire_protobuf.$_$.g;
-    var ExportedText = kotlin_com_wire_protobuf.$_$.m;
+    var ExportedLocation = kotlin_com_wire_protobuf.$_$.l;
+    var ExportedText = kotlin_com_wire_protobuf.$_$.r;
     var toLong = kotlin_kotlin.$_$.gc;
     var ByteArr = kotlin_pro_streem_pbandk_pbandk_runtime.$_$.d;
-    var ExportedAsset = kotlin_com_wire_protobuf.$_$.d;
-    var ExportedMessage = kotlin_com_wire_protobuf.$_$.k;
-    var ExportedConversation = kotlin_com_wire_protobuf.$_$.e;
+    var ExportedVideoMetaData = kotlin_com_wire_protobuf.$_$.s;
+    var ExportedImageMetaData = kotlin_com_wire_protobuf.$_$.k;
+    var ExportedAudioMetaData = kotlin_com_wire_protobuf.$_$.h;
+    var ExportedAsset = kotlin_com_wire_protobuf.$_$.g;
+    var ExportedMessage = kotlin_com_wire_protobuf.$_$.p;
+    var ExportedConversation = kotlin_com_wire_protobuf.$_$.i;
     var copyToArray = kotlin_kotlin.$_$.h7;
     var numberToLong = kotlin_kotlin.$_$.ac;
     //endregion
@@ -136,6 +143,10 @@
     setMetadataFor(BackupUser, 'BackupUser', classMeta);
     setMetadataFor(BackupConversation, 'BackupConversation', classMeta);
     setMetadataFor(BackupMessage, 'BackupMessage', classMeta);
+    setMetadataFor(AssetMetadata, 'AssetMetadata', classMeta);
+    setMetadataFor(Image_0, 'Image', classMeta, AssetMetadata);
+    setMetadataFor(Video_0, 'Video', classMeta, AssetMetadata);
+    setMetadataFor(Audio_0, 'Audio', classMeta, AssetMetadata);
     setMetadataFor(EncryptionAlgorithm, 'EncryptionAlgorithm', classMeta, Enum);
     setMetadataFor(BackupMessageContent, 'BackupMessageContent', classMeta);
     setMetadataFor(Text_0, 'Text', classMeta, BackupMessageContent);
@@ -586,9 +597,153 @@
       EncryptionAlgorithm_AES_CBC_instance = new EncryptionAlgorithm('AES_CBC', 1);
     }
     var $ENTRIES;
+    function Image_0(width, height, tag) {
+      AssetMetadata.call(this);
+      this.width = width;
+      this.height = height;
+      this.tag = tag;
+    }
+    protoOf(Image_0).get_width_j0q4yl_k$ = function () {
+      return this.width;
+    };
+    protoOf(Image_0).get_height_e7t92o_k$ = function () {
+      return this.height;
+    };
+    protoOf(Image_0).get_tag_18ivnz_k$ = function () {
+      return this.tag;
+    };
+    protoOf(Image_0).component1_7eebsc_k$ = function () {
+      return this.width;
+    };
+    protoOf(Image_0).component2_7eebsb_k$ = function () {
+      return this.height;
+    };
+    protoOf(Image_0).component3_7eebsa_k$ = function () {
+      return this.tag;
+    };
+    protoOf(Image_0).copy_72eg8e_k$ = function (width, height, tag) {
+      return new Image_0(width, height, tag);
+    };
+    protoOf(Image_0).copy = function (width, height, tag, $super) {
+      width = width === VOID ? this.width : width;
+      height = height === VOID ? this.height : height;
+      tag = tag === VOID ? this.tag : tag;
+      return this.copy_72eg8e_k$(width, height, tag);
+    };
+    protoOf(Image_0).toString = function () {
+      return 'Image(width=' + this.width + ', height=' + this.height + ', tag=' + this.tag + ')';
+    };
+    protoOf(Image_0).hashCode = function () {
+      var result = this.width;
+      result = (imul(result, 31) + this.height) | 0;
+      result = (imul(result, 31) + (this.tag == null ? 0 : getStringHashCode(this.tag))) | 0;
+      return result;
+    };
+    protoOf(Image_0).equals = function (other) {
+      if (this === other) return true;
+      if (!(other instanceof Image_0)) return false;
+      var tmp0_other_with_cast = other instanceof Image_0 ? other : THROW_CCE();
+      if (!(this.width === tmp0_other_with_cast.width)) return false;
+      if (!(this.height === tmp0_other_with_cast.height)) return false;
+      if (!(this.tag == tmp0_other_with_cast.tag)) return false;
+      return true;
+    };
+    function Video_0(width, height, duration) {
+      AssetMetadata.call(this);
+      this.width = width;
+      this.height = height;
+      this.duration = duration;
+    }
+    protoOf(Video_0).get_width_j0q4yl_k$ = function () {
+      return this.width;
+    };
+    protoOf(Video_0).get_height_e7t92o_k$ = function () {
+      return this.height;
+    };
+    protoOf(Video_0).get_duration_6a6kpp_k$ = function () {
+      return this.duration;
+    };
+    protoOf(Video_0).component1_7eebsc_k$ = function () {
+      return this.width;
+    };
+    protoOf(Video_0).component2_7eebsb_k$ = function () {
+      return this.height;
+    };
+    protoOf(Video_0).component3_7eebsa_k$ = function () {
+      return this.duration;
+    };
+    protoOf(Video_0).copy_um4d44_k$ = function (width, height, duration) {
+      return new Video_0(width, height, duration);
+    };
+    protoOf(Video_0).copy = function (width, height, duration, $super) {
+      width = width === VOID ? this.width : width;
+      height = height === VOID ? this.height : height;
+      duration = duration === VOID ? this.duration : duration;
+      return this.copy_um4d44_k$(width, height, duration);
+    };
+    protoOf(Video_0).toString = function () {
+      return 'Video(width=' + this.width + ', height=' + this.height + ', duration=' + toString(this.duration) + ')';
+    };
+    protoOf(Video_0).hashCode = function () {
+      var result = this.width == null ? 0 : this.width;
+      result = (imul(result, 31) + (this.height == null ? 0 : this.height)) | 0;
+      result = (imul(result, 31) + (this.duration == null ? 0 : this.duration.hashCode())) | 0;
+      return result;
+    };
+    protoOf(Video_0).equals = function (other) {
+      if (this === other) return true;
+      if (!(other instanceof Video_0)) return false;
+      var tmp0_other_with_cast = other instanceof Video_0 ? other : THROW_CCE();
+      if (!(this.width == tmp0_other_with_cast.width)) return false;
+      if (!(this.height == tmp0_other_with_cast.height)) return false;
+      if (!equals(this.duration, tmp0_other_with_cast.duration)) return false;
+      return true;
+    };
+    function Audio_0(normalization, duration) {
+      AssetMetadata.call(this);
+      this.normalization = normalization;
+      this.duration = duration;
+    }
+    protoOf(Audio_0).get_normalization_odhpcc_k$ = function () {
+      return this.normalization;
+    };
+    protoOf(Audio_0).get_duration_6a6kpp_k$ = function () {
+      return this.duration;
+    };
+    protoOf(Audio_0).component1_7eebsc_k$ = function () {
+      return this.normalization;
+    };
+    protoOf(Audio_0).component2_7eebsb_k$ = function () {
+      return this.duration;
+    };
+    protoOf(Audio_0).copy_33o8yx_k$ = function (normalization, duration) {
+      return new Audio_0(normalization, duration);
+    };
+    protoOf(Audio_0).copy = function (normalization, duration, $super) {
+      normalization = normalization === VOID ? this.normalization : normalization;
+      duration = duration === VOID ? this.duration : duration;
+      return this.copy_33o8yx_k$(normalization, duration);
+    };
+    protoOf(Audio_0).toString = function () {
+      return 'Audio(normalization=' + toString_0(this.normalization) + ', duration=' + toString(this.duration) + ')';
+    };
+    protoOf(Audio_0).hashCode = function () {
+      var result = this.normalization == null ? 0 : hashCode(this.normalization);
+      result = (imul(result, 31) + (this.duration == null ? 0 : this.duration.hashCode())) | 0;
+      return result;
+    };
+    protoOf(Audio_0).equals = function (other) {
+      if (this === other) return true;
+      if (!(other instanceof Audio_0)) return false;
+      var tmp0_other_with_cast = other instanceof Audio_0 ? other : THROW_CCE();
+      if (!equals(this.normalization, tmp0_other_with_cast.normalization)) return false;
+      if (!equals(this.duration, tmp0_other_with_cast.duration)) return false;
+      return true;
+    };
     function EncryptionAlgorithm(name, ordinal) {
       Enum.call(this, name, ordinal);
     }
+    function AssetMetadata() {}
     function EncryptionAlgorithm_AES_GCM_getInstance() {
       EncryptionAlgorithm_initEntries();
       return EncryptionAlgorithm_AES_GCM_instance;
@@ -627,7 +782,7 @@
       if (!(this.text === tmp0_other_with_cast.text)) return false;
       return true;
     };
-    function Asset_0(mimeType, size, name, otrKey, sha256, assetId, assetToken, assetDomain, encryption) {
+    function Asset_0(mimeType, size, name, otrKey, sha256, assetId, assetToken, assetDomain, encryption, metaData) {
       BackupMessageContent.call(this);
       this.mimeType = mimeType;
       this.size = size;
@@ -638,6 +793,7 @@
       this.assetToken = assetToken;
       this.assetDomain = assetDomain;
       this.encryption = encryption;
+      this.metaData = metaData;
     }
     protoOf(Asset_0).get_mimeType_g7ccbb_k$ = function () {
       return this.mimeType;
@@ -666,6 +822,9 @@
     protoOf(Asset_0).get_encryption_pua0p8_k$ = function () {
       return this.encryption;
     };
+    protoOf(Asset_0).get_metaData_vroqag_k$ = function () {
+      return this.metaData;
+    };
     protoOf(Asset_0).equals = function (other) {
       if (this === other) return true;
       if (other == null ? true : !getKClassFromExpression(this).equals(getKClassFromExpression(other))) return false;
@@ -676,6 +835,7 @@
       if (!(this.assetToken == other.assetToken)) return false;
       if (!(this.assetDomain == other.assetDomain)) return false;
       if (!equals(this.encryption, other.encryption)) return false;
+      if (!equals(this.metaData, other.metaData)) return false;
       return true;
     };
     protoOf(Asset_0).hashCode = function () {
@@ -694,6 +854,10 @@
       var tmp4_safe_receiver = this.encryption;
       var tmp5_elvis_lhs = tmp4_safe_receiver == null ? null : tmp4_safe_receiver.hashCode();
       result = (tmp_1 + (tmp5_elvis_lhs == null ? 0 : tmp5_elvis_lhs)) | 0;
+      var tmp_2 = imul(31, result);
+      var tmp6_safe_receiver = this.metaData;
+      var tmp7_elvis_lhs = tmp6_safe_receiver == null ? null : hashCode(tmp6_safe_receiver);
+      result = (tmp_2 + (tmp7_elvis_lhs == null ? 0 : tmp7_elvis_lhs)) | 0;
       return result;
     };
     protoOf(Asset_0).component1_7eebsc_k$ = function () {
@@ -723,7 +887,10 @@
     protoOf(Asset_0).component9_7eebs4_k$ = function () {
       return this.encryption;
     };
-    protoOf(Asset_0).copy_fwyscx_k$ = function (
+    protoOf(Asset_0).component10_gazzfo_k$ = function () {
+      return this.metaData;
+    };
+    protoOf(Asset_0).copy_57e20h_k$ = function (
       mimeType,
       size,
       name,
@@ -733,8 +900,9 @@
       assetToken,
       assetDomain,
       encryption,
+      metaData,
     ) {
-      return new Asset_0(mimeType, size, name, otrKey, sha256, assetId, assetToken, assetDomain, encryption);
+      return new Asset_0(mimeType, size, name, otrKey, sha256, assetId, assetToken, assetDomain, encryption, metaData);
     };
     protoOf(Asset_0).copy = function (
       mimeType,
@@ -746,6 +914,7 @@
       assetToken,
       assetDomain,
       encryption,
+      metaData,
       $super,
     ) {
       mimeType = mimeType === VOID ? this.mimeType : mimeType;
@@ -757,7 +926,19 @@
       assetToken = assetToken === VOID ? this.assetToken : assetToken;
       assetDomain = assetDomain === VOID ? this.assetDomain : assetDomain;
       encryption = encryption === VOID ? this.encryption : encryption;
-      return this.copy_fwyscx_k$(mimeType, size, name, otrKey, sha256, assetId, assetToken, assetDomain, encryption);
+      metaData = metaData === VOID ? this.metaData : metaData;
+      return this.copy_57e20h_k$(
+        mimeType,
+        size,
+        name,
+        otrKey,
+        sha256,
+        assetId,
+        assetToken,
+        assetDomain,
+        encryption,
+        metaData,
+      );
     };
     protoOf(Asset_0).toString = function () {
       return (
@@ -768,9 +949,9 @@
         ', name=' +
         this.name +
         ', otrKey=' +
-        toString(this.otrKey) +
+        toString_0(this.otrKey) +
         ', sha256=' +
-        toString(this.sha256) +
+        toString_0(this.sha256) +
         ', assetId=' +
         this.assetId +
         ', assetToken=' +
@@ -779,6 +960,8 @@
         this.assetDomain +
         ', encryption=' +
         this.encryption +
+        ', metaData=' +
+        this.metaData +
         ')'
       );
     };
@@ -1136,7 +1319,44 @@
             }
             tmp_8 = tmp_9;
           }
-          tmp = new Asset_0(tmp_0, tmp_1, tmp_2, tmp_3, tmp_4, tmp_5, tmp_6, tmp_7, tmp_8);
+          var tmp_10 = tmp_8;
+          var tmp1_safe_receiver = protoContent.get_value_j01efc_k$().metaData;
+          var tmp_11;
+          if (tmp1_safe_receiver == null) {
+            tmp_11 = null;
+          } else {
+            // Inline function 'kotlin.let' call
+            // Inline function 'kotlin.contracts.contract' call
+            // Inline function 'com.wire.backup.ingest.MPBackupMapper.fromMessageProtoToBackupModel.<anonymous>' call
+            var tmp_12;
+            if (tmp1_safe_receiver instanceof Audio) {
+              var tmp1_safe_receiver_0 = tmp1_safe_receiver.get_value_j01efc_k$().normalizedLoudness;
+              tmp_12 = new Audio_0(
+                tmp1_safe_receiver_0 == null ? null : tmp1_safe_receiver_0.array,
+                tmp1_safe_receiver.get_value_j01efc_k$().durationInMillis,
+              );
+            } else {
+              if (tmp1_safe_receiver instanceof Image) {
+                tmp_12 = new Image_0(
+                  tmp1_safe_receiver.get_value_j01efc_k$().width,
+                  tmp1_safe_receiver.get_value_j01efc_k$().height,
+                  tmp1_safe_receiver.get_value_j01efc_k$().tag,
+                );
+              } else {
+                if (tmp1_safe_receiver instanceof Video) {
+                  tmp_12 = new Video_0(
+                    tmp1_safe_receiver.get_value_j01efc_k$().width,
+                    tmp1_safe_receiver.get_value_j01efc_k$().height,
+                    tmp1_safe_receiver.get_value_j01efc_k$().durationInMillis,
+                  );
+                } else {
+                  noWhenBranchMatchedException();
+                }
+              }
+            }
+            tmp_11 = tmp_12;
+          }
+          tmp = new Asset_0(tmp_0, tmp_1, tmp_2, tmp_3, tmp_4, tmp_5, tmp_6, tmp_7, tmp_10, tmp_11);
         } else {
           if (protoContent instanceof Location) {
             tmp = new Location_0(
@@ -1155,20 +1375,20 @@
         }
       }
       var content = tmp;
-      var tmp_10 = message.id;
-      var tmp_11 = toModel(message.conversationId);
-      var tmp_12 = toModel(message.senderUserId);
-      var tmp_13 = message.senderClientId;
-      var tmp_14 = BackupDateTime_0(message.timeIso);
-      var tmp1_safe_receiver = message.webPk;
+      var tmp_13 = message.id;
+      var tmp_14 = toModel(message.conversationId);
+      var tmp_15 = toModel(message.senderUserId);
+      var tmp_16 = message.senderClientId;
+      var tmp_17 = BackupDateTime_0(message.timeIso);
+      var tmp2_safe_receiver = message.webPk;
       return new BackupMessage(
-        tmp_10,
-        tmp_11,
-        tmp_12,
         tmp_13,
         tmp_14,
+        tmp_15,
+        tmp_16,
+        tmp_17,
         content,
-        tmp1_safe_receiver == null ? null : tmp1_safe_receiver.toInt_1tsl84_k$(),
+        tmp2_safe_receiver == null ? null : tmp2_safe_receiver.toInt_1tsl84_k$(),
       );
     }
     function fromConversationProtoToBackupModel($this, conversation) {
@@ -1182,11 +1402,11 @@
       return new ExportUser(toProtoModel(it.id), it.name, it.handle);
     };
     protoOf(MPBackupMapper).mapMessageToProtobuf_a1fp5o_k$ = function (it) {
-      var tmp2_id = it.id;
-      var tmp3_timeIso = toLongMilliseconds(it.creationDate);
-      var tmp4_senderUserId = toProtoModel(it.senderUserId);
-      var tmp5_senderClientId = it.senderClientId;
-      var tmp6_conversationId = toProtoModel(it.conversationId);
+      var tmp3_id = it.id;
+      var tmp4_timeIso = toLongMilliseconds(it.creationDate);
+      var tmp5_senderUserId = toProtoModel(it.senderUserId);
+      var tmp6_senderClientId = it.senderClientId;
+      var tmp7_conversationId = toProtoModel(it.conversationId);
       var content = it.content;
       var tmp;
       if (content instanceof Asset_0) {
@@ -1214,7 +1434,51 @@
             noWhenBranchMatchedException();
             break;
         }
-        tmp = new Asset(new ExportedAsset(tmp_0, tmp_1, tmp_2, tmp_3, tmp_4, tmp_5, tmp_6, tmp_7, tmp_8));
+        var tmp_9 = tmp_8;
+        var tmp2_safe_receiver = content.metaData;
+        var tmp_10;
+        if (tmp2_safe_receiver == null) {
+          tmp_10 = null;
+        } else {
+          // Inline function 'kotlin.let' call
+          // Inline function 'kotlin.contracts.contract' call
+          // Inline function 'com.wire.backup.ingest.MPBackupMapper.mapMessageToProtobuf.<anonymous>' call
+          var tmp_11;
+          if (tmp2_safe_receiver instanceof Audio_0) {
+            var tmp_12 = tmp2_safe_receiver.duration;
+            var tmp1_safe_receiver = tmp2_safe_receiver.normalization;
+            var tmp_13;
+            if (tmp1_safe_receiver == null) {
+              tmp_13 = null;
+            } else {
+              // Inline function 'kotlin.let' call
+              // Inline function 'kotlin.contracts.contract' call
+              // Inline function 'com.wire.backup.ingest.MPBackupMapper.mapMessageToProtobuf.<anonymous>.<anonymous>' call
+              tmp_13 = new ByteArr(tmp1_safe_receiver);
+            }
+            tmp_11 = new Audio(new ExportedAudioMetaData(tmp_12, tmp_13));
+          } else {
+            if (tmp2_safe_receiver instanceof Image_0) {
+              tmp_11 = new Image(
+                new ExportedImageMetaData(tmp2_safe_receiver.width, tmp2_safe_receiver.height, tmp2_safe_receiver.tag),
+              );
+            } else {
+              if (tmp2_safe_receiver instanceof Video_0) {
+                tmp_11 = new Video(
+                  new ExportedVideoMetaData(
+                    tmp2_safe_receiver.width,
+                    tmp2_safe_receiver.height,
+                    tmp2_safe_receiver.duration,
+                  ),
+                );
+              } else {
+                noWhenBranchMatchedException();
+              }
+            }
+          }
+          tmp_10 = tmp_11;
+        }
+        tmp = new Asset(new ExportedAsset(tmp_0, tmp_1, tmp_2, tmp_3, tmp_4, tmp_5, tmp_6, tmp_7, tmp_9, tmp_10));
       } else {
         if (content instanceof Text_0) {
           tmp = new Text(new ExportedText(content.text));
@@ -1226,17 +1490,17 @@
           }
         }
       }
-      var tmp7_content = tmp;
+      var tmp8_content = tmp;
       var tmp0_safe_receiver = it.webPrimaryKey;
-      var tmp8_webPk = tmp0_safe_receiver == null ? null : toLong(tmp0_safe_receiver);
+      var tmp9_webPk = tmp0_safe_receiver == null ? null : toLong(tmp0_safe_receiver);
       return new ExportedMessage(
-        tmp2_id,
-        tmp3_timeIso,
-        tmp4_senderUserId,
-        tmp5_senderClientId,
-        tmp6_conversationId,
-        tmp8_webPk,
-        tmp7_content,
+        tmp3_id,
+        tmp4_timeIso,
+        tmp5_senderUserId,
+        tmp6_senderClientId,
+        tmp7_conversationId,
+        tmp9_webPk,
+        tmp8_content,
       );
     };
     protoOf(MPBackupMapper).mapConversationToProtobuf_sjz8yk_k$ = function (it) {
@@ -1373,6 +1637,10 @@
         'AES_CBC',
         EncryptionAlgorithm_AES_CBC_getInstance,
       );
+      $com$wire$backup$data.BackupMessageContent.Asset.AssetMetadata = AssetMetadata;
+      $com$wire$backup$data.BackupMessageContent.Asset.AssetMetadata.Image = Image_0;
+      $com$wire$backup$data.BackupMessageContent.Asset.AssetMetadata.Video = Video_0;
+      $com$wire$backup$data.BackupMessageContent.Asset.AssetMetadata.Audio = Audio_0;
       $com$wire$backup$data.BackupMessageContent.Location = Location_0;
       var $com = _.com || (_.com = {});
       var $com$wire = $com.wire || ($com.wire = {});

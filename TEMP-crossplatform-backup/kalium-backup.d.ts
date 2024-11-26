@@ -2118,6 +2118,7 @@ export declare namespace com.wire.kalium.protobuf.backup {
       assetToken?: Nullable<string>,
       assetDomain?: Nullable<string>,
       encryption?: Nullable<com.wire.kalium.protobuf.backup.ExportedEncryptionAlgorithm>,
+      metaData?: Nullable<com.wire.kalium.protobuf.backup.ExportedAsset.MetaData<any /*UnknownType **/>>,
       unknownFields?: any /* kotlin.collections.Map<number, pbandk.UnknownField> */,
     );
     get mimetype(): string;
@@ -2129,6 +2130,10 @@ export declare namespace com.wire.kalium.protobuf.backup {
     get assetToken(): Nullable<string>;
     get assetDomain(): Nullable<string>;
     get encryption(): Nullable<com.wire.kalium.protobuf.backup.ExportedEncryptionAlgorithm>;
+    get metaData(): Nullable<com.wire.kalium.protobuf.backup.ExportedAsset.MetaData<any /*UnknownType **/>>;
+    get image(): Nullable<com.wire.kalium.protobuf.backup.ExportedImageMetaData>;
+    get video(): Nullable<com.wire.kalium.protobuf.backup.ExportedVideoMetaData>;
+    get audio(): Nullable<com.wire.kalium.protobuf.backup.ExportedAudioMetaData>;
     copy(
       mimetype?: string,
       size?: any /* kotlin.Long */,
@@ -2139,12 +2144,96 @@ export declare namespace com.wire.kalium.protobuf.backup {
       assetToken?: Nullable<string>,
       assetDomain?: Nullable<string>,
       encryption?: Nullable<com.wire.kalium.protobuf.backup.ExportedEncryptionAlgorithm>,
+      metaData?: Nullable<com.wire.kalium.protobuf.backup.ExportedAsset.MetaData<any /*UnknownType **/>>,
       unknownFields?: any /* kotlin.collections.Map<number, pbandk.UnknownField> */,
     ): com.wire.kalium.protobuf.backup.ExportedAsset;
     toString(): string;
     hashCode(): number;
     equals(other: Nullable<any>): boolean;
     static get Companion(): {} & any /* pbandk.Message.Companion<com.wire.kalium.protobuf.backup.ExportedAsset> */;
+  }
+  namespace ExportedAsset {
+    abstract class MetaData<V> /* extends pbandk.Message.OneOf<V> */ {
+      protected constructor(value: V);
+    }
+    namespace MetaData {
+      class Image extends com.wire.kalium.protobuf.backup.ExportedAsset
+        .MetaData<com.wire.kalium.protobuf.backup.ExportedImageMetaData> {
+        constructor(image: com.wire.kalium.protobuf.backup.ExportedImageMetaData);
+      }
+      class Video extends com.wire.kalium.protobuf.backup.ExportedAsset
+        .MetaData<com.wire.kalium.protobuf.backup.ExportedVideoMetaData> {
+        constructor(video: com.wire.kalium.protobuf.backup.ExportedVideoMetaData);
+      }
+      class Audio extends com.wire.kalium.protobuf.backup.ExportedAsset
+        .MetaData<com.wire.kalium.protobuf.backup.ExportedAudioMetaData> {
+        constructor(audio: com.wire.kalium.protobuf.backup.ExportedAudioMetaData);
+      }
+    }
+  }
+  class ExportedImageMetaData /* implements pbandk.Message */ {
+    constructor(
+      width: number,
+      height: number,
+      tag?: Nullable<string>,
+      unknownFields?: any /* kotlin.collections.Map<number, pbandk.UnknownField> */,
+    );
+    get width(): number;
+    get height(): number;
+    get tag(): Nullable<string>;
+    copy(
+      width?: number,
+      height?: number,
+      tag?: Nullable<string>,
+      unknownFields?: any /* kotlin.collections.Map<number, pbandk.UnknownField> */,
+    ): com.wire.kalium.protobuf.backup.ExportedImageMetaData;
+    toString(): string;
+    hashCode(): number;
+    equals(other: Nullable<any>): boolean;
+    static get Companion(): {} & any /* pbandk.Message.Companion<com.wire.kalium.protobuf.backup.ExportedImageMetaData> */;
+  }
+  class ExportedVideoMetaData /* implements pbandk.Message */ {
+    constructor(
+      width?: Nullable<number>,
+      height?: Nullable<number>,
+      durationInMillis?: Nullable<any> /* Nullable<kotlin.Long> */,
+      unknownFields?: any /* kotlin.collections.Map<number, pbandk.UnknownField> */,
+    );
+    get width(): Nullable<number>;
+    get height(): Nullable<number>;
+    get durationInMillis(): Nullable<any> /* Nullable<kotlin.Long> */;
+    copy(
+      width?: Nullable<number>,
+      height?: Nullable<number>,
+      durationInMillis?: Nullable<any> /* Nullable<kotlin.Long> */,
+      unknownFields?: any /* kotlin.collections.Map<number, pbandk.UnknownField> */,
+    ): com.wire.kalium.protobuf.backup.ExportedVideoMetaData;
+    toString(): string;
+    hashCode(): number;
+    equals(other: Nullable<any>): boolean;
+    static get Companion(): {
+      get defaultInstance(): com.wire.kalium.protobuf.backup.ExportedVideoMetaData;
+    } & any /* pbandk.Message.Companion<com.wire.kalium.protobuf.backup.ExportedVideoMetaData> */;
+  }
+  class ExportedAudioMetaData /* implements pbandk.Message */ {
+    constructor(
+      durationInMillis?: Nullable<any> /* Nullable<kotlin.Long> */,
+      normalizedLoudness?: Nullable<pbandk.ByteArr>,
+      unknownFields?: any /* kotlin.collections.Map<number, pbandk.UnknownField> */,
+    );
+    get durationInMillis(): Nullable<any> /* Nullable<kotlin.Long> */;
+    get normalizedLoudness(): Nullable<pbandk.ByteArr>;
+    copy(
+      durationInMillis?: Nullable<any> /* Nullable<kotlin.Long> */,
+      normalizedLoudness?: Nullable<pbandk.ByteArr>,
+      unknownFields?: any /* kotlin.collections.Map<number, pbandk.UnknownField> */,
+    ): com.wire.kalium.protobuf.backup.ExportedAudioMetaData;
+    toString(): string;
+    hashCode(): number;
+    equals(other: Nullable<any>): boolean;
+    static get Companion(): {
+      get defaultInstance(): com.wire.kalium.protobuf.backup.ExportedAudioMetaData;
+    } & any /* pbandk.Message.Companion<com.wire.kalium.protobuf.backup.ExportedAudioMetaData> */;
   }
   class ExportedLocation /* implements pbandk.Message */ {
     constructor(
@@ -2170,6 +2259,12 @@ export declare namespace com.wire.kalium.protobuf.backup {
     equals(other: Nullable<any>): boolean;
     static get Companion(): {} & any /* pbandk.Message.Companion<com.wire.kalium.protobuf.backup.ExportedLocation> */;
   }
+  function orDefaultForExportedVideoMetaData(
+    _this_: Nullable<com.wire.kalium.protobuf.backup.ExportedVideoMetaData>,
+  ): com.wire.kalium.protobuf.backup.ExportedVideoMetaData;
+  function orDefaultForExportedAudioMetaData(
+    _this_: Nullable<com.wire.kalium.protobuf.backup.ExportedAudioMetaData>,
+  ): com.wire.kalium.protobuf.backup.ExportedAudioMetaData;
 }
 export declare namespace com.wire.kalium.protobuf.messages {
   abstract class ClientAction /* implements pbandk.Message.Enum */ {
@@ -3896,6 +3991,7 @@ export declare namespace com.wire.backup.data {
         assetToken: Nullable<string>,
         assetDomain: Nullable<string>,
         encryption: Nullable<com.wire.backup.data.BackupMessageContent.Asset.EncryptionAlgorithm>,
+        metaData: Nullable<com.wire.backup.data.BackupMessageContent.Asset.AssetMetadata>,
       );
       get mimeType(): string;
       get size(): number;
@@ -3906,6 +4002,7 @@ export declare namespace com.wire.backup.data {
       get assetToken(): Nullable<string>;
       get assetDomain(): Nullable<string>;
       get encryption(): Nullable<com.wire.backup.data.BackupMessageContent.Asset.EncryptionAlgorithm>;
+      get metaData(): Nullable<com.wire.backup.data.BackupMessageContent.Asset.AssetMetadata>;
       equals(other: Nullable<any>): boolean;
       hashCode(): number;
       copy(
@@ -3918,6 +4015,7 @@ export declare namespace com.wire.backup.data {
         assetToken?: Nullable<string>,
         assetDomain?: Nullable<string>,
         encryption?: Nullable<com.wire.backup.data.BackupMessageContent.Asset.EncryptionAlgorithm>,
+        metaData?: Nullable<com.wire.backup.data.BackupMessageContent.Asset.AssetMetadata>,
       ): com.wire.backup.data.BackupMessageContent.Asset;
       toString(): string;
     }
@@ -3936,6 +4034,55 @@ export declare namespace com.wire.backup.data {
         static valueOf(value: string): com.wire.backup.data.BackupMessageContent.Asset.EncryptionAlgorithm;
         get name(): 'AES_GCM' | 'AES_CBC';
         get ordinal(): 0 | 1;
+      }
+      abstract class AssetMetadata {
+        protected constructor();
+      }
+      namespace AssetMetadata {
+        class Image extends com.wire.backup.data.BackupMessageContent.Asset.AssetMetadata {
+          constructor(width: number, height: number, tag: Nullable<string>);
+          get width(): number;
+          get height(): number;
+          get tag(): Nullable<string>;
+          copy(
+            width?: number,
+            height?: number,
+            tag?: Nullable<string>,
+          ): com.wire.backup.data.BackupMessageContent.Asset.AssetMetadata.Image;
+          toString(): string;
+          hashCode(): number;
+          equals(other: Nullable<any>): boolean;
+        }
+        class Video extends com.wire.backup.data.BackupMessageContent.Asset.AssetMetadata {
+          constructor(
+            width: Nullable<number>,
+            height: Nullable<number>,
+            duration: Nullable<any> /* Nullable<kotlin.Long> */,
+          );
+          get width(): Nullable<number>;
+          get height(): Nullable<number>;
+          get duration(): Nullable<any> /* Nullable<kotlin.Long> */;
+          copy(
+            width?: Nullable<number>,
+            height?: Nullable<number>,
+            duration?: Nullable<any> /* Nullable<kotlin.Long> */,
+          ): com.wire.backup.data.BackupMessageContent.Asset.AssetMetadata.Video;
+          toString(): string;
+          hashCode(): number;
+          equals(other: Nullable<any>): boolean;
+        }
+        class Audio extends com.wire.backup.data.BackupMessageContent.Asset.AssetMetadata {
+          constructor(normalization: Nullable<Int8Array>, duration: Nullable<any> /* Nullable<kotlin.Long> */);
+          get normalization(): Nullable<Int8Array>;
+          get duration(): Nullable<any> /* Nullable<kotlin.Long> */;
+          copy(
+            normalization?: Nullable<Int8Array>,
+            duration?: Nullable<any> /* Nullable<kotlin.Long> */,
+          ): com.wire.backup.data.BackupMessageContent.Asset.AssetMetadata.Audio;
+          toString(): string;
+          hashCode(): number;
+          equals(other: Nullable<any>): boolean;
+        }
       }
     }
     class Location extends com.wire.backup.data.BackupMessageContent {
