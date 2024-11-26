@@ -30,7 +30,7 @@ const logger = getLogger('ErrorFallback');
 export const ErrorFallback = ({error, resetErrorBoundary}: FallbackProps) => {
   useEffect(() => {
     const customError = new Error();
-    logger.error({error, stackTrace: customError.stack});
+    logger.error({originalError: error, originalStack: error?.stack, fallbackInvocationStack: customError.stack});
 
     PrimaryModal.show(PrimaryModal.type.CONFIRM, {
       preventClose: true,
