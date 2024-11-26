@@ -30,9 +30,7 @@ export const isMPBackup = (data: FileData): boolean => !!data[MPBackup.ZIP_ENTRY
 
 export const isMessageAddEvent = (eventType: unknown): boolean =>
   eventType === ClientEvent.CONVERSATION.MESSAGE_ADD.toString();
-
 export const isAssetAddEvent = (eventType: unknown): boolean =>
   eventType === ClientEvent.CONVERSATION.ASSET_ADD.toString();
-
 export const isSupportedEventType = (eventType: string): boolean =>
   isMessageAddEvent(eventType) || isAssetAddEvent(eventType);

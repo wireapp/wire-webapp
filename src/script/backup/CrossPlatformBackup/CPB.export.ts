@@ -21,6 +21,7 @@ import Dexie from 'dexie';
 
 import {ConversationRecord, UserRecord, EventRecord} from 'src/script/storage';
 
+import {buildMetaData} from './AssetMetadata';
 import {
   MPBackupExporter,
   BackupQualifiedId,
@@ -150,6 +151,10 @@ export const exportCPBHistoryFromDatabase = async ({
         return;
       }
 
+      const metaData = buildMetaData(data.content_type, data.info);
+
+      CPBLogger.log('metaData', metaData, data.content_type);
+
       const asset = new BackupMessageContent.Asset(
         data.content_type,
         data.content_length,
@@ -160,7 +165,7 @@ export const exportCPBHistoryFromDatabase = async ({
         data.token,
         data.domain,
         null,
-        null, // todo map this guy here to AssetMetadata
+        metaData,
       );
       backupExporter.addMessage(
         new BackupMessage(id, conversationId, senderUserId, senderClientId, creationDate, asset, webPrimaryKey),

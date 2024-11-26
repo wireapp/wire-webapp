@@ -102,25 +102,7 @@ const mapAssetMessageToEventRecord = (message: AssetBackupMessage): EventRecord 
   data: {
     content_length: message.content.size.toString(),
     content_type: message.content.mimeType.toString(),
-
-    // lets hardcode the values for now
-    info: {
-      name: message.content.name?.toString() ?? '',
-      height: 423,
-      width: 657,
-      tag: 'medium',
-    },
-
-    /* //todo map from "message.content.metaData" com.wire.backup.data.BackupMessageContent.Asset.AssetMetadata
-    info: {
-      name: message.content.metaData,
-      height: 423,
-      width: 657,
-      tag: 'medium',
-    },
-    expects_read_confirmation: undefined,
-    legal_hold_status: undefined,
-  */
+    info: message.content.metaData,
     domain: message.content.assetDomain?.toString(),
     key: message.content.assetId?.toString(),
     otr_key: transformArrayToObject(message.content.otrKey),

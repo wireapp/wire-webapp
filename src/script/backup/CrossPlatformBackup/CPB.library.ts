@@ -32,6 +32,7 @@ import BackUpConversation = com.wire.backup.data.BackupConversation;
 import BackupMessageContent = com.wire.backup.data.BackupMessageContent;
 import BackupDateTime = com.wire.backup.data.BackupDateTime;
 import EncryptionAlgorithm = BackupMessageContent.Asset.EncryptionAlgorithm;
+import AssetMetaData = com.wire.backup.data.BackupMessageContent.Asset.AssetMetadata;
 /* eslint-enable */
 
 export {
@@ -46,4 +47,5 @@ export {
   BackupMessageContent,
   BackupDateTime,
   EncryptionAlgorithm,
+  AssetMetaData,
 };

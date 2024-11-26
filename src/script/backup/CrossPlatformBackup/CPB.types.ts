@@ -34,3 +34,18 @@ export interface ImportHistoryToDatabaseParams {
   fileData: FileData;
   progressCallback: ProgressCallback;
 }
+
+interface commonAsset {
+  name: string | null;
+}
+export type ImageAsset = commonAsset & {
+  height: number;
+  width: number;
+  tag: string;
+};
+export type FileAsset = commonAsset;
+export type AudioAsset = commonAsset;
+export type VideoAsset = commonAsset;
+export type TexttAsset = commonAsset;
+export type UndefinedAsset = commonAsset;
+export type OtherAsset = commonAsset;
