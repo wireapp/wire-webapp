@@ -9,7 +9,7 @@ pipeline {
 
     environment {
         CREDENTIALS = credentials('GITHUB_TOKEN_WEB')
-        WIRE_BOT_SECRET = credentials('JENKINSBOT_WEBAPP_QA')
+        WIRE_BOT_SECRET = credentials('JENKINSBOT_WEBAPP_DEV')
     }
 
     stages {
