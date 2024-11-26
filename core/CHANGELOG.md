@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [46.9.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.8.0...@wireapp/core@46.9.0) (2024-11-26)
+
+### Features
+
+* update cc ([#6695](https://github.com/wireapp/wire-web-packages/issues/6695)) ([3a79e48](https://github.com/wireapp/wire-web-packages/commit/3a79e48743fa60614ead449d538841e6b402c282))
+
 # [46.8.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.7.1...@wireapp/core@46.8.0) (2024-11-25)
 
 ### Features
