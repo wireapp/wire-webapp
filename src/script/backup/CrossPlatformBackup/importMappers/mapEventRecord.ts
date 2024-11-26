@@ -110,9 +110,10 @@ const mapAssetMessageToEventRecord = (message: AssetBackupMessage): EventRecord 
       width: 657,
       tag: 'medium',
     },
-    /*
+
+    /* //todo map from "message.content.metaData" com.wire.backup.data.BackupMessageContent.Asset.AssetMetadata
     info: {
-      name: null,
+      name: message.content.metaData,
       height: 423,
       width: 657,
       tag: 'medium',
