@@ -24,10 +24,9 @@ import {BackendError, StatusCode} from '@wireapp/api-client/lib/http';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import {Converter, Decoder, Encoder} from 'bazinga64';
-import logdown from 'logdown';
 
 import {APIClient} from '@wireapp/api-client';
-import {TimeUtil, TypedEventEmitter} from '@wireapp/commons';
+import {LogFactory, TimeUtil, TypedEventEmitter} from '@wireapp/commons';
 import {
   AddProposalArgs,
   Ciphersuite,
@@ -102,7 +101,7 @@ type Events = {
   newCrlDistributionPoints: string[];
 };
 export class MLSService extends TypedEventEmitter<Events> {
-  logger = logdown('@wireapp/core/MLSService');
+  logger = LogFactory.getLogger('@wireapp/core/MLSService');
   private _config?: MLSConfig;
   private readonly textEncoder = new TextEncoder();
   private readonly textDecoder = new TextDecoder();

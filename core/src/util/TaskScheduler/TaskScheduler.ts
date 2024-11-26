@@ -17,14 +17,11 @@
  *
  */
 
-import logdown from 'logdown';
+import {LogFactory} from '@wireapp/commons';
 
 import {TaskSchedulerStore} from './TaskScheduler.store';
 
-const logger = logdown('@wireapp/core/TaskScheduler', {
-  logger: console,
-  markdown: false,
-});
+const logger = LogFactory.getLogger('@wireapp/core/TaskScheduler');
 
 type ScheduleTaskParams = {
   task: () => Promise<void> | void;

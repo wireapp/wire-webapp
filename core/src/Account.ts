@@ -39,7 +39,7 @@ import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import logdown from 'logdown';
 
 import {APIClient, BackendFeatures} from '@wireapp/api-client';
-import {TypedEventEmitter} from '@wireapp/commons';
+import {LogFactory, TypedEventEmitter} from '@wireapp/commons';
 import {CRUDEngine, MemoryEngine} from '@wireapp/store-engine';
 
 import {AccountService} from './account/';
@@ -199,10 +199,7 @@ export class Account extends TypedEventEmitter<Events> {
       }
     });
 
-    this.logger = logdown('@wireapp/core/Account', {
-      logger: console,
-      markdown: false,
-    });
+    this.logger = LogFactory.getLogger('@wireapp/core/Account');
   }
 
   /**
@@ -651,7 +648,7 @@ export class Account extends TypedEventEmitter<Events> {
         handleMissedNotifications,
         abortHandler,
       );
-      this.logger.info(`Finished processing notifications ${JSON.stringify(results)}`, results);
+      this.logger.info('Finished processing notifications', results);
 
       if (abortHandler.signal.aborted) {
         this.logger.warn('Ending connection process as websocket was closed');

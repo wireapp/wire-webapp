@@ -28,8 +28,8 @@ import {
 } from '@wireapp/api-client/lib/conversation';
 import type {ConversationOtrMessageAddEvent} from '@wireapp/api-client/lib/event';
 import type {QualifiedId, QualifiedUserPreKeyBundleMap} from '@wireapp/api-client/lib/user';
-import logdown from 'logdown';
 
+import {LogFactory} from '@wireapp/commons';
 import {CRUDEngine} from '@wireapp/store-engine';
 
 import {CryptoClient} from './CryptoClient';
@@ -76,7 +76,7 @@ export type EncryptionResult = {
 
 export class ProteusService {
   private readonly messageService: MessageService;
-  private readonly logger = logdown('@wireapp/core/ProteusService');
+  private readonly logger = LogFactory.getLogger('@wireapp/core/ProteusService');
 
   constructor(
     private readonly apiClient: APIClient,

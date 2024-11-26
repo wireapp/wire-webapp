@@ -24,6 +24,9 @@ import logdown from 'logdown';
 import * as os from 'os';
 import * as path from 'path';
 
+import {Runtime} from './util';
+import {serializeArgs} from './util/StringUtil';
+
 export type Logger = logdown.Logger;
 
 export interface LoggerOptions {
@@ -114,6 +117,27 @@ export class LogFactory {
 
     if (config.forceEnable) {
       logger.state.isEnabled = true;
+    }
+
+    if (Runtime.isDesktopApp()) {
+      return {
+        ...logger,
+        debug: (...args: any[]): void => {
+          logger.debug(...serializeArgs(args));
+        },
+        error: (...args: any[]): void => {
+          logger.error(...serializeArgs(args));
+        },
+        info: (...args: any[]): void => {
+          logger.info(...serializeArgs(args));
+        },
+        log: (...args: any[]): void => {
+          logger.log(...serializeArgs(args));
+        },
+        warn: (...args: any[]): void => {
+          logger.warn(...serializeArgs(args));
+        },
+      };
     }
 
     return logger;

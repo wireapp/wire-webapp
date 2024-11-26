@@ -22,6 +22,8 @@ import {ErrorEvent} from 'reconnecting-websocket';
 
 import {EventEmitter} from 'events';
 
+import {LogFactory} from '@wireapp/commons';
+
 import {ReconnectingWebsocket, WEBSOCKET_STATE} from './ReconnectingWebsocket';
 
 import {InvalidTokenError, MissingCookieAndTokenError, MissingCookieError} from '../auth/';
@@ -69,10 +71,7 @@ export class WebSocketClient extends EventEmitter {
     this.socket = new ReconnectingWebsocket(this.onReconnect);
     this.websocketState = this.socket.getState();
 
-    this.logger = logdown('@wireapp/api-client/tcp/WebSocketClient', {
-      logger: console,
-      markdown: false,
-    });
+    this.logger = LogFactory.getLogger('@wireapp/api-client/tcp/WebSocketClient');
   }
 
   private onStateChange(newState: WEBSOCKET_STATE): void {

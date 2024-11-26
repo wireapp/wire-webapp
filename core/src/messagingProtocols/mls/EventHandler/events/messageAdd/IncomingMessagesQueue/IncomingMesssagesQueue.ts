@@ -17,11 +17,10 @@
  *
  */
 
-import logdown from 'logdown';
-
+import {LogFactory} from '@wireapp/commons';
 import {PromiseQueue} from '@wireapp/promise-queue';
 
-const logger = logdown('@wireapp/core/MLSService/IncomingMessagesQueue');
+const logger = LogFactory.getLogger('@wireapp/core/MLSService/IncomingMessagesQueue');
 
 // (groupId string -> queue) map
 const queues = new Map<string, PromiseQueue>();

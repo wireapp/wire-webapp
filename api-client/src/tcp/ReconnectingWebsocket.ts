@@ -20,7 +20,7 @@
 import logdown from 'logdown';
 import RWS, {CloseEvent, ErrorEvent, Event, Options} from 'reconnecting-websocket';
 
-import {TimeUtil} from '@wireapp/commons';
+import {LogFactory, TimeUtil} from '@wireapp/commons';
 
 import * as buffer from '../shims/node/buffer';
 import {WebSocketNode} from '../shims/node/websocket';
@@ -73,10 +73,7 @@ export class ReconnectingWebsocket {
       pingInterval?: number;
     } = {},
   ) {
-    this.logger = logdown('@wireapp/api-client/tcp/ReconnectingWebsocket', {
-      logger: console,
-      markdown: false,
-    });
+    this.logger = LogFactory.getLogger('@wireapp/api-client/tcp/ReconnectingWebsocket');
 
     if (options.pingInterval) {
       this.PING_INTERVAL = options.pingInterval;

@@ -34,3 +34,7 @@ export function bytesToUUID(uuid: Buffer | Uint8Array): string {
   const str = uuid.toString('hex');
   return `${str.slice(0, 8)}-${str.slice(8, 12)}-${str.slice(12, 16)}-${str.slice(16, 20)}-${str.slice(20)}`;
 }
+
+export function serializeArgs(args: any[]): any[] {
+  return args.map(arg => (typeof arg === 'object' && arg !== null ? JSON.stringify(arg) : arg));
+}
