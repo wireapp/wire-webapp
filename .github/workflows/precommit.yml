@@ -10,13 +10,20 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  procommit-deploy:
+  build:
     runs-on: buildjet-8vcpu-ubuntu-2204
 
+    outputs:
+      unit_tests_report: ${{ env.UNIT_TEST_REPORT_FILE }}
+      build_artifact: ${{ env.BUILD_ARTIFACT }}
+
     env:
-      DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS: 150
-      AWS_APPLICATION_NAME: Webapp
-      AWS_BUILD_ZIP_PATH: server/dist/s3/ebs.zip
+      BUILD_DIR: server/dist/s3/
+      BUILD_ARTIFACT: ebs.zip
+      COMMIT_URL: ${{github.event.head_commit.url}}
+      COMMITTER: ${{github.event.head_commit.committer.name}}
+      CHANGELOG_FILE: './changelog.md'
+      UNIT_TEST_REPORT_FILE: './unit-tests.log'
 
     steps:
       - name: Checkout
@@ -30,6 +37,29 @@ jobs:
 
       - name: Install JS dependencies
         run: yarn --immutable
+
+      - name: Update configuration
+        run: yarn configure
+
+      # - name: Test
+      #   run: |
+      #     set -o pipefail
+      #     yarn test --detectOpenHandles=false 2>&1 | tee ${{ env.UNIT_TEST_REPORT_FILE }}
+      #     echo -e "COMMIT SHA = ${{ github.sha }}" >> ${{env.UNIT_TEST_REPORT_FILE}}
+      #     echo -e "TEST RUN DATE = $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> ${{env.UNIT_TEST_REPORT_FILE}}
+
+      # - uses: actions/upload-artifact@v4
+      #   with:
+      #     name: 'unit-tests-report'
+      #     path: ${{env.UNIT_TEST_REPORT_FILE}}
+
+      - name: Build
+        run: yarn build:prod
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: 'build-artifact'
+          path: '${{env.BUILD_DIR}}${{env.BUILD_ARTIFACT}}'
 
       - name: Fetch PR details
         id: pr_details
@@ -47,22 +77,32 @@ jobs:
           echo "Total additions: $total_additions"
           echo "total_additions=$total_additions" >> $GITHUB_ENV
 
+  deploy_to_aws:
+    name: 'Deploy to live environments'
+    runs-on: ubuntu-latest
+    needs: [build]
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: 'build-artifact'
+
       - name: Deploy to precommit environment
         id: deploy
         if: ${{ env.total_additions > 100 && github.actor != 'dependabot[bot]' }}
         uses: einaregilsson/beanstalk-deploy@v22
         with:
-          application_name: ${{ env.AWS_APPLICATION_NAME }}
+          application_name: Webapp
           aws_access_key: ${{ secrets.WEBTEAM_AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY }}
-          deployment_package: ${{ env.AWS_BUILD_ZIP_PATH }}
+          deployment_package: ${{needs.build.outputs.build_artifact}}
           environment_name: wire-webapp-precommit
           region: eu-central-1
           use_existing_version_if_available: true
           version_description: ${{ github.sha }}
           version_label: ${{ github.run_id }}
           wait_for_deployment: false
-          wait_for_environment_recovery: ${{ env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS }}
+          wait_for_environment_recovery: 150
 
       - name: Deployment Status
         if: ${{ always() }}
