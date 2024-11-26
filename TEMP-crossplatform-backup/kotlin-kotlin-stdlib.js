@@ -49,6 +49,11 @@ if (typeof Array.prototype.fill === 'undefined') {
     Object.defineProperty(TypedArray.prototype, 'fill', {value: Array.prototype.fill});
   }
 });
+if (typeof Math.log10 === 'undefined') {
+  Math.log10 = function (x) {
+    return Math.log(x) * Math.LOG10E;
+  };
+}
 if (typeof Math.clz32 === 'undefined') {
   Math.clz32 = (function (log, LN2) {
     return function (x) {
@@ -67,11 +72,6 @@ if (typeof Math.sign === 'undefined') {
       return Number(x);
     }
     return x > 0 ? 1 : -1;
-  };
-}
-if (typeof Math.log10 === 'undefined') {
-  Math.log10 = function (x) {
-    return Math.log(x) * Math.LOG10E;
   };
 }
 if (typeof String.prototype.startsWith === 'undefined') {
@@ -331,13 +331,13 @@ if (typeof String.prototype.endsWith === 'undefined') {
   setMetadataFor(DoubleCompanionObject, 'DoubleCompanionObject', objectMeta);
   setMetadataFor(StringCompanionObject, 'StringCompanionObject', objectMeta);
   setMetadataFor(BooleanCompanionObject, 'BooleanCompanionObject', objectMeta);
+  setMetadataFor(JsQualifier, 'JsQualifier', classMeta, VOID, [Annotation]);
+  setMetadataFor(JsFileName, 'JsFileName', classMeta, VOID, [Annotation]);
+  setMetadataFor(JsName, 'JsName', classMeta, VOID, [Annotation]);
+  setMetadataFor(JsModule, 'JsModule', classMeta, VOID, [Annotation]);
+  setMetadataFor(JsNonModule, 'JsNonModule', classMeta, VOID, [Annotation]);
   setMetadataFor(Ignore, 'Ignore', classMeta, VOID, [Annotation]);
   setMetadataFor(JsExport, 'JsExport', classMeta, VOID, [Annotation]);
-  setMetadataFor(JsNonModule, 'JsNonModule', classMeta, VOID, [Annotation]);
-  setMetadataFor(JsFileName, 'JsFileName', classMeta, VOID, [Annotation]);
-  setMetadataFor(JsModule, 'JsModule', classMeta, VOID, [Annotation]);
-  setMetadataFor(JsName, 'JsName', classMeta, VOID, [Annotation]);
-  setMetadataFor(JsQualifier, 'JsQualifier', classMeta, VOID, [Annotation]);
   setMetadataFor(EagerInitialization, 'EagerInitialization', classMeta, VOID, [Annotation]);
   setMetadataFor(AbstractCollection, 'AbstractCollection', classMeta, VOID, [Collection]);
   setMetadataFor(AbstractMutableCollection, 'AbstractMutableCollection', classMeta, AbstractCollection, [
@@ -7593,6 +7593,90 @@ if (typeof String.prototype.endsWith === 'undefined') {
     var this_0 = ~(_this__u8e3s4 | (-_this__u8e3s4 | 0));
     return (tmp - clz32(this_0)) | 0;
   }
+  function JsQualifier(value) {
+    this.value_1 = value;
+  }
+  protoOf(JsQualifier).get_value_j01efc_k$ = function () {
+    return this.value_1;
+  };
+  protoOf(JsQualifier).equals = function (other) {
+    if (!(other instanceof JsQualifier)) return false;
+    var tmp0_other_with_cast = other instanceof JsQualifier ? other : THROW_CCE();
+    if (!(this.value_1 === tmp0_other_with_cast.value_1)) return false;
+    return true;
+  };
+  protoOf(JsQualifier).hashCode = function () {
+    return imul(getStringHashCode('value'), 127) ^ getStringHashCode(this.value_1);
+  };
+  protoOf(JsQualifier).toString = function () {
+    return '@kotlin.js.JsQualifier(value=' + this.value_1 + ')';
+  };
+  function JsFileName(name) {
+    this.name_1 = name;
+  }
+  protoOf(JsFileName).get_name_woqyms_k$ = function () {
+    return this.name_1;
+  };
+  protoOf(JsFileName).equals = function (other) {
+    if (!(other instanceof JsFileName)) return false;
+    var tmp0_other_with_cast = other instanceof JsFileName ? other : THROW_CCE();
+    if (!(this.name_1 === tmp0_other_with_cast.name_1)) return false;
+    return true;
+  };
+  protoOf(JsFileName).hashCode = function () {
+    return imul(getStringHashCode('name'), 127) ^ getStringHashCode(this.name_1);
+  };
+  protoOf(JsFileName).toString = function () {
+    return '@kotlin.js.JsFileName(name=' + this.name_1 + ')';
+  };
+  function JsName(name) {
+    this.name_1 = name;
+  }
+  protoOf(JsName).get_name_woqyms_k$ = function () {
+    return this.name_1;
+  };
+  protoOf(JsName).equals = function (other) {
+    if (!(other instanceof JsName)) return false;
+    var tmp0_other_with_cast = other instanceof JsName ? other : THROW_CCE();
+    if (!(this.name_1 === tmp0_other_with_cast.name_1)) return false;
+    return true;
+  };
+  protoOf(JsName).hashCode = function () {
+    return imul(getStringHashCode('name'), 127) ^ getStringHashCode(this.name_1);
+  };
+  protoOf(JsName).toString = function () {
+    return '@kotlin.js.JsName(name=' + this.name_1 + ')';
+  };
+  function JsModule(import_0) {
+    this.import_1 = import_0;
+  }
+  protoOf(JsModule).get_import_etdvam_k$ = function () {
+    return this.import_1;
+  };
+  protoOf(JsModule).equals = function (other) {
+    if (!(other instanceof JsModule)) return false;
+    var tmp0_other_with_cast = other instanceof JsModule ? other : THROW_CCE();
+    if (!(this.import_1 === tmp0_other_with_cast.import_1)) return false;
+    return true;
+  };
+  protoOf(JsModule).hashCode = function () {
+    return imul(getStringHashCode('import'), 127) ^ getStringHashCode(this.import_1);
+  };
+  protoOf(JsModule).toString = function () {
+    return '@kotlin.js.JsModule(import=' + this.import_1 + ')';
+  };
+  function JsNonModule() {}
+  protoOf(JsNonModule).equals = function (other) {
+    if (!(other instanceof JsNonModule)) return false;
+    other instanceof JsNonModule || THROW_CCE();
+    return true;
+  };
+  protoOf(JsNonModule).hashCode = function () {
+    return 0;
+  };
+  protoOf(JsNonModule).toString = function () {
+    return '@kotlin.js.JsNonModule()';
+  };
   function Ignore() {}
   protoOf(Ignore).equals = function (other) {
     if (!(other instanceof Ignore)) return false;
@@ -7616,90 +7700,6 @@ if (typeof String.prototype.endsWith === 'undefined') {
   };
   protoOf(JsExport).toString = function () {
     return '@kotlin.js.JsExport()';
-  };
-  function JsNonModule() {}
-  protoOf(JsNonModule).equals = function (other) {
-    if (!(other instanceof JsNonModule)) return false;
-    other instanceof JsNonModule || THROW_CCE();
-    return true;
-  };
-  protoOf(JsNonModule).hashCode = function () {
-    return 0;
-  };
-  protoOf(JsNonModule).toString = function () {
-    return '@kotlin.js.JsNonModule()';
-  };
-  function JsFileName(name) {
-    this.name_1 = name;
-  }
-  protoOf(JsFileName).get_name_woqyms_k$ = function () {
-    return this.name_1;
-  };
-  protoOf(JsFileName).equals = function (other) {
-    if (!(other instanceof JsFileName)) return false;
-    var tmp0_other_with_cast = other instanceof JsFileName ? other : THROW_CCE();
-    if (!(this.name_1 === tmp0_other_with_cast.name_1)) return false;
-    return true;
-  };
-  protoOf(JsFileName).hashCode = function () {
-    return imul(getStringHashCode('name'), 127) ^ getStringHashCode(this.name_1);
-  };
-  protoOf(JsFileName).toString = function () {
-    return '@kotlin.js.JsFileName(name=' + this.name_1 + ')';
-  };
-  function JsModule(import_0) {
-    this.import_1 = import_0;
-  }
-  protoOf(JsModule).get_import_etdvam_k$ = function () {
-    return this.import_1;
-  };
-  protoOf(JsModule).equals = function (other) {
-    if (!(other instanceof JsModule)) return false;
-    var tmp0_other_with_cast = other instanceof JsModule ? other : THROW_CCE();
-    if (!(this.import_1 === tmp0_other_with_cast.import_1)) return false;
-    return true;
-  };
-  protoOf(JsModule).hashCode = function () {
-    return imul(getStringHashCode('import'), 127) ^ getStringHashCode(this.import_1);
-  };
-  protoOf(JsModule).toString = function () {
-    return '@kotlin.js.JsModule(import=' + this.import_1 + ')';
-  };
-  function JsName(name) {
-    this.name_1 = name;
-  }
-  protoOf(JsName).get_name_woqyms_k$ = function () {
-    return this.name_1;
-  };
-  protoOf(JsName).equals = function (other) {
-    if (!(other instanceof JsName)) return false;
-    var tmp0_other_with_cast = other instanceof JsName ? other : THROW_CCE();
-    if (!(this.name_1 === tmp0_other_with_cast.name_1)) return false;
-    return true;
-  };
-  protoOf(JsName).hashCode = function () {
-    return imul(getStringHashCode('name'), 127) ^ getStringHashCode(this.name_1);
-  };
-  protoOf(JsName).toString = function () {
-    return '@kotlin.js.JsName(name=' + this.name_1 + ')';
-  };
-  function JsQualifier(value) {
-    this.value_1 = value;
-  }
-  protoOf(JsQualifier).get_value_j01efc_k$ = function () {
-    return this.value_1;
-  };
-  protoOf(JsQualifier).equals = function (other) {
-    if (!(other instanceof JsQualifier)) return false;
-    var tmp0_other_with_cast = other instanceof JsQualifier ? other : THROW_CCE();
-    if (!(this.value_1 === tmp0_other_with_cast.value_1)) return false;
-    return true;
-  };
-  protoOf(JsQualifier).hashCode = function () {
-    return imul(getStringHashCode('value'), 127) ^ getStringHashCode(this.value_1);
-  };
-  protoOf(JsQualifier).toString = function () {
-    return '@kotlin.js.JsQualifier(value=' + this.value_1 + ')';
   };
   function EagerInitialization() {}
   protoOf(EagerInitialization).equals = function (other) {
