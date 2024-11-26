@@ -1,9 +1,0 @@
-{
-  "backend.maxHeapSizeMb": 1487,
-  "plugins": [
-    {
-      "type": "add",
-      "pluginName": "fleet.aiCompletion"
-    }
-  ]
-}
