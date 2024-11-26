@@ -70,6 +70,7 @@ import {
 } from './FullscreenVideoCall.styles';
 import {GroupVideoGrid} from './GroupVideoGrid';
 import {Pagination} from './Pagination';
+import {useSyncCurrentRange} from './useSyncCurrentRange';
 
 import type {Call} from '../../calling/Call';
 import {CallingViewMode, CallState, MuteState} from '../../calling/CallState';
@@ -119,6 +120,8 @@ export interface FullscreenVideoCallProps {
 const EMOJIS_LIST = ['👍', '🎉', '❤️', '😂', '😮', '👏', '🤔', '😢', '👎'];
 
 const LOCAL_STORAGE_KEY_FOR_SCREEN_SHARING_CONFIRM_MODAL = 'DO_NOT_ASK_AGAIN_FOR_SCREEN_SHARING_CONFIRM_MODAL';
+
+const DEFAULT_VISIBLE_DOTS = 5;
 
 const FullscreenVideoCall = ({
   call,
@@ -453,6 +456,46 @@ const FullscreenVideoCall = ({
 
   const isModerator = selfUser && roles[selfUser.id] === DefaultConversationRoleName.WIRE_ADMIN;
 
+  const [currentStart, setCurrentStart] = useState(0);
+  const visibleDots = DEFAULT_VISIBLE_DOTS > totalPages ? totalPages : DEFAULT_VISIBLE_DOTS;
+
+  useSyncCurrentRange({
+    currentStart,
+    currentPage,
+    totalPages,
+    visibleDots,
+    setCurrentStart,
+  });
+
+  const handlePreviousPage = () => {
+    if (currentPage === 0) {
+      return;
+    }
+
+    const previousPage = currentPage - 1;
+
+    // previousPage !== 0 --> jest niepotrzebne prawdopodnie
+    if (previousPage === currentStart && previousPage !== 0) {
+      setCurrentStart(currentStart => currentStart - 1);
+    }
+
+    changePage(previousPage, call);
+  };
+
+  const handleNextPage = () => {
+    if (currentPage === totalPages - 1) {
+      return;
+    }
+
+    const nextPage = currentPage + 1;
+
+    if (nextPage === currentStart + visibleDots - 1 && nextPage !== totalPages - 1) {
+      setCurrentStart(currentStart => currentStart + 1);
+    }
+
+    changePage(nextPage, call);
+  };
+
   return (
     <div
       className={cx('video-calling-wrapper', {
@@ -509,8 +552,8 @@ const FullscreenVideoCall = ({
                 <button
                   data-uie-name="pagination-previous"
                   type="button"
-                  onClick={() => changePage(currentPage - 1, call)}
-                  onKeyDown={event => handleKeyDown(event, () => changePage(currentPage - 1, call))}
+                  onClick={handlePreviousPage}
+                  onKeyDown={event => handleKeyDown(event, handlePreviousPage)}
                   className="button-reset-default"
                   disabled={currentPage === 0}
                   css={{
@@ -526,12 +569,13 @@ const FullscreenVideoCall = ({
                 <Pagination
                   totalPages={totalPages}
                   currentPage={currentPage}
-                  onChangePage={newPage => changePage(newPage, call)}
+                  currentStart={currentStart}
+                  visibleDots={visibleDots}
                 />
                 <button
                   data-uie-name="pagination-next"
-                  onClick={() => changePage(currentPage + 1, call)}
-                  onKeyDown={event => handleKeyDown(event, () => changePage(currentPage + 1, call))}
+                  onClick={handleNextPage}
+                  onKeyDown={event => handleKeyDown(event, handleNextPage)}
                   type="button"
                   className="button-reset-default"
                   disabled={currentPage === totalPages - 1}

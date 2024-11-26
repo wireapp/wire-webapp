@@ -21,12 +21,11 @@ import React from 'react';
 
 import {CSSObject} from '@emotion/react';
 
-import {handleKeyDown} from 'Util/KeyboardUtil';
-
 export interface PaginationProps {
   currentPage: number;
-  onChangePage: (newPage: number) => void;
   totalPages: number;
+  currentStart: number;
+  visibleDots: number;
   wrapperStyles?: CSSObject;
 }
 
@@ -35,14 +34,17 @@ const paginationItemStyles: CSSObject = {
     marginRight: 4,
   },
   borderRadius: '50%',
-  cursor: 'pointer',
-  height: 12,
   marginLeft: 4,
-  width: 12,
 };
 
-const Pagination: React.FC<PaginationProps> = ({totalPages, currentPage, onChangePage, wrapperStyles = {}}) => {
-  const pages = new Array(totalPages).fill(null).map((_, index) => index);
+const Pagination: React.FC<PaginationProps> = ({
+  totalPages,
+  currentPage,
+  currentStart,
+  visibleDots,
+  wrapperStyles = {},
+}) => {
+  const visibleRange = Array.from({length: visibleDots}, (_, index) => currentStart + index);
 
   return (
     <div
@@ -56,40 +58,29 @@ const Pagination: React.FC<PaginationProps> = ({totalPages, currentPage, onChang
       }}
       data-uie-name="pagination-wrapper"
     >
-      {pages.map(page => {
+      {visibleRange.map((page, index) => {
         const isCurrentPage = currentPage === page;
+        const isFirstOrLastInTheRange = index === 0 || index === visibleRange.length - 1;
+        const isLastPage = page === totalPages - 1;
+        const isFirstPage = page === 0;
+
+        const isSmaller = isFirstOrLastInTheRange && !(isFirstPage || isLastPage);
 
         return (
-          <button
+          <div
             data-uie-name="pagination-item"
             data-uie-status={isCurrentPage ? 'active' : 'inactive'}
             key={page}
-            onClick={() => onChangePage(page)}
-            onKeyDown={event => handleKeyDown(event, () => onChangePage(page))}
-            type="button"
-            className="button-reset-default"
             css={{
               ...paginationItemStyles,
-              '&:focus-visible': {
-                backgroundColor: isCurrentPage ? 'var(--toggle-button-hover-bg)' : 'none',
-                border: '1px solid var(--accent-color)',
-                outline: 'none',
-              },
-              '&:hover': {
-                backgroundColor: isCurrentPage
-                  ? 'var(--toggle-button-hover-bg)'
-                  : 'var(--toggle-button-unselected-hover-bg)',
-                border: isCurrentPage
-                  ? '1px solid var(--toggle-button-hover-bg)'
-                  : '1px solid var(--toggle-button-unselected-hover-border)',
-              },
-
               '&:active': {
                 backgroundColor: isCurrentPage ? 'var(--accent-color)' : 'var(--toggle-button-unselected-bg)',
                 border: '1px solid var(--accent-color)',
               },
-              backgroundColor: isCurrentPage ? 'var(--accent-color)' : 'none',
+              backgroundColor: isCurrentPage ? 'var(--accent-color)' : 'transparent',
               border: isCurrentPage ? 'solid 1px var(--accent-color)' : 'solid 1px var(--foreground)',
+              width: isSmaller ? '8px' : '12px',
+              height: isSmaller ? '8px' : '12px',
             }}
           />
         );
