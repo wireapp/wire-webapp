@@ -16,6 +16,7 @@ jobs:
     outputs:
       unit_tests_report: ${{ env.UNIT_TEST_REPORT_FILE }}
       build_artifact: ${{ env.BUILD_ARTIFACT }}
+      total_additions: ${{ steps.check_additions.outputs.total_additions }}
 
     env:
       BUILD_DIR: server/dist/s3/
@@ -72,10 +73,13 @@ jobs:
       - name: Check total PR additions
         id: check_additions
         run: |
-          # Parse the JSON response directly without storing in file
-          total_additions=$(echo '${{ fromJSON(steps.pr_details.outputs.data).additions }}')
-          echo "Total additions: $total_additions"
-          echo "total_additions=$total_additions" >> $GITHUB_ENV
+          # Store response data in variable
+          response='${{ steps.pr_details.outputs.data }}'
+          # Parse additions from response
+          total_additions=$(echo "$response" | jq -r '.additions')
+          echo "Found total additions: $total_additions"
+          # Output for subsequent steps
+          echo "total_additions=$total_additions" >> $GITHUB_OUTPUT
 
   deploy_to_aws:
     name: 'Deploy to live environments'
@@ -89,7 +93,7 @@ jobs:
 
       - name: Deploy to precommit environment
         id: deploy
-        if: ${{ env.total_additions > 100 && github.actor != 'dependabot[bot]' }}
+        if: ${{ needs.build.outputs.total_additions > 100 && github.actor != 'dependabot[bot]' }}
         uses: einaregilsson/beanstalk-deploy@v22
         with:
           application_name: Webapp
@@ -110,8 +114,8 @@ jobs:
           if [[ "${{ steps.deploy.outcome }}" == "success" ]]; then
             echo "✅ Deployment completed successfully"
           elif [[ "${{ steps.deploy.outcome }}" == "skipped" ]]; then
-            if [[ "${{ env.total_additions }}" -le 100 ]]; then
-              echo "⏭️ Deployment was skipped: PR has ${{ env.total_additions }} additions (threshold: 100)"
+            if [[ "${{ needs.build.outputs.total_additions }}" -le 100 ]]; then
+              echo "⏭️ Deployment was skipped: PR has ${{ needs.build.outputs.total_additions }} additions (threshold: 100)"
             elif [[ "${{ github.actor }}" == "dependabot[bot]" ]]; then
               echo "⏭️ Deployment was skipped: PR is from dependabot"
             else
