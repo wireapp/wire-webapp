@@ -73,6 +73,7 @@ import {
 } from './FullscreenVideoCall.styles';
 import {GroupVideoGrid} from './GroupVideoGrid';
 import {Pagination} from './Pagination';
+import {useSyncCurrentRange} from './useSyncCurrentRange';
 
 import type {Call} from '../../calling/Call';
 import {CallingViewMode, CallState, MuteState} from '../../calling/CallState';
@@ -123,6 +124,8 @@ export interface FullscreenVideoCallProps {
 const EMOJIS_LIST = ['👍', '🎉', '❤️', '😂', '😮', '👏', '🤔', '😢', '👎'];
 
 const LOCAL_STORAGE_KEY_FOR_SCREEN_SHARING_CONFIRM_MODAL = 'DO_NOT_ASK_AGAIN_FOR_SCREEN_SHARING_CONFIRM_MODAL';
+
+const DEFAULT_VISIBLE_DOTS = 5;
 
 const FullscreenVideoCall = ({
   call,
@@ -463,6 +466,45 @@ const FullscreenVideoCall = ({
       () => propertiesRepository.getPreference(PROPERTIES_TYPE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE),
       WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE,
     ) && Config.getConfig().FEATURE.ENABLE_PRESS_SPACE_TO_UNMUTE;
+  const [currentStart, setCurrentStart] = useState(0);
+  const visibleDots = DEFAULT_VISIBLE_DOTS > totalPages ? totalPages : DEFAULT_VISIBLE_DOTS;
+
+  useSyncCurrentRange({
+    currentStart,
+    currentPage,
+    totalPages,
+    visibleDots,
+    setCurrentStart,
+  });
+
+  const handlePreviousPage = () => {
+    if (currentPage === 0) {
+      return;
+    }
+
+    const previousPage = currentPage - 1;
+
+    // previousPage !== 0 --> jest niepotrzebne prawdopodnie
+    if (previousPage === currentStart && previousPage !== 0) {
+      setCurrentStart(currentStart => currentStart - 1);
+    }
+
+    changePage(previousPage, call);
+  };
+
+  const handleNextPage = () => {
+    if (currentPage === totalPages - 1) {
+      return;
+    }
+
+    const nextPage = currentPage + 1;
+
+    if (nextPage === currentStart + visibleDots - 1 && nextPage !== totalPages - 1) {
+      setCurrentStart(currentStart => currentStart + 1);
+    }
+
+    changePage(nextPage, call);
+  };
 
   return (
     <div
@@ -520,11 +562,11 @@ const FullscreenVideoCall = ({
                 <button
                   data-uie-name="pagination-previous"
                   type="button"
-                  onClick={() => changePage(currentPage - 1, call)}
+                  onClick={handlePreviousPage}
                   onKeyDown={event =>
                     handleKeyDown({
                       event,
-                      callback: () => changePage(currentPage - 1, call),
+                      callback: handlePreviousPage,
                       keys: [KEY.ENTER, KEY.SPACE],
                     })
                   }
@@ -543,15 +585,16 @@ const FullscreenVideoCall = ({
                 <Pagination
                   totalPages={totalPages}
                   currentPage={currentPage}
-                  onChangePage={newPage => changePage(newPage, call)}
+                  currentStart={currentStart}
+                  visibleDots={visibleDots}
                 />
                 <button
                   data-uie-name="pagination-next"
-                  onClick={() => changePage(currentPage + 1, call)}
+                  onClick={handleNextPage}
                   onKeyDown={event =>
                     handleKeyDown({
                       event,
-                      callback: () => changePage(currentPage + 1, call),
+                      callback: handleNextPage,
                       keys: [KEY.ENTER, KEY.SPACE],
                     })
                   }
