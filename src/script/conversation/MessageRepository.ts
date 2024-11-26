@@ -29,14 +29,11 @@ import {
   SendResult,
 } from '@wireapp/core/lib/conversation';
 import {
-  AudioMetaData,
   EditedTextContent,
   FileMetaDataContent,
-  ImageMetaData,
   LinkPreviewContent,
   LinkPreviewUploadedContent,
   TextContent,
-  VideoMetaData,
 } from '@wireapp/core/lib/conversation/content';
 import * as MessageBuilder from '@wireapp/core/lib/conversation/message/MessageBuilder';
 import {OtrMessage} from '@wireapp/core/lib/conversation/message/OtrMessage';
@@ -514,7 +511,14 @@ export class MessageRepository {
     };
 
     window.addEventListener('beforeunload', beforeUnload);
-    const {message, metaData} = await this.createAssetMetadata(conversation, file, asImage, originalId);
+    const assetMetadata = await this.createAssetMetadata(conversation, file, asImage, originalId);
+
+    if (!assetMetadata) {
+      window.removeEventListener('beforeunload', beforeUnload);
+      return;
+    }
+
+    const {message, metaData} = assetMetadata;
     const {messageId} = message;
 
     try {
@@ -622,29 +626,27 @@ export class MessageRepository {
     allowImageDetection?: boolean,
     originalId?: string,
   ) {
-    let metadata;
     try {
-      metadata = await buildMetadata(file);
+      const metadata = await buildMetadata(file);
+      const meta = {
+        audio: (isAudio(file) && metadata) || null,
+        video: (isVideo(file) && metadata) || null,
+        image: (allowImageDetection && isImage(file) && metadata) || null,
+        length: file.size,
+        name: (file as File).name,
+        type: file.type,
+      } as FileMetaDataContent;
+
+      const message = MessageBuilder.buildFileMetaDataMessage({metaData: meta as FileMetaDataContent}, originalId);
+      this.assetRepository.addToProcessQueue(message, conversation.id);
+      return {message, metaData: meta as FileMetaDataContent};
     } catch (error) {
       const logMessage = `Couldn't render asset preview from metadata. Asset might be corrupt: ${
         (error as Error).message
       }`;
       this.logger.warn(logMessage, error);
+      return null;
     }
-
-    const meta = {length: file.size, name: (file as File).name, type: file.type} as Partial<FileMetaDataContent>;
-
-    if (isAudio(file)) {
-      meta.audio = metadata as AudioMetaData;
-    } else if (isVideo(file)) {
-      meta.video = metadata as VideoMetaData;
-    } else if (allowImageDetection && isImage(file)) {
-      meta.image = metadata as ImageMetaData;
-    }
-
-    const message = MessageBuilder.buildFileMetaDataMessage({metaData: meta as FileMetaDataContent}, originalId);
-    this.assetRepository.addToProcessQueue(message, conversation.id);
-    return {message, metaData: meta as FileMetaDataContent};
   }
 
   private async sendAssetRemotedata(

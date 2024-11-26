@@ -33,7 +33,7 @@ interface Props {
 }
 
 export const UploadAssetItem = ({assetRepository, message}: Props) => {
-  const [uploadProgress, setUploadProgress] = useState<number>(0);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   useEffect(() => {
     const progressSubscribable = assetRepository.getUploadProgress(message.messageId);

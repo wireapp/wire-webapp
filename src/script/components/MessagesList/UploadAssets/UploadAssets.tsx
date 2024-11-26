@@ -45,18 +45,24 @@ export const UploadAssets = ({assetRepository, conversationId}: Props) => {
     return null;
   }
 
+  const uploadProgressMap = new Map(uploadProgressQueue.map(item => [item.messageId, item]));
+
   return (
     <div css={uploadAssetsContainer} data-uie-name="upload-assets">
-      {processQueue.map((processingMessage, key) => {
-        const processingAsset = uploadProgressQueue.find(
-          message => message.messageId === processingMessage.message.messageId,
-        );
+      {currentConversationProcessQueue.map(processingMessage => {
+        const processingAsset = uploadProgressMap.get(processingMessage.message.messageId);
 
         if (!processingAsset) {
           return null;
         }
 
-        return <UploadAssetItem assetRepository={assetRepository} message={processingMessage.message} key={key} />;
+        return (
+          <UploadAssetItem
+            assetRepository={assetRepository}
+            message={processingMessage.message}
+            key={processingMessage.message.messageId}
+          />
+        );
       })}
     </div>
   );
