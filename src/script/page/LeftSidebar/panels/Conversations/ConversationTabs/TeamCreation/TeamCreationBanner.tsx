@@ -31,6 +31,7 @@ import {Segmentation} from 'src/script/tracking/Segmentation';
 import {t} from 'Util/LocalizerUtil';
 
 import {
+  bannerWrapperCss,
   iconButtonCss,
   teamUpgradeBannerButtonCss,
   teamUpgradeBannerContainerCss,
@@ -101,7 +102,7 @@ export const TeamCreationBanner = ({onClick}: {onClick: () => void}) => {
           positionY={position.y + PADDING_Y}
           onClose={portalCloseHandler}
         >
-          <div css={{marginLeft: '40px'}}>
+          <div css={bannerWrapperCss}>
             <Banner onClick={bannerBtnClickHandler} />
           </div>
         </BannerPortal>
