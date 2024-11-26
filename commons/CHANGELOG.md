@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.4.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/commons@5.3.0...@wireapp/commons@5.4.0) (2024-11-26)
+
+### Features
+
+* **core, api-client:** Serialize object arguments in desktop runtime ([#6696](https://github.com/wireapp/wire-web-packages/issues/6696)) ([199e656](https://github.com/wireapp/wire-web-packages/commit/199e65671224a4330556af80f524c7031db0b861))
+
 # [5.3.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/commons@5.2.13...@wireapp/commons@5.3.0) (2024-11-19)
 
 ### Features
