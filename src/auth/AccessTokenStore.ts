@@ -21,6 +21,8 @@ import logdown from 'logdown';
 
 import {EventEmitter} from 'events';
 
+import {LogFactory} from '@wireapp/commons';
+
 import {AccessTokenData} from '../auth/';
 
 enum TOPIC {
@@ -45,10 +47,7 @@ export class AccessTokenStore extends EventEmitter {
   constructor() {
     super();
 
-    this.logger = logdown('@wireapp/api-client/AccessTokenStore', {
-      logger: console,
-      markdown: false,
-    });
+    this.logger = LogFactory.getLogger('@wireapp/api-client/AccessTokenStore');
   }
 
   public async delete(): Promise<void> {

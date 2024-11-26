@@ -21,6 +21,8 @@ import logdown from 'logdown';
 
 import {EventEmitter} from 'events';
 
+import {LogFactory} from '@wireapp/commons';
+
 import {AccountAPI} from './account/AccountAPI';
 import {AssetAPI} from './asset/';
 import {
@@ -172,10 +174,7 @@ export class APIClient extends EventEmitter {
       this.emit(APIClient.TOPIC.COOKIE_REFRESH, cookie),
     );
 
-    this.logger = logdown('@wireapp/api-client/Client', {
-      logger: console,
-      markdown: false,
-    });
+    this.logger = LogFactory.getLogger('@wireapp/api-client/Client');
 
     const httpClient = new HttpClient(this.config, this.accessTokenStore);
     const webSocket = new WebSocketClient(this.config.urls.ws, httpClient);
