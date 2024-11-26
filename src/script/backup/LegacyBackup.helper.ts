@@ -46,7 +46,6 @@ const verifyMetadata = async ({backupService, fileData, user}: VerifyMetaDataPar
   };
 
   const _verifyMetadata = (user: User, archiveMetadata: Metadata): number => {
-    return archiveMetadata.version;
     const localMetadata = createMetaData(user, '');
     const isExpectedUserId = archiveMetadata.user_id === localMetadata.user_id;
     if (!isExpectedUserId) {
