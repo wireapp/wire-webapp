@@ -6047,9 +6047,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:46.7.1":
-  version: 46.7.1
-  resolution: "@wireapp/core@npm:46.7.1"
+"@wireapp/core@npm:46.8.0":
+  version: 46.8.0
+  resolution: "@wireapp/core@npm:46.8.0"
   dependencies:
     "@wireapp/api-client": "npm:^27.10.1"
     "@wireapp/commons": "npm:^5.3.0"
@@ -6069,7 +6069,7 @@ __metadata:
     long: "npm:^5.2.0"
     uuid: "npm:9.0.1"
     zod: "npm:3.23.8"
-  checksum: 10/c425120eb795847c6170b0f9712cadc9889633304f9dd7e16dbc57cb6d617769aa26f3d6dcd353e89b43fae9a0a76dcd09f7c3ef76fc7d5bc254e9e7be34547c
+  checksum: 10/3179e039689d5fa8c52e2487ca580f7e49734e36e162995582ee17b9feed0553323db705b84751f3d3741640992844328a49c8b4acaf3bd6dcadae2856747245
   languageName: node
   linkType: hard
 
@@ -8017,7 +8017,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cross-spawn@npm:^7.0.0, cross-spawn@npm:^7.0.1, cross-spawn@npm:^7.0.2, cross-spawn@npm:^7.0.3":
+"cross-spawn@npm:7.0.6":
   version: 7.0.6
   resolution: "cross-spawn@npm:7.0.6"
   dependencies:
@@ -18725,7 +18725,7 @@ __metadata:
     "@wireapp/avs": "npm:9.10.16"
     "@wireapp/commons": "npm:5.3.0"
     "@wireapp/copy-config": "npm:2.2.10"
-    "@wireapp/core": "npm:46.7.1"
+    "@wireapp/core": "npm:46.8.0"
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/prettier-config": "npm:0.6.4"
     "@wireapp/react-ui-kit": "npm:9.26.3"

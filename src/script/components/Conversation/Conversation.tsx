@@ -511,6 +511,7 @@ export const Conversation = ({
             conversation={activeConversation}
             selfUser={selfUser}
             conversationRepository={conversationRepository}
+            assetRepository={repositories.asset}
             messageRepository={repositories.message}
             messageActions={mainViewModel.actions}
             invitePeople={clickOnInvitePeople}

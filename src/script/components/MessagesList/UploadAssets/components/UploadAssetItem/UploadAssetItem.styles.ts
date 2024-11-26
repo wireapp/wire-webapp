@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2021 Wire Swiss GmbH
+ * Copyright (C) 2024 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,24 +17,9 @@
  *
  */
 
-import {FC} from 'react';
+import {CSSObject} from '@emotion/react';
 
-import cx from 'classnames';
-
-export interface LoadingBarProps {
-  message?: string;
-  progress: number;
-  className?: string;
-  centerText?: boolean;
-}
-
-const LoadingBar: FC<LoadingBarProps> = ({progress, message, className = '', centerText = true}) => (
-  <div className={cx('loading-bar', {'text-center': centerText}, className)}>
-    {message && <div className="progress-console">{message}</div>}
-    <div className="progress-bar">
-      <div data-uie-name="loading-bar-progress" style={{width: `${progress}%`}}></div>
-    </div>
-  </div>
-);
-
-export {LoadingBar};
+export const uploadingProgressText: CSSObject = {
+  color: 'var(--gray-70)',
+  fontSize: 'var(--font-size-small)',
+};
