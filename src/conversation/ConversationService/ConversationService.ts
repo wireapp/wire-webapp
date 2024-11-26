@@ -44,10 +44,9 @@ import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {XOR} from '@wireapp/commons/lib/util/TypeUtil';
 import {Decoder} from 'bazinga64';
-import logdown from 'logdown';
 
 import {APIClient} from '@wireapp/api-client';
-import {TypedEventEmitter} from '@wireapp/commons';
+import {LogFactory, TypedEventEmitter} from '@wireapp/commons';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {
@@ -84,7 +83,7 @@ type Events = {
 
 export class ConversationService extends TypedEventEmitter<Events> {
   public readonly messageTimer: MessageTimer;
-  private readonly logger = logdown('@wireapp/core/ConversationService');
+  private readonly logger = LogFactory.getLogger('@wireapp/core/ConversationService');
 
   constructor(
     private readonly apiClient: APIClient,

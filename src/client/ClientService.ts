@@ -22,9 +22,9 @@ import {ClientCapability, ClientType, CreateClientPayload, RegisteredClient} fro
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import axios from 'axios';
 import {StatusCodes} from 'http-status-codes';
-import logdown from 'logdown';
 
 import {APIClient} from '@wireapp/api-client';
+import {LogFactory} from '@wireapp/commons';
 import {CRUDEngine} from '@wireapp/store-engine';
 
 import type {ProteusService} from '../messagingProtocols/proteus';
@@ -44,10 +44,7 @@ export interface MetaClient extends RegisteredClient {
 export class ClientService {
   private readonly database: ClientDatabaseRepository;
   private readonly backend: ClientBackendRepository;
-  private readonly logger = logdown('@wireapp/core/Client', {
-    logger: console,
-    markdown: false,
-  });
+  private readonly logger = LogFactory.getLogger('@wireapp/core/Client');
 
   constructor(
     private readonly apiClient: APIClient,

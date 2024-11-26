@@ -18,7 +18,8 @@
  */
 
 import {ConversationOtrMessageAddEvent} from '@wireapp/api-client/lib/event/';
-import logdown from 'logdown';
+
+import {LogFactory} from '@wireapp/commons';
 
 import {GenericMessageType, MessageSendingState, PayloadBundle, PayloadBundleType} from '../conversation';
 import {
@@ -34,11 +35,9 @@ import {
   TextContent,
 } from '../conversation/content';
 import {NotificationSource} from '../notification';
+
 export class GenericMessageMapper {
-  private static readonly logger = logdown('@wireapp/core/GenericMessageMapper', {
-    logger: console,
-    markdown: false,
-  });
+  private static readonly logger = LogFactory.getLogger('@wireapp/core/GenericMessageMapper');
 
   // TODO: Turn "any" into a specific type (or collection of types) and make the return type more specific based on the
   // "genericMessage" input parameter.
@@ -257,7 +256,7 @@ export class GenericMessageMapper {
         };
       }
       default: {
-        this.logger.warn(`Unhandled event type "${genericMessage.content}": ${JSON.stringify(genericMessage)}`);
+        this.logger.warn(`Unhandled event type "${genericMessage.content}": ${genericMessage}`);
         return {
           ...baseMessage,
           content: genericMessage.content,

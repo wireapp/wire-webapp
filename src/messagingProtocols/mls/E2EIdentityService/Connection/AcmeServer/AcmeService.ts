@@ -18,7 +18,8 @@
  */
 
 import axios, {AxiosInstance} from 'axios';
-import logdown from 'logdown';
+
+import {LogFactory} from '@wireapp/commons';
 
 import {
   GetDirectoryReturnValue,
@@ -48,7 +49,7 @@ import {
 import {AcmeChallenge, AcmeDirectory} from '../../E2EIService.types';
 
 export class AcmeService {
-  private logger = logdown('@wireapp/core/AcmeService');
+  private logger = LogFactory.getLogger('@wireapp/core/AcmeService');
   private readonly axiosInstance: AxiosInstance = axios.create();
   private readonly url = {
     ROOTS: '/roots.pem',

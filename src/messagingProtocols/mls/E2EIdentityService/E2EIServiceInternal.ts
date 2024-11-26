@@ -17,9 +17,8 @@
  *
  */
 
-import logdown from 'logdown';
-
 import {APIClient} from '@wireapp/api-client';
+import {LogFactory} from '@wireapp/commons';
 
 import {AcmeService} from './Connection/AcmeServer';
 import {AcmeDirectory, Ciphersuite, CoreCrypto, E2eiEnrollment} from './E2EIService.types';
@@ -37,7 +36,7 @@ import {CoreDatabase} from '../../../storage/CoreDB';
 
 export type getTokenCallback = (challengesData?: {challenge: any; keyAuth: string}) => Promise<string | undefined>;
 export class E2EIServiceInternal {
-  private readonly logger = logdown('@wireapp/core/E2EIdentityServiceInternal');
+  private readonly logger = LogFactory.getLogger('@wireapp/core/E2EIdentityServiceInternal');
   private acmeService: AcmeService;
   private enrollmentStorage: ReturnType<typeof createE2EIEnrollmentStorage>;
 

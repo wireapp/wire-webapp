@@ -19,12 +19,12 @@
 
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {Self} from '@wireapp/api-client/lib/self/';
-import logdown from 'logdown';
 
 import {APIClient} from '@wireapp/api-client';
+import {LogFactory} from '@wireapp/commons';
 
 export class SelfService {
-  private readonly logger = logdown('@wireapp/core/SelfService');
+  private readonly logger = LogFactory.getLogger('@wireapp/core/SelfService');
 
   constructor(private readonly apiClient: APIClient) {}
 

@@ -19,10 +19,9 @@
 
 import {BackendEvent} from '@wireapp/api-client/lib/event';
 import {Notification} from '@wireapp/api-client/lib/notification/';
-import logdown from 'logdown';
 
 import {APIClient} from '@wireapp/api-client';
-import {TypedEventEmitter} from '@wireapp/commons';
+import {LogFactory, TypedEventEmitter} from '@wireapp/commons';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
 
@@ -72,10 +71,7 @@ export class NotificationService extends TypedEventEmitter<Events> {
   private readonly apiClient: APIClient;
   private readonly backend: NotificationBackendRepository;
   private readonly database: NotificationDatabaseRepository;
-  private readonly logger = logdown('@wireapp/core/NotificationService', {
-    logger: console,
-    markdown: false,
-  });
+  private readonly logger = LogFactory.getLogger('@wireapp/core/NotificationService');
   public static readonly TOPIC = TOPIC;
 
   constructor(
