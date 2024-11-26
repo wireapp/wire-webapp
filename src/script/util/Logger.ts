@@ -17,42 +17,15 @@
  *
  */
 
-import {LogFactory, Logger, Runtime} from '@wireapp/commons';
+import {LogFactory, Logger} from '@wireapp/commons';
 
 const LOGGER_NAMESPACE = '@wireapp/webapp';
 
-function serializeArgs(args: any[]): any[] {
-  return args.map(arg => (typeof arg === 'object' && arg !== null ? JSON.stringify(arg) : arg));
-}
-
 function getLogger(name: string): Logger {
-  const logger = LogFactory.getLogger(name, {
+  return LogFactory.getLogger(name, {
     namespace: LOGGER_NAMESPACE,
     separator: '/',
   });
-
-  if (Runtime.isDesktopApp()) {
-    return {
-      ...logger,
-      debug: (...args: any[]): void => {
-        logger.debug(...serializeArgs(args));
-      },
-      error: (...args: any[]): void => {
-        logger.error(...serializeArgs(args));
-      },
-      info: (...args: any[]): void => {
-        logger.info(...serializeArgs(args));
-      },
-      log: (...args: any[]): void => {
-        logger.log(...serializeArgs(args));
-      },
-      warn: (...args: any[]): void => {
-        logger.warn(...serializeArgs(args));
-      },
-    };
-  }
-
-  return logger;
 }
 
 export {getLogger, LOGGER_NAMESPACE, Logger};
