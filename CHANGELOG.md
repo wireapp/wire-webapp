@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.11.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.10.1...@wireapp/api-client@27.11.0) (2024-11-26)
+
+### Features
+
+* **core, api-client:** Serialize object arguments in desktop runtime ([#6696](https://github.com/wireapp/wire-web-packages/issues/6696)) ([199e656](https://github.com/wireapp/wire-web-packages/commit/199e65671224a4330556af80f524c7031db0b861))
+
 ## [27.10.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.10.0...@wireapp/api-client@27.10.1) (2024-11-19)
 
 **Note:** Version bump only for package @wireapp/api-client
