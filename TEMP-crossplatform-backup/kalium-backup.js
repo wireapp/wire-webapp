@@ -7,6 +7,7 @@
       './kalium-protobuf.js',
       './Kotlin-DateTime-library-kotlinx-datetime.js',
       './pbandk-pbandk-runtime.js',
+      './Kermit-kermit.js',
     ], factory);
   else if (typeof exports === 'object')
     factory(
@@ -16,6 +17,7 @@
       require('./kalium-protobuf.js'),
       require('./Kotlin-DateTime-library-kotlinx-datetime.js'),
       require('./pbandk-pbandk-runtime.js'),
+      require('./Kermit-kermit.js'),
     );
   else {
     if (typeof this['kotlin-kotlin-stdlib'] === 'undefined') {
@@ -43,6 +45,11 @@
         "Error loading module 'com.wire:backup'. Its dependency 'pbandk-pbandk-runtime' was not found. Please, check whether 'pbandk-pbandk-runtime' is loaded prior to 'com.wire:backup'.",
       );
     }
+    if (typeof this['Kermit-kermit'] === 'undefined') {
+      throw new Error(
+        "Error loading module 'com.wire:backup'. Its dependency 'Kermit-kermit' was not found. Please, check whether 'Kermit-kermit' is loaded prior to 'com.wire:backup'.",
+      );
+    }
     root['com.wire:backup'] = factory(
       typeof this['com.wire:backup'] === 'undefined' ? {} : this['com.wire:backup'],
       this['kotlin-kotlin-stdlib'],
@@ -50,6 +57,7 @@
       this['kalium-protobuf'],
       this['Kotlin-DateTime-library-kotlinx-datetime'],
       this['pbandk-pbandk-runtime'],
+      this['Kermit-kermit'],
     );
   }
 })(
@@ -61,6 +69,7 @@
     kotlin_com_wire_protobuf,
     kotlin_org_jetbrains_kotlinx_kotlinx_datetime,
     kotlin_pro_streem_pbandk_pbandk_runtime,
+    kotlin_co_touchlab_kermit,
   ) {
     'use strict';
     //region block: imports
@@ -121,6 +130,7 @@
     var ExportUser = kotlin_com_wire_protobuf.$_$.c;
     var ExportedLocation = kotlin_com_wire_protobuf.$_$.l;
     var ExportedText = kotlin_com_wire_protobuf.$_$.r;
+    var Companion_getInstance_0 = kotlin_co_touchlab_kermit.$_$.b;
     var toLong = kotlin_kotlin.$_$.gc;
     var ByteArr = kotlin_pro_streem_pbandk_pbandk_runtime.$_$.d;
     var ExportedVideoMetaData = kotlin_com_wire_protobuf.$_$.s;
@@ -218,7 +228,7 @@
       return $serializer_getInstance();
     };
     var Companion_instance;
-    function Companion_getInstance_0() {
+    function Companion_getInstance_1() {
       if (Companion_instance == null) new Companion();
       return Companion_instance;
     }
@@ -306,7 +316,7 @@
       );
     }
     function BackupQualifiedId(id, domain) {
-      Companion_getInstance_0();
+      Companion_getInstance_1();
       this.id = id;
       this.domain = domain;
     }
@@ -1397,6 +1407,11 @@
     function fromUserProtoToBackupModel($this, user) {
       return new BackupUser(toModel(user.id), user.name, user.handle);
     }
+    function MPBackupMapper$mapMessageToProtobuf$lambda($content) {
+      return function () {
+        return 'Mapping asset message to protobuf: ' + $content.metaData;
+      };
+    }
     function MPBackupMapper() {}
     protoOf(MPBackupMapper).mapUserToProtobuf_k4zmp8_k$ = function (it) {
       return new ExportUser(toProtoModel(it.id), it.name, it.handle);
@@ -1410,61 +1425,63 @@
       var content = it.content;
       var tmp;
       if (content instanceof Asset_0) {
-        var tmp_0 = content.mimeType;
-        var tmp_1 = toLong(content.size);
-        var tmp_2 = content.name;
-        var tmp_3 = new ByteArr(content.otrKey);
-        var tmp_4 = new ByteArr(content.sha256);
-        var tmp_5 = content.assetId;
-        var tmp_6 = content.assetToken;
-        var tmp_7 = content.assetDomain;
+        var tmp_0 = Companion_getInstance_0();
+        tmp_0.d$default_mucxl2_k$('MPBackupMapper', VOID, MPBackupMapper$mapMessageToProtobuf$lambda(content));
+        var tmp_1 = content.mimeType;
+        var tmp_2 = toLong(content.size);
+        var tmp_3 = content.name;
+        var tmp_4 = new ByteArr(content.otrKey);
+        var tmp_5 = new ByteArr(content.sha256);
+        var tmp_6 = content.assetId;
+        var tmp_7 = content.assetToken;
+        var tmp_8 = content.assetDomain;
         var tmp1_subject = content.encryption;
-        var tmp_8;
+        var tmp_9;
         switch (tmp1_subject == null ? -1 : tmp1_subject.get_ordinal_ip24qg_k$()) {
           case 0:
-            tmp_8 = BACKUP_AES_GCM_getInstance();
+            tmp_9 = BACKUP_AES_GCM_getInstance();
             break;
           case 1:
-            tmp_8 = BACKUP_AES_CBC_getInstance();
+            tmp_9 = BACKUP_AES_CBC_getInstance();
             break;
           case -1:
-            tmp_8 = null;
+            tmp_9 = null;
             break;
           default:
             noWhenBranchMatchedException();
             break;
         }
-        var tmp_9 = tmp_8;
+        var tmp_10 = tmp_9;
         var tmp2_safe_receiver = content.metaData;
-        var tmp_10;
+        var tmp_11;
         if (tmp2_safe_receiver == null) {
-          tmp_10 = null;
+          tmp_11 = null;
         } else {
           // Inline function 'kotlin.let' call
           // Inline function 'kotlin.contracts.contract' call
           // Inline function 'com.wire.backup.ingest.MPBackupMapper.mapMessageToProtobuf.<anonymous>' call
-          var tmp_11;
+          var tmp_12;
           if (tmp2_safe_receiver instanceof Audio_0) {
-            var tmp_12 = tmp2_safe_receiver.duration;
+            var tmp_13 = tmp2_safe_receiver.duration;
             var tmp1_safe_receiver = tmp2_safe_receiver.normalization;
-            var tmp_13;
+            var tmp_14;
             if (tmp1_safe_receiver == null) {
-              tmp_13 = null;
+              tmp_14 = null;
             } else {
               // Inline function 'kotlin.let' call
               // Inline function 'kotlin.contracts.contract' call
               // Inline function 'com.wire.backup.ingest.MPBackupMapper.mapMessageToProtobuf.<anonymous>.<anonymous>' call
-              tmp_13 = new ByteArr(tmp1_safe_receiver);
+              tmp_14 = new ByteArr(tmp1_safe_receiver);
             }
-            tmp_11 = new Audio(new ExportedAudioMetaData(tmp_12, tmp_13));
+            tmp_12 = new Audio(new ExportedAudioMetaData(tmp_13, tmp_14));
           } else {
             if (tmp2_safe_receiver instanceof Image_0) {
-              tmp_11 = new Image(
+              tmp_12 = new Image(
                 new ExportedImageMetaData(tmp2_safe_receiver.width, tmp2_safe_receiver.height, tmp2_safe_receiver.tag),
               );
             } else {
               if (tmp2_safe_receiver instanceof Video_0) {
-                tmp_11 = new Video(
+                tmp_12 = new Video(
                   new ExportedVideoMetaData(
                     tmp2_safe_receiver.width,
                     tmp2_safe_receiver.height,
@@ -1476,9 +1493,9 @@
               }
             }
           }
-          tmp_10 = tmp_11;
+          tmp_11 = tmp_12;
         }
-        tmp = new Asset(new ExportedAsset(tmp_0, tmp_1, tmp_2, tmp_3, tmp_4, tmp_5, tmp_6, tmp_7, tmp_9, tmp_10));
+        tmp = new Asset(new ExportedAsset(tmp_1, tmp_2, tmp_3, tmp_4, tmp_5, tmp_6, tmp_7, tmp_8, tmp_10, tmp_11));
       } else {
         if (content instanceof Text_0) {
           tmp = new Text(new ExportedText(content.text));
@@ -1617,7 +1634,7 @@
       var $com$wire$backup$data = $com$wire$backup.data || ($com$wire$backup.data = {});
       $com$wire$backup$data.BackupData = BackupData_0;
       $com$wire$backup$data.BackupQualifiedId = BackupQualifiedId;
-      defineProp($com$wire$backup$data.BackupQualifiedId, 'Companion', Companion_getInstance_0);
+      defineProp($com$wire$backup$data.BackupQualifiedId, 'Companion', Companion_getInstance_1);
       $com$wire$backup$data.BackupUser = BackupUser;
       $com$wire$backup$data.BackupConversation = BackupConversation;
       $com$wire$backup$data.BackupMessage = BackupMessage;

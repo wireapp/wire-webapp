@@ -318,6 +318,7 @@
   //region block: exports
   _.$_$ = _.$_$ || {};
   _.$_$.a = Logger;
+  _.$_$.b = Companion_getInstance;
   //endregion
   return _;
 });
