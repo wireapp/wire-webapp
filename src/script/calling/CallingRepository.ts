@@ -1303,7 +1303,7 @@ export class CallingRepository {
   }
 
   /**
-   * This methode spams request video stream messages. I assumed this was to ensure that when a client mutes or
+   * This method spams request video stream messages. I assumed this was to ensure that when a client mutes or
    * unmutes its video it is displayed correctly.
    * @param call
    * @param newPage
