@@ -20,7 +20,7 @@
 import {isObject} from 'src/script/guards/common';
 
 import {AssetMetaData, BackupMessageContent} from './CPB.library';
-import {ImageAsset} from './CPB.types';
+import {FileAsset, ImageAsset, UndefinedAsset} from './CPB.types';
 
 const AssetContentType = {
   Image: ['image/jpg', 'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/'],
@@ -58,8 +58,8 @@ const isImageAsset = (contentType: string, infoObject: unknown): infoObject is I
   'height' in infoObject &&
   'width' in infoObject &&
   'tag' in infoObject;
-//const isFileAsset = (contentType: string, infoObject: unknown): infoObject is FileAsset =>
-//  AssetContentType.isData(contentType) && isObject(infoObject) && 'name' in infoObject;
+const isFileAsset = (contentType: string, infoObject: unknown): infoObject is FileAsset =>
+  AssetContentType.isData(contentType) && isObject(infoObject) && 'name' in infoObject;
 //const isVideoAsset = (contentType: string, infoObject: unknown): infoObject is VideoAsset =>
 //  AssetContentType.isVideo(contentType) && isObject(infoObject) && infoObject !== null && 'name' in infoObject;
 //const isAudioAsset = (contentType: string, infoObject: unknown): infoObject is AudioAsset =>
@@ -68,8 +68,8 @@ const isImageAsset = (contentType: string, infoObject: unknown): infoObject is I
 //  AssetContentType.isText(contentType) && isObject(infoObject) && infoObject !== null && 'name' in infoObject;
 //const isOtherAsset = (contentType: string, infoObject: unknown): infoObject is OtherAsset =>
 //  AssetContentType.isOther(contentType) && isObject(infoObject) && infoObject !== null && 'name' in infoObject;
-//const isUndefinedAsset = (contentType: string, infoObject: unknown): infoObject is UndefinedAsset =>
-//  AssetContentType.isUndefined(contentType) && isObject(infoObject) && infoObject !== null && 'name' in infoObject;
+const isUndefinedAsset = (contentType: string, infoObject: unknown): infoObject is UndefinedAsset =>
+  AssetContentType.isUndefined(contentType) && isObject(infoObject) && infoObject !== null && 'name' in infoObject;
 
 /**
  * Build metadata for an asset backup
@@ -85,6 +85,8 @@ export const buildMetaData = (contentType: string, infoObject: unknown) => {
     // todo: expand else-if and map: video, audio, the rest can be null as in the lib is nullable.
     //  } else if (isVideoAsset(contentType, infoObject)) {
     //    metaData = new BackupMessageContent.Asset.AssetMetadata.Video(null, null, null);
+  } else if (isFileAsset(contentType, infoObject) || isUndefinedAsset(contentType, infoObject)) {
+    metaData = new BackupMessageContent.Asset.AssetMetadata.Generic(infoObject.name);
   } else {
     metaData = null;
   }

@@ -103,7 +103,7 @@
     var contentEquals = kotlin_kotlin.$_$.r6;
     var contentHashCode = kotlin_kotlin.$_$.s6;
     var getNumberHashCode = kotlin_kotlin.$_$.cb;
-    var ExportedQualifiedId = kotlin_com_wire_protobuf.$_$.q;
+    var ExportedQualifiedId = kotlin_com_wire_protobuf.$_$.s;
     var ArrayList_init_$Create$ = kotlin_kotlin.$_$.m;
     var System_getInstance = kotlin_org_jetbrains_kotlinx_kotlinx_datetime.$_$.b;
     var BackupInfo = kotlin_com_wire_protobuf.$_$.b;
@@ -113,32 +113,34 @@
     var encodeToByteArray = kotlin_pro_streem_pbandk_pbandk_runtime.$_$.x;
     var toHexString = kotlin_kotlin.$_$.ff;
     var println = kotlin_kotlin.$_$.ja;
-    var Companion_getInstance = kotlin_com_wire_protobuf.$_$.t;
+    var Companion_getInstance = kotlin_com_wire_protobuf.$_$.v;
     var decodeFromByteArray = kotlin_pro_streem_pbandk_pbandk_runtime.$_$.w;
     var printStackTrace = kotlin_kotlin.$_$.qh;
     var noWhenBranchMatchedException = kotlin_kotlin.$_$.oh;
     var IllegalArgumentException_init_$Create$ = kotlin_kotlin.$_$.r1;
-    var Location = kotlin_com_wire_protobuf.$_$.n;
-    var UNRECOGNIZED = kotlin_com_wire_protobuf.$_$.j;
-    var BACKUP_AES_GCM_getInstance = kotlin_com_wire_protobuf.$_$.v;
-    var BACKUP_AES_CBC_getInstance = kotlin_com_wire_protobuf.$_$.u;
-    var Video = kotlin_com_wire_protobuf.$_$.f;
-    var Image = kotlin_com_wire_protobuf.$_$.e;
+    var Location = kotlin_com_wire_protobuf.$_$.p;
+    var UNRECOGNIZED = kotlin_com_wire_protobuf.$_$.k;
+    var BACKUP_AES_GCM_getInstance = kotlin_com_wire_protobuf.$_$.x;
+    var BACKUP_AES_CBC_getInstance = kotlin_com_wire_protobuf.$_$.w;
+    var Generic = kotlin_com_wire_protobuf.$_$.e;
+    var Video = kotlin_com_wire_protobuf.$_$.g;
+    var Image = kotlin_com_wire_protobuf.$_$.f;
     var Audio = kotlin_com_wire_protobuf.$_$.d;
-    var Asset = kotlin_com_wire_protobuf.$_$.m;
-    var Text = kotlin_com_wire_protobuf.$_$.o;
+    var Asset = kotlin_com_wire_protobuf.$_$.o;
+    var Text = kotlin_com_wire_protobuf.$_$.q;
     var ExportUser = kotlin_com_wire_protobuf.$_$.c;
-    var ExportedLocation = kotlin_com_wire_protobuf.$_$.l;
-    var ExportedText = kotlin_com_wire_protobuf.$_$.r;
+    var ExportedLocation = kotlin_com_wire_protobuf.$_$.n;
+    var ExportedText = kotlin_com_wire_protobuf.$_$.t;
     var Companion_getInstance_0 = kotlin_co_touchlab_kermit.$_$.b;
     var toLong = kotlin_kotlin.$_$.gc;
     var ByteArr = kotlin_pro_streem_pbandk_pbandk_runtime.$_$.d;
-    var ExportedVideoMetaData = kotlin_com_wire_protobuf.$_$.s;
-    var ExportedImageMetaData = kotlin_com_wire_protobuf.$_$.k;
-    var ExportedAudioMetaData = kotlin_com_wire_protobuf.$_$.h;
-    var ExportedAsset = kotlin_com_wire_protobuf.$_$.g;
-    var ExportedMessage = kotlin_com_wire_protobuf.$_$.p;
-    var ExportedConversation = kotlin_com_wire_protobuf.$_$.i;
+    var ExportedGenericMetaData = kotlin_com_wire_protobuf.$_$.l;
+    var ExportedVideoMetaData = kotlin_com_wire_protobuf.$_$.u;
+    var ExportedImageMetaData = kotlin_com_wire_protobuf.$_$.m;
+    var ExportedAudioMetaData = kotlin_com_wire_protobuf.$_$.i;
+    var ExportedAsset = kotlin_com_wire_protobuf.$_$.h;
+    var ExportedMessage = kotlin_com_wire_protobuf.$_$.r;
+    var ExportedConversation = kotlin_com_wire_protobuf.$_$.j;
     var copyToArray = kotlin_kotlin.$_$.h7;
     var numberToLong = kotlin_kotlin.$_$.ac;
     //endregion
@@ -157,6 +159,7 @@
     setMetadataFor(Image_0, 'Image', classMeta, AssetMetadata);
     setMetadataFor(Video_0, 'Video', classMeta, AssetMetadata);
     setMetadataFor(Audio_0, 'Audio', classMeta, AssetMetadata);
+    setMetadataFor(Generic_0, 'Generic', classMeta, AssetMetadata);
     setMetadataFor(EncryptionAlgorithm, 'EncryptionAlgorithm', classMeta, Enum);
     setMetadataFor(BackupMessageContent, 'BackupMessageContent', classMeta);
     setMetadataFor(Text_0, 'Text', classMeta, BackupMessageContent);
@@ -748,6 +751,36 @@
       var tmp0_other_with_cast = other instanceof Audio_0 ? other : THROW_CCE();
       if (!equals(this.normalization, tmp0_other_with_cast.normalization)) return false;
       if (!equals(this.duration, tmp0_other_with_cast.duration)) return false;
+      return true;
+    };
+    function Generic_0(name) {
+      AssetMetadata.call(this);
+      this.name = name;
+    }
+    protoOf(Generic_0).get_name_woqyms_k$ = function () {
+      return this.name;
+    };
+    protoOf(Generic_0).component1_7eebsc_k$ = function () {
+      return this.name;
+    };
+    protoOf(Generic_0).copy_q202ni_k$ = function (name) {
+      return new Generic_0(name);
+    };
+    protoOf(Generic_0).copy = function (name, $super) {
+      name = name === VOID ? this.name : name;
+      return this.copy_q202ni_k$(name);
+    };
+    protoOf(Generic_0).toString = function () {
+      return 'Generic(name=' + this.name + ')';
+    };
+    protoOf(Generic_0).hashCode = function () {
+      return this.name == null ? 0 : getStringHashCode(this.name);
+    };
+    protoOf(Generic_0).equals = function (other) {
+      if (this === other) return true;
+      if (!(other instanceof Generic_0)) return false;
+      var tmp0_other_with_cast = other instanceof Generic_0 ? other : THROW_CCE();
+      if (!(this.name == tmp0_other_with_cast.name)) return false;
       return true;
     };
     function EncryptionAlgorithm(name, ordinal) {
@@ -1360,7 +1393,11 @@
                     tmp1_safe_receiver.get_value_j01efc_k$().durationInMillis,
                   );
                 } else {
-                  noWhenBranchMatchedException();
+                  if (tmp1_safe_receiver instanceof Generic) {
+                    tmp_12 = new Generic_0(tmp1_safe_receiver.get_value_j01efc_k$().name);
+                  } else {
+                    noWhenBranchMatchedException();
+                  }
                 }
               }
             }
@@ -1489,7 +1526,11 @@
                   ),
                 );
               } else {
-                noWhenBranchMatchedException();
+                if (tmp2_safe_receiver instanceof Generic_0) {
+                  tmp_12 = new Generic(new ExportedGenericMetaData(tmp2_safe_receiver.name));
+                } else {
+                  noWhenBranchMatchedException();
+                }
               }
             }
           }
@@ -1658,6 +1699,7 @@
       $com$wire$backup$data.BackupMessageContent.Asset.AssetMetadata.Image = Image_0;
       $com$wire$backup$data.BackupMessageContent.Asset.AssetMetadata.Video = Video_0;
       $com$wire$backup$data.BackupMessageContent.Asset.AssetMetadata.Audio = Audio_0;
+      $com$wire$backup$data.BackupMessageContent.Asset.AssetMetadata.Generic = Generic_0;
       $com$wire$backup$data.BackupMessageContent.Location = Location_0;
       var $com = _.com || (_.com = {});
       var $com$wire = $com.wire || ($com.wire = {});
