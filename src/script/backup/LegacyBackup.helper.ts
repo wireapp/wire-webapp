@@ -21,11 +21,26 @@ import {getLogger} from 'Util/Logger';
 
 import {ProgressCallback, FileData, Filename, FileDescriptor, Metadata} from './Backup.types';
 import {BackupService} from './BackupService';
+import {exportTable} from './CrossPlatformBackup';
 import {DifferentAccountError, IncompatiblePlatformError, InvalidMetaDataError} from './Error';
+import {preprocessConversations, preprocessEvents, preprocessUsers} from './recordPreprocessors';
 
 import {User} from '../entity/User';
+import {StorageSchemata} from '../storage/StorageSchemata';
 
 const logger = getLogger('wire:backup:LegacyBackup');
+
+export const createMetaData = (user: User, clientId: string, backupService: BackupService): Metadata => {
+  return {
+    client_id: clientId,
+    creation_time: new Date().toISOString(),
+    platform: 'Web',
+    user_handle: user.username(),
+    user_id: user.id,
+    user_name: user.name(),
+    version: backupService.getDatabaseVersion(),
+  };
+};
 
 interface VerifyMetaDataParams {
   user: User;
@@ -33,20 +48,8 @@ interface VerifyMetaDataParams {
   backupService: BackupService;
 }
 const verifyMetadata = async ({backupService, fileData, user}: VerifyMetaDataParams): Promise<number> => {
-  const createMetaData = (user: User, clientId: string): Metadata => {
-    return {
-      client_id: clientId,
-      creation_time: new Date().toISOString(),
-      platform: 'Web',
-      user_handle: user.username(),
-      user_id: user.id,
-      user_name: user.name(),
-      version: backupService.getDatabaseVersion(),
-    };
-  };
-
   const _verifyMetadata = (user: User, archiveMetadata: Metadata): number => {
-    const localMetadata = createMetaData(user, '');
+    const localMetadata = createMetaData(user, '', backupService);
     const isExpectedUserId = archiveMetadata.user_id === localMetadata.user_id;
     if (!isExpectedUserId) {
       const fromUserId = archiveMetadata.user_id;
@@ -104,4 +107,39 @@ export const importLegacyBackupToDatabase = async ({
     });
 
   return {archiveVersion, fileDescriptors};
+};
+
+export const exportHistory = async (progressCallback: ProgressCallback, backupService: BackupService) => {
+  const [conversationTable, eventsTable, usersTable] = backupService.getTables();
+  const tableData: Record<string, any[]> = {};
+
+  function streamProgress<T>(dataProcessor: (data: T[]) => T[]) {
+    return (data: T[]) => {
+      progressCallback(data.length);
+      return dataProcessor(data);
+    };
+  }
+
+  const conversationsData = await exportTable({
+    table: conversationTable,
+    preprocessor: streamProgress(preprocessConversations),
+    backupService,
+  });
+  tableData[StorageSchemata.OBJECT_STORE.CONVERSATIONS] = conversationsData;
+
+  const eventsData = await exportTable({
+    table: eventsTable,
+    preprocessor: streamProgress(preprocessEvents),
+    backupService,
+  });
+  tableData[StorageSchemata.OBJECT_STORE.EVENTS] = eventsData;
+
+  const usersData = await exportTable({
+    table: usersTable,
+    preprocessor: streamProgress(preprocessUsers),
+    backupService,
+  });
+  tableData[StorageSchemata.OBJECT_STORE.USERS] = usersData;
+
+  return tableData;
 };

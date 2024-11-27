@@ -173,6 +173,9 @@ export type Env = {
   /** Feature to enable team creation flow for individual users */
   FEATURE_ENABLE_TEAM_CREATION: string;
 
+  /** Feature to enable Cross Platform Backup export */
+  FEATURE_ENABLE_CROSS_PLATFORM_BACKUP_EXPORT: string;
+
   /** Sets the verification ID for Google webmasters */
   GOOGLE_WEBMASTER_ID: string;
 

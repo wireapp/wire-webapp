@@ -37,8 +37,9 @@ import {
   IncompatibleBackupFormatError,
   InvalidPassword,
 } from './Error';
-import {importLegacyBackupToDatabase} from './LegacyBackup.helper';
+import {createMetaData, exportHistory, importLegacyBackupToDatabase} from './LegacyBackup.helper';
 
+import {Config} from '../Config';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import {isReadableConversation} from '../conversation/ConversationSelectors';
 import type {Conversation} from '../entity/Conversation';
@@ -85,12 +86,28 @@ export class BackupRepository {
   ): Promise<Blob> {
     this.canceled = false;
 
+    const {
+      FEATURE: {ENABLE_CROSS_PLATFORM_BACKUP_EXPORT},
+    } = Config.getConfig();
+
     try {
-      const exportedData = await exportCPBHistoryFromDatabase({
-        progressCallback,
-        user,
-        backupService: this.backupService,
-      });
+      let exportedData = null;
+      // If the feature flag is enabled, export the history as a Multiplatform backup
+      if (ENABLE_CROSS_PLATFORM_BACKUP_EXPORT) {
+        exportedData = await exportCPBHistoryFromDatabase({
+          progressCallback,
+          user,
+          backupService: this.backupService,
+        });
+        // If the feature flag is disabled, export the history as a legacy backup
+      } else {
+        exportedData = await exportHistory(progressCallback, this.backupService);
+      }
+
+      if (exportedData === null) {
+        throw new Error('Exported data is null');
+      }
+
       return await this.compressHistoryFiles(user, clientId, exportedData, password);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : error;
@@ -103,12 +120,29 @@ export class BackupRepository {
   private async compressHistoryFiles(
     user: User,
     clientId: string, // TODO: Add clientId to metadata
-    exportedData: Int8Array,
+    exportedData: Int8Array | Record<string, any[]>,
     password: string,
   ): Promise<Blob> {
     const files: Record<string, Uint8Array> = {};
 
-    files[MPBackup.ZIP_ENTRY_DATA] = new Uint8Array(exportedData.buffer, 0, exportedData.byteLength);
+    // If the exported data is an Int8Array, it is a Multiplatform backup
+    if (exportedData instanceof Int8Array) {
+      files[MPBackup.ZIP_ENTRY_DATA] = new Uint8Array(exportedData.buffer, 0, exportedData.byteLength);
+      // If the exported data is an object, it is a legacy backup
+    } else {
+      const metaData = createMetaData(user, clientId, this.backupService);
+
+      const stringifiedMetadata = JSON.stringify(metaData, null, 2);
+      const encodedMetadata = new TextEncoder().encode(stringifiedMetadata);
+
+      for (const tableName in exportedData) {
+        const stringifiedData = JSON.stringify(exportedData[tableName]);
+        const encodedData = new TextEncoder().encode(stringifiedData);
+        const fileName = `${tableName}.json`;
+        files[fileName] = encodedData;
+      }
+      files[Filename.METADATA] = encodedMetadata;
+    }
 
     if (password) {
       return this.createEncryptedBackup(files, user, password);

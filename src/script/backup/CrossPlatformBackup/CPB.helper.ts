@@ -17,12 +17,15 @@
  *
  */
 
+import Dexie from 'dexie';
+
 import {ClientEvent} from 'src/script/event/Client';
 import {getLogger} from 'Util/Logger';
 
 import {MPBackup} from './CPB.library';
 
 import {FileData} from '../Backup.types';
+import {BackupService} from '../BackupService';
 
 export const CPBLogger = getLogger('wire:backup:CPB');
 
@@ -34,3 +37,19 @@ export const isAssetAddEvent = (eventType: unknown): boolean =>
   eventType === ClientEvent.CONVERSATION.ASSET_ADD.toString();
 export const isSupportedEventType = (eventType: string): boolean =>
   isMessageAddEvent(eventType) || isAssetAddEvent(eventType);
+
+interface ExportTableParams<T> {
+  backupService: BackupService;
+  table: Dexie.Table<T>;
+  preprocessor: (tableRows: any[]) => any[];
+}
+export const exportTable = async <T>({backupService, preprocessor, table}: ExportTableParams<T>) => {
+  const tableData: T[] = [];
+
+  await backupService.exportTable(table, tableRows => {
+    const processedData = preprocessor(tableRows);
+    tableData.push(...processedData);
+  });
+
+  return tableData;
+};

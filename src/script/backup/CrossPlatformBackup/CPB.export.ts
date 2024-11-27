@@ -17,8 +17,6 @@
  *
  */
 
-import Dexie from 'dexie';
-
 import {ConversationRecord, UserRecord, EventRecord} from 'src/script/storage';
 
 import {buildMetaData} from './AssetMetadata';
@@ -34,10 +32,9 @@ import {
 import {ExportHistoryFromDatabaseParams} from './CPB.types';
 import {ConversationTableSchema, UserTableSchema, EventTableSchema, AssetContentSchema} from './data.schema';
 
-import {BackupService} from '../BackupService';
 import {preprocessConversations, preprocessUsers, preprocessEvents} from '../recordPreprocessors';
 
-import {CPBLogger, isAssetAddEvent, isMessageAddEvent, isSupportedEventType} from '.';
+import {CPBLogger, exportTable, isAssetAddEvent, isMessageAddEvent, isSupportedEventType} from '.';
 
 // Helper function to transform an Int8Array to an object
 const transformObjectToArray = (array: {[key: number]: number}): Int8Array => {
@@ -46,22 +43,6 @@ const transformObjectToArray = (array: {[key: number]: number}): Int8Array => {
     result[parseInt(key, 10)] = array[key];
   }
   return result;
-};
-
-interface ExportTableParams<T> {
-  backupService: BackupService;
-  table: Dexie.Table<T>;
-  preprocessor: (tableRows: any[]) => any[];
-}
-const exportTable = async <T>({backupService, preprocessor, table}: ExportTableParams<T>) => {
-  const tableData: T[] = [];
-
-  await backupService.exportTable(table, tableRows => {
-    const processedData = preprocessor(tableRows);
-    tableData.push(...processedData);
-  });
-
-  return tableData;
 };
 
 /**
