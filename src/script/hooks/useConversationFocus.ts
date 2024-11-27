@@ -46,7 +46,7 @@ function useConversationFocus(conversations: Conversation[]) {
     [conversations],
   );
 
-  const resetConversationFocus = () => setCurrentFocus(conversations[0]?.id || '');
+  const resetConversationFocus = useCallback(() => setCurrentFocus(conversations[0]?.id || ''), [conversations]);
 
   useEffect(() => {
     if (currentFocus === conversations[0]?.id) {

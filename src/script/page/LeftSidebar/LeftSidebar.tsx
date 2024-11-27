@@ -37,7 +37,7 @@ type LeftSidebarProps = {
   isActivatedAccount: boolean;
 };
 
-const LeftSidebar = ({listViewModel, selfUser, isActivatedAccount}: LeftSidebarProps) => {
+export const LeftSidebar = ({listViewModel, selfUser, isActivatedAccount}: LeftSidebarProps) => {
   const {conversationRepository, propertiesRepository} = listViewModel;
   const repositories = listViewModel.contentViewModel.repositories;
 
@@ -81,5 +81,3 @@ const LeftSidebar = ({listViewModel, selfUser, isActivatedAccount}: LeftSidebarP
     </aside>
   );
 };
-
-export {LeftSidebar};

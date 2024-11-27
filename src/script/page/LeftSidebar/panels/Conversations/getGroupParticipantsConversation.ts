@@ -52,21 +52,29 @@ export const getGroupParticipantsConversations = ({
   const {query, isHandleQuery} = searchRepository.normalizeQuery(conversationsFilter);
   let filteredGroup = conversationRepository.getGroupsByName(query, isHandleQuery);
 
+  // Convert arrays to Sets for faster lookups
+  const favoriteSet = new Set(favoriteConversations);
+  const archivedSet = new Set(archivedConversations);
+  const conversationsSet = new Set(conversations);
+  const currentFolderConversations =
+    isFolderView && currentFolder?.conversations() ? new Set(currentFolder.conversations()) : null;
+
   if (isFavoritesView) {
-    filteredGroup = favoriteConversations.filter(item => filteredGroup.includes(item));
+    filteredGroup = filteredGroup.filter(item => favoriteSet.has(item));
   }
 
   if (isArchivesView) {
-    filteredGroup = archivedConversations.filter(item => filteredGroup.includes(item));
+    filteredGroup = filteredGroup.filter(item => archivedSet.has(item));
   }
 
-  if (isFolderView && currentFolder) {
-    filteredGroup = currentFolder?.conversations()?.filter(item => filteredGroup.includes(item)) || [];
+  if (isFolderView && currentFolderConversations) {
+    filteredGroup = filteredGroup.filter(item => currentFolderConversations.has(item));
   }
 
   if (!isArchivesView) {
-    filteredGroup = filteredGroup.filter(item => !archivedConversations.includes(item));
+    filteredGroup = filteredGroup.filter(item => !archivedSet.has(item));
   }
 
-  return filteredGroup.filter(item => !conversations.includes(item));
+  // Exclude existing conversations
+  return filteredGroup.filter(item => !conversationsSet.has(item));
 };

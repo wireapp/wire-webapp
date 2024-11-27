@@ -23,6 +23,7 @@ import React, {
   useEffect,
   useState,
   MutableRefObject,
+  useCallback,
 } from 'react';
 
 import {ConversationListCell} from 'Components/ConversationListCell';
@@ -91,43 +92,67 @@ export const ConversationsList = ({
 
   const {joinableCalls} = useKoSubscribableChildren(callState, ['joinableCalls']);
 
-  const isActiveConversation = (conversation: Conversation) => conversationState.isActiveConversation(conversation);
+  const isActiveConversation = useCallback(
+    (conversation: Conversation) => conversationState.isActiveConversation(conversation),
+    [conversationState],
+  );
 
-  const openContextMenu = (conversation: Conversation, event: MouseEvent | React.MouseEvent<Element, MouseEvent>) =>
-    listViewModel.onContextMenu(conversation, event);
+  const openContextMenu = useCallback(
+    (conversation: Conversation, event: MouseEvent | React.MouseEvent<Element, MouseEvent>) =>
+      listViewModel.onContextMenu(conversation, event),
+    [listViewModel],
+  );
 
-  const answerCall = (conversation: Conversation) => listViewModel.answerCall(conversation);
+  const answerCall = useCallback(
+    (conversation: Conversation) => listViewModel.answerCall(conversation),
+    [listViewModel],
+  );
 
-  const hasJoinableCall = (conversation: Conversation) => {
-    const call = joinableCalls.find((callInstance: Call) =>
-      matchQualifiedIds(callInstance.conversation.qualifiedId, conversation.qualifiedId),
-    );
+  const hasJoinableCall = useCallback(
+    (conversation: Conversation) => {
+      const call = joinableCalls.find((callInstance: Call) =>
+        matchQualifiedIds(callInstance.conversation.qualifiedId, conversation.qualifiedId),
+      );
 
-    return !!call && !conversation.isSelfUserRemoved();
-  };
+      return !!call && !conversation.isSelfUserRemoved();
+    },
+    [joinableCalls],
+  );
 
   const onConnectionRequestClick = () => {
     setCurrentView(ViewType.MOBILE_CENTRAL_COLUMN);
     listViewModel.contentViewModel.switchContent(ContentState.CONNECTION_REQUESTS);
   };
 
+  const onConversationClick = useCallback(
+    (conversation: Conversation) =>
+      (event: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>) => {
+        if (isActiveConversation(conversation)) {
+          clearSearchFilter();
+          setClickedFilteredConversationId(conversation.id);
+          return;
+        }
+
+        if (isKeyboardEvent(event)) {
+          createNavigateKeyboard(generateConversationUrl(conversation.qualifiedId), true)(event);
+        } else {
+          createNavigate(generateConversationUrl(conversation.qualifiedId))(event);
+        }
+
+        clearSearchFilter();
+        setClickedFilteredConversationId(conversation.id);
+      },
+    [clearSearchFilter, isActiveConversation],
+  );
+
   const getCommonConversationCellProps = (conversation: Conversation, index: number) => ({
     isFocused:
       document.activeElement !== searchInputRef.current && !conversationsFilter && currentFocus === conversation.id,
     handleArrowKeyDown: handleArrowKeyDown(index),
-    resetConversationFocus: resetConversationFocus,
+    resetConversationFocus,
     dataUieName: 'item-conversation',
-    conversation: conversation,
-    onClick: (event: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>) => {
-      if (isKeyboardEvent(event)) {
-        createNavigateKeyboard(generateConversationUrl(conversation.qualifiedId), true)(event);
-      } else {
-        createNavigate(generateConversationUrl(conversation.qualifiedId))(event);
-      }
-
-      clearSearchFilter();
-      setClickedFilteredConversationId(conversation.id);
-    },
+    conversation,
+    onClick: onConversationClick(conversation),
     isSelected: isActiveConversation,
     onJoinCall: answerCall,
     rightClick: openContextMenu,

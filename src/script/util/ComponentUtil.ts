@@ -17,9 +17,10 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 
 import ko, {Unwrapped} from 'knockout';
+import {isEqual} from 'underscore';
 
 type Subscribables<T> = {
   [Key in keyof T]: T[Key] extends ko.Subscribable ? T[Key] : never;
@@ -43,9 +44,9 @@ const resolveObservables = <C extends keyof Subscribables<P>, P extends Partial<
 /**
  * Will subscribe to all the observable properties of the object and call the onUpdate callback everytime one observable updates
  *
- * @param object The object containinig some observable properties
+ * @param object The object containing some observable properties
  * @param onUpdate The callback called everytime an observable emits. It will only give back the slice of the object that have updates
- * @param children? An optional list of properties to watch (by default will watch for all the observable properties)
+ * @param children An optional list of properties to watch (by default will watch for all the observable properties)
  */
 const subscribeProperties = <C extends keyof Subscribables<P>, P extends Partial<Record<C, ko.Subscribable>>>(
   object: P,
@@ -53,8 +54,6 @@ const subscribeProperties = <C extends keyof Subscribables<P>, P extends Partial
   children?: C[],
 ) => {
   const properties = children ?? (Object.keys(object).filter(key => key !== '$raw') as C[]);
-  onUpdate(resolveObservables(object, children));
-
   const subscriptions = properties
     .filter(child => ko.isSubscribable(object?.[child]))
     .map(child => {
@@ -76,15 +75,26 @@ export const useKoSubscribableChildren = <
   parent: P,
   children: C[],
 ): UnwrappedValues<Pick<P, C>> => {
-  const [state, setState] = useState<UnwrappedValues<P>>(resolveObservables(parent, children));
+  const [state, setState] = useState<UnwrappedValues<P>>(() => resolveObservables(parent, children));
+  const memoizedParent = useMemo(() => parent, [parent]); // Memoize parent to avoid unnecessary re-subscribing
+
   useEffect(() => {
-    const subscription = subscribeProperties(
-      parent,
-      updates => setState(currentState => ({...currentState, ...updates})),
-      children,
-    );
+    let currentState = resolveObservables(memoizedParent, children);
+
+    const handleUpdate = (updates: Partial<UnwrappedValues<P>>) => {
+      // Perform a deep equality check to ensure no unnecessary state updates
+      const nextState = {...currentState, ...updates};
+
+      if (!isEqual(currentState, nextState)) {
+        currentState = nextState; // Update the local state tracker
+        setState(nextState); // Update React state
+      }
+    };
+
+    const subscription = subscribeProperties(memoizedParent, handleUpdate, children);
+
     return () => subscription.dispose();
-  }, [parent]);
+  }, [memoizedParent, children]);
 
   return state;
 };
