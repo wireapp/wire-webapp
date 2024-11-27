@@ -1634,8 +1634,10 @@ export class ConversationRepository {
       ),
     );
 
-    const mostRecentlyUsedProteusConversation = proteusConversations.sort(
-      (a, b) => b.last_event_timestamp() - a.last_event_timestamp(),
+    // In the event that multiple 1:1 Proteus conversations exist, we migrate the one with the lowest id
+    // See https://wearezeta.atlassian.net/wiki/spaces/ENGINEERIN/pages/1344602120/Use+case+multiple+1+1+conversation+in+teams+Proteus
+    const proteusConversationToBeKept = proteusConversations.sort((a, b) =>
+      a.qualifiedId.id.localeCompare(b.qualifiedId.id),
     )[0];
 
     // Before we delete the proteus 1:1 conversation, we need to make sure all the local properties are also migrated
@@ -1652,7 +1654,7 @@ export class ConversationRepository {
       mutedTimestamp,
       status,
       verification_state,
-    } = mostRecentlyUsedProteusConversation;
+    } = proteusConversationToBeKept;
 
     const updates: Partial<Record<keyof Conversation, any>> = {
       archivedState: archivedState(),
