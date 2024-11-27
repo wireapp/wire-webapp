@@ -1,5 +1,5 @@
 {
-  "AppLockDisableCancel": "Abbrechen",
+  "AppLockDisableCancel": "Cancel",
   "AppLockDisableInfo": "Sie müssen Wire nicht mehr mit Ihrem Kennwort entsperren.",
   "AppLockDisableTurnOff": "Ausschalten",
   "ApplockDisableHeadline": "App-Sperre ausschalten?",
@@ -1125,7 +1125,7 @@
   "modalServiceUnavailableMessage": "Der Dienst ist derzeit nicht verfügbar.",
   "modalSessionResetHeadline": "Die Session wurde zurückgesetzt",
   "modalSessionResetMessage": "Bitte [link]Kontakt aufnehmen[/link], falls das Problem nicht behoben ist.",
-  "modalUnableToReceiveMessages": "You can’t receive messages at the moment. Please log out and log in again directly to resolve this case.",
+  "modalUnableToReceiveMessages": "Sie können im Moment keine Nachrichten empfangen. Bitte melden Sie sich ab und melden Sie sich direkt wieder an, um das Problem zu beheben.",
   "modalUploadContactsAction": "Erneut versuchen",
   "modalUploadContactsMessage": "Wir haben Ihre Informationen nicht erhalten. Bitte versuchen Sie erneut, Ihre Kontakte zu importieren.",
   "modalUserBlockAction": "Blockieren",

@@ -19,8 +19,9 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const portalContainerCss: CSSObject = {
-  zIndex: 1000,
-  position: 'fixed',
-  borderRadius: '0.5rem',
+export const uploadAssetsContainer: CSSObject = {
+  paddingLeft: 'var(--conversation-message-sender-width)',
+  paddingBottom: '16px',
+  marginTop: '8px',
+  width: '100%',
 };

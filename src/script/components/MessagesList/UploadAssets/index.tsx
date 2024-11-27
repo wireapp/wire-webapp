@@ -17,10 +17,4 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
-
-export const portalContainerCss: CSSObject = {
-  zIndex: 1000,
-  position: 'fixed',
-  borderRadius: '0.5rem',
-};
+export * from './UploadAssets';

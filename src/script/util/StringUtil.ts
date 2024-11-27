@@ -234,26 +234,33 @@ export const generateRandomPassword = (passwordLength: number = 8): string => {
   // Concatenate all possible characters into a single string
   const allChars = lowercaseChars + uppercaseChars + numericChars + specialChars;
 
+  // Helper function to get a secure random index
+  const getRandomIndex = (max: number): number => {
+    const randomValues = new Uint32Array(1);
+    crypto.getRandomValues(randomValues);
+    return randomValues[0] % max;
+  };
+
   // Calculate the number of characters to add to the password to meet the minimum requirements
   const minRequiredChars = 4;
   const additionalChars = Math.max(0, passwordLength - minRequiredChars);
 
   // Add one random lowercase letter, one random uppercase letter, one random number, and one random special character to the password
   let password = '';
-  password += lowercaseChars[Math.floor(Math.random() * lowercaseChars.length)];
-  password += uppercaseChars[Math.floor(Math.random() * uppercaseChars.length)];
-  password += numericChars[Math.floor(Math.random() * numericChars.length)];
-  password += specialChars[Math.floor(Math.random() * specialChars.length)];
+  password += lowercaseChars[getRandomIndex(lowercaseChars.length)];
+  password += uppercaseChars[getRandomIndex(uppercaseChars.length)];
+  password += numericChars[getRandomIndex(numericChars.length)];
+  password += specialChars[getRandomIndex(specialChars.length)];
 
   // Add additional random characters to the password using all possible characters
   for (let i = 0; i < additionalChars; i++) {
-    password += allChars[Math.floor(Math.random() * allChars.length)];
+    password += allChars[getRandomIndex(allChars.length)];
   }
 
   // Shuffle the characters of the password randomly to make it more secure
   password = password
     .split('')
-    .sort(() => Math.random() - 0.5)
+    .sort(() => getRandomIndex(2) - 1) // Generates either -1 or 1 for shuffling
     .join('');
 
   // Truncate the password to the desired length if necessary

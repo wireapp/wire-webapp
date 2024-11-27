@@ -19,8 +19,7 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const portalContainerCss: CSSObject = {
-  zIndex: 1000,
-  position: 'fixed',
-  borderRadius: '0.5rem',
+export const uploadingProgressText: CSSObject = {
+  color: 'var(--gray-70)',
+  fontSize: 'var(--font-size-small)',
 };

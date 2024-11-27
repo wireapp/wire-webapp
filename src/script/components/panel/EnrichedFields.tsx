@@ -22,6 +22,8 @@ import {useEffect, useState} from 'react';
 import type {RichInfoField} from '@wireapp/api-client/lib/user/RichInfo';
 import {container} from 'tsyringe';
 
+import {Availability} from '@wireapp/protocol-messaging';
+
 import {availabilityStatus, availabilityTranslationKeys} from 'Util/AvailabilityStatus';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -98,9 +100,12 @@ const EnrichedFields = ({
     return null;
   }
 
+  const shouldShowAvailability =
+    showAvailability && availability !== undefined && availability !== Availability.Type.NONE;
+
   return (
     <div className="enriched-fields">
-      {showAvailability && availability !== undefined && (
+      {shouldShowAvailability && (
         <div className="enriched-fields__entry">
           <p className="enriched-fields__entry__key" data-uie-name="item-enriched-key">
             {t('availability.status')}
