@@ -34,7 +34,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {ButtonAction} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {StringIdentifer, replaceLink, t} from 'Util/LocalizerUtil';
+import {replaceLink, t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {formatDuration} from 'Util/TimeUtil';
 
@@ -43,11 +43,28 @@ import {loadFeatureConfig, saveFeatureConfig} from './FeatureConfigChangeNotifie
 import {Config} from '../../../../Config';
 import {TeamState} from '../../../../team/TeamState';
 
+type Features =
+  | 'FileSharing'
+  | 'AudioVideo'
+  | 'Applock'
+  | 'DownloadPath'
+  | 'SelfDeletingMessages'
+  | 'ConferenceCalling'
+  | 'ConversationGuestLinks';
+
+type Title = `featureConfigChangeModal${Features}Headline`;
+
 type FeatureMessageGenerator = {
   [K in keyof FeatureList]: (
     oldConfig?: FeatureList[K],
     newConfig?: FeatureList[K],
-  ) => undefined | {htmlMessage: string; title: StringIdentifer; primaryAction?: ButtonAction};
+  ) =>
+    | undefined
+    | {
+        htmlMessage: string;
+        title: Title;
+        primaryAction?: ButtonAction;
+      };
 };
 
 const featureNotifications: FeatureMessageGenerator = {
@@ -92,7 +109,7 @@ const featureNotifications: FeatureMessageGenerator = {
   [FEATURE_KEY.ENFORCE_DOWNLOAD_PATH]: (oldConfig, newConfig) => {
     const handleDlPathChange: (
       status: FeatureStatus | boolean,
-    ) => undefined | {htmlMessage: string; title: StringIdentifer; primaryAction?: ButtonAction} = status => {
+    ) => undefined | {htmlMessage: string; title: Title; primaryAction?: ButtonAction} = status => {
       if (newConfig && 'config' in newConfig) {
         localStorage.setItem('enforcedDownloadLocation', newConfig.config.enforcedDownloadLocation);
         amplify.publish(
@@ -187,7 +204,7 @@ const featureNotifications: FeatureMessageGenerator = {
         {brandName: Config.getConfig().BRAND_NAME},
         replaceEnterprise,
       ),
-      title: 'featureConfigChangeModalConferenceCallingTitle',
+      title: 'featureConfigChangeModalConferenceCallingHeadline',
     };
   },
   [FEATURE_KEY.CONVERSATION_GUEST_LINKS]: (oldConfig, newConfig) => {

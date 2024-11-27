@@ -204,7 +204,7 @@ export class ContentViewModel {
       {
         text: {
           message: t('conversationNotFoundMessage'),
-          title: t('conversationNotFoundTitle', Config.getConfig().BRAND_NAME),
+          title: t('conversationNotFoundTitle', {brandName: Config.getConfig().BRAND_NAME}),
         },
       },
       undefined,

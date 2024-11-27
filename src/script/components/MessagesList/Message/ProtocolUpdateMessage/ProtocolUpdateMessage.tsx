@@ -40,7 +40,11 @@ const createSystemMessage = (caption: string) => {
 export const ProtocolUpdateMessage = ({message}: ProtocolUpdateMessageProps) => {
   if (message.protocol === ConversationProtocol.MIXED) {
     const captions = [
-      t('conversationProtocolUpdatedToMixedPart1', {}, replaceLink(Config.getConfig().URL.SUPPORT.MLS_LEARN_MORE)),
+      t(
+        'conversationProtocolUpdatedToMixedPart1',
+        undefined,
+        replaceLink(Config.getConfig().URL.SUPPORT.MLS_LEARN_MORE),
+      ),
       t('conversationProtocolUpdatedToMixedPart2'),
     ];
     const messages = captions.map(createSystemMessage);
@@ -54,7 +58,7 @@ export const ProtocolUpdateMessage = ({message}: ProtocolUpdateMessageProps) => 
   }
 
   const migratedToMLSMessage = createSystemMessage(
-    t('conversationProtocolUpdatedToMLS', {}, replaceLink(Config.getConfig().URL.SUPPORT.MLS_LEARN_MORE)),
+    t('conversationProtocolUpdatedToMLS', undefined, replaceLink(Config.getConfig().URL.SUPPORT.MLS_LEARN_MORE)),
   );
   return <SystemMessageBase message={migratedToMLSMessage} icon={<Icon.InfoIcon />} />;
 };

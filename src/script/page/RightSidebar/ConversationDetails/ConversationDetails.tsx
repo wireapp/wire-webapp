@@ -290,10 +290,9 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
                   <button
                     className="panel__action-item"
                     type="button"
-                    title={t(
-                      'tooltipConversationDetailsAddPeople',
-                      Shortcut.getShortcutTooltip(ShortcutType.ADD_PEOPLE),
-                    )}
+                    title={t('tooltipConversationDetailsAddPeople', {
+                      shortcut: Shortcut.getShortcutTooltip(ShortcutType.ADD_PEOPLE),
+                    })}
                     onClick={openAddParticipants}
                     data-uie-name="go-add-people"
                   >

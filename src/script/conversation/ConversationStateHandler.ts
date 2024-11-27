@@ -79,9 +79,9 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
             const {featureName, ...featureInfo} = featureFromStateChange(prevAccessState, accessState);
 
             if (featureInfo.isAvailable) {
-              messageString = t(`modalConversationOptionsAllow${featureName}Message`);
+              messageString = t(`modalConversationOptionsAllow${featureName as 'Guest' | 'Service'}Message`);
             } else {
-              messageString = t(`modalConversationOptionsDisable${featureName}Message`);
+              messageString = t(`modalConversationOptionsDisable${featureName as 'Guest' | 'Service'}Message`);
             }
             this._showModal(messageString);
           }
@@ -90,7 +90,7 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
       }
     }
     const {featureName} = featureFromStateChange(prevAccessState, accessState);
-    this._showModal(t(`modalConversationOptionsToggle${featureName}Message`));
+    this._showModal(t(`modalConversationOptionsToggle${featureName as 'Service' | 'Guest'}Message`));
   }
 
   async getAccessCode(conversationEntity: Conversation): Promise<void> {

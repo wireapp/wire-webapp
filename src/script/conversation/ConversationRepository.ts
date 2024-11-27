@@ -1120,7 +1120,7 @@ export class ConversationRepository {
 
       PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
         text: {
-          message: t('modalConversationDeleteErrorMessage', conversationEntity.name()),
+          message: t('modalConversationDeleteErrorMessage', {name: conversationEntity.name()}),
           title: t('modalConversationDeleteErrorHeadline'),
         },
       });
@@ -2975,7 +2975,7 @@ export class ConversationRepository {
     } else {
       // TODO(Federation): Update code once connections are implemented on the backend
       const userEntity = await this.userRepository.getUserById(userIds[0]);
-      this.showModal(t('modalConversationNotConnectedMessageOne', userEntity.name()), titleText);
+      this.showModal(t('modalConversationNotConnectedMessageOne', {name: userEntity.name()}), titleText);
     }
   }
 
@@ -2995,7 +2995,7 @@ export class ConversationRepository {
       'read-more-legal-hold',
     );
 
-    const messageText = t('modalLegalHoldConversationMissingConsentMessage', {}, replaceLinkLegalHold);
+    const messageText = t('modalLegalHoldConversationMissingConsentMessage', undefined, replaceLinkLegalHold);
     const titleText = t('modalUserCannotBeAddedHeadline');
 
     PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {

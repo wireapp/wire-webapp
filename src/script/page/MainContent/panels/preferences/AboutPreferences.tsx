@@ -104,7 +104,7 @@ const AboutPreferences: React.FC<AboutPreferencesProps> = ({selfUser, teamState 
             {websiteUrl && (
               <li className="preferences-about-list-item">
                 <Link variant={LinkVariant.PRIMARY} targetBlank href={websiteUrl} data-uie-name="go-wire-dot-com">
-                  {t('preferencesAboutWebsite', config.BRAND_NAME)}
+                  {t('preferencesAboutWebsite', {brandName: config.BRAND_NAME})}
                 </Link>
               </li>
             )}
@@ -113,12 +113,12 @@ const AboutPreferences: React.FC<AboutPreferencesProps> = ({selfUser, teamState 
       )}
       <PreferencesSection hasSeparator>
         {desktopConfig && (
-          <p className="preferences-detail">{t('preferencesAboutDesktopVersion', desktopConfig.version)}</p>
+          <p className="preferences-detail">{t('preferencesAboutDesktopVersion', {version: desktopConfig.version})}</p>
         )}
         <p className="preferences-detail">
           {t('preferencesAboutVersion', {brandName: config.BRAND_NAME, version: config.VERSION})}
         </p>
-        <p className="preferences-detail">{t('preferencesAboutAVSVersion', config.AVS_VERSION)}</p>
+        <p className="preferences-detail">{t('preferencesAboutAVSVersion', {version: config.AVS_VERSION})}</p>
         <p className="preferences-detail">{t('preferencesAboutCopyright')}</p>
       </PreferencesSection>
     </PreferencesPage>
