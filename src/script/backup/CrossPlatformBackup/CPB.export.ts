@@ -105,7 +105,7 @@ export const exportCPBHistoryFromDatabase = async ({
   usersData.forEach(userData =>
     backupExporter.addUser(
       new BackupUser(
-        new BackupQualifiedId(userData.qualified_id.id, userData.qualified_id.domain),
+        new BackupQualifiedId(userData?.qualified_id?.id ?? userData.id, userData?.qualified_id?.domain ?? ''),
         userData.name,
         userData.handle ?? '',
       ),

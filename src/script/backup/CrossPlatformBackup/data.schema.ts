@@ -48,18 +48,20 @@ export const ConversationTableSchema = zod.array(ConversationSchema);
 export type ConversationTable = zod.infer<typeof ConversationTableSchema>;
 
 const UserSchema = zod.object({
-  accent_id: zod.number(),
-  assets: zod.array(zod.any()),
+  accent_id: zod.number().optional(),
+  assets: zod.array(zod.any()).optional(),
   handle: zod.string().optional(),
   id: zod.string(),
-  legalhold_status: zod.string(),
+  legalhold_status: zod.string().optional(),
   name: zod.string(),
-  picture: zod.array(zod.any()),
-  qualified_id: zod.object({
-    domain: zod.string(),
-    id: zod.string(),
-  }),
-  supported_protocols: zod.array(zod.string()),
+  picture: zod.array(zod.any()).optional(),
+  qualified_id: zod
+    .object({
+      domain: zod.string(),
+      id: zod.string(),
+    })
+    .optional(),
+  supported_protocols: zod.array(zod.string()).optional(),
   team: zod.string().optional(),
 });
 export const UserTableSchema = zod.array(UserSchema);
