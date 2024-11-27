@@ -4300,7 +4300,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lexical/code@npm:0.20.0":
+"@lexical/code@npm:0.20.0, @lexical/code@npm:^0.20.0":
   version: 0.20.0
   resolution: "@lexical/code@npm:0.20.0"
   dependencies:
@@ -4378,7 +4378,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lexical/list@npm:0.20.0":
+"@lexical/list@npm:0.20.0, @lexical/list@npm:^0.20.0":
   version: 0.20.0
   resolution: "@lexical/list@npm:0.20.0"
   dependencies:
@@ -4398,7 +4398,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lexical/markdown@npm:0.20.0":
+"@lexical/markdown@npm:0.20.0, @lexical/markdown@npm:^0.20.0":
   version: 0.20.0
   resolution: "@lexical/markdown@npm:0.20.0"
   dependencies:
@@ -6183,9 +6183,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/react-ui-kit@npm:9.26.3":
-  version: 9.26.3
-  resolution: "@wireapp/react-ui-kit@npm:9.26.3"
+"@wireapp/react-ui-kit@npm:9.28.0":
+  version: 9.28.0
+  resolution: "@wireapp/react-ui-kit@npm:9.28.0"
   dependencies:
     "@types/color": "npm:3.0.6"
     color: "npm:4.2.3"
@@ -6200,7 +6200,7 @@ __metadata:
   peerDependenciesMeta:
     "@types/react":
       optional: true
-  checksum: 10/328ff96312b386be51a78972c10ca14337d7d2d4f0dfbc706b93e68b3569099a109d545ec438644c06be0865c3d42849a8db137e60fc8d1c03c5c8d7de5aa222
+  checksum: 10/de925b2b3b2216bac2cd6ab89f2f6a4596e4985b0d449516648d79c765a51b14934b58fc329e770bf228d0057b4ed8ae697d34bb3693475db4a98a067ed6a77b
   languageName: node
   linkType: hard
 
@@ -18691,7 +18691,10 @@ __metadata:
     "@emotion/react": "npm:11.11.4"
     "@faker-js/faker": "npm:9.2.0"
     "@formatjs/cli": "npm:6.3.11"
+    "@lexical/code": "npm:^0.20.0"
     "@lexical/history": "npm:0.20.0"
+    "@lexical/list": "npm:^0.20.0"
+    "@lexical/markdown": "npm:^0.20.0"
     "@lexical/react": "npm:0.20.0"
     "@mediapipe/tasks-vision": "npm:0.10.18"
     "@roamhq/wrtc": "npm:0.8.0"
@@ -18728,7 +18731,7 @@ __metadata:
     "@wireapp/core": "npm:46.7.1"
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/prettier-config": "npm:0.6.4"
-    "@wireapp/react-ui-kit": "npm:9.26.3"
+    "@wireapp/react-ui-kit": "npm:9.28.0"
     "@wireapp/store-engine": "npm:5.1.11"
     "@wireapp/store-engine-dexie": "npm:2.1.15"
     "@wireapp/telemetry": "npm:0.1.3"

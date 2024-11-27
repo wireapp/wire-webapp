@@ -43,6 +43,7 @@ export type ControlButtonsProps = {
   onSelectImages: (files: File[]) => void;
   onCancelEditing: () => void;
   onGifClick: () => void;
+  onFormatClick: () => void;
 };
 
 const ControlButtons: React.FC<ControlButtonsProps> = ({
@@ -58,6 +59,7 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
   onSelectImages,
   onCancelEditing,
   onGifClick,
+  onFormatClick,
 }) => {
   const pingTooltip = t('tooltipConversationPing');
 
@@ -85,6 +87,18 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
         <li>
           <button
             className={`controls-right-button buttons-group-button-left ${scaledDownClass}`}
+            type="button"
+            onClick={onFormatClick}
+            title="rich text"
+            aria-label="rich text"
+            data-uie-name="format-text"
+          >
+            <Icon.MarkdownIcon />
+          </button>
+        </li>
+        <li>
+          <button
+            className={`conversation-button controls-right-button no-radius ${scaledDownClass}`}
             type="button"
             onClick={onClickPing}
             disabled={disablePing}

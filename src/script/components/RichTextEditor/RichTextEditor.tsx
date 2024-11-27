@@ -17,17 +17,54 @@
  *
  */
 
-import {ReactElement, useRef} from 'react';
+import {ReactElement, useEffect, useRef, useState} from 'react';
 
+import {CodeHighlightNode, CodeNode} from '@lexical/code';
+import {LinkNode} from '@lexical/link';
+import {
+  INSERT_ORDERED_LIST_COMMAND,
+  INSERT_UNORDERED_LIST_COMMAND,
+  ListItemNode,
+  ListNode,
+  REMOVE_LIST_COMMAND,
+} from '@lexical/list';
+import {
+  CODE,
+  UNORDERED_LIST,
+  ORDERED_LIST,
+  BOLD_ITALIC_STAR,
+  BOLD_ITALIC_UNDERSCORE,
+  BOLD_STAR,
+  BOLD_UNDERSCORE,
+  INLINE_CODE,
+  ITALIC_STAR,
+  ITALIC_UNDERSCORE,
+  STRIKETHROUGH,
+} from '@lexical/markdown';
 import {ClearEditorPlugin} from '@lexical/react/LexicalClearEditorPlugin';
 import {InitialConfigType, LexicalComposer} from '@lexical/react/LexicalComposer';
 import {ContentEditable} from '@lexical/react/LexicalContentEditable';
 import {EditorRefPlugin} from '@lexical/react/LexicalEditorRefPlugin';
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary';
+import {HorizontalRuleNode} from '@lexical/react/LexicalHorizontalRuleNode';
+import {ListPlugin} from '@lexical/react/LexicalListPlugin';
+import {MarkdownShortcutPlugin} from '@lexical/react/LexicalMarkdownShortcutPlugin';
 import {OnChangePlugin} from '@lexical/react/LexicalOnChangePlugin';
-import {PlainTextPlugin} from '@lexical/react/LexicalPlainTextPlugin';
+import {RichTextPlugin} from '@lexical/react/LexicalRichTextPlugin';
+import {HeadingNode, QuoteNode} from '@lexical/rich-text';
 import cx from 'classnames';
-import {LexicalEditor, EditorState, $nodesOfType} from 'lexical';
+import {
+  LexicalEditor,
+  EditorState,
+  $nodesOfType,
+  FORMAT_TEXT_COMMAND,
+  $getSelection,
+  $isRangeSelection,
+  TextNode,
+  ElementNode,
+} from 'lexical';
+
+import {BoldIcon, BulletListIcon, CodeIcon, ItalicIcon, NumberedListIcon, UnderlineIcon} from '@wireapp/react-ui-kit';
 
 import {DraftState} from 'Components/InputBar/util/DraftStateUtil';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
@@ -58,6 +95,17 @@ const theme = {
   mentions: {
     '@': `at-mentions`, // use the trigger name as the key
     '@Focused': 'focused-mentions', // add the "Focused" suffix to style the focused mention
+  },
+  text: {
+    bold: 'font-bold',
+    italic: 'italic',
+    underline: 'underline',
+    strikethrough: 'line-through',
+    code: 'font-mono bg-gray-100 px-1 rounded',
+  },
+  list: {
+    ul: 'list-disc ml-4',
+    ol: 'list-decimal ml-4',
   },
 };
 
@@ -132,6 +180,7 @@ export const RichTextEditor = ({
   // Emojis
   const emojiPickerOpen = useRef<boolean>(true);
   const mentionsOpen = useRef<boolean>(true);
+  const editorRef = useRef<LexicalEditor | null>(null);
 
   const editorConfig: InitialConfigType = {
     namespace: 'WireLexicalEditor',
@@ -139,7 +188,18 @@ export const RichTextEditor = ({
     onError(error: unknown) {
       logger.error(error);
     },
-    nodes: [MentionNode, EmojiNode],
+    nodes: [
+      MentionNode,
+      EmojiNode,
+      ListItemNode,
+      ListNode,
+      HeadingNode,
+      HorizontalRuleNode,
+      QuoteNode,
+      CodeNode,
+      CodeHighlightNode,
+      LinkNode,
+    ],
   };
 
   const saveDraft = (editorState: EditorState) => {
@@ -159,18 +219,38 @@ export const RichTextEditor = ({
         <div className="input-bar--wrapper">
           <AutoFocusPlugin />
           <GlobalEventsPlugin onShiftTab={onShiftTab} onEscape={onEscape} onArrowUp={onArrowUp} onBlur={onBlur} />
-          <EditorRefPlugin editorRef={onSetup} />
+          <EditorRefPlugin
+            editorRef={editor => {
+              editorRef.current = editor;
+              onSetup(editor!);
+            }}
+          />
           <DraftStatePlugin loadDraftState={loadDraftState} />
           <EditedMessagePlugin message={editedMessage} />
 
           <EmojiPickerPlugin openStateRef={emojiPickerOpen} />
           <HistoryPlugin />
-
+          <ListPlugin />
           {replaceEmojis && <ReplaceEmojiPlugin />}
 
           <ReplaceCarriageReturnPlugin />
+          <MarkdownShortcutPlugin
+            transformers={[
+              CODE,
+              UNORDERED_LIST,
+              ORDERED_LIST,
+              BOLD_ITALIC_STAR,
+              BOLD_ITALIC_UNDERSCORE,
+              BOLD_STAR,
+              BOLD_UNDERSCORE,
+              INLINE_CODE,
+              ITALIC_STAR,
+              ITALIC_UNDERSCORE,
+              STRIKETHROUGH,
+            ]}
+          />
 
-          <PlainTextPlugin
+          <RichTextPlugin
             contentEditable={<ContentEditable className="conversation-input-bar-text" data-uie-name="input-message" />}
             placeholder={<Placeholder text={placeholder} hasLocalEphemeralTimer={hasLocalEphemeralTimer} />}
             ErrorBoundary={LexicalErrorBoundary}
@@ -192,6 +272,7 @@ export const RichTextEditor = ({
             }}
           />
         </div>
+        <FormatToolbar editor={editorRef.current!} />
       </div>
 
       {children}
@@ -209,3 +290,169 @@ function Placeholder({text, hasLocalEphemeralTimer}: {text: string; hasLocalEphe
     </div>
   );
 }
+
+const FormatToolbar = ({editor}: {editor: LexicalEditor}) => {
+  const [activeFormats, setActiveFormats] = useState<string[]>([]);
+
+  const isNodeInBulletList = (node: TextNode | ElementNode | null) => {
+    if (!node) {
+      return false;
+    }
+    if (node.getType() === 'list' && node.getTag() === 'ul') {
+      return true;
+    }
+    return isNodeInBulletList(node.getParent());
+  };
+
+  const isNodeInNumberedList = (node: TextNode | ElementNode | null) => {
+    if (!node) {
+      return false;
+    }
+    if (node.getType() === 'list' && node.getTag() === 'ol') {
+      return true;
+    }
+    return isNodeInNumberedList(node.getParent());
+  };
+
+  useEffect(() => {
+    if (!editor) {
+      return;
+    }
+
+    const updateToolbar = () => {
+      editor.update(() => {
+        const selection = $getSelection();
+        if ($isRangeSelection(selection)) {
+          const formats = [];
+          // "italic" | "underline" | "code" | "bold" | "strikethrough" | "highlight" | "subscript" | "superscript"
+          if (selection.hasFormat('bold')) {
+            formats.push('bold');
+          }
+          if (selection.hasFormat('italic')) {
+            formats.push('italic');
+          }
+
+          if (selection.hasFormat('underline')) {
+            formats.push('underline');
+          }
+
+          if (selection.hasFormat('strikethrough')) {
+            formats.push('strikethrough');
+          }
+
+          if (selection.hasFormat('code')) {
+            formats.push('code');
+          }
+
+          if (isNodeInBulletList(selection.anchor.getNode())) {
+            formats.push('bulletList');
+          }
+
+          if (isNodeInNumberedList(selection.anchor.getNode())) {
+            formats.push('numberedList');
+          }
+
+          setActiveFormats(formats);
+        }
+      });
+    };
+
+    const unregister = editor.registerUpdateListener(updateToolbar);
+    return () => unregister();
+  }, [editor]);
+
+  console.log({activeFormats});
+
+  const formatText = (format: 'bold' | 'italic' | 'underline' | 'strikethrough' | 'code') => {
+    editor.dispatchCommand(FORMAT_TEXT_COMMAND, format);
+  };
+
+  const toggleList = (type: 'bullet' | 'number') => {
+    // if (type === 'bullet') {
+    //   editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined);
+    // } else {
+    //   editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined);
+    // }
+    editor.update(() => {
+      const selection = $getSelection();
+      if ($isRangeSelection(selection)) {
+        const isBulletList = isNodeInBulletList(selection.anchor.getNode());
+
+        if (type === 'bullet') {
+          if (isBulletList) {
+            editor.dispatchCommand(REMOVE_LIST_COMMAND, undefined);
+          } else {
+            editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined);
+          }
+        }
+
+        const isNumberedList = isNodeInNumberedList(selection.anchor.getNode());
+
+        if (type === 'number') {
+          if (isNumberedList) {
+            editor.dispatchCommand(REMOVE_LIST_COMMAND, undefined);
+          } else {
+            editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined);
+          }
+        }
+      }
+    });
+  };
+
+  return (
+    <div className="buttons-group">
+      <button
+        className={`controls-right-button buttons-group-button-left button-icon-large ${activeFormats.includes('bold') ? 'active' : ''}`}
+        onClick={() => formatText('bold')}
+      >
+        <BoldIcon />
+      </button>
+      <button
+        className={`conversation-button controls-right-button no-radius button-icon-large ${activeFormats.includes('italic') ? 'active' : ''}`}
+        onClick={() => formatText('italic')}
+      >
+        <ItalicIcon />
+      </button>
+      <button
+        className={`conversation-button controls-right-button no-radius button-icon-large ${activeFormats.includes('underline') ? 'active' : ''}`}
+        onClick={() => formatText('underline')}
+      >
+        <UnderlineIcon />
+      </button>
+      {/* <button className="px-2 py-1 border rounded hover:bg-gray-100" onClick={() => formatText('strikethrough')}>
+        Strike
+      </button> */}
+      <button
+        className={`conversation-button controls-right-button no-radius button-icon-large ${activeFormats.includes('code') ? 'active' : ''}`}
+        onClick={() => formatText('code')}
+      >
+        <CodeIcon />
+      </button>
+      <button
+        className={`conversation-button controls-right-button no-radius button-icon-large ${activeFormats.includes('bulletList') ? 'active' : ''}`}
+        onClick={() => toggleList('bullet')}
+      >
+        <BulletListIcon />
+      </button>
+      <button
+        className={`conversation-button controls-right-button no-radius button-icon-large ${activeFormats.includes('numberedList') ? 'active' : ''}`}
+        onClick={() => toggleList('number')}
+      >
+        <NumberedListIcon />
+      </button>
+      {/* <button
+        className="px-2 py-1 border rounded hover:bg-gray-100"
+        onClick={() =>
+          editor.getEditorState().read(() => {
+            const emojiPickerRef = emojiPickerOpen.current;
+            if (emojiPickerRef !== undefined) {
+              emojiPickerRef = true;
+            }
+          })
+        }
+      >
+        Emoji
+      </button> */}
+    </div>
+  );
+};

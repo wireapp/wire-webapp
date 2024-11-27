@@ -20,7 +20,7 @@
 import {useEffect} from 'react';
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {COMMAND_PRIORITY_LOW, KEY_ENTER_COMMAND} from 'lexical';
+import {COMMAND_PRIORITY_LOW, INSERT_PARAGRAPH_COMMAND, KEY_ENTER_COMMAND} from 'lexical';
 
 type Props = {
   onSend: () => void;
@@ -37,8 +37,11 @@ export function SendPlugin({onSend}: Props): null {
           return false;
         }
 
+        // Mimic the "Enter" behavior when a user press "Shift + Enter"
+        // It's useful for the rich text editor, especially when creating lists
         if (event.shiftKey) {
-          return true;
+          event.preventDefault();
+          return editor.dispatchCommand(INSERT_PARAGRAPH_COMMAND, undefined);
         }
 
         // When sending a message with "Enter", we want to prevent the default behavior (new line)
