@@ -687,7 +687,7 @@
   "featureConfigChangeModalAudioVideoDescriptionItemCameraEnabled": "A câmera nas chamadas está ativada",
   "featureConfigChangeModalAudioVideoHeadline": "Houve uma mudança em {brandName}",
   "featureConfigChangeModalConferenceCallingEnabled": "Sua equipe foi atualizada para o {brandName} Empresarial, que oferece acesso a recursos como chamadas em conferência e muito mais. [link]Saiba mais sobre o {brandName} Empresarial[/link]",
-  "featureConfigChangeModalConferenceCallingTitle": "{brandName} Empresarial",
+  "featureConfigChangeModalConferenceCallingHeadline": "{brandName} Enterprise",
   "featureConfigChangeModalConversationGuestLinksDescriptionItemConversationGuestLinksDisabled": "A geração de links de convidados agora está desabilitada para todos os administradores do grupo.",
   "featureConfigChangeModalConversationGuestLinksDescriptionItemConversationGuestLinksEnabled": "A geração de links de convidados agora está habilitada para todos os administradores do grupo.",
   "featureConfigChangeModalConversationGuestLinksHeadline": "As configurações da equipe foram alteradas",

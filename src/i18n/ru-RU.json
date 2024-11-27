@@ -687,7 +687,7 @@
   "featureConfigChangeModalAudioVideoDescriptionItemCameraEnabled": "Камера во время вызовов включена",
   "featureConfigChangeModalAudioVideoHeadline": "В {brandName} произошли изменения",
   "featureConfigChangeModalConferenceCallingEnabled": "Ваша команда перешла на {brandName} Enterprise, который представляет доступ к групповым вызовам и многим другим возможностям. [link]Узнать больше о {brandName} Enterprise[/link]",
-  "featureConfigChangeModalConferenceCallingTitle": "{brandName} Enterprise",
+  "featureConfigChangeModalConferenceCallingHeadline": "{brandName} Enterprise",
   "featureConfigChangeModalConversationGuestLinksDescriptionItemConversationGuestLinksDisabled": "Генерация гостевых ссылок теперь отключена для всех администраторов групп.",
   "featureConfigChangeModalConversationGuestLinksDescriptionItemConversationGuestLinksEnabled": "Генерация гостевых ссылок теперь включена для всех администраторов групп.",
   "featureConfigChangeModalConversationGuestLinksHeadline": "Настройки команды изменены",

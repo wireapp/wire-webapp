@@ -687,7 +687,7 @@
   "featureConfigChangeModalAudioVideoDescriptionItemCameraEnabled": "ඇමතුම්වල දී රූගතය සබලයි",
   "featureConfigChangeModalAudioVideoHeadline": "{brandName} හි වෙනසක් තිබේ",
   "featureConfigChangeModalConferenceCallingEnabled": "{brandName} ව්‍යවසාය වෙත ඔබගේ කණ්ඩායම උත්ශ්‍රේණි කර ඇත, දැන් සම්මන්ත්‍රණ ඇමතුම් වැනි විශේෂාංග වෙත ප්‍රවේශය තිබේ. [link]{brandName} ව්‍යවසාය[/link] ගැන තව දැනගන්න",
-  "featureConfigChangeModalConferenceCallingTitle": "{brandName} ව්‍යවසාය",
+  "featureConfigChangeModalConferenceCallingHeadline": "{brandName} Enterprise",
   "featureConfigChangeModalConversationGuestLinksDescriptionItemConversationGuestLinksDisabled": "සමූහයේ සියළුම පරිපාලකයින් සඳහා ආගන්තුක සබැඳි උත්පාදනය අබල කර ඇත.",
   "featureConfigChangeModalConversationGuestLinksDescriptionItemConversationGuestLinksEnabled": "සමූහයේ සියළුම පරිපාලකයින් සඳහා ආගන්තුක සබැඳි උත්පාදනය සබල කර ඇත.",
   "featureConfigChangeModalConversationGuestLinksHeadline": "කණ්ඩායමේ සැකසුම් සංශෝධිතයි",
