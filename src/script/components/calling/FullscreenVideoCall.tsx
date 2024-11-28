@@ -648,6 +648,7 @@ const FullscreenVideoCall = ({
                   }
                 : videoGrid
             }
+            call={call}
             setMaximizedParticipant={participant => setMaximizedParticipant(call, participant)}
           />
           {classifiedDomains && (
