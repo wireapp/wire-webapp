@@ -103,6 +103,7 @@
     "babel-loader": "9.2.1",
     "babel-plugin-transform-import-meta": "2.2.1",
     "cross-env": "7.0.3",
+    "cross-spawn": "^7.0.6",
     "css-loader": "7.1.2",
     "cssnano": "7.0.6",
     "dexie": "4.0.7",
@@ -202,7 +203,9 @@
     "test:server": "cd server && yarn test",
     "test:types": "tsc --project tsconfig.build.json --noEmit && cd server && tsc --noEmit",
     "translate:extract": "i18next-scanner 'src/{page,script}/**/*.{js,html,htm}'",
-    "translate:merge": "formatjs extract --format './bin/translations_extract_formatter.js' --out-file './src/i18n/en-US.json'"
+    "translate:merge": "formatjs extract --format './bin/translations_extract_formatter.js' --out-file './src/i18n/en-US.json'",
+    "translate:generate-types": "node ./bin/transalations_generate_types.js",
+    "typecheck": "tsc --noEmit"
   },
   "resolutions": {
     "cross-spawn": "7.0.6",

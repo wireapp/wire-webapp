@@ -393,7 +393,7 @@ const LoginComponent = ({
                   <div>
                     <H2 center>{t('login.twoFactorLoginTitle')}</H2>
                     <Text data-uie-name="label-with-email">
-                      {t('login.twoFactorLoginSubHead', {email: twoFactorLoginData.email})}
+                      {t('login.twoFactorLoginSubHead', {email: twoFactorLoginData.email as string})}
                     </Text>
                     <Label markInvalid={!!twoFactorSubmitError}>
                       <CodeInput

@@ -343,7 +343,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
         accountInfo.availability = this.userState.self().availability();
       }
 
-      this.logger.log('Publishing account info', accountInfo);
+      this.logger.log('Publishing account info', {...accountInfo, picture: null});
       amplify.publish(WebAppEvents.TEAM.INFO, accountInfo);
       return accountInfo;
     }

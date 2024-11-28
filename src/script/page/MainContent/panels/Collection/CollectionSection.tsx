@@ -46,7 +46,7 @@ const CollectionSection: React.FC<{
         <span className="label-bold-xs">{label}</span>
         {hasExtra && (
           <button className="collection-header-all accent-text" onClick={onSelect}>
-            <span data-uie-name="collection-show-all">{t('collectionShowAll', messages.length)}</span>
+            <span data-uie-name="collection-show-all">{t('collectionShowAll', {number: messages.length})}</span>
             &nbsp;<span className="icon-forward font-size-xxs"></span>
           </button>
         )}

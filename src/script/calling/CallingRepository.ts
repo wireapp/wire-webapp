@@ -631,7 +631,7 @@ export class CallingRepository {
               text: t('callDegradationAction'),
             },
             text: {
-              message: t('callDegradationDescription', participant.user.name()),
+              message: t('callDegradationDescription', {username: participant.user.name()}),
               title: t('callDegradationTitle'),
             },
           },
@@ -661,8 +661,8 @@ export class CallingRepository {
       {
         close: () => this.acceptVersionWarning(conversationId),
         text: {
-          message: t('modalCallUpdateClientMessage', brandName),
-          title: t('modalCallUpdateClientHeadline', brandName),
+          message: t('modalCallUpdateClientMessage', {brandName}),
+          title: t('modalCallUpdateClientHeadline', {brandName}),
         },
       },
       'update-client-warning',
@@ -2291,13 +2291,17 @@ export class CallingRepository {
     const modalOptions = {
       text: {
         closeBtnLabel: t('modalNoCameraCloseBtn'),
-        htmlMessage: t('modalNoCameraMessage', Config.getConfig().BRAND_NAME, {
-          '/faqLink': '</a>',
-          br: '<br>',
-          faqLink: `<a href="${
-            Config.getConfig().URL.SUPPORT.CAMERA_ACCESS_DENIED
-          }" data-uie-name="go-no-camera-faq" target="_blank" rel="noopener noreferrer">`,
-        }),
+        htmlMessage: t(
+          'modalNoCameraMessage',
+          {brandName: Config.getConfig().BRAND_NAME},
+          {
+            '/faqLink': '</a>',
+            br: '<br>',
+            faqLink: `<a href="${
+              Config.getConfig().URL.SUPPORT.CAMERA_ACCESS_DENIED
+            }" data-uie-name="go-no-camera-faq" target="_blank" rel="noopener noreferrer">`,
+          },
+        ),
         title: t('modalNoCameraTitle'),
       },
     };

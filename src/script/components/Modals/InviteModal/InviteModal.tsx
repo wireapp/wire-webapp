@@ -41,10 +41,12 @@ const InviteModal: React.FC<InviteModalProps> = ({selfUser, onClose}) => {
   const userName = selfUser.username();
   const inviteMessage = userName
     ? t('inviteMessage', {brandName: brandName, username: `@${userName}`})
-    : t('inviteMessageNoEmail', brandName);
+    : t('inviteMessageNoEmail', {brandName});
 
   const metaKey = Runtime.isMacOS() ? t('inviteMetaKeyMac') : t('inviteMetaKeyPc');
-  const inviteHint = isInviteMessageSelected ? t('inviteHintSelected', metaKey) : t('inviteHintUnselected', metaKey);
+  const inviteHint = isInviteMessageSelected
+    ? t('inviteHintSelected', {metaKey})
+    : t('inviteHintUnselected', {metaKey});
 
   const onTextClick = () => setIsInviteMessageSelected(true);
   const onBlur = () => setIsInviteMessageSelected(false);
@@ -69,7 +71,7 @@ const InviteModal: React.FC<InviteModalProps> = ({selfUser, onClose}) => {
     >
       <div className="modal__header">
         <h2 className="modal__header__title" data-uie-name="status-modal-title">
-          {t('inviteHeadline', brandName)}
+          {t('inviteHeadline', {brandName})}
         </h2>
 
         <button type="button" className="modal__header__button" onClick={onClose} data-uie-name="do-close">

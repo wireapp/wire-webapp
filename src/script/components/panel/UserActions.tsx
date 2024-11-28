@@ -211,7 +211,7 @@ const UserActions: React.FC<UserActionsProps> = ({
                 return PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
                   text: {
                     title: t('modal1To1ConversationCreateErrorNoKeyPackagesHeadline'),
-                    htmlMessage: t('modal1To1ConversationCreateErrorNoKeyPackagesMessage', user.name()),
+                    htmlMessage: t('modal1To1ConversationCreateErrorNoKeyPackagesMessage', {name: user.name()}),
                   },
                 });
               }

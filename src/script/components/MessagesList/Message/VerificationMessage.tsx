@@ -84,7 +84,7 @@ const VerificationMessage: React.FC<VerificationMessageProps> = ({message}) => {
             >
               {isSelfClient
                 ? t('conversationDeviceYourDevices')
-                : t('conversationDeviceUserDevices', userEntities[0]?.name())}
+                : t('conversationDeviceUserDevices', {user: userEntities[0]?.name()})}
             </button>
           </>
         )}

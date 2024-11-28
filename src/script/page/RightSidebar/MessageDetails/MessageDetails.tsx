@@ -121,11 +121,12 @@ const MessageDetails: FC<MessageDetailsProps> = ({
 
   const sentFooter = timestamp ? formatTime(timestamp) : '';
 
-  const receiptsTitle = t(
-    'messageDetailsTitleReceipts',
-    messageEntity?.expectsReadConfirmation ? formatUserCount(receiptUsers) : '',
-  );
-  const reactionsTitle = t('messageDetailsTitleReactions', totalNbReactions > 0 ? ` (${totalNbReactions})` : '');
+  const receiptsTitle = t('messageDetailsTitleReceipts', {
+    count: messageEntity?.expectsReadConfirmation ? formatUserCount(receiptUsers) : '',
+  });
+  const reactionsTitle = t('messageDetailsTitleReactions', {
+    count: totalNbReactions > 0 ? ` (${totalNbReactions})` : '',
+  });
 
   const panelTitle = useMemo(() => {
     if (!supportsReceipts) {
@@ -225,12 +226,12 @@ const MessageDetails: FC<MessageDetailsProps> = ({
 
       <div className="panel__footer">
         <p className="panel__footer__info" data-uie-name="status-message-details-sent">
-          {t('messageDetailsSent', sentFooter)}
+          {t('messageDetailsSent', {sent: sentFooter})}
         </p>
 
         {editedFooter && (
           <p className="panel__footer__info" data-uie-name="status-message-details-edited">
-            {t('messageDetailsEdited', editedFooter)}
+            {t('messageDetailsEdited', {edited: editedFooter})}
           </p>
         )}
       </div>
