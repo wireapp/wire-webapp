@@ -38,6 +38,7 @@ export const teamUpgradeBannerButtonCss: CSSObject = {
   fontSize: 'var(--font-size-medium)',
   padding: '0.25rem 0.5rem',
   borderRadius: '12px',
+  minWidth: '9rem',
 };
 
 export const iconButtonCss: CSSObject = {
@@ -133,7 +134,12 @@ export const teamUpgradeBannerContainerCss: CSSObject = {
   marginBottom: '4px',
   padding: '0.5rem',
   border: '1px solid var(--accent-color-500)',
-  boxShadow: '0px 0px 12px 0px var(--background-fade-32)',
   // fixed with the width of collapsable sidebar
   width: '203px',
+};
+
+export const bannerWrapperCss: CSSObject = {
+  marginLeft: '40px',
+  boxShadow: '0px 0px 12px 0px var(--background-fade-32)',
+  borderRadius: '0.5rem',
 };
