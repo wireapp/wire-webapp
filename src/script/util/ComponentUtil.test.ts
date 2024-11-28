@@ -46,25 +46,23 @@ describe('ComponentUtil', () => {
     });
 
     it('returns a new object when the observed object changes', () => {
-      const {result, rerender} = renderHook(({obj}) => useKoSubscribableChildren(obj, ['observableA', 'observableB']), {
-        initialProps: {
-          obj: {
-            observableA: ko.observable(1),
-            observableB: ko.observable(0),
-          },
-        },
-      });
+      const obj = {
+        observableA: ko.observable(1),
+        observableB: ko.observable(0),
+      };
+
+      const {result} = renderHook(() => useKoSubscribableChildren(obj, ['observableA', 'observableB']));
       const preResult = result.current;
-      rerender({
-        obj: {
-          observableA: ko.observable(0),
-          observableB: ko.observable(1),
-        },
-      });
-      const postResult = result.current;
 
       expect(preResult).toEqual({observableA: 1, observableB: 0});
 
+      act(() => {
+        obj.observableA(0);
+        obj.observableB(1);
+        jest.advanceTimersByTime(1);
+      });
+
+      const postResult = result.current;
       expect(postResult).toEqual({observableA: 0, observableB: 1});
     });
   });
