@@ -752,12 +752,16 @@ export class CallingRepository {
       }
 
       case CALL_MESSAGE_TYPE.EMOJIS: {
-        const call = this.findCall(conversationId);
-        if (!call || !this.selfUser) {
+        const currentCall = this.callState.joinedCall();
+        if (
+          !currentCall ||
+          !matchQualifiedIds(currentCall.conversation.qualifiedId, conversationId) ||
+          !this.selfUser
+        ) {
           return;
         }
 
-        const senderParticipant = call
+        const senderParticipant = currentCall
           .participants()
           .find(participant => matchQualifiedIds(participant.user.qualifiedId, userId));
 
