@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useMemo, useState} from 'react';
+import {useEffect, useState} from 'react';
 
 import ko, {Unwrapped} from 'knockout';
 import {isEqual} from 'underscore';
@@ -54,6 +54,8 @@ const subscribeProperties = <C extends keyof Subscribables<P>, P extends Partial
   children?: C[],
 ) => {
   const properties = children ?? (Object.keys(object).filter(key => key !== '$raw') as C[]);
+  onUpdate(resolveObservables(object, children));
+
   const subscriptions = properties
     .filter(child => ko.isSubscribable(object?.[child]))
     .map(child => {
@@ -75,26 +77,25 @@ export const useKoSubscribableChildren = <
   parent: P,
   children: C[],
 ): UnwrappedValues<Pick<P, C>> => {
-  const [state, setState] = useState<UnwrappedValues<P>>(() => resolveObservables(parent, children));
-  const memoizedParent = useMemo(() => parent, [parent]); // Memoize parent to avoid unnecessary re-subscribing
+  const [state, setState] = useState<UnwrappedValues<P>>(resolveObservables(parent, children));
 
   useEffect(() => {
-    let currentState = resolveObservables(memoizedParent, children);
+    let currentState = state;
 
-    const handleUpdate = (updates: Partial<UnwrappedValues<P>>) => {
-      // Perform a deep equality check to ensure no unnecessary state updates
-      const nextState = {...currentState, ...updates};
+    const onUpdate = (updates: Partial<UnwrappedValues<P>>) => {
+      const updatedState = {...currentState, ...updates};
 
-      if (!isEqual(currentState, nextState)) {
-        currentState = nextState; // Update the local state tracker
-        setState(nextState); // Update React state
+      if (!isEqual(currentState, updatedState)) {
+        // eslint-disable-next-line no-console
+        console.log('[ComponentUtil.ts] przemvs updatedState', updatedState);
+        currentState = updatedState;
+        setState(updatedState);
       }
     };
 
-    const subscription = subscribeProperties(memoizedParent, handleUpdate, children);
-
+    const subscription = subscribeProperties(parent, onUpdate, children);
     return () => subscription.dispose();
-  }, [memoizedParent, children]);
+  }, [parent]);
 
   return state;
 };
