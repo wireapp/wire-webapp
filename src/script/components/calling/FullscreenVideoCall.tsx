@@ -561,6 +561,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   }
                 : videoGrid
             }
+            call={call}
             setMaximizedParticipant={participant => setMaximizedParticipant(call, participant)}
           />
           {classifiedDomains && (
