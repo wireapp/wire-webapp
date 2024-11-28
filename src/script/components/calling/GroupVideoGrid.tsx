@@ -22,8 +22,12 @@ import React, {CSSProperties, useEffect, useState} from 'react';
 import {css} from '@emotion/react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
+import {QUERY} from '@wireapp/react-ui-kit';
+
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import * as Icon from 'Components/Icon';
+import {useActiveWindowMatchMedia} from 'Hooks/useActiveWindowMatchMedia';
+import {Call} from 'src/script/calling/Call';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -38,6 +42,7 @@ export interface GroupVideoGripProps {
   maximizedParticipant: Participant | null;
   minimized?: boolean;
   selfParticipant: Participant;
+  call: Call;
   setMaximizedParticipant?: (participant: Participant | null) => void;
 }
 
@@ -46,9 +51,52 @@ interface RowsAndColumns extends CSSProperties {
   '--rows': number;
 }
 
-const calculateRowsAndColumns = (totalCount: number): RowsAndColumns => {
-  const columns = totalCount ? Math.ceil(Math.sqrt(totalCount)) : 1;
+const COLUMNS = {
+  DESKTOP: 3,
+  DESKTOP_EDGE_CASE: 2,
+  TABLET: 2,
+  MOBILE: 1,
+};
+
+const PARTICIPANTS_DESKTOP_EDGE_CASE = 3;
+
+const getDesiredColumns = ({
+  totalCount,
+  isDesktop,
+  isTablet,
+  isShort,
+}: {
+  totalCount: number;
+  isDesktop: boolean;
+  isTablet: boolean;
+  isShort: boolean;
+}): number => {
+  if (isDesktop) {
+    // Special case: use different layout for 3 participants when not in short mode
+    if (totalCount === PARTICIPANTS_DESKTOP_EDGE_CASE && !isShort) {
+      return COLUMNS.DESKTOP_EDGE_CASE;
+    }
+    return COLUMNS.DESKTOP;
+  }
+
+  if (isTablet) {
+    return COLUMNS.TABLET;
+  }
+
+  return COLUMNS.MOBILE;
+};
+
+const calculateRowsAndColumns = (params: {
+  totalCount: number;
+  isTablet: boolean;
+  isDesktop: boolean;
+  isShort: boolean;
+}): RowsAndColumns => {
+  const {totalCount} = params;
+  const desiredColumns = getDesiredColumns(params);
+  const columns = Math.min(totalCount, desiredColumns);
   const rows = totalCount ? Math.ceil(totalCount / columns) : 1;
+
   return {'--columns': columns, '--rows': rows};
 };
 
@@ -76,13 +124,27 @@ const GroupVideoThumbnailWrapper: React.FC<{children?: React.ReactNode; minimize
   </div>
 );
 
+const HEIGHT_QUERIES = {
+  SHORT: 'max-height: 469px',
+  MEDIUM: 'min-height: 470px) and (max-height: 829px',
+  TALL: 'min-height: 830px',
+};
+
 const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
   minimized = false,
   grid,
   selfParticipant,
   maximizedParticipant,
+  call,
   setMaximizedParticipant,
 }) => {
+  const isMobile = useActiveWindowMatchMedia(QUERY.mobile);
+  const isTablet = useActiveWindowMatchMedia(QUERY.tablet);
+  const isDesktop = useActiveWindowMatchMedia(QUERY.desktop);
+  const isShort = useActiveWindowMatchMedia(HEIGHT_QUERIES.SHORT);
+  const isMedium = useActiveWindowMatchMedia(HEIGHT_QUERIES.MEDIUM);
+  const isTall = useActiveWindowMatchMedia(HEIGHT_QUERIES.TALL);
+
   const thumbnail = useKoSubscribableChildren(grid.thumbnail!, [
     'hasActiveVideo',
     'sharesScreen',
@@ -90,7 +152,14 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
     'blurredVideoStream',
   ]);
 
-  const [rowsAndColumns, setRowsAndColumns] = useState<RowsAndColumns>(calculateRowsAndColumns(grid?.grid.length));
+  const [rowsAndColumns, setRowsAndColumns] = useState<RowsAndColumns>(
+    calculateRowsAndColumns({
+      totalCount: grid?.grid.length,
+      isTablet: isTablet,
+      isDesktop: isDesktop,
+      isShort: isShort,
+    }),
+  );
 
   const doubleClickedOnVideo = (userId: QualifiedId, clientId: string) => {
     if (typeof setMaximizedParticipant !== 'function') {
@@ -111,8 +180,45 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
   const participants = (maximizedParticipant ? [maximizedParticipant] : grid.grid).filter(Boolean);
 
   useEffect(() => {
-    setRowsAndColumns(calculateRowsAndColumns(participants.length));
-  }, [participants.length]);
+    setRowsAndColumns(
+      calculateRowsAndColumns({
+        totalCount: participants.length,
+        isTablet: isTablet,
+        isDesktop: isDesktop,
+        isShort: isShort,
+      }),
+    );
+  }, [participants.length, isTablet, isDesktop, isShort]);
+
+  useEffect(() => {
+    const PARTICIPANTS_LIMITS = {
+      TABLET: {SHORT: 2, MEDIUM: 4, TALL: 8},
+      DESKTOP: {SHORT: 3, MEDIUM: 6, TALL: 9},
+      MOBILE: {SHORT: 1, MEDIUM: 2, TALL: 4},
+    };
+
+    const setParticipantsForDevice = (limits: {SHORT: number; MEDIUM: number; TALL: number}) => {
+      if (isShort) {
+        return call.setNumberOfParticipantsInOnePage(limits.SHORT);
+      }
+      if (isMedium) {
+        return call.setNumberOfParticipantsInOnePage(limits.MEDIUM);
+      }
+      if (isTall) {
+        return call.setNumberOfParticipantsInOnePage(limits.TALL);
+      }
+    };
+
+    if (isTablet) {
+      return setParticipantsForDevice(PARTICIPANTS_LIMITS.TABLET);
+    }
+    if (isDesktop) {
+      return setParticipantsForDevice(PARTICIPANTS_LIMITS.DESKTOP);
+    }
+    if (isMobile) {
+      setParticipantsForDevice(PARTICIPANTS_LIMITS.MOBILE);
+    }
+  }, [call, isTablet, isDesktop, isMobile, isShort, isMedium, isTall]);
 
   const {isMuted: selfIsMuted, handRaisedAt: selfHandRaisedAt} = useKoSubscribableChildren(selfParticipant, [
     'isMuted',
