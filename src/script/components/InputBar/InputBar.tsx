@@ -46,7 +46,7 @@ import {formatLocale, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {getFileExtension} from 'Util/util';
 
 import {ControlButtons} from './components/InputBarControls/ControlButtons';
-import {GiphyButton} from './components/InputBarControls/GiphyButton';
+import {GiphyButton} from './components/InputBarControls/GiphyButton/GiphyButton';
 import {PastedFileControls} from './components/PastedFileControls';
 import {ReplyBar} from './components/ReplyBar';
 import {TypingIndicator} from './components/TypingIndicator/TypingIndicator';
@@ -635,16 +635,14 @@ export const InputBar = ({
                       </ul>
                     </>
                   ) : (
-                    <>
-                      <ul
-                        className={cx('controls-right buttons-group', {
-                          'controls-right-shrinked': textValue.length !== 0,
-                        })}
-                      >
-                        <ControlButtons {...controlButtonsProps} showGiphyButton={showGiphyButton} />
-                        <SendMessageButton disabled={!enableSending} onSend={handleSendMessage} />
-                      </ul>
-                    </>
+                    <ul
+                      className={cx('controls-right buttons-group', {
+                        'controls-right-shrinked': textValue.length !== 0,
+                      })}
+                    >
+                      <ControlButtons {...controlButtonsProps} showGiphyButton={showGiphyButton} />
+                      <SendMessageButton disabled={!enableSending} onSend={handleSendMessage} />
+                    </ul>
                   )}
                 </RichTextEditor>
               )}

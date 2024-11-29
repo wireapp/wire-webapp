@@ -136,6 +136,26 @@ const parseMentions = (editor: LexicalEditor, textValue: string, mentions: User[
   });
 };
 
+const editorConfig: InitialConfigType = {
+  namespace: 'WireLexicalEditor',
+  theme,
+  onError(error: unknown) {
+    logger.error(error);
+  },
+  nodes: [
+    MentionNode,
+    EmojiNode,
+    ListItemNode,
+    ListNode,
+    HeadingNode,
+    HorizontalRuleNode,
+    QuoteNode,
+    CodeNode,
+    CodeHighlightNode,
+    LinkNode,
+  ],
+};
+
 export const RichTextEditor = ({
   placeholder,
   children,
@@ -154,30 +174,9 @@ export const RichTextEditor = ({
   onSend,
   onSetup = () => {},
 }: RichTextEditorProps) => {
-  // Emojis
+  const editorRef = useRef<LexicalEditor | null>(null);
   const emojiPickerOpen = useRef<boolean>(true);
   const mentionsOpen = useRef<boolean>(true);
-  const editorRef = useRef<LexicalEditor | null>(null);
-
-  const editorConfig: InitialConfigType = {
-    namespace: 'WireLexicalEditor',
-    theme,
-    onError(error: unknown) {
-      logger.error(error);
-    },
-    nodes: [
-      MentionNode,
-      EmojiNode,
-      ListItemNode,
-      ListNode,
-      HeadingNode,
-      HorizontalRuleNode,
-      QuoteNode,
-      CodeNode,
-      CodeHighlightNode,
-      LinkNode,
-    ],
-  };
 
   const handleChange = (editorState: EditorState) => {
     saveDraftState(JSON.stringify(editorState.toJSON()));

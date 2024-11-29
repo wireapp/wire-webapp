@@ -17,32 +17,23 @@
  *
  */
 
-import {ElementType} from 'react';
+import * as Icon from 'Components/Icon';
+import {t} from 'Util/LocalizerUtil';
 
-import {css} from '@emotion/react';
-
-import {buttonActiveStyles, buttonStyles} from './FormatButton.styles';
-
-interface FormatButtonProps {
-  label: string;
-  icon: ElementType<any>;
-  active: boolean;
+interface CancelEditButtonProps {
   onClick: () => void;
 }
 
-export const FormatButton = ({label, icon: Icon, active, onClick}: FormatButtonProps) => {
+export const CancelEditButton = ({onClick}: CancelEditButtonProps) => {
   return (
     <button
-      title={label}
-      aria-label={label}
-      css={css`
-        ${buttonStyles};
-        ${active && buttonActiveStyles};
-      `}
+      type="button"
+      className="controls-right-button button-icon-large"
       onClick={onClick}
-      data-uie-name={`format-text-${label}`}
+      data-uie-name="do-cancel-edit"
+      aria-label={t('accessibility.cancelMsgEdit')}
     >
-      <Icon />
+      <Icon.CloseIcon />
     </button>
   );
 };

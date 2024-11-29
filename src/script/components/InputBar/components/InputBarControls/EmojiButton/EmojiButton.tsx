@@ -17,32 +17,34 @@
  *
  */
 
-import {ElementType} from 'react';
+import type {MouseEvent} from 'react';
 
-import {css} from '@emotion/react';
+import cx from 'classnames';
 
-import {buttonActiveStyles, buttonStyles} from './FormatButton.styles';
+import {EmojiIcon} from '@wireapp/react-ui-kit';
 
-interface FormatButtonProps {
-  label: string;
-  icon: ElementType<any>;
-  active: boolean;
-  onClick: () => void;
+import {t} from 'Util/LocalizerUtil';
+
+interface EmojiButtonProps {
+  isScaledDown: boolean;
+  isActive: boolean;
+  onClick: (event: MouseEvent<HTMLButtonElement>) => void;
 }
 
-export const FormatButton = ({label, icon: Icon, active, onClick}: FormatButtonProps) => {
+export const EmojiButton = ({isScaledDown, isActive, onClick}: EmojiButtonProps) => {
   return (
     <button
-      title={label}
-      aria-label={label}
-      css={css`
-        ${buttonStyles};
-        ${active && buttonActiveStyles};
-      `}
+      className={cx('controls-right-button no-radius', {
+        active: isActive,
+        'controls-right-button_responsive': isScaledDown,
+      })}
+      type="button"
       onClick={onClick}
-      data-uie-name={`format-text-${label}`}
+      title={t('tooltipConversationEmoji')}
+      aria-label={t('tooltipConversationEmoji')}
+      data-uie-name="add-emoji"
     >
-      <Icon />
+      <EmojiIcon />
     </button>
   );
 };

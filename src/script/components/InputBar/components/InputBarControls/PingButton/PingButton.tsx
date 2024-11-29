@@ -17,32 +17,31 @@
  *
  */
 
-import {ElementType} from 'react';
+import cx from 'classnames';
 
-import {css} from '@emotion/react';
+import * as Icon from 'Components/Icon';
+import {t} from 'Util/LocalizerUtil';
 
-import {buttonActiveStyles, buttonStyles} from './FormatButton.styles';
-
-interface FormatButtonProps {
-  label: string;
-  icon: ElementType<any>;
-  active: boolean;
+interface PingButtonProps {
   onClick: () => void;
+  isDisabled: boolean;
+  isScaledDown: boolean;
 }
 
-export const FormatButton = ({label, icon: Icon, active, onClick}: FormatButtonProps) => {
+export const PingButton = ({isDisabled, isScaledDown, onClick}: PingButtonProps) => {
   return (
     <button
-      title={label}
-      aria-label={label}
-      css={css`
-        ${buttonStyles};
-        ${active && buttonActiveStyles};
-      `}
+      className={cx('conversation-button controls-right-button no-radius', {
+        'controls-right-button_responsive': isScaledDown,
+      })}
+      type="button"
       onClick={onClick}
-      data-uie-name={`format-text-${label}`}
+      disabled={isDisabled}
+      title={t('tooltipConversationPing')}
+      aria-label={t('tooltipConversationPing')}
+      data-uie-name="do-ping"
     >
-      <Icon />
+      <Icon.PingIcon />
     </button>
   );
 };

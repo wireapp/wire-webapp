@@ -19,14 +19,14 @@
 
 import React, {MouseEvent} from 'react';
 
-import {EmojiIcon} from '@wireapp/react-ui-kit';
-
-import * as Icon from 'Components/Icon';
 import {Config} from 'src/script/Config';
 import {Conversation} from 'src/script/entity/Conversation';
-import {t} from 'Util/LocalizerUtil';
 
-import {GiphyButton} from './GiphyButton';
+import {CancelEditButton} from './CancelEditButton/CancelEditButton';
+import {EmojiButton} from './EmojiButton/EmojiButton';
+import {FormatTextButton} from './FormatTextButton/FormatTextButton';
+import {GiphyButton} from './GiphyButton/GiphyButton';
+import {PingButton} from './PingButton/PingButton';
 
 import {AssetUploadButton} from '../AssetUploadButton';
 import {ImageUploadButton} from '../ImageUploadButton';
@@ -69,55 +69,23 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
   onFormatClick,
   onEmojiClick,
 }) => {
-  const pingTooltip = t('tooltipConversationPing');
-
   if (isEditing) {
     return (
       <li>
-        <button
-          type="button"
-          className="controls-right-button button-icon-large"
-          onClick={onCancelEditing}
-          data-uie-name="do-cancel-edit"
-          aria-label={t('accessibility.cancelMsgEdit')}
-        >
-          <Icon.CloseIcon />
-        </button>
+        <CancelEditButton onClick={onCancelEditing} />
       </li>
     );
   }
 
   if (input.length === 0 || isScaledDown) {
-    const scaledDownClass = isScaledDown && 'controls-right-button_responsive';
-
     return (
       <>
         <li>
-          <button
-            className={`controls-right-button buttons-group-button-left ${scaledDownClass} ${isFormatActive ? 'active' : ''}`}
-            type="button"
-            onClick={onFormatClick}
-            title="rich text"
-            aria-label="rich text"
-            data-uie-name="format-text"
-          >
-            <Icon.MarkdownIcon />
-          </button>
+          <FormatTextButton isActive={isFormatActive} isScaledDown={!!isScaledDown} onClick={onFormatClick} />
         </li>
-
         <li>
-          <button
-            className={`controls-right-button no-radius ${scaledDownClass} ${isEmojiActive ? 'active' : ''}`}
-            type="button"
-            onClick={onEmojiClick}
-            title="rich text"
-            aria-label="rich text"
-            data-uie-name="format-text"
-          >
-            <EmojiIcon />
-          </button>
+          <EmojiButton isScaledDown={!!isScaledDown} isActive={isEmojiActive} onClick={onEmojiClick} />
         </li>
-
         {!disableFilesharing && (
           <>
             <li>
@@ -126,7 +94,6 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
                 acceptedImageTypes={Config.getConfig().ALLOWED_IMAGE_TYPES}
               />
             </li>
-
             <li>
               <AssetUploadButton
                 onSelectFiles={onSelectFiles}
@@ -135,21 +102,9 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
             </li>
           </>
         )}
-
         <li>
-          <button
-            className={`conversation-button controls-right-button no-radius ${scaledDownClass}`}
-            type="button"
-            onClick={onClickPing}
-            disabled={disablePing}
-            title={pingTooltip}
-            aria-label={pingTooltip}
-            data-uie-name="do-ping"
-          >
-            <Icon.PingIcon />
-          </button>
+          <PingButton isDisabled={!!disablePing} isScaledDown={!!isScaledDown} onClick={onClickPing} />
         </li>
-
         <li>
           <MessageTimerButton conversation={conversation} />
         </li>
@@ -162,29 +117,10 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
       {showGiphyButton && !disableFilesharing && (
         <>
           <li>
-            <button
-              className={`controls-right-button buttons-group-button-left ${isFormatActive ? 'active' : ''}`}
-              type="button"
-              onClick={onFormatClick}
-              title="rich text"
-              aria-label="rich text"
-              data-uie-name="format-text"
-            >
-              <Icon.MarkdownIcon />
-            </button>
+            <FormatTextButton isActive={isFormatActive} isScaledDown={false} onClick={onFormatClick} />
           </li>
-
           <li>
-            <button
-              className={`controls-right-button no-radius ${isEmojiActive ? 'active' : ''}`}
-              type="button"
-              onClick={onEmojiClick}
-              title="rich text"
-              aria-label="rich text"
-              data-uie-name="format-text"
-            >
-              <EmojiIcon />
-            </button>
+            <EmojiButton isActive={isEmojiActive} isScaledDown={false} onClick={onEmojiClick} />
           </li>
           <GiphyButton onGifClick={onGifClick} />
         </>
