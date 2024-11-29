@@ -33,6 +33,7 @@ const GiphyButton: React.FC<GiphyButtonProps> = ({onGifClick}) => {
     <>
       <li>
         <IconButton
+          className="buttons-group-button-right"
           type="button"
           css={{marginBottom: '0'}}
           title={t('extensionsBubbleButtonGif')}

@@ -55,6 +55,7 @@ const markdownit = new MarkdownIt('zero', {
   'linkify',
   'newline',
   'list',
+  'strikethrough',
 ]);
 
 const originalFenceRule = markdownit.renderer.rules.fence!;

@@ -4474,7 +4474,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lexical/rich-text@npm:0.20.0":
+"@lexical/rich-text@npm:0.20.0, @lexical/rich-text@npm:^0.20.0":
   version: 0.20.0
   resolution: "@lexical/rich-text@npm:0.20.0"
   dependencies:
@@ -18696,6 +18696,7 @@ __metadata:
     "@lexical/list": "npm:^0.20.0"
     "@lexical/markdown": "npm:^0.20.0"
     "@lexical/react": "npm:0.20.0"
+    "@lexical/rich-text": "npm:^0.20.0"
     "@mediapipe/tasks-vision": "npm:0.10.18"
     "@roamhq/wrtc": "npm:0.8.0"
     "@testing-library/dom": "npm:^10.4.0"

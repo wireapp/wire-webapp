@@ -17,7 +17,9 @@
  *
  */
 
-import React from 'react';
+import React, {MouseEvent} from 'react';
+
+import {EmojiIcon} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
 import {Config} from 'src/script/Config';
@@ -37,6 +39,8 @@ export type ControlButtonsProps = {
   disableFilesharing?: boolean;
   isEditing?: boolean;
   isScaledDown?: boolean;
+  isFormatActive: boolean;
+  isEmojiActive: boolean;
   showGiphyButton?: boolean;
   onClickPing: () => void;
   onSelectFiles: (files: File[]) => void;
@@ -44,6 +48,7 @@ export type ControlButtonsProps = {
   onCancelEditing: () => void;
   onGifClick: () => void;
   onFormatClick: () => void;
+  onEmojiClick: (event: MouseEvent<HTMLButtonElement>) => void;
 };
 
 const ControlButtons: React.FC<ControlButtonsProps> = ({
@@ -53,6 +58,8 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
   input,
   isEditing,
   isScaledDown,
+  isFormatActive,
+  isEmojiActive,
   showGiphyButton,
   onClickPing,
   onSelectFiles,
@@ -60,6 +67,7 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
   onCancelEditing,
   onGifClick,
   onFormatClick,
+  onEmojiClick,
 }) => {
   const pingTooltip = t('tooltipConversationPing');
 
@@ -86,7 +94,7 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
       <>
         <li>
           <button
-            className={`controls-right-button buttons-group-button-left ${scaledDownClass}`}
+            className={`controls-right-button buttons-group-button-left ${scaledDownClass} ${isFormatActive ? 'active' : ''}`}
             type="button"
             onClick={onFormatClick}
             title="rich text"
@@ -96,19 +104,20 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
             <Icon.MarkdownIcon />
           </button>
         </li>
+
         <li>
           <button
-            className={`conversation-button controls-right-button no-radius ${scaledDownClass}`}
+            className={`controls-right-button no-radius ${scaledDownClass} ${isEmojiActive ? 'active' : ''}`}
             type="button"
-            onClick={onClickPing}
-            disabled={disablePing}
-            title={pingTooltip}
-            aria-label={pingTooltip}
-            data-uie-name="do-ping"
+            onClick={onEmojiClick}
+            title="rich text"
+            aria-label="rich text"
+            data-uie-name="format-text"
           >
-            <Icon.PingIcon />
+            <EmojiIcon />
           </button>
         </li>
+
         {!disableFilesharing && (
           <>
             <li>
@@ -128,13 +137,60 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
         )}
 
         <li>
+          <button
+            className={`conversation-button controls-right-button no-radius ${scaledDownClass}`}
+            type="button"
+            onClick={onClickPing}
+            disabled={disablePing}
+            title={pingTooltip}
+            aria-label={pingTooltip}
+            data-uie-name="do-ping"
+          >
+            <Icon.PingIcon />
+          </button>
+        </li>
+
+        <li>
           <MessageTimerButton conversation={conversation} />
         </li>
       </>
     );
   }
 
-  return <>{showGiphyButton && !disableFilesharing && <GiphyButton onGifClick={onGifClick} />}</>;
+  return (
+    <>
+      {showGiphyButton && !disableFilesharing && (
+        <>
+          <li>
+            <button
+              className={`controls-right-button buttons-group-button-left ${isFormatActive ? 'active' : ''}`}
+              type="button"
+              onClick={onFormatClick}
+              title="rich text"
+              aria-label="rich text"
+              data-uie-name="format-text"
+            >
+              <Icon.MarkdownIcon />
+            </button>
+          </li>
+
+          <li>
+            <button
+              className={`controls-right-button no-radius ${isEmojiActive ? 'active' : ''}`}
+              type="button"
+              onClick={onEmojiClick}
+              title="rich text"
+              aria-label="rich text"
+              data-uie-name="format-text"
+            >
+              <EmojiIcon />
+            </button>
+          </li>
+          <GiphyButton onGifClick={onGifClick} />
+        </>
+      )}
+    </>
+  );
 };
 
 export {ControlButtons};

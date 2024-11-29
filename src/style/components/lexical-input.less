@@ -168,3 +168,51 @@
   flex-grow: 1;
   line-height: 20px;
 }
+
+.editor-bold {
+  font-weight: bold;
+}
+
+.editor-italic {
+  font-style: italic;
+}
+
+.editor-underline {
+  text-decoration: underline;
+}
+
+.editor-strikethrough {
+  text-decoration: line-through;
+}
+
+.editor-underline.editor-strikethrough {
+  text-decoration: underline line-through;
+}
+
+.editor-code {
+  display: inline-block;
+  padding: 2px 4px;
+  border-radius: 4px;
+  background: var(--foreground-fade-8);
+}
+
+.editor-list {
+  padding-left: 24px;
+  margin: 0;
+}
+
+.editor-list--unordered {
+  list-style-type: disc;
+}
+
+.editor-list--ordered {
+  list-style-type: decimal;
+}
+
+.editor-heading {
+  margin: 8px 0;
+}
+
+.editor-heading--1 {
+  font-size: var(--font-size-large);
+}

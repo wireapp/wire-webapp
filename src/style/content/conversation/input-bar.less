@@ -29,7 +29,7 @@
     z-index: 10;
     display: flex;
     flex-wrap: wrap;
-    padding-right: 8px;
+    padding: 0 8px 0 24px;
     background-color: var(--input-bar-bg);
 
     &--editing,
@@ -102,13 +102,24 @@
   align-items: center;
 }
 
+.input-bar-center {
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
 .controls-right {
   .list-unstyled;
 
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: flex-end;
   margin: 0;
+  margin-bottom: 8px;
+
+  li {
+    margin-bottom: 8px;
+  }
 
   &.controls-right-shrinked {
     min-width: auto;
@@ -143,9 +154,10 @@
   body.theme-dark &--send {
     width: 40px;
     height: 40px;
-    align-self: center;
+    align-self: flex-end;
     border: 0;
     border-radius: 50%;
+    margin-bottom: 6px;
     margin-left: 10px;
     background-color: var(--accent-color-500);
     color: var(--white);

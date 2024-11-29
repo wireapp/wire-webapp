@@ -21,15 +21,15 @@ import {useCallback, useEffect, useRef, useState} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
-import {CLEAR_EDITOR_COMMAND, LexicalEditor} from 'lexical';
+import {CLEAR_EDITOR_COMMAND, LexicalEditor, $createTextNode, $insertNodes} from 'lexical';
 import {container} from 'tsyringe';
 
 import {useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import {checkFileSharingPermission} from 'Components/Conversation/utils/checkFileSharingPermission';
+import {EmojiPicker} from 'Components/EmojiPicker/EmojiPicker';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
 import {RichTextContent, RichTextEditor} from 'Components/RichTextEditor';
@@ -50,8 +50,10 @@ import {GiphyButton} from './components/InputBarControls/GiphyButton';
 import {PastedFileControls} from './components/PastedFileControls';
 import {ReplyBar} from './components/ReplyBar';
 import {TypingIndicator} from './components/TypingIndicator/TypingIndicator';
-import {useFilePaste} from './hooks/useFilePaste';
-import {useTypingIndicator} from './hooks/useTypingIndicator';
+import {useEmojiPicker} from './hooks/useEmojiPicker/useEmojiPicker';
+import {useFilePaste} from './hooks/useFilePaste/useFilePaste';
+import {useFormatToolbar} from './hooks/useFormatToolbar/useFormatToolbar';
+import {useTypingIndicator} from './hooks/useTypingIndicator/useTypingIndicator';
 import {handleClickOutsideOfInputBar, IgnoreOutsideClickWrapper} from './util/clickHandlers';
 import {loadDraftState, saveDraftState} from './util/DraftStateUtil';
 
@@ -74,10 +76,6 @@ import {TeamState} from '../../team/TeamState';
 const CONFIG = {
   ...Config.getConfig(),
   PING_TIMEOUT: TIME_IN_MILLIS.SECOND * 2,
-};
-
-const config = {
-  GIPHY_TEXT_LENGTH: 256,
 };
 
 interface InputBarProps {
@@ -108,7 +106,6 @@ export const InputBar = ({
   propertiesRepository,
   searchRepository,
   storageRepository,
-  selfUser,
   teamState = container.resolve(TeamState),
   onShiftTab,
   uploadDroppedFiles,
@@ -133,6 +130,8 @@ export const InputBar = ({
     'isIncomingRequest',
   ]);
 
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
   // Lexical
   const editorRef = useRef<LexicalEditor | null>(null);
 
@@ -146,6 +145,17 @@ export const InputBar = ({
   const [editedMessage, setEditedMessage] = useState<ContentMessage | undefined>();
   const [replyMessageEntity, setReplyMessageEntity] = useState<ContentMessage | null>(null);
   const textValue = messageContent.text;
+
+  const formatToolbar = useFormatToolbar();
+
+  const emojiPicker = useEmojiPicker({
+    wrapperRef,
+    onEmojiPicked: emoji => {
+      editorRef.current?.update(() => {
+        $insertNodes([$createTextNode(emoji)]);
+      });
+    },
+  });
 
   // Files
   const [pastedFile, setPastedFile] = useState<File | null>(null);
@@ -170,7 +180,7 @@ export const InputBar = ({
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
   const isScaledDown = useMatchMedia('max-width: 768px');
 
-  const showGiphyButton = textValue.length > 0 && textValue.length <= config.GIPHY_TEXT_LENGTH;
+  const showGiphyButton = textValue.length > 0;
 
   const shouldReplaceEmoji = useUserPropertyValue(
     () => propertiesRepository.getPreference(PROPERTIES_TYPE.EMOJI.REPLACE_INLINE),
@@ -541,100 +551,121 @@ export const InputBar = ({
     onSelectFiles: uploadFiles,
     onSelectImages: uploadImages,
     showGiphyButton: showGiphyButton,
+    isFormatActive: formatToolbar.open,
+    onFormatClick: formatToolbar.handleClick,
+    isEmojiActive: emojiPicker.open,
+    onEmojiClick: emojiPicker.handleToggle,
   };
 
   const enableSending = textValue.length > 0;
 
   return (
-    <IgnoreOutsideClickWrapper
-      id={conversationInputBarClassName}
-      className={cx(conversationInputBarClassName, {'is-right-panel-open': isRightSidebarOpen})}
-      aria-live="assertive"
-    >
-      {isTypingIndicatorEnabled && <TypingIndicator conversationId={conversation.id} />}
-
-      {classifiedDomains && !isConnectionRequest && (
-        <ConversationClassifiedBar conversation={conversation} classifiedDomains={classifiedDomains} />
-      )}
-
-      {isReplying && !isEditing && <ReplyBar replyMessageEntity={replyMessageEntity} onCancel={handleCancelReply} />}
-
-      <div
-        className={cx(`${conversationInputBarClassName}__input`, {
-          [`${conversationInputBarClassName}__input--editing`]: isEditing,
-        })}
+    <div ref={wrapperRef}>
+      <IgnoreOutsideClickWrapper
+        id={conversationInputBarClassName}
+        className={cx(conversationInputBarClassName, {'is-right-panel-open': isRightSidebarOpen})}
+        aria-live="assertive"
       >
-        {!isOutgoingRequest && (
-          <>
-            <div className="controls-left">
-              {!!textValue.length && (
-                <Avatar
-                  className="cursor-default"
-                  participant={selfUser}
-                  avatarSize={AVATAR_SIZE.X_SMALL}
-                  hideAvailabilityStatus
-                />
-              )}
-            </div>
+        {isTypingIndicatorEnabled && <TypingIndicator conversationId={conversation.id} />}
 
-            {!isSelfUserRemoved && !pastedFile && (
-              <RichTextEditor
-                onSetup={lexical => {
-                  editorRef.current = lexical;
-                }}
-                editedMessage={editedMessage}
-                onEscape={() => {
-                  if (editedMessage) {
-                    cancelMessageEditing(true);
-                  } else if (replyMessageEntity) {
-                    cancelMessageReply();
-                  }
-                }}
-                onArrowUp={() => {
-                  if (textValue.length === 0) {
-                    editMessage(conversation.getLastEditableMessage());
-                  }
-                }}
-                getMentionCandidates={getMentionCandidates}
-                replaceEmojis={shouldReplaceEmoji}
-                placeholder={inputPlaceholder}
-                onUpdate={setMessageContent}
-                hasLocalEphemeralTimer={hasLocalEphemeralTimer}
-                saveDraftState={saveDraft}
-                loadDraftState={loadDraft}
-                onShiftTab={onShiftTab}
-                onSend={handleSendMessage}
-                onBlur={() => isTypingRef.current && conversationRepository.sendTypingStop(conversation)}
-              >
-                {isScaledDown ? (
-                  <>
-                    <ul className="controls-right buttons-group" css={{minWidth: '95px'}}>
-                      {showGiphyButton && <GiphyButton onGifClick={onGifClick} />}
-                      <SendMessageButton disabled={!enableSending} onSend={handleSendMessage} />
-                    </ul>
-                    <ul className="controls-right buttons-group" css={{justifyContent: 'center', width: '100%'}}>
-                      <ControlButtons {...controlButtonsProps} isScaledDown={isScaledDown} />
-                    </ul>
-                  </>
-                ) : (
-                  <>
-                    <ul
-                      className={cx('controls-right buttons-group', {
-                        'controls-right-shrinked': textValue.length !== 0,
-                      })}
-                    >
-                      <ControlButtons {...controlButtonsProps} showGiphyButton={showGiphyButton} />
-                      <SendMessageButton disabled={!enableSending} onSend={handleSendMessage} />
-                    </ul>
-                  </>
-                )}
-              </RichTextEditor>
-            )}
-          </>
+        {classifiedDomains && !isConnectionRequest && (
+          <ConversationClassifiedBar conversation={conversation} classifiedDomains={classifiedDomains} />
         )}
 
-        {pastedFile && <PastedFileControls pastedFile={pastedFile} onClear={clearPastedFile} onSend={sendPastedFile} />}
-      </div>
-    </IgnoreOutsideClickWrapper>
+        {isReplying && !isEditing && <ReplyBar replyMessageEntity={replyMessageEntity} onCancel={handleCancelReply} />}
+
+        <div
+          className={cx(`${conversationInputBarClassName}__input`, {
+            [`${conversationInputBarClassName}__input--editing`]: isEditing,
+          })}
+        >
+          {!isOutgoingRequest && (
+            <>
+              {/* <div className="controls-left">
+                {!!textValue.length && (
+                  <Avatar
+                    className="cursor-default"
+                    participant={selfUser}
+                    avatarSize={AVATAR_SIZE.X_SMALL}
+                    hideAvailabilityStatus
+                  />
+                )}
+              </div> */}
+
+              {!isSelfUserRemoved && !pastedFile && (
+                <RichTextEditor
+                  onSetup={lexical => {
+                    editorRef.current = lexical;
+                  }}
+                  editedMessage={editedMessage}
+                  onEscape={() => {
+                    if (editedMessage) {
+                      cancelMessageEditing(true);
+                    } else if (replyMessageEntity) {
+                      cancelMessageReply();
+                    }
+                  }}
+                  onArrowUp={() => {
+                    if (textValue.length === 0) {
+                      editMessage(conversation.getLastEditableMessage());
+                    }
+                  }}
+                  getMentionCandidates={getMentionCandidates}
+                  replaceEmojis={shouldReplaceEmoji}
+                  placeholder={inputPlaceholder}
+                  onUpdate={content => {
+                    setMessageContent({...content, text: content.markdown!});
+                  }}
+                  hasLocalEphemeralTimer={hasLocalEphemeralTimer}
+                  shwowFormatToolbar={formatToolbar.open}
+                  saveDraftState={saveDraft}
+                  loadDraftState={loadDraft}
+                  onShiftTab={onShiftTab}
+                  onSend={handleSendMessage}
+                  onBlur={() => isTypingRef.current && conversationRepository.sendTypingStop(conversation)}
+                >
+                  {isScaledDown ? (
+                    <>
+                      <ul className="controls-right buttons-group" css={{minWidth: '95px'}}>
+                        {showGiphyButton && <GiphyButton onGifClick={onGifClick} />}
+                        <SendMessageButton disabled={!enableSending} onSend={handleSendMessage} />
+                      </ul>
+                      <ul className="controls-right buttons-group" css={{justifyContent: 'center', width: '100%'}}>
+                        <ControlButtons {...controlButtonsProps} />
+                      </ul>
+                    </>
+                  ) : (
+                    <>
+                      <ul
+                        className={cx('controls-right buttons-group', {
+                          'controls-right-shrinked': textValue.length !== 0,
+                        })}
+                      >
+                        <ControlButtons {...controlButtonsProps} showGiphyButton={showGiphyButton} />
+                        <SendMessageButton disabled={!enableSending} onSend={handleSendMessage} />
+                      </ul>
+                    </>
+                  )}
+                </RichTextEditor>
+              )}
+            </>
+          )}
+
+          {pastedFile && (
+            <PastedFileControls pastedFile={pastedFile} onClear={clearPastedFile} onSend={sendPastedFile} />
+          )}
+        </div>
+      </IgnoreOutsideClickWrapper>
+      {emojiPicker.open ? (
+        <EmojiPicker
+          posX={emojiPicker.position.x}
+          posY={emojiPicker.position.y}
+          onKeyPress={emojiPicker.handleClose}
+          resetActionMenuStates={emojiPicker.handleClose}
+          wrapperRef={emojiPicker.ref}
+          handleReactionClick={emojiPicker.handlePick}
+        />
+      ) : null}
+    </div>
   );
 };

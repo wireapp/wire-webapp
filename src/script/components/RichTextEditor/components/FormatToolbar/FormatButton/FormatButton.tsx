@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2023 Wire Swiss GmbH
+ * Copyright (C) 2024 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,23 +17,31 @@
  *
  */
 
-import {useEffect} from 'react';
+import {ElementType} from 'react';
 
-import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {LexicalEditor} from 'lexical';
+import {css} from '@emotion/react';
 
-type Props = {
-  onUpdate: (editor: LexicalEditor, text: string) => void;
-};
+import {buttonActiveStyles, buttonStyles} from './FormatButton.styles';
 
-export function TextChangePlugin({onUpdate}: Props): null {
-  const [editor] = useLexicalComposerContext();
-
-  useEffect(() => {
-    return editor.registerTextContentListener(textContent => {
-      onUpdate(editor, textContent);
-    });
-  }, [editor, onUpdate]);
-
-  return null;
+interface FormatButtonProps {
+  label: string;
+  icon: ElementType<any>;
+  active: boolean;
+  onClick: () => void;
 }
+
+export const FormatButton = ({label, icon: Icon, active, onClick}: FormatButtonProps) => {
+  return (
+    <button
+      title={label}
+      aria-label={label}
+      css={css`
+        ${buttonStyles};
+        ${active && buttonActiveStyles};
+      `}
+      onClick={onClick}
+    >
+      <Icon />
+    </button>
+  );
+};
