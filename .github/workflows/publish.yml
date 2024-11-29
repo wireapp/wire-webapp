@@ -287,7 +287,7 @@ jobs:
           map: |
             {
               "dev": {
-                "targets": "[\"wire-webapp-dev\"]"
+                "targets": "[\"wire-webapp-dev\", \"wire-webapp-edge\"]"
               },
               "master": {
                 "targets": "[\"wire-webapp-main\"]"
