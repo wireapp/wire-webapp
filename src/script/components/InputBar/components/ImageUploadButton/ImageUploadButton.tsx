@@ -20,6 +20,7 @@
 import {useRef} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+import cx from 'classnames';
 
 import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
@@ -27,9 +28,10 @@ import {t} from 'Util/LocalizerUtil';
 interface ImageUploadButtonProps {
   onSelectImages: (files: File[]) => void;
   acceptedImageTypes: ReadonlyArray<string>;
+  hasRoundedCorners: boolean;
 }
 
-export const ImageUploadButton = ({onSelectImages, acceptedImageTypes}: ImageUploadButtonProps) => {
+export const ImageUploadButton = ({onSelectImages, acceptedImageTypes, hasRoundedCorners}: ImageUploadButtonProps) => {
   const imageRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -50,7 +52,9 @@ export const ImageUploadButton = ({onSelectImages, acceptedImageTypes}: ImageUpl
         type="button"
         aria-label={t('tooltipConversationAddImage')}
         title={t('tooltipConversationAddImage')}
-        className="conversation-button controls-right-button no-radius file-button"
+        className={cx('conversation-button controls-right-button no-radius file-button', {
+          'buttons-group-button-left': hasRoundedCorners,
+        })}
         onClick={() => imageRef.current?.click()}
         data-uie-name="do-share-image"
       >

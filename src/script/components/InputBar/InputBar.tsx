@@ -559,6 +559,8 @@ export const InputBar = ({
 
   const enableSending = textValue.length > 0;
 
+  const messageFormatButtonsEnabled = Config.getConfig().FEATURE.ENABLE_MESSAGE_FORMAT_BUTTONS;
+
   return (
     <div ref={wrapperRef}>
       <IgnoreOutsideClickWrapper
@@ -627,7 +629,9 @@ export const InputBar = ({
                   {isScaledDown ? (
                     <>
                       <ul className="controls-right buttons-group" css={{minWidth: '95px'}}>
-                        {showGiphyButton && <GiphyButton onGifClick={onGifClick} />}
+                        {showGiphyButton && (
+                          <GiphyButton onGifClick={onGifClick} hasRoundedLeftCorner={!messageFormatButtonsEnabled} />
+                        )}
                         <SendMessageButton disabled={!enableSending} onSend={handleSendMessage} />
                       </ul>
                       <ul className="controls-right buttons-group" css={{justifyContent: 'center', width: '100%'}}>

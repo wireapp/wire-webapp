@@ -69,6 +69,8 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
   onFormatClick,
   onEmojiClick,
 }) => {
+  const messageFormatButtonsEnabled = Config.getConfig().FEATURE.ENABLE_MESSAGE_FORMAT_BUTTONS;
+
   if (isEditing) {
     return (
       <li>
@@ -80,16 +82,22 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
   if (input.length === 0 || isScaledDown) {
     return (
       <>
-        <li>
-          <FormatTextButton isActive={isFormatActive} isScaledDown={!!isScaledDown} onClick={onFormatClick} />
-        </li>
-        <li>
-          <EmojiButton isScaledDown={!!isScaledDown} isActive={isEmojiActive} onClick={onEmojiClick} />
-        </li>
+        {messageFormatButtonsEnabled && (
+          <>
+            <li>
+              <FormatTextButton isActive={isFormatActive} isScaledDown={!!isScaledDown} onClick={onFormatClick} />
+            </li>
+            <li>
+              <EmojiButton isScaledDown={!!isScaledDown} isActive={isEmojiActive} onClick={onEmojiClick} />
+            </li>
+          </>
+        )}
+
         {!disableFilesharing && (
           <>
             <li>
               <ImageUploadButton
+                hasRoundedCorners={!messageFormatButtonsEnabled}
                 onSelectImages={onSelectImages}
                 acceptedImageTypes={Config.getConfig().ALLOWED_IMAGE_TYPES}
               />
@@ -116,13 +124,17 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
     <>
       {showGiphyButton && !disableFilesharing && (
         <>
-          <li>
-            <FormatTextButton isActive={isFormatActive} isScaledDown={false} onClick={onFormatClick} />
-          </li>
-          <li>
-            <EmojiButton isActive={isEmojiActive} isScaledDown={false} onClick={onEmojiClick} />
-          </li>
-          <GiphyButton onGifClick={onGifClick} />
+          {messageFormatButtonsEnabled && (
+            <>
+              <li>
+                <FormatTextButton isActive={isFormatActive} isScaledDown={false} onClick={onFormatClick} />
+              </li>
+              <li>
+                <EmojiButton isActive={isEmojiActive} isScaledDown={false} onClick={onEmojiClick} />
+              </li>
+            </>
+          )}
+          <GiphyButton onGifClick={onGifClick} hasRoundedLeftCorner={!messageFormatButtonsEnabled} />
         </>
       )}
     </>

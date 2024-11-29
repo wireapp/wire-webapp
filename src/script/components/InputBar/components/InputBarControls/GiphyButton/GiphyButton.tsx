@@ -19,21 +19,26 @@
 
 import React from 'react';
 
+import cx from 'classnames';
+
 import {IconButton} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
 export type GiphyButtonProps = {
+  hasRoundedLeftCorner: boolean;
   onGifClick: () => void;
 };
 
-const GiphyButton: React.FC<GiphyButtonProps> = ({onGifClick}) => {
+const GiphyButton: React.FC<GiphyButtonProps> = ({onGifClick, hasRoundedLeftCorner}) => {
   return (
     <>
       <li>
         <IconButton
-          className="buttons-group-button-right"
+          className={cx({
+            'buttons-group-button-right': !hasRoundedLeftCorner,
+          })}
           type="button"
           css={{marginBottom: '0'}}
           title={t('extensionsBubbleButtonGif')}
