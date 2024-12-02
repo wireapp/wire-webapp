@@ -204,7 +204,6 @@
 
   &__item__minimize {
     display: flex;
-    min-width: 157px;
   }
 
   &__view-mode div[class$='-Control'] {
@@ -214,6 +213,10 @@
   &__button_primary {
     position: relative;
     .button-icon-primary;
+
+    @media (max-width: 639px) {
+      width: 48px;
+    }
   }
 
   &__button {
@@ -225,12 +228,11 @@
     align-items: center;
     justify-content: center;
     border-radius: 24px;
-    margin: 0 10px;
     cursor: pointer;
     line-height: 0;
 
-    @media (max-width: 500px) {
-      margin: 0 5px;
+    @media (max-width: 639px) {
+      width: 48px;
     }
 
     &--small {
