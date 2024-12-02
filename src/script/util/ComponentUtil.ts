@@ -20,7 +20,6 @@
 import {useEffect, useState} from 'react';
 
 import ko, {Unwrapped} from 'knockout';
-import {isEqual} from 'underscore';
 
 type Subscribables<T> = {
   [Key in keyof T]: T[Key] extends ko.Subscribable ? T[Key] : never;
@@ -44,9 +43,9 @@ const resolveObservables = <C extends keyof Subscribables<P>, P extends Partial<
 /**
  * Will subscribe to all the observable properties of the object and call the onUpdate callback everytime one observable updates
  *
- * @param object The object containing some observable properties
+ * @param object The object containinig some observable properties
  * @param onUpdate The callback called everytime an observable emits. It will only give back the slice of the object that have updates
- * @param children An optional list of properties to watch (by default will watch for all the observable properties)
+ * @param children? An optional list of properties to watch (by default will watch for all the observable properties)
  */
 const subscribeProperties = <C extends keyof Subscribables<P>, P extends Partial<Record<C, ko.Subscribable>>>(
   object: P,
@@ -78,22 +77,12 @@ export const useKoSubscribableChildren = <
   children: C[],
 ): UnwrappedValues<Pick<P, C>> => {
   const [state, setState] = useState<UnwrappedValues<P>>(resolveObservables(parent, children));
-
   useEffect(() => {
-    let currentState = state;
-
-    const onUpdate = (updates: Partial<UnwrappedValues<P>>) => {
-      const updatedState = {...currentState, ...updates};
-
-      if (!isEqual(currentState, updatedState)) {
-        // eslint-disable-next-line no-console
-        console.log('[ComponentUtil.ts] przemvs updatedState', updatedState);
-        currentState = updatedState;
-        setState(updatedState);
-      }
-    };
-
-    const subscription = subscribeProperties(parent, onUpdate, children);
+    const subscription = subscribeProperties(
+      parent,
+      updates => setState(currentState => ({...currentState, ...updates})),
+      children,
+    );
     return () => subscription.dispose();
   }, [parent]);
 
