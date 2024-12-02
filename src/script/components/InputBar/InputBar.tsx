@@ -619,9 +619,7 @@ export const InputBar = ({
                   getMentionCandidates={getMentionCandidates}
                   replaceEmojis={shouldReplaceEmoji}
                   placeholder={inputPlaceholder}
-                  onUpdate={content => {
-                    setMessageContent({...content, text: content.markdown!});
-                  }}
+                  onUpdate={setMessageContent}
                   hasLocalEphemeralTimer={hasLocalEphemeralTimer}
                   shwowFormatToolbar={formatToolbar.open}
                   saveDraftState={saveDraft}

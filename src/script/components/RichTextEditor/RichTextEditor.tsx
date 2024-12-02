@@ -35,7 +35,7 @@ import {OnChangePlugin} from '@lexical/react/LexicalOnChangePlugin';
 import {RichTextPlugin} from '@lexical/react/LexicalRichTextPlugin';
 import {HeadingNode, QuoteNode} from '@lexical/rich-text';
 import cx from 'classnames';
-import {LexicalEditor, EditorState, $nodesOfType, $getRoot} from 'lexical';
+import {LexicalEditor, EditorState, $nodesOfType} from 'lexical';
 
 import {DraftState} from 'Components/InputBar/util/DraftStateUtil';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
@@ -186,14 +186,11 @@ export const RichTextEditor = ({
         return;
       }
 
-      const root = $getRoot();
-      const textValue = root.getTextContent();
       const markdown = $convertToMarkdownString(TRANSFORMERS);
 
       onUpdate({
-        text: replaceEmojis ? findAndTransformEmoji(textValue) : textValue,
-        mentions: parseMentions(editorRef.current!, textValue, getMentionCandidates()),
-        markdown: replaceEmojis ? findAndTransformEmoji(markdown) : markdown,
+        text: replaceEmojis ? findAndTransformEmoji(markdown) : markdown,
+        mentions: parseMentions(editorRef.current!, markdown, getMentionCandidates()),
       });
     });
   };
