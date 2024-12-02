@@ -19,7 +19,6 @@
 
 import {useEffect} from 'react';
 
-import {$convertFromMarkdownString, TRANSFORMERS} from '@lexical/markdown';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {$getRoot, $setSelection} from 'lexical';
 
@@ -43,18 +42,7 @@ export function EditedMessagePlugin({message}: Props): null {
           // This behaviour is needed to clear selection, if we not clear selection will be on beginning.
           $setSelection(null);
           // Replace the current root with the content of the message being edited
-
-          const text = message.getFirstAsset().text;
-
-          $convertFromMarkdownString(text, TRANSFORMERS);
-
-          const nodesToUpdate = toEditorNodes(message);
-
-          if (!nodesToUpdate) {
-            return;
-          }
-
-          root.append(nodesToUpdate);
+          root.append(toEditorNodes(message));
 
           editor.focus();
         });

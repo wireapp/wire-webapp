@@ -198,8 +198,6 @@ export const RichTextEditor = ({
     });
   };
 
-  console.log({editedMessage});
-
   return (
     <LexicalComposer initialConfig={editorConfig}>
       <div className="controls-center input-bar-center">
