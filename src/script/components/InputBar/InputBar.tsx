@@ -27,6 +27,7 @@ import {container} from 'tsyringe';
 import {useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import {checkFileSharingPermission} from 'Components/Conversation/utils/checkFileSharingPermission';
 import {EmojiPicker} from 'Components/EmojiPicker/EmojiPicker';
@@ -107,6 +108,7 @@ export const InputBar = ({
   propertiesRepository,
   searchRepository,
   storageRepository,
+  selfUser,
   teamState = container.resolve(TeamState),
   onShiftTab,
   uploadDroppedFiles,
@@ -585,7 +587,7 @@ export const InputBar = ({
         >
           {!isOutgoingRequest && (
             <>
-              {/* <div className="controls-left">
+              <div className="controls-left">
                 {!!textValue.length && (
                   <Avatar
                     className="cursor-default"
@@ -594,7 +596,7 @@ export const InputBar = ({
                     hideAvailabilityStatus
                   />
                 )}
-              </div> */}
+              </div>
 
               {!isSelfUserRemoved && !pastedFile && (
                 <RichTextEditor
