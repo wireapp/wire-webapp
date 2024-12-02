@@ -17,15 +17,12 @@
  *
  */
 
-import {useEffect} from 'react';
-
 import cx from 'classnames';
 
 import {Runtime} from '@wireapp/commons';
 
 import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
-import {afterRender} from 'Util/util';
 
 import {closeWarning, useWarningsState} from './WarningsState';
 import {CONFIG, TYPE as type} from './WarningsTypes';
@@ -40,27 +37,6 @@ export const WarningsContainer = ({onRefresh}: WarningProps) => {
   const name = useWarningsState(state => state.name);
   const warnings = useWarningsState(state => state.warnings);
   const visibleWarning = warnings[warnings.length - 1];
-
-  useEffect(() => {
-    const isConnectivityRecovery = visibleWarning === type.CONNECTIVITY_RECOVERY;
-    const hasOffset = warnings.length > 0 && !isConnectivityRecovery;
-    const isMiniMode = CONFIG.MINI_MODES.includes(visibleWarning);
-
-    const app = document.querySelector('#app');
-    const callingWrapper = document.querySelector('.video-calling-wrapper');
-
-    if (app) {
-      app.classList.toggle('app--small-offset', hasOffset && isMiniMode);
-      app.classList.toggle('app--large-offset', hasOffset && !isMiniMode);
-    }
-
-    if (callingWrapper) {
-      callingWrapper.classList.toggle('app--small-offset', hasOffset && isMiniMode);
-      callingWrapper.classList.toggle('app--large-offset', hasOffset && !isMiniMode);
-    }
-
-    afterRender(() => window.dispatchEvent(new Event('resize')));
-  }, [visibleWarning, warnings.length]);
 
   if (warnings.length === 0) {
     return null;
