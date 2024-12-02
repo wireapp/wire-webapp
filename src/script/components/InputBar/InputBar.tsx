@@ -38,6 +38,7 @@ import {ConversationRepository} from 'src/script/conversation/ConversationReposi
 import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
+import {EventName} from 'src/script/tracking/EventName';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from 'src/script/user/TypingIndicatorMode';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {KEY} from 'Util/KeyboardUtil';
@@ -154,6 +155,7 @@ export const InputBar = ({
       editorRef.current?.update(() => {
         $insertNodes([$createTextNode(emoji)]);
       });
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.INPUT.EMOJI_MODAL.EMOJI_PICKED);
     },
   });
 

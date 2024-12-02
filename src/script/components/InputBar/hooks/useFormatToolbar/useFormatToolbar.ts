@@ -19,7 +19,12 @@
 
 import {useState} from 'react';
 
+import {amplify} from 'amplify';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {StorageKey} from 'src/script/storage';
+import {EventName} from 'src/script/tracking/EventName';
 import {loadValue, storeValue} from 'Util/StorageUtil';
 
 export const useFormatToolbar = () => {
@@ -28,8 +33,10 @@ export const useFormatToolbar = () => {
   });
 
   const handleClick = () => {
-    storeValue(StorageKey.INPUT.SHOW_FORMATTING, !open);
-    setOpen(prev => !prev);
+    const nextValue = !open;
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.INPUT.FORMAT_TEXT[nextValue ? 'ENABLED' : 'DISABLED']);
+    storeValue(StorageKey.INPUT.SHOW_FORMATTING, nextValue);
+    setOpen(nextValue);
   };
 
   return {

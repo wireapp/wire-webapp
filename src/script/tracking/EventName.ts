@@ -64,4 +64,13 @@ export const EventName = {
     BACKUP_CREATED: 'history.backup_created',
     BACKUP_CANCELLED: 'history.backup_cancelled',
   },
+  INPUT: {
+    FORMAT_TEXT: {
+      ENABLED: 'input.rich_text_editor.enabled',
+      DISABLED: 'input.rich_text_editor.disabled',
+    },
+    EMOJI_MODAL: {
+      EMOJI_PICKED: 'input.emoji_modal.emoji_picked',
+    },
+  },
 };
