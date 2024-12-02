@@ -17,7 +17,13 @@
  *
  */
 
-import React, {MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent, useEffect, useState} from 'react';
+import React, {
+  MouseEvent as ReactMouseEvent,
+  KeyboardEvent as ReactKeyBoardEvent,
+  useEffect,
+  useState,
+  MutableRefObject,
+} from 'react';
 
 import {ConversationListCell} from 'Components/ConversationListCell';
 import {Call} from 'src/script/calling/Call';
@@ -58,6 +64,7 @@ interface ConversationsListProps {
   groupParticipantsConversations: Conversation[];
   isGroupParticipantsVisible: boolean;
   isEmpty: boolean;
+  searchInputRef: MutableRefObject<HTMLInputElement | null>;
 }
 
 export const ConversationsList = ({
@@ -75,6 +82,7 @@ export const ConversationsList = ({
   groupParticipantsConversations,
   isGroupParticipantsVisible,
   isEmpty,
+  searchInputRef,
 }: ConversationsListProps) => {
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
   const {currentTab} = useSidebarStore();
@@ -104,7 +112,8 @@ export const ConversationsList = ({
   };
 
   const getCommonConversationCellProps = (conversation: Conversation, index: number) => ({
-    isFocused: !conversationsFilter && currentFocus === conversation.id,
+    isFocused:
+      document.activeElement !== searchInputRef.current && !conversationsFilter && currentFocus === conversation.id,
     handleArrowKeyDown: handleArrowKeyDown(index),
     resetConversationFocus: resetConversationFocus,
     dataUieName: 'item-conversation',

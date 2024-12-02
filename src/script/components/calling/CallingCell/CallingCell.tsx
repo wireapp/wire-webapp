@@ -260,7 +260,7 @@ export const CallingCell = ({
     <div css={callingContainer}>
       {isIncoming && (
         <p role="alert" className="visually-hidden">
-          {t('callConversationAcceptOrDecline', conversationName)}
+          {t('callConversationAcceptOrDecline', {conversationName})}
         </p>
       )}
 

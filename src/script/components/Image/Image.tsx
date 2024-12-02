@@ -117,8 +117,12 @@ export const Image = ({
     <InViewport
       onVisible={() => setIsInViewport(true)}
       css={getWrapperStyles(!!onClick)}
-      className={cx(className, {'loading-dots': isLoading})}
-      onClick={onClick}
+      className={cx(className, {'loading-dots image-asset--no-image': isLoading})}
+      onClick={event => {
+        if (!isLoading) {
+          onClick?.(event);
+        }
+      }}
       data-uie-status={isLoading ? 'loading' : 'loaded'}
       {...props}
     >

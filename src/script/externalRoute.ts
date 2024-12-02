@@ -63,7 +63,7 @@ export const getManageServicesUrl = (utmSource?: string): string | undefined =>
  * @returns The URL for managing team settings with optional UTM parameters.
  */
 export const getManageTeamUrl = (utmSource?: string): string | undefined =>
-  getTeamSettingsUrl(URL.URL_PATH.MANAGE_TEAM, utmSource);
+  getTeamSettingsUrl(URL.URL_PATH?.MANAGE_TEAM, utmSource);
 
 const getCreateTeamUrl = (): string | undefined =>
   Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION ? `${URL.TEAMS_BASE}${URL.URL_PATH.CREATE_TEAM}` : undefined;

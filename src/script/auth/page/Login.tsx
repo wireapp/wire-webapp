@@ -23,7 +23,6 @@ import {LoginData} from '@wireapp/api-client/lib/auth';
 import {ClientType} from '@wireapp/api-client/lib/client/index';
 import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
 import {StatusCodes} from 'http-status-codes';
-import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
@@ -55,6 +54,7 @@ import {
   TextLink,
 } from '@wireapp/react-ui-kit';
 
+import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {isBackendError} from 'Util/TypePredicateUtil';
 
@@ -62,7 +62,6 @@ import {EntropyContainer} from './EntropyContainer';
 import {Page} from './Page';
 
 import {Config} from '../../Config';
-import {indexStrings, loginStrings, verifyStrings} from '../../strings';
 import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
 import {Exception} from '../component/Exception';
 import {JoinGuestLinkPasswordModal} from '../component/JoinGuestLinkPasswordModal';
@@ -78,7 +77,6 @@ import * as ConversationSelector from '../module/selector/ConversationSelector';
 import {QUERY_KEY, ROUTE} from '../route';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {getOAuthQueryString} from '../util/oauthUtil';
-
 type Props = React.HTMLProps<HTMLDivElement> & {
   embedded?: boolean;
 };
@@ -106,7 +104,6 @@ const LoginComponent = ({
   embedded,
 }: Props & ConnectedProps & DispatchProps) => {
   const logger = getLogger('Login');
-  const {formatMessage: _} = useIntl();
   const navigate = useNavigate();
   const [conversationCode, setConversationCode] = useState<string | null>(null);
   const [conversationKey, setConversationKey] = useState<string | null>(null);
@@ -341,7 +338,7 @@ const LoginComponent = ({
   };
 
   const backArrow = (
-    <RouterLink to={ROUTE.INDEX} data-uie-name="go-index" aria-label={_(loginStrings.goBack)}>
+    <RouterLink to={ROUTE.INDEX} data-uie-name="go-index" aria-label={t('login.goBack')}>
       <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
     </RouterLink>
   );
@@ -394,9 +391,9 @@ const LoginComponent = ({
               >
                 {twoFactorLoginData ? (
                   <div>
-                    <H2 center>{_(loginStrings.twoFactorLoginTitle)}</H2>
+                    <H2 center>{t('login.twoFactorLoginTitle')}</H2>
                     <Text data-uie-name="label-with-email">
-                      {_(loginStrings.twoFactorLoginSubHead, {email: twoFactorLoginData.email})}
+                      {t('login.twoFactorLoginSubHead', {email: twoFactorLoginData.email as string})}
                     </Text>
                     <Label markInvalid={!!twoFactorSubmitError}>
                       <CodeInput
@@ -414,7 +411,7 @@ const LoginComponent = ({
                         <Loading size={20} />
                       ) : (
                         <TextLink onClick={resendTwoFactorCode} center data-uie-name="do-resend-code">
-                          {_(verifyStrings.resendCode)}
+                          {t('verify.resendCode')}
                         </TextLink>
                       )}
                     </div>
@@ -425,7 +422,7 @@ const LoginComponent = ({
                         css={{marginTop: 65}}
                         onClick={() => handleSubmit({...twoFactorLoginData, verificationCode}, [])}
                       >
-                        {_({id: 'login.submitTwoFactorButton'})}
+                        {t('login.submitTwoFactorButton')}
                       </Button>
                     </FlexBox>
                   </div>
@@ -433,9 +430,9 @@ const LoginComponent = ({
                   <>
                     <div>
                       <Heading level={embedded ? '2' : '1'} center>
-                        {_(loginStrings.headline)}
+                        {t('login.headline')}
                       </Heading>
-                      <Muted>{_(loginStrings.subhead)}</Muted>
+                      <Muted>{t('login.subhead')}</Muted>
                       <Form style={{marginTop: 30}} data-uie-name="login">
                         <LoginForm isFetching={isFetching} onSubmit={handleSubmit} />
                         {validationErrors.length ? (
@@ -458,7 +455,7 @@ const LoginComponent = ({
                             aligncenter
                           >
                             <CheckboxLabel htmlFor="enter-public-computer-sign-in">
-                              {_(loginStrings.publicComputer)}
+                              {t('login.publicComputer')}
                             </CheckboxLabel>
                           </Checkbox>
                         )}
@@ -471,7 +468,7 @@ const LoginComponent = ({
                       target="_blank"
                       data-uie-name="go-forgot-password"
                     >
-                      {_(loginStrings.forgotPassword)}
+                      {t('login.forgotPassword')}
                     </Link>
                     {embedded && (isDomainDiscoveryEnabled || isSSOEnabled) && (
                       <Button
@@ -481,7 +478,7 @@ const LoginComponent = ({
                         style={{marginTop: '16px'}}
                         data-uie-name="go-sso-login"
                       >
-                        {_(isDomainDiscoveryEnabled ? indexStrings.enterprise : indexStrings.ssoLogin)}
+                        {t(isDomainDiscoveryEnabled ? 'index.enterprise' : 'index.ssoLogin')}
                       </Button>
                     )}
                   </>

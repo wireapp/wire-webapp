@@ -23,7 +23,7 @@ import {ClientType} from '@wireapp/api-client/lib/client/index';
 import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http';
 import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
 import {isValidEmail, PATTERN} from '@wireapp/commons/lib/util/ValidationUtil';
-import {FormattedMessage, useIntl} from 'react-intl';
+import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
 import {Navigate, useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
@@ -42,10 +42,10 @@ import {
   RoundIconButton,
 } from '@wireapp/react-ui-kit';
 
+import {t} from 'Util/LocalizerUtil';
 import {isBackendError} from 'Util/TypePredicateUtil';
 
 import {Config} from '../../Config';
-import {loginStrings, logoutReasonStrings, ssoLoginStrings} from '../../strings';
 import {JoinGuestLinkPasswordModal} from '../component/JoinGuestLinkPasswordModal';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {ValidationError} from '../module/action/ValidationError';
@@ -54,6 +54,7 @@ import * as AuthSelector from '../module/selector/AuthSelector';
 import * as ConversationSelector from '../module/selector/ConversationSelector';
 import {QUERY_KEY, ROUTE} from '../route';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
+import {logoutReasonStrings} from '../util/logoutUtil';
 import {getSearchParams} from '../util/urlUtil';
 
 export interface SingleSignOnFormProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -83,7 +84,6 @@ const SingleSignOnFormComponent = ({
   const codeOrMailInput = useRef<HTMLInputElement>();
   const [codeOrMail, setCodeOrMail] = useState('');
   const [disableInput, setDisableInput] = useState(false);
-  const {formatMessage: _} = useIntl();
   const navigate = useNavigate();
   const [clientType, setClientType] = useState<ClientType | null>(null);
   const [ssoError, setSsoError] = useState<BackendError | null>(null);
@@ -289,8 +289,8 @@ const SingleSignOnFormComponent = ({
     : ValidationError.FIELD.SSO_CODE.name;
 
   const inputPlaceholder = enableDomainDiscovery
-    ? ssoLoginStrings.codeOrMailInputPlaceholder
-    : ssoLoginStrings.codeInputPlaceholder;
+    ? t('ssoLogin.codeOrMailInputPlaceholder')
+    : t('ssoLogin.codeInputPlaceholder');
 
   const inputPattern = enableDomainDiscovery
     ? `(${SSO_CODE_PREFIX_REGEX}${PATTERN.UUID_V4}|${PATTERN.EMAIL})`
@@ -325,7 +325,7 @@ const SingleSignOnFormComponent = ({
               onChange={onCodeChange}
               ref={codeOrMailInput}
               markInvalid={!isCodeOrMailInputValid}
-              placeholder={_(inputPlaceholder)}
+              placeholder={inputPlaceholder}
               value={codeOrMail}
               autoComplete="section-login sso-code"
               maxLength={1024}
@@ -349,7 +349,7 @@ const SingleSignOnFormComponent = ({
         ) : logoutReason ? (
           <ErrorMessage data-uie-name="status-logout-reason">
             <FormattedMessage
-              {...logoutReasonStrings[logoutReason]}
+              id={logoutReasonStrings[logoutReason]}
               values={{
                 newline: <br />,
               }}
@@ -370,7 +370,7 @@ const SingleSignOnFormComponent = ({
             aligncenter
             style={{justifyContent: 'center', marginTop: '36px'}}
           >
-            <CheckboxLabel htmlFor="">{_(loginStrings.publicComputer)}</CheckboxLabel>
+            <CheckboxLabel htmlFor="">{t('login.publicComputer')}</CheckboxLabel>
           </Checkbox>
         )}
       </Form>

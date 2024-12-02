@@ -19,17 +19,17 @@
 
 import React, {useEffect} from 'react';
 
-import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 
 import {UrlUtil, StringUtil, Runtime} from '@wireapp/commons';
 import {Button, ButtonVariant, ContainerXS, H1, Muted, QUERY, useMatchMedia, useTimeout} from '@wireapp/react-ui-kit';
 
+import {t} from 'Util/LocalizerUtil';
+
 import {Page} from './Page';
 
 import {Config} from '../../Config';
-import {clientManagerStrings} from '../../strings';
 import {ClientList} from '../component/ClientList';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {RootState, bindActionCreators} from '../module/reducer';
@@ -38,7 +38,6 @@ import {QUERY_KEY} from '../route';
 type Props = React.HTMLProps<HTMLDivElement>;
 
 const ClientManagerComponent = ({doGetAllClients, doLogout}: Props & ConnectedProps & DispatchProps) => {
-  const {formatMessage: _} = useIntl();
   const SFAcode = localStorage.getItem(QUERY_KEY.CONVERSATION_CODE);
   const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE);
   const isMobile = useMatchMedia(QUERY.mobile);
@@ -84,7 +83,7 @@ const ClientManagerComponent = ({doGetAllClients, doLogout}: Props & ConnectedPr
         }}
       >
         <H1 center style={{marginTop: '140px'}}>
-          {_(clientManagerStrings.headline)}
+          {t('clientManager.headline')}
         </H1>
         <Muted
           center
@@ -94,8 +93,8 @@ const ClientManagerComponent = ({doGetAllClients, doLogout}: Props & ConnectedPr
           data-uie-name="status-device-limit-info"
         >
           {isOauth
-            ? _(clientManagerStrings.oauth, {device})
-            : _(clientManagerStrings.subhead, {brandName: Config.getConfig().BRAND_NAME})}
+            ? t('clientManager.oauth', {device})
+            : t('clientManager.subhead', {brandName: Config.getConfig().BRAND_NAME})}
         </Muted>
         <ClientList />
         <Button
@@ -104,7 +103,7 @@ const ClientManagerComponent = ({doGetAllClients, doLogout}: Props & ConnectedPr
           style={{alignSelf: 'center', margin: '48px 0 80px 0'}}
           data-uie-name="go-sign-out"
         >
-          {_(clientManagerStrings.logout)}
+          {t('clientManager.logout')}
         </Button>
       </ContainerXS>
     </Page>

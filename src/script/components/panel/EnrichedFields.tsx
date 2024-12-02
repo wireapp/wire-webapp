@@ -17,11 +17,14 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 
 import type {RichInfoField} from '@wireapp/api-client/lib/user/RichInfo';
 import {container} from 'tsyringe';
 
+import {Availability} from '@wireapp/protocol-messaging';
+
+import {availabilityStatus, availabilityTranslationKeys} from 'Util/AvailabilityStatus';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {noop} from 'Util/util';
@@ -34,6 +37,7 @@ export interface EnrichedFieldsProps {
   richProfileRepository?: RichProfileRepository;
   showDomain?: boolean;
   user: User;
+  showAvailability?: boolean;
 }
 
 export const useEnrichedFields = (
@@ -72,16 +76,17 @@ export const useEnrichedFields = (
     return () => {
       cancel = true;
     };
-  }, [user, addEmail && email]);
+  }, [user, addEmail, email]);
   return fields;
 };
 
-const EnrichedFields: React.FC<EnrichedFieldsProps> = ({
+const EnrichedFields = ({
   onFieldsLoaded = noop,
   showDomain = false,
   richProfileRepository = container.resolve(RichProfileRepository),
   user,
-}) => {
+  showAvailability = false,
+}: EnrichedFieldsProps) => {
   const fields = useEnrichedFields(
     user,
     {addDomain: showDomain, addEmail: true},
@@ -89,22 +94,44 @@ const EnrichedFields: React.FC<EnrichedFieldsProps> = ({
     onFieldsLoaded,
   );
 
-  if (fields?.length < 1) {
+  const {availability} = useKoSubscribableChildren(user, ['availability']);
+
+  if (fields?.length < 1 && !showAvailability) {
     return null;
   }
 
+  const shouldShowAvailability =
+    showAvailability && availability !== undefined && availability !== Availability.Type.NONE;
+
   return (
     <div className="enriched-fields">
-      {fields.map(({type, value}) => (
-        <div key={type} className="enriched-fields__entry">
+      {shouldShowAvailability && (
+        <div className="enriched-fields__entry">
           <p className="enriched-fields__entry__key" data-uie-name="item-enriched-key">
-            {type}
+            {t('availability.status')}
           </p>
-          <p className="enriched-fields__entry__value" data-uie-name="item-enriched-value" data-uie-value={value}>
-            {value}
+          <p
+            className="enriched-fields__entry__value availability-status"
+            data-uie-name="item-enriched-value"
+            data-uie-value={availability}
+          >
+            {availabilityStatus[availability]}
+            <span>{t(availabilityTranslationKeys[availability])}</span>
           </p>
         </div>
-      ))}
+      )}
+
+      {fields?.length >= 1 &&
+        fields.map(({type, value}) => (
+          <div key={type} className="enriched-fields__entry">
+            <p className="enriched-fields__entry__key" data-uie-name="item-enriched-key">
+              {type}
+            </p>
+            <p className="enriched-fields__entry__value" data-uie-name="item-enriched-value" data-uie-value={value}>
+              {value}
+            </p>
+          </div>
+        ))}
     </div>
   );
 };

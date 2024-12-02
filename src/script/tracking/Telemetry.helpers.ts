@@ -22,7 +22,7 @@ import {getLogger, Logger} from 'Util/Logger';
 
 import {Config} from '../Config';
 
-const logger: Logger = getLogger('CountlyHelpers');
+const logger: Logger = getLogger('TelemetryHelpers');
 
 // This variable is used to force the activation of error reporting on specific environments
 let forceActivateErrorReporting: boolean = false;
@@ -46,7 +46,7 @@ export const initForcedErrorReporting = () => {
   }
 };
 
-export function isCountlyEnabledAtCurrentEnvironment(): boolean {
+export function isTelemetryEnabledAtCurrentEnvironment(): boolean {
   if (forceActivateErrorReporting) {
     return true;
   }
@@ -54,8 +54,7 @@ export function isCountlyEnabledAtCurrentEnvironment(): boolean {
   const {COUNTLY_API_KEY, COUNTLY_ALLOWED_BACKEND, BACKEND_REST} = Config.getConfig();
 
   const allowedBackendUrls = COUNTLY_ALLOWED_BACKEND?.split(',').map(url => url.trim()) || [];
-  const isCountlyEnabled =
-    !!COUNTLY_API_KEY && allowedBackendUrls.length > 0 && allowedBackendUrls.includes(BACKEND_REST);
+  const isEnabled = !!COUNTLY_API_KEY && allowedBackendUrls.length > 0 && allowedBackendUrls.includes(BACKEND_REST);
 
-  return isCountlyEnabled;
+  return isEnabled;
 }

@@ -127,7 +127,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
   const enabledAddAction = selectedContacts.length > ENABLE_ADD_ACTIONS_LENGTH;
 
   const headerText = selectedContacts.length
-    ? t('addParticipantsHeaderWithCounter', selectedContacts.length)
+    ? t('addParticipantsHeaderWithCounter', {number: selectedContacts.length})
     : t('addParticipantsHeader');
 
   const showIntegrations = useMemo(() => {

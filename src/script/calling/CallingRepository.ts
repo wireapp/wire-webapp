@@ -94,10 +94,10 @@ import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
 import {TeamState} from '../team/TeamState';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
-import {isCountlyEnabledAtCurrentEnvironment} from '../tracking/Countly.helpers';
 import {EventName} from '../tracking/EventName';
 import * as trackingHelpers from '../tracking/Helpers';
 import {Segmentation} from '../tracking/Segmentation';
+import {isTelemetryEnabledAtCurrentEnvironment} from '../tracking/Telemetry.helpers';
 import type {UserRepository} from '../user/UserRepository';
 import {Warnings} from '../view_model/WarningsContainer';
 
@@ -631,7 +631,7 @@ export class CallingRepository {
               text: t('callDegradationAction'),
             },
             text: {
-              message: t('callDegradationDescription', participant.user.name()),
+              message: t('callDegradationDescription', {username: participant.user.name()}),
               title: t('callDegradationTitle'),
             },
           },
@@ -661,8 +661,8 @@ export class CallingRepository {
       {
         close: () => this.acceptVersionWarning(conversationId),
         text: {
-          message: t('modalCallUpdateClientMessage', brandName),
-          title: t('modalCallUpdateClientHeadline', brandName),
+          message: t('modalCallUpdateClientMessage', {brandName}),
+          title: t('modalCallUpdateClientHeadline', {brandName}),
         },
       },
       'update-client-warning',
@@ -752,12 +752,16 @@ export class CallingRepository {
       }
 
       case CALL_MESSAGE_TYPE.EMOJIS: {
-        const call = this.findCall(conversationId);
-        if (!call || !this.selfUser) {
+        const currentCall = this.callState.joinedCall();
+        if (
+          !currentCall ||
+          !matchQualifiedIds(currentCall.conversation.qualifiedId, conversationId) ||
+          !this.selfUser
+        ) {
           return;
         }
 
-        const senderParticipant = call
+        const senderParticipant = currentCall
           .participants()
           .find(participant => matchQualifiedIds(participant.user.qualifiedId, userId));
 
@@ -967,31 +971,23 @@ export class CallingRepository {
   toggleScreenshare = async (call: Call): Promise<void> => {
     const {conversation} = call;
 
+    // The screen share was stopped by the user through the application. We clean up the state and stop the screen share
+    // video track. Note that stopping a track does not trigger an "ended" event.
     const selfParticipant = call.getSelfParticipant();
     if (selfParticipant.sharesScreen()) {
-      selfParticipant.videoState(VIDEO_STATE.STOPPED);
-      this.sendCallingEvent(EventName.CALLING.SCREEN_SHARE, call, {
-        [Segmentation.SCREEN_SHARE.DIRECTION]: 'outgoing',
-        [Segmentation.SCREEN_SHARE.DURATION]:
-          Math.ceil((Date.now() - selfParticipant.startedScreenSharingAt()) / 5000) * 5,
-      });
-      return this.wCall?.setVideoSendState(
-        this.wUser,
-        this.serializeQualifiedId(conversation.qualifiedId),
-        VIDEO_STATE.STOPPED,
-      );
+      this.stopScreenShare(selfParticipant, conversation, call);
+      return;
     }
+
     try {
       const mediaStream = await this.getMediaStream({audio: true, screen: true}, call.isGroupOrConference);
-      // https://stackoverflow.com/a/25179198/451634
+
+      // If the screen share is stopped by the os system or the browser, an "ended" event is triggered. We listen for
+      // this event to clean up the screen share state in this case.
       mediaStream.getVideoTracks()[0].onended = () => {
-        this.wCall?.setVideoSendState(
-          this.wUser,
-          this.serializeQualifiedId(conversation.qualifiedId),
-          VIDEO_STATE.STOPPED,
-        );
+        this.stopScreenShare(selfParticipant, conversation, call);
       };
-      const selfParticipant = call.getSelfParticipant();
+
       selfParticipant.videoState(VIDEO_STATE.SCREENSHARE);
       selfParticipant.updateMediaStream(mediaStream, true);
       this.wCall?.setVideoSendState(
@@ -1004,6 +1000,28 @@ export class CallingRepository {
       this.logger.info('Failed to get screen sharing stream', error);
     }
   };
+
+  /**
+   * This method ends the screen share regardless of the event that triggered it.
+   * There are two ways to end a screen share: one by clicking the Applications button, and the other by stopping it
+   * through the os system ore browser's sharing option.
+   */
+  private stopScreenShare(selfParticipant: Participant, conversation: Conversation, call: Call): void {
+    selfParticipant.videoState(VIDEO_STATE.STOPPED);
+    selfParticipant.releaseVideoStream(true);
+
+    this.sendCallingEvent(EventName.CALLING.SCREEN_SHARE, call, {
+      [Segmentation.SCREEN_SHARE.DIRECTION]: 'outgoing',
+      [Segmentation.SCREEN_SHARE.DURATION]:
+        Math.ceil((Date.now() - selfParticipant.startedScreenSharingAt()) / 5000) * 5,
+    });
+
+    return this.wCall?.setVideoSendState(
+      this.wUser,
+      this.serializeQualifiedId(conversation.qualifiedId),
+      VIDEO_STATE.STOPPED,
+    );
+  }
 
   onPageHide = (event: PageTransitionEvent) => {
     if (event.persisted) {
@@ -1177,7 +1195,7 @@ export class CallingRepository {
   }
 
   private readonly leave1on1MLSConference = async (conversationId: QualifiedId) => {
-    if (isCountlyEnabledAtCurrentEnvironment()) {
+    if (isTelemetryEnabledAtCurrentEnvironment()) {
       this.showCallQualityFeedbackModal();
     }
 
@@ -1329,7 +1347,7 @@ export class CallingRepository {
   };
 
   readonly leaveCall = (conversationId: QualifiedId, reason: LEAVE_CALL_REASON): void => {
-    if (isCountlyEnabledAtCurrentEnvironment()) {
+    if (isTelemetryEnabledAtCurrentEnvironment()) {
       this.showCallQualityFeedbackModal();
     }
 
@@ -2169,6 +2187,7 @@ export class CallingRepository {
     if (!call) {
       return;
     }
+
     const participant = call.getParticipant(userId, clientId);
     if (!participant) {
       return;
@@ -2199,10 +2218,6 @@ export class CallingRepository {
 
     if (state === VIDEO_STATE.SCREENSHARE) {
       call.analyticsScreenSharing = true;
-    }
-
-    if (call.state() === CALL_STATE.MEDIA_ESTAB && isSameUser && !selfParticipant.sharesScreen()) {
-      selfParticipant.releaseVideoStream(true);
     }
 
     call
@@ -2280,13 +2295,17 @@ export class CallingRepository {
     const modalOptions = {
       text: {
         closeBtnLabel: t('modalNoCameraCloseBtn'),
-        htmlMessage: t('modalNoCameraMessage', Config.getConfig().BRAND_NAME, {
-          '/faqLink': '</a>',
-          br: '<br>',
-          faqLink: `<a href="${
-            Config.getConfig().URL.SUPPORT.CAMERA_ACCESS_DENIED
-          }" data-uie-name="go-no-camera-faq" target="_blank" rel="noopener noreferrer">`,
-        }),
+        htmlMessage: t(
+          'modalNoCameraMessage',
+          {brandName: Config.getConfig().BRAND_NAME},
+          {
+            '/faqLink': '</a>',
+            br: '<br>',
+            faqLink: `<a href="${
+              Config.getConfig().URL.SUPPORT.CAMERA_ACCESS_DENIED
+            }" data-uie-name="go-no-camera-faq" target="_blank" rel="noopener noreferrer">`,
+          },
+        ),
         title: t('modalNoCameraTitle'),
       },
     };

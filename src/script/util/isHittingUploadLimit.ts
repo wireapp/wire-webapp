@@ -31,7 +31,7 @@ const isHittingUploadLimit = (files: File[], assetRepository: AssetRepository): 
   if (isHittingUploadLimit) {
     const modalOptions = {
       text: {
-        message: t('modalAssetParallelUploadsMessage', CONCURRENT_UPLOAD_LIMIT),
+        message: t('modalAssetParallelUploadsMessage', {number: CONCURRENT_UPLOAD_LIMIT}),
         title: t('modalAssetParallelUploadsHeadline'),
       },
     };

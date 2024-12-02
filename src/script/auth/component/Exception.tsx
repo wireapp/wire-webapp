@@ -23,8 +23,10 @@ import {FormattedMessage} from 'react-intl';
 
 import {ErrorMessage, Link} from '@wireapp/react-ui-kit';
 
+import {errorHandlerStrings} from 'Util/ErrorUtil';
+import {validationErrorStrings} from 'Util/ValidationUtil';
+
 import {Config} from '../../Config';
-import {errorHandlerStrings, validationErrorStrings} from '../../strings';
 
 interface ExceptionProps {
   errors: any[];
@@ -46,23 +48,23 @@ const Exception = ({errors = []}: ExceptionProps) => {
           >
             {translatedErrors.hasOwnProperty(error.label) ? (
               <FormattedMessage
-                {...translatedErrors[error.label]}
+                id={translatedErrors[error.label]}
                 values={{
                   minPasswordLength: Config.getConfig().MINIMUM_PASSWORD_LENGTH,
                   supportEmailExistsLink: (
                     <Link targetBlank href={Config.getConfig().URL.SUPPORT.EMAIL_EXISTS}>
-                      <FormattedMessage {...errorHandlerStrings.learnMore} />
+                      <FormattedMessage id="BackendError.learnMore" />
                     </Link>
                   ),
                   supportKeychainLink: (
                     <Link targetBlank href={Config.getConfig().URL.SUPPORT.SYSTEM_KEYCHAIN_ACCESS}>
-                      <FormattedMessage {...errorHandlerStrings.howToLogIn} />
+                      <FormattedMessage id="LabeledError.howToLogIn" />
                     </Link>
                   ),
                 }}
               />
             ) : (
-              <FormattedMessage {...translatedErrors.unexpected} values={error} />
+              <FormattedMessage id="BackendError.unexpected" values={error} />
             )}
           </ErrorMessage>
         );

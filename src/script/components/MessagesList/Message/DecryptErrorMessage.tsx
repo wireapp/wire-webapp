@@ -40,14 +40,22 @@ const DecryptErrorMessage: React.FC<DecryptErrorMessageProps> = ({message, onCli
 
   const link = Config.getConfig().URL.SUPPORT.DECRYPT_ERROR;
   const caption = message.isIdentityChanged
-    ? t('conversationUnableToDecrypt2', message.user().name(), {
-        '/highlight': '</span>',
-        highlight: '<span class="label-bold-xs">',
-      })
-    : t('conversationUnableToDecrypt1', message.user().name(), {
-        '/highlight': '</span>',
-        highlight: '<span class="label-bold-xs">',
-      });
+    ? t(
+        'conversationUnableToDecrypt2',
+        {user: message.user().name()},
+        {
+          '/highlight': '</span>',
+          highlight: '<span class="label-bold-xs">',
+        },
+      )
+    : t(
+        'conversationUnableToDecrypt1',
+        {user: message.user().name()},
+        {
+          '/highlight': '</span>',
+          highlight: '<span class="label-bold-xs">',
+        },
+      );
 
   return (
     <div data-uie-name="element-message-decrypt-error">

@@ -113,7 +113,9 @@ const GuestOptions: FC<GuestOptionsProps> = ({
         t('guestRoomToggleInfo')
       );
     }
-    return isGuestEnabled ? t('guestOptionsInfoText', Config.getConfig().BRAND_NAME) : t('guestRoomToggleInfo');
+    return isGuestEnabled
+      ? t('guestOptionsInfoText', {brandName: Config.getConfig().BRAND_NAME})
+      : t('guestRoomToggleInfo');
   }, [inTeam, isGuestEnabled, accessCodeHasPassword]);
 
   const guestLinkDisabledInfo = !isTeamStateGuestLinkEnabled
