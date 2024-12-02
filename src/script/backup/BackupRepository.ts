@@ -125,6 +125,10 @@ export class BackupRepository {
   ): Promise<Blob> {
     const files: Record<string, Uint8Array> = {};
 
+    if (this.canceled) {
+      throw new CancelError();
+    }
+
     // If the exported data is an Int8Array, it is a Multiplatform backup
     if (exportedData instanceof Int8Array) {
       files[MPBackup.ZIP_ENTRY_DATA] = new Uint8Array(exportedData.buffer, 0, exportedData.byteLength);
