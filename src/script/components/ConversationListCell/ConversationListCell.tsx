@@ -175,7 +175,7 @@ export const ConversationListCell = ({
         onKeyDown={handleDivKeyDown}
         data-uie-name="go-open-conversation"
         tabIndex={isFocused ? TabIndex.FOCUSABLE : TabIndex.UNFOCUSABLE}
-        aria-label={t('accessibility.openConversation', displayName)}
+        aria-label={t('accessibility.openConversation', {name: displayName})}
         aria-describedby={contextMenuKeyboardShortcut}
       >
         <span id={contextMenuKeyboardShortcut} aria-label={t('accessibility.conversationOptionsMenuAccessKey')} />

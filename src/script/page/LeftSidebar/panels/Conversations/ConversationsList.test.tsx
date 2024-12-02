@@ -17,6 +17,8 @@
  *
  */
 
+import {createRef} from 'react';
+
 import {render} from '@testing-library/react';
 import {ConversationProtocol, CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import ko from 'knockout';
@@ -82,6 +84,7 @@ describe('ConversationsList', () => {
         groupParticipantsConversations={[]}
         isGroupParticipantsVisible={false}
         isEmpty={false}
+        searchInputRef={createRef()}
       />,
     );
 

@@ -90,8 +90,8 @@ username: your-username
 
 **Usage:**
 
-1. Add string variable to "src/script/strings.ts" (source for the React part of our app) and text to "i18n/en-US.json" (source for the Knockout part of our app)
-1. Create a PR and merge it after approval. When the PR gets merged, our CI will take care of uploading the english texts to Crowdin.
+1. Add string variable to "i18n/en-US.json"
+2. Create a PR and merge it after approval. When the PR gets merged, our CI will take care of uploading the english texts to Crowdin.
 
 If our CI pipeline is broken, you still have the option to upload new strings manually. For this case do the following:
 

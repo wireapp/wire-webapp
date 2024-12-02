@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 
 import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation/';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
@@ -39,6 +39,7 @@ import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import * as Icon from 'Components/Icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
+import {useClickOutside} from 'Hooks/useClickOutside';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {Config} from 'src/script/Config';
 import {isCallViewOption} from 'src/script/guards/CallView';
@@ -148,6 +149,11 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     'sharesScreen',
     'sharesCamera',
   ]);
+
+  const emojiBarRef = useRef(null);
+  const emojiBarToggleButtonRef = useRef(null);
+
+  useClickOutside(emojiBarRef, () => setShowEmojisBar(false), emojiBarToggleButtonRef);
 
   const {blurredVideoStream} = useKoSubscribableChildren(selfParticipant, ['blurredVideoStream']);
   const hasBlurredBackground = !!blurredVideoStream;
@@ -794,6 +800,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                     <li className="video-controls__item">
                       {showEmojisBar && (
                         <div
+                          ref={emojiBarRef}
                           role="toolbar"
                           className="video-controls-emoji-bar"
                           data-uie-name="video-controls-emoji-bar"
@@ -818,6 +825,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                         </div>
                       )}
                       <button
+                        ref={emojiBarToggleButtonRef}
                         title={t('callReactions')}
                         className={classNames('video-controls__button_primary', {active: showEmojisBar})}
                         onClick={() => setShowEmojisBar(prev => !prev)}

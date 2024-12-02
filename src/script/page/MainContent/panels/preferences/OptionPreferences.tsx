@@ -232,11 +232,9 @@ const OptionPreferences = ({propertiesRepository, selfUser}: OptionPreferencesPr
                 className="preferences-detail preferences-detail-intended"
                 aria-hidden="true"
                 dangerouslySetInnerHTML={{
-                  __html: t(
-                    'preferencesOptionsEmojiReplaceDetail',
-                    {},
-                    {icon: "<span class='font-size-xs icon-emoji'></span>"},
-                  ),
+                  __html: t('preferencesOptionsEmojiReplaceDetail', undefined, {
+                    icon: "<span class='font-size-xs icon-emoji'></span>",
+                  }),
                 }}
               />
             </div>

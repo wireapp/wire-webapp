@@ -112,6 +112,9 @@ export const QualityFeedbackModal = () => {
           {ratingListItems.map(ratingItem => (
             <li key={ratingItem.value}>
               {ratingItem?.headingTranslationKey && (
+                // @ts-expect-error
+                // headingTranslationKey has to broad type to specify it
+                // TODO: narrow down the type
                 <div css={ratingItemHeading}>{t(ratingItem.headingTranslationKey)}</div>
               )}
               <Button

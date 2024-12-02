@@ -34,7 +34,7 @@ export class DeleteConversationMessage extends SystemMessage {
     this.system_message_type = SystemMessageType.CONVERSATION_DELETE;
 
     this.caption = conversationEntity
-      ? t('notificationConversationDeletedNamed', conversationEntity.name())
+      ? t('notificationConversationDeletedNamed', {name: conversationEntity.name()})
       : t('notificationConversationDeleted');
   }
 }

@@ -19,7 +19,7 @@
 
 import {FC} from 'react';
 
-import {IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
+import {IconButton, IconButtonVariant, QUERY, useMatchMedia} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {useAppMainState, ViewType} from 'src/script/page/state';
@@ -33,7 +33,7 @@ interface PreferencesPageProps {
 
 const PreferencesPage: FC<PreferencesPageProps> = ({title, children}) => {
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
-  const smBreakpoint = useMatchMedia('max-width: 720px');
+  const smBreakpoint = useMatchMedia(QUERY.tabletSMDown);
 
   const {currentView, setCurrentView} = useAppMainState(state => state.responsiveView);
   const isCentralColumn = currentView == ViewType.MOBILE_CENTRAL_COLUMN;

@@ -19,7 +19,7 @@
 
 import React, {useEffect, useState} from 'react';
 
-import {FormattedMessage, useIntl} from 'react-intl';
+import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
 import {Navigate, useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
@@ -30,20 +30,20 @@ import {Button, ButtonVariant, ContainerXS, ErrorMessage, Text} from '@wireapp/r
 import {LogoFullIcon} from 'Components/Icon';
 import {isDataDogEnabled} from 'Util/DataDog';
 import {getWebEnvironment} from 'Util/Environment';
+import {t} from 'Util/LocalizerUtil';
 
 import {Page} from './Page';
 
 import {Config} from '../../Config';
 import '../../localization/Localizer';
-import {indexStrings, logoutReasonStrings} from '../../strings';
 import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {QUERY_KEY, ROUTE} from '../route';
+import {logoutReasonStrings} from '../util/logoutUtil';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
 const IndexComponent = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
-  const {formatMessage: _} = useIntl();
   const navigate = useNavigate();
   const [logoutReason, setLogoutReason] = useState<string>();
 
@@ -81,7 +81,7 @@ const IndexComponent = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps
           style={{fontSize: '2rem', fontWeight: 300, marginBottom: '48px'}}
           data-uie-name="welcome-text"
         >
-          {_(indexStrings.welcome, {brandName: Config.getConfig().BACKEND_NAME})}
+          {t('index.welcome', {brandName: Config.getConfig().BACKEND_NAME})}
         </Text>
 
         {!getWebEnvironment().isProduction && isDataDogEnabled() && (
@@ -91,13 +91,16 @@ const IndexComponent = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps
             style={{fontSize: '0.75rem', fontWeight: 300, marginBottom: '48px'}}
             data-uie-name="disclaimer"
           >
-            {_(indexStrings.disclaimer, {
-              link: (
-                <a href="https://app.wire.com" rel="noopener noreferrer">
-                  https://app.wire.com
-                </a>
-              ),
-            })}
+            <FormattedMessage
+              id="index.disclaimer"
+              values={{
+                link: (
+                  <a href="https://app.wire.com" rel="noopener noreferrer">
+                    https://app.wire.com
+                  </a>
+                ),
+              }}
+            />
           </Text>
         )}
 
@@ -108,16 +111,16 @@ const IndexComponent = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps
             block
             data-uie-name="go-set-account-type"
           >
-            {_(indexStrings.createAccount)}
+            {t('index.createAccount')}
           </Button>
         )}
         <Button type="button" onClick={() => navigate(ROUTE.LOGIN)} block data-uie-name="go-login">
-          {_(indexStrings.logIn)}
+          {t('index.login')}
         </Button>
         {logoutReason && (
           <ErrorMessage data-uie-name="status-logout-reason">
             <FormattedMessage
-              {...logoutReasonStrings[logoutReason]}
+              id={logoutReasonStrings[logoutReason]}
               values={{
                 newline: <br />,
               }}
@@ -133,7 +136,7 @@ const IndexComponent = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps
             style={{marginTop: '120px'}}
             data-uie-name="go-sso-login"
           >
-            {_(features.ENABLE_DOMAIN_DISCOVERY ? indexStrings.enterprise : indexStrings.ssoLogin)}
+            {t(features.ENABLE_DOMAIN_DISCOVERY ? 'index.enterprise' : 'index.ssoLogin')}
           </Button>
         )}
       </ContainerXS>

@@ -19,16 +19,16 @@
 
 import React, {useRef, useState} from 'react';
 
-import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {Navigate, useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 
 import {Button, ContainerXS, Form, H1, Input} from '@wireapp/react-ui-kit';
 
+import {t} from 'Util/LocalizerUtil';
+
 import {Page} from './Page';
 
-import {setEmailStrings} from '../../strings';
 import {Exception} from '../component/Exception';
 import {actionRoot} from '../module/action';
 import {ValidationError} from '../module/action/ValidationError';
@@ -44,8 +44,6 @@ const SetEmailComponent = ({
   doSetEmail,
   isFetching,
 }: Props & ConnectedProps & DispatchProps) => {
-  const {formatMessage: _} = useIntl();
-
   const emailInput = useRef<HTMLInputElement>();
   const [error, setError] = useState();
   const [isValidEmail, setIsValidEmail] = useState(true);
@@ -85,10 +83,10 @@ const SetEmailComponent = ({
         style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
       >
         <Form onSubmit={onSetEmail}>
-          <H1 center>{_(setEmailStrings.headline)}</H1>
+          <H1 center>{t('setEmail.headline')}</H1>
           <Input
             name="email"
-            placeholder={_(setEmailStrings.emailPlaceholder)}
+            placeholder={t('setEmail.emailPlaceholder')}
             type="email"
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               emailInput.current.setCustomValidity('');
@@ -113,7 +111,7 @@ const SetEmailComponent = ({
             type="submit"
             data-uie-name="do-verify-email"
           >
-            {_(setEmailStrings.button)}
+            {t('setEmail.button')}
           </Button>
         </Form>
       </ContainerXS>

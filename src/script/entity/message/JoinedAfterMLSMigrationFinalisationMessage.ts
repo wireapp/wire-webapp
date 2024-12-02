@@ -29,7 +29,7 @@ export class JoinedAfterMLSMigrationFinalisationMessage extends SystemMessage {
     this.system_message_type = SystemMessageType.JOINED_AFTER_MLS_MIGRATION;
     this.caption = t(
       'conversationJoinedAfterMLSMigrationFinalisation',
-      {},
+      undefined,
       replaceLink(Config.getConfig().URL.SUPPORT.MLS_LEARN_MORE),
     );
   }

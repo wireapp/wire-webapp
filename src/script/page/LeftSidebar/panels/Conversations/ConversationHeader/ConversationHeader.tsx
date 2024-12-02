@@ -17,7 +17,7 @@
  *
  */
 
-import {forwardRef, KeyboardEvent, useEffect, useRef} from 'react';
+import {forwardRef, KeyboardEvent, MutableRefObject, useEffect} from 'react';
 
 import {amplify} from 'amplify';
 
@@ -53,6 +53,7 @@ interface ConversationHeaderProps {
   currentFolder?: ConversationLabel;
   onSearchEnterClick: (event: KeyboardEvent<HTMLInputElement>) => void;
   jumpToRecentSearch: () => void;
+  searchInputRef: MutableRefObject<HTMLInputElement | null>;
 }
 
 export const ConversationHeaderComponent = ({
@@ -65,9 +66,8 @@ export const ConversationHeaderComponent = ({
   searchInputPlaceholder,
   onSearchEnterClick,
   jumpToRecentSearch,
+  searchInputRef,
 }: ConversationHeaderProps) => {
-  const inputRef = useRef<HTMLInputElement | null>(null);
-
   const {canCreateGroupConversation} = generatePermissionHelpers(selfUser.teamRole());
   const isFolderView = currentTab === SidebarTabs.FOLDER;
 
@@ -89,7 +89,7 @@ export const ConversationHeaderComponent = ({
   useEffect(() => {
     const onSearchShortcut = () => {
       jumpToRecentSearch();
-      inputRef.current?.focus();
+      searchInputRef?.current?.focus();
     };
 
     amplify.subscribe(WebAppEvents.SHORTCUT.SEARCH, onSearchShortcut);
@@ -97,7 +97,7 @@ export const ConversationHeaderComponent = ({
     return () => {
       amplify.unsubscribe(WebAppEvents.SHORTCUT.SEARCH, onSearchShortcut);
     };
-  }, [jumpToRecentSearch]);
+  }, [searchInputRef, jumpToRecentSearch]);
 
   return (
     <>
@@ -121,7 +121,7 @@ export const ConversationHeaderComponent = ({
       {showSearchInput && (
         <Input
           onKeyDown={onKeyDown}
-          ref={inputRef}
+          ref={searchInputRef}
           className="label-1"
           value={searchValue}
           onChange={event => setSearchValue(event.currentTarget.value)}

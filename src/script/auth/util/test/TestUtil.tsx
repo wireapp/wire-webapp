@@ -32,10 +32,61 @@ import {ThunkDispatch} from 'redux-thunk';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
+import cs from 'I18n/cs-CZ.json';
+import da from 'I18n/da-DK.json';
+import de from 'I18n/de-DE.json';
+import el from 'I18n/el-GR.json';
+import en from 'I18n/en-US.json';
+import es from 'I18n/es-ES.json';
+import et from 'I18n/et-EE.json';
+import fi from 'I18n/fi-FI.json';
+import fr from 'I18n/fr-FR.json';
+import hr from 'I18n/hr-HR.json';
+import hu from 'I18n/hu-HU.json';
+import it from 'I18n/it-IT.json';
+import lt from 'I18n/lt-LT.json';
+import nl from 'I18n/nl-NL.json';
+import pl from 'I18n/pl-PL.json';
+import pt from 'I18n/pt-BR.json';
+import ro from 'I18n/ro-RO.json';
+import ru from 'I18n/ru-RU.json';
+import si from 'I18n/si-LK.json';
+import sk from 'I18n/sk-SK.json';
+import sl from 'I18n/sl-SI.json';
+import tr from 'I18n/tr-TR.json';
+import uk from 'I18n/uk-UA.json';
 import {User} from 'src/script/entity/User';
+import {setStrings} from 'Util/LocalizerUtil';
 import {createUuid} from 'Util/uuid';
 
+import {mapLanguage} from '../../localeConfig';
 import {Api, RootState} from '../../module/reducer';
+
+const internalizationStrings = {
+  cs,
+  da,
+  de,
+  el,
+  en,
+  es,
+  et,
+  fi,
+  fr,
+  hr,
+  hu,
+  it,
+  lt,
+  nl,
+  pl,
+  pt,
+  ro,
+  ru,
+  si,
+  sk,
+  sl,
+  tr,
+  uk,
+};
 
 const withStore = (
   children: React.ReactNode,
@@ -44,7 +95,19 @@ const withStore = (
 
 const withRouter = (component: React.ReactNode) => <Router>{component}</Router>;
 
-export const withIntl = (component: React.ReactNode) => <IntlProvider locale="en">{component}</IntlProvider>;
+const loadLanguage = (language: string) => {
+  return require(`I18n/${mapLanguage(language)}.json`);
+};
+
+export const withIntl = (component: React.ReactNode) => {
+  setStrings(internalizationStrings);
+
+  return (
+    <IntlProvider locale="en" messages={loadLanguage('en-US')}>
+      {component}
+    </IntlProvider>
+  );
+};
 
 export const withTheme = (component: React.ReactNode) => <StyledApp themeId={THEME_ID.DEFAULT}>{component}</StyledApp>;
 

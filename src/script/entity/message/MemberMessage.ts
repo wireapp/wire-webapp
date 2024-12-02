@@ -96,7 +96,7 @@ export class MemberMessage extends SystemMessage {
 
         const groupCreationString = this.user().isMe
           ? t('conversationCreatedNameYou')
-          : t('conversationCreatedName', this.senderName());
+          : t('conversationCreatedName', {name: this.senderName()});
         return capitalizeFirstChar(groupCreationString);
       }
       return '';

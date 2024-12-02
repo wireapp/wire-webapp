@@ -20,7 +20,6 @@
 import React, {useState} from 'react';
 
 import {BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http';
-import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 
@@ -41,9 +40,10 @@ import {
   InputBlock,
 } from '@wireapp/react-ui-kit';
 
+import {t} from 'Util/LocalizerUtil';
+
 import {Page} from './Page';
 
-import {inviteStrings} from '../../strings';
 import {Exception} from '../component/Exception';
 import {EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
@@ -66,7 +66,6 @@ const InitialInviteComponent = ({
   isTeamFlow,
   removeLocalStorage,
 }: Props & ConnectedProps & DispatchProps) => {
-  const {formatMessage: _} = useIntl();
   const emailInput = React.useRef<HTMLInputElement>();
   const [enteredEmail, setEnteredEmail] = useState('');
   const [error, setError] = useState(null);
@@ -152,8 +151,8 @@ const InitialInviteComponent = ({
         style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 428}}
       >
         <div>
-          <H1 center>{_(inviteStrings.headline)}</H1>
-          <Muted>{_(inviteStrings.subhead)}</Muted>
+          <H1 center>{t('invite.headline')}</H1>
+          <Muted>{t('invite.subhead')}</Muted>
         </div>
         <div style={{margin: '18px 0', minHeight: 220}}>
           {invites.map(({email}) => renderEmail(email))}
@@ -163,7 +162,7 @@ const InitialInviteComponent = ({
                 <Input
                   id="enter-invite-email"
                   name="email"
-                  placeholder={_(inviteStrings.emailPlaceholder)}
+                  placeholder={t('invite.emailPlaceholder')}
                   type="email"
                   onChange={onEmailChange}
                   // Note: Curser issues when using controlled input
@@ -187,11 +186,11 @@ const InitialInviteComponent = ({
         <div>
           {invites.length ? (
             <Button type="button" onClick={onInviteDone} data-uie-name="do-next">
-              {_(inviteStrings.nextButton)}
+              {t('invite.nextButton')}
             </Button>
           ) : (
             <Link onClick={onInviteDone} data-uie-name="do-skip">
-              {_(inviteStrings.skipForNow)}
+              {t('invite.skipForNow')}
             </Link>
           )}
         </div>

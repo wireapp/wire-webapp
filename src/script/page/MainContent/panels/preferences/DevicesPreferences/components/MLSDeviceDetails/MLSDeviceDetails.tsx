@@ -46,7 +46,7 @@ export const MLSDeviceDetails = ({isCurrentDevice, identity, isSelfUser = false}
 
   return (
     <div css={styles.wrapper}>
-      <h4 className="paragraph-body-3">{t('mlsSignature', MLSPublicKeys.ED25519.toUpperCase())}</h4>
+      <h4 className="paragraph-body-3">{t('mlsSignature', {signature: MLSPublicKeys.ED25519.toUpperCase()})}</h4>
 
       {identity?.thumbprint && (
         <>
