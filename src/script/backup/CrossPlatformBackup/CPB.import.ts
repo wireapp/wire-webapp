@@ -44,28 +44,25 @@ export const importMPBHistoryToDatabase = async ({
   const result = backupImporter.importBackup(new Int8Array(backupRawData.buffer));
 
   if (result instanceof BackupImportResult.Success) {
-    CPBLogger.log(`SUCCESSFUL BACKUP IMPORT: ${result.backupData}`); // eslint-disable-line
+    CPBLogger.log(`SUCCESSFUL BACKUP IMPORT: ${result.backupData}`);
     const eventRecords: EventRecord[] = [];
     result.backupData.messages.forEach(message => {
-      CPBLogger.log(`IMPORTED MESSAGE: ${message.toString()}`); // eslint-disable-line
       const eventRecord = mapEventRecord(message);
       if (eventRecord) {
         eventRecords.push(eventRecord);
       }
     });
     result.backupData.conversations.forEach(conversation => {
-      CPBLogger.log(`IMPORTED CONVERSATION: ${conversation.toString()}`); // eslint-disable-line
       // TODO: Import conversations
     });
     result.backupData.users.forEach(user => {
-      CPBLogger.log(`IMPORTED USER: ${user.toString()}`); // eslint-disable-line
       // TODO: Import users
     });
 
-    CPBLogger.log(`IMPORTED ${eventRecords.length} EVENTS`); // eslint-disable-line
+    CPBLogger.log(`IMPORTED ${eventRecords.length} EVENTS`);
     FileDescriptor.push({entities: eventRecords, filename: Filename.EVENTS});
   } else {
-    CPBLogger.log(`ERROR DURING BACKUP IMPORT: ${result}`); // eslint-disable-line
+    CPBLogger.log(`ERROR DURING BACKUP IMPORT: ${result}`);
     throw new IncompatibleBackupError('Incompatible Multiplatform backup');
   }
 

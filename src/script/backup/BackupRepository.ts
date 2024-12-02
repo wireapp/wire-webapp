@@ -284,7 +284,6 @@ export class BackupRepository {
     const nbEntities = fileDescriptors.reduce((acc, {entities}) => acc + entities.length, 0);
     initCallback(nbEntities);
 
-    this.logger.log('AW Importing history data', fileDescriptors);
     await this.importHistoryData(archiveVersion, fileDescriptors, progressCallback);
   }
 
@@ -338,6 +337,7 @@ export class BackupRepository {
     }
 
     // Run all the database migrations on the imported data
+    progressCallback(0);
     await this.backupService.runDbSchemaUpdates(archiveVersion);
 
     const readableConversations = importedConversations.filter(isReadableConversation);
