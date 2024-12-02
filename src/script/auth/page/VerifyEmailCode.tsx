@@ -19,18 +19,18 @@
 
 import React from 'react';
 
-import {FormattedMessage, useIntl} from 'react-intl';
+import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 
 import {CodeInput, ContainerXS, H1, Muted} from '@wireapp/react-ui-kit';
 
+import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 
 import {Page} from './Page';
 
-import {verifyStrings} from '../../strings';
 import {LinkButton} from '../component/LinkButton';
 import {RouterLink} from '../component/RouterLink';
 import {actionRoot as ROOT_ACTIONS} from '../module/action';
@@ -57,7 +57,6 @@ const VerifyEmailCodeComponent = ({
   doSendActivationCode,
 }: Props & ConnectedProps & DispatchProps) => {
   const navigate = useNavigate();
-  const {formatMessage: _} = useIntl();
 
   const logger = getLogger('VerifyEmailCode');
   const createAccount = async (email_code: string) => {
@@ -101,10 +100,10 @@ const VerifyEmailCodeComponent = ({
         style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
       >
         <div>
-          <H1 center>{_(verifyStrings.headline)}</H1>
+          <H1 center>{t('verify.headline')}</H1>
           <Muted data-uie-name="label-with-email">
             <FormattedMessage
-              {...verifyStrings.subhead}
+              id="verify.subhead"
               values={{
                 email: account.email,
                 newline: <br />,
@@ -116,10 +115,10 @@ const VerifyEmailCodeComponent = ({
         </div>
         <div>
           <LinkButton onClick={resendCode} data-uie-name="do-resend-code">
-            {_(verifyStrings.resendCode)}
+            {t('verify.resendCode')}
           </LinkButton>
           <RouterLink to={changeEmailRedirect[currentFlow]} style={{marginLeft: 35}} data-uie-name="go-change-email">
-            {_(verifyStrings.changeEmail)}
+            {t('verify.changeEmail')}
           </RouterLink>
         </div>
       </ContainerXS>

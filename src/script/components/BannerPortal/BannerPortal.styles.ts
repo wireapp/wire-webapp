@@ -22,6 +22,5 @@ import {CSSObject} from '@emotion/react';
 export const portalContainerCss: CSSObject = {
   zIndex: 1000,
   position: 'fixed',
-  boxShadow: '0px 0px 12px 0px var(--background-fade-32)',
   borderRadius: '0.5rem',
 };

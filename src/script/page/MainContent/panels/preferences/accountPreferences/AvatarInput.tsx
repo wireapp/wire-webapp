@@ -69,7 +69,7 @@ export const AvatarInput = ({
     const isTooLarge = newUserPicture.size > Config.getConfig().MAXIMUM_IMAGE_FILE_SIZE;
     if (isTooLarge) {
       const maximumSizeInMB = Config.getConfig().MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024;
-      const messageString = t('modalPictureTooLargeMessage', maximumSizeInMB);
+      const messageString = t('modalPictureTooLargeMessage', {number: maximumSizeInMB});
       const titleString = t('modalPictureTooLargeHeadline');
 
       return showUploadWarning(titleString, messageString);

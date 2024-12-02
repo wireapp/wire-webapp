@@ -36,6 +36,9 @@ const getDefaultParams = (): React.ComponentProps<typeof MessagesList> => {
   return {
     cancelConnectionRequest: jest.fn(),
     conversation,
+    assetRepository: {
+      processQueue: [],
+    } as any,
     conversationRepository: {
       expectReadReceipt: jest.fn(() => false),
       getMessagesWithOffset: jest.fn(),

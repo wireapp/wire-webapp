@@ -66,9 +66,9 @@ export const ReadOnlyConversationMessage: FC<ReadOnlyConversationMessageProps> =
         return (
           <ReadOnlyConversationMessageBase>
             <span>
-              {replaceReactComponents(t('otherUserNotSupportMLSMsg'), [
+              {replaceReactComponents(t('otherUserNotSupportMLSMsg', {participantName: '{participantName}'}), [
                 {
-                  exactMatch: '{{participantName}}',
+                  exactMatch: '{participantName}',
                   render: () => <strong>{user.name()}</strong>,
                 },
               ])}
@@ -79,9 +79,9 @@ export const ReadOnlyConversationMessage: FC<ReadOnlyConversationMessageProps> =
         return (
           <ReadOnlyConversationMessageBase>
             <span>
-              {replaceReactComponents(t('selfNotSupportMLSMsgPart1'), [
+              {replaceReactComponents(t('selfNotSupportMLSMsgPart1', {selfUserName: '{selfUserName}'}), [
                 {
-                  exactMatch: '{{selfUserName}}',
+                  exactMatch: '{selfUserName}',
                   render: () => <strong>{user.name()}</strong>,
                 },
               ])}
@@ -104,9 +104,9 @@ export const ReadOnlyConversationMessage: FC<ReadOnlyConversationMessageProps> =
         return (
           <ReadOnlyConversationMessageBase>
             <span>
-              {replaceReactComponents(t('otherUserNoAvailableKeyPackages'), [
+              {replaceReactComponents(t('otherUserNoAvailableKeyPackages', {participantName: '{participantName}'}), [
                 {
-                  exactMatch: '{{participantName}}',
+                  exactMatch: '{participantName}',
                   render: () => <strong>{user.name()}</strong>,
                 },
               ])}

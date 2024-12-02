@@ -148,7 +148,7 @@ export const Conversation = ({
 
           return showWarningModal(
             t(isGif ? 'modalGifTooLargeHeadline' : 'modalPictureTooLargeHeadline'),
-            t(isGif ? 'modalGifTooLargeMessage' : 'modalPictureTooLargeMessage', maxSize),
+            t(isGif ? 'modalGifTooLargeMessage' : 'modalPictureTooLargeMessage', {number: maxSize}),
           );
         }
       }
@@ -189,7 +189,7 @@ export const Conversation = ({
 
           if (isFileTooLarge) {
             const fileSize = formatBytes(uploadLimit);
-            showWarningModal(t('modalAssetTooLargeHeadline'), t('modalAssetTooLargeMessage', fileSize));
+            showWarningModal(t('modalAssetTooLargeHeadline'), t('modalAssetTooLargeMessage', {number: fileSize}));
 
             return;
           }
@@ -294,7 +294,7 @@ export const Conversation = ({
         text: t('modalOpenLinkAction'),
       },
       text: {
-        htmlMessage: t('modalOpenLinkMessage', href, {}, true),
+        htmlMessage: t('modalOpenLinkMessage', {link: href}, {}, true),
         title: t('modalOpenLinkTitle'),
       },
     });
@@ -511,6 +511,7 @@ export const Conversation = ({
             conversation={activeConversation}
             selfUser={selfUser}
             conversationRepository={conversationRepository}
+            assetRepository={repositories.asset}
             messageRepository={repositories.message}
             messageActions={mainViewModel.actions}
             invitePeople={clickOnInvitePeople}

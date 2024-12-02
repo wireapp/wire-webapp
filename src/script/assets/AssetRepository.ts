@@ -22,7 +22,7 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
 
-import {LegalHoldStatus} from '@wireapp/protocol-messaging';
+import {GenericMessage, LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {downloadBlob, loadFileBuffer, loadImage} from 'Util/util';
@@ -60,6 +60,8 @@ export class AssetRepository {
   readonly uploadCancelTokens: {[messageId: string]: () => void} = {};
   logger: Logger;
 
+  processQueue: ko.ObservableArray<{message: GenericMessage; conversationId: string}> = ko.observableArray();
+
   constructor(
     private readonly core = container.resolve(Core),
     private readonly teamState = container.resolve(TeamState),
@@ -69,6 +71,14 @@ export class AssetRepository {
 
   get assetCoreService() {
     return this.core.service!.asset;
+  }
+
+  public addToProcessQueue(message: GenericMessage, conversationId: string) {
+    this.processQueue.push({message, conversationId});
+  }
+
+  public removeFromProcessQueue(messageId: string) {
+    this.processQueue(this.processQueue().filter(queueItem => queueItem.message.messageId !== messageId));
   }
 
   async getObjectUrl(asset: AssetRemoteData): Promise<string> {
@@ -234,6 +244,7 @@ export class AssetRepository {
         progressObservable(percentage);
       },
     );
+
     this.uploadCancelTokens[messageId] = () => {
       request.cancel();
       onCancel?.();
@@ -266,6 +277,7 @@ export class AssetRepository {
 
   private removeFromUploadQueue(messageId: string): void {
     this.uploadProgressQueue(this.uploadProgressQueue().filter(upload => upload.messageId !== messageId));
+    this.removeFromProcessQueue(messageId);
     delete this.uploadCancelTokens[messageId];
   }
 }

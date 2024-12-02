@@ -45,7 +45,9 @@ export class MessageTimerUpdateMessage extends SystemMessage {
 const getCaption = (messageTimer: number, isSelfUser: boolean) => {
   if (messageTimer) {
     const timeString = formatDuration(messageTimer).text;
-    return isSelfUser ? t('conversationUpdatedTimerYou', timeString) : t('conversationUpdatedTimer', timeString);
+    return isSelfUser
+      ? t('conversationUpdatedTimerYou', {time: timeString})
+      : t('conversationUpdatedTimer', {time: timeString});
   }
 
   return isSelfUser ? t('conversationResetTimerYou') : t('conversationResetTimer');
