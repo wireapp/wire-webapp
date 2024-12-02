@@ -19,10 +19,64 @@
 
 import {css, CSSObject} from '@emotion/react';
 
-export const classifiedBarStyles: CSSObject = {
-  lineHeight: '1.5em',
+export const videoControlsWrapperStyles: CSSObject = {
   display: 'flex',
+  alignItems: 'center',
+  padding: '8px 16px',
+  margin: 0,
+  gap: '8px',
+
+  '@media (min-width: 640px)': {
+    gap: '16px',
+  },
 };
+
+export const minimizeVideoControlStyles: CSSObject = {
+  '@media (min-width: 640px)': {
+    marginRight: 'auto',
+  },
+};
+
+export const shareScreenVideoControlStyles: CSSObject = {
+  '@media (max-width: 639px)': {
+    marginLeft: 'auto',
+    marginRight: 'auto',
+  },
+};
+
+export const hangUpVideoControlStyles: CSSObject = {
+  '@media (max-width: 639px)': {
+    order: 2,
+  },
+  '@media (min-width: 640px)': {
+    marginRight: 'auto',
+  },
+};
+
+export const videoControlActiveStyles = css`
+  background-color: var(--main-color);
+  border: 1px solid var(--main-color);
+  svg,
+  svg > path {
+    fill: var(--app-bg-secondary);
+  }
+  &:hover {
+    background-color: var(--background);
+  }
+  &:active {
+    background-color: var(--accent-color-highlight-inversed);
+    border: 1px solid var(--accent-color-focus);
+  }
+`;
+
+export const videoControlDisabledStyles = css`
+  background-color: var(--disabled-call-button-bg);
+  border: 1px solid var(--disabled-call-button-border);
+  cursor: default;
+  svg {
+    fill: var(--disabled-call-button-svg);
+  }
+`;
 
 export const videoControlInActiveStyles = css`
   background-color: var(--inactive-call-button-bg);
@@ -40,47 +94,3 @@ export const videoControlInActiveStyles = css`
     border: 1px solid var(--accent-color-focus);
   }
 `;
-
-export const paginationButtonStyles: CSSObject = {
-  ['& svg > path']: {
-    fill: 'var(--main-color)',
-  },
-  ['&:focus-visible']: {
-    ['& svg > path']: {
-      fill: 'var(--accent-color)',
-    },
-    outline: '1px solid var(--accent-color-focus)',
-  },
-  ['&:not([disabled]):hover svg > path']: {
-    fill: 'var(--accent-color)',
-  },
-  ['&:disabled svg > path']: {
-    fill: 'var(--disabled-call-button-svg)',
-  },
-  display: 'flex',
-  alignItems: 'center',
-  cursor: 'pointer',
-  height: '100%',
-};
-
-export const videoTopBarStyles: CSSObject = {
-  display: 'grid',
-  gridTemplateColumns: '1fr auto 1fr',
-  alignItems: 'center',
-  backgroundColor: 'var(--sidebar-bg)',
-  padding: '4px 0px',
-};
-
-export const headerActionsWrapperStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  width: 'fit-content',
-  marginLeft: 'auto',
-  padding: '0 6px',
-};
-
-export const paginationWrapperStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: '10px',
-};
