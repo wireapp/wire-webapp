@@ -17,7 +17,7 @@
  *
  */
 
-import {MPBackup, MPBackupImporter, BackupImportResult} from './CPB.library';
+import {CPBackup, CPBackupImporter, BackupImportResult} from './CPB.library';
 import {ImportHistoryToDatabaseParams} from './CPB.types';
 import {mapEventRecord} from './importMappers/mapEventRecord';
 
@@ -30,14 +30,14 @@ import {CPBLogger} from '.';
 /**
  * Imports the history from a Multi-Platform backup to the Database
  */
-export const importMPBHistoryToDatabase = async ({
+export const importCPBHistoryToDatabase = async ({
   fileData,
 }: ImportHistoryToDatabaseParams): Promise<{
   archiveVersion: number;
   fileDescriptors: FileDescriptor[];
 }> => {
-  const backupImporter = new MPBackupImporter();
-  const backupRawData = fileData[MPBackup.ZIP_ENTRY_DATA];
+  const backupImporter = new CPBackupImporter();
+  const backupRawData = fileData[CPBackup.ZIP_ENTRY_DATA];
   const FileDescriptor: FileDescriptor[] = [];
 
   // Import the backup
@@ -63,7 +63,7 @@ export const importMPBHistoryToDatabase = async ({
     FileDescriptor.push({entities: eventRecords, filename: Filename.EVENTS});
   } else {
     CPBLogger.log(`ERROR DURING BACKUP IMPORT: ${result}`);
-    throw new IncompatibleBackupError('Incompatible Multiplatform backup');
+    throw new IncompatibleBackupError('Incompatible cross-platform backup');
   }
 
   return {archiveVersion: 0, fileDescriptors: FileDescriptor};

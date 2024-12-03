@@ -27,7 +27,7 @@ import {WebWorker} from 'Util/worker';
 import {ProgressCallback, Filename, FileDescriptor} from './Backup.types';
 import {BackUpHeader, ERROR_TYPES} from './BackUpHeader';
 import {BackupService} from './BackupService';
-import {exportCPBHistoryFromDatabase, importMPBHistoryToDatabase, isMPBackup, MPBackup} from './CrossPlatformBackup';
+import {exportCPBHistoryFromDatabase, importCPBHistoryToDatabase, CPBackup, isCPBackup} from './CrossPlatformBackup';
 import {
   CancelError,
   DifferentAccountError,
@@ -92,7 +92,7 @@ export class BackupRepository {
 
     try {
       let exportedData = null;
-      // If the feature flag is enabled, export the history as a Multiplatform backup
+      // If the feature flag is enabled, export the history as a cross-platform backup
       if (ENABLE_CROSS_PLATFORM_BACKUP_EXPORT) {
         exportedData = await exportCPBHistoryFromDatabase({
           progressCallback,
@@ -129,9 +129,9 @@ export class BackupRepository {
       throw new CancelError();
     }
 
-    // If the exported data is an Int8Array, it is a Multiplatform backup
+    // If the exported data is an Int8Array, it is a cross-platform backup
     if (exportedData instanceof Int8Array) {
-      files[MPBackup.ZIP_ENTRY_DATA] = new Uint8Array(exportedData.buffer, 0, exportedData.byteLength);
+      files[CPBackup.ZIP_ENTRY_DATA] = new Uint8Array(exportedData.buffer, 0, exportedData.byteLength);
       // If the exported data is an object, it is a legacy backup
     } else {
       const metaData = createMetaData(user, clientId, this.backupService);
@@ -262,17 +262,17 @@ export class BackupRepository {
       throw new ImportError(files.error as unknown as string);
     }
 
-    // Check for Multiplatform backup
-    if (isMPBackup(files)) {
-      // Import Multiplatform backup
-      const mpbData = await importMPBHistoryToDatabase({
+    // Check for cross-platform backup
+    if (isCPBackup(files)) {
+      // Import cross-platform backup
+      const cpbData = await importCPBHistoryToDatabase({
         backupService: this.backupService,
         progressCallback,
         fileData: files,
         user,
       });
-      fileDescriptors = mpbData.fileDescriptors;
-      archiveVersion = mpbData.archiveVersion;
+      fileDescriptors = cpbData.fileDescriptors;
+      archiveVersion = cpbData.archiveVersion;
     } else {
       // Import legacy backup
       const legacyData = await importLegacyBackupToDatabase({

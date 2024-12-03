@@ -21,7 +21,7 @@ import {ConversationRecord, UserRecord, EventRecord} from 'src/script/storage';
 
 import {buildMetaData} from './AssetMetadata';
 import {
-  MPBackupExporter,
+  CPBackupExporter,
   BackupQualifiedId,
   BackUpConversation,
   BackupUser,
@@ -54,7 +54,7 @@ export const exportCPBHistoryFromDatabase = async ({
   user,
 }: ExportHistoryFromDatabaseParams): Promise<Int8Array> => {
   const [conversationTable, eventsTable, usersTable] = backupService.getTables();
-  const backupExporter = new MPBackupExporter(new BackupQualifiedId(user.id, user.domain));
+  const backupExporter = new CPBackupExporter(new BackupQualifiedId(user.id, user.domain));
   function streamProgress<T>(dataProcessor: (data: T[]) => T[]) {
     return (data: T[]) => {
       progressCallback(data.length);

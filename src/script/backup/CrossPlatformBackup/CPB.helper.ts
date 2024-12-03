@@ -22,14 +22,14 @@ import Dexie from 'dexie';
 import {ClientEvent} from 'src/script/event/Client';
 import {getLogger} from 'Util/Logger';
 
-import {MPBackup} from './CPB.library';
+import {CPBackup} from './CPB.library';
 
 import {FileData} from '../Backup.types';
 import {BackupService} from '../BackupService';
 
 export const CPBLogger = getLogger('wire:backup:CPB');
 
-export const isMPBackup = (data: FileData): boolean => !!data[MPBackup.ZIP_ENTRY_DATA];
+export const isCPBackup = (data: FileData): boolean => !!data[CPBackup.ZIP_ENTRY_DATA];
 
 export const isMessageAddEvent = (eventType: unknown): boolean =>
   eventType === ClientEvent.CONVERSATION.MESSAGE_ADD.toString();

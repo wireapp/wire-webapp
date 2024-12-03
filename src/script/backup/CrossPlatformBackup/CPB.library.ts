@@ -21,10 +21,10 @@ import {com} from 'kalium-backup';
 
 // Importing classes from the Java library
 /* eslint-disable */
-import MPBackup = com.wire.backup.MPBackup;
-import MPBackupImporter = com.wire.backup.ingest.MPBackupImporter;
+import CPBackup = com.wire.backup.MPBackup;
+import CPBackupImporter = com.wire.backup.ingest.MPBackupImporter;
 import BackupImportResult = com.wire.backup.ingest.BackupImportResult;
-import MPBackupExporter = com.wire.backup.dump.MPBackupExporter;
+import CPBackupExporter = com.wire.backup.dump.MPBackupExporter;
 import BackupQualifiedId = com.wire.backup.data.BackupQualifiedId;
 import BackupMessage = com.wire.backup.data.BackupMessage;
 import BackupUser = com.wire.backup.data.BackupUser;
@@ -36,10 +36,10 @@ import AssetMetaData = com.wire.backup.data.BackupMessageContent.Asset.AssetMeta
 /* eslint-enable */
 
 export {
-  MPBackup,
-  MPBackupImporter,
+  CPBackup,
+  CPBackupImporter,
   BackupImportResult,
-  MPBackupExporter,
+  CPBackupExporter,
   BackupQualifiedId,
   BackupMessage,
   BackupUser,
