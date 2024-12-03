@@ -1330,15 +1330,16 @@ export class CallingRepository {
   }
 
   requestCurrentPageVideoStreams(call: Call): void {
-    const currentPageParticipants = call.pages()[call.currentPage()];
-    if (currentPageParticipants === undefined) {
-      return;
-    }
+    const currentPageParticipants = call.pages()[call.currentPage()] ?? [];
     const videoQuality: RESOLUTION = currentPageParticipants.length <= 2 ? RESOLUTION.HIGH : RESOLUTION.LOW;
     this.requestVideoStreams(call.conversation.qualifiedId, currentPageParticipants, videoQuality);
   }
 
   requestVideoStreams(conversationId: QualifiedId, participants: Participant[], videoQuality: RESOLUTION) {
+    if (participants.length === 0) {
+      return;
+    }
+
     const convId = this.serializeQualifiedId(conversationId);
 
     const payload = {
