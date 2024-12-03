@@ -20,8 +20,9 @@
 import {useCallback, useEffect} from 'react';
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {$createHeadingNode} from '@lexical/rich-text';
 import {$getSelection, $isRangeSelection, $createParagraphNode, createCommand} from 'lexical';
+
+import {headingCommand} from './headingCommand';
 
 import {isNodeHeading} from '../common/isNodeHeading/isNodeHeading';
 
@@ -31,27 +32,7 @@ export const useHeadingState = () => {
   const [editor] = useLexicalComposerContext();
 
   const registerHeadingCommand = useCallback((): void => {
-    editor.registerCommand(
-      INSERT_HEADING_COMMAND,
-      () => {
-        const selection = $getSelection();
-
-        if ($isRangeSelection(selection)) {
-          const headingNode = $createHeadingNode('h1');
-          const node = selection.anchor.getNode();
-          const parent = node.getParent();
-
-          if (!parent || parent.getType() === 'root') {
-            return false;
-          }
-
-          parent.replace(headingNode);
-          headingNode.append(...selection.extract());
-        }
-        return true;
-      },
-      0,
-    );
+    editor.registerCommand(INSERT_HEADING_COMMAND, headingCommand, 0);
   }, [editor]);
 
   useEffect(() => {

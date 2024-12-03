@@ -19,16 +19,19 @@
 
 import {useEffect} from 'react';
 
+import {$convertFromMarkdownString, TRANSFORMERS} from '@lexical/markdown';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {$getRoot, $setSelection} from 'lexical';
 
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 
-import {toEditorNodes} from '../utils/messageToEditorNodes';
+import {getMentionMarkdownTransformer} from './getMentionMarkdownTransformer/getMentionMarkdownTransformer';
+import {getMentionNodesFromMessage} from './getMentionNodesFromMessage/getMentionNodesFromMessage';
 
 type Props = {
   message?: ContentMessage;
 };
+
 export function EditedMessagePlugin({message}: Props): null {
   const [editor] = useLexicalComposerContext();
 
@@ -41,8 +44,21 @@ export function EditedMessagePlugin({message}: Props): null {
           root.clear();
           // This behaviour is needed to clear selection, if we not clear selection will be on beginning.
           $setSelection(null);
-          // Replace the current root with the content of the message being edited
-          root.append(toEditorNodes(message));
+
+          const messageContent = message.getFirstAsset().text;
+
+          const mentionNodes = getMentionNodesFromMessage(message);
+
+          const allowedMentions = mentionNodes.map(node => node.getTextContent());
+
+          const mentionMarkdownTransformer = getMentionMarkdownTransformer(allowedMentions);
+
+          // Text comes from the message is in the raw markdown format, we need to convert it to the editor format (preview), display **bold** as bold, etc.
+          // The below function do that by getting the text, and transofrming it to the desired format.
+          // During the transformation, we have to tell the editor to transofrm mentions as well.
+          // We can't do that by diretcly updating the $root (e.g. $root.appent(...MentionNodes)), because this function will overwrite the result.
+          // One way of overcoming this issue is to use a custom transformer (quite a hacky way). Transformers are responisble for converting the text to the desired format (e.g. **bold** to bold).
+          $convertFromMarkdownString(messageContent, [...TRANSFORMERS, mentionMarkdownTransformer]);
 
           editor.focus();
         });

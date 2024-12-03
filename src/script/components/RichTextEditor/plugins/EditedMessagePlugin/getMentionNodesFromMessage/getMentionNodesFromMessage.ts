@@ -17,30 +17,16 @@
  *
  */
 
-import {$createParagraphNode, $createTextNode} from 'lexical';
-
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 
-import {createNodes} from './generateNodes';
+import {Text} from '../../../../../entity/message/Text';
+import {$createMentionNode, MentionNode} from '../../../nodes/MentionNode';
+import {createNodes} from '../../../utils/generateNodes';
 
-import {Text} from '../../../entity/message/Text';
-import {$createMentionNode} from '../nodes/MentionNode';
-
-export function toEditorNodes(message: ContentMessage) {
+export const getMentionNodesFromMessage = (message: ContentMessage): MentionNode[] => {
   const firstAsset = message.getFirstAsset() as Text;
   const newMentions = firstAsset.mentions().slice();
-
   const nodes = createNodes(newMentions, firstAsset.text);
 
-  const paragraphs = nodes.map(node => {
-    if (node.type === 'Mention') {
-      return $createMentionNode('@', node.data.slice(1));
-    }
-
-    return $createTextNode(node.data);
-  });
-
-  const paragraphNode = $createParagraphNode();
-  paragraphNode.append(...paragraphs);
-  return paragraphNode;
-}
+  return nodes.filter(node => node.type === 'Mention').map(node => $createMentionNode('@', node.data.slice(1)));
+};
