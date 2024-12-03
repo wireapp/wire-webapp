@@ -79,10 +79,17 @@ export type PostMlsMessageResponse = {
 
 type ConversationGuestLinkStatus = {status: 'enabled' | 'disabled'};
 
+const apiBreakpoint = {
+  version2: 2,
+  // API V7 introduces new endpoints to conversations and users
+  version7: 7,
+};
+
 export class ConversationAPI {
   public static readonly MAX_CHUNK_SIZE = 500;
   public static readonly URL = {
     ACCESS: 'access',
+    BOT: 'bot',
     BOTS: 'bots',
     CLIENTS: '/clients',
     CODE: 'code',
@@ -151,7 +158,10 @@ export class ConversationAPI {
   public async deleteService(conversationId: string, serviceId: string): Promise<void> {
     const config: AxiosRequestConfig = {
       method: 'delete',
-      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.BOTS}/${serviceId}`,
+      url:
+        this.backendFeatures.version >= apiBreakpoint.version7
+          ? `${ConversationAPI.URL.BOT}/${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${serviceId}`
+          : `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.BOTS}/${serviceId}`,
     };
 
     await this.client.sendJSON(config);
@@ -332,7 +342,7 @@ export class ConversationAPI {
         data: {qualified_ids: chunk},
         method: 'post',
         url:
-          this.backendFeatures.version >= 2
+          this.backendFeatures.version >= apiBreakpoint.version2
             ? `${ConversationAPI.URL.CONVERSATIONS}/${ConversationAPI.URL.LIST}`
             : `${ConversationAPI.URL.CONVERSATIONS}/${ConversationAPI.URL.LIST}/${ConversationAPI.URL.V2}`,
       };
@@ -411,7 +421,10 @@ export class ConversationAPI {
     const config: AxiosRequestConfig = {
       data: conversationData,
       method: 'post',
-      url: `${ConversationAPI.URL.CONVERSATIONS}/${ConversationAPI.URL.ONE_2_ONE}`,
+      url:
+        this.backendFeatures.version >= apiBreakpoint.version7
+          ? `${ConversationAPI.URL.ONE_2_ONE}-${ConversationAPI.URL.CONVERSATIONS}`
+          : `${ConversationAPI.URL.CONVERSATIONS}/${ConversationAPI.URL.ONE_2_ONE}`,
     };
 
     await this.client.sendJSON(config);
@@ -424,7 +437,10 @@ export class ConversationAPI {
   public async getMLS1to1Conversation({domain, id}: QualifiedId): Promise<MLS1to1Conversation | MLSConversation> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${ConversationAPI.URL.CONVERSATIONS}/${ConversationAPI.URL.ONE_2_ONE}/${domain}/${id}`,
+      url:
+        this.backendFeatures.version >= apiBreakpoint.version7
+          ? `${ConversationAPI.URL.ONE_2_ONE}-${ConversationAPI.URL.CONVERSATIONS}/${domain}/${id}`
+          : `${ConversationAPI.URL.CONVERSATIONS}/${ConversationAPI.URL.ONE_2_ONE}/${domain}/${id}`,
     };
 
     const response = await this.client.sendJSON<MLS1to1Conversation | MLSConversation>(config);
@@ -482,7 +498,10 @@ export class ConversationAPI {
         service: serviceId,
       },
       method: 'post',
-      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.BOTS}`,
+      url:
+        this.backendFeatures.version >= apiBreakpoint.version7
+          ? `${ConversationAPI.URL.BOT}/${ConversationAPI.URL.CONVERSATIONS}/${conversationId}`
+          : `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.BOTS}}`,
     };
 
     const response = await this.client.sendJSON<ConversationMemberJoinEvent>(config);
