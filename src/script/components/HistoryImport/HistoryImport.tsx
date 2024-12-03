@@ -123,7 +123,7 @@ const HistoryImport = ({user, backupRepository, file, switchContent}: HistoryImp
       setErrorSecondary(t('backupImportAccountErrorSecondary'));
     } else if (error instanceof IncompatibleBackupError) {
       setErrorHeadline(t('backupImportVersionErrorHeadline'));
-      setErrorSecondary(t('backupImportVersionErrorSecondary', Config.getConfig().BRAND_NAME));
+      setErrorSecondary(t('backupImportVersionErrorSecondary', {brandName: Config.getConfig().BRAND_NAME}));
     } else if (error instanceof IncompatibleBackupFormatError) {
       setErrorHeadline(t('backupImportFormatErrorHeadline'));
       setErrorSecondary(t('backupImportFormatErrorSecondary'));

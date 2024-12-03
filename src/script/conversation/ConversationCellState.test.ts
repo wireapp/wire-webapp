@@ -89,7 +89,7 @@ describe('ConversationCellState', () => {
       {
         description: 'returns the number of missed calls',
         expected: {
-          description: t('conversationsSecondaryLineSummaryMissedCalls', 2),
+          description: t('conversationsSecondaryLineSummaryMissedCalls', {number: 2}),
           icon: ConversationStatusIcon.MISSED_CALL,
         },
         messages: [callMessage, callMessage],
@@ -105,7 +105,7 @@ describe('ConversationCellState', () => {
       {
         description: 'returns the number of pings',
         expected: {
-          description: t('conversationsSecondaryLineSummaryPings', 2),
+          description: t('conversationsSecondaryLineSummaryPings', {number: 2}),
           icon: ConversationStatusIcon.UNREAD_PING,
         },
         messages: [pingMessage, pingMessage],
@@ -113,7 +113,7 @@ describe('ConversationCellState', () => {
       {
         description: 'returns the number of mentions',
         expected: {
-          description: t('conversationsSecondaryLineSummaryMentions', 2),
+          description: t('conversationsSecondaryLineSummaryMentions', {number: 2}),
           icon: ConversationStatusIcon.UNREAD_MENTION,
         },
         messages: [mention, mention],
@@ -121,10 +121,10 @@ describe('ConversationCellState', () => {
       {
         description: 'prioritizes mentions, calls, pings and messages',
         expected: {
-          description: `${t('conversationsSecondaryLineSummaryMentions', 2)}, ${t(
+          description: `${t('conversationsSecondaryLineSummaryMentions', {number: 2})}, ${t(
             'conversationsSecondaryLineSummaryMissedCalls',
-            2,
-          )}, ${t('conversationsSecondaryLineSummaryPings', 2)}, ${t('conversationsSecondaryLineSummaryMessages', 2)}`,
+            {number: 2},
+          )}, ${t('conversationsSecondaryLineSummaryPings', {number: 2})}, ${t('conversationsSecondaryLineSummaryMessages', {number: 2})}`,
           icon: ConversationStatusIcon.UNREAD_MENTION,
         },
         messages: [

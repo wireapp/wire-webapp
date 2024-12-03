@@ -342,15 +342,15 @@ export class ListViewModel {
         entries.push({
           click: () => this.clickToOpenNotificationSettings(conversationEntity),
           label: t('conversationsPopoverNotificationSettings'),
-          title: t('tooltipConversationsNotifications', notificationsShortcut),
+          title: t('tooltipConversationsNotifications', {shortcut: notificationsShortcut}),
         });
       } else {
         const label = conversationEntity.showNotificationsNothing()
           ? t('conversationsPopoverNotify')
           : t('conversationsPopoverSilence');
         const title = conversationEntity.showNotificationsNothing()
-          ? t('tooltipConversationsNotify', notificationsShortcut)
-          : t('tooltipConversationsSilence', notificationsShortcut);
+          ? t('tooltipConversationsNotify', {shortcut: notificationsShortcut})
+          : t('tooltipConversationsSilence', {shortcut: notificationsShortcut});
 
         entries.push({
           click: () => this.clickToToggleMute(conversationEntity),
@@ -382,7 +382,7 @@ export class ListViewModel {
       if (customLabel) {
         entries.push({
           click: () => conversationLabelRepository.removeConversationFromLabel(customLabel, conversationEntity),
-          label: t('conversationsPopoverRemoveFrom', customLabel.name, {}, true),
+          label: t('conversationsPopoverRemoveFrom', {name: customLabel.name}, {}, true),
         });
       }
 
@@ -403,7 +403,7 @@ export class ListViewModel {
       entries.push({
         click: () => this.clickToArchive(conversationEntity),
         label: t('conversationsPopoverArchive'),
-        title: t('tooltipConversationsArchive', shortcut),
+        title: t('tooltipConversationsArchive', {shortcut}),
       });
     }
 

@@ -77,7 +77,7 @@ const GroupDetails: FC<GroupDetailsProps> = ({
           className="panel__info-text conversation-details__group-size-info"
           data-uie-name="status-group-size-info-conversation-details"
         >
-          {t('groupSizeInfo', ConversationRepository.CONFIG.GROUP.MAX_SIZE)}
+          {t('groupSizeInfo', {count: ConversationRepository.CONFIG.GROUP.MAX_SIZE})}
         </p>
       )}
     </>

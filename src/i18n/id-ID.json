@@ -687,7 +687,7 @@
   "featureConfigChangeModalAudioVideoDescriptionItemCameraEnabled": "Camera in calls is enabled",
   "featureConfigChangeModalAudioVideoHeadline": "There has been a change in {brandName}",
   "featureConfigChangeModalConferenceCallingEnabled": "Your team was upgraded to {brandName} Enterprise, which gives you access to features such as conference calls and more. [link]Learn more about {brandName} Enterprise[/link]",
-  "featureConfigChangeModalConferenceCallingTitle": "{brandName} Enterprise",
+  "featureConfigChangeModalConferenceCallingHeadline": "{brandName} Enterprise",
   "featureConfigChangeModalConversationGuestLinksDescriptionItemConversationGuestLinksDisabled": "Generating guest links is now disabled for all group admins.",
   "featureConfigChangeModalConversationGuestLinksDescriptionItemConversationGuestLinksEnabled": "Generating guest links is now enabled for all group admins.",
   "featureConfigChangeModalConversationGuestLinksHeadline": "Team settings changed",

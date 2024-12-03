@@ -242,6 +242,8 @@ export const RichTextEditor = ({
         </div>
         {shwowFormatToolbar && <FormatToolbar />}
       </div>
+
+      {/* {shwowFormatToolbar && <FormatToolbar />} */}
       {children}
     </LexicalComposer>
   );

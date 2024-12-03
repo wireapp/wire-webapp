@@ -190,7 +190,7 @@ export const UserList = ({
         {(admins.length > 0 || showEmptyAdmin) && (
           <>
             <h3 className="user-list__header" data-uie-name="label-conversation-admins">
-              {t('searchListAdmins', adminCount)}
+              {t('searchListAdmins', {count: adminCount})}
             </h3>
 
             {admins.length > 0 && (
@@ -210,7 +210,7 @@ export const UserList = ({
         {members.length > 0 && maxShownUsers > admins.length && (
           <>
             <h3 className="user-list__header" data-uie-name="label-conversation-members">
-              {t('searchListMembers', memberCount)}
+              {t('searchListMembers', {count: memberCount})}
             </h3>
 
             <ul className={cx('search-list', cssClasses)} data-uie-name="list-members">
@@ -250,7 +250,7 @@ export const UserList = ({
                 <Icon.DiscloseIcon width={16} height={16} />
               </span>
 
-              {t('userListSelectedContacts', selectedUsersCount)}
+              {t('userListSelectedContacts', {selectedContacts: selectedUsersCount})}
             </button>
 
             <ul

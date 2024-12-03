@@ -81,7 +81,7 @@ export const ConversationDetailsParticipants = ({
               </span>
 
               <span className="panel__action-item__text">
-                {t('conversationDetailsActionConversationParticipants', allUsersCount)}
+                {t('conversationDetailsActionConversationParticipants', {number: allUsersCount})}
               </span>
 
               <Icon.ChevronRight className="chevron-right-icon" />

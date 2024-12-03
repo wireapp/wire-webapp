@@ -341,7 +341,7 @@ export const InputBar = ({
     if (isMessageTextTooLong) {
       showWarningModal(
         t('modalConversationMessageTooLongHeadline'),
-        t('modalConversationMessageTooLongMessage', CONFIG.MAXIMUM_MESSAGE_LENGTH),
+        t('modalConversationMessageTooLongMessage', {number: CONFIG.MAXIMUM_MESSAGE_LENGTH}),
       );
 
       return;
@@ -427,7 +427,7 @@ export const InputBar = ({
     const {lastModified} = pastedFile;
 
     const date = formatLocale(lastModified || new Date(), 'PP, pp');
-    const fileName = `${t('conversationSendPastedFile', date)}.${getFileExtension(pastedFile.name)}`;
+    const fileName = `${t('conversationSendPastedFile', {date})}.${getFileExtension(pastedFile.name)}`;
 
     const newFile = new File([pastedFile], fileName, {
       type: pastedFile.type,
