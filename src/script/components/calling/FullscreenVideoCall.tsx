@@ -22,6 +22,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation/';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import classNames from 'classnames';
+import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import {CALL_TYPE} from '@wireapp/avs';
@@ -73,6 +74,7 @@ import {CallingViewMode, CallState, MuteState} from '../../calling/CallState';
 import {Participant} from '../../calling/Participant';
 import type {Grid} from '../../calling/videoGridHandler';
 import type {Conversation} from '../../entity/Conversation';
+import {useWarnings} from '../../guards/useWarnings';
 import {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
 import {TeamState} from '../../team/TeamState';
 import {CallViewTab} from '../../view_model/CallingViewModel';
@@ -144,6 +146,9 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   const [isConfirmCloseModalOpen, setIsConfirmCloseModalOpen] = useState<boolean>(false);
   const [showEmojisBar, setShowEmojisBar] = useState<boolean>(false);
   const [disabledEmojis, setDisabledEmojis] = useState<string[]>([]);
+
+  const {showSmallOffset, showLargeOffset} = useWarnings();
+
   const selfParticipant = call.getSelfParticipant();
   const {sharesScreen: selfSharesScreen, sharesCamera: selfSharesCamera} = useKoSubscribableChildren(selfParticipant, [
     'sharesScreen',
@@ -406,7 +411,12 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   const isModerator = selfUser && roles[selfUser.id] === DefaultConversationRoleName.WIRE_ADMIN;
 
   return (
-    <div className="video-calling-wrapper">
+    <div
+      className={cx('video-calling-wrapper', {
+        'app--small-offset': showSmallOffset,
+        'app--large-offset': showLargeOffset,
+      })}
+    >
       <div id="video-calling" className="video-calling">
         <div css={videoTopBarStyles}>
           <div id="video-title" className="video-title">

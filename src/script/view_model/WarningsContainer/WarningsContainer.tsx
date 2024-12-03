@@ -17,18 +17,15 @@
  *
  */
 
-import React, {useEffect} from 'react';
-
 import cx from 'classnames';
 
 import {Runtime} from '@wireapp/commons';
 
 import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
-import {afterRender} from 'Util/util';
 
 import {closeWarning, useWarningsState} from './WarningsState';
-import {CONFIG, TYPE} from './WarningsTypes';
+import {CONFIG, TYPE as type} from './WarningsTypes';
 
 import {Config} from '../../Config';
 
@@ -36,30 +33,18 @@ interface WarningProps {
   onRefresh: () => void;
 }
 
-const WarningsContainer: React.FC<WarningProps> = ({onRefresh}) => {
+export const WarningsContainer = ({onRefresh}: WarningProps) => {
   const name = useWarningsState(state => state.name);
   const warnings = useWarningsState(state => state.warnings);
-  const type = TYPE;
   const visibleWarning = warnings[warnings.length - 1];
+
+  if (warnings.length === 0) {
+    return null;
+  }
+
   const warningDimmed = warnings.some(warning => CONFIG.DIMMED_MODES.includes(warning));
 
-  useEffect(() => {
-    const visibleWarning = warnings[warnings.length - 1];
-    const isConnectivityRecovery = visibleWarning === TYPE.CONNECTIVITY_RECOVERY;
-    const hasOffset = warnings.length > 0 && !isConnectivityRecovery;
-    const isMiniMode = CONFIG.MINI_MODES.includes(visibleWarning);
-
-    const app = document.querySelector('#app');
-    if (app) {
-      app.classList.toggle('app--small-offset', hasOffset && isMiniMode);
-      app.classList.toggle('app--large-offset', hasOffset && !isMiniMode);
-    }
-
-    afterRender(() => window.dispatchEvent(new Event('resize')));
-  }, [warnings]);
-
-  const brandName = Config.getConfig().BRAND_NAME;
-  const URL = Config.getConfig().URL;
+  const {BRAND_NAME: brandName, URL} = Config.getConfig();
 
   const closeButton = (
     <button
@@ -69,10 +54,6 @@ const WarningsContainer: React.FC<WarningProps> = ({onRefresh}) => {
       onClick={closeWarning}
     />
   );
-
-  if (warnings.length === 0) {
-    return null;
-  }
 
   return (
     <div className={cx('warning', {'warning-dimmed': warningDimmed})}>
@@ -328,5 +309,3 @@ const WarningsContainer: React.FC<WarningProps> = ({onRefresh}) => {
     </div>
   );
 };
-
-export {WarningsContainer};
