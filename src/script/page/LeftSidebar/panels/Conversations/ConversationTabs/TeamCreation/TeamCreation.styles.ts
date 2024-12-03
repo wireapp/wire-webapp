@@ -22,7 +22,7 @@ import {CSSObject} from '@emotion/react';
 import {media} from '@wireapp/react-ui-kit';
 
 export const teamUpgradeBannerHeaderCss: CSSObject = {
-  lineHeight: '0.875rem',
+  lineHeight: 'var(--line-height-small-plus)',
   marginLeft: '0.5rem',
   verticalAlign: 'text-top',
   fontWeight: 'var(--font-weight-semibold)',

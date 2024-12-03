@@ -36,7 +36,7 @@ interface AvailabilityInputProps {
 }
 
 const headerStyles: CSSObject = {
-  lineHeight: '0.875rem',
+  lineHeight: 'var(--line-height-small-plus)',
   margin: '37px 0 6px',
   padding: 0,
   textAlign: 'center',
