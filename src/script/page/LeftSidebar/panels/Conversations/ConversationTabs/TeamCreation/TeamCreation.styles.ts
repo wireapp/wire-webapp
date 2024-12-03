@@ -22,9 +22,10 @@ import {CSSObject} from '@emotion/react';
 import {media} from '@wireapp/react-ui-kit';
 
 export const teamUpgradeBannerHeaderCss: CSSObject = {
-  lineHeight: 'var(--line-height-sm)',
+  lineHeight: '0.875rem',
   marginLeft: '0.5rem',
   verticalAlign: 'text-top',
+  fontWeight: 'var(--font-weight-semibold)',
 };
 
 export const teamUpgradeBannerContentCss: CSSObject = {
@@ -121,8 +122,9 @@ export const teamUpgradeAccountBannerContainerCss: CSSObject = {
   justifyContent: 'space-between',
   alignItems: 'center',
   padding: '0.5rem',
+  gap: '0.5rem',
   marginBottom: '2rem',
-  [media.tabletSMDown]: {
+  [media.tabletDown]: {
     flexDirection: 'column',
     alignItems: 'baseline',
     gap: '0.5rem',
@@ -142,4 +144,10 @@ export const bannerWrapperCss: CSSObject = {
   marginLeft: '40px',
   boxShadow: '0px 0px 12px 0px var(--background-fade-32)',
   borderRadius: '0.5rem',
+};
+
+export const bannerHeaderContainerCss: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  marginBottom: '0.5rem',
 };
