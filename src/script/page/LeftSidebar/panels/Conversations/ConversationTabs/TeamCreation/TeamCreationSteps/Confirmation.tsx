@@ -40,13 +40,13 @@ import {
 
 import {buttonCss} from '../TeamCreation.styles';
 
-const confirmationList = [
-  t('teamCreationConfirmListItem1'),
-  t('teamCreationConfirmListItem2'),
-  t('teamCreationConfirmListItem3'),
-];
-
 export const Confirmation = ({onPreviousStep, onNextStep, teamName, goToFirstStep, onSuccess}: StepProps) => {
+  const confirmationList = [
+    t('teamCreationConfirmListItem1'),
+    t('teamCreationConfirmListItem2'),
+    t('teamCreationConfirmListItem3'),
+  ];
+
   const [isMigrationAccepted, setIsMigrationAccepted] = useState(false);
   const [isTermOfUseAccepted, setIsTermOfUseAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
