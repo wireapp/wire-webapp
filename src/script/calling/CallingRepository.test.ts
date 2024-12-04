@@ -132,10 +132,12 @@ describe('CallingRepository', () => {
         buildMediaDevicesHandler(),
       );
 
+      call.state(CALL_STATE.MEDIA_ESTAB);
+
       conversation.roles({[senderUserId.id]: DefaultConversationRoleName.WIRE_ADMIN});
 
       callingRepository['conversationState'].conversations.push(conversation);
-      callingRepository['callState'].joinedCall(call);
+      callingRepository['callState'].calls([call]);
       spyOn(callingRepository, 'muteCall').and.callThrough();
       spyOn(wCall, 'recvMsg').and.callThrough();
 
@@ -175,10 +177,12 @@ describe('CallingRepository', () => {
         buildMediaDevicesHandler(),
       );
 
+      call.state(CALL_STATE.MEDIA_ESTAB);
+
       conversation.roles({[senderUserId.id]: DefaultConversationRoleName.WIRE_MEMBER});
 
       callingRepository['conversationState'].conversations.push(conversation);
-      callingRepository['callState'].joinedCall(call);
+      callingRepository['callState'].calls([call]);
       spyOn(callingRepository, 'muteCall').and.callThrough();
       spyOn(wCall, 'recvMsg').and.callThrough();
 
@@ -218,10 +222,12 @@ describe('CallingRepository', () => {
         buildMediaDevicesHandler(),
       );
 
+      call.state(CALL_STATE.MEDIA_ESTAB);
+
       conversation.roles({[senderUserId.id]: DefaultConversationRoleName.WIRE_ADMIN});
 
       callingRepository['conversationState'].conversations.push(conversation);
-      callingRepository['callState'].joinedCall(call);
+      callingRepository['callState'].calls([call]);
       spyOn(callingRepository, 'muteCall').and.callThrough();
       spyOn(wCall, 'recvMsg').and.callThrough();
 
