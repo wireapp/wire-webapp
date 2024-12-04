@@ -81,7 +81,7 @@ const UserModalUserActionsSection: React.FC<UserModalUserActionsSectionProps> = 
       <div
         className="modal__message"
         data-uie-name="status-blocked-legal-hold"
-        dangerouslySetInnerHTML={{__html: t('modalUserBlockedForLegalHold', {}, replaceLinkLegalHold)}}
+        dangerouslySetInnerHTML={{__html: t('modalUserBlockedForLegalHold', undefined, replaceLinkLegalHold)}}
       />
     );
   }
@@ -190,7 +190,7 @@ const UserModal: React.FC<UserModalProps> = ({
       <div className="modal__header">
         {userNotFound && (
           <h2 className="modal__header__title" data-uie-name="status-modal-title">
-            {t('userNotFoundTitle', brandName)}
+            {t('userNotFoundTitle', {brandName})}
           </h2>
         )}
 
@@ -235,7 +235,7 @@ const UserModal: React.FC<UserModalProps> = ({
         {userNotFound && (
           <>
             <div className="modal__message" data-uie-name="status-modal-text">
-              {t('userNotFoundMessage', brandName)}
+              {t('userNotFoundMessage', {brandName})}
             </div>
 
             <div className="modal__buttons">

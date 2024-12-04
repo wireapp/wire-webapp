@@ -233,7 +233,11 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
     case PrimaryModalType.SESSION_RESET: {
       content.titleText = t('modalSessionResetHeadline');
       content.primaryAction = {...primaryAction, text: t('modalAcknowledgeAction')};
-      content.messageHtml = t('modalSessionResetMessage', {}, replaceLink(Config.getConfig().URL.SUPPORT.BUG_REPORT));
+      content.messageHtml = t(
+        'modalSessionResetMessage',
+        undefined,
+        replaceLink(Config.getConfig().URL.SUPPORT.BUG_REPORT),
+      );
       break;
     }
   }

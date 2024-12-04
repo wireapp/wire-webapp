@@ -9,6 +9,7 @@ module.exports = {
     amplify: 'readonly',
   },
   ignorePatterns: [
+    'TEMP-crossplatform-backup/',
     '.git/',
     'docs/',
     'bin/',
@@ -23,6 +24,7 @@ module.exports = {
     'src/worker/',
     'src/script/components/Icon.tsx',
     '*.js',
+    'src/types/i18n.d.ts',
   ],
   parserOptions: {
     project: ['./tsconfig.build.json', './server/tsconfig.json'],

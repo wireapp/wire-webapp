@@ -139,13 +139,17 @@ const CameraPreferences: React.FC<CameraPreferencesProps> = ({
               <div
                 className="preferences-av-video-disabled__info"
                 dangerouslySetInnerHTML={{
-                  __html: t('preferencesAVNoCamera', brandName, {
-                    '/faqLink': '</a>',
-                    br: '<br>',
-                    faqLink: `<a href='${
-                      Config.getConfig().URL.SUPPORT.CAMERA_ACCESS_DENIED
-                    }' data-uie-name='go-no-camera-faq' target='_blank' rel='noopener noreferrer'>`,
-                  }),
+                  __html: t(
+                    'preferencesAVNoCamera',
+                    {brandName},
+                    {
+                      '/faqLink': '</a>',
+                      br: '<br>',
+                      faqLink: `<a href='${
+                        Config.getConfig().URL.SUPPORT.CAMERA_ACCESS_DENIED
+                      }' data-uie-name='go-no-camera-faq' target='_blank' rel='noopener noreferrer'>`,
+                    },
+                  ),
                 }}
               />
               <button

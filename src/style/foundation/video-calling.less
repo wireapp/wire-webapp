@@ -31,6 +31,14 @@
   width: 100vw;
   height: 100vh;
   background-color: var(--app-bg-secondary);
+
+  &.app--small-offset {
+    height: calc(100vh - 32px);
+  }
+
+  &.app--large-offset {
+    height: calc(100vh - 64px);
+  }
 }
 
 .video-calling {
@@ -114,6 +122,10 @@
 
   &__item {
     position: relative;
+
+    & button {
+      vertical-align: middle;
+    }
   }
 
   &__centered-items {
@@ -141,8 +153,8 @@
     left: 50%;
     display: grid;
     padding: 0.4rem;
-    border-radius: 1rem;
-    background-color: var(--app-bg-secondary);
+    border-radius: 12px;
+    background-color: var(--inactive-call-button-bg);
     box-shadow: 0px 7px 15px 0 #0000004d;
     gap: 0.5rem;
     grid-template-columns: repeat(3, 1fr);
@@ -154,7 +166,7 @@
       left: 50%;
       width: 0;
       height: 0;
-      border-top: 0.5rem solid var(--app-bg-secondary);
+      border-top: 0.5rem solid var(--inactive-call-button-bg);
       border-right: 0.5rem solid transparent;
       border-left: 0.5rem solid transparent;
       content: '';

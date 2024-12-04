@@ -75,7 +75,7 @@ export enum CallViewTab {
 
 export const CallViewTabs: ButtonGroupTab[] = [
   {getText: () => t('videoSpeakersTabSpeakers').toUpperCase(), value: CallViewTab.SPEAKERS},
-  {getText: substitute => t('videoSpeakersTabAll', substitute), value: CallViewTab.ALL},
+  {getText: substitute => t('videoSpeakersTabAll', substitute as unknown as {count: number}), value: CallViewTab.ALL},
 ];
 
 declare global {
@@ -243,7 +243,7 @@ export class CallingViewModel {
         },
         text: {
           htmlMessage: `<div class="modal-description">
-            ${t('groupCallConfirmationModalTitle', memberCount)}
+            ${t('groupCallConfirmationModalTitle', {memberCount})}
           </div>`,
           closeBtnLabel: t('groupCallModalCloseBtnLabel'),
         },

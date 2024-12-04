@@ -219,6 +219,7 @@ const MLSVerificationBadge = ({
       };
 
       return (
+        // @ts-expect-error: too broad `translationKeys` type, todo: narrow it down
         <TooltipIcon {...mlsVerificationProps} body={t(translationKeys[context])}>
           <MLSVerified />
         </TooltipIcon>

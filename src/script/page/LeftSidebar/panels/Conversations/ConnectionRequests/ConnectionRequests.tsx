@@ -43,7 +43,7 @@ export const ConnectionRequests = ({connectionRequests, onConnectionRequestClick
 
   const connectionText =
     connectionRequestsCount > 1
-      ? t('conversationsConnectionRequestMany', connectionRequestsCount)
+      ? t('conversationsConnectionRequestMany', {number: connectionRequestsCount})
       : t('conversationsConnectionRequestOne');
 
   return (

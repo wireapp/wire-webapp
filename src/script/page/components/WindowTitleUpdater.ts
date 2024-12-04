@@ -98,8 +98,8 @@ const useWindowTitle = () => {
         case ContentState.CONNECTION_REQUESTS: {
           const multipleRequests = connectionRequestsCount > MIN_CONNECTION_REQUEST_COUNT;
           const requestsString = multipleRequests
-            ? t('conversationsConnectionRequestMany', connectionRequestsCount)
-            : t('conversationsConnectionRequestOne', connectionRequestsCount);
+            ? t('conversationsConnectionRequestMany', {number: connectionRequestsCount})
+            : t('conversationsConnectionRequestOne');
           specificTitle += requestsString;
           break;
         }

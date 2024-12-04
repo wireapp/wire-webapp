@@ -23,7 +23,6 @@ import {Availability} from '@wireapp/protocol-messaging';
 
 import * as Icon from 'Components/Icon';
 import {CSS_SQUARE} from 'Util/CSSMixin';
-import {StringIdentifer} from 'Util/LocalizerUtil';
 
 const iconStyles: CSSObject = {
   ...CSS_SQUARE(10),
@@ -60,7 +59,9 @@ export const availabilityStatus: {
   [Availability.Type.NONE]: null,
 };
 
-export const availabilityTranslationKeys: Record<Availability.Type, StringIdentifer> = {
+type AvailabilityTransaltionValues = `availability.${'available' | 'busy' | 'away' | 'none'}`;
+
+export const availabilityTranslationKeys: Record<Availability.Type, AvailabilityTransaltionValues> = {
   [Availability.Type.AVAILABLE]: 'availability.available',
   [Availability.Type.BUSY]: 'availability.busy',
   [Availability.Type.AWAY]: 'availability.away',

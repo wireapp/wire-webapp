@@ -45,8 +45,7 @@ import {TeamCreation} from './TeamCreation/TeamCreation';
 
 import {Config} from '../../../../../Config';
 import {Conversation} from '../../../../../entity/Conversation';
-import {Shortcut} from '../../../../../ui/Shortcut';
-import {ShortcutType} from '../../../../../ui/ShortcutType';
+import {ContentState} from '../../../../useAppState';
 import {ConversationTab} from '../ConversationTab';
 
 interface ConversationTabsProps {
@@ -58,7 +57,7 @@ interface ConversationTabsProps {
   conversationRepository: ConversationRepository;
   onChangeTab: (tab: SidebarTabs, folderId?: string) => void;
   currentTab: SidebarTabs;
-  onClickPreferences: () => void;
+  onClickPreferences: (contentState: ContentState) => void;
   showNotificationsBadge?: boolean;
   selfUser: User;
   teamRepository: TeamRepository;
@@ -137,7 +136,7 @@ export const ConversationTabs = ({
     },
     {
       type: SidebarTabs.ARCHIVES,
-      title: t('tooltipConversationsArchived', archivedConversations.length),
+      title: t('tooltipConversationsArchived', {number: archivedConversations.length}),
       label: t('conversationFooterArchive'),
       dataUieName: 'go-archive',
       Icon: <Icon.ArchiveIcon />,
@@ -188,7 +187,7 @@ export const ConversationTabs = ({
         </div>
 
         <ConversationTab
-          title={t('searchConnect', Shortcut.getShortcutTooltip(ShortcutType.START))}
+          title={t('searchConnect')}
           label={t('searchConnect')}
           type={SidebarTabs.CONNECT}
           Icon={<Icon.AddParticipantsIcon />}
@@ -238,13 +237,13 @@ export const ConversationTabs = ({
         )}
 
         <ConversationTab
-          title={t('preferencesHeadline', Shortcut.getShortcutTooltip(ShortcutType.START))}
+          title={t('preferencesHeadline')}
           label={t('preferencesHeadline')}
           type={SidebarTabs.PREFERENCES}
           Icon={<Icon.SettingsIcon />}
           onChangeTab={tab => {
             onChangeTab(tab);
-            onClickPreferences();
+            onClickPreferences(ContentState.PREFERENCES_ACCOUNT);
           }}
           conversationTabIndex={1}
           dataUieName="go-preferences"
@@ -259,7 +258,7 @@ export const ConversationTabs = ({
           id="tab-2"
           type="button"
           className="conversations-sidebar-btn"
-          title={t('preferencesAboutSupport', Shortcut.getShortcutTooltip(ShortcutType.START))}
+          title={t('preferencesAboutSupport')}
           data-uie-name="go-people"
         >
           <span className="conversations-sidebar-btn--text-wrapper">

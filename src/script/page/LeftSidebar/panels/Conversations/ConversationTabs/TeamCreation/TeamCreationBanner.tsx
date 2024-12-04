@@ -31,6 +31,8 @@ import {Segmentation} from 'src/script/tracking/Segmentation';
 import {t} from 'Util/LocalizerUtil';
 
 import {
+  bannerHeaderContainerCss,
+  bannerWrapperCss,
   iconButtonCss,
   teamUpgradeBannerButtonCss,
   teamUpgradeBannerContainerCss,
@@ -43,10 +45,12 @@ import {SidebarStatus, useSidebarStore} from '../../useSidebarStore';
 const Banner = ({onClick}: {onClick: () => void}) => {
   return (
     <div css={teamUpgradeBannerContainerCss}>
-      <Icon.InfoIcon />
-      <span className="heading-h4" css={teamUpgradeBannerHeaderCss}>
-        {t('teamUpgradeBannerHeader')}
-      </span>
+      <div css={bannerHeaderContainerCss}>
+        <Icon.InfoIcon />
+        <span className="heading-h4" css={teamUpgradeBannerHeaderCss}>
+          {t('teamUpgradeBannerHeader')}
+        </span>
+      </div>
       <div className="subline" css={teamUpgradeBannerContentCss}>
         {t('teamUpgradeBannerContent')}
       </div>
@@ -57,14 +61,13 @@ const Banner = ({onClick}: {onClick: () => void}) => {
   );
 };
 
-const PADDING_X = 40;
 const PADDING_Y = 34;
 
 export const TeamCreationBanner = ({onClick}: {onClick: () => void}) => {
   const [isBannerVisible, setIsBannerVisible] = useState(false);
   const [position, setPosition] = useState<{x: number; y: number}>({x: 0, y: 0});
   const {status: sidebarStatus} = useSidebarStore();
-  const clickHandler = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const openHandler = (event: React.MouseEvent<HTMLButtonElement> | React.MouseEvent<HTMLDivElement>) => {
     setIsBannerVisible(true);
     const rect = event.currentTarget.getBoundingClientRect();
     setPosition({x: rect.x, y: rect.y});
@@ -92,17 +95,19 @@ export const TeamCreationBanner = ({onClick}: {onClick: () => void}) => {
 
   return (
     <>
-      <IconButton css={iconButtonCss} onClick={clickHandler}>
+      <IconButton css={iconButtonCss} onClick={openHandler} onMouseOver={openHandler}>
         <Icon.InfoIcon />
       </IconButton>
       {isBannerVisible && (
         <BannerPortal
           // Position + padding
-          positionX={position.x + PADDING_X}
+          positionX={position.x}
           positionY={position.y + PADDING_Y}
           onClose={portalCloseHandler}
         >
-          <Banner onClick={bannerBtnClickHandler} />
+          <div css={bannerWrapperCss}>
+            <Banner onClick={bannerBtnClickHandler} />
+          </div>
         </BannerPortal>
       )}
     </>

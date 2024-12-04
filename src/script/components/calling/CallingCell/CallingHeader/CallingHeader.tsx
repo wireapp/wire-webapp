@@ -100,7 +100,7 @@ export const CallingHeader = ({
         aria-label={
           showAlert
             ? callStartedAlert
-            : `${isOngoing ? `${ongoingCallAlert} ` : ''}${t('accessibility.openConversation', conversationName)}`
+            : `${isOngoing ? `${ongoingCallAlert} ` : ''}${t('accessibility.openConversation', {name: conversationName})}`
         }
       >
         {isDetachedWindow && !isTemporaryUser && (

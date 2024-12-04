@@ -57,7 +57,7 @@ export class ContentMessage extends Message {
   }
 
   readonly displayEditedTimestamp = () => {
-    return t('conversationEditTimestamp', formatTimeShort(this.edited_timestamp()));
+    return t('conversationEditTimestamp', {date: formatTimeShort(this.edited_timestamp())});
   };
 
   /**
