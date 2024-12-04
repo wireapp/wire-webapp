@@ -24,10 +24,8 @@ import cx from 'classnames';
 import {CLEAR_EDITOR_COMMAND, LexicalEditor, $createTextNode, $insertNodes} from 'lexical';
 import {container} from 'tsyringe';
 
-import {useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import {checkFileSharingPermission} from 'Components/Conversation/utils/checkFileSharingPermission';
 import {EmojiPicker} from 'Components/EmojiPicker/EmojiPicker';
@@ -48,7 +46,6 @@ import {formatLocale, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {getFileExtension} from 'Util/util';
 
 import {ControlButtons} from './components/InputBarControls/ControlButtons';
-import {GiphyButton} from './components/InputBarControls/GiphyButton/GiphyButton';
 import {PastedFileControls} from './components/PastedFileControls';
 import {ReplyBar} from './components/ReplyBar';
 import {TypingIndicator} from './components/TypingIndicator/TypingIndicator';
@@ -180,9 +177,6 @@ export const InputBar = ({
   const isConnectionRequest = isOutgoingRequest || isIncomingRequest;
   const hasLocalEphemeralTimer = isSelfDeletingMessagesEnabled && !!localMessageTimer && !hasGlobalMessageTimer;
   const isTypingRef = useRef(false);
-
-  // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
-  const isScaledDown = useMatchMedia('max-width: 768px');
 
   const showGiphyButton = textValue.length > 0;
 
@@ -548,7 +542,7 @@ export const InputBar = ({
     disablePing: pingDisabled,
     input: textValue,
     isEditing: isEditing,
-    isScaledDown: isScaledDown,
+    false: false,
     onCancelEditing: () => cancelMessageEditing(true),
     onClickPing: onPingClick,
     onGifClick: onGifClick,
@@ -562,8 +556,6 @@ export const InputBar = ({
   };
 
   const enableSending = textValue.length > 0;
-
-  const messageFormatButtonsEnabled = Config.getConfig().FEATURE.ENABLE_MESSAGE_FORMAT_BUTTONS;
 
   return (
     <div ref={wrapperRef}>
@@ -581,23 +573,13 @@ export const InputBar = ({
         {isReplying && !isEditing && <ReplyBar replyMessageEntity={replyMessageEntity} onCancel={handleCancelReply} />}
 
         <div
-          className={cx(`${conversationInputBarClassName}__input`, {
+          className={cx(`${conversationInputBarClassName}__input input-bar-container`, {
             [`${conversationInputBarClassName}__input--editing`]: isEditing,
+            'input-bar-container--with-toolbar': formatToolbar.open,
           })}
         >
           {!isOutgoingRequest && (
             <>
-              <div className="controls-left">
-                {!!textValue.length && (
-                  <Avatar
-                    className="cursor-default"
-                    participant={selfUser}
-                    avatarSize={AVATAR_SIZE.X_SMALL}
-                    hideAvailabilityStatus
-                  />
-                )}
-              </div>
-
               {!isSelfUserRemoved && !pastedFile && (
                 <RichTextEditor
                   onSetup={lexical => {
@@ -616,6 +598,8 @@ export const InputBar = ({
                       editMessage(conversation.getLastEditableMessage());
                     }
                   }}
+                  avatarVisible={!!textValue.length}
+                  selfUser={selfUser}
                   getMentionCandidates={getMentionCandidates}
                   replaceEmojis={shouldReplaceEmoji}
                   placeholder={inputPlaceholder}
@@ -628,28 +612,14 @@ export const InputBar = ({
                   onSend={handleSendMessage}
                   onBlur={() => isTypingRef.current && conversationRepository.sendTypingStop(conversation)}
                 >
-                  {isScaledDown ? (
-                    <>
-                      <ul className="controls-right buttons-group" css={{minWidth: '95px'}}>
-                        {showGiphyButton && (
-                          <GiphyButton onGifClick={onGifClick} hasRoundedLeftCorner={!messageFormatButtonsEnabled} />
-                        )}
-                        <SendMessageButton disabled={!enableSending} onSend={handleSendMessage} />
-                      </ul>
-                      <ul className="controls-right buttons-group" css={{justifyContent: 'center', width: '100%'}}>
-                        <ControlButtons {...controlButtonsProps} />
-                      </ul>
-                    </>
-                  ) : (
-                    <ul
-                      className={cx('controls-right buttons-group', {
-                        'controls-right-shrinked': textValue.length !== 0,
-                      })}
-                    >
-                      <ControlButtons {...controlButtonsProps} showGiphyButton={showGiphyButton} />
-                      <SendMessageButton disabled={!enableSending} onSend={handleSendMessage} />
-                    </ul>
-                  )}
+                  <ul
+                    className={cx('controls-right buttons-group input-bar-right', {
+                      'controls-right-shrinked': textValue.length !== 0,
+                    })}
+                  >
+                    <ControlButtons {...controlButtonsProps} showGiphyButton={showGiphyButton} />
+                    <SendMessageButton disabled={!enableSending} onSend={handleSendMessage} />
+                  </ul>
                 </RichTextEditor>
               )}
             </>

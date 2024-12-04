@@ -102,12 +102,6 @@
   align-items: center;
 }
 
-.input-bar-center {
-  flex-direction: column;
-  align-items: flex-start;
-  margin-bottom: 8px;
-}
-
 .controls-right {
   .list-unstyled;
 
@@ -117,9 +111,9 @@
   margin: 0;
   margin-bottom: 8px;
 
-  li {
-    margin-bottom: 8px;
-  }
+  //   li {
+  //     margin-bottom: 8px;
+  //   }
 
   &.controls-right-shrinked {
     min-width: auto;
@@ -136,8 +130,7 @@
   display: flex;
 
   @media (max-width: 768px) {
-    width: 75px;
-    margin-bottom: 5px;
+    margin-bottom: 0px;
   }
 
   body.theme-dark &:focus-visible,
@@ -168,6 +161,10 @@
 
     > * {
       display: flex;
+    }
+
+    @media (min-width: 900px) {
+      margin-bottom: 8px;
     }
 
     &[disabled]:not([disabled='false']) {
@@ -390,5 +387,78 @@
   100% {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+.input-bar-container {
+  display: grid;
+  padding-left: 20px;
+  grid-template-areas:
+    'avatar input'
+    'buttons buttons';
+  grid-template-columns: min-content 1fr min-content;
+  row-gap: 8px;
+
+  @media (min-width: 900px) {
+    grid-template-areas: 'avatar input buttons';
+  }
+}
+
+.input-bar-container--with-toolbar {
+  grid-template-areas:
+    'toolbar toolbar'
+    'input input'
+    'buttons buttons';
+  grid-template-columns: min-content 1fr;
+  row-gap: 0;
+
+  @media (min-width: 1050px) {
+    grid-template-areas:
+      'input input'
+      'toolbar buttons';
+  }
+}
+
+.input-bar-center {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 20px;
+  grid-area: input;
+}
+
+.input-bar-left {
+  margin-top: auto;
+  margin-bottom: 8px;
+  grid-area: avatar;
+
+  @media (min-width: 1050px) {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+}
+
+.input-bar-avatar {
+  display: flex;
+  width: 24px;
+  margin-top: 16px;
+}
+
+.input-bar-right {
+  width: 100%;
+  height: 100%;
+  max-height: 56px;
+  align-items: center;
+  margin-top: auto;
+  margin-bottom: 0;
+  margin-left: auto !important;
+  grid-area: buttons;
+
+  @media (min-width: 900px) {
+    width: auto;
+  }
+
+  @media (min-width: 1050px) {
+    margin-left: 0;
   }
 }
