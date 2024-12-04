@@ -80,6 +80,8 @@ const theme = {
   },
   heading: {
     h1: 'editor-heading editor-heading--1',
+    h2: 'editor-heading editor-heading--2',
+    h3: 'editor-heading editor-heading--3',
   },
 };
 
