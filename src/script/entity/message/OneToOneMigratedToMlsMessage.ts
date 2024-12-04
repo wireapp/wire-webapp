@@ -29,7 +29,7 @@ export class OneToOneMigratedToMlsMessage extends SystemMessage {
     this.system_message_type = SystemMessageType.ONE2ONE_MIGRATED_TO_MLS;
     this.caption = t(
       'conversationProtocolUpdatedToMLS',
-      {},
+      undefined,
       replaceLink(Config.getConfig().URL.SUPPORT.MLS_LEARN_MORE),
     );
   }

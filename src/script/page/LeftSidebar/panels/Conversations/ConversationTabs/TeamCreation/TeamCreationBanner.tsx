@@ -19,13 +19,20 @@
 
 import {useState} from 'react';
 
+import {amplify} from 'amplify';
+
 import {Button, ButtonVariant, IconButton} from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {BannerPortal} from 'Components/BannerPortal/BannerPortal';
 import * as Icon from 'Components/Icon';
+import {EventName} from 'src/script/tracking/EventName';
+import {Segmentation} from 'src/script/tracking/Segmentation';
 import {t} from 'Util/LocalizerUtil';
 
 import {
+  bannerHeaderContainerCss,
+  bannerWrapperCss,
   iconButtonCss,
   teamUpgradeBannerButtonCss,
   teamUpgradeBannerContainerCss,
@@ -35,53 +42,72 @@ import {
 
 import {SidebarStatus, useSidebarStore} from '../../useSidebarStore';
 
-const Banner = () => {
+const Banner = ({onClick}: {onClick: () => void}) => {
   return (
     <div css={teamUpgradeBannerContainerCss}>
-      <Icon.InfoIcon />
-      <span className="heading-h4" css={teamUpgradeBannerHeaderCss}>
-        {t('teamUpgradeBannerHeader')}
-      </span>
+      <div css={bannerHeaderContainerCss}>
+        <Icon.InfoIcon />
+        <span className="heading-h4" css={teamUpgradeBannerHeaderCss}>
+          {t('teamUpgradeBannerHeader')}
+        </span>
+      </div>
       <div className="subline" css={teamUpgradeBannerContentCss}>
         {t('teamUpgradeBannerContent')}
       </div>
-      <Button css={teamUpgradeBannerButtonCss} variant={ButtonVariant.SECONDARY}>
+      <Button css={teamUpgradeBannerButtonCss} variant={ButtonVariant.SECONDARY} onClick={onClick}>
         {t('teamUpgradeBannerButtonText')}
       </Button>
     </div>
   );
 };
 
-const PADDING_X = 40;
 const PADDING_Y = 34;
 
-export const TeamCreationBanner = () => {
+export const TeamCreationBanner = ({onClick}: {onClick: () => void}) => {
   const [isBannerVisible, setIsBannerVisible] = useState(false);
   const [position, setPosition] = useState<{x: number; y: number}>({x: 0, y: 0});
   const {status: sidebarStatus} = useSidebarStore();
-  const clickHandler = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const openHandler = (event: React.MouseEvent<HTMLButtonElement> | React.MouseEvent<HTMLDivElement>) => {
     setIsBannerVisible(true);
     const rect = event.currentTarget.getBoundingClientRect();
     setPosition({x: rect.x, y: rect.y});
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.UI.CLICKED.SETTINGS_MIGRATION);
+  };
+
+  const bannerBtnClickHandler = () => {
+    setIsBannerVisible(false);
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.UI.CLICKED.PERSONAL_MIGRATION_CTA, {
+      step: Segmentation.TEAM_CREATION_STEP.CLICKED_CREATE_TEAM,
+    });
+    onClick();
+  };
+
+  const portalCloseHandler = () => {
+    setIsBannerVisible(false);
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.UI.CLICKED.PERSONAL_MIGRATION_CTA, {
+      step: Segmentation.TEAM_CREATION_STEP.CLICKED_DISMISS_CTA,
+    });
   };
 
   if (sidebarStatus === SidebarStatus.OPEN) {
-    return <Banner />;
+    return <Banner onClick={bannerBtnClickHandler} />;
   }
 
   return (
     <>
-      <IconButton css={iconButtonCss} onClick={clickHandler}>
+      <IconButton css={iconButtonCss} onClick={openHandler} onMouseOver={openHandler}>
         <Icon.InfoIcon />
       </IconButton>
       {isBannerVisible && (
         <BannerPortal
           // Position + padding
-          positionX={position.x + PADDING_X}
+          positionX={position.x}
           positionY={position.y + PADDING_Y}
-          onClose={() => setIsBannerVisible(false)}
+          onClose={portalCloseHandler}
         >
-          <Banner />
+          <div css={bannerWrapperCss}>
+            <Banner onClick={bannerBtnClickHandler} />
+          </div>
         </BannerPortal>
       )}
     </>

@@ -21,22 +21,19 @@ import {ConversationProtocol, MessageSendingStatus, QualifiedUserClients} from '
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import {QualifiedId, RequestCancellationError} from '@wireapp/api-client/lib/user';
 import {
+  GenericMessageType,
+  InCallEmojiType,
   MessageSendingState,
   MessageTargetMode,
   ReactionType,
-  GenericMessageType,
   SendResult,
-  InCallEmojiType,
 } from '@wireapp/core/lib/conversation';
 import {
-  AudioMetaData,
   EditedTextContent,
   FileMetaDataContent,
-  ImageMetaData,
   LinkPreviewContent,
   LinkPreviewUploadedContent,
   TextContent,
-  VideoMetaData,
 } from '@wireapp/core/lib/conversation/content';
 import * as MessageBuilder from '@wireapp/core/lib/conversation/message/MessageBuilder';
 import {OtrMessage} from '@wireapp/core/lib/conversation/message/OtrMessage';
@@ -457,7 +454,7 @@ export class MessageRepository {
     }
 
     const blob = await loadUrlBlob(url);
-    const textMessage = t('extensionsGiphyMessage', tag, {}, true);
+    const textMessage = t('extensionsGiphyMessage', {tag: tag as string | number}, {}, true);
     this.sendText({conversation: conversationEntity, message: textMessage, quote: quoteEntity});
     return this.uploadImages(conversationEntity, [blob]);
   }
@@ -509,18 +506,34 @@ export class MessageRepository {
     originalId?: string,
   ): Promise<EventRecord | void> {
     const uploadStarted = Date.now();
+    const beforeUnload = (event: Event) => {
+      event.preventDefault();
+    };
 
-    const {id, state} = await this.sendAssetMetadata(conversation, file, asImage, originalId);
-    if (state === SendAndInjectSendingState.FAILED) {
-      await this.storeFileInDb(conversation, id, file);
+    window.addEventListener('beforeunload', beforeUnload);
+    const assetMetadata = await this.createAssetMetadata(conversation, file, asImage, originalId);
+
+    if (!assetMetadata) {
+      window.removeEventListener('beforeunload', beforeUnload);
       return;
     }
-    if (state === MessageSendingState.CANCELED) {
-      // The user has canceled the upload, no need to do anything else
-      return;
-    }
+
+    const {message, metaData} = assetMetadata;
+    const {messageId} = message;
+
     try {
-      await this.sendAssetRemotedata(conversation, file, id, asImage);
+      const {state} = await this.sendAssetRemotedata(conversation, file, messageId, asImage, metaData);
+
+      if (state === SendAndInjectSendingState.FAILED) {
+        await this.storeFileInDb(conversation, messageId, file);
+        return;
+      }
+
+      if (state === MessageSendingState.CANCELED) {
+        // The user has canceled the upload, no need to do anything else
+        return;
+      }
+
       const uploadDuration = (Date.now() - uploadStarted) / TIME_IN_MILLIS.SECOND;
       this.logger.info(`Finished to upload asset for conversation'${conversation.id} in ${uploadDuration}`);
     } catch (error) {
@@ -531,9 +544,11 @@ export class MessageRepository {
         `Failed to upload asset for conversation '${conversation.id}': ${(error as Error).message}`,
         error,
       );
-      const messageEntity = await this.getMessageInConversationById(conversation, id);
+      const messageEntity = await this.getMessageInConversationById(conversation, messageId);
       await this.sendAssetUploadFailed(conversation, messageEntity.id);
       return this.updateMessageAsUploadFailed(messageEntity);
+    } finally {
+      window.removeEventListener('beforeunload', beforeUnload);
     }
   }
 
@@ -602,7 +617,45 @@ export class MessageRepository {
     return this.eventService.updateEventAsUploadFailed(message_et.primary_key, reason);
   }
 
-  private async sendAssetRemotedata(conversation: Conversation, file: Blob, messageId: string, asImage: boolean) {
+  /**
+   * Create asset metadata message to specified conversation.
+   */
+  private async createAssetMetadata(
+    conversation: Conversation,
+    file: File | Blob,
+    allowImageDetection?: boolean,
+    originalId?: string,
+  ) {
+    try {
+      const metadata = await buildMetadata(file);
+      const meta = {
+        audio: (isAudio(file) && metadata) || null,
+        video: (isVideo(file) && metadata) || null,
+        image: (allowImageDetection && isImage(file) && metadata) || null,
+        length: file.size,
+        name: (file as File).name,
+        type: file.type,
+      } as FileMetaDataContent;
+
+      const message = MessageBuilder.buildFileMetaDataMessage({metaData: meta as FileMetaDataContent}, originalId);
+      this.assetRepository.addToProcessQueue(message, conversation.id);
+      return {message, metaData: meta as FileMetaDataContent};
+    } catch (error) {
+      const logMessage = `Couldn't render asset preview from metadata. Asset might be corrupt: ${
+        (error as Error).message
+      }`;
+      this.logger.warn(logMessage, error);
+      return null;
+    }
+  }
+
+  private async sendAssetRemotedata(
+    conversation: Conversation,
+    file: Blob,
+    messageId: string,
+    asImage: boolean,
+    meta: FileMetaDataContent,
+  ) {
     const retention = this.assetRepository.getAssetRetention(this.userState.self(), conversation);
     const options = {
       legalHoldStatus: conversation.legalHoldStatus(),
@@ -618,6 +671,7 @@ export class MessageRepository {
       asset: asset,
       expectsReadConfirmation: this.expectReadReceipt(conversation),
     };
+
     const assetMessage = metadata
       ? MessageBuilder.buildImageMessage(
           {
@@ -628,43 +682,14 @@ export class MessageRepository {
         )
       : MessageBuilder.buildFileDataMessage(
           {
+            metaData: meta,
             ...commonMessageData,
             file: {data: Buffer.from(await file.arrayBuffer())},
           },
           messageId,
         );
-    return this.sendAndInjectMessage(assetMessage, conversation, {enableEphemeral: true, syncTimestamp: false});
-  }
 
-  /**
-   * Send asset metadata message to specified conversation.
-   */
-  private async sendAssetMetadata(
-    conversation: Conversation,
-    file: File | Blob,
-    allowImageDetection?: boolean,
-    originalId?: string,
-  ) {
-    let metadata;
-    try {
-      metadata = await buildMetadata(file);
-    } catch (error) {
-      const logMessage = `Couldn't render asset preview from metadata. Asset might be corrupt: ${
-        (error as Error).message
-      }`;
-      this.logger.warn(logMessage, error);
-    }
-    const meta = {length: file.size, name: (file as File).name, type: file.type} as Partial<FileMetaDataContent>;
-
-    if (isAudio(file)) {
-      meta.audio = metadata as AudioMetaData;
-    } else if (isVideo(file)) {
-      meta.video = metadata as VideoMetaData;
-    } else if (allowImageDetection && isImage(file)) {
-      meta.image = metadata as ImageMetaData;
-    }
-    const message = MessageBuilder.buildFileMetaDataMessage({metaData: meta as FileMetaDataContent}, originalId);
-    return this.sendAndInjectMessage(message, conversation, {enableEphemeral: true});
+    return this.sendAndInjectMessage(assetMessage, conversation, {enableEphemeral: true});
   }
 
   /**
@@ -720,9 +745,11 @@ export class MessageRepository {
 
     const baseTitle =
       users.length > 1
-        ? t('modalConversationNewDeviceHeadlineMany', titleSubstitutions)
-        : t('modalConversationNewDeviceHeadlineOne', titleSubstitutions);
-    const titleString = users[0].isMe ? t('modalConversationNewDeviceHeadlineYou', titleSubstitutions) : baseTitle;
+        ? t('modalConversationNewDeviceHeadlineMany', {users: titleSubstitutions})
+        : t('modalConversationNewDeviceHeadlineOne', {user: titleSubstitutions});
+    const titleString = users[0].isMe
+      ? t('modalConversationNewDeviceHeadlineYou', {user: titleSubstitutions})
+      : baseTitle;
 
     return new Promise(resolve => {
       const options = {

@@ -17,11 +17,12 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 
 import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation/';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import classNames from 'classnames';
+import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import {CALL_TYPE} from '@wireapp/avs';
@@ -41,6 +42,7 @@ import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import * as Icon from 'Components/Icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
+import {useClickOutside} from 'Hooks/useClickOutside';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {Config} from 'src/script/Config';
 import {isCallViewOption} from 'src/script/guards/CallView';
@@ -74,6 +76,7 @@ import {CallingViewMode, CallState, MuteState} from '../../calling/CallState';
 import {Participant} from '../../calling/Participant';
 import type {Grid} from '../../calling/videoGridHandler';
 import type {Conversation} from '../../entity/Conversation';
+import {useWarnings} from '../../guards/useWarnings';
 import {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
 import {TeamState} from '../../team/TeamState';
 import {CallViewTab} from '../../view_model/CallingViewModel';
@@ -147,11 +150,19 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   const [isConfirmCloseModalOpen, setIsConfirmCloseModalOpen] = useState<boolean>(false);
   const [showEmojisBar, setShowEmojisBar] = useState<boolean>(false);
   const [disabledEmojis, setDisabledEmojis] = useState<string[]>([]);
+
+  const {showSmallOffset, showLargeOffset} = useWarnings();
+
   const selfParticipant = call.getSelfParticipant();
   const {sharesScreen: selfSharesScreen, sharesCamera: selfSharesCamera} = useKoSubscribableChildren(selfParticipant, [
     'sharesScreen',
     'sharesCamera',
   ]);
+
+  const emojiBarRef = useRef(null);
+  const emojiBarToggleButtonRef = useRef(null);
+
+  useClickOutside(emojiBarRef, () => setShowEmojisBar(false), emojiBarToggleButtonRef);
 
   const {blurredVideoStream} = useKoSubscribableChildren(selfParticipant, ['blurredVideoStream']);
   const hasBlurredBackground = !!blurredVideoStream;
@@ -423,7 +434,12 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   const totalHandRaisedParticipants = handRaisedParticipants.length;
 
   return (
-    <div className="video-calling-wrapper">
+    <div
+      className={cx('video-calling-wrapper', {
+        'app--small-offset': showSmallOffset,
+        'app--large-offset': showLargeOffset,
+      })}
+    >
       <div id="video-calling" className="video-calling">
         <div css={videoTopBarStyles}>
           <div id="video-title" className="video-title">
@@ -846,6 +862,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                     <li className="video-controls__item">
                       {showEmojisBar && (
                         <div
+                          ref={emojiBarRef}
                           role="toolbar"
                           className="video-controls-emoji-bar"
                           data-uie-name="video-controls-emoji-bar"
@@ -870,6 +887,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                         </div>
                       )}
                       <button
+                        ref={emojiBarToggleButtonRef}
                         title={t('callReactions')}
                         className={classNames('video-controls__button_primary', {active: showEmojisBar})}
                         onClick={() => setShowEmojisBar(prev => !prev)}

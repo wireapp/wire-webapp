@@ -137,7 +137,7 @@ export const UserListItem = ({
     <>
       {canSelect ? (
         <div
-          aria-label={t('accessibility.openConversation', userName)}
+          aria-label={t('accessibility.openConversation', {name: userName})}
           css={listWrapper({isHighlighted, noUnderline, noInteraction})}
         >
           <Checkbox
@@ -159,7 +159,7 @@ export const UserListItem = ({
         <div
           tabIndex={TabIndex.FOCUSABLE}
           role="button"
-          aria-label={t('accessibility.openConversation', userName)}
+          aria-label={t('accessibility.openConversation', {name: userName})}
           css={listWrapper({isHighlighted, noUnderline})}
           {...(!noInteraction && {
             onClick: event => onClick(user, event.nativeEvent),

@@ -85,22 +85,24 @@ function getContent(message: MemberMessageEntity) {
         if (message.allTeamMembers && exceedsMaxTeam) {
           const guestCount = targetedUsers.filter(userEntity => userEntity.isGuest()).length;
           if (!guestCount) {
-            return t('conversationCreateTeam', {});
+            return t('conversationCreateTeam');
           }
 
           const hasSingleGuest = guestCount === 1;
-          return hasSingleGuest ? t('conversationCreateTeamGuest', {}) : t('conversationCreateTeamGuests', guestCount);
+          return hasSingleGuest
+            ? t('conversationCreateTeamGuest')
+            : t('conversationCreateTeamGuests', {count: guestCount});
         }
 
         return exceedsMaxVisibleUsers
           ? t('conversationCreateWithMore', {count: hiddenUsersCount.toString(), users: dativeUsers}, {}, true)
-          : t('conversationCreateWith', dativeUsers, {}, true);
+          : t('conversationCreateWith', {users: dativeUsers}, {}, true);
       }
 
       if (actor.isMe) {
         return exceedsMaxVisibleUsers
           ? t('conversationCreatedYouMore', {count: hiddenUsersCount.toString(), users: dativeUsers}, {}, true)
-          : t('conversationCreatedYou', dativeUsers, {}, true);
+          : t('conversationCreatedYou', {users: dativeUsers}, {}, true);
       }
 
       return exceedsMaxVisibleUsers
@@ -109,7 +111,7 @@ function getContent(message: MemberMessageEntity) {
     }
 
     case SystemMessageType.CONVERSATION_RESUME: {
-      return t('conversationResume', generateNames(targetedUsers, Declension.DATIVE, false), {}, true);
+      return t('conversationResume', {users: generateNames(targetedUsers, Declension.DATIVE, false)}, {}, true);
     }
 
     default:
@@ -122,13 +124,13 @@ function getContent(message: MemberMessageEntity) {
       if (senderJoined) {
         return message.user().isMe
           ? t('conversationMemberJoinedSelfYou')
-          : t('conversationMemberJoinedSelf', message.senderName(), {}, true);
+          : t('conversationMemberJoinedSelf', {name: message.senderName()}, {}, true);
       }
 
       if (message.user().isMe) {
         return exceedsMaxVisibleUsers
           ? t('conversationMemberJoinedYouMore', {count: hiddenUsersCount.toString(), users: accusativeUsers}, {}, true)
-          : t('conversationMemberJoinedYou', accusativeUsers, {}, true);
+          : t('conversationMemberJoinedYou', {users: accusativeUsers}, {}, true);
       }
       return exceedsMaxVisibleUsers
         ? t(
@@ -148,12 +150,12 @@ function getContent(message: MemberMessageEntity) {
           'read-more-legal-hold',
         );
         if (message.userEntities().some(user => user.isMe)) {
-          return t('conversationYouRemovedMissingLegalHoldConsent', {}, replaceLinkLegalHold);
+          return t('conversationYouRemovedMissingLegalHoldConsent', undefined, replaceLinkLegalHold);
         }
         const users = generateNames(targetedUsers);
 
         if (message.userEntities().length === 1) {
-          return t('conversationMemberRemovedMissingLegalHoldConsent', users, replaceLinkLegalHold);
+          return t('conversationMemberRemovedMissingLegalHoldConsent', {user: users}, replaceLinkLegalHold);
         }
         if (exceedsMaxVisibleUsers) {
           return t(
@@ -166,7 +168,7 @@ function getContent(message: MemberMessageEntity) {
             true,
           );
         }
-        return t('conversationMultipleMembersRemovedMissingLegalHoldConsent', users, replaceLinkLegalHold);
+        return t('conversationMultipleMembersRemovedMissingLegalHoldConsent', {users}, replaceLinkLegalHold);
       }
       const temporaryGuestRemoval = message.otherUser().isMe && message.otherUser().isTemporaryGuest();
       if (temporaryGuestRemoval) {
@@ -175,20 +177,20 @@ function getContent(message: MemberMessageEntity) {
 
       const senderLeft = matchQualifiedIds(message.otherUser(), actor);
       if (senderLeft) {
-        return message.user().isMe ? t('conversationMemberLeftYou') : t('conversationMemberLeft', name, {}, true);
+        return message.user().isMe ? t('conversationMemberLeftYou') : t('conversationMemberLeft', {name}, {}, true);
       }
 
       const allUsers = generateNames(targetedUsers);
       if (!actor.id) {
-        return t('conversationMemberWereRemoved', allUsers, {}, true);
+        return t('conversationMemberWereRemoved', {users: allUsers}, {}, true);
       }
       return actor.isMe
-        ? t('conversationMemberRemovedYou', allUsers, {}, true)
+        ? t('conversationMemberRemovedYou', {users: allUsers}, {}, true)
         : t('conversationMemberRemoved', {name, users: allUsers}, {}, true);
     }
 
     case ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE: {
-      return t('conversationTeamLeft', name, {}, true);
+      return t('conversationTeamLeft', {name}, {}, true);
     }
 
     default:

@@ -24,7 +24,7 @@ import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
+import {IconButton, IconButtonVariant, QUERY, useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ConversationVerificationBadges} from 'Components/Badge';
@@ -36,7 +36,7 @@ import {useAppMainState, ViewType} from 'src/script/page/state';
 import {ContentState} from 'src/script/page/useAppState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
-import {StringIdentifer, t} from 'Util/LocalizerUtil';
+import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
@@ -138,11 +138,11 @@ export const TitleBar: React.FC<TitleBarProps> = ({
   const conversationSubtitle = is1to1 && firstUserEntity?.isFederated ? firstUserEntity?.handle ?? '' : '';
 
   const shortcut = Shortcut.getShortcutTooltip(ShortcutType.PEOPLE);
-  const peopleTooltip = t('tooltipConversationPeople', shortcut);
+  const peopleTooltip = t('tooltipConversationPeople', {shortcut});
 
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
   const mdBreakpoint = useMatchMedia('max-width: 1000px');
-  const smBreakpoint = useMatchMedia('max-width: 720px');
+  const smBreakpoint = useMatchMedia(QUERY.tabletSMDown);
 
   const {close: closeRightSidebar} = useAppMainState(state => state.rightSidebar);
 
@@ -368,6 +368,24 @@ export const TitleBar: React.FC<TitleBarProps> = ({
   );
 };
 
+type BadgeKeys =
+  | 'External'
+  | 'ExternalAndGuest'
+  | 'ExternalAndGuestAndService'
+  | 'ExternalAndService'
+  | 'Federated'
+  | 'FederatedAndExternal'
+  | 'FederatedAndExternalAndGuest'
+  | 'FederatedAndExternalAndGuestAndService'
+  | 'FederatedAndExternalAndService'
+  | 'FederatedAndGuest'
+  | 'FederatedAndGuestAndService'
+  | 'FederatedAndService'
+  | 'GuestAndService'
+  | 'Service';
+
+type WarningBadgeKey = '' | 'guestRoomConversationBadge' | `${'guestRoomConversationBadge'}${BadgeKeys}`;
+
 export function generateWarningBadgeKey({
   hasFederated,
   hasExternal,
@@ -378,7 +396,7 @@ export function generateWarningBadgeKey({
   hasFederated?: boolean;
   hasGuest?: boolean;
   hasService?: boolean;
-}): StringIdentifer {
+}): WarningBadgeKey {
   const baseKey = 'guestRoomConversationBadge';
   const extras = [];
   if (hasGuest && !hasExternal && !hasService && !hasFederated) {
@@ -399,5 +417,5 @@ export function generateWarningBadgeKey({
   if (!extras.length) {
     return '';
   }
-  return `${baseKey}${extras.join('And')}` as StringIdentifer;
+  return `${baseKey}${extras.join('And')}` as WarningBadgeKey;
 }

@@ -20,12 +20,12 @@
 import React, {useState} from 'react';
 
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {useIntl} from 'react-intl';
 
 import {Button, COLOR, Container, ErrorMessage, Form, H2, Input, Link, Modal, Text} from '@wireapp/react-ui-kit';
 
+import {t} from 'Util/LocalizerUtil';
+
 import {Config} from '../../Config';
-import {joinGuestLinkPasswordModalStrings} from '../../strings';
 
 export interface JoinGuestLinkPasswordModalProps {
   onSubmitPassword: (password: string) => void;
@@ -42,7 +42,6 @@ const JoinGuestLinkPasswordModal: React.FC<JoinGuestLinkPasswordModalProps> = ({
   conversationName,
   onSubmitPassword,
 }) => {
-  const {formatMessage: _} = useIntl();
   const [passwordValue, setPasswordValue] = useState<string>('');
 
   const onSubmit = (event: React.FormEvent<HTMLFormElement | HTMLButtonElement>) => {
@@ -52,7 +51,7 @@ const JoinGuestLinkPasswordModal: React.FC<JoinGuestLinkPasswordModalProps> = ({
 
   const Error = () => {
     if (error?.code === HTTP_STATUS.FORBIDDEN || error?.code === HTTP_STATUS.BAD_REQUEST) {
-      return <ErrorMessage>{_(joinGuestLinkPasswordModalStrings.passwordIncorrect)}</ErrorMessage>;
+      return <ErrorMessage>{t('guestLinkPasswordModal.passwordIncorrect')}</ErrorMessage>;
     }
     return null;
   };
@@ -62,11 +61,11 @@ const JoinGuestLinkPasswordModal: React.FC<JoinGuestLinkPasswordModalProps> = ({
       <Container style={{maxWidth: '400px'}}>
         <H2 style={{whiteSpace: 'break-spaces', fontWeight: 500, marginTop: '10px', textAlign: 'center'}}>
           {conversationName
-            ? _(joinGuestLinkPasswordModalStrings.headline, {conversationName})
-            : _(joinGuestLinkPasswordModalStrings.headlineDefault)}
+            ? t('guestLinkPasswordModal.headline', {conversationName})
+            : t('guestLinkPasswordModal.headlineDefault')}
         </H2>
         <Text block fontSize="var(--font-size-base)" style={{marginBottom: 24}}>
-          {_(joinGuestLinkPasswordModalStrings.description)}
+          {t('guestLinkPasswordModal.description')}
         </Text>
         <Form
           name="guest-password-join-form"
@@ -79,8 +78,8 @@ const JoinGuestLinkPasswordModal: React.FC<JoinGuestLinkPasswordModalProps> = ({
             data-uie-name="guest-link-join-password-input"
             name="guest-join-password"
             required
-            placeholder={_(joinGuestLinkPasswordModalStrings.passwordInputLabel)}
-            label={_(joinGuestLinkPasswordModalStrings.passwordInputLabel)}
+            placeholder={t('guestLinkPasswordModal.passwordInputLabel')}
+            label={t('guestLinkPasswordModal.passwordInputLabel')}
             id="guest_link_join_password"
             className="modal__input"
             type="password"
@@ -91,7 +90,7 @@ const JoinGuestLinkPasswordModal: React.FC<JoinGuestLinkPasswordModalProps> = ({
         </Form>
         <Link href={Config.getConfig().URL.SUPPORT.LEARN_MORE_ABOUT_GUEST_LINKS} target="_blank">
           <Text block color={COLOR.BLUE} style={{textDecoration: 'underline', marginBottom: 24}}>
-            {_(joinGuestLinkPasswordModalStrings.learnMoreLink)}
+            {t('guestLinkPasswordModal.learnMoreLink')}
           </Text>
         </Link>
         <Button
@@ -102,7 +101,7 @@ const JoinGuestLinkPasswordModal: React.FC<JoinGuestLinkPasswordModalProps> = ({
           onClick={(event: React.FormEvent<HTMLButtonElement>) => onSubmit(event)}
           data-uie-name="guest-link-join-submit-button"
         >
-          {_(joinGuestLinkPasswordModalStrings.joinConversation)}
+          {t('guestLinkPasswordModal.joinConversation')}
         </Button>
       </Container>
     </Modal>

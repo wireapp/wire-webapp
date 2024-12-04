@@ -333,13 +333,13 @@ export class User {
     if (remainingMinutes <= 45) {
       const remainingQuarters = Math.max(1, Math.ceil(remainingMinutes / 15));
       const timeValue = remainingQuarters * 15;
-      this.expirationText(t('userRemainingTimeMinutes', timeValue));
+      this.expirationText(t('userRemainingTimeMinutes', {time: timeValue}));
       this.expirationRemaining(timeValue * TIME_IN_MILLIS.MINUTE);
       this.expirationRemainingText(`${timeValue}m`);
     } else {
       const showOneAndAHalf = remainingMinutes > 60 && remainingMinutes <= 90;
       const timeValue = showOneAndAHalf ? 1.5 : Math.ceil(remainingMinutes / 60);
-      this.expirationText(t('userRemainingTimeHours', timeValue));
+      this.expirationText(t('userRemainingTimeHours', {time: timeValue}));
       this.expirationRemaining(timeValue * TIME_IN_MILLIS.HOUR);
       this.expirationRemainingText(`${timeValue}h`);
     }

@@ -20,10 +20,11 @@
 import {FC, useEffect, useLayoutEffect} from 'react';
 
 import {amplify} from 'amplify';
+import cx from 'classnames';
 import {ErrorBoundary} from 'react-error-boundary';
 import {container} from 'tsyringe';
 
-import {StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
+import {QUERY, StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingContainer} from 'Components/calling/CallingOverlayContainer';
@@ -51,6 +52,7 @@ import {useAppState, ContentState} from './useAppState';
 import {CallingViewMode, CallState, DesktopScreenShareMenu} from '../calling/CallState';
 import {ConversationState} from '../conversation/ConversationState';
 import {User} from '../entity/User';
+import {useWarnings} from '../guards/useWarnings';
 import {useActiveWindow} from '../hooks/useActiveWindow';
 import {useInitializeRootFontSize} from '../hooks/useRootFontSize';
 import {App} from '../main/app';
@@ -92,6 +94,8 @@ export const AppMain: FC<AppMainProps> = ({
   useActiveWindow(window);
 
   useInitializeRootFontSize();
+
+  const {showSmallOffset, showLargeOffset} = useWarnings();
 
   if (!apiContext) {
     throw new Error('API Context has not been set');
@@ -137,7 +141,7 @@ export const AppMain: FC<AppMainProps> = ({
   };
 
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
-  const isMobileView = useMatchMedia('max-width: 720px');
+  const isMobileView = useMatchMedia(QUERY.tabletSMDown);
   const {currentView} = useAppMainState(state => state.responsiveView);
   const {isHidden: isLeftSidebarHidden} = useAppMainState(state => state.leftSidebar);
 
@@ -249,7 +253,13 @@ export const AppMain: FC<AppMainProps> = ({
         <ErrorBoundary FallbackComponent={ErrorFallback}>
           {Config.getConfig().FEATURE.ENABLE_DEBUG && <ConfigToolbar />}
           {!locked && (
-            <div id="app" className="app">
+            <div
+              id="app"
+              className={cx('app', {
+                'app--small-offset': showSmallOffset,
+                'app--large-offset': showLargeOffset,
+              })}
+            >
               {showLeftSidebar && (
                 <LeftSidebar
                   listViewModel={mainView.list}

@@ -307,9 +307,9 @@ export class NotificationRepository {
           let notificationText;
 
           if (assetEntity.isUserMentioned(this.userState.self().qualifiedId)) {
-            notificationText = t('notificationMention', assetEntity.text, {}, true);
+            notificationText = t('notificationMention', {text: assetEntity.text}, {}, true);
           } else if (messageEntity.isUserQuoted(this.userState.self().id)) {
-            notificationText = t('notificationReply', assetEntity.text, {}, true);
+            notificationText = t('notificationReply', {text: assetEntity.text}, {}, true);
           } else {
             notificationText = getRenderedTextContent(assetEntity.text);
           }
@@ -360,7 +360,7 @@ export class NotificationRepository {
 
       const senderJoined = messageEntity.user().id === otherUserEntity.id;
       if (senderJoined) {
-        return t('notificationMemberJoinSelf', nameOfJoinedUser, {}, true);
+        return t('notificationMemberJoinSelf', {user: nameOfJoinedUser}, {}, true);
       }
 
       const substitutions = {user1: messageEntity.user().name(), user2: nameOfJoinedUser};
@@ -381,7 +381,7 @@ export class NotificationRepository {
   private createBodyMemberLeave(messageEntity: MemberMessage): string | void {
     const updatedOneParticipant = messageEntity.userEntities().length === 1;
     if (updatedOneParticipant && !messageEntity.remoteUserEntities().length) {
-      return t('notificationMemberLeaveRemovedYou', messageEntity.user().name(), {}, true);
+      return t('notificationMemberLeaveRemovedYou', {user: messageEntity.user().name()}, {}, true);
     }
   }
 
@@ -412,7 +412,7 @@ export class NotificationRepository {
       case SystemMessageType.CONNECTION_REQUEST:
         return t('notificationConnectionRequest');
       case SystemMessageType.CONVERSATION_CREATE:
-        return t('notificationConversationCreate', messageEntity.user().name(), {}, true);
+        return t('notificationConversationCreate', {user: messageEntity.user().name()}, {}, true);
     }
   }
 
@@ -474,7 +474,7 @@ export class NotificationRepository {
         const substitutions = {time: timeString, user: messageEntity.user().name()};
         return t('notificationConversationMessageTimerUpdate', substitutions, {}, true);
       }
-      return t('notificationConversationMessageTimerReset', messageEntity.user().name(), {}, true);
+      return t('notificationConversationMessageTimerReset', {user: messageEntity.user().name()}, {}, true);
     };
 
     const createBodyRename = () => {

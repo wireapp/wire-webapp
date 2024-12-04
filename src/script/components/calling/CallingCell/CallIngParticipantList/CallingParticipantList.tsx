@@ -94,6 +94,7 @@ export const CallingParticipantList = ({
         'call-ui__participant-list__wrapper--active': showParticipants,
       })}
     >
+      <p css={labelStyles}>{t('videoCallOverlayParticipantsListLabel', {count: participants.length})}</p>
       <FadingScrollbar className="call-ui__participant-list__container">
         <p css={labelStyles}>{t('videoCallOverlayParticipantsWithRaisedHandListLabel', participants.length)}</p>
         <ul className="call-ui__participant-list" data-uie-name="list-call-ui-participants">

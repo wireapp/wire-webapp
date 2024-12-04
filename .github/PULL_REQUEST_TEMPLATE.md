@@ -7,7 +7,7 @@
 
 ## Checklist
 
-- [ ] mentions the JIRA issue in the PR name (Ex. [WPB-423])
+- [ ] mentions the JIRA issue in the PR name (Ex. [WPB-XXXX])
 - [ ] PR has been self reviewed by the author;
 - [ ] Hard-to-understand areas of the code have been commented;
 - [ ] If it is a core feature, unit tests have been added;

@@ -39,6 +39,16 @@ const isOauth = (): boolean => location?.hash?.includes(QUERY_KEY.SCOPE) ?? fals
 
 const cookieName = 'cookie_supported_test_wire_cookie_name';
 
+const isMobileBrowser = (): boolean => {
+  const isTouchScreen = window.matchMedia('(any-pointer:coarse)').matches;
+  const isSmallScreen = window.matchMedia('(max-width: 768px)').matches;
+  return (
+    isTouchScreen &&
+    isSmallScreen &&
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+  );
+};
+
 const supportsCookies = (): boolean => {
   switch (navigator.cookieEnabled) {
     case true:
@@ -53,6 +63,11 @@ const supportsCookies = (): boolean => {
       }
       return false;
   }
+};
+
+const redirectUnsupportedBrowser = (error: string): void => {
+  location.href = '/unsupported/';
+  console.error(error);
 };
 
 const supportsIndexDB = (): Promise<boolean> =>
@@ -92,24 +107,28 @@ const supportsIndexDB = (): Promise<boolean> =>
 
 const checkBrowser = (): void => {
   if (!supportsCookies()) {
-    location.href = '/unsupported/';
-    console.error("This browser doesn't support cookies to run the Wire app!");
+    redirectUnsupportedBrowser("This browser doesn't support cookies to run the Wire app!");
     return;
   }
+  // Skip the mobile browser check for OAuth
   if (isOauth()) {
     return;
   }
-  if (!('RTCPeerConnection' in window)) {
-    location.href = '/unsupported/';
-    console.error("This browser doesn't support RTC to run the Wire app!");
+
+  if (isMobileBrowser()) {
+    redirectUnsupportedBrowser("This browser doesn't support the Wire app on mobile devices!");
     return;
   }
-  supportsIndexDB()
+
+  if (!('RTCPeerConnection' in window)) {
+    redirectUnsupportedBrowser("This browser doesn't support RTC to run the Wire app!");
+    return;
+  }
+  void supportsIndexDB()
     .catch(() => false)
     .then(res => {
       if (!res) {
-        location.href = '/unsupported/';
-        console.error("This browser doesn't support IndexDB to run the Wire app!");
+        redirectUnsupportedBrowser("This browser doesn't support IndexDB to run the Wire app!");
       }
     });
 };

@@ -23,6 +23,8 @@ import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {ConversationState} from 'src/script/conversation/ConversationState';
 import {Conversation} from 'src/script/entity/Conversation';
+import {TeamRepository} from 'src/script/team/TeamRepository';
+import {UserRepository} from 'src/script/user/UserRepository';
 
 import {
   conversationsSidebarHandleStyles,
@@ -31,6 +33,7 @@ import {
 } from './ConversationSidebar.styles';
 
 import {User} from '../../../../../entity/User';
+import {ContentState} from '../../../../useAppState';
 import {UserDetails} from '../../../UserDetails';
 import {ConversationTabs} from '../ConversationTabs';
 import {SidebarTabs} from '../useSidebarStore';
@@ -50,8 +53,10 @@ type ConversationSidebarProps = {
   favoriteConversations: Conversation[];
   archivedConversations: Conversation[];
   conversationRepository: ConversationRepository;
-  onClickPreferences: () => void;
+  onClickPreferences: (contentState: ContentState) => void;
   showNotificationsBadge: boolean;
+  teamRepository: TeamRepository;
+  userRepository: UserRepository;
 };
 
 export const ConversationSidebar = ({
@@ -71,6 +76,8 @@ export const ConversationSidebar = ({
   conversationRepository,
   onClickPreferences,
   showNotificationsBadge,
+  teamRepository,
+  userRepository,
 }: ConversationSidebarProps) => {
   return (
     <nav className="conversations-sidebar" css={conversationsSidebarStyles(isScreenLessThanMdBreakpoint)}>
@@ -94,6 +101,8 @@ export const ConversationSidebar = ({
           onClickPreferences={onClickPreferences}
           showNotificationsBadge={showNotificationsBadge}
           selfUser={selfUser}
+          userRepository={userRepository}
+          teamRepository={teamRepository}
         />
       </FadingScrollbar>
 

@@ -257,8 +257,8 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
         tabIndex={messageFocusedTabIndex}
       >
         {isBeforeToday(timestamp)
-          ? t('replyQuoteTimeStampDate', formatDateNumeral(timestamp))
-          : t('replyQuoteTimeStampTime', formatTimeShort(timestamp))}
+          ? t('replyQuoteTimeStampDate', {date: formatDateNumeral(timestamp)})
+          : t('replyQuoteTimeStampTime', {time: formatTimeShort(timestamp)})}
       </button>
     </>
   );

@@ -259,6 +259,7 @@ export const MessageWrapper: React.FC<MessageParams> = ({
         message={message}
         is1to1Conversation={conversation.is1to1()}
         isLastDeliveredMessage={isLastDeliveredMessage}
+        onClickDetails={onClickDetails}
       />
     );
   }

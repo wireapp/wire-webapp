@@ -17,10 +17,11 @@
  *
  */
 
-import React, {KeyboardEvent as ReactKeyBoardEvent, useEffect, useState} from 'react';
+import React, {KeyboardEvent as ReactKeyBoardEvent, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
+import {useShallow} from 'zustand/react/shallow';
 
 import {useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -80,7 +81,7 @@ type ConversationsProps = {
   userRepository: UserRepository;
 };
 
-const Conversations: React.FC<ConversationsProps> = ({
+export const Conversations: React.FC<ConversationsProps> = ({
   integrationRepository,
   searchRepository,
   teamRepository,
@@ -96,8 +97,14 @@ const Conversations: React.FC<ConversationsProps> = ({
   selfUser,
 }) => {
   const [conversationListRef, setConversationListRef] = useState<HTMLElement | null>(null);
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
 
-  const {currentTab, status: sidebarStatus, setStatus: setSidebarStatus, setCurrentTab} = useSidebarStore();
+  const {
+    currentTab,
+    status: sidebarStatus,
+    setStatus: setSidebarStatus,
+    setCurrentTab,
+  } = useSidebarStore(useShallow(state => state));
   const [conversationsFilter, setConversationsFilter] = useState<string>('');
   const {classifiedDomains, isTeam} = useKoSubscribableChildren(teamState, ['classifiedDomains', 'isTeam']);
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
@@ -111,7 +118,7 @@ const Conversations: React.FC<ConversationsProps> = ({
     archivedConversations,
     groupConversations,
     directConversations,
-    visibleConversations: conversations,
+    visibleConversations,
   } = useKoSubscribableChildren(conversationState, [
     'activeConversation',
     'archivedConversations',
@@ -121,10 +128,15 @@ const Conversations: React.FC<ConversationsProps> = ({
     'visibleConversations',
   ]);
 
+  const conversations = useMemo(() => visibleConversations, [visibleConversations]);
+
   const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
 
   const {conversationLabelRepository} = conversationRepository;
-  const favoriteConversations = conversationLabelRepository.getFavorites(conversations);
+  const favoriteConversations = useMemo(
+    () => conversationLabelRepository.getFavorites(conversations),
+    [conversationLabelRepository, conversations],
+  );
 
   const isPreferences = currentTab === SidebarTabs.PREFERENCES;
 
@@ -137,8 +149,10 @@ const Conversations: React.FC<ConversationsProps> = ({
     SidebarTabs.ARCHIVES,
   ].includes(currentTab);
 
-  const {setCurrentView} = useAppMainState(state => state.responsiveView);
-  const {openFolder, closeFolder, expandedFolder, isFoldersTabOpen, toggleFoldersTab} = useFolderStore();
+  const {setCurrentView} = useAppMainState(useShallow(state => state.responsiveView));
+  const {openFolder, closeFolder, expandedFolder, isFoldersTabOpen, toggleFoldersTab} = useFolderStore(
+    useShallow(state => state),
+  );
   const {currentFocus, handleKeyDown, resetConversationFocus} = useConversationFocus(conversations);
 
   // false when screen is larger than 1000px
@@ -190,7 +204,7 @@ const Conversations: React.FC<ConversationsProps> = ({
     ((showSearchInput && currentTabConversations.length === 0) ||
       (hasNoConversations && currentTab !== SidebarTabs.ARCHIVES));
 
-  function toggleSidebar() {
+  const toggleSidebar = useCallback(() => {
     if (isFoldersTabOpen) {
       toggleFoldersTab();
     }
@@ -200,7 +214,7 @@ const Conversations: React.FC<ConversationsProps> = ({
       WebAppEvents.ANALYTICS.EVENT,
       isSideBarOpen ? EventName.UI.SIDEBAR_COLLAPSE : EventName.UI.SIDEBAR_UNCOLLAPSE,
     );
-  }
+  }, [isFoldersTabOpen, isSideBarOpen, setSidebarStatus, toggleFoldersTab]);
 
   useEffect(() => {
     amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, (conversation?: Conversation) => {
@@ -243,65 +257,75 @@ const Conversations: React.FC<ConversationsProps> = ({
     };
   }, []);
 
-  const clearConversationFilter = () => setConversationsFilter('');
-
-  function changeTab(nextTab: SidebarTabs, folderId?: string) {
-    if (!folderId) {
-      closeFolder();
-    }
-
-    if (nextTab === SidebarTabs.ARCHIVES) {
-      // will eventually load missing events from the db
-      void conversationRepository.updateArchivedConversations();
-    }
-
-    if (nextTab !== SidebarTabs.PREFERENCES) {
-      onExitPreferences();
-    }
-
-    clearConversationFilter();
-    setCurrentTab(nextTab);
-  }
+  const clearConversationFilter = useCallback(() => setConversationsFilter(''), []);
 
   const switchList = listViewModel.switchList;
+  const switchContent = listViewModel.contentViewModel.switchContent;
 
-  const onExitPreferences = () => {
+  const onExitPreferences = useCallback(() => {
     setCurrentView(ViewType.MOBILE_LEFT_SIDEBAR);
     switchList(ListState.CONVERSATIONS);
-    listViewModel.contentViewModel.switchContent(ContentState.CONVERSATION);
-  };
+    switchContent(ContentState.CONVERSATION);
+  }, []);
 
-  function onClickPreferences(itemId: ContentState) {
+  const changeTab = useCallback(
+    (nextTab: SidebarTabs, folderId?: string) => {
+      if (!folderId) {
+        closeFolder();
+      }
+
+      if (nextTab === SidebarTabs.ARCHIVES) {
+        // will eventually load missing events from the db
+        void conversationRepository.updateArchivedConversations();
+      }
+
+      if (nextTab !== SidebarTabs.PREFERENCES) {
+        onExitPreferences();
+      }
+
+      clearConversationFilter();
+      setCurrentTab(nextTab);
+    },
+    [conversationRepository],
+  );
+
+  const onClickPreferences = useCallback((itemId: ContentState) => {
     switchList(ListState.PREFERENCES);
     setCurrentView(ViewType.MOBILE_CENTRAL_COLUMN);
-    listViewModel.contentViewModel.switchContent(itemId);
+    switchContent(itemId);
 
     setTimeout(() => {
       const centerColumn = document.getElementById('center-column');
       const nextElementToFocus = centerColumn?.querySelector("[tabindex='0']") as HTMLElement | null;
       nextElementToFocus?.focus();
     }, ANIMATED_PAGE_TRANSITION_DURATION + 1);
-  }
+  }, []);
 
-  const handleEnterSearchClick = (event: ReactKeyBoardEvent<HTMLDivElement>) => {
-    const firstFoundConversation = currentTabConversations?.[0];
+  const handleEnterSearchClick = useCallback(
+    (event: ReactKeyBoardEvent<HTMLDivElement>) => {
+      const firstFoundConversation = currentTabConversations?.[0];
 
-    if (firstFoundConversation) {
-      createNavigateKeyboard(generateConversationUrl(firstFoundConversation.qualifiedId), true)(event);
-      setConversationsFilter('');
-      scrollToConversation(firstFoundConversation.id);
-    }
-  };
+      if (firstFoundConversation) {
+        createNavigateKeyboard(generateConversationUrl(firstFoundConversation.qualifiedId), true)(event);
+        setConversationsFilter('');
+        scrollToConversation(firstFoundConversation.id);
+      }
+    },
+    [currentTabConversations],
+  );
 
-  const onSearch = (searchValue: string) => {
-    setConversationsFilter(searchValue);
-    conversationListRef?.scrollTo(0, 0);
-  };
+  const onSearch = useCallback(
+    (searchValue: string) => {
+      setConversationsFilter(searchValue);
+      conversationListRef?.scrollTo(0, 0);
+    },
+    [conversationListRef],
+  );
 
-  const jumpToRecentSearch = () => {
+  const jumpToRecentSearch = useCallback(() => {
     switchList(ListState.CONVERSATIONS);
     setCurrentTab(SidebarTabs.RECENT);
-  };
+  }, []);
 
   return (
     <div className="conversations-wrapper">
@@ -319,6 +343,7 @@ const Conversations: React.FC<ConversationsProps> = ({
             searchInputPlaceholder={searchInputPlaceholder}
             onSearchEnterClick={handleEnterSearchClick}
             jumpToRecentSearch={jumpToRecentSearch}
+            searchInputRef={searchInputRef}
           />
         }
         setConversationListRef={setConversationListRef}
@@ -340,8 +365,10 @@ const Conversations: React.FC<ConversationsProps> = ({
               favoriteConversations={favoriteConversations}
               archivedConversations={archivedConversations}
               conversationRepository={conversationRepository}
-              onClickPreferences={() => onClickPreferences(ContentState.PREFERENCES_ACCOUNT)}
+              onClickPreferences={onClickPreferences}
               showNotificationsBadge={notifications.length > 0}
+              userRepository={userRepository}
+              teamRepository={teamRepository}
             />
           )
         }
@@ -403,6 +430,7 @@ const Conversations: React.FC<ConversationsProps> = ({
                 isEmpty={hasEmptyConversationsList}
                 groupParticipantsConversations={groupParticipantsConversations}
                 isGroupParticipantsVisible={isGroupParticipantsVisible}
+                searchInputRef={searchInputRef}
               />
             )}
           </>
@@ -411,5 +439,3 @@ const Conversations: React.FC<ConversationsProps> = ({
     </div>
   );
 };
-
-export {Conversations};
