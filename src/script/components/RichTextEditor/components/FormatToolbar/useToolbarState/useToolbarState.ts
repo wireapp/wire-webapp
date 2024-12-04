@@ -59,6 +59,7 @@ export const useToolbarState = () => {
 
   useEffect(() => {
     if (!editor) {
+      // @ts-ignore: Not all code paths return a value
       return;
     }
 
