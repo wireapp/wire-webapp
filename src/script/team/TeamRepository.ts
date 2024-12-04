@@ -241,7 +241,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
   public async filterRemoteDomainUsers(users: User[]): Promise<User[]> {
     const isMLS = this.teamState.teamFeatures()?.mls?.config.defaultProtocol === ConversationProtocol.MLS;
 
-    // If MLS is enabled, we return all users
+    // IF MLS is enabled, THEN return all users
     if (isMLS) {
       return users;
     }
@@ -254,11 +254,12 @@ export class TeamRepository extends TypedEventEmitter<Events> {
       this.backendSupportsMLS = await apiClient.supportsMLS();
     }
 
-    // If the backend does not support MLS and there are federated users, we return all users - Akamaya special case
+    // IF the backend does not support MLS, AND there are federated users, THEN return all users
     if (!this.backendSupportsMLS && hasFederatedUsers) {
       return users;
     }
 
+    // IF the backend supports MLS, AND we use the proteus protocol, THEN filter out federated users
     return users.filter(user => {
       if (user.domain !== domain) {
         this.logger.log(`Filtering out user ${user.id} because of domain mismatch, current protocol is not MLS`);
