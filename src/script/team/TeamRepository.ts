@@ -56,6 +56,7 @@ import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {IntegrationMapper} from '../integration/IntegrationMapper';
 import {ServiceEntity} from '../integration/ServiceEntity';
 import {MLSMigrationStatus, getMLSMigrationStatus} from '../mls/MLSMigration/migrationStatus';
+import {APIClient} from '../service/APIClientSingleton';
 import {ROLE, ROLE as TEAM_ROLE, roleFromTeamPermissions} from '../user/UserPermission';
 import {UserRepository} from '../user/UserRepository';
 import {UserState} from '../user/UserState';
@@ -82,6 +83,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
   private readonly teamMapper: TeamMapper;
   private readonly userRepository: UserRepository;
   private readonly assetRepository: AssetRepository;
+  private backendSupportsMLS: boolean | null = null;
 
   constructor(
     userRepository: UserRepository,
@@ -236,13 +238,27 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     await this.updateTeamMembersByIds(selfTeamId, newTeamMemberIds, true);
   };
 
-  filterRemoteDomainUsers(users: User[]): User[] {
+  public async filterRemoteDomainUsers(users: User[]): Promise<User[]> {
     const isMLS = this.teamState.teamFeatures()?.mls?.config.defaultProtocol === ConversationProtocol.MLS;
 
+    // If MLS is enabled, we return all users
     if (isMLS) {
       return users;
     }
+
     const domain = this.userState.self()?.domain ?? this.teamState.teamDomain();
+    const hasFederatedUsers = users.some(user => user.domain !== domain);
+
+    if (this.backendSupportsMLS === null) {
+      const apiClient = container.resolve(APIClient);
+      this.backendSupportsMLS = await apiClient.supportsMLS();
+    }
+
+    // If the backend does not support MLS and there are federated users, we return all users - Akamaya special case
+    if (!this.backendSupportsMLS && hasFederatedUsers) {
+      return users;
+    }
+
     return users.filter(user => {
       if (user.domain !== domain) {
         this.logger.log(`Filtering out user ${user.id} because of domain mismatch, current protocol is not MLS`);
