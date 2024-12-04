@@ -247,13 +247,13 @@ describe('APIClient', () => {
     it('refreshes an access token when it becomes invalid', async () => {
       const queriedHandle = 'webappbot';
 
-      nock(baseUrl).get(UserAPI.URL.USERS).query({handles: queriedHandle}).once().reply(StatusCode.FORBIDDEN, {
+      nock(baseUrl).get(`/${UserAPI.URL.USERS}`).query({handles: queriedHandle}).once().reply(StatusCode.FORBIDDEN, {
         code: StatusCode.FORBIDDEN,
         label: BackendErrorLabel.INVALID_CREDENTIALS,
         message: 'Token expired',
       });
 
-      nock(baseUrl).get(UserAPI.URL.USERS).query({handles: queriedHandle}).reply(StatusCode.OK, userData);
+      nock(baseUrl).get(`/${UserAPI.URL.USERS}`).query({handles: queriedHandle}).reply(StatusCode.OK, userData);
 
       nock(baseUrl).post(AuthAPI.URL.ACCESS).reply(StatusCode.OK, accessTokenData);
 

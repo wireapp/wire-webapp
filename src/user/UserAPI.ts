@@ -74,27 +74,27 @@ export class UserAPI {
   public static readonly DEFAULT_USERS_CHUNK_SIZE = 50;
   public static readonly DEFAULT_USERS_PREKEY_BUNDLE_CHUNK_SIZE = 128;
   public static readonly URL = {
-    ACTIVATE: '/activate',
+    ACTIVATE: 'activate',
     BY_HANDLE: 'by-handle',
-    CALLS: '/calls',
+    CALLS: 'calls',
     CLIENTS: 'clients',
     CONFIG: 'config',
     CONTACTS: 'contacts',
-    DELETE: '/delete',
+    DELETE: 'delete',
     EMAIL: 'email',
     HANDLES: 'handles',
     LIST_CLIENTS: 'list-clients',
     LIST_PREKEYS: 'list-prekeys',
-    LIST_USERS: '/list-users',
-    PASSWORD_RESET: '/password-reset',
+    LIST_USERS: 'list-users',
+    PASSWORD_RESET: 'password-reset',
     PRE_KEYS: 'prekeys',
-    PROPERTIES: '/properties',
+    PROPERTIES: 'properties',
     RICH_INFO: 'rich-info',
-    SEARCH: '/search',
+    SEARCH: 'search',
     SEND: 'send',
-    USERS: '/users',
+    USERS: 'users',
     V2: 'v2',
-    VERIFICATION: '/verification-code',
+    VERIFICATION: 'verification-code',
     SUPPORTED_PROTOCOLS: 'supported-protocols',
   };
 
@@ -110,7 +110,7 @@ export class UserAPI {
   public async deleteProperties(): Promise<void> {
     const config: AxiosRequestConfig = {
       method: 'delete',
-      url: UserAPI.URL.PROPERTIES,
+      url: `/${UserAPI.URL.PROPERTIES}`,
     };
 
     await this.client.sendJSON(config);
@@ -124,7 +124,7 @@ export class UserAPI {
   public async deleteProperty(propertyKey: string): Promise<void> {
     const config: AxiosRequestConfig = {
       method: 'delete',
-      url: `${UserAPI.URL.PROPERTIES}/${propertyKey}`,
+      url: `/${UserAPI.URL.PROPERTIES}/${propertyKey}`,
     };
 
     await this.client.sendJSON(config);
@@ -143,7 +143,7 @@ export class UserAPI {
         code: activationCode,
         key: activationKey,
       },
-      url: UserAPI.URL.ACTIVATE,
+      url: `/${UserAPI.URL.ACTIVATE}`,
     };
 
     const response = await this.client.sendJSON<ActivationResponse>(config);
@@ -157,7 +157,7 @@ export class UserAPI {
   public async getCallsConfiguration(): Promise<RTCConfiguration> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${UserAPI.URL.CALLS}/${UserAPI.URL.CONFIG}`,
+      url: `/${UserAPI.URL.CALLS}/${UserAPI.URL.CONFIG}`,
     };
 
     const response = await this.client.sendJSON<RTCConfiguration>(config);
@@ -171,7 +171,7 @@ export class UserAPI {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getUserClient
    */
   public async getClient(userId: QualifiedId, clientId: string): Promise<PublicClient> {
-    const url = `${UserAPI.URL.USERS}/${userId.domain}/${userId.id}/${UserAPI.URL.CLIENTS}/${clientId}`;
+    const url = `/${UserAPI.URL.USERS}/${userId.domain}/${userId.id}/${UserAPI.URL.CLIENTS}/${clientId}`;
 
     const config: AxiosRequestConfig = {
       method: 'get',
@@ -190,7 +190,7 @@ export class UserAPI {
    */
   public async getClientPreKey(userId: QualifiedId, clientId: string): Promise<ClientPreKey> {
     const {id, domain} = userId;
-    const url = `${UserAPI.URL.USERS}/${domain}/${id}/${UserAPI.URL.PRE_KEYS}/${clientId}`;
+    const url = `/${UserAPI.URL.USERS}/${domain}/${id}/${UserAPI.URL.PRE_KEYS}/${clientId}`;
     const config: AxiosRequestConfig = {
       method: 'get',
       url,
@@ -206,7 +206,7 @@ export class UserAPI {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getUserClients
    */
   public async getClients(userId: QualifiedId): Promise<PublicClient[]> {
-    const url = `${UserAPI.URL.USERS}/${userId.domain}/${userId.id}/${UserAPI.URL.CLIENTS}`;
+    const url = `/${UserAPI.URL.USERS}/${userId.domain}/${userId.id}/${UserAPI.URL.CLIENTS}`;
 
     const config: AxiosRequestConfig = {
       method: 'get',
@@ -226,7 +226,7 @@ export class UserAPI {
   public async getHandle(handle: string): Promise<HandleInfo> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${UserAPI.URL.USERS}/${UserAPI.URL.HANDLES}/${handle}`,
+      url: `/${UserAPI.URL.USERS}/${UserAPI.URL.HANDLES}/${handle}`,
     };
 
     const response = await this.client.sendJSON<HandleInfo>(config);
@@ -240,7 +240,7 @@ export class UserAPI {
   public async getProperties(): Promise<string[]> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: UserAPI.URL.PROPERTIES,
+      url: `/${UserAPI.URL.PROPERTIES}`,
     };
 
     const response = await this.client.sendJSON<string[]>(config);
@@ -255,7 +255,7 @@ export class UserAPI {
   public async getProperty<T>(propertyKey: string): Promise<T> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${UserAPI.URL.PROPERTIES}/${propertyKey}`,
+      url: `/${UserAPI.URL.PROPERTIES}/${propertyKey}`,
     };
 
     const response = await this.client.sendJSON<T>(config);
@@ -281,7 +281,7 @@ export class UserAPI {
       params: {
         q: query,
       },
-      url: `${UserAPI.URL.SEARCH}/${UserAPI.URL.CONTACTS}`,
+      url: `/${UserAPI.URL.SEARCH}/${UserAPI.URL.CONTACTS}`,
     };
 
     if (domain) {
@@ -318,8 +318,8 @@ export class UserAPI {
   public async getUser(userId: string | QualifiedId): Promise<User> {
     const url =
       typeof userId === 'string'
-        ? `${UserAPI.URL.USERS}/${userId}`
-        : `${UserAPI.URL.USERS}/${userId.domain}/${userId.id}`;
+        ? `/${UserAPI.URL.USERS}/${userId}`
+        : `/${UserAPI.URL.USERS}/${userId.domain}/${userId.id}`;
 
     const config: AxiosRequestConfig = {
       method: 'get',
@@ -331,7 +331,7 @@ export class UserAPI {
   }
 
   public async getUserPreKeys(userId: QualifiedId): Promise<PreKeyBundle> {
-    const url = `${UserAPI.URL.USERS}/${userId.domain}/${userId.id}/${UserAPI.URL.PRE_KEYS}`;
+    const url = `/${UserAPI.URL.USERS}/${userId.domain}/${userId.id}/${UserAPI.URL.PRE_KEYS}`;
 
     const config: AxiosRequestConfig = {
       method: 'get',
@@ -343,7 +343,7 @@ export class UserAPI {
   }
 
   public async getUserSupportedProtocols(userId: QualifiedId): Promise<ConversationProtocol[]> {
-    const url = `${UserAPI.URL.USERS}/${userId.domain}/${userId.id}/${UserAPI.URL.SUPPORTED_PROTOCOLS}`;
+    const url = `/${UserAPI.URL.USERS}/${userId.domain}/${userId.id}/${UserAPI.URL.SUPPORTED_PROTOCOLS}`;
 
     const config: AxiosRequestConfig = {
       method: 'get',
@@ -415,8 +415,8 @@ export class UserAPI {
   public async headUsers(userId: string | QualifiedId): Promise<void> {
     const url =
       typeof userId === 'string'
-        ? `${UserAPI.URL.USERS}/${userId}`
-        : `${UserAPI.URL.USERS}/${userId.domain}/${userId.id}`;
+        ? `/${UserAPI.URL.USERS}/${userId}`
+        : `/${UserAPI.URL.USERS}/${userId.domain}/${userId.id}`;
 
     const config: AxiosRequestConfig = {
       method: 'head',
@@ -436,7 +436,7 @@ export class UserAPI {
     const config: AxiosRequestConfig = {
       data: activationData,
       method: 'post',
-      url: UserAPI.URL.ACTIVATE,
+      url: `/${UserAPI.URL.ACTIVATE}`,
     };
 
     const response = await this.client.sendJSON<ActivationResponse>(config);
@@ -452,7 +452,7 @@ export class UserAPI {
     const config: AxiosRequestConfig = {
       data: activationCodeData,
       method: 'post',
-      url: `${UserAPI.URL.ACTIVATE}/${UserAPI.URL.SEND}`,
+      url: `/${UserAPI.URL.ACTIVATE}/${UserAPI.URL.SEND}`,
     };
 
     await this.client.sendJSON(config);
@@ -467,7 +467,7 @@ export class UserAPI {
     const config: AxiosRequestConfig = {
       data: {email, action},
       method: 'post',
-      url: `${UserAPI.URL.VERIFICATION}/${UserAPI.URL.SEND}`,
+      url: `/${UserAPI.URL.VERIFICATION}/${UserAPI.URL.SEND}`,
     };
     await this.client.sendJSON(config);
   }
@@ -481,7 +481,7 @@ export class UserAPI {
     const config: AxiosRequestConfig = {
       data: verificationData,
       method: 'post',
-      url: UserAPI.URL.DELETE,
+      url: `/${UserAPI.URL.DELETE}`,
     };
 
     await this.client.sendJSON(config);
@@ -498,8 +498,8 @@ export class UserAPI {
       method: 'post',
       url:
         this.backendFeatures.version >= apiBreakpoint.version7
-          ? `${UserAPI.URL.HANDLES}`
-          : `${UserAPI.URL.USERS}/${UserAPI.URL.HANDLES}`,
+          ? `/${UserAPI.URL.HANDLES}`
+          : `/${UserAPI.URL.USERS}/${UserAPI.URL.HANDLES}`,
     };
 
     const response = await this.client.sendJSON<string[]>(config);
@@ -516,8 +516,8 @@ export class UserAPI {
       method: 'head',
       url:
         this.backendFeatures.version >= apiBreakpoint.version7
-          ? `${UserAPI.URL.HANDLES}/${handle}`
-          : `${UserAPI.URL.USERS}/${UserAPI.URL.HANDLES}/${handle}`,
+          ? `/${UserAPI.URL.HANDLES}/${handle}`
+          : `/${UserAPI.URL.USERS}/${UserAPI.URL.HANDLES}/${handle}`,
     };
 
     await this.client.sendJSON(config);
@@ -531,7 +531,7 @@ export class UserAPI {
   public async getUserByHandle(handle: QualifiedHandle): Promise<User> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${UserAPI.URL.USERS}/${UserAPI.URL.BY_HANDLE}/${handle.domain}/${handle.handle}`,
+      url: `/${UserAPI.URL.USERS}/${UserAPI.URL.BY_HANDLE}/${handle.domain}/${handle.handle}`,
     };
 
     const response = await this.client.sendJSON<User>(config);
@@ -542,7 +542,7 @@ export class UserAPI {
     const config: AxiosRequestConfig = {
       data: userClientMap,
       method: 'post',
-      url: `${UserAPI.URL.USERS}/${UserAPI.URL.LIST_PREKEYS}`,
+      url: `/${UserAPI.URL.USERS}/${UserAPI.URL.LIST_PREKEYS}`,
     };
 
     const response = await this.client.sendJSON<QualifiedUserPreKeyBundleMap | PrekeysResponse>(config, true);
@@ -559,7 +559,7 @@ export class UserAPI {
     const config: AxiosRequestConfig = {
       data: users,
       method: 'post',
-      url: UserAPI.URL.LIST_USERS,
+      url: `/${UserAPI.URL.LIST_USERS}`,
     };
     try {
       /**
@@ -592,7 +592,7 @@ export class UserAPI {
         const {data: sameBackendUserData} = await this.client.sendJSON<User[]>({
           data: {qualified_ids: sameBackendUsers},
           method: 'post',
-          url: UserAPI.URL.LIST_USERS,
+          url: `/${UserAPI.URL.LIST_USERS}`,
         });
         return {found: sameBackendUserData, failed: federatedUsers};
       }
@@ -609,8 +609,8 @@ export class UserAPI {
       method: 'post',
       url:
         this.backendFeatures.version >= apiBreakpoint.version2
-          ? `${UserAPI.URL.USERS}/${UserAPI.URL.LIST_CLIENTS}`
-          : `${UserAPI.URL.USERS}/${UserAPI.URL.LIST_CLIENTS}/${UserAPI.URL.V2}`,
+          ? `/${UserAPI.URL.USERS}/${UserAPI.URL.LIST_CLIENTS}`
+          : `/${UserAPI.URL.USERS}/${UserAPI.URL.LIST_CLIENTS}/${UserAPI.URL.V2}`,
     };
 
     const response = await this.client.sendJSON<QualifiedPublicClients>(config);
@@ -677,7 +677,7 @@ export class UserAPI {
     const config: AxiosRequestConfig = {
       data: resetData,
       method: 'post',
-      url: UserAPI.URL.PASSWORD_RESET,
+      url: `/${UserAPI.URL.PASSWORD_RESET}`,
     };
 
     await this.client.sendJSON(config);
@@ -693,7 +693,7 @@ export class UserAPI {
     const config: AxiosRequestConfig = {
       data: propertyData,
       method: 'put',
-      url: `${UserAPI.URL.PROPERTIES}/${propertyKey}`,
+      url: `/${UserAPI.URL.PROPERTIES}/${propertyKey}`,
     };
 
     await this.client.sendJSON(config);
@@ -707,7 +707,7 @@ export class UserAPI {
   public async getRichInfo(userId: string): Promise<RichInfo> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${UserAPI.URL.USERS}/${userId}/${UserAPI.URL.RICH_INFO}`,
+      url: `/${UserAPI.URL.USERS}/${userId}/${UserAPI.URL.RICH_INFO}`,
     };
 
     const response = await this.client.sendJSON<RichInfo>(config);
@@ -723,7 +723,7 @@ export class UserAPI {
     const config: AxiosRequestConfig = {
       data: {email},
       method: 'put',
-      url: `${UserAPI.URL.USERS}/${userId}/${UserAPI.URL.EMAIL}`,
+      url: `/${UserAPI.URL.USERS}/${userId}/${UserAPI.URL.EMAIL}`,
     };
     await this.client.sendJSON(config);
   }
