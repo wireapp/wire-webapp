@@ -793,12 +793,17 @@ export class CallingRepository {
       }
 
       case CALL_MESSAGE_TYPE.HAND_RAISED: {
-        const call = this.findCall(conversationId);
-        if (!call || !this.selfUser) {
+        const currentCall = this.callState.joinedCall();
+        if (
+          !currentCall ||
+          !matchQualifiedIds(currentCall.conversation.qualifiedId, conversationId) ||
+          !this.selfUser
+        ) {
           this.logger.info('Ignored hand raise event because no active call was found');
           return;
         }
-        const participant = call
+
+        const participant = currentCall
           .participants()
           .find(participant => matchQualifiedIds(participant.user.qualifiedId, userId));
 
