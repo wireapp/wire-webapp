@@ -23,13 +23,21 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {Config} from 'src/script/Config';
 import {StorageKey} from 'src/script/storage';
 import {EventName} from 'src/script/tracking/EventName';
 import {loadValue, storeValue} from 'Util/StorageUtil';
 
 export const useFormatToolbar = () => {
   const [open, setOpen] = useState(() => {
-    return loadValue<boolean>(StorageKey.INPUT.SHOW_FORMATTING) ?? false;
+    const messageFormatButtonsEnabled = Config.getConfig().FEATURE.ENABLE_MESSAGE_FORMAT_BUTTONS;
+    const storageValue = loadValue<boolean>(StorageKey.INPUT.SHOW_FORMATTING);
+
+    if (storageValue && messageFormatButtonsEnabled) {
+      return storageValue;
+    }
+
+    return false;
   });
 
   const handleClick = () => {

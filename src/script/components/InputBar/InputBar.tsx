@@ -76,6 +76,7 @@ import {TeamState} from '../../team/TeamState';
 const CONFIG = {
   ...Config.getConfig(),
   PING_TIMEOUT: TIME_IN_MILLIS.SECOND * 2,
+  GIPHY_TEXT_LENGTH: 256,
 };
 
 interface InputBarProps {
@@ -179,7 +180,11 @@ export const InputBar = ({
   const hasLocalEphemeralTimer = isSelfDeletingMessagesEnabled && !!localMessageTimer && !hasGlobalMessageTimer;
   const isTypingRef = useRef(false);
 
-  const showGiphyButton = textValue.length > 0;
+  const messageFormatButtonsEnabled = CONFIG.FEATURE.ENABLE_MESSAGE_FORMAT_BUTTONS;
+
+  const showGiphyButton = messageFormatButtonsEnabled
+    ? textValue.length > 0
+    : textValue.length > 0 && textValue.length <= CONFIG.GIPHY_TEXT_LENGTH;
 
   const shouldReplaceEmoji = useUserPropertyValue(
     () => propertiesRepository.getPreference(PROPERTIES_TYPE.EMOJI.REPLACE_INLINE),
