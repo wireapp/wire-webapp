@@ -37,7 +37,6 @@ import {HeadingNode, QuoteNode} from '@lexical/rich-text';
 import cx from 'classnames';
 import {LexicalEditor, EditorState, $nodesOfType} from 'lexical';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {DraftState} from 'Components/InputBar/util/DraftStateUtil';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {User} from 'src/script/entity/User';
@@ -94,7 +93,6 @@ const logger = getLogger('LexicalInput');
 interface RichTextEditorProps {
   placeholder: string;
   replaceEmojis?: boolean;
-  selfUser: User;
   editedMessage?: ContentMessage;
   children: ReactElement;
   hasLocalEphemeralTimer: boolean;
@@ -164,7 +162,6 @@ export const RichTextEditor = ({
   replaceEmojis,
   editedMessage,
   showFormatToolbar,
-  selfUser,
   onUpdate,
   saveDraftState,
   loadDraftState,
@@ -200,14 +197,6 @@ export const RichTextEditor = ({
   return (
     <LexicalComposer initialConfig={editorConfig}>
       <div className="controls-center input-bar-field">
-        <div className="input-bar-avatar">
-          <Avatar
-            className="cursor-default"
-            participant={selfUser}
-            avatarSize={AVATAR_SIZE.X_SMALL}
-            hideAvailabilityStatus
-          />
-        </div>
         <div className="input-bar--wrapper">
           <AutoFocusPlugin />
           <GlobalEventsPlugin onShiftTab={onShiftTab} onEscape={onEscape} onArrowUp={onArrowUp} onBlur={onBlur} />

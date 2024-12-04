@@ -26,6 +26,7 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import {checkFileSharingPermission} from 'Components/Conversation/utils/checkFileSharingPermission';
 import {EmojiPicker} from 'Components/EmojiPicker/EmojiPicker';
@@ -579,6 +580,14 @@ export const InputBar = ({
         >
           {!isOutgoingRequest && (
             <>
+              <div className="input-bar-avatar">
+                <Avatar
+                  className="cursor-default"
+                  participant={selfUser}
+                  avatarSize={AVATAR_SIZE.X_SMALL}
+                  hideAvailabilityStatus
+                />
+              </div>
               {!isSelfUserRemoved && !pastedFile && (
                 <RichTextEditor
                   onSetup={lexical => {
@@ -597,7 +606,6 @@ export const InputBar = ({
                       editMessage(conversation.getLastEditableMessage());
                     }
                   }}
-                  selfUser={selfUser}
                   getMentionCandidates={getMentionCandidates}
                   replaceEmojis={shouldReplaceEmoji}
                   placeholder={inputPlaceholder}
