@@ -268,7 +268,17 @@ export class CallingRepository {
       if (isSpeakersViewActive) {
         const videoQuality = call.activeSpeakers().length > 2 ? RESOLUTION.LOW : RESOLUTION.HIGH;
 
-        this.requestVideoStreams(call.conversation.qualifiedId, call.activeSpeakers(), videoQuality);
+        const speakes = call.activeSpeakers();
+        speakes.forEach(p => {
+          // This is a temporary solution. The SFT does not send a response when a track change has occurred.
+          // To prevent the wrong video from being briefly displayed, we introduce a timeout here.
+          p.isSwitchingVideoResolution(true);
+          window.setTimeout(() => {
+            p.isSwitchingVideoResolution(false);
+          }, 1000);
+        });
+
+        this.requestVideoStreams(call.conversation.qualifiedId, speakes, videoQuality);
       }
     });
 
@@ -280,6 +290,12 @@ export class CallingRepository {
       }
       const maximizedParticipant = call.maximizedParticipant();
       if (maximizedParticipant !== null) {
+        maximizedParticipant.isSwitchingVideoResolution(true);
+        // This is a temporary solution. The SFT does not send a response when a track change has occurred.
+        // To prevent the wrong video from being briefly displayed, we introduce a timeout here.
+        window.setTimeout(() => {
+          maximizedParticipant.isSwitchingVideoResolution(false);
+        }, 1000);
         this.requestVideoStreams(call.conversation.qualifiedId, [maximizedParticipant], RESOLUTION.HIGH);
       } else {
         this.requestCurrentPageVideoStreams(call);
@@ -1317,8 +1333,8 @@ export class CallingRepository {
   }
 
   /**
-   * This method spams request video stream messages. I assumed this was to ensure that when a client mutes or
-   * unmutes its video it is displayed correctly.
+   * This method monitors every change in the call and is therefore the main method for handling video requests.
+   * These changes include mute/unmute, screen sharing, or camera switching, joining or leaving of participants, or...
    * @param call
    * @param newPage
    */
@@ -1329,6 +1345,11 @@ export class CallingRepository {
     }
   }
 
+  /**
+   * This method queries streams for the participants who are displayed on the active page! This can include up to nine
+   * participants and is used when flipping pages or starting a call.
+   * @param call
+   */
   requestCurrentPageVideoStreams(call: Call): void {
     const currentPageParticipants = call.pages()[call.currentPage()] ?? [];
     const videoQuality: RESOLUTION = currentPageParticipants.length <= 2 ? RESOLUTION.HIGH : RESOLUTION.LOW;
@@ -1339,11 +1360,16 @@ export class CallingRepository {
     if (participants.length === 0) {
       return;
     }
+    // Filter myself out and do not request my own stream.
+    const requestParticipants = participants.filter(p => !this.isSelfUser(p));
+    if (requestParticipants.length === 0) {
+      return;
+    }
 
     const convId = this.serializeQualifiedId(conversationId);
 
     const payload = {
-      clients: participants.map(participant => ({
+      clients: requestParticipants.map(participant => ({
         clientid: participant.clientId,
         userid: this.serializeQualifiedId(participant.user.qualifiedId),
         quality: videoQuality,
@@ -2338,6 +2364,13 @@ export class CallingRepository {
       },
     };
     PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, modalOptions);
+  }
+
+  private isSelfUser(participant: Participant): boolean {
+    if (this.selfUser == null || this.selfClientId == null) {
+      return false;
+    }
+    return participant.doesMatchIds(this.selfUser.qualifiedId, this.selfClientId);
   }
 
   //##############################################################################

@@ -40,6 +40,7 @@ export class Participant {
   public readonly hasPausedVideo: ko.PureComputed<boolean>;
   public readonly sharesScreen: ko.PureComputed<boolean>;
   public readonly sharesCamera: ko.PureComputed<boolean>;
+  public readonly isSwitchingVideoResolution = observable(false);
   public readonly startedScreenSharingAt = observable<number>(0);
   public readonly isActivelySpeaking = observable(false);
   public readonly isSendingVideo: ko.PureComputed<boolean>;
@@ -68,6 +69,7 @@ export class Participant {
     this.isSendingVideo = pureComputed(() => {
       return this.videoState() !== VIDEO_STATE.STOPPED;
     });
+    this.isSwitchingVideoResolution(false);
 
     computed(() => {
       const stream = this.videoStream();
