@@ -340,10 +340,26 @@
         margin: 0;
         text-overflow: ellipsis;
       }
+
+      &:not(pre) > code {
+        padding: 2px 4px;
+        border-radius: 4px;
+        background: var(--foreground-fade-8);
+      }
+
+      ul {
+        padding: 0 16px;
+        margin: 0;
+      }
+    }
+
+    .md-heading {
+      .text-medium;
     }
 
     .message-mention {
       .text-medium;
+      color: var(--accent-color);
     }
 
     &__image img {
