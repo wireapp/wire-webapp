@@ -34,6 +34,7 @@ export class OAuthAPI {
     CODES: 'codes',
     CLIENTS: 'clients',
     OAUTH: '/oauth',
+    SESSIONS: 'sessions',
   };
 
   /**
@@ -52,10 +53,11 @@ export class OAuthAPI {
   /**
    * Remove an application by ID.
    */
-  public async deleteApplication(applicationId: string): Promise<void> {
+  public async deleteApplication(applicationId: string, password?: string): Promise<void> {
     const config: AxiosRequestConfig = {
+      ...(password && {data: {password}}),
       method: 'delete',
-      url: `${OAuthAPI.URL.OAUTH}/${OAuthAPI.URL.APPLICATIONS}/${applicationId}`,
+      url: `${OAuthAPI.URL.OAUTH}/${OAuthAPI.URL.APPLICATIONS}/${applicationId}/sessions`,
     };
     try {
       await this.client.sendJSON(config);
