@@ -76,7 +76,26 @@ export const AppNotification = ({
   );
 };
 
-export const showAppNotification = (message: string) => {
+interface Notification {
+  message: string;
+  notificationTimeout: number;
+}
+
+const notificationQueue: Notification[] = [];
+let isNotificationVisible = false;
+
+const processQueue = () => {
+  if (isNotificationVisible || notificationQueue.length === 0) {
+    return;
+  }
+
+  const nextNotification = notificationQueue.shift();
+  if (!nextNotification) {
+    return;
+  }
+
+  const {message, notificationTimeout} = nextNotification;
+
   const appNotificationContainer = document.querySelector(APP_NOTIFICATION_SELECTOR);
 
   if (!appNotificationContainer) {
@@ -84,7 +103,25 @@ export const showAppNotification = (message: string) => {
   }
 
   const root = createRoot(appNotificationContainer);
-  const closeNotification = () => root.unmount();
+  const closeNotification = () => {
+    isNotificationVisible = false;
+    root.unmount();
+    processQueue();
+  };
 
-  root.render(<AppNotification message={message} onClose={closeNotification} />);
+  isNotificationVisible = true;
+  root.render(
+    <AppNotification message={message} notificationTimeout={notificationTimeout} onClose={closeNotification} />,
+  );
+};
+
+export const showAppNotification = (message: string, notificationTimeout = DEFAULT_NOTIFICATION_TIMEOUT) => {
+  const appNotificationContainer = document.querySelector(APP_NOTIFICATION_SELECTOR);
+
+  if (!appNotificationContainer) {
+    return;
+  }
+
+  notificationQueue.push({message, notificationTimeout});
+  processQueue();
 };
