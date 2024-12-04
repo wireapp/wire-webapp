@@ -26,17 +26,15 @@ import {EmojiIcon} from '@wireapp/react-ui-kit';
 import {t} from 'Util/LocalizerUtil';
 
 interface EmojiButtonProps {
-  isScaledDown: boolean;
   isActive: boolean;
   onClick: (event: MouseEvent<HTMLButtonElement>) => void;
 }
 
-export const EmojiButton = ({isScaledDown, isActive, onClick}: EmojiButtonProps) => {
+export const EmojiButton = ({isActive, onClick}: EmojiButtonProps) => {
   return (
     <button
       className={cx('controls-right-button no-radius', {
         active: isActive,
-        'controls-right-button_responsive': isScaledDown,
       })}
       type="button"
       onClick={onClick}

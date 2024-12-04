@@ -542,7 +542,6 @@ export const InputBar = ({
     disablePing: pingDisabled,
     input: textValue,
     isEditing: isEditing,
-    false: false,
     onCancelEditing: () => cancelMessageEditing(true),
     onClickPing: onPingClick,
     onGifClick: onGifClick,
@@ -598,14 +597,13 @@ export const InputBar = ({
                       editMessage(conversation.getLastEditableMessage());
                     }
                   }}
-                  avatarVisible={!!textValue.length}
                   selfUser={selfUser}
                   getMentionCandidates={getMentionCandidates}
                   replaceEmojis={shouldReplaceEmoji}
                   placeholder={inputPlaceholder}
                   onUpdate={setMessageContent}
                   hasLocalEphemeralTimer={hasLocalEphemeralTimer}
-                  shwowFormatToolbar={formatToolbar.open}
+                  showFormatToolbar={formatToolbar.open}
                   saveDraftState={saveDraft}
                   loadDraftState={loadDraft}
                   onShiftTab={onShiftTab}
@@ -613,7 +611,7 @@ export const InputBar = ({
                   onBlur={() => isTypingRef.current && conversationRepository.sendTypingStop(conversation)}
                 >
                   <ul
-                    className={cx('controls-right buttons-group input-bar-right', {
+                    className={cx('controls-right buttons-group input-bar-buttons', {
                       'controls-right-shrinked': textValue.length !== 0,
                     })}
                   >

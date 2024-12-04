@@ -17,23 +17,18 @@
  *
  */
 
-import cx from 'classnames';
-
 import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
 interface PingButtonProps {
   onClick: () => void;
   isDisabled: boolean;
-  isScaledDown: boolean;
 }
 
-export const PingButton = ({isDisabled, isScaledDown, onClick}: PingButtonProps) => {
+export const PingButton = ({isDisabled, onClick}: PingButtonProps) => {
   return (
     <button
-      className={cx('conversation-button controls-right-button no-radius', {
-        'controls-right-button_responsive': isScaledDown,
-      })}
+      className="conversation-button controls-right-button no-radius"
       type="button"
       onClick={onClick}
       disabled={isDisabled}

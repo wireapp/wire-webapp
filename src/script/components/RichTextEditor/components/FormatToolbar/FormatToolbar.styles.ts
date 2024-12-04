@@ -22,19 +22,6 @@ import {CSSObject} from '@emotion/react';
 export const wrapperStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
-  marginBottom: '8px',
-  //   marginTop: '8px',
-  //   order: 1,
-  //   marginLeft: 'auto',
-
-  //   '@media (min-width: 1050px)': {
-  //     display: 'flex',
-  //     alignItems: 'center',
-  //     marginBottom: '8px',
-  //     marginTop: 0,
-  //     marginLeft: 0,
-  //   },
+  margin: '8px 0 8px auto',
   gridArea: 'toolbar',
-  marginLeft: 'auto',
-  marginTop: '8px',
 };

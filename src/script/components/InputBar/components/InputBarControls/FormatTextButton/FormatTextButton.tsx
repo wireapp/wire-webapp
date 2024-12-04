@@ -25,17 +25,15 @@ import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
 interface FormatTextButtonProps {
-  isScaledDown: boolean;
   isActive: boolean;
   onClick: (event: MouseEvent<HTMLButtonElement>) => void;
 }
 
-export const FormatTextButton = ({isScaledDown, isActive, onClick}: FormatTextButtonProps) => {
+export const FormatTextButton = ({isActive, onClick}: FormatTextButtonProps) => {
   return (
     <button
       className={cx(`controls-right-button buttons-group-button-left`, {
         active: isActive,
-        'controls-right-button_responsive': isScaledDown,
       })}
       type="button"
       onClick={onClick}

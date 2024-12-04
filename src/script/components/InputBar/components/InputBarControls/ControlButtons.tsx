@@ -38,7 +38,6 @@ export type ControlButtonsProps = {
   disablePing?: boolean;
   disableFilesharing?: boolean;
   isEditing?: boolean;
-  isScaledDown?: boolean;
   isFormatActive: boolean;
   isEmojiActive: boolean;
   showGiphyButton?: boolean;
@@ -57,7 +56,6 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
   disableFilesharing,
   input,
   isEditing,
-  isScaledDown,
   isFormatActive,
   isEmojiActive,
   showGiphyButton,
@@ -79,16 +77,16 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
     );
   }
 
-  if (input.length === 0 || isScaledDown) {
+  if (input.length === 0) {
     return (
       <>
         {messageFormatButtonsEnabled && (
           <>
             <li>
-              <FormatTextButton isActive={isFormatActive} isScaledDown={!!isScaledDown} onClick={onFormatClick} />
+              <FormatTextButton isActive={isFormatActive} onClick={onFormatClick} />
             </li>
             <li>
-              <EmojiButton isScaledDown={!!isScaledDown} isActive={isEmojiActive} onClick={onEmojiClick} />
+              <EmojiButton isActive={isEmojiActive} onClick={onEmojiClick} />
             </li>
           </>
         )}
@@ -111,7 +109,7 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
           </>
         )}
         <li>
-          <PingButton isDisabled={!!disablePing} isScaledDown={!!isScaledDown} onClick={onClickPing} />
+          <PingButton isDisabled={!!disablePing} onClick={onClickPing} />
         </li>
         <li>
           <MessageTimerButton conversation={conversation} />
@@ -127,10 +125,10 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
           {messageFormatButtonsEnabled && (
             <>
               <li>
-                <FormatTextButton isActive={isFormatActive} isScaledDown={false} onClick={onFormatClick} />
+                <FormatTextButton isActive={isFormatActive} onClick={onFormatClick} />
               </li>
               <li>
-                <EmojiButton isActive={isEmojiActive} isScaledDown={false} onClick={onEmojiClick} />
+                <EmojiButton isActive={isEmojiActive} onClick={onEmojiClick} />
               </li>
             </>
           )}

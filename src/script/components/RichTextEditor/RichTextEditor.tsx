@@ -87,7 +87,6 @@ const theme = {
 export type RichTextContent = {
   text: string;
   mentions?: MentionEntity[];
-  markdown?: string;
 };
 
 const logger = getLogger('LexicalInput');
@@ -99,8 +98,7 @@ interface RichTextEditorProps {
   editedMessage?: ContentMessage;
   children: ReactElement;
   hasLocalEphemeralTimer: boolean;
-  shwowFormatToolbar: boolean;
-  avatarVisible: boolean;
+  showFormatToolbar: boolean;
   getMentionCandidates: (search?: string | null) => User[];
   saveDraftState: (editor: string) => void;
   loadDraftState: () => Promise<DraftState>;
@@ -165,9 +163,8 @@ export const RichTextEditor = ({
   hasLocalEphemeralTimer,
   replaceEmojis,
   editedMessage,
-  shwowFormatToolbar,
+  showFormatToolbar,
   selfUser,
-  avatarVisible,
   onUpdate,
   saveDraftState,
   loadDraftState,
@@ -202,16 +199,14 @@ export const RichTextEditor = ({
 
   return (
     <LexicalComposer initialConfig={editorConfig}>
-      <div className="controls-center input-bar-center">
+      <div className="controls-center input-bar-field">
         <div className="input-bar-avatar">
-          {true && (
-            <Avatar
-              className="cursor-default"
-              participant={selfUser}
-              avatarSize={AVATAR_SIZE.X_SMALL}
-              hideAvailabilityStatus
-            />
-          )}
+          <Avatar
+            className="cursor-default"
+            participant={selfUser}
+            avatarSize={AVATAR_SIZE.X_SMALL}
+            hideAvailabilityStatus
+          />
         </div>
         <div className="input-bar--wrapper">
           <AutoFocusPlugin />
@@ -256,9 +251,7 @@ export const RichTextEditor = ({
           />
         </div>
       </div>
-      {shwowFormatToolbar && <FormatToolbar />}
-
-      {/* {shwowFormatToolbar && <FormatToolbar />} */}
+      {showFormatToolbar && <FormatToolbar />}
       {children}
     </LexicalComposer>
   );

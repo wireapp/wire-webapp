@@ -11,11 +11,6 @@
   width: 100%;
   min-width: 160px;
   align-items: center;
-  order: 2;
-
-  @media (min-width: 1050px) {
-    order: 1;
-  }
 }
 
 .editor-container {
@@ -183,16 +178,8 @@
   font-style: italic;
 }
 
-.editor-underline {
-  text-decoration: underline;
-}
-
 .editor-strikethrough {
   text-decoration: line-through;
-}
-
-.editor-underline.editor-strikethrough {
-  text-decoration: underline line-through;
 }
 
 .editor-code {
@@ -205,20 +192,20 @@
 .editor-list {
   padding-left: 24px;
   margin: 0;
-}
 
-.editor-list--unordered {
-  list-style-type: disc;
-}
+  &--unordered {
+    list-style-type: disc;
+  }
 
-.editor-list--ordered {
-  list-style-type: decimal;
+  &--ordered {
+    list-style-type: decimal;
+  }
 }
 
 .editor-heading {
   margin: 8px 0;
-}
 
-.editor-heading--1 {
-  font-size: var(--font-size-large);
+  &--1 {
+    font-size: var(--font-size-large);
+  }
 }
