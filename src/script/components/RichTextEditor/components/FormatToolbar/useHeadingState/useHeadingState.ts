@@ -31,7 +31,7 @@ const INSERT_HEADING_COMMAND = createCommand();
 export const useHeadingState = () => {
   const [editor] = useLexicalComposerContext();
 
-  const registerHeadingCommand = useCallback((): void => {
+  const registerHeadingCommand = useCallback(() => {
     editor.registerCommand(INSERT_HEADING_COMMAND, headingCommand, 0);
   }, [editor]);
 

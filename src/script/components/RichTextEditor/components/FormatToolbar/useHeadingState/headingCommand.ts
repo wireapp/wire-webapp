@@ -25,7 +25,7 @@ export const headingCommand = () => {
 
   if ($isRangeSelection(selection)) {
     // Leaving "h1" instead of dynamic heading level selection
-    // As long as we don't support other types, this is fine
+    // As long as we don't support other types (via rich text editor buttons), this is fine
     const headingNode = $createHeadingNode('h1');
 
     const node = selection.anchor.getNode();
