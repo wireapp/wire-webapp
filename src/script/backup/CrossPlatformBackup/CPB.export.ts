@@ -23,14 +23,19 @@ import {buildMetaData} from './AssetMetadata';
 import {
   CPBackupExporter,
   BackupQualifiedId,
-  BackUpConversation,
   BackupUser,
-  BackupMessage,
+  BackUpConversation,
   BackupDateTime,
   BackupMessageContent,
+  BackupMessage,
 } from './CPB.library';
 import {ExportHistoryFromDatabaseParams} from './CPB.types';
-import {ConversationTableSchema, UserTableSchema, EventTableSchema, AssetContentSchema} from './data.schema';
+import {
+  AssetContentSchema,
+  ConversationTableEntrySchema,
+  EventTableEntrySchema,
+  UserTableEntrySchema,
+} from './data.schema';
 
 import {preprocessConversations, preprocessUsers, preprocessEvents} from '../recordPreprocessors';
 
@@ -63,62 +68,55 @@ export const exportCPBHistoryFromDatabase = async ({
   }
 
   // Taking care of conversations
-  const {
-    success: conversationsSuccess,
-    data: conversationsData,
-    error: conversationsError,
-  } = ConversationTableSchema.safeParse(
-    await exportTable<ConversationRecord>({
-      backupService,
-      table: conversationTable,
-      preprocessor: streamProgress(preprocessConversations),
-    }),
-  );
-  if (conversationsSuccess) {
-    conversationsData.forEach(conversationData =>
-      backupExporter.addConversation(
-        new BackUpConversation(
-          new BackupQualifiedId(conversationData.id, conversationData.domain),
-          conversationData.name ?? '',
-        ),
-      ),
-    );
-  } else {
-    CPBLogger.log('Conversation data schema validation failed', conversationsError);
-  }
+  const conversationRecords = await exportTable<ConversationRecord>({
+    backupService,
+    table: conversationTable,
+    preprocessor: streamProgress(preprocessConversations),
+  });
+  conversationRecords.forEach(record => {
+    const {success, data, error} = ConversationTableEntrySchema.safeParse(record);
+
+    if (success) {
+      backupExporter.addConversation(new BackUpConversation(new BackupQualifiedId(data.id, data.domain), data.name));
+    } else {
+      CPBLogger.error('Conversation data schema validation failed', error);
+    }
+  });
+  // ------------------------------
 
   // Taking care of users
-  const {
-    success: usersSuccess,
-    data: usersData,
-    error: usersError,
-  } = UserTableSchema.safeParse(
-    await exportTable<UserRecord>({backupService, table: usersTable, preprocessor: streamProgress(preprocessUsers)}),
-  );
-  if (usersSuccess) {
-    usersData.forEach(userData =>
+  const userRecords = await exportTable<UserRecord>({
+    backupService,
+    table: usersTable,
+    preprocessor: streamProgress(preprocessUsers),
+  });
+  userRecords.forEach(record => {
+    const {success, data, error} = UserTableEntrySchema.safeParse(record);
+
+    if (success) {
       backupExporter.addUser(
         new BackupUser(
-          new BackupQualifiedId(userData?.qualified_id?.id ?? userData.id, userData?.qualified_id?.domain ?? ''),
-          userData.name,
-          userData.handle ?? '',
+          new BackupQualifiedId(data?.qualified_id?.id ?? data.id, data?.qualified_id?.domain ?? ''),
+          data.name,
+          data.handle ?? '',
         ),
-      ),
-    );
-  } else {
-    CPBLogger.log('User data schema validation failed', usersError);
-  }
+      );
+    } else {
+      CPBLogger.error('User data schema validation failed', error);
+    }
+  });
+  // ------------------------------
 
   // Taking care of events
-  const {
-    success: eventsSuccess,
-    data: eventsData,
-    error: eventsError,
-  } = EventTableSchema.safeParse(
-    await exportTable<EventRecord>({backupService, table: eventsTable, preprocessor: streamProgress(preprocessEvents)}),
-  );
-  if (eventsSuccess) {
-    eventsData.forEach(eventData => {
+  const eventRecords = await exportTable<EventRecord>({
+    backupService,
+    table: eventsTable,
+    preprocessor: streamProgress(preprocessEvents),
+  });
+
+  eventRecords.forEach(record => {
+    const {success, data: eventData, error} = EventTableEntrySchema.safeParse(record);
+    if (success) {
       const {type} = eventData;
       // ToDo: Add support for other types of messages and different types of content. Also figure out which fields are required.
       if (!isSupportedEventType(type)) {
@@ -147,28 +145,31 @@ export const exportCPBHistoryFromDatabase = async ({
       const webPrimaryKey = eventData.primary_key;
 
       if (isAssetAddEvent(type)) {
-        const {success, error, data} = AssetContentSchema.safeParse(eventData.data);
-        if (!success) {
-          CPBLogger.log('Asset data schema validation failed', error);
+        const {
+          success: assetParseSuccess,
+          error: assetParseError,
+          data: assetParseData,
+        } = AssetContentSchema.safeParse(eventData.data);
+        if (!assetParseSuccess) {
+          CPBLogger.error('Asset data schema validation failed', assetParseError);
           return;
         }
 
-        const metaData = buildMetaData(data.content_type, data.info);
-
-        CPBLogger.log('metaData', metaData, data.content_type);
+        const metaData = buildMetaData(assetParseData.content_type, assetParseData.info);
 
         const asset = new BackupMessageContent.Asset(
-          data.content_type,
-          data.content_length,
-          data.info.name,
-          transformObjectToArray(data.otr_key),
-          transformObjectToArray(data.sha256),
-          data.key,
-          data.token,
-          data.domain,
+          assetParseData.content_type,
+          Number.parseInt(assetParseData.content_length),
+          assetParseData.info.name,
+          transformObjectToArray(assetParseData.otr_key),
+          transformObjectToArray(assetParseData.sha256),
+          assetParseData.key,
+          assetParseData.token,
+          assetParseData.domain,
           null,
           metaData,
         );
+
         backupExporter.addMessage(
           new BackupMessage(id, conversationId, senderUserId, senderClientId, creationDate, asset, webPrimaryKey),
         );
@@ -180,10 +181,12 @@ export const exportCPBHistoryFromDatabase = async ({
           new BackupMessage(id, conversationId, senderUserId, senderClientId, creationDate, text, webPrimaryKey),
         );
       }
-    });
-  } else {
-    CPBLogger.log('Event data schema validation failed', eventsError);
-  }
+    } else {
+      CPBLogger.error('Event data schema validation failed', error);
+    }
+  });
+
+  // ------------------------------
 
   return backupExporter.serialize();
 };
