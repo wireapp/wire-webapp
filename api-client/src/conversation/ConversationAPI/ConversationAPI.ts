@@ -423,7 +423,7 @@ export class ConversationAPI {
       method: 'post',
       url:
         this.backendFeatures.version >= apiBreakpoint.version7
-          ? `${ConversationAPI.URL.ONE_2_ONE}-${ConversationAPI.URL.CONVERSATIONS}`
+          ? `/${ConversationAPI.URL.ONE_2_ONE}-${ConversationAPI.URL.CONVERSATIONS}`
           : `/${ConversationAPI.URL.CONVERSATIONS}/${ConversationAPI.URL.ONE_2_ONE}`,
     };
 
@@ -439,7 +439,7 @@ export class ConversationAPI {
       method: 'get',
       url:
         this.backendFeatures.version >= apiBreakpoint.version7
-          ? `${ConversationAPI.URL.ONE_2_ONE}-${ConversationAPI.URL.CONVERSATIONS}/${domain}/${id}`
+          ? `/${ConversationAPI.URL.ONE_2_ONE}-${ConversationAPI.URL.CONVERSATIONS}/${domain}/${id}`
           : `/${ConversationAPI.URL.CONVERSATIONS}/${ConversationAPI.URL.ONE_2_ONE}/${domain}/${id}`,
     };
 
