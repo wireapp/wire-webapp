@@ -517,7 +517,7 @@ export class ConversationAPI {
     const config: AxiosRequestConfig = {
       data: conversationData,
       method: 'post',
-      url: ConversationAPI.URL.CONVERSATIONS,
+      url: `/${ConversationAPI.URL.CONVERSATIONS}`,
     };
     try {
       const response = await this.client.sendJSON<Conversation>(config);
