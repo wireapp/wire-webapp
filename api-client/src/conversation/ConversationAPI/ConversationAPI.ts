@@ -91,14 +91,14 @@ export class ConversationAPI {
     ACCESS: 'access',
     BOT: 'bot',
     BOTS: 'bots',
-    CLIENTS: '/clients',
+    CLIENTS: 'clients',
     CODE: 'code',
-    CODE_CHECK: '/code-check',
-    CONVERSATIONS: '/conversations',
+    CODE_CHECK: 'code-check',
+    CONVERSATIONS: 'conversations',
     SUBCONVERSATIONS: 'subconversations',
     GROUP_INFO: 'groupinfo',
-    MLS: '/mls',
-    JOIN: '/join',
+    MLS: 'mls',
+    JOIN: 'join',
     LIST: 'list',
     LIST_IDS: 'list-ids',
     MEMBERS: 'members',
@@ -124,8 +124,8 @@ export class ConversationAPI {
 
   private generateBaseConversationUrl(conversationId: QualifiedId, supportsQualifiedEndpoint: boolean = true): string {
     return supportsQualifiedEndpoint && conversationId.domain
-      ? `${ConversationAPI.URL.CONVERSATIONS}/${conversationId.domain}/${conversationId.id}`
-      : `${ConversationAPI.URL.CONVERSATIONS}/${conversationId.id}`;
+      ? `/${ConversationAPI.URL.CONVERSATIONS}/${conversationId.domain}/${conversationId.id}`
+      : `/${ConversationAPI.URL.CONVERSATIONS}/${conversationId.id}`;
   }
 
   /**
@@ -136,7 +136,7 @@ export class ConversationAPI {
   public async deleteConversationCode(conversationId: string): Promise<ConversationCodeDeleteEvent> {
     const config: AxiosRequestConfig = {
       method: 'delete',
-      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.CODE}`,
+      url: `/${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.CODE}`,
     };
 
     const response = await this.client.sendJSON<ConversationCodeDeleteEvent>(config);
@@ -160,8 +160,8 @@ export class ConversationAPI {
       method: 'delete',
       url:
         this.backendFeatures.version >= apiBreakpoint.version7
-          ? `${ConversationAPI.URL.BOT}/${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${serviceId}`
-          : `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.BOTS}/${serviceId}`,
+          ? `/${ConversationAPI.URL.BOT}/${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${serviceId}`
+          : `/${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.BOTS}/${serviceId}`,
     };
 
     await this.client.sendJSON(config);
@@ -174,7 +174,7 @@ export class ConversationAPI {
    * @see https://staging-nginz-https.zinfra.io/api/swagger-ui/#/default/delete_conversations__cnv_domain___cnv__members__usr_domain___usr_
    */
   public async deleteMember(conversationId: QualifiedId, userId: QualifiedId): Promise<ConversationMemberLeaveEvent> {
-    const url = `${ConversationAPI.URL.CONVERSATIONS}/${conversationId.domain}/${conversationId.id}/${ConversationAPI.URL.MEMBERS}/${userId.domain}/${userId.id}`;
+    const url = `/${ConversationAPI.URL.CONVERSATIONS}/${conversationId.domain}/${conversationId.id}/${ConversationAPI.URL.MEMBERS}/${userId.domain}/${userId.id}`;
 
     const response = await this.client.sendJSON<ConversationMemberLeaveEvent>({
       method: 'delete',
@@ -191,7 +191,7 @@ export class ConversationAPI {
   public async getConversationCode(conversationId: string): Promise<ConversationCode> {
     const config: AxiosRequestConfig = {
       method: 'GET',
-      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.CODE}`,
+      url: `/${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.CODE}`,
     };
 
     const response = await this.client.sendJSON<ConversationCode>(config);
@@ -205,7 +205,7 @@ export class ConversationAPI {
   public async getConversationGuestLinkFeature(conversationId: string): Promise<ConversationGuestLinkStatus> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/features/conversationGuestLinks`,
+      url: `/${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/features/conversationGuestLinks`,
     };
 
     const response = await this.client.sendJSON<ConversationGuestLinkStatus>(config);
@@ -225,7 +225,7 @@ export class ConversationAPI {
   public async getMLSSelfConversation(): Promise<MLSConversation> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${ConversationAPI.URL.CONVERSATIONS}/${ConversationAPI.URL.MLS_SELF}`,
+      url: `/${ConversationAPI.URL.CONVERSATIONS}/${ConversationAPI.URL.MLS_SELF}`,
     };
 
     const response = await this.client.sendJSON<MLSConversation>(config);
@@ -301,7 +301,7 @@ export class ConversationAPI {
     const config: AxiosRequestConfig = {
       data: {},
       method: 'post',
-      url: `${ConversationAPI.URL.CONVERSATIONS}/${ConversationAPI.URL.LIST_IDS}`,
+      url: `/${ConversationAPI.URL.CONVERSATIONS}/${ConversationAPI.URL.LIST_IDS}`,
     };
 
     if (limit > 0) {
@@ -343,8 +343,8 @@ export class ConversationAPI {
         method: 'post',
         url:
           this.backendFeatures.version >= apiBreakpoint.version2
-            ? `${ConversationAPI.URL.CONVERSATIONS}/${ConversationAPI.URL.LIST}`
-            : `${ConversationAPI.URL.CONVERSATIONS}/${ConversationAPI.URL.LIST}/${ConversationAPI.URL.V2}`,
+            ? `/${ConversationAPI.URL.CONVERSATIONS}/${ConversationAPI.URL.LIST}`
+            : `/${ConversationAPI.URL.CONVERSATIONS}/${ConversationAPI.URL.LIST}/${ConversationAPI.URL.V2}`,
       };
 
       const {data} = await this.client.sendJSON<RemoteConversations>(config);
@@ -390,7 +390,7 @@ export class ConversationAPI {
   public async getRoles(conversationId: string): Promise<ConversationRolesList> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.ROLES}`,
+      url: `/${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.ROLES}`,
     };
 
     const response = await this.client.sendJSON<ConversationRolesList>(config);
@@ -424,7 +424,7 @@ export class ConversationAPI {
       url:
         this.backendFeatures.version >= apiBreakpoint.version7
           ? `${ConversationAPI.URL.ONE_2_ONE}-${ConversationAPI.URL.CONVERSATIONS}`
-          : `${ConversationAPI.URL.CONVERSATIONS}/${ConversationAPI.URL.ONE_2_ONE}`,
+          : `/${ConversationAPI.URL.CONVERSATIONS}/${ConversationAPI.URL.ONE_2_ONE}`,
     };
 
     await this.client.sendJSON(config);
@@ -440,7 +440,7 @@ export class ConversationAPI {
       url:
         this.backendFeatures.version >= apiBreakpoint.version7
           ? `${ConversationAPI.URL.ONE_2_ONE}-${ConversationAPI.URL.CONVERSATIONS}/${domain}/${id}`
-          : `${ConversationAPI.URL.CONVERSATIONS}/${ConversationAPI.URL.ONE_2_ONE}/${domain}/${id}`,
+          : `/${ConversationAPI.URL.CONVERSATIONS}/${ConversationAPI.URL.ONE_2_ONE}/${domain}/${id}`,
     };
 
     const response = await this.client.sendJSON<MLS1to1Conversation | MLSConversation>(config);
@@ -457,7 +457,7 @@ export class ConversationAPI {
     const config: AxiosRequestConfig = {
       data: invitationData,
       method: 'post',
-      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.MEMBERS}`,
+      url: `/${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.MEMBERS}`,
     };
 
     try {
@@ -500,8 +500,8 @@ export class ConversationAPI {
       method: 'post',
       url:
         this.backendFeatures.version >= apiBreakpoint.version7
-          ? `${ConversationAPI.URL.BOT}/${ConversationAPI.URL.CONVERSATIONS}/${conversationId}`
-          : `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.BOTS}}`,
+          ? `/${ConversationAPI.URL.BOT}/${ConversationAPI.URL.CONVERSATIONS}/${conversationId}`
+          : `/${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.BOTS}}`,
     };
 
     const response = await this.client.sendJSON<ConversationMemberJoinEvent>(config);
@@ -547,7 +547,7 @@ export class ConversationAPI {
   ): Promise<ConversationCodeUpdateEvent> {
     const config: AxiosRequestConfig = {
       method: 'post',
-      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.CODE}`,
+      url: `/${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.CODE}`,
       data: {},
     };
 
@@ -568,7 +568,7 @@ export class ConversationAPI {
     const config: AxiosRequestConfig = {
       data: conversationCode,
       method: 'post',
-      url: `${ConversationAPI.URL.CONVERSATIONS}${ConversationAPI.URL.CODE_CHECK}`,
+      url: `/${ConversationAPI.URL.CONVERSATIONS}/${ConversationAPI.URL.CODE_CHECK}`,
     };
 
     try {
@@ -593,7 +593,7 @@ export class ConversationAPI {
     const config: AxiosRequestConfig = {
       data: conversationCode,
       method: 'post',
-      url: `${ConversationAPI.URL.CONVERSATIONS}${ConversationAPI.URL.JOIN}`,
+      url: `/${ConversationAPI.URL.CONVERSATIONS}/${ConversationAPI.URL.JOIN}`,
     };
 
     try {
@@ -624,7 +624,7 @@ export class ConversationAPI {
     const config: AxiosRequestConfig = {
       params: conversationCode,
       method: 'get',
-      url: `${ConversationAPI.URL.CONVERSATIONS}${ConversationAPI.URL.JOIN}`,
+      url: `/${ConversationAPI.URL.CONVERSATIONS}/${ConversationAPI.URL.JOIN}`,
     };
 
     try {
@@ -649,7 +649,7 @@ export class ConversationAPI {
   public async postJoin(conversationId: string): Promise<ConversationEvent> {
     const config: AxiosRequestConfig = {
       method: 'post',
-      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}`,
+      url: `/${ConversationAPI.URL.CONVERSATIONS}/${conversationId}`,
     };
 
     const response = await this.client.sendJSON<ConversationEvent>(config);
@@ -690,7 +690,7 @@ export class ConversationAPI {
        */
       data: ProtobufOTR.QualifiedNewOtrMessage.encode(messageData).finish().slice(),
       method: 'post',
-      url: `${ConversationAPI.URL.CONVERSATIONS}/${domain}/${conversationId}/${ConversationAPI.URL.PROTEUS}/${ConversationAPI.URL.MESSAGES}`,
+      url: `/${ConversationAPI.URL.CONVERSATIONS}/${domain}/${conversationId}/${ConversationAPI.URL.PROTEUS}/${ConversationAPI.URL.MESSAGES}`,
     };
 
     const response = await this.client.sendProtocolBuffer<MessageSendingStatus>(config, true);
@@ -707,7 +707,7 @@ export class ConversationAPI {
     const config: AxiosRequestConfig = {
       data: messageData,
       method: 'post',
-      url: `${ConversationAPI.URL.MLS}/${ConversationAPI.URL.MESSAGES}`,
+      url: `/${ConversationAPI.URL.MLS}/${ConversationAPI.URL.MESSAGES}`,
     };
 
     const response = await this.client.sendProtocolMls<PostMlsMessageResponse>(config, true);
@@ -724,7 +724,7 @@ export class ConversationAPI {
     const config: AxiosRequestConfig = {
       data: messageData,
       method: 'post',
-      url: `${ConversationAPI.URL.MLS}/commit-bundles`,
+      url: `/${ConversationAPI.URL.MLS}/commit-bundles`,
     };
 
     const response = await this.client.sendProtocolMls<PostMlsMessageResponse>(config, true);
@@ -738,7 +738,7 @@ export class ConversationAPI {
   public async postSelf(): Promise<Conversation> {
     const config: AxiosRequestConfig = {
       method: 'post',
-      url: `${ConversationAPI.URL.CONVERSATIONS}/${ConversationAPI.URL.SELF}`,
+      url: `/${ConversationAPI.URL.CONVERSATIONS}/${ConversationAPI.URL.SELF}`,
     };
 
     const response = await this.client.sendJSON<Conversation>(config);
@@ -795,7 +795,7 @@ export class ConversationAPI {
     const config: AxiosRequestConfig = {
       data: conversationNameData,
       method: 'put',
-      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.NAME}`,
+      url: `/${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.NAME}`,
     };
 
     const response = await this.client.sendJSON<ConversationRenameEvent>(config);
@@ -815,7 +815,7 @@ export class ConversationAPI {
     const config: AxiosRequestConfig = {
       data: messageTimerData,
       method: 'put',
-      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId.id}/${ConversationAPI.URL.MESSAGE_TIMER}`,
+      url: `/${ConversationAPI.URL.CONVERSATIONS}/${conversationId.id}/${ConversationAPI.URL.MESSAGE_TIMER}`,
     };
 
     const response = await this.client.sendJSON<ConversationMessageTimerUpdateEvent>(config);
@@ -857,7 +857,7 @@ export class ConversationAPI {
       url:
         this.backendFeatures.version >= 2
           ? `${this.generateBaseConversationUrl(conversationId)}/${ConversationAPI.URL.MEMBERS}`
-          : `${ConversationAPI.URL.CONVERSATIONS}/${conversationId.id}/${ConversationAPI.URL.MEMBERS}/${ConversationAPI.URL.V2}`,
+          : `/${ConversationAPI.URL.CONVERSATIONS}/${conversationId.id}/${ConversationAPI.URL.MEMBERS}/${ConversationAPI.URL.V2}`,
     };
 
     try {
@@ -892,7 +892,7 @@ export class ConversationAPI {
     const config: AxiosRequestConfig = {
       data: memberUpdateData,
       method: 'put',
-      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.MEMBERS}/${userId}`,
+      url: `/${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.MEMBERS}/${userId}`,
     };
 
     await this.client.sendJSON<ConversationMemberJoinEvent>(config);
