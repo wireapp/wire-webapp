@@ -63,103 +63,127 @@ export const exportCPBHistoryFromDatabase = async ({
   }
 
   // Taking care of conversations
-  const conversationsData = ConversationTableSchema.parse(
+  const {
+    success: conversationsSuccess,
+    data: conversationsData,
+    error: conversationsError,
+  } = ConversationTableSchema.safeParse(
     await exportTable<ConversationRecord>({
       backupService,
       table: conversationTable,
       preprocessor: streamProgress(preprocessConversations),
     }),
   );
-  conversationsData.forEach(conversationData =>
-    backupExporter.addConversation(
-      new BackUpConversation(
-        new BackupQualifiedId(conversationData.id, conversationData.domain),
-        conversationData.name ?? '',
+  if (conversationsSuccess) {
+    conversationsData.forEach(conversationData =>
+      backupExporter.addConversation(
+        new BackUpConversation(
+          new BackupQualifiedId(conversationData.id, conversationData.domain),
+          conversationData.name ?? '',
+        ),
       ),
-    ),
-  );
+    );
+  } else {
+    CPBLogger.log('Conversation data schema validation failed', conversationsError);
+  }
 
   // Taking care of users
-  const usersData = UserTableSchema.parse(
+  const {
+    success: usersSuccess,
+    data: usersData,
+    error: usersError,
+  } = UserTableSchema.safeParse(
     await exportTable<UserRecord>({backupService, table: usersTable, preprocessor: streamProgress(preprocessUsers)}),
   );
-  usersData.forEach(userData =>
-    backupExporter.addUser(
-      new BackupUser(
-        new BackupQualifiedId(userData?.qualified_id?.id ?? userData.id, userData?.qualified_id?.domain ?? ''),
-        userData.name,
-        userData.handle ?? '',
+  if (usersSuccess) {
+    usersData.forEach(userData =>
+      backupExporter.addUser(
+        new BackupUser(
+          new BackupQualifiedId(userData?.qualified_id?.id ?? userData.id, userData?.qualified_id?.domain ?? ''),
+          userData.name,
+          userData.handle ?? '',
+        ),
       ),
-    ),
-  );
+    );
+  } else {
+    CPBLogger.log('User data schema validation failed', usersError);
+  }
 
   // Taking care of events
-  const eventsData = EventTableSchema.parse(
+  const {
+    success: eventsSuccess,
+    data: eventsData,
+    error: eventsError,
+  } = EventTableSchema.safeParse(
     await exportTable<EventRecord>({backupService, table: eventsTable, preprocessor: streamProgress(preprocessEvents)}),
   );
-  eventsData.forEach(eventData => {
-    const {type} = eventData;
-    // ToDo: Add support for other types of messages and different types of content. Also figure out which fields are required.
-    if (!isSupportedEventType(type)) {
-      // eslint-disable-next-line no-console
-      CPBLogger.log('Unsupported message type', type);
-      return;
-    }
-    if (!eventData.id) {
-      // eslint-disable-next-line no-console
-      CPBLogger.log('Event without id', eventData);
-      return;
-    }
-
-    const id = eventData.id;
-    const conversationId = new BackupQualifiedId(
-      eventData.qualified_conversation.id,
-      eventData.qualified_conversation.domain ?? '',
-    );
-    const senderUserId = new BackupQualifiedId(
-      eventData.qualified_from?.id ?? eventData.from ?? '',
-      eventData.qualified_from?.domain ?? '',
-    );
-    const senderClientId = eventData.from_client_id ?? '';
-    const creationDate = new BackupDateTime(new Date(eventData.time));
-    // for debugging purposes
-    const webPrimaryKey = eventData.primary_key;
-
-    if (isAssetAddEvent(type)) {
-      const {success, error, data} = AssetContentSchema.safeParse(eventData.data);
-      if (!success) {
-        CPBLogger.log('Asset data schema validation failed', error);
+  if (eventsSuccess) {
+    eventsData.forEach(eventData => {
+      const {type} = eventData;
+      // ToDo: Add support for other types of messages and different types of content. Also figure out which fields are required.
+      if (!isSupportedEventType(type)) {
+        // eslint-disable-next-line no-console
+        CPBLogger.log('Unsupported message type', type);
+        return;
+      }
+      if (!eventData.id) {
+        // eslint-disable-next-line no-console
+        CPBLogger.log('Event without id', eventData);
         return;
       }
 
-      const metaData = buildMetaData(data.content_type, data.info);
-
-      CPBLogger.log('metaData', metaData, data.content_type);
-
-      const asset = new BackupMessageContent.Asset(
-        data.content_type,
-        data.content_length,
-        data.info.name,
-        transformObjectToArray(data.otr_key),
-        transformObjectToArray(data.sha256),
-        data.key,
-        data.token,
-        data.domain,
-        null,
-        metaData,
+      const id = eventData.id;
+      const conversationId = new BackupQualifiedId(
+        eventData.qualified_conversation.id,
+        eventData.qualified_conversation.domain ?? '',
       );
-      backupExporter.addMessage(
-        new BackupMessage(id, conversationId, senderUserId, senderClientId, creationDate, asset, webPrimaryKey),
+      const senderUserId = new BackupQualifiedId(
+        eventData.qualified_from?.id ?? eventData.from ?? '',
+        eventData.qualified_from?.domain ?? '',
       );
-    }
+      const senderClientId = eventData.from_client_id ?? '';
+      const creationDate = new BackupDateTime(new Date(eventData.time));
+      // for debugging purposes
+      const webPrimaryKey = eventData.primary_key;
 
-    if (isMessageAddEvent(type) && eventData.data?.content) {
-      const text = new BackupMessageContent.Text(eventData.data.content);
-      backupExporter.addMessage(
-        new BackupMessage(id, conversationId, senderUserId, senderClientId, creationDate, text, webPrimaryKey),
-      );
-    }
-  });
+      if (isAssetAddEvent(type)) {
+        const {success, error, data} = AssetContentSchema.safeParse(eventData.data);
+        if (!success) {
+          CPBLogger.log('Asset data schema validation failed', error);
+          return;
+        }
+
+        const metaData = buildMetaData(data.content_type, data.info);
+
+        CPBLogger.log('metaData', metaData, data.content_type);
+
+        const asset = new BackupMessageContent.Asset(
+          data.content_type,
+          data.content_length,
+          data.info.name,
+          transformObjectToArray(data.otr_key),
+          transformObjectToArray(data.sha256),
+          data.key,
+          data.token,
+          data.domain,
+          null,
+          metaData,
+        );
+        backupExporter.addMessage(
+          new BackupMessage(id, conversationId, senderUserId, senderClientId, creationDate, asset, webPrimaryKey),
+        );
+      }
+
+      if (isMessageAddEvent(type) && eventData.data?.content) {
+        const text = new BackupMessageContent.Text(eventData.data.content);
+        backupExporter.addMessage(
+          new BackupMessage(id, conversationId, senderUserId, senderClientId, creationDate, text, webPrimaryKey),
+        );
+      }
+    });
+  } else {
+    CPBLogger.log('Event data schema validation failed', eventsError);
+  }
 
   return backupExporter.serialize();
 };
