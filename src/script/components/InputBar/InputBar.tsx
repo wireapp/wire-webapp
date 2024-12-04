@@ -562,6 +562,8 @@ export const InputBar = ({
 
   const enableSending = textValue.length > 0;
 
+  const showAvatar = messageFormatButtonsEnabled ? true : !!textValue.length;
+
   return (
     <div ref={wrapperRef}>
       <IgnoreOutsideClickWrapper
@@ -586,12 +588,14 @@ export const InputBar = ({
           {!isOutgoingRequest && (
             <>
               <div className="input-bar-avatar">
-                <Avatar
-                  className="cursor-default"
-                  participant={selfUser}
-                  avatarSize={AVATAR_SIZE.X_SMALL}
-                  hideAvailabilityStatus
-                />
+                {showAvatar && (
+                  <Avatar
+                    className="cursor-default"
+                    participant={selfUser}
+                    avatarSize={AVATAR_SIZE.X_SMALL}
+                    hideAvailabilityStatus
+                  />
+                )}
               </div>
               {!isSelfUserRemoved && !pastedFile && (
                 <RichTextEditor
