@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.13.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.12.2...@wireapp/api-client@27.13.0) (2024-12-04)
+
+### Features
+
+* updating endpoints to fulfill v7 BE plans [WPB-14768] ([#6726](https://github.com/wireapp/wire-web-packages/issues/6726)) ([414245d](https://github.com/wireapp/wire-web-packages/commit/414245df580ed29c49fd52f1b9b1f0cbe1b47d16))
+
 ## [27.12.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.12.1...@wireapp/api-client@27.12.2) (2024-12-04)
 
 **Note:** Version bump only for package @wireapp/api-client
