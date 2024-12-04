@@ -94,24 +94,30 @@ export const CallingParticipantList = ({
         'call-ui__participant-list__wrapper--active': showParticipants,
       })}
     >
-      <p css={labelStyles}>{t('videoCallOverlayParticipantsListLabel', {count: participants.length})}</p>
       <FadingScrollbar className="call-ui__participant-list__container">
-        <p css={labelStyles}>{t('videoCallOverlayParticipantsWithRaisedHandListLabel', participants.length)}</p>
-        <ul className="call-ui__participant-list" data-uie-name="list-call-ui-participants">
-          {handRaisedParticipantsList.map((participant, index, participantsArray) => (
-            <li key={participant.clientId} className="call-ui__participant-list__participant">
-              <CallParticipantsListItem
-                key={participant.clientId}
-                callParticipant={participant}
-                isSelfVerified={isSelfVerified}
-                showContextMenu={!!isModerator}
-                onContextMenu={event => getParticipantContext(event, participant)}
-                isLast={participantsArray.length === index}
-              />
-            </li>
-          ))}
-        </ul>
-        <p css={labelStyles}>{t('videoCallOverlayParticipantsListLabel', participants.length)}</p>
+        {handRaisedParticipantsList.length > 0 && (
+          <>
+            <p css={labelStyles}>
+              {t('videoCallOverlayParticipantsRaisedHandListLabel', {count: handRaisedParticipantsList.length})}
+            </p>
+            <ul className="call-ui__participant-list" data-uie-name="list-call-ui-participants">
+              {handRaisedParticipantsList.map((participant, index, participantsArray) => (
+                <li key={participant.clientId} className="call-ui__participant-list__participant">
+                  <CallParticipantsListItem
+                    isHandRaised
+                    key={participant.clientId}
+                    callParticipant={participant}
+                    isSelfVerified={isSelfVerified}
+                    showContextMenu={!!isModerator}
+                    onContextMenu={event => getParticipantContext(event, participant)}
+                    isLast={participantsArray.length === index}
+                  />
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+        <p css={labelStyles}>{t('videoCallOverlayParticipantsListLabel', {count: participants.length})}</p>
         <ul className="call-ui__participant-list" data-uie-name="list-call-ui-participants">
           {participantsList.map((participant, index, participantsArray) => (
             <li key={participant.clientId} className="call-ui__participant-list__participant">

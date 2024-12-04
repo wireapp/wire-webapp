@@ -122,7 +122,19 @@
         &:hover {
           opacity: 1;
         }
+
         &__label {
+          .label-small-medium;
+          position: absolute;
+          top: 7px;
+          right: 7px;
+          padding: 5px 10px;
+          border-radius: 6px;
+          background-color: var(--accent-color);
+          color: var(--app-bg-secondary);
+        }
+
+        &__hand_raise_icon {
           .label-small-medium;
           position: absolute;
           top: 7px;
@@ -182,6 +194,12 @@
               fill: var(--red-500);
             }
           }
+        }
+
+        &__hand_icon {
+          position: absolute;
+          top: 10px;
+          left: 10px;
         }
 
         &__name {

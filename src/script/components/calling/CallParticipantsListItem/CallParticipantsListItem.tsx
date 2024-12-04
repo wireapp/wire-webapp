@@ -44,6 +44,7 @@ export interface CallParticipantsListItemProps {
   onContextMenu: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   isSelfVerified?: boolean;
   isLast?: boolean;
+  isHandRaised?: boolean;
 }
 
 export const CallParticipantsListItem = ({
@@ -52,6 +53,7 @@ export const CallParticipantsListItem = ({
   showContextMenu,
   onContextMenu,
   isLast = false,
+  isHandRaised = false,
 }: CallParticipantsListItemProps) => {
   const {user} = callParticipant;
   const {isMe: isSelf, isFederated} = user;
@@ -105,6 +107,8 @@ export const CallParticipantsListItem = ({
           showContextMenu={showContextMenu}
           onDropdownClick={event => onContextMenu?.(event as unknown as React.MouseEvent<HTMLDivElement>)}
         />
+
+        {isHandRaised && <span>✋</span>}
 
         {isAudioEstablished ? (
           <>
