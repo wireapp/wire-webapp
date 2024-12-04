@@ -4227,6 +4227,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@js-joda/core@npm:3.2.0":
+  version: 3.2.0
+  resolution: "@js-joda/core@npm:3.2.0"
+  checksum: 10/af7d3717eacbee33c7b7af68d17ea99765218e3d1fff7c7ea555986181a8ee6459b8c7289f346f9e67e7dfbb97f16c356e98efd9d0cb0ae2137608f38e837ee9
+  languageName: node
+  linkType: hard
+
 "@jsdoc/salty@npm:^0.2.1":
   version: 0.2.7
   resolution: "@jsdoc/salty@npm:0.2.7"
@@ -6240,7 +6247,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"abort-controller@npm:^3.0.0":
+"abort-controller@npm:3.0.0, abort-controller@npm:^3.0.0":
   version: 3.0.0
   resolution: "abort-controller@npm:3.0.0"
   dependencies:
@@ -10025,6 +10032,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"format-util@npm:^1.0.5":
+  version: 1.0.5
+  resolution: "format-util@npm:1.0.5"
+  checksum: 10/0c8622e54ad899ca184ff0b4999e9ff9567965051bade140911209d60554c2ea4d43075763c1cf574d2f740966afe46469c9284357919505cdddf1a0b65ff85c
+  languageName: node
+  linkType: hard
+
 "fraction.js@npm:^4.3.7":
   version: 4.3.7
   resolution: "fraction.js@npm:4.3.7"
@@ -12561,6 +12575,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"kalium-backup@file:./TEMP-crossplatform-backup::locator=wire-webapp%40workspace%3A.":
+  version: 0.0.1-SNAPSHOT
+  resolution: "kalium-backup@file:./TEMP-crossplatform-backup#./TEMP-crossplatform-backup::hash=fc41d0&locator=wire-webapp%40workspace%3A."
+  dependencies:
+    "@js-joda/core": "npm:3.2.0"
+    abort-controller: "npm:3.0.0"
+    format-util: "npm:^1.0.5"
+    libsodium-wrappers-sumo: "npm:0.7.9"
+    node-fetch: "npm:2.6.7"
+    protobufjs: "npm:^7.3.2"
+    ws: "npm:8.5.0"
+  checksum: 10/2fcac36a053b8e541fd763321596f981d583c30ae3e95e19cef79c105c6f484c514149c2c533959867ef94a6eef32863799089758fa7621080714f02f324c816
+  languageName: node
+  linkType: hard
+
 "keyboardjs@npm:2.7.0":
   version: 2.7.0
   resolution: "keyboardjs@npm:2.7.0"
@@ -13701,6 +13730,20 @@ __metadata:
   version: 2.1.2
   resolution: "node-cleanup@npm:2.1.2"
   checksum: 10/eeb831d27d734179ca6aa7504a65fa0debd7c77a883c5dbea2849fb7ed8fa0a3fe3a346926c5b1aaaf5537fd801d03da0efcf20b28385d7150276a9e8a2127a5
+  languageName: node
+  linkType: hard
+
+"node-fetch@npm:2.6.7":
+  version: 2.6.7
+  resolution: "node-fetch@npm:2.6.7"
+  dependencies:
+    whatwg-url: "npm:^5.0.0"
+  peerDependencies:
+    encoding: ^0.1.0
+  peerDependenciesMeta:
+    encoding:
+      optional: true
+  checksum: 10/4bc9245383db92c35601a798c9a992fdf38d99920ceac11e0e6512ef3014d188b3807ccb060bc6c4bdb57a145030c73f5b5fd6730f665979f9264bc43ca3afea
   languageName: node
   linkType: hard
 
@@ -15496,6 +15539,26 @@ __metadata:
     "@types/node": "npm:>=13.7.0"
     long: "npm:^5.0.0"
   checksum: 10/6c5aa62b61dff843f585f3acd9cb7a82d566de2dbf167a300b39afee91b04298c4b4aec61354b7c00308b40596f5f3f4b07d6246cfb4ee0abeaea25101033315
+  languageName: node
+  linkType: hard
+
+"protobufjs@npm:^7.3.2":
+  version: 7.4.0
+  resolution: "protobufjs@npm:7.4.0"
+  dependencies:
+    "@protobufjs/aspromise": "npm:^1.1.2"
+    "@protobufjs/base64": "npm:^1.1.2"
+    "@protobufjs/codegen": "npm:^2.0.4"
+    "@protobufjs/eventemitter": "npm:^1.1.0"
+    "@protobufjs/fetch": "npm:^1.1.0"
+    "@protobufjs/float": "npm:^1.0.2"
+    "@protobufjs/inquire": "npm:^1.1.0"
+    "@protobufjs/path": "npm:^1.1.2"
+    "@protobufjs/pool": "npm:^1.1.0"
+    "@protobufjs/utf8": "npm:^1.1.0"
+    "@types/node": "npm:>=13.7.0"
+    long: "npm:^5.0.0"
+  checksum: 10/408423506610f70858d7593632f4a6aa4f05796c90fd632be9b9252457c795acc71aa6d3b54bb7f48a890141728fee4ca3906723ccea6c202ad71f21b3879b8b
   languageName: node
   linkType: hard
 
@@ -18722,6 +18785,7 @@ __metadata:
     js-cookie: "npm:3.0.5"
     jsdom-worker: "npm:0.3.0"
     jszip: "npm:3.10.1"
+    kalium-backup: ./TEMP-crossplatform-backup
     keyboardjs: "npm:2.7.0"
     knockout: "npm:3.5.1"
     less: "npm:4.2.1"
@@ -18780,6 +18844,7 @@ __metadata:
     webpack-hot-middleware: "npm:2.26.1"
     webrtc-adapter: "npm:9.0.1"
     workbox-webpack-plugin: "npm:7.3.0"
+    zod: "npm:^3.23.8"
     zustand: "npm:4.5.5"
   languageName: unknown
   linkType: soft
@@ -19071,6 +19136,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ws@npm:8.5.0":
+  version: 8.5.0
+  resolution: "ws@npm:8.5.0"
+  peerDependencies:
+    bufferutil: ^4.0.1
+    utf-8-validate: ^5.0.2
+  peerDependenciesMeta:
+    bufferutil:
+      optional: true
+    utf-8-validate:
+      optional: true
+  checksum: 10/f0ee700970a0bf925b1ec213ca3691e84fb8b435a91461fe3caf52f58c6cec57c99ed5890fbf6978824c932641932019aafc55d864cad38ac32577496efd5d3a
+  languageName: node
+  linkType: hard
+
 "ws@npm:^8.11.0":
   version: 8.17.1
   resolution: "ws@npm:8.17.1"
@@ -19241,7 +19321,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zod@npm:3.23.8":
+"zod@npm:3.23.8, zod@npm:^3.23.8":
   version: 3.23.8
   resolution: "zod@npm:3.23.8"
   checksum: 10/846fd73e1af0def79c19d510ea9e4a795544a67d5b34b7e1c4d0425bf6bfd1c719446d94cdfa1721c1987d891321d61f779e8236fde517dc0e524aa851a6eff1

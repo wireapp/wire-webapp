@@ -176,6 +176,9 @@ export type Env = {
   /** Feature to enable rich text editor */
   FEATURE_ENABLE_MESSAGE_FORMAT_BUTTONS: string;
 
+  /** Feature to enable Cross Platform Backup export */
+  FEATURE_ENABLE_CROSS_PLATFORM_BACKUP_EXPORT: string;
+
   /** Sets the verification ID for Google webmasters */
   GOOGLE_WEBMASTER_ID: string;
 

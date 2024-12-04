@@ -45,6 +45,7 @@ import {TeamCreation} from './TeamCreation/TeamCreation';
 
 import {Config} from '../../../../../Config';
 import {Conversation} from '../../../../../entity/Conversation';
+import {ContentState} from '../../../../useAppState';
 import {ConversationTab} from '../ConversationTab';
 
 interface ConversationTabsProps {
@@ -56,7 +57,7 @@ interface ConversationTabsProps {
   conversationRepository: ConversationRepository;
   onChangeTab: (tab: SidebarTabs, folderId?: string) => void;
   currentTab: SidebarTabs;
-  onClickPreferences: () => void;
+  onClickPreferences: (contentState: ContentState) => void;
   showNotificationsBadge?: boolean;
   selfUser: User;
   teamRepository: TeamRepository;
@@ -242,7 +243,7 @@ export const ConversationTabs = ({
           Icon={<Icon.SettingsIcon />}
           onChangeTab={tab => {
             onChangeTab(tab);
-            onClickPreferences();
+            onClickPreferences(ContentState.PREFERENCES_ACCOUNT);
           }}
           conversationTabIndex={1}
           dataUieName="go-preferences"

@@ -31,6 +31,7 @@
     "jimp": "0.22.12",
     "js-cookie": "3.0.5",
     "jszip": "3.10.1",
+    "kalium-backup": "./TEMP-crossplatform-backup",
     "keyboardjs": "2.7.0",
     "knockout": "3.5.1",
     "lexical": "0.20.2",
@@ -59,6 +60,7 @@
     "uuid": "11.0.3",
     "webgl-utils.js": "1.1.0",
     "webrtc-adapter": "9.0.1",
+    "zod": "^3.23.8",
     "zustand": "4.5.5"
   },
   "devDependencies": {
