@@ -1508,7 +1508,7 @@
   "teamCreationSuccessListItem1": "Пригласите первых членов своей команды и начните совместную работу",
   "teamCreationSuccessListItem2": "Настройте параметры своей команды",
   "teamCreationSuccessListTitle": "Перейдите к Управлению командой:",
-  "teamCreationSuccessSubTitle": "Теперь вы являетесь владельцем команды ({teamName}).",
+  "teamCreationSuccessSubTitle": "You’re now the owner of the team {teamName}.",
   "teamCreationSuccessTitle": "Поздравляем {name}!",
   "teamCreationTitle": "Создать свою команду",
   "teamName.headline": "Назовите команду",
