@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import React, {useMemo} from 'react';
 
 import cx from 'classnames';
 
@@ -82,9 +82,11 @@ export const CallingParticipantList = ({
     showContextMenu({event, entries, identifier: 'participant-moderator-menu'});
   };
 
-  const participantsList = participants
-    .slice()
-    .sort((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user));
+  const participantsList = useMemo(() => {
+    return participants
+      .slice()
+      .sort((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user));
+  }, [participants]);
 
   return (
     <div
