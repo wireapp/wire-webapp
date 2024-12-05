@@ -431,8 +431,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
 
   const isModerator = selfUser && roles[selfUser.id] === DefaultConversationRoleName.WIRE_ADMIN;
 
-  const totalHandRaisedParticipants = handRaisedParticipants.length;
-
   return (
     <div
       className={cx('video-calling-wrapper', {
@@ -850,9 +848,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                           <RaiseHandOffIcon width={16} height={16} />
                         ) : (
                           <RaiseHandIcon width={16} height={16} />
-                        )}
-                        {totalHandRaisedParticipants > 0 && (
-                          <span className="video-controls__button_badge">{totalHandRaisedParticipants}</span>
                         )}
                       </button>
                     </li>

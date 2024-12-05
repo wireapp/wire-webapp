@@ -114,9 +114,9 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
     setRowsAndColumns(calculateRowsAndColumns(participants.length));
   }, [participants.length]);
 
-  const {isMuted: selfIsMuted, isHandUp: selfIsHandUp} = useKoSubscribableChildren(selfParticipant, [
+  const {isMuted: selfIsMuted, handRaisedAt: selfHandRaisedAt} = useKoSubscribableChildren(selfParticipant, [
     'isMuted',
-    'isHandUp',
+    'handRaisedAt',
   ]);
 
   return (
@@ -188,7 +188,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
               <Icon.MicOffIcon data-uie-name="mic-icon-off" />
             </span>
           )}
-          {selfIsHandUp && !minimized && (
+          {selfHandRaisedAt && !minimized && (
             <span className="group-video-grid__element__label__hand_icon" data-uie-name="status-call-audio-muted">
               ✋
             </span>
@@ -211,7 +211,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
                 <Icon.MicOffIcon data-uie-name="mic-icon-off" />
               </span>
             )}
-            {selfIsHandUp && !minimized && (
+            {selfHandRaisedAt && !minimized && (
               <span className="group-video-grid__element__label__hand_icon" data-uie-name="status-call-audio-muted">
                 ✋
               </span>

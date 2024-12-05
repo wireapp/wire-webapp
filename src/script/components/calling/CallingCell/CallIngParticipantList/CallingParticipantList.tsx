@@ -84,10 +84,6 @@ export const CallingParticipantList = ({
     .slice()
     .sort((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user));
 
-  const handRaisedParticipantsList = handRaisedParticipants
-    .slice()
-    .sort((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user));
-
   return (
     <div
       className={cx('call-ui__participant-list__wrapper', {
@@ -95,13 +91,13 @@ export const CallingParticipantList = ({
       })}
     >
       <FadingScrollbar className="call-ui__participant-list__container">
-        {handRaisedParticipantsList.length > 0 && (
+        {handRaisedParticipants.length > 0 && (
           <>
             <p css={labelStyles}>
-              {t('videoCallOverlayParticipantsRaisedHandListLabel', {count: handRaisedParticipantsList.length})}
+              {t('videoCallOverlayParticipantsRaisedHandListLabel', {count: handRaisedParticipants.length})}
             </p>
             <ul className="call-ui__participant-list" data-uie-name="list-call-ui-participants">
-              {handRaisedParticipantsList.map((participant, index, participantsArray) => (
+              {handRaisedParticipants.map((participant, index, participantsArray) => (
                 <li key={participant.clientId} className="call-ui__participant-list__participant">
                   <CallParticipantsListItem
                     isHandRaised

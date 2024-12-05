@@ -92,8 +92,11 @@ export class Call {
     this.selfClientId = selfParticipant?.clientId;
     this.participants = ko.observableArray([selfParticipant]);
     this.handRaisedParticipants = ko.pureComputed(() =>
-      this.participants().filter(participant => participant.isHandUp()),
+      this.participants()
+        .filter(participant => Boolean(participant.handRaisedAt()))
+        .sort((p1, p2) => p1.handRaisedAt()! - p2.handRaisedAt()!),
     );
+
     this.activeAudioOutput = this.mediaDevicesHandler.currentAvailableDeviceId.audiooutput();
     this.mediaDevicesHandler.currentAvailableDeviceId.audiooutput.subscribe((newActiveAudioOutput: string) => {
       this.activeAudioOutput = newActiveAudioOutput;

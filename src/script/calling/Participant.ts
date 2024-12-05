@@ -49,7 +49,7 @@ export class Participant {
   // Audio
   public readonly audioStream = observable<MediaStream | undefined>();
   public readonly isMuted = observable(false);
-  public readonly isHandUp = observable(false);
+  public readonly handRaisedAt = observable<number | null>(null);
 
   constructor(
     public readonly user: User,

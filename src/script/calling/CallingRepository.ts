@@ -724,11 +724,13 @@ export class CallingRepository {
    * Handle incoming calling events from backend.
    */
   onCallEvent = async (event: CallingEvent, source: string): Promise<void> => {
+    console.info('BARDIA CALLING EVENT', {event, source});
+
     if (this.isSoftLock) {
       return;
     }
 
-    const {content, qualified_conversation, from, qualified_from} = event;
+    const {content, qualified_conversation, from, qualified_from, time} = event;
     const isFederated = this.core.backendFeatures.isFederated && qualified_conversation && qualified_from;
     const userId = isFederated ? qualified_from : {domain: '', id: from};
     const conversationId = this.extractTargetedConversationId(event);
@@ -854,17 +856,19 @@ export class CallingRepository {
         const isSelf = matchQualifiedIds(this.selfUser.qualifiedId, userId);
 
         const {isHandUp} = content;
-        participant.isHandUp(isHandUp);
+        const handRaisedAt = time ? new Date(time).getTime() : new Date().getTime();
+        participant.handRaisedAt(isHandUp ? handRaisedAt : null);
+
+        if (!isHandUp) {
+          break;
+        }
 
         const name = participant.user.name();
         const handUpMessage = isSelf
           ? t('videoCallParticipantRaisedSelfHandUp')
           : t('videoCallParticipantRaisedTheirHandUp', {name});
-        const handDownMessage = isSelf
-          ? t('videoCallParticipantRaisedSelfHandDown')
-          : t('videoCallParticipantRaisedTheirHandDown', {name});
 
-        showAppNotification(isHandUp ? handUpMessage : handDownMessage);
+        showAppNotification(handUpMessage);
 
         break;
       }
