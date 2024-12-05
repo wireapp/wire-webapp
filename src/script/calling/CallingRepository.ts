@@ -724,8 +724,6 @@ export class CallingRepository {
    * Handle incoming calling events from backend.
    */
   onCallEvent = async (event: CallingEvent, source: string): Promise<void> => {
-    console.info('BARDIA CALLING EVENT', {event, source});
-
     if (this.isSoftLock) {
       return;
     }
