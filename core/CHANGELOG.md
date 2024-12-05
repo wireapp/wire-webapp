@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [46.12.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.11.6...@wireapp/core@46.12.0) (2024-12-05)
+
+### Features
+
+* update core-crypto to 2.0.0 [WPB-11654] ([#6730](https://github.com/wireapp/wire-web-packages/issues/6730)) ([4f8ca82](https://github.com/wireapp/wire-web-packages/commit/4f8ca82437055e5f3560314e0ecef3701e6c5f31))
+
 ## [46.11.6](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.11.5...@wireapp/core@46.11.6) (2024-12-04)
 
 **Note:** Version bump only for package @wireapp/core
