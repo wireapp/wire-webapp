@@ -153,8 +153,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   const emojiBarRef = useRef(null);
   const emojiBarToggleButtonRef = useRef(null);
 
-  useClickOutside(emojiBarRef, () => setShowEmojisBar(false), emojiBarToggleButtonRef);
-
   const {blurredVideoStream} = useKoSubscribableChildren(selfParticipant, ['blurredVideoStream']);
   const hasBlurredBackground = !!blurredVideoStream;
 
@@ -188,11 +186,12 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   ]);
 
   const {selfUser, roles} = useKoSubscribableChildren(conversation, ['selfUser', 'roles']);
-  const {emojis, viewMode, isScreenSharingSourceFromDetachedWindow} = useKoSubscribableChildren(callState, [
-    'emojis',
-    'viewMode',
-    'isScreenSharingSourceFromDetachedWindow',
-  ]);
+  const {emojis, viewMode, detachedWindow, isScreenSharingSourceFromDetachedWindow} = useKoSubscribableChildren(
+    callState,
+    ['emojis', 'viewMode', 'detachedWindow', 'isScreenSharingSourceFromDetachedWindow'],
+  );
+
+  useClickOutside(emojiBarRef, () => setShowEmojisBar(false), emojiBarToggleButtonRef, detachedWindow?.document);
 
   const [audioOptionsOpen, setAudioOptionsOpen] = useState(false);
   const [videoOptionsOpen, setVideoOptionsOpen] = useState(false);
