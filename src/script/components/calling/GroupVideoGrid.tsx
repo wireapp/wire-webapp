@@ -189,7 +189,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
             </span>
           )}
           {selfHandRaisedAt && !minimized && (
-            <span className="group-video-grid__element__label__hand_icon" data-uie-name="status-call-audio-muted">
+            <span className="group-video-grid__element__label__hand_icon small" data-uie-name="status-call-audio-muted">
               ✋
             </span>
           )}
@@ -212,7 +212,10 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
               </span>
             )}
             {selfHandRaisedAt && !minimized && (
-              <span className="group-video-grid__element__label__hand_icon" data-uie-name="status-call-audio-muted">
+              <span
+                className="group-video-grid__element__label__hand_icon small"
+                data-uie-name="status-call-audio-muted"
+              >
                 ✋
               </span>
             )}

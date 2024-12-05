@@ -21,7 +21,6 @@ import React, {useEffect, useRef, useState} from 'react';
 
 import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation/';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
-import classNames from 'classnames';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
@@ -35,7 +34,6 @@ import {
   IconButtonVariant,
   Select,
   RaiseHandIcon,
-  RaiseHandOffIcon,
 } from '@wireapp/react-ui-kit';
 
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
@@ -788,7 +786,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                             toggleCallView();
                           }
                         }}
-                        className={classNames('video-controls__button_primary', {active: isCallViewOpen})}
+                        className={cx('video-controls__button_primary', {active: isCallViewOpen})}
                         onClick={toggleCallView}
                         onKeyDown={event => handleKeyDown(event, toggleCallView)}
                         type="button"
@@ -833,7 +831,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                         data-uie-value={isHandRaised ? 'active' : 'inactive'}
                         onClick={() => toggleIsHandRaised(isHandRaised)}
                         onKeyDown={event => handleKeyDown(event, () => toggleIsHandRaised(isHandRaised))}
-                        className={classNames('video-controls__button_primary', {active: isHandRaised})}
+                        className={cx('video-controls__button_primary', {active: isHandRaised})}
                         type="button"
                         data-uie-name="do-toggle-hand-raise"
                         role="switch"
@@ -844,11 +842,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                             : t('videoCallOverlayShowParticipantsList')
                         }
                       >
-                        {isHandRaised ? (
-                          <RaiseHandOffIcon width={16} height={16} />
-                        ) : (
-                          <RaiseHandIcon width={16} height={16} />
-                        )}
+                        <RaiseHandIcon width={16} height={16} />
                       </button>
                     </li>
                   )}
@@ -873,7 +867,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                                 key={emoji}
                                 disabled={isDisabled}
                                 onClick={() => onEmojiClick(emoji)}
-                                className={classNames({disabled: isDisabled})}
+                                className={cx({disabled: isDisabled})}
                               >
                                 {emoji}
                               </button>
@@ -884,7 +878,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                       <button
                         ref={emojiBarToggleButtonRef}
                         title={t('callReactions')}
-                        className={classNames('video-controls__button_primary', {active: showEmojisBar})}
+                        className={cx('video-controls__button_primary', {active: showEmojisBar})}
                         onClick={() => setShowEmojisBar(prev => !prev)}
                         type="button"
                         aria-labelledby="show-emoji-bar"
@@ -899,7 +893,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                       data-uie-value={isParticipantsListOpen ? 'active' : 'inactive'}
                       onClick={toggleParticipantsList}
                       onKeyDown={event => handleKeyDown(event, toggleParticipantsList)}
-                      className={classNames('video-controls__button_primary', {active: isParticipantsListOpen})}
+                      className={cx('video-controls__button_primary', {active: isParticipantsListOpen})}
                       type="button"
                       data-uie-name="do-toggle-call-participants-list"
                       role="switch"
