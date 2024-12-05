@@ -19,4 +19,9 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const toolTipStyles: CSSObject = {gap: '0.2rem'};
+export const toolTipStyles: CSSObject = {
+  gap: '0.2rem',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+};

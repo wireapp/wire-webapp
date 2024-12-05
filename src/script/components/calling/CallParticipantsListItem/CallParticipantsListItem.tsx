@@ -110,7 +110,7 @@ export const CallParticipantsListItem = ({
           onDropdownClick={event => onContextMenu?.(event as unknown as React.MouseEvent<HTMLDivElement>)}
         />
 
-        <CallParticipantsListItemHandRaiseIcon handRaisedAt={handRaisedAt} />
+        <CallParticipantsListItemHandRaiseIcon handRaisedAt={{value: handRaisedAt}} />
 
         {isAudioEstablished ? (
           <>

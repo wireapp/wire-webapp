@@ -17,7 +17,7 @@
  *
  */
 
-import {observable, Observable} from 'knockout';
+import {Observable} from 'knockout';
 
 import {InviteIcon, Tooltip} from '@wireapp/react-ui-kit';
 
@@ -28,13 +28,11 @@ import {formatDuration} from 'Util/TimeUtil';
 import {toolTipStyles} from './CallParticipantsListItemHandRaiseIcon.styles';
 
 export interface CallParticipantsListItemHandRaiseIconProps {
-  handRaisedAt?: Observable<number | null>;
+  handRaisedAt: {value: Observable<number | null>};
 }
 
-export function CallParticipantsListItemHandRaiseIcon({
-  handRaisedAt = observable(null),
-}: CallParticipantsListItemHandRaiseIconProps) {
-  const {handRaisedAt: handRaisedAtValue} = useKoSubscribableChildren({handRaisedAt}, ['handRaisedAt']);
+export function CallParticipantsListItemHandRaiseIcon({handRaisedAt}: CallParticipantsListItemHandRaiseIconProps) {
+  const {value: handRaisedAtValue} = useKoSubscribableChildren(handRaisedAt, ['value']);
 
   if (!handRaisedAtValue) {
     return null;
@@ -44,7 +42,7 @@ export function CallParticipantsListItemHandRaiseIcon({
     <>
       <Tooltip
         body={
-          <div className="flex-center" css={toolTipStyles}>
+          <div css={toolTipStyles}>
             <InviteIcon />
             <span>
               {t('videoCallParticipantRaisedHandRaiseDuration', {
