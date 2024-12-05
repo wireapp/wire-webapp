@@ -41,7 +41,6 @@ export function CallParticipantsListItemHandRaiseIcon({
   return (
     <>
       <Tooltip
-        className="message-header-icon-guest"
         body={
           <div className="flex-center" style={{gap: '0.2rem'}}>
             <InviteIcon />

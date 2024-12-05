@@ -21,13 +21,15 @@ import React from 'react';
 
 import cx from 'classnames';
 
+import {Tooltip} from '@wireapp/react-ui-kit';
+
 import {CallParticipantsListItem} from 'Components/calling/CallParticipantsListItem';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
-import {labelStyles} from './CallingParticipantList.styles';
+import {labelStyles, labelWithIconStyles} from './CallingParticipantList.styles';
 
 import {CallingRepository} from '../../../../calling/CallingRepository';
 import {Participant} from '../../../../calling/Participant';
@@ -93,8 +95,11 @@ export const CallingParticipantList = ({
       <FadingScrollbar className="call-ui__participant-list__container">
         {handRaisedParticipants.length > 0 && (
           <>
-            <p css={labelStyles}>
+            <p css={labelWithIconStyles}>
               {t('videoCallOverlayParticipantsRaisedHandListLabel', {count: handRaisedParticipants.length})}
+              <Tooltip body={t('videoCallParticipantRaisedSortByTime')} data-uie-name="hand-sort-info">
+                <Icon.InfoIcon />
+              </Tooltip>
             </p>
             <ul className="call-ui__participant-list" data-uie-name="list-call-ui-participants">
               {handRaisedParticipants.map((participant, index, participantsArray) => (
