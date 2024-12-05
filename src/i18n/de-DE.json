@@ -1508,7 +1508,7 @@
   "teamCreationSuccessListItem1": "Ihre ersten Team-Mitglieder einzuladen und mit der Zusammenarbeit zu beginnen",
   "teamCreationSuccessListItem2": "Ihre Team-Einstellungen anzupassen",
   "teamCreationSuccessListTitle": "Öffnen Sie Team-Management, um:",
-  "teamCreationSuccessSubTitle": "Sie sind jetzt Besitzer des Teams {teamName}.",
+  "teamCreationSuccessSubTitle": "You’re now the owner of the team {teamName}.",
   "teamCreationSuccessTitle": "Herzlichen Glückwunsch {name}!",
   "teamCreationTitle": "Erstellen Sie Ihr Team",
   "teamName.headline": "Team benennen",
