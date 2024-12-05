@@ -17,7 +17,7 @@
  *
  */
 
-import {MLSStatuses, WireIdentity} from 'src/script/E2EIdentity';
+import {E2EIHandler, MLSStatuses, WireIdentity} from 'src/script/E2EIdentity';
 import {t} from 'Util/LocalizerUtil';
 import {splitFingerprint} from 'Util/StringUtil';
 
@@ -39,6 +39,7 @@ export const MLSDeviceDetails = ({isCurrentDevice, identity, isSelfUser = false}
   }
 
   const certificateState = identity?.status ?? MLSStatuses.NOT_ACTIVATED;
+  const isE2EIEnabled = E2EIHandler.getInstance().isE2EIEnabled();
 
   if (!isSelfUser && certificateState === MLSStatuses.NOT_ACTIVATED) {
     return null;
@@ -58,7 +59,7 @@ export const MLSDeviceDetails = ({isCurrentDevice, identity, isSelfUser = false}
         </>
       )}
 
-      {(isSelfUser || (!isSelfUser && certificateState !== MLSStatuses.NOT_ACTIVATED)) && (
+      {isE2EIEnabled && (isSelfUser || (!isSelfUser && certificateState !== MLSStatuses.NOT_ACTIVATED)) && (
         <E2EICertificateDetails identity={identity} isCurrentDevice={isCurrentDevice} />
       )}
     </div>
