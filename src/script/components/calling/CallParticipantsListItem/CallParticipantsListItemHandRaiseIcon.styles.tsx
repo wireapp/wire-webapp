@@ -19,13 +19,9 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const labelStyles: CSSObject = {
-  padding: '12px 10px',
-  fontWeight: 'var(--font-weight-semibold)',
-};
-
-export const labelWithIconStyles: CSSObject = {
-  ...labelStyles,
+export const toolTipStyles: CSSObject = {
+  gap: '0.2rem',
   display: 'flex',
-  justifyContent: 'space-between',
+  alignItems: 'center',
+  justifyContent: 'center',
 };

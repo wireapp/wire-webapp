@@ -20,9 +20,11 @@
 import React from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+import {observable, Observable} from 'knockout';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {UserStatusBadges} from 'Components/Badge';
+import {CallParticipantsListItemHandRaiseIcon} from 'Components/calling/CallParticipantsListItem/CallParticipantsListItemHandRaiseIcon';
 import {Participant} from 'src/script/calling/Participant';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
@@ -44,6 +46,7 @@ export interface CallParticipantsListItemProps {
   onContextMenu: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   isSelfVerified?: boolean;
   isLast?: boolean;
+  handRaisedAt?: Observable<number | null>;
 }
 
 export const CallParticipantsListItem = ({
@@ -52,6 +55,7 @@ export const CallParticipantsListItem = ({
   showContextMenu,
   onContextMenu,
   isLast = false,
+  handRaisedAt = observable(null),
 }: CallParticipantsListItemProps) => {
   const {user} = callParticipant;
   const {isMe: isSelf, isFederated} = user;
@@ -105,6 +109,8 @@ export const CallParticipantsListItem = ({
           showContextMenu={showContextMenu}
           onDropdownClick={event => onContextMenu?.(event as unknown as React.MouseEvent<HTMLDivElement>)}
         />
+
+        <CallParticipantsListItemHandRaiseIcon handRaisedAt={{value: handRaisedAt}} />
 
         {isAudioEstablished ? (
           <>

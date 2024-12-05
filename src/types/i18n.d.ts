@@ -1607,7 +1607,12 @@ declare module 'I18n/en-US.json' {
     'videoCallOverlayMicrophone': `Microphone`;
     'videoCallOverlayOpenFullScreen': `Open the call in full screen`;
     'videoCallOverlayOpenPopupWindow': `Open in a new window`;
+    'videoCallOverlayParticipantsRaisedHandListLabel': `Hand raised ({count})`;
     'videoCallOverlayParticipantsListLabel': `Participants ({count})`;
+    'videoCallParticipantRaisedTheirHandUp': `{name} has raised their hand up`;
+    'videoCallParticipantRaisedSortByTime': `Person waiting the longest is on the top of the list.`;
+    'videoCallParticipantRaisedHandRaiseDuration': `Hand raised for {duration}`;
+    'videoCallParticipantRaisedSelfHandUp': `You have raised your hand up`;
     'videoCallOverlayShareScreen': `Share Screen`;
     'videoCallOverlayShowParticipantsList': `Show participants list`;
     'videoCallOverlayViewModeAll': `Show all participants`;
