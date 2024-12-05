@@ -25,6 +25,8 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatDuration} from 'Util/TimeUtil';
 
+import {toolTipStyles} from './CallParticipantsListItemHandRaiseIcon.styles';
+
 export interface CallParticipantsListItemHandRaiseIconProps {
   handRaisedAt?: Observable<number | null>;
 }
@@ -42,7 +44,7 @@ export function CallParticipantsListItemHandRaiseIcon({
     <>
       <Tooltip
         body={
-          <div className="flex-center" style={{gap: '0.2rem'}}>
+          <div className="flex-center" css={toolTipStyles}>
             <InviteIcon />
             <span>
               {t('videoCallParticipantRaisedHandRaiseDuration', {
