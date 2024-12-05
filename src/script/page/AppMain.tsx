@@ -95,8 +95,6 @@ export const AppMain: FC<AppMainProps> = ({
 
   useInitializeRootFontSize();
 
-  const {showSmallOffset, showLargeOffset} = useWarnings();
-
   if (!apiContext) {
     throw new Error('API Context has not been set');
   }
@@ -113,6 +111,8 @@ export const AppMain: FC<AppMainProps> = ({
     'desktopScreenShareMenu',
     'viewMode',
   ]);
+
+  const {showSmallOffset, showLargeOffset} = useWarnings();
 
   const teamState = container.resolve(TeamState);
   const userState = container.resolve(UserState);
