@@ -100,7 +100,7 @@ export const CallingParticipantList = ({
               {handRaisedParticipants.map((participant, index, participantsArray) => (
                 <li key={participant.clientId} className="call-ui__participant-list__participant">
                   <CallParticipantsListItem
-                    isHandRaised
+                    handRaisedAt={participant.handRaisedAt}
                     key={participant.clientId}
                     callParticipant={participant}
                     isSelfVerified={isSelfVerified}

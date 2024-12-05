@@ -1610,6 +1610,7 @@ declare module 'I18n/en-US.json' {
     'videoCallOverlayParticipantsRaisedHandListLabel': `Hand raised ({count})`;
     'videoCallOverlayParticipantsListLabel': `Participants ({count})`;
     'videoCallParticipantRaisedTheirHandUp': `{name} has raised their hand up`;
+    'videoCallParticipantRaisedHandRaiseDuration': `Hand raised for {duration}`;
     'videoCallParticipantRaisedSelfHandUp': `You have raised your hand up`;
     'videoCallOverlayShareScreen': `Share Screen`;
     'videoCallOverlayShowParticipantsList': `Show participants list`;
