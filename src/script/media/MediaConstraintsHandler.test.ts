@@ -100,6 +100,7 @@ describe('MediaConstraintsHandler', () => {
       expect((constraints?.video as MediaTrackConstraintsExt).mandatory).toEqual({
         chromeMediaSource: 'desktop',
         chromeMediaSourceId: 'camera',
+        maxFrameRate: 5,
       });
     });
 
