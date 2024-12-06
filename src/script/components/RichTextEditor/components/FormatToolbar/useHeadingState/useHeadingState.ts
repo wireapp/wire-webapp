@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect} from 'react';
+import {useEffect} from 'react';
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {$getSelection, $isRangeSelection, $createParagraphNode, createCommand} from 'lexical';
@@ -31,14 +31,9 @@ const INSERT_HEADING_COMMAND = createCommand();
 export const useHeadingState = () => {
   const [editor] = useLexicalComposerContext();
 
-  const registerHeadingCommand = useCallback(() => {
-    editor.registerCommand(INSERT_HEADING_COMMAND, headingCommand, 0);
-  }, [editor]);
-
   useEffect(() => {
-    const unregister = registerHeadingCommand();
-    return unregister;
-  }, [registerHeadingCommand]);
+    return editor.registerCommand(INSERT_HEADING_COMMAND, headingCommand, 0);
+  }, [editor]);
 
   const toggleHeading = () => {
     editor.update(() => {
