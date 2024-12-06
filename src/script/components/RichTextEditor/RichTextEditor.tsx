@@ -19,13 +19,21 @@
 
 import {ReactElement, useRef} from 'react';
 
+import {CodeHighlightNode, CodeNode} from '@lexical/code';
+import {LinkNode} from '@lexical/link';
+import {ListItemNode, ListNode} from '@lexical/list';
+import {$convertToMarkdownString, TRANSFORMERS} from '@lexical/markdown';
 import {ClearEditorPlugin} from '@lexical/react/LexicalClearEditorPlugin';
 import {InitialConfigType, LexicalComposer} from '@lexical/react/LexicalComposer';
 import {ContentEditable} from '@lexical/react/LexicalContentEditable';
 import {EditorRefPlugin} from '@lexical/react/LexicalEditorRefPlugin';
-import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary';
+import {LexicalErrorBoundary} from '@lexical/react/LexicalErrorBoundary';
+import {HorizontalRuleNode} from '@lexical/react/LexicalHorizontalRuleNode';
+import {ListPlugin} from '@lexical/react/LexicalListPlugin';
+import {MarkdownShortcutPlugin} from '@lexical/react/LexicalMarkdownShortcutPlugin';
 import {OnChangePlugin} from '@lexical/react/LexicalOnChangePlugin';
-import {PlainTextPlugin} from '@lexical/react/LexicalPlainTextPlugin';
+import {RichTextPlugin} from '@lexical/react/LexicalRichTextPlugin';
+import {HeadingNode, QuoteNode} from '@lexical/rich-text';
 import cx from 'classnames';
 import {LexicalEditor, EditorState, $nodesOfType} from 'lexical';
 
@@ -34,11 +42,12 @@ import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {User} from 'src/script/entity/User';
 import {getLogger} from 'Util/Logger';
 
+import {FormatToolbar} from './components/FormatToolbar/FormatToolbar';
 import {EmojiNode} from './nodes/EmojiNode';
 import {MentionNode} from './nodes/MentionNode';
 import {AutoFocusPlugin} from './plugins/AutoFocusPlugin';
 import {DraftStatePlugin} from './plugins/DraftStatePlugin';
-import {EditedMessagePlugin} from './plugins/EditedMessagePlugin';
+import {EditedMessagePlugin} from './plugins/EditedMessagePlugin/EditedMessagePlugin';
 import {EmojiPickerPlugin} from './plugins/EmojiPickerPlugin';
 import {GlobalEventsPlugin} from './plugins/GlobalEventsPlugin';
 import {HistoryPlugin} from './plugins/HistoryPlugin';
@@ -46,7 +55,6 @@ import {findAndTransformEmoji, ReplaceEmojiPlugin} from './plugins/InlineEmojiRe
 import {MentionsPlugin} from './plugins/MentionsPlugin';
 import {ReplaceCarriageReturnPlugin} from './plugins/ReplaceCarriageReturnPlugin/ReplaceCarriageReturnPlugin';
 import {SendPlugin} from './plugins/SendPlugin';
-import {TextChangePlugin} from './plugins/TextChangePlugin';
 
 import {MentionEntity} from '../../message/MentionEntity';
 
@@ -58,6 +66,22 @@ const theme = {
   mentions: {
     '@': `at-mentions`, // use the trigger name as the key
     '@Focused': 'focused-mentions', // add the "Focused" suffix to style the focused mention
+  },
+  text: {
+    bold: 'editor-bold',
+    italic: 'editor-italic',
+    underline: 'editor-underline',
+    strikethrough: 'editor-strikethrough',
+    code: 'editor-code',
+  },
+  list: {
+    ul: 'editor-list editor-list--unordered',
+    ol: 'editor-list editor-list--ordered',
+  },
+  heading: {
+    h1: 'editor-heading editor-heading--1',
+    h2: 'editor-heading editor-heading--2',
+    h3: 'editor-heading editor-heading--3',
   },
 };
 
@@ -74,6 +98,7 @@ interface RichTextEditorProps {
   editedMessage?: ContentMessage;
   children: ReactElement;
   hasLocalEphemeralTimer: boolean;
+  showFormatToolbar: boolean;
   getMentionCandidates: (search?: string | null) => User[];
   saveDraftState: (editor: string) => void;
   loadDraftState: () => Promise<DraftState>;
@@ -112,12 +137,33 @@ const parseMentions = (editor: LexicalEditor, textValue: string, mentions: User[
   });
 };
 
+const editorConfig: InitialConfigType = {
+  namespace: 'WireLexicalEditor',
+  theme,
+  onError(error: unknown) {
+    logger.error(error);
+  },
+  nodes: [
+    MentionNode,
+    EmojiNode,
+    ListItemNode,
+    ListNode,
+    HeadingNode,
+    HorizontalRuleNode,
+    QuoteNode,
+    CodeNode,
+    CodeHighlightNode,
+    LinkNode,
+  ],
+};
+
 export const RichTextEditor = ({
   placeholder,
   children,
   hasLocalEphemeralTimer,
   replaceEmojis,
   editedMessage,
+  showFormatToolbar,
   onUpdate,
   saveDraftState,
   loadDraftState,
@@ -129,48 +175,51 @@ export const RichTextEditor = ({
   onSend,
   onSetup = () => {},
 }: RichTextEditorProps) => {
-  // Emojis
+  const editorRef = useRef<LexicalEditor | null>(null);
   const emojiPickerOpen = useRef<boolean>(true);
   const mentionsOpen = useRef<boolean>(true);
 
-  const editorConfig: InitialConfigType = {
-    namespace: 'WireLexicalEditor',
-    theme,
-    onError(error: unknown) {
-      logger.error(error);
-    },
-    nodes: [MentionNode, EmojiNode],
-  };
-
-  const saveDraft = (editorState: EditorState) => {
+  const handleChange = (editorState: EditorState) => {
     saveDraftState(JSON.stringify(editorState.toJSON()));
-  };
 
-  const parseUpdatedText = (editor: LexicalEditor, textValue: string) => {
-    onUpdate({
-      text: replaceEmojis ? findAndTransformEmoji(textValue) : textValue,
-      mentions: parseMentions(editor, textValue, getMentionCandidates()),
+    editorState.read(() => {
+      if (!editorRef.current) {
+        return;
+      }
+
+      const markdown = $convertToMarkdownString(TRANSFORMERS);
+
+      onUpdate({
+        text: replaceEmojis ? findAndTransformEmoji(markdown) : markdown,
+        mentions: parseMentions(editorRef.current!, markdown, getMentionCandidates()),
+      });
     });
   };
 
   return (
     <LexicalComposer initialConfig={editorConfig}>
-      <div className="controls-center">
+      <div className="controls-center input-bar-field">
         <div className="input-bar--wrapper">
           <AutoFocusPlugin />
           <GlobalEventsPlugin onShiftTab={onShiftTab} onEscape={onEscape} onArrowUp={onArrowUp} onBlur={onBlur} />
-          <EditorRefPlugin editorRef={onSetup} />
+          <EditorRefPlugin
+            editorRef={editor => {
+              editorRef.current = editor;
+              onSetup(editor!);
+            }}
+          />
           <DraftStatePlugin loadDraftState={loadDraftState} />
           <EditedMessagePlugin message={editedMessage} />
 
           <EmojiPickerPlugin openStateRef={emojiPickerOpen} />
           <HistoryPlugin />
-
+          <ListPlugin />
           {replaceEmojis && <ReplaceEmojiPlugin />}
 
           <ReplaceCarriageReturnPlugin />
+          <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
 
-          <PlainTextPlugin
+          <RichTextPlugin
             contentEditable={<ContentEditable className="conversation-input-bar-text" data-uie-name="input-message" />}
             placeholder={<Placeholder text={placeholder} hasLocalEphemeralTimer={hasLocalEphemeralTimer} />}
             ErrorBoundary={LexicalErrorBoundary}
@@ -182,8 +231,8 @@ export const RichTextEditor = ({
             openStateRef={mentionsOpen}
           />
 
-          <OnChangePlugin onChange={saveDraft} ignoreSelectionChange />
-          <TextChangePlugin onUpdate={parseUpdatedText} />
+          <OnChangePlugin onChange={handleChange} ignoreSelectionChange />
+
           <SendPlugin
             onSend={() => {
               if (!mentionsOpen.current && !emojiPickerOpen.current) {
@@ -193,7 +242,7 @@ export const RichTextEditor = ({
           />
         </div>
       </div>
-
+      {showFormatToolbar && <FormatToolbar />}
       {children}
     </LexicalComposer>
   );

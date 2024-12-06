@@ -17,16 +17,16 @@
  *
  */
 
-import {useState, useEffect, useRef, FC, RefObject} from 'react';
+import {useState, useEffect, useRef, RefObject} from 'react';
 
-import EmojiPicker, {EmojiClickData, EmojiStyle, SkinTones} from 'emoji-picker-react';
+import EmojiPickerReact, {EmojiClickData, EmojiStyle, SkinTones} from 'emoji-picker-react';
 import {createPortal} from 'react-dom';
 
 import {useClickOutside} from 'src/script/hooks/useClickOutside';
 import {isEnterKey, isEscapeKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
-interface EmojiPickerContainerProps {
+interface EmojiPickerProps {
   posX: number;
   posY: number;
   onKeyPress: () => void;
@@ -35,14 +35,14 @@ interface EmojiPickerContainerProps {
   handleReactionClick: (emoji: string) => void;
 }
 
-const EmojiPickerContainer: FC<EmojiPickerContainerProps> = ({
+export const EmojiPicker = ({
   posX,
   posY,
   onKeyPress,
   resetActionMenuStates,
   wrapperRef,
   handleReactionClick,
-}) => {
+}: EmojiPickerProps) => {
   const emojiRef = useRef<HTMLDivElement>(null);
   useClickOutside(emojiRef, resetActionMenuStates, wrapperRef);
   const [style, setStyle] = useState<object>({
@@ -128,7 +128,7 @@ const EmojiPickerContainer: FC<EmojiPickerContainerProps> = ({
               event.stopPropagation();
             }}
           >
-            <EmojiPicker
+            <EmojiPickerReact
               emojiStyle={EmojiStyle.NATIVE}
               onEmojiClick={onEmojiClick}
               searchPlaceHolder={t('accessibility.emojiPickerSearchPlaceholder')}
@@ -141,5 +141,3 @@ const EmojiPickerContainer: FC<EmojiPickerContainerProps> = ({
     </>
   );
 };
-
-export {EmojiPickerContainer};
