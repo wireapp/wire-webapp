@@ -30,11 +30,7 @@ describe('ImageUploadButton', () => {
     const onSelectImages = jest.fn();
 
     const {container} = render(
-      <ImageUploadButton
-        onSelectImages={onSelectImages}
-        acceptedImageTypes={ALLOWED_IMAGE_TYPES}
-        hasRoundedCorners={true}
-      />,
+      <ImageUploadButton onSelectImages={onSelectImages} acceptedImageTypes={ALLOWED_IMAGE_TYPES} hasRoundedCorners />,
     );
     const fileInput = container.querySelector('input[type="file"]') as HTMLInputElement;
 
@@ -49,11 +45,7 @@ describe('ImageUploadButton', () => {
     const onSelectImages = jest.fn();
 
     const {container} = render(
-      <ImageUploadButton
-        onSelectImages={onSelectImages}
-        acceptedImageTypes={ALLOWED_IMAGE_TYPES}
-        hasRoundedCorners={true}
-      />,
+      <ImageUploadButton onSelectImages={onSelectImages} acceptedImageTypes={ALLOWED_IMAGE_TYPES} hasRoundedCorners />,
     );
 
     const form = container.querySelector('form');
