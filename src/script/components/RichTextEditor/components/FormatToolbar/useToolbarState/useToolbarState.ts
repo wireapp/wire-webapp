@@ -62,9 +62,7 @@ export const useToolbarState = () => {
       return undefined;
     }
 
-    const unregister = editor.registerUpdateListener(updateToolbar);
-
-    return unregister;
+    return editor.registerUpdateListener(updateToolbar);
   }, [editor, updateToolbar]);
 
   return {activeFormats};
