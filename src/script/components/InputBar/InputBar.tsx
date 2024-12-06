@@ -562,7 +562,7 @@ export const InputBar = ({
 
   const enableSending = textValue.length > 0;
 
-  const showAvatar = messageFormatButtonsEnabled ? true : !!textValue.length;
+  const showAvatar = messageFormatButtonsEnabled || !!textValue.length;
 
   return (
     <div ref={wrapperRef}>
