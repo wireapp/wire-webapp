@@ -17,24 +17,35 @@
  *
  */
 
-import {Observable} from 'knockout';
+import {useEffect, useState} from 'react';
+
+import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 
 import {InviteIcon, Tooltip} from '@wireapp/react-ui-kit';
 
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatDuration} from 'Util/TimeUtil';
 
 import {toolTipStyles} from './CallParticipantsListItemHandRaiseIcon.styles';
 
 export interface CallParticipantsListItemHandRaiseIconProps {
-  handRaisedAt: {value: Observable<number | null>};
+  handRaisedAt: number;
 }
 
 export function CallParticipantsListItemHandRaiseIcon({handRaisedAt}: CallParticipantsListItemHandRaiseIconProps) {
-  const {value: handRaisedAtValue} = useKoSubscribableChildren(handRaisedAt, ['value']);
+  const [duration, setDuration] = useState<string>();
 
-  if (!handRaisedAtValue) {
+  useEffect(() => {
+    const timerId = setTimeout(() => {
+      setDuration(formatDuration(Date.now() - handRaisedAt + TimeInMillis.SECOND).text);
+    }, TimeInMillis.SECOND);
+
+    return () => {
+      clearTimeout(timerId);
+    };
+  });
+
+  if (!duration) {
     return null;
   }
 
@@ -46,7 +57,7 @@ export function CallParticipantsListItemHandRaiseIcon({handRaisedAt}: CallPartic
             <InviteIcon />
             <span>
               {t('videoCallParticipantRaisedHandRaiseDuration', {
-                duration: formatDuration(Date.now() - handRaisedAtValue).text,
+                duration,
               })}
             </span>
           </div>
