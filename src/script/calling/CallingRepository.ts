@@ -1020,6 +1020,9 @@ export class CallingRepository {
 
     try {
       const mediaStream = await this.getMediaStream({audio: true, screen: true}, call.isGroupOrConference);
+      if ('contentHint' in mediaStream.getVideoTracks()[0]) {
+        mediaStream.getVideoTracks()[0].contentHint = 'detail';
+      }
 
       // If the screen share is stopped by the os system or the browser, an "ended" event is triggered. We listen for
       // this event to clean up the screen share state in this case.
