@@ -7,7 +7,7 @@
     "@wireapp/commons": "5.4.0",
     "dotenv": "16.4.5",
     "dotenv-extended": "2.9.0",
-    "express": "4.21.1",
+    "express": "4.21.2",
     "express-sitemap-xml": "3.1.0",
     "express-useragent": "1.0.15",
     "fs-extra": "11.2.0",
