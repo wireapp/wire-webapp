@@ -41,7 +41,7 @@ export const DetailedDevice: React.FC<DeviceProps> = ({
   getDeviceIdentity,
   isProteusVerified,
 }) => {
-  const getIdentity = getDeviceIdentity ? () => getDeviceIdentity(device.id) : undefined;
+  const getIdentity = () => getDeviceIdentity?.(device.id);
 
   return (
     <>

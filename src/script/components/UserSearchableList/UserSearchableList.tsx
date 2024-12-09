@@ -94,7 +94,7 @@ export const UserSearchableList = ({
       // We shouldn't show any members that have the 'external' role and are not already locally known.
       const nonExternalMembers = await teamRepository.filterExternals(uniqueMembers);
       setRemoteTeamMembers(
-        filterRemoteTeamUsers ? teamRepository.filterRemoteDomainUsers(nonExternalMembers) : nonExternalMembers,
+        filterRemoteTeamUsers ? await teamRepository.filterRemoteDomainUsers(nonExternalMembers) : nonExternalMembers,
       );
     }, 300),
     [],
@@ -103,6 +103,10 @@ export const UserSearchableList = ({
   // Filter all list items if a filter is provided
 
   useEffect(() => {
+    const setUsers = async (users: User[]) => {
+      setFilteredUsers(filterRemoteTeamUsers ? await teamRepository.filterRemoteDomainUsers(users) : users);
+    };
+
     const {query: normalizedQuery} = searchRepository.normalizeQuery(filter);
     const results = searchRepository
       .searchUserInSet(filter, users)
@@ -119,7 +123,7 @@ export const UserSearchableList = ({
     }
 
     if (!selfFirst) {
-      setFilteredUsers(filterRemoteTeamUsers ? teamRepository.filterRemoteDomainUsers(results) : results);
+      void setUsers(results);
       return;
     }
 
@@ -127,7 +131,7 @@ export const UserSearchableList = ({
     const [selfUser, otherUsers] = partition(results, user => user.isMe);
 
     const concatUsers = selfUser.concat(otherUsers);
-    setFilteredUsers(filterRemoteTeamUsers ? teamRepository.filterRemoteDomainUsers(concatUsers) : concatUsers);
+    void setUsers(concatUsers);
   }, [filter, users.length]);
 
   const foundUserEntities = () => {

@@ -23,6 +23,7 @@ import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
 import {
+  bannerHeaderContainerCss,
   teamUpgradeAccountBannerContainerCss,
   teamUpgradeBannerButtonCss,
   teamUpgradeBannerHeaderCss,
@@ -35,11 +36,13 @@ interface Props {
 export const TeamCreationAccountHeader = ({onClick}: Props) => {
   return (
     <div css={teamUpgradeAccountBannerContainerCss}>
-      <div>
-        <Icon.InfoIcon />
-        <span className="heading-h4" css={teamUpgradeBannerHeaderCss}>
-          {t('teamUpgradeBannerHeader')}
-        </span>
+      <div css={{flex: '1'}}>
+        <div css={bannerHeaderContainerCss}>
+          <Icon.InfoIcon />
+          <span className="heading-h4" css={teamUpgradeBannerHeaderCss}>
+            {t('teamUpgradeBannerHeader')}
+          </span>
+        </div>
         <div className="subline">{t('teamUpgradeBannerContent')}</div>
       </div>
       <Button css={teamUpgradeBannerButtonCss} variant={ButtonVariant.SECONDARY} onClick={onClick}>

@@ -33,7 +33,7 @@ export interface AccentColorPickerProps {
 }
 
 const headerStyles: CSSObject = {
-  lineHeight: '0.875rem',
+  lineHeight: 'var(--line-height-small-plus)',
   margin: '20px 0 6px',
   padding: 0,
   textAlign: 'center',

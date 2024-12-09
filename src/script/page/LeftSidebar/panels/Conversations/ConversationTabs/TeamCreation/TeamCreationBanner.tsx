@@ -31,6 +31,7 @@ import {Segmentation} from 'src/script/tracking/Segmentation';
 import {t} from 'Util/LocalizerUtil';
 
 import {
+  bannerHeaderContainerCss,
   bannerWrapperCss,
   iconButtonCss,
   teamUpgradeBannerButtonCss,
@@ -44,10 +45,12 @@ import {SidebarStatus, useSidebarStore} from '../../useSidebarStore';
 const Banner = ({onClick}: {onClick: () => void}) => {
   return (
     <div css={teamUpgradeBannerContainerCss}>
-      <Icon.InfoIcon />
-      <span className="heading-h4" css={teamUpgradeBannerHeaderCss}>
-        {t('teamUpgradeBannerHeader')}
-      </span>
+      <div css={bannerHeaderContainerCss}>
+        <Icon.InfoIcon />
+        <span className="heading-h4" css={teamUpgradeBannerHeaderCss}>
+          {t('teamUpgradeBannerHeader')}
+        </span>
+      </div>
       <div className="subline" css={teamUpgradeBannerContentCss}>
         {t('teamUpgradeBannerContent')}
       </div>

@@ -85,6 +85,7 @@ import {externalUrl} from '../externalRoute';
 import {IntegrationRepository} from '../integration/IntegrationRepository';
 import {IntegrationService} from '../integration/IntegrationService';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
+import {scheduleApiVersionUpdate, updateApiVersion} from '../lifecycle/updateRemoteConfigs';
 import {MediaRepository} from '../media/MediaRepository';
 import {initMLSGroupConversations, initialiseSelfAndTeamConversations} from '../mls';
 import {joinConversationsAfterMigrationFinalisation} from '../mls/MLSMigration/migrationFinaliser';
@@ -343,8 +344,8 @@ export class App {
   async initApp(clientType: ClientType, onProgress: (progress: number, message?: string) => void) {
     // add body information
     const startTime = Date.now();
-    const [apiVersionMin, apiVersionMax] = this.config.SUPPORTED_API_RANGE;
-    await this.core.useAPIVersion(apiVersionMin, apiVersionMax, this.config.ENABLE_DEV_BACKEND_API);
+    await updateApiVersion();
+    await scheduleApiVersionUpdate();
 
     const osCssClass = Runtime.isMacOS() ? 'os-mac' : 'os-pc';
     const platformCssClass = Runtime.isDesktopApp() ? 'platform-electron' : 'platform-web';

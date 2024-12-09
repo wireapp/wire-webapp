@@ -139,7 +139,7 @@ const AccountInput: FC<AccountInputProps> = ({
               alignItems: 'center',
               display: 'flex',
               height: 32,
-              lineHeight: '0.875rem',
+              lineHeight: 'var(--line-height-small-plus)',
               position: 'relative',
             }}
             data-uie-name={labelUie}

@@ -1508,7 +1508,7 @@
   "teamCreationSuccessListItem1": "Invite your first team members, and start working together",
   "teamCreationSuccessListItem2": "Customize your team settings",
   "teamCreationSuccessListTitle": "Go to Team Management to:",
-  "teamCreationSuccessSubTitle": "You’re now the owner of the team ({teamName}).",
+  "teamCreationSuccessSubTitle": "You’re now the owner of the team {teamName}.",
   "teamCreationSuccessTitle": "Congratulations {name}!",
   "teamCreationTitle": "Create your team",
   "teamName.headline": "チーム名",

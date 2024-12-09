@@ -723,8 +723,12 @@ export class CallingRepository {
       }
 
       case CALL_MESSAGE_TYPE.REMOTE_MUTE: {
-        const call = this.findCall(conversationId);
-        if (!call) {
+        const currentCall = this.callState.joinedCall();
+        if (
+          !currentCall ||
+          !matchQualifiedIds(currentCall.conversation.qualifiedId, conversationId) ||
+          !this.selfUser
+        ) {
           return;
         }
 
@@ -747,7 +751,7 @@ export class CallingRepository {
           return;
         }
 
-        this.muteCall(call, true, MuteState.REMOTE_MUTED);
+        this.muteCall(currentCall, true, MuteState.REMOTE_MUTED);
         return this.processCallingMessage(conversation, event);
       }
 

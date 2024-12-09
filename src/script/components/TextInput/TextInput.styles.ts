@@ -43,7 +43,7 @@ export const errorMessageCSS: CSSObject = {
   bottom: 4,
   color: 'var(--text-input-alert)',
   left: 0,
-  lineHeight: '0.875rem',
+  lineHeight: 'var(--line-height-small-plus)',
   position: 'absolute',
   textTransform: 'unset',
 };

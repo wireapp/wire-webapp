@@ -33,15 +33,15 @@ import {
 
 import {buttonCss} from '../TeamCreation.styles';
 
-const featuresList = [
-  t('teamCreationIntroListItem1'),
-  t('teamCreationIntroListItem2'),
-  t('teamCreationIntroListItem3'),
-  t('teamCreationIntroListItem4'),
-  t('teamCreationIntroListItem5'),
-];
-
 export const Introduction = ({onNextStep}: StepProps) => {
+  const featuresList = [
+    t('teamCreationIntroListItem1'),
+    t('teamCreationIntroListItem2'),
+    t('teamCreationIntroListItem3'),
+    t('teamCreationIntroListItem4'),
+    t('teamCreationIntroListItem5'),
+  ];
+
   return (
     <>
       <h2 className="heading-h2" data-uie-name="team-creation-intro-title">
