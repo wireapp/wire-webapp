@@ -38,6 +38,7 @@ import {actionRoot} from './module/action';
 import {Root} from './page/Root';
 
 import {Config} from '../Config';
+import {updateApiVersion} from '../lifecycle/updateRemoteConfigs';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
 
@@ -76,8 +77,7 @@ const render = (Component: FC): void => {
 const config = Config.getConfig();
 
 async function runApp() {
-  const [min, max] = config.SUPPORTED_API_RANGE;
-  const {domain} = await core.useAPIVersion(min, max, config.ENABLE_DEV_BACKEND_API);
+  const {domain} = await updateApiVersion();
   await initializeDataDog(config, {domain: domain});
 
   render(Root);
