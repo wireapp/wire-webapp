@@ -114,6 +114,10 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     void callingRepository.sendInCallEmoji(emoji, call);
   };
 
+  const sendHandRaised = (isHandUp: boolean, call: Call) => {
+    void callingRepository.sendInCallHandRaised(isHandUp, call);
+  };
+
   const switchSpeakerOutput = (deviceId: string) => {
     mediaDevicesHandler.currentDeviceId.audiooutput(deviceId);
   };
@@ -152,6 +156,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
           muteState={muteState}
           isChoosingScreen={isScreenshareActive}
           sendEmoji={sendEmoji}
+          sendHandRaised={sendHandRaised}
           switchCameraInput={switchCameraInput}
           switchMicrophoneInput={switchMicrophoneInput}
           switchSpeakerOutput={switchSpeakerOutput}

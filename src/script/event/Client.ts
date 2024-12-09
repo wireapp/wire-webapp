@@ -20,6 +20,7 @@
 export enum CALL {
   E_CALL = 'call.e-call',
   IN_CALL_EMOJI = 'call.in-call-emoji',
+  IN_CALL_HAND_RAISE = 'call.in-call-hand-raise',
 }
 
 export enum CONVERSATION {

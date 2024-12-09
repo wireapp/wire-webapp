@@ -72,6 +72,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
   const {
     isMuted,
     videoState,
+    handRaisedAt,
     videoStream,
     blurredVideoStream,
     isActivelySpeaking,
@@ -79,6 +80,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
     isSwitchingVideoResolution,
   } = useKoSubscribableChildren(participant, [
     'isMuted',
+    'handRaisedAt',
     'videoStream',
     'blurredVideoStream',
     'isActivelySpeaking',
@@ -238,6 +240,8 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
           <Icon.MicOffIcon data-uie-name="mic-icon-off" />
         </span>
       )}
+
+      {!minimized && handRaisedAt && <span className="group-video-grid__element__label__hand_icon">✋</span>}
 
       {isMaximized && (
         <div className="group-video-grid__element__overlay">

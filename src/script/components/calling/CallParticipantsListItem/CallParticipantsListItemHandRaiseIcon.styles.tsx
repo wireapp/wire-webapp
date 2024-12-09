@@ -17,18 +17,11 @@
  *
  */
 
-import {useWarningsState} from '../view_model/WarningsContainer/WarningsState';
-import {CONFIG, TYPE as type} from '../view_model/WarningsContainer/WarningsTypes';
+import {CSSObject} from '@emotion/react';
 
-export const useWarnings = () => {
-  const warnings = useWarningsState(state => state.warnings);
-  const visibleWarning = warnings[warnings.length - 1];
-  const isConnectivityRecovery = visibleWarning === type.CONNECTIVITY_RECOVERY;
-  const hasOffset = warnings.length > 0 && !isConnectivityRecovery;
-  const isMiniMode = CONFIG.MINI_MODES.includes(visibleWarning);
-
-  return {
-    showSmallOffset: hasOffset && isMiniMode,
-    showLargeOffset: hasOffset && !isMiniMode,
-  };
+export const toolTipStyles: CSSObject = {
+  gap: '0.2rem',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
 };

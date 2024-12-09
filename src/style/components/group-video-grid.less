@@ -122,7 +122,19 @@
         &:hover {
           opacity: 1;
         }
+
         &__label {
+          .label-small-medium;
+          position: absolute;
+          top: 7px;
+          right: 7px;
+          padding: 5px 10px;
+          border-radius: 6px;
+          background-color: var(--accent-color);
+          color: var(--app-bg-secondary);
+        }
+
+        &__hand_raise_icon {
           .label-small-medium;
           position: absolute;
           top: 7px;
@@ -204,6 +216,53 @@
               fill: var(--red-500);
             }
           }
+        }
+
+        &__hand_icon {
+          position: absolute;
+          top: 10px;
+          left: 10px;
+
+          display: inline-block;
+          animation:
+            raise 0.5s ease-in-out,
+            shake 1s ease-in-out 0.5s;
+          animation-fill-mode: forwards;
+          font-size: 1.5rem;
+
+          @keyframes raise {
+            0% {
+              opacity: 0;
+              transform: translateY(10px);
+            }
+
+            100% {
+              transform: translateY(0);
+            }
+          }
+
+          @keyframes shake {
+            0% {
+              transform: rotate(0deg);
+            }
+            25% {
+              transform: rotate(-10deg);
+            }
+            50% {
+              transform: rotate(10deg);
+            }
+            75% {
+              transform: rotate(-10deg);
+            }
+            100% {
+              transform: rotate(0deg);
+            }
+          }
+        }
+
+        &__hand_icon.small {
+          top: 12px;
+          font-size: 1.2rem;
         }
 
         &__name {
