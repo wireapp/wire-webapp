@@ -23,3 +23,9 @@ export const labelStyles: CSSObject = {
   padding: '12px 10px',
   fontWeight: 'var(--font-weight-semibold)',
 };
+
+export const labelWithIconStyles: CSSObject = {
+  ...labelStyles,
+  display: 'flex',
+  justifyContent: 'space-between',
+};

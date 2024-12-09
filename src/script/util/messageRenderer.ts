@@ -60,7 +60,10 @@ const markdownit = new MarkdownIt('zero', {
 
 const originalFenceRule = markdownit.renderer.rules.fence!;
 
-markdownit.renderer.rules.heading_open = () => '<div class="md-heading">';
+markdownit.renderer.rules.heading_open = (tokens, idx) => {
+  const headingLevel = tokens[idx].tag.slice(1);
+  return `<div class="md-heading md-heading--${headingLevel}">`;
+};
 markdownit.renderer.rules.heading_close = () => '</div>';
 const originalNormalizeLink = markdownit.normalizeLink!;
 

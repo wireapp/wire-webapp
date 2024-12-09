@@ -21,6 +21,17 @@ import {ConversationRecord} from 'src/script/storage';
 
 import {BackUpConversation} from '../CPB.library';
 
-export const mapConversationRecord = ({id, name}: BackUpConversation): ConversationRecord | null => {
-  return null;
+export const mapConversationRecord = ({id: qualifiedId, name}: BackUpConversation): ConversationRecord | null => {
+  if (!qualifiedId || !name) {
+    return null;
+  }
+
+  // We dont get all the "required" fields from the backup, so we need to outsmart the type system.
+  // ToDO: Fix the backup to include all required fields or check if we can make them optional without breaking anything.
+  const conversationRecord: ConversationRecord = {
+    id: qualifiedId.id.toString(),
+    name: name.toString(),
+    domain: qualifiedId.domain.toString(),
+  } as ConversationRecord;
+  return conversationRecord;
 };

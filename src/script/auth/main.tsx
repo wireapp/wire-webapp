@@ -38,6 +38,7 @@ import {actionRoot} from './module/action';
 import {Root} from './page/Root';
 
 import {Config} from '../Config';
+import {setAppLocale} from '../localization/Localizer';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
 
@@ -81,6 +82,7 @@ async function runApp() {
   await initializeDataDog(config, {domain: domain});
 
   render(Root);
+  setAppLocale();
   if (module.hot) {
     module.hot.accept('./page/Root', () => {
       render(require('./page/Root').Root);

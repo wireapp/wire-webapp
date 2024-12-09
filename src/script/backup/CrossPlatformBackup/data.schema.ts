@@ -19,55 +19,55 @@
 
 import zod from 'zod';
 
-const ConversationSchema = zod.object({
-  accessModes: zod.array(zod.string()).optional(),
-  accessRole: zod.array(zod.any()).optional(),
-  accessRoleV2: zod.string().optional(),
-  archived_state: zod.boolean(),
-  archived_timestamp: zod.number(),
-  cipher_suite: zod.string().optional(),
-  creator: zod.string(),
+// For now we just check for the data we urgently need for the backup
+export const ConversationTableEntrySchema = zod.object({
   domain: zod.string(),
-  group_id: zod.string().optional(),
   id: zod.string(),
-  last_event_timestamp: zod.number(),
-  last_server_timestamp: zod.number(),
-  message_timer: zod.string().nullable().optional(),
-  muted_state: zod.number().nullable(),
-  muted_timestamp: zod.number(),
-  name: zod.string().nullable(),
-  others: zod.array(zod.any()),
-  protocol: zod.string(),
-  receipt_mode: zod.number().nullable(),
-  roles: zod.object({}).passthrough(),
-  status: zod.number(),
-  team_id: zod.string().nullable().optional(),
-  type: zod.number(),
+  name: zod.string(),
+  // accessModes: zod.array(zod.string()).optional(),
+  // accessRole: zod.array(zod.any()).optional(),
+  // accessRoleV2: zod.string().optional(),
+  // archived_state: zod.boolean(),
+  // archived_timestamp: zod.number(),
+  // cipher_suite: zod.number().optional(),
+  // creator: zod.string(),
+  // group_id: zod.string().optional(),
+  // last_event_timestamp: zod.number(),
+  // last_server_timestamp: zod.number(),
+  // message_timer: zod.string().nullable().optional(),
+  // muted_state: zod.number().nullable(),
+  // muted_timestamp: zod.number(),
+  // others: zod.array(zod.any()),
+  // protocol: zod.string(),
+  // receipt_mode: zod.number().nullable(),
+  // roles: zod.object({}).passthrough(),
+  // status: zod.number(),
+  // team_id: zod.string().nullable().optional(),
+  // type: zod.number(),
 });
-export const ConversationTableSchema = zod.array(ConversationSchema);
-export type ConversationTable = zod.infer<typeof ConversationTableSchema>;
+export type ConversationTableEntry = zod.infer<typeof ConversationTableEntrySchema>;
 
-const UserSchema = zod.object({
-  accent_id: zod.number().optional(),
-  assets: zod.array(zod.any()).optional(),
+// For now we just check for the data we urgently need for the backup
+export const UserTableEntrySchema = zod.object({
   handle: zod.string().optional(),
   id: zod.string(),
-  legalhold_status: zod.string().optional(),
   name: zod.string(),
-  picture: zod.array(zod.any()).optional(),
   qualified_id: zod
     .object({
       domain: zod.string(),
       id: zod.string(),
     })
     .optional(),
-  supported_protocols: zod.array(zod.string()).optional(),
-  team: zod.string().optional(),
+  // accent_id: zod.number().optional(),
+  // assets: zod.array(zod.any()).optional(),
+  // legalhold_status: zod.string().optional(),
+  // picture: zod.array(zod.any()).optional(),
+  // supported_protocols: zod.array(zod.string()).optional(),
+  // team: zod.string().optional(),
 });
-export const UserTableSchema = zod.array(UserSchema);
-export type UserTable = zod.infer<typeof UserTableSchema>;
+export type UserTableEntry = zod.infer<typeof UserTableEntrySchema>;
 
-const EventSchema = zod.object({
+export const EventTableEntrySchema = zod.object({
   category: zod.number().int().optional(),
   conversation: zod.string().min(1, 'Conversation is required'),
   data: zod.any(),
@@ -89,19 +89,18 @@ const EventSchema = zod.object({
   time: zod.string(),
   type: zod.string().min(1, 'Type is required'),
 });
-export const EventTableSchema = zod.array(EventSchema);
-export type EventTable = zod.infer<typeof EventTableSchema>;
+export type EventTableEntry = zod.infer<typeof EventTableEntrySchema>;
 
 export const AssetContentSchema = zod.object({
-  content_length: zod.number(),
+  content_length: zod.string().or(zod.number()),
   content_type: zod.string(),
   domain: zod.string().optional(),
-  expects_read_confirmation: zod.boolean(),
   info: zod.any(),
   key: zod.string(),
-  legal_hold_status: zod.number(),
   otr_key: zod.record(zod.string(), zod.number()),
   sha256: zod.record(zod.string(), zod.number()),
-  status: zod.string().optional(),
   token: zod.string().optional(),
+  // expects_read_confirmation: zod.boolean(),
+  // status: zod.string().optional(),
+  // legal_hold_status: zod.number(),
 });

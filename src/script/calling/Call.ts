@@ -49,6 +49,7 @@ export class Call {
   public readonly state: ko.Observable<CALL_STATE> = ko.observable(CALL_STATE.UNKNOWN);
   public readonly muteState: ko.Observable<MuteState> = ko.observable(MuteState.NOT_MUTED);
   public readonly participants: ko.ObservableArray<Participant>;
+  public readonly handRaisedParticipants: ko.PureComputed<Participant[]>;
   public readonly selfClientId: ClientId;
   public readonly initialType: CALL_TYPE;
   public readonly isCbrEnabled: ko.Observable<boolean> = ko.observable(
@@ -60,7 +61,7 @@ export class Call {
   public blockMessages: boolean = false;
   public currentPage: ko.Observable<number> = ko.observable(0);
   public pages: ko.ObservableArray<Participant[]> = ko.observableArray();
-  readonly maximizedParticipant: ko.Observable<Participant | null>;
+  public readonly maximizedParticipant: ko.Observable<Participant | null>;
   public readonly isActive: ko.PureComputed<boolean>;
 
   private readonly audios: Record<string, {audioElement: HTMLAudioElement; stream: MediaStream}> = {};
@@ -90,6 +91,12 @@ export class Call {
     this.initialType = callType;
     this.selfClientId = selfParticipant?.clientId;
     this.participants = ko.observableArray([selfParticipant]);
+    this.handRaisedParticipants = ko.pureComputed(() =>
+      this.participants()
+        .filter(participant => Boolean(participant.handRaisedAt()))
+        .sort((p1, p2) => p1.handRaisedAt()! - p2.handRaisedAt()!),
+    );
+
     this.activeAudioOutput = this.mediaDevicesHandler.currentAvailableDeviceId.audiooutput();
     this.mediaDevicesHandler.currentAvailableDeviceId.audiooutput.subscribe((newActiveAudioOutput: string) => {
       this.activeAudioOutput = newActiveAudioOutput;

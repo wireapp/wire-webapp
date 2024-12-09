@@ -43,6 +43,7 @@ import {
   LOG_LEVEL,
   QUALITY,
   REASON,
+  RESOLUTION,
   STATE as CALL_STATE,
   VIDEO_STATE,
   VSTREAMS,
@@ -50,6 +51,7 @@ import {
   WcallClient,
   WcallMember,
 } from '@wireapp/avs';
+import {AvsDebugger} from '@wireapp/avs-debugger';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -256,6 +258,7 @@ export class CallingRepository {
 
     this.onChooseScreen = (deviceId: string) => {};
 
+    // Request the video streams whenever the mode changes to active speaker
     ko.computed(() => {
       const call = this.callState.joinedCall();
       if (!call) {
@@ -263,7 +266,39 @@ export class CallingRepository {
       }
       const isSpeakersViewActive = this.callState.isSpeakersViewActive();
       if (isSpeakersViewActive) {
-        this.requestVideoStreams(call.conversation.qualifiedId, call.activeSpeakers());
+        const videoQuality = call.activeSpeakers().length > 2 ? RESOLUTION.LOW : RESOLUTION.HIGH;
+
+        const speakes = call.activeSpeakers();
+        speakes.forEach(p => {
+          // This is a temporary solution. The SFT does not send a response when a track change has occurred.
+          // To prevent the wrong video from being briefly displayed, we introduce a timeout here.
+          p.isSwitchingVideoResolution(true);
+          window.setTimeout(() => {
+            p.isSwitchingVideoResolution(false);
+          }, 1000);
+        });
+
+        this.requestVideoStreams(call.conversation.qualifiedId, speakes, videoQuality);
+      }
+    });
+
+    // Request the video streams whenever toggle display maximised Participant.
+    ko.computed(() => {
+      const call = this.callState.joinedCall();
+      if (!call) {
+        return;
+      }
+      const maximizedParticipant = call.maximizedParticipant();
+      if (maximizedParticipant !== null) {
+        maximizedParticipant.isSwitchingVideoResolution(true);
+        // This is a temporary solution. The SFT does not send a response when a track change has occurred.
+        // To prevent the wrong video from being briefly displayed, we introduce a timeout here.
+        window.setTimeout(() => {
+          maximizedParticipant.isSwitchingVideoResolution(false);
+        }, 1000);
+        this.requestVideoStreams(call.conversation.qualifiedId, [maximizedParticipant], RESOLUTION.HIGH);
+      } else {
+        this.requestCurrentPageVideoStreams(call);
       }
     });
   }
@@ -693,7 +728,7 @@ export class CallingRepository {
       return;
     }
 
-    const {content, qualified_conversation, from, qualified_from} = event;
+    const {content, qualified_conversation, from, qualified_from, time} = event;
     const isFederated = this.core.backendFeatures.isFederated && qualified_conversation && qualified_from;
     const userId = isFederated ? qualified_from : {domain: '', id: from};
     const conversationId = this.extractTargetedConversationId(event);
@@ -703,6 +738,7 @@ export class CallingRepository {
       this.logger.warn(`Unable to find a conversation with id of ${conversationId.id}@${conversationId.domain}`);
       return;
     }
+
     switch (content.type) {
       case CALL_MESSAGE_TYPE.CONFKEY: {
         if (source !== EventRepository.SOURCE.STREAM) {
@@ -723,8 +759,12 @@ export class CallingRepository {
       }
 
       case CALL_MESSAGE_TYPE.REMOTE_MUTE: {
-        const call = this.findCall(conversationId);
-        if (!call) {
+        const currentCall = this.callState.joinedCall();
+        if (
+          !currentCall ||
+          !matchQualifiedIds(currentCall.conversation.qualifiedId, conversationId) ||
+          !this.selfUser
+        ) {
           return;
         }
 
@@ -747,7 +787,7 @@ export class CallingRepository {
           return;
         }
 
-        this.muteCall(call, true, MuteState.REMOTE_MUTED);
+        this.muteCall(currentCall, true, MuteState.REMOTE_MUTED);
         return this.processCallingMessage(conversation, event);
       }
 
@@ -788,6 +828,46 @@ export class CallingRepository {
             .filter(item => !newEmojis.some(newItem => newItem.id === item.id));
           this.callState.emojis(remainingEmojis);
         }, CallingRepository.EMOJI_TIME_OUT_DURATION);
+        break;
+      }
+
+      case CALL_MESSAGE_TYPE.HAND_RAISED: {
+        const currentCall = this.callState.joinedCall();
+        if (
+          !currentCall ||
+          !matchQualifiedIds(currentCall.conversation.qualifiedId, conversationId) ||
+          !this.selfUser
+        ) {
+          this.logger.info('Ignored hand raise event because no active call was found');
+          return;
+        }
+
+        const participant = currentCall
+          .participants()
+          .find(participant => matchQualifiedIds(participant.user.qualifiedId, userId));
+
+        if (!participant) {
+          this.logger.info('Ignored hand raise event because no active participant was found');
+          return;
+        }
+
+        const isSelf = matchQualifiedIds(this.selfUser.qualifiedId, userId);
+
+        const {isHandUp} = content;
+        const handRaisedAt = time ? new Date(time).getTime() : new Date().getTime();
+        participant.handRaisedAt(isHandUp ? handRaisedAt : null);
+
+        if (!isHandUp) {
+          break;
+        }
+
+        const name = participant.user.name();
+        const handUpMessage = isSelf
+          ? t('videoCallParticipantRaisedSelfHandUp')
+          : t('videoCallParticipantRaisedTheirHandUp', {name});
+
+        showAppNotification(handUpMessage);
+
         break;
       }
 
@@ -1204,6 +1284,7 @@ export class CallingRepository {
     const conversationIdStr = this.serializeQualifiedId(conversationId);
     this.wCall?.end(this.wUser, conversationIdStr);
     callingSubscriptions.removeCall(conversationId);
+    AvsDebugger.reset();
   };
 
   private readonly leaveMLSConference = async (conversationId: QualifiedId) => {
@@ -1300,24 +1381,47 @@ export class CallingRepository {
     this.wCall?.reject(this.wUser, this.serializeQualifiedId(conversationId));
   }
 
+  /**
+   * This method monitors every change in the call and is therefore the main method for handling video requests.
+   * These changes include mute/unmute, screen sharing, or camera switching, joining or leaving of participants, or...
+   * @param call
+   * @param newPage
+   */
   changeCallPage(call: Call, newPage: number): void {
     call.currentPage(newPage);
-    if (!this.callState.isSpeakersViewActive()) {
+    if (!this.callState.isSpeakersViewActive() && !this.callState.isMaximisedViewActive()) {
       this.requestCurrentPageVideoStreams(call);
     }
   }
 
+  /**
+   * This method queries streams for the participants who are displayed on the active page! This can include up to nine
+   * participants and is used when flipping pages or starting a call.
+   * @param call
+   */
   requestCurrentPageVideoStreams(call: Call): void {
-    const currentPageParticipants = call.pages()[call.currentPage()];
-    this.requestVideoStreams(call.conversation.qualifiedId, currentPageParticipants);
+    const currentPageParticipants = call.pages()[call.currentPage()] ?? [];
+    const videoQuality: RESOLUTION = currentPageParticipants.length <= 2 ? RESOLUTION.HIGH : RESOLUTION.LOW;
+    this.requestVideoStreams(call.conversation.qualifiedId, currentPageParticipants, videoQuality);
   }
 
-  requestVideoStreams(conversationId: QualifiedId, participants: Participant[]) {
+  requestVideoStreams(conversationId: QualifiedId, participants: Participant[], videoQuality: RESOLUTION) {
+    if (participants.length === 0) {
+      return;
+    }
+    // Filter myself out and do not request my own stream.
+    const requestParticipants = participants.filter(p => !this.isSelfUser(p));
+    if (requestParticipants.length === 0) {
+      return;
+    }
+
     const convId = this.serializeQualifiedId(conversationId);
+
     const payload = {
-      clients: participants.map(participant => ({
+      clients: requestParticipants.map(participant => ({
         clientid: participant.clientId,
         userid: this.serializeQualifiedId(participant.user.qualifiedId),
+        quality: videoQuality,
       })),
       convid: convId,
     };
@@ -1355,6 +1459,7 @@ export class CallingRepository {
     const conversationIdStr = this.serializeQualifiedId(conversationId);
     delete this.poorCallQualityUsers[conversationIdStr];
     this.wCall?.end(this.wUser, conversationIdStr);
+    AvsDebugger.reset();
   };
 
   muteCall(call: Call, shouldMute: boolean, reason?: MuteState): void {
@@ -1614,6 +1719,10 @@ export class CallingRepository {
     void this.messageRepository.sendInCallEmoji(call.conversation, {
       [emojis]: 1,
     });
+  };
+
+  readonly sendInCallHandRaised = async (isHandUp: boolean, call: Call) => {
+    void this.messageRepository.sendInCallHandRaised(call.conversation, isHandUp);
   };
 
   readonly sendModeratorMute = (conversationId: QualifiedId, participants: Participant[]) => {
@@ -2262,6 +2371,8 @@ export class CallingRepository {
     this.callState
       .calls()
       .forEach((call: Call) => this.wCall?.end(this.wUser, this.serializeQualifiedId(call.conversation.qualifiedId)));
+
+    AvsDebugger.reset();
     this.wCall?.destroy(this.wUser);
   }
 
@@ -2310,6 +2421,13 @@ export class CallingRepository {
       },
     };
     PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, modalOptions);
+  }
+
+  private isSelfUser(participant: Participant): boolean {
+    if (this.selfUser == null || this.selfClientId == null) {
+      return false;
+    }
+    return participant.doesMatchIds(this.selfUser.qualifiedId, this.selfClientId);
   }
 
   //##############################################################################

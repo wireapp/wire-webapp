@@ -23,14 +23,19 @@ import {buildMetaData} from './AssetMetadata';
 import {
   CPBackupExporter,
   BackupQualifiedId,
-  BackUpConversation,
   BackupUser,
-  BackupMessage,
+  BackUpConversation,
   BackupDateTime,
   BackupMessageContent,
+  BackupMessage,
 } from './CPB.library';
 import {ExportHistoryFromDatabaseParams} from './CPB.types';
-import {ConversationTableSchema, UserTableSchema, EventTableSchema, AssetContentSchema} from './data.schema';
+import {
+  AssetContentSchema,
+  ConversationTableEntrySchema,
+  EventTableEntrySchema,
+  UserTableEntrySchema,
+} from './data.schema';
 
 import {preprocessConversations, preprocessUsers, preprocessEvents} from '../recordPreprocessors';
 
@@ -63,103 +68,125 @@ export const exportCPBHistoryFromDatabase = async ({
   }
 
   // Taking care of conversations
-  const conversationsData = ConversationTableSchema.parse(
-    await exportTable<ConversationRecord>({
-      backupService,
-      table: conversationTable,
-      preprocessor: streamProgress(preprocessConversations),
-    }),
-  );
-  conversationsData.forEach(conversationData =>
-    backupExporter.addConversation(
-      new BackUpConversation(
-        new BackupQualifiedId(conversationData.id, conversationData.domain),
-        conversationData.name ?? '',
-      ),
-    ),
-  );
+  const conversationRecords = await exportTable<ConversationRecord>({
+    backupService,
+    table: conversationTable,
+    preprocessor: streamProgress(preprocessConversations),
+  });
+  conversationRecords.forEach(record => {
+    const {success, data, error} = ConversationTableEntrySchema.safeParse(record);
+
+    if (success) {
+      backupExporter.addConversation(new BackUpConversation(new BackupQualifiedId(data.id, data.domain), data.name));
+    } else {
+      CPBLogger.error('Conversation data schema validation failed', error);
+    }
+  });
+  // ------------------------------
 
   // Taking care of users
-  const usersData = UserTableSchema.parse(
-    await exportTable<UserRecord>({backupService, table: usersTable, preprocessor: streamProgress(preprocessUsers)}),
-  );
-  usersData.forEach(userData =>
-    backupExporter.addUser(
-      new BackupUser(
-        new BackupQualifiedId(userData?.qualified_id?.id ?? userData.id, userData?.qualified_id?.domain ?? ''),
-        userData.name,
-        userData.handle ?? '',
-      ),
-    ),
-  );
+  const userRecords = await exportTable<UserRecord>({
+    backupService,
+    table: usersTable,
+    preprocessor: streamProgress(preprocessUsers),
+  });
+  userRecords.forEach(record => {
+    const {success, data, error} = UserTableEntrySchema.safeParse(record);
+
+    if (success) {
+      backupExporter.addUser(
+        new BackupUser(
+          new BackupQualifiedId(data?.qualified_id?.id ?? data.id, data?.qualified_id?.domain ?? ''),
+          data.name,
+          data.handle ?? '',
+        ),
+      );
+    } else {
+      CPBLogger.error('User data schema validation failed', error);
+    }
+  });
+  // ------------------------------
 
   // Taking care of events
-  const eventsData = EventTableSchema.parse(
-    await exportTable<EventRecord>({backupService, table: eventsTable, preprocessor: streamProgress(preprocessEvents)}),
-  );
-  eventsData.forEach(eventData => {
-    const {type} = eventData;
-    // ToDo: Add support for other types of messages and different types of content. Also figure out which fields are required.
-    if (!isSupportedEventType(type)) {
-      // eslint-disable-next-line no-console
-      CPBLogger.log('Unsupported message type', type);
-      return;
-    }
-    if (!eventData.id) {
-      // eslint-disable-next-line no-console
-      CPBLogger.log('Event without id', eventData);
-      return;
-    }
+  const eventRecords = await exportTable<EventRecord>({
+    backupService,
+    table: eventsTable,
+    preprocessor: streamProgress(preprocessEvents),
+  });
 
-    const id = eventData.id;
-    const conversationId = new BackupQualifiedId(
-      eventData.qualified_conversation.id,
-      eventData.qualified_conversation.domain ?? '',
-    );
-    const senderUserId = new BackupQualifiedId(
-      eventData.qualified_from?.id ?? eventData.from ?? '',
-      eventData.qualified_from?.domain ?? '',
-    );
-    const senderClientId = eventData.from_client_id ?? '';
-    const creationDate = new BackupDateTime(new Date(eventData.time));
-    // for debugging purposes
-    const webPrimaryKey = eventData.primary_key;
-
-    if (isAssetAddEvent(type)) {
-      const {success, error, data} = AssetContentSchema.safeParse(eventData.data);
-      if (!success) {
-        CPBLogger.log('Asset data schema validation failed', error);
+  eventRecords.forEach(record => {
+    const {success, data: eventData, error} = EventTableEntrySchema.safeParse(record);
+    if (success) {
+      const {type} = eventData;
+      // ToDo: Add support for other types of messages and different types of content. Also figure out which fields are required.
+      if (!isSupportedEventType(type)) {
+        // eslint-disable-next-line no-console
+        CPBLogger.log('Unsupported message type', type);
+        return;
+      }
+      if (!eventData.id) {
+        // eslint-disable-next-line no-console
+        CPBLogger.log('Event without id', eventData);
         return;
       }
 
-      const metaData = buildMetaData(data.content_type, data.info);
-
-      CPBLogger.log('metaData', metaData, data.content_type);
-
-      const asset = new BackupMessageContent.Asset(
-        data.content_type,
-        data.content_length,
-        data.info.name,
-        transformObjectToArray(data.otr_key),
-        transformObjectToArray(data.sha256),
-        data.key,
-        data.token,
-        data.domain,
-        null,
-        metaData,
+      const id = eventData.id;
+      const conversationId = new BackupQualifiedId(
+        eventData.qualified_conversation.id,
+        eventData.qualified_conversation.domain ?? '',
       );
-      backupExporter.addMessage(
-        new BackupMessage(id, conversationId, senderUserId, senderClientId, creationDate, asset, webPrimaryKey),
+      const senderUserId = new BackupQualifiedId(
+        eventData.qualified_from?.id ?? eventData.from ?? '',
+        eventData.qualified_from?.domain ?? '',
       );
-    }
+      const senderClientId = eventData.from_client_id ?? '';
+      const creationDate = new BackupDateTime(new Date(eventData.time));
+      // for debugging purposes
+      const webPrimaryKey = eventData.primary_key;
 
-    if (isMessageAddEvent(type) && eventData.data?.content) {
-      const text = new BackupMessageContent.Text(eventData.data.content);
-      backupExporter.addMessage(
-        new BackupMessage(id, conversationId, senderUserId, senderClientId, creationDate, text, webPrimaryKey),
-      );
+      if (isAssetAddEvent(type)) {
+        const {
+          success: assetParseSuccess,
+          error: assetParseError,
+          data: assetParseData,
+        } = AssetContentSchema.safeParse(eventData.data);
+        if (!assetParseSuccess) {
+          CPBLogger.error('Asset data schema validation failed', assetParseError);
+          return;
+        }
+
+        const metaData = buildMetaData(assetParseData.content_type, assetParseData.info);
+
+        const asset = new BackupMessageContent.Asset(
+          assetParseData.content_type,
+          Number.parseInt(`${assetParseData.content_length}`),
+          assetParseData.info.name,
+          transformObjectToArray(assetParseData.otr_key),
+          transformObjectToArray(assetParseData.sha256),
+          assetParseData.key,
+          assetParseData.token,
+          assetParseData.domain,
+          null,
+          metaData,
+        );
+
+        backupExporter.addMessage(
+          new BackupMessage(id, conversationId, senderUserId, senderClientId, creationDate, asset, webPrimaryKey),
+        );
+      }
+
+      if (isMessageAddEvent(type) && eventData.data?.content) {
+        const text = new BackupMessageContent.Text(eventData.data.content);
+        backupExporter.addMessage(
+          new BackupMessage(id, conversationId, senderUserId, senderClientId, creationDate, text, webPrimaryKey),
+        );
+      }
+    } else {
+      CPBLogger.error('Event data schema validation failed', error);
     }
   });
+
+  // ------------------------------
 
   return backupExporter.serialize();
 };

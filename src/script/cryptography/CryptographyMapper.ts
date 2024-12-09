@@ -50,6 +50,7 @@ import {
   Reaction,
   Text,
   InCallEmoji,
+  InCallHandRaise,
 } from '@wireapp/protocol-messaging';
 
 import {CALL_MESSAGE_TYPE} from 'src/script/calling/enum/CallMessageType';
@@ -218,6 +219,11 @@ export class CryptographyMapper {
 
       case GenericMessageType.IN_CALL_EMOJI: {
         specificContent = this._mapInCallEmoji(genericMessage.inCallEmoji as InCallEmoji);
+        break;
+      }
+
+      case GenericMessageType.IN_CALL_HAND_RAISE: {
+        specificContent = this._mapInCallHandRaise(genericMessage.inCallHandRaise as InCallHandRaise);
         break;
       }
 
@@ -562,6 +568,16 @@ export class CryptographyMapper {
         type: CALL_MESSAGE_TYPE.EMOJIS,
       },
       type: ClientEvent.CALL.IN_CALL_EMOJI,
+    };
+  }
+
+  private _mapInCallHandRaise(handRaise: InCallHandRaise) {
+    return {
+      content: {
+        isHandUp: handRaise.isHandUp,
+        type: CALL_MESSAGE_TYPE.HAND_RAISED,
+      },
+      type: ClientEvent.CALL.IN_CALL_HAND_RAISE,
     };
   }
 

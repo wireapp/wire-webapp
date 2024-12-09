@@ -235,6 +235,7 @@ export class EventTrackingRepository {
           apiKey: COUNTLY_API_KEY,
           enableLogging: COUNTLY_ENABLE_LOGGING,
           serverUrl: 'https://countly.wire.com/',
+          autoErrorTracking: true,
         },
       });
 
