@@ -32,8 +32,8 @@ import {
   GridIcon,
   IconButton,
   IconButtonVariant,
-  Select,
   RaiseHandIcon,
+  Select,
 } from '@wireapp/react-ui-kit';
 
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
@@ -57,13 +57,13 @@ import {preventFocusOutside} from 'Util/util';
 import {CallingParticipantList} from './CallingCell/CallIngParticipantList';
 import {Duration} from './Duration';
 import {
-  videoControlActiveStyles,
-  videoControlInActiveStyles,
-  videoControlDisabledStyles,
-  paginationButtonStyles,
   classifiedBarStyles,
   headerActionsWrapperStyles,
+  paginationButtonStyles,
   paginationWrapperStyles,
+  videoControlActiveStyles,
+  videoControlDisabledStyles,
+  videoControlInActiveStyles,
   videoTopBarStyles,
 } from './FullscreenVideoCall.styles';
 import {GroupVideoGrid} from './GroupVideoGrid';
@@ -77,6 +77,8 @@ import type {Conversation} from '../../entity/Conversation';
 import {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
 import {TeamState} from '../../team/TeamState';
 import {CallViewTab} from '../../view_model/CallingViewModel';
+import {useWarningsState} from '../../view_model/WarningsContainer/WarningsState';
+import {CONFIG, TYPE} from '../../view_model/WarningsContainer/WarningsTypes';
 
 enum BlurredBackgroundStatus {
   OFF = 'bluroff',
@@ -116,7 +118,7 @@ const EMOJIS_LIST = ['👍', '🎉', '❤️', '😂', '😮', '👏', '🤔', '
 
 const LOCAL_STORAGE_KEY_FOR_SCREEN_SHARING_CONFIRM_MODAL = 'DO_NOT_ASK_AGAIN_FOR_SCREEN_SHARING_CONFIRM_MODAL';
 
-const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
+const FullscreenVideoCall = ({
   call,
   canShareScreen,
   conversation,
@@ -143,7 +145,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   sendHandRaised,
   teamState = container.resolve(TeamState),
   callState = container.resolve(CallState),
-}) => {
+}: FullscreenVideoCallProps) => {
   const [isConfirmCloseModalOpen, setIsConfirmCloseModalOpen] = useState<boolean>(false);
   const [showEmojisBar, setShowEmojisBar] = useState<boolean>(false);
   const [disabledEmojis, setDisabledEmojis] = useState<string[]>([]);
@@ -156,6 +158,13 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   const isSelfHandRaised = Boolean(selfHandRaisedAt);
   const emojiBarRef = useRef(null);
   const emojiBarToggleButtonRef = useRef(null);
+
+  // Warnings banner
+  const warnings = useWarningsState(state => state.warnings);
+  const visibleWarning = warnings[warnings.length - 1];
+  const isConnectivityRecovery = visibleWarning === TYPE.CONNECTIVITY_RECOVERY;
+  const hasOffset = warnings.length > 0 && !isConnectivityRecovery;
+  const isMiniMode = CONFIG.MINI_MODES.includes(visibleWarning);
 
   const {blurredVideoStream} = useKoSubscribableChildren(selfParticipant, ['blurredVideoStream']);
   const hasBlurredBackground = !!blurredVideoStream;
@@ -425,7 +434,12 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   const isModerator = selfUser && roles[selfUser.id] === DefaultConversationRoleName.WIRE_ADMIN;
 
   return (
-    <div className="video-calling-wrapper">
+    <div
+      className={cx('video-calling-wrapper', {
+        'app--small-offset': hasOffset && isMiniMode,
+        'app--large-offset': hasOffset && !isMiniMode,
+      })}
+    >
       <div id="video-calling" className="video-calling">
         <div css={videoTopBarStyles}>
           <div id="video-title" className="video-title">
