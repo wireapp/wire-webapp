@@ -74,7 +74,6 @@ import {CallingViewMode, CallState, MuteState} from '../../calling/CallState';
 import {Participant} from '../../calling/Participant';
 import type {Grid} from '../../calling/videoGridHandler';
 import type {Conversation} from '../../entity/Conversation';
-import {useWarnings} from '../../guards/useWarnings';
 import {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
 import {TeamState} from '../../team/TeamState';
 import {CallViewTab} from '../../view_model/CallingViewModel';
@@ -148,15 +147,13 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   const [isConfirmCloseModalOpen, setIsConfirmCloseModalOpen] = useState<boolean>(false);
   const [showEmojisBar, setShowEmojisBar] = useState<boolean>(false);
   const [disabledEmojis, setDisabledEmojis] = useState<string[]>([]);
-
-  const {showSmallOffset, showLargeOffset} = useWarnings();
-
   const selfParticipant = call.getSelfParticipant();
-  const {sharesScreen: selfSharesScreen, sharesCamera: selfSharesCamera} = useKoSubscribableChildren(selfParticipant, [
-    'sharesScreen',
-    'sharesCamera',
-  ]);
-
+  const {
+    sharesScreen: selfSharesScreen,
+    sharesCamera: selfSharesCamera,
+    handRaisedAt: selfHandRaisedAt,
+  } = useKoSubscribableChildren(selfParticipant, ['sharesScreen', 'sharesCamera', 'handRaisedAt']);
+  const isSelfHandRaised = Boolean(selfHandRaisedAt);
   const emojiBarRef = useRef(null);
   const emojiBarToggleButtonRef = useRef(null);
 
@@ -229,11 +226,10 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   const openPopup = () => callingRepository.setViewModeDetached();
 
   const [isCallViewOpen, toggleCallView] = useToggleState(false);
-  const [isHandRaised, setIsHandRaised] = useState(false);
   const [isParticipantsListOpen, toggleParticipantsList] = useToggleState(false);
 
   function toggleIsHandRaised(currentIsHandRaised: boolean) {
-    setIsHandRaised(!currentIsHandRaised);
+    selfParticipant.handRaisedAt(new Date().getTime());
     sendHandRaised(!currentIsHandRaised, call);
   }
 
@@ -429,12 +425,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   const isModerator = selfUser && roles[selfUser.id] === DefaultConversationRoleName.WIRE_ADMIN;
 
   return (
-    <div
-      className={cx('video-calling-wrapper', {
-        'app--small-offset': showSmallOffset,
-        'app--large-offset': showLargeOffset,
-      })}
-    >
+    <div className="video-calling-wrapper">
       <div id="video-calling" className="video-calling">
         <div css={videoTopBarStyles}>
           <div id="video-title" className="video-title">
@@ -827,16 +818,16 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   {Config.getConfig().FEATURE.ENABLE_IN_CALL_HAND_RAISE && !is1to1Conversation && (
                     <li className="video-controls__item">
                       <button
-                        data-uie-value={isHandRaised ? 'active' : 'inactive'}
-                        onClick={() => toggleIsHandRaised(isHandRaised)}
-                        onKeyDown={event => handleKeyDown(event, () => toggleIsHandRaised(isHandRaised))}
-                        className={cx('video-controls__button_primary', {active: isHandRaised})}
+                        data-uie-value={isSelfHandRaised ? 'active' : 'inactive'}
+                        onClick={() => toggleIsHandRaised(isSelfHandRaised)}
+                        onKeyDown={event => handleKeyDown(event, () => toggleIsHandRaised(isSelfHandRaised))}
+                        className={cx('video-controls__button_primary', {active: isSelfHandRaised})}
                         type="button"
                         data-uie-name="do-toggle-hand-raise"
                         role="switch"
-                        aria-checked={isHandRaised}
+                        aria-checked={isSelfHandRaised}
                         title={
-                          isHandRaised
+                          isSelfHandRaised
                             ? t('videoCallOverlayHideParticipantsList')
                             : t('videoCallOverlayShowParticipantsList')
                         }
