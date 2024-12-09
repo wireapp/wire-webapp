@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [46.13.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.12.0...@wireapp/core@46.13.0) (2024-12-09)
+
+### Features
+
+* add periodic keypackages check and logging [WPB-14727] ([#6746](https://github.com/wireapp/wire-web-packages/issues/6746)) ([38fc333](https://github.com/wireapp/wire-web-packages/commit/38fc333d1c4313268a6b3da5eba1bc4278ff5553))
+
 # [46.12.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.11.6...@wireapp/core@46.12.0) (2024-12-05)
 
 ### Features
