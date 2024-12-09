@@ -235,8 +235,6 @@ export class PropertiesRepository {
   }
 
   savePreference(propertiesType: string, updatedPreference: any = true): void {
-    console.log('savePreference', {propertiesType, get: this.getPreference(propertiesType)});
-
     if (updatedPreference !== this.getPreference(propertiesType)) {
       this.setPreference(propertiesType, updatedPreference);
 
@@ -319,7 +317,6 @@ export class PropertiesRepository {
   }
 
   private publishPropertyUpdate(propertiesType: string, updatedPreference: any): void {
-    console.log('propertiesType', {propertiesType, updatedPreference});
     switch (propertiesType) {
       case PROPERTIES_TYPE.INTERFACE.THEME:
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, updatedPreference);
@@ -355,7 +352,6 @@ export class PropertiesRepository {
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.CALL.PUSH_TO_TALK_KEY, updatedPreference);
         break;
       case PROPERTIES_TYPE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE:
-        console.log('updatedPreference', updatedPreference);
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE, updatedPreference);
         break;
       default:

@@ -113,7 +113,11 @@ export const handleEscDown = (event: ReactKeyboardEvent<Element> | KeyboardEvent
  * @param onRelease A function to call when the key is released.
  * @returns A function to unsubscribe.
  */
-export const handleKeyPress = (key: string, {onPress, onRelease}: {onPress: () => void; onRelease: () => void}) => {
+export const handleKeyPress = (
+  key: string,
+  element: Window | null = window,
+  {onPress, onRelease}: {onPress: () => void; onRelease: () => void},
+) => {
   let isKeyDown = false;
 
   const handleKeyDown = (event: KeyboardEvent) => {
@@ -147,11 +151,11 @@ export const handleKeyPress = (key: string, {onPress, onRelease}: {onPress: () =
     onRelease();
   };
 
-  window.addEventListener('keydown', handleKeyDown, true);
-  window.addEventListener('keyup', handleKeyUp);
+  element?.addEventListener('keydown', handleKeyDown, true);
+  element?.addEventListener('keyup', handleKeyUp, true);
 
   return () => {
-    window.removeEventListener('keydown', handleKeyDown);
-    window.removeEventListener('keyup', handleKeyUp);
+    element?.removeEventListener('keydown', handleKeyDown, true);
+    element?.removeEventListener('keyup', handleKeyUp, true);
   };
 };

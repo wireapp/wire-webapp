@@ -60,7 +60,6 @@ interface AnsweringControlsProps {
   callActions: CallActions;
   callingRepository: CallingRepository;
   propertiesRepository: PropertiesRepository;
-  pushToTalkKey: string | null;
   isFullUi?: boolean;
   callState?: CallState;
   classifiedDomains?: string[];
@@ -81,7 +80,6 @@ export const CallingCell = ({
   hasAccessToCamera,
   callingRepository,
   propertiesRepository,
-  pushToTalkKey,
   setMaximizedParticipant,
   teamState = container.resolve(TeamState),
   callState = container.resolve(CallState),
@@ -164,10 +162,8 @@ export const CallingCell = ({
     WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE,
   );
 
-  console.log('pressSpaceToUnmuteEnabled', {pressSpaceToUnmuteEnabled});
-
   usePushToTalk({
-    key: pushToTalkKey,
+    callState,
     toggleMute,
     isMuted: isCurrentlyMuted,
     enabled: pressSpaceToUnmuteEnabled,

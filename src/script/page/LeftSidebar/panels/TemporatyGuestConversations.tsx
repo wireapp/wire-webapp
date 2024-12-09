@@ -22,7 +22,6 @@ import React from 'react';
 import {CallingCell} from 'Components/calling/CallingCell';
 import * as Icon from 'Components/Icon';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -84,7 +83,6 @@ const TemporaryGuestConversations: React.FC<TemporaryGuestConversations> = ({
             callingRepository={callingViewModel.callingRepository}
             propertiesRepository={callingViewModel.propertiesRepository}
             hasAccessToCamera={callingViewModel.hasAccessToCamera()}
-            pushToTalkKey={callingViewModel.propertiesRepository.getPreference(PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY)}
           />
         );
       })}

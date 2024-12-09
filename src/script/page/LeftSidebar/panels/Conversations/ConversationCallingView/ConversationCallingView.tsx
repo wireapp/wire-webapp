@@ -20,7 +20,6 @@
 import {CallingCell} from 'Components/calling/CallingCell';
 import {Call} from 'src/script/calling/Call';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
-import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
 import {ListViewModel} from 'src/script/view_model/ListViewModel';
 
 type ConversationCallingViewProps = {
@@ -52,7 +51,6 @@ export const ConversationCallingView = ({
               callActions={callingViewModel.callActions}
               callingRepository={callingRepository}
               propertiesRepository={propertiesRepository}
-              pushToTalkKey={propertiesRepository.getPreference(PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY)}
               isFullUi
               hasAccessToCamera={callingViewModel.hasAccessToCamera()}
             />

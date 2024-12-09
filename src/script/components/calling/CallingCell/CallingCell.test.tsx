@@ -29,6 +29,7 @@ import {Participant} from 'src/script/calling/Participant';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {MediaDevicesHandler} from 'src/script/media/MediaDevicesHandler';
+import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {TeamState} from 'src/script/team/TeamState';
 import {CallActions} from 'src/script/view_model/CallingViewModel';
 import {createUuid} from 'Util/uuid';
@@ -69,7 +70,7 @@ const createProps = async () => {
     call: createCall(CALL_STATE.MEDIA_ESTAB),
     callActions: {} as CallActions,
     callingRepository: mockCallingRepository as CallingRepository,
-    pushToTalkKey: null,
+    propertiesRepository: {} as PropertiesRepository,
     conversation,
     hasAccessToCamera: true,
     teamState: mockTeamState,

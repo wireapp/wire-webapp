@@ -35,7 +35,6 @@ import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
 import {TitleBar} from 'Components/TitleBar';
 import {CallState} from 'src/script/calling/CallState';
 import {Config} from 'src/script/Config';
-import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isLastReceivedMessage} from 'Util/conversationMessages';
 import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/FileTypeUtil';
@@ -501,9 +500,6 @@ export const Conversation = ({
                 callActions={callingViewModel.callActions}
                 callingRepository={callingRepository}
                 propertiesRepository={repositories.properties}
-                pushToTalkKey={callingViewModel.propertiesRepository.getPreference(
-                  PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY,
-                )}
               />
             );
           })}
