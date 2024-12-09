@@ -291,8 +291,8 @@ export class CallingRepository {
       const maximizedParticipant = call.maximizedParticipant();
       if (maximizedParticipant !== null) {
         maximizedParticipant.isSwitchingVideoResolution(true);
-        // This is a temporary solution. The SFT does not send a response when a track change has occurred.
-        // To prevent the wrong video from being briefly displayed, we introduce a timeout here.
+        // This is a temporary solution. The SFT does not send a response when a track change has occurred. To prevent
+        // the wrong video from being briefly displayed, we introduce a timeout here.
         window.setTimeout(() => {
           maximizedParticipant.isSwitchingVideoResolution(false);
         }, 1000);
