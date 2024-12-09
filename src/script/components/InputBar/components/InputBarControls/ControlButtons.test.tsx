@@ -34,6 +34,10 @@ const defaultParams: PropsType = {
   onSelectFiles: jest.fn(),
   onSelectImages: jest.fn(),
   showGiphyButton: true,
+  isFormatActive: true,
+  isEmojiActive: true,
+  onFormatClick: jest.fn(),
+  onEmojiClick: jest.fn(),
 };
 
 const allButtonTitles = [
