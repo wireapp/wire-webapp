@@ -48,6 +48,10 @@ const CallOptions: React.FC<CallOptionsProps> = ({constraintsHandler, properties
     propertiesRepository.properties.settings.call.enable_soundless_incoming_calls,
   );
 
+  const [pressSpaceToUnmuteEnabled, setPressSpaceToUnmuteEnabled] = useState(
+    !!propertiesRepository.properties.settings.call.enable_press_space_to_unmute,
+  );
+
   useEffect(() => {
     const updateProperties = ({settings}: WebappProperties) => {
       setVbrEncoding(!isCbrEncodingEnforced && settings.call.enable_vbr_encoding);
@@ -109,6 +113,24 @@ const CallOptions: React.FC<CallOptionsProps> = ({constraintsHandler, properties
         </Checkbox>
         <p className="preferences-detail preferences-detail-intended">
           {t('preferencesOptionsEnableSoundlessIncomingCallsDetails')}
+        </p>
+      </div>
+      <div className="checkbox-margin">
+        <Checkbox
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            const isChecked = event.target.checked;
+            propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE, isChecked);
+            setPressSpaceToUnmuteEnabled(isChecked);
+          }}
+          checked={pressSpaceToUnmuteEnabled}
+          data-uie-name="status-preference-press-space-to-unmute"
+        >
+          <CheckboxLabel htmlFor="status-preference-press-space-to-unmute">
+            {t('preferencesOptionsEnablePressSpaceToUnmute')}
+          </CheckboxLabel>
+        </Checkbox>
+        <p className="preferences-detail preferences-detail-intended">
+          {t('preferencesOptionsEnablePressSpaceToUnmuteDetails')}
         </p>
       </div>
     </PreferencesSection>

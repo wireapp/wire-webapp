@@ -256,6 +256,7 @@ export class DebugUtil {
   }
 
   async enablePushToTalk(key: string | null = KEY.SPACE) {
+    console.log('enablePushToTalk', {key});
     this.propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY, key);
   }
 

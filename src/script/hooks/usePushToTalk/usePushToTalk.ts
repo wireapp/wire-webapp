@@ -23,6 +23,7 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {createAppNotification} from 'Components/AppNotification';
 import {handleKeyPress} from 'Util/KeyboardUtil';
 
 interface PushToTalk {
@@ -37,22 +38,30 @@ const subscribeToKeyPress = ({
   isMuted,
   wasUnmutedWithKeyPressRef,
 }: PushToTalk & {key: string; wasUnmutedWithKeyPressRef: React.MutableRefObject<boolean>}) => {
+  const micOnNotification = createAppNotification();
+
   return handleKeyPress(key, {
     onPress: () => {
+      console.log('onPress');
       // If we are already unmuted, we do nothing.
       if (!isMuted()) {
         return;
       }
 
+      micOnNotification.show('Microphone temporarily on');
+
       wasUnmutedWithKeyPressRef.current = true;
       toggleMute(false);
     },
     onRelease: () => {
+      console.log('onRelease');
       // If we were unmuted with the key press, we mute again.
       // (This is to prevent muting when first unmuted with the unmute button)
       if (wasUnmutedWithKeyPressRef.current) {
         toggleMute(true);
       }
+
+      micOnNotification.close();
 
       wasUnmutedWithKeyPressRef.current = false;
     },
@@ -79,10 +88,19 @@ export const usePushToTalk = ({key: initialKey, toggleMute, isMuted}: PushToTalk
   }, []);
 
   useEffect(() => {
-    if (!key) {
-      return () => {};
-    }
+    console.log({key});
+    // if (!key) {
+    //   return () => {};
+    // }
 
-    return subscribeToKeyPress({key, toggleMute, isMuted, wasUnmutedWithKeyPressRef});
+    return subscribeToKeyPress({
+      key: key || ' ',
+      toggleMute: v => {
+        console.log('toggleMute', v);
+        toggleMute(v);
+      },
+      isMuted,
+      wasUnmutedWithKeyPressRef,
+    });
   }, [key, toggleMute, isMuted]);
 };

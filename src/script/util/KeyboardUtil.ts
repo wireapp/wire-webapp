@@ -147,7 +147,7 @@ export const handleKeyPress = (key: string, {onPress, onRelease}: {onPress: () =
     onRelease();
   };
 
-  window.addEventListener('keydown', handleKeyDown);
+  window.addEventListener('keydown', handleKeyDown, true);
   window.addEventListener('keyup', handleKeyUp);
 
   return () => {
