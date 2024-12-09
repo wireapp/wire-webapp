@@ -82,6 +82,7 @@ const TemporaryGuestConversations: React.FC<TemporaryGuestConversations> = ({
             isFullUi
             callActions={callingViewModel.callActions}
             callingRepository={callingViewModel.callingRepository}
+            propertiesRepository={callingViewModel.propertiesRepository}
             hasAccessToCamera={callingViewModel.hasAccessToCamera()}
             pushToTalkKey={callingViewModel.propertiesRepository.getPreference(PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY)}
           />

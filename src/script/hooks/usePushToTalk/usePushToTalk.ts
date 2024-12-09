@@ -30,6 +30,7 @@ interface PushToTalk {
   key: string | null;
   toggleMute: (shouldMute: boolean) => void;
   isMuted: () => boolean;
+  enabled: boolean;
 }
 
 const subscribeToKeyPress = ({
@@ -37,7 +38,7 @@ const subscribeToKeyPress = ({
   toggleMute,
   isMuted,
   wasUnmutedWithKeyPressRef,
-}: PushToTalk & {key: string; wasUnmutedWithKeyPressRef: React.MutableRefObject<boolean>}) => {
+}: Omit<PushToTalk, 'enabled'> & {key: string; wasUnmutedWithKeyPressRef: React.MutableRefObject<boolean>}) => {
   const micOnNotification = createAppNotification();
 
   return handleKeyPress(key, {
@@ -78,7 +79,7 @@ const subscribeToKeyPress = ({
  * const unsubscribe = pushToTalk.subscribe(() => settings.getToggleKey(), toggleMute, isMuted);
  * unsubscribe();
  */
-export const usePushToTalk = ({key: initialKey, toggleMute, isMuted}: PushToTalk) => {
+export const usePushToTalk = ({key: initialKey, toggleMute, isMuted, enabled}: PushToTalk) => {
   const [key, setKey] = useState<string | null>(initialKey);
   const wasUnmutedWithKeyPressRef = useRef(false);
 
@@ -93,14 +94,15 @@ export const usePushToTalk = ({key: initialKey, toggleMute, isMuted}: PushToTalk
     //   return () => {};
     // }
 
+    if (!enabled) {
+      return undefined;
+    }
+
     return subscribeToKeyPress({
       key: key || ' ',
-      toggleMute: v => {
-        console.log('toggleMute', v);
-        toggleMute(v);
-      },
+      toggleMute,
       isMuted,
       wasUnmutedWithKeyPressRef,
     });
-  }, [key, toggleMute, isMuted]);
+  }, [key, toggleMute, isMuted, enabled]);
 };

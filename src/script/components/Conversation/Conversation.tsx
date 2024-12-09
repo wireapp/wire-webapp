@@ -500,6 +500,7 @@ export const Conversation = ({
                 call={call}
                 callActions={callingViewModel.callActions}
                 callingRepository={callingRepository}
+                propertiesRepository={repositories.properties}
                 pushToTalkKey={callingViewModel.propertiesRepository.getPreference(
                   PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY,
                 )}
