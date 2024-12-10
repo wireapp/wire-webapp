@@ -36,7 +36,7 @@ import {
   Select,
 } from '@wireapp/react-ui-kit';
 
-import {createAppNotification} from 'Components/AppNotification';
+import {useNotification} from 'Components/AppNotification/AppNotification3';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import * as Icon from 'Components/Icon';
@@ -434,10 +434,11 @@ const FullscreenVideoCall = ({
 
   const isModerator = selfUser && roles[selfUser.id] === DefaultConversationRoleName.WIRE_ADMIN;
 
-  const noti = createAppNotification({
+  const noti = useNotification({
     id: 'first',
     message: 'First one',
     activeWindow: viewMode === CallingViewMode.DETACHED_WINDOW ? detachedWindow! : window,
+    autoClose: false,
   });
 
   const handleOpen = () => {
@@ -448,10 +449,11 @@ const FullscreenVideoCall = ({
     noti?.close();
   };
 
-  const noti2 = createAppNotification({
+  const noti2 = useNotification({
     id: 'second',
     message: 'Second one',
     activeWindow: viewMode === CallingViewMode.DETACHED_WINDOW ? detachedWindow! : window,
+    autoClose: false,
   });
 
   const handleOpen2 = () => {

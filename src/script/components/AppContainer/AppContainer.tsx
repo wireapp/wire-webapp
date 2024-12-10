@@ -24,6 +24,7 @@ import {container} from 'tsyringe';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
+import {NotificationProvider} from 'Components/AppNotification/AppNotification3';
 import {DetachedCallingCell} from 'Components/calling/DetachedCallingCell';
 import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
 import {QualityFeedbackModal} from 'Components/Modals/QualityFeedbackModal';
@@ -92,7 +93,7 @@ export const AppContainer: FC<AppProps> = ({config, clientType}) => {
   }
 
   return (
-    <>
+    <NotificationProvider>
       <AppLoader init={onProgress => app.initApp(clientType, onProgress)}>
         {selfUser => {
           return <AppMain app={app} selfUser={selfUser} mainView={mainView} locked={softLockEnabled} />;
@@ -111,6 +112,6 @@ export const AppContainer: FC<AppProps> = ({config, clientType}) => {
           toggleScreenshare={mainView.calling.callActions.toggleScreenshare}
         />
       )}
-    </>
+    </NotificationProvider>
   );
 };

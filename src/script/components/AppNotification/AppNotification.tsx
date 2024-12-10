@@ -21,6 +21,7 @@ export const showAppNotification = (message: string) => {};
 
 import {useState, useCallback, useEffect} from 'react';
 
+import {createPortal} from 'react-dom';
 import {createRoot} from 'react-dom/client';
 
 import * as Icon from 'Components/Icon';
@@ -31,7 +32,7 @@ const APP_NOTIFICATION_SELECTOR = '#app-notification';
 
 type NotificationManager = {show: (notification: Notification) => void; close: (id: string) => void} | null;
 
-let root: ReturnType<typeof createRoot> | null = null;
+const root: ReturnType<typeof createRoot> | null = null;
 
 let notificationManager: NotificationManager = null;
 
@@ -54,11 +55,13 @@ export const createAppNotification = ({id, message, autoClose, activeWindow = wi
   // We don't want to create a new root each time the function is called, instead we create it only once.
   // An exception is when the "active" window changes (e.g. we switch from normal call view, to the detatched window), in which case we need to render the component in a new root, in a new window.
   // Our detatched window has a "name" property, which we can use to check if the window has changed.
-  if (!root || previousActiveWindow.name !== activeWindow.name) {
-    previousActiveWindow = activeWindow;
-    root = createRoot(notificationContainer);
-    root.render(<NotificationContainer />);
-  }
+  //   if (!root || previousActiveWindow.name !== activeWindow.name) {
+  //     previousActiveWindow = activeWindow;
+  //     root = createRoot(notificationContainer);
+  //     root.render(<NotificationContainer />);
+  //   }
+
+  createPortal(<NotificationContainer />, notificationContainer);
 
   return {
     show: () => {
