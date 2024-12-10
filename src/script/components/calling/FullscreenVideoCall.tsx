@@ -437,6 +437,7 @@ const FullscreenVideoCall = ({
   const noti = createAppNotification({
     id: 'first',
     message: 'First one',
+    activeWindow: viewMode === CallingViewMode.DETACHED_WINDOW ? detachedWindow! : window,
   });
 
   const handleOpen = () => {
@@ -450,6 +451,7 @@ const FullscreenVideoCall = ({
   const noti2 = createAppNotification({
     id: 'second',
     message: 'Second one',
+    activeWindow: viewMode === CallingViewMode.DETACHED_WINDOW ? detachedWindow! : window,
   });
 
   const handleOpen2 = () => {
