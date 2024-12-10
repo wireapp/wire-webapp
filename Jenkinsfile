@@ -139,20 +139,20 @@ pipeline {
         }
     }
 
-    stage('Trigger smoke test') {
-      steps {
-        build job: 'Webapp_Smoke_Chrome', parameters: [string(name: 'TAGS', value: '@smoke'), string(name: 'GIT_BRANCH', value: 'dev'), string(name: 'webappApplicationPath', value: "$webappApplicationPath")], wait: false
-      }
-    }
-      post {
-      success {
-        wireSend secret: "$jenkinsbot_secret", message: "✅ **Build finished for branch '$GIT_BRANCH_WEBAPP'**\n${commit_msg}"
-      }
-      failure {
-        script {
-          wireSend(secret: env.WIRE_BOT_SECRET, message: "❌ **$BRANCH_NAME**\n[$CHANGE_TITLE](${CHANGE_URL})\nBuild aborted or failed! See [Github Actions](" + env.GITHUB_ACTION_URL + ')')
+        stage('Trigger smoke test') {
+          steps {
+            build job: 'Webapp_Smoke_Chrome', parameters: [string(name: 'TAGS', value: '@smoke'), string(name: 'GIT_BRANCH', value: 'dev'), string(name: 'webappApplicationPath', value: "$webappApplicationPath")], wait: false
+          }
         }
-      }
-      }
     }
 }
+      post {
+  success {
+    wireSend secret: "$jenkinsbot_secret", message: "✅ **Build finished for branch '$GIT_BRANCH_WEBAPP'**\n${commit_msg}"
+  }
+  failure {
+    script {
+      wireSend(secret: env.WIRE_BOT_SECRET, message: "❌ **$BRANCH_NAME**\n[$CHANGE_TITLE](${CHANGE_URL})\nBuild aborted or failed! See [Github Actions](" + env.GITHUB_ACTION_URL + ')')
+    }
+  }
+      }
