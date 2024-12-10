@@ -109,11 +109,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
   };
 
   const handleZoomClick = () => {
-    if (isZoomedIn) {
-      setIsZoomedIn(false);
-    } else {
-      setIsZoomedIn(true);
-    }
+    setIsZoomedIn(prev => !prev);
   };
 
   const participantNameColor = getParticipantNameColor({isActivelySpeaking, isAudioEstablished});
@@ -124,7 +120,6 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
       data-user-id={participant?.user.id}
       className="group-video-grid__element__action_icon"
       onClick={handleZoomClick}
-      onKeyDown={handleZoomClick}
     >
       {!isZoomedIn && <Icon.ZoomInIcon data-uie-name="zoom-in-icon" />}
       {isZoomedIn && <Icon.ZoomOutIcon data-uie-name="zoom-out-icon" />}
