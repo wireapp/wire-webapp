@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.14.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.13.2...@wireapp/api-client@27.14.0) (2024-12-10)
+
+### Features
+
+* revert api changes for scim token ([#6747](https://github.com/wireapp/wire-web-packages/issues/6747)) ([b0cc6a9](https://github.com/wireapp/wire-web-packages/commit/b0cc6a99862f9969371afc130ec1a14d09765145))
+
 ## [27.13.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.13.1...@wireapp/api-client@27.13.2) (2024-12-09)
 
 **Note:** Version bump only for package @wireapp/api-client
