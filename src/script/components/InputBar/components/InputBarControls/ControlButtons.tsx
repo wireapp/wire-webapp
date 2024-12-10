@@ -17,14 +17,16 @@
  *
  */
 
-import React from 'react';
+import React, {MouseEvent} from 'react';
 
-import * as Icon from 'Components/Icon';
 import {Config} from 'src/script/Config';
 import {Conversation} from 'src/script/entity/Conversation';
-import {t} from 'Util/LocalizerUtil';
 
-import {GiphyButton} from './GiphyButton';
+import {CancelEditButton} from './CancelEditButton/CancelEditButton';
+import {EmojiButton} from './EmojiButton/EmojiButton';
+import {FormatTextButton} from './FormatTextButton/FormatTextButton';
+import {GiphyButton} from './GiphyButton/GiphyButton';
+import {PingButton} from './PingButton/PingButton';
 
 import {AssetUploadButton} from '../AssetUploadButton';
 import {ImageUploadButton} from '../ImageUploadButton';
@@ -36,13 +38,16 @@ export type ControlButtonsProps = {
   disablePing?: boolean;
   disableFilesharing?: boolean;
   isEditing?: boolean;
-  isScaledDown?: boolean;
+  isFormatActive: boolean;
+  isEmojiActive: boolean;
   showGiphyButton?: boolean;
   onClickPing: () => void;
   onSelectFiles: (files: File[]) => void;
   onSelectImages: (files: File[]) => void;
   onCancelEditing: () => void;
   onGifClick: () => void;
+  onFormatClick: () => void;
+  onEmojiClick: (event: MouseEvent<HTMLButtonElement>) => void;
 };
 
 const ControlButtons: React.FC<ControlButtonsProps> = ({
@@ -51,59 +56,50 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
   disableFilesharing,
   input,
   isEditing,
-  isScaledDown,
+  isFormatActive,
+  isEmojiActive,
   showGiphyButton,
   onClickPing,
   onSelectFiles,
   onSelectImages,
   onCancelEditing,
   onGifClick,
+  onFormatClick,
+  onEmojiClick,
 }) => {
-  const pingTooltip = t('tooltipConversationPing');
+  const messageFormatButtonsEnabled = Config.getConfig().FEATURE.ENABLE_MESSAGE_FORMAT_BUTTONS;
 
   if (isEditing) {
     return (
       <li>
-        <button
-          type="button"
-          className="controls-right-button button-icon-large"
-          onClick={onCancelEditing}
-          data-uie-name="do-cancel-edit"
-          aria-label={t('accessibility.cancelMsgEdit')}
-        >
-          <Icon.CloseIcon />
-        </button>
+        <CancelEditButton onClick={onCancelEditing} />
       </li>
     );
   }
 
-  if (input.length === 0 || isScaledDown) {
-    const scaledDownClass = isScaledDown && 'controls-right-button_responsive';
-
+  if (input.length === 0) {
     return (
       <>
-        <li>
-          <button
-            className={`controls-right-button buttons-group-button-left ${scaledDownClass}`}
-            type="button"
-            onClick={onClickPing}
-            disabled={disablePing}
-            title={pingTooltip}
-            aria-label={pingTooltip}
-            data-uie-name="do-ping"
-          >
-            <Icon.PingIcon />
-          </button>
-        </li>
+        {messageFormatButtonsEnabled && (
+          <>
+            <li>
+              <FormatTextButton isActive={isFormatActive} onClick={onFormatClick} />
+            </li>
+            <li>
+              <EmojiButton isActive={isEmojiActive} onClick={onEmojiClick} />
+            </li>
+          </>
+        )}
+
         {!disableFilesharing && (
           <>
             <li>
               <ImageUploadButton
+                hasRoundedCorners={!messageFormatButtonsEnabled}
                 onSelectImages={onSelectImages}
                 acceptedImageTypes={Config.getConfig().ALLOWED_IMAGE_TYPES}
               />
             </li>
-
             <li>
               <AssetUploadButton
                 onSelectFiles={onSelectFiles}
@@ -112,7 +108,9 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
             </li>
           </>
         )}
-
+        <li>
+          <PingButton isDisabled={!!disablePing} onClick={onClickPing} />
+        </li>
         <li>
           <MessageTimerButton conversation={conversation} />
         </li>
@@ -120,7 +118,25 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
     );
   }
 
-  return <>{showGiphyButton && !disableFilesharing && <GiphyButton onGifClick={onGifClick} />}</>;
+  return (
+    <>
+      {showGiphyButton && !disableFilesharing && (
+        <>
+          {messageFormatButtonsEnabled && (
+            <>
+              <li>
+                <FormatTextButton isActive={isFormatActive} onClick={onFormatClick} />
+              </li>
+              <li>
+                <EmojiButton isActive={isEmojiActive} onClick={onEmojiClick} />
+              </li>
+            </>
+          )}
+          <GiphyButton onGifClick={onGifClick} hasRoundedLeftCorner={!messageFormatButtonsEnabled} />
+        </>
+      )}
+    </>
+  );
 };
 
 export {ControlButtons};
