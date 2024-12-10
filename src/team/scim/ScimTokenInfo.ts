@@ -20,7 +20,6 @@
 export interface ScimTokenInfo {
   team: string;
   id: string;
-  name?: string;
   created_at: string;
   idp?: string;
   description: string;
