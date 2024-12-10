@@ -36,6 +36,7 @@ import {
   Select,
 } from '@wireapp/react-ui-kit';
 
+import {createAppNotification} from 'Components/AppNotification';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import * as Icon from 'Components/Icon';
@@ -433,6 +434,32 @@ const FullscreenVideoCall = ({
 
   const isModerator = selfUser && roles[selfUser.id] === DefaultConversationRoleName.WIRE_ADMIN;
 
+  const noti = createAppNotification({
+    id: 'first',
+    message: 'First one',
+  });
+
+  const handleOpen = () => {
+    noti?.show();
+  };
+
+  const handleClose = () => {
+    noti?.close();
+  };
+
+  const noti2 = createAppNotification({
+    id: 'second',
+    message: 'Second one',
+  });
+
+  const handleOpen2 = () => {
+    noti2?.show();
+  };
+
+  const handleClose2 = () => {
+    noti2?.close();
+  };
+
   return (
     <div
       className={cx('video-calling-wrapper', {
@@ -610,6 +637,18 @@ const FullscreenVideoCall = ({
                 </li>
               )}
               <div className="video-controls__centered-items">
+                <li>
+                  <button onClick={handleOpen}>open 1</button>
+                </li>
+                <li>
+                  <button onClick={handleClose}>close 1</button>
+                </li>
+                <li>
+                  <button onClick={handleOpen2}>open 2</button>
+                </li>
+                <li>
+                  <button onClick={handleClose2}>close 2</button>
+                </li>
                 <li className="video-controls__item">
                   <button
                     className="video-controls__button"
