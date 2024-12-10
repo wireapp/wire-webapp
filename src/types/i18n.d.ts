@@ -1065,7 +1065,7 @@ declare module 'I18n/en-US.json' {
     'modalConversationOptionsToggleServiceMessage': `Could not change services state.`;
     'modalConversationRemoveAction': `Remove`;
     'modalConversationRemoveCloseBtn': `Close window \'Remove\'`;
-    'modalConversationRemoveGroupAction': `Delete for me`;
+    'modalConversationRemoveGroupAction': `Delete for Me`;
     'modalConversationRemoveGroupHeadline': `Delete {conversation} group for me?`;
     'modalConversationRemoveGroupMessage': `You won’t be able to access the group and its content. There is no option to restore it.`;
     'modalConversationRemoveGuestsHeadline': `Disable guest access?`;
