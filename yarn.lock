@@ -5941,14 +5941,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^27.10.1":
-  version: 27.11.0
-  resolution: "@wireapp/api-client@npm:27.11.0"
+"@wireapp/api-client@npm:^27.13.2":
+  version: 27.13.2
+  resolution: "@wireapp/api-client@npm:27.13.2"
   dependencies:
     "@wireapp/commons": "npm:^5.4.0"
     "@wireapp/priority-queue": "npm:^2.1.11"
     "@wireapp/protocol-messaging": "npm:1.51.0"
-    axios: "npm:1.7.7"
+    axios: "npm:1.7.9"
     axios-retry: "npm:4.5.0"
     http-status-codes: "npm:2.3.0"
     logdown: "npm:3.3.1"
@@ -5958,7 +5958,7 @@ __metadata:
     tough-cookie: "npm:4.1.4"
     ws: "npm:8.18.0"
     zod: "npm:3.23.8"
-  checksum: 10/94228768ef54f70e8f74000c924dd460fa47c96a1c50d83472583f5a144daeca915604bc78844199db82b37ef53e88c315ea85c1ac127ffb12783890e6581ea6
+  checksum: 10/1fbe961c5648fd349de4f59df29eb52e80d7999c7114066cfdfbf14a7c42e4ebfa6276218f4694aa4a141e7e6221e1b2bd9f65de48cfcd2c3207e330e00edc9d
   languageName: node
   linkType: hard
 
@@ -5976,7 +5976,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/commons@npm:5.4.0, @wireapp/commons@npm:^5.3.0, @wireapp/commons@npm:^5.4.0":
+"@wireapp/commons@npm:5.4.0, @wireapp/commons@npm:^5.4.0":
   version: 5.4.0
   resolution: "@wireapp/commons@npm:5.4.0"
   dependencies:
@@ -6005,26 +6005,26 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core-crypto@npm:1.0.2":
-  version: 1.0.2
-  resolution: "@wireapp/core-crypto@npm:1.0.2"
-  checksum: 10/99d47fd88657abcfe7fa702fcf9bdc0b815010a2b7b62bffd7779bf8e56bdaee23ebdf306192653ecfa076fc13a749d59c089219e64966b3c74327998c14bdd7
+"@wireapp/core-crypto@npm:2.0.0":
+  version: 2.0.0
+  resolution: "@wireapp/core-crypto@npm:2.0.0"
+  checksum: 10/f4d9a687ba32bea4026d831f05dcc20e65436f44e6600663348aaf3089ceb1d0a6ad179d24516fc54436be104805b065ab44fe9418b3c8ef872aba8417f71ce3
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:46.8.0":
-  version: 46.8.0
-  resolution: "@wireapp/core@npm:46.8.0"
+"@wireapp/core@npm:46.13.0":
+  version: 46.13.0
+  resolution: "@wireapp/core@npm:46.13.0"
   dependencies:
-    "@wireapp/api-client": "npm:^27.10.1"
-    "@wireapp/commons": "npm:^5.3.0"
-    "@wireapp/core-crypto": "npm:1.0.2"
+    "@wireapp/api-client": "npm:^27.13.2"
+    "@wireapp/commons": "npm:^5.4.0"
+    "@wireapp/core-crypto": "npm:2.0.0"
     "@wireapp/cryptobox": "npm:12.8.0"
     "@wireapp/priority-queue": "npm:^2.1.11"
-    "@wireapp/promise-queue": "npm:^2.3.9"
+    "@wireapp/promise-queue": "npm:^2.3.10"
     "@wireapp/protocol-messaging": "npm:1.51.0"
     "@wireapp/store-engine": "npm:5.1.11"
-    axios: "npm:1.7.7"
+    axios: "npm:1.7.9"
     bazinga64: "npm:^6.3.11"
     deepmerge-ts: "npm:6.0.0"
     hash.js: "npm:1.1.7"
@@ -6034,7 +6034,7 @@ __metadata:
     long: "npm:^5.2.0"
     uuid: "npm:9.0.1"
     zod: "npm:3.23.8"
-  checksum: 10/3179e039689d5fa8c52e2487ca580f7e49734e36e162995582ee17b9feed0553323db705b84751f3d3741640992844328a49c8b4acaf3bd6dcadae2856747245
+  checksum: 10/30b90cdc3fdc0ba8e015bac7182244c410528ba66ed0a48c7aa647e8354e2b4fa6aa0c9e30af18923aa02551b6c10562632604c6d59537e49dc1e113d4858cb6
   languageName: node
   linkType: hard
 
@@ -6117,7 +6117,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/promise-queue@npm:^2.3.9":
+"@wireapp/promise-queue@npm:^2.3.10":
   version: 2.3.10
   resolution: "@wireapp/promise-queue@npm:2.3.10"
   checksum: 10/22f141ee3fae3592ef4b423297ab955471f0a3965e84f9e259361cdfdd4dde73697085a4fe552aeda819113bbe5264bb2d537fab157a9f49a82bbefc809c7b1c
@@ -6871,6 +6871,17 @@ __metadata:
     form-data: "npm:^4.0.0"
     proxy-from-env: "npm:^1.1.0"
   checksum: 10/7f875ea13b9298cd7b40fd09985209f7a38d38321f1118c701520939de2f113c4ba137832fe8e3f811f99a38e12c8225481011023209a77b0c0641270e20cde1
+  languageName: node
+  linkType: hard
+
+"axios@npm:1.7.9":
+  version: 1.7.9
+  resolution: "axios@npm:1.7.9"
+  dependencies:
+    follow-redirects: "npm:^1.15.6"
+    form-data: "npm:^4.0.0"
+    proxy-from-env: "npm:^1.1.0"
+  checksum: 10/b7a5f660ea53ba9c2a745bf5ad77ad8bf4f1338e13ccc3f9f09f810267d6c638c03dac88b55dae8dc98b79c57d2d6835be651d58d2af97c174f43d289a9fd007
   languageName: node
   linkType: hard
 
@@ -18672,7 +18683,7 @@ __metadata:
     "@wireapp/avs": "npm:9.10.16"
     "@wireapp/commons": "npm:5.4.0"
     "@wireapp/copy-config": "npm:2.2.10"
-    "@wireapp/core": "npm:46.8.0"
+    "@wireapp/core": "npm:46.13.0"
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/prettier-config": "npm:0.6.4"
     "@wireapp/react-ui-kit": "npm:9.28.0"

@@ -55,7 +55,9 @@ import {EventSource} from '../event/EventSource';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {IntegrationMapper} from '../integration/IntegrationMapper';
 import {ServiceEntity} from '../integration/ServiceEntity';
+import {scheduleRecurringTask, updateRemoteConfigLogger} from '../lifecycle/updateRemoteConfigs';
 import {MLSMigrationStatus, getMLSMigrationStatus} from '../mls/MLSMigration/migrationStatus';
+import {APIClient} from '../service/APIClientSingleton';
 import {ROLE, ROLE as TEAM_ROLE, roleFromTeamPermissions} from '../user/UserPermission';
 import {UserRepository} from '../user/UserRepository';
 import {UserState} from '../user/UserState';
@@ -82,6 +84,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
   private readonly teamMapper: TeamMapper;
   private readonly userRepository: UserRepository;
   private readonly assetRepository: AssetRepository;
+  private backendSupportsMLS: boolean | null = null;
 
   constructor(
     userRepository: UserRepository,
@@ -142,7 +145,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     });
 
     const members = await this.loadInitialTeamMembers(teamId);
-    this.scheduleTeamRefresh();
+    await this.scheduleTeamRefresh();
     return {team, features: newFeatureList, members};
   }
 
@@ -160,18 +163,24 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     };
   }
 
-  private readonly scheduleTeamRefresh = (): void => {
+  private readonly scheduleTeamRefresh = async (): Promise<void> => {
     const updateTeam = async () => {
       try {
+        updateRemoteConfigLogger.info('Updating team-settings');
         await this.getTeam();
         await this.updateFeatureConfig();
       } catch (error) {
         this.logger.error(error);
       }
     };
+
     // We want to poll the latest team data every time the app is focused and every day
-    window.addEventListener('focus', updateTeam);
-    window.setInterval(updateTeam, TIME_IN_MILLIS.DAY);
+    await scheduleRecurringTask({
+      every: TIME_IN_MILLIS.DAY,
+      task: updateTeam,
+      key: 'team-refresh',
+      addTaskOnWindowFocusEvent: true,
+    });
   };
 
   private async getInitialTeamMembers(teamId: string): Promise<TeamMemberEntity[]> {
@@ -236,13 +245,28 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     await this.updateTeamMembersByIds(selfTeamId, newTeamMemberIds, true);
   };
 
-  filterRemoteDomainUsers(users: User[]): User[] {
+  public async filterRemoteDomainUsers(users: User[]): Promise<User[]> {
     const isMLS = this.teamState.teamFeatures()?.mls?.config.defaultProtocol === ConversationProtocol.MLS;
 
+    // IF MLS is enabled, THEN return all users
     if (isMLS) {
       return users;
     }
+
     const domain = this.userState.self()?.domain ?? this.teamState.teamDomain();
+    const hasFederatedUsers = users.some(user => user.domain !== domain);
+
+    if (this.backendSupportsMLS === null) {
+      const apiClient = container.resolve(APIClient);
+      this.backendSupportsMLS = await apiClient.supportsMLS();
+    }
+
+    // IF the backend does not support MLS, AND there are federated users, THEN return all users
+    if (!this.backendSupportsMLS && hasFederatedUsers) {
+      return users;
+    }
+
+    // IF the backend supports MLS, AND we use the proteus protocol, THEN filter out federated users
     return users.filter(user => {
       if (user.domain !== domain) {
         this.logger.log(`Filtering out user ${user.id} because of domain mismatch, current protocol is not MLS`);
