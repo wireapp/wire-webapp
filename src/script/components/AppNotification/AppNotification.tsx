@@ -121,8 +121,6 @@ import {createRoot} from 'react-dom/client';
 
 import * as Icon from 'Components/Icon';
 
-import {buttonStyles, closeIcon, content, wrapper} from './AppNotification.styles';
-
 const DEFAULT_NOTIFICATION_TIMEOUT = 3000;
 const ANIMATION_DURATION = 300;
 const APP_NOTIFICATION_SELECTOR = '#app-notification';
@@ -157,16 +155,16 @@ const AppNotification = ({
 
   return (
     <div
-      css={{
-        ...wrapper,
+      className="notification"
+      style={{
         top: !isClosing ? '50px' : '0',
         opacity: isClosing ? 0 : 1,
         transition: `all ${ANIMATION_DURATION}ms ease-in-out`,
       }}
     >
-      <div css={content}>{message}</div>
-      <button css={buttonStyles} onClick={onClose}>
-        <Icon.CloseIcon css={closeIcon} />
+      <div className="notification__content">{message}</div>
+      <button className="notification__button" onClick={onClose}>
+        <Icon.CloseIcon className="notification__close-icon" />
       </button>
     </div>
   );
@@ -211,22 +209,35 @@ const NotificationContainer = () => {
 
 let root: ReturnType<typeof createRoot> | null = null;
 let globalNotificationManager: ((message: string, timeout?: number | null) => void) | null = null;
+let previousContainer: Window;
 
-export const createAppNotification = () => {
-  const container = document.querySelector(APP_NOTIFICATION_SELECTOR);
+export const createAppNotification = ({
+  message,
+  timeout,
 
-  if (!container) {
+  container = window,
+}: {
+  message: string;
+  timeout?: number | null;
+  container?: Window;
+}) => {
+  const notificationContainer = container.document.querySelector(APP_NOTIFICATION_SELECTOR);
+
+  if (!notificationContainer) {
     console.warn(`Notification container with selector ${APP_NOTIFICATION_SELECTOR} not found.`);
-    return {show: () => {}, close: () => {}};
+    return;
   }
 
-  if (!root) {
-    root = createRoot(container);
+  if (!root || previousContainer.name !== container.name) {
+    previousContainer = container;
+    root = createRoot(notificationContainer);
     root.render(<NotificationContainer />);
   }
 
   return {
-    show: (message: string, timeout?: number | null) => globalNotificationManager?.(message, timeout),
+    show: () => {
+      globalNotificationManager?.(message, timeout);
+    },
     close: () => globalNotificationManager?.('', 0),
   };
 };

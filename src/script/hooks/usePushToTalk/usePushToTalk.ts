@@ -31,46 +31,48 @@ interface PushToTalk {
   enabled: boolean;
 }
 
-const subscribeToKeyPress = ({
-  toggleMute,
-  isMuted,
-  wasUnmutedWithKeyPressRef,
-}: Omit<PushToTalk, 'enabled'> & {key: string; wasUnmutedWithKeyPressRef: React.MutableRefObject<boolean>}) => {
-  const micOnNotification = createAppNotification();
-  let pressTimeout: NodeJS.Timeout | null = null;
+// const subscribeToKeyPress = ({
+//   toggleMute,
+//   isMuted,
+//   wasUnmutedWithKeyPressRef,
+// }: Omit<PushToTalk, 'enabled'> & {key: string; wasUnmutedWithKeyPressRef: React.MutableRefObject<boolean>}) => {
+//   const micOnNotification = createAppNotification({
+//     message: 'Microphone temporarily on',
+//   });
+//   let pressTimeout: NodeJS.Timeout | null = null;
 
-  return handleKeyPress(' ', {
-    onPress: () => {
-      console.log('onPress');
-      // If we are already unmuted, we do nothing.
-      if (!isMuted()) {
-        return;
-      }
+//   return handleKeyPress(' ', {
+//     onPress: () => {
+//       console.log('onPress');
+//       // If we are already unmuted, we do nothing.
+//       if (!isMuted()) {
+//         return;
+//       }
 
-      pressTimeout = setTimeout(() => {
-        micOnNotification.show('Microphone temporarily on');
-        wasUnmutedWithKeyPressRef.current = true;
-        toggleMute(false);
-      }, 200); // Adjust the delay as needed
-    },
-    onRelease: () => {
-      console.log('onRelease');
-      if (pressTimeout) {
-        clearTimeout(pressTimeout);
-        pressTimeout = null;
-      }
+//       pressTimeout = setTimeout(() => {
+//         micOnNotification.show();
+//         wasUnmutedWithKeyPressRef.current = true;
+//         toggleMute(false);
+//       }, 200); // Adjust the delay as needed
+//     },
+//     onRelease: () => {
+//       console.log('onRelease');
+//       if (pressTimeout) {
+//         clearTimeout(pressTimeout);
+//         pressTimeout = null;
+//       }
 
-      // If we were unmuted with the key press, we mute again.
-      // (This is to prevent muting when first unmuted with the unmute button)
-      if (wasUnmutedWithKeyPressRef.current) {
-        toggleMute(true);
-      }
+//       // If we were unmuted with the key press, we mute again.
+//       // (This is to prevent muting when first unmuted with the unmute button)
+//       if (wasUnmutedWithKeyPressRef.current) {
+//         toggleMute(true);
+//       }
 
-      micOnNotification.close();
-      wasUnmutedWithKeyPressRef.current = false;
-    },
-  });
-};
+//       micOnNotification.close();
+//       wasUnmutedWithKeyPressRef.current = false;
+//     },
+//   });
+// };
 
 const checkUserInCallAndViewMode = (callState: CallState): boolean => {
   const {activeWindow} = useActiveWindowState.getState();
@@ -98,10 +100,10 @@ const checkUserInCallAndViewMode = (callState: CallState): boolean => {
  */
 export const usePushToTalk = ({callState, toggleMute, isMuted, enabled}: PushToTalk) => {
   const wasUnmutedWithKeyPressRef = useRef(false);
-  const micOnNotification = createAppNotification();
+
   const isInCallAndViewMode = checkUserInCallAndViewMode(callState);
 
-  const {detachedWindow} = callState;
+  const {detachedWindow, viewMode} = callState;
   const detatchedWindowElement = detachedWindow();
 
   useEffect(() => {
@@ -109,13 +111,16 @@ export const usePushToTalk = ({callState, toggleMute, isMuted, enabled}: PushToT
     //   return undefined;
     // }
 
+    const micOnNotification = createAppNotification({
+      message: 'Microphone temporarily on',
+      container: viewMode() === CallingViewMode.DETACHED_WINDOW ? detachedWindow()! : window,
+    });
+
+    console.log('createNoti', {view: viewMode() === CallingViewMode.DETACHED_WINDOW ? 'detached' : 'normal'});
+
     let pressTimeout: NodeJS.Timeout | null = null;
 
-    detatchedWindowElement?.addEventListener('keydown', event =>
-      console.log('detatchedWindowElement keydown', event.key),
-    );
-
-    return handleKeyPress(' ', detatchedWindowElement, {
+    return handleKeyPress(' ', viewMode() === CallingViewMode.DETACHED_WINDOW ? detatchedWindowElement : window, {
       onPress: () => {
         console.log('onPress');
         // If we are already unmuted, we do nothing.
@@ -124,7 +129,7 @@ export const usePushToTalk = ({callState, toggleMute, isMuted, enabled}: PushToT
         }
 
         pressTimeout = setTimeout(() => {
-          micOnNotification.show('Microphone temporarily on');
+          micOnNotification.show();
           wasUnmutedWithKeyPressRef.current = true;
           toggleMute(false);
         }, 200);
@@ -145,5 +150,5 @@ export const usePushToTalk = ({callState, toggleMute, isMuted, enabled}: PushToT
         wasUnmutedWithKeyPressRef.current = false;
       },
     });
-  }, [toggleMute, isMuted, enabled, micOnNotification, isInCallAndViewMode]);
+  }, [toggleMute, isMuted, enabled, isInCallAndViewMode, detatchedWindowElement, viewMode, callState]);
 };
