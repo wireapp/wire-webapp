@@ -1,3 +1,27 @@
+@NonCPS
+def checkWorkflowRun(Map run, String commitHash) {
+    final String headSha = run['head_sha']
+    if (headSha == commitHash) {
+        echo("Found hash ${headSha}")
+        final String conclusion = run['conclusion']
+        echo("conclusion: ${conclusion}")
+
+        switch(conclusion) {
+            case 'success':
+                return true
+            case 'failure':
+                final String url = run['url']
+                error("❌ **Build failed for branch '${GIT_BRANCH_WEBAPP}'** See [Github Actions](${url})")
+                break
+            case 'cancelled':
+                final String url = run['url']
+                error("⚠️ **Build aborted for branch '${GIT_BRANCH_WEBAPP}'** See [Github Actions](${url})")
+                break
+        }
+    }
+    return false
+}
+
 pipeline {
     agent {
         node {
@@ -64,60 +88,50 @@ pipeline {
       }
         }
 
-stage('Wait for GitHub action to finish') {
-    when {
-      expression { BRANCH_NAME ==~ /PR-[0-9]+/ }
-    }
-    timeout(time: 20, unit: 'MINUTES') {
-      waitUntil {
-        def output = sh label: 'Get runs', returnStdout: true, script: 'curl -u ${CREDENTIALS} https://api.github.com/repos/wireapp/wire-webapp/actions/workflows/79043704/runs'
-        def json = readJSON text: output
-        def runs = json['workflow_runs']
-        echo('Looking for hash ' + commit_hash)
-        for (run in runs) {
-          if (run['head_sha'] == commit_hash) {
-            echo('Found hash ' + run['head_sha'])
-            echo('conclusion: ' + run['conclusion'])
-            // conclusion can be: success, failure, neutral, cancelled, skipped, timed_out, or action_required
-            if (run['conclusion'] == 'success') {
-              return true
-                               } else if (run['conclusion'] == 'failure') {
-              error("❌ **Build failed for branch '${GIT_BRANCH_WEBAPP}'** See [Github Actions](" + run['url'] + ')')
-                               } else if (run['conclusion'] == 'cancelled') {
-              error("⚠️ **Build aborted for branch '${GIT_BRANCH_WEBAPP}'** See [Github Actions](" + run['url'] + ')')
+    stage('Check GitHub Action Status') {
+        steps {
+            when { expression { BRANCH_NAME ==~ /PR-[0-9]+/ } }
+            timeout(time: 15, unit: 'MINUTES') {
+                script {
+                    final String apiUrl = 'https://api.github.com/repos/wireapp/wire-webapp/actions/workflows/79043704/runs'
+                    final String curlCmd = "curl -u \${CREDENTIALS} ${apiUrl}"
+                    waitUntil {
+                        final String output = sh(label: 'Check workflow', returnStdout: true, script: curlCmd)
+                        final Object jsonData = readJSON(text: output)
+                        final List workflowRuns = jsonData['workflow_runs']
+                        echo("Looking for hash ${commit_hash}")
+
+                        return workflowRuns.any { run -> checkWorkflowRun(run, commit_hash) }
+                    }
+                }
             }
-          }
         }
-        sleep(20)
-        return false
-      }
-    }
     }
 
     stage('Check deployment') {
         try {
-      // Wait until deployment has finished (20 retries * 30 seconds == 10 minutes)
-      timeout(time: 10, unit: 'MINUTES') {
-        waitUntil {
-          def randomid = sh returnStdout: true, script: 'uuidgen'
-          randomid = randomid.trim()
-          def current_hash = sh returnStdout: true, script: "curl '${webappApplicationPath}commit?v=${randomid}'"
-          current_hash = current_hash.trim()
-          echo('Current version is: ' + current_hash)
-          if (current_hash == commit_hash) {
-            echo('Deployment finished.')
-            return true
+        // Wait until deployment has finished (20 retries * 30 seconds == 10 minutes)
+        timeout(time: 10, unit: 'MINUTES') {
+          waitUntil {
+            def randomid = sh returnStdout: true, script: 'uuidgen'
+            randomid = randomid.trim()
+            def current_hash = sh returnStdout: true, script: "curl '${webappApplicationPath}commit?v=${randomid}'"
+            current_hash = current_hash.trim()
+            echo('Current version is: ' + current_hash)
+            if (current_hash == commit_hash) {
+              echo('Deployment finished.')
+              return true
+            }
+            env.MESSAGE = 'Current hash still is ' + current_hash + ' and not ' + commit_hash
+            sh "echo '${MESSAGE}' > deployment.log"
+            sleep(30)
+            return false
           }
-          env.MESSAGE = 'Current hash still is ' + current_hash + ' and not ' + commit_hash
-          sh "echo '${MESSAGE}' > deployment.log"
-          sleep(30)
-          return false
         }
-      }
         } catch (e) {
-      def reason = sh returnStdout: true, script: 'cat deployment.log || echo ""'
-      wireSend secret: "$jenkinsbot_secret", message: "❌ **Deployment failed on** ${webappApplicationPath}\n${commit_msg}\n**Reason:** ${e}\n${reason}"
-      error("$e / $reason")
+        def reason = sh returnStdout: true, script: 'cat deployment.log || echo ""'
+        wireSend secret: "$jenkinsbot_secret", message: "❌ **Deployment failed on** ${webappApplicationPath}\n${commit_msg}\n**Reason:** ${e}\n${reason}"
+        error("$e / $reason")
         }
         wireSend secret: "$jenkinsbot_secret", message: "✅ **Deployment successful on** ${webappApplicationPath}\n${commit_msg}"
     }
@@ -125,54 +139,15 @@ stage('Wait for GitHub action to finish') {
     stage('Trigger smoke test') {
       build job: 'Webapp_Smoke_Chrome', parameters: [string(name: 'TAGS', value: '@smoke'), string(name: 'GIT_BRANCH', value: 'dev'), string(name: 'webappApplicationPath', value: "$webappApplicationPath")], wait: false
     }
-}
-      post {
-  success {
-    wireSend secret: "$jenkinsbot_secret", message: "✅ **Build finished for branch '$GIT_BRANCH_WEBAPP'**\n${commit_msg}"
-  }
-  failure {
-    script {
-      wireSend(secret: env.WIRE_BOT_SECRET, message: "❌ **$BRANCH_NAME**\n[$CHANGE_TITLE](${CHANGE_URL})\nBuild aborted or failed! See [Github Actions](" + env.GITHUB_ACTION_URL + ')')
     }
-  }
+      post {
+    success {
+      wireSend secret: "$jenkinsbot_secret", message: "✅ **Build finished for branch '$GIT_BRANCH_WEBAPP'**\n${commit_msg}"
+    }
+    failure {
+      script {
+        wireSend(secret: env.WIRE_BOT_SECRET, message: "❌ **$BRANCH_NAME**\n[$CHANGE_TITLE](${CHANGE_URL})\nBuild aborted or failed! See [Github Actions](" + env.GITHUB_ACTION_URL + ')')
       }
-
-//         stage('Smoke Tests') {
-//       when {
-//         expression { BRANCH_NAME ==~ /PR-[0-9]+/ }
-//       }
-//       steps {
-//         script {
-//           def files = []
-//           withAWS(region: 'eu-west-1', credentials: 'S3_CREDENTIALS') {
-//             files = s3FindFiles bucket: 'z-lohika', path: "artifacts/megazord/android/reloaded/staging/compat/$BRANCH_NAME/", onlyFiles: true, glob: '*.apk'
-//           }
-//           files.sort { a, b -> a.lastModified <=> b.lastModified }
-//           if (files.size() < 1) {
-//             error('Could not find any apk at provided location!')
-//                     } else {
-//             def lastModifiedFileName = files[-1].name
-//             build job: 'android_reloaded_smoke', parameters: [string(name: 'AppBuildNumber', value: "artifacts/megazord/android/reloaded/staging/compat/$BRANCH_NAME/${lastModifiedFileName}"), string(name: 'TAGS', value: '@smoke'), string(name: 'Branch', value: 'android_dev')]
-//           }
-//         }
-//       }
-//       post {
-//         unsuccessful {
-//           script {
-//             wireSend(secret: env.WIRE_BOT_SECRET, message: "❌ **$BRANCH_NAME**\n[$CHANGE_TITLE](${CHANGE_URL})\nQA-Jenkins - Smoke tests failed (see above report)")
-//           }
-//         }
-//       }
-//         }
-//     }
-
-//     post {
-//         success {
-//       script {
-//         if (env.BRANCH_NAME ==~ /PR-[0-9]+/) {
-//           wireSend(secret: env.WIRE_BOT_SECRET, message: "✅ **$BRANCH_NAME**\n[$CHANGE_TITLE](${CHANGE_URL})\nQA-Jenkins - Smoke tests successful (see above report)")
-//         }
-//       }
-//         }
-//     }
-// }
+    }
+      }
+}
