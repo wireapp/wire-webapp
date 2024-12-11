@@ -17,43 +17,42 @@
  *
  */
 
-export const CoreCryptoMLSError = {
-  DECRYPTION: {
-    WRONG_EPOCH: 'Incoming message is for the wrong epoch',
-    ALREADY_DECRYPTED: 'We already decrypted this message once',
-    EXTERNAL_COMMIT_NOT_MERGED:
-      'You tried to join with an external commit but did not merge it yet. We will reapply this message for you when you merge your external commit',
-    FUTURE_EPOCH: 'Incoming message is for a future epoch. We will buffer it until the commit for that epoch arrives',
-    STALE_COMMIT: 'The received commit is deemed stale and is from an older epoch.',
-    STALE_PROPOSAL: 'The received proposal is deemed stale and is from an older epoch.',
-    DUPLICATE_MESSAGE: 'We already decrypted this message once',
-  },
-  CONVERSATION_ALREADY_EXISTS: 'Conversation already exists',
-  ORPHAN_WELCOME_MESSAGE:
-    'Although this Welcome seems valid, the local KeyPackage it references has already been deleted locally. Join this group with an external commit',
-} as const;
+export const CORE_CRYPTO_ERROR_NAMES = {
+  MlsErrorConversationAlreadyExists: 'MlsErrorConversationAlreadyExists',
+  MlsErrorDuplicateMessage: 'MlsErrorDuplicateMessage',
+  MlsErrorBufferedFutureMessage: 'MlsErrorBufferedFutureMessage',
+  MlsErrorMessageEpochTooOld: 'MlsErrorMessageEpochTooOld',
+  MlsErrorSelfCommitIgnored: 'MlsErrorSelfCommitIgnored',
+  MlsErrorUnmergedPendingGroup: 'MlsErrorUnmergedPendingGroup',
+  MlsErrorStaleProposal: 'MlsErrorStaleProposal',
+  MlsErrorStaleCommit: 'MlsErrorStaleCommit',
+  MlsErrorOther: 'MlsErrorOther',
+  ProteusErrorSessionNotFound: 'ProteusErrorSessionNotFound',
+  ProteusErrorRemoteIdentityChanged: 'ProteusErrorRemoteIdentityChanged',
+  MlsErrorWrongEpoch: 'MlsErrorWrongEpoch',
+  MlsErrorOrphanWelcomeMessage: 'MlsErrorOrphanWelcomeMessage',
+};
 
 export const isCoreCryptoMLSWrongEpochError = (error: unknown): boolean => {
-  return error instanceof Error && error.message === CoreCryptoMLSError.DECRYPTION.WRONG_EPOCH;
+  return error instanceof Error && error.name === CORE_CRYPTO_ERROR_NAMES.MlsErrorWrongEpoch;
 };
 
 export const isCoreCryptoMLSConversationAlreadyExistsError = (error: unknown): boolean => {
-  return error instanceof Error && error.message === CoreCryptoMLSError.CONVERSATION_ALREADY_EXISTS;
+  return error instanceof Error && error.name === CORE_CRYPTO_ERROR_NAMES.MlsErrorConversationAlreadyExists;
 };
 
 export const isCoreCryptoMLSOrphanWelcomeMessageError = (error: unknown): boolean => {
-  return error instanceof Error && error.message === CoreCryptoMLSError.ORPHAN_WELCOME_MESSAGE;
+  return error instanceof Error && error.name === CORE_CRYPTO_ERROR_NAMES.MlsErrorOrphanWelcomeMessage;
 };
 
-const mlsDecryptionErrorsToIgnore: string[] = [
-  CoreCryptoMLSError.DECRYPTION.ALREADY_DECRYPTED,
-  CoreCryptoMLSError.DECRYPTION.EXTERNAL_COMMIT_NOT_MERGED,
-  CoreCryptoMLSError.DECRYPTION.FUTURE_EPOCH,
-  CoreCryptoMLSError.DECRYPTION.STALE_COMMIT,
-  CoreCryptoMLSError.DECRYPTION.STALE_PROPOSAL,
-  CoreCryptoMLSError.DECRYPTION.DUPLICATE_MESSAGE,
+const mlsDecryptionErrorNamesToIgnore: string[] = [
+  CORE_CRYPTO_ERROR_NAMES.MlsErrorStaleCommit,
+  CORE_CRYPTO_ERROR_NAMES.MlsErrorStaleProposal,
+  CORE_CRYPTO_ERROR_NAMES.MlsErrorDuplicateMessage,
+  CORE_CRYPTO_ERROR_NAMES.MlsErrorBufferedFutureMessage,
+  CORE_CRYPTO_ERROR_NAMES.MlsErrorUnmergedPendingGroup,
 ];
 
 export const shouldMLSDecryptionErrorBeIgnored = (error: unknown): error is Error => {
-  return error instanceof Error && mlsDecryptionErrorsToIgnore.includes(error.message);
+  return error instanceof Error && mlsDecryptionErrorNamesToIgnore.includes(error.name);
 };

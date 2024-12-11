@@ -31,7 +31,7 @@ import {randomUUID} from 'crypto';
 import {APIClient} from '@wireapp/api-client';
 import {Ciphersuite, CommitBundle, CoreCrypto, DecryptedMessage} from '@wireapp/core-crypto';
 
-import {CoreCryptoMLSError} from './CoreCryptoMLSError';
+import {CORE_CRYPTO_ERROR_NAMES} from './CoreCryptoMLSError';
 import {InitClientOptions, MLSService} from './MLSService';
 
 import {AddUsersFailure, AddUsersFailureReasons} from '../../../conversation';
@@ -793,9 +793,11 @@ describe('MLSService', () => {
       const mockGroupId = 'mock-group-id';
 
       jest.spyOn(mlsService, 'conversationExists').mockResolvedValueOnce(false);
-      jest
-        .spyOn(mlsService, 'registerConversation')
-        .mockRejectedValueOnce(new Error(CoreCryptoMLSError.CONVERSATION_ALREADY_EXISTS));
+
+      const conversationAlreadyExistsError = new Error();
+      conversationAlreadyExistsError.name = CORE_CRYPTO_ERROR_NAMES.MlsErrorConversationAlreadyExists;
+
+      jest.spyOn(mlsService, 'registerConversation').mockRejectedValueOnce(conversationAlreadyExistsError);
 
       const wasConversationEstablished = await mlsService.tryEstablishingMLSGroup(mockGroupId);
 
