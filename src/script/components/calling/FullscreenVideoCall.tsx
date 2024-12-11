@@ -36,7 +36,7 @@ import {
   Select,
 } from '@wireapp/react-ui-kit';
 
-import {useNotification} from 'Components/AppNotification/AppNotification3';
+import {useAppNotification} from 'Components/AppNotification/AppNotification';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import * as Icon from 'Components/Icon';
@@ -434,11 +434,11 @@ const FullscreenVideoCall = ({
 
   const isModerator = selfUser && roles[selfUser.id] === DefaultConversationRoleName.WIRE_ADMIN;
 
-  const noti = useNotification({
-    id: 'first',
-    message: 'First one',
+  const noti = useAppNotification({
+    message: 'Microphone temporarily on',
     activeWindow: viewMode === CallingViewMode.DETACHED_WINDOW ? detachedWindow! : window,
-    autoClose: false,
+    withCloseButton: true,
+    leadingIcon: Icon.MicOnIcon,
   });
 
   const handleOpen = () => {
@@ -449,11 +449,9 @@ const FullscreenVideoCall = ({
     noti?.close();
   };
 
-  const noti2 = useNotification({
-    id: 'second',
+  const noti2 = useAppNotification({
     message: 'Second one',
     activeWindow: viewMode === CallingViewMode.DETACHED_WINDOW ? detachedWindow! : window,
-    autoClose: false,
   });
 
   const handleOpen2 = () => {

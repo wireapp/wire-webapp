@@ -1,20 +1,11 @@
-.notification {
+.app-notification {
   align-items: center;
   background-color: var(--main-color);
-  border-radius: 8px;
+  border-radius: 12px;
   box-shadow: 0 2px 16px 0 var(--background-fade-16);
   display: flex;
-  gap: 16px;
+  gap: 12px;
   padding: 8px 16px;
-
-  position: fixed;
-  top: 0;
-  left: 50%;
-  translate: -50% 0;
-  transition:
-    top 0.3s,
-    opacity 0.3s;
-  z-index: 99999;
 
   body.theme-dark & {
     background-color: var(--gray-80);
@@ -37,7 +28,13 @@
     justify-content: center;
   }
 
-  &__close-icon {
+  &__icon {
     fill: var(--white);
   }
+}
+
+[data-sonner-toaster] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
