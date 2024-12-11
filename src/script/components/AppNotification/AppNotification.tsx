@@ -32,8 +32,13 @@ interface AppNotificationOptions {
   autoClose?: boolean;
 }
 
-const DEFAULT_NOTIFICATION_TIMEOUT = 3000;
+const NOTIFICATION_TIMEOUT_MS = 3000;
 const APP_NOTIFICATION_SELECTOR = '#app-notification';
+
+// Small delay to ensure rendering is complete.
+// In some cases (switching between windows) the notification is not displayed without this delay.
+// It's caused by the rendering behavior of the toast library (injecting the <Toaster/> into the DOM node).
+const ACTION_DELAY_MS = 1;
 
 // Stores React roots for different windows (activeWindow).
 // Each window (identified by its 'name' property or 'default' if not available) gets its own root.
@@ -49,7 +54,7 @@ export const useAppNotification = (props?: AppNotificationOptions) => {
   useEffect(() => {
     setTimeout(() => {
       clearRoots();
-    }, 1);
+    }, ACTION_DELAY_MS);
   }, [activeWindow]);
 
   return {
@@ -67,7 +72,7 @@ export const useAppNotification = (props?: AppNotificationOptions) => {
             />
           ),
           {
-            duration: props?.autoClose === false ? Infinity : DEFAULT_NOTIFICATION_TIMEOUT,
+            duration: props?.autoClose === false ? Infinity : NOTIFICATION_TIMEOUT_MS,
             position: 'top-center',
             unstyled: true,
             dismissible: false,
@@ -77,10 +82,7 @@ export const useAppNotification = (props?: AppNotificationOptions) => {
           },
         );
         notificationId.current = id;
-        // Small delay to ensure rendering is complete.
-        // In some cases (switching between windows) the notification is not displayed without this delay.
-        // It's caused by the rendering behavior of the toast library (injecting the <Toaster/> into the DOM node).
-      }, 1);
+      }, ACTION_DELAY_MS);
     },
     close: () => {
       if (!notificationId.current) {
@@ -92,7 +94,7 @@ export const useAppNotification = (props?: AppNotificationOptions) => {
   };
 };
 
-const injectToaster = (activeWindow: Window) => {
+export const injectToaster = (activeWindow: Window) => {
   const windowKey = activeWindow.name || 'default';
 
   if (roots[windowKey]) {

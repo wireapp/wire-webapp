@@ -169,8 +169,6 @@ export const CallingCell = ({
 
   useEffect(() => {
     amplify.subscribe(WebAppEvents.CALL.SCREEN_SHARING_ENDED, () => {
-      console.log('WebAppEvents.CALL.SCREEN_SHARING_ENDED');
-
       screenSharingEndedNotification.show();
     });
 
