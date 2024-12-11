@@ -78,6 +78,8 @@ export type Env = {
   FEATURE_ALLOWED_FILE_UPLOAD_EXTENSIONS: string;
 
   /** will enable the MLS protocol */
+  FEATURE_ENABLE_MLS?: string;
+
   FEATURE_USE_CORE_CRYPTO?: string;
 
   FEATURE_MLS_CONFIG_KEYING_MATERIAL_UPDATE_THRESHOLD?: string;
