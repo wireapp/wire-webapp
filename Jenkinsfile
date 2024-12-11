@@ -87,8 +87,8 @@ pipeline {
         }
 
     stage('Check GitHub Action Status') {
+        when { expression { BRANCH_NAME ==~ /PR-[0-9]+/ } }
         steps {
-            when { expression { BRANCH_NAME ==~ /PR-[0-9]+/ } }
             timeout(time: 15, unit: 'MINUTES') {
           script {
             final String apiUrl = 'https://api.github.com/repos/wireapp/wire-webapp/actions/workflows/79043704/runs'
