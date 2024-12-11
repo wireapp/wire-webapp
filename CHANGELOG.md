@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [46.14.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.13.1...@wireapp/core@46.14.0) (2024-12-11)
+
+### Features
+
+* Integrate core crypto logger (WPB-14636) ([#6749](https://github.com/wireapp/wire-web-packages/issues/6749)) ([0d17225](https://github.com/wireapp/wire-web-packages/commit/0d17225b8892d6e0611027dbca6771b2b996b098))
+
 ## [46.13.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.13.0...@wireapp/core@46.13.1) (2024-12-10)
 
 **Note:** Version bump only for package @wireapp/core
