@@ -21,6 +21,7 @@ import React, {useEffect, useRef, useState} from 'react';
 
 import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation/';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
@@ -35,6 +36,7 @@ import {
   RaiseHandIcon,
   Select,
 } from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useAppNotification} from 'Components/AppNotification/AppNotification';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
@@ -238,6 +240,20 @@ const FullscreenVideoCall = ({
   const [isCallViewOpen, toggleCallView] = useToggleState(false);
   const [isParticipantsListOpen, toggleParticipantsList] = useToggleState(false);
 
+  const handRaisedNotification = useAppNotification({
+    activeWindow: viewMode === CallingViewMode.DETACHED_WINDOW ? detachedWindow! : window,
+  });
+
+  useEffect(() => {
+    amplify.subscribe(WebAppEvents.CALL.HAND_RAISED, (event: {notificationMessage: string}) => {
+      handRaisedNotification.show({message: event.notificationMessage});
+    });
+
+    return () => {
+      amplify.unsubscribeAll(WebAppEvents.CALL.HAND_RAISED);
+    };
+  }, [handRaisedNotification]);
+
   function toggleIsHandRaised(currentIsHandRaised: boolean) {
     selfParticipant.handRaisedAt(new Date().getTime());
     sendHandRaised(!currentIsHandRaised, call);
@@ -435,14 +451,15 @@ const FullscreenVideoCall = ({
   const isModerator = selfUser && roles[selfUser.id] === DefaultConversationRoleName.WIRE_ADMIN;
 
   const noti = useAppNotification({
-    message: 'Microphone temporarily on',
     activeWindow: viewMode === CallingViewMode.DETACHED_WINDOW ? detachedWindow! : window,
     withCloseButton: true,
     leadingIcon: Icon.MicOnIcon,
   });
 
   const handleOpen = () => {
-    noti?.show();
+    noti?.show({
+      message: 'Microphone temporarily on',
+    });
   };
 
   const handleClose = () => {

@@ -55,7 +55,6 @@ import {AvsDebugger} from '@wireapp/avs-debugger';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {showAppNotification} from 'Components/AppNotification';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {CALL_QUALITY_FEEDBACK_KEY} from 'Components/Modals/QualityFeedbackModal/constants';
 import {flatten} from 'Util/ArrayUtil';
@@ -866,7 +865,7 @@ export class CallingRepository {
           ? t('videoCallParticipantRaisedSelfHandUp')
           : t('videoCallParticipantRaisedTheirHandUp', {name});
 
-        showAppNotification(handUpMessage);
+        amplify.publish(WebAppEvents.CALL.HAND_RAISED, {notificationMessage: handUpMessage});
 
         break;
       }
@@ -1129,9 +1128,9 @@ export class CallingRepository {
     const isScreenSharingSourceFromDetachedWindow = this.callState.isScreenSharingSourceFromDetachedWindow();
 
     if (joinedCall && isSharingScreen && isScreenSharingSourceFromDetachedWindow) {
+      amplify.publish(WebAppEvents.CALL.SCREEN_SHARING_ENDED);
       this.callState.isScreenSharingSourceFromDetachedWindow(false);
       void this.toggleScreenshare(joinedCall);
-      showAppNotification(t('videoCallScreenShareEnded'));
     }
   };
 

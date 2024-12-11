@@ -24,8 +24,8 @@ import {toast, Toaster} from 'sonner';
 
 import * as Icon from 'Components/Icon';
 
-interface UseAppNotificationParams {
-  message: string;
+interface AppNotificationOptions {
+  message?: string;
   activeWindow?: Window;
   leadingIcon?: React.ElementType<any>;
   withCloseButton?: boolean;
@@ -41,46 +41,43 @@ const APP_NOTIFICATION_SELECTOR = '#app-notification';
 // It's necessary to display notifications in different windows (e.g. main window and detached call window).
 let roots: Record<string, Root> = {};
 
-export const useAppNotification = ({
-  message,
-  activeWindow = window,
-  leadingIcon,
-  withCloseButton = true,
-  autoClose = true,
-}: UseAppNotificationParams) => {
+export const useAppNotification = (props?: AppNotificationOptions) => {
   const notificationId = useRef<string | number | null>(null);
 
-  useEffect(() => {
-    const timeout = setTimeout(() => injectToaster(activeWindow));
+  const activeWindow = props?.activeWindow || window;
 
-    return () => {
-      clearTimeout(timeout);
-      setTimeout(() => clearRoots());
-    };
+  useEffect(() => {
+    setTimeout(() => {
+      clearRoots();
+    });
   }, [activeWindow]);
 
   return {
-    show: () => {
-      const id = toast.custom(
-        toastId => (
-          <AppNotification
-            message={message}
-            leadingIcon={leadingIcon}
-            withCloseButton={withCloseButton}
-            onClose={() => toast.dismiss(toastId)}
-          />
-        ),
-        {
-          duration: autoClose ? DEFAULT_NOTIFICATION_TIMEOUT : Infinity,
-          position: 'top-center',
-          unstyled: true,
-          dismissible: false,
-          style: {
-            top: 24,
+    show: (options?: Pick<AppNotificationOptions, 'message'>) => {
+      injectToaster(activeWindow);
+
+      setTimeout(() => {
+        const id = toast.custom(
+          toastId => (
+            <AppNotification
+              message={options?.message || props?.message || ''}
+              leadingIcon={props?.leadingIcon}
+              withCloseButton={props?.withCloseButton}
+              onClose={() => toast.dismiss(toastId)}
+            />
+          ),
+          {
+            duration: props?.autoClose === false ? Infinity : DEFAULT_NOTIFICATION_TIMEOUT,
+            position: 'top-center',
+            unstyled: true,
+            dismissible: false,
+            style: {
+              top: 24,
+            },
           },
-        },
-      );
-      notificationId.current = id;
+        );
+        notificationId.current = id;
+      });
     },
     close: () => {
       if (!notificationId.current) {
@@ -123,7 +120,7 @@ const clearRoots = () => {
   roots = {};
 };
 
-interface AppNotificationProps extends Pick<UseAppNotificationParams, 'message' | 'leadingIcon' | 'withCloseButton'> {
+interface AppNotificationProps extends Pick<AppNotificationOptions, 'message' | 'leadingIcon' | 'withCloseButton'> {
   onClose?: () => void;
 }
 
