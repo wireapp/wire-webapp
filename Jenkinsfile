@@ -92,7 +92,7 @@ pipeline {
             timeout(time: 15, unit: 'MINUTES') {
           script {
             def commit_hash = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
-            final String apiUrl = 'https://api.github.com/repos/wireapp/wire-webapp/actions/workflows/79043704/runs'
+            final String apiUrl = 'https://api.github.com/repos/wireapp/wire-webapp/actions/workflows/128602012/runs'
             final String curlCmd = "curl -u \${CREDENTIALS} ${apiUrl}"
             waitUntil {
               final String output = sh(label: 'Check workflow', returnStdout: true, script: curlCmd)
