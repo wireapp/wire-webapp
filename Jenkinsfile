@@ -91,6 +91,7 @@ pipeline {
         steps {
             timeout(time: 15, unit: 'MINUTES') {
           script {
+            def commit_hash = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
             final String apiUrl = 'https://api.github.com/repos/wireapp/wire-webapp/actions/workflows/79043704/runs'
             final String curlCmd = "curl -u \${CREDENTIALS} ${apiUrl}"
             waitUntil {
@@ -109,6 +110,7 @@ pipeline {
     stage('Check deployment') {
         steps {
             script {
+          def commit_hash = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
           try {
             // Wait until deployment has finished (20 retries * 30 seconds == 10 minutes)
             timeout(time: 10, unit: 'MINUTES') {
