@@ -132,10 +132,10 @@ pipeline {
             }
         } catch (e) {
             def reason = sh returnStdout: true, script: 'cat deployment.log || echo ""'
-            wireSend secret: "$jenkinsbot_secret", message: "❌ **Deployment failed on** ${webappApplicationPath}\n${commit_msg}\n**Reason:** ${e}\n${reason}"
+            wireSend secret: env.WIRE_BOT_SECRET, message: "❌ **Deployment failed on** ${webappApplicationPath}\n${commit_msg}\n**Reason:** ${e}\n${reason}"
           }
             }
-        wireSend secret: "$jenkinsbot_secret", message: "✅ **Deployment successful on** ${webappApplicationPath}\n${commit_msg}"
+        wireSend secret: env.WIRE_BOT_SECRET, message: "✅ **Deployment successful on** ${webappApplicationPath}\n${commit_msg}"
         }
     }
 
@@ -148,7 +148,7 @@ pipeline {
 }
       post {
   success {
-    wireSend secret: "$jenkinsbot_secret", message: "✅ **Build finished for branch '$GIT_BRANCH_WEBAPP'**\n${commit_msg}"
+    wireSend secret: env.WIRE_BOT_SECRET, message: "✅ **Build finished for branch '$GIT_BRANCH_WEBAPP'**\n${commit_msg}"
   }
   failure {
     script {
