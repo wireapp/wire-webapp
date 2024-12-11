@@ -39,7 +39,7 @@ import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {AddUsersFailure, AddUsersFailureReasons, ConversationService, MessageSendingState} from '..';
 import {MLSService} from '../../messagingProtocols/mls';
-import {CoreCryptoMLSError} from '../../messagingProtocols/mls/MLSService/CoreCryptoMLSError';
+import {CORE_CRYPTO_ERROR_NAMES} from '../../messagingProtocols/mls/MLSService/CoreCryptoMLSError';
 import {ProteusService} from '../../messagingProtocols/proteus';
 import * as MessagingProtocols from '../../messagingProtocols/proteus';
 import {openDB} from '../../storage/CoreDB';
@@ -491,9 +491,10 @@ describe('ConversationService', () => {
 
       const mockMLSMessageAddEvent = createMLSMessageAddEventMock(conversationId);
 
-      jest
-        .spyOn(mlsService, 'handleMLSMessageAddEvent')
-        .mockRejectedValueOnce(new Error(CoreCryptoMLSError.DECRYPTION.WRONG_EPOCH));
+      const wrongEpochError = new Error();
+      wrongEpochError.name = CORE_CRYPTO_ERROR_NAMES.MlsErrorWrongEpoch;
+
+      jest.spyOn(mlsService, 'handleMLSMessageAddEvent').mockRejectedValueOnce(wrongEpochError);
 
       const remoteEpoch = 5;
       const localEpoch = 4;
@@ -523,9 +524,10 @@ describe('ConversationService', () => {
 
       const mockMLSMessageAddEvent = createMLSMessageAddEventMock(conversationId, SUBCONVERSATION_ID.CONFERENCE);
 
-      jest
-        .spyOn(mlsService, 'handleMLSMessageAddEvent')
-        .mockRejectedValueOnce(new Error(CoreCryptoMLSError.DECRYPTION.WRONG_EPOCH));
+      const wrongEpochError = new Error();
+      wrongEpochError.name = CORE_CRYPTO_ERROR_NAMES.MlsErrorWrongEpoch;
+
+      jest.spyOn(mlsService, 'handleMLSMessageAddEvent').mockRejectedValueOnce(wrongEpochError);
 
       const remoteEpoch = 5;
       const localEpoch = 4;
@@ -556,9 +558,10 @@ describe('ConversationService', () => {
 
       const mockMLSWelcomeMessageEvent = createMLSWelcomeMessageEventMock(conversationId);
 
-      jest
-        .spyOn(mlsService, 'handleMLSWelcomeMessageEvent')
-        .mockRejectedValueOnce(new Error(CoreCryptoMLSError.ORPHAN_WELCOME_MESSAGE));
+      const orphanWelcomeMessageError = new Error();
+      orphanWelcomeMessageError.name = CORE_CRYPTO_ERROR_NAMES.MlsErrorOrphanWelcomeMessage;
+
+      jest.spyOn(mlsService, 'handleMLSWelcomeMessageEvent').mockRejectedValueOnce(orphanWelcomeMessageError);
 
       jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValueOnce({
         qualified_id: conversationId,
