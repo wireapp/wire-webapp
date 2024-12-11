@@ -450,35 +450,6 @@ const FullscreenVideoCall = ({
 
   const isModerator = selfUser && roles[selfUser.id] === DefaultConversationRoleName.WIRE_ADMIN;
 
-  const noti = useAppNotification({
-    activeWindow: viewMode === CallingViewMode.DETACHED_WINDOW ? detachedWindow! : window,
-    withCloseButton: true,
-    leadingIcon: Icon.MicOnIcon,
-  });
-
-  const handleOpen = () => {
-    noti?.show({
-      message: 'Microphone temporarily on',
-    });
-  };
-
-  const handleClose = () => {
-    noti?.close();
-  };
-
-  const noti2 = useAppNotification({
-    message: 'Second one',
-    activeWindow: viewMode === CallingViewMode.DETACHED_WINDOW ? detachedWindow! : window,
-  });
-
-  const handleOpen2 = () => {
-    noti2?.show();
-  };
-
-  const handleClose2 = () => {
-    noti2?.close();
-  };
-
   return (
     <div
       className={cx('video-calling-wrapper', {
@@ -656,18 +627,6 @@ const FullscreenVideoCall = ({
                 </li>
               )}
               <div className="video-controls__centered-items">
-                <li>
-                  <button onClick={handleOpen}>open 1</button>
-                </li>
-                <li>
-                  <button onClick={handleClose}>close 1</button>
-                </li>
-                <li>
-                  <button onClick={handleOpen2}>open 2</button>
-                </li>
-                <li>
-                  <button onClick={handleClose2}>close 2</button>
-                </li>
                 <li className="video-controls__item">
                   <button
                     className="video-controls__button"

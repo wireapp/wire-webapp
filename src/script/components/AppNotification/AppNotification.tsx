@@ -22,12 +22,12 @@ import {useEffect, useRef} from 'react';
 import {createRoot, Root} from 'react-dom/client';
 import {toast, Toaster} from 'sonner';
 
-import * as Icon from 'Components/Icon';
+import {CloseIcon} from 'Components/Icon';
 
 interface AppNotificationOptions {
   message?: string;
   activeWindow?: Window;
-  leadingIcon?: React.ElementType<any>;
+  icon?: React.ElementType<any>;
   withCloseButton?: boolean;
   autoClose?: boolean;
 }
@@ -49,7 +49,7 @@ export const useAppNotification = (props?: AppNotificationOptions) => {
   useEffect(() => {
     setTimeout(() => {
       clearRoots();
-    });
+    }, 1);
   }, [activeWindow]);
 
   return {
@@ -61,7 +61,7 @@ export const useAppNotification = (props?: AppNotificationOptions) => {
           toastId => (
             <AppNotification
               message={options?.message || props?.message || ''}
-              leadingIcon={props?.leadingIcon}
+              icon={props?.icon}
               withCloseButton={props?.withCloseButton}
               onClose={() => toast.dismiss(toastId)}
             />
@@ -77,7 +77,10 @@ export const useAppNotification = (props?: AppNotificationOptions) => {
           },
         );
         notificationId.current = id;
-      });
+        // Small delay to ensure rendering is complete.
+        // In some cases (switching between windows) the notification is not displayed without this delay.
+        // It's caused by the rendering behavior of the toast library (injecting the <Toaster/> into the DOM node).
+      }, 1);
     },
     close: () => {
       if (!notificationId.current) {
@@ -120,18 +123,18 @@ const clearRoots = () => {
   roots = {};
 };
 
-interface AppNotificationProps extends Pick<AppNotificationOptions, 'message' | 'leadingIcon' | 'withCloseButton'> {
+interface AppNotificationProps extends Pick<AppNotificationOptions, 'message' | 'icon' | 'withCloseButton'> {
   onClose?: () => void;
 }
 
-const AppNotification = ({message, leadingIcon: LeadingIcon, withCloseButton, onClose}: AppNotificationProps) => {
+const AppNotification = ({message, icon: Icon, withCloseButton, onClose}: AppNotificationProps) => {
   return (
     <div className="app-notification">
-      {LeadingIcon && <LeadingIcon className="app-notification__icon" />}
+      {Icon && <Icon className="app-notification__icon" />}
       <div className="app-notification__content">{message}</div>
       {withCloseButton && (
         <button className="app-notification__button" onClick={onClose}>
-          <Icon.CloseIcon className="app-notification__icon" />
+          <CloseIcon className="app-notification__icon" />
         </button>
       )}
     </div>
