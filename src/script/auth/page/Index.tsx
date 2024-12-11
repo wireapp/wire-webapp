@@ -40,6 +40,7 @@ import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {QUERY_KEY, ROUTE} from '../route';
 import {logoutReasonStrings} from '../util/logoutUtil';
+import {getPrefixedSSOCode} from '../util/urlUtil';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
@@ -56,7 +57,7 @@ const IndexComponent = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps
 
   if (defaultSSOCode) {
     // Redirect to prefilled SSO login if default SSO code is set on backend
-    return <Navigate to={`${ROUTE.SSO}/wire-${defaultSSOCode}`} />;
+    return <Navigate to={`${ROUTE.SSO}/${getPrefixedSSOCode(defaultSSOCode)}`} />;
   }
 
   const features = Config.getConfig().FEATURE;

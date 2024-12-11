@@ -55,14 +55,13 @@ import * as ConversationSelector from '../module/selector/ConversationSelector';
 import {QUERY_KEY, ROUTE} from '../route';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {logoutReasonStrings} from '../util/logoutUtil';
-import {getSearchParams} from '../util/urlUtil';
+import {getSearchParams, SSO_CODE_PREFIX} from '../util/urlUtil';
 
 export interface SingleSignOnFormProps extends React.HTMLAttributes<HTMLDivElement> {
   doLogin: (code: string) => Promise<void>;
   initialCode?: string;
 }
 
-const SSO_CODE_PREFIX = 'wire-';
 const SSO_CODE_PREFIX_REGEX = '[wW][iI][rR][eE]-';
 const SingleSignOnFormComponent = ({
   initialCode,
