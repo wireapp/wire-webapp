@@ -111,6 +111,7 @@ pipeline {
         steps {
             script {
           def commit_hash = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
+          String commitMsg = sh(returnStdout: true, script: 'git log -1 --pretty=%B').trim()
           try {
             // Wait until deployment has finished (20 retries * 30 seconds == 10 minutes)
             timeout(time: 10, unit: 'MINUTES') {
@@ -132,10 +133,16 @@ pipeline {
             }
         } catch (e) {
             def reason = sh returnStdout: true, script: 'cat deployment.log || echo ""'
-            wireSend secret: env.WIRE_BOT_SECRET, message: "❌ **Deployment failed on** ${webappApplicationPath}\n${commit_msg}\n**Reason:** ${e}\n${reason}"
+            String errorMessage = """❌ **Deployment failed on** ${webappApplicationPath}
+            ${commitMsg}
+            **Reason:** ${e}
+            ${reason}"""
+            wireSend secret: env.WIRE_BOT_SECRET, message: errorMessage
           }
             }
-        wireSend secret: env.WIRE_BOT_SECRET, message: "✅ **Deployment successful on** ${webappApplicationPath}\n${commit_msg}"
+        def successMessage = """✅ **Deployment successful on** ${webappApplicationPath}
+        ${commitMsg}"""
+        wireSend secret: env.WIRE_BOT_SECRET, message: successMessage
         }
     }
 
