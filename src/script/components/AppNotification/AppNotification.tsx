@@ -26,9 +26,23 @@ import {CloseIcon} from 'Components/Icon';
 
 interface AppNotificationOptions {
   message?: string;
+  /**
+   * The window in which the notification should be displayed.
+   * @default window
+   */
   activeWindow?: Window;
+  /**
+   * Additional icon to be displayed in the notification.
+   */
   icon?: React.ElementType<any>;
+  /**
+   * Whether the notification should have a close button.
+   */
   withCloseButton?: boolean;
+  /**
+   * Whether the notification should be automatically closed after a certain time.
+   * @default true
+   */
   autoClose?: boolean;
 }
 
@@ -46,6 +60,23 @@ const ACTION_DELAY_MS = 1;
 // It's necessary to display notifications in different windows (e.g. main window and detached call window).
 let roots: Record<string, Root> = {};
 
+/**
+ * Hook to display app notifications.
+ *
+ * Usage, based on the default options:
+ * ```tsx
+ * const notification = useAppNotification({message: 'Hello, World!'});
+ * notification.show();
+ * ```
+ *
+ * Usage, with the show method options (useful when the message is dynamic, based on some other action):
+ *
+ * ```tsx
+ * const notification = useAppNotification();
+ * notification.show({message: 'Hello, World!'});
+ * ```
+ *
+ */
 export const useAppNotification = (props?: AppNotificationOptions) => {
   const notificationId = useRef<string | number | null>(null);
 
