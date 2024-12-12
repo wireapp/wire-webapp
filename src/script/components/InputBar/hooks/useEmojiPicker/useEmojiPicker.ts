@@ -47,7 +47,7 @@ export const useEmojiPicker = ({wrapperRef, onEmojiPicked}: EmojiPickerParams) =
 
   useClickOutside(wrapperRef, () => {
     if (open) {
-      setOpen(false);
+      handleClose();
     }
   });
 
