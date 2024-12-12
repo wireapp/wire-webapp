@@ -18,7 +18,7 @@
  */
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {FORMAT_TEXT_COMMAND} from 'lexical';
+import {FORMAT_TEXT_COMMAND, TextFormatType} from 'lexical';
 
 import {
   BoldIcon,
@@ -47,7 +47,7 @@ export const FormatToolbar = () => {
 
   const {toggleList} = useListState();
 
-  const formatText = (format: 'bold' | 'italic' | 'strikethrough' | 'code') => {
+  const formatText = (format: Extract<TextFormatType, 'bold' | 'italic' | 'strikethrough' | 'code'>) => {
     editor.dispatchCommand(FORMAT_TEXT_COMMAND, format);
   };
 
