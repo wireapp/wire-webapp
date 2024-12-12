@@ -327,7 +327,7 @@ export class ActionsViewModel {
       },
       text: {
         message: t('modalConversationRemoveGroupMessage'),
-        title: t('modalConversationRemoveGroupHeadline'),
+        title: t('modalConversationRemoveGroupHeadline', {conversation: conversationEntity.display_name()}),
       },
     });
   };
