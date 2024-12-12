@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.25.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.24.3...@wireapp/webapp-events@0.25.0) (2024-12-12)
+
+### Features
+
+* **webapp-events:** add call hand raised and screen sharing ended events [WPB-8580] ([#6750](https://github.com/wireapp/wire-web-packages/issues/6750)) ([07938bc](https://github.com/wireapp/wire-web-packages/commit/07938bc540853db83ff9b0c7a6540562d963eb6b))
+
 ## [0.24.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.24.0...@wireapp/webapp-events@0.24.3) (2024-10-16)
 
 ### Bug Fixes
