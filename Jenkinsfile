@@ -34,7 +34,7 @@ pipeline {
     environment {
         CREDENTIALS = credentials('GITHUB_TOKEN_WEB')
         WIRE_BOT_SECRET = credentials('JENKINSBOT_WEBAPP_DEV')
-        webappApplicationPath = 'https:/wire-webapp-precommit.zinfra.io/'
+        webappApplicationPath = 'https://wire-webapp-precommit.zinfra.io/'
     }
 
     stages {
@@ -152,14 +152,15 @@ pipeline {
           }
         }
     }
-}
-      post {
-        success {
-           wireSend secret: env.WIRE_BOT_SECRET, message: "✅ **Build finished for branch '$GIT_BRANCH_WEBAPP'**\n${commit_msg}"
-  }
-  failure {
-    script {
-      wireSend(secret: env.WIRE_BOT_SECRET, message: "❌ **$BRANCH_NAME**\n[$CHANGE_TITLE](${CHANGE_URL})\nBuild aborted or failed! See [Github Actions](" + env.GITHUB_ACTION_URL + ')')
-    }
-  }
+
+  post {
+      success {
+          wireSend secret: env.WIRE_BOT_SECRET, message: "✅ **Build finished for branch '$GIT_BRANCH_WEBAPP'**\n${commit_msg}"
       }
+      failure {
+          script {
+              wireSend(secret: env.WIRE_BOT_SECRET, message: "❌ **$BRANCH_NAME**\n[$CHANGE_TITLE](${CHANGE_URL})\nBuild aborted or failed! See [Github Actions](${env.GITHUB_ACTION_URL})")
+          }
+      }
+  }
+}
