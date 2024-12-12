@@ -23,17 +23,23 @@ import {splitFingerprint} from 'Util/StringUtil';
 
 import {styles} from './MLSDeviceDetails.styles';
 
-import {MLSPublicKeys} from '../../../../../../../client';
+import {isKnownSignature, MLSPublicKeys} from '../../../../../../../client';
 import {E2EICertificateDetails} from '../E2EICertificateDetails';
 import {FormattedId} from '../FormattedId';
 
 interface MLSDeviceDetailsProps {
+  cipherSuite?: string;
   isCurrentDevice?: boolean;
   identity?: WireIdentity;
   isSelfUser?: boolean;
 }
 
-export const MLSDeviceDetails = ({isCurrentDevice, identity, isSelfUser = false}: MLSDeviceDetailsProps) => {
+export const MLSDeviceDetails = ({
+  cipherSuite,
+  isCurrentDevice,
+  identity,
+  isSelfUser = false,
+}: MLSDeviceDetailsProps) => {
   if (!isCurrentDevice && !identity) {
     return null;
   }
@@ -53,7 +59,9 @@ export const MLSDeviceDetails = ({isCurrentDevice, identity, isSelfUser = false}
 
   return (
     <div css={styles.wrapper}>
-      <h4 className="paragraph-body-3">{t('mlsSignature', {signature: MLSPublicKeys.ED25519.toUpperCase()})}</h4>
+      {isKnownSignature(cipherSuite) && (
+        <h4 className="paragraph-body-3">{t('mlsSignature', {signature: MLSPublicKeys[cipherSuite]})}</h4>
+      )}
 
       {identity?.thumbprint && (
         <>
