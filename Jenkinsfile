@@ -155,7 +155,7 @@ pipeline {
 
   post {
       success {
-          wireSend secret: env.WIRE_BOT_SECRET, message: "✅ **Build finished for branch '$GIT_BRANCH_WEBAPP'**\n${commit_msg}"
+          wireSend secret: env.WIRE_BOT_SECRET, message: "✅ **Build finished for branch '$env.webappApplicationPath'**"
       }
       failure {
           script {
