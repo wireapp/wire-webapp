@@ -303,7 +303,7 @@ export class ConversationService {
     return this.apiClient.api.conversation.deleteMember(conversationId, userId);
   }
 
-  putMembers(conversationId: string, userId: string, data: ConversationOtherMemberUpdateData): Promise<void> {
+  putMembers(conversationId: string, userId: QualifiedId, data: ConversationOtherMemberUpdateData): Promise<void> {
     return this.apiClient.api.conversation.putOtherMember(userId, conversationId, data);
   }
 

@@ -95,7 +95,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
     }
 
     const newRole = isAdmin ? DefaultRole.WIRE_MEMBER : DefaultRole.WIRE_ADMIN;
-    await conversationRoleRepository.setMemberConversationRole(activeConversation, currentUser.id, newRole);
+    await conversationRoleRepository.setMemberConversationRole(activeConversation, currentUser.qualifiedId, newRole);
 
     roles[currentUser.id] = newRole;
     activeConversation.roles(roles);
