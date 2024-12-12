@@ -110,39 +110,39 @@ pipeline {
     stage('Check deployment') {
         steps {
             script {
-          def commit_hash = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
-          String commitMsg = sh(returnStdout: true, script: 'git log -1 --pretty=%B').trim()
-          try {
-            // Wait until deployment has finished (20 retries * 30 seconds == 10 minutes)
-            timeout(time: 10, unit: 'MINUTES') {
-              waitUntil {
-                def randomid = sh returnStdout: true, script: 'uuidgen'
-                randomid = randomid.trim()
-                def current_hash = sh returnStdout: true, script: "curl '${webappApplicationPath}commit?v=${randomid}'"
-                current_hash = current_hash.trim()
-                echo('Current version is: ' + current_hash)
-                if (current_hash == commit_hash) {
-                  echo('Deployment finished.')
-                  return true
+                def commit_hash = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
+                String commitMsg = sh(returnStdout: true, script: 'git log -1 --pretty=%B').trim()
+                try {
+                  // Wait until deployment has finished (20 retries * 30 seconds == 10 minutes)
+                  timeout(time: 10, unit: 'MINUTES') {
+                    waitUntil {
+                      def randomid = sh returnStdout: true, script: 'uuidgen'
+                      randomid = randomid.trim()
+                      def current_hash = sh returnStdout: true, script: "curl '${webappApplicationPath}commit?v=${randomid}'"
+                      current_hash = current_hash.trim()
+                      echo('Current version is: ' + current_hash)
+                      if (current_hash == commit_hash) {
+                        echo('Deployment finished.')
+                        return true
+                      }
+                      env.MESSAGE = 'Current hash still is ' + current_hash + ' and not ' + commit_hash
+                      sh "echo '${MESSAGE}' > deployment.log"
+                      sleep(30)
+                      return false
+                    }
+                  }
+              } catch (e) {
+                  def reason = sh returnStdout: true, script: 'cat deployment.log || echo ""'
+                  String errorMessage = """❌ **Deployment failed on** ${webappApplicationPath}
+                  ${commitMsg}
+                  **Reason:** ${e}
+                  ${reason}"""
+                  wireSend secret: env.WIRE_BOT_SECRET, message: errorMessage
                 }
-                env.MESSAGE = 'Current hash still is ' + current_hash + ' and not ' + commit_hash
-                sh "echo '${MESSAGE}' > deployment.log"
-                sleep(30)
-                return false
-              }
+                def successMessage = """✅ **Deployment successful on** ${webappApplicationPath}
+              ${commitMsg}"""
+                wireSend secret: env.WIRE_BOT_SECRET, message: successMessage
             }
-        } catch (e) {
-            def reason = sh returnStdout: true, script: 'cat deployment.log || echo ""'
-            String errorMessage = """❌ **Deployment failed on** ${webappApplicationPath}
-            ${commitMsg}
-            **Reason:** ${e}
-            ${reason}"""
-            wireSend secret: env.WIRE_BOT_SECRET, message: errorMessage
-          }
-            }
-        def successMessage = """✅ **Deployment successful on** ${webappApplicationPath}
-        ${commitMsg}"""
-        wireSend secret: env.WIRE_BOT_SECRET, message: successMessage
         }
     }
 
@@ -154,8 +154,8 @@ pipeline {
     }
 }
       post {
-  success {
-    wireSend secret: env.WIRE_BOT_SECRET, message: "✅ **Build finished for branch '$GIT_BRANCH_WEBAPP'**\n${commit_msg}"
+        success {
+           wireSend secret: env.WIRE_BOT_SECRET, message: "✅ **Build finished for branch '$GIT_BRANCH_WEBAPP'**\n${commit_msg}"
   }
   failure {
     script {
