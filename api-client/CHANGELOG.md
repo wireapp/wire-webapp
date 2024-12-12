@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.15.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.14.0...@wireapp/api-client@27.15.0) (2024-12-12)
+
+### Features
+
+* **api-client/core:** use v7 endpoint for setting member conversation roles [WPB-15024] ([#6754](https://github.com/wireapp/wire-web-packages/issues/6754)) ([33ea8fb](https://github.com/wireapp/wire-web-packages/commit/33ea8fbe2b6eed350a2c947f721082ab3adb3b87))
+
 # [27.14.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.13.2...@wireapp/api-client@27.14.0) (2024-12-10)
 
 ### Features
