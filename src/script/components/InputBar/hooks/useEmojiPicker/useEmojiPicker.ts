@@ -35,7 +35,9 @@ export const useEmojiPicker = ({wrapperRef, onEmojiPicked}: EmojiPickerParams) =
   const emojiPickerPosition = useRef<{x: number; y: number}>({x: 0, y: 0});
 
   const handleClose = () => {
-    setOpen(false);
+    if (open) {
+      setOpen(false);
+    }
   };
 
   const handleToggle = (event: MouseEvent<HTMLButtonElement>) => {
@@ -45,11 +47,7 @@ export const useEmojiPicker = ({wrapperRef, onEmojiPicked}: EmojiPickerParams) =
     setOpen(prev => !prev);
   };
 
-  useClickOutside(wrapperRef, () => {
-    if (open) {
-      handleClose();
-    }
-  });
+  useClickOutside(wrapperRef, handleClose);
 
   return {
     open,
