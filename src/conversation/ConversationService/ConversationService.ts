@@ -252,7 +252,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
 
   public setMemberConversationRole(
     conversationId: string,
-    userId: string,
+    userId: QualifiedId,
     conversationRole: DefaultConversationRoleName | string,
   ): Promise<void> {
     return this.apiClient.api.conversation.putOtherMember(userId, conversationId, {
