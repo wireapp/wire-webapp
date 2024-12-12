@@ -43,7 +43,6 @@ import {showAppNotification} from 'Components/AppNotification';
 import {getStorage} from 'Util/localStorage';
 import {getLogger, Logger} from 'Util/Logger';
 
-import {KEY} from './KeyboardUtil';
 import {TIME_IN_MILLIS} from './TimeUtil';
 import {createUuid} from './uuid';
 
@@ -255,9 +254,12 @@ export class DebugUtil {
     }
   }
 
-  async enablePushToTalk(key: string | null = KEY.SPACE) {
-    console.log('enablePushToTalk', {key});
-    this.propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY, key);
+  async enablePushToTalk() {
+    this.propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE, true);
+  }
+
+  async disablePushToTalk() {
+    this.propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE, false);
   }
 
   setupAvsDebugger() {

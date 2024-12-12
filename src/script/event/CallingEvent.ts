@@ -33,7 +33,6 @@ interface CallingEventContentData {
   [CALL_MESSAGE_TYPE.REMOTE_MUTE]: CallingRemoteMuteEventContentData;
   [CALL_MESSAGE_TYPE.EMOJIS]: {};
   [CALL_MESSAGE_TYPE.HAND_RAISED]: {};
-  [CALL_MESSAGE_TYPE.PRESS_TO_MUTE]: {};
 }
 
 type CallingEventContent = {

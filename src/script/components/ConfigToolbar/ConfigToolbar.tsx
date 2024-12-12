@@ -199,7 +199,7 @@ export function ConfigToolbar() {
 
       <Button onClick={() => window.wire?.app?.debug?.reconnectWebSocket()}>reconnectWebSocket</Button>
       <Button onClick={() => window.wire?.app?.debug?.enablePushToTalk()}>enablePushToTalk</Button>
-      <Button onClick={() => window.wire?.app?.debug?.enablePushToTalk(null)}>disablePushToTalk</Button>
+      <Button onClick={() => window.wire?.app?.debug?.disablePushToTalk()}>disablePushToTalk</Button>
 
       <div>{renderAvsSwitch(avsDebuggerEnabled)}</div>
 

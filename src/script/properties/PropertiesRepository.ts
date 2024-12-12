@@ -81,7 +81,6 @@ export class PropertiesRepository {
         call: {
           enable_soundless_incoming_calls: false,
           enable_vbr_encoding: true,
-          push_to_talk_key: null,
           enable_press_space_to_unmute: false,
         },
         emoji: {
@@ -347,9 +346,6 @@ export class PropertiesRepository {
         break;
       case PROPERTIES_TYPE.CALL.ENABLE_SOUNDLESS_INCOMING_CALLS:
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_SOUNDLESS_INCOMING_CALLS, updatedPreference);
-        break;
-      case PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY:
-        amplify.publish(WebAppEvents.PROPERTIES.UPDATE.CALL.PUSH_TO_TALK_KEY, updatedPreference);
         break;
       case PROPERTIES_TYPE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE:
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE, updatedPreference);
