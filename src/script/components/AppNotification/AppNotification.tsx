@@ -17,227 +17,159 @@
  *
  */
 
-// import {useCallback, useEffect, useRef, useState} from 'react';
+import {useEffect, useRef} from 'react';
 
-// import {createRoot} from 'react-dom/client';
+import {createRoot, Root} from 'react-dom/client';
+import {toast, Toaster} from 'sonner';
 
-// import * as Icon from 'Components/Icon';
+import {CloseIcon} from 'Components/Icon';
 
-// import {buttonStyles, closeIcon, content, wrapper} from './AppNotification.styles';
-
-// const DEFAULT_NOTIFICATION_TIMEOUT = 3000;
-// const ANIMATION_DURATION = 300;
-// const APP_NOTIFICATION_SELECTOR = '#app-notification';
-
-// interface AppNotificationProps {
-//   message: string;
-//   onClose: () => void;
-//   notificationTimeout?: number;
-// }
-
-// export const AppNotification = ({
-//   message,
-//   onClose,
-//   notificationTimeout = DEFAULT_NOTIFICATION_TIMEOUT,
-// }: AppNotificationProps) => {
-//   const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-//   const [isAnimated, setIsAnimated] = useState(false);
-//   const [isClosing, setIsClosing] = useState(false);
-
-//   const handleCloseNotification = useCallback(() => {
-//     closeTimeoutRef.current = setTimeout(() => {
-//       setIsClosing(true);
-//       setTimeout(() => {
-//         onClose();
-//       }, ANIMATION_DURATION);
-//     }, notificationTimeout - ANIMATION_DURATION);
-//   }, [notificationTimeout, onClose]);
-
-//   useEffect(() => {
-//     setIsAnimated(true);
-//     handleCloseNotification();
-
-//     return () => {
-//       if (closeTimeoutRef.current) {
-//         clearTimeout(closeTimeoutRef.current);
-//       }
-//     };
-//   }, [handleCloseNotification]);
-
-//   return (
-//     <div css={{...wrapper, top: isAnimated && !isClosing ? '50px' : '0', opacity: !isAnimated || isClosing ? 0 : 1}}>
-//       <div css={content}>{message}</div>
-
-//       <button css={buttonStyles} onClick={onClose}>
-//         <Icon.CloseIcon css={closeIcon} />
-//       </button>
-//     </div>
-//   );
-// };
-
-export const showAppNotification = (message: string) => {
-  const appNotificationContainer = document.querySelector(APP_NOTIFICATION_SELECTOR);
-
-  if (!appNotificationContainer) {
-    return;
-  }
-
-  const root = createRoot(appNotificationContainer);
-  const closeNotification = () => root.unmount();
-
-  root.render(<AppNotification message={message} onClose={closeNotification} />);
-};
-
-// export const createAppNotification = ({message, closeAfterMs}: {message: string; closeAfterMs?: number}) => {
-//   const appNotificationContainer = document.querySelector(APP_NOTIFICATION_SELECTOR);
-//   let isShown: boolean;
-
-//   if (!appNotificationContainer) {
-//     throw new Error('appNotificationContainer is not defined');
-//   }
-
-//   const root = createRoot(appNotificationContainer);
-//   const closeNotification = () => root.unmount();
-
-//   return {
-//     show: () => {
-//       if (isShown) {
-//         return;
-//       }
-//       root.render(<AppNotification message={message} onClose={closeNotification} notificationTimeout={closeAfterMs} />);
-//       isShown = true;
-//     },
-//     close: () => {
-//       closeNotification();
-//       isShown = false;
-//     },
-//   };
-// };
-
-import {useState, useCallback, useEffect} from 'react';
-
-import {createRoot} from 'react-dom/client';
-
-import * as Icon from 'Components/Icon';
-
-const DEFAULT_NOTIFICATION_TIMEOUT = 3000;
-const ANIMATION_DURATION = 300;
-const APP_NOTIFICATION_SELECTOR = '#app-notification';
-
-interface AppNotificationProps {
-  message: string;
-  onClose: () => void;
-  notificationTimeout?: number | null;
-  isClosing?: boolean;
+interface AppNotificationOptions {
+  message?: string;
+  /**
+   * The window in which the notification should be displayed.
+   * @default window
+   */
+  activeWindow?: Window;
+  /**
+   * Additional icon to be displayed in the notification.
+   */
+  icon?: React.ElementType<any>;
+  /**
+   * Whether the notification should have a close button.
+   */
+  withCloseButton?: boolean;
+  /**
+   * Whether the notification should be automatically closed after a certain time.
+   * @default true
+   */
+  autoClose?: boolean;
 }
 
-const AppNotification = ({
-  message,
-  notificationTimeout = DEFAULT_NOTIFICATION_TIMEOUT,
-  onClose,
-  isClosing = false,
-}: AppNotificationProps) => {
-  const [visible, setVisible] = useState(false);
+const NOTIFICATION_TIMEOUT_MS = 3000;
+const APP_NOTIFICATION_SELECTOR = '#app-notification';
+
+// Small delay to ensure rendering is complete.
+// In some cases (switching between windows) the notification is not displayed without this delay.
+// It's caused by the rendering behavior of the toast library (injecting the <Toaster/> into the DOM node).
+const ACTION_DELAY_MS = 1;
+
+// Stores React roots for different windows (activeWindow).
+// Each window (identified by its 'name' property or 'default' if not available) gets its own root.
+// This prevents multiple calls to createRoot() for the same container, ensuring a single root per window.
+// It's necessary to display notifications in different windows (e.g. main window and detached call window).
+let roots: Record<string, Root> = {};
+
+/**
+ * Hook to display app notifications.
+ *
+ * Usage, based on the default options:
+ * ```tsx
+ * const notification = useAppNotification({message: 'Hello, World!'});
+ * notification.show();
+ * ```
+ *
+ * Usage, with the show method options (useful when the message is dynamic, based on some other action):
+ *
+ * ```tsx
+ * const notification = useAppNotification();
+ * notification.show({message: 'Hello, World!'});
+ * ```
+ *
+ */
+export const useAppNotification = (props?: AppNotificationOptions) => {
+  const notificationId = useRef<string | number | null>(null);
+
+  const activeWindow = props?.activeWindow || window;
 
   useEffect(() => {
-    setVisible(true);
-
-    if (typeof notificationTimeout === 'number') {
-      const timer = setTimeout(onClose, notificationTimeout - ANIMATION_DURATION);
-      return () => clearTimeout(timer);
-    }
-  }, [notificationTimeout, onClose]);
-
-  if (!visible) {
-    return null;
-  }
-
-  return (
-    <div
-      className="notification"
-      style={{
-        top: !isClosing ? '50px' : '0',
-        opacity: isClosing ? 0 : 1,
-        transition: `all ${ANIMATION_DURATION}ms ease-in-out`,
-      }}
-    >
-      <div className="notification__content">{message}</div>
-      <button className="notification__button" onClick={onClose}>
-        <Icon.CloseIcon className="notification__close-icon" />
-      </button>
-    </div>
-  );
-};
-
-const NotificationContainer = () => {
-  const [notification, setNotification] = useState({message: '', timeout: null as number | null});
-  const [isClosing, setIsClosing] = useState(false);
-
-  const handleClose = useCallback(() => {
-    setIsClosing(true);
     setTimeout(() => {
-      setNotification({message: '', timeout: null});
-      setIsClosing(false);
-    }, ANIMATION_DURATION);
-  }, []);
+      clearRoots();
+    }, ACTION_DELAY_MS);
+  }, [activeWindow]);
 
-  useEffect(() => {
-    globalNotificationManager = (message, timeout) => {
-      if (message) {
-        setNotification({message, timeout});
-        setIsClosing(false);
-      } else {
-        handleClose();
+  return {
+    show: (options?: Pick<AppNotificationOptions, 'message'>) => {
+      injectToaster(activeWindow);
+
+      setTimeout(() => {
+        const id = toast.custom(
+          toastId => (
+            <AppNotification
+              message={options?.message || props?.message || ''}
+              icon={props?.icon}
+              withCloseButton={props?.withCloseButton}
+              onClose={() => toast.dismiss(toastId)}
+            />
+          ),
+          {
+            duration: props?.autoClose === false ? Infinity : NOTIFICATION_TIMEOUT_MS,
+            position: 'top-center',
+            unstyled: true,
+            dismissible: false,
+            style: {
+              top: 24,
+            },
+          },
+        );
+        notificationId.current = id;
+      }, ACTION_DELAY_MS);
+    },
+    close: () => {
+      if (!notificationId.current) {
+        return;
       }
-    };
-  }, [handleClose]);
 
-  if (!notification.message) {
-    return null;
-  }
-
-  return (
-    <AppNotification
-      message={notification.message}
-      notificationTimeout={notification.timeout}
-      onClose={handleClose}
-      isClosing={isClosing}
-    />
-  );
+      toast.dismiss(notificationId.current);
+    },
+  };
 };
 
-let root: ReturnType<typeof createRoot> | null = null;
-let globalNotificationManager: ((message: string, timeout?: number | null) => void) | null = null;
-let previousContainer: Window;
+export const injectToaster = (activeWindow: Window) => {
+  const windowKey = activeWindow.name || 'default';
 
-export const createAppNotification = ({
-  message,
-  timeout,
-
-  container = window,
-}: {
-  message: string;
-  timeout?: number | null;
-  container?: Window;
-}) => {
-  const notificationContainer = container.document.querySelector(APP_NOTIFICATION_SELECTOR);
-
-  if (!notificationContainer) {
-    console.warn(`Notification container with selector ${APP_NOTIFICATION_SELECTOR} not found.`);
+  if (roots[windowKey]) {
     return;
   }
 
-  if (!root || previousContainer.name !== container.name) {
-    previousContainer = container;
-    root = createRoot(notificationContainer);
-    root.render(<NotificationContainer />);
+  const container = activeWindow.document.querySelector(APP_NOTIFICATION_SELECTOR);
+
+  if (!container) {
+    throw new Error('Notification container not found!');
   }
 
-  return {
-    show: () => {
-      globalNotificationManager?.(message, timeout);
-    },
-    close: () => globalNotificationManager?.('', 0),
-  };
+  const root = createRoot(container);
+
+  roots[windowKey] = root;
+
+  root.render(<Toaster expand />);
+};
+
+// Clear all roots to prevent memory leaks.
+// Necessary, when the activeWindow changes (e.g. switching from the main window to the detached call window).
+// Without cleaning the roots (unmounting) the <Toaster /> from the DOM note, would be rendered in both windows.
+const clearRoots = () => {
+  // eslint-disable-next-line id-length
+  Object.entries(roots).forEach(([_, rootEntry]) => {
+    rootEntry.unmount();
+  });
+  roots = {};
+};
+
+interface AppNotificationProps extends Pick<AppNotificationOptions, 'message' | 'icon' | 'withCloseButton'> {
+  onClose?: () => void;
+}
+
+const AppNotification = ({message, icon: Icon, withCloseButton, onClose}: AppNotificationProps) => {
+  return (
+    <div className="app-notification">
+      {Icon && <Icon className="app-notification__icon" />}
+      <div className="app-notification__content">{message}</div>
+      {withCloseButton && (
+        <button className="app-notification__button" onClick={onClose}>
+          <CloseIcon className="app-notification__icon" />
+        </button>
+      )}
+    </div>
+  );
 };

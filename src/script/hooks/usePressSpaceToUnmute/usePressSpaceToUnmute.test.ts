@@ -19,7 +19,7 @@
 
 import {renderHook} from '@testing-library/react';
 
-import {usePushToTalk} from './usePushToTalk';
+import {usePushToTalk} from './usePressSpaceToUnmute';
 
 describe('PushToTalk', () => {
   it('unmutes if key was pressed when muted', async () => {

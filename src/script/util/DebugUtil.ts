@@ -39,7 +39,6 @@ import {container} from 'tsyringe';
 
 import {AvsDebugger} from '@wireapp/avs-debugger';
 
-import {showAppNotification} from 'Components/AppNotification';
 import {getStorage} from 'Util/localStorage';
 import {getLogger, Logger} from 'Util/Logger';
 
@@ -623,9 +622,5 @@ export class DebugUtil {
   // Used by QA test automation, allows to disable or enable the forced error reporting
   disableForcedErrorReporting() {
     return disableForcedErrorReporting();
-  }
-
-  renderAppNotification(message?: string) {
-    showAppNotification(message || 'Test notification');
   }
 }

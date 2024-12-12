@@ -55,7 +55,6 @@ import {AvsDebugger} from '@wireapp/avs-debugger';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {showAppNotification} from 'Components/AppNotification';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {CALL_QUALITY_FEEDBACK_KEY} from 'Components/Modals/QualityFeedbackModal/constants';
 import {flatten} from 'Util/ArrayUtil';
@@ -291,8 +290,8 @@ export class CallingRepository {
       const maximizedParticipant = call.maximizedParticipant();
       if (maximizedParticipant !== null) {
         maximizedParticipant.isSwitchingVideoResolution(true);
-        // This is a temporary solution. The SFT does not send a response when a track change has occurred.
-        // To prevent the wrong video from being briefly displayed, we introduce a timeout here.
+        // This is a temporary solution. The SFT does not send a response when a track change has occurred. To prevent
+        // the wrong video from being briefly displayed, we introduce a timeout here.
         window.setTimeout(() => {
           maximizedParticipant.isSwitchingVideoResolution(false);
         }, 1000);
@@ -866,7 +865,13 @@ export class CallingRepository {
           ? t('videoCallParticipantRaisedSelfHandUp')
           : t('videoCallParticipantRaisedTheirHandUp', {name});
 
-        showAppNotification(handUpMessage);
+        window.dispatchEvent(
+          new CustomEvent(WebAppEvents.CALL.HAND_RAISED, {
+            detail: {
+              notificationMessage: handUpMessage,
+            },
+          }),
+        );
 
         break;
       }
@@ -1061,6 +1066,9 @@ export class CallingRepository {
 
     try {
       const mediaStream = await this.getMediaStream({audio: true, screen: true}, call.isGroupOrConference);
+      if ('contentHint' in mediaStream.getVideoTracks()[0]) {
+        mediaStream.getVideoTracks()[0].contentHint = 'detail';
+      }
 
       // If the screen share is stopped by the os system or the browser, an "ended" event is triggered. We listen for
       // this event to clean up the screen share state in this case.
@@ -1129,9 +1137,9 @@ export class CallingRepository {
     const isScreenSharingSourceFromDetachedWindow = this.callState.isScreenSharingSourceFromDetachedWindow();
 
     if (joinedCall && isSharingScreen && isScreenSharingSourceFromDetachedWindow) {
+      window.dispatchEvent(new CustomEvent(WebAppEvents.CALL.SCREEN_SHARING_ENDED));
       this.callState.isScreenSharingSourceFromDetachedWindow(false);
       void this.toggleScreenshare(joinedCall);
-      showAppNotification(t('videoCallScreenShareEnded'));
     }
   };
 

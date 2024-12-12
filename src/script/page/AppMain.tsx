@@ -20,7 +20,6 @@
 import {FC, useEffect, useLayoutEffect} from 'react';
 
 import {amplify} from 'amplify';
-import cx from 'classnames';
 import {ErrorBoundary} from 'react-error-boundary';
 import {container} from 'tsyringe';
 
@@ -52,7 +51,6 @@ import {useAppState, ContentState} from './useAppState';
 import {CallingViewMode, CallState, DesktopScreenShareMenu} from '../calling/CallState';
 import {ConversationState} from '../conversation/ConversationState';
 import {User} from '../entity/User';
-import {useWarnings} from '../guards/useWarnings';
 import {useActiveWindow} from '../hooks/useActiveWindow';
 import {useInitializeRootFontSize} from '../hooks/useRootFontSize';
 import {App} from '../main/app';
@@ -111,8 +109,6 @@ export const AppMain: FC<AppMainProps> = ({
     'desktopScreenShareMenu',
     'viewMode',
   ]);
-
-  const {showSmallOffset, showLargeOffset} = useWarnings();
 
   const teamState = container.resolve(TeamState);
   const userState = container.resolve(UserState);
@@ -253,13 +249,7 @@ export const AppMain: FC<AppMainProps> = ({
         <ErrorBoundary FallbackComponent={ErrorFallback}>
           {Config.getConfig().FEATURE.ENABLE_DEBUG && <ConfigToolbar />}
           {!locked && (
-            <div
-              id="app"
-              className={cx('app', {
-                'app--small-offset': showSmallOffset,
-                'app--large-offset': showLargeOffset,
-              })}
-            >
+            <div id="app" className="app">
               {showLeftSidebar && (
                 <LeftSidebar
                   listViewModel={mainView.list}

@@ -25,6 +25,7 @@ import {container} from 'tsyringe';
 import {CALL_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {useAppNotification} from 'Components/AppNotification';
 import {callingContainer} from 'Components/calling/CallingCell/CallingCell.styles';
 import {CallingControls} from 'Components/calling/CallingCell/CallingControls';
 import {CallingHeader} from 'Components/calling/CallingCell/CallingHeader';
@@ -32,7 +33,7 @@ import {GroupVideoGrid} from 'Components/calling/GroupVideoGrid';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import * as Icon from 'Components/Icon';
-import {usePushToTalk} from 'src/script/hooks/usePushToTalk/usePushToTalk';
+import {usePressSpaceToUnmute} from 'Hooks/usePressSpaceToUnmute/usePressSpaceToUnmute';
 import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
@@ -162,12 +163,29 @@ export const CallingCell = ({
     WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE,
   );
 
-  usePushToTalk({
+  usePressSpaceToUnmute({
     callState,
     toggleMute,
     isMuted: isCurrentlyMuted,
     enabled: pressSpaceToUnmuteEnabled,
   });
+
+  const screenSharingEndedNotification = useAppNotification({
+    message: t('videoCallScreenShareEnded'),
+    activeWindow: window,
+  });
+
+  useEffect(() => {
+    const screenSharingEndedHandler = () => {
+      screenSharingEndedNotification.show();
+    };
+
+    window.addEventListener(WebAppEvents.CALL.SCREEN_SHARING_ENDED, screenSharingEndedHandler);
+
+    return () => {
+      window.removeEventListener(WebAppEvents.CALL.SCREEN_SHARING_ENDED, screenSharingEndedHandler);
+    };
+  }, [screenSharingEndedNotification]);
 
   const handleMaximizeKeydown = useCallback(
     (event: React.KeyboardEvent<HTMLInputElement>) => {

@@ -25,7 +25,7 @@ import {container} from 'tsyringe';
 import {Button, ButtonVariant, Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {showAppNotification} from 'Components/AppNotification';
+import {useAppNotification} from 'Components/AppNotification';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
@@ -58,6 +58,10 @@ export const QualityFeedbackModal = () => {
   const {setQualityFeedbackModalShown, qualityFeedbackModalShown} = useCallAlertState();
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
 
+  const submittedNotification = useAppNotification({
+    message: t('qualityFeedback.notificationSubmitted'),
+  });
+
   if (!qualityFeedbackModalShown) {
     return null;
   }
@@ -76,7 +80,7 @@ export const QualityFeedbackModal = () => {
 
       currentStorageData[selfUser.id] = isChecked ? null : dateUntilShowModal.getTime();
       localStorage.setItem(CALL_QUALITY_FEEDBACK_KEY, JSON.stringify(currentStorageData));
-      showAppNotification(t('qualityFeedback.notificationSubmitted'));
+      submittedNotification.show();
     } catch (error) {
       logger.warn(`Can't send feedback: ${(error as Error).message}`);
     } finally {

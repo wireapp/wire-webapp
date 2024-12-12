@@ -20,7 +20,6 @@
 import React from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
-import {observable, Observable} from 'knockout';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {UserStatusBadges} from 'Components/Badge';
@@ -46,7 +45,7 @@ export interface CallParticipantsListItemProps {
   onContextMenu: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   isSelfVerified?: boolean;
   isLast?: boolean;
-  handRaisedAt?: Observable<number | null>;
+  handRaisedAt?: number | null;
 }
 
 export const CallParticipantsListItem = ({
@@ -55,11 +54,10 @@ export const CallParticipantsListItem = ({
   showContextMenu,
   onContextMenu,
   isLast = false,
-  handRaisedAt = observable(null),
+  handRaisedAt = null,
 }: CallParticipantsListItemProps) => {
   const {user} = callParticipant;
   const {isMe: isSelf, isFederated} = user;
-
   const {isAudioEstablished} = useKoSubscribableChildren(callParticipant, ['isAudioEstablished']);
 
   const {
@@ -110,7 +108,7 @@ export const CallParticipantsListItem = ({
           onDropdownClick={event => onContextMenu?.(event as unknown as React.MouseEvent<HTMLDivElement>)}
         />
 
-        <CallParticipantsListItemHandRaiseIcon handRaisedAt={{value: handRaisedAt}} />
+        {handRaisedAt && <CallParticipantsListItemHandRaiseIcon handRaisedAt={handRaisedAt} />}
 
         {isAudioEstablished ? (
           <>
