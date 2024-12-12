@@ -65,6 +65,8 @@ export const WebAppEvents = {
       REJECT: 'wire.webapp.call.state.reject',
       TOGGLE: 'wire.webapp.call.state.toggle',
     },
+    HAND_RAISED: 'wire.webapp.call.hand_raised',
+    SCREEN_SHARING_ENDED: 'wire.webapp.call.screen_sharing_ended',
   },
   CLIENT: {
     ADD: 'wire.webapp.user.client.add',
