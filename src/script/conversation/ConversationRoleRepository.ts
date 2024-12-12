@@ -112,7 +112,7 @@ export class ConversationRoleRepository {
     userId: QualifiedId,
     conversationRole: string,
   ): Promise<void> => {
-    return this.conversationService.putMembers(conversation.id, userId, {
+    return this.conversationService.putMembers(conversation.qualifiedId, userId, {
       conversation_role: conversationRole,
     });
   };
