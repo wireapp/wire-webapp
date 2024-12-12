@@ -35,7 +35,9 @@ import {
   RaiseHandIcon,
   Select,
 } from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {useAppNotification} from 'Components/AppNotification/AppNotification';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import * as Icon from 'Components/Icon';
@@ -236,6 +238,24 @@ const FullscreenVideoCall = ({
 
   const [isCallViewOpen, toggleCallView] = useToggleState(false);
   const [isParticipantsListOpen, toggleParticipantsList] = useToggleState(false);
+
+  const handRaisedNotification = useAppNotification({
+    activeWindow: viewMode === CallingViewMode.DETACHED_WINDOW ? detachedWindow! : window,
+  });
+
+  useEffect(() => {
+    const handRaisedHandler = (event: Event) => {
+      handRaisedNotification.show({
+        message: (event as CustomEvent<{notificationMessage: string}>).detail.notificationMessage,
+      });
+    };
+
+    window.addEventListener(WebAppEvents.CALL.HAND_RAISED, handRaisedHandler);
+
+    return () => {
+      window.removeEventListener(WebAppEvents.CALL.HAND_RAISED, handRaisedHandler);
+    };
+  }, [handRaisedNotification]);
 
   function toggleIsHandRaised(currentIsHandRaised: boolean) {
     selfParticipant.handRaisedAt(new Date().getTime());
