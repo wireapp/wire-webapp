@@ -20,6 +20,7 @@
 import {useCallback, useEffect, useRef} from 'react';
 
 import {useAppNotification} from 'Components/AppNotification';
+import {MicOnIcon} from 'Components/Icon';
 import {useActiveWindowState} from 'Hooks/useActiveWindow';
 import {CallingViewMode, CallState} from 'src/script/calling/CallState';
 import {handleKeyPress, KEY} from 'Util/KeyboardUtil';
@@ -34,6 +35,9 @@ interface PushToTalk {
 const HOLD_DELAY = 200;
 
 export const usePressSpaceToUnmute = ({callState, toggleMute, isMuted, enabled}: PushToTalk) => {
+  const hasNotifiedRef = useRef(false);
+  const holdTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const isInCallAndViewMode = checkUserInCallAndViewMode(callState);
 
   const {detachedWindow, viewMode} = callState;
@@ -42,14 +46,13 @@ export const usePressSpaceToUnmute = ({callState, toggleMute, isMuted, enabled}:
 
   const micOnNotification = useAppNotification({
     message: 'Microphone temporarily on',
+    icon: MicOnIcon,
     activeWindow,
+    withCloseButton: false,
     autoClose: false,
   });
 
-  const hasNotifiedRef = useRef(false);
-  const holdTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const startHoldTracking = useCallback(() => {
+  const handlePress = useCallback(() => {
     if (!isMuted()) {
       return;
     }
@@ -69,7 +72,7 @@ export const usePressSpaceToUnmute = ({callState, toggleMute, isMuted, enabled}:
     }, HOLD_DELAY);
   }, [micOnNotification, toggleMute, isMuted]);
 
-  const stopHoldTracking = useCallback(() => {
+  const handleRelease = useCallback(() => {
     if (holdTimeoutRef.current) {
       clearTimeout(holdTimeoutRef.current);
       holdTimeoutRef.current = null;
@@ -85,11 +88,14 @@ export const usePressSpaceToUnmute = ({callState, toggleMute, isMuted, enabled}:
       return;
     }
 
-    handleKeyPress(KEY.SPACE, activeWindow, {
-      onPress: startHoldTracking,
-      onRelease: stopHoldTracking,
+    handleKeyPress({
+      key: KEY.SPACE,
+      activeWindow,
+      onPress: handlePress,
+      onRelease: handleRelease,
+      useCapture: true,
     });
-  }, [activeWindow, enabled, isInCallAndViewMode, startHoldTracking, stopHoldTracking]);
+  }, [activeWindow, enabled, isInCallAndViewMode, handlePress, handleRelease]);
 };
 
 const checkUserInCallAndViewMode = (callState: CallState): boolean => {

@@ -253,11 +253,11 @@ export class DebugUtil {
     }
   }
 
-  async enablePushToTalk() {
+  async enablePressSpaceToUnmute() {
     this.propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE, true);
   }
 
-  async disablePushToTalk() {
+  async disablePressSpaceToUnmute() {
     this.propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE, false);
   }
 

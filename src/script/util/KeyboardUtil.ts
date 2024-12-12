@@ -105,6 +105,14 @@ export const handleEscDown = (event: ReactKeyboardEvent<Element> | KeyboardEvent
   }
 };
 
+interface HandleKeyPressParmas {
+  key: string;
+  activeWindow?: Window;
+  onPress: (event: KeyboardEvent) => void;
+  onRelease: (event: KeyboardEvent) => void;
+  useCapture?: boolean;
+}
+
 /**
  * Handles global key press event - calls onPress when the key is pressed and onRelease when the key is released.
  * @note The onPress is called only once when the key is pressed (it is not called repeatedly when key is held down).
@@ -113,11 +121,13 @@ export const handleEscDown = (event: ReactKeyboardEvent<Element> | KeyboardEvent
  * @param onRelease A function to call when the key is released.
  * @returns A function to unsubscribe.
  */
-export const handleKeyPress = (
-  key: string,
-  element: Window | null = window,
-  {onPress, onRelease}: {onPress: () => void; onRelease: () => void},
-) => {
+export const handleKeyPress = ({
+  key,
+  activeWindow = window,
+  onPress,
+  onRelease,
+  useCapture = false,
+}: HandleKeyPressParmas) => {
   let isKeyDown = false;
 
   const handleKeyDown = (event: KeyboardEvent) => {
@@ -132,7 +142,7 @@ export const handleKeyPress = (
 
     isKeyDown = true;
 
-    onPress();
+    onPress(event);
   };
 
   const handleKeyUp = (event: KeyboardEvent) => {
@@ -148,14 +158,14 @@ export const handleKeyPress = (
     // Release the key.
     isKeyDown = false;
 
-    onRelease();
+    onRelease(event);
   };
 
-  element?.addEventListener('keydown', handleKeyDown, true);
-  element?.addEventListener('keyup', handleKeyUp, true);
+  activeWindow.addEventListener('keydown', handleKeyDown, useCapture);
+  activeWindow.addEventListener('keyup', handleKeyUp, useCapture);
 
   return () => {
-    element?.removeEventListener('keydown', handleKeyDown, true);
-    element?.removeEventListener('keyup', handleKeyUp, true);
+    activeWindow.removeEventListener('keydown', handleKeyDown, useCapture);
+    activeWindow.removeEventListener('keyup', handleKeyUp, useCapture);
   };
 };
