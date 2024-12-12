@@ -56,7 +56,6 @@ export const CallParticipantStatusIcons = ({callParticipant}: CallParticipantSta
       {isMuted ? (
         <span css={micOffWrapper}>
           <Icon.MicOffIcon css={micOffIcon} data-uie-name="status-audio-off" />
-          <Icon.ZoomInIcon css={micOffIcon} data-uie-name="status-zoom-in" />
         </span>
       ) : (
         <ParticipantMicOnIcon
