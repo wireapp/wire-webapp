@@ -865,7 +865,13 @@ export class CallingRepository {
           ? t('videoCallParticipantRaisedSelfHandUp')
           : t('videoCallParticipantRaisedTheirHandUp', {name});
 
-        amplify.publish(WebAppEvents.CALL.HAND_RAISED, {notificationMessage: handUpMessage});
+        window.dispatchEvent(
+          new CustomEvent(WebAppEvents.CALL.HAND_RAISED, {
+            detail: {
+              notificationMessage: handUpMessage,
+            },
+          }),
+        );
 
         break;
       }
@@ -1128,7 +1134,7 @@ export class CallingRepository {
     const isScreenSharingSourceFromDetachedWindow = this.callState.isScreenSharingSourceFromDetachedWindow();
 
     if (joinedCall && isSharingScreen && isScreenSharingSourceFromDetachedWindow) {
-      amplify.publish(WebAppEvents.CALL.SCREEN_SHARING_ENDED);
+      window.dispatchEvent(new CustomEvent(WebAppEvents.CALL.SCREEN_SHARING_ENDED));
       this.callState.isScreenSharingSourceFromDetachedWindow(false);
       void this.toggleScreenshare(joinedCall);
     }

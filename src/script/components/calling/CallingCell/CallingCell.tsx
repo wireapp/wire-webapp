@@ -20,7 +20,6 @@
 import React, {useCallback, useEffect} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
-import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
 import {CALL_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
@@ -168,12 +167,14 @@ export const CallingCell = ({
   });
 
   useEffect(() => {
-    amplify.subscribe(WebAppEvents.CALL.SCREEN_SHARING_ENDED, () => {
+    const screenSharingEndedHandler = () => {
       screenSharingEndedNotification.show();
-    });
+    };
+
+    window.addEventListener(WebAppEvents.CALL.SCREEN_SHARING_ENDED, screenSharingEndedHandler);
 
     return () => {
-      amplify.unsubscribeAll(WebAppEvents.CALL.SCREEN_SHARING_ENDED);
+      window.removeEventListener(WebAppEvents.CALL.SCREEN_SHARING_ENDED, screenSharingEndedHandler);
     };
   }, [screenSharingEndedNotification]);
 

@@ -21,7 +21,6 @@ import React, {useEffect, useRef, useState} from 'react';
 
 import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation/';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
-import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
@@ -245,12 +244,16 @@ const FullscreenVideoCall = ({
   });
 
   useEffect(() => {
-    amplify.subscribe(WebAppEvents.CALL.HAND_RAISED, (event: {notificationMessage: string}) => {
-      handRaisedNotification.show({message: event.notificationMessage});
-    });
+    const handRaisedHandler = (event: Event) => {
+      handRaisedNotification.show({
+        message: (event as CustomEvent<{notificationMessage: string}>).detail.notificationMessage,
+      });
+    };
+
+    window.addEventListener(WebAppEvents.CALL.HAND_RAISED, handRaisedHandler);
 
     return () => {
-      amplify.unsubscribeAll(WebAppEvents.CALL.HAND_RAISED);
+      window.removeEventListener(WebAppEvents.CALL.HAND_RAISED, handRaisedHandler);
     };
   }, [handRaisedNotification]);
 
