@@ -148,7 +148,7 @@ pipeline {
 
         stage('Trigger smoke test') {
           steps {
-            build job: 'Webapp_Smoke_Chrome', parameters: [string(name: 'TAGS', value: '@smoke'), string(name: 'GIT_BRANCH', value: 'dev'), string(name: 'webappApplicationPath', value: "$webappApplicationPath")], wait: false
+            build job: 'Webapp_Smoke_Chrome', parameters: [string(name: 'TAGS', value: '@smoke'), string(name: 'GIT_BRANCH', value: 'web-dev'), string(name: 'webappApplicationPath', value: "$webappApplicationPath")], wait: false
           }
         }
     }
