@@ -96,7 +96,7 @@ export const useKeyPressAndHold = ({
 
   useEffect(() => {
     if (!enabled) {
-      return;
+      return undefined;
     }
 
     activeWindow.addEventListener('keydown', handleKeyDown, true);

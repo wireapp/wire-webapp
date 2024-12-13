@@ -55,7 +55,7 @@ describe('usePressSpaceToUnmute', () => {
   const defaultCallState = {
     joinedCall: () => true,
     viewMode: () => CallingViewMode.FULL_SCREEN,
-    detachedWindow: () => null,
+    detachedWindow: (): Window | null => null,
   } as unknown as CallState;
 
   beforeEach(() => {
