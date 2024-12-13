@@ -18,6 +18,7 @@
  */
 
 import {DefaultConversationRoleName as DefaultRole, ConversationRole} from '@wireapp/api-client/lib/conversation/';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
@@ -108,10 +109,10 @@ export class ConversationRoleRepository {
 
   readonly setMemberConversationRole = (
     conversation: Conversation,
-    userId: string,
+    userId: QualifiedId,
     conversationRole: string,
   ): Promise<void> => {
-    return this.conversationService.putMembers(conversation.id, userId, {
+    return this.conversationService.putMembers(conversation.qualifiedId, userId, {
       conversation_role: conversationRole,
     });
   };

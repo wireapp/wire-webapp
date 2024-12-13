@@ -59,13 +59,11 @@ export const useUserIdentity = (userId: QualifiedId, groupId?: string, updateAft
 
   return {
     deviceIdentities,
-
     status: !deviceIdentities
       ? undefined
       : deviceIdentities.length > 0 && deviceIdentities.every(identity => identity.status === MLSStatuses.VALID)
         ? MLSStatuses.VALID
         : MLSStatuses.NOT_ACTIVATED,
-
     getDeviceIdentity,
   };
 };
