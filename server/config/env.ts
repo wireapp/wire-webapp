@@ -177,6 +177,9 @@ export type Env = {
   /** Feature to enable Cross Platform Backup export */
   FEATURE_ENABLE_CROSS_PLATFORM_BACKUP_EXPORT: string;
 
+  /** Feature to enable the press space to unmute feature */
+  FEATURE_ENABLE_PRESS_SPACE_TO_UNMUTE: string;
+
   /** Sets the verification ID for Google webmasters */
   GOOGLE_WEBMASTER_ID: string;
 

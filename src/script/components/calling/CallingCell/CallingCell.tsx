@@ -33,6 +33,7 @@ import {GroupVideoGrid} from 'Components/calling/GroupVideoGrid';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import * as Icon from 'Components/Icon';
+import {Config} from 'src/script/Config';
 import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
@@ -159,16 +160,17 @@ export const CallingCell = ({
     [call, callActions],
   );
 
-  const pressSpaceToUnmuteEnabled = useUserPropertyValue(
-    () => propertiesRepository.getPreference(PROPERTIES_TYPE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE),
-    WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE,
-  );
+  const isPressSpaceToUnmuteEnabled =
+    useUserPropertyValue(
+      () => propertiesRepository.getPreference(PROPERTIES_TYPE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE),
+      WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE,
+    ) && Config.getConfig().FEATURE.ENABLE_PRESS_SPACE_TO_UNMUTE;
 
   usePressSpaceToUnmute({
     callState,
     toggleMute,
     isMuted: isCurrentlyMuted,
-    enabled: pressSpaceToUnmuteEnabled,
+    enabled: isPressSpaceToUnmuteEnabled,
   });
 
   const screenSharingEndedNotification = useAppNotification({

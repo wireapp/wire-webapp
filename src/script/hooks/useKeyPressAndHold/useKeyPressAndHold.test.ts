@@ -38,13 +38,11 @@ describe('useKeyPressAndHold', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.clearAllTimers();
-    // Clean up any existing event listeners
     window.removeEventListener('keydown', expect.any(Function));
     window.removeEventListener('keyup', expect.any(Function));
   });
 
   afterEach(() => {
-    // Cleanup after each test
     jest.clearAllTimers();
     jest.clearAllMocks();
   });
