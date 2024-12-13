@@ -17,11 +17,16 @@
  *
  */
 
+import {amplify} from 'amplify';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {useAppNotification} from 'Components/AppNotification';
 import {MicOnIcon} from 'Components/Icon';
 import {useActiveWindowState} from 'Hooks/useActiveWindow';
 import {useKeyPressAndHold} from 'Hooks/useKeyPressAndHold/useKeyPressAndHold';
 import {CallingViewMode, CallState} from 'src/script/calling/CallState';
+import {EventName} from 'src/script/tracking/EventName';
 import {KEY} from 'Util/KeyboardUtil';
 
 interface UsePressAndHoldParams {
@@ -59,6 +64,7 @@ export const usePressSpaceToUnmute = ({callState, toggleMute, isMuted, enabled}:
       }
       toggleMute(false);
       micOnNotification.show();
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.PRESS_SPACE_TO_UNMUTE);
     },
     onRelease: () => {
       toggleMute(true);
