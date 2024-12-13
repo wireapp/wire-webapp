@@ -33,7 +33,6 @@ import {GroupVideoGrid} from 'Components/calling/GroupVideoGrid';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import * as Icon from 'Components/Icon';
-import {usePressSpaceToUnmute} from 'Hooks/usePressSpaceToUnmute/usePressSpaceToUnmute';
 import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
@@ -41,6 +40,8 @@ import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isEnterKey, isSpaceOrEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
+
+import {usePressSpaceToUnmute} from './usePressSpaceToUnmute/usePressSpaceToUnmute';
 
 import type {Call} from '../../../calling/Call';
 import type {CallingRepository} from '../../../calling/CallingRepository';

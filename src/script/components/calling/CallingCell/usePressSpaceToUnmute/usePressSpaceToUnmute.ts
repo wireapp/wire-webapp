@@ -17,15 +17,14 @@
  *
  */
 
-import {useCallback, useEffect, useRef} from 'react';
-
 import {useAppNotification} from 'Components/AppNotification';
 import {MicOnIcon} from 'Components/Icon';
 import {useActiveWindowState} from 'Hooks/useActiveWindow';
+import {useKeyPressAndHold} from 'Hooks/useKeyPressAndHold/useKeyPressAndHold';
 import {CallingViewMode, CallState} from 'src/script/calling/CallState';
-import {handleKeyPress, KEY} from 'Util/KeyboardUtil';
+import {KEY} from 'Util/KeyboardUtil';
 
-interface PushToTalk {
+interface UsePressAndHoldParams {
   callState: CallState;
   toggleMute: (shouldMute: boolean) => void;
   isMuted: () => boolean;
@@ -34,10 +33,7 @@ interface PushToTalk {
 
 const HOLD_DELAY = 200;
 
-export const usePressSpaceToUnmute = ({callState, toggleMute, isMuted, enabled}: PushToTalk) => {
-  const hasNotifiedRef = useRef(false);
-  const holdTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
+export const usePressSpaceToUnmute = ({callState, toggleMute, isMuted, enabled}: UsePressAndHoldParams) => {
   const isInCallAndViewMode = checkUserInCallAndViewMode(callState);
 
   const {detachedWindow, viewMode} = callState;
@@ -52,50 +48,23 @@ export const usePressSpaceToUnmute = ({callState, toggleMute, isMuted, enabled}:
     autoClose: false,
   });
 
-  const handlePress = useCallback(() => {
-    if (!isMuted()) {
-      return;
-    }
-
-    if (holdTimeoutRef.current) {
-      clearTimeout(holdTimeoutRef.current);
-    }
-
-    holdTimeoutRef.current = setTimeout(() => {
-      if (hasNotifiedRef.current) {
+  useKeyPressAndHold({
+    key: KEY.SPACE,
+    enabled: enabled && isInCallAndViewMode,
+    activeWindow,
+    holdDelay: HOLD_DELAY,
+    onHold: () => {
+      if (!isMuted()) {
         return;
       }
-
       toggleMute(false);
       micOnNotification.show();
-      hasNotifiedRef.current = true;
-    }, HOLD_DELAY);
-  }, [micOnNotification, toggleMute, isMuted]);
-
-  const handleRelease = useCallback(() => {
-    if (holdTimeoutRef.current) {
-      clearTimeout(holdTimeoutRef.current);
-      holdTimeoutRef.current = null;
-    }
-
-    toggleMute(true);
-    micOnNotification.close();
-    hasNotifiedRef.current = false;
-  }, [toggleMute, micOnNotification]);
-
-  useEffect(() => {
-    if (!enabled || !isInCallAndViewMode) {
-      return;
-    }
-
-    handleKeyPress({
-      key: KEY.SPACE,
-      activeWindow,
-      onPress: handlePress,
-      onRelease: handleRelease,
-      useCapture: true,
-    });
-  }, [activeWindow, enabled, isInCallAndViewMode, handlePress, handleRelease]);
+    },
+    onRelease: () => {
+      toggleMute(true);
+      micOnNotification.close();
+    },
+  });
 };
 
 const checkUserInCallAndViewMode = (callState: CallState): boolean => {
