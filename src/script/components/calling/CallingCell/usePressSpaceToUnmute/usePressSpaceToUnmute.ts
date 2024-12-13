@@ -28,6 +28,7 @@ import {useKeyPressAndHold} from 'Hooks/useKeyPressAndHold/useKeyPressAndHold';
 import {CallingViewMode, CallState} from 'src/script/calling/CallState';
 import {EventName} from 'src/script/tracking/EventName';
 import {KEY} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
 
 interface UsePressSpaceToUnmuteParams {
   callState: CallState;
@@ -46,7 +47,7 @@ export const usePressSpaceToUnmute = ({callState, toggleMute, isMuted, enabled}:
   const activeWindow = viewMode() === CallingViewMode.DETACHED_WINDOW ? detachedWindow()! : window;
 
   const micOnNotification = useAppNotification({
-    message: 'Microphone temporarily on',
+    message: t('videoCallParticipantPressSpaceToUnmuteNotification'),
     icon: MicOnIcon,
     activeWindow,
     withCloseButton: false,

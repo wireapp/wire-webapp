@@ -1617,6 +1617,7 @@ declare module 'I18n/en-US.json' {
     'videoCallOverlayViewModeLabel': `View mode`;
     'videoCallOverlayViewModeSpeakers': `Show active speakers only`;
     'videoCallParticipantConnecting': `Connecting...`;
+    'videoCallParticipantPressSpaceToUnmuteNotification': `Microphone temporarily on`;
     'videoCallParticipantRaisedHandRaiseDuration': `Hand raised for {duration}`;
     'videoCallParticipantRaisedSelfHandUp': `You have raised your hand up`;
     'videoCallParticipantRaisedSortByTime': `Top in the list raised their hand first.`;
