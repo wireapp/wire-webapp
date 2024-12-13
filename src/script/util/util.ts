@@ -300,10 +300,10 @@ export const setContextMenuPosition = (event: React.KeyboardEvent) => {
   });
 };
 
-const supportsSecretStorage = () => !Runtime.isDesktopApp() || !!window.systemCrypto;
+// const supportsSecretStorage = () => !Runtime.isDesktopApp() || !!window.systemCrypto;
 
 // disables mls for old 'broken' desktop clients, see https://github.com/wireapp/wire-desktop/pull/6094
-export const supportsMLS = () => supportsSecretStorage();
+export const supportsMLS = () => false;
 
 export const incomingCssClass = 'content-animation-incoming-horizontal-left';
 
