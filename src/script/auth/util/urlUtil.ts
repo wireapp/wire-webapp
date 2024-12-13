@@ -61,3 +61,9 @@ export function openTab(url: string): Window {
   }
   return newWindow;
 }
+
+export const SSO_CODE_PREFIX = 'wire-';
+
+export function getPrefixedSSOCode(code?: string) {
+  return code ? `${SSO_CODE_PREFIX}${code}` : '';
+}
