@@ -126,9 +126,11 @@ export const UserVerificationBadges = ({
 export const DeviceVerificationBadges = ({
   device,
   getIdentity,
+  isE2EIEnabled = false,
 }: {
   device: ClientEntity;
   getIdentity?: (deviceId: string) => WireIdentity | undefined;
+  isE2EIEnabled?: boolean;
 }) => {
   const userState = useRef(container.resolve(UserState));
   const identity = useMemo(() => getIdentity?.(device.id), [device, getIdentity]);
@@ -159,7 +161,7 @@ export const DeviceVerificationBadges = ({
   }, [identity]);
 
   let status: MLSStatuses | undefined = undefined;
-  if (identity && user) {
+  if (isE2EIEnabled && identity && user) {
     const mlsStatuses = getMLSStatuses({identities: [identity], user});
     status = mlsStatuses?.[0];
   }
