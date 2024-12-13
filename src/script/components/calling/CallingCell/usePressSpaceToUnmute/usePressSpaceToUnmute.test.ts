@@ -59,16 +59,7 @@ describe('usePressSpaceToUnmute', () => {
   } as unknown as CallState;
 
   beforeEach(() => {
-    // Reset mocks
     jest.clearAllMocks();
-
-    // Setup default mocks
-    (useKeyPressAndHold as jest.Mock).mockImplementation(({onHold, onRelease}) => {
-      return {
-        onHold,
-        onRelease,
-      };
-    });
 
     (useAppNotification as jest.Mock).mockReturnValue(mockMicOnNotification);
   });
@@ -94,7 +85,7 @@ describe('usePressSpaceToUnmute', () => {
     const callStateNotInCall = {
       ...defaultCallState,
       joinedCall: () => false,
-    };
+    } as unknown as CallState;
 
     renderHook(() =>
       usePressSpaceToUnmute({
@@ -179,7 +170,7 @@ describe('usePressSpaceToUnmute', () => {
       ...defaultCallState,
       viewMode: () => CallingViewMode.DETACHED_WINDOW,
       detachedWindow: () => mockActiveWindow,
-    };
+    } as unknown as CallState;
 
     jest
       .spyOn(require('Hooks/useActiveWindow').useActiveWindowState, 'getState')

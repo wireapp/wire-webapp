@@ -32,7 +32,7 @@ describe('useKeyPressAndHold', () => {
     key: KEY.SPACE,
     onHold: mockOnHold,
     onRelease: mockOnRelease,
-    holdDelay: 200,
+    holdDelayMs: 200,
   };
 
   beforeEach(() => {
@@ -67,7 +67,7 @@ describe('useKeyPressAndHold', () => {
     expect(mockOnRelease).toHaveBeenCalledTimes(1);
   });
 
-  it('not trigger onHold if key is released before holdDelay', () => {
+  it("doesn't trigger onHold if key is released before holdDelay", () => {
     renderHook(() => useKeyPressAndHold(defaultProps));
 
     act(() => {
@@ -83,7 +83,7 @@ describe('useKeyPressAndHold', () => {
     expect(mockOnRelease).toHaveBeenCalledTimes(1);
   });
 
-  it('not respond to key events when disabled', () => {
+  it("doesn't respond to key events when disabled", () => {
     renderHook(() => useKeyPressAndHold({...defaultProps, enabled: false}));
 
     act(() => {

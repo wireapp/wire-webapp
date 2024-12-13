@@ -29,16 +29,16 @@ import {CallingViewMode, CallState} from 'src/script/calling/CallState';
 import {EventName} from 'src/script/tracking/EventName';
 import {KEY} from 'Util/KeyboardUtil';
 
-interface UsePressAndHoldParams {
+interface UsePressSpaceToUnmuteParams {
   callState: CallState;
   toggleMute: (shouldMute: boolean) => void;
   isMuted: () => boolean;
   enabled: boolean;
 }
 
-const HOLD_DELAY = 200;
+const HOLD_DELAY_MS = 200;
 
-export const usePressSpaceToUnmute = ({callState, toggleMute, isMuted, enabled}: UsePressAndHoldParams) => {
+export const usePressSpaceToUnmute = ({callState, toggleMute, isMuted, enabled}: UsePressSpaceToUnmuteParams) => {
   const isInCallAndViewMode = checkUserInCallAndViewMode(callState);
 
   const {detachedWindow, viewMode} = callState;
@@ -57,7 +57,7 @@ export const usePressSpaceToUnmute = ({callState, toggleMute, isMuted, enabled}:
     key: KEY.SPACE,
     enabled: enabled && isInCallAndViewMode,
     activeWindow,
-    holdDelay: HOLD_DELAY,
+    holdDelayMs: HOLD_DELAY_MS,
     onHold: () => {
       if (!isMuted()) {
         return;
