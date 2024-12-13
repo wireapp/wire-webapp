@@ -879,14 +879,14 @@ export class ConversationAPI {
 
   /**
    * Update membership of the specified user in a certain conversation
-   * @param qualifiedId The user ID
-   * @param conversationId The conversation ID to change the user's membership in
+   * @param userId The user qualified ID
+   * @param conversationId The qualified ID of the conversation to change the user's membership in
    * @param memberUpdateData The new member data
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/updateOtherMember
    */
   public async putOtherMember(
-    qualifiedId: QualifiedId,
-    conversationId: string,
+    userId: QualifiedId,
+    conversationId: QualifiedId,
     memberUpdateData: ConversationOtherMemberUpdateData,
   ): Promise<void> {
     const config: AxiosRequestConfig = {
@@ -894,8 +894,8 @@ export class ConversationAPI {
       method: 'put',
       url:
         this.backendFeatures.version >= apiBreakpoint.version7
-          ? `/${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.MEMBERS}/${qualifiedId.domain}/${qualifiedId.id}`
-          : `/${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.MEMBERS}/${qualifiedId.id}`,
+          ? `/${ConversationAPI.URL.CONVERSATIONS}/${conversationId.domain}/${conversationId.id}/${ConversationAPI.URL.MEMBERS}/${userId.domain}/${userId.id}`
+          : `/${ConversationAPI.URL.CONVERSATIONS}/${conversationId.id}/${ConversationAPI.URL.MEMBERS}/${userId.id}`,
     };
 
     await this.client.sendJSON<ConversationMemberJoinEvent>(config);
