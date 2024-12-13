@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.26.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.25.0...@wireapp/webapp-events@0.26.0) (2024-12-13)
+
+### Features
+
+* **webapp-events:** add enable press space to unmute event ([#6753](https://github.com/wireapp/wire-web-packages/issues/6753)) ([6299a4f](https://github.com/wireapp/wire-web-packages/commit/6299a4f555df4d198bc42af87c9254329f3617fc))
+
 # [0.25.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.24.3...@wireapp/webapp-events@0.25.0) (2024-12-12)
 
 ### Features
