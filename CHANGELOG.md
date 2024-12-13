@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.16.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.15.1...@wireapp/api-client@27.16.0) (2024-12-13)
+
+### Features
+
+* **webapp-events:** add enable press space to unmute event ([#6753](https://github.com/wireapp/wire-web-packages/issues/6753)) ([6299a4f](https://github.com/wireapp/wire-web-packages/commit/6299a4f555df4d198bc42af87c9254329f3617fc))
+
 ## [27.15.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.15.0...@wireapp/api-client@27.15.1) (2024-12-13)
 
 **Note:** Version bump only for package @wireapp/api-client
