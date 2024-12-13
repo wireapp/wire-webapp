@@ -70,7 +70,9 @@ const createProps = async () => {
     call: createCall(CALL_STATE.MEDIA_ESTAB),
     callActions: {} as CallActions,
     callingRepository: mockCallingRepository as CallingRepository,
-    propertiesRepository: {} as PropertiesRepository,
+    propertiesRepository: {
+      getPreference: jest.fn(),
+    } as unknown as PropertiesRepository,
     conversation,
     hasAccessToCamera: true,
     teamState: mockTeamState,
