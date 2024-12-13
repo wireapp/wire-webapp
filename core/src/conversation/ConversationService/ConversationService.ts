@@ -251,7 +251,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
   }
 
   public setMemberConversationRole(
-    conversationId: string,
+    conversationId: QualifiedId,
     userId: QualifiedId,
     conversationRole: DefaultConversationRoleName | string,
   ): Promise<void> {
