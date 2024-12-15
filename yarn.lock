@@ -5402,12 +5402,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-transition-group@npm:4.4.11":
-  version: 4.4.11
-  resolution: "@types/react-transition-group@npm:4.4.11"
-  dependencies:
-    "@types/react": "npm:*"
-  checksum: 10/a7f4de6e5f57d9fcdea027e22873c633f96a803c96d422db8b99a45c36a9cceb7882d152136bbc31c7158fc1827e37aea5070d369724bb71dd11b5687332bc4d
+"@types/react-transition-group@npm:4.4.12":
+  version: 4.4.12
+  resolution: "@types/react-transition-group@npm:4.4.12"
+  peerDependencies:
+    "@types/react": "*"
+  checksum: 10/ea14bc84f529a3887f9954b753843820ac8a3c49fcdfec7840657ecc6a8800aad98afdbe4b973eb96c7252286bde38476fcf64b1c09527354a9a9366e516d9a2
   languageName: node
   linkType: hard
 
@@ -18768,7 +18768,7 @@ __metadata:
     "@types/platform": "npm:1.3.6"
     "@types/react": "npm:18.3.3"
     "@types/react-dom": "npm:18.3.1"
-    "@types/react-transition-group": "npm:4.4.11"
+    "@types/react-transition-group": "npm:4.4.12"
     "@types/redux-mock-store": "npm:1.5.0"
     "@types/seedrandom": "npm:3.0.8"
     "@types/sinon": "npm:17.0.3"
