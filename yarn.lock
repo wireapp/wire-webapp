@@ -4513,10 +4513,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mediapipe/tasks-vision@npm:0.10.18":
-  version: 0.10.18
-  resolution: "@mediapipe/tasks-vision@npm:0.10.18"
-  checksum: 10/40a091b9e595f12f06e14b1663184833922e081f93a30d1d91f1a48230e70e16a76d49dc9a21caaaa11c55d6023aa6f07f1f0bd11c19b7f38e7e0b0cdf2029fa
+"@mediapipe/tasks-vision@npm:0.10.20":
+  version: 0.10.20
+  resolution: "@mediapipe/tasks-vision@npm:0.10.20"
+  checksum: 10/429cee0a762940096e917c4d934adf4520e930de80cf4bb38cb074ab275305b452222cb566290d248f225eb4297a9f53cfc3c92d10f8ebfcc675b8e08fcb33fc
   languageName: node
   linkType: hard
 
@@ -18748,7 +18748,7 @@ __metadata:
     "@formatjs/cli": "npm:6.3.14"
     "@lexical/history": "npm:0.21.0"
     "@lexical/react": "npm:0.21.0"
-    "@mediapipe/tasks-vision": "npm:0.10.18"
+    "@mediapipe/tasks-vision": "npm:0.10.20"
     "@roamhq/wrtc": "npm:0.8.0"
     "@testing-library/dom": "npm:^10.4.0"
     "@testing-library/react": "npm:16.1.0"
