@@ -26,6 +26,6 @@
     "clean": "rimraf lib"
   },
   "dependencies": {
-    "countly-sdk-web": "24.11.1"
+    "countly-sdk-web": "24.11.2"
   }
 }
