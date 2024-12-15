@@ -43,7 +43,7 @@
     "react-dom": "18.3.1",
     "react-error-boundary": "4.1.2",
     "react-intl": "7.0.2",
-    "react-redux": "9.1.2",
+    "react-redux": "9.2.0",
     "react-router": "6.28.0",
     "react-router-dom": "6.28.0",
     "react-transition-group": "4.4.5",
