@@ -93,7 +93,7 @@ const VerifyEmailCodeComponent = ({
   };
 
   return (
-    <Page hasAccountData>
+    <Page hasAccountData withSideBar>
       <ContainerXS
         centerText
         verticalCenter

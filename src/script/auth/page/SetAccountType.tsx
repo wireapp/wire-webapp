@@ -33,8 +33,11 @@ import {
   Link,
   Logo,
   ProfileIcon,
+  QUERY,
+  QueryKeys,
   TeamIcon,
   Text,
+  useMatchMedia,
 } from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/LocalizerUtil';
@@ -50,6 +53,7 @@ type Props = React.HTMLProps<HTMLDivElement>;
 
 const SetAccountType = ({}: Props) => {
   const isMacOsWrapper = Runtime.isDesktopApp() && Runtime.isMacOS();
+  const isTablet = useMatchMedia(QUERY[QueryKeys.TABLET_DOWN]);
 
   const backArrow = (
     <RouterLink to={ROUTE.INDEX} data-uie-name="go-index" aria-label={t('index.goBack')}>
@@ -68,7 +72,7 @@ const SetAccountType = ({}: Props) => {
   };
 
   return (
-    <Page>
+    <Page withSideBar>
       {(Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ||
         Config.getConfig().FEATURE.ENABLE_SSO ||
         Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION) && (
@@ -90,9 +94,7 @@ const SetAccountType = ({}: Props) => {
             </Column>
           </IsMobile>
           <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
-            <Column>
-              <Logo scale={1.68} data-uie-name="ui-wire-logo" />
-            </Column>
+            <Column>{isTablet && <Logo scale={1.68} data-uie-name="ui-wire-logo" />}</Column>
             <Columns style={{margin: '70px auto'}}>
               <Column style={{marginLeft: isMacOsWrapper ? 0 : 16}}>
                 <RouterLink to={ROUTE.CREATE_ACCOUNT} data-uie-name="go-register-personal">

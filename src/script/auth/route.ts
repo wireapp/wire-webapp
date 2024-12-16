@@ -34,6 +34,9 @@ export const QUERY_KEY = {
   SCOPE: 'scope',
   TRACKING: 'tracking',
   TWO_FACTOR: '2fa',
+  EMAIL: 'email',
+  ACCOUNT_CREATION_ENABLED: 'accountCreationEnabled',
+  CONFIG_URL: 'config_url',
 };
 
 // These are the query keys that are in the redirect link from the OAuth server
@@ -80,6 +83,7 @@ export const ROUTE = {
   INDEX: '/',
   INITIAL_INVITE: '/teaminvite',
   LOGIN: '/login',
+  CUSTOM_BACKEND: '/custom-backend',
   SET_ACCOUNT_TYPE: '/setaccounttype',
   SET_EMAIL: '/setemail',
   SET_ENTROPY: '/setentropy',

@@ -76,7 +76,7 @@ const HistoryInfoComponent = ({
   }
 
   return (
-    <Page>
+    <Page withSideBar>
       <ContainerXS centerText verticalCenter style={{width: '100%'}}>
         <H1 center>{t('historyInfo.noHistoryHeadline', {brandName: Config.getConfig().BRAND_NAME})}</H1>
         <Paragraph center style={{marginBottom: 56}}>

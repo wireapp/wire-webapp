@@ -19,29 +19,21 @@
 
 import React, {useEffect, useRef, useState} from 'react';
 
+import {DomainRedirectType} from '@wireapp/api-client/lib/account/DomainRedirect';
 import {ClientType} from '@wireapp/api-client/lib/client/index';
 import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http';
 import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
 import {isValidEmail, PATTERN} from '@wireapp/commons/lib/util/ValidationUtil';
 import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
-import {Navigate, useNavigate} from 'react-router-dom';
+import {createSearchParams, Navigate, useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
+import {container} from 'tsyringe';
 
 import {Runtime, UrlUtil} from '@wireapp/commons';
-import {
-  ArrowIcon,
-  Checkbox,
-  CheckboxLabel,
-  ErrorMessage,
-  Form,
-  Input,
-  InputBlock,
-  InputSubmitCombo,
-  Loading,
-  RoundIconButton,
-} from '@wireapp/react-ui-kit';
+import {Button, Checkbox, CheckboxLabel, ErrorMessage, Form, Input, InputBlock, Loading} from '@wireapp/react-ui-kit';
 
+import {APIClient} from 'src/script/service/APIClientSingleton';
 import {t} from 'Util/LocalizerUtil';
 import {isBackendError} from 'Util/TypePredicateUtil';
 
@@ -79,8 +71,10 @@ const SingleSignOnFormComponent = ({
   doJoinConversationByCode,
   doGetConversationInfoByCode,
   doNavigate,
+  pushLoginData,
 }: SingleSignOnFormProps & ConnectedProps & DispatchProps) => {
   const codeOrMailInput = useRef<HTMLInputElement>();
+  const apiClient = container.resolve(APIClient);
   const [codeOrMail, setCodeOrMail] = useState('');
   const [disableInput, setDisableInput] = useState(false);
   const navigate = useNavigate();
@@ -170,6 +164,20 @@ const SingleSignOnFormComponent = ({
     setIsCodeOrMailInputValid(true);
   };
 
+  const loginWithSSO = async (code = codeOrMail, password?: string) => {
+    setIsLoading(true);
+    const strippedCode = stripPrefix(code);
+    await validateSSOCode(strippedCode);
+    await doLogin(strippedCode);
+    await doFinalizeSSOLogin({clientType});
+    const hasKeyAndCode = conversationKey && conversationCode;
+    if (hasKeyAndCode) {
+      await doJoinConversationByCode(conversationKey, conversationCode, undefined, password);
+    }
+
+    navigate(ROUTE.HISTORY_INFO);
+  };
+
   const handleSubmit = async (event?: React.FormEvent, password?: string): Promise<void> => {
     if (event) {
       event.preventDefault();
@@ -209,38 +217,63 @@ const SingleSignOnFormComponent = ({
       }
       const email = codeOrMail.trim();
       if (isValidEmail(email)) {
-        const domain = email.split('@')[1];
-        const {webapp_welcome_url} = await doGetDomainInfo(domain);
-        const [path, query = ''] = webapp_welcome_url.split('?');
-        const welcomeUrl = pathWithParams(
-          path,
-          {[QUERY_KEY.CLIENT_TYPE]: clientType, [QUERY_KEY.SSO_AUTO_LOGIN]: true},
-          null,
-          query,
-        );
+        // TODO: add a FF and api version condition
+        if (true) {
+          const domainRedirect = await apiClient.api.account.getDomainRegistration(email);
+          if (
+            domainRedirect.type === DomainRedirectType.CLOUD ||
+            domainRedirect.type === DomainRedirectType.CLOUD_NO_REGISTRATION
+          ) {
+            const searchParams = new URLSearchParams();
+            searchParams.append(email, email);
 
-        // This refreshes the page as we replace the whole URL.
-        // This works for now as we don't need anything from the state anymore at this point.
-        // Ideal would be to abandon the HashRouter (in the near future) and use something that
-        // allows us to pass search query parameters.
-        // https://reacttraining.com/react-router/web/api/HashRouter
-        doNavigate(
-          `/auth?${getSearchParams({[QUERY_KEY.DESTINATION_URL]: encodeURIComponent(welcomeUrl)})}#${
-            ROUTE.CUSTOM_ENV_REDIRECT
-          }`,
-        );
-      } else {
-        setIsLoading(true);
-        const strippedCode = stripPrefix(codeOrMail);
-        await validateSSOCode(strippedCode);
-        await doLogin(strippedCode);
-        await doFinalizeSSOLogin({clientType});
-        const hasKeyAndCode = conversationKey && conversationCode;
-        if (hasKeyAndCode) {
-          await doJoinConversationByCode(conversationKey, conversationCode, undefined, password);
+            navigate({
+              pathname: ROUTE.LOGIN,
+              search: createSearchParams({
+                [QUERY_KEY.EMAIL]: encodeURIComponent(email),
+                [QUERY_KEY.ACCOUNT_CREATION_ENABLED]:
+                  domainRedirect.type === DomainRedirectType.CLOUD_NO_REGISTRATION ? 'false' : 'true',
+              }).toString(),
+            });
+          }
+
+          if (domainRedirect.type === DomainRedirectType.SSO) {
+            await loginWithSSO(domainRedirect.payload.sso.code, password);
+          }
+
+          if (domainRedirect.type === DomainRedirectType.CUSTOM_BACKEND) {
+            navigate({
+              pathname: ROUTE.CUSTOM_BACKEND,
+              search: createSearchParams({
+                [QUERY_KEY.EMAIL]: encodeURIComponent(email),
+                [QUERY_KEY.CONFIG_URL]: domainRedirect.payload.backend.url,
+              }).toString(),
+            });
+          }
+        } else {
+          const domain = email.split('@')[1];
+          const {webapp_welcome_url} = await doGetDomainInfo(domain);
+          const [path, query = ''] = webapp_welcome_url.split('?');
+          const welcomeUrl = pathWithParams(
+            path,
+            {[QUERY_KEY.CLIENT_TYPE]: clientType, [QUERY_KEY.SSO_AUTO_LOGIN]: true},
+            null,
+            query,
+          );
+
+          // This refreshes the page as we replace the whole URL.
+          // This works for now as we don't need anything from the state anymore at this point.
+          // Ideal would be to abandon the HashRouter (in the near future) and use something that
+          // allows us to pass search query parameters.
+          // https://reacttraining.com/react-router/web/api/HashRouter
+          doNavigate(
+            `/auth?${getSearchParams({[QUERY_KEY.DESTINATION_URL]: encodeURIComponent(welcomeUrl)})}#${
+              ROUTE.CUSTOM_ENV_REDIRECT
+            }`,
+          );
         }
-
-        navigate(ROUTE.HISTORY_INFO);
+      } else {
+        await loginWithSSO();
       }
     } catch (error) {
       setIsLoading(false);
@@ -317,57 +350,65 @@ const SingleSignOnFormComponent = ({
       <Form style={{marginTop: 30}} data-uie-name="sso" onSubmit={handleSubmit}>
         {!isValidLink && <Navigate to={ROUTE.CONVERSATION_JOIN_INVALID} replace />}
         <InputBlock>
-          <InputSubmitCombo>
-            <Input
-              id={inputName}
-              name={inputName}
-              onChange={onCodeChange}
-              ref={codeOrMailInput}
-              markInvalid={!isCodeOrMailInputValid}
-              placeholder={inputPlaceholder}
-              value={codeOrMail}
-              autoComplete="section-login sso-code"
-              maxLength={1024}
-              pattern={inputPattern}
-              type="text"
-              required
-              disabled={disableInput}
-              data-uie-name="enter-code"
-            />
-            <RoundIconButton disabled={!codeOrMail} type="submit" formNoValidate data-uie-name="do-sso-sign-in">
-              <ArrowIcon />
-            </RoundIconButton>
-          </InputSubmitCombo>
+          <Input
+            id={inputName}
+            name={inputName}
+            onChange={onCodeChange}
+            ref={codeOrMailInput}
+            markInvalid={!isCodeOrMailInputValid}
+            placeholder={inputPlaceholder}
+            value={codeOrMail}
+            autoComplete="section-login sso-code"
+            maxLength={1024}
+            pattern={inputPattern}
+            type="text"
+            required
+            disabled={disableInput}
+            data-uie-name="enter-code"
+          />
         </InputBlock>
-        {validationError ? (
-          parseValidationErrors([validationError])
-        ) : authError ? (
-          parseError(authError)
-        ) : ssoError ? (
-          parseError(ssoError)
-        ) : logoutReason ? (
-          <ErrorMessage data-uie-name="status-logout-reason">
-            <FormattedMessage
-              id={logoutReasonStrings[logoutReason]}
-              values={{
-                newline: <br />,
-              }}
-            />
-          </ErrorMessage>
-        ) : (
-          <span style={{marginBottom: '4px'}}>&nbsp;</span>
-        )}
+        <Button
+          block
+          type="submit"
+          disabled={!codeOrMail}
+          formNoValidate
+          onClick={handleSubmit}
+          aria-label={t('login.headline')}
+          data-uie-name="do-sign-in"
+        >
+          {t('login.headline')}
+        </Button>
+        {validationError
+          ? parseValidationErrors([validationError])
+          : authError
+            ? parseError(authError)
+            : ssoError
+              ? parseError(ssoError)
+              : logoutReason && (
+                  <ErrorMessage data-uie-name="status-logout-reason">
+                    <FormattedMessage
+                      id={logoutReasonStrings[logoutReason]}
+                      values={{
+                        newline: <br />,
+                      }}
+                    />
+                  </ErrorMessage>
+                )}
+
         {!Runtime.isDesktopApp() && (
           <Checkbox
             name="enter-public-computer-sso-sign-in"
             id="enter-public-computer-sso-sign-in"
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-              setClientType(event.target.checked ? ClientType.TEMPORARY : ClientType.PERMANENT)
-            }
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              setClientType(event.target.checked ? ClientType.TEMPORARY : ClientType.PERMANENT);
+              void pushLoginData({
+                clientType: event.target.checked ? ClientType.TEMPORARY : ClientType.PERMANENT,
+              });
+            }}
             checked={clientType === ClientType.TEMPORARY}
             data-uie-name="enter-public-computer-sso-sign-in"
             aligncenter
-            style={{justifyContent: 'center', marginTop: '36px'}}
+            style={{justifyContent: 'center', marginTop: '2rem'}}
           >
             <CheckboxLabel htmlFor="">{t('login.publicComputer')}</CheckboxLabel>
           </Checkbox>
@@ -395,6 +436,7 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
       doGetDomainInfo: ROOT_ACTIONS.authAction.doGetDomainInfo,
       doJoinConversationByCode: ROOT_ACTIONS.conversationAction.doJoinConversationByCode,
       doGetConversationInfoByCode: ROOT_ACTIONS.conversationAction.doGetConversationInfoByCode,
+      pushLoginData: ROOT_ACTIONS.authAction.pushLoginData,
       doNavigate: ROOT_ACTIONS.navigationAction.doNavigate,
       resetAuthError: ROOT_ACTIONS.authAction.resetAuthError,
       validateSSOCode: ROOT_ACTIONS.authAction.validateSSOCode,

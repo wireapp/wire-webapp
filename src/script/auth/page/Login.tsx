@@ -19,12 +19,13 @@
 
 import React, {useEffect, useRef, useState} from 'react';
 
+import {CSSObject} from '@emotion/react';
 import {LoginData} from '@wireapp/api-client/lib/auth';
 import {ClientType} from '@wireapp/api-client/lib/client/index';
 import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
 import {StatusCodes} from 'http-status-codes';
 import {connect} from 'react-redux';
-import {useNavigate} from 'react-router-dom';
+import {useNavigate, useSearchParams} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 
 import {Runtime, UrlUtil} from '@wireapp/commons';
@@ -43,17 +44,19 @@ import {
   FlexBox,
   Form,
   H2,
-  Heading,
   IsMobile,
   Label,
   Link,
   LinkVariant,
   Loading,
-  Muted,
+  QUERY,
+  QueryKeys,
   Text,
   TextLink,
+  useMatchMedia,
 } from '@wireapp/react-ui-kit';
 
+import {LogoFullIcon} from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {isBackendError} from 'Util/TypePredicateUtil';
@@ -80,6 +83,7 @@ import {getOAuthQueryString} from '../util/oauthUtil';
 import {getPrefixedSSOCode} from '../util/urlUtil';
 type Props = React.HTMLProps<HTMLDivElement> & {
   embedded?: boolean;
+  withSideBar?: boolean;
 };
 
 const LoginComponent = ({
@@ -103,9 +107,15 @@ const LoginComponent = ({
   conversationInfo,
   conversationInfoFetching,
   embedded,
+  withSideBar,
 }: Props & ConnectedProps & DispatchProps) => {
   const logger = getLogger('Login');
   const navigate = useNavigate();
+  const isTablet = useMatchMedia(QUERY[QueryKeys.TABLET_DOWN]);
+  const [params] = useSearchParams();
+  const accountCreationEnabled = params.get(QUERY_KEY.ACCOUNT_CREATION_ENABLED) === 'true';
+  const defaultEmail = params.get(QUERY_KEY.EMAIL);
+
   const [conversationCode, setConversationCode] = useState<string | null>(null);
   const [conversationKey, setConversationKey] = useState<string | null>(null);
   const [conversationSubmitData, setConversationSubmitData] = useState<Partial<LoginData> | null>(null);
@@ -340,7 +350,7 @@ const LoginComponent = ({
 
   const backArrow = (
     <RouterLink to={ROUTE.INDEX} data-uie-name="go-index" aria-label={t('login.goBack')}>
-      <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
+      <ArrowIcon direction="left" color={COLOR.TEXT} />
     </RouterLink>
   );
 
@@ -353,7 +363,7 @@ const LoginComponent = ({
   };
 
   return (
-    <Page>
+    <Page withSideBar={withSideBar}>
       {showBackButton && (
         <IsMobile>
           <div style={{margin: 16}}>{backArrow}</div>
@@ -363,6 +373,15 @@ const LoginComponent = ({
         <EntropyContainer onSetEntropy={storeEntropy} />
       ) : (
         <Container centerText verticalCenter style={{width: '100%'}}>
+          {isTablet && (
+            <LogoFullIcon
+              aria-hidden="true"
+              width={102}
+              height={33}
+              style={{marginBottom: '80px'}}
+              data-uie-name="ui-wire-logo"
+            />
+          )}
           {!embedded && <AppAlreadyOpen />}
           {isLinkPasswordModalOpen && (
             <JoinGuestLinkPasswordModal
@@ -381,7 +400,7 @@ const LoginComponent = ({
             {!embedded && (
               <IsMobile not>
                 <Column style={{display: 'flex'}}>
-                  {showBackButton && <div style={{margin: 'auto'}}>{backArrow}</div>}
+                  {showBackButton && <div style={{margin: '0.75rem 0px auto auto'}}>{backArrow}</div>}
                 </Column>
               </IsMobile>
             )}
@@ -430,20 +449,17 @@ const LoginComponent = ({
                 ) : (
                   <>
                     <div>
-                      <Heading level={embedded ? '2' : '1'} center>
-                        {t('login.headline')}
-                      </Heading>
-                      <Muted>{t('login.subhead')}</Muted>
+                      <div css={{fontWeight: '500', fontSize: '1.5rem', marginBottom: '2rem'}}>
+                        {t('index.welcome', {brandName: Config.getConfig().BACKEND_NAME})}
+                      </div>
+                      <Text>{t('login.subhead')}</Text>
                       <Form style={{marginTop: 30}} data-uie-name="login">
                         <LoginForm isFetching={isFetching} onSubmit={handleSubmit} />
-                        {validationErrors.length ? (
-                          parseValidationErrors(validationErrors)
-                        ) : authError ? (
-                          <Exception errors={[authError]} />
-                        ) : (
-                          <div style={{marginTop: '4px'}}>&nbsp;</div>
-                        )}
-                        {!Runtime.isDesktopApp() && (
+                        {validationErrors.length
+                          ? parseValidationErrors(validationErrors)
+                          : authError && <Exception errors={[authError]} />}
+
+                        {!Runtime.isDesktopApp() && !defaultEmail && (
                           <Checkbox
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                               void pushLoginData({
@@ -452,7 +468,7 @@ const LoginComponent = ({
                             }}
                             checked={loginData.clientType === ClientType.TEMPORARY}
                             data-uie-name="enter-public-computer-sign-in"
-                            style={{justifyContent: 'center', marginTop: '12px'}}
+                            style={{justifyContent: 'center', marginBottom: '16px'}}
                             aligncenter
                           >
                             <CheckboxLabel htmlFor="enter-public-computer-sign-in">
@@ -464,7 +480,7 @@ const LoginComponent = ({
                     </div>
                     <Link
                       variant={LinkVariant.PRIMARY}
-                      style={{paddingTop: '24px', textAlign: 'center'}}
+                      style={{textAlign: 'center'}}
                       href={EXTERNAL_ROUTE.WIRE_ACCOUNT_PASSWORD_RESET}
                       target="_blank"
                       data-uie-name="go-forgot-password"
@@ -481,6 +497,27 @@ const LoginComponent = ({
                       >
                         {t(isDomainDiscoveryEnabled ? 'index.enterprise' : 'index.ssoLogin')}
                       </Button>
+                    )}
+                    {accountCreationEnabled && (
+                      <>
+                        <div css={separator}>
+                          <span>{t('index.or')}</span>
+                        </div>
+
+                        <div>
+                          <Button
+                            css={{width: '100%'}}
+                            variant={ButtonVariant.SECONDARY}
+                            onClick={async () => {
+                              await resetAuthError();
+                              navigate(ROUTE.SET_ACCOUNT_TYPE);
+                            }}
+                            data-uie-name="go-create-account"
+                          >
+                            {t('index.createAccount')}
+                          </Button>
+                        </div>
+                      </>
                     )}
                   </>
                 )}
@@ -529,5 +566,26 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
   );
 
 const Login = connect(mapStateToProps, mapDispatchToProps)(LoginComponent);
+
+export const separator: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  margin: '40px 0px',
+
+  '> span': {
+    fontSize: '0.75rem',
+    fontWeight: '500',
+    lineHeight: '14px',
+    paddingInline: '25px',
+    textTransform: 'uppercase',
+  },
+
+  '&::before, &::after': {
+    content: '" "',
+    height: '1px',
+    backgroundColor: '#DCE0E3',
+    width: '100%',
+  },
+};
 
 export {Login};

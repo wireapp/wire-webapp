@@ -33,16 +33,19 @@ import {
   Columns,
   Container,
   ContainerXS,
-  H1,
   IsMobile,
   Link,
   Logo,
   Muted,
   Overlay,
+  QUERY,
+  QueryKeys,
   Text,
+  useMatchMedia,
 } from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {LogoFullIcon} from 'Components/Icon';
 import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
@@ -64,6 +67,7 @@ const logger = getLogger('SingleSignOn');
 const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
   const ssoWindowRef = useRef<Window>();
   const params = useParams<{code?: string}>();
+  const isTablet = useMatchMedia(QUERY[QueryKeys.TABLET_DOWN]);
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
 
   const handleSSOWindow = (code: string): Promise<void> => {
@@ -184,12 +188,12 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
 
   const backArrow = (
     <RouterLink to={ROUTE.INDEX} data-uie-name="go-login">
-      <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
+      <ArrowIcon direction="left" color={COLOR.TEXT} />
     </RouterLink>
   );
 
   return (
-    <Page>
+    <Page withSideBar>
       {isOverlayOpen && (
         <Overlay>
           <Container centerText style={{color: COLOR.WHITE, maxWidth: '330px'}}>
@@ -228,11 +232,22 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
         </IsMobile>
       )}
       <Container centerText verticalCenter style={{width: '100%'}}>
+        {isTablet && (
+          <LogoFullIcon
+            aria-hidden="true"
+            width={102}
+            height={33}
+            style={{marginBottom: '80px'}}
+            data-uie-name="ui-wire-logo"
+          />
+        )}
         <AppAlreadyOpen />
         <Columns>
           <IsMobile not>
             <Column style={{display: 'flex'}}>
-              {!hasDefaultSSOCode && <div style={{margin: 'auto'}}>{backArrow}</div>}
+              {!hasDefaultSSOCode && (
+                <div style={{margin: 'auto', marginTop: '1.25rem', marginRight: '0px'}}>{backArrow}</div>
+              )}
             </Column>
           </IsMobile>
           <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
@@ -241,17 +256,14 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
               style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
             >
               <div>
-                <H1 center>{t('ssoLogin.headline')}</H1>
+                <div css={{fontWeight: '500', fontSize: '1.5rem'}}>
+                  {t('index.welcome', {brandName: Config.getConfig().BACKEND_NAME})}
+                </div>
                 {Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ? (
                   <>
-                    <Muted center style={{display: 'block'}} data-uie-name="status-email-or-sso-code">
+                    <Text center style={{display: 'block'}} data-uie-name="status-email-or-sso-code">
                       {t('ssoLogin.subheadCodeOrEmail')}
-                    </Muted>
-                    <Muted center style={{display: 'block'}} data-uie-name="status-email-environment-switch-warning">
-                      {t('ssoLogin.subheadEmailEnvironmentSwitchWarning', {
-                        brandName: Config.getConfig().BRAND_NAME,
-                      })}
-                    </Muted>
+                    </Text>
                   </>
                 ) : (
                   <Muted data-uie-name="status-sso-code">{t('ssoLogin.subheadCode')}</Muted>

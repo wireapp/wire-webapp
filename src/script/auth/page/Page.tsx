@@ -23,6 +23,7 @@ import {TeamData} from '@wireapp/api-client/lib/team';
 import {connect} from 'react-redux';
 import {Navigate} from 'react-router-dom';
 
+import {Layout} from '../component/Layout';
 import {RootState} from '../module/reducer';
 import {RegistrationDataState} from '../module/reducer/authReducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
@@ -32,6 +33,7 @@ interface Props extends React.HTMLProps<HTMLDivElement> {
   hasAccountData?: boolean;
   hasTeamData?: boolean;
   isAuthenticated?: boolean;
+  withSideBar?: boolean;
 }
 
 const hasInvalidAccountData = (account: RegistrationDataState) => !account.name || !account.email || !account.password;
@@ -52,6 +54,7 @@ const PageComponent = ({
   isStateAuthenticated,
   account,
   children,
+  withSideBar,
 }: Props & ConnectedProps) => {
   if (
     (hasAccountData && hasInvalidAccountData(account) && !isStateAuthenticated) ||
@@ -60,6 +63,11 @@ const PageComponent = ({
   ) {
     return <Navigate to={redirects[currentFlow] || ROUTE.INDEX} replace />;
   }
+
+  if (withSideBar) {
+    return <Layout>{children} </Layout>;
+  }
+
   return <>{children}</>;
 };
 

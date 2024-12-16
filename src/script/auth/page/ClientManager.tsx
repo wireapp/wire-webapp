@@ -70,7 +70,7 @@ const ClientManagerComponent = ({doGetAllClients, doLogout}: Props & ConnectedPr
   };
 
   return (
-    <Page>
+    <Page withSideBar>
       <ContainerXS
         centerText
         verticalCenter
@@ -82,7 +82,7 @@ const ClientManagerComponent = ({doGetAllClients, doLogout}: Props & ConnectedPr
           marginInline: isMobile ? '20px' : 'auto',
         }}
       >
-        <H1 center style={{marginTop: '140px'}}>
+        <H1 center style={{marginTop: '1rem'}}>
           {t('clientManager.headline')}
         </H1>
         <Muted
@@ -100,7 +100,7 @@ const ClientManagerComponent = ({doGetAllClients, doLogout}: Props & ConnectedPr
         <Button
           variant={ButtonVariant.SECONDARY}
           onClick={logout}
-          style={{alignSelf: 'center', margin: '48px 0 80px 0'}}
+          style={{alignSelf: 'center', margin: '48px 0 1rem 0'}}
           data-uie-name="go-sign-out"
         >
           {t('clientManager.logout')}
