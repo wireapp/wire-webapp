@@ -77,7 +77,7 @@ export class ClientAction {
             ),
           };
 
-      const teamConfig = (await core.service?.team.getTeamFeatureConfig()) ?? {};
+      const teamConfig = (await core.service?.team.getCommonFeatureConfig()) ?? {};
       await core.initClient(creationStatus.client, getClientMLSConfig(teamConfig));
       dispatch(ClientActionCreator.successfulInitializeClient(creationStatus));
     };
