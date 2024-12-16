@@ -28,6 +28,7 @@ import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 
 import {getMentionMarkdownTransformer} from './getMentionMarkdownTransformer/getMentionMarkdownTransformer';
 import {getMentionNodesFromMessage} from './getMentionNodesFromMessage/getMentionNodesFromMessage';
+import {wrapMentionsWithTags} from './wrapMentionsWithTags/wrapMentionsWithTags';
 
 type Props = {
   message?: ContentMessage;
@@ -52,6 +53,8 @@ export function EditedMessagePlugin({message}: Props): null {
 
           const allowedMentions = mentionNodes.map(node => node.getTextContent());
 
+          const wrappedWithTags = wrapMentionsWithTags(messageContent, allowedMentions);
+
           const mentionMarkdownTransformer = getMentionMarkdownTransformer(allowedMentions);
 
           // Text comes from the message is in the raw markdown format, we need to convert it to the editor format (preview), display **bold** as bold, etc.
@@ -59,7 +62,7 @@ export function EditedMessagePlugin({message}: Props): null {
           // During the transformation, we have to tell the editor to transofrm mentions as well.
           // We can't do that by diretcly updating the $root (e.g. $root.appent(...MentionNodes)), because this function will overwrite the result.
           // One way of overcoming this issue is to use a custom transformer (quite a hacky way). Transformers are responisble for converting the text to the desired format (e.g. **bold** to bold).
-          $convertFromMarkdownString(messageContent, [...markdownTransformers, mentionMarkdownTransformer]);
+          $convertFromMarkdownString(wrappedWithTags, [mentionMarkdownTransformer, ...markdownTransformers]);
 
           editor.focus();
         });
