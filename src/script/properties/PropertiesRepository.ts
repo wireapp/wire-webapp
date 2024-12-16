@@ -81,6 +81,7 @@ export class PropertiesRepository {
         call: {
           enable_soundless_incoming_calls: false,
           enable_vbr_encoding: true,
+          //@ts-ignore - push_to_talk_key is not used in the webapp, since it is currently being worked on
           push_to_talk_key: null,
         },
         emoji: {

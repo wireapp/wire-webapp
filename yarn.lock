@@ -5941,9 +5941,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^27.16.1":
-  version: 27.16.1
-  resolution: "@wireapp/api-client@npm:27.16.1"
+"@wireapp/api-client@npm:^27.17.0":
+  version: 27.17.0
+  resolution: "@wireapp/api-client@npm:27.17.0"
   dependencies:
     "@wireapp/commons": "npm:^5.4.0"
     "@wireapp/priority-queue": "npm:^2.1.11"
@@ -5957,8 +5957,8 @@ __metadata:
     spark-md5: "npm:3.0.2"
     tough-cookie: "npm:4.1.4"
     ws: "npm:8.18.0"
-    zod: "npm:3.23.8"
-  checksum: 10/d9965829f8264dbc0317cbf2addca0eb3ef08f958ebf2422be60985de8254d777b24edbe89e98112dbe0a7096bea3b41b9cc246602404aa72b8e4b07ffabd57e
+    zod: "npm:3.24.1"
+  checksum: 10/14f8406fa2891e93356cf999e36713dcc789f44990dd22d9ac3e32f8a47243e9697e127219d3d3b2e9798603bbd312ec46be18debe65bfe7ff8588b58b515545
   languageName: node
   linkType: hard
 
@@ -6012,11 +6012,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:46.15.3":
-  version: 46.15.3
-  resolution: "@wireapp/core@npm:46.15.3"
+"@wireapp/core@npm:46.15.5":
+  version: 46.15.5
+  resolution: "@wireapp/core@npm:46.15.5"
   dependencies:
-    "@wireapp/api-client": "npm:^27.16.1"
+    "@wireapp/api-client": "npm:^27.17.0"
     "@wireapp/commons": "npm:^5.4.0"
     "@wireapp/core-crypto": "npm:3.0.0"
     "@wireapp/cryptobox": "npm:12.8.0"
@@ -6033,8 +6033,8 @@ __metadata:
     logdown: "npm:3.3.1"
     long: "npm:^5.2.0"
     uuid: "npm:9.0.1"
-    zod: "npm:3.23.8"
-  checksum: 10/ec2f4f32606367e6a8d94341b8f528a0cf90c4b0cb05f40b0e972605557a9d97ae5891cfd8338cdecb615515240dfcfbbe2b4c1faf7d3f79ee2d37b1ad248e07
+    zod: "npm:3.24.1"
+  checksum: 10/a00991c8c91590fc35f8a97392d7d2f88266379f8dcb5fa0d0602ca70fc1aa28477e4bed8561cb7e32a150de481b6dd383beaa9f435f0db34c37ad43094e292e
   languageName: node
   linkType: hard
 
@@ -6148,9 +6148,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/react-ui-kit@npm:9.28.0":
-  version: 9.28.0
-  resolution: "@wireapp/react-ui-kit@npm:9.28.0"
+"@wireapp/react-ui-kit@npm:9.28.1":
+  version: 9.28.1
+  resolution: "@wireapp/react-ui-kit@npm:9.28.1"
   dependencies:
     "@types/color": "npm:3.0.6"
     color: "npm:4.2.3"
@@ -6165,7 +6165,7 @@ __metadata:
   peerDependenciesMeta:
     "@types/react":
       optional: true
-  checksum: 10/de925b2b3b2216bac2cd6ab89f2f6a4596e4985b0d449516648d79c765a51b14934b58fc329e770bf228d0057b4ed8ae697d34bb3693475db4a98a067ed6a77b
+  checksum: 10/d45bc50889404d97e4105822e48fbf67610731b6f3d74f68ee15940e15c77da5705332ba68e1a46494bff1bd91e9db8cf7798c3ebda33513e296a0d46995768c
   languageName: node
   linkType: hard
 
@@ -18683,10 +18683,10 @@ __metadata:
     "@wireapp/avs": "npm:9.10.16"
     "@wireapp/commons": "npm:5.4.0"
     "@wireapp/copy-config": "npm:2.2.10"
-    "@wireapp/core": "npm:46.15.3"
+    "@wireapp/core": "npm:46.15.5"
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/prettier-config": "npm:0.6.4"
-    "@wireapp/react-ui-kit": "npm:9.28.0"
+    "@wireapp/react-ui-kit": "npm:9.28.1"
     "@wireapp/store-engine": "npm:5.1.11"
     "@wireapp/store-engine-dexie": "npm:2.1.15"
     "@wireapp/telemetry": "npm:0.1.3"
@@ -19248,10 +19248,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zod@npm:3.23.8":
-  version: 3.23.8
-  resolution: "zod@npm:3.23.8"
-  checksum: 10/846fd73e1af0def79c19d510ea9e4a795544a67d5b34b7e1c4d0425bf6bfd1c719446d94cdfa1721c1987d891321d61f779e8236fde517dc0e524aa851a6eff1
+"zod@npm:3.24.1":
+  version: 3.24.1
+  resolution: "zod@npm:3.24.1"
+  checksum: 10/54e25956495dec22acb9399c168c6ba657ff279801a7fcd0530c414d867f1dcca279335e160af9b138dd70c332e17d548be4bc4d2f7eaf627dead50d914fec27
   languageName: node
   linkType: hard
 
