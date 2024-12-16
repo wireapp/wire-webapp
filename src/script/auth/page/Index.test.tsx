@@ -28,6 +28,7 @@ import {initialAuthState} from '../module/reducer/authReducer';
 import {ROUTE} from '../route';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
+import {getPrefixedSSOCode} from '../util/urlUtil';
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
@@ -71,7 +72,7 @@ describe('when visiting the index page', () => {
       }),
     );
 
-    expect(Navigate).toHaveBeenCalledWith({to: `${ROUTE.SSO}/wire-${defaultSSOCode}`}, {});
+    expect(Navigate).toHaveBeenCalledWith({to: `${ROUTE.SSO}/${getPrefixedSSOCode(defaultSSOCode)}`}, {});
   });
 
   it('shows the welcome text with default backend name', () => {

@@ -1382,6 +1382,13 @@ declare module 'I18n/en-US.json' {
     'replyQuoteShowMore': `Show more`;
     'replyQuoteTimeStampDate': `Original message from {date}`;
     'replyQuoteTimeStampTime': `Original message from {time}`;
+    'richTextHeading': `Heading`;
+    'richTextBold': `Bold`;
+    'richTextItalic': `Italic`;
+    'richTextStrikethrough': `Strikethrough`;
+    'richTextUnorderedList': `Unordered list`;
+    'richTextOrderedList': `Ordered list`;
+    'richTextCode': `Code`;
     'roleAdmin': `Admin`;
     'roleOwner': `Owner`;
     'rolePartner': `External`;
@@ -1538,9 +1545,11 @@ declare module 'I18n/en-US.json' {
     'tooltipConversationCall': `Call`;
     'tooltipConversationDetailsAddPeople': `Add participants to conversation ({shortcut})`;
     'tooltipConversationDetailsRename': `Change conversation name`;
+    'tooltipConversationEmoji': `Select emoji`;
     'tooltipConversationEphemeral': `Self-deleting message`;
     'tooltipConversationEphemeralAriaLabel': `Type a self-deleting message, currently set to {time}`;
     'tooltipConversationFile': `Add file`;
+    'tooltipConversationHideFormatting': `Hide formatting`;
     'tooltipConversationInfo': `Conversation info`;
     'tooltipConversationInputMoreThanTwoUserTyping': `{user1} and {count} more people are typing`;
     'tooltipConversationInputOneUserTyping': `{user1} is typing`;
@@ -1551,6 +1560,7 @@ declare module 'I18n/en-US.json' {
     'tooltipConversationPing': `Ping`;
     'tooltipConversationSearch': `Search`;
     'tooltipConversationSendMessage': `Send message`;
+    'tooltipConversationShowFormatting': `Show formatting`;
     'tooltipConversationVideoCall': `Video Call`;
     'tooltipConversationsArchive': `Archive ({shortcut})`;
     'tooltipConversationsArchived': `Show archive ({number})`;

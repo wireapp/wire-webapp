@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2023 Wire Swiss GmbH
+ * Copyright (C) 2024 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,23 +17,26 @@
  *
  */
 
-import {useEffect} from 'react';
+import * as Icon from 'Components/Icon';
+import {t} from 'Util/LocalizerUtil';
 
-import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {LexicalEditor} from 'lexical';
-
-type Props = {
-  onUpdate: (editor: LexicalEditor, text: string) => void;
-};
-
-export function TextChangePlugin({onUpdate}: Props): null {
-  const [editor] = useLexicalComposerContext();
-
-  useEffect(() => {
-    return editor.registerTextContentListener(textContent => {
-      onUpdate(editor, textContent);
-    });
-  }, [editor, onUpdate]);
-
-  return null;
+interface PingButtonProps {
+  onClick: () => void;
+  isDisabled: boolean;
 }
+
+export const PingButton = ({isDisabled, onClick}: PingButtonProps) => {
+  return (
+    <button
+      className="conversation-button controls-right-button no-radius"
+      type="button"
+      onClick={onClick}
+      disabled={isDisabled}
+      title={t('tooltipConversationPing')}
+      aria-label={t('tooltipConversationPing')}
+      data-uie-name="do-ping"
+    >
+      <Icon.PingIcon />
+    </button>
+  );
+};
