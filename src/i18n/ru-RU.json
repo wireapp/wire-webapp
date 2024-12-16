@@ -1621,6 +1621,8 @@
   "videoCallOverlayViewModeLabel": "Режим просмотра",
   "videoCallOverlayViewModeSpeakers": "Показывать только активных спикеров",
   "videoCallParticipantConnecting": "Подключение...",
+  "videoCallParticipantLowerYourHand": "Lower your hand",
+  "videoCallParticipantRaiseYourHand": "Raise your hand",
   "videoCallParticipantRaisedHandRaiseDuration": "Поднята рука {duration}",
   "videoCallParticipantRaisedSelfHandUp": "Вы подняли руку",
   "videoCallParticipantRaisedSortByTime": "Первый в списке поднял руку первым.",
