@@ -19,12 +19,12 @@
 
 import {useState, RefObject, FC, useRef} from 'react';
 
+import {EmojiPicker} from 'Components/EmojiPicker/EmojiPicker';
 import {isSpaceOrEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {EmojiChar} from './EmojiChar';
 import {reactionImgSize} from './EmojiChar.styles';
-import {EmojiPickerContainer} from './EmojiPicker';
 
 import {MessageActionsId} from '../MessageActions';
 import {useMessageActionsState} from '../MessageActions.state';
@@ -218,7 +218,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
         </svg>
       </button>
       {showEmojis ? (
-        <EmojiPickerContainer
+        <EmojiPicker
           posX={clientX}
           posY={clientY}
           onKeyPress={handleEmojiSelectionWithKeyboard}

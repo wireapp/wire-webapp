@@ -9,6 +9,7 @@
   position: relative;
   display: flex;
   width: 100%;
+  min-width: 160px;
   align-items: center;
 }
 
@@ -43,7 +44,7 @@
 .editor-placeholder {
   position: absolute;
   top: 50%;
-  left: 10px;
+  left: 0;
   display: inline-block;
 
   overflow: hidden;
@@ -167,4 +168,52 @@
   min-width: 150px;
   flex-grow: 1;
   line-height: 20px;
+}
+
+.editor-bold {
+  font-weight: bold;
+}
+
+.editor-italic {
+  font-style: italic;
+}
+
+.editor-strikethrough {
+  text-decoration: line-through;
+}
+
+.editor-code {
+  display: inline-block;
+  padding: 2px 4px;
+  border-radius: 4px;
+  background: var(--foreground-fade-8);
+}
+
+.editor-list {
+  padding-left: 24px;
+  margin: 0;
+
+  &--unordered {
+    list-style-type: disc;
+  }
+
+  &--ordered {
+    list-style-type: decimal;
+  }
+}
+
+.editor-heading {
+  margin: 8px 0;
+
+  &--1 {
+    font-size: var(--font-size-xlarge);
+  }
+
+  &--2 {
+    font-size: var(--font-size-large);
+  }
+
+  &--3 {
+    font-size: var(--font-size-base);
+  }
 }

@@ -69,6 +69,12 @@
       max-height: unset;
       white-space: normal;
 
+      &:not(pre) > code {
+        padding: 2px 4px;
+        border-radius: 4px;
+        background: var(--foreground-fade-8);
+      }
+
       pre {
         overflow: auto;
         max-width: var(--conversation-message-asset-width);
