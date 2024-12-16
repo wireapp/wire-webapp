@@ -60,7 +60,7 @@ export class TeamService {
     return this.apiClient.api.teams.team.putTeam(teamId, teamData);
   }
 
-  public getTeamFeatureConfig() {
+  public getCommonFeatureConfig() {
     return this.apiClient.api.teams.feature.getAllFeatures();
   }
 }
