@@ -77,6 +77,7 @@ import * as ConversationSelector from '../module/selector/ConversationSelector';
 import {QUERY_KEY, ROUTE} from '../route';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {getOAuthQueryString} from '../util/oauthUtil';
+import {getPrefixedSSOCode} from '../util/urlUtil';
 type Props = React.HTMLProps<HTMLDivElement> & {
   embedded?: boolean;
 };
@@ -156,7 +157,7 @@ const LoginComponent = ({
   useEffect(() => {
     // Redirect to prefilled SSO login if default SSO code is set on backend unless we're following the guest link flow
     if (defaultSSOCode && !embedded) {
-      navigate(`${ROUTE.SSO}/${defaultSSOCode}`);
+      navigate(`${ROUTE.SSO}/${getPrefixedSSOCode(defaultSSOCode)}`);
     }
   }, [defaultSSOCode, embedded, navigate]);
 
@@ -474,7 +475,7 @@ const LoginComponent = ({
                       <Button
                         type="button"
                         variant={ButtonVariant.SECONDARY}
-                        onClick={() => navigate(`${ROUTE.SSO}/${defaultSSOCode ?? ''}`)}
+                        onClick={() => navigate(`${ROUTE.SSO}/${getPrefixedSSOCode(defaultSSOCode)}`)}
                         style={{marginTop: '16px'}}
                         data-uie-name="go-sso-login"
                       >

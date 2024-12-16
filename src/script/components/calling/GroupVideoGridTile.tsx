@@ -88,6 +88,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
     'isAudioEstablished',
     'isSwitchingVideoResolution',
   ]);
+
   const {name} = useKoSubscribableChildren(participant?.user, ['name']);
 
   const sharesScreen = videoState === VIDEO_STATE.SCREENSHARE;

@@ -21,7 +21,7 @@ import React from 'react';
 
 import {DeviceVerificationBadges} from 'Components/Badge';
 import {ClientEntity} from 'src/script/client/ClientEntity';
-import {WireIdentity} from 'src/script/E2EIdentity';
+import {E2EIHandler, WireIdentity} from 'src/script/E2EIdentity';
 
 import {MLSDeviceDetails} from './MLSDeviceDetails';
 import {ProteusDeviceDetails} from './ProteusDeviceDetails';
@@ -41,16 +41,24 @@ export const DetailedDevice: React.FC<DeviceProps> = ({
   getDeviceIdentity,
   isProteusVerified,
 }) => {
+  const isE2eiEnabled = E2EIHandler.getInstance().isE2EIEnabled();
   const getIdentity = () => getDeviceIdentity?.(device.id);
 
   return (
     <>
       <h3 className="preferences-devices-model preferences-devices-model-name" data-uie-name="device-model">
         <span>{device.model}</span>
-        <DeviceVerificationBadges device={device} getIdentity={getIdentity} />
+        <DeviceVerificationBadges device={device} getIdentity={getIdentity} isE2EIEnabled={isE2eiEnabled} />
       </h3>
 
-      {getIdentity && <MLSDeviceDetails isCurrentDevice={isCurrentDevice} identity={getIdentity()} isSelfUser />}
+      {getIdentity() !== undefined && (
+        <MLSDeviceDetails
+          isCurrentDevice={isCurrentDevice}
+          identity={getIdentity()}
+          isSelfUser
+          cipherSuite={device.getCipherSuite()}
+        />
+      )}
 
       <ProteusDeviceDetails device={device} fingerprint={fingerprint} isProteusVerified={isProteusVerified} />
     </>
