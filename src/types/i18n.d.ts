@@ -1629,6 +1629,8 @@ declare module 'I18n/en-US.json' {
     'videoCallParticipantRaisedSelfHandUp': `You have raised your hand up`;
     'videoCallParticipantRaisedSortByTime': `Top in the list raised their hand first.`;
     'videoCallParticipantRaisedTheirHandUp': `{name} has raised their hand up`;
+    'videoCallParticipantRaiseYourHand': `Raise your hand`;
+    'videoCallParticipantLowerYourHand': `Lower your hand`;
     'videoCallPaused': `Video paused`;
     'videoCallScreenShareEndConfirm': `End screen share`;
     'videoCallScreenShareEndConfirmDescription': `If you minimize the window, your screen share will end.`;
