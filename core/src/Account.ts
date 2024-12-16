@@ -34,6 +34,7 @@ import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 import {Notification} from '@wireapp/api-client/lib/notification/';
 import {WebSocketClient} from '@wireapp/api-client/lib/tcp/';
 import {WEBSOCKET_STATE} from '@wireapp/api-client/lib/tcp/ReconnectingWebsocket';
+import {FEATURE_KEY, FeatureStatus} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import logdown from 'logdown';
@@ -363,7 +364,8 @@ export class Account extends TypedEventEmitter<Events> {
     await this.apiClient.transport.http.associateClientWithSession(client.id);
 
     await this.service.proteus.initClient(this.storeEngine, this.apiClient.context);
-    if (this.service.mls && mlsConfig) {
+
+    if ((await this.isMLSActiveForClient()) && this.service.mls && mlsConfig) {
       const {userId, domain = ''} = this.apiClient.context;
       await this.service.mls.initClient({id: userId, domain}, client, mlsConfig);
       // initialize schedulers for pending mls proposals once client is initialized
@@ -719,4 +721,24 @@ export class Account extends TypedEventEmitter<Events> {
 
     return this.service?.subconversation.getSubconversationGroupId(conversationId, subconversationId);
   };
+
+  public async isMLSActiveForClient(): Promise<boolean> {
+    // MLS service is initialized
+    const isMLSServiceInitialized = this.service?.mls !== undefined;
+    if (!isMLSServiceInitialized) {
+      return false;
+    }
+
+    // Backend Supports MLS trough removal keys
+    const isMLSSupported = await this.apiClient.supportsMLS();
+    if (!isMLSSupported) {
+      return false;
+    }
+
+    // MLS is enabled for the public via feature flag
+    const commonConfig = (await this.service?.team.getCommonFeatureConfig()) ?? {};
+    const isMLSForTeamEnabled = commonConfig[FEATURE_KEY.MLS]?.status === FeatureStatus.ENABLED;
+
+    return isMLSSupported && isMLSForTeamEnabled && isMLSServiceInitialized;
+  }
 }
