@@ -562,7 +562,7 @@ export const InputBar = ({
 
   const enableSending = textValue.length > 0;
 
-  const showAvatar = messageFormatButtonsEnabled || !!textValue.length;
+  const showAvatar = !!textValue.length;
 
   return (
     <div ref={wrapperRef}>
@@ -627,14 +627,20 @@ export const InputBar = ({
                   onSend={handleSendMessage}
                   onBlur={() => isTypingRef.current && conversationRepository.sendTypingStop(conversation)}
                 >
-                  <ul
-                    className={cx('controls-right buttons-group input-bar-buttons', {
-                      'controls-right-shrinked': textValue.length !== 0,
-                    })}
-                  >
-                    <ControlButtons {...controlButtonsProps} showGiphyButton={showGiphyButton} />
-                    <SendMessageButton disabled={!enableSending} onSend={handleSendMessage} />
-                  </ul>
+                  <div className="input-bar-buttons">
+                    <ul
+                      className={cx('controls-right buttons-group input-bar-buttons__list', {
+                        'controls-right-shrinked': textValue.length !== 0,
+                      })}
+                    >
+                      <ControlButtons {...controlButtonsProps} showGiphyButton={showGiphyButton} />
+                    </ul>
+                    <SendMessageButton
+                      disabled={!enableSending}
+                      onSend={handleSendMessage}
+                      className="input-bar-buttons__send"
+                    />
+                  </div>
                 </RichTextEditor>
               )}
             </>

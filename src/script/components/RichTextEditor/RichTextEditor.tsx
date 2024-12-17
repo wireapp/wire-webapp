@@ -251,7 +251,11 @@ export const RichTextEditor = ({
           />
         </div>
       </div>
-      {showFormatToolbar && <FormatToolbar />}
+      {showFormatToolbar && (
+        <div className="input-bar-toolbar">
+          <FormatToolbar />
+        </div>
+      )}
       {children}
     </LexicalComposer>
   );
