@@ -52,6 +52,8 @@ import {EmojiPickerPlugin} from './plugins/EmojiPickerPlugin';
 import {GlobalEventsPlugin} from './plugins/GlobalEventsPlugin';
 import {HistoryPlugin} from './plugins/HistoryPlugin';
 import {findAndTransformEmoji, ReplaceEmojiPlugin} from './plugins/InlineEmojiReplacementPlugin';
+import {ListItemTabIndentationPlugin} from './plugins/ListIndentationPlugin/ListIndentationPlugin';
+import {ListMaxIndentLevelPlugin} from './plugins/ListMaxIndentLevelPlugin/ListMaxIndentLevelPlugin';
 import {MentionsPlugin} from './plugins/MentionsPlugin';
 import {ReplaceCarriageReturnPlugin} from './plugins/ReplaceCarriageReturnPlugin/ReplaceCarriageReturnPlugin';
 import {SendPlugin} from './plugins/SendPlugin';
@@ -76,8 +78,13 @@ const theme = {
     code: 'editor-code',
   },
   list: {
-    ul: 'editor-list editor-list--unordered',
-    ol: 'editor-list editor-list--ordered',
+    ul: 'editor-list editor-list-unordered',
+    ol: 'editor-list editor-list-ordered',
+    listitem: 'editor-list__item',
+    nested: {
+      listitem: 'editor-list__item--nested',
+    },
+    olDepth: ['editor-list-ordered--1', 'editor-list-ordered--2', 'editor-list-ordered--3'],
   },
   heading: {
     h1: 'editor-heading editor-heading--1',
@@ -211,7 +218,8 @@ export const RichTextEditor = ({
           />
           <DraftStatePlugin loadDraftState={loadDraftState} />
           <EditedMessagePlugin message={editedMessage} />
-
+          <ListItemTabIndentationPlugin />
+          <ListMaxIndentLevelPlugin maxDepth={3} />
           <EmojiPickerPlugin openStateRef={emojiPickerOpen} />
           <HistoryPlugin />
           <ListPlugin />

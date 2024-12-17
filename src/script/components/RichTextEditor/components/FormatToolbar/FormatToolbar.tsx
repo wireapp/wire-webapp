@@ -17,8 +17,20 @@
  *
  */
 
+import {useEffect} from 'react';
+
+import {$isListNode} from '@lexical/list';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {FORMAT_TEXT_COMMAND, TextFormatType} from 'lexical';
+import {
+  FORMAT_TEXT_COMMAND,
+  KEY_TAB_COMMAND,
+  TextFormatType,
+  $isRangeSelection,
+  $getSelection,
+  OUTDENT_CONTENT_COMMAND,
+  INDENT_CONTENT_COMMAND,
+  COMMAND_PRIORITY_HIGH,
+} from 'lexical';
 
 import {
   BoldIcon,
@@ -50,6 +62,26 @@ export const FormatToolbar = () => {
   const formatText = (format: Extract<TextFormatType, 'bold' | 'italic' | 'strikethrough' | 'code'>) => {
     editor.dispatchCommand(FORMAT_TEXT_COMMAND, format);
   };
+
+  useEffect(() => {
+    editor.registerCommand<KeyboardEvent>(
+      KEY_TAB_COMMAND,
+      event => {
+        const selection = $getSelection();
+        if (!$isRangeSelection(selection)) {
+          return false;
+        }
+
+        if (!$isListNode(selection.anchor.getNode())) {
+          return false;
+        }
+
+        event.preventDefault();
+        return editor.dispatchCommand(event.shiftKey ? OUTDENT_CONTENT_COMMAND : INDENT_CONTENT_COMMAND, undefined);
+      },
+      COMMAND_PRIORITY_HIGH,
+    );
+  });
 
   return (
     <div css={wrapperStyles}>

@@ -193,12 +193,41 @@
   padding-left: 24px;
   margin: 0;
 
-  &--unordered {
-    list-style-type: disc;
+  &__item {
+    margin: 0 24px;
+
+    &--nested {
+      list-style-type: none;
+
+      &::before,
+      &::after {
+        display: none;
+      }
+    }
   }
 
-  &--ordered {
-    list-style-type: decimal;
+  &-unordered {
+    padding: 0;
+    margin: 0;
+    list-style-position: outside;
+  }
+
+  &-ordered {
+    padding: 0;
+    margin: 0;
+    list-style: decimal;
+
+    &--1 {
+      list-style-position: outside;
+    }
+    &--2 {
+      list-style-position: outside;
+      list-style-type: upper-alpha;
+    }
+    &--3 {
+      list-style-position: outside;
+      list-style-type: lower-alpha;
+    }
   }
 }
 

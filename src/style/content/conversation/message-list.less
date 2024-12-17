@@ -316,12 +316,24 @@
     white-space: pre-wrap;
     word-wrap: break-word;
 
+    li {
+      line-height: var(--line-height-lg);
+    }
+
     ul,
     ol {
-      padding-left: 32px;
+      padding-left: 24px;
       margin-top: 0;
       margin-bottom: 0;
-      line-height: 1;
+      line-height: 0.85;
+    }
+
+    ol ol {
+      list-style: upper-alpha;
+    }
+
+    ol ol ol {
+      list-style: lower-alpha;
     }
   }
 
