@@ -58,7 +58,7 @@ export const ReadReceiptStatus = ({message, is1to1Conversation, onClickDetails}:
         !!onClickDetails && 'message-status-read__clickable',
       )}
       data-uie-name="status-message-read-receipts"
-      aria-label={t('accessibility.messageDetailsReadReceipts', readReceiptText)}
+      aria-label={t('accessibility.messageDetailsReadReceipts', {readReceiptText})}
       {...(!is1to1Conversation && {
         onClick: () => {
           onClickDetails?.(message);

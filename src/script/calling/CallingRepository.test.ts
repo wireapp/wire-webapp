@@ -132,16 +132,19 @@ describe('CallingRepository', () => {
         buildMediaDevicesHandler(),
       );
 
+      call.state(CALL_STATE.MEDIA_ESTAB);
+
       conversation.roles({[senderUserId.id]: DefaultConversationRoleName.WIRE_ADMIN});
 
       callingRepository['conversationState'].conversations.push(conversation);
-      spyOn(callingRepository, 'findCall').and.returnValue(call);
+      callingRepository['callState'].calls([call]);
       spyOn(callingRepository, 'muteCall').and.callThrough();
       spyOn(wCall, 'recvMsg').and.callThrough();
 
       const event: CallingEvent = {
         content: {
           emojis: {},
+          isHandUp: false,
           type: CALL_MESSAGE_TYPE.REMOTE_MUTE,
           version: '',
           data: {targets: {[selfUserId.domain]: {[selfUserId.id]: [selfClientId]}}},
@@ -175,16 +178,19 @@ describe('CallingRepository', () => {
         buildMediaDevicesHandler(),
       );
 
+      call.state(CALL_STATE.MEDIA_ESTAB);
+
       conversation.roles({[senderUserId.id]: DefaultConversationRoleName.WIRE_MEMBER});
 
       callingRepository['conversationState'].conversations.push(conversation);
-      spyOn(callingRepository, 'findCall').and.returnValue(call);
+      callingRepository['callState'].calls([call]);
       spyOn(callingRepository, 'muteCall').and.callThrough();
       spyOn(wCall, 'recvMsg').and.callThrough();
 
       const event: CallingEvent = {
         content: {
           emojis: {},
+          isHandUp: false,
           type: CALL_MESSAGE_TYPE.REMOTE_MUTE,
           version: '',
           data: {targets: {[selfUserId.domain]: {[selfUserId.id]: [selfClientId]}}},
@@ -218,10 +224,12 @@ describe('CallingRepository', () => {
         buildMediaDevicesHandler(),
       );
 
+      call.state(CALL_STATE.MEDIA_ESTAB);
+
       conversation.roles({[senderUserId.id]: DefaultConversationRoleName.WIRE_ADMIN});
 
       callingRepository['conversationState'].conversations.push(conversation);
-      spyOn(callingRepository, 'findCall').and.returnValue(call);
+      callingRepository['callState'].calls([call]);
       spyOn(callingRepository, 'muteCall').and.callThrough();
       spyOn(wCall, 'recvMsg').and.callThrough();
 
@@ -230,6 +238,7 @@ describe('CallingRepository', () => {
       const event: CallingEvent = {
         content: {
           emojis: {},
+          isHandUp: false,
           type: CALL_MESSAGE_TYPE.REMOTE_MUTE,
           version: '',
           data: {targets: {[selfUserId.domain]: {[selfUserId.id]: [someOtherClientId]}}},

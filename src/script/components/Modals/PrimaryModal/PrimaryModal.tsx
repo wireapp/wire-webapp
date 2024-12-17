@@ -17,27 +17,33 @@
  *
  */
 
-import {FC, FormEvent, MouseEvent, useState, useRef, ChangeEvent, useEffect} from 'react';
-
-import cx from 'classnames';
+import {FC, FormEvent, MouseEvent, useState, useRef, ChangeEvent, useEffect, useMemo} from 'react';
 
 import {ValidationUtil} from '@wireapp/commons';
-import {Checkbox, CheckboxLabel, COLOR, Form, Link, Text, Input, Loading, ErrorMessage} from '@wireapp/react-ui-kit';
+import {ErrorMessage} from '@wireapp/react-ui-kit';
 
 import {CopyToClipboardButton} from 'Components/CopyToClipboardButton';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import * as Icon from 'Components/Icon';
-import {ModalComponent} from 'Components/ModalComponent';
-import {PasswordGeneratorButton} from 'Components/PasswordGeneratorButton';
 import {Config} from 'src/script/Config';
 import {isEnterKey, isEscapeKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {isValidPassword} from 'Util/StringUtil';
 
+import {CheckboxOption} from './CheckboxOption/CheckboxOption';
 import {MessageContent} from './Content/MessageContent';
-import {guestLinkPasswordErrorMessageStyles} from './PrimaryModal.styles';
+import {GuestLinkPasswordForm} from './GuestLinkPasswordForm/GuestLinkPasswordForm';
+import {InputForm} from './InputForm/InputForm';
+import {JoinGuestLinkPasswordForm} from './JoinGuestLinkPasswordForm/JoinGuestLinkPasswordForm';
+import {PasswordAdvancedSecurityForm} from './PasswordAdvancedSecurityForm/PasswordAdvancedSecurityForm';
+import {PasswordForm} from './PasswordForm/PasswordForm';
+import {PrimaryButton} from './PrimaryButton/PrimaryButton';
+import {PrimaryModalButtons} from './PrimaryModalButtons/PrimaryModalButtons';
+import {PrimaryModalHeader} from './PrimaryModalHeader/PrimaryModalHeader';
+import {PrimaryModalLoading} from './PrimaryModalLoading/PrimaryModalLoading';
+import {PrimaryModalShell} from './PrimaryModalShell/PrimaryModalShell';
 import {usePrimaryModalState, showNextModalInQueue, defaultContent, removeCurrentModal} from './PrimaryModalState';
 import {ButtonAction, PrimaryModalType} from './PrimaryModalTypes';
+import {SecondaryButton} from './SecondaryButton/SecondaryButton';
 
 export const PrimaryModalComponent: FC = () => {
   const [inputValue, updateInputValue] = useState<string>('');
@@ -55,6 +61,7 @@ export const PrimaryModalComponent: FC = () => {
   const isModalVisible = currentId !== null;
   const passwordValueRef = useRef<HTMLInputElement>(null);
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
+  const isBackupPasswordValid = useMemo(() => passwordInput === '' || isValidPassword(passwordInput), [passwordInput]);
 
   const {
     checkboxLabel,
@@ -109,6 +116,7 @@ export const PrimaryModalComponent: FC = () => {
     }
     return passwordRegex.test(passwordInput);
   };
+
   const checkGuestLinkPassword = (password: string, passwordConfirm: string): boolean => {
     if (password !== passwordConfirm) {
       return false;
@@ -137,12 +145,17 @@ export const PrimaryModalComponent: FC = () => {
     return !inputActionEnabled && !actionEnabled;
   };
 
-  const doAction =
+  const performAction =
     (action?: Function, closeAfter = true, skipValidation = false) =>
     (event: FormEvent<HTMLFormElement> | MouseEvent<HTMLButtonElement>) => {
       event.preventDefault();
 
       if (!skipValidation && !inputActionEnabled) {
+        return;
+      }
+
+      if (hasPasswordWithRules && !isBackupPasswordValid) {
+        setIsFormSubmitted(true);
         return;
       }
 
@@ -171,7 +184,7 @@ export const PrimaryModalComponent: FC = () => {
       [PrimaryModalType.PASSWORD]: () => action(passwordValue),
       [PrimaryModalType.GUEST_LINK_PASSWORD]: () => action(passwordValue, didCopyPassword),
       [PrimaryModalType.JOIN_GUEST_LINK_PASSWORD]: () => action(passwordValue),
-      [PrimaryModalType.PASSWORD_ADVANCED_SECURITY]: () => action(passwordInput),
+      [PrimaryModalType.PASSWORD_ADVANCED_SECURITY]: () => action(passwordInput, isFormSubmitted),
     };
 
     if (Object.keys(actions).includes(content?.currentType ?? '')) {
@@ -190,13 +203,7 @@ export const PrimaryModalComponent: FC = () => {
 
   const secondaryActions = Array.isArray(secondaryAction) ? secondaryAction : [secondaryAction];
 
-  const modalRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
-    if (isModalVisible) {
-      modalRef.current?.focus();
-    }
-
     const onKeyPress = (event: KeyboardEvent) => {
       if (isEscapeKey(event) && isModalVisible) {
         removeCurrentModal();
@@ -211,7 +218,7 @@ export const PrimaryModalComponent: FC = () => {
 
     document.addEventListener('keypress', onKeyPress);
     return () => document.removeEventListener('keypress', onKeyPress);
-  }, [isModalVisible, primaryAction]);
+  }, [primaryAction, isModalVisible]);
 
   const closeAction = () => {
     if (hasPasswordWithRules) {
@@ -223,293 +230,130 @@ export const PrimaryModalComponent: FC = () => {
   const secondaryButtons = secondaryActions
     .filter((action): action is ButtonAction => action !== null && !!action.text)
     .map(action => (
-      <button
+      <SecondaryButton
         key={`${action.text}-${action.uieName}`}
-        type="button"
-        onClick={doAction(action.action, !!closeOnSecondaryAction, true)}
-        data-uie-name={action.uieName}
-        className={cx('modal__button modal__button--secondary', {
-          'modal__button--full': hasMultipleSecondary || allButtonsFullWidth,
-        })}
-        disabled={action.disabled || false}
+        onClick={performAction(action.action, !!closeOnSecondaryAction, true)}
+        disabled={action.disabled}
+        fullWidth={hasMultipleSecondary || allButtonsFullWidth}
+        uieName={action.uieName}
       >
         {action.text}
-      </button>
+      </SecondaryButton>
     ));
 
   const primaryButton = !!primaryAction?.text && (
-    <button
+    <PrimaryButton
+      key="modal-primary-button"
       ref={primaryActionButtonRef}
-      type="button"
-      onClick={doAction(confirm, !!closeOnConfirm)}
+      onClick={performAction(confirm, !!closeOnConfirm)}
       disabled={isPrimaryActionDisabled(primaryAction.disabled)}
-      className={cx('modal__button modal__button--primary', {
-        'modal__button--full': hasMultipleSecondary || allButtonsFullWidth,
-      })}
-      data-uie-name="do-action"
-      key={`modal-primary-button`}
+      fullWidth={hasMultipleSecondary || allButtonsFullWidth}
     >
       {primaryAction.text}
-    </button>
+    </PrimaryButton>
   );
 
   const buttons = primaryBtnFirst ? [primaryButton, ...secondaryButtons] : [...secondaryButtons, primaryButton];
   const isPasswordFieldValid = isFormSubmitted && !passwordValueRef.current?.validity.valid;
 
-  const guestLinkPasswordErrorMessage = isPasswordFieldValid ? (
-    <ErrorMessage data-uie-name="primary-modals-error-message" css={guestLinkPasswordErrorMessageStyles}>
-      {t('modalGuestLinkJoinHelperText', {
-        minPasswordLength: Config.getConfig().MINIMUM_PASSWORD_LENGTH.toString(),
-      })}
-    </ErrorMessage>
-  ) : undefined;
+  const backupPasswordHint = t('backupPasswordHint', {
+    minPasswordLength: Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH.toString(),
+  });
 
   return (
-    <div
-      id="modals"
-      data-uie-name="primary-modals-container"
-      role="dialog"
-      aria-modal="true"
-      aria-label={titleText}
-      tabIndex={-1}
-      ref={modalRef}
+    <PrimaryModalShell
+      title={titleText}
+      isShown={isModalVisible}
+      onClose={onModalHidden}
+      onBgClick={onBgClick}
+      dataUieName={modalUie}
     >
-      <ModalComponent isShown={isModalVisible} onClosed={onModalHidden} onBgClick={onBgClick} data-uie-name={modalUie}>
-        {isModalVisible && (
-          <>
-            <div className="modal__header" data-uie-name="status-modal-title">
-              {titleText && (
-                <h2 className="modal__header__title" id="modal-title">
-                  {titleText}
-                </h2>
-              )}
-              {!hideCloseBtn && (
-                <button
-                  type="button"
-                  className="modal__header__button"
-                  onClick={() => {
-                    removeCurrentModal();
-                    closeAction();
-                  }}
-                  aria-label={closeBtnTitle}
-                  data-uie-name="do-close"
-                >
-                  <Icon.CloseIcon className="modal__header__icon" aria-hidden="true" />
-                </button>
-              )}
-            </div>
+      <PrimaryModalHeader
+        titleText={titleText}
+        closeBtnTitle={closeBtnTitle}
+        hideCloseBtn={hideCloseBtn}
+        closeAction={closeAction}
+      />
+      <FadingScrollbar className="modal__body">
+        <MessageContent message={message} messageHtml={messageHtml} />
 
-            <FadingScrollbar className="modal__body">
-              <MessageContent message={message} messageHtml={messageHtml} />
-
-              {isGuestLinkPassword && (
-                <PasswordGeneratorButton
-                  passwordLength={Config.getConfig().MINIMUM_PASSWORD_LENGTH}
-                  onGeneratePassword={password => {
-                    setPasswordValue(password);
-                    setPasswordConfirmationValue(password);
-                    setIsFormSubmitted(false);
-                  }}
-                />
-              )}
-
-              {isGuestLinkPassword && (
-                <Form
-                  name="guest-password-link-form"
-                  data-uie-name="guest-password-link-form"
-                  onSubmit={doAction(confirm, !!closeOnConfirm)}
-                  autoComplete="off"
-                >
-                  <Input
-                    name="guest-link-password"
-                    data-uie-name="guest-link-password"
-                    required
-                    placeholder={t('modalGuestLinkJoinPlaceholder')}
-                    label={t('modalGuestLinkJoinLabel')}
-                    helperText={t('modalGuestLinkJoinHelperText', {
-                      minPasswordLength: Config.getConfig().MINIMUM_PASSWORD_LENGTH.toString(),
-                    })}
-                    id="modal_pswd"
-                    className="modal__input"
-                    type="password"
-                    autoComplete="off"
-                    value={passwordValue}
-                    ref={passwordValueRef}
-                    onChange={event => setPasswordValue(event.currentTarget.value)}
-                    pattern={ValidationUtil.getNewPasswordPattern(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH)}
-                    markInvalid={isPasswordFieldValid}
-                    error={guestLinkPasswordErrorMessage}
-                  />
-                  <Input
-                    name="guest-link-password-confirm"
-                    data-uie-name="guest-link-password-confirm"
-                    required
-                    placeholder={t('modalGuestLinkJoinConfirmPlaceholder')}
-                    label={t('modalGuestLinkJoinConfirmLabel')}
-                    className="modal__input"
-                    type="password"
-                    id="modal_pswd_confirmation"
-                    autoComplete="off"
-                    value={passwordConfirmationValue}
-                    onChange={event => setPasswordConfirmationValue(event.currentTarget.value)}
-                    markInvalid={isFormSubmitted && !areGuestLinkPasswordsValid}
-                  />
-                </Form>
-              )}
-
-              {copyPassword && (
-                <CopyToClipboardButton
-                  disabled={!passwordGuestLinkActionEnabled}
-                  textToCopy={passwordValue}
-                  displayText={t('guestOptionsPasswordCopyToClipboard')}
-                  copySuccessText={t('guestOptionsPasswordCopyToClipboardSuccess')}
-                  onCopySuccess={() => setDidCopyPassword(true)}
-                />
-              )}
-
-              {isPassword && (
-                <form onSubmit={doAction(confirm, !!closeOnConfirm)}>
-                  <label htmlFor="modal_pswd" className="visually-hidden">
-                    {inputPlaceholder}
-                  </label>
-
-                  <input
-                    id="modal_pswd"
-                    className="modal__input"
-                    type="password"
-                    value={passwordValue}
-                    placeholder={inputPlaceholder}
-                    onChange={event => setPasswordValue(event.target.value)}
-                  />
-                </form>
-              )}
-
-              {isJoinGuestLinkPassword && (
-                <Form
-                  name="guest-password-join-form"
-                  data-uie-name="guest-password-join-form"
-                  onSubmit={doAction(confirm, !!closeOnConfirm)}
-                  autoComplete="off"
-                >
-                  <label
-                    style={{
-                      fontSize: '0.875rem',
-                      fontWeight: 400,
-                      lineHeight: '1rem',
-                      color: 'var(--text-input-label)',
-                      marginBottom: 2,
-                    }}
-                    htmlFor="modal_pswd"
-                  >
-                    {t('guestLinkPasswordModal.passwordInputLabel')}
-                  </label>
-
-                  <input
-                    style={{
-                      boxShadow: '0 0 0 1px var(--text-input-border)',
-                      borderRadius: 12,
-                      margin: 0,
-                    }}
-                    id="modal_pswd"
-                    className="modal__input"
-                    type="password"
-                    value={passwordValue}
-                    placeholder={t('guestLinkPasswordModal.passwordInputPlaceholder')}
-                    onChange={event => setPasswordValue(event.target.value)}
-                  />
-
-                  <Link
-                    style={{marginTop: 24}}
-                    href={Config.getConfig().URL.SUPPORT.LEARN_MORE_ABOUT_GUEST_LINKS}
-                    target="_blank"
-                  >
-                    <Text block color={COLOR.BLUE} style={{textDecoration: 'underline', marginBottom: 24}}>
-                      {t('guestLinkPasswordModal.learnMoreLink')}
-                    </Text>
-                  </Link>
-                </Form>
-              )}
-
-              {hasPasswordWithRules && (
-                <form onSubmit={doAction(confirm, !!closeOnConfirm)}>
-                  <Input
-                    id="modal_pswd_with_rules"
-                    type="password"
-                    value={passwordInput}
-                    placeholder={inputPlaceholder}
-                    required
-                    data-uie-name="backup-password"
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                      updatePasswordWithRules(event.target.value)
-                    }
-                    autoComplete="password"
-                    pattern=".{2,64}"
-                    helperText={t('backupPasswordHint', {
-                      minPasswordLength: Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH.toString(),
-                    })}
-                  />
-                </form>
-              )}
-
-              {isInput && (
-                <form onSubmit={doAction(confirm, !!closeOnConfirm)}>
-                  <label htmlFor="modal-input" className="visually-hidden">
-                    {inputPlaceholder}
-                  </label>
-
-                  <input
-                    ref={ref => ref?.focus()}
-                    maxLength={64}
-                    className="modal__input"
-                    id="modal-input"
-                    value={inputValue}
-                    placeholder={inputPlaceholder}
-                    onChange={event => updateInputValue(event.target.value)}
-                  />
-                </form>
-              )}
-
-              {errorMessage && <div className="modal__input__error">{errorMessage}</div>}
-
-              {isOption && (
-                <div className="modal-option">
-                  <Checkbox
-                    checked={optionChecked}
-                    data-uie-name="modal-option-checkbox"
-                    id="clear-data-checkbox"
-                    onChange={onOptionChange}
-                  >
-                    <CheckboxLabel className="label-xs" htmlFor="clear-data-checkbox">
-                      {checkboxLabel}
-                    </CheckboxLabel>
-                  </Checkbox>
-                </div>
-              )}
-
-              {showLoadingIndicator ? (
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    margin: '1.5rem 0 2rem 0',
-                  }}
-                >
-                  <Loading />
-                </div>
-              ) : (
-                <div
-                  className={cx('modal__buttons', {
-                    'modal__buttons--column': hasMultipleSecondary || allButtonsFullWidth,
-                  })}
-                >
-                  {buttons}
-                </div>
-              )}
-            </FadingScrollbar>
-          </>
+        {isGuestLinkPassword && (
+          <GuestLinkPasswordForm
+            onSubmit={performAction(confirm, !!closeOnConfirm)}
+            onGeneratePassword={password => {
+              setPasswordValue(password);
+              setPasswordConfirmationValue(password);
+              setIsFormSubmitted(false);
+            }}
+            passwordValue={passwordValue}
+            passwordValueRef={passwordValueRef}
+            onPasswordValueChange={setPasswordValue}
+            isPasswordInputMarkInvalid={isPasswordFieldValid}
+            passwordConfirmationValue={passwordConfirmationValue}
+            onPasswordConfirmationChange={setPasswordConfirmationValue}
+            isPasswordConfirmationMarkInvalid={isFormSubmitted && !areGuestLinkPasswordsValid}
+          />
         )}
-      </ModalComponent>
-    </div>
+
+        {copyPassword && (
+          <CopyToClipboardButton
+            disabled={!passwordGuestLinkActionEnabled}
+            textToCopy={passwordValue}
+            displayText={t('guestOptionsPasswordCopyToClipboard')}
+            copySuccessText={t('guestOptionsPasswordCopyToClipboardSuccess')}
+            onCopySuccess={() => setDidCopyPassword(true)}
+          />
+        )}
+
+        {isPassword && (
+          <PasswordForm
+            onSubmit={performAction(confirm, !!closeOnConfirm)}
+            inputPlaceholder={inputPlaceholder}
+            inputValue={passwordValue}
+            onInputChange={setPasswordValue}
+          />
+        )}
+
+        {isJoinGuestLinkPassword && (
+          <JoinGuestLinkPasswordForm
+            onSubmit={performAction(confirm, !!closeOnConfirm)}
+            inputValue={passwordValue}
+            onInputChange={setPasswordValue}
+          />
+        )}
+
+        {hasPasswordWithRules && (
+          <PasswordAdvancedSecurityForm
+            onSubmit={performAction(confirm, !!closeOnConfirm)}
+            inputValue={passwordInput}
+            inputPlaceholder={inputPlaceholder}
+            isInputInvalid={isFormSubmitted && !isBackupPasswordValid}
+            onInputChange={updatePasswordWithRules}
+            inputHelperText={backupPasswordHint}
+            {...(isFormSubmitted &&
+              !isBackupPasswordValid && {error: <ErrorMessage>{backupPasswordHint}</ErrorMessage>})}
+          />
+        )}
+
+        {isInput && (
+          <InputForm
+            onSubmit={performAction(confirm, !!closeOnConfirm)}
+            inputValue={inputValue}
+            inputPlaceholder={inputPlaceholder}
+            onInputChange={updateInputValue}
+          />
+        )}
+
+        {errorMessage && <div className="modal__input__error">{errorMessage}</div>}
+
+        {isOption && <CheckboxOption isChecked={optionChecked} onChange={onOptionChange} label={checkboxLabel} />}
+
+        {showLoadingIndicator ? (
+          <PrimaryModalLoading />
+        ) : (
+          <PrimaryModalButtons isColumn={hasMultipleSecondary || allButtonsFullWidth}>{buttons}</PrimaryModalButtons>
+        )}
+      </FadingScrollbar>
+    </PrimaryModalShell>
   );
 };

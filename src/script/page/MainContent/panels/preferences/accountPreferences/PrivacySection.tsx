@@ -119,7 +119,9 @@ const PrivacySection: React.FC<PrivacySectionProps> = ({
             <CheckboxLabel htmlFor="status-preference-applock">{t('preferencesAccountAppLockCheckbox')}</CheckboxLabel>
           </Checkbox>
           <p className="preferences-detail preferences-detail-intended">
-            {t('preferencesAccountAppLockDetail', formatDurationCaption(appLockInactivityTimeoutSecs * 1000))}
+            {t('preferencesAccountAppLockDetail', {
+              locktime: formatDurationCaption(appLockInactivityTimeoutSecs * 1000),
+            })}
           </p>
         </div>
       )}

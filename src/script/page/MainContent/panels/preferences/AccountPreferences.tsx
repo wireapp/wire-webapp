@@ -22,12 +22,15 @@ import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
 
+import {UserVerificationBadges} from 'Components/Badge';
 import {ErrorFallback} from 'Components/ErrorFallback';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {useEnrichedFields} from 'Components/panel/EnrichedFields';
-import {UserVerificationBadges} from 'Components/VerificationBadge';
 import {ConversationState} from 'src/script/conversation/ConversationState';
+import {TeamCreation} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTabs/TeamCreation/TeamCreation';
 import {ContentState} from 'src/script/page/useAppState';
+import {Core} from 'src/script/service/CoreSingleton';
+import {TeamRepository} from 'src/script/team/TeamRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
@@ -68,6 +71,7 @@ interface AccountPreferencesProps {
   showDomain?: boolean;
   teamState?: TeamState;
   userRepository: UserRepository;
+  teamRepository: TeamRepository;
   selfUser: User;
   isActivatedAccount?: boolean;
   conversationState?: ConversationState;
@@ -79,6 +83,7 @@ export const AccountPreferences = ({
   importFile,
   clientRepository,
   userRepository,
+  teamRepository,
   propertiesRepository,
   switchContent,
   conversationRepository,
@@ -88,6 +93,7 @@ export const AccountPreferences = ({
   teamState = container.resolve(TeamState),
   conversationState = container.resolve(ConversationState),
 }: AccountPreferencesProps) => {
+  const core = container.resolve(Core);
   const {isTeam, teamName} = useKoSubscribableChildren(teamState, ['isTeam', 'teamName']);
   const {name, email, availability, username, managedBy} = useKoSubscribableChildren(selfUser, [
     'name',
@@ -102,6 +108,9 @@ export const AccountPreferences = ({
   const config = Config.getConfig();
   const brandName = config.BRAND_NAME;
   const isConsentCheckEnabled = config.FEATURE.CHECK_CONSENT;
+  const isTeamCreationEnabled =
+    Config.getConfig().FEATURE.ENABLE_TEAM_CREATION &&
+    core.backendFeatures.version >= Config.getConfig().MIN_TEAM_CREATION_SUPPORTED_API_VERSION;
 
   const richFields = useEnrichedFields(selfUser, {addDomain: showDomain, addEmail: false});
   const domain = selfUser.domain;
@@ -134,6 +143,14 @@ export const AccountPreferences = ({
   return (
     <PreferencesPage title={t('preferencesAccount')}>
       <div className="preferences-wrapper">
+        {isTeamCreationEnabled && !teamState.isInTeam(selfUser) && (
+          <TeamCreation
+            teamRepository={teamRepository}
+            userRepository={userRepository}
+            selfUser={selfUser}
+            isAccountPage
+          />
+        )}
         <div className="preferences-account-name">
           <h3 className="heading-h3 text-center" title={name}>
             {name}

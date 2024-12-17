@@ -17,12 +17,19 @@
  *
  */
 
-import {GroupIcon, InfoIcon, MessageIcon, StarIcon, ExternalLinkIcon, Tooltip} from '@wireapp/react-ui-kit';
+import {container} from 'tsyringe';
+
+import {GroupIcon, MessageIcon, StarIcon, ExternalLinkIcon, Tooltip, SupportIcon} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
+import {User} from 'src/script/entity/User';
 import {ConversationFolderTab} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTab/ConversationFolderTab';
 import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
+import {Core} from 'src/script/service/CoreSingleton';
+import {TeamRepository} from 'src/script/team/TeamRepository';
+import {TeamState} from 'src/script/team/TeamState';
+import {UserRepository} from 'src/script/user/UserRepository';
 import {isDataDogEnabled} from 'Util/DataDog';
 import {getWebEnvironment} from 'Util/Environment';
 import {replaceLink, t} from 'Util/LocalizerUtil';
@@ -34,11 +41,11 @@ import {
   iconStyle,
 } from './ConversationTabs.styles';
 import {FolderIcon} from './FolderIcon';
+import {TeamCreation} from './TeamCreation/TeamCreation';
 
 import {Config} from '../../../../../Config';
 import {Conversation} from '../../../../../entity/Conversation';
-import {Shortcut} from '../../../../../ui/Shortcut';
-import {ShortcutType} from '../../../../../ui/ShortcutType';
+import {ContentState} from '../../../../useAppState';
 import {ConversationTab} from '../ConversationTab';
 
 interface ConversationTabsProps {
@@ -50,8 +57,11 @@ interface ConversationTabsProps {
   conversationRepository: ConversationRepository;
   onChangeTab: (tab: SidebarTabs, folderId?: string) => void;
   currentTab: SidebarTabs;
-  onClickPreferences: () => void;
+  onClickPreferences: (contentState: ContentState) => void;
   showNotificationsBadge?: boolean;
+  selfUser: User;
+  teamRepository: TeamRepository;
+  userRepository: UserRepository;
 }
 
 export const ConversationTabs = ({
@@ -65,7 +75,12 @@ export const ConversationTabs = ({
   currentTab,
   onClickPreferences,
   showNotificationsBadge = false,
+  selfUser,
+  userRepository,
+  teamRepository,
 }: ConversationTabsProps) => {
+  const core = container.resolve(Core);
+  const teamState = container.resolve(TeamState);
   const totalUnreadConversations = unreadConversations.length;
 
   const totalUnreadFavoriteConversations = favoriteConversations.filter(favoriteConversation =>
@@ -78,6 +93,10 @@ export const ConversationTabs = ({
 
   const filterUnreadAndArchivedConversations = (conversation: Conversation) =>
     !conversation.is_archived() && conversation.hasUnread();
+
+  const isTeamCreationEnabled =
+    Config.getConfig().FEATURE.ENABLE_TEAM_CREATION &&
+    core.backendFeatures.version >= Config.getConfig().MIN_TEAM_CREATION_SUPPORTED_API_VERSION;
 
   const conversationTabs = [
     {
@@ -117,7 +136,7 @@ export const ConversationTabs = ({
     },
     {
       type: SidebarTabs.ARCHIVES,
-      title: t('tooltipConversationsArchived', archivedConversations.length),
+      title: t('tooltipConversationsArchived', {number: archivedConversations.length}),
       label: t('conversationFooterArchive'),
       dataUieName: 'go-archive',
       Icon: <Icon.ArchiveIcon />,
@@ -168,7 +187,7 @@ export const ConversationTabs = ({
         </div>
 
         <ConversationTab
-          title={t('searchConnect', Shortcut.getShortcutTooltip(ShortcutType.START))}
+          title={t('searchConnect')}
           label={t('searchConnect')}
           type={SidebarTabs.CONNECT}
           Icon={<Icon.AddParticipantsIcon />}
@@ -185,6 +204,10 @@ export const ConversationTabs = ({
         aria-owns="tab-1 tab-2"
         className="conversations-sidebar-list-footer"
       >
+        {isTeamCreationEnabled && !teamState.isInTeam(selfUser) && (
+          <TeamCreation teamRepository={teamRepository} userRepository={userRepository} selfUser={selfUser} />
+        )}
+
         {!getWebEnvironment().isProduction && isDataDogEnabled() && (
           <div css={footerDisclaimer}>
             <Tooltip
@@ -214,13 +237,13 @@ export const ConversationTabs = ({
         )}
 
         <ConversationTab
-          title={t('preferencesHeadline', Shortcut.getShortcutTooltip(ShortcutType.START))}
+          title={t('preferencesHeadline')}
           label={t('preferencesHeadline')}
           type={SidebarTabs.PREFERENCES}
           Icon={<Icon.SettingsIcon />}
           onChangeTab={tab => {
             onChangeTab(tab);
-            onClickPreferences();
+            onClickPreferences(ContentState.PREFERENCES_ACCOUNT);
           }}
           conversationTabIndex={1}
           dataUieName="go-preferences"
@@ -235,11 +258,11 @@ export const ConversationTabs = ({
           id="tab-2"
           type="button"
           className="conversations-sidebar-btn"
-          title={t('preferencesAboutSupport', Shortcut.getShortcutTooltip(ShortcutType.START))}
+          title={t('preferencesAboutSupport')}
           data-uie-name="go-people"
         >
           <span className="conversations-sidebar-btn--text-wrapper">
-            <InfoIcon />
+            <SupportIcon viewBox="0 0 16 16" />
             <span className="conversations-sidebar-btn--text">{t('preferencesAboutSupport')}</span>
             <ExternalLinkIcon className="external-link-icon" />
           </span>

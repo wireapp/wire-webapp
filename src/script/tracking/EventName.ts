@@ -39,5 +39,38 @@ export const EventName = {
     CALLING_UI_SIZE: 'ui.calling_ui_size',
     SIDEBAR_COLLAPSE: 'ui.sidebar_collapse',
     SIDEBAR_UNCOLLAPSE: 'ui.sidebar_uncollapse',
+    CLICKED: {
+      SETTINGS_MIGRATION: 'ui.clicked_settings_migration',
+      PERSONAL_MIGRATION_CTA: 'ui.clicked_personal_migration_cta',
+    },
+  },
+  USER: {
+    PERSONAL_TEAM_CREATION: {
+      FLOW_STARTED: 'user.personal_team_creation_flow_started',
+      FLOW_STOPPED: 'user.personal_team_creation_flow_stopped',
+      FLOW_CANCELLED: 'user.personal_team_creation_flow_cancelled',
+      FLOW_COMPLETED: 'user.personal_team_creation_flow_completed',
+    },
+  },
+  MESSAGES: {
+    VIDEO: {
+      PLAY_SUCCESS: 'messages.video.play_success',
+      PLAY_FAILED: 'messages.video.play_failed',
+      UNSUPPORTED_MIME_TYPE: 'messages.video.unsupported_mime_type',
+      UNPLAYABLE_ERROR: 'messages.video.unplayable_error',
+    },
+  },
+  HISTORY: {
+    BACKUP_CREATED: 'history.backup_created',
+    BACKUP_CANCELLED: 'history.backup_cancelled',
+  },
+  INPUT: {
+    FORMAT_TEXT: {
+      ENABLED: 'input.rich_text_editor.enabled',
+      DISABLED: 'input.rich_text_editor.disabled',
+    },
+    EMOJI_MODAL: {
+      EMOJI_PICKED: 'input.emoji_modal.emoji_picked',
+    },
   },
 };

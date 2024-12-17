@@ -28,7 +28,7 @@ import {ValidationUtil} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/Icon';
-import {ModalComponent} from 'Components/ModalComponent';
+import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {SIGN_OUT_REASON} from 'src/script/auth/SignOutReason';
 import {ClientRepository} from 'src/script/client';
 import {ClientState} from 'src/script/client/ClientState';
@@ -246,17 +246,17 @@ const AppLock: React.FC<AppLockProps> = ({
   const headerText = () => {
     switch (state) {
       case APPLOCK_STATE.SETUP_CHANGE:
-        return t('modalAppLockSetupChangeTitle', Config.getConfig().BRAND_NAME);
+        return t('modalAppLockSetupChangeTitle', {brandName: Config.getConfig().BRAND_NAME});
       case APPLOCK_STATE.SETUP:
         return t('modalAppLockSetupTitle');
       case APPLOCK_STATE.LOCKED:
-        return t('modalAppLockLockedTitle', Config.getConfig().BRAND_NAME);
+        return t('modalAppLockLockedTitle', {brandName: Config.getConfig().BRAND_NAME});
       case APPLOCK_STATE.FORGOT:
         return t('modalAppLockForgotTitle');
       case APPLOCK_STATE.WIPE_CONFIRM:
         return t('modalAppLockWipeConfirmTitle');
       case APPLOCK_STATE.WIPE_PASSWORD:
-        return t('modalAppLockWipePasswordTitle', Config.getConfig().BRAND_NAME);
+        return t('modalAppLockWipePasswordTitle', {brandName: Config.getConfig().BRAND_NAME});
       default:
         return '';
     }
@@ -289,7 +289,7 @@ const AppLock: React.FC<AppLockProps> = ({
           <form onSubmit={onSetCode}>
             <p
               className="modal__text"
-              dangerouslySetInnerHTML={{__html: t('modalAppLockSetupMessage', {}, {br: '<br><br>'})}}
+              dangerouslySetInnerHTML={{__html: t('modalAppLockSetupMessage', undefined, {br: '<br><br>'})}}
               data-uie-name="label-applock-set-text"
             />
 
@@ -400,7 +400,7 @@ const AppLock: React.FC<AppLockProps> = ({
             </div>
 
             <input
-              aria-label={t('modalAppLockSetupChangeTitle')}
+              aria-label={t('modalAppLockSetupChangeTitle', {brandName: Config.getConfig().BRAND_NAME})}
               autoFocus
               className="modal__input"
               type="password"
@@ -453,7 +453,7 @@ const AppLock: React.FC<AppLockProps> = ({
             </div>
 
             <input
-              aria-label={t('modalAppLockLockedTitle')}
+              aria-label={t('modalAppLockLockedTitle', {brandName: Config.getConfig().BRAND_NAME})}
               autoFocus
               className="modal__input"
               type="password"
@@ -541,7 +541,7 @@ const AppLock: React.FC<AppLockProps> = ({
         {state === APPLOCK_STATE.WIPE_PASSWORD && (
           <form onSubmit={onWipeDatabase}>
             <input
-              aria-label={t('modalAppLockWipePasswordTitle')}
+              aria-label={t('modalAppLockWipePasswordTitle', {brandName: Config.getConfig().BRAND_NAME})}
               autoFocus
               className="modal__input"
               type="password"

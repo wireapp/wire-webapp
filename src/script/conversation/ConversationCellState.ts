@@ -104,32 +104,32 @@ const _generateSummaryDescription = (activities: Record<ACTIVITY_TYPE, number>):
         switch (activity) {
           case ACTIVITY_TYPE.CALL: {
             return activityCountIsOne
-              ? t('conversationsSecondaryLineSummaryMissedCall', activityCount)
-              : t('conversationsSecondaryLineSummaryMissedCalls', activityCount);
+              ? t('conversationsSecondaryLineSummaryMissedCall', {number: activityCount})
+              : t('conversationsSecondaryLineSummaryMissedCalls', {number: activityCount});
           }
 
           case ACTIVITY_TYPE.MENTION: {
             return activityCountIsOne
-              ? t('conversationsSecondaryLineSummaryMention', activityCount)
-              : t('conversationsSecondaryLineSummaryMentions', activityCount);
+              ? t('conversationsSecondaryLineSummaryMention', {number: activityCount})
+              : t('conversationsSecondaryLineSummaryMentions', {number: activityCount});
           }
 
           case ACTIVITY_TYPE.MESSAGE: {
             return activityCountIsOne
-              ? t('conversationsSecondaryLineSummaryMessage', activityCount)
-              : t('conversationsSecondaryLineSummaryMessages', activityCount);
+              ? t('conversationsSecondaryLineSummaryMessage', {number: activityCount})
+              : t('conversationsSecondaryLineSummaryMessages', {number: activityCount});
           }
 
           case ACTIVITY_TYPE.PING: {
             return activityCountIsOne
-              ? t('conversationsSecondaryLineSummaryPing', activityCount)
-              : t('conversationsSecondaryLineSummaryPings', activityCount);
+              ? t('conversationsSecondaryLineSummaryPing', {number: activityCount})
+              : t('conversationsSecondaryLineSummaryPings', {number: activityCount});
           }
 
           case ACTIVITY_TYPE.REPLY: {
             return activityCountIsOne
-              ? t('conversationsSecondaryLineSummaryReply', activityCount)
-              : t('conversationsSecondaryLineSummaryReplies', activityCount);
+              ? t('conversationsSecondaryLineSummaryReply', {number: activityCount})
+              : t('conversationsSecondaryLineSummaryReplies', {number: activityCount});
           }
 
           default:
@@ -201,19 +201,21 @@ const _getStateGroupActivity = {
         if ((lastMessageEntity as MemberMessage).isMemberJoin()) {
           if (userCountIsOne) {
             if (!(lastMessageEntity as MemberMessage).remoteUserEntities().length) {
-              return t('conversationsSecondaryLinePersonAddedYou', (lastMessageEntity as MemberMessage).user().name());
+              return t('conversationsSecondaryLinePersonAddedYou', {
+                user: (lastMessageEntity as MemberMessage).user().name(),
+              });
             }
 
             const [remoteUserEntity] = (lastMessageEntity as MemberMessage).remoteUserEntities();
             const userSelfJoined = lastMessageEntity.user().id === remoteUserEntity.id;
             const string = userSelfJoined
-              ? t('conversationsSecondaryLinePersonAddedSelf', remoteUserEntity.name())
-              : t('conversationsSecondaryLinePersonAdded', remoteUserEntity.name());
+              ? t('conversationsSecondaryLinePersonAddedSelf', {user: remoteUserEntity.name()})
+              : t('conversationsSecondaryLinePersonAdded', {user: remoteUserEntity.name()});
 
             return string;
           }
 
-          return t('conversationsSecondaryLinePeopleAdded', userCount);
+          return t('conversationsSecondaryLinePeopleAdded', {user: userCount});
         }
 
         if ((lastMessageEntity as MemberMessage).isMemberRemoval()) {
@@ -223,19 +225,19 @@ const _getStateGroupActivity = {
             if (remoteUserEntity) {
               if ((lastMessageEntity as MemberMessage).isTeamMemberLeave()) {
                 const name = (lastMessageEntity as MemberMessage).name() || remoteUserEntity.name();
-                return t('conversationsSecondaryLinePersonRemovedTeam', name);
+                return t('conversationsSecondaryLinePersonRemovedTeam', {user: name});
               }
 
               const userSelfLeft = remoteUserEntity.id === lastMessageEntity.user().id;
               const string = userSelfLeft
-                ? t('conversationsSecondaryLinePersonLeft', remoteUserEntity.name())
-                : t('conversationsSecondaryLinePersonRemoved', remoteUserEntity.name());
+                ? t('conversationsSecondaryLinePersonLeft', {user: remoteUserEntity.name()})
+                : t('conversationsSecondaryLinePersonRemoved', {user: remoteUserEntity.name()});
 
               return string;
             }
           }
 
-          return t('conversationsSecondaryLinePeopleLeft', userCount);
+          return t('conversationsSecondaryLinePeopleLeft', {number: userCount});
         }
       }
     }
@@ -243,7 +245,7 @@ const _getStateGroupActivity = {
     const isConversationRename =
       lastMessageEntity.isSystem() && (lastMessageEntity as SystemMessage).isConversationRename();
     if (isConversationRename) {
-      return t('conversationsSecondaryLineRenamed', lastMessageEntity.user().name());
+      return t('conversationsSecondaryLineRenamed', {user: lastMessageEntity.user().name()});
     }
 
     return '';

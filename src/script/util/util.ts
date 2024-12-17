@@ -25,7 +25,6 @@ import {Runtime} from '@wireapp/commons';
 import {isTabKey} from './KeyboardUtil';
 import {getLogger} from './Logger';
 
-import {Config} from '../Config';
 import type {Conversation} from '../entity/Conversation';
 import {AuthError} from '../error/AuthError';
 
@@ -304,7 +303,7 @@ export const setContextMenuPosition = (event: React.KeyboardEvent) => {
 const supportsSecretStorage = () => !Runtime.isDesktopApp() || !!window.systemCrypto;
 
 // disables mls for old 'broken' desktop clients, see https://github.com/wireapp/wire-desktop/pull/6094
-export const supportsMLS = () => Config.getConfig().FEATURE.ENABLE_MLS && supportsSecretStorage();
+export const supportsMLS = () => supportsSecretStorage();
 
 export const incomingCssClass = 'content-animation-incoming-horizontal-left';
 

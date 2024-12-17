@@ -17,9 +17,16 @@
  *
  */
 
-import React, {MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent, useEffect, useState} from 'react';
+import React, {
+  MouseEvent as ReactMouseEvent,
+  KeyboardEvent as ReactKeyBoardEvent,
+  useEffect,
+  useState,
+  MutableRefObject,
+  useCallback,
+} from 'react';
 
-import {ConversationListCell} from 'Components/list/ConversationListCell';
+import {ConversationListCell} from 'Components/ConversationListCell';
 import {Call} from 'src/script/calling/Call';
 import {ConversationLabel, ConversationLabelRepository} from 'src/script/conversation/ConversationLabelRepository';
 import {User} from 'src/script/entity/User';
@@ -30,17 +37,14 @@ import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {ConnectionRequests} from './ConnectionRequests';
-import {conversationsList} from './ConversationsList.styles';
-import {FilteredGroupConversations} from './FilteredGroupConversations';
+import {conversationsList, headingTitle, noResultsMessage} from './ConversationsList.styles';
 import {conversationSearchFilter, scrollToConversation} from './helpers';
 
 import {CallState} from '../../../../calling/CallState';
-import {ConversationRepository} from '../../../../conversation/ConversationRepository';
 import {ConversationState} from '../../../../conversation/ConversationState';
 import {Conversation} from '../../../../entity/Conversation';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from '../../../../router/routerBindings';
-import {SearchRepository} from '../../../../search/SearchRepository';
 import {ListViewModel} from '../../../../view_model/ListViewModel';
 import {useAppMainState, ViewType} from '../../../state';
 import {ContentState} from '../../../useAppState';
@@ -48,8 +52,6 @@ import {ContentState} from '../../../useAppState';
 interface ConversationsListProps {
   callState: CallState;
   connectRequests: User[];
-  conversationRepository: ConversationRepository;
-  searchRepository: SearchRepository;
   conversations: Conversation[];
   conversationState: ConversationState;
   listViewModel: ListViewModel;
@@ -60,16 +62,15 @@ interface ConversationsListProps {
   resetConversationFocus: () => void;
   handleArrowKeyDown: (index: number) => (e: React.KeyboardEvent) => void;
   clearSearchFilter: () => void;
-  isConversationFilterFocused: boolean;
-  favoriteConversations: Conversation[];
-  archivedConversations: Conversation[];
+  groupParticipantsConversations: Conversation[];
+  isGroupParticipantsVisible: boolean;
+  isEmpty: boolean;
+  searchInputRef: MutableRefObject<HTMLInputElement | null>;
 }
 
 export const ConversationsList = ({
   conversations,
   conversationsFilter,
-  conversationRepository,
-  searchRepository,
   listViewModel,
   connectRequests,
   conversationState,
@@ -79,9 +80,10 @@ export const ConversationsList = ({
   resetConversationFocus,
   handleArrowKeyDown,
   clearSearchFilter,
-  isConversationFilterFocused,
-  favoriteConversations,
-  archivedConversations,
+  groupParticipantsConversations,
+  isGroupParticipantsVisible,
+  isEmpty,
+  searchInputRef,
 }: ConversationsListProps) => {
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
   const {currentTab} = useSidebarStore();
@@ -90,42 +92,67 @@ export const ConversationsList = ({
 
   const {joinableCalls} = useKoSubscribableChildren(callState, ['joinableCalls']);
 
-  const isActiveConversation = (conversation: Conversation) => conversationState.isActiveConversation(conversation);
+  const isActiveConversation = useCallback(
+    (conversation: Conversation) => conversationState.isActiveConversation(conversation),
+    [conversationState],
+  );
 
-  const openContextMenu = (conversation: Conversation, event: MouseEvent | React.MouseEvent<Element, MouseEvent>) =>
-    listViewModel.onContextMenu(conversation, event);
+  const openContextMenu = useCallback(
+    (conversation: Conversation, event: MouseEvent | React.MouseEvent<Element, MouseEvent>) =>
+      listViewModel.onContextMenu(conversation, event),
+    [listViewModel],
+  );
 
-  const answerCall = (conversation: Conversation) => listViewModel.answerCall(conversation);
+  const answerCall = useCallback(
+    (conversation: Conversation) => listViewModel.answerCall(conversation),
+    [listViewModel],
+  );
 
-  const hasJoinableCall = (conversation: Conversation) => {
-    const call = joinableCalls.find((callInstance: Call) =>
-      matchQualifiedIds(callInstance.conversation.qualifiedId, conversation.qualifiedId),
-    );
+  const hasJoinableCall = useCallback(
+    (conversation: Conversation) => {
+      const call = joinableCalls.find((callInstance: Call) =>
+        matchQualifiedIds(callInstance.conversation.qualifiedId, conversation.qualifiedId),
+      );
 
-    return !!call && !conversation.isSelfUserRemoved();
-  };
+      return !!call && !conversation.isSelfUserRemoved();
+    },
+    [joinableCalls],
+  );
 
   const onConnectionRequestClick = () => {
     setCurrentView(ViewType.MOBILE_CENTRAL_COLUMN);
     listViewModel.contentViewModel.switchContent(ContentState.CONNECTION_REQUESTS);
   };
 
-  const getCommonConversationCellProps = (conversation: Conversation, index: number) => ({
-    isFocused: !isConversationFilterFocused && currentFocus === conversation.id,
-    handleArrowKeyDown: handleArrowKeyDown(index),
-    resetConversationFocus: resetConversationFocus,
-    dataUieName: 'item-conversation',
-    conversation: conversation,
-    onClick: (event: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>) => {
-      if (isKeyboardEvent(event)) {
-        createNavigateKeyboard(generateConversationUrl(conversation.qualifiedId), true)(event);
-      } else {
-        createNavigate(generateConversationUrl(conversation.qualifiedId))(event);
-      }
+  const onConversationClick = useCallback(
+    (conversation: Conversation) =>
+      (event: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>) => {
+        if (isActiveConversation(conversation)) {
+          clearSearchFilter();
+          setClickedFilteredConversationId(conversation.id);
+          return;
+        }
 
-      clearSearchFilter();
-      setClickedFilteredConversationId(conversation.id);
-    },
+        if (isKeyboardEvent(event)) {
+          createNavigateKeyboard(generateConversationUrl(conversation.qualifiedId), true)(event);
+        } else {
+          createNavigate(generateConversationUrl(conversation.qualifiedId))(event);
+        }
+
+        clearSearchFilter();
+        setClickedFilteredConversationId(conversation.id);
+      },
+    [clearSearchFilter, isActiveConversation],
+  );
+
+  const getCommonConversationCellProps = (conversation: Conversation, index: number) => ({
+    isFocused:
+      document.activeElement !== searchInputRef.current && !conversationsFilter && currentFocus === conversation.id,
+    handleArrowKeyDown: handleArrowKeyDown(index),
+    resetConversationFocus,
+    dataUieName: 'item-conversation',
+    conversation,
+    onClick: onConversationClick(conversation),
     isSelected: isActiveConversation,
     onJoinCall: answerCall,
     rightClick: openContextMenu,
@@ -150,23 +177,31 @@ export const ConversationsList = ({
 
       <ConnectionRequests connectionRequests={connectRequests} onConnectionRequestClick={onConnectionRequestClick} />
 
+      {conversationsFilter && !isEmpty && <h3 css={headingTitle}>{t('searchConversationNames')}</h3>}
+
+      {conversations.length === 0 && groupParticipantsConversations.length > 0 && (
+        <p css={noResultsMessage}>{t('searchConversationsNoResult')}</p>
+      )}
+
       <ul css={conversationsList} data-uie-name="conversation-view">
         {conversationsToDisplay.map((conversation, index) => (
           <ConversationListCell key={conversation.id} {...getCommonConversationCellProps(conversation, index)} />
         ))}
       </ul>
 
-      {conversationsFilter && ![SidebarTabs.DIRECTS, SidebarTabs.GROUPS].includes(currentTab) && (
-        <FilteredGroupConversations
-          archivedConversations={archivedConversations}
-          conversationRepository={conversationRepository}
-          conversations={conversations}
-          conversationsFilter={conversationsFilter}
-          currentFolder={currentFolder}
-          favoriteConversations={favoriteConversations}
-          getCommonConversationCellProps={getCommonConversationCellProps}
-          searchRepository={searchRepository}
-        />
+      {isGroupParticipantsVisible && (
+        <>
+          <h3 css={headingTitle}>{t('searchGroupParticipants')}</h3>
+          <ul
+            css={conversationsList}
+            data-uie-name="group-participants-conversations-view"
+            className="group-participants-conversations"
+          >
+            {groupParticipantsConversations.map((conversation, index) => (
+              <ConversationListCell key={conversation.id} {...getCommonConversationCellProps(conversation, index)} />
+            ))}
+          </ul>
+        </>
       )}
     </>
   );

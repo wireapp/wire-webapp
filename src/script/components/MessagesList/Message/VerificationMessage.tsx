@@ -23,7 +23,7 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {VerificationIcon} from 'Components/VerifiedIcon';
+import {VerificationIcon} from 'Components/VerificationIcon';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {Declension, joinNames, t} from 'Util/LocalizerUtil';
@@ -84,7 +84,7 @@ const VerificationMessage: React.FC<VerificationMessageProps> = ({message}) => {
             >
               {isSelfClient
                 ? t('conversationDeviceYourDevices')
-                : t('conversationDeviceUserDevices', userEntities[0]?.name())}
+                : t('conversationDeviceUserDevices', {user: userEntities[0]?.name()})}
             </button>
           </>
         )}

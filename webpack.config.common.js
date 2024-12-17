@@ -45,8 +45,6 @@ const templateParameters = {
   OPEN_GRAPH_TITLE: serverConfig.OPEN_GRAPH.TITLE,
   OPEN_GRAPH_DESCRIPTION: serverConfig.OPEN_GRAPH.DESCRIPTION,
   OPEN_GRAPH_IMAGE_URL: serverConfig.OPEN_GRAPH.IMAGE_URL,
-  COUNTLY_API_KEY: serverConfig.COUNTLY_API_KEY,
-  COUNTLY_NONCE: serverConfig.COUNTLY_NONCE,
 };
 
 module.exports = {
@@ -165,7 +163,6 @@ module.exports = {
         {from: `assets`, to: `${dist}/assets`},
         {from: 'src/page/basicBrowserFeatureCheck.js', to: `${dist}/min/`},
         {from: 'src/page/loader.js', to: `${dist}/min/`},
-        {from: 'src/page/countlyBoomerangCustom.js', to: `${dist}/min/`},
       ],
     }),
     new webpack.IgnorePlugin({resourceRegExp: /.*\.wasm/}),
@@ -191,6 +188,7 @@ module.exports = {
   resolve: {
     alias: {
       Components: path.resolve(srcScript, 'components'),
+      Hooks: path.resolve(srcScript, 'hooks'),
       I18n: path.resolve(SRC_PATH, 'i18n'),
       Resource: path.resolve(ROOT_PATH, 'resource'),
       Util: path.resolve(srcScript, 'util'),

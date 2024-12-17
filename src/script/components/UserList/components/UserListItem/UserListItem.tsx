@@ -24,9 +24,9 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {UserStatusBadges} from 'Components/Badge';
 import {ParticipantItemContent} from 'Components/ParticipantItemContent';
 import {listItem, listWrapper} from 'Components/ParticipantItemContent/ParticipantItem.styles';
-import {UserStatusBadges} from 'Components/UserBadges';
 import {UserlistMode} from 'Components/UserList';
 import {useUserName} from 'Components/UserName';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -137,7 +137,7 @@ export const UserListItem = ({
     <>
       {canSelect ? (
         <div
-          aria-label={t('accessibility.openConversation', userName)}
+          aria-label={t('accessibility.openConversation', {name: userName})}
           css={listWrapper({isHighlighted, noUnderline, noInteraction})}
         >
           <Checkbox
@@ -159,7 +159,7 @@ export const UserListItem = ({
         <div
           tabIndex={TabIndex.FOCUSABLE}
           role="button"
-          aria-label={t('accessibility.openConversation', userName)}
+          aria-label={t('accessibility.openConversation', {name: userName})}
           css={listWrapper({isHighlighted, noUnderline})}
           {...(!noInteraction && {
             onClick: event => onClick(user, event.nativeEvent),

@@ -22,12 +22,12 @@ import {amplify} from 'amplify';
 import {Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {t} from 'Util/LocalizerUtil';
 
 import {button, paragraph, paragraphBold, paragraphGray, seperator, wrapper} from './EmptyConversationList.styles';
 
 import {Config} from '../../../../../Config';
+import {SidebarTabs} from '../useSidebarStore';
 
 interface EmptyConversationListProps {
   currentTab: SidebarTabs;
@@ -36,24 +36,13 @@ interface EmptyConversationListProps {
 }
 
 export const EmptyConversationList = ({currentTab, onChangeTab, searchValue = ''}: EmptyConversationListProps) => {
-  const ConnectWithNewUsersButton = () => (
-    <Button
-      variant={ButtonVariant.TERTIARY}
-      onClick={() => onChangeTab(SidebarTabs.CONNECT)}
-      data-uie-name="connect-with-new-users"
-      css={button}
-    >
-      {t('conversationConnectWithNewUsers')}
-    </Button>
-  );
-
   if (currentTab === SidebarTabs.RECENT || currentTab === SidebarTabs.FOLDER) {
     return (
       <div css={wrapper} className="empty-conversations-list">
         <div>
           <p css={paragraph}>{searchValue ? t('searchConversationsNoResult') : t('conversationAllWelcomeMessage')}</p>
 
-          <ConnectWithNewUsersButton />
+          <ConnectWithNewUsersButton onClick={() => onChangeTab(SidebarTabs.CONNECT)} />
 
           <span css={seperator}>{t('conversationButtonSeparator')}</span>
 
@@ -97,7 +86,7 @@ export const EmptyConversationList = ({currentTab, onChangeTab, searchValue = ''
         <div>
           <p css={paragraph}>{searchValue ? t('searchConversationsNoResult') : t('conversationGroupEmptyMessage')}</p>
 
-          <ConnectWithNewUsersButton />
+          <ConnectWithNewUsersButton onClick={() => onChangeTab(SidebarTabs.CONNECT)} />
 
           <span css={seperator}>{t('conversationButtonSeparator')}</span>
 
@@ -124,7 +113,7 @@ export const EmptyConversationList = ({currentTab, onChangeTab, searchValue = ''
               : t('conversationDirectEmptyMessage', {brandName: Config.getConfig().BRAND_NAME})}
           </p>
 
-          <ConnectWithNewUsersButton />
+          <ConnectWithNewUsersButton onClick={() => onChangeTab(SidebarTabs.CONNECT)} />
         </div>
       </div>
     );
@@ -149,3 +138,13 @@ export const EmptyConversationList = ({currentTab, onChangeTab, searchValue = ''
 
   return null;
 };
+
+type ConnectWithNewUsersButtonProps = {
+  onClick: () => void;
+};
+
+const ConnectWithNewUsersButton = ({onClick}: ConnectWithNewUsersButtonProps) => (
+  <Button variant={ButtonVariant.TERTIARY} onClick={onClick} data-uie-name="connect-with-new-users" css={button}>
+    {t('conversationConnectWithNewUsers')}
+  </Button>
+);

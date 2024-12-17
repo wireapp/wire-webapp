@@ -58,7 +58,14 @@ export function UsersReactions({reactions, selfUser, findUsers, onParticipantCli
           <span css={reactionsCountAlignment}>({emojiCount})</span>
         </div>
         <div data-uie-name="reaction-list">
-          <UserList selfUser={selfUser} key={reactionKey} users={users} noUnderline onClick={onParticipantClick} />
+          <UserList
+            selfUser={selfUser}
+            key={reactionKey}
+            users={users}
+            noUnderline
+            onClick={onParticipantClick}
+            filterDeletedUsers={false}
+          />
         </div>
       </Fragment>
     );

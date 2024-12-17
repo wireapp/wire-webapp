@@ -85,6 +85,7 @@ import {externalUrl} from '../externalRoute';
 import {IntegrationRepository} from '../integration/IntegrationRepository';
 import {IntegrationService} from '../integration/IntegrationService';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
+import {scheduleApiVersionUpdate, updateApiVersion} from '../lifecycle/updateRemoteConfigs';
 import {MediaRepository} from '../media/MediaRepository';
 import {initMLSGroupConversations, initialiseSelfAndTeamConversations} from '../mls';
 import {joinConversationsAfterMigrationFinalisation} from '../mls/MLSMigration/migrationFinaliser';
@@ -288,6 +289,7 @@ export class App {
       repositories.conversation,
       repositories.permission,
       repositories.audio,
+      repositories.calling,
     );
     repositories.preferenceNotification = new PreferenceNotificationRepository(repositories.user['userState'].self);
 
@@ -342,8 +344,8 @@ export class App {
   async initApp(clientType: ClientType, onProgress: (progress: number, message?: string) => void) {
     // add body information
     const startTime = Date.now();
-    const [apiVersionMin, apiVersionMax] = this.config.SUPPORTED_API_RANGE;
-    await this.core.useAPIVersion(apiVersionMin, apiVersionMax, this.config.ENABLE_DEV_BACKEND_API);
+    await updateApiVersion();
+    await scheduleApiVersionUpdate();
 
     const osCssClass = Runtime.isMacOS() ? 'os-mac' : 'os-pc';
     const platformCssClass = Runtime.isDesktopApp() ? 'platform-electron' : 'platform-web';
@@ -374,7 +376,7 @@ export class App {
       await initializeDataDog(this.config, selfUser.qualifiedId);
       const eventLogger = new InitializationEventLogger(selfUser.id);
       eventLogger.log(AppInitializationStep.AppInitialize);
-      onProgress(5, t('initReceivedSelfUser', selfUser.name(), {}, true));
+      onProgress(5, t('initReceivedSelfUser', {user: selfUser.name()}, {}, true));
 
       try {
         await this.core.init(clientType);
@@ -395,7 +397,25 @@ export class App {
         throw new ClientError(CLIENT_ERROR_TYPE.NO_VALID_CLIENT, 'Client has been deleted on backend');
       }
       const {features: teamFeatures, members: teamMembers} = await teamRepository.initTeam(selfUser.teamId);
-      await this.core.initClient(localClient, getClientMLSConfig(teamFeatures));
+      try {
+        await this.core.initClient(localClient, getClientMLSConfig(teamFeatures));
+      } catch (error) {
+        PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
+          hideCloseBtn: true,
+          preventClose: true,
+          hideSecondary: true,
+          primaryAction: {
+            action: async () => {
+              await this.logout(SIGN_OUT_REASON.CLIENT_REMOVED, false);
+            },
+            text: t('modalAccountLogoutAction'),
+          },
+          text: {
+            title: t('unknownApplicationErrorTitle'),
+            message: t('modalUnableToReceiveMessages'),
+          },
+        });
+      }
 
       const e2eiHandler = await configureE2EI(teamFeatures);
       configureDownloadPath(teamFeatures);
@@ -501,7 +521,7 @@ export class App {
       eventLogger.log(AppInitializationStep.SetupMLS);
       telemetry.timeStep(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
       telemetry.addStatistic(AppInitStatisticsValue.NOTIFICATIONS, totalNotifications, 100);
-      onProgress(97.5, t('initUpdatedFromNotifications', this.config.BRAND_NAME));
+      onProgress(97.5, t('initUpdatedFromNotifications', {brandName: this.config.BRAND_NAME}));
 
       const clientEntities = await clientRepository.updateClientsForSelf();
 

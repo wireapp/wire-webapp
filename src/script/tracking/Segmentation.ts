@@ -59,4 +59,29 @@ export const Segmentation = {
     FROM: 'from',
     TO: 'to',
   },
+  BACKUP_CREATION: {
+    PASSWORD: 'password',
+    PASSWORD_MULTIPLE_ATTEMPTS: 'password_multiple_attempts',
+    CREATION_DURATION: 'creation_duration',
+    CANCELLATION_STEP: {
+      DURING_BACKUP: 'during_backup',
+      BEFORE_BACKUP: 'before_backup',
+    },
+  },
+  GENERAL: {
+    STEP: 'step',
+    YES: 'yes',
+    NO: 'no',
+  },
+  TEAM_CREATION_STEP: {
+    CLICKED_CREATE_TEAM: 'clicked_create_team',
+    CLICKED_DISMISS_CTA: 'clicked_dismiss_cta',
+    MODAL_DISCLAIMERS: 'modal_disclaimers',
+    MODAL_TEAM_NAME: 'modal_team_name',
+    MODAL_CONFIRMATION: 'modal_confirmation',
+    MODAL_LEAVE_CLICKED: 'modal_leave_clicked',
+    MODAL_CONTINUE_CLICKED: 'modal_continue_clicked',
+    MODAL_BACK_TO_WIRE_CLICKED: 'modal_back_to_wire_clicked',
+    MODAL_OPEN_TM_CLICKED: 'modal_open_tm_clicked',
+  },
 };

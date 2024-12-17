@@ -1120,14 +1120,14 @@ export class ConversationRepository {
 
       PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
         text: {
-          message: t('modalConversationDeleteErrorMessage', conversationEntity.name()),
+          message: t('modalConversationDeleteErrorMessage', {name: conversationEntity.name()}),
           title: t('modalConversationDeleteErrorHeadline'),
         },
       });
     }
   }
 
-  private readonly deleteConversationLocally = async (conversationId: QualifiedId, skipNotification: boolean) => {
+  public readonly deleteConversationLocally = async (conversationId: QualifiedId, skipNotification: boolean) => {
     const conversationEntity = this.conversationState.findConversation(conversationId);
     if (!conversationEntity) {
       return;
@@ -1634,8 +1634,10 @@ export class ConversationRepository {
       ),
     );
 
-    const mostRecentlyUsedProteusConversation = proteusConversations.sort(
-      (a, b) => b.last_event_timestamp() - a.last_event_timestamp(),
+    // In the event that multiple 1:1 Proteus conversations exist, we migrate the one with the lowest id
+    // See https://wearezeta.atlassian.net/wiki/spaces/ENGINEERIN/pages/1344602120/Use+case+multiple+1+1+conversation+in+teams+Proteus
+    const proteusConversationToBeKept = proteusConversations.sort((a, b) =>
+      a.qualifiedId.id.localeCompare(b.qualifiedId.id),
     )[0];
 
     // Before we delete the proteus 1:1 conversation, we need to make sure all the local properties are also migrated
@@ -1652,7 +1654,7 @@ export class ConversationRepository {
       mutedTimestamp,
       status,
       verification_state,
-    } = mostRecentlyUsedProteusConversation;
+    } = proteusConversationToBeKept;
 
     const updates: Partial<Record<keyof Conversation, any>> = {
       archivedState: archivedState(),
@@ -2975,7 +2977,7 @@ export class ConversationRepository {
     } else {
       // TODO(Federation): Update code once connections are implemented on the backend
       const userEntity = await this.userRepository.getUserById(userIds[0]);
-      this.showModal(t('modalConversationNotConnectedMessageOne', userEntity.name()), titleText);
+      this.showModal(t('modalConversationNotConnectedMessageOne', {name: userEntity.name()}), titleText);
     }
   }
 
@@ -2995,7 +2997,7 @@ export class ConversationRepository {
       'read-more-legal-hold',
     );
 
-    const messageText = t('modalLegalHoldConversationMissingConsentMessage', {}, replaceLinkLegalHold);
+    const messageText = t('modalLegalHoldConversationMissingConsentMessage', undefined, replaceLinkLegalHold);
     const titleText = t('modalUserCannotBeAddedHeadline');
 
     PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
@@ -3057,7 +3059,7 @@ export class ConversationRepository {
   // Event callbacks
   //##############################################################################
 
-  private logConversationEvent(event: IncomingEvent, source: EventSource) {
+  private logConversationEvent(event: IncomingEvent, source: EventSource, duration: number) {
     if (event.type === CONVERSATION_EVENT.TYPING) {
       // Prevent logging typing events
       return;
@@ -3080,7 +3082,15 @@ export class ConversationRepository {
       case ClientEvent.CONVERSATION.MESSAGE_DELETE:
         extra.deletedMessage = event.data.message_id;
     }
-    this.logger.info(logMessage, {time, from, type, qualified_conversation, ...extra});
+
+    this.logger.info(logMessage, {
+      time,
+      from,
+      type,
+      qualified_conversation,
+      duration,
+      ...extra,
+    });
   }
 
   /**
@@ -3090,9 +3100,14 @@ export class ConversationRepository {
    * @param source Source of event
    * @returns Resolves when event was handled
    */
-  private readonly onConversationEvent = (event: IncomingEvent, source = EventRepository.SOURCE.STREAM) => {
-    this.logConversationEvent(event, source);
-    return this.handleConversationEvent(event, source);
+  private readonly onConversationEvent = async (event: IncomingEvent, source = EventRepository.SOURCE.STREAM) => {
+    const start = performance.now();
+    const handledConversations = await this.handleConversationEvent(event, source);
+    const duration = performance.now() - start;
+
+    this.logConversationEvent(event, source, duration);
+
+    return handledConversations;
   };
 
   private handleConversationEvent(
@@ -4124,7 +4139,7 @@ export class ConversationRepository {
     eventId: string,
     newData: EventRecord,
   ): Promise<ContentMessage | undefined> {
-    const originalMessage = conversationEntity.getMessage(eventId);
+    const originalMessage = conversationEntity?.getMessage(eventId);
     if (!originalMessage) {
       return undefined;
     }

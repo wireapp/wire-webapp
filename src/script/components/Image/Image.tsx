@@ -23,6 +23,7 @@ import {CSSObject} from '@emotion/react';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
+import {InViewport} from 'Components/InViewport';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {getImageStyle, getWrapperStyles} from './Image.styles';
@@ -33,7 +34,6 @@ import {Config} from '../../Config';
 import {MediumImage} from '../../entity/message/MediumImage';
 import {TeamState} from '../../team/TeamState';
 import {AssetUrl, useAssetTransfer} from '../MessagesList/Message/ContentMessage/asset/useAssetTransfer';
-import {InViewport} from '../utils/InViewport';
 
 interface BaseImageProps extends React.HTMLProps<HTMLDivElement> {
   alt?: string;
@@ -117,8 +117,12 @@ export const Image = ({
     <InViewport
       onVisible={() => setIsInViewport(true)}
       css={getWrapperStyles(!!onClick)}
-      className={cx(className, {'loading-dots': isLoading})}
-      onClick={onClick}
+      className={cx(className, {'loading-dots image-asset--no-image': isLoading})}
+      onClick={event => {
+        if (!isLoading) {
+          onClick?.(event);
+        }
+      }}
       data-uie-status={isLoading ? 'loading' : 'loaded'}
       {...props}
     >

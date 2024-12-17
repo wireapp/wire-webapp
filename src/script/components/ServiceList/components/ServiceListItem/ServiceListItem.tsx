@@ -47,7 +47,7 @@ export const ServiceListItem = ({service, onClick}: ServiceListItemProps) => {
       onKeyDown={event => handleKeyDown(event, onServiceClick)}
       data-uie-name="item-service"
       data-uie-value={serviceName}
-      aria-label={t('accessibility.openConversation', serviceName)}
+      aria-label={t('accessibility.openConversation', {name: serviceName})}
       css={listWrapper({noUnderline: true})}
     >
       <div css={listItem()}>

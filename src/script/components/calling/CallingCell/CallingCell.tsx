@@ -23,14 +23,16 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {container} from 'tsyringe';
 
 import {CALL_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {useAppNotification} from 'Components/AppNotification';
 import {callingContainer} from 'Components/calling/CallingCell/CallingCell.styles';
 import {CallingControls} from 'Components/calling/CallingCell/CallingControls';
 import {CallingHeader} from 'Components/calling/CallingCell/CallingHeader';
 import {GroupVideoGrid} from 'Components/calling/GroupVideoGrid';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
+import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import * as Icon from 'Components/Icon';
-import {ConversationClassifiedBar} from 'Components/input/ClassifiedBar';
 import {usePushToTalk} from 'src/script/hooks/usePushToTalk/usePushToTalk';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -54,7 +56,7 @@ interface VideoCallProps {
 interface AnsweringControlsProps {
   call: Call;
   callActions: CallActions;
-  callingRepository: Pick<CallingRepository, 'supportsScreenSharing'>;
+  callingRepository: CallingRepository;
   pushToTalkKey: string | null;
   isFullUi?: boolean;
   callState?: CallState;
@@ -159,24 +161,41 @@ export const CallingCell = ({
     isMuted: isCurrentlyMuted,
   });
 
+  const screenSharingEndedNotification = useAppNotification({
+    message: t('videoCallScreenShareEnded'),
+    activeWindow: window,
+  });
+
+  useEffect(() => {
+    const screenSharingEndedHandler = () => {
+      screenSharingEndedNotification.show();
+    };
+
+    window.addEventListener(WebAppEvents.CALL.SCREEN_SHARING_ENDED, screenSharingEndedHandler);
+
+    return () => {
+      window.removeEventListener(WebAppEvents.CALL.SCREEN_SHARING_ENDED, screenSharingEndedHandler);
+    };
+  }, [screenSharingEndedNotification]);
+
   const handleMaximizeKeydown = useCallback(
     (event: React.KeyboardEvent<HTMLInputElement>) => {
       if (!isOngoing) {
         return;
       }
       if (isSpaceOrEnterKey(event.key)) {
-        void callState.setViewModeFullScreen();
+        void callingRepository.setViewModeFullScreen();
       }
     },
-    [isOngoing, callState],
+    [isOngoing, callingRepository],
   );
 
   const handleMaximizeClick = useCallback(() => {
     if (!isOngoing) {
       return;
     }
-    void callState.setViewModeFullScreen();
-  }, [isOngoing, callState]);
+    void callingRepository.setViewModeFullScreen();
+  }, [isOngoing, callingRepository]);
 
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
   const {showAlert, clearShowAlert} = useCallAlertState();
@@ -250,17 +269,17 @@ export const CallingCell = ({
 
   const toggleDetachedWindow = () => {
     if (isDetachedWindow) {
-      void callState.setViewModeMinimized();
+      void callingRepository.setViewModeMinimized();
       return;
     }
-    void callState.setViewModeDetached();
+    void callingRepository.setViewModeDetached();
   };
 
   return (
     <div css={callingContainer}>
       {isIncoming && (
         <p role="alert" className="visually-hidden">
-          {t('callConversationAcceptOrDecline', conversationName)}
+          {t('callConversationAcceptOrDecline', {conversationName})}
         </p>
       )}
 

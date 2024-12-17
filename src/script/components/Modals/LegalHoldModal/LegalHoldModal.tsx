@@ -25,9 +25,10 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import * as Icon from 'Components/Icon';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
-import {ModalComponent} from 'Components/ModalComponent';
-import {useUserDevicesHistory, UserDevicesState, UserDevices} from 'Components/UserDevices';
+import {ModalComponent} from 'Components/Modals/ModalComponent';
+import {UserDevicesState, UserDevices} from 'Components/UserDevices';
 import {UserSearchableList} from 'Components/UserSearchableList';
+import {useUserDevicesHistory} from 'Hooks/useUserDevicesHistory';
 import {handleEnterDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -328,14 +329,10 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
             <div className="modal__text" data-uie-name="status-modal-text">
               <p
                 dangerouslySetInnerHTML={{
-                  __html: t(
-                    'legalHoldModalText',
-                    {},
-                    {
-                      br: '<br>',
-                      fingerprint: `<span class="legal-hold-modal__fingerprint" data-uie-name="status-modal-fingerprint">${fingerprint}</span>`,
-                    },
-                  ),
+                  __html: t('legalHoldModalText', undefined, {
+                    br: '<br>',
+                    fingerprint: `<span class="legal-hold-modal__fingerprint" data-uie-name="status-modal-fingerprint">${fingerprint}</span>`,
+                  }),
                 }}
               />
 

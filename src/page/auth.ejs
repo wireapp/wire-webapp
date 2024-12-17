@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <!-- Wire, Copyright (C) 2022 Wire Swiss GmbH -->
 <!-- <%= VERSION %> -->
 <html>
@@ -22,24 +22,7 @@
     <script src="../min/basicBrowserFeatureCheck.js?v=<%= VERSION %>"></script>
     <script src="../min/checkBrowser.js?v=<%= VERSION %>"></script>
 
-    <script src='../libs/countly/countly.min.js?v=<%= VERSION %>' type='text/javascript'></script>
-    <script type='text/javascript' nonce="<%= COUNTLY_NONCE %>">
-      var Countly = Countly || {};
-      Countly.q = Countly.q || [];
-
-      Countly.app_key = "<%= COUNTLY_API_KEY %>";
-      Countly.url = "https://countly.wire.com/";
-      Countly.offline_mode = true;
-      Countly.use_session_cookie = false;
-      Countly.storage = 'localstorage';
-      Countly.debug = false;
-      Countly.require_consent = true;
-
-      Countly.q.push(['track_sessions']);
-      Countly.q.push(['track_pageview']);
-      
-      Countly.init();
-    </script>
+    <script src="../libs/wire/telemetry/embed.js"></script>
   </head>
 
   <body>

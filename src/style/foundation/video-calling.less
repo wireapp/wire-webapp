@@ -31,6 +31,14 @@
   width: 100vw;
   height: 100vh;
   background-color: var(--app-bg-secondary);
+
+  &.app--small-offset {
+    height: calc(100vh - 32px);
+  }
+
+  &.app--large-offset {
+    height: calc(100vh - 64px);
+  }
 }
 
 .video-calling {
@@ -114,6 +122,10 @@
 
   &__item {
     position: relative;
+
+    & button {
+      vertical-align: middle;
+    }
   }
 
   &__centered-items {
@@ -141,8 +153,8 @@
     left: 50%;
     display: grid;
     padding: 0.4rem;
-    border-radius: 1rem;
-    background-color: #fff;
+    border-radius: 12px;
+    background-color: var(--inactive-call-button-bg);
     box-shadow: 0px 7px 15px 0 #0000004d;
     gap: 0.5rem;
     grid-template-columns: repeat(3, 1fr);
@@ -154,7 +166,7 @@
       left: 50%;
       width: 0;
       height: 0;
-      border-top: 0.5rem solid #fff;
+      border-top: 0.5rem solid var(--inactive-call-button-bg);
       border-right: 0.5rem solid transparent;
       border-left: 0.5rem solid transparent;
       content: '';
@@ -167,7 +179,7 @@
       border-radius: 1rem;
       font-size: 1.5rem;
       &:hover {
-        background-color: var(--inactive-call-button-border);
+        background-color: var(--inactive-call-button-hover-bg);
       }
 
       &.disabled {
@@ -197,6 +209,11 @@
 
   &__view-mode div[class$='-Control'] {
     display: none;
+  }
+
+  &__button_primary {
+    position: relative;
+    .button-icon-primary;
   }
 
   &__button {
@@ -272,16 +289,16 @@
     animation:
       flyUp 4s linear forwards,
       fadeIn 1s;
-    font-size: 2rem;
+    font-size: 1.75rem;
     gap: 0.1rem;
   }
 
   .emoji-text {
-    padding: 0.4rem;
-    border-radius: 0.3rem;
+    padding: 0.4rem 0.6rem;
+    border-radius: 0.5rem;
     background-color: rgba(0, 0, 0, 0.804);
     color: white;
-    font-size: 1rem;
+    font-size: 0.875rem;
     font-size: bold;
     font-weight: bold;
   }

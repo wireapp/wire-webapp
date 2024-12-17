@@ -29,6 +29,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/Icon';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {listCSS} from 'Components/panel/PanelActions/PanelActions.styles';
 import {ConversationState} from 'src/script/conversation/ConversationState';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {TeamState} from 'src/script/team/TeamState';
@@ -210,7 +211,7 @@ const UserActions: React.FC<UserActionsProps> = ({
                 return PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
                   text: {
                     title: t('modal1To1ConversationCreateErrorNoKeyPackagesHeadline'),
-                    htmlMessage: t('modal1To1ConversationCreateErrorNoKeyPackagesMessage', user.name()),
+                    htmlMessage: t('modal1To1ConversationCreateErrorNoKeyPackagesMessage', {name: user.name()}),
                   },
                 });
               }
@@ -367,7 +368,9 @@ const UserActions: React.FC<UserActionsProps> = ({
       onCancel={onAction}
     />
   ) : (
-    <PanelActions items={items} />
+    <ul css={listCSS}>
+      <PanelActions items={items} />
+    </ul>
   );
 };
 

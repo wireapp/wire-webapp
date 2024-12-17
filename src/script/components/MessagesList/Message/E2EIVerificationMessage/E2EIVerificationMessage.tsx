@@ -110,7 +110,7 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
         {isVerified && (
           <span
             dangerouslySetInnerHTML={{
-              __html: t('conversation.AllE2EIDevicesVerified', {}, learnMoreReplacement),
+              __html: t('conversation.AllE2EIDevicesVerified', undefined, learnMoreReplacement),
             }}
           />
         )}
@@ -182,7 +182,7 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
           ) : (
             <span
               dangerouslySetInnerHTML={{
-                __html: t('conversation.E2EISelfUserCertificateRevoked', {}, learnMoreReplacement),
+                __html: t('conversation.E2EISelfUserCertificateRevoked', undefined, learnMoreReplacement),
               }}
             />
           ))}
@@ -190,7 +190,7 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
         {isNoLongerVerified && (
           <span
             dangerouslySetInnerHTML={{
-              __html: t('conversation.E2EICertificateNoLongerVerifiedGeneric', {}, learnMoreReplacement),
+              __html: t('conversation.E2EICertificateNoLongerVerifiedGeneric', undefined, learnMoreReplacement),
             }}
           />
         )}

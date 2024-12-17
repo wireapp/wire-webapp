@@ -78,8 +78,6 @@ export type Env = {
   FEATURE_ALLOWED_FILE_UPLOAD_EXTENSIONS: string;
 
   /** will enable the MLS protocol */
-  FEATURE_ENABLE_MLS?: string;
-
   FEATURE_USE_CORE_CRYPTO?: string;
 
   FEATURE_MLS_CONFIG_KEYING_MATERIAL_UPDATE_THRESHOLD?: string;
@@ -164,8 +162,23 @@ export type Env = {
   /** Feature to enable in call reactions */
   FEATURE_ENABLE_IN_CALL_REACTIONS: string;
 
+  /** Feature to enable in call hand raise */
+  FEATURE_ENABLE_IN_CALL_HAND_RAISE: string;
+
+  /** Feature to enable remove conversation locally */
+  FEATURE_ENABLE_REMOVE_GROUP_CONVERSATION: string;
+
   /** Feature to enable calling popout window */
   FEATURE_ENABLE_DETACHED_CALLING_WINDOW: string;
+
+  /** Feature to enable team creation flow for individual users */
+  FEATURE_ENABLE_TEAM_CREATION: string;
+
+  /** Feature to enable rich text editor */
+  FEATURE_ENABLE_MESSAGE_FORMAT_BUTTONS: string;
+
+  /** Feature to enable Cross Platform Backup export */
+  FEATURE_ENABLE_CROSS_PLATFORM_BACKUP_EXPORT: string;
 
   /** Sets the verification ID for Google webmasters */
   GOOGLE_WEBMASTER_ID: string;
@@ -181,6 +194,12 @@ export type Env = {
 
   /** Sets the Countly product reporting API key */
   COUNTLY_API_KEY: string;
+
+  /** Enables logging for Countly */
+  COUNTLY_ENABLE_LOGGING: string;
+
+  /** Force Countly reporting (only to be used on internal environments) */
+  COUNTLY_FORCE_REPORTING: string;
 
   /** Countly allow list for backend urls
    * Multiple entries separated by comma, e.g. "https://nginz-https.anta.wire.link, https://nginz-https.diya.wire.link, https://prod-nginz-https.wire.com"

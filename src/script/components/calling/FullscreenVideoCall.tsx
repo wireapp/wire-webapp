@@ -17,19 +17,32 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 
 import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation/';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
-import classNames from 'classnames';
+import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import {CALL_TYPE} from '@wireapp/avs';
-import {EmojiIcon, GridIcon, IconButton, IconButtonVariant, Select} from '@wireapp/react-ui-kit';
+import {
+  Checkbox,
+  CheckboxLabel,
+  EmojiIcon,
+  GridIcon,
+  IconButton,
+  IconButtonVariant,
+  RaiseHandIcon,
+  Select,
+} from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {useAppNotification} from 'Components/AppNotification/AppNotification';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
+import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import * as Icon from 'Components/Icon';
-import {ConversationClassifiedBar} from 'Components/input/ClassifiedBar';
+import {ModalComponent} from 'Components/Modals/ModalComponent';
+import {useClickOutside} from 'Hooks/useClickOutside';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {Config} from 'src/script/Config';
 import {isCallViewOption} from 'src/script/guards/CallView';
@@ -46,13 +59,13 @@ import {preventFocusOutside} from 'Util/util';
 import {CallingParticipantList} from './CallingCell/CallIngParticipantList';
 import {Duration} from './Duration';
 import {
-  videoControlActiveStyles,
-  videoControlInActiveStyles,
-  videoControlDisabledStyles,
-  paginationButtonStyles,
   classifiedBarStyles,
   headerActionsWrapperStyles,
+  paginationButtonStyles,
   paginationWrapperStyles,
+  videoControlActiveStyles,
+  videoControlDisabledStyles,
+  videoControlInActiveStyles,
   videoTopBarStyles,
 } from './FullscreenVideoCall.styles';
 import {GroupVideoGrid} from './GroupVideoGrid';
@@ -66,6 +79,8 @@ import type {Conversation} from '../../entity/Conversation';
 import {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
 import {TeamState} from '../../team/TeamState';
 import {CallViewTab} from '../../view_model/CallingViewModel';
+import {useWarningsState} from '../../view_model/WarningsContainer/WarningsState';
+import {CONFIG, TYPE} from '../../view_model/WarningsContainer/WarningsTypes';
 
 enum BlurredBackgroundStatus {
   OFF = 'bluroff',
@@ -97,12 +112,15 @@ export interface FullscreenVideoCallProps {
   toggleMute: (call: Call, muteState: boolean) => void;
   toggleScreenshare: (call: Call) => void;
   sendEmoji: (emoji: string, call: Call) => void;
+  sendHandRaised: (isHandUp: boolean, call: Call) => void;
   videoGrid: Grid;
 }
 
 const EMOJIS_LIST = ['👍', '🎉', '❤️', '😂', '😮', '👏', '🤔', '😢', '👎'];
 
-const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
+const LOCAL_STORAGE_KEY_FOR_SCREEN_SHARING_CONFIRM_MODAL = 'DO_NOT_ASK_AGAIN_FOR_SCREEN_SHARING_CONFIRM_MODAL';
+
+const FullscreenVideoCall = ({
   call,
   canShareScreen,
   conversation,
@@ -126,16 +144,29 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   toggleScreenshare,
   leave,
   changePage,
+  sendHandRaised,
   teamState = container.resolve(TeamState),
   callState = container.resolve(CallState),
-}) => {
+}: FullscreenVideoCallProps) => {
+  const [isConfirmCloseModalOpen, setIsConfirmCloseModalOpen] = useState<boolean>(false);
   const [showEmojisBar, setShowEmojisBar] = useState<boolean>(false);
   const [disabledEmojis, setDisabledEmojis] = useState<string[]>([]);
   const selfParticipant = call.getSelfParticipant();
-  const {sharesScreen: selfSharesScreen, sharesCamera: selfSharesCamera} = useKoSubscribableChildren(selfParticipant, [
-    'sharesScreen',
-    'sharesCamera',
-  ]);
+  const {
+    sharesScreen: selfSharesScreen,
+    sharesCamera: selfSharesCamera,
+    handRaisedAt: selfHandRaisedAt,
+  } = useKoSubscribableChildren(selfParticipant, ['sharesScreen', 'sharesCamera', 'handRaisedAt']);
+  const isSelfHandRaised = Boolean(selfHandRaisedAt);
+  const emojiBarRef = useRef(null);
+  const emojiBarToggleButtonRef = useRef(null);
+
+  // Warnings banner
+  const warnings = useWarningsState(state => state.warnings);
+  const visibleWarning = warnings[warnings.length - 1];
+  const isConnectivityRecovery = visibleWarning === TYPE.CONNECTIVITY_RECOVERY;
+  const hasOffset = warnings.length > 0 && !isConnectivityRecovery;
+  const isMiniMode = CONFIG.MINI_MODES.includes(visibleWarning);
 
   const {blurredVideoStream} = useKoSubscribableChildren(selfParticipant, ['blurredVideoStream']);
   const hasBlurredBackground = !!blurredVideoStream;
@@ -146,8 +177,19 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     pages: callPages,
     startedAt,
     participants,
-  } = useKoSubscribableChildren(call, ['activeSpeakers', 'currentPage', 'pages', 'startedAt', 'participants']);
-  const {display_name: conversationName} = useKoSubscribableChildren(conversation, ['display_name']);
+    handRaisedParticipants,
+  } = useKoSubscribableChildren(call, [
+    'activeSpeakers',
+    'currentPage',
+    'pages',
+    'startedAt',
+    'participants',
+    'handRaisedParticipants',
+  ]);
+  const {display_name: conversationName, is1to1: is1to1Conversation} = useKoSubscribableChildren(conversation, [
+    'display_name',
+    'is1to1',
+  ]);
   const {isVideoCallingEnabled, classifiedDomains} = useKoSubscribableChildren(teamState, [
     'isVideoCallingEnabled',
     'classifiedDomains',
@@ -170,15 +212,55 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   ]);
 
   const {selfUser, roles} = useKoSubscribableChildren(conversation, ['selfUser', 'roles']);
-  const {emojis, viewMode} = useKoSubscribableChildren(callState, ['emojis', 'viewMode']);
+  const {emojis, viewMode, detachedWindow, isScreenSharingSourceFromDetachedWindow} = useKoSubscribableChildren(
+    callState,
+    ['emojis', 'viewMode', 'detachedWindow', 'isScreenSharingSourceFromDetachedWindow'],
+  );
+
+  useClickOutside(emojiBarRef, () => setShowEmojisBar(false), emojiBarToggleButtonRef, detachedWindow?.document);
 
   const [audioOptionsOpen, setAudioOptionsOpen] = useState(false);
   const [videoOptionsOpen, setVideoOptionsOpen] = useState(false);
-  const minimize = () => callState.setViewModeMinimized();
-  const openPopup = () => callState.setViewModeDetached();
 
-  const [isParticipantsListOpen, toggleParticipantsList] = useToggleState(false);
+  const minimize = () => {
+    const isSharingScreen = call?.getSelfParticipant().sharesScreen();
+
+    const hasAlreadyConfirmed = localStorage.getItem(LOCAL_STORAGE_KEY_FOR_SCREEN_SHARING_CONFIRM_MODAL) === 'true';
+
+    if (isSharingScreen && isScreenSharingSourceFromDetachedWindow && !hasAlreadyConfirmed) {
+      setIsConfirmCloseModalOpen(true);
+      return;
+    }
+
+    callingRepository.setViewModeMinimized();
+  };
+  const openPopup = () => callingRepository.setViewModeDetached();
+
   const [isCallViewOpen, toggleCallView] = useToggleState(false);
+  const [isParticipantsListOpen, toggleParticipantsList] = useToggleState(false);
+
+  const handRaisedNotification = useAppNotification({
+    activeWindow: viewMode === CallingViewMode.DETACHED_WINDOW ? detachedWindow! : window,
+  });
+
+  useEffect(() => {
+    const handRaisedHandler = (event: Event) => {
+      handRaisedNotification.show({
+        message: (event as CustomEvent<{notificationMessage: string}>).detail.notificationMessage,
+      });
+    };
+
+    window.addEventListener(WebAppEvents.CALL.HAND_RAISED, handRaisedHandler);
+
+    return () => {
+      window.removeEventListener(WebAppEvents.CALL.HAND_RAISED, handRaisedHandler);
+    };
+  }, [handRaisedNotification]);
+
+  function toggleIsHandRaised(currentIsHandRaised: boolean) {
+    selfParticipant.handRaisedAt(new Date().getTime());
+    sendHandRaised(!currentIsHandRaised, call);
+  }
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent): void => {
@@ -372,7 +454,12 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   const isModerator = selfUser && roles[selfUser.id] === DefaultConversationRoleName.WIRE_ADMIN;
 
   return (
-    <div className="video-calling-wrapper">
+    <div
+      className={cx('video-calling-wrapper', {
+        'app--small-offset': hasOffset && isMiniMode,
+        'app--large-offset': hasOffset && !isMiniMode,
+      })}
+    >
       <div id="video-calling" className="video-calling">
         <div css={videoTopBarStyles}>
           <div id="video-title" className="video-title">
@@ -468,7 +555,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                 onClick={openPopup}
                 onKeyDown={event => handleKeyDown(event, () => openPopup())}
                 type="button"
-                data-uie-name="do-call-controls-video-minimize"
+                data-uie-name="do-call-controls-video-maximize"
                 title={t('videoCallOverlayOpenPopupWindow')}
               >
                 <Icon.OpenDetachedWindowIcon />
@@ -711,6 +798,8 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                     ...(!horizontalSmBreakpoint && {minWidth: '157px'}),
                     display: 'flex',
                     justifyContent: 'flex-end',
+                    gap: 10,
+                    marginRight: 10,
                   }}
                 >
                   {participants.length > 2 && (
@@ -721,10 +810,9 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                             toggleCallView();
                           }
                         }}
-                        className="video-controls__button video-controls__button--small video-controls__view-mode"
+                        className={cx('video-controls__button_primary', {active: isCallViewOpen})}
                         onClick={toggleCallView}
                         onKeyDown={event => handleKeyDown(event, toggleCallView)}
-                        css={isCallViewOpen ? videoControlActiveStyles : videoControlInActiveStyles}
                         type="button"
                         data-uie-name="do-call-controls-video-call-view"
                         role="switch"
@@ -761,10 +849,33 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                     </li>
                   )}
 
+                  {Config.getConfig().FEATURE.ENABLE_IN_CALL_HAND_RAISE && !is1to1Conversation && (
+                    <li className="video-controls__item">
+                      <button
+                        data-uie-value={isSelfHandRaised ? 'active' : 'inactive'}
+                        onClick={() => toggleIsHandRaised(isSelfHandRaised)}
+                        onKeyDown={event => handleKeyDown(event, () => toggleIsHandRaised(isSelfHandRaised))}
+                        className={cx('video-controls__button_primary', {active: isSelfHandRaised})}
+                        type="button"
+                        data-uie-name="do-toggle-hand-raise"
+                        role="switch"
+                        aria-checked={isSelfHandRaised}
+                        title={
+                          isSelfHandRaised
+                            ? t('videoCallParticipantLowerYourHand')
+                            : t('videoCallParticipantRaiseYourHand')
+                        }
+                      >
+                        <RaiseHandIcon width={16} height={16} />
+                      </button>
+                    </li>
+                  )}
+
                   {Config.getConfig().FEATURE.ENABLE_IN_CALL_REACTIONS && (
                     <li className="video-controls__item">
                       {showEmojisBar && (
                         <div
+                          ref={emojiBarRef}
                           role="toolbar"
                           className="video-controls-emoji-bar"
                           data-uie-name="video-controls-emoji-bar"
@@ -780,7 +891,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                                 key={emoji}
                                 disabled={isDisabled}
                                 onClick={() => onEmojiClick(emoji)}
-                                className={classNames({disabled: isDisabled})}
+                                className={cx({disabled: isDisabled})}
                               >
                                 {emoji}
                               </button>
@@ -789,9 +900,9 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                         </div>
                       )}
                       <button
+                        ref={emojiBarToggleButtonRef}
                         title={t('callReactions')}
-                        css={showEmojisBar ? videoControlActiveStyles : videoControlInActiveStyles}
-                        className="video-controls__button video-controls__button--small"
+                        className={cx('video-controls__button_primary', {active: showEmojisBar})}
                         onClick={() => setShowEmojisBar(prev => !prev)}
                         type="button"
                         aria-labelledby="show-emoji-bar"
@@ -803,11 +914,10 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   )}
                   <li className="video-controls__item">
                     <button
-                      className="video-controls__button video-controls__button--small"
                       data-uie-value={isParticipantsListOpen ? 'active' : 'inactive'}
                       onClick={toggleParticipantsList}
                       onKeyDown={event => handleKeyDown(event, toggleParticipantsList)}
-                      css={isParticipantsListOpen ? videoControlActiveStyles : videoControlInActiveStyles}
+                      className={cx('video-controls__button_primary', {active: isParticipantsListOpen})}
                       type="button"
                       data-uie-name="do-toggle-call-participants-list"
                       role="switch"
@@ -829,6 +939,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
       </div>
       {isParticipantsListOpen && (
         <CallingParticipantList
+          handRaisedParticipants={handRaisedParticipants}
           callingRepository={callingRepository}
           conversation={conversation}
           participants={participants}
@@ -837,6 +948,72 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
           showParticipants={true}
         />
       )}
+      <ModalComponent
+        isShown={isConfirmCloseModalOpen}
+        onClosed={() => setIsConfirmCloseModalOpen(false)}
+        onBgClick={() => setIsConfirmCloseModalOpen(false)}
+        data-uie-name="confirm-close-with-active-screen-share-modal"
+        wrapperCSS={{borderRadius: 10, width: 328}}
+      >
+        {isConfirmCloseModalOpen && (
+          <>
+            <div className="modal__header" data-uie-name="status-modal-title">
+              <h2 className="text-medium" id="modal-title">
+                {t('videoCallScreenShareEndConfirm')}
+              </h2>
+            </div>
+
+            <div className="modal__body">
+              <div id="modal-description-text">{t('videoCallScreenShareEndConfirmDescription')}</div>
+              <Checkbox
+                wrapperCSS={{marginTop: 16}}
+                data-uie-name="do-not-ask-again-checkbox"
+                id="do-not-ask-again-checkbox"
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                  localStorage.setItem(
+                    LOCAL_STORAGE_KEY_FOR_SCREEN_SHARING_CONFIRM_MODAL,
+                    event.target.checked.toString(),
+                  )
+                }
+              >
+                <CheckboxLabel className="label-xs" htmlFor="do-not-ask-again-checkbox">
+                  {t('qualityFeedback.doNotAskAgain')}
+                </CheckboxLabel>
+              </Checkbox>
+              <div className="modal__buttons">
+                <button
+                  key="cancel"
+                  type="button"
+                  onClick={() => setIsConfirmCloseModalOpen(false)}
+                  data-uie-name="do-close"
+                  className="modal__button modal__button--secondary"
+                >
+                  {t('modalConfirmSecondary')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => callingRepository.setViewModeMinimized()}
+                  className="modal__button modal__button--primary"
+                  data-uie-name="do-action"
+                  key="modal-primary-button"
+                >
+                  {t('modalAcknowledgeAction')}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              className="modal__header__button"
+              onClick={() => setIsConfirmCloseModalOpen(false)}
+              aria-label={'closeBtnTitle'}
+              data-uie-name="do-close"
+            >
+              <Icon.CloseIcon className="modal__header__icon" aria-hidden="true" />
+            </button>
+          </>
+        )}
+      </ModalComponent>
     </div>
   );
 };

@@ -71,7 +71,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
 
   useEffect(() => {
     if (currentCallState === undefined) {
-      void callState.setViewModeMinimized();
+      void callingRepository.setViewModeMinimized();
     }
   }, [currentCallState]);
 
@@ -82,7 +82,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
   const {clearShowAlert} = useCallAlertState();
 
   const leave = (call: Call) => {
-    callState.setViewModeMinimized();
+    callingRepository.setViewModeMinimized();
     callingRepository.leaveCall(call.conversation.qualifiedId, LEAVE_CALL_REASON.MANUAL_LEAVE_BY_UI_CLICK);
     callState.activeCallViewTab(CallViewTab.ALL);
     call.maximizedParticipant(null);
@@ -114,6 +114,10 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     void callingRepository.sendInCallEmoji(emoji, call);
   };
 
+  const sendHandRaised = (isHandUp: boolean, call: Call) => {
+    void callingRepository.sendInCallHandRaised(isHandUp, call);
+  };
+
   const switchSpeakerOutput = (deviceId: string) => {
     mediaDevicesHandler.currentDeviceId.audiooutput(deviceId);
   };
@@ -129,9 +133,6 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
   }
 
   const toggleScreenShare = (call: Call) => {
-    if (viewMode === CallingViewMode.DETACHED_WINDOW) {
-      callState.setViewModeMinimized();
-    }
     toggleScreenshare(call, DesktopScreenShareMenu.DETACHED_WINDOW);
   };
 
@@ -155,6 +156,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
           muteState={muteState}
           isChoosingScreen={isScreenshareActive}
           sendEmoji={sendEmoji}
+          sendHandRaised={sendHandRaised}
           switchCameraInput={switchCameraInput}
           switchMicrophoneInput={switchMicrophoneInput}
           switchSpeakerOutput={switchSpeakerOutput}

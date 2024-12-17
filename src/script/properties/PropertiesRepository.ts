@@ -38,7 +38,7 @@ import {PROPERTIES_TYPE, UserConsentStatus} from './PropertiesType';
 
 import type {User} from '../entity/User';
 import type {SelfService} from '../self/SelfService';
-import {isCountlyEnabledAtCurrentEnvironment} from '../tracking/Countly.helpers';
+import {isTelemetryEnabledAtCurrentEnvironment} from '../tracking/Telemetry.helpers';
 import {ConsentValue} from '../user/ConsentValue';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from '../user/TypingIndicatorMode';
 
@@ -81,6 +81,7 @@ export class PropertiesRepository {
         call: {
           enable_soundless_incoming_calls: false,
           enable_vbr_encoding: true,
+          //@ts-ignore - push_to_talk_key is not used in the webapp, since it is currently being worked on
           push_to_talk_key: null,
         },
         emoji: {
@@ -134,14 +135,14 @@ export class PropertiesRepository {
         userConsentStatus === UserConsentStatus.ALL_GRANTED,
       isTelemetryConsentGiven:
         userConsentStatus === UserConsentStatus.TRACKING_GRANTED || userConsentStatus === UserConsentStatus.ALL_GRANTED,
-      isCountlyEnabledAtCurrentEnvironment: isCountlyEnabledAtCurrentEnvironment(),
+      isTelemetryEnabledAtCurrentEnvironment: isTelemetryEnabledAtCurrentEnvironment(),
     };
   }
 
   checkTelemetrySharingPermission(): void {
     const isTelemetryPreferenceSet = this.getPreference(PROPERTIES_TYPE.PRIVACY.TELEMETRY_SHARING) !== undefined;
 
-    if (!isCountlyEnabledAtCurrentEnvironment() || isTelemetryPreferenceSet) {
+    if (!isTelemetryEnabledAtCurrentEnvironment() || isTelemetryPreferenceSet) {
       return;
     }
 
@@ -153,7 +154,7 @@ export class PropertiesRepository {
     PrimaryModal.show(PrimaryModalType.CONFIRM, {
       text: {
         title: t('dataSharingModalTitle'),
-        htmlMessage: t('dataSharingModalDescription', {}, replaceLink(Config.getConfig().URL.PRIVACY_POLICY)),
+        htmlMessage: t('dataSharingModalDescription', undefined, replaceLink(Config.getConfig().URL.PRIVACY_POLICY)),
       },
       primaryAction: {
         text: t('dataSharingModalAgree'),
@@ -225,7 +226,6 @@ export class PropertiesRepository {
 
   private initTemporaryGuestAccount(): Promise<WebappProperties> {
     this.logger.info('Temporary guest user: Using default properties');
-    this.savePreference(PROPERTIES_TYPE.PRIVACY.TELEMETRY_SHARING, false);
     return Promise.resolve(this.publishProperties());
   }
 

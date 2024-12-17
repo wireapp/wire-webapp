@@ -77,7 +77,11 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
 }) => {
   const {isGroup, roles} = useKoSubscribableChildren(activeConversation, ['isGroup', 'roles']);
   const {isTemporaryGuest, isAvailable} = useKoSubscribableChildren(currentUser, ['isTemporaryGuest', 'isAvailable']);
-  const {classifiedDomains, team} = useKoSubscribableChildren(teamState, ['classifiedDomains', 'team']);
+  const {classifiedDomains, team, isTeam} = useKoSubscribableChildren(teamState, [
+    'classifiedDomains',
+    'team',
+    'isTeam',
+  ]);
   const {isActivatedAccount} = useKoSubscribableChildren(selfUser, ['isActivatedAccount']);
 
   const canChangeRole =
@@ -91,7 +95,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
     }
 
     const newRole = isAdmin ? DefaultRole.WIRE_MEMBER : DefaultRole.WIRE_ADMIN;
-    await conversationRoleRepository.setMemberConversationRole(activeConversation, currentUser.id, newRole);
+    await conversationRoleRepository.setMemberConversationRole(activeConversation, currentUser.qualifiedId, newRole);
 
     roles[currentUser.id] = newRole;
     activeConversation.roles(roles);
@@ -202,7 +206,13 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
           </>
         )}
 
-        {!isTemporaryGuest && <EnrichedFields user={currentUser} showDomain={isFederated} />}
+        {!isTemporaryGuest && (
+          <EnrichedFields
+            user={currentUser}
+            showDomain={isFederated}
+            showAvailability={isTeam && teamState.isInTeam(currentUser)}
+          />
+        )}
 
         <UserActions
           user={currentUser}

@@ -35,6 +35,7 @@ import {ContentViewModel} from './ContentViewModel';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 
 import type {CallingRepository} from '../calling/CallingRepository';
+import {Config} from '../Config';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConversationState} from '../conversation/ConversationState';
 import type {Conversation} from '../entity/Conversation';
@@ -185,9 +186,11 @@ export class ListViewModel {
 
   onKeyDownListView = (keyboardEvent: KeyboardEvent) => {
     const {currentModalId} = usePrimaryModalState.getState();
+    const {currentTab} = useSidebarStore.getState();
+
     // don't switch view for primary modal(ex: preferences->set status->modal opened)
     // when user press escape, only close the modal and stay within the preference screen
-    if (isEscapeKey(keyboardEvent) && currentModalId === null) {
+    if (isEscapeKey(keyboardEvent) && currentModalId === null && currentTab !== SidebarTabs.PREFERENCES) {
       const newState = this.isActivatedAccount() ? ListState.CONVERSATIONS : ListState.TEMPORARY_GUEST;
       this.switchList(newState);
     }
@@ -340,15 +343,15 @@ export class ListViewModel {
         entries.push({
           click: () => this.clickToOpenNotificationSettings(conversationEntity),
           label: t('conversationsPopoverNotificationSettings'),
-          title: t('tooltipConversationsNotifications', notificationsShortcut),
+          title: t('tooltipConversationsNotifications', {shortcut: notificationsShortcut}),
         });
       } else {
         const label = conversationEntity.showNotificationsNothing()
           ? t('conversationsPopoverNotify')
           : t('conversationsPopoverSilence');
         const title = conversationEntity.showNotificationsNothing()
-          ? t('tooltipConversationsNotify', notificationsShortcut)
-          : t('tooltipConversationsSilence', notificationsShortcut);
+          ? t('tooltipConversationsNotify', {shortcut: notificationsShortcut})
+          : t('tooltipConversationsSilence', {shortcut: notificationsShortcut});
 
         entries.push({
           click: () => this.clickToToggleMute(conversationEntity),
@@ -380,7 +383,7 @@ export class ListViewModel {
       if (customLabel) {
         entries.push({
           click: () => conversationLabelRepository.removeConversationFromLabel(customLabel, conversationEntity),
-          label: t('conversationsPopoverRemoveFrom', customLabel.name, {}, true),
+          label: t('conversationsPopoverRemoveFrom', {name: customLabel.name}, {}, true),
         });
       }
 
@@ -401,7 +404,7 @@ export class ListViewModel {
       entries.push({
         click: () => this.clickToArchive(conversationEntity),
         label: t('conversationsPopoverArchive'),
-        title: t('tooltipConversationsArchive', shortcut),
+        title: t('tooltipConversationsArchive', {shortcut}),
       });
     }
 
@@ -441,6 +444,17 @@ export class ListViewModel {
       entries.push({
         click: () => this.clickToLeave(conversationEntity),
         label: t('conversationsPopoverLeave'),
+      });
+    }
+
+    if (
+      Config.getConfig().FEATURE.ENABLE_REMOVE_GROUP_CONVERSATION &&
+      conversationEntity.isGroup() &&
+      conversationEntity.isSelfUserRemoved()
+    ) {
+      entries.push({
+        click: () => this.actionsViewModel.removeConversation(conversationEntity),
+        label: t('conversationsPopoverDeleteForMe'),
       });
     }
 

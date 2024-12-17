@@ -37,10 +37,9 @@ export interface DeleteMessageProps {
 const DeleteMessage: React.FC<DeleteMessageProps> = ({message, onClickAvatar = () => {}}) => {
   const deletedTimeStamp = message.deleted_timestamp || 0;
 
-  const formattedDeletionTime = t(
-    'conversationDeleteTimestamp',
-    formatTimeShort(fromUnixTime(deletedTimeStamp / TIME_IN_MILLIS.SECOND)),
-  );
+  const formattedDeletionTime = t('conversationDeleteTimestamp', {
+    date: formatTimeShort(fromUnixTime(deletedTimeStamp / TIME_IN_MILLIS.SECOND)),
+  });
 
   return (
     <MessageHeader message={message} onClickAvatar={onClickAvatar} uieName="element-message-delete" noBadges noColor>

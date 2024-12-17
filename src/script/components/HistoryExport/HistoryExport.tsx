@@ -19,15 +19,19 @@
 
 import {useContext, useEffect, useState} from 'react';
 
+import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, FlexBox} from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {LoadingBar} from 'Components/LoadingBar/LoadingBar';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {ClientState} from 'src/script/client/ClientState';
 import {User} from 'src/script/entity/User';
 import {ContentState} from 'src/script/page/useAppState';
+import {EventName} from 'src/script/tracking/EventName';
+import {Segmentation} from 'src/script/tracking/Segmentation';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {getCurrentDate} from 'Util/TimeUtil';
@@ -45,7 +49,8 @@ enum ExportState {
 }
 
 export const CONFIG = {
-  FILE_EXTENSION: 'desktop_wbu',
+  LEGACY_FILE_EXTENSION: 'desktop_wbu',
+  UNIVERSAL_FILE_EXTENSION: 'wirebackup',
 };
 
 interface HistoryExportProps {
@@ -68,7 +73,7 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
   const mainViewModel = useContext(RootContext);
 
   useEffect(() => {
-    exportHistory();
+    showBackupModal();
   }, []);
 
   if (!mainViewModel) {
@@ -126,8 +131,13 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
   };
 
   const downloadArchiveFile = () => {
+    const {
+      FEATURE: {ENABLE_CROSS_PLATFORM_BACKUP_EXPORT},
+    } = Config.getConfig();
     const userName = user.username();
-    const fileExtension = CONFIG.FILE_EXTENSION;
+    const fileExtension = ENABLE_CROSS_PLATFORM_BACKUP_EXPORT
+      ? CONFIG.UNIVERSAL_FILE_EXTENSION
+      : CONFIG.LEGACY_FILE_EXTENSION;
     const sanitizedBrandName = Config.getConfig().BRAND_NAME.replace(/[^A-Za-z0-9_]/g, '');
     const filename = `${sanitizedBrandName}-${userName}-Backup_${getCurrentDate()}.${fileExtension}`;
 
@@ -138,43 +148,48 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
     }
   };
 
-  const onCancel = () => backupRepository.cancelAction();
+  const onCancel = () => {
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.HISTORY.BACKUP_CANCELLED, {
+      [Segmentation.GENERAL.STEP]: Segmentation.BACKUP_CREATION.CANCELLATION_STEP.DURING_BACKUP,
+    });
+    backupRepository.cancelAction();
+  };
 
-  const getBackUpPassword = (): Promise<string> => {
-    return new Promise(resolve => {
-      PrimaryModal.show(PrimaryModal.type.PASSWORD_ADVANCED_SECURITY, {
-        primaryAction: {
-          action: async (password: string) => {
-            resolve(password);
-          },
-          text: t('backupEncryptionModalAction'),
+  const showBackupModal = () => {
+    PrimaryModal.show(PrimaryModal.type.PASSWORD_ADVANCED_SECURITY, {
+      primaryAction: {
+        action: async (password: string, hasMultipleAttempts: boolean) => {
+          exportHistory(password, hasMultipleAttempts);
         },
-        secondaryAction: [
-          {
-            action: () => {
-              resolve('');
-              dismissExport();
-            },
-            text: t('backupEncryptionModalCloseBtn'),
+        text: t('backupEncryptionModalAction'),
+      },
+      secondaryAction: [
+        {
+          action: () => {
+            amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.HISTORY.BACKUP_CANCELLED, {
+              [Segmentation.GENERAL.STEP]: Segmentation.BACKUP_CREATION.CANCELLATION_STEP.BEFORE_BACKUP,
+            });
+            dismissExport();
           },
-        ],
-        passwordOptional: true,
-        text: {
-          closeBtnLabel: t('backupEncryptionModalCloseBtn'),
-          input: t('backupEncryptionModalPlaceholder'),
-          message: t('backupEncryptionModalMessage'),
-          title: t('backupEncryptionModalTitle'),
+          text: t('backupEncryptionModalCloseBtn'),
         },
-      });
+      ],
+      passwordOptional: true,
+      text: {
+        closeBtnLabel: t('backupEncryptionModalCloseBtn'),
+        input: t('backupEncryptionModalPlaceholder'),
+        message: t('backupEncryptionModalMessage'),
+        title: t('backupEncryptionModalTitle'),
+      },
     });
   };
 
-  const exportHistory = async () => {
-    const password = await getBackUpPassword();
+  const exportHistory = async (password: string, hasMultipleAttempts: boolean) => {
     setHistoryState(ExportState.PREPARING);
     setHasError(false);
 
     try {
+      const startTime = Date.now();
       const numberOfRecords = await backupRepository.getBackupInitData();
       logger.log(`Exporting '${numberOfRecords}' records from history`);
 
@@ -188,7 +203,14 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
           onProgress,
           password,
         );
-
+        amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.HISTORY.BACKUP_CREATED, {
+          // converting to seconds
+          [Segmentation.BACKUP_CREATION.CREATION_DURATION]: Math.ceil((Date.now() - startTime) / 1000),
+          [Segmentation.BACKUP_CREATION.PASSWORD]: password ? Segmentation.GENERAL.YES : Segmentation.GENERAL.NO,
+          [Segmentation.BACKUP_CREATION.PASSWORD_MULTIPLE_ATTEMPTS]: hasMultipleAttempts
+            ? Segmentation.GENERAL.YES
+            : Segmentation.GENERAL.NO,
+        });
         onSuccess(archiveBlob);
         logger.log(`Completed export of '${numberOfRecords}' records from history`);
       } else {
@@ -258,7 +280,7 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
               {t('backupCancel')}
             </Button>
 
-            <Button onClick={exportHistory} data-uie-name="do-try-again-history-export-error">
+            <Button onClick={showBackupModal} data-uie-name="do-try-again-history-export-error">
               {t('backupTryAgain')}
             </Button>
           </FlexBox>

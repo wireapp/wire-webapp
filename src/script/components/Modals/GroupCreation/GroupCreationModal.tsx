@@ -31,7 +31,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import * as Icon from 'Components/Icon';
-import {ModalComponent} from 'Components/ModalComponent';
+import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {SearchInput} from 'Components/SearchInput';
 import {TextInput} from 'Components/TextInput';
 import {BaseToggle} from 'Components/toggle/BaseToggle';
@@ -81,15 +81,12 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   } = useKoSubscribableChildren(teamState, ['isTeam', 'isMLSEnabled', 'isProtocolToggleEnabledForUser']);
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
 
-  const isMLSFeatureEnabled = Config.getConfig().FEATURE.ENABLE_MLS;
-
-  const enableMLSToggle = isMLSFeatureEnabled && isMLSEnabledForTeam && isProtocolToggleEnabledForUser;
+  const enableMLSToggle = isMLSEnabledForTeam && isProtocolToggleEnabledForUser;
 
   //if feature flag is set to false or mls is disabled for current team use proteus as default
-  const defaultProtocol =
-    isMLSFeatureEnabled && isMLSEnabledForTeam
-      ? teamState.teamFeatures()?.mls?.config.defaultProtocol
-      : ConversationProtocol.PROTEUS;
+  const defaultProtocol = isMLSEnabledForTeam
+    ? teamState.teamFeatures()?.mls?.config.defaultProtocol
+    : ConversationProtocol.PROTEUS;
 
   const protocolOptions: ProtocolOption[] = ([ConversationProtocol.PROTEUS, ConversationProtocol.MLS] as const).map(
     protocol => ({
@@ -363,7 +360,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
 
             <h2 id="group-creation-label" className="modal__header__title" data-uie-name="status-people-selected">
               {selectedContacts.length
-                ? t('groupCreationParticipantsHeaderWithCounter', selectedContacts.length)
+                ? t('groupCreationParticipantsHeaderWithCounter', {number: selectedContacts.length})
                 : t('groupCreationParticipantsHeader')}
             </h2>
 
@@ -479,7 +476,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                   style={{visibility: hasNameError ? 'hidden' : 'visible'}}
                   data-uie-name="status-group-size-info"
                 >
-                  {t('groupSizeInfo', maxSize)}
+                  {t('groupSizeInfo', {count: maxSize})}
                 </p>
                 <hr className="group-creation__modal__separator" />
                 <BaseToggle

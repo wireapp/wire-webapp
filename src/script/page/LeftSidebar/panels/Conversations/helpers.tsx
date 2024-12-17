@@ -17,9 +17,10 @@
  *
  */
 
-import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {t} from 'Util/LocalizerUtil';
 import {replaceAccents} from 'Util/StringUtil';
+
+import {SidebarTabs} from './useSidebarStore';
 
 import {Conversation} from '../../../../entity/Conversation';
 
@@ -101,25 +102,21 @@ export const conversationSearchFilter = (filter: string) => (conversation: Conve
 };
 
 export const scrollToConversation = (conversationId: string) => {
-  const timeout = setTimeout(() => {
-    const element = document.querySelector<HTMLElement>(`.conversation-list-cell[data-uie-uid="${conversationId}"]`);
+  const element = document.querySelector<HTMLElement>(`.conversation-list-cell[data-uie-uid="${conversationId}"]`);
 
-    if (!element) {
-      return;
-    }
+  if (!element) {
+    return;
+  }
 
-    const rect = element.getBoundingClientRect();
+  const rect = element.getBoundingClientRect();
 
-    const isVisible =
-      rect.top >= 0 &&
-      rect.left >= 0 &&
-      rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-      rect.right <= (window.innerWidth || document.documentElement.clientWidth);
+  const isVisible =
+    rect.top >= 0 &&
+    rect.left >= 0 &&
+    rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+    rect.right <= (window.innerWidth || document.documentElement.clientWidth);
 
-    if (!isVisible) {
-      element.scrollIntoView({behavior: 'instant', block: 'center', inline: 'nearest'});
-    }
-
-    clearTimeout(timeout);
-  }, 1);
+  if (!isVisible) {
+    element.scrollIntoView({behavior: 'instant', block: 'center', inline: 'nearest'});
+  }
 };

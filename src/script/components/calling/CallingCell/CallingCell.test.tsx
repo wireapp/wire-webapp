@@ -35,7 +35,7 @@ import {createUuid} from 'Util/uuid';
 
 import {CallingCell, CallingCellProps} from './CallingCell';
 
-jest.mock('Components/utils/InViewport', () => ({
+jest.mock('Components/InViewport', () => ({
   InViewport: ({onVisible, children}: {onVisible: () => void; children: any}) => {
     setTimeout(onVisible);
     return <div>{children}</div>;
@@ -68,7 +68,7 @@ const createProps = async () => {
   return {
     call: createCall(CALL_STATE.MEDIA_ESTAB),
     callActions: {} as CallActions,
-    callingRepository: mockCallingRepository,
+    callingRepository: mockCallingRepository as CallingRepository,
     pushToTalkKey: null,
     conversation,
     hasAccessToCamera: true,

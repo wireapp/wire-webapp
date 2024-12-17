@@ -18,9 +18,10 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import ko, {observable, pureComputed} from 'knockout';
+import ko, {computed, observable, pureComputed} from 'knockout';
 
 import {VIDEO_STATE} from '@wireapp/avs';
+import {AvsDebugger} from '@wireapp/avs-debugger';
 
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
@@ -39,6 +40,7 @@ export class Participant {
   public readonly hasPausedVideo: ko.PureComputed<boolean>;
   public readonly sharesScreen: ko.PureComputed<boolean>;
   public readonly sharesCamera: ko.PureComputed<boolean>;
+  public readonly isSwitchingVideoResolution = observable(false);
   public readonly startedScreenSharingAt = observable<number>(0);
   public readonly isActivelySpeaking = observable(false);
   public readonly isSendingVideo: ko.PureComputed<boolean>;
@@ -47,6 +49,7 @@ export class Participant {
   // Audio
   public readonly audioStream = observable<MediaStream | undefined>();
   public readonly isMuted = observable(false);
+  public readonly handRaisedAt = observable<number | null>(null);
 
   constructor(
     public readonly user: User,
@@ -66,6 +69,18 @@ export class Participant {
     });
     this.isSendingVideo = pureComputed(() => {
       return this.videoState() !== VIDEO_STATE.STOPPED;
+    });
+    this.isSwitchingVideoResolution(false);
+
+    computed(() => {
+      const stream = this.videoStream();
+
+      if (stream && stream.getVideoTracks().length > 0) {
+        if (AvsDebugger.hasTrack(this.user.id)) {
+          AvsDebugger.removeTrack(this.user.id);
+        }
+        AvsDebugger.addTrack(this.user.id, this.user.name(), stream.getVideoTracks()[0], this.sharesScreen());
+      }
     });
   }
 
@@ -141,6 +156,9 @@ export class Participant {
         track.stop();
       }
       mediaStream.removeTrack(track);
+      if (track.kind == 'video' && AvsDebugger.hasTrack(this.user.id)) {
+        AvsDebugger.removeTrack(this.user.id);
+      }
     });
   }
 }

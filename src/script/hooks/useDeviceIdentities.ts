@@ -26,9 +26,12 @@ import {E2EIHandler, getUsersIdentities, MLSStatuses, WireIdentity} from '../E2E
 
 export const useUserIdentity = (userId: QualifiedId, groupId?: string, updateAfterEnrollment?: boolean) => {
   const [deviceIdentities, setDeviceIdentities] = useState<WireIdentity[] | undefined>();
+  const getDeviceIdentity = (deviceId: string) => {
+    return deviceIdentities?.find(identity => identity.deviceId === deviceId);
+  };
 
   const refreshDeviceIdentities = useCallback(async () => {
-    if (!E2EIHandler.getInstance().isE2EIEnabled() || !groupId) {
+    if (!groupId) {
       return;
     }
 
@@ -56,18 +59,11 @@ export const useUserIdentity = (userId: QualifiedId, groupId?: string, updateAft
 
   return {
     deviceIdentities,
-
     status: !deviceIdentities
       ? undefined
       : deviceIdentities.length > 0 && deviceIdentities.every(identity => identity.status === MLSStatuses.VALID)
         ? MLSStatuses.VALID
         : MLSStatuses.NOT_ACTIVATED,
-
-    getDeviceIdentity:
-      deviceIdentities !== undefined
-        ? (deviceId: string) => {
-            return deviceIdentities.find(identity => identity.deviceId === deviceId);
-          }
-        : undefined,
+    getDeviceIdentity,
   };
 };

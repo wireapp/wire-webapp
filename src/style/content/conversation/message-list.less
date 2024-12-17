@@ -19,6 +19,7 @@
 
 // MEMBER LIST
 .message-list {
+  position: relative;
   overflow: auto;
   flex: 1 1;
 }
@@ -26,7 +27,9 @@
 .messages {
   transform: translateZ(0);
   &.flex-center {
+    flex-wrap: wrap;
     margin: auto;
+
     & .message {
       width: 100%;
       min-width: 75%;
@@ -184,6 +187,11 @@
   justify-content: center;
 }
 
+.message-header-content {
+  display: flex;
+  align-items: center;
+}
+
 .message-header-label {
   display: flex;
   min-width: 0; // fixes ellipsis not working with flexbox (FF)
@@ -332,9 +340,21 @@
 
   .md-heading {
     margin: 4px 0 8px;
-    font-size: var(--font-size-large);
+    font-size: var(--font-size-base);
     font-weight: var(--font-weight-bold);
     line-height: var(--line-height-lg);
+
+    &--1 {
+      font-size: var(--font-size-xlarge);
+    }
+
+    &--2 {
+      font-size: var(--font-size-large);
+    }
+
+    &--3 {
+      font-size: var(--font-size-base);
+    }
 
     & + br {
       display: none;
@@ -357,8 +377,10 @@
   cursor: pointer;
 
   &--no-image {
-    background-color: var(--foreground-fade-8);
-    cursor: default;
+    .message-asset & {
+      background-color: var(--foreground-fade-8);
+      cursor: default;
+    }
   }
 
   .image-icon svg {

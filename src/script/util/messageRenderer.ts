@@ -43,11 +43,27 @@ const markdownit = new MarkdownIt('zero', {
   html: false,
   langPrefix: 'lang-',
   linkify: true,
-}).enable(['autolink', 'backticks', 'code', 'emphasis', 'escape', 'fence', 'heading', 'link', 'linkify', 'newline']);
+}).enable([
+  'autolink',
+  'backticks',
+  'code',
+  'emphasis',
+  'escape',
+  'fence',
+  'heading',
+  'link',
+  'linkify',
+  'newline',
+  'list',
+  'strikethrough',
+]);
 
 const originalFenceRule = markdownit.renderer.rules.fence!;
 
-markdownit.renderer.rules.heading_open = () => '<div class="md-heading">';
+markdownit.renderer.rules.heading_open = (tokens, idx) => {
+  const headingLevel = tokens[idx].tag.slice(1);
+  return `<div class="md-heading md-heading--${headingLevel}">`;
+};
 markdownit.renderer.rules.heading_close = () => '</div>';
 const originalNormalizeLink = markdownit.normalizeLink!;
 

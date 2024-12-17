@@ -17,8 +17,11 @@
  *
  */
 
+import {container} from 'tsyringe';
+
 import {Runtime} from '@wireapp/commons';
 
+import {CallingViewMode, CallState} from 'src/script/calling/CallState';
 import {getLogger, Logger} from 'Util/Logger';
 
 import {MediaConstraintsHandler, ScreensharingMethods} from './MediaConstraintsHandler';
@@ -151,7 +154,7 @@ export class MediaStreamHandler {
     hasPermission: boolean,
   ): Promise<MediaStream> {
     const mediaConstraints = screen
-      ? this.constraintsHandler.getScreenStreamConstraints(this.screensharingMethod, isGroup)
+      ? this.constraintsHandler.getScreenStreamConstraints(this.screensharingMethod)
       : this.constraintsHandler.getMediaStreamConstraints(audio, video, isGroup);
 
     const willPromptForPermission = !hasPermission && !Runtime.isDesktopApp();
@@ -159,13 +162,25 @@ export class MediaStreamHandler {
       this.schedulePermissionHint(audio, video, screen);
     }
 
+    const callState = container.resolve(CallState);
+
+    const detachedWindow = callState.detachedWindow();
+    const isInDetachedMode = callState.viewMode() === CallingViewMode.DETACHED_WINDOW;
+    const useDetachedWindowForScreenSharingSource = screen && !video && isInDetachedMode && detachedWindow !== null;
+
+    if (useDetachedWindowForScreenSharingSource) {
+      callState.isScreenSharingSourceFromDetachedWindow(true);
+    }
+
+    const windowToUse = useDetachedWindowForScreenSharingSource ? detachedWindow : window;
+
     const supportsGetDisplayMedia = screen && this.screensharingMethod === ScreensharingMethods.DISPLAY_MEDIA;
     const mediaAPI = supportsGetDisplayMedia
-      ? navigator.mediaDevices.getDisplayMedia
-      : navigator.mediaDevices.getUserMedia;
+      ? windowToUse.navigator.mediaDevices.getDisplayMedia
+      : windowToUse.navigator.mediaDevices.getUserMedia;
 
     return mediaAPI
-      .call(navigator.mediaDevices, mediaConstraints)
+      .call(windowToUse.navigator.mediaDevices, mediaConstraints)
       .then((mediaStream: MediaStream) => {
         this.clearPermissionRequestHint(audio, video, screen);
         return mediaStream;

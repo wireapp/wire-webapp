@@ -3,6 +3,7 @@
 .DS_Store
 .idea
 .vscode
+.fleet
 /config
 /coverage
 /keys
@@ -24,3 +25,6 @@ yarn-error.log
 !.yarn/plugins
 !.yarn/releases
 !.yarn/sdks
+
+yalc.lock
+.yalc

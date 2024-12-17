@@ -43,6 +43,7 @@ import {
   LOG_LEVEL,
   QUALITY,
   REASON,
+  RESOLUTION,
   STATE as CALL_STATE,
   VIDEO_STATE,
   VSTREAMS,
@@ -50,22 +51,26 @@ import {
   WcallClient,
   WcallMember,
 } from '@wireapp/avs';
+import {AvsDebugger} from '@wireapp/avs-debugger';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {CALL_QUALITY_FEEDBACK_KEY} from 'Components/Modals/QualityFeedbackModal/constants';
 import {flatten} from 'Util/ArrayUtil';
+import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
+import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {roundLogarithmic} from 'Util/NumberUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
+import {copyStyles} from 'Util/renderElement';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {createUuid} from 'Util/uuid';
 
 import {Call, SerializedConversationId} from './Call';
 import {callingSubscriptions} from './callingSubscriptionsHandler';
-import {CallState, MuteState} from './CallState';
+import {CallingViewMode, CallState, MuteState} from './CallState';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
 import {ClientId, Participant, UserId} from './Participant';
@@ -90,10 +95,10 @@ import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
 import {TeamState} from '../team/TeamState';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
-import {isCountlyEnabledAtCurrentEnvironment} from '../tracking/Countly.helpers';
 import {EventName} from '../tracking/EventName';
 import * as trackingHelpers from '../tracking/Helpers';
 import {Segmentation} from '../tracking/Segmentation';
+import {isTelemetryEnabledAtCurrentEnvironment} from '../tracking/Telemetry.helpers';
 import type {UserRepository} from '../user/UserRepository';
 import {Warnings} from '../view_model/WarningsContainer';
 
@@ -252,6 +257,7 @@ export class CallingRepository {
 
     this.onChooseScreen = (deviceId: string) => {};
 
+    // Request the video streams whenever the mode changes to active speaker
     ko.computed(() => {
       const call = this.callState.joinedCall();
       if (!call) {
@@ -259,7 +265,39 @@ export class CallingRepository {
       }
       const isSpeakersViewActive = this.callState.isSpeakersViewActive();
       if (isSpeakersViewActive) {
-        this.requestVideoStreams(call.conversation.qualifiedId, call.activeSpeakers());
+        const videoQuality = call.activeSpeakers().length > 2 ? RESOLUTION.LOW : RESOLUTION.HIGH;
+
+        const speakes = call.activeSpeakers();
+        speakes.forEach(p => {
+          // This is a temporary solution. The SFT does not send a response when a track change has occurred.
+          // To prevent the wrong video from being briefly displayed, we introduce a timeout here.
+          p.isSwitchingVideoResolution(true);
+          window.setTimeout(() => {
+            p.isSwitchingVideoResolution(false);
+          }, 1000);
+        });
+
+        this.requestVideoStreams(call.conversation.qualifiedId, speakes, videoQuality);
+      }
+    });
+
+    // Request the video streams whenever toggle display maximised Participant.
+    ko.computed(() => {
+      const call = this.callState.joinedCall();
+      if (!call) {
+        return;
+      }
+      const maximizedParticipant = call.maximizedParticipant();
+      if (maximizedParticipant !== null) {
+        maximizedParticipant.isSwitchingVideoResolution(true);
+        // This is a temporary solution. The SFT does not send a response when a track change has occurred. To prevent
+        // the wrong video from being briefly displayed, we introduce a timeout here.
+        window.setTimeout(() => {
+          maximizedParticipant.isSwitchingVideoResolution(false);
+        }, 1000);
+        this.requestVideoStreams(call.conversation.qualifiedId, [maximizedParticipant], RESOLUTION.HIGH);
+      } else {
+        this.requestCurrentPageVideoStreams(call);
       }
     });
   }
@@ -627,7 +665,7 @@ export class CallingRepository {
               text: t('callDegradationAction'),
             },
             text: {
-              message: t('callDegradationDescription', participant.user.name()),
+              message: t('callDegradationDescription', {username: participant.user.name()}),
               title: t('callDegradationTitle'),
             },
           },
@@ -657,8 +695,8 @@ export class CallingRepository {
       {
         close: () => this.acceptVersionWarning(conversationId),
         text: {
-          message: t('modalCallUpdateClientMessage', brandName),
-          title: t('modalCallUpdateClientHeadline', brandName),
+          message: t('modalCallUpdateClientMessage', {brandName}),
+          title: t('modalCallUpdateClientHeadline', {brandName}),
         },
       },
       'update-client-warning',
@@ -689,7 +727,7 @@ export class CallingRepository {
       return;
     }
 
-    const {content, qualified_conversation, from, qualified_from} = event;
+    const {content, qualified_conversation, from, qualified_from, time} = event;
     const isFederated = this.core.backendFeatures.isFederated && qualified_conversation && qualified_from;
     const userId = isFederated ? qualified_from : {domain: '', id: from};
     const conversationId = this.extractTargetedConversationId(event);
@@ -699,6 +737,7 @@ export class CallingRepository {
       this.logger.warn(`Unable to find a conversation with id of ${conversationId.id}@${conversationId.domain}`);
       return;
     }
+
     switch (content.type) {
       case CALL_MESSAGE_TYPE.CONFKEY: {
         if (source !== EventRepository.SOURCE.STREAM) {
@@ -719,8 +758,12 @@ export class CallingRepository {
       }
 
       case CALL_MESSAGE_TYPE.REMOTE_MUTE: {
-        const call = this.findCall(conversationId);
-        if (!call) {
+        const currentCall = this.callState.joinedCall();
+        if (
+          !currentCall ||
+          !matchQualifiedIds(currentCall.conversation.qualifiedId, conversationId) ||
+          !this.selfUser
+        ) {
           return;
         }
 
@@ -743,17 +786,21 @@ export class CallingRepository {
           return;
         }
 
-        this.muteCall(call, true, MuteState.REMOTE_MUTED);
+        this.muteCall(currentCall, true, MuteState.REMOTE_MUTED);
         return this.processCallingMessage(conversation, event);
       }
 
       case CALL_MESSAGE_TYPE.EMOJIS: {
-        const call = this.findCall(conversationId);
-        if (!call || !this.selfUser) {
+        const currentCall = this.callState.joinedCall();
+        if (
+          !currentCall ||
+          !matchQualifiedIds(currentCall.conversation.qualifiedId, conversationId) ||
+          !this.selfUser
+        ) {
           return;
         }
 
-        const senderParticipant = call
+        const senderParticipant = currentCall
           .participants()
           .find(participant => matchQualifiedIds(participant.user.qualifiedId, userId));
 
@@ -780,6 +827,52 @@ export class CallingRepository {
             .filter(item => !newEmojis.some(newItem => newItem.id === item.id));
           this.callState.emojis(remainingEmojis);
         }, CallingRepository.EMOJI_TIME_OUT_DURATION);
+        break;
+      }
+
+      case CALL_MESSAGE_TYPE.HAND_RAISED: {
+        const currentCall = this.callState.joinedCall();
+        if (
+          !currentCall ||
+          !matchQualifiedIds(currentCall.conversation.qualifiedId, conversationId) ||
+          !this.selfUser
+        ) {
+          this.logger.info('Ignored hand raise event because no active call was found');
+          return;
+        }
+
+        const participant = currentCall
+          .participants()
+          .find(participant => matchQualifiedIds(participant.user.qualifiedId, userId));
+
+        if (!participant) {
+          this.logger.info('Ignored hand raise event because no active participant was found');
+          return;
+        }
+
+        const isSelf = matchQualifiedIds(this.selfUser.qualifiedId, userId);
+
+        const {isHandUp} = content;
+        const handRaisedAt = time ? new Date(time).getTime() : new Date().getTime();
+        participant.handRaisedAt(isHandUp ? handRaisedAt : null);
+
+        if (!isHandUp) {
+          break;
+        }
+
+        const name = participant.user.name();
+        const handUpMessage = isSelf
+          ? t('videoCallParticipantRaisedSelfHandUp')
+          : t('videoCallParticipantRaisedTheirHandUp', {name});
+
+        window.dispatchEvent(
+          new CustomEvent(WebAppEvents.CALL.HAND_RAISED, {
+            detail: {
+              notificationMessage: handUpMessage,
+            },
+          }),
+        );
+
         break;
       }
 
@@ -862,7 +955,7 @@ export class CallingRepository {
   }
 
   async startCall(conversation: Conversation, callType: CALL_TYPE): Promise<void | Call> {
-    void this.callState.setViewModeMinimized();
+    void this.setViewModeMinimized();
     if (!this.selfUser || !this.selfClientId) {
       this.logger.warn(
         `Calling repository is not initialized correctly \n ${JSON.stringify({
@@ -963,31 +1056,26 @@ export class CallingRepository {
   toggleScreenshare = async (call: Call): Promise<void> => {
     const {conversation} = call;
 
+    // The screen share was stopped by the user through the application. We clean up the state and stop the screen share
+    // video track. Note that stopping a track does not trigger an "ended" event.
     const selfParticipant = call.getSelfParticipant();
     if (selfParticipant.sharesScreen()) {
-      selfParticipant.videoState(VIDEO_STATE.STOPPED);
-      this.sendCallingEvent(EventName.CALLING.SCREEN_SHARE, call, {
-        [Segmentation.SCREEN_SHARE.DIRECTION]: 'outgoing',
-        [Segmentation.SCREEN_SHARE.DURATION]:
-          Math.ceil((Date.now() - selfParticipant.startedScreenSharingAt()) / 5000) * 5,
-      });
-      return this.wCall?.setVideoSendState(
-        this.wUser,
-        this.serializeQualifiedId(conversation.qualifiedId),
-        VIDEO_STATE.STOPPED,
-      );
+      this.stopScreenShare(selfParticipant, conversation, call);
+      return;
     }
+
     try {
       const mediaStream = await this.getMediaStream({audio: true, screen: true}, call.isGroupOrConference);
-      // https://stackoverflow.com/a/25179198/451634
+      if ('contentHint' in mediaStream.getVideoTracks()[0]) {
+        mediaStream.getVideoTracks()[0].contentHint = 'detail';
+      }
+
+      // If the screen share is stopped by the os system or the browser, an "ended" event is triggered. We listen for
+      // this event to clean up the screen share state in this case.
       mediaStream.getVideoTracks()[0].onended = () => {
-        this.wCall?.setVideoSendState(
-          this.wUser,
-          this.serializeQualifiedId(conversation.qualifiedId),
-          VIDEO_STATE.STOPPED,
-        );
+        this.stopScreenShare(selfParticipant, conversation, call);
       };
-      const selfParticipant = call.getSelfParticipant();
+
       selfParticipant.videoState(VIDEO_STATE.SCREENSHARE);
       selfParticipant.updateMediaStream(mediaStream, true);
       this.wCall?.setVideoSendState(
@@ -1001,8 +1089,131 @@ export class CallingRepository {
     }
   };
 
+  /**
+   * This method ends the screen share regardless of the event that triggered it.
+   * There are two ways to end a screen share: one by clicking the Applications button, and the other by stopping it
+   * through the os system ore browser's sharing option.
+   */
+  private stopScreenShare(selfParticipant: Participant, conversation: Conversation, call: Call): void {
+    selfParticipant.videoState(VIDEO_STATE.STOPPED);
+    selfParticipant.releaseVideoStream(true);
+
+    this.sendCallingEvent(EventName.CALLING.SCREEN_SHARE, call, {
+      [Segmentation.SCREEN_SHARE.DIRECTION]: 'outgoing',
+      [Segmentation.SCREEN_SHARE.DURATION]:
+        Math.ceil((Date.now() - selfParticipant.startedScreenSharingAt()) / 5000) * 5,
+    });
+
+    return this.wCall?.setVideoSendState(
+      this.wUser,
+      this.serializeQualifiedId(conversation.qualifiedId),
+      VIDEO_STATE.STOPPED,
+    );
+  }
+
+  onPageHide = (event: PageTransitionEvent) => {
+    if (event.persisted) {
+      return;
+    }
+
+    this.callState.detachedWindow()?.close();
+  };
+
+  handleThemeUpdateEvent = () => {
+    const detachedWindow = this.callState.detachedWindow();
+    if (detachedWindow) {
+      detachedWindow.document.body.className = window.document.body.className;
+    }
+  };
+
+  closeDetachedWindow = () => {
+    this.callState.detachedWindow(null);
+    this.callState.detachedWindowCallQualifiedId(null);
+    amplify.unsubscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, this.handleThemeUpdateEvent);
+    this.callState.viewMode(CallingViewMode.MINIMIZED);
+
+    const joinedCall = this.callState.joinedCall();
+    const isSharingScreen = joinedCall?.getSelfParticipant().sharesScreen();
+    const isScreenSharingSourceFromDetachedWindow = this.callState.isScreenSharingSourceFromDetachedWindow();
+
+    if (joinedCall && isSharingScreen && isScreenSharingSourceFromDetachedWindow) {
+      window.dispatchEvent(new CustomEvent(WebAppEvents.CALL.SCREEN_SHARING_ENDED));
+      this.callState.isScreenSharingSourceFromDetachedWindow(false);
+      void this.toggleScreenshare(joinedCall);
+    }
+  };
+
+  setViewModeMinimized = () => {
+    const isDetachedWindowSupported = isDetachedCallingFeatureEnabled();
+
+    if (!isDetachedWindowSupported) {
+      this.callState.viewMode(CallingViewMode.MINIMIZED);
+      return;
+    }
+
+    this.callState.detachedWindow()?.close();
+    this.closeDetachedWindow();
+  };
+
+  setViewModeFullScreen = () => {
+    this.callState.viewMode(CallingViewMode.FULL_SCREEN);
+  };
+
+  async setViewModeDetached(
+    detachedViewModeOptions: {name: string; height: number; width: number} = {
+      name: 'WIRE_PICTURE_IN_PICTURE_CALL',
+      width: 1026,
+      height: 829,
+    },
+  ) {
+    if (!isDetachedCallingFeatureEnabled()) {
+      this.setViewModeFullScreen();
+      return;
+    }
+
+    const {name, width, height} = detachedViewModeOptions;
+    const {top, left} = calculateChildWindowPosition(height, width);
+
+    const detachedWindow = window.open(
+      '',
+      name,
+      `
+        width=${width}
+        height=${height},
+        top=${top},
+        left=${left}
+        location=no,
+        menubar=no,
+        resizable=yes,
+        status=no,
+        toolbar=no,
+      `,
+    );
+
+    this.callState.detachedWindow(detachedWindow);
+
+    this.callState.detachedWindowCallQualifiedId(this.callState.joinedCall()?.conversation.qualifiedId ?? null);
+
+    if (!detachedWindow) {
+      return;
+    }
+
+    // New window is not opened on the same domain (it's about:blank), so we cannot use any of the dom loaded events to copy the styles.
+    setTimeout(() => copyStyles(window.document, detachedWindow.document), 0);
+
+    detachedWindow.document.title = t('callingPopOutWindowTitle', {brandName: Config.getConfig().BRAND_NAME});
+
+    detachedWindow.addEventListener('beforeunload', this.closeDetachedWindow);
+    detachedWindow.addEventListener('pagehide', this.closeDetachedWindow);
+    window.addEventListener('pagehide', this.onPageHide);
+
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, this.handleThemeUpdateEvent);
+
+    this.callState.viewMode(CallingViewMode.DETACHED_WINDOW);
+  }
+
   async answerCall(call: Call, callType?: CALL_TYPE): Promise<void> {
-    void this.callState.setViewModeMinimized();
+    void this.setViewModeMinimized();
     const {conversation} = call;
     try {
       callType ??= call.getSelfParticipant().sharesCamera() ? call.initialType : CALL_TYPE.NORMAL;
@@ -1072,7 +1283,7 @@ export class CallingRepository {
   }
 
   private readonly leave1on1MLSConference = async (conversationId: QualifiedId) => {
-    if (isCountlyEnabledAtCurrentEnvironment()) {
+    if (isTelemetryEnabledAtCurrentEnvironment()) {
       this.showCallQualityFeedbackModal();
     }
 
@@ -1081,6 +1292,7 @@ export class CallingRepository {
     const conversationIdStr = this.serializeQualifiedId(conversationId);
     this.wCall?.end(this.wUser, conversationIdStr);
     callingSubscriptions.removeCall(conversationId);
+    AvsDebugger.reset();
   };
 
   private readonly leaveMLSConference = async (conversationId: QualifiedId) => {
@@ -1177,24 +1389,47 @@ export class CallingRepository {
     this.wCall?.reject(this.wUser, this.serializeQualifiedId(conversationId));
   }
 
+  /**
+   * This method monitors every change in the call and is therefore the main method for handling video requests.
+   * These changes include mute/unmute, screen sharing, or camera switching, joining or leaving of participants, or...
+   * @param call
+   * @param newPage
+   */
   changeCallPage(call: Call, newPage: number): void {
     call.currentPage(newPage);
-    if (!this.callState.isSpeakersViewActive()) {
+    if (!this.callState.isSpeakersViewActive() && !this.callState.isMaximisedViewActive()) {
       this.requestCurrentPageVideoStreams(call);
     }
   }
 
+  /**
+   * This method queries streams for the participants who are displayed on the active page! This can include up to nine
+   * participants and is used when flipping pages or starting a call.
+   * @param call
+   */
   requestCurrentPageVideoStreams(call: Call): void {
-    const currentPageParticipants = call.pages()[call.currentPage()];
-    this.requestVideoStreams(call.conversation.qualifiedId, currentPageParticipants);
+    const currentPageParticipants = call.pages()[call.currentPage()] ?? [];
+    const videoQuality: RESOLUTION = currentPageParticipants.length <= 2 ? RESOLUTION.HIGH : RESOLUTION.LOW;
+    this.requestVideoStreams(call.conversation.qualifiedId, currentPageParticipants, videoQuality);
   }
 
-  requestVideoStreams(conversationId: QualifiedId, participants: Participant[]) {
+  requestVideoStreams(conversationId: QualifiedId, participants: Participant[], videoQuality: RESOLUTION) {
+    if (participants.length === 0) {
+      return;
+    }
+    // Filter myself out and do not request my own stream.
+    const requestParticipants = participants.filter(p => !this.isSelfUser(p));
+    if (requestParticipants.length === 0) {
+      return;
+    }
+
     const convId = this.serializeQualifiedId(conversationId);
+
     const payload = {
-      clients: participants.map(participant => ({
+      clients: requestParticipants.map(participant => ({
         clientid: participant.clientId,
         userid: this.serializeQualifiedId(participant.user.qualifiedId),
+        quality: videoQuality,
       })),
       convid: convId,
     };
@@ -1224,7 +1459,7 @@ export class CallingRepository {
   };
 
   readonly leaveCall = (conversationId: QualifiedId, reason: LEAVE_CALL_REASON): void => {
-    if (isCountlyEnabledAtCurrentEnvironment()) {
+    if (isTelemetryEnabledAtCurrentEnvironment()) {
       this.showCallQualityFeedbackModal();
     }
 
@@ -1232,6 +1467,7 @@ export class CallingRepository {
     const conversationIdStr = this.serializeQualifiedId(conversationId);
     delete this.poorCallQualityUsers[conversationIdStr];
     this.wCall?.end(this.wUser, conversationIdStr);
+    AvsDebugger.reset();
   };
 
   muteCall(call: Call, shouldMute: boolean, reason?: MuteState): void {
@@ -1493,6 +1729,10 @@ export class CallingRepository {
     });
   };
 
+  readonly sendInCallHandRaised = async (isHandUp: boolean, call: Call) => {
+    void this.messageRepository.sendInCallHandRaised(call.conversation, isHandUp);
+  };
+
   readonly sendModeratorMute = (conversationId: QualifiedId, participants: Participant[]) => {
     const recipients = this.convertParticipantsToCallingMessageRecepients(participants);
     void this.sendCallingMessage(
@@ -1562,7 +1802,7 @@ export class CallingRepository {
         },
       )
     ) {
-      void this.callState.setViewModeMinimized();
+      void this.setViewModeMinimized();
     }
 
     // There's nothing we need to do for non-mls calls
@@ -2064,6 +2304,7 @@ export class CallingRepository {
     if (!call) {
       return;
     }
+
     const participant = call.getParticipant(userId, clientId);
     if (!participant) {
       return;
@@ -2094,10 +2335,6 @@ export class CallingRepository {
 
     if (state === VIDEO_STATE.SCREENSHARE) {
       call.analyticsScreenSharing = true;
-    }
-
-    if (call.state() === CALL_STATE.MEDIA_ESTAB && isSameUser && !selfParticipant.sharesScreen()) {
-      selfParticipant.releaseVideoStream(true);
     }
 
     call
@@ -2142,6 +2379,8 @@ export class CallingRepository {
     this.callState
       .calls()
       .forEach((call: Call) => this.wCall?.end(this.wUser, this.serializeQualifiedId(call.conversation.qualifiedId)));
+
+    AvsDebugger.reset();
     this.wCall?.destroy(this.wUser);
   }
 
@@ -2175,17 +2414,28 @@ export class CallingRepository {
     const modalOptions = {
       text: {
         closeBtnLabel: t('modalNoCameraCloseBtn'),
-        htmlMessage: t('modalNoCameraMessage', Config.getConfig().BRAND_NAME, {
-          '/faqLink': '</a>',
-          br: '<br>',
-          faqLink: `<a href="${
-            Config.getConfig().URL.SUPPORT.CAMERA_ACCESS_DENIED
-          }" data-uie-name="go-no-camera-faq" target="_blank" rel="noopener noreferrer">`,
-        }),
+        htmlMessage: t(
+          'modalNoCameraMessage',
+          {brandName: Config.getConfig().BRAND_NAME},
+          {
+            '/faqLink': '</a>',
+            br: '<br>',
+            faqLink: `<a href="${
+              Config.getConfig().URL.SUPPORT.CAMERA_ACCESS_DENIED
+            }" data-uie-name="go-no-camera-faq" target="_blank" rel="noopener noreferrer">`,
+          },
+        ),
         title: t('modalNoCameraTitle'),
       },
     };
     PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, modalOptions);
+  }
+
+  private isSelfUser(participant: Participant): boolean {
+    if (this.selfUser == null || this.selfClientId == null) {
+      return false;
+    }
+    return participant.doesMatchIds(this.selfUser.qualifiedId, this.selfClientId);
   }
 
   //##############################################################################

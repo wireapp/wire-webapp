@@ -553,11 +553,11 @@ describe('Markdown for code snippets', () => {
 });
 
 describe('Markdown for headings', () => {
-  it('renders all headings the same', () => {
-    expect(renderMessage('# heading')).toBe('<div class="md-heading">heading</div>');
-    expect(renderMessage('## heading')).toBe('<div class="md-heading">heading</div>');
-    expect(renderMessage('### heading')).toBe('<div class="md-heading">heading</div>');
-    expect(renderMessage('#### heading')).toBe('<div class="md-heading">heading</div>');
+  it('differentiate heading size by its level', () => {
+    expect(renderMessage('# heading')).toBe('<div class="md-heading md-heading--1">heading</div>');
+    expect(renderMessage('## heading')).toBe('<div class="md-heading md-heading--2">heading</div>');
+    expect(renderMessage('### heading')).toBe('<div class="md-heading md-heading--3">heading</div>');
+    expect(renderMessage('#### heading')).toBe('<div class="md-heading md-heading--4">heading</div>');
   });
 });
 

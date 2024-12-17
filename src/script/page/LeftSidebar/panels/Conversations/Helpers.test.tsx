@@ -18,8 +18,9 @@
  */
 
 import {getTabConversations} from 'src/script/page/LeftSidebar/panels/Conversations/helpers';
-import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {generateConversation} from 'test/helper/ConversationGenerator';
+
+import {SidebarTabs} from './useSidebarStore';
 
 import {Conversation} from '../../../../entity/Conversation';
 
