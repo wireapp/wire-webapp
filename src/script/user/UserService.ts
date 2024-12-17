@@ -58,8 +58,18 @@ export class UserService {
    * @todo There might be more keys which are returned by this function
    * @returns Resolves with all the stored user states
    */
-  loadUserFromDb(): Promise<UserRecord[]> {
+  loadUsersFromDb(): Promise<UserRecord[]> {
     return this.storageService.getAll<UserRecord>(this.USER_STORE_NAME);
+  }
+
+  /**
+   * Loads user from the local database
+   * @returns Resolves to the stored user, if it does not exists resolves to undefined
+   */
+  loadUserFromDb(qualifiedId: QualifiedId): Promise<UserRecord | undefined> {
+    const primaryKey = constructUserPrimaryKey(qualifiedId);
+
+    return this.storageService.load<UserRecord>(this.USER_STORE_NAME, primaryKey);
   }
 
   /**
