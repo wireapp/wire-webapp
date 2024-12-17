@@ -80,7 +80,7 @@ export const registerListItemTabIndentation = (editor: LexicalEditor) => {
  * This plugin adds the ability to indent list items using the tab key.
  * It ONLY works when the selection is completely within list items.
  */
-export const ListItemTabIndentationPlugin = () => {
+export const ListItemTabIndentationPlugin = (): null => {
   const [editor] = useLexicalComposerContext();
   useEffect(() => {
     return registerListItemTabIndentation(editor);

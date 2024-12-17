@@ -68,7 +68,7 @@ const $shouldPreventIndent = (maxDepth: number): boolean => {
   return totalDepth > maxDepth;
 };
 
-export const ListMaxIndentLevelPlugin = ({maxDepth = 7}: {maxDepth?: number}) => {
+export const ListMaxIndentLevelPlugin = ({maxDepth = 7}: {maxDepth?: number}): null => {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {
