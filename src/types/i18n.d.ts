@@ -447,7 +447,7 @@ declare module 'I18n/en-US.json' {
     'conversationDetailsActionGuestOptions': `Guests`;
     'conversationDetailsActionLeave': `Leave group`;
     'conversationDetailsActionNotifications': `Notifications`;
-    'conversationDetailsActionRemove': `Remove group`;
+    'conversationDetailsActionDeleteForMe': `Delete for Me`;
     'conversationDetailsActionServicesOptions': `Services`;
     'conversationDetailsActionTimedMessages': `Self-deleting messages`;
     'conversationDetailsActionUnblock': `Unblock`;
@@ -601,6 +601,7 @@ declare module 'I18n/en-US.json' {
     'conversationsPopoverBlock': `Block`;
     'conversationsPopoverCancel': `Cancel request`;
     'conversationsPopoverClear': `Clear content`;
+    'conversationsPopoverDeleteForMe': `Delete for Me`;
     'conversationsPopoverLeave': `Leave group`;
     'conversationsPopoverMoveTo': `Move to`;
     'conversationsPopoverNewFolder': `Create new folder`;
@@ -1380,13 +1381,13 @@ declare module 'I18n/en-US.json' {
     'replyQuoteShowMore': `Show more`;
     'replyQuoteTimeStampDate': `Original message from {date}`;
     'replyQuoteTimeStampTime': `Original message from {time}`;
-    'richTextHeading': `Heading`;
     'richTextBold': `Bold`;
+    'richTextCode': `Code`;
+    'richTextHeading': `Heading`;
     'richTextItalic': `Italic`;
+    'richTextOrderedList': `Ordered list`;
     'richTextStrikethrough': `Strikethrough`;
     'richTextUnorderedList': `Unordered list`;
-    'richTextOrderedList': `Ordered list`;
-    'richTextCode': `Code`;
     'roleAdmin': `Admin`;
     'roleOwner': `Owner`;
     'rolePartner': `External`;
@@ -1625,12 +1626,12 @@ declare module 'I18n/en-US.json' {
     'videoCallOverlayViewModeLabel': `View mode`;
     'videoCallOverlayViewModeSpeakers': `Show active speakers only`;
     'videoCallParticipantConnecting': `Connecting...`;
+    'videoCallParticipantLowerYourHand': `Lower your hand`;
+    'videoCallParticipantRaiseYourHand': `Raise your hand`;
     'videoCallParticipantRaisedHandRaiseDuration': `Hand raised for {duration}`;
     'videoCallParticipantRaisedSelfHandUp': `You have raised your hand up`;
     'videoCallParticipantRaisedSortByTime': `Top in the list raised their hand first.`;
     'videoCallParticipantRaisedTheirHandUp': `{name} has raised their hand up`;
-    'videoCallParticipantRaiseYourHand': `Raise your hand`;
-    'videoCallParticipantLowerYourHand': `Lower your hand`;
     'videoCallPaused': `Video paused`;
     'videoCallScreenShareEndConfirm': `End screen share`;
     'videoCallScreenShareEndConfirmDescription': `If you minimize the window, your screen share will end.`;
