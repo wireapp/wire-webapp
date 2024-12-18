@@ -26,6 +26,8 @@ import React, {
   useCallback,
 } from 'react';
 
+import {useVirtualizer} from '@tanstack/react-virtual';
+
 import {ConversationListCell} from 'Components/ConversationListCell';
 import {Call} from 'src/script/calling/Call';
 import {ConversationLabel, ConversationLabelRepository} from 'src/script/conversation/ConversationLabelRepository';
@@ -171,6 +173,16 @@ export const ConversationsList = ({
     (isFolderView && currentFolder?.conversations().filter(conversationSearchFilter(conversationsFilter))) || [];
   const conversationsToDisplay = filteredConversations.length ? filteredConversations : conversations;
 
+  // The scrollable element for your list
+  const parentRef = React.useRef(null);
+
+  // The virtualizer
+  const rowVirtualizer = useVirtualizer({
+    count: conversationsToDisplay.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 56,
+  });
+
   return (
     <>
       <h2 className="visually-hidden">{t('conversationViewTooltip')}</h2>
@@ -183,10 +195,45 @@ export const ConversationsList = ({
         <p css={noResultsMessage}>{t('searchConversationsNoResult')}</p>
       )}
 
-      <ul css={conversationsList} data-uie-name="conversation-view">
-        {conversationsToDisplay.map((conversation, index) => (
-          <ConversationListCell key={conversation.id} {...getCommonConversationCellProps(conversation, index)} />
-        ))}
+      <ul
+        css={conversationsList}
+        data-uie-name="conversation-view"
+        ref={parentRef}
+        style={{
+          height: '100%',
+          overflow: 'auto',
+        }}
+      >
+        <div
+          style={{
+            height: `${rowVirtualizer.getTotalSize()}px`,
+            width: '100%',
+            position: 'relative',
+          }}
+        >
+          {rowVirtualizer.getVirtualItems().map(virtualItem => {
+            const conversation = conversationsToDisplay[virtualItem.index];
+
+            return (
+              <div
+                key={virtualItem.key}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: `${virtualItem.size}px`,
+                  transform: `translateY(${virtualItem.start}px)`,
+                }}
+              >
+                <ConversationListCell
+                  key={conversation.id}
+                  {...getCommonConversationCellProps(conversation, virtualItem.index)}
+                />
+              </div>
+            );
+          })}
+        </div>
       </ul>
 
       {isGroupParticipantsVisible && (
