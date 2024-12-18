@@ -564,7 +564,7 @@
   "conversationSomeone": "有人",
   "conversationStartNewConversation": "Create a Group",
   "conversationTeamLeft": "[bold]{name}[/bold] was removed from the team",
-  "conversationToday": "今天",
+  "conversationToday": "today",
   "conversationTweetAuthor": " 在推特上",
   "conversationUnableToDecrypt1": "有一個來自 {user} 的訊息未被接收。",
   "conversationUnableToDecrypt2": "{user} 的設備識別碼改變了，訊息無法送達。",

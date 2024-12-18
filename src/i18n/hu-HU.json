@@ -564,7 +564,7 @@
   "conversationSomeone": "Valaki",
   "conversationStartNewConversation": "Create a Group",
   "conversationTeamLeft": "[bold]{name}[/bold] eltávolítottuk a csapatból",
-  "conversationToday": "ma",
+  "conversationToday": "today",
   "conversationTweetAuthor": " Twitteren",
   "conversationUnableToDecrypt1": "Nem kaptál meg egy üzenetet tőle: {user}.",
   "conversationUnableToDecrypt2": "{user} eszközének azonosítója megváltozott. Kézbesítetlen üzenet.",

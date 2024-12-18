@@ -564,7 +564,7 @@
   "conversationSomeone": "شخص ما",
   "conversationStartNewConversation": "Create a Group",
   "conversationTeamLeft": "[bold]{name}[/bold] was removed from the team",
-  "conversationToday": "اليوم",
+  "conversationToday": "today",
   "conversationTweetAuthor": " على تويتر",
   "conversationUnableToDecrypt1": "رسالة من {user} لم تُستقبل.",
   "conversationUnableToDecrypt2": "[highlight]{user}[/highlight]´s device identity changed. Undelivered message.",

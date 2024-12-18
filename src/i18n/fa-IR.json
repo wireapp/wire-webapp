@@ -564,7 +564,7 @@
   "conversationSomeone": "شخصی",
   "conversationStartNewConversation": "Create a Group",
   "conversationTeamLeft": "[bold]{name}[/bold] was removed from the team",
-  "conversationToday": "امروز",
+  "conversationToday": "today",
   "conversationTweetAuthor": " در توییتر",
   "conversationUnableToDecrypt1": "یک پیام از {user} دریافت نشد.",
   "conversationUnableToDecrypt2": "هویت دستگاه {user} تغییر یافته است. پیام تحویل داده نشده است.",

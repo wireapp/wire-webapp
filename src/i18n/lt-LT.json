@@ -564,7 +564,7 @@
   "conversationSomeone": "Kažkas",
   "conversationStartNewConversation": "Create a Group",
   "conversationTeamLeft": "[bold]{name}[/bold] buvo pašalintas (-a) iš komandos",
-  "conversationToday": "šiandien",
+  "conversationToday": "today",
   "conversationTweetAuthor": " socialiniame tinkle Twitter",
   "conversationUnableToDecrypt1": "žinutė nuo {user} nebuvo gauta.",
   "conversationUnableToDecrypt2": "Pasikeitė {user} įrenginio tapatybė. Žinutė nepristatyta.",

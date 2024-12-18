@@ -17,9 +17,26 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {
+  BOLD_ITALIC_STAR,
+  BOLD_STAR,
+  CODE,
+  HEADING,
+  INLINE_CODE,
+  ITALIC_STAR,
+  ORDERED_LIST,
+  STRIKETHROUGH,
+  UNORDERED_LIST,
+} from '@lexical/markdown';
 
-export const wrapperStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-};
+export const markdownTransformers = [
+  UNORDERED_LIST,
+  CODE,
+  HEADING,
+  ORDERED_LIST,
+  BOLD_ITALIC_STAR,
+  BOLD_STAR,
+  INLINE_CODE,
+  ITALIC_STAR,
+  STRIKETHROUGH,
+];

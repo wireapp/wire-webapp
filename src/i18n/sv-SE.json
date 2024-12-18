@@ -564,7 +564,7 @@
   "conversationSomeone": "Någon",
   "conversationStartNewConversation": "Skapa en grupp",
   "conversationTeamLeft": "[bold]{name}[/bold] togs bort från teamet",
-  "conversationToday": "idag",
+  "conversationToday": "today",
   "conversationTweetAuthor": " på Twitter",
   "conversationUnableToDecrypt1": "Ett meddelande från {user} tog inte emot.",
   "conversationUnableToDecrypt2": "{user}\"s enhetsidentitet ändrades. Icke levererat meddelande.",

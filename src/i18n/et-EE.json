@@ -564,7 +564,7 @@
   "conversationSomeone": "Keegi",
   "conversationStartNewConversation": "Create a Group",
   "conversationTeamLeft": "[bold]{name}[/bold] eemaldati meeskonnast",
-  "conversationToday": "täna",
+  "conversationToday": "today",
   "conversationTweetAuthor": " Twitteris",
   "conversationUnableToDecrypt1": "Sõnumit kasutajalt [highlight]{user}[/highlight] ei võetud vastu.",
   "conversationUnableToDecrypt2": "[highlight]{user}[/highlight] seadme identiteet muutus. Sõnumit ei saadetud.",

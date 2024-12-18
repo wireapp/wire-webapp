@@ -564,7 +564,7 @@
   "conversationSomeone": "Netko",
   "conversationStartNewConversation": "Create a Group",
   "conversationTeamLeft": "[bold]{name}[/bold] je uklonjen iz tima",
-  "conversationToday": "danas",
+  "conversationToday": "today",
   "conversationTweetAuthor": " na Twitteru",
   "conversationUnableToDecrypt1": "Poruka od [highlight]{user}[/highlight] nije zaprimljena.",
   "conversationUnableToDecrypt2": "Identitet [highlight]{user}[/highlight] uređaja je promjenjen. Poruka nije dostavljena.",

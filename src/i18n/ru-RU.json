@@ -564,7 +564,7 @@
   "conversationSomeone": "Кто-то",
   "conversationStartNewConversation": "Создать группу",
   "conversationTeamLeft": "[bold]{name}[/bold] был удален из команды",
-  "conversationToday": "сегодня",
+  "conversationToday": "today",
   "conversationTweetAuthor": " в Twitter",
   "conversationUnableToDecrypt1": "Сообщение от [highlight]{user}[/highlight] не было получено.",
   "conversationUnableToDecrypt2": "Идентификатор устройства [highlight]{user}[/highlight] изменился. Сообщение не доставлено.",

@@ -564,7 +564,7 @@
   "conversationSomeone": "Někdo",
   "conversationStartNewConversation": "Create a Group",
   "conversationTeamLeft": "[bold]{name}[/bold] was removed from the team",
-  "conversationToday": "dnes",
+  "conversationToday": "today",
   "conversationTweetAuthor": " na Twittru",
   "conversationUnableToDecrypt1": "zpráva od uživatele {user} nebyla přijata.",
   "conversationUnableToDecrypt2": "Identita uživatele {user} se změnila. Zpráva nedoručena.",

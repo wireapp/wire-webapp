@@ -564,7 +564,7 @@
   "conversationSomeone": "Хтось",
   "conversationStartNewConversation": "Create a Group",
   "conversationTeamLeft": "[bold]{name}[/bold] був(-ла) видалений(-а) з команди",
-  "conversationToday": "сьогодні",
+  "conversationToday": "today",
   "conversationTweetAuthor": " в Twitter",
   "conversationUnableToDecrypt1": "Повідомлення від [highlight]{user}[/highlight] не отримане.",
   "conversationUnableToDecrypt2": "Ідентифікатор пристрою [highlight]{user}[/highlight] змінився. Повідомлення не доставлене.",

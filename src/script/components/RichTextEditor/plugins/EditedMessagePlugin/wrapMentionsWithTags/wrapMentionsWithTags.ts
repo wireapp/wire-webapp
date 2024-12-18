@@ -17,9 +17,17 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+/**
+ * Wraps mentions in a given text with a <mention> tag.
+ * It's useful cause it sets the mentions apart from the rest of the text.
+ * Thanks to that, we can differentiate them from the rest of the text, and render them as MentionNodes.
+ */
+export const wrapMentionsWithTags = (text: string, allMentions: string[]): string => {
+  if (!allMentions.length) {
+    return text;
+  }
 
-export const wrapperStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
+  const mentionRegex = new RegExp(`(${allMentions.join('|')})`, 'g');
+
+  return text.replace(mentionRegex, '<mention>$1</mention>');
 };

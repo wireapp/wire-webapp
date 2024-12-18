@@ -564,7 +564,7 @@
   "conversationSomeone": "Birisi",
   "conversationStartNewConversation": "Create a Group",
   "conversationTeamLeft": "[bold]{name}[/bold] ekipten çıkarıldı",
-  "conversationToday": "bugün",
+  "conversationToday": "today",
   "conversationTweetAuthor": " Twitter’da",
   "conversationUnableToDecrypt1": "{user}’den gelen bir mesaj alınamadı.",
   "conversationUnableToDecrypt2": "{user}’nin cihaz kimliği değişti. Teslim edilmemiş mesaj.",
