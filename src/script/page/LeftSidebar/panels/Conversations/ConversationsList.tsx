@@ -24,6 +24,7 @@ import React, {
   useState,
   MutableRefObject,
   useCallback,
+  useRef,
 } from 'react';
 
 import {useVirtualizer} from '@tanstack/react-virtual';
@@ -173,10 +174,8 @@ export const ConversationsList = ({
     (isFolderView && currentFolder?.conversations().filter(conversationSearchFilter(conversationsFilter))) || [];
   const conversationsToDisplay = filteredConversations.length ? filteredConversations : conversations;
 
-  // The scrollable element for your list
-  const parentRef = React.useRef(null);
+  const parentRef = useRef(null);
 
-  // The virtualizer
   const rowVirtualizer = useVirtualizer({
     count: conversationsToDisplay.length,
     getScrollElement: () => parentRef.current,
