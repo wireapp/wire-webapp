@@ -23,7 +23,7 @@ import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 
 import {UrlUtil, StringUtil, Runtime} from '@wireapp/commons';
-import {Button, ButtonVariant, ContainerXS, H1, Muted, QUERY, useMatchMedia, useTimeout} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, ContainerXS, Muted, QUERY, Text, useMatchMedia, useTimeout} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/LocalizerUtil';
 
@@ -82,9 +82,9 @@ const ClientManagerComponent = ({doGetAllClients, doLogout}: Props & ConnectedPr
           marginInline: isMobile ? '20px' : 'auto',
         }}
       >
-        <H1 center style={{marginTop: '1rem'}}>
+        <Text center block style={{marginTop: '1rem', fontSize: '1.5rem', fontWeight: '500'}}>
           {t('clientManager.headline')}
-        </H1>
+        </Text>
         <Muted
           center
           style={{

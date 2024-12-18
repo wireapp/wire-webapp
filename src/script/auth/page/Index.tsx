@@ -76,6 +76,11 @@ const IndexComponent = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps
     return <Navigate to={ROUTE.LOGIN} />;
   }
 
+  // TODO: add condition for api version and FF
+  if (true) {
+    return <Navigate to={ROUTE.SSO} />;
+  }
+
   return (
     <Page withSideBar>
       <ContainerXS centerText verticalCenter style={{width: '380px'}}>
@@ -96,7 +101,6 @@ const IndexComponent = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps
         >
           {t('index.welcome', {brandName: Config.getConfig().BACKEND_NAME})}
         </Text>
-
         {!getWebEnvironment().isProduction && isDataDogEnabled() && (
           <Text
             block
@@ -116,7 +120,6 @@ const IndexComponent = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps
             />
           </Text>
         )}
-
         {features.ENABLE_ACCOUNT_REGISTRATION && (
           <Button
             type="button"

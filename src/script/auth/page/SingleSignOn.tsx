@@ -27,7 +27,6 @@ import {useParams} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 
 import {
-  ArrowIcon,
   COLOR,
   Column,
   Columns,
@@ -55,10 +54,8 @@ import {SingleSignOnForm} from './SingleSignOnForm';
 
 import {Config} from '../../Config';
 import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
-import {RouterLink} from '../component/RouterLink';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
-import {ROUTE} from '../route';
 
 type Props = React.HTMLAttributes<HTMLDivElement>;
 
@@ -186,12 +183,6 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
     ssoWindowRef.current?.focus();
   };
 
-  const backArrow = (
-    <RouterLink to={ROUTE.INDEX} data-uie-name="go-login">
-      <ArrowIcon direction="left" color={COLOR.TEXT} />
-    </RouterLink>
-  );
-
   return (
     <Page withSideBar>
       {isOverlayOpen && (
@@ -226,12 +217,8 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
           </Container>
         </Overlay>
       )}
-      {!hasDefaultSSOCode && (
-        <IsMobile>
-          <div style={{margin: 16}}>{backArrow}</div>
-        </IsMobile>
-      )}
-      <Container centerText verticalCenter style={{width: '100%'}}>
+
+      <Container centerText verticalCenter style={{width: '100%', padding: '1rem'}}>
         {isTablet && (
           <LogoFullIcon
             aria-hidden="true"
@@ -244,11 +231,7 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
         <AppAlreadyOpen />
         <Columns>
           <IsMobile not>
-            <Column style={{display: 'flex'}}>
-              {!hasDefaultSSOCode && (
-                <div style={{margin: 'auto', marginTop: '1.25rem', marginRight: '0px'}}>{backArrow}</div>
-              )}
-            </Column>
+            <Column style={{display: 'flex'}} />
           </IsMobile>
           <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
             <ContainerXS

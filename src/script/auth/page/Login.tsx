@@ -43,7 +43,6 @@ import {
   ContainerXS,
   FlexBox,
   Form,
-  H2,
   IsMobile,
   Label,
   Link,
@@ -411,14 +410,16 @@ const LoginComponent = ({
               >
                 {twoFactorLoginData ? (
                   <div>
-                    <H2 center>{t('login.twoFactorLoginTitle')}</H2>
-                    <Text data-uie-name="label-with-email">
+                    <Text fontSize="1.5rem" css={{fontWeight: '500'}} center block>
+                      {t('login.twoFactorLoginTitle')}
+                    </Text>
+                    <Text data-uie-name="label-with-email" fontSize="1rem">
                       {t('login.twoFactorLoginSubHead', {email: twoFactorLoginData.email as string})}
                     </Text>
                     <Label markInvalid={!!twoFactorSubmitError}>
                       <CodeInput
                         disabled={isFetching}
-                        style={{marginTop: 60}}
+                        style={{marginTop: '1rem'}}
                         onCodeComplete={submitTwoFactorLogin}
                         data-uie-name="enter-code"
                       />
@@ -426,7 +427,7 @@ const LoginComponent = ({
                     <div style={{display: 'flex', justifyContent: 'center', marginTop: 10}}>
                       {!!twoFactorSubmitError && parseError(twoFactorSubmitError)}
                     </div>
-                    <div style={{marginTop: 20}}>
+                    <div style={{marginTop: '1rem'}}>
                       {isSendingTwoFactorCode ? (
                         <Loading size={20} />
                       ) : (
@@ -439,7 +440,7 @@ const LoginComponent = ({
                       <Button
                         disabled={!!twoFactorSubmitError || isFetching}
                         type="submit"
-                        css={{marginTop: 65}}
+                        css={{marginTop: '1rem'}}
                         onClick={() => handleSubmit({...twoFactorLoginData, verificationCode}, [])}
                       >
                         {t('login.submitTwoFactorButton')}
