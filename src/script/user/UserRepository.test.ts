@@ -252,7 +252,7 @@ describe('UserRepository', () => {
       beforeEach(async () => {
         [userRepository, {userState, userService}] = await buildUserRepository();
         jest.resetAllMocks();
-        jest.spyOn(userService, 'loadUserFromDb').mockResolvedValue(localUsers);
+        jest.spyOn(userService, 'loadUsersFromDb').mockResolvedValue(localUsers);
         const selfUser = new User('self');
         selfUser.isMe = true;
         userState.self(selfUser);
@@ -294,7 +294,7 @@ describe('UserRepository', () => {
           {id: userIds[1].id, availability: Availability.Type.BUSY},
         ];
 
-        jest.spyOn(userRepository['userService'], 'loadUserFromDb').mockResolvedValue(partialUsers as any);
+        jest.spyOn(userRepository['userService'], 'loadUsersFromDb').mockResolvedValue(partialUsers as any);
         const fetchUserSpy = jest.spyOn(userService, 'getUsers').mockResolvedValue({found: localUsers});
 
         await userRepository.loadUsers(new User('self'), connections, [], []);
