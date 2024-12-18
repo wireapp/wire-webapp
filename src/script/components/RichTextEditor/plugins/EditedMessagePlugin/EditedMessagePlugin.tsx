@@ -51,7 +51,7 @@ export function EditedMessagePlugin({message}: Props): null {
 
           const mentionNodes = getMentionNodesFromMessage(message);
 
-          const allowedMentions = mentionNodes.map(node => node.getTextContent());
+          const allowedMentions = [...new Set(mentionNodes.map(node => node.getTextContent()))];
 
           const wrappedWithTags = wrapMentionsWithTags(messageContent, allowedMentions);
 
