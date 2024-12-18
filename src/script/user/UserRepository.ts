@@ -337,7 +337,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
       const dbUser = await this.userService.loadUserFromDb(userId);
 
       if (dbUser && dbUser.name) {
-        user.name = dbUser?.name;
+        user.name = dbUser.name;
       }
     }
 
