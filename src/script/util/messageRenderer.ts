@@ -19,10 +19,9 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import MarkdownIt from 'markdown-it';
-import Prism from 'prismjs';
-import 'prismjs/components/prism-javascript';
 import {escape} from 'underscore';
 
+import {highlightCode, languages} from './highlightCode';
 import {replaceInRange} from './StringUtil';
 
 import type {MentionEntity} from '../message/MentionEntity';
@@ -181,11 +180,11 @@ export const renderMessage = (message: string, selfId?: QualifiedId, mentionEnti
         return escape(code);
       }
 
-      if (lang && Prism.languages[lang]) {
-        return Prism.highlight(code, Prism.languages[lang], lang);
+      if (lang && languages[lang]) {
+        return highlightCode({code, grammar: languages[lang], lang});
       }
 
-      return Prism.highlight(code, Prism.languages.javascript, 'javascript');
+      return highlightCode({code, grammar: languages.javascript, lang: 'javascript'});
     },
   });
 
