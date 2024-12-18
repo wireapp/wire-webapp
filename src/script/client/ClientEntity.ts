@@ -30,9 +30,9 @@ import {ClientRecord} from '../storage';
 export const MLSPublicKeys = {
   ed25519: 'ED25519',
   ed448: 'ED448',
-  ecdsa_secp521r1_sha512: 'EDCSA_SECP521R1_SHA512',
-  ecdsa_secp384r1_sha384: 'EDCSA_SECP384R1_SHA384',
-  ecdsa_secp256r1_sha256: 'EDCSA_SECP256R1_SHA256',
+  ecdsa_secp521r1_sha512: 'P521',
+  ecdsa_secp384r1_sha384: 'P384',
+  ecdsa_secp256r1_sha256: 'P256',
 } as const;
 
 export const isKnownSignature = (signature: unknown): signature is keyof typeof MLSPublicKeys =>
