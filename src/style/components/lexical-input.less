@@ -182,11 +182,22 @@
   text-decoration: line-through;
 }
 
-.editor-code {
+.editor-inline-code {
   display: inline-block;
   padding: 2px 4px;
   border-radius: 4px;
   background: var(--foreground-fade-8);
+}
+
+.editor-code {
+  display: inline-block;
+  overflow: auto;
+  max-width: var(--conversation-message-asset-width);
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--foreground-fade-8);
+  font-size: var(--font-size-small);
+  text-overflow: unset;
 }
 
 .editor-list {
@@ -216,4 +227,166 @@
   &--3 {
     font-size: var(--font-size-base);
   }
+}
+
+// Lexical code highlighting
+
+// Prism One Light Theme - based on node_modules/prism-themes/themes/prism-one-light.css
+body.theme-default {
+  --token-atrule: hsl(35, 99%, 36%);
+  --token-attr: hsl(119, 34%, 47%);
+  --token-boolean: hsl(35, 99%, 36%);
+  --token-builtin: hsl(119, 34%, 47%);
+  --token-cdata: hsl(230, 4%, 64%);
+  --token-char: hsl(119, 34%, 47%);
+  --token-class: hsl(35, 99%, 36%);
+  --token-class-name: hsl(35, 99%, 36%);
+  --token-comment: hsl(230, 4%, 64%);
+  --token-constant: hsl(35, 99%, 36%);
+  --token-deleted: hsl(5, 74%, 59%);
+  --token-doctype: hsl(230, 8%, 24%);
+  --token-entity: hsl(230, 8%, 24%);
+  --token-function: hsl(221, 87%, 60%);
+  --token-important: hsl(5, 74%, 59%);
+  --token-inserted: hsl(119, 34%, 47%);
+  --token-keyword: hsl(301, 63%, 40%);
+  --token-number: hsl(35, 99%, 36%);
+  --token-operator: hsl(221, 87%, 60%);
+  --token-prolog: hsl(230, 4%, 64%);
+  --token-property: hsl(5, 74%, 59%);
+  --token-punctuation: hsl(230, 8%, 24%);
+  --token-regex: hsl(119, 34%, 47%);
+  --token-selector: hsl(119, 34%, 47%);
+  --token-string: hsl(119, 34%, 47%);
+  --token-symbol: hsl(5, 74%, 59%);
+  --token-tag: hsl(5, 74%, 59%);
+  --token-url: hsl(198, 99%, 37%);
+  --token-variable: hsl(221, 87%, 60%);
+}
+
+// Prism One Dark Theme - based on node_modules/prism-themes/themes/prism-one-dark.css
+body.theme-dark {
+  --token-atrule: hsl(286, 60%, 67%);
+  --token-attr: hsl(95, 38%, 62%);
+  --token-boolean: hsl(29, 54%, 61%);
+  --token-builtin: hsl(95, 38%, 62%);
+  --token-cdata: hsl(220, 10%, 40%);
+  --token-char: hsl(95, 38%, 62%);
+  --token-class: hsl(29, 54%, 61%);
+  --token-class-name: hsl(29, 54%, 61%);
+  --token-comment: hsl(220, 10%, 40%);
+  --token-constant: hsl(29, 54%, 61%);
+  --token-deleted: hsl(355, 65%, 65%);
+  --token-doctype: hsl(220, 14%, 71%);
+  --token-entity: hsl(220, 14%, 71%);
+  --token-function: hsl(187, 47%, 55%);
+  --token-important: hsl(286, 60%, 67%);
+  --token-inserted: hsl(95, 38%, 62%);
+  --token-keyword: hsl(286, 60%, 67%);
+  --token-number: hsl(29, 54%, 61%);
+  --token-operator: hsl(286, 60%, 67%);
+  --token-prolog: hsl(220, 10%, 40%);
+  --token-property: hsl(220, 14%, 71%);
+  --token-punctuation: hsl(220, 14%, 71%);
+  --token-regex: hsl(95, 38%, 62%);
+  --token-selector: hsl(355, 65%, 65%);
+  --token-string: hsl(95, 38%, 62%);
+  --token-symbol: hsl(355, 65%, 65%);
+  --token-tag: hsl(355, 65%, 65%);
+  --token-url: hsl(95, 38%, 62%);
+  --token-variable: hsl(207, 82%, 66%);
+}
+
+// Token classes, should match the theme config in RichTextEditor.tsx
+.editor-tokenAtrule {
+  color: var(--token-atrule);
+}
+
+.editor-tokenAttr {
+  color: var(--token-attr);
+}
+
+.editor-tokenBoolean {
+  color: var(--token-boolean);
+}
+.editor-tokenBuiltin {
+  color: var(--token-builtin);
+}
+.editor-tokenCdata {
+  color: var(--token-cdata);
+}
+.editor-tokenChar {
+  color: var(--token-char);
+}
+.editor-tokenClass {
+  color: var(--token-class);
+}
+.editor-tokenClassName {
+  color: var(--token-class-name);
+}
+.editor-tokenComment {
+  color: var(--token-comment);
+}
+.editor-tokenConstant {
+  color: var(--token-constant);
+}
+.editor-tokenDeleted {
+  color: var(--token-deleted);
+}
+.editor-tokenDoctype {
+  color: var(--token-doctype);
+}
+.editor-tokenEntity {
+  color: var(--token-entity);
+}
+.editor-tokenFunction {
+  color: var(--token-function);
+}
+.editor-tokenImportant {
+  color: var(--token-important);
+}
+.editor-tokenInserted {
+  color: var(--token-inserted);
+}
+.editor-tokenNamespace {
+  opacity: 0.7;
+}
+.editor-tokenKeyword {
+  color: var(--token-keyword);
+}
+.editor-tokenNumber {
+  color: var(--token-number);
+}
+.editor-tokenOperator {
+  color: var(--token-operator);
+}
+.editor-tokenProlog {
+  color: var(--token-prolog);
+}
+.editor-tokenProperty {
+  color: var(--token-property);
+}
+.editor-tokenPunctuation {
+  color: var(--token-punctuation);
+}
+.editor-tokenRegex {
+  color: var(--token-regex);
+}
+.editor-tokenSelector {
+  color: var(--token-selector);
+}
+.editor-tokenString {
+  color: var(--token-string);
+}
+.editor-tokenSymbol {
+  color: var(--token-symbol);
+}
+.editor-tokenTag {
+  color: var(--token-tag);
+}
+.editor-tokenUrl {
+  color: var(--token-url);
+}
+.editor-tokenVariable {
+  color: var(--token-variable);
 }

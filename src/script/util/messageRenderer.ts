@@ -18,8 +18,9 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import hljs from 'highlight.js';
 import MarkdownIt from 'markdown-it';
+import Prism from 'prismjs';
+import 'prismjs/components/prism-javascript';
 import {escape} from 'underscore';
 
 import {replaceInRange} from './StringUtil';
@@ -179,7 +180,12 @@ export const renderMessage = (message: string, selfId?: QualifiedId, mentionEnti
         // highlighting will be wrong anyway because this is not valid code
         return escape(code);
       }
-      return hljs.highlightAuto(code, lang ? [lang] : undefined).value;
+
+      if (lang && Prism.languages[lang]) {
+        return Prism.highlight(code, Prism.languages[lang], lang);
+      }
+
+      return Prism.highlight(code, Prism.languages.javascript, 'javascript');
     },
   });
 

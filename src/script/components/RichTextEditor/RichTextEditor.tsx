@@ -46,6 +46,7 @@ import {FormatToolbar} from './components/FormatToolbar/FormatToolbar';
 import {EmojiNode} from './nodes/EmojiNode';
 import {MentionNode} from './nodes/MentionNode';
 import {AutoFocusPlugin} from './plugins/AutoFocusPlugin';
+import {CodeHighlightPlugin} from './plugins/CodeHighlightPlugin/CodeHighlightPlugin';
 import {DraftStatePlugin} from './plugins/DraftStatePlugin';
 import {EditedMessagePlugin} from './plugins/EditedMessagePlugin/EditedMessagePlugin';
 import {EmojiPickerPlugin} from './plugins/EmojiPickerPlugin';
@@ -72,7 +73,7 @@ const theme = {
     italic: 'editor-italic',
     underline: 'editor-underline',
     strikethrough: 'editor-strikethrough',
-    code: 'editor-code',
+    code: 'editor-inline-code',
   },
   list: {
     ul: 'editor-list editor-list--unordered',
@@ -82,6 +83,39 @@ const theme = {
     h1: 'editor-heading editor-heading--1',
     h2: 'editor-heading editor-heading--2',
     h3: 'editor-heading editor-heading--3',
+  },
+  code: 'editor-code',
+  codeHighlight: {
+    atrule: 'editor-tokenAtrule',
+    attr: 'editor-tokenAttr',
+    boolean: 'editor-tokenBoolean',
+    builtin: 'editor-tokenBuiltin',
+    cdata: 'editor-tokenCdata',
+    char: 'editor-tokenChar',
+    class: 'editor-tokenClass',
+    'class-name': 'editor-tokenClassName',
+    comment: 'editor-tokenComment',
+    constant: 'editor-tokenConstant',
+    deleted: 'editor-tokenDeleted',
+    doctype: 'editor-tokenDoctype',
+    entity: 'editor-tokenEntity',
+    function: 'editor-tokenFunction',
+    important: 'editor-tokenImportant',
+    inserted: 'editor-tokenInserted',
+    keyword: 'editor-tokenKeyword',
+    namespace: 'editor-tokenNamespace',
+    number: 'editor-tokenNumber',
+    operator: 'editor-tokenOperator',
+    prolog: 'editor-tokenProlog',
+    property: 'editor-tokenProperty',
+    punctuation: 'editor-tokenPunctuation',
+    regex: 'editor-tokenRegex',
+    selector: 'editor-tokenSelector',
+    string: 'editor-tokenString',
+    symbol: 'editor-tokenSymbol',
+    tag: 'editor-tokenTag',
+    url: 'editor-tokenUrl',
+    variable: 'editor-tokenVariable',
   },
 };
 
@@ -218,7 +252,7 @@ export const RichTextEditor = ({
 
           <ReplaceCarriageReturnPlugin />
           <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
-
+          <CodeHighlightPlugin />
           <RichTextPlugin
             contentEditable={<ContentEditable className="conversation-input-bar-text" data-uie-name="input-message" />}
             placeholder={<Placeholder text={placeholder} hasLocalEphemeralTimer={hasLocalEphemeralTimer} />}
