@@ -290,8 +290,16 @@ describe('UserRepository', () => {
         const userIds = localUsers.map(user => user.qualified_id!);
         const connections = createConnections(localUsers);
         const partialUsers = [
-          {id: userIds[0].id, availability: Availability.Type.AVAILABLE},
-          {id: userIds[1].id, availability: Availability.Type.BUSY},
+          {
+            id: userIds[0].id,
+            availability: Availability.Type.AVAILABLE,
+            qualified_id: userIds[0],
+          },
+          {
+            id: userIds[1].id,
+            availability: Availability.Type.BUSY,
+            qualified_id: userIds[1],
+          },
         ];
 
         jest.spyOn(userRepository['userService'], 'loadUsersFromDb').mockResolvedValue(partialUsers as any);
