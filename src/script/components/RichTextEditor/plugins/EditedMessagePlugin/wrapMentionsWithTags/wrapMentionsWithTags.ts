@@ -27,7 +27,8 @@ export const wrapMentionsWithTags = (text: string, allMentions: string[]): strin
     return text;
   }
 
-  const mentionRegex = new RegExp(`(${allMentions.join('|')})`, 'g');
-
-  return text.replace(mentionRegex, '<mention>$1</mention>');
+  return allMentions.reduce(
+    (updatedText, mention) => updatedText.split(mention).join(`<mention>${mention}</mention>`),
+    text,
+  );
 };
