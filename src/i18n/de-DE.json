@@ -564,7 +564,7 @@
   "conversationSomeone": "Jemand",
   "conversationStartNewConversation": "Eine Gruppe erstellen",
   "conversationTeamLeft": "[bold]{name}[/bold] wurde aus dem Team entfernt",
-  "conversationToday": "Heute",
+  "conversationToday": "today",
   "conversationTweetAuthor": " auf Twitter",
   "conversationUnableToDecrypt1": "Eine Nachricht von [highlight]{user}[/highlight] wurde nicht empfangen.",
   "conversationUnableToDecrypt2": "[highlight]{users}s[/highlight] Geräte-Identität hat sich geändert. Nachricht kann nicht entschlüsselt werden.",

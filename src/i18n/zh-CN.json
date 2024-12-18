@@ -564,7 +564,7 @@
   "conversationSomeone": "某人",
   "conversationStartNewConversation": "Create a Group",
   "conversationTeamLeft": "[bold]{name}[/bold] 已从团队删除",
-  "conversationToday": "今天",
+  "conversationToday": "today",
   "conversationTweetAuthor": " 在 Twitter 上",
   "conversationUnableToDecrypt1": "一条来自 {user} 的消息未被接收。",
   "conversationUnableToDecrypt2": "{user} 的设备指纹已改变。该消息未送达。",
