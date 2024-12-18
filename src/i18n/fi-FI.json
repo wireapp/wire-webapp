@@ -564,7 +564,7 @@
   "conversationSomeone": "Joku",
   "conversationStartNewConversation": "Create a Group",
   "conversationTeamLeft": "[bold]{name}[/bold] was removed from the team",
-  "conversationToday": "tänään",
+  "conversationToday": "today",
   "conversationTweetAuthor": " Twitterissä",
   "conversationUnableToDecrypt1": "Käyttäjän {user} viesti ei tullut perille.",
   "conversationUnableToDecrypt2": "Käyttäjän {user} laitteen identiteetti muuttui. Viestiä ei toimitettu.",

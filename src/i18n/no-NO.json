@@ -564,7 +564,7 @@
   "conversationSomeone": "Noen",
   "conversationStartNewConversation": "Create a Group",
   "conversationTeamLeft": "[bold]{name}[/bold] was removed from the team",
-  "conversationToday": "i dag",
+  "conversationToday": "today",
   "conversationTweetAuthor": " på Twitter",
   "conversationUnableToDecrypt1": "A message from [highlight]{user}[/highlight] was not received.",
   "conversationUnableToDecrypt2": "[highlight]{user}[/highlight]´s device identity changed. Undelivered message.",

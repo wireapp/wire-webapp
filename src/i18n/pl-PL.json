@@ -564,7 +564,7 @@
   "conversationSomeone": "Ktoś",
   "conversationStartNewConversation": "Create a Group",
   "conversationTeamLeft": "[bold]{name}[/bold] was removed from the team",
-  "conversationToday": "dzisiaj",
+  "conversationToday": "today",
   "conversationTweetAuthor": " na Twitterze",
   "conversationUnableToDecrypt1": "wiadomość od {user} nie została dostarczona.",
   "conversationUnableToDecrypt2": "Użytkownik {user} zmienił urządzenie. Wiadomość nie została dostarczona.",

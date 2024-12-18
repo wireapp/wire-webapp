@@ -564,7 +564,7 @@
   "conversationSomeone": "誰か",
   "conversationStartNewConversation": "Create a Group",
   "conversationTeamLeft": "[bold]{name}[/bold] はチームから削除されました",
-  "conversationToday": "今日",
+  "conversationToday": "today",
   "conversationTweetAuthor": " はツイッターにいます",
   "conversationUnableToDecrypt1": "{user} からのメッセージが受信されませんでした",
   "conversationUnableToDecrypt2": "{user} のデバイスIDが変更されました。メッセージは配信されません。",

@@ -564,7 +564,7 @@
   "conversationSomeone": "Nekdo",
   "conversationStartNewConversation": "Create a Group",
   "conversationTeamLeft": "[bold]{name}[/bold] was removed from the team",
-  "conversationToday": "danes",
+  "conversationToday": "today",
   "conversationTweetAuthor": " na Twitterju",
   "conversationUnableToDecrypt1": "sporočilo od {user} ni bilo prejeto.",
   "conversationUnableToDecrypt2": "Identita naprave od {user} je bila spremenjena. Sporočilo ni dostavljeno.",

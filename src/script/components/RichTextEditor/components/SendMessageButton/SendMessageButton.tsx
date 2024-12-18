@@ -25,13 +25,14 @@ import {t} from 'Util/LocalizerUtil';
 interface SendMessageButtonProps {
   disabled?: boolean;
   onSend: () => void;
+  className?: string;
 }
 
-export const SendMessageButton = ({disabled, onSend}: SendMessageButtonProps) => {
+export const SendMessageButton = ({disabled, onSend, className}: SendMessageButtonProps) => {
   return (
     <button
       type="button"
-      className={cx('controls-right-button controls-right-button--send')}
+      className={cx('controls-right-button controls-right-button--send', className)}
       disabled={disabled}
       title={t('tooltipConversationSendMessage')}
       aria-label={t('tooltipConversationSendMessage')}
