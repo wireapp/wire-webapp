@@ -13,7 +13,7 @@
     "@wireapp/avs": "10.0.4",
     "@wireapp/avs-debugger": "0.0.7",
     "@wireapp/commons": "5.4.0",
-    "@wireapp/core": "46.15.4",
+    "@wireapp/core": "46.15.5",
     "@wireapp/react-ui-kit": "9.28.1",
     "@wireapp/store-engine-dexie": "2.1.15",
     "@wireapp/telemetry": "0.1.4",

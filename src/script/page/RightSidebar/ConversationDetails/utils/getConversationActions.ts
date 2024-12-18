@@ -173,7 +173,7 @@ const getConversationActions = ({
         click: () => actionsViewModel.removeConversation(conversationEntity),
         Icon: Icon.CloseIcon,
         identifier: 'do-remove',
-        label: t('conversationDetailsActionRemove'),
+        label: t('conversationDetailsActionDeleteForMe'),
       },
     },
   ];
