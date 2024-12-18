@@ -409,9 +409,9 @@
   display: grid;
   padding-left: var(--input-bar-avatar-spacing);
   grid-template-areas:
-    'avatar input'
-    'buttons buttons';
-  grid-template-columns: calc(var(--input-bar-avatar-size) + var(--input-bar-avatar-spacing)) 1fr;
+    'avatar input input'
+    'avatar buttons buttons';
+  grid-template-columns: calc(var(--input-bar-avatar-size) + var(--input-bar-avatar-spacing)) 1fr 1fr;
   row-gap: 8px;
 
   @media (min-width: 900px) {
@@ -419,18 +419,19 @@
   }
 
   &--with-toolbar {
+    padding-bottom: 8px;
     grid-template-areas:
-      'toolbar toolbar'
-      'avatar input'
-      'buttons buttons';
-    grid-template-columns: calc(var(--input-bar-avatar-size) + var(--input-bar-avatar-spacing)) 1fr;
+      'toolbar toolbar toolbar'
+      'avatar input input'
+      'avatar buttons buttons';
+    grid-template-columns: calc(var(--input-bar-avatar-size) + var(--input-bar-avatar-spacing)) 1fr 1fr;
     grid-template-rows: auto auto;
     row-gap: 0;
 
     @media (min-width: 1050px) {
       grid-template-areas:
-        'avatar input'
-        'toolbar buttons';
+        'avatar input input'
+        'avatar toolbar buttons';
     }
   }
 }
@@ -452,14 +453,17 @@
 }
 
 .input-bar-buttons {
-  width: 100%;
-  height: 100%;
-  max-height: var(--conversation-input-min-height);
+  display: flex;
+  height: 40px;
   align-items: center;
   margin-top: auto;
-  margin-bottom: 0;
+  margin-bottom: 0px;
   margin-left: auto !important;
   grid-area: buttons;
+
+  &__send {
+    margin-bottom: 8px;
+  }
 
   @media (min-width: 900px) {
     width: auto;
@@ -467,5 +471,31 @@
 
   @media (min-width: 1050px) {
     margin-left: 0;
+  }
+}
+
+.input-bar-container .input-bar-buttons__list {
+  padding-bottom: 8px;
+}
+
+.input-bar-container--with-toolbar .input-bar-buttons__send {
+  margin-bottom: 0px;
+}
+
+.input-bar-container--with-toolbar .input-bar-buttons__list {
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
+.input-bar-toolbar {
+  display: flex;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  margin: 12px 0 0 auto;
+  grid-area: toolbar;
+
+  @media (min-width: 1050px) {
+    margin: 0 auto 0 0;
   }
 }

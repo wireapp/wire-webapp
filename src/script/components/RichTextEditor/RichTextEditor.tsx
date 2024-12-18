@@ -22,7 +22,7 @@ import {ReactElement, useRef} from 'react';
 import {CodeHighlightNode, CodeNode} from '@lexical/code';
 import {LinkNode} from '@lexical/link';
 import {ListItemNode, ListNode} from '@lexical/list';
-import {$convertToMarkdownString, TRANSFORMERS} from '@lexical/markdown';
+import {$convertToMarkdownString} from '@lexical/markdown';
 import {ClearEditorPlugin} from '@lexical/react/LexicalClearEditorPlugin';
 import {InitialConfigType, LexicalComposer} from '@lexical/react/LexicalComposer';
 import {ContentEditable} from '@lexical/react/LexicalContentEditable';
@@ -52,9 +52,12 @@ import {EmojiPickerPlugin} from './plugins/EmojiPickerPlugin';
 import {GlobalEventsPlugin} from './plugins/GlobalEventsPlugin';
 import {HistoryPlugin} from './plugins/HistoryPlugin';
 import {findAndTransformEmoji, ReplaceEmojiPlugin} from './plugins/InlineEmojiReplacementPlugin';
+import {ListItemTabIndentationPlugin} from './plugins/ListIndentationPlugin/ListIndentationPlugin';
+import {ListMaxIndentLevelPlugin} from './plugins/ListMaxIndentLevelPlugin/ListMaxIndentLevelPlugin';
 import {MentionsPlugin} from './plugins/MentionsPlugin';
 import {ReplaceCarriageReturnPlugin} from './plugins/ReplaceCarriageReturnPlugin/ReplaceCarriageReturnPlugin';
 import {SendPlugin} from './plugins/SendPlugin';
+import {markdownTransformers} from './utils/markdownTransformers';
 
 import {MentionEntity} from '../../message/MentionEntity';
 
@@ -75,8 +78,13 @@ const theme = {
     code: 'editor-code',
   },
   list: {
-    ul: 'editor-list editor-list--unordered',
-    ol: 'editor-list editor-list--ordered',
+    ul: 'editor-list editor-list-unordered',
+    ol: 'editor-list editor-list-ordered',
+    listitem: 'editor-list__item',
+    nested: {
+      listitem: 'editor-list__item--nested',
+    },
+    olDepth: ['editor-list-ordered--1', 'editor-list-ordered--2', 'editor-list-ordered--3'],
   },
   heading: {
     h1: 'editor-heading editor-heading--1',
@@ -187,7 +195,7 @@ export const RichTextEditor = ({
         return;
       }
 
-      const markdown = $convertToMarkdownString(TRANSFORMERS);
+      const markdown = $convertToMarkdownString(markdownTransformers);
 
       onUpdate({
         text: replaceEmojis ? findAndTransformEmoji(markdown) : markdown,
@@ -210,14 +218,15 @@ export const RichTextEditor = ({
           />
           <DraftStatePlugin loadDraftState={loadDraftState} />
           <EditedMessagePlugin message={editedMessage} />
-
+          <ListItemTabIndentationPlugin />
+          <ListMaxIndentLevelPlugin maxDepth={3} />
           <EmojiPickerPlugin openStateRef={emojiPickerOpen} />
           <HistoryPlugin />
           <ListPlugin />
           {replaceEmojis && <ReplaceEmojiPlugin />}
 
           <ReplaceCarriageReturnPlugin />
-          <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
+          <MarkdownShortcutPlugin transformers={markdownTransformers} />
 
           <RichTextPlugin
             contentEditable={<ContentEditable className="conversation-input-bar-text" data-uie-name="input-message" />}
@@ -242,7 +251,11 @@ export const RichTextEditor = ({
           />
         </div>
       </div>
-      {showFormatToolbar && <FormatToolbar />}
+      {showFormatToolbar && (
+        <div className="input-bar-toolbar">
+          <FormatToolbar />
+        </div>
+      )}
       {children}
     </LexicalComposer>
   );
