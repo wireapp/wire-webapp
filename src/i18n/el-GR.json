@@ -564,7 +564,7 @@
   "conversationSomeone": "Κάποιος",
   "conversationStartNewConversation": "Create a Group",
   "conversationTeamLeft": "[bold]{name}[/bold] was removed from the team",
-  "conversationToday": "σήμερα",
+  "conversationToday": "today",
   "conversationTweetAuthor": " στο Twitter",
   "conversationUnableToDecrypt1": "ένα μήνυμα από τον {user} δεν παρελήφθη.",
   "conversationUnableToDecrypt2": "{user}´ς η ταυτότητα συσκευής άλλαξε. Ανεπίδοτο μήνυμα.",

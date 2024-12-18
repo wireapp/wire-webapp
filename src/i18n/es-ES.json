@@ -564,7 +564,7 @@
   "conversationSomeone": "Alguien",
   "conversationStartNewConversation": "Create a Group",
   "conversationTeamLeft": "[bold]{name}[/bold] fue removido del equipo",
-  "conversationToday": "hoy",
+  "conversationToday": "today",
   "conversationTweetAuthor": " en Twitter",
   "conversationUnableToDecrypt1": "un mensaje de {user} no se ha recibido.",
   "conversationUnableToDecrypt2": "La identidad del dispositivo de {user} ha cambiado. Mensaje no entregado.",
