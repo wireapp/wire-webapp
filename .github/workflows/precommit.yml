@@ -82,9 +82,17 @@ jobs:
         with:
           name: 'build-artifact'
 
+      - name: Check if deploy is necessary
+        id: check_deploy
+        if: ${{ always() }}
+        run: |
+          if [[ ${{ needs.build.outputs.total_additions }} -le 100 || "${{ github.actor }}" == "dependabot[bot]" ]]; then
+            echo "Skipping deployment"
+            exit 0
+            fi
+
       - name: Deploy to precommit environment
         id: deploy
-        if: ${{ needs.build.outputs.total_additions > 100 && github.actor != 'dependabot[bot]' }}
         uses: einaregilsson/beanstalk-deploy@v22
         with:
           application_name: Webapp

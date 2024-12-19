@@ -85,27 +85,34 @@ pipeline {
         }
       }
         }
-
-    stage('Check GitHub Action Status') {
-        when { expression { BRANCH_NAME ==~ /PR-[0-9]+/ } }
-        steps {
+        stage('Check GitHub Action Status') {
+          when { expression { BRANCH_NAME ==~ /PR-[0-9]+/ } }
+          steps {
             timeout(time: 15, unit: 'MINUTES') {
-          script {
-            def commit_hash = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
-            final String apiUrl = 'https://api.github.com/repos/wireapp/wire-webapp/actions/workflows/128602012/runs'
-            final String curlCmd = "curl -u \${CREDENTIALS} ${apiUrl}"
-            waitUntil {
-              final String output = sh(label: 'Check workflow', returnStdout: true, script: curlCmd)
-              final Object jsonData = readJSON(text: output)
-              final List workflowRuns = jsonData['workflow_runs']
-              echo("Looking for hash ${commit_hash}")
+              script {
+                def commit_hash = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
+                final String apiUrl = 'https://api.github.com/repos/wireapp/wire-webapp/actions/workflows/128602012/runs'
+                final String curlCmd = "curl -u \${CREDENTIALS} ${apiUrl}"
+                waitUntil {
+                  final String output = sh(label: 'Check workflow', returnStdout: true, script: curlCmd)
+                  final Object jsonData = readJSON(text: output)
+                  final List workflowRuns = jsonData['workflow_runs']
+                  echo("Looking for hash ${commit_hash}")
 
-              return workflowRuns.any { run -> checkWorkflowRun(run, commit_hash) }
+                  return workflowRuns.any { run -> 
+                    def result = checkWorkflowRun(run, commit_hash)
+                    if (run['conclusion'] == 'cancelled') {
+                      echo("GitHub Action was cancelled. Ending Jenkins pipeline.")
+                      return true
+                    }
+                    
+                    return result
+                  }
+                }
+              }
             }
           }
-            }
         }
-    }
 
     stage('Check deployment') {
         steps {
