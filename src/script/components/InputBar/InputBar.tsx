@@ -621,6 +621,7 @@ export const InputBar = ({
                   onUpdate={setMessageContent}
                   hasLocalEphemeralTimer={hasLocalEphemeralTimer}
                   showFormatToolbar={formatToolbar.open}
+                  showMarkdownPreview={false}
                   saveDraftState={saveDraft}
                   loadDraftState={loadDraft}
                   onShiftTab={onShiftTab}

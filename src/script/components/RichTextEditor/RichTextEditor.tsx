@@ -22,7 +22,6 @@ import {ReactElement, useRef} from 'react';
 import {CodeHighlightNode, CodeNode} from '@lexical/code';
 import {LinkNode} from '@lexical/link';
 import {ListItemNode, ListNode} from '@lexical/list';
-import {$convertToMarkdownString} from '@lexical/markdown';
 import {ClearEditorPlugin} from '@lexical/react/LexicalClearEditorPlugin';
 import {InitialConfigType, LexicalComposer} from '@lexical/react/LexicalComposer';
 import {ContentEditable} from '@lexical/react/LexicalContentEditable';
@@ -57,6 +56,7 @@ import {ListMaxIndentLevelPlugin} from './plugins/ListMaxIndentLevelPlugin/ListM
 import {MentionsPlugin} from './plugins/MentionsPlugin';
 import {ReplaceCarriageReturnPlugin} from './plugins/ReplaceCarriageReturnPlugin/ReplaceCarriageReturnPlugin';
 import {SendPlugin} from './plugins/SendPlugin';
+import {TextChangePlugin} from './plugins/TextChangePlugin';
 import {markdownTransformers} from './utils/markdownTransformers';
 
 import {MentionEntity} from '../../message/MentionEntity';
@@ -107,6 +107,7 @@ interface RichTextEditorProps {
   children: ReactElement;
   hasLocalEphemeralTimer: boolean;
   showFormatToolbar: boolean;
+  showMarkdownPreview: boolean;
   getMentionCandidates: (search?: string | null) => User[];
   saveDraftState: (editor: string) => void;
   loadDraftState: () => Promise<DraftState>;
@@ -172,6 +173,7 @@ export const RichTextEditor = ({
   replaceEmojis,
   editedMessage,
   showFormatToolbar,
+  showMarkdownPreview,
   onUpdate,
   saveDraftState,
   loadDraftState,
@@ -190,17 +192,24 @@ export const RichTextEditor = ({
   const handleChange = (editorState: EditorState) => {
     saveDraftState(JSON.stringify(editorState.toJSON()));
 
-    editorState.read(() => {
-      if (!editorRef.current) {
-        return;
-      }
+    // editorState.read(() => {
+    //   if (!editorRef.current) {
+    //     return;
+    //   }
 
-      const markdown = $convertToMarkdownString(markdownTransformers);
+    //   const markdown = $convertToMarkdownString(markdownTransformers);
 
-      onUpdate({
-        text: replaceEmojis ? findAndTransformEmoji(markdown) : markdown,
-        mentions: parseMentions(editorRef.current!, markdown, getMentionCandidates()),
-      });
+    //   onUpdate({
+    //     text: replaceEmojis ? findAndTransformEmoji(markdown) : markdown,
+    //     mentions: parseMentions(editorRef.current!, markdown, getMentionCandidates()),
+    //   });
+    // });
+  };
+
+  const parseUpdatedText = (editor: LexicalEditor, textValue: string) => {
+    onUpdate({
+      text: replaceEmojis ? findAndTransformEmoji(textValue) : textValue,
+      mentions: parseMentions(editor, textValue, getMentionCandidates()),
     });
   };
 
@@ -217,16 +226,21 @@ export const RichTextEditor = ({
             }}
           />
           <DraftStatePlugin loadDraftState={loadDraftState} />
-          <EditedMessagePlugin message={editedMessage} />
-          <ListItemTabIndentationPlugin />
-          <ListMaxIndentLevelPlugin maxDepth={3} />
+          <EditedMessagePlugin message={editedMessage} showMarkdownPreview={showMarkdownPreview} />
           <EmojiPickerPlugin openStateRef={emojiPickerOpen} />
           <HistoryPlugin />
           <ListPlugin />
           {replaceEmojis && <ReplaceEmojiPlugin />}
 
           <ReplaceCarriageReturnPlugin />
-          <MarkdownShortcutPlugin transformers={markdownTransformers} />
+
+          {showMarkdownPreview && (
+            <>
+              <ListItemTabIndentationPlugin />
+              <ListMaxIndentLevelPlugin maxDepth={3} />
+              <MarkdownShortcutPlugin transformers={markdownTransformers} />
+            </>
+          )}
 
           <RichTextPlugin
             contentEditable={<ContentEditable className="conversation-input-bar-text" data-uie-name="input-message" />}
@@ -241,7 +255,7 @@ export const RichTextEditor = ({
           />
 
           <OnChangePlugin onChange={handleChange} ignoreSelectionChange />
-
+          <TextChangePlugin onUpdate={parseUpdatedText} />
           <SendPlugin
             onSend={() => {
               if (!mentionsOpen.current && !emojiPickerOpen.current) {
