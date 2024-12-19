@@ -18,10 +18,10 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import hljs from 'highlight.js';
 import MarkdownIt from 'markdown-it';
 import {escape} from 'underscore';
 
+import {highlightCode, languages} from './highlightCode';
 import {replaceInRange} from './StringUtil';
 
 import type {MentionEntity} from '../message/MentionEntity';
@@ -179,7 +179,12 @@ export const renderMessage = (message: string, selfId?: QualifiedId, mentionEnti
         // highlighting will be wrong anyway because this is not valid code
         return escape(code);
       }
-      return hljs.highlightAuto(code, lang ? [lang] : undefined).value;
+
+      if (lang && languages[lang]) {
+        return highlightCode({code, grammar: languages[lang], lang});
+      }
+
+      return highlightCode({code, grammar: languages.javascript, lang: 'javascript'});
     },
   });
 
