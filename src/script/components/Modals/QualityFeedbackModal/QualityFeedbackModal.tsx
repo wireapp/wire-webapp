@@ -66,7 +66,7 @@ export const QualityFeedbackModal = () => {
     return null;
   }
 
-  const handleCloseModal = (skipNotification = false) => {
+  const handleCloseModal = ({skipNotification = false} = {}) => {
     if (!selfUser) {
       setQualityFeedbackModalShown(false);
       return;
@@ -105,7 +105,7 @@ export const QualityFeedbackModal = () => {
       [Segmentation.CALL.QUALITY_REVIEW_LABEL]: RatingListLabel.DISMISSED,
     });
 
-    handleCloseModal(true);
+    handleCloseModal({skipNotification: true});
   };
 
   return (
