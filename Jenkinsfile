@@ -102,8 +102,10 @@ pipeline {
                   return workflowRuns.any { run -> 
                     def result = checkWorkflowRun(run, commit_hash)
                     if (run['conclusion'] == 'cancelled') {
-                      error("GitHub Action was cancelled. Aborting Jenkins pipeline.")
+                      echo("GitHub Action was cancelled. Ending Jenkins pipeline.")
+                      return true
                     }
+                    
                     return result
                   }
                 }

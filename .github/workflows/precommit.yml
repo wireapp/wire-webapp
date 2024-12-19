@@ -84,7 +84,12 @@ jobs:
 
       - name: Deploy to precommit environment
         id: deploy
-        if: ${{ needs.build.outputs.total_additions > 100 && github.actor != 'dependabot[bot]' }}
+        if: ${{ always() }}
+        run: |
+          if [[ ${{ needs.build.outputs.total_additions }} -le 100 || "${{ github.actor }}" == "dependabot[bot]" ]]; then
+            echo "Skipping deployment"
+            exit 0
+          fi
         uses: einaregilsson/beanstalk-deploy@v22
         with:
           application_name: Webapp
