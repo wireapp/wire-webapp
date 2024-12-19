@@ -41,28 +41,6 @@ export const videoControlInActiveStyles = css`
   }
 `;
 
-export const paginationButtonStyles: CSSObject = {
-  ['& svg > path']: {
-    fill: 'var(--main-color)',
-  },
-  ['&:focus-visible']: {
-    ['& svg > path']: {
-      fill: 'var(--accent-color)',
-    },
-    outline: '1px solid var(--accent-color-focus)',
-  },
-  ['&:not([disabled]):hover svg > path']: {
-    fill: 'var(--accent-color)',
-  },
-  ['&:disabled svg > path']: {
-    fill: 'var(--disabled-call-button-svg)',
-  },
-  display: 'flex',
-  alignItems: 'center',
-  cursor: 'pointer',
-  height: '100%',
-};
-
 export const videoTopBarStyles: CSSObject = {
   display: 'grid',
   gridTemplateColumns: '1fr auto 1fr',
@@ -77,10 +55,4 @@ export const headerActionsWrapperStyles: CSSObject = {
   width: 'fit-content',
   marginLeft: 'auto',
   padding: '0 6px',
-};
-
-export const paginationWrapperStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: '10px',
 };

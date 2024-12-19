@@ -20,6 +20,7 @@
 import {css, CSSObject} from '@emotion/react';
 
 export const videoControlsWrapperStyles: CSSObject = {
+  position: 'relative',
   display: 'flex',
   alignItems: 'center',
   padding: '8px 16px',
@@ -51,6 +52,30 @@ export const hangUpVideoControlStyles: CSSObject = {
   '@media (min-width: 640px)': {
     marginRight: 'auto',
   },
+};
+
+export const menuMoreInteractionsVideoControlStyles: CSSObject = {
+  display: 'flex',
+  flexDirection: 'column',
+  width: 'max-content',
+  position: 'absolute',
+  top: '-10px',
+  right: 0,
+  transform: 'translateY(-100%)',
+  padding: '8px 0',
+  borderRadius: '12px',
+  backgroundColor: 'var(--app-bg-secondary)',
+  boxShadow: '0px 0px 12px 0px #00000040',
+};
+
+export const menuMoreInteractionsButtonStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  padding: '8px',
+};
+
+export const menuMoreInteractionsIconStyles: CSSObject = {
+  marginRight: '8px',
 };
 
 export const videoControlActiveStyles = css`

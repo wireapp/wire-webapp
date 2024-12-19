@@ -23,7 +23,7 @@ import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation/
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {container} from 'tsyringe';
 
-import {Checkbox, CheckboxLabel, IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
+import {Checkbox, CheckboxLabel, IconButton, IconButtonVariant, QUERY} from '@wireapp/react-ui-kit';
 
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
@@ -43,15 +43,12 @@ import {CallingParticipantList} from './CallingCell/CallIngParticipantList';
 import {Duration} from './Duration';
 import {
   videoControlInActiveStyles,
-  paginationButtonStyles,
   classifiedBarStyles,
   headerActionsWrapperStyles,
-  paginationWrapperStyles,
   videoTopBarStyles,
 } from './FullscreenVideoCall.styles';
 import {GroupVideoGrid} from './GroupVideoGrid';
-import {Pagination} from './Pagination';
-import {useSyncCurrentRange} from './useSyncCurrentRange';
+import {Pagination} from './Pagination/Pagination';
 import {VideoControls} from './VideoControls/VideoControls';
 
 import type {Call} from '../../calling/Call';
@@ -91,8 +88,6 @@ export interface FullscreenVideoCallProps {
 }
 
 const LOCAL_STORAGE_KEY_FOR_SCREEN_SHARING_CONFIRM_MODAL = 'DO_NOT_ASK_AGAIN_FOR_SCREEN_SHARING_CONFIRM_MODAL';
-
-const DEFAULT_VISIBLE_DOTS = 5;
 
 const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   call,
@@ -194,47 +189,10 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     cameraStatus: t(selfSharesCamera ? 'cameraStatusOn' : 'cameraStatusOff'),
   });
 
+  const isMobile = useActiveWindowMatchMedia(QUERY.mobile);
+  const isPaginationVisible = !maximizedParticipant && activeCallViewTab === CallViewTab.ALL && totalPages > 1;
+
   const isModerator = selfUser && roles[selfUser.id] === DefaultConversationRoleName.WIRE_ADMIN;
-
-  const [currentStart, setCurrentStart] = useState(0);
-  const visibleDots = DEFAULT_VISIBLE_DOTS > totalPages ? totalPages : DEFAULT_VISIBLE_DOTS;
-
-  useSyncCurrentRange({
-    currentStart,
-    currentPage,
-    totalPages,
-    visibleDots,
-    setCurrentStart,
-  });
-
-  const handlePreviousPage = () => {
-    if (currentPage === 0) {
-      return;
-    }
-
-    const previousPage = currentPage - 1;
-
-    // previousPage !== 0 --> jest niepotrzebne prawdopodnie
-    if (previousPage === currentStart && previousPage !== 0) {
-      setCurrentStart(currentStart => currentStart - 1);
-    }
-
-    changePage(previousPage, call);
-  };
-
-  const handleNextPage = () => {
-    if (currentPage === totalPages - 1) {
-      return;
-    }
-
-    const nextPage = currentPage + 1;
-
-    if (nextPage === currentStart + visibleDots - 1 && nextPage !== totalPages - 1) {
-      setCurrentStart(currentStart => currentStart + 1);
-    }
-
-    changePage(nextPage, call);
-  };
 
   return (
     <div className="video-calling-wrapper">
@@ -282,49 +240,12 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
             )}
           </div>
           <div css={headerActionsWrapperStyles}>
-            {!maximizedParticipant && activeCallViewTab === CallViewTab.ALL && totalPages > 1 && (
-              <div css={paginationWrapperStyles}>
-                <button
-                  data-uie-name="pagination-previous"
-                  type="button"
-                  onClick={handlePreviousPage}
-                  onKeyDown={event => handleKeyDown(event, handlePreviousPage)}
-                  className="button-reset-default"
-                  disabled={currentPage === 0}
-                  css={{
-                    ...paginationButtonStyles,
-                    borderBottomRightRadius: 32,
-                    borderTopRightRadius: 32,
-                    left: 0,
-                  }}
-                >
-                  <Icon.ChevronRight css={{position: 'relative', right: 4, transform: 'rotateY(180deg)'}} />
-                </button>
-
-                <Pagination
-                  totalPages={totalPages}
-                  currentPage={currentPage}
-                  currentStart={currentStart}
-                  visibleDots={visibleDots}
-                />
-                <button
-                  data-uie-name="pagination-next"
-                  onClick={handleNextPage}
-                  onKeyDown={event => handleKeyDown(event, handleNextPage)}
-                  type="button"
-                  className="button-reset-default"
-                  disabled={currentPage === totalPages - 1}
-                  css={{
-                    ...paginationButtonStyles,
-                    borderBottomLeftRadius: 32,
-                    borderTopLeftRadius: 32,
-                    right: 0,
-                    marginRight: 14,
-                  }}
-                >
-                  <Icon.ChevronRight css={{left: 4, position: 'relative'}} />
-                </button>
-              </div>
+            {!isMobile && isPaginationVisible && (
+              <Pagination
+                totalPages={totalPages}
+                currentPage={currentPage}
+                onChangePage={newPage => changePage(newPage, call)}
+              />
             )}
 
             {isDetachedCallingFeatureEnabled() && viewMode !== CallingViewMode.DETACHED_WINDOW && (
@@ -368,6 +289,14 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
             />
           )}
         </div>
+
+        {isMobile && isPaginationVisible && (
+          <Pagination
+            totalPages={totalPages}
+            currentPage={currentPage}
+            onChangePage={newPage => changePage(newPage, call)}
+          />
+        )}
 
         {!isChoosingScreen && (
           <div id="video-controls" className="video-controls">
