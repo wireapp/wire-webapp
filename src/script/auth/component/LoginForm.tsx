@@ -20,6 +20,7 @@
 import React, {useRef, useState} from 'react';
 
 import {LoginData} from '@wireapp/api-client/lib/auth';
+import {useSearchParams} from 'react-router-dom';
 
 import {Button, Input, Loading} from '@wireapp/react-ui-kit';
 
@@ -27,6 +28,7 @@ import {t} from 'Util/LocalizerUtil';
 import {isValidEmail, isValidUsername} from 'Util/ValidationUtil';
 
 import {ValidationError} from '../module/action/ValidationError';
+import {QUERY_KEY} from '../route';
 
 interface LoginFormProps {
   isFetching: boolean;
@@ -36,11 +38,13 @@ interface LoginFormProps {
 const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
   const emailInput = useRef<HTMLInputElement>(null);
   const passwordInput = useRef<HTMLInputElement>(null);
+  const [params] = useSearchParams();
+  const defaultEmail = params.get(QUERY_KEY.EMAIL);
 
   const [validEmailInput, setValidEmailInput] = useState(true);
   const [validPasswordInput, setValidPasswordInput] = useState(true);
 
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(decodeURIComponent(defaultEmail || ''));
   const [password, setPassword] = useState('');
 
   const handleSubmit = (event: React.FormEvent): void => {
@@ -97,6 +101,7 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
   return (
     <div>
       <Input
+        disabled={!!defaultEmail}
         id="email"
         name="email"
         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {

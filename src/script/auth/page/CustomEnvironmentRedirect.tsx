@@ -63,13 +63,9 @@ const CustomEnvironmentRedirectComponent = ({doNavigate, doSendNavigationEvent}:
   }, [destinationUrl]);
 
   return (
-    <Page>
+    <Page withSideBar>
       <FlexBox column>
-        <FlexBox
-          justify="center"
-          align="flex-end"
-          style={{backgroundColor: 'black', height: 216, marginBottom: 64, width: '100vw'}}
-        >
+        <FlexBox justify="center" align="flex-end" style={{marginBottom: 64, alignSelf: 'center'}}>
           <FlexBox
             justify="center"
             align="center"
@@ -83,7 +79,7 @@ const CustomEnvironmentRedirectComponent = ({doNavigate, doSendNavigationEvent}:
               width: 120,
             }}
           >
-            <LogoIcon aria-hidden="true" color={COLOR.WHITE} width={47} height={38} />
+            <LogoIcon aria-hidden="true" fill={COLOR.WHITE} color={COLOR.WHITE} width={47} height={38} />
             <svg
               aria-hidden="true"
               style={{position: 'absolute'}}
