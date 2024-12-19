@@ -1270,7 +1270,7 @@
   "preferencesAccountMarketingConsentDetail": "Receive news and product updates from {brandName} via email.",
   "preferencesAccountPrivacy": "Prywatność",
   "preferencesAccountReadReceiptsCheckbox": "Read receipts",
-  "preferencesAccountReadReceiptsDetail": "When this is off, you won’t be able to see read receipts from other people. This setting does not apply to group conversations.",
+  "preferencesAccountReadReceiptsDetail": "When this is on, others can see if you read their messages. In group conversations, the group admin can overwrite this setting.",
   "preferencesAccountResetAppLockPassphrase": "Reset app lock passcode",
   "preferencesAccountResetPassword": "Zresetuj hasło",
   "preferencesAccountSelectedLabel": "Selected",
