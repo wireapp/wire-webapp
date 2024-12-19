@@ -30,6 +30,7 @@ export const EventName = {
     RECEIVED_CALL: 'calling.received_call',
     SCREEN_SHARE: 'calling.screen_share',
     QUALITY_REVIEW: 'calling.call_quality_review',
+    PRESS_SPACE_TO_UNMUTE: 'calling.press_space_to_unmute',
   },
   CONTRIBUTED: 'contributed',
   E2EE: {

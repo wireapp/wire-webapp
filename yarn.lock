@@ -6224,10 +6224,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/webapp-events@npm:0.26.1":
-  version: 0.26.1
-  resolution: "@wireapp/webapp-events@npm:0.26.1"
-  checksum: 10/b1c3cdcaa96eb75f7b27ed116387c4751608fb08a3d2ff940274ee2c3f5a035abe3b9bbd7b9b7096fb102496813193fa766e6b4fc2c3df246c64f63282eacf23
+"@wireapp/webapp-events@npm:0.27.0":
+  version: 0.27.0
+  resolution: "@wireapp/webapp-events@npm:0.27.0"
+  checksum: 10/9767c3abdb4ba6012931b54f9d7f6008e172fc0d3696e00edee4aff4108838bb383a8d732499c56380a5ae8232f05568d4a0b1c0ff55d08badf80595267f15dc
   languageName: node
   linkType: hard
 
@@ -18793,7 +18793,7 @@ __metadata:
     "@wireapp/store-engine": "npm:5.1.11"
     "@wireapp/store-engine-dexie": "npm:2.1.15"
     "@wireapp/telemetry": "npm:0.1.4"
-    "@wireapp/webapp-events": "npm:0.26.1"
+    "@wireapp/webapp-events": "npm:0.27.0"
     amplify: "https://github.com/wireapp/amplify#head=master"
     archiver: "npm:7.0.1"
     autoprefixer: "npm:10.4.20"
