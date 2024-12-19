@@ -216,36 +216,26 @@ export class UserRepository extends TypedEventEmitter<Events> {
     // the entries we get back will be used to feed the availabilities of those users
     const nonQualifiedUsers = await this.userService.clearNonQualifiedUsers();
 
-    const dbUsers = await this.userService.loadUsersFromDb();
+    const dbUsers = await this.userService.loadUserFromDb();
 
     // The self user doesn't need to be re-fetched
     const usersToFetch = users.filter(user => !matchQualifiedIds(selfUser.qualifiedId, user));
 
     const {found, failed} = await this.fetchRawUsers(usersToFetch, selfUser.domain);
 
-    const usersWithAvailability = found.map(user => {
-      const localUser = dbUsers.find(
-        dbUser => dbUser.id === user.id || matchQualifiedIds(dbUser.qualified_id, user.qualified_id),
-      );
+    const userWithAvailability = found.map(user => {
+      const availability = [...dbUsers, ...nonQualifiedUsers].find(userRecord => userRecord.id === user.id);
 
-      const userWithAvailability = [...dbUsers, ...nonQualifiedUsers].find(userRecord => userRecord.id === user.id);
-
-      const userWithEscapedDefaultName = this.replaceDeletedUserNameWithNameInDb(user, localUser);
-
-      if (userWithAvailability) {
-        return {
-          availability: userWithAvailability.availability,
-          ...userWithEscapedDefaultName,
-        };
+      if (availability) {
+        return {availability: availability.availability, ...user};
       }
-
-      return userWithEscapedDefaultName;
+      return user;
     });
 
     // Save all new users to the database
-    await Promise.all(usersWithAvailability.map(user => this.saveUserInDb(user)));
+    await Promise.all(userWithAvailability.map(user => this.saveUserInDb(user)));
 
-    const mappedUsers = this.mapUserResponse(usersWithAvailability, failed, dbUsers);
+    const mappedUsers = this.mapUserResponse(userWithAvailability, failed, dbUsers);
 
     // Assign connections to users
     mappedUsers.forEach(user => {
@@ -333,14 +323,6 @@ export class UserRepository extends TypedEventEmitter<Events> {
    * Will update the user both in database and in memory.
    */
   private async updateUser(userId: QualifiedId, user: Partial<UserRecord>, isWebSocket = false): Promise<User> {
-    if (user.deleted && user.name) {
-      const dbUser = await this.userService.loadUserFromDb(userId);
-
-      if (dbUser && dbUser.name) {
-        user.name = dbUser.name;
-      }
-    }
-
     const selfUser = this.userState.self();
     const isSelfUser = matchQualifiedIds(userId, selfUser.qualifiedId);
     const userEntity = isSelfUser ? selfUser : await this.getUserById(userId);
@@ -593,19 +575,23 @@ export class UserRepository extends TypedEventEmitter<Events> {
   }
 
   // Replaces a deleted user name ("default") with the name from the local database.
-  private replaceDeletedUserNameWithNameInDb(user: APIClientUser, localUser?: UserRecord): UserRecord {
-    if (!user.deleted) {
+  private restoreDeletedUserNames(apiUsers: APIClientUser[], dbUsers: UserRecord[]): UserRecord[] {
+    return apiUsers.map(user => {
+      if (!user.deleted) {
+        return user;
+      }
+
+      const localUser = dbUsers.find(dbUser => dbUser.id === user.id);
+
+      if (localUser && localUser.name) {
+        return {
+          ...user,
+          name: localUser.name,
+        };
+      }
+
       return user;
-    }
-
-    if (localUser && localUser.name) {
-      return {
-        ...user,
-        name: localUser.name,
-      };
-    }
-
-    return {...user, name: t('deletedUser')};
+    });
   }
 
   private mapUserResponse(found: APIClientUser[], failed: QualifiedId[], dbUsers: UserRecord[]): User[] {
@@ -629,7 +615,9 @@ export class UserRepository extends TypedEventEmitter<Events> {
       return new User(userId.id, userId.domain);
     });
 
-    const mappedUsers = this.userMapper.mapUsersFromJson(found, selfDomain).concat(failedToLoad);
+    const users = this.restoreDeletedUserNames(found, dbUsers);
+
+    const mappedUsers = this.userMapper.mapUsersFromJson(users, selfDomain).concat(failedToLoad);
 
     if (this.teamState.isTeam()) {
       this.mapGuestStatus(mappedUsers);
@@ -645,7 +633,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
    */
   private async fetchUsers(userIds: QualifiedId[]): Promise<User[]> {
     const {found, failed} = await this.fetchRawUsers(userIds, this.userState.self().domain);
-    const dbUsers = await this.userService.loadUsersFromDb();
+    const dbUsers = await this.userService.loadUserFromDb();
     const users = this.mapUserResponse(found, failed, dbUsers);
 
     let fetchedUserEntities = this.saveUsers(users);
@@ -725,7 +713,6 @@ export class UserRepository extends TypedEventEmitter<Events> {
     if (localOnly) {
       const deletedUser = new User(userId.id, userId.domain);
       deletedUser.isDeleted = true;
-      deletedUser.name(t('deletedUser'));
       return deletedUser;
     }
     try {
