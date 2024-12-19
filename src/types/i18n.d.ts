@@ -1630,7 +1630,7 @@ declare module 'I18n/en-US.json' {
     'videoCallOverlayViewModeSpeakers': `Show active speakers only`;
     'videoCallParticipantConnecting': `Connecting...`;
     'videoCallParticipantLowerYourHand': `Lower your hand`;
-    'videoCallParticipantPressSpaceToUnmuteNotification': `Microphone temporarily on`;
+    'videoCallParticipantPressSpaceToUnmuteNotification': `Your microphone is on`;
     'videoCallParticipantRaiseYourHand': `Raise your hand`;
     'videoCallParticipantRaisedHandRaiseDuration': `Hand raised for {duration}`;
     'videoCallParticipantRaisedSelfHandUp': `You have raised your hand up`;

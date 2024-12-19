@@ -66,7 +66,7 @@ export const QualityFeedbackModal = () => {
     return null;
   }
 
-  const handleCloseModal = () => {
+  const handleCloseModal = (skipNotification = false) => {
     if (!selfUser) {
       setQualityFeedbackModalShown(false);
       return;
@@ -80,7 +80,10 @@ export const QualityFeedbackModal = () => {
 
       currentStorageData[selfUser.id] = isChecked ? null : dateUntilShowModal.getTime();
       localStorage.setItem(CALL_QUALITY_FEEDBACK_KEY, JSON.stringify(currentStorageData));
-      submittedNotification.show();
+
+      if (!skipNotification) {
+        submittedNotification.show();
+      }
     } catch (error) {
       logger.warn(`Can't send feedback: ${(error as Error).message}`);
     } finally {
@@ -102,7 +105,7 @@ export const QualityFeedbackModal = () => {
       [Segmentation.CALL.QUALITY_REVIEW_LABEL]: RatingListLabel.DISMISSED,
     });
 
-    handleCloseModal();
+    handleCloseModal(true);
   };
 
   return (
