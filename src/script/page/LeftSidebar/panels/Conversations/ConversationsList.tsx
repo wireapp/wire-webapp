@@ -41,7 +41,7 @@ import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {ConnectionRequests} from './ConnectionRequests';
 import {conversationsList, headingTitle, noResultsMessage} from './ConversationsList.styles';
-import {conversationSearchFilter, scrollToConversation} from './helpers';
+import {conversationSearchFilter} from './helpers';
 
 import {CallState} from '../../../../calling/CallState';
 import {ConversationState} from '../../../../conversation/ConversationState';
@@ -127,6 +127,19 @@ export const ConversationsList = ({
     listViewModel.contentViewModel.switchContent(ContentState.CONNECTION_REQUESTS);
   };
 
+  const isFolderView = currentTab === SidebarTabs.FOLDER;
+  const filteredConversations =
+    (isFolderView && currentFolder?.conversations().filter(conversationSearchFilter(conversationsFilter))) || [];
+  const conversationsToDisplay = filteredConversations.length ? filteredConversations : conversations;
+
+  const parentRef = useRef(null);
+
+  const rowVirtualizer = useVirtualizer({
+    count: conversationsToDisplay.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 56,
+  });
+
   const onConversationClick = useCallback(
     (conversation: Conversation) =>
       (event: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>) => {
@@ -164,23 +177,16 @@ export const ConversationsList = ({
 
   useEffect(() => {
     if (!conversationsFilter && clickedFilteredConversationId) {
-      scrollToConversation(clickedFilteredConversationId);
+      const conversationIndex = conversationsToDisplay.findIndex(conv => conv.id === clickedFilteredConversationId);
+
+      if (conversationIndex !== -1) {
+        rowVirtualizer.scrollToIndex(conversationIndex, {align: 'center'});
+      }
+
+      // scrollToConversation(clickedFilteredConversationId);
       setClickedFilteredConversationId(null);
     }
-  }, [conversationsFilter, clickedFilteredConversationId]);
-
-  const isFolderView = currentTab === SidebarTabs.FOLDER;
-  const filteredConversations =
-    (isFolderView && currentFolder?.conversations().filter(conversationSearchFilter(conversationsFilter))) || [];
-  const conversationsToDisplay = filteredConversations.length ? filteredConversations : conversations;
-
-  const parentRef = useRef(null);
-
-  const rowVirtualizer = useVirtualizer({
-    count: conversationsToDisplay.length,
-    getScrollElement: () => parentRef.current,
-    estimateSize: () => 56,
-  });
+  }, [conversationsFilter, clickedFilteredConversationId, conversationsToDisplay]);
 
   return (
     <>

@@ -51,6 +51,24 @@ jest.mock('axios', () => {
   };
 });
 
+class ResizeObserver {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+global.ResizeObserver = ResizeObserver;
+
+// Mock IntersectionObserver
+class IntersectionObserver {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+  takeRecords() {
+    return [];
+  }
+}
+global.IntersectionObserver = IntersectionObserver;
+
 window.TextEncoder = encoding.TextEncoder;
 window.TextDecoder = encoding.TextDecoder;
 
