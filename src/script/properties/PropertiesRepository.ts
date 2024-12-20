@@ -237,7 +237,6 @@ export class PropertiesRepository {
 
   savePreference(propertiesType: string, updatedPreference: any = true): void {
     if (updatedPreference !== this.getPreference(propertiesType)) {
-      console.log('SAVE PREFERENCE', propertiesType, updatedPreference);
       this.setPreference(propertiesType, updatedPreference);
 
       const savePromise = this.selfUser()?.isTemporaryGuest()
