@@ -71,6 +71,7 @@ jobs:
           echo "Found total additions: $total_additions"
           # Output for subsequent steps
           echo "total_additions=$total_additions" >> $GITHUB_OUTPUT
+          print "total_additions=$total_additions"
 
   deploy_to_aws:
     name: 'Deploy to live environments'
