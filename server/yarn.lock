@@ -900,6 +900,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/express-serve-static-core@npm:^5.0.0":
+  version: 5.0.0
+  resolution: "@types/express-serve-static-core@npm:5.0.0"
+  dependencies:
+    "@types/node": "npm:*"
+    "@types/qs": "npm:*"
+    "@types/range-parser": "npm:*"
+    "@types/send": "npm:*"
+  checksum: 10/fc40cdeae61113d8b2335f4b0f9334a7a64388a0931f2e98f8fc9bdadd0b13b501a70da14c256ae4aa140db49bd2eff75a99a683266d561e62540784a61dc489
+  languageName: node
+  linkType: hard
+
 "@types/express-sitemap-xml@npm:3.0.4":
   version: 3.0.4
   resolution: "@types/express-sitemap-xml@npm:3.0.4"
@@ -930,15 +942,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/express@npm:4.17.21":
-  version: 4.17.21
-  resolution: "@types/express@npm:4.17.21"
+"@types/express@npm:5.0.0":
+  version: 5.0.0
+  resolution: "@types/express@npm:5.0.0"
   dependencies:
     "@types/body-parser": "npm:*"
-    "@types/express-serve-static-core": "npm:^4.17.33"
+    "@types/express-serve-static-core": "npm:^5.0.0"
     "@types/qs": "npm:*"
     "@types/serve-static": "npm:*"
-  checksum: 10/7a6d26cf6f43d3151caf4fec66ea11c9d23166e4f3102edfe45a94170654a54ea08cf3103d26b3928d7ebcc24162c90488e33986b7e3a5f8941225edd5eb18c7
+  checksum: 10/45b199ab669caa33e6badafeebf078e277ea95042309d325a04b1ec498f33d33fd5a4ae9c8e358342367b178fe454d7323c5dfc8002bf27070b210a2c6cc11f0
   languageName: node
   linkType: hard
 
@@ -5669,7 +5681,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "wire-web-server@workspace:."
   dependencies:
-    "@types/express": "npm:4.17.21"
+    "@types/express": "npm:5.0.0"
     "@types/express-sitemap-xml": "npm:3.0.4"
     "@types/express-useragent": "npm:1.0.5"
     "@types/fs-extra": "npm:11.0.4"
