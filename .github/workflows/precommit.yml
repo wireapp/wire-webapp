@@ -65,7 +65,7 @@ jobs:
         id: check_additions
         run: |
           # Store response data in variable
-          response='${{ steps.pr_details.outputs.data }}'
+          response="${{ steps.pr_details.outputs.data }}"
           # Parse additions from response
           total_additions=$(echo "$response" | jq -r '.additions')
           echo "Found total additions: $total_additions"
