@@ -1337,6 +1337,8 @@ declare module 'I18n/en-US.json' {
     'preferencesOptionsEmojiReplaceDetail': `:-) → [icon]`;
     'preferencesOptionsEnableAgcCheckbox': `Automatic gain control (AGC)`;
     'preferencesOptionsEnableAgcDetails': `Enable to allow your microphone volume to be adjusted automatically to ensure all participants in a call are heard with similar and comfortable loudness.`;
+    'preferencesOptionsEnablePressSpaceToUnmute': `Press and hold to unmute`;
+    'preferencesOptionsEnablePressSpaceToUnmuteDetails': `Enable "Press and Hold to Unmute" by holding the space bar to temporarily unmute your microphone, re-muting automatically upon release.`;
     'preferencesOptionsEnableSoundlessIncomingCalls': `Silence other calls`;
     'preferencesOptionsEnableSoundlessIncomingCallsDetails': `Enable to silence incoming calls when you are already in an ongoing call.`;
     'preferencesOptionsEnableVbrCheckbox': `Variable Bit Rate Encoding`;
@@ -1629,6 +1631,7 @@ declare module 'I18n/en-US.json' {
     'videoCallOverlayViewModeSpeakers': `Show active speakers only`;
     'videoCallParticipantConnecting': `Connecting...`;
     'videoCallParticipantLowerYourHand': `Lower your hand`;
+    'videoCallParticipantPressSpaceToUnmuteNotification': `Your microphone is on`;
     'videoCallParticipantRaiseYourHand': `Raise your hand`;
     'videoCallParticipantRaisedHandRaiseDuration': `Hand raised for {duration}`;
     'videoCallParticipantRaisedSelfHandUp': `You have raised your hand up`;
