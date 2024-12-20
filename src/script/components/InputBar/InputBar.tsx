@@ -542,7 +542,10 @@ export const InputBar = ({
     };
   }, [pastedFile]);
 
-  const showMarkdownPreview = false;
+  const showMarkdownPreview = useUserPropertyValue<boolean>(
+    () => propertiesRepository.getPreference(PROPERTIES_TYPE.INTERFACE.MARKDOWN_PREVIEW),
+    WebAppEvents.PROPERTIES.UPDATE.INTERFACE.MARKDOWN_PREVIEW,
+  );
 
   const controlButtonsProps = {
     conversation: conversation,
