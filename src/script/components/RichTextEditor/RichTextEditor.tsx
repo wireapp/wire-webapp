@@ -22,6 +22,7 @@ import {ReactElement, useRef} from 'react';
 import {CodeHighlightNode, CodeNode} from '@lexical/code';
 import {LinkNode} from '@lexical/link';
 import {ListItemNode, ListNode} from '@lexical/list';
+import {$convertToMarkdownString} from '@lexical/markdown';
 import {ClearEditorPlugin} from '@lexical/react/LexicalClearEditorPlugin';
 import {InitialConfigType, LexicalComposer} from '@lexical/react/LexicalComposer';
 import {ContentEditable} from '@lexical/react/LexicalContentEditable';
@@ -30,11 +31,10 @@ import {LexicalErrorBoundary} from '@lexical/react/LexicalErrorBoundary';
 import {HorizontalRuleNode} from '@lexical/react/LexicalHorizontalRuleNode';
 import {ListPlugin} from '@lexical/react/LexicalListPlugin';
 import {MarkdownShortcutPlugin} from '@lexical/react/LexicalMarkdownShortcutPlugin';
-import {OnChangePlugin} from '@lexical/react/LexicalOnChangePlugin';
 import {RichTextPlugin} from '@lexical/react/LexicalRichTextPlugin';
 import {HeadingNode, QuoteNode} from '@lexical/rich-text';
 import cx from 'classnames';
-import {LexicalEditor, EditorState, $nodesOfType} from 'lexical';
+import {LexicalEditor, $nodesOfType} from 'lexical';
 
 import {DraftState} from 'Components/InputBar/util/DraftStateUtil';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
@@ -189,27 +189,20 @@ export const RichTextEditor = ({
   const emojiPickerOpen = useRef<boolean>(true);
   const mentionsOpen = useRef<boolean>(true);
 
-  const handleChange = (editorState: EditorState) => {
-    saveDraftState(JSON.stringify(editorState.toJSON()));
+  const handleUpdate = (editor: LexicalEditor, textValue: string) => {
+    saveDraftState(JSON.stringify(editor.toJSON()));
 
-    // editorState.read(() => {
-    //   if (!editorRef.current) {
-    //     return;
-    //   }
+    editor.read(() => {
+      if (!editorRef.current) {
+        return;
+      }
 
-    //   const markdown = $convertToMarkdownString(markdownTransformers);
+      const text = showMarkdownPreview ? $convertToMarkdownString(markdownTransformers) : textValue;
 
-    //   onUpdate({
-    //     text: replaceEmojis ? findAndTransformEmoji(markdown) : markdown,
-    //     mentions: parseMentions(editorRef.current!, markdown, getMentionCandidates()),
-    //   });
-    // });
-  };
-
-  const parseUpdatedText = (editor: LexicalEditor, textValue: string) => {
-    onUpdate({
-      text: replaceEmojis ? findAndTransformEmoji(textValue) : textValue,
-      mentions: parseMentions(editor, textValue, getMentionCandidates()),
+      onUpdate({
+        text: replaceEmojis ? findAndTransformEmoji(text) : text,
+        mentions: parseMentions(editorRef.current!, text, getMentionCandidates()),
+      });
     });
   };
 
@@ -254,8 +247,7 @@ export const RichTextEditor = ({
             openStateRef={mentionsOpen}
           />
 
-          <OnChangePlugin onChange={handleChange} ignoreSelectionChange />
-          <TextChangePlugin onUpdate={parseUpdatedText} />
+          <TextChangePlugin onUpdate={handleUpdate} />
           <SendPlugin
             onSend={() => {
               if (!mentionsOpen.current && !emojiPickerOpen.current) {
@@ -265,7 +257,7 @@ export const RichTextEditor = ({
           />
         </div>
       </div>
-      {showFormatToolbar && (
+      {showFormatToolbar && showMarkdownPreview && (
         <div className="input-bar-toolbar">
           <FormatToolbar />
         </div>

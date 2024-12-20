@@ -294,11 +294,7 @@ export class CallingViewModel {
         this.callingRepository.rejectCall(conversation.qualifiedId);
       },
       startAudio: async (conversationEntity: Conversation) => {
-        if (conversationEntity.isGroup() && !this.teamState.isConferenceCallingEnabled()) {
-          this.showRestrictedConferenceCallingModal();
-        } else {
-          await handleCallAction(conversationEntity, CALL_TYPE.NORMAL);
-        }
+        await handleCallAction(conversationEntity, CALL_TYPE.NORMAL);
       },
       startVideo: async (conversationEntity: Conversation) => {
         if (conversationEntity.isGroup() && !this.teamState.isConferenceCallingEnabled()) {
