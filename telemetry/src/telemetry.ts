@@ -121,6 +121,11 @@ interface InitializeConfig {
      */
     enableLogging?: boolean;
     /**
+     * Whether to track orientation (landscape/portrait)
+     * @default false
+     */
+    enableOrientationTracking?: boolean;
+    /**
      * Whether to require user consent before tracking data
      * @default true
      */
@@ -169,6 +174,7 @@ export const initialize = (config: InitializeConfig): void => {
   window.Countly.use_session_cookie = config.provider.useSessionCookie ?? false;
   window.Countly.storage = config.provider.storage ?? 'localstorage';
   window.Countly.require_consent = config.provider.requireConsent ?? true;
+  window.Countly.enable_orientation_tracking = config.provider.enableOrientationTracking ?? false;
 
   if (config.provider.autoSessionTracking) {
     window.Countly.q.push(['track_sessions']);

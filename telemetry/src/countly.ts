@@ -71,6 +71,8 @@ export interface Countly {
   ignore_visitor: boolean;
   // Pass true if you are implementing GDPR compatible consent management. This would prevent running any functionality without proper consent (default: false)
   require_consent: boolean;
+  // Pass false if you don't want to see orientation tracking event (default: true)
+  enable_orientation_tracking: boolean;
   // object instructing which UTM parameters to track (default: {"source":true, "medium":true, "campaign":true, "term":true, "content":true})
   utm: {[key: string]: boolean};
   // use cookies to track sessions (default: true)
