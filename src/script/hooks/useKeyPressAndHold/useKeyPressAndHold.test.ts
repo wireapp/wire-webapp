@@ -26,7 +26,7 @@ import {useKeyPressAndHold} from './useKeyPressAndHold';
 jest.useFakeTimers();
 
 describe('useKeyPressAndHold', () => {
-  const mockOnHold = jest.fn();
+  const mockOnHold = jest.fn().mockReturnValue(true);
   const mockOnRelease = jest.fn();
   const defaultProps = {
     key: KEY.SPACE,
@@ -67,20 +67,35 @@ describe('useKeyPressAndHold', () => {
     expect(mockOnRelease).toHaveBeenCalledTimes(1);
   });
 
-  it("doesn't trigger onHold if key is released before holdDelay", () => {
+  it('calls onRelease only when onHold returns true', () => {
     renderHook(() => useKeyPressAndHold(defaultProps));
 
     act(() => {
-      window.dispatchEvent(new KeyboardEvent('keydown', {key: KEY.SPACE}));
-    });
-
-    act(() => {
-      jest.advanceTimersByTime(100);
       window.dispatchEvent(new KeyboardEvent('keyup', {key: KEY.SPACE}));
     });
 
-    expect(mockOnHold).not.toHaveBeenCalled();
+    expect(mockOnRelease).not.toHaveBeenCalled();
+
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent('keydown', {key: KEY.SPACE}));
+      jest.advanceTimersByTime(200);
+      window.dispatchEvent(new KeyboardEvent('keyup', {key: KEY.SPACE}));
+    });
+
+    expect(mockOnHold).toHaveBeenCalledTimes(1);
     expect(mockOnRelease).toHaveBeenCalledTimes(1);
+  });
+
+  it("doesn't call onRelease only when onHold returns false", () => {
+    renderHook(() => useKeyPressAndHold({...defaultProps, onHold: jest.fn().mockReturnValue(false)}));
+
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent('keydown', {key: KEY.SPACE}));
+      jest.advanceTimersByTime(200);
+      window.dispatchEvent(new KeyboardEvent('keyup', {key: KEY.SPACE}));
+    });
+
+    expect(mockOnRelease).toHaveBeenCalledTimes(0);
   });
 
   it("doesn't respond to key events when disabled", () => {

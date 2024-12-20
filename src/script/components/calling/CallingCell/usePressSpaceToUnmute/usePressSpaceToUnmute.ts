@@ -61,11 +61,14 @@ export const usePressSpaceToUnmute = ({callState, toggleMute, isMuted, enabled}:
     holdDelayMs: HOLD_DELAY_MS,
     onHold: () => {
       if (!isMuted()) {
-        return;
+        return false;
       }
+
       toggleMute(false);
       micOnNotification.show();
       amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.PRESS_SPACE_TO_UNMUTE);
+
+      return true;
     },
     onRelease: () => {
       toggleMute(true);

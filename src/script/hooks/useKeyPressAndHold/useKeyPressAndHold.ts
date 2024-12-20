@@ -23,7 +23,7 @@ import {KEY} from 'Util/KeyboardUtil';
 
 interface KeyPressAndHoldParams {
   key: (typeof KEY)[keyof typeof KEY];
-  onHold: () => void;
+  onHold: () => boolean;
   onRelease: () => void;
   holdDelayMs: number;
   enabled?: boolean;
@@ -41,6 +41,7 @@ export const useKeyPressAndHold = ({
   const hasTriggeredRef = useRef(false);
   const holdTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isKeyDownRef = useRef(false);
+  const isPressHandledRef = useRef(false);
 
   const handlePress = useCallback(() => {
     if (holdTimeoutRef.current) {
@@ -52,8 +53,9 @@ export const useKeyPressAndHold = ({
         return;
       }
 
-      onHold();
+      const called = onHold();
       hasTriggeredRef.current = true;
+      isPressHandledRef.current = called;
     }, holdDelayMs);
   }, [onHold, holdDelayMs]);
 
@@ -66,8 +68,14 @@ export const useKeyPressAndHold = ({
 
   const handleRelease = useCallback(() => {
     clearHoldTimeout();
-    onRelease();
     hasTriggeredRef.current = false;
+
+    if (!isPressHandledRef.current) {
+      return;
+    }
+
+    onRelease();
+    isPressHandledRef.current = false;
   }, [onRelease, clearHoldTimeout]);
 
   const handleKeyDown = useCallback(
