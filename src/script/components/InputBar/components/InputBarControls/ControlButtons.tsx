@@ -41,6 +41,7 @@ export type ControlButtonsProps = {
   isFormatActive: boolean;
   isEmojiActive: boolean;
   showGiphyButton?: boolean;
+  showFormatButton: boolean;
   onClickPing: () => void;
   onSelectFiles: (files: File[]) => void;
   onSelectImages: (files: File[]) => void;
@@ -59,6 +60,7 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
   isFormatActive,
   isEmojiActive,
   showGiphyButton,
+  showFormatButton,
   onClickPing,
   onSelectFiles,
   onSelectImages,
@@ -67,8 +69,6 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
   onFormatClick,
   onEmojiClick,
 }) => {
-  const messageFormatButtonsEnabled = Config.getConfig().FEATURE.ENABLE_MESSAGE_FORMAT_BUTTONS;
-
   if (isEditing) {
     return (
       <li>
@@ -80,13 +80,13 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
   if (input.length === 0) {
     return (
       <>
-        {messageFormatButtonsEnabled && (
+        {showFormatButton && (
           <>
             <li>
               <FormatTextButton isActive={isFormatActive} onClick={onFormatClick} />
             </li>
             <li>
-              <EmojiButton isActive={isEmojiActive} onClick={onEmojiClick} />
+              <EmojiButton isActive={isEmojiActive} hasRoundedCorners={!showFormatButton} onClick={onEmojiClick} />
             </li>
           </>
         )}
@@ -95,7 +95,7 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
           <>
             <li>
               <ImageUploadButton
-                hasRoundedCorners={!messageFormatButtonsEnabled}
+                hasRoundedCorners={!showFormatButton}
                 onSelectImages={onSelectImages}
                 acceptedImageTypes={Config.getConfig().ALLOWED_IMAGE_TYPES}
               />
@@ -122,17 +122,17 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
     <>
       {showGiphyButton && !disableFilesharing && (
         <>
-          {messageFormatButtonsEnabled && (
+          {showFormatButton && (
             <>
               <li>
                 <FormatTextButton isActive={isFormatActive} onClick={onFormatClick} />
               </li>
               <li>
-                <EmojiButton isActive={isEmojiActive} onClick={onEmojiClick} />
+                <EmojiButton isActive={isEmojiActive} hasRoundedCorners={!showFormatButton} onClick={onEmojiClick} />
               </li>
             </>
           )}
-          <GiphyButton onGifClick={onGifClick} hasRoundedLeftCorner={!messageFormatButtonsEnabled} />
+          <GiphyButton onGifClick={onGifClick} hasRoundedLeftCorner={!showFormatButton} />
         </>
       )}
     </>
