@@ -64,10 +64,8 @@ jobs:
       - name: Check total PR additions
         id: check_additions
         run: |
-          # Store response data in variable
-          response='${{ steps.pr_details.outputs.data }}'
-          # Parse additions from response
-          total_additions=$(echo "$response" | jq -r '.additions')
+          # Parse additions directly from the response
+          total_additions=$(jq -r '.data.additions' <<< '${{ toJSON(steps.pr_details.outputs) }}')
           echo "Found total additions: $total_additions"
           # Output for subsequent steps
           echo "total_additions=$total_additions" >> $GITHUB_OUTPUT
