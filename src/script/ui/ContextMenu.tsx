@@ -23,6 +23,7 @@ import cx from 'classnames';
 import {createRoot, Root} from 'react-dom/client';
 
 import {Availability} from '@wireapp/protocol-messaging';
+import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
 import {IgnoreOutsideClickWrapper} from 'Components/InputBar/util/clickHandlers';
@@ -276,13 +277,15 @@ export const showContextMenu = ({
   activeWindow.document.body.appendChild(container);
   reactRoot = createRoot(container);
   reactRoot.render(
-    <ContextMenu
-      entries={entries}
-      defaultIdentifier={identifier}
-      posX={event.clientX}
-      posY={event.clientY}
-      resetMenuStates={resetMenuStates}
-      placeholder={placeholder}
-    />,
+    <StyledApp themeId={THEME_ID.DEFAULT}>
+      <ContextMenu
+        entries={entries}
+        defaultIdentifier={identifier}
+        posX={event.clientX}
+        posY={event.clientY}
+        resetMenuStates={resetMenuStates}
+        placeholder={placeholder}
+      />
+    </StyledApp>,
   );
 };

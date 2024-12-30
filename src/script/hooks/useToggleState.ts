@@ -22,5 +22,6 @@ import {useCallback, useState} from 'react';
 export const useToggleState = (initialState = false) => {
   const [state, setState] = useState(initialState);
   const toggle = useCallback(() => setState(currentState => !currentState), []);
+  console.log('stan', state);
   return [state, toggle] as const;
 };
