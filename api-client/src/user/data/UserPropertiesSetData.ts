@@ -46,6 +46,7 @@ export interface WebappProperties {
       font_size: string;
       theme: 'dark' | 'default';
       view_folders: boolean;
+      markdown_preview: boolean;
     };
     notifications: NotificationPreference;
     previews: {
