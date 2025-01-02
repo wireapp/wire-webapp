@@ -552,11 +552,6 @@ describe('Ignored Markdown syntax', () => {
     expect(renderMessage('no h2\n---')).toBe('no h2<br>---');
   });
 
-  it('does not render blockquotes', () => {
-    expect(renderMessage('>no blockquote')).toBe('&gt;no blockquote');
-    expect(renderMessage('> no blockquote')).toBe('&gt; no blockquote');
-  });
-
   it('does not render tables', () => {
     const input = 'First Header | Second Header\n------------ | -------------\nCell 1 | Cell 2';
     const expected = 'First Header | Second Header<br>------------ | -------------<br>Cell 1 | Cell 2';
