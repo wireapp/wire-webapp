@@ -4274,7 +4274,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lexical/code@npm:0.22, @lexical/code@npm:0.22.0":
+"@lexical/code@npm:0.22.0":
   version: 0.22.0
   resolution: "@lexical/code@npm:0.22.0"
   dependencies:
@@ -4321,7 +4321,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lexical/history@npm:0.22, @lexical/history@npm:0.22.0":
+"@lexical/history@npm:0.22.0":
   version: 0.22.0
   resolution: "@lexical/history@npm:0.22.0"
   dependencies:
@@ -4352,7 +4352,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lexical/list@npm:0.22, @lexical/list@npm:0.22.0":
+"@lexical/list@npm:0.22.0":
   version: 0.22.0
   resolution: "@lexical/list@npm:0.22.0"
   dependencies:
@@ -4372,7 +4372,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lexical/markdown@npm:0.22, @lexical/markdown@npm:0.22.0":
+"@lexical/markdown@npm:0.22.0":
   version: 0.22.0
   resolution: "@lexical/markdown@npm:0.22.0"
   dependencies:
@@ -4417,7 +4417,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lexical/react@npm:0.22":
+"@lexical/react@npm:0.22.0":
   version: 0.22.0
   resolution: "@lexical/react@npm:0.22.0"
   dependencies:
@@ -4448,7 +4448,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lexical/rich-text@npm:0.22, @lexical/rich-text@npm:0.22.0":
+"@lexical/rich-text@npm:0.22.0":
   version: 0.22.0
   resolution: "@lexical/rich-text@npm:0.22.0"
   dependencies:
@@ -12790,7 +12790,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lexical@npm:0.22, lexical@npm:0.22.0":
+"lexical@npm:0.22.0":
   version: 0.22.0
   resolution: "lexical@npm:0.22.0"
   checksum: 10/b0f34d32d64c70dd790c5a7f12b9bcaba7cd4e8b89b4e6c7988e9668c953dfaa3bddc2db8c9fe4127add78da43abd01463943c1f570a94fb1373a15ae2719a73
@@ -18745,12 +18745,12 @@ __metadata:
     "@emotion/react": "npm:11.11.4"
     "@faker-js/faker": "npm:9.3.0"
     "@formatjs/cli": "npm:6.3.14"
-    "@lexical/code": "npm:0.22"
-    "@lexical/history": "npm:0.22"
-    "@lexical/list": "npm:0.22"
-    "@lexical/markdown": "npm:0.22"
-    "@lexical/react": "npm:0.22"
-    "@lexical/rich-text": "npm:0.22"
+    "@lexical/code": "npm:0.22.0"
+    "@lexical/history": "npm:0.22.0"
+    "@lexical/list": "npm:0.22.0"
+    "@lexical/markdown": "npm:0.22.0"
+    "@lexical/react": "npm:0.22.0"
+    "@lexical/rich-text": "npm:0.22.0"
     "@mediapipe/tasks-vision": "npm:0.10.20"
     "@roamhq/wrtc": "npm:0.8.0"
     "@testing-library/dom": "npm:^10.4.0"
@@ -18835,7 +18835,7 @@ __metadata:
     knockout: "npm:3.5.1"
     less: "npm:4.2.1"
     less-loader: "npm:12.2.0"
-    lexical: "npm:0.22"
+    lexical: "npm:0.22.0"
     libsodium-wrappers: "npm:0.7.15"
     linkify-it: "npm:5.0.0"
     lint-staged: "npm:15.2.11"
