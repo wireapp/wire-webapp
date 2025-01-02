@@ -1344,6 +1344,8 @@
   "preferencesOptionsFontSizeSmall": "Small",
   "preferencesOptionsInputLevelDetected": "Audio detected from microphone",
   "preferencesOptionsInputLevelNotDetected": "No audio detected from microphone",
+  "preferencesOptionsMarkdownPreview": "Preview text formatting",
+  "preferencesOptionsMarkdownPreviewDetails": "When this is on, you can select various formatting options and see the chosen format while typing a message. Otherwise, you need to use markdown commands. This setting applies to all your devices.",
   "preferencesOptionsNotifications": "Notifications",
   "preferencesOptionsNotificationsNone": "Off",
   "preferencesOptionsNotificationsObfuscate": "Hide details",

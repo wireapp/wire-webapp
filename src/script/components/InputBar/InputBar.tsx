@@ -180,9 +180,9 @@ export const InputBar = ({
   const hasLocalEphemeralTimer = isSelfDeletingMessagesEnabled && !!localMessageTimer && !hasGlobalMessageTimer;
   const isTypingRef = useRef(false);
 
-  const messageFormatButtonsEnabled = CONFIG.FEATURE.ENABLE_MESSAGE_FORMAT_BUTTONS;
+  const isMessageFormatButtonsFlagEnabled = CONFIG.FEATURE.ENABLE_MESSAGE_FORMAT_BUTTONS;
 
-  const showGiphyButton = messageFormatButtonsEnabled
+  const showGiphyButton = isMessageFormatButtonsFlagEnabled
     ? textValue.length > 0
     : textValue.length > 0 && textValue.length <= CONFIG.GIPHY_TEXT_LENGTH;
 
@@ -542,6 +542,11 @@ export const InputBar = ({
     };
   }, [pastedFile]);
 
+  const showMarkdownPreview = useUserPropertyValue<boolean>(
+    () => propertiesRepository.getPreference(PROPERTIES_TYPE.INTERFACE.MARKDOWN_PREVIEW),
+    WebAppEvents.PROPERTIES.UPDATE.INTERFACE.MARKDOWN_PREVIEW,
+  );
+
   const controlButtonsProps = {
     conversation: conversation,
     disableFilesharing: !isFileSharingSendingEnabled,
@@ -554,6 +559,8 @@ export const InputBar = ({
     onSelectFiles: uploadFiles,
     onSelectImages: uploadImages,
     showGiphyButton: showGiphyButton,
+    showFormatButton: isMessageFormatButtonsFlagEnabled && showMarkdownPreview,
+    showEmojiButton: isMessageFormatButtonsFlagEnabled,
     isFormatActive: formatToolbar.open,
     onFormatClick: formatToolbar.handleClick,
     isEmojiActive: emojiPicker.open,
@@ -582,7 +589,7 @@ export const InputBar = ({
         <div
           className={cx(`${conversationInputBarClassName}__input input-bar-container`, {
             [`${conversationInputBarClassName}__input--editing`]: isEditing,
-            'input-bar-container--with-toolbar': formatToolbar.open,
+            'input-bar-container--with-toolbar': formatToolbar.open && showMarkdownPreview,
           })}
         >
           {!isOutgoingRequest && (
@@ -621,6 +628,7 @@ export const InputBar = ({
                   onUpdate={setMessageContent}
                   hasLocalEphemeralTimer={hasLocalEphemeralTimer}
                   showFormatToolbar={formatToolbar.open}
+                  showMarkdownPreview={showMarkdownPreview}
                   saveDraftState={saveDraft}
                   loadDraftState={loadDraft}
                   onShiftTab={onShiftTab}

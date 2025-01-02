@@ -34,6 +34,8 @@ const defaultParams: PropsType = {
   onSelectFiles: jest.fn(),
   onSelectImages: jest.fn(),
   showGiphyButton: true,
+  showFormatButton: true,
+  showEmojiButton: true,
   isFormatActive: true,
   isEmojiActive: true,
   onFormatClick: jest.fn(),
@@ -53,7 +55,7 @@ describe('ControlButtons', () => {
     [{isEditing: true}, []],
   ])('renders the right buttons depending on props (%s)', (overrides, buttonTitles) => {
     const params = {...defaultParams, ...overrides};
-    const {getByTitle, queryByTitle} = render(<ControlButtons {...params} />);
+    const {getByTitle, queryByTitle} = render(withTheme(<ControlButtons {...params} />));
     // check that the relevant buttons are present
     buttonTitles.forEach(button => expect(getByTitle(button)).not.toBe(null));
 

@@ -41,6 +41,8 @@ export type ControlButtonsProps = {
   isFormatActive: boolean;
   isEmojiActive: boolean;
   showGiphyButton?: boolean;
+  showFormatButton: boolean;
+  showEmojiButton: boolean;
   onClickPing: () => void;
   onSelectFiles: (files: File[]) => void;
   onSelectImages: (files: File[]) => void;
@@ -59,6 +61,8 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
   isFormatActive,
   isEmojiActive,
   showGiphyButton,
+  showFormatButton,
+  showEmojiButton,
   onClickPing,
   onSelectFiles,
   onSelectImages,
@@ -67,8 +71,6 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
   onFormatClick,
   onEmojiClick,
 }) => {
-  const messageFormatButtonsEnabled = Config.getConfig().FEATURE.ENABLE_MESSAGE_FORMAT_BUTTONS;
-
   if (isEditing) {
     return (
       <li>
@@ -80,22 +82,23 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
   if (input.length === 0) {
     return (
       <>
-        {messageFormatButtonsEnabled && (
-          <>
-            <li>
-              <FormatTextButton isActive={isFormatActive} onClick={onFormatClick} />
-            </li>
-            <li>
-              <EmojiButton isActive={isEmojiActive} onClick={onEmojiClick} />
-            </li>
-          </>
+        {showFormatButton && (
+          <li>
+            <FormatTextButton isActive={isFormatActive} onClick={onFormatClick} />
+          </li>
+        )}
+
+        {showEmojiButton && (
+          <li>
+            <EmojiButton isActive={isEmojiActive} hasRoundedCorners={!showFormatButton} onClick={onEmojiClick} />
+          </li>
         )}
 
         {!disableFilesharing && (
           <>
             <li>
               <ImageUploadButton
-                hasRoundedCorners={!messageFormatButtonsEnabled}
+                hasRoundedCorners={!showFormatButton && !showEmojiButton}
                 onSelectImages={onSelectImages}
                 acceptedImageTypes={Config.getConfig().ALLOWED_IMAGE_TYPES}
               />
@@ -122,17 +125,17 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
     <>
       {showGiphyButton && !disableFilesharing && (
         <>
-          {messageFormatButtonsEnabled && (
-            <>
-              <li>
-                <FormatTextButton isActive={isFormatActive} onClick={onFormatClick} />
-              </li>
-              <li>
-                <EmojiButton isActive={isEmojiActive} onClick={onEmojiClick} />
-              </li>
-            </>
+          {showFormatButton && (
+            <li>
+              <FormatTextButton isActive={isFormatActive} onClick={onFormatClick} />
+            </li>
           )}
-          <GiphyButton onGifClick={onGifClick} hasRoundedLeftCorner={!messageFormatButtonsEnabled} />
+          {showEmojiButton && (
+            <li>
+              <EmojiButton isActive={isEmojiActive} hasRoundedCorners={!showFormatButton} onClick={onEmojiClick} />
+            </li>
+          )}
+          <GiphyButton onGifClick={onGifClick} hasRoundedLeftCorner={!showFormatButton && !showEmojiButton} />
         </>
       )}
     </>
