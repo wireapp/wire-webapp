@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.18.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.17.0...@wireapp/api-client@27.18.0) (2025-01-02)
+
+### Features
+
+* markdown preview events ([#6773](https://github.com/wireapp/wire-web-packages/issues/6773)) ([7e0745b](https://github.com/wireapp/wire-web-packages/commit/7e0745b182f8a468af6651628b60f28a090a2acd))
+
 # [27.17.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.16.1...@wireapp/api-client@27.17.0) (2024-12-16)
 
 ### Features

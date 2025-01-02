@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.3.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/telemetry@0.1.5...@wireapp/telemetry@0.3.0) (2025-01-02)
+
+### Bug Fixes
+
+* updated telemetry version to 0.2.0 ([#6774](https://github.com/wireapp/wire-web-packages/issues/6774)) ([8623cc6](https://github.com/wireapp/wire-web-packages/commit/8623cc68894c36c7b3d86481ad130be5071acbeb))
+
+### Features
+
+* add disable orientation tracking option [WPB-14968] ([#6772](https://github.com/wireapp/wire-web-packages/issues/6772)) ([1dd87dc](https://github.com/wireapp/wire-web-packages/commit/1dd87dc9df81e096bf8684856c542799e74e8c1f))
+
 ## [0.1.5](https://github.com/wireapp/wire-web-packages/compare/@wireapp/telemetry@0.1.4...@wireapp/telemetry@0.1.5) (2024-12-16)
 
 **Note:** Version bump only for package @wireapp/telemetry
