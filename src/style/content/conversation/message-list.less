@@ -372,6 +372,24 @@
       display: none;
     }
   }
+
+  .md-blockquote {
+    position: relative;
+    padding: 0 12px 0 16px;
+    margin: 0;
+
+    &::before {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      border-radius: 2px;
+      margin-right: 12px;
+      background-color: var(--message-quote-bg);
+      content: '';
+    }
+  }
 }
 
 .message-body-like {
