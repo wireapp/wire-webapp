@@ -180,9 +180,9 @@ export const InputBar = ({
   const hasLocalEphemeralTimer = isSelfDeletingMessagesEnabled && !!localMessageTimer && !hasGlobalMessageTimer;
   const isTypingRef = useRef(false);
 
-  const messageFormatButtonsEnabled = CONFIG.FEATURE.ENABLE_MESSAGE_FORMAT_BUTTONS;
+  const isMessageFormatButtonsFlagEnabled = CONFIG.FEATURE.ENABLE_MESSAGE_FORMAT_BUTTONS;
 
-  const showGiphyButton = messageFormatButtonsEnabled
+  const showGiphyButton = isMessageFormatButtonsFlagEnabled
     ? textValue.length > 0
     : textValue.length > 0 && textValue.length <= CONFIG.GIPHY_TEXT_LENGTH;
 
@@ -559,7 +559,8 @@ export const InputBar = ({
     onSelectFiles: uploadFiles,
     onSelectImages: uploadImages,
     showGiphyButton: showGiphyButton,
-    showFormatButton: messageFormatButtonsEnabled && showMarkdownPreview,
+    showFormatButton: isMessageFormatButtonsFlagEnabled && showMarkdownPreview,
+    showEmojiButton: isMessageFormatButtonsFlagEnabled,
     isFormatActive: formatToolbar.open,
     onFormatClick: formatToolbar.handleClick,
     isEmojiActive: emojiPicker.open,
