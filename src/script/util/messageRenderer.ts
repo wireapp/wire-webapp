@@ -56,6 +56,7 @@ const markdownit = new MarkdownIt('zero', {
   'newline',
   'list',
   'strikethrough',
+  'blockquote',
 ]);
 
 const originalFenceRule = markdownit.renderer.rules.fence!;
@@ -83,6 +84,9 @@ markdownit.normalizeLink = (url: string): string => {
   }
   return url;
 };
+
+markdownit.renderer.rules.blockquote_open = () => '<blockquote class="md-blockquote">';
+markdownit.renderer.rules.blockquote_close = () => '</blockquote>';
 
 markdownit.renderer.rules.softbreak = () => '<br>';
 markdownit.renderer.rules.hardbreak = () => '<br>';

@@ -78,6 +78,7 @@ const theme = {
     strikethrough: 'editor-strikethrough',
     code: 'editor-inline-code',
   },
+  quote: 'editor-quote',
   list: {
     ul: 'editor-list editor-list-unordered',
     ol: 'editor-list editor-list-ordered',
@@ -196,6 +197,7 @@ const editorConfig: InitialConfigType = {
     CodeNode,
     CodeHighlightNode,
     LinkNode,
+    QuoteNode,
   ],
 };
 
