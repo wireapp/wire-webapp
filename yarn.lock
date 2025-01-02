@@ -5956,27 +5956,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@file:.yalc/@wireapp/api-client::locator=wire-webapp%40workspace%3A.":
-  version: 27.16.0
-  resolution: "@wireapp/api-client@file:.yalc/@wireapp/api-client#.yalc/@wireapp/api-client::hash=32fa4b&locator=wire-webapp%40workspace%3A."
-  dependencies:
-    "@wireapp/commons": "npm:^5.4.0"
-    "@wireapp/priority-queue": "npm:^2.1.11"
-    "@wireapp/protocol-messaging": "npm:1.51.0"
-    axios: "npm:1.7.9"
-    axios-retry: "npm:4.5.0"
-    http-status-codes: "npm:2.3.0"
-    logdown: "npm:3.3.1"
-    pako: "npm:2.1.0"
-    reconnecting-websocket: "npm:4.4.0"
-    spark-md5: "npm:3.0.2"
-    tough-cookie: "npm:4.1.4"
-    ws: "npm:8.18.0"
-    zod: "npm:3.23.8"
-  checksum: 10/e274c4221073d9dda9c6d926e04e80ceb59b40b0207fdaf741a77bf6d657d73c9b5eb087f67839cc8239d75b597ef3153783f9284531257d5d4ab6f065350335
-  languageName: node
-  linkType: hard
-
 "@wireapp/api-client@npm:^27.18.0":
   version: 27.18.0
   resolution: "@wireapp/api-client@npm:27.18.0"
@@ -18802,7 +18781,6 @@ __metadata:
     "@types/uuid": "npm:^10.0.0"
     "@types/webpack-env": "npm:1.18.5"
     "@types/wicg-file-system-access": "npm:^2023.10.5"
-    "@wireapp/api-client": "file:.yalc/@wireapp/api-client"
     "@wireapp/avs": "npm:10.0.4"
     "@wireapp/avs-debugger": "npm:0.0.7"
     "@wireapp/commons": "npm:5.4.0"
@@ -19388,13 +19366,6 @@ __metadata:
     compress-commons: "npm:^6.0.2"
     readable-stream: "npm:^4.0.0"
   checksum: 10/aa5abd6a89590eadeba040afbc375f53337f12637e5e98330012a12d9886cde7a3ccc28bd91aafab50576035bbb1de39a9a316eecf2411c8b9009c9f94f0db27
-  languageName: node
-  linkType: hard
-
-"zod@npm:3.23.8":
-  version: 3.23.8
-  resolution: "zod@npm:3.23.8"
-  checksum: 10/846fd73e1af0def79c19d510ea9e4a795544a67d5b34b7e1c4d0425bf6bfd1c719446d94cdfa1721c1987d891321d61f779e8236fde517dc0e524aa851a6eff1
   languageName: node
   linkType: hard
 
