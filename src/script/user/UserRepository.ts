@@ -225,7 +225,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
 
     const usersWithAvailability = found.map(user => {
       const localUser = dbUsers.find(
-        dbUser => dbUser.id === user.id || matchQualifiedIds(dbUser.qualified_id, user.qualified_id),
+        dbUser => dbUser.id === user.id || matchQualifiedIds(dbUser.qualified_id ?? {}, user.qualified_id ?? {}),
       );
 
       const userWithAvailability = [...dbUsers, ...nonQualifiedUsers].find(userRecord => userRecord.id === user.id);
