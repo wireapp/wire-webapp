@@ -194,11 +194,20 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
     const PARTICIPANTS_LIMITS = {
       TABLET: {SHORT: 2, MEDIUM: 4, TALL: 8},
       DESKTOP: {SHORT: 3, MEDIUM: 6, TALL: 9},
-      MOBILE: {SHORT: 1, MEDIUM: 2, TALL: 4},
+      MOBILE: {WITH_THUMBNAIL: 2, SHORT: 1, MEDIUM: 2, TALL: 4},
     };
 
-    const setParticipantsForDevice = (limits: {SHORT: number; MEDIUM: number; TALL: number}) => {
+    const setParticipantsForDevice = (limits: {
+      WITH_THUMBNAIL?: number;
+      SHORT: number;
+      MEDIUM: number;
+      TALL: number;
+    }) => {
       if (isShort) {
+        // Special case: use different layout for 2 participants when in short mode
+        if (grid.thumbnail && limits.WITH_THUMBNAIL) {
+          return call.setNumberOfParticipantsInOnePage(limits.WITH_THUMBNAIL);
+        }
         return call.setNumberOfParticipantsInOnePage(limits.SHORT);
       }
       if (isMedium) {
@@ -218,7 +227,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
     if (isMobile) {
       setParticipantsForDevice(PARTICIPANTS_LIMITS.MOBILE);
     }
-  }, [call, isTablet, isDesktop, isMobile, isShort, isMedium, isTall]);
+  }, [call, grid.thumbnail, isTablet, isDesktop, isMobile, isShort, isMedium, isTall]);
 
   const {isMuted: selfIsMuted, handRaisedAt: selfHandRaisedAt} = useKoSubscribableChildren(selfParticipant, [
     'isMuted',
