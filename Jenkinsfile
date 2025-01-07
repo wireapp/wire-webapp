@@ -99,13 +99,13 @@ pipeline {
                   final List workflowRuns = jsonData['workflow_runs']
                   echo("Looking for hash ${commit_hash}")
 
-                  return workflowRuns.any { run -> 
+                  return workflowRuns.any { run ->
                     def result = checkWorkflowRun(run, commit_hash)
                     if (run['conclusion'] == 'cancelled') {
                       echo("GitHub Action was cancelled. Ending Jenkins pipeline.")
                       return true
                     }
-                    
+
                     return result
                   }
                 }
@@ -155,7 +155,7 @@ pipeline {
 
         stage('Trigger smoke test') {
           steps {
-            build job: 'Webapp_Smoke_Chrome', parameters: [string(name: 'TAGS', value: '@smoke'), string(name: 'GIT_BRANCH', value: 'web-dev'), string(name: 'webappApplicationPath', value: "$webappApplicationPath")], wait: false
+            build job: 'Webapp_Smoke_Chrome', parameters: [string(name: 'TAGS', value: '@smoke'), string(name: 'GIT_BRANCH', value: 'web-dev'), string(name: 'webappApplicationPath', value: "$webappApplicationPath")]
           }
         }
     }
