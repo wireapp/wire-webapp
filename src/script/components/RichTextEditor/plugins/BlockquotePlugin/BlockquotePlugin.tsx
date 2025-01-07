@@ -33,7 +33,7 @@ import {
   LexicalEditor,
 } from 'lexical';
 
-export const BlockquotePlugin = () => {
+export const BlockquotePlugin = (): null => {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {
