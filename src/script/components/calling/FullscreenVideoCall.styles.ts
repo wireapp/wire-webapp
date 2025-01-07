@@ -17,70 +17,61 @@
  *
  */
 
-import {css, CSSObject} from '@emotion/react';
+import {CSSObject} from '@emotion/react';
+
+import {media} from '@wireapp/react-ui-kit';
 
 export const classifiedBarStyles: CSSObject = {
   lineHeight: '1.5em',
   display: 'flex',
 };
 
-export const videoControlInActiveStyles = css`
-  background-color: var(--inactive-call-button-bg);
-  border: 1px solid var(--inactive-call-button-border);
-  svg > path,
-  svg > g > path {
-    fill: var(--main-color);
-  }
-  &:hover {
-    background-color: var(--inactive-call-button-hover-bg);
-    border: 1px solid var(--inactive-call-button-hover-border);
-  }
-  &:active {
-    background-color: var(--accent-color-highlight);
-    border: 1px solid var(--accent-color-focus);
-  }
-`;
-
-export const paginationButtonStyles: CSSObject = {
-  ['& svg > path']: {
-    fill: 'var(--main-color)',
-  },
-  ['&:focus-visible']: {
-    ['& svg > path']: {
-      fill: 'var(--accent-color)',
-    },
-    outline: '1px solid var(--accent-color-focus)',
-  },
-  ['&:not([disabled]):hover svg > path']: {
-    fill: 'var(--accent-color)',
-  },
-  ['&:disabled svg > path']: {
-    fill: 'var(--disabled-call-button-svg)',
-  },
+export const videoTopBarStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
-  cursor: 'pointer',
-  height: '100%',
-};
+  justifyContent: 'space-between',
+  padding: '4px 4px 8px',
 
-export const videoTopBarStyles: CSSObject = {
-  display: 'grid',
-  gridTemplateColumns: '1fr auto 1fr',
-  alignItems: 'center',
-  backgroundColor: 'var(--sidebar-bg)',
-  padding: '4px 0px',
+  [media.tabletUp]: {
+    display: 'grid',
+    gridTemplateColumns: '1fr auto 1fr',
+    justifyContent: 'normal',
+  },
 };
 
 export const headerActionsWrapperStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
   width: 'fit-content',
-  marginLeft: 'auto',
-  padding: '0 6px',
+  gap: '8px',
+
+  [media.tabletUp]: {
+    gridColumn: 3,
+    justifySelf: 'end',
+  },
+};
+
+export const backButtonStyles: CSSObject = {
+  marginBottom: 0,
+};
+
+export const backIconStyles: CSSObject = {
+  transform: 'rotateY(180deg)',
+  width: '16px',
+  height: '16px',
 };
 
 export const paginationWrapperStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: '10px',
+  [media.mobile]: {
+    margin: '0 auto',
+    padding: '8px 0',
+  },
+};
+
+export const minimizeButtonStyles: CSSObject = {
+  marginBottom: 0,
+};
+
+export const openDetachedWindowButtonStyles: CSSObject = {
+  marginBottom: 0,
 };
