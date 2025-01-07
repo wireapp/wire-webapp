@@ -24,7 +24,7 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {Checkbox, CheckboxLabel, IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
+import {ArrowIcon, Checkbox, CheckboxLabel, IconButton, IconButtonVariant, QUERY} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useAppNotification} from 'Components/AppNotification/AppNotification';
@@ -47,14 +47,15 @@ import {Duration} from './Duration';
 import {
   classifiedBarStyles,
   headerActionsWrapperStyles,
-  paginationButtonStyles,
   paginationWrapperStyles,
-  videoControlInActiveStyles,
   videoTopBarStyles,
+  backButtonStyles,
+  backIconStyles,
+  minimizeButtonStyles,
+  openDetachedWindowButtonStyles,
 } from './FullscreenVideoCall.styles';
 import {GroupVideoGrid} from './GroupVideoGrid';
-import {Pagination} from './Pagination';
-import {useSyncCurrentRange} from './useSyncCurrentRange';
+import {Pagination} from './Pagination/Pagination';
 import {VideoControls} from './VideoControls/VideoControls';
 
 import type {Call} from '../../calling/Call';
@@ -97,8 +98,6 @@ export interface FullscreenVideoCallProps {
 }
 
 const LOCAL_STORAGE_KEY_FOR_SCREEN_SHARING_CONFIRM_MODAL = 'DO_NOT_ASK_AGAIN_FOR_SCREEN_SHARING_CONFIRM_MODAL';
-
-const DEFAULT_VISIBLE_DOTS = 5;
 
 const FullscreenVideoCall = ({
   call,
@@ -226,7 +225,7 @@ const FullscreenVideoCall = ({
   const totalPages = callPages.length;
 
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
-  const horizontalSmBreakpoint = useActiveWindowMatchMedia('max-width: 680px');
+  const horizontalSmBreakpoint = useActiveWindowMatchMedia('max-width: 639px');
 
   const callGroupStartedAlert = t(isGroupCall ? 'startedVideoGroupCallingAlert' : 'startedVideoCallingAlert', {
     conversationName,
@@ -238,47 +237,10 @@ const FullscreenVideoCall = ({
     cameraStatus: t(selfSharesCamera ? 'cameraStatusOn' : 'cameraStatusOff'),
   });
 
+  const isMobile = useActiveWindowMatchMedia(QUERY.mobile);
+  const isPaginationVisible = !maximizedParticipant && activeCallViewTab === CallViewTab.ALL && totalPages > 1;
+
   const isModerator = selfUser && roles[selfUser.id] === DefaultConversationRoleName.WIRE_ADMIN;
-
-  const [currentStart, setCurrentStart] = useState(0);
-  const visibleDots = DEFAULT_VISIBLE_DOTS > totalPages ? totalPages : DEFAULT_VISIBLE_DOTS;
-
-  useSyncCurrentRange({
-    currentStart,
-    currentPage,
-    totalPages,
-    visibleDots,
-    setCurrentStart,
-  });
-
-  const handlePreviousPage = () => {
-    if (currentPage === 0) {
-      return;
-    }
-
-    const previousPage = currentPage - 1;
-
-    // previousPage !== 0 --> jest niepotrzebne prawdopodnie
-    if (previousPage === currentStart && previousPage !== 0) {
-      setCurrentStart(currentStart => currentStart - 1);
-    }
-
-    changePage(previousPage, call);
-  };
-
-  const handleNextPage = () => {
-    if (currentPage === totalPages - 1) {
-      return;
-    }
-
-    const nextPage = currentPage + 1;
-
-    if (nextPage === currentStart + visibleDots - 1 && nextPage !== totalPages - 1) {
-      setCurrentStart(currentStart => currentStart + 1);
-    }
-
-    changePage(nextPage, call);
-  };
 
   return (
     <div
@@ -291,12 +253,9 @@ const FullscreenVideoCall = ({
         <div css={videoTopBarStyles}>
           <div id="video-title" className="video-title">
             {horizontalSmBreakpoint && (
-              <IconButton
-                variant={IconButtonVariant.SECONDARY}
-                className=" icon-back"
-                css={{height: '25px', left: '5px', position: 'absolute', top: '10px'}}
-                onClick={minimize}
-              />
+              <IconButton variant={IconButtonVariant.SECONDARY} css={backButtonStyles} onClick={minimize}>
+                <ArrowIcon css={backIconStyles} />
+              </IconButton>
             )}
 
             {/* Calling conversation name and duration */}
@@ -331,63 +290,40 @@ const FullscreenVideoCall = ({
             )}
           </div>
           <div css={headerActionsWrapperStyles}>
-            {!maximizedParticipant && activeCallViewTab === CallViewTab.ALL && totalPages > 1 && (
-              <div css={paginationWrapperStyles}>
-                <button
-                  data-uie-name="pagination-previous"
-                  type="button"
-                  onClick={handlePreviousPage}
-                  onKeyDown={event => handleKeyDown(event, handlePreviousPage)}
-                  className="button-reset-default"
-                  disabled={currentPage === 0}
-                  css={{
-                    ...paginationButtonStyles,
-                    borderBottomRightRadius: 32,
-                    borderTopRightRadius: 32,
-                    left: 0,
-                  }}
-                >
-                  <Icon.ChevronRight css={{position: 'relative', right: 4, transform: 'rotateY(180deg)'}} />
-                </button>
+            {!isMobile && isPaginationVisible && (
+              <Pagination
+                totalPages={totalPages}
+                currentPage={currentPage}
+                onChangePage={newPage => changePage(newPage, call)}
+              />
+            )}
 
-                <Pagination
-                  totalPages={totalPages}
-                  currentPage={currentPage}
-                  currentStart={currentStart}
-                  visibleDots={visibleDots}
-                />
-                <button
-                  data-uie-name="pagination-next"
-                  onClick={handleNextPage}
-                  onKeyDown={event => handleKeyDown(event, handleNextPage)}
-                  type="button"
-                  className="button-reset-default"
-                  disabled={currentPage === totalPages - 1}
-                  css={{
-                    ...paginationButtonStyles,
-                    borderBottomLeftRadius: 32,
-                    borderTopLeftRadius: 32,
-                    right: 0,
-                    marginRight: 14,
-                  }}
-                >
-                  <Icon.ChevronRight css={{left: 4, position: 'relative'}} />
-                </button>
-              </div>
+            {isMobile && (
+              <IconButton
+                variant={IconButtonVariant.PRIMARY}
+                css={minimizeButtonStyles}
+                onClick={minimize}
+                onKeyDown={event => handleKeyDown(event, () => minimize())}
+                type="button"
+                data-uie-name="do-call-controls-video-minimize"
+                title={t('videoCallOverlayCloseFullScreen')}
+              >
+                {viewMode === CallingViewMode.DETACHED_WINDOW ? <Icon.CloseDetachedWindowIcon /> : <Icon.MessageIcon />}
+              </IconButton>
             )}
 
             {isDetachedCallingFeatureEnabled() && viewMode !== CallingViewMode.DETACHED_WINDOW && (
-              <button
-                className="video-controls__button video-controls__button--small"
-                css={videoControlInActiveStyles}
+              <IconButton
+                variant={IconButtonVariant.PRIMARY}
+                css={openDetachedWindowButtonStyles}
                 onClick={openPopup}
                 onKeyDown={event => handleKeyDown(event, () => openPopup())}
-                type="button"
                 data-uie-name="do-call-controls-video-maximize"
                 title={t('videoCallOverlayOpenPopupWindow')}
+                type="button"
               >
                 <Icon.OpenDetachedWindowIcon />
-              </button>
+              </IconButton>
             )}
           </div>
         </div>
@@ -418,8 +354,17 @@ const FullscreenVideoCall = ({
           )}
         </div>
 
+        {isMobile && isPaginationVisible && (
+          <Pagination
+            totalPages={totalPages}
+            currentPage={currentPage}
+            onChangePage={newPage => changePage(newPage, call)}
+            className={paginationWrapperStyles}
+          />
+        )}
+
         {!isChoosingScreen && (
-          <div id="video-controls" className="video-controls">
+          <>
             {emojis.map(({id, emoji, left, from}) => (
               <div
                 key={id}
@@ -460,7 +405,7 @@ const FullscreenVideoCall = ({
               setMaximizedParticipant={setMaximizedParticipant}
               sendEmoji={sendEmoji}
             />
-          </div>
+          </>
         )}
       </div>
       {isParticipantsListOpen && (
