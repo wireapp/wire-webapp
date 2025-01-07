@@ -20,7 +20,9 @@
 import {useEffect} from 'react';
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {$getSelection, $isRangeSelection, $createParagraphNode, createCommand} from 'lexical';
+import {$createHeadingNode} from '@lexical/rich-text';
+import {$setBlocksType} from '@lexical/selection';
+import {$getSelection, createCommand, $isRangeSelection, $createParagraphNode} from 'lexical';
 
 import {headingCommand} from './headingCommand';
 
@@ -46,20 +48,12 @@ export const useHeadingState = () => {
       const anchorNode = selection.anchor.getNode();
       const isHeading = isNodeHeading(anchorNode);
 
-      if (!isHeading) {
-        editor.dispatchCommand(INSERT_HEADING_COMMAND, {});
+      if (isHeading) {
+        $setBlocksType(selection, () => $createParagraphNode());
         return;
       }
 
-      const paragraphNode = $createParagraphNode();
-      const headingNode = anchorNode.getParent();
-
-      if (!headingNode) {
-        return;
-      }
-
-      headingNode.replace(paragraphNode);
-      paragraphNode.append(...headingNode.getChildren());
+      $setBlocksType(selection, () => $createHeadingNode('h1'));
     });
   };
 

@@ -23,6 +23,7 @@ import {$createMentionNode, $isMentionNode, MentionNode} from 'Components/RichTe
 
 // Cutom transformer for handling mentions when converting markdown to editor format.
 // Based on https://github.com/facebook/lexical/blob/main/packages/lexical-markdown/src/MarkdownTransformers.ts#L489
+// It takes mentions from the markdown (e.g. <mention>@John Doe</mention>) and converts them to MentionNodes.
 export const getMentionMarkdownTransformer = (allowedMentions: Array<string>): TextMatchTransformer => {
   return {
     dependencies: [MentionNode],
@@ -30,19 +31,18 @@ export const getMentionMarkdownTransformer = (allowedMentions: Array<string>): T
       if (!$isMentionNode(node)) {
         return null;
       }
-      return `@${node.getTextContent()}`;
+      return `<mention>${node.getTextContent()}</mention>`;
     },
-    importRegExp: /(@\w+)/,
-    regExp: /(@\w+)$/,
+    importRegExp: /<mention>([^<]+)<\/mention>/,
+    regExp: /<mention>([^<]+)<\/mention>/,
     replace: (textNode, match) => {
-      const [mentionText] = match;
+      const mentionText = match[1];
 
       if (!allowedMentions.includes(mentionText)) {
         return;
       }
 
       const mentionNode = $createMentionNode('@', mentionText.slice(1));
-
       textNode.replace(mentionNode);
     },
     trigger: ' ',

@@ -198,8 +198,8 @@ export function ConfigToolbar() {
       <h3>Debug Functions</h3>
 
       <Button onClick={() => window.wire?.app?.debug?.reconnectWebSocket()}>reconnectWebSocket</Button>
-      <Button onClick={() => window.wire?.app?.debug?.enablePushToTalk()}>enablePushToTalk</Button>
-      <Button onClick={() => window.wire?.app?.debug?.enablePushToTalk(null)}>disablePushToTalk</Button>
+      <Button onClick={() => window.wire?.app?.debug?.enablePressSpaceToUnmute()}>enablePressSpaceToUnmute</Button>
+      <Button onClick={() => window.wire?.app?.debug?.disablePressSpaceToUnmute()}>disablePressSpaceToUnmute</Button>
 
       <div>{renderAvsSwitch(avsDebuggerEnabled)}</div>
 

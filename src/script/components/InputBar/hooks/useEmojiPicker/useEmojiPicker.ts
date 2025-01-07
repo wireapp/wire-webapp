@@ -26,6 +26,10 @@ interface EmojiPickerParams {
   onEmojiPicked: (emoji: string) => void;
 }
 
+const TRIGGER_WIDTH = 40;
+const TRIGGER_HEIGHT = 32;
+const Y_OFFSET = 8;
+
 export const useEmojiPicker = ({wrapperRef, onEmojiPicked}: EmojiPickerParams) => {
   const [open, setOpen] = useState(false);
 
@@ -43,7 +47,7 @@ export const useEmojiPicker = ({wrapperRef, onEmojiPicked}: EmojiPickerParams) =
   const handleToggle = (event: MouseEvent<HTMLButtonElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();
     // eslint-disable-next-line id-length
-    emojiPickerPosition.current = {x: rect.x, y: rect.y};
+    emojiPickerPosition.current = {x: rect.x + TRIGGER_WIDTH, y: rect.y - TRIGGER_HEIGHT - Y_OFFSET};
     setOpen(prev => !prev);
   };
 

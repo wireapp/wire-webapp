@@ -19,14 +19,16 @@
 
 import {useEffect} from 'react';
 
-import {$convertFromMarkdownString, TRANSFORMERS} from '@lexical/markdown';
+import {$convertFromMarkdownString} from '@lexical/markdown';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {$getRoot, $setSelection} from 'lexical';
 
+import {markdownTransformers} from 'Components/RichTextEditor/utils/markdownTransformers';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 
 import {getMentionMarkdownTransformer} from './getMentionMarkdownTransformer/getMentionMarkdownTransformer';
 import {getMentionNodesFromMessage} from './getMentionNodesFromMessage/getMentionNodesFromMessage';
+import {wrapMentionsWithTags} from './wrapMentionsWithTags/wrapMentionsWithTags';
 
 type Props = {
   message?: ContentMessage;
@@ -49,7 +51,9 @@ export function EditedMessagePlugin({message}: Props): null {
 
           const mentionNodes = getMentionNodesFromMessage(message);
 
-          const allowedMentions = mentionNodes.map(node => node.getTextContent());
+          const allowedMentions = [...new Set(mentionNodes.map(node => node.getTextContent()))];
+
+          const wrappedWithTags = wrapMentionsWithTags(messageContent, allowedMentions);
 
           const mentionMarkdownTransformer = getMentionMarkdownTransformer(allowedMentions);
 
@@ -58,7 +62,7 @@ export function EditedMessagePlugin({message}: Props): null {
           // During the transformation, we have to tell the editor to transofrm mentions as well.
           // We can't do that by diretcly updating the $root (e.g. $root.appent(...MentionNodes)), because this function will overwrite the result.
           // One way of overcoming this issue is to use a custom transformer (quite a hacky way). Transformers are responisble for converting the text to the desired format (e.g. **bold** to bold).
-          $convertFromMarkdownString(messageContent, [...TRANSFORMERS, mentionMarkdownTransformer]);
+          $convertFromMarkdownString(wrappedWithTags, [mentionMarkdownTransformer, ...markdownTransformers]);
 
           editor.focus();
         });

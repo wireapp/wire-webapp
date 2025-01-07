@@ -22,6 +22,4 @@ import {CSSObject} from '@emotion/react';
 export const wrapperStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
-  margin: '8px 0 8px auto',
-  gridArea: 'toolbar',
 };

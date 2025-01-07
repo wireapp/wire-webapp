@@ -78,16 +78,16 @@ export const FormatToolbar = () => {
         onClick={() => formatText('strikethrough')}
       />
       <FormatButton
-        label={t('richTextUnorderedList')}
-        icon={BulletListIcon}
-        active={activeFormats.includes('unorderedList')}
-        onClick={() => toggleList('unordered')}
-      />
-      <FormatButton
         label={t('richTextOrderedList')}
         icon={NumberedListIcon}
         active={activeFormats.includes('orderedList')}
         onClick={() => toggleList('ordered')}
+      />
+      <FormatButton
+        label={t('richTextUnorderedList')}
+        icon={BulletListIcon}
+        active={activeFormats.includes('unorderedList')}
+        onClick={() => toggleList('unordered')}
       />
       <FormatButton
         label={t('richTextCode')}
