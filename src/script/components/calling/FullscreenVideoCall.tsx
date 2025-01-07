@@ -862,8 +862,8 @@ const FullscreenVideoCall = ({
                         aria-checked={isSelfHandRaised}
                         title={
                           isSelfHandRaised
-                            ? t('videoCallOverlayHideParticipantsList')
-                            : t('videoCallOverlayShowParticipantsList')
+                            ? t('videoCallParticipantLowerYourHand')
+                            : t('videoCallParticipantRaiseYourHand')
                         }
                       >
                         <RaiseHandIcon width={16} height={16} />

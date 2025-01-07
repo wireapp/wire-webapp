@@ -35,6 +35,7 @@ import {ContentViewModel} from './ContentViewModel';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 
 import type {CallingRepository} from '../calling/CallingRepository';
+import {Config} from '../Config';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConversationState} from '../conversation/ConversationState';
 import type {Conversation} from '../entity/Conversation';
@@ -443,6 +444,17 @@ export class ListViewModel {
       entries.push({
         click: () => this.clickToLeave(conversationEntity),
         label: t('conversationsPopoverLeave'),
+      });
+    }
+
+    if (
+      Config.getConfig().FEATURE.ENABLE_REMOVE_GROUP_CONVERSATION &&
+      conversationEntity.isGroup() &&
+      conversationEntity.isSelfUserRemoved()
+    ) {
+      entries.push({
+        click: () => this.actionsViewModel.removeConversation(conversationEntity),
+        label: t('conversationsPopoverDeleteForMe'),
       });
     }
 

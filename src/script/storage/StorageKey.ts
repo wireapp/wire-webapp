@@ -39,6 +39,9 @@ export const StorageKey = {
   SEARCH: {
     SUGGESTED_SEARCH_ETS: 'z.storage.StorageKey.SEARCH.SUGGESTED_SEARCH_ETS',
   },
+  INPUT: {
+    SHOW_FORMATTING: 'z.storage.StorageKey.INPUT.SHOW_FORMATTING',
+  },
 };
 
 export const ROOT_FONT_SIZE_KEY = 'root-font-size';

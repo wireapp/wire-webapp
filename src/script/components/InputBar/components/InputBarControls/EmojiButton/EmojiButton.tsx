@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2022 Wire Swiss GmbH
+ * Copyright (C) 2024 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,34 +17,32 @@
  *
  */
 
-import React from 'react';
+import type {MouseEvent} from 'react';
 
-import {IconButton} from '@wireapp/react-ui-kit';
+import cx from 'classnames';
 
-import * as Icon from 'Components/Icon';
+import {EmojiIcon} from '@wireapp/react-ui-kit';
+
 import {t} from 'Util/LocalizerUtil';
 
-export type GiphyButtonProps = {
-  onGifClick: () => void;
-};
+interface EmojiButtonProps {
+  isActive: boolean;
+  onClick: (event: MouseEvent<HTMLButtonElement>) => void;
+}
 
-const GiphyButton: React.FC<GiphyButtonProps> = ({onGifClick}) => {
+export const EmojiButton = ({isActive, onClick}: EmojiButtonProps) => {
   return (
-    <>
-      <li>
-        <IconButton
-          type="button"
-          css={{marginBottom: '0'}}
-          title={t('extensionsBubbleButtonGif')}
-          aria-label={t('extensionsBubbleButtonGif')}
-          onClick={onGifClick}
-          data-uie-name="do-giphy-popover"
-        >
-          <Icon.GifIcon />
-        </IconButton>
-      </li>
-    </>
+    <button
+      className={cx('controls-right-button no-radius', {
+        active: isActive,
+      })}
+      type="button"
+      onClick={onClick}
+      title={t('tooltipConversationEmoji')}
+      aria-label={t('tooltipConversationEmoji')}
+      data-uie-name="add-emoji"
+    >
+      <EmojiIcon />
+    </button>
   );
 };
-
-export {GiphyButton};

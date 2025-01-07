@@ -24,11 +24,19 @@ import {splitFingerprint} from 'Util/StringUtil';
 
 import {ClientMapper} from './ClientMapper';
 
+import {isObject} from '../guards/common';
 import {ClientRecord} from '../storage';
 
-export enum MLSPublicKeys {
-  ED25519 = 'ed25519',
-}
+export const MLSPublicKeys = {
+  ed25519: 'ED25519',
+  ed448: 'ED448',
+  ecdsa_secp521r1_sha512: 'P521',
+  ecdsa_secp384r1_sha384: 'P384',
+  ecdsa_secp256r1_sha256: 'P256',
+} as const;
+
+export const isKnownSignature = (signature: unknown): signature is keyof typeof MLSPublicKeys =>
+  signature !== undefined && typeof signature === 'string' && Object.keys(MLSPublicKeys).includes(signature);
 
 export class ClientEntity {
   static CONFIG = {
@@ -51,7 +59,7 @@ export class ClientEntity {
   model?: string;
   time?: string;
   type?: ClientType.PERMANENT | ClientType.TEMPORARY;
-  mlsPublicKeys?: Partial<Record<MLSPublicKeys, string>>;
+  mlsPublicKeys?: Partial<Record<keyof typeof MLSPublicKeys, string>>;
 
   constructor(isSelfClient: boolean, domain: string | null, id = '') {
     this.isSelfClient = isSelfClient;
@@ -99,6 +107,12 @@ export class ClientEntity {
   getName(): string | undefined {
     const hasModel = this.model && this.model !== ClientEntity.CONFIG.DEFAULT_VALUE;
     return hasModel ? this.model : this.class.toUpperCase();
+  }
+
+  getCipherSuite(): string | undefined {
+    return isObject(this.mlsPublicKeys) && Object.keys(this.mlsPublicKeys).length > 0
+      ? Object.keys(this.mlsPublicKeys).at(0)
+      : undefined;
   }
 
   /**

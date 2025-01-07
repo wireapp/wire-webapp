@@ -52,7 +52,7 @@ const APP_NOTIFICATION_SELECTOR = '#app-notification';
 // Small delay to ensure rendering is complete.
 // In some cases (switching between windows) the notification is not displayed without this delay.
 // It's caused by the rendering behavior of the toast library (injecting the <Toaster/> into the DOM node).
-const ACTION_DELAY_MS = 1;
+const ACTION_DELAY_MS = 100;
 
 // Stores React roots for different windows (activeWindow).
 // Each window (identified by its 'name' property or 'default' if not available) gets its own root.

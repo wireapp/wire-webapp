@@ -174,8 +174,14 @@ export type Env = {
   /** Feature to enable team creation flow for individual users */
   FEATURE_ENABLE_TEAM_CREATION: string;
 
+  /** Feature to enable rich text editor */
+  FEATURE_ENABLE_MESSAGE_FORMAT_BUTTONS: string;
+
   /** Feature to enable Cross Platform Backup export */
   FEATURE_ENABLE_CROSS_PLATFORM_BACKUP_EXPORT: string;
+
+  /** Feature to enable the press space to unmute feature */
+  FEATURE_ENABLE_PRESS_SPACE_TO_UNMUTE: string;
 
   /** Sets the verification ID for Google webmasters */
   GOOGLE_WEBMASTER_ID: string;

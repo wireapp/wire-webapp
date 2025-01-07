@@ -443,11 +443,11 @@ declare module 'I18n/en-US.json' {
     'conversationDetailsActionConversationParticipants': `Show all ({number})`;
     'conversationDetailsActionCreateGroup': `Create group`;
     'conversationDetailsActionDelete': `Delete group`;
+    'conversationDetailsActionDeleteForMe': `Delete for Me`;
     'conversationDetailsActionDevices': `Devices`;
     'conversationDetailsActionGuestOptions': `Guests`;
     'conversationDetailsActionLeave': `Leave group`;
     'conversationDetailsActionNotifications': `Notifications`;
-    'conversationDetailsActionRemove': `Remove group`;
     'conversationDetailsActionServicesOptions': `Services`;
     'conversationDetailsActionTimedMessages': `Self-deleting messages`;
     'conversationDetailsActionUnblock': `Unblock`;
@@ -601,6 +601,7 @@ declare module 'I18n/en-US.json' {
     'conversationsPopoverBlock': `Block`;
     'conversationsPopoverCancel': `Cancel request`;
     'conversationsPopoverClear': `Clear content`;
+    'conversationsPopoverDeleteForMe': `Delete for Me`;
     'conversationsPopoverLeave': `Leave group`;
     'conversationsPopoverMoveTo': `Move to`;
     'conversationsPopoverNewFolder': `Create new folder`;
@@ -653,6 +654,7 @@ declare module 'I18n/en-US.json' {
     'dataSharingModalDecline': `Decline`;
     'dataSharingModalDescription': `Help to improve Wire by sharing your usage data via a pseudonymous ID. The data is neither linked to your personal information nor shared with third parties besides Wire Group. It includes, for example, when you use a feature, your app version, device type, or your operating system. This data will be deleted at the latest after 365 days. <br /> Find further details in our [link]Privacy Policy[/link]. You can revoke your consent at any time.`;
     'dataSharingModalTitle': `Consent to share user data`;
+    'deletedUser': `Deleted User`;
     'downloadLatestMLS': `Download the latest MLS Wire version`;
     'enumerationAnd': `, and `;
     'ephemeralRemaining': `remaining`;
@@ -1336,6 +1338,8 @@ declare module 'I18n/en-US.json' {
     'preferencesOptionsEmojiReplaceDetail': `:-) → [icon]`;
     'preferencesOptionsEnableAgcCheckbox': `Automatic gain control (AGC)`;
     'preferencesOptionsEnableAgcDetails': `Enable to allow your microphone volume to be adjusted automatically to ensure all participants in a call are heard with similar and comfortable loudness.`;
+    'preferencesOptionsEnablePressSpaceToUnmute': `Press and hold to unmute`;
+    'preferencesOptionsEnablePressSpaceToUnmuteDetails': `Enable "Press and Hold to Unmute" by holding the space bar to temporarily unmute your microphone, re-muting automatically upon release.`;
     'preferencesOptionsEnableSoundlessIncomingCalls': `Silence other calls`;
     'preferencesOptionsEnableSoundlessIncomingCallsDetails': `Enable to silence incoming calls when you are already in an ongoing call.`;
     'preferencesOptionsEnableVbrCheckbox': `Variable Bit Rate Encoding`;
@@ -1380,6 +1384,13 @@ declare module 'I18n/en-US.json' {
     'replyQuoteShowMore': `Show more`;
     'replyQuoteTimeStampDate': `Original message from {date}`;
     'replyQuoteTimeStampTime': `Original message from {time}`;
+    'richTextBold': `Bold`;
+    'richTextCode': `Code`;
+    'richTextHeading': `Heading`;
+    'richTextItalic': `Italic`;
+    'richTextOrderedList': `Ordered list`;
+    'richTextStrikethrough': `Strikethrough`;
+    'richTextUnorderedList': `Unordered list`;
     'roleAdmin': `Admin`;
     'roleOwner': `Owner`;
     'rolePartner': `External`;
@@ -1536,9 +1547,11 @@ declare module 'I18n/en-US.json' {
     'tooltipConversationCall': `Call`;
     'tooltipConversationDetailsAddPeople': `Add participants to conversation ({shortcut})`;
     'tooltipConversationDetailsRename': `Change conversation name`;
+    'tooltipConversationEmoji': `Select emoji`;
     'tooltipConversationEphemeral': `Self-deleting message`;
     'tooltipConversationEphemeralAriaLabel': `Type a self-deleting message, currently set to {time}`;
     'tooltipConversationFile': `Add file`;
+    'tooltipConversationHideFormatting': `Hide formatting`;
     'tooltipConversationInfo': `Conversation info`;
     'tooltipConversationInputMoreThanTwoUserTyping': `{user1} and {count} more people are typing`;
     'tooltipConversationInputOneUserTyping': `{user1} is typing`;
@@ -1549,6 +1562,7 @@ declare module 'I18n/en-US.json' {
     'tooltipConversationPing': `Ping`;
     'tooltipConversationSearch': `Search`;
     'tooltipConversationSendMessage': `Send message`;
+    'tooltipConversationShowFormatting': `Show formatting`;
     'tooltipConversationVideoCall': `Video Call`;
     'tooltipConversationsArchive': `Archive ({shortcut})`;
     'tooltipConversationsArchived': `Show archive ({number})`;
@@ -1615,6 +1629,9 @@ declare module 'I18n/en-US.json' {
     'videoCallOverlayViewModeLabel': `View mode`;
     'videoCallOverlayViewModeSpeakers': `Show active speakers only`;
     'videoCallParticipantConnecting': `Connecting...`;
+    'videoCallParticipantLowerYourHand': `Lower your hand`;
+    'videoCallParticipantPressSpaceToUnmuteNotification': `Your microphone is on`;
+    'videoCallParticipantRaiseYourHand': `Raise your hand`;
     'videoCallParticipantRaisedHandRaiseDuration': `Hand raised for {duration}`;
     'videoCallParticipantRaisedSelfHandUp': `You have raised your hand up`;
     'videoCallParticipantRaisedSortByTime': `Top in the list raised their hand first.`;

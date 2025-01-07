@@ -30,6 +30,7 @@ export const EventName = {
     RECEIVED_CALL: 'calling.received_call',
     SCREEN_SHARE: 'calling.screen_share',
     QUALITY_REVIEW: 'calling.call_quality_review',
+    PRESS_SPACE_TO_UNMUTE: 'calling.press_space_to_unmute',
   },
   CONTRIBUTED: 'contributed',
   E2EE: {
@@ -63,5 +64,14 @@ export const EventName = {
   HISTORY: {
     BACKUP_CREATED: 'history.backup_created',
     BACKUP_CANCELLED: 'history.backup_cancelled',
+  },
+  INPUT: {
+    FORMAT_TEXT: {
+      ENABLED: 'input.rich_text_editor.enabled',
+      DISABLED: 'input.rich_text_editor.disabled',
+    },
+    EMOJI_MODAL: {
+      EMOJI_PICKED: 'input.emoji_modal.emoji_picked',
+    },
   },
 };
