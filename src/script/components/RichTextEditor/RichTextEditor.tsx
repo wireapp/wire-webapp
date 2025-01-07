@@ -46,6 +46,7 @@ import {FormatToolbar} from './components/FormatToolbar/FormatToolbar';
 import {EmojiNode} from './nodes/EmojiNode';
 import {MentionNode} from './nodes/MentionNode';
 import {AutoFocusPlugin} from './plugins/AutoFocusPlugin';
+import {BlockquotePlugin} from './plugins/BlockquotePlugin/BlockquotePlugin';
 import {CodeHighlightPlugin} from './plugins/CodeHighlightPlugin/CodeHighlightPlugin';
 import {DraftStatePlugin} from './plugins/DraftStatePlugin';
 import {EditedMessagePlugin} from './plugins/EditedMessagePlugin/EditedMessagePlugin';
@@ -259,8 +260,8 @@ export const RichTextEditor = ({
           <EmojiPickerPlugin openStateRef={emojiPickerOpen} />
           <HistoryPlugin />
           <ListPlugin />
+          <BlockquotePlugin />
           {replaceEmojis && <ReplaceEmojiPlugin />}
-
           <ReplaceCarriageReturnPlugin />
           <MarkdownShortcutPlugin transformers={markdownTransformers} />
           <CodeHighlightPlugin />
@@ -269,13 +270,11 @@ export const RichTextEditor = ({
             placeholder={<Placeholder text={placeholder} hasLocalEphemeralTimer={hasLocalEphemeralTimer} />}
             ErrorBoundary={LexicalErrorBoundary}
           />
-
           <ClearEditorPlugin />
           <MentionsPlugin
             onSearch={search => (typeof search === 'string' ? getMentionCandidates(search) : [])}
             openStateRef={mentionsOpen}
           />
-
           <OnChangePlugin onChange={handleChange} ignoreSelectionChange />
 
           <SendPlugin

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2023 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,17 +39,16 @@ export function SendPlugin({onSend}: Props): null {
           return false;
         }
 
-        // Mimic the "Enter" behavior when a user press "Shift + Enter"
-        // It's useful for the rich text editor, especially when creating lists
         if (event.shiftKey) {
           const messageFormatButtonsEnabled = Config.getConfig().FEATURE.ENABLE_MESSAGE_FORMAT_BUTTONS;
 
           if (messageFormatButtonsEnabled) {
             event.preventDefault();
-            return editor.dispatchCommand(INSERT_PARAGRAPH_COMMAND, undefined);
+            editor.update(() => {
+              editor.dispatchCommand(INSERT_PARAGRAPH_COMMAND, undefined);
+            });
+            return true;
           }
-
-          return true;
         }
 
         // When sending a message with "Enter", we want to prevent the default behavior (new line)
