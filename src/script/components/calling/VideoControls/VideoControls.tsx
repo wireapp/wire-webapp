@@ -24,16 +24,14 @@ import classNames from 'classnames';
 import {container} from 'tsyringe';
 
 import {CALL_TYPE} from '@wireapp/avs';
-import {EmojiIcon, GridIcon, QUERY, RaiseHandIcon, Select} from '@wireapp/react-ui-kit';
+import {EmojiIcon, GridIcon, QUERY, RaiseHandIcon, MoreIcon} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/Icon';
 import {useActiveWindowMatchMedia} from 'Hooks/useActiveWindowMatchMedia';
 import {useClickOutside} from 'Hooks/useClickOutside';
-import {useToggleState} from 'Hooks/useToggleState';
 import {useUserPropertyValue} from 'Hooks/useUserProperty';
 import {Call} from 'src/script/calling/Call';
-import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {CallingViewMode, CallState} from 'src/script/calling/CallState';
 import {Participant} from 'src/script/calling/Participant';
 import {Config} from 'src/script/Config';
@@ -45,29 +43,28 @@ import {MediaDeviceType} from 'src/script/media/MediaDeviceType';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
 import {TeamState} from 'src/script/team/TeamState';
+import {ContextMenuEntry, showContextMenu} from 'src/script/ui/ContextMenu';
 import {CallViewTab} from 'src/script/view_model/CallingViewModel';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, isEscapeKey, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
+import {EmojisBar} from './EmojisBar/EmojisBar';
 import {
   hangUpVideoControlStyles,
   minimizeVideoControlStyles,
   shareScreenVideoControlStyles,
   videoControlActiveStyles,
   videoControlDisabledStyles,
+  videoControlInActiveStyles,
   videoControlsWrapperStyles,
 } from './VideoControls.styles';
-
-// TODO: move to a shared location
-import {videoControlInActiveStyles} from '../FullscreenVideoCall.styles';
+import {VideoControlsSelect} from './VideoControlsSelect/VideoControlsSelect';
 
 enum BlurredBackgroundStatus {
   OFF = 'bluroff',
   ON = 'bluron',
 }
-
-const EMOJIS_LIST = ['👍', '🎉', '❤️', '😂', '😮', '👏', '🤔', '😢', '👎'];
 
 export interface VideoControlsProps {
   activeCallViewTab: string;
@@ -141,7 +138,6 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
   const {participants} = useKoSubscribableChildren(call, ['participants']);
 
   const [showEmojisBar, setShowEmojisBar] = useState<boolean>(false);
-  const [disabledEmojis, setDisabledEmojis] = useState<string[]>([]);
 
   const {viewMode, detachedWindow} = useKoSubscribableChildren(callState, ['viewMode', 'detachedWindow']);
 
@@ -166,11 +162,11 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
   ]);
 
   const isMobile = useActiveWindowMatchMedia(QUERY.mobile);
+  const isDesktop = useActiveWindowMatchMedia(QUERY.desktop);
 
   const [audioOptionsOpen, setAudioOptionsOpen] = useState(false);
   const [videoOptionsOpen, setVideoOptionsOpen] = useState(false);
-
-  const [isCallViewOpen, toggleCallView] = useToggleState(false);
+  const [isCallViewOpen, setIsCallViewOpen] = useState(false);
 
   const showToggleVideo =
     isVideoCallingEnabled &&
@@ -314,14 +310,61 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
     }
   };
 
-  const onEmojiClick = (selectedEmoji: string) => {
-    setDisabledEmojis(prev => [...prev, selectedEmoji]);
+  const handleEmojiClick = (selectedEmoji: string) => sendEmoji(selectedEmoji, call);
 
-    sendEmoji(selectedEmoji, call);
+  const onMoreInteractionsMenuClick = (event: React.MouseEvent) => {
+    const mobileEntires: ContextMenuEntry[] = isMobile
+      ? [
+          {
+            click: () => {
+              setAudioOptionsOpen(prev => !prev);
+            },
+            label: t('videoCallMenuMoreAudioSettings'),
+            icon: Icon.MicOnIcon,
+          },
+          {
+            click: () => {
+              setVideoOptionsOpen(prev => !prev);
+            },
+            label: t('videoCallMenuMoreVideoSettings'),
+            icon: Icon.CameraIcon,
+          },
+        ]
+      : [];
 
-    setTimeout(() => {
-      setDisabledEmojis(prev => [...prev].filter(emoji => emoji !== selectedEmoji));
-    }, CallingRepository.EMOJI_TIME_OUT_DURATION);
+    const emojiBarEntry: ContextMenuEntry[] = Config.getConfig().FEATURE.ENABLE_IN_CALL_REACTIONS
+      ? [
+          {
+            click: () => setShowEmojisBar(prev => !prev),
+            label: showEmojisBar ? t('videoCallMenuMoreCloseReactions') : t('videoCallMenuMoreAddReaction'),
+            icon: props => <EmojiIcon {...props} height={16} width={16} scale={1} />,
+          },
+        ]
+      : [];
+
+    showContextMenu({
+      event: event.nativeEvent,
+      entries: [
+        ...mobileEntires,
+        {
+          label: t('videoCallMenuMoreRaiseHand'),
+        },
+        {
+          click: () => setIsCallViewOpen(prev => !prev),
+          label: t('videoCallMenuMoreChangeView'),
+          icon: props => <GridIcon {...props} height={16} width={16} scale={1} />,
+        },
+        ...emojiBarEntry,
+        {
+          click: toggleParticipantsList,
+          label: isParticipantsListOpen
+            ? t('videoCallMenuMoreHideParticipants')
+            : t('videoCallMenuMoreSeeParticipants'),
+          icon: Icon.PeopleIcon,
+        },
+      ],
+      identifier: 'more-interactions-menu',
+    });
   };
 
   const isPressSpaceToUnmuteEnabled =
@@ -331,7 +374,73 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
     ) && Config.getConfig().FEATURE.ENABLE_PRESS_SPACE_TO_UNMUTE;
 
   return (
-    <ul className="video-controls__wrapper" css={videoControlsWrapperStyles}>
+    <ul id="video-controls" className="video-controls" css={videoControlsWrapperStyles}>
+      <div
+        css={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+        }}
+      >
+        {isMobile && audioOptionsOpen && (
+          <VideoControlsSelect
+            value={selectedAudioOptions}
+            id="select-microphone"
+            dataUieName="select-microphone"
+            options={audioOptions}
+            onChange={selectedOption => {
+              updateAudioOptions(String(selectedOption?.value), String(selectedOption?.value).includes('input'));
+              setAudioOptionsOpen(false);
+            }}
+            onKeyDown={event => isEscapeKey(event) && setAudioOptionsOpen(false)}
+            onMenuClose={() => setAudioOptionsOpen(false)}
+            menuIsOpen={audioOptionsOpen}
+            menuCSS={{width: '100vw', minWidth: 'initial'}}
+          />
+        )}
+        {isMobile && videoOptionsOpen && (
+          <VideoControlsSelect
+            value={selectedVideoOptions}
+            onChange={selectedOption => {
+              updateVideoOptions(String(selectedOption?.value));
+              setVideoOptionsOpen(false);
+            }}
+            onKeyDown={event =>
+              handleKeyDown({
+                event,
+                callback: () => toggleCamera(call),
+                keys: [KEY.ENTER, KEY.SPACE],
+              })
+            }
+            id="select-camera"
+            dataUieName="select-camera"
+            options={videoOptions}
+            onMenuClose={() => setVideoOptionsOpen(false)}
+            menuIsOpen={videoOptionsOpen}
+            menuCSS={{width: '100vw', minWidth: 'initial'}}
+          />
+        )}
+        {!isDesktop && isCallViewOpen && (
+          <VideoControlsSelect
+            value={selectedCallViewOption}
+            id="select-call-view"
+            dataUieName="select-call-view"
+            options={callViewOptions}
+            onChange={selectedOption => {
+              if (isCallViewOption(selectedOption)) {
+                setIsCallViewOpen(false);
+                setActiveCallViewTab(selectedOption.value);
+                setMaximizedParticipant(call, null);
+              }
+            }}
+            onKeyDown={event => isEscapeKey(event) && setAudioOptionsOpen(false)}
+            onMenuClose={() => setIsCallViewOpen(false)}
+            menuIsOpen={isCallViewOpen}
+            menuCSS={{width: '100vw', minWidth: 'initial'}}
+          />
+        )}
+      </div>
+
       {!isMobile && (
         <li className="video-controls__item__minimize" css={minimizeVideoControlStyles}>
           <button
@@ -353,6 +462,7 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
           </button>
         </li>
       )}
+
       <li className="video-controls__item">
         <button
           className="video-controls__button"
@@ -395,22 +505,15 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
           >
             {audioOptionsOpen ? (
               <>
-                <Select
-                  // eslint-disable-next-line jsx-a11y/no-autofocus
-                  autoFocus
+                <VideoControlsSelect
                   value={selectedAudioOptions}
                   id="select-microphone"
                   dataUieName="select-microphone"
-                  controlShouldRenderValue={false}
-                  isClearable={false}
-                  backspaceRemovesValue={false}
-                  hideSelectedOptions={false}
                   options={audioOptions}
                   onChange={selectedOption => {
                     updateAudioOptions(String(selectedOption?.value), String(selectedOption?.value).includes('input'));
                   }}
                   onKeyDown={event => isEscapeKey(event) && setAudioOptionsOpen(false)}
-                  menuPlacement="top"
                   menuIsOpen
                   wrapperCSS={{marginBottom: 0}}
                 />
@@ -469,20 +572,13 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
             >
               {videoOptionsOpen ? (
                 <>
-                  <Select
-                    // eslint-disable-next-line jsx-a11y/no-autofocus
-                    autoFocus
+                  <VideoControlsSelect
                     value={selectedVideoOptions}
                     onChange={selectedOption => updateVideoOptions(String(selectedOption?.value))}
                     onKeyDown={event => isEscapeKey(event) && setVideoOptionsOpen(false)}
                     id="select-camera"
                     dataUieName="select-camera"
-                    controlShouldRenderValue={false}
-                    isClearable={false}
-                    backspaceRemovesValue={false}
-                    hideSelectedOptions={false}
                     options={videoOptions}
-                    menuPlacement="top"
                     menuIsOpen
                     wrapperCSS={{marginBottom: 0}}
                   />
@@ -548,22 +644,39 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
         </button>
       </li>
 
-      {!isMobile && (
+      {!isDesktop && (
+        <li className="video-controls__item">
+          {showEmojisBar && <EmojisBar onEmojiClick={handleEmojiClick} ref={emojiBarRef} />}
+          <button
+            title={t('callMenuMoreInteractions')}
+            className={classNames('video-controls__button_primary', {
+              active: isParticipantsListOpen || showEmojisBar,
+            })}
+            onClick={onMoreInteractionsMenuClick}
+            type="button"
+            data-uie-name="video-controls-menu-more-interactions"
+          >
+            <MoreIcon width={16} height={16} />
+          </button>
+        </li>
+      )}
+
+      {isDesktop && (
         <>
           {participants.length > 2 && (
             <li className="video-controls__item">
               <button
                 onBlur={event => {
-                  if (!event.currentTarget.contains(event.relatedTarget) && isCallViewOpen) {
-                    toggleCallView();
+                  if (!event.currentTarget.contains(event.relatedTarget)) {
+                    setIsCallViewOpen(false);
                   }
                 }}
                 className={classNames('video-controls__button_primary', {active: isCallViewOpen})}
-                onClick={toggleCallView}
+                onClick={() => setIsCallViewOpen(prev => !prev)}
                 onKeyDown={event =>
                   handleKeyDown({
                     event,
-                    callback: toggleCallView,
+                    callback: () => setIsCallViewOpen(prev => !prev),
                     keys: [KEY.ENTER, KEY.SPACE],
                   })
                 }
@@ -574,16 +687,10 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
                 title={t('videoCallOverlayChangeViewMode')}
               >
                 {isCallViewOpen && (
-                  <Select
-                    // eslint-disable-next-line jsx-a11y/no-autofocus
-                    autoFocus
+                  <VideoControlsSelect
                     value={selectedCallViewOption}
                     id="select-call-view"
                     dataUieName="select-call-view"
-                    controlShouldRenderValue={false}
-                    isClearable={false}
-                    backspaceRemovesValue={false}
-                    hideSelectedOptions={false}
                     options={callViewOptions}
                     onChange={selectedOption => {
                       if (isCallViewOption(selectedOption)) {
@@ -592,7 +699,6 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
                       }
                     }}
                     onKeyDown={event => isEscapeKey(event) && setAudioOptionsOpen(false)}
-                    menuPlacement="top"
                     menuIsOpen={isCallViewOpen}
                     wrapperCSS={{marginBottom: 0, width: 0, height: 0}}
                     menuCSS={{right: 0, bottom: 10}}
@@ -631,39 +737,13 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
 
           {Config.getConfig().FEATURE.ENABLE_IN_CALL_REACTIONS && (
             <li className="video-controls__item">
-              {showEmojisBar && (
-                <div
-                  ref={emojiBarRef}
-                  role="toolbar"
-                  className="video-controls-emoji-bar"
-                  data-uie-name="video-controls-emoji-bar"
-                  aria-label={t('callReactionButtonsAriaLabel')}
-                >
-                  {EMOJIS_LIST.map(emoji => {
-                    const isDisabled = disabledEmojis.includes(emoji);
-                    return (
-                      <button
-                        aria-label={t('callReactionButtonAriaLabel', {emoji})}
-                        data-uie-name="video-controls-emoji"
-                        data-uie-value={emoji}
-                        key={emoji}
-                        disabled={isDisabled}
-                        onClick={() => onEmojiClick(emoji)}
-                        className={classNames({disabled: isDisabled})}
-                      >
-                        {emoji}
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
+              {showEmojisBar && <EmojisBar onEmojiClick={handleEmojiClick} ref={emojiBarRef} />}
               <button
                 ref={emojiBarToggleButtonRef}
                 title={t('callReactions')}
                 className={classNames('video-controls__button_primary', {active: showEmojisBar})}
                 onClick={() => setShowEmojisBar(prev => !prev)}
                 type="button"
-                aria-labelledby="show-emoji-bar"
                 data-uie-name="do-call-controls-video-call-cancel"
               >
                 <EmojiIcon />

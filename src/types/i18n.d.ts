@@ -335,6 +335,7 @@ declare module 'I18n/en-US.json' {
     'callReactionButtonsAriaLabel': `Emoji selection bar`;
     'callReactions': `Reactions`;
     'callReactionsAriaLabel': `Emoji {emoji} from {from}`;
+    'callMenuMoreInteractions': `More settings`;
     'callStateCbr': `Constant Bit Rate`;
     'callStateConnecting': `Connecting…`;
     'callStateIncoming': `Calling…`;
@@ -1612,6 +1613,14 @@ declare module 'I18n/en-US.json' {
     'verify.headline': `You’ve got mail`;
     'verify.resendCode': `Resend code`;
     'verify.subhead': `Enter the verification code we sent to{newline}{email}`;
+    'videoCallMenuMoreAudioSettings': `Audio Settings`;
+    'videoCallMenuMoreVideoSettings': `Video Settings`;
+    'videoCallMenuMoreChangeView': `Change view`;
+    'videoCallMenuMoreRaiseHand': `Raise hand`;
+    'videoCallMenuMoreAddReaction': `Add reaction`;
+    'videoCallMenuMoreCloseReactions': `Close reactions`;
+    'videoCallMenuMoreSeeParticipants': `See participants`;
+    'videoCallMenuMoreHideParticipants': `Hide participants`;
     'videoCallOverlayCamera': `Camera`;
     'videoCallOverlayChangeViewMode': `Change view mode`;
     'videoCallOverlayCloseFullScreen': `Go back to minimized view`;
