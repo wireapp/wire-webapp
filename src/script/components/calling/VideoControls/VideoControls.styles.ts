@@ -19,36 +19,39 @@
 
 import {css, CSSObject} from '@emotion/react';
 
+import {media} from '@wireapp/react-ui-kit';
+
 export const videoControlsWrapperStyles: CSSObject = {
+  position: 'relative',
   display: 'flex',
   alignItems: 'center',
-  padding: '8px 16px',
+  padding: '4px 16px 8px',
   margin: 0,
   gap: '8px',
 
-  '@media (min-width: 640px)': {
+  [media.tabletUp]: {
     gap: '16px',
   },
 };
 
 export const minimizeVideoControlStyles: CSSObject = {
-  '@media (min-width: 640px)': {
+  [media.tabletUp]: {
     marginRight: 'auto',
   },
 };
 
 export const shareScreenVideoControlStyles: CSSObject = {
-  '@media (max-width: 639px)': {
+  [media.mobile]: {
     marginLeft: 'auto',
     marginRight: 'auto',
   },
 };
 
 export const hangUpVideoControlStyles: CSSObject = {
-  '@media (max-width: 639px)': {
+  [media.mobile]: {
     order: 2,
   },
-  '@media (min-width: 640px)': {
+  [media.tabletUp]: {
     marginRight: 'auto',
   },
 };
