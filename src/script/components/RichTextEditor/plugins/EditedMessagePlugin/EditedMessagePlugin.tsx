@@ -28,13 +28,15 @@ import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 
 import {getMentionMarkdownTransformer} from './getMentionMarkdownTransformer/getMentionMarkdownTransformer';
 import {getMentionNodesFromMessage} from './getMentionNodesFromMessage/getMentionNodesFromMessage';
+import {getRawMarkdownNodesWithMentions} from './getRawMarkdownFromMessage/getRawMarkdownFromMessage';
 import {wrapMentionsWithTags} from './wrapMentionsWithTags/wrapMentionsWithTags';
 
 type Props = {
   message?: ContentMessage;
+  showMarkdownPreview: boolean;
 };
 
-export function EditedMessagePlugin({message}: Props): null {
+export function EditedMessagePlugin({message, showMarkdownPreview}: Props): null {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {
@@ -46,6 +48,12 @@ export function EditedMessagePlugin({message}: Props): null {
           root.clear();
           // This behaviour is needed to clear selection, if we not clear selection will be on beginning.
           $setSelection(null);
+
+          if (!showMarkdownPreview) {
+            const rawMarkdownNodes = getRawMarkdownNodesWithMentions(message);
+            root.append(rawMarkdownNodes);
+            return;
+          }
 
           const messageContent = message.getFirstAsset().text;
 
@@ -68,7 +76,7 @@ export function EditedMessagePlugin({message}: Props): null {
         });
       });
     }
-  }, [editor, message]);
+  }, [editor, message, showMarkdownPreview]);
 
   return null;
 }

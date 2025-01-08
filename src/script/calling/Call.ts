@@ -226,10 +226,13 @@ export class Call {
     const selfParticipant = this.getSelfParticipant();
     const remoteParticipants = this.getRemoteParticipants().sort((p1, p2) => sortUsersByPriority(p1.user, p2.user));
 
-    const [withVideo, withoutVideo] = partition(remoteParticipants, participant => participant.isSendingVideo());
+    const [withVideoAndScreenShare, withoutVideo] = partition(remoteParticipants, participant =>
+      participant.isSendingVideo(),
+    );
+    const [withScreenShare, withVideo] = partition(withVideoAndScreenShare, participant => participant.sharesScreen());
 
     const newPages = chunk<Participant>(
-      [selfParticipant, ...withVideo, ...withoutVideo].filter(Boolean),
+      [selfParticipant, ...withScreenShare, ...withVideo, ...withoutVideo].filter(Boolean),
       NUMBER_OF_PARTICIPANTS_IN_ONE_PAGE,
     );
 

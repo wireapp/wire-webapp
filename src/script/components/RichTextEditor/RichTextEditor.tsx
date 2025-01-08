@@ -143,6 +143,7 @@ interface RichTextEditorProps {
   children: ReactElement;
   hasLocalEphemeralTimer: boolean;
   showFormatToolbar: boolean;
+  showMarkdownPreview: boolean;
   getMentionCandidates: (search?: string | null) => User[];
   saveDraftState: (editor: string) => void;
   loadDraftState: () => Promise<DraftState>;
@@ -209,6 +210,7 @@ export const RichTextEditor = ({
   replaceEmojis,
   editedMessage,
   showFormatToolbar,
+  showMarkdownPreview,
   onUpdate,
   saveDraftState,
   loadDraftState,
@@ -254,17 +256,23 @@ export const RichTextEditor = ({
             }}
           />
           <DraftStatePlugin loadDraftState={loadDraftState} />
-          <EditedMessagePlugin message={editedMessage} />
-          <ListItemTabIndentationPlugin />
-          <ListMaxIndentLevelPlugin maxDepth={3} />
+          <EditedMessagePlugin message={editedMessage} showMarkdownPreview={showMarkdownPreview} />
           <EmojiPickerPlugin openStateRef={emojiPickerOpen} />
           <HistoryPlugin />
           <ListPlugin />
           <BlockquotePlugin />
           {replaceEmojis && <ReplaceEmojiPlugin />}
           <ReplaceCarriageReturnPlugin />
-          <MarkdownShortcutPlugin transformers={markdownTransformers} />
-          <CodeHighlightPlugin />
+
+          {showMarkdownPreview && (
+            <>
+              <ListItemTabIndentationPlugin />
+              <ListMaxIndentLevelPlugin maxDepth={3} />
+              <MarkdownShortcutPlugin transformers={markdownTransformers} />
+              <CodeHighlightPlugin />
+            </>
+          )}
+
           <RichTextPlugin
             contentEditable={<ContentEditable className="conversation-input-bar-text" data-uie-name="input-message" />}
             placeholder={<Placeholder text={placeholder} hasLocalEphemeralTimer={hasLocalEphemeralTimer} />}
@@ -276,7 +284,6 @@ export const RichTextEditor = ({
             openStateRef={mentionsOpen}
           />
           <OnChangePlugin onChange={handleChange} ignoreSelectionChange />
-
           <SendPlugin
             onSend={() => {
               if (!mentionsOpen.current && !emojiPickerOpen.current) {
@@ -286,7 +293,7 @@ export const RichTextEditor = ({
           />
         </div>
       </div>
-      {showFormatToolbar && (
+      {showFormatToolbar && showMarkdownPreview && (
         <div className="input-bar-toolbar">
           <FormatToolbar />
         </div>
@@ -299,7 +306,9 @@ export const RichTextEditor = ({
 function Placeholder({text, hasLocalEphemeralTimer}: {text: string; hasLocalEphemeralTimer: boolean}) {
   return (
     <div
-      className={cx('editor-placeholder', {'conversation-input-bar-text--accent': hasLocalEphemeralTimer})}
+      className={cx('editor-placeholder', {
+        'conversation-input-bar-text--accent': hasLocalEphemeralTimer,
+      })}
       data-uie-name="input-placeholder"
     >
       {text}

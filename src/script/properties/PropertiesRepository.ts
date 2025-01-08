@@ -90,6 +90,7 @@ export class PropertiesRepository {
           font_size: '',
           theme: 'default',
           view_folders: false,
+          markdown_preview: true,
         },
         notifications: NotificationPreference.ON,
         previews: {
@@ -322,6 +323,9 @@ export class PropertiesRepository {
         break;
       case PROPERTIES_TYPE.EMOJI.REPLACE_INLINE:
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE, updatedPreference);
+        break;
+      case PROPERTIES_TYPE.INTERFACE.MARKDOWN_PREVIEW:
+        amplify.publish(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.MARKDOWN_PREVIEW, updatedPreference);
         break;
       case PROPERTIES_TYPE.ENABLE_DEBUGGING:
         amplify.publish(getLogger.prototype.LOG_ON_DEBUG, updatedPreference);
