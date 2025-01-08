@@ -259,17 +259,18 @@ export const RichTextEditor = ({
           <EditedMessagePlugin message={editedMessage} showMarkdownPreview={showMarkdownPreview} />
           <EmojiPickerPlugin openStateRef={emojiPickerOpen} />
           <HistoryPlugin />
-          <ListPlugin />
-          <BlockquotePlugin />
+
           {replaceEmojis && <ReplaceEmojiPlugin />}
           <ReplaceCarriageReturnPlugin />
 
           {showMarkdownPreview && (
             <>
+              <ListPlugin />
               <ListItemTabIndentationPlugin />
               <ListMaxIndentLevelPlugin maxDepth={3} />
               <MarkdownShortcutPlugin transformers={markdownTransformers} />
               <CodeHighlightPlugin />
+              <BlockquotePlugin />
             </>
           )}
 
