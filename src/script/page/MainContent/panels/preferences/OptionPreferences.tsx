@@ -135,7 +135,7 @@ const OptionPreferences = ({propertiesRepository, selfUser}: OptionPreferencesPr
     {value: 6, label: RootFontSize.XXL, heading: t('preferencesOptionsFontSizeLarge')},
   ];
 
-  const messageFormatButtonsEnabled = Config.getConfig().FEATURE.ENABLE_MESSAGE_FORMAT_BUTTONS;
+  const isMessageFormatButtonsFlagEnabled = Config.getConfig().FEATURE.ENABLE_MESSAGE_FORMAT_BUTTONS;
 
   return (
     <PreferencesPage title={t('preferencesOptions')}>
@@ -249,7 +249,7 @@ const OptionPreferences = ({propertiesRepository, selfUser}: OptionPreferencesPr
               />
             </div>
 
-            {messageFormatButtonsEnabled && (
+            {isMessageFormatButtonsFlagEnabled && (
               <div className="checkbox-margin">
                 <Checkbox
                   tabIndex={TabIndex.FOCUSABLE}
