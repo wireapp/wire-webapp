@@ -28,6 +28,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Theme} from 'Components/AppContainer/hooks/useTheme';
 import {RadioGroup} from 'Components/Radio';
+import {Config} from 'src/script/Config';
 import {User} from 'src/script/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -133,6 +134,8 @@ const OptionPreferences = ({propertiesRepository, selfUser}: OptionPreferencesPr
     {value: 5, label: RootFontSize.XL},
     {value: 6, label: RootFontSize.XXL, heading: t('preferencesOptionsFontSizeLarge')},
   ];
+
+  const messageFormatButtonsEnabled = Config.getConfig().FEATURE.ENABLE_MESSAGE_FORMAT_BUTTONS;
 
   return (
     <PreferencesPage title={t('preferencesOptions')}>
@@ -246,24 +249,26 @@ const OptionPreferences = ({propertiesRepository, selfUser}: OptionPreferencesPr
               />
             </div>
 
-            <div className="checkbox-margin">
-              <Checkbox
-                tabIndex={TabIndex.FOCUSABLE}
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                  saveMarkdownPreviewPreference(event.target.checked);
-                }}
-                checked={optionMarkdownPreview}
-                data-uie-name="status-preference-markdown-preview"
-              >
-                <CheckboxLabel htmlFor="status-preference-markdown-preview">
-                  {t('preferencesOptionsMarkdownPreview')}
-                </CheckboxLabel>
-              </Checkbox>
+            {messageFormatButtonsEnabled && (
+              <div className="checkbox-margin">
+                <Checkbox
+                  tabIndex={TabIndex.FOCUSABLE}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    saveMarkdownPreviewPreference(event.target.checked);
+                  }}
+                  checked={optionMarkdownPreview}
+                  data-uie-name="status-preference-markdown-preview"
+                >
+                  <CheckboxLabel htmlFor="status-preference-markdown-preview">
+                    {t('preferencesOptionsMarkdownPreview')}
+                  </CheckboxLabel>
+                </Checkbox>
 
-              <p className="preferences-detail preferences-detail-intended">
-                {t('preferencesOptionsMarkdownPreviewDetails')}
-              </p>
-            </div>
+                <p className="preferences-detail preferences-detail-intended">
+                  {t('preferencesOptionsMarkdownPreviewDetails')}
+                </p>
+              </div>
+            )}
 
             <div className="checkbox-margin">
               <Checkbox
