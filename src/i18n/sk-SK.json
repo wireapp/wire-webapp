@@ -1345,6 +1345,8 @@
   "preferencesOptionsFontSizeSmall": "Small",
   "preferencesOptionsInputLevelDetected": "Audio detected from microphone",
   "preferencesOptionsInputLevelNotDetected": "No audio detected from microphone",
+  "preferencesOptionsMarkdownPreview": "Preview text formatting",
+  "preferencesOptionsMarkdownPreviewDetails": "When this is on, you can select various formatting options and see the chosen format while typing a message. Otherwise, you need to use markdown commands. This setting applies to your Wire apps on desktop and Wire for web.",
   "preferencesOptionsNotifications": "Notifikácie",
   "preferencesOptionsNotificationsNone": "Vypnúť",
   "preferencesOptionsNotificationsObfuscate": "Skryť detaily",
