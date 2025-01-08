@@ -29,8 +29,8 @@ import {
   KEY_BACKSPACE_COMMAND,
   $isLineBreakNode,
   INSERT_PARAGRAPH_COMMAND,
-  INSERT_LINE_BREAK_COMMAND,
   LexicalEditor,
+  INSERT_LINE_BREAK_COMMAND,
 } from 'lexical';
 
 export const BlockquotePlugin = (): null => {
@@ -69,19 +69,17 @@ const registerBlockquoteEnterCommand = (editor: LexicalEditor) => {
       const anchorNode = selection.anchor.getNode();
       const quoteBlock = anchorNode.getParent();
 
-      if (!$isQuoteNode(quoteBlock) || !$isQuoteNode(anchorNode)) {
+      if (!$isQuoteNode(quoteBlock) && !$isQuoteNode(anchorNode)) {
         return false;
       }
 
-      if (event.shiftKey) {
-        event.preventDefault();
-        editor.update(() => {
-          editor.dispatchCommand(INSERT_LINE_BREAK_COMMAND, true);
-        });
-        return true;
-      }
-
       event.preventDefault();
+
+      if (event.shiftKey) {
+        editor.update(() => {
+          editor.dispatchCommand(INSERT_LINE_BREAK_COMMAND, false);
+        });
+      }
 
       return true;
     },
