@@ -43,7 +43,7 @@ import {
 import * as Icon from 'Components/Icon';
 import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
 import {AssetRepository} from 'src/script/assets/AssetRepository';
-import {handleEscDown, handleKeyDown} from 'Util/KeyboardUtil';
+import {handleEscDown, handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {loadDataUrl} from 'Util/util';
 
@@ -228,7 +228,7 @@ const OAuthPermissionsComponent = ({
                 type="button"
                 onClick={onContinue}
                 data-uie-name="do-oauth-allow"
-                onKeyDown={event => handleKeyDown(event, () => onContinue())}
+                onKeyDown={event => handleKeyDown({event, callback: onContinue, keys: [KEY.ENTER, KEY.SPACE]})}
               >
                 {t('oauth.allow')}
               </Button>

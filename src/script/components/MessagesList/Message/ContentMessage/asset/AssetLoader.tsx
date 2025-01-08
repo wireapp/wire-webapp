@@ -22,7 +22,7 @@ import React from 'react';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {CloseIcon} from 'Components/Icon';
-import {handleKeyDown} from 'Util/KeyboardUtil';
+import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 
 export interface AssetLoaderProps {
   large?: boolean;
@@ -47,7 +47,7 @@ const AssetLoader: React.FC<AssetLoaderProps> = ({large, loadProgress, onCancel}
       tabIndex={TabIndex.FOCUSABLE}
       className="media-button"
       onClick={onClick}
-      onKeyDown={event => handleKeyDown(event, () => onClick(event))}
+      onKeyDown={event => handleKeyDown({event, callback: () => onClick(event), keys: [KEY.ENTER, KEY.SPACE]})}
       data-uie-name="status-loading-media"
     >
       <svg aria-hidden="true" viewBox={viewBox} data-uie-name="asset-loader-svg">

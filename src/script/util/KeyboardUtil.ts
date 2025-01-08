@@ -83,11 +83,16 @@ export const isRemovalAction = (key: string): boolean => removalKeys.includes(ke
 
 export const isSpaceOrEnterKey = (key: string): boolean => key === KEY.SPACE || key === KEY.ENTER;
 
-export const handleKeyDown = (
-  event: ReactKeyboardEvent<Element> | KeyboardEvent,
-  callback: (event?: ReactKeyboardEvent<Element> | KeyboardEvent) => void,
-) => {
-  if (event.key === KEY.ENTER || event.key === KEY.SPACE) {
+export const handleKeyDown = ({
+  event,
+  callback,
+  keys,
+}: {
+  event: ReactKeyboardEvent<Element> | KeyboardEvent;
+  callback: (event?: ReactKeyboardEvent<Element> | KeyboardEvent) => void;
+  keys: Array<(typeof KEY)[keyof typeof KEY]>;
+}) => {
+  if (keys.includes(event.key as (typeof KEY)[keyof typeof KEY])) {
     callback(event);
   }
   return true;
