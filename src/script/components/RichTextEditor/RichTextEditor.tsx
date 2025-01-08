@@ -46,6 +46,7 @@ import {FormatToolbar} from './components/FormatToolbar/FormatToolbar';
 import {EmojiNode} from './nodes/EmojiNode';
 import {MentionNode} from './nodes/MentionNode';
 import {AutoFocusPlugin} from './plugins/AutoFocusPlugin';
+import {BlockquotePlugin} from './plugins/BlockquotePlugin/BlockquotePlugin';
 import {CodeHighlightPlugin} from './plugins/CodeHighlightPlugin/CodeHighlightPlugin';
 import {DraftStatePlugin} from './plugins/DraftStatePlugin';
 import {EditedMessagePlugin} from './plugins/EditedMessagePlugin/EditedMessagePlugin';
@@ -78,6 +79,7 @@ const theme = {
     strikethrough: 'editor-strikethrough',
     code: 'editor-inline-code',
   },
+  quote: 'editor-quote',
   list: {
     ul: 'editor-list editor-list-unordered',
     ol: 'editor-list editor-list-ordered',
@@ -197,6 +199,7 @@ const editorConfig: InitialConfigType = {
     CodeNode,
     CodeHighlightNode,
     LinkNode,
+    QuoteNode,
   ],
 };
 
@@ -256,17 +259,18 @@ export const RichTextEditor = ({
           <EditedMessagePlugin message={editedMessage} showMarkdownPreview={showMarkdownPreview} />
           <EmojiPickerPlugin openStateRef={emojiPickerOpen} />
           <HistoryPlugin />
-          <ListPlugin />
-          {replaceEmojis && <ReplaceEmojiPlugin />}
 
+          {replaceEmojis && <ReplaceEmojiPlugin />}
           <ReplaceCarriageReturnPlugin />
 
           {showMarkdownPreview && (
             <>
+              <ListPlugin />
               <ListItemTabIndentationPlugin />
               <ListMaxIndentLevelPlugin maxDepth={3} />
               <MarkdownShortcutPlugin transformers={markdownTransformers} />
               <CodeHighlightPlugin />
+              <BlockquotePlugin />
             </>
           )}
 
@@ -275,13 +279,11 @@ export const RichTextEditor = ({
             placeholder={<Placeholder text={placeholder} hasLocalEphemeralTimer={hasLocalEphemeralTimer} />}
             ErrorBoundary={LexicalErrorBoundary}
           />
-
           <ClearEditorPlugin />
           <MentionsPlugin
             onSearch={search => (typeof search === 'string' ? getMentionCandidates(search) : [])}
             openStateRef={mentionsOpen}
           />
-
           <OnChangePlugin onChange={handleChange} ignoreSelectionChange />
           <SendPlugin
             onSend={() => {

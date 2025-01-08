@@ -258,6 +258,25 @@
   }
 }
 
+.editor-quote {
+  position: relative;
+  padding: 0 12px 0 16px;
+  margin: 0;
+  margin-left: 2px;
+
+  &::before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    border-radius: 2px;
+    margin-right: 12px;
+    background-color: var(--message-quote-bg);
+    content: '';
+  }
+}
+
 // Lexical code highlighting
 
 // Prism One Light Theme - based on node_modules/prism-themes/themes/prism-one-light.css
