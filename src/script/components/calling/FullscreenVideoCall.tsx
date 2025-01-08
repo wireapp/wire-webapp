@@ -43,6 +43,7 @@ import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar'
 import * as Icon from 'Components/Icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {useClickOutside} from 'Hooks/useClickOutside';
+import {useUserPropertyValue} from 'Hooks/useUserProperty';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {Config} from 'src/script/Config';
 import {isCallViewOption} from 'src/script/guards/CallView';
@@ -50,6 +51,8 @@ import {isMediaDevice} from 'src/script/guards/MediaDevice';
 import {useActiveWindowMatchMedia} from 'src/script/hooks/useActiveWindowMatchMedia';
 import {useToggleState} from 'src/script/hooks/useToggleState';
 import {MediaDeviceType} from 'src/script/media/MediaDeviceType';
+import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
+import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
 import {handleKeyDown, isEscapeKey, KEY} from 'Util/KeyboardUtil';
@@ -97,6 +100,7 @@ export interface FullscreenVideoCallProps {
   isMuted: boolean;
   leave: (call: Call) => void;
   maximizedParticipant: Participant | null;
+  propertiesRepository: PropertiesRepository;
   callingRepository: CallingRepository;
   mediaDevicesHandler: MediaDevicesHandler;
   muteState: MuteState;
@@ -129,6 +133,7 @@ const FullscreenVideoCall = ({
   isMuted,
   muteState,
   mediaDevicesHandler,
+  propertiesRepository,
   callingRepository,
   videoGrid,
   maximizedParticipant,
@@ -453,6 +458,12 @@ const FullscreenVideoCall = ({
 
   const isModerator = selfUser && roles[selfUser.id] === DefaultConversationRoleName.WIRE_ADMIN;
 
+  const isPressSpaceToUnmuteEnabled =
+    useUserPropertyValue(
+      () => propertiesRepository.getPreference(PROPERTIES_TYPE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE),
+      WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE,
+    ) && Config.getConfig().FEATURE.ENABLE_PRESS_SPACE_TO_UNMUTE;
+
   return (
     <div
       className={cx('video-calling-wrapper', {
@@ -663,7 +674,7 @@ const FullscreenVideoCall = ({
                       handleKeyDown({
                         event,
                         callback: () => toggleMute(call, !isMuted),
-                        keys: [KEY.ENTER, KEY.SPACE],
+                        keys: isPressSpaceToUnmuteEnabled ? [KEY.ENTER] : [KEY.ENTER, KEY.SPACE],
                       })
                     }
                     css={!isMuted ? videoControlActiveStyles : videoControlInActiveStyles}
