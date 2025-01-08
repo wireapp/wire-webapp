@@ -29,6 +29,7 @@ enum CALL {
 
 enum INTERFACE {
   THEME = 'settings.interface.theme',
+  MARKDOWN_PREVIEW = 'settings.interface.markdown_preview',
 }
 
 enum PREVIEWS {
@@ -39,7 +40,6 @@ enum PROPERTIES {
   ENABLE_DEBUGGING = 'enable_debugging',
   NOTIFICATIONS = 'settings.notifications',
   SOUND_ALERTS = 'settings.sound.alerts',
-
   VERSION = 'version',
 }
 

@@ -1349,6 +1349,8 @@ declare module 'I18n/en-US.json' {
     'preferencesOptionsFontSizeSmall': `Small`;
     'preferencesOptionsInputLevelDetected': `Audio detected from microphone`;
     'preferencesOptionsInputLevelNotDetected': `No audio detected from microphone`;
+    'preferencesOptionsMarkdownPreview': `Preview text formatting`;
+    'preferencesOptionsMarkdownPreviewDetails': `When this is on, you see the chosen format while typing a message. Otherwise, you view the markdown commands. The setting applies to all your devices.`;
     'preferencesOptionsNotifications': `Notifications`;
     'preferencesOptionsNotificationsNone': `Off`;
     'preferencesOptionsNotificationsObfuscate': `Hide details`;

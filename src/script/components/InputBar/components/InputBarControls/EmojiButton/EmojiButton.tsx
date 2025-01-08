@@ -27,14 +27,16 @@ import {t} from 'Util/LocalizerUtil';
 
 interface EmojiButtonProps {
   isActive: boolean;
+  hasRoundedCorners: boolean;
   onClick: (event: MouseEvent<HTMLButtonElement>) => void;
 }
 
-export const EmojiButton = ({isActive, onClick}: EmojiButtonProps) => {
+export const EmojiButton = ({isActive, hasRoundedCorners, onClick}: EmojiButtonProps) => {
   return (
     <button
       className={cx('controls-right-button no-radius', {
         active: isActive,
+        'buttons-group-button-left': hasRoundedCorners,
       })}
       type="button"
       onClick={onClick}
