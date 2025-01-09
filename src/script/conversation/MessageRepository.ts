@@ -1579,7 +1579,7 @@ export class MessageRepository {
         [Segmentation.CONVERSATION.SERVICES]: roundLogarithmic(services, 6),
         [Segmentation.MESSAGE.ACTION]: actionType,
         ...(isRichText !== undefined && {
-          [Segmentation.MESSAGE.IS_RICH_TEXT]: isRichText,
+          [Segmentation.IS_RICH_TEXT]: isRichText,
         }),
       };
 
