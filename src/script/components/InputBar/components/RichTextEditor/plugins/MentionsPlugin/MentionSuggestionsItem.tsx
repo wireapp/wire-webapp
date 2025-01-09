@@ -27,7 +27,7 @@ import * as Icon from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 
-import {User} from '../../../../entity/User';
+import {User} from '../../../../../../entity/User';
 
 type MentionSuggestionsItemProps = {
   isSelected: boolean;

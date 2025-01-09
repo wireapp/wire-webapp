@@ -32,8 +32,6 @@ import {checkFileSharingPermission} from 'Components/Conversation/utils/checkFil
 import {EmojiPicker} from 'Components/EmojiPicker/EmojiPicker';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
-import {RichTextContent, RichTextEditor} from 'Components/RichTextEditor';
-import {SendMessageButton} from 'Components/RichTextEditor/components/SendMessageButton';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
@@ -47,8 +45,10 @@ import {formatLocale, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {getFileExtension} from 'Util/util';
 
 import {ControlButtons} from './components/InputBarControls/ControlButtons';
-import {PastedFileControls} from './components/PastedFileControls';
-import {ReplyBar} from './components/ReplyBar';
+import {PastedFileControls} from './components/PastedFileControls/PastedFileControls';
+import {ReplyBar} from './components/ReplyBar/ReplyBar';
+import {RichTextContent, RichTextEditor} from './components/RichTextEditor';
+import {SendMessageButton} from './components/RichTextEditor/components/SendMessageButton';
 import {TypingIndicator} from './components/TypingIndicator/TypingIndicator';
 import {useEmojiPicker} from './hooks/useEmojiPicker/useEmojiPicker';
 import {useFilePaste} from './hooks/useFilePaste/useFilePaste';
@@ -127,7 +127,7 @@ export const InputBar = ({
       'isSelfUserRemoved',
       'is1to1',
     ]);
-  const {isOutgoingRequest, isIncomingRequest} = useKoSubscribableChildren(connection, [
+  const {isOutgoingRequest, isIncomingRequest} = useKoSubscribableChildren(connection!, [
     'isOutgoingRequest',
     'isIncomingRequest',
   ]);

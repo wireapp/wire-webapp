@@ -31,7 +31,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {renderMessage} from 'Util/messageRenderer';
 
-import {ContentMessage} from '../../../entity/message/ContentMessage';
+import {ContentMessage} from '../../../../entity/message/ContentMessage';
 
 interface ReplyBarProps {
   replyMessageEntity: ContentMessage;
