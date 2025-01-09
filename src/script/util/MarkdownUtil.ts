@@ -40,9 +40,9 @@ export const isMarkdownText = (text: string): boolean => {
     // Images
     /!\[[^\]]*\]\([^)]*\)/,
 
-    // Lists - Enhanced patterns
-    /^[-*+]\s[^\n]*$/m, // Unordered lists
-    /^\d+\.\s[^\n]*$/m, // Ordered lists
+    // Lists
+    /^[-*+]\s[^\n]*$/m, // Unordered
+    /^\d+\.\s[^\n]*$/m, // Ordered
 
     // Blockquotes
     /^>\s+/m,
