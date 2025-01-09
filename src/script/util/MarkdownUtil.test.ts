@@ -86,5 +86,31 @@ describe('MarkdownUtil', () => {
     it('returns false for plain text', () => {
       expect(isMarkdownText('plain text')).toBe(false);
     });
+
+    it('returns true for a mix of Markdown features', () => {
+      expect(isMarkdownText('# Header with [link](http://example.com)')).toBe(true);
+      expect(isMarkdownText('**Bold and _italic_**')).toBe(true);
+      expect(isMarkdownText('- item with `inline code`')).toBe(true);
+      expect(isMarkdownText('> Quote with *italic*')).toBe(true);
+    });
+
+    it('returns true for multi-line Markdown', () => {
+      expect(
+        isMarkdownText(`\`\`\`
+  Line 1
+  Line 2
+  \`\`\``),
+      ).toBe(true);
+      expect(
+        isMarkdownText(`1. Item 1
+  2. Item 2`),
+      ).toBe(true);
+    });
+
+    it('handles escaped Markdown patterns correctly', () => {
+      expect(isMarkdownText('\\*not italic\\*')).toBe(false);
+      expect(isMarkdownText('Some \\`inline code\\` here')).toBe(false);
+      expect(isMarkdownText('\\> Not a blockquote')).toBe(false);
+    });
   });
 });

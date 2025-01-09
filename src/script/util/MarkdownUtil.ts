@@ -23,44 +23,53 @@ export const isMarkdownText = (text: string): boolean => {
   }
 
   const markdownPatterns = [
-    // Headers
+    // Headers (e.g. # Header)
     /^#{1,6}\s+/m,
 
-    // Bold
+    // Bold (e.g. **bold** or __bold__)
     /\*\*[^*]+\*\*/,
     /__[^_]+__/,
 
-    // Italic
+    // Italic (e.g. *italic* or _italic_)
     /\*[^*]+\*/,
     /_[^_]+_/,
 
-    // Links
+    // Links (e.g. [text](http://example.com))
     /\[[^\]\r\n]{0,500}\]\([^()\r\n]{0,1000}\)/,
 
-    // Images
+    // Images (e.g. ![alt](url))
     /!\[[^\]]*\]\([^)]*\)/,
 
     // Lists
-    /^[-*+]\s[^\n]*$/m, // Unordered
-    /^\d+\.\s[^\n]*$/m, // Ordered
+    /^[-*+]\s[^\n]*$/m, // Unordered (e.g. - item, * item)
+    /^\d+\.\s[^\n]*$/m, // Ordered (e.g. 1. item)
 
-    // Blockquotes
+    // Blockquotes (e.g. > quote)
     /^>\s+/m,
 
-    // Code blocks
+    // Code blocks (e.g. ``` code ``` or `inline code`)
     /```[\s\S]*?```/,
     /`[^`]+`/,
 
-    // Horizontal rules
+    // Horizontal rules (e.g. --- or *** or ___)
     /^(?:[-*_]){3,}\s*$/m,
 
-    // Tables
+    // Tables (e.g. | Header | row | --- | :---: |)
     /\|[^|]+\|/,
     /^[-:|]+$/m,
 
-    // Strikethrough
+    // Strikethrough (e.g., ~~text~~)
     /~~[^~]+~~/,
   ];
+
+  const invalidPatterns = [
+    // Escaped markdown characters (\*not italic\*)
+    /\\([\\`*_{}[\]()#+\-.!>])/,
+  ];
+
+  if (invalidPatterns.some(pattern => pattern.test(text))) {
+    return false;
+  }
 
   return markdownPatterns.some(pattern => pattern.test(text));
 };
