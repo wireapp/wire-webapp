@@ -17,6 +17,10 @@
  *
  */
 
+import {$getRoot, createEditor} from 'lexical';
+
+import {useMessageDraftState} from 'Hooks/useMessageDraftState';
+
 import {MessageRepository} from '../../../conversation/MessageRepository';
 import {Conversation} from '../../../entity/Conversation';
 import {ContentMessage} from '../../../entity/message/ContentMessage';
@@ -28,7 +32,7 @@ export interface DraftState {
   editedMessage?: ContentMessage;
 }
 
-const generateConversationInputStorageKey = (conversationEntity: Conversation): string =>
+export const generateConversationInputStorageKey = (conversationEntity: Conversation): string =>
   `${StorageKey.CONVERSATION.INPUT}|${conversationEntity.id}`;
 
 export const saveDraftState = async (
@@ -82,4 +86,20 @@ export const loadDraftState = async (
   }
 
   return {...storageValue, messageReply, editedMessage};
+};
+
+export const getDraftTextMessageContent = (conversation: Conversation, storageValue: string) => {
+  const config = {
+    namespace: `DraftEditor-${conversation.id}`,
+    theme: {},
+    onError: console.error,
+  };
+
+  const editor = createEditor(config);
+  const editorState = editor.parseEditorState(storageValue);
+  const textContent = editorState.read(() => $getRoot().getTextContent());
+
+  const {setDraftMessage} = useMessageDraftState.getState();
+
+  setDraftMessage(conversation.id, textContent);
 };
