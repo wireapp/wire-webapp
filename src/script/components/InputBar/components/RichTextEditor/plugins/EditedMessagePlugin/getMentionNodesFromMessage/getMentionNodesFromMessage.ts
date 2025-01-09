@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2024 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,28 +17,16 @@
  *
  */
 
-import {$createParagraphNode, $createTextNode} from 'lexical';
-
-import {$createMentionNode} from 'Components/RichTextEditor/nodes/MentionNode';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {Text} from 'src/script/entity/message/Text';
 
+import {Text} from '../../../../../../../entity/message/Text';
+import {$createMentionNode, MentionNode} from '../../../nodes/MentionNode';
 import {createNodes} from '../../../utils/generateNodes';
 
-export const getRawMarkdownNodesWithMentions = (message: ContentMessage) => {
+export const getMentionNodesFromMessage = (message: ContentMessage): MentionNode[] => {
   const firstAsset = message.getFirstAsset() as Text;
   const newMentions = firstAsset.mentions().slice();
   const nodes = createNodes(newMentions, firstAsset.text);
 
-  const paragraphs = nodes.map(node => {
-    if (node.type === 'Mention') {
-      return $createMentionNode('@', node.data.slice(1));
-    }
-
-    return $createTextNode(node.data);
-  });
-
-  const paragraphNode = $createParagraphNode();
-  paragraphNode.append(...paragraphs);
-  return paragraphNode;
+  return nodes.filter(node => node.type === 'Mention').map(node => $createMentionNode('@', node.data.slice(1)));
 };

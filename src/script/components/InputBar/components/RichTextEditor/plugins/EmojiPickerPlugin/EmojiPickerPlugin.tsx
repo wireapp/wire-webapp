@@ -26,15 +26,15 @@ import emojiList from 'emoji-picker-react/src/data/emojis.json';
 import {$createTextNode, TextNode} from 'lexical';
 import * as ReactDOM from 'react-dom';
 
-import {TypeaheadMenuPlugin} from 'Components/RichTextEditor/plugins/TypeaheadMenuPlugin';
 import {loadValue, storeValue} from 'Util/StorageUtil';
 import {sortByPriority} from 'Util/StringUtil';
 
 import {EmojiItem} from './EmojiItem';
 
-import {StorageKey} from '../../../../storage';
+import {StorageKey} from '../../../../../../storage';
 import {getDOMRangeRect} from '../../utils/getDomRangeRect';
 import {getSelectionInfo} from '../../utils/getSelectionInfo';
+import {TypeaheadMenuPlugin} from '../TypeaheadMenuPlugin/TypeaheadMenuPlugin';
 
 const TRIGGER = ':';
 const triggerRegexp = new RegExp(`(\\W|^)(${TRIGGER}([\\w+\\-][\\w \\-]*))$`);

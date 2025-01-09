@@ -29,10 +29,10 @@ import {IgnoreOutsideClickWrapper} from 'Components/InputBar/util/clickHandlers'
 
 import {MentionSuggestionsItem} from './MentionSuggestionsItem';
 
-import {User} from '../../../../entity/User';
+import {User} from '../../../../../../entity/User';
 import {$createMentionNode} from '../../nodes/MentionNode';
 import {getSelectionInfo} from '../../utils/getSelectionInfo';
-import {TypeaheadMenuPlugin} from '../TypeaheadMenuPlugin';
+import {TypeaheadMenuPlugin} from '../TypeaheadMenuPlugin/TypeaheadMenuPlugin';
 
 const TRIGGER = '@';
 const triggerRegexp = new RegExp(`(^| )(${TRIGGER}(\\S*))$`);
