@@ -35,18 +35,14 @@ export const isMarkdownText = (text: string): boolean => {
     /_[^_]+_/,
 
     // Links
-    /\[([^\]]+)\]\(([^)]+)\)/,
+    /\[[^\]]*\]\([^)]*\)/,
 
     // Images
-    /!\[([^\]]+)\]\(([^)]+)\)/,
+    /!\[[^\]]*\]\([^)]*\)/,
 
     // Lists - Enhanced patterns
-    /^[-*+]\s+.+$/m, // Unordered lists
-    /^\d+\.\s+.+$/m, // Ordered lists
-    /^\s{2,}[-*+]\s+.+$/m, // Nested unordered lists
-    /^\s{2,}\d+\.\s+.+$/m, // Nested ordered lists
-    /^[a-z]\.\s+.+$/m, // Alphabetical lists
-    /^[ivxlcdm]+\.\s+.+$/im, // Roman numeral lists
+    /^[-*+]\s[^\n]*$/m, // Unordered lists
+    /^\d+\.\s[^\n]*$/m, // Ordered lists
 
     // Blockquotes
     /^>\s+/m,

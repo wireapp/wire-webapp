@@ -59,22 +59,6 @@ describe('MarkdownUtil', () => {
       expect(isMarkdownText('1. item')).toBe(true);
     });
 
-    it('returns true for nested unordered lists', () => {
-      expect(isMarkdownText('  - item')).toBe(true);
-    });
-
-    it('returns true for nested ordered lists', () => {
-      expect(isMarkdownText('  1. item')).toBe(true);
-    });
-
-    it('returns true for alphabetical lists', () => {
-      expect(isMarkdownText('a. item')).toBe(true);
-    });
-
-    it('returns true for roman numeral lists', () => {
-      expect(isMarkdownText('i. item')).toBe(true);
-    });
-
     it('returns true for blockquotes', () => {
       expect(isMarkdownText('> quote')).toBe(true);
     });
