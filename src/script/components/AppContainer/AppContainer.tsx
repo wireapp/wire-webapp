@@ -106,6 +106,7 @@ export const AppContainer: FC<AppProps> = ({config, clientType}) => {
 
       {isDetachedCallingFeatureEnabled() && (
         <DetachedCallingCell
+          propertiesRepository={app.repository.properties}
           callingRepository={app.repository.calling}
           mediaRepository={app.repository.media}
           toggleScreenshare={mainView.calling.callActions.toggleScreenshare}

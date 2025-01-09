@@ -25,7 +25,7 @@ import cx from 'classnames';
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import * as Icon from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleKeyDown} from 'Util/KeyboardUtil';
+import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 
 import {User} from '../../../../../../entity/User';
 
@@ -55,7 +55,13 @@ const MentionSuggestionsItemComponent: React.ForwardRefRenderFunction<HTMLDivEle
       role="button"
       tabIndex={TabIndex.FOCUSABLE}
       onClick={onClick}
-      onKeyDown={e => handleKeyDown(e, () => onClick(e))}
+      onKeyDown={event =>
+        handleKeyDown({
+          event,
+          callback: () => onClick(event),
+          keys: [KEY.ENTER, KEY.SPACE],
+        })
+      }
       onMouseEnter={onMouseEnter}
       className={cx('mention-suggestion-list__item', {'mention-suggestion-list__item--highlighted': isSelected})}
       data-uie-name="item-mention-suggestion"

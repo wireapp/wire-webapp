@@ -32,7 +32,7 @@ import {EnrichedFields} from 'Components/panel/EnrichedFields';
 import {UserActions} from 'Components/panel/UserActions';
 import {UserDetails} from 'Components/panel/UserDetails';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleKeyDown} from 'Util/KeyboardUtil';
+import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 
 import {useUserModalState} from './UserModal.state';
@@ -197,7 +197,13 @@ const UserModal: React.FC<UserModalProps> = ({
         <Icon.CloseIcon
           className="modal__header__button"
           onClick={hide}
-          onKeyDown={event => handleKeyDown(event, hide)}
+          onKeyDown={event =>
+            handleKeyDown({
+              event,
+              callback: hide,
+              keys: [KEY.ENTER, KEY.SPACE],
+            })
+          }
           data-uie-name="do-close"
           tabIndex={TabIndex.FOCUSABLE}
         />

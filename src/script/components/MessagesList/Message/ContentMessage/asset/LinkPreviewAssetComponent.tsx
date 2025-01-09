@@ -23,7 +23,7 @@ import cx from 'classnames';
 
 import {Image} from 'Components/Image';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleKeyDown} from 'Util/KeyboardUtil';
+import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {cleanURL, prependProtocol} from 'Util/UrlUtil';
@@ -89,7 +89,7 @@ const LinkPreviewAsset: React.FC<LinkPreviewAssetProps> = ({header = false, mess
       tabIndex={messageFocusedTabIndex}
       className="link-preview-asset"
       onClick={onClick}
-      onKeyDown={e => handleKeyDown(e, () => onClick(e))}
+      onKeyDown={event => handleKeyDown({event, callback: () => onClick(event), keys: [KEY.ENTER, KEY.SPACE]})}
     >
       <div className="link-preview-image-container">
         {preview && previewImage ? (

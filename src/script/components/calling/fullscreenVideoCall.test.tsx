@@ -27,6 +27,9 @@ import {Grid} from 'src/script/calling/videoGridHandler';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {MediaDevicesHandler} from 'src/script/media/MediaDevicesHandler';
+import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
+import {PropertiesService} from 'src/script/properties/PropertiesService';
+import {SelfService} from 'src/script/self/SelfService';
 
 import {FullscreenVideoCall, FullscreenVideoCallProps} from './FullscreenVideoCall';
 
@@ -52,6 +55,7 @@ describe('fullscreenVideoCall', () => {
       conversation: conversation,
       isChoosingScreen: false,
       isMuted: false,
+      propertiesRepository: new PropertiesRepository({} as PropertiesService, {} as SelfService),
       mediaDevicesHandler: {
         availableDevices: {
           audioinput: ko.observableArray(),

@@ -85,7 +85,11 @@ export const DetailViewModal = ({
   };
 
   const handleOnClosePress = (event: KeyboardEvent | ReactKeyboardEvent<HTMLButtonElement>) => {
-    handleKeyDown(event, onCloseClick);
+    handleKeyDown({
+      event,
+      callback: onCloseClick,
+      keys: [KEY.ENTER, KEY.SPACE],
+    });
   };
 
   const onReplyClick = async (conversation: Conversation, message: ContentMessage) => {
