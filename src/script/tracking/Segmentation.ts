@@ -50,6 +50,7 @@ export const Segmentation = {
     IS_EPHEMERAL_MESSAGE: 'message_is_ephemeral_message',
     IS_REPLY: 'message_is_reply',
     MENTION: 'message_mention',
+    IS_RICH_TEXT: 'message_is_rich_text',
   },
   SCREEN_SHARE: {
     DIRECTION: 'screen_share_direction',

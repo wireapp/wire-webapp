@@ -54,6 +54,7 @@ import {
 } from 'Util/LinkPreviewSender';
 import {Declension, joinNames, t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
+import {isMarkdownText} from 'Util/MarkdownUtil';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
 import {roundLogarithmic} from 'Util/NumberUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
@@ -1509,7 +1510,10 @@ export class MessageRepository {
     }
 
     const messageContentType = genericMessage.content;
+
     let actionType;
+    let isRichText: boolean | undefined = undefined;
+
     switch (messageContentType) {
       case 'asset': {
         const protoAsset = genericMessage.asset;
@@ -1548,6 +1552,9 @@ export class MessageRepository {
         if (!length) {
           actionType = 'text';
         }
+        if (protoText) {
+          isRichText = isMarkdownText(protoText.content);
+        }
         break;
       }
 
@@ -1571,7 +1578,11 @@ export class MessageRepository {
         [Segmentation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
         [Segmentation.CONVERSATION.SERVICES]: roundLogarithmic(services, 6),
         [Segmentation.MESSAGE.ACTION]: actionType,
+        ...(isRichText !== undefined && {
+          [Segmentation.MESSAGE.IS_RICH_TEXT]: isRichText,
+        }),
       };
+
       const isTeamConversation = !!conversationEntity.teamId;
       if (isTeamConversation) {
         segmentations = {
