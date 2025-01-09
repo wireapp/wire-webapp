@@ -31,7 +31,7 @@ import {SearchInput} from 'Components/SearchInput';
 import {ServiceList} from 'Components/ServiceList/ServiceList';
 import {UserSearchableList} from 'Components/UserSearchableList';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleKeyDown} from 'Util/KeyboardUtil';
+import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
@@ -215,7 +215,13 @@ const AddParticipants: FC<AddParticipantsProps> = ({
               tabIndex={TabIndex.FOCUSABLE}
               className={cx('panel__tab', {'panel__tab--active': isAddPeopleState})}
               onClick={onAddPeople}
-              onKeyDown={event => handleKeyDown(event, onAddPeople)}
+              onKeyDown={event =>
+                handleKeyDown({
+                  event,
+                  callback: onAddPeople,
+                  keys: [KEY.ENTER, KEY.SPACE],
+                })
+              }
               data-uie-name="do-add-people"
             >
               {t('addParticipantsTabsPeople')}
@@ -226,7 +232,13 @@ const AddParticipants: FC<AddParticipantsProps> = ({
               tabIndex={TabIndex.FOCUSABLE}
               className={cx('panel__tab', {'panel__tab--active': isAddServiceState})}
               onClick={onAddServices}
-              onKeyDown={event => handleKeyDown(event, onAddServices)}
+              onKeyDown={event =>
+                handleKeyDown({
+                  event,
+                  callback: onAddServices,
+                  keys: [KEY.ENTER, KEY.SPACE],
+                })
+              }
               data-uie-name="do-add-services"
             >
               {t('addParticipantsTabsServices')}
@@ -263,7 +275,13 @@ const AddParticipants: FC<AddParticipantsProps> = ({
                         tabIndex={TabIndex.FOCUSABLE}
                         className="left-list-item left-list-item-clickable"
                         onClick={openManageServices}
-                        onKeyDown={event => handleKeyDown(event, openManageServices)}
+                        onKeyDown={event =>
+                          handleKeyDown({
+                            event,
+                            callback: openManageServices,
+                            keys: [KEY.ENTER, KEY.SPACE],
+                          })
+                        }
                         data-uie-name="go-manage-services"
                       >
                         <div className="left-column-icon left-column-icon-dark">
@@ -294,7 +312,13 @@ const AddParticipants: FC<AddParticipantsProps> = ({
                         type="button"
                         tabIndex={TabIndex.FOCUSABLE}
                         onClick={openManageServices}
-                        onKeyDown={event => handleKeyDown(event, openManageServices)}
+                        onKeyDown={event =>
+                          handleKeyDown({
+                            event,
+                            callback: openManageServices,
+                            keys: [KEY.ENTER, KEY.SPACE],
+                          })
+                        }
                         data-uie-name="go-enable-services"
                         style={{marginTop: '1em'}}
                       >

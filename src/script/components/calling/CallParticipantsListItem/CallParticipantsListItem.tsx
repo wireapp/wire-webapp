@@ -26,7 +26,7 @@ import {UserStatusBadges} from 'Components/Badge';
 import {CallParticipantsListItemHandRaiseIcon} from 'Components/calling/CallParticipantsListItem/CallParticipantsListItemHandRaiseIcon';
 import {Participant} from 'src/script/calling/Participant';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleKeyDown} from 'Util/KeyboardUtil';
+import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {setContextMenuPosition} from 'Util/util';
 
@@ -68,9 +68,13 @@ export const CallParticipantsListItem = ({
   } = useKoSubscribableChildren(user, ['isDirectGuest', 'is_verified', 'name', 'isExternal']);
 
   const handleContextKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    handleKeyDown(event, () => {
-      const newEvent = setContextMenuPosition(event);
-      onContextMenu?.(newEvent as unknown as React.MouseEvent<HTMLDivElement>);
+    handleKeyDown({
+      event,
+      callback: () => {
+        const newEvent = setContextMenuPosition(event);
+        onContextMenu?.(newEvent as unknown as React.MouseEvent<HTMLDivElement>);
+      },
+      keys: [KEY.ENTER, KEY.SPACE],
     });
   };
 

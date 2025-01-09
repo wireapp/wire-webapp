@@ -24,7 +24,7 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleKeyDown} from 'Util/KeyboardUtil';
+import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 
 import {AssetRepository} from '../../../../../../assets/AssetRepository';
 import {User} from '../../../../../../entity/User';
@@ -56,7 +56,14 @@ const TopContact: React.FC<TopContactProps> = ({assetRepository, user, clickOnUs
       onClick={event => {
         clickOnUser?.(user, event);
       }}
-      onKeyPress={event => clickOnUser && handleKeyDown(event, clickOnUser.bind(this, user, event))}
+      onKeyPress={event =>
+        clickOnUser &&
+        handleKeyDown({
+          event,
+          callback: clickOnUser.bind(this, user, event),
+          keys: [KEY.ENTER, KEY.SPACE],
+        })
+      }
     >
       <Avatar avatarSize={AVATAR_SIZE.LARGE} className="search-list-item-image" participant={user} />
       <div className="search-list-item-content">

@@ -24,7 +24,7 @@ import cx from 'classnames';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {handleKeyDown} from 'Util/KeyboardUtil';
+import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {validateProfileImageResolution} from 'Util/util';
@@ -128,7 +128,13 @@ export const AvatarInput = ({
     <div
       tabIndex={TabIndex.FOCUSABLE}
       role="button"
-      onKeyDown={(event: React.KeyboardEvent<HTMLElement>) => handleKeyDown(event, inputClick)}
+      onKeyDown={(event: React.KeyboardEvent<HTMLElement>) =>
+        handleKeyDown({
+          event,
+          callback: inputClick,
+          keys: [KEY.ENTER, KEY.SPACE],
+        })
+      }
       aria-label={`${t('tooltipPreferencesPicture')}`}
     >
       <label

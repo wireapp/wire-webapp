@@ -24,7 +24,7 @@ import {container} from 'tsyringe';
 
 import {RestrictedFile} from 'Components/asset/RestrictedFile';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleKeyDown} from 'Util/KeyboardUtil';
+import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 
@@ -102,7 +102,7 @@ const FileAsset: React.FC<FileAssetProps> = ({
           tabIndex={messageFocusedTabIndex}
           aria-label={`${t('conversationContextMenuDownload')} ${fileName}.${fileExtension}`}
           onClick={onDownloadAsset}
-          onKeyDown={event => handleKeyDown(event, onDownloadAsset)}
+          onKeyDown={event => handleKeyDown({event, callback: onDownloadAsset, keys: [KEY.ENTER, KEY.SPACE]})}
         >
           {isPendingUpload ? (
             <div className="asset-placeholder loading-dots" />
