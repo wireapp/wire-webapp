@@ -35,7 +35,7 @@ export const isMarkdownText = (text: string): boolean => {
     /_[^_]+_/,
 
     // Links
-    /\[[^\]\r\n]*\]\([^()\r\n]*?\)/,
+    /\[[^\]\r\n]{0,500}\]\([^()\r\n]{0,1000}\)/,
 
     // Images
     /!\[[^\]]*\]\([^)]*\)/,
