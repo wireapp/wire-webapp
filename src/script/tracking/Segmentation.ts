@@ -51,6 +51,7 @@ export const Segmentation = {
     IS_REPLY: 'message_is_reply',
     MENTION: 'message_mention',
   },
+  IS_RICH_TEXT: 'is_rich_text',
   SCREEN_SHARE: {
     DIRECTION: 'screen_share_direction',
     DURATION: 'screen_share_duration',
