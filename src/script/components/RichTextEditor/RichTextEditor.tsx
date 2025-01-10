@@ -207,7 +207,6 @@ export const RichTextEditor = ({
           <GlobalEventsPlugin onShiftTab={onShiftTab} onEscape={onEscape} onArrowUp={onArrowUp} onBlur={onBlur} />
           <EditorRefPlugin
             editorRef={editor => {
-              // editorRef.current = editor;
               onSetup(editor!);
             }}
           />

@@ -141,20 +141,6 @@ const _generateSummaryDescription = (activities: Record<ACTIVITY_TYPE, number>):
     .join(', ');
 };
 
-const _matchAlertState = (conversation: Conversation) => {
-  const {
-    calls: unreadCalls,
-    pings: unreadPings,
-    selfMentions: unreadSelfMentions,
-    selfReplies: unreadSelfReplies,
-  } = conversation.unreadState();
-
-  const hasUnreadActivities =
-    unreadCalls.length > 0 || unreadPings.length > 0 || unreadSelfMentions.length > 0 || unreadSelfReplies.length > 0;
-
-  return hasUnreadActivities;
-};
-
 const _getStateAlert = {
   description: (conversationEntity: Conversation) => _accumulateSummary(conversationEntity, true),
   icon: (conversationEntity: Conversation): ConversationStatusIcon | void => {
@@ -181,20 +167,24 @@ const _getStateAlert = {
       return ConversationStatusIcon.UNREAD_PING;
     }
   },
-  match: (conversationEntity: Conversation) => _matchAlertState(conversationEntity),
+  match: (conversationEntity: Conversation) => {
+    const {
+      calls: unreadCalls,
+      pings: unreadPings,
+      selfMentions: unreadSelfMentions,
+      selfReplies: unreadSelfReplies,
+    } = conversationEntity.unreadState();
+
+    const hasUnreadActivities =
+      unreadCalls.length > 0 || unreadPings.length > 0 || unreadSelfMentions.length > 0 || unreadSelfReplies.length > 0;
+
+    return hasUnreadActivities;
+  },
 };
 
 const _getStateDefault = {
   description: () => '',
   icon: () => ConversationStatusIcon.NONE,
-};
-
-const _matchGroupActivityState = (conversation: Conversation) => {
-  const lastMessageEntity = conversation.getNewestMessage();
-  const isExpectedType = lastMessageEntity ? lastMessageEntity.isMember() || lastMessageEntity.isSystem() : false;
-  const unreadEvents = conversation.unreadState().allEvents;
-
-  return conversation.isGroup() && unreadEvents.length > 0 && isExpectedType;
 };
 
 const _getStateGroupActivity = {
@@ -265,11 +255,13 @@ const _getStateGroupActivity = {
       ? ConversationStatusIcon.UNREAD_MESSAGES
       : ConversationStatusIcon.MUTED;
   },
-  match: (conversationEntity: Conversation) => _matchGroupActivityState(conversationEntity),
-};
+  match: (conversationEntity: Conversation) => {
+    const lastMessageEntity = conversationEntity.getNewestMessage();
+    const isExpectedType = lastMessageEntity ? lastMessageEntity.isMember() || lastMessageEntity.isSystem() : false;
+    const unreadEvents = conversationEntity.unreadState().allEvents;
 
-const _matchMutedState = (conversation: Conversation) => {
-  return !conversation.showNotificationsEverything();
+    return conversationEntity.isGroup() && unreadEvents.length > 0 && isExpectedType;
+  },
 };
 
 const _getStateMuted = {
@@ -292,11 +284,7 @@ const _getStateMuted = {
 
     return ConversationStatusIcon.MUTED;
   },
-  match: (conversationEntity: Conversation) => _matchMutedState(conversationEntity),
-};
-
-const _matchRemovedState = (conversation: Conversation) => {
-  return conversation.isSelfUserRemoved();
+  match: (conversationEntity: Conversation) => !conversationEntity.showNotificationsEverything(),
 };
 
 const _getStateRemoved = {
@@ -318,13 +306,7 @@ const _getStateRemoved = {
     return '';
   },
   icon: () => ConversationStatusIcon.UNREAD_MESSAGES,
-  match: (conversationEntity: Conversation) => _matchRemovedState(conversationEntity),
-};
-
-const _matchUnreadMessageState = (conversation: Conversation) => {
-  const {allMessages, systemMessages} = conversation.unreadState();
-  const hasUnreadMessages = [...allMessages, ...systemMessages].length > 0;
-  return hasUnreadMessages;
+  match: (conversationEntity: Conversation) => conversationEntity.isSelfUserRemoved(),
 };
 
 const _getStateUnreadMessage = {
@@ -384,16 +366,11 @@ const _getStateUnreadMessage = {
     return '';
   },
   icon: () => ConversationStatusIcon.UNREAD_MESSAGES,
-  match: (conversationEntity: Conversation) => _matchUnreadMessageState(conversationEntity),
-};
-
-const _matchUserNameState = (conversation: Conversation) => {
-  const lastMessageEntity = conversation.getNewestMessage();
-  const isMemberJoin =
-    lastMessageEntity && lastMessageEntity.isMember() && (lastMessageEntity as MemberMessage).isMemberJoin();
-  const isEmpty1to1Conversation = conversation.is1to1() && isMemberJoin;
-
-  return conversation.isRequest() || !!isEmpty1to1Conversation;
+  match: (conversationEntity: Conversation) => {
+    const {allMessages, systemMessages} = conversationEntity.unreadState();
+    const hasUnreadMessages = [...allMessages, ...systemMessages].length > 0;
+    return hasUnreadMessages;
+  },
 };
 
 const _getStateUserName = {
@@ -407,34 +384,20 @@ const _getStateUserName = {
       return ConversationStatusIcon.PENDING_CONNECTION;
     }
   },
-  match: (conversationEntity: Conversation): boolean => _matchUserNameState(conversationEntity),
-};
-
-const _getStateDraftMessage = (draftState: any) => ({
-  description: (): string => draftState || '',
-  icon: () => ConversationStatusIcon.NONE,
   match: (conversationEntity: Conversation): boolean => {
-    const matchedAlertState = _matchAlertState(conversationEntity);
-    const matchedGroupActivityState = _matchGroupActivityState(conversationEntity);
-    const matchedRemovedState = _matchRemovedState(conversationEntity);
-    const matchedUnreadMessageState = _matchUnreadMessageState(conversationEntity);
-    const matchedUserNameState = _matchUserNameState(conversationEntity);
+    const lastMessageEntity = conversationEntity.getNewestMessage();
+    const isMemberJoin =
+      lastMessageEntity && lastMessageEntity.isMember() && (lastMessageEntity as MemberMessage).isMemberJoin();
+    const isEmpty1to1Conversation = conversationEntity.is1to1() && isMemberJoin;
 
-    return !(
-      matchedAlertState ||
-      matchedGroupActivityState ||
-      matchedRemovedState ||
-      matchedUnreadMessageState ||
-      matchedUserNameState
-    );
+    return conversationEntity.isRequest() || isEmpty1to1Conversation;
   },
-});
+};
 
 export const generateCellState = (
   conversationEntity: Conversation,
-  draftState?: any,
 ): {description: string; icon: ConversationStatusIcon | void} => {
-  const iconStates = [
+  const states = [
     _getStateRemoved,
     _getStateMuted,
     _getStateAlert,
@@ -443,13 +406,10 @@ export const generateCellState = (
     _getStateUserName,
   ];
 
-  const descriptionStates = [_getStateDraftMessage(draftState), ...iconStates];
-
-  const matchingDescriptionState = descriptionStates.find(state => state.match(conversationEntity)) || _getStateDefault;
-  const matchingIconState = iconStates.find(state => state.match(conversationEntity)) || _getStateDefault;
+  const matchingState = states.find(state => state.match(conversationEntity)) || _getStateDefault;
 
   return {
-    description: matchingDescriptionState.description(conversationEntity),
-    icon: matchingIconState.icon(conversationEntity),
+    description: matchingState.description(conversationEntity),
+    icon: matchingState.icon(conversationEntity),
   };
 };

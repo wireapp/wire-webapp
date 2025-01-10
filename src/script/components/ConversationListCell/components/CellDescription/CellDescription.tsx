@@ -45,10 +45,7 @@ export const CellDescription = ({conversation, mutedState, isActive, isRequest, 
   const {draftMessage} = useMessageDraftState();
   const currentConversationDraftMessage = isActive ? '' : draftMessage[conversation.id];
 
-  const cellState = useMemo(
-    () => generateCellState(conversation, currentConversationDraftMessage),
-    [unreadState, mutedState, isRequest, currentConversationDraftMessage],
-  );
+  const cellState = useMemo(() => generateCellState(conversation), [unreadState, mutedState, isRequest]);
 
   const getDraftMessageContent = useCallback(async () => {
     const storageKey = generateConversationInputStorageKey(conversation);
@@ -65,7 +62,7 @@ export const CellDescription = ({conversation, mutedState, isActive, isRequest, 
     void getDraftMessageContent();
   }, [getDraftMessageContent]);
 
-  if (!cellState.description) {
+  if (!cellState.description && !currentConversationDraftMessage) {
     return null;
   }
 
@@ -76,8 +73,8 @@ export const CellDescription = ({conversation, mutedState, isActive, isRequest, 
       })}
       data-uie-name="secondary-line"
     >
-      {currentConversationDraftMessage && <Icon.DraftMessageIcon css={iconStyle} />}
-      {cellState.description}
+      {!cellState.description && currentConversationDraftMessage && <Icon.DraftMessageIcon css={iconStyle} />}
+      {cellState.description || currentConversationDraftMessage}
     </span>
   );
 };
