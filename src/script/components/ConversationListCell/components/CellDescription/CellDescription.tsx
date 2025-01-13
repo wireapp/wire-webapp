@@ -22,7 +22,7 @@ import {useMemo} from 'react';
 import cx from 'classnames';
 
 import * as Icon from 'Components/Icon';
-import {generateConversationInputStorageKey} from 'Components/InputBar/util/DraftStateUtil';
+import {DraftState, generateConversationInputStorageKey} from 'Components/InputBar/util/DraftStateUtil';
 import {useLocalStorage} from 'Hooks/useLocalStorage';
 
 import {iconStyle} from './CellDescription.style';
@@ -43,10 +43,9 @@ export const CellDescription = ({conversation, mutedState, isActive, isRequest, 
 
   const storageKey = generateConversationInputStorageKey(conversation);
   // Hardcoded __amplify__ because of StorageUtil saving as __amplify__<storage_key>
-  const [store] = useLocalStorage(`__amplify__${storageKey}`);
+  const [store] = useLocalStorage<{data?: DraftState}>(`__amplify__${storageKey}`);
 
-  const parsedStore = store ? JSON.parse(store) : {};
-  const draftMessage = parsedStore?.data?.plainMessage;
+  const draftMessage = store?.data?.plainMessage;
   const currentConversationDraftMessage = isActive ? '' : draftMessage;
 
   if (!cellState.description && !currentConversationDraftMessage) {

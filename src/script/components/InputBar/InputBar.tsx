@@ -41,6 +41,7 @@ import {CONVERSATION_TYPING_INDICATOR_MODE} from 'src/script/user/TypingIndicato
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
+import {sanitizeMarkdown} from 'Util/MarkdownUtil';
 import {formatLocale, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {getFileExtension} from 'Util/util';
 
@@ -460,14 +461,14 @@ export const InputBar = ({
   }, []);
 
   const saveDraft = async (editorState: string, plainMessage: string) => {
-    await saveDraftState(
+    await saveDraftState({
       storageRepository,
       conversation,
       editorState,
-      plainMessage,
-      replyMessageEntity?.id,
-      editedMessage?.id,
-    );
+      plainMessage: sanitizeMarkdown(plainMessage),
+      replyId: replyMessageEntity?.id,
+      editedMessageId: editedMessage?.id,
+    });
   };
 
   const loadDraft = async () => {

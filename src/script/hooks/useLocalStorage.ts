@@ -19,10 +19,20 @@
 
 import {useSyncExternalStore} from 'react';
 
-export const useLocalStorage = (key: string) => {
-  const setLocalStorage = (newValue: string) => {
-    window.localStorage.setItem('sidebar', newValue);
-    window.dispatchEvent(new StorageEvent('storage', {key, newValue}));
+const parseJSON = <Value>(key: string, value: string | null): Value | null => {
+  try {
+    return value === null ? null : JSON.parse(value);
+  } catch {
+    console.error(`Error parsing JSON for key "${key}"`);
+    return null;
+  }
+};
+
+export const useLocalStorage = <T>(key: string) => {
+  const setLocalStorage = (newValue: T): void => {
+    const serializedValue = JSON.stringify(newValue);
+    window.localStorage.setItem(key, serializedValue);
+    window.dispatchEvent(new StorageEvent('storage', {key, newValue: serializedValue}));
   };
 
   const getSnapshot = () => localStorage.getItem(key);
@@ -34,5 +44,5 @@ export const useLocalStorage = (key: string) => {
 
   const store = useSyncExternalStore(subscribe, getSnapshot);
 
-  return [store, setLocalStorage] as const;
+  return [parseJSON<T>(key, store), setLocalStorage] as const;
 };
