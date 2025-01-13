@@ -31,7 +31,7 @@ const CODE_BLOCK_PATTERN = /```[\s\S]*?```/;
 const INLINE_CODE_PATTERN = /`[^`]+`/;
 const HORIZONTAL_RULE_PATTERN = /^(?:[-*_]){3,}\s*$/m;
 const TABLE_PATTERN_1 = /^\|[^|]+\|.*$/gm;
-const TABLE_PATTERN_2 = /^\|[-:|]+\|.*$/gm;
+const TABLE_PATTERN_2 = /^\|[-:|]+(?:\|[-:|]+)*\|$/gm;
 const STRIKETHROUGH_PATTERN = /~~[^~]+~~/;
 
 const UNORDERED_LIST_DETECT_PATTERN = /^[-*+]\s.*/m;
@@ -120,11 +120,19 @@ const markdownSanitizers: MarkdownSanitizer[] = [
   },
   {
     pattern: LINK_PATTERN,
-    transform: (match: string) => match.match(/\[(.*?)\]/)?.[1] || '',
+    transform: (match: string) => {
+      const start = match.indexOf('[') + 1;
+      const end = match.indexOf(']');
+      return start > 0 && end > start ? match.slice(start, end) : '';
+    },
   },
   {
     pattern: IMAGE_PATTERN,
-    transform: (match: string) => match.match(/\[(.*?)\]/)?.[1] || '',
+    transform: (match: string) => {
+      const start = match.indexOf('[') + 1;
+      const end = match.indexOf(']');
+      return start > 0 && end > start ? match.slice(start, end) : '';
+    },
   },
   {
     pattern: UNORDERED_LIST_PATTERN,
