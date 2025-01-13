@@ -32,15 +32,15 @@ const HORIZONTAL_RULE_PATTERN = /^(?:[-*_]){3,}\s*$/m;
 const STRIKETHROUGH_PATTERN = /~~[^~]+~~/;
 
 // List patterns
-const LIST_SANITIZE_UNORDERED = /^[-*+]\s.*/gm;
-const LIST_SANITIZE_ORDERED = /^[\d]+\.\s.*/gm;
-const LIST_DETECT_UNORDERED = /^[-*+]\s.*/m;
-const LIST_DETECT_ORDERED = /^[\d]+\.\s.*/m;
+const LIST_UNORDERED_SANITIZE_PATTERN = /^[-*+]\s.*/gm;
+const LIST_ORDERED_SANITIZE_PATTERN = /^[\d]+\.\s.*/gm;
+const LIST_UNORDERED_DETECT_PATTERN = /^[-*+]\s.*/m;
+const LIST_ORDERED_DETECT_PATTERN = /^[\d]+\.\s.*/m;
 
 // Table patterns
-const TABLE_DETECT_ROW = /^\|[^|]+\|/m;
-const TABLE_DETECT_SEPARATOR = /^\|[-:|]+\|/m;
-const TABLE_SANITIZE = /^\|.*\|$/gm;
+const TABLE_ROW_DETECT_PATTERN = /^\|[^|]+\|/m;
+const TABLE_SEPARATOR_DETECT_PATTERN = /^\|[-:|]+\|/m;
+const TABLE_SANITIZE_PATTERN = /^\|.*\|$/gm;
 
 // Special patterns
 const ESCAPED_CHARS_PATTERN = /\\(.)/g;
@@ -54,14 +54,14 @@ const MARKDOWN_PATTERNS = [
   ITALIC_PATTERN_2,
   LINK_PATTERN,
   IMAGE_PATTERN,
-  LIST_DETECT_UNORDERED,
-  LIST_DETECT_ORDERED,
+  LIST_UNORDERED_DETECT_PATTERN,
+  LIST_ORDERED_DETECT_PATTERN,
   BLOCKQUOTE_PATTERN,
   CODE_BLOCK_PATTERN,
   CODE_INLINE_PATTERN,
   HORIZONTAL_RULE_PATTERN,
-  TABLE_DETECT_ROW,
-  TABLE_DETECT_SEPARATOR,
+  TABLE_ROW_DETECT_PATTERN,
+  TABLE_SEPARATOR_DETECT_PATTERN,
   STRIKETHROUGH_PATTERN,
 ];
 
@@ -148,11 +148,11 @@ const markdownSanitizers: MarkdownSanitizer[] = [
     },
   },
   {
-    pattern: LIST_SANITIZE_UNORDERED,
+    pattern: LIST_UNORDERED_SANITIZE_PATTERN,
     transform: (match: string) => match.replace(/^[-*+]\s/, ''),
   },
   {
-    pattern: LIST_SANITIZE_ORDERED,
+    pattern: LIST_ORDERED_SANITIZE_PATTERN,
     transform: (match: string) => match.replace(/^[\d]+\.\s/, ''),
   },
   {
@@ -172,7 +172,7 @@ const markdownSanitizers: MarkdownSanitizer[] = [
     transform: (_match: string) => '',
   },
   {
-    pattern: TABLE_SANITIZE,
+    pattern: TABLE_SANITIZE_PATTERN,
     transform: (match: string) => {
       const line = match.trim();
       if (isTableSeparator(line)) {
