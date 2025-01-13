@@ -32,12 +32,14 @@ import {deepMerge} from 'Util/deepMerge';
 import {Environment} from 'Util/Environment';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
+import {loadValue} from 'Util/StorageUtil';
 
 import type {PropertiesService} from './PropertiesService';
 import {PROPERTIES_TYPE, UserConsentStatus} from './PropertiesType';
 
 import type {User} from '../entity/User';
 import type {SelfService} from '../self/SelfService';
+import {StorageKey} from '../storage';
 import {isTelemetryEnabledAtCurrentEnvironment} from '../tracking/Telemetry.helpers';
 import {ConsentValue} from '../user/ConsentValue';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from '../user/TypingIndicatorMode';
@@ -97,7 +99,9 @@ export class PropertiesRepository {
         },
         privacy: {
           telemetry_data_sharing: undefined,
-          marketing_consent: PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.defaultValue,
+          marketing_consent:
+            loadValue(StorageKey.INITIAL_MAKRETING_CONSENT_ACCEPTED) ||
+            PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.defaultValue,
         },
         sound: {
           alerts: AudioPreference.ALL,
