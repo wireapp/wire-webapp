@@ -31,7 +31,7 @@ const CODE_BLOCK_PATTERN = /```[\s\S]*?```/;
 const INLINE_CODE_PATTERN = /`[^`]+`/;
 const HORIZONTAL_RULE_PATTERN = /^(?:[-*_]){3,}\s*$/m;
 const TABLE_PATTERN_1 = /^\|[^|]+\|.*$/gm;
-const TABLE_PATTERN_2 = /^\|[-:|]+(?:\|[-:|]+)*\|$/gm;
+const TABLE_PATTERN_2 = /^\|[-:|]+(?:\|[-:|]{1,10})*\|$/gm;
 const STRIKETHROUGH_PATTERN = /~~[^~]+~~/;
 
 const UNORDERED_LIST_DETECT_PATTERN = /^[-*+]\s.*/m;
