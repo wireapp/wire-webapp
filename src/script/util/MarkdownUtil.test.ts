@@ -17,7 +17,7 @@
  *
  */
 
-import {isMarkdownText} from './MarkdownUtil';
+import {isMarkdownText, sanitizeMarkdown} from './MarkdownUtil';
 
 describe('MarkdownUtil', () => {
   describe('isMarkdownText', () => {
@@ -28,6 +28,9 @@ describe('MarkdownUtil', () => {
     it('returns true for headers', () => {
       expect(isMarkdownText('# Header')).toBe(true);
       expect(isMarkdownText('## Header')).toBe(true);
+      expect(isMarkdownText('### Header')).toBe(true);
+      expect(isMarkdownText('#### Header')).toBe(true);
+      expect(isMarkdownText('##### Header')).toBe(true);
       expect(isMarkdownText('###### Header')).toBe(true);
     });
 
@@ -111,6 +114,94 @@ describe('MarkdownUtil', () => {
       expect(isMarkdownText('\\*not italic\\*')).toBe(false);
       expect(isMarkdownText('Some \\`inline code\\` here')).toBe(false);
       expect(isMarkdownText('\\> Not a blockquote')).toBe(false);
+    });
+  });
+
+  describe('sanitizeMarkdown', () => {
+    it('returns empty string for falsy input', () => {
+      expect(sanitizeMarkdown('')).toBe('');
+    });
+
+    it('removes headers while preserving text', () => {
+      expect(sanitizeMarkdown('# Header 1')).toBe('Header 1');
+      expect(sanitizeMarkdown('## Header 2')).toBe('Header 2');
+      expect(sanitizeMarkdown('### Header 3')).toBe('Header 3');
+      expect(sanitizeMarkdown('#### Header 4')).toBe('Header 4');
+      expect(sanitizeMarkdown('##### Header 5')).toBe('Header 5');
+      expect(sanitizeMarkdown('###### Header 6')).toBe('Header 6');
+    });
+
+    it('removes bold formatting', () => {
+      expect(sanitizeMarkdown('**bold text**')).toBe('bold text');
+      expect(sanitizeMarkdown('__also bold__')).toBe('also bold');
+      expect(sanitizeMarkdown('normal **bold** normal')).toBe('normal bold normal');
+    });
+
+    it('removes italic formatting', () => {
+      expect(sanitizeMarkdown('*italic text*')).toBe('italic text');
+      expect(sanitizeMarkdown('_also italic_')).toBe('also italic');
+      expect(sanitizeMarkdown('normal *italic* normal')).toBe('normal italic normal');
+    });
+
+    it('removes links while preserving link text', () => {
+      expect(sanitizeMarkdown('[link text](http://example.com)')).toBe('link text');
+      expect(sanitizeMarkdown('Click [here](http://example.com) now')).toBe('Click here now');
+      expect(sanitizeMarkdown('[](http://example.com)')).toBe('');
+    });
+
+    it('removes list markers', () => {
+      expect(sanitizeMarkdown('- First item\n- Second item')).toBe('First item\nSecond item');
+      expect(sanitizeMarkdown('* Star item\n+ Plus item')).toBe('Star item\nPlus item');
+      expect(sanitizeMarkdown('1. First\n2. Second')).toBe('First\nSecond');
+    });
+
+    it('removes blockquotes', () => {
+      expect(sanitizeMarkdown('> quoted text')).toBe('quoted text');
+      expect(sanitizeMarkdown('> multiple\n> line quote')).toBe('multiple\nline quote');
+    });
+
+    it('removes code blocks', () => {
+      expect(sanitizeMarkdown('```\ncode block\n```')).toBe('code block');
+      expect(sanitizeMarkdown('`inline code`')).toBe('inline code');
+      expect(sanitizeMarkdown('```typescript\nconst x = 1;\n```')).toBe('typescript\nconst x = 1;');
+    });
+
+    it('removes table formatting', () => {
+      expect(sanitizeMarkdown('| Header |')).toBe('Header');
+      expect(sanitizeMarkdown('| Col 1 | Col 2 |\n|--|--|\n| Data 1 | Data 2 |')).toBe('Col 1 Col 2\n\nData 1 Data 2');
+    });
+
+    it('removes strikethrough', () => {
+      expect(sanitizeMarkdown('~~struck text~~')).toBe('struck text');
+      expect(sanitizeMarkdown('normal ~~struck~~ normal')).toBe('normal struck normal');
+    });
+
+    it('handles complex mixed markdown', () => {
+      const complexMarkdown = `# Main Title
+
+**Important** _announcement_:
+
+1. First [point](http://example.com)
+2. Second point with ~~strike~~
+
+> Quote with \`code\`
+
+\`\`\`
+Example code
+\`\`\``;
+
+      const expected = `Main Title
+
+Important announcement:
+
+First point
+Second point with strike
+
+Quote with code
+
+Example code`;
+
+      expect(sanitizeMarkdown(complexMarkdown).replace(/\s+/g, ' ').trim()).toBe(expected.replace(/\s+/g, ' ').trim());
     });
   });
 });
