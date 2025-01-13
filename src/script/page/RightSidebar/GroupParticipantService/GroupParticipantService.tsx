@@ -25,7 +25,7 @@ import {FadingScrollbar} from 'Components/FadingScrollbar';
 import * as Icon from 'Components/Icon';
 import {ServiceDetails} from 'Components/panel/ServiceDetails';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleKeyDown} from 'Util/KeyboardUtil';
+import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {Conversation} from '../../../entity/Conversation';
@@ -106,7 +106,13 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
             className="panel__action-item"
             data-uie-name="go-conversation"
             onClick={onOpen}
-            onKeyDown={event => handleKeyDown(event, onOpen)}
+            onKeyDown={event =>
+              handleKeyDown({
+                event,
+                callback: onOpen,
+                keys: [KEY.ENTER, KEY.SPACE],
+              })
+            }
           >
             <span className="panel__action-item__icon">
               <Icon.MessageIcon />
@@ -123,7 +129,13 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
             className="panel__action-item"
             data-uie-name="do-remove"
             onClick={() => onRemove(serviceUser)}
-            onKeyDown={event => handleKeyDown(event, () => onRemove(serviceUser))}
+            onKeyDown={event =>
+              handleKeyDown({
+                event,
+                callback: () => onRemove(serviceUser),
+                keys: [KEY.ENTER, KEY.SPACE],
+              })
+            }
           >
             <span className="panel__action-item__icon">
               <Icon.MinusIcon />

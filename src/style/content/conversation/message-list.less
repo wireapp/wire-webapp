@@ -313,15 +313,27 @@
     display: inline;
     min-width: 0;
     line-height: var(--line-height-lg);
-    white-space: pre-wrap;
+    white-space: normal;
     word-wrap: break-word;
+
+    li {
+      line-height: var(--line-height-lg);
+    }
 
     ul,
     ol {
-      padding-left: 32px;
+      padding-left: 24px;
       margin-top: 0;
       margin-bottom: 0;
-      line-height: 1;
+      line-height: 0.85;
+    }
+
+    ol ol {
+      list-style: lower-alpha;
+    }
+
+    ol ol ol {
+      list-style: lower-roman;
     }
   }
 
@@ -358,6 +370,24 @@
 
     & + br {
       display: none;
+    }
+  }
+
+  .md-blockquote {
+    position: relative;
+    padding: 0 12px 0 16px;
+    margin: 0;
+
+    &::before {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      border-radius: 2px;
+      margin-right: 12px;
+      background-color: var(--message-quote-bg);
+      content: '';
     }
   }
 }

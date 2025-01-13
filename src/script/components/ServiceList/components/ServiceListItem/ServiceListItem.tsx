@@ -23,7 +23,7 @@ import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {ParticipantItemContent} from 'Components/ParticipantItemContent';
 import {listItem, listWrapper} from 'Components/ParticipantItemContent/ParticipantItem.styles';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleKeyDown} from 'Util/KeyboardUtil';
+import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {ServiceEntity} from '../../../../integration/ServiceEntity';
@@ -44,7 +44,13 @@ export const ServiceListItem = ({service, onClick}: ServiceListItemProps) => {
       tabIndex={TabIndex.FOCUSABLE}
       role="button"
       onClick={onServiceClick}
-      onKeyDown={event => handleKeyDown(event, onServiceClick)}
+      onKeyDown={event =>
+        handleKeyDown({
+          event,
+          callback: onServiceClick,
+          keys: [KEY.ENTER, KEY.SPACE],
+        })
+      }
       data-uie-name="item-service"
       data-uie-value={serviceName}
       aria-label={t('accessibility.openConversation', {name: serviceName})}

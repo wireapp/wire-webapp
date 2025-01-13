@@ -32,8 +32,6 @@ import {checkFileSharingPermission} from 'Components/Conversation/utils/checkFil
 import {EmojiPicker} from 'Components/EmojiPicker/EmojiPicker';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
-import {RichTextContent, RichTextEditor} from 'Components/RichTextEditor';
-import {SendMessageButton} from 'Components/RichTextEditor/components/SendMessageButton';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
@@ -47,8 +45,10 @@ import {formatLocale, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {getFileExtension} from 'Util/util';
 
 import {ControlButtons} from './components/InputBarControls/ControlButtons';
-import {PastedFileControls} from './components/PastedFileControls';
-import {ReplyBar} from './components/ReplyBar';
+import {PastedFileControls} from './components/PastedFileControls/PastedFileControls';
+import {ReplyBar} from './components/ReplyBar/ReplyBar';
+import {RichTextContent, RichTextEditor} from './components/RichTextEditor';
+import {SendMessageButton} from './components/RichTextEditor/components/SendMessageButton';
 import {TypingIndicator} from './components/TypingIndicator/TypingIndicator';
 import {useEmojiPicker} from './hooks/useEmojiPicker/useEmojiPicker';
 import {useFilePaste} from './hooks/useFilePaste/useFilePaste';
@@ -180,9 +180,9 @@ export const InputBar = ({
   const hasLocalEphemeralTimer = isSelfDeletingMessagesEnabled && !!localMessageTimer && !hasGlobalMessageTimer;
   const isTypingRef = useRef(false);
 
-  const messageFormatButtonsEnabled = CONFIG.FEATURE.ENABLE_MESSAGE_FORMAT_BUTTONS;
+  const isMessageFormatButtonsFlagEnabled = CONFIG.FEATURE.ENABLE_MESSAGE_FORMAT_BUTTONS;
 
-  const showGiphyButton = messageFormatButtonsEnabled
+  const showGiphyButton = isMessageFormatButtonsFlagEnabled
     ? textValue.length > 0
     : textValue.length > 0 && textValue.length <= CONFIG.GIPHY_TEXT_LENGTH;
 
@@ -549,6 +549,11 @@ export const InputBar = ({
     };
   }, [pastedFile]);
 
+  const showMarkdownPreview = useUserPropertyValue<boolean>(
+    () => propertiesRepository.getPreference(PROPERTIES_TYPE.INTERFACE.MARKDOWN_PREVIEW),
+    WebAppEvents.PROPERTIES.UPDATE.INTERFACE.MARKDOWN_PREVIEW,
+  );
+
   const controlButtonsProps = {
     conversation: conversation,
     disableFilesharing: !isFileSharingSendingEnabled,
@@ -561,6 +566,8 @@ export const InputBar = ({
     onSelectFiles: uploadFiles,
     onSelectImages: uploadImages,
     showGiphyButton: showGiphyButton,
+    showFormatButton: isMessageFormatButtonsFlagEnabled && showMarkdownPreview,
+    showEmojiButton: isMessageFormatButtonsFlagEnabled,
     isFormatActive: formatToolbar.open,
     onFormatClick: formatToolbar.handleClick,
     isEmojiActive: emojiPicker.open,
@@ -569,7 +576,7 @@ export const InputBar = ({
 
   const enableSending = textValue.length > 0;
 
-  const showAvatar = messageFormatButtonsEnabled || !!textValue.length;
+  const showAvatar = !!textValue.length;
 
   return (
     <div ref={wrapperRef}>
@@ -589,7 +596,7 @@ export const InputBar = ({
         <div
           className={cx(`${conversationInputBarClassName}__input input-bar-container`, {
             [`${conversationInputBarClassName}__input--editing`]: isEditing,
-            'input-bar-container--with-toolbar': formatToolbar.open,
+            'input-bar-container--with-toolbar': formatToolbar.open && showMarkdownPreview,
           })}
         >
           {!isOutgoingRequest && (
@@ -628,20 +635,27 @@ export const InputBar = ({
                   onUpdate={setMessageContent}
                   hasLocalEphemeralTimer={hasLocalEphemeralTimer}
                   showFormatToolbar={formatToolbar.open}
+                  showMarkdownPreview={showMarkdownPreview}
                   saveDraftState={saveDraft}
                   loadDraftState={loadDraft}
                   onShiftTab={onShiftTab}
                   onSend={handleSendMessage}
                   onBlur={() => isTypingRef.current && conversationRepository.sendTypingStop(conversation)}
                 >
-                  <ul
-                    className={cx('controls-right buttons-group input-bar-buttons', {
-                      'controls-right-shrinked': textValue.length !== 0,
-                    })}
-                  >
-                    <ControlButtons {...controlButtonsProps} showGiphyButton={showGiphyButton} />
-                    <SendMessageButton disabled={!enableSending} onSend={handleSendMessage} />
-                  </ul>
+                  <div className="input-bar-buttons">
+                    <ul
+                      className={cx('controls-right buttons-group input-bar-buttons__list', {
+                        'controls-right-shrinked': textValue.length !== 0,
+                      })}
+                    >
+                      <ControlButtons {...controlButtonsProps} showGiphyButton={showGiphyButton} />
+                    </ul>
+                    <SendMessageButton
+                      disabled={!enableSending}
+                      onSend={handleSendMessage}
+                      className="input-bar-buttons__send"
+                    />
+                  </div>
                 </RichTextEditor>
               )}
             </>

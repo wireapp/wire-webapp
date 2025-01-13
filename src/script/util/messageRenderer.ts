@@ -18,10 +18,10 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import hljs from 'highlight.js';
 import MarkdownIt from 'markdown-it';
 import {escape} from 'underscore';
 
+import {highlightCode, languages} from './highlightCode';
 import {replaceInRange} from './StringUtil';
 
 import type {MentionEntity} from '../message/MentionEntity';
@@ -56,6 +56,7 @@ const markdownit = new MarkdownIt('zero', {
   'newline',
   'list',
   'strikethrough',
+  'blockquote',
 ]);
 
 const originalFenceRule = markdownit.renderer.rules.fence!;
@@ -83,6 +84,9 @@ markdownit.normalizeLink = (url: string): string => {
   }
   return url;
 };
+
+markdownit.renderer.rules.blockquote_open = () => '<blockquote class="md-blockquote">';
+markdownit.renderer.rules.blockquote_close = () => '</blockquote>';
 
 markdownit.renderer.rules.softbreak = () => '<br>';
 markdownit.renderer.rules.hardbreak = () => '<br>';
@@ -179,7 +183,12 @@ export const renderMessage = (message: string, selfId?: QualifiedId, mentionEnti
         // highlighting will be wrong anyway because this is not valid code
         return escape(code);
       }
-      return hljs.highlightAuto(code, lang ? [lang] : undefined).value;
+
+      if (lang && languages[lang]) {
+        return highlightCode({code, grammar: languages[lang], lang});
+      }
+
+      return highlightCode({code, grammar: languages.javascript, lang: 'javascript'});
     },
   });
 

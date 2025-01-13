@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import {ChangeEvent, FormEvent, HTMLProps, useEffect, useRef, useState, MouseEvent, KeyboardEvent} from 'react';
 
 import {RegisteredClient} from '@wireapp/api-client/lib/client/index';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
@@ -43,9 +43,9 @@ import {splitFingerprint} from 'Util/StringUtil';
 import {ValidationError} from '../module/action/ValidationError';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 
-export interface Props extends React.HTMLProps<HTMLDivElement> {
+export interface Props extends HTMLProps<HTMLDivElement> {
   client: RegisteredClient;
-  onClick: (event: React.MouseEvent<HTMLDivElement> | React.KeyboardEvent) => void;
+  onClick: (event: MouseEvent<HTMLDivElement> | KeyboardEvent) => void;
   onClientRemoval: (password?: string) => void;
   requirePassword: boolean;
   selected: boolean;
@@ -53,7 +53,7 @@ export interface Props extends React.HTMLProps<HTMLDivElement> {
 }
 
 const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, requirePassword}: Props) => {
-  const passwordInput = React.useRef<HTMLInputElement>(null);
+  const passwordInput = useRef<HTMLInputElement>(null);
 
   const CONFIG = {
     animationSteps: 8,
@@ -136,19 +136,19 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
     setIsAnimating(false);
   };
 
-  const handleWrapperClick = (event: React.MouseEvent<HTMLDivElement> | React.KeyboardEvent): void => {
+  const handleWrapperClick = (event: MouseEvent<HTMLDivElement> | KeyboardEvent): void => {
     resetState();
     onClick(event);
   };
 
-  const onWrapperEnter = (event: React.KeyboardEvent) => {
+  const onWrapperEnter = (event: KeyboardEvent) => {
     if (!isEnterKey(event)) {
       return;
     }
     handleWrapperClick(event);
   };
 
-  const handlePasswordlessClientDeletion = (event: React.FormEvent): Promise<void> => {
+  const handlePasswordlessClientDeletion = (event: FormEvent): Promise<void> => {
     event.preventDefault();
 
     return Promise.resolve()
@@ -160,7 +160,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
       });
   };
 
-  const handleSubmit = (event: React.FormEvent): Promise<void> => {
+  const handleSubmit = (event: FormEvent): Promise<void> => {
     event.preventDefault();
     let localValidationError = null;
 
@@ -200,7 +200,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
       });
   };
 
-  const onPasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onPasswordChange = (event: ChangeEvent<HTMLInputElement>) => {
     setPassword(event.target.value);
     setIsValidPassword(true);
   };
@@ -234,8 +234,8 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
         data-uie-value={client.model}
       >
         <ContainerXS
-          onClick={(event: React.MouseEvent<HTMLDivElement>) => requirePassword && handleWrapperClick(event)}
-          onKeyDown={(event: React.KeyboardEvent) => requirePassword && onWrapperEnter(event)}
+          onClick={(event: MouseEvent<HTMLDivElement>) => requirePassword && handleWrapperClick(event)}
+          onKeyDown={(event: KeyboardEvent) => requirePassword && onWrapperEnter(event)}
           css={{
             ['&:focus-visible']: {
               outline: `none`,
