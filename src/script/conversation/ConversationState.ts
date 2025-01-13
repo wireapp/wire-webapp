@@ -252,7 +252,11 @@ export class ConversationState {
   /**
    * Check whether conversation is currently displayed.
    */
-  isActiveConversation(conversationEntity: Conversation): boolean {
+  isActiveConversation(conversationEntity?: Conversation): boolean {
+    if (!conversationEntity) {
+      return false;
+    }
+
     const activeConversation = this.activeConversation();
     return !!activeConversation && !!conversationEntity && matchQualifiedIds(activeConversation, conversationEntity);
   }
