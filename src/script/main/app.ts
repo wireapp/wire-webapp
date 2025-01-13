@@ -103,6 +103,7 @@ import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
 import {StorageKey, StorageRepository, StorageService} from '../storage';
 import {TeamRepository} from '../team/TeamRepository';
+import {TeamService} from '../team/TeamService';
 import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsValue';
 import {AppInitTelemetry} from '../telemetry/app_init/AppInitTelemetry';
 import {AppInitTimingsStep} from '../telemetry/app_init/AppInitTimingsStep';
@@ -207,6 +208,7 @@ export class App {
   private _setupRepositories() {
     const repositories: ViewModelRepositories = {} as ViewModelRepositories;
     const selfService = new SelfService();
+    const teamService = new TeamService();
 
     repositories.asset = container.resolve(AssetRepository);
 
@@ -228,11 +230,20 @@ export class App {
       serverTimeHandler,
       repositories.properties,
     );
-    repositories.connection = new ConnectionRepository(new ConnectionService(), repositories.user);
+    repositories.connection = new ConnectionRepository(
+      new ConnectionService(),
+      repositories.user,
+      selfService,
+      teamService,
+    );
     repositories.event = new EventRepository(this.service.event, this.service.notification, serverTimeHandler);
     repositories.search = new SearchRepository(repositories.user);
-    repositories.team = new TeamRepository(repositories.user, repositories.asset, () =>
-      this.logout(SIGN_OUT_REASON.ACCOUNT_DELETED, true),
+
+    repositories.team = new TeamRepository(
+      repositories.user,
+      repositories.asset,
+      () => this.logout(SIGN_OUT_REASON.ACCOUNT_DELETED, true),
+      teamService,
     );
 
     repositories.message = new MessageRepository(
@@ -462,7 +473,7 @@ export class App {
       onProgress(10);
       telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
-      const connections = await connectionRepository.getConnections();
+      const connections = await connectionRepository.getConnections(teamMembers);
 
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_USER_DATA);
 

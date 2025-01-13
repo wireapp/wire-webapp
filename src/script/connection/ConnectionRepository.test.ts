@@ -25,6 +25,8 @@ import {StatusCodes} from 'http-status-codes';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {SelfService} from 'src/script/self/SelfService';
+import {TeamService} from 'src/script/team/TeamService';
 import {generateUser} from 'test/helper/UserGenerator';
 import {createUuid} from 'Util/uuid';
 
@@ -39,9 +41,11 @@ import {UserRepository} from '../user/UserRepository';
 function buildConnectionRepository() {
   const connectionState = new ConnectionState();
   const connectionService = new ConnectionService();
+  const selfService = new SelfService();
+  const teamService = new TeamService();
   const userRepository = {refreshUser: jest.fn()} as unknown as UserRepository;
   return [
-    new ConnectionRepository(connectionService, userRepository, connectionState),
+    new ConnectionRepository(connectionService, userRepository, selfService, teamService, connectionState),
     {connectionState, userRepository, connectionService},
   ] as const;
 }
@@ -130,7 +134,7 @@ describe('ConnectionRepository', () => {
 
       jest.spyOn(connectionService, 'getConnections').mockResolvedValue([connectionRequest, connectionRequest]);
 
-      await connectionRepository.getConnections();
+      await connectionRepository.getConnections([]);
 
       const storedConnection = connectionRepository.getConnectionByConversationId({
         id: connectionRequest.conversation,
