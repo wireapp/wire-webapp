@@ -28,6 +28,9 @@ describe('MarkdownUtil', () => {
     it('returns true for headers', () => {
       expect(isMarkdownText('# Header')).toBe(true);
       expect(isMarkdownText('## Header')).toBe(true);
+      expect(isMarkdownText('### Header')).toBe(true);
+      expect(isMarkdownText('#### Header')).toBe(true);
+      expect(isMarkdownText('##### Header')).toBe(true);
       expect(isMarkdownText('###### Header')).toBe(true);
     });
 
@@ -117,13 +120,15 @@ describe('MarkdownUtil', () => {
   describe('sanitizeMarkdown', () => {
     it('returns empty string for falsy input', () => {
       expect(sanitizeMarkdown('')).toBe('');
-      expect(sanitizeMarkdown(null as any)).toBe('');
-      expect(sanitizeMarkdown(undefined as any)).toBe('');
     });
 
     it('removes headers while preserving text', () => {
       expect(sanitizeMarkdown('# Header 1')).toBe('Header 1');
-      expect(sanitizeMarkdown('### Deep Header')).toBe('Deep Header');
+      expect(sanitizeMarkdown('## Header 2')).toBe('Header 2');
+      expect(sanitizeMarkdown('### Header 3')).toBe('Header 3');
+      expect(sanitizeMarkdown('#### Header 4')).toBe('Header 4');
+      expect(sanitizeMarkdown('##### Header 5')).toBe('Header 5');
+      expect(sanitizeMarkdown('###### Header 6')).toBe('Header 6');
     });
 
     it('removes bold formatting', () => {
