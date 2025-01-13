@@ -17,20 +17,18 @@
  *
  */
 
-import {useCallback, useEffect, useMemo} from 'react';
+import {useMemo} from 'react';
 
 import cx from 'classnames';
-import {container} from 'tsyringe';
 
 import * as Icon from 'Components/Icon';
-import {generateConversationInputStorageKey, getDraftTextMessageContent} from 'Components/InputBar/util/DraftStateUtil';
-import {useMessageDraftState} from 'Hooks/useMessageDraftState';
+import {generateConversationInputStorageKey} from 'Components/InputBar/util/DraftStateUtil';
+import {useLocalStorage} from 'Hooks/useLocalStorage';
 
 import {iconStyle} from './CellDescription.style';
 
 import {generateCellState} from '../../../../conversation/ConversationCellState';
 import {Conversation, UnreadState} from '../../../../entity/Conversation';
-import {StorageService} from '../../../../storage';
 
 interface Props {
   conversation: Conversation;
@@ -41,26 +39,15 @@ interface Props {
 }
 
 export const CellDescription = ({conversation, mutedState, isActive, isRequest, unreadState}: Props) => {
-  const storageService = container.resolve(StorageService);
-  const {draftMessage} = useMessageDraftState();
-  const currentConversationDraftMessage = isActive ? '' : draftMessage[conversation.id];
-
   const cellState = useMemo(() => generateCellState(conversation), [unreadState, mutedState, isRequest]);
 
-  const getDraftMessageContent = useCallback(async () => {
-    const storageKey = generateConversationInputStorageKey(conversation);
-    const storageValue = await storageService.loadFromSimpleStorage<any>(storageKey);
+  const storageKey = generateConversationInputStorageKey(conversation);
+  // Hardcoded __amplify__ because of StorageUtil saving as __amplify__<storage_key>
+  const [store] = useLocalStorage(`__amplify__${storageKey}`);
 
-    if (typeof storageValue === 'undefined') {
-      return;
-    }
-
-    getDraftTextMessageContent(conversation, storageValue.editorState);
-  }, [conversation, storageService]);
-
-  useEffect(() => {
-    void getDraftMessageContent();
-  }, [getDraftMessageContent]);
+  const parsedStore = store ? JSON.parse(store) : {};
+  const draftMessage = parsedStore?.data?.plainMessage;
+  const currentConversationDraftMessage = isActive ? '' : draftMessage;
 
   if (!cellState.description && !currentConversationDraftMessage) {
     return null;

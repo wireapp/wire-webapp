@@ -17,10 +17,6 @@
  *
  */
 
-import {$getRoot, createEditor} from 'lexical';
-
-import {useMessageDraftState} from 'Hooks/useMessageDraftState';
-
 import {MessageRepository} from '../../../conversation/MessageRepository';
 import {Conversation} from '../../../entity/Conversation';
 import {ContentMessage} from '../../../entity/message/ContentMessage';
@@ -30,6 +26,7 @@ export interface DraftState {
   editorState: string | null;
   messageReply?: ContentMessage;
   editedMessage?: ContentMessage;
+  plainMessage?: string;
 }
 
 export const generateConversationInputStorageKey = (conversationEntity: Conversation): string =>
@@ -39,6 +36,7 @@ export const saveDraftState = async (
   storageRepository: StorageRepository,
   conversation: Conversation,
   editorState: string,
+  plainMessage: string,
   replyMessageId?: string,
   editedMessageId?: string,
 ): Promise<void> => {
@@ -47,6 +45,7 @@ export const saveDraftState = async (
 
   await storageRepository.storageService.saveToSimpleStorage<any>(storageKey, {
     editorState,
+    plainMessage,
     replyId: replyMessageId,
     editedMessageId,
   });
@@ -85,21 +84,5 @@ export const loadDraftState = async (
     editedMessage = await loadMessage(editedMessageId);
   }
 
-  return {...storageValue, messageReply, editedMessage};
-};
-
-export const getDraftTextMessageContent = (conversation: Conversation, storageValue: string) => {
-  const config = {
-    namespace: `DraftEditor-${conversation.id}`,
-    theme: {},
-    onError: console.error,
-  };
-
-  const editor = createEditor(config);
-  const editorState = editor.parseEditorState(storageValue);
-  const textContent = editorState.read(() => $getRoot().getTextContent());
-
-  const {setDraftMessage} = useMessageDraftState.getState();
-
-  setDraftMessage(conversation.id, textContent);
+  return {...storageValue, messageReply, editedMessage, plainMessage: storageValue?.plainMessage || ''};
 };

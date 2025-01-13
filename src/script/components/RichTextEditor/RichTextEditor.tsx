@@ -38,7 +38,6 @@ import cx from 'classnames';
 import {LexicalEditor, EditorState, $nodesOfType} from 'lexical';
 
 import {DraftState} from 'Components/InputBar/util/DraftStateUtil';
-import {useMessageDraftState} from 'Hooks/useMessageDraftState';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {User} from 'src/script/entity/User';
 import {getLogger} from 'Util/Logger';
@@ -57,7 +56,6 @@ import {MentionsPlugin} from './plugins/MentionsPlugin';
 import {ReplaceCarriageReturnPlugin} from './plugins/ReplaceCarriageReturnPlugin/ReplaceCarriageReturnPlugin';
 import {SendPlugin} from './plugins/SendPlugin';
 
-import {Conversation} from '../../entity/Conversation';
 import {MentionEntity} from '../../message/MentionEntity';
 
 const theme = {
@@ -95,7 +93,6 @@ export type RichTextContent = {
 const logger = getLogger('LexicalInput');
 
 interface RichTextEditorProps {
-  conversation: Conversation;
   placeholder: string;
   replaceEmojis?: boolean;
   editedMessage?: ContentMessage;
@@ -103,7 +100,7 @@ interface RichTextEditorProps {
   hasLocalEphemeralTimer: boolean;
   showFormatToolbar: boolean;
   getMentionCandidates: (search?: string | null) => User[];
-  saveDraftState: (editor: string) => void;
+  saveDraftState: (editor: string, plainMessage: string) => void;
   loadDraftState: () => Promise<DraftState>;
   onUpdate: (content: RichTextContent) => void;
   onArrowUp: () => void;
@@ -161,7 +158,6 @@ const editorConfig: InitialConfigType = {
 };
 
 export const RichTextEditor = ({
-  conversation,
   placeholder,
   children,
   hasLocalEphemeralTimer,
@@ -182,15 +178,11 @@ export const RichTextEditor = ({
   const emojiPickerOpen = useRef<boolean>(true);
   const mentionsOpen = useRef<boolean>(true);
 
-  const {setDraftMessage} = useMessageDraftState();
-
   const handleChange = (editorState: EditorState, editor: LexicalEditor) => {
-    saveDraftState(JSON.stringify(editorState.toJSON()));
-
     editorState.read(() => {
       const markdown = $convertToMarkdownString(TRANSFORMERS);
 
-      setDraftMessage(conversation.id, replaceEmojis ? findAndTransformEmoji(markdown) : markdown);
+      saveDraftState(JSON.stringify(editorState.toJSON()), replaceEmojis ? findAndTransformEmoji(markdown) : markdown);
 
       onUpdate({
         text: replaceEmojis ? findAndTransformEmoji(markdown) : markdown,

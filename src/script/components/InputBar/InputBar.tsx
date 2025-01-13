@@ -127,7 +127,7 @@ export const InputBar = ({
       'isSelfUserRemoved',
       'is1to1',
     ]);
-  const {isOutgoingRequest, isIncomingRequest} = useKoSubscribableChildren(connection, [
+  const {isOutgoingRequest, isIncomingRequest} = useKoSubscribableChildren(connection!, [
     'isOutgoingRequest',
     'isIncomingRequest',
   ]);
@@ -459,8 +459,15 @@ export const InputBar = ({
     };
   }, []);
 
-  const saveDraft = async (editorState: string) => {
-    await saveDraftState(storageRepository, conversation, editorState, replyMessageEntity?.id, editedMessage?.id);
+  const saveDraft = async (editorState: string, plainMessage: string) => {
+    await saveDraftState(
+      storageRepository,
+      conversation,
+      editorState,
+      plainMessage,
+      replyMessageEntity?.id,
+      editedMessage?.id,
+    );
   };
 
   const loadDraft = async () => {
@@ -599,7 +606,6 @@ export const InputBar = ({
               </div>
               {!isSelfUserRemoved && !pastedFile && (
                 <RichTextEditor
-                  conversation={conversation}
                   onSetup={lexical => {
                     editorRef.current = lexical;
                   }}
