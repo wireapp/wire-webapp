@@ -182,7 +182,12 @@ export class TestFactory {
     await this.exposeUserActors();
     this.connection_service = new ConnectionService();
 
-    this.connection_repository = new ConnectionRepository(this.connection_service, this.user_repository);
+    this.connection_repository = new ConnectionRepository(
+      this.connection_service,
+      this.user_repository,
+      this.self_service,
+      this.team_service,
+    );
 
     return this.connection_repository;
   }
@@ -223,8 +228,10 @@ export class TestFactory {
     await this.exposeTeamActors();
     await this.exposeClientActors();
 
+    this.self_service = new SelfService();
+
     this.self_repository = new SelfRepository(
-      new SelfService(),
+      this.self_service,
       this.user_repository,
       this.team_repository,
       this.client_repository,
