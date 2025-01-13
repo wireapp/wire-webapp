@@ -17,59 +17,154 @@
  *
  */
 
+const HEADER_PATTERN = /^#{1,6}\s+/m;
+const BOLD_PATTERN_1 = /\*\*[^*]+\*\*/;
+const BOLD_PATTERN_2 = /__[^_]+__/;
+const ITALIC_PATTERN_1 = /\*[^*]+\*/;
+const ITALIC_PATTERN_2 = /_[^_]+_/;
+const LINK_PATTERN = /\[[^\]\r\n]{0,500}\]\([^()\r\n]{0,1000}\)/;
+const IMAGE_PATTERN = /!\[[^\]]*\]\([^)]*\)/;
+const UNORDERED_LIST_PATTERN = /^[-*+]\s.*/gm;
+const ORDERED_LIST_PATTERN = /^[\d]+\.\s.*/gm;
+const BLOCKQUOTE_PATTERN = /^>\s+/gm;
+const CODE_BLOCK_PATTERN_1 = /```[\s\S]*?```/;
+const CODE_BLOCK_PATTERN_2 = /`[^`]+`/;
+const HORIZONTAL_RULE_PATTERN = /^(?:[-*_]){3,}\s*$/m;
+const TABLE_PATTERN_1 = /^\|[^|]+\|.*$/gm;
+const TABLE_PATTERN_2 = /^\|[-:|]+\|.*$/gm;
+const STRIKETHROUGH_PATTERN = /~~[^~]+~~/;
+
+const UNORDERED_LIST_DETECT_PATTERN = /^[-*+]\s.*/m;
+const ORDERED_LIST_DETECT_PATTERN = /^[\d]+\.\s.*/m;
+
+const MARKDOWN_PATTERNS = [
+  HEADER_PATTERN,
+  BOLD_PATTERN_1,
+  BOLD_PATTERN_2,
+  ITALIC_PATTERN_1,
+  ITALIC_PATTERN_2,
+  LINK_PATTERN,
+  IMAGE_PATTERN,
+  UNORDERED_LIST_DETECT_PATTERN,
+  ORDERED_LIST_DETECT_PATTERN,
+  BLOCKQUOTE_PATTERN,
+  CODE_BLOCK_PATTERN_1,
+  CODE_BLOCK_PATTERN_2,
+  HORIZONTAL_RULE_PATTERN,
+  TABLE_PATTERN_1,
+  TABLE_PATTERN_2,
+  STRIKETHROUGH_PATTERN,
+];
+
+const ESCAPED_MARKDOWN_PATTERN = /\\(.)/g;
+
+const INVALID_PATTERNS = [/\\([\\`*_{}[\]()#+\-.!>])/];
+
+/**
+ * Checks if the given text string contains markdown.
+ */
 export const isMarkdownText = (text: string): boolean => {
   if (!text) {
     return false;
   }
 
-  const markdownPatterns = [
-    // Headers (e.g. # Header)
-    /^#{1,6}\s+/m,
-
-    // Bold (e.g. **bold** or __bold__)
-    /\*\*[^*]+\*\*/,
-    /__[^_]+__/,
-
-    // Italic (e.g. *italic* or _italic_)
-    /\*[^*]+\*/,
-    /_[^_]+_/,
-
-    // Links (e.g. [text](http://example.com))
-    /\[[^\]\r\n]{0,500}\]\([^()\r\n]{0,1000}\)/,
-
-    // Images (e.g. ![alt](url))
-    /!\[[^\]]*\]\([^)]*\)/,
-
-    // Lists
-    /^[-*+]\s[^\n]*$/m, // Unordered (e.g. - item, * item)
-    /^\d+\.\s[^\n]*$/m, // Ordered (e.g. 1. item)
-
-    // Blockquotes (e.g. > quote)
-    /^>\s+/m,
-
-    // Code blocks (e.g. ``` code ``` or `inline code`)
-    /```[\s\S]*?```/,
-    /`[^`]+`/,
-
-    // Horizontal rules (e.g. --- or *** or ___)
-    /^(?:[-*_]){3,}\s*$/m,
-
-    // Tables (e.g. | Header | row | --- | :---: |)
-    /\|[^|]+\|/,
-    /^[-:|]+$/m,
-
-    // Strikethrough (e.g., ~~text~~)
-    /~~[^~]+~~/,
-  ];
-
-  const invalidPatterns = [
-    // Escaped markdown characters (\*not italic\*)
-    /\\([\\`*_{}[\]()#+\-.!>])/,
-  ];
-
-  if (invalidPatterns.some(pattern => pattern.test(text))) {
+  if (INVALID_PATTERNS.some(pattern => pattern.test(text))) {
     return false;
   }
 
-  return markdownPatterns.some(pattern => pattern.test(text));
+  return MARKDOWN_PATTERNS.some(pattern => pattern.test(text));
 };
+
+/**
+ * Removes all markdown formatting from a given string.
+ */
+export const sanitizeMarkdown = (text: string): string => {
+  if (!text) {
+    return '';
+  }
+
+  return markdownSanitizers
+    .reduce((sanitizedText, {pattern, transform}) => sanitizedText.replace(pattern, transform), text)
+    .trim();
+};
+
+interface MarkdownSanitizer {
+  pattern: RegExp;
+  transform: (match: string, ...args: any[]) => string;
+}
+
+const markdownSanitizers: MarkdownSanitizer[] = [
+  {
+    pattern: ESCAPED_MARKDOWN_PATTERN,
+    transform: (_match: string, char: string) => char,
+  },
+  {
+    pattern: HEADER_PATTERN,
+    transform: (_match: string) => '',
+  },
+  {
+    pattern: BOLD_PATTERN_1,
+    transform: (match: string) => match.slice(2, -2),
+  },
+  {
+    pattern: BOLD_PATTERN_2,
+    transform: (match: string) => match.slice(2, -2),
+  },
+  {
+    pattern: ITALIC_PATTERN_1,
+    transform: (match: string) => match.slice(1, -1),
+  },
+  {
+    pattern: ITALIC_PATTERN_2,
+    transform: (match: string) => match.slice(1, -1),
+  },
+  {
+    pattern: LINK_PATTERN,
+    transform: (match: string) => match.match(/\[(.*?)\]/)?.[1] || '',
+  },
+  {
+    pattern: IMAGE_PATTERN,
+    transform: (match: string) => match.match(/\[(.*?)\]/)?.[1] || '',
+  },
+  {
+    pattern: UNORDERED_LIST_PATTERN,
+    transform: (match: string) => match.replace(/^[-*+]\s/, ''),
+  },
+  {
+    pattern: ORDERED_LIST_PATTERN,
+    transform: (match: string) => match.replace(/^[\d]+\.\s/, ''),
+  },
+  {
+    pattern: BLOCKQUOTE_PATTERN,
+    transform: (_match: string) => '',
+  },
+  {
+    pattern: CODE_BLOCK_PATTERN_1,
+    transform: (match: string) => match.replace(/```/g, '').trim(),
+  },
+  {
+    pattern: CODE_BLOCK_PATTERN_2,
+    transform: (match: string) => match.slice(1, -1),
+  },
+  {
+    pattern: HORIZONTAL_RULE_PATTERN,
+    transform: (_match: string) => '',
+  },
+  {
+    pattern: TABLE_PATTERN_2,
+    transform: (_match: string) => '',
+  },
+  {
+    pattern: TABLE_PATTERN_1,
+    transform: (match: string) =>
+      match
+        .split('|')
+        .filter(cell => cell.trim())
+        .map(cell => cell.trim())
+        .join(' '),
+  },
+  {
+    pattern: STRIKETHROUGH_PATTERN,
+    transform: (match: string) => match.slice(2, -2),
+  },
+];
