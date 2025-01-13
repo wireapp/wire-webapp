@@ -17,6 +17,7 @@
  *
  */
 
+// Basic markdown patterns (used for both detection and sanitization)
 const HEADER_PATTERN = /^#{1,6}\s+/m;
 const BOLD_PATTERN_1 = /\*\*[^*]+\*\*/;
 const BOLD_PATTERN_2 = /__[^_]+__/;
@@ -24,18 +25,26 @@ const ITALIC_PATTERN_1 = /\*[^*]+\*/;
 const ITALIC_PATTERN_2 = /_[^_]+_/;
 const LINK_PATTERN = /\[[^\]\r\n]{0,500}\]\([^()\r\n]{0,1000}\)/;
 const IMAGE_PATTERN = /!\[[^\]]*\]\([^)]*\)/;
-const UNORDERED_LIST_PATTERN = /^[-*+]\s.*/gm;
-const ORDERED_LIST_PATTERN = /^[\d]+\.\s.*/gm;
 const BLOCKQUOTE_PATTERN = /^>\s+/gm;
 const CODE_BLOCK_PATTERN = /```[\s\S]*?```/;
-const INLINE_CODE_PATTERN = /`[^`]+`/;
+const CODE_INLINE_PATTERN = /`[^`]+`/;
 const HORIZONTAL_RULE_PATTERN = /^(?:[-*_]){3,}\s*$/m;
-const TABLE_PATTERN_1 = /^\|[^|]+\|.*$/gm;
-const TABLE_PATTERN_2 = /^\|[-:|]+(?:\|[-:|]{1,10})*\|$/gm;
 const STRIKETHROUGH_PATTERN = /~~[^~]+~~/;
 
-const UNORDERED_LIST_DETECT_PATTERN = /^[-*+]\s.*/m;
-const ORDERED_LIST_DETECT_PATTERN = /^[\d]+\.\s.*/m;
+// List patterns
+const LIST_SANITIZE_UNORDERED = /^[-*+]\s.*/gm;
+const LIST_SANITIZE_ORDERED = /^[\d]+\.\s.*/gm;
+const LIST_DETECT_UNORDERED = /^[-*+]\s.*/m;
+const LIST_DETECT_ORDERED = /^[\d]+\.\s.*/m;
+
+// Table patterns
+const TABLE_DETECT_ROW = /^\|[^|]+\|/m;
+const TABLE_DETECT_SEPARATOR = /^\|[-:|]+\|/m;
+const TABLE_SANITIZE = /^\|.*\|$/gm;
+
+// Special patterns
+const ESCAPED_CHARS_PATTERN = /\\(.)/g;
+const INVALID_CHARS_PATTERN = /\\([\\`*_{}[\]()#+\-.!>])/;
 
 const MARKDOWN_PATTERNS = [
   HEADER_PATTERN,
@@ -45,20 +54,16 @@ const MARKDOWN_PATTERNS = [
   ITALIC_PATTERN_2,
   LINK_PATTERN,
   IMAGE_PATTERN,
-  UNORDERED_LIST_DETECT_PATTERN,
-  ORDERED_LIST_DETECT_PATTERN,
+  LIST_DETECT_UNORDERED,
+  LIST_DETECT_ORDERED,
   BLOCKQUOTE_PATTERN,
   CODE_BLOCK_PATTERN,
-  INLINE_CODE_PATTERN,
+  CODE_INLINE_PATTERN,
   HORIZONTAL_RULE_PATTERN,
-  TABLE_PATTERN_1,
-  TABLE_PATTERN_2,
+  TABLE_DETECT_ROW,
+  TABLE_DETECT_SEPARATOR,
   STRIKETHROUGH_PATTERN,
 ];
-
-const ESCAPED_MARKDOWN_PATTERN = /\\(.)/g;
-
-const INVALID_PATTERNS = [/\\([\\`*_{}[\]()#+\-.!>])/];
 
 /**
  * Checks if the given text string contains markdown.
@@ -68,7 +73,7 @@ export const isMarkdownText = (text: string): boolean => {
     return false;
   }
 
-  if (INVALID_PATTERNS.some(pattern => pattern.test(text))) {
+  if (INVALID_CHARS_PATTERN.test(text)) {
     return false;
   }
 
@@ -93,9 +98,17 @@ interface MarkdownSanitizer {
   transform: (match: string, ...args: any[]) => string;
 }
 
+const isTableSeparator = (line: string): boolean => {
+  if (!line.startsWith('|') || !line.endsWith('|')) {
+    return false;
+  }
+  const cells = line.slice(1, -1).split('|');
+  return cells.every(cell => /^[-:|]+$/.test(cell.trim()));
+};
+
 const markdownSanitizers: MarkdownSanitizer[] = [
   {
-    pattern: ESCAPED_MARKDOWN_PATTERN,
+    pattern: ESCAPED_CHARS_PATTERN,
     transform: (_match: string, char: string) => char,
   },
   {
@@ -135,11 +148,11 @@ const markdownSanitizers: MarkdownSanitizer[] = [
     },
   },
   {
-    pattern: UNORDERED_LIST_PATTERN,
+    pattern: LIST_SANITIZE_UNORDERED,
     transform: (match: string) => match.replace(/^[-*+]\s/, ''),
   },
   {
-    pattern: ORDERED_LIST_PATTERN,
+    pattern: LIST_SANITIZE_ORDERED,
     transform: (match: string) => match.replace(/^[\d]+\.\s/, ''),
   },
   {
@@ -151,7 +164,7 @@ const markdownSanitizers: MarkdownSanitizer[] = [
     transform: (match: string) => match.replace(/```/g, '').trim(),
   },
   {
-    pattern: INLINE_CODE_PATTERN,
+    pattern: CODE_INLINE_PATTERN,
     transform: (match: string) => match.slice(1, -1),
   },
   {
@@ -159,17 +172,18 @@ const markdownSanitizers: MarkdownSanitizer[] = [
     transform: (_match: string) => '',
   },
   {
-    pattern: TABLE_PATTERN_2,
-    transform: (_match: string) => '',
-  },
-  {
-    pattern: TABLE_PATTERN_1,
-    transform: (match: string) =>
-      match
+    pattern: TABLE_SANITIZE,
+    transform: (match: string) => {
+      const line = match.trim();
+      if (isTableSeparator(line)) {
+        return '';
+      }
+      return line
         .split('|')
         .filter(cell => cell.trim())
         .map(cell => cell.trim())
-        .join(' '),
+        .join(' ');
+    },
   },
   {
     pattern: STRIKETHROUGH_PATTERN,
