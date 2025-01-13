@@ -100,7 +100,7 @@ export class PropertiesRepository {
         privacy: {
           telemetry_data_sharing: undefined,
           marketing_consent:
-            loadValue(StorageKey.INITIAL_MAKRETING_CONSENT_ACCEPTED) ||
+            loadValue(StorageKey.INITIAL_MAKRETING_CONSENT_ACCEPTED) ??
             PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.defaultValue,
         },
         sound: {
