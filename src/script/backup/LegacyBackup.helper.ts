@@ -70,7 +70,7 @@ const verifyMetadata = async ({backupService, fileData, user}: VerifyMetaDataPar
   const metaData = new TextDecoder().decode(rawData);
   const parsedMetaData = JSON.parse(metaData);
   const archiveVersion = _verifyMetadata(user, parsedMetaData);
-  logger.debug('Validated metadata during history import', fileData);
+  logger.debug('Validated metadata during history import');
   return archiveVersion;
 };
 
