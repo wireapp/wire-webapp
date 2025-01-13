@@ -27,8 +27,8 @@ const IMAGE_PATTERN = /!\[[^\]]*\]\([^)]*\)/;
 const UNORDERED_LIST_PATTERN = /^[-*+]\s.*/gm;
 const ORDERED_LIST_PATTERN = /^[\d]+\.\s.*/gm;
 const BLOCKQUOTE_PATTERN = /^>\s+/gm;
-const CODE_BLOCK_PATTERN_1 = /```[\s\S]*?```/;
-const CODE_BLOCK_PATTERN_2 = /`[^`]+`/;
+const CODE_BLOCK_PATTERN = /```[\s\S]*?```/;
+const INLINE_CODE_PATTERN = /`[^`]+`/;
 const HORIZONTAL_RULE_PATTERN = /^(?:[-*_]){3,}\s*$/m;
 const TABLE_PATTERN_1 = /^\|[^|]+\|.*$/gm;
 const TABLE_PATTERN_2 = /^\|[-:|]+\|.*$/gm;
@@ -48,8 +48,8 @@ const MARKDOWN_PATTERNS = [
   UNORDERED_LIST_DETECT_PATTERN,
   ORDERED_LIST_DETECT_PATTERN,
   BLOCKQUOTE_PATTERN,
-  CODE_BLOCK_PATTERN_1,
-  CODE_BLOCK_PATTERN_2,
+  CODE_BLOCK_PATTERN,
+  INLINE_CODE_PATTERN,
   HORIZONTAL_RULE_PATTERN,
   TABLE_PATTERN_1,
   TABLE_PATTERN_2,
@@ -139,11 +139,11 @@ const markdownSanitizers: MarkdownSanitizer[] = [
     transform: (_match: string) => '',
   },
   {
-    pattern: CODE_BLOCK_PATTERN_1,
+    pattern: CODE_BLOCK_PATTERN,
     transform: (match: string) => match.replace(/```/g, '').trim(),
   },
   {
-    pattern: CODE_BLOCK_PATTERN_2,
+    pattern: INLINE_CODE_PATTERN,
     transform: (match: string) => match.slice(1, -1),
   },
   {
