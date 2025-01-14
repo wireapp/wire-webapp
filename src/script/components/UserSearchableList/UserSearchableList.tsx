@@ -83,23 +83,19 @@ export const UserSearchableList = ({
    * Try to load additional members from the backend.
    * This is needed for large teams (>= 2000 members)
    */
-  const fetchMembersFromBackend = useDebouncedCallback(
-    async (query: string, ignoreMembers: User[]) => {
-      const resultUsers = await searchRepository.searchByName(query, selfUser.teamId);
-      const selfTeamId = selfUser.teamId;
-      const foundMembers = resultUsers.filter(user => user.teamId === selfTeamId);
-      const ignoreIds = ignoreMembers.map(member => member.id);
-      const uniqueMembers = foundMembers.filter(member => !ignoreIds.includes(member.id));
+  const fetchMembersFromBackend = useDebouncedCallback(async (query: string, ignoreMembers: User[]) => {
+    const resultUsers = await searchRepository.searchByName(query, selfUser.teamId);
+    const selfTeamId = selfUser.teamId;
+    const foundMembers = resultUsers.filter(user => user.teamId === selfTeamId);
+    const ignoreIds = ignoreMembers.map(member => member.id);
+    const uniqueMembers = foundMembers.filter(member => !ignoreIds.includes(member.id));
 
-      // We shouldn't show any members that have the 'external' role and are not already locally known.
-      const nonExternalMembers = await teamRepository.filterExternals(uniqueMembers);
-      setRemoteTeamMembers(
-        filterRemoteTeamUsers ? await teamRepository.filterRemoteDomainUsers(nonExternalMembers) : nonExternalMembers,
-      );
-    },
-    300,
-    {maxWait: 1000},
-  );
+    // We shouldn't show any members that have the 'external' role and are not already locally known.
+    const nonExternalMembers = await teamRepository.filterExternals(uniqueMembers);
+    setRemoteTeamMembers(
+      filterRemoteTeamUsers ? await teamRepository.filterRemoteDomainUsers(nonExternalMembers) : nonExternalMembers,
+    );
+  }, 300);
 
   // Filter all list items if a filter is provided
 

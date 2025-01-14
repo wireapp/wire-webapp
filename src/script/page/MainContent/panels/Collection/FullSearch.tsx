@@ -54,26 +54,22 @@ const FullSearch: React.FC<FullSearchProps> = ({searchProvider, click = noop, ch
   const [hasNoResults, setHasNoResults] = useState(false);
   const [element, setElement] = useEffectRef<HTMLDivElement>();
 
-  const [debouncedSearch] = useDebounce(
-    async () => {
-      const trimmedInput = searchValue.trim();
-      change(trimmedInput);
-      if (trimmedInput.length < 2) {
-        setMessages([]);
-        setMessageCount(0);
-        setHasNoResults(false);
-        return;
-      }
-      const {messageEntities, query} = await searchProvider(trimmedInput);
-      if (query === trimmedInput) {
-        setHasNoResults(messageEntities.length === 0);
-        setMessages(messageEntities as ContentMessage[]);
-        setMessageCount(MAX_VISIBLE_MESSAGES);
-      }
-    },
-    DEBOUNCE_TIME,
-    {maxWait: 1000},
-  );
+  const [debouncedSearch] = useDebounce(async () => {
+    const trimmedInput = searchValue.trim();
+    change(trimmedInput);
+    if (trimmedInput.length < 2) {
+      setMessages([]);
+      setMessageCount(0);
+      setHasNoResults(false);
+      return;
+    }
+    const {messageEntities, query} = await searchProvider(trimmedInput);
+    if (query === trimmedInput) {
+      setHasNoResults(messageEntities.length === 0);
+      setMessages(messageEntities as ContentMessage[]);
+      setMessageCount(MAX_VISIBLE_MESSAGES);
+    }
+  }, DEBOUNCE_TIME);
 
   useEffect(() => {
     debouncedSearch();

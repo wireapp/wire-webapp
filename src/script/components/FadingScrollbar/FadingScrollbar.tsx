@@ -84,9 +84,7 @@ export const FadingScrollbar = forwardRef<HTMLDivElement, React.HTMLAttributes<H
   const fadeIn = (element: HTMLElement) => startAnimation('fadein', element);
   const fadeOut = (element: HTMLElement) => startAnimation('fadeout', element);
 
-  const debouncedFadeOut = useDebouncedCallback((element: HTMLElement) => fadeOut(element), config.DEBOUNCE_THRESHOLD, {
-    maxWait: config.DEBOUNCE_THRESHOLD * 2,
-  });
+  const debouncedFadeOut = useDebouncedCallback((element: HTMLElement) => fadeOut(element), config.DEBOUNCE_THRESHOLD);
 
   const fadeInIdle = (element: HTMLElement) => {
     fadeIn(element);

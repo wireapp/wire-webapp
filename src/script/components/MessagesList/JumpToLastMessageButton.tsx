@@ -39,13 +39,9 @@ export interface JumpToLastMessageButtonProps extends HTMLProps<HTMLElement> {
 export const JumpToLastMessageButton = ({onGoToLastMessage, conversation}: JumpToLastMessageButtonProps) => {
   const [isLastMessageVisible, setIsLastMessageVisible] = useState(conversation.isLastMessageVisible());
 
-  const debouncedSetVisibility = useDebouncedCallback(
-    (value: boolean) => {
-      setIsLastMessageVisible(value);
-    },
-    200,
-    {maxWait: 1000},
-  );
+  const debouncedSetVisibility = useDebouncedCallback((value: boolean) => {
+    setIsLastMessageVisible(value);
+  }, 200);
 
   useEffect(() => {
     const subscription = conversation.isLastMessageVisible.subscribe(debouncedSetVisibility);
