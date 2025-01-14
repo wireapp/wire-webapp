@@ -22,7 +22,7 @@ import {useEffect, useRef, useState} from 'react';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {partition} from 'underscore';
-import {useDebounce} from 'use-debounce';
+import {useDebouncedCallback} from 'use-debounce';
 
 import * as Icon from 'Components/Icon';
 import {UserList, UserlistMode} from 'Components/UserList';
@@ -156,7 +156,7 @@ export const PeopleTab = ({
     }
   }, []);
 
-  const [debouncedSearch] = useDebounce(async () => {
+  const debouncedSearch = useDebouncedCallback(async () => {
     setHasFederationError(false);
     const {query} = searchRepository.normalizeQuery(searchQuery);
     if (!query) {

@@ -19,7 +19,7 @@
 
 import React, {useState, useEffect} from 'react';
 
-import {useDebounce} from 'use-debounce';
+import {useDebouncedCallback} from 'use-debounce';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
@@ -44,16 +44,12 @@ export const ServicesTab: React.FC<{
 
   const openManageServices = () => safeWindowOpen(manageServicesUrl!);
 
-  const [debouncedSearch] = useDebounce(
-    async () => {
-      const results = await integrationRepository.searchForServices(searchQuery);
-      if (results) {
-        setServices(results);
-      }
-    },
-    300,
-    {maxWait: 1000},
-  );
+  const debouncedSearch = useDebouncedCallback(async () => {
+    const results = await integrationRepository.searchForServices(searchQuery);
+    if (results) {
+      setServices(results);
+    }
+  }, 300);
 
   useEffect(() => {
     debouncedSearch();
