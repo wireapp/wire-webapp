@@ -60,6 +60,7 @@
     "switch-path": "1.2.0",
     "tsyringe": "4.8.0",
     "underscore": "1.13.7",
+    "use-debounce": "^10.0.4",
     "uuid": "11.0.3",
     "webgl-utils.js": "1.1.0",
     "webrtc-adapter": "9.0.1",

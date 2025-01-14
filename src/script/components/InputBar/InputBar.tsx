@@ -41,6 +41,7 @@ import {CONVERSATION_TYPING_INDICATOR_MODE} from 'src/script/user/TypingIndicato
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
+import {sanitizeMarkdown} from 'Util/MarkdownUtil';
 import {formatLocale, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {getFileExtension} from 'Util/util';
 
@@ -186,7 +187,7 @@ export const InputBar = ({
     ? textValue.length > 0
     : textValue.length > 0 && textValue.length <= CONFIG.GIPHY_TEXT_LENGTH;
 
-  const shouldReplaceEmoji = useUserPropertyValue(
+  const shouldReplaceEmoji = useUserPropertyValue<boolean>(
     () => propertiesRepository.getPreference(PROPERTIES_TYPE.EMOJI.REPLACE_INLINE),
     WebAppEvents.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE,
   );
@@ -459,8 +460,15 @@ export const InputBar = ({
     };
   }, []);
 
-  const saveDraft = async (editorState: string) => {
-    await saveDraftState(storageRepository, conversation, editorState, replyMessageEntity?.id, editedMessage?.id);
+  const saveDraft = async (editorState: string, plainMessage: string) => {
+    await saveDraftState({
+      storageRepository,
+      conversation,
+      editorState,
+      plainMessage: sanitizeMarkdown(plainMessage),
+      replyId: replyMessageEntity?.id,
+      editedMessageId: editedMessage?.id,
+    });
   };
 
   const loadDraft = async () => {

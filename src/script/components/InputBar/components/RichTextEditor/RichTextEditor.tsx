@@ -46,7 +46,7 @@ import {EditedMessagePlugin} from './plugins/EditedMessagePlugin/EditedMessagePl
 import {EmojiPickerPlugin} from './plugins/EmojiPickerPlugin';
 import {GlobalEventsPlugin} from './plugins/GlobalEventsPlugin/GlobalEventsPlugin';
 import {HistoryPlugin} from './plugins/HistoryPlugin/HistoryPlugin';
-import {findAndTransformEmoji, ReplaceEmojiPlugin} from './plugins/InlineEmojiReplacementPlugin';
+import {ReplaceEmojiPlugin} from './plugins/InlineEmojiReplacementPlugin';
 import {ListItemTabIndentationPlugin} from './plugins/ListIndentationPlugin/ListIndentationPlugin';
 import {ListMaxIndentLevelPlugin} from './plugins/ListMaxIndentLevelPlugin/ListMaxIndentLevelPlugin';
 import {MentionsPlugin} from './plugins/MentionsPlugin';
@@ -54,6 +54,8 @@ import {ReplaceCarriageReturnPlugin} from './plugins/ReplaceCarriageReturnPlugin
 import {SendPlugin} from './plugins/SendPlugin/SendPlugin';
 import {markdownTransformers} from './utils/markdownTransformers';
 import {parseMentions} from './utils/parseMentions';
+import {transformMessage} from './utils/transformMessage';
+import {useEditorDraftState} from './utils/useEditorDraftState';
 
 import {MentionEntity} from '../../../../message/MentionEntity';
 
@@ -64,14 +66,14 @@ export type RichTextContent = {
 
 interface RichTextEditorProps {
   placeholder: string;
-  replaceEmojis?: boolean;
+  replaceEmojis: boolean;
   editedMessage?: ContentMessage;
   children: ReactElement;
   hasLocalEphemeralTimer: boolean;
   showFormatToolbar: boolean;
   showMarkdownPreview: boolean;
   getMentionCandidates: (search?: string | null) => User[];
-  saveDraftState: (editor: string) => void;
+  saveDraftState: (editor: string, plainMessage: string) => void;
   loadDraftState: () => Promise<DraftState>;
   onUpdate: (content: RichTextContent) => void;
   onArrowUp: () => void;
@@ -105,9 +107,13 @@ export const RichTextEditor = ({
   const emojiPickerOpen = useRef<boolean>(true);
   const mentionsOpen = useRef<boolean>(true);
 
-  const handleChange = (editorState: EditorState) => {
-    saveDraftState(JSON.stringify(editorState.toJSON()));
+  const {saveDraft} = useEditorDraftState({
+    editorRef,
+    saveDraftState,
+    replaceEmojis,
+  });
 
+  const handleChange = (editorState: EditorState) => {
     editorState.read(() => {
       if (!editorRef.current) {
         return;
@@ -115,10 +121,14 @@ export const RichTextEditor = ({
 
       const markdown = $convertToMarkdownString(markdownTransformers);
 
+      const text = transformMessage({replaceEmojis, markdown});
+
       onUpdate({
-        text: replaceEmojis ? findAndTransformEmoji(markdown) : markdown,
-        mentions: parseMentions(editorRef.current!, markdown, getMentionCandidates()),
+        text,
+        mentions: parseMentions(editorRef.current, markdown, getMentionCandidates()),
       });
+
+      saveDraft();
     });
   };
 

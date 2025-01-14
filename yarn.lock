@@ -18175,6 +18175,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"use-debounce@npm:^10.0.4":
+  version: 10.0.4
+  resolution: "use-debounce@npm:10.0.4"
+  peerDependencies:
+    react: "*"
+  checksum: 10/e193bbed307204b655abab545704ca608b23db10680f299f4b9b48b935a9fd68b68827c79de3bf5517010524bfa15709bf6b0ab1f915d6305b5d2ce27bf11ad7
+  languageName: node
+  linkType: hard
+
 "use-isomorphic-layout-effect@npm:^1.1.2":
   version: 1.1.2
   resolution: "use-isomorphic-layout-effect@npm:1.1.2"
@@ -18884,6 +18893,7 @@ __metadata:
     tsyringe: "npm:4.8.0"
     typescript: "npm:5.5.2"
     underscore: "npm:1.13.7"
+    use-debounce: "npm:^10.0.4"
     uuid: "npm:11.0.3"
     webgl-utils.js: "npm:1.1.0"
     webpack: "npm:5.97.1"

@@ -19,7 +19,6 @@
 
 import React, {
   useEffect,
-  useMemo,
   useRef,
   useState,
   MouseEvent as ReactMouseEvent,
@@ -31,6 +30,7 @@ import cx from 'classnames';
 
 import {Avatar, AVATAR_SIZE, GroupAvatar} from 'Components/Avatar';
 import {UserBlockedBadge} from 'Components/Badge';
+import {CellDescription} from 'Components/ConversationListCell/components/CellDescription';
 import {UserInfo} from 'Components/UserInfo';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isKey, isOneOfKeys, KEY} from 'Util/KeyboardUtil';
@@ -39,7 +39,6 @@ import {noop, setContextMenuPosition} from 'Util/util';
 
 import {StatusIcon} from './components/StatusIcon';
 
-import {generateCellState} from '../../conversation/ConversationCellState';
 import type {Conversation} from '../../entity/Conversation';
 import {MediaType} from '../../media/MediaType';
 
@@ -104,8 +103,6 @@ export const ConversationListCell = ({
     event.preventDefault();
     rightClick(conversation, event);
   };
-
-  const cellState = useMemo(() => generateCellState(conversation), [unreadState, mutedState, isRequest]);
 
   const onClickJoinCall = (event: React.MouseEvent) => {
     event.preventDefault();
@@ -201,16 +198,13 @@ export const ConversationListCell = ({
             </span>
           )}
 
-          {cellState.description && (
-            <span
-              className={cx('conversation-list-cell-description', {
-                'conversation-list-cell-description--active': isActive,
-              })}
-              data-uie-name="secondary-line"
-            >
-              {cellState.description}
-            </span>
-          )}
+          <CellDescription
+            conversation={conversation}
+            mutedState={mutedState}
+            isActive={isActive}
+            isRequest={isRequest}
+            unreadState={unreadState}
+          />
         </div>
       </div>
 
