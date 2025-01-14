@@ -19,7 +19,7 @@
 
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 
-import {useDebounce} from 'use-debounce';
+import {useDebouncedCallback} from 'use-debounce';
 
 import {CloseIcon, Input, InputSubmitCombo, SearchIcon} from '@wireapp/react-ui-kit';
 
@@ -54,7 +54,7 @@ const FullSearch: React.FC<FullSearchProps> = ({searchProvider, click = noop, ch
   const [hasNoResults, setHasNoResults] = useState(false);
   const [element, setElement] = useEffectRef<HTMLDivElement>();
 
-  const [debouncedSearch] = useDebounce(async () => {
+  const debouncedSearch = useDebouncedCallback(async () => {
     const trimmedInput = searchValue.trim();
     change(trimmedInput);
     if (trimmedInput.length < 2) {
