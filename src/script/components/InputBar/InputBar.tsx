@@ -614,7 +614,6 @@ export const InputBar = ({
               </div>
               {!isSelfUserRemoved && !pastedFile && (
                 <RichTextEditor
-                  key={conversation.id}
                   onSetup={lexical => {
                     editorRef.current = lexical;
                   }}
