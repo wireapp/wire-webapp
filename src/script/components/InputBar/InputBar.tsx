@@ -187,7 +187,7 @@ export const InputBar = ({
     ? textValue.length > 0
     : textValue.length > 0 && textValue.length <= CONFIG.GIPHY_TEXT_LENGTH;
 
-  const shouldReplaceEmoji = useUserPropertyValue(
+  const shouldReplaceEmoji = useUserPropertyValue<boolean>(
     () => propertiesRepository.getPreference(PROPERTIES_TYPE.EMOJI.REPLACE_INLINE),
     WebAppEvents.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE,
   );
@@ -614,6 +614,7 @@ export const InputBar = ({
               </div>
               {!isSelfUserRemoved && !pastedFile && (
                 <RichTextEditor
+                  key={conversation.id}
                   onSetup={lexical => {
                     editorRef.current = lexical;
                   }}
