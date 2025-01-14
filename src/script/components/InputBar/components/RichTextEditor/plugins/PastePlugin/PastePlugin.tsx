@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect} from 'react';
+import {useCallback, useEffect} from 'react';
 
 import {$generateNodesFromDOM} from '@lexical/html';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
@@ -45,7 +45,7 @@ interface Segment {
  * It preserves mentions for users that exist in the current context and
  * converts mentions of non-existent users to plain text.
  */
-export const PastePlugin = ({getMentionCandidates}: PastePluginProps) => {
+export const PastePlugin = ({getMentionCandidates}: PastePluginProps): JSX.Element | null => {
   const [editor] = useLexicalComposerContext();
 
   /**
@@ -90,72 +90,79 @@ export const PastePlugin = ({getMentionCandidates}: PastePluginProps) => {
   });
 
   /**
-   * Processes plain text content and splits it into segments.
-   * Each segment is either a mention, link, or plain text.
-   * Preserves the original text structure including spaces and formatting.
-   */
-  const processPlainTextSegments = (text: string, availableUsers: User[]): Segment[] => {
-    const segments: Segment[] = [];
-    let lastIndex = 0;
-
-    // First, find all URLs and create segments
-    const urlMatches = Array.from(text.matchAll(URL_REGEX));
-    urlMatches.forEach(match => {
-      const url = match[0];
-      const urlIndex = match.index!;
-
-      // Add text before URL if exists
-      if (urlIndex > lastIndex) {
-        const textBefore = text.slice(lastIndex, urlIndex);
-        const mentionSegments = processMentionSegments(textBefore, availableUsers);
-        segments.push(...mentionSegments);
-      }
-
-      // Add URL segment
-      segments.push(createSegment('link', url, url));
-      lastIndex = urlIndex + url.length;
-    });
-
-    // Process remaining text for mentions
-    if (lastIndex < text.length) {
-      const remainingText = text.slice(lastIndex);
-      const mentionSegments = processMentionSegments(remainingText, availableUsers);
-      segments.push(...mentionSegments);
-    }
-
-    return segments;
-  };
-
-  /**
    * Processes text for mentions and returns segments
    */
-  const processMentionSegments = (text: string, availableUsers: User[]): Segment[] => {
-    const mentions = text.match(/@[\w]+/g) || [];
+  const processMentionSegments = useCallback((text: string, availableUsers: User[]): Segment[] => {
+    const mentions: string[] = text.match(/@[\w]+/g) || [];
     if (mentions.length === 0) {
       return [createSegment('text', text)];
     }
 
-    return mentions.reduce<{segments: Segment[]; lastIndex: number}>(
-      (acc, mention) => {
-        const mentionIndex = text.indexOf(mention, acc.lastIndex);
-        const segments = [...acc.segments];
+    type Accumulator = {
+      segments: Segment[];
+      lastIndex: number;
+    };
 
-        if (mentionIndex > acc.lastIndex) {
-          segments.push(createSegment('text', text.slice(acc.lastIndex, mentionIndex)));
+    const initialValue: Accumulator = {segments: [], lastIndex: 0};
+
+    return mentions.reduce((acc: Accumulator, mention: string): Accumulator => {
+      const mentionIndex = text.indexOf(mention, acc.lastIndex);
+      const segments = [...acc.segments];
+
+      if (mentionIndex > acc.lastIndex) {
+        segments.push(createSegment('text', text.slice(acc.lastIndex, mentionIndex)));
+      }
+
+      const username = mention.substring(1);
+      const userExists = availableUsers.some(user => user.name() === username);
+      segments.push(createSegment(userExists ? 'mention' : 'text', userExists ? username : mention));
+
+      return {
+        segments,
+        lastIndex: mentionIndex + mention.length,
+      };
+    }, initialValue).segments;
+  }, []);
+
+  /**
+   * Processes plain text content and splits it into segments.
+   * Each segment is either a mention, link, or plain text.
+   * Preserves the original text structure including spaces and formatting.
+   */
+  const processPlainTextSegments = useCallback(
+    (text: string, availableUsers: User[]): Segment[] => {
+      const segments: Segment[] = [];
+      let lastIndex = 0;
+
+      // First, find all URLs and create segments
+      const urlMatches = Array.from(text.matchAll(URL_REGEX));
+      urlMatches.forEach(match => {
+        const url = match[0];
+        const urlIndex = match.index!;
+
+        // Add text before URL if exists
+        if (urlIndex > lastIndex) {
+          const textBefore = text.slice(lastIndex, urlIndex);
+          const mentionSegments = processMentionSegments(textBefore, availableUsers);
+          segments.push(...mentionSegments);
         }
 
-        const username = mention.substring(1);
-        const userExists = availableUsers.some(user => user.name() === username);
-        segments.push(createSegment(userExists ? 'mention' : 'text', userExists ? username : mention));
+        // Add URL segment
+        segments.push(createSegment('link', url, url));
+        lastIndex = urlIndex + url.length;
+      });
 
-        return {
-          segments,
-          lastIndex: mentionIndex + mention.length,
-        };
-      },
-      {segments: [], lastIndex: 0},
-    ).segments;
-  };
+      // Process remaining text for mentions
+      if (lastIndex < text.length) {
+        const remainingText = text.slice(lastIndex);
+        const mentionSegments = processMentionSegments(remainingText, availableUsers);
+        segments.push(...mentionSegments);
+      }
+
+      return segments;
+    },
+    [processMentionSegments],
+  );
 
   /**
    * Inserts a list of segments into the editor at the current selection.
@@ -213,78 +220,85 @@ export const PastePlugin = ({getMentionCandidates}: PastePluginProps) => {
     return true;
   };
 
-  const handleFormattedContent = (doc: Document): boolean => {
-    const selection = $getSelection();
-    if (!selection) {
+  const handleFormattedContent = useCallback(
+    (doc: Document): boolean => {
+      const selection = $getSelection();
+      if (!selection) {
+        return false;
+      }
+
+      // Convert HTML content to Lexical nodes while preserving formatting
+      const nodes = $generateNodesFromDOM(editor, doc);
+
+      if (nodes.length > 0) {
+        selection.insertNodes(nodes);
+        return true;
+      }
+
       return false;
-    }
-
-    // Convert HTML content to Lexical nodes while preserving formatting
-    const nodes = $generateNodesFromDOM(editor, doc);
-
-    if (nodes.length > 0) {
-      selection.insertNodes(nodes);
-      return true;
-    }
-
-    return false;
-  };
+    },
+    [editor],
+  );
 
   /**
    * Handles the paste event by processing both HTML and plain text content.
    * Attempts to preserve rich text structure when possible, falling back to
    * plain text processing when needed.
    */
-  const handlePaste = (event: ClipboardEvent) => {
-    const clipboardData = event.clipboardData;
-    if (!clipboardData) {
-      return false;
-    }
-
-    const htmlContent = clipboardData.getData('text/html');
-    const plainText = clipboardData.getData('text/plain');
-    const availableUsers = getMentionCandidates();
-
-    editor.update(() => {
-      try {
-        if (htmlContent) {
-          const parser = new DOMParser();
-          const doc = parser.parseFromString(htmlContent, 'text/html');
-
-          // First try to handle formatted content
-          const handledFormatted = handleFormattedContent(doc);
-          if (handledFormatted) {
-            return true;
-          }
-
-          // If no formatted content, try to handle mentions and links
-          const mentions = doc.querySelectorAll('[data-lexical-mention]');
-          const handledMentions = mentions.length > 0;
-          // TODO: To be removed after the link format button is implemented
-          const handledLinks = handleLinksFromHtml(doc);
-
-          if (handledMentions || handledLinks) {
-            mentions.forEach(mention => handleMentionFromHtml(mention, availableUsers));
-            return true;
-          }
-        }
-
-        // Fallback to plain text handling
-        const segments = processPlainTextSegments(plainText, availableUsers);
-        insertSegments(segments);
-      } catch (error) {
-        console.error('Error handling paste:', error);
-        const selection = $getSelection();
-        selection?.insertText(plainText);
+  const handlePaste = useCallback(
+    (event: ClipboardEvent) => {
+      const clipboardData = event.clipboardData;
+      if (!clipboardData) {
+        return false;
       }
-    });
 
-    return true;
-  };
+      const htmlContent = clipboardData.getData('text/html');
+      const plainText = clipboardData.getData('text/plain');
+      const availableUsers = getMentionCandidates();
+
+      editor.update(() => {
+        try {
+          if (htmlContent) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlContent, 'text/html');
+
+            // First try to handle formatted content
+            const handledFormatted = handleFormattedContent(doc);
+            if (handledFormatted) {
+              return true;
+            }
+
+            // If no formatted content, try to handle mentions and links
+            const mentions = doc.querySelectorAll('[data-lexical-mention]');
+            const handledMentions = mentions.length > 0;
+            // TODO: To be removed after the link format button is implemented
+            const handledLinks = handleLinksFromHtml(doc);
+
+            if (handledMentions || handledLinks) {
+              mentions.forEach(mention => handleMentionFromHtml(mention, availableUsers));
+              return true;
+            }
+          }
+
+          // Fallback to plain text handling
+          const segments = processPlainTextSegments(plainText, availableUsers);
+          insertSegments(segments);
+        } catch (error) {
+          console.error('Error handling paste:', error);
+          const selection = $getSelection();
+          selection?.insertText(plainText);
+        }
+        return undefined;
+      });
+
+      return true;
+    },
+    [editor, getMentionCandidates, handleFormattedContent, processPlainTextSegments],
+  );
 
   useEffect(() => {
     return editor.registerCommand(PASTE_COMMAND, handlePaste, COMMAND_PRIORITY_LOW);
-  }, [editor, getMentionCandidates]);
+  }, [editor, getMentionCandidates, handlePaste]);
 
   return null;
 };
