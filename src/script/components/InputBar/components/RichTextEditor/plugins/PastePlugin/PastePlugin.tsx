@@ -19,6 +19,7 @@
 
 import {useEffect} from 'react';
 
+import {$generateNodesFromDOM} from '@lexical/html';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {$getSelection, $createTextNode, PASTE_COMMAND, COMMAND_PRIORITY_LOW} from 'lexical';
 
@@ -84,6 +85,7 @@ export const PastePlugin = ({getMentionCandidates}: PastePluginProps) => {
   const createSegment = (type: Segment['type'], content: string, url?: string): Segment => ({
     type,
     content,
+    // TODO: To be removed after the link format button is implemented
     ...(url && {url}),
   });
 
@@ -174,6 +176,7 @@ export const PastePlugin = ({getMentionCandidates}: PastePluginProps) => {
           const mentionNode = $createMentionNode('@', segment.content);
           selection.insertNodes([mentionNode, $createTextNode(' ')]);
           break;
+        //  TODO: To be removed after the link format button is implemented
         case 'link':
           selection.insertText(createMarkdownLink(segment.url!, segment.content));
           break;
@@ -184,6 +187,7 @@ export const PastePlugin = ({getMentionCandidates}: PastePluginProps) => {
   /**
    * Processes HTML links from pasted content.
    * Creates markdown links preserving both href and text content.
+   * TODO: To be removed after the link format button is implemented
    */
   const handleLinksFromHtml = (doc: Document): boolean => {
     const links = doc.querySelectorAll('a');
@@ -209,6 +213,23 @@ export const PastePlugin = ({getMentionCandidates}: PastePluginProps) => {
     return true;
   };
 
+  const handleFormattedContent = (doc: Document): boolean => {
+    const selection = $getSelection();
+    if (!selection) {
+      return false;
+    }
+
+    // Convert HTML content to Lexical nodes while preserving formatting
+    const nodes = $generateNodesFromDOM(editor, doc);
+
+    if (nodes.length > 0) {
+      selection.insertNodes(nodes);
+      return true;
+    }
+
+    return false;
+  };
+
   /**
    * Handles the paste event by processing both HTML and plain text content.
    * Attempts to preserve rich text structure when possible, falling back to
@@ -230,8 +251,16 @@ export const PastePlugin = ({getMentionCandidates}: PastePluginProps) => {
           const parser = new DOMParser();
           const doc = parser.parseFromString(htmlContent, 'text/html');
 
+          // First try to handle formatted content
+          const handledFormatted = handleFormattedContent(doc);
+          if (handledFormatted) {
+            return true;
+          }
+
+          // If no formatted content, try to handle mentions and links
           const mentions = doc.querySelectorAll('[data-lexical-mention]');
           const handledMentions = mentions.length > 0;
+          // TODO: To be removed after the link format button is implemented
           const handledLinks = handleLinksFromHtml(doc);
 
           if (handledMentions || handledLinks) {
@@ -240,6 +269,7 @@ export const PastePlugin = ({getMentionCandidates}: PastePluginProps) => {
           }
         }
 
+        // Fallback to plain text handling
         const segments = processPlainTextSegments(plainText, availableUsers);
         insertSegments(segments);
       } catch (error) {
@@ -259,12 +289,16 @@ export const PastePlugin = ({getMentionCandidates}: PastePluginProps) => {
   return null;
 };
 
-// URL regex that matches most common URL formats
+/**
+ * URL regex that matches most common URL formats
+ * TODO: To be removed after the link format button is implemented
+ */
 const URL_REGEX =
   /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/gi;
 
 /**
  * Creates a markdown link from a URL and optional text
+ * TODO: To be removed after the link format button is implemented
  */
 const createMarkdownLink = (url: string, text?: string): string => {
   return `[${text || url}](${url})`;
