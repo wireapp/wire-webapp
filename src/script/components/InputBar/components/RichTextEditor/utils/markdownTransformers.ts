@@ -28,7 +28,6 @@ import {
   STRIKETHROUGH,
   UNORDERED_LIST,
   QUOTE,
-  LINK,
 } from '@lexical/markdown';
 
 export const markdownTransformers = [
@@ -42,5 +41,4 @@ export const markdownTransformers = [
   ITALIC_STAR,
   STRIKETHROUGH,
   QUOTE,
-  LINK,
 ];
