@@ -22,4 +22,8 @@ import {CSSObject} from '@emotion/react';
 export const iconStyle: CSSObject = {
   verticalAlign: 'middle',
   marginRight: '8px',
+
+  path: {
+    fill: 'var(--background)',
+  },
 };
