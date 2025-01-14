@@ -19,6 +19,8 @@
 
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 
+import {useDebounce} from 'use-debounce';
+
 import {CloseIcon, Input, InputSubmitCombo, SearchIcon} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/LocalizerUtil';
@@ -30,7 +32,6 @@ import {FullSearchItem} from './fullSearch/FullSearchItem';
 
 import {ContentMessage} from '../../../../entity/message/ContentMessage';
 import type {Message} from '../../../../entity/message/Message';
-import {useDebounce} from '../../../../hooks/useDebounce';
 import {getSearchRegex} from '../../../../search/FullTextSearch';
 
 const MAX_VISIBLE_MESSAGES = 30;
@@ -53,7 +54,7 @@ const FullSearch: React.FC<FullSearchProps> = ({searchProvider, click = noop, ch
   const [hasNoResults, setHasNoResults] = useState(false);
   const [element, setElement] = useEffectRef<HTMLDivElement>();
 
-  useDebounce(
+  const [debouncedSearch] = useDebounce(
     async () => {
       const trimmedInput = searchValue.trim();
       change(trimmedInput);
@@ -71,8 +72,12 @@ const FullSearch: React.FC<FullSearchProps> = ({searchProvider, click = noop, ch
       }
     },
     DEBOUNCE_TIME,
-    [searchValue],
+    {maxWait: 1000},
   );
+
+  useEffect(() => {
+    debouncedSearch();
+  }, [searchValue]);
 
   useEffect(() => {
     const parent = element?.closest('.collection-list') as HTMLDivElement;

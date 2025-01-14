@@ -22,6 +22,7 @@ import {useEffect, useRef, useState} from 'react';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {partition} from 'underscore';
+import {useDebounce} from 'use-debounce';
 
 import * as Icon from 'Components/Icon';
 import {UserList, UserlistMode} from 'Components/UserList';
@@ -38,7 +39,6 @@ import {ConversationRepository} from '../../../../conversation/ConversationRepos
 import {ConversationState} from '../../../../conversation/ConversationState';
 import {User} from '../../../../entity/User';
 import {getManageTeamUrl} from '../../../../externalRoute';
-import {useDebounce} from '../../../../hooks/useDebounce';
 import {SearchRepository} from '../../../../search/SearchRepository';
 import {TeamRepository} from '../../../../team/TeamRepository';
 import {TeamState} from '../../../../team/TeamState';
@@ -156,7 +156,7 @@ export const PeopleTab = ({
     }
   }, []);
 
-  useDebounce(
+  const [debouncedSearch] = useDebounce(
     async () => {
       setHasFederationError(false);
       const {query} = searchRepository.normalizeQuery(searchQuery);
@@ -209,8 +209,12 @@ export const PeopleTab = ({
       }
     },
     300,
-    [searchQuery],
+    {maxWait: 1000},
   );
+
+  useEffect(() => {
+    debouncedSearch();
+  }, [searchQuery]);
 
   useEffect(() => {
     // keep track of the most up to date value of the search query (in order to cancel outdated queries)
