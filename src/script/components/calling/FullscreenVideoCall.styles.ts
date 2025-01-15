@@ -31,6 +31,7 @@ export const videoTopBarStyles: CSSObject = {
   alignItems: 'center',
   justifyContent: 'space-between',
   padding: '4px 4px 8px',
+  backgroundColor: 'var(--app-bg-secondary)',
 
   [media.tabletUp]: {
     display: 'grid',
@@ -63,8 +64,14 @@ export const backIconStyles: CSSObject = {
 
 export const paginationWrapperStyles: CSSObject = {
   [media.mobile]: {
-    margin: '0 auto',
+    backgroundColor: 'var(--app-bg-secondary)',
     padding: '8px 0',
+  },
+};
+
+export const paginationStyles: CSSObject = {
+  [media.mobile]: {
+    justifyContent: 'center',
   },
 };
 

@@ -54,6 +54,7 @@ import {
   backIconStyles,
   minimizeButtonStyles,
   openDetachedWindowButtonStyles,
+  paginationStyles,
 } from './FullscreenVideoCall.styles';
 import {GroupVideoGrid} from './GroupVideoGrid';
 import {Pagination} from './Pagination/Pagination';
@@ -370,12 +371,14 @@ const FullscreenVideoCall = ({
         </div>
 
         {isMobile && isPaginationVisible && (
-          <Pagination
-            totalPages={totalPages}
-            currentPage={currentPage}
-            onChangePage={newPage => changePage(newPage, call)}
-            className={paginationWrapperStyles}
-          />
+          <div css={paginationWrapperStyles}>
+            <Pagination
+              totalPages={totalPages}
+              currentPage={currentPage}
+              onChangePage={newPage => changePage(newPage, call)}
+              className={paginationStyles}
+            />
+          </div>
         )}
 
         {!isChoosingScreen && (
