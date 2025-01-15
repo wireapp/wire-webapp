@@ -41,6 +41,7 @@ export const VideoControlsSelect: React.FC<VideoControlsSelectProps> = ({
   dataUieName,
   options,
   onChange,
+  onKeyDown,
   onMenuClose,
   menuIsOpen,
   wrapperCSS,
@@ -59,6 +60,7 @@ export const VideoControlsSelect: React.FC<VideoControlsSelectProps> = ({
       hideSelectedOptions={false}
       options={options}
       onChange={onChange}
+      onKeyDown={onKeyDown}
       onMenuClose={onMenuClose}
       menuPlacement="top"
       menuIsOpen={menuIsOpen}
