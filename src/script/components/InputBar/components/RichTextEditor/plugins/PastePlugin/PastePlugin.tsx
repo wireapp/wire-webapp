@@ -28,6 +28,7 @@ import {
   COMMAND_PRIORITY_LOW,
   $isRangeSelection,
   $isTextNode,
+  BaseSelection,
 } from 'lexical';
 
 import {User} from 'src/script/entity/User';
@@ -38,6 +39,8 @@ interface PastePluginProps {
   /** Function that returns list of users that can be mentioned in the current context */
   getMentionCandidates: () => User[];
 }
+
+type RangeSelection = BaseSelection | null;
 
 /**
  * PastePlugin handles pasting content into the editor while preserving formatting and special nodes.
@@ -87,7 +90,7 @@ export const PastePlugin = ({getMentionCandidates}: PastePluginProps): JSX.Eleme
    * @returns boolean - True if mentions were handled successfully
    */
   const handleLexicalMentions = useCallback(
-    (doc: Document, selection: ReturnType<typeof $getSelection> | null, availableUsers: User[]): boolean => {
+    (doc: Document, selection: RangeSelection | null, availableUsers: User[]): boolean => {
       if (!selection) {
         return false;
       }
@@ -133,7 +136,7 @@ export const PastePlugin = ({getMentionCandidates}: PastePluginProps): JSX.Eleme
    * @returns boolean - True if formatted content was handled successfully
    */
   const handleFormattedContent = useCallback(
-    (doc: Document, selection: ReturnType<typeof $getSelection> | null): boolean => {
+    (doc: Document, selection: RangeSelection | null): boolean => {
       if (!selection) {
         return false;
       }
@@ -178,7 +181,7 @@ export const PastePlugin = ({getMentionCandidates}: PastePluginProps): JSX.Eleme
    * @param availableUsers - List of users that can be mentioned in current context
    */
   const processMentions = useCallback(
-    (selection: ReturnType<typeof $getSelection> | null, mentions: NodeListOf<Element>, availableUsers: User[]) => {
+    (selection: RangeSelection | null, mentions: NodeListOf<Element>, availableUsers: User[]) => {
       if (!selection) {
         return;
       }
