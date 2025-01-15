@@ -55,6 +55,30 @@ export const PastePlugin = ({getMentionCandidates}: PastePluginProps): JSX.Eleme
   const [editor] = useLexicalComposerContext();
 
   /**
+   * Extracts and validates a username from a mention element.
+   * @param mention - The mention DOM element
+   * @param availableUsers - List of users that can be mentioned
+   * @returns Object containing validation result and username if valid
+   */
+  const validateMention = useCallback(
+    (mention: Element, availableUsers: User[]): {isValid: boolean; username?: string} => {
+      const value = mention.getAttribute('data-lexical-mention-value');
+      if (typeof value !== 'string') {
+        return {isValid: false};
+      }
+
+      const username = value.startsWith('@') ? value.substring(1) : value;
+      const userExists = availableUsers.some(user => user.name() === username);
+
+      return {
+        isValid: userExists,
+        username,
+      };
+    },
+    [],
+  );
+
+  /**
    * Handles pasted content that contains Lexical mentions.
    * Processes the DOM before generating Lexical nodes to ensure proper mention handling.
    * @param doc - The parsed HTML document
@@ -75,15 +99,12 @@ export const PastePlugin = ({getMentionCandidates}: PastePluginProps): JSX.Eleme
 
       // Process mentions in the DOM before generating nodes
       lexicalMentions.forEach(mention => {
-        const value = mention.getAttribute('data-lexical-mention-value');
-        if (typeof value !== 'string') {
+        const {isValid, username} = validateMention(mention, availableUsers);
+        if (!username) {
           return;
         }
 
-        const username = value.startsWith('@') ? value.substring(1) : value;
-        const userExists = availableUsers.some(user => user.name() === username);
-
-        if (!userExists) {
+        if (!isValid) {
           const textNode = doc.createTextNode(`@${username}`);
           const parent = mention.parentNode;
           if (!parent) {
@@ -163,13 +184,8 @@ export const PastePlugin = ({getMentionCandidates}: PastePluginProps): JSX.Eleme
       }
 
       mentions.forEach(mention => {
-        const value = mention.getAttribute('data-lexical-mention-value');
-        if (typeof value !== 'string') {
-          return;
-        }
-
-        const username = value.startsWith('@') ? value.substring(1) : value;
-        if (!availableUsers.some(user => user.name() === username)) {
+        const {isValid, username} = validateMention(mention, availableUsers);
+        if (!username || !isValid) {
           return;
         }
 
