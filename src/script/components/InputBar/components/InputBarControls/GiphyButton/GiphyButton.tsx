@@ -19,8 +19,6 @@
 
 import React from 'react';
 
-import {IconButton} from '@wireapp/react-ui-kit';
-
 import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
@@ -33,7 +31,7 @@ const GiphyButton: React.FC<GiphyButtonProps> = ({onGifClick, hasRoundedLeftCorn
   return (
     <>
       <li>
-        <IconButton
+        <button
           className="input-bar-control"
           type="button"
           css={{marginBottom: '0'}}
@@ -43,7 +41,7 @@ const GiphyButton: React.FC<GiphyButtonProps> = ({onGifClick, hasRoundedLeftCorn
           data-uie-name="do-giphy-popover"
         >
           <Icon.GifIcon width={14} height={14} />
-        </IconButton>
+        </button>
       </li>
     </>
   );

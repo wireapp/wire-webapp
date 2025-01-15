@@ -131,12 +131,12 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
               <FormatTextButton isActive={isFormatActive} onClick={onFormatClick} />
             </li>
           )}
-          <div css={separatorStyles} />
           {showEmojiButton && (
             <li>
               <EmojiButton isActive={isEmojiActive} hasRoundedCorners={!showFormatButton} onClick={onEmojiClick} />
             </li>
           )}
+          <div css={separatorStyles} />
           <GiphyButton onGifClick={onGifClick} hasRoundedLeftCorner={!showFormatButton && !showEmojiButton} />
         </>
       )}
