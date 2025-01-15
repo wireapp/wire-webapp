@@ -136,16 +136,17 @@ export const PastePlugin = ({getMentionCandidates}: PastePluginProps): JSX.Eleme
    * @returns string - Processed text with markdown links
    */
   const processLinks = (text: string, links: NodeListOf<Element>): string => {
-    let processedText = text;
-    links.forEach(link => {
+    return Array.from(links).reduce((processedText, link) => {
       const href = link.getAttribute('href');
       const linkText = link.textContent?.trim();
-      if (href && linkText) {
-        const linkMarkdown = `[${linkText}](${href})`;
-        processedText = processedText.replace(new RegExp(`\\b${linkText}\\b`), linkMarkdown);
+
+      if (!href || !linkText) {
+        return processedText;
       }
-    });
-    return processedText;
+
+      const linkMarkdown = `[${linkText}](${href})`;
+      return processedText.replace(new RegExp(`\\b${linkText}\\b`), linkMarkdown);
+    }, text);
   };
 
   /**
