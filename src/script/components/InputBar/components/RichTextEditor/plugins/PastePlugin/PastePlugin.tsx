@@ -40,7 +40,7 @@ interface PastePluginProps {
   getMentionCandidates: () => User[];
 }
 
-type RangeSelection = BaseSelection | null;
+type Selection = BaseSelection | null;
 
 /**
  * PastePlugin handles pasting content into the editor while preserving formatting and special nodes.
@@ -90,7 +90,7 @@ export const PastePlugin = ({getMentionCandidates}: PastePluginProps): JSX.Eleme
    * @returns boolean - True if mentions were handled successfully
    */
   const handleLexicalMentions = useCallback(
-    (doc: Document, selection: RangeSelection | null, availableUsers: User[]): boolean => {
+    (doc: Document, selection: Selection, availableUsers: User[]): boolean => {
       if (!selection) {
         return false;
       }
@@ -135,7 +135,7 @@ export const PastePlugin = ({getMentionCandidates}: PastePluginProps): JSX.Eleme
    * @returns boolean - True if formatted content was handled successfully
    */
   const handleFormattedContent = useCallback(
-    (doc: Document, selection: RangeSelection | null): boolean => {
+    (doc: Document, selection: Selection): boolean => {
       if (!selection) {
         return false;
       }
@@ -180,7 +180,7 @@ export const PastePlugin = ({getMentionCandidates}: PastePluginProps): JSX.Eleme
    * @param availableUsers - List of users that can be mentioned in current context
    */
   const processMentions = useCallback(
-    (selection: RangeSelection | null, mentions: NodeListOf<Element>, availableUsers: User[]) => {
+    (selection: Selection, mentions: NodeListOf<Element>, availableUsers: User[]) => {
       if (!selection) {
         return;
       }
