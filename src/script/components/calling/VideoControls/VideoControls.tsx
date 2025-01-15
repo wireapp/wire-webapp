@@ -347,7 +347,9 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
       entries: [
         ...mobileEntires,
         {
-          label: t('videoCallMenuMoreRaiseHand'),
+          click: () => toggleIsHandRaised(isSelfHandRaised),
+          label: isSelfHandRaised ? t('videoCallMenuMoreLowerHand') : t('videoCallMenuMoreRaiseHand'),
+          icon: props => <RaiseHandIcon {...props} height={16} width={16} scale={1} />,
         },
         {
           click: () => setIsCallViewOpen(prev => !prev),

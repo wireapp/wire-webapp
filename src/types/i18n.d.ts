@@ -1617,6 +1617,7 @@ declare module 'I18n/en-US.json' {
     'videoCallMenuMoreVideoSettings': `Video Settings`;
     'videoCallMenuMoreChangeView': `Change view`;
     'videoCallMenuMoreRaiseHand': `Raise hand`;
+    'videoCallMenuMoreLowerHand': `Lower hand`;
     'videoCallMenuMoreAddReaction': `Add reaction`;
     'videoCallMenuMoreCloseReactions': `Close reactions`;
     'videoCallMenuMoreSeeParticipants': `See participants`;
