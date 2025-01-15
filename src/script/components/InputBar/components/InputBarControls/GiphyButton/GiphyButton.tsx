@@ -19,8 +19,6 @@
 
 import React from 'react';
 
-import cx from 'classnames';
-
 import {IconButton} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
@@ -36,9 +34,7 @@ const GiphyButton: React.FC<GiphyButtonProps> = ({onGifClick, hasRoundedLeftCorn
     <>
       <li>
         <IconButton
-          className={cx({
-            'buttons-group-button-right': !hasRoundedLeftCorner,
-          })}
+          className="input-bar-control"
           type="button"
           css={{marginBottom: '0'}}
           title={t('extensionsBubbleButtonGif')}
@@ -46,7 +42,7 @@ const GiphyButton: React.FC<GiphyButtonProps> = ({onGifClick, hasRoundedLeftCorn
           onClick={onGifClick}
           data-uie-name="do-giphy-popover"
         >
-          <Icon.GifIcon />
+          <Icon.GifIcon width={14} height={14} />
         </IconButton>
       </li>
     </>

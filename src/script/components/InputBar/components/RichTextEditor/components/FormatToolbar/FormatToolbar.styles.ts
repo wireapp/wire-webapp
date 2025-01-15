@@ -22,4 +22,15 @@ import {CSSObject} from '@emotion/react';
 export const wrapperStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
+  columnGap: '4px',
+};
+
+export const separatorStyles: CSSObject = {
+  width: '2px',
+  height: '24px',
+  backgroundColor: 'var(--gray-40)',
+
+  'body.theme-dark &': {
+    backgroundColor: 'var(--gray-80)',
+  },
 };

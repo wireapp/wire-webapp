@@ -23,6 +23,7 @@ import {Config} from 'src/script/Config';
 import {Conversation} from 'src/script/entity/Conversation';
 
 import {CancelEditButton} from './CancelEditButton/CancelEditButton';
+import {separatorStyles} from './ControlButtons.styles';
 import {EmojiButton} from './EmojiButton/EmojiButton';
 import {FormatTextButton} from './FormatTextButton/FormatTextButton';
 import {GiphyButton} from './GiphyButton/GiphyButton';
@@ -93,7 +94,6 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
             <EmojiButton isActive={isEmojiActive} hasRoundedCorners={!showFormatButton} onClick={onEmojiClick} />
           </li>
         )}
-
         {!disableFilesharing && (
           <>
             <li>
@@ -111,6 +111,7 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
             </li>
           </>
         )}
+        <div css={separatorStyles} />
         <li>
           <PingButton isDisabled={!!disablePing} onClick={onClickPing} />
         </li>
@@ -130,6 +131,7 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
               <FormatTextButton isActive={isFormatActive} onClick={onFormatClick} />
             </li>
           )}
+          <div css={separatorStyles} />
           {showEmojiButton && (
             <li>
               <EmojiButton isActive={isEmojiActive} hasRoundedCorners={!showFormatButton} onClick={onEmojiClick} />

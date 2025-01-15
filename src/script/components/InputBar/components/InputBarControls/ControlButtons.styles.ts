@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2024 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,26 +17,14 @@
  *
  */
 
-import * as Icon from 'Components/Icon';
-import {t} from 'Util/LocalizerUtil';
+import {CSSObject} from '@emotion/react';
 
-interface PingButtonProps {
-  onClick: () => void;
-  isDisabled: boolean;
-}
+export const separatorStyles: CSSObject = {
+  width: '2px',
+  height: '24px',
+  backgroundColor: 'var(--gray-40)',
 
-export const PingButton = ({isDisabled, onClick}: PingButtonProps) => {
-  return (
-    <button
-      className="input-bar-control"
-      type="button"
-      onClick={onClick}
-      disabled={isDisabled}
-      title={t('tooltipConversationPing')}
-      aria-label={t('tooltipConversationPing')}
-      data-uie-name="do-ping"
-    >
-      <Icon.PingIcon width={14} height={14} />
-    </button>
-  );
+  'body.theme-dark &': {
+    backgroundColor: 'var(--gray-80)',
+  },
 };

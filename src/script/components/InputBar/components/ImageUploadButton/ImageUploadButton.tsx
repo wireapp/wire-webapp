@@ -52,7 +52,7 @@ export const ImageUploadButton = ({onSelectImages, acceptedImageTypes, hasRounde
         type="button"
         aria-label={t('tooltipConversationAddImage')}
         title={t('tooltipConversationAddImage')}
-        className={cx('conversation-button controls-right-button no-radius file-button', {
+        className={cx('input-bar-control file-button', {
           'buttons-group-button-left': hasRoundedCorners,
         })}
         onClick={() => imageRef.current?.click()}

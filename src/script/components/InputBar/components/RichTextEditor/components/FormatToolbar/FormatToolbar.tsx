@@ -33,7 +33,7 @@ import {
 import {t} from 'Util/LocalizerUtil';
 
 import {FormatButton} from './FormatButton/FormatButton';
-import {wrapperStyles} from './FormatToolbar.styles';
+import {separatorStyles, wrapperStyles} from './FormatToolbar.styles';
 import {useHeadingState} from './useHeadingState/useHeadingState';
 import {useListState} from './useListState/useListState';
 import {useToolbarState} from './useToolbarState/useToolbarState';
@@ -77,6 +77,7 @@ export const FormatToolbar = () => {
         active={activeFormats.includes('strikethrough')}
         onClick={() => formatText('strikethrough')}
       />
+      <div css={separatorStyles} />
       <FormatButton
         label={t('richTextOrderedList')}
         icon={NumberedListIcon}

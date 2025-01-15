@@ -32,7 +32,7 @@ interface FormatTextButtonProps {
 export const FormatTextButton = ({isActive, onClick}: FormatTextButtonProps) => {
   return (
     <button
-      className={cx(`controls-right-button buttons-group-button-left`, {
+      className={cx(`input-bar-control `, {
         active: isActive,
       })}
       type="button"
@@ -41,7 +41,7 @@ export const FormatTextButton = ({isActive, onClick}: FormatTextButtonProps) => 
       aria-label={isActive ? t('tooltipConversationHideFormatting') : t('tooltipConversationShowFormatting')}
       data-uie-name="format-text"
     >
-      <Icon.MarkdownIcon />
+      <Icon.MarkdownIcon width={14} height={14} />
     </button>
   );
 };

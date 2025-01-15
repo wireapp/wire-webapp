@@ -19,9 +19,7 @@
 
 import {ElementType} from 'react';
 
-import {css} from '@emotion/react';
-
-import {buttonActiveStyles, buttonStyles} from './FormatButton.styles';
+import cx from 'classnames';
 
 interface FormatButtonProps {
   label: string;
@@ -35,14 +33,11 @@ export const FormatButton = ({label, icon: Icon, active, onClick}: FormatButtonP
     <button
       title={label}
       aria-label={label}
-      css={css`
-        ${buttonStyles};
-        ${active && buttonActiveStyles};
-      `}
+      className={cx('input-bar-control', {active})}
       onClick={onClick}
       data-uie-name={`format-text-${label}`}
     >
-      <Icon />
+      <Icon width={14} height={14} />
     </button>
   );
 };

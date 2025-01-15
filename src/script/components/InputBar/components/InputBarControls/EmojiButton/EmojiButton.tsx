@@ -34,7 +34,7 @@ interface EmojiButtonProps {
 export const EmojiButton = ({isActive, hasRoundedCorners, onClick}: EmojiButtonProps) => {
   return (
     <button
-      className={cx('controls-right-button no-radius', {
+      className={cx('input-bar-control', {
         active: isActive,
         'buttons-group-button-left': hasRoundedCorners,
       })}
@@ -44,7 +44,7 @@ export const EmojiButton = ({isActive, hasRoundedCorners, onClick}: EmojiButtonP
       aria-label={t('tooltipConversationEmoji')}
       data-uie-name="add-emoji"
     >
-      <EmojiIcon />
+      <EmojiIcon width={14} height={14} />
     </button>
   );
 };

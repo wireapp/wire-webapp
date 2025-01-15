@@ -33,7 +33,7 @@ export const CancelEditButton = ({onClick}: CancelEditButtonProps) => {
       data-uie-name="do-cancel-edit"
       aria-label={t('accessibility.cancelMsgEdit')}
     >
-      <Icon.CloseIcon />
+      <Icon.CloseIcon width={14} height={14} />
     </button>
   );
 };
