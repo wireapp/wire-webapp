@@ -122,7 +122,7 @@ export const PastePlugin = ({getMentionCandidates}: PastePluginProps): JSX.Eleme
       selection.insertNodes(nodes);
       return true;
     },
-    [editor],
+    [editor, validateMention],
   );
 
   /**
@@ -203,7 +203,7 @@ export const PastePlugin = ({getMentionCandidates}: PastePluginProps): JSX.Eleme
         }
       });
     },
-    [],
+    [validateMention],
   );
 
   /**
