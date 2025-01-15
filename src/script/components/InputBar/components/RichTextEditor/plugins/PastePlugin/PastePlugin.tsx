@@ -21,229 +21,183 @@ import {useCallback, useEffect} from 'react';
 
 import {$generateNodesFromDOM} from '@lexical/html';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {$getSelection, $createTextNode, PASTE_COMMAND, COMMAND_PRIORITY_LOW} from 'lexical';
+import {
+  $getSelection,
+  $createTextNode,
+  PASTE_COMMAND,
+  COMMAND_PRIORITY_LOW,
+  $isRangeSelection,
+  $isTextNode,
+} from 'lexical';
 
 import {User} from 'src/script/entity/User';
 
 import {$createMentionNode} from '../../nodes/MentionNode';
 
 interface PastePluginProps {
+  /** Function that returns list of users that can be mentioned in the current context */
   getMentionCandidates: () => User[];
 }
 
-interface Segment {
-  /** Type of the segment - either plain text, mention, or link */
-  type: 'text' | 'mention' | 'link';
-  /** Content of the segment */
-  content: string;
-  /** URL for link segments */
-  url?: string;
-}
-
 /**
- * Plugin that handles pasting text with mentions into the editor.
- * It preserves mentions for users that exist in the current context and
- * converts mentions of non-existent users to plain text.
+ * PastePlugin handles pasting content into the editor while preserving formatting and special nodes.
+ * It specifically handles:
+ * 1. Lexical mentions - preserving mention nodes for users that exist in current conversation
+ * 2. Formatted content - preserving text formatting (bold, italic, etc.)
+ * 3. Links - converting them to markdown format [text](url) (TODO: To be removed after the link format button is implemented)
+ * 4. Plain text - as a fallback
+ *
+ * The plugin processes mentions intelligently:
+ * - If a mentioned user exists in the current conversation, the mention is preserved as a MentionNode
+ * - If a mentioned user doesn't exist, the mention is converted to plain text with @ symbol
  */
 export const PastePlugin = ({getMentionCandidates}: PastePluginProps): JSX.Element | null => {
   const [editor] = useLexicalComposerContext();
 
   /**
-   * Processes a mention element from pasted HTML content.
-   * Creates a mention node if the user exists in the current context,
-   * otherwise converts it to plain text.
+   * Handles pasted content that contains Lexical mentions.
+   * Processes the DOM before generating Lexical nodes to ensure proper mention handling.
+   * @param doc - The parsed HTML document
+   * @param selection - Current editor selection
+   * @param availableUsers - List of users that can be mentioned in current context
+   * @returns boolean - True if mentions were handled successfully
    */
-  const handleMentionFromHtml = (mentionElem: Element, availableUsers: User[]) => {
-    const value = mentionElem.getAttribute('data-lexical-mention-value');
-    if (!value) {
-      return;
-    }
-
-    const username = value.startsWith('@') ? value.substring(1) : value;
-    const selection = $getSelection();
-
-    if (!selection) {
-      return;
-    }
-
-    const userExists = availableUsers.some(user => user.name() === username);
-
-    if (!userExists) {
-      selection.insertText(`@${username}`);
-      return;
-    }
-
-    const mentionNode = $createMentionNode('@', username);
-
-    selection.insertNodes([mentionNode, $createTextNode(' ')]);
-  };
-
-  /**
-   * Creates a segment object with the specified type and content.
-   * Used to standardize segment creation throughout the plugin.
-   */
-  const createSegment = (type: Segment['type'], content: string, url?: string): Segment => ({
-    type,
-    content,
-    // TODO: To be removed after the link format button is implemented
-    ...(url && {url}),
-  });
-
-  /**
-   * Processes text for mentions and returns segments
-   */
-  const processMentionSegments = useCallback((text: string, availableUsers: User[]): Segment[] => {
-    const mentions: string[] = text.match(/@[\w]+/g) || [];
-    if (mentions.length === 0) {
-      return [createSegment('text', text)];
-    }
-
-    type Accumulator = {
-      segments: Segment[];
-      lastIndex: number;
-    };
-
-    const initialValue: Accumulator = {segments: [], lastIndex: 0};
-
-    return mentions.reduce((acc: Accumulator, mention: string): Accumulator => {
-      const mentionIndex = text.indexOf(mention, acc.lastIndex);
-      const segments = [...acc.segments];
-
-      if (mentionIndex > acc.lastIndex) {
-        segments.push(createSegment('text', text.slice(acc.lastIndex, mentionIndex)));
-      }
-
-      const username = mention.substring(1);
-      const userExists = availableUsers.some(user => user.name() === username);
-      segments.push(createSegment(userExists ? 'mention' : 'text', userExists ? username : mention));
-
-      return {
-        segments,
-        lastIndex: mentionIndex + mention.length,
-      };
-    }, initialValue).segments;
-  }, []);
-
-  /**
-   * Processes plain text content and splits it into segments.
-   * Each segment is either a mention, link, or plain text.
-   * Preserves the original text structure including spaces and formatting.
-   */
-  const processPlainTextSegments = useCallback(
-    (text: string, availableUsers: User[]): Segment[] => {
-      const segments: Segment[] = [];
-      let lastIndex = 0;
-
-      // First, find all URLs and create segments
-      const urlMatches = Array.from(text.matchAll(URL_REGEX));
-      urlMatches.forEach(match => {
-        const url = match[0];
-        const urlIndex = match.index!;
-
-        // Add text before URL if exists
-        if (urlIndex > lastIndex) {
-          const textBefore = text.slice(lastIndex, urlIndex);
-          const mentionSegments = processMentionSegments(textBefore, availableUsers);
-          segments.push(...mentionSegments);
-        }
-
-        // Add URL segment
-        segments.push(createSegment('link', url, url));
-        lastIndex = urlIndex + url.length;
-      });
-
-      // Process remaining text for mentions
-      if (lastIndex < text.length) {
-        const remainingText = text.slice(lastIndex);
-        const mentionSegments = processMentionSegments(remainingText, availableUsers);
-        segments.push(...mentionSegments);
-      }
-
-      return segments;
-    },
-    [processMentionSegments],
-  );
-
-  /**
-   * Inserts a list of segments into the editor at the current selection.
-   * Handles both text and mention segments appropriately.
-   */
-  const insertSegments = (segments: Segment[]) => {
-    const selection = $getSelection();
-    if (!selection) {
-      return;
-    }
-
-    segments.forEach(segment => {
-      switch (segment.type) {
-        case 'text':
-          selection.insertText(segment.content);
-          break;
-        case 'mention':
-          const mentionNode = $createMentionNode('@', segment.content);
-          selection.insertNodes([mentionNode, $createTextNode(' ')]);
-          break;
-        //  TODO: To be removed after the link format button is implemented
-        case 'link':
-          selection.insertText(createMarkdownLink(segment.url!, segment.content));
-          break;
-      }
-    });
-  };
-
-  /**
-   * Processes HTML links from pasted content.
-   * Creates markdown links preserving both href and text content.
-   * TODO: To be removed after the link format button is implemented
-   */
-  const handleLinksFromHtml = (doc: Document): boolean => {
-    const links = doc.querySelectorAll('a');
-    if (links.length === 0) {
-      return false;
-    }
-
-    const selection = $getSelection();
-    if (!selection) {
-      return false;
-    }
-
-    links.forEach(link => {
-      const href = link.getAttribute('href');
-      const text = link.textContent?.trim();
-
-      if (href && text) {
-        selection.insertText(createMarkdownLink(href, text));
-        selection.insertText(' ');
-      }
-    });
-
-    return true;
-  };
-
-  const handleFormattedContent = useCallback(
-    (doc: Document): boolean => {
-      const selection = $getSelection();
+  const handleLexicalMentions = useCallback(
+    (doc: Document, selection: ReturnType<typeof $getSelection> | null, availableUsers: User[]): boolean => {
       if (!selection) {
         return false;
       }
 
-      // Convert HTML content to Lexical nodes while preserving formatting
-      const nodes = $generateNodesFromDOM(editor, doc);
-
-      if (nodes.length > 0) {
-        selection.insertNodes(nodes);
-        return true;
+      const lexicalMentions = doc.querySelectorAll('[data-lexical-mention="true"]');
+      if (lexicalMentions.length === 0) {
+        return false;
       }
 
-      return false;
+      // Process mentions in the DOM before generating nodes
+      lexicalMentions.forEach(mention => {
+        const value = mention.getAttribute('data-lexical-mention-value');
+        if (typeof value !== 'string') {
+          return;
+        }
+
+        const username = value.startsWith('@') ? value.substring(1) : value;
+        const userExists = availableUsers.some(user => user.name() === username);
+
+        if (!userExists) {
+          const textNode = doc.createTextNode(`@${username}`);
+          const parent = mention.parentNode;
+          if (!parent) {
+            return;
+          }
+          parent.replaceChild(textNode, mention);
+        }
+      });
+
+      const nodes = $generateNodesFromDOM(editor, doc);
+      if (nodes.length === 0) {
+        return false;
+      }
+
+      selection.insertNodes(nodes);
+      return true;
     },
     [editor],
   );
 
   /**
-   * Handles the paste event by processing both HTML and plain text content.
-   * Attempts to preserve rich text structure when possible, falling back to
-   * plain text processing when needed.
+   * Handles pasted content with formatting (bold, italic, etc.).
+   * Converts HTML content to Lexical nodes while preserving formatting.
+   * @param doc - The parsed HTML document
+   * @param selection - Current editor selection
+   * @returns boolean - True if formatted content was handled successfully
+   */
+  const handleFormattedContent = useCallback(
+    (doc: Document, selection: ReturnType<typeof $getSelection> | null): boolean => {
+      if (!selection) {
+        return false;
+      }
+
+      const nodes = $generateNodesFromDOM(editor, doc);
+      if (nodes.length === 0) {
+        return false;
+      }
+
+      selection.insertNodes(nodes);
+      return true;
+    },
+    [editor],
+  );
+
+  /**
+   * Processes links in pasted content, converting them to markdown format.
+   * TODO: To be removed after the link format button is implemented
+   * @param text - The text containing links
+   * @param links - NodeList of link elements
+   * @returns string - Processed text with markdown links
+   */
+  const processLinks = (text: string, links: NodeListOf<Element>): string => {
+    let processedText = text;
+    links.forEach(link => {
+      const href = link.getAttribute('href');
+      const linkText = link.textContent?.trim();
+      if (href && linkText) {
+        const linkMarkdown = `[${linkText}](${href})`;
+        processedText = processedText.replace(new RegExp(`\\b${linkText}\\b`), linkMarkdown);
+      }
+    });
+    return processedText;
+  };
+
+  /**
+   * Processes mentions in pasted content that aren't in Lexical format.
+   * Converts valid mentions to MentionNodes and preserves their position in text.
+   * @param selection - Current editor selection
+   * @param mentions - NodeList of mention elements
+   * @param availableUsers - List of users that can be mentioned in current context
+   */
+  const processMentions = useCallback(
+    (selection: ReturnType<typeof $getSelection> | null, mentions: NodeListOf<Element>, availableUsers: User[]) => {
+      if (!selection) {
+        return;
+      }
+
+      mentions.forEach(mention => {
+        const value = mention.getAttribute('data-lexical-mention-value');
+        if (typeof value !== 'string') {
+          return;
+        }
+
+        const username = value.startsWith('@') ? value.substring(1) : value;
+        if (!availableUsers.some(user => user.name() === username)) {
+          return;
+        }
+
+        const mentionText = `@${username}`;
+        const content = selection.getTextContent();
+        const startOffset = content.indexOf(mentionText);
+
+        if (startOffset !== -1 && $isRangeSelection(selection)) {
+          const node = selection.anchor.getNode();
+          if (!node || !$isTextNode(node)) {
+            return;
+          }
+          selection.setTextNodeRange(node, startOffset, node, startOffset + mentionText.length);
+          selection.insertNodes([$createMentionNode('@', username), $createTextNode(' ')]);
+        }
+      });
+    },
+    [],
+  );
+
+  /**
+   * Main paste handler that orchestrates the processing of pasted content.
+   * Tries different handling strategies in order:
+   * 1. Lexical mentions
+   * 2. Formatted content
+   * 3. Manual processing of links and mentions
+   * Falls back to plain text if all else fails.
+   * @param event - Clipboard event containing pasted content
+   * @returns boolean - True if paste was handled
    */
   const handlePaste = useCallback(
     (event: ClipboardEvent) => {
@@ -258,62 +212,53 @@ export const PastePlugin = ({getMentionCandidates}: PastePluginProps): JSX.Eleme
 
       editor.update(() => {
         try {
-          if (htmlContent) {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(htmlContent, 'text/html');
-
-            // First try to handle formatted content
-            const handledFormatted = handleFormattedContent(doc);
-            if (handledFormatted) {
-              return true;
-            }
-
-            // If no formatted content, try to handle mentions and links
-            const mentions = doc.querySelectorAll('[data-lexical-mention]');
-            const handledMentions = mentions.length > 0;
-            // TODO: To be removed after the link format button is implemented
-            const handledLinks = handleLinksFromHtml(doc);
-
-            if (handledMentions || handledLinks) {
-              mentions.forEach(mention => handleMentionFromHtml(mention, availableUsers));
-              return true;
-            }
+          const selection = $getSelection();
+          if (!selection) {
+            $getSelection()?.insertText(plainText);
+            return false;
           }
 
-          // Fallback to plain text handling
-          const segments = processPlainTextSegments(plainText, availableUsers);
-          insertSegments(segments);
+          if (!htmlContent) {
+            selection.insertText(plainText);
+            return false;
+          }
+
+          const doc = new DOMParser().parseFromString(htmlContent, 'text/html');
+
+          // Try handling lexical mentions first
+          if (handleLexicalMentions(doc, selection, availableUsers)) {
+            return true;
+          }
+
+          const mentions = doc.querySelectorAll('[data-lexical-mention]');
+          const links = doc.querySelectorAll('a');
+
+          // Try handling formatted content if no special elements
+          if (mentions.length === 0 && links.length === 0 && handleFormattedContent(doc, selection)) {
+            return true;
+          }
+
+          // Process links and mentions manually
+          const processedText = processLinks(plainText, links);
+          selection.insertText(processedText);
+          processMentions(selection, mentions, availableUsers);
+
+          return true;
         } catch (error) {
           console.error('Error handling paste:', error);
-          const selection = $getSelection();
-          selection?.insertText(plainText);
+          $getSelection()?.insertText(plainText);
+          return false;
         }
-        return undefined;
       });
 
       return true;
     },
-    [editor, getMentionCandidates, handleFormattedContent, processPlainTextSegments],
+    [editor, getMentionCandidates, handleLexicalMentions, handleFormattedContent, processMentions],
   );
 
   useEffect(() => {
     return editor.registerCommand(PASTE_COMMAND, handlePaste, COMMAND_PRIORITY_LOW);
-  }, [editor, getMentionCandidates, handlePaste]);
+  }, [editor, handlePaste]);
 
   return null;
-};
-
-/**
- * URL regex that matches most common URL formats
- * TODO: To be removed after the link format button is implemented
- */
-const URL_REGEX =
-  /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/gi;
-
-/**
- * Creates a markdown link from a URL and optional text
- * TODO: To be removed after the link format button is implemented
- */
-const createMarkdownLink = (url: string, text?: string): string => {
-  return `[${text || url}](${url})`;
 };
