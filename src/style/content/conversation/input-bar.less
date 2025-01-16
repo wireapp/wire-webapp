@@ -416,19 +416,21 @@
     'avatar input input'
     'avatar buttons buttons';
   grid-template-columns: calc(var(--input-bar-avatar-size) + var(--input-bar-avatar-spacing)) 1fr min-content;
-  row-gap: 8px;
+  padding-bottom: 8px;
+
+  //   row-gap: 8px;
 
   //   @media (min-width: 900px) {
   //     grid-template-areas: 'avatar input buttons';
   //   }
 
   &--with-toolbar {
-    padding-bottom: 8px;
     grid-template-areas:
       'avatar toolbar toolbar'
       'avatar input input'
       'avatar buttons buttons';
     grid-template-columns: calc(var(--input-bar-avatar-size) + var(--input-bar-avatar-spacing)) 1fr 1fr;
+    padding-bottom: 8px;
     grid-template-rows: auto auto;
     row-gap: 0;
 
@@ -457,6 +459,14 @@
   grid-row: 2;
 }
 
+.input-bar-container .input-bar-avatar {
+  grid-row: 1;
+}
+
+.input-bar-container--with-toolbar .input-bar-avatar {
+  grid-row: 2;
+}
+
 .input-bar-buttons {
   display: flex;
   height: 40px;
@@ -468,7 +478,7 @@
   justify-content: space-between;
 
   &__send {
-    margin-bottom: 8px;
+    margin-bottom: 0;
   }
 
   //   @media (min-width: 900px) {
@@ -510,7 +520,8 @@
   display: flex;
   justify-content: flex-end;
   list-style-type: none;
-  margin: 0 0 8px;
+  //   margin: 0 0 8px;
+  margin: 0;
   padding-left: 0;
   gap: 4px;
 }
