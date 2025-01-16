@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2024 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,16 +17,15 @@
  *
  */
 
-import {INSERT_ORDERED_LIST_COMMAND, INSERT_UNORDERED_LIST_COMMAND, REMOVE_LIST_COMMAND} from '@lexical/list';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {$getSelection, $isRangeSelection} from 'lexical';
+import {$isQuoteNode, $createQuoteNode} from '@lexical/rich-text';
+import {$setBlocksType} from '@lexical/selection';
+import {$createParagraphNode, $getSelection, $isRangeSelection} from 'lexical';
 
-import {isNodeList} from '../common/isNodeList/isNodeList';
-
-export const useListState = () => {
+export const useBlockquoteState = () => {
   const [editor] = useLexicalComposerContext();
 
-  const formatList = (listType: 'unordered' | 'ordered') => {
+  const formatBlockquote = () => {
     editor.update(() => {
       const selection = $getSelection();
 
@@ -34,14 +33,19 @@ export const useListState = () => {
         return;
       }
 
-      const node = selection.anchor.getNode();
-      const isActive = isNodeList(node, listType);
+      const anchorNode = selection.anchor.getNode();
+      const parent = anchorNode.getParent();
 
-      const command = listType === 'unordered' ? INSERT_UNORDERED_LIST_COMMAND : INSERT_ORDERED_LIST_COMMAND;
+      const isBlockquote = $isQuoteNode(anchorNode) || $isQuoteNode(parent);
 
-      editor.dispatchCommand(isActive ? REMOVE_LIST_COMMAND : command, undefined);
+      if (isBlockquote) {
+        $setBlocksType(selection, () => $createParagraphNode());
+        return;
+      }
+
+      $setBlocksType(selection, () => $createQuoteNode());
     });
   };
 
-  return {formatList};
+  return {formatBlockquote};
 };

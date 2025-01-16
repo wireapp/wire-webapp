@@ -37,7 +37,7 @@ export const useHeadingState = () => {
     return editor.registerCommand(INSERT_HEADING_COMMAND, headingCommand, 0);
   }, [editor]);
 
-  const toggleHeading = () => {
+  const formatHeading = () => {
     editor.update(() => {
       const selection = $getSelection();
 
@@ -57,5 +57,5 @@ export const useHeadingState = () => {
     });
   };
 
-  return {toggleHeading};
+  return {formatHeading};
 };

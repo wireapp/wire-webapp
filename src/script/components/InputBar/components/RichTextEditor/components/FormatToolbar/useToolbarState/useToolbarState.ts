@@ -22,10 +22,19 @@ import {useCallback, useEffect, useState} from 'react';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {$getSelection, $isRangeSelection} from 'lexical';
 
+import {isNodeBlockquote} from '../common/isNodeBlockquote/isNodeBlockquote';
 import {isNodeHeading} from '../common/isNodeHeading/isNodeHeading';
 import {isNodeList} from '../common/isNodeList/isNodeList';
 
-type FormatTypes = 'bold' | 'italic' | 'strikethrough' | 'code' | 'unorderedList' | 'orderedList' | 'heading';
+type FormatTypes =
+  | 'bold'
+  | 'italic'
+  | 'strikethrough'
+  | 'code'
+  | 'unorderedList'
+  | 'orderedList'
+  | 'heading'
+  | 'blockquote';
 
 export const useToolbarState = () => {
   const [editor] = useLexicalComposerContext();
@@ -49,20 +58,29 @@ export const useToolbarState = () => {
         {format: 'unorderedList', check: () => isNodeList(node, 'unordered')},
         {format: 'orderedList', check: () => isNodeList(node, 'ordered')},
         {format: 'heading', check: () => isNodeHeading(node)},
+        {format: 'blockquote', check: () => isNodeBlockquote(node)},
       ];
 
       const activeFormats = formatChecks.filter(({check}) => check()).map(({format}) => format);
 
-      setActiveFormats(activeFormats);
+      setActiveFormats(prevFormats => {
+        if (
+          prevFormats.length !== activeFormats.length ||
+          !prevFormats.every(format => activeFormats.includes(format))
+        ) {
+          return activeFormats;
+        }
+        return prevFormats;
+      });
     });
   }, [editor]);
 
   useEffect(() => {
-    if (!editor) {
-      return undefined;
-    }
-
-    return editor.registerUpdateListener(updateToolbar);
+    return editor.registerUpdateListener(({editorState}) => {
+      editorState.read(() => {
+        updateToolbar();
+      });
+    });
   }, [editor, updateToolbar]);
 
   return {activeFormats};

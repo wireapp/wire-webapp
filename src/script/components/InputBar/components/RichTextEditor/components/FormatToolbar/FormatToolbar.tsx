@@ -34,6 +34,7 @@ import {t} from 'Util/LocalizerUtil';
 
 import {FormatButton} from './FormatButton/FormatButton';
 import {separatorStyles, wrapperStyles} from './FormatToolbar.styles';
+import {useBlockquoteState} from './useBlockquoteState/useBlockquoteState';
 import {useHeadingState} from './useHeadingState/useHeadingState';
 import {useListState} from './useListState/useListState';
 import {useToolbarState} from './useToolbarState/useToolbarState';
@@ -43,9 +44,11 @@ export const FormatToolbar = () => {
 
   const {activeFormats} = useToolbarState();
 
-  const {toggleHeading} = useHeadingState();
+  const {formatHeading} = useHeadingState();
 
-  const {toggleList} = useListState();
+  const {formatList} = useListState();
+
+  const {formatBlockquote} = useBlockquoteState();
 
   const formatText = (format: Extract<TextFormatType, 'bold' | 'italic' | 'strikethrough' | 'code'>) => {
     editor.dispatchCommand(FORMAT_TEXT_COMMAND, format);
@@ -57,7 +60,7 @@ export const FormatToolbar = () => {
         label={t('richTextHeading')}
         icon={HeadingIcon}
         active={activeFormats.includes('heading')}
-        onClick={toggleHeading}
+        onClick={formatHeading}
       />
       <FormatButton
         label={t('richTextBold')}
@@ -82,19 +85,26 @@ export const FormatToolbar = () => {
         label={t('richTextOrderedList')}
         icon={NumberedListIcon}
         active={activeFormats.includes('orderedList')}
-        onClick={() => toggleList('ordered')}
+        onClick={() => formatList('ordered')}
       />
       <FormatButton
         label={t('richTextUnorderedList')}
         icon={BulletListIcon}
         active={activeFormats.includes('unorderedList')}
-        onClick={() => toggleList('unordered')}
+        onClick={() => formatList('unordered')}
       />
       <FormatButton
         label={t('richTextCode')}
         icon={CodeIcon}
         active={activeFormats.includes('code')}
         onClick={() => formatText('code')}
+      />
+      <div css={separatorStyles} />
+      <FormatButton
+        label="Blockquote"
+        icon={BulletListIcon}
+        active={activeFormats.includes('blockquote')}
+        onClick={formatBlockquote}
       />
     </div>
   );
