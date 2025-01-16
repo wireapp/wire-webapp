@@ -6222,12 +6222,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/telemetry@npm:0.1.5":
-  version: 0.1.5
-  resolution: "@wireapp/telemetry@npm:0.1.5"
+"@wireapp/telemetry@npm:0.3.1":
+  version: 0.3.1
+  resolution: "@wireapp/telemetry@npm:0.3.1"
   dependencies:
-    countly-sdk-web: "npm:24.11.2"
-  checksum: 10/50b3bd7abd0378280dc3425bc29d51b1db257fdd21b3656229402284ef1dac66ac29113c9c26b215b9060bc507318c7ae014334b9fcac8d9fdc077dfff50f744
+    countly-sdk-web: "npm:24.11.4"
+  checksum: 10/1e96f68103c0850c7709ceb5651672a0b14f6bc4492a4f940950de8922b496d046589252ebdef836f131be09b1e3531db9470b1b37d27596821e64573521a9eb
   languageName: node
   linkType: hard
 
@@ -7939,10 +7939,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"countly-sdk-web@npm:24.11.2":
-  version: 24.11.2
-  resolution: "countly-sdk-web@npm:24.11.2"
-  checksum: 10/8b32bb38d5e7db77ecdf8ab5d14c69a97d205a117da08ec30b9a4d5ff31181c12c38d1d3cdb0a8e1a26c5272e17f4e1d6da30540b2db1fe5c4e54afa31e1dc33
+"countly-sdk-web@npm:24.11.4":
+  version: 24.11.4
+  resolution: "countly-sdk-web@npm:24.11.4"
+  checksum: 10/375cd12c4584ecbf4b93d6894b89ca6d1b260dca51ae82807e82798c30a483951ce71c11f5214a29d790a52b8991993550e617006c6d5cd35491c645bf4ab185
   languageName: node
   linkType: hard
 
@@ -18800,7 +18800,7 @@ __metadata:
     "@wireapp/react-ui-kit": "npm:9.28.1"
     "@wireapp/store-engine": "npm:5.1.11"
     "@wireapp/store-engine-dexie": "npm:2.1.15"
-    "@wireapp/telemetry": "npm:0.1.5"
+    "@wireapp/telemetry": "npm:0.3.1"
     "@wireapp/webapp-events": "npm:0.28.0"
     amplify: "https://github.com/wireapp/amplify#head=master"
     archiver: "npm:7.0.1"
