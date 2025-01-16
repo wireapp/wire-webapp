@@ -73,13 +73,15 @@ const registerBlockquoteEnterCommand = (editor: LexicalEditor) => {
         return false;
       }
 
+      if (!event.shiftKey) {
+        return false;
+      }
+
       event.preventDefault();
 
-      if (event.shiftKey) {
-        editor.update(() => {
-          editor.dispatchCommand(INSERT_LINE_BREAK_COMMAND, false);
-        });
-      }
+      editor.update(() => {
+        editor.dispatchCommand(INSERT_LINE_BREAK_COMMAND, false);
+      });
 
       return true;
     },
