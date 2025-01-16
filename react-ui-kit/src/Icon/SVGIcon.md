@@ -97,7 +97,9 @@ import {
   NumberedListIcon,
   MarkdownIcon,
   HeadingIcon,
-  CodeIcon,
+  CodeInlineIcon,
+  CodeBlockIcon,
+  BlockquoteIcon,
 } from '@wireapp/react-ui-kit';
 
 const icons = [
@@ -182,7 +184,9 @@ const icons = [
   NumberedListIcon,
   MarkdownIcon,
   HeadingIcon,
-  CodeIcon,
+  CodeInlineIcon,
+  CodeBlockIcon,
+  BlockquoteIcon,
 ];
 
 const brandIcons = [
