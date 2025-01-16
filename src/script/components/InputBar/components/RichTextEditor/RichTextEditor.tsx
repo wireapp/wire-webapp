@@ -50,6 +50,7 @@ import {ReplaceEmojiPlugin} from './plugins/InlineEmojiReplacementPlugin';
 import {ListItemTabIndentationPlugin} from './plugins/ListIndentationPlugin/ListIndentationPlugin';
 import {ListMaxIndentLevelPlugin} from './plugins/ListMaxIndentLevelPlugin/ListMaxIndentLevelPlugin';
 import {MentionsPlugin} from './plugins/MentionsPlugin';
+import {PastePlugin} from './plugins/PastePlugin/PastePlugin';
 import {ReplaceCarriageReturnPlugin} from './plugins/ReplaceCarriageReturnPlugin/ReplaceCarriageReturnPlugin';
 import {SendPlugin} from './plugins/SendPlugin/SendPlugin';
 import {markdownTransformers} from './utils/markdownTransformers';
@@ -181,6 +182,7 @@ export const RichTextEditor = ({
               }
             }}
           />
+          <PastePlugin getMentionCandidates={getMentionCandidates} />
         </div>
       </div>
       {showFormatToolbar && showMarkdownPreview && (
