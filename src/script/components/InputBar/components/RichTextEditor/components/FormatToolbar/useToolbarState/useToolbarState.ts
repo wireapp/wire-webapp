@@ -23,6 +23,7 @@ import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {$getSelection, $isRangeSelection} from 'lexical';
 
 import {isNodeBlockquote} from '../common/isNodeBlockquote/isNodeBlockquote';
+import {isNodeCodeBlock} from '../common/isNodeCodeBlock/isNodeCodeBlock';
 import {isNodeHeading} from '../common/isNodeHeading/isNodeHeading';
 import {isNodeList} from '../common/isNodeList/isNodeList';
 
@@ -34,7 +35,8 @@ type FormatTypes =
   | 'unorderedList'
   | 'orderedList'
   | 'heading'
-  | 'blockquote';
+  | 'blockquote'
+  | 'codeBlock';
 
 export const useToolbarState = () => {
   const [editor] = useLexicalComposerContext();
@@ -59,6 +61,7 @@ export const useToolbarState = () => {
         {format: 'orderedList', check: () => isNodeList(node, 'ordered')},
         {format: 'heading', check: () => isNodeHeading(node)},
         {format: 'blockquote', check: () => isNodeBlockquote(node)},
+        {format: 'codeBlock', check: () => isNodeCodeBlock(node)},
       ];
 
       const activeFormats = formatChecks.filter(({check}) => check()).map(({format}) => format);

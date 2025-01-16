@@ -35,6 +35,7 @@ import {t} from 'Util/LocalizerUtil';
 import {FormatButton} from './FormatButton/FormatButton';
 import {separatorStyles, wrapperStyles} from './FormatToolbar.styles';
 import {useBlockquoteState} from './useBlockquoteState/useBlockquoteState';
+import {useCodeBlockState} from './useCodeBlockState/useCodeBlockState';
 import {useHeadingState} from './useHeadingState/useHeadingState';
 import {useListState} from './useListState/useListState';
 import {useToolbarState} from './useToolbarState/useToolbarState';
@@ -49,6 +50,8 @@ export const FormatToolbar = () => {
   const {formatList} = useListState();
 
   const {formatBlockquote} = useBlockquoteState();
+
+  const {formatCodeBlock} = useCodeBlockState();
 
   const formatText = (format: Extract<TextFormatType, 'bold' | 'italic' | 'strikethrough' | 'code'>) => {
     editor.dispatchCommand(FORMAT_TEXT_COMMAND, format);
@@ -98,6 +101,12 @@ export const FormatToolbar = () => {
         icon={CodeIcon}
         active={activeFormats.includes('code')}
         onClick={() => formatText('code')}
+      />
+      <FormatButton
+        label="Code block"
+        icon={NumberedListIcon}
+        active={activeFormats.includes('codeBlock')}
+        onClick={formatCodeBlock}
       />
       <div css={separatorStyles} />
       <FormatButton
