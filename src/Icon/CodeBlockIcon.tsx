@@ -19,8 +19,27 @@
 
 import {SVGIcon, SVGIconProps} from './SVGIcon';
 
-export const CodeIcon = (props: SVGIconProps) => (
+export const CodeBlockIcon = (props: SVGIconProps) => (
   <SVGIcon realWidth={16} realHeight={16} {...props}>
-    <path d="M5.52218 14.7905L8.52218 0.790466L10.4778 1.20952L7.47779 15.2095L5.52218 14.7905ZM4.84799 4.52999L3.15199 3.47L0.32074 8L3.15199 12.53L4.84799 11.47L2.67923 8L4.84799 4.52999ZM10.8207 4.52999L12.5167 3.47L15.348 8L12.5167 12.53L10.8207 11.47L12.9895 8L10.8207 4.52999Z" />
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M15 15.125L15 3.875L14 3.875L14 2L17 2L17 17L16 17L2 17L1 17L1 11L3 11L3 15.125L15 15.125Z"
+    />
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M3.13174 1.50391L4.86823 2.49618L3.15173 5.50005L4.86823 8.50391L3.13174 9.49618L0.848231 5.50005L3.13174 1.50391Z"
+    />
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M10.8683 1.50391L9.13177 2.49618L10.8483 5.50005L9.13177 8.50391L10.8683 9.49618L13.1518 5.50005L10.8683 1.50391Z"
+    />
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M5.04446 9.18799L7.0444 0.717374L8.95549 1.28256L6.95555 9.75319L5.04446 9.18799Z"
+    />
   </SVGIcon>
 );

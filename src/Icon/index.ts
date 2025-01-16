@@ -116,4 +116,6 @@ export * from './BulletListIcon';
 export * from './NumberedListIcon';
 export * from './MarkdownIcon';
 export * from './HeadingIcon';
-export * from './CodeIcon';
+export * from './CodeInlineIcon';
+export * from './CodeBlockIcon';
+export * from './BlockquoteIcon';
