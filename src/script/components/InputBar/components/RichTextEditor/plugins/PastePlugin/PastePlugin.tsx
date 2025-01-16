@@ -103,17 +103,21 @@ export const PastePlugin = ({getMentionCandidates}: PastePluginProps): JSX.Eleme
       // Process mentions in the DOM before generating nodes
       lexicalMentions.forEach(mention => {
         const {isValid, username} = validateMention(mention, availableUsers);
-        if (!username || isValid) {
+
+        if (!username) {
           return;
         }
 
-        const parent = mention.parentNode;
-        if (!parent) {
-          return;
-        }
+        // Only convert to plain text if the mention is invalid
+        if (!isValid) {
+          const parent = mention.parentNode;
+          if (!parent) {
+            return;
+          }
 
-        const textNode = doc.createTextNode(`@${username}`);
-        parent.replaceChild(textNode, mention);
+          const textNode = doc.createTextNode(`@${username}`);
+          parent.replaceChild(textNode, mention);
+        }
       });
 
       const nodes = $generateNodesFromDOM(editor, doc);
