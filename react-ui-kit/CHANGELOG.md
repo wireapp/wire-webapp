@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.29.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.28.1...@wireapp/react-ui-kit@9.29.0) (2025-01-16)
+
+### Features
+
+* add Blockquote and CodeBlock icons ([#6818](https://github.com/wireapp/wire-web-packages/issues/6818)) ([9e4ac40](https://github.com/wireapp/wire-web-packages/commit/9e4ac40f88797cadd120bc5b0c24403b3b5573e9))
+
 ## [9.28.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.28.0...@wireapp/react-ui-kit@9.28.1) (2024-12-09)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
