@@ -61,6 +61,12 @@
 .editor-paragraph {
   //margin: 0 0 15px 0;
   position: relative;
+
+  // Inline code should have a smaller, custom line height
+  // It prevents input from flickering when inserting an inline code
+  code:not(editor-code) {
+    line-height: 17px;
+  }
 }
 
 .dropdown .item .icon {
@@ -183,10 +189,11 @@
 }
 
 .editor-inline-code {
-  display: inline-block;
-  padding: 2px 4px;
+  display: inline;
+  padding: 2px 3px;
   border-radius: 4px;
   background: var(--foreground-fade-8);
+  font-size: var(--font-size-medium);
 }
 
 .editor-code {
@@ -438,4 +445,9 @@ body.theme-dark {
 }
 .editor-tokenVariable {
   color: var(--token-variable);
+}
+
+.conversation-input-bar-text {
+  min-height: var(--conversation-input-line-height);
+  line-height: var(--conversation-input-line-height);
 }
