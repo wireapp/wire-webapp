@@ -17,15 +17,20 @@
  *
  */
 
-import {fireEvent, render} from '@testing-library/react';
-import underscore from 'underscore';
+import {fireEvent, render, act} from '@testing-library/react';
 
 import {FadingScrollbar, parseColor} from './FadingScrollbar';
+
+jest.useFakeTimers();
 
 describe('FadingScrollbar', () => {
   let step: () => void = () => {};
   beforeEach(() => {
     jest.spyOn(window, 'requestAnimationFrame').mockImplementation((cb: any) => (step = cb));
+  });
+
+  afterEach(() => {
+    jest.clearAllTimers();
   });
 
   const getAlpha = (element: HTMLElement) => {
@@ -34,31 +39,36 @@ describe('FadingScrollbar', () => {
   };
 
   it('fade scrollbar in when mouse enters and fades out after debounce', () => {
-    let runDebounce = () => {};
-    jest.spyOn(underscore, 'debounce').mockImplementation((cb: any): any => {
-      const callback = (args: any) => {
-        runDebounce = () => cb(args);
-      };
-      return callback;
-    });
-
     const {getByTestId} = render(
       <FadingScrollbar data-uie-name="fading-scrollbar" style={{'--scrollbar-color': 'rgba(0,0,0,0)'} as any}>
         <div>hello</div>
       </FadingScrollbar>,
     );
     const scrollingElement = getByTestId('fading-scrollbar');
-    fireEvent.mouseEnter(scrollingElement);
+
+    act(() => {
+      fireEvent.mouseEnter(scrollingElement);
+    });
     expect(getAlpha(scrollingElement)).toEqual(0.05);
 
+    // Run fade in animation
     for (let i = 0; i < 20; i++) {
-      step();
+      act(() => {
+        step();
+      });
     }
     expect(getAlpha(scrollingElement)).toBeGreaterThanOrEqual(1);
 
-    runDebounce();
+    // Fast forward past the debounce time
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+
+    // Run fade out animation
     for (let i = 0; i < 20; i++) {
-      step();
+      act(() => {
+        step();
+      });
     }
     expect(getAlpha(scrollingElement)).toBeLessThanOrEqual(0);
   });
@@ -71,12 +81,17 @@ describe('FadingScrollbar', () => {
     );
 
     const scrollingElement = getByTestId('fading-scrollbar');
-    fireEvent.mouseLeave(scrollingElement);
+
+    act(() => {
+      fireEvent.mouseLeave(scrollingElement);
+    });
 
     expect(getAlpha(scrollingElement)).toEqual(0.95);
 
     for (let i = 0; i < 20; i++) {
-      step();
+      act(() => {
+        step();
+      });
     }
     expect(getAlpha(scrollingElement)).toBeLessThanOrEqual(0);
   });

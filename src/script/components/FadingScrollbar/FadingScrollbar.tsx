@@ -19,7 +19,7 @@
 
 import React, {forwardRef, useRef} from 'react';
 
-import {debounce} from 'underscore';
+import {useDebouncedCallback} from 'use-debounce';
 
 const config = {
   ANIMATION_STEP: 0.05,
@@ -83,7 +83,9 @@ export const FadingScrollbar = forwardRef<HTMLDivElement, React.HTMLAttributes<H
 
   const fadeIn = (element: HTMLElement) => startAnimation('fadein', element);
   const fadeOut = (element: HTMLElement) => startAnimation('fadeout', element);
-  const debouncedFadeOut = debounce(fadeOut, config.DEBOUNCE_THRESHOLD);
+
+  const debouncedFadeOut = useDebouncedCallback((element: HTMLElement) => fadeOut(element), config.DEBOUNCE_THRESHOLD);
+
   const fadeInIdle = (element: HTMLElement) => {
     fadeIn(element);
     debouncedFadeOut(element);
