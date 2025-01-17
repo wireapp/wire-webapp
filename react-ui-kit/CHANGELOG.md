@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.29.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.29.1...@wireapp/react-ui-kit@9.29.2) (2025-01-17)
+
+### Bug Fixes
+
+* **CodeBlockIcon:** svg path ([#6820](https://github.com/wireapp/wire-web-packages/issues/6820)) ([96651b9](https://github.com/wireapp/wire-web-packages/commit/96651b9ccc554124cbbf0b7076f79858e7a2d6ec))
+
 ## [9.29.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.29.0...@wireapp/react-ui-kit@9.29.1) (2025-01-16)
 
 ### Bug Fixes
