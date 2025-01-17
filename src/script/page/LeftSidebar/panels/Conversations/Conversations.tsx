@@ -133,6 +133,7 @@ export const Conversations: React.FC<ConversationsProps> = ({
   const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
 
   const {conversationLabelRepository} = conversationRepository;
+  const {labels} = useKoSubscribableChildren(conversationLabelRepository, ['labels']);
   const favoriteConversations = useMemo(
     () => conversationLabelRepository.getFavorites(conversations),
     [conversationLabelRepository, conversations],
@@ -177,8 +178,7 @@ export const Conversations: React.FC<ConversationsProps> = ({
     favoriteConversations,
   });
 
-  const currentFolder = conversationLabelRepository
-    .getLabels()
+  const currentFolder = labels
     .map(label => createLabel(label.name, conversationLabelRepository.getLabelConversations(label), label.id))
     .find(folder => folder.id === expandedFolder);
 
