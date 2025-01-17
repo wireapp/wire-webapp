@@ -193,8 +193,8 @@
   display: inline-block;
   overflow: auto;
   max-width: var(--conversation-message-asset-width);
-  padding: 12px;
-  border-radius: 12px;
+  padding: 8px 12px;
+  border-radius: 8px;
   background: var(--foreground-fade-8);
   font-size: var(--font-size-small);
   text-overflow: unset;
@@ -437,4 +437,14 @@ body.theme-dark {
 }
 .editor-tokenVariable {
   color: var(--token-variable);
+}
+
+.editor-link {
+  color: var(--accent-color);
+  text-decoration: underline;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: none;
+  }
 }

@@ -81,4 +81,5 @@ export const theme = {
     url: 'editor-tokenUrl',
     variable: 'editor-tokenVariable',
   },
+  link: 'editor-link',
 };

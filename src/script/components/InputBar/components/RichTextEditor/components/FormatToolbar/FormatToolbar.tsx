@@ -21,13 +21,16 @@ import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {FORMAT_TEXT_COMMAND, TextFormatType} from 'lexical';
 
 import {
+  CodeBlockIcon,
+  BlockquoteIcon,
   BoldIcon,
-  BulletListIcon,
-  CodeIcon,
-  HeadingIcon,
+  CodeInlineIcon,
   ItalicIcon,
-  NumberedListIcon,
   StrikethroughIcon,
+  BulletListIcon,
+  NumberedListIcon,
+  HeadingIcon,
+  LinkIcon,
 } from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/LocalizerUtil';
@@ -37,8 +40,11 @@ import {separatorStyles, wrapperStyles} from './FormatToolbar.styles';
 import {useBlockquoteState} from './useBlockquoteState/useBlockquoteState';
 import {useCodeBlockState} from './useCodeBlockState/useCodeBlockState';
 import {useHeadingState} from './useHeadingState/useHeadingState';
+import {useLinkState} from './useLinkState/useLinkState';
 import {useListState} from './useListState/useListState';
 import {useToolbarState} from './useToolbarState/useToolbarState';
+
+import {LinkDialog} from '../LinkDialog/LinkDialog';
 
 export const FormatToolbar = () => {
   const [editor] = useLexicalComposerContext();
@@ -52,6 +58,9 @@ export const FormatToolbar = () => {
   const {formatBlockquote} = useBlockquoteState();
 
   const {formatCodeBlock} = useCodeBlockState();
+
+  const {formatLink, insertLink, showCreateDialog, setShowCreateDialog, selectedText, linkUrl, linkNode} =
+    useLinkState();
 
   const formatText = (format: Extract<TextFormatType, 'bold' | 'italic' | 'strikethrough' | 'code'>) => {
     editor.dispatchCommand(FORMAT_TEXT_COMMAND, format);
@@ -98,22 +107,34 @@ export const FormatToolbar = () => {
       />
       <FormatButton
         label={t('richTextCode')}
-        icon={CodeIcon}
+        icon={CodeInlineIcon}
         active={activeFormats.includes('code')}
         onClick={() => formatText('code')}
       />
       <FormatButton
         label="Code block"
-        icon={NumberedListIcon}
+        icon={CodeBlockIcon}
         active={activeFormats.includes('codeBlock')}
         onClick={formatCodeBlock}
       />
       <div css={separatorStyles} />
       <FormatButton
         label="Blockquote"
-        icon={BulletListIcon}
+        icon={BlockquoteIcon}
         active={activeFormats.includes('blockquote')}
         onClick={formatBlockquote}
+      />
+      <div css={separatorStyles} />
+      <FormatButton label="link" icon={LinkIcon} active={activeFormats.includes('link')} onClick={formatLink} />
+
+      <LinkDialog
+        isShown={showCreateDialog}
+        title={linkNode ? 'Edit Link' : 'Add Link'}
+        initialUrl={linkUrl}
+        initialText={selectedText}
+        onSubmit={insertLink}
+        onClose={() => setShowCreateDialog(false)}
+        showTextInput={true}
       />
     </div>
   );

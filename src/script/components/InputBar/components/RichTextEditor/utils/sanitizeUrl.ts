@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2024 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,30 +17,16 @@
  *
  */
 
-import {
-  BOLD_ITALIC_STAR,
-  BOLD_STAR,
-  CODE,
-  HEADING,
-  INLINE_CODE,
-  ITALIC_STAR,
-  ORDERED_LIST,
-  STRIKETHROUGH,
-  UNORDERED_LIST,
-  QUOTE,
-  LINK,
-} from '@lexical/markdown';
+const SUPPORTED_URL_PROTOCOLS = new Set(['http:', 'https:', 'mailto:', 'tel:', 'sms:']);
 
-export const markdownTransformers = [
-  UNORDERED_LIST,
-  CODE,
-  HEADING,
-  ORDERED_LIST,
-  BOLD_ITALIC_STAR,
-  BOLD_STAR,
-  INLINE_CODE,
-  ITALIC_STAR,
-  STRIKETHROUGH,
-  QUOTE,
-  LINK,
-];
+export function sanitizeUrl(url: string): string {
+  try {
+    const parsedUrl = new URL(url);
+    if (!SUPPORTED_URL_PROTOCOLS.has(parsedUrl.protocol)) {
+      return '';
+    }
+  } catch {
+    return url.startsWith('http') ? url : `https://${url}`;
+  }
+  return url;
+}

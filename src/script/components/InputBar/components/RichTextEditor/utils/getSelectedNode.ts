@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2024 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,30 +17,20 @@
  *
  */
 
-import {
-  BOLD_ITALIC_STAR,
-  BOLD_STAR,
-  CODE,
-  HEADING,
-  INLINE_CODE,
-  ITALIC_STAR,
-  ORDERED_LIST,
-  STRIKETHROUGH,
-  UNORDERED_LIST,
-  QUOTE,
-  LINK,
-} from '@lexical/markdown';
+import {$isAtNodeEnd} from '@lexical/selection';
+import {ElementNode, RangeSelection, TextNode} from 'lexical';
 
-export const markdownTransformers = [
-  UNORDERED_LIST,
-  CODE,
-  HEADING,
-  ORDERED_LIST,
-  BOLD_ITALIC_STAR,
-  BOLD_STAR,
-  INLINE_CODE,
-  ITALIC_STAR,
-  STRIKETHROUGH,
-  QUOTE,
-  LINK,
-];
+export function getSelectedNode(selection: RangeSelection): TextNode | ElementNode {
+  const anchor = selection.anchor;
+  const focus = selection.focus;
+  const anchorNode = selection.anchor.getNode();
+  const focusNode = selection.focus.getNode();
+  if (anchorNode === focusNode) {
+    return anchorNode;
+  }
+  const isBackward = selection.isBackward();
+  if (isBackward) {
+    return $isAtNodeEnd(focus) ? anchorNode : focusNode;
+  }
+  return $isAtNodeEnd(anchor) ? focusNode : anchorNode;
+}
