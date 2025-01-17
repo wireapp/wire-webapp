@@ -244,9 +244,18 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
       .sort(({name: nameA}, {name: nameB}) => nameA.localeCompare(nameB, undefined, {sensitivity: 'base'}));
 
   readonly removeConversationFromLabel = (label: ConversationLabel, removeConversation: Conversation): void => {
-    label.conversations(label.conversations().filter(conversation => conversation !== removeConversation));
-
     const {setCurrentTab} = useSidebarStore.getState();
+
+    // Remove conversation from folder and update folder in labels
+    const folderIndex = this.labels.indexOf(label);
+    const updatedFolder = createLabel(
+      label.name,
+      label.conversations().filter(conversation => conversation !== removeConversation),
+      label.id,
+      label.type,
+    );
+
+    this.labels.splice(folderIndex, 1, updatedFolder);
 
     // Delete folder if it no longer contains any conversation
     if (!label.conversations().length) {
