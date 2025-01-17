@@ -26,6 +26,8 @@ import React, {
   useCallback,
 } from 'react';
 
+import {WIDTH} from '@wireapp/react-ui-kit';
+
 import {ConversationListCell} from 'Components/ConversationListCell';
 import {Call} from 'src/script/calling/Call';
 import {ConversationLabel, ConversationLabelRepository} from 'src/script/conversation/ConversationLabelRepository';
@@ -128,9 +130,11 @@ export const ConversationsList = ({
     (conversation: Conversation) =>
       (event: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>) => {
         if (isActiveConversation(conversation)) {
-          clearSearchFilter();
-          setClickedFilteredConversationId(conversation.id);
-          return;
+          if (window.innerWidth > WIDTH.TABLET_SM_MAX || document.documentElement.clientWidth > WIDTH.TABLET_SM_MAX) {
+            clearSearchFilter();
+            setClickedFilteredConversationId(conversation.id);
+            return;
+          }
         }
 
         if (isKeyboardEvent(event)) {
