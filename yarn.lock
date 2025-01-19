@@ -5957,9 +5957,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^27.18.0":
-  version: 27.18.0
-  resolution: "@wireapp/api-client@npm:27.18.0"
+"@wireapp/api-client@npm:^27.18.1":
+  version: 27.18.1
+  resolution: "@wireapp/api-client@npm:27.18.1"
   dependencies:
     "@wireapp/commons": "npm:^5.4.0"
     "@wireapp/priority-queue": "npm:^2.1.11"
@@ -5974,7 +5974,7 @@ __metadata:
     tough-cookie: "npm:4.1.4"
     ws: "npm:8.18.0"
     zod: "npm:3.24.1"
-  checksum: 10/f2f9661d2c5f9607e959929805bb116c4047d67bb6a7ecc2c4561730b372f521848aa0c8c7030e40b6df19c10d03530ab0e3afea094e2848ade238985c9530f1
+  checksum: 10/f410db26f5d45c0ea4a113ac1b02b15ccf4ac135473069d4c06522ee449ac64be3a7572cf0c92e663083b117800fe7ab02b56e09a68c7001c12ee541277f3862
   languageName: node
   linkType: hard
 
@@ -6039,11 +6039,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:46.15.6":
-  version: 46.15.6
-  resolution: "@wireapp/core@npm:46.15.6"
+"@wireapp/core@npm:46.15.7":
+  version: 46.15.7
+  resolution: "@wireapp/core@npm:46.15.7"
   dependencies:
-    "@wireapp/api-client": "npm:^27.18.0"
+    "@wireapp/api-client": "npm:^27.18.1"
     "@wireapp/commons": "npm:^5.4.0"
     "@wireapp/core-crypto": "npm:3.0.0"
     "@wireapp/cryptobox": "npm:12.8.0"
@@ -6061,7 +6061,7 @@ __metadata:
     long: "npm:^5.2.0"
     uuid: "npm:9.0.1"
     zod: "npm:3.24.1"
-  checksum: 10/143a57f493d34c0d3c2f41858dae2831f6ad9d8b26098dcdf7ddd0fcd2d814e5e03271a6fc397e1b543d8d149f98da738b462f50737c2fa4b49a25e3b4c26ee3
+  checksum: 10/5dfd7f548e030246a4b7373ac94bd63cacad278618274d44e8f0f4416ba906354c75605d43654c28955fd737de37403d3ca34bebc4f69476e817363584f381ef
   languageName: node
   linkType: hard
 
@@ -18802,7 +18802,7 @@ __metadata:
     "@wireapp/avs-debugger": "npm:0.0.7"
     "@wireapp/commons": "npm:5.4.0"
     "@wireapp/copy-config": "npm:2.2.11"
-    "@wireapp/core": "npm:46.15.6"
+    "@wireapp/core": "npm:46.15.7"
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/prettier-config": "npm:0.6.4"
     "@wireapp/react-ui-kit": "npm:9.28.1"
