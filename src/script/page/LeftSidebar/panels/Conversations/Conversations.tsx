@@ -134,9 +134,11 @@ export const Conversations: React.FC<ConversationsProps> = ({
 
   const {conversationLabelRepository} = conversationRepository;
   const {labels} = useKoSubscribableChildren(conversationLabelRepository, ['labels']);
+  const favoriteLabel = conversationLabelRepository.getFavoriteLabel();
+
   const favoriteConversations = useMemo(
-    () => conversationLabelRepository.getFavorites(conversations),
-    [conversationLabelRepository, conversations],
+    () => conversationLabelRepository.getLabelConversations(favoriteLabel, conversations),
+    [conversationLabelRepository, conversations, favoriteLabel],
   );
 
   const isPreferences = currentTab === SidebarTabs.PREFERENCES;
