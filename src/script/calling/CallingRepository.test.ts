@@ -18,8 +18,8 @@
  */
 
 import {
-  ConversationProtocol,
   CONVERSATION_TYPE,
+  ConversationProtocol,
   DefaultConversationRoleName,
 } from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
@@ -27,7 +27,7 @@ import 'jsdom-worker';
 import ko, {Subscription} from 'knockout';
 import {container} from 'tsyringe';
 
-import {CONV_TYPE, CALL_TYPE, STATE as CALL_STATE, REASON, Wcall} from '@wireapp/avs';
+import {CALL_TYPE, CONV_TYPE, REASON, STATE as CALL_STATE, VIDEO_STATE, Wcall} from '@wireapp/avs';
 import {Runtime} from '@wireapp/commons';
 
 import {Call} from 'src/script/calling/Call';
@@ -518,6 +518,114 @@ describe('CallingRepository', () => {
 
       expect(selfParticipant.releaseAudioStream).toHaveBeenCalledTimes(1);
       expect(selfParticipant.releaseVideoStream).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('camera', () => {
+    let selfParticipant: Participant;
+    let conv: Conversation;
+    let call: Call;
+    beforeEach(() => {
+      selfParticipant = createSelfParticipant();
+      conv = createConversation();
+      call = new Call(
+        {domain: '', id: ''},
+        conv,
+        CONV_TYPE.CONFERENCE,
+        selfParticipant,
+        CALL_TYPE.NORMAL,
+        buildMediaDevicesHandler(),
+      );
+    });
+
+    describe('on incoming call', () => {
+      it('toggle on', async () => {
+        selfParticipant.videoState(VIDEO_STATE.STOPPED);
+        spyOn(selfParticipant, 'releaseVideoStream');
+        spyOn(wCall, 'setVideoSendState');
+        call.state(CALL_STATE.INCOMING);
+        callingRepository.toggleCamera(call);
+        expect(selfParticipant.releaseVideoStream).toHaveBeenCalledTimes(0);
+        expect(wCall.setVideoSendState).toHaveBeenCalledWith(wUser, conv.id, VIDEO_STATE.STARTED);
+      });
+
+      it('toggle off', async () => {
+        selfParticipant.videoState(VIDEO_STATE.STARTED);
+        spyOn(selfParticipant, 'releaseVideoStream');
+        spyOn(wCall, 'setVideoSendState');
+        call.state(CALL_STATE.INCOMING);
+        callingRepository.toggleCamera(call);
+
+        expect(selfParticipant.releaseVideoStream).toHaveBeenCalledTimes(1);
+        expect(wCall.setVideoSendState).toHaveBeenCalledWith(wUser, conv.id, VIDEO_STATE.STOPPED);
+      });
+    });
+
+    describe('on running call', () => {
+      it('toggle on', async () => {
+        selfParticipant.videoState(VIDEO_STATE.STOPPED);
+        spyOn(selfParticipant, 'releaseVideoStream');
+        spyOn(wCall, 'setVideoSendState');
+        call.state(CALL_STATE.MEDIA_ESTAB);
+        callingRepository.toggleCamera(call);
+        expect(selfParticipant.releaseVideoStream).toHaveBeenCalledTimes(0);
+        expect(wCall.setVideoSendState).toHaveBeenCalledWith(wUser, conv.id, VIDEO_STATE.STARTED);
+      });
+
+      it('toggle off', async () => {
+        selfParticipant.videoState(VIDEO_STATE.STARTED);
+        spyOn(selfParticipant, 'releaseVideoStream');
+        spyOn(wCall, 'setVideoSendState');
+        call.state(CALL_STATE.MEDIA_ESTAB);
+        callingRepository.toggleCamera(call);
+
+        expect(selfParticipant.releaseVideoStream).toHaveBeenCalledTimes(1);
+        expect(wCall.setVideoSendState).toHaveBeenCalledWith(wUser, conv.id, VIDEO_STATE.STOPPED);
+      });
+
+      // This is an edge case. You can toggleCamera on when you have screen share enabled!
+      it('toggle on when screen shared', async () => {
+        selfParticipant.videoState(VIDEO_STATE.SCREENSHARE);
+        spyOn(selfParticipant, 'releaseVideoStream');
+        spyOn(wCall, 'setVideoSendState');
+        call.state(CALL_STATE.MEDIA_ESTAB);
+        callingRepository.toggleCamera(call);
+        expect(selfParticipant.releaseVideoStream).toHaveBeenCalledTimes(0);
+        expect(wCall.setVideoSendState).toHaveBeenCalledWith(wUser, conv.id, VIDEO_STATE.STARTED);
+      });
+    });
+
+    describe('on not supported call state', () => {
+      it('ANSWERED, toggle will be failing', async () => {
+        selfParticipant.videoState(VIDEO_STATE.STOPPED);
+        call.state(CALL_STATE.ANSWERED);
+        expect(() => callingRepository.toggleCamera(call)).toThrow('invalid call state in `toggleCamera`');
+      });
+      it('NONE, toggle will be failing', async () => {
+        selfParticipant.videoState(VIDEO_STATE.STOPPED);
+        call.state(CALL_STATE.NONE);
+        expect(() => callingRepository.toggleCamera(call)).toThrow('invalid call state in `toggleCamera`');
+      });
+      it('UNKNOWN, toggle will be failing', async () => {
+        selfParticipant.videoState(VIDEO_STATE.STOPPED);
+        call.state(CALL_STATE.UNKNOWN);
+        expect(() => callingRepository.toggleCamera(call)).toThrow('invalid call state in `toggleCamera`');
+      });
+      it('OUTGOING, toggle will be failing', async () => {
+        selfParticipant.videoState(VIDEO_STATE.STOPPED);
+        call.state(CALL_STATE.OUTGOING);
+        expect(() => callingRepository.toggleCamera(call)).toThrow('invalid call state in `toggleCamera`');
+      });
+      it('TERM_LOCAL, toggle will be failing', async () => {
+        selfParticipant.videoState(VIDEO_STATE.STOPPED);
+        call.state(CALL_STATE.TERM_LOCAL);
+        expect(() => callingRepository.toggleCamera(call)).toThrow('invalid call state in `toggleCamera`');
+      });
+      it('TERM_REMOTE, toggle will be failing', async () => {
+        selfParticipant.videoState(VIDEO_STATE.STOPPED);
+        call.state(CALL_STATE.TERM_REMOTE);
+        expect(() => callingRepository.toggleCamera(call)).toThrow('invalid call state in `toggleCamera`');
+      });
     });
   });
 });
