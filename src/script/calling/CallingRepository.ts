@@ -1046,7 +1046,10 @@ export class CallingRepository {
       } else {
         this.warmupMediaStreams(call, false, true);
       }
+    } else if (call.state() === CALL_STATE.MEDIA_ESTAB && !selfParticipant.sharesScreen()) {
+      selfParticipant.releaseVideoStream(true);
     }
+
     this.wCall?.setVideoSendState(this.wUser, this.serializeQualifiedId(call.conversation.qualifiedId), newState);
   }
 
