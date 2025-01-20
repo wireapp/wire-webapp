@@ -117,6 +117,7 @@ export const FormatToolbar = () => {
         active={activeFormats.includes('codeBlock')}
         onClick={formatCodeBlock}
       />
+      <CodeBlockIcon />
       <div css={separatorStyles} />
       <FormatButton
         label="Blockquote"
