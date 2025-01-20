@@ -70,7 +70,12 @@ export function EditedMessagePlugin({message, showMarkdownPreview}: Props): null
           // During the transformation, we have to tell the editor to transofrm mentions as well.
           // We can't do that by diretcly updating the $root (e.g. $root.appent(...MentionNodes)), because this function will overwrite the result.
           // One way of overcoming this issue is to use a custom transformer (quite a hacky way). Transformers are responisble for converting the text to the desired format (e.g. **bold** to bold).
-          $convertFromMarkdownString(wrappedWithTags, [mentionMarkdownTransformer, ...markdownTransformers]);
+          $convertFromMarkdownString(
+            wrappedWithTags,
+            [mentionMarkdownTransformer, ...markdownTransformers],
+            undefined,
+            true,
+          );
 
           editor.focus();
         });

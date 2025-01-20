@@ -120,7 +120,7 @@ export const RichTextEditor = ({
         return;
       }
 
-      const markdown = $convertToMarkdownString(markdownTransformers);
+      const markdown = $convertToMarkdownString(markdownTransformers, undefined, true);
 
       const text = transformMessage({replaceEmojis, markdown});
 

@@ -42,7 +42,7 @@ export const useEditorDraftState = ({editorRef, saveDraftState, replaceEmojis}: 
     }
 
     editor.getEditorState().read(() => {
-      const markdown = $convertToMarkdownString(markdownTransformers);
+      const markdown = $convertToMarkdownString(markdownTransformers, undefined, true);
       saveDraftState(JSON.stringify(editor.getEditorState().toJSON()), transformMessage({replaceEmojis, markdown}));
     });
   }, [editorRef, saveDraftState, replaceEmojis]);
