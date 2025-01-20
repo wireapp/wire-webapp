@@ -120,7 +120,7 @@ export const RichTextEditor = ({
         return;
       }
 
-      const markdown = $convertToMarkdownString(markdownTransformers);
+      const markdown = $convertToMarkdownString(markdownTransformers, undefined, true);
 
       const text = transformMessage({replaceEmojis, markdown});
 
@@ -194,3 +194,50 @@ export const RichTextEditor = ({
     </LexicalComposer>
   );
 };
+
+/**
+ *
+ *  root
+  ├ (116) paragraph
+  | └ (125) text "first"
+  ├ (126) paragraph
+  | └ (127) text "second"
+  ├ (128) paragraph
+  └ (129) paragraph
+>   └ (130) text "third"
+ *
+
+   root
+  └ (132) code
+>   ├ (134) code-highlight "first"
+    ├ (135) linebreak
+    ├ (136) linebreak
+    ├ (137) code-highlight "second"
+    ├ (138) linebreak
+    ├ (139) linebreak
+    └ (140) code-highlight "third"
+ *
+
+
+
+     root
+  └ (142) paragraph
+    ├ (151) text "first"
+    ├ (152) linebreak
+    ├ (153) text "second"
+    ├ (154) linebreak
+    ├ (155) linebreak
+>   └ (156) text "third"
+ *
+
+
+ root
+  └ (157) code
+>   ├ (159) code-highlight "first"
+    ├ (160) linebreak
+    ├ (161) code-highlight "second"
+    ├ (162) linebreak
+    ├ (163) linebreak
+    └ (164) code-highlight "third"
+
+ */
