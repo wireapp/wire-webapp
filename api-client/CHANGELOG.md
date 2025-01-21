@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [27.18.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.18.2...@wireapp/api-client@27.18.3) (2025-01-21)
+
+### Bug Fixes
+
+* removed unwanted curly bracket from conv API URL [WPB-11925] ([#6838](https://github.com/wireapp/wire-web-packages/issues/6838)) ([d600315](https://github.com/wireapp/wire-web-packages/commit/d600315183f5fe55e46b9cc633dd07f9515a1336))
+
 ## [27.18.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.18.1...@wireapp/api-client@27.18.2) (2025-01-21)
 
 **Note:** Version bump only for package @wireapp/api-client
