@@ -91,9 +91,7 @@
 .video-title {
   display: flex;
   align-items: baseline;
-  align-items: center;
   justify-content: center;
-  gap: 8px;
 
   @media (min-width: 640px) {
     grid-column: 2;
@@ -112,12 +110,16 @@
 .video-remote-name {
   display: flex;
   flex-direction: column;
-  align-items: center;
+
+  @media (min-width: 640px) {
+    align-items: center;
+  }
 }
 
 .video-remote-title {
   .heading-h3;
   overflow: hidden;
+  max-width: 400px;
   margin: 0;
   text-overflow: ellipsis;
   white-space: nowrap;
