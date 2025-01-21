@@ -29,6 +29,10 @@ export const videoControlsWrapperStyles: CSSObject = {
   margin: 0,
   gap: '8px',
 
+  [media.mobile]: {
+    justifyContent: 'center',
+  },
+
   [media.tabletUp]: {
     gap: '16px',
   },
@@ -36,13 +40,6 @@ export const videoControlsWrapperStyles: CSSObject = {
 
 export const minimizeVideoControlStyles: CSSObject = {
   [media.tabletUp]: {
-    marginRight: 'auto',
-  },
-};
-
-export const shareScreenVideoControlStyles: CSSObject = {
-  [media.mobile]: {
-    marginLeft: 'auto',
     marginRight: 'auto',
   },
 };

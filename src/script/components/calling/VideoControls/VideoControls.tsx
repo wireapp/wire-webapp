@@ -53,7 +53,6 @@ import {EmojisBar} from './EmojisBar/EmojisBar';
 import {
   hangUpVideoControlStyles,
   minimizeVideoControlStyles,
-  shareScreenVideoControlStyles,
   videoControlActiveStyles,
   videoControlDisabledStyles,
   videoControlInActiveStyles,
@@ -594,7 +593,7 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
         </li>
       )}
 
-      <li className="video-controls__item" css={shareScreenVideoControlStyles}>
+      <li className="video-controls__item">
         <button
           className={`video-controls__button ${!canShareScreen ? 'with-tooltip with-tooltip--top' : ''}`}
           data-tooltip={t('videoCallScreenShareNotSupported')}
