@@ -1277,7 +1277,7 @@
   "preferencesAccountSetAppLockPassphrase": "Kennwort der App-Sperre festlegen",
   "preferencesAccountTeam": "Team",
   "preferencesAccountTypingIndicatorCheckbox": "Eingabeanzeige",
-  "preferencesAccountTypingIndicatorsDetail": "Wenn diese Option deaktiviert ist, können Sie nicht sehen, wenn andere Personen tippen, und andere sehen nicht, wenn Sie tippen. Gilt für alle Unterhaltungen auf diesem Gerät.",
+  "preferencesAccountTypingIndicatorsDetail": "Wenn diese Option aktiviert ist, sehen Sie, wenn andere Personen eine Nachricht schreiben, sofern sie die Option ebenfalls aktiviert haben. Andere sehen auch, wenn Sie tippen. Gilt für alle Unterhaltungen auf diesem Gerät.",
   "preferencesAccountUpdateLabel": "Ändern Sie Ihren Status zu",
   "preferencesAccountUsername": "Benutzername",
   "preferencesAccountUsernameAvailable": "Verfügbar",

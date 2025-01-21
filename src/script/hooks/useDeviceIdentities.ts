@@ -31,7 +31,7 @@ export const useUserIdentity = (userId: QualifiedId, groupId?: string, updateAft
   };
 
   const refreshDeviceIdentities = useCallback(async () => {
-    if (!groupId) {
+    if (!groupId || !E2EIHandler.getInstance().isE2EIEnabled()) {
       return;
     }
 
