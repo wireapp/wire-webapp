@@ -22,14 +22,14 @@ import {CSSObject} from '@emotion/react';
 export const paginationWrapperStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
-  gap: '8px',
+  gap: '4px',
 };
 
 export const paginationItemsStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  gap: '6px',
+  gap: '4px',
   height: 22,
   borderRadius: 12,
 };
