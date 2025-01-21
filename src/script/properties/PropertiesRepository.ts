@@ -91,6 +91,7 @@ export class PropertiesRepository {
           font_size: '',
           theme: 'default',
           view_folders: false,
+          markdown_preview: false,
         },
         notifications: NotificationPreference.ON,
         previews: {
