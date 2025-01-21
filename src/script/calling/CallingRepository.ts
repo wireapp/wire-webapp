@@ -958,7 +958,8 @@ export class CallingRepository {
   toggleCamera(call: Call): void {
     const selfParticipant = call.getSelfParticipant();
     const newState = selfParticipant.sharesCamera() ? VIDEO_STATE.STOPPED : VIDEO_STATE.STARTED;
-    if (call.state() === CALL_STATE.INCOMING) {
+    const callState = call.state();
+    if (callState === CALL_STATE.INCOMING) {
       selfParticipant.videoState(newState);
       if (newState === VIDEO_STATE.STOPPED) {
         selfParticipant.releaseVideoStream(true);
@@ -966,6 +967,18 @@ export class CallingRepository {
         this.warmupMediaStreams(call, false, true);
       }
     }
+
+    if (callState !== CALL_STATE.INCOMING && newState === VIDEO_STATE.STOPPED && !selfParticipant.sharesScreen()) {
+      selfParticipant.releaseVideoStream(true);
+    }
+
+    // Let us test this one in staging before we go live with it!
+    // if (callState !== CALL_STATE.MEDIA_ESTAB && callState !== CALL_STATE.INCOMING) {
+    //   // Toggle Camera should not be available in any other call state for this reason we make an exception for the
+    //   // case that someone wants to access the camera outside a call!
+    //   throw new Error('invalid call state in `toggleCamera`');
+    // }
+
     this.wCall?.setVideoSendState(this.wUser, this.serializeQualifiedId(call.conversation.qualifiedId), newState);
   }
 
