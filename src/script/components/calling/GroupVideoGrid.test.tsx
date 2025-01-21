@@ -18,8 +18,13 @@
  */
 
 import {render, fireEvent} from '@testing-library/react';
+import ko from 'knockout';
 
-import {VIDEO_STATE} from '@wireapp/avs';
+import {CALL_TYPE, VIDEO_STATE} from '@wireapp/avs';
+
+import {Call} from 'src/script/calling/Call';
+import {Conversation} from 'src/script/entity/Conversation';
+import {MediaDevicesHandler} from 'src/script/media/MediaDevicesHandler';
 
 import {GroupVideoGrid, GroupVideoGripProps} from './GroupVideoGrid';
 
@@ -40,6 +45,21 @@ const createMockParticipant = (
   return participant;
 };
 
+const createMockCall = () => {
+  return new Call(
+    {domain: '', id: ''},
+    new Conversation('', ''),
+    0,
+    new Participant(new User(''), ''),
+    CALL_TYPE.NORMAL,
+    {
+      currentAvailableDeviceId: {
+        audiooutput: ko.pureComputed(() => 'test'),
+      },
+    } as MediaDevicesHandler,
+  );
+};
+
 describe('GroupVideoGrid', () => {
   it('renders video grids', async () => {
     const selfParticipant = createMockParticipant('selfUser', 'selfClient', {isMuted: true});
@@ -57,6 +77,7 @@ describe('GroupVideoGrid', () => {
       minimized: false,
       selfParticipant: selfParticipant,
       setMaximizedParticipant: jest.fn(),
+      call: createMockCall(),
     };
 
     const {getByTestId} = render(<GroupVideoGrid {...props} />);
@@ -82,6 +103,7 @@ describe('GroupVideoGrid', () => {
       minimized: false,
       selfParticipant: participant,
       setMaximizedParticipant: jest.fn(),
+      call: createMockCall(),
     };
 
     const {getByTestId} = render(<GroupVideoGrid {...props} />);
@@ -110,6 +132,7 @@ describe('GroupVideoGrid', () => {
       minimized: false,
       selfParticipant: participant,
       setMaximizedParticipant: jest.fn(),
+      call: createMockCall(),
     };
 
     const {queryByTestId} = render(<GroupVideoGrid {...props} />);
@@ -130,6 +153,7 @@ describe('GroupVideoGrid', () => {
       minimized: false,
       selfParticipant: participant,
       setMaximizedParticipant: jest.fn(),
+      call: createMockCall(),
     };
 
     const {getAllByTestId} = render(<GroupVideoGrid {...props} />);
@@ -152,6 +176,7 @@ describe('GroupVideoGrid', () => {
       minimized: false,
       selfParticipant: participant,
       setMaximizedParticipant: jest.fn(),
+      call: createMockCall(),
     };
 
     const {queryByTestId} = render(<GroupVideoGrid {...props} />);
@@ -173,6 +198,7 @@ describe('GroupVideoGrid', () => {
       minimized: false,
       selfParticipant: participant,
       setMaximizedParticipant: jest.fn(),
+      call: createMockCall(),
     };
 
     const {getAllByText} = render(<GroupVideoGrid {...props} />);
