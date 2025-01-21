@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.29.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.29.2...@wireapp/react-ui-kit@9.29.3) (2025-01-21)
+
+### Bug Fixes
+
+* **react-ui-kit:** link icon path ([#6837](https://github.com/wireapp/wire-web-packages/issues/6837)) ([458b4ca](https://github.com/wireapp/wire-web-packages/commit/458b4cad79c396c2a41350f228170741a7afde0e))
+
 ## [9.29.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.29.1...@wireapp/react-ui-kit@9.29.2) (2025-01-17)
 
 ### Bug Fixes
