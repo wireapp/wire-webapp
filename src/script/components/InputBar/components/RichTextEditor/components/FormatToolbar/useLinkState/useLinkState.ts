@@ -29,29 +29,43 @@ import {
   COMMAND_PRIORITY_LOW,
   CLICK_COMMAND,
   TextNode,
+  RangeSelection,
 } from 'lexical';
 
 import {FORMAT_LINK_COMMAND} from '../../../editorConfig';
 import {getSelectedNode} from '../../../utils/getSelectedNode';
 import {sanitizeUrl} from '../../../utils/sanitizeUrl';
 
+interface Link {
+  text: string;
+  url: string;
+  node: LinkNode | null;
+  selection: {
+    anchor: {key: string; offset: number};
+    focus: {key: string; offset: number};
+  } | null;
+}
+
+interface SelectionPoint {
+  key: string;
+  offset: number;
+}
+
+interface SavedSelection {
+  anchor: SelectionPoint;
+  focus: SelectionPoint;
+}
+
+interface CreateLinkParams {
+  selection: RangeSelection;
+  url: string;
+  text?: string;
+}
+
 export const useLinkState = () => {
   const [editor] = useLexicalComposerContext();
-  const [showCreateDialog, setShowCreateDialog] = useState(false);
-  const [editingLink, setEditingLink] = useState<{
-    text: string;
-    url: string;
-    node: LinkNode | null;
-    selection: {
-      anchor: {key: string; offset: number};
-      focus: {key: string; offset: number};
-    } | null;
-  }>({
-    text: '',
-    url: '',
-    node: null,
-    selection: null,
-  });
+  const {isOpen, open, close} = useModalState();
+  const {editingLink, setEditingLink, resetLinkState} = useLinkEditing();
 
   const formatLink = useCallback(
     (isClickEvent = false) => {
@@ -66,24 +80,11 @@ export const useLinkState = () => {
         }
 
         const node = getSelectedNode(selection);
-        const parent = $findMatchingParent(node, $isLinkNode);
+        const existingLink = $findMatchingParent(node, $isLinkNode);
 
-        if (parent) {
-          if (isClickEvent) {
-            setEditingLink({
-              node: parent,
-              url: parent.getURL(),
-              text: parent.getTextContent(),
-              selection: null,
-            });
-            setShowCreateDialog(true);
-          } else {
-            editor.dispatchCommand(TOGGLE_LINK_COMMAND, null);
-          }
-        } else {
-          const selectionText = selection.getTextContent();
+        if (!existingLink) {
           setEditingLink({
-            text: selectionText,
+            text: selection.getTextContent(),
             url: '',
             node: null,
             selection: {
@@ -91,12 +92,34 @@ export const useLinkState = () => {
               focus: {key: selection.focus.key, offset: selection.focus.offset},
             },
           });
-          setShowCreateDialog(true);
+          open();
+          return;
         }
+
+        if (isClickEvent) {
+          setEditingLink({
+            node: existingLink,
+            url: existingLink.getURL(),
+            text: existingLink.getTextContent(),
+            selection: null,
+          });
+          open();
+          return;
+        }
+
+        editor.dispatchCommand(TOGGLE_LINK_COMMAND, null);
       });
     },
-    [editor],
+    [editor, setEditingLink, open],
   );
+
+  const restoreSelection = useCallback((selection: RangeSelection, savedSelection: SavedSelection) => {
+    selection.anchor.key = savedSelection.anchor.key;
+    selection.anchor.offset = savedSelection.anchor.offset;
+    selection.focus.key = savedSelection.focus.key;
+    selection.focus.offset = savedSelection.focus.offset;
+    selection.dirty = true;
+  }, []);
 
   const insertLink = useCallback(
     (url: string, text?: string) => {
@@ -105,46 +128,89 @@ export const useLinkState = () => {
       }
 
       editor.update(() => {
-        if (editingLink.node) {
-          if ($isLinkNode(editingLink.node)) {
-            editingLink.node.setURL(sanitizeUrl(url));
-            if (text) {
-              const textNode = editingLink.node.getFirstChild();
-              if (textNode instanceof TextNode) {
-                textNode.setTextContent(text);
+        const sanitizedUrl = sanitizeUrl(url);
+
+        if (editingLink.node && $isLinkNode(editingLink.node)) {
+          editingLink.node.setURL(sanitizedUrl);
+          if (text) {
+            const textNode = editingLink.node.getFirstChild();
+            if (textNode instanceof TextNode) {
+              textNode.setTextContent(text);
+              const selection = $getSelection();
+              if ($isRangeSelection(selection)) {
+                selection.setTextNodeRange(textNode, 0, textNode, text.length);
               }
             }
           }
-        } else {
-          const selection = $getSelection();
-          if ($isRangeSelection(selection)) {
-            if (editingLink.selection) {
-              selection.anchor.key = editingLink.selection.anchor.key;
-              selection.anchor.offset = editingLink.selection.anchor.offset;
-              selection.focus.key = editingLink.selection.focus.key;
-              selection.focus.offset = editingLink.selection.focus.offset;
-              selection.dirty = true;
-            }
+          resetLinkState(close);
+          return;
+        }
 
-            const textContent = text || selection.getTextContent() || url;
-            const textNode = $createTextNode(textContent);
-            const linkNode = $createLinkNode(sanitizeUrl(url));
-            linkNode.append(textNode);
+        const selection = $getSelection();
+        if (!$isRangeSelection(selection)) {
+          return;
+        }
 
-            selection.insertNodes([linkNode]);
-          }
+        if (editingLink.selection) {
+          restoreSelection(selection, editingLink.selection);
+        }
+
+        createNewLink({
+          selection,
+          url: sanitizedUrl,
+          text,
+        });
+        resetLinkState(close);
+      });
+    },
+    [editor, editingLink.node, editingLink.selection, resetLinkState, restoreSelection, close],
+  );
+
+  const handleLinkClick = useCallback(
+    (linkNode: LinkNode) => {
+      editor.update(() => {
+        if (!$isLinkNode(linkNode)) {
+          return;
+        }
+
+        const selection = $getSelection();
+        if (!$isRangeSelection(selection)) {
+          return;
+        }
+
+        const textNode = linkNode.getFirstChild() as TextNode;
+        selection.setTextNodeRange(textNode, 0, textNode, linkNode.getTextContent().length);
+        editor.dispatchCommand(FORMAT_LINK_COMMAND, undefined);
+      });
+    },
+    [editor],
+  );
+
+  const handleClickCommand = useCallback(
+    (event: MouseEvent) => {
+      const linkDomNode = (event.target as HTMLElement).closest('a');
+      if (!linkDomNode) {
+        return false;
+      }
+
+      event.preventDefault();
+
+      editor.getEditorState().read(() => {
+        const selection = $getSelection();
+        if (!$isRangeSelection(selection)) {
+          return;
+        }
+
+        const node = getSelectedNode(selection);
+        const linkNode = $findMatchingParent(node, $isLinkNode);
+        if (linkNode) {
+          handleLinkClick(linkNode);
         }
       });
 
-      setShowCreateDialog(false);
-      setEditingLink({
-        text: '',
-        url: '',
-        node: null,
-        selection: null,
-      });
+      return false;
     },
-    [editor, editingLink],
+    [editor, handleLinkClick],
   );
 
   useEffect(() => {
@@ -158,58 +224,58 @@ export const useLinkState = () => {
     );
   }, [editor, formatLink]);
 
-  const handleLinkClick = useCallback(
-    (linkNode: LinkNode) => {
-      editor.update(() => {
-        if ($isLinkNode(linkNode)) {
-          const selection = $getSelection();
-          if ($isRangeSelection(selection)) {
-            selection.setTextNodeRange(
-              linkNode.getFirstChild() as TextNode,
-              0,
-              linkNode.getFirstChild() as TextNode,
-              linkNode.getTextContent().length,
-            );
-          }
-          editor.dispatchCommand(FORMAT_LINK_COMMAND, undefined);
-        }
-      });
-    },
-    [editor],
-  );
-
   useEffect(() => {
-    return editor.registerCommand(
-      CLICK_COMMAND,
-      event => {
-        const linkDomNode = (event.target as HTMLElement).closest('a');
-        if (linkDomNode) {
-          event.preventDefault();
-
-          editor.getEditorState().read(() => {
-            const selection = $getSelection();
-            if ($isRangeSelection(selection)) {
-              const node = getSelectedNode(selection);
-              const linkNode = $findMatchingParent(node, $isLinkNode);
-              if (linkNode) {
-                handleLinkClick(linkNode);
-              }
-            }
-          });
-        }
-        return false;
-      },
-      COMMAND_PRIORITY_LOW,
-    );
-  }, [editor, handleLinkClick]);
+    return editor.registerCommand(CLICK_COMMAND, handleClickCommand, COMMAND_PRIORITY_LOW);
+  }, [editor, handleClickCommand]);
 
   return {
     formatLink,
     insertLink,
-    showCreateDialog,
-    setShowCreateDialog,
+    isModalOpen: isOpen,
+    closeModal: close,
     selectedText: editingLink.text,
     linkUrl: editingLink.url,
     linkNode: editingLink.node,
   };
+};
+
+const useLinkEditing = () => {
+  const [editingLink, setEditingLink] = useState<Link>({
+    text: '',
+    url: '',
+    node: null,
+    selection: null,
+  });
+
+  const resetLinkState = useCallback((closeModal: () => void) => {
+    setEditingLink({
+      text: '',
+      url: '',
+      node: null,
+      selection: null,
+    });
+    closeModal();
+  }, []);
+
+  return {
+    editingLink,
+    setEditingLink,
+    resetLinkState,
+  };
+};
+
+const createNewLink = ({selection, url, text}: CreateLinkParams) => {
+  const textContent = text || selection.getTextContent() || url;
+  const textNode = $createTextNode(textContent);
+  const linkNode = $createLinkNode(sanitizeUrl(url));
+  linkNode.append(textNode);
+  selection.insertNodes([linkNode]);
+};
+
+const useModalState = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const open = useCallback(() => setIsOpen(true), []);
+  const close = useCallback(() => setIsOpen(false), []);
+
+  return {isOpen, open, close};
 };

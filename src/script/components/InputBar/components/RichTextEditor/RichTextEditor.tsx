@@ -25,7 +25,6 @@ import {LexicalComposer} from '@lexical/react/LexicalComposer';
 import {ContentEditable} from '@lexical/react/LexicalContentEditable';
 import {EditorRefPlugin} from '@lexical/react/LexicalEditorRefPlugin';
 import {LexicalErrorBoundary} from '@lexical/react/LexicalErrorBoundary';
-import {LinkPlugin} from '@lexical/react/LexicalLinkPlugin';
 import {ListPlugin} from '@lexical/react/LexicalListPlugin';
 import {MarkdownShortcutPlugin} from '@lexical/react/LexicalMarkdownShortcutPlugin';
 import {OnChangePlugin} from '@lexical/react/LexicalOnChangePlugin';
@@ -49,6 +48,7 @@ import {EmojiPickerPlugin} from './plugins/EmojiPickerPlugin';
 import {GlobalEventsPlugin} from './plugins/GlobalEventsPlugin/GlobalEventsPlugin';
 import {HistoryPlugin} from './plugins/HistoryPlugin/HistoryPlugin';
 import {ReplaceEmojiPlugin} from './plugins/InlineEmojiReplacementPlugin';
+import {LinkPlugin} from './plugins/LinkPlugin/LinkPlugin';
 import {ListItemTabIndentationPlugin} from './plugins/ListIndentationPlugin/ListIndentationPlugin';
 import {ListMaxIndentLevelPlugin} from './plugins/ListMaxIndentLevelPlugin/ListMaxIndentLevelPlugin';
 import {MentionsPlugin} from './plugins/MentionsPlugin';
@@ -61,8 +61,6 @@ import {transformMessage} from './utils/transformMessage';
 import {useEditorDraftState} from './utils/useEditorDraftState';
 
 import {MentionEntity} from '../../../../message/MentionEntity';
-
-const SUPPORTED_URL_PROTOCOLS = new Set(['http:', 'https:', 'mailto:', 'tel:', 'sms:']);
 
 export type RichTextContent = {
   text: string;
@@ -165,17 +163,8 @@ export const RichTextEditor = ({
               <MarkdownShortcutPlugin transformers={markdownTransformers} />
               <CodeHighlightPlugin />
               <BlockquotePlugin />
+              <LinkPlugin />
               <AutoLinkPlugin />
-              <LinkPlugin
-                validateUrl={url => {
-                  try {
-                    const parsedUrl = new URL(url);
-                    return SUPPORTED_URL_PROTOCOLS.has(parsedUrl.protocol);
-                  } catch {
-                    return !!url.startsWith('http');
-                  }
-                }}
-              />
             </>
           )}
 
