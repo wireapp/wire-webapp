@@ -501,7 +501,7 @@ export class ConversationAPI {
       url:
         this.backendFeatures.version >= apiBreakpoint.version7
           ? `/${ConversationAPI.URL.BOT}/${ConversationAPI.URL.CONVERSATIONS}/${conversationId}`
-          : `/${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.BOTS}}`,
+          : `/${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.BOTS}`,
     };
 
     const response = await this.client.sendJSON<ConversationMemberJoinEvent>(config);
