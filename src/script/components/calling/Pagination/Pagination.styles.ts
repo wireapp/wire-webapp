@@ -34,6 +34,20 @@ export const paginationItemsStyles: CSSObject = {
   borderRadius: 12,
 };
 
+export const paginationItemWrapperStyles = (isSmaller: boolean): CSSObject => {
+  return {
+    display: 'flex',
+    justifyContent: 'center',
+    minWidth: '12px',
+    '&:first-of-type': {
+      justifyContent: isSmaller ? 'flex-end' : 'center',
+    },
+    '&:last-of-type': {
+      justifyContent: isSmaller ? 'flex-start' : 'center',
+    },
+  };
+};
+
 export const paginationItemStyles = (isCurrentPage: boolean, isSmaller: boolean): CSSObject => {
   return {
     borderRadius: '50%',

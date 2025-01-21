@@ -31,6 +31,7 @@ import {
   iconButtonStyles,
   paginationItemsStyles,
   paginationItemStyles,
+  paginationItemWrapperStyles,
   paginationWrapperStyles,
 } from './Pagination.styles';
 
@@ -79,7 +80,6 @@ const Pagination: React.FC<PaginationProps> = ({totalPages, currentPage, onChang
 
   return (
     <div id="video-pagination" css={[paginationWrapperStyles, className]}>
-      {/* TODO: waiting for an answer from the designer if it can be IconButton and with that particular icon */}
       <IconButton
         variant={IconButtonVariant.SECONDARY}
         css={iconButtonStyles}
@@ -107,16 +107,16 @@ const Pagination: React.FC<PaginationProps> = ({totalPages, currentPage, onChang
           const isSmaller = isFirstOrLastInTheRange && !(isFirstPage || isLastPage);
 
           return (
-            <div
-              data-uie-name="pagination-item"
-              data-uie-status={isCurrentPage ? 'active' : 'inactive'}
-              key={page}
-              css={paginationItemStyles(isCurrentPage, isSmaller)}
-            />
+            <div key={page} css={paginationItemWrapperStyles(isSmaller)}>
+              <div
+                data-uie-name="pagination-item"
+                data-uie-status={isCurrentPage ? 'active' : 'inactive'}
+                css={paginationItemStyles(isCurrentPage, isSmaller)}
+              />
+            </div>
           );
         })}
       </div>
-      {/* TODO: waiting for an answer from the designer if it can be IconButton and with that particular icon */}
       <IconButton
         variant={IconButtonVariant.SECONDARY}
         css={iconButtonStyles}
