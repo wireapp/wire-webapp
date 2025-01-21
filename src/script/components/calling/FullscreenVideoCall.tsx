@@ -24,7 +24,7 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {ArrowIcon, Checkbox, CheckboxLabel, IconButton, IconButtonVariant, QUERY} from '@wireapp/react-ui-kit';
+import {Checkbox, CheckboxLabel, IconButton, IconButtonVariant, QUERY} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useAppNotification} from 'Components/AppNotification/AppNotification';
@@ -50,8 +50,6 @@ import {
   headerActionsWrapperStyles,
   paginationWrapperStyles,
   videoTopBarStyles,
-  backButtonStyles,
-  backIconStyles,
   minimizeButtonStyles,
   openDetachedWindowButtonStyles,
   paginationStyles,
@@ -228,9 +226,6 @@ const FullscreenVideoCall = ({
 
   const totalPages = callPages.length;
 
-  // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
-  const horizontalSmBreakpoint = useActiveWindowMatchMedia('max-width: 639px');
-
   const callGroupStartedAlert = t(isGroupCall ? 'startedVideoGroupCallingAlert' : 'startedVideoCallingAlert', {
     conversationName,
     cameraStatus: t(selfSharesCamera ? 'cameraStatusOn' : 'cameraStatusOff'),
@@ -256,12 +251,6 @@ const FullscreenVideoCall = ({
       <div id="video-calling" className="video-calling">
         <div css={videoTopBarStyles}>
           <div id="video-title" className="video-title">
-            {horizontalSmBreakpoint && (
-              <IconButton variant={IconButtonVariant.SECONDARY} css={backButtonStyles} onClick={minimize}>
-                <ArrowIcon css={backIconStyles} />
-              </IconButton>
-            )}
-
             {/* Calling conversation name and duration */}
             <div
               className="video-remote-name"

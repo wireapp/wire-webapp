@@ -52,16 +52,6 @@ export const headerActionsWrapperStyles: CSSObject = {
   },
 };
 
-export const backButtonStyles: CSSObject = {
-  marginBottom: 0,
-};
-
-export const backIconStyles: CSSObject = {
-  transform: 'rotateY(180deg)',
-  width: '16px',
-  height: '16px',
-};
-
 export const paginationWrapperStyles: CSSObject = {
   [media.mobile]: {
     backgroundColor: 'var(--app-bg-secondary)',
