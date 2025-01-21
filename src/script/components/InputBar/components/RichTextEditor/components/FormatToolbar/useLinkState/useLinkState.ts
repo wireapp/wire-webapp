@@ -19,10 +19,17 @@
 
 import {useCallback, useState, useEffect} from 'react';
 
-import {$createLinkNode, $isLinkNode, TOGGLE_LINK_COMMAND} from '@lexical/link';
+import {$createLinkNode, $isLinkNode, TOGGLE_LINK_COMMAND, LinkNode} from '@lexical/link';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {$findMatchingParent} from '@lexical/utils';
-import {$getSelection, $isRangeSelection, $createTextNode, COMMAND_PRIORITY_LOW} from 'lexical';
+import {
+  $getSelection,
+  $isRangeSelection,
+  $createTextNode,
+  COMMAND_PRIORITY_LOW,
+  CLICK_COMMAND,
+  TextNode,
+} from 'lexical';
 
 import {FORMAT_LINK_COMMAND} from '../../../editorConfig';
 import {getSelectedNode} from '../../../utils/getSelectedNode';
@@ -31,13 +38,20 @@ import {sanitizeUrl} from '../../../utils/sanitizeUrl';
 export const useLinkState = () => {
   const [editor] = useLexicalComposerContext();
   const [showCreateDialog, setShowCreateDialog] = useState(false);
-  const [selectedText, setSelectedText] = useState('');
-  const [savedSelection, setSavedSelection] = useState<{
-    anchor: {key: string; offset: number};
-    focus: {key: string; offset: number};
-  } | null>(null);
-  const [linkNode, setLinkNode] = useState<any>(null);
-  const [linkUrl, setLinkUrl] = useState('');
+  const [editingLink, setEditingLink] = useState<{
+    text: string;
+    url: string;
+    node: LinkNode | null;
+    selection: {
+      anchor: {key: string; offset: number};
+      focus: {key: string; offset: number};
+    } | null;
+  }>({
+    text: '',
+    url: '',
+    node: null,
+    selection: null,
+  });
 
   const formatLink = useCallback(
     (isClickEvent = false) => {
@@ -56,21 +70,27 @@ export const useLinkState = () => {
 
         if (parent) {
           if (isClickEvent) {
-            setLinkNode(parent);
-            setLinkUrl(parent.getURL());
-            setSelectedText(parent.getTextContent());
+            setEditingLink({
+              node: parent,
+              url: parent.getURL(),
+              text: parent.getTextContent(),
+              selection: null,
+            });
             setShowCreateDialog(true);
           } else {
             editor.dispatchCommand(TOGGLE_LINK_COMMAND, null);
           }
         } else {
-          // Even if no text is selected, we can still create a link
           const selectionText = selection.getTextContent();
-          setSavedSelection({
-            anchor: {key: selection.anchor.key, offset: selection.anchor.offset},
-            focus: {key: selection.focus.key, offset: selection.focus.offset},
+          setEditingLink({
+            text: selectionText,
+            url: '',
+            node: null,
+            selection: {
+              anchor: {key: selection.anchor.key, offset: selection.anchor.offset},
+              focus: {key: selection.focus.key, offset: selection.focus.offset},
+            },
           });
-          setSelectedText(selectionText);
           setShowCreateDialog(true);
         }
       });
@@ -85,26 +105,24 @@ export const useLinkState = () => {
       }
 
       editor.update(() => {
-        if (linkNode) {
-          // Editing existing link
-          if ($isLinkNode(linkNode)) {
-            linkNode.setURL(sanitizeUrl(url));
+        if (editingLink.node) {
+          if ($isLinkNode(editingLink.node)) {
+            editingLink.node.setURL(sanitizeUrl(url));
             if (text) {
-              const textNode = linkNode.getFirstChild();
-              if (textNode) {
+              const textNode = editingLink.node.getFirstChild();
+              if (textNode instanceof TextNode) {
                 textNode.setTextContent(text);
               }
             }
           }
         } else {
-          // Creating new link
           const selection = $getSelection();
           if ($isRangeSelection(selection)) {
-            if (savedSelection) {
-              selection.anchor.key = savedSelection.anchor.key;
-              selection.anchor.offset = savedSelection.anchor.offset;
-              selection.focus.key = savedSelection.focus.key;
-              selection.focus.offset = savedSelection.focus.offset;
+            if (editingLink.selection) {
+              selection.anchor.key = editingLink.selection.anchor.key;
+              selection.anchor.offset = editingLink.selection.anchor.offset;
+              selection.focus.key = editingLink.selection.focus.key;
+              selection.focus.offset = editingLink.selection.focus.offset;
               selection.dirty = true;
             }
 
@@ -119,11 +137,14 @@ export const useLinkState = () => {
       });
 
       setShowCreateDialog(false);
-      setSavedSelection(null);
-      setLinkNode(null);
-      setLinkUrl('');
+      setEditingLink({
+        text: '',
+        url: '',
+        node: null,
+        selection: null,
+      });
     },
-    [editor, savedSelection, linkNode],
+    [editor, editingLink],
   );
 
   useEffect(() => {
@@ -137,13 +158,58 @@ export const useLinkState = () => {
     );
   }, [editor, formatLink]);
 
+  const handleLinkClick = useCallback(
+    (linkNode: LinkNode) => {
+      editor.update(() => {
+        if ($isLinkNode(linkNode)) {
+          const selection = $getSelection();
+          if ($isRangeSelection(selection)) {
+            selection.setTextNodeRange(
+              linkNode.getFirstChild() as TextNode,
+              0,
+              linkNode.getFirstChild() as TextNode,
+              linkNode.getTextContent().length,
+            );
+          }
+          editor.dispatchCommand(FORMAT_LINK_COMMAND, undefined);
+        }
+      });
+    },
+    [editor],
+  );
+
+  useEffect(() => {
+    return editor.registerCommand(
+      CLICK_COMMAND,
+      event => {
+        const linkDomNode = (event.target as HTMLElement).closest('a');
+        if (linkDomNode) {
+          event.preventDefault();
+
+          editor.getEditorState().read(() => {
+            const selection = $getSelection();
+            if ($isRangeSelection(selection)) {
+              const node = getSelectedNode(selection);
+              const linkNode = $findMatchingParent(node, $isLinkNode);
+              if (linkNode) {
+                handleLinkClick(linkNode);
+              }
+            }
+          });
+        }
+        return false;
+      },
+      COMMAND_PRIORITY_LOW,
+    );
+  }, [editor, handleLinkClick]);
+
   return {
     formatLink,
     insertLink,
     showCreateDialog,
     setShowCreateDialog,
-    selectedText,
-    linkUrl,
-    linkNode,
+    selectedText: editingLink.text,
+    linkUrl: editingLink.url,
+    linkNode: editingLink.node,
   };
 };

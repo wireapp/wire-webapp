@@ -65,7 +65,6 @@ const inputStyles = css`
 
 const buttonGroupStyles = css`
   display: flex;
-  gap: 16px;
   justify-content: flex-end;
 `;
 
@@ -110,23 +109,26 @@ export const LinkDialog = ({
   isShown,
   title,
 }: LinkDialogProps) => {
+  const [url, setUrl] = useState(initialUrl);
+  const [text, setText] = useState(initialText);
   const urlInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (isShown) {
+      setUrl(initialUrl);
+      setText(initialText);
       setTimeout(() => urlInputRef.current?.focus(), 100);
     }
-  }, [isShown]);
+  }, [isShown, initialUrl, initialText]);
 
-  const [text, setText] = useState(initialText);
-  const [url, setUrl] = useState(initialUrl);
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (url) {
-      onSubmit(url, text);
+    if (!url) {
+      return;
     }
+
+    onSubmit(url, text);
   };
 
   return (
@@ -178,10 +180,10 @@ export const LinkDialog = ({
           />
         </div>
         <div css={buttonGroupStyles}>
-          <button type="button" css={cancelButtonStyles} onClick={onClose}>
+          <button type="button" className="modal__button modal__button--secondary" onClick={onClose}>
             Cancel
           </button>
-          <button type="submit" css={buttonStyles}>
+          <button type="submit" className="modal__button modal__button--primary">
             {showTextInput ? 'Add Link' : 'Update Link'}
           </button>
         </div>

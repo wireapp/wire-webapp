@@ -19,7 +19,6 @@
 
 import {ReactElement, useRef} from 'react';
 
-import {$isLinkNode} from '@lexical/link';
 import {$convertToMarkdownString} from '@lexical/markdown';
 import {ClearEditorPlugin} from '@lexical/react/LexicalClearEditorPlugin';
 import {LexicalComposer} from '@lexical/react/LexicalComposer';
@@ -31,7 +30,7 @@ import {ListPlugin} from '@lexical/react/LexicalListPlugin';
 import {MarkdownShortcutPlugin} from '@lexical/react/LexicalMarkdownShortcutPlugin';
 import {OnChangePlugin} from '@lexical/react/LexicalOnChangePlugin';
 import {RichTextPlugin} from '@lexical/react/LexicalRichTextPlugin';
-import {LexicalEditor, EditorState, $isRangeSelection, $getSelection} from 'lexical';
+import {LexicalEditor, EditorState} from 'lexical';
 
 import {DraftState} from 'Components/InputBar/util/DraftStateUtil';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
@@ -39,8 +38,9 @@ import {User} from 'src/script/entity/User';
 
 import {FormatToolbar} from './components/FormatToolbar/FormatToolbar';
 import {Placeholder} from './components/Placeholder/Placeholder';
-import {editorConfig, FORMAT_LINK_COMMAND} from './editorConfig';
+import {editorConfig} from './editorConfig';
 import {AutoFocusPlugin} from './plugins/AutoFocusPlugin/AutoFocusPlugin';
+import {AutoLinkPlugin} from './plugins/AutoLinkPlugin/AutoLinkPlugin';
 import {BlockquotePlugin} from './plugins/BlockquotePlugin/BlockquotePlugin';
 import {CodeHighlightPlugin} from './plugins/CodeHighlightPlugin/CodeHighlightPlugin';
 import {DraftStatePlugin} from './plugins/DraftStatePlugin/DraftStatePlugin';
@@ -49,7 +49,6 @@ import {EmojiPickerPlugin} from './plugins/EmojiPickerPlugin';
 import {GlobalEventsPlugin} from './plugins/GlobalEventsPlugin/GlobalEventsPlugin';
 import {HistoryPlugin} from './plugins/HistoryPlugin/HistoryPlugin';
 import {ReplaceEmojiPlugin} from './plugins/InlineEmojiReplacementPlugin';
-import {LinkClickPlugin} from './plugins/LinkClickPlugin/LinkClickPlugin';
 import {ListItemTabIndentationPlugin} from './plugins/ListIndentationPlugin/ListIndentationPlugin';
 import {ListMaxIndentLevelPlugin} from './plugins/ListMaxIndentLevelPlugin/ListMaxIndentLevelPlugin';
 import {MentionsPlugin} from './plugins/MentionsPlugin';
@@ -137,23 +136,6 @@ export const RichTextEditor = ({
     });
   };
 
-  const handleLinkClick = (linkNode: any) => {
-    editorRef.current?.update(() => {
-      if ($isLinkNode(linkNode)) {
-        const selection = $getSelection();
-        if ($isRangeSelection(selection)) {
-          selection.setTextNodeRange(
-            linkNode.getFirstChild(),
-            0,
-            linkNode.getFirstChild(),
-            linkNode.getTextContent().length,
-          );
-        }
-        editorRef.current?.dispatchCommand(FORMAT_LINK_COMMAND, undefined);
-      }
-    });
-  };
-
   return (
     <LexicalComposer initialConfig={editorConfig}>
       <div className="controls-center input-bar-field">
@@ -182,6 +164,17 @@ export const RichTextEditor = ({
               <MarkdownShortcutPlugin transformers={markdownTransformers} />
               <CodeHighlightPlugin />
               <BlockquotePlugin />
+              <AutoLinkPlugin />
+              <LinkPlugin
+                validateUrl={url => {
+                  try {
+                    const parsedUrl = new URL(url);
+                    return SUPPORTED_URL_PROTOCOLS.has(parsedUrl.protocol);
+                  } catch {
+                    return !!url.startsWith('http');
+                  }
+                }}
+              />
             </>
           )}
 
@@ -203,17 +196,6 @@ export const RichTextEditor = ({
               }
             }}
           />
-          <LinkPlugin
-            validateUrl={url => {
-              try {
-                const parsedUrl = new URL(url);
-                return SUPPORTED_URL_PROTOCOLS.has(parsedUrl.protocol);
-              } catch {
-                return !!url.startsWith('http');
-              }
-            }}
-          />
-          <LinkClickPlugin onLinkClick={handleLinkClick} />
         </div>
       </div>
       {showFormatToolbar && showMarkdownPreview && (
