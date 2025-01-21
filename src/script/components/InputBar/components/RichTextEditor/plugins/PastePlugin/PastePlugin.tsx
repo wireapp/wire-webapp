@@ -274,6 +274,8 @@ export const PastePlugin = ({getMentionCandidates}: PastePluginProps): JSX.Eleme
         }
       });
 
+      // Prevent the default paste behavior
+      event.preventDefault();
       return true;
     },
     [editor, getMentionCandidates, handleLexicalMentions, handleFormattedContent, processMentions],
