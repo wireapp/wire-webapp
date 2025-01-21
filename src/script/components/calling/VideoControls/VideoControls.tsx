@@ -374,6 +374,8 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
       WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE,
     ) && Config.getConfig().FEATURE.ENABLE_PRESS_SPACE_TO_UNMUTE;
 
+  const isMoreInteractionsMenuActive = isParticipantsListOpen || showEmojisBar || isSelfHandRaised;
+
   return (
     <ul id="video-controls" className="video-controls" css={videoControlsWrapperStyles}>
       <div
@@ -650,9 +652,14 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
           {showEmojisBar && <EmojisBar onEmojiClick={handleEmojiClick} ref={emojiBarRef} />}
           <button
             title={t('callMenuMoreInteractions')}
-            className={classNames('video-controls__button_primary', {
-              active: isParticipantsListOpen || showEmojisBar,
-            })}
+            className={classNames(
+              {
+                'video-controls__button': isMobile,
+                'video-controls__button_primary': !isMobile,
+              },
+              {active: isMoreInteractionsMenuActive},
+            )}
+            css={isMobile && (isMoreInteractionsMenuActive ? videoControlActiveStyles : videoControlInActiveStyles)}
             onClick={onMoreInteractionsMenuClick}
             type="button"
             data-uie-name="video-controls-menu-more-interactions"
