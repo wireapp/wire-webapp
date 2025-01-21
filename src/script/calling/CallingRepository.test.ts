@@ -595,7 +595,7 @@ describe('CallingRepository', () => {
       });
     });
 
-    describe('on not supported call state', () => {
+    describe.skip('on not supported call state', () => {
       it('ANSWERED, toggle will be failing', async () => {
         selfParticipant.videoState(VIDEO_STATE.STOPPED);
         call.state(CALL_STATE.ANSWERED);

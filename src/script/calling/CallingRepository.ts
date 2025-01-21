@@ -1047,21 +1047,18 @@ export class CallingRepository {
       } else {
         this.warmupMediaStreams(call, false, true);
       }
-    } else if (
-      callState === CALL_STATE.MEDIA_ESTAB &&
-      newState === VIDEO_STATE.STOPPED &&
-      // This condition is to be safe. This should not happen because: `newState === VIDEO_STATE.STARTED` when
-      // participant doing screen share!
-      !selfParticipant.sharesScreen()
-    ) {
+    }
+
+    if (callState !== CALL_STATE.INCOMING && newState === VIDEO_STATE.STOPPED && !selfParticipant.sharesScreen()) {
       selfParticipant.releaseVideoStream(true);
     }
 
-    if (callState !== CALL_STATE.MEDIA_ESTAB && callState !== CALL_STATE.INCOMING) {
-      // Toggle Camera should not be available in any other call state for this reason we make an exception for the
-      // case that someone wants to access the camera outside a call!
-      throw new Error('invalid call state in `toggleCamera`');
-    }
+    // Let us test this one in staging before we go live with it!
+    // if (callState !== CALL_STATE.MEDIA_ESTAB && callState !== CALL_STATE.INCOMING) {
+    //   // Toggle Camera should not be available in any other call state for this reason we make an exception for the
+    //   // case that someone wants to access the camera outside a call!
+    //   throw new Error('invalid call state in `toggleCamera`');
+    // }
 
     this.wCall?.setVideoSendState(this.wUser, this.serializeQualifiedId(call.conversation.qualifiedId), newState);
   }
