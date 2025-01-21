@@ -55,7 +55,7 @@ export const wrapperStyles: CSSObject = {
     [media.tablet]: {
       transform: 'none',
       left: 'auto',
-      right: '1.5rem',
+      right: '0.625rem',
     },
   },
 };
