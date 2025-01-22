@@ -19,7 +19,7 @@
 
 import {useCallback, useState, useEffect} from 'react';
 
-import {$createLinkNode, $isLinkNode, TOGGLE_LINK_COMMAND, LinkNode} from '@lexical/link';
+import {$createLinkNode, $isLinkNode, LinkNode} from '@lexical/link';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {$findMatchingParent} from '@lexical/utils';
 import {
@@ -96,18 +96,13 @@ export const useLinkState = () => {
           return;
         }
 
-        if (isClickEvent) {
-          setEditingLink({
-            node: existingLink,
-            url: existingLink.getURL(),
-            text: existingLink.getTextContent(),
-            selection: null,
-          });
-          open();
-          return;
-        }
-
-        editor.dispatchCommand(TOGGLE_LINK_COMMAND, null);
+        setEditingLink({
+          node: existingLink,
+          url: existingLink.getURL(),
+          text: existingLink.getTextContent(),
+          selection: null,
+        });
+        open();
       });
     },
     [editor, setEditingLink, open],
@@ -131,19 +126,26 @@ export const useLinkState = () => {
         const sanitizedUrl = sanitizeUrl(url);
 
         if (editingLink.node && $isLinkNode(editingLink.node)) {
-          editingLink.node.setURL(sanitizedUrl);
-          if (text) {
-            const textNode = editingLink.node.getFirstChild();
-            if (textNode instanceof TextNode) {
-              textNode.setTextContent(text);
-              const selection = $getSelection();
-              if ($isRangeSelection(selection)) {
-                selection.setTextNodeRange(textNode, 0, textNode, text.length);
-              }
+          const nodeStillExists = editingLink.node.isAttached();
+
+          if (nodeStillExists) {
+            // Create a new link node with the updated properties
+            const newLinkNode = $createLinkNode(sanitizedUrl);
+            const newTextNode = $createTextNode(text || editingLink.node.getTextContent());
+            newLinkNode.append(newTextNode);
+
+            // Replace the old link node with the new one
+            editingLink.node.replace(newLinkNode);
+
+            // Update selection
+            const selection = $getSelection();
+            if ($isRangeSelection(selection)) {
+              selection.setTextNodeRange(newTextNode, 0, newTextNode, newTextNode.getTextContent().length);
             }
+
+            resetLinkState(close);
+            return;
           }
-          resetLinkState(close);
-          return;
         }
 
         const selection = $getSelection();
@@ -180,10 +182,17 @@ export const useLinkState = () => {
 
         const textNode = linkNode.getFirstChild() as TextNode;
         selection.setTextNodeRange(textNode, 0, textNode, linkNode.getTextContent().length);
-        editor.dispatchCommand(FORMAT_LINK_COMMAND, undefined);
+
+        setEditingLink({
+          node: linkNode,
+          url: linkNode.getURL(),
+          text: linkNode.getTextContent(),
+          selection: null,
+        });
+        open();
       });
     },
-    [editor],
+    [editor, setEditingLink, open],
   );
 
   const handleClickCommand = useCallback(
