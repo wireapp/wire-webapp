@@ -188,7 +188,7 @@ export const RichTextEditor = ({
               }
             }}
           />
-          <PastePlugin getMentionCandidates={getMentionCandidates} />
+          <PastePlugin getMentionCandidates={getMentionCandidates} isPreviewMode={showMarkdownPreview} />
         </div>
       </div>
       {showFormatToolbar && showMarkdownPreview && (

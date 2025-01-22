@@ -38,6 +38,8 @@ import {$createMentionNode} from '../../nodes/MentionNode';
 interface PastePluginProps {
   /** Function that returns list of users that can be mentioned in the current context */
   getMentionCandidates: () => User[];
+  /** Whether the preview mode (render link as formatted node or raw markdown [text](url)) is enabled */
+  isPreviewMode: boolean;
 }
 
 type Selection = BaseSelection | null;
@@ -53,7 +55,7 @@ type Selection = BaseSelection | null;
  * - If a mentioned user exists in the current conversation, the mention is preserved as a MentionNode
  * - If a mentioned user doesn't exist, the mention is converted to plain text with @ symbol
  */
-export const PastePlugin = ({getMentionCandidates}: PastePluginProps): JSX.Element | null => {
+export const PastePlugin = ({getMentionCandidates, isPreviewMode}: PastePluginProps): JSX.Element | null => {
   const [editor] = useLexicalComposerContext();
 
   /**
@@ -155,6 +157,26 @@ export const PastePlugin = ({getMentionCandidates}: PastePluginProps): JSX.Eleme
   );
 
   /**
+   * Processes links in pasted content, converting them to markdown format.
+   * @param text - The text containing links
+   * @param links - NodeList of link elements
+   * @returns string - Processed text with markdown links
+   */
+  const processLinks = (text: string, links: NodeListOf<Element>): string => {
+    return Array.from(links).reduce((processedText, link) => {
+      const href = link.getAttribute('href');
+      const linkText = link.textContent?.trim();
+
+      if (!href || !linkText) {
+        return processedText;
+      }
+
+      const linkMarkdown = `[${linkText}](${href})`;
+      return processedText.replace(new RegExp(`\\b${linkText}\\b`), linkMarkdown);
+    }, text);
+  };
+
+  /**
    * Processes mentions in pasted content that aren't in Lexical format.
    * Converts valid mentions to MentionNodes and preserves their position in text.
    * @param selection - Current editor selection
@@ -195,6 +217,7 @@ export const PastePlugin = ({getMentionCandidates}: PastePluginProps): JSX.Eleme
    * Tries different handling strategies in order:
    * 1. Lexical mentions
    * 2. Formatted content
+   * 3. Manual processing of links and mentions
    * Falls back to plain text if all else fails.
    * @param event - Clipboard event containing pasted content
    * @returns boolean - True if paste was handled
@@ -231,14 +254,25 @@ export const PastePlugin = ({getMentionCandidates}: PastePluginProps): JSX.Eleme
           }
 
           const mentions = doc.querySelectorAll('[data-lexical-mention]');
+          const links = doc.querySelectorAll('a');
 
           // Try handling formatted content if no special elements
-          if (mentions.length === 0 && handleFormattedContent(doc, selection)) {
+          if (
+            mentions.length === 0 &&
+            (!isPreviewMode ? links.length === 0 : true) &&
+            handleFormattedContent(doc, selection)
+          ) {
             return true;
           }
 
-          // Process mentions manually
-          selection.insertText(plainText);
+          // Transform links to markdown ([text](url)) only if the preview mode is disabled
+          if (!isPreviewMode) {
+            const processedText = processLinks(plainText, links);
+            selection.insertText(processedText);
+          } else {
+            selection.insertText(plainText);
+          }
+
           processMentions(selection, mentions, availableUsers);
 
           return true;
