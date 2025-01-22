@@ -96,25 +96,26 @@ export const LinkDialog = ({
     }
   };
 
-  const validateForm = (): boolean => {
-    const newErrors: FormErrors = {
-      url: !isFieldValid('url', formData.url) ? getFieldError('url') : undefined,
-      text: !isFieldValid('text', formData.text) ? getFieldError('text') : undefined,
-    };
-
-    setErrors(newErrors);
-    return !Object.values(newErrors).some(Boolean);
-  };
-
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
+    event.stopPropagation();
     setIsSubmitted(true);
 
-    const isValid = validateForm();
+    const isValid = validateForm(formData);
 
     if (isValid) {
       onSubmit(formData.url, formData.text);
     }
+  };
+
+  const validateForm = (data: FormData): boolean => {
+    const newErrors: FormErrors = {
+      url: !isFieldValid('url', data.url) ? getFieldError('url') : undefined,
+      text: !isFieldValid('text', data.text) ? getFieldError('text') : undefined,
+    };
+
+    setErrors(newErrors);
+    return !Object.values(newErrors).some(Boolean);
   };
 
   return (
@@ -131,7 +132,7 @@ export const LinkDialog = ({
           <Icon.CloseIcon aria-hidden="true" />
         </button>
       </div>
-      <form css={formStyles} onSubmit={handleSubmit}>
+      <form css={formStyles} onSubmit={handleSubmit} noValidate>
         <Input
           ref={textInputRef}
           id="link-text"
@@ -152,7 +153,7 @@ export const LinkDialog = ({
           error={!!isSubmitted && !!errors.url ? <ErrorMessage>{errors.url}</ErrorMessage> : undefined}
         />
         <div css={buttonGroupStyles}>
-          <Button onClick={onClose} variant={ButtonVariant.SECONDARY} css={buttonStyles}>
+          <Button type="button" onClick={onClose} variant={ButtonVariant.SECONDARY} css={buttonStyles}>
             {t('richTextLinkDialogCancelButton')}
           </Button>
           <Button type="submit" variant={ButtonVariant.PRIMARY} css={buttonStyles}>
