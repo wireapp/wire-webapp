@@ -249,6 +249,7 @@ export const PastePlugin = ({getMentionCandidates}: PastePluginProps): JSX.Eleme
         }
       });
 
+      event.preventDefault();
       return true;
     },
     [editor, getMentionCandidates, handleLexicalMentions, handleFormattedContent, processMentions],
