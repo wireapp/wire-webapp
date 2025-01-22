@@ -23,6 +23,15 @@ export const wrapperStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
   columnGap: '4px',
+  overflowX: 'auto',
+  scrollbarWidth: 'none',
+  '-ms-overflow-style': 'none',
+
+  '&::-webkit-scrollbar': {
+    width: 0,
+    height: 0,
+    display: 'none',
+  },
 };
 
 export const separatorStyles: CSSObject = {
