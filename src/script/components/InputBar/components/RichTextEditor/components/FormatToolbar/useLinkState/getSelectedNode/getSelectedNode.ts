@@ -20,7 +20,24 @@
 import {$isAtNodeEnd} from '@lexical/selection';
 import {ElementNode, RangeSelection, TextNode} from 'lexical';
 
-export function getSelectedNode(selection: RangeSelection): TextNode | ElementNode {
+/**
+ * Gets the most relevant node from a text selection to determine link context.
+ * Used for:
+ * 1. Finding if selected text is already part of a link when formatting
+ * 2. Detecting if a clicked element is part of a link node
+ *
+ * For example, when user clicks on a link or selects text:
+ * ```ts
+ * const node = getSelectedNode(selection);
+ * const linkNode = $findMatchingParent(node, $isLinkNode);
+ * ```
+ *  linkNode will be the parent LinkNode if text is part of a link
+ *  or null if text is not linked
+ *
+ * @param selection - Current text selection in the editor
+ * @returns The node that should be checked for link context
+ */
+export const getSelectedNode = (selection: RangeSelection): TextNode | ElementNode => {
   const anchor = selection.anchor;
   const focus = selection.focus;
   const anchorNode = selection.anchor.getNode();
@@ -33,4 +50,4 @@ export function getSelectedNode(selection: RangeSelection): TextNode | ElementNo
     return $isAtNodeEnd(focus) ? anchorNode : focusNode;
   }
   return $isAtNodeEnd(anchor) ? focusNode : anchorNode;
-}
+};

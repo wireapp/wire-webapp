@@ -34,10 +34,10 @@ import {
 } from 'lexical';
 
 import {createNewLink} from './createNewLink/createNewLink';
+import {getSelectedNode} from './getSelectedNode/getSelectedNode';
 import {useLinkEditing} from './useLinkEditing/useLinkEditing';
 import {useModalState} from './useModalState/useModalState';
 
-import {getSelectedNode} from '../../../utils/getSelectedNode';
 import {sanitizeUrl} from '../../../utils/sanitizeUrl';
 
 export const FORMAT_LINK_COMMAND = createCommand<void>();
