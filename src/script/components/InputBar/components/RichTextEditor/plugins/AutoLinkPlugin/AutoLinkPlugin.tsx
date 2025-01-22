@@ -24,15 +24,9 @@ import {
 
 import {URL_REGEX} from '../../utils/url';
 
-const EMAIL_REGEX =
-  /[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}/;
-
 const MATCHERS = [
   createLinkMatcherWithRegExp(URL_REGEX, text => {
     return text.startsWith('http') ? text : `https://${text}`;
-  }),
-  createLinkMatcherWithRegExp(EMAIL_REGEX, text => {
-    return `mailto:${text}`;
   }),
 ];
 
