@@ -26,14 +26,15 @@ interface FormatButtonProps {
   icon: ElementType<any>;
   active: boolean;
   onClick: () => void;
+  isEditing: boolean;
 }
 
-export const FormatButton = ({label, icon: Icon, active, onClick}: FormatButtonProps) => {
+export const FormatButton = ({label, icon: Icon, active, onClick, isEditing}: FormatButtonProps) => {
   return (
     <button
       title={label}
       aria-label={label}
-      className={cx('input-bar-control', {active})}
+      className={cx('input-bar-control', {active, 'input-bar-control--editing': isEditing})}
       onClick={onClick}
       data-uie-name={`format-text-${label}`}
     >

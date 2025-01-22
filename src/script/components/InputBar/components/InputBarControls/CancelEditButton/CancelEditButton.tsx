@@ -17,18 +17,23 @@
  *
  */
 
+import cx from 'classnames';
+
 import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
 interface CancelEditButtonProps {
+  isEditing: boolean;
   onClick: () => void;
 }
 
-export const CancelEditButton = ({onClick}: CancelEditButtonProps) => {
+export const CancelEditButton = ({isEditing, onClick}: CancelEditButtonProps) => {
   return (
     <button
       type="button"
-      className="controls-right-button button-icon-large"
+      className={cx('input-bar-control', {
+        'input-bar-control--editing': isEditing,
+      })}
       onClick={onClick}
       data-uie-name="do-cancel-edit"
       aria-label={t('accessibility.cancelMsgEdit')}

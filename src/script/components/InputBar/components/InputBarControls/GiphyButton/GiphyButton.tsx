@@ -23,11 +23,10 @@ import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
 export type GiphyButtonProps = {
-  hasRoundedLeftCorner: boolean;
   onGifClick: () => void;
 };
 
-const GiphyButton: React.FC<GiphyButtonProps> = ({onGifClick, hasRoundedLeftCorner}) => {
+const GiphyButton: React.FC<GiphyButtonProps> = ({onGifClick}) => {
   return (
     <>
       <li>

@@ -17,14 +17,12 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import cx from 'classnames';
 
-export const separatorStyles: CSSObject = {
-  width: '2px',
-  height: '24px',
-  backgroundColor: 'var(--gray-40)',
+interface FormatSeparatorProps {
+  isEditing: boolean;
+}
 
-  'body.theme-dark &': {
-    backgroundColor: 'var(--gray-80)',
-  },
+export const FormatSeparator = ({isEditing}: FormatSeparatorProps) => {
+  return <div className={cx('input-bar-control-separator', {'input-bar-control-separator--editing': isEditing})} />;
 };

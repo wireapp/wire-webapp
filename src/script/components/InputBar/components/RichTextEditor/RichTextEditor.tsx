@@ -135,6 +135,8 @@ export const RichTextEditor = ({
     });
   };
 
+  const isEditing = !!editedMessage;
+
   return (
     <LexicalComposer initialConfig={editorConfig}>
       <div className="controls-center input-bar-field">
@@ -191,7 +193,7 @@ export const RichTextEditor = ({
       </div>
       {showFormatToolbar && showMarkdownPreview && (
         <div className="input-bar-toolbar">
-          <FormatToolbar />
+          <FormatToolbar isEditing={isEditing} />
         </div>
       )}
       {children}

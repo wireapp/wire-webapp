@@ -36,7 +36,7 @@ import {
 import {t} from 'Util/LocalizerUtil';
 
 import {FormatButton} from './FormatButton/FormatButton';
-import {separatorStyles, wrapperStyles} from './FormatToolbar.styles';
+import {wrapperStyles} from './FormatToolbar.styles';
 import {LinkDialog} from './LinkDialog/LinkDialog';
 import {useBlockquoteState} from './useBlockquoteState/useBlockquoteState';
 import {useCodeBlockState} from './useCodeBlockState/useCodeBlockState';
@@ -45,7 +45,13 @@ import {useLinkState} from './useLinkState/useLinkState';
 import {useListState} from './useListState/useListState';
 import {useToolbarState} from './useToolbarState/useToolbarState';
 
-export const FormatToolbar = () => {
+import {FormatSeparator} from '../../../common/FormatSeparator/FormatSeparator';
+
+interface FormatToolbarProps {
+  isEditing: boolean;
+}
+
+export const FormatToolbar = ({isEditing}: FormatToolbarProps) => {
   const [editor] = useLexicalComposerContext();
 
   const {activeFormats} = useToolbarState();
@@ -71,59 +77,73 @@ export const FormatToolbar = () => {
         icon={HeadingIcon}
         active={activeFormats.includes('heading')}
         onClick={formatHeading}
+        isEditing={isEditing}
       />
       <FormatButton
         label={t('richTextBold')}
         icon={BoldIcon}
         active={activeFormats.includes('bold')}
         onClick={() => formatText('bold')}
+        isEditing={isEditing}
       />
       <FormatButton
         label={t('richTextItalic')}
         icon={ItalicIcon}
         active={activeFormats.includes('italic')}
         onClick={() => formatText('italic')}
+        isEditing={isEditing}
       />
       <FormatButton
         label={t('richTextStrikethrough')}
         icon={StrikethroughIcon}
         active={activeFormats.includes('strikethrough')}
         onClick={() => formatText('strikethrough')}
+        isEditing={isEditing}
       />
-      <div css={separatorStyles} />
+      <FormatSeparator isEditing={isEditing} />
       <FormatButton
         label={t('richTextOrderedList')}
         icon={NumberedListIcon}
         active={activeFormats.includes('orderedList')}
         onClick={() => formatList('ordered')}
+        isEditing={isEditing}
       />
       <FormatButton
         label={t('richTextUnorderedList')}
         icon={BulletListIcon}
         active={activeFormats.includes('unorderedList')}
         onClick={() => formatList('unordered')}
+        isEditing={isEditing}
       />
       <FormatButton
         label="Blockquote"
         icon={BlockquoteIcon}
         active={activeFormats.includes('blockquote')}
         onClick={formatBlockquote}
+        isEditing={isEditing}
       />
-      <div css={separatorStyles} />
-      <FormatButton label="link" icon={LinkIcon} active={activeFormats.includes('link')} onClick={formatLink} />
+      <FormatSeparator isEditing={isEditing} />
+      <FormatButton
+        label="link"
+        icon={LinkIcon}
+        active={activeFormats.includes('link')}
+        onClick={formatLink}
+        isEditing={isEditing}
+      />
       <FormatButton
         label="Code block"
         icon={CodeBlockIcon}
         active={activeFormats.includes('codeBlock')}
         onClick={formatCodeBlock}
+        isEditing={isEditing}
       />
       <FormatButton
         label={t('richTextCode')}
         icon={CodeInlineIcon}
         active={activeFormats.includes('code')}
         onClick={() => formatText('code')}
+        isEditing={isEditing}
       />
-
       <LinkDialog
         isOpen={isModalOpen}
         isEditing={!!linkNode}

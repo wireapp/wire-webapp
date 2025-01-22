@@ -34,3 +34,7 @@ export const separatorStyles: CSSObject = {
     backgroundColor: 'var(--gray-80)',
   },
 };
+
+export const separatorStylesEditing: CSSObject = {
+  backgroundColor: 'var(--accent-color-200)',
+};
