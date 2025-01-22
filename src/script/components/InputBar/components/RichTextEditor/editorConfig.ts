@@ -23,7 +23,6 @@ import {ListItemNode, ListNode} from '@lexical/list';
 import {InitialConfigType} from '@lexical/react/LexicalComposer';
 import {HorizontalRuleNode} from '@lexical/react/LexicalHorizontalRuleNode';
 import {HeadingNode, QuoteNode} from '@lexical/rich-text';
-import {createCommand} from 'lexical';
 
 import {getLogger} from 'Util/Logger';
 
@@ -32,9 +31,6 @@ import {MentionNode} from './nodes/MentionNode';
 import {theme} from './theme';
 
 const logger = getLogger('LexicalInput');
-
-export const EDIT_LINK_COMMAND = createCommand<void>();
-export const FORMAT_LINK_COMMAND = createCommand<void>();
 
 export const editorConfig: InitialConfigType = {
   namespace: 'WireLexicalEditor',

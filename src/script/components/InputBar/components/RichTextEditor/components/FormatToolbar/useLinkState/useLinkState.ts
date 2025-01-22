@@ -30,15 +30,17 @@ import {
   CLICK_COMMAND,
   TextNode,
   RangeSelection,
+  createCommand,
 } from 'lexical';
 
 import {createNewLink} from './createNewLink/createNewLink';
 import {useLinkEditing} from './useLinkEditing/useLinkEditing';
 import {useModalState} from './useModalState/useModalState';
 
-import {FORMAT_LINK_COMMAND} from '../../../editorConfig';
 import {getSelectedNode} from '../../../utils/getSelectedNode';
 import {sanitizeUrl} from '../../../utils/sanitizeUrl';
+
+export const FORMAT_LINK_COMMAND = createCommand<void>();
 
 interface SelectionPoint {
   key: string;
