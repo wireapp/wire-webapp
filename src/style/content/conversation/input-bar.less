@@ -416,35 +416,30 @@
   --input-bar-avatar-spacing: 20px;
 
   display: grid;
-  padding-bottom: 8px;
+  padding-bottom: 0;
   padding-left: var(--input-bar-avatar-spacing);
-  grid-template-areas:
-    'avatar input input'
-    'buttons buttons buttons';
+  grid-template-areas: 'avatar input buttons';
   grid-template-columns: calc(var(--input-bar-avatar-size) + var(--input-bar-avatar-spacing)) 1fr min-content;
 
   @media (min-width: 900px) {
-    grid-template-areas:
-      'avatar input input'
-      'avatar buttons buttons';
+    grid-template-areas: 'avatar input buttons';
   }
 
   &--with-toolbar {
     padding-top: 8px;
-    padding-bottom: 8px;
+    padding-bottom: 0;
     grid-template-areas:
       'toolbar toolbar toolbar'
       'avatar input input'
       'buttons buttons buttons';
-    grid-template-columns: calc(var(--input-bar-avatar-size) + var(--input-bar-avatar-spacing)) 1fr 1fr;
+    grid-template-columns: calc(var(--input-bar-avatar-size) + var(--input-bar-avatar-spacing)) 1fr min-content;
     grid-template-rows: auto auto;
     row-gap: 0;
 
     @media (min-width: 900px) {
       grid-template-areas:
         'avatar toolbar toolbar'
-        'avatar input input'
-        'avatar buttons buttons';
+        'avatar input buttons';
     }
   }
 }
@@ -453,6 +448,7 @@
   display: flex;
   align-items: flex-start;
   justify-content: center;
+  padding-right: 8px;
   gap: var(--input-bar-avatar-spacing);
   grid-area: input;
 }
@@ -479,9 +475,9 @@
   width: 100%;
   height: 40px;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   margin-top: auto;
-  margin-bottom: 0px;
+  margin-bottom: 8px;
   grid-area: buttons;
 
   &__send {
