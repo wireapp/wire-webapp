@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2024 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,17 +19,14 @@
 
 import {ElementNode, TextNode} from 'lexical';
 
-export const isNodeList = (node: TextNode | ElementNode | null, listType: 'ordered' | 'unordered'): boolean => {
+export const isBlockquoteNode = (node: TextNode | ElementNode | null): boolean => {
   if (!node) {
     return false;
   }
 
-  const tag = listType === 'ordered' ? 'ol' : 'ul';
-
-  // @ts-expect-error: `getTag` is not specified in the type definition, but it exists
-  if (node.getType() === 'list' && node.getTag() === tag) {
+  if (node.getType() === 'quote') {
     return true;
   }
 
-  return isNodeList(node.getParent(), listType);
+  return isBlockquoteNode(node.getParent());
 };

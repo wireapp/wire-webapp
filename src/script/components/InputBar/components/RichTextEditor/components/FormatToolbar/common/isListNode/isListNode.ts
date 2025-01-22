@@ -19,14 +19,17 @@
 
 import {ElementNode, TextNode} from 'lexical';
 
-export const isNodeCodeBlock = (node: TextNode | ElementNode | null): boolean => {
+export const isListNode = (node: TextNode | ElementNode | null, listType: 'ordered' | 'unordered'): boolean => {
   if (!node) {
     return false;
   }
 
-  if (node.getType() === 'code') {
+  const tag = listType === 'ordered' ? 'ol' : 'ul';
+
+  // @ts-expect-error: `getTag` is not specified in the type definition, but it exists
+  if (node.getType() === 'list' && node.getTag() === tag) {
     return true;
   }
 
-  return isNodeCodeBlock(node.getParent());
+  return isListNode(node.getParent(), listType);
 };

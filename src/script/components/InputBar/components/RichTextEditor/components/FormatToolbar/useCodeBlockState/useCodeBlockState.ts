@@ -22,7 +22,7 @@ import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {$setBlocksType} from '@lexical/selection';
 import {$getSelection, $isRangeSelection, $createParagraphNode} from 'lexical';
 
-import {isNodeCodeBlock} from '../common/isNodeCodeBlock/isNodeCodeBlock';
+import {isCodeBlockNode} from '../common/isCodeBlockNode/isCodeBlockNode';
 
 export const useCodeBlockState = () => {
   const [editor] = useLexicalComposerContext();
@@ -36,7 +36,7 @@ export const useCodeBlockState = () => {
       }
 
       const anchorNode = selection.anchor.getNode();
-      const isCodeBlock = isNodeCodeBlock(anchorNode);
+      const isCodeBlock = isCodeBlockNode(anchorNode);
 
       if (isCodeBlock) {
         $setBlocksType(selection, () => $createParagraphNode());

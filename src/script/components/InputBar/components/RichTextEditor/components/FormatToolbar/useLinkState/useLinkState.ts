@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useState, useEffect} from 'react';
+import {useCallback, useEffect} from 'react';
 
 import {$createLinkNode, $isLinkNode, LinkNode} from '@lexical/link';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
@@ -32,19 +32,13 @@ import {
   RangeSelection,
 } from 'lexical';
 
+import {createNewLink} from './createNewLink/createNewLink';
+import {useLinkEditing} from './useLinkEditing/useLinkEditing';
+import {useModalState} from './useModalState/useModalState';
+
 import {FORMAT_LINK_COMMAND} from '../../../editorConfig';
 import {getSelectedNode} from '../../../utils/getSelectedNode';
 import {sanitizeUrl} from '../../../utils/sanitizeUrl';
-
-interface Link {
-  text: string;
-  url: string;
-  node: LinkNode | null;
-  selection: {
-    anchor: {key: string; offset: number};
-    focus: {key: string; offset: number};
-  } | null;
-}
 
 interface SelectionPoint {
   key: string;
@@ -56,57 +50,48 @@ interface SavedSelection {
   focus: SelectionPoint;
 }
 
-interface CreateLinkParams {
-  selection: RangeSelection;
-  url: string;
-  text?: string;
-}
-
 export const useLinkState = () => {
   const [editor] = useLexicalComposerContext();
   const {isOpen, open, close} = useModalState();
   const {editingLink, setEditingLink, resetLinkState} = useLinkEditing();
 
-  const formatLink = useCallback(
-    (isClickEvent = false) => {
-      if (!editor.isEditable()) {
+  const formatLink = useCallback(() => {
+    if (!editor.isEditable()) {
+      return;
+    }
+
+    editor.getEditorState().read(() => {
+      const selection = $getSelection();
+      if (!$isRangeSelection(selection)) {
         return;
       }
 
-      editor.getEditorState().read(() => {
-        const selection = $getSelection();
-        if (!$isRangeSelection(selection)) {
-          return;
-        }
+      const node = getSelectedNode(selection);
+      const existingLink = $findMatchingParent(node, $isLinkNode);
 
-        const node = getSelectedNode(selection);
-        const existingLink = $findMatchingParent(node, $isLinkNode);
-
-        if (!existingLink) {
-          setEditingLink({
-            text: selection.getTextContent(),
-            url: '',
-            node: null,
-            selection: {
-              anchor: {key: selection.anchor.key, offset: selection.anchor.offset},
-              focus: {key: selection.focus.key, offset: selection.focus.offset},
-            },
-          });
-          open();
-          return;
-        }
-
+      if (!existingLink) {
         setEditingLink({
-          node: existingLink,
-          url: existingLink.getURL(),
-          text: existingLink.getTextContent(),
-          selection: null,
+          text: selection.getTextContent(),
+          url: '',
+          node: null,
+          selection: {
+            anchor: {key: selection.anchor.key, offset: selection.anchor.offset},
+            focus: {key: selection.focus.key, offset: selection.focus.offset},
+          },
         });
         open();
+        return;
+      }
+
+      setEditingLink({
+        node: existingLink,
+        url: existingLink.getURL(),
+        text: existingLink.getTextContent(),
+        selection: null,
       });
-    },
-    [editor, setEditingLink, open],
-  );
+      open();
+    });
+  }, [editor, setEditingLink, open]);
 
   const restoreSelection = useCallback((selection: RangeSelection, savedSelection: SavedSelection) => {
     selection.anchor.key = savedSelection.anchor.key;
@@ -226,7 +211,7 @@ export const useLinkState = () => {
     return editor.registerCommand(
       FORMAT_LINK_COMMAND,
       () => {
-        formatLink(true);
+        formatLink();
         return true;
       },
       COMMAND_PRIORITY_LOW,
@@ -246,45 +231,4 @@ export const useLinkState = () => {
     linkUrl: editingLink.url,
     linkNode: editingLink.node,
   };
-};
-
-const useLinkEditing = () => {
-  const [editingLink, setEditingLink] = useState<Link>({
-    text: '',
-    url: '',
-    node: null,
-    selection: null,
-  });
-
-  const resetLinkState = useCallback((closeModal: () => void) => {
-    setEditingLink({
-      text: '',
-      url: '',
-      node: null,
-      selection: null,
-    });
-    closeModal();
-  }, []);
-
-  return {
-    editingLink,
-    setEditingLink,
-    resetLinkState,
-  };
-};
-
-const createNewLink = ({selection, url, text}: CreateLinkParams) => {
-  const textContent = text || selection.getTextContent() || url;
-  const textNode = $createTextNode(textContent);
-  const linkNode = $createLinkNode(sanitizeUrl(url));
-  linkNode.append(textNode);
-  selection.insertNodes([linkNode]);
-};
-
-const useModalState = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const open = useCallback(() => setIsOpen(true), []);
-  const close = useCallback(() => setIsOpen(false), []);
-
-  return {isOpen, open, close};
 };

@@ -17,16 +17,41 @@
  *
  */
 
-import {ElementNode, TextNode} from 'lexical';
+import {useCallback, useState} from 'react';
 
-export const isNodeBlockquote = (node: TextNode | ElementNode | null): boolean => {
-  if (!node) {
-    return false;
-  }
+import {LinkNode} from '@lexical/link';
 
-  if (node.getType() === 'quote') {
-    return true;
-  }
+interface Link {
+  text: string;
+  url: string;
+  node: LinkNode | null;
+  selection: {
+    anchor: {key: string; offset: number};
+    focus: {key: string; offset: number};
+  } | null;
+}
 
-  return isNodeBlockquote(node.getParent());
+export const useLinkEditing = () => {
+  const [editingLink, setEditingLink] = useState<Link>({
+    text: '',
+    url: '',
+    node: null,
+    selection: null,
+  });
+
+  const resetLinkState = useCallback((closeModal: () => void) => {
+    setEditingLink({
+      text: '',
+      url: '',
+      node: null,
+      selection: null,
+    });
+    closeModal();
+  }, []);
+
+  return {
+    editingLink,
+    setEditingLink,
+    resetLinkState,
+  };
 };

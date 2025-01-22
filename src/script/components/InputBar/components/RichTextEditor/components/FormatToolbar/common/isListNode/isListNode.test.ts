@@ -19,7 +19,7 @@
 
 import {ElementNode, TextNode} from 'lexical';
 
-import {isNodeList} from './isNodeList';
+import {isListNode} from './isListNode';
 
 const createMockElementNode = (type: string, tag: string, parent: ElementNode | null = null): ElementNode => {
   return {
@@ -37,59 +37,59 @@ const createMockTextNode = (parent: ElementNode | null = null): TextNode => {
   } as unknown as TextNode;
 };
 
-describe('isNodeList', () => {
+describe('isListNode', () => {
   it('returns false when node is null', () => {
-    expect(isNodeList(null, 'ordered')).toBe(false);
+    expect(isListNode(null, 'ordered')).toBe(false);
   });
 
   it('returns false for a non-list node', () => {
     const textNode = createMockTextNode();
 
-    expect(isNodeList(textNode, 'ordered')).toBe(false);
+    expect(isListNode(textNode, 'ordered')).toBe(false);
   });
 
   it('returns true for an ordered list node', () => {
     const orderedListNode = createMockElementNode('list', 'ol');
 
-    expect(isNodeList(orderedListNode, 'ordered')).toBe(true);
+    expect(isListNode(orderedListNode, 'ordered')).toBe(true);
   });
 
   it('returns false for an unordered list node when looking for ordered', () => {
     const unorderedListNode = createMockElementNode('list', 'ul');
 
-    expect(isNodeList(unorderedListNode, 'ordered')).toBe(false);
+    expect(isListNode(unorderedListNode, 'ordered')).toBe(false);
   });
 
   it('returns true for an unordered list node', () => {
     const unorderedListNode = createMockElementNode('list', 'ul');
 
-    expect(isNodeList(unorderedListNode, 'unordered')).toBe(true);
+    expect(isListNode(unorderedListNode, 'unordered')).toBe(true);
   });
 
   it('returns false for an ordered list node when looking for unordered', () => {
     const orderedListNode = createMockElementNode('list', 'ol');
 
-    expect(isNodeList(orderedListNode, 'unordered')).toBe(false);
+    expect(isListNode(orderedListNode, 'unordered')).toBe(false);
   });
 
   it('returns true when a parent node is an ordered list', () => {
     const parentOrderedListNode = createMockElementNode('list', 'ol');
     const childNode = createMockTextNode(parentOrderedListNode);
 
-    expect(isNodeList(childNode, 'ordered')).toBe(true);
+    expect(isListNode(childNode, 'ordered')).toBe(true);
   });
 
   it('returns true when a parent node is an unordered list', () => {
     const parentUnorderedListNode = createMockElementNode('list', 'ul');
     const childNode = createMockTextNode(parentUnorderedListNode);
 
-    expect(isNodeList(childNode, 'unordered')).toBe(true);
+    expect(isListNode(childNode, 'unordered')).toBe(true);
   });
 
   it('returns false when no parent node matches the list type', () => {
     const childNode = createMockTextNode();
 
-    expect(isNodeList(childNode, 'ordered')).toBe(false);
+    expect(isListNode(childNode, 'ordered')).toBe(false);
   });
 
   it('handles deeply nested parent list nodes', () => {
@@ -97,6 +97,6 @@ describe('isNodeList', () => {
     const parentUnorderedListNode = createMockElementNode('list', 'ul', grandparentOrderedListNode);
     const childNode = createMockTextNode(parentUnorderedListNode);
 
-    expect(isNodeList(childNode, 'ordered')).toBe(true);
+    expect(isListNode(childNode, 'ordered')).toBe(true);
   });
 });

@@ -19,7 +19,7 @@
 
 import {ElementNode, TextNode} from 'lexical';
 
-import {isNodeCodeBlock} from './isNodeCodeBlock';
+import {isBlockquoteNode} from './isBlockquoteNode';
 
 const createMockElementNode = (type: string, parent: ElementNode | null = null): ElementNode => {
   return {
@@ -35,37 +35,37 @@ const createMockTextNode = (parent: ElementNode | null = null): TextNode => {
   } as unknown as TextNode;
 };
 
-describe('isNodeCodeBlock', () => {
+describe('isBlockquoteNode', () => {
   it('returns false when node is null', () => {
-    expect(isNodeCodeBlock(null)).toBe(false);
+    expect(isBlockquoteNode(null)).toBe(false);
   });
 
-  it('returns false for a non-code node', () => {
+  it('returns false for a non-blockquote node', () => {
     const textNode = createMockTextNode();
-    expect(isNodeCodeBlock(textNode)).toBe(false);
+    expect(isBlockquoteNode(textNode)).toBe(false);
   });
 
-  it('returns true for a code node', () => {
-    const codeNode = createMockElementNode('code');
-    expect(isNodeCodeBlock(codeNode)).toBe(true);
+  it('returns true for a blockquote node', () => {
+    const blockquoteNode = createMockElementNode('quote');
+    expect(isBlockquoteNode(blockquoteNode)).toBe(true);
   });
 
-  it('returns true when a parent node is a code block', () => {
-    const parentCodeNode = createMockElementNode('code');
-    const childNode = createMockTextNode(parentCodeNode);
-    expect(isNodeCodeBlock(childNode)).toBe(true);
+  it('returns true when a parent node is a blockquote', () => {
+    const parentBlockquoteNode = createMockElementNode('quote');
+    const childNode = createMockTextNode(parentBlockquoteNode);
+    expect(isBlockquoteNode(childNode)).toBe(true);
   });
 
-  it('returns false when no code block is in the ancestor chain', () => {
-    const nonCodeParent = createMockElementNode('paragraph');
-    const childNode = createMockTextNode(nonCodeParent);
-    expect(isNodeCodeBlock(childNode)).toBe(false);
+  it('returns false when no blockquote is in the ancestor chain', () => {
+    const nonBlockquoteParent = createMockElementNode('paragraph');
+    const childNode = createMockTextNode(nonBlockquoteParent);
+    expect(isBlockquoteNode(childNode)).toBe(false);
   });
 
-  it('handles deeply nested parent code block nodes', () => {
-    const grandparentCodeNode = createMockElementNode('code');
-    const parentNode = createMockElementNode('paragraph', grandparentCodeNode);
+  it('handles deeply nested parent blockquote nodes', () => {
+    const grandparentBlockquoteNode = createMockElementNode('quote');
+    const parentNode = createMockElementNode('paragraph', grandparentBlockquoteNode);
     const childNode = createMockTextNode(parentNode);
-    expect(isNodeCodeBlock(childNode)).toBe(true);
+    expect(isBlockquoteNode(childNode)).toBe(true);
   });
 });

@@ -26,7 +26,7 @@ import {$getSelection, createCommand, $isRangeSelection, $createParagraphNode} f
 
 import {headingCommand} from './headingCommand';
 
-import {isNodeHeading} from '../common/isNodeHeading/isNodeHeading';
+import {isHeadingNode} from '../common/isHeadingNode/isHeadingNode';
 
 const INSERT_HEADING_COMMAND = createCommand();
 
@@ -46,7 +46,7 @@ export const useHeadingState = () => {
       }
 
       const anchorNode = selection.anchor.getNode();
-      const isHeading = isNodeHeading(anchorNode);
+      const isHeading = isHeadingNode(anchorNode);
 
       if (isHeading) {
         $setBlocksType(selection, () => $createParagraphNode());

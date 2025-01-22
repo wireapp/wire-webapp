@@ -21,7 +21,7 @@ import {ElementNode, TextNode} from 'lexical';
 
 type HeadingTag = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
 
-export const isNodeHeading = (node: TextNode | ElementNode | null, headingTag: HeadingTag = 'h1'): boolean => {
+export const isHeadingNode = (node: TextNode | ElementNode | null, headingTag: HeadingTag = 'h1'): boolean => {
   if (!node) {
     return false;
   }
@@ -31,5 +31,5 @@ export const isNodeHeading = (node: TextNode | ElementNode | null, headingTag: H
     return true;
   }
 
-  return isNodeHeading(node.getParent(), headingTag);
+  return isHeadingNode(node.getParent(), headingTag);
 };
