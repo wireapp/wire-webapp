@@ -80,6 +80,9 @@ export const LinkDialog = ({
   useEffect(() => {
     if (isOpen) {
       resetForm();
+      // The setTimeout is needed here to ensure the input is mounted and visible in the DOM
+      // This is necessary because the modal's animation needs to complete first.
+      // The timeout does the trick.
       setTimeout(() => textInputRef.current?.focus());
     }
   }, [isOpen, initialUrl, initialText, resetForm]);
@@ -135,7 +138,6 @@ export const LinkDialog = ({
       <form css={formStyles} onSubmit={handleSubmit} noValidate>
         <Input
           ref={textInputRef}
-          id="link-text"
           type="text"
           label={t('richTextLinkDialogTextLabel')}
           value={formData.text}
@@ -144,7 +146,6 @@ export const LinkDialog = ({
           error={!!isSubmitted && !!errors.text ? <ErrorMessage>{errors.text}</ErrorMessage> : undefined}
         />
         <Input
-          id="link-url"
           type="text"
           label={t('richTextLinkDialogLinkLabel')}
           value={formData.url}
@@ -166,23 +167,21 @@ export const LinkDialog = ({
 };
 
 const isFieldValid = (field: keyof FormData, value: string): boolean => {
-  switch (field) {
-    case 'url':
-      return validateUrl(value);
-    case 'text':
-      return value.length > 0;
-    default:
-      return true;
+  if (field === 'url') {
+    return validateUrl(value);
   }
+  if (field === 'text') {
+    return value.length > 0;
+  }
+  return true;
 };
 
 const getFieldError = (field: keyof FormData): string => {
-  switch (field) {
-    case 'url':
-      return t('richTextLinkDialogLinkError');
-    case 'text':
-      return t('richTextLinkDialogTextError');
-    default:
-      return '';
+  if (field === 'url') {
+    return t('richTextLinkDialogLinkError');
   }
+  if (field === 'text') {
+    return t('richTextLinkDialogTextError');
+  }
+  return '';
 };
