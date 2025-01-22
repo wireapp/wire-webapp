@@ -73,28 +73,28 @@ export const FormatToolbar = ({isEditing}: FormatToolbarProps) => {
   return (
     <div css={wrapperStyles}>
       <FormatButton
-        label={t('richTextHeading')}
+        label={t('richTextFormatHeading')}
         icon={HeadingIcon}
         active={activeFormats.includes('heading')}
         onClick={formatHeading}
         isEditing={isEditing}
       />
       <FormatButton
-        label={t('richTextBold')}
+        label={t('richTextFormatBold')}
         icon={BoldIcon}
         active={activeFormats.includes('bold')}
         onClick={() => formatText('bold')}
         isEditing={isEditing}
       />
       <FormatButton
-        label={t('richTextItalic')}
+        label={t('richTextFormatItalic')}
         icon={ItalicIcon}
         active={activeFormats.includes('italic')}
         onClick={() => formatText('italic')}
         isEditing={isEditing}
       />
       <FormatButton
-        label={t('richTextStrikethrough')}
+        label={t('richTextFormatStrikethrough')}
         icon={StrikethroughIcon}
         active={activeFormats.includes('strikethrough')}
         onClick={() => formatText('strikethrough')}
@@ -102,21 +102,21 @@ export const FormatToolbar = ({isEditing}: FormatToolbarProps) => {
       />
       <FormatSeparator isEditing={isEditing} />
       <FormatButton
-        label={t('richTextOrderedList')}
+        label={t('richTextFormatOrderedList')}
         icon={NumberedListIcon}
         active={activeFormats.includes('orderedList')}
         onClick={() => formatList('ordered')}
         isEditing={isEditing}
       />
       <FormatButton
-        label={t('richTextUnorderedList')}
+        label={t('richTextFormatUnorderedList')}
         icon={BulletListIcon}
         active={activeFormats.includes('unorderedList')}
         onClick={() => formatList('unordered')}
         isEditing={isEditing}
       />
       <FormatButton
-        label="Blockquote"
+        label={t('richTextFormatBlockquote')}
         icon={BlockquoteIcon}
         active={activeFormats.includes('blockquote')}
         onClick={formatBlockquote}
@@ -124,21 +124,21 @@ export const FormatToolbar = ({isEditing}: FormatToolbarProps) => {
       />
       <FormatSeparator isEditing={isEditing} />
       <FormatButton
-        label="link"
+        label={t('richTextFormatLink')}
         icon={LinkIcon}
         active={activeFormats.includes('link')}
         onClick={formatLink}
         isEditing={isEditing}
       />
       <FormatButton
-        label="Code block"
+        label={t('richTextFormatCodeBlock')}
         icon={CodeBlockIcon}
         active={activeFormats.includes('codeBlock')}
         onClick={formatCodeBlock}
         isEditing={isEditing}
       />
       <FormatButton
-        label={t('richTextCode')}
+        label={t('richTextFormatCodeInline')}
         icon={CodeInlineIcon}
         active={activeFormats.includes('code')}
         onClick={() => formatText('code')}

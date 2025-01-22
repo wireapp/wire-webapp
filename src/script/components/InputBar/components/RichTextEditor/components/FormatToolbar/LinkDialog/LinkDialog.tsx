@@ -17,21 +17,24 @@
  *
  */
 
-import {ChangeEvent, useCallback, useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useRef, useState, FormEvent} from 'react';
 
-import {Input, ErrorMessage} from '@wireapp/react-ui-kit';
+import {Input, ErrorMessage, Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
+import {t} from 'Util/LocalizerUtil';
 
 import {
   buttonGroupStyles,
+  buttonStyles,
   closeButtonStyles,
   formStyles,
   headerStyles,
-  inputWrapperStyles,
   titleStyles,
 } from './LinkDialog.styles';
+
+import {validateUrl} from '../../../utils/url';
 
 interface LinkDialogProps {
   isOpen: boolean;
@@ -66,7 +69,7 @@ export const LinkDialog = ({
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const urlInputRef = useRef<HTMLInputElement>(null);
+  const textInputRef = useRef<HTMLInputElement>(null);
 
   const resetForm = useCallback(() => {
     setFormData({url: initialUrl, text: initialText});
@@ -77,42 +80,39 @@ export const LinkDialog = ({
   useEffect(() => {
     if (isOpen) {
       resetForm();
-      setTimeout(() => urlInputRef.current?.focus(), 100);
+      setTimeout(() => textInputRef.current?.focus());
     }
   }, [isOpen, initialUrl, initialText, resetForm]);
 
-  const validateForm = (): boolean => {
-    const newErrors: FormErrors = {};
-    const {url, text} = formData;
-
-    if (!url) {
-      newErrors.url = 'URL is required';
-    } else if (!/^https?:\/\//i.test(url)) {
-      newErrors.url = 'URL must start with http:// or https://';
-    }
-
-    if (!text) {
-      newErrors.text = 'Text is required';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleInputChange = (field: keyof FormData) => (event: ChangeEvent<HTMLInputElement>) => {
-    const {value} = event.target;
+  const handleInputChange = ({event, field}: {event: FormEvent<HTMLInputElement>; field: keyof FormData}) => {
+    const {value} = event.target as HTMLInputElement;
     setFormData(prev => ({...prev, [field]: value}));
 
     if (isSubmitted) {
-      validateForm();
+      setErrors(prev => ({
+        ...prev,
+        [field]: !isFieldValid(field, value) ? getFieldError(field) : undefined,
+      }));
     }
+  };
+
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {
+      url: !isFieldValid('url', formData.url) ? getFieldError('url') : undefined,
+      text: !isFieldValid('text', formData.text) ? getFieldError('text') : undefined,
+    };
+
+    setErrors(newErrors);
+    return !Object.values(newErrors).some(Boolean);
   };
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     setIsSubmitted(true);
 
-    if (validateForm()) {
+    const isValid = validateForm();
+
+    if (isValid) {
       onSubmit(formData.url, formData.text);
     }
   };
@@ -120,46 +120,68 @@ export const LinkDialog = ({
   return (
     <ModalComponent isShown={isOpen} onBgClick={onClose}>
       <div css={headerStyles}>
-        <h2 css={titleStyles}>{isEditing ? 'Edit Link' : 'Add Link'}</h2>
-        <button type="button" css={closeButtonStyles} onClick={onClose} aria-label="Close" data-uie-name="do-close">
-          <Icon.CloseIcon className="modal__header__icon" aria-hidden="true" />
+        <h2 css={titleStyles}>{isEditing ? t('richTextLinkDialogEditTitle') : t('richTextLinkDialogNewTitle')}</h2>
+        <button
+          type="button"
+          css={closeButtonStyles}
+          onClick={onClose}
+          aria-label={t('modalCloseButton')}
+          data-uie-name="do-close"
+        >
+          <Icon.CloseIcon aria-hidden="true" />
         </button>
       </div>
       <form css={formStyles} onSubmit={handleSubmit}>
-        <div css={inputWrapperStyles}>
-          <Input
-            id="link-text"
-            type="text"
-            label="Text"
-            value={formData.text}
-            placeholder="Text"
-            markInvalid={isSubmitted && !!errors.text}
-            onChange={handleInputChange('text')}
-          />
-          {isSubmitted && errors.text && <ErrorMessage>{errors.text}</ErrorMessage>}
-        </div>
-
-        <div css={inputWrapperStyles}>
-          <Input
-            id="link-url"
-            type="text"
-            label="URL"
-            value={formData.url}
-            placeholder="Enter URL"
-            markInvalid={isSubmitted && !!errors.url}
-            onChange={handleInputChange('url')}
-          />
-          {isSubmitted && errors.url && <ErrorMessage>{errors.url}</ErrorMessage>}
-        </div>
+        <Input
+          ref={textInputRef}
+          id="link-text"
+          type="text"
+          label={t('richTextLinkDialogTextLabel')}
+          value={formData.text}
+          markInvalid={isSubmitted && !!errors.text}
+          onChange={event => handleInputChange({event, field: 'text'})}
+          error={!!isSubmitted && !!errors.text ? <ErrorMessage>{errors.text}</ErrorMessage> : undefined}
+        />
+        <Input
+          id="link-url"
+          type="text"
+          label={t('richTextLinkDialogLinkLabel')}
+          value={formData.url}
+          markInvalid={isSubmitted && !!errors.url}
+          onChange={event => handleInputChange({event, field: 'url'})}
+          error={!!isSubmitted && !!errors.url ? <ErrorMessage>{errors.url}</ErrorMessage> : undefined}
+        />
         <div css={buttonGroupStyles}>
-          <button type="button" className="modal__button modal__button--secondary" onClick={onClose}>
-            Cancel
-          </button>
-          <button type="submit" className="modal__button modal__button--primary">
-            {isEditing ? 'Update Link' : 'Add Link'}
-          </button>
+          <Button onClick={onClose} variant={ButtonVariant.SECONDARY} css={buttonStyles}>
+            {t('richTextLinkDialogCancelButton')}
+          </Button>
+          <Button type="submit" variant={ButtonVariant.PRIMARY} css={buttonStyles}>
+            {isEditing ? t('richTextLinkDialogEditButton') : t('richTextLinkDialogNewButton')}
+          </Button>
         </div>
       </form>
     </ModalComponent>
   );
+};
+
+const isFieldValid = (field: keyof FormData, value: string): boolean => {
+  switch (field) {
+    case 'url':
+      return validateUrl(value);
+    case 'text':
+      return value.length > 0;
+    default:
+      return true;
+  }
+};
+
+const getFieldError = (field: keyof FormData): string => {
+  switch (field) {
+    case 'url':
+      return t('richTextLinkDialogLinkError');
+    case 'text':
+      return t('richTextLinkDialogTextError');
+    default:
+      return '';
+  }
 };

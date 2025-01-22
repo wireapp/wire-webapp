@@ -26,8 +26,6 @@ export const headerStyles: CSSObject = {
   alignItems: 'center',
   columnGap: '4px',
   padding: '16px 16px 0 16px',
-  marginBottom: '20px',
-
   backgroundColor: 'var(--modal-bg)',
   color: 'var(--main-color)',
   fill: 'var(--main-color)',
@@ -65,13 +63,13 @@ export const formStyles: CSSObject = {
   padding: '24px',
 };
 
-export const inputWrapperStyles: CSSObject = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '8px',
-};
-
 export const buttonGroupStyles: CSSObject = {
   display: 'flex',
+  alignItems: 'center',
   justifyContent: 'flex-end',
+  gap: '16px',
+};
+
+export const buttonStyles: CSSObject = {
+  width: '100%',
 };
