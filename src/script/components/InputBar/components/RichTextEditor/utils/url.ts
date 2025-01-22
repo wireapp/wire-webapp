@@ -26,10 +26,10 @@ export const sanitizeUrl = (url: string): string => {
   try {
     const parsedUrl = new URL(url);
     if (!SUPPORTED_URL_PROTOCOLS.has(parsedUrl.protocol)) {
-      return 'about:blank';
+      return '';
     }
   } catch {
-    return url;
+    return url.startsWith('http') ? url : `https://${url}`;
   }
   return url;
 };
