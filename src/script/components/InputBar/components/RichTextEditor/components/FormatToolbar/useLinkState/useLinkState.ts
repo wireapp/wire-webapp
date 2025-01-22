@@ -38,7 +38,7 @@ import {getSelectedNode} from './getSelectedNode/getSelectedNode';
 import {useLinkEditing} from './useLinkEditing/useLinkEditing';
 import {useModalState} from './useModalState/useModalState';
 
-import {sanitizeUrl} from '../../../utils/sanitizeUrl';
+import {sanitizeUrl} from '../../../utils/url';
 
 export const FORMAT_LINK_COMMAND = createCommand<void>();
 
@@ -113,26 +113,23 @@ export const useLinkState = () => {
         const sanitizedUrl = sanitizeUrl(url);
 
         if (editingLink.node && $isLinkNode(editingLink.node)) {
-          const nodeStillExists = editingLink.node.isAttached();
-
-          if (nodeStillExists) {
-            // Create a new link node with the updated properties
-            const newLinkNode = $createLinkNode(sanitizedUrl);
-            const newTextNode = $createTextNode(text || editingLink.node.getTextContent());
-            newLinkNode.append(newTextNode);
-
-            // Replace the old link node with the new one
-            editingLink.node.replace(newLinkNode);
-
-            // Update selection
-            const selection = $getSelection();
-            if ($isRangeSelection(selection)) {
-              selection.setTextNodeRange(newTextNode, 0, newTextNode, newTextNode.getTextContent().length);
-            }
-
-            resetLinkState(close);
+          if (!editingLink.node.isAttached()) {
+            // Node no longer exists in the editor
             return;
           }
+
+          const newLinkNode = $createLinkNode(sanitizedUrl);
+          const newTextNode = $createTextNode(text || editingLink.node.getTextContent());
+          newLinkNode.append(newTextNode);
+          editingLink.node.replace(newLinkNode);
+
+          const selection = $getSelection();
+          if ($isRangeSelection(selection)) {
+            selection.setTextNodeRange(newTextNode, 0, newTextNode, newTextNode.getTextContent().length);
+          }
+
+          resetLinkState(close);
+          return;
         }
 
         const selection = $getSelection();
