@@ -72,4 +72,5 @@ export const buttonGroupStyles: CSSObject = {
 
 export const buttonStyles: CSSObject = {
   width: '100%',
+  marginBottom: '0',
 };
