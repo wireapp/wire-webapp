@@ -77,22 +77,22 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
       <>
         {showFormatButton && (
           <li>
-            <FormatTextButton isActive={isFormatActive} isEditing={true} onClick={onFormatClick} />
+            <FormatTextButton isActive={isFormatActive} isEditing onClick={onFormatClick} />
           </li>
         )}
 
         {showEmojiButton && (
           <li>
-            <EmojiButton isActive={isEmojiActive} isEditing={true} onClick={onEmojiClick} />
+            <EmojiButton isActive={isEmojiActive} isEditing onClick={onEmojiClick} />
           </li>
         )}
         {(showFormatButton || showEmojiButton) && (
           <li aria-hidden="true">
-            <FormatSeparator isEditing={true} />
+            <FormatSeparator isEditing />
           </li>
         )}
         <li>
-          <CancelEditButton isEditing={true} onClick={onCancelEditing} />
+          <CancelEditButton isEditing onClick={onCancelEditing} />
         </li>
       </>
     );
