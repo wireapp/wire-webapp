@@ -38,15 +38,16 @@ import {ElementNode, RangeSelection, TextNode} from 'lexical';
  * @returns The node that should be checked for link context
  */
 export const getSelectedNode = (selection: RangeSelection): TextNode | ElementNode => {
-  const anchor = selection.anchor;
-  const focus = selection.focus;
-  const anchorNode = selection.anchor.getNode();
-  const focusNode = selection.focus.getNode();
+  const {anchor, focus, isBackward} = selection;
+
+  const anchorNode = anchor.getNode();
+  const focusNode = focus.getNode();
+
   if (anchorNode === focusNode) {
     return anchorNode;
   }
-  const isBackward = selection.isBackward();
-  if (isBackward) {
+
+  if (isBackward()) {
     return $isAtNodeEnd(focus) ? anchorNode : focusNode;
   }
   return $isAtNodeEnd(anchor) ? focusNode : anchorNode;
