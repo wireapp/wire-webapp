@@ -22,6 +22,7 @@ import {useEffect, useState} from 'react';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {LoadingBar} from 'Components/LoadingBar';
+import {t} from 'Util/LocalizerUtil';
 
 import {uploadingProgressText} from './UploadAssetItem.styles';
 
@@ -44,13 +45,21 @@ export const UploadAssetItem = ({assetRepository, message}: Props) => {
     };
   }, [assetRepository, message]);
 
+  const cancelUpload = async () => {
+    assetRepository.cancelUpload(message.messageId);
+  };
+
   return (
     <div data-uie-name="upload-asset-item" data-uie-value={message.messageId}>
       <span css={uploadingProgressText}>
-        Uploading {message.asset?.original?.name || ''} - {Math.trunc(uploadProgress)}%
+        {t('conversationAssetUploading')} {message.asset?.original?.name || ''} - {Math.trunc(uploadProgress)}%
       </span>
 
       <LoadingBar className="uploading-asset" progress={uploadProgress} centerText={false} />
+
+      <button className="uploading-asset button-reset-default accent-text" onClick={cancelUpload}>
+        {t('conversationAssetUploadCancel')}
+      </button>
     </div>
   );
 };

@@ -663,9 +663,7 @@ export class MessageRepository {
       public: true,
       retention,
     };
-    const asset = await this.assetRepository.uploadFile(file, messageId, options, () =>
-      this.cancelAssetUpload(conversation, messageId),
-    );
+    const asset = await this.assetRepository.uploadFile(file, messageId, options);
 
     const metadata = asImage ? ((await buildMetadata(file)) as ImageMetadata) : undefined;
     const commonMessageData = {
@@ -1246,14 +1244,6 @@ export class MessageRepository {
       this.createRecipients(users),
       this.onClientMismatch,
     );
-  };
-
-  /**
-   * Cancel asset upload.
-   * @param messageId Id of the message which upload has been cancelled
-   */
-  private readonly cancelAssetUpload = (conversation: Conversation, messageId: string) => {
-    this.sendAssetUploadFailed(conversation, messageId, Asset.NotUploaded.CANCELLED);
   };
 
   /**
