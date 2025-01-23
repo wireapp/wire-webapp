@@ -57,7 +57,11 @@ export const UploadAssetItem = ({assetRepository, message}: Props) => {
 
       <LoadingBar className="uploading-asset" progress={uploadProgress} centerText={false} />
 
-      <button className="uploading-asset button-reset-default accent-text" onClick={cancelUpload}>
+      <button
+        data-uie-name="cancel-asset-item-upload"
+        className="uploading-asset button-reset-default accent-text"
+        onClick={cancelUpload}
+      >
         {t('conversationAssetUploadCancel')}
       </button>
     </div>
