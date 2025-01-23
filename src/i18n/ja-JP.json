@@ -394,6 +394,7 @@
   "conversationAssetFailedDecryptDownloading": "DOWNLOAD FAILED (File could not be decrypted)",
   "conversationAssetFailedHashDownloading": "DOWNLOAD FAILED (HASH DOES NOT MATCH)",
   "conversationAssetRestrictedAudioMessageHeadline": "Audio message",
+  "conversationAssetUploadCancel": "Cancel",
   "conversationAssetUploadFailed": "アップロードに失敗",
   "conversationAssetUploading": "アップロード中...",
   "conversationAudioAssetRestricted": "Receiving audio messages is prohibited",

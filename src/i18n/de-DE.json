@@ -394,6 +394,7 @@
   "conversationAssetFailedDecryptDownloading": "DOWNLOAD FEHLGESCHLADEN (Datei konnte nicht entschlüsselt werden)",
   "conversationAssetFailedHashDownloading": "DOWNLOAD FEHLGESCHLADEN (HASH STIMMT NICHT ÜBEREIN)",
   "conversationAssetRestrictedAudioMessageHeadline": "Audionachricht",
+  "conversationAssetUploadCancel": "Cancel",
   "conversationAssetUploadFailed": "Hochladen fehlgeschlagen",
   "conversationAssetUploading": "Hochladen…",
   "conversationAudioAssetRestricted": "Empfang von Audiodateien ist verboten",
