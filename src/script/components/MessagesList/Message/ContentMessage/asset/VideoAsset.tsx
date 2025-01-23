@@ -39,6 +39,7 @@ import {SeekBar} from './controls/SeekBar';
 import {FileAsset} from './FileAssetComponent';
 import {AssetUrl, useAssetTransfer} from './useAssetTransfer';
 
+import {AssetError} from '../../../../../assets/AssetError';
 import {AssetRepository} from '../../../../../assets/AssetRepository';
 import {AssetTransferState} from '../../../../../assets/AssetTransferState';
 import type {ContentMessage} from '../../../../../entity/message/ContentMessage';
@@ -147,7 +148,11 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
           setIsVideoLoaded(true);
           amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.PLAY_SUCCESS);
         } catch (error) {
-          setVideoPlaybackError(true);
+          if (error instanceof Error) {
+            if (error.name !== AssetError.CANCEL_ERROR) {
+              setVideoPlaybackError(true);
+            }
+          }
           amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.PLAY_FAILED);
           console.error('Failed to load video asset ', error);
         }

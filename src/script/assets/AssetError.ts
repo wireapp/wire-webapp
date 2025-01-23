@@ -17,13 +17,6 @@
  *
  */
 
-export enum AssetTransferState {
-  CANCELED = 'cancelled',
-  DOWNLOADING = 'downloading',
-  UPLOAD_FAILED = 'upload-failed',
-  UPLOAD_PENDING = 'upload-pending',
-  UPLOADED = 'uploaded',
-  UPLOADING = 'uploading',
-  DOWNLOAD_FAILED_DECRPYT = 'download-failed-decrypt',
-  DOWNLOAD_FAILED_HASH = 'download-failed-hash',
+export enum AssetError {
+  CANCEL_ERROR = 'RequestCancellationError',
 }

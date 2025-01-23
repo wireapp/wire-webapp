@@ -71,7 +71,7 @@ const FileAsset: React.FC<FileAssetProps> = ({
 
   const isPendingUpload = assetStatus === AssetTransferState.UPLOAD_PENDING;
   const isFailedUpload = assetStatus === AssetTransferState.UPLOAD_FAILED;
-  const isUploaded = assetStatus === AssetTransferState.UPLOADED;
+  const isUploaded = assetStatus === AssetTransferState.UPLOADED || assetStatus === AssetTransferState.CANCELED;
   const isDownloading = assetStatus === AssetTransferState.DOWNLOADING;
   const isFailedDownloadingDecrypt = assetStatus === AssetTransferState.DOWNLOAD_FAILED_DECRPYT;
   const isFailedDownloadingHash = assetStatus === AssetTransferState.DOWNLOAD_FAILED_HASH;
