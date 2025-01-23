@@ -301,6 +301,7 @@ export class ConnectionRepository {
     const deadConnectionEntities = ConnectionMapper.mapConnectionsFromJson(deadConnections);
 
     this.connectionState.connections(connections);
+    this.connectionState.deadConnections(deadConnectionEntities);
     return {connections, deadConnections: deadConnectionEntities};
   }
 

@@ -2549,7 +2549,7 @@ describe('ConversationRepository', () => {
         .mockResolvedValue(localConversations as unknown as ConversationDatabaseData[]);
       jest.spyOn(conversationService, 'saveConversationsInDb').mockImplementation(data => Promise.resolve(data));
 
-      const conversations = await conversationRepository.loadConversations([]);
+      const conversations = await conversationRepository.loadConversations([], []);
 
       expect(conversations).toHaveLength(remoteConversations.found.length);
     });
@@ -2594,7 +2594,7 @@ describe('ConversationRepository', () => {
         .mockResolvedValue(localConversations as unknown as ConversationDatabaseData[]);
       jest.spyOn(conversationService, 'saveConversationsInDb').mockImplementation(data => Promise.resolve(data));
 
-      const conversations = await conversationRepository.loadConversations([]);
+      const conversations = await conversationRepository.loadConversations([], []);
 
       expect(conversations).toHaveLength(1);
     });
@@ -2639,7 +2639,7 @@ describe('ConversationRepository', () => {
         .mockResolvedValue(localConversations as unknown as ConversationDatabaseData[]);
       jest.spyOn(conversationService, 'saveConversationsInDb').mockImplementation(data => Promise.resolve(data));
 
-      const conversations = await conversationRepository.loadConversations([]);
+      const conversations = await conversationRepository.loadConversations([], []);
 
       expect(conversations).toHaveLength(remoteConversations.found.length);
     });
@@ -2675,7 +2675,7 @@ describe('ConversationRepository', () => {
         .mockResolvedValue(localConversations as unknown as ConversationDatabaseData[]);
       jest.spyOn(conversationService, 'saveConversationsInDb').mockImplementation(data => Promise.resolve(data));
 
-      const conversations = await conversationRepository.loadConversations([]);
+      const conversations = await conversationRepository.loadConversations([], []);
 
       expect(conversations).toHaveLength(0);
       expect(conversationService.deleteConversationFromDb).toHaveBeenCalledWith(connectionReq.qualified_id.id);
@@ -2719,7 +2719,7 @@ describe('ConversationRepository', () => {
         .spyOn(conversationService, 'getAllConversations')
         .mockResolvedValue(remoteConversations as unknown as RemoteConversations);
 
-      await conversationRepository.loadConversations([]);
+      await conversationRepository.loadConversations([], []);
 
       expect(conversationState.missingConversations).toHaveLength(remoteConversations.failed.length);
     });

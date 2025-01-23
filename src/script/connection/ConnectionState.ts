@@ -25,8 +25,10 @@ import {ConnectionEntity} from './ConnectionEntity';
 @singleton()
 export class ConnectionState {
   public readonly connections: ko.ObservableArray<ConnectionEntity>;
+  public readonly deadConnections: ko.ObservableArray<ConnectionEntity>;
 
   constructor() {
     this.connections = ko.observableArray();
+    this.deadConnections = ko.observableArray();
   }
 }

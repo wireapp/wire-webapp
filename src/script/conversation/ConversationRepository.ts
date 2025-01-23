@@ -643,7 +643,8 @@ export class ConversationRepository {
       });
 
     const connections = this.connectionState.connections();
-    return this.loadRemoteConversations(remoteConversations, connections);
+    const deadConnections = this.connectionState.deadConnections();
+    return this.loadRemoteConversations(remoteConversations, connections, deadConnections);
   }
 
   /**
@@ -725,7 +726,7 @@ export class ConversationRepository {
     localConversations: ConversationDatabaseData[],
     remoteConversations: RemoteConversations,
     connections: ConnectionEntity[],
-    deadConnections: ConnectionEntity[],
+    deadConnections: ConnectionEntity[] = [],
   ): Promise<{localConversations: ConversationDatabaseData[]; remoteConversations: RemoteConversations}> {
     //If there's any local conversation of type 3 (CONNECT), but the connection doesn't exist anymore (user was deleted),
     // we delete the conversation and blacklist it so it's never refetched from the backend
@@ -811,7 +812,7 @@ export class ConversationRepository {
   private async loadRemoteConversations(
     remoteConversations: RemoteConversations,
     connections: ConnectionEntity[],
-    deadConnections: ConnectionEntity[],
+    deadConnections: ConnectionEntity[] = [],
   ): Promise<Conversation[]> {
     const localConversations = await this.conversationService.loadConversationStatesFromDb<ConversationDatabaseData>();
 
