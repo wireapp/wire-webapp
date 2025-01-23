@@ -394,6 +394,7 @@
   "conversationAssetFailedDecryptDownloading": "ÉCHEC DU TÉLÉCHARGEMENT (Impossible de déchiffrer le fichier)",
   "conversationAssetFailedHashDownloading": "ÉCHEC DU TÉLÉCHARGEMENT (L'EMPREINTE NUMÉRIQUE NE CORRESPOND PAS)",
   "conversationAssetRestrictedAudioMessageHeadline": "Message vocal",
+  "conversationAssetUploadCancel": "Cancel",
   "conversationAssetUploadFailed": "Échec de l’envoi",
   "conversationAssetUploading": "Envoi en cours…",
   "conversationAudioAssetRestricted": "La réception de messages audio est restreinte",

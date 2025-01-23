@@ -394,6 +394,7 @@
   "conversationAssetFailedDecryptDownloading": "FALHA AO BAIXAR (O arquivo não pôde ser descriptografado)",
   "conversationAssetFailedHashDownloading": "FALHA AO BAIXAR (O HASH NÃO COMBINA)",
   "conversationAssetRestrictedAudioMessageHeadline": "Mensagem de áudio",
+  "conversationAssetUploadCancel": "Cancel",
   "conversationAssetUploadFailed": "Falha ao enviar",
   "conversationAssetUploading": "Enviando…",
   "conversationAudioAssetRestricted": "Receber mensagens de áudio é proibido",

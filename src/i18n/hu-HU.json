@@ -394,6 +394,7 @@
   "conversationAssetFailedDecryptDownloading": "DOWNLOAD FAILED (File could not be decrypted)",
   "conversationAssetFailedHashDownloading": "DOWNLOAD FAILED (HASH DOES NOT MATCH)",
   "conversationAssetRestrictedAudioMessageHeadline": "Audio message",
+  "conversationAssetUploadCancel": "Cancel",
   "conversationAssetUploadFailed": "A feltöltés sikertelen",
   "conversationAssetUploading": "Feltöltés…",
   "conversationAudioAssetRestricted": "Receiving audio messages is prohibited",

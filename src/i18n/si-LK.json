@@ -394,6 +394,7 @@
   "conversationAssetFailedDecryptDownloading": "බාගැනීමට අසමත් විය! (ගොනුව විසංකේතනයට නොහැකියි)",
   "conversationAssetFailedHashDownloading": "බාගැනීමට අසමත් විය (පූරකය (HASH) නොගැළපේ)",
   "conversationAssetRestrictedAudioMessageHeadline": "ශ්‍රව්‍ය පණිවිඩය",
+  "conversationAssetUploadCancel": "Cancel",
   "conversationAssetUploadFailed": "උඩුගත කිරීම අසාර්ථකයි",
   "conversationAssetUploading": "උඩුගත වෙමින්...",
   "conversationAudioAssetRestricted": "හඬ පණිවිඩ ලැබීම වළක්වා ඇත",
