@@ -760,14 +760,15 @@ export class ConversationRepository {
       );
     });
 
-    await this.deleteAndBlockConversations(
-      deletedConnectionRequests.map(
-        deletedConnection =>
-          deletedConnection.qualified_id || {id: deletedConnection.id, domain: deletedConnection.domain ?? ''},
-      ),
+const deletedConnectionIds = deletedConnectionRequests.map(
+      deletedConnection =>
+        deletedConnection.qualified_id || {id: deletedConnection.id, domain: deletedConnection.domain ?? ''},
     );
 
-    await this.deleteAndBlockConversations(deadConnections.map(deadConnection => deadConnection.conversationId));
+    const deadConnectionIds = deadConnections.map(deadConnection => deadConnection.conversationId);
+
+    await this.deleteAndBlockConversations(deletedConnectionIds);
+    await this.deleteAndBlockConversations(deadConnectionIds);
 
     return {
       localConversations: filteredLocalConversations,
