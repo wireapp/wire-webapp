@@ -748,20 +748,19 @@ export class ConversationRepository {
       }
     }
 
-    let filteredRemoteConversations = remoteConversations.found?.filter(
-      remoteConversation =>
-        !deletedConnectionRequests.find(({qualified_id, id, domain}) =>
-          matchQualifiedIds(qualified_id || {id, domain}, remoteConversation.qualified_id),
-        ),
-    );
-
-    filteredRemoteConversations = filteredRemoteConversations?.filter(backendConversation => {
-      return !deadConnections.some(deadConnection =>
-        matchQualifiedIds(backendConversation.qualified_id, deadConnection.conversationId),
+    const filteredRemoteConversations = remoteConversations.found?.filter(remoteConversation => {
+      const isNotDeletedConnection = !deletedConnectionRequests.find(({qualified_id, id, domain}) =>
+        matchQualifiedIds(qualified_id || {id, domain}, remoteConversation.qualified_id),
       );
+
+      const isNotDeadConnection = !deadConnections.some(deadConnection =>
+        matchQualifiedIds(remoteConversation.qualified_id, deadConnection.conversationId),
+      );
+
+      return isNotDeletedConnection && isNotDeadConnection;
     });
 
-const deletedConnectionIds = deletedConnectionRequests.map(
+    const deletedConnectionIds = deletedConnectionRequests.map(
       deletedConnection =>
         deletedConnection.qualified_id || {id: deletedConnection.id, domain: deletedConnection.domain ?? ''},
     );
