@@ -17,8 +17,6 @@
  *
  */
 
-import React from 'react';
-
 import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
@@ -26,7 +24,7 @@ export type GiphyButtonProps = {
   onGifClick: () => void;
 };
 
-const GiphyButton: React.FC<GiphyButtonProps> = ({onGifClick}) => {
+export const GiphyButton = ({onGifClick}: GiphyButtonProps) => {
   return (
     <>
       <li>
@@ -45,5 +43,3 @@ const GiphyButton: React.FC<GiphyButtonProps> = ({onGifClick}) => {
     </>
   );
 };
-
-export {GiphyButton};
