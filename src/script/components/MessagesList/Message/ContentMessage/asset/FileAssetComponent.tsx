@@ -71,14 +71,15 @@ const FileAsset: React.FC<FileAssetProps> = ({
 
   const isPendingUpload = assetStatus === AssetTransferState.UPLOAD_PENDING;
   const isFailedUpload = assetStatus === AssetTransferState.UPLOAD_FAILED;
-  const isUploaded = assetStatus === AssetTransferState.UPLOADED || assetStatus === AssetTransferState.CANCELED;
+  const isUploadedOrCancelled =
+    assetStatus === AssetTransferState.UPLOADED || assetStatus === AssetTransferState.CANCELED;
   const isDownloading = assetStatus === AssetTransferState.DOWNLOADING;
   const isFailedDownloadingDecrypt = assetStatus === AssetTransferState.DOWNLOAD_FAILED_DECRPYT;
   const isFailedDownloadingHash = assetStatus === AssetTransferState.DOWNLOAD_FAILED_HASH;
   const isUploading = assetStatus === AssetTransferState.UPLOADING;
 
   const onDownloadAsset = async () => {
-    if (isUploaded) {
+    if (isUploadedOrCancelled) {
       downloadAsset(asset);
     }
   };
@@ -94,7 +95,7 @@ const FileAsset: React.FC<FileAssetProps> = ({
       {isFileSharingReceivingEnabled ? (
         <div
           className={cx('file', {
-            'cursor-pointer': isUploaded,
+            'cursor-pointer': isUploadedOrCancelled,
           })}
           data-uie-name="file"
           data-uie-value={asset.file_name}
@@ -108,7 +109,7 @@ const FileAsset: React.FC<FileAssetProps> = ({
             <div className="asset-placeholder loading-dots" />
           ) : (
             <>
-              {isUploaded && (
+              {isUploadedOrCancelled && (
                 <div className="file__icon icon-file" data-uie-name="file-icon">
                   <span className="file__icon__ext icon-view" />
                 </div>
