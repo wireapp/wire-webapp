@@ -815,7 +815,7 @@
   "index.createAccountForPersonalUse": "Privat",
   "index.createPersonalAccount": "Privat mit Freunden und der Familie chatten",
   "index.createTeam": "Sichere Zusammenarbeit für Unternehmen, Institutionen und Organisationen",
-  "index.disclaimer": "Dies ist NICHT WIRE, sondern eine interne Testumgebung und ist nur für die Verwendung durch Mitarbeiter von Wire autorisiert. Jede öffentliche Nutzung ist UNTERSAGT. Die Daten der Benutzer dieser Testumgebung werden umfassend erfasst und analysiert. Um den sicheren Messenger Wire zu verwenden, besuchen Sie bitte {link}",
+  "index.disclaimer": "It is not an official version of Wire but an internal testing environment. Only Wire employees are allowed to use this version. Any public use is prohibited. Wire records and analyses the user data extensively. Visit {link} to get the official Wire version.",
   "index.enterprise": "Anmeldung für Unternehmen",
   "index.goBack": "Zurück",
   "index.login": "Anmelden",
