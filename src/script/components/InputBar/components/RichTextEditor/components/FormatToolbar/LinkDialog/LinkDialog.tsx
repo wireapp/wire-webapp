@@ -167,21 +167,19 @@ export const LinkDialog = ({
 };
 
 const isFieldValid = (field: keyof FormData, value: string): boolean => {
-  if (field === 'url') {
-    return validateUrl(value);
-  }
-  if (field === 'text') {
-    return value.length > 0;
-  }
-  return true;
+  const fieldValidators = {
+    url: validateUrl,
+    text: (value: string) => value.length > 0,
+  } as const;
+
+  return fieldValidators[field](value) ?? true;
 };
 
 const getFieldError = (field: keyof FormData): string => {
-  if (field === 'url') {
-    return t('richTextLinkDialogLinkError');
-  }
-  if (field === 'text') {
-    return t('richTextLinkDialogTextError');
-  }
-  return '';
+  const fieldErrors = {
+    url: t('richTextLinkDialogLinkError'),
+    text: t('richTextLinkDialogTextError'),
+  } as const;
+
+  return fieldErrors?.[field] || '';
 };
