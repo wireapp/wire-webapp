@@ -186,7 +186,7 @@ export function ConfigToolbar() {
 
   return (
     <div ref={wrapperRef} css={wrapperStyles}>
-      <h3>Configuration Tool</h3>
+      <h3>Developer Menu</h3>
       <h4 style={{color: 'red', fontWeight: 'bold'}}>
         Caution: Modifying these settings can affect the behavior of the application. Ensure you understand the
         implications of each change before proceeding. Changes may cause unexpected behavior.

@@ -17,7 +17,7 @@
  *
  */
 
-import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
+import {Connection, ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {UserConnectionEvent, USER_EVENT, UserEvent} from '@wireapp/api-client/lib/event/';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
@@ -275,20 +275,33 @@ export class ConnectionRepository {
    *
    * @returns Promise that resolves when all connections have been retrieved and mapped
    */
-  async getConnections(teamMembers: QualifiedId[]): Promise<ConnectionEntity[]> {
+  async getConnections(
+    teamMembers: QualifiedId[],
+  ): Promise<{connections: ConnectionEntity[]; deadConnections: ConnectionEntity[]}> {
     const connectionData = await this.connectionService.getConnections();
 
-    const acceptedConnectionsOrNoneTeamMembersConnections = connectionData.filter(connection => {
+    const acceptedConnectionsOrNoneTeamMembersConnections: Connection[] = [];
+    const deadConnections: Connection[] = [];
+
+    connectionData.forEach(connection => {
       const isTeamMember = teamMembers.some(teamMemberQualifiedId =>
         matchQualifiedIds(connection.qualified_to, teamMemberQualifiedId),
       );
-      return !isTeamMember || connection.status === ConnectionStatus.ACCEPTED;
+
+      if (!isTeamMember || connection.status === ConnectionStatus.ACCEPTED) {
+        acceptedConnectionsOrNoneTeamMembersConnections.push(connection);
+      }
+
+      if (isTeamMember && connection.status !== ConnectionStatus.ACCEPTED) {
+        deadConnections.push(connection);
+      }
     });
 
     const connections = ConnectionMapper.mapConnectionsFromJson(acceptedConnectionsOrNoneTeamMembersConnections);
+    const deadConnectionEntities = ConnectionMapper.mapConnectionsFromJson(deadConnections);
 
     this.connectionState.connections(connections);
-    return connections;
+    return {connections, deadConnections: deadConnectionEntities};
   }
 
   /**

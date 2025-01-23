@@ -466,13 +466,13 @@ export class App {
       onProgress(10);
       telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
-      const connections = await connectionRepository.getConnections(teamMembers);
+      const {connections, deadConnections} = await connectionRepository.getConnections(teamMembers);
 
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_USER_DATA);
 
       telemetry.addStatistic(AppInitStatisticsValue.CONNECTIONS, connections.length, 50);
 
-      const conversations = await conversationRepository.loadConversations(connections);
+      const conversations = await conversationRepository.loadConversations(connections, deadConnections);
       eventLogger.log(AppInitializationStep.ConversationsLoaded);
       // We load all the users the self user is connected with
       await userRepository.loadUsers(selfUser, connections, conversations, teamMembers);
