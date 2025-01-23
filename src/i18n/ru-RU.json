@@ -815,7 +815,7 @@
   "index.createAccountForPersonalUse": "Personal",
   "index.createPersonalAccount": "Конфиденциальное общение с друзьями и семьей",
   "index.createTeam": "Безопасная совместная работа для предприятий, учреждений и профессиональных организаций",
-  "index.disclaimer": "It is not an official version of Wire but an internal testing environment. Only Wire employees are allowed to use this version. Any public use is prohibited. Wire records and analyses the user data extensively. Visit {link} to get the official Wire version.",
+  "index.disclaimer": "Это не официальная версия Wire, а внутренняя среда тестирования. Этой версией могут пользоваться только сотрудники Wire. Любое публичное использование запрещено. Wire активно записывает и анализирует данные пользователей. Посетите {link}, чтобы получить официальную версию Wire.",
   "index.enterprise": "Вход для организаций",
   "index.goBack": "Вернуться назад",
   "index.login": "Вход",
