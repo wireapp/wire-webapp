@@ -259,7 +259,7 @@ export const PastePlugin = ({getMentionCandidates, isPreviewMode}: PastePluginPr
           // Try handling formatted content if no special elements
           if (
             mentions.length === 0 &&
-            (!isPreviewMode ? links.length === 0 : true) &&
+            (isPreviewMode || links.length === 0) &&
             handleFormattedContent(doc, selection)
           ) {
             return true;
