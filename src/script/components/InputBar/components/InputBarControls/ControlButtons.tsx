@@ -103,13 +103,13 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
       <>
         {showFormatButton && (
           <li>
-            <FormatTextButton isActive={isFormatActive} isEditing={false} onClick={onFormatClick} />
+            <FormatTextButton isActive={isFormatActive} onClick={onFormatClick} />
           </li>
         )}
 
         {showEmojiButton && (
           <li>
-            <EmojiButton isActive={isEmojiActive} isEditing={false} onClick={onEmojiClick} />
+            <EmojiButton isActive={isEmojiActive} onClick={onEmojiClick} />
           </li>
         )}
         {!disableFilesharing && (
@@ -129,7 +129,7 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
           </>
         )}
         <li aria-hidden="true">
-          <FormatSeparator isEditing={false} />
+          <FormatSeparator />
         </li>
         <li>
           <PingButton isDisabled={!!disablePing} onClick={onClickPing} />
@@ -147,16 +147,16 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
         <>
           {showFormatButton && (
             <li>
-              <FormatTextButton isActive={isFormatActive} isEditing={false} onClick={onFormatClick} />
+              <FormatTextButton isActive={isFormatActive} onClick={onFormatClick} />
             </li>
           )}
           {showEmojiButton && (
             <li>
-              <EmojiButton isActive={isEmojiActive} isEditing={false} onClick={onEmojiClick} />
+              <EmojiButton isActive={isEmojiActive} onClick={onEmojiClick} />
             </li>
           )}
           <li aria-hidden="true">
-            <FormatSeparator isEditing={false} />
+            <FormatSeparator />
           </li>
           <li>
             <GiphyButton onGifClick={onGifClick} />

@@ -20,9 +20,9 @@
 import cx from 'classnames';
 
 interface FormatSeparatorProps {
-  isEditing: boolean;
+  isEditing?: boolean;
 }
 
-export const FormatSeparator = ({isEditing}: FormatSeparatorProps) => {
+export const FormatSeparator = ({isEditing = false}: FormatSeparatorProps) => {
   return <div className={cx('input-bar-control-separator', {'input-bar-control-separator--editing': isEditing})} />;
 };
