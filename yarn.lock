@@ -16299,13 +16299,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"resize-observer-polyfill@npm:^1.5.1":
-  version: 1.5.1
-  resolution: "resize-observer-polyfill@npm:1.5.1"
-  checksum: 10/e10ee50cd6cf558001de5c6fb03fee15debd011c2f694564b71f81742eef03fb30d6c2596d1d5bf946d9991cb692fcef529b7bd2e4057041377ecc9636c753ce
-  languageName: node
-  linkType: hard
-
 "resolve-cwd@npm:^3.0.0":
   version: 3.0.0
   resolution: "resolve-cwd@npm:3.0.0"
@@ -19002,7 +18995,6 @@ __metadata:
     redux-logdown: "npm:1.0.4"
     redux-mock-store: "npm:1.5.5"
     redux-thunk: "npm:3.1.0"
-    resize-observer-polyfill: "npm:^1.5.1"
     seedrandom: "npm:3.0.5"
     simple-git: "npm:3.27.0"
     sinon: "npm:18.0.0"
