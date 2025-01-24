@@ -24,7 +24,7 @@ import {CSSObject} from '@emotion/react';
 import * as Icon from 'Components/Icon';
 import {AssetImage} from 'Components/Image';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleKeyDown} from 'Util/KeyboardUtil';
+import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {ContentMessage} from '../../../../../../entity/message/ContentMessage';
@@ -79,7 +79,9 @@ export const ImageAsset = ({asset, message, onClick}: ImageAssetProps) => {
           data-uie-name="go-image-detail"
           data-uie-visible={visible && !isObfuscated}
           onClick={event => onClick(message, event)}
-          onKeyDown={event => handleKeyDown(event, onClick.bind(null, message, event))}
+          onKeyDown={event =>
+            handleKeyDown({event, callback: onClick.bind(null, message, event), keys: [KEY.ENTER, KEY.SPACE]})
+          }
           tabIndex={0}
           role="button"
           aria-label={imageAltText}

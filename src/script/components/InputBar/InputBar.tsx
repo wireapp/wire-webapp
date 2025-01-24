@@ -32,8 +32,6 @@ import {checkFileSharingPermission} from 'Components/Conversation/utils/checkFil
 import {EmojiPicker} from 'Components/EmojiPicker/EmojiPicker';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
-import {RichTextContent, RichTextEditor} from 'Components/RichTextEditor';
-import {SendMessageButton} from 'Components/RichTextEditor/components/SendMessageButton';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
@@ -43,12 +41,15 @@ import {CONVERSATION_TYPING_INDICATOR_MODE} from 'src/script/user/TypingIndicato
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
+import {sanitizeMarkdown} from 'Util/MarkdownUtil';
 import {formatLocale, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {getFileExtension} from 'Util/util';
 
 import {ControlButtons} from './components/InputBarControls/ControlButtons';
-import {PastedFileControls} from './components/PastedFileControls';
-import {ReplyBar} from './components/ReplyBar';
+import {PastedFileControls} from './components/PastedFileControls/PastedFileControls';
+import {ReplyBar} from './components/ReplyBar/ReplyBar';
+import {RichTextContent, RichTextEditor} from './components/RichTextEditor';
+import {SendMessageButton} from './components/RichTextEditor/components/SendMessageButton';
 import {TypingIndicator} from './components/TypingIndicator/TypingIndicator';
 import {useEmojiPicker} from './hooks/useEmojiPicker/useEmojiPicker';
 import {useFilePaste} from './hooks/useFilePaste/useFilePaste';
@@ -127,7 +128,7 @@ export const InputBar = ({
       'isSelfUserRemoved',
       'is1to1',
     ]);
-  const {isOutgoingRequest, isIncomingRequest} = useKoSubscribableChildren(connection, [
+  const {isOutgoingRequest, isIncomingRequest} = useKoSubscribableChildren(connection!, [
     'isOutgoingRequest',
     'isIncomingRequest',
   ]);
@@ -180,13 +181,13 @@ export const InputBar = ({
   const hasLocalEphemeralTimer = isSelfDeletingMessagesEnabled && !!localMessageTimer && !hasGlobalMessageTimer;
   const isTypingRef = useRef(false);
 
-  const messageFormatButtonsEnabled = CONFIG.FEATURE.ENABLE_MESSAGE_FORMAT_BUTTONS;
+  const isMessageFormatButtonsFlagEnabled = CONFIG.FEATURE.ENABLE_MESSAGE_FORMAT_BUTTONS;
 
-  const showGiphyButton = messageFormatButtonsEnabled
+  const showGiphyButton = isMessageFormatButtonsFlagEnabled
     ? textValue.length > 0
     : textValue.length > 0 && textValue.length <= CONFIG.GIPHY_TEXT_LENGTH;
 
-  const shouldReplaceEmoji = useUserPropertyValue(
+  const shouldReplaceEmoji = useUserPropertyValue<boolean>(
     () => propertiesRepository.getPreference(PROPERTIES_TYPE.EMOJI.REPLACE_INLINE),
     WebAppEvents.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE,
   );
@@ -459,8 +460,15 @@ export const InputBar = ({
     };
   }, []);
 
-  const saveDraft = async (editorState: string) => {
-    await saveDraftState(storageRepository, conversation, editorState, replyMessageEntity?.id, editedMessage?.id);
+  const saveDraft = async (editorState: string, plainMessage: string) => {
+    await saveDraftState({
+      storageRepository,
+      conversation,
+      editorState,
+      plainMessage: sanitizeMarkdown(plainMessage),
+      replyId: replyMessageEntity?.id,
+      editedMessageId: editedMessage?.id,
+    });
   };
 
   const loadDraft = async () => {
@@ -542,6 +550,11 @@ export const InputBar = ({
     };
   }, [pastedFile]);
 
+  const showMarkdownPreview = useUserPropertyValue<boolean>(
+    () => propertiesRepository.getPreference(PROPERTIES_TYPE.INTERFACE.MARKDOWN_PREVIEW),
+    WebAppEvents.PROPERTIES.UPDATE.INTERFACE.MARKDOWN_PREVIEW,
+  );
+
   const controlButtonsProps = {
     conversation: conversation,
     disableFilesharing: !isFileSharingSendingEnabled,
@@ -554,6 +567,8 @@ export const InputBar = ({
     onSelectFiles: uploadFiles,
     onSelectImages: uploadImages,
     showGiphyButton: showGiphyButton,
+    showFormatButton: isMessageFormatButtonsFlagEnabled && showMarkdownPreview,
+    showEmojiButton: isMessageFormatButtonsFlagEnabled,
     isFormatActive: formatToolbar.open,
     onFormatClick: formatToolbar.handleClick,
     isEmojiActive: emojiPicker.open,
@@ -582,7 +597,7 @@ export const InputBar = ({
         <div
           className={cx(`${conversationInputBarClassName}__input input-bar-container`, {
             [`${conversationInputBarClassName}__input--editing`]: isEditing,
-            'input-bar-container--with-toolbar': formatToolbar.open,
+            'input-bar-container--with-toolbar': formatToolbar.open && showMarkdownPreview,
           })}
         >
           {!isOutgoingRequest && (
@@ -621,6 +636,7 @@ export const InputBar = ({
                   onUpdate={setMessageContent}
                   hasLocalEphemeralTimer={hasLocalEphemeralTimer}
                   showFormatToolbar={formatToolbar.open}
+                  showMarkdownPreview={showMarkdownPreview}
                   saveDraftState={saveDraft}
                   loadDraftState={loadDraft}
                   onShiftTab={onShiftTab}
@@ -628,11 +644,7 @@ export const InputBar = ({
                   onBlur={() => isTypingRef.current && conversationRepository.sendTypingStop(conversation)}
                 >
                   <div className="input-bar-buttons">
-                    <ul
-                      className={cx('controls-right buttons-group input-bar-buttons__list', {
-                        'controls-right-shrinked': textValue.length !== 0,
-                      })}
-                    >
+                    <ul className="input-bar-controls">
                       <ControlButtons {...controlButtonsProps} showGiphyButton={showGiphyButton} />
                     </ul>
                     <SendMessageButton

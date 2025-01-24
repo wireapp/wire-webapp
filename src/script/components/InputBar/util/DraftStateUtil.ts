@@ -26,24 +26,38 @@ export interface DraftState {
   editorState: string | null;
   messageReply?: ContentMessage;
   editedMessage?: ContentMessage;
+  plainMessage?: string;
 }
 
-const generateConversationInputStorageKey = (conversationEntity: Conversation): string =>
+export const generateConversationInputStorageKey = (conversationEntity: Conversation): string =>
   `${StorageKey.CONVERSATION.INPUT}|${conversationEntity.id}`;
 
-export const saveDraftState = async (
-  storageRepository: StorageRepository,
-  conversation: Conversation,
-  editorState: string,
-  replyMessageId?: string,
-  editedMessageId?: string,
-): Promise<void> => {
+type SaveDraftState = {
+  storageRepository: StorageRepository;
+  conversation: Conversation;
+  editorState: string;
+  plainMessage: string;
+  replyId?: string;
+  editedMessageId?: string;
+};
+
+export const saveDraftState = async ({
+  storageRepository,
+  conversation,
+  editorState,
+  plainMessage,
+  replyId,
+  editedMessageId,
+}: SaveDraftState): Promise<void> => {
   // we only save state for newly written messages
   const storageKey = generateConversationInputStorageKey(conversation);
 
-  await storageRepository.storageService.saveToSimpleStorage<any>(storageKey, {
+  await storageRepository.storageService.saveToSimpleStorage<
+    Omit<SaveDraftState, 'storageRepository' | 'conversation'>
+  >(storageKey, {
     editorState,
-    replyId: replyMessageId,
+    plainMessage,
+    replyId,
     editedMessageId,
   });
 };
@@ -81,5 +95,5 @@ export const loadDraftState = async (
     editedMessage = await loadMessage(editedMessageId);
   }
 
-  return {...storageValue, messageReply, editedMessage};
+  return {...storageValue, messageReply, editedMessage, plainMessage: storageValue?.plainMessage || ''};
 };

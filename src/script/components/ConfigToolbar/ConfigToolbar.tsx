@@ -186,7 +186,7 @@ export function ConfigToolbar() {
 
   return (
     <div ref={wrapperRef} css={wrapperStyles}>
-      <h3>Configuration Tool</h3>
+      <h3>Developer Menu</h3>
       <h4 style={{color: 'red', fontWeight: 'bold'}}>
         Caution: Modifying these settings can affect the behavior of the application. Ensure you understand the
         implications of each change before proceeding. Changes may cause unexpected behavior.
@@ -198,8 +198,8 @@ export function ConfigToolbar() {
       <h3>Debug Functions</h3>
 
       <Button onClick={() => window.wire?.app?.debug?.reconnectWebSocket()}>reconnectWebSocket</Button>
-      <Button onClick={() => window.wire?.app?.debug?.enablePushToTalk()}>enablePushToTalk</Button>
-      <Button onClick={() => window.wire?.app?.debug?.enablePushToTalk(null)}>disablePushToTalk</Button>
+      <Button onClick={() => window.wire?.app?.debug?.enablePressSpaceToUnmute()}>enablePressSpaceToUnmute</Button>
+      <Button onClick={() => window.wire?.app?.debug?.disablePressSpaceToUnmute()}>disablePressSpaceToUnmute</Button>
 
       <div>{renderAvsSwitch(avsDebuggerEnabled)}</div>
 

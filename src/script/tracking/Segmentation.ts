@@ -18,6 +18,12 @@
  */
 
 export const Segmentation = {
+  APP_OPEN: {
+    DESKTOP_APP: 'app_desktop_app',
+    APP_VERSION: 'app_version',
+    OS_VERSION: 'os_version',
+    IS_TEAM_MEMBER: 'is_team_member',
+  },
   CALL: {
     AV_SWITCH_TOGGLE: 'call_av_switch_toggle',
     DIRECTION: 'call_direction',
@@ -32,8 +38,12 @@ export const Segmentation = {
     VIDEO: 'call_video',
   },
   COMMON: {
-    APP_VERSION: 'app_version',
-    DESKTOP_APP: 'app_desktop_app',
+    TEAM_IS_TEAM: 'team_is_team',
+    TEAM_IS_ENTERPRISE: 'team_is_enterprise',
+    TEAM_TEAM_ID: 'team_team_id',
+    TEAM_TEAM_SIZE: 'team_team_size',
+    TEAM_USER_TYPE: 'team_user_type',
+    USER_CONTACTS: 'user_contacts',
   },
   CONVERSATION: {
     ALLOW_GUESTS: 'conversation_allow_guests',
@@ -51,6 +61,7 @@ export const Segmentation = {
     IS_REPLY: 'message_is_reply',
     MENTION: 'message_mention',
   },
+  IS_RICH_TEXT: 'is_rich_text',
   SCREEN_SHARE: {
     DIRECTION: 'screen_share_direction',
     DURATION: 'screen_share_duration',

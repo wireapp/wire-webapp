@@ -42,6 +42,7 @@ export const StorageKey = {
   INPUT: {
     SHOW_FORMATTING: 'z.storage.StorageKey.INPUT.SHOW_FORMATTING',
   },
+  INITIAL_MAKRETING_CONSENT_ACCEPTED: 'z.storage.StorageKey.INITIAL_MAKRETING_CONSENT_ACCEPTED',
 };
 
 export const ROOT_FONT_SIZE_KEY = 'root-font-size';

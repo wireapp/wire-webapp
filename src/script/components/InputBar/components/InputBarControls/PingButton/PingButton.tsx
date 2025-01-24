@@ -28,7 +28,7 @@ interface PingButtonProps {
 export const PingButton = ({isDisabled, onClick}: PingButtonProps) => {
   return (
     <button
-      className="conversation-button controls-right-button no-radius"
+      className="input-bar-control"
       type="button"
       onClick={onClick}
       disabled={isDisabled}
@@ -36,7 +36,7 @@ export const PingButton = ({isDisabled, onClick}: PingButtonProps) => {
       aria-label={t('tooltipConversationPing')}
       data-uie-name="do-ping"
     >
-      <Icon.PingIcon />
+      <Icon.PingIcon width={14} height={14} />
     </button>
   );
 };

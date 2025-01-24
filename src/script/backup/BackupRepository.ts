@@ -31,11 +31,13 @@ import {exportCPBHistoryFromDatabase, importCPBHistoryToDatabase, CPBackup, isCP
 import {
   CancelError,
   DifferentAccountError,
+  ErrorType,
   ExportError,
   ImportError,
   IncompatibleBackupError,
   IncompatibleBackupFormatError,
   InvalidPassword,
+  isErrorOfType,
 } from './Error';
 import {createMetaData, exportHistory, importLegacyBackupToDatabase} from './LegacyBackup.helper';
 
@@ -86,6 +88,8 @@ export class BackupRepository {
   ): Promise<Blob> {
     this.canceled = false;
 
+    const checkCancelStatus = () => this.canceled;
+
     const {
       FEATURE: {ENABLE_CROSS_PLATFORM_BACKUP_EXPORT},
     } = Config.getConfig();
@@ -98,10 +102,11 @@ export class BackupRepository {
           progressCallback,
           user,
           backupService: this.backupService,
+          checkCancelStatus,
         });
         // If the feature flag is disabled, export the history as a legacy backup
       } else {
-        exportedData = await exportHistory(progressCallback, this.backupService);
+        exportedData = await exportHistory(progressCallback, this.backupService, checkCancelStatus);
       }
 
       if (exportedData === null) {
@@ -112,7 +117,7 @@ export class BackupRepository {
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : error;
       this.logger.error(`Could not export history: ${errorMessage}`, error);
-      const isCancelError = error instanceof CancelError;
+      const isCancelError = isErrorOfType(error, ErrorType.CancelError);
       throw isCancelError ? error : new ExportError();
     }
   }

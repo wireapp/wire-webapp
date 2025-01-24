@@ -42,7 +42,6 @@ import {AvsDebugger} from '@wireapp/avs-debugger';
 import {getStorage} from 'Util/localStorage';
 import {getLogger, Logger} from 'Util/Logger';
 
-import {KEY} from './KeyboardUtil';
 import {TIME_IN_MILLIS} from './TimeUtil';
 import {createUuid} from './uuid';
 
@@ -254,8 +253,12 @@ export class DebugUtil {
     }
   }
 
-  async enablePushToTalk(key: string | null = KEY.SPACE) {
-    this.propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY, key);
+  async enablePressSpaceToUnmute() {
+    this.propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE, true);
+  }
+
+  async disablePressSpaceToUnmute() {
+    this.propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE, false);
   }
 
   setupAvsDebugger() {

@@ -21,7 +21,7 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 
 import {Avatar, AVATAR_SIZE, GroupAvatar} from 'Components/Avatar';
-import {handleKeyDown} from 'Util/KeyboardUtil';
+import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {User} from '../../../../../entity/User';
@@ -56,7 +56,13 @@ export const ConnectionRequests = ({connectionRequests, onConnectionRequestClick
             'conversation-list-cell--active': isShowingConnectionRequests,
           })}
           onClick={onConnectionRequestClick}
-          onKeyDown={event => handleKeyDown(event, onConnectionRequestClick)}
+          onKeyDown={event =>
+            handleKeyDown({
+              event,
+              callback: onConnectionRequestClick,
+              keys: [KEY.ENTER, KEY.SPACE],
+            })
+          }
         >
           <div className="conversation-list-cell-left">
             {connectionRequestsCount === 1 ? (

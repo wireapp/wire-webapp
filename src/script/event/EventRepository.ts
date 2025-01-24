@@ -384,7 +384,7 @@ export class EventRepository {
       case EventValidation.VALID:
         let eventToProcess: IncomingEvent | undefined = event;
         if (event.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD || event.type === CONVERSATION_EVENT.MLS_MESSAGE_ADD) {
-          eventToProcess = await this.mapEncryptedEvent(event, {decryptedData, decryptionError});
+          eventToProcess = await this.mapEncryptedEvent(event, {decryptedData, decryptionError}, source);
         }
         if (!eventToProcess) {
           return event;
@@ -397,9 +397,11 @@ export class EventRepository {
   private async mapEncryptedEvent(
     event: ConversationOtrMessageAddEvent | ConversationMLSMessageAddEvent,
     {decryptedData, decryptionError}: Pick<HandledEventPayload, 'decryptedData' | 'decryptionError'>,
+    source: EventSource,
   ): Promise<IncomingEvent | undefined> {
     if (decryptionError) {
       this.logger.warn(`Decryption Error: '${event.type}'`, {
+        source,
         eventType: event.type,
         date: event.time,
         code: decryptionError.code,

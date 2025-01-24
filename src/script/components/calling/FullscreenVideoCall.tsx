@@ -43,6 +43,7 @@ import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar'
 import * as Icon from 'Components/Icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {useClickOutside} from 'Hooks/useClickOutside';
+import {useUserPropertyValue} from 'Hooks/useUserProperty';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {Config} from 'src/script/Config';
 import {isCallViewOption} from 'src/script/guards/CallView';
@@ -50,9 +51,11 @@ import {isMediaDevice} from 'src/script/guards/MediaDevice';
 import {useActiveWindowMatchMedia} from 'src/script/hooks/useActiveWindowMatchMedia';
 import {useToggleState} from 'src/script/hooks/useToggleState';
 import {MediaDeviceType} from 'src/script/media/MediaDeviceType';
+import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
+import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
-import {handleKeyDown, isEscapeKey} from 'Util/KeyboardUtil';
+import {handleKeyDown, isEscapeKey, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {preventFocusOutside} from 'Util/util';
 
@@ -97,6 +100,7 @@ export interface FullscreenVideoCallProps {
   isMuted: boolean;
   leave: (call: Call) => void;
   maximizedParticipant: Participant | null;
+  propertiesRepository: PropertiesRepository;
   callingRepository: CallingRepository;
   mediaDevicesHandler: MediaDevicesHandler;
   muteState: MuteState;
@@ -129,6 +133,7 @@ const FullscreenVideoCall = ({
   isMuted,
   muteState,
   mediaDevicesHandler,
+  propertiesRepository,
   callingRepository,
   videoGrid,
   maximizedParticipant,
@@ -453,6 +458,12 @@ const FullscreenVideoCall = ({
 
   const isModerator = selfUser && roles[selfUser.id] === DefaultConversationRoleName.WIRE_ADMIN;
 
+  const isPressSpaceToUnmuteEnabled =
+    useUserPropertyValue(
+      () => propertiesRepository.getPreference(PROPERTIES_TYPE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE),
+      WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE,
+    ) && Config.getConfig().FEATURE.ENABLE_PRESS_SPACE_TO_UNMUTE;
+
   return (
     <div
       className={cx('video-calling-wrapper', {
@@ -510,7 +521,13 @@ const FullscreenVideoCall = ({
                   data-uie-name="pagination-previous"
                   type="button"
                   onClick={() => changePage(currentPage - 1, call)}
-                  onKeyDown={event => handleKeyDown(event, () => changePage(currentPage - 1, call))}
+                  onKeyDown={event =>
+                    handleKeyDown({
+                      event,
+                      callback: () => changePage(currentPage - 1, call),
+                      keys: [KEY.ENTER, KEY.SPACE],
+                    })
+                  }
                   className="button-reset-default"
                   disabled={currentPage === 0}
                   css={{
@@ -531,7 +548,13 @@ const FullscreenVideoCall = ({
                 <button
                   data-uie-name="pagination-next"
                   onClick={() => changePage(currentPage + 1, call)}
-                  onKeyDown={event => handleKeyDown(event, () => changePage(currentPage + 1, call))}
+                  onKeyDown={event =>
+                    handleKeyDown({
+                      event,
+                      callback: () => changePage(currentPage + 1, call),
+                      keys: [KEY.ENTER, KEY.SPACE],
+                    })
+                  }
                   type="button"
                   className="button-reset-default"
                   disabled={currentPage === totalPages - 1}
@@ -553,7 +576,13 @@ const FullscreenVideoCall = ({
                 className="video-controls__button video-controls__button--small"
                 css={videoControlInActiveStyles}
                 onClick={openPopup}
-                onKeyDown={event => handleKeyDown(event, () => openPopup())}
+                onKeyDown={event =>
+                  handleKeyDown({
+                    event,
+                    callback: openPopup,
+                    keys: [KEY.ENTER, KEY.SPACE],
+                  })
+                }
                 type="button"
                 data-uie-name="do-call-controls-video-maximize"
                 title={t('videoCallOverlayOpenPopupWindow')}
@@ -616,7 +645,13 @@ const FullscreenVideoCall = ({
                     className="video-controls__button video-controls__button--small"
                     css={videoControlInActiveStyles}
                     onClick={minimize}
-                    onKeyDown={event => handleKeyDown(event, () => minimize())}
+                    onKeyDown={event =>
+                      handleKeyDown({
+                        event,
+                        callback: minimize,
+                        keys: [KEY.ENTER, KEY.SPACE],
+                      })
+                    }
                     type="button"
                     data-uie-name="do-call-controls-video-minimize"
                     title={t('videoCallOverlayCloseFullScreen')}
@@ -635,7 +670,13 @@ const FullscreenVideoCall = ({
                     className="video-controls__button"
                     data-uie-value={!isMuted ? 'inactive' : 'active'}
                     onClick={() => toggleMute(call, !isMuted)}
-                    onKeyDown={event => handleKeyDown(event, () => toggleMute(call, !isMuted))}
+                    onKeyDown={event =>
+                      handleKeyDown({
+                        event,
+                        callback: () => toggleMute(call, !isMuted),
+                        keys: isPressSpaceToUnmuteEnabled ? [KEY.ENTER] : [KEY.ENTER, KEY.SPACE],
+                      })
+                    }
                     css={!isMuted ? videoControlActiveStyles : videoControlInActiveStyles}
                     type="button"
                     data-uie-name="do-call-controls-video-call-mute"
@@ -651,7 +692,13 @@ const FullscreenVideoCall = ({
                       className="device-toggle-button"
                       css={audioOptionsOpen ? videoControlActiveStyles : videoControlInActiveStyles}
                       onClick={() => setAudioOptionsOpen(prev => !prev)}
-                      onKeyDown={event => handleKeyDown(event, () => setAudioOptionsOpen(prev => !prev))}
+                      onKeyDown={event =>
+                        handleKeyDown({
+                          event,
+                          callback: () => setAudioOptionsOpen(prev => !prev),
+                          keys: [KEY.ENTER, KEY.SPACE],
+                        })
+                      }
                       onBlur={event => {
                         if (!event.currentTarget.contains(event.relatedTarget)) {
                           setAudioOptionsOpen(false);
@@ -697,7 +744,13 @@ const FullscreenVideoCall = ({
                       className="video-controls__button"
                       data-uie-value={selfSharesCamera ? 'active' : 'inactive'}
                       onClick={() => toggleCamera(call)}
-                      onKeyDown={event => handleKeyDown(event, () => toggleCamera(call))}
+                      onKeyDown={event =>
+                        handleKeyDown({
+                          event,
+                          callback: () => toggleCamera(call),
+                          keys: [KEY.ENTER, KEY.SPACE],
+                        })
+                      }
                       role="switch"
                       aria-checked={selfSharesCamera}
                       tabIndex={TabIndex.FOCUSABLE}
@@ -716,7 +769,13 @@ const FullscreenVideoCall = ({
                       className="device-toggle-button"
                       css={videoOptionsOpen ? videoControlActiveStyles : videoControlInActiveStyles}
                       onClick={() => setVideoOptionsOpen(prev => !prev)}
-                      onKeyDown={event => handleKeyDown(event, () => setVideoOptionsOpen(prev => !prev))}
+                      onKeyDown={event =>
+                        handleKeyDown({
+                          event,
+                          callback: () => setVideoOptionsOpen(prev => !prev),
+                          keys: [KEY.ENTER, KEY.SPACE],
+                        })
+                      }
                       onBlur={event => {
                         if (!event.currentTarget.contains(event.relatedTarget)) {
                           setVideoOptionsOpen(false);
@@ -763,7 +822,13 @@ const FullscreenVideoCall = ({
                           : videoControlInActiveStyles
                     }
                     onClick={() => toggleScreenshare(call)}
-                    onKeyDown={event => handleKeyDown(event, () => toggleScreenshare(call))}
+                    onKeyDown={event =>
+                      handleKeyDown({
+                        event,
+                        callback: () => toggleScreenshare(call),
+                        keys: [KEY.ENTER, KEY.SPACE],
+                      })
+                    }
                     type="button"
                     data-uie-value={selfSharesScreen ? 'active' : 'inactive'}
                     data-uie-enabled={canShareScreen ? 'true' : 'false'}
@@ -782,7 +847,13 @@ const FullscreenVideoCall = ({
                   <button
                     className="video-controls__button video-controls__button--red"
                     onClick={() => leave(call)}
-                    onKeyDown={event => handleKeyDown(event, () => leave(call))}
+                    onKeyDown={event =>
+                      handleKeyDown({
+                        event,
+                        callback: () => leave(call),
+                        keys: [KEY.ENTER, KEY.SPACE],
+                      })
+                    }
                     type="button"
                     data-uie-name="do-call-controls-video-call-cancel"
                     title={t('videoCallOverlayHangUp')}
@@ -812,7 +883,13 @@ const FullscreenVideoCall = ({
                         }}
                         className={cx('video-controls__button_primary', {active: isCallViewOpen})}
                         onClick={toggleCallView}
-                        onKeyDown={event => handleKeyDown(event, toggleCallView)}
+                        onKeyDown={event =>
+                          handleKeyDown({
+                            event,
+                            callback: toggleCallView,
+                            keys: [KEY.ENTER, KEY.SPACE],
+                          })
+                        }
                         type="button"
                         data-uie-name="do-call-controls-video-call-view"
                         role="switch"
@@ -854,7 +931,13 @@ const FullscreenVideoCall = ({
                       <button
                         data-uie-value={isSelfHandRaised ? 'active' : 'inactive'}
                         onClick={() => toggleIsHandRaised(isSelfHandRaised)}
-                        onKeyDown={event => handleKeyDown(event, () => toggleIsHandRaised(isSelfHandRaised))}
+                        onKeyDown={event =>
+                          handleKeyDown({
+                            event,
+                            callback: () => toggleIsHandRaised(isSelfHandRaised),
+                            keys: [KEY.ENTER, KEY.SPACE],
+                          })
+                        }
                         className={cx('video-controls__button_primary', {active: isSelfHandRaised})}
                         type="button"
                         data-uie-name="do-toggle-hand-raise"
@@ -916,7 +999,13 @@ const FullscreenVideoCall = ({
                     <button
                       data-uie-value={isParticipantsListOpen ? 'active' : 'inactive'}
                       onClick={toggleParticipantsList}
-                      onKeyDown={event => handleKeyDown(event, toggleParticipantsList)}
+                      onKeyDown={event =>
+                        handleKeyDown({
+                          event,
+                          callback: toggleParticipantsList,
+                          keys: [KEY.ENTER, KEY.SPACE],
+                        })
+                      }
                       className={cx('video-controls__button_primary', {active: isParticipantsListOpen})}
                       type="button"
                       data-uie-name="do-toggle-call-participants-list"

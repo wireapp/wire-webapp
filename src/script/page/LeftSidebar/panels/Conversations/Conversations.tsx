@@ -26,6 +26,7 @@ import {useShallow} from 'zustand/react/shallow';
 import {useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {useConversationFocus} from 'Hooks/useConversationFocus';
 import {IntegrationRepository} from 'src/script/integration/IntegrationRepository';
 import {Preferences} from 'src/script/page/LeftSidebar/panels/Preferences';
 import {StartUI} from 'src/script/page/LeftSidebar/panels/StartUI';
@@ -55,7 +56,6 @@ import {ConversationRepository} from '../../../../conversation/ConversationRepos
 import {ConversationState} from '../../../../conversation/ConversationState';
 import type {Conversation} from '../../../../entity/Conversation';
 import {User} from '../../../../entity/User';
-import {useConversationFocus} from '../../../../hooks/useConversationFocus';
 import {PreferenceNotificationRepository} from '../../../../notification/PreferenceNotificationRepository';
 import {PropertiesRepository} from '../../../../properties/PropertiesRepository';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
@@ -133,9 +133,12 @@ export const Conversations: React.FC<ConversationsProps> = ({
   const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
 
   const {conversationLabelRepository} = conversationRepository;
+  const {labels} = useKoSubscribableChildren(conversationLabelRepository, ['labels']);
+  const favoriteLabel = conversationLabelRepository.getFavoriteLabel();
+
   const favoriteConversations = useMemo(
-    () => conversationLabelRepository.getFavorites(conversations),
-    [conversationLabelRepository, conversations],
+    () => conversationLabelRepository.getLabelConversations(favoriteLabel, conversations),
+    [conversationLabelRepository, conversations, favoriteLabel],
   );
 
   const isPreferences = currentTab === SidebarTabs.PREFERENCES;
@@ -177,8 +180,7 @@ export const Conversations: React.FC<ConversationsProps> = ({
     favoriteConversations,
   });
 
-  const currentFolder = conversationLabelRepository
-    .getLabels()
+  const currentFolder = labels
     .map(label => createLabel(label.name, conversationLabelRepository.getLabelConversations(label), label.id))
     .find(folder => folder.id === expandedFolder);
 

@@ -97,7 +97,7 @@ const IndexComponent = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps
               values={{
                 link: (
                   <a href="https://app.wire.com" rel="noopener noreferrer">
-                    https://app.wire.com
+                    wire.com
                   </a>
                 ),
               }}

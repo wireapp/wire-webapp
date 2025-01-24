@@ -19,6 +19,7 @@
 
 import React, {MouseEvent} from 'react';
 
+import {FormatSeparator} from 'Components/InputBar/components/common/FormatSeparator/FormatSeparator';
 import {Config} from 'src/script/Config';
 import {Conversation} from 'src/script/entity/Conversation';
 
@@ -41,6 +42,8 @@ export type ControlButtonsProps = {
   isFormatActive: boolean;
   isEmojiActive: boolean;
   showGiphyButton?: boolean;
+  showFormatButton: boolean;
+  showEmojiButton: boolean;
   onClickPing: () => void;
   onSelectFiles: (files: File[]) => void;
   onSelectImages: (files: File[]) => void;
@@ -59,6 +62,8 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
   isFormatActive,
   isEmojiActive,
   showGiphyButton,
+  showFormatButton,
+  showEmojiButton,
   onClickPing,
   onSelectFiles,
   onSelectImages,
@@ -67,35 +72,50 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
   onFormatClick,
   onEmojiClick,
 }) => {
-  const messageFormatButtonsEnabled = Config.getConfig().FEATURE.ENABLE_MESSAGE_FORMAT_BUTTONS;
-
   if (isEditing) {
     return (
-      <li>
-        <CancelEditButton onClick={onCancelEditing} />
-      </li>
+      <>
+        {showFormatButton && (
+          <li>
+            <FormatTextButton isActive={isFormatActive} isEditing onClick={onFormatClick} />
+          </li>
+        )}
+
+        {showEmojiButton && (
+          <li>
+            <EmojiButton isActive={isEmojiActive} isEditing onClick={onEmojiClick} />
+          </li>
+        )}
+        {(showFormatButton || showEmojiButton) && (
+          <li aria-hidden="true">
+            <FormatSeparator isEditing />
+          </li>
+        )}
+        <li>
+          <CancelEditButton isEditing onClick={onCancelEditing} />
+        </li>
+      </>
     );
   }
 
   if (input.length === 0) {
     return (
       <>
-        {messageFormatButtonsEnabled && (
-          <>
-            <li>
-              <FormatTextButton isActive={isFormatActive} onClick={onFormatClick} />
-            </li>
-            <li>
-              <EmojiButton isActive={isEmojiActive} onClick={onEmojiClick} />
-            </li>
-          </>
+        {showFormatButton && (
+          <li>
+            <FormatTextButton isActive={isFormatActive} onClick={onFormatClick} />
+          </li>
         )}
 
+        {showEmojiButton && (
+          <li>
+            <EmojiButton isActive={isEmojiActive} onClick={onEmojiClick} />
+          </li>
+        )}
         {!disableFilesharing && (
           <>
             <li>
               <ImageUploadButton
-                hasRoundedCorners={!messageFormatButtonsEnabled}
                 onSelectImages={onSelectImages}
                 acceptedImageTypes={Config.getConfig().ALLOWED_IMAGE_TYPES}
               />
@@ -108,6 +128,9 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
             </li>
           </>
         )}
+        <li aria-hidden="true">
+          <FormatSeparator />
+        </li>
         <li>
           <PingButton isDisabled={!!disablePing} onClick={onClickPing} />
         </li>
@@ -122,17 +145,22 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
     <>
       {showGiphyButton && !disableFilesharing && (
         <>
-          {messageFormatButtonsEnabled && (
-            <>
-              <li>
-                <FormatTextButton isActive={isFormatActive} onClick={onFormatClick} />
-              </li>
-              <li>
-                <EmojiButton isActive={isEmojiActive} onClick={onEmojiClick} />
-              </li>
-            </>
+          {showFormatButton && (
+            <li>
+              <FormatTextButton isActive={isFormatActive} onClick={onFormatClick} />
+            </li>
           )}
-          <GiphyButton onGifClick={onGifClick} hasRoundedLeftCorner={!messageFormatButtonsEnabled} />
+          {showEmojiButton && (
+            <li>
+              <EmojiButton isActive={isEmojiActive} onClick={onEmojiClick} />
+            </li>
+          )}
+          <li aria-hidden="true">
+            <FormatSeparator />
+          </li>
+          <li>
+            <GiphyButton onGifClick={onGifClick} />
+          </li>
         </>
       )}
     </>
