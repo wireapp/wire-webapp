@@ -1335,7 +1335,7 @@
   "preferencesOptionsEmojiReplaceDetail": ":-) → [icon]",
   "preferencesOptionsEnableAgcCheckbox": "Автоматическая регулировка усиления (АРУ)",
   "preferencesOptionsEnableAgcDetails": "Включение позволяет автоматически регулировать громкость микрофона, чтобы все участники разговора были слышны с одинаковой и комфортной громкостью.",
-  "preferencesOptionsEnablePressSpaceToUnmute": "Unmute with space bar",
+  "preferencesOptionsEnablePressSpaceToUnmute": "Включить звук пробелом",
   "preferencesOptionsEnablePressSpaceToUnmuteDetails": "Enable to unmute your microphone by pressing and holding the space bar as long as you want to speak. You can use this option in full view.",
   "preferencesOptionsEnableSoundlessIncomingCalls": "Не уведомлять во время вызова",
   "preferencesOptionsEnableSoundlessIncomingCallsDetails": "Уведомление будет отключено, если вы в этот момент с кем-то разговариваете",
