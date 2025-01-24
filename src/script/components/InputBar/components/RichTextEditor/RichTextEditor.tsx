@@ -39,6 +39,7 @@ import {FormatToolbar} from './components/FormatToolbar/FormatToolbar';
 import {Placeholder} from './components/Placeholder/Placeholder';
 import {editorConfig} from './editorConfig';
 import {AutoFocusPlugin} from './plugins/AutoFocusPlugin/AutoFocusPlugin';
+import {AutoLinkPlugin} from './plugins/AutoLinkPlugin/AutoLinkPlugin';
 import {BlockquotePlugin} from './plugins/BlockquotePlugin/BlockquotePlugin';
 import {CodeHighlightPlugin} from './plugins/CodeHighlightPlugin/CodeHighlightPlugin';
 import {DraftStatePlugin} from './plugins/DraftStatePlugin/DraftStatePlugin';
@@ -47,6 +48,7 @@ import {EmojiPickerPlugin} from './plugins/EmojiPickerPlugin';
 import {GlobalEventsPlugin} from './plugins/GlobalEventsPlugin/GlobalEventsPlugin';
 import {HistoryPlugin} from './plugins/HistoryPlugin/HistoryPlugin';
 import {ReplaceEmojiPlugin} from './plugins/InlineEmojiReplacementPlugin';
+import {LinkPlugin} from './plugins/LinkPlugin/LinkPlugin';
 import {ListItemTabIndentationPlugin} from './plugins/ListIndentationPlugin/ListIndentationPlugin';
 import {ListMaxIndentLevelPlugin} from './plugins/ListMaxIndentLevelPlugin/ListMaxIndentLevelPlugin';
 import {MentionsPlugin} from './plugins/MentionsPlugin';
@@ -133,6 +135,8 @@ export const RichTextEditor = ({
     });
   };
 
+  const isEditing = !!editedMessage;
+
   return (
     <LexicalComposer initialConfig={editorConfig}>
       <div className="controls-center input-bar-field">
@@ -161,6 +165,8 @@ export const RichTextEditor = ({
               <MarkdownShortcutPlugin transformers={markdownTransformers} />
               <CodeHighlightPlugin />
               <BlockquotePlugin />
+              <LinkPlugin />
+              <AutoLinkPlugin />
             </>
           )}
 
@@ -182,12 +188,12 @@ export const RichTextEditor = ({
               }
             }}
           />
-          <PastePlugin getMentionCandidates={getMentionCandidates} />
+          <PastePlugin getMentionCandidates={getMentionCandidates} isPreviewMode={showMarkdownPreview} />
         </div>
       </div>
       {showFormatToolbar && showMarkdownPreview && (
         <div className="input-bar-toolbar">
-          <FormatToolbar />
+          <FormatToolbar isEditing={isEditing} />
         </div>
       )}
       {children}

@@ -19,13 +19,26 @@
 
 import {useCallback, useEffect, useState} from 'react';
 
+import {$isLinkNode} from '@lexical/link';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {$getSelection, $isRangeSelection} from 'lexical';
 
-import {isNodeHeading} from '../common/isNodeHeading/isNodeHeading';
-import {isNodeList} from '../common/isNodeList/isNodeList';
+import {isBlockquoteNode} from '../common/isBlockquoteNode/isBlockquoteNode';
+import {isCodeBlockNode} from '../common/isCodeBlockNode/isCodeBlockNode';
+import {isHeadingNode} from '../common/isHeadingNode/isHeadingNode';
+import {isListNode} from '../common/isListNode/isListNode';
 
-type FormatTypes = 'bold' | 'italic' | 'strikethrough' | 'code' | 'unorderedList' | 'orderedList' | 'heading';
+type FormatTypes =
+  | 'bold'
+  | 'italic'
+  | 'strikethrough'
+  | 'code'
+  | 'unorderedList'
+  | 'orderedList'
+  | 'heading'
+  | 'blockquote'
+  | 'codeBlock'
+  | 'link';
 
 export const useToolbarState = () => {
   const [editor] = useLexicalComposerContext();
@@ -46,23 +59,34 @@ export const useToolbarState = () => {
         {format: 'italic', check: () => selection.hasFormat('italic')},
         {format: 'strikethrough', check: () => selection.hasFormat('strikethrough')},
         {format: 'code', check: () => selection.hasFormat('code')},
-        {format: 'unorderedList', check: () => isNodeList(node, 'unordered')},
-        {format: 'orderedList', check: () => isNodeList(node, 'ordered')},
-        {format: 'heading', check: () => isNodeHeading(node)},
+        {format: 'unorderedList', check: () => isListNode(node, 'unordered')},
+        {format: 'orderedList', check: () => isListNode(node, 'ordered')},
+        {format: 'heading', check: () => isHeadingNode(node)},
+        {format: 'blockquote', check: () => isBlockquoteNode(node)},
+        {format: 'codeBlock', check: () => isCodeBlockNode(node)},
+        {format: 'link', check: () => $isLinkNode(node) || $isLinkNode(node.getParent())},
       ];
 
       const activeFormats = formatChecks.filter(({check}) => check()).map(({format}) => format);
 
-      setActiveFormats(activeFormats);
+      setActiveFormats(prevFormats => {
+        if (
+          prevFormats.length !== activeFormats.length ||
+          !prevFormats.every(format => activeFormats.includes(format))
+        ) {
+          return activeFormats;
+        }
+        return prevFormats;
+      });
     });
   }, [editor]);
 
   useEffect(() => {
-    if (!editor) {
-      return undefined;
-    }
-
-    return editor.registerUpdateListener(updateToolbar);
+    return editor.registerUpdateListener(({editorState}) => {
+      editorState.read(() => {
+        updateToolbar();
+      });
+    });
   }, [editor, updateToolbar]);
 
   return {activeFormats};

@@ -92,7 +92,7 @@ const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({
   return (
     <button
       id="conversation-input-bar-message-timer"
-      className="controls-right-button buttons-group-button-right conversation-input-bar-message-timer"
+      className="input-bar-control conversation-input-bar-message-timer"
       onClick={isTimerDisabled ? undefined : onClick}
       onKeyDown={handleContextKeyDown}
       title={t('tooltipConversationEphemeral')}
@@ -119,7 +119,7 @@ const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({
         )
       ) : (
         <span className={cx({disabled: isTimerDisabled})} css={{display: 'flex'}}>
-          <Icon.TimerIcon data-uie-name="message-timer-icon" />
+          <Icon.TimerIcon data-uie-name="message-timer-icon" width={14} height={14} />
         </span>
       )}
     </button>

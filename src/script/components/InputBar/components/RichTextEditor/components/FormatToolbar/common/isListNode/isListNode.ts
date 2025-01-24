@@ -19,17 +19,17 @@
 
 import {ElementNode, TextNode} from 'lexical';
 
-type HeadingTag = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
-
-export const isNodeHeading = (node: TextNode | ElementNode | null, headingTag: HeadingTag = 'h1'): boolean => {
+export const isListNode = (node: TextNode | ElementNode | null, listType: 'ordered' | 'unordered'): boolean => {
   if (!node) {
     return false;
   }
 
+  const tag = listType === 'ordered' ? 'ol' : 'ul';
+
   // @ts-expect-error: `getTag` is not specified in the type definition, but it exists
-  if (node.getType() === 'heading' && node.getTag() === headingTag) {
+  if (node.getType() === 'list' && node.getTag() === tag) {
     return true;
   }
 
-  return isNodeHeading(node.getParent(), headingTag);
+  return isListNode(node.getParent(), listType);
 };

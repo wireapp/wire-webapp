@@ -17,27 +17,17 @@
  *
  */
 
-import {useEffect} from 'react';
-
+import {$createCodeNode} from '@lexical/code';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {$createHeadingNode} from '@lexical/rich-text';
 import {$setBlocksType} from '@lexical/selection';
-import {$getSelection, createCommand, $isRangeSelection, $createParagraphNode} from 'lexical';
+import {$getSelection, $isRangeSelection, $createParagraphNode} from 'lexical';
 
-import {headingCommand} from './headingCommand';
+import {isCodeBlockNode} from '../common/isCodeBlockNode/isCodeBlockNode';
 
-import {isHeadingNode} from '../common/isHeadingNode/isHeadingNode';
-
-const INSERT_HEADING_COMMAND = createCommand();
-
-export const useHeadingState = () => {
+export const useCodeBlockState = () => {
   const [editor] = useLexicalComposerContext();
 
-  useEffect(() => {
-    return editor.registerCommand(INSERT_HEADING_COMMAND, headingCommand, 0);
-  }, [editor]);
-
-  const formatHeading = () => {
+  const formatCodeBlock = () => {
     editor.update(() => {
       const selection = $getSelection();
 
@@ -46,16 +36,16 @@ export const useHeadingState = () => {
       }
 
       const anchorNode = selection.anchor.getNode();
-      const isHeading = isHeadingNode(anchorNode);
+      const isCodeBlock = isCodeBlockNode(anchorNode);
 
-      if (isHeading) {
+      if (isCodeBlock) {
         $setBlocksType(selection, () => $createParagraphNode());
         return;
       }
 
-      $setBlocksType(selection, () => $createHeadingNode('h1'));
+      $setBlocksType(selection, () => $createCodeNode());
     });
   };
 
-  return {formatHeading};
+  return {formatCodeBlock};
 };

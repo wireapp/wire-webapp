@@ -21,12 +21,12 @@ import {INSERT_ORDERED_LIST_COMMAND, INSERT_UNORDERED_LIST_COMMAND, REMOVE_LIST_
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {$getSelection, $isRangeSelection} from 'lexical';
 
-import {isNodeList} from '../common/isNodeList/isNodeList';
+import {isListNode} from '../common/isListNode/isListNode';
 
 export const useListState = () => {
   const [editor] = useLexicalComposerContext();
 
-  const toggleList = (listType: 'unordered' | 'ordered') => {
+  const formatList = (listType: 'unordered' | 'ordered') => {
     editor.update(() => {
       const selection = $getSelection();
 
@@ -35,7 +35,7 @@ export const useListState = () => {
       }
 
       const node = selection.anchor.getNode();
-      const isActive = isNodeList(node, listType);
+      const isActive = isListNode(node, listType);
 
       const command = listType === 'unordered' ? INSERT_UNORDERED_LIST_COMMAND : INSERT_ORDERED_LIST_COMMAND;
 
@@ -43,5 +43,5 @@ export const useListState = () => {
     });
   };
 
-  return {toggleList};
+  return {formatList};
 };

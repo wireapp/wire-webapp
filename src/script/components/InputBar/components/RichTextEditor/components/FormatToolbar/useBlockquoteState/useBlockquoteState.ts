@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2024 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,27 +17,15 @@
  *
  */
 
-import {useEffect} from 'react';
-
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {$createHeadingNode} from '@lexical/rich-text';
+import {$isQuoteNode, $createQuoteNode} from '@lexical/rich-text';
 import {$setBlocksType} from '@lexical/selection';
-import {$getSelection, createCommand, $isRangeSelection, $createParagraphNode} from 'lexical';
+import {$createParagraphNode, $getSelection, $isRangeSelection} from 'lexical';
 
-import {headingCommand} from './headingCommand';
-
-import {isHeadingNode} from '../common/isHeadingNode/isHeadingNode';
-
-const INSERT_HEADING_COMMAND = createCommand();
-
-export const useHeadingState = () => {
+export const useBlockquoteState = () => {
   const [editor] = useLexicalComposerContext();
 
-  useEffect(() => {
-    return editor.registerCommand(INSERT_HEADING_COMMAND, headingCommand, 0);
-  }, [editor]);
-
-  const formatHeading = () => {
+  const formatBlockquote = () => {
     editor.update(() => {
       const selection = $getSelection();
 
@@ -46,16 +34,18 @@ export const useHeadingState = () => {
       }
 
       const anchorNode = selection.anchor.getNode();
-      const isHeading = isHeadingNode(anchorNode);
+      const parent = anchorNode.getParent();
 
-      if (isHeading) {
+      const isBlockquote = $isQuoteNode(anchorNode) || $isQuoteNode(parent);
+
+      if (isBlockquote) {
         $setBlocksType(selection, () => $createParagraphNode());
         return;
       }
 
-      $setBlocksType(selection, () => $createHeadingNode('h1'));
+      $setBlocksType(selection, () => $createQuoteNode());
     });
   };
 
-  return {formatHeading};
+  return {formatBlockquote};
 };

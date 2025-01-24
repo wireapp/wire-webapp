@@ -17,33 +17,16 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {ElementNode, TextNode} from 'lexical';
 
-export const wrapperStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  columnGap: '4px',
-  overflowX: 'auto',
-  scrollbarWidth: 'none',
-  '-ms-overflow-style': 'none',
+export const isCodeBlockNode = (node: TextNode | ElementNode | null): boolean => {
+  if (!node) {
+    return false;
+  }
 
-  '&::-webkit-scrollbar': {
-    width: 0,
-    height: 0,
-    display: 'none',
-  },
-};
+  if (node.getType() === 'code') {
+    return true;
+  }
 
-export const separatorStyles: CSSObject = {
-  width: '2px',
-  height: '24px',
-  backgroundColor: 'var(--gray-40)',
-
-  'body.theme-dark &': {
-    backgroundColor: 'var(--gray-80)',
-  },
-};
-
-export const separatorStylesEditing: CSSObject = {
-  backgroundColor: 'var(--accent-color-200)',
+  return isCodeBlockNode(node.getParent());
 };

@@ -19,6 +19,7 @@
 
 import React, {MouseEvent} from 'react';
 
+import {FormatSeparator} from 'Components/InputBar/components/common/FormatSeparator/FormatSeparator';
 import {Config} from 'src/script/Config';
 import {Conversation} from 'src/script/entity/Conversation';
 
@@ -73,9 +74,27 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
 }) => {
   if (isEditing) {
     return (
-      <li>
-        <CancelEditButton onClick={onCancelEditing} />
-      </li>
+      <>
+        {showFormatButton && (
+          <li>
+            <FormatTextButton isActive={isFormatActive} isEditing onClick={onFormatClick} />
+          </li>
+        )}
+
+        {showEmojiButton && (
+          <li>
+            <EmojiButton isActive={isEmojiActive} isEditing onClick={onEmojiClick} />
+          </li>
+        )}
+        {(showFormatButton || showEmojiButton) && (
+          <li aria-hidden="true">
+            <FormatSeparator isEditing />
+          </li>
+        )}
+        <li>
+          <CancelEditButton isEditing onClick={onCancelEditing} />
+        </li>
+      </>
     );
   }
 
@@ -90,15 +109,13 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
 
         {showEmojiButton && (
           <li>
-            <EmojiButton isActive={isEmojiActive} hasRoundedCorners={!showFormatButton} onClick={onEmojiClick} />
+            <EmojiButton isActive={isEmojiActive} onClick={onEmojiClick} />
           </li>
         )}
-
         {!disableFilesharing && (
           <>
             <li>
               <ImageUploadButton
-                hasRoundedCorners={!showFormatButton && !showEmojiButton}
                 onSelectImages={onSelectImages}
                 acceptedImageTypes={Config.getConfig().ALLOWED_IMAGE_TYPES}
               />
@@ -111,6 +128,9 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
             </li>
           </>
         )}
+        <li aria-hidden="true">
+          <FormatSeparator />
+        </li>
         <li>
           <PingButton isDisabled={!!disablePing} onClick={onClickPing} />
         </li>
@@ -132,10 +152,15 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
           )}
           {showEmojiButton && (
             <li>
-              <EmojiButton isActive={isEmojiActive} hasRoundedCorners={!showFormatButton} onClick={onEmojiClick} />
+              <EmojiButton isActive={isEmojiActive} onClick={onEmojiClick} />
             </li>
           )}
-          <GiphyButton onGifClick={onGifClick} hasRoundedLeftCorner={!showFormatButton && !showEmojiButton} />
+          <li aria-hidden="true">
+            <FormatSeparator />
+          </li>
+          <li>
+            <GiphyButton onGifClick={onGifClick} />
+          </li>
         </>
       )}
     </>

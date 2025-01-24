@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2024 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,33 +17,21 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {$createLinkNode} from '@lexical/link';
+import {RangeSelection, $createTextNode} from 'lexical';
 
-export const wrapperStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  columnGap: '4px',
-  overflowX: 'auto',
-  scrollbarWidth: 'none',
-  '-ms-overflow-style': 'none',
+import {sanitizeUrl} from '../../../../utils/url';
 
-  '&::-webkit-scrollbar': {
-    width: 0,
-    height: 0,
-    display: 'none',
-  },
-};
+interface CreateLinkParams {
+  selection: RangeSelection;
+  url: string;
+  text?: string;
+}
 
-export const separatorStyles: CSSObject = {
-  width: '2px',
-  height: '24px',
-  backgroundColor: 'var(--gray-40)',
-
-  'body.theme-dark &': {
-    backgroundColor: 'var(--gray-80)',
-  },
-};
-
-export const separatorStylesEditing: CSSObject = {
-  backgroundColor: 'var(--accent-color-200)',
+export const createNewLink = ({selection, url, text}: CreateLinkParams) => {
+  const textContent = text || selection.getTextContent() || url;
+  const textNode = $createTextNode(textContent);
+  const linkNode = $createLinkNode(sanitizeUrl(url));
+  linkNode.append(textNode);
+  selection.insertNodes([linkNode]);
 };

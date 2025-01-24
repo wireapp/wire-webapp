@@ -644,11 +644,7 @@ export const InputBar = ({
                   onBlur={() => isTypingRef.current && conversationRepository.sendTypingStop(conversation)}
                 >
                   <div className="input-bar-buttons">
-                    <ul
-                      className={cx('controls-right buttons-group input-bar-buttons__list', {
-                        'controls-right-shrinked': textValue.length !== 0,
-                      })}
-                    >
+                    <ul className="input-bar-controls">
                       <ControlButtons {...controlButtonsProps} showGiphyButton={showGiphyButton} />
                     </ul>
                     <SendMessageButton

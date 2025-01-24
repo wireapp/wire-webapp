@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2024 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,33 +17,21 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+const SUPPORTED_URL_PROTOCOLS = new Set(['http:', 'https:', 'mailto:', 'sms:', 'tel:']);
 
-export const wrapperStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  columnGap: '4px',
-  overflowX: 'auto',
-  scrollbarWidth: 'none',
-  '-ms-overflow-style': 'none',
+export const URL_REGEX =
+  /((https?:\/\/(www\.)?)|(www\.))[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)(?<![-.+():%])/;
 
-  '&::-webkit-scrollbar': {
-    width: 0,
-    height: 0,
-    display: 'none',
-  },
+export const sanitizeUrl = (url: string): string => {
+  try {
+    const parsedUrl = new URL(url);
+    if (!SUPPORTED_URL_PROTOCOLS.has(parsedUrl.protocol)) {
+      return '';
+    }
+  } catch {
+    return url.startsWith('http') ? url : `https://${url}`;
+  }
+  return url;
 };
 
-export const separatorStyles: CSSObject = {
-  width: '2px',
-  height: '24px',
-  backgroundColor: 'var(--gray-40)',
-
-  'body.theme-dark &': {
-    backgroundColor: 'var(--gray-80)',
-  },
-};
-
-export const separatorStylesEditing: CSSObject = {
-  backgroundColor: 'var(--accent-color-200)',
-};
+export const validateUrl = (url: string): boolean => url === 'https://' || URL_REGEX.test(url);

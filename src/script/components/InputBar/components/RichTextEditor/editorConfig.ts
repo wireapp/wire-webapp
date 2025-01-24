@@ -18,7 +18,7 @@
  */
 
 import {CodeHighlightNode, CodeNode} from '@lexical/code';
-import {LinkNode} from '@lexical/link';
+import {LinkNode, AutoLinkNode} from '@lexical/link';
 import {ListItemNode, ListNode} from '@lexical/list';
 import {InitialConfigType} from '@lexical/react/LexicalComposer';
 import {HorizontalRuleNode} from '@lexical/react/LexicalHorizontalRuleNode';
@@ -48,7 +48,8 @@ export const editorConfig: InitialConfigType = {
     QuoteNode,
     CodeNode,
     CodeHighlightNode,
-    LinkNode,
     QuoteNode,
+    LinkNode,
+    AutoLinkNode,
   ],
 };

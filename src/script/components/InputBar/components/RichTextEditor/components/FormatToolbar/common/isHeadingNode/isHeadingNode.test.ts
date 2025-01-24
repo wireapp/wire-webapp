@@ -19,7 +19,7 @@
 
 import {ElementNode, TextNode} from 'lexical';
 
-import {isNodeHeading} from './isNodeHeading';
+import {isHeadingNode} from './isHeadingNode';
 
 const createMockElementNode = (type: string, tag: string, parent: ElementNode | null = null): ElementNode => {
   return {
@@ -37,47 +37,47 @@ const createMockTextNode = (parent: ElementNode | null = null): TextNode => {
   } as unknown as TextNode;
 };
 
-describe('isNodeHeading', () => {
+describe('isHeadingNode', () => {
   it('returns false when node is null', () => {
-    expect(isNodeHeading(null)).toBe(false);
+    expect(isHeadingNode(null)).toBe(false);
   });
 
   it('returns false for a non-heading node', () => {
     const textNode = createMockTextNode();
 
-    expect(isNodeHeading(textNode)).toBe(false);
+    expect(isHeadingNode(textNode)).toBe(false);
   });
 
   it('returns true for a heading node with the default tag', () => {
     const headingNode = createMockElementNode('heading', 'h1');
 
-    expect(isNodeHeading(headingNode)).toBe(true);
+    expect(isHeadingNode(headingNode)).toBe(true);
   });
 
   it('returns false for a heading node with a different tag', () => {
     const headingNode = createMockElementNode('heading', 'h2');
 
-    expect(isNodeHeading(headingNode)).toBe(false);
+    expect(isHeadingNode(headingNode)).toBe(false);
   });
 
   it('returns true for a heading node with a specified matching tag', () => {
     const headingNode = createMockElementNode('heading', 'h3');
 
-    expect(isNodeHeading(headingNode, 'h3')).toBe(true);
+    expect(isHeadingNode(headingNode, 'h3')).toBe(true);
   });
 
   it('returns true when a parent node is a matching heading', () => {
     const parentHeadingNode = createMockElementNode('heading', 'h2');
     const childNode = createMockTextNode(parentHeadingNode);
 
-    expect(isNodeHeading(childNode, 'h2')).toBe(true);
+    expect(isHeadingNode(childNode, 'h2')).toBe(true);
   });
 
   it('returns false when no parent node matches the heading tag', () => {
     const parentHeadingNode = createMockElementNode('heading', 'h3');
     const childNode = createMockTextNode(parentHeadingNode);
 
-    expect(isNodeHeading(childNode, 'h1')).toBe(false);
+    expect(isHeadingNode(childNode, 'h1')).toBe(false);
   });
 
   it('handles deeply nested parent heading nodes', () => {
@@ -85,13 +85,13 @@ describe('isNodeHeading', () => {
     const parentNode = createMockElementNode('heading', 'h3', grandparentHeadingNode);
     const childNode = createMockTextNode(parentNode);
 
-    expect(isNodeHeading(childNode, 'h4')).toBe(true);
+    expect(isHeadingNode(childNode, 'h4')).toBe(true);
   });
 
   it('returns false when no heading is in the ancestor chain', () => {
     const nonHeadingParent = createMockElementNode('div', '');
     const childNode = createMockTextNode(nonHeadingParent);
 
-    expect(isNodeHeading(childNode, 'h1')).toBe(false);
+    expect(isHeadingNode(childNode, 'h1')).toBe(false);
   });
 });

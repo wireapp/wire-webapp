@@ -27,16 +27,16 @@ import {t} from 'Util/LocalizerUtil';
 
 interface EmojiButtonProps {
   isActive: boolean;
-  hasRoundedCorners: boolean;
+  isEditing?: boolean;
   onClick: (event: MouseEvent<HTMLButtonElement>) => void;
 }
 
-export const EmojiButton = ({isActive, hasRoundedCorners, onClick}: EmojiButtonProps) => {
+export const EmojiButton = ({isActive, isEditing = false, onClick}: EmojiButtonProps) => {
   return (
     <button
-      className={cx('controls-right-button no-radius', {
+      className={cx('input-bar-control', {
         active: isActive,
-        'buttons-group-button-left': hasRoundedCorners,
+        'input-bar-control--editing': isEditing,
       })}
       type="button"
       onClick={onClick}
@@ -44,7 +44,7 @@ export const EmojiButton = ({isActive, hasRoundedCorners, onClick}: EmojiButtonP
       aria-label={t('tooltipConversationEmoji')}
       data-uie-name="add-emoji"
     >
-      <EmojiIcon />
+      <EmojiIcon width={14} height={14} />
     </button>
   );
 };

@@ -200,8 +200,8 @@
   display: block;
   overflow: auto;
   max-width: max-content;
-  padding: 12px;
-  border-radius: 12px;
+  padding: 8px 12px;
+  border-radius: 8px;
   margin: 4px 0;
   background: var(--foreground-fade-8);
   font-size: var(--font-size-small);
@@ -445,4 +445,14 @@ body.theme-dark {
 }
 .editor-tokenVariable {
   color: var(--token-variable);
+}
+
+.editor-link {
+  color: var(--accent-color);
+  cursor: pointer;
+
+  &:hover,
+  &:focus {
+    text-decoration: underline;
+  }
 }

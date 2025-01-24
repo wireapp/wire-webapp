@@ -38,6 +38,8 @@ import {$createMentionNode} from '../../nodes/MentionNode';
 interface PastePluginProps {
   /** Function that returns list of users that can be mentioned in the current context */
   getMentionCandidates: () => User[];
+  /** Whether the preview mode (render link as formatted node or raw markdown [text](url)) is enabled */
+  isPreviewMode: boolean;
 }
 
 type Selection = BaseSelection | null;
@@ -47,14 +49,13 @@ type Selection = BaseSelection | null;
  * It specifically handles:
  * 1. Lexical mentions - preserving mention nodes for users that exist in current conversation
  * 2. Formatted content - preserving text formatting (bold, italic, etc.)
- * 3. Links - converting them to markdown format [text](url) (TODO: To be removed after the link format button is implemented)
- * 4. Plain text - as a fallback
+ * 3. Plain text - as a fallback
  *
  * The plugin processes mentions intelligently:
  * - If a mentioned user exists in the current conversation, the mention is preserved as a MentionNode
  * - If a mentioned user doesn't exist, the mention is converted to plain text with @ symbol
  */
-export const PastePlugin = ({getMentionCandidates}: PastePluginProps): JSX.Element | null => {
+export const PastePlugin = ({getMentionCandidates, isPreviewMode}: PastePluginProps): JSX.Element | null => {
   const [editor] = useLexicalComposerContext();
 
   /**
@@ -157,7 +158,6 @@ export const PastePlugin = ({getMentionCandidates}: PastePluginProps): JSX.Eleme
 
   /**
    * Processes links in pasted content, converting them to markdown format.
-   * TODO: To be removed after the link format button is implemented
    * @param text - The text containing links
    * @param links - NodeList of link elements
    * @returns string - Processed text with markdown links
@@ -257,13 +257,22 @@ export const PastePlugin = ({getMentionCandidates}: PastePluginProps): JSX.Eleme
           const links = doc.querySelectorAll('a');
 
           // Try handling formatted content if no special elements
-          if (mentions.length === 0 && links.length === 0 && handleFormattedContent(doc, selection)) {
+          if (
+            mentions.length === 0 &&
+            (isPreviewMode || links.length === 0) &&
+            handleFormattedContent(doc, selection)
+          ) {
             return true;
           }
 
-          // Process links and mentions manually
-          const processedText = processLinks(plainText, links);
-          selection.insertText(processedText);
+          // Transform links to markdown ([text](url)) only if the preview mode is disabled
+          if (!isPreviewMode) {
+            const processedText = processLinks(plainText, links);
+            selection.insertText(processedText);
+          } else {
+            selection.insertText(plainText);
+          }
+
           processMentions(selection, mentions, availableUsers);
 
           return true;
