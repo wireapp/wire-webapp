@@ -26,11 +26,11 @@ import {t} from 'Util/LocalizerUtil';
 
 interface FormatTextButtonProps {
   isActive: boolean;
-  isEditing: boolean;
+  isEditing?: boolean;
   onClick: (event: MouseEvent<HTMLButtonElement>) => void;
 }
 
-export const FormatTextButton = ({isActive, isEditing, onClick}: FormatTextButtonProps) => {
+export const FormatTextButton = ({isActive, isEditing = false, onClick}: FormatTextButtonProps) => {
   return (
     <button
       className={cx(`input-bar-control`, {
