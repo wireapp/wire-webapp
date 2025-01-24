@@ -394,7 +394,7 @@
   "conversationAssetFailedDecryptDownloading": "ЗАГРУЗКА НЕ УДАЛАСЬ (файл не может быть расшифрован)",
   "conversationAssetFailedHashDownloading": "ЗАГРУЗКА НЕ УДАЛАСЬ (ХЭШ НЕ СОВПАДАЕТ)",
   "conversationAssetRestrictedAudioMessageHeadline": "Аудиосообщение",
-  "conversationAssetUploadCancel": "Cancel",
+  "conversationAssetUploadCancel": "Отмена",
   "conversationAssetUploadFailed": "Ошибка отправки",
   "conversationAssetUploading": "Загрузка…",
   "conversationAudioAssetRestricted": "Получение аудиосообщений запрещено",
