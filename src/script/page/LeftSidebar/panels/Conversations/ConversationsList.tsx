@@ -24,10 +24,7 @@ import React, {
   useState,
   MutableRefObject,
   useCallback,
-  useRef,
 } from 'react';
-
-import {useVirtualizer} from '@tanstack/react-virtual';
 
 import {WIDTH} from '@wireapp/react-ui-kit';
 
@@ -43,7 +40,7 @@ import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {ConnectionRequests} from './ConnectionRequests';
 import {conversationsList, headingTitle, noResultsMessage} from './ConversationsList.styles';
-import {conversationSearchFilter} from './helpers';
+import {conversationSearchFilter, scrollToConversation} from './helpers';
 
 import {CallState} from '../../../../calling/CallState';
 import {ConversationState} from '../../../../conversation/ConversationState';
@@ -129,19 +126,6 @@ export const ConversationsList = ({
     listViewModel.contentViewModel.switchContent(ContentState.CONNECTION_REQUESTS);
   };
 
-  const isFolderView = currentTab === SidebarTabs.FOLDER;
-  const filteredConversations =
-    (isFolderView && currentFolder?.conversations().filter(conversationSearchFilter(conversationsFilter))) || [];
-  const conversationsToDisplay = filteredConversations.length ? filteredConversations : conversations;
-
-  const parentRef = useRef(null);
-
-  const rowVirtualizer = useVirtualizer({
-    count: conversationsToDisplay.length,
-    getScrollElement: () => parentRef.current,
-    estimateSize: () => 56,
-  });
-
   const onConversationClick = useCallback(
     (conversation: Conversation) =>
       (event: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>) => {
@@ -181,16 +165,15 @@ export const ConversationsList = ({
 
   useEffect(() => {
     if (!conversationsFilter && clickedFilteredConversationId) {
-      const conversationIndex = conversationsToDisplay.findIndex(conv => conv.id === clickedFilteredConversationId);
-
-      if (conversationIndex !== -1) {
-        rowVirtualizer.scrollToIndex(conversationIndex, {align: 'center'});
-      }
-
-      // scrollToConversation(clickedFilteredConversationId);
+      scrollToConversation(clickedFilteredConversationId);
       setClickedFilteredConversationId(null);
     }
-  }, [conversationsFilter, clickedFilteredConversationId, conversationsToDisplay]);
+  }, [conversationsFilter, clickedFilteredConversationId]);
+
+  const isFolderView = currentTab === SidebarTabs.FOLDER;
+  const filteredConversations =
+    (isFolderView && currentFolder?.conversations().filter(conversationSearchFilter(conversationsFilter))) || [];
+  const conversationsToDisplay = filteredConversations.length ? filteredConversations : conversations;
 
   return (
     <>
@@ -204,45 +187,10 @@ export const ConversationsList = ({
         <p css={noResultsMessage}>{t('searchConversationsNoResult')}</p>
       )}
 
-      <ul
-        css={conversationsList}
-        data-uie-name="conversation-view"
-        ref={parentRef}
-        style={{
-          height: '100%',
-          overflow: 'auto',
-        }}
-      >
-        <div
-          style={{
-            height: `${rowVirtualizer.getTotalSize()}px`,
-            width: '100%',
-            position: 'relative',
-          }}
-        >
-          {rowVirtualizer.getVirtualItems().map(virtualItem => {
-            const conversation = conversationsToDisplay[virtualItem.index];
-
-            return (
-              <div
-                key={virtualItem.key}
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  height: `${virtualItem.size}px`,
-                  transform: `translateY(${virtualItem.start}px)`,
-                }}
-              >
-                <ConversationListCell
-                  key={conversation.id}
-                  {...getCommonConversationCellProps(conversation, virtualItem.index)}
-                />
-              </div>
-            );
-          })}
-        </div>
+      <ul css={conversationsList} data-uie-name="conversation-view">
+        {conversationsToDisplay.map((conversation, index) => (
+          <ConversationListCell key={conversation.id} {...getCommonConversationCellProps(conversation, index)} />
+        ))}
       </ul>
 
       {isGroupParticipantsVisible && (

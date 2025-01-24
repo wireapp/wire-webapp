@@ -89,14 +89,12 @@ describe('ConversationsList', () => {
     );
 
   it("should render all 1:1 conversations if there's no search filter", () => {
-    const userNames = ['Alice', 'Bob', 'Charlie'];
-    const conversations = userNames.map(create1to1Conversation);
-
-    window.Element.prototype.getBoundingClientRect = jest.fn().mockReturnValue({height: 1000, width: 1000});
+    const unserNames = ['Alice', 'Bob', 'Charlie'];
+    const conversations = unserNames.map(create1to1Conversation);
 
     const {getByText} = renderComponent(conversations);
 
-    userNames.forEach(userName => {
+    unserNames.forEach(userName => {
       expect(getByText(userName)).toBeDefined();
     });
   });

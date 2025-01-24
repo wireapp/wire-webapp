@@ -4909,25 +4909,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tanstack/react-virtual@npm:^3.11.2":
-  version: 3.11.2
-  resolution: "@tanstack/react-virtual@npm:3.11.2"
-  dependencies:
-    "@tanstack/virtual-core": "npm:3.11.2"
-  peerDependencies:
-    react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-    react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-  checksum: 10/a1136da0ec4c2ecbd4f996d8b84f228f0b8d851b15806e01049a160ad1d9b2eef0e0a491035fe017c6f84a0e125334f69ea23b32c180df23614ea4a8eeb7490c
-  languageName: node
-  linkType: hard
-
-"@tanstack/virtual-core@npm:3.11.2":
-  version: 3.11.2
-  resolution: "@tanstack/virtual-core@npm:3.11.2"
-  checksum: 10/8433044a5c801052ba2e4cdda098cdc8e32adfd3a76ba31af7064bbdda60062fe221a3558096987baa66cd94f528855e887c282cb0f9eb99d3751457c2a62872
-  languageName: node
-  linkType: hard
-
 "@testing-library/dom@npm:^10.4.0":
   version: 10.4.0
   resolution: "@testing-library/dom@npm:10.4.0"
@@ -18879,7 +18860,6 @@ __metadata:
     "@lexical/rich-text": "npm:0.23.1"
     "@mediapipe/tasks-vision": "npm:0.10.20"
     "@roamhq/wrtc": "npm:0.8.0"
-    "@tanstack/react-virtual": "npm:^3.11.2"
     "@testing-library/dom": "npm:^10.4.0"
     "@testing-library/react": "npm:16.2.0"
     "@types/dexie-batch": "npm:0.4.7"
