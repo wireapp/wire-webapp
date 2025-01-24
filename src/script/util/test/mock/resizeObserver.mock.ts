@@ -22,9 +22,6 @@ Object.defineProperty(window, 'ResizeObserver', {
     observe() {}
     unobserve() {}
     disconnect() {}
-    takeRecords() {
-      return [];
-    }
   },
   writable: true,
 });
