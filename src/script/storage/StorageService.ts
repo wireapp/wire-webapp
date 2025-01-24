@@ -331,7 +331,11 @@ export class StorageService {
       if (this.hasHookSupport) {
         const numberOfUpdates = await this.db.table(storeName).update(primaryKey, changes);
         const logMessage = `Updated ${numberOfUpdates} record(s) with key '${primaryKey}' in store '${storeName}'`;
-        this.logger.log(logMessage, changes);
+        if (changes?.data?.content && typeof changes.data === 'object' && typeof changes.data.content === 'string') {
+          this.logger.log(logMessage, {...changes, data: {...changes.data, content: ''}});
+        } else {
+          this.logger.log(logMessage, changes);
+        }
         return numberOfUpdates;
       }
       const oldRecord = await this.load<unknown>(storeName, primaryKey);
