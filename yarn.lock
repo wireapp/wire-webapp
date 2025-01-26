@@ -3430,14 +3430,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@formatjs/icu-messageformat-parser@npm:2.10.0":
-  version: 2.10.0
-  resolution: "@formatjs/icu-messageformat-parser@npm:2.10.0"
+"@formatjs/icu-messageformat-parser@npm:2.11.0":
+  version: 2.11.0
+  resolution: "@formatjs/icu-messageformat-parser@npm:2.11.0"
   dependencies:
     "@formatjs/ecma402-abstract": "npm:2.3.2"
     "@formatjs/icu-skeleton-parser": "npm:1.8.12"
     tslib: "npm:2"
-  checksum: 10/7c45b4bb073795df8de063bf2cfa3651dc9064cf9f5b64356931d53b5fc7783bc3504ba9d77988d9282abd54ddb686d1e53acc0d4e1500e35211d4f10ae060e8
+  checksum: 10/e82814d6db129be03fcdfb0c668f6902e5f3c3af85e8e81d04ab2550868645e95f439f39922d259e4a91b8b455d5d552a11b077ee95519ede7f850e50d7919de
   languageName: node
   linkType: hard
 
@@ -3460,21 +3460,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@formatjs/intl@npm:3.1.1":
-  version: 3.1.1
-  resolution: "@formatjs/intl@npm:3.1.1"
+"@formatjs/intl@npm:3.1.3":
+  version: 3.1.3
+  resolution: "@formatjs/intl@npm:3.1.3"
   dependencies:
     "@formatjs/ecma402-abstract": "npm:2.3.2"
     "@formatjs/fast-memoize": "npm:2.2.6"
-    "@formatjs/icu-messageformat-parser": "npm:2.10.0"
-    intl-messageformat: "npm:10.7.12"
+    "@formatjs/icu-messageformat-parser": "npm:2.11.0"
+    intl-messageformat: "npm:10.7.14"
     tslib: "npm:2"
   peerDependencies:
     typescript: 5
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 10/cded3da08e525a3108f28d636034f4285fb1a268f052a9895b2576bdb6dae7870bebbdcf458f30ba57e97046b939a194392b5119cef4ae3939936accdb727e5c
+  checksum: 10/ab2152116f406cfd9fb49668fc75fa0d53820d1d5f1c24b7b927d7edac77f58875eb87026c8034edc86660d6988c2950f20943934968d71a28644e9c870f8606
   languageName: node
   linkType: hard
 
@@ -5466,13 +5466,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:16 || 17 || 18":
-  version: 18.3.18
-  resolution: "@types/react@npm:18.3.18"
+"@types/react@npm:16 || 17 || 18 || 19":
+  version: 19.0.8
+  resolution: "@types/react@npm:19.0.8"
   dependencies:
-    "@types/prop-types": "npm:*"
     csstype: "npm:^3.0.2"
-  checksum: 10/7fdd8b853e0d291d4138133f93f8d5c333da918e5804afcea61a923aab4bdfc9bb15eb21a5640959b452972b8715ddf10ffb12b3bd071898b9e37738636463f2
+  checksum: 10/1080d5b96ee0b4395f8f167ae6952f570088ee03bdce69f8237aab82c32d9bd2b71106f787bac17ba351acc4aba5e3454bafca51f2eb11d1562073b821e63d15
   languageName: node
   linkType: hard
 
@@ -11119,15 +11118,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"intl-messageformat@npm:10.7.12":
-  version: 10.7.12
-  resolution: "intl-messageformat@npm:10.7.12"
+"intl-messageformat@npm:10.7.14":
+  version: 10.7.14
+  resolution: "intl-messageformat@npm:10.7.14"
   dependencies:
     "@formatjs/ecma402-abstract": "npm:2.3.2"
     "@formatjs/fast-memoize": "npm:2.2.6"
-    "@formatjs/icu-messageformat-parser": "npm:2.10.0"
+    "@formatjs/icu-messageformat-parser": "npm:2.11.0"
     tslib: "npm:2"
-  checksum: 10/760a9d31d1c16b32f58de996fc6f86c9691a05194628f87947605e043a91c867ab39027f3a39ddd1b2fdb8c74f47878d97cd38e3baafaece744f8a12cc16cb3a
+  checksum: 10/1e6c41b154b50593c4b47a71930a3e02221af559f84d0f597dc250bb40c7c754f91c7264211ff4b6c1a305a8f106f8cd8f05acfe0480bd5b382405746c68ad3d
   languageName: node
   linkType: hard
 
@@ -15827,25 +15826,25 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-intl@npm:7.1.1":
-  version: 7.1.1
-  resolution: "react-intl@npm:7.1.1"
+"react-intl@npm:7.1.5":
+  version: 7.1.5
+  resolution: "react-intl@npm:7.1.5"
   dependencies:
     "@formatjs/ecma402-abstract": "npm:2.3.2"
-    "@formatjs/icu-messageformat-parser": "npm:2.10.0"
-    "@formatjs/intl": "npm:3.1.1"
+    "@formatjs/icu-messageformat-parser": "npm:2.11.0"
+    "@formatjs/intl": "npm:3.1.3"
     "@types/hoist-non-react-statics": "npm:3"
-    "@types/react": "npm:16 || 17 || 18"
+    "@types/react": "npm:16 || 17 || 18 || 19"
     hoist-non-react-statics: "npm:3"
-    intl-messageformat: "npm:10.7.12"
+    intl-messageformat: "npm:10.7.14"
     tslib: "npm:2"
   peerDependencies:
-    react: ^16.6.0 || 17 || 18
+    react: ^16.6.0 || 17 || 18 || 19
     typescript: 5
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 10/3017505810dc1e435e3c98344f3e31e972fc91bffc40b909afaff36a7b773e32181c97f3b8b199ccd28b5ed586cb79c40a18c8d57fb4c6fd1c28080f31f1a0da
+  checksum: 10/eab0615170a9f52d17b4117a10f60a07e898c5aa9206aaa239156367279378fc48bc14d436d149d04ea61f3ab6f7d2e195fe1218e089d66bc3e12bd0f93fe49e
   languageName: node
   linkType: hard
 
@@ -18986,7 +18985,7 @@ __metadata:
     react: "npm:18.3.1"
     react-dom: "npm:18.3.1"
     react-error-boundary: "npm:5.0.0"
-    react-intl: "npm:7.1.1"
+    react-intl: "npm:7.1.5"
     react-redux: "npm:9.2.0"
     react-router: "npm:6.28.0"
     react-router-dom: "npm:6.28.0"
