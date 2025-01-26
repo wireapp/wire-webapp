@@ -38,7 +38,7 @@
     "lexical": "0.23.1",
     "libsodium-wrappers": "0.7.15",
     "linkify-it": "5.0.0",
-    "long": "5.2.3",
+    "long": "5.2.4",
     "markdown-it": "14.0.0",
     "murmurhash": "2.0.1",
     "oidc-client-ts": "3.1.0",
