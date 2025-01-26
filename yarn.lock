@@ -6122,20 +6122,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/copy-config@npm:2.2.11":
-  version: 2.2.11
-  resolution: "@wireapp/copy-config@npm:2.2.11"
+"@wireapp/copy-config@npm:2.2.12":
+  version: 2.2.12
+  resolution: "@wireapp/copy-config@npm:2.2.12"
   dependencies:
     axios: "npm:1.7.9"
     copy: "npm:0.3.2"
     cosmiconfig: "npm:9.0.0"
-    fs-extra: "npm:11.2.0"
+    fs-extra: "npm:11.3.0"
     jszip: "npm:3.10.1"
     logdown: "npm:3.3.1"
     rimraf: "npm:6.0.1"
   bin:
     copy-config: lib/cli.js
-  checksum: 10/802a6a9745348b16e50e0fff1b970ae4da1452e06f16df9b6f6dd85ceff124837c31b66e80aed974a20ae16927247a9c4853e5f0938b903d286918c01fea986a
+  checksum: 10/a8b7a0334ffde6a573edac473c1e16aa583c9e6eedcb90ee55e4c0e6a299ca100b0738bb7d6ac44cf5e2901a25d6af8f5465d20d9274ccc303a4685d461af599
   languageName: node
   linkType: hard
 
@@ -10218,17 +10218,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fs-extra@npm:11.2.0, fs-extra@npm:^11.1.1":
-  version: 11.2.0
-  resolution: "fs-extra@npm:11.2.0"
-  dependencies:
-    graceful-fs: "npm:^4.2.0"
-    jsonfile: "npm:^6.0.1"
-    universalify: "npm:^2.0.0"
-  checksum: 10/0579bf6726a4cd054d4aa308f10b483f52478bb16284f32cf60b4ce0542063d551fca1a08a2af365e35db21a3fa5a06cf2a6ed614004b4368982bc754cb816b3
-  languageName: node
-  linkType: hard
-
 "fs-extra@npm:11.3.0":
   version: 11.3.0
   resolution: "fs-extra@npm:11.3.0"
@@ -10237,6 +10226,17 @@ __metadata:
     jsonfile: "npm:^6.0.1"
     universalify: "npm:^2.0.0"
   checksum: 10/c9fe7b23dded1efe7bbae528d685c3206477e20cc60e9aaceb3f024f9b9ff2ee1f62413c161cb88546cc564009ab516dec99e9781ba782d869bb37e4fe04a97f
+  languageName: node
+  linkType: hard
+
+"fs-extra@npm:^11.1.1":
+  version: 11.2.0
+  resolution: "fs-extra@npm:11.2.0"
+  dependencies:
+    graceful-fs: "npm:^4.2.0"
+    jsonfile: "npm:^6.0.1"
+    universalify: "npm:^2.0.0"
+  checksum: 10/0579bf6726a4cd054d4aa308f10b483f52478bb16284f32cf60b4ce0542063d551fca1a08a2af365e35db21a3fa5a06cf2a6ed614004b4368982bc754cb816b3
   languageName: node
   linkType: hard
 
@@ -18974,7 +18974,7 @@ __metadata:
     "@wireapp/avs": "npm:10.0.4"
     "@wireapp/avs-debugger": "npm:0.0.7"
     "@wireapp/commons": "npm:5.4.1"
-    "@wireapp/copy-config": "npm:2.2.11"
+    "@wireapp/copy-config": "npm:2.2.12"
     "@wireapp/core": "npm:46.15.9"
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/prettier-config": "npm:0.6.4"
