@@ -5665,10 +5665,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/webpack-env@npm:1.18.5":
-  version: 1.18.5
-  resolution: "@types/webpack-env@npm:1.18.5"
-  checksum: 10/3c8dd0b23d45e2d33abdfbae7f1d8f75ce23d54588b08943e833f4dba81eb683ac68672a75eccbdba8e008bc1647638803c1bcadc8cdfd1dd7142fa2c3f612de
+"@types/webpack-env@npm:1.18.6":
+  version: 1.18.6
+  resolution: "@types/webpack-env@npm:1.18.6"
+  checksum: 10/463e545441d206e52bf24b4577a503bf9a96198a69b3ad1234d15bf96e9a6d5ccb25bb1197e520541cb8da968232305fe8d8400595d5745e16abfdc4089e73d0
   languageName: node
   linkType: hard
 
@@ -18984,7 +18984,7 @@ __metadata:
     "@types/speakingurl": "npm:13.0.6"
     "@types/underscore": "npm:1.13.0"
     "@types/uuid": "npm:^10.0.0"
-    "@types/webpack-env": "npm:1.18.5"
+    "@types/webpack-env": "npm:1.18.6"
     "@types/wicg-file-system-access": "npm:^2023.10.5"
     "@wireapp/avs": "npm:10.0.4"
     "@wireapp/avs-debugger": "npm:0.0.7"
