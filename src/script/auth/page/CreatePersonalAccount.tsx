@@ -80,7 +80,7 @@ const CreatePersonalAccountComponent = ({
     </RouterLink>
   );
   return (
-    <Page>
+    <Page withSideBar>
       <IsMobile>
         <div style={{margin: 16}}>{backArrow}</div>
       </IsMobile>

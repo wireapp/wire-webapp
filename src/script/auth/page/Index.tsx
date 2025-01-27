@@ -25,7 +25,16 @@ import {Navigate, useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 
 import {UrlUtil} from '@wireapp/commons';
-import {Button, ButtonVariant, ContainerXS, ErrorMessage, Text} from '@wireapp/react-ui-kit';
+import {
+  Button,
+  ButtonVariant,
+  ContainerXS,
+  ErrorMessage,
+  QUERY,
+  QueryKeys,
+  Text,
+  useMatchMedia,
+} from '@wireapp/react-ui-kit';
 
 import {LogoFullIcon} from 'Components/Icon';
 import {isDataDogEnabled} from 'Util/DataDog';
@@ -46,6 +55,7 @@ type Props = React.HTMLProps<HTMLDivElement>;
 
 const IndexComponent = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
   const navigate = useNavigate();
+  const isTablet = useMatchMedia(QUERY[QueryKeys.TABLET_DOWN]);
   const [logoutReason, setLogoutReason] = useState<string>();
 
   useEffect(() => {
@@ -66,16 +76,23 @@ const IndexComponent = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps
     return <Navigate to={ROUTE.LOGIN} />;
   }
 
+  // TODO: add condition for api version and FF
+  if (true) {
+    return <Navigate to={ROUTE.SSO} />;
+  }
+
   return (
-    <Page>
+    <Page withSideBar>
       <ContainerXS centerText verticalCenter style={{width: '380px'}}>
-        <LogoFullIcon
-          aria-hidden="true"
-          width={102}
-          height={33}
-          style={{marginBottom: '80px'}}
-          data-uie-name="ui-wire-logo"
-        />
+        {isTablet && (
+          <LogoFullIcon
+            aria-hidden="true"
+            width={102}
+            height={33}
+            style={{marginBottom: '80px'}}
+            data-uie-name="ui-wire-logo"
+          />
+        )}
         <Text
           block
           center
@@ -84,7 +101,6 @@ const IndexComponent = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps
         >
           {t('index.welcome', {brandName: Config.getConfig().BACKEND_NAME})}
         </Text>
-
         {!getWebEnvironment().isProduction && isDataDogEnabled() && (
           <Text
             block
@@ -104,7 +120,6 @@ const IndexComponent = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps
             />
           </Text>
         )}
-
         {features.ENABLE_ACCOUNT_REGISTRATION && (
           <Button
             type="button"
