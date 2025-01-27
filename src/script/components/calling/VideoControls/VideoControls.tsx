@@ -128,15 +128,15 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
 
   const {is1to1: is1to1Conversation} = useKoSubscribableChildren(conversation, ['is1to1']);
 
-  const emojiBarRef = useRef(null);
-  const emojiBarToggleButtonRef = useRef(null);
+  const emojiBarRef = useRef<HTMLDivElement | null>(null);
+  const emojiBarToggleButtonRef = useRef<HTMLButtonElement | null>(null);
 
   const {blurredVideoStream} = useKoSubscribableChildren(selfParticipant, ['blurredVideoStream']);
   const hasBlurredBackground = !!blurredVideoStream;
 
   const {participants} = useKoSubscribableChildren(call, ['participants']);
 
-  const [showEmojisBar, setShowEmojisBar] = useState<boolean>(false);
+  const [showEmojisBar, setShowEmojisBar] = useState(false);
 
   const {viewMode, detachedWindow} = useKoSubscribableChildren(callState, ['viewMode', 'detachedWindow']);
 
@@ -250,7 +250,7 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
     switchSpeakerOutput(speaker.id);
   };
 
-  const isBlurredBackgroundEnabled = Config.getConfig().FEATURE.ENABLE_BLUR_BACKGROUND;
+  const {ENABLE_BLUR_BACKGROUND: isBlurredBackgroundEnabled} = Config.getConfig().FEATURE;
 
   const blurredBackgroundOptions = {
     label: t('videoCallbackgroundBlurHeadline'),

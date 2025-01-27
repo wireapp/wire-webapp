@@ -31,7 +31,7 @@ export interface EmojisBarProps {
   ref: React.RefObject<HTMLDivElement>;
 }
 
-export const EmojisBar: React.FC<EmojisBarProps> = ({onEmojiClick, ref}) => {
+export const EmojisBar = ({onEmojiClick, ref}: EmojisBarProps) => {
   const [disabledEmojis, setDisabledEmojis] = useState<string[]>([]);
 
   const handleEmojiClick = (selectedEmoji: string) => {

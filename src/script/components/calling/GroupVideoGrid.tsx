@@ -37,6 +37,12 @@ import {Video} from './Video';
 import type {Participant} from '../../calling/Participant';
 import type {Grid} from '../../calling/videoGridHandler';
 
+const PARTICIPANTS_LIMITS = {
+  TABLET: {SHORT: 2, MEDIUM: 4, TALL: 8},
+  DESKTOP: {SHORT: 3, MEDIUM: 6, TALL: 9},
+  MOBILE: {WITH_THUMBNAIL: 2, SHORT: 1, MEDIUM: 2, TALL: 4},
+};
+
 export interface GroupVideoGripProps {
   grid: Grid;
   maximizedParticipant: Participant | null;
@@ -60,17 +66,14 @@ const COLUMNS = {
 
 const PARTICIPANTS_DESKTOP_EDGE_CASE = 3;
 
-const getDesiredColumns = ({
-  totalCount,
-  isDesktop,
-  isTablet,
-  isShort,
-}: {
+interface CalculateRowsAndColumsParams {
   totalCount: number;
   isDesktop: boolean;
   isTablet: boolean;
   isShort: boolean;
-}): number => {
+}
+
+const getDesiredColumns = ({totalCount, isDesktop, isTablet, isShort}: CalculateRowsAndColumsParams): number => {
   if (isDesktop) {
     // Special case: use different layout for 3 participants when not in short mode
     if (totalCount === PARTICIPANTS_DESKTOP_EDGE_CASE && !isShort) {
@@ -86,12 +89,7 @@ const getDesiredColumns = ({
   return COLUMNS.MOBILE;
 };
 
-const calculateRowsAndColumns = (params: {
-  totalCount: number;
-  isTablet: boolean;
-  isDesktop: boolean;
-  isShort: boolean;
-}): RowsAndColumns => {
+const calculateRowsAndColumns = (params: CalculateRowsAndColumsParams): RowsAndColumns => {
   const {totalCount} = params;
   const desiredColumns = getDesiredColumns(params);
   const columns = Math.min(totalCount, desiredColumns);
@@ -191,12 +189,6 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
   }, [participants.length, isTablet, isDesktop, isShort]);
 
   useEffect(() => {
-    const PARTICIPANTS_LIMITS = {
-      TABLET: {SHORT: 2, MEDIUM: 4, TALL: 8},
-      DESKTOP: {SHORT: 3, MEDIUM: 6, TALL: 9},
-      MOBILE: {WITH_THUMBNAIL: 2, SHORT: 1, MEDIUM: 2, TALL: 4},
-    };
-
     const setParticipantsForDevice = (limits: {
       WITH_THUMBNAIL?: number;
       SHORT: number;

@@ -43,11 +43,12 @@ export const useSyncCurrentRange = ({
     const isLastPage = currentPage === totalPages - 1;
 
     if (isLastInTheRange && !isLastPage) {
-      return setCurrentStart(currentStart + 1);
+      setCurrentStart(currentStart + 1);
+      return;
     }
 
     if (currentStart + visibleDots - 1 >= totalPages && currentStart > 0) {
-      return setCurrentStart(currentStart - 1);
+      setCurrentStart(currentStart - 1);
     }
   }, [totalPages, setCurrentStart, currentStart, currentPage, visibleDots]);
 };

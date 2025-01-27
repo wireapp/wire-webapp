@@ -44,7 +44,7 @@ export interface PaginationProps {
 
 const DEFAULT_VISIBLE_DOTS = 5;
 
-const Pagination: React.FC<PaginationProps> = ({totalPages, currentPage, onChangePage, className}) => {
+const Pagination = ({totalPages, currentPage, onChangePage, className}: PaginationProps) => {
   const [currentStart, setCurrentStart] = useState(0);
   const visibleDots = DEFAULT_VISIBLE_DOTS > totalPages ? totalPages : DEFAULT_VISIBLE_DOTS;
 

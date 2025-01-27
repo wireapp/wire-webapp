@@ -35,7 +35,7 @@ type VideoControlsSelectProps = Pick<
   | 'menuCSS'
 >;
 
-export const VideoControlsSelect: React.FC<VideoControlsSelectProps> = ({
+export const VideoControlsSelect = ({
   value,
   id,
   dataUieName,
@@ -46,7 +46,7 @@ export const VideoControlsSelect: React.FC<VideoControlsSelectProps> = ({
   menuIsOpen,
   wrapperCSS,
   menuCSS,
-}) => {
+}: VideoControlsSelectProps) => {
   return (
     <Select
       // eslint-disable-next-line jsx-a11y/no-autofocus
