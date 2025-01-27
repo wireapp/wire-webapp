@@ -47,7 +47,7 @@ import {getPrefixedSSOCode} from '../util/urlUtil';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const IndexComponent = ({defaultSSOCode, doInit, doInitializeClient}: Props & ConnectedProps & DispatchProps) => {
+const IndexComponent = ({defaultSSOCode, doInit}: Props & ConnectedProps & DispatchProps) => {
   const navigate = useNavigate();
   const core = container.resolve(Core);
   const [logoutReason, setLogoutReason] = useState<string>();
@@ -173,7 +173,6 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
   bindActionCreators(
     {
       doInit: actionRoot.authAction.doInit,
-      doInitializeClient: actionRoot.clientAction.doInitializeClient,
     },
     dispatch,
   );
