@@ -211,10 +211,12 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
     };
 
     if (isTablet) {
-      return setParticipantsForDevice(PARTICIPANTS_LIMITS.TABLET);
+      setParticipantsForDevice(PARTICIPANTS_LIMITS.TABLET);
+      return;
     }
     if (isDesktop) {
-      return setParticipantsForDevice(PARTICIPANTS_LIMITS.DESKTOP);
+      setParticipantsForDevice(PARTICIPANTS_LIMITS.DESKTOP);
+      return;
     }
     if (isMobile) {
       setParticipantsForDevice(PARTICIPANTS_LIMITS.MOBILE);
