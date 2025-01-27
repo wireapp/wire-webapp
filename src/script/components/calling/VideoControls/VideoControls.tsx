@@ -124,6 +124,13 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
     sharesCamera: selfSharesCamera,
     handRaisedAt: selfHandRaisedAt,
   } = useKoSubscribableChildren(selfParticipant, ['sharesScreen', 'sharesCamera', 'handRaisedAt']);
+  const {
+    ENABLE_BLUR_BACKGROUND: isBlurredBackgroundEnabled,
+    ENABLE_PRESS_SPACE_TO_UNMUTE: isPressSpaceToUnmuteEnable,
+    ENABLE_IN_CALL_REACTIONS: isInCallReactionsEnable,
+    ENABLE_IN_CALL_HAND_RAISE: isInCallHandRaiseEnable,
+  } = Config.getConfig().FEATURE;
+
   const isSelfHandRaised = Boolean(selfHandRaisedAt);
 
   const {is1to1: is1to1Conversation} = useKoSubscribableChildren(conversation, ['is1to1']);
@@ -250,8 +257,6 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
     switchSpeakerOutput(speaker.id);
   };
 
-  const {ENABLE_BLUR_BACKGROUND: isBlurredBackgroundEnabled} = Config.getConfig().FEATURE;
-
   const blurredBackgroundOptions = {
     label: t('videoCallbackgroundBlurHeadline'),
     options: [
@@ -331,7 +336,7 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
         ]
       : [];
 
-    const emojiBarEntry: ContextMenuEntry[] = Config.getConfig().FEATURE.ENABLE_IN_CALL_REACTIONS
+    const emojiBarEntry: ContextMenuEntry[] = isInCallReactionsEnable
       ? [
           {
             click: () => setShowEmojisBar(prev => !prev),
@@ -372,9 +377,11 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
     useUserPropertyValue(
       () => propertiesRepository.getPreference(PROPERTIES_TYPE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE),
       WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE,
-    ) && Config.getConfig().FEATURE.ENABLE_PRESS_SPACE_TO_UNMUTE;
+    ) && isPressSpaceToUnmuteEnable;
 
   const isMoreInteractionsMenuActive = isParticipantsListOpen || showEmojisBar || isSelfHandRaised;
+
+  const isInCallHandRaiseControlVisible = isInCallHandRaiseEnable && !is1to1Conversation;
 
   return (
     <ul id="video-controls" className="video-controls" css={videoControlsWrapperStyles}>
@@ -717,7 +724,7 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
             </li>
           )}
 
-          {Config.getConfig().FEATURE.ENABLE_IN_CALL_HAND_RAISE && !is1to1Conversation && (
+          {isInCallHandRaiseControlVisible && (
             <li className="video-controls__item">
               <button
                 data-uie-value={isSelfHandRaised ? 'active' : 'inactive'}
@@ -743,7 +750,7 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
             </li>
           )}
 
-          {Config.getConfig().FEATURE.ENABLE_IN_CALL_REACTIONS && (
+          {isInCallReactionsEnable && (
             <li className="video-controls__item">
               {showEmojisBar && <EmojisBar onEmojiClick={handleEmojiClick} ref={emojiBarRef} />}
               <button
