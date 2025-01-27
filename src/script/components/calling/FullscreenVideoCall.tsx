@@ -131,7 +131,7 @@ const FullscreenVideoCall = ({
 }: FullscreenVideoCallProps) => {
   const [isConfirmCloseModalOpen, setIsConfirmCloseModalOpen] = useState<boolean>(false);
   const selfParticipant = call.getSelfParticipant();
-  const {sharesCamera: selfSharesCamera} = useKoSubscribableChildren(selfParticipant, ['sharesScreen', 'sharesCamera']);
+  const {sharesCamera: selfSharesCamera} = useKoSubscribableChildren(selfParticipant, ['sharesCamera']);
 
   // Warnings banner
   const warnings = useWarningsState(state => state.warnings);
