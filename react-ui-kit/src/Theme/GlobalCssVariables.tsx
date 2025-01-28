@@ -69,6 +69,46 @@ const light: () => CSSObject = () => ({
   '--success-color': COLOR_V2.GREEN_LIGHT_500,
   '--app-bg': COLOR_V2.GRAY_10,
   '--main-color': COLOR.BLACK,
+
+  // Archive File Icon
+  '--archive-file-icon-bg': COLOR_V2.AMBER_LIGHT_50,
+  '--archive-file-icon-stroke': COLOR_V2.AMBER_LIGHT_700,
+
+  // Audio File Icon
+  '--audio-file-icon-bg': COLOR_V2.PURPLE_DARK_50,
+  '--audio-file-icon-stroke': COLOR_V2.PURPLE_DARK_700,
+
+  // Code File Icon
+  '--code-file-icon-bg': COLOR_V2.PURPLE_LIGHT_50,
+  '--code-file-icon-stroke': COLOR_V2.PURPLE_LIGHT_700,
+
+  // Document File Icon
+  '--document-file-icon-bg': COLOR_V2.BLUE_LIGHT_50,
+  '--document-file-icon-stroke': COLOR_V2.BLUE_LIGHT_700,
+
+  // Image File Icon
+  '--image-file-icon-bg': COLOR_V2.TURQUOISE_LIGHT_50,
+  '--image-file-icon-stroke': COLOR_V2.TURQUOISE_LIGHT_700,
+
+  // PDF File Icon
+  '--pdf-file-icon-bg': COLOR_V2.RED_LIGHT_50,
+  '--pdf-file-icon-stroke': COLOR_V2.RED_LIGHT_700,
+
+  // Spreadsheet File Icon
+  '--spreadsheet-file-icon-bg': COLOR_V2.GREEN_LIGHT_50,
+  '--spreadsheet-file-icon-stroke': COLOR_V2.GREEN_LIGHT_700,
+
+  // Presentation File Icon
+  '--presentation-file-icon-bg': COLOR_V2.AMBER_LIGHT_50,
+  '--presentation-file-icon-stroke': COLOR_V2.AMBER_LIGHT_700,
+
+  // Video File Icon
+  '--video-file-icon-bg': COLOR_V2.RED_LIGHT_50,
+  '--video-file-icon-stroke': COLOR_V2.RED_LIGHT_700,
+
+  // Other File Icon
+  '--other-file-icon-bg': COLOR_V2.WHITE,
+  '--other-file-icon-stroke': COLOR_V2.GRAY_70,
 });
 
 const dark: () => CSSObject = () => ({
@@ -119,6 +159,46 @@ const dark: () => CSSObject = () => ({
   '--success-color': COLOR_V2.GREEN_DARK_500,
   '--app-bg': COLOR_V2.GRAY_95,
   '--main-color': COLOR.WHITE,
+
+  // Archive File Icon
+  '--archive-file-icon-bg': COLOR_V2.AMBER_DARK_50,
+  '--archive-file-icon-stroke': COLOR_V2.AMBER_DARK_700,
+
+  // Audio File Icon
+  '--audio-file-icon-bg': COLOR_V2.PURPLE_DARK_50,
+  '--audio-file-icon-stroke': COLOR_V2.PURPLE_DARK_700,
+
+  // Code File Icon
+  '--code-file-icon-bg': COLOR_V2.PURPLE_DARK_50,
+  '--code-file-icon-stroke': COLOR_V2.PURPLE_DARK_700,
+
+  // Document File Icon
+  '--document-file-icon-bg': COLOR_V2.BLUE_DARK_50,
+  '--document-file-icon-stroke': COLOR_V2.BLUE_DARK_700,
+
+  // Image File Icon
+  '--image-file-icon-bg': COLOR_V2.TURQUOISE_DARK_50,
+  '--image-file-icon-stroke': COLOR_V2.TURQUOISE_DARK_700,
+
+  // PDF File Icon
+  '--pdf-file-icon-bg': COLOR_V2.RED_DARK_50,
+  '--pdf-file-icon-stroke': COLOR_V2.RED_DARK_700,
+
+  // Spreadsheet File Icon
+  '--spreadsheet-file-icon-bg': COLOR_V2.GREEN_DARK_50,
+  '--spreadsheet-file-icon-stroke': COLOR_V2.GREEN_DARK_700,
+
+  // Presentation File Icon
+  '--presentation-file-icon-bg': COLOR_V2.AMBER_DARK_50,
+  '--presentation-file-icon-stroke': COLOR_V2.AMBER_DARK_700,
+
+  // Video File Icon
+  '--video-file-icon-bg': COLOR_V2.RED_DARK_50,
+  '--video-file-icon-stroke': COLOR_V2.RED_DARK_700,
+
+  // Other File Icon
+  '--other-file-icon-bg': COLOR_V2.GRAY_10,
+  '--other-file-icon-stroke': COLOR_V2.GRAY_60,
 });
 
 const accentColors: () => CSSObject = () => ({
