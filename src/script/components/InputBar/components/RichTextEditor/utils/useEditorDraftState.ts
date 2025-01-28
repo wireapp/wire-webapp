@@ -30,7 +30,7 @@ const DRAFT_SAVE_DELAY = 800;
 
 interface UseEditorDraftStateProps {
   editorRef: RefObject<LexicalEditor | null>;
-  saveDraftState: (editorState: string, plainMessage: string) => void;
+  saveDraftState: (editorState: string, plainMessage: string, replyId?: string) => void;
   replaceEmojis: boolean;
 }
 
@@ -43,7 +43,11 @@ export const useEditorDraftState = ({editorRef, saveDraftState, replaceEmojis}: 
 
     editor.getEditorState().read(() => {
       const markdown = $convertToMarkdownString(markdownTransformers, undefined, true);
-      saveDraftState(JSON.stringify(editor.getEditorState().toJSON()), transformMessage({replaceEmojis, markdown}));
+      saveDraftState(
+        JSON.stringify(editor.getEditorState().toJSON()),
+        transformMessage({replaceEmojis, markdown}),
+        undefined,
+      );
     });
   }, [editorRef, saveDraftState, replaceEmojis]);
 

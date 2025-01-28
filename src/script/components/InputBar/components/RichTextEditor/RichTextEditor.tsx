@@ -76,7 +76,7 @@ interface RichTextEditorProps {
   showFormatToolbar: boolean;
   showMarkdownPreview: boolean;
   getMentionCandidates: (search?: string | null) => User[];
-  saveDraftState: (editor: string, plainMessage: string) => void;
+  saveDraftState: (editor: string, plainMessage: string, replyId?: string) => void;
   loadDraftState: () => Promise<DraftState>;
   onUpdate: (content: RichTextContent) => void;
   onArrowUp: () => void;

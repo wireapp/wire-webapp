@@ -19,9 +19,10 @@
 
 import {useCallback, useEffect, useRef, useState} from 'react';
 
+import {$convertToMarkdownString} from '@lexical/markdown';
 import {amplify} from 'amplify';
 import cx from 'classnames';
-import {CLEAR_EDITOR_COMMAND, LexicalEditor, $createTextNode, $insertNodes} from 'lexical';
+import {LexicalEditor, $createTextNode, $insertNodes} from 'lexical';
 import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -30,6 +31,8 @@ import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import {checkFileSharingPermission} from 'Components/Conversation/utils/checkFileSharingPermission';
 import {EmojiPicker} from 'Components/EmojiPicker/EmojiPicker';
+import {markdownTransformers} from 'Components/InputBar/components/RichTextEditor/utils/markdownTransformers';
+import {transformMessage} from 'Components/InputBar/components/RichTextEditor/utils/transformMessage';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
@@ -214,9 +217,27 @@ export const InputBar = ({
     ),
   });
 
+  const handleSaveEditorDraft = (replyId?: string) => {
+    const editor = editorRef.current;
+
+    if (!editor) {
+      return;
+    }
+
+    editor.getEditorState().read(() => {
+      const markdown = $convertToMarkdownString(markdownTransformers, undefined, true);
+      void saveDraft(
+        JSON.stringify(editor.getEditorState().toJSON()),
+        transformMessage({replaceEmojis: shouldReplaceEmoji, markdown}),
+        replyId,
+      );
+    });
+  };
+
   const resetDraftState = () => {
     setReplyMessageEntity(null);
-    editorRef.current?.dispatchCommand(CLEAR_EDITOR_COMMAND, undefined);
+
+    handleSaveEditorDraft();
   };
 
   const clearPastedFile = () => setPastedFile(null);
@@ -255,10 +276,6 @@ export const InputBar = ({
     }
   };
 
-  const handleCancelReply = () => {
-    cancelMessageReply(false);
-  };
-
   const editMessage = (messageEntity?: ContentMessage) => {
     if (messageEntity?.isEditable() && messageEntity !== editedMessage) {
       cancelMessageReply();
@@ -279,6 +296,7 @@ export const InputBar = ({
       cancelMessageReply(false);
       cancelMessageEditing(!!editedMessage);
       setReplyMessageEntity(messageEntity);
+      handleSaveEditorDraft(messageEntity.id);
 
       editorRef.current?.focus();
     }
@@ -460,13 +478,13 @@ export const InputBar = ({
     };
   }, []);
 
-  const saveDraft = async (editorState: string, plainMessage: string) => {
+  const saveDraft = async (editorState: string, plainMessage: string, replyId?: string) => {
     await saveDraftState({
       storageRepository,
       conversation,
       editorState,
       plainMessage: sanitizeMarkdown(plainMessage),
-      replyId: replyMessageEntity?.id,
+      replyId: replyId ?? replyMessageEntity?.id,
       editedMessageId: editedMessage?.id,
     });
   };
@@ -592,7 +610,9 @@ export const InputBar = ({
           <ConversationClassifiedBar conversation={conversation} classifiedDomains={classifiedDomains} />
         )}
 
-        {isReplying && !isEditing && <ReplyBar replyMessageEntity={replyMessageEntity} onCancel={handleCancelReply} />}
+        {isReplying && !isEditing && (
+          <ReplyBar replyMessageEntity={replyMessageEntity} onCancel={() => cancelMessageReply(true)} />
+        )}
 
         <div
           className={cx(`${conversationInputBarClassName}__input input-bar-container`, {
