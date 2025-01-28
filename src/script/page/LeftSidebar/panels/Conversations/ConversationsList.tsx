@@ -182,12 +182,10 @@ export const ConversationsList = ({
   useEffect(() => {
     if (!conversationsFilter && clickedFilteredConversationId) {
       const conversationIndex = conversationsToDisplay.findIndex(conv => conv.id === clickedFilteredConversationId);
-
       if (conversationIndex !== -1) {
-        rowVirtualizer.scrollToIndex(conversationIndex, {align: 'center'});
+        rowVirtualizer.scrollToIndex(conversationIndex, {align: 'auto'});
       }
 
-      // scrollToConversation(clickedFilteredConversationId);
       setClickedFilteredConversationId(null);
     }
   }, [conversationsFilter, clickedFilteredConversationId, conversationsToDisplay]);
