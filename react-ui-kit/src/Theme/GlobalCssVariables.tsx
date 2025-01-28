@@ -106,9 +106,21 @@ const light: () => CSSObject = () => ({
   '--video-file-icon-bg': COLOR_V2.RED_LIGHT_50,
   '--video-file-icon-stroke': COLOR_V2.RED_LIGHT_700,
 
+  // Text File Icon
+  '--text-file-icon-bg': COLOR_V2.AMBER_LIGHT_50,
+  '--text-file-icon-stroke': COLOR_V2.AMBER_LIGHT_700,
+
   // Other File Icon
   '--other-file-icon-bg': COLOR_V2.WHITE,
   '--other-file-icon-stroke': COLOR_V2.GRAY_70,
+
+  // Folder Icon
+  '--folder-icon-bg': COLOR_V2.BLUE_LIGHT_50,
+  '--folder-icon-stroke': COLOR_V2.BLUE_LIGHT_700,
+
+  // Multiple File Icon
+  '--multiple-file-icon-bg': COLOR_V2.WHITE,
+  '--multiple-file-icon-stroke': COLOR_V2.GRAY_70,
 });
 
 const dark: () => CSSObject = () => ({
@@ -196,9 +208,21 @@ const dark: () => CSSObject = () => ({
   '--video-file-icon-bg': COLOR_V2.RED_DARK_50,
   '--video-file-icon-stroke': COLOR_V2.RED_DARK_700,
 
+  // Text File Icon
+  '--text-file-icon-bg': COLOR_V2.AMBER_DARK_50,
+  '--text-file-icon-stroke': COLOR_V2.AMBER_DARK_700,
+
   // Other File Icon
-  '--other-file-icon-bg': COLOR_V2.GRAY_10,
+  '--other-file-icon-bg': COLOR_V2.GRAY_95,
   '--other-file-icon-stroke': COLOR_V2.GRAY_60,
+
+  // Folder Icon
+  '--folder-icon-bg': COLOR_V2.BLUE_DARK_50,
+  '--folder-icon-stroke': COLOR_V2.BLUE_DARK_700,
+
+  // Multiple File Icon
+  '--multiple-file-icon-bg': COLOR_V2.GRAY_95,
+  '--multiple-file-icon-stroke': COLOR_V2.GRAY_60,
 });
 
 const accentColors: () => CSSObject = () => ({

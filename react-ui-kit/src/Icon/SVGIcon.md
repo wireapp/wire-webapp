@@ -108,6 +108,9 @@ import {
   CodeInlineIcon,
   CodeBlockIcon,
   BlockquoteIcon,
+  TextFileIcon,
+  FolderIcon,
+  MultipleFilesIcon,
 } from '@wireapp/react-ui-kit';
 
 const icons = [
@@ -218,6 +221,9 @@ const fileIcons = [
   OtherFileIcon,
   PdfFileIcon,
   VideoFileIcon,
+  TextFileIcon,
+  FolderIcon,
+  MultipleFilesIcon,
 ];
 
 <Container>
@@ -254,6 +260,7 @@ const fileIcons = [
       </span>
     ))}
   </div>
+
   <Line />
   <H1>Brand Icons</H1>
   <div
@@ -270,13 +277,14 @@ const fileIcons = [
       </span>
     ))}
   </div>
+
   <Line />
   <H1>File Icons</H1>
   <div
     style={{
       display: 'grid',
       gridGap: 16,
-      gridTemplateColumns: `repeat(${fileIcons.length}, 1fr)`,
+      gridTemplateColumns: 'repeat(auto-fill, minmax(50px, 1fr)',
       justifyItems: 'center',
     }}
   >
