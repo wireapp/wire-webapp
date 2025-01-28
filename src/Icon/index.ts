@@ -119,3 +119,14 @@ export * from './HeadingIcon';
 export * from './CodeInlineIcon';
 export * from './CodeBlockIcon';
 export * from './BlockquoteIcon';
+
+export * from './Files/ArchiveFileIcon';
+export * from './Files/AudioFileIcon';
+export * from './Files/CodeFileIcon';
+export * from './Files/DocumentFileIcon';
+export * from './Files/ImageFileIcon';
+export * from './Files/OtherFileIcon';
+export * from './Files/PdfFileIcon';
+export * from './Files/PresentationFileIcon';
+export * from './Files/SpreadsheetFileIcon';
+export * from './Files/VideoFileIcon';

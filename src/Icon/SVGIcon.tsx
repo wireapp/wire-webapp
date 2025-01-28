@@ -52,6 +52,7 @@ export const SVGIcon = ({
   height = null,
   shadow,
   children,
+  fill,
   ...props
 }: InternalSVGIconProps) => {
   let newScale = scale;
@@ -65,7 +66,7 @@ export const SVGIcon = ({
   const shadowId = shadow && Math.random().toString();
   return (
     <svg
-      css={(theme: Theme) => svgIconStyle(theme, props)}
+      css={(theme: Theme) => svgIconStyle(theme, fill === 'none' ? {color: 'transparent'} : props)}
       viewBox={`0 0 ${realWidth} ${realHeight}`}
       width={newWidth}
       height={newHeight}

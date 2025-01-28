@@ -7,6 +7,14 @@ import {
   AndroidIcon,
   AppleIcon,
   ArchiveIcon,
+  ArchiveFileIcon,
+  AudioFileIcon,
+  CodeFileIcon,
+  DocumentFileIcon,
+  ImageFileIcon,
+  PdfFileIcon,
+  VideoFileIcon,
+  OtherFileIcon,
   ArrowIcon,
   AttachmentIcon,
   AudioVideoIcon,
@@ -201,6 +209,17 @@ const brandIcons = [
   TwitterIcon,
 ];
 
+const fileIcons = [
+  ArchiveFileIcon,
+  AudioFileIcon,
+  CodeFileIcon,
+  DocumentFileIcon,
+  ImageFileIcon,
+  OtherFileIcon,
+  PdfFileIcon,
+  VideoFileIcon,
+];
+
 <Container>
   <div
     style={{
@@ -246,6 +265,22 @@ const brandIcons = [
     }}
   >
     {brandIcons.map((Icon, index) => (
+      <span key={index} title={Icon.name}>
+        <Icon height={48} width={48} />
+      </span>
+    ))}
+  </div>
+  <Line />
+  <H1>File Icons</H1>
+  <div
+    style={{
+      display: 'grid',
+      gridGap: 16,
+      gridTemplateColumns: `repeat(${fileIcons.length}, 1fr)`,
+      justifyItems: 'center',
+    }}
+  >
+    {fileIcons.map((Icon, index) => (
       <span key={index} title={Icon.name}>
         <Icon height={48} width={48} />
       </span>
