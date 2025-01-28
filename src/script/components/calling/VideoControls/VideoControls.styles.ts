@@ -22,34 +22,25 @@ import {css, CSSObject} from '@emotion/react';
 import {media} from '@wireapp/react-ui-kit';
 
 export const videoControlsWrapperStyles: CSSObject = {
-  position: 'relative',
-  display: 'flex',
-  alignItems: 'center',
+  display: 'grid',
+  gridTemplateColumns: '1fr auto 1fr',
+  justifyContent: 'normal',
   padding: '4px 16px 8px',
   margin: 0,
-  gap: '8px',
+  gap: '16px',
 
   [media.mobile]: {
+    gridTemplateColumns: 'auto auto',
     justifyContent: 'center',
   },
-
-  [media.tabletUp]: {
-    gap: '16px',
-  },
 };
 
-export const minimizeVideoControlStyles: CSSObject = {
-  [media.tabletUp]: {
-    marginRight: 'auto',
-  },
-};
+export const moreControlsWrapperStyles: CSSObject = {
+  display: 'flex',
+  gap: 16,
 
-export const hangUpVideoControlStyles: CSSObject = {
-  [media.mobile]: {
-    order: 2,
-  },
   [media.tabletUp]: {
-    marginRight: 'auto',
+    justifySelf: 'end',
   },
 };
 

@@ -51,8 +51,7 @@ import {t} from 'Util/LocalizerUtil';
 
 import {EmojisBar} from './EmojisBar/EmojisBar';
 import {
-  hangUpVideoControlStyles,
-  minimizeVideoControlStyles,
+  moreControlsWrapperStyles,
   videoControlActiveStyles,
   videoControlDisabledStyles,
   videoControlInActiveStyles,
@@ -452,7 +451,7 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
       </div>
 
       {!isMobile && (
-        <li className="video-controls__item__minimize" css={minimizeVideoControlStyles}>
+        <li className="video-controls__item__minimize">
           <button
             className="video-controls__button video-controls__button--small"
             css={videoControlInActiveStyles}
@@ -473,122 +472,61 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
         </li>
       )}
 
-      <li className="video-controls__item">
-        <button
-          className="video-controls__button"
-          data-uie-value={!isMuted ? 'inactive' : 'active'}
-          onClick={() => toggleMute(call, !isMuted)}
-          onKeyDown={event =>
-            handleKeyDown({
-              event,
-              callback: () => toggleMute(call, !isMuted),
-              keys: isPressSpaceToUnmuteEnabled ? [KEY.ENTER] : [KEY.ENTER, KEY.SPACE],
-            })
-          }
-          css={!isMuted ? videoControlActiveStyles : videoControlInActiveStyles}
-          type="button"
-          data-uie-name="do-call-controls-video-call-mute"
-          role="switch"
-          aria-checked={!isMuted}
-          title={t('videoCallOverlayMicrophone')}
-        >
-          {isMuted ? <Icon.MicOffIcon width={16} height={16} /> : <Icon.MicOnIcon width={16} height={16} />}
-        </button>
-
-        {!isMobile && showSwitchMicrophone && (
-          <button
-            className="device-toggle-button"
-            css={audioOptionsOpen ? videoControlActiveStyles : videoControlInActiveStyles}
-            onClick={() => setAudioOptionsOpen(prev => !prev)}
-            onKeyDown={event =>
-              handleKeyDown({
-                event,
-                callback: () => setAudioOptionsOpen(prev => !prev),
-                keys: [KEY.ENTER, KEY.SPACE],
-              })
-            }
-            onBlur={event => {
-              if (!event.currentTarget.contains(event.relatedTarget)) {
-                setAudioOptionsOpen(false);
-              }
-            }}
-          >
-            {audioOptionsOpen ? (
-              <>
-                <VideoControlsSelect
-                  value={selectedAudioOptions}
-                  id="select-microphone"
-                  dataUieName="select-microphone"
-                  options={audioOptions}
-                  onChange={selectedOption => {
-                    updateAudioOptions(String(selectedOption?.value), String(selectedOption?.value).includes('input'));
-                  }}
-                  onKeyDown={event => isEscapeKey(event) && setAudioOptionsOpen(false)}
-                  menuIsOpen
-                  wrapperCSS={{marginBottom: 0}}
-                />
-                <Icon.ChevronIcon css={{height: '16px'}} />
-              </>
-            ) : (
-              <Icon.ChevronIcon css={{rotate: '180deg', height: '16px'}} />
-            )}
-          </button>
-        )}
-      </li>
-
-      {showToggleVideo && (
+      <div className="video-controls__centered-items">
         <li className="video-controls__item">
           <button
             className="video-controls__button"
-            data-uie-value={selfSharesCamera ? 'active' : 'inactive'}
-            onClick={() => toggleCamera(call)}
+            data-uie-value={!isMuted ? 'inactive' : 'active'}
+            onClick={() => toggleMute(call, !isMuted)}
             onKeyDown={event =>
               handleKeyDown({
                 event,
-                callback: () => toggleCamera(call),
-                keys: [KEY.ENTER, KEY.SPACE],
+                callback: () => toggleMute(call, !isMuted),
+                keys: isPressSpaceToUnmuteEnabled ? [KEY.ENTER] : [KEY.ENTER, KEY.SPACE],
               })
             }
+            css={!isMuted ? videoControlActiveStyles : videoControlInActiveStyles}
+            type="button"
+            data-uie-name="do-call-controls-video-call-mute"
             role="switch"
-            aria-checked={selfSharesCamera}
-            tabIndex={TabIndex.FOCUSABLE}
-            css={selfSharesCamera ? videoControlActiveStyles : videoControlInActiveStyles}
-            data-uie-name="do-call-controls-toggle-video"
-            title={t('videoCallOverlayCamera')}
+            aria-checked={!isMuted}
+            title={t('videoCallOverlayMicrophone')}
           >
-            {selfSharesCamera ? (
-              <Icon.CameraIcon width={16} height={16} />
-            ) : (
-              <Icon.CameraOffIcon width={16} height={16} />
-            )}
+            {isMuted ? <Icon.MicOffIcon width={16} height={16} /> : <Icon.MicOnIcon width={16} height={16} />}
           </button>
-          {!isMobile && (
+
+          {!isMobile && showSwitchMicrophone && (
             <button
               className="device-toggle-button"
-              css={videoOptionsOpen ? videoControlActiveStyles : videoControlInActiveStyles}
-              onClick={() => setVideoOptionsOpen(prev => !prev)}
+              css={audioOptionsOpen ? videoControlActiveStyles : videoControlInActiveStyles}
+              onClick={() => setAudioOptionsOpen(prev => !prev)}
               onKeyDown={event =>
                 handleKeyDown({
                   event,
-                  callback: () => setVideoOptionsOpen(prev => !prev),
+                  callback: () => setAudioOptionsOpen(prev => !prev),
                   keys: [KEY.ENTER, KEY.SPACE],
                 })
               }
               onBlur={event => {
                 if (!event.currentTarget.contains(event.relatedTarget)) {
-                  setVideoOptionsOpen(false);
+                  setAudioOptionsOpen(false);
                 }
               }}
             >
-              {videoOptionsOpen ? (
+              {audioOptionsOpen ? (
                 <>
                   <VideoControlsSelect
-                    value={selectedVideoOptions}
-                    onChange={selectedOption => updateVideoOptions(String(selectedOption?.value))}
-                    onKeyDown={event => isEscapeKey(event) && setVideoOptionsOpen(false)}
-                    id="select-camera"
-                    dataUieName="select-camera"
-                    options={videoOptions}
+                    value={selectedAudioOptions}
+                    id="select-microphone"
+                    dataUieName="select-microphone"
+                    options={audioOptions}
+                    onChange={selectedOption => {
+                      updateAudioOptions(
+                        String(selectedOption?.value),
+                        String(selectedOption?.value).includes('input'),
+                      );
+                    }}
+                    onKeyDown={event => isEscapeKey(event) && setAudioOptionsOpen(false)}
                     menuIsOpen
                     wrapperCSS={{marginBottom: 0}}
                   />
@@ -600,199 +538,267 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
             </button>
           )}
         </li>
-      )}
 
-      <li className="video-controls__item">
-        <button
-          className={`video-controls__button ${!canShareScreen ? 'with-tooltip with-tooltip--top' : ''}`}
-          data-tooltip={t('videoCallScreenShareNotSupported')}
-          css={
-            !canShareScreen
-              ? videoControlDisabledStyles
-              : selfSharesScreen
-                ? videoControlActiveStyles
-                : videoControlInActiveStyles
-          }
-          onClick={() => toggleScreenshare(call)}
-          onKeyDown={event =>
-            handleKeyDown({
-              event,
-              callback: () => toggleScreenshare(call),
-              keys: [KEY.ENTER, KEY.SPACE],
-            })
-          }
-          type="button"
-          data-uie-value={selfSharesScreen ? 'active' : 'inactive'}
-          data-uie-enabled={canShareScreen ? 'true' : 'false'}
-          data-uie-name="do-toggle-screen"
-          title={t('videoCallOverlayShareScreen')}
-        >
-          {selfSharesScreen ? (
-            <Icon.ScreenshareIcon width={16} height={16} />
-          ) : (
-            <Icon.ScreenshareOffIcon width={16} height={16} />
-          )}
-        </button>
-      </li>
-
-      <li className="video-controls__item" css={hangUpVideoControlStyles}>
-        <button
-          className="video-controls__button video-controls__button--red"
-          onClick={() => leave(call)}
-          onKeyDown={event =>
-            handleKeyDown({
-              event,
-              callback: () => leave(call),
-              keys: [KEY.ENTER, KEY.SPACE],
-            })
-          }
-          type="button"
-          data-uie-name="do-call-controls-video-call-cancel"
-          title={t('videoCallOverlayHangUp')}
-        >
-          <Icon.HangupIcon />
-        </button>
-      </li>
-
-      {!isDesktop && (
-        <li className="video-controls__item">
-          {showEmojisBar && <EmojisBar onEmojiClick={handleEmojiClick} ref={emojiBarRef} />}
-          <button
-            title={t('callMenuMoreInteractions')}
-            className={classNames(
-              {
-                'video-controls__button': isMobile,
-                'video-controls__button_primary': !isMobile,
-              },
-              {active: isMoreInteractionsMenuActive},
-            )}
-            css={isMobile && (isMoreInteractionsMenuActive ? videoControlActiveStyles : videoControlInActiveStyles)}
-            onClick={onMoreInteractionsMenuClick}
-            type="button"
-            data-uie-name="video-controls-menu-more-interactions"
-          >
-            <MoreIcon width={16} height={16} />
-          </button>
-        </li>
-      )}
-
-      {isDesktop && (
-        <>
-          {participants.length > 2 && (
-            <li className="video-controls__item">
-              <button
-                onBlur={event => {
-                  if (!event.currentTarget.contains(event.relatedTarget)) {
-                    setIsCallViewOpen(false);
-                  }
-                }}
-                className={classNames('video-controls__button_primary', {active: isCallViewOpen})}
-                onClick={() => setIsCallViewOpen(prev => !prev)}
-                onKeyDown={event =>
-                  handleKeyDown({
-                    event,
-                    callback: () => setIsCallViewOpen(prev => !prev),
-                    keys: [KEY.ENTER, KEY.SPACE],
-                  })
-                }
-                type="button"
-                data-uie-name="do-call-controls-video-call-view"
-                role="switch"
-                aria-checked={!isMuted}
-                title={t('videoCallOverlayChangeViewMode')}
-              >
-                {isCallViewOpen && (
-                  <VideoControlsSelect
-                    value={selectedCallViewOption}
-                    id="select-call-view"
-                    dataUieName="select-call-view"
-                    options={callViewOptions}
-                    onChange={selectedOption => {
-                      if (isCallViewOption(selectedOption)) {
-                        setActiveCallViewTab(selectedOption.value);
-                        setMaximizedParticipant(call, null);
-                      }
-                    }}
-                    onKeyDown={event => isEscapeKey(event) && setAudioOptionsOpen(false)}
-                    menuIsOpen={isCallViewOpen}
-                    wrapperCSS={{marginBottom: 0, width: 0, height: 0}}
-                    menuCSS={{right: 0, bottom: 10}}
-                  />
-                )}
-                <GridIcon width={16} height={16} />
-              </button>
-            </li>
-          )}
-
-          {isInCallHandRaiseControlVisible && (
-            <li className="video-controls__item">
-              <button
-                data-uie-value={isSelfHandRaised ? 'active' : 'inactive'}
-                onClick={() => toggleIsHandRaised(isSelfHandRaised)}
-                onKeyDown={event =>
-                  handleKeyDown({
-                    event,
-                    callback: () => toggleIsHandRaised(isSelfHandRaised),
-                    keys: [KEY.ENTER, KEY.SPACE],
-                  })
-                }
-                className={classNames('video-controls__button_primary', {active: isSelfHandRaised})}
-                type="button"
-                data-uie-name="do-toggle-hand-raise"
-                role="switch"
-                aria-checked={isSelfHandRaised}
-                title={
-                  isSelfHandRaised ? t('videoCallParticipantLowerYourHand') : t('videoCallParticipantRaiseYourHand')
-                }
-              >
-                <RaiseHandIcon width={16} height={16} />
-              </button>
-            </li>
-          )}
-
-          {isInCallReactionsEnable && (
-            <li className="video-controls__item">
-              {showEmojisBar && <EmojisBar onEmojiClick={handleEmojiClick} ref={emojiBarRef} />}
-              <button
-                ref={emojiBarToggleButtonRef}
-                title={t('callReactions')}
-                className={classNames('video-controls__button_primary', {active: showEmojisBar})}
-                onClick={() => setShowEmojisBar(prev => !prev)}
-                type="button"
-                data-uie-name="do-call-controls-video-call-cancel"
-              >
-                <EmojiIcon />
-              </button>
-            </li>
-          )}
-
+        {showToggleVideo && (
           <li className="video-controls__item">
             <button
-              data-uie-value={isParticipantsListOpen ? 'active' : 'inactive'}
-              onClick={toggleParticipantsList}
+              className="video-controls__button"
+              data-uie-value={selfSharesCamera ? 'active' : 'inactive'}
+              onClick={() => toggleCamera(call)}
               onKeyDown={event =>
                 handleKeyDown({
                   event,
-                  callback: toggleParticipantsList,
+                  callback: () => toggleCamera(call),
                   keys: [KEY.ENTER, KEY.SPACE],
                 })
               }
-              className={classNames('video-controls__button_primary', {active: isParticipantsListOpen})}
-              type="button"
-              data-uie-name="do-toggle-call-participants-list"
               role="switch"
-              aria-checked={isParticipantsListOpen}
-              title={
-                isParticipantsListOpen
-                  ? t('videoCallOverlayHideParticipantsList')
-                  : t('videoCallOverlayShowParticipantsList')
-              }
+              aria-checked={selfSharesCamera}
+              tabIndex={TabIndex.FOCUSABLE}
+              css={selfSharesCamera ? videoControlActiveStyles : videoControlInActiveStyles}
+              data-uie-name="do-call-controls-toggle-video"
+              title={t('videoCallOverlayCamera')}
             >
-              <Icon.PeopleIcon width={16} height={16} />
+              {selfSharesCamera ? (
+                <Icon.CameraIcon width={16} height={16} />
+              ) : (
+                <Icon.CameraOffIcon width={16} height={16} />
+              )}
+            </button>
+            {!isMobile && (
+              <button
+                className="device-toggle-button"
+                css={videoOptionsOpen ? videoControlActiveStyles : videoControlInActiveStyles}
+                onClick={() => setVideoOptionsOpen(prev => !prev)}
+                onKeyDown={event =>
+                  handleKeyDown({
+                    event,
+                    callback: () => setVideoOptionsOpen(prev => !prev),
+                    keys: [KEY.ENTER, KEY.SPACE],
+                  })
+                }
+                onBlur={event => {
+                  if (!event.currentTarget.contains(event.relatedTarget)) {
+                    setVideoOptionsOpen(false);
+                  }
+                }}
+              >
+                {videoOptionsOpen ? (
+                  <>
+                    <VideoControlsSelect
+                      value={selectedVideoOptions}
+                      onChange={selectedOption => updateVideoOptions(String(selectedOption?.value))}
+                      onKeyDown={event => isEscapeKey(event) && setVideoOptionsOpen(false)}
+                      id="select-camera"
+                      dataUieName="select-camera"
+                      options={videoOptions}
+                      menuIsOpen
+                      wrapperCSS={{marginBottom: 0}}
+                    />
+                    <Icon.ChevronIcon css={{height: '16px'}} />
+                  </>
+                ) : (
+                  <Icon.ChevronIcon css={{rotate: '180deg', height: '16px'}} />
+                )}
+              </button>
+            )}
+          </li>
+        )}
+
+        <li className="video-controls__item">
+          <button
+            className={`video-controls__button ${!canShareScreen ? 'with-tooltip with-tooltip--top' : ''}`}
+            data-tooltip={t('videoCallScreenShareNotSupported')}
+            css={
+              !canShareScreen
+                ? videoControlDisabledStyles
+                : selfSharesScreen
+                  ? videoControlActiveStyles
+                  : videoControlInActiveStyles
+            }
+            onClick={() => toggleScreenshare(call)}
+            onKeyDown={event =>
+              handleKeyDown({
+                event,
+                callback: () => toggleScreenshare(call),
+                keys: [KEY.ENTER, KEY.SPACE],
+              })
+            }
+            type="button"
+            data-uie-value={selfSharesScreen ? 'active' : 'inactive'}
+            data-uie-enabled={canShareScreen ? 'true' : 'false'}
+            data-uie-name="do-toggle-screen"
+            title={t('videoCallOverlayShareScreen')}
+          >
+            {selfSharesScreen ? (
+              <Icon.ScreenshareIcon width={16} height={16} />
+            ) : (
+              <Icon.ScreenshareOffIcon width={16} height={16} />
+            )}
+          </button>
+        </li>
+
+        <li className="video-controls__item">
+          <button
+            className="video-controls__button video-controls__button--red"
+            onClick={() => leave(call)}
+            onKeyDown={event =>
+              handleKeyDown({
+                event,
+                callback: () => leave(call),
+                keys: [KEY.ENTER, KEY.SPACE],
+              })
+            }
+            type="button"
+            data-uie-name="do-call-controls-video-call-cancel"
+            title={t('videoCallOverlayHangUp')}
+          >
+            <Icon.HangupIcon />
+          </button>
+        </li>
+      </div>
+
+      <div css={moreControlsWrapperStyles}>
+        {!isDesktop && (
+          <li className="video-controls__item">
+            {showEmojisBar && <EmojisBar onEmojiClick={handleEmojiClick} ref={emojiBarRef} />}
+            <button
+              title={t('callMenuMoreInteractions')}
+              className={classNames(
+                {
+                  'video-controls__button': isMobile,
+                  'video-controls__button_primary': !isMobile,
+                },
+                {active: isMoreInteractionsMenuActive},
+              )}
+              css={isMobile && (isMoreInteractionsMenuActive ? videoControlActiveStyles : videoControlInActiveStyles)}
+              onClick={onMoreInteractionsMenuClick}
+              type="button"
+              data-uie-name="video-controls-menu-more-interactions"
+            >
+              <MoreIcon width={16} height={16} />
             </button>
           </li>
-        </>
-      )}
+        )}
+
+        {isDesktop && (
+          <>
+            {participants.length > 2 && (
+              <li className="video-controls__item">
+                <button
+                  onBlur={event => {
+                    if (!event.currentTarget.contains(event.relatedTarget)) {
+                      setIsCallViewOpen(false);
+                    }
+                  }}
+                  className={classNames('video-controls__button_primary', {active: isCallViewOpen})}
+                  onClick={() => setIsCallViewOpen(prev => !prev)}
+                  onKeyDown={event =>
+                    handleKeyDown({
+                      event,
+                      callback: () => setIsCallViewOpen(prev => !prev),
+                      keys: [KEY.ENTER, KEY.SPACE],
+                    })
+                  }
+                  type="button"
+                  data-uie-name="do-call-controls-video-call-view"
+                  role="switch"
+                  aria-checked={!isMuted}
+                  title={t('videoCallOverlayChangeViewMode')}
+                >
+                  {isCallViewOpen && (
+                    <VideoControlsSelect
+                      value={selectedCallViewOption}
+                      id="select-call-view"
+                      dataUieName="select-call-view"
+                      options={callViewOptions}
+                      onChange={selectedOption => {
+                        if (isCallViewOption(selectedOption)) {
+                          setActiveCallViewTab(selectedOption.value);
+                          setMaximizedParticipant(call, null);
+                        }
+                      }}
+                      onKeyDown={event => isEscapeKey(event) && setAudioOptionsOpen(false)}
+                      menuIsOpen={isCallViewOpen}
+                      wrapperCSS={{marginBottom: 0, width: 0, height: 0}}
+                      menuCSS={{right: 0, bottom: 10}}
+                    />
+                  )}
+                  <GridIcon width={16} height={16} />
+                </button>
+              </li>
+            )}
+
+            {isInCallHandRaiseControlVisible && (
+              <li className="video-controls__item">
+                <button
+                  data-uie-value={isSelfHandRaised ? 'active' : 'inactive'}
+                  onClick={() => toggleIsHandRaised(isSelfHandRaised)}
+                  onKeyDown={event =>
+                    handleKeyDown({
+                      event,
+                      callback: () => toggleIsHandRaised(isSelfHandRaised),
+                      keys: [KEY.ENTER, KEY.SPACE],
+                    })
+                  }
+                  className={classNames('video-controls__button_primary', {active: isSelfHandRaised})}
+                  type="button"
+                  data-uie-name="do-toggle-hand-raise"
+                  role="switch"
+                  aria-checked={isSelfHandRaised}
+                  title={
+                    isSelfHandRaised ? t('videoCallParticipantLowerYourHand') : t('videoCallParticipantRaiseYourHand')
+                  }
+                >
+                  <RaiseHandIcon width={16} height={16} />
+                </button>
+              </li>
+            )}
+
+            {isInCallReactionsEnable && (
+              <li className="video-controls__item">
+                {showEmojisBar && <EmojisBar onEmojiClick={handleEmojiClick} ref={emojiBarRef} />}
+                <button
+                  ref={emojiBarToggleButtonRef}
+                  title={t('callReactions')}
+                  className={classNames('video-controls__button_primary', {active: showEmojisBar})}
+                  onClick={() => setShowEmojisBar(prev => !prev)}
+                  type="button"
+                  data-uie-name="do-toggle-emojis-bar"
+                >
+                  <EmojiIcon />
+                </button>
+              </li>
+            )}
+
+            <li className="video-controls__item">
+              <button
+                data-uie-value={isParticipantsListOpen ? 'active' : 'inactive'}
+                onClick={toggleParticipantsList}
+                onKeyDown={event =>
+                  handleKeyDown({
+                    event,
+                    callback: toggleParticipantsList,
+                    keys: [KEY.ENTER, KEY.SPACE],
+                  })
+                }
+                className={classNames('video-controls__button_primary', {active: isParticipantsListOpen})}
+                type="button"
+                data-uie-name="do-toggle-call-participants-list"
+                role="switch"
+                aria-checked={isParticipantsListOpen}
+                title={
+                  isParticipantsListOpen
+                    ? t('videoCallOverlayHideParticipantsList')
+                    : t('videoCallOverlayShowParticipantsList')
+                }
+              >
+                <Icon.PeopleIcon width={16} height={16} />
+              </button>
+            </li>
+          </>
+        )}
+      </div>
     </ul>
   );
 };
