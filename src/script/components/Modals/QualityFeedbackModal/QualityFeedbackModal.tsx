@@ -19,16 +19,16 @@
 
 import React, {useState} from 'react';
 
-import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useAppNotification} from 'Components/AppNotification';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
+import {CallingRepository} from 'src/script/calling/CallingRepository';
+import {trackCallQualityFeedback} from 'src/script/tracking/Helpers';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
@@ -45,17 +45,16 @@ import {
   wrapper,
 } from './QualityFeedbackModal.styles';
 
-import {EventName} from '../../../tracking/EventName';
-import {Segmentation} from '../../../tracking/Segmentation';
 import {UserState} from '../../../user/UserState';
 
 const logger = getLogger('CallQualityFeedback');
 
-export const QualityFeedbackModal = () => {
+export const QualityFeedbackModal = ({callingRepository}: {callingRepository: CallingRepository}) => {
   const userState = container.resolve(UserState);
-
+  const {conversationId} = useCallAlertState();
+  const call = conversationId && callingRepository.findCall(conversationId);
   const [isChecked, setIsChecked] = useState(false);
-  const {setQualityFeedbackModalShown, qualityFeedbackModalShown} = useCallAlertState();
+  const {setQualityFeedbackModalShown, qualityFeedbackModalShown, setConversationId} = useCallAlertState();
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
 
   const submittedNotification = useAppNotification({
@@ -69,6 +68,7 @@ export const QualityFeedbackModal = () => {
   const handleCloseModal = ({skipNotification = false} = {}) => {
     if (!selfUser) {
       setQualityFeedbackModalShown(false);
+      setConversationId();
       return;
     }
 
@@ -88,23 +88,18 @@ export const QualityFeedbackModal = () => {
       logger.warn(`Can't send feedback: ${(error as Error).message}`);
     } finally {
       setQualityFeedbackModalShown(false);
+      setConversationId();
     }
   };
 
   const sendQualityFeedback = (score: number) => {
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.QUALITY_REVIEW, {
-      [Segmentation.CALL.SCORE]: score,
-      [Segmentation.CALL.QUALITY_REVIEW_LABEL]: RatingListLabel.ANSWERED,
-    });
+    trackCallQualityFeedback({call, score, label: RatingListLabel.ANSWERED});
 
     handleCloseModal();
   };
 
   const skipQualityFeedback = () => {
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.QUALITY_REVIEW, {
-      [Segmentation.CALL.QUALITY_REVIEW_LABEL]: RatingListLabel.DISMISSED,
-    });
-
+    trackCallQualityFeedback({call, label: RatingListLabel.DISMISSED});
     handleCloseModal({skipNotification: true});
   };
 

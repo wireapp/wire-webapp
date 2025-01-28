@@ -317,12 +317,7 @@ export class EventTrackingRepository {
       telemetry.beginSession();
       if (this.sendAppOpenEvent) {
         this.sendAppOpenEvent = false;
-        this.trackProductReportingEvent(EventName.APP_OPEN, {
-          [Segmentation.APP_OPEN.DESKTOP_APP]: getPlatform(),
-          [Segmentation.APP_OPEN.APP_VERSION]: Config.getConfig().VERSION,
-          [Segmentation.APP_OPEN.OS_VERSION]: navigator.userAgent,
-          [Segmentation.APP_OPEN.IS_TEAM_MEMBER]: this.teamState.isTeam(),
-        });
+        this.trackProductReportingEvent(EventName.APP_OPEN);
       }
       this.telemetryLogger.info('Telemetry session has been started');
     }
@@ -330,6 +325,10 @@ export class EventTrackingRepository {
 
   private getCommonSegmentation(): ContributedSegmentations {
     const segmentation: ContributedSegmentations = {
+      [Segmentation.APP_OPEN.DESKTOP_APP]: getPlatform(),
+      [Segmentation.APP_OPEN.APP_VERSION]: Config.getConfig().VERSION,
+      [Segmentation.APP_OPEN.OS_VERSION]: navigator.userAgent,
+      [Segmentation.APP_OPEN.IS_TEAM_MEMBER]: this.teamState.isTeam(),
       [Segmentation.COMMON.TEAM_IS_TEAM]: this.teamState.isTeam(),
     };
 

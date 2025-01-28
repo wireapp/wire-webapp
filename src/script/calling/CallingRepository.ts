@@ -57,6 +57,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {CALL_QUALITY_FEEDBACK_KEY} from 'Components/Modals/QualityFeedbackModal/constants';
+import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
 import {flatten} from 'Util/ArrayUtil';
 import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
@@ -1296,8 +1297,10 @@ export class CallingRepository {
   }
 
   private readonly leave1on1MLSConference = async (conversationId: QualifiedId) => {
+    const call = this.findCall(conversationId);
+    call?.endedAt(Date.now());
     if (isTelemetryEnabledAtCurrentEnvironment()) {
-      this.showCallQualityFeedbackModal();
+      this.showCallQualityFeedbackModal(conversationId);
     }
 
     await this.subconversationService.leaveConferenceSubconversation(conversationId);
@@ -1449,31 +1452,44 @@ export class CallingRepository {
     this.wCall?.requestVideoStreams(this.wUser, convId, VSTREAMS.LIST, JSON.stringify(payload));
   }
 
-  readonly showCallQualityFeedbackModal = () => {
+  readonly showCallQualityFeedbackModal = (conversationId: QualifiedId) => {
     if (!this.selfUser || !this.hasActiveCall()) {
       return;
     }
 
-    const {setQualityFeedbackModalShown} = useCallAlertState.getState();
+    const {setQualityFeedbackModalShown, setConversationId} = useCallAlertState.getState();
 
     try {
       const qualityFeedbackStorage = localStorage.getItem(CALL_QUALITY_FEEDBACK_KEY);
       const currentStorageData = qualityFeedbackStorage ? JSON.parse(qualityFeedbackStorage) : {};
       const currentUserDate = currentStorageData?.[this.selfUser.id];
       const currentDate = new Date().getTime();
+      const call = this.findCall(conversationId);
+      const isCallTooShort = (call?.endedAt() || 0) - (call?.startedAt() || 0) <= TIME_IN_MILLIS.MINUTE;
+      const isFeedbackMuted =
+        currentUserDate !== undefined && (currentUserDate === null || currentDate < currentUserDate);
 
-      if (currentUserDate === undefined || (currentUserDate !== null && currentDate >= currentUserDate)) {
+      if (isFeedbackMuted || isCallTooShort) {
+        trackingHelpers.trackCallQualityFeedback({
+          call,
+          label: isFeedbackMuted ? RatingListLabel.MUTED : RatingListLabel.CALL_TOO_SHORT,
+        });
+      } else {
+        setConversationId(conversationId);
         setQualityFeedbackModalShown(true);
       }
     } catch (error) {
       this.logger.warn(`Storage data can't found: ${(error as Error).message}`);
+      setConversationId(conversationId);
       setQualityFeedbackModalShown(true);
     }
   };
 
   readonly leaveCall = (conversationId: QualifiedId, reason: LEAVE_CALL_REASON): void => {
+    const call = this.findCall(conversationId);
+    call?.endedAt(Date.now());
     if (isTelemetryEnabledAtCurrentEnvironment()) {
-      this.showCallQualityFeedbackModal();
+      this.showCallQualityFeedbackModal(conversationId);
     }
 
     this.logger.info(`Ending call with reason ${reason} \n Stack trace: `, new Error().stack);
@@ -1854,7 +1870,9 @@ export class CallingRepository {
     this.sendCallingEvent(EventName.CALLING.ENDED_CALL, call, {
       [Segmentation.CALL.AV_SWITCH_TOGGLE]: call.analyticsAvSwitchToggle,
       [Segmentation.CALL.DIRECTION]: this.getCallDirection(call),
-      [Segmentation.CALL.DURATION]: Math.ceil((Date.now() - (call.startedAt() || 0)) / 5000) * 5,
+      [Segmentation.CALL.DURATION]: Math.ceil(
+        ((call.endedAt() || 0) - (call.startedAt() || 0)) / TIME_IN_MILLIS.SECOND,
+      ),
       [Segmentation.CALL.END_REASON]: reason,
       [Segmentation.CALL.REASON]: this.getCallEndReasonText(reason),
       [Segmentation.CALL.PARTICIPANTS]: call.analyticsMaximumParticipants,
