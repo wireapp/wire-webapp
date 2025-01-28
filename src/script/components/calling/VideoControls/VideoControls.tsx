@@ -50,6 +50,7 @@ import {handleKeyDown, isEscapeKey, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {EmojisBar} from './EmojisBar/EmojisBar';
+import {VideoCallCancelButton} from './VideoCallCancelButton/VideoCallCancelButton';
 import {
   moreControlsWrapperStyles,
   videoControlActiveStyles,
@@ -637,25 +638,11 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
             )}
           </button>
         </li>
-
-        <li className="video-controls__item">
-          <button
-            className="video-controls__button video-controls__button--red"
-            onClick={() => leave(call)}
-            onKeyDown={event =>
-              handleKeyDown({
-                event,
-                callback: () => leave(call),
-                keys: [KEY.ENTER, KEY.SPACE],
-              })
-            }
-            type="button"
-            data-uie-name="do-call-controls-video-call-cancel"
-            title={t('videoCallOverlayHangUp')}
-          >
-            <Icon.HangupIcon />
-          </button>
-        </li>
+        {!isMobile && (
+          <li className="video-controls__item">
+            <VideoCallCancelButton onAction={() => leave(call)} />
+          </li>
+        )}
       </div>
 
       <div css={moreControlsWrapperStyles}>
@@ -678,6 +665,12 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
             >
               <MoreIcon width={16} height={16} />
             </button>
+          </li>
+        )}
+
+        {isMobile && (
+          <li className="video-controls__item">
+            <VideoCallCancelButton onAction={() => leave(call)} />
           </li>
         )}
 
