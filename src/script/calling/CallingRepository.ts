@@ -1870,9 +1870,7 @@ export class CallingRepository {
     this.sendCallingEvent(EventName.CALLING.ENDED_CALL, call, {
       [Segmentation.CALL.AV_SWITCH_TOGGLE]: call.analyticsAvSwitchToggle,
       [Segmentation.CALL.DIRECTION]: this.getCallDirection(call),
-      [Segmentation.CALL.DURATION]: Math.ceil(
-        ((call.endedAt() || 0) - (call.startedAt() || 0)) / TIME_IN_MILLIS.SECOND,
-      ),
+      [Segmentation.CALL.DURATION]: Math.ceil((call.endedAt() - (call.startedAt() || 0)) / TIME_IN_MILLIS.SECOND),
       [Segmentation.CALL.END_REASON]: reason,
       [Segmentation.CALL.REASON]: this.getCallEndReasonText(reason),
       [Segmentation.CALL.PARTICIPANTS]: call.analyticsMaximumParticipants,

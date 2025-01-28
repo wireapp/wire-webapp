@@ -112,7 +112,7 @@ export function trackCallQualityFeedback({call, score, label}: {call?: Call; sco
     return;
   }
 
-  const duration = (call.endedAt() || 0) - (call.startedAt() || 0) / TIME_IN_MILLIS.SECOND;
+  const duration = call.endedAt() - (call.startedAt() || 0) / TIME_IN_MILLIS.SECOND;
   amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.QUALITY_REVIEW, {
     ...(score && {[Segmentation.CALL.SCORE]: score}),
     [Segmentation.CALL.QUALITY_REVIEW_LABEL]: label,

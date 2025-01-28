@@ -49,7 +49,11 @@ import {UserState} from '../../../user/UserState';
 
 const logger = getLogger('CallQualityFeedback');
 
-export const QualityFeedbackModal = ({callingRepository}: {callingRepository: CallingRepository}) => {
+interface Props {
+  callingRepository: CallingRepository;
+}
+
+export const QualityFeedbackModal = ({callingRepository}: Props) => {
   const userState = container.resolve(UserState);
   const {conversationId} = useCallAlertState();
   const call = conversationId && callingRepository.findCall(conversationId);
@@ -62,6 +66,12 @@ export const QualityFeedbackModal = ({callingRepository}: {callingRepository: Ca
   });
 
   if (!qualityFeedbackModalShown) {
+    return null;
+  }
+
+  if (!call) {
+    logger.warn('Call not found for conversationId', conversationId);
+    setQualityFeedbackModalShown(false);
     return null;
   }
 
