@@ -130,3 +130,6 @@ export * from './Files/PdfFileIcon';
 export * from './Files/PresentationFileIcon';
 export * from './Files/SpreadsheetFileIcon';
 export * from './Files/VideoFileIcon';
+export * from './Files/TextFileIcon';
+export * from './Files/FolderIcon';
+export * from './Files/MultipleFilesIcon';
