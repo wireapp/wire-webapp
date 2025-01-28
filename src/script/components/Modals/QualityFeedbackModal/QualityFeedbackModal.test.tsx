@@ -100,6 +100,7 @@ describe('QualityFeedbackModal', () => {
 
     act(() => {
       useCallAlertState.getState().setQualityFeedbackModalShown(true);
+      useCallAlertState.getState().setConversationId(call.conversation.qualifiedId);
     });
 
     expect(useCallAlertState.getState().qualityFeedbackModalShown).toBe(true);
