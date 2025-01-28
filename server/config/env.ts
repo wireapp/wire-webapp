@@ -174,6 +174,9 @@ export type Env = {
   /** Feature to enable team creation flow for individual users */
   FEATURE_ENABLE_TEAM_CREATION: string;
 
+  /** Feature to enable auto login */
+  FEATURE_ENABLE_AUTO_LOGIN: string;
+
   /** Feature to enable rich text editor */
   FEATURE_ENABLE_MESSAGE_FORMAT_BUTTONS: string;
 
