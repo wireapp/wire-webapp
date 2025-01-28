@@ -44,7 +44,7 @@ export async function downloadFileAsync(url: string, baseDir: string): Promise<v
   const zipFile = path.join(baseDir, 'archive.zip');
   await ensureDir(baseDir);
 
-  await new Promise((resolve, reject) => {
+  await new Promise<void>((resolve, reject) => {
     const writer = createWriteStream(zipFile).on('error', reject).on('finish', resolve);
 
     return axios
