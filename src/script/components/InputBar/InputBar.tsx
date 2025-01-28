@@ -22,7 +22,7 @@ import {useCallback, useEffect, useRef, useState} from 'react';
 import {$convertToMarkdownString} from '@lexical/markdown';
 import {amplify} from 'amplify';
 import cx from 'classnames';
-import {LexicalEditor, $createTextNode, $insertNodes} from 'lexical';
+import {LexicalEditor, $createTextNode, $insertNodes, CLEAR_EDITOR_COMMAND} from 'lexical';
 import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -236,8 +236,7 @@ export const InputBar = ({
 
   const resetDraftState = () => {
     setReplyMessageEntity(null);
-
-    handleSaveEditorDraft();
+    editorRef.current?.dispatchCommand(CLEAR_EDITOR_COMMAND, undefined);
   };
 
   const clearPastedFile = () => setPastedFile(null);
@@ -251,6 +250,7 @@ export const InputBar = ({
 
   const cancelMessageReply = (resetDraft = true) => {
     setReplyMessageEntity(null);
+    handleSaveEditorDraft();
 
     if (resetDraft) {
       resetDraftState();
@@ -611,7 +611,7 @@ export const InputBar = ({
         )}
 
         {isReplying && !isEditing && (
-          <ReplyBar replyMessageEntity={replyMessageEntity} onCancel={() => cancelMessageReply(true)} />
+          <ReplyBar replyMessageEntity={replyMessageEntity} onCancel={() => cancelMessageReply()} />
         )}
 
         <div
