@@ -217,7 +217,7 @@ export const InputBar = ({
     ),
   });
 
-  const handleSaveEditorDraft = (replyId?: string) => {
+  const handleSaveEditorDraft = (replyId = '') => {
     const editor = editorRef.current;
 
     if (!editor) {
@@ -611,7 +611,7 @@ export const InputBar = ({
         )}
 
         {isReplying && !isEditing && (
-          <ReplyBar replyMessageEntity={replyMessageEntity} onCancel={() => cancelMessageReply()} />
+          <ReplyBar replyMessageEntity={replyMessageEntity} onCancel={() => cancelMessageReply(false)} />
         )}
 
         <div
