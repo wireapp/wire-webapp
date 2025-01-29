@@ -323,13 +323,9 @@ export class EventTrackingRepository {
     }
   }
 
-  private getCommonSegmentation(): ContributedSegmentations {
+  private getUserData(): ContributedSegmentations {
     const segmentation: ContributedSegmentations = {
-      [Segmentation.APP_OPEN.DESKTOP_APP]: getPlatform(),
-      [Segmentation.APP_OPEN.APP_VERSION]: Config.getConfig().VERSION,
-      [Segmentation.APP_OPEN.OS_VERSION]: navigator.userAgent,
-      [Segmentation.APP_OPEN.IS_TEAM_MEMBER]: this.teamState.isTeam(),
-      [Segmentation.COMMON.TEAM_IS_TEAM]: this.teamState.isTeam(),
+      [UserData.IS_TEAM]: this.teamState.isTeam(),
     };
 
     if (this.teamState.isTeam()) {
@@ -354,16 +350,17 @@ export class EventTrackingRepository {
     }
 
     if (this.isProductReportingActivated === true || getForcedErrorReportingStatus()) {
-      const userData = {
-        [UserData.IS_TEAM]: this.teamState.isTeam(),
-      };
+      const userData = this.getUserData();
 
       telemetry.setUserData(userData);
 
       this.telemetryLogger.info(`Reporting user data for product event ${eventName}@${JSON.stringify(userData)}`);
 
       const segmentation = {
-        ...this.getCommonSegmentation(),
+        [Segmentation.APP_OPEN.DESKTOP_APP]: getPlatform(),
+        [Segmentation.APP_OPEN.APP_VERSION]: Config.getConfig().VERSION,
+        [Segmentation.APP_OPEN.OS_VERSION]: navigator.userAgent,
+        [Segmentation.APP_OPEN.IS_TEAM_MEMBER]: this.teamState.isTeam(),
         ...customSegmentations,
       };
 
