@@ -21,17 +21,20 @@ import {useCallback, useEffect, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
+import {container} from 'tsyringe';
 
 import {E2EIHandler, getUsersIdentities, MLSStatuses, WireIdentity} from '../E2EIdentity';
+import {Core} from '../service/CoreSingleton';
 
 export const useUserIdentity = (userId: QualifiedId, groupId?: string, updateAfterEnrollment?: boolean) => {
+  const core = container.resolve(Core);
   const [deviceIdentities, setDeviceIdentities] = useState<WireIdentity[] | undefined>();
   const getDeviceIdentity = (deviceId: string) => {
     return deviceIdentities?.find(identity => identity.deviceId === deviceId);
   };
 
   const refreshDeviceIdentities = useCallback(async () => {
-    if (!groupId || !E2EIHandler.getInstance().isE2EIEnabled()) {
+    if (!groupId || !core.isMLSActiveForClient()) {
       return;
     }
 
@@ -41,7 +44,7 @@ export const useUserIdentity = (userId: QualifiedId, groupId?: string, updateAft
     /**
      * Dont check the userId directly, as it is a object that changes on every render, will cause infinite loop
      */
-  }, [userId.id, userId.domain, groupId]);
+  }, [groupId, userId.id, userId.domain]);
 
   useEffect(() => {
     void refreshDeviceIdentities();
