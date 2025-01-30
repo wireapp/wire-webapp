@@ -30,6 +30,7 @@ import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 
 import {AssetHeader} from './AssetHeader';
 import {AssetLoader} from './AssetLoader';
+import {FileCard} from './FileCard/FileCard';
 import {useAssetTransfer} from './useAssetTransfer';
 
 import {AssetTransferState} from '../../../../../assets/AssetTransferState';
@@ -60,7 +61,7 @@ const FileAsset: React.FC<FileAssetProps> = ({
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isFocusable);
 
   const fileName = trimFileExtension(asset.file_name);
-  const fileExtension = getFileExtension(asset.file_name);
+  const fileExtension = getFileExtension(asset.file_name!);
   const formattedFileSize = formatBytes(asset.file_size);
 
   // This is a hack since we don't have a FileAsset available before it's
@@ -78,14 +79,20 @@ const FileAsset: React.FC<FileAssetProps> = ({
   const isFailedDownloadingHash = assetStatus === AssetTransferState.DOWNLOAD_FAILED_HASH;
   const isUploading = assetStatus === AssetTransferState.UPLOADING;
 
+  const newUI = true;
+
   const onDownloadAsset = async () => {
     if (isUploadedOrCancelled) {
-      downloadAsset(asset);
+      await downloadAsset(asset);
     }
   };
 
   if (isObfuscated) {
     return null;
+  }
+
+  if (newUI) {
+    return <FileCard extension={fileExtension} name={fileName} size={formattedFileSize} />;
   }
 
   return (
