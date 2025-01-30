@@ -21,7 +21,7 @@ import {CSSObject} from '@emotion/react';
 
 import {media} from '@wireapp/react-ui-kit';
 
-export const wrapperStyles: CSSObject = {
+export const emojisBarWrapperStyles: CSSObject = {
   position: 'absolute',
   bottom: '130%',
   left: '50%',
@@ -60,7 +60,7 @@ export const wrapperStyles: CSSObject = {
   },
 };
 
-export const buttonStyles: CSSObject = {
+export const emojisBarButtonStyles: CSSObject = {
   backgroundColor: 'transparent',
   border: 0,
   padding: '0.5rem',

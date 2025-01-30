@@ -22,7 +22,7 @@ import React, {useState} from 'react';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {t} from 'Util/LocalizerUtil';
 
-import {buttonStyles, wrapperStyles} from './EmojisBar.styles';
+import {emojisBarButtonStyles, emojisBarWrapperStyles} from './EmojisBar.styles';
 
 const EMOJIS_LIST = ['👍', '🎉', '❤️', '😂', '😮', '👏', '🤔', '😢', '👎'];
 
@@ -50,7 +50,7 @@ export const EmojisBar = ({onEmojiClick, ref}: EmojisBarProps) => {
       role="toolbar"
       data-uie-name="video-controls-emojis-bar"
       aria-label={t('callReactionButtonsAriaLabel')}
-      css={wrapperStyles}
+      css={emojisBarWrapperStyles}
     >
       {EMOJIS_LIST.map(emoji => {
         const isDisabled = disabledEmojis.includes(emoji);
@@ -62,7 +62,7 @@ export const EmojisBar = ({onEmojiClick, ref}: EmojisBarProps) => {
             key={emoji}
             disabled={isDisabled}
             onClick={() => handleEmojiClick(emoji)}
-            css={buttonStyles}
+            css={emojisBarButtonStyles}
           >
             {emoji}
           </button>
