@@ -707,6 +707,7 @@
   "featureConfigChangeModalSelfDeletingMessagesHeadline": "There has been a change in {brandName}",
   "federationConnectionRemove": "The backends [bold]{backendUrlOne}[/bold] and [bold]{backendUrlTwo}[/bold] stopped federating.",
   "federationDelete": "[bold]Your backend[/bold] stopped federating with [bold]{backendUrl}.[/bold]",
+  "fileCardDefaultCloseButtonLabel": "Close",
   "fileTypeRestrictedIncoming": "Le fichier &nbsp;[bold]{name}[/bold]&nbsp;ne peut pas être ouvert",
   "fileTypeRestrictedOutgoing": "Le partage de fichiers avec l'extension {fileExt} n'est pas autorisé par votre organisation",
   "folderViewTooltip": "Dossiers",
