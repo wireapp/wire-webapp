@@ -28,14 +28,17 @@ import {
   MenuProps,
   GroupBase,
   OptionsOrGroups,
+  MenuListProps,
 } from 'react-select';
 
 import {Option} from './Select';
+import {menuListCloseButtonStyles, menuListHeadingContainerStyles} from './SelectComponents.styles';
 
-import {CheckIcon} from '../Icon';
+import {CheckIcon, CloseIcon} from '../Icon';
 import {ArrowDown} from '../Icon/ArrowDown';
 import {Theme} from '../Layout';
 import {TabIndex} from '../types/enums';
+
 // SelectContainer
 export const SelectContainer = (props: ContainerProps) => {
   return (
@@ -133,6 +136,36 @@ export const Menu = (dataUieName: string, css?: CSSObject) => (props: MenuProps)
     </components.Menu>
   );
 };
+
+// eslint-disable-next-line react/display-name
+export const MenuList = (menuListHeading: string, dataUieName: string) => (props: MenuListProps) => {
+  const {selectProps, children} = props;
+
+  const handleClose = () => {
+    if (selectProps && selectProps.onMenuClose) {
+      selectProps.onMenuClose();
+    }
+  };
+
+  return (
+    <components.MenuList {...props}>
+      <div
+        {...(dataUieName && {
+          'data-uie-name': `menu-list-${dataUieName}`,
+        })}
+      >
+        <div css={(theme: Theme) => menuListHeadingContainerStyles(theme)}>
+          {menuListHeading}
+          <button onClick={handleClose} css={menuListCloseButtonStyles} aria-label={`Close: ${menuListHeading}`}>
+            <CloseIcon width={16} height={16} />
+          </button>
+        </div>
+        {children}
+      </div>
+    </components.MenuList>
+  );
+};
+MenuList.displayName = 'MenuList';
 
 export const renderValue = value => {
   if (Array.isArray(value)) {

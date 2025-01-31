@@ -29,6 +29,7 @@ import {
   DropdownIndicator,
   IndicatorsContainer,
   Menu,
+  MenuList,
   SelectContainer,
   ValueContainer,
   isGroup,
@@ -61,6 +62,7 @@ interface SelectProps<IsMulti extends boolean, Group extends GroupBase<Option>>
   isMulti?: IsMulti;
   isSearchable?: boolean;
   overlayMenu?: boolean;
+  menuListHeading?: string;
 }
 
 export const Select = <IsMulti extends boolean = false, Group extends GroupBase<Option> = GroupBase<Option>>({
@@ -78,6 +80,7 @@ export const Select = <IsMulti extends boolean = false, Group extends GroupBase<
   required = false,
   isSearchable = false,
   overlayMenu = true,
+  menuListHeading,
   ...props
 }: SelectProps<IsMulti, Group>) => {
   const theme = useTheme();
@@ -119,6 +122,7 @@ export const Select = <IsMulti extends boolean = false, Group extends GroupBase<
           Menu: Menu(dataUieName, menuCSS),
           ValueContainer,
           IndicatorsContainer,
+          ...(menuListHeading && {MenuList: MenuList(menuListHeading, dataUieName)}),
         }}
         tabIndex={TabIndex.UNFOCUSABLE}
         isDisabled={disabled}
