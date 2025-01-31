@@ -31,7 +31,8 @@ const groupOptions = [
     ],
   },
 ];
-const [isOpen, setIsOpen] = React.useState(false);
+const [isGroupSelectOpen, setIsGroupSelectOpen] = React.useState(false);
+const [isGroupSelectWithHeadingOpen, setIsGroupSelectWithHeadingOpen] = React.useState(false);
 
 <Container>
   <Columns>
@@ -93,12 +94,12 @@ const [isOpen, setIsOpen] = React.useState(false);
       <button
         className="device-toggle-button"
         onClick={() => {
-          setIsOpen(prev => !prev);
+          setIsGroupSelectOpen(prev => !prev);
         }}
         style={{width: '100px', height: '30px'}}
       >
         click me
-        {isOpen && (
+        {isGroupSelectOpen && (
           <Select
             id="groupSelect"
             menuPlacement="top"
@@ -111,6 +112,38 @@ const [isOpen, setIsOpen] = React.useState(false);
             onChange={selectedOption => console.log('Selected option', selectedOption)}
             dataUieName="group-select"
             defaultValue={[groupOptions[0].options[0], groupOptions[1].options[3]]}
+          />
+        )}
+      </button>
+    </Column>
+  </Columns>
+
+  <Columns>
+    <Column>Select With Groups and heading for all groups</Column>
+
+    <Column>
+      <button
+        className="device-toggle-button"
+        onClick={() => {
+          setIsGroupSelectWithHeadingOpen(prev => !prev);
+        }}
+        style={{width: '100px', height: '30px'}}
+      >
+        click me
+        {isGroupSelectWithHeadingOpen && (
+          <Select
+            id="groupSelectWithHeading"
+            menuPlacement="top"
+            menuIsOpen
+            controlShouldRenderValue={false}
+            isClearable={false}
+            backspaceRemovesValue={false}
+            hideSelectedOptions={false}
+            options={groupOptions}
+            onChange={selectedOption => console.log('Selected option', selectedOption)}
+            dataUieName="group-select-with-heading"
+            defaultValue={[groupOptions[0].options[0], groupOptions[1].options[3]]}
+            menuListHeading="Heading"
           />
         )}
       </button>
