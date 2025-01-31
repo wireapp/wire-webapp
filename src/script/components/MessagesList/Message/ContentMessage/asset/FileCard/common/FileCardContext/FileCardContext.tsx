@@ -20,7 +20,7 @@
 import {createContext, ReactNode, useContext} from 'react';
 
 interface FileCardContextValue {
-  variant: 'preview' | 'message';
+  variant: 'small' | 'large';
   extension: string;
   name: string;
   size: string;

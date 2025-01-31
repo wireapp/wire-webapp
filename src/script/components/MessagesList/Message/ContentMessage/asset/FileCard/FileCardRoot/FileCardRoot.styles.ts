@@ -19,20 +19,30 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const wrapperStyles: CSSObject = {
+const wrapperStyles: CSSObject = {
   backgroundColor: 'var(--app-bg-secondary)',
   border: '1px solid var(--border-color)',
   borderRadius: '10px',
-  height: '76px',
   padding: '8px',
   position: 'relative',
+};
+
+export const wrapperStylesSmall: CSSObject = {
+  ...wrapperStyles,
+  height: '76px',
   width: '268px',
+};
+
+export const wrapperStylesLarge: CSSObject = {
+  ...wrapperStyles,
+  height: 'auto',
+  width: '500px',
 };
 
 export const contentStyles: CSSObject = {
   alignItems: 'flex-start',
   display: 'flex',
   flexDirection: 'column',
-  height: '60px',
+  minHeight: '60px',
   justifyContent: 'flex-end',
 };

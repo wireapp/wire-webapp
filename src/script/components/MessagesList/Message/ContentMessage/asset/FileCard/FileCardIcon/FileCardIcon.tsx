@@ -17,6 +17,10 @@
  *
  */
 
+import React, {ComponentType} from 'react';
+
+import {SVGIconProps} from '@wireapp/react-ui-kit/lib/Icon/SVGIcon';
+
 import {
   PdfFileIcon,
   ImageFileIcon,
@@ -32,20 +36,20 @@ import {
 } from '@wireapp/react-ui-kit';
 
 import {iconStyles} from './FileCardIcon.styles';
+import {getFileTypeFromExtension} from './getFileTypeFromExtension/getFileTypeFromExtension';
 
 import {useFileCardContext} from '../common/FileCardContext/FileCardContext';
 import {FileType} from '../common/fileType/fileType';
-import {getFileTypeFromExtension} from '../getFileTypeFromExtension/getFileTypeFromExtension';
 
 export const FileCardIcon = () => {
   const {extension} = useFileCardContext();
-  const category = getFileTypeFromExtension(extension);
-  const Icon = fileIcons[category];
+  const type = getFileTypeFromExtension(extension);
+  const Icon = fileIcons[type];
 
   return <Icon css={iconStyles} />;
 };
 
-const fileIcons: Record<FileType, any> = {
+const fileIcons: Record<FileType, ComponentType<SVGIconProps>> = {
   pdf: PdfFileIcon,
   image: ImageFileIcon,
   video: VideoFileIcon,

@@ -17,17 +17,24 @@
  *
  */
 
-import {errorStyles, loadingStyles, wrapperStyles} from './FileCardStatus.styles';
+import {CSSObject} from '@emotion/react';
 
-interface FileCardStatusProps {
-  status?: 'error' | 'loading';
-}
+export const wrapperStyles: CSSObject = {
+  width: '100%',
+  height: '100%',
+  borderRadius: '10px',
+  position: 'absolute',
+  left: 0,
+  top: 0,
+  pointerEvents: 'none',
+  overflow: 'hidden',
+};
 
-export const FileCardStatus = ({status}: FileCardStatusProps) => {
-  return (
-    <div css={wrapperStyles}>
-      {status === 'error' && <div css={errorStyles} />}
-      {status === 'loading' && <div css={loadingStyles} />}
-    </div>
-  );
+export const loadingStyles: CSSObject = {
+  height: '3px',
+  width: 'var(--progress, 100%)',
+  position: 'absolute',
+  bottom: 0,
+  left: 0,
+  backgroundColor: 'var(--accent-color)',
 };

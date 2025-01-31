@@ -17,7 +17,7 @@
  *
  */
 
-import {FileType} from '../common/fileType/fileType';
+import {FileType} from '../../common/fileType/fileType';
 
 const extensions: Record<Exclude<FileType, 'other'>, string[]> = {
   pdf: ['pdf'],
@@ -66,7 +66,8 @@ const extensions: Record<Exclude<FileType, 'other'>, string[]> = {
 export const getFileTypeFromExtension = (extension: string): FileType => {
   const ext = extension.toLowerCase().replace(/^\./, '');
 
-  const category = Object.entries(extensions).find(([_, exts]) => exts.includes(ext))?.[0] as FileType | undefined;
+  // eslint-disable-next-line id-length
+  const type = Object.entries(extensions).find(([_, exts]) => exts.includes(ext))?.[0] as FileType | undefined;
 
-  return category ?? 'other';
+  return type ?? 'other';
 };

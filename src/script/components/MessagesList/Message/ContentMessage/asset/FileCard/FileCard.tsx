@@ -20,19 +20,63 @@
 import {FileCardActions} from './FileCardActions/FileCardActions';
 import {FileCardCloseButton} from './FileCardCloseButton/FileCardCloseButton';
 import {FileCardContent} from './FileCardContent/FileCardContent';
+import {FileCardError} from './FileCardError/FileCardError';
 import {FileCardHeader} from './FileCardHeader/FileCardHeader';
 import {FileCardIcon} from './FileCardIcon/FileCardIcon';
+import {FileCardLoading} from './FileCardLoading/FileCardLoading';
 import {FileCardName} from './FileCardName/FileCardName';
 import {FileCardRoot} from './FileCardRoot/FileCardRoot';
 import {FileCardType} from './FileCardType/FileCardType';
 
-interface FileCardProps {
-  extension: string;
-  name: string;
-  size: string;
-}
-
-const FileCard = {
+/**
+ * Compound component that displays file information in a card format.
+ * It supports various states including loading, error, and different file types.
+ *
+ * @example Basic usage
+ * ```tsx
+ * <FileCard.Root variant="small" extension="docx" name="Monthly report" size="7.1 MB">
+ *   <FileCard.Header>
+ *     <FileCard.Icon />
+ *     <FileCard.Type />
+ *     <FileCard.Actions>
+ *       <FileCard.CloseButton onClose={() => {}} />
+ *     </FileCard.Actions>
+ *   </FileCard.Header>
+ *   <FileCard.Name truncateAfterLines={2} />
+ *   <FileCard.Loading progress={50} />
+ * </FileCard.Root>
+ * ```
+ *
+ * @example With an additional content
+ * ```tsx
+ * <FileCard.Root variant="large" extension="pdf" name="Project status report" size="1.2 MB">
+ *   <FileCard.Header>
+ *     <FileCard.Icon />
+ *     <FileCard.Type />
+ *     <FileCard.Name />
+ *     <FileCard.Actions>
+ *       <FileCard.CloseButton onClose={() => {}} />
+ *     </FileCard.Actions>
+ *   </FileCard.Header>
+ *   <FileCard.Content>
+ *     <PDFPreview />
+ *   </FileCard.Content>
+ * </FileCard.Root>
+ * ```
+ *
+ * @example Error state
+ * ```tsx
+ * <FileCard.Root variant="small" extension="mp3" name="Meeting recording" size="2.6 MB">
+ *   <FileCard.Header>
+ *     <FileCard.Icon />
+ *     <FileCard.Type />
+ *   </FileCard.Header>
+ *   <FileCard.Name truncateAfterLines={2} />
+ *   <FileCard.Error />
+ * </FileCard.Root>
+ * ```
+ */
+export const FileCard = {
   Root: FileCardRoot,
   Header: FileCardHeader,
   Icon: FileCardIcon,
@@ -41,68 +85,6 @@ const FileCard = {
   CloseButton: FileCardCloseButton,
   Name: FileCardName,
   Content: FileCardContent,
+  Loading: FileCardLoading,
+  Error: FileCardError,
 };
-
-// const PDFPreview = () => {
-//   return (
-//     <div
-//       style={{
-//         background: COLOR_V2.GRAY_30,
-//         borderRadius: '8px',
-//         width: '484px',
-//         height: '280px',
-//       }}
-//     >
-//       PDF Preview
-//     </div>
-//   );
-// };
-
-const FileCardComponent = ({extension, name, size}: FileCardProps) => {
-  return (
-    <FileCard.Root variant="preview" extension={extension} name={name} size={size} status="loading">
-      <FileCard.Header>
-        <FileCard.Icon />
-        <FileCard.Type />
-        <FileCard.Name truncateAfterLines={2} />
-        <FileCard.Actions>
-          {/* <button
-            style={{
-              background: 'none',
-              border: 'none',
-              padding: 0,
-              margin: 0,
-              cursor: 'pointer',
-            }}
-            onKeyDown={event => {
-              if (isSpaceOrEnterKey(event.key)) {
-                const newEvent = setContextMenuPosition(event);
-
-                showContextMenu({
-                  event: newEvent,
-                  entries: [{title: 'Download', label: 'Download'}],
-                  identifier: 'message-options-menu',
-                });
-              }
-            }}
-            onClick={event => {
-              showContextMenu({
-                event,
-                entries: [{title: 'Download', label: 'Download'}],
-                identifier: 'message-options-menu',
-              });
-            }}
-          >
-            <MoreIcon />
-          </button> */}
-          <FileCard.CloseButton onClose={() => {}} />
-        </FileCard.Actions>
-      </FileCard.Header>
-      {/* <FileCard.Content>
-        <PDFPreview />
-      </FileCard.Content> */}
-    </FileCard.Root>
-  );
-};
-
-export {FileCardComponent as FileCard};

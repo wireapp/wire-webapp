@@ -17,39 +17,12 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {wrapperStyles, errorStyles} from './FileCardError.styles';
 
-import {COLOR_V2} from '@wireapp/react-ui-kit';
-
-export const wrapperStyles: CSSObject = {
-  width: '100%',
-  height: '100%',
-  borderRadius: '10px',
-  position: 'absolute',
-  left: 0,
-  top: 0,
-  pointerEvents: 'none',
-  overflow: 'hidden',
-};
-
-const statusStyles: CSSObject = {
-  height: '3px',
-  width: '100%',
-  position: 'absolute',
-  bottom: 0,
-  left: 0,
-};
-
-export const errorStyles: CSSObject = {
-  ...statusStyles,
-  backgroundColor: COLOR_V2.RED_LIGHT_500,
-
-  'body.theme-dark &': {
-    backgroundColor: COLOR_V2.RED_DARK_500,
-  },
-};
-
-export const loadingStyles: CSSObject = {
-  ...statusStyles,
-  backgroundColor: 'var(--accent-color)',
+export const FileCardError = () => {
+  return (
+    <div css={wrapperStyles}>
+      <div css={errorStyles} />
+    </div>
+  );
 };

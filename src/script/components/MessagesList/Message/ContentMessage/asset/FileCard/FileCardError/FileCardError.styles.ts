@@ -17,10 +17,30 @@
  *
  */
 
-import {ReactNode, ElementType, Children, isValidElement} from 'react';
+import {CSSObject} from '@emotion/react';
 
-export const getComponentFromChildren = (children: ReactNode | ReactNode[], Component: ElementType) => {
-  return Children.toArray(children).filter(child => {
-    return isValidElement(child) && (child.type === Component ? child : null);
-  });
+import {COLOR_V2} from '@wireapp/react-ui-kit';
+
+export const wrapperStyles: CSSObject = {
+  width: '100%',
+  height: '100%',
+  borderRadius: '10px',
+  position: 'absolute',
+  left: 0,
+  top: 0,
+  pointerEvents: 'none',
+  overflow: 'hidden',
+};
+
+export const errorStyles: CSSObject = {
+  height: '3px',
+  width: '100%',
+  position: 'absolute',
+  bottom: 0,
+  left: 0,
+  backgroundColor: COLOR_V2.RED_LIGHT_500,
+
+  'body.theme-dark &': {
+    backgroundColor: COLOR_V2.RED_DARK_500,
+  },
 };

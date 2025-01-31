@@ -19,31 +19,20 @@
 
 import {CSSProperties} from 'react';
 
-import {textStyles} from './FileCardName.styles';
+import {loadingStyles, wrapperStyles} from './FileCardLoading.styles';
 
-import {useFileCardContext} from '../common/FileCardContext/FileCardContext';
-
-interface FileCardNameProps {
+interface FileCardLoadingProps {
   /**
-   * Number of lines to truncate (adds '...' at the end) the file name after
-   * @default 1
+   * Progress of the file card loading
+   * @default 100
    */
-  truncateAfterLines?: number;
+  progress?: number;
 }
 
-export const FileCardName = ({truncateAfterLines = 1}: FileCardNameProps) => {
-  const {name} = useFileCardContext();
-
+export const FileCardLoading = ({progress = 100}: FileCardLoadingProps) => {
   return (
-    <p
-      css={textStyles}
-      style={
-        {
-          '--truncate-after-lines': truncateAfterLines,
-        } as CSSProperties
-      }
-    >
-      {name}
-    </p>
+    <div css={wrapperStyles}>
+      <div css={loadingStyles} style={{'--progress': `${progress}%`} as CSSProperties} />
+    </div>
   );
 };

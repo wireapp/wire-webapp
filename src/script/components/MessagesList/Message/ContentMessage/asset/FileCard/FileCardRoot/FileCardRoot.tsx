@@ -19,42 +19,58 @@
 
 import {ReactNode, memo, useMemo} from 'react';
 
-import {wrapperStyles, contentStyles} from './FileCardRoot.styles';
+import {contentStyles, wrapperStylesLarge, wrapperStylesSmall} from './FileCardRoot.styles';
 
 import {FileCardContextProvider} from '../common/FileCardContext/FileCardContext';
-import {FileCardStatus} from '../FileCardStatus/FileCardStatus';
 
-interface FileCardRootProps {
-  status?: 'error' | 'loading';
+interface FileCardOptions {
+  /**
+   * Size of the file card
+   * @default 'small'
+   */
+  variant?: 'small' | 'large';
+  /** File extension
+   * @example 'pdf', 'doc', 'jpg', 'png', 'mp4'
+   */
+  extension: string;
+  /** Name of the file without extension */
+  name: string;
+  /** Formatted file size
+   * @example '1.2 MB'
+   */
+  size: string;
+}
+
+interface FileCardRootProps extends Pick<FileCardOptions, 'variant'> {
   children: ReactNode;
 }
 
-const FileCardRoot = memo(({children, status}: FileCardRootProps) => {
+const FileCardRoot = memo(({children, variant}: FileCardRootProps) => {
   return (
-    <article css={wrapperStyles}>
+    <article css={variant === 'small' ? wrapperStylesSmall : wrapperStylesLarge}>
       <div css={contentStyles}>{children}</div>
-      <FileCardStatus status={status} />
     </article>
   );
 });
 
 FileCardRoot.displayName = 'FileCardRoot';
 
-interface FileCardRootWithContextProps {
-  variant: 'preview' | 'message';
-  status?: 'error' | 'loading';
-  extension: string;
-  name: string;
-  size: string;
+interface FileCardRootWithContextProps extends FileCardOptions {
   children: ReactNode;
 }
 
-const FileCardRootWithContext = ({children, variant, extension, name, size, status}: FileCardRootWithContextProps) => {
+const FileCardRootWithContext = ({
+  children,
+  variant = 'small',
+  extension,
+  name,
+  size,
+}: FileCardRootWithContextProps) => {
   const value = useMemo(() => ({variant, extension, name, size}), [extension, name, size, variant]);
 
   return (
     <FileCardContextProvider value={value}>
-      <FileCardRoot status={status}>{children}</FileCardRoot>
+      <FileCardRoot variant={variant}>{children}</FileCardRoot>
     </FileCardContextProvider>
   );
 };
