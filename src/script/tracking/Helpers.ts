@@ -17,10 +17,19 @@
  *
  */
 
+import {amplify} from 'amplify';
+
 import {Runtime} from '@wireapp/commons';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {ConversationType, UserType, PlatformType} from './attribute';
+import {EventName} from './EventName';
+import {Segmentation} from './Segmentation';
 
+import {Call} from '../calling/Call';
 import {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
 
@@ -96,4 +105,20 @@ export function getPlatform(): PlatformType {
     return PlatformType.DESKTOP_WINDOWS;
   }
   return Runtime.isMacOS() ? PlatformType.DESKTOP_MACOS : PlatformType.DESKTOP_LINUX;
+}
+
+export function trackCallQualityFeedback({call, score, label}: {call?: Call; score?: number; label: RatingListLabel}) {
+  if (!call) {
+    return;
+  }
+
+  const duration = call.endedAt() - (call.startedAt() || 0) / TIME_IN_MILLIS.SECOND;
+  amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.QUALITY_REVIEW, {
+    ...(score && {[Segmentation.CALL.SCORE]: score}),
+    [Segmentation.CALL.QUALITY_REVIEW_LABEL]: label,
+    [Segmentation.CALL.DURATION]: duration,
+    [Segmentation.CALL.SCREEN_SHARE]: call.analyticsScreenSharing,
+    [Segmentation.CALL.PARTICIPANTS]: call.analyticsMaximumParticipants,
+    [Segmentation.CALL.VIDEO]: call.analyticsAvSwitchToggle,
+  });
 }

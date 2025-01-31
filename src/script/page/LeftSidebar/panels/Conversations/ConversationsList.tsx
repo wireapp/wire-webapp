@@ -28,6 +28,8 @@ import React, {
 } from 'react';
 
 import {useVirtualizer} from '@tanstack/react-virtual';
+import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
+import {useDebouncedCallback} from 'use-debounce';
 
 import {WIDTH} from '@wireapp/react-ui-kit';
 
@@ -142,27 +144,38 @@ export const ConversationsList = ({
     estimateSize: () => 56,
   });
 
+  const debouncedOnConversationClick = useDebouncedCallback(
+    (
+      conversation: Conversation,
+      event: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>,
+    ) => {
+      if (isActiveConversation(conversation)) {
+        if (window.innerWidth > WIDTH.TABLET_SM_MAX || document.documentElement.clientWidth > WIDTH.TABLET_SM_MAX) {
+          clearSearchFilter();
+          setClickedFilteredConversationId(conversation.id);
+          return;
+        }
+      }
+
+      if (isKeyboardEvent(event)) {
+        createNavigateKeyboard(generateConversationUrl(conversation.qualifiedId), true)(event);
+      } else {
+        createNavigate(generateConversationUrl(conversation.qualifiedId))(event);
+      }
+
+      clearSearchFilter();
+      setClickedFilteredConversationId(conversation.id);
+    },
+    TimeInMillis.SECOND / 2, // Adjust debounce delay as needed
+    {leading: true},
+  );
+
   const onConversationClick = useCallback(
     (conversation: Conversation) =>
       (event: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>) => {
-        if (isActiveConversation(conversation)) {
-          if (window.innerWidth > WIDTH.TABLET_SM_MAX || document.documentElement.clientWidth > WIDTH.TABLET_SM_MAX) {
-            clearSearchFilter();
-            setClickedFilteredConversationId(conversation.id);
-            return;
-          }
-        }
-
-        if (isKeyboardEvent(event)) {
-          createNavigateKeyboard(generateConversationUrl(conversation.qualifiedId), true)(event);
-        } else {
-          createNavigate(generateConversationUrl(conversation.qualifiedId))(event);
-        }
-
-        clearSearchFilter();
-        setClickedFilteredConversationId(conversation.id);
+        debouncedOnConversationClick(conversation, event);
       },
-    [clearSearchFilter, isActiveConversation],
+    [debouncedOnConversationClick],
   );
 
   const getCommonConversationCellProps = (conversation: Conversation, index: number) => ({
@@ -182,12 +195,10 @@ export const ConversationsList = ({
   useEffect(() => {
     if (!conversationsFilter && clickedFilteredConversationId) {
       const conversationIndex = conversationsToDisplay.findIndex(conv => conv.id === clickedFilteredConversationId);
-
       if (conversationIndex !== -1) {
-        rowVirtualizer.scrollToIndex(conversationIndex, {align: 'center'});
+        rowVirtualizer.scrollToIndex(conversationIndex, {align: 'auto'});
       }
 
-      // scrollToConversation(clickedFilteredConversationId);
       setClickedFilteredConversationId(null);
     }
   }, [conversationsFilter, clickedFilteredConversationId, conversationsToDisplay]);

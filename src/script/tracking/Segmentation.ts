@@ -38,7 +38,6 @@ export const Segmentation = {
     VIDEO: 'call_video',
   },
   COMMON: {
-    TEAM_IS_TEAM: 'team_is_team',
     TEAM_IS_ENTERPRISE: 'team_is_enterprise',
     TEAM_TEAM_ID: 'team_team_id',
     TEAM_TEAM_SIZE: 'team_team_size',

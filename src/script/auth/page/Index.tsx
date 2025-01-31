@@ -17,17 +17,19 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 
 import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
 import {Navigate, useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
+import {container} from 'tsyringe';
 
 import {UrlUtil} from '@wireapp/commons';
 import {Button, ButtonVariant, ContainerXS, ErrorMessage, Text} from '@wireapp/react-ui-kit';
 
 import {LogoFullIcon} from 'Components/Icon';
+import {Core} from 'src/script/service/CoreSingleton';
 import {isDataDogEnabled} from 'Util/DataDog';
 import {getWebEnvironment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
@@ -36,6 +38,7 @@ import {Page} from './Page';
 
 import {Config} from '../../Config';
 import '../../localization/Localizer';
+import {actionRoot} from '../module/action';
 import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {QUERY_KEY, ROUTE} from '../route';
@@ -44,8 +47,9 @@ import {getPrefixedSSOCode} from '../util/urlUtil';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const IndexComponent = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
+const IndexComponent = ({defaultSSOCode, doInit}: Props & ConnectedProps & DispatchProps) => {
   const navigate = useNavigate();
+  const core = container.resolve(Core);
   const [logoutReason, setLogoutReason] = useState<string>();
 
   useEffect(() => {
@@ -54,6 +58,20 @@ const IndexComponent = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps
       setLogoutReason(queryLogoutReason);
     }
   }, []);
+
+  const immediateLogin = useCallback(async () => {
+    await doInit({isImmediateLogin: true, shouldValidateLocalClient: true});
+    // Check if the user is already logged in
+    if (core.getLocalClient()) {
+      navigate(ROUTE.HISTORY_INFO);
+    }
+  }, [core, doInit, navigate]);
+
+  useEffect(() => {
+    if (Config.getConfig().FEATURE.ENABLE_AUTO_LOGIN) {
+      void immediateLogin();
+    }
+  }, [immediateLogin]);
 
   if (defaultSSOCode) {
     // Redirect to prefilled SSO login if default SSO code is set on backend
@@ -151,7 +169,13 @@ const mapStateToProps = (state: RootState) => ({
 });
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => bindActionCreators({}, dispatch);
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
+  bindActionCreators(
+    {
+      doInit: actionRoot.authAction.doInit,
+    },
+    dispatch,
+  );
 
 const Index = connect(mapStateToProps, mapDispatchToProps)(IndexComponent);
 

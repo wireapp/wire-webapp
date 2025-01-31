@@ -17,13 +17,7 @@
  *
  */
 
-import React, {
-  useEffect,
-  useRef,
-  useState,
-  MouseEvent as ReactMouseEvent,
-  KeyboardEvent as ReactKeyBoardEvent,
-} from 'react';
+import React, {useRef, useState, MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
@@ -143,13 +137,6 @@ export const ConversationListCell = ({
       handleArrowKeyDown(event);
     }
   };
-
-  // always focus on the selected conversation when the folder tab loaded
-  useEffect(() => {
-    if (isFocused) {
-      conversationRef.current?.focus();
-    }
-  }, [isFocused]);
 
   return (
     <li
