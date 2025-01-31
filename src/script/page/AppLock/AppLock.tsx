@@ -84,6 +84,8 @@ const AppLock: React.FC<AppLockProps> = ({
     'isAppLockEnforced',
   ]);
 
+  // We log the user out if there is a style change on the app element
+  // i.e. if there is an attempt to remove the blur effect
   const {current: appObserver} = useRef(
     new MutationObserver(mutationRecords => {
       const [{attributeName}] = mutationRecords;
@@ -93,6 +95,7 @@ const AppLock: React.FC<AppLockProps> = ({
     }),
   );
 
+  // We log the user out if the modal is removed from the DOM
   const {current: modalObserver} = useRef(
     new MutationObserver(() => {
       const modalInDOM = document.querySelector('[data-uie-name="applock-modal"]');
@@ -156,11 +159,16 @@ const AppLock: React.FC<AppLockProps> = ({
     app?.style.setProperty('pointer-events', isVisible ? 'none' : 'auto', 'important');
 
     if (isVisible) {
-      modalObserver.observe(document.querySelector('#wire-main'), {
-        childList: true,
-        subtree: true,
-      });
-      appObserver.observe(document.querySelector('#app'), {attributes: true});
+      const wireMain = document.querySelector('#wire-main');
+      if (wireMain) {
+        modalObserver.observe(wireMain, {
+          childList: true,
+        });
+      }
+      const appElement = document.querySelector('#app');
+      if (appElement) {
+        appObserver.observe(appElement, {attributes: true});
+      }
     }
     return () => {
       modalObserver.disconnect();
