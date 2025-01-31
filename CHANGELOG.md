@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.32.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.31.0...@wireapp/react-ui-kit@9.32.0) (2025-01-31)
+
+### Features
+
+* **react-ui-kit:** add menuListHeading inside Select [WPB-3307] ([#6714](https://github.com/wireapp/wire-web-packages/issues/6714)) ([978b71b](https://github.com/wireapp/wire-web-packages/commit/978b71bdbebec295865499fcbc749b4ab6e8a6c3))
+
 # [9.31.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.30.0...@wireapp/react-ui-kit@9.31.0) (2025-01-28)
 
 ### Features
