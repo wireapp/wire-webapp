@@ -20,6 +20,8 @@
 import {render, waitFor, act} from '@testing-library/react';
 import ko from 'knockout';
 
+import {useMatchMedia, QUERY} from '@wireapp/react-ui-kit';
+
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {Call} from 'src/script/calling/Call';
 import {Participant} from 'src/script/calling/Participant';
@@ -32,6 +34,8 @@ import {PropertiesService} from 'src/script/properties/PropertiesService';
 import {SelfService} from 'src/script/self/SelfService';
 
 import {FullscreenVideoCall, FullscreenVideoCallProps} from './FullscreenVideoCall';
+
+const useMatchMediaMock = useMatchMedia as jest.Mock;
 
 jest.mock('@wireapp/react-ui-kit', () => ({
   ...(jest.requireActual('@wireapp/react-ui-kit') as any),
@@ -108,6 +112,7 @@ describe('fullscreenVideoCall', () => {
   });
 
   it('resets the maximized participant on active speaker switch', async () => {
+    useMatchMediaMock.mockImplementation(mediaQuery => mediaQuery === QUERY.desktop);
     const setMaximizedSpy = jasmine.createSpy();
     const props = createProps();
     props.setMaximizedParticipant = setMaximizedSpy;
