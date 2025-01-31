@@ -19,8 +19,6 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {COLOR_V2} from '@wireapp/react-ui-kit';
-
 export const wrapperStyles: CSSObject = {
   width: '100%',
   height: '100%',
@@ -38,9 +36,5 @@ export const errorStyles: CSSObject = {
   position: 'absolute',
   bottom: 0,
   left: 0,
-  backgroundColor: COLOR_V2.RED_LIGHT_500,
-
-  'body.theme-dark &': {
-    backgroundColor: COLOR_V2.RED_DARK_500,
-  },
+  backgroundColor: 'var(--danger-color)',
 };
