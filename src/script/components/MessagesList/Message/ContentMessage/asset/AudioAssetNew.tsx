@@ -97,12 +97,7 @@ export const AudioAsset: React.FC<AudioAssetProps> = ({
   useEffect(() => () => audioSrc?.dispose(), [audioSrc]);
 
   return (
-    <div
-      className={cx('audio-asset', className)}
-      data-uie-name="audio-asset"
-      data-uie-value={asset.file_name}
-      style={{padding: '8px'}}
-    >
+    <div className={cx('audio-asset', className)} data-uie-name="audio-asset" data-uie-value={asset.file_name}>
       {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
       <audio ref={setAudioElement} src={audioSrc?.url} onTimeUpdate={onTimeupdate} />
       {!isObfuscated ? (
@@ -118,22 +113,23 @@ export const AudioAsset: React.FC<AudioAssetProps> = ({
                 <div className="asset-placeholder loading-dots" />
               )}
               {transferState !== AssetTransferState.UPLOAD_PENDING && (
-                <div className="audio-controls" style={{gap: '8px', alignItems: 'flex-start'}}>
-                  <div style={{display: 'flex', alignItems: 'center', height: '40px', width: '40px'}}>
-                    <MediaButton
-                      mediaElement={audioElement}
-                      asset={asset}
-                      play={onPlayButtonClicked}
-                      pause={onPauseButtonClicked}
-                      cancel={cancelUpload}
-                      transferState={transferState}
-                      uploadProgress={uploadProgress}
-                      isFocusable={isFocusable}
-                    />
-                  </div>
+                <div className="audio-controls">
+                  <MediaButton
+                    mediaElement={audioElement}
+                    asset={asset}
+                    play={onPlayButtonClicked}
+                    pause={onPauseButtonClicked}
+                    cancel={cancelUpload}
+                    transferState={transferState}
+                    uploadProgress={uploadProgress}
+                    isFocusable={isFocusable}
+                  />
 
                   {transferState !== AssetTransferState.UPLOADING && audioElement && (
-                    <div style={{display: 'flex', flexDirection: 'column', gap: '8px', width: '100%'}}>
+                    <>
+                      <span className="audio-controls-time label-xs" data-uie-name="status-audio-time">
+                        {formatSeconds(audioTime)}
+                      </span>
                       {showLoudnessPreview ? (
                         <AudioSeekBar audioElement={audioElement} asset={asset} disabled={!audioSrc} />
                       ) : (
@@ -144,14 +140,7 @@ export const AudioAsset: React.FC<AudioAssetProps> = ({
                           data-uie-name="status-audio-seekbar"
                         />
                       )}
-                      <span
-                        className="audio-controls-time label-xs"
-                        data-uie-name="status-audio-time"
-                        style={{margin: 0}}
-                      >
-                        {formatSeconds(audioTime)}
-                      </span>
-                    </div>
+                    </>
                   )}
                 </div>
               )}
