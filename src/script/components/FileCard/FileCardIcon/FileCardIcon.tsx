@@ -17,7 +17,7 @@
  *
  */
 
-import React, {ComponentType} from 'react';
+import {ComponentType} from 'react';
 
 import {SVGIconProps} from '@wireapp/react-ui-kit/lib/Icon/SVGIcon';
 
