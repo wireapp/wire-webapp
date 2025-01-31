@@ -707,6 +707,7 @@
   "featureConfigChangeModalSelfDeletingMessagesHeadline": "Es gab eine Änderung bei {brandName}",
   "federationConnectionRemove": "Backends [bold]{backendUrlOne}[/bold] und [bold]{backendUrlTwo}[/bold] sind nicht mehr verbunden.",
   "federationDelete": "[bold]Ihr Backend[/bold] ist nicht mehr mit [bold]{backendUrl}.[/bold] verbunden.",
+  "fileCardDefaultCloseButtonLabel": "Close",
   "fileTypeRestrictedIncoming": "Datei von&nbsp;[bold]{name}[/bold]&nbsp;kann nicht geöffnet werden",
   "fileTypeRestrictedOutgoing": "Das Senden und Empfangen von Dateien mit der Endung {fileExt} ist in Ihrer Organisation nicht erlaubt",
   "folderViewTooltip": "Ordner",

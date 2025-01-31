@@ -707,6 +707,7 @@
   "featureConfigChangeModalSelfDeletingMessagesHeadline": "В {brandName} произошли изменения",
   "federationConnectionRemove": "Бэкэнды [bold]{backendUrlOne}[/bold] и [bold]{backendUrlTwo}[/bold] прекратили взаимодействие.",
   "federationDelete": "[bold]Ваш бэкэнд[/bold] прекратил взаимодействие с [bold]{backendUrl}.[/bold]",
+  "fileCardDefaultCloseButtonLabel": "Close",
   "fileTypeRestrictedIncoming": "Файл от&nbsp;[bold]{name}[/bold]&nbsp; не может быть открыт",
   "fileTypeRestrictedOutgoing": "Совместное использование файлов с расширением {fileExt} запрещено вашей организацией",
   "folderViewTooltip": "Папки",

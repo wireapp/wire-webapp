@@ -707,6 +707,7 @@
   "featureConfigChangeModalSelfDeletingMessagesHeadline": "{brandName} හි වෙනසක් සිදු වී ඇත",
   "federationConnectionRemove": "[bold]{backendUrlOne}[/bold] සහ [bold]{backendUrlTwo}[/bold] සේවාදායක තවදුරටත් එකාබද්ධ නොවේ.",
   "federationDelete": "[bold]{backendUrl}[/bold] සමඟ තවදුරටත් [bold]ඔබගේ සේවාදායකය[/bold] ඒකාබද්ධ නොවේ.",
+  "fileCardDefaultCloseButtonLabel": "Close",
   "fileTypeRestrictedIncoming": "&nbsp;[bold]{name}[/bold]&nbsp; වෙතින් ගොනුව ඇරීමට නොහැකිය",
   "fileTypeRestrictedOutgoing": "ඔබගේ සංවිධානයේ {fileExt} දිගුව සහිත ගොනු බෙදා ගැනීමට අවසර නැත",
   "folderViewTooltip": "බහාලුම්",
