@@ -39,7 +39,7 @@ import {FileCardType} from './FileCardType/FileCardType';
  *     <FileCard.Icon />
  *     <FileCard.Type />
  *     <FileCard.Actions>
- *       <FileCard.CloseButton onClose={() => {}} />
+ *       <FileCard.CloseButton label="Close" onClose={() => {}} />
  *     </FileCard.Actions>
  *   </FileCard.Header>
  *   <FileCard.Name truncateAfterLines={2} />
@@ -55,7 +55,7 @@ import {FileCardType} from './FileCardType/FileCardType';
  *     <FileCard.Type />
  *     <FileCard.Name />
  *     <FileCard.Actions>
- *       <FileCard.CloseButton onClose={() => {}} />
+ *       <FileCard.CloseButton label="Close" onClose={() => {}} />
  *     </FileCard.Actions>
  *   </FileCard.Header>
  *   <FileCard.Content>
