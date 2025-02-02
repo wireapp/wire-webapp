@@ -17385,9 +17385,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"stylelint@npm:16.14.0":
-  version: 16.14.0
-  resolution: "stylelint@npm:16.14.0"
+"stylelint@npm:16.14.1":
+  version: 16.14.1
+  resolution: "stylelint@npm:16.14.1"
   dependencies:
     "@csstools/css-parser-algorithms": "npm:^3.0.4"
     "@csstools/css-tokenizer": "npm:^3.0.3"
@@ -17429,7 +17429,7 @@ __metadata:
     write-file-atomic: "npm:^5.0.1"
   bin:
     stylelint: bin/stylelint.mjs
-  checksum: 10/7fbbd6fc628a252383bd26f20325083459789ea890ad56fb66591869173d4dd55716dba315334ea787ee77c275c1a98654041c0b5ead85e8b64b1d747bd06172
+  checksum: 10/2c0c95e5ee77d946efdbe58573da75ff4b12bc89c220e78b69f0c2f94251f5e5a1096f5ab583f28f56ae14f298b1335e212d52fe066719d63b8a41d6cc8083b6
   languageName: node
   linkType: hard
 
@@ -19079,7 +19079,7 @@ __metadata:
     sonner: "npm:^1.7.4"
     speakingurl: "npm:14.0.1"
     style-loader: "npm:4.0.0"
-    stylelint: "npm:16.14.0"
+    stylelint: "npm:16.14.1"
     stylelint-config-idiomatic-order: "npm:10.0.0"
     svg-inline-loader: "npm:0.8.2"
     switch-path: "npm:1.2.0"
