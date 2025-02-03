@@ -60,7 +60,7 @@ const FileAsset: React.FC<FileAssetProps> = ({
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isFocusable);
 
   const fileName = trimFileExtension(asset.file_name);
-  const fileExtension = getFileExtension(asset.file_name);
+  const fileExtension = getFileExtension(asset.file_name!);
   const formattedFileSize = formatBytes(asset.file_size);
 
   // This is a hack since we don't have a FileAsset available before it's
@@ -80,7 +80,7 @@ const FileAsset: React.FC<FileAssetProps> = ({
 
   const onDownloadAsset = async () => {
     if (isUploadedOrCancelled) {
-      downloadAsset(asset);
+      await downloadAsset(asset);
     }
   };
 

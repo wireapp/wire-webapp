@@ -19,6 +19,7 @@
 
 import {render, waitFor} from '@testing-library/react';
 import {CONVERSATION_TYPE, ConversationProtocol} from '@wireapp/api-client/lib/conversation';
+import {container} from 'tsyringe';
 
 import {randomUUID} from 'crypto';
 
@@ -28,6 +29,7 @@ import {ClientState} from 'src/script/client/ClientState';
 import {ConversationState} from 'src/script/conversation/ConversationState';
 import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
 import {User} from 'src/script/entity/User';
+import {Core} from 'src/script/service/CoreSingleton';
 import {createUuid} from 'Util/uuid';
 
 import {DevicesPreferences} from './DevicesPreference';
@@ -57,6 +59,9 @@ describe('DevicesPreferences', () => {
   const selfProteusConversation = createConversation(ConversationProtocol.PROTEUS, CONVERSATION_TYPE.SELF);
   const selfMLSConversation = createConversation(ConversationProtocol.MLS, CONVERSATION_TYPE.SELF);
   const regularConversation = createConversation();
+
+  const coreMock = container.resolve(Core);
+  coreMock.isMLSActiveForClient = jest.fn().mockReturnValue(true);
 
   const selfUser = new User(createUuid());
   selfUser.devices([createDevice(), createDevice()]);

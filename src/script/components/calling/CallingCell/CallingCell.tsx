@@ -341,6 +341,7 @@ export const CallingCell = ({
                     minimized
                     maximizedParticipant={maximizedParticipant}
                     selfParticipant={selfParticipant}
+                    call={call}
                     setMaximizedParticipant={setMaximizedParticipant}
                   />
 

@@ -35,8 +35,6 @@ import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 
 export type SerializedConversationId = string;
 
-const NUMBER_OF_PARTICIPANTS_IN_ONE_PAGE = 9;
-
 interface ActiveSpeaker {
   clientId: string;
   levelNow: number;
@@ -62,6 +60,7 @@ export class Call {
   public blockMessages: boolean = false;
   public currentPage: ko.Observable<number> = ko.observable(0);
   public pages: ko.ObservableArray<Participant[]> = ko.observableArray();
+  public numberOfParticipantsInOnePage: number = 9;
   public readonly maximizedParticipant: ko.Observable<Participant | null>;
   public readonly isActive: ko.PureComputed<boolean>;
 
@@ -223,6 +222,11 @@ export class Call {
     return this.participants().filter(({user, clientId}) => !user.isMe || this.selfClientId !== clientId);
   }
 
+  setNumberOfParticipantsInOnePage(participantsInOnePage: number): void {
+    this.numberOfParticipantsInOnePage = participantsInOnePage;
+    this.updatePages();
+  }
+
   updatePages() {
     const selfParticipant = this.getSelfParticipant();
     const remoteParticipants = this.getRemoteParticipants().sort((p1, p2) => sortUsersByPriority(p1.user, p2.user));
@@ -234,7 +238,7 @@ export class Call {
 
     const newPages = chunk<Participant>(
       [selfParticipant, ...withScreenShare, ...withVideo, ...withoutVideo].filter(Boolean),
-      NUMBER_OF_PARTICIPANTS_IN_ONE_PAGE,
+      this.numberOfParticipantsInOnePage,
     );
 
     this.currentPage(Math.min(this.currentPage(), newPages.length - 1));
