@@ -113,7 +113,7 @@ const StyledLabel = ({
   );
 };
 
-interface CheckboxProps<T = HTMLInputElement> extends InputProps<T> {
+export interface CheckboxProps<T = HTMLInputElement> extends InputProps<T> {
   id?: string;
   aligncenter?: boolean;
   labelBeforeCheckbox?: boolean;

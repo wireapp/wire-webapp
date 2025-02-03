@@ -38,7 +38,7 @@ const CodeInputWrapper = (props: React.HTMLProps<HTMLDivElement>) => (
   />
 );
 
-type DigitInputProps<T = HTMLInputElement> = InputProps<T>;
+export type DigitInputProps<T = HTMLInputElement> = InputProps<T>;
 
 const digitInputStyle: <T>(theme: Theme, props: DigitInputProps<T>) => CSSObject = (theme, props) => ({
   ...inputStyle(theme, props),

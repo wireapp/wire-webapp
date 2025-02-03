@@ -42,6 +42,7 @@ const labelStyle: <T>(theme: Theme, props: LabelProps<T>) => CSSObject = (
 });
 
 export const Label = (props: LabelProps) => (
+  // eslint-disable-next-line jsx-a11y/label-has-associated-control
   <label css={(theme: Theme) => labelStyle(theme, props)} {...filterTextProps(props)} />
 );
 
@@ -55,5 +56,6 @@ const labelLinkStyle: <T>(theme, props: LabelLinkProps<T>) => CSSObject = (
 });
 
 export const LabelLink = (props: LabelProps<HTMLAnchorElement>) => (
+  // eslint-disable-next-line jsx-a11y/anchor-has-content
   <a css={(theme: Theme) => labelLinkStyle(theme, props)} {...filterTextProps(props)} />
 );
