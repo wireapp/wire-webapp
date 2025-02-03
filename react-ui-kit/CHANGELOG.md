@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.33.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.33.0...@wireapp/react-ui-kit@9.33.1) (2025-02-03)
+
+### Bug Fixes
+
+* **react-ui-kit:** Adjust the behavior of eye icon on password input (WPB-15930) ([#6878](https://github.com/wireapp/wire-web-packages/issues/6878)) ([6ecfa54](https://github.com/wireapp/wire-web-packages/commit/6ecfa543a4186c4eac777ebc34fd1ffb4d95c15f))
+
 # [9.33.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.32.0...@wireapp/react-ui-kit@9.33.0) (2025-02-03)
 
 ### Features
