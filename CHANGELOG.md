@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.33.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.32.0...@wireapp/react-ui-kit@9.33.0) (2025-02-03)
+
+### Features
+
+* **react-ui-kit:** storybook ([#6860](https://github.com/wireapp/wire-web-packages/issues/6860)) ([d4f7214](https://github.com/wireapp/wire-web-packages/commit/d4f72145e8bff3d8baa8ace1c3add69b4ae2a23b))
+
 # [9.32.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.31.0...@wireapp/react-ui-kit@9.32.0) (2025-01-31)
 
 ### Features
