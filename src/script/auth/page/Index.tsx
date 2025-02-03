@@ -29,6 +29,7 @@ import {UrlUtil} from '@wireapp/commons';
 import {Button, ButtonVariant, ContainerXS, ErrorMessage, Text} from '@wireapp/react-ui-kit';
 
 import {LogoFullIcon} from 'Components/Icon';
+import {useSingleInstance} from 'Hooks/useSingleInstance';
 import {Core} from 'src/script/service/CoreSingleton';
 import {isDataDogEnabled} from 'Util/DataDog';
 import {getWebEnvironment} from 'Util/Environment';
@@ -49,6 +50,7 @@ type Props = React.HTMLProps<HTMLDivElement>;
 
 const IndexComponent = ({defaultSSOCode, doInit}: Props & ConnectedProps & DispatchProps) => {
   const navigate = useNavigate();
+  const {hasOtherInstance} = useSingleInstance();
   const core = container.resolve(Core);
   const [logoutReason, setLogoutReason] = useState<string>();
 
@@ -62,10 +64,10 @@ const IndexComponent = ({defaultSSOCode, doInit}: Props & ConnectedProps & Dispa
   const immediateLogin = useCallback(async () => {
     await doInit({isImmediateLogin: true, shouldValidateLocalClient: true});
     // Check if the user is already logged in
-    if (core.getLocalClient()) {
+    if (!hasOtherInstance && core.getLocalClient()) {
       navigate(ROUTE.HISTORY_INFO);
     }
-  }, [core, doInit, navigate]);
+  }, [core, doInit, navigate, hasOtherInstance]);
 
   useEffect(() => {
     if (Config.getConfig().FEATURE.ENABLE_AUTO_LOGIN) {

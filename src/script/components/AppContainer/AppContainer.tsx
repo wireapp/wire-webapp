@@ -20,9 +20,11 @@
 import {FC, useEffect, useMemo} from 'react';
 
 import {ClientType} from '@wireapp/api-client/lib/client/';
+import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {DetachedCallingCell} from 'Components/calling/DetachedCallingCell';
 import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
@@ -36,7 +38,7 @@ import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnab
 import {useAccentColor} from './hooks/useAccentColor';
 import {useTheme} from './hooks/useTheme';
 
-import {Configuration} from '../../Config';
+import {Config, Configuration} from '../../Config';
 import {setAppLocale} from '../../localization/Localizer';
 import {App} from '../../main/app';
 import {AppMain} from '../../page/AppMain';
@@ -53,6 +55,7 @@ interface AppProps {
 export const AppContainer: FC<AppProps> = ({config, clientType}) => {
   setAppLocale();
   const app = useMemo(() => new App(container.resolve(Core), container.resolve(APIClient), config), []);
+  const enableAutoLogin = Config.getConfig().FEATURE.ENABLE_AUTO_LOGIN;
 
   // Publishing application on the global scope for debug and testing purposes.
   window.wire.app = app;
@@ -87,7 +90,13 @@ export const AppContainer: FC<AppProps> = ({config, clientType}) => {
   const {softLockEnabled} = useAppSoftLock(repositories.calling, repositories.notification);
 
   if (hasOtherInstance) {
-    app.redirectToLogin(SIGN_OUT_REASON.MULTIPLE_TABS);
+    // Automatically sign out the user if the user has multiple tabs open
+    if (enableAutoLogin) {
+      amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.MULTIPLE_TABS);
+    } else {
+      app.redirectToLogin(SIGN_OUT_REASON.MULTIPLE_TABS);
+    }
+
     return null;
   }
 
