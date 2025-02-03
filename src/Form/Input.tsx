@@ -196,7 +196,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps<HTMLInputElem
               aria-controls={props.id}
               aria-expanded={togglePassword}
             >
-              {togglePassword ? <HideIcon /> : <ShowIcon />}
+              {togglePassword ? <ShowIcon /> : <HideIcon />}
             </button>
           )}
         </div>
