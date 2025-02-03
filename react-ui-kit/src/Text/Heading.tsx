@@ -24,7 +24,7 @@ import {TextProps, filterTextProps, textStyle} from './Text';
 import {Theme} from '../Layout';
 import {QueryKeys, media} from '../mediaQueries';
 
-interface HeadingProps<T = HTMLHeadingElement> extends TextProps<T> {
+export interface HeadingProps<T = HTMLHeadingElement> extends TextProps<T> {
   level?: string;
 }
 

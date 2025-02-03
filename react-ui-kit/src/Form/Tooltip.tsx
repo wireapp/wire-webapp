@@ -166,7 +166,7 @@ const PortalComponent = ({children, wrapperRect, selector = '#wire-app'}: Portal
   );
 };
 
-interface TooltipProps<T = HTMLDivElement> extends HTMLProps<T> {
+export interface TooltipProps<T = HTMLDivElement> extends HTMLProps<T> {
   body: ReactNode;
   selector?: string;
 }

@@ -17,7 +17,7 @@
  *
  */
 
-import * as React from 'react';
+import {ReactNode, ComponentType, HTMLProps, createElement} from 'react';
 
 import {ClassNames} from '@emotion/react';
 
@@ -26,8 +26,8 @@ import {DURATION, EASE} from './motions';
 const {CSSTransition, TransitionGroup} = require('react-transition-group');
 
 type TransitionProps = Partial<any> & {
-  children: React.ReactNode;
-  component?: string | React.ComponentType<any>;
+  children: ReactNode;
+  component?: string | ComponentType<any>;
 };
 
 type OpacityProps = TransitionProps & {
@@ -40,7 +40,7 @@ type MovementProps = TransitionProps & {
   startValue?: string;
 };
 
-type TransitionContainerProps = React.HTMLProps<any> & {
+type TransitionContainerProps = HTMLProps<any> & {
   appear?: boolean;
   component?: string;
   enter?: boolean;
@@ -53,7 +53,7 @@ export const Transition = ({animationStyle, timeout, component = 'div', children
   <ClassNames>
     {({css}) => (
       <CSSTransition timeout={timeout} classNames={css(animationStyle)} {...props}>
-        {component ? React.createElement(component, {}, children) : children}
+        {component ? createElement(component, {}, children) : children}
       </CSSTransition>
     )}
   </ClassNames>
@@ -153,8 +153,12 @@ export const Slide = ({startValue = '-100%', endValue = '0%', timeout = DURATION
   />
 );
 
-export const LeftRightMovement = props => <XAxisMovement startValue="-100vh" endValue="0vh" {...props} />;
-export const RightLeftMovement = props => <XAxisMovement startValue="100vh" endValue="0vh" {...props} />;
+export const LeftRightMovement = (props: MovementProps) => (
+  <XAxisMovement startValue="-100vh" endValue="0vh" {...props} />
+);
+export const RightLeftMovement = (props: MovementProps) => (
+  <XAxisMovement startValue="100vh" endValue="0vh" {...props} />
+);
 
-export const TopDownMovement = props => <YAxisMovement startValue="-100%" endValue="0%" {...props} />;
-export const BottomUpMovement = props => <YAxisMovement startValue="100%" endValue="0%" {...props} />;
+export const TopDownMovement = (props: MovementProps) => <YAxisMovement startValue="-100%" endValue="0%" {...props} />;
+export const BottomUpMovement = (props: MovementProps) => <YAxisMovement startValue="100%" endValue="0%" {...props} />;
