@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.34.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.33.1...@wireapp/react-ui-kit@9.34.0) (2025-02-04)
+
+### Features
+
+* **react-ui-kit:** play icon [WPB-15809] ([#6879](https://github.com/wireapp/wire-web-packages/issues/6879)) ([5116681](https://github.com/wireapp/wire-web-packages/commit/511668170ed549f2ee48d33c0012b2a4379e945a))
+
 ## [9.33.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.33.0...@wireapp/react-ui-kit@9.33.1) (2025-02-03)
 
 ### Bug Fixes
