@@ -133,3 +133,5 @@ export * from './Files/VideoFileIcon';
 export * from './Files/TextFileIcon';
 export * from './Files/FolderIcon';
 export * from './Files/MultipleFilesIcon';
+
+export * from './PlayIcon';
