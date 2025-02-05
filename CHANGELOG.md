@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.35.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.34.0...@wireapp/react-ui-kit@9.35.0) (2025-02-05)
+
+### Features
+
+* **react-ui-kit:** pause icon ([#6880](https://github.com/wireapp/wire-web-packages/issues/6880)) ([1c49be2](https://github.com/wireapp/wire-web-packages/commit/1c49be2aa1bf61bf32baaed372c7a4e0e7f62a58))
+
 # [9.34.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.33.1...@wireapp/react-ui-kit@9.34.0) (2025-02-04)
 
 ### Features
