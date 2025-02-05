@@ -19,6 +19,7 @@
 
 import {useEffect, useState} from 'react';
 
+import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
 import {getLogger} from 'Util/Logger';
 import {useEffectRef} from 'Util/useEffectRef';
 
@@ -30,7 +31,7 @@ const logger = getLogger('useAudioPlayer');
 
 interface UseAudioPlayerProps {
   asset: FileAsset;
-  getAssetUrl: (resource: any) => Promise<AssetUrl>;
+  getAssetUrl: (resource: AssetRemoteData) => Promise<AssetUrl>;
 }
 
 export const useAudioPlayer = ({asset, getAssetUrl}: UseAudioPlayerProps) => {
