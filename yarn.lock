@@ -6169,20 +6169,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core-crypto@npm:3.0.1":
-  version: 3.0.1
-  resolution: "@wireapp/core-crypto@npm:3.0.1"
-  checksum: 10/65320f2d1fc55c6531b23468c811fba476430c3c7731628acbb88b329243e5c370ddf58d7c50d49a27d0e6000a21493e6b784c9e2f30bc77e497c9a7ca70afca
+"@wireapp/core-crypto@npm:3.0.2":
+  version: 3.0.2
+  resolution: "@wireapp/core-crypto@npm:3.0.2"
+  checksum: 10/09edf1ebc8a68dbcbf7581e37fcc16d842279e94a9076ee4956ff3e46229fc1ffdcdb6a162e30597bc911192c69fc7e8c1f2ef8d5132ca555e16f4ddd59c4a00
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:46.16.0":
-  version: 46.16.0
-  resolution: "@wireapp/core@npm:46.16.0"
+"@wireapp/core@npm:46.17.0":
+  version: 46.17.0
+  resolution: "@wireapp/core@npm:46.17.0"
   dependencies:
     "@wireapp/api-client": "npm:^27.18.4"
     "@wireapp/commons": "npm:^5.4.1"
-    "@wireapp/core-crypto": "npm:3.0.1"
+    "@wireapp/core-crypto": "npm:3.0.2"
     "@wireapp/cryptobox": "npm:12.8.0"
     "@wireapp/priority-queue": "npm:^2.1.11"
     "@wireapp/promise-queue": "npm:^2.3.11"
@@ -6193,12 +6193,12 @@ __metadata:
     deepmerge-ts: "npm:6.0.0"
     hash.js: "npm:1.1.7"
     http-status-codes: "npm:2.3.0"
-    idb: "npm:8.0.1"
+    idb: "npm:8.0.2"
     logdown: "npm:3.3.1"
     long: "npm:^5.2.0"
     uuid: "npm:9.0.1"
     zod: "npm:3.24.1"
-  checksum: 10/68337c77d7fa87542fdc51db9239f7fd776e8f054f56f0b57fa2294b62bae21e9c16b65a4920e192a9c67fe623a0a50503241b91676db90234472cad1a9c3940
+  checksum: 10/22f86b7d4d89c1a820c6e4242abf1849bd136c76c6f9676c925f7d949f478ad45420f0d0edcc748307ff9eeff721b527aaf047ab0990595187454bb1db2345d3
   languageName: node
   linkType: hard
 
@@ -11109,10 +11109,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"idb@npm:8.0.1":
-  version: 8.0.1
-  resolution: "idb@npm:8.0.1"
-  checksum: 10/98415c4f7b633ff34d69230e3849a3dbe065c7aac6c8474ab4f728862725b3e65affd2aae8a8fc03ef070b4e1cab16f6782133e166b1c81579b7e40691ddff3c
+"idb@npm:8.0.2":
+  version: 8.0.2
+  resolution: "idb@npm:8.0.2"
+  checksum: 10/64f5ed239bc4f91a59bcc82248971f36fe6f1ff9562a0b1fe476dd86993c63a1e82e6bc20852c7d561000fd0844e35defe72cc771bb1ccaf5e1ebba36ee6521a
   languageName: node
   linkType: hard
 
@@ -19070,7 +19070,7 @@ __metadata:
     "@wireapp/avs-debugger": "npm:0.0.7"
     "@wireapp/commons": "npm:5.4.1"
     "@wireapp/copy-config": "npm:2.3.0"
-    "@wireapp/core": "npm:46.16.0"
+    "@wireapp/core": "npm:46.17.0"
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/prettier-config": "npm:0.6.4"
     "@wireapp/react-ui-kit": "npm:9.35.0"
