@@ -57,7 +57,7 @@ export const AudioPlayButton = ({
 
   useEffect(() => {
     if (!mediaElement) {
-      return;
+      return undefined;
     }
 
     mediaElement.addEventListener('playing', handlePlay);
