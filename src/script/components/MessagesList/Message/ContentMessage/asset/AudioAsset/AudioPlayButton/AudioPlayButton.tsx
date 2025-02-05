@@ -56,15 +56,16 @@ export const AudioPlayButton = ({
   const isUploading = transferState === AssetTransferState.UPLOADING;
 
   useEffect(() => {
-    if (mediaElement) {
-      mediaElement.addEventListener('playing', handlePlay);
-      mediaElement.addEventListener('pause', handlePause);
+    if (!mediaElement) {
+      return;
     }
+
+    mediaElement.addEventListener('playing', handlePlay);
+    mediaElement.addEventListener('pause', handlePause);
+
     return () => {
-      if (mediaElement) {
-        mediaElement.removeEventListener('playing', handlePlay);
-        mediaElement.removeEventListener('pause', handlePause);
-      }
+      mediaElement.removeEventListener('playing', handlePlay);
+      mediaElement.removeEventListener('pause', handlePause);
     };
   }, [mediaElement]);
 
