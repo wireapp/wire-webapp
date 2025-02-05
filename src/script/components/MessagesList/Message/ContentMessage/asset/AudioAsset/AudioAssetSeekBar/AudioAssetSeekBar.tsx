@@ -19,7 +19,7 @@
 
 import {FileAsset} from 'src/script/entity/message/FileAsset';
 
-import {AudioSeekBarNew} from './AudioSeekBarNew/AudioSeekBarNew';
+import {AudioSeekBarNew} from './AudioSeekBarV2/AudioSeekBarV2';
 
 import {SeekBar} from '../../controls/SeekBar';
 

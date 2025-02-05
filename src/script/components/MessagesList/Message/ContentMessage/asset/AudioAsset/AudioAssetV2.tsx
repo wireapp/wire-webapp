@@ -18,12 +18,11 @@
  */
 
 import {AudioAssetCard} from './AudioAssetCard/AudioAssetCard';
-import {controlStyles, playerWrapperStyles} from './AudioAssetNew.styles';
 import {AudioAssetPlaceholder} from './AudioAssetPlaceholder/AudioAssetPlaceholder';
 import {AudioAssetRestricted} from './AudioAssetRestricted/AudioAssetRestricted';
 import {AudioAssetSeekBar} from './AudioAssetSeekBar/AudioAssetSeekBar';
 import {AudioAssetTimer} from './AudioAssetTimer/AudioAssetTimer';
-// import {AudioEmptySeekBar} from './AudioAssetLoading/AudioEmptySeekBar/AudioEmptySeekBar';
+import {controlStyles, playerWrapperStyles} from './AudioAssetV2.styles';
 import {AudioPlayButton} from './AudioPlayButton/AudioPlayButton';
 import {useAudioMetadata} from './useAudioMetadata/useAudioMetadata';
 import {useAudioPlayer} from './useAudioPlayer/useAudioPlayer';
