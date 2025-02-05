@@ -72,4 +72,5 @@ export const timeStyles: CSSObject = {
   margin: 0,
   fontSize: 'var(--font-size-xsmall)',
   fontWeight: 'var(--font-weight-regular)',
+  color: 'var(--foreground)',
 };
