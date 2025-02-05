@@ -25,7 +25,8 @@ export const FileCardType = () => {
   const {extension, size} = useFileCardContext();
   return (
     <p css={wrapperStyles}>
-      <span css={categoryStyles}>{extension}</span> ({size})
+      <span css={categoryStyles}>{extension}</span>
+      {size && ` (${size})`}
     </p>
   );
 };

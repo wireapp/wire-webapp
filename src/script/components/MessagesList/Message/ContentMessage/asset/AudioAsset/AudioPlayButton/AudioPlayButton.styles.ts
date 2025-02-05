@@ -17,34 +17,23 @@
  *
  */
 
-import {CSSProperties} from 'react';
+import {CSSObject} from '@emotion/react';
 
-import {textStyles} from './FileCardName.styles';
+export const wrapperStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  height: '32px',
+  width: '32px',
+};
 
-import {useFileCardContext} from '../common/FileCardContext/FileCardContext';
-
-interface FileCardNameProps {
-  /**
-   * Number of lines to truncate (adds '...' at the end) the file name after
-   * @default 1
-   */
-  truncateAfterLines?: number;
-}
-
-export const FileCardName = ({truncateAfterLines = 1}: FileCardNameProps) => {
-  const {name} = useFileCardContext();
-
-  return (
-    <p
-      css={textStyles}
-      style={
-        {
-          '--truncate-after-lines': truncateAfterLines,
-        } as CSSProperties
-      }
-      data-file-card="name"
-    >
-      {name}
-    </p>
-  );
+export const playButtonStyles: CSSObject = {
+  width: '32px',
+  height: '32px',
+  borderRadius: '50%',
+  backgroundColor: 'var(--icon-button-primary-bg)',
+  border: '1px solid var(--icon-button-primary-border)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  flexShrink: 0,
 };

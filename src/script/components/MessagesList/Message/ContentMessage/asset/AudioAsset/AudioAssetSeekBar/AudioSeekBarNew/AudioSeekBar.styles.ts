@@ -17,34 +17,32 @@
  *
  */
 
-import {CSSProperties} from 'react';
+import {CSSObject} from '@emotion/react';
 
-import {textStyles} from './FileCardName.styles';
+export const svgStyles: CSSObject = {
+  position: 'relative',
+  display: 'flex',
+  width: '100%',
+  height: '32px',
+  cursor: 'pointer',
 
-import {useFileCardContext} from '../common/FileCardContext/FileCardContext';
+  path: {
+    fill: 'var(--gray-60)',
+    transition: 'all 0.15s ease',
 
-interface FileCardNameProps {
-  /**
-   * Number of lines to truncate (adds '...' at the end) the file name after
-   * @default 1
-   */
-  truncateAfterLines?: number;
-}
+    '&.active': {
+      fill: 'var(--accent-color)',
+    },
+  },
 
-export const FileCardName = ({truncateAfterLines = 1}: FileCardNameProps) => {
-  const {name} = useFileCardContext();
+  'body.theme-dark &': {
+    path: {
+      fill: 'var(--foreground)',
+    },
+  },
+};
 
-  return (
-    <p
-      css={textStyles}
-      style={
-        {
-          '--truncate-after-lines': truncateAfterLines,
-        } as CSSProperties
-      }
-      data-file-card="name"
-    >
-      {name}
-    </p>
-  );
+export const svgStylesDisabled: CSSObject = {
+  ...svgStyles,
+  pointerEvents: 'none',
 };

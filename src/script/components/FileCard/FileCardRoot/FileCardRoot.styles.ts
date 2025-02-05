@@ -25,6 +25,11 @@ const wrapperStyles: CSSObject = {
   borderRadius: '10px',
   padding: '8px',
   position: 'relative',
+
+  'body.theme-dark &': {
+    backgroundColor: 'var(--foreground-fade-8)',
+    border: '1px solid transparent',
+  },
 };
 
 export const wrapperStylesSmall: CSSObject = {

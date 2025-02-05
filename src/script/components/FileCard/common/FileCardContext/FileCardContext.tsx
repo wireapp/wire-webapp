@@ -23,7 +23,7 @@ interface FileCardContextValue {
   variant: 'small' | 'large';
   extension: string;
   name: string;
-  size: string;
+  size?: string;
 }
 
 const FileCardContext = createContext<FileCardContextValue | null>(null);

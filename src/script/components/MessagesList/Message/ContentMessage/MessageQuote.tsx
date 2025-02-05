@@ -33,7 +33,7 @@ import {includesOnlyEmojis} from 'Util/EmojiUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatDateNumeral, formatTimeShort, isBeforeToday} from 'Util/TimeUtil';
 
-import {AudioAsset} from './asset/AudioAsset';
+import {AudioAsset} from './asset/AudioAsset/AudioAsset';
 import {FileAsset} from './asset/FileAssetComponent';
 import {LocationAsset} from './asset/LocationAsset';
 import {TextMessageRenderer} from './asset/TextMessageRenderer';

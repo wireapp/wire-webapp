@@ -20,5 +20,6 @@
 import {CSSObject} from '@emotion/react';
 
 export const wrapperStyles: CSSObject = {
+  width: '100%',
   marginTop: '8px',
 };

@@ -17,34 +17,28 @@
  *
  */
 
-import {CSSProperties} from 'react';
+import {PlayIcon} from '@wireapp/react-ui-kit';
 
-import {textStyles} from './FileCardName.styles';
+import {buttonStyles, seekBarStyles, timerWrapperStyles, wrapperStyles} from './AudioAssetLoading.styles';
+import {AudioEmptySeekBar} from './AudioEmptySeekBar/AudioEmptySeekBar';
 
-import {useFileCardContext} from '../common/FileCardContext/FileCardContext';
+import {timeStyles} from '../AudioAssetTimer/AudioAssetTimer.styles';
 
-interface FileCardNameProps {
-  /**
-   * Number of lines to truncate (adds '...' at the end) the file name after
-   * @default 1
-   */
-  truncateAfterLines?: number;
-}
-
-export const FileCardName = ({truncateAfterLines = 1}: FileCardNameProps) => {
-  const {name} = useFileCardContext();
-
+export const AudioAssetLoading = () => {
   return (
-    <p
-      css={textStyles}
-      style={
-        {
-          '--truncate-after-lines': truncateAfterLines,
-        } as CSSProperties
-      }
-      data-file-card="name"
-    >
-      {name}
-    </p>
+    <div css={wrapperStyles}>
+      <div css={buttonStyles}>
+        <PlayIcon width={12.5} height={12.5} />
+      </div>
+      <div>
+        <div css={seekBarStyles}>
+          <AudioEmptySeekBar />
+        </div>
+        <div css={timerWrapperStyles}>
+          <span css={timeStyles}>0:00</span>
+          <div className="loading-dots" />
+        </div>
+      </div>
+    </div>
   );
 };

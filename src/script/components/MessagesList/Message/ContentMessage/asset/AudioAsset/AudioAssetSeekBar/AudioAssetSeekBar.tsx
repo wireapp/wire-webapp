@@ -17,34 +17,23 @@
  *
  */
 
-import {CSSProperties} from 'react';
+import {FileAsset} from 'src/script/entity/message/FileAsset';
 
-import {textStyles} from './FileCardName.styles';
+import {AudioSeekBarNew} from './AudioSeekBarNew/AudioSeekBarNew';
 
-import {useFileCardContext} from '../common/FileCardContext/FileCardContext';
+import {SeekBar} from '../../controls/SeekBar';
 
-interface FileCardNameProps {
-  /**
-   * Number of lines to truncate (adds '...' at the end) the file name after
-   * @default 1
-   */
-  truncateAfterLines?: number;
+interface AudioAssetSeekBarProps {
+  audioElement: HTMLMediaElement;
+  asset: FileAsset;
+  loudnessPreview: boolean;
+  disabled?: boolean;
 }
 
-export const FileCardName = ({truncateAfterLines = 1}: FileCardNameProps) => {
-  const {name} = useFileCardContext();
+export const AudioAssetSeekBar = ({audioElement, asset, loudnessPreview, disabled}: AudioAssetSeekBarProps) => {
+  if (loudnessPreview) {
+    return <AudioSeekBarNew audioElement={audioElement} asset={asset} disabled={disabled} />;
+  }
 
-  return (
-    <p
-      css={textStyles}
-      style={
-        {
-          '--truncate-after-lines': truncateAfterLines,
-        } as CSSProperties
-      }
-      data-file-card="name"
-    >
-      {name}
-    </p>
-  );
+  return <SeekBar dark mediaElement={audioElement} data-uie-name="status-audio-seekbar" disabled={disabled} />;
 };

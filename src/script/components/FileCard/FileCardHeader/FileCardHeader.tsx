@@ -26,5 +26,9 @@ interface FileCardHeaderProps {
 }
 
 export const FileCardHeader = ({children}: FileCardHeaderProps) => {
-  return <header css={wrapperStyles}>{children}</header>;
+  return (
+    <header css={wrapperStyles} data-file-card="header">
+      {children}
+    </header>
+  );
 };

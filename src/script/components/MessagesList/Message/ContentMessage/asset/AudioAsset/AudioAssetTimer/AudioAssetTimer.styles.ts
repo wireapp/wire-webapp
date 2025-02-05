@@ -17,34 +17,28 @@
  *
  */
 
-import {CSSProperties} from 'react';
+import {CSSObject} from '@emotion/react';
 
-import {textStyles} from './FileCardName.styles';
+export const wrapperStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  width: '100%',
+};
 
-import {useFileCardContext} from '../common/FileCardContext/FileCardContext';
+const timeStyles: CSSObject = {
+  minWidth: '32px',
+  margin: 0,
+  fontSize: 'var(--font-size-xsmall)',
+  fontWeight: 'var(--font-weight-regular)',
+};
 
-interface FileCardNameProps {
-  /**
-   * Number of lines to truncate (adds '...' at the end) the file name after
-   * @default 1
-   */
-  truncateAfterLines?: number;
-}
+export const currentTimeStyles: CSSObject = {
+  ...timeStyles,
+  color: 'var(--accent-color)',
+};
 
-export const FileCardName = ({truncateAfterLines = 1}: FileCardNameProps) => {
-  const {name} = useFileCardContext();
-
-  return (
-    <p
-      css={textStyles}
-      style={
-        {
-          '--truncate-after-lines': truncateAfterLines,
-        } as CSSProperties
-      }
-      data-file-card="name"
-    >
-      {name}
-    </p>
-  );
+export const durationStyles: CSSObject = {
+  ...timeStyles,
+  color: 'var(--foreground)',
 };

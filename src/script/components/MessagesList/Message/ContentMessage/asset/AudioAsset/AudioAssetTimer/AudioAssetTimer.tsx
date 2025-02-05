@@ -17,34 +17,24 @@
  *
  */
 
-import {CSSProperties} from 'react';
+import {formatSeconds} from 'Util/TimeUtil';
 
-import {textStyles} from './FileCardName.styles';
+import {currentTimeStyles, durationStyles, wrapperStyles} from './AudioAssetTimer.styles';
 
-import {useFileCardContext} from '../common/FileCardContext/FileCardContext';
-
-interface FileCardNameProps {
-  /**
-   * Number of lines to truncate (adds '...' at the end) the file name after
-   * @default 1
-   */
-  truncateAfterLines?: number;
+interface AudioAssetTimerProps {
+  currentTime: number;
+  overallDuration: number;
 }
 
-export const FileCardName = ({truncateAfterLines = 1}: FileCardNameProps) => {
-  const {name} = useFileCardContext();
-
+export const AudioAssetTimer = ({currentTime, overallDuration}: AudioAssetTimerProps) => {
   return (
-    <p
-      css={textStyles}
-      style={
-        {
-          '--truncate-after-lines': truncateAfterLines,
-        } as CSSProperties
-      }
-      data-file-card="name"
-    >
-      {name}
-    </p>
+    <div css={wrapperStyles}>
+      <span css={currentTimeStyles} data-uie-name="status-audio-time">
+        {formatSeconds(currentTime === overallDuration ? 0 : currentTime)}
+      </span>
+      <span css={durationStyles} data-uie-name="status-audio-time">
+        {formatSeconds(overallDuration)}
+      </span>
+    </div>
   );
 };

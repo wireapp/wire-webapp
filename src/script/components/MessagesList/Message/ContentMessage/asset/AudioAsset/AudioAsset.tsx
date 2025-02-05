@@ -22,23 +22,22 @@ import React, {useEffect, useState} from 'react';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {RestrictedAudio} from 'Components/asset/RestrictedAudio';
 import * as Icon from 'Components/Icon';
+import {RestrictedAudio} from 'Components/MessagesList/Message/ContentMessage/asset/AudioAsset/RestrictedAudio/RestrictedAudio';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getLogger} from 'Util/Logger';
 import {formatSeconds} from 'Util/TimeUtil';
 import {useEffectRef} from 'Util/useEffectRef';
 
-import {AssetHeader} from './AssetHeader';
-import {AudioSeekBar} from './controls/AudioSeekBar';
-import {MediaButton} from './controls/MediaButton';
-import {SeekBar} from './controls/SeekBar';
-import {AssetUrl, useAssetTransfer} from './useAssetTransfer';
-
-import {AssetTransferState} from '../../../../../assets/AssetTransferState';
-import type {ContentMessage} from '../../../../../entity/message/ContentMessage';
-import type {FileAsset} from '../../../../../entity/message/FileAsset';
-import {TeamState} from '../../../../../team/TeamState';
+import {AssetTransferState} from '../../../../../../assets/AssetTransferState';
+import type {ContentMessage} from '../../../../../../entity/message/ContentMessage';
+import type {FileAsset} from '../../../../../../entity/message/FileAsset';
+import {TeamState} from '../../../../../../team/TeamState';
+import {AssetHeader} from '../AssetHeader';
+import {AudioSeekBar} from '../controls/AudioSeekBar';
+import {MediaButton} from '../controls/MediaButton';
+import {SeekBar} from '../controls/SeekBar';
+import {AssetUrl, useAssetTransfer} from '../useAssetTransfer';
 
 const logger = getLogger('AudioAssetComponent');
 
@@ -68,6 +67,8 @@ export const AudioAsset: React.FC<AudioAssetProps> = ({
   const onTimeupdate = () => audioElement && setAudioTime(audioElement.currentTime);
   const showLoudnessPreview = !!(asset.meta?.loudness?.length ?? 0 > 0);
   const onPauseButtonClicked = () => audioElement?.pause();
+
+  const duration = asset?.meta?.duration ?? 0;
 
   const onPlayButtonClicked = async () => {
     if (audioSrc) {
@@ -144,13 +145,26 @@ export const AudioAsset: React.FC<AudioAssetProps> = ({
                           data-uie-name="status-audio-seekbar"
                         />
                       )}
-                      <span
-                        className="audio-controls-time label-xs"
-                        data-uie-name="status-audio-time"
-                        style={{margin: 0}}
+                      <div
+                        style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%'}}
                       >
-                        {formatSeconds(audioTime)}
-                      </span>
+                        <span
+                          className="audio-controls-time label-xs"
+                          data-uie-name="status-audio-time"
+                          style={{margin: 0}}
+                        >
+                          {formatSeconds(audioTime === duration ? 0 : audioTime)}
+                        </span>
+                        {duration && (
+                          <span
+                            className="audio-controls-time label-xs"
+                            data-uie-name="status-audio-time"
+                            style={{margin: 0}}
+                          >
+                            {formatSeconds(duration)}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>

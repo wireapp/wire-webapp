@@ -29,7 +29,7 @@ import {StatusType} from 'src/script/message/StatusType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
 
-import {AudioAsset} from './AudioAsset';
+import {AudioAssetNew} from './AudioAsset/AudioAssetNew';
 import {FileAsset} from './FileAssetComponent';
 import {ImageAsset} from './ImageAsset';
 import {LinkPreviewAsset} from './LinkPreviewAssetComponent';
@@ -54,6 +54,7 @@ interface ContentAssetProps {
   selfId: QualifiedId;
   isMessageFocused: boolean;
   is1to1Conversation: boolean;
+  isFileShareRestricted: boolean;
   onClickDetails: () => void;
 }
 
@@ -66,6 +67,7 @@ const ContentAsset = ({
   onClickButton,
   isMessageFocused,
   is1to1Conversation,
+  isFileShareRestricted,
   onClickDetails,
 }: ContentAssetProps) => {
   const {isObfuscated, status} = useKoSubscribableChildren(message, ['isObfuscated', 'status']);
@@ -114,7 +116,13 @@ const ContentAsset = ({
       }
 
       if ((asset as FileAssetType).isAudio()) {
-        return <AudioAsset message={message} isFocusable={isMessageFocused} />;
+        return (
+          <AudioAssetNew
+            message={message}
+            isFocusable={isMessageFocused}
+            isFileShareRestricted={isFileShareRestricted}
+          />
+        );
       }
 
       if ((asset as FileAssetType).isVideo()) {

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2025 Wire Swiss GmbH
+ * Copyright (C) 2021 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,34 +17,21 @@
  *
  */
 
-import {CSSProperties} from 'react';
+import React from 'react';
 
-import {textStyles} from './FileCardName.styles';
+import * as Icon from 'Components/Icon';
 
-import {useFileCardContext} from '../common/FileCardContext/FileCardContext';
+import {messageStyles, wrapperStyles} from './AudioAssetError.styles';
 
-interface FileCardNameProps {
-  /**
-   * Number of lines to truncate (adds '...' at the end) the file name after
-   * @default 1
-   */
-  truncateAfterLines?: number;
+export interface RestrictedAudioProps {
+  message?: string;
 }
 
-export const FileCardName = ({truncateAfterLines = 1}: FileCardNameProps) => {
-  const {name} = useFileCardContext();
-
+export const AudiAssetError: React.FC<RestrictedAudioProps> = ({message}) => {
   return (
-    <p
-      css={textStyles}
-      style={
-        {
-          '--truncate-after-lines': truncateAfterLines,
-        } as CSSProperties
-      }
-      data-file-card="name"
-    >
-      {name}
-    </p>
+    <article css={wrapperStyles}>
+      <Icon.MicOnIcon width={16} height={16} />
+      <p css={messageStyles}>{message}</p>
+    </article>
   );
 };
