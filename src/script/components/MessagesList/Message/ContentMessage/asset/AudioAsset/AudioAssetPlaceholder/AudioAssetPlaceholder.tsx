@@ -34,6 +34,7 @@ interface AudioAssetPlaceholderProps {
 }
 
 export const AudioAssetPlaceholder = ({variant}: AudioAssetPlaceholderProps) => {
+  const isLoading = variant === 'loading';
   return (
     <div css={wrapperStyles}>
       <div css={buttonStyles}>
@@ -43,9 +44,9 @@ export const AudioAssetPlaceholder = ({variant}: AudioAssetPlaceholderProps) => 
         <div css={seekBarStyles}>
           <AudioEmptySeekBar />
         </div>
-        <div css={variant === 'loading' ? timerWrapperStylesWithLoading : timerWrapperStyles}>
+        <div css={isLoading ? timerWrapperStylesWithLoading : timerWrapperStyles}>
           <span css={timeStyles}>0:00</span>
-          {variant === 'loading' ? <div className="loading-dots" /> : <span css={timeStyles}>0:00</span>}
+          {isLoading ? <div className="loading-dots" /> : <span css={timeStyles}>0:00</span>}
         </div>
       </div>
     </div>
