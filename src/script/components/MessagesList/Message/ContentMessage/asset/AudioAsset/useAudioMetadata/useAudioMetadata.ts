@@ -19,11 +19,11 @@
 
 import {useMemo} from 'react';
 
+import {t} from 'Util/LocalizerUtil';
 import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 
 import {AssetTransferState} from '../../../../../../../assets/AssetTransferState';
 import type {FileAsset} from '../../../../../../../entity/message/FileAsset';
-
 interface AudioMetadataParams {
   asset: FileAsset;
   transferState: AssetTransferState;
@@ -38,10 +38,10 @@ export const useAudioMetadata = ({asset, transferState}: AudioMetadataParams) =>
 
   const formattedName = useMemo(() => {
     if (transferState === AssetTransferState.UPLOAD_PENDING) {
-      return `Uploading: ${name}`;
+      return t('conversationAudioAssetUploading', {name});
     }
     if (transferState === AssetTransferState.UPLOAD_FAILED) {
-      return `Upload failed: ${name}`;
+      return t('conversationAudioAssetUploadFailed', {name});
     }
     return name;
   }, [name, transferState]);

@@ -71,7 +71,7 @@ export const AudioPlayButton = ({
 
   if (isUploading || isDownloading) {
     return (
-      <AudioButton label={t('mediaBtnPlay')} onClick={onCancel} tabIndex={messageFocusedTabIndex}>
+      <AudioButton label={t('conversationAudioAssetCancel')} onClick={onCancel} tabIndex={messageFocusedTabIndex}>
         <CloseIcon width={10} height={10} />
       </AudioButton>
     );
@@ -79,7 +79,11 @@ export const AudioPlayButton = ({
 
   if (isUploaded) {
     return (
-      <AudioButton label={t('mediaBtnPlay')} onClick={isPlaying ? onPause : onPlay} tabIndex={messageFocusedTabIndex}>
+      <AudioButton
+        label={isPlaying ? t('conversationAudioAssetPause') : t('conversationAudioAssetPlay')}
+        onClick={isPlaying ? onPause : onPlay}
+        tabIndex={messageFocusedTabIndex}
+      >
         {isPlaying ? <PauseIcon width={10} height={10} /> : <PlayIcon width={10} height={10} />}
       </AudioButton>
     );
