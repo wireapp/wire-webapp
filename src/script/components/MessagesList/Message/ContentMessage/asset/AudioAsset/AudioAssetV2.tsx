@@ -17,6 +17,10 @@
  *
  */
 
+import {AssetTransferState} from 'src/script/assets/AssetTransferState';
+import type {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import type {FileAsset} from 'src/script/entity/message/FileAsset';
+
 import {AudioAssetCard} from './AudioAssetCard/AudioAssetCard';
 import {AudioAssetPlaceholder} from './AudioAssetPlaceholder/AudioAssetPlaceholder';
 import {AudioAssetRestricted} from './AudioAssetRestricted/AudioAssetRestricted';
@@ -27,9 +31,6 @@ import {AudioPlayButton} from './AudioPlayButton/AudioPlayButton';
 import {useAudioMetadata} from './useAudioMetadata/useAudioMetadata';
 import {useAudioPlayer} from './useAudioPlayer/useAudioPlayer';
 
-import {AssetTransferState} from '../../../../../../assets/AssetTransferState';
-import type {ContentMessage} from '../../../../../../entity/message/ContentMessage';
-import type {FileAsset} from '../../../../../../entity/message/FileAsset';
 import {useAssetTransfer} from '../useAssetTransfer';
 
 export interface AudioAssetProps {
