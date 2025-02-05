@@ -19,16 +19,14 @@
 
 import {PlayIcon} from '@wireapp/react-ui-kit';
 
-import {buttonStyles, seekBarStyles, timerWrapperStyles, wrapperStyles} from './AudioAssetLoading.styles';
+import {buttonStyles, seekBarStyles, timerWrapperStyles, wrapperStyles, timeStyles} from './AudioAssetLoading.styles';
 import {AudioEmptySeekBar} from './AudioEmptySeekBar/AudioEmptySeekBar';
-
-import {timeStyles} from '../AudioAssetTimer/AudioAssetTimer.styles';
 
 export const AudioAssetLoading = () => {
   return (
     <div css={wrapperStyles}>
       <div css={buttonStyles}>
-        <PlayIcon width={12.5} height={12.5} />
+        <PlayIcon width={10} height={10} />
       </div>
       <div>
         <div css={seekBarStyles}>
