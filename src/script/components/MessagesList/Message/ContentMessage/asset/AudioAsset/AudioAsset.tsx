@@ -23,11 +23,12 @@ import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import * as Icon from 'Components/Icon';
-import {RestrictedAudio} from 'Components/MessagesList/Message/ContentMessage/asset/AudioAsset/RestrictedAudio/RestrictedAudio';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getLogger} from 'Util/Logger';
 import {formatSeconds} from 'Util/TimeUtil';
 import {useEffectRef} from 'Util/useEffectRef';
+
+import {RestrictedAudio} from './RestrictedAudio/RestrictedAudio';
 
 import {AssetTransferState} from '../../../../../../assets/AssetTransferState';
 import type {ContentMessage} from '../../../../../../entity/message/ContentMessage';
@@ -68,11 +69,9 @@ export const AudioAsset: React.FC<AudioAssetProps> = ({
   const showLoudnessPreview = !!(asset.meta?.loudness?.length ?? 0 > 0);
   const onPauseButtonClicked = () => audioElement?.pause();
 
-  const duration = asset?.meta?.duration ?? 0;
-
   const onPlayButtonClicked = async () => {
     if (audioSrc) {
-      await audioElement?.play();
+      audioElement?.play();
     } else {
       asset.status(AssetTransferState.DOWNLOADING);
       try {
@@ -95,17 +94,12 @@ export const AudioAsset: React.FC<AudioAssetProps> = ({
     }
   }, [audioElement, audioSrc]);
 
-  useEffect(() => () => audioSrc?.dispose(), [audioSrc]);
+  useEffect(() => () => audioSrc?.dispose(), []);
 
   return (
-    <div
-      className={cx('audio-asset', className)}
-      data-uie-name="audio-asset"
-      data-uie-value={asset.file_name}
-      style={{padding: '8px'}}
-    >
-      {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+    <div className={cx('audio-asset', className)} data-uie-name="audio-asset" data-uie-value={asset.file_name}>
       <audio ref={setAudioElement} src={audioSrc?.url} onTimeUpdate={onTimeupdate} />
+
       {!isObfuscated ? (
         <>
           {hasHeader && (
@@ -119,22 +113,23 @@ export const AudioAsset: React.FC<AudioAssetProps> = ({
                 <div className="asset-placeholder loading-dots" />
               )}
               {transferState !== AssetTransferState.UPLOAD_PENDING && (
-                <div className="audio-controls" style={{gap: '8px', alignItems: 'flex-start'}}>
-                  <div style={{display: 'flex', alignItems: 'center', height: '40px', width: '40px'}}>
-                    <MediaButton
-                      mediaElement={audioElement}
-                      asset={asset}
-                      play={onPlayButtonClicked}
-                      pause={onPauseButtonClicked}
-                      cancel={cancelUpload}
-                      transferState={transferState}
-                      uploadProgress={uploadProgress}
-                      isFocusable={isFocusable}
-                    />
-                  </div>
+                <div className="audio-controls">
+                  <MediaButton
+                    mediaElement={audioElement}
+                    asset={asset}
+                    play={onPlayButtonClicked}
+                    pause={onPauseButtonClicked}
+                    cancel={cancelUpload}
+                    transferState={transferState}
+                    uploadProgress={uploadProgress}
+                    isFocusable={isFocusable}
+                  />
 
                   {transferState !== AssetTransferState.UPLOADING && audioElement && (
-                    <div style={{display: 'flex', flexDirection: 'column', gap: '8px', width: '100%'}}>
+                    <>
+                      <span className="audio-controls-time label-xs" data-uie-name="status-audio-time">
+                        {formatSeconds(audioTime)}
+                      </span>
                       {showLoudnessPreview ? (
                         <AudioSeekBar audioElement={audioElement} asset={asset} disabled={!audioSrc} />
                       ) : (
@@ -145,27 +140,7 @@ export const AudioAsset: React.FC<AudioAssetProps> = ({
                           data-uie-name="status-audio-seekbar"
                         />
                       )}
-                      <div
-                        style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%'}}
-                      >
-                        <span
-                          className="audio-controls-time label-xs"
-                          data-uie-name="status-audio-time"
-                          style={{margin: 0}}
-                        >
-                          {formatSeconds(audioTime === duration ? 0 : audioTime)}
-                        </span>
-                        {duration && (
-                          <span
-                            className="audio-controls-time label-xs"
-                            data-uie-name="status-audio-time"
-                            style={{margin: 0}}
-                          >
-                            {formatSeconds(duration)}
-                          </span>
-                        )}
-                      </div>
-                    </div>
+                    </>
                   )}
                 </div>
               )}
