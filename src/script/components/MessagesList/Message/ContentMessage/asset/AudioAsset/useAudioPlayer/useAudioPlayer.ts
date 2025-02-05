@@ -26,7 +26,7 @@ import {AssetTransferState} from '../../../../../../../assets/AssetTransferState
 import type {FileAsset} from '../../../../../../../entity/message/FileAsset';
 import {AssetUrl} from '../../useAssetTransfer';
 
-const logger = getLogger('AudioAssetComponent');
+const logger = getLogger('useAudioPlayer');
 
 interface UseAudioPlayerProps {
   asset: FileAsset;
@@ -84,10 +84,7 @@ export const useAudioPlayer = ({asset, getAssetUrl}: UseAudioPlayerProps) => {
   }, [audioElement, audioSrc]);
 
   useEffect(() => {
-    if (!audioSrc) {
-      return;
-    }
-    return audioSrc.dispose;
+    return audioSrc?.dispose;
   }, [audioSrc]);
 
   return {

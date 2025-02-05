@@ -29,7 +29,7 @@ import {StatusType} from 'src/script/message/StatusType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
 
-import {AudioAssetNew} from './AudioAsset/AudioAssetNew';
+import {AudioAsset} from './AudioAsset/AudioAsset';
 import {FileAsset} from './FileAssetComponent';
 import {ImageAsset} from './ImageAsset';
 import {LinkPreviewAsset} from './LinkPreviewAssetComponent';
@@ -67,7 +67,6 @@ const ContentAsset = ({
   onClickButton,
   isMessageFocused,
   is1to1Conversation,
-  isFileShareRestricted,
   onClickDetails,
 }: ContentAssetProps) => {
   const {isObfuscated, status} = useKoSubscribableChildren(message, ['isObfuscated', 'status']);
@@ -116,13 +115,7 @@ const ContentAsset = ({
       }
 
       if ((asset as FileAssetType).isAudio()) {
-        return (
-          <AudioAssetNew
-            message={message}
-            isFocusable={isMessageFocused}
-            isFileShareRestricted={isFileShareRestricted}
-          />
-        );
+        return <AudioAsset message={message} isFocusable={isMessageFocused} />;
       }
 
       if ((asset as FileAssetType).isVideo()) {

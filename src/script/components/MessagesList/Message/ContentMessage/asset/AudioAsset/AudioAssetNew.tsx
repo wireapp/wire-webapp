@@ -17,12 +17,10 @@
  *
  */
 
-import {t} from 'Util/LocalizerUtil';
-
 import {AudioAssetCard} from './AudioAssetCard/AudioAssetCard';
-import {AudiAssetError} from './AudioAssetError/AudioAssetError';
 import {controlStyles, playerWrapperStyles} from './AudioAssetNew.styles';
 import {AudioAssetPlaceholder} from './AudioAssetPlaceholder/AudioAssetPlaceholder';
+import {AudioAssetRestricted} from './AudioAssetRestricted/AudioAssetRestricted';
 import {AudioAssetSeekBar} from './AudioAssetSeekBar/AudioAssetSeekBar';
 import {AudioAssetTimer} from './AudioAssetTimer/AudioAssetTimer';
 // import {AudioEmptySeekBar} from './AudioAssetLoading/AudioEmptySeekBar/AudioEmptySeekBar';
@@ -79,7 +77,7 @@ export const AudioAssetNew = ({message, isFocusable, isFileShareRestricted}: Aud
   }
 
   if (isFileShareRestricted) {
-    return <AudiAssetError message={t('conversationAudioAssetRestricted')} />;
+    return <AudioAssetRestricted />;
   }
 
   return (

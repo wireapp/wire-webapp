@@ -118,10 +118,6 @@ export const useAudioSeekBar = ({asset, audioElement, svgRef}: UseAudioSeekBarPr
   }, [asset]);
 
   useEffect(() => {
-    if (!audioElement) {
-      return;
-    }
-
     audioElement.addEventListener('ended', onAudioEnded);
     audioElement.addEventListener('timeupdate', onTimeUpdate);
 

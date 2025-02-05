@@ -42,7 +42,6 @@ export const FileCardName = ({truncateAfterLines = 1}: FileCardNameProps) => {
           '--truncate-after-lines': truncateAfterLines,
         } as CSSProperties
       }
-      data-file-card="name"
     >
       {name}
     </p>

@@ -19,8 +19,6 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {COLOR_V2} from '@wireapp/react-ui-kit';
-
 export const wrapperStyles: CSSObject = {
   display: 'flex',
   alignItems: 'flex-start',
@@ -42,12 +40,12 @@ export const buttonStyles: CSSObject = {
   cursor: 'not-allowed',
 
   '& svg': {
-    fill: COLOR_V2.GRAY_70,
+    fill: 'var(--gray-70)',
   },
 
   'body.dark &': {
     '& svg': {
-      fill: COLOR_V2.GRAY_60,
+      fill: 'var(--gray-60)',
     },
   },
 };

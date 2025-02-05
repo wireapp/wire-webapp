@@ -17,21 +17,16 @@
  *
  */
 
-import React from 'react';
-
 import * as Icon from 'Components/Icon';
+import {t} from 'Util/LocalizerUtil';
 
-import {messageStyles, wrapperStyles} from './AudioAssetError.styles';
+import {messageStyles, wrapperStyles} from './AudioAssetRestricted.styles';
 
-export interface RestrictedAudioProps {
-  message?: string;
-}
-
-export const AudiAssetError: React.FC<RestrictedAudioProps> = ({message}) => {
+export const AudioAssetRestricted = () => {
   return (
     <article css={wrapperStyles}>
       <Icon.MicOnIcon width={16} height={16} />
-      <p css={messageStyles}>{message}</p>
+      <p css={messageStyles}>{t('conversationAudioAssetRestricted')}</p>
     </article>
   );
 };
