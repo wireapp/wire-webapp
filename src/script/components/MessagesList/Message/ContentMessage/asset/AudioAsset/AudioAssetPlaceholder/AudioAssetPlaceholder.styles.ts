@@ -63,11 +63,14 @@ export const timerWrapperStyles: CSSObject = {
   width: '100%',
   display: 'flex',
   justifyContent: 'space-between',
+};
+
+export const timerWrapperStylesWithLoading: CSSObject = {
+  ...timerWrapperStyles,
   paddingRight: '16px',
 };
 
 export const timeStyles: CSSObject = {
-  minWidth: '32px',
   margin: 0,
   fontSize: 'var(--font-size-xsmall)',
   fontWeight: 'var(--font-weight-regular)',

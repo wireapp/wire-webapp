@@ -21,8 +21,8 @@ import {t} from 'Util/LocalizerUtil';
 
 import {AudioAssetCard} from './AudioAssetCard/AudioAssetCard';
 import {AudiAssetError} from './AudioAssetError/AudioAssetError';
-import {AudioAssetLoading} from './AudioAssetLoading/AudioAssetLoading';
 import {controlStyles, playerWrapperStyles} from './AudioAssetNew.styles';
+import {AudioAssetPlaceholder} from './AudioAssetPlaceholder/AudioAssetPlaceholder';
 import {AudioAssetSeekBar} from './AudioAssetSeekBar/AudioAssetSeekBar';
 import {AudioAssetTimer} from './AudioAssetTimer/AudioAssetTimer';
 // import {AudioEmptySeekBar} from './AudioAssetLoading/AudioEmptySeekBar/AudioEmptySeekBar';
@@ -50,50 +50,70 @@ export const AudioAssetNew = ({message, isFocusable, isFileShareRestricted}: Aud
   const {audioElement, setAudioElementRef, audioTime, audioSrc, handleTimeUpdate, handlePause, handlePlay} =
     useAudioPlayer({asset, getAssetUrl});
 
-  if (isFileShareRestricted) {
-    return <AudiAssetError message={t('conversationAudioAssetRestricted')} />;
-  }
-
   if (transferState === AssetTransferState.UPLOAD_PENDING || !audioElement) {
     return (
-      <AudioAssetCard extension={extension} name={name} size={size} isLoading loadingProgress={uploadProgress}>
-        {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-        <audio ref={setAudioElementRef} src={audioSrc?.url} onTimeUpdate={handleTimeUpdate} />
-        <AudioAssetLoading />
+      <AudioAssetCard
+        src={audioSrc?.url}
+        extension={extension}
+        name={name}
+        size={size}
+        isLoading
+        loadingProgress={uploadProgress}
+        getAudioElementRef={setAudioElementRef}
+        onTimeUpdate={handleTimeUpdate}
+      >
+        <AudioAssetPlaceholder variant="loading" />
       </AudioAssetCard>
     );
   }
 
-  return (
-    <>
+  if (transferState === AssetTransferState.UPLOAD_FAILED) {
+    return (
       <AudioAssetCard
         extension={extension}
         name={name}
         size={size}
-        isError={transferState === AssetTransferState.UPLOAD_FAILED}
+        isError
+        getAudioElementRef={setAudioElementRef}
+        onTimeUpdate={handleTimeUpdate}
       >
-        {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-        <audio ref={setAudioElementRef} src={audioSrc?.url} onTimeUpdate={handleTimeUpdate} />
-        <div css={controlStyles}>
-          <AudioPlayButton
-            mediaElement={audioElement}
-            onPlay={handlePlay}
-            onPause={handlePause}
-            onCancel={cancelUpload}
-            transferState={transferState}
-            isFocusable={isFocusable}
-          />
-          <div css={playerWrapperStyles}>
-            <AudioAssetSeekBar
-              audioElement={audioElement}
-              asset={asset}
-              loudnessPreview={loudnessPreview}
-              disabled={!audioSrc}
-            />
-            <AudioAssetTimer currentTime={audioTime} overallDuration={duration} />
-          </div>
-        </div>
+        <AudioAssetPlaceholder variant="error" />
       </AudioAssetCard>
-    </>
+    );
+  }
+
+  if (isFileShareRestricted) {
+    return <AudiAssetError message={t('conversationAudioAssetRestricted')} />;
+  }
+
+  return (
+    <AudioAssetCard
+      src={audioSrc?.url}
+      getAudioElementRef={setAudioElementRef}
+      extension={extension}
+      name={name}
+      size={size}
+      onTimeUpdate={handleTimeUpdate}
+    >
+      <div css={controlStyles}>
+        <AudioPlayButton
+          mediaElement={audioElement}
+          onPlay={handlePlay}
+          onPause={handlePause}
+          onCancel={cancelUpload}
+          transferState={transferState}
+          isFocusable={isFocusable}
+        />
+        <div css={playerWrapperStyles}>
+          <AudioAssetSeekBar
+            audioElement={audioElement}
+            asset={asset}
+            loudnessPreview={loudnessPreview}
+            disabled={!audioSrc}
+          />
+          <AudioAssetTimer currentTime={audioTime} overallDuration={duration} />
+        </div>
+      </div>
+    </AudioAssetCard>
   );
 };

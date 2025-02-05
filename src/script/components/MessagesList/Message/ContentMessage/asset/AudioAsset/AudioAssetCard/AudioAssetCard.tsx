@@ -17,23 +17,27 @@
  *
  */
 
-import {ReactNode} from 'react';
+import {ReactNode, SyntheticEvent} from 'react';
 
 import {FileCard} from 'Components/FileCard/FileCard';
 
 import {contentStyles} from './AudioAssetCard.styles';
 
 interface AudioAssetCardProps {
+  src?: string;
+  getAudioElementRef: (element: HTMLMediaElement) => void;
   extension: string;
   name: string;
   size: string;
   isError?: boolean;
   isLoading?: boolean;
   loadingProgress?: number;
+  onTimeUpdate: (event: SyntheticEvent<HTMLAudioElement>) => void;
   children: ReactNode;
 }
 
 export const AudioAssetCard = ({
+  src,
   extension,
   name,
   size,
@@ -41,6 +45,8 @@ export const AudioAssetCard = ({
   isError,
   isLoading,
   loadingProgress,
+  getAudioElementRef,
+  onTimeUpdate,
 }: AudioAssetCardProps) => {
   return (
     <FileCard.Root variant="large" extension={extension} name={name} size={size}>
@@ -50,6 +56,8 @@ export const AudioAssetCard = ({
       </FileCard.Header>
       <FileCard.Name />
       <FileCard.Content>
+        {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+        <audio ref={getAudioElementRef} src={src} onTimeUpdate={onTimeUpdate} />
         <div css={contentStyles}>{children}</div>
       </FileCard.Content>
       {isError && <FileCard.Error />}

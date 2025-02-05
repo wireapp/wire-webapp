@@ -19,10 +19,21 @@
 
 import {PlayIcon} from '@wireapp/react-ui-kit';
 
-import {buttonStyles, seekBarStyles, timerWrapperStyles, wrapperStyles, timeStyles} from './AudioAssetLoading.styles';
+import {
+  buttonStyles,
+  seekBarStyles,
+  timerWrapperStyles,
+  wrapperStyles,
+  timeStyles,
+  timerWrapperStylesWithLoading,
+} from './AudioAssetPlaceholder.styles';
 import {AudioEmptySeekBar} from './AudioEmptySeekBar/AudioEmptySeekBar';
 
-export const AudioAssetLoading = () => {
+interface AudioAssetPlaceholderProps {
+  variant: 'loading' | 'error';
+}
+
+export const AudioAssetPlaceholder = ({variant}: AudioAssetPlaceholderProps) => {
   return (
     <div css={wrapperStyles}>
       <div css={buttonStyles}>
@@ -32,9 +43,9 @@ export const AudioAssetLoading = () => {
         <div css={seekBarStyles}>
           <AudioEmptySeekBar />
         </div>
-        <div css={timerWrapperStyles}>
+        <div css={variant === 'loading' ? timerWrapperStylesWithLoading : timerWrapperStyles}>
           <span css={timeStyles}>0:00</span>
-          <div className="loading-dots" />
+          {variant === 'loading' ? <div className="loading-dots" /> : <span css={timeStyles}>0:00</span>}
         </div>
       </div>
     </div>

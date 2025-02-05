@@ -38,13 +38,26 @@ export const useAudioPlayer = ({asset, getAssetUrl}: UseAudioPlayerProps) => {
   const [audioTime, setAudioTime] = useState<number>(asset?.meta?.duration || 0);
   const [audioSrc, setAudioSrc] = useState<AssetUrl>();
 
-  const handleTimeUpdate = () => audioElement && setAudioTime(audioElement.currentTime);
-  const handlePause = () => audioElement?.pause();
+  const handleTimeUpdate = () => {
+    if (!audioElement) {
+      return;
+    }
+    setAudioTime(audioElement.currentTime);
+  };
+
+  const handlePause = () => {
+    if (!audioElement) {
+      return;
+    }
+    audioElement.pause();
+  };
 
   const handlePlay = async () => {
-    if (audioSrc) {
-      await audioElement?.play();
-    } else {
+    if (!audioElement) {
+      return;
+    }
+
+    if (!audioSrc) {
       asset.status(AssetTransferState.DOWNLOADING);
       try {
         const url = await getAssetUrl(asset.original_resource());
@@ -54,19 +67,28 @@ export const useAudioPlayer = ({asset, getAssetUrl}: UseAudioPlayerProps) => {
       }
       asset.status(AssetTransferState.UPLOADED);
     }
+
+    await audioElement.play();
   };
 
   useEffect(() => {
-    if (audioSrc && audioElement) {
-      const playPromise = audioElement.play();
-
-      playPromise?.catch(error => {
-        logger.error('Failed to load audio asset ', error);
-      });
+    if (!audioSrc || !audioElement) {
+      return;
     }
+
+    const playPromise = audioElement.play();
+
+    playPromise?.catch(error => {
+      logger.error('Failed to load audio asset ', error);
+    });
   }, [audioElement, audioSrc]);
 
-  useEffect(() => () => audioSrc?.dispose(), [audioSrc]);
+  useEffect(() => {
+    if (!audioSrc) {
+      return;
+    }
+    return audioSrc.dispose;
+  }, [audioSrc]);
 
   return {
     audioElement,
