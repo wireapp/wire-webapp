@@ -37,13 +37,11 @@ export const useAudioMetadata = ({asset, transferState}: AudioMetadataParams) =>
   const loudnessPreview = !!(asset.meta?.loudness?.length ?? 0 > 0);
 
   const formattedName = useMemo(() => {
-    if (transferState === AssetTransferState.UPLOAD_PENDING) {
-      return t('conversationAudioAssetUploading', {name});
-    }
-    if (transferState === AssetTransferState.UPLOAD_FAILED) {
-      return t('conversationAudioAssetUploadFailed', {name});
-    }
-    return name;
+    const transferNames = {
+      [AssetTransferState.UPLOAD_PENDING]: t('conversationAudioAssetUploading', {name}),
+      [AssetTransferState.UPLOAD_FAILED]: t('conversationAudioAssetUploadFailed', {name}),
+    };
+    return transferNames[transferState as keyof typeof transferNames] ?? name;
   }, [name, transferState]);
 
   return {
