@@ -348,6 +348,7 @@ export const Conversations: React.FC<ConversationsProps> = ({
             searchInputRef={searchInputRef}
           />
         }
+        conversationListRef={conversationListRef}
         setConversationListRef={setConversationListRef}
         hasHeader={!isPreferences}
         sidebar={
