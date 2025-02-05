@@ -48,6 +48,10 @@ export const AudioAssetNew = ({message, isFocusable, isFileShareRestricted}: Aud
   const {audioElement, setAudioElementRef, audioTime, audioSrc, handleTimeUpdate, handlePause, handlePlay} =
     useAudioPlayer({asset, getAssetUrl});
 
+  if (isFileShareRestricted) {
+    return <AudioAssetRestricted />;
+  }
+
   if (transferState === AssetTransferState.UPLOAD_PENDING || !audioElement) {
     return (
       <AudioAssetCard
@@ -74,10 +78,6 @@ export const AudioAssetNew = ({message, isFocusable, isFileShareRestricted}: Aud
         <AudioAssetPlaceholder variant="error" />
       </AudioAssetCard>
     );
-  }
-
-  if (isFileShareRestricted) {
-    return <AudioAssetRestricted />;
   }
 
   return (
