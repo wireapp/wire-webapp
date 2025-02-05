@@ -45,7 +45,7 @@ export const AudioAssetNew = ({message, isFocusable, isFileShareRestricted}: Aud
   const asset = message.getFirstAsset() as FileAsset;
   const {transferState, uploadProgress, cancelUpload, getAssetUrl} = useAssetTransfer(message);
 
-  const {name, extension, size, duration, loudnessPreview} = useAudioMetadata({asset, transferState});
+  const metadata = useAudioMetadata({asset, transferState});
 
   const {audioElement, setAudioElementRef, audioTime, audioSrc, handleTimeUpdate, handlePause, handlePlay} =
     useAudioPlayer({asset, getAssetUrl});
@@ -54,9 +54,7 @@ export const AudioAssetNew = ({message, isFocusable, isFileShareRestricted}: Aud
     return (
       <AudioAssetCard
         src={audioSrc?.url}
-        extension={extension}
-        name={name}
-        size={size}
+        metadata={metadata}
         isLoading
         loadingProgress={uploadProgress}
         getAudioElementRef={setAudioElementRef}
@@ -70,9 +68,7 @@ export const AudioAssetNew = ({message, isFocusable, isFileShareRestricted}: Aud
   if (transferState === AssetTransferState.UPLOAD_FAILED) {
     return (
       <AudioAssetCard
-        extension={extension}
-        name={name}
-        size={size}
+        metadata={metadata}
         isError
         getAudioElementRef={setAudioElementRef}
         onTimeUpdate={handleTimeUpdate}
@@ -90,9 +86,7 @@ export const AudioAssetNew = ({message, isFocusable, isFileShareRestricted}: Aud
     <AudioAssetCard
       src={audioSrc?.url}
       getAudioElementRef={setAudioElementRef}
-      extension={extension}
-      name={name}
-      size={size}
+      metadata={metadata}
       onTimeUpdate={handleTimeUpdate}
     >
       <div css={controlStyles}>
@@ -108,10 +102,10 @@ export const AudioAssetNew = ({message, isFocusable, isFileShareRestricted}: Aud
           <AudioAssetSeekBar
             audioElement={audioElement}
             asset={asset}
-            loudnessPreview={loudnessPreview}
+            loudnessPreview={metadata.loudnessPreview}
             disabled={!audioSrc}
           />
-          <AudioAssetTimer currentTime={audioTime} overallDuration={duration} />
+          <AudioAssetTimer currentTime={audioTime} overallDuration={metadata.duration} />
         </div>
       </div>
     </AudioAssetCard>

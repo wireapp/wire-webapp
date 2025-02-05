@@ -23,12 +23,18 @@ import {FileCard} from 'Components/FileCard/FileCard';
 
 import {contentStyles} from './AudioAssetCard.styles';
 
+interface AudioMetadata {
+  name: string;
+  extension: string;
+  size: string;
+  duration: number;
+  loudnessPreview: boolean;
+}
+
 interface AudioAssetCardProps {
   src?: string;
   getAudioElementRef: (element: HTMLMediaElement) => void;
-  extension: string;
-  name: string;
-  size: string;
+  metadata: AudioMetadata;
   isError?: boolean;
   isLoading?: boolean;
   loadingProgress?: number;
@@ -38,9 +44,7 @@ interface AudioAssetCardProps {
 
 export const AudioAssetCard = ({
   src,
-  extension,
-  name,
-  size,
+  metadata,
   children,
   isError,
   isLoading,
@@ -49,7 +53,7 @@ export const AudioAssetCard = ({
   onTimeUpdate,
 }: AudioAssetCardProps) => {
   return (
-    <FileCard.Root variant="large" extension={extension} name={name} size={size}>
+    <FileCard.Root variant="large" extension={metadata.extension} name={metadata.name} size={metadata.size}>
       <FileCard.Header>
         <FileCard.Icon />
         <FileCard.Type />
