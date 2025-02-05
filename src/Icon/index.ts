@@ -135,3 +135,4 @@ export * from './Files/FolderIcon';
 export * from './Files/MultipleFilesIcon';
 
 export * from './PlayIcon';
+export * from './PauseIcon';
