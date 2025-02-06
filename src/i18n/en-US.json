@@ -332,6 +332,8 @@
   "callReactionButtonsAriaLabel": "Emoji selection bar",
   "callReactions": "Reactions",
   "callReactionsAriaLabel": "Emoji {emoji} from {from}",
+  "callReactionEmojiPickerButtonAriaLabel": "Open emoji picker",
+  "callReactionEmojiPickerAriaLabel": "Emoji picker",
   "callStateCbr": "Constant Bit Rate",
   "callStateConnecting": "Connecting…",
   "callStateIncoming": "Calling…",

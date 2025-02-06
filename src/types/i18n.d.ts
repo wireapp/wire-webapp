@@ -336,6 +336,8 @@ declare module 'I18n/en-US.json' {
     'callReactionButtonsAriaLabel': `Emoji selection bar`;
     'callReactions': `Reactions`;
     'callReactionsAriaLabel': `Emoji {emoji} from {from}`;
+    'callReactionEmojiPickerButtonAriaLabel': `Open emoji picker`;
+    'callReactionEmojiPickerAriaLabel': `Emoji picker`;
     'callStateCbr': `Constant Bit Rate`;
     'callStateConnecting': `Connecting…`;
     'callStateIncoming': `Calling…`;
@@ -402,12 +404,12 @@ declare module 'I18n/en-US.json' {
     'conversationAssetUploadCancel': `Cancel`;
     'conversationAssetUploadFailed': `Upload Failed`;
     'conversationAssetUploading': `Uploading…`;
-    'conversationAudioAssetRestricted': `Receiving audio messages is prohibited`;
-    'conversationAudioAssetUploading': `Uploading: {name}`;
-    'conversationAudioAssetUploadFailed': `Upload failed: {name}`;
-    'conversationAudioAssetPlay': `Play`;
-    'conversationAudioAssetPause': `Pause`;
     'conversationAudioAssetCancel': `Cancel`;
+    'conversationAudioAssetPause': `Pause`;
+    'conversationAudioAssetPlay': `Play`;
+    'conversationAudioAssetRestricted': `Receiving audio messages is prohibited`;
+    'conversationAudioAssetUploadFailed': `Upload failed: {name}`;
+    'conversationAudioAssetUploading': `Uploading: {name}`;
     'conversationButtonSeparator': `or`;
     'conversationClassified': `Security level: VS-NfD`;
     'conversationConnectWithNewUsers': `Connect with People`;

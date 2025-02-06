@@ -17,22 +17,28 @@
  *
  */
 
-import React, {useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
+
+import EmojiPicker, {EmojiClickData, EmojiStyle} from 'emoji-picker-react';
 
 import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {t} from 'Util/LocalizerUtil';
 
-import {emojisBarButtonStyles, emojisBarWrapperStyles} from './EmojisBar.styles';
+import {styles} from './EmojisBar.styles';
 
-const EMOJIS_LIST = ['👍', '🎉', '❤️', '😂', '😮', '👏', '🤔', '😢', '👎'];
+const EMOJIS_LIST = ['👍', '🎉', '❤️', '😂', '😮', '👏', '🤔', '😢'];
 
 export interface EmojisBarProps {
   onEmojiClick: (emoji: string) => void;
-  ref: React.RefObject<HTMLDivElement>;
+  onPickerEmojiClick: () => void;
+  detachedWindow?: Window | null;
 }
 
-export const EmojisBar = ({onEmojiClick, ref}: EmojisBarProps) => {
+export const EmojisBar = ({onEmojiClick, onPickerEmojiClick, detachedWindow}: EmojisBarProps) => {
+  const emojisBarRef = useRef<HTMLDivElement>(null);
+
   const [disabledEmojis, setDisabledEmojis] = useState<string[]>([]);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   const handleEmojiClick = (selectedEmoji: string) => {
     setDisabledEmojis(prev => [...prev, selectedEmoji]);
@@ -40,34 +46,79 @@ export const EmojisBar = ({onEmojiClick, ref}: EmojisBarProps) => {
     onEmojiClick(selectedEmoji);
 
     setTimeout(() => {
-      setDisabledEmojis(prev => [...prev].filter(emoji => emoji !== selectedEmoji));
+      setDisabledEmojis(prev => prev.filter(emoji => emoji !== selectedEmoji));
     }, CallingRepository.EMOJI_TIME_OUT_DURATION);
   };
 
+  const handlePickerEmojiClick = (emojiData: EmojiClickData) => {
+    onEmojiClick(emojiData.emoji);
+    onPickerEmojiClick();
+  };
+
+  const handleClickOutside = (event: MouseEvent) => {
+    if (emojisBarRef.current && !emojisBarRef.current.contains(event.target as Node)) {
+      onPickerEmojiClick();
+    }
+  };
+
+  useEffect(() => {
+    if (detachedWindow) {
+      detachedWindow.document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        detachedWindow.document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+
+    return () => {};
+  }, [detachedWindow]);
+
   return (
-    <div
-      ref={ref}
-      role="toolbar"
-      data-uie-name="video-controls-emojis-bar"
-      aria-label={t('callReactionButtonsAriaLabel')}
-      css={emojisBarWrapperStyles}
-    >
-      {EMOJIS_LIST.map(emoji => {
-        const isDisabled = disabledEmojis.includes(emoji);
-        return (
+    <div ref={emojisBarRef}>
+      {showEmojiPicker ? (
+        <div
+          role="dialog"
+          data-uie-name="video-controls-emojis-picker"
+          aria-label={t('callReactionEmojiPickerAriaLabel')}
+          css={styles.picker}
+        >
+          <EmojiPicker emojiStyle={EmojiStyle.NATIVE} onEmojiClick={handlePickerEmojiClick} />
+        </div>
+      ) : (
+        <div
+          role="toolbar"
+          data-uie-name="video-controls-emojis-bar"
+          aria-label={t('callReactionButtonsAriaLabel')}
+          css={styles.emojisBar}
+        >
+          {EMOJIS_LIST.map(emoji => {
+            const isDisabled = disabledEmojis.includes(emoji);
+            return (
+              <button
+                aria-label={t('callReactionButtonAriaLabel', {emoji})}
+                data-uie-name="video-controls-emoji"
+                data-uie-value={emoji}
+                key={emoji}
+                disabled={isDisabled}
+                onClick={() => handleEmojiClick(emoji)}
+                css={styles.button}
+              >
+                {emoji}
+              </button>
+            );
+          })}
           <button
-            aria-label={t('callReactionButtonAriaLabel', {emoji})}
-            data-uie-name="video-controls-emoji"
-            data-uie-value={emoji}
-            key={emoji}
-            disabled={isDisabled}
-            onClick={() => handleEmojiClick(emoji)}
-            css={emojisBarButtonStyles}
-          >
-            {emoji}
-          </button>
-        );
-      })}
+            aria-label={t('callReactionEmojiPickerButtonAriaLabel')}
+            data-uie-name="call-reaction-emoji-picker-button"
+            data-uie-value="open-emoji-picker"
+            className="icon-more font-size-sm"
+            onClick={event => {
+              event.stopPropagation();
+              setShowEmojiPicker(prev => !prev);
+            }}
+            css={styles.button}
+          ></button>
+        </div>
+      )}
     </div>
   );
 };
