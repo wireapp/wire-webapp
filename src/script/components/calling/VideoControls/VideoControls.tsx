@@ -17,19 +17,18 @@
  *
  */
 
-import React, {useRef, useState} from 'react';
+import React, {useState} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import classNames from 'classnames';
 import {container} from 'tsyringe';
 
 import {CALL_TYPE} from '@wireapp/avs';
-import {EmojiIcon, GridIcon, QUERY, RaiseHandIcon, MoreIcon} from '@wireapp/react-ui-kit';
+import {EmojiIcon, GridIcon, MoreIcon, QUERY, RaiseHandIcon} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/Icon';
 import {useActiveWindowMatchMedia} from 'Hooks/useActiveWindowMatchMedia';
-import {useClickOutside} from 'Hooks/useClickOutside';
 import {useUserPropertyValue} from 'Hooks/useUserProperty';
 import {Call} from 'src/script/calling/Call';
 import {CallingViewMode, CallState} from 'src/script/calling/CallState';
@@ -135,9 +134,6 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
 
   const {is1to1: is1to1Conversation} = useKoSubscribableChildren(conversation, ['is1to1']);
 
-  const emojiBarRef = useRef<HTMLDivElement | null>(null);
-  const emojiBarToggleButtonRef = useRef<HTMLButtonElement | null>(null);
-
   const {blurredVideoStream} = useKoSubscribableChildren(selfParticipant, ['blurredVideoStream']);
   const hasBlurredBackground = !!blurredVideoStream;
 
@@ -146,8 +142,6 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
   const [showEmojisBar, setShowEmojisBar] = useState(false);
 
   const {viewMode, detachedWindow} = useKoSubscribableChildren(callState, ['viewMode', 'detachedWindow']);
-
-  useClickOutside(emojiBarRef, () => setShowEmojisBar(false), emojiBarToggleButtonRef, detachedWindow?.document);
 
   const {isVideoCallingEnabled} = useKoSubscribableChildren(teamState, ['isVideoCallingEnabled']);
 
@@ -648,7 +642,13 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
       <div css={moreControlsWrapperStyles}>
         {!isDesktop && (
           <li className="video-controls__item">
-            {showEmojisBar && <EmojisBar onEmojiClick={handleEmojiClick} ref={emojiBarRef} />}
+            {showEmojisBar && (
+              <EmojisBar
+                onEmojiClick={handleEmojiClick}
+                onPickerEmojiClick={() => setShowEmojisBar(false)}
+                detachedWindow={detachedWindow}
+              />
+            )}
             <button
               title={t('callMenuMoreInteractions')}
               className={classNames(
@@ -750,9 +750,14 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
 
             {isInCallReactionsEnable && (
               <li className="video-controls__item">
-                {showEmojisBar && <EmojisBar onEmojiClick={handleEmojiClick} ref={emojiBarRef} />}
+                {showEmojisBar && (
+                  <EmojisBar
+                    onEmojiClick={handleEmojiClick}
+                    onPickerEmojiClick={() => setShowEmojisBar(false)}
+                    detachedWindow={detachedWindow}
+                  />
+                )}
                 <button
-                  ref={emojiBarToggleButtonRef}
                   title={t('callReactions')}
                   className={classNames('video-controls__button_primary', {active: showEmojisBar})}
                   onClick={() => setShowEmojisBar(prev => !prev)}

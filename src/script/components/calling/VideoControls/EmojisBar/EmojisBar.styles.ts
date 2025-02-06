@@ -21,58 +21,133 @@ import {CSSObject} from '@emotion/react';
 
 import {media} from '@wireapp/react-ui-kit';
 
-export const emojisBarWrapperStyles: CSSObject = {
-  position: 'absolute',
-  bottom: '130%',
-  left: '50%',
-  display: 'grid',
-  padding: '0.4rem',
-  borderRadius: '12px',
-  backgroundColor: 'var(--inactive-call-button-bg)',
-  boxShadow: '0px 7px 15px 0 #0000004d',
-  gap: '0.5rem',
-  gridTemplateColumns: 'repeat(3, 1fr)',
-  transform: 'translateX(-50%)',
-
-  [media.tablet]: {
-    transform: 'none',
-    left: 'auto',
-    right: 0,
-  },
-
-  '&::after': {
+export const styles: {
+  emojisBar: CSSObject;
+  button: CSSObject;
+  picker: CSSObject;
+} = {
+  emojisBar: {
     position: 'absolute',
-    bottom: '-0.5rem',
+    bottom: '130%',
     left: '50%',
-    width: 0,
-    height: 0,
-    borderTop: '0.5rem solid var(--inactive-call-button-bg)',
-    borderRight: '0.5rem solid transparent',
-    borderLeft: '0.5rem solid transparent',
-    content: '""',
     transform: 'translateX(-50%)',
+    display: 'grid',
+    gap: '0.5rem',
+    gridTemplateColumns: 'repeat(3, 1fr)',
+    borderRadius: '12px',
+    backgroundColor: 'var(--inactive-call-button-bg)',
+    boxShadow: '0px 7px 15px 0 #0000004d',
+    padding: '0.5rem',
 
     [media.tablet]: {
       transform: 'none',
       left: 'auto',
-      right: '0.625rem',
+      right: 0,
+    },
+
+    '&::after': {
+      position: 'absolute',
+      bottom: '-0.5rem',
+      left: '50%',
+      width: 0,
+      height: 0,
+      borderTop: '0.5rem solid var(--inactive-call-button-bg)',
+      borderRight: '0.5rem solid transparent',
+      borderLeft: '0.5rem solid transparent',
+      content: '""',
+      transform: 'translateX(-50%)',
+
+      [media.tablet]: {
+        transform: 'none',
+        left: 'auto',
+        right: '0.625rem',
+      },
     },
   },
-};
+  button: {
+    backgroundColor: 'transparent',
+    border: 0,
+    padding: '0.5rem',
+    borderRadius: '1rem',
+    fontSize: '1.5rem',
 
-export const emojisBarButtonStyles: CSSObject = {
-  backgroundColor: 'transparent',
-  border: 0,
-  padding: '0.5rem',
-  borderRadius: '1rem',
-  fontSize: '1.5rem',
+    '&:disabled': {
+      cursor: 'not-allowed',
+      opacity: 0.5,
+    },
 
-  '&:disabled': {
-    cursor: 'not-allowed',
-    opacity: 0.5,
+    '&:hover': {
+      backgroundColor: 'var(--inactive-call-button-hover-bg)',
+    },
   },
+  picker: {
+    position: 'absolute',
+    bottom: '130%',
+    right: 0,
+    transform: 'translateX(15%)',
+    borderRadius: '12px',
+    backgroundColor: 'var(--inactive-call-button-bg)',
+    boxShadow: '0px 7px 15px 0 #0000004d',
+    padding: '0.5rem',
 
-  '&:hover': {
-    backgroundColor: 'var(--inactive-call-button-hover-bg)',
+    [media.tablet]: {
+      transform: 'none',
+    },
+
+    [media.mobile]: {
+      transform: 'translateX(26%)',
+    },
+
+    '&::after': {
+      position: 'absolute',
+      bottom: '-0.5rem',
+      right: '18%',
+      width: 0,
+      height: 0,
+      borderTop: '0.5rem solid var(--inactive-call-button-bg)',
+      borderRight: '0.5rem solid transparent',
+      borderLeft: '0.5rem solid transparent',
+      content: '""',
+
+      [media.tablet]: {
+        right: '0.625rem',
+      },
+
+      [media.mobile]: {
+        right: '30%',
+      },
+    },
+
+    '& .EmojiPickerReact': {
+      borderStyle: 'none !important',
+      backgroundColor: 'var(--message-actions-background) !important',
+      boxShadow: 'none',
+
+      'body.theme-dark &': {
+        boxShadow: 'none',
+      },
+    },
+
+    '& .EmojiPickerReact .epr-preview': {
+      borderTop: '1px solid var(--message-actions-border-hover)',
+    },
+
+    '& .EmojiPickerReact li.epr-emoji-category > .epr-emoji-category-label': {
+      backgroundColor: 'var(--message-actions-background)',
+    },
+
+    '& .EmojiPickerReact .epr-search-container input': {
+      'body.theme-dark &': {
+        border: '1px solid var(--gray-70)',
+        borderRadius: '12px',
+        background: 'var(--gray-100)',
+      },
+    },
+
+    '& .EmojiPickerReact button.epr-emoji': {
+      '&:hover > *, &:focus > *, &:focus-visible > *': {
+        backgroundColor: 'var(--message-actions-background-hover)',
+      },
+    },
   },
 };
