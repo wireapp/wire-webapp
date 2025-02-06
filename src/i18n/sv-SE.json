@@ -330,6 +330,8 @@
   "callParticipants": "{number} on call",
   "callReactionButtonAriaLabel": "Välj emoji {emoji}",
   "callReactionButtonsAriaLabel": "Emoji selection bar",
+  "callReactionEmojiPickerAriaLabel": "Emoji picker",
+  "callReactionEmojiPickerButtonAriaLabel": "Open emoji picker",
   "callReactions": "Reaktioner",
   "callReactionsAriaLabel": "Emoji {emoji} from {from}",
   "callStateCbr": "Constant Bit Rate",
