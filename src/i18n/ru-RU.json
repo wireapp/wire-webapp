@@ -330,6 +330,8 @@
   "callParticipants": "{number} участника(-ов)",
   "callReactionButtonAriaLabel": "Выбрать смайлик {emoji}",
   "callReactionButtonsAriaLabel": "Панель выбора смайликов",
+  "callReactionEmojiPickerAriaLabel": "Emoji picker",
+  "callReactionEmojiPickerButtonAriaLabel": "Open emoji picker",
   "callReactions": "Реакции",
   "callReactionsAriaLabel": "Смайлик {emoji} из {from}",
   "callStateCbr": "Постоянный битрейт",

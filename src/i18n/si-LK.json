@@ -330,6 +330,8 @@
   "callParticipants": "ඇමතුමෙහි {number} ක් සිටියි",
   "callReactionButtonAriaLabel": "Select emoji {emoji}",
   "callReactionButtonsAriaLabel": "Emoji selection bar",
+  "callReactionEmojiPickerAriaLabel": "Emoji picker",
+  "callReactionEmojiPickerButtonAriaLabel": "Open emoji picker",
   "callReactions": "Reactions",
   "callReactionsAriaLabel": "Emoji {emoji} from {from}",
   "callStateCbr": "අචල බිටු අනුපාතය",

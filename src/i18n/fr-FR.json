@@ -330,6 +330,8 @@
   "callParticipants": "{number} sur l’appel",
   "callReactionButtonAriaLabel": "Select emoji {emoji}",
   "callReactionButtonsAriaLabel": "Emoji selection bar",
+  "callReactionEmojiPickerAriaLabel": "Emoji picker",
+  "callReactionEmojiPickerButtonAriaLabel": "Open emoji picker",
   "callReactions": "Reactions",
   "callReactionsAriaLabel": "Emoji {emoji} from {from}",
   "callStateCbr": "Débit constant (CBR)",
