@@ -17,16 +17,24 @@
  *
  */
 
-import {categoryStyles, wrapperStyles} from './FileCardType.styles';
+import {formatSeconds} from 'Util/TimeUtil';
 
-import {useFileCardContext} from '../common/FileCardContext/FileCardContext';
+import {currentTimeStyles, durationStyles, wrapperStyles} from './AudioAssetTimer.styles';
 
-export const FileCardType = () => {
-  const {extension, size} = useFileCardContext();
+interface AudioAssetTimerProps {
+  currentTime: number;
+  overallDuration: number;
+}
+
+export const AudioAssetTimer = ({currentTime, overallDuration}: AudioAssetTimerProps) => {
   return (
-    <p css={wrapperStyles}>
-      <span css={categoryStyles}>{extension}</span>
-      {size && ` (${size})`}
-    </p>
+    <div css={wrapperStyles}>
+      <span css={currentTimeStyles} data-uie-name="status-audio-time">
+        {formatSeconds(currentTime === overallDuration ? 0 : currentTime)}
+      </span>
+      <span css={durationStyles} data-uie-name="status-audio-time">
+        {formatSeconds(overallDuration)}
+      </span>
+    </div>
   );
 };

@@ -19,35 +19,30 @@
 
 import {CSSObject} from '@emotion/react';
 
-const wrapperStyles: CSSObject = {
-  backgroundColor: 'var(--app-bg-secondary)',
-  border: '1px solid var(--border-color)',
-  borderRadius: '10px',
-  padding: '8px',
+export const svgStyles: CSSObject = {
   position: 'relative',
+  display: 'flex',
+  width: '100%',
+  height: '32px',
+  cursor: 'pointer',
+
+  path: {
+    fill: 'var(--gray-60)',
+    transition: 'all 0.15s ease',
+
+    '&.active': {
+      fill: 'var(--accent-color)',
+    },
+  },
 
   'body.theme-dark &': {
-    backgroundColor: 'var(--foreground-fade-8)',
-    border: '1px solid transparent',
+    path: {
+      fill: 'var(--foreground)',
+    },
   },
 };
 
-export const wrapperStylesSmall: CSSObject = {
-  ...wrapperStyles,
-  height: '76px',
-  width: '268px',
-};
-
-export const wrapperStylesLarge: CSSObject = {
-  ...wrapperStyles,
-  height: 'auto',
-  width: '500px',
-};
-
-export const contentStyles: CSSObject = {
-  alignItems: 'flex-start',
-  display: 'flex',
-  flexDirection: 'column',
-  minHeight: '60px',
-  justifyContent: 'flex-end',
+export const svgStylesDisabled: CSSObject = {
+  ...svgStyles,
+  pointerEvents: 'none',
 };

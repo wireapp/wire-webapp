@@ -19,35 +19,22 @@
 
 import {CSSObject} from '@emotion/react';
 
-const wrapperStyles: CSSObject = {
+export const wrapperStyles: CSSObject = {
+  width: '100%',
+  maxWidth: '500px',
+  height: '82px',
   backgroundColor: 'var(--app-bg-secondary)',
   border: '1px solid var(--border-color)',
   borderRadius: '10px',
-  padding: '8px',
-  position: 'relative',
-
-  'body.theme-dark &': {
-    backgroundColor: 'var(--foreground-fade-8)',
-    border: '1px solid transparent',
-  },
-};
-
-export const wrapperStylesSmall: CSSObject = {
-  ...wrapperStyles,
-  height: '76px',
-  width: '268px',
-};
-
-export const wrapperStylesLarge: CSSObject = {
-  ...wrapperStyles,
-  height: 'auto',
-  width: '500px',
-};
-
-export const contentStyles: CSSObject = {
-  alignItems: 'flex-start',
+  gap: '8px',
   display: 'flex',
-  flexDirection: 'column',
-  minHeight: '60px',
-  justifyContent: 'flex-end',
+  alignItems: 'center',
+  justifyContent: 'center',
+};
+
+export const messageStyles: CSSObject = {
+  fontSize: 'var(--font-size-small)',
+  color: 'var(--danger-color)',
+  margin: 0,
+  padding: 0,
 };

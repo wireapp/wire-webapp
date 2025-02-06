@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2025 Wire Swiss GmbH
+ * Copyright (C) 2021 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,16 +17,16 @@
  *
  */
 
-import {categoryStyles, wrapperStyles} from './FileCardType.styles';
+import * as Icon from 'Components/Icon';
+import {t} from 'Util/LocalizerUtil';
 
-import {useFileCardContext} from '../common/FileCardContext/FileCardContext';
+import {messageStyles, wrapperStyles} from './AudioAssetRestricted.styles';
 
-export const FileCardType = () => {
-  const {extension, size} = useFileCardContext();
+export const AudioAssetRestricted = () => {
   return (
-    <p css={wrapperStyles}>
-      <span css={categoryStyles}>{extension}</span>
-      {size && ` (${size})`}
-    </p>
+    <article css={wrapperStyles}>
+      <Icon.MicOnIcon width={16} height={16} />
+      <p css={messageStyles}>{t('conversationAudioAssetRestricted')}</p>
+    </article>
   );
 };

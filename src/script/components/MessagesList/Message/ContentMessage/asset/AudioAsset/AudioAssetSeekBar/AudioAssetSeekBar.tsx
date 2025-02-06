@@ -17,16 +17,23 @@
  *
  */
 
-import {categoryStyles, wrapperStyles} from './FileCardType.styles';
+import {FileAsset} from 'src/script/entity/message/FileAsset';
 
-import {useFileCardContext} from '../common/FileCardContext/FileCardContext';
+import {AudioSeekBarNew} from './AudioSeekBarV2/AudioSeekBarV2';
 
-export const FileCardType = () => {
-  const {extension, size} = useFileCardContext();
-  return (
-    <p css={wrapperStyles}>
-      <span css={categoryStyles}>{extension}</span>
-      {size && ` (${size})`}
-    </p>
-  );
+import {SeekBar} from '../../controls/SeekBar';
+
+interface AudioAssetSeekBarProps {
+  audioElement: HTMLMediaElement;
+  asset: FileAsset;
+  loudnessPreview: boolean;
+  disabled?: boolean;
+}
+
+export const AudioAssetSeekBar = ({audioElement, asset, loudnessPreview, disabled}: AudioAssetSeekBarProps) => {
+  if (loudnessPreview) {
+    return <AudioSeekBarNew audioElement={audioElement} asset={asset} disabled={disabled} />;
+  }
+
+  return <SeekBar dark mediaElement={audioElement} data-uie-name="status-audio-seekbar" disabled={disabled} />;
 };
