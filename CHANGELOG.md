@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.36.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.35.0...@wireapp/react-ui-kit@9.36.0) (2025-02-07)
+
+### Features
+
+* **react-ui-kit:** alert icon ([#6881](https://github.com/wireapp/wire-web-packages/issues/6881)) ([8a8987f](https://github.com/wireapp/wire-web-packages/commit/8a8987f60d3a85de47f9643fdf219cb76c056fb1))
+
 # [9.35.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.34.0...@wireapp/react-ui-kit@9.35.0) (2025-02-05)
 
 ### Features
