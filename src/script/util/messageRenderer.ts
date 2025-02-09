@@ -27,7 +27,7 @@ import {replaceInRange} from './StringUtil';
 import type {MentionEntity} from '../message/MentionEntity';
 
 interface MentionText {
-  domain: string | null;
+  domain: string | null | undefined;
   isSelfMentioned: boolean;
   text: string;
   userId: string;
