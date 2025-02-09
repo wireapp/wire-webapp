@@ -4647,10 +4647,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mediapipe/tasks-vision@npm:0.10.20":
-  version: 0.10.20
-  resolution: "@mediapipe/tasks-vision@npm:0.10.20"
-  checksum: 10/429cee0a762940096e917c4d934adf4520e930de80cf4bb38cb074ab275305b452222cb566290d248f225eb4297a9f53cfc3c92d10f8ebfcc675b8e08fcb33fc
+"@mediapipe/tasks-vision@npm:0.10.21":
+  version: 0.10.21
+  resolution: "@mediapipe/tasks-vision@npm:0.10.21"
+  checksum: 10/57c1d7d903e0c03640e411217f551a06a636f1a36a9078070350b90cecb0eea5d7d745b60c7542dc6ec8f6d3f14eb801579e0763a04952a91ec9626f3e45e81e
   languageName: node
   linkType: hard
 
@@ -19126,7 +19126,7 @@ __metadata:
     "@lexical/markdown": "npm:0.24.0"
     "@lexical/react": "npm:0.24.0"
     "@lexical/rich-text": "npm:0.24.0"
-    "@mediapipe/tasks-vision": "npm:0.10.20"
+    "@mediapipe/tasks-vision": "npm:0.10.21"
     "@roamhq/wrtc": "npm:0.8.0"
     "@tanstack/react-virtual": "npm:^3.13.0"
     "@testing-library/dom": "npm:^10.4.0"
