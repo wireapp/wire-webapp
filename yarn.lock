@@ -6379,9 +6379,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/react-ui-kit@npm:9.35.0":
-  version: 9.35.0
-  resolution: "@wireapp/react-ui-kit@npm:9.35.0"
+"@wireapp/react-ui-kit@npm:9.36.0":
+  version: 9.36.0
+  resolution: "@wireapp/react-ui-kit@npm:9.36.0"
   dependencies:
     "@types/color": "npm:3.0.6"
     color: "npm:4.2.3"
@@ -6396,7 +6396,7 @@ __metadata:
   peerDependenciesMeta:
     "@types/react":
       optional: true
-  checksum: 10/4854bec9b1a7ce55a727bb8a9b99d397fea9b678cf506de4bf602934de2174c2215a8ccb18d193b4c1b52a55419f1e89e729778f3ac801dce20b3e29a83b4929
+  checksum: 10/41233d8605d9e2f9ebf774cf62788960ef648eddd4c2148250b7e52e5e16ab09c7aff1aca859857b5272242aa7f9b239af23a8e22fc4857c3831ef3a91818b95
   languageName: node
   linkType: hard
 
@@ -19196,7 +19196,7 @@ __metadata:
     "@wireapp/core": "npm:46.17.0"
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/prettier-config": "npm:0.6.4"
-    "@wireapp/react-ui-kit": "npm:9.35.0"
+    "@wireapp/react-ui-kit": "npm:9.36.0"
     "@wireapp/store-engine": "npm:5.1.11"
     "@wireapp/store-engine-dexie": "npm:2.1.15"
     "@wireapp/telemetry": "npm:0.3.1"
