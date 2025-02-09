@@ -99,9 +99,9 @@ markdownit.renderer.rules.paragraph_open = (tokens, idx) => {
     .find(({map}) => map?.length);
   const previousPosition = previousWithMap ? (previousWithMap.map || [0, 0])[1] - 1 : 0;
   const count = position - previousPosition;
-  return '<br>'.repeat(Math.max(count, 0));
+  return count > 1 ? `${'<br>'.repeat(count - 1)}<p>` : '<p>';
 };
-markdownit.renderer.rules.paragraph_close = () => '';
+markdownit.renderer.rules.paragraph_close = () => '</p>';
 
 const renderMention = (mentionData: MentionText) => {
   const elementClasses = mentionData.isSelfMentioned ? ' self-mention' : '';
