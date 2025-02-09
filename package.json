@@ -10,7 +10,7 @@
     "@lexical/react": "0.24.0",
     "@lexical/rich-text": "0.24.0",
     "@mediapipe/tasks-vision": "0.10.20",
-    "@tanstack/react-virtual": "^3.11.3",
+    "@tanstack/react-virtual": "^3.13.0",
     "@wireapp/avs": "10.0.4",
     "@wireapp/avs-debugger": "0.0.7",
     "@wireapp/commons": "5.4.1",
