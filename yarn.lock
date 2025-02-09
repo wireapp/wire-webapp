@@ -15768,12 +15768,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:*, prettier@npm:3.3.2, prettier@npm:^3":
+"prettier@npm:*, prettier@npm:^3":
   version: 3.3.2
   resolution: "prettier@npm:3.3.2"
   bin:
     prettier: bin/prettier.cjs
   checksum: 10/83214e154afa5aa9b664c2506640212323eb1376b13379b2413dc351b7de0687629dca3f00ff2ec895ebd7e3a2adb7d7e231b6c77606e2358137f2150807405b
+  languageName: node
+  linkType: hard
+
+"prettier@npm:3.5.0":
+  version: 3.5.0
+  resolution: "prettier@npm:3.5.0"
+  bin:
+    prettier: bin/prettier.cjs
+  checksum: 10/fc26c74bd317282f2a49ffe3ac0ffa79adbe6b2d7a1cdcadd96acf7fec77d3fa45b15f3728c1a2f281f4beccb35d97207187452a581d4919d18b460d0c37e480
   languageName: node
   linkType: hard
 
@@ -19260,7 +19269,7 @@ __metadata:
     postcss-loader: "npm:8.1.1"
     postcss-preset-env: "npm:10.1.3"
     postcss-scss: "npm:4.0.9"
-    prettier: "npm:3.3.2"
+    prettier: "npm:3.5.0"
     prism-themes: "npm:^1.9.0"
     prismjs: "npm:^1.29.0"
     raw-loader: "npm:4.0.2"
