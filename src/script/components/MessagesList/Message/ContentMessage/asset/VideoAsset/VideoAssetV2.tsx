@@ -118,6 +118,7 @@ export const VideoAssetV2 = ({message, isFocusable = true, isFileShareRestricted
         <video
           ref={setVideoElement}
           src={url}
+          preload="metadata"
           css={videoStyles}
           playsInline
           onError={handleError}
