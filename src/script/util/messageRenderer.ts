@@ -100,7 +100,6 @@ markdownit.renderer.rules.paragraph_open = (tokens, idx) => {
   const previousPosition = previousWithMap ? (previousWithMap.map || [0, 0])[1] - 1 : 0;
   const count = position - previousPosition;
 
-  // Check if the previous token was a list (either bullet or ordered)
   const previousToken = tokens[idx - 1];
   const isPreviousTokenList =
     previousToken && (previousToken.type === 'bullet_list_close' || previousToken.type === 'ordered_list_close');
