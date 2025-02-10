@@ -28,18 +28,18 @@ import {Button, ButtonVariant, useTimeout} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {RestrictedVideo} from 'Components/asset/RestrictedVideo';
+import {AssetError} from 'src/script/assets/AssetError';
+import {AssetRepository} from 'src/script/assets/AssetRepository';
+import {AssetTransferState} from 'src/script/assets/AssetTransferState';
+import type {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import type {FileAsset as FileAssetType} from 'src/script/entity/message/FileAsset';
+import {TeamState} from 'src/script/team/TeamState';
 import {EventName} from 'src/script/tracking/EventName';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatSeconds} from 'Util/TimeUtil';
 import {useEffectRef} from 'Util/useEffectRef';
 
-import {AssetError} from '../../../../../../assets/AssetError';
-import {AssetRepository} from '../../../../../../assets/AssetRepository';
-import {AssetTransferState} from '../../../../../../assets/AssetTransferState';
-import type {ContentMessage} from '../../../../../../entity/message/ContentMessage';
-import type {FileAsset as FileAssetType} from '../../../../../../entity/message/FileAsset';
-import {TeamState} from '../../../../../../team/TeamState';
 import {MediaButton} from '../controls/MediaButton';
 import {SeekBar} from '../controls/SeekBar';
 import {FileAsset} from '../FileAssetComponent';
