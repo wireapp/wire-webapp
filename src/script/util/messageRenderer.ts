@@ -99,7 +99,16 @@ markdownit.renderer.rules.paragraph_open = (tokens, idx) => {
     .find(({map}) => map?.length);
   const previousPosition = previousWithMap ? (previousWithMap.map || [0, 0])[1] - 1 : 0;
   const count = position - previousPosition;
-  return count > 1 ? `${'<br>'.repeat(count - 1)}` : '';
+
+  // Check if the previous token was a list (either bullet or ordered)
+  const previousToken = tokens[idx - 1];
+  const isPreviousTokenList =
+    previousToken && (previousToken.type === 'bullet_list_close' || previousToken.type === 'ordered_list_close');
+
+  if (isPreviousTokenList) {
+    return count > 1 ? `${'<br>'.repeat(count - 1)}` : '';
+  }
+  return '<br>'.repeat(Math.max(count, 0));
 };
 markdownit.renderer.rules.paragraph_close = () => '';
 
