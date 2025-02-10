@@ -19,22 +19,22 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const wrapperStyles: CSSObject = {
+const overlayStyles: CSSObject = {
   position: 'absolute',
   top: 0,
   left: 0,
   right: 0,
   bottom: 0,
+};
+
+export const wrapperStyles: CSSObject = {
+  ...overlayStyles,
   borderRadius: '10px',
   overflow: 'hidden',
 };
 
 export const controlsWrapperStyles: CSSObject = {
-  position: 'absolute',
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
+  ...overlayStyles,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
