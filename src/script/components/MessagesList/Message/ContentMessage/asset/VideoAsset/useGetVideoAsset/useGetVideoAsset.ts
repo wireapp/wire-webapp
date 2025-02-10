@@ -32,17 +32,17 @@ import {AssetUrl} from '../../useAssetTransfer';
 
 interface UseGetVideoAssetProps {
   asset: FileAsset;
-  enabled: boolean;
+  isEnabled: boolean;
   getAssetUrl: (resource: any) => Promise<AssetUrl>;
 }
 
-export const useGetVideoAsset = ({asset, enabled, getAssetUrl}: UseGetVideoAssetProps) => {
+export const useGetVideoAsset = ({asset, isEnabled, getAssetUrl}: UseGetVideoAssetProps) => {
   const [url, setUrl] = useState('');
   const [isError, setIsError] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
 
   const fetchAssetUrl = useCallback(async () => {
-    if (url || !enabled) {
+    if (url || !isEnabled) {
       return;
     }
 
@@ -64,7 +64,7 @@ export const useGetVideoAsset = ({asset, enabled, getAssetUrl}: UseGetVideoAsset
     }
 
     asset.status(AssetTransferState.UPLOADED);
-  }, [asset, enabled, getAssetUrl, url]);
+  }, [asset, isEnabled, getAssetUrl, url]);
 
   useEffect(() => {
     void fetchAssetUrl();

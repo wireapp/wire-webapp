@@ -61,11 +61,9 @@ export const VideoAssetV2 = ({message, isFocusable = true, isFileShareRestricted
 
   const {transferState, isPendingUpload, uploadProgress, cancelUpload, getAssetUrl} = useAssetTransfer(message);
 
-  const {
-    url,
-    isError: isApiError,
-    isLoaded,
-  } = useGetVideoAsset({asset, enabled: !isFileShareRestricted && isInView, getAssetUrl});
+  const isEnabled = !isFileShareRestricted && isInView;
+
+  const {url, isError: isApiError, isLoaded} = useGetVideoAsset({asset, isEnabled, getAssetUrl});
 
   const {
     isPlaying,
@@ -78,7 +76,7 @@ export const VideoAssetV2 = ({message, isFocusable = true, isFileShareRestricted
   } = useVideoPlayback({
     url,
     videoElement,
-    enabled: !isFileShareRestricted && isInView,
+    isEnabled,
   });
 
   const {name, extension, size, type} = getVideoMetadata({asset});

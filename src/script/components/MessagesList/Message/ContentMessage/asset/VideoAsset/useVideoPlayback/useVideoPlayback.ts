@@ -32,12 +32,12 @@ import {AssetUrl} from '../../useAssetTransfer';
 interface UseVideoPlaybackProps {
   url: string;
   videoElement: HTMLVideoElement | undefined;
-  enabled: boolean;
+  isEnabled: boolean;
 }
 
 type PlayabilityStatus = 'not-checked' | 'playable' | 'unplayable';
 
-export const useVideoPlayback = ({url, videoElement, enabled}: UseVideoPlaybackProps) => {
+export const useVideoPlayback = ({url, videoElement, isEnabled}: UseVideoPlaybackProps) => {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [isError, setIsError] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -71,7 +71,7 @@ export const useVideoPlayback = ({url, videoElement, enabled}: UseVideoPlaybackP
   };
 
   const handlePlay = async (src?: AssetUrl): Promise<void> => {
-    if (!enabled || !src || !videoElement) {
+    if (!isEnabled || !src || !videoElement) {
       return;
     }
 
