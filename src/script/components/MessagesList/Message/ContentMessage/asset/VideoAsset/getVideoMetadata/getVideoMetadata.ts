@@ -20,11 +20,11 @@
 import type {FileAsset as FileAssetType} from 'src/script/entity/message/FileAsset';
 import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 
-interface UseVideoMetadataParams {
+interface GetVideoMetadataParams {
   asset: FileAssetType;
 }
 
-export const useVideoMetadata = ({asset}: UseVideoMetadataParams) => {
+export const getVideoMetadata = ({asset}: GetVideoMetadataParams) => {
   const name = trimFileExtension(asset.file_name);
   const extension = getFileExtension(asset.file_name!);
   const size = formatBytes(asset.file_size);

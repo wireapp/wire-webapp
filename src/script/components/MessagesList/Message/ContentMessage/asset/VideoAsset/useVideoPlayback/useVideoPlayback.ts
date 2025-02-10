@@ -17,15 +17,12 @@
  *
  */
 
-import {useState, useCallback, useEffect, SyntheticEvent, useRef} from 'react';
+import {useState, useCallback, useRef, SyntheticEvent} from 'react';
 
 import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {AssetError} from 'src/script/assets/AssetError';
-import {AssetTransferState} from 'src/script/assets/AssetTransferState';
-import type {FileAsset} from 'src/script/entity/message/FileAsset';
 import {EventName} from 'src/script/tracking/EventName';
 
 import {isVideoPlayable} from './isVideoPlayable/isVideoPlayable';
@@ -33,54 +30,19 @@ import {isVideoPlayable} from './isVideoPlayable/isVideoPlayable';
 import {AssetUrl} from '../../useAssetTransfer';
 
 interface UseVideoPlaybackProps {
-  asset: FileAsset;
+  url: string;
   videoElement: HTMLVideoElement | undefined;
   enabled: boolean;
-  getAssetUrl: (resource: any) => Promise<AssetUrl>;
 }
 
-export const useVideoPlayback = ({asset, videoElement, enabled, getAssetUrl}: UseVideoPlaybackProps) => {
-  const [src, setSrc] = useState<AssetUrl>();
+type PlayabilityStatus = 'not-checked' | 'playable' | 'unplayable';
+
+export const useVideoPlayback = ({url, videoElement, enabled}: UseVideoPlaybackProps) => {
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [isError, setIsError] = useState(false);
-  const [isLoaded, setIsLoaded] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const isPlayedRef = useRef(false);
-
-  const fetchAssetUrl = useCallback(async () => {
-    if (src || !enabled) {
-      return;
-    }
-
-    asset.status(AssetTransferState.DOWNLOADING);
-
-    try {
-      const assetUrl = await getAssetUrl(asset.original_resource());
-      const playable = await isVideoPlayable(assetUrl.url);
-
-      if (!playable) {
-        amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.PLAY_FAILED);
-        amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.UNPLAYABLE_ERROR);
-        setIsError(true);
-        return;
-      }
-
-      setSrc(assetUrl);
-      setIsLoaded(true);
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.PLAY_SUCCESS);
-    } catch (error) {
-      if (error instanceof Error && error.name !== AssetError.CANCEL_ERROR) {
-        setIsError(true);
-      }
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.PLAY_FAILED);
-      console.error('Failed to load video asset ', error);
-    }
-
-    asset.status(AssetTransferState.UPLOADED);
-  }, [asset, enabled, getAssetUrl, src]);
-
-  useEffect(() => {
-    void fetchAssetUrl();
-  }, [fetchAssetUrl]);
+  const playabilityStatusRef = useRef<PlayabilityStatus>('not-checked');
 
   const handleTimeUpdate = useCallback(() => {
     if (!videoElement) {
@@ -89,19 +51,50 @@ export const useVideoPlayback = ({asset, videoElement, enabled, getAssetUrl}: Us
     setCurrentTime(videoElement.currentTime);
   }, [videoElement]);
 
+  const getPlayabilityStatus = async (): Promise<PlayabilityStatus> => {
+    const playable = await isVideoPlayable(url);
+
+    if (!playable) {
+      const status = 'unplayable';
+
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.PLAY_FAILED);
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.UNPLAYABLE_ERROR);
+      setIsError(true);
+      playabilityStatusRef.current = status;
+      return status;
+    }
+
+    const status = 'playable';
+
+    playabilityStatusRef.current = status;
+    return status;
+  };
+
   const handlePlay = async (src?: AssetUrl): Promise<void> => {
-    if (!enabled) {
+    if (!enabled || !src || !videoElement) {
       return;
     }
 
-    if (src && videoElement) {
-      void videoElement.play();
+    if (playabilityStatusRef.current !== 'not-checked') {
+      isPlayedRef.current = true;
+      setIsPlaying(true);
+      await videoElement.play();
+      return;
+    }
+
+    const playabilityStatus = await getPlayabilityStatus();
+
+    if (playabilityStatus === 'unplayable') {
+      return;
     }
 
     isPlayedRef.current = true;
+    setIsPlaying(true);
+    await videoElement.play();
   };
 
   const handlePause = useCallback((): void => {
+    setIsPlaying(false);
     videoElement?.pause();
   }, [videoElement]);
 
@@ -112,10 +105,9 @@ export const useVideoPlayback = ({asset, videoElement, enabled, getAssetUrl}: Us
   }, []);
 
   return {
-    src,
     currentTime,
+    isPlaying,
     isError,
-    isLoaded,
     isPlayedRef,
     handleTimeUpdate,
     handlePlay,

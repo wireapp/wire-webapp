@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode, useEffect, useState} from 'react';
+import {ReactNode, useEffect} from 'react';
 
 import {CloseIcon, PauseIcon, PlayIcon} from '@wireapp/react-ui-kit';
 
@@ -33,6 +33,7 @@ export interface VideoPlayButtonProps {
   onPlay: () => void;
   onCancel?: () => void;
   transferState: AssetTransferState;
+  isPlaying: boolean;
   isFocusable?: boolean;
   isDisabled?: boolean;
   isFullscreen?: boolean;
@@ -44,14 +45,11 @@ export const VideoPlayButton = ({
   onPlay,
   onPause,
   onCancel,
+  isPlaying,
   isFocusable = true,
   isFullscreen = false,
   isDisabled = false,
 }: VideoPlayButtonProps) => {
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const handlePlay = () => setIsPlaying(true);
-  const handlePause = () => setIsPlaying(false);
-
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isFocusable);
 
   const isUploaded = transferState === AssetTransferState.UPLOADED;
@@ -63,14 +61,14 @@ export const VideoPlayButton = ({
       return undefined;
     }
 
-    mediaElement.addEventListener('playing', handlePlay);
-    mediaElement.addEventListener('pause', handlePause);
+    mediaElement.addEventListener('playing', onPlay);
+    mediaElement.addEventListener('pause', onPause);
 
     return () => {
-      mediaElement.removeEventListener('playing', handlePlay);
-      mediaElement.removeEventListener('pause', handlePause);
+      mediaElement.removeEventListener('playing', onPlay);
+      mediaElement.removeEventListener('pause', onPause);
     };
-  }, [mediaElement]);
+  }, [mediaElement, onPlay, onPause]);
 
   if (isUploading || isDownloading) {
     return (

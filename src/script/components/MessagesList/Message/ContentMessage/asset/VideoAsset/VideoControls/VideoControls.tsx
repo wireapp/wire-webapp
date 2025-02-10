@@ -27,6 +27,7 @@ import {VideoPlayButton} from '../common/VideoPlayButton/VideoPlayButton';
 
 interface VideoControlsProps {
   videoElement: HTMLVideoElement;
+  isPlaying: boolean;
   isFocusable: boolean;
   handlePlay: () => void;
   handlePause: () => void;
@@ -35,6 +36,7 @@ interface VideoControlsProps {
 
 export const VideoControls = ({
   videoElement,
+  isPlaying,
   isFocusable,
   handlePlay,
   handlePause,
@@ -48,6 +50,7 @@ export const VideoControls = ({
       <div css={playButtonWrapperStyles}>
         <VideoPlayButton
           mediaElement={videoElement}
+          isPlaying={isPlaying}
           onPlay={handlePlay}
           onPause={handlePause}
           transferState={transferState}

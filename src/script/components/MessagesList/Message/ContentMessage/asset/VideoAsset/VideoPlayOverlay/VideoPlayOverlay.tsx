@@ -24,21 +24,21 @@ import {wrapperStyles} from './VideoPlayOverlay.styles';
 import {VideoPlayButton} from '../common/VideoPlayButton/VideoPlayButton';
 
 interface VideoPlayOverlayProps {
+  isPlaying: boolean;
   videoElement?: HTMLVideoElement;
   handlePlay: () => void;
   handlePause: () => void;
   handleCancelUpload: () => void;
   handleCancelDownload: () => void;
   transferState: AssetTransferState;
-  isUploading: boolean;
   isFocusable: boolean;
 }
 
 export const VideoPlayOverlay = ({
+  isPlaying,
   videoElement,
   handlePlay,
   handlePause,
-  isUploading,
   handleCancelUpload,
   handleCancelDownload,
   transferState,
@@ -47,10 +47,11 @@ export const VideoPlayOverlay = ({
   return (
     <div css={wrapperStyles}>
       <VideoPlayButton
+        isPlaying={isPlaying}
         mediaElement={videoElement}
         onPlay={handlePlay}
         onPause={handlePause}
-        onCancel={isUploading ? handleCancelUpload : handleCancelDownload}
+        onCancel={transferState === AssetTransferState.UPLOADING ? handleCancelUpload : handleCancelDownload}
         transferState={transferState}
         isFocusable={isFocusable}
         isFullscreen

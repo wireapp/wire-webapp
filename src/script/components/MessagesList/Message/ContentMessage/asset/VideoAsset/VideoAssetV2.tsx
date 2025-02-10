@@ -24,8 +24,9 @@ import type {FileAsset as FileAssetType} from 'src/script/entity/message/FileAss
 import {useInView} from 'src/script/hooks/useInView/useInView';
 import {useEffectRef} from 'Util/useEffectRef';
 
+import {getVideoMetadata} from './getVideoMetadata/getVideoMetadata';
 import {isVideoMimeTypeSupported} from './isVideoMimeTypeSupported/isVideoMimeTypeSupported';
-import {useVideoMetadata} from './useVideoMetadata/useVideoMetadata';
+import {useGetVideoAsset} from './useGetVideoAsset/useGetVideoAsset';
 import {useVideoPlayback} from './useVideoPlayback/useVideoPlayback';
 import {VideoAssetCard} from './VideoAssetCard/VideoAssetCard';
 import {VideoAssetError} from './VideoAssetError/VideoAssetError';
@@ -54,21 +55,35 @@ export const VideoAssetV2 = ({message, isFocusable = true, isFileShareRestricted
 
   const [videoElement, setVideoElement] = useEffectRef<HTMLVideoElement>();
 
-  const {elementRef, isInView} = useInView({
+  const {elementRef: wrapperRef, isInView} = useInView({
     rootMargin: VIDEO_ROOT_MARGIN,
   });
 
   const {transferState, isPendingUpload, uploadProgress, cancelUpload, getAssetUrl} = useAssetTransfer(message);
 
-  const {src, isError, isLoaded, isPlayedRef, handlePlay, handlePause, handleError, handleTimeUpdate} =
-    useVideoPlayback({
-      asset,
-      videoElement,
-      enabled: !isFileShareRestricted && isInView,
-      getAssetUrl,
-    });
+  const {
+    url,
+    isError: isApiError,
+    isLoaded,
+  } = useGetVideoAsset({asset, enabled: !isFileShareRestricted && isInView, getAssetUrl});
 
-  const {name, extension, size, type} = useVideoMetadata({asset});
+  const {
+    isPlaying,
+    isPlayedRef,
+    isError: isPlaybackError,
+    handlePlay,
+    handlePause,
+    handleError,
+    handleTimeUpdate,
+  } = useVideoPlayback({
+    url,
+    videoElement,
+    enabled: !isFileShareRestricted && isInView,
+  });
+
+  const {name, extension, size, type} = getVideoMetadata({asset});
+
+  const isError = isApiError || isPlaybackError;
 
   if (!isVideoMimeTypeSupported(type)) {
     return <FileAsset message={message} isFocusable={isFocusable} />;
@@ -77,7 +92,7 @@ export const VideoAssetV2 = ({message, isFocusable = true, isFileShareRestricted
   if (isPendingUpload || !isLoaded) {
     return (
       <VideoAssetCard
-        ref={elementRef}
+        ref={wrapperRef}
         extension={extension}
         name={name}
         size={size}
@@ -91,18 +106,18 @@ export const VideoAssetV2 = ({message, isFocusable = true, isFileShareRestricted
 
   if (isError) {
     return (
-      <VideoAssetCard ref={elementRef} extension={extension} name={name} size={size} isError>
+      <VideoAssetCard ref={wrapperRef} extension={extension} name={name} size={size} isError>
         <VideoAssetError />
       </VideoAssetCard>
     );
   }
 
   return (
-    <VideoAssetCard ref={elementRef} extension={extension} name={name} size={size}>
+    <VideoAssetCard ref={wrapperRef} extension={extension} name={name} size={size}>
       <div css={wrapperStyles}>
         <video
           ref={setVideoElement}
-          src={src?.url}
+          src={url}
           css={videoStyles}
           playsInline
           onError={handleError}
@@ -113,6 +128,7 @@ export const VideoAssetV2 = ({message, isFocusable = true, isFileShareRestricted
         <div css={controlsWrapperStyles}>
           {!isPlayedRef.current && (
             <VideoPlayOverlay
+              isPlaying={isPlaying}
               videoElement={videoElement}
               handlePlay={handlePlay}
               handlePause={handlePause}
@@ -124,6 +140,7 @@ export const VideoAssetV2 = ({message, isFocusable = true, isFileShareRestricted
           )}
           {videoElement && isPlayedRef.current && (
             <VideoControls
+              isPlaying={isPlaying}
               videoElement={videoElement}
               handlePlay={handlePlay}
               handlePause={handlePause}
