@@ -17,23 +17,17 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
-
-export const wrapperStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  height: '32px',
-  width: '32px',
-};
-
-export const playButtonStyles: CSSObject = {
-  width: '32px',
-  height: '32px',
-  borderRadius: '50%',
-  backgroundColor: 'var(--icon-button-primary-enabled-bg)',
-  border: '1px solid var(--icon-button-primary-border)',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  flexShrink: 0,
+export const isVideoPlayable = async (url: string): Promise<boolean> => {
+  const video = document.createElement('video');
+  return new Promise<boolean>(resolve => {
+    video.onloadedmetadata = () => {
+      if (video.videoWidth === 0 || video.videoHeight === 0) {
+        resolve(false);
+        return;
+      }
+      resolve(true);
+    };
+    video.onerror = () => resolve(false);
+    video.src = url;
+  });
 };

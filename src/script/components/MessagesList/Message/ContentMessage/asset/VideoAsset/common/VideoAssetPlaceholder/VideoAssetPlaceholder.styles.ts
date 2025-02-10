@@ -21,19 +21,17 @@ import {CSSObject} from '@emotion/react';
 
 export const wrapperStyles: CSSObject = {
   display: 'flex',
-  alignItems: 'center',
-  height: '32px',
-  width: '32px',
-};
-
-export const playButtonStyles: CSSObject = {
-  width: '32px',
-  height: '32px',
-  borderRadius: '50%',
-  backgroundColor: 'var(--icon-button-primary-enabled-bg)',
-  border: '1px solid var(--icon-button-primary-border)',
-  display: 'flex',
-  alignItems: 'center',
   justifyContent: 'center',
-  flexShrink: 0,
+  alignItems: 'center',
+  width: '100%',
+  backgroundColor: 'var(--foreground-fade-8)',
+  border: '1px solid var(--border-color)',
+  borderRadius: '10px',
+  color: 'var(--gray-70)',
+  aspectRatio: '16/9',
+
+  // Fallback for the above  aspect-ratio
+  '@supports not (aspect-ratio: 16/9)': {
+    paddingBottom: '56.25%',
+  },
 };

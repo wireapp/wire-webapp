@@ -60,7 +60,6 @@ export const AudioAssetCard = ({
       </FileCard.Header>
       <FileCard.Name />
       <FileCard.Content>
-        {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
         <audio ref={getAudioElementRef} src={src} onTimeUpdate={onTimeUpdate} />
         <div css={contentStyles}>{children}</div>
       </FileCard.Content>

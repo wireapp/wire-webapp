@@ -48,6 +48,7 @@ module.exports = {
     'prefer-promise-reject-errors': 'off',
     'valid-jsdoc': 'off',
     'jest/no-jasmine-globals': 'off',
+    'jsx-a11y/media-has-caption': 'off',
   },
   settings: {
     'import/resolver': {

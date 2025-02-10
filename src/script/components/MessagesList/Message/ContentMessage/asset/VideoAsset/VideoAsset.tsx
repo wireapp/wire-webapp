@@ -34,17 +34,16 @@ import {t} from 'Util/LocalizerUtil';
 import {formatSeconds} from 'Util/TimeUtil';
 import {useEffectRef} from 'Util/useEffectRef';
 
-import {MediaButton} from './controls/MediaButton';
-import {SeekBar} from './controls/SeekBar';
-import {FileAsset} from './FileAssetComponent';
-import {AssetUrl, useAssetTransfer} from './useAssetTransfer';
-
-import {AssetError} from '../../../../../assets/AssetError';
-import {AssetRepository} from '../../../../../assets/AssetRepository';
-import {AssetTransferState} from '../../../../../assets/AssetTransferState';
-import type {ContentMessage} from '../../../../../entity/message/ContentMessage';
-import type {FileAsset as FileAssetType} from '../../../../../entity/message/FileAsset';
-import {TeamState} from '../../../../../team/TeamState';
+import {AssetError} from '../../../../../../assets/AssetError';
+import {AssetRepository} from '../../../../../../assets/AssetRepository';
+import {AssetTransferState} from '../../../../../../assets/AssetTransferState';
+import type {ContentMessage} from '../../../../../../entity/message/ContentMessage';
+import type {FileAsset as FileAssetType} from '../../../../../../entity/message/FileAsset';
+import {TeamState} from '../../../../../../team/TeamState';
+import {MediaButton} from '../controls/MediaButton';
+import {SeekBar} from '../controls/SeekBar';
+import {FileAsset} from '../FileAssetComponent';
+import {AssetUrl, useAssetTransfer} from '../useAssetTransfer';
 
 interface VideoAssetProps {
   assetRepository?: AssetRepository;

@@ -36,7 +36,7 @@ import {LinkPreviewAsset} from './LinkPreviewAssetComponent';
 import {LocationAsset} from './LocationAsset';
 import {MessageButton} from './MessageButton';
 import {TextMessageRenderer} from './TextMessageRenderer';
-import {VideoAsset} from './VideoAsset';
+import {VideoAssetV2} from './VideoAsset/VideoAssetV2';
 
 import {MessageActions} from '../..';
 import {AssetType} from '../../../../../assets/AssetType';
@@ -68,6 +68,7 @@ const ContentAsset = ({
   isMessageFocused,
   is1to1Conversation,
   onClickDetails,
+  isFileShareRestricted,
 }: ContentAssetProps) => {
   const {isObfuscated, status} = useKoSubscribableChildren(message, ['isObfuscated', 'status']);
   const {previews} = useKoSubscribableChildren(asset as Text, ['previews']);
@@ -119,7 +120,13 @@ const ContentAsset = ({
       }
 
       if ((asset as FileAssetType).isVideo()) {
-        return <VideoAsset message={message} isFocusable={isMessageFocused} />;
+        return (
+          <VideoAssetV2
+            message={message}
+            isFocusable={isMessageFocused}
+            isFileShareRestricted={isFileShareRestricted}
+          />
+        );
       }
 
     case AssetType.IMAGE:

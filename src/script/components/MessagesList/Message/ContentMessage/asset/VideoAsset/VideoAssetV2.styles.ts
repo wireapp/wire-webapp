@@ -20,20 +20,28 @@
 import {CSSObject} from '@emotion/react';
 
 export const wrapperStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  height: '32px',
-  width: '32px',
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  borderRadius: '10px',
+  overflow: 'hidden',
 };
 
-export const playButtonStyles: CSSObject = {
-  width: '32px',
-  height: '32px',
-  borderRadius: '50%',
-  backgroundColor: 'var(--icon-button-primary-enabled-bg)',
-  border: '1px solid var(--icon-button-primary-border)',
+export const controlsWrapperStyles: CSSObject = {
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  flexShrink: 0,
+};
+
+export const videoStyles: CSSObject = {
+  backgroundColor: 'var(--black)',
+  width: '100%',
+  height: '100%',
 };
