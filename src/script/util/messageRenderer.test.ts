@@ -164,7 +164,7 @@ describe('renderMessage', () => {
   });
 
   it('renders text with more than one newline in between', () => {
-    expect(renderMessage('Hello,\n\n\n\n\n\n\nworld!')).toBe('Hello,<br><br><br><br><br><br>world!');
+    expect(renderMessage('Hello,\n\n\n\n\n\n\nworld!')).toBe('Hello,<br><br><br><br><br><br><br>world!');
   });
 
   it('does not render URLs within <code> tags', () => {
