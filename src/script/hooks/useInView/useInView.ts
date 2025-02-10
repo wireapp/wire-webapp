@@ -35,7 +35,7 @@ export const useInView = <Element extends HTMLElement = HTMLDivElement>(options:
   useEffect(() => {
     const element = elementRef.current;
     if (!element) {
-      return;
+      return undefined;
     }
 
     const observer = new IntersectionObserver(([entry]) => {
