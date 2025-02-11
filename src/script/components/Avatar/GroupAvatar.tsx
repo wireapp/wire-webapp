@@ -46,10 +46,12 @@ export const GroupAvatar: React.FC<GroupAvatarProps> = ({className}) => {
           flexWrap: 'wrap',
           margin: 1,
           overflow: 'hidden',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
         data-uie-name="group-avatar-box-wrapper"
       >
-        <GroupIcon css={{margin: 'auto'}} />
+        <GroupIcon />
       </div>
     </div>
   );
