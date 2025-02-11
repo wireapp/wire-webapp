@@ -22,19 +22,31 @@ import {act, renderHook} from '@testing-library/react';
 import {useInView} from './useInView';
 
 describe('useInView', () => {
-  const mockIntersectionObserver = jest.fn();
+  let mockObserve: jest.Mock;
+  let mockDisconnect: jest.Mock;
   let observerCallback: (entries: IntersectionObserverEntry[]) => void;
 
   beforeEach(() => {
-    mockIntersectionObserver.mockImplementation((callback: (entries: IntersectionObserverEntry[]) => void) => {
+    mockObserve = jest.fn();
+    mockDisconnect = jest.fn();
+    observerCallback = () => {};
+
+    window.IntersectionObserver = jest.fn((callback, options) => {
       observerCallback = callback;
       return {
-        observe: jest.fn(),
-        disconnect: jest.fn(),
+        observe: mockObserve,
+        disconnect: mockDisconnect,
+        unobserve: jest.fn(),
+        takeRecords: jest.fn(),
+        root: options?.root ?? null,
+        rootMargin: options?.rootMargin ?? '0px',
+        thresholds: Array.isArray(options?.threshold) ? options.threshold : [options?.threshold ?? 0],
       };
-    });
+    }) as unknown as typeof window.IntersectionObserver;
+  });
 
-    window.IntersectionObserver = mockIntersectionObserver;
+  afterEach(() => {
+    jest.resetAllMocks();
   });
 
   it('initializes with element not in view', () => {
@@ -45,56 +57,57 @@ describe('useInView', () => {
   });
 
   it('updates isInView state when intersection changes', () => {
-    const {result} = renderHook(() => useInView());
+    const {result, rerender} = renderHook(() => useInView());
+
+    act(() => {
+      result.current.elementRef.current = document.createElement('div');
+      rerender();
+    });
+
+    expect(mockObserve).toHaveBeenCalledWith(result.current.elementRef.current);
 
     act(() => {
       observerCallback([{isIntersecting: true} as IntersectionObserverEntry]);
     });
 
-    const {isInView} = result.current;
-    expect(isInView).toBe(true);
-  });
-
-  it('creates IntersectionObserver with provided options', () => {
-    const options = {
-      root: document.createElement('div'),
-      rootMargin: '10px',
-      threshold: 0.5,
-    };
-
-    renderHook(() => useInView(options));
-
-    expect(mockIntersectionObserver).toHaveBeenCalledWith(expect.any(Function), options);
+    expect(result.current.isInView).toBe(true);
   });
 
   it('disconnects observer on unmount', () => {
-    const disconnect = jest.fn();
-    mockIntersectionObserver.mockImplementation(() => ({
-      observe: jest.fn(),
-      disconnect,
-    }));
+    const {result, rerender, unmount} = renderHook(() => useInView());
 
-    const {unmount} = renderHook(() => useInView());
+    act(() => {
+      result.current.elementRef.current = document.createElement('div');
+      rerender();
+    });
+
+    expect(mockObserve).toHaveBeenCalled();
+
     unmount();
 
-    expect(disconnect).toHaveBeenCalled();
+    expect(mockDisconnect).toHaveBeenCalled();
   });
 
   it('respects rootMargin option when determining visibility', () => {
-    const {result} = renderHook(() =>
+    const {result, rerender} = renderHook(() =>
       useInView({
         rootMargin: '50px',
       }),
     );
 
     act(() => {
-      // Simulate an element that would be just outside the viewport
-      // but within the rootMargin area
+      result.current.elementRef.current = document.createElement('div');
+      rerender();
+    });
+
+    expect(mockObserve).toHaveBeenCalled();
+
+    act(() => {
       observerCallback([
         {
           isIntersecting: true,
           boundingClientRect: {
-            top: -45, // element is 45px above viewport
+            top: -45,
             bottom: 0,
             left: 0,
             right: 0,
@@ -103,7 +116,21 @@ describe('useInView', () => {
       ]);
     });
 
-    const {isInView} = result.current;
-    expect(isInView).toBe(true);
+    expect(result.current.isInView).toBe(true);
+  });
+
+  it('handles configuration options', () => {
+    const threshold = 0.5;
+    const {result, rerender} = renderHook(() => useInView({threshold}));
+
+    act(() => {
+      result.current.elementRef.current = document.createElement('div');
+      rerender();
+    });
+
+    expect(window.IntersectionObserver).toHaveBeenCalledWith(
+      expect.any(Function),
+      expect.objectContaining({threshold}),
+    );
   });
 });
