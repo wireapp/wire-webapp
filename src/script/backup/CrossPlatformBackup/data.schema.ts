@@ -25,7 +25,7 @@ const ConversationSchema = zod.object({
   accessRoleV2: zod.string().optional(),
   archived_state: zod.boolean(),
   archived_timestamp: zod.number(),
-  cipher_suite: zod.number().optional(),
+  cipher_suite: zod.string().optional(),
   creator: zod.string(),
   domain: zod.string(),
   group_id: zod.string().optional(),
