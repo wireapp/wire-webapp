@@ -28,4 +28,9 @@ export const textStyles: CSSObject = {
   WebkitLineClamp: 'var(--truncate-after-lines)',
   WebkitBoxOrient: 'vertical',
   overflow: 'hidden',
+  marginTop: '4px',
+
+  '[data-file-card="header"] &': {
+    marginTop: '0',
+  },
 };

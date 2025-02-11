@@ -38,7 +38,7 @@ interface FileCardOptions {
   /** Formatted file size
    * @example '1.2 MB'
    */
-  size: string;
+  size?: string;
 }
 
 interface FileCardRootProps extends Pick<FileCardOptions, 'variant'> {

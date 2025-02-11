@@ -21,7 +21,7 @@ import {CSSObject} from '@emotion/react';
 
 export const wrapperStyles: CSSObject = {
   alignItems: 'center',
-  color: 'var(--gray-70)',
+  color: 'var(--foreground)',
   display: 'flex',
   fontSize: 'var(--font-size-small)',
   height: '16px',

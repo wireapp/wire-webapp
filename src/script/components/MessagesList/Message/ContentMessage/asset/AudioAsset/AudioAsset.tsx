@@ -22,23 +22,23 @@ import React, {useEffect, useState} from 'react';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {RestrictedAudio} from 'Components/asset/RestrictedAudio';
 import * as Icon from 'Components/Icon';
+import {AssetTransferState} from 'src/script/assets/AssetTransferState';
+import type {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import type {FileAsset} from 'src/script/entity/message/FileAsset';
+import {TeamState} from 'src/script/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getLogger} from 'Util/Logger';
 import {formatSeconds} from 'Util/TimeUtil';
 import {useEffectRef} from 'Util/useEffectRef';
 
-import {AssetHeader} from './AssetHeader';
-import {AudioSeekBar} from './controls/AudioSeekBar';
-import {MediaButton} from './controls/MediaButton';
-import {SeekBar} from './controls/SeekBar';
-import {AssetUrl, useAssetTransfer} from './useAssetTransfer';
+import {RestrictedAudio} from './RestrictedAudio/RestrictedAudio';
 
-import {AssetTransferState} from '../../../../../assets/AssetTransferState';
-import type {ContentMessage} from '../../../../../entity/message/ContentMessage';
-import type {FileAsset} from '../../../../../entity/message/FileAsset';
-import {TeamState} from '../../../../../team/TeamState';
+import {AssetHeader} from '../AssetHeader';
+import {AudioSeekBar} from '../controls/AudioSeekBar';
+import {MediaButton} from '../controls/MediaButton';
+import {SeekBar} from '../controls/SeekBar';
+import {AssetUrl, useAssetTransfer} from '../useAssetTransfer';
 
 const logger = getLogger('AudioAssetComponent');
 
