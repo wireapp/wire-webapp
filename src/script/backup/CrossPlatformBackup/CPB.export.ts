@@ -37,7 +37,6 @@ import {
   UserTableEntrySchema,
 } from './data.schema';
 
-import {CancelError} from '../Error';
 import {preprocessConversations, preprocessUsers, preprocessEvents} from '../recordPreprocessors';
 
 import {CPBLogger, exportTable, isAssetAddEvent, isMessageAddEvent, isSupportedEventType} from '.';
@@ -58,17 +57,9 @@ export const exportCPBHistoryFromDatabase = async ({
   backupService,
   progressCallback,
   user,
-  checkCancelStatus,
 }: ExportHistoryFromDatabaseParams): Promise<Int8Array> => {
   const [conversationTable, eventsTable, usersTable] = backupService.getTables();
   const backupExporter = new CPBackupExporter(new BackupQualifiedId(user.id, user.domain));
-
-  const checkIfCancelled = () => {
-    if (checkCancelStatus()) {
-      throw new CancelError();
-    }
-  };
-
   function streamProgress<T>(dataProcessor: (data: T[]) => T[]) {
     return (data: T[]) => {
       progressCallback(data.length);
@@ -82,17 +73,13 @@ export const exportCPBHistoryFromDatabase = async ({
     table: conversationTable,
     preprocessor: streamProgress(preprocessConversations),
   });
-  conversationRecords.forEach((record, index) => {
+  conversationRecords.forEach(record => {
     const {success, data, error} = ConversationTableEntrySchema.safeParse(record);
 
     if (success) {
       backupExporter.addConversation(new BackUpConversation(new BackupQualifiedId(data.id, data.domain), data.name));
     } else {
       CPBLogger.error('Conversation data schema validation failed', error);
-    }
-
-    if (index % 10 === 0) {
-      checkIfCancelled();
     }
   });
   // ------------------------------
@@ -103,7 +90,7 @@ export const exportCPBHistoryFromDatabase = async ({
     table: usersTable,
     preprocessor: streamProgress(preprocessUsers),
   });
-  userRecords.forEach((record, index) => {
+  userRecords.forEach(record => {
     const {success, data, error} = UserTableEntrySchema.safeParse(record);
 
     if (success) {
@@ -117,10 +104,6 @@ export const exportCPBHistoryFromDatabase = async ({
     } else {
       CPBLogger.error('User data schema validation failed', error);
     }
-
-    if (index % 10 === 0) {
-      checkIfCancelled();
-    }
   });
   // ------------------------------
 
@@ -131,7 +114,7 @@ export const exportCPBHistoryFromDatabase = async ({
     preprocessor: streamProgress(preprocessEvents),
   });
 
-  eventRecords.forEach((record, index) => {
+  eventRecords.forEach(record => {
     const {success, data: eventData, error} = EventTableEntrySchema.safeParse(record);
     if (success) {
       const {type} = eventData;
@@ -200,10 +183,6 @@ export const exportCPBHistoryFromDatabase = async ({
       }
     } else {
       CPBLogger.error('Event data schema validation failed', error);
-    }
-
-    if (index % 100 === 0) {
-      checkIfCancelled();
     }
   });
 

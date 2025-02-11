@@ -22,7 +22,7 @@ import {getLogger} from 'Util/Logger';
 import {ProgressCallback, FileData, Filename, FileDescriptor, Metadata} from './Backup.types';
 import {BackupService} from './BackupService';
 import {exportTable} from './CrossPlatformBackup';
-import {CancelError, DifferentAccountError, IncompatiblePlatformError, InvalidMetaDataError} from './Error';
+import {DifferentAccountError, IncompatiblePlatformError, InvalidMetaDataError} from './Error';
 import {preprocessConversations, preprocessEvents, preprocessUsers} from './recordPreprocessors';
 
 import {User} from '../entity/User';
@@ -109,19 +109,9 @@ export const importLegacyBackupToDatabase = async ({
   return {archiveVersion, fileDescriptors};
 };
 
-export const exportHistory = async (
-  progressCallback: ProgressCallback,
-  backupService: BackupService,
-  checkCancelStatus: () => boolean,
-) => {
+export const exportHistory = async (progressCallback: ProgressCallback, backupService: BackupService) => {
   const [conversationTable, eventsTable, usersTable] = backupService.getTables();
   const tableData: Record<string, any[]> = {};
-
-  const checkIfCancelled = () => {
-    if (checkCancelStatus()) {
-      throw new CancelError();
-    }
-  };
 
   function streamProgress<T>(dataProcessor: (data: T[]) => T[]) {
     return (data: T[]) => {
@@ -129,7 +119,6 @@ export const exportHistory = async (
       return dataProcessor(data);
     };
   }
-  checkIfCancelled();
 
   const conversationsData = await exportTable({
     table: conversationTable,
@@ -137,7 +126,6 @@ export const exportHistory = async (
     backupService,
   });
   tableData[StorageSchemata.OBJECT_STORE.CONVERSATIONS] = conversationsData;
-  checkIfCancelled();
 
   const eventsData = await exportTable({
     table: eventsTable,
@@ -145,7 +133,6 @@ export const exportHistory = async (
     backupService,
   });
   tableData[StorageSchemata.OBJECT_STORE.EVENTS] = eventsData;
-  checkIfCancelled();
 
   const usersData = await exportTable({
     table: usersTable,
@@ -153,7 +140,6 @@ export const exportHistory = async (
     backupService,
   });
   tableData[StorageSchemata.OBJECT_STORE.USERS] = usersData;
-  checkIfCancelled();
 
   return tableData;
 };
