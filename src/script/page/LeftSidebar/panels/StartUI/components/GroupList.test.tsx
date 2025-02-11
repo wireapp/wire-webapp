@@ -21,6 +21,7 @@ import {fireEvent, render} from '@testing-library/react';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 
+import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {noop} from 'Util/util';
 import {createUuid} from 'Util/uuid';
 
@@ -70,7 +71,7 @@ describe('GroupList', () => {
       groups,
     };
 
-    const {container} = render(<GroupList {...props} />);
+    const {container} = render(withTheme(<GroupList {...props} />));
 
     expect(getGroupItemById(container, groups[0].id)).not.toBeNull();
     expect(getGroupItemById(container, groups[1].id)).not.toBeNull();
@@ -85,7 +86,7 @@ describe('GroupList', () => {
       groups,
     };
 
-    const {container} = render(<GroupList {...props} />);
+    const {container} = render(withTheme(<GroupList {...props} />));
 
     const itemGroup1 = getGroupItemById(container, groups[0].id);
     fireEvent.click(itemGroup1!);
