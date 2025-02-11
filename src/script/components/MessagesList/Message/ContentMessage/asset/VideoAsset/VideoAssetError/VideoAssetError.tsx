@@ -19,6 +19,8 @@
 
 import {AlertIcon} from '@wireapp/react-ui-kit';
 
+import {t} from 'Util/LocalizerUtil';
+
 import {wrapperStyles, iconStyles, textStyles} from './VideoAssetError.styles';
 
 import {VideoAssetPlaceholder} from '../common/VideoAssetPlaceholder/VideoAssetPlaceholder';
@@ -28,7 +30,7 @@ export const VideoAssetError = () => {
     <VideoAssetPlaceholder>
       <div css={wrapperStyles}>
         <AlertIcon css={iconStyles} />
-        <p css={textStyles}>Couldn’t generate preview</p>
+        <p css={textStyles}>{t('conversationVideoAssetError')}</p>
       </div>
     </VideoAssetPlaceholder>
   );
