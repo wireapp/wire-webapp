@@ -121,12 +121,13 @@ const mapAssetMessageToEventRecord = (message: AssetBackupMessage): EventRecord 
  * @returns EventRecord or undefined
  */
 export const mapEventRecord = (message: BackupMessage): EventRecord | undefined => {
-  if (isAssetContent(message.content)) {
-    return mapAssetMessageToEventRecord(message as AssetBackupMessage);
-  }
-
   if (isTextContent(message.content)) {
     return mapTextMessageToEventRecord(message as TextBackupMessage);
+  }
+
+  if (isAssetContent(message.content)) {
+    CPBLogger.log('Asset message', message);
+    return mapAssetMessageToEventRecord(message as AssetBackupMessage);
   }
 
   CPBLogger.error('Unknown message type', message);

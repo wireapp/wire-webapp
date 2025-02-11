@@ -21,20 +21,6 @@ import {UserRecord} from 'src/script/storage';
 
 import {BackupUser} from '../CPB.library';
 
-export const mapUserRecord = ({id: qualifiedId, name, handle}: BackupUser): UserRecord | null => {
-  if (!qualifiedId || !name || !handle) {
-    return null;
-  }
-  // We dont get all the "required" fields from the backup, so we need to outsmart the type system.
-  // ToDO: Fix the backup to include all required fields or check if we can make them optional without breaking anything.
-  const userRecord: UserRecord = {
-    id: qualifiedId.id.toString(),
-    name: name.toString(),
-    handle: handle.toString(),
-    qualified_id: {
-      domain: qualifiedId.domain.toString(),
-      id: qualifiedId.id.toString(),
-    },
-  } as UserRecord;
-  return userRecord;
+export const mapUserRecord = ({id, name, handle}: BackupUser): UserRecord | null => {
+  return null;
 };

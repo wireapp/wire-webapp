@@ -55,7 +55,7 @@ const hasNameProperty = (infoObject: unknown): infoObject is {name: string} =>
   isObject(infoObject) && 'name' in infoObject;
 const isImageAsset = (contentType: string, infoObject: unknown): infoObject is ImageAsset =>
   AssetContentType.isImage(contentType) &&
-  isObject(infoObject) &&
+  hasNameProperty(infoObject) &&
   'height' in infoObject &&
   'width' in infoObject &&
   'tag' in infoObject;

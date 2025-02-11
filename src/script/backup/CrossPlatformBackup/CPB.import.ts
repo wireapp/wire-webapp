@@ -19,10 +19,9 @@
 
 import {CPBackup, CPBackupImporter, BackupImportResult} from './CPB.library';
 import {ImportHistoryToDatabaseParams} from './CPB.types';
-import {mapConversationRecord, mapUserRecord} from './importMappers';
 import {mapEventRecord} from './importMappers/mapEventRecord';
 
-import {ConversationRecord, EventRecord, UserRecord} from '../../storage';
+import {EventRecord} from '../../storage';
 import {FileDescriptor, Filename} from '../Backup.types';
 import {IncompatibleBackupError} from '../Error';
 
@@ -45,7 +44,7 @@ export const importCPBHistoryToDatabase = async ({
   const result = backupImporter.importBackup(new Int8Array(backupRawData.buffer));
 
   if (result instanceof BackupImportResult.Success) {
-    // import events
+    CPBLogger.log(`SUCCESSFUL BACKUP IMPORT: ${result.backupData}`);
     const eventRecords: EventRecord[] = [];
     result.backupData.messages.forEach(message => {
       const eventRecord = mapEventRecord(message);
@@ -53,30 +52,15 @@ export const importCPBHistoryToDatabase = async ({
         eventRecords.push(eventRecord);
       }
     });
-    FileDescriptor.push({entities: eventRecords, filename: Filename.EVENTS});
-    CPBLogger.log(`IMPORTED ${eventRecords.length} EVENTS`);
-
-    // import conversations
-    const conversationRecords: ConversationRecord[] = [];
     result.backupData.conversations.forEach(conversation => {
-      const conversationRecord = mapConversationRecord(conversation);
-      if (conversationRecord) {
-        conversationRecords.push(conversationRecord);
-      }
+      // TODO: Import conversations
     });
-    FileDescriptor.push({entities: conversationRecords, filename: Filename.CONVERSATIONS});
-    CPBLogger.log(`IMPORTED ${conversationRecords.length} CONVERSATIONS`);
-
-    // import users
-    const userRecords: UserRecord[] = [];
     result.backupData.users.forEach(user => {
-      const userRecord = mapUserRecord(user);
-      if (userRecord) {
-        userRecords.push(userRecord);
-      }
+      // TODO: Import users
     });
-    FileDescriptor.push({entities: userRecords, filename: Filename.USERS});
-    CPBLogger.log(`IMPORTED ${userRecords.length} USERS`);
+
+    CPBLogger.log(`IMPORTED ${eventRecords.length} EVENTS`);
+    FileDescriptor.push({entities: eventRecords, filename: Filename.EVENTS});
   } else {
     CPBLogger.log(`ERROR DURING BACKUP IMPORT: ${result}`);
     throw new IncompatibleBackupError('Incompatible cross-platform backup');
