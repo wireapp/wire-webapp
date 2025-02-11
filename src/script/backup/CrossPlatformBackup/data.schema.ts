@@ -92,7 +92,7 @@ export const EventTableEntrySchema = zod.object({
 export type EventTableEntry = zod.infer<typeof EventTableEntrySchema>;
 
 export const AssetContentSchema = zod.object({
-  content_length: zod.string().or(zod.number()),
+  content_length: zod.string(),
   content_type: zod.string(),
   domain: zod.string().optional(),
   info: zod.any(),

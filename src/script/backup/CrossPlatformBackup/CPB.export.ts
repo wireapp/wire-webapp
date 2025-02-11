@@ -159,7 +159,7 @@ export const exportCPBHistoryFromDatabase = async ({
 
         const asset = new BackupMessageContent.Asset(
           assetParseData.content_type,
-          Number.parseInt(`${assetParseData.content_length}`),
+          Number.parseInt(assetParseData.content_length),
           assetParseData.info.name,
           transformObjectToArray(assetParseData.otr_key),
           transformObjectToArray(assetParseData.sha256),
