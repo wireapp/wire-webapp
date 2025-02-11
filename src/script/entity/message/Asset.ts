@@ -60,7 +60,7 @@ export class Asset {
   }
 
   isFile(): this is FileAsset {
-    return this.type === AssetType.FILE && !this.isVideo() && !this.isAudio();
+    return this.type === AssetType.FILE && !this.isVideo() && !this.isAudio() && !this.isPdf();
   }
 
   isLocation(): this is LocationAsset {
@@ -84,5 +84,9 @@ export class Asset {
 
   isButton(): boolean {
     return this.type === AssetType.BUTTON;
+  }
+
+  isPdf(): boolean {
+    return this.type === AssetType.FILE && !!this.file_type?.startsWith('application/pdf');
   }
 }
