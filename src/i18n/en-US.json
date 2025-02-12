@@ -549,6 +549,7 @@
   "conversationNotFoundTitle": "{brandName} can’t open this conversation.",
   "conversationParticipantsSearchPlaceholder": "Search by name",
   "conversationParticipantsTitle": "People",
+  "conversationPdfAssetError": "Couldn’t generate preview",
   "conversationPing": " pinged",
   "conversationPingConfirmTitle": "Are you sure you want to ping {memberCount} people?",
   "conversationPingYou": " pinged",

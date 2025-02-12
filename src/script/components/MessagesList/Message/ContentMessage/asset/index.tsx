@@ -35,7 +35,7 @@ import {ImageAsset} from './ImageAsset';
 import {LinkPreviewAsset} from './LinkPreviewAssetComponent';
 import {LocationAsset} from './LocationAsset';
 import {MessageButton} from './MessageButton';
-import {PdfFileAsset} from './PdfFileAsset/PdfFileAsset';
+import {PdfFileAsset} from './PdfAsset/PdfFileAsset';
 import {TextMessageRenderer} from './TextMessageRenderer';
 import {VideoAsset} from './VideoAsset';
 

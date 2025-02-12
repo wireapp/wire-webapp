@@ -17,18 +17,9 @@
  *
  */
 
-import {wrapperStyles} from './PdfFilePlaceholder.styles';
+import {CSSObject} from '@emotion/react';
 
-interface PdfFilePlaceholderProps {
-  variant: 'loading' | 'error' | 'restricted';
-}
-
-export const PdfFilePlaceholder = ({variant}: PdfFilePlaceholderProps) => {
-  return (
-    <div css={wrapperStyles}>
-      {variant === 'loading' && <div className="loading-dots" />}
-      {variant === 'error' && <span>Error loading PDF</span>}
-      {variant === 'restricted' && <span>PDF preview is restricted</span>}
-    </div>
-  );
+export const documentStyles: CSSObject = {
+  pointerEvents: 'none',
+  userSelect: 'none',
 };

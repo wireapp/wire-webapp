@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2024 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,20 +19,18 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const contentWrapperStyles: CSSObject = {
+export const wrapperStyles: CSSObject = {
   display: 'flex',
-  justifyContent: 'center',
   alignItems: 'center',
-  width: '100%',
-  backgroundColor: 'var(--foreground-fade-8)',
-  border: '1px solid var(--border-color)',
-  borderRadius: '10px',
-  color: 'var(--gray-70)',
-  aspectRatio: '16/9',
-  overflowY: 'auto',
+  gap: '16px',
+};
 
-  // Fallback for the above aspect-ratio
-  '@supports not (aspect-ratio: 16/9)': {
-    paddingBottom: '56.25%',
-  },
+export const iconStyles: CSSObject = {
+  fill: 'var(--gray-70)',
+};
+
+export const textStyles: CSSObject = {
+  color: 'var(--main-color)',
+  fontSize: 'var(--font-size-medium)',
+  fontWeight: 'var(--font-weight-regular)',
 };

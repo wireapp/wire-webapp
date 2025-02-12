@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2024 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,21 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {AlertIcon} from '@wireapp/react-ui-kit';
 
-export const wrapperStyles: CSSObject = {
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  width: '100%',
-  height: '100%',
-  backgroundColor: 'var(--foreground-fade-8)',
-  color: 'var(--gray-70)',
+import {t} from 'Util/LocalizerUtil';
+
+import {wrapperStyles, iconStyles, textStyles} from './PdfAssetError.styles';
+
+import {PdfAssetPlaceholder} from '../common/PdfAssetPlaceholder/PdfAssetPlaceholder';
+
+export const PdfAssetError = () => {
+  return (
+    <PdfAssetPlaceholder>
+      <div css={wrapperStyles}>
+        <AlertIcon css={iconStyles} />
+        <p css={textStyles}>{t('conversationPdfAssetError')}</p>
+      </div>
+    </PdfAssetPlaceholder>
+  );
 };

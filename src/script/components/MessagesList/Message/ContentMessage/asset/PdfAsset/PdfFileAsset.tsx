@@ -17,14 +17,17 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {Suspense, lazy} from 'react';
 
 import type {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import type {FileAsset} from 'src/script/entity/message/FileAsset';
-import {formatBytes, trimFileExtension} from 'Util/util';
 
-import {PdfFileCard} from './PdfFileCard/PdfFileCard';
-import {PdfFileContent} from './PdfFileContent/PdfFileContent';
+import {PdfAssetLoader} from './common/PdfAssetLoader/PdfAssetLoader';
+import {getPdfMetadata} from './getPdfMetadata/getPdfMetadata';
+import {PdfFileCard} from './PdfAssetCard/PdfFileCard';
+import {PdfAssetError} from './PdfAssetError/PdfAssetError';
+import {useGetPdfAsset} from './useGetPdfAsset/useGetPdfAsset';
+import {useInView} from './useInView';
 
 import {useAssetTransfer} from '../useAssetTransfer';
 
@@ -33,41 +36,48 @@ export interface PdfFileAssetProps {
   isFileShareRestricted: boolean;
 }
 
+const PdfAssetPreview = lazy(() =>
+  import('./PdfAssetContent/PdfAssetPreview').then(module => ({
+    default: module.PdfAssetPreview,
+  })),
+);
+
 export const PdfFileAsset = ({message, isFileShareRestricted}: PdfFileAssetProps) => {
   const asset = message.getFirstAsset() as FileAsset;
-  const {transferState, uploadProgress, getAssetUrl} = useAssetTransfer(message);
-  //   const {pdfUrl} = usePdfFile({asset, getAssetUrl});
+  const {getAssetUrl} = useAssetTransfer(message);
+  const {elementRef, hasBeenInView} = useInView();
 
-  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const {url, isLoading, isError} = useGetPdfAsset({
+    asset,
+    isEnabled: hasBeenInView,
+    getAssetUrl,
+  });
 
-  const name = trimFileExtension(asset.file_name);
-  const size = formatBytes(asset.file_size);
+  const {name, size} = getPdfMetadata({asset});
 
-  useEffect(() => {
-    const sync = async () => {
-      if (pdfUrl) {
-        return;
-      }
-
-      const assetUrl = await getAssetUrl(asset.original_resource());
-      setPdfUrl(assetUrl.url);
-    };
-    void sync();
-  }, [asset, getAssetUrl, pdfUrl]);
-
-  console.log('PdfFileAsset', asset);
-
-  if (!pdfUrl) {
+  if (isError) {
     return (
       <PdfFileCard extension="pdf" name={name} size={size}>
-        Loading...
+        <PdfAssetError />
+      </PdfFileCard>
+    );
+  }
+
+  if (isLoading || !url) {
+    return (
+      <PdfFileCard ref={elementRef} extension="pdf" name={name} size={size}>
+        <PdfAssetLoader />
       </PdfFileCard>
     );
   }
 
   return (
-    <PdfFileCard extension="pdf" name={name} size={size}>
-      <PdfFileContent url={pdfUrl} />
+    <PdfFileCard ref={elementRef} extension="pdf" name={name} size={size}>
+      {hasBeenInView && (
+        <Suspense fallback={<PdfAssetLoader />}>
+          <PdfAssetPreview url={url} />
+        </Suspense>
+      )}
     </PdfFileCard>
   );
 };

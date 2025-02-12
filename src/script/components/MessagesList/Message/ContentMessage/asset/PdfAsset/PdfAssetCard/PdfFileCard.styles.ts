@@ -19,11 +19,20 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const contentStyles: CSSObject = {
+export const contentWrapperStyles: CSSObject = {
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
   width: '100%',
-  height: '100%',
+  backgroundColor: 'var(--foreground-fade-8)',
+  border: '1px solid var(--border-color)',
+  borderRadius: '10px',
+  color: 'var(--gray-70)',
+  aspectRatio: '16/9',
   overflow: 'hidden',
+
+  // Fallback for the above aspect-ratio
+  '@supports not (aspect-ratio: 16/9)': {
+    paddingBottom: '56.25%',
+  },
 };

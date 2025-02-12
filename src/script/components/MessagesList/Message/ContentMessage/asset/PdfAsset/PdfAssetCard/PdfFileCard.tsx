@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode} from 'react';
+import {forwardRef, ReactNode} from 'react';
 
 import {FileCard} from 'src/script/components/FileCard/FileCard';
 
@@ -33,27 +33,25 @@ interface PdfFileCardProps {
   children: ReactNode;
 }
 
-export const PdfFileCard = ({
-  extension,
-  name,
-  size,
-  isError,
-  isLoading,
-  loadingProgress,
-  children,
-}: PdfFileCardProps) => {
-  return (
-    <FileCard.Root variant="large" extension={extension} name={name} size={size}>
-      <FileCard.Header>
-        <FileCard.Icon />
-        <FileCard.Type />
-        <FileCard.Name />
-      </FileCard.Header>
-      <FileCard.Content>
-        <div css={contentWrapperStyles}>{children}</div>
-      </FileCard.Content>
-      {isError && <FileCard.Error />}
-      {isLoading && <FileCard.Loading progress={loadingProgress} />}
-    </FileCard.Root>
-  );
-};
+export const PdfFileCard = forwardRef<HTMLDivElement, PdfFileCardProps>(
+  ({extension, name, size, isError, isLoading, loadingProgress, children}, ref) => {
+    return (
+      <FileCard.Root variant="large" extension={extension} name={name} size={size}>
+        <FileCard.Header>
+          <FileCard.Icon />
+          <FileCard.Type />
+          <FileCard.Name />
+        </FileCard.Header>
+        <FileCard.Content>
+          <div ref={ref} css={contentWrapperStyles}>
+            {children}
+          </div>
+        </FileCard.Content>
+        {isError && <FileCard.Error />}
+        {isLoading && <FileCard.Loading progress={loadingProgress} />}
+      </FileCard.Root>
+    );
+  },
+);
+
+PdfFileCard.displayName = 'PdfFileCard';

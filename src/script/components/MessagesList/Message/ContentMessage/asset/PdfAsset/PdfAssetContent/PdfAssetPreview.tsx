@@ -17,17 +17,21 @@
  *
  */
 
-interface PdfFileContentProps {
-  url: string;
-}
-
 import {Document, Page} from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
-export const PdfFileContent = ({url}: PdfFileContentProps) => {
+import {documentStyles} from './PdfAssetPreview.styles';
+
+import {PdfAssetLoader} from '../common/PdfAssetLoader/PdfAssetLoader';
+
+interface PdfAssetPreviewProps {
+  url: string;
+}
+
+export const PdfAssetPreview = ({url}: PdfAssetPreviewProps) => {
   return (
-    <Document file={url}>
+    <Document file={url} loading={<PdfAssetLoader />} css={documentStyles}>
       <Page pageNumber={1} />
     </Document>
   );
