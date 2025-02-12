@@ -35,7 +35,7 @@ import {ImageAsset} from './ImageAsset';
 import {LinkPreviewAsset} from './LinkPreviewAssetComponent';
 import {LocationAsset} from './LocationAsset';
 import {MessageButton} from './MessageButton';
-import {PdfFileAsset} from './PdfAsset/PdfFileAsset';
+import {PdfAsset} from './PdfAsset/PdfAsset';
 import {TextMessageRenderer} from './TextMessageRenderer';
 import {VideoAssetV2} from './VideoAsset/VideoAssetV2';
 
@@ -132,7 +132,7 @@ const ContentAsset = ({
 
       if ((asset as FileAssetType).isPdf()) {
         // return <p>pdf</p>;
-        return <PdfFileAsset message={message} isFileShareRestricted={isFileShareRestricted} />;
+        return <PdfAsset message={message} isFileShareRestricted={isFileShareRestricted} />;
       }
 
     case AssetType.IMAGE:

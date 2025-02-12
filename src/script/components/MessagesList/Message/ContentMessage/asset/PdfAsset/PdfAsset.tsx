@@ -37,12 +37,12 @@ export interface PdfFileAssetProps {
 }
 
 const PdfAssetPreview = lazy(() =>
-  import('./PdfAssetContent/PdfAssetPreview').then(module => ({
+  import('./PdfAssetPreview/PdfAssetPreview').then(module => ({
     default: module.PdfAssetPreview,
   })),
 );
 
-export const PdfFileAsset = ({message, isFileShareRestricted}: PdfFileAssetProps) => {
+export const PdfAsset = ({message, isFileShareRestricted}: PdfFileAssetProps) => {
   const asset = message.getFirstAsset() as FileAsset;
   const {isUploading, getAssetUrl, uploadProgress} = useAssetTransfer(message);
   const {elementRef, hasBeenInView} = useInView();

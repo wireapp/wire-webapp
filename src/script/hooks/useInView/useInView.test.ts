@@ -144,19 +144,16 @@ describe('useInView', () => {
 
     expect(result.current.hasBeenInView).toBe(false);
 
-    // Simulate element coming into view
     act(() => {
       observerCallback([{isIntersecting: true} as IntersectionObserverEntry]);
     });
 
     expect(result.current.hasBeenInView).toBe(true);
 
-    // Simulate element going out of view
     act(() => {
       observerCallback([{isIntersecting: false} as IntersectionObserverEntry]);
     });
 
-    // hasBeenInView should remain true even when element is no longer in view
     expect(result.current.hasBeenInView).toBe(true);
     expect(result.current.isInView).toBe(false);
   });

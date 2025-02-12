@@ -23,7 +23,6 @@ import 'core-js/full/reflect';
 // eslint-disable-next-line import/order
 import {ClientType} from '@wireapp/api-client/lib/client/';
 import {createRoot} from 'react-dom/client';
-import {pdfjs} from 'react-pdf';
 
 import {Runtime} from '@wireapp/commons';
 
@@ -37,8 +36,6 @@ import {doRedirect} from './app';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {Config} from '../Config';
 import {StorageKey} from '../storage';
-
-pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
 
 document.addEventListener('DOMContentLoaded', async () => {
   const config = Config.getConfig();

@@ -19,6 +19,11 @@
 
 import {CSSObject} from '@emotion/react';
 
+export const wrapperStyles: CSSObject = {
+  marginTop: 'auto',
+  width: '100%',
+};
+
 export const documentStyles: CSSObject = {
   pointerEvents: 'none',
   userSelect: 'none',

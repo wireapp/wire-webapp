@@ -82,27 +82,24 @@ export const useVideoPlayback = ({url, videoElement, isEnabled}: UseVideoPlaybac
     await videoElement.play();
   }, [videoElement]);
 
-  const handlePlay = useCallback(
-    async (url?: string): Promise<void> => {
-      if (!isEnabled || !url || !videoElement) {
-        return;
-      }
+  const handlePlay = useCallback(async (): Promise<void> => {
+    if (!isEnabled || !url || !videoElement) {
+      return;
+    }
 
-      if (playabilityStatusRef.current !== 'not-checked') {
-        await play();
-        return;
-      }
-
-      const playabilityStatus = await getPlayabilityStatus(url);
-
-      if (playabilityStatus === 'unplayable') {
-        return;
-      }
-
+    if (playabilityStatusRef.current !== 'not-checked') {
       await play();
-    },
-    [getPlayabilityStatus, isEnabled, play, videoElement],
-  );
+      return;
+    }
+
+    const playabilityStatus = await getPlayabilityStatus(url);
+
+    if (playabilityStatus === 'unplayable') {
+      return;
+    }
+
+    await play();
+  }, [getPlayabilityStatus, isEnabled, play, url, videoElement]);
 
   const handlePause = useCallback(() => {
     setIsPlaying(false);

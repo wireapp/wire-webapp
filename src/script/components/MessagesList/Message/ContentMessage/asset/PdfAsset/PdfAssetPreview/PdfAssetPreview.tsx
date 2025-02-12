@@ -21,18 +21,31 @@ import {Document, Page} from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
-import {documentStyles} from './PdfAssetPreview.styles';
+import {useResizeObserver} from 'Hooks/useResizeObserver/useResizeObserver';
+
+import {documentStyles, wrapperStyles} from './PdfAssetPreview.styles';
 
 import {PdfAssetLoader} from '../common/PdfAssetLoader/PdfAssetLoader';
+import {PdfAssetError} from '../PdfAssetError/PdfAssetError';
 
 interface PdfAssetPreviewProps {
   url: string;
 }
 
 export const PdfAssetPreview = ({url}: PdfAssetPreviewProps) => {
+  const {ref, width, height} = useResizeObserver();
+
   return (
-    <Document file={url} loading={<PdfAssetLoader />} css={documentStyles}>
-      <Page pageNumber={1} />
-    </Document>
+    <div ref={ref} css={wrapperStyles}>
+      <Document file={url} loading={<PdfAssetLoader />} noData={<PdfAssetError />} css={documentStyles}>
+        <Page
+          pageNumber={1}
+          loading={<></>}
+          width={width || undefined}
+          height={height || undefined}
+          renderAnnotationLayer={false}
+        />
+      </Document>
+    </div>
   );
 };

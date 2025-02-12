@@ -26,7 +26,7 @@ import {wrapperStyles, iconStyles, textStyles} from './PdfAssetError.styles';
 import {PdfAssetPlaceholder} from '../common/PdfAssetPlaceholder/PdfAssetPlaceholder';
 
 interface PdfAssetErrorProps {
-  isFileShareRestricted: boolean;
+  isFileShareRestricted?: boolean;
 }
 
 export const PdfAssetError = ({isFileShareRestricted}: PdfAssetErrorProps) => {
