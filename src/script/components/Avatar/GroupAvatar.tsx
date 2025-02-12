@@ -40,7 +40,7 @@ export const GroupAvatar: React.FC<GroupAvatarProps> = ({className}) => {
       <div
         css={{
           ...CSS_SQUARE(28),
-          backgroundColor: 'var(--app-bg-secondary)',
+          backgroundColor: 'var(--group-icon-bg)',
           borderRadius: 5,
           display: 'flex',
           flexWrap: 'wrap',
