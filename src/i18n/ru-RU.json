@@ -583,7 +583,7 @@
   "conversationUnverifiedUserWarning": "Пожалуйста, будьте осторожны со всеми с кем делитесь конфиденциальной информацией.",
   "conversationUpdatedTimer": " установил(-а) таймер сообщения на {time}",
   "conversationUpdatedTimerYou": " установили таймер сообщения на {time}",
-  "conversationVideoAssetError": "Couldn’t generate preview",
+  "conversationVideoAssetError": "Не удалось сгенерировать превью",
   "conversationVideoAssetRestricted": "Получение видео запрещено",
   "conversationViewAllConversations": "Все беседы",
   "conversationViewTooltip": "Все",
