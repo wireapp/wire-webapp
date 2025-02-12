@@ -22,18 +22,15 @@ import {CSSObject} from '@emotion/react';
 export const wrapperStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
-  height: '32px',
-  width: '32px',
+  gap: '16px',
 };
 
-export const playButtonStyles: CSSObject = {
-  width: '32px',
-  height: '32px',
-  borderRadius: '50%',
-  backgroundColor: 'var(--icon-button-primary-enabled-bg)',
-  border: '1px solid var(--icon-button-primary-border)',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  flexShrink: 0,
+export const iconStyles: CSSObject = {
+  fill: 'var(--gray-70)',
+};
+
+export const textStyles: CSSObject = {
+  color: 'var(--main-color)',
+  fontSize: 'var(--font-size-medium)',
+  fontWeight: 'var(--font-weight-regular)',
 };

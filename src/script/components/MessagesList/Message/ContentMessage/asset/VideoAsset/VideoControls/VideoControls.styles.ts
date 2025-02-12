@@ -20,20 +20,41 @@
 import {CSSObject} from '@emotion/react';
 
 export const wrapperStyles: CSSObject = {
+  position: 'absolute',
+  bottom: 0,
   display: 'flex',
+  width: '100%',
+  height: '56px',
   alignItems: 'center',
-  height: '32px',
-  width: '32px',
+  padding: '0 8px',
+  color: 'var(--white)',
+
+  '&::before': {
+    content: "''",
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 0,
+    pointerEvents: 'none',
+    background: 'linear-gradient(to bottom, rgba(255,255,255,0), rgba(0,0,0,0.4))',
+  },
 };
 
-export const playButtonStyles: CSSObject = {
-  width: '32px',
-  height: '32px',
-  borderRadius: '50%',
-  backgroundColor: 'var(--icon-button-primary-enabled-bg)',
-  border: '1px solid var(--icon-button-primary-border)',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  flexShrink: 0,
+export const timeStyles: CSSObject = {
+  fontSize: 'var(--font-size-xsmall)',
+  fontWeight: 'var(--font-weight-regular)',
+  textAlign: 'center',
+  zIndex: 1,
+};
+
+export const seekbarStyles: CSSObject = {
+  margin: '0 8px',
+  zIndex: 1,
+};
+
+export const playButtonWrapperStyles: CSSObject = {
+  marginRight: '8px',
+  zIndex: 1,
 };

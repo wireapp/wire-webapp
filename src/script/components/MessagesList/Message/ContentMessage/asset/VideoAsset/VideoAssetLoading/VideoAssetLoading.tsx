@@ -17,23 +17,12 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {VideoAssetPlaceholder} from '../common/VideoAssetPlaceholder/VideoAssetPlaceholder';
 
-export const wrapperStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  height: '32px',
-  width: '32px',
-};
-
-export const playButtonStyles: CSSObject = {
-  width: '32px',
-  height: '32px',
-  borderRadius: '50%',
-  backgroundColor: 'var(--icon-button-primary-enabled-bg)',
-  border: '1px solid var(--icon-button-primary-border)',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  flexShrink: 0,
+export const VideoAssetLoading = () => {
+  return (
+    <VideoAssetPlaceholder>
+      <div className="loading-dots" />
+    </VideoAssetPlaceholder>
+  );
 };

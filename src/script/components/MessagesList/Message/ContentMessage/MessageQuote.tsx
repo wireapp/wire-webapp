@@ -37,7 +37,7 @@ import {AudioAsset} from './asset/AudioAsset/AudioAsset';
 import {FileAsset} from './asset/FileAssetComponent';
 import {LocationAsset} from './asset/LocationAsset';
 import {TextMessageRenderer} from './asset/TextMessageRenderer';
-import {VideoAsset} from './asset/VideoAsset';
+import {VideoAsset} from './asset/VideoAsset/VideoAsset';
 
 import {MessageActions} from '..';
 import type {Conversation} from '../../../../entity/Conversation';

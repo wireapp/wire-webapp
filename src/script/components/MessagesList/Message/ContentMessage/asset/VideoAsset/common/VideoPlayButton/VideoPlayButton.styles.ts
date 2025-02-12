@@ -22,13 +22,26 @@ import {CSSObject} from '@emotion/react';
 export const wrapperStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
-  height: '32px',
-  width: '32px',
+  justifyContent: 'center',
+  height: '24px',
+  width: '24px',
+  background: 'none',
+  border: 'none',
+  padding: 0,
+  margin: 0,
+  cursor: 'pointer',
+  outline: 'none',
+};
+
+export const wrapperStylesFullscreen: CSSObject = {
+  ...wrapperStyles,
+  height: '100%',
+  width: '100%',
 };
 
 export const playButtonStyles: CSSObject = {
-  width: '32px',
-  height: '32px',
+  width: '24px',
+  height: '24px',
   borderRadius: '50%',
   backgroundColor: 'var(--icon-button-primary-enabled-bg)',
   border: '1px solid var(--icon-button-primary-border)',

@@ -17,23 +17,25 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import type {FileAsset as FileAssetType} from 'src/script/entity/message/FileAsset';
+import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 
-export const wrapperStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  height: '32px',
-  width: '32px',
-};
+interface GetVideoMetadataParams {
+  asset: FileAssetType;
+}
 
-export const playButtonStyles: CSSObject = {
-  width: '32px',
-  height: '32px',
-  borderRadius: '50%',
-  backgroundColor: 'var(--icon-button-primary-enabled-bg)',
-  border: '1px solid var(--icon-button-primary-border)',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  flexShrink: 0,
+export const getVideoMetadata = ({asset}: GetVideoMetadataParams) => {
+  const name = trimFileExtension(asset.file_name);
+  const extension = getFileExtension(asset.file_name!);
+  const size = formatBytes(asset.file_size);
+  const type = asset.file_type || '';
+  const duration = asset?.meta?.duration ?? 0;
+
+  return {
+    name,
+    extension,
+    size,
+    type,
+    duration,
+  };
 };

@@ -17,23 +17,20 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {amplify} from 'amplify';
 
-export const wrapperStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  height: '32px',
-  width: '32px',
-};
+import {WebAppEvents} from '@wireapp/webapp-events';
 
-export const playButtonStyles: CSSObject = {
-  width: '32px',
-  height: '32px',
-  borderRadius: '50%',
-  backgroundColor: 'var(--icon-button-primary-enabled-bg)',
-  border: '1px solid var(--icon-button-primary-border)',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  flexShrink: 0,
+import {EventName} from 'src/script/tracking/EventName';
+
+export const isVideoMimeTypeSupported = (mimeType: string): boolean => {
+  const video = document.createElement('video');
+  const canPlay = video.canPlayType(mimeType) !== '';
+
+  if (!canPlay) {
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.PLAY_FAILED);
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.UNSUPPORTED_MIME_TYPE);
+  }
+
+  return canPlay;
 };

@@ -17,23 +17,21 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {AlertIcon} from '@wireapp/react-ui-kit';
 
-export const wrapperStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  height: '32px',
-  width: '32px',
-};
+import {t} from 'Util/LocalizerUtil';
 
-export const playButtonStyles: CSSObject = {
-  width: '32px',
-  height: '32px',
-  borderRadius: '50%',
-  backgroundColor: 'var(--icon-button-primary-enabled-bg)',
-  border: '1px solid var(--icon-button-primary-border)',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  flexShrink: 0,
+import {wrapperStyles, iconStyles, textStyles} from './VideoAssetError.styles';
+
+import {VideoAssetPlaceholder} from '../common/VideoAssetPlaceholder/VideoAssetPlaceholder';
+
+export const VideoAssetError = () => {
+  return (
+    <VideoAssetPlaceholder>
+      <div css={wrapperStyles}>
+        <AlertIcon css={iconStyles} />
+        <p css={textStyles}>{t('conversationVideoAssetError')}</p>
+      </div>
+    </VideoAssetPlaceholder>
+  );
 };
