@@ -18,8 +18,6 @@
  */
 
 import {Document, Page} from 'react-pdf';
-import 'react-pdf/dist/Page/AnnotationLayer.css';
-import 'react-pdf/dist/Page/TextLayer.css';
 
 import {useResizeObserver} from 'Hooks/useResizeObserver/useResizeObserver';
 
@@ -40,10 +38,11 @@ export const PdfAssetPreview = ({url}: PdfAssetPreviewProps) => {
       <Document file={url} loading={<PdfAssetLoader />} noData={<PdfAssetError />} css={documentStyles}>
         <Page
           pageNumber={1}
-          loading={<></>}
+          loading={<PdfAssetLoader />}
           width={width || undefined}
           height={height || undefined}
           renderAnnotationLayer={false}
+          renderTextLayer={false}
         />
       </Document>
     </div>
