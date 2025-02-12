@@ -583,6 +583,7 @@
   "conversationUnverifiedUserWarning": "Please still be careful with whom you share sensitive information.",
   "conversationUpdatedTimer": " nustatė žinutė laikmatį į {time}",
   "conversationUpdatedTimerYou": " nustatėte žinučių laikmatį į {time}",
+  "conversationVideoAssetError": "Couldn’t generate preview",
   "conversationVideoAssetRestricted": "Receiving videos is prohibited",
   "conversationViewAllConversations": "All conversations",
   "conversationViewTooltip": "All",

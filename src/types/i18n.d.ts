@@ -590,6 +590,7 @@ declare module 'I18n/en-US.json' {
     'conversationUpdatedTimerYou': ` set the message timer to {time}`;
     'conversationVideoAssetRestricted': `Receiving videos is prohibited`;
     'conversationViewAllConversations': `All conversations`;
+    'conversationVideoAssetError': `Couldn’t generate preview`;
     'conversationViewTooltip': `All`;
     'conversationVoiceChannelDeactivate': ` called`;
     'conversationVoiceChannelDeactivateYou': ` called`;

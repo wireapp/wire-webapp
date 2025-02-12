@@ -37,7 +37,7 @@ import {LocationAsset} from './LocationAsset';
 import {MessageButton} from './MessageButton';
 import {PdfFileAsset} from './PdfAsset/PdfFileAsset';
 import {TextMessageRenderer} from './TextMessageRenderer';
-import {VideoAsset} from './VideoAsset';
+import {VideoAsset} from './VideoAsset/VideoAsset';
 
 import {MessageActions} from '../..';
 import {AssetType} from '../../../../../assets/AssetType';
