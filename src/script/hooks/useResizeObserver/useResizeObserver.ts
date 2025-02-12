@@ -50,7 +50,7 @@ export const useResizeObserver = <Element extends HTMLElement = HTMLDivElement>(
 
   useEffect(() => {
     if (!ref.current) {
-      return;
+      return undefined;
     }
 
     const observer = new ResizeObserver(onResize);
