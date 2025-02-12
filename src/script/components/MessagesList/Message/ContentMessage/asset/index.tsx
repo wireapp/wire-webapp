@@ -35,9 +35,8 @@ import {ImageAsset} from './ImageAsset';
 import {LinkPreviewAsset} from './LinkPreviewAssetComponent';
 import {LocationAsset} from './LocationAsset';
 import {MessageButton} from './MessageButton';
-import {PdfAsset} from './PdfAsset/PdfAsset';
 import {TextMessageRenderer} from './TextMessageRenderer';
-import {VideoAssetV2} from './VideoAsset/VideoAssetV2';
+import {VideoAsset} from './VideoAsset/VideoAsset';
 
 import {MessageActions} from '../..';
 import {AssetType} from '../../../../../assets/AssetType';
@@ -121,18 +120,7 @@ const ContentAsset = ({
       }
 
       if ((asset as FileAssetType).isVideo()) {
-        return (
-          <VideoAssetV2
-            message={message}
-            isFocusable={isMessageFocused}
-            isFileShareRestricted={isFileShareRestricted}
-          />
-        );
-      }
-
-      if ((asset as FileAssetType).isPdf()) {
-        // return <p>pdf</p>;
-        return <PdfAsset message={message} isFileShareRestricted={isFileShareRestricted} />;
+        return <VideoAsset message={message} isFocusable={isMessageFocused} />;
       }
 
     case AssetType.IMAGE:
