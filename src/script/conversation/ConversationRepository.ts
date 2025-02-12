@@ -4167,7 +4167,7 @@ export class ConversationRepository {
     eventId: string,
     newData: EventRecord,
   ): Promise<ContentMessage | undefined> {
-    const originalMessage = conversationEntity?.getMessage(eventId);
+    const originalMessage = conversationEntity.getMessage(eventId);
     if (!originalMessage) {
       return undefined;
     }

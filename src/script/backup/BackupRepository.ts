@@ -17,6 +17,7 @@
  *
  */
 
+import type Dexie from 'dexie';
 import {omit} from 'underscore';
 
 import {chunk} from 'Util/ArrayUtil';
@@ -24,24 +25,21 @@ import {Logger, getLogger} from 'Util/Logger';
 import {constructUserPrimaryKey} from 'Util/StorageUtil';
 import {WebWorker} from 'Util/worker';
 
-import {ProgressCallback, Filename, FileDescriptor} from './Backup.types';
 import {BackUpHeader, ERROR_TYPES} from './BackUpHeader';
 import {BackupService} from './BackupService';
-import {exportCPBHistoryFromDatabase, importCPBHistoryToDatabase, CPBackup, isCPBackup} from './CrossPlatformBackup';
 import {
   CancelError,
   DifferentAccountError,
-  ErrorType,
   ExportError,
   ImportError,
   IncompatibleBackupError,
   IncompatibleBackupFormatError,
+  IncompatiblePlatformError,
+  InvalidMetaDataError,
   InvalidPassword,
-  isErrorOfType,
 } from './Error';
-import {createMetaData, exportHistory, importLegacyBackupToDatabase} from './LegacyBackup.helper';
+import {preprocessConversations, preprocessEvents, preprocessUsers} from './recordPreprocessors';
 
-import {Config} from '../Config';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import {isReadableConversation} from '../conversation/ConversationSelectors';
 import type {Conversation} from '../entity/Conversation';
@@ -50,7 +48,38 @@ import {EventRecord, UserRecord} from '../storage';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {StorageSchemata} from '../storage/StorageSchemata';
 
-/* eslint-enable */
+interface Metadata {
+  client_id: string;
+  creation_time: string;
+  platform: 'Web';
+  user_handle: string;
+  user_id: string;
+  user_name: string;
+  version: number;
+}
+
+type ProgressCallback = (done: number) => void;
+
+export type FileDescriptor =
+  | {
+      entities: UserRecord[];
+      filename: Filename.USERS;
+    }
+  | {
+      entities: EventRecord[];
+      filename: Filename.EVENTS;
+    }
+  | {
+      entities: ConversationRecord[];
+      filename: Filename.CONVERSATIONS;
+    };
+
+export enum Filename {
+  CONVERSATIONS = 'conversations.json',
+  EVENTS = 'events.json',
+  USERS = 'users.json',
+  METADATA = 'export.json',
+}
 
 const UINT8ARRAY_FIELDS = ['otr_key', 'sha256'];
 
@@ -74,6 +103,18 @@ export class BackupRepository {
     this.canceled = true;
   }
 
+  public createMetaData(user: User, clientId: string): Metadata {
+    return {
+      client_id: clientId,
+      creation_time: new Date().toISOString(),
+      platform: 'Web',
+      user_handle: user.username(),
+      user_id: user.id,
+      user_name: user.name(),
+      version: this.backupService.getDatabaseVersion(),
+    };
+  }
+
   /**
    * Gather needed data for the export and generates the history
    *
@@ -88,70 +129,72 @@ export class BackupRepository {
   ): Promise<Blob> {
     this.canceled = false;
 
-    const checkCancelStatus = () => this.canceled;
-
-    const {
-      FEATURE: {ENABLE_CROSS_PLATFORM_BACKUP_EXPORT},
-    } = Config.getConfig();
-
     try {
-      let exportedData = null;
-      // If the feature flag is enabled, export the history as a cross-platform backup
-      if (ENABLE_CROSS_PLATFORM_BACKUP_EXPORT) {
-        exportedData = await exportCPBHistoryFromDatabase({
-          progressCallback,
-          user,
-          backupService: this.backupService,
-          checkCancelStatus,
-        });
-        // If the feature flag is disabled, export the history as a legacy backup
-      } else {
-        exportedData = await exportHistory(progressCallback, this.backupService, checkCancelStatus);
-      }
-
-      if (exportedData === null) {
-        throw new Error('Exported data is null');
-      }
-
+      const exportedData = await this._exportHistory(progressCallback);
       return await this.compressHistoryFiles(user, clientId, exportedData, password);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : error;
       this.logger.error(`Could not export history: ${errorMessage}`, error);
-      const isCancelError = isErrorOfType(error, ErrorType.CancelError);
+      const isCancelError = error instanceof CancelError;
       throw isCancelError ? error : new ExportError();
     }
   }
 
+  private async _exportHistory(progressCallback: ProgressCallback) {
+    const [conversationTable, eventsTable, usersTable] = this.backupService.getTables();
+    const tableData: Record<string, any[]> = {};
+
+    function streamProgress<T>(dataProcessor: (data: T[]) => T[]) {
+      return (data: T[]) => {
+        progressCallback(data.length);
+        return dataProcessor(data);
+      };
+    }
+
+    const conversationsData = await this.exportTable(conversationTable, streamProgress(preprocessConversations));
+    tableData[StorageSchemata.OBJECT_STORE.CONVERSATIONS] = conversationsData;
+
+    const eventsData = await this.exportTable(eventsTable, streamProgress(preprocessEvents));
+    tableData[StorageSchemata.OBJECT_STORE.EVENTS] = eventsData;
+
+    const usersData = await this.exportTable(usersTable, streamProgress(preprocessUsers));
+    tableData[StorageSchemata.OBJECT_STORE.USERS] = usersData;
+
+    return tableData;
+  }
+
+  private async exportTable<T>(table: Dexie.Table<T, unknown>, preprocessor: (tableRows: T[]) => T[]): Promise<any[]> {
+    const tableData: T[] = [];
+
+    await this.backupService.exportTable(table, tableRows => {
+      if (this.canceled) {
+        throw new CancelError();
+      }
+      const processedData = preprocessor(tableRows);
+      tableData.push(...processedData);
+    });
+    return tableData;
+  }
   private async compressHistoryFiles(
     user: User,
-    clientId: string, // TODO: Add clientId to metadata
-    exportedData: Int8Array | Record<string, any[]>,
+    clientId: string,
+    exportedData: Record<string, any>,
     password: string,
   ): Promise<Blob> {
+    const metaData = this.createMetaData(user, clientId);
+
     const files: Record<string, Uint8Array> = {};
 
-    if (this.canceled) {
-      throw new CancelError();
+    const stringifiedMetadata = JSON.stringify(metaData, null, 2);
+    const encodedMetadata = new TextEncoder().encode(stringifiedMetadata);
+
+    for (const tableName in exportedData) {
+      const stringifiedData = JSON.stringify(exportedData[tableName]);
+      const encodedData = new TextEncoder().encode(stringifiedData);
+      const fileName = `${tableName}.json`;
+      files[fileName] = encodedData;
     }
-
-    // If the exported data is an Int8Array, it is a cross-platform backup
-    if (exportedData instanceof Int8Array) {
-      files[CPBackup.ZIP_ENTRY_DATA] = new Uint8Array(exportedData.buffer, 0, exportedData.byteLength);
-      // If the exported data is an object, it is a legacy backup
-    } else {
-      const metaData = createMetaData(user, clientId, this.backupService);
-
-      const stringifiedMetadata = JSON.stringify(metaData, null, 2);
-      const encodedMetadata = new TextEncoder().encode(stringifiedMetadata);
-
-      for (const tableName in exportedData) {
-        const stringifiedData = JSON.stringify(exportedData[tableName]);
-        const encodedData = new TextEncoder().encode(stringifiedData);
-        const fileName = `${tableName}.json`;
-        files[fileName] = encodedData;
-      }
-      files[Filename.METADATA] = encodedMetadata;
-    }
+    files[Filename.METADATA] = encodedMetadata;
 
     if (password) {
       return this.createEncryptedBackup(files, user, password);
@@ -247,8 +290,6 @@ export class BackupRepository {
   ): Promise<void> {
     this.canceled = false;
     let files;
-    let fileDescriptors: FileDescriptor[];
-    let archiveVersion: number;
 
     if (password) {
       files = await this.createDecryptedBackup(data, user, password);
@@ -267,28 +308,21 @@ export class BackupRepository {
       throw new ImportError(files.error as unknown as string);
     }
 
-    // Check for cross-platform backup
-    if (isCPBackup(files)) {
-      // Import cross-platform backup
-      const cpbData = await importCPBHistoryToDatabase({
-        backupService: this.backupService,
-        progressCallback,
-        fileData: files,
-        user,
-      });
-      fileDescriptors = cpbData.fileDescriptors;
-      archiveVersion = cpbData.archiveVersion;
-    } else {
-      // Import legacy backup
-      const legacyData = await importLegacyBackupToDatabase({
-        backupService: this.backupService,
-        fileData: files,
-        progressCallback,
-        user,
-      });
-      fileDescriptors = legacyData.fileDescriptors;
-      archiveVersion = legacyData.archiveVersion;
+    if (!files[Filename.METADATA]) {
+      throw new InvalidMetaDataError();
     }
+
+    const archiveVersion = await this.verifyMetadata(user, files);
+    const fileDescriptors = Object.entries(files)
+      .filter(([filename]) => filename !== Filename.METADATA)
+      .map(([filename, content]) => {
+        const data = new TextDecoder().decode(content);
+        const entities = JSON.parse(data);
+        return {
+          entities,
+          filename,
+        } as FileDescriptor;
+      });
 
     const nbEntities = fileDescriptors.reduce((acc, {entities}) => acc + entities.length, 0);
     initCallback(nbEntities);
@@ -346,7 +380,6 @@ export class BackupRepository {
     }
 
     // Run all the database migrations on the imported data
-    progressCallback(0);
     await this.backupService.runDbSchemaUpdates(archiveVersion);
 
     const readableConversations = importedConversations.filter(isReadableConversation);
@@ -446,6 +479,34 @@ export class BackupRepository {
       });
     }
     return omit(entity, 'primary_key');
+  }
+
+  private async verifyMetadata(user: User, files: Record<string, Uint8Array>): Promise<number> {
+    const rawData = files[Filename.METADATA];
+    const metaData = new TextDecoder().decode(rawData);
+    const parsedMetaData = JSON.parse(metaData);
+    const archiveVersion = this._verifyMetadata(user, parsedMetaData);
+    this.logger.debug('Validated metadata during history import', files);
+    return archiveVersion;
+  }
+
+  private _verifyMetadata(user: User, archiveMetadata: Metadata): number {
+    const localMetadata = this.createMetaData(user, '');
+    const isExpectedUserId = archiveMetadata.user_id === localMetadata.user_id;
+    if (!isExpectedUserId) {
+      const fromUserId = archiveMetadata.user_id;
+      const toUserId = localMetadata.user_id;
+      const message = `History from user "${fromUserId}" cannot be restored for user "${toUserId}".`;
+      throw new DifferentAccountError(message);
+    }
+
+    const isExpectedPlatform = archiveMetadata.platform === localMetadata.platform;
+    if (!isExpectedPlatform) {
+      const message = `History created from "${archiveMetadata.platform}" device cannot be imported`;
+      throw new IncompatiblePlatformError(message);
+    }
+
+    return archiveMetadata.version;
   }
 
   private mapDecodingError(decodingError: string) {

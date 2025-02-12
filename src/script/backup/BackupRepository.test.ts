@@ -28,12 +28,10 @@ import {noop} from 'Util/util';
 import {createUuid} from 'Util/uuid';
 import {WebWorker} from 'Util/worker';
 
-import {Filename} from './Backup.types';
 import {BackUpHeader, DecodedHeader, ENCRYPTED_BACKUP_FORMAT, ENCRYPTED_BACKUP_VERSION} from './BackUpHeader';
-import {BackupRepository} from './BackupRepository';
+import {BackupRepository, Filename} from './BackupRepository';
 import {BackupService} from './BackupService';
 import {CancelError, DifferentAccountError, IncompatiblePlatformError} from './Error';
-import {createMetaData} from './LegacyBackup.helper';
 import {handleZipEvent} from './zipWorker';
 
 import {User} from '../entity/User';
@@ -100,14 +98,14 @@ describe('BackupRepository', () => {
 
   describe('createMetaData', () => {
     it('creates backup metadata', async () => {
-      const [, {backupService}] = await buildBackupRepository();
+      const [backupRepository, {backupService}] = await buildBackupRepository();
       jest.useFakeTimers();
       const freezedTime = new Date();
       jest.setSystemTime(freezedTime);
       const userId = createUuid();
       const clientId = createUuid();
 
-      const metaDescription = createMetaData(new User(userId), clientId, backupService);
+      const metaDescription = backupRepository.createMetaData(new User(userId), clientId);
 
       expect(metaDescription.client_id).toBe(clientId);
       expect(metaDescription.creation_time).toBe(freezedTime.toISOString());
@@ -177,9 +175,9 @@ describe('BackupRepository', () => {
         },
       ],
     ])(`fails if metadata doesn't match`, async ({metaChanges, expectedError}) => {
-      const [backupRepository, {backupService}] = await buildBackupRepository();
+      const [backupRepository] = await buildBackupRepository();
 
-      const meta = {...createMetaData(new User('user1'), 'client1', backupService), ...metaChanges};
+      const meta = {...backupRepository.createMetaData(new User('user1'), 'client1'), ...metaChanges};
 
       const files = {
         [Filename.METADATA]: JSON.stringify(meta),
@@ -197,7 +195,7 @@ describe('BackupRepository', () => {
       const importSpy = jest.spyOn(backupService, 'importEntities').mockResolvedValue(1);
       const users = [generateAPIUser(), generateAPIUser()];
 
-      const metadata = {...createMetaData(user, 'client1', backupService), version: mockedDBVersion};
+      const metadata = {...backupRepository.createMetaData(user, 'client1'), version: mockedDBVersion};
 
       const conversation = generateConversation({
         id: {id: 'conversation1', domain: 'staging2'},
