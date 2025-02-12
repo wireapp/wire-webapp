@@ -25,12 +25,18 @@ import {wrapperStyles, iconStyles, textStyles} from './VideoAssetError.styles';
 
 import {VideoAssetPlaceholder} from '../common/VideoAssetPlaceholder/VideoAssetPlaceholder';
 
-export const VideoAssetError = () => {
+interface VideoAssetErrorProps {
+  isFileShareRestricted: boolean;
+}
+
+export const VideoAssetError = ({isFileShareRestricted}: VideoAssetErrorProps) => {
+  const message = isFileShareRestricted ? t('conversationVideoAssetRestricted') : t('conversationVideoAssetError');
+
   return (
     <VideoAssetPlaceholder>
       <div css={wrapperStyles}>
         <AlertIcon css={iconStyles} />
-        <p css={textStyles}>{t('conversationVideoAssetError')}</p>
+        <p css={textStyles}>{message}</p>
       </div>
     </VideoAssetPlaceholder>
   );

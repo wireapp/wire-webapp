@@ -40,10 +40,10 @@ import {t} from 'Util/LocalizerUtil';
 import {formatSeconds} from 'Util/TimeUtil';
 import {useEffectRef} from 'Util/useEffectRef';
 
-import {MediaButton} from '../controls/MediaButton';
-import {SeekBar} from '../controls/SeekBar';
+import {MediaButton} from '../common/MediaButton/MediaButton';
+import {SeekBar} from '../common/SeekBar/SeekBar';
+import {AssetUrl, useAssetTransfer} from '../common/useAssetTransfer/useAssetTransfer';
 import {FileAsset} from '../FileAssetComponent';
-import {AssetUrl, useAssetTransfer} from '../useAssetTransfer';
 
 interface VideoAssetProps {
   assetRepository?: AssetRepository;

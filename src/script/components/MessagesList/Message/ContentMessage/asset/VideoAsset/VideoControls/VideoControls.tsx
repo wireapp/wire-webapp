@@ -22,7 +22,7 @@ import {formatSeconds} from 'Util/TimeUtil';
 
 import {wrapperStyles, playButtonWrapperStyles, seekbarStyles, timeStyles} from './VideoControls.styles';
 
-import {SeekBar} from '../../controls/SeekBar';
+import {SeekBar} from '../../common/SeekBar/SeekBar';
 import {VideoPlayButton} from '../common/VideoPlayButton/VideoPlayButton';
 
 interface VideoControlsProps {

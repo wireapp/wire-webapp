@@ -25,7 +25,7 @@ import type {FileAsset} from 'src/script/entity/message/FileAsset';
 import {getLogger} from 'Util/Logger';
 import {useEffectRef} from 'Util/useEffectRef';
 
-import {AssetUrl} from '../../useAssetTransfer';
+import {AssetUrl} from '../../common/useAssetTransfer/useAssetTransfer';
 
 const logger = getLogger('useAudioPlayer');
 

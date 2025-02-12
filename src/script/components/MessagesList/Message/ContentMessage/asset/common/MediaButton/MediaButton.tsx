@@ -26,9 +26,9 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {noop} from 'Util/util';
 
-import {AssetTransferState} from '../../../../../../assets/AssetTransferState';
-import type {FileAsset} from '../../../../../../entity/message/FileAsset';
-import {AssetLoader} from '../AssetLoader';
+import {AssetTransferState} from '../../../../../../../assets/AssetTransferState';
+import type {FileAsset} from '../../../../../../../entity/message/FileAsset';
+import {AssetLoader} from '../AssetLoader/AssetLoader';
 
 export interface MediaButtonProps {
   asset: FileAsset;

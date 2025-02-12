@@ -25,12 +25,18 @@ import {wrapperStyles, iconStyles, textStyles} from './PdfAssetError.styles';
 
 import {PdfAssetPlaceholder} from '../common/PdfAssetPlaceholder/PdfAssetPlaceholder';
 
-export const PdfAssetError = () => {
+interface PdfAssetErrorProps {
+  isFileShareRestricted: boolean;
+}
+
+export const PdfAssetError = ({isFileShareRestricted}: PdfAssetErrorProps) => {
+  const message = isFileShareRestricted ? t('conversationPdfAssetRestricted') : t('conversationPdfAssetError');
+
   return (
     <PdfAssetPlaceholder>
       <div css={wrapperStyles}>
         <AlertIcon css={iconStyles} />
-        <p css={textStyles}>{t('conversationPdfAssetError')}</p>
+        <p css={textStyles}>{message}</p>
       </div>
     </PdfAssetPlaceholder>
   );

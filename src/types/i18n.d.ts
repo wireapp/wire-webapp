@@ -554,6 +554,7 @@ declare module 'I18n/en-US.json' {
     'conversationParticipantsSearchPlaceholder': `Search by name`;
     'conversationParticipantsTitle': `People`;
     'conversationPdfAssetError': `Couldn’t generate preview`;
+    'conversationPdfAssetRestricted': `Receiving PDFs is prohibited`;
     'conversationPing': ` pinged`;
     'conversationPingConfirmTitle': `Are you sure you want to ping {memberCount} people?`;
     'conversationPingYou': ` pinged`;
@@ -588,9 +589,9 @@ declare module 'I18n/en-US.json' {
     'conversationUnverifiedUserWarning': `Please still be careful with whom you share sensitive information.`;
     'conversationUpdatedTimer': ` set the message timer to {time}`;
     'conversationUpdatedTimerYou': ` set the message timer to {time}`;
+    'conversationVideoAssetError': `Couldn’t generate preview`;
     'conversationVideoAssetRestricted': `Receiving videos is prohibited`;
     'conversationViewAllConversations': `All conversations`;
-    'conversationVideoAssetError': `Couldn’t generate preview`;
     'conversationViewTooltip': `All`;
     'conversationVoiceChannelDeactivate': ` called`;
     'conversationVoiceChannelDeactivateYou': ` called`;

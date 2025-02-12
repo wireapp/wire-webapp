@@ -23,11 +23,11 @@ import {container} from 'tsyringe';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-import {AssetRemoteData} from '../../../../../assets/AssetRemoteData';
-import {AssetRepository} from '../../../../../assets/AssetRepository';
-import {AssetTransferState} from '../../../../../assets/AssetTransferState';
-import {ContentMessage} from '../../../../../entity/message/ContentMessage';
-import {FileAsset} from '../../../../../entity/message/FileAsset';
+import {AssetRemoteData} from '../../../../../../../assets/AssetRemoteData';
+import {AssetRepository} from '../../../../../../../assets/AssetRepository';
+import {AssetTransferState} from '../../../../../../../assets/AssetTransferState';
+import {ContentMessage} from '../../../../../../../entity/message/ContentMessage';
+import {FileAsset} from '../../../../../../../entity/message/FileAsset';
 
 export type AssetUrl = {
   url: string;

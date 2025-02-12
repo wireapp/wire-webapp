@@ -37,7 +37,7 @@ import {LocationAsset} from './LocationAsset';
 import {MessageButton} from './MessageButton';
 import {PdfFileAsset} from './PdfAsset/PdfFileAsset';
 import {TextMessageRenderer} from './TextMessageRenderer';
-import {VideoAsset} from './VideoAsset/VideoAsset';
+import {VideoAssetV2} from './VideoAsset/VideoAssetV2';
 
 import {MessageActions} from '../..';
 import {AssetType} from '../../../../../assets/AssetType';
@@ -121,7 +121,13 @@ const ContentAsset = ({
       }
 
       if ((asset as FileAssetType).isVideo()) {
-        return <VideoAsset message={message} isFocusable={isMessageFocused} />;
+        return (
+          <VideoAssetV2
+            message={message}
+            isFocusable={isMessageFocused}
+            isFileShareRestricted={isFileShareRestricted}
+          />
+        );
       }
 
       if ((asset as FileAssetType).isPdf()) {

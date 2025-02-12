@@ -19,6 +19,7 @@
 
 import {Suspense, lazy} from 'react';
 
+import {useInView} from 'Hooks/useInView/useInView';
 import type {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import type {FileAsset} from 'src/script/entity/message/FileAsset';
 
@@ -26,10 +27,9 @@ import {PdfAssetLoader} from './common/PdfAssetLoader/PdfAssetLoader';
 import {getPdfMetadata} from './getPdfMetadata/getPdfMetadata';
 import {PdfFileCard} from './PdfAssetCard/PdfFileCard';
 import {PdfAssetError} from './PdfAssetError/PdfAssetError';
-import {useGetPdfAsset} from './useGetPdfAsset/useGetPdfAsset';
-import {useInView} from './useInView';
 
-import {useAssetTransfer} from '../useAssetTransfer';
+import {useAssetTransfer} from '../common/useAssetTransfer/useAssetTransfer';
+import {useGetAssetUrl} from '../common/useGetAssetUrl/useGetAssetUrl';
 
 export interface PdfFileAssetProps {
   message: ContentMessage;
@@ -44,10 +44,10 @@ const PdfAssetPreview = lazy(() =>
 
 export const PdfFileAsset = ({message, isFileShareRestricted}: PdfFileAssetProps) => {
   const asset = message.getFirstAsset() as FileAsset;
-  const {getAssetUrl} = useAssetTransfer(message);
+  const {isUploading, getAssetUrl, uploadProgress} = useAssetTransfer(message);
   const {elementRef, hasBeenInView} = useInView();
 
-  const {url, isLoading, isError} = useGetPdfAsset({
+  const {url, isLoading, isError} = useGetAssetUrl({
     asset,
     isEnabled: hasBeenInView,
     getAssetUrl,
@@ -55,17 +55,17 @@ export const PdfFileAsset = ({message, isFileShareRestricted}: PdfFileAssetProps
 
   const {name, size} = getPdfMetadata({asset});
 
-  if (isError) {
+  if (isError || isFileShareRestricted) {
     return (
-      <PdfFileCard extension="pdf" name={name} size={size}>
-        <PdfAssetError />
+      <PdfFileCard extension="pdf" name={name} size={size} isError>
+        <PdfAssetError isFileShareRestricted={isFileShareRestricted} />
       </PdfFileCard>
     );
   }
 
-  if (isLoading || !url) {
+  if (isUploading || isLoading || !url) {
     return (
-      <PdfFileCard ref={elementRef} extension="pdf" name={name} size={size}>
+      <PdfFileCard ref={elementRef} extension="pdf" name={name} size={size} isLoading loadingProgress={uploadProgress}>
         <PdfAssetLoader />
       </PdfFileCard>
     );

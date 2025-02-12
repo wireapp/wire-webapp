@@ -550,6 +550,7 @@
   "conversationParticipantsSearchPlaceholder": "Search by name",
   "conversationParticipantsTitle": "People",
   "conversationPdfAssetError": "Couldn’t generate preview",
+  "conversationPdfAssetRestricted": "Receiving PDFs is prohibited",
   "conversationPing": " pinged",
   "conversationPingConfirmTitle": "Are you sure you want to ping {memberCount} people?",
   "conversationPingYou": " pinged",
