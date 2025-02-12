@@ -26,6 +26,8 @@ import type {FileAsset} from 'src/script/entity/message/FileAsset';
 
 import {useGetAssetUrl} from './useGetAssetUrl';
 
+type Result = {current: {url: string | undefined; isLoading: boolean; isError: boolean}} | undefined;
+
 describe('useGetAssetUrl', () => {
   const mockAssetUrl = {url: 'mock-asset-url'};
   const mockGetAssetUrl = jest.fn().mockResolvedValue(mockAssetUrl);
@@ -51,7 +53,7 @@ describe('useGetAssetUrl', () => {
   });
 
   it('fetches asset URL when enabled', async () => {
-    let result: any;
+    let result: Result;
 
     await act(async () => {
       const rendered = renderHook(() =>
@@ -68,8 +70,8 @@ describe('useGetAssetUrl', () => {
 
     expect(mockAsset.status).toHaveBeenCalledWith(AssetTransferState.DOWNLOADING);
     expect(mockGetAssetUrl).toHaveBeenCalled();
-    expect(result.current.url).toBe(mockAssetUrl.url);
-    expect(result.current.isLoading).toBe(false);
+    expect(result?.current.url).toBe(mockAssetUrl.url);
+    expect(result?.current.isLoading).toBe(false);
     expect(mockOnSuccess).toHaveBeenCalledWith(mockAssetUrl.url);
     expect(mockAsset.status).toHaveBeenCalledWith(AssetTransferState.UPLOADED);
   });
@@ -93,7 +95,7 @@ describe('useGetAssetUrl', () => {
     const mockError = new Error('Failed to fetch asset');
     const mockGetAssetUrlWithError = jest.fn().mockRejectedValue(mockError);
 
-    let result: any;
+    let result: Result;
 
     await act(async () => {
       const rendered = renderHook(() =>
@@ -108,8 +110,8 @@ describe('useGetAssetUrl', () => {
       await Promise.resolve();
     });
 
-    expect(result.current.isError).toBe(true);
-    expect(result.current.isLoading).toBe(false);
+    expect(result?.current.isError).toBe(true);
+    expect(result?.current.isLoading).toBe(false);
     expect(mockOnError).toHaveBeenCalledWith(mockError);
   });
 
@@ -118,13 +120,7 @@ describe('useGetAssetUrl', () => {
     cancelError.name = AssetError.CANCEL_ERROR;
     const mockGetAssetUrlWithCancel = jest.fn().mockRejectedValue(cancelError);
 
-    let result:
-      | {
-          current: {
-            isError: boolean;
-          };
-        }
-      | undefined;
+    let result: Result;
 
     await act(async () => {
       const rendered = renderHook(() =>
@@ -144,7 +140,7 @@ describe('useGetAssetUrl', () => {
   });
 
   it('does not fetch again if URL is already set', async () => {
-    let rerender: any;
+    let rerender: () => void;
 
     await act(async () => {
       const rendered = renderHook(() =>
