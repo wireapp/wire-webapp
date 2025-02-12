@@ -583,6 +583,7 @@
   "conversationUnverifiedUserWarning": "Bitte seien Sie dennoch vorsichtig, mit wem Sie vertrauliche Informationen teilen.",
   "conversationUpdatedTimer": " hat selbstlöschende Nachrichten auf {time} gestellt",
   "conversationUpdatedTimerYou": " haben selbstlöschende Nachrichten auf {time} gestellt",
+  "conversationVideoAssetError": "Couldn’t generate preview",
   "conversationVideoAssetRestricted": "Empfang von Videos ist verboten",
   "conversationViewAllConversations": "Alle Unterhaltungen",
   "conversationViewTooltip": "Alle",

@@ -583,6 +583,7 @@
   "conversationUnverifiedUserWarning": "Please still be careful with whom you share sensitive information.",
   "conversationUpdatedTimer": " állítsa az üzenet időzítőjét {time}",
   "conversationUpdatedTimerYou": " állítsa az üzenet időzítőjét {time}",
+  "conversationVideoAssetError": "Couldn’t generate preview",
   "conversationVideoAssetRestricted": "Receiving videos is prohibited",
   "conversationViewAllConversations": "All conversations",
   "conversationViewTooltip": "All",

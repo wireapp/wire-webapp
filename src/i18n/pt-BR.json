@@ -583,6 +583,7 @@
   "conversationUnverifiedUserWarning": "Please still be careful with whom you share sensitive information.",
   "conversationUpdatedTimer": " definiu as mensagens temporárias para {time}",
   "conversationUpdatedTimerYou": " definiu as mensagens temporárias para {time}",
+  "conversationVideoAssetError": "Couldn’t generate preview",
   "conversationVideoAssetRestricted": "Receber vídeos é proibido",
   "conversationViewAllConversations": "All conversations",
   "conversationViewTooltip": "All",

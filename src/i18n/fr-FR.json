@@ -583,6 +583,7 @@
   "conversationUnverifiedUserWarning": "Restez prudent quant aux personnes avec lesquelles vous partagez des informations sensibles.",
   "conversationUpdatedTimer": " a défini les messages éphémère à {time}",
   "conversationUpdatedTimerYou": " avez défini les message éphémères à {time}",
+  "conversationVideoAssetError": "Couldn’t generate preview",
   "conversationVideoAssetRestricted": "La réception de vidéos est restreinte",
   "conversationViewAllConversations": "Toutes les conversations",
   "conversationViewTooltip": "All",
