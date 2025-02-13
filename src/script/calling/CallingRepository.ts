@@ -272,9 +272,9 @@ export class CallingRepository {
           // This is a temporary solution. The SFT does not send a response when a track change has occurred.
           // To prevent the wrong video from being briefly displayed, we introduce a timeout here.
           p.isSwitchingVideoResolution(true);
-          window.setTimeout(() => {
-            p.isSwitchingVideoResolution(false);
-          }, 1000);
+          // window.setTimeout(() => {
+          //   p.isSwitchingVideoResolution(false);
+          // }, 1000);
         });
 
         this.requestVideoStreams(call.conversation.qualifiedId, speakes, videoQuality);
@@ -292,9 +292,9 @@ export class CallingRepository {
         maximizedParticipant.isSwitchingVideoResolution(true);
         // This is a temporary solution. The SFT does not send a response when a track change has occurred. To prevent
         // the wrong video from being briefly displayed, we introduce a timeout here.
-        window.setTimeout(() => {
-          maximizedParticipant.isSwitchingVideoResolution(false);
-        }, 1000);
+        // window.setTimeout(() => {
+        //   maximizedParticipant.isSwitchingVideoResolution(false);
+        // }, 1000);
         this.requestVideoStreams(call.conversation.qualifiedId, [maximizedParticipant], RESOLUTION.HIGH);
       } else {
         this.requestCurrentPageVideoStreams(call);
@@ -1446,6 +1446,7 @@ export class CallingRepository {
       })),
       convid: convId,
     };
+    // console.log('######### -> request', JSON.stringify(payload));
     this.wCall?.requestVideoStreams(this.wUser, convId, VSTREAMS.LIST, JSON.stringify(payload));
   }
 
@@ -1786,7 +1787,9 @@ export class CallingRepository {
   private readonly requestConfig = () => {
     const _requestConfig = async () => {
       const limit = Runtime.isFirefox() ? CallingRepository.CONFIG.MAX_FIREFOX_TURN_COUNT : undefined;
-      const config = await this.fetchConfig(limit);
+      const config = (await this.fetchConfig(limit)) as any;
+      config.sft_servers = [{urls: ['https://sft01.avs.zinfra.io']}];
+      config.sft_servers_all = [{urls: ['https://sft01.avs.zinfra.io']}];
       this.wCall?.configUpdate(this.wUser, 0, JSON.stringify(config));
     };
     _requestConfig().catch(error => {
@@ -2290,12 +2293,15 @@ export class CallingRepository {
 
     if (streams === null || streams.length === 0) {
       participant?.releaseVideoStream(false);
+      // participant?.isSwitchingVideoResolution(false);
       return;
     }
 
     const [stream] = streams;
     if (stream.getVideoTracks().length > 0 && participant?.videoStream() !== stream) {
       participant?.videoStream(stream);
+      // console.log('###XX update', remoteUserId);
+      participant?.isSwitchingVideoResolution(false);
     }
   };
 
