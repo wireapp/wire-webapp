@@ -30,7 +30,7 @@ interface ResizeObserverResult<Element extends HTMLElement = HTMLDivElement> {
  * @template Element The type of HTML element to observe (defaults to HTMLDivElement)
  * @returns An object containing the ref to attach to the element, and its current dimensions
  */
-export const useResizeObserver = <Element extends HTMLElement = HTMLDivElement>(): ResizeObserverResult<Element> => {
+export const useElementSize = <Element extends HTMLElement = HTMLDivElement>(): ResizeObserverResult<Element> => {
   const [width, setWidth] = useState(0);
   const [height, setHeight] = useState(0);
   const ref = useRef<Element>(null);

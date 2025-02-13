@@ -19,7 +19,7 @@
 
 import {Document, Page} from 'react-pdf';
 
-import {useResizeObserver} from 'Hooks/useResizeObserver/useResizeObserver';
+import {useElementSize} from 'Hooks/useElementSize/useElementSize';
 
 import {documentStyles, wrapperStyles} from './PdfAssetPreview.styles';
 
@@ -31,7 +31,7 @@ interface PdfAssetPreviewProps {
 }
 
 export const PdfAssetPreview = ({url}: PdfAssetPreviewProps) => {
-  const {ref, width, height} = useResizeObserver();
+  const {ref, width, height} = useElementSize();
 
   return (
     <div ref={ref} css={wrapperStyles}>
