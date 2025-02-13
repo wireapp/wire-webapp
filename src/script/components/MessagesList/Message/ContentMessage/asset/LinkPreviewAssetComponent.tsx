@@ -29,7 +29,7 @@ import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {cleanURL, prependProtocol} from 'Util/UrlUtil';
 import {isTweetUrl} from 'Util/ValidationUtil';
 
-import {AssetHeader} from './AssetHeader';
+import {AssetHeader} from './common/AssetHeader/AssetHeader';
 
 import type {ContentMessage} from '../../../../../entity/message/ContentMessage';
 import type {Text} from '../../../../../entity/message/Text';

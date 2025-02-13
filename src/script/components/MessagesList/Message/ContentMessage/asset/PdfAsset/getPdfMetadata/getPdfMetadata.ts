@@ -17,23 +17,19 @@
  *
  */
 
-import {FileAsset} from 'src/script/entity/message/FileAsset';
+import type {FileAsset as FileAssetType} from 'src/script/entity/message/FileAsset';
+import {formatBytes, trimFileExtension} from 'Util/util';
 
-import {AudioSeekBarNew} from './AudioSeekBarV2/AudioSeekBarV2';
-
-import {SeekBar} from '../../common/SeekBar/SeekBar';
-
-interface AudioAssetSeekBarProps {
-  audioElement: HTMLMediaElement;
-  asset: FileAsset;
-  loudnessPreview: boolean;
-  disabled?: boolean;
+interface GetPdfMetadataParams {
+  asset: FileAssetType;
 }
 
-export const AudioAssetSeekBar = ({audioElement, asset, loudnessPreview, disabled}: AudioAssetSeekBarProps) => {
-  if (loudnessPreview) {
-    return <AudioSeekBarNew audioElement={audioElement} asset={asset} disabled={disabled} />;
-  }
+export const getPdfMetadata = ({asset}: GetPdfMetadataParams) => {
+  const name = trimFileExtension(asset.file_name);
+  const size = formatBytes(asset.file_size);
 
-  return <SeekBar dark mediaElement={audioElement} data-uie-name="status-audio-seekbar" disabled={disabled} />;
+  return {
+    name,
+    size,
+  };
 };

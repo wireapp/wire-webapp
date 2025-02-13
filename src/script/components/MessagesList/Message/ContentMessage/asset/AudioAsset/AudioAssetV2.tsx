@@ -31,7 +31,7 @@ import {AudioPlayButton} from './AudioPlayButton/AudioPlayButton';
 import {useAudioMetadata} from './useAudioMetadata/useAudioMetadata';
 import {useAudioPlayer} from './useAudioPlayer/useAudioPlayer';
 
-import {useAssetTransfer} from '../useAssetTransfer';
+import {useAssetTransfer} from '../common/useAssetTransfer/useAssetTransfer';
 
 export interface AudioAssetProps {
   message: ContentMessage;

@@ -29,8 +29,8 @@ import {t} from 'Util/LocalizerUtil';
 
 import {ContentMessage} from '../../../../../../entity/message/ContentMessage';
 import {MediumImage} from '../../../../../../entity/message/MediumImage';
-import {AssetLoader} from '../AssetLoader';
-import {useAssetTransfer} from '../useAssetTransfer';
+import {AssetLoader} from '../common/AssetLoader/AssetLoader';
+import {useAssetTransfer} from '../common/useAssetTransfer/useAssetTransfer';
 
 export interface ImageAssetProps {
   asset: MediumImage;

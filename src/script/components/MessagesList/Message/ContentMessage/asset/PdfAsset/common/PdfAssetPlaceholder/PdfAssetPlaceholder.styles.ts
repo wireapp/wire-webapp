@@ -17,23 +17,21 @@
  *
  */
 
-import {FileAsset} from 'src/script/entity/message/FileAsset';
+import {CSSObject} from '@emotion/react';
 
-import {AudioSeekBarNew} from './AudioSeekBarV2/AudioSeekBarV2';
+export const wrapperStyles: CSSObject = {
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  width: '100%',
+  backgroundColor: 'var(--foreground-fade-8)',
+  border: '1px solid var(--border-color)',
+  borderRadius: '10px',
+  color: 'var(--gray-70)',
+  aspectRatio: '16/9',
 
-import {SeekBar} from '../../common/SeekBar/SeekBar';
-
-interface AudioAssetSeekBarProps {
-  audioElement: HTMLMediaElement;
-  asset: FileAsset;
-  loudnessPreview: boolean;
-  disabled?: boolean;
-}
-
-export const AudioAssetSeekBar = ({audioElement, asset, loudnessPreview, disabled}: AudioAssetSeekBarProps) => {
-  if (loudnessPreview) {
-    return <AudioSeekBarNew audioElement={audioElement} asset={asset} disabled={disabled} />;
-  }
-
-  return <SeekBar dark mediaElement={audioElement} data-uie-name="status-audio-seekbar" disabled={disabled} />;
+  // Fallback for the above  aspect-ratio
+  '@supports not (aspect-ratio: 16/9)': {
+    paddingBottom: '56.25%',
+  },
 };

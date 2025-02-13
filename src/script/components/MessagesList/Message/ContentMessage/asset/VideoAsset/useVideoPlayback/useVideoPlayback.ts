@@ -27,10 +27,8 @@ import {EventName} from 'src/script/tracking/EventName';
 
 import {isVideoPlayable} from './isVideoPlayable/isVideoPlayable';
 
-import {AssetUrl} from '../../useAssetTransfer';
-
 interface UseVideoPlaybackProps {
-  url: string;
+  url?: string;
   videoElement: HTMLVideoElement | undefined;
   isEnabled: boolean;
 }
@@ -51,7 +49,11 @@ export const useVideoPlayback = ({url, videoElement, isEnabled}: UseVideoPlaybac
     setCurrentTime(videoElement.currentTime);
   }, [videoElement]);
 
-  const getPlayabilityStatus = useCallback(async (): Promise<PlayabilityStatus> => {
+  const getPlayabilityStatus = useCallback(async (url?: string): Promise<PlayabilityStatus> => {
+    if (!url) {
+      return 'unplayable';
+    }
+
     const playable = await isVideoPlayable(url);
 
     if (!playable) {
@@ -68,7 +70,7 @@ export const useVideoPlayback = ({url, videoElement, isEnabled}: UseVideoPlaybac
 
     playabilityStatusRef.current = status;
     return status;
-  }, [url]);
+  }, []);
 
   const play = useCallback(async () => {
     if (!videoElement) {
@@ -80,27 +82,24 @@ export const useVideoPlayback = ({url, videoElement, isEnabled}: UseVideoPlaybac
     await videoElement.play();
   }, [videoElement]);
 
-  const handlePlay = useCallback(
-    async (src?: AssetUrl): Promise<void> => {
-      if (!isEnabled || !src || !videoElement) {
-        return;
-      }
+  const handlePlay = useCallback(async (): Promise<void> => {
+    if (!isEnabled || !url || !videoElement) {
+      return;
+    }
 
-      if (playabilityStatusRef.current !== 'not-checked') {
-        await play();
-        return;
-      }
-
-      const playabilityStatus = await getPlayabilityStatus();
-
-      if (playabilityStatus === 'unplayable') {
-        return;
-      }
-
+    if (playabilityStatusRef.current !== 'not-checked') {
       await play();
-    },
-    [getPlayabilityStatus, isEnabled, play, videoElement],
-  );
+      return;
+    }
+
+    const playabilityStatus = await getPlayabilityStatus(url);
+
+    if (playabilityStatus === 'unplayable') {
+      return;
+    }
+
+    await play();
+  }, [getPlayabilityStatus, isEnabled, play, url, videoElement]);
 
   const handlePause = useCallback(() => {
     setIsPlaying(false);

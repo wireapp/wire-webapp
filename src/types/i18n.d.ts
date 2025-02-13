@@ -334,10 +334,10 @@ declare module 'I18n/en-US.json' {
     'callParticipants': `{number} on call`;
     'callReactionButtonAriaLabel': `Select emoji {emoji}`;
     'callReactionButtonsAriaLabel': `Emoji selection bar`;
+    'callReactionEmojiPickerAriaLabel': `Emoji picker`;
+    'callReactionEmojiPickerButtonAriaLabel': `Open emoji picker`;
     'callReactions': `Reactions`;
     'callReactionsAriaLabel': `Emoji {emoji} from {from}`;
-    'callReactionEmojiPickerButtonAriaLabel': `Open emoji picker`;
-    'callReactionEmojiPickerAriaLabel': `Emoji picker`;
     'callStateCbr': `Constant Bit Rate`;
     'callStateConnecting': `Connecting…`;
     'callStateIncoming': `Calling…`;
@@ -553,6 +553,8 @@ declare module 'I18n/en-US.json' {
     'conversationNotFoundTitle': `{brandName} can’t open this conversation.`;
     'conversationParticipantsSearchPlaceholder': `Search by name`;
     'conversationParticipantsTitle': `People`;
+    'conversationPdfAssetError': `Couldn’t generate preview`;
+    'conversationPdfAssetRestricted': `Receiving PDFs is prohibited`;
     'conversationPing': ` pinged`;
     'conversationPingConfirmTitle': `Are you sure you want to ping {memberCount} people?`;
     'conversationPingYou': ` pinged`;
@@ -587,9 +589,9 @@ declare module 'I18n/en-US.json' {
     'conversationUnverifiedUserWarning': `Please still be careful with whom you share sensitive information.`;
     'conversationUpdatedTimer': ` set the message timer to {time}`;
     'conversationUpdatedTimerYou': ` set the message timer to {time}`;
+    'conversationVideoAssetError': `Couldn’t generate preview`;
     'conversationVideoAssetRestricted': `Receiving videos is prohibited`;
     'conversationViewAllConversations': `All conversations`;
-    'conversationVideoAssetError': `Couldn’t generate preview`;
     'conversationViewTooltip': `All`;
     'conversationVoiceChannelDeactivate': ` called`;
     'conversationVoiceChannelDeactivateYou': ` called`;
@@ -1401,13 +1403,13 @@ declare module 'I18n/en-US.json' {
     'richTextFormatBlockquote': `Blockquote`;
     'richTextFormatBold': `Bold`;
     'richTextFormatCodeBlock': `Code block`;
-    'richTextFormatCodeInline': `Code inline`;
+    'richTextFormatCodeInline': `Inline code`;
     'richTextFormatHeading': `Heading`;
     'richTextFormatItalic': `Italic`;
     'richTextFormatLink': `Link`;
-    'richTextFormatOrderedList': `Ordered list`;
+    'richTextFormatOrderedList': `Number list`;
     'richTextFormatStrikethrough': `Strikethrough`;
-    'richTextFormatUnorderedList': `Unordered list`;
+    'richTextFormatUnorderedList': `Bullet list`;
     'richTextLinkDialogCancelButton': `Cancel`;
     'richTextLinkDialogEditButton': `Update link`;
     'richTextLinkDialogEditTitle': `Edit Link`;
@@ -1573,7 +1575,7 @@ declare module 'I18n/en-US.json' {
     'tooltipConversationCall': `Call`;
     'tooltipConversationDetailsAddPeople': `Add participants to conversation ({shortcut})`;
     'tooltipConversationDetailsRename': `Change conversation name`;
-    'tooltipConversationEmoji': `Select emoji`;
+    'tooltipConversationEmoji': `Add emoji`;
     'tooltipConversationEphemeral': `Self-deleting message`;
     'tooltipConversationEphemeralAriaLabel': `Type a self-deleting message, currently set to {time}`;
     'tooltipConversationFile': `Add file`;

@@ -17,23 +17,20 @@
  *
  */
 
-import {FileAsset} from 'src/script/entity/message/FileAsset';
+import {CSSObject} from '@emotion/react';
 
-import {AudioSeekBarNew} from './AudioSeekBarV2/AudioSeekBarV2';
+export const wrapperStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '16px',
+};
 
-import {SeekBar} from '../../common/SeekBar/SeekBar';
+export const iconStyles: CSSObject = {
+  fill: 'var(--gray-70)',
+};
 
-interface AudioAssetSeekBarProps {
-  audioElement: HTMLMediaElement;
-  asset: FileAsset;
-  loudnessPreview: boolean;
-  disabled?: boolean;
-}
-
-export const AudioAssetSeekBar = ({audioElement, asset, loudnessPreview, disabled}: AudioAssetSeekBarProps) => {
-  if (loudnessPreview) {
-    return <AudioSeekBarNew audioElement={audioElement} asset={asset} disabled={disabled} />;
-  }
-
-  return <SeekBar dark mediaElement={audioElement} data-uie-name="status-audio-seekbar" disabled={disabled} />;
+export const textStyles: CSSObject = {
+  color: 'var(--main-color)',
+  fontSize: 'var(--font-size-medium)',
+  fontWeight: 'var(--font-weight-regular)',
 };

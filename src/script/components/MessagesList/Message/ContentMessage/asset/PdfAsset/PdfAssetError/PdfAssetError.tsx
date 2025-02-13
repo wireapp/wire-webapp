@@ -17,23 +17,27 @@
  *
  */
 
-import {FileAsset} from 'src/script/entity/message/FileAsset';
+import {AlertIcon} from '@wireapp/react-ui-kit';
 
-import {AudioSeekBarNew} from './AudioSeekBarV2/AudioSeekBarV2';
+import {t} from 'Util/LocalizerUtil';
 
-import {SeekBar} from '../../common/SeekBar/SeekBar';
+import {wrapperStyles, iconStyles, textStyles} from './PdfAssetError.styles';
 
-interface AudioAssetSeekBarProps {
-  audioElement: HTMLMediaElement;
-  asset: FileAsset;
-  loudnessPreview: boolean;
-  disabled?: boolean;
+import {PdfAssetPlaceholder} from '../common/PdfAssetPlaceholder/PdfAssetPlaceholder';
+
+interface PdfAssetErrorProps {
+  isFileShareRestricted?: boolean;
 }
 
-export const AudioAssetSeekBar = ({audioElement, asset, loudnessPreview, disabled}: AudioAssetSeekBarProps) => {
-  if (loudnessPreview) {
-    return <AudioSeekBarNew audioElement={audioElement} asset={asset} disabled={disabled} />;
-  }
+export const PdfAssetError = ({isFileShareRestricted}: PdfAssetErrorProps) => {
+  const message = isFileShareRestricted ? t('conversationPdfAssetRestricted') : t('conversationPdfAssetError');
 
-  return <SeekBar dark mediaElement={audioElement} data-uie-name="status-audio-seekbar" disabled={disabled} />;
+  return (
+    <PdfAssetPlaceholder>
+      <div css={wrapperStyles}>
+        <AlertIcon css={iconStyles} />
+        <p css={textStyles}>{message}</p>
+      </div>
+    </PdfAssetPlaceholder>
+  );
 };

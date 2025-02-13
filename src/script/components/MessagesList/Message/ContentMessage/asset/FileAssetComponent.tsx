@@ -28,9 +28,9 @@ import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 
-import {AssetHeader} from './AssetHeader';
-import {AssetLoader} from './AssetLoader';
-import {useAssetTransfer} from './useAssetTransfer';
+import {AssetHeader} from './common/AssetHeader/AssetHeader';
+import {AssetLoader} from './common/AssetLoader/AssetLoader';
+import {useAssetTransfer} from './common/useAssetTransfer/useAssetTransfer';
 
 import {AssetTransferState} from '../../../../../assets/AssetTransferState';
 import type {ContentMessage} from '../../../../../entity/message/ContentMessage';
