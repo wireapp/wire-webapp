@@ -549,6 +549,8 @@
   "conversationNotFoundTitle": "{brandName} can’t open this conversation.",
   "conversationParticipantsSearchPlaceholder": "Szukaj według nazwy",
   "conversationParticipantsTitle": "Osoby",
+  "conversationPdfAssetError": "Couldn’t generate preview",
+  "conversationPdfAssetRestricted": "Receiving PDFs is prohibited",
   "conversationPing": " zaczepił/a",
   "conversationPingConfirmTitle": "Are you sure you want to ping {memberCount} people?",
   "conversationPingYou": " zaczepił/a",

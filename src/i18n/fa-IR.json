@@ -549,6 +549,8 @@
   "conversationNotFoundTitle": "{brandName} can’t open this conversation.",
   "conversationParticipantsSearchPlaceholder": "جستجو بر اساس نام",
   "conversationParticipantsTitle": "افراد",
+  "conversationPdfAssetError": "Couldn’t generate preview",
+  "conversationPdfAssetRestricted": "Receiving PDFs is prohibited",
   "conversationPing": " صدا زد",
   "conversationPingConfirmTitle": "Are you sure you want to ping {memberCount} people?",
   "conversationPingYou": " صدا زد",

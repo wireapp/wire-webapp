@@ -549,6 +549,8 @@
   "conversationNotFoundTitle": "{brandName} 不能打开此对话。",
   "conversationParticipantsSearchPlaceholder": "按名字搜索",
   "conversationParticipantsTitle": "联系人",
+  "conversationPdfAssetError": "Couldn’t generate preview",
+  "conversationPdfAssetRestricted": "Receiving PDFs is prohibited",
   "conversationPing": " ping了一下",
   "conversationPingConfirmTitle": "Are you sure you want to ping {memberCount} people?",
   "conversationPingYou": " ping了一下",
