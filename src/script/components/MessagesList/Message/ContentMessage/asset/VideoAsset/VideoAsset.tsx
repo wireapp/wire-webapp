@@ -42,7 +42,7 @@ import {useEffectRef} from 'Util/useEffectRef';
 
 import {MediaButton} from '../controls/MediaButton';
 import {SeekBar} from '../controls/SeekBar';
-import {FileAsset} from '../FileAssetComponent';
+import {FileAsset} from '../FileAsset/FileAsset';
 import {AssetUrl, useAssetTransfer} from '../useAssetTransfer';
 
 interface VideoAssetProps {

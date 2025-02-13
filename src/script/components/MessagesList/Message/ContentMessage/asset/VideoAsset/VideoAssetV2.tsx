@@ -35,7 +35,7 @@ import {wrapperStyles, videoStyles, controlsWrapperStyles} from './VideoAssetV2.
 import {VideoControls} from './VideoControls/VideoControls';
 import {VideoPlayOverlay} from './VideoPlayOverlay/VideoPlayOverlay';
 
-import {FileAsset} from '../FileAssetComponent';
+import {FileAsset} from '../FileAsset/FileAsset';
 import {useAssetTransfer} from '../useAssetTransfer';
 
 interface VideoAssetProps {

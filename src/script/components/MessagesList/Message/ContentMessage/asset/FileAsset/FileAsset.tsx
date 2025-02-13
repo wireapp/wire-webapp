@@ -22,21 +22,20 @@ import React from 'react';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {RestrictedFile} from 'Components/asset/RestrictedFile';
+import {RestrictedFile} from 'Components/MessagesList/Message/ContentMessage/asset/FileAsset/RestrictedFile/RestrictedFile';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 
-import {AssetHeader} from './AssetHeader';
-import {AssetLoader} from './AssetLoader';
-import {useAssetTransfer} from './useAssetTransfer';
-
-import {AssetTransferState} from '../../../../../assets/AssetTransferState';
-import type {ContentMessage} from '../../../../../entity/message/ContentMessage';
-import type {FileAsset as FileAssetType} from '../../../../../entity/message/FileAsset';
-import {TeamState} from '../../../../../team/TeamState';
-import {useMessageFocusedTabIndex} from '../../util';
+import {AssetTransferState} from '../../../../../../assets/AssetTransferState';
+import type {ContentMessage} from '../../../../../../entity/message/ContentMessage';
+import type {FileAsset as FileAssetType} from '../../../../../../entity/message/FileAsset';
+import {TeamState} from '../../../../../../team/TeamState';
+import {useMessageFocusedTabIndex} from '../../../util';
+import {AssetHeader} from '../AssetHeader';
+import {AssetLoader} from '../AssetLoader';
+import {useAssetTransfer} from '../useAssetTransfer';
 
 export interface FileAssetProps {
   hasHeader?: boolean;

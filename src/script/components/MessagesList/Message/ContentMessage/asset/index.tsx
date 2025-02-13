@@ -29,14 +29,14 @@ import {StatusType} from 'src/script/message/StatusType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
 
-import {AudioAsset} from './AudioAsset/AudioAsset';
-import {FileAsset} from './FileAssetComponent';
+import {AudioAssetV2} from './AudioAsset/AudioAssetV2';
+import {FileAssetV2} from './FileAsset/FileAssetV2';
 import {ImageAsset} from './ImageAsset';
 import {LinkPreviewAsset} from './LinkPreviewAssetComponent';
 import {LocationAsset} from './LocationAsset';
 import {MessageButton} from './MessageButton';
 import {TextMessageRenderer} from './TextMessageRenderer';
-import {VideoAsset} from './VideoAsset/VideoAsset';
+import {VideoAssetV2} from './VideoAsset/VideoAssetV2';
 
 import {MessageActions} from '../..';
 import {AssetType} from '../../../../../assets/AssetType';
@@ -68,6 +68,7 @@ const ContentAsset = ({
   isMessageFocused,
   is1to1Conversation,
   onClickDetails,
+  isFileShareRestricted,
 }: ContentAssetProps) => {
   const {isObfuscated, status} = useKoSubscribableChildren(message, ['isObfuscated', 'status']);
   const {previews} = useKoSubscribableChildren(asset as Text, ['previews']);
@@ -111,15 +112,21 @@ const ContentAsset = ({
       );
     case AssetType.FILE:
       if ((asset as FileAssetType).isFile()) {
-        return <FileAsset message={message} isFocusable={isMessageFocused} />;
+        return <FileAssetV2 message={message} isFileShareRestricted={isFileShareRestricted} />;
       }
 
       if ((asset as FileAssetType).isAudio()) {
-        return <AudioAsset message={message} isFocusable={isMessageFocused} />;
+        return (
+          <AudioAssetV2
+            message={message}
+            isFocusable={isMessageFocused}
+            isFileShareRestricted={isFileShareRestricted}
+          />
+        );
       }
 
       if ((asset as FileAssetType).isVideo()) {
-        return <VideoAsset message={message} isFocusable={isMessageFocused} />;
+        return <VideoAssetV2 message={message} isFileShareRestricted={isFileShareRestricted} />;
       }
 
     case AssetType.IMAGE:

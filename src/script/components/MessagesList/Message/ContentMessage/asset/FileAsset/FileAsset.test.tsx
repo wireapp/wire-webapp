@@ -24,9 +24,9 @@ import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {FileAsset} from 'src/script/entity/message/FileAsset';
 import {TeamState} from 'src/script/team/TeamState';
 
-import {FileAsset as FileAssetComponent} from './FileAssetComponent';
+import {FileAsset as FileAssetComponent} from './FileAsset';
 
-import {StatusType} from '../../../../../message/StatusType';
+import {StatusType} from '../../../../../../message/StatusType';
 
 describe('FileAssetComponent', () => {
   function mockContentMessage(): ContentMessage {
