@@ -549,6 +549,8 @@
   "conversationNotFoundTitle": "{brandName} මගින් මෙම සංවාදය ඇරීමට නොහැකිය.",
   "conversationParticipantsSearchPlaceholder": "නමින් සොයන්න",
   "conversationParticipantsTitle": "පුද්ගලයින්",
+  "conversationPdfAssetError": "Couldn’t generate preview",
+  "conversationPdfAssetRestricted": "Receiving PDFs is prohibited",
   "conversationPing": "හැඬවීය",
   "conversationPingConfirmTitle": "ඔබට {memberCount} දෙනෙකුගේ උපාංග හැඬවීමට වුවමනාද?",
   "conversationPingYou": "හැඬවීය",
