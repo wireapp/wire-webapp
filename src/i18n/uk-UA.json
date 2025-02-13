@@ -549,6 +549,8 @@
   "conversationNotFoundTitle": "{brandName} не може відкрити дану розмову.",
   "conversationParticipantsSearchPlaceholder": "Пошук за іменем",
   "conversationParticipantsTitle": "Список контактів",
+  "conversationPdfAssetError": "Couldn’t generate preview",
+  "conversationPdfAssetRestricted": "Receiving PDFs is prohibited",
   "conversationPing": " відправив(-ла) пінг",
   "conversationPingConfirmTitle": "Are you sure you want to ping {memberCount} people?",
   "conversationPingYou": " відправив(-ла) пінг",

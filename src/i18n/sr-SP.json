@@ -549,6 +549,8 @@
   "conversationNotFoundTitle": "{brandName} не може отворити овај разговор.",
   "conversationParticipantsSearchPlaceholder": "Претрага по имену",
   "conversationParticipantsTitle": "Особе",
+  "conversationPdfAssetError": "Couldn’t generate preview",
+  "conversationPdfAssetRestricted": "Receiving PDFs is prohibited",
   "conversationPing": " пингова",
   "conversationPingConfirmTitle": "Are you sure you want to ping {memberCount} people?",
   "conversationPingYou": " пингова",

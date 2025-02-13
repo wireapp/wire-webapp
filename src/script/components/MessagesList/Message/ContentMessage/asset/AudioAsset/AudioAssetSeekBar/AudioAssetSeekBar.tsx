@@ -21,7 +21,7 @@ import {FileAsset} from 'src/script/entity/message/FileAsset';
 
 import {AudioSeekBarNew} from './AudioSeekBarV2/AudioSeekBarV2';
 
-import {SeekBar} from '../../controls/SeekBar';
+import {SeekBar} from '../../common/SeekBar/SeekBar';
 
 interface AudioAssetSeekBarProps {
   audioElement: HTMLMediaElement;

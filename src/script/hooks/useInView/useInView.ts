@@ -30,6 +30,7 @@ interface UseInViewOptions {
 
 export const useInView = <Element extends HTMLElement = HTMLDivElement>(options: UseInViewOptions = {}) => {
   const [isInView, setIsInView] = useState(false);
+  const [hasBeenInView, setHasBeenInView] = useState(false);
   const elementRef = useRef<Element | null>(null);
 
   useEffect(() => {
@@ -39,7 +40,12 @@ export const useInView = <Element extends HTMLElement = HTMLDivElement>(options:
     }
 
     const observer = new IntersectionObserver(([entry]) => {
-      setIsInView(entry.isIntersecting);
+      const isIntersecting = entry.isIntersecting;
+      setIsInView(isIntersecting);
+
+      if (isIntersecting) {
+        setHasBeenInView(true);
+      }
     }, options);
 
     observer.observe(element);
@@ -49,5 +55,5 @@ export const useInView = <Element extends HTMLElement = HTMLDivElement>(options:
     };
   }, [options, options.root, options.rootMargin, options.threshold]);
 
-  return {elementRef, isInView};
+  return {elementRef, isInView, hasBeenInView};
 };

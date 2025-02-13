@@ -20,12 +20,11 @@
 import type {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import type {FileAsset as FileAssetType} from 'src/script/entity/message/FileAsset';
 
-import {FileAssetCard} from './FileAssetCard/FileAssetCard';
-import {FileAssetRestricted} from './FileAssetRestricted/FileAssetRestricted';
-import {getFileAssetMetadata} from './getFileAssetMetadata/getFileAssetMetadata';
-import {getFileAssetStatus} from './getFileAssetStatus/getAssetStatus';
-
-import {useAssetTransfer} from '../useAssetTransfer';
+import {useAssetTransfer} from '../common/useAssetTransfer/useAssetTransfer';
+import {FileAssetCard} from '../FileAsset/FileAssetCard/FileAssetCard';
+import {FileAssetRestricted} from '../FileAsset/FileAssetRestricted/FileAssetRestricted';
+import {getFileAssetMetadata} from '../FileAsset/getFileAssetMetadata/getFileAssetMetadata';
+import {getFileAssetStatus} from '../FileAsset/getFileAssetStatus/getAssetStatus';
 
 interface FileAssetV2Props {
   message: ContentMessage;

@@ -18,15 +18,18 @@
  */
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+import {amplify} from 'amplify';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import type {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import type {FileAsset as FileAssetType} from 'src/script/entity/message/FileAsset';
 import {useInView} from 'src/script/hooks/useInView/useInView';
+import {EventName} from 'src/script/tracking/EventName';
 import {useEffectRef} from 'Util/useEffectRef';
 
 import {getVideoMetadata} from './getVideoMetadata/getVideoMetadata';
 import {isVideoMimeTypeSupported} from './isVideoMimeTypeSupported/isVideoMimeTypeSupported';
-import {useGetVideoAsset} from './useGetVideoAsset/useGetVideoAsset';
 import {useVideoPlayback} from './useVideoPlayback/useVideoPlayback';
 import {VideoAssetCard} from './VideoAssetCard/VideoAssetCard';
 import {VideoAssetError} from './VideoAssetError/VideoAssetError';
@@ -35,8 +38,9 @@ import {wrapperStyles, videoStyles, controlsWrapperStyles} from './VideoAssetV2.
 import {VideoControls} from './VideoControls/VideoControls';
 import {VideoPlayOverlay} from './VideoPlayOverlay/VideoPlayOverlay';
 
+import {useAssetTransfer} from '../common/useAssetTransfer/useAssetTransfer';
+import {useGetAssetUrl} from '../common/useGetAssetUrl/useGetAssetUrl';
 import {FileAsset} from '../FileAsset/FileAsset';
-import {useAssetTransfer} from '../useAssetTransfer';
 
 interface VideoAssetProps {
   message: ContentMessage;
@@ -63,7 +67,21 @@ export const VideoAssetV2 = ({message, isFocusable = true, isFileShareRestricted
 
   const isEnabled = !isFileShareRestricted && isInView;
 
-  const {url, isError: isApiError, isLoaded} = useGetVideoAsset({asset, isEnabled, getAssetUrl});
+  const {
+    url,
+    isError: isApiError,
+    isLoading,
+  } = useGetAssetUrl({
+    asset,
+    isEnabled,
+    getAssetUrl,
+    onSuccess: () => {
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.PLAY_SUCCESS);
+    },
+    onError: () => {
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.PLAY_FAILED);
+    },
+  });
 
   const {
     isPlaying,
@@ -87,7 +105,7 @@ export const VideoAssetV2 = ({message, isFocusable = true, isFileShareRestricted
     return <FileAsset message={message} isFocusable={isFocusable} />;
   }
 
-  if (isPendingUpload || !isLoaded) {
+  if (isPendingUpload || isLoading) {
     return (
       <VideoAssetCard
         ref={wrapperRef}
@@ -102,10 +120,10 @@ export const VideoAssetV2 = ({message, isFocusable = true, isFileShareRestricted
     );
   }
 
-  if (isError) {
+  if (isError || isFileShareRestricted) {
     return (
       <VideoAssetCard ref={wrapperRef} extension={extension} name={name} size={size} isError>
-        <VideoAssetError />
+        <VideoAssetError isFileShareRestricted={isFileShareRestricted} />
       </VideoAssetCard>
     );
   }

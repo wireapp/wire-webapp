@@ -549,6 +549,8 @@
   "conversationNotFoundTitle": "{brandName} ne peut pas ouvrir cette conversation.",
   "conversationParticipantsSearchPlaceholder": "Rechercher par nom",
   "conversationParticipantsTitle": "Contacts",
+  "conversationPdfAssetError": "Couldn’t generate preview",
+  "conversationPdfAssetRestricted": "Receiving PDFs is prohibited",
   "conversationPing": " a fait un signe",
   "conversationPingConfirmTitle": "Are you sure you want to ping {memberCount} people?",
   "conversationPingYou": " avez fait un signe",

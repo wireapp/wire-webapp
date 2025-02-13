@@ -23,19 +23,19 @@ import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import {RestrictedFile} from 'Components/MessagesList/Message/ContentMessage/asset/FileAsset/RestrictedFile/RestrictedFile';
+import {AssetTransferState} from 'src/script/assets/AssetTransferState';
+import type {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import type {FileAsset as FileAssetType} from 'src/script/entity/message/FileAsset';
+import {TeamState} from 'src/script/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 
-import {AssetTransferState} from '../../../../../../assets/AssetTransferState';
-import type {ContentMessage} from '../../../../../../entity/message/ContentMessage';
-import type {FileAsset as FileAssetType} from '../../../../../../entity/message/FileAsset';
-import {TeamState} from '../../../../../../team/TeamState';
 import {useMessageFocusedTabIndex} from '../../../util';
-import {AssetHeader} from '../AssetHeader';
-import {AssetLoader} from '../AssetLoader';
-import {useAssetTransfer} from '../useAssetTransfer';
+import {AssetHeader} from '../common/AssetHeader/AssetHeader';
+import {AssetLoader} from '../common/AssetLoader/AssetLoader';
+import {useAssetTransfer} from '../common/useAssetTransfer/useAssetTransfer';
 
 export interface FileAssetProps {
   hasHeader?: boolean;

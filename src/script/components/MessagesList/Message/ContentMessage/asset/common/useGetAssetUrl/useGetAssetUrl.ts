@@ -19,52 +19,49 @@
 
 import {useState, useCallback, useEffect} from 'react';
 
-import {amplify} from 'amplify';
-
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {AssetError} from 'src/script/assets/AssetError';
+import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 import type {FileAsset} from 'src/script/entity/message/FileAsset';
-import {EventName} from 'src/script/tracking/EventName';
 
-import {AssetUrl} from '../../useAssetTransfer';
+import {AssetUrl} from '../useAssetTransfer/useAssetTransfer';
 
-interface UseGetVideoAssetProps {
+interface UseGetAssetUrlProps {
   asset: FileAsset;
   isEnabled: boolean;
-  getAssetUrl: (resource: any) => Promise<AssetUrl>;
+  getAssetUrl: (resource: AssetRemoteData) => Promise<AssetUrl>;
+  onError?: (error: Error) => void;
+  onSuccess?: (url: string) => void;
 }
 
-export const useGetVideoAsset = ({asset, isEnabled, getAssetUrl}: UseGetVideoAssetProps) => {
-  const [url, setUrl] = useState('');
+export const useGetAssetUrl = ({asset, isEnabled, getAssetUrl, onError, onSuccess}: UseGetAssetUrlProps) => {
+  const [url, setUrl] = useState<string>();
+  const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
-  const [isLoaded, setIsLoaded] = useState(false);
 
   const fetchAssetUrl = useCallback(async () => {
     if (url || !isEnabled) {
       return;
     }
 
+    setIsLoading(true);
     asset.status(AssetTransferState.DOWNLOADING);
 
     try {
       const assetUrl = await getAssetUrl(asset.original_resource());
-
       setUrl(assetUrl.url);
-      setIsLoaded(true);
-
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.PLAY_SUCCESS);
+      onSuccess?.(assetUrl.url);
     } catch (error) {
       if (error instanceof Error && error.name !== AssetError.CANCEL_ERROR) {
         setIsError(true);
+        onError?.(error);
       }
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.PLAY_FAILED);
-      console.error('Failed to load video asset ', error);
+      console.error(`Failed to load asset ${asset.id}`, error);
+    } finally {
+      setIsLoading(false);
+      asset.status(AssetTransferState.UPLOADED);
     }
-
-    asset.status(AssetTransferState.UPLOADED);
-  }, [asset, isEnabled, getAssetUrl, url]);
+  }, [url, isEnabled, asset, getAssetUrl, onSuccess, onError]);
 
   useEffect(() => {
     void fetchAssetUrl();
@@ -72,7 +69,7 @@ export const useGetVideoAsset = ({asset, isEnabled, getAssetUrl}: UseGetVideoAss
 
   return {
     url,
+    isLoading,
     isError,
-    isLoaded,
   };
 };

@@ -32,13 +32,13 @@ import {getLogger} from 'Util/Logger';
 import {formatSeconds} from 'Util/TimeUtil';
 import {useEffectRef} from 'Util/useEffectRef';
 
+import {AudioSeekBar} from './AudioSeekBar/AudioSeekBar';
 import {RestrictedAudio} from './RestrictedAudio/RestrictedAudio';
 
-import {AssetHeader} from '../AssetHeader';
-import {AudioSeekBar} from '../controls/AudioSeekBar';
-import {MediaButton} from '../controls/MediaButton';
-import {SeekBar} from '../controls/SeekBar';
-import {AssetUrl, useAssetTransfer} from '../useAssetTransfer';
+import {AssetHeader} from '../common/AssetHeader/AssetHeader';
+import {MediaButton} from '../common/MediaButton/MediaButton';
+import {SeekBar} from '../common/SeekBar/SeekBar';
+import {AssetUrl, useAssetTransfer} from '../common/useAssetTransfer/useAssetTransfer';
 
 const logger = getLogger('AudioAssetComponent');
 

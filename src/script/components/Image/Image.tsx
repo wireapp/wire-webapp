@@ -33,7 +33,10 @@ import {AssetRemoteData} from '../../assets/AssetRemoteData';
 import {Config} from '../../Config';
 import {MediumImage} from '../../entity/message/MediumImage';
 import {TeamState} from '../../team/TeamState';
-import {AssetUrl, useAssetTransfer} from '../MessagesList/Message/ContentMessage/asset/useAssetTransfer';
+import {
+  AssetUrl,
+  useAssetTransfer,
+} from '../MessagesList/Message/ContentMessage/asset/common/useAssetTransfer/useAssetTransfer';
 
 interface BaseImageProps extends React.HTMLProps<HTMLDivElement> {
   alt?: string;

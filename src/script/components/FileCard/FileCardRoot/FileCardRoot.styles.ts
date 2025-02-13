@@ -41,7 +41,8 @@ export const wrapperStylesSmall: CSSObject = {
 export const wrapperStylesLarge: CSSObject = {
   ...wrapperStyles,
   height: 'auto',
-  width: '500px',
+  maxWidth: '500px',
+  width: '100%',
 };
 
 export const contentStyles: CSSObject = {
