@@ -205,7 +205,12 @@ const FullscreenVideoCall = ({
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent): void => {
-      if (viewMode !== CallingViewMode.FULL_SCREEN) {
+      const target = event.target as HTMLElement;
+
+      if (
+        viewMode !== CallingViewMode.FULL_SCREEN ||
+        target?.getAttribute('aria-controls') === 'epr-search-id' // Exclude emoji search input
+      ) {
         return;
       }
 
