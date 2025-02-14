@@ -118,4 +118,24 @@ describe('TeamCreationModal', () => {
     fireEvent.click(getByTestId(testIdentifiers.doClose));
     expect(onCloseMock).toHaveBeenCalled();
   });
+
+  it('disables Continue button for empty or whitespace-only team names', () => {
+    const {getByTestId} = renderTeamCreationModal();
+
+    fireEvent.click(getByTestId(testIdentifiers.doContinue));
+
+    const continueButton = getByTestId(testIdentifiers.doContinue);
+    const teamNameInput = getByTestId(testIdentifiers.enterTeamName);
+
+    expect(continueButton).toBeDisabled();
+
+    fireEvent.change(teamNameInput, {target: {value: '   '}});
+    expect(continueButton).toBeDisabled();
+
+    fireEvent.change(teamNameInput, {target: {value: ''}});
+    expect(continueButton).toBeDisabled();
+
+    fireEvent.change(teamNameInput, {target: {value: 'Valid Team'}});
+    expect(continueButton).not.toBeDisabled();
+  });
 });
