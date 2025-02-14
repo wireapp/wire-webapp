@@ -31,10 +31,10 @@ const EMOJIS_LIST = ['👍', '🎉', '❤️', '😂', '😮', '👏', '🤔', '
 export interface EmojisBarProps {
   onEmojiClick: (emoji: string) => void;
   onPickerEmojiClick: () => void;
-  detachedWindow?: Window | null;
+  targetWindow: Window;
 }
 
-export const EmojisBar = ({onEmojiClick, onPickerEmojiClick, detachedWindow}: EmojisBarProps) => {
+export const EmojisBar = ({onEmojiClick, onPickerEmojiClick, targetWindow}: EmojisBarProps) => {
   const emojisBarRef = useRef<HTMLDivElement>(null);
 
   const [disabledEmojis, setDisabledEmojis] = useState<string[]>([]);
@@ -62,15 +62,11 @@ export const EmojisBar = ({onEmojiClick, onPickerEmojiClick, detachedWindow}: Em
   };
 
   useEffect(() => {
-    if (detachedWindow) {
-      detachedWindow.document.addEventListener('mousedown', handleClickOutside);
-      return () => {
-        detachedWindow.document.removeEventListener('mousedown', handleClickOutside);
-      };
-    }
-
-    return () => {};
-  }, [detachedWindow]);
+    targetWindow.document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      targetWindow.document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [targetWindow, onPickerEmojiClick]);
 
   return (
     <div ref={emojisBarRef}>

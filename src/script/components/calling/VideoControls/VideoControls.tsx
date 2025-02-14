@@ -646,7 +646,7 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
               <EmojisBar
                 onEmojiClick={handleEmojiClick}
                 onPickerEmojiClick={() => setShowEmojisBar(false)}
-                detachedWindow={detachedWindow}
+                targetWindow={viewMode === CallingViewMode.DETACHED_WINDOW ? detachedWindow! : window}
               />
             )}
             <button
@@ -754,7 +754,7 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
                   <EmojisBar
                     onEmojiClick={handleEmojiClick}
                     onPickerEmojiClick={() => setShowEmojisBar(false)}
-                    detachedWindow={detachedWindow}
+                    targetWindow={viewMode === CallingViewMode.DETACHED_WINDOW ? detachedWindow! : window}
                   />
                 )}
                 <button
