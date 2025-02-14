@@ -27,10 +27,15 @@ import {modalButtonsCss} from './TeamCreationSteps.styles';
 import {buttonCss} from '../TeamCreation.styles';
 
 export const Form = ({onNextStep, onPreviousStep, teamName, setTeamName}: StepProps) => {
-  const isValidTeamName = teamName.trim().length > 0;
+  const trimmedTeamName = teamName.trim();
+  const isValidTeamName = trimmedTeamName.length > 0;
 
   function handleNextStep() {
-    setTeamName(teamName.trim());
+    if (!isValidTeamName) {
+      return;
+    }
+
+    setTeamName(trimmedTeamName);
     onNextStep();
   }
 
