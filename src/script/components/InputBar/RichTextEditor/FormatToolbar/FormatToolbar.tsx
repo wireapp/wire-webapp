@@ -45,7 +45,7 @@ import {useLinkState} from './useLinkState/useLinkState';
 import {useListState} from './useListState/useListState';
 import {useToolbarState} from './useToolbarState/useToolbarState';
 
-import {FormatSeparator} from '../../../common/FormatSeparator/FormatSeparator';
+import {FormatSeparator} from '../../../../common/FormatSeparator/FormatSeparator';
 
 interface FormatToolbarProps {
   isEditing: boolean;

@@ -17,13 +17,10 @@
  *
  */
 
-import {FC} from 'react';
-
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
-import {useTypingIndicatorState} from './TypingIndicator.state';
 import {
   dotOneStyles,
   dotThreeStyles,
@@ -33,12 +30,13 @@ import {
   indicatorTitleStyles,
   wrapperStyles,
 } from './TypingIndicator.styles';
+import {useTypingIndicatorState} from './useTypingIndicatorState/useTypingIndicatorState';
 
 export interface TypingIndicatorProps {
   conversationId: string;
 }
 
-const TypingIndicator: FC<TypingIndicatorProps> = ({conversationId}) => {
+export const TypingIndicator = ({conversationId}: TypingIndicatorProps) => {
   const users = useTypingIndicatorState(state => state.getTypingUsersInConversation(conversationId));
   const usersCount = users.length;
 
@@ -93,5 +91,3 @@ const TypingIndicator: FC<TypingIndicatorProps> = ({conversationId}) => {
     </div>
   );
 };
-
-export {TypingIndicator};

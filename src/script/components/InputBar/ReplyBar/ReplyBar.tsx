@@ -19,8 +19,6 @@
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 
-import {FC} from 'react';
-
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {RestrictedVideo} from 'Components/asset/RestrictedVideo';
@@ -31,14 +29,14 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {renderMessage} from 'Util/messageRenderer';
 
-import {ContentMessage} from '../../../../entity/message/ContentMessage';
+import {ContentMessage} from '../../../entity/message/ContentMessage';
 
 interface ReplyBarProps {
   replyMessageEntity: ContentMessage;
   onCancel: () => void;
 }
 
-const ReplyBar: FC<ReplyBarProps> = ({replyMessageEntity, onCancel}) => {
+export const ReplyBar = ({replyMessageEntity, onCancel}: ReplyBarProps) => {
   const {
     assets,
     senderName,
@@ -131,5 +129,3 @@ const ReplyBar: FC<ReplyBarProps> = ({replyMessageEntity, onCancel}) => {
     </div>
   );
 };
-
-export {ReplyBar};

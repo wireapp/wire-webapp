@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactElement, useRef} from 'react';
+import {ReactNode, useRef} from 'react';
 
 import {$convertToMarkdownString} from '@lexical/markdown';
 import {ClearEditorPlugin} from '@lexical/react/LexicalClearEditorPlugin';
@@ -35,9 +35,9 @@ import {DraftState} from 'Components/InputBar/util/DraftStateUtil';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {User} from 'src/script/entity/User';
 
-import {FormatToolbar} from './components/FormatToolbar/FormatToolbar';
-import {Placeholder} from './components/Placeholder/Placeholder';
 import {editorConfig} from './editorConfig';
+import {FormatToolbar} from './FormatToolbar/FormatToolbar';
+import {Placeholder} from './Placeholder/Placeholder';
 import {AutoFocusPlugin} from './plugins/AutoFocusPlugin/AutoFocusPlugin';
 import {AutoLinkPlugin} from './plugins/AutoLinkPlugin/AutoLinkPlugin';
 import {BlockquotePlugin} from './plugins/BlockquotePlugin/BlockquotePlugin';
@@ -60,7 +60,7 @@ import {parseMentions} from './utils/parseMentions';
 import {transformMessage} from './utils/transformMessage';
 import {useEditorDraftState} from './utils/useEditorDraftState';
 
-import {MentionEntity} from '../../../../message/MentionEntity';
+import {MentionEntity} from '../../../message/MentionEntity';
 
 export type RichTextContent = {
   text: string;
@@ -71,7 +71,7 @@ interface RichTextEditorProps {
   placeholder: string;
   replaceEmojis: boolean;
   editedMessage?: ContentMessage;
-  children: ReactElement;
+  children: ReactNode;
   hasLocalEphemeralTimer: boolean;
   showFormatToolbar: boolean;
   showMarkdownPreview: boolean;
