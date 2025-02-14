@@ -55,6 +55,7 @@ export const FileAssetV2 = ({message, isFileShareRestricted}: FileAssetV2Props) 
         name={name}
         size={size}
         isLoading
+        // eslint-disable-next-line no-magic-numbers
         loadingProgress={isUploading ? uploadProgress : 100}
       />
     );

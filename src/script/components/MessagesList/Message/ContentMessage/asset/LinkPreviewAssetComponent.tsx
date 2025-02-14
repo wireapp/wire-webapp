@@ -17,7 +17,7 @@
  *
  */
 
-import React, {UIEvent} from 'react';
+import React, {UIEvent, useRef} from 'react';
 
 import cx from 'classnames';
 
@@ -54,7 +54,7 @@ const LinkPreviewAsset: React.FC<LinkPreviewAssetProps> = ({header = false, mess
   const {isObfuscated} = useKoSubscribableChildren(message, ['isObfuscated']);
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isFocusable);
 
-  const linkRef = React.useRef<HTMLAnchorElement>(null);
+  const linkRef = useRef<HTMLAnchorElement>(null);
 
   const onClick = ({target}: UIEvent) => {
     // Clicking on the link directly will already open the link, so we don't want to open it manually

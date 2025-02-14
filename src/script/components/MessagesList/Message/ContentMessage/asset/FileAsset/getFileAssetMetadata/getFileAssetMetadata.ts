@@ -33,11 +33,11 @@ export const getFileAssetMetadata = ({asset, transferState}: FileAssetMetadataPa
   const size = formatBytes(asset.file_size);
 
   const transferNames = {
-    [AssetTransferState.UPLOAD_PENDING]: t('conversationAssetUploading'),
-    [AssetTransferState.UPLOAD_FAILED]: t('conversationAssetUploadFailed'),
-    [AssetTransferState.DOWNLOADING]: t('conversationAssetDownloading'),
-    [AssetTransferState.DOWNLOAD_FAILED_DECRPYT]: t('conversationAssetFailedDecryptDownloading'),
-    [AssetTransferState.DOWNLOAD_FAILED_HASH]: t('conversationAssetFailedHashDownloading'),
+    [AssetTransferState.UPLOAD_PENDING]: t('conversationAssetUploadingV2', {name}),
+    [AssetTransferState.UPLOAD_FAILED]: t('conversationAssetUploadFailedV2', {name}),
+    [AssetTransferState.DOWNLOADING]: t('conversationAssetDownloadingV2', {name}),
+    [AssetTransferState.DOWNLOAD_FAILED_DECRPYT]: t('conversationAssetFailedDecryptDownloadingV2'),
+    [AssetTransferState.DOWNLOAD_FAILED_HASH]: t('conversationAssetFailedHashDownloadingV2'),
   };
 
   const formattedName = transferNames[transferState as keyof typeof transferNames] ?? name;

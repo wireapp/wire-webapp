@@ -36,7 +36,6 @@ export class Asset {
   public file_name?: string;
   public id?: string;
   public key: string;
-  public size: string;
   public type: string;
   public text: string;
 
@@ -60,7 +59,7 @@ export class Asset {
   }
 
   isFile(): this is FileAsset {
-    return this.type === AssetType.FILE && !this.isVideo() && !this.isAudio();
+    return this.type === AssetType.FILE && !this.isVideo() && !this.isAudio() && !this.isPdf();
   }
 
   isLocation(): this is LocationAsset {
@@ -71,10 +70,14 @@ export class Asset {
     return this.type === AssetType.FILE && !!this.file_type?.startsWith('video');
   }
 
+  isPdf(): boolean {
+    return this.type === AssetType.FILE && !!this.file_type?.startsWith('application/pdf');
+  }
+
   isAudio(): boolean {
     const is_audio_asset = this.type === AssetType.FILE && this.file_type?.startsWith('audio');
     if (is_audio_asset) {
-      const can_play = document.createElement('audio').canPlayType(this.file_type);
+      const can_play = document.createElement('audio').canPlayType(this.file_type!);
       if (can_play !== '') {
         return true;
       }
