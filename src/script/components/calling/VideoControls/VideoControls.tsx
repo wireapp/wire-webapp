@@ -377,6 +377,8 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
 
   const isInCallHandRaiseControlVisible = isInCallHandRaiseEnable && !is1to1Conversation;
 
+  const emojisBarTargetWindow = viewMode === CallingViewMode.DETACHED_WINDOW ? detachedWindow! : window;
+
   return (
     <ul id="video-controls" className="video-controls" css={videoControlsWrapperStyles}>
       <div
@@ -646,7 +648,7 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
               <EmojisBar
                 onEmojiClick={handleEmojiClick}
                 onPickerEmojiClick={() => setShowEmojisBar(false)}
-                detachedWindow={detachedWindow}
+                targetWindow={emojisBarTargetWindow}
               />
             )}
             <button
@@ -754,7 +756,7 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
                   <EmojisBar
                     onEmojiClick={handleEmojiClick}
                     onPickerEmojiClick={() => setShowEmojisBar(false)}
-                    detachedWindow={detachedWindow}
+                    targetWindow={emojisBarTargetWindow}
                   />
                 )}
                 <button
