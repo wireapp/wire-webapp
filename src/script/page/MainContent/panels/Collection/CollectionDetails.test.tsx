@@ -39,7 +39,7 @@ jest.mock('Components/MessagesList/Message/ContentMessage/asset/AudioAsset/Audio
   AudioAsset: () => <div>Audio</div>,
   __esModule: true,
 }));
-jest.mock('Components/MessagesList/Message/ContentMessage/asset/FileAsset', () => ({
+jest.mock('Components/MessagesList/Message/ContentMessage/asset/FileAsset/FileAsset', () => ({
   FileAsset: () => <div>File</div>,
   __esModule: true,
 }));
