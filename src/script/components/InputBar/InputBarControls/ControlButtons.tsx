@@ -19,19 +19,18 @@
 
 import React, {MouseEvent} from 'react';
 
-import {FormatSeparator} from 'Components/InputBar/components/common/FormatSeparator/FormatSeparator';
+import {FormatSeparator} from 'Components/InputBar/common/FormatSeparator/FormatSeparator';
 import {Config} from 'src/script/Config';
 import {Conversation} from 'src/script/entity/Conversation';
 
+import {AssetUploadButton} from './AssetUploadButton';
 import {CancelEditButton} from './CancelEditButton/CancelEditButton';
 import {EmojiButton} from './EmojiButton/EmojiButton';
 import {FormatTextButton} from './FormatTextButton/FormatTextButton';
 import {GiphyButton} from './GiphyButton/GiphyButton';
+import {ImageUploadButton} from './ImageUploadButton';
+import {MessageTimerButton} from './MessageTimerButton';
 import {PingButton} from './PingButton/PingButton';
-
-import {AssetUploadButton} from '../AssetUploadButton';
-import {ImageUploadButton} from '../ImageUploadButton';
-import {MessageTimerButton} from '../MessageTimerButton';
 
 export type ControlButtonsProps = {
   input: string;
@@ -53,7 +52,7 @@ export type ControlButtonsProps = {
   onEmojiClick: (event: MouseEvent<HTMLButtonElement>) => void;
 };
 
-const ControlButtons: React.FC<ControlButtonsProps> = ({
+const ControlButtons = ({
   conversation,
   disablePing,
   disableFilesharing,
@@ -71,7 +70,7 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
   onGifClick,
   onFormatClick,
   onEmojiClick,
-}) => {
+}: ControlButtonsProps) => {
   if (isEditing) {
     return (
       <>

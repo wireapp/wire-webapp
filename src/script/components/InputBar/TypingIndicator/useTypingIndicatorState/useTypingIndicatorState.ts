@@ -36,7 +36,7 @@ type TypingIndicatorState = {
   getTypingUser: (user: User, conversationId: string) => TypingUser | undefined;
 };
 
-const useTypingIndicatorState = create<TypingIndicatorState>((set, get) => ({
+export const useTypingIndicatorState = create<TypingIndicatorState>((set, get) => ({
   typingUsers: [],
   addTypingUser: ({conversationId, user, timerId}) =>
     set(state => {
@@ -65,5 +65,3 @@ const useTypingIndicatorState = create<TypingIndicatorState>((set, get) => ({
       .map(typingUser => typingUser.user),
   clearTypingUsers: () => set({typingUsers: []}),
 }));
-
-export {useTypingIndicatorState};

@@ -21,7 +21,7 @@ import {render} from '@testing-library/react';
 import {act} from 'react-dom/test-utils';
 
 import {TypingIndicator, TypingIndicatorProps} from './TypingIndicator';
-import {useTypingIndicatorState} from './TypingIndicator.state';
+import {useTypingIndicatorState} from './useTypingIndicatorState/useTypingIndicatorState';
 
 import {User} from '../../../../entity/User';
 

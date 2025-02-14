@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2022 Wire Swiss GmbH
+ * Copyright (C) 2024 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,10 +17,29 @@
  *
  */
 
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {FC} from 'react';
 
-export * from './TypingIndicator';
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {User} from 'src/script/entity/User';
 
-export {useTypingIndicatorState} from './TypingIndicator.state';
+interface InputBarAvatarProps {
+  selfUser: User;
+  showAvatar: boolean;
+}
 
-export const TYPING_TIMEOUT = TIME_IN_MILLIS.SECOND * 10;
+export const InputBarAvatar: FC<InputBarAvatarProps> = ({selfUser, showAvatar}) => {
+  if (!showAvatar) {
+    return null;
+  }
+
+  return (
+    <div className="input-bar-avatar">
+      <Avatar
+        className="cursor-default"
+        participant={selfUser}
+        avatarSize={AVATAR_SIZE.X_SMALL}
+        hideAvailabilityStatus
+      />
+    </div>
+  );
+};

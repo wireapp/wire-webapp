@@ -24,7 +24,7 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
-import {Config} from '../../../../Config';
+import {Config} from '../../../Config';
 
 interface PastedFileControlsProps {
   pastedFile: File;
@@ -32,7 +32,7 @@ interface PastedFileControlsProps {
   onSend: () => void;
 }
 
-const PastedFileControls: FC<PastedFileControlsProps> = ({pastedFile, onClear, onSend}) => {
+export const PastedFileControls: FC<PastedFileControlsProps> = ({pastedFile, onClear, onSend}) => {
   const isSupportedFileType = (Config.getConfig().ALLOWED_IMAGE_TYPES as ReadonlyArray<string>).includes(
     pastedFile.type,
   );
@@ -85,5 +85,3 @@ const PastedFileControls: FC<PastedFileControlsProps> = ({pastedFile, onClear, o
     </div>
   );
 };
-
-export {PastedFileControls};
