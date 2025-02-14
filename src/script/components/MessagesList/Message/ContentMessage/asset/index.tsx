@@ -29,15 +29,14 @@ import {StatusType} from 'src/script/message/StatusType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
 
-import {AudioAssetV2} from './AudioAsset/AudioAssetV2';
-import {FileAssetV2} from './FileAsset/FileAssetV2';
+import {AudioAsset} from './AudioAsset/AudioAsset';
+import {FileAsset} from './FileAsset/FileAsset';
 import {ImageAsset} from './ImageAsset';
 import {LinkPreviewAsset} from './LinkPreviewAssetComponent';
 import {LocationAsset} from './LocationAsset';
 import {MessageButton} from './MessageButton';
-import {PdfAsset} from './PdfAsset/PdfAsset';
 import {TextMessageRenderer} from './TextMessageRenderer';
-import {VideoAssetV2} from './VideoAsset/VideoAssetV2';
+import {VideoAsset} from './VideoAsset/VideoAsset';
 
 import {MessageActions} from '../..';
 import {AssetType} from '../../../../../assets/AssetType';
@@ -69,7 +68,6 @@ const ContentAsset = ({
   isMessageFocused,
   is1to1Conversation,
   onClickDetails,
-  isFileShareRestricted,
 }: ContentAssetProps) => {
   const {isObfuscated, status} = useKoSubscribableChildren(message, ['isObfuscated', 'status']);
   const {previews} = useKoSubscribableChildren(asset as Text, ['previews']);
@@ -113,25 +111,15 @@ const ContentAsset = ({
       );
     case AssetType.FILE:
       if ((asset as FileAssetType).isFile()) {
-        return <FileAssetV2 message={message} isFileShareRestricted={isFileShareRestricted} />;
+        return <FileAsset message={message} />;
       }
 
       if ((asset as FileAssetType).isAudio()) {
-        return (
-          <AudioAssetV2
-            message={message}
-            isFocusable={isMessageFocused}
-            isFileShareRestricted={isFileShareRestricted}
-          />
-        );
+        return <AudioAsset message={message} isFocusable={isMessageFocused} />;
       }
 
       if ((asset as FileAssetType).isVideo()) {
-        return <VideoAssetV2 message={message} isFileShareRestricted={isFileShareRestricted} />;
-      }
-
-      if ((asset as FileAssetType).isPdf()) {
-        return <PdfAsset message={message} isFileShareRestricted={isFileShareRestricted} />;
+        return <VideoAsset message={message} />;
       }
 
     case AssetType.IMAGE:
