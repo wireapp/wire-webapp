@@ -111,7 +111,7 @@ const ContentAsset = ({
       );
     case AssetType.FILE:
       if ((asset as FileAssetType).isFile()) {
-        return <FileAsset message={message} />;
+        return <FileAsset message={message} isFocusable={isMessageFocused} />;
       }
 
       if ((asset as FileAssetType).isAudio()) {
@@ -119,7 +119,7 @@ const ContentAsset = ({
       }
 
       if ((asset as FileAssetType).isVideo()) {
-        return <VideoAsset message={message} />;
+        return <VideoAsset message={message} isFocusable={isMessageFocused} />;
       }
 
     case AssetType.IMAGE:

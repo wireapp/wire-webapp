@@ -36,6 +36,7 @@ export class Asset {
   public file_name?: string;
   public id?: string;
   public key: string;
+  public size: string;
   public type: string;
   public text: string;
 
