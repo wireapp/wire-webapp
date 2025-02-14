@@ -22,11 +22,10 @@ import ko from 'knockout';
 
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {FileAsset} from 'src/script/entity/message/FileAsset';
+import {StatusType} from 'src/script/message/StatusType';
 import {TeamState} from 'src/script/team/TeamState';
 
-import {FileAsset as FileAssetComponent} from './FileAssetComponent';
-
-import {StatusType} from '../../../../../message/StatusType';
+import {FileAsset as FileAssetComponent} from './FileAsset';
 
 describe('FileAssetComponent', () => {
   function mockContentMessage(): ContentMessage {

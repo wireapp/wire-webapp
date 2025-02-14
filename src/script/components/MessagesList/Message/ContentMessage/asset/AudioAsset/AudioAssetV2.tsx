@@ -39,7 +39,7 @@ export interface AudioAssetProps {
   isFileShareRestricted: boolean;
 }
 
-export const AudioAssetNew = ({message, isFocusable, isFileShareRestricted}: AudioAssetProps) => {
+export const AudioAssetV2 = ({message, isFocusable, isFileShareRestricted}: AudioAssetProps) => {
   const asset = message.getFirstAsset() as FileAsset;
   const {transferState, uploadProgress, cancelUpload, getAssetUrl} = useAssetTransfer(message);
 

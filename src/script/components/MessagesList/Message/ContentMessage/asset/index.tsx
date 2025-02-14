@@ -30,7 +30,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
 
 import {AudioAsset} from './AudioAsset/AudioAsset';
-import {FileAsset} from './FileAssetComponent';
+import {FileAsset} from './FileAsset/FileAsset';
 import {ImageAsset} from './ImageAsset';
 import {LinkPreviewAsset} from './LinkPreviewAssetComponent';
 import {LocationAsset} from './LocationAsset';
@@ -68,7 +68,6 @@ const ContentAsset = ({
   isMessageFocused,
   is1to1Conversation,
   onClickDetails,
-  isFileShareRestricted,
 }: ContentAssetProps) => {
   const {isObfuscated, status} = useKoSubscribableChildren(message, ['isObfuscated', 'status']);
   const {previews} = useKoSubscribableChildren(asset as Text, ['previews']);
