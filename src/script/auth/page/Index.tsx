@@ -73,7 +73,7 @@ const IndexComponent = ({defaultSSOCode, doInit}: Props & ConnectedProps & Dispa
     if (Config.getConfig().FEATURE.ENABLE_AUTO_LOGIN) {
       void immediateLogin();
     }
-  }, [immediateLogin]);
+  }, []);
 
   if (defaultSSOCode) {
     // Redirect to prefilled SSO login if default SSO code is set on backend
