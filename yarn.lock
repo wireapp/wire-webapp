@@ -8841,7 +8841,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dexie@npm:4.0.7, dexie@npm:>3.2.0":
+"dexie@npm:4.0.11":
+  version: 4.0.11
+  resolution: "dexie@npm:4.0.11"
+  checksum: 10/52011f03655ce90aa6701f1e0724a10a3fd6b33d6e1ec72ba27b4392f500df54788e6ed23fd692a62eb50a21ab4fe146e08a85ceca19bbeb62e12269b124b4e2
+  languageName: node
+  linkType: hard
+
+"dexie@npm:>3.2.0":
   version: 4.0.7
   resolution: "dexie@npm:4.0.7"
   checksum: 10/e95facd65d4cc1dd450a104d0b94b81c3a5fb5be559ab68e93af1af4df435639b41850727594aaa4d4e50239abf8626f79c03423a0d3dabf1391e311580e7400
@@ -19508,7 +19515,7 @@ __metadata:
     css-loader: "npm:7.1.2"
     cssnano: "npm:7.0.6"
     date-fns: "npm:4.1.0"
-    dexie: "npm:4.0.7"
+    dexie: "npm:4.0.11"
     dexie-batch: "npm:0.4.3"
     dexie-encrypted: "npm:2.0.0"
     dotenv: "npm:16.4.7"
