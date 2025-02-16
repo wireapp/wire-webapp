@@ -13507,10 +13507,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"long@npm:5.2.4":
-  version: 5.2.4
-  resolution: "long@npm:5.2.4"
-  checksum: 10/c27c060a683d4d76dc48da12ded0ae49c610aaf10d028ec938829d7bebe916979dcc8b67ed71f8bf6d845a90151b66a9b741a3ee51ec874908e496c2a576697a
+"long@npm:5.3.0":
+  version: 5.3.0
+  resolution: "long@npm:5.3.0"
+  checksum: 10/ac75ff43d6b70bcd34f9b2c8185e1716c2da256468ae6d5cdc5fba5623e0a0124953389da2d78c3996efb9f2a199db727b04e02a7b408e8bd9f2ea196d8c3e4b
   languageName: node
   linkType: hard
 
@@ -19540,7 +19540,7 @@ __metadata:
     libsodium-wrappers: "npm:0.7.15"
     linkify-it: "npm:5.0.0"
     lint-staged: "npm:15.4.3"
-    long: "npm:5.2.4"
+    long: "npm:5.3.0"
     markdown-it: "npm:14.0.0"
     murmurhash: "npm:2.0.1"
     oidc-client-ts: "npm:3.1.0"
