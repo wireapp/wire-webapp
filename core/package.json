@@ -28,7 +28,7 @@
     "logdown": "3.3.1",
     "long": "^5.2.0",
     "uuid": "9.0.1",
-    "zod": "3.24.1"
+    "zod": "3.24.2"
   },
   "devDependencies": {
     "@faker-js/faker": "^9.0.0",
