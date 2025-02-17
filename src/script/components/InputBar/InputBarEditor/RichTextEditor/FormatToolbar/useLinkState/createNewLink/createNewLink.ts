@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2022 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,4 +17,21 @@
  *
  */
 
-export * from './ImageUploadButton';
+import {$createLinkNode} from '@lexical/link';
+import {RangeSelection, $createTextNode} from 'lexical';
+
+import {sanitizeUrl} from '../../../utils/url';
+
+interface CreateLinkParams {
+  selection: RangeSelection;
+  url: string;
+  text?: string;
+}
+
+export const createNewLink = ({selection, url, text}: CreateLinkParams) => {
+  const textContent = text || selection.getTextContent() || url;
+  const textNode = $createTextNode(textContent);
+  const linkNode = $createLinkNode(sanitizeUrl(url));
+  linkNode.append(textNode);
+  selection.insertNodes([linkNode]);
+};

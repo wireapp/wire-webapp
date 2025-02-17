@@ -34,7 +34,7 @@ import {
   titleStyles,
 } from './LinkDialog.styles';
 
-import {validateUrl} from '../../../utils/url';
+import {validateUrl} from '../../utils/url';
 
 interface LinkDialogProps {
   isOpen: boolean;

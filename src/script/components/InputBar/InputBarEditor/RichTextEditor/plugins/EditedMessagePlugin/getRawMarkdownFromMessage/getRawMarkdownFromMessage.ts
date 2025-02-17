@@ -19,10 +19,10 @@
 
 import {$createParagraphNode, $createTextNode} from 'lexical';
 
-import {$createMentionNode} from 'Components/InputBar/components/RichTextEditor/nodes/MentionNode';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {Text} from 'src/script/entity/message/Text';
 
+import {$createMentionNode} from '../../../nodes/MentionNode';
 import {createNodes} from '../../../utils/generateNodes';
 
 export const getRawMarkdownNodesWithMentions = (message: ContentMessage) => {

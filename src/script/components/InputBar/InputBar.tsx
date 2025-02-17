@@ -37,12 +37,12 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
+import {MessageContent} from './common/messageContent/messageContent';
 import {InputBarAvatar} from './InputBarAvatar/InputBarAvatar';
-import {InputBarButtons} from './InputBarButtons/InputBarButtons';
+import {InputBarControls} from './InputBarControls/InputBarControls';
 import {InputBarEditor} from './InputBarEditor/InputBarEditor';
 import {PastedFileControls} from './PastedFileControls/PastedFileControls';
 import {ReplyBar} from './ReplyBar/ReplyBar';
-import {RichTextContent} from './RichTextEditor';
 import {TypingIndicator} from './TypingIndicator';
 import {useDraftState} from './useDraftState/useDraftState';
 import {useEmojiPicker} from './useEmojiPicker/useEmojiPicker';
@@ -125,7 +125,7 @@ export const InputBar = ({
 
   const wrapperRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<LexicalEditor | null>(null);
-  const [messageContent, setMessageContent] = useState<RichTextContent>({text: ''});
+  const [messageContent, setMessageContent] = useState<MessageContent>({text: ''});
 
   const {rightSidebar} = useAppMainState.getState();
   const lastItem = rightSidebar.history.length - 1;
@@ -276,7 +276,7 @@ export const InputBar = ({
         )}
 
         <div className="input-bar-container">
-          <InputBarAvatar selfUser={selfUser} showAvatar={showAvatar} />
+          {showAvatar && <InputBarAvatar selfUser={selfUser} />}
 
           {!isSelfUserRemoved && !fileHandling.pastedFile && (
             <InputBarEditor
@@ -309,7 +309,7 @@ export const InputBar = ({
               loadDraftState={draftState.loadDraftState}
               replaceEmojis={shouldReplaceEmoji}
             >
-              <InputBarButtons
+              <InputBarControls
                 conversation={conversation}
                 isFileSharingSendingEnabled={isFileSharingSendingEnabled}
                 pingDisabled={ping.isPingDisabled}

@@ -23,13 +23,14 @@ import {$convertFromMarkdownString} from '@lexical/markdown';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {$getRoot, $setSelection} from 'lexical';
 
-import {markdownTransformers} from 'Components/InputBar/components/RichTextEditor/utils/markdownTransformers';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 
 import {getMentionMarkdownTransformer} from './getMentionMarkdownTransformer/getMentionMarkdownTransformer';
 import {getMentionNodesFromMessage} from './getMentionNodesFromMessage/getMentionNodesFromMessage';
 import {getRawMarkdownNodesWithMentions} from './getRawMarkdownFromMessage/getRawMarkdownFromMessage';
 import {wrapMentionsWithTags} from './wrapMentionsWithTags/wrapMentionsWithTags';
+
+import {markdownTransformers} from '../../utils/markdownTransformers';
 
 type Props = {
   message?: ContentMessage;

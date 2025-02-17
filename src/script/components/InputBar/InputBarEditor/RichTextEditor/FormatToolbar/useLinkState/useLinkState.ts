@@ -38,7 +38,7 @@ import {getSelectedNode} from './getSelectedNode/getSelectedNode';
 import {useLinkEditing} from './useLinkEditing/useLinkEditing';
 import {useModalState} from './useModalState/useModalState';
 
-import {sanitizeUrl} from '../../../utils/url';
+import {sanitizeUrl} from '../../utils/url';
 
 export const FORMAT_LINK_COMMAND = createCommand<void>();
 

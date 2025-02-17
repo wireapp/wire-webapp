@@ -23,7 +23,9 @@ import {LexicalEditor} from 'lexical';
 
 import {User} from 'src/script/entity/User';
 
-import {RichTextEditor, RichTextContent} from '../RichTextEditor';
+import {RichTextEditor} from './RichTextEditor';
+
+import {MessageContent} from '../common/messageContent/messageContent';
 
 interface InputBarEditorProps {
   editorRef: React.MutableRefObject<LexicalEditor | null>;
@@ -39,7 +41,7 @@ interface InputBarEditorProps {
   onArrowUp: () => void;
   onShiftTab: () => void;
   onBlur: () => void;
-  onUpdate: (content: RichTextContent) => void;
+  onUpdate: (content: MessageContent) => void;
   onSend: () => void;
   getMentionCandidates: (search?: string | null) => User[];
   saveDraftState: (editorState: string, plainMessage: string, replyId?: string) => void;

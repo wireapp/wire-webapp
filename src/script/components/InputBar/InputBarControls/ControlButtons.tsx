@@ -17,19 +17,19 @@
  *
  */
 
-import React, {MouseEvent} from 'react';
+import {MouseEvent} from 'react';
 
 import {FormatSeparator} from 'Components/InputBar/common/FormatSeparator/FormatSeparator';
 import {Config} from 'src/script/Config';
 import {Conversation} from 'src/script/entity/Conversation';
 
-import {AssetUploadButton} from './AssetUploadButton';
+import {AssetUploadButton} from './AssetUploadButton/AssetUploadButton';
 import {CancelEditButton} from './CancelEditButton/CancelEditButton';
 import {EmojiButton} from './EmojiButton/EmojiButton';
 import {FormatTextButton} from './FormatTextButton/FormatTextButton';
 import {GiphyButton} from './GiphyButton/GiphyButton';
-import {ImageUploadButton} from './ImageUploadButton';
-import {MessageTimerButton} from './MessageTimerButton';
+import {ImageUploadButton} from './ImageUploadButton/ImageUploadButton';
+import {MessageTimerButton} from './MessageTimerButton/MessageTimerButton';
 import {PingButton} from './PingButton/PingButton';
 
 export type ControlButtonsProps = {

@@ -31,6 +31,7 @@ import {OnChangePlugin} from '@lexical/react/LexicalOnChangePlugin';
 import {RichTextPlugin} from '@lexical/react/LexicalRichTextPlugin';
 import {LexicalEditor, EditorState} from 'lexical';
 
+import {MessageContent} from 'Components/InputBar/common/messageContent/messageContent';
 import {DraftState} from 'Components/InputBar/util/DraftStateUtil';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {User} from 'src/script/entity/User';
@@ -60,13 +61,6 @@ import {parseMentions} from './utils/parseMentions';
 import {transformMessage} from './utils/transformMessage';
 import {useEditorDraftState} from './utils/useEditorDraftState';
 
-import {MentionEntity} from '../../../message/MentionEntity';
-
-export type RichTextContent = {
-  text: string;
-  mentions?: MentionEntity[];
-};
-
 interface RichTextEditorProps {
   placeholder: string;
   replaceEmojis: boolean;
@@ -78,7 +72,7 @@ interface RichTextEditorProps {
   getMentionCandidates: (search?: string | null) => User[];
   saveDraftState: (editor: string, plainMessage: string, replyId?: string) => void;
   loadDraftState: () => Promise<DraftState>;
-  onUpdate: (content: RichTextContent) => void;
+  onUpdate: (content: MessageContent) => void;
   onArrowUp: () => void;
   onEscape: () => void;
   onShiftTab: () => void;

@@ -20,14 +20,14 @@
 import {render} from '@testing-library/react';
 
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {Conversation} from 'src/script/entity/Conversation';
 
 import {ControlButtons} from './ControlButtons';
 
 type PropsType = React.ComponentProps<typeof ControlButtons>;
 const defaultParams: PropsType = {
-  conversation: undefined,
+  conversation: undefined as unknown as Conversation,
   input: '',
-
   onCancelEditing: jest.fn(),
   onClickPing: jest.fn(),
   onGifClick: jest.fn(),

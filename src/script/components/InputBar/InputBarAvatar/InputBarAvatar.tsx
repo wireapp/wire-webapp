@@ -17,21 +17,14 @@
  *
  */
 
-import {FC} from 'react';
-
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {User} from 'src/script/entity/User';
 
 interface InputBarAvatarProps {
   selfUser: User;
-  showAvatar: boolean;
 }
 
-export const InputBarAvatar: FC<InputBarAvatarProps> = ({selfUser, showAvatar}) => {
-  if (!showAvatar) {
-    return null;
-  }
-
+export const InputBarAvatar = ({selfUser}: InputBarAvatarProps) => {
   return (
     <div className="input-bar-avatar">
       <Avatar

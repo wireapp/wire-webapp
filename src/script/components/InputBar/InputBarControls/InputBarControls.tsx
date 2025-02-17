@@ -19,15 +19,16 @@
 
 import {Conversation} from 'src/script/entity/Conversation';
 
-import {ControlButtons} from '../InputBarControls/ControlButtons';
-import {RichTextContent} from '../RichTextEditor/RichTextEditor';
-import {SendMessageButton} from '../RichTextEditor/SendMessageButton';
+import {ControlButtons} from './ControlButtons';
+import {SendMessageButton} from './SendMessageButton/SendMessageButton';
 
-interface InputBarButtonsProps {
+import {MessageContent} from '../common/messageContent/messageContent';
+
+interface InputBarControlsProps {
   conversation: Conversation;
   isFileSharingSendingEnabled: boolean;
   pingDisabled: boolean;
-  messageContent: RichTextContent;
+  messageContent: MessageContent;
   isEditing: boolean;
   isMessageFormatButtonsFlagEnabled: boolean;
   showMarkdownPreview: boolean;
@@ -48,7 +49,7 @@ interface InputBarButtonsProps {
   onSend: () => void;
 }
 
-export const InputBarButtons = ({
+export const InputBarControls = ({
   conversation,
   isFileSharingSendingEnabled,
   pingDisabled,
@@ -65,7 +66,7 @@ export const InputBarButtons = ({
   onSelectFiles,
   onSelectImages,
   onSend,
-}: InputBarButtonsProps) => {
+}: InputBarControlsProps) => {
   const enableSending = messageContent.text.length > 0;
 
   return (

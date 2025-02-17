@@ -79,7 +79,7 @@ export const ReplyBar = ({replyMessageEntity, onCancel}: ReplyBarProps) => {
             <div
               className="input-bar__reply__message input-bar__reply__message__text"
               data-uie-name="media-text-reply-box"
-              dangerouslySetInnerHTML={{__html: renderMessage(replyAsset.text, null, replyAsset.mentions())}}
+              dangerouslySetInnerHTML={{__html: renderMessage(replyAsset.text, undefined, replyAsset.mentions())}}
               aria-label={replyAsset.text}
               tabIndex={TabIndex.FOCUSABLE}
             />
