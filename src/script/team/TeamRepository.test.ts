@@ -92,7 +92,6 @@ describe('TeamRepository', () => {
       const [teamRepo, {teamService, teamState}] = buildConnectionRepository();
       jest.spyOn(teamService, 'getTeamById').mockResolvedValue(team_metadata);
       jest.spyOn(teamRepo, 'getSelfMember').mockResolvedValue(new TeamMemberEntity(randomUUID()));
-      jest.spyOn(teamRepo, 'emit');
 
       const localFeatures = {
         mls: {
@@ -121,10 +120,6 @@ describe('TeamRepository', () => {
       await teamRepo.initTeam();
 
       expect(teamState.teamFeatures()).toEqual(featuresFromBackend);
-      expect(teamRepo.emit).toHaveBeenCalledWith('featureConfigUpdated', {
-        prevFeatureList: localFeatures,
-        newFeatureList: featuresFromBackend,
-      });
     });
   });
 

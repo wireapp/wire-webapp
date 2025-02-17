@@ -26,7 +26,7 @@ import type {
   TeamMemberLeaveEvent,
 } from '@wireapp/api-client/lib/event';
 import {TEAM_EVENT} from '@wireapp/api-client/lib/event/TeamEvent';
-import {FeatureStatus, FeatureList} from '@wireapp/api-client/lib/team/feature/';
+import {FeatureStatus, FeatureList, FEATURE_KEY} from '@wireapp/api-client/lib/team/feature/';
 import type {PermissionsData} from '@wireapp/api-client/lib/team/member/PermissionsData';
 import type {TeamData} from '@wireapp/api-client/lib/team/team/TeamData';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
@@ -37,6 +37,7 @@ import {Runtime, TypedEventEmitter} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
@@ -129,7 +130,10 @@ export class TeamRepository extends TypedEventEmitter<Events> {
   ): Promise<{team: TeamEntity | undefined; features: FeatureList; members: QualifiedId[]}> {
     const team = await this.getTeam();
     // get the fresh feature config from backend
-    const {newFeatureList} = await this.updateFeatureConfig();
+    const newFeatureList = await this.teamService.getAllTeamFeatures();
+
+    this.teamState.teamFeatures(newFeatureList);
+
     if (!teamId) {
       return {team: undefined, features: {}, members: []};
     }
@@ -156,6 +160,22 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     this.teamState.teamFeatures(newFeatureList);
 
     this.emit('featureConfigUpdated', {prevFeatureList, newFeatureList});
+
+    if (
+      !prevFeatureList?.[FEATURE_KEY.MLS]?.config.supportedProtocols.includes(ConversationProtocol.MLS) &&
+      newFeatureList?.[FEATURE_KEY.MLS]?.config.supportedProtocols.includes(ConversationProtocol.MLS)
+    ) {
+      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
+        primaryAction: {
+          action: () => window.location.reload(),
+          text: t('mlsWasEnabledReload'),
+        },
+        text: {
+          message: t('mlsWasEnabledDescription'),
+          title: t('mlsWasEnabledTitle'),
+        },
+      });
+    }
 
     return {
       newFeatureList,
