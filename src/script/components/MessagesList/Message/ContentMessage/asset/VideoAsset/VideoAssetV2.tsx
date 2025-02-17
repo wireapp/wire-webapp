@@ -40,7 +40,7 @@ import {VideoPlayOverlay} from './VideoPlayOverlay/VideoPlayOverlay';
 
 import {useAssetTransfer} from '../common/useAssetTransfer/useAssetTransfer';
 import {useGetAssetUrl} from '../common/useGetAssetUrl/useGetAssetUrl';
-import {FileAsset} from '../FileAssetComponent';
+import {FileAssetV2} from '../FileAsset/FileAssetV2';
 
 interface VideoAssetProps {
   message: ContentMessage;
@@ -102,7 +102,7 @@ export const VideoAssetV2 = ({message, isFocusable = true, isFileShareRestricted
   const isError = isApiError || isPlaybackError;
 
   if (!isVideoMimeTypeSupported(type)) {
-    return <FileAsset message={message} isFocusable={isFocusable} />;
+    return <FileAssetV2 message={message} isFileShareRestricted={isFileShareRestricted} />;
   }
 
   if (isPendingUpload || isLoading) {
