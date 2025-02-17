@@ -29,7 +29,7 @@ interface UseFilePasteParams {
 }
 
 export const useFilePaste = ({onFilePasted}: UseFilePasteParams) => {
-  const handlePasteFiles = useCallback(
+  const processClipboardFiles = useCallback(
     (files: FileList): void => {
       const [pastedFile] = files;
 
@@ -50,7 +50,7 @@ export const useFilePaste = ({onFilePasted}: UseFilePasteParams) => {
     [onFilePasted],
   );
 
-  const handleFilePasting = useCallback(
+  const handlePasteEvent = useCallback(
     (event: ClipboardEvent) => {
       if (event.clipboardData?.types.includes('text/plain')) {
         return;
@@ -60,14 +60,14 @@ export const useFilePaste = ({onFilePasted}: UseFilePasteParams) => {
       const files = event.clipboardData?.files;
 
       if (files) {
-        handlePasteFiles(files);
+        processClipboardFiles(files);
       }
     },
-    [handlePasteFiles],
+    [processClipboardFiles],
   );
 
   useEffect(() => {
-    document.addEventListener('paste', checkFileSharingPermission(handleFilePasting));
-    return () => document.removeEventListener('paste', checkFileSharingPermission(handleFilePasting));
-  }, [handleFilePasting]);
+    document.addEventListener('paste', checkFileSharingPermission(handlePasteEvent));
+    return () => document.removeEventListener('paste', checkFileSharingPermission(handlePasteEvent));
+  }, [handlePasteEvent]);
 };

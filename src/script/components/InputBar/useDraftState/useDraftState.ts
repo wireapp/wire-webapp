@@ -44,12 +44,12 @@ export const useDraftState = ({conversation, storageRepository, messageRepositor
     return loadDraftState(conversation, storageRepository, messageRepository);
   }, [conversation, messageRepository, storageRepository]);
 
-  const save = async (editorState: string, plainMessage: string, replyId = '') => {
+  const save = async (editorState: string, text: string, replyId = '') => {
     void saveDraftState({
       storageRepository,
       conversation,
       editorState,
-      plainMessage: sanitizeMarkdown(plainMessage),
+      plainMessage: sanitizeMarkdown(text),
       replyId,
     });
   };
