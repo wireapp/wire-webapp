@@ -26,7 +26,7 @@ import {Conversation} from 'src/script/entity/Conversation';
 import {StorageRepository} from 'src/script/storage';
 import {sanitizeMarkdown} from 'Util/MarkdownUtil';
 
-import {loadDraftState as loadDraft, saveDraftState as saveDraft} from '../util/DraftStateUtil';
+import {loadDraftState, saveDraftState} from '../util/DraftStateUtil';
 
 interface UseDraftStateProps {
   conversation: Conversation;
@@ -36,30 +36,27 @@ interface UseDraftStateProps {
 }
 
 export const useDraftState = ({conversation, storageRepository, messageRepository, editorRef}: UseDraftStateProps) => {
-  const resetDraftState = useCallback(() => {
+  const reset = useCallback(() => {
     editorRef.current?.dispatchCommand(CLEAR_EDITOR_COMMAND, undefined);
   }, [editorRef]);
 
-  const saveDraftState = useCallback(
-    async (editorState: string, plainMessage: string, replyId?: string) => {
-      await saveDraft({
-        storageRepository,
-        conversation,
-        editorState,
-        plainMessage: sanitizeMarkdown(plainMessage),
-        replyId,
-      });
-    },
-    [conversation, storageRepository],
-  );
-
-  const loadDraftState = useCallback(async () => {
-    return loadDraft(conversation, storageRepository, messageRepository);
+  const load = useCallback(async () => {
+    return loadDraftState(conversation, storageRepository, messageRepository);
   }, [conversation, messageRepository, storageRepository]);
 
+  const save = async (editorState: string, plainMessage: string, replyId = '') => {
+    void saveDraftState({
+      storageRepository,
+      conversation,
+      editorState,
+      plainMessage: sanitizeMarkdown(plainMessage),
+      replyId,
+    });
+  };
+
   return {
-    resetDraftState,
-    saveDraftState,
-    loadDraftState,
+    reset,
+    load,
+    save,
   };
 };

@@ -17,16 +17,36 @@
  *
  */
 
-import {useMemo} from 'react';
+import {useCallback, useEffect, useMemo} from 'react';
+
+import {amplify} from 'amplify';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {MessageRepository, OutgoingQuote} from 'src/script/conversation/MessageRepository';
+import {Conversation} from 'src/script/entity/Conversation';
 
 interface UseGiphyProps {
   text: string;
   maxLength: number;
   isMessageFormatButtonsFlagEnabled: boolean;
   openGiphy: (inputValue: string) => void;
+  generateQuote: () => Promise<OutgoingQuote | undefined>;
+  messageRepository: MessageRepository;
+  conversation: Conversation;
+  cancelMessageEditing: (resetDraft?: boolean) => void;
 }
 
-export const useGiphy = ({text, maxLength, isMessageFormatButtonsFlagEnabled, openGiphy}: UseGiphyProps) => {
+export const useGiphy = ({
+  text,
+  maxLength,
+  isMessageFormatButtonsFlagEnabled,
+  openGiphy,
+  generateQuote,
+  messageRepository,
+  conversation,
+  cancelMessageEditing,
+}: UseGiphyProps) => {
   const showGiphyButton = useMemo(() => {
     if (isMessageFormatButtonsFlagEnabled) {
       return text.length > 0;
@@ -36,8 +56,27 @@ export const useGiphy = ({text, maxLength, isMessageFormatButtonsFlagEnabled, op
 
   const handleGifClick = () => openGiphy(text);
 
+  const sendGiphy = useCallback(
+    (gifUrl: string, tag: string): void => {
+      void generateQuote().then(quoteEntity => {
+        void messageRepository.sendGif(conversation, gifUrl, tag, quoteEntity);
+        cancelMessageEditing(true);
+      });
+    },
+    [cancelMessageEditing, conversation, generateQuote, messageRepository],
+  );
+
+  useEffect(() => {
+    amplify.subscribe(WebAppEvents.EXTENSIONS.GIPHY.SEND, sendGiphy);
+
+    return () => {
+      amplify.unsubscribeAll(WebAppEvents.EXTENSIONS.GIPHY.SEND);
+    };
+  }, [sendGiphy, cancelMessageEditing]);
+
   return {
     showGiphyButton,
     handleGifClick,
+    sendGiphy,
   };
 };

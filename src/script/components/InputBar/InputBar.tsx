@@ -17,18 +17,18 @@
  *
  */
 
-import {useRef, useState} from 'react';
+import {useCallback, useRef, useState} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {LexicalEditor, $createTextNode, $insertNodes} from 'lexical';
+import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
-import {checkFileSharingPermission} from 'Components/Conversation/utils/checkFileSharingPermission';
 import {EmojiPicker} from 'Components/EmojiPicker/EmojiPicker';
-import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
 import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
 import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
 import {EventName} from 'src/script/tracking/EventName';
@@ -38,7 +38,7 @@ import {t} from 'Util/LocalizerUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {MessageContent} from './common/messageContent/messageContent';
-import {InputBarAvatar} from './InputBarAvatar/InputBarAvatar';
+import {InputBarContainer} from './InputBarContainer/InputBarContainer';
 import {InputBarControls} from './InputBarControls/InputBarControls';
 import {InputBarEditor} from './InputBarEditor/InputBarEditor';
 import {PastedFileControls} from './PastedFileControls/PastedFileControls';
@@ -47,7 +47,6 @@ import {TypingIndicator} from './TypingIndicator';
 import {useDraftState} from './useDraftState/useDraftState';
 import {useEmojiPicker} from './useEmojiPicker/useEmojiPicker';
 import {useFileHandling} from './useFileHandling/useFileHandling';
-import {useFilePaste} from './useFilePaste/useFilePaste';
 import {useFormatToolbar} from './useFormatToolbar/useFormatToolbar';
 import {useGiphy} from './useGiphy/useGiphy';
 import {useMessageHandling} from './useMessageHandling/useMessageHandling';
@@ -60,7 +59,6 @@ import {MessageRepository} from '../../conversation/MessageRepository';
 import {Conversation} from '../../entity/Conversation';
 import {User} from '../../entity/User';
 import {EventRepository} from '../../event/EventRepository';
-import {useAppMainState} from '../../page/state';
 import {PropertiesRepository} from '../../properties/PropertiesRepository';
 import {SearchRepository} from '../../search/SearchRepository';
 import {StorageRepository} from '../../storage';
@@ -88,6 +86,7 @@ interface InputBarProps {
   uploadImages: (images: File[]) => void;
   uploadFiles: (files: File[]) => void;
 }
+const conversationInputBarClassName = 'conversation-input-bar';
 
 export const InputBar = ({
   conversation,
@@ -99,7 +98,7 @@ export const InputBar = ({
   searchRepository,
   storageRepository,
   selfUser,
-  teamState,
+  teamState = container.resolve(TeamState),
   onShiftTab,
   uploadDroppedFiles,
   uploadImages,
@@ -124,13 +123,28 @@ export const InputBar = ({
   ]);
 
   const wrapperRef = useRef<HTMLDivElement>(null);
+
   const editorRef = useRef<LexicalEditor | null>(null);
+
+  const {typingIndicatorMode} = useKoSubscribableChildren(propertiesRepository, ['typingIndicatorMode']);
+  const isTypingIndicatorEnabled = typingIndicatorMode === CONVERSATION_TYPING_INDICATOR_MODE.ON;
+
+  /** The messageContent represents the message being edited.
+   * It's directly derived from the editor state
+   */
   const [messageContent, setMessageContent] = useState<MessageContent>({text: ''});
 
-  const {rightSidebar} = useAppMainState.getState();
-  const lastItem = rightSidebar.history.length - 1;
-  const currentState = rightSidebar.history[lastItem];
-  const isRightSidebarOpen = !!currentState;
+  const formatToolbar = useFormatToolbar();
+
+  const emojiPicker = useEmojiPicker({
+    wrapperRef,
+    onEmojiPicked: emoji => {
+      editorRef.current?.update(() => {
+        $insertNodes([$createTextNode(emoji)]);
+      });
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.INPUT.EMOJI_MODAL.EMOJI_PICKED);
+    },
+  });
 
   const inputPlaceholder = messageTimer ? t('tooltipConversationEphemeral') : t('tooltipConversationInputPlaceholder');
 
@@ -145,10 +159,39 @@ export const InputBar = ({
     WebAppEvents.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE,
   );
 
-  const {typingIndicatorMode} = useKoSubscribableChildren(propertiesRepository, ['typingIndicatorMode']);
-  const isTypingIndicatorEnabled = typingIndicatorMode === CONVERSATION_TYPING_INDICATOR_MODE.ON;
+  const getMentionCandidates = useCallback(
+    (search?: string | null) => {
+      const candidates = conversation.participating_user_ets().filter(userEntity => !userEntity.isService);
+      return typeof search === 'string' ? searchRepository.searchUserInSet(search, candidates) : candidates;
+    },
+    [conversation, searchRepository],
+  );
 
-  const formatToolbar = useFormatToolbar();
+  useTypingIndicator({
+    isEnabled: isTypingIndicatorEnabled,
+    text: messageContent.text,
+    onTypingChange: useCallback(
+      isTyping => {
+        isTypingRef.current = isTyping;
+        if (isTyping) {
+          void conversationRepository.sendTypingStart(conversation);
+        } else {
+          void conversationRepository.sendTypingStop(conversation);
+        }
+      },
+      [conversationRepository, conversation],
+    ),
+  });
+
+  const fileHandling = useFileHandling({
+    uploadDroppedFiles,
+    uploadImages,
+  });
+
+  const showMarkdownPreview = useUserPropertyValue<boolean>(
+    () => propertiesRepository.getPreference(PROPERTIES_TYPE.INTERFACE.MARKDOWN_PREVIEW),
+    WebAppEvents.PROPERTIES.UPDATE.INTERFACE.MARKDOWN_PREVIEW,
+  );
 
   const draftState = useDraftState({
     conversation,
@@ -166,33 +209,19 @@ export const InputBar = ({
     cancelMessageEditing,
     cancelMessageReply,
     editMessage,
+    generateQuote,
   } = useMessageHandling({
+    messageContent,
     conversation,
     conversationRepository,
     eventRepository,
     messageRepository,
     editorRef,
-    onResetDraftState: draftState.resetDraftState,
+    pastedFile: fileHandling.pastedFile,
+    sendPastedFile: fileHandling.sendPastedFile,
+    onResetDraftState: draftState.reset,
     onSaveDraft: (replyId?: string) =>
-      draftState.saveDraftState(
-        JSON.stringify(editorRef.current?.getEditorState().toJSON()),
-        messageContent.text,
-        replyId,
-      ),
-  });
-
-  const fileHandling = useFileHandling({
-    uploadDroppedFiles,
-  });
-
-  const emojiPicker = useEmojiPicker({
-    wrapperRef,
-    onEmojiPicked: emoji => {
-      editorRef.current?.update(() => {
-        $insertNodes([$createTextNode(emoji)]);
-      });
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.INPUT.EMOJI_MODAL.EMOJI_PICKED);
-    },
+      draftState.save(JSON.stringify(editorRef.current?.getEditorState().toJSON()), messageContent.text, replyId),
   });
 
   const ping = usePing({
@@ -208,63 +237,17 @@ export const InputBar = ({
     maxLength: CONFIG.GIPHY_TEXT_LENGTH,
     isMessageFormatButtonsFlagEnabled,
     openGiphy,
+    generateQuote,
+    messageRepository,
+    conversation,
+    cancelMessageEditing,
   });
 
-  useTypingIndicator({
-    isEnabled: isTypingIndicatorEnabled,
-    text: messageContent.text,
-    onTypingChange: isTyping => {
-      isTypingRef.current = isTyping;
-      if (isTyping) {
-        void conversationRepository.sendTypingStart(conversation);
-      } else {
-        void conversationRepository.sendTypingStop(conversation);
-      }
-    },
-  });
-
-  useFilePaste(checkFileSharingPermission(fileHandling.handlePasteFiles));
-
-  const getMentionCandidates = (search?: string | null) => {
-    const candidates = conversation.participating_user_ets().filter(userEntity => !userEntity.isService);
-    return typeof search === 'string' ? searchRepository.searchUserInSet(search, candidates) : candidates;
-  };
-
-  const showMarkdownPreview = useUserPropertyValue<boolean>(
-    () => propertiesRepository.getPreference(PROPERTIES_TYPE.INTERFACE.MARKDOWN_PREVIEW),
-    WebAppEvents.PROPERTIES.UPDATE.INTERFACE.MARKDOWN_PREVIEW,
-  );
-
-  const handleSend = () => {
-    if (fileHandling.pastedFile) {
-      fileHandling.sendPastedFile();
-    } else {
-      const messageTrimmedStart = messageContent.text.trimStart();
-      const text = messageTrimmedStart.trimEnd();
-      const isMessageTextTooLong = text.length > CONFIG.MAXIMUM_MESSAGE_LENGTH;
-
-      if (isMessageTextTooLong) {
-        showWarningModal(
-          t('modalConversationMessageTooLongHeadline'),
-          t('modalConversationMessageTooLongMessage', {number: CONFIG.MAXIMUM_MESSAGE_LENGTH}),
-        );
-        return;
-      }
-
-      void handleSendMessage(text, messageContent.mentions ?? []);
-    }
-  };
-
-  const conversationInputBarClassName = 'conversation-input-bar';
   const showAvatar = !!messageContent.text.length;
 
   return (
-    <div ref={emojiPicker.ref}>
-      <div
-        id={conversationInputBarClassName}
-        className={cx(conversationInputBarClassName, {'is-right-panel-open': isRightSidebarOpen})}
-        aria-live="assertive"
-      >
+    <div ref={wrapperRef}>
+      <InputBarContainer>
         {isTypingIndicatorEnabled && <TypingIndicator conversationId={conversation.id} />}
 
         {classifiedDomains && !isConnectionRequest && (
@@ -275,65 +258,82 @@ export const InputBar = ({
           <ReplyBar replyMessageEntity={replyMessageEntity} onCancel={() => cancelMessageReply(false)} />
         )}
 
-        <div className="input-bar-container">
-          {showAvatar && <InputBarAvatar selfUser={selfUser} />}
-
-          {!isSelfUserRemoved && !fileHandling.pastedFile && (
-            <InputBarEditor
-              editorRef={editorRef}
-              inputPlaceholder={inputPlaceholder}
-              hasLocalEphemeralTimer={hasLocalEphemeralTimer}
-              showMarkdownPreview={showMarkdownPreview}
-              formatToolbar={formatToolbar}
-              onSetup={editor => {
-                editorRef.current = editor;
-              }}
-              onEscape={() => {
-                if (editedMessage) {
-                  cancelMessageEditing(true);
-                } else if (replyMessageEntity) {
-                  cancelMessageReply();
-                }
-              }}
-              onArrowUp={() => {
-                if (messageContent.text.length === 0) {
-                  editMessage(conversation.getLastEditableMessage());
-                }
-              }}
-              onShiftTab={onShiftTab}
-              onBlur={() => isTypingRef.current && conversationRepository.sendTypingStop(conversation)}
-              onUpdate={setMessageContent}
-              onSend={handleSend}
-              getMentionCandidates={getMentionCandidates}
-              saveDraftState={draftState.saveDraftState}
-              loadDraftState={draftState.loadDraftState}
-              replaceEmojis={shouldReplaceEmoji}
-            >
-              <InputBarControls
-                conversation={conversation}
-                isFileSharingSendingEnabled={isFileSharingSendingEnabled}
-                pingDisabled={ping.isPingDisabled}
-                messageContent={messageContent}
-                isEditing={isEditing}
-                isMessageFormatButtonsFlagEnabled={isMessageFormatButtonsFlagEnabled}
-                showMarkdownPreview={showMarkdownPreview}
-                showGiphyButton={giphy.showGiphyButton}
-                formatToolbar={formatToolbar}
-                emojiPicker={emojiPicker}
-                onEscape={() => {
-                  if (editedMessage) {
-                    cancelMessageEditing(true);
-                  } else if (replyMessageEntity) {
-                    cancelMessageReply();
-                  }
-                }}
-                onClickPing={ping.handlePing}
-                onGifClick={giphy.handleGifClick}
-                onSelectFiles={uploadFiles}
-                onSelectImages={uploadImages}
-                onSend={handleSend}
-              />
-            </InputBarEditor>
+        <div
+          className={cx(`${conversationInputBarClassName}__input input-bar-container`, {
+            [`${conversationInputBarClassName}__input--editing`]: isEditing,
+            'input-bar-container--with-toolbar': formatToolbar.open && showMarkdownPreview,
+          })}
+        >
+          {!isOutgoingRequest && (
+            <>
+              <div className="input-bar-avatar">
+                {showAvatar && (
+                  <Avatar
+                    className="cursor-default"
+                    participant={selfUser}
+                    avatarSize={AVATAR_SIZE.X_SMALL}
+                    hideAvailabilityStatus
+                  />
+                )}
+              </div>
+              {!isSelfUserRemoved && !fileHandling.pastedFile && (
+                <InputBarEditor
+                  editorRef={editorRef}
+                  inputPlaceholder={inputPlaceholder}
+                  hasLocalEphemeralTimer={hasLocalEphemeralTimer}
+                  showMarkdownPreview={showMarkdownPreview}
+                  formatToolbar={formatToolbar}
+                  onSetup={editor => {
+                    editorRef.current = editor;
+                  }}
+                  onEscape={() => {
+                    if (editedMessage) {
+                      cancelMessageEditing(true);
+                    } else if (replyMessageEntity) {
+                      cancelMessageReply();
+                    }
+                  }}
+                  onArrowUp={() => {
+                    if (messageContent.text.length === 0) {
+                      editMessage(conversation.getLastEditableMessage());
+                    }
+                  }}
+                  onShiftTab={onShiftTab}
+                  onBlur={() => isTypingRef.current && conversationRepository.sendTypingStop(conversation)}
+                  onUpdate={setMessageContent}
+                  onSend={handleSendMessage}
+                  getMentionCandidates={getMentionCandidates}
+                  saveDraftState={draftState.save}
+                  loadDraftState={draftState.load}
+                  replaceEmojis={shouldReplaceEmoji}
+                >
+                  <InputBarControls
+                    conversation={conversation}
+                    isFileSharingSendingEnabled={isFileSharingSendingEnabled}
+                    pingDisabled={ping.isPingDisabled}
+                    messageContent={messageContent}
+                    isEditing={isEditing}
+                    isMessageFormatButtonsFlagEnabled={isMessageFormatButtonsFlagEnabled}
+                    showMarkdownPreview={showMarkdownPreview}
+                    showGiphyButton={giphy.showGiphyButton}
+                    formatToolbar={formatToolbar}
+                    emojiPicker={emojiPicker}
+                    onEscape={() => {
+                      if (editedMessage) {
+                        cancelMessageEditing(true);
+                      } else if (replyMessageEntity) {
+                        cancelMessageReply();
+                      }
+                    }}
+                    onClickPing={ping.handlePing}
+                    onGifClick={giphy.handleGifClick}
+                    onSelectFiles={uploadFiles}
+                    onSelectImages={uploadImages}
+                    onSend={handleSendMessage}
+                  />
+                </InputBarEditor>
+              )}
+            </>
           )}
 
           {fileHandling.pastedFile && (
@@ -344,7 +344,7 @@ export const InputBar = ({
             />
           )}
         </div>
-      </div>
+      </InputBarContainer>
       {emojiPicker.open ? (
         <EmojiPicker
           posX={emojiPicker.position.x}

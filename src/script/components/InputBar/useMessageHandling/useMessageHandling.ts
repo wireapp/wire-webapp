@@ -25,6 +25,8 @@ import {LexicalEditor} from 'lexical';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
+import {Config} from 'src/script/Config';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
 import {MessageRepository, OutgoingQuote} from 'src/script/conversation/MessageRepository';
@@ -37,7 +39,11 @@ import {MessageHasher} from 'src/script/message/MessageHasher';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
 import {t} from 'Util/LocalizerUtil';
 
+import {MessageContent} from '../common/messageContent/messageContent';
+import {handleClickOutsideOfInputBar} from '../util/clickHandlers';
+
 interface UseMessageHandlingProps {
+  messageContent: MessageContent;
   conversation: Conversation;
   conversationRepository: ConversationRepository;
   eventRepository: EventRepository;
@@ -45,9 +51,12 @@ interface UseMessageHandlingProps {
   editorRef: React.RefObject<LexicalEditor>;
   onResetDraftState: () => void;
   onSaveDraft: (replyId?: string) => void;
+  pastedFile: File | null;
+  sendPastedFile: () => void;
 }
 
 export const useMessageHandling = ({
+  messageContent,
   conversation,
   conversationRepository,
   eventRepository,
@@ -55,64 +64,113 @@ export const useMessageHandling = ({
   editorRef,
   onResetDraftState,
   onSaveDraft,
+  pastedFile,
+  sendPastedFile,
 }: UseMessageHandlingProps) => {
   const [editedMessage, setEditedMessage] = useState<ContentMessage | undefined>();
   const [replyMessageEntity, setReplyMessageEntity] = useState<ContentMessage | null>(null);
 
-  const generateQuote = async (): Promise<OutgoingQuote | undefined> => {
-    if (!replyMessageEntity) {
-      return undefined;
-    }
+  const isEditing = !!editedMessage;
+  const isReplying = !!replyMessageEntity;
 
-    const event = await eventRepository.eventService.loadEvent(
-      replyMessageEntity.conversation_id,
-      replyMessageEntity.id,
-    );
-    if (!event) {
-      return undefined;
-    }
+  const generateQuote = useCallback(async (): Promise<OutgoingQuote | undefined> => {
+    return !replyMessageEntity
+      ? Promise.resolve(undefined)
+      : eventRepository.eventService
+          .loadEvent(replyMessageEntity.conversation_id, replyMessageEntity.id)
+          .then(MessageHasher.hashEvent)
+          .then((messageHash: ArrayBuffer) => {
+            return new QuoteEntity({
+              hash: messageHash,
+              messageId: replyMessageEntity.id,
+              userId: replyMessageEntity.from,
+            }) as OutgoingQuote;
+          });
+  }, [eventRepository.eventService, replyMessageEntity]);
 
-    const messageHash = await MessageHasher.hashEvent(event);
-    return new QuoteEntity({
-      hash: messageHash,
-      messageId: replyMessageEntity.id,
-      userId: replyMessageEntity.from,
-    }) as OutgoingQuote;
-  };
+  const cancelMessageReply = useCallback(
+    (resetDraft = true) => {
+      setReplyMessageEntity(null);
+      onSaveDraft();
 
-  const sendMessageEdit = (messageText: string, mentions: MentionEntity[]): void | Promise<any> => {
-    const mentionEntities = mentions.slice(0);
-    cancelMessageEditing(true);
+      if (resetDraft) {
+        onResetDraftState();
+      }
+    },
+    [onResetDraftState, onSaveDraft],
+  );
 
-    if (!messageText.length && editedMessage) {
-      return messageRepository.deleteMessageForEveryone(conversation, editedMessage);
-    }
+  const cancelMessageEditing = useCallback(
+    (resetDraft = true) => {
+      setEditedMessage(undefined);
+      setReplyMessageEntity(null);
 
-    if (editedMessage) {
-      messageRepository.sendMessageEdit(conversation, messageText, editedMessage, mentionEntities).catch(error => {
-        if (error.type !== ConversationError.TYPE.NO_MESSAGE_CHANGES) {
-          throw error;
-        }
-      });
+      if (resetDraft) {
+        onResetDraftState();
+      }
+    },
+    [onResetDraftState],
+  );
 
-      cancelMessageReply();
-    }
-  };
-
-  const sendTextMessage = (messageText: string, mentions: MentionEntity[]) => {
-    if (messageText.length) {
+  const sendMessageEdit = useCallback(
+    (messageText: string, mentions: MentionEntity[]): void | Promise<any> => {
       const mentionEntities = mentions.slice(0);
+      cancelMessageEditing(true);
 
-      void generateQuote().then(quoteEntity => {
-        void messageRepository.sendTextWithLinkPreview(conversation, messageText, mentionEntities, quoteEntity);
+      if (!messageText.length && editedMessage) {
+        return messageRepository.deleteMessageForEveryone(conversation, editedMessage);
+      }
+
+      if (editedMessage) {
+        messageRepository.sendMessageEdit(conversation, messageText, editedMessage, mentionEntities).catch(error => {
+          if (error.type !== ConversationError.TYPE.NO_MESSAGE_CHANGES) {
+            throw error;
+          }
+        });
+
         cancelMessageReply();
-      });
-    }
-  };
+      }
+    },
+    [cancelMessageEditing, cancelMessageReply, conversation, editedMessage, messageRepository],
+  );
 
-  const sendMessage = (text: string, mentions: MentionEntity[]): void => {
+  const sendTextMessage = useCallback(
+    (messageText: string, mentions: MentionEntity[]) => {
+      if (messageText.length) {
+        const mentionEntities = mentions.slice(0);
+
+        void generateQuote().then(quoteEntity => {
+          void messageRepository.sendTextWithLinkPreview(conversation, messageText, mentionEntities, quoteEntity);
+          cancelMessageReply();
+        });
+      }
+    },
+    [cancelMessageReply, conversation, generateQuote, messageRepository],
+  );
+
+  const sendMessage = useCallback((): void => {
+    if (pastedFile) {
+      return void sendPastedFile();
+    }
+
+    const text = messageContent.text;
+    const mentions = messageContent.mentions ?? [];
+
     const messageTrimmedStart = text.trimStart();
     const messageText = messageTrimmedStart.trimEnd();
+
+    const config = Config.getConfig();
+
+    const isMessageTextTooLong = text.length > config.MAXIMUM_MESSAGE_LENGTH;
+
+    if (isMessageTextTooLong) {
+      showWarningModal(
+        t('modalConversationMessageTooLongHeadline'),
+        t('modalConversationMessageTooLongMessage', {number: config.MAXIMUM_MESSAGE_LENGTH}),
+      );
+
+      return;
+    }
 
     if (editedMessage) {
       void sendMessageEdit(messageText, mentions);
@@ -122,9 +180,18 @@ export const useMessageHandling = ({
 
     editorRef.current?.focus();
     onResetDraftState();
-  };
+  }, [
+    editedMessage,
+    editorRef,
+    onResetDraftState,
+    pastedFile,
+    sendMessageEdit,
+    sendPastedFile,
+    sendTextMessage,
+    messageContent,
+  ]);
 
-  const handleSendMessage = async (text: string, mentions: MentionEntity[]) => {
+  const handleSendMessage = useCallback(async () => {
     await conversationRepository.refreshMLSConversationVerificationState(conversation);
     const isE2EIDegraded = conversation.mlsVerificationState() === ConversationVerificationState.DEGRADED;
 
@@ -133,7 +200,7 @@ export const useMessageHandling = ({
         secondaryAction: {
           action: () => {
             conversation.mlsVerificationState(ConversationVerificationState.UNVERIFIED);
-            sendMessage(text, mentions);
+            sendMessage();
           },
           text: t('conversation.E2EISendAnyway'),
         },
@@ -147,52 +214,41 @@ export const useMessageHandling = ({
         },
       });
     } else {
-      sendMessage(text, mentions);
+      sendMessage();
     }
-  };
+  }, [conversation, conversationRepository, sendMessage]);
 
-  const cancelMessageEditing = (resetDraft = true) => {
-    setEditedMessage(undefined);
-    setReplyMessageEntity(null);
+  const editMessage = useCallback(
+    (messageEntity?: ContentMessage) => {
+      if (messageEntity?.isEditable() && messageEntity !== editedMessage) {
+        cancelMessageReply();
+        cancelMessageEditing(true);
+        setEditedMessage(messageEntity);
 
-    if (resetDraft) {
-      onResetDraftState();
-    }
-  };
-
-  const cancelMessageReply = (resetDraft = true) => {
-    setReplyMessageEntity(null);
-
-    if (resetDraft) {
-      onResetDraftState();
-    }
-  };
-
-  const editMessage = (messageEntity?: ContentMessage) => {
-    if (messageEntity?.isEditable() && messageEntity !== editedMessage) {
-      cancelMessageReply();
-      cancelMessageEditing(true);
-      setEditedMessage(messageEntity);
-
-      const quote = messageEntity.quote();
-      if (quote && conversation) {
-        void messageRepository
-          .getMessageInConversationById(conversation, quote.messageId)
-          .then(quotedMessage => setReplyMessageEntity(quotedMessage));
+        const quote = messageEntity.quote();
+        if (quote && conversation) {
+          void messageRepository
+            .getMessageInConversationById(conversation, quote.messageId)
+            .then(quotedMessage => setReplyMessageEntity(quotedMessage));
+        }
       }
-    }
-  };
+    },
+    [cancelMessageEditing, cancelMessageReply, conversation, editedMessage, messageRepository],
+  );
 
-  const replyMessage = (messageEntity: ContentMessage): void => {
-    if (messageEntity?.isReplyable() && messageEntity !== replyMessageEntity) {
-      cancelMessageReply(false);
-      cancelMessageEditing(!!editedMessage);
-      setReplyMessageEntity(messageEntity);
-      onSaveDraft(messageEntity.id);
+  const replyMessage = useCallback(
+    (messageEntity: ContentMessage) => {
+      if (messageEntity?.isReplyable() && messageEntity !== replyMessageEntity) {
+        cancelMessageReply(false);
+        cancelMessageEditing(!!editedMessage);
+        setReplyMessageEntity(messageEntity);
+        onSaveDraft(messageEntity.id);
 
-      editorRef.current?.focus();
-    }
-  };
+        editorRef.current?.focus();
+      }
+    },
+    [cancelMessageEditing, cancelMessageReply, editedMessage, editorRef, onSaveDraft, replyMessageEntity],
+  );
 
   const handleRepliedMessageDeleted = useCallback(
     (messageId: string) => {
@@ -224,17 +280,50 @@ export const useMessageHandling = ({
       amplify.unsubscribeAll(WebAppEvents.CONVERSATION.MESSAGE.UPDATED);
       amplify.unsubscribeAll(WebAppEvents.CONVERSATION.MESSAGE.EDIT);
     };
-  }, [handleRepliedMessageDeleted, handleRepliedMessageUpdated]);
+  }, [handleRepliedMessageDeleted, replyMessage, editMessage, handleRepliedMessageUpdated]);
+
+  useEffect(() => {
+    const onWindowClick = (event: Event): void =>
+      handleClickOutsideOfInputBar(event, () => {
+        // We want to add a timeout in case the click happens because the user switched conversation and the component is unmounting.
+        // In this case we want to keep the edited message for this conversation
+        setTimeout(() => {
+          cancelMessageEditing(true);
+          cancelMessageReply();
+        });
+      });
+    if (isEditing) {
+      window.addEventListener('click', onWindowClick);
+
+      return () => {
+        window.removeEventListener('click', onWindowClick);
+      };
+    }
+
+    return () => undefined;
+  }, [cancelMessageEditing, cancelMessageReply, isEditing]);
+
+  useEffect(() => {
+    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REPLY, replyMessage);
+    conversation.isTextInputReady(true);
+
+    return () => {
+      amplify.unsubscribeAll(WebAppEvents.CONVERSATION.MESSAGE.REPLY);
+      conversation.isTextInputReady(false);
+    };
+  }, [replyMessage, conversation]);
 
   return {
     editedMessage,
     replyMessageEntity,
-    isEditing: !!editedMessage,
-    isReplying: !!replyMessageEntity,
+    isEditing,
+    isReplying,
+    handleSendMessage2: sendMessage,
     handleSendMessage,
     cancelMessageEditing,
     cancelMessageReply,
     editMessage,
     replyMessage,
+    generateQuote,
   };
 };

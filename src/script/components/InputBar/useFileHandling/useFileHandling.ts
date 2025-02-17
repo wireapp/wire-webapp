@@ -19,16 +19,25 @@
 
 import {useEffect, useState} from 'react';
 
-import {t} from 'Util/LocalizerUtil';
-import {formatLocale} from 'Util/TimeUtil';
-import {getFileExtension} from 'Util/util';
+import {amplify} from 'amplify';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {useFilePaste} from './useFilePaste/useFilePaste';
 
 interface UseFileHandlingProps {
   uploadDroppedFiles: (files: File[]) => void;
+  uploadImages: (images: File[]) => void;
 }
 
-export const useFileHandling = ({uploadDroppedFiles}: UseFileHandlingProps) => {
+export const useFileHandling = ({uploadDroppedFiles, uploadImages}: UseFileHandlingProps) => {
   const [pastedFile, setPastedFile] = useState<File | null>(null);
+
+  useFilePaste({
+    onFilePasted: file => {
+      setPastedFile(file);
+    },
+  });
 
   const clearPastedFile = () => setPastedFile(null);
 
@@ -37,24 +46,6 @@ export const useFileHandling = ({uploadDroppedFiles}: UseFileHandlingProps) => {
       uploadDroppedFiles([pastedFile]);
       clearPastedFile();
     }
-  };
-
-  const handlePasteFiles = (files: FileList): void => {
-    const [pastedFile] = files;
-
-    if (!pastedFile) {
-      return;
-    }
-    const {lastModified} = pastedFile;
-
-    const date = formatLocale(lastModified || new Date(), 'PP, pp');
-    const fileName = `${t('conversationSendPastedFile', {date})}.${getFileExtension(pastedFile.name)}`;
-
-    const newFile = new File([pastedFile], fileName, {
-      type: pastedFile.type,
-    });
-
-    setPastedFile(newFile);
   };
 
   const sendImageOnEnterClick = (event: KeyboardEvent) => {
@@ -75,10 +66,17 @@ export const useFileHandling = ({uploadDroppedFiles}: UseFileHandlingProps) => {
     };
   }, [pastedFile]);
 
+  useEffect(() => {
+    amplify.subscribe(WebAppEvents.CONVERSATION.IMAGE.SEND, uploadImages);
+
+    return () => {
+      amplify.unsubscribeAll(WebAppEvents.CONVERSATION.IMAGE.SEND);
+    };
+  }, []);
+
   return {
     pastedFile,
     clearPastedFile,
     sendPastedFile,
-    handlePasteFiles,
   };
 };

@@ -17,6 +17,12 @@
  *
  */
 
+import {useEffect} from 'react';
+
+import {amplify} from 'amplify';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {Conversation} from 'src/script/entity/Conversation';
 
 import {ControlButtons} from './ControlButtons';
@@ -68,6 +74,14 @@ export const InputBarControls = ({
   onSend,
 }: InputBarControlsProps) => {
   const enableSending = messageContent.text.length > 0;
+
+  useEffect(() => {
+    amplify.subscribe(WebAppEvents.SHORTCUT.PING, onClickPing);
+
+    return () => {
+      amplify.unsubscribeAll(WebAppEvents.SHORTCUT.PING);
+    };
+  }, [onClickPing]);
 
   return (
     <div className="input-bar-buttons">
