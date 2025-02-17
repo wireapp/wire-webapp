@@ -32,15 +32,17 @@ export const getFileAssetStatus = ({uploadProgress, transferState}: GetFileAsset
     // eslint-disable-next-line no-magic-numbers
     uploadProgress && (uploadProgress > 0 && uploadProgress < 100 ? AssetTransferState.UPLOADING : transferState);
 
-  const isPendingUpload = assetStatus === AssetTransferState.UPLOAD_PENDING;
-  const isFailedUpload = assetStatus === AssetTransferState.UPLOAD_FAILED;
-  const isDownloading = assetStatus === AssetTransferState.DOWNLOADING;
-  const isFailedDownloadingDecrypt = assetStatus === AssetTransferState.DOWNLOAD_FAILED_DECRPYT;
-  const isFailedDownloadingHash = assetStatus === AssetTransferState.DOWNLOAD_FAILED_HASH;
-  const isUploading = assetStatus === AssetTransferState.UPLOADING;
+  const isLoading = [
+    AssetTransferState.UPLOAD_PENDING,
+    AssetTransferState.UPLOADING,
+    AssetTransferState.DOWNLOADING,
+  ].includes(assetStatus as AssetTransferState);
 
-  const isLoading = isPendingUpload || isUploading || isDownloading;
-  const isError = isFailedUpload || isFailedDownloadingDecrypt || isFailedDownloadingHash;
+  const isError = [
+    AssetTransferState.UPLOAD_FAILED,
+    AssetTransferState.DOWNLOAD_FAILED_DECRPYT,
+    AssetTransferState.DOWNLOAD_FAILED_HASH,
+  ].includes(assetStatus as AssetTransferState);
 
   return {isLoading, isError};
 };
