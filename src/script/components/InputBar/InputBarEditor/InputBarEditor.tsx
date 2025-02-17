@@ -17,8 +17,6 @@
  *
  */
 
-import {FC} from 'react';
-
 import {LexicalEditor} from 'lexical';
 
 import {User} from 'src/script/entity/User';
@@ -50,7 +48,7 @@ interface InputBarEditorProps {
   children: React.ReactNode;
 }
 
-export const InputBarEditor: FC<InputBarEditorProps> = ({
+export const InputBarEditor = ({
   editorRef,
   inputPlaceholder,
   hasLocalEphemeralTimer,
@@ -68,7 +66,7 @@ export const InputBarEditor: FC<InputBarEditorProps> = ({
   loadDraftState,
   replaceEmojis,
   children,
-}) => {
+}: InputBarEditorProps) => {
   return (
     <RichTextEditor
       onSetup={editor => {

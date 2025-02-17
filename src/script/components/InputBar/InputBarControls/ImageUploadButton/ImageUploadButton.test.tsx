@@ -19,7 +19,7 @@
 
 import {render, fireEvent} from '@testing-library/react';
 
-import {ImageUploadButton} from '.';
+import {ImageUploadButton} from './ImageUploadButton';
 
 const ALLOWED_IMAGE_TYPES = ['image/gif', 'image/avif'];
 
