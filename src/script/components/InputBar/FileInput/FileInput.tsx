@@ -17,8 +17,6 @@
  *
  */
 
-import {FC} from 'react';
-
 import {PastedFileControls} from '../PastedFileControls/PastedFileControls';
 
 interface FileInputProps {
@@ -27,7 +25,7 @@ interface FileInputProps {
   onSendPastedFile: () => void;
 }
 
-export const FileInput: FC<FileInputProps> = ({pastedFile, onClearPastedFile, onSendPastedFile}) => {
+export const FileInput = ({pastedFile, onClearPastedFile, onSendPastedFile}: FileInputProps) => {
   if (!pastedFile) {
     return null;
   }
