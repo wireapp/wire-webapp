@@ -30,11 +30,7 @@ export const getFileAssetStatus = ({uploadProgress, transferState}: GetFileAsset
   // transition into the `AssetTransferState.UPLOADING` state.
   const assetStatus =
     // eslint-disable-next-line no-magic-numbers
-    uploadProgress
-      ? uploadProgress > 0 && uploadProgress < 100
-        ? AssetTransferState.UPLOADING
-        : transferState
-      : transferState;
+    uploadProgress > 0 && uploadProgress < 100 ? AssetTransferState.UPLOADING : transferState;
 
   const isLoading = [
     AssetTransferState.UPLOAD_PENDING,
