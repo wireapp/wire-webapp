@@ -21,6 +21,7 @@ import {MutableRefObject} from 'react';
 
 import {LexicalEditor} from 'lexical';
 
+import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {User} from 'src/script/entity/User';
 
 import {RichTextEditor} from './RichTextEditor';
@@ -30,6 +31,7 @@ import {MessageContent} from '../common/messageContent/messageContent';
 
 interface InputBarEditorProps {
   editorRef: MutableRefObject<LexicalEditor | null>;
+  editedMessage: ContentMessage | undefined;
   inputPlaceholder: string;
   hasLocalEphemeralTimer: boolean;
   showMarkdownPreview: boolean;
@@ -53,6 +55,7 @@ interface InputBarEditorProps {
 
 export const InputBarEditor = ({
   editorRef,
+  editedMessage,
   inputPlaceholder,
   hasLocalEphemeralTimer,
   showMarkdownPreview,
@@ -76,7 +79,7 @@ export const InputBarEditor = ({
         editorRef.current = editor;
         onSetup(editor);
       }}
-      editedMessage={undefined}
+      editedMessage={editedMessage}
       onEscape={onEscape}
       onArrowUp={onArrowUp}
       getMentionCandidates={getMentionCandidates}

@@ -44,7 +44,6 @@ import {InputBarEditor} from './InputBarEditor/InputBarEditor';
 import {PastedFileControls} from './PastedFileControls/PastedFileControls';
 import {ReplyBar} from './ReplyBar/ReplyBar';
 import {TypingIndicator} from './TypingIndicator';
-import {useDraftState} from './useDraftState/useDraftState';
 import {useEmojiPicker} from './useEmojiPicker/useEmojiPicker';
 import {useFileHandling} from './useFileHandling/useFileHandling';
 import {useFormatToolbar} from './useFormatToolbar/useFormatToolbar';
@@ -190,13 +189,6 @@ export const InputBar = ({
     WebAppEvents.PROPERTIES.UPDATE.INTERFACE.MARKDOWN_PREVIEW,
   );
 
-  const draftState = useDraftState({
-    conversation,
-    storageRepository,
-    messageRepository,
-    editorRef,
-  });
-
   const {
     editedMessage,
     replyMessageEntity,
@@ -206,19 +198,18 @@ export const InputBar = ({
     cancelMessageEditing,
     cancelMessageReply,
     editMessage,
+    draftState,
     generateQuote,
   } = useMessageHandling({
     messageContent,
     conversation,
     conversationRepository,
+    storageRepository,
     eventRepository,
     messageRepository,
     editorRef,
     pastedFile: fileHandling.pastedFile,
     sendPastedFile: fileHandling.sendPastedFile,
-    onResetDraftState: draftState.reset,
-    onSaveDraft: (replyId?: string) =>
-      draftState.save(JSON.stringify(editorRef.current?.getEditorState().toJSON()), messageContent.text, replyId),
   });
 
   const ping = usePing({
@@ -275,6 +266,7 @@ export const InputBar = ({
               {!isSelfUserRemoved && !fileHandling.pastedFile && (
                 <InputBarEditor
                   editorRef={editorRef}
+                  editedMessage={editedMessage}
                   inputPlaceholder={inputPlaceholder}
                   hasLocalEphemeralTimer={hasLocalEphemeralTimer}
                   showMarkdownPreview={showMarkdownPreview}

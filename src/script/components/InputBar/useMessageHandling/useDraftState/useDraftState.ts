@@ -26,23 +26,36 @@ import {Conversation} from 'src/script/entity/Conversation';
 import {StorageRepository} from 'src/script/storage';
 import {sanitizeMarkdown} from 'Util/MarkdownUtil';
 
-import {loadDraftState, saveDraftState} from '../common/draftState/draftState';
+import {DraftState, loadDraftState, saveDraftState} from '../../common/draftState/draftState';
 
 interface UseDraftStateProps {
   conversation: Conversation;
   storageRepository: StorageRepository;
   messageRepository: MessageRepository;
   editorRef: React.RefObject<LexicalEditor>;
+  onLoad?: (draftState: DraftState) => void;
+  editedMessageId?: string;
+  replyMessageEntityId?: string;
 }
 
-export const useDraftState = ({conversation, storageRepository, messageRepository, editorRef}: UseDraftStateProps) => {
+export const useDraftState = ({
+  conversation,
+  storageRepository,
+  messageRepository,
+  editorRef,
+  onLoad,
+  editedMessageId,
+  replyMessageEntityId,
+}: UseDraftStateProps) => {
   const reset = useCallback(() => {
     editorRef.current?.dispatchCommand(CLEAR_EDITOR_COMMAND, undefined);
   }, [editorRef]);
 
   const load = useCallback(async () => {
-    return loadDraftState(conversation, storageRepository, messageRepository);
-  }, [conversation, messageRepository, storageRepository]);
+    const draftState = await loadDraftState(conversation, storageRepository, messageRepository);
+    onLoad?.(draftState);
+    return draftState;
+  }, [conversation, messageRepository, onLoad, storageRepository]);
 
   const save = async (editorState: string, text: string, replyId = '') => {
     void saveDraftState({
@@ -50,7 +63,8 @@ export const useDraftState = ({conversation, storageRepository, messageRepositor
       conversation,
       editorState,
       plainMessage: sanitizeMarkdown(text),
-      replyId,
+      replyId: replyId ?? replyMessageEntityId,
+      editedMessageId,
     });
   };
 

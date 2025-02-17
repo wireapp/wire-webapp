@@ -37,7 +37,10 @@ import {EventRepository} from 'src/script/event/EventRepository';
 import {MentionEntity} from 'src/script/message/MentionEntity';
 import {MessageHasher} from 'src/script/message/MessageHasher';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
+import {StorageRepository} from 'src/script/storage';
 import {t} from 'Util/LocalizerUtil';
+
+import {useDraftState} from './useDraftState/useDraftState';
 
 import {MessageContent} from '../common/messageContent/messageContent';
 import {handleClickOutsideOfInputBar} from '../util/clickHandlers';
@@ -48,9 +51,8 @@ interface UseMessageHandlingProps {
   conversationRepository: ConversationRepository;
   eventRepository: EventRepository;
   messageRepository: MessageRepository;
+  storageRepository: StorageRepository;
   editorRef: React.RefObject<LexicalEditor>;
-  onResetDraftState: () => void;
-  onSaveDraft: (replyId?: string) => void;
   pastedFile: File | null;
   sendPastedFile: () => void;
 }
@@ -61,9 +63,8 @@ export const useMessageHandling = ({
   conversationRepository,
   eventRepository,
   messageRepository,
+  storageRepository,
   editorRef,
-  onResetDraftState,
-  onSaveDraft,
   pastedFile,
   sendPastedFile,
 }: UseMessageHandlingProps) => {
@@ -72,6 +73,33 @@ export const useMessageHandling = ({
 
   const isEditing = !!editedMessage;
   const isReplying = !!replyMessageEntity;
+
+  const draftState = useDraftState({
+    conversation,
+    storageRepository,
+    messageRepository,
+    editorRef,
+    editedMessageId: editedMessage?.id,
+    replyMessageEntityId: replyMessageEntity?.id,
+    onLoad: draftState => {
+      const reply = draftState.messageReply;
+      if (reply?.isReplyable()) {
+        setReplyMessageEntity(reply);
+      }
+
+      const editedMessage = draftState.editedMessage;
+      if (editedMessage) {
+        setEditedMessage(editedMessage);
+      }
+    },
+  });
+
+  const handleSaveDraft = useCallback(
+    async (replyId?: string) => {
+      await draftState.save(JSON.stringify(editorRef.current?.getEditorState().toJSON()), messageContent.text, replyId);
+    },
+    [draftState, editorRef, messageContent.text],
+  );
 
   const generateQuote = useCallback(async (): Promise<OutgoingQuote | undefined> => {
     return !replyMessageEntity
@@ -91,13 +119,13 @@ export const useMessageHandling = ({
   const cancelMessageReply = useCallback(
     (resetDraft = true) => {
       setReplyMessageEntity(null);
-      onSaveDraft();
+      void handleSaveDraft();
 
       if (resetDraft) {
-        onResetDraftState();
+        draftState.reset();
       }
     },
-    [onResetDraftState, onSaveDraft],
+    [draftState, handleSaveDraft],
   );
 
   const cancelMessageEditing = useCallback(
@@ -106,10 +134,10 @@ export const useMessageHandling = ({
       setReplyMessageEntity(null);
 
       if (resetDraft) {
-        onResetDraftState();
+        draftState.reset();
       }
     },
-    [onResetDraftState],
+    [draftState],
   );
 
   const sendMessageEdit = useCallback(
@@ -179,16 +207,17 @@ export const useMessageHandling = ({
     }
 
     editorRef.current?.focus();
-    onResetDraftState();
+    draftState.reset();
   }, [
+    pastedFile,
+    messageContent.text,
+    messageContent.mentions,
     editedMessage,
     editorRef,
-    onResetDraftState,
-    pastedFile,
-    sendMessageEdit,
+    draftState,
     sendPastedFile,
+    sendMessageEdit,
     sendTextMessage,
-    messageContent,
   ]);
 
   const handleSendMessage = useCallback(async () => {
@@ -242,12 +271,12 @@ export const useMessageHandling = ({
         cancelMessageReply(false);
         cancelMessageEditing(!!editedMessage);
         setReplyMessageEntity(messageEntity);
-        onSaveDraft(messageEntity.id);
+        void handleSaveDraft(messageEntity.id);
 
         editorRef.current?.focus();
       }
     },
-    [cancelMessageEditing, cancelMessageReply, editedMessage, editorRef, onSaveDraft, replyMessageEntity],
+    [cancelMessageEditing, cancelMessageReply, editedMessage, editorRef, handleSaveDraft, replyMessageEntity],
   );
 
   const handleRepliedMessageDeleted = useCallback(
@@ -314,6 +343,7 @@ export const useMessageHandling = ({
   }, [replyMessage, conversation]);
 
   return {
+    draftState,
     editedMessage,
     replyMessageEntity,
     isEditing,
