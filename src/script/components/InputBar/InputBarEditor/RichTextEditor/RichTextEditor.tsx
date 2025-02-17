@@ -31,8 +31,8 @@ import {OnChangePlugin} from '@lexical/react/LexicalOnChangePlugin';
 import {RichTextPlugin} from '@lexical/react/LexicalRichTextPlugin';
 import {LexicalEditor, EditorState} from 'lexical';
 
+import {DraftState} from 'Components/InputBar/common/draftState/draftState';
 import {MessageContent} from 'Components/InputBar/common/messageContent/messageContent';
-import {DraftState} from 'Components/InputBar/util/DraftStateUtil';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {User} from 'src/script/entity/User';
 
