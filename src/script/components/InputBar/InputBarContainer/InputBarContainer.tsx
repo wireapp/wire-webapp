@@ -29,8 +29,6 @@ interface InputBarContainerProps {
   children: ReactNode;
 }
 
-const conversationInputBarClassName = 'conversation-input-bar';
-
 export const InputBarContainer = ({children}: InputBarContainerProps) => {
   const {rightSidebar} = useAppMainState.getState();
   const lastItem = rightSidebar.history.length - 1;
@@ -39,8 +37,8 @@ export const InputBarContainer = ({children}: InputBarContainerProps) => {
 
   return (
     <IgnoreOutsideClickWrapper
-      id={conversationInputBarClassName}
-      className={cx(conversationInputBarClassName, {'is-right-panel-open': isRightSidebarOpen})}
+      id={'conversation-input-bar'}
+      className={cx('conversation-input-bar', {'is-right-panel-open': isRightSidebarOpen})}
       aria-live="assertive"
     >
       {children}

@@ -86,7 +86,6 @@ interface InputBarProps {
   uploadImages: (images: File[]) => void;
   uploadFiles: (files: File[]) => void;
 }
-const conversationInputBarClassName = 'conversation-input-bar';
 
 export const InputBar = ({
   conversation,
@@ -259,8 +258,8 @@ export const InputBar = ({
         )}
 
         <div
-          className={cx(`${conversationInputBarClassName}__input input-bar-container`, {
-            [`${conversationInputBarClassName}__input--editing`]: isEditing,
+          className={cx(`conversation-input-bar__input input-bar-container`, {
+            [`conversation-input-bar__input--editing`]: isEditing,
             'input-bar-container--with-toolbar': formatToolbar.open && showMarkdownPreview,
           })}
         >
