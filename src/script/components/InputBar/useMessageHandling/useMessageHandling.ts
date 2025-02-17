@@ -19,7 +19,10 @@
 
 import {useCallback, useEffect} from 'react';
 
+import {amplify} from 'amplify';
 import {LexicalEditor} from 'lexical';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
@@ -32,9 +35,9 @@ import {useDraftState} from './useDraftState/useDraftState';
 import {useMessageEditing} from './useMessageEditing/useMessageEditing';
 import {useMessageReply} from './useMessageReply/useMessageReply';
 import {useMessageSend} from './useMessageSend/useMessageSend';
+import {useOutsideInputClick} from './useOutsideInputClick/useOutsideInputClick';
 
 import {MessageContent} from '../common/messageContent/messageContent';
-import {handleClickOutsideOfInputBar} from '../util/clickHandlers';
 
 interface UseMessageHandlingProps {
   messageContent: MessageContent;
@@ -158,7 +161,6 @@ export const useMessageHandling = ({
       if (messageEntity?.isReplyable() && messageEntity !== replyMessageEntity) {
         cancelMessageReply(false);
         cancelMessageEditing(() => {
-          replyMessageCallback(null);
           if (isEditing) {
             draftState.reset();
           }
@@ -191,32 +193,20 @@ export const useMessageHandling = ({
   }, [editedMessage, replyMessageEntity, cancelMesssageEditingWithDraftReset, cancelMessageReply]);
 
   useEffect(() => {
-    const onWindowClick = (event: Event): void =>
-      handleClickOutsideOfInputBar(event, () => {
-        // We want to add a timeout in case the click happens because the user switched conversation and the component is unmounting.
-        // In this case we want to keep the edited message for this conversation
-        setTimeout(() => {
-          cancelMesssageEditingWithDraftReset();
-          cancelMessageReply();
-        });
-      });
-    if (isEditing) {
-      window.addEventListener('click', onWindowClick);
+    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REPLY, replyMessage);
 
-      return () => {
-        window.removeEventListener('click', onWindowClick);
-      };
-    }
+    return () => {
+      amplify.unsubscribeAll(WebAppEvents.CONVERSATION.MESSAGE.REPLY);
+    };
+  }, [replyMessage]);
 
-    return () => undefined;
-  }, [
-    cancelMessageEditing,
-    cancelMessageReply,
-    cancelMesssageEditingWithDraftReset,
-    draftState,
+  useOutsideInputClick({
     isEditing,
-    replyMessageCallback,
-  ]);
+    callback: () => {
+      cancelMesssageEditingWithDraftReset();
+      cancelMessageReply();
+    },
+  });
 
   useEffect(() => {
     conversation.isTextInputReady(true);

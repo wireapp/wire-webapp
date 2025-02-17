@@ -51,12 +51,10 @@ export const useMessageReply = () => {
   );
 
   useEffect(() => {
-    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REPLY, replyMessage);
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, handleRepliedMessageDeleted);
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, handleRepliedMessageUpdated);
 
     return () => {
-      amplify.unsubscribeAll(WebAppEvents.CONVERSATION.MESSAGE.REPLY);
       amplify.unsubscribeAll(WebAppEvents.CONVERSATION.MESSAGE.REMOVED);
       amplify.unsubscribeAll(WebAppEvents.CONVERSATION.MESSAGE.UPDATED);
     };
