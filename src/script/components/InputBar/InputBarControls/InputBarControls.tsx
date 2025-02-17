@@ -23,6 +23,7 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {Config} from 'src/script/Config';
 import {Conversation} from 'src/script/entity/Conversation';
 
 import {ControlButtons} from './ControlButtons';
@@ -36,7 +37,6 @@ interface InputBarControlsProps {
   pingDisabled: boolean;
   messageContent: MessageContent;
   isEditing: boolean;
-  isMessageFormatButtonsFlagEnabled: boolean;
   showMarkdownPreview: boolean;
   showGiphyButton: boolean;
   formatToolbar: {
@@ -61,7 +61,6 @@ export const InputBarControls = ({
   pingDisabled,
   messageContent,
   isEditing,
-  isMessageFormatButtonsFlagEnabled,
   showMarkdownPreview,
   showGiphyButton,
   formatToolbar,
@@ -74,6 +73,8 @@ export const InputBarControls = ({
   onSend,
 }: InputBarControlsProps) => {
   const enableSending = messageContent.text.length > 0;
+
+  const isMessageFormatButtonsFlagEnabled = Config.getConfig().FEATURE.ENABLE_MESSAGE_FORMAT_BUTTONS;
 
   useEffect(() => {
     amplify.subscribe(WebAppEvents.SHORTCUT.PING, onClickPing);

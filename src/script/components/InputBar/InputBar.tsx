@@ -151,8 +151,6 @@ export const InputBar = ({
   const hasLocalEphemeralTimer = isSelfDeletingMessagesEnabled && !!localMessageTimer && !hasGlobalMessageTimer;
   const isTypingRef = useRef(false);
 
-  const isMessageFormatButtonsFlagEnabled = CONFIG.FEATURE.ENABLE_MESSAGE_FORMAT_BUTTONS;
-
   const shouldReplaceEmoji = useUserPropertyValue<boolean>(
     () => propertiesRepository.getPreference(PROPERTIES_TYPE.EMOJI.REPLACE_INLINE),
     WebAppEvents.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE,
@@ -234,7 +232,6 @@ export const InputBar = ({
   const giphy = useGiphy({
     text: messageContent.text,
     maxLength: CONFIG.GIPHY_TEXT_LENGTH,
-    isMessageFormatButtonsFlagEnabled,
     openGiphy,
     generateQuote,
     messageRepository,
@@ -312,7 +309,6 @@ export const InputBar = ({
                     pingDisabled={ping.isPingDisabled}
                     messageContent={messageContent}
                     isEditing={isEditing}
-                    isMessageFormatButtonsFlagEnabled={isMessageFormatButtonsFlagEnabled}
                     showMarkdownPreview={showMarkdownPreview}
                     showGiphyButton={giphy.showGiphyButton}
                     formatToolbar={formatToolbar}

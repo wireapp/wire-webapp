@@ -23,13 +23,13 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {Config} from 'src/script/Config';
 import {MessageRepository, OutgoingQuote} from 'src/script/conversation/MessageRepository';
 import {Conversation} from 'src/script/entity/Conversation';
 
 interface UseGiphyProps {
   text: string;
   maxLength: number;
-  isMessageFormatButtonsFlagEnabled: boolean;
   openGiphy: (inputValue: string) => void;
   generateQuote: () => Promise<OutgoingQuote | undefined>;
   messageRepository: MessageRepository;
@@ -40,13 +40,14 @@ interface UseGiphyProps {
 export const useGiphy = ({
   text,
   maxLength,
-  isMessageFormatButtonsFlagEnabled,
   openGiphy,
   generateQuote,
   messageRepository,
   conversation,
   cancelMessageEditing,
 }: UseGiphyProps) => {
+  const isMessageFormatButtonsFlagEnabled = Config.getConfig().FEATURE.ENABLE_MESSAGE_FORMAT_BUTTONS;
+
   const showGiphyButton = useMemo(() => {
     if (isMessageFormatButtonsFlagEnabled) {
       return text.length > 0;
