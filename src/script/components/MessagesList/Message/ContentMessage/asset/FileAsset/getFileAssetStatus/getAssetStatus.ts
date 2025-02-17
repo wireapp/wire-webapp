@@ -30,19 +30,23 @@ export const getFileAssetStatus = ({uploadProgress, transferState}: GetFileAsset
   // transition into the `AssetTransferState.UPLOADING` state.
   const assetStatus =
     // eslint-disable-next-line no-magic-numbers
-    uploadProgress && (uploadProgress > 0 && uploadProgress < 100 ? AssetTransferState.UPLOADING : transferState);
+    uploadProgress
+      ? uploadProgress > 0 && uploadProgress < 100
+        ? AssetTransferState.UPLOADING
+        : transferState
+      : transferState;
 
   const isLoading = [
     AssetTransferState.UPLOAD_PENDING,
     AssetTransferState.UPLOADING,
     AssetTransferState.DOWNLOADING,
-  ].includes(assetStatus as AssetTransferState);
+  ].includes(assetStatus);
 
   const isError = [
     AssetTransferState.UPLOAD_FAILED,
     AssetTransferState.DOWNLOAD_FAILED_DECRPYT,
     AssetTransferState.DOWNLOAD_FAILED_HASH,
-  ].includes(assetStatus as AssetTransferState);
+  ].includes(assetStatus);
 
   return {isLoading, isError};
 };
