@@ -17,16 +17,19 @@
  *
  */
 
+import {MutableRefObject} from 'react';
+
 import {LexicalEditor} from 'lexical';
 
 import {User} from 'src/script/entity/User';
 
 import {RichTextEditor} from './RichTextEditor';
 
+import {DraftState} from '../common/draftState/draftState';
 import {MessageContent} from '../common/messageContent/messageContent';
 
 interface InputBarEditorProps {
-  editorRef: React.MutableRefObject<LexicalEditor | null>;
+  editorRef: MutableRefObject<LexicalEditor | null>;
   inputPlaceholder: string;
   hasLocalEphemeralTimer: boolean;
   showMarkdownPreview: boolean;
@@ -43,7 +46,7 @@ interface InputBarEditorProps {
   onSend: () => void;
   getMentionCandidates: (search?: string | null) => User[];
   saveDraftState: (editorState: string, plainMessage: string, replyId?: string) => void;
-  loadDraftState: () => Promise<any>;
+  loadDraftState: () => Promise<DraftState>;
   replaceEmojis: boolean;
   children: React.ReactNode;
 }

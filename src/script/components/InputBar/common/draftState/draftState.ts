@@ -17,10 +17,10 @@
  *
  */
 
-import {MessageRepository} from '../../../conversation/MessageRepository';
-import {Conversation} from '../../../entity/Conversation';
-import {ContentMessage} from '../../../entity/message/ContentMessage';
-import {StorageKey, StorageRepository} from '../../../storage';
+import {MessageRepository} from 'src/script/conversation/MessageRepository';
+import {Conversation} from 'src/script/entity/Conversation';
+import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import {StorageKey, StorageRepository} from 'src/script/storage';
 
 export interface DraftState {
   editorState: string | null;

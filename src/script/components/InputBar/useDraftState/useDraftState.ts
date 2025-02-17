@@ -26,7 +26,7 @@ import {Conversation} from 'src/script/entity/Conversation';
 import {StorageRepository} from 'src/script/storage';
 import {sanitizeMarkdown} from 'Util/MarkdownUtil';
 
-import {loadDraftState, saveDraftState} from '../util/DraftStateUtil';
+import {loadDraftState, saveDraftState} from '../common/draftState/draftState';
 
 interface UseDraftStateProps {
   conversation: Conversation;
