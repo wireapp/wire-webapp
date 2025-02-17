@@ -226,6 +226,7 @@ export class ConversationRepository {
     private readonly conversationState = container.resolve(ConversationState),
     private readonly connectionState = container.resolve(ConnectionState),
     private readonly core = container.resolve(Core),
+    private dedupe1to1MigratedToMlsMessage: string[] = [],
   ) {
     this.eventService = eventRepository.eventService;
     // we register a client mismatch handler agains the message repository so that we can react to missing members
@@ -3418,13 +3419,18 @@ export class ConversationRepository {
       case ClientEvent.CONVERSATION.JOINED_AFTER_MLS_MIGRATION:
       case ClientEvent.CONVERSATION.MLS_MIGRATION_ONGOING_CALL:
       case ClientEvent.CONVERSATION.MLS_CONVERSATION_RECOVERED:
-      case ClientEvent.CONVERSATION.ONE2ONE_MIGRATED_TO_MLS:
       case ClientEvent.CONVERSATION.UNABLE_TO_DECRYPT:
       case ClientEvent.CONVERSATION.VERIFICATION:
       case ClientEvent.CONVERSATION.E2EI_VERIFICATION:
       case ClientEvent.CONVERSATION.VOICE_CHANNEL_ACTIVATE:
       case ClientEvent.CONVERSATION.VOICE_CHANNEL_DEACTIVATE:
         return this.addEventToConversation(conversationEntity, eventJson);
+
+      case ClientEvent.CONVERSATION.ONE2ONE_MIGRATED_TO_MLS:
+        if (!this.dedupe1to1MigratedToMlsMessage.includes(conversationEntity.id)) {
+          this.dedupe1to1MigratedToMlsMessage.push(conversationEntity.id);
+          return this.inject1to1MigratedToMLS(conversationEntity);
+        }
     }
   }
 
