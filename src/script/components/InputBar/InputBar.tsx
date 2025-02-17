@@ -194,8 +194,9 @@ export const InputBar = ({
     replyMessageEntity,
     isEditing,
     isReplying,
-    handleSendMessage,
-    cancelMessageEditing,
+    sendMessage,
+    cancelSending,
+    cancelMesssageEditing,
     cancelMessageReply,
     editMessage,
     draftState,
@@ -216,8 +217,6 @@ export const InputBar = ({
     conversation,
     messageRepository,
     is1to1,
-    maxUsersWithoutAlert: CONFIG.FEATURE.MAX_USERS_TO_PING_WITHOUT_ALERT,
-    enablePingConfirmation: CONFIG.FEATURE.ENABLE_PING_CONFIRMATION,
   });
 
   const giphy = useGiphy({
@@ -227,7 +226,7 @@ export const InputBar = ({
     generateQuote,
     messageRepository,
     conversation,
-    cancelMessageEditing,
+    cancelMesssageEditing,
   });
 
   const showAvatar = !!messageContent.text.length;
@@ -274,13 +273,7 @@ export const InputBar = ({
                   onSetup={editor => {
                     editorRef.current = editor;
                   }}
-                  onEscape={() => {
-                    if (editedMessage) {
-                      cancelMessageEditing(true);
-                    } else if (replyMessageEntity) {
-                      cancelMessageReply();
-                    }
-                  }}
+                  onEscape={cancelSending}
                   onArrowUp={() => {
                     if (messageContent.text.length === 0) {
                       editMessage(conversation.getLastEditableMessage());
@@ -289,7 +282,7 @@ export const InputBar = ({
                   onShiftTab={onShiftTab}
                   onBlur={() => isTypingRef.current && conversationRepository.sendTypingStop(conversation)}
                   onUpdate={setMessageContent}
-                  onSend={handleSendMessage}
+                  onSend={sendMessage}
                   getMentionCandidates={getMentionCandidates}
                   saveDraftState={draftState.save}
                   loadDraftState={draftState.load}
@@ -305,18 +298,12 @@ export const InputBar = ({
                     showGiphyButton={giphy.showGiphyButton}
                     formatToolbar={formatToolbar}
                     emojiPicker={emojiPicker}
-                    onEscape={() => {
-                      if (editedMessage) {
-                        cancelMessageEditing(true);
-                      } else if (replyMessageEntity) {
-                        cancelMessageReply();
-                      }
-                    }}
+                    onEscape={cancelSending}
                     onClickPing={ping.handlePing}
                     onGifClick={giphy.handleGifClick}
                     onSelectFiles={uploadFiles}
                     onSelectImages={uploadImages}
-                    onSend={handleSendMessage}
+                    onSend={sendMessage}
                   />
                 </InputBarEditor>
               )}

@@ -20,6 +20,7 @@
 import {useState} from 'react';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {Config} from 'src/script/Config';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
 import {Conversation} from 'src/script/entity/Conversation';
 import {t} from 'Util/LocalizerUtil';
@@ -29,18 +30,13 @@ interface UsePingProps {
   conversation: Conversation;
   messageRepository: MessageRepository;
   is1to1: boolean;
-  maxUsersWithoutAlert: number;
-  enablePingConfirmation: boolean;
 }
 
-export const usePing = ({
-  conversation,
-  messageRepository,
-  is1to1,
-  maxUsersWithoutAlert,
-  enablePingConfirmation,
-}: UsePingProps) => {
+export const usePing = ({conversation, messageRepository, is1to1}: UsePingProps) => {
   const [isPingDisabled, setIsPingDisabled] = useState(false);
+
+  const maxUsersWithoutAlert = Config.getConfig().FEATURE.MAX_USERS_TO_PING_WITHOUT_ALERT;
+  const enablePingConfirmation = Config.getConfig().FEATURE.ENABLE_PING_CONFIRMATION;
 
   const pingConversation = () => {
     setIsPingDisabled(true);

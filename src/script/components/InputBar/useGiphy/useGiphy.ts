@@ -34,7 +34,7 @@ interface UseGiphyProps {
   generateQuote: () => Promise<OutgoingQuote | undefined>;
   messageRepository: MessageRepository;
   conversation: Conversation;
-  cancelMessageEditing: (resetDraft?: boolean) => void;
+  cancelMesssageEditing: () => void;
 }
 
 export const useGiphy = ({
@@ -44,7 +44,7 @@ export const useGiphy = ({
   generateQuote,
   messageRepository,
   conversation,
-  cancelMessageEditing,
+  cancelMesssageEditing,
 }: UseGiphyProps) => {
   const isMessageFormatButtonsFlagEnabled = Config.getConfig().FEATURE.ENABLE_MESSAGE_FORMAT_BUTTONS;
 
@@ -61,10 +61,10 @@ export const useGiphy = ({
     (gifUrl: string, tag: string): void => {
       void generateQuote().then(quoteEntity => {
         void messageRepository.sendGif(conversation, gifUrl, tag, quoteEntity);
-        cancelMessageEditing(true);
+        cancelMesssageEditing();
       });
     },
-    [cancelMessageEditing, conversation, generateQuote, messageRepository],
+    [cancelMesssageEditing, conversation, generateQuote, messageRepository],
   );
 
   useEffect(() => {
@@ -73,7 +73,7 @@ export const useGiphy = ({
     return () => {
       amplify.unsubscribeAll(WebAppEvents.EXTENSIONS.GIPHY.SEND);
     };
-  }, [sendGiphy, cancelMessageEditing]);
+  }, [sendGiphy, cancelMesssageEditing]);
 
   return {
     showGiphyButton,
