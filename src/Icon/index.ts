@@ -137,3 +137,4 @@ export * from './Files/MultipleFilesIcon';
 export * from './PlayIcon';
 export * from './PauseIcon';
 export * from './AlertIcon';
+export * from './SaveIcon';
