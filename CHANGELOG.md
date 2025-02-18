@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.37.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.36.1...@wireapp/react-ui-kit@9.37.0) (2025-02-18)
+
+### Features
+
+* **react-ui-kit:** save icon ([#6928](https://github.com/wireapp/wire-web-packages/issues/6928)) ([a69fb61](https://github.com/wireapp/wire-web-packages/commit/a69fb6112218546301cd5a56809dabaab2b6c302))
+
 ## [9.36.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.36.0...@wireapp/react-ui-kit@9.36.1) (2025-02-14)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
