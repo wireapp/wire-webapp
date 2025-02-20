@@ -493,7 +493,19 @@ declare module 'I18n/en-US.json' {
     'conversationFavoritesTabEmptyLinkText': `How to label conversations as favorites`;
     'conversationFavoritesTabEmptyMessage': `Select your favorite conversations, and you’ll find them here 👍`;
     'conversationFederationIndicator': `Federated`;
+    'conversationFilePreviewDeleteButtonLabel': `Remove file`;
+    'conversationFileImagePreviewLabel': `Image file preview for: {src}`;
+    'conversationFileVideoPreviewLabel': `Video file preview for: {src}`;
     'conversationFileAssetRestricted': `Receiving files is prohibited`;
+    'conversationFileUploadFailedHeading': `File upload failed`;
+    'conversationFileUploadFailedMessage': `Error occurred in the upload. Please try again.`;
+    'conversationFileUploadFailedTooManyFilesHeading': `Too many files`;
+    'conversationFileUploadFailedTooManyFilesMessage': `Please select a maximum of {maxFiles} files.`;
+    'conversationFileUploadFailedTooLargeFilesHeading': `Files too large`;
+    'conversationFileUploadFailedTooLargeFilesMessage': `Please select files smaller than {maxSize}MB.`;
+    'conversationFileUploadFailedTooLargeImagesMessage': `Please select images smaller than {maxSize}MB.`;
+    'conversationFileUploadFailedTooLargeFilesAndImagesMessage': `Please select files smaller than {maxImageSize}MB and images smaller than {maxFileSize}MB.`;
+    'conversationFileUploadOverlayText': `Just drop to add files`;
     'conversationFoldersEmptyText': `Add your conversations to folders to stay organized.`;
     'conversationFoldersEmptyTextLearnMore': `Learn more`;
     'conversationFooterArchive': `Archive`;
@@ -728,7 +740,6 @@ declare module 'I18n/en-US.json' {
     'federationConnectionRemove': `The backends [bold]{backendUrlOne}[/bold] and [bold]{backendUrlTwo}[/bold] stopped federating.`;
     'federationDelete': `[bold]Your backend[/bold] stopped federating with [bold]{backendUrl}.[/bold]`;
     'fileCardDefaultCloseButtonLabel': `Close`;
-    'filePreviewDeleteButtonLabel': `Remove file`;
     'fileTypeRestrictedIncoming': `File from&nbsp;[bold]{name}[/bold]&nbsp;can’t be opened`;
     'fileTypeRestrictedOutgoing': `Sharing files with the {fileExt} extension is not permitted by your organization`;
     'folderViewTooltip': `Folders`;

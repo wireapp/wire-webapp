@@ -17,46 +17,57 @@
  *
  */
 
-import {ReactNode} from 'react';
+import {ReactNode, useEffect} from 'react';
 
-import {useDropzone} from 'react-dropzone';
+import {FileRejection, useDropzone} from 'react-dropzone';
 
-import {SaveIcon} from '@wireapp/react-ui-kit';
+import {Config} from 'src/script/Config';
+import {t} from 'Util/LocalizerUtil';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-
-import {iconStyles, overlayActiveStyles, overlayStyles, textStyles, wrapperStyles} from './FileDropzone.styles';
+import {wrapperStyles} from './FileDropzone.styles';
+import {showFileDropzoneErrorModal} from './FileDropzoneErrorModal/FileDropzoneErrorModal';
+import {FileDropzoneOverlay} from './FileDropzoneOverlay/FileDropzoneOverlay';
+import {validateFiles} from './fileValidation/fileValidation';
 import {useIsDragging} from './useIsDragging/useIsDragging';
 
 import {useFileUploadState} from '../useFiles/useFiles';
 
 interface FileDropzoneProps {
   children: ReactNode;
+  isTeam: boolean;
 }
 
 const MAX_FILES = 10;
 
-export const FileDropzone = ({children}: FileDropzoneProps) => {
+const CONFIG = Config.getConfig();
+
+export const FileDropzone = ({isTeam, children}: FileDropzoneProps) => {
   const {isDragging, wrapperRef} = useIsDragging();
 
   const {addFiles, files} = useFileUploadState();
 
+  const MAX_SIZE = isTeam ? CONFIG.MAXIMUM_ASSET_FILE_SIZE_TEAM : CONFIG.MAXIMUM_ASSET_FILE_SIZE_PERSONAL;
+
   const {getRootProps, getInputProps, isDragAccept} = useDropzone({
     maxFiles: MAX_FILES,
+    maxSize: MAX_SIZE,
     noClick: true,
     noKeyboard: true,
-    onDrop: (acceptedFiles: File[]) => {
-      if (files.length + acceptedFiles.length > MAX_FILES) {
-        PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-          secondaryAction: undefined,
-          primaryAction: {
-            action: () => {},
-            text: 'Close',
-          },
-          text: {
-            message: 'You can only upload 10 files at a time',
-            title: 'File upload limit reached',
-          },
+    onDrop: (acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
+      const newFiles = [...acceptedFiles, ...rejectedFiles.map(file => file.file)];
+
+      const validationResult = validateFiles({
+        newFiles,
+        currentFiles: files,
+        maxSize: MAX_SIZE,
+        maxFiles: MAX_FILES,
+      });
+
+      if (!validationResult.isValid) {
+        showFileDropzoneErrorModal({
+          title: validationResult.error.title,
+          message: validationResult.error.message,
+          invalidFiles: validationResult.invalidFiles,
         });
         return;
       }
@@ -69,16 +80,25 @@ export const FileDropzone = ({children}: FileDropzoneProps) => {
 
       addFiles(acceptedFilesWithPreview);
     },
+    onError: () => {
+      showFileDropzoneErrorModal({
+        title: t('conversationFileUploadFailedHeading'),
+        message: t('conversationFileUploadFailedMessage'),
+        invalidFiles: [],
+      });
+    },
   });
+
+  useEffect(() => {
+    // Make sure to revoke the data uris to avoid memory leaks, will run on unmount
+    return () => files.forEach(file => URL.revokeObjectURL(file.preview));
+  }, [files]);
 
   return (
     <div ref={wrapperRef} css={wrapperStyles}>
       <div {...getRootProps()}>
         <input {...getInputProps()} />
-        <div css={isDragging && isDragAccept ? overlayActiveStyles : overlayStyles}>
-          <SaveIcon width={20} height={20} css={iconStyles} />
-          <p css={textStyles}>Just drop to add files</p>
-        </div>
+        <FileDropzoneOverlay isActive={isDragging && isDragAccept} />
         {children}
       </div>
     </div>

@@ -17,27 +17,27 @@
  *
  */
 
-import {useRef} from 'react';
+import {t} from 'Util/LocalizerUtil';
 
-import {controlStyles, imageStyles, wrapperStyles} from './VideoPreviewCard.styles';
+import {imageStyles, wrapperStyles} from './ImagePreviewCard.styles';
 
 import {FilePreviewDeleteButton} from '../common/FilePreviewDeleteButton/FilePreviewDeleteButton';
-import {FilePreviewPlayButton} from '../common/FilePreviewPlayButton/FilePreviewPlayButton';
-
-interface VideoPreviewCardProps {
+interface ImagePreviewCardProps {
   src: string;
   onDelete: () => void;
 }
 
-export const VideoPreviewCard = ({src, onDelete}: VideoPreviewCardProps) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
-
+export const ImagePreviewCard = ({src, onDelete}: ImagePreviewCardProps) => {
   return (
-    <article css={wrapperStyles} aria-label={`Video file preview for: ${src}`}>
-      <video ref={videoRef} src={src} preload="metadata" css={imageStyles} playsInline />
-      <div css={controlStyles}>
-        <FilePreviewPlayButton />
-      </div>
+    <article css={wrapperStyles} aria-label={t('conversationFileImagePreviewLabel', {src})}>
+      <img
+        src={src}
+        alt=""
+        css={imageStyles}
+        onLoad={() => {
+          URL.revokeObjectURL(src);
+        }}
+      />
       <FilePreviewDeleteButton onDelete={onDelete} />
     </article>
   );

@@ -19,6 +19,10 @@
 
 import {useEffect, useRef, useState} from 'react';
 
+/**
+ * It's used to detect if the user is dragging a file over the dropzone.
+ * Instead of using status from useDropzone, we use the native drag and drop events, which are more reliable.
+ */
 export const useIsDragging = () => {
   const [isDragging, setIsDragging] = useState(false);
 

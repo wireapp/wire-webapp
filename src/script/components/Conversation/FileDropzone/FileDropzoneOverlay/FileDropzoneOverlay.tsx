@@ -17,10 +17,21 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {SaveIcon} from '@wireapp/react-ui-kit';
 
-export const wrapperStyles: CSSObject = {
-  position: 'relative',
-  width: '100%',
-  height: '100%',
+import {t} from 'Util/LocalizerUtil';
+
+import {iconStyles, overlayActiveStyles, overlayStyles, textStyles} from './FileDropzoneOverlay.styles';
+
+interface FileDropzoneOverlayProps {
+  isActive: boolean;
+}
+
+export const FileDropzoneOverlay = ({isActive}: FileDropzoneOverlayProps) => {
+  return (
+    <div css={isActive ? overlayActiveStyles : overlayStyles}>
+      <SaveIcon width={20} height={20} css={iconStyles} />
+      <p css={textStyles}>{t('conversationFileUploadOverlayText')}</p>
+    </div>
+  );
 };

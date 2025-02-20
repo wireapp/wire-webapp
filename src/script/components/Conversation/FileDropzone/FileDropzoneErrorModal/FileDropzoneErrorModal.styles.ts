@@ -19,8 +19,32 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const wrapperStyles: CSSObject = {
-  position: 'relative',
-  width: '100%',
-  height: '100%',
+export const listStyles: CSSObject = {
+  margin: 0,
+  padding: 0,
+  listStyle: 'none',
+  marginBottom: '16px',
+  maxHeight: '90px',
+  overflowY: 'auto',
+};
+
+export const itemStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
+  padding: '8px 0',
+};
+
+export const fileNameStyles: CSSObject = {
+  fontSize: 'var(--font-size-medium)',
+  lineHeight: 'var(--line-height-md)',
+  display: '-webkit-box',
+  WebkitLineClamp: '2',
+  WebkitBoxOrient: 'vertical',
+  overflow: 'hidden',
+  color: 'var(--gray-70)',
+
+  'body.theme-dark &': {
+    color: 'var(--gray-60)',
+  },
 };

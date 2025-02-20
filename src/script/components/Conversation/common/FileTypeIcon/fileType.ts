@@ -17,10 +17,15 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
-
-export const wrapperStyles: CSSObject = {
-  position: 'relative',
-  width: '100%',
-  height: '100%',
-};
+export type FileType =
+  | 'pdf'
+  | 'image'
+  | 'video'
+  | 'audio'
+  | 'document'
+  | 'presentation'
+  | 'spreadsheet'
+  | 'text'
+  | 'code'
+  | 'archive'
+  | 'other';

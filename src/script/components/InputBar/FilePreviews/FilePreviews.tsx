@@ -25,7 +25,7 @@ import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 
 import {AudioPreviewCard} from './AudioPreviewCard/AudioPreviewCard';
 import {FilePreviewCard} from './FilePreviewCard/FilePreviewCard';
-import {wrapperStyles} from './FilePrevious.styles';
+import {wrapperStyles} from './FilePreviews.styles';
 import {ImagePreviewCard} from './ImagePreviewCard/ImagePreviewCard';
 import {VideoPreviewCard} from './VideoPreviewCard/VideoPreviewCard';
 

@@ -27,7 +27,7 @@ interface FilePreviewDeleteButtonProps {
 }
 
 export const FilePreviewDeleteButton = ({onDelete}: FilePreviewDeleteButtonProps) => {
-  const label = t('filePreviewDeleteButtonLabel');
+  const label = t('conversationFilePreviewDeleteButtonLabel');
   return (
     <button type="button" onClick={onDelete} css={buttonStyles} aria-label={label} title={label}>
       <CloseIcon width={12} height={12} css={iconStyles} />

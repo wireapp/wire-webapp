@@ -76,10 +76,6 @@ interface ConversationProps {
 
 const CONFIG = Config.getConfig();
 
-interface FileWithPreview extends File {
-  preview: string;
-}
-
 export const Conversation = ({
   teamState,
   selfUser,
@@ -474,7 +470,7 @@ export const Conversation = ({
   }, [files]);
 
   return (
-    <FileDropzone>
+    <FileDropzone isTeam={inTeam}>
       <div
         id="conversation"
         className={cx('conversation', {[incomingCssClass]: isConversationLoaded, loading: !isConversationLoaded})}
