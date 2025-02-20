@@ -72,6 +72,7 @@ describe('InputBar', () => {
   const getDefaultProps = () => ({
     assetRepository: new AssetRepository(),
     conversation: new Conversation(createUuid()),
+    files: [],
     conversationRepository: {
       sendTypingStart: jest.fn(),
       sendTypingStop: jest.fn(),

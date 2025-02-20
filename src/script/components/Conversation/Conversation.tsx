@@ -25,7 +25,6 @@ import {container} from 'tsyringe';
 import {useMatchMedia} from '@wireapp/react-ui-kit';
 
 import {CallingCell} from 'Components/calling/CallingCell';
-import {DropFileArea} from 'Components/DropFileArea';
 import {Giphy} from 'Components/Giphy';
 import {InputBar} from 'Components/InputBar';
 import {MessagesList} from 'Components/MessagesList';
@@ -44,9 +43,10 @@ import {getLogger} from 'Util/Logger';
 import {safeMailOpen, safeWindowOpen} from 'Util/SanitizationUtil';
 import {formatBytes, incomingCssClass, removeAnimationsClass} from 'Util/util';
 
+import {FileDropzone} from './FileDropzone/FileDropzone';
 import {useReadReceiptSender} from './hooks/useReadReceipt';
 import {ReadOnlyConversationMessage} from './ReadOnlyConversationMessage';
-import {checkFileSharingPermission} from './utils/checkFileSharingPermission';
+import {useFileUploadState} from './useFiles/useFiles';
 
 import {ConversationState} from '../../conversation/ConversationState';
 import {Conversation as ConversationEntity} from '../../entity/Conversation';
@@ -75,6 +75,10 @@ interface ConversationProps {
 }
 
 const CONFIG = Config.getConfig();
+
+interface FileWithPreview extends File {
+  preview: string;
+}
 
 export const Conversation = ({
   teamState,
@@ -124,6 +128,8 @@ export const Conversation = ({
   const smBreakpoint = useMatchMedia('max-width: 640px');
 
   const {addReadReceiptToBatch} = useReadReceiptSender(repositories.message);
+
+  const {files} = useFileUploadState();
 
   useEffect(() => {
     // When the component is mounted we want to make sure its conversation entity's last message is marked as visible
@@ -462,105 +468,111 @@ export const Conversation = ({
     [addReadReceiptToBatch, repositories.conversation, repositories.integration, updateConversationLastRead],
   );
 
+  useEffect(() => {
+    // Make sure to revoke the data uris to avoid memory leaks, will run on unmount
+    return () => files.forEach(file => URL.revokeObjectURL(file.preview));
+  }, [files]);
+
   return (
-    <DropFileArea
-      onFileDropped={checkFileSharingPermission(uploadDroppedFiles)}
-      id="conversation"
-      className={cx('conversation', {[incomingCssClass]: isConversationLoaded, loading: !isConversationLoaded})}
-      ref={removeAnimationsClass}
-      key={activeConversation?.id}
-    >
-      {activeConversation && (
-        <>
-          <TitleBar
-            repositories={repositories}
-            conversation={activeConversation}
-            selfUser={selfUser}
-            teamState={teamState}
-            callActions={mainViewModel.calling.callActions}
-            openRightSidebar={openRightSidebar}
-            isRightSidebarOpen={isRightSidebarOpen}
-            isReadOnlyConversation={isReadOnlyConversation || isSelfUserRemoved}
-          />
+    <FileDropzone>
+      <div
+        id="conversation"
+        className={cx('conversation', {[incomingCssClass]: isConversationLoaded, loading: !isConversationLoaded})}
+        ref={removeAnimationsClass}
+        key={activeConversation?.id}
+      >
+        {activeConversation && (
+          <>
+            <TitleBar
+              repositories={repositories}
+              conversation={activeConversation}
+              selfUser={selfUser}
+              teamState={teamState}
+              callActions={mainViewModel.calling.callActions}
+              openRightSidebar={openRightSidebar}
+              isRightSidebarOpen={isRightSidebarOpen}
+              isReadOnlyConversation={isReadOnlyConversation || isSelfUserRemoved}
+            />
 
-          {activeCalls.map(call => {
-            const {conversation} = call;
-            const callingViewModel = mainViewModel.calling;
-            const callingRepository = callingViewModel.callingRepository;
+            {activeCalls.map(call => {
+              const {conversation} = call;
+              const callingViewModel = mainViewModel.calling;
+              const callingRepository = callingViewModel.callingRepository;
 
-            if (!smBreakpoint) {
-              return null;
-            }
+              if (!smBreakpoint) {
+                return null;
+              }
 
-            return (
-              <CallingCell
-                key={conversation.id}
-                classifiedDomains={classifiedDomains}
-                call={call}
-                callActions={callingViewModel.callActions}
-                callingRepository={callingRepository}
-                propertiesRepository={repositories.properties}
-              />
-            );
-          })}
+              return (
+                <CallingCell
+                  key={conversation.id}
+                  classifiedDomains={classifiedDomains}
+                  call={call}
+                  callActions={callingViewModel.callActions}
+                  callingRepository={callingRepository}
+                  propertiesRepository={repositories.properties}
+                />
+              );
+            })}
 
-          <MessagesList
-            conversation={activeConversation}
-            selfUser={selfUser}
-            conversationRepository={conversationRepository}
-            assetRepository={repositories.asset}
-            messageRepository={repositories.message}
-            messageActions={mainViewModel.actions}
-            invitePeople={clickOnInvitePeople}
-            cancelConnectionRequest={clickOnCancelRequest}
-            showUserDetails={showUserDetails}
-            showMessageDetails={showMessageDetails}
-            showMessageReactions={showMessageReactions}
-            showParticipants={showParticipants}
-            showImageDetails={showDetail}
-            resetSession={onSessionResetClick}
-            onClickMessage={handleClickOnMessage}
-            onLoading={loading => setIsConversationLoaded(!loading)}
-            getVisibleCallback={getInViewportCallback}
-            isMsgElementsFocusable={isMsgElementsFocusable}
-            setMsgElementsFocusable={setMsgElementsFocusable}
-            isRightSidebarOpen={isRightSidebarOpen}
-            updateConversationLastRead={updateConversationLastRead}
-          />
+            <MessagesList
+              conversation={activeConversation}
+              selfUser={selfUser}
+              conversationRepository={conversationRepository}
+              assetRepository={repositories.asset}
+              messageRepository={repositories.message}
+              messageActions={mainViewModel.actions}
+              invitePeople={clickOnInvitePeople}
+              cancelConnectionRequest={clickOnCancelRequest}
+              showUserDetails={showUserDetails}
+              showMessageDetails={showMessageDetails}
+              showMessageReactions={showMessageReactions}
+              showParticipants={showParticipants}
+              showImageDetails={showDetail}
+              resetSession={onSessionResetClick}
+              onClickMessage={handleClickOnMessage}
+              onLoading={loading => setIsConversationLoaded(!loading)}
+              getVisibleCallback={getInViewportCallback}
+              isMsgElementsFocusable={isMsgElementsFocusable}
+              setMsgElementsFocusable={setMsgElementsFocusable}
+              isRightSidebarOpen={isRightSidebarOpen}
+              updateConversationLastRead={updateConversationLastRead}
+            />
 
-          {isConversationLoaded &&
-            !isSelfUserRemoved &&
-            (isReadOnlyConversation ? (
-              <ReadOnlyConversationMessage reloadApp={reloadApp} conversation={activeConversation} />
-            ) : (
-              <InputBar
-                key={activeConversation?.id}
-                conversation={activeConversation}
-                conversationRepository={repositories.conversation}
-                eventRepository={repositories.event}
-                messageRepository={repositories.message}
-                openGiphy={openGiphy}
-                propertiesRepository={repositories.properties}
-                searchRepository={repositories.search}
-                storageRepository={repositories.storage}
-                teamState={teamState}
-                selfUser={selfUser}
-                onShiftTab={() => setMsgElementsFocusable(false)}
-                uploadDroppedFiles={uploadDroppedFiles}
-                uploadImages={uploadImages}
-                uploadFiles={uploadFiles}
-              />
-            ))}
+            {isConversationLoaded &&
+              !isSelfUserRemoved &&
+              (isReadOnlyConversation ? (
+                <ReadOnlyConversationMessage reloadApp={reloadApp} conversation={activeConversation} />
+              ) : (
+                <InputBar
+                  key={activeConversation?.id}
+                  conversation={activeConversation}
+                  conversationRepository={repositories.conversation}
+                  eventRepository={repositories.event}
+                  messageRepository={repositories.message}
+                  openGiphy={openGiphy}
+                  propertiesRepository={repositories.properties}
+                  searchRepository={repositories.search}
+                  storageRepository={repositories.storage}
+                  teamState={teamState}
+                  selfUser={selfUser}
+                  onShiftTab={() => setMsgElementsFocusable(false)}
+                  uploadDroppedFiles={uploadDroppedFiles}
+                  uploadImages={uploadImages}
+                  uploadFiles={uploadFiles}
+                />
+              ))}
 
-          <div className="conversation-loading">
-            <div className="icon-spinner spin accent-text"></div>
-          </div>
-        </>
-      )}
+            <div className="conversation-loading">
+              <div className="icon-spinner spin accent-text"></div>
+            </div>
+          </>
+        )}
 
-      {isGiphyModalOpen && inputValue && (
-        <Giphy giphyRepository={repositories.giphy} inputValue={inputValue} onClose={closeGiphy} />
-      )}
-    </DropFileArea>
+        {isGiphyModalOpen && inputValue && (
+          <Giphy giphyRepository={repositories.giphy} inputValue={inputValue} onClose={closeGiphy} />
+        )}
+      </div>
+    </FileDropzone>
   );
 };

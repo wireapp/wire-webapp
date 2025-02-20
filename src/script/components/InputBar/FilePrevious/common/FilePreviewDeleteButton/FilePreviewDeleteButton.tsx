@@ -17,18 +17,20 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {CloseIcon} from 'Components/Icon';
+import {t} from 'Util/LocalizerUtil';
 
-export const textStyles: CSSObject = {
-  fontSize: 'var(--font-size-medium)',
-  fontWeight: 'var(--font-weight-medium)',
-  lineHeight: 'var(--line-height-md)',
-  margin: 0,
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  marginTop: '4px',
+import {buttonStyles, iconStyles} from './FilePreviewDeleteButton.styles';
 
-  '[data-file-card="header"] &': {
-    marginTop: '0',
-  },
+interface FilePreviewDeleteButtonProps {
+  onDelete: () => void;
+}
+
+export const FilePreviewDeleteButton = ({onDelete}: FilePreviewDeleteButtonProps) => {
+  const label = t('filePreviewDeleteButtonLabel');
+  return (
+    <button type="button" onClick={onDelete} css={buttonStyles} aria-label={label} title={label}>
+      <CloseIcon width={12} height={12} css={iconStyles} />
+    </button>
+  );
 };

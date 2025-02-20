@@ -28,6 +28,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
+import {useFileUploadState} from 'Components/Conversation/useFiles/useFiles';
 import {EmojiPicker} from 'Components/EmojiPicker/EmojiPicker';
 import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
 import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
@@ -38,6 +39,7 @@ import {t} from 'Util/LocalizerUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {MessageContent} from './common/messageContent/messageContent';
+import {FilePrevious} from './FilePrevious/FilePrevious';
 import {InputBarContainer} from './InputBarContainer/InputBarContainer';
 import {InputBarControls} from './InputBarControls/InputBarControls';
 import {InputBarEditor} from './InputBarEditor/InputBarEditor';
@@ -229,6 +231,8 @@ export const InputBar = ({
     cancelMesssageEditing,
   });
 
+  const {files} = useFileUploadState();
+
   const showAvatar = !!messageContent.text.length;
 
   return (
@@ -248,6 +252,7 @@ export const InputBar = ({
           className={cx(`conversation-input-bar__input input-bar-container`, {
             [`conversation-input-bar__input--editing`]: isEditing,
             'input-bar-container--with-toolbar': formatToolbar.open && showMarkdownPreview,
+            'input-bar-container--with-files': files.length > 0,
           })}
         >
           {!isOutgoingRequest && (
@@ -317,6 +322,7 @@ export const InputBar = ({
               onSend={fileHandling.sendPastedFile}
             />
           )}
+          <FilePrevious files={files} />
         </div>
       </InputBarContainer>
       {emojiPicker.open ? (

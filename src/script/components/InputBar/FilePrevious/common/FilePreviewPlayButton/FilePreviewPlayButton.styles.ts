@@ -19,36 +19,19 @@
 
 import {CSSObject} from '@emotion/react';
 
-const wrapperStyles: CSSObject = {
-  backgroundColor: 'var(--app-bg-secondary)',
-  border: '1px solid var(--border-color)',
-  borderRadius: '10px',
-  padding: '8px',
-  position: 'relative',
-
-  'body.theme-dark &': {
-    backgroundColor: 'var(--foreground-fade-8)',
-    border: '1px solid transparent',
-  },
-};
-
-export const wrapperStylesSmall: CSSObject = {
-  ...wrapperStyles,
-  height: '76px',
-  maxWidth: '268px',
-};
-
-export const wrapperStylesLarge: CSSObject = {
-  ...wrapperStyles,
-  height: 'auto',
-  maxWidth: '500px',
-  width: '100%',
-};
-
-export const contentStyles: CSSObject = {
-  alignItems: 'flex-start',
+export const buttonStyles: CSSObject = {
+  width: '32px',
+  height: '32px',
+  borderRadius: '50%',
+  backgroundColor: 'var(--icon-button-primary-disabled-bg)',
+  border: '1px solid var(--icon-button-primary-border)',
   display: 'flex',
-  flexDirection: 'column',
-  minHeight: '60px',
-  justifyContent: 'flex-end',
+  alignItems: 'center',
+  justifyContent: 'center',
+  flexShrink: 0,
+  cursor: 'not-allowed',
+};
+
+export const playIconStyles: CSSObject = {
+  fill: 'var(--gray-70)',
 };

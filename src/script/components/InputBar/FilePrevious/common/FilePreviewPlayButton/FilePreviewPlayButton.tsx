@@ -17,18 +17,14 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {PlayIcon} from '@wireapp/react-ui-kit';
 
-export const textStyles: CSSObject = {
-  fontSize: 'var(--font-size-medium)',
-  fontWeight: 'var(--font-weight-medium)',
-  lineHeight: 'var(--line-height-md)',
-  margin: 0,
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  marginTop: '4px',
+import {buttonStyles, playIconStyles} from './FilePreviewPlayButton.styles';
 
-  '[data-file-card="header"] &': {
-    marginTop: '0',
-  },
+export const FilePreviewPlayButton = () => {
+  return (
+    <div css={buttonStyles}>
+      <PlayIcon width={10} height={10} css={playIconStyles} />
+    </div>
+  );
 };

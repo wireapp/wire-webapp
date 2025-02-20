@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2025 Wire Swiss GmbH
+ * Copyright (C) 2024 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,18 +17,26 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {create} from 'zustand';
 
-export const textStyles: CSSObject = {
-  fontSize: 'var(--font-size-medium)',
-  fontWeight: 'var(--font-weight-medium)',
-  lineHeight: 'var(--line-height-md)',
-  margin: 0,
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  marginTop: '4px',
+export interface FileWithPreview extends File {
+  preview: string;
+}
 
-  '[data-file-card="header"] &': {
-    marginTop: '0',
-  },
-};
+interface FileUploadState {
+  files: FileWithPreview[];
+  addFiles: (files: FileWithPreview[]) => void;
+  deleteFile: (file: FileWithPreview) => void;
+}
+
+export const useFileUploadState = create<FileUploadState>(set => ({
+  files: [],
+  addFiles: newFiles =>
+    set(state => ({
+      files: [...newFiles, ...state.files],
+    })),
+  deleteFile: fileToDelete =>
+    set(state => ({
+      files: state.files.filter(file => file !== fileToDelete),
+    })),
+}));

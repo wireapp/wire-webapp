@@ -57,7 +57,7 @@ export const buildMetadata = (file: File | Blob): Promise<Metadata | void> => {
   return Promise.resolve();
 };
 
-const buildMetadataAudio = async (audioFile: File | Blob): Promise<AudioMetadata> => {
+export const buildMetadataAudio = async (audioFile: File | Blob): Promise<AudioMetadata> => {
   const buffer = await loadFileBuffer(audioFile);
   const audioContext = new AudioContext();
   audioContext.close();

@@ -19,36 +19,21 @@
 
 import {CSSObject} from '@emotion/react';
 
-const wrapperStyles: CSSObject = {
-  backgroundColor: 'var(--app-bg-secondary)',
-  border: '1px solid var(--border-color)',
-  borderRadius: '10px',
-  padding: '8px',
+export const wrapperStyles: CSSObject = {
+  gridColumn: 'span 3',
+};
+
+export const controlStyles: CSSObject = {
   position: 'relative',
-
-  'body.theme-dark &': {
-    backgroundColor: 'var(--foreground-fade-8)',
-    border: '1px solid transparent',
-  },
-};
-
-export const wrapperStylesSmall: CSSObject = {
-  ...wrapperStyles,
-  height: '76px',
-  maxWidth: '268px',
-};
-
-export const wrapperStylesLarge: CSSObject = {
-  ...wrapperStyles,
-  height: 'auto',
-  maxWidth: '500px',
+  display: 'flex',
   width: '100%',
+  gap: '8px',
+  alignItems: 'flex-start',
 };
 
-export const contentStyles: CSSObject = {
-  alignItems: 'flex-start',
+export const playerWrapperStyles: CSSObject = {
   display: 'flex',
   flexDirection: 'column',
-  minHeight: '60px',
-  justifyContent: 'flex-end',
+  gap: '4px',
+  width: '100%',
 };

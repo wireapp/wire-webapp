@@ -728,6 +728,7 @@ declare module 'I18n/en-US.json' {
     'federationConnectionRemove': `The backends [bold]{backendUrlOne}[/bold] and [bold]{backendUrlTwo}[/bold] stopped federating.`;
     'federationDelete': `[bold]Your backend[/bold] stopped federating with [bold]{backendUrl}.[/bold]`;
     'fileCardDefaultCloseButtonLabel': `Close`;
+    'filePreviewDeleteButtonLabel': `Remove file`;
     'fileTypeRestrictedIncoming': `File from&nbsp;[bold]{name}[/bold]&nbsp;can’t be opened`;
     'fileTypeRestrictedOutgoing': `Sharing files with the {fileExt} extension is not permitted by your organization`;
     'folderViewTooltip': `Folders`;
@@ -919,13 +920,13 @@ declare module 'I18n/en-US.json' {
     'messageFailedToSendWillReceivePlural': `will get your message later.`;
     'messageFailedToSendWillReceiveSingular': `will get your message later.`;
     'mlsConversationRecovered': `You haven\'t used this device for a while, or an issue has occurred. Some older messages may not appear here.`;
-    'mlsWasEnabledTitle': `New messaging protocol is enabled on your team`;
-    'mlsWasEnabledDescription': `MLS messaging protocol was just enabled on your team, in order for your client to migrate to this protocol we recommend reloading the app`;
-    'mlsWasEnabledReload': `Reload`;
     'mlsSignature': `MLS with {signature} Signature`;
     'mlsThumbprint': `MLS Thumbprint`;
     'mlsToggleInfo': `When this is on, conversation will use the new messaging layer security (MLS) protocol.`;
     'mlsToggleName': `MLS`;
+    'mlsWasEnabledDescription': `MLS messaging protocol was just enabled on your team, in order for your client to migrate to this protocol we recommend reloading the app`;
+    'mlsWasEnabledReload': `Reload`;
+    'mlsWasEnabledTitle': `New messaging protocol is enabled on your team`;
     'modal1To1ConversationCreateErrorNoKeyPackagesHeadline': `Unable to start conversation`;
     'modal1To1ConversationCreateErrorNoKeyPackagesMessage': `You can’t start the conversation with {name} right now.<br/>{name} needs to open Wire or log in again first.<br/>Please try again later.`;
     'modalAccountCreateAction': `OK`;

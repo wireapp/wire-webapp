@@ -17,18 +17,27 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {imageStyles, wrapperStyles} from './ImagePreviewCard.styles';
 
-export const textStyles: CSSObject = {
-  fontSize: 'var(--font-size-medium)',
-  fontWeight: 'var(--font-weight-medium)',
-  lineHeight: 'var(--line-height-md)',
-  margin: 0,
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  marginTop: '4px',
+import {FilePreviewDeleteButton} from '../common/FilePreviewDeleteButton/FilePreviewDeleteButton';
 
-  '[data-file-card="header"] &': {
-    marginTop: '0',
-  },
+interface ImagePreviewCardProps {
+  src: string;
+  onDelete: () => void;
+}
+
+export const ImagePreviewCard = ({src, onDelete}: ImagePreviewCardProps) => {
+  return (
+    <article css={wrapperStyles} aria-label={`Image file preview for: ${src}`}>
+      <img
+        src={src}
+        alt=""
+        css={imageStyles}
+        onLoad={() => {
+          URL.revokeObjectURL(src);
+        }}
+      />
+      <FilePreviewDeleteButton onDelete={onDelete} />
+    </article>
+  );
 };
