@@ -487,7 +487,7 @@
   "conversationDirectEmptyMessage": "Sie haben noch keine Kontakte. Suchen Sie nach Personen auf {brandName} und treten Sie in Kontakt.",
   "conversationEditTimestamp": "Bearbeitet: {date}",
   "conversationFavoritesTabEmptyLinkText": "So kennzeichnen Sie Unterhaltungen als Favoriten",
-  "conversationFavoritesTabEmptyMessage": "Wählen Sie Ihre Lieblingsunterhaltungen aus, und Sie werden sie hier finden 👍",
+  "conversationFavoritesTabEmptyMessage": "Wählen Sie Ihre Lieblingsunterhaltungen aus und Sie werden sie hier finden 👍",
   "conversationFederationIndicator": "Föderiert",
   "conversationFileAssetRestricted": "Empfang von Dateien ist verboten",
   "conversationFoldersEmptyText": "Fügen Sie Ihre Unterhaltungen Ordnern hinzu, um organisiert zu bleiben.",
