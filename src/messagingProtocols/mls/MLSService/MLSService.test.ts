@@ -61,7 +61,6 @@ const createMLSService = async () => {
     mlsInit: jest.fn(),
     clientPublicKey: jest.fn(),
     processWelcomeMessage: jest.fn(),
-    decryptMessage: jest.fn(),
     conversationEpoch: jest.fn(),
     commitPendingProposals: jest.fn(),
     registerCallbacks: jest.fn(),
@@ -69,6 +68,7 @@ const createMLSService = async () => {
     clearPendingGroupFromExternalCommit: async () => {},
     clearPendingCommit: async () => {},
     commitAccepted: jest.fn(),
+    transaction: jest.fn(),
   } as unknown as CoreCrypto;
 
   const mockedDb = await openDB('core-test-db');
@@ -601,7 +601,7 @@ describe('MLSService', () => {
         proposals: [],
       };
 
-      jest.spyOn(mockCoreCrypto, 'decryptMessage').mockResolvedValueOnce(mockedDecryptoedMessage);
+      jest.spyOn(mockCoreCrypto, 'transaction').mockResolvedValueOnce(mockedDecryptoedMessage);
       jest.spyOn(mockCoreCrypto, 'conversationEpoch').mockResolvedValueOnce(mockedNewEpoch);
       jest.spyOn(mlsService, 'emit').mockImplementation(jest.fn());
 
@@ -615,7 +615,7 @@ describe('MLSService', () => {
       };
 
       await mlsService.handleMLSMessageAddEvent(mockedMLSWelcomeEvent, getGroupIdFromConversationId);
-      expect(mockCoreCrypto.decryptMessage).toHaveBeenCalled();
+      expect(mockCoreCrypto.transaction).toHaveBeenCalled();
       expect(mlsService.emit).toHaveBeenCalledWith('newEpoch', {epoch: mockedNewEpoch, groupId: mockGroupId});
     });
 
@@ -636,7 +636,7 @@ describe('MLSService', () => {
         commitDelay,
       };
 
-      jest.spyOn(mockCoreCrypto, 'decryptMessage').mockResolvedValueOnce(mockedDecryptoedMessage);
+      jest.spyOn(mockCoreCrypto, 'transaction').mockResolvedValueOnce(mockedDecryptoedMessage);
       jest.spyOn(mockCoreCrypto, 'conversationEpoch').mockResolvedValueOnce(mockedNewEpoch);
 
       jest.spyOn(mlsService, 'commitPendingProposals');
@@ -655,7 +655,7 @@ describe('MLSService', () => {
       expect(mockCoreCrypto.commitPendingProposals).not.toHaveBeenCalled();
 
       jest.advanceTimersByTime(commitDelay);
-      expect(mockCoreCrypto.decryptMessage).toHaveBeenCalled();
+      expect(mockCoreCrypto.transaction).toHaveBeenCalled();
       expect(mockCoreCrypto.commitPendingProposals).toHaveBeenCalled();
     });
   });

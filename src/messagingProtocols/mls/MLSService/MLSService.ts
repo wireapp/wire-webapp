@@ -420,7 +420,9 @@ export class MLSService extends TypedEventEmitter<Events> {
 
   public async decryptMessage(conversationId: ConversationId, payload: Uint8Array): Promise<DecryptedMessage> {
     try {
-      const decryptedMessage = await this.coreCryptoClient.decryptMessage(conversationId, payload);
+      const decryptedMessage = await this.coreCryptoClient.transaction(cx =>
+        cx.decryptMessage(conversationId, payload),
+      );
       this.dispatchNewCrlDistributionPoints(decryptedMessage);
       return decryptedMessage;
     } catch (error) {
