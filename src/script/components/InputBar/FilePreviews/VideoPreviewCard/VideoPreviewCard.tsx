@@ -17,8 +17,6 @@
  *
  */
 
-import {useRef} from 'react';
-
 import {t} from 'Util/LocalizerUtil';
 
 import {controlStyles, imageStyles, wrapperStyles} from './VideoPreviewCard.styles';
@@ -31,11 +29,9 @@ interface VideoPreviewCardProps {
 }
 
 export const VideoPreviewCard = ({src, onDelete}: VideoPreviewCardProps) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
-
   return (
     <article css={wrapperStyles} aria-label={t('conversationFileVideoPreviewLabel', {src})}>
-      <video ref={videoRef} src={src} preload="metadata" css={imageStyles} playsInline />
+      <video src={src} preload="metadata" css={imageStyles} playsInline />
       <div css={controlStyles}>
         <FilePreviewPlayButton />
       </div>
