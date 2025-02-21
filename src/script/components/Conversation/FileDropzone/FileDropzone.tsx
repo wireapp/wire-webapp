@@ -28,7 +28,7 @@ import {createUuid} from 'Util/uuid';
 import {wrapperStyles} from './FileDropzone.styles';
 import {showFileDropzoneErrorModal} from './FileDropzoneErrorModal/FileDropzoneErrorModal';
 import {FileDropzoneOverlay} from './FileDropzoneOverlay/FileDropzoneOverlay';
-import {validateFiles} from './fileValidation/fileValidation';
+import {validateFiles, ValidationResult} from './fileValidation/fileValidation';
 import {useIsDragging} from './useIsDragging/useIsDragging';
 
 import {useFileUploadState} from '../useFiles/useFiles';
@@ -64,10 +64,11 @@ export const FileDropzone = ({isTeam, children}: FileDropzoneProps) => {
       });
 
       if (!validationResult.isValid) {
+        const invalidResult = validationResult as Extract<ValidationResult, {isValid: false}>;
         showFileDropzoneErrorModal({
-          title: validationResult.error.title,
-          message: validationResult.error.message,
-          invalidFiles: validationResult.invalidFiles,
+          title: invalidResult.error.title,
+          message: invalidResult.error.message,
+          invalidFiles: invalidResult.invalidFiles,
         });
         return;
       }

@@ -27,7 +27,7 @@ interface ValidationError {
   message: string;
 }
 
-type ValidationResult = {isValid: true} | {isValid: false; error: ValidationError; invalidFiles: File[]};
+export type ValidationResult = {isValid: true} | {isValid: false; error: ValidationError; invalidFiles: File[]};
 
 interface ValidateFilesParams {
   newFiles: File[];
