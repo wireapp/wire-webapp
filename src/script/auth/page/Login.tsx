@@ -19,13 +19,12 @@
 
 import React, {useEffect, useRef, useState} from 'react';
 
-import {CSSObject} from '@emotion/react';
 import {LoginData} from '@wireapp/api-client/lib/auth';
 import {ClientType} from '@wireapp/api-client/lib/client/index';
 import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
 import {StatusCodes} from 'http-status-codes';
 import {connect} from 'react-redux';
-import {useNavigate, useSearchParams} from 'react-router-dom';
+import {useLocation, useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 
 import {Runtime, UrlUtil} from '@wireapp/commons';
@@ -43,6 +42,7 @@ import {
   ContainerXS,
   FlexBox,
   Form,
+  Heading,
   IsMobile,
   Label,
   Link,
@@ -61,6 +61,7 @@ import {getLogger} from 'Util/Logger';
 import {isBackendError} from 'Util/TypePredicateUtil';
 
 import {EntropyContainer} from './EntropyContainer';
+import {separator} from './Login.styles';
 import {Page} from './Page';
 
 import {Config} from '../../Config';
@@ -79,10 +80,10 @@ import * as ConversationSelector from '../module/selector/ConversationSelector';
 import {QUERY_KEY, ROUTE} from '../route';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {getOAuthQueryString} from '../util/oauthUtil';
+import {getEnterpriseLoginV2FF} from '../util/randomUtil';
 import {getPrefixedSSOCode} from '../util/urlUtil';
 type Props = React.HTMLProps<HTMLDivElement> & {
   embedded?: boolean;
-  withSideBar?: boolean;
 };
 
 const LoginComponent = ({
@@ -106,14 +107,13 @@ const LoginComponent = ({
   conversationInfo,
   conversationInfoFetching,
   embedded,
-  withSideBar,
 }: Props & ConnectedProps & DispatchProps) => {
   const logger = getLogger('Login');
   const navigate = useNavigate();
   const isTablet = useMatchMedia(QUERY[QueryKeys.TABLET_DOWN]);
-  const [params] = useSearchParams();
-  const accountCreationEnabled = params.get(QUERY_KEY.ACCOUNT_CREATION_ENABLED) === 'true';
-  const defaultEmail = params.get(QUERY_KEY.EMAIL);
+
+  const {state} = useLocation();
+  const accountCreationEnabled = state?.accountCreationEnabled;
 
   const [conversationCode, setConversationCode] = useState<string | null>(null);
   const [conversationKey, setConversationKey] = useState<string | null>(null);
@@ -125,6 +125,7 @@ const LoginComponent = ({
   const [twoFactorLoginData, setTwoFactorLoginData] = useState<LoginData>();
   const [verificationCode, setVerificationCode] = useState('');
   const [twoFactorSubmitFailedOnce, setTwoFactorSubmitFailedOnce] = useState(false);
+  const isEnterpriseLoginV2Enabled = getEnterpriseLoginV2FF();
 
   const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE, window.location.hash);
 
@@ -362,7 +363,7 @@ const LoginComponent = ({
   };
 
   return (
-    <Page withSideBar={withSideBar}>
+    <Page withSideBar={isEnterpriseLoginV2Enabled}>
       {showBackButton && (
         <IsMobile>
           <div style={{margin: 16}}>{backArrow}</div>
@@ -372,7 +373,7 @@ const LoginComponent = ({
         <EntropyContainer onSetEntropy={storeEntropy} />
       ) : (
         <Container centerText verticalCenter style={{width: '100%'}}>
-          {isTablet && (
+          {isEnterpriseLoginV2Enabled && isTablet && (
             <LogoFullIcon
               aria-hidden="true"
               width={102}
@@ -399,7 +400,11 @@ const LoginComponent = ({
             {!embedded && (
               <IsMobile not>
                 <Column style={{display: 'flex'}}>
-                  {showBackButton && <div style={{margin: '0.75rem 0px auto auto'}}>{backArrow}</div>}
+                  {showBackButton && (
+                    <div style={{margin: isEnterpriseLoginV2Enabled ? '0.75rem 0px auto auto' : 'auto'}}>
+                      {backArrow}
+                    </div>
+                  )}
                 </Column>
               </IsMobile>
             )}
@@ -450,9 +455,15 @@ const LoginComponent = ({
                 ) : (
                   <>
                     <div>
-                      <div css={{fontWeight: '500', fontSize: '1.5rem', marginBottom: '2rem'}}>
-                        {t('index.welcome', {brandName: Config.getConfig().BACKEND_NAME})}
-                      </div>
+                      {isEnterpriseLoginV2Enabled ? (
+                        <div css={{fontWeight: '500', fontSize: '1.5rem', marginBottom: '2rem'}}>
+                          {t('index.welcome', {brandName: Config.getConfig().BACKEND_NAME})}
+                        </div>
+                      ) : (
+                        <Heading level={embedded ? '2' : '1'} center>
+                          {t('login.headline')}
+                        </Heading>
+                      )}
                       <Text>{t('login.subhead')}</Text>
                       <Form style={{marginTop: 30}} data-uie-name="login">
                         <LoginForm isFetching={isFetching} onSubmit={handleSubmit} />
@@ -460,7 +471,7 @@ const LoginComponent = ({
                           ? parseValidationErrors(validationErrors)
                           : authError && <Exception errors={[authError]} />}
 
-                        {!Runtime.isDesktopApp() && !defaultEmail && (
+                        {!Runtime.isDesktopApp() && (
                           <Checkbox
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                               void pushLoginData({
@@ -499,7 +510,7 @@ const LoginComponent = ({
                         {t(isDomainDiscoveryEnabled ? 'index.enterprise' : 'index.ssoLogin')}
                       </Button>
                     )}
-                    {accountCreationEnabled && (
+                    {isEnterpriseLoginV2Enabled && accountCreationEnabled && (
                       <>
                         <div css={separator}>
                           <span>{t('index.or')}</span>
@@ -567,26 +578,5 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
   );
 
 const Login = connect(mapStateToProps, mapDispatchToProps)(LoginComponent);
-
-export const separator: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  margin: '40px 0px',
-
-  '> span': {
-    fontSize: '0.75rem',
-    fontWeight: '500',
-    lineHeight: '14px',
-    paddingInline: '25px',
-    textTransform: 'uppercase',
-  },
-
-  '&::before, &::after': {
-    content: '" "',
-    height: '1px',
-    backgroundColor: '#DCE0E3',
-    width: '100%',
-  },
-};
 
 export {Login};

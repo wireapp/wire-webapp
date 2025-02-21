@@ -34,11 +34,13 @@ import {Page} from './Page';
 import {actionRoot} from '../module/action';
 import {bindActionCreators} from '../module/reducer';
 import {QUERY_KEY} from '../route';
+import {getEnterpriseLoginV2FF} from '../util/randomUtil';
 
 const REDIRECT_DELAY = 5000;
 const CustomEnvironmentRedirectComponent = ({doNavigate, doSendNavigationEvent}: DispatchProps) => {
   const [destinationUrl, setDestinationUrl] = useState<string | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
+  const isEnterpriseLoginV2Enabled = getEnterpriseLoginV2FF();
 
   useEffect(() => {
     const destinationParam = UrlUtil.getURLParameter(QUERY_KEY.DESTINATION_URL);
@@ -63,7 +65,7 @@ const CustomEnvironmentRedirectComponent = ({doNavigate, doSendNavigationEvent}:
   }, [destinationUrl]);
 
   return (
-    <Page withSideBar>
+    <Page withSideBar={isEnterpriseLoginV2Enabled}>
       <FlexBox column>
         <FlexBox justify="center" align="flex-end" style={{marginBottom: 64, alignSelf: 'center'}}>
           <FlexBox

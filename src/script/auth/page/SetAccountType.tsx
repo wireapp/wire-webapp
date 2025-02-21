@@ -47,6 +47,7 @@ import {Page} from './Page';
 import {Config} from '../../Config';
 import {RouterLink} from '../component/RouterLink';
 import {ROUTE} from '../route';
+import {getEnterpriseLoginV2FF} from '../util/randomUtil';
 import {pathWithParams} from '../util/urlUtil';
 
 type Props = React.HTMLProps<HTMLDivElement>;
@@ -54,6 +55,7 @@ type Props = React.HTMLProps<HTMLDivElement>;
 const SetAccountType = ({}: Props) => {
   const isMacOsWrapper = Runtime.isDesktopApp() && Runtime.isMacOS();
   const isTablet = useMatchMedia(QUERY[QueryKeys.TABLET_DOWN]);
+  const isEnterpriseLoginV2Enabled = getEnterpriseLoginV2FF();
 
   const backArrow = (
     <RouterLink to={ROUTE.INDEX} data-uie-name="go-index" aria-label={t('index.goBack')}>
@@ -72,7 +74,7 @@ const SetAccountType = ({}: Props) => {
   };
 
   return (
-    <Page withSideBar>
+    <Page withSideBar={isEnterpriseLoginV2Enabled}>
       {(Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ||
         Config.getConfig().FEATURE.ENABLE_SSO ||
         Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION) && (
@@ -94,7 +96,11 @@ const SetAccountType = ({}: Props) => {
             </Column>
           </IsMobile>
           <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
-            <Column>{isTablet && <Logo scale={1.68} data-uie-name="ui-wire-logo" />}</Column>
+            <Column>
+              {((isEnterpriseLoginV2Enabled && isTablet) || !isEnterpriseLoginV2Enabled) && (
+                <Logo scale={1.68} data-uie-name="ui-wire-logo" />
+              )}
+            </Column>
             <Columns style={{margin: '70px auto'}}>
               <Column style={{marginLeft: isMacOsWrapper ? 0 : 16}}>
                 <RouterLink to={ROUTE.CREATE_ACCOUNT} data-uie-name="go-register-personal">

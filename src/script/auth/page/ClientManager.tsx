@@ -34,6 +34,7 @@ import {ClientList} from '../component/ClientList';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {RootState, bindActionCreators} from '../module/reducer';
 import {QUERY_KEY} from '../route';
+import {getEnterpriseLoginV2FF} from '../util/randomUtil';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
@@ -41,6 +42,7 @@ const ClientManagerComponent = ({doGetAllClients, doLogout}: Props & ConnectedPr
   const SFAcode = localStorage.getItem(QUERY_KEY.CONVERSATION_CODE);
   const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE);
   const isMobile = useMatchMedia(QUERY.mobile);
+  const isEnterpriseLoginV2Enabled = getEnterpriseLoginV2FF();
 
   const device = StringUtil.capitalize(Runtime.getBrowserName());
 
@@ -70,7 +72,7 @@ const ClientManagerComponent = ({doGetAllClients, doLogout}: Props & ConnectedPr
   };
 
   return (
-    <Page withSideBar>
+    <Page withSideBar={isEnterpriseLoginV2Enabled}>
       <ContainerXS
         centerText
         verticalCenter

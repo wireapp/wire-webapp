@@ -19,26 +19,25 @@
 
 import React, {useEffect, useRef, useState} from 'react';
 
-import {DomainRedirectType} from '@wireapp/api-client/lib/account/DomainRedirect';
 import {ClientType} from '@wireapp/api-client/lib/client/index';
 import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http';
 import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
 import {isValidEmail, PATTERN} from '@wireapp/commons/lib/util/ValidationUtil';
 import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
-import {createSearchParams, Navigate, useNavigate} from 'react-router-dom';
+import {Navigate, useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
-import {container} from 'tsyringe';
 
 import {Runtime, UrlUtil} from '@wireapp/commons';
 import {Button, Checkbox, CheckboxLabel, ErrorMessage, Form, Input, InputBlock, Loading} from '@wireapp/react-ui-kit';
 
-import {APIClient} from 'src/script/service/APIClientSingleton';
 import {t} from 'Util/LocalizerUtil';
 import {isBackendError} from 'Util/TypePredicateUtil';
 
 import {Config} from '../../Config';
+import {AccountAlreadyExistsModal} from '../component/AccountAlreadyExistsModal';
 import {JoinGuestLinkPasswordModal} from '../component/JoinGuestLinkPasswordModal';
+import {useEnterpriseLoginV2} from '../hooks/useEnterpriseLoginV2';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {ValidationError} from '../module/action/ValidationError';
 import {bindActionCreators, RootState} from '../module/reducer';
@@ -47,6 +46,7 @@ import * as ConversationSelector from '../module/selector/ConversationSelector';
 import {QUERY_KEY, ROUTE} from '../route';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {logoutReasonStrings} from '../util/logoutUtil';
+import {getEnterpriseLoginV2FF} from '../util/randomUtil';
 import {getSearchParams, SSO_CODE_PREFIX} from '../util/urlUtil';
 
 export interface SingleSignOnFormProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -71,10 +71,8 @@ const SingleSignOnFormComponent = ({
   doJoinConversationByCode,
   doGetConversationInfoByCode,
   doNavigate,
-  pushLoginData,
 }: SingleSignOnFormProps & ConnectedProps & DispatchProps) => {
   const codeOrMailInput = useRef<HTMLInputElement>();
-  const apiClient = container.resolve(APIClient);
   const [codeOrMail, setCodeOrMail] = useState('');
   const [disableInput, setDisableInput] = useState(false);
   const navigate = useNavigate();
@@ -95,6 +93,26 @@ const SingleSignOnFormComponent = ({
     !!conversationInfo?.has_password ||
       (!!conversationError && conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD),
   );
+  const isEnterpriseLoginV2Enabled = getEnterpriseLoginV2FF();
+
+  const loginWithSSO = async (code = codeOrMail, password?: string) => {
+    setIsLoading(true);
+    const strippedCode = stripPrefix(code);
+    await validateSSOCode(strippedCode);
+    await doLogin(strippedCode);
+    await doFinalizeSSOLogin({clientType});
+    const hasKeyAndCode = conversationKey && conversationCode;
+    if (hasKeyAndCode) {
+      await doJoinConversationByCode(conversationKey, conversationCode, undefined, password);
+    }
+
+    navigate(ROUTE.HISTORY_INFO);
+  };
+
+  const {backendName, hideAccountAlreadyExistsModal, isAccountAlreadyExistsModalOpen, loginV2} = useEnterpriseLoginV2({
+    codeOrMail,
+    loginWithSSO,
+  });
 
   useEffect(() => {
     setIsLinkPasswordModalOpen(
@@ -164,20 +182,6 @@ const SingleSignOnFormComponent = ({
     setIsCodeOrMailInputValid(true);
   };
 
-  const loginWithSSO = async (code = codeOrMail, password?: string) => {
-    setIsLoading(true);
-    const strippedCode = stripPrefix(code);
-    await validateSSOCode(strippedCode);
-    await doLogin(strippedCode);
-    await doFinalizeSSOLogin({clientType});
-    const hasKeyAndCode = conversationKey && conversationCode;
-    if (hasKeyAndCode) {
-      await doJoinConversationByCode(conversationKey, conversationCode, undefined, password);
-    }
-
-    navigate(ROUTE.HISTORY_INFO);
-  };
-
   const handleSubmit = async (event?: React.FormEvent, password?: string): Promise<void> => {
     if (event) {
       event.preventDefault();
@@ -217,39 +221,8 @@ const SingleSignOnFormComponent = ({
       }
       const email = codeOrMail.trim();
       if (isValidEmail(email)) {
-        // TODO: add a FF and api version condition
-        if (true) {
-          const domainRedirect = await apiClient.api.account.getDomainRegistration(email);
-          if (
-            domainRedirect.type === DomainRedirectType.CLOUD ||
-            domainRedirect.type === DomainRedirectType.CLOUD_NO_REGISTRATION
-          ) {
-            const searchParams = new URLSearchParams();
-            searchParams.append(email, email);
-
-            navigate({
-              pathname: ROUTE.LOGIN,
-              search: createSearchParams({
-                [QUERY_KEY.EMAIL]: encodeURIComponent(email),
-                [QUERY_KEY.ACCOUNT_CREATION_ENABLED]:
-                  domainRedirect.type === DomainRedirectType.CLOUD_NO_REGISTRATION ? 'false' : 'true',
-              }).toString(),
-            });
-          }
-
-          if (domainRedirect.type === DomainRedirectType.SSO) {
-            await loginWithSSO(domainRedirect.payload.sso.code, password);
-          }
-
-          if (domainRedirect.type === DomainRedirectType.CUSTOM_BACKEND) {
-            navigate({
-              pathname: ROUTE.CUSTOM_BACKEND,
-              search: createSearchParams({
-                [QUERY_KEY.EMAIL]: encodeURIComponent(email),
-                [QUERY_KEY.CONFIG_URL]: domainRedirect.payload.backend.url,
-              }).toString(),
-            });
-          }
+        if (isEnterpriseLoginV2Enabled) {
+          await loginV2(email, password);
         } else {
           const domain = email.split('@')[1];
           const {webapp_welcome_url} = await doGetDomainInfo(domain);
@@ -347,6 +320,9 @@ const SingleSignOnFormComponent = ({
           onSubmitPassword={submitJoinCodeWithPassword}
         />
       )}
+      {isAccountAlreadyExistsModalOpen && (
+        <AccountAlreadyExistsModal backendName={backendName} onClose={hideAccountAlreadyExistsModal} />
+      )}
       <Form style={{marginTop: 30}} data-uie-name="sso" onSubmit={handleSubmit}>
         {!isValidLink && <Navigate to={ROUTE.CONVERSATION_JOIN_INVALID} replace />}
         <InputBlock>
@@ -401,9 +377,6 @@ const SingleSignOnFormComponent = ({
             id="enter-public-computer-sso-sign-in"
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               setClientType(event.target.checked ? ClientType.TEMPORARY : ClientType.PERMANENT);
-              void pushLoginData({
-                clientType: event.target.checked ? ClientType.TEMPORARY : ClientType.PERMANENT,
-              });
             }}
             checked={clientType === ClientType.TEMPORARY}
             data-uie-name="enter-public-computer-sso-sign-in"
@@ -436,7 +409,6 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
       doGetDomainInfo: ROOT_ACTIONS.authAction.doGetDomainInfo,
       doJoinConversationByCode: ROOT_ACTIONS.conversationAction.doJoinConversationByCode,
       doGetConversationInfoByCode: ROOT_ACTIONS.conversationAction.doGetConversationInfoByCode,
-      pushLoginData: ROOT_ACTIONS.authAction.pushLoginData,
       doNavigate: ROOT_ACTIONS.navigationAction.doNavigate,
       resetAuthError: ROOT_ACTIONS.authAction.resetAuthError,
       validateSSOCode: ROOT_ACTIONS.authAction.validateSSOCode,

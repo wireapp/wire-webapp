@@ -37,6 +37,7 @@ import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
+import {getEnterpriseLoginV2FF} from '../util/randomUtil';
 
 type Props = React.HTMLAttributes<HTMLDivElement>;
 
@@ -45,6 +46,7 @@ const CreatePersonalAccountComponent = ({
   enterPersonalCreationFlow,
 }: Props & ConnectedProps & DispatchProps) => {
   const navigate = useNavigate();
+  const isEnterpriseLoginV2Enabled = getEnterpriseLoginV2FF();
 
   const isMacOsWrapper = Runtime.isDesktopApp() && Runtime.isMacOS();
   React.useEffect(() => {
@@ -80,7 +82,7 @@ const CreatePersonalAccountComponent = ({
     </RouterLink>
   );
   return (
-    <Page withSideBar>
+    <Page withSideBar={isEnterpriseLoginV2Enabled}>
       <IsMobile>
         <div style={{margin: 16}}>{backArrow}</div>
       </IsMobile>

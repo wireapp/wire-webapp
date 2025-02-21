@@ -17,24 +17,25 @@
  *
  */
 
-import {container} from 'tsyringe';
+import {CSSObject} from '@emotion/react';
 
-import {Config} from 'src/script/Config';
-import {Core} from 'src/script/service/CoreSingleton';
+export const separator: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  margin: '40px 0px',
 
-export function randomArrayElement<T>(array: T[]): T {
-  return array[randomInt(array.length - 1)];
-}
+  '> span': {
+    fontSize: '0.75rem',
+    fontWeight: '500',
+    lineHeight: '14px',
+    paddingInline: '25px',
+    textTransform: 'uppercase',
+  },
 
-// returns number: 0 <= number <= max
-export function randomInt(max: number): number {
-  return Math.floor(Math.random() * (max + 1));
-}
-
-export function getEnterpriseLoginV2FF() {
-  const core = container.resolve(Core);
-  return (
-    Config.getConfig().FEATURE.ENABLE_ENTERPRISE_LOGIN_V2 &&
-    core.backendFeatures.version >= Config.getConfig().MIN_ENTERPRISE_LOGIN_V2_SUPPORTED_API_VERSION
-  );
-}
+  '&::before, &::after': {
+    content: '" "',
+    height: '1px',
+    backgroundColor: '#DCE0E3',
+    width: '100%',
+  },
+};

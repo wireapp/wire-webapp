@@ -1467,6 +1467,7 @@
   "ssoLogin.pasteButton": "Paste code",
   "ssoLogin.subhead": "Enter the company SSO access code.",
   "ssoLogin.subheadCode": "Please enter your SSO code",
+  "ssoLogin.subheadEmailEnvironmentSwitchWarning": "If your email matches an enterprise installation of {brandName}, this app will connect to that server.",
   "ssoLogin.subheadCodeOrEmail": "Please enter your email or SSO code.",
   "startedAudioCallingAlert": "You are calling {conversationName}.",
   "startedGroupCallingAlert": "You started a conference call with {conversationName}.",
@@ -1685,5 +1686,10 @@
   "redirectHideDetails": "Hide details",
   "redirectShowDetails": "Show details",
   "redirectConnect": "Connect",
-  "redirectCancel": "Cancel"
+  "redirectCancel": "Cancel",
+  "accountAlreadyExistsModal.header": "Email already in use",
+  "accountAlreadyExistsModal.content": "You can't log in with this email on the on-premises backend {backendName}.\nPlease change your email in the account settings or delete your account. Then, you can use this email again for your on-premises account.",
+  "accountAlreadyExistsModal.changeEmailLink": "Change your email address",
+  "accountAlreadyExistsModal.deletePersonalAccount": "Delete personal account",
+  "accountAlreadyExistsModal.removeTeamMember": "remove team member"
 }

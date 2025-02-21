@@ -25,16 +25,7 @@ import {Navigate, useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 
 import {UrlUtil} from '@wireapp/commons';
-import {
-  Button,
-  ButtonVariant,
-  ContainerXS,
-  ErrorMessage,
-  QUERY,
-  QueryKeys,
-  Text,
-  useMatchMedia,
-} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, ContainerXS, ErrorMessage, Text} from '@wireapp/react-ui-kit';
 
 import {LogoFullIcon} from 'Components/Icon';
 import {isDataDogEnabled} from 'Util/DataDog';
@@ -49,14 +40,16 @@ import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {QUERY_KEY, ROUTE} from '../route';
 import {logoutReasonStrings} from '../util/logoutUtil';
+import {getEnterpriseLoginV2FF} from '../util/randomUtil';
 import {getPrefixedSSOCode} from '../util/urlUtil';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
 const IndexComponent = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
   const navigate = useNavigate();
-  const isTablet = useMatchMedia(QUERY[QueryKeys.TABLET_DOWN]);
   const [logoutReason, setLogoutReason] = useState<string>();
+
+  const isEnterpriseLoginV2Enabled = getEnterpriseLoginV2FF();
 
   useEffect(() => {
     const queryLogoutReason = UrlUtil.getURLParameter(QUERY_KEY.LOGOUT_REASON) || null;
@@ -76,23 +69,20 @@ const IndexComponent = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps
     return <Navigate to={ROUTE.LOGIN} />;
   }
 
-  // TODO: add condition for api version and FF
-  if (true) {
+  if (isEnterpriseLoginV2Enabled) {
     return <Navigate to={ROUTE.SSO} />;
   }
 
   return (
-    <Page withSideBar>
+    <Page>
       <ContainerXS centerText verticalCenter style={{width: '380px'}}>
-        {isTablet && (
-          <LogoFullIcon
-            aria-hidden="true"
-            width={102}
-            height={33}
-            style={{marginBottom: '80px'}}
-            data-uie-name="ui-wire-logo"
-          />
-        )}
+        <LogoFullIcon
+          aria-hidden="true"
+          width={102}
+          height={33}
+          style={{marginBottom: '80px'}}
+          data-uie-name="ui-wire-logo"
+        />
         <Text
           block
           center
@@ -101,6 +91,7 @@ const IndexComponent = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps
         >
           {t('index.welcome', {brandName: Config.getConfig().BACKEND_NAME})}
         </Text>
+
         {!getWebEnvironment().isProduction && isDataDogEnabled() && (
           <Text
             block
@@ -120,6 +111,7 @@ const IndexComponent = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps
             />
           </Text>
         )}
+
         {features.ENABLE_ACCOUNT_REGISTRATION && (
           <Button
             type="button"

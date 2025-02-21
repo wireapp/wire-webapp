@@ -172,7 +172,7 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
                 path={`${ROUTE.LOGIN}/*`}
                 element={
                   <Title title={`${t('authLoginTitle')} . ${brandName}`}>
-                    <Login withSideBar />
+                    <Login />
                   </Title>
                 }
               />

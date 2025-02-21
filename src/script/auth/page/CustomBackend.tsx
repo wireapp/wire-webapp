@@ -17,76 +17,66 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 
-import {BackendConfig} from '@wireapp/api-client/lib/account/BackendConfig';
-import {useNavigate, useSearchParams} from 'react-router-dom';
-import {container} from 'tsyringe';
+import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
+import {connect} from 'react-redux';
+import {useLocation, useNavigate} from 'react-router-dom';
+import {bindActionCreators, Dispatch} from 'redux';
 
 import {Button, ButtonVariant, Container, Muted, Text} from '@wireapp/react-ui-kit';
 
-import {APIClient} from 'src/script/service/APIClientSingleton';
 import {t} from 'Util/LocalizerUtil';
 
 import {Page} from './Page';
 
+import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {QUERY_KEY, ROUTE} from '../route';
+import {BackendConfig} from '../util/configUtil';
 import {getSearchParams} from '../util/urlUtil';
 
-export function CustomBackend() {
-  const [searchParams] = useSearchParams();
-  const url = searchParams.get(QUERY_KEY.CONFIG_URL);
+function CustomBackendComponent({doNavigate}: DispatchProps) {
   const navigate = useNavigate();
-  const [config, setConfig] = useState<BackendConfig | undefined>();
+  const {state} = useLocation();
+  const config = state.config as BackendConfig;
   const [isDetailVisible, setIsDetailVisible] = useState(false);
 
-  if (!url) {
+  const navigateToIndex = () => {
     navigate(ROUTE.INDEX);
+  };
+
+  if (!config) {
+    navigateToIndex();
   }
-
-  const apiClient = container.resolve(APIClient);
-
-  useEffect(() => {
-    if (url) {
-      apiClient.api.account
-        .getBackendConfig(url)
-        .then(res => {
-          setConfig(res);
-        })
-        .catch(() => {
-          navigate(ROUTE.INDEX);
-        });
-    }
-  }, [apiClient.api.account, navigate, url]);
 
   const details = [
     {
       label: t('redirectBackendName'),
-      text: config?.backendName,
+      text: config?.title,
     },
     {
       label: t('redirectBackendURL'),
-      text: config?.backendURL,
+      text: config?.endpoints.backendURL,
     },
     {
       label: t('redirectBackendWSURL'),
-      text: config?.backendWSURL,
+      text: config?.endpoints.backendWSURL,
     },
     {
       label: t('redirectBlacklistURL'),
-      text: config?.blacklistURL,
+      text: config?.endpoints.blackListURL,
     },
     {
       label: t('redirectTeamsURL'),
-      text: config?.teamsURL,
+      text: config?.endpoints.teamsURL,
     },
     {
       label: t('redirectAccountURL'),
-      text: config?.accountURL,
+      text: config?.endpoints.accountsURL,
     },
     {
       label: t('redirectWebsiteURL'),
-      text: config?.websiteURL,
+      text: config?.endpoints.websiteURL,
     },
   ];
 
@@ -95,9 +85,10 @@ export function CustomBackend() {
   };
 
   const onConnect = () => {
-    if (config?.webAppURL) {
-      window.location.assign(
-        `/auth?${getSearchParams({[QUERY_KEY.DESTINATION_URL]: encodeURIComponent(`https://local.zinfra.io:8081/auth/#/login?email=${searchParams.get(QUERY_KEY.EMAIL)}`)})}#${
+    if (config?.endpoints.websiteURL) {
+      const welcomeUrl = pathWithParams(config.webAppUrl, {[QUERY_KEY.SSO_AUTO_LOGIN]: true});
+      doNavigate(
+        `/auth?${getSearchParams({[QUERY_KEY.DESTINATION_URL]: encodeURIComponent(welcomeUrl)})}#${
           ROUTE.CUSTOM_ENV_REDIRECT
         }`,
       );
@@ -111,7 +102,7 @@ export function CustomBackend() {
           {t('redirectHeader')}
         </Text>
         <Text block center>
-          {t('redirectSubHeader', {backendName: config?.backendName || ''})}
+          {t('redirectSubHeader', {backendName: config?.title || ''})}
         </Text>
         {isDetailVisible && (
           <div>
@@ -134,7 +125,7 @@ export function CustomBackend() {
             display: 'flex',
           }}
         >
-          <Button css={{flex: '1'}} variant={ButtonVariant.SECONDARY}>
+          <Button css={{flex: '1'}} onClick={navigateToIndex} variant={ButtonVariant.SECONDARY}>
             {t('redirectCancel')}
           </Button>
           <Button css={{flex: '1'}} onClick={onConnect}>
@@ -145,3 +136,16 @@ export function CustomBackend() {
     </Page>
   );
 }
+
+type DispatchProps = ReturnType<typeof mapDispatchToProps>;
+const mapDispatchToProps = (dispatch: Dispatch) =>
+  bindActionCreators(
+    {
+      doNavigate: ROOT_ACTIONS.navigationAction.doNavigate,
+    },
+    dispatch,
+  );
+
+const CustomBackend = connect(null, mapDispatchToProps)(CustomBackendComponent);
+
+export {CustomBackend};

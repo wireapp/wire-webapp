@@ -38,6 +38,7 @@ import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
 import {parseError} from '../util/errorUtil';
+import {getEnterpriseLoginV2FF} from '../util/randomUtil';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
@@ -57,6 +58,7 @@ const VerifyEmailCodeComponent = ({
   doSendActivationCode,
 }: Props & ConnectedProps & DispatchProps) => {
   const navigate = useNavigate();
+  const isEnterpriseLoginV2Enabled = getEnterpriseLoginV2FF();
 
   const logger = getLogger('VerifyEmailCode');
   const createAccount = async (email_code: string) => {
@@ -93,7 +95,7 @@ const VerifyEmailCodeComponent = ({
   };
 
   return (
-    <Page hasAccountData withSideBar>
+    <Page hasAccountData withSideBar={isEnterpriseLoginV2Enabled}>
       <ContainerXS
         centerText
         verticalCenter

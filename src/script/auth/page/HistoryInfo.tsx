@@ -37,6 +37,7 @@ import {actionRoot} from '../module/action/';
 import {bindActionCreators, RootState} from '../module/reducer';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import {ROUTE} from '../route';
+import {getEnterpriseLoginV2FF} from '../util/randomUtil';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
@@ -49,7 +50,7 @@ const HistoryInfoComponent = ({
 }: Props & ConnectedProps & DispatchProps) => {
   const navigate = useNavigate();
   const shouldLoadClients = !hasLoadedClients && isNewCurrentSelfClient;
-
+  const isEnterpriseLoginV2Enabled = getEnterpriseLoginV2FF();
   const onContinue = () => {
     return navigate(ROUTE.SET_EMAIL);
   };
@@ -76,7 +77,7 @@ const HistoryInfoComponent = ({
   }
 
   return (
-    <Page withSideBar>
+    <Page withSideBar={isEnterpriseLoginV2Enabled}>
       <ContainerXS centerText verticalCenter style={{width: '100%', maxWidth: '20rem'}}>
         <Text fontSize="1.5rem" css={{fontWeight: '500'}} center>
           {t('historyInfo.noHistoryHeadline', {brandName: Config.getConfig().BRAND_NAME})}
