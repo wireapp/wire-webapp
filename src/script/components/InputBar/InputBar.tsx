@@ -39,7 +39,7 @@ import {t} from 'Util/LocalizerUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {MessageContent} from './common/messageContent/messageContent';
-import {FilePrevious} from './FilePrevious/FilePrevious';
+import {FilePreviews} from './FilePreviews/FilePreviews';
 import {InputBarContainer} from './InputBarContainer/InputBarContainer';
 import {InputBarControls} from './InputBarControls/InputBarControls';
 import {InputBarEditor} from './InputBarEditor/InputBarEditor';
@@ -322,7 +322,7 @@ export const InputBar = ({
               onSend={fileHandling.sendPastedFile}
             />
           )}
-          <FilePrevious files={files} />
+          <FilePreviews files={files} />
         </div>
       </InputBarContainer>
       {emojiPicker.open ? (

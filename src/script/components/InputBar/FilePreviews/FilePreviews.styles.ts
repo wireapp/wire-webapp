@@ -29,7 +29,7 @@ export const wrapperStyles: CSSObject = {
   width: '100%',
   overflowY: 'auto',
   overflowX: 'hidden',
-  padding: '8px 0',
+  padding: '8px 8px 8px 0',
   background: 'var(--input-bar-bg)',
   margin: '0',
 };

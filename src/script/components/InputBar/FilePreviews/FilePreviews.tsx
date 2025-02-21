@@ -19,7 +19,7 @@
 
 import {useAutoAnimate} from '@formkit/auto-animate/react';
 
-import {useFileUploadState} from 'Components/Conversation/useFiles/useFiles';
+import {FileWithPreview, useFileUploadState} from 'Components/Conversation/useFiles/useFiles';
 import {isAudio, isImage, isVideo} from 'src/script/assets/AssetMetaDataBuilder';
 import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 
@@ -29,15 +29,11 @@ import {wrapperStyles} from './FilePreviews.styles';
 import {ImagePreviewCard} from './ImagePreviewCard/ImagePreviewCard';
 import {VideoPreviewCard} from './VideoPreviewCard/VideoPreviewCard';
 
-interface FileWithPreview extends File {
-  preview: string;
-}
-
-interface FilePreviousProps {
+interface FilePreviewsProps {
   files: FileWithPreview[];
 }
 
-export const FilePrevious = ({files}: FilePreviousProps) => {
+export const FilePreviews = ({files}: FilePreviewsProps) => {
   const [wrapperRef] = useAutoAnimate();
 
   if (files.length === 0) {
@@ -47,7 +43,7 @@ export const FilePrevious = ({files}: FilePreviousProps) => {
   return (
     <div ref={wrapperRef} css={wrapperStyles}>
       {files.map(file => (
-        <FilePreview key={file.name} file={file} />
+        <FilePreview key={file.id} file={file} />
       ))}
     </div>
   );
@@ -61,7 +57,7 @@ const FilePreview = ({file}: {file: FileWithPreview}) => {
   const {deleteFile} = useFileUploadState();
 
   const handleDelete = () => {
-    deleteFile(file);
+    deleteFile(file.id);
   };
 
   if (isImage(file)) {

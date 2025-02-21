@@ -20,13 +20,14 @@
 import {create} from 'zustand';
 
 export interface FileWithPreview extends File {
+  id: string;
   preview: string;
 }
 
 interface FileUploadState {
   files: FileWithPreview[];
   addFiles: (files: FileWithPreview[]) => void;
-  deleteFile: (file: FileWithPreview) => void;
+  deleteFile: (fileId: string) => void;
 }
 
 export const useFileUploadState = create<FileUploadState>(set => ({
@@ -35,8 +36,8 @@ export const useFileUploadState = create<FileUploadState>(set => ({
     set(state => ({
       files: [...newFiles, ...state.files],
     })),
-  deleteFile: fileToDelete =>
+  deleteFile: fileId =>
     set(state => ({
-      files: state.files.filter(file => file !== fileToDelete),
+      files: state.files.filter(file => file.id !== fileId),
     })),
 }));

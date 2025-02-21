@@ -23,6 +23,7 @@ import {FileRejection, useDropzone} from 'react-dropzone';
 
 import {Config} from 'src/script/Config';
 import {t} from 'Util/LocalizerUtil';
+import {createUuid} from 'Util/uuid';
 
 import {wrapperStyles} from './FileDropzone.styles';
 import {showFileDropzoneErrorModal} from './FileDropzoneErrorModal/FileDropzoneErrorModal';
@@ -49,7 +50,6 @@ export const FileDropzone = ({isTeam, children}: FileDropzoneProps) => {
   const MAX_SIZE = isTeam ? CONFIG.MAXIMUM_ASSET_FILE_SIZE_TEAM : CONFIG.MAXIMUM_ASSET_FILE_SIZE_PERSONAL;
 
   const {getRootProps, getInputProps, isDragAccept} = useDropzone({
-    maxFiles: MAX_FILES,
     maxSize: MAX_SIZE,
     noClick: true,
     noKeyboard: true,
@@ -74,6 +74,7 @@ export const FileDropzone = ({isTeam, children}: FileDropzoneProps) => {
 
       const acceptedFilesWithPreview = acceptedFiles.map(file => {
         return Object.assign(file, {
+          id: createUuid(),
           preview: URL.createObjectURL(file),
         });
       });

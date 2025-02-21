@@ -24,8 +24,10 @@ export const textStyles: CSSObject = {
   fontWeight: 'var(--font-weight-medium)',
   lineHeight: 'var(--line-height-md)',
   margin: 0,
+  display: '-webkit-box',
+  WebkitLineClamp: 'var(--truncate-after-lines)',
+  WebkitBoxOrient: 'vertical',
   overflow: 'hidden',
-  textOverflow: 'ellipsis',
   marginTop: '4px',
 
   '[data-file-card="header"] &': {
