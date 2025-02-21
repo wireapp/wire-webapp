@@ -65,11 +65,11 @@ export const FileDropzone = ({isTeam, children}: FileDropzoneProps) => {
       });
 
       if (!validationResult.isValid) {
-        const invalidResult = validationResult as Extract<ValidationResult, {isValid: false}>;
+        const {error, invalidFiles} = validationResult as Extract<ValidationResult, {isValid: false}>;
         showFileDropzoneErrorModal({
-          title: invalidResult.error.title,
-          message: invalidResult.error.message,
-          invalidFiles: invalidResult.invalidFiles,
+          title: error.title,
+          message: error.message,
+          invalidFiles,
         });
         return;
       }

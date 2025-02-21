@@ -35,7 +35,7 @@ const wrapperStyles: CSSObject = {
 export const wrapperStylesSmall: CSSObject = {
   ...wrapperStyles,
   height: '76px',
-  maxWidth: '268px',
+  width: '268px',
 };
 
 export const wrapperStylesLarge: CSSObject = {
