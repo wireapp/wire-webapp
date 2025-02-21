@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [46.19.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.18.1...@wireapp/core@46.19.0) (2025-02-21)
+
+### Features
+
+* **mls:** add mlsOtherError to error ignore list [WPB-16234] ([#6930](https://github.com/wireapp/wire-web-packages/issues/6930)) ([6628664](https://github.com/wireapp/wire-web-packages/commit/6628664fd963ed13775cd8858d72ce1dccdd1f0b))
+
 ## [46.18.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.18.0...@wireapp/core@46.18.1) (2025-02-18)
 
 **Note:** Version bump only for package @wireapp/core
