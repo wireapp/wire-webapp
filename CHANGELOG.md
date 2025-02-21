@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.19.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.18.6...@wireapp/api-client@27.19.0) (2025-02-21)
+
+### Features
+
+* add API wrapper for GET getDomainRegistration [WPB-14366] ([#6771](https://github.com/wireapp/wire-web-packages/issues/6771)) ([4e6290c](https://github.com/wireapp/wire-web-packages/commit/4e6290cc610f09f92f142368ec1851e9fd80228d))
+
 ## [27.18.6](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.18.5...@wireapp/api-client@27.18.6) (2025-02-18)
 
 **Note:** Version bump only for package @wireapp/api-client
