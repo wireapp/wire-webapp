@@ -123,7 +123,11 @@ const HistoryImport = ({user, backupRepository, file, switchContent}: HistoryImp
       setErrorSecondary(t('backupImportAccountErrorSecondary'));
     } else if (error instanceof IncompatibleBackupError) {
       setErrorHeadline(t('backupImportVersionErrorHeadline'));
-      setErrorSecondary(t('backupImportVersionErrorSecondary', {brandName: Config.getConfig().BRAND_NAME}));
+      //@ts-expect-error
+      //the "brandname" should be provided
+      //the correct syntax is suspected to create issues with electron's console see https://wearezeta.atlassian.net/browse/WPB-15317
+      //TODO: figure out the issue with the electron console
+      setErrorSecondary(t('backupImportVersionErrorSecondary', Config.getConfig().BRAND_NAME));
     } else if (error instanceof IncompatibleBackupFormatError) {
       setErrorHeadline(t('backupImportFormatErrorHeadline'));
       setErrorSecondary(t('backupImportFormatErrorSecondary'));

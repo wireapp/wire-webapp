@@ -17,19 +17,19 @@
  *
  */
 
-import React, {UIEvent} from 'react';
+import React, {UIEvent, useRef} from 'react';
 
 import cx from 'classnames';
 
 import {Image} from 'Components/Image';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleKeyDown} from 'Util/KeyboardUtil';
+import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {cleanURL, prependProtocol} from 'Util/UrlUtil';
 import {isTweetUrl} from 'Util/ValidationUtil';
 
-import {AssetHeader} from './AssetHeader';
+import {AssetHeader} from './common/AssetHeader/AssetHeader';
 
 import type {ContentMessage} from '../../../../../entity/message/ContentMessage';
 import type {Text} from '../../../../../entity/message/Text';
@@ -54,7 +54,7 @@ const LinkPreviewAsset: React.FC<LinkPreviewAssetProps> = ({header = false, mess
   const {isObfuscated} = useKoSubscribableChildren(message, ['isObfuscated']);
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isFocusable);
 
-  const linkRef = React.useRef<HTMLAnchorElement>(null);
+  const linkRef = useRef<HTMLAnchorElement>(null);
 
   const onClick = ({target}: UIEvent) => {
     // Clicking on the link directly will already open the link, so we don't want to open it manually
@@ -89,7 +89,7 @@ const LinkPreviewAsset: React.FC<LinkPreviewAssetProps> = ({header = false, mess
       tabIndex={messageFocusedTabIndex}
       className="link-preview-asset"
       onClick={onClick}
-      onKeyDown={e => handleKeyDown(e, () => onClick(e))}
+      onKeyDown={event => handleKeyDown({event, callback: () => onClick(event), keys: [KEY.ENTER, KEY.SPACE]})}
     >
       <div className="link-preview-image-container">
         {preview && previewImage ? (

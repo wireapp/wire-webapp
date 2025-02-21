@@ -63,7 +63,7 @@ import {ContentState, useAppState} from '../page/useAppState';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {TeamState} from '../team/TeamState';
 
-interface UnreadState {
+export interface UnreadState {
   allEvents: Message[];
   allMessages: ContentMessage[];
   calls: CallMessage[];

@@ -17,17 +17,19 @@
  *
  */
 
-import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
-import {UserConnectionEvent, USER_EVENT} from '@wireapp/api-client/lib/event/';
-import type {BackendEventType} from '@wireapp/api-client/lib/event/BackendEvent';
+import {Connection, ConnectionStatus} from '@wireapp/api-client/lib/connection/';
+import {UserConnectionEvent, USER_EVENT, UserEvent} from '@wireapp/api-client/lib/event/';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import type {UserConnectionData} from '@wireapp/api-client/lib/user/data/';
+import type {UserConnectionData, UserUpdateData} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {SelfService} from 'src/script/self/SelfService';
+import {TeamService} from 'src/script/team/TeamService';
+import {UserState} from 'src/script/user/UserState';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
@@ -54,16 +56,13 @@ export class ConnectionRepository {
   private readonly logger: Logger;
   private onDeleteConnectionRequestConversation?: (userId: QualifiedId) => Promise<void>;
 
-  static get CONFIG(): Record<string, BackendEventType[]> {
-    return {
-      SUPPORTED_EVENTS: [USER_EVENT.CONNECTION],
-    };
-  }
-
   constructor(
     connectionService: ConnectionService,
     userRepository: UserRepository,
+    private readonly selfService: SelfService,
+    private readonly teamService: TeamService,
     private readonly connectionState = container.resolve(ConnectionState),
+    private readonly userState = container.resolve(UserState),
   ) {
     this.connectionService = connectionService;
     this.userRepository = userRepository;
@@ -79,19 +78,26 @@ export class ConnectionRepository {
    * @param eventJson JSON data for event
    * @param source Source of event
    */
-  private readonly onUserEvent = async (eventJson: UserConnectionEvent, source: EventSource) => {
+  private readonly onUserEvent = async (eventJson: UserEvent, source: EventSource) => {
     const eventType = eventJson.type;
 
-    const isSupportedType = ConnectionRepository.CONFIG.SUPPORTED_EVENTS.includes(eventType);
-    if (isSupportedType) {
-      this.logger.info(`User Event: '${eventType}' (Source: ${source})`);
-
-      const isUserConnection = eventType === USER_EVENT.CONNECTION;
-      if (isUserConnection) {
-        await this.onUserConnection(eventJson, source);
-      }
+    switch (eventType) {
+      case USER_EVENT.CONNECTION:
+        await this.onUserConnection(eventJson as UserConnectionEvent, source);
+        break;
+      case USER_EVENT.UPDATE:
+        await this.onUserUpdate(eventJson);
+        break;
     }
   };
+
+  private async onUserUpdate(eventJson: UserUpdateData) {
+    if (eventJson.user.id === this.userState.self()?.qualifiedId.id) {
+      await this.deletePendingConnectionsToSelfNewTeamMembers();
+      return;
+    }
+    await this.deletePendingConnectionToNewTeamMember(eventJson);
+  }
 
   /**
    * Convert a JSON event into an entity and get the matching conversation.
@@ -269,12 +275,34 @@ export class ConnectionRepository {
    *
    * @returns Promise that resolves when all connections have been retrieved and mapped
    */
-  async getConnections(): Promise<ConnectionEntity[]> {
+  async getConnections(
+    teamMembers: QualifiedId[],
+  ): Promise<{connections: ConnectionEntity[]; deadConnections: ConnectionEntity[]}> {
     const connectionData = await this.connectionService.getConnections();
-    const connections = ConnectionMapper.mapConnectionsFromJson(connectionData);
+
+    const acceptedConnectionsOrNoneTeamMembersConnections: Connection[] = [];
+    const deadConnections: Connection[] = [];
+
+    connectionData.forEach(connection => {
+      const isTeamMember = teamMembers.some(teamMemberQualifiedId =>
+        matchQualifiedIds(connection.qualified_to, teamMemberQualifiedId),
+      );
+
+      if (!isTeamMember || connection.status === ConnectionStatus.ACCEPTED) {
+        acceptedConnectionsOrNoneTeamMembersConnections.push(connection);
+      }
+
+      if (isTeamMember && connection.status !== ConnectionStatus.ACCEPTED) {
+        deadConnections.push(connection);
+      }
+    });
+
+    const connections = ConnectionMapper.mapConnectionsFromJson(acceptedConnectionsOrNoneTeamMembersConnections);
+    const deadConnectionEntities = ConnectionMapper.mapConnectionsFromJson(deadConnections);
 
     this.connectionState.connections(connections);
-    return connections;
+    this.connectionState.deadConnections(deadConnectionEntities);
+    return {connections, deadConnections: deadConnectionEntities};
   }
 
   /**
@@ -375,17 +403,17 @@ export class ConnectionRepository {
     }
   }
 
-  private async deleteConnectionWithUser(user: User) {
+  public async deleteConnectionWithUser(user: User) {
     const connection = this.connectionState
       .connections()
       .find(connection => matchQualifiedIds(connection.userId, user.qualifiedId));
+
+    await this.onDeleteConnectionRequestConversation?.(user.qualifiedId);
 
     if (connection) {
       this.connectionState.connections.remove(connection);
       user.connection(null);
     }
-
-    await this.onDeleteConnectionRequestConversation?.(user.qualifiedId);
   }
 
   /**
@@ -436,5 +464,59 @@ export class ConnectionRepository {
 
       amplify.publish(WebAppEvents.NOTIFICATION.NOTIFY, messageEntity, connectionEntity);
     }
+  }
+
+  async deletePendingConnectionsToSelfNewTeamMembers() {
+    const freshSelf = await this.selfService.getSelf([]);
+    const newTeamId = freshSelf.team;
+
+    if (!newTeamId) {
+      return;
+    }
+
+    const currentConnectionsUserIds = this.connectionState.connections().map(connection => connection.userId);
+    const currentConnectionsUsers = await this.userRepository.getUsersById(currentConnectionsUserIds);
+
+    const teamMembersToDeletePendingConnectionsWith = await this.teamService.getTeamMembersByIds(
+      newTeamId,
+      currentConnectionsUsers.map(user => user.qualifiedId.id),
+    );
+
+    const currentUsersToDeleteConnectionWith = currentConnectionsUsers.filter(user => {
+      return teamMembersToDeletePendingConnectionsWith.some(member => member.user === user.qualifiedId.id);
+    });
+
+    for (const user of currentUsersToDeleteConnectionWith) {
+      await this.deleteConnectionWithUser(user);
+    }
+  }
+
+  async deletePendingConnectionToNewTeamMember(event: UserUpdateData) {
+    const newlyJoinedUserId = event.user.id;
+    const selfUserDomain = this.userState.self()?.domain;
+    const newlyJoinedUserQualifiedId = {
+      id: newlyJoinedUserId,
+      /*
+          we can assume that the domain of the user is the same as the self user domain
+          because they have joined our team
+        */
+      domain: selfUserDomain ?? '',
+    };
+
+    const newlyJoinedUser = await this.userRepository.getUserById(newlyJoinedUserQualifiedId);
+    const connectionWithNewlyJoinedUser = newlyJoinedUser.connection();
+    const conversationIdWithNewlyJoinedUser = connectionWithNewlyJoinedUser?.conversationId;
+
+    // If the connection is already accepted, we don't need to delete the conversation from our state
+    // we're gonna use the previous 1:1 conversation with the newly joined user
+    if (
+      !connectionWithNewlyJoinedUser ||
+      !conversationIdWithNewlyJoinedUser ||
+      connectionWithNewlyJoinedUser?.status() === ConnectionStatus.ACCEPTED
+    ) {
+      return;
+    }
+
+    await this.deleteConnectionWithUser(newlyJoinedUser);
   }
 }

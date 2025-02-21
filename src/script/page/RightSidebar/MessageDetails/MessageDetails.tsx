@@ -151,7 +151,7 @@ const MessageDetails: FC<MessageDetailsProps> = ({
   const onParticipantClick = (userEntity: User) => togglePanel(PanelState.GROUP_PARTICIPANT_USER, userEntity);
 
   return (
-    <div id="message-details" className="panel__page message-details">
+    <div id="message-details" className="panel__page panel__message-details">
       <PanelHeader
         onClose={onClose}
         title={panelTitle}
@@ -203,23 +203,23 @@ const MessageDetails: FC<MessageDetailsProps> = ({
         )}
 
         {messageState === MESSAGE_STATES.NO_RECEIPTS && (
-          <div className="message-details__empty" data-uie-name="message-details-no-receipts-placeholder">
-            <Icon.ReadIcon className="message-details__empty__icon" />
-            <p className="message-details__empty__text">{t('messageDetailsNoReceipts')}</p>
+          <div className="panel__message-details__empty" data-uie-name="message-details-no-receipts-placeholder">
+            <Icon.ReadIcon className="panel__message-details__empty__icon" />
+            <p className="panel__message-details__empty__text">{t('messageDetailsNoReceipts')}</p>
           </div>
         )}
 
         {messageState === MESSAGE_STATES.NO_REACTIONS && (
-          <div className="message-details__empty" data-uie-name="message-details-no-reactions-placeholder">
-            <Icon.LikeIcon className="message-details__empty__icon" />
-            <p className="message-details__empty__text">{t('messageDetailsNoReactions')}</p>
+          <div className="panel__message-details__empty" data-uie-name="message-details-no-reactions-placeholder">
+            <Icon.LikeIcon className="panel__message-details__empty__icon" />
+            <p className="panel__message-details__empty__text">{t('messageDetailsNoReactions')}</p>
           </div>
         )}
 
         {messageState === MESSAGE_STATES.RECEIPTS_OFF && (
           <div className="message-details__empty" data-uie-name="message-details-receipts-off-placeholder">
-            <Icon.ReadIcon className="message-details__empty__icon" />
-            <p className="message-details__empty__text">{t('messageDetailsReceiptsOff')}</p>
+            <Icon.ReadIcon className="panel__message-details__empty__icon" />
+            <p className="panel__message-details__empty__text">{t('messageDetailsReceiptsOff')}</p>
           </div>
         )}
       </FadingScrollbar>

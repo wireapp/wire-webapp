@@ -61,6 +61,12 @@
 .editor-paragraph {
   //margin: 0 0 15px 0;
   position: relative;
+
+  // Inline code should have a smaller, custom line height
+  // It prevents input from flickering when inserting an inline code
+  code:not(.editor-code) {
+    line-height: 17px;
+  }
 }
 
 .dropdown .item .icon {
@@ -183,18 +189,20 @@
 }
 
 .editor-inline-code {
-  display: inline-block;
+  display: inline;
   padding: 2px 4px;
   border-radius: 4px;
   background: var(--foreground-fade-8);
+  font-size: var(--font-size-medium);
 }
 
 .editor-code {
-  display: inline-block;
+  display: block;
   overflow: auto;
-  max-width: var(--conversation-message-asset-width);
-  padding: 12px;
-  border-radius: 12px;
+  max-width: max-content;
+  padding: 8px 12px;
+  border-radius: 8px;
+  margin: 4px 0;
   background: var(--foreground-fade-8);
   font-size: var(--font-size-small);
   text-overflow: unset;
@@ -255,6 +263,25 @@
 
   &--3 {
     font-size: var(--font-size-base);
+  }
+}
+
+.editor-quote {
+  position: relative;
+  padding: 0 12px 0 16px;
+  margin: 0;
+  margin-left: 2px;
+
+  &::before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    border-radius: 2px;
+    margin-right: 12px;
+    background-color: var(--message-quote-bg);
+    content: '';
   }
 }
 
@@ -418,4 +445,14 @@ body.theme-dark {
 }
 .editor-tokenVariable {
   color: var(--token-variable);
+}
+
+.editor-link {
+  color: var(--accent-color);
+  cursor: pointer;
+
+  &:hover,
+  &:focus {
+    text-decoration: underline;
+  }
 }

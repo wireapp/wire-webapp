@@ -32,12 +32,14 @@ import {deepMerge} from 'Util/deepMerge';
 import {Environment} from 'Util/Environment';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
+import {loadValue} from 'Util/StorageUtil';
 
 import type {PropertiesService} from './PropertiesService';
 import {PROPERTIES_TYPE, UserConsentStatus} from './PropertiesType';
 
 import type {User} from '../entity/User';
 import type {SelfService} from '../self/SelfService';
+import {StorageKey} from '../storage';
 import {isTelemetryEnabledAtCurrentEnvironment} from '../tracking/Telemetry.helpers';
 import {ConsentValue} from '../user/ConsentValue';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from '../user/TypingIndicatorMode';
@@ -90,6 +92,7 @@ export class PropertiesRepository {
           font_size: '',
           theme: 'default',
           view_folders: false,
+          markdown_preview: true,
         },
         notifications: NotificationPreference.ON,
         previews: {
@@ -97,7 +100,9 @@ export class PropertiesRepository {
         },
         privacy: {
           telemetry_data_sharing: undefined,
-          marketing_consent: PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.defaultValue,
+          marketing_consent:
+            loadValue(StorageKey.INITIAL_MAKRETING_CONSENT_ACCEPTED) ??
+            PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.defaultValue,
         },
         sound: {
           alerts: AudioPreference.ALL,
@@ -322,6 +327,9 @@ export class PropertiesRepository {
         break;
       case PROPERTIES_TYPE.EMOJI.REPLACE_INLINE:
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE, updatedPreference);
+        break;
+      case PROPERTIES_TYPE.INTERFACE.MARKDOWN_PREVIEW:
+        amplify.publish(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.MARKDOWN_PREVIEW, updatedPreference);
         break;
       case PROPERTIES_TYPE.ENABLE_DEBUGGING:
         amplify.publish(getLogger.prototype.LOG_ON_DEBUG, updatedPreference);

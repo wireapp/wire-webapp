@@ -24,7 +24,7 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {Avatar, AVATAR_SIZE, GroupAvatar} from 'Components/Avatar';
 import {listWrapper} from 'Components/ParticipantItemContent/ParticipantItem.styles';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleKeyDown} from 'Util/KeyboardUtil';
+import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 
 import type {Conversation} from '../../../../../../entity/Conversation';
 import {generateConversationUrl} from '../../../../../../router/routeGenerator';
@@ -56,7 +56,13 @@ const GroupListItem: React.FC<GroupListItemProps> = ({click, group}) => {
       className="search-list-item"
       data-uie-uid={`${group.id}`}
       onClick={onClick}
-      onKeyDown={event => handleKeyDown(event, onClick)}
+      onKeyDown={event =>
+        handleKeyDown({
+          event,
+          callback: onClick,
+          keys: [KEY.ENTER, KEY.SPACE],
+        })
+      }
       data-uie-value={displayName}
       css={listWrapper({})}
     >
@@ -64,7 +70,7 @@ const GroupListItem: React.FC<GroupListItemProps> = ({click, group}) => {
         {is1to1 ? (
           <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={participatingUserEts[0]} css={{margin: '0 16px'}} />
         ) : (
-          <GroupAvatar users={participatingUserEts} css={{margin: '0 16px'}} />
+          <GroupAvatar css={{margin: '0 16px'}} />
         )}
       </div>
       <div className="search-list-item-header">{displayName}</div>

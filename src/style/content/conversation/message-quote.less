@@ -11,6 +11,7 @@
       .focus-outline;
       .focus-border-radius;
       .focus-offset;
+      margin: 0.75rem 0;
     }
   }
 
@@ -60,6 +61,12 @@
       text-overflow: ellipsis;
     }
 
+    ol,
+    ul {
+      padding: 0 16px;
+      margin: 0;
+    }
+
     &--large {
       font-size: var(--font-size-xxl);
     }
@@ -78,8 +85,8 @@
       pre {
         overflow: auto;
         max-width: var(--conversation-message-asset-width);
-        padding: 12px;
-        border-radius: 12px;
+        padding: 8px 12px;
+        border-radius: 8px;
         background: var(--foreground-fade-8);
         font-size: var(--font-size-small);
         margin-block: 4px;

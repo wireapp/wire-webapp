@@ -17,20 +17,14 @@
  *
  */
 
-import React, {
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  MouseEvent as ReactMouseEvent,
-  KeyboardEvent as ReactKeyBoardEvent,
-} from 'react';
+import React, {useRef, useState, MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 
 import {Avatar, AVATAR_SIZE, GroupAvatar} from 'Components/Avatar';
 import {UserBlockedBadge} from 'Components/Badge';
+import {CellDescription} from 'Components/ConversationListCell/components/CellDescription';
 import {UserInfo} from 'Components/UserInfo';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isKey, isOneOfKeys, KEY} from 'Util/KeyboardUtil';
@@ -39,7 +33,6 @@ import {noop, setContextMenuPosition} from 'Util/util';
 
 import {StatusIcon} from './components/StatusIcon';
 
-import {generateCellState} from '../../conversation/ConversationCellState';
 import type {Conversation} from '../../entity/Conversation';
 import {MediaType} from '../../media/MediaType';
 
@@ -105,8 +98,6 @@ export const ConversationListCell = ({
     rightClick(conversation, event);
   };
 
-  const cellState = useMemo(() => generateCellState(conversation), [unreadState, mutedState, isRequest]);
-
   const onClickJoinCall = (event: React.MouseEvent) => {
     event.preventDefault();
     onJoinCall(conversation, MediaType.AUDIO);
@@ -147,13 +138,6 @@ export const ConversationListCell = ({
     }
   };
 
-  // always focus on the selected conversation when the folder tab loaded
-  useEffect(() => {
-    if (isFocused) {
-      conversationRef.current?.focus();
-    }
-  }, [isFocused]);
-
   return (
     <li
       onContextMenu={openContextMenu}
@@ -185,7 +169,7 @@ export const ConversationListCell = ({
             'conversation-list-cell-left-opaque': isSelfUserRemoved || users.length === 0,
           })}
         >
-          {isGroup && <GroupAvatar className="conversation-list-cell-avatar-arrow" users={users} />}
+          {isGroup && <GroupAvatar className="conversation-list-cell-avatar-arrow" />}
 
           {!isGroup && !!users.length && <Avatar participant={users[0]} avatarSize={AVATAR_SIZE.SMALL} />}
         </div>
@@ -201,16 +185,13 @@ export const ConversationListCell = ({
             </span>
           )}
 
-          {cellState.description && (
-            <span
-              className={cx('conversation-list-cell-description', {
-                'conversation-list-cell-description--active': isActive,
-              })}
-              data-uie-name="secondary-line"
-            >
-              {cellState.description}
-            </span>
-          )}
+          <CellDescription
+            conversation={conversation}
+            mutedState={mutedState}
+            isActive={isActive}
+            isRequest={isRequest}
+            unreadState={unreadState}
+          />
         </div>
       </div>
 

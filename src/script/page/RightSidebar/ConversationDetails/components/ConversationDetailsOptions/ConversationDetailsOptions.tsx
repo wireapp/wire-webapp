@@ -114,8 +114,7 @@ const ConversationDetailsOptions = ({
   const isActiveGroupParticipant = isGroup && !isSelfUserRemoved;
 
   const showOptionGuests = isActiveGroupParticipant && !!teamId && roleRepository.canToggleGuests(activeConversation);
-  const hasAdvancedNotifications = isMutable && isTeam;
-  const showOptionNotificationsGroup = hasAdvancedNotifications && isGroup;
+  const showOptionNotificationsGroup = isMutable && isGroup;
   const showOptionTimedMessages =
     isActiveGroupParticipant && roleRepository.canToggleTimeout(activeConversation) && isSelfDeletingMessagesEnabled;
   const showOptionServices =
@@ -123,7 +122,7 @@ const ConversationDetailsOptions = ({
     !!teamId &&
     roleRepository.canToggleGuests(activeConversation) &&
     !isMLSConversation(activeConversation);
-  const showOptionNotifications1To1 = hasAdvancedNotifications && !isGroup;
+  const showOptionNotifications1To1 = isMutable && !isGroup;
   const showOptionReadReceipts = !!teamId && roleRepository.canToggleReadReceipts(activeConversation);
 
   const hasReceiptsEnabled = conversationRepository.expectReadReceipt(activeConversation);

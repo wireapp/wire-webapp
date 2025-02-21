@@ -58,9 +58,11 @@ export const useVideoGrid = (call: Call): Grid => {
     updateGrid();
     const nameSubscriptions = participants?.map(p => p.user.name.subscribe(updateGrid));
     const videoSubscriptions = participants?.map(p => p.isSendingVideo.subscribe(updateGrid));
+    const screenShareSubscriptions = participants?.map(p => p.sharesScreen.subscribe(updateGrid));
     return () => {
       nameSubscriptions?.forEach(s => s.dispose());
       videoSubscriptions?.forEach(s => s.dispose());
+      screenShareSubscriptions?.forEach(s => s.dispose());
     };
   }, [participants, participants?.length, call, currentPage, pages?.length]);
 

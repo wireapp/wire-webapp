@@ -350,6 +350,10 @@
     aspect-ratio: 16 / 9;
   }
 
+  a:hover {
+    text-decoration: underline;
+  }
+
   .md-heading {
     margin: 4px 0 8px;
     font-size: var(--font-size-base);
@@ -370,6 +374,24 @@
 
     & + br {
       display: none;
+    }
+  }
+
+  .md-blockquote {
+    position: relative;
+    padding: 0 12px 0 16px;
+    margin: 0;
+
+    &::before {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      border-radius: 2px;
+      margin-right: 12px;
+      background-color: var(--message-quote-bg);
+      content: '';
     }
   }
 }
@@ -557,6 +579,11 @@
 
 .message-connected-avatar {
   margin-top: 24px;
+}
+
+.message-details {
+  margin-left: var(--conversation-message-sender-width);
+  font-size: var(--font-size-small);
 }
 
 .message-group-creation-header,

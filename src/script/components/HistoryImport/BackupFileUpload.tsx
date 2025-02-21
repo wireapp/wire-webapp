@@ -24,7 +24,7 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {CONFIG as HistoryExportConfig} from 'Components/HistoryExport';
-import {handleKeyDown} from 'Util/KeyboardUtil';
+import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 
 interface BackupFileUploadProps {
   onFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -51,7 +51,7 @@ const BackupFileUpload = ({
           ref={fileInputRef}
           tabIndex={TabIndex.UNFOCUSABLE}
           type="file"
-          accept={`.${HistoryExportConfig.LEGACY_FILE_EXTENSION},.${HistoryExportConfig.UNIVERSAL_FILE_EXTENSION}`}
+          accept={`.${HistoryExportConfig.FILE_EXTENSION}`}
           onChange={onFileChange}
           onFocus={({target}) => target.blur()}
           data-uie-name="input-import-file"
@@ -64,7 +64,7 @@ const BackupFileUpload = ({
         className={cssClassName}
         role="button"
         tabIndex={TabIndex.FOCUSABLE}
-        onKeyDown={event => handleKeyDown(event, fileInputClick)}
+        onKeyDown={event => handleKeyDown({event, callback: fileInputClick, keys: [KEY.ENTER, KEY.SPACE]})}
         onClick={() => fileInputRef.current?.click()}
         aria-labelledby="do-backup-import"
       >

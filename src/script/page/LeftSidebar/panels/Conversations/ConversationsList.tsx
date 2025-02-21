@@ -24,7 +24,14 @@ import React, {
   useState,
   MutableRefObject,
   useCallback,
+  useRef,
 } from 'react';
+
+import {useVirtualizer} from '@tanstack/react-virtual';
+import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
+import {useDebouncedCallback} from 'use-debounce';
+
+import {WIDTH} from '@wireapp/react-ui-kit';
 
 import {ConversationListCell} from 'Components/ConversationListCell';
 import {Call} from 'src/script/calling/Call';
@@ -38,7 +45,7 @@ import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {ConnectionRequests} from './ConnectionRequests';
 import {conversationsList, headingTitle, noResultsMessage} from './ConversationsList.styles';
-import {conversationSearchFilter, scrollToConversation} from './helpers';
+import {conversationSearchFilter} from './helpers';
 
 import {CallState} from '../../../../calling/CallState';
 import {ConversationState} from '../../../../conversation/ConversationState';
@@ -124,25 +131,51 @@ export const ConversationsList = ({
     listViewModel.contentViewModel.switchContent(ContentState.CONNECTION_REQUESTS);
   };
 
-  const onConversationClick = useCallback(
-    (conversation: Conversation) =>
-      (event: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>) => {
-        if (isActiveConversation(conversation)) {
+  const isFolderView = currentTab === SidebarTabs.FOLDER;
+  const filteredConversations =
+    (isFolderView && currentFolder?.conversations().filter(conversationSearchFilter(conversationsFilter))) || [];
+  const conversationsToDisplay = filteredConversations.length ? filteredConversations : conversations;
+
+  const parentRef = useRef(null);
+
+  const rowVirtualizer = useVirtualizer({
+    count: conversationsToDisplay.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 56,
+  });
+
+  const debouncedOnConversationClick = useDebouncedCallback(
+    (
+      conversation: Conversation,
+      event: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>,
+    ) => {
+      if (isActiveConversation(conversation)) {
+        if (window.innerWidth > WIDTH.TABLET_SM_MAX || document.documentElement.clientWidth > WIDTH.TABLET_SM_MAX) {
           clearSearchFilter();
           setClickedFilteredConversationId(conversation.id);
           return;
         }
+      }
 
-        if (isKeyboardEvent(event)) {
-          createNavigateKeyboard(generateConversationUrl(conversation.qualifiedId), true)(event);
-        } else {
-          createNavigate(generateConversationUrl(conversation.qualifiedId))(event);
-        }
+      if (isKeyboardEvent(event)) {
+        createNavigateKeyboard(generateConversationUrl(conversation.qualifiedId), true)(event);
+      } else {
+        createNavigate(generateConversationUrl(conversation.qualifiedId))(event);
+      }
 
-        clearSearchFilter();
-        setClickedFilteredConversationId(conversation.id);
+      clearSearchFilter();
+      setClickedFilteredConversationId(conversation.id);
+    },
+    TimeInMillis.SECOND / 2, // Adjust debounce delay as needed
+    {leading: true},
+  );
+
+  const onConversationClick = useCallback(
+    (conversation: Conversation) =>
+      (event: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>) => {
+        debouncedOnConversationClick(conversation, event);
       },
-    [clearSearchFilter, isActiveConversation],
+    [debouncedOnConversationClick],
   );
 
   const getCommonConversationCellProps = (conversation: Conversation, index: number) => ({
@@ -161,15 +194,14 @@ export const ConversationsList = ({
 
   useEffect(() => {
     if (!conversationsFilter && clickedFilteredConversationId) {
-      scrollToConversation(clickedFilteredConversationId);
+      const conversationIndex = conversationsToDisplay.findIndex(conv => conv.id === clickedFilteredConversationId);
+      if (conversationIndex !== -1) {
+        rowVirtualizer.scrollToIndex(conversationIndex, {align: 'auto'});
+      }
+
       setClickedFilteredConversationId(null);
     }
-  }, [conversationsFilter, clickedFilteredConversationId]);
-
-  const isFolderView = currentTab === SidebarTabs.FOLDER;
-  const filteredConversations =
-    (isFolderView && currentFolder?.conversations().filter(conversationSearchFilter(conversationsFilter))) || [];
-  const conversationsToDisplay = filteredConversations.length ? filteredConversations : conversations;
+  }, [conversationsFilter, clickedFilteredConversationId, conversationsToDisplay]);
 
   return (
     <>
@@ -183,10 +215,45 @@ export const ConversationsList = ({
         <p css={noResultsMessage}>{t('searchConversationsNoResult')}</p>
       )}
 
-      <ul css={conversationsList} data-uie-name="conversation-view">
-        {conversationsToDisplay.map((conversation, index) => (
-          <ConversationListCell key={conversation.id} {...getCommonConversationCellProps(conversation, index)} />
-        ))}
+      <ul
+        css={conversationsList}
+        data-uie-name="conversation-view"
+        ref={parentRef}
+        style={{
+          height: '100%',
+          overflow: 'auto',
+        }}
+      >
+        <div
+          style={{
+            height: `${rowVirtualizer.getTotalSize()}px`,
+            width: '100%',
+            position: 'relative',
+          }}
+        >
+          {rowVirtualizer.getVirtualItems().map(virtualItem => {
+            const conversation = conversationsToDisplay[virtualItem.index];
+
+            return (
+              <div
+                key={virtualItem.key}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: `${virtualItem.size}px`,
+                  transform: `translateY(${virtualItem.start}px)`,
+                }}
+              >
+                <ConversationListCell
+                  key={conversation.id}
+                  {...getCommonConversationCellProps(conversation, virtualItem.index)}
+                />
+              </div>
+            );
+          })}
+        </div>
       </ul>
 
       {isGroupParticipantsVisible && (

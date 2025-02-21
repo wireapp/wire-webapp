@@ -64,6 +64,7 @@ describe('message', () => {
       onRetry: jest.fn(),
       selfId: {domain: '', id: createUuid()},
       isMsgElementsFocusable: true,
+      isFileShareRestricted: false,
     };
   });
 

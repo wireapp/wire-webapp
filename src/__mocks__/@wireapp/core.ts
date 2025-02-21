@@ -36,6 +36,7 @@ export class Account extends EventEmitter {
   }
   configureMLSCallbacks = jest.fn();
   enrollE2EI = jest.fn();
+  isMLSActiveForClient = jest.fn();
   service = {
     e2eIdentity: {
       isE2EIEnabled: jest.fn(),

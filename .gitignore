@@ -3,7 +3,6 @@
 .DS_Store
 .idea
 .vscode
-.fleet
 /config
 /coverage
 /keys

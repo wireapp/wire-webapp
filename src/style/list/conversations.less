@@ -245,11 +245,6 @@
     gap: 12px;
   }
 
-  &--text {
-    .text-bold-small;
-    color: var(--gray-90);
-  }
-
   .button-states();
 
   &:focus-visible {
@@ -258,7 +253,11 @@
   }
 
   .conversations-sidebar-btn--text {
+    .text-bold-small;
+    overflow: hidden;
     color: var(--main-color);
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   &.active {
@@ -298,6 +297,7 @@
   svg {
     width: 14px;
     height: 14px;
+    flex-shrink: 0;
   }
 
   svg.folders-open-indicator {

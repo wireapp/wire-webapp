@@ -17,7 +17,9 @@
  *
  */
 
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
+
+import {useDebouncedCallback} from 'use-debounce';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
@@ -29,7 +31,6 @@ import {t} from 'Util/LocalizerUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 
 import {getManageServicesUrl} from '../../../../externalRoute';
-import {useDebounce} from '../../../../hooks/useDebounce';
 
 export const ServicesTab: React.FC<{
   canManageServices: boolean;
@@ -41,18 +42,18 @@ export const ServicesTab: React.FC<{
   const [services, setServices] = useState<ServiceEntity[]>(integrationRepository.services());
   const manageServicesUrl = getManageServicesUrl('client_landing');
 
-  const openManageServices = () => safeWindowOpen(manageServicesUrl);
+  const openManageServices = () => safeWindowOpen(manageServicesUrl!);
 
-  useDebounce(
-    async () => {
-      const results = await integrationRepository.searchForServices(searchQuery);
-      if (results) {
-        setServices(results);
-      }
-    },
-    300,
-    [searchQuery],
-  );
+  const debouncedSearch = useDebouncedCallback(async () => {
+    const results = await integrationRepository.searchForServices(searchQuery);
+    if (results) {
+      setServices(results);
+    }
+  }, 300);
+
+  useEffect(() => {
+    debouncedSearch();
+  }, [searchQuery]);
 
   return (
     <>

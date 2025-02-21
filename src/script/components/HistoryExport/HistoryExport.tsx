@@ -49,8 +49,7 @@ enum ExportState {
 }
 
 export const CONFIG = {
-  LEGACY_FILE_EXTENSION: 'desktop_wbu',
-  UNIVERSAL_FILE_EXTENSION: 'wirebackup',
+  FILE_EXTENSION: 'desktop_wbu',
 };
 
 interface HistoryExportProps {
@@ -131,13 +130,8 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
   };
 
   const downloadArchiveFile = () => {
-    const {
-      FEATURE: {ENABLE_CROSS_PLATFORM_BACKUP_EXPORT},
-    } = Config.getConfig();
     const userName = user.username();
-    const fileExtension = ENABLE_CROSS_PLATFORM_BACKUP_EXPORT
-      ? CONFIG.UNIVERSAL_FILE_EXTENSION
-      : CONFIG.LEGACY_FILE_EXTENSION;
+    const fileExtension = CONFIG.FILE_EXTENSION;
     const sanitizedBrandName = Config.getConfig().BRAND_NAME.replace(/[^A-Za-z0-9_]/g, '');
     const filename = `${sanitizedBrandName}-${userName}-Backup_${getCurrentDate()}.${fileExtension}`;
 
