@@ -25,6 +25,7 @@ import {container} from 'tsyringe';
 import {useMatchMedia} from '@wireapp/react-ui-kit';
 
 import {CallingCell} from 'Components/calling/CallingCell';
+import {DropFileArea} from 'Components/DropFileArea';
 import {Giphy} from 'Components/Giphy';
 import {InputBar} from 'Components/InputBar';
 import {MessagesList} from 'Components/MessagesList';
@@ -43,10 +44,9 @@ import {getLogger} from 'Util/Logger';
 import {safeMailOpen, safeWindowOpen} from 'Util/SanitizationUtil';
 import {formatBytes, incomingCssClass, removeAnimationsClass} from 'Util/util';
 
-import {FileDropzone} from './FileDropzone/FileDropzone';
 import {useReadReceiptSender} from './hooks/useReadReceipt';
 import {ReadOnlyConversationMessage} from './ReadOnlyConversationMessage';
-import {useFileUploadState} from './useFiles/useFiles';
+import {checkFileSharingPermission} from './utils/checkFileSharingPermission';
 
 import {ConversationState} from '../../conversation/ConversationState';
 import {Conversation as ConversationEntity} from '../../entity/Conversation';
@@ -124,8 +124,6 @@ export const Conversation = ({
   const smBreakpoint = useMatchMedia('max-width: 640px');
 
   const {addReadReceiptToBatch} = useReadReceiptSender(repositories.message);
-
-  const {files} = useFileUploadState();
 
   useEffect(() => {
     // When the component is mounted we want to make sure its conversation entity's last message is marked as visible
@@ -464,13 +462,14 @@ export const Conversation = ({
     [addReadReceiptToBatch, repositories.conversation, repositories.integration, updateConversationLastRead],
   );
 
-  useEffect(() => {
-    // Make sure to revoke the data uris to avoid memory leaks, will run on unmount
-    return () => files.forEach(file => URL.revokeObjectURL(file.preview));
-  }, [files]);
-
   return (
-    <FileDropzone isTeam={inTeam}>
+    <DropFileArea
+      onFileDropped={checkFileSharingPermission(uploadDroppedFiles)}
+      id="conversation"
+      className={cx('conversation', {[incomingCssClass]: isConversationLoaded, loading: !isConversationLoaded})}
+      ref={removeAnimationsClass}
+      key={activeConversation?.id}
+    >
       <div
         id="conversation"
         className={cx('conversation', {[incomingCssClass]: isConversationLoaded, loading: !isConversationLoaded})}
@@ -569,6 +568,6 @@ export const Conversation = ({
           <Giphy giphyRepository={repositories.giphy} inputValue={inputValue} onClose={closeGiphy} />
         )}
       </div>
-    </FileDropzone>
+    </DropFileArea>
   );
 };

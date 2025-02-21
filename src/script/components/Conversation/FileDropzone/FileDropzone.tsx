@@ -32,6 +32,7 @@ import {validateFiles, ValidationResult} from './fileValidation/fileValidation';
 import {useIsDragging} from './useIsDragging/useIsDragging';
 
 import {useFileUploadState} from '../useFiles/useFiles';
+import {checkFileSharingPermission} from '../utils/checkFileSharingPermission';
 
 interface FileDropzoneProps {
   children: ReactNode;
@@ -53,7 +54,7 @@ export const FileDropzone = ({isTeam, children}: FileDropzoneProps) => {
     maxSize: MAX_SIZE,
     noClick: true,
     noKeyboard: true,
-    onDrop: (acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
+    onDrop: checkFileSharingPermission((acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
       const newFiles = [...acceptedFiles, ...rejectedFiles.map(file => file.file)];
 
       const validationResult = validateFiles({
@@ -81,7 +82,7 @@ export const FileDropzone = ({isTeam, children}: FileDropzoneProps) => {
       });
 
       addFiles(acceptedFilesWithPreview);
-    },
+    }),
     onError: () => {
       showFileDropzoneErrorModal({
         title: t('conversationFileUploadFailedHeading'),
