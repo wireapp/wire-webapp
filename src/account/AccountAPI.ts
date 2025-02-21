@@ -23,6 +23,7 @@ import {CustomBackendNotFoundError} from './AccountError';
 import {BackendConfigData} from './BackendConfigData';
 import {CallConfigData} from './CallConfigData';
 import {DomainData} from './DomainData';
+import {DomainRedirectPayload} from './DomainRedirect';
 import {SSOSettings} from './SSOSettings';
 
 import {HttpClient, BackendErrorLabel, BackendError} from '../http';
@@ -44,6 +45,7 @@ export class AccountAPI {
     PROVIDER: '/provider',
     SETTINGS: 'settings',
     SSO: '/sso',
+    GET_DOMAIN_REGISTRATION: '/get-domain-registration',
   };
 
   /**
@@ -220,6 +222,19 @@ export class AccountAPI {
     };
 
     const response = await this.client.sendJSON<BackendConfigData>(config);
+    return response.data;
+  }
+
+  public async getDomainRegistration(email: string): Promise<DomainRedirectPayload> {
+    const config: AxiosRequestConfig = {
+      data: {
+        email,
+      },
+      method: 'post',
+      url: AccountAPI.URL.GET_DOMAIN_REGISTRATION,
+    };
+
+    const response = await this.client.sendJSON<DomainRedirectPayload>(config);
     return response.data;
   }
 }
