@@ -20,7 +20,9 @@
 import {ReactNode, useEffect} from 'react';
 
 import {FileRejection, useDropzone} from 'react-dropzone';
+import {container} from 'tsyringe';
 
+import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {Config} from 'src/script/Config';
 import {t} from 'Util/LocalizerUtil';
 import {createUuid} from 'Util/uuid';
@@ -37,13 +39,18 @@ import {checkFileSharingPermission} from '../utils/checkFileSharingPermission';
 interface FileDropzoneProps {
   children: ReactNode;
   isTeam: boolean;
+  cellsRepository?: CellsRepository;
 }
 
 const MAX_FILES = 10;
 
 const CONFIG = Config.getConfig();
 
-export const FileDropzone = ({isTeam, children}: FileDropzoneProps) => {
+export const FileDropzone = ({
+  isTeam,
+  cellsRepository = container.resolve(CellsRepository),
+  children,
+}: FileDropzoneProps) => {
   const {isDragging, wrapperRef} = useIsDragging();
 
   const {addFiles, files} = useFileUploadState();
@@ -82,8 +89,12 @@ export const FileDropzone = ({isTeam, children}: FileDropzoneProps) => {
       });
 
       addFiles(acceptedFilesWithPreview);
+
+      void cellsRepository.uploadFile(acceptedFilesWithPreview[0]);
     }),
-    onError: () => {
+    onError: (error: Error) => {
+      console.error('FileDropzone onError', error);
+
       showFileDropzoneErrorModal({
         title: t('conversationFileUploadFailedHeading'),
         message: t('conversationFileUploadFailedMessage'),

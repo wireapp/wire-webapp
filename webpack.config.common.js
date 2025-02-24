@@ -69,12 +69,6 @@ module.exports = {
   module: {
     rules: [
       {
-        exclude: /node_modules/,
-        include: srcScript,
-        loader: 'babel-loader',
-        test: /\.[tj]sx?$/,
-      },
-      {
         loader: 'svg-inline-loader',
         options: {
           removeSVGTagAttrs: false,
@@ -84,6 +78,12 @@ module.exports = {
       {
         loader: 'raw-loader',
         test: /\.glsl$/,
+      },
+      {
+        test: /\.tsx?$/,
+        use: 'ts-loader',
+        include: /node_modules\/cells-sdk-ts/,
+        exclude: /node_modules\/(?!cells-sdk-ts)/,
       },
       {
         test: /\.less$/i,

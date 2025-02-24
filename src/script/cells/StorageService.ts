@@ -17,11 +17,24 @@
  *
  */
 
-import {CellsAPI} from './CellsAPI';
+export interface StorageService {
+  putObject({
+    filePath,
+    file,
+    metadata,
+  }: {
+    filePath: string;
+    file: File;
+    metadata?: Record<string, string>;
+  }): Promise<void>;
+}
 
-export class CellsRepository {
-  async uploadFile(file: File): Promise<void> {
-    const service = new CellsAPI();
-    await service.uploadFile({filePath: 'test', file, autoRename: true});
+export class StorageServiceError extends Error {
+  constructor(
+    message: string,
+    public readonly cause?: Error,
+  ) {
+    super(message);
+    this.name = 'StorageServiceError';
   }
 }
