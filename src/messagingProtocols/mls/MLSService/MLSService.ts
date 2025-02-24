@@ -419,23 +419,23 @@ export class MLSService extends TypedEventEmitter<Events> {
   }
 
   public async decryptMessage(conversationId: ConversationId, payload: Uint8Array): Promise<DecryptedMessage> {
-    try {
-      const decryptedMessage = await this.coreCryptoClient.transaction(cx =>
-        cx.decryptMessage(conversationId, payload),
-      );
-      this.dispatchNewCrlDistributionPoints(decryptedMessage);
-      return decryptedMessage;
-    } catch (error) {
-      // According to CoreCrypto JS doc on .decryptMessage method, we should ignore some errors (corecrypto handle them internally)
-      if (shouldMLSDecryptionErrorBeIgnored(error)) {
-        return {
-          hasEpochChanged: false,
-          isActive: false,
-          proposals: [],
-        };
+    return await this.coreCryptoClient.transaction(async cx => {
+      try {
+        const decryptedMessage = await cx.decryptMessage(conversationId, payload);
+        this.dispatchNewCrlDistributionPoints(decryptedMessage);
+        return decryptedMessage;
+      } catch (error) {
+        // According to CoreCrypto JS doc on .decryptMessage method, we should ignore some errors (corecrypto handle them internally)
+        if (shouldMLSDecryptionErrorBeIgnored(error)) {
+          return {
+            hasEpochChanged: false,
+            isActive: false,
+            proposals: [],
+          };
+        }
+        throw error;
       }
-      throw error;
-    }
+    });
   }
 
   public async encryptMessage(conversationId: ConversationId, message: Uint8Array): Promise<Uint8Array> {
