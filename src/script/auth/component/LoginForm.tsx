@@ -43,7 +43,7 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
   const [validEmailInput, setValidEmailInput] = useState(true);
   const [validPasswordInput, setValidPasswordInput] = useState(true);
 
-  const [email, setEmail] = useState(decodeURIComponent(defaultEmail || ''));
+  const [email, setEmail] = useState(defaultEmail || '');
   const [password, setPassword] = useState('');
 
   const handleSubmit = (event: React.FormEvent): void => {

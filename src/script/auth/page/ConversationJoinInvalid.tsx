@@ -33,7 +33,7 @@ type Props = React.HTMLProps<HTMLDivElement>;
 const ConversationJoinInvalid = ({}: Props) => {
   return (
     <WirelessContainer>
-      <ContainerXS style={{margin: 'auto 0'}}>
+      <ContainerXS style={{margin: 'auto'}}>
         <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} data-uie-name="status-invalid-headline">
           <FormattedMessage
             id="conversationJoin.invalidHeadline"

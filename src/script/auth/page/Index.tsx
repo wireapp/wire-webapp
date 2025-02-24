@@ -78,8 +78,9 @@ const IndexComponent = ({defaultSSOCode, doInit}: Props & ConnectedProps & Dispa
     }
   }, [immediateLogin]);
 
-  if (defaultSSOCode) {
+  if (defaultSSOCode || isEnterpriseLoginV2Enabled) {
     // Redirect to prefilled SSO login if default SSO code is set on backend
+    // or if enterprise login v2 is enabled
     return <Navigate to={`${ROUTE.SSO}/${getPrefixedSSOCode(defaultSSOCode)}`} />;
   }
 
@@ -87,10 +88,6 @@ const IndexComponent = ({defaultSSOCode, doInit}: Props & ConnectedProps & Dispa
   if (!features.ENABLE_DOMAIN_DISCOVERY && !features.ENABLE_SSO && !features.ENABLE_ACCOUNT_REGISTRATION) {
     // Navigate directly to email login because it's the only available option on the index page
     return <Navigate to={ROUTE.LOGIN} />;
-  }
-
-  if (isEnterpriseLoginV2Enabled) {
-    return <Navigate to={ROUTE.SSO} />;
   }
 
   return (

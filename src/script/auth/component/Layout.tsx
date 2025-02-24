@@ -19,11 +19,11 @@
 
 import {ReactNode} from 'react';
 
-import {CSSObject} from '@emotion/react';
-
 import {Bold, COLOR_V2, FlexBox, Link, Logo, QUERY, QueryKeys, Text, useMatchMedia} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/LocalizerUtil';
+
+import {bodyCss, contentContainerCss, leftSectionCss, whiteFontCss} from './Layout.styles';
 
 import {Config} from '../../Config';
 import {WavesPattern} from '../assets/WavesPattern';
@@ -32,7 +32,7 @@ export const Layout = ({children}: {children: ReactNode}) => {
   const isTablet = useMatchMedia(QUERY[QueryKeys.TABLET_DOWN]);
 
   return (
-    <FlexBox css={{flex: 'auto', flexDirection: 'row', background: COLOR_V2.WHITE, height: '100%', minHeight: '100vh'}}>
+    <FlexBox css={bodyCss}>
       {!isTablet && (
         <div css={leftSectionCss}>
           <Logo color={COLOR_V2.WHITE} scale={1.9} />
@@ -52,21 +52,7 @@ export const Layout = ({children}: {children: ReactNode}) => {
           <WavesPattern />
         </div>
       )}
-      <div css={{maxHeight: '100vh', overflowY: 'auto', width: '100%', alignSelf: 'center'}}>{children}</div>
+      <div css={contentContainerCss}>{children}</div>
     </FlexBox>
   );
-};
-
-const leftSectionCss: CSSObject = {
-  background: 'black',
-  margin: 0,
-  height: '100vh',
-  maxWidth: '26rem',
-  padding: '6rem 3.75rem',
-  position: 'relative',
-  minHeight: '42rem',
-};
-
-const whiteFontCss: CSSObject = {
-  color: 'white',
 };

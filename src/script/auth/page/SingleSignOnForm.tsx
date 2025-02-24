@@ -246,7 +246,7 @@ const SingleSignOnFormComponent = ({
           );
         }
       } else {
-        await loginWithSSO();
+        await loginWithSSO(codeOrMail, password);
       }
     } catch (error) {
       setIsLoading(false);
