@@ -67,3 +67,7 @@ export const SSO_CODE_PREFIX = 'wire-';
 export function getPrefixedSSOCode(code?: string) {
   return code ? `${SSO_CODE_PREFIX}${code}` : '';
 }
+
+export const navigateTo = (url: string) => {
+  window.location.assign(url);
+};

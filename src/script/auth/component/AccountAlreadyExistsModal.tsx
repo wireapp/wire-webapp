@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2023 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,12 +17,12 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
-
 import {Button, Container, H2, Link, Modal, Text} from '@wireapp/react-ui-kit';
 
 import {Config} from 'src/script/Config';
 import {t} from 'Util/LocalizerUtil';
+
+import {buttonCss, containerCss, headerCss, linkCss} from './AccountAlreadyExistsModal.styles';
 
 export interface AccountAlreadyExistsModalProps {
   onClose: () => void;
@@ -30,47 +30,39 @@ export interface AccountAlreadyExistsModalProps {
 }
 
 export const AccountAlreadyExistsModal = ({onClose, backendName}: AccountAlreadyExistsModalProps) => {
+  const {
+    CHANGE_EMAIL_ADDRESS: changeEmailAddressUrl,
+    DELETE_PERSONAL_ACCOUNT: deletePersonalAccountUrl,
+    REMOVE_TEAM_MEMBER: removeTeamMemberUrl,
+  } = Config.getConfig().URL.SUPPORT;
+
   return (
     <Modal onClose={onClose}>
-      <Container style={{maxWidth: '360px'}}>
-        <H2 style={{whiteSpace: 'break-spaces', fontWeight: 500, marginTop: '10px', textAlign: 'center'}}>
-          {t('accountAlreadyExistsModal.header')}
-        </H2>
+      <Container css={containerCss}>
+        <H2 css={headerCss}>{t('accountAlreadyExistsModal.header')}</H2>
         <Text block fontSize="var(--font-size-base)" style={{marginBottom: 24}}>
           {t('accountAlreadyExistsModal.content', {backendName})}
         </Text>
         <Text block>
           👉{' '}
-          <Link href={Config.getConfig().URL.SUPPORT.CHANGE_EMAIL_ADDRESS} target="_blank" css={linkStyles}>
+          <Link href={changeEmailAddressUrl} target="_blank" css={linkCss}>
             {t('accountAlreadyExistsModal.changeEmailLink')}
           </Link>
         </Text>
         <Text block>
           👉{' '}
-          <Link href={Config.getConfig().URL.SUPPORT.DELETE_PERSONAL_ACCOUNT} target="_blank" css={linkStyles}>
+          <Link href={deletePersonalAccountUrl} target="_blank" css={linkCss}>
             {t('accountAlreadyExistsModal.deletePersonalAccount')}
           </Link>{' '}
           {t('index.or')}{' '}
-          <Link href={Config.getConfig().URL.SUPPORT.REMOVE_TEAM_MEMBER} target="_blank" css={linkStyles}>
+          <Link href={removeTeamMemberUrl} target="_blank" css={linkCss}>
             {t('accountAlreadyExistsModal.removeTeamMember')}
           </Link>
         </Text>
-        <Button
-          css={{marginBottom: '0px', marginTop: '1rem'}}
-          block
-          type="button"
-          onClick={onClose}
-          data-uie-name="guest-link-join-submit-button"
-        >
+        <Button css={buttonCss} block type="button" onClick={onClose} data-uie-name="guest-link-join-submit-button">
           {t('authHistoryButton')}
         </Button>
       </Container>
     </Modal>
   );
-};
-
-const linkStyles: CSSObject = {
-  textDecoration: 'underline',
-  textTransform: 'none',
-  fontSize: 'var(--font-size-base)',
 };

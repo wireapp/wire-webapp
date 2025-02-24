@@ -79,8 +79,8 @@ import * as AuthSelector from '../module/selector/AuthSelector';
 import * as ConversationSelector from '../module/selector/ConversationSelector';
 import {QUERY_KEY, ROUTE} from '../route';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
+import {getEnterpriseLoginV2FF} from '../util/helpers';
 import {getOAuthQueryString} from '../util/oauthUtil';
-import {getEnterpriseLoginV2FF} from '../util/randomUtil';
 import {getPrefixedSSOCode} from '../util/urlUtil';
 type Props = React.HTMLProps<HTMLDivElement> & {
   embedded?: boolean;

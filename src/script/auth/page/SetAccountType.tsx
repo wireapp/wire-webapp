@@ -47,7 +47,7 @@ import {Page} from './Page';
 import {Config} from '../../Config';
 import {RouterLink} from '../component/RouterLink';
 import {ROUTE} from '../route';
-import {getEnterpriseLoginV2FF} from '../util/randomUtil';
+import {getEnterpriseLoginV2FF} from '../util/helpers';
 import {pathWithParams} from '../util/urlUtil';
 
 type Props = React.HTMLProps<HTMLDivElement>;

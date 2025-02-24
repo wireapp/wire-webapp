@@ -37,7 +37,7 @@ import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
-import {getEnterpriseLoginV2FF} from '../util/randomUtil';
+import {getEnterpriseLoginV2FF} from '../util/helpers';
 
 type Props = React.HTMLAttributes<HTMLDivElement>;
 

@@ -19,7 +19,7 @@
 
 import {ReactNode} from 'react';
 
-import {Bold, COLOR_V2, FlexBox, Link, Logo, QUERY, QueryKeys, Text, useMatchMedia} from '@wireapp/react-ui-kit';
+import {Bold, COLOR_V2, FlexBox, Link, Logo, Text} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/LocalizerUtil';
 
@@ -29,29 +29,26 @@ import {Config} from '../../Config';
 import {WavesPattern} from '../assets/WavesPattern';
 
 export const Layout = ({children}: {children: ReactNode}) => {
-  const isTablet = useMatchMedia(QUERY[QueryKeys.TABLET_DOWN]);
-
   return (
     <FlexBox css={bodyCss}>
-      {!isTablet && (
-        <div css={leftSectionCss}>
-          <Logo color={COLOR_V2.WHITE} scale={1.9} />
-          <div css={{margin: '4rem 0'}}>
-            <Text bold css={whiteFontCss} fontSize="1.5rem">
-              {t('layoutSidebarHeader')}
-            </Text>
+      <div css={leftSectionCss}>
+        <Logo color={COLOR_V2.WHITE} scale={1.9} />
+        <div css={{margin: '4rem 0'}}>
+          <Text bold css={whiteFontCss} fontSize="1.5rem">
+            {t('layoutSidebarHeader')}
+          </Text>
+          <br />
+          <div css={{marginTop: '0.5rem'}}>
+            <Text css={{...whiteFontCss, lineHeight: '1.5rem'}}>{t('layoutSidebarContent')}</Text>
             <br />
-            <div css={{marginTop: '0.5rem'}}>
-              <Text css={{...whiteFontCss, lineHeight: '1.5rem'}}>{t('layoutSidebarContent')}</Text>
-              <br />
-              <Link href={Config.getConfig().URL.WEBSITE_BASE}>
-                <Bold css={{...whiteFontCss, textDecoration: 'underline'}}> {t('layoutSidebarLink')}</Bold>
-              </Link>
-            </div>
+            <Link href={Config.getConfig().URL.WEBSITE_BASE}>
+              <Bold css={{...whiteFontCss, textDecoration: 'underline'}}> {t('layoutSidebarLink')}</Bold>
+            </Link>
           </div>
-          <WavesPattern />
         </div>
-      )}
+        <WavesPattern />
+      </div>
+
       <div css={contentContainerCss}>{children}</div>
     </FlexBox>
   );

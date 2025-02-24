@@ -34,7 +34,7 @@ import {Page} from './Page';
 import {actionRoot} from '../module/action';
 import {bindActionCreators} from '../module/reducer';
 import {QUERY_KEY} from '../route';
-import {getEnterpriseLoginV2FF} from '../util/randomUtil';
+import {getEnterpriseLoginV2FF} from '../util/helpers';
 
 const REDIRECT_DELAY = 5000;
 const CustomEnvironmentRedirectComponent = ({doNavigate, doSendNavigationEvent}: DispatchProps) => {
@@ -67,7 +67,7 @@ const CustomEnvironmentRedirectComponent = ({doNavigate, doSendNavigationEvent}:
   return (
     <Page withSideBar={isEnterpriseLoginV2Enabled}>
       <FlexBox column>
-        <FlexBox justify="center" align="flex-end" style={{marginBottom: 64, alignSelf: 'center'}}>
+        <FlexBox justify="center" align="flex-end" style={{marginBottom: 64, alignSelf: 'center', padding: '4px'}}>
           <FlexBox
             justify="center"
             align="center"

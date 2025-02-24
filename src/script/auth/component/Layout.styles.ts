@@ -19,7 +19,7 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {COLOR_V2} from '@wireapp/react-ui-kit';
+import {COLOR_V2, media} from '@wireapp/react-ui-kit';
 
 export const leftSectionCss: CSSObject = {
   background: 'black',
@@ -29,6 +29,9 @@ export const leftSectionCss: CSSObject = {
   padding: '6rem 3.75rem',
   position: 'relative',
   minHeight: '42rem',
+  [media.tablet]: {
+    display: 'none',
+  },
 };
 
 export const contentContainerCss: CSSObject = {

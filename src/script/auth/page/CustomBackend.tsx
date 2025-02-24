@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2024 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,29 +20,28 @@
 import {useState} from 'react';
 
 import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
-import {connect} from 'react-redux';
 import {useLocation, useNavigate} from 'react-router-dom';
-import {bindActionCreators, Dispatch} from 'redux';
 
-import {Button, ButtonVariant, Container, Muted, Text} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, Container, Muted, QUERY, QueryKeys, Text, useMatchMedia} from '@wireapp/react-ui-kit';
 
+import {LogoFullIcon} from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
 import {Page} from './Page';
 
-import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {QUERY_KEY, ROUTE} from '../route';
 import {BackendConfig} from '../util/configUtil';
-import {getSearchParams} from '../util/urlUtil';
+import {getSearchParams, navigateTo} from '../util/urlUtil';
 
-function CustomBackendComponent({doNavigate}: DispatchProps) {
+export const CustomBackend = () => {
   const navigate = useNavigate();
   const {state} = useLocation();
-  const config = state.config as BackendConfig;
+  const isTablet = useMatchMedia(QUERY[QueryKeys.TABLET_DOWN]);
+  const config = state?.config as BackendConfig;
   const [isDetailVisible, setIsDetailVisible] = useState(false);
 
   const navigateToIndex = () => {
-    navigate(ROUTE.INDEX);
+    navigate(ROUTE.SSO);
   };
 
   if (!config) {
@@ -87,7 +86,7 @@ function CustomBackendComponent({doNavigate}: DispatchProps) {
   const onConnect = () => {
     if (config?.endpoints.websiteURL) {
       const welcomeUrl = pathWithParams(config.webAppUrl, {[QUERY_KEY.SSO_AUTO_LOGIN]: true});
-      doNavigate(
+      navigateTo(
         `/auth?${getSearchParams({[QUERY_KEY.DESTINATION_URL]: encodeURIComponent(welcomeUrl)})}#${
           ROUTE.CUSTOM_ENV_REDIRECT
         }`,
@@ -98,6 +97,15 @@ function CustomBackendComponent({doNavigate}: DispatchProps) {
   return (
     <Page withSideBar>
       <Container centerText verticalCenter style={{width: '100%', maxWidth: '22rem'}}>
+        {isTablet && (
+          <LogoFullIcon
+            aria-hidden="true"
+            width={102}
+            height={33}
+            style={{marginBottom: '80px'}}
+            data-uie-name="ui-wire-logo"
+          />
+        )}
         <Text block center css={{fontSize: '1.5rem'}}>
           {t('redirectHeader')}
         </Text>
@@ -135,17 +143,4 @@ function CustomBackendComponent({doNavigate}: DispatchProps) {
       </Container>
     </Page>
   );
-}
-
-type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: Dispatch) =>
-  bindActionCreators(
-    {
-      doNavigate: ROOT_ACTIONS.navigationAction.doNavigate,
-    },
-    dispatch,
-  );
-
-const CustomBackend = connect(null, mapDispatchToProps)(CustomBackendComponent);
-
-export {CustomBackend};
+};

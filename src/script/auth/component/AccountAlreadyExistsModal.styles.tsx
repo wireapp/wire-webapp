@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,11 +17,26 @@
  *
  */
 
-export function randomArrayElement<T>(array: T[]): T {
-  return array[randomInt(array.length - 1)];
-}
+import {CSSObject} from '@emotion/react';
 
-// returns number: 0 <= number <= max
-export function randomInt(max: number): number {
-  return Math.floor(Math.random() * (max + 1));
-}
+export const headerCss: CSSObject = {
+  whiteSpace: 'break-spaces',
+  fontWeight: 500,
+  marginTop: '10px',
+  textAlign: 'center',
+};
+
+export const containerCss: CSSObject = {
+  maxWidth: '360px',
+};
+
+export const buttonCss: CSSObject = {
+  marginBottom: '0px',
+  marginTop: '1rem',
+};
+
+export const linkCss: CSSObject = {
+  textDecoration: 'underline',
+  textTransform: 'none',
+  fontSize: 'var(--font-size-base)',
+};

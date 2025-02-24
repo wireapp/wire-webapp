@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,11 +17,15 @@
  *
  */
 
-export function randomArrayElement<T>(array: T[]): T {
-  return array[randomInt(array.length - 1)];
-}
+import {container} from 'tsyringe';
 
-// returns number: 0 <= number <= max
-export function randomInt(max: number): number {
-  return Math.floor(Math.random() * (max + 1));
+import {Config} from 'src/script/Config';
+import {Core} from 'src/script/service/CoreSingleton';
+
+export function getEnterpriseLoginV2FF() {
+  const core = container.resolve(Core);
+  return (
+    Config.getConfig().FEATURE.ENABLE_ENTERPRISE_LOGIN_V2 &&
+    core.backendFeatures.version >= Config.getConfig().MIN_ENTERPRISE_LOGIN_V2_SUPPORTED_API_VERSION
+  );
 }

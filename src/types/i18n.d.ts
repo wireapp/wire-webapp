@@ -920,13 +920,13 @@ declare module 'I18n/en-US.json' {
     'messageFailedToSendWillReceivePlural': `will get your message later.`;
     'messageFailedToSendWillReceiveSingular': `will get your message later.`;
     'mlsConversationRecovered': `You haven\'t used this device for a while, or an issue has occurred. Some older messages may not appear here.`;
-    'mlsWasEnabledTitle': `New messaging protocol is enabled on your team`;
-    'mlsWasEnabledDescription': `MLS messaging protocol was just enabled on your team, in order for your client to migrate to this protocol we recommend reloading the app`;
-    'mlsWasEnabledReload': `Reload`;
     'mlsSignature': `MLS with {signature} Signature`;
     'mlsThumbprint': `MLS Thumbprint`;
     'mlsToggleInfo': `When this is on, conversation will use the new messaging layer security (MLS) protocol.`;
     'mlsToggleName': `MLS`;
+    'mlsWasEnabledDescription': `MLS messaging protocol was just enabled on your team, in order for your client to migrate to this protocol we recommend reloading the app`;
+    'mlsWasEnabledReload': `Reload`;
+    'mlsWasEnabledTitle': `New messaging protocol is enabled on your team`;
     'modal1To1ConversationCreateErrorNoKeyPackagesHeadline': `Unable to start conversation`;
     'modal1To1ConversationCreateErrorNoKeyPackagesMessage': `You can’t start the conversation with {name} right now.<br/>{name} needs to open Wire or log in again first.<br/>Please try again later.`;
     'modalAccountCreateAction': `OK`;
@@ -1721,7 +1721,7 @@ declare module 'I18n/en-US.json' {
     'wireWindows': `{brandName} for Windows`;
     'wire_for_web': `{brandName} for Web`;
     'layoutSidebarHeader': `Collaborate without Compromise`;
-    'layoutSidebarContent': `Connect, message, and share files with ease, protected by the industry&rsquo;s most secure end-to-end encryption`;
+    'layoutSidebarContent': `Connect, message, and share files with ease, protected by the industry\'s most secure end-to-end encryption`;
     'layoutSidebarLink': `Learn more`;
     'redirectHeader': `Connect to your custom backend?`;
     'redirectSubHeader': `If you continue, we will redirect you to your team’s customized backend {backendName} to log in.`;
