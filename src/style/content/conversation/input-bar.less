@@ -440,6 +440,29 @@
         'avatar input buttons';
     }
   }
+
+  &--with-files {
+    grid-template-areas:
+      'avatar input input'
+      'avatar files files'
+      'buttons buttons buttons';
+  }
+
+  &--with-toolbar&--with-files {
+    grid-template-areas:
+      'toolbar toolbar toolbar'
+      'avatar input input'
+      'avatar files files'
+      'buttons buttons buttons';
+
+    @media (min-width: 900px) {
+      grid-template-areas:
+        'avatar toolbar toolbar'
+        'avatar input input'
+        'avatar files files'
+        'buttons buttons buttons';
+    }
+  }
 }
 
 .input-bar-field {
