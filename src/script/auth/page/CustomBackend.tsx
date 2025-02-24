@@ -22,11 +22,12 @@ import {useState} from 'react';
 import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
 import {useLocation, useNavigate} from 'react-router-dom';
 
-import {Button, ButtonVariant, Container, Muted, QUERY, QueryKeys, Text, useMatchMedia} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, Container, Muted, Text} from '@wireapp/react-ui-kit';
 
 import {LogoFullIcon} from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
+import {buttonContainerCss, containerCss, headerCss, logoCss} from './CustomBackend.styles';
 import {Page} from './Page';
 
 import {QUERY_KEY, ROUTE} from '../route';
@@ -36,7 +37,6 @@ import {getSearchParams, navigateTo} from '../util/urlUtil';
 export const CustomBackend = () => {
   const navigate = useNavigate();
   const {state} = useLocation();
-  const isTablet = useMatchMedia(QUERY[QueryKeys.TABLET_DOWN]);
   const config = state?.config as BackendConfig;
   const [isDetailVisible, setIsDetailVisible] = useState(false);
 
@@ -96,17 +96,9 @@ export const CustomBackend = () => {
 
   return (
     <Page withSideBar>
-      <Container centerText verticalCenter style={{width: '100%', maxWidth: '22rem'}}>
-        {isTablet && (
-          <LogoFullIcon
-            aria-hidden="true"
-            width={102}
-            height={33}
-            style={{marginBottom: '80px'}}
-            data-uie-name="ui-wire-logo"
-          />
-        )}
-        <Text block center css={{fontSize: '1.5rem'}}>
+      <Container centerText verticalCenter css={containerCss}>
+        <LogoFullIcon aria-hidden="true" width={102} height={33} css={logoCss} data-uie-name="ui-wire-logo" />
+        <Text block center css={headerCss}>
           {t('redirectHeader')}
         </Text>
         <Text block center>
@@ -126,13 +118,7 @@ export const CustomBackend = () => {
         <Text css={{textDecoration: 'underline', cursor: 'pointer'}} onClick={toggleDetails}>
           {isDetailVisible ? t('redirectHideDetails') : t('redirectShowDetails')}
         </Text>
-        <div
-          css={{
-            marginTop: '2rem',
-            gap: '1rem',
-            display: 'flex',
-          }}
-        >
+        <div css={buttonContainerCss}>
           <Button css={{flex: '1'}} onClick={navigateToIndex} variant={ButtonVariant.SECONDARY}>
             {t('redirectCancel')}
           </Button>

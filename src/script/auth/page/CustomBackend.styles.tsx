@@ -19,36 +19,22 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {COLOR_V2, media} from '@wireapp/react-ui-kit';
+import {media} from '@wireapp/react-ui-kit';
 
-export const leftSectionCss: CSSObject = {
-  background: 'black',
-  margin: 0,
-  height: '100vh',
-  maxWidth: '26rem',
-  padding: '6rem 3.75rem',
-  position: 'relative',
-  minHeight: '42rem',
+export const logoCss: CSSObject = {
+  marginBottom: '80px',
+  display: 'none',
   [media.tabletDown]: {
-    display: 'none',
+    display: 'unset',
   },
 };
 
-export const contentContainerCss: CSSObject = {
-  maxHeight: '100vh',
-  overflowY: 'auto',
-  width: '100%',
-  alignSelf: 'center',
+export const headerCss: CSSObject = {fontSize: '1.5rem', marginBottom: '1rem'};
+
+export const buttonContainerCss: CSSObject = {
+  marginTop: '2rem',
+  gap: '1rem',
+  display: 'flex',
 };
 
-export const whiteFontCss: CSSObject = {
-  color: 'white',
-};
-
-export const bodyCss: CSSObject = {
-  flex: 'auto',
-  flexDirection: 'row',
-  background: COLOR_V2.WHITE,
-  height: '100%',
-  minHeight: '100vh',
-};
+export const containerCss: CSSObject = {width: '100%', maxWidth: '23rem'};
