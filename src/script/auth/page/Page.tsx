@@ -65,7 +65,7 @@ const PageComponent = ({
   }
 
   if (withSideBar) {
-    return <Layout>{children} </Layout>;
+    return <Layout>{children}</Layout>;
   }
 
   return <>{children}</>;
