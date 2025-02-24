@@ -21,7 +21,13 @@ import {SaveIcon} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/LocalizerUtil';
 
-import {iconStyles, overlayActiveStyles, overlayStyles, textStyles} from './FileDropzoneOverlay.styles';
+import {
+  iconStyles,
+  overlayActiveStyles,
+  overlayStyles,
+  descriptionStyles,
+  titleStyles,
+} from './FileDropzoneOverlay.styles';
 
 interface FileDropzoneOverlayProps {
   isActive: boolean;
@@ -29,9 +35,10 @@ interface FileDropzoneOverlayProps {
 
 export const FileDropzoneOverlay = ({isActive}: FileDropzoneOverlayProps) => {
   return (
-    <div css={isActive ? overlayActiveStyles : overlayStyles}>
-      <SaveIcon width={20} height={20} css={iconStyles} />
-      <p css={textStyles}>{t('conversationFileUploadOverlayText')}</p>
+    <div css={isActive ? overlayActiveStyles : overlayStyles} aria-hidden={!isActive}>
+      <SaveIcon width={24} height={24} css={iconStyles} />
+      <p css={titleStyles}>{t('conversationFileUploadOverlayTitle')}</p>
+      <p css={descriptionStyles}>{t('conversationFileUploadOverlayDescription')}</p>
     </div>
   );
 };
