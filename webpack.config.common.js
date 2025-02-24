@@ -80,12 +80,6 @@ module.exports = {
         test: /\.glsl$/,
       },
       {
-        test: /\.tsx?$/,
-        use: 'ts-loader',
-        include: /node_modules\/cells-sdk-ts/,
-        exclude: /node_modules\/(?!cells-sdk-ts)/,
-      },
-      {
         test: /\.less$/i,
         use: [
           'style-loader',

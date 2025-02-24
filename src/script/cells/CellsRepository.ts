@@ -17,11 +17,14 @@
  *
  */
 
-import {CellsAPI} from './CellsAPI';
+import {container} from 'tsyringe';
+
+import {APIClient} from '../service/APIClientSingleton';
 
 export class CellsRepository {
+  constructor(private readonly apiClient = container.resolve(APIClient)) {}
+
   async uploadFile(file: File): Promise<void> {
-    const service = new CellsAPI();
-    await service.uploadFile({filePath: 'test', file, autoRename: true});
+    // await this.apiClient.api.cells.uploadFile({filePath: 'test', file, autoRename: true});
   }
 }
