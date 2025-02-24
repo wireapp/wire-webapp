@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [46.19.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.19.1...@wireapp/core@46.19.2) (2025-02-24)
+
+### Bug Fixes
+
+* **core:** Catch and suppress buffer errors inside transaction (WPB-16234) ([#6959](https://github.com/wireapp/wire-web-packages/issues/6959)) ([df8bbb3](https://github.com/wireapp/wire-web-packages/commit/df8bbb3bcb4f99a9b438a9ce5e35a47097de1d3b))
+
 ## [46.19.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.19.0...@wireapp/core@46.19.1) (2025-02-21)
 
 **Note:** Version bump only for package @wireapp/core
