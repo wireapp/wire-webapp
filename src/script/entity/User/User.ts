@@ -103,6 +103,7 @@ export class User {
   public domain: string;
   public readonly isBlockedLegalHold: ko.PureComputed<boolean>;
   public readonly supportedProtocols: ko.Observable<null | ConversationProtocol[]>;
+  private hasBeenInitializedForMLS: boolean = false;
 
   static get ACCENT_COLOR() {
     return {
@@ -249,6 +250,16 @@ export class User {
 
   markConnectionAsUnknown() {
     this.connection()?.status(ConnectionStatus.UNKNOWN);
+  }
+
+  updateMLSStatus() {
+    if (!this.hasBeenInitializedForMLS) {
+      this.hasBeenInitializedForMLS = true;
+    }
+  }
+
+  getMLSStatus() {
+    return this.hasBeenInitializedForMLS;
   }
 
   addClient(new_client_et: ClientEntity): boolean {

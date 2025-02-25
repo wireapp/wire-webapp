@@ -781,13 +781,29 @@ export class UserRepository extends TypedEventEmitter<Events> {
     const localUser = this.findUserById(userId);
     const localSupportedProtocols = localUser?.supportedProtocols();
 
+    if (!localUser) {
+      return [];
+    }
+
+    const returnSupportProtocols = (supportedProtocols: ConversationProtocol[]): ConversationProtocol[] => {
+      if (supportedProtocols.includes(ConversationProtocol.MLS)) {
+        // We need to persist the MLS status after the first time a user has the MLS protocol added
+        localUser.updateMLSStatus();
+      }
+      if (localUser.getMLSStatus() === true) {
+        // If the user has MLS enabled, we need to add it to the supported protocols, removing duplicates
+        return [...new Set([...supportedProtocols, ConversationProtocol.MLS])];
+      }
+      return supportedProtocols;
+    };
+
     if (shouldRefreshUser && localUser) {
       // Trigger a refresh of the supported protocols in the background. No need to await for this one.
       void this.refreshUserSupportedProtocols(localUser);
     }
 
     if (localSupportedProtocols) {
-      return localSupportedProtocols;
+      return returnSupportProtocols(localSupportedProtocols);
     }
 
     try {
@@ -795,14 +811,14 @@ export class UserRepository extends TypedEventEmitter<Events> {
 
       //update local user entity with new supported protocols
       await this.updateUserSupportedProtocols(userId, supportedProtocols);
-      return supportedProtocols;
+      return returnSupportProtocols(supportedProtocols);
     } catch (error) {
       if (localSupportedProtocols) {
         this.logger.warn(
           `Failed when fetching supported protocols of user ${userId.id}, using local supported protocols as fallback: `,
           localSupportedProtocols,
         );
-        return localSupportedProtocols;
+        return returnSupportProtocols(localSupportedProtocols);
       }
 
       this.logger.error(`Couldn't specify supported protocols of user ${userId.id}.`, error);
