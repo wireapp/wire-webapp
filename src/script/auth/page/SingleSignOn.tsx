@@ -39,10 +39,14 @@ import {
   Logo,
   Muted,
   Overlay,
+  QUERY,
+  QueryKeys,
   Text,
+  useMatchMedia,
 } from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {LogoFullIcon} from 'Components/Icon';
 import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
@@ -56,6 +60,7 @@ import {RouterLink} from '../component/RouterLink';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
+import {getEnterpriseLoginV2FF} from '../util/helpers';
 
 type Props = React.HTMLAttributes<HTMLDivElement>;
 
@@ -64,7 +69,9 @@ const logger = getLogger('SingleSignOn');
 const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
   const ssoWindowRef = useRef<Window>();
   const params = useParams<{code?: string}>();
+  const isTablet = useMatchMedia(QUERY[QueryKeys.TABLET_DOWN]);
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
+  const isEnterpriseLoginV2Enabled = getEnterpriseLoginV2FF();
 
   const handleSSOWindow = (code: string): Promise<void> => {
     const POPUP_HEIGHT = 520;
@@ -189,7 +196,7 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
   );
 
   return (
-    <Page>
+    <Page withSideBar={isEnterpriseLoginV2Enabled}>
       {isOverlayOpen && (
         <Overlay>
           <Container centerText style={{color: COLOR.WHITE, maxWidth: '330px'}}>
@@ -222,17 +229,28 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
           </Container>
         </Overlay>
       )}
-      {!hasDefaultSSOCode && (
+
+      {!isEnterpriseLoginV2Enabled && !hasDefaultSSOCode && (
         <IsMobile>
           <div style={{margin: 16}}>{backArrow}</div>
         </IsMobile>
       )}
-      <Container centerText verticalCenter style={{width: '100%'}}>
+
+      <Container centerText verticalCenter style={{width: '100%', padding: '1rem'}}>
+        {isTablet && isEnterpriseLoginV2Enabled && (
+          <LogoFullIcon
+            aria-hidden="true"
+            width={102}
+            height={33}
+            style={{marginBottom: '80px'}}
+            data-uie-name="ui-wire-logo"
+          />
+        )}
         <AppAlreadyOpen />
         <Columns>
           <IsMobile not>
             <Column style={{display: 'flex'}}>
-              {!hasDefaultSSOCode && <div style={{margin: 'auto'}}>{backArrow}</div>}
+              {!isEnterpriseLoginV2Enabled && !hasDefaultSSOCode && <div style={{margin: 'auto'}}>{backArrow}</div>}
             </Column>
           </IsMobile>
           <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
@@ -241,22 +259,39 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
               style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
             >
               <div>
-                <H1 center>{t('ssoLogin.headline')}</H1>
-                {Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ? (
+                {isEnterpriseLoginV2Enabled ? (
                   <>
-                    <Muted center style={{display: 'block'}} data-uie-name="status-email-or-sso-code">
+                    <div css={{fontWeight: '500', fontSize: '1.5rem'}}>
+                      {t('index.welcome', {brandName: Config.getConfig().BACKEND_NAME})}
+                    </div>
+
+                    <Text block center data-uie-name="status-email-or-sso-code">
                       {t('ssoLogin.subheadCodeOrEmail')}
-                    </Muted>
-                    <Muted center style={{display: 'block'}} data-uie-name="status-email-environment-switch-warning">
-                      {t('ssoLogin.subheadEmailEnvironmentSwitchWarning', {
-                        brandName: Config.getConfig().BRAND_NAME,
-                      })}
-                    </Muted>
+                    </Text>
+
+                    <SingleSignOnForm doLogin={handleSSOWindow} initialCode={params.code} />
                   </>
                 ) : (
-                  <Muted data-uie-name="status-sso-code">{t('ssoLogin.subheadCode')}</Muted>
+                  <>
+                    <H1 center>{t('ssoLogin.headline')}</H1>
+                    {Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ? (
+                      <>
+                        <Muted block center data-uie-name="status-email-or-sso-code">
+                          {t('ssoLogin.subheadCodeOrEmail')}
+                        </Muted>
+
+                        <Muted block center data-uie-name="status-email-environment-switch-warning">
+                          {t('ssoLogin.subheadEmailEnvironmentSwitchWarning', {
+                            brandName: Config.getConfig().BRAND_NAME,
+                          })}
+                        </Muted>
+                      </>
+                    ) : (
+                      <Muted data-uie-name="status-sso-code">{t('ssoLogin.subheadCode')}</Muted>
+                    )}
+                    <SingleSignOnForm doLogin={handleSSOWindow} initialCode={params.code} />
+                  </>
                 )}
-                <SingleSignOnForm doLogin={handleSSOWindow} initialCode={params.code} />
               </div>
             </ContainerXS>
           </Column>

@@ -171,6 +171,9 @@ export type Env = {
   /** Feature to enable calling popout window */
   FEATURE_ENABLE_DETACHED_CALLING_WINDOW: string;
 
+  /** Feature to enable Enterprise login v2 */
+  FEATURE_ENABLE_ENTERPRISE_LOGIN_V2: string;
+
   /** Feature to enable team creation flow for individual users */
   FEATURE_ENABLE_TEAM_CREATION: string;
 
@@ -313,6 +316,12 @@ export type Env = {
   URL_SUPPORT_PRIVACY_UNVERIFIED_USERS: string;
 
   URL_SUPPORT_PRIVACY_WHY: string;
+
+  URL_SUPPORT_CHANGE_EMAIL_ADDRESS: string;
+
+  URL_SUPPORT_DELETE_PERSONAL_ACCOUNT: string;
+
+  URL_SUPPORT_REMOVE_TEAM_MEMBER: string;
 
   URL_WHATS_NEW: string;
 

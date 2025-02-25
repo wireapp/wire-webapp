@@ -24,7 +24,7 @@ import {ClientType} from '@wireapp/api-client/lib/client/index';
 import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
 import {StatusCodes} from 'http-status-codes';
 import {connect} from 'react-redux';
-import {useNavigate} from 'react-router-dom';
+import {useLocation, useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 
 import {Runtime, UrlUtil} from '@wireapp/commons';
@@ -42,23 +42,26 @@ import {
   ContainerXS,
   FlexBox,
   Form,
-  H2,
   Heading,
   IsMobile,
   Label,
   Link,
   LinkVariant,
   Loading,
-  Muted,
+  QUERY,
+  QueryKeys,
   Text,
   TextLink,
+  useMatchMedia,
 } from '@wireapp/react-ui-kit';
 
+import {LogoFullIcon} from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {isBackendError} from 'Util/TypePredicateUtil';
 
 import {EntropyContainer} from './EntropyContainer';
+import {separator} from './Login.styles';
 import {Page} from './Page';
 
 import {Config} from '../../Config';
@@ -76,6 +79,7 @@ import * as AuthSelector from '../module/selector/AuthSelector';
 import * as ConversationSelector from '../module/selector/ConversationSelector';
 import {QUERY_KEY, ROUTE} from '../route';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
+import {getEnterpriseLoginV2FF} from '../util/helpers';
 import {getOAuthQueryString} from '../util/oauthUtil';
 import {getPrefixedSSOCode} from '../util/urlUtil';
 type Props = React.HTMLProps<HTMLDivElement> & {
@@ -106,6 +110,11 @@ const LoginComponent = ({
 }: Props & ConnectedProps & DispatchProps) => {
   const logger = getLogger('Login');
   const navigate = useNavigate();
+  const isTablet = useMatchMedia(QUERY[QueryKeys.TABLET_DOWN]);
+
+  const {state} = useLocation();
+  const accountCreationEnabled = state?.accountCreationEnabled;
+
   const [conversationCode, setConversationCode] = useState<string | null>(null);
   const [conversationKey, setConversationKey] = useState<string | null>(null);
   const [conversationSubmitData, setConversationSubmitData] = useState<Partial<LoginData> | null>(null);
@@ -116,6 +125,7 @@ const LoginComponent = ({
   const [twoFactorLoginData, setTwoFactorLoginData] = useState<LoginData>();
   const [verificationCode, setVerificationCode] = useState('');
   const [twoFactorSubmitFailedOnce, setTwoFactorSubmitFailedOnce] = useState(false);
+  const isEnterpriseLoginV2Enabled = getEnterpriseLoginV2FF();
 
   const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE, window.location.hash);
 
@@ -340,7 +350,7 @@ const LoginComponent = ({
 
   const backArrow = (
     <RouterLink to={ROUTE.INDEX} data-uie-name="go-index" aria-label={t('login.goBack')}>
-      <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
+      <ArrowIcon direction="left" color={COLOR.TEXT} />
     </RouterLink>
   );
 
@@ -353,7 +363,7 @@ const LoginComponent = ({
   };
 
   return (
-    <Page>
+    <Page withSideBar={isEnterpriseLoginV2Enabled}>
       {showBackButton && (
         <IsMobile>
           <div style={{margin: 16}}>{backArrow}</div>
@@ -363,6 +373,15 @@ const LoginComponent = ({
         <EntropyContainer onSetEntropy={storeEntropy} />
       ) : (
         <Container centerText verticalCenter style={{width: '100%'}}>
+          {isEnterpriseLoginV2Enabled && isTablet && (
+            <LogoFullIcon
+              aria-hidden="true"
+              width={102}
+              height={33}
+              style={{marginBottom: '80px'}}
+              data-uie-name="ui-wire-logo"
+            />
+          )}
           {!embedded && <AppAlreadyOpen />}
           {isLinkPasswordModalOpen && (
             <JoinGuestLinkPasswordModal
@@ -381,7 +400,11 @@ const LoginComponent = ({
             {!embedded && (
               <IsMobile not>
                 <Column style={{display: 'flex'}}>
-                  {showBackButton && <div style={{margin: 'auto'}}>{backArrow}</div>}
+                  {showBackButton && (
+                    <div style={{margin: isEnterpriseLoginV2Enabled ? '0.75rem 0px auto auto' : 'auto'}}>
+                      {backArrow}
+                    </div>
+                  )}
                 </Column>
               </IsMobile>
             )}
@@ -392,14 +415,16 @@ const LoginComponent = ({
               >
                 {twoFactorLoginData ? (
                   <div>
-                    <H2 center>{t('login.twoFactorLoginTitle')}</H2>
-                    <Text data-uie-name="label-with-email">
+                    <Text fontSize="1.5rem" css={{fontWeight: '500'}} center block>
+                      {t('login.twoFactorLoginTitle')}
+                    </Text>
+                    <Text data-uie-name="label-with-email" fontSize="1rem">
                       {t('login.twoFactorLoginSubHead', {email: twoFactorLoginData.email as string})}
                     </Text>
                     <Label markInvalid={!!twoFactorSubmitError}>
                       <CodeInput
                         disabled={isFetching}
-                        style={{marginTop: 60}}
+                        style={{marginTop: '1rem'}}
                         onCodeComplete={submitTwoFactorLogin}
                         data-uie-name="enter-code"
                       />
@@ -407,7 +432,7 @@ const LoginComponent = ({
                     <div style={{display: 'flex', justifyContent: 'center', marginTop: 10}}>
                       {!!twoFactorSubmitError && parseError(twoFactorSubmitError)}
                     </div>
-                    <div style={{marginTop: 20}}>
+                    <div style={{marginTop: '1rem'}}>
                       {isSendingTwoFactorCode ? (
                         <Loading size={20} />
                       ) : (
@@ -420,7 +445,7 @@ const LoginComponent = ({
                       <Button
                         disabled={!!twoFactorSubmitError || isFetching}
                         type="submit"
-                        css={{marginTop: 65}}
+                        css={{marginTop: '1rem'}}
                         onClick={() => handleSubmit({...twoFactorLoginData, verificationCode}, [])}
                       >
                         {t('login.submitTwoFactorButton')}
@@ -430,19 +455,22 @@ const LoginComponent = ({
                 ) : (
                   <>
                     <div>
-                      <Heading level={embedded ? '2' : '1'} center>
-                        {t('login.headline')}
-                      </Heading>
-                      <Muted>{t('login.subhead')}</Muted>
+                      {isEnterpriseLoginV2Enabled ? (
+                        <div css={{fontWeight: '500', fontSize: '1.5rem', marginBottom: '2rem'}}>
+                          {t('index.welcome', {brandName: Config.getConfig().BACKEND_NAME})}
+                        </div>
+                      ) : (
+                        <Heading level={embedded ? '2' : '1'} center>
+                          {t('login.headline')}
+                        </Heading>
+                      )}
+                      <Text>{t('login.subhead')}</Text>
                       <Form style={{marginTop: 30}} data-uie-name="login">
                         <LoginForm isFetching={isFetching} onSubmit={handleSubmit} />
-                        {validationErrors.length ? (
-                          parseValidationErrors(validationErrors)
-                        ) : authError ? (
-                          <Exception errors={[authError]} />
-                        ) : (
-                          <div style={{marginTop: '4px'}}>&nbsp;</div>
-                        )}
+                        {validationErrors.length
+                          ? parseValidationErrors(validationErrors)
+                          : authError && <Exception errors={[authError]} />}
+
                         {!Runtime.isDesktopApp() && (
                           <Checkbox
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -452,7 +480,7 @@ const LoginComponent = ({
                             }}
                             checked={loginData.clientType === ClientType.TEMPORARY}
                             data-uie-name="enter-public-computer-sign-in"
-                            style={{justifyContent: 'center', marginTop: '12px'}}
+                            style={{justifyContent: 'center', marginBottom: '16px'}}
                             aligncenter
                           >
                             <CheckboxLabel htmlFor="enter-public-computer-sign-in">
@@ -464,7 +492,7 @@ const LoginComponent = ({
                     </div>
                     <Link
                       variant={LinkVariant.PRIMARY}
-                      style={{paddingTop: '24px', textAlign: 'center'}}
+                      style={{textAlign: 'center'}}
                       href={EXTERNAL_ROUTE.WIRE_ACCOUNT_PASSWORD_RESET}
                       target="_blank"
                       data-uie-name="go-forgot-password"
@@ -481,6 +509,27 @@ const LoginComponent = ({
                       >
                         {t(isDomainDiscoveryEnabled ? 'index.enterprise' : 'index.ssoLogin')}
                       </Button>
+                    )}
+                    {isEnterpriseLoginV2Enabled && accountCreationEnabled && (
+                      <>
+                        <div css={separator}>
+                          <span>{t('index.or')}</span>
+                        </div>
+
+                        <div>
+                          <Button
+                            css={{width: '100%'}}
+                            variant={ButtonVariant.SECONDARY}
+                            onClick={async () => {
+                              await resetAuthError();
+                              navigate(ROUTE.SET_ACCOUNT_TYPE);
+                            }}
+                            data-uie-name="go-create-account"
+                          >
+                            {t('index.createAccount')}
+                          </Button>
+                        </div>
+                      </>
                     )}
                   </>
                 )}
