@@ -19,6 +19,7 @@
 
 import {act, fireEvent, render, waitFor} from '@testing-library/react';
 
+import {FileWithPreview} from 'Components/Conversation/useFiles/useFiles';
 import {InputBar} from 'Components/InputBar/index';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {Config} from 'src/script/Config';
@@ -72,6 +73,7 @@ describe('InputBar', () => {
   const getDefaultProps = () => ({
     assetRepository: new AssetRepository(),
     conversation: new Conversation(createUuid()),
+    files: [] as FileWithPreview[],
     conversationRepository: {
       sendTypingStart: jest.fn(),
       sendTypingStop: jest.fn(),
@@ -119,6 +121,7 @@ describe('InputBar', () => {
     expect(inputBar.textContent).toBe(testMessage);
   });
 
+  // eslint-disable-next-line jest/no-disabled-tests
   it.skip('typing request is sent if the typing indicator mode is enabled and user is typing', async () => {
     const props = getDefaultProps();
     const {getByTestId, container} = render(withTheme(<InputBar {...props} />));

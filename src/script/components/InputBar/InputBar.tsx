@@ -248,6 +248,7 @@ export const InputBar = ({
           className={cx(`conversation-input-bar__input input-bar-container`, {
             [`conversation-input-bar__input--editing`]: isEditing,
             'input-bar-container--with-toolbar': formatToolbar.open && showMarkdownPreview,
+            'input-bar-container--with-files': false,
           })}
         >
           {!isOutgoingRequest && (
