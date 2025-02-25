@@ -122,7 +122,6 @@ export class TeamState {
     this.isConferenceCallingEnabled = ko.pureComputed(
       () => this.teamFeatures()?.conferenceCalling?.status === FeatureStatus.ENABLED,
     );
-
     this.isGuestLinkEnabled = ko.pureComputed(
       () => this.teamFeatures()?.conversationGuestLinks?.status === FeatureStatus.ENABLED,
     );
