@@ -21,15 +21,21 @@ import React, {useMemo} from 'react';
 
 import cx from 'classnames';
 
-import {Tooltip} from '@wireapp/react-ui-kit';
+import {QUERY, Tooltip} from '@wireapp/react-ui-kit';
 
 import {CallParticipantsListItem} from 'Components/calling/CallParticipantsListItem';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import * as Icon from 'Components/Icon';
+import {useActiveWindowMatchMedia} from 'Hooks/useActiveWindowMatchMedia';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
-import {labelStyles, labelWithIconStyles} from './CallingParticipantList.styles';
+import {
+  headerStyles,
+  labelStyles,
+  labelWithIconStyles,
+  participantListWrapperStyles,
+} from './CallingParticipantList.styles';
 
 import {CallingRepository} from '../../../../calling/CallingRepository';
 import {Participant} from '../../../../calling/Participant';
@@ -44,6 +50,7 @@ interface CallingParticipantListProps {
   participants: Participant[];
   handRaisedParticipants: Participant[];
   showParticipants?: boolean;
+  onClose: () => void;
 }
 
 export const CallingParticipantList = ({
@@ -54,6 +61,7 @@ export const CallingParticipantList = ({
   participants,
   handRaisedParticipants,
   showParticipants,
+  onClose,
 }: CallingParticipantListProps) => {
   const getParticipantContext = (event: React.MouseEvent<HTMLDivElement>, participant: Participant) => {
     event.preventDefault();
@@ -88,13 +96,28 @@ export const CallingParticipantList = ({
       .sort((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user));
   }, [participants]);
 
+  const isMobile = useActiveWindowMatchMedia(QUERY.mobile);
+
   return (
     <div
       className={cx('call-ui__participant-list__wrapper', {
         'call-ui__participant-list__wrapper--active': showParticipants,
       })}
+      css={participantListWrapperStyles(isMobile)}
     >
       <FadingScrollbar className="call-ui__participant-list__container">
+        {isMobile && (
+          <div css={headerStyles}>
+            <button
+              type="button"
+              className="icon-button"
+              onClick={onClose}
+              title={t('videoCallOverlayParticipantsListCloseButton')}
+            >
+              <Icon.CloseIcon />
+            </button>
+          </div>
+        )}
         {handRaisedParticipants.length > 0 && (
           <>
             <p css={labelWithIconStyles}>

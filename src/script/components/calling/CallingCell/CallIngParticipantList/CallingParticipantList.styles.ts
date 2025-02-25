@@ -29,3 +29,26 @@ export const labelWithIconStyles: CSSObject = {
   display: 'flex',
   justifyContent: 'space-between',
 };
+
+export const participantListWrapperStyles = (isMobile: boolean): CSSObject => ({
+  position: isMobile ? 'absolute' : 'relative',
+  inset: isMobile ? 0 : 'auto',
+  width: isMobile ? '100%' : 'auto',
+  height: isMobile ? '100%' : 'auto',
+  zIndex: isMobile ? 2 : 'auto',
+  backgroundColor: 'var(--app-bg-secondary)',
+  border: isMobile ? '2px solid var(--accent-color)' : 'none',
+  borderRadius: isMobile ? 10 : 0,
+});
+
+export const headerStyles: CSSObject = {
+  display: 'flex',
+  justifyContent: 'flex-end',
+  alignItems: 'center',
+  padding: '12px 10px',
+  borderBottom: '1px solid var(--border-color)',
+  '& button': {
+    minWidth: 'auto',
+    minHeight: 'auto',
+  },
+};

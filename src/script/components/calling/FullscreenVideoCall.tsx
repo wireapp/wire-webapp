@@ -362,6 +362,19 @@ const FullscreenVideoCall = ({
               }}
             />
           )}
+
+          {isMobile && isParticipantsListOpen && (
+            <CallingParticipantList
+              handRaisedParticipants={handRaisedParticipants}
+              callingRepository={callingRepository}
+              conversation={conversation}
+              participants={participants}
+              isModerator={isModerator}
+              isSelfVerified={selfUser?.is_verified()}
+              showParticipants={true}
+              onClose={toggleParticipantsList}
+            />
+          )}
         </div>
 
         {isMobile && isPaginationVisible && (
@@ -421,7 +434,7 @@ const FullscreenVideoCall = ({
           </>
         )}
       </div>
-      {isParticipantsListOpen && (
+      {!isMobile && isParticipantsListOpen && (
         <CallingParticipantList
           handRaisedParticipants={handRaisedParticipants}
           callingRepository={callingRepository}
@@ -430,6 +443,7 @@ const FullscreenVideoCall = ({
           isModerator={isModerator}
           isSelfVerified={selfUser?.is_verified()}
           showParticipants={true}
+          onClose={toggleParticipantsList}
         />
       )}
       <ModalComponent

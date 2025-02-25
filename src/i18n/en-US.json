@@ -1675,6 +1675,7 @@
   "videoCallOverlayMicrophone": "Microphone",
   "videoCallOverlayOpenFullScreen": "Open the call in full screen",
   "videoCallOverlayOpenPopupWindow": "Open in a new window",
+  "videoCallOverlayParticipantsListCloseButton": "Hide participants",
   "videoCallOverlayParticipantsListLabel": "Participants ({count})",
   "videoCallOverlayParticipantsRaisedHandListLabel": "Raised hands ({count})",
   "videoCallOverlayShareScreen": "Share Screen",
