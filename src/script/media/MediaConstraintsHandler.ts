@@ -29,10 +29,15 @@ import {UserState} from '../user/UserState';
 interface Config {
   CONSTRAINTS: {
     SCREEN: {
-      DESKTOP_CAPTURER: MediaTrackConstraints & {
-        mandatory?: {chromeMediaSource: string; chromeMediaSourceId?: string; maxFrameRate?: number};
+      DESKTOP_CAPTURER_FULL: MediaTrackConstraints & {
+        mandatory: {chromeMediaSource: string; chromeMediaSourceId?: string; maxHeight?: number; minHeight?: number};
       };
+      DESKTOP_CAPTURER: MediaTrackConstraints & {
+        mandatory: {chromeMediaSource: string; chromeMediaSourceId?: string; maxHeight: number; minHeight: number};
+      };
+      DISPLAY_MEDIA_FULL: MediaTrackConstraints;
       DISPLAY_MEDIA: MediaTrackConstraints;
+      USER_MEDIA_FULL: MediaTrackConstraints & {mediaSource: string};
       USER_MEDIA: MediaTrackConstraints & {mediaSource: string};
     };
     VIDEO: Record<VIDEO_QUALITY_MODE, MediaTrackConstraints> & {PREFERRED_FACING_MODE: string};
@@ -54,17 +59,35 @@ export class MediaConstraintsHandler {
     return {
       CONSTRAINTS: {
         SCREEN: {
+          DESKTOP_CAPTURER_FULL: {
+            mandatory: {
+              chromeMediaSource: 'desktop',
+            },
+          },
           DESKTOP_CAPTURER: {
             mandatory: {
               chromeMediaSource: 'desktop',
-              maxFrameRate: 5,
+              maxHeight: 1080,
+              minHeight: 1080,
             },
+          },
+          DISPLAY_MEDIA_FULL: {
+            frameRate: 12,
           },
           DISPLAY_MEDIA: {
             frameRate: 5,
+            height: {
+              ideal: 1080,
+              max: 1080,
+            },
+          },
+          USER_MEDIA_FULL: {
+            frameRate: 12,
+            mediaSource: 'screen',
           },
           USER_MEDIA: {
             frameRate: 5,
+            height: {exact: 720},
             mediaSource: 'screen',
           },
         },
@@ -130,12 +153,14 @@ export class MediaConstraintsHandler {
     };
   }
 
-  getScreenStreamConstraints(method: ScreensharingMethods): MediaStreamConstraints | undefined {
+  getScreenStreamConstraints(method: ScreensharingMethods, isGroup: boolean): MediaStreamConstraints | undefined {
     switch (method) {
       case ScreensharingMethods.DESKTOP_CAPTURER:
-        this.logger.info(`Enabling screen sharing from desktopCapturer (with fULL resolution)`);
+        this.logger.info(`Enabling screen sharing from desktopCapturer (with fULL resolution: ${isGroup})`);
 
-        const desktopCapturer = MediaConstraintsHandler.CONFIG.CONSTRAINTS.SCREEN.DESKTOP_CAPTURER;
+        const desktopCapturer = isGroup
+          ? MediaConstraintsHandler.CONFIG.CONSTRAINTS.SCREEN.DESKTOP_CAPTURER
+          : MediaConstraintsHandler.CONFIG.CONSTRAINTS.SCREEN.DESKTOP_CAPTURER_FULL;
 
         const streamConstraints = {
           audio: false,
@@ -147,18 +172,22 @@ export class MediaConstraintsHandler {
 
         return streamConstraints;
       case ScreensharingMethods.DISPLAY_MEDIA:
-        this.logger.info(`Enabling screen sharing from getDisplayMedia (with fULL resolution)`);
+        this.logger.info(`Enabling screen sharing from getDisplayMedia (with fULL resolution: ${isGroup})`);
 
-        const display = MediaConstraintsHandler.CONFIG.CONSTRAINTS.SCREEN.DISPLAY_MEDIA;
+        const display = isGroup
+          ? MediaConstraintsHandler.CONFIG.CONSTRAINTS.SCREEN.DISPLAY_MEDIA
+          : MediaConstraintsHandler.CONFIG.CONSTRAINTS.SCREEN.DISPLAY_MEDIA_FULL;
 
         return {
           audio: false,
           video: display,
         };
       case ScreensharingMethods.USER_MEDIA:
-        this.logger.info(`Enabling screen sharing from getUserMedia (with fULL resolution)`);
+        this.logger.info(`Enabling screen sharing from getUserMedia (with fULL resolution: ${isGroup})`);
 
-        const userMedia = MediaConstraintsHandler.CONFIG.CONSTRAINTS.SCREEN.USER_MEDIA;
+        const userMedia = isGroup
+          ? MediaConstraintsHandler.CONFIG.CONSTRAINTS.SCREEN.USER_MEDIA
+          : MediaConstraintsHandler.CONFIG.CONSTRAINTS.SCREEN.USER_MEDIA_FULL;
 
         return {
           audio: false,

@@ -79,7 +79,7 @@ export class Participant {
         if (AvsDebugger.hasTrack(this.user.id)) {
           AvsDebugger.removeTrack(this.user.id);
         }
-        AvsDebugger.addTrack(this.user.id, this.user.name(), stream.getVideoTracks()[0], this.sharesScreen());
+        AvsDebugger.addTrack(this.user.id, this.user.name(), stream.getVideoTracks()[0]);
       }
     });
   }
