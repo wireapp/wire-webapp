@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import React, {useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
@@ -89,6 +89,8 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
     'isSwitchingVideoResolution',
   ]);
 
+  const [isZoomedIn, setIsZoomedIn] = useState(false);
+
   const {name} = useKoSubscribableChildren(participant?.user, ['name']);
 
   const sharesScreen = videoState === VIDEO_STATE.SCREENSHARE;
@@ -106,7 +108,23 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
     }
   };
 
+  const handleZoomClick = () => {
+    setIsZoomedIn(prev => !prev);
+  };
+
   const participantNameColor = getParticipantNameColor({isActivelySpeaking, isAudioEstablished});
+
+  const actionItem = !minimized && sharesScreen && (
+    <button
+      data-uie-name="item-grid"
+      data-user-id={participant?.user.id}
+      className="group-video-grid__element__action_icon"
+      onClick={handleZoomClick}
+    >
+      {!isZoomedIn && <Icon.ZoomInIcon data-uie-name="zoom-in-icon" />}
+      {isZoomedIn && <Icon.ZoomOutIcon data-uie-name="zoom-out-icon" />}
+    </button>
+  );
 
   const nameContainer = !minimized && (
     <div
@@ -161,7 +179,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
       tabIndex={isMaximized ? TabIndex.FOCUSABLE : TabIndex.UNFOCUSABLE}
     >
       {hasActiveVideo ? (
-        <div className="tile-wrapper">
+        <div className="tile-wrapper" css={{overflow: isZoomedIn ? 'auto' : 'unset', zIndex: isZoomedIn ? 1 : 'unset'}}>
           <Video
             autoPlay
             playsInline
@@ -175,6 +193,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
             css={{
               objectFit: isMaximized || sharesScreen ? 'contain' : 'cover',
               transform: participant === selfParticipant && sharesCamera ? 'rotateY(180deg)' : 'initial',
+              height: isZoomedIn ? 'unset' : '100%',
             }}
           />
         </div>
@@ -230,6 +249,8 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
           <span className="group-video-grid__element__overlay__label">{t('videoCallOverlayFitVideoLabel')}</span>
         </div>
       )}
+
+      {actionItem}
 
       {nameContainer}
 
