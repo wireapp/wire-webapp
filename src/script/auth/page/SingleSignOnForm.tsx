@@ -350,7 +350,7 @@ const SingleSignOnFormComponent = ({
           formNoValidate
           onClick={handleSubmit}
           aria-label={t('login.headline')}
-          data-uie-name="do-sign-in"
+          data-uie-name="do-sso-sign-in"
         >
           {t('login.headline')}
         </Button>
