@@ -539,8 +539,8 @@ export class TeamRepository extends TypedEventEmitter<Events> {
 
     const teamSupportedProtocols = mlsFeature.config.supportedProtocols;
 
-    if (this.hasPersistedSupportedProtocols) {
-      return [...teamSupportedProtocols, ConversationProtocol.MLS];
+    if (this.hasPersistedSupportedProtocols && teamSupportedProtocols?.length > 0) {
+      return [...new Set([...teamSupportedProtocols, ConversationProtocol.MLS])];
     }
 
     // For old teams (created on some older backend versions) supportedProtocols field might not exist or be empty,
