@@ -22,7 +22,6 @@ import React, {useLayoutEffect, useRef, useEffect} from 'react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
 
-import {InViewport} from 'Components/InViewport';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getAllFocusableElements, setElementsTabIndex} from 'Util/focusUtil';
@@ -56,6 +55,8 @@ export interface MessageActions {
 }
 
 export interface MessageParams extends MessageActions {
+  measureElement: any;
+  dataIndex: any;
   conversation: Conversation;
   hasReadReceiptsTurnedOn: boolean;
   isLastDeliveredMessage: boolean;
@@ -68,7 +69,6 @@ export interface MessageParams extends MessageActions {
     deleteMessageEveryone: (conversation: Conversation, message: BaseMessage) => void;
   };
   messageRepository: MessageRepository;
-  onVisible?: () => void;
   onVisibilityLost?: () => void;
   selfId: QualifiedId;
   shouldShowInvitePeople: boolean;
@@ -85,10 +85,11 @@ export interface MessageParams extends MessageActions {
 
 export const Message = (props: MessageParams & {scrollTo?: ScrollToElement}) => {
   const {
+    measureElement,
     message,
     isHighlighted,
     hideHeader,
-    onVisible,
+    dataIndex,
     onVisibilityLost,
     scrollTo,
     isFocused,
@@ -165,7 +166,15 @@ export const Message = (props: MessageParams & {scrollTo?: ScrollToElement}) => 
         'content-message': message.isContent(),
         'system-message': !message.isContent(),
       })}
-      ref={messageElementRef}
+      ref={element => {
+        if (!element) {
+          return;
+        }
+
+        messageElementRef.current = element;
+        measureElement(element);
+      }}
+      data-index={dataIndex}
       data-uie-uid={message.id}
       data-uie-value={message.super_type}
       data-uie-expired-status={ephemeral_expires}
@@ -176,19 +185,7 @@ export const Message = (props: MessageParams & {scrollTo?: ScrollToElement}) => 
       onKeyDown={handleDivKeyDown}
       onClick={() => handleFocus(message.id)}
     >
-      {onVisible ? (
-        <InViewport
-          requireFullyInView
-          allowBiggerThanViewport
-          checkOverlay
-          onVisible={onVisible}
-          onVisibilityLost={onVisibilityLost}
-        >
-          {messageContent}
-        </InViewport>
-      ) : (
-        messageContent
-      )}
+      {messageContent}
     </div>
   );
 };
