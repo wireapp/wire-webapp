@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [27.19.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.19.1...@wireapp/api-client@27.19.2) (2025-02-26)
+
+### Bug Fixes
+
+* update DomainRedirectPayload type ([#6961](https://github.com/wireapp/wire-web-packages/issues/6961)) ([7b22faa](https://github.com/wireapp/wire-web-packages/commit/7b22faa334c579526f06b9c8e4f9596ce0c31d7b))
+
 ## [27.19.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.19.0...@wireapp/api-client@27.19.1) (2025-02-24)
 
 **Note:** Version bump only for package @wireapp/api-client
