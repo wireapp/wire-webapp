@@ -45,10 +45,8 @@ export type DomainRedirectPayload =
   | {
       domain_redirect: DomainRedirect.SSO;
       sso_code: string;
-      due_to_existing_account: boolean;
     }
   | {
       domain_redirect: DomainRedirect.BACKEND;
       backend_url: string;
-      due_to_existing_account: boolean;
     };
