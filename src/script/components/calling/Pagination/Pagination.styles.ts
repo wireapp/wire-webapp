@@ -19,13 +19,13 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const paginationWrapperStyles: CSSObject = {
+export const paginationContainerStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
   gap: '4px',
 };
 
-export const paginationItemsStyles: CSSObject = {
+export const paginationDotsContainerStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -34,7 +34,7 @@ export const paginationItemsStyles: CSSObject = {
   borderRadius: 12,
 };
 
-export const paginationItemWrapperStyles = (isSmaller: boolean): CSSObject => {
+export const dotWrapperStyles = (isSmaller: boolean): CSSObject => {
   return {
     display: 'flex',
     justifyContent: 'center',
@@ -48,15 +48,15 @@ export const paginationItemWrapperStyles = (isSmaller: boolean): CSSObject => {
   };
 };
 
-export const paginationItemStyles = (isCurrentPage: boolean, isSmaller: boolean): CSSObject => {
+export const dotStyles = (isActive: boolean, isSmaller: boolean): CSSObject => {
   return {
     borderRadius: '50%',
     '&:active': {
-      backgroundColor: isCurrentPage ? 'var(--accent-color)' : 'var(--toggle-button-unselected-bg)',
+      backgroundColor: isActive ? 'var(--accent-color)' : 'var(--toggle-button-unselected-bg)',
       border: '1px solid var(--accent-color)',
     },
-    backgroundColor: isCurrentPage ? 'var(--accent-color)' : 'transparent',
-    border: isCurrentPage ? 'solid 1px var(--accent-color)' : 'solid 1px var(--foreground)',
+    backgroundColor: isActive ? 'var(--accent-color)' : 'transparent',
+    border: isActive ? 'solid 1px var(--accent-color)' : 'solid 1px var(--foreground)',
     width: isSmaller ? '8px' : '12px',
     height: isSmaller ? '8px' : '12px',
   };
