@@ -17,21 +17,26 @@
  *
  */
 
-const SUPPORTED_URL_PROTOCOLS = new Set(['http:', 'https:', 'mailto:', 'sms:', 'tel:']);
+import {CSSObject} from '@emotion/react';
 
-export const URL_REGEX =
-  /https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z]{2,6}(?:[-a-zA-Z0-9()@:%_+.~#?&//=,]*)/;
-
-export const sanitizeUrl = (url: string): string => {
-  try {
-    const parsedUrl = new URL(url);
-    if (!SUPPORTED_URL_PROTOCOLS.has(parsedUrl.protocol)) {
-      return '';
-    }
-  } catch {
-    return url.startsWith('http') ? url : `https://${url}`;
-  }
-  return url;
+export const headerCss: CSSObject = {
+  whiteSpace: 'break-spaces',
+  fontWeight: 500,
+  marginTop: '10px',
+  textAlign: 'center',
 };
 
-export const validateUrl = (url: string): boolean => url === 'https://' || URL_REGEX.test(url);
+export const containerCss: CSSObject = {
+  maxWidth: '360px',
+};
+
+export const buttonCss: CSSObject = {
+  marginBottom: '0px',
+  marginTop: '1rem',
+};
+
+export const linkCss: CSSObject = {
+  textDecoration: 'underline',
+  textTransform: 'none',
+  fontSize: 'var(--font-size-base)',
+};

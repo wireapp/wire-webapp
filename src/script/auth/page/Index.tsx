@@ -43,6 +43,7 @@ import {actionRoot} from '../module/action';
 import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {QUERY_KEY, ROUTE} from '../route';
+import {getEnterpriseLoginV2FF} from '../util/helpers';
 import {logoutReasonStrings} from '../util/logoutUtil';
 import {getPrefixedSSOCode} from '../util/urlUtil';
 
@@ -53,6 +54,8 @@ const IndexComponent = ({defaultSSOCode, doInit}: Props & ConnectedProps & Dispa
   const {hasOtherInstance} = useSingleInstance();
   const core = container.resolve(Core);
   const [logoutReason, setLogoutReason] = useState<string>();
+
+  const isEnterpriseLoginV2Enabled = getEnterpriseLoginV2FF();
 
   useEffect(() => {
     const queryLogoutReason = UrlUtil.getURLParameter(QUERY_KEY.LOGOUT_REASON) || null;
@@ -75,8 +78,9 @@ const IndexComponent = ({defaultSSOCode, doInit}: Props & ConnectedProps & Dispa
     }
   }, [immediateLogin]);
 
-  if (defaultSSOCode) {
+  if (defaultSSOCode || isEnterpriseLoginV2Enabled) {
     // Redirect to prefilled SSO login if default SSO code is set on backend
+    // or if enterprise login v2 is enabled
     return <Navigate to={`${ROUTE.SSO}/${getPrefixedSSOCode(defaultSSOCode)}`} />;
   }
 

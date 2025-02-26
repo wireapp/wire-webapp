@@ -17,21 +17,38 @@
  *
  */
 
-const SUPPORTED_URL_PROTOCOLS = new Set(['http:', 'https:', 'mailto:', 'sms:', 'tel:']);
+import {CSSObject} from '@emotion/react';
 
-export const URL_REGEX =
-  /https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z]{2,6}(?:[-a-zA-Z0-9()@:%_+.~#?&//=,]*)/;
+import {COLOR_V2, media} from '@wireapp/react-ui-kit';
 
-export const sanitizeUrl = (url: string): string => {
-  try {
-    const parsedUrl = new URL(url);
-    if (!SUPPORTED_URL_PROTOCOLS.has(parsedUrl.protocol)) {
-      return '';
-    }
-  } catch {
-    return url.startsWith('http') ? url : `https://${url}`;
-  }
-  return url;
+export const leftSectionCss: CSSObject = {
+  background: 'black',
+  margin: 0,
+  height: '100vh',
+  maxWidth: '26rem',
+  padding: '6rem 3.75rem',
+  position: 'relative',
+  minHeight: '42rem',
+  [media.tabletDown]: {
+    display: 'none',
+  },
 };
 
-export const validateUrl = (url: string): boolean => url === 'https://' || URL_REGEX.test(url);
+export const contentContainerCss: CSSObject = {
+  maxHeight: '100vh',
+  overflowY: 'auto',
+  width: '100%',
+  alignSelf: 'center',
+};
+
+export const whiteFontCss: CSSObject = {
+  color: 'white',
+};
+
+export const bodyCss: CSSObject = {
+  flex: 'auto',
+  flexDirection: 'row',
+  background: COLOR_V2.WHITE,
+  height: '100%',
+  minHeight: '100vh',
+};

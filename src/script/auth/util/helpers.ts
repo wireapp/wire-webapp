@@ -17,21 +17,15 @@
  *
  */
 
-const SUPPORTED_URL_PROTOCOLS = new Set(['http:', 'https:', 'mailto:', 'sms:', 'tel:']);
+import {container} from 'tsyringe';
 
-export const URL_REGEX =
-  /https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z]{2,6}(?:[-a-zA-Z0-9()@:%_+.~#?&//=,]*)/;
+import {Config} from 'src/script/Config';
+import {Core} from 'src/script/service/CoreSingleton';
 
-export const sanitizeUrl = (url: string): string => {
-  try {
-    const parsedUrl = new URL(url);
-    if (!SUPPORTED_URL_PROTOCOLS.has(parsedUrl.protocol)) {
-      return '';
-    }
-  } catch {
-    return url.startsWith('http') ? url : `https://${url}`;
-  }
-  return url;
-};
-
-export const validateUrl = (url: string): boolean => url === 'https://' || URL_REGEX.test(url);
+export function getEnterpriseLoginV2FF() {
+  const core = container.resolve(Core);
+  return (
+    Config.getConfig().FEATURE.ENABLE_ENTERPRISE_LOGIN_V2 &&
+    core.backendFeatures.version >= Config.getConfig().MIN_ENTERPRISE_LOGIN_V2_SUPPORTED_API_VERSION
+  );
+}
