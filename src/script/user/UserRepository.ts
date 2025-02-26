@@ -781,19 +781,17 @@ export class UserRepository extends TypedEventEmitter<Events> {
     const localUser = this.findUserById(userId);
     const localSupportedProtocols = localUser?.supportedProtocols();
 
-    if (!localUser) {
-      return [];
-    }
-
     const returnSupportProtocols = (supportedProtocols: ConversationProtocol[]): ConversationProtocol[] => {
       if (supportedProtocols.includes(ConversationProtocol.MLS)) {
         // We need to persist the MLS status after the first time a user has the MLS protocol added
-        localUser.updateMLSStatus();
+        localUser?.updateMLSStatus();
       }
-      if (localUser.getMLSStatus() === true) {
+
+      if (localUser?.getMLSStatus()) {
         // If the user has MLS enabled, we need to add it to the supported protocols, removing duplicates
         return [...new Set([...supportedProtocols, ConversationProtocol.MLS])];
       }
+
       return supportedProtocols;
     };
 

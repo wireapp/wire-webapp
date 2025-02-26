@@ -37,6 +37,8 @@ import {ACCENT_ID} from '../../Config';
 import {ConnectionEntity} from '../../connection/ConnectionEntity';
 import {ROLE as TEAM_ROLE} from '../../user/UserPermission';
 
+export const HAS_BEEN_INITIALIZED_FOR_MLS = 'HAS_BEEN_INITIALIZED_FOR_MLS';
+
 export class User {
   private expirationIntervalId?: number;
   private expirationTimeoutId?: number;
@@ -103,7 +105,7 @@ export class User {
   public domain: string;
   public readonly isBlockedLegalHold: ko.PureComputed<boolean>;
   public readonly supportedProtocols: ko.Observable<null | ConversationProtocol[]>;
-  private hasBeenInitializedForMLS: boolean = false;
+  private hasBeenInitializedForMLS: boolean = localStorage.getItem(HAS_BEEN_INITIALIZED_FOR_MLS) === 'true';
 
   static get ACCENT_COLOR() {
     return {
@@ -254,7 +256,7 @@ export class User {
 
   updateMLSStatus() {
     if (!this.hasBeenInitializedForMLS) {
-      this.hasBeenInitializedForMLS = true;
+      localStorage.setItem(HAS_BEEN_INITIALIZED_FOR_MLS, 'true');
     }
   }
 
