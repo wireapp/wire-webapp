@@ -1747,7 +1747,7 @@
   "redirectConnect": "Connect",
   "redirectCancel": "Cancel",
   "accountAlreadyExistsModal.header": "Email already in use",
-  "accountAlreadyExistsModal.content": "You can't log in with this email on the on-premises backend {backendName}.\nPlease change your email in the account settings or delete your account. Then, you can use this email again for your on-premises account.",
+  "accountAlreadyExistsModal.content": "This email's domain belongs to a Wire Enterprise Instance, but the email address is associated with a Wire Cloud account. To proceed with the Enterprise instance login, please update your email address to another domain, or delete your account. If the account is part of a team, please reach out to the Team Administrator.",
   "accountAlreadyExistsModal.changeEmailLink": "Change your email address",
   "accountAlreadyExistsModal.deletePersonalAccount": "Delete personal account",
   "accountAlreadyExistsModal.removeTeamMember": "remove team member"

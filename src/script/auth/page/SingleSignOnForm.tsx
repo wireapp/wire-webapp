@@ -35,7 +35,6 @@ import {t} from 'Util/LocalizerUtil';
 import {isBackendError} from 'Util/TypePredicateUtil';
 
 import {Config} from '../../Config';
-import {AccountAlreadyExistsModal} from '../component/AccountAlreadyExistsModal';
 import {JoinGuestLinkPasswordModal} from '../component/JoinGuestLinkPasswordModal';
 import {useEnterpriseLoginV2} from '../hooks/useEnterpriseLoginV2';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
@@ -109,7 +108,7 @@ const SingleSignOnFormComponent = ({
     navigate(ROUTE.HISTORY_INFO);
   };
 
-  const {backendName, hideAccountAlreadyExistsModal, isAccountAlreadyExistsModalOpen, loginV2} = useEnterpriseLoginV2({
+  const {loginV2} = useEnterpriseLoginV2({
     codeOrMail,
     loginWithSSO,
   });
@@ -319,9 +318,6 @@ const SingleSignOnFormComponent = ({
           isLoading={isFetching || conversationInfoFetching}
           onSubmitPassword={submitJoinCodeWithPassword}
         />
-      )}
-      {isAccountAlreadyExistsModalOpen && (
-        <AccountAlreadyExistsModal backendName={backendName} onClose={hideAccountAlreadyExistsModal} />
       )}
       <Form style={{marginTop: 30}} data-uie-name="sso" onSubmit={handleSubmit}>
         {!isValidLink && <Navigate to={ROUTE.CONVERSATION_JOIN_INVALID} replace />}
