@@ -333,9 +333,9 @@ declare module 'I18n/en-US.json' {
     'callNoOneJoined': `no other participant joined.`;
     'callParticipants': `{number} on call`;
     'callReactionButtonAriaLabel': `Select emoji {emoji}`;
-    'callReactionButtonsAriaLabel': `Emoji selection bar`;
-    'callReactionEmojiPickerAriaLabel': `Emoji picker`;
-    'callReactionEmojiPickerButtonAriaLabel': `Open emoji picker`;
+    'callReactionButtonsAriaLabel': `Reactions`;
+    'callReactionEmojiPickerAriaLabel': `Emoji collection`;
+    'callReactionEmojiPickerButtonAriaLabel': `View all reactions`;
     'callReactions': `Reactions`;
     'callReactionsAriaLabel': `Emoji {emoji} from {from}`;
     'callStateCbr': `Constant Bit Rate`;
@@ -1680,6 +1680,7 @@ declare module 'I18n/en-US.json' {
     'videoCallOverlayMicrophone': `Microphone`;
     'videoCallOverlayOpenFullScreen': `Open the call in full screen`;
     'videoCallOverlayOpenPopupWindow': `Open in a new window`;
+    'videoCallOverlayParticipantsListCloseButton': `Hide participants`;
     'videoCallOverlayParticipantsListLabel': `Participants ({count})`;
     'videoCallOverlayParticipantsRaisedHandListLabel': `Raised hands ({count})`;
     'videoCallOverlayShareScreen': `Share Screen`;
