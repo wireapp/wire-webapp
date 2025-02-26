@@ -69,6 +69,12 @@ module.exports = {
   module: {
     rules: [
       {
+        exclude: /node_modules/,
+        include: srcScript,
+        loader: 'babel-loader',
+        test: /\.[tj]sx?$/,
+      },
+      {
         loader: 'svg-inline-loader',
         options: {
           removeSVGTagAttrs: false,

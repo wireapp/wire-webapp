@@ -22,9 +22,10 @@ import {container} from 'tsyringe';
 import {APIClient} from '../service/APIClientSingleton';
 
 export class CellsRepository {
+  private readonly basePath = 'wire-cells-web';
   constructor(private readonly apiClient = container.resolve(APIClient)) {}
 
   async uploadFile(file: File): Promise<void> {
-    // await this.apiClient.api.cells.uploadFile({filePath: 'test', file, autoRename: true});
+    await this.apiClient.api.cells.uploadFileDraft({filePath: `${this.basePath}/${file.name}`, file});
   }
 }
