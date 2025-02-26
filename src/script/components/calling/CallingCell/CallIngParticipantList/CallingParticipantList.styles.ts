@@ -19,6 +19,8 @@
 
 import {CSSObject} from '@emotion/react';
 
+import {media} from '@wireapp/react-ui-kit';
+
 export const labelStyles: CSSObject = {
   padding: '12px 10px',
   fontWeight: 'var(--font-weight-semibold)',
@@ -30,23 +32,28 @@ export const labelWithIconStyles: CSSObject = {
   justifyContent: 'space-between',
 };
 
-export const participantListWrapperStyles = (isMobile: boolean): CSSObject => ({
-  position: isMobile ? 'absolute' : 'relative',
-  inset: isMobile ? 0 : 'auto',
-  width: isMobile ? '100%' : 'auto',
-  height: isMobile ? '100%' : 'auto',
-  zIndex: isMobile ? 2 : 'auto',
-  backgroundColor: 'var(--app-bg-secondary)',
-  border: isMobile ? '2px solid var(--accent-color)' : 'none',
-  borderRadius: isMobile ? 10 : 0,
-});
+export const participantListWrapperStyles: CSSObject = {
+  [media.mobile]: {
+    position: 'absolute',
+    inset: 0,
+    width: '100%',
+    height: '100%',
+    zIndex: 2,
+    backgroundColor: 'var(--app-bg-secondary)',
+    border: '2px solid var(--accent-color)',
+    borderRadius: 10,
+  },
+};
 
 export const headerStyles: CSSObject = {
-  display: 'flex',
-  justifyContent: 'flex-end',
-  alignItems: 'center',
-  padding: '12px 10px',
-  borderBottom: '1px solid var(--border-color)',
+  display: 'none',
+  [media.mobile]: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    padding: '12px 10px',
+    borderBottom: '1px solid var(--border-color)',
+  },
   '& button': {
     minWidth: 'auto',
     minHeight: 'auto',

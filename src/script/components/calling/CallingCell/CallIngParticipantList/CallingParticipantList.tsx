@@ -21,12 +21,11 @@ import React, {useMemo} from 'react';
 
 import cx from 'classnames';
 
-import {QUERY, Tooltip} from '@wireapp/react-ui-kit';
+import {Tooltip} from '@wireapp/react-ui-kit';
 
 import {CallParticipantsListItem} from 'Components/calling/CallParticipantsListItem';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import * as Icon from 'Components/Icon';
-import {useActiveWindowMatchMedia} from 'Hooks/useActiveWindowMatchMedia';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
@@ -96,28 +95,24 @@ export const CallingParticipantList = ({
       .sort((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user));
   }, [participants]);
 
-  const isMobile = useActiveWindowMatchMedia(QUERY.mobile);
-
   return (
     <div
       className={cx('call-ui__participant-list__wrapper', {
         'call-ui__participant-list__wrapper--active': showParticipants,
       })}
-      css={participantListWrapperStyles(isMobile)}
+      css={participantListWrapperStyles}
     >
       <FadingScrollbar className="call-ui__participant-list__container">
-        {isMobile && (
-          <div css={headerStyles}>
-            <button
-              type="button"
-              className="icon-button"
-              onClick={onClose}
-              title={t('videoCallOverlayParticipantsListCloseButton')}
-            >
-              <Icon.CloseIcon />
-            </button>
-          </div>
-        )}
+        <div css={headerStyles}>
+          <button
+            type="button"
+            className="icon-button"
+            onClick={onClose}
+            title={t('videoCallOverlayParticipantsListCloseButton')}
+          >
+            <Icon.CloseIcon />
+          </button>
+        </div>
         {handRaisedParticipants.length > 0 && (
           <>
             <p css={labelWithIconStyles}>
