@@ -71,11 +71,14 @@ function parseCommaSeparatedList(list: string = ''): string[] {
 function mergedCSP({urls}: ConfigGeneratorParams, env: Record<string, string>): Record<string, Iterable<string>> {
   const objectSrc = parseCommaSeparatedList(env.CSP_EXTRA_OBJECT_SRC);
   const csp = {
-    connectSrc:
-      env.FEATURE_ENABLE_DEBUG === 'true'
-        ? // Allow all connections in debug mode
-          ['*']
-        : [...defaultCSP.connectSrc, urls.api, urls.ws, ...parseCommaSeparatedList(env.CSP_EXTRA_CONNECT_SRC)],
+    connectSrc: [
+      ...defaultCSP.connectSrc,
+      urls.api,
+      urls.ws,
+      ...parseCommaSeparatedList(env.CSP_EXTRA_CONNECT_SRC),
+      // Allow all other connections in debug mode
+      env.FEATURE_ENABLE_DEBUG == 'true' ? '*' : '',
+    ].filter(Boolean),
     defaultSrc: [...defaultCSP.defaultSrc, ...parseCommaSeparatedList(env.CSP_EXTRA_DEFAULT_SRC)],
     fontSrc: [...defaultCSP.fontSrc, ...parseCommaSeparatedList(env.CSP_EXTRA_FONT_SRC)],
     frameSrc: [...defaultCSP.frameSrc, ...parseCommaSeparatedList(env.CSP_EXTRA_FRAME_SRC)],
