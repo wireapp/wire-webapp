@@ -255,7 +255,7 @@ export class User {
   }
 
   updateMLSStatus() {
-    if (!this.hasBeenInitializedForMLS) {
+    if (!this.hasBeenInitializedForMLS && this.supportedProtocols()?.includes(ConversationProtocol.MLS)) {
       localStorage.setItem(HAS_BEEN_INITIALIZED_FOR_MLS, 'true');
     }
   }
