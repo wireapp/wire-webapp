@@ -678,6 +678,32 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
 
         {isDesktop && (
           <>
+            {isInCallHandRaiseControlVisible && (
+              <li className="video-controls__item">
+                <button
+                  data-uie-value={isSelfHandRaised ? 'active' : 'inactive'}
+                  onClick={() => toggleIsHandRaised(isSelfHandRaised)}
+                  onKeyDown={event =>
+                    handleKeyDown({
+                      event,
+                      callback: () => toggleIsHandRaised(isSelfHandRaised),
+                      keys: [KEY.ENTER, KEY.SPACE],
+                    })
+                  }
+                  className={classNames('video-controls__button_primary', {active: isSelfHandRaised})}
+                  type="button"
+                  data-uie-name="do-toggle-hand-raise"
+                  role="switch"
+                  aria-checked={isSelfHandRaised}
+                  title={
+                    isSelfHandRaised ? t('videoCallParticipantLowerYourHand') : t('videoCallParticipantRaiseYourHand')
+                  }
+                >
+                  <RaiseHandIcon width={16} height={16} />
+                </button>
+              </li>
+            )}
+
             {participants.length > 2 && (
               <li className="video-controls__item">
                 <button
@@ -720,32 +746,6 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
                     />
                   )}
                   <GridIcon width={16} height={16} />
-                </button>
-              </li>
-            )}
-
-            {isInCallHandRaiseControlVisible && (
-              <li className="video-controls__item">
-                <button
-                  data-uie-value={isSelfHandRaised ? 'active' : 'inactive'}
-                  onClick={() => toggleIsHandRaised(isSelfHandRaised)}
-                  onKeyDown={event =>
-                    handleKeyDown({
-                      event,
-                      callback: () => toggleIsHandRaised(isSelfHandRaised),
-                      keys: [KEY.ENTER, KEY.SPACE],
-                    })
-                  }
-                  className={classNames('video-controls__button_primary', {active: isSelfHandRaised})}
-                  type="button"
-                  data-uie-name="do-toggle-hand-raise"
-                  role="switch"
-                  aria-checked={isSelfHandRaised}
-                  title={
-                    isSelfHandRaised ? t('videoCallParticipantLowerYourHand') : t('videoCallParticipantRaiseYourHand')
-                  }
-                >
-                  <RaiseHandIcon width={16} height={16} />
                 </button>
               </li>
             )}
