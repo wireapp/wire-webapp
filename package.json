@@ -64,7 +64,7 @@
     "tsyringe": "4.8.0",
     "underscore": "1.13.7",
     "use-debounce": "^10.0.4",
-    "uuid": "11.0.5",
+    "uuid": "11.1.0",
     "webgl-utils.js": "1.1.0",
     "webrtc-adapter": "9.0.1",
     "zustand": "4.5.5"
