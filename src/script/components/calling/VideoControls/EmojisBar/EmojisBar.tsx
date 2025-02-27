@@ -26,13 +26,17 @@ import {t} from 'Util/LocalizerUtil';
 
 import {styles} from './EmojisBar.styles';
 
-const DEFAULT_EMOJI_LIST = ['👍', '🎉', '❤️', '😂', '😮', '👏', '🤔', '😢'];
-
 export interface EmojisBarProps {
   onEmojiClick: (emoji: string) => void;
   onPickerEmojiClick: () => void;
   targetWindow: Window;
 }
+
+const DEFAULT_EMOJI_LIST = ['👍', '🎉', '❤️', '😂', '😮', '👏', '🤔', '😢'];
+
+type EmojiPickerLocalStorageItem = {unified: string; original: string; count: number}[];
+
+const EMOJI_PICKER_LOCAL_STORAGE_KEY = 'epr_suggested';
 
 export const EmojisBar = ({onEmojiClick, onPickerEmojiClick, targetWindow}: EmojisBarProps) => {
   const emojisBarRef = useRef<HTMLDivElement>(null);
@@ -68,8 +72,8 @@ export const EmojisBar = ({onEmojiClick, onPickerEmojiClick, targetWindow}: Emoj
     };
   }, [targetWindow, onPickerEmojiClick]);
 
-  const recentEmojis: {unified: string; original: string; count: number}[] = JSON.parse(
-    localStorage.getItem('epr_suggested') ?? '[]',
+  const recentEmojis: EmojiPickerLocalStorageItem = JSON.parse(
+    localStorage.getItem(EMOJI_PICKER_LOCAL_STORAGE_KEY) ?? '[]',
   );
 
   const recentTopEmojis = recentEmojis
