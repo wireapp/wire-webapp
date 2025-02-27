@@ -26,7 +26,7 @@ import {t} from 'Util/LocalizerUtil';
 
 import {styles} from './EmojisBar.styles';
 
-const EMOJIS_LIST = ['👍', '🎉', '❤️', '😂', '😮', '👏', '🤔', '😢'];
+const DEFAULT_EMOJI_LIST = ['👍', '🎉', '❤️', '😂', '😮', '👏', '🤔', '😢'];
 
 export interface EmojisBarProps {
   onEmojiClick: (emoji: string) => void;
@@ -68,6 +68,16 @@ export const EmojisBar = ({onEmojiClick, onPickerEmojiClick, targetWindow}: Emoj
     };
   }, [targetWindow, onPickerEmojiClick]);
 
+  const recentEmojis: {unified: string; original: string; count: number}[] = JSON.parse(
+    localStorage.getItem('epr_suggested') ?? '[]',
+  );
+
+  const recentTopEmojis = recentEmojis
+    .sort((emojiA, emojiB) => emojiB.count - emojiA.count)
+    .map(emoji => String.fromCodePoint(parseInt(emoji.unified, 16)))
+    .concat(DEFAULT_EMOJI_LIST)
+    .slice(0, 8);
+
   return (
     <div ref={emojisBarRef}>
       {showEmojiPicker ? (
@@ -86,7 +96,7 @@ export const EmojisBar = ({onEmojiClick, onPickerEmojiClick, targetWindow}: Emoj
           aria-label={t('callReactionButtonsAriaLabel')}
           css={styles.emojisBar}
         >
-          {EMOJIS_LIST.map(emoji => {
+          {recentTopEmojis.map(emoji => {
             const isDisabled = disabledEmojis.includes(emoji);
             return (
               <button
