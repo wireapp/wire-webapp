@@ -17,7 +17,7 @@
  *
  */
 
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 
 import {CSSObject} from '@emotion/react';
 
@@ -35,47 +35,38 @@ export interface PaginationProps {
 const DEFAULT_VISIBLE_DOTS = 5;
 
 const Pagination = ({totalPages, currentPage, onChangePage, className}: PaginationProps) => {
-  const [currentStart, setCurrentStart] = useState(0);
   const visibleDots = Math.min(DEFAULT_VISIBLE_DOTS, totalPages);
 
-  const calculateNewStart = (page: number): number =>
-    Math.min(Math.max(0, page - Math.floor(visibleDots / 2)), Math.max(0, totalPages - visibleDots));
+  const calculateStartPosition = (page: number) => {
+    return Math.min(Math.max(0, page - Math.floor(visibleDots / 2)), Math.max(0, totalPages - visibleDots));
+  };
 
-  const isPageOutOfVisibleRange = (page: number): boolean => page < currentStart || page >= currentStart + visibleDots;
+  const [currentStart, setCurrentStart] = useState(() => calculateStartPosition(currentPage));
+
+  useEffect(() => {
+    setCurrentStart(calculateStartPosition(currentPage));
+  }, [currentPage, totalPages, visibleDots]);
+
+  const isFirstPage = currentPage === 0;
+  const isLastPage = currentPage === totalPages - 1;
 
   const handlePageChange = (newPage: number) => {
     if (newPage === currentPage) {
       return;
     }
-
-    if (isPageOutOfVisibleRange(newPage)) {
-      setCurrentStart(calculateNewStart(newPage));
-    }
     onChangePage(newPage);
   };
 
   const handlePreviousPage = () => {
-    if (currentPage === 0) {
-      return;
+    if (!isFirstPage) {
+      handlePageChange(currentPage - 1);
     }
-
-    const previousPage = currentPage - 1;
-    if (previousPage === currentStart && previousPage !== 0) {
-      setCurrentStart(current => current - 1);
-    }
-    onChangePage(previousPage);
   };
 
   const handleNextPage = () => {
-    if (currentPage === totalPages - 1) {
-      return;
+    if (!isLastPage) {
+      handlePageChange(currentPage + 1);
     }
-
-    const nextPage = currentPage + 1;
-    if (nextPage === currentStart + visibleDots - 1 && nextPage !== totalPages - 1) {
-      setCurrentStart(current => current + 1);
-    }
-    onChangePage(nextPage);
   };
 
   const visibleRange = Array.from({length: visibleDots}, (_, index) => currentStart + index);
@@ -84,22 +75,22 @@ const Pagination = ({totalPages, currentPage, onChangePage, className}: Paginati
     <div id="video-pagination" css={[paginationContainerStyles, className]}>
       <PaginationArrow
         onClick={handlePreviousPage}
-        disabled={currentPage === 0}
+        disabled={isFirstPage}
         direction="left"
         data-uie-name="pagination-previous"
       />
 
       <div css={paginationDotsContainerStyles} data-uie-name="pagination-wrapper">
         {visibleRange.map((page, index) => {
-          const isFirstOrLastInTheRange = index === 0 || index === visibleRange.length - 1;
-          const isSmaller = isFirstOrLastInTheRange && !(page === 0 || page === totalPages - 1);
+          const isFirstOrLastInRange = index === 0 || index === visibleDots - 1;
+          const isEndpoint = page === 0 || page === totalPages - 1;
 
           return (
             <PaginationDot
               key={page}
               page={page}
-              isCurrentPage={currentPage === page}
-              isSmaller={isSmaller}
+              isCurrentPage={page === currentPage}
+              isSmaller={isFirstOrLastInRange && !isEndpoint}
               onClick={handlePageChange}
             />
           );
@@ -108,7 +99,7 @@ const Pagination = ({totalPages, currentPage, onChangePage, className}: Paginati
 
       <PaginationArrow
         onClick={handleNextPage}
-        disabled={currentPage === totalPages - 1}
+        disabled={isLastPage}
         direction="right"
         data-uie-name="pagination-next"
       />
