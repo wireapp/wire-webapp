@@ -34,7 +34,7 @@ export const paginationDotsContainerStyles: CSSObject = {
   borderRadius: 12,
 };
 
-export const dotWrapperStyles = (isSmaller: boolean): CSSObject => {
+export const dotButtonStyles = (isSmaller: boolean): CSSObject => {
   return {
     display: 'flex',
     justifyContent: 'center',

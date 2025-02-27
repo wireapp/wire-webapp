@@ -20,6 +20,7 @@
 import {ChevronIcon, IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
 
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
 
 import {chevronLeftStyles, chevronRightStyles, iconButtonStyles} from './Pagination.styles';
 
@@ -30,7 +31,9 @@ interface PaginationArrowProps {
   'data-uie-name': string;
 }
 
-export function PaginationArrow({onClick, disabled, direction, 'data-uie-name': uieName}: PaginationArrowProps) {
+export const PaginationArrow = ({onClick, disabled, direction, 'data-uie-name': uieName}: PaginationArrowProps) => {
+  const ariaLabel = direction === 'left' ? t('paginationLeftArrowAriaLabel') : t('paginationRightArrowAriaLabel');
+
   return (
     <IconButton
       variant={IconButtonVariant.SECONDARY}
@@ -46,8 +49,9 @@ export function PaginationArrow({onClick, disabled, direction, 'data-uie-name': 
       disabled={disabled}
       data-uie-name={uieName}
       type="button"
+      aria-label={ariaLabel}
     >
-      <ChevronIcon css={direction === 'left' ? chevronLeftStyles : chevronRightStyles} />
+      <ChevronIcon css={direction === 'left' ? chevronLeftStyles : chevronRightStyles} aria-hidden="true" />
     </IconButton>
   );
-}
+};

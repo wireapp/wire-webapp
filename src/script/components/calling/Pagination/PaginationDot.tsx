@@ -18,8 +18,9 @@
  */
 
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
 
-import {dotStyles, dotWrapperStyles} from './Pagination.styles';
+import {dotStyles, dotButtonStyles} from './Pagination.styles';
 
 interface PaginationDotProps {
   page: number;
@@ -28,11 +29,11 @@ interface PaginationDotProps {
   onClick: (page: number) => void;
 }
 
-export function PaginationDot({page, isCurrentPage, isSmaller, onClick}: PaginationDotProps) {
+export const PaginationDot = ({page, isCurrentPage, isSmaller, onClick}: PaginationDotProps) => {
   return (
-    <div
-      key={page}
-      css={dotWrapperStyles(isSmaller)}
+    <button
+      className="icon-button"
+      css={dotButtonStyles(isSmaller)}
       onClick={() => onClick(page)}
       onKeyDown={event =>
         handleKeyDown({
@@ -41,14 +42,13 @@ export function PaginationDot({page, isCurrentPage, isSmaller, onClick}: Paginat
           keys: [KEY.ENTER, KEY.SPACE],
         })
       }
-      role="button"
-      tabIndex={0}
+      aria-label={t('paginationDotAriaLabel', {page: page + 1})}
     >
       <div
         data-uie-name="pagination-item"
         data-uie-status={isCurrentPage ? 'active' : 'inactive'}
         css={dotStyles(isCurrentPage, isSmaller)}
       />
-    </div>
+    </button>
   );
-}
+};
