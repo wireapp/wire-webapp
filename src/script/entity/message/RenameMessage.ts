@@ -18,22 +18,44 @@
  */
 
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
+import {container} from 'tsyringe';
 
 import {t} from 'Util/LocalizerUtil';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {SystemMessage} from './SystemMessage';
 
 import {SystemMessageType} from '../../message/SystemMessageType';
+import {UserState} from '../../user/UserState';
+import {User} from '../User';
 
 export class RenameMessage extends SystemMessage {
-  public name: string;
+  public readonly name: string;
+  private readonly userState = container.resolve(UserState);
 
-  constructor(name: string) {
+  constructor(name: string, userId?: string, userDomain?: string) {
     super();
 
     this.type = CONVERSATION_EVENT.RENAME;
     this.system_message_type = SystemMessageType.CONVERSATION_RENAME;
     this.name = name;
-    this.caption = this.user().isMe ? t('conversationRenameYou') : t('conversationRename');
+
+    if (userId) {
+      this.from = userId;
+      this.fromDomain = userDomain;
+      this.user(new User(userId, userDomain));
+    }
+
+    this.caption = this.generateCaption();
+  }
+
+  private generateCaption(): string {
+    if (!this.user()) {
+      return t('conversationRename');
+    }
+
+    return matchQualifiedIds(this.user().qualifiedId, this.userState.self()?.qualifiedId)
+      ? t('conversationRenameYou')
+      : t('conversationRename');
   }
 }

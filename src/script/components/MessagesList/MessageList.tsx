@@ -24,7 +24,6 @@ import cx from 'classnames';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {JumpToLastMessageButton} from 'Components/MessagesList/JumpToLastMessageButton';
-import {UploadAssets} from 'Components/MessagesList/UploadAssets';
 import {filterMessages} from 'Components/MessagesList/utils/messagesFilter';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
@@ -43,6 +42,7 @@ import {useResizeObserver} from 'Util/DOM/resizeObserver';
 import {Message, MessageActions} from './Message';
 import {MarkerComponent} from './Message/Marker';
 import {ScrollToElement} from './Message/types';
+import {UploadAssets} from './UploadAssets';
 import {groupMessagesBySenderAndTime, isMarker} from './utils/messagesGroup';
 import {updateScroll, FocusedElement} from './utils/scrollUpdater';
 

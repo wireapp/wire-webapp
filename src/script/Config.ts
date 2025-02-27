@@ -77,8 +77,11 @@ const config = {
   /** min supported api version for team creation */
   MIN_TEAM_CREATION_SUPPORTED_API_VERSION: 7,
 
+  /** min supported api version for Enterprise login v2 */
+  MIN_ENTERPRISE_LOGIN_V2_SUPPORTED_API_VERSION: 8,
+
   /** Image MIME types */
-  ALLOWED_IMAGE_TYPES: ['image/bmp', 'image/gif', 'image/jpeg', 'image/jpg', 'image/png'],
+  ALLOWED_IMAGE_TYPES: ['image/bmp', 'image/gif', 'image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
 
   /** Which min and max version of the backend api do we support */
   SUPPORTED_API_RANGE: [1, env.ENABLE_DEV_BACKEND_API ? Infinity : 7],

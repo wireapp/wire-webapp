@@ -18,16 +18,16 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import hljs from 'highlight.js';
 import MarkdownIt from 'markdown-it';
 import {escape} from 'underscore';
 
+import {highlightCode, languages} from './highlightCode';
 import {replaceInRange} from './StringUtil';
 
 import type {MentionEntity} from '../message/MentionEntity';
 
 interface MentionText {
-  domain: string | null;
+  domain: string | null | undefined;
   isSelfMentioned: boolean;
   text: string;
   userId: string;
@@ -43,7 +43,21 @@ const markdownit = new MarkdownIt('zero', {
   html: false,
   langPrefix: 'lang-',
   linkify: true,
-}).enable(['autolink', 'backticks', 'code', 'emphasis', 'escape', 'fence', 'heading', 'link', 'linkify', 'newline']);
+}).enable([
+  'autolink',
+  'backticks',
+  'code',
+  'emphasis',
+  'escape',
+  'fence',
+  'heading',
+  'link',
+  'linkify',
+  'newline',
+  'list',
+  'strikethrough',
+  'blockquote',
+]);
 
 const originalFenceRule = markdownit.renderer.rules.fence!;
 
@@ -71,6 +85,9 @@ markdownit.normalizeLink = (url: string): string => {
   return url;
 };
 
+markdownit.renderer.rules.blockquote_open = () => '<blockquote class="md-blockquote">';
+markdownit.renderer.rules.blockquote_close = () => '</blockquote>';
+
 markdownit.renderer.rules.softbreak = () => '<br>';
 markdownit.renderer.rules.hardbreak = () => '<br>';
 markdownit.renderer.rules.paragraph_open = (tokens, idx) => {
@@ -82,6 +99,14 @@ markdownit.renderer.rules.paragraph_open = (tokens, idx) => {
     .find(({map}) => map?.length);
   const previousPosition = previousWithMap ? (previousWithMap.map || [0, 0])[1] - 1 : 0;
   const count = position - previousPosition;
+
+  const previousToken = tokens[idx - 1];
+  const isPreviousTokenList =
+    previousToken && (previousToken.type === 'bullet_list_close' || previousToken.type === 'ordered_list_close');
+
+  if (isPreviousTokenList) {
+    return count > 1 ? `${'<br>'.repeat(count - 1)}` : '';
+  }
   return '<br>'.repeat(Math.max(count, 0));
 };
 markdownit.renderer.rules.paragraph_close = () => '';
@@ -166,7 +191,12 @@ export const renderMessage = (message: string, selfId?: QualifiedId, mentionEnti
         // highlighting will be wrong anyway because this is not valid code
         return escape(code);
       }
-      return hljs.highlightAuto(code, lang ? [lang] : undefined).value;
+
+      if (lang && languages[lang]) {
+        return highlightCode({code, grammar: languages[lang], lang});
+      }
+
+      return highlightCode({code, grammar: languages.javascript, lang: 'javascript'});
     },
   });
 

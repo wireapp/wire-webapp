@@ -18,6 +18,7 @@
  */
 
 export enum AssetTransferState {
+  CANCELED = 'cancelled',
   DOWNLOADING = 'downloading',
   UPLOAD_FAILED = 'upload-failed',
   UPLOAD_PENDING = 'upload-pending',

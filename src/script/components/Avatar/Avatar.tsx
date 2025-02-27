@@ -20,7 +20,7 @@
 import {HTMLProps, MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent} from 'react';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleKeyDown, isKeyboardEvent} from 'Util/KeyboardUtil';
+import {handleKeyDown, isKeyboardEvent, KEY} from 'Util/KeyboardUtil';
 
 import {PlaceholderAvatar} from './PlaceholderAvatar';
 import {ServiceAvatar} from './ServiceAvatar';
@@ -97,7 +97,7 @@ const Avatar = ({
     const parentNode = event.currentTarget.parentNode;
     if (parentNode) {
       if (isKeyboardEvent(event)) {
-        handleKeyDown(event, () => onAvatarClick?.(participant));
+        handleKeyDown({event, callback: () => onAvatarClick?.(participant), keys: [KEY.ENTER, KEY.SPACE]});
         return;
       }
       onAvatarClick?.(participant);

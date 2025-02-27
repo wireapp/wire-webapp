@@ -25,7 +25,7 @@ import {DeviceVerificationBadges} from 'Components/Badge';
 import * as Icon from 'Components/Icon';
 import {WireIdentity} from 'src/script/E2EIdentity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleKeyDown} from 'Util/KeyboardUtil';
+import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {splitFingerprint} from 'Util/StringUtil';
 
@@ -63,7 +63,13 @@ export const Device = ({device, isSSO, onSelect, onRemove, getDeviceIdentity, de
     <div
       className="preferences-devices-card"
       onClick={onDeviceSelect}
-      onKeyDown={event => handleKeyDown(event, onDeviceSelect)}
+      onKeyDown={event =>
+        handleKeyDown({
+          event,
+          callback: onDeviceSelect,
+          keys: [KEY.ENTER, KEY.SPACE],
+        })
+      }
       role="button"
       aria-label={t('accessibility.headings.preferencesDeviceDetails')}
       tabIndex={TabIndex.FOCUSABLE}

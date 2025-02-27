@@ -17,56 +17,48 @@
  *
  */
 
-import {useCallback, useEffect, useRef, useState} from 'react';
+import {useCallback, useRef, useState} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
-import {CLEAR_EDITOR_COMMAND, LexicalEditor} from 'lexical';
+import {LexicalEditor, $createTextNode, $insertNodes} from 'lexical';
 import {container} from 'tsyringe';
 
-import {useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
-import {checkFileSharingPermission} from 'Components/Conversation/utils/checkFileSharingPermission';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
-import {RichTextContent, RichTextEditor} from 'Components/RichTextEditor';
-import {SendMessageButton} from 'Components/RichTextEditor/components/SendMessageButton';
-import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
+import {EmojiPicker} from 'Components/EmojiPicker/EmojiPicker';
 import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
-import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
+import {EventName} from 'src/script/tracking/EventName';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from 'src/script/user/TypingIndicatorMode';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
-import {formatLocale, TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {getFileExtension} from 'Util/util';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
-import {ControlButtons} from './components/InputBarControls/ControlButtons';
-import {GiphyButton} from './components/InputBarControls/GiphyButton';
-import {PastedFileControls} from './components/PastedFileControls';
-import {ReplyBar} from './components/ReplyBar';
-import {TypingIndicator} from './components/TypingIndicator/TypingIndicator';
-import {useFilePaste} from './hooks/useFilePaste';
-import {useTypingIndicator} from './hooks/useTypingIndicator';
-import {handleClickOutsideOfInputBar, IgnoreOutsideClickWrapper} from './util/clickHandlers';
-import {loadDraftState, saveDraftState} from './util/DraftStateUtil';
+import {MessageContent} from './common/messageContent/messageContent';
+import {InputBarContainer} from './InputBarContainer/InputBarContainer';
+import {InputBarControls} from './InputBarControls/InputBarControls';
+import {InputBarEditor} from './InputBarEditor/InputBarEditor';
+import {PastedFileControls} from './PastedFileControls/PastedFileControls';
+import {ReplyBar} from './ReplyBar/ReplyBar';
+import {TypingIndicator} from './TypingIndicator';
+import {useEmojiPicker} from './useEmojiPicker/useEmojiPicker';
+import {useFileHandling} from './useFileHandling/useFileHandling';
+import {useFormatToolbar} from './useFormatToolbar/useFormatToolbar';
+import {useGiphy} from './useGiphy/useGiphy';
+import {useMessageHandling} from './useMessageHandling/useMessageHandling';
+import {usePing} from './usePing/usePing';
+import {useTypingIndicator} from './useTypingIndicator/useTypingIndicator';
 
 import {Config} from '../../Config';
-import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
-import {MessageRepository, OutgoingQuote} from '../../conversation/MessageRepository';
+import {ConversationRepository} from '../../conversation/ConversationRepository';
+import {MessageRepository} from '../../conversation/MessageRepository';
 import {Conversation} from '../../entity/Conversation';
-import {ContentMessage} from '../../entity/message/ContentMessage';
 import {User} from '../../entity/User';
-import {ConversationError} from '../../error/ConversationError';
 import {EventRepository} from '../../event/EventRepository';
-import {MentionEntity} from '../../message/MentionEntity';
-import {MessageHasher} from '../../message/MessageHasher';
-import {QuoteEntity} from '../../message/QuoteEntity';
-import {useAppMainState} from '../../page/state';
+import {PropertiesRepository} from '../../properties/PropertiesRepository';
 import {SearchRepository} from '../../search/SearchRepository';
 import {StorageRepository} from '../../storage';
 import {TeamState} from '../../team/TeamState';
@@ -74,9 +66,6 @@ import {TeamState} from '../../team/TeamState';
 const CONFIG = {
   ...Config.getConfig(),
   PING_TIMEOUT: TIME_IN_MILLIS.SECOND * 2,
-};
-
-const config = {
   GIPHY_TEXT_LENGTH: 256,
 };
 
@@ -96,8 +85,6 @@ interface InputBarProps {
   uploadImages: (images: File[]) => void;
   uploadFiles: (files: File[]) => void;
 }
-
-const conversationInputBarClassName = 'conversation-input-bar';
 
 export const InputBar = ({
   conversation,
@@ -128,64 +115,57 @@ export const InputBar = ({
       'isSelfUserRemoved',
       'is1to1',
     ]);
-  const {isOutgoingRequest, isIncomingRequest} = useKoSubscribableChildren(connection, [
+  const {isOutgoingRequest, isIncomingRequest} = useKoSubscribableChildren(connection!, [
     'isOutgoingRequest',
     'isIncomingRequest',
   ]);
 
-  // Lexical
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
   const editorRef = useRef<LexicalEditor | null>(null);
 
-  // Typing indicator
   const {typingIndicatorMode} = useKoSubscribableChildren(propertiesRepository, ['typingIndicatorMode']);
   const isTypingIndicatorEnabled = typingIndicatorMode === CONVERSATION_TYPING_INDICATOR_MODE.ON;
 
-  // Message
-  /** the messageContent represents the message being edited. It's directly derived from the editor state */
-  const [messageContent, setMessageContent] = useState<RichTextContent>({text: ''});
-  const [editedMessage, setEditedMessage] = useState<ContentMessage | undefined>();
-  const [replyMessageEntity, setReplyMessageEntity] = useState<ContentMessage | null>(null);
-  const textValue = messageContent.text;
+  /** The messageContent represents the message being edited.
+   * It's directly derived from the editor state
+   */
+  const [messageContent, setMessageContent] = useState<MessageContent>({text: ''});
 
-  // Files
-  const [pastedFile, setPastedFile] = useState<File | null>(null);
+  const formatToolbar = useFormatToolbar();
 
-  // Common
-  const [pingDisabled, setIsPingDisabled] = useState<boolean>(false);
-
-  // Right sidebar
-  const {rightSidebar} = useAppMainState.getState();
-  const lastItem = rightSidebar.history.length - 1;
-  const currentState = rightSidebar.history[lastItem];
-  const isRightSidebarOpen = !!currentState;
+  const emojiPicker = useEmojiPicker({
+    wrapperRef,
+    onEmojiPicked: emoji => {
+      editorRef.current?.update(() => {
+        $insertNodes([$createTextNode(emoji)]);
+      });
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.INPUT.EMOJI_MODAL.EMOJI_PICKED);
+    },
+  });
 
   const inputPlaceholder = messageTimer ? t('tooltipConversationEphemeral') : t('tooltipConversationInputPlaceholder');
 
-  const isEditing = !!editedMessage;
-  const isReplying = !!replyMessageEntity;
   const isConnectionRequest = isOutgoingRequest || isIncomingRequest;
   const hasLocalEphemeralTimer = isSelfDeletingMessagesEnabled && !!localMessageTimer && !hasGlobalMessageTimer;
   const isTypingRef = useRef(false);
 
-  // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
-  const isScaledDown = useMatchMedia('max-width: 768px');
-
-  const showGiphyButton = textValue.length > 0 && textValue.length <= config.GIPHY_TEXT_LENGTH;
-
-  const shouldReplaceEmoji = useUserPropertyValue(
+  const shouldReplaceEmoji = useUserPropertyValue<boolean>(
     () => propertiesRepository.getPreference(PROPERTIES_TYPE.EMOJI.REPLACE_INLINE),
     WebAppEvents.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE,
   );
 
-  // Mentions
-  const getMentionCandidates = (search?: string | null) => {
-    const candidates = conversation.participating_user_ets().filter(userEntity => !userEntity.isService);
-    return typeof search === 'string' ? searchRepository.searchUserInSet(search, candidates) : candidates;
-  };
+  const getMentionCandidates = useCallback(
+    (search?: string | null) => {
+      const candidates = conversation.participating_user_ets().filter(userEntity => !userEntity.isService);
+      return typeof search === 'string' ? searchRepository.searchUserInSet(search, candidates) : candidates;
+    },
+    [conversation, searchRepository],
+  );
 
   useTypingIndicator({
     isEnabled: isTypingIndicatorEnabled,
-    text: textValue,
+    text: messageContent.text,
     onTypingChange: useCallback(
       isTyping => {
         isTypingRef.current = isTyping;
@@ -199,442 +179,157 @@ export const InputBar = ({
     ),
   });
 
-  const resetDraftState = () => {
-    setReplyMessageEntity(null);
-    editorRef.current?.dispatchCommand(CLEAR_EDITOR_COMMAND, undefined);
-  };
-
-  const clearPastedFile = () => setPastedFile(null);
-
-  const sendPastedFile = () => {
-    if (pastedFile) {
-      uploadDroppedFiles([pastedFile]);
-      clearPastedFile();
-    }
-  };
-
-  const cancelMessageReply = (resetDraft = true) => {
-    setReplyMessageEntity(null);
-
-    if (resetDraft) {
-      resetDraftState();
-    }
-  };
-
-  useEffect(() => {
-    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.EDIT, (messageEntity: ContentMessage) => {
-      editMessage(messageEntity);
-    });
-
-    return () => {
-      amplify.unsubscribeAll(WebAppEvents.CONVERSATION.MESSAGE.EDIT);
-    };
+  const fileHandling = useFileHandling({
+    uploadDroppedFiles,
+    uploadImages,
   });
 
-  const cancelMessageEditing = (resetDraft = true) => {
-    setEditedMessage(undefined);
-    setReplyMessageEntity(null);
+  const showMarkdownPreview = useUserPropertyValue<boolean>(
+    () => propertiesRepository.getPreference(PROPERTIES_TYPE.INTERFACE.MARKDOWN_PREVIEW),
+    WebAppEvents.PROPERTIES.UPDATE.INTERFACE.MARKDOWN_PREVIEW,
+  );
 
-    if (resetDraft) {
-      resetDraftState();
-    }
-  };
+  const {
+    editedMessage,
+    replyMessageEntity,
+    isEditing,
+    isReplying,
+    sendMessage,
+    cancelSending,
+    cancelMesssageEditing,
+    cancelMessageReply,
+    editMessage,
+    draftState,
+    generateQuote,
+  } = useMessageHandling({
+    messageContent,
+    conversation,
+    conversationRepository,
+    storageRepository,
+    eventRepository,
+    messageRepository,
+    editorRef,
+    pastedFile: fileHandling.pastedFile,
+    sendPastedFile: fileHandling.sendPastedFile,
+  });
 
-  const handleCancelReply = () => {
-    cancelMessageReply(false);
-  };
+  const ping = usePing({
+    conversation,
+    messageRepository,
+    is1to1,
+  });
 
-  const editMessage = (messageEntity?: ContentMessage) => {
-    if (messageEntity?.isEditable() && messageEntity !== editedMessage) {
-      cancelMessageReply();
-      cancelMessageEditing(true);
-      setEditedMessage(messageEntity);
+  const giphy = useGiphy({
+    text: messageContent.text,
+    maxLength: CONFIG.GIPHY_TEXT_LENGTH,
+    openGiphy,
+    generateQuote,
+    messageRepository,
+    conversation,
+    cancelMesssageEditing,
+  });
 
-      const quote = messageEntity.quote();
-      if (quote && conversation) {
-        void messageRepository
-          .getMessageInConversationById(conversation, quote.messageId)
-          .then(quotedMessage => setReplyMessageEntity(quotedMessage));
-      }
-    }
-  };
-
-  const replyMessage = (messageEntity: ContentMessage): void => {
-    if (messageEntity?.isReplyable() && messageEntity !== replyMessageEntity) {
-      cancelMessageReply(false);
-      cancelMessageEditing(!!editedMessage);
-      setReplyMessageEntity(messageEntity);
-
-      editorRef.current?.focus();
-    }
-  };
-
-  const generateQuote = (): Promise<OutgoingQuote | undefined> => {
-    return !replyMessageEntity
-      ? Promise.resolve(undefined)
-      : eventRepository.eventService
-          .loadEvent(replyMessageEntity.conversation_id, replyMessageEntity.id)
-          .then(MessageHasher.hashEvent)
-          .then((messageHash: ArrayBuffer) => {
-            return new QuoteEntity({
-              hash: messageHash,
-              messageId: replyMessageEntity.id,
-              userId: replyMessageEntity.from,
-            }) as OutgoingQuote;
-          });
-  };
-
-  const sendMessageEdit = (messageText: string, mentions: MentionEntity[]): void | Promise<any> => {
-    const mentionEntities = mentions.slice(0);
-    cancelMessageEditing(true);
-
-    if (!messageText.length && editedMessage) {
-      return messageRepository.deleteMessageForEveryone(conversation, editedMessage);
-    }
-
-    if (editedMessage) {
-      messageRepository.sendMessageEdit(conversation, messageText, editedMessage, mentionEntities).catch(error => {
-        if (error.type !== ConversationError.TYPE.NO_MESSAGE_CHANGES) {
-          throw error;
-        }
-      });
-
-      cancelMessageReply();
-    }
-  };
-
-  const sendTextMessage = (messageText: string, mentions: MentionEntity[]) => {
-    if (messageText.length) {
-      const mentionEntities = mentions.slice(0);
-
-      void generateQuote().then(quoteEntity => {
-        void messageRepository.sendTextWithLinkPreview(conversation, messageText, mentionEntities, quoteEntity);
-        cancelMessageReply();
-      });
-    }
-  };
-
-  const sendMessage = (): void => {
-    if (pastedFile) {
-      return void sendPastedFile();
-    }
-
-    const messageTrimmedStart = textValue.trimStart();
-    const text = messageTrimmedStart.trimEnd();
-    const isMessageTextTooLong = text.length > CONFIG.MAXIMUM_MESSAGE_LENGTH;
-    const mentions = messageContent.mentions ?? [];
-
-    if (isMessageTextTooLong) {
-      showWarningModal(
-        t('modalConversationMessageTooLongHeadline'),
-        t('modalConversationMessageTooLongMessage', {number: CONFIG.MAXIMUM_MESSAGE_LENGTH}),
-      );
-
-      return;
-    }
-
-    if (isEditing) {
-      void sendMessageEdit(text, mentions);
-    } else {
-      sendTextMessage(text, mentions);
-    }
-
-    editorRef.current?.focus();
-    resetDraftState();
-  };
-
-  const handleSendMessage = async () => {
-    await conversationRepository.refreshMLSConversationVerificationState(conversation);
-    const isE2EIDegraded = conversation.mlsVerificationState() === ConversationVerificationState.DEGRADED;
-
-    if (isE2EIDegraded) {
-      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-        secondaryAction: {
-          action: () => {
-            conversation.mlsVerificationState(ConversationVerificationState.UNVERIFIED);
-            sendMessage();
-          },
-          text: t('conversation.E2EISendAnyway'),
-        },
-        primaryAction: {
-          action: () => {},
-          text: t('conversation.E2EICancel'),
-        },
-        text: {
-          message: t('conversation.E2EIDegradedNewMessage'),
-          title: t('conversation.E2EIConversationNoLongerVerified'),
-        },
-      });
-    } else {
-      sendMessage();
-    }
-  };
-
-  const onGifClick = () => openGiphy(textValue);
-
-  const pingConversation = () => {
-    setIsPingDisabled(true);
-    void messageRepository.sendPing(conversation).then(() => {
-      window.setTimeout(() => setIsPingDisabled(false), CONFIG.PING_TIMEOUT);
-    });
-  };
-
-  const onPingClick = () => {
-    if (pingDisabled) {
-      return;
-    }
-
-    const totalConversationUsers = conversation.participating_user_ets().length;
-    if (
-      !CONFIG.FEATURE.ENABLE_PING_CONFIRMATION ||
-      is1to1 ||
-      totalConversationUsers < CONFIG.FEATURE.MAX_USERS_TO_PING_WITHOUT_ALERT
-    ) {
-      pingConversation();
-    } else {
-      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-        primaryAction: {
-          action: pingConversation,
-          text: t('tooltipConversationPing'),
-        },
-        text: {
-          title: t('conversationPingConfirmTitle', {memberCount: totalConversationUsers.toString()}),
-        },
-      });
-    }
-  };
-
-  const handlePasteFiles = (files: FileList): void => {
-    const [pastedFile] = files;
-
-    if (!pastedFile) {
-      return;
-    }
-    const {lastModified} = pastedFile;
-
-    const date = formatLocale(lastModified || new Date(), 'PP, pp');
-    const fileName = `${t('conversationSendPastedFile', {date})}.${getFileExtension(pastedFile.name)}`;
-
-    const newFile = new File([pastedFile], fileName, {
-      type: pastedFile.type,
-    });
-
-    setPastedFile(newFile);
-  };
-
-  const sendGiphy = (gifUrl: string, tag: string): void => {
-    void generateQuote().then(quoteEntity => {
-      void messageRepository.sendGif(conversation, gifUrl, tag, quoteEntity);
-      cancelMessageEditing(true);
-    });
-  };
-
-  useEffect(() => {
-    amplify.subscribe(WebAppEvents.CONVERSATION.IMAGE.SEND, uploadImages);
-    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REPLY, replyMessage);
-    amplify.subscribe(WebAppEvents.EXTENSIONS.GIPHY.SEND, sendGiphy);
-    amplify.subscribe(WebAppEvents.SHORTCUT.PING, onPingClick);
-    conversation.isTextInputReady(true);
-
-    return () => {
-      amplify.unsubscribeAll(WebAppEvents.SHORTCUT.PING);
-      amplify.unsubscribeAll(WebAppEvents.CONVERSATION.IMAGE.SEND);
-      amplify.unsubscribeAll(WebAppEvents.CONVERSATION.MESSAGE.REPLY);
-      amplify.unsubscribeAll(WebAppEvents.EXTENSIONS.GIPHY.SEND);
-      conversation.isTextInputReady(false);
-    };
-  }, []);
-
-  const saveDraft = async (editorState: string) => {
-    await saveDraftState(storageRepository, conversation, editorState, replyMessageEntity?.id, editedMessage?.id);
-  };
-
-  const loadDraft = async () => {
-    const draftState = await loadDraftState(conversation, storageRepository, messageRepository);
-
-    const reply = draftState.messageReply;
-    if (reply?.isReplyable()) {
-      setReplyMessageEntity(reply);
-    }
-
-    const editedMessage = draftState.editedMessage;
-    if (editedMessage) {
-      setEditedMessage(editedMessage);
-    }
-
-    return draftState;
-  };
-
-  const handleRepliedMessageDeleted = (messageId: string) => {
-    if (replyMessageEntity?.id === messageId) {
-      setReplyMessageEntity(null);
-    }
-  };
-
-  const handleRepliedMessageUpdated = (originalMessageId: string, messageEntity: ContentMessage) => {
-    if (replyMessageEntity?.id === originalMessageId) {
-      setReplyMessageEntity(messageEntity);
-    }
-  };
-
-  useEffect(() => {
-    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, handleRepliedMessageDeleted);
-    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, handleRepliedMessageUpdated);
-
-    return () => {
-      amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, handleRepliedMessageDeleted);
-      amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, handleRepliedMessageUpdated);
-    };
-  }, [replyMessageEntity]);
-
-  useEffect(() => {
-    const onWindowClick = (event: Event): void =>
-      handleClickOutsideOfInputBar(event, () => {
-        // We want to add a timeout in case the click happens because the user switched conversation and the component is unmounting.
-        // In this case we want to keep the edited message for this conversation
-        setTimeout(() => {
-          cancelMessageEditing(true);
-          cancelMessageReply();
-        });
-      });
-    if (isEditing) {
-      window.addEventListener('click', onWindowClick);
-
-      return () => {
-        window.removeEventListener('click', onWindowClick);
-      };
-    }
-
-    return () => undefined;
-  }, [cancelMessageEditing, cancelMessageReply, isEditing]);
-
-  useFilePaste(checkFileSharingPermission(handlePasteFiles));
-
-  const sendImageOnEnterClick = (event: KeyboardEvent) => {
-    if (event.key === KEY.ENTER && !event.shiftKey && !event.altKey && !event.metaKey) {
-      sendPastedFile();
-    }
-  };
-
-  useEffect(() => {
-    if (!pastedFile) {
-      return () => undefined;
-    }
-
-    window.addEventListener('keydown', sendImageOnEnterClick);
-
-    return () => {
-      window.removeEventListener('keydown', sendImageOnEnterClick);
-    };
-  }, [pastedFile]);
-
-  const controlButtonsProps = {
-    conversation: conversation,
-    disableFilesharing: !isFileSharingSendingEnabled,
-    disablePing: pingDisabled,
-    input: textValue,
-    isEditing: isEditing,
-    isScaledDown: isScaledDown,
-    onCancelEditing: () => cancelMessageEditing(true),
-    onClickPing: onPingClick,
-    onGifClick: onGifClick,
-    onSelectFiles: uploadFiles,
-    onSelectImages: uploadImages,
-    showGiphyButton: showGiphyButton,
-  };
-
-  const enableSending = textValue.length > 0;
+  const showAvatar = !!messageContent.text.length;
 
   return (
-    <IgnoreOutsideClickWrapper
-      id={conversationInputBarClassName}
-      className={cx(conversationInputBarClassName, {'is-right-panel-open': isRightSidebarOpen})}
-      aria-live="assertive"
-    >
-      {isTypingIndicatorEnabled && <TypingIndicator conversationId={conversation.id} />}
+    <div ref={wrapperRef}>
+      <InputBarContainer>
+        {isTypingIndicatorEnabled && <TypingIndicator conversationId={conversation.id} />}
 
-      {classifiedDomains && !isConnectionRequest && (
-        <ConversationClassifiedBar conversation={conversation} classifiedDomains={classifiedDomains} />
-      )}
-
-      {isReplying && !isEditing && <ReplyBar replyMessageEntity={replyMessageEntity} onCancel={handleCancelReply} />}
-
-      <div
-        className={cx(`${conversationInputBarClassName}__input`, {
-          [`${conversationInputBarClassName}__input--editing`]: isEditing,
-        })}
-      >
-        {!isOutgoingRequest && (
-          <>
-            <div className="controls-left">
-              {!!textValue.length && (
-                <Avatar
-                  className="cursor-default"
-                  participant={selfUser}
-                  avatarSize={AVATAR_SIZE.X_SMALL}
-                  hideAvailabilityStatus
-                />
-              )}
-            </div>
-
-            {!isSelfUserRemoved && !pastedFile && (
-              <RichTextEditor
-                onSetup={lexical => {
-                  editorRef.current = lexical;
-                }}
-                editedMessage={editedMessage}
-                onEscape={() => {
-                  if (editedMessage) {
-                    cancelMessageEditing(true);
-                  } else if (replyMessageEntity) {
-                    cancelMessageReply();
-                  }
-                }}
-                onArrowUp={() => {
-                  if (textValue.length === 0) {
-                    editMessage(conversation.getLastEditableMessage());
-                  }
-                }}
-                getMentionCandidates={getMentionCandidates}
-                replaceEmojis={shouldReplaceEmoji}
-                placeholder={inputPlaceholder}
-                onUpdate={setMessageContent}
-                hasLocalEphemeralTimer={hasLocalEphemeralTimer}
-                saveDraftState={saveDraft}
-                loadDraftState={loadDraft}
-                onShiftTab={onShiftTab}
-                onSend={handleSendMessage}
-                onBlur={() => isTypingRef.current && conversationRepository.sendTypingStop(conversation)}
-              >
-                {isScaledDown ? (
-                  <>
-                    <ul className="controls-right buttons-group" css={{minWidth: '95px'}}>
-                      {showGiphyButton && <GiphyButton onGifClick={onGifClick} />}
-                      <SendMessageButton disabled={!enableSending} onSend={handleSendMessage} />
-                    </ul>
-                    <ul className="controls-right buttons-group" css={{justifyContent: 'center', width: '100%'}}>
-                      <ControlButtons {...controlButtonsProps} isScaledDown={isScaledDown} />
-                    </ul>
-                  </>
-                ) : (
-                  <>
-                    <ul
-                      className={cx('controls-right buttons-group', {
-                        'controls-right-shrinked': textValue.length !== 0,
-                      })}
-                    >
-                      <ControlButtons {...controlButtonsProps} showGiphyButton={showGiphyButton} />
-                      <SendMessageButton disabled={!enableSending} onSend={handleSendMessage} />
-                    </ul>
-                  </>
-                )}
-              </RichTextEditor>
-            )}
-          </>
+        {classifiedDomains && !isConnectionRequest && (
+          <ConversationClassifiedBar conversation={conversation} classifiedDomains={classifiedDomains} />
         )}
 
-        {pastedFile && <PastedFileControls pastedFile={pastedFile} onClear={clearPastedFile} onSend={sendPastedFile} />}
-      </div>
-    </IgnoreOutsideClickWrapper>
+        {isReplying && !isEditing && replyMessageEntity && (
+          <ReplyBar replyMessageEntity={replyMessageEntity} onCancel={() => cancelMessageReply(false)} />
+        )}
+
+        <div
+          className={cx(`conversation-input-bar__input input-bar-container`, {
+            [`conversation-input-bar__input--editing`]: isEditing,
+            'input-bar-container--with-toolbar': formatToolbar.open && showMarkdownPreview,
+            'input-bar-container--with-files': false,
+          })}
+        >
+          {!isOutgoingRequest && (
+            <>
+              <div className="input-bar-avatar">
+                {showAvatar && (
+                  <Avatar
+                    className="cursor-default"
+                    participant={selfUser}
+                    avatarSize={AVATAR_SIZE.X_SMALL}
+                    hideAvailabilityStatus
+                  />
+                )}
+              </div>
+              {!isSelfUserRemoved && !fileHandling.pastedFile && (
+                <InputBarEditor
+                  editorRef={editorRef}
+                  editedMessage={editedMessage}
+                  inputPlaceholder={inputPlaceholder}
+                  hasLocalEphemeralTimer={hasLocalEphemeralTimer}
+                  showMarkdownPreview={showMarkdownPreview}
+                  formatToolbar={formatToolbar}
+                  onSetup={editor => {
+                    editorRef.current = editor;
+                  }}
+                  onEscape={cancelSending}
+                  onArrowUp={() => {
+                    if (messageContent.text.length === 0) {
+                      editMessage(conversation.getLastEditableMessage());
+                    }
+                  }}
+                  onShiftTab={onShiftTab}
+                  onBlur={() => isTypingRef.current && conversationRepository.sendTypingStop(conversation)}
+                  onUpdate={setMessageContent}
+                  onSend={sendMessage}
+                  getMentionCandidates={getMentionCandidates}
+                  saveDraftState={draftState.save}
+                  loadDraftState={draftState.load}
+                  replaceEmojis={shouldReplaceEmoji}
+                >
+                  <InputBarControls
+                    conversation={conversation}
+                    isFileSharingSendingEnabled={isFileSharingSendingEnabled}
+                    pingDisabled={ping.isPingDisabled}
+                    messageContent={messageContent}
+                    isEditing={isEditing}
+                    showMarkdownPreview={showMarkdownPreview}
+                    showGiphyButton={giphy.showGiphyButton}
+                    formatToolbar={formatToolbar}
+                    emojiPicker={emojiPicker}
+                    onEscape={cancelSending}
+                    onClickPing={ping.handlePing}
+                    onGifClick={giphy.handleGifClick}
+                    onSelectFiles={uploadFiles}
+                    onSelectImages={uploadImages}
+                    onSend={sendMessage}
+                  />
+                </InputBarEditor>
+              )}
+            </>
+          )}
+
+          {fileHandling.pastedFile && (
+            <PastedFileControls
+              pastedFile={fileHandling.pastedFile}
+              onClear={fileHandling.clearPastedFile}
+              onSend={fileHandling.sendPastedFile}
+            />
+          )}
+        </div>
+      </InputBarContainer>
+      {emojiPicker.open ? (
+        <EmojiPicker
+          posX={emojiPicker.position.x}
+          posY={emojiPicker.position.y}
+          onKeyPress={emojiPicker.handleClose}
+          resetActionMenuStates={emojiPicker.handleClose}
+          wrapperRef={emojiPicker.ref}
+          handleReactionClick={emojiPicker.handlePick}
+        />
+      ) : null}
+    </div>
   );
 };

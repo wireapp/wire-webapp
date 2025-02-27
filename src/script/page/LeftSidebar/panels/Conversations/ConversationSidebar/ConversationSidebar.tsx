@@ -33,6 +33,7 @@ import {
 } from './ConversationSidebar.styles';
 
 import {User} from '../../../../../entity/User';
+import {ContentState} from '../../../../useAppState';
 import {UserDetails} from '../../../UserDetails';
 import {ConversationTabs} from '../ConversationTabs';
 import {SidebarTabs} from '../useSidebarStore';
@@ -52,7 +53,7 @@ type ConversationSidebarProps = {
   favoriteConversations: Conversation[];
   archivedConversations: Conversation[];
   conversationRepository: ConversationRepository;
-  onClickPreferences: () => void;
+  onClickPreferences: (contentState: ContentState) => void;
   showNotificationsBadge: boolean;
   teamRepository: TeamRepository;
   userRepository: UserRepository;

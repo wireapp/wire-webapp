@@ -21,33 +21,69 @@ import {render, fireEvent, act} from '@testing-library/react';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
+import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {CALL_QUALITY_FEEDBACK_KEY} from 'Components/Modals/QualityFeedbackModal/constants';
 import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
+import {Call} from 'src/script/calling/Call';
+import {CallingRepository} from 'src/script/calling/CallingRepository';
+import {User} from 'src/script/entity/User';
+import {UserState} from 'src/script/user/UserState';
+import {TestFactory} from 'test/helper/TestFactory';
 import {t} from 'Util/LocalizerUtil';
 
 import {QualityFeedbackModal} from './QualityFeedbackModal';
 
-import {withIntl, withTheme} from '../../../auth/util/test/TestUtil';
-import {User} from '../../../entity/User';
+import {
+  buildMediaDevicesHandler,
+  createConversation,
+  createSelfParticipant,
+  withIntl,
+  withTheme,
+} from '../../../auth/util/test/TestUtil';
 import {EventName} from '../../../tracking/EventName';
 import {Segmentation} from '../../../tracking/Segmentation';
-import {UserState} from '../../../user/UserState';
 
 jest.mock('../../../tracking/Telemetry.helpers', () => ({
   isTelemetryEnabledAtCurrentEnvironment: () => true,
 }));
 
 describe('QualityFeedbackModal', () => {
-  const renderQualityFeedbackModal = () => render(withTheme(withIntl(<QualityFeedbackModal />)));
+  let callingRepository: CallingRepository;
+  let call: Call;
+  const testFactory = new TestFactory();
   const user = new User('userId', 'domain');
 
   beforeEach(() => {
     jest.clearAllMocks();
     spyOn(container.resolve(UserState), 'self').and.returnValue(user);
   });
+
+  beforeAll(() => {
+    return testFactory.exposeCallingActors().then(injectedCallingRepository => {
+      callingRepository = injectedCallingRepository;
+      const conversation = createConversation();
+      const selfParticipant = createSelfParticipant();
+      const selfUserId = callingRepository['selfUser']?.qualifiedId!;
+
+      call = new Call(
+        selfUserId,
+        conversation,
+        CONV_TYPE.CONFERENCE,
+        selfParticipant,
+        CALL_TYPE.NORMAL,
+        buildMediaDevicesHandler(),
+      );
+
+      callingRepository['conversationState'].conversations.push(conversation);
+      callingRepository['callState'].calls([call]);
+    });
+  });
+
+  const renderQualityFeedbackModal = () =>
+    render(withTheme(withIntl(<QualityFeedbackModal callingRepository={callingRepository} />)));
 
   it('should not render if qualityFeedbackModalShown is false', () => {
     renderQualityFeedbackModal();
@@ -64,6 +100,7 @@ describe('QualityFeedbackModal', () => {
 
     act(() => {
       useCallAlertState.getState().setQualityFeedbackModalShown(true);
+      useCallAlertState.getState().setConversationId(call.conversation.qualifiedId);
     });
 
     expect(useCallAlertState.getState().qualityFeedbackModalShown).toBe(true);
@@ -74,6 +111,7 @@ describe('QualityFeedbackModal', () => {
 
     act(() => {
       useCallAlertState.getState().setQualityFeedbackModalShown(true);
+      useCallAlertState.getState().setConversationId(call.conversation.qualifiedId);
     });
 
     spyOn(amplify, 'publish').and.returnValue({
@@ -88,6 +126,10 @@ describe('QualityFeedbackModal', () => {
 
     expect(amplify.publish).toHaveBeenCalledWith(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.QUALITY_REVIEW, {
       [Segmentation.CALL.QUALITY_REVIEW_LABEL]: RatingListLabel.DISMISSED,
+      [Segmentation.CALL.DURATION]: 0,
+      [Segmentation.CALL.PARTICIPANTS]: 0,
+      [Segmentation.CALL.SCREEN_SHARE]: false,
+      [Segmentation.CALL.VIDEO]: false,
     });
 
     expect(useCallAlertState.getState().qualityFeedbackModalShown).toBe(false);
@@ -98,13 +140,13 @@ describe('QualityFeedbackModal', () => {
 
     act(() => {
       useCallAlertState.getState().setQualityFeedbackModalShown(true);
+      useCallAlertState.getState().setConversationId(call.conversation.qualifiedId);
     });
 
     spyOn(amplify, 'publish').and.returnValue({
       eventKey: WebAppEvents.ANALYTICS.EVENT,
       type: EventName.CALLING.QUALITY_REVIEW,
       value: {
-        [Segmentation.CALL.SCORE]: 5,
         [Segmentation.CALL.QUALITY_REVIEW_LABEL]: RatingListLabel.ANSWERED,
       },
     });
@@ -114,6 +156,10 @@ describe('QualityFeedbackModal', () => {
     expect(amplify.publish).toHaveBeenCalledWith(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.QUALITY_REVIEW, {
       [Segmentation.CALL.SCORE]: 5,
       [Segmentation.CALL.QUALITY_REVIEW_LABEL]: RatingListLabel.ANSWERED,
+      [Segmentation.CALL.DURATION]: 0,
+      [Segmentation.CALL.PARTICIPANTS]: 0,
+      [Segmentation.CALL.SCREEN_SHARE]: false,
+      [Segmentation.CALL.VIDEO]: false,
     });
 
     expect(useCallAlertState.getState().qualityFeedbackModalShown).toBe(false);
@@ -124,6 +170,7 @@ describe('QualityFeedbackModal', () => {
 
     act(() => {
       useCallAlertState.getState().setQualityFeedbackModalShown(true);
+      useCallAlertState.getState().setConversationId(call.conversation.qualifiedId);
     });
 
     const checkbox = getByText(t('qualityFeedback.doNotAskAgain'));

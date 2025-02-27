@@ -25,7 +25,7 @@ import {connect} from 'react-redux';
 import {Navigate, useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 
-import {Button, ContainerXS, H1, Link, Paragraph} from '@wireapp/react-ui-kit';
+import {Button, ContainerXS, Link, Paragraph, Text} from '@wireapp/react-ui-kit';
 
 import {handleEnterDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -37,6 +37,7 @@ import {actionRoot} from '../module/action/';
 import {bindActionCreators, RootState} from '../module/reducer';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import {ROUTE} from '../route';
+import {getEnterpriseLoginV2FF} from '../util/helpers';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
@@ -49,7 +50,7 @@ const HistoryInfoComponent = ({
 }: Props & ConnectedProps & DispatchProps) => {
   const navigate = useNavigate();
   const shouldLoadClients = !hasLoadedClients && isNewCurrentSelfClient;
-
+  const isEnterpriseLoginV2Enabled = getEnterpriseLoginV2FF();
   const onContinue = () => {
     return navigate(ROUTE.SET_EMAIL);
   };
@@ -76,10 +77,12 @@ const HistoryInfoComponent = ({
   }
 
   return (
-    <Page>
-      <ContainerXS centerText verticalCenter style={{width: '100%'}}>
-        <H1 center>{t('historyInfo.noHistoryHeadline', {brandName: Config.getConfig().BRAND_NAME})}</H1>
-        <Paragraph center style={{marginBottom: 56}}>
+    <Page withSideBar={isEnterpriseLoginV2Enabled}>
+      <ContainerXS centerText verticalCenter style={{width: '100%', maxWidth: '20rem'}}>
+        <Text fontSize="1.5rem" css={{fontWeight: '500'}} center>
+          {t('historyInfo.noHistoryHeadline', {brandName: Config.getConfig().BRAND_NAME})}
+        </Text>
+        <Paragraph center style={{marginBottom: '1rem'}}>
           <FormattedMessage
             id="historyInfo.noHistoryInfo"
             values={{
@@ -96,7 +99,7 @@ const HistoryInfoComponent = ({
         >
           {t('historyInfo.ok')}
         </Button>
-        <Paragraph center style={{marginTop: 40}}>
+        <Paragraph center style={{marginTop: '1rem'}}>
           <Link href={Config.getConfig().URL.SUPPORT.HISTORY} target="_blank" data-uie-name="do-history-learn-more">
             {t('historyInfo.learnMore')}
           </Link>

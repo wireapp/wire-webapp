@@ -53,9 +53,9 @@ import {
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {showAppNotification} from 'Components/AppNotification';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {CALL_QUALITY_FEEDBACK_KEY} from 'Components/Modals/QualityFeedbackModal/constants';
+import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
 import {flatten} from 'Util/ArrayUtil';
 import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
@@ -693,7 +693,7 @@ export class CallingRepository {
       return;
     }
 
-    const {content, qualified_conversation, from, qualified_from} = event;
+    const {content, qualified_conversation, from, qualified_from, time} = event;
     const isFederated = this.core.backendFeatures.isFederated && qualified_conversation && qualified_from;
     const userId = isFederated ? qualified_from : {domain: '', id: from};
     const conversationId = this.extractTargetedConversationId(event);
@@ -703,6 +703,7 @@ export class CallingRepository {
       this.logger.warn(`Unable to find a conversation with id of ${conversationId.id}@${conversationId.domain}`);
       return;
     }
+
     switch (content.type) {
       case CALL_MESSAGE_TYPE.CONFKEY: {
         if (source !== EventRepository.SOURCE.STREAM) {
@@ -792,6 +793,52 @@ export class CallingRepository {
             .filter(item => !newEmojis.some(newItem => newItem.id === item.id));
           this.callState.emojis(remainingEmojis);
         }, CallingRepository.EMOJI_TIME_OUT_DURATION);
+        break;
+      }
+
+      case CALL_MESSAGE_TYPE.HAND_RAISED: {
+        const currentCall = this.callState.joinedCall();
+        if (
+          !currentCall ||
+          !matchQualifiedIds(currentCall.conversation.qualifiedId, conversationId) ||
+          !this.selfUser
+        ) {
+          this.logger.info('Ignored hand raise event because no active call was found');
+          return;
+        }
+
+        const participant = currentCall
+          .participants()
+          .find(participant => matchQualifiedIds(participant.user.qualifiedId, userId));
+
+        if (!participant) {
+          this.logger.info('Ignored hand raise event because no active participant was found');
+          return;
+        }
+
+        const isSelf = matchQualifiedIds(this.selfUser.qualifiedId, userId);
+
+        const {isHandUp} = content;
+        const handRaisedAt = time ? new Date(time).getTime() : new Date().getTime();
+        participant.handRaisedAt(isHandUp ? handRaisedAt : null);
+
+        if (!isHandUp) {
+          break;
+        }
+
+        const name = participant.user.name();
+        const handUpMessage = isSelf
+          ? t('videoCallParticipantRaisedSelfHandUp')
+          : t('videoCallParticipantRaisedTheirHandUp', {name});
+
+        window.dispatchEvent(
+          new CustomEvent(WebAppEvents.CALL.HAND_RAISED, {
+            detail: {
+              notificationMessage: handUpMessage,
+            },
+          }),
+        );
+
         break;
       }
 
@@ -1066,9 +1113,9 @@ export class CallingRepository {
     const isScreenSharingSourceFromDetachedWindow = this.callState.isScreenSharingSourceFromDetachedWindow();
 
     if (joinedCall && isSharingScreen && isScreenSharingSourceFromDetachedWindow) {
+      window.dispatchEvent(new CustomEvent(WebAppEvents.CALL.SCREEN_SHARING_ENDED));
       this.callState.isScreenSharingSourceFromDetachedWindow(false);
       void this.toggleScreenshare(joinedCall);
-      showAppNotification(t('videoCallScreenShareEnded'));
     }
   };
 
@@ -1212,8 +1259,10 @@ export class CallingRepository {
   }
 
   private readonly leave1on1MLSConference = async (conversationId: QualifiedId) => {
+    const call = this.findCall(conversationId);
+    call?.endedAt(Date.now());
     if (isTelemetryEnabledAtCurrentEnvironment()) {
-      this.showCallQualityFeedbackModal();
+      this.showCallQualityFeedbackModal(conversationId);
     }
 
     await this.subconversationService.leaveConferenceSubconversation(conversationId);
@@ -1341,31 +1390,44 @@ export class CallingRepository {
     this.wCall?.requestVideoStreams(this.wUser, convId, VSTREAMS.LIST, JSON.stringify(payload));
   }
 
-  readonly showCallQualityFeedbackModal = () => {
+  readonly showCallQualityFeedbackModal = (conversationId: QualifiedId) => {
     if (!this.selfUser || !this.hasActiveCall()) {
       return;
     }
 
-    const {setQualityFeedbackModalShown} = useCallAlertState.getState();
+    const {setQualityFeedbackModalShown, setConversationId} = useCallAlertState.getState();
 
     try {
       const qualityFeedbackStorage = localStorage.getItem(CALL_QUALITY_FEEDBACK_KEY);
       const currentStorageData = qualityFeedbackStorage ? JSON.parse(qualityFeedbackStorage) : {};
       const currentUserDate = currentStorageData?.[this.selfUser.id];
       const currentDate = new Date().getTime();
+      const call = this.findCall(conversationId);
+      const isCallTooShort = (call?.endedAt() || 0) - (call?.startedAt() || 0) <= TIME_IN_MILLIS.MINUTE;
+      const isFeedbackMuted =
+        currentUserDate !== undefined && (currentUserDate === null || currentDate < currentUserDate);
 
-      if (currentUserDate === undefined || (currentUserDate !== null && currentDate >= currentUserDate)) {
+      if (isFeedbackMuted || isCallTooShort) {
+        trackingHelpers.trackCallQualityFeedback({
+          call,
+          label: isFeedbackMuted ? RatingListLabel.MUTED : RatingListLabel.CALL_TOO_SHORT,
+        });
+      } else {
+        setConversationId(conversationId);
         setQualityFeedbackModalShown(true);
       }
     } catch (error) {
       this.logger.warn(`Storage data can't found: ${(error as Error).message}`);
+      setConversationId(conversationId);
       setQualityFeedbackModalShown(true);
     }
   };
 
   readonly leaveCall = (conversationId: QualifiedId, reason: LEAVE_CALL_REASON): void => {
+    const call = this.findCall(conversationId);
+    call?.endedAt(Date.now());
     if (isTelemetryEnabledAtCurrentEnvironment()) {
-      this.showCallQualityFeedbackModal();
+      this.showCallQualityFeedbackModal(conversationId);
     }
 
     this.logger.info(`Ending call with reason ${reason} \n Stack trace: `, new Error().stack);
@@ -1633,6 +1695,10 @@ export class CallingRepository {
     });
   };
 
+  readonly sendInCallHandRaised = async (isHandUp: boolean, call: Call) => {
+    void this.messageRepository.sendInCallHandRaised(call.conversation, isHandUp);
+  };
+
   readonly sendModeratorMute = (conversationId: QualifiedId, participants: Participant[]) => {
     const recipients = this.convertParticipantsToCallingMessageRecepients(participants);
     void this.sendCallingMessage(
@@ -1741,7 +1807,7 @@ export class CallingRepository {
     this.sendCallingEvent(EventName.CALLING.ENDED_CALL, call, {
       [Segmentation.CALL.AV_SWITCH_TOGGLE]: call.analyticsAvSwitchToggle,
       [Segmentation.CALL.DIRECTION]: this.getCallDirection(call),
-      [Segmentation.CALL.DURATION]: Math.ceil((Date.now() - (call.startedAt() || 0)) / 5000) * 5,
+      [Segmentation.CALL.DURATION]: Math.ceil((call.endedAt() - (call.startedAt() || 0)) / TIME_IN_MILLIS.SECOND),
       [Segmentation.CALL.END_REASON]: reason,
       [Segmentation.CALL.REASON]: this.getCallEndReasonText(reason),
       [Segmentation.CALL.PARTICIPANTS]: call.analyticsMaximumParticipants,

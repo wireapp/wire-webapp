@@ -23,6 +23,7 @@ import {Call} from 'src/script/calling/Call';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {CallState, CallingViewMode, DesktopScreenShareMenu} from 'src/script/calling/CallState';
 import {MediaRepository} from 'src/script/media/MediaRepository';
+import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {UserState} from 'src/script/user/UserState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
@@ -32,6 +33,7 @@ import {CallingContainer} from '../CallingOverlayContainer';
 import {WindowContextProvider} from '../useWindow';
 
 interface DetachedCallingCellProps {
+  propertiesRepository: PropertiesRepository;
   callingRepository: CallingRepository;
   mediaRepository: MediaRepository;
   toggleScreenshare: (call: Call, desktopScreenShareMenu: DesktopScreenShareMenu) => void;
@@ -40,6 +42,7 @@ interface DetachedCallingCellProps {
 }
 
 export const DetachedCallingCell = ({
+  propertiesRepository,
   callingRepository,
   mediaRepository,
   toggleScreenshare,
@@ -63,6 +66,7 @@ export const DetachedCallingCell = ({
     <DetachedWindow callState={callState}>
       <WindowContextProvider value={detachedWindow || window}>
         <CallingContainer
+          propertiesRepository={propertiesRepository}
           callingRepository={callingRepository}
           mediaRepository={mediaRepository}
           toggleScreenshare={toggleScreenshare}

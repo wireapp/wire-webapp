@@ -31,6 +31,7 @@ import {WebWorker} from 'Util/worker';
 import {AssetRemoteData} from './AssetRemoteData';
 import {AssetTransferState} from './AssetTransferState';
 import {getAssetUrl, setAssetUrl} from './AssetURLCache';
+import {AssetError} from './AssetError';
 
 import {Conversation} from '../entity/Conversation';
 import {FileAsset} from '../entity/message/FileAsset';
@@ -157,7 +158,9 @@ export class AssetRepository {
       return downloadBlob(blob, asset.file_name);
     } catch (error) {
       if (error instanceof Error) {
-        if (error.message.endsWith('Encrypted asset does not match its SHA-256 hash')) {
+        if (error.name === AssetError.CANCEL_ERROR) {
+          asset.status(AssetTransferState.CANCELED);
+        } else if (error.message.endsWith('Encrypted asset does not match its SHA-256 hash')) {
           asset.status(AssetTransferState.DOWNLOAD_FAILED_HASH);
         } else {
           asset.status(AssetTransferState.DOWNLOAD_FAILED_DECRPYT);

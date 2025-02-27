@@ -74,7 +74,7 @@ export class Asset {
   isAudio(): boolean {
     const is_audio_asset = this.type === AssetType.FILE && this.file_type?.startsWith('audio');
     if (is_audio_asset) {
-      const can_play = document.createElement('audio').canPlayType(this.file_type);
+      const can_play = document.createElement('audio').canPlayType(this.file_type!);
       if (can_play !== '') {
         return true;
       }

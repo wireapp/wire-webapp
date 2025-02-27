@@ -33,11 +33,11 @@ import {includesOnlyEmojis} from 'Util/EmojiUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatDateNumeral, formatTimeShort, isBeforeToday} from 'Util/TimeUtil';
 
-import {AudioAsset} from './asset/AudioAsset';
-import {FileAsset} from './asset/FileAssetComponent';
+import {AudioAsset} from './asset/AudioAsset/AudioAsset';
+import {FileAsset} from './asset/FileAsset/FileAsset';
 import {LocationAsset} from './asset/LocationAsset';
 import {TextMessageRenderer} from './asset/TextMessageRenderer';
-import {VideoAsset} from './asset/VideoAsset';
+import {VideoAsset} from './asset/VideoAsset/VideoAsset';
 
 import {MessageActions} from '..';
 import type {Conversation} from '../../../../entity/Conversation';

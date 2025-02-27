@@ -44,11 +44,13 @@ import {Config} from '../Config';
 import type {ContributedSegmentations, MessageRepository} from '../conversation/MessageRepository';
 import {ClientEvent} from '../event/Client';
 import {TeamState} from '../team/TeamState';
+import {UserState} from '../user/UserState';
 
+export const TEAM_SIZE_THRESHOLD_VALUE = 6;
 export class EventTrackingRepository {
   private isProductReportingActivated: boolean = false;
   private sendAppOpenEvent: boolean = true;
-  private telemetryDeviceId: string;
+  private telemetryDeviceId: string | undefined;
   private readonly logger: Logger = getLogger('EventTrackingRepository');
   private readonly telemetryLogger: Logger = getLogger('Telemetry');
   private telemetryInitialized: boolean = false;
@@ -71,6 +73,7 @@ export class EventTrackingRepository {
   constructor(
     private readonly messageRepository: MessageRepository,
     private readonly teamState = container.resolve(TeamState),
+    private readonly userState = container.resolve(UserState),
   ) {
     amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent);
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.PRIVACY.TELEMETRY_SHARING, this.toggleTelemetry);
@@ -235,6 +238,7 @@ export class EventTrackingRepository {
           apiKey: COUNTLY_API_KEY,
           enableLogging: COUNTLY_ENABLE_LOGGING,
           serverUrl: 'https://countly.wire.com/',
+          autoErrorTracking: true,
         },
       });
 
@@ -319,6 +323,26 @@ export class EventTrackingRepository {
     }
   }
 
+  private getUserData(): ContributedSegmentations {
+    const segmentation: ContributedSegmentations = {
+      [UserData.IS_TEAM]: this.teamState.isTeam(),
+    };
+
+    if (this.teamState.isTeam()) {
+      segmentation[Segmentation.COMMON.TEAM_IS_ENTERPRISE] = this.teamState.isConferenceCallingEnabled();
+      if (this.teamState.teamSize() >= TEAM_SIZE_THRESHOLD_VALUE) {
+        const selfRole = this.teamState.selfRole();
+        segmentation[Segmentation.COMMON.TEAM_USER_TYPE] = selfRole ? selfRole.toString() : '';
+        segmentation[Segmentation.COMMON.TEAM_TEAM_ID] = this.teamState.team().id!;
+        segmentation[Segmentation.COMMON.TEAM_TEAM_SIZE] = this.teamState.teamSize();
+      }
+    } else {
+      segmentation[Segmentation.COMMON.USER_CONTACTS] = this.userState.connectedUsers().length;
+    }
+
+    return segmentation;
+  }
+
   private trackProductReportingEvent(eventName: string, customSegmentations?: ContributedSegmentations): void {
     if (!telemetry.isLoaded()) {
       this.telemetryLogger.warn('Telemetry is not available');
@@ -326,17 +350,17 @@ export class EventTrackingRepository {
     }
 
     if (this.isProductReportingActivated === true || getForcedErrorReportingStatus()) {
-      const userData = {
-        [UserData.IS_TEAM]: this.teamState.isTeam(),
-      };
+      const userData = this.getUserData();
 
       telemetry.setUserData(userData);
 
       this.telemetryLogger.info(`Reporting user data for product event ${eventName}@${JSON.stringify(userData)}`);
 
       const segmentation = {
-        [Segmentation.COMMON.APP_VERSION]: Config.getConfig().VERSION,
-        [Segmentation.COMMON.DESKTOP_APP]: getPlatform(),
+        [Segmentation.APP_OPEN.DESKTOP_APP]: getPlatform(),
+        [Segmentation.APP_OPEN.APP_VERSION]: Config.getConfig().VERSION,
+        [Segmentation.APP_OPEN.OS_VERSION]: navigator.userAgent,
+        [Segmentation.APP_OPEN.IS_TEAM_MEMBER]: this.teamState.isTeam(),
         ...customSegmentations,
       };
 

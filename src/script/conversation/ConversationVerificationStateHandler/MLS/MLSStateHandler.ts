@@ -23,6 +23,7 @@ import {E2eiConversationState} from '@wireapp/core/lib/messagingProtocols/mls';
 import {StringifiedQualifiedId, stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 
 import {
+  E2EIHandler,
   getActiveWireIdentity,
   getAllGroupUsersIdentities,
   getConversationVerificationState,
@@ -197,8 +198,12 @@ export class MLSConversationVerificationStateHandler {
   };
 
   public checkConversationVerificationState = async (conversation: Conversation): Promise<void> => {
-    const isSelfConversation = conversation.type() === CONVERSATION_TYPE.SELF;
-    if (!isMLSConversation(conversation) || isSelfConversation) {
+    // Is the feature supported and enabled?
+    const isMLSAndE2EIEnabled = (await this.core.isMLSActiveForClient()) && E2EIHandler.getInstance().isE2EIEnabled();
+    // We only want to check MLS conversations that are not self conversations
+    const isMLSAndNotSelfConversation =
+      isMLSConversation(conversation) && conversation.type() !== CONVERSATION_TYPE.SELF;
+    if (!isMLSAndE2EIEnabled || !isMLSAndNotSelfConversation) {
       return;
     }
 

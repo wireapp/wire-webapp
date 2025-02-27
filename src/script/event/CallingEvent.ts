@@ -32,6 +32,7 @@ interface CallingRemoteMuteEventContentData {
 interface CallingEventContentData {
   [CALL_MESSAGE_TYPE.REMOTE_MUTE]: CallingRemoteMuteEventContentData;
   [CALL_MESSAGE_TYPE.EMOJIS]: {};
+  [CALL_MESSAGE_TYPE.HAND_RAISED]: {};
 }
 
 type CallingEventContent = {
@@ -41,6 +42,7 @@ type CallingEventContent = {
         version: string;
         data: CallingEventContentData[EventType];
         emojis: InCallEmojiType;
+        isHandUp: boolean;
       }
     : {type: EventType; version: string};
 }[CALL_MESSAGE_TYPE];

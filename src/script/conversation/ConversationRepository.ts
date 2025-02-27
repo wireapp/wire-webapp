@@ -58,7 +58,7 @@ import {flatten} from 'underscore';
 import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {TYPING_TIMEOUT, useTypingIndicatorState} from 'Components/InputBar/components/TypingIndicator';
+import {TYPING_TIMEOUT, useTypingIndicatorState} from 'Components/InputBar/TypingIndicator';
 import {getNextItem} from 'Util/ArrayUtil';
 import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/FileTypeUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
@@ -226,6 +226,7 @@ export class ConversationRepository {
     private readonly conversationState = container.resolve(ConversationState),
     private readonly connectionState = container.resolve(ConnectionState),
     private readonly core = container.resolve(Core),
+    private dedupe1to1MigratedToMlsMessage: string[] = [],
   ) {
     this.eventService = eventRepository.eventService;
     // we register a client mismatch handler agains the message repository so that we can react to missing members
@@ -615,12 +616,15 @@ export class ConversationRepository {
    * Will load all the conversations in memory
    * @returns all the conversations from backend merged with the locally stored conversations and loaded into memory
    */
-  public async loadConversations(connections: ConnectionEntity[]): Promise<Conversation[]> {
+  public async loadConversations(
+    connections: ConnectionEntity[],
+    deadConnections: ConnectionEntity[],
+  ): Promise<Conversation[]> {
     const remoteConversations = await this.conversationService.getAllConversations().catch(error => {
       this.logger.error(`Failed to get all conversations from backend: ${error.message}`);
       return {found: []} as RemoteConversations;
     });
-    return this.loadRemoteConversations(remoteConversations, connections);
+    return this.loadRemoteConversations(remoteConversations, connections, deadConnections);
   }
 
   /**
@@ -640,7 +644,8 @@ export class ConversationRepository {
       });
 
     const connections = this.connectionState.connections();
-    return this.loadRemoteConversations(remoteConversations, connections);
+    const deadConnections = this.connectionState.deadConnections();
+    return this.loadRemoteConversations(remoteConversations, connections, deadConnections);
   }
 
   /**
@@ -722,6 +727,7 @@ export class ConversationRepository {
     localConversations: ConversationDatabaseData[],
     remoteConversations: RemoteConversations,
     connections: ConnectionEntity[],
+    deadConnections: ConnectionEntity[] = [],
   ): Promise<{localConversations: ConversationDatabaseData[]; remoteConversations: RemoteConversations}> {
     //If there's any local conversation of type 3 (CONNECT), but the connection doesn't exist anymore (user was deleted),
     // we delete the conversation and blacklist it so it's never refetched from the backend
@@ -743,20 +749,27 @@ export class ConversationRepository {
       }
     }
 
-    const filteredRemoteConversations = remoteConversations.found?.filter(
-      remoteConversation =>
-        !deletedConnectionRequests.find(({qualified_id, id, domain}) =>
-          matchQualifiedIds(qualified_id || {id, domain}, remoteConversation.qualified_id),
-        ),
+    const filteredRemoteConversations = remoteConversations.found?.filter(remoteConversation => {
+      const isNotDeletedConnection = !deletedConnectionRequests.find(({qualified_id, id, domain}) =>
+        matchQualifiedIds(qualified_id || {id, domain}, remoteConversation.qualified_id),
+      );
+
+      const isNotDeadConnection = !deadConnections.some(deadConnection =>
+        matchQualifiedIds(remoteConversation.qualified_id, deadConnection.conversationId),
+      );
+
+      return isNotDeletedConnection && isNotDeadConnection;
+    });
+
+    const deletedConnectionIds = deletedConnectionRequests.map(
+      deletedConnection =>
+        deletedConnection.qualified_id || {id: deletedConnection.id, domain: deletedConnection.domain ?? ''},
     );
 
-    await Promise.all(
-      deletedConnectionRequests.map(async ({id, domain, qualified_id}) => {
-        const qualifiedId = qualified_id || {id, domain};
-        await this.conversationService.deleteConversationFromDb(qualifiedId.id);
-        await this.blacklistConversation(qualifiedId);
-      }),
-    );
+    const deadConnectionIds = deadConnections.map(deadConnection => deadConnection.conversationId);
+
+    await this.deleteAndBlockConversations(deletedConnectionIds);
+    await this.deleteAndBlockConversations(deadConnectionIds);
 
     return {
       localConversations: filteredLocalConversations,
@@ -764,17 +777,32 @@ export class ConversationRepository {
     };
   }
 
+  private async deleteAndBlockConversations(conversationIds: QualifiedId[]) {
+    await Promise.all(
+      conversationIds.map(async conversationId => {
+        await this.conversationService.deleteConversationFromDb(conversationId.id);
+        await this.blacklistConversation(conversationId);
+      }),
+    );
+  }
+
   private async filterLoadedConversations(
     localConversations: ConversationDatabaseData[],
     remoteConversations: RemoteConversations,
     connections: ConnectionEntity[],
+    deadConnections: ConnectionEntity[],
   ): Promise<{localConversations: ConversationDatabaseData[]; remoteConversations: RemoteConversations}> {
     const filteredAbandonedRemoteConversations = await this.filterAbandonedProteus1to1Conversations(
       remoteConversations,
       localConversations,
     );
 
-    return this.filterDeletedConnectionRequests(localConversations, filteredAbandonedRemoteConversations, connections);
+    return this.filterDeletedConnectionRequests(
+      localConversations,
+      filteredAbandonedRemoteConversations,
+      connections,
+      deadConnections,
+    );
   }
 
   /**
@@ -785,13 +813,14 @@ export class ConversationRepository {
   private async loadRemoteConversations(
     remoteConversations: RemoteConversations,
     connections: ConnectionEntity[],
+    deadConnections: ConnectionEntity[] = [],
   ): Promise<Conversation[]> {
     const localConversations = await this.conversationService.loadConversationStatesFromDb<ConversationDatabaseData>();
 
     let conversationsData: any[];
 
     const {localConversations: filteredLocalConversations, remoteConversations: filteredRemoteConversations} =
-      await this.filterLoadedConversations(localConversations, remoteConversations, connections);
+      await this.filterLoadedConversations(localConversations, remoteConversations, connections, deadConnections);
 
     if (!remoteConversations.found?.length) {
       conversationsData = filteredLocalConversations;
@@ -3390,13 +3419,18 @@ export class ConversationRepository {
       case ClientEvent.CONVERSATION.JOINED_AFTER_MLS_MIGRATION:
       case ClientEvent.CONVERSATION.MLS_MIGRATION_ONGOING_CALL:
       case ClientEvent.CONVERSATION.MLS_CONVERSATION_RECOVERED:
-      case ClientEvent.CONVERSATION.ONE2ONE_MIGRATED_TO_MLS:
       case ClientEvent.CONVERSATION.UNABLE_TO_DECRYPT:
       case ClientEvent.CONVERSATION.VERIFICATION:
       case ClientEvent.CONVERSATION.E2EI_VERIFICATION:
       case ClientEvent.CONVERSATION.VOICE_CHANNEL_ACTIVATE:
       case ClientEvent.CONVERSATION.VOICE_CHANNEL_DEACTIVATE:
         return this.addEventToConversation(conversationEntity, eventJson);
+
+      case ClientEvent.CONVERSATION.ONE2ONE_MIGRATED_TO_MLS:
+        if (!this.dedupe1to1MigratedToMlsMessage.includes(conversationEntity.id)) {
+          this.dedupe1to1MigratedToMlsMessage.push(conversationEntity.id);
+          return this.inject1to1MigratedToMLS(conversationEntity);
+        }
     }
   }
 

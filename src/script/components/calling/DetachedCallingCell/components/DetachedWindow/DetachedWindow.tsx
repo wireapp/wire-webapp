@@ -54,6 +54,7 @@ export const DetachedWindow = ({children, callState = container.resolve(CallStat
     <CacheProvider value={memoizedCreateCacheWithContainer(detachedWindow.document.head)}>
       <StyledApp id="detached-window" themeId={THEME_ID.DEFAULT} style={{height: '100%'}}>
         {children}
+        <div id="app-notification"></div>
       </StyledApp>
     </CacheProvider>,
     detachedWindow.document.body,

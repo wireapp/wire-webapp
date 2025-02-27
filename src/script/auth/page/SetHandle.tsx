@@ -38,7 +38,9 @@ import {
   Text,
 } from '@wireapp/react-ui-kit';
 
+import {StorageKey} from 'src/script/storage';
 import {t} from 'Util/LocalizerUtil';
+import {storeValue} from 'Util/StorageUtil';
 import {isBackendError} from 'Util/TypePredicateUtil';
 
 import {Page} from './Page';
@@ -105,6 +107,16 @@ const SetHandleComponent = ({
     setHandle(event.target.value);
   };
 
+  const handleAcceptNewletterConsent = () => {
+    void updateConsent(ConsentType.MARKETING, 1);
+    storeValue(StorageKey.INITIAL_MAKRETING_CONSENT_ACCEPTED, true);
+  };
+
+  const handleDeclineNewletterConsent = () => {
+    void updateConsent(ConsentType.MARKETING, 0);
+    storeValue(StorageKey.INITIAL_MAKRETING_CONSENT_ACCEPTED, false);
+  };
+
   if (hasSelfHandle) {
     return null;
   }
@@ -143,10 +155,7 @@ const SetHandleComponent = ({
         {error && parseError(error)}
       </ContainerXS>
       {!isFetching && hasUnsetMarketingConsent && (
-        <AcceptNewsModal
-          onConfirm={() => updateConsent(ConsentType.MARKETING, 1)}
-          onDecline={() => updateConsent(ConsentType.MARKETING, 0)}
-        />
+        <AcceptNewsModal onConfirm={handleAcceptNewletterConsent} onDecline={handleDeclineNewletterConsent} />
       )}
     </Page>
   );

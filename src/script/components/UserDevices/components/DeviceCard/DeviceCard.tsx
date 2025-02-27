@@ -24,7 +24,7 @@ import {DeviceVerificationBadges} from 'Components/Badge';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
 import {WireIdentity} from 'src/script/E2EIdentity';
-import {handleKeyDown} from 'Util/KeyboardUtil';
+import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {splitFingerprint} from 'Util/StringUtil';
 
@@ -62,7 +62,13 @@ const DeviceCard = ({click, getDeviceIdentity, device: clientEntity, showIcon = 
       tabIndex={messageFocusedTabIndex}
       className={cx('device-card', {'device-card__no-hover': !clickable})}
       onClick={clickOnDevice}
-      onKeyDown={e => handleKeyDown(e, clickOnDevice)}
+      onKeyDown={event =>
+        handleKeyDown({
+          event,
+          callback: clickOnDevice,
+          keys: [KEY.ENTER, KEY.SPACE],
+        })
+      }
       data-uie-uid={id}
       data-uie-name="device-card"
     >

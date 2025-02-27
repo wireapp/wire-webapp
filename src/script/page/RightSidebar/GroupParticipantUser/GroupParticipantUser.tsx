@@ -32,7 +32,7 @@ import {UserActions, Actions} from 'Components/panel/UserActions';
 import {UserDetails} from 'Components/panel/UserDetails';
 import {BaseToggle} from 'Components/toggle/BaseToggle';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleKeyDown} from 'Util/KeyboardUtil';
+import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {ConversationRoleRepository} from '../../../conversation/ConversationRoleRepository';
@@ -184,7 +184,13 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
                 aria-label={t('accessibility.conversationDetailsActionGroupAdminLabel')}
                 aria-pressed={isAdmin}
                 onClick={toggleAdmin}
-                onKeyDown={(event: React.KeyboardEvent<HTMLElement>) => handleKeyDown(event, toggleAdmin)}
+                onKeyDown={(event: React.KeyboardEvent<HTMLElement>) =>
+                  handleKeyDown({
+                    event,
+                    callback: toggleAdmin,
+                    keys: [KEY.ENTER, KEY.SPACE],
+                  })
+                }
               >
                 <span className="panel__action-item__icon">
                   <Icon.GroupAdminIcon />

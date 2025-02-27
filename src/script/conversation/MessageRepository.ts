@@ -54,6 +54,7 @@ import {
 } from 'Util/LinkPreviewSender';
 import {Declension, joinNames, t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
+import {isMarkdownText} from 'Util/MarkdownUtil';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
 import {roundLogarithmic} from 'Util/NumberUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
@@ -662,9 +663,7 @@ export class MessageRepository {
       public: true,
       retention,
     };
-    const asset = await this.assetRepository.uploadFile(file, messageId, options, () =>
-      this.cancelAssetUpload(conversation, messageId),
-    );
+    const asset = await this.assetRepository.uploadFile(file, messageId, options);
 
     const metadata = asImage ? ((await buildMetadata(file)) as ImageMetadata) : undefined;
     const commonMessageData = {
@@ -1044,6 +1043,12 @@ export class MessageRepository {
     return this.sendAndInjectMessage(emojisMessage, conversation);
   }
 
+  public async sendInCallHandRaised(conversation: Conversation, isHandUp: boolean) {
+    const handRaiseMessage = MessageBuilder.buildInCallHandRaiseMessage({isHandUp: isHandUp});
+
+    return this.sendAndInjectMessage(handRaiseMessage, conversation);
+  }
+
   private expectReadReceipt(conversationEntity: Conversation): boolean {
     if (conversationEntity.is1to1()) {
       return !!this.propertyRepository.receiptMode();
@@ -1139,7 +1144,9 @@ export class MessageRepository {
   }
 
   private async sendToSelfConversations(payload: GenericMessage) {
-    const selfConversations = this.conversationState.getSelfConversations(supportsMLS());
+    const selfConversations = this.conversationState.getSelfConversations(
+      supportsMLS() && this.teamState.isMLSEnabled(),
+    );
     await Promise.all(
       selfConversations.map(selfConversation =>
         this.sendAndInjectMessage(payload, selfConversation, {
@@ -1239,14 +1246,6 @@ export class MessageRepository {
       this.createRecipients(users),
       this.onClientMismatch,
     );
-  };
-
-  /**
-   * Cancel asset upload.
-   * @param messageId Id of the message which upload has been cancelled
-   */
-  private readonly cancelAssetUpload = (conversation: Conversation, messageId: string) => {
-    this.sendAssetUploadFailed(conversation, messageId, Asset.NotUploaded.CANCELLED);
   };
 
   /**
@@ -1503,7 +1502,10 @@ export class MessageRepository {
     }
 
     const messageContentType = genericMessage.content;
+
     let actionType;
+    let isRichText: boolean | undefined = undefined;
+
     switch (messageContentType) {
       case 'asset': {
         const protoAsset = genericMessage.asset;
@@ -1542,6 +1544,9 @@ export class MessageRepository {
         if (!length) {
           actionType = 'text';
         }
+        if (protoText) {
+          isRichText = isMarkdownText(protoText.content);
+        }
         break;
       }
 
@@ -1565,7 +1570,11 @@ export class MessageRepository {
         [Segmentation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
         [Segmentation.CONVERSATION.SERVICES]: roundLogarithmic(services, 6),
         [Segmentation.MESSAGE.ACTION]: actionType,
+        ...(isRichText !== undefined && {
+          [Segmentation.IS_RICH_TEXT]: isRichText,
+        }),
       };
+
       const isTeamConversation = !!conversationEntity.teamId;
       if (isTeamConversation) {
         segmentations = {

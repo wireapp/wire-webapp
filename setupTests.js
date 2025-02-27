@@ -24,6 +24,7 @@ import 'core-js/full/reflect';
 import 'intersection-observer';
 import 'core-js/stable/structured-clone';
 import 'fake-indexeddb/auto';
+import '@testing-library/jest-dom';
 
 import 'src/script/util/test/mock/createObjectURLMock';
 import 'src/script/util/test/mock/cryptoMock';

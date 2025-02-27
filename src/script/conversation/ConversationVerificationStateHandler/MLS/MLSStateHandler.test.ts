@@ -20,7 +20,7 @@
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
 import {E2eiConversationState} from '@wireapp/core/lib/messagingProtocols/mls';
 
-import * as e2eIdentity from 'src/script/E2EIdentity/E2EIdentityVerification';
+import * as e2eIdentity from 'src/script/E2EIdentity';
 import {Conversation} from 'src/script/entity/Conversation';
 import {Core} from 'src/script/service/CoreSingleton';
 import {createUuid} from 'Util/uuid';
@@ -31,9 +31,20 @@ import {MLSConversationVerificationStateHandler} from './MLSStateHandler';
 import {ConversationState} from '../../ConversationState';
 import {ConversationVerificationState} from '../../ConversationVerificationState';
 
+jest.mock('src/script/E2EIdentity', () => ({
+  ...jest.requireActual('src/script/E2EIdentity'),
+  getConversationVerificationState: jest.fn(),
+  E2EIHandler: {
+    getInstance: jest.fn().mockReturnValue({
+      isE2EIEnabled: jest.fn(),
+    }),
+  },
+}));
+
 describe('MLSConversationVerificationStateHandler', () => {
   const conversationState = new ConversationState();
   let core: Core;
+  const e2eiHandler = e2eIdentity.E2EIHandler.getInstance();
   const groupId = 'AAEAAKA0LuGtiU7NjqqlZIE2dQUAZWxuYS53aXJlLmxpbms=';
   const conversation = new Conversation(createUuid(), '', ConversationProtocol.MLS);
   conversationState.conversations.push(conversation);
@@ -42,6 +53,36 @@ describe('MLSConversationVerificationStateHandler', () => {
   beforeEach(() => {
     core = new Core();
     jest.clearAllMocks();
+    core.isMLSActiveForClient = jest.fn().mockReturnValue(true);
+    e2eiHandler.isE2EIEnabled = jest.fn().mockReturnValue(true);
+  });
+
+  it('should do nothing if MLS feature is not active', () => {
+    core.isMLSActiveForClient = jest.fn().mockReturnValue(false);
+
+    new MLSConversationVerificationStateHandler(
+      'domain',
+      () => {},
+      async () => {},
+      conversationState,
+      core,
+    );
+
+    expect(core.service?.mls?.conversationExists).not.toHaveBeenCalled();
+  });
+
+  it('should do nothing if E2EI feature is not active', () => {
+    e2eiHandler.isE2EIEnabled = jest.fn().mockReturnValue(false);
+
+    new MLSConversationVerificationStateHandler(
+      'domain',
+      () => {},
+      async () => {},
+      conversationState,
+      core,
+    );
+
+    expect(core.service?.mls?.conversationExists).not.toHaveBeenCalled();
   });
 
   it('should do nothing if MLS service is not available', () => {

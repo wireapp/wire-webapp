@@ -162,14 +162,32 @@ export type Env = {
   /** Feature to enable in call reactions */
   FEATURE_ENABLE_IN_CALL_REACTIONS: string;
 
+  /** Feature to enable in call hand raise */
+  FEATURE_ENABLE_IN_CALL_HAND_RAISE: string;
+
   /** Feature to enable remove conversation locally */
   FEATURE_ENABLE_REMOVE_GROUP_CONVERSATION: string;
 
   /** Feature to enable calling popout window */
   FEATURE_ENABLE_DETACHED_CALLING_WINDOW: string;
 
+  /** Feature to enable Enterprise login v2 */
+  FEATURE_ENABLE_ENTERPRISE_LOGIN_V2: string;
+
   /** Feature to enable team creation flow for individual users */
   FEATURE_ENABLE_TEAM_CREATION: string;
+
+  /** Feature to enable auto login */
+  FEATURE_ENABLE_AUTO_LOGIN: string;
+
+  /** Feature to enable rich text editor */
+  FEATURE_ENABLE_MESSAGE_FORMAT_BUTTONS: string;
+
+  /** Feature to enable Cross Platform Backup export */
+  FEATURE_ENABLE_CROSS_PLATFORM_BACKUP_EXPORT: string;
+
+  /** Feature to enable the press space to unmute feature */
+  FEATURE_ENABLE_PRESS_SPACE_TO_UNMUTE: string;
 
   /** Sets the verification ID for Google webmasters */
   GOOGLE_WEBMASTER_ID: string;
@@ -298,6 +316,12 @@ export type Env = {
   URL_SUPPORT_PRIVACY_UNVERIFIED_USERS: string;
 
   URL_SUPPORT_PRIVACY_WHY: string;
+
+  URL_SUPPORT_CHANGE_EMAIL_ADDRESS: string;
+
+  URL_SUPPORT_DELETE_PERSONAL_ACCOUNT: string;
+
+  URL_SUPPORT_REMOVE_TEAM_MEMBER: string;
 
   URL_WHATS_NEW: string;
 

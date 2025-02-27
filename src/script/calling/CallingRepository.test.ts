@@ -22,9 +22,8 @@ import {
   ConversationProtocol,
   DefaultConversationRoleName,
 } from '@wireapp/api-client/lib/conversation';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import 'jsdom-worker';
-import ko, {Subscription} from 'knockout';
+import {Subscription} from 'knockout';
 import {container} from 'tsyringe';
 
 import {CALL_TYPE, CONV_TYPE, REASON, STATE as CALL_STATE, VIDEO_STATE, Wcall} from '@wireapp/avs';
@@ -45,46 +44,11 @@ import {createUuid} from 'Util/uuid';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
 
+import {buildMediaDevicesHandler, createConversation, createSelfParticipant} from '../auth/util/test/TestUtil';
 import {CallingEvent} from '../event/CallingEvent';
 import {CALL} from '../event/Client';
-import {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import {Core} from '../service/CoreSingleton';
 import {UserRepository} from '../user/UserRepository';
-
-const createSelfParticipant = () => {
-  const selfUser = new User();
-  selfUser.isMe = true;
-  return new Participant(selfUser, 'client1');
-};
-
-const createConversation = (
-  type: CONVERSATION_TYPE = CONVERSATION_TYPE.ONE_TO_ONE,
-  protocol: ConversationProtocol = ConversationProtocol.PROTEUS,
-  conversationId: QualifiedId = {id: createUuid(), domain: ''},
-  groupId = 'group-id',
-) => {
-  const conversation = new Conversation(conversationId.id, conversationId.domain, protocol);
-  conversation.participating_user_ets.push(new User(createUuid()));
-  conversation.type(type);
-  if (protocol === ConversationProtocol.MLS) {
-    conversation.groupId = groupId;
-  }
-  return conversation;
-};
-
-const mediaDevices = {
-  audioinput: ko.pureComputed(() => 'test'),
-  audiooutput: ko.pureComputed(() => 'test'),
-  screeninput: ko.pureComputed(() => 'test'),
-  videoinput: ko.pureComputed(() => 'test'),
-};
-
-const buildMediaDevicesHandler = () => {
-  return {
-    currentAvailableDeviceId: mediaDevices,
-    setOnMediaDevicesRefreshHandler: jest.fn(),
-  } as unknown as MediaDevicesHandler;
-};
 
 describe('CallingRepository', () => {
   const testFactory = new TestFactory();
@@ -144,6 +108,7 @@ describe('CallingRepository', () => {
       const event: CallingEvent = {
         content: {
           emojis: {},
+          isHandUp: false,
           type: CALL_MESSAGE_TYPE.REMOTE_MUTE,
           version: '',
           data: {targets: {[selfUserId.domain]: {[selfUserId.id]: [selfClientId]}}},
@@ -189,6 +154,7 @@ describe('CallingRepository', () => {
       const event: CallingEvent = {
         content: {
           emojis: {},
+          isHandUp: false,
           type: CALL_MESSAGE_TYPE.REMOTE_MUTE,
           version: '',
           data: {targets: {[selfUserId.domain]: {[selfUserId.id]: [selfClientId]}}},
@@ -236,6 +202,7 @@ describe('CallingRepository', () => {
       const event: CallingEvent = {
         content: {
           emojis: {},
+          isHandUp: false,
           type: CALL_MESSAGE_TYPE.REMOTE_MUTE,
           version: '',
           data: {targets: {[selfUserId.domain]: {[selfUserId.id]: [someOtherClientId]}}},

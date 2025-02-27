@@ -34,6 +34,11 @@ jest.mock('./panels/preferences/AccountPreferences', () => ({
   __esModule: true,
 }));
 
+jest.mock('@formkit/auto-animate/react', () => ({
+  __esModule: true,
+  useAutoAnimate: jest.fn(),
+}));
+
 describe('Preferences', () => {
   const mainViewModel = {
     content: {

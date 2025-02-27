@@ -34,11 +34,13 @@ import {Page} from './Page';
 import {actionRoot} from '../module/action';
 import {bindActionCreators} from '../module/reducer';
 import {QUERY_KEY} from '../route';
+import {getEnterpriseLoginV2FF} from '../util/helpers';
 
 const REDIRECT_DELAY = 5000;
 const CustomEnvironmentRedirectComponent = ({doNavigate, doSendNavigationEvent}: DispatchProps) => {
   const [destinationUrl, setDestinationUrl] = useState<string | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
+  const isEnterpriseLoginV2Enabled = getEnterpriseLoginV2FF();
 
   useEffect(() => {
     const destinationParam = UrlUtil.getURLParameter(QUERY_KEY.DESTINATION_URL);
@@ -63,13 +65,9 @@ const CustomEnvironmentRedirectComponent = ({doNavigate, doSendNavigationEvent}:
   }, [destinationUrl]);
 
   return (
-    <Page>
+    <Page withSideBar={isEnterpriseLoginV2Enabled}>
       <FlexBox column>
-        <FlexBox
-          justify="center"
-          align="flex-end"
-          style={{backgroundColor: 'black', height: 216, marginBottom: 64, width: '100vw'}}
-        >
+        <FlexBox justify="center" align="flex-end" style={{marginBottom: 64, alignSelf: 'center', padding: '4px'}}>
           <FlexBox
             justify="center"
             align="center"
@@ -83,7 +81,7 @@ const CustomEnvironmentRedirectComponent = ({doNavigate, doSendNavigationEvent}:
               width: 120,
             }}
           >
-            <LogoIcon aria-hidden="true" color={COLOR.WHITE} width={47} height={38} />
+            <LogoIcon aria-hidden="true" fill={COLOR.WHITE} color={COLOR.WHITE} width={47} height={38} />
             <svg
               aria-hidden="true"
               style={{position: 'absolute'}}
