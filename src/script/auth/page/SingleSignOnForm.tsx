@@ -109,7 +109,6 @@ const SingleSignOnFormComponent = ({
   };
 
   const {loginV2} = useEnterpriseLoginV2({
-    codeOrMail,
     loginWithSSO,
   });
 

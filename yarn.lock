@@ -6172,9 +6172,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^27.19.0":
-  version: 27.19.0
-  resolution: "@wireapp/api-client@npm:27.19.0"
+"@wireapp/api-client@npm:^27.19.2":
+  version: 27.19.2
+  resolution: "@wireapp/api-client@npm:27.19.2"
   dependencies:
     "@wireapp/commons": "npm:^5.4.1"
     "@wireapp/priority-queue": "npm:^2.1.11"
@@ -6187,9 +6187,9 @@ __metadata:
     reconnecting-websocket: "npm:4.4.0"
     spark-md5: "npm:3.0.2"
     tough-cookie: "npm:4.1.4"
-    ws: "npm:8.18.0"
+    ws: "npm:8.18.1"
     zod: "npm:3.24.2"
-  checksum: 10/4a916c2c4b3174559cb4f083817ff380049094e3cc725f941de984b502634438c73cecd662eccb7cbfb88cc229430a1d403146933b6eb9b7340ebfceb1d3d3b4
+  checksum: 10/249850a09a80af61578d8ba62ae9c5f7820073e348b4437eee6762e4c54498c8ac24225f2eb508c226a502c6ece7a5a0190cb4e9a5efcd1f1480be697f62dd95
   languageName: node
   linkType: hard
 
@@ -6254,11 +6254,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:46.19.1":
-  version: 46.19.1
-  resolution: "@wireapp/core@npm:46.19.1"
+"@wireapp/core@npm:46.19.3":
+  version: 46.19.3
+  resolution: "@wireapp/core@npm:46.19.3"
   dependencies:
-    "@wireapp/api-client": "npm:^27.19.0"
+    "@wireapp/api-client": "npm:^27.19.2"
     "@wireapp/commons": "npm:^5.4.1"
     "@wireapp/core-crypto": "npm:3.1.0"
     "@wireapp/cryptobox": "npm:12.8.0"
@@ -6276,7 +6276,7 @@ __metadata:
     long: "npm:^5.2.0"
     uuid: "npm:9.0.1"
     zod: "npm:3.24.2"
-  checksum: 10/5398e265c9e056d08b2c050cd1e1b73bf8d181ac7884552689f250b534be1e39ffae8ec2fe13ed12e367b4453381440f5e4addf7941778f0aa74ca22e3a50874
+  checksum: 10/5df294fee0640f41fc5e540257ead4f985905e05e7dec92ea88aa223a9e3c20094625d1a82f3dec8554ff0fecd967cbf0c31f1d33be3b61da52f6f03b832e816
   languageName: node
   linkType: hard
 
@@ -19482,7 +19482,7 @@ __metadata:
     "@wireapp/avs-debugger": "npm:0.0.7"
     "@wireapp/commons": "npm:5.4.1"
     "@wireapp/copy-config": "npm:2.3.0"
-    "@wireapp/core": "npm:46.19.1"
+    "@wireapp/core": "npm:46.19.3"
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/prettier-config": "npm:0.6.4"
     "@wireapp/react-ui-kit": "npm:9.37.0"
@@ -19867,9 +19867,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ws@npm:8.18.0":
-  version: 8.18.0
-  resolution: "ws@npm:8.18.0"
+"ws@npm:8.18.1":
+  version: 8.18.1
+  resolution: "ws@npm:8.18.1"
   peerDependencies:
     bufferutil: ^4.0.1
     utf-8-validate: ">=5.0.2"
@@ -19878,7 +19878,7 @@ __metadata:
       optional: true
     utf-8-validate:
       optional: true
-  checksum: 10/70dfe53f23ff4368d46e4c0b1d4ca734db2c4149c6f68bc62cb16fc21f753c47b35fcc6e582f3bdfba0eaeb1c488cddab3c2255755a5c3eecb251431e42b3ff6
+  checksum: 10/3f38e9594f2af5b6324138e86b74df7d77bbb8e310bf8188679dd80bac0d1f47e51536a1923ac3365f31f3d8b25ea0b03e4ade466aa8292a86cd5defca64b19b
   languageName: node
   linkType: hard
 

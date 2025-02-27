@@ -26,10 +26,8 @@ import {ROUTE} from '../route';
 import {getValidatedBackendConfig} from '../util/configUtil';
 
 export const useEnterpriseLoginV2 = ({
-  codeOrMail,
   loginWithSSO,
 }: {
-  codeOrMail: string;
   loginWithSSO: (code: string, password?: string) => Promise<void>;
 }) => {
   const apiClient = container.resolve(APIClient);
