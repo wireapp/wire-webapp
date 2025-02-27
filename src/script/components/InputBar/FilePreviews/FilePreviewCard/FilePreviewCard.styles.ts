@@ -22,3 +22,8 @@ import {CSSObject} from '@emotion/react';
 export const wrapperStyles: CSSObject = {
   gridColumn: 'span 3',
 };
+
+export const loadingStyles: CSSObject = {
+  color: 'var(--foreground)',
+  marginLeft: 'auto',
+};

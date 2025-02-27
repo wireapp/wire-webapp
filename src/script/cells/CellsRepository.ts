@@ -19,13 +19,29 @@
 
 import {container} from 'tsyringe';
 
+import {createUuid} from 'Util/uuid';
+
 import {APIClient} from '../service/APIClientSingleton';
 
 export class CellsRepository {
   private readonly basePath = 'wire-cells-web';
   constructor(private readonly apiClient = container.resolve(APIClient)) {}
 
-  async uploadFile(file: File): Promise<void> {
-    await this.apiClient.api.cells.uploadFileDraft({filePath: `${this.basePath}/${file.name}`, file});
+  async uploadFile(file: File): Promise<{uuid: string; versionId: string}> {
+    const path = `${this.basePath}/${encodeURIComponent(file.name)}`;
+
+    const uuid = createUuid();
+    const versionId = createUuid();
+
+    await this.apiClient.api.cells.uploadFileDraft({filePath: path, file, uuid, versionId});
+
+    return {
+      uuid,
+      versionId,
+    };
+  }
+
+  async deleteFileDraft({uuid, versionId}: {uuid: string; versionId: string}) {
+    return this.apiClient.api.cells.deleteFileDraft({uuid, versionId});
   }
 }

@@ -18,9 +18,11 @@
  */
 
 import {useAutoAnimate} from '@formkit/auto-animate/react';
+import {container} from 'tsyringe';
 
 import {FileWithPreview, useFileUploadState} from 'Components/Conversation/useFiles/useFiles';
-import {isAudio, isImage, isVideo} from 'src/script/assets/AssetMetaDataBuilder';
+import {isAudio, isVideo, isImage} from 'src/script/assets/AssetMetaDataBuilder';
+import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 
 import {AudioPreviewCard} from './AudioPreviewCard/AudioPreviewCard';
@@ -36,7 +38,7 @@ interface FilePreviewsProps {
 export const FilePreviews = ({files}: FilePreviewsProps) => {
   const [wrapperRef] = useAutoAnimate();
 
-  if (files.length === 0) {
+  if (!files || files.length === 0) {
     return null;
   }
 
@@ -49,15 +51,22 @@ export const FilePreviews = ({files}: FilePreviewsProps) => {
   );
 };
 
-const FilePreview = ({file}: {file: FileWithPreview}) => {
+const FilePreview = ({
+  file,
+  cellsRepository = container.resolve(CellsRepository),
+}: {
+  file: FileWithPreview;
+  cellsRepository?: CellsRepository;
+}) => {
+  const {deleteFile} = useFileUploadState();
+
   const name = trimFileExtension(file.name);
   const extension = getFileExtension(file.name);
   const size = formatBytes(file.size);
 
-  const {deleteFile} = useFileUploadState();
-
   const handleDelete = () => {
     deleteFile(file.id);
+    void cellsRepository.deleteFileDraft({uuid: file.remoteUuid, versionId: file.remoteVersionId});
   };
 
   if (isImage(file)) {
@@ -72,5 +81,13 @@ const FilePreview = ({file}: {file: FileWithPreview}) => {
     return <VideoPreviewCard src={file.preview} onDelete={handleDelete} />;
   }
 
-  return <FilePreviewCard extension={extension} name={name} size={size} onDelete={handleDelete} />;
+  return (
+    <FilePreviewCard
+      extension={extension}
+      name={name}
+      size={size}
+      onDelete={handleDelete}
+      isLoading={file.uploadStatus === 'uploading'}
+    />
+  );
 };

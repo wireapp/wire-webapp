@@ -33,7 +33,7 @@ import {FileDropzoneOverlay} from './FileDropzoneOverlay/FileDropzoneOverlay';
 import {validateFiles, ValidationResult} from './fileValidation/fileValidation';
 import {useIsDragging} from './useIsDragging/useIsDragging';
 
-import {useFileUploadState} from '../useFiles/useFiles';
+import {FileWithPreview, useFileUploadState} from '../useFiles/useFiles';
 import {checkFileSharingPermission} from '../utils/checkFileSharingPermission';
 
 interface FileDropzoneProps {
@@ -53,9 +53,14 @@ export const FileDropzone = ({
 }: FileDropzoneProps) => {
   const {isDragging, wrapperRef} = useIsDragging();
 
-  const {addFiles, files} = useFileUploadState();
+  const {addFiles, files, updateFile} = useFileUploadState();
 
   const MAX_SIZE = isTeam ? CONFIG.MAXIMUM_ASSET_FILE_SIZE_TEAM : CONFIG.MAXIMUM_ASSET_FILE_SIZE_PERSONAL;
+
+  const uploadFile = async (file: FileWithPreview) => {
+    const {uuid, versionId} = await cellsRepository.uploadFile(file);
+    updateFile(file.id, {remoteUuid: uuid, remoteVersionId: versionId, uploadStatus: 'success'});
+  };
 
   const {getRootProps, getInputProps, isDragAccept} = useDropzone({
     maxSize: MAX_SIZE,
@@ -85,12 +90,17 @@ export const FileDropzone = ({
         return Object.assign(file, {
           id: createUuid(),
           preview: URL.createObjectURL(file),
+          remoteUuid: '',
+          remoteVersionId: '',
+          uploadStatus: 'uploading' as const,
         });
       });
 
       addFiles(acceptedFilesWithPreview);
 
-      void cellsRepository.uploadFile(acceptedFilesWithPreview[0]);
+      acceptedFilesWithPreview.forEach(file => {
+        void uploadFile(file);
+      });
     }),
     onError: (error: Error) => {
       console.error('FileDropzone onError', error);
