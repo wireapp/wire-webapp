@@ -19,39 +19,55 @@
 
 import React from 'react';
 
-import {GroupIcon} from '@wireapp/react-ui-kit';
+import {CSS_SQUARE, CSS_FLEX_CENTER} from 'Util/CSSMixin';
 
-import {CSS_SQUARE} from 'Util/CSSMixin';
+import type {User} from '../../entity/User';
 
 export interface GroupAvatarProps {
   className?: string;
+  users: User[];
 }
 
-export const GroupAvatar: React.FC<GroupAvatarProps> = ({className}) => {
+export const GroupAvatar: React.FC<GroupAvatarProps> = ({users, className}) => {
+  const slicedUsers = users.slice(0, 4);
+
   return (
     <div
       className={className}
       css={{
         ...CSS_SQUARE(32),
-        border: '1px solid var(--border-color)',
+        border: '1px solid var(--text-input-placeholder)',
         borderRadius: 6,
       }}
     >
       <div
         css={{
           ...CSS_SQUARE(28),
-          backgroundColor: 'var(--app-bg-secondary)',
+          backgroundColor: 'var(--app-bg)',
           borderRadius: 5,
           display: 'flex',
           flexWrap: 'wrap',
           margin: 1,
           overflow: 'hidden',
-          alignItems: 'center',
-          justifyContent: 'center',
         }}
         data-uie-name="group-avatar-box-wrapper"
       >
-        <GroupIcon />
+        {slicedUsers.map(user => (
+          <div
+            key={user.id}
+            className="group-avatar-box"
+            css={{
+              ...CSS_FLEX_CENTER,
+              ...CSS_SQUARE(14),
+              color: user.accent_color(),
+              flex: '0 0 auto',
+              fontSize: 9,
+              fontWeight: 900,
+            }}
+          >
+            {Array.from(user.initials())[0]}
+          </div>
+        ))}
       </div>
     </div>
   );
