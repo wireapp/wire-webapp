@@ -1750,5 +1750,8 @@
   "accountAlreadyExistsModal.content": "This email's domain belongs to a Wire Enterprise Instance, but the email address is associated with a Wire Cloud account. To proceed with the Enterprise instance login, please update your email address to another domain, or delete your account. If the account is part of a team, please reach out to the Team Administrator.",
   "accountAlreadyExistsModal.changeEmailLink": "Change your email address",
   "accountAlreadyExistsModal.deletePersonalAccount": "Delete personal account",
-  "accountAlreadyExistsModal.removeTeamMember": "remove team member"
+  "accountAlreadyExistsModal.removeTeamMember": "remove team member",
+  "paginationLeftArrowAriaLabel": "Go to previous page",
+  "paginationRightArrowAriaLabel": "Go to next page",
+  "paginationDotAriaLabel": "Go to page {page}"
 }

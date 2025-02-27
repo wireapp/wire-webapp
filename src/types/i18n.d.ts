@@ -1755,6 +1755,9 @@ declare module 'I18n/en-US.json' {
     'accountAlreadyExistsModal.changeEmailLink': `Change your email address`;
     'accountAlreadyExistsModal.deletePersonalAccount': `Delete personal account`;
     'accountAlreadyExistsModal.removeTeamMember': `remove team member`;
+    'paginationLeftArrowAriaLabel': `Go to previous page`;
+    'paginationRightArrowAriaLabel': `Go to next page`;
+    'paginationDotAriaLabel': `Go to page {page}`;
   };
   export default translations;
 }
