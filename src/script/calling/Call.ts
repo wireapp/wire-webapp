@@ -61,7 +61,7 @@ export class Call {
   public currentPage: ko.Observable<number> = ko.observable(0);
   public pages: ko.ObservableArray<Participant[]> = ko.observableArray();
   public numberOfParticipantsInOnePage: number = 9;
-  readonly maximizedParticipant: ko.Observable<Participant | null>;
+  public readonly maximizedParticipant: ko.Observable<Participant | null>;
   public readonly isActive: ko.PureComputed<boolean>;
 
   private readonly audios: Record<string, {audioElement: HTMLAudioElement; stream: MediaStream}> = {};
