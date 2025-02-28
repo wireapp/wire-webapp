@@ -185,9 +185,15 @@ export class SelfRepository extends TypedEventEmitter<Events> {
     const localSupportedProtocols = this.selfUser.supportedProtocols();
 
     this.logger.info('Evaluating self supported protocols, currently supported protocols:', localSupportedProtocols);
+
+    const currentSelf = await this.selfService.getSelf([]);
+
+    const previousSupportedProtocols = currentSelf.supported_protocols;
+
     const refreshedSupportedProtocols = await evaluateSelfSupportedProtocols(
       this.teamRepository,
       this.clientRepository,
+      previousSupportedProtocols,
     );
 
     if (!localSupportedProtocols) {

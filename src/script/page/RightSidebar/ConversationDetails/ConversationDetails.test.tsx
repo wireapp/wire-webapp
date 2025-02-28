@@ -21,6 +21,7 @@ import {act, render} from '@testing-library/react';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 
 import {Conversation} from 'src/script/entity/Conversation';
+import 'src/script/util/test/mock/LocalStorageMock';
 import {createUuid} from 'Util/uuid';
 
 import {ConversationDetails} from './ConversationDetails';

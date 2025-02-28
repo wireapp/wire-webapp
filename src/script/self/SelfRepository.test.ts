@@ -67,6 +67,12 @@ describe('SelfRepository', () => {
 
       jest.spyOn(SelfSupportedProtocols, 'evaluateSelfSupportedProtocols').mockResolvedValueOnce(evaluatedProtocols);
       jest.spyOn(selfRepository['selfService'], 'putSupportedProtocols');
+      jest.spyOn(selfRepository['selfService'], 'getSelf').mockResolvedValueOnce({
+        locale: 'test',
+        qualified_id: {domain: 'test-domain', id: 'test-id'},
+        id: 'test-id',
+        name: 'test-name',
+      });
 
       void selfRepository.initialisePeriodicSelfSupportedProtocolsCheck();
 
@@ -88,6 +94,12 @@ describe('SelfRepository', () => {
 
       jest.spyOn(SelfSupportedProtocols, 'evaluateSelfSupportedProtocols').mockResolvedValueOnce(evaluatedProtocols);
       jest.spyOn(selfRepository['selfService'], 'putSupportedProtocols');
+      jest.spyOn(selfRepository['selfService'], 'getSelf').mockResolvedValueOnce({
+        locale: 'test',
+        qualified_id: {domain: 'test-domain', id: 'test-id'},
+        id: 'test-id',
+        name: 'test-name',
+      });
 
       await selfRepository.initialisePeriodicSelfSupportedProtocolsCheck();
 
@@ -108,6 +120,12 @@ describe('SelfRepository', () => {
 
       jest.spyOn(SelfSupportedProtocols, 'evaluateSelfSupportedProtocols').mockResolvedValueOnce(evaluatedProtocols);
       jest.spyOn(core.recurringTaskScheduler, 'registerTask');
+      jest.spyOn(selfRepository['selfService'], 'getSelf').mockResolvedValueOnce({
+        locale: 'test',
+        qualified_id: {domain: 'test-domain', id: 'test-id'},
+        id: 'test-id',
+        name: 'test-name',
+      });
 
       await selfRepository.initialisePeriodicSelfSupportedProtocolsCheck();
 
@@ -162,6 +180,12 @@ describe('SelfRepository', () => {
 
       jest.spyOn(SelfSupportedProtocols, 'evaluateSelfSupportedProtocols').mockResolvedValueOnce(evaluatedProtocols);
       jest.spyOn(selfRepository['selfService'], 'putSupportedProtocols');
+      jest.spyOn(selfRepository['selfService'], 'getSelf').mockResolvedValueOnce({
+        locale: 'test',
+        qualified_id: {domain: 'test-domain', id: 'test-id'},
+        id: 'test-id',
+        name: 'test-name',
+      });
 
       await selfRepository.refreshSelfSupportedProtocols();
 
@@ -181,6 +205,12 @@ describe('SelfRepository', () => {
 
       jest.spyOn(SelfSupportedProtocols, 'evaluateSelfSupportedProtocols').mockResolvedValueOnce(evaluatedProtocols);
       jest.spyOn(selfRepository['selfService'], 'putSupportedProtocols');
+      jest.spyOn(selfRepository['selfService'], 'getSelf').mockResolvedValueOnce({
+        locale: 'test',
+        qualified_id: {domain: 'test-domain', id: 'test-id'},
+        id: 'test-id',
+        name: 'test-name',
+      });
 
       await selfRepository.refreshSelfSupportedProtocols();
 
