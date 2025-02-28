@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,22 +17,24 @@
  *
  */
 
-import {BackendData} from './env/';
+export interface CellsStorage {
+  putObject({
+    filePath,
+    file,
+    metadata,
+  }: {
+    filePath: string;
+    file: File;
+    metadata?: Record<string, string>;
+  }): Promise<void>;
+}
 
-export interface Config {
-  urls: BackendData;
-  cells?: {
-    pydio: {
-      apiKey: string;
-      segment: string;
-      url: string;
-    };
-    s3: {
-      apiKey: string;
-      bucket: string;
-      endpoint: string;
-      region: string;
-    };
-  };
-  headers?: Record<string, string>;
+export class CellsStorageError extends Error {
+  constructor(
+    message: string,
+    public readonly cause?: Error,
+  ) {
+    super(message);
+    this.name = 'CellsStorageError';
+  }
 }
