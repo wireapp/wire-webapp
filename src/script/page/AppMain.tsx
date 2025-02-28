@@ -291,6 +291,7 @@ export const AppMain: FC<AppMainProps> = ({
 
               {viewMode === CallingViewMode.FULL_SCREEN && (
                 <CallingContainer
+                  propertiesRepository={repositories.properties}
                   callingRepository={repositories.calling}
                   mediaRepository={repositories.media}
                   toggleScreenshare={mainView.calling.callActions.toggleScreenshare}

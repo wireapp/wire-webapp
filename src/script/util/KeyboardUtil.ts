@@ -83,11 +83,16 @@ export const isRemovalAction = (key: string): boolean => removalKeys.includes(ke
 
 export const isSpaceOrEnterKey = (key: string): boolean => key === KEY.SPACE || key === KEY.ENTER;
 
-export const handleKeyDown = (
-  event: ReactKeyboardEvent<Element> | KeyboardEvent,
-  callback: (event?: ReactKeyboardEvent<Element> | KeyboardEvent) => void,
-) => {
-  if (event.key === KEY.ENTER || event.key === KEY.SPACE) {
+export const handleKeyDown = ({
+  event,
+  callback,
+  keys,
+}: {
+  event: ReactKeyboardEvent<Element> | KeyboardEvent;
+  callback: (event?: ReactKeyboardEvent<Element> | KeyboardEvent) => void;
+  keys: Array<(typeof KEY)[keyof typeof KEY]>;
+}) => {
+  if (keys.includes(event.key as (typeof KEY)[keyof typeof KEY])) {
     callback(event);
   }
   return true;
@@ -103,55 +108,4 @@ export const handleEscDown = (event: ReactKeyboardEvent<Element> | KeyboardEvent
   if (event?.key === KEY.ESC) {
     callback();
   }
-};
-
-/**
- * Handles global key press event - calls onPress when the key is pressed and onRelease when the key is released.
- * @note The onPress is called only once when the key is pressed (it is not called repeatedly when key is held down).
- * @param key The key to listen to.
- * @param onPress A function to call when the key is pressed.
- * @param onRelease A function to call when the key is released.
- * @returns A function to unsubscribe.
- */
-export const handleKeyPress = (key: string, {onPress, onRelease}: {onPress: () => void; onRelease: () => void}) => {
-  let isKeyDown = false;
-
-  const handleKeyDown = (event: KeyboardEvent) => {
-    if (event.key !== key) {
-      return;
-    }
-
-    // Do nothing if the key press was already registered.
-    if (isKeyDown) {
-      return;
-    }
-
-    isKeyDown = true;
-
-    onPress();
-  };
-
-  const handleKeyUp = (event: KeyboardEvent) => {
-    if (event.key !== key) {
-      return;
-    }
-
-    // If the key was not pressed, we do nothing.
-    if (!isKeyDown) {
-      return;
-    }
-
-    // Release the key.
-    isKeyDown = false;
-
-    onRelease();
-  };
-
-  window.addEventListener('keydown', handleKeyDown);
-  window.addEventListener('keyup', handleKeyUp);
-
-  return () => {
-    window.removeEventListener('keydown', handleKeyDown);
-    window.removeEventListener('keyup', handleKeyUp);
-  };
 };

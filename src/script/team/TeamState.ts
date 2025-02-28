@@ -17,6 +17,7 @@
  *
  */
 
+import {Role} from '@wireapp/api-client/lib/team';
 import {FeatureList, FeatureStatus, SelfDeletingTimeout} from '@wireapp/api-client/lib/team/feature/';
 import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
@@ -27,7 +28,7 @@ import {TeamEntity} from './TeamEntity';
 
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
-import {ROLE} from '../user/UserPermission';
+import {ROLE, roleMap} from '../user/UserPermission';
 import {UserState} from '../user/UserState';
 
 @singleton()
@@ -57,6 +58,7 @@ export class TeamState {
   readonly team = ko.observable(new TeamEntity());
   readonly teamDomain: ko.PureComputed<string>;
   readonly teamSize: ko.PureComputed<number>;
+  readonly selfRole: ko.PureComputed<Role | undefined>;
 
   constructor(private readonly userState = container.resolve(UserState)) {
     this.isTeam = ko.pureComputed(() => !!this.team()?.id);
@@ -123,6 +125,12 @@ export class TeamState {
     this.isGuestLinkEnabled = ko.pureComputed(
       () => this.teamFeatures()?.conversationGuestLinks?.status === FeatureStatus.ENABLED,
     );
+
+    this.selfRole = ko.pureComputed(() => {
+      const roles = this.memberRoles();
+      const userId = this.userState.self()?.id;
+      return roles && userId ? roleMap[roles[userId]] : undefined;
+    });
   }
 
   isInTeam(entity: User | Conversation): boolean {

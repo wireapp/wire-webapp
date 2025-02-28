@@ -149,11 +149,7 @@ const MessageDetails = ({failure, isMessageFocused, allUsers}: MessageDetailsPro
   const text = getText();
 
   return (
-    <p
-      data-uie-name="multi-user-not-added-details"
-      data-uie-value={domainStr}
-      style={{lineHeight: 'var(--line-height-sm)'}}
-    >
+    <p data-uie-name="multi-user-not-added-details" data-uie-value={domainStr}>
       {text && (
         <span
           css={warning}
@@ -251,7 +247,7 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
           />
         </p>
       </div>
-      <div className="message-body" css={{flexDirection: 'column'}}>
+      <div className="message-details">
         {isOpen &&
           failures.map((failure, index) => (
             <MessageDetails allUsers={allUsers} isMessageFocused={isMessageFocused} key={index} failure={failure} />

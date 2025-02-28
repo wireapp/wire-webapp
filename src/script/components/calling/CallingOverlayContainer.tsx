@@ -22,6 +22,7 @@ import React, {Fragment, useEffect} from 'react';
 import {container} from 'tsyringe';
 
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
+import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {ChooseScreen} from './ChooseScreen';
@@ -37,6 +38,7 @@ import {MediaRepository} from '../../media/MediaRepository';
 import {CallViewTab} from '../../view_model/CallingViewModel';
 
 export interface CallingContainerProps {
+  readonly propertiesRepository: PropertiesRepository;
   readonly callingRepository: CallingRepository;
   readonly mediaRepository: MediaRepository;
   readonly callState?: CallState;
@@ -44,6 +46,7 @@ export interface CallingContainerProps {
 }
 
 const CallingContainer: React.FC<CallingContainerProps> = ({
+  propertiesRepository,
   mediaRepository,
   callingRepository,
   callState = container.resolve(CallState),
@@ -114,6 +117,10 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     void callingRepository.sendInCallEmoji(emoji, call);
   };
 
+  const sendHandRaised = (isHandUp: boolean, call: Call) => {
+    void callingRepository.sendInCallHandRaised(isHandUp, call);
+  };
+
   const switchSpeakerOutput = (deviceId: string) => {
     mediaDevicesHandler.currentDeviceId.audiooutput(deviceId);
   };
@@ -146,12 +153,14 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
           conversation={conversation}
           canShareScreen={callingRepository.supportsScreenSharing}
           maximizedParticipant={maximizedParticipant}
+          propertiesRepository={propertiesRepository}
           callingRepository={callingRepository}
           mediaDevicesHandler={mediaDevicesHandler}
           isMuted={isMuted}
           muteState={muteState}
           isChoosingScreen={isScreenshareActive}
           sendEmoji={sendEmoji}
+          sendHandRaised={sendHandRaised}
           switchCameraInput={switchCameraInput}
           switchMicrophoneInput={switchMicrophoneInput}
           switchSpeakerOutput={switchSpeakerOutput}

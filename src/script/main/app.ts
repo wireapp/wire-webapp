@@ -26,6 +26,7 @@ import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/'
 import {EVENTS as CoreEvents} from '@wireapp/core/lib/Account';
 import {amplify} from 'amplify';
 import platform from 'platform';
+import {pdfjs} from 'react-pdf';
 import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
@@ -114,6 +115,8 @@ import {UserRepository} from '../user/UserRepository';
 import {UserService} from '../user/UserService';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
 import {Warnings} from '../view_model/WarningsContainer';
+
+pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
 
 export function doRedirect(signOutReason: SIGN_OUT_REASON) {
   let url = `/auth/${location.search}`;
@@ -473,13 +476,13 @@ export class App {
       onProgress(10);
       telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
-      const connections = await connectionRepository.getConnections(teamMembers);
+      const {connections, deadConnections} = await connectionRepository.getConnections(teamMembers);
 
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_USER_DATA);
 
       telemetry.addStatistic(AppInitStatisticsValue.CONNECTIONS, connections.length, 50);
 
-      const conversations = await conversationRepository.loadConversations(connections);
+      const conversations = await conversationRepository.loadConversations(connections, deadConnections);
       eventLogger.log(AppInitializationStep.ConversationsLoaded);
       // We load all the users the self user is connected with
       await userRepository.loadUsers(selfUser, connections, conversations, teamMembers);

@@ -35,7 +35,7 @@ import {User} from 'src/script/entity/User';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {ContentState} from 'src/script/page/useAppState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleKeyDown} from 'Util/KeyboardUtil';
+import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -252,7 +252,13 @@ export const TitleBar: React.FC<TitleBarProps> = ({
           onClick={onClickDetails}
           title={peopleTooltip}
           aria-label={peopleTooltip}
-          onKeyDown={event => handleKeyDown(event, onClickDetails)}
+          onKeyDown={event =>
+            handleKeyDown({
+              event,
+              callback: onClickDetails,
+              keys: [KEY.ENTER, KEY.SPACE],
+            })
+          }
           data-placement="bottom"
           role="button"
           tabIndex={TabIndex.FOCUSABLE}

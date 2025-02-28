@@ -34,6 +34,7 @@ import {ConversationJoin} from './ConversationJoin';
 import {ConversationJoinInvalid} from './ConversationJoinInvalid';
 import {CreateAccount} from './CreateAccount';
 import {CreatePersonalAccount} from './CreatePersonalAccount';
+import {CustomBackend} from './CustomBackend';
 import {CustomEnvironmentRedirect} from './CustomEnvironmentRedirect';
 import {HistoryInfo} from './HistoryInfo';
 import {Index} from './Index';
@@ -138,7 +139,10 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
   const brandName = Config.getConfig().BRAND_NAME;
   return (
     <IntlProvider locale={normalizeLanguage(language)} messages={loadLanguage(language)}>
-      <StyledApp themeId={THEME_ID.DEFAULT} style={{display: 'flex', height: '100%', minHeight: '100vh'}}>
+      <StyledApp
+        themeId={THEME_ID.DEFAULT}
+        style={{alignContent: 'center', height: '100%', minHeight: '100vh', display: 'flex'}}
+      >
         {isFetchingSSOSettings ? (
           <ContainerXS centerText verticalCenter style={{justifyContent: 'center'}}>
             <Loading />
@@ -163,6 +167,7 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
               <Route path={ROUTE.HISTORY_INFO} element={<ProtectedHistoryInfo />} />
               <Route path={ROUTE.INITIAL_INVITE} element={<ProtectedInitialInvite />} />
               <Route path={`${ROUTE.AUTHORIZE}`} element={<ProtectedOAuthPermissions />} />
+              <Route path={ROUTE.CUSTOM_BACKEND} element={<CustomBackend />} />
               <Route
                 path={`${ROUTE.LOGIN}/*`}
                 element={

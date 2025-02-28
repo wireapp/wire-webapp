@@ -19,7 +19,43 @@
 
 import {CSSObject} from '@emotion/react';
 
+import {media} from '@wireapp/react-ui-kit';
+
 export const labelStyles: CSSObject = {
   padding: '12px 10px',
   fontWeight: 'var(--font-weight-semibold)',
+};
+
+export const labelWithIconStyles: CSSObject = {
+  ...labelStyles,
+  display: 'flex',
+  justifyContent: 'space-between',
+};
+
+export const participantListWrapperStyles: CSSObject = {
+  [media.mobile]: {
+    position: 'absolute',
+    inset: 0,
+    width: '100%',
+    height: '100%',
+    zIndex: 2,
+    backgroundColor: 'var(--app-bg-secondary)',
+    border: '2px solid var(--accent-color)',
+    borderRadius: 10,
+  },
+};
+
+export const headerStyles: CSSObject = {
+  display: 'none',
+  [media.mobile]: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    padding: '12px 10px',
+    borderBottom: '1px solid var(--border-color)',
+  },
+  '& button': {
+    minWidth: 'auto',
+    minHeight: 'auto',
+  },
 };

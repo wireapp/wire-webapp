@@ -17,6 +17,7 @@
  *
  */
 
+import {Role} from '@wireapp/api-client/lib/team';
 import type {PermissionsData} from '@wireapp/api-client/lib/team/member/PermissionsData';
 
 import {capitalizeFirstChar} from 'Util/StringUtil';
@@ -144,6 +145,15 @@ export enum ROLE {
   OWNER = 'z.team.TeamRole.ROLE.OWNER',
   PARTNER = 'z.team.TeamRole.ROLE.PARTNER',
 }
+
+/** Map of roles from the API to the frontend */
+export const roleMap: {[key in ROLE]?: Role} = {
+  [ROLE.ADMIN]: Role.ADMIN,
+  [ROLE.MEMBER]: Role.MEMBER,
+  [ROLE.NONE]: Role.NONE,
+  [ROLE.OWNER]: Role.OWNER,
+  [ROLE.PARTNER]: Role.EXTERNAL,
+};
 
 /** Roles sorted by priority, highest first. */
 const RolesByPriority = [ROLE.OWNER, ROLE.ADMIN, ROLE.MEMBER, ROLE.PARTNER, ROLE.NONE, ROLE.INVALID];

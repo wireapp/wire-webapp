@@ -35,8 +35,6 @@ import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 
 export type SerializedConversationId = string;
 
-const NUMBER_OF_PARTICIPANTS_IN_ONE_PAGE = 9;
-
 interface ActiveSpeaker {
   clientId: string;
   levelNow: number;
@@ -46,9 +44,11 @@ interface ActiveSpeaker {
 export class Call {
   public readonly reason: ko.Observable<number | undefined> = ko.observable();
   public readonly startedAt: ko.Observable<number | undefined> = ko.observable();
+  public readonly endedAt: ko.Observable<number> = ko.observable(0);
   public readonly state: ko.Observable<CALL_STATE> = ko.observable(CALL_STATE.UNKNOWN);
   public readonly muteState: ko.Observable<MuteState> = ko.observable(MuteState.NOT_MUTED);
   public readonly participants: ko.ObservableArray<Participant>;
+  public readonly handRaisedParticipants: ko.PureComputed<Participant[]>;
   public readonly selfClientId: ClientId;
   public readonly initialType: CALL_TYPE;
   public readonly isCbrEnabled: ko.Observable<boolean> = ko.observable(
@@ -60,6 +60,7 @@ export class Call {
   public blockMessages: boolean = false;
   public currentPage: ko.Observable<number> = ko.observable(0);
   public pages: ko.ObservableArray<Participant[]> = ko.observableArray();
+  public numberOfParticipantsInOnePage: number = 9;
   readonly maximizedParticipant: ko.Observable<Participant | null>;
   public readonly isActive: ko.PureComputed<boolean>;
 
@@ -90,6 +91,12 @@ export class Call {
     this.initialType = callType;
     this.selfClientId = selfParticipant?.clientId;
     this.participants = ko.observableArray([selfParticipant]);
+    this.handRaisedParticipants = ko.pureComputed(() =>
+      this.participants()
+        .filter(participant => Boolean(participant.handRaisedAt()))
+        .sort((p1, p2) => p1.handRaisedAt()! - p2.handRaisedAt()!),
+    );
+
     this.activeAudioOutput = this.mediaDevicesHandler.currentAvailableDeviceId.audiooutput();
     this.mediaDevicesHandler.currentAvailableDeviceId.audiooutput.subscribe((newActiveAudioOutput: string) => {
       this.activeAudioOutput = newActiveAudioOutput;
@@ -215,15 +222,23 @@ export class Call {
     return this.participants().filter(({user, clientId}) => !user.isMe || this.selfClientId !== clientId);
   }
 
+  setNumberOfParticipantsInOnePage(participantsInOnePage: number): void {
+    this.numberOfParticipantsInOnePage = participantsInOnePage;
+    this.updatePages();
+  }
+
   updatePages() {
     const selfParticipant = this.getSelfParticipant();
     const remoteParticipants = this.getRemoteParticipants().sort((p1, p2) => sortUsersByPriority(p1.user, p2.user));
 
-    const [withVideo, withoutVideo] = partition(remoteParticipants, participant => participant.isSendingVideo());
+    const [withVideoAndScreenShare, withoutVideo] = partition(remoteParticipants, participant =>
+      participant.isSendingVideo(),
+    );
+    const [withScreenShare, withVideo] = partition(withVideoAndScreenShare, participant => participant.sharesScreen());
 
     const newPages = chunk<Participant>(
-      [selfParticipant, ...withVideo, ...withoutVideo].filter(Boolean),
-      NUMBER_OF_PARTICIPANTS_IN_ONE_PAGE,
+      [selfParticipant, ...withScreenShare, ...withVideo, ...withoutVideo].filter(Boolean),
+      this.numberOfParticipantsInOnePage,
     );
 
     this.currentPage(Math.min(this.currentPage(), newPages.length - 1));

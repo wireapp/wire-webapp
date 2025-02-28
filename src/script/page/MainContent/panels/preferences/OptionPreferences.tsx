@@ -28,6 +28,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Theme} from 'Components/AppContainer/hooks/useTheme';
 import {RadioGroup} from 'Components/Radio';
+import {Config} from 'src/script/Config';
 import {User} from 'src/script/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -55,6 +56,7 @@ const OptionPreferences = ({propertiesRepository, selfUser}: OptionPreferencesPr
   const [optionDarkMode, setOptionDarkMode] = useState<boolean>(settings.interface.theme === 'dark');
   const [optionSendPreviews, setOptionSendPreviews] = useState<boolean>(settings.previews.send);
   const [optionNotifications, setOptionNotifications] = useState<NotificationPreference>(settings.notifications);
+  const [optionMarkdownPreview, setOptionMarkdownPreview] = useState<boolean>(settings.interface.markdown_preview);
   const [currentRootFontSize, setCurrentRootFontSize] = useRootFontSize();
   const [sliderValue, setSliderValue] = useState<number>(fontSizes.indexOf(currentRootFontSize));
 
@@ -65,6 +67,7 @@ const OptionPreferences = ({propertiesRepository, selfUser}: OptionPreferencesPr
       setOptionDarkMode(settings.interface.theme === 'dark');
       setOptionSendPreviews(settings.previews.send);
       setOptionNotifications(settings.notifications);
+      setOptionMarkdownPreview(settings.interface.markdown_preview);
     };
 
     const updateDarkMode = (newDarkMode: boolean) => setOptionDarkMode(newDarkMode);
@@ -91,6 +94,11 @@ const OptionPreferences = ({propertiesRepository, selfUser}: OptionPreferencesPr
   const saveOptionNotificationsPreference = (notificationsPreference: NotificationPreference) => {
     propertiesRepository.savePreference(PROPERTIES_TYPE.NOTIFICATIONS, notificationsPreference);
     setOptionNotifications(notificationsPreference);
+  };
+
+  const saveMarkdownPreviewPreference = (markdownPreviewPreference: boolean) => {
+    propertiesRepository.savePreference(PROPERTIES_TYPE.INTERFACE.MARKDOWN_PREVIEW, markdownPreviewPreference);
+    setOptionMarkdownPreview(markdownPreviewPreference);
   };
 
   const saveOptionSendPreviewsPreference = (sendPreviewsPreference: boolean) => {
@@ -126,6 +134,8 @@ const OptionPreferences = ({propertiesRepository, selfUser}: OptionPreferencesPr
     {value: 5, label: RootFontSize.XL},
     {value: 6, label: RootFontSize.XXL, heading: t('preferencesOptionsFontSizeLarge')},
   ];
+
+  const isMessageFormatButtonsFlagEnabled = Config.getConfig().FEATURE.ENABLE_MESSAGE_FORMAT_BUTTONS;
 
   return (
     <PreferencesPage title={t('preferencesOptions')}>
@@ -238,6 +248,27 @@ const OptionPreferences = ({propertiesRepository, selfUser}: OptionPreferencesPr
                 }}
               />
             </div>
+
+            {isMessageFormatButtonsFlagEnabled && (
+              <div className="checkbox-margin">
+                <Checkbox
+                  tabIndex={TabIndex.FOCUSABLE}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    saveMarkdownPreviewPreference(event.target.checked);
+                  }}
+                  checked={optionMarkdownPreview}
+                  data-uie-name="status-preference-markdown-preview"
+                >
+                  <CheckboxLabel htmlFor="status-preference-markdown-preview">
+                    {t('preferencesOptionsMarkdownPreview')}
+                  </CheckboxLabel>
+                </Checkbox>
+
+                <p className="preferences-detail preferences-detail-intended">
+                  {t('preferencesOptionsMarkdownPreviewDetails')}
+                </p>
+              </div>
+            )}
 
             <div className="checkbox-margin">
               <Checkbox

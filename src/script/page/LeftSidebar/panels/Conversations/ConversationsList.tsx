@@ -23,7 +23,15 @@ import React, {
   useEffect,
   useState,
   MutableRefObject,
+  useCallback,
+  useRef,
 } from 'react';
+
+import {useVirtualizer} from '@tanstack/react-virtual';
+import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
+import {useDebouncedCallback} from 'use-debounce';
+
+import {WIDTH} from '@wireapp/react-ui-kit';
 
 import {ConversationListCell} from 'Components/ConversationListCell';
 import {Call} from 'src/script/calling/Call';
@@ -37,7 +45,7 @@ import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {ConnectionRequests} from './ConnectionRequests';
 import {conversationsList, headingTitle, noResultsMessage} from './ConversationsList.styles';
-import {conversationSearchFilter, scrollToConversation} from './helpers';
+import {conversationSearchFilter} from './helpers';
 
 import {CallState} from '../../../../calling/CallState';
 import {ConversationState} from '../../../../conversation/ConversationState';
@@ -91,34 +99,64 @@ export const ConversationsList = ({
 
   const {joinableCalls} = useKoSubscribableChildren(callState, ['joinableCalls']);
 
-  const isActiveConversation = (conversation: Conversation) => conversationState.isActiveConversation(conversation);
+  const isActiveConversation = useCallback(
+    (conversation: Conversation) => conversationState.isActiveConversation(conversation),
+    [conversationState],
+  );
 
-  const openContextMenu = (conversation: Conversation, event: MouseEvent | React.MouseEvent<Element, MouseEvent>) =>
-    listViewModel.onContextMenu(conversation, event);
+  const openContextMenu = useCallback(
+    (conversation: Conversation, event: MouseEvent | React.MouseEvent<Element, MouseEvent>) =>
+      listViewModel.onContextMenu(conversation, event),
+    [listViewModel],
+  );
 
-  const answerCall = (conversation: Conversation) => listViewModel.answerCall(conversation);
+  const answerCall = useCallback(
+    (conversation: Conversation) => listViewModel.answerCall(conversation),
+    [listViewModel],
+  );
 
-  const hasJoinableCall = (conversation: Conversation) => {
-    const call = joinableCalls.find((callInstance: Call) =>
-      matchQualifiedIds(callInstance.conversation.qualifiedId, conversation.qualifiedId),
-    );
+  const hasJoinableCall = useCallback(
+    (conversation: Conversation) => {
+      const call = joinableCalls.find((callInstance: Call) =>
+        matchQualifiedIds(callInstance.conversation.qualifiedId, conversation.qualifiedId),
+      );
 
-    return !!call && !conversation.isSelfUserRemoved();
-  };
+      return !!call && !conversation.isSelfUserRemoved();
+    },
+    [joinableCalls],
+  );
 
   const onConnectionRequestClick = () => {
     setCurrentView(ViewType.MOBILE_CENTRAL_COLUMN);
     listViewModel.contentViewModel.switchContent(ContentState.CONNECTION_REQUESTS);
   };
 
-  const getCommonConversationCellProps = (conversation: Conversation, index: number) => ({
-    isFocused:
-      document.activeElement !== searchInputRef.current && !conversationsFilter && currentFocus === conversation.id,
-    handleArrowKeyDown: handleArrowKeyDown(index),
-    resetConversationFocus: resetConversationFocus,
-    dataUieName: 'item-conversation',
-    conversation: conversation,
-    onClick: (event: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>) => {
+  const isFolderView = currentTab === SidebarTabs.FOLDER;
+  const filteredConversations =
+    (isFolderView && currentFolder?.conversations().filter(conversationSearchFilter(conversationsFilter))) || [];
+  const conversationsToDisplay = filteredConversations.length ? filteredConversations : conversations;
+
+  const parentRef = useRef(null);
+
+  const rowVirtualizer = useVirtualizer({
+    count: conversationsToDisplay.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 56,
+  });
+
+  const debouncedOnConversationClick = useDebouncedCallback(
+    (
+      conversation: Conversation,
+      event: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>,
+    ) => {
+      if (isActiveConversation(conversation)) {
+        if (window.innerWidth > WIDTH.TABLET_SM_MAX || document.documentElement.clientWidth > WIDTH.TABLET_SM_MAX) {
+          clearSearchFilter();
+          setClickedFilteredConversationId(conversation.id);
+          return;
+        }
+      }
+
       if (isKeyboardEvent(event)) {
         createNavigateKeyboard(generateConversationUrl(conversation.qualifiedId), true)(event);
       } else {
@@ -128,6 +166,26 @@ export const ConversationsList = ({
       clearSearchFilter();
       setClickedFilteredConversationId(conversation.id);
     },
+    TimeInMillis.SECOND / 2, // Adjust debounce delay as needed
+    {leading: true},
+  );
+
+  const onConversationClick = useCallback(
+    (conversation: Conversation) =>
+      (event: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>) => {
+        debouncedOnConversationClick(conversation, event);
+      },
+    [debouncedOnConversationClick],
+  );
+
+  const getCommonConversationCellProps = (conversation: Conversation, index: number) => ({
+    isFocused:
+      document.activeElement !== searchInputRef.current && !conversationsFilter && currentFocus === conversation.id,
+    handleArrowKeyDown: handleArrowKeyDown(index),
+    resetConversationFocus,
+    dataUieName: 'item-conversation',
+    conversation,
+    onClick: onConversationClick(conversation),
     isSelected: isActiveConversation,
     onJoinCall: answerCall,
     rightClick: openContextMenu,
@@ -136,15 +194,14 @@ export const ConversationsList = ({
 
   useEffect(() => {
     if (!conversationsFilter && clickedFilteredConversationId) {
-      scrollToConversation(clickedFilteredConversationId);
+      const conversationIndex = conversationsToDisplay.findIndex(conv => conv.id === clickedFilteredConversationId);
+      if (conversationIndex !== -1) {
+        rowVirtualizer.scrollToIndex(conversationIndex, {align: 'auto'});
+      }
+
       setClickedFilteredConversationId(null);
     }
-  }, [conversationsFilter, clickedFilteredConversationId]);
-
-  const isFolderView = currentTab === SidebarTabs.FOLDER;
-  const filteredConversations =
-    (isFolderView && currentFolder?.conversations().filter(conversationSearchFilter(conversationsFilter))) || [];
-  const conversationsToDisplay = filteredConversations.length ? filteredConversations : conversations;
+  }, [conversationsFilter, clickedFilteredConversationId, conversationsToDisplay]);
 
   return (
     <>
@@ -158,10 +215,45 @@ export const ConversationsList = ({
         <p css={noResultsMessage}>{t('searchConversationsNoResult')}</p>
       )}
 
-      <ul css={conversationsList} data-uie-name="conversation-view">
-        {conversationsToDisplay.map((conversation, index) => (
-          <ConversationListCell key={conversation.id} {...getCommonConversationCellProps(conversation, index)} />
-        ))}
+      <ul
+        css={conversationsList}
+        data-uie-name="conversation-view"
+        ref={parentRef}
+        style={{
+          height: '100%',
+          overflow: 'auto',
+        }}
+      >
+        <div
+          style={{
+            height: `${rowVirtualizer.getTotalSize()}px`,
+            width: '100%',
+            position: 'relative',
+          }}
+        >
+          {rowVirtualizer.getVirtualItems().map(virtualItem => {
+            const conversation = conversationsToDisplay[virtualItem.index];
+
+            return (
+              <div
+                key={virtualItem.key}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: `${virtualItem.size}px`,
+                  transform: `translateY(${virtualItem.start}px)`,
+                }}
+              >
+                <ConversationListCell
+                  key={conversation.id}
+                  {...getCommonConversationCellProps(conversation, virtualItem.index)}
+                />
+              </div>
+            );
+          })}
+        </div>
       </ul>
 
       {isGroupParticipantsVisible && (

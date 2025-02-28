@@ -9,6 +9,7 @@
   position: relative;
   display: flex;
   width: 100%;
+  min-width: 160px;
   align-items: center;
 }
 
@@ -43,7 +44,7 @@
 .editor-placeholder {
   position: absolute;
   top: 50%;
-  left: 10px;
+  left: 0;
   display: inline-block;
 
   overflow: hidden;
@@ -60,6 +61,12 @@
 .editor-paragraph {
   //margin: 0 0 15px 0;
   position: relative;
+
+  // Inline code should have a smaller, custom line height
+  // It prevents input from flickering when inserting an inline code
+  code:not(.editor-code) {
+    line-height: 17px;
+  }
 }
 
 .dropdown .item .icon {
@@ -167,4 +174,285 @@
   min-width: 150px;
   flex-grow: 1;
   line-height: 20px;
+}
+
+.editor-bold {
+  font-weight: bold;
+}
+
+.editor-italic {
+  font-style: italic;
+}
+
+.editor-strikethrough {
+  text-decoration: line-through;
+}
+
+.editor-inline-code {
+  display: inline;
+  padding: 2px 4px;
+  border-radius: 4px;
+  background: var(--foreground-fade-8);
+  font-size: var(--font-size-medium);
+}
+
+.editor-code {
+  display: block;
+  overflow: auto;
+  max-width: max-content;
+  padding: 8px 12px;
+  border-radius: 8px;
+  margin: 4px 0;
+  background: var(--foreground-fade-8);
+  font-size: var(--font-size-small);
+  text-overflow: unset;
+}
+
+.editor-list {
+  padding-left: 24px;
+  margin: 0;
+
+  &__item {
+    margin: 0 24px;
+
+    &--nested {
+      list-style-type: none;
+
+      &::before,
+      &::after {
+        display: none;
+      }
+    }
+  }
+
+  &-unordered {
+    padding: 0;
+    margin: 0;
+    list-style-position: outside;
+  }
+
+  &-ordered {
+    padding: 0;
+    margin: 0;
+    list-style: decimal;
+
+    &--1 {
+      list-style-position: outside;
+    }
+    &--2 {
+      list-style-position: outside;
+      list-style-type: lower-alpha;
+    }
+    &--3 {
+      list-style-position: outside;
+      list-style-type: lower-roman;
+    }
+  }
+}
+
+.editor-heading {
+  margin: 0 0 8px 0;
+
+  &--1 {
+    font-size: var(--font-size-xlarge);
+  }
+
+  &--2 {
+    font-size: var(--font-size-large);
+  }
+
+  &--3 {
+    font-size: var(--font-size-base);
+  }
+}
+
+.editor-quote {
+  position: relative;
+  padding: 0 12px 0 16px;
+  margin: 0;
+  margin-left: 2px;
+
+  &::before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    border-radius: 2px;
+    margin-right: 12px;
+    background-color: var(--message-quote-bg);
+    content: '';
+  }
+}
+
+// Lexical code highlighting
+
+// Prism One Light Theme - based on node_modules/prism-themes/themes/prism-one-light.css
+body.theme-default {
+  --token-atrule: #b76b01;
+  --token-attr: #50a14f;
+  --token-boolean: #b76b01;
+  --token-builtin: #50a14f;
+  --token-cdata: #a0a1a7;
+  --token-char: #50a14f;
+  --token-class: #b76b01;
+  --token-class-name: #b76b01;
+  --token-comment: #a0a1a7;
+  --token-constant: #b76b01;
+  --token-deleted: #e45649;
+  --token-doctype: #383a42;
+  --token-entity: #383a42;
+  --token-function: #4078f2;
+  --token-important: #e45649;
+  --token-inserted: #50a14f;
+  --token-keyword: #a626a4;
+  --token-number: #b76b01;
+  --token-operator: #4078f2;
+  --token-prolog: #a0a1a7;
+  --token-property: #e45649;
+  --token-punctuation: #383a42;
+  --token-regex: #50a14f;
+  --token-selector: #50a14f;
+  --token-string: #50a14f;
+  --token-symbol: #e45649;
+  --token-tag: #e45649;
+  --token-url: #0184bc;
+  --token-variable: #4078f2;
+}
+
+// Prism One Dark Theme - based on node_modules/prism-themes/themes/prism-one-dark.css
+body.theme-dark {
+  --token-atrule: #c678dd;
+  --token-attr: #98c379;
+  --token-boolean: #d19a66;
+  --token-builtin: #98c379;
+  --token-cdata: #5c6370;
+  --token-char: #98c379;
+  --token-class: #d19a66;
+  --token-class-name: #d19a66;
+  --token-comment: #5c6370;
+  --token-constant: #d19a66;
+  --token-deleted: #e06c75;
+  --token-doctype: #abb2bf;
+  --token-entity: #abb2bf;
+  --token-function: #56b6c2;
+  --token-important: #c678dd;
+  --token-inserted: #98c379;
+  --token-keyword: #c678dd;
+  --token-number: #d19a66;
+  --token-operator: #c678dd;
+  --token-prolog: #5c6370;
+  --token-property: #abb2bf;
+  --token-punctuation: #abb2bf;
+  --token-regex: #98c379;
+  --token-selector: #e06c75;
+  --token-string: #98c379;
+  --token-symbol: #e06c75;
+  --token-tag: #e06c75;
+  --token-url: #98c379;
+  --token-variable: #61afef;
+}
+
+// Token classes, should match the theme config in RichTextEditor.tsx
+.editor-tokenAtrule {
+  color: var(--token-atrule);
+}
+
+.editor-tokenAttr {
+  color: var(--token-attr);
+}
+
+.editor-tokenBoolean {
+  color: var(--token-boolean);
+}
+.editor-tokenBuiltin {
+  color: var(--token-builtin);
+}
+.editor-tokenCdata {
+  color: var(--token-cdata);
+}
+.editor-tokenChar {
+  color: var(--token-char);
+}
+.editor-tokenClass {
+  color: var(--token-class);
+}
+.editor-tokenClassName {
+  color: var(--token-class-name);
+}
+.editor-tokenComment {
+  color: var(--token-comment);
+}
+.editor-tokenConstant {
+  color: var(--token-constant);
+}
+.editor-tokenDeleted {
+  color: var(--token-deleted);
+}
+.editor-tokenDoctype {
+  color: var(--token-doctype);
+}
+.editor-tokenEntity {
+  color: var(--token-entity);
+}
+.editor-tokenFunction {
+  color: var(--token-function);
+}
+.editor-tokenImportant {
+  color: var(--token-important);
+}
+.editor-tokenInserted {
+  color: var(--token-inserted);
+}
+.editor-tokenNamespace {
+  opacity: 0.7;
+}
+.editor-tokenKeyword {
+  color: var(--token-keyword);
+}
+.editor-tokenNumber {
+  color: var(--token-number);
+}
+.editor-tokenOperator {
+  color: var(--token-operator);
+}
+.editor-tokenProlog {
+  color: var(--token-prolog);
+}
+.editor-tokenProperty {
+  color: var(--token-property);
+}
+.editor-tokenPunctuation {
+  color: var(--token-punctuation);
+}
+.editor-tokenRegex {
+  color: var(--token-regex);
+}
+.editor-tokenSelector {
+  color: var(--token-selector);
+}
+.editor-tokenString {
+  color: var(--token-string);
+}
+.editor-tokenSymbol {
+  color: var(--token-symbol);
+}
+.editor-tokenTag {
+  color: var(--token-tag);
+}
+.editor-tokenUrl {
+  color: var(--token-url);
+}
+.editor-tokenVariable {
+  color: var(--token-variable);
+}
+
+.editor-link {
+  color: var(--accent-color);
+  cursor: pointer;
+
+  &:hover,
+  &:focus {
+    text-decoration: underline;
+  }
 }

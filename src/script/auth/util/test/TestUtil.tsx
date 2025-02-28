@@ -20,9 +20,10 @@
 import React from 'react';
 
 import {render} from '@testing-library/react';
-import type {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_TYPE, ConversationProtocol, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {RecursivePartial} from '@wireapp/commons/lib/util/TypeUtil';
+import ko from 'knockout';
 import {IntlProvider} from 'react-intl';
 import {Provider} from 'react-redux';
 import {HashRouter as Router} from 'react-router-dom';
@@ -55,7 +56,10 @@ import sk from 'I18n/sk-SK.json';
 import sl from 'I18n/sl-SI.json';
 import tr from 'I18n/tr-TR.json';
 import uk from 'I18n/uk-UA.json';
+import {Participant} from 'src/script/calling/Participant';
+import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
+import {MediaDevicesHandler} from 'src/script/media/MediaDevicesHandler';
 import {setStrings} from 'Util/LocalizerUtil';
 import {createUuid} from 'Util/uuid';
 
@@ -148,3 +152,38 @@ export function generateQualifiedIds(nbUsers: number, domain: string) {
   }
   return users;
 }
+
+export const createConversation = (
+  type: CONVERSATION_TYPE = CONVERSATION_TYPE.ONE_TO_ONE,
+  protocol: ConversationProtocol = ConversationProtocol.PROTEUS,
+  conversationId: QualifiedId = {id: createUuid(), domain: ''},
+  groupId = 'group-id',
+) => {
+  const conversation = new Conversation(conversationId.id, conversationId.domain, protocol);
+  conversation.participating_user_ets.push(new User(createUuid()));
+  conversation.type(type);
+  if (protocol === ConversationProtocol.MLS) {
+    conversation.groupId = groupId;
+  }
+  return conversation;
+};
+
+export const createSelfParticipant = () => {
+  const selfUser = new User();
+  selfUser.isMe = true;
+  return new Participant(selfUser, 'client1');
+};
+
+export const mediaDevices = {
+  audioinput: ko.pureComputed(() => 'test'),
+  audiooutput: ko.pureComputed(() => 'test'),
+  screeninput: ko.pureComputed(() => 'test'),
+  videoinput: ko.pureComputed(() => 'test'),
+};
+
+export const buildMediaDevicesHandler = () => {
+  return {
+    currentAvailableDeviceId: mediaDevices,
+    setOnMediaDevicesRefreshHandler: jest.fn(),
+  } as unknown as MediaDevicesHandler;
+};

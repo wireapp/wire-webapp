@@ -152,6 +152,7 @@ export class ContentViewModel {
 
   private handleMissingConversation(): void {
     this.closeRightSidebar();
+    setHistoryParam('/', history.state);
     return this.switchContent(ContentState.CONNECTION_REQUESTS);
   }
 

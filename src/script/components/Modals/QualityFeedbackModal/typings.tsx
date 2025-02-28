@@ -27,4 +27,6 @@ export type RatingListItem = {
 export enum RatingListLabel {
   ANSWERED = 'answered',
   DISMISSED = 'dismissed',
+  MUTED = 'muted',
+  CALL_TOO_SHORT = 'call_too_short',
 }

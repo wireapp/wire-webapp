@@ -27,6 +27,18 @@ import {modalButtonsCss} from './TeamCreationSteps.styles';
 import {buttonCss} from '../TeamCreation.styles';
 
 export const Form = ({onNextStep, onPreviousStep, teamName, setTeamName}: StepProps) => {
+  const trimmedTeamName = teamName.trim();
+  const isValidTeamName = trimmedTeamName.length > 0;
+
+  function handleNextStep() {
+    if (!isValidTeamName) {
+      return;
+    }
+
+    setTeamName(trimmedTeamName);
+    onNextStep();
+  }
+
   return (
     <>
       <h2 className="heading-h2">{t('teamCreationFormTitle')}</h2>
@@ -47,7 +59,7 @@ export const Form = ({onNextStep, onPreviousStep, teamName, setTeamName}: StepPr
         <Button data-uie-name="do-go-back" onClick={onPreviousStep} variant={ButtonVariant.SECONDARY} css={buttonCss}>
           {t('teamCreationBack')}
         </Button>
-        <Button data-uie-name="do-continue" disabled={!teamName} onClick={onNextStep} css={buttonCss}>
+        <Button data-uie-name="do-continue" disabled={!isValidTeamName} onClick={handleNextStep} css={buttonCss}>
           {t('teamCreationContinue')}
         </Button>
       </div>

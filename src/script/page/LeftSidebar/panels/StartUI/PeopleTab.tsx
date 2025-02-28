@@ -22,6 +22,7 @@ import {useEffect, useRef, useState} from 'react';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {partition} from 'underscore';
+import {useDebouncedCallback} from 'use-debounce';
 
 import * as Icon from 'Components/Icon';
 import {UserList, UserlistMode} from 'Components/UserList';
@@ -38,7 +39,6 @@ import {ConversationRepository} from '../../../../conversation/ConversationRepos
 import {ConversationState} from '../../../../conversation/ConversationState';
 import {User} from '../../../../entity/User';
 import {getManageTeamUrl} from '../../../../externalRoute';
-import {useDebounce} from '../../../../hooks/useDebounce';
 import {SearchRepository} from '../../../../search/SearchRepository';
 import {TeamRepository} from '../../../../team/TeamRepository';
 import {TeamState} from '../../../../team/TeamState';
@@ -156,61 +156,61 @@ export const PeopleTab = ({
     }
   }, []);
 
-  useDebounce(
-    async () => {
-      setHasFederationError(false);
-      const {query} = searchRepository.normalizeQuery(searchQuery);
-      if (!query) {
-        setResults({contacts: getLocalUsers(), others: []});
-        onSearchResults(undefined);
-        return;
-      }
-      const localSearchSources = getLocalUsers(true);
+  const debouncedSearch = useDebouncedCallback(async () => {
+    setHasFederationError(false);
+    const {query} = searchRepository.normalizeQuery(searchQuery);
+    if (!query) {
+      setResults({contacts: getLocalUsers(), others: []});
+      onSearchResults(undefined);
+      return;
+    }
+    const localSearchSources = getLocalUsers(true);
 
-      const contactResults = searchRepository.searchUserInSet(searchQuery, localSearchSources);
-      const filteredResults = contactResults.filter(
-        user =>
-          conversationState.hasConversationWith(user) ||
-          teamRepository.isSelfConnectedTo(user.id) ||
-          user.username() === query,
-      );
+    const contactResults = searchRepository.searchUserInSet(searchQuery, localSearchSources);
+    const filteredResults = contactResults.filter(
+      user =>
+        conversationState.hasConversationWith(user) ||
+        teamRepository.isSelfConnectedTo(user.id) ||
+        user.username() === query,
+    );
 
-      const localSearchResults: SearchResultsData = {
-        contacts: filteredResults,
-        others: [],
-      };
-      setResults(localSearchResults);
-      onSearchResults(localSearchResults);
-      if (canSearchUnconnectedUsers) {
-        try {
-          const userEntities = await searchRepository.searchByName(searchQuery, selfUser.teamId);
-          const localUserIds = localSearchResults.contacts.map(({id}) => id);
-          const onlyRemoteUsers = userEntities.filter(user => !localUserIds.includes(user.id));
-          const results = inTeam
-            ? await organizeTeamSearchResults(onlyRemoteUsers, localSearchResults, query)
-            : {...localSearchResults, others: onlyRemoteUsers};
+    const localSearchResults: SearchResultsData = {
+      contacts: filteredResults,
+      others: [],
+    };
+    setResults(localSearchResults);
+    onSearchResults(localSearchResults);
+    if (canSearchUnconnectedUsers) {
+      try {
+        const userEntities = await searchRepository.searchByName(searchQuery, selfUser.teamId);
+        const localUserIds = localSearchResults.contacts.map(({id}) => id);
+        const onlyRemoteUsers = userEntities.filter(user => !localUserIds.includes(user.id));
+        const results = inTeam
+          ? await organizeTeamSearchResults(onlyRemoteUsers, localSearchResults, query)
+          : {...localSearchResults, others: onlyRemoteUsers};
 
-          if (currentSearchQuery.current === searchQuery) {
-            // Only update the results if the query that has been processed correspond to the current search query
-            onSearchResults(results);
-            setResults(results);
-          }
-        } catch (error) {
-          if (isBackendError(error)) {
-            if (error.code === HTTP_STATUS.UNPROCESSABLE_ENTITY) {
-              return setHasFederationError(true);
-            }
-            if (error.code === HTTP_STATUS.BAD_REQUEST && error.label === BackendErrorLabel.FEDERATION_NOT_ALLOWED) {
-              return logger.warn(`Error searching for contacts: ${error.message}`);
-            }
-          }
-          logger.error(`Error searching for contacts: ${(error as any).message}`, error);
+        if (currentSearchQuery.current === searchQuery) {
+          // Only update the results if the query that has been processed correspond to the current search query
+          onSearchResults(results);
+          setResults(results);
         }
+      } catch (error) {
+        if (isBackendError(error)) {
+          if (error.code === HTTP_STATUS.UNPROCESSABLE_ENTITY) {
+            return setHasFederationError(true);
+          }
+          if (error.code === HTTP_STATUS.BAD_REQUEST && error.label === BackendErrorLabel.FEDERATION_NOT_ALLOWED) {
+            return logger.warn(`Error searching for contacts: ${error.message}`);
+          }
+        }
+        logger.error(`Error searching for contacts: ${(error as any).message}`, error);
       }
-    },
-    300,
-    [searchQuery],
-  );
+    }
+  }, 300);
+
+  useEffect(() => {
+    debouncedSearch();
+  }, [searchQuery]);
 
   useEffect(() => {
     // keep track of the most up to date value of the search query (in order to cancel outdated queries)

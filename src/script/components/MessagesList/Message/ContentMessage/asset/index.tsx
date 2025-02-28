@@ -29,14 +29,14 @@ import {StatusType} from 'src/script/message/StatusType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
 
-import {AudioAsset} from './AudioAsset';
-import {FileAsset} from './FileAssetComponent';
+import {AudioAsset} from './AudioAsset/AudioAsset';
+import {FileAsset} from './FileAsset/FileAsset';
 import {ImageAsset} from './ImageAsset';
 import {LinkPreviewAsset} from './LinkPreviewAssetComponent';
 import {LocationAsset} from './LocationAsset';
 import {MessageButton} from './MessageButton';
 import {TextMessageRenderer} from './TextMessageRenderer';
-import {VideoAsset} from './VideoAsset';
+import {VideoAsset} from './VideoAsset/VideoAsset';
 
 import {MessageActions} from '../..';
 import {AssetType} from '../../../../../assets/AssetType';
@@ -54,6 +54,7 @@ interface ContentAssetProps {
   selfId: QualifiedId;
   isMessageFocused: boolean;
   is1to1Conversation: boolean;
+  isFileShareRestricted: boolean;
   onClickDetails: () => void;
 }
 

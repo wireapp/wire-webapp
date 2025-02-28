@@ -37,10 +37,8 @@ import keyboardjs from 'keyboardjs';
 import {$createTextNode, $getRoot, LexicalEditor} from 'lexical';
 import {container} from 'tsyringe';
 
-import {showAppNotification} from 'Components/AppNotification';
 import {getLogger, Logger} from 'Util/Logger';
 
-import {KEY} from './KeyboardUtil';
 import {TIME_IN_MILLIS} from './TimeUtil';
 import {createUuid} from './uuid';
 
@@ -249,8 +247,12 @@ export class DebugUtil {
     }
   }
 
-  async enablePushToTalk(key: string | null = KEY.SPACE) {
-    this.propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY, key);
+  async enablePressSpaceToUnmute() {
+    this.propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE, true);
+  }
+
+  async disablePressSpaceToUnmute() {
+    this.propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE, false);
   }
 
   /** Used by QA test automation. */
@@ -581,9 +583,5 @@ export class DebugUtil {
   // Used by QA test automation, allows to disable or enable the forced error reporting
   disableForcedErrorReporting() {
     return disableForcedErrorReporting();
-  }
-
-  renderAppNotification(message?: string) {
-    showAppNotification(message || 'Test notification');
   }
 }

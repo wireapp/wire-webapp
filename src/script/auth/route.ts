@@ -80,6 +80,7 @@ export const ROUTE = {
   INDEX: '/',
   INITIAL_INVITE: '/teaminvite',
   LOGIN: '/login',
+  CUSTOM_BACKEND: '/custom-backend',
   SET_ACCOUNT_TYPE: '/setaccounttype',
   SET_EMAIL: '/setemail',
   SET_ENTROPY: '/setentropy',

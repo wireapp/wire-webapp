@@ -24,11 +24,12 @@ enum EMOJI {
 enum CALL {
   ENABLE_SOUNDLESS_INCOMING_CALLS = 'settings.call.enable_soundless_incoming_calls',
   ENABLE_VBR_ENCODING = 'settings.call.enable_vbr_encoding',
-  PUSH_TO_TALK_KEY = 'settings.call.push_to_talk_key',
+  ENABLE_PRESS_SPACE_TO_UNMUTE = 'settings.call.enable_press_space_to_unmute',
 }
 
 enum INTERFACE {
   THEME = 'settings.interface.theme',
+  MARKDOWN_PREVIEW = 'settings.interface.markdown_preview',
 }
 
 enum PREVIEWS {
@@ -39,7 +40,6 @@ enum PROPERTIES {
   ENABLE_DEBUGGING = 'enable_debugging',
   NOTIFICATIONS = 'settings.notifications',
   SOUND_ALERTS = 'settings.sound.alerts',
-
   VERSION = 'version',
 }
 

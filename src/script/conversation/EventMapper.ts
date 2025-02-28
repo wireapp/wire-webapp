@@ -715,8 +715,8 @@ export class EventMapper {
    * @param eventData Message data
    * @returns Rename message entity
    */
-  private _mapEventRename({data: eventData}: LegacyEventRecord) {
-    return new RenameMessage(eventData.name);
+  private _mapEventRename({data: eventData, from, qualified_from}: LegacyEventRecord) {
+    return new RenameMessage(eventData.name, from, qualified_from?.domain);
   }
 
   /**
