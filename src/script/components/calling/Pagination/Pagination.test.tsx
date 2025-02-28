@@ -44,10 +44,9 @@ describe('Pagination', () => {
     expect(getAllByTestId(testIdentifiers.paginationItem)).toHaveLength(5);
   });
 
-  it('should show correct active dot', () => {
-    const {getAllByTestId} = renderPagination({currentPage: 2});
-    const dots = getAllByTestId(testIdentifiers.paginationItem);
-    expect(dots[2]).toHaveAttribute('data-uie-status', 'active');
+  it('should adjust visible dots when total pages is less than default', () => {
+    const {getAllByTestId} = renderPagination({totalPages: 3});
+    expect(getAllByTestId(testIdentifiers.paginationItem)).toHaveLength(3);
   });
 
   it('should disable previous button on first page', () => {
@@ -58,6 +57,12 @@ describe('Pagination', () => {
   it('should disable next button on last page', () => {
     const {getByTestId} = renderPagination({currentPage: 9});
     expect(getByTestId(testIdentifiers.paginationNext)).toBeDisabled();
+  });
+
+  it('should enable both buttons when on middle page', () => {
+    const {getByTestId} = renderPagination({currentPage: 5, totalPages: 10});
+    expect(getByTestId(testIdentifiers.paginationPrevious)).not.toBeDisabled();
+    expect(getByTestId(testIdentifiers.paginationNext)).not.toBeDisabled();
   });
 
   it('should calls onChangePage when dot is clicked', () => {
@@ -78,8 +83,39 @@ describe('Pagination', () => {
     expect(onChangePageMock).toHaveBeenCalledWith(3);
   });
 
-  it('should adjusts visible dots for smaller total pages', () => {
-    const {getAllByTestId} = renderPagination({totalPages: 3});
-    expect(getAllByTestId(testIdentifiers.paginationItem)).toHaveLength(3);
+  it('should not call onChangePage when clicking current page dot', () => {
+    const {getAllByTestId} = renderPagination({currentPage: 2});
+    fireEvent.click(getAllByTestId(testIdentifiers.paginationItem)[2]);
+    expect(onChangePageMock).not.toHaveBeenCalled();
+  });
+
+  it('should show correct active dot for current page', () => {
+    const {getAllByTestId} = renderPagination({currentPage: 2});
+    const dots = getAllByTestId(testIdentifiers.paginationItem);
+    expect(dots[2]).toHaveAttribute('data-uie-status', 'active');
+  });
+
+  it('should update active dot when page changes', () => {
+    const {getAllByTestId, rerender} = renderPagination({currentPage: 1});
+    rerender(withTheme(<Pagination totalPages={10} currentPage={2} onChangePage={onChangePageMock} />));
+    const dots = getAllByTestId(testIdentifiers.paginationItem);
+    expect(dots[2]).toHaveAttribute('data-uie-status', 'active');
+  });
+
+  it('should handle single page correctly', () => {
+    const {queryByTestId} = renderPagination({totalPages: 1});
+    expect(queryByTestId(testIdentifiers.paginationNext)).toBeDisabled();
+    expect(queryByTestId(testIdentifiers.paginationPrevious)).toBeDisabled();
+  });
+
+  it('should maintain visible range when navigating to high page numbers', () => {
+    const {getAllByTestId} = renderPagination({currentPage: 8, totalPages: 10});
+    const dots = getAllByTestId(testIdentifiers.paginationItem);
+    expect(dots).toHaveLength(5);
+
+    // Verify that page 8 is active
+    const activeDot = dots.find(dot => dot.getAttribute('data-uie-status') === 'active');
+    expect(activeDot).toBeTruthy();
+    expect(Number(activeDot?.getAttribute('data-page'))).toBe(8);
   });
 });

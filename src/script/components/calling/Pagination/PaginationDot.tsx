@@ -43,12 +43,12 @@ export const PaginationDot = ({page, isCurrentPage, isSmaller, onClick}: Paginat
         })
       }
       aria-label={t('paginationDotAriaLabel', {page: page + 1})}
+      aria-current={isCurrentPage ? 'page' : undefined}
+      data-page={page}
+      data-uie-name="pagination-item"
+      data-uie-status={isCurrentPage ? 'active' : 'inactive'}
     >
-      <div
-        data-uie-name="pagination-item"
-        data-uie-status={isCurrentPage ? 'active' : 'inactive'}
-        css={dotStyles(isCurrentPage, isSmaller)}
-      />
+      <div css={dotStyles(isCurrentPage, isSmaller)} />
     </button>
   );
 };
