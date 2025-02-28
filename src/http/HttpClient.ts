@@ -61,7 +61,7 @@ export interface HttpClient {
 const FILE_SIZE_100_MB = 104857600;
 
 export class HttpClient extends EventEmitter {
-  private readonly client: AxiosInstance;
+  public readonly client: AxiosInstance;
   private readonly logger: logdown.Logger;
   private connectionState: ConnectionState;
   private readonly requestQueue: PriorityQueue;
@@ -77,6 +77,7 @@ export class HttpClient extends EventEmitter {
 
     this.client = axios.create({
       baseURL: this.config.urls.rest,
+      headers: this.config.headers,
     });
     axiosRetry(this.client, {
       retries: Infinity,
