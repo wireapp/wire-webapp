@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.38.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.37.0...@wireapp/react-ui-kit@9.38.0) (2025-02-28)
+
+### Features
+
+* **react-ui-kit:** open detached window icon [WPB-16170] ([#6963](https://github.com/wireapp/wire-web-packages/issues/6963)) ([0566587](https://github.com/wireapp/wire-web-packages/commit/0566587be3ae54a33da0085247ae0fdfd29b9ed0))
+
 # [9.37.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.36.1...@wireapp/react-ui-kit@9.37.0) (2025-02-18)
 
 ### Features
