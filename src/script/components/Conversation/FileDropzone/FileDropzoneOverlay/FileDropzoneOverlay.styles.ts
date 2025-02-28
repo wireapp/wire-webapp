@@ -24,34 +24,48 @@ export const overlayStyles: CSSObject = {
   height: '100%',
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'flex-end',
+  justifyContent: 'center',
   flexDirection: 'column',
-  paddingBottom: '96px',
   position: 'absolute',
   top: 0,
   left: 0,
-  backgroundColor: 'rgba(0, 0, 0, 0.75)',
+  backgroundColor: 'var(--app-bg)',
   opacity: 0,
-  gap: '16px',
   zIndex: 'var(--z-index-modal)',
   transition: 'opacity var(--animation-timing-fast) var(--ease-out-quart)',
   pointerEvents: 'none',
   userSelect: 'none',
+
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    top: '16px',
+    left: '16px',
+    width: 'calc(100% - 32px)',
+    height: 'calc(100% - 32px)',
+    border: '2px dashed var(--border-color)',
+    borderRadius: '8px',
+  },
 };
 
 export const overlayActiveStyles: CSSObject = {
   ...overlayStyles,
-  opacity: 0.8,
+  opacity: 1,
   transition: 'opacity var(--animation-timing-fast) var(--ease-in-quad)',
   pointerEvents: 'auto',
 };
 
-export const textStyles: CSSObject = {
-  color: 'var(--white)',
+export const titleStyles: CSSObject = {
+  fontSize: 'var(--font-size-base)',
+  fontWeight: 'var(--font-weight-semibold)',
+  marginBottom: '4px',
+};
+
+export const descriptionStyles: CSSObject = {
   fontSize: 'var(--font-size-small)',
 };
 
 export const iconStyles: CSSObject = {
-  fill: 'var(--white)',
   transform: 'rotate(180deg)',
+  marginBottom: '16px',
 };

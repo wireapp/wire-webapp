@@ -333,9 +333,9 @@ declare module 'I18n/en-US.json' {
     'callNoOneJoined': `no other participant joined.`;
     'callParticipants': `{number} on call`;
     'callReactionButtonAriaLabel': `Select emoji {emoji}`;
-    'callReactionButtonsAriaLabel': `Emoji selection bar`;
-    'callReactionEmojiPickerAriaLabel': `Emoji picker`;
-    'callReactionEmojiPickerButtonAriaLabel': `Open emoji picker`;
+    'callReactionButtonsAriaLabel': `Reactions`;
+    'callReactionEmojiPickerAriaLabel': `Emoji collection`;
+    'callReactionEmojiPickerButtonAriaLabel': `View all reactions`;
     'callReactions': `Reactions`;
     'callReactionsAriaLabel': `Emoji {emoji} from {from}`;
     'callStateCbr': `Constant Bit Rate`;
@@ -505,7 +505,8 @@ declare module 'I18n/en-US.json' {
     'conversationFileUploadFailedTooLargeFilesMessage': `Please select files smaller than {maxSize}MB.`;
     'conversationFileUploadFailedTooLargeImagesMessage': `Please select images smaller than {maxSize}MB.`;
     'conversationFileUploadFailedTooLargeFilesAndImagesMessage': `Please select files smaller than {maxImageSize}MB and images smaller than {maxFileSize}MB.`;
-    'conversationFileUploadOverlayText': `Just drop to add files`;
+    'conversationFileUploadOverlayTitle': `Upload files`;
+    'conversationFileUploadOverlayDescription': `Drag & drop to add files`;
     'conversationFoldersEmptyText': `Add your conversations to folders to stay organized.`;
     'conversationFoldersEmptyTextLearnMore': `Learn more`;
     'conversationFooterArchive': `Archive`;
@@ -842,7 +843,7 @@ declare module 'I18n/en-US.json' {
     'guestRoomToggleName': `Allow Guests`;
     'historyInfo.learnMore': `Learn more`;
     'historyInfo.noHistoryHeadline': `It’s the first time you’re using {brandName} on this device.`;
-    'historyInfo.noHistoryInfo': `For privacy reasons, {newline}your conversation history will not appear here.`;
+    'historyInfo.noHistoryInfo': `For privacy reasons, your history will not appear here.`;
     'historyInfo.ok': `OK`;
     'index.createAccount': `Create account`;
     'index.createAccountForOrganizations': `Wire for Free`;
@@ -855,7 +856,8 @@ declare module 'I18n/en-US.json' {
     'index.login': `Log in`;
     'index.loginInfo': `Already have an account?`;
     'index.ssoLogin': `Log in with SSO`;
-    'index.welcome': `Welcome to {brandName}`;
+    'index.welcome': `Welcome to {brandName}!`;
+    'index.or': `or`;
     'initDecryption': `Decrypting messages`;
     'initEvents': `Loading messages`;
     'initProgress': ` — {number1} of {number2}`;
@@ -1518,8 +1520,8 @@ declare module 'I18n/en-US.json' {
     'ssoLogin.pasteButton': `Paste code`;
     'ssoLogin.subhead': `Enter the company SSO access code.`;
     'ssoLogin.subheadCode': `Please enter your SSO code`;
-    'ssoLogin.subheadCodeOrEmail': `Please enter your email or SSO code.`;
     'ssoLogin.subheadEmailEnvironmentSwitchWarning': `If your email matches an enterprise installation of {brandName}, this app will connect to that server.`;
+    'ssoLogin.subheadCodeOrEmail': `Please enter your email or SSO code.`;
     'startedAudioCallingAlert': `You are calling {conversationName}.`;
     'startedGroupCallingAlert': `You started a conference call with {conversationName}.`;
     'startedVideoCallingAlert': `You are calling {conversationName}, you camera is {cameraStatus}.`;
@@ -1678,6 +1680,7 @@ declare module 'I18n/en-US.json' {
     'videoCallOverlayMicrophone': `Microphone`;
     'videoCallOverlayOpenFullScreen': `Open the call in full screen`;
     'videoCallOverlayOpenPopupWindow': `Open in a new window`;
+    'videoCallOverlayParticipantsListCloseButton': `Hide participants`;
     'videoCallOverlayParticipantsListLabel': `Participants ({count})`;
     'videoCallOverlayParticipantsRaisedHandListLabel': `Raised hands ({count})`;
     'videoCallOverlayShareScreen': `Share Screen`;
@@ -1731,6 +1734,27 @@ declare module 'I18n/en-US.json' {
     'wireMacos': `{brandName} for macOS`;
     'wireWindows': `{brandName} for Windows`;
     'wire_for_web': `{brandName} for Web`;
+    'layoutSidebarHeader': `Collaborate without Compromise`;
+    'layoutSidebarContent': `Connect, message, and share files with ease, protected by the industry\'s most secure end-to-end encryption`;
+    'layoutSidebarLink': `Learn more`;
+    'redirectHeader': `Connect to your custom backend?`;
+    'redirectSubHeader': `If you continue, we will redirect you to your team’s customized backend {backendName} to log in.`;
+    'redirectBackendName': `Backend name:`;
+    'redirectBackendURL': `Backend URL:`;
+    'redirectBackendWSURL': `Backend WSURL:`;
+    'redirectBlacklistURL': `Blacklist URL:`;
+    'redirectTeamsURL': `Teams URL:`;
+    'redirectAccountURL': `Accounts URL:`;
+    'redirectWebsiteURL': `Website URL:`;
+    'redirectHideDetails': `Hide details`;
+    'redirectShowDetails': `Show details`;
+    'redirectConnect': `Connect`;
+    'redirectCancel': `Cancel`;
+    'accountAlreadyExistsModal.header': `Email already in use`;
+    'accountAlreadyExistsModal.content': `You can\'t log in with this email on the on-premises backend {backendName}.\nPlease change your email in the account settings or delete your account. Then, you can use this email again for your on-premises account.`;
+    'accountAlreadyExistsModal.changeEmailLink': `Change your email address`;
+    'accountAlreadyExistsModal.deletePersonalAccount': `Delete personal account`;
+    'accountAlreadyExistsModal.removeTeamMember': `remove team member`;
   };
   export default translations;
 }

@@ -70,9 +70,8 @@ export class CallState {
   public readonly activeCalls: ko.PureComputed<Call[]>;
   public readonly joinedCall: ko.PureComputed<Call | undefined>;
   public readonly activeCallViewTab = ko.observable(CallViewTab.ALL);
-  public readonly hasAvailableScreensToShare: ko.PureComputed<boolean>;
-  public readonly isSpeakersViewActive: ko.PureComputed<boolean>;
-  public readonly isMaximisedViewActive: ko.PureComputed<boolean>;
+  readonly hasAvailableScreensToShare: ko.PureComputed<boolean>;
+  readonly isSpeakersViewActive: ko.PureComputed<boolean>;
   public readonly viewMode = ko.observable<CallingViewMode>(CallingViewMode.MINIMIZED);
   public readonly detachedWindow = ko.observable<Window | null>(null);
   public readonly isScreenSharingSourceFromDetachedWindow = ko.observable<boolean>(false);
@@ -96,14 +95,6 @@ export class CallState {
       );
     });
     this.isSpeakersViewActive = ko.pureComputed(() => this.activeCallViewTab() === CallViewTab.SPEAKERS);
-
-    this.isMaximisedViewActive = ko.pureComputed(() => {
-      const call = this.joinedCall();
-      if (!call) {
-        return false;
-      }
-      return call.maximizedParticipant() !== null;
-    });
 
     this.hasAvailableScreensToShare = ko.pureComputed(
       () => this.selectableScreens().length > 0 || this.selectableWindows().length > 0,

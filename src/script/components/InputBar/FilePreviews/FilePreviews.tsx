@@ -20,15 +20,15 @@
 import {useAutoAnimate} from '@formkit/auto-animate/react';
 import {container} from 'tsyringe';
 
-import {FileWithPreview, useFileUploadState} from 'Components/Conversation/useFiles/useFiles';
+import {FileWithPreview} from 'Components/Conversation/useFiles/useFiles';
 import {isAudio, isVideo, isImage} from 'src/script/assets/AssetMetaDataBuilder';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
-import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 
 import {AudioPreviewCard} from './AudioPreviewCard/AudioPreviewCard';
 import {FilePreviewCard} from './FilePreviewCard/FilePreviewCard';
 import {wrapperStyles} from './FilePreviews.styles';
 import {ImagePreviewCard} from './ImagePreviewCard/ImagePreviewCard';
+import {useFilePreview} from './useFilePreview/useFilePreview';
 import {VideoPreviewCard} from './VideoPreviewCard/VideoPreviewCard';
 
 interface FilePreviewsProps {
@@ -51,34 +51,53 @@ export const FilePreviews = ({files}: FilePreviewsProps) => {
   );
 };
 
-const FilePreview = ({
-  file,
-  cellsRepository = container.resolve(CellsRepository),
-}: {
+interface FilePreviewProps {
   file: FileWithPreview;
   cellsRepository?: CellsRepository;
-}) => {
-  const {deleteFile} = useFileUploadState();
+}
 
-  const name = trimFileExtension(file.name);
-  const extension = getFileExtension(file.name);
-  const size = formatBytes(file.size);
-
-  const handleDelete = () => {
-    deleteFile(file.id);
-    void cellsRepository.deleteFileDraft({uuid: file.remoteUuid, versionId: file.remoteVersionId});
-  };
+const FilePreview = ({file, cellsRepository = container.resolve(CellsRepository)}: FilePreviewProps) => {
+  const {name, extension, size, isLoading, isError, handleDelete, handleRetry} = useFilePreview({
+    file,
+    cellsRepository,
+  });
 
   if (isImage(file)) {
-    return <ImagePreviewCard src={file.preview} onDelete={handleDelete} />;
+    return (
+      <ImagePreviewCard
+        src={file.preview}
+        onDelete={handleDelete}
+        onRetry={handleRetry}
+        isLoading={isLoading}
+        isError={isError}
+      />
+    );
   }
 
   if (isAudio(file)) {
-    return <AudioPreviewCard extension={extension} name={name} size={size} onDelete={handleDelete} />;
+    return (
+      <AudioPreviewCard
+        extension={extension}
+        name={name}
+        size={size}
+        onDelete={handleDelete}
+        onRetry={handleRetry}
+        isLoading={isLoading}
+        isError={isError}
+      />
+    );
   }
 
   if (isVideo(file)) {
-    return <VideoPreviewCard src={file.preview} onDelete={handleDelete} />;
+    return (
+      <VideoPreviewCard
+        src={file.preview}
+        onDelete={handleDelete}
+        onRetry={handleRetry}
+        isLoading={isLoading}
+        isError={isError}
+      />
+    );
   }
 
   return (
@@ -87,7 +106,9 @@ const FilePreview = ({
       name={name}
       size={size}
       onDelete={handleDelete}
-      isLoading={file.uploadStatus === 'uploading'}
+      onRetry={handleRetry}
+      isLoading={isLoading}
+      isError={isError}
     />
   );
 };

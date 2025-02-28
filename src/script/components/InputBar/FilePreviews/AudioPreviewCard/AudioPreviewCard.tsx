@@ -24,9 +24,10 @@ import {
 } from 'Components/MessagesList/Message/ContentMessage/asset/AudioAsset/AudioAssetV2.styles';
 
 import {AudioEmptySeekBar} from './AudioEmptySeekBar/AudioEmptySeekBar';
-import {wrapperStyles} from './AudioPreviewCard.styles';
+import {loaderWrapperStyles, loadingStyles, wrapperStyles} from './AudioPreviewCard.styles';
 
 import {FilePreviewDeleteButton} from '../common/FilePreviewDeleteButton/FilePreviewDeleteButton';
+import {FilePreviewErrorMoreButton} from '../common/FilePreviewErrorMoreButton/FilePreviewErrorMoreButton';
 import {FilePreviewPlayButton} from '../common/FilePreviewPlayButton/FilePreviewPlayButton';
 
 interface AudioPreviewCardProps {
@@ -35,8 +36,8 @@ interface AudioPreviewCardProps {
   size: string;
   isError?: boolean;
   isLoading?: boolean;
-  loadingProgress?: number;
   onDelete: () => void;
+  onRetry: () => void;
 }
 
 export const AudioPreviewCard = ({
@@ -45,8 +46,8 @@ export const AudioPreviewCard = ({
   size,
   isError,
   isLoading,
-  loadingProgress,
   onDelete,
+  onRetry,
 }: AudioPreviewCardProps) => {
   return (
     <div css={wrapperStyles}>
@@ -56,15 +57,20 @@ export const AudioPreviewCard = ({
           <FileCard.Type />
           <FileCard.Name />
         </FileCard.Header>
-        <FilePreviewDeleteButton onDelete={onDelete} />
         <div css={controlStyles}>
-          <FilePreviewPlayButton />
+          {isLoading && (
+            <div css={loaderWrapperStyles}>
+              <div css={loadingStyles} className="icon-spinner spin"></div>
+            </div>
+          )}
+          {!isLoading && <FilePreviewPlayButton />}
           <div css={playerWrapperStyles}>
             <AudioEmptySeekBar />
           </div>
         </div>
-        {isError && <FileCard.Error />}
-        {isLoading && <FileCard.Loading progress={loadingProgress} />}
+        {isError && !isLoading && <FileCard.Error />}
+        {!isError && !isLoading && <FilePreviewDeleteButton onDelete={onDelete} />}
+        {isError && !isLoading && <FilePreviewErrorMoreButton onDelete={onDelete} onRetry={onRetry} />}
       </FileCard.Root>
     </div>
   );

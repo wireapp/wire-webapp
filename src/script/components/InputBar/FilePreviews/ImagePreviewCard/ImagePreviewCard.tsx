@@ -19,15 +19,20 @@
 
 import {t} from 'Util/LocalizerUtil';
 
-import {imageStyles, wrapperStyles} from './ImagePreviewCard.styles';
+import {imageStyles, loaderWrapperStyles, wrapperStyles} from './ImagePreviewCard.styles';
 
 import {FilePreviewDeleteButton} from '../common/FilePreviewDeleteButton/FilePreviewDeleteButton';
+import {FilePreviewErrorMoreButton} from '../common/FilePreviewErrorMoreButton/FilePreviewErrorMoreButton';
+import {FilePreviewSpinner} from '../common/FilePreviewSpinner/FilePreviewSpinner';
 interface ImagePreviewCardProps {
   src: string;
   onDelete: () => void;
+  onRetry: () => void;
+  isLoading?: boolean;
+  isError?: boolean;
 }
 
-export const ImagePreviewCard = ({src, onDelete}: ImagePreviewCardProps) => {
+export const ImagePreviewCard = ({src, onDelete, onRetry, isLoading, isError}: ImagePreviewCardProps) => {
   return (
     <article css={wrapperStyles} aria-label={t('conversationFileImagePreviewLabel', {src})}>
       <img
@@ -38,7 +43,13 @@ export const ImagePreviewCard = ({src, onDelete}: ImagePreviewCardProps) => {
           URL.revokeObjectURL(src);
         }}
       />
-      <FilePreviewDeleteButton onDelete={onDelete} />
+      {isLoading && (
+        <div css={loaderWrapperStyles}>
+          <FilePreviewSpinner />
+        </div>
+      )}
+      {isError && <FilePreviewErrorMoreButton onDelete={onDelete} onRetry={onRetry} />}
+      {!isLoading && !isError && <FilePreviewDeleteButton onDelete={onDelete} />}
     </article>
   );
 };

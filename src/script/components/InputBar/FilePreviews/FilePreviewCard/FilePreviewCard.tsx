@@ -24,6 +24,7 @@ import {FileCard} from 'Components/FileCard/FileCard';
 import {loadingStyles, wrapperStyles} from './FilePreviewCard.styles';
 
 import {FilePreviewDeleteButton} from '../common/FilePreviewDeleteButton/FilePreviewDeleteButton';
+import {FilePreviewErrorMoreButton} from '../common/FilePreviewErrorMoreButton/FilePreviewErrorMoreButton';
 
 interface FilePreviewCardProps {
   extension: string;
@@ -32,6 +33,7 @@ interface FilePreviewCardProps {
   isError?: boolean;
   isLoading?: boolean;
   onDelete: () => void;
+  onRetry: () => void;
   children?: ReactNode;
 }
 
@@ -42,6 +44,7 @@ export const FilePreviewCard = ({
   isError,
   isLoading,
   onDelete,
+  onRetry,
   children,
 }: FilePreviewCardProps) => {
   return (
@@ -52,10 +55,11 @@ export const FilePreviewCard = ({
           <FileCard.Type />
           {isLoading && <div css={loadingStyles} className="icon-spinner spin"></div>}
         </FileCard.Header>
-        {!isLoading && <FilePreviewDeleteButton onDelete={onDelete} />}
+        {!isLoading && isError && <FilePreviewErrorMoreButton onDelete={onDelete} onRetry={onRetry} />}
+        {!isLoading && !isError && <FilePreviewDeleteButton onDelete={onDelete} />}
         <FileCard.Name />
         {children}
-        {isError && <FileCard.Error />}
+        {!isLoading && isError && <FileCard.Error />}
       </FileCard.Root>
     </div>
   );

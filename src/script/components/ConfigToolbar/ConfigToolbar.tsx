@@ -37,7 +37,6 @@ export function ConfigToolbar() {
   const messageCountRef = useRef<number>(0); // For the message count
   const [prefix, setPrefix] = useState('Message -'); // Prefix input
   const wrapperRef = useRef(null);
-  const [avsDebuggerEnabled, setAvsDebuggerEnabled] = useState(!!window.wire?.app?.debug?.isEnabledAvsDebugger()); //
 
   // Toggle config tool on 'cmd/ctrl + shift + 2'
   useEffect(() => {
@@ -161,25 +160,6 @@ export function ConfigToolbar() {
 
   useClickOutside(wrapperRef, () => setShowConfig(false));
 
-  const handleAvsEnable = (isChecked: boolean) => {
-    setAvsDebuggerEnabled(!!window.wire?.app?.debug?.enableAvsDebugger(isChecked));
-  };
-
-  const renderAvsSwitch = (value: boolean) => {
-    return (
-      <div style={{marginBottom: '10px'}}>
-        <label htmlFor="avs-debugger-checkbox" style={{display: 'block', fontWeight: 'bold'}}>
-          ENABLE AVS TRACK DEBUGGER
-        </label>
-        <Switch
-          id="avs-debugger-checkbox"
-          checked={avsDebuggerEnabled}
-          onToggle={isChecked => handleAvsEnable(isChecked)}
-        />
-      </div>
-    );
-  };
-
   if (!showConfig) {
     return null;
   }
@@ -193,17 +173,10 @@ export function ConfigToolbar() {
       </h4>
       <div>{renderConfig(configFeaturesState)}</div>
 
-      <hr />
-
       <h3>Debug Functions</h3>
-
       <Button onClick={() => window.wire?.app?.debug?.reconnectWebSocket()}>reconnectWebSocket</Button>
       <Button onClick={() => window.wire?.app?.debug?.enablePressSpaceToUnmute()}>enablePressSpaceToUnmute</Button>
       <Button onClick={() => window.wire?.app?.debug?.disablePressSpaceToUnmute()}>disablePressSpaceToUnmute</Button>
-
-      <div>{renderAvsSwitch(avsDebuggerEnabled)}</div>
-
-      <hr />
 
       <h3>Message Automation</h3>
       <Input

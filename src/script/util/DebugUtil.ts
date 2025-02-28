@@ -37,9 +37,6 @@ import keyboardjs from 'keyboardjs';
 import {$createTextNode, $getRoot, LexicalEditor} from 'lexical';
 import {container} from 'tsyringe';
 
-import {AvsDebugger} from '@wireapp/avs-debugger';
-
-import {getStorage} from 'Util/localStorage';
 import {getLogger, Logger} from 'Util/Logger';
 
 import {TIME_IN_MILLIS} from './TimeUtil';
@@ -113,9 +110,6 @@ export class DebugUtil {
     this.logger = getLogger('DebugUtil');
 
     keyboardjs.bind(['command+shift+1', 'ctrl+shift+1'], this.toggleDebugUi);
-
-    // If the debugger marked as active in the LocalStorage, install the Web Component
-    this.setupAvsDebugger();
   }
 
   async importEvents() {
@@ -259,39 +253,6 @@ export class DebugUtil {
 
   async disablePressSpaceToUnmute() {
     this.propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE, false);
-  }
-
-  setupAvsDebugger() {
-    if (this.isEnabledAvsDebugger()) {
-      this.enableAvsDebugger(true);
-    }
-  }
-
-  enableAvsDebugger(enable: boolean): boolean {
-    const storage = getStorage();
-
-    if (storage === undefined) {
-      return false;
-    }
-    if (enable) {
-      AvsDebugger.initTrackDebugger();
-    } else {
-      AvsDebugger.destructTrackDebugger();
-    }
-
-    storage.setItem('avs-debugger-enabled', `${enable}`);
-    return enable;
-  }
-
-  isEnabledAvsDebugger(): boolean {
-    const storage = getStorage();
-
-    if (storage === undefined) {
-      return false;
-    }
-
-    const isEnabled = storage.getItem('avs-debugger-enabled');
-    return isEnabled === 'true';
   }
 
   /** Used by QA test automation. */

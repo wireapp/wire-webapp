@@ -1144,7 +1144,9 @@ export class MessageRepository {
   }
 
   private async sendToSelfConversations(payload: GenericMessage) {
-    const selfConversations = this.conversationState.getSelfConversations(supportsMLS());
+    const selfConversations = this.conversationState.getSelfConversations(
+      supportsMLS() && this.teamState.isMLSEnabled(),
+    );
     await Promise.all(
       selfConversations.map(selfConversation =>
         this.sendAndInjectMessage(payload, selfConversation, {

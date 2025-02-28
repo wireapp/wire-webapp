@@ -23,7 +23,7 @@ import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 
 import {UrlUtil, StringUtil, Runtime} from '@wireapp/commons';
-import {Button, ButtonVariant, ContainerXS, H1, Muted, QUERY, useMatchMedia, useTimeout} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, ContainerXS, Muted, QUERY, Text, useMatchMedia, useTimeout} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/LocalizerUtil';
 
@@ -34,6 +34,7 @@ import {ClientList} from '../component/ClientList';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {RootState, bindActionCreators} from '../module/reducer';
 import {QUERY_KEY} from '../route';
+import {getEnterpriseLoginV2FF} from '../util/helpers';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
@@ -41,6 +42,7 @@ const ClientManagerComponent = ({doGetAllClients, doLogout}: Props & ConnectedPr
   const SFAcode = localStorage.getItem(QUERY_KEY.CONVERSATION_CODE);
   const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE);
   const isMobile = useMatchMedia(QUERY.mobile);
+  const isEnterpriseLoginV2Enabled = getEnterpriseLoginV2FF();
 
   const device = StringUtil.capitalize(Runtime.getBrowserName());
 
@@ -70,7 +72,7 @@ const ClientManagerComponent = ({doGetAllClients, doLogout}: Props & ConnectedPr
   };
 
   return (
-    <Page>
+    <Page withSideBar={isEnterpriseLoginV2Enabled}>
       <ContainerXS
         centerText
         verticalCenter
@@ -82,9 +84,9 @@ const ClientManagerComponent = ({doGetAllClients, doLogout}: Props & ConnectedPr
           marginInline: isMobile ? '20px' : 'auto',
         }}
       >
-        <H1 center style={{marginTop: '140px'}}>
+        <Text center block style={{marginTop: '1rem', fontSize: '1.5rem', fontWeight: '500'}}>
           {t('clientManager.headline')}
-        </H1>
+        </Text>
         <Muted
           center
           style={{
@@ -100,7 +102,7 @@ const ClientManagerComponent = ({doGetAllClients, doLogout}: Props & ConnectedPr
         <Button
           variant={ButtonVariant.SECONDARY}
           onClick={logout}
-          style={{alignSelf: 'center', margin: '48px 0 80px 0'}}
+          style={{alignSelf: 'center', margin: '48px 0 1rem 0'}}
           data-uie-name="go-sign-out"
         >
           {t('clientManager.logout')}
