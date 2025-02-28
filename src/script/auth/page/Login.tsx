@@ -65,6 +65,7 @@ import {separator} from './Login.styles';
 import {Page} from './Page';
 
 import {Config} from '../../Config';
+import {AccountAlreadyExistsModal} from '../component/AccountAlreadyExistsModal';
 import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
 import {Exception} from '../component/Exception';
 import {JoinGuestLinkPasswordModal} from '../component/JoinGuestLinkPasswordModal';
@@ -114,12 +115,14 @@ const LoginComponent = ({
 
   const {state} = useLocation();
   const accountCreationEnabled = state?.accountCreationEnabled;
+  const shouldDisplayWarning = state?.shouldDisplayWarning;
 
   const [conversationCode, setConversationCode] = useState<string | null>(null);
   const [conversationKey, setConversationKey] = useState<string | null>(null);
   const [conversationSubmitData, setConversationSubmitData] = useState<Partial<LoginData> | null>(null);
   const [isLinkPasswordModalOpen, setIsLinkPasswordModalOpen] = useState<boolean>(false);
   const [validationErrors, setValidationErrors] = useState<Error[]>([]);
+  const [isAccountAlreadyExistsModalOpen, setIsAccountAlreadyExistsModalOpen] = useState(false);
 
   const [twoFactorSubmitError, setTwoFactorSubmitError] = useState<string | Error>('');
   const [twoFactorLoginData, setTwoFactorLoginData] = useState<LoginData>();
@@ -263,6 +266,12 @@ const LoginComponent = ({
 
         return navigate(`${ROUTE.AUTHORIZE}/${queryString}`);
       }
+
+      if (shouldDisplayWarning) {
+        setIsAccountAlreadyExistsModalOpen(true);
+        return;
+      }
+
       return navigate(ROUTE.HISTORY_INFO);
     } catch (error) {
       if (isBackendError(error)) {
@@ -362,8 +371,14 @@ const LoginComponent = ({
     await handleSubmit(conversationSubmitData, [], password);
   };
 
+  const hideAccountAlreadyExistsModal = () => {
+    setIsAccountAlreadyExistsModalOpen(false);
+    return navigate(ROUTE.HISTORY_INFO);
+  };
+
   return (
     <Page withSideBar={isEnterpriseLoginV2Enabled}>
+      {isAccountAlreadyExistsModalOpen && <AccountAlreadyExistsModal onClose={hideAccountAlreadyExistsModal} />}
       {showBackButton && (
         <IsMobile>
           <div style={{margin: 16}}>{backArrow}</div>

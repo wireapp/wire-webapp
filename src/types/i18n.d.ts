@@ -333,9 +333,9 @@ declare module 'I18n/en-US.json' {
     'callNoOneJoined': `no other participant joined.`;
     'callParticipants': `{number} on call`;
     'callReactionButtonAriaLabel': `Select emoji {emoji}`;
-    'callReactionButtonsAriaLabel': `Emoji selection bar`;
-    'callReactionEmojiPickerAriaLabel': `Emoji picker`;
-    'callReactionEmojiPickerButtonAriaLabel': `Open emoji picker`;
+    'callReactionButtonsAriaLabel': `Reactions`;
+    'callReactionEmojiPickerAriaLabel': `Emoji collection`;
+    'callReactionEmojiPickerButtonAriaLabel': `View all reactions`;
     'callReactions': `Reactions`;
     'callReactionsAriaLabel': `Emoji {emoji} from {from}`;
     'callStateCbr': `Constant Bit Rate`;
@@ -505,7 +505,8 @@ declare module 'I18n/en-US.json' {
     'conversationFileUploadFailedTooLargeFilesMessage': `Please select files smaller than {maxSize}MB.`;
     'conversationFileUploadFailedTooLargeImagesMessage': `Please select images smaller than {maxSize}MB.`;
     'conversationFileUploadFailedTooLargeFilesAndImagesMessage': `Please select files smaller than {maxImageSize}MB and images smaller than {maxFileSize}MB.`;
-    'conversationFileUploadOverlayText': `Just drop to add files`;
+    'conversationFileUploadOverlayTitle': `Upload files`;
+    'conversationFileUploadOverlayDescription': `Drag & drop to add files`;
     'conversationFoldersEmptyText': `Add your conversations to folders to stay organized.`;
     'conversationFoldersEmptyTextLearnMore': `Learn more`;
     'conversationFooterArchive': `Archive`;
@@ -1679,6 +1680,7 @@ declare module 'I18n/en-US.json' {
     'videoCallOverlayMicrophone': `Microphone`;
     'videoCallOverlayOpenFullScreen': `Open the call in full screen`;
     'videoCallOverlayOpenPopupWindow': `Open in a new window`;
+    'videoCallOverlayParticipantsListCloseButton': `Hide participants`;
     'videoCallOverlayParticipantsListLabel': `Participants ({count})`;
     'videoCallOverlayParticipantsRaisedHandListLabel': `Raised hands ({count})`;
     'videoCallOverlayShareScreen': `Share Screen`;
@@ -1749,10 +1751,13 @@ declare module 'I18n/en-US.json' {
     'redirectConnect': `Connect`;
     'redirectCancel': `Cancel`;
     'accountAlreadyExistsModal.header': `Email already in use`;
-    'accountAlreadyExistsModal.content': `You can\'t log in with this email on the on-premises backend {backendName}.\nPlease change your email in the account settings or delete your account. Then, you can use this email again for your on-premises account.`;
+    'accountAlreadyExistsModal.content': `This email\'s domain belongs to a Wire Enterprise Instance, but the email address is associated with a Wire Cloud account. To proceed with the Enterprise instance login, please update your email address to another domain, or delete your account. If the account is part of a team, please reach out to the Team Administrator.`;
     'accountAlreadyExistsModal.changeEmailLink': `Change your email address`;
     'accountAlreadyExistsModal.deletePersonalAccount': `Delete personal account`;
     'accountAlreadyExistsModal.removeTeamMember': `remove team member`;
+    'paginationLeftArrowAriaLabel': `Go to previous page`;
+    'paginationRightArrowAriaLabel': `Go to next page`;
+    'paginationDotAriaLabel': `Go to page {page}`;
   };
   export default translations;
 }

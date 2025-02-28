@@ -17,23 +17,13 @@
  *
  */
 
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 
 import {CSSObject} from '@emotion/react';
 
-import {ChevronIcon, IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
-
-import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
-
-import {
-  chevronLeftStyles,
-  chevronRightStyles,
-  iconButtonStyles,
-  paginationItemsStyles,
-  paginationItemStyles,
-  paginationItemWrapperStyles,
-  paginationWrapperStyles,
-} from './Pagination.styles';
+import {paginationContainerStyles, paginationDotsContainerStyles} from './Pagination.styles';
+import {PaginationArrow} from './PaginationArrow';
+import {PaginationDot} from './PaginationDot';
 
 export interface PaginationProps {
   currentPage: number;
@@ -45,95 +35,74 @@ export interface PaginationProps {
 const DEFAULT_VISIBLE_DOTS = 5;
 
 const Pagination = ({totalPages, currentPage, onChangePage, className}: PaginationProps) => {
-  const [currentStart, setCurrentStart] = useState(0);
-  const visibleDots = DEFAULT_VISIBLE_DOTS > totalPages ? totalPages : DEFAULT_VISIBLE_DOTS;
+  const visibleDots = Math.min(DEFAULT_VISIBLE_DOTS, totalPages);
 
-  const handlePreviousPage = () => {
-    if (currentPage === 0) {
+  const calculateStartPosition = (page: number) => {
+    return Math.min(Math.max(0, page - Math.floor(visibleDots / 2)), Math.max(0, totalPages - visibleDots));
+  };
+
+  const [currentStart, setCurrentStart] = useState(() => calculateStartPosition(currentPage));
+
+  useEffect(() => {
+    setCurrentStart(calculateStartPosition(currentPage));
+  }, [currentPage, totalPages, visibleDots]);
+
+  const isFirstPage = currentPage === 0;
+  const isLastPage = currentPage === totalPages - 1;
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage === currentPage) {
       return;
     }
+    onChangePage(newPage);
+  };
 
-    const previousPage = currentPage - 1;
-
-    if (previousPage === currentStart && previousPage !== 0) {
-      setCurrentStart(currentStart => currentStart - 1);
+  const handlePreviousPage = () => {
+    if (!isFirstPage) {
+      handlePageChange(currentPage - 1);
     }
-
-    onChangePage(previousPage);
   };
 
   const handleNextPage = () => {
-    if (currentPage === totalPages - 1) {
-      return;
+    if (!isLastPage) {
+      handlePageChange(currentPage + 1);
     }
-
-    const nextPage = currentPage + 1;
-
-    if (nextPage === currentStart + visibleDots - 1 && nextPage !== totalPages - 1) {
-      setCurrentStart(currentStart => currentStart + 1);
-    }
-
-    onChangePage(nextPage);
   };
 
   const visibleRange = Array.from({length: visibleDots}, (_, index) => currentStart + index);
 
   return (
-    <div id="video-pagination" css={[paginationWrapperStyles, className]}>
-      <IconButton
-        variant={IconButtonVariant.SECONDARY}
-        css={iconButtonStyles}
+    <div id="video-pagination" css={[paginationContainerStyles, className]}>
+      <PaginationArrow
         onClick={handlePreviousPage}
-        onKeyDown={event =>
-          handleKeyDown({
-            event,
-            callback: handlePreviousPage,
-            keys: [KEY.ENTER, KEY.SPACE],
-          })
-        }
-        disabled={currentPage === 0}
+        disabled={isFirstPage}
+        direction="left"
         data-uie-name="pagination-previous"
-        type="button"
-      >
-        <ChevronIcon css={chevronLeftStyles} />
-      </IconButton>
-      <div css={paginationItemsStyles} data-uie-name="pagination-wrapper">
-        {visibleRange.map((page, index) => {
-          const isCurrentPage = currentPage === page;
-          const isFirstOrLastInTheRange = index === 0 || index === visibleRange.length - 1;
-          const isLastPage = page === totalPages - 1;
-          const isFirstPage = page === 0;
+      />
 
-          const isSmaller = isFirstOrLastInTheRange && !(isFirstPage || isLastPage);
+      <div css={paginationDotsContainerStyles} data-uie-name="pagination-wrapper">
+        {visibleRange.map((page, index) => {
+          const isFirstOrLastInRange = index === 0 || index === visibleDots - 1;
+          const isEndpoint = page === 0 || page === totalPages - 1;
 
           return (
-            <div key={page} css={paginationItemWrapperStyles(isSmaller)}>
-              <div
-                data-uie-name="pagination-item"
-                data-uie-status={isCurrentPage ? 'active' : 'inactive'}
-                css={paginationItemStyles(isCurrentPage, isSmaller)}
-              />
-            </div>
+            <PaginationDot
+              key={page}
+              page={page}
+              isCurrentPage={page === currentPage}
+              isSmaller={isFirstOrLastInRange && !isEndpoint}
+              onClick={handlePageChange}
+            />
           );
         })}
       </div>
-      <IconButton
-        variant={IconButtonVariant.SECONDARY}
-        css={iconButtonStyles}
+
+      <PaginationArrow
         onClick={handleNextPage}
-        onKeyDown={event =>
-          handleKeyDown({
-            event,
-            callback: handleNextPage,
-            keys: [KEY.ENTER, KEY.SPACE],
-          })
-        }
-        disabled={currentPage === totalPages - 1}
+        disabled={isLastPage}
+        direction="right"
         data-uie-name="pagination-next"
-        type="button"
-      >
-        <ChevronIcon css={chevronRightStyles} />
-      </IconButton>
+      />
     </div>
   );
 };
