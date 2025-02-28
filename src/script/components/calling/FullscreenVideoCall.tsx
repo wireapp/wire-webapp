@@ -24,7 +24,14 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {Checkbox, CheckboxLabel, IconButton, IconButtonVariant, QUERY} from '@wireapp/react-ui-kit';
+import {
+  Checkbox,
+  CheckboxLabel,
+  IconButton,
+  IconButtonVariant,
+  OpenDetachedWindowIcon,
+  QUERY,
+} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useAppNotification} from 'Components/AppNotification/AppNotification';
@@ -332,7 +339,7 @@ const FullscreenVideoCall = ({
                 data-uie-name="do-call-controls-video-maximize"
                 title={t('videoCallOverlayOpenPopupWindow')}
               >
-                <Icon.OpenDetachedWindowIcon />
+                <OpenDetachedWindowIcon />
               </IconButton>
             )}
           </div>
