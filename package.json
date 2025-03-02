@@ -114,7 +114,7 @@
     "@wireapp/store-engine": "5.1.11",
     "archiver": "7.0.1",
     "autoprefixer": "10.4.20",
-    "babel-loader": "9.2.1",
+    "babel-loader": "10.0.0",
     "babel-plugin-transform-import-meta": "2.3.2",
     "cross-env": "7.0.3",
     "css-loader": "7.1.2",
