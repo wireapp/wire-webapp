@@ -33,7 +33,17 @@ const markerStyles: Partial<Record<Marker['type'], SerializedStyles>> = {
   day: dayMarkerStyle,
 };
 
-export function MarkerComponent({marker, scrollTo}: {marker: Marker; scrollTo: ScrollToElement}) {
+export function MarkerComponent({
+  marker,
+  scrollTo,
+  measureElement,
+  dataIndex,
+}: {
+  marker: Marker;
+  scrollTo: ScrollToElement;
+  measureElement: any;
+  dataIndex: any;
+}) {
   const timeAgo = useRelativeTimestamp(marker.timestamp, marker.type === 'day');
   const elementRef = useRef<HTMLDivElement>(null);
 
@@ -48,7 +58,19 @@ export function MarkerComponent({marker, scrollTo}: {marker: Marker; scrollTo: S
   }, []);
 
   return (
-    <div className="message-header" css={style} ref={elementRef}>
+    <div
+      className="message-header"
+      css={style}
+      ref={element => {
+        if (!element) {
+          return;
+        }
+
+        elementRef.current = element;
+        measureElement(element);
+      }}
+      data-index={dataIndex}
+    >
       <div className="message-header-icon">
         {marker.type === 'unread' && <span className="message-unread-dot dot-md" />}
       </div>

@@ -17,8 +17,9 @@
  *
  */
 
-import React, {FC, useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
+import React, {FC, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 
+import {useVirtualizer} from '@tanstack/react-virtual';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 
@@ -236,10 +237,6 @@ export const MessagesList: FC<MessagesListParams> = ({
     }
   }, [loaded]);
 
-  if (!loaded) {
-    return null;
-  }
-
   const scrollToElement: ScrollToElement = ({element, center}, isUnread) => {
     if (isUnread && messagesContainer) {
       // if it's a new unread message, but we are not on the first render of the list,
@@ -250,6 +247,60 @@ export const MessagesList: FC<MessagesListParams> = ({
     setTimeout(() => (focusedElement.current = null), 1000);
     syncScrollPosition();
   };
+
+  const flattenedGroupedMessagesV2 = useMemo(
+    () =>
+      groupedMessages.flatMap((group, groupIndex) => {
+        if (isMarker(group)) {
+          return {
+            group,
+            key: `${group.type}-${group.timestamp}`,
+          };
+        }
+
+        const {messages, firstMessageTimestamp} = group;
+
+        return messages.map((message, messageIndex) => {
+          const isLastDeliveredMessage = lastDeliveredMessage?.id === message.id;
+          const isLastLoadedMessage = groupIndex === groupedMessages.length - 1 && messageIndex === messages.length - 1;
+
+          const isLastMessage = isLastLoadedMessage && conversation.hasLastReceivedMessageLoaded();
+
+          const lastMessageInvisibleCallback = isLastMessage
+            ? () => {
+                conversation.isLastMessageVisible(false);
+              }
+            : undefined;
+
+          const key = `${message.id || 'message'}-${message.timestamp()}`;
+
+          const isHighlighted = !!highlightedMessage && highlightedMessage === message.id;
+          const isFocused = !!focusedId && focusedId === message.id;
+
+          return {
+            firstMessageTimestamp,
+            lastMessageInvisibleCallback,
+            key,
+            message,
+            isLastDeliveredMessage,
+            isHighlighted,
+            isFocused,
+            isLastMessage,
+          };
+        });
+      }),
+    [groupedMessages.length],
+  );
+
+  const rowVirtualizer = useVirtualizer({
+    count: flattenedGroupedMessagesV2.length,
+    getScrollElement: () => messageListRef.current,
+    estimateSize: () => 60,
+  });
+
+  if (!loaded) {
+    return null;
+  }
 
   const jumpToLastMessage = () => {
     if (conversation) {
@@ -269,6 +320,8 @@ export const MessagesList: FC<MessagesListParams> = ({
     }
   };
 
+  const items = rowVirtualizer.getVirtualItems();
+
   return (
     <>
       <FadingScrollbar
@@ -276,53 +329,55 @@ export const MessagesList: FC<MessagesListParams> = ({
         id="message-list"
         className={cx('message-list', {'is-right-panel-open': isRightSidebarOpen})}
         tabIndex={TabIndex.UNFOCUSABLE}
+        style={{height: '100%', overflow: 'auto'}}
       >
-        <div ref={setMessagesContainer} className={cx('messages', {'flex-center': verticallyCenterMessage()})}>
-          {groupedMessages.flatMap((group, groupIndex) => {
-            if (isMarker(group)) {
-              return (
-                <MarkerComponent key={`${group.type}-${group.timestamp}`} scrollTo={scrollToElement} marker={group} />
-              );
-            }
-            const {messages, firstMessageTimestamp} = group;
+        <div
+          ref={setMessagesContainer}
+          className={cx('messages', {'flex-center': verticallyCenterMessage()})}
+          style={{
+            height: `${rowVirtualizer.getTotalSize()}px`,
+            width: '100%',
+            position: 'relative',
+          }}
+        >
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              transform: `translateY(${items[0]?.start ?? 0}px)`,
+            }}
+          >
+            {items.map(virtualItem => {
+              const mess = flattenedGroupedMessagesV2[virtualItem.index];
 
-            return messages.map((message, messageIndex) => {
-              const isLastDeliveredMessage = lastDeliveredMessage?.id === message.id;
-              const isLastLoadedMessage =
-                groupIndex === groupedMessages.length - 1 && messageIndex === messages.length - 1;
-
-              const isLastMessage = isLastLoadedMessage && conversation.hasLastReceivedMessageLoaded();
-
-              const visibleCallback = () => {
-                getVisibleCallback(conversation, message)?.();
-                if (isLastMessage) {
-                  conversation.isLastMessageVisible(true);
-                }
-              };
-
-              const lastMessageInvisibleCallback = isLastMessage
-                ? () => {
-                    conversation.isLastMessageVisible(false);
-                  }
-                : undefined;
-
-              const key = `${message.id || 'message'}-${message.timestamp()}`;
-
-              const isHighlighted = !!highlightedMessage && highlightedMessage === message.id;
-              const isFocused = !!focusedId && focusedId === message.id;
+              if (isMarker(mess.group)) {
+                return (
+                  <MarkerComponent
+                    key={virtualItem.key}
+                    scrollTo={scrollToElement}
+                    marker={mess.group}
+                    measureElement={rowVirtualizer.measureElement}
+                    dataIndex={virtualItem.index}
+                  />
+                );
+              }
 
               return (
                 <Message
-                  key={key}
-                  onVisible={visibleCallback}
-                  onVisibilityLost={lastMessageInvisibleCallback}
-                  message={message}
-                  hideHeader={message.timestamp() !== firstMessageTimestamp}
+                  measureElement={rowVirtualizer.measureElement}
+                  dataIndex={virtualItem.index}
+                  key={virtualItem.key}
+                  // onVisible={visibleCallback}
+                  onVisibilityLost={mess.lastMessageInvisibleCallback}
+                  message={mess.message}
+                  hideHeader={mess.message.timestamp() !== mess.firstMessageTimestamp}
                   messageActions={messageActions}
                   conversation={conversation}
                   hasReadReceiptsTurnedOn={conversationRepository.expectReadReceipt(conversation)}
-                  isLastDeliveredMessage={isLastDeliveredMessage}
-                  isHighlighted={isHighlighted}
+                  isLastDeliveredMessage={mess.isLastDeliveredMessage}
+                  isHighlighted={mess.isHighlighted}
                   scrollTo={scrollToElement}
                   isSelfTemporaryGuest={selfUser.isTemporaryGuest()}
                   messageRepository={messageRepository}
@@ -353,15 +408,15 @@ export const MessagesList: FC<MessagesListParams> = ({
                   }}
                   selfId={selfUser.qualifiedId}
                   shouldShowInvitePeople={shouldShowInvitePeople}
-                  isFocused={isFocused}
+                  isFocused={mess.isFocused}
                   handleFocus={setFocusedId}
                   handleArrowKeyDown={handleKeyDown}
                   isMsgElementsFocusable={isMsgElementsFocusable}
                   setMsgElementsFocusable={setMsgElementsFocusable}
                 />
               );
-            });
-          })}
+            })}
+          </div>
 
           <UploadAssets assetRepository={assetRepository} conversationId={conversation.id} />
         </div>
