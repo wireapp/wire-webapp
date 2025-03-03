@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.4.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/commons@5.4.1...@wireapp/commons@5.4.2) (2025-03-03)
+
+### Bug Fixes
+
+* issue with stringifying very large objects ([#6964](https://github.com/wireapp/wire-web-packages/issues/6964)) ([207b8fa](https://github.com/wireapp/wire-web-packages/commit/207b8fa548ef66261e242433f3c176062543aef1))
+
 ## [5.4.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/commons@5.4.0...@wireapp/commons@5.4.1) (2025-01-21)
 
 **Note:** Version bump only for package @wireapp/commons
