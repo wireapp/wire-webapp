@@ -29,11 +29,8 @@ export interface AccountAlreadyExistsModalProps {
 }
 
 export const AccountAlreadyExistsModal = ({onClose}: AccountAlreadyExistsModalProps) => {
-  const {
-    CHANGE_EMAIL_ADDRESS: changeEmailAddressUrl,
-    DELETE_PERSONAL_ACCOUNT: deletePersonalAccountUrl,
-    REMOVE_TEAM_MEMBER: removeTeamMemberUrl,
-  } = Config.getConfig().URL.SUPPORT;
+  const {CHANGE_EMAIL_ADDRESS: changeEmailAddressUrl, DELETE_PERSONAL_ACCOUNT: deletePersonalAccountUrl} =
+    Config.getConfig().URL.SUPPORT;
 
   return (
     <Modal onClose={onClose}>
@@ -52,10 +49,6 @@ export const AccountAlreadyExistsModal = ({onClose}: AccountAlreadyExistsModalPr
           👉{' '}
           <Link href={deletePersonalAccountUrl} target="_blank" css={linkCss}>
             {t('accountAlreadyExistsModal.deletePersonalAccount')}
-          </Link>{' '}
-          {t('index.or')}{' '}
-          <Link href={removeTeamMemberUrl} target="_blank" css={linkCss}>
-            {t('accountAlreadyExistsModal.removeTeamMember')}
           </Link>
         </Text>
         <Button css={buttonCss} block type="button" onClick={onClose} data-uie-name="guest-link-join-submit-button">
