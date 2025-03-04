@@ -28,6 +28,7 @@ import type {AssetRepository} from '../assets/AssetRepository';
 import type {AudioRepository} from '../audio/AudioRepository';
 import type {BackupRepository} from '../backup/BackupRepository';
 import type {CallingRepository} from '../calling/CallingRepository';
+import {CellsRepository} from '../cells/CellsRepository';
 import type {ClientRepository} from '../client';
 import type {ConnectionRepository} from '../connection/ConnectionRepository';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
@@ -55,6 +56,7 @@ export interface ViewModelRepositories {
   asset: AssetRepository;
   audio: AudioRepository;
   backup: BackupRepository;
+  cells: CellsRepository;
   calling: CallingRepository;
   client: ClientRepository;
   connection: ConnectionRepository;

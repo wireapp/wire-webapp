@@ -69,3 +69,7 @@ Object.defineProperty(document, 'elementFromPoint', {
 
 const testLib = require('@testing-library/react');
 testLib.configure({testIdAttribute: 'data-uie-name'});
+
+jest.mock('@formkit/auto-animate/react', () => ({
+  useAutoAnimate: () => [null, () => {}],
+}));

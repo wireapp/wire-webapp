@@ -19,13 +19,11 @@
 
 import {UIEvent, useCallback, useEffect, useState} from 'react';
 
-import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import {useMatchMedia} from '@wireapp/react-ui-kit';
 
 import {CallingCell} from 'Components/calling/CallingCell';
-import {DropFileArea} from 'Components/DropFileArea';
 import {Giphy} from 'Components/Giphy';
 import {InputBar} from 'Components/InputBar';
 import {MessagesList} from 'Components/MessagesList';
@@ -42,8 +40,9 @@ import {isHittingUploadLimit} from 'Util/isHittingUploadLimit';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {safeMailOpen, safeWindowOpen} from 'Util/SanitizationUtil';
-import {formatBytes, incomingCssClass, removeAnimationsClass} from 'Util/util';
+import {formatBytes} from 'Util/util';
 
+import {ConversationFileDropzone} from './ConversationFileDropzone/ConversationFileDropzone';
 import {useReadReceiptSender} from './hooks/useReadReceipt';
 import {ReadOnlyConversationMessage} from './ReadOnlyConversationMessage';
 import {checkFileSharingPermission} from './utils/checkFileSharingPermission';
@@ -463,12 +462,12 @@ export const Conversation = ({
   );
 
   return (
-    <DropFileArea
+    <ConversationFileDropzone
+      inTeam={inTeam}
+      isCellsEnabled={false}
+      isConversationLoaded={isConversationLoaded}
+      activeConversationId={activeConversation?.id}
       onFileDropped={checkFileSharingPermission(uploadDroppedFiles)}
-      id="conversation"
-      className={cx('conversation', {[incomingCssClass]: isConversationLoaded, loading: !isConversationLoaded})}
-      ref={removeAnimationsClass}
-      key={activeConversation?.id}
     >
       {activeConversation && (
         <>
@@ -561,6 +560,6 @@ export const Conversation = ({
       {isGiphyModalOpen && inputValue && (
         <Giphy giphyRepository={repositories.giphy} inputValue={inputValue} onClose={closeGiphy} />
       )}
-    </DropFileArea>
+    </ConversationFileDropzone>
   );
 };
