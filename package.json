@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.750.0",
     "@datadog/browser-logs": "5.35.1",
     "@datadog/browser-rum": "5.35.1",
     "@emotion/react": "11.11.4",
@@ -16,14 +15,13 @@
     "@wireapp/avs": "9.10.25",
     "@wireapp/avs-debugger": "0.0.7",
     "@wireapp/commons": "5.4.1",
-    "@wireapp/core": "46.19.4",
+    "@wireapp/core": "46.19.5",
     "@wireapp/react-ui-kit": "9.37.0",
     "@wireapp/store-engine-dexie": "2.1.15",
     "@wireapp/telemetry": "0.3.1",
     "@wireapp/webapp-events": "0.28.0",
     "amplify": "https://github.com/wireapp/amplify#head=master",
     "beautiful-react-hooks": "5.0.2",
-    "cells-sdk-ts": "https://github.com/pydio/cells-sdk-ts#dev",
     "classnames": "2.5.1",
     "copy-webpack-plugin": "12.0.2",
     "core-js": "3.40.0",
