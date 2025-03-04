@@ -20,7 +20,7 @@
 import {useAutoAnimate} from '@formkit/auto-animate/react';
 import {container} from 'tsyringe';
 
-import {FileWithPreview} from 'Components/Conversation/useFiles/useFiles';
+import {FileWithPreview} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
 import {isAudio, isVideo, isImage} from 'src/script/assets/AssetMetaDataBuilder';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 

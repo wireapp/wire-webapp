@@ -47,6 +47,7 @@ export type Env = {
   APP_NAME: string;
 
   /** Specifies configuration for Cells */
+  FEATURE_ENABLE_CELLS: string;
   CELLS_PYDIO_API_KEY: string;
   CELLS_PYDIO_SEGMENT: string;
   CELLS_PYDIO_URL: string;

@@ -17,7 +17,7 @@
  *
  */
 
-import {FileWithPreview, useFileUploadState} from 'Components/Conversation/useFiles/useFiles';
+import {FileWithPreview, useFileUploadState} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {getFileExtension, trimFileExtension, formatBytes} from 'Util/util';
 

@@ -20,6 +20,7 @@
 import {ReactNode} from 'react';
 
 import cx from 'classnames';
+import {DropzoneInputProps, DropzoneRootProps} from 'react-dropzone/.';
 
 import {DropFileArea} from 'Components/DropFileArea';
 import {incomingCssClass, removeAnimationsClass} from 'Util/util';
@@ -27,25 +28,29 @@ import {incomingCssClass, removeAnimationsClass} from 'Util/util';
 import {FileDropzone} from './FileDropzone/FileDropzone';
 
 interface ConversationFileDropzoneProps {
-  inTeam: boolean;
   isCellsEnabled: boolean;
   isConversationLoaded: boolean;
   activeConversationId?: string;
   onFileDropped: (files: File[]) => void;
+  isDragAccept: boolean;
+  rootProps: DropzoneRootProps;
+  inputProps: DropzoneInputProps;
   children: ReactNode;
 }
 
 export const ConversationFileDropzone = ({
-  inTeam,
   isCellsEnabled,
   isConversationLoaded,
   activeConversationId,
   onFileDropped,
+  isDragAccept,
+  rootProps,
+  inputProps,
   children,
 }: ConversationFileDropzoneProps) => {
   if (isCellsEnabled) {
     return (
-      <FileDropzone isTeam={inTeam}>
+      <FileDropzone isDragAccept={isDragAccept} rootProps={rootProps} inputProps={inputProps}>
         <div
           id="conversation"
           className={cx('conversation', {[incomingCssClass]: isConversationLoaded, loading: !isConversationLoaded})}
