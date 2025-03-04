@@ -34,7 +34,7 @@ export const imageStyles: CSSObject = {
   borderRadius: '10px',
 };
 
-export const loaderWrapperStyles: CSSObject = {
+export const iconWrapperStyles: CSSObject = {
   position: 'absolute',
   top: '50%',
   left: '50%',
@@ -46,4 +46,8 @@ export const loaderWrapperStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
+};
+
+export const alertIconStyles: CSSObject = {
+  fill: 'var(--danger-color)',
 };

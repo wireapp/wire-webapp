@@ -17,13 +17,16 @@
  *
  */
 
+import {AlertIcon} from '@wireapp/react-ui-kit';
+
 import {t} from 'Util/LocalizerUtil';
 
-import {imageStyles, loaderWrapperStyles, wrapperStyles} from './ImagePreviewCard.styles';
+import {alertIconStyles, iconWrapperStyles, imageStyles, wrapperStyles} from './ImagePreviewCard.styles';
 
 import {FilePreviewDeleteButton} from '../common/FilePreviewDeleteButton/FilePreviewDeleteButton';
 import {FilePreviewErrorMoreButton} from '../common/FilePreviewErrorMoreButton/FilePreviewErrorMoreButton';
 import {FilePreviewSpinner} from '../common/FilePreviewSpinner/FilePreviewSpinner';
+
 interface ImagePreviewCardProps {
   src: string;
   onDelete: () => void;
@@ -44,11 +47,18 @@ export const ImagePreviewCard = ({src, onDelete, onRetry, isLoading, isError}: I
         }}
       />
       {isLoading && (
-        <div css={loaderWrapperStyles}>
+        <div css={iconWrapperStyles}>
           <FilePreviewSpinner />
         </div>
       )}
-      {isError && <FilePreviewErrorMoreButton onDelete={onDelete} onRetry={onRetry} />}
+      {isError && (
+        <>
+          <div css={iconWrapperStyles}>
+            <AlertIcon css={alertIconStyles} />
+          </div>
+          <FilePreviewErrorMoreButton onDelete={onDelete} onRetry={onRetry} />
+        </>
+      )}
       {!isLoading && !isError && <FilePreviewDeleteButton onDelete={onDelete} />}
     </article>
   );

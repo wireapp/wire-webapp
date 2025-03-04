@@ -56,5 +56,5 @@ export const iconWrapperStyles: CSSObject = {
 };
 
 export const alertIconStyles: CSSObject = {
-  color: 'var(--foreground)',
+  fill: 'var(--danger-color)',
 };

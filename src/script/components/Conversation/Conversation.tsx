@@ -464,7 +464,7 @@ export const Conversation = ({
   return (
     <ConversationFileDropzone
       inTeam={inTeam}
-      isCellsEnabled={false}
+      isCellsEnabled={true}
       isConversationLoaded={isConversationLoaded}
       activeConversationId={activeConversation?.id}
       onFileDropped={checkFileSharingPermission(uploadDroppedFiles)}
