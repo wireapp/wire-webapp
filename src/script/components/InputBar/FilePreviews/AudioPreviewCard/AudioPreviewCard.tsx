@@ -59,19 +59,24 @@ export const AudioPreviewCard = ({
           <FileCard.Name />
         </FileCard.Header>
         <div css={controlStyles}>
-          {isLoading && (
+          {isLoading ? (
             <div css={loaderWrapperStyles}>
               <FilePreviewSpinner />
             </div>
+          ) : (
+            <FilePreviewPlayButton />
           )}
-          {!isLoading && <FilePreviewPlayButton />}
           <div css={playerWrapperStyles}>
             <AudioEmptySeekBar />
           </div>
         </div>
-        {isError && !isLoading && <FileCard.Error />}
+        {isError && (
+          <>
+            <FileCard.Error />
+            <FilePreviewErrorMoreButton onDelete={onDelete} onRetry={onRetry} />
+          </>
+        )}
         {!isError && !isLoading && <FilePreviewDeleteButton onDelete={onDelete} />}
-        {isError && !isLoading && <FilePreviewErrorMoreButton onDelete={onDelete} onRetry={onRetry} />}
       </FileCard.Root>
     </div>
   );

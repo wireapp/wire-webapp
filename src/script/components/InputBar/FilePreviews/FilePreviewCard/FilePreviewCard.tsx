@@ -56,10 +56,14 @@ export const FilePreviewCard = ({
             </div>
           )}
         </FileCard.Header>
-        {!isLoading && isError && <FilePreviewErrorMoreButton onDelete={onDelete} onRetry={onRetry} />}
-        {!isLoading && !isError && <FilePreviewDeleteButton onDelete={onDelete} />}
         <FileCard.Name />
-        {!isLoading && isError && <FileCard.Error />}
+        {isError && (
+          <>
+            <FileCard.Error />
+            <FilePreviewErrorMoreButton onDelete={onDelete} onRetry={onRetry} />
+          </>
+        )}
+        {!isError && !isLoading && <FilePreviewDeleteButton onDelete={onDelete} />}
       </FileCard.Root>
     </div>
   );
