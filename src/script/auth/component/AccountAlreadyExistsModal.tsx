@@ -26,10 +26,9 @@ import {buttonCss, containerCss, headerCss, linkCss} from './AccountAlreadyExist
 
 export interface AccountAlreadyExistsModalProps {
   onClose: () => void;
-  backendName: string;
 }
 
-export const AccountAlreadyExistsModal = ({onClose, backendName}: AccountAlreadyExistsModalProps) => {
+export const AccountAlreadyExistsModal = ({onClose}: AccountAlreadyExistsModalProps) => {
   const {
     CHANGE_EMAIL_ADDRESS: changeEmailAddressUrl,
     DELETE_PERSONAL_ACCOUNT: deletePersonalAccountUrl,
@@ -41,7 +40,7 @@ export const AccountAlreadyExistsModal = ({onClose, backendName}: AccountAlready
       <Container css={containerCss}>
         <H2 css={headerCss}>{t('accountAlreadyExistsModal.header')}</H2>
         <Text block fontSize="var(--font-size-base)" style={{marginBottom: 24}}>
-          {t('accountAlreadyExistsModal.content', {backendName})}
+          {t('accountAlreadyExistsModal.content')}
         </Text>
         <Text block>
           👉{' '}

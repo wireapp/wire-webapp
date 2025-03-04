@@ -105,7 +105,7 @@ export const CallingHeader = ({
       >
         {isDetachedWindow && !isTemporaryUser && (
           <div css={callAvatar}>
-            {isGroup && <GroupAvatar />}
+            {isGroup && <GroupAvatar users={conversationParticipants} />}
             {!isGroup && !!conversationParticipants.length && (
               <Avatar participant={conversationParticipants[0]} avatarSize={AVATAR_SIZE.SMALL} />
             )}

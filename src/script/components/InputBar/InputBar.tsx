@@ -323,7 +323,7 @@ export const InputBar = ({
             />
           )}
 
-          <FilePreviews files={files} />
+          {files.length > 0 && <FilePreviews files={files} />}
         </div>
       </InputBarContainer>
       {emojiPicker.open ? (

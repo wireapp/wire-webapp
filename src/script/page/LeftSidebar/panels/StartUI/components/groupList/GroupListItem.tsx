@@ -70,7 +70,7 @@ const GroupListItem: React.FC<GroupListItemProps> = ({click, group}) => {
         {is1to1 ? (
           <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={participatingUserEts[0]} css={{margin: '0 16px'}} />
         ) : (
-          <GroupAvatar css={{margin: '0 16px'}} />
+          <GroupAvatar users={participatingUserEts} css={{margin: '0 16px'}} />
         )}
       </div>
       <div className="search-list-item-header">{displayName}</div>
