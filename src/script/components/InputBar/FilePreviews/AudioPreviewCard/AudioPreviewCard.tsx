@@ -24,11 +24,12 @@ import {
 } from 'Components/MessagesList/Message/ContentMessage/asset/AudioAsset/AudioAssetV2.styles';
 
 import {AudioEmptySeekBar} from './AudioEmptySeekBar/AudioEmptySeekBar';
-import {loaderWrapperStyles, loadingStyles, wrapperStyles} from './AudioPreviewCard.styles';
+import {loaderWrapperStyles, wrapperStyles} from './AudioPreviewCard.styles';
 
 import {FilePreviewDeleteButton} from '../common/FilePreviewDeleteButton/FilePreviewDeleteButton';
 import {FilePreviewErrorMoreButton} from '../common/FilePreviewErrorMoreButton/FilePreviewErrorMoreButton';
 import {FilePreviewPlayButton} from '../common/FilePreviewPlayButton/FilePreviewPlayButton';
+import {FilePreviewSpinner} from '../common/FilePreviewSpinner/FilePreviewSpinner';
 
 interface AudioPreviewCardProps {
   extension: string;
@@ -60,7 +61,7 @@ export const AudioPreviewCard = ({
         <div css={controlStyles}>
           {isLoading && (
             <div css={loaderWrapperStyles}>
-              <div css={loadingStyles} className="icon-spinner spin"></div>
+              <FilePreviewSpinner />
             </div>
           )}
           {!isLoading && <FilePreviewPlayButton />}
