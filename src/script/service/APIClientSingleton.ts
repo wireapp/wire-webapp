@@ -26,25 +26,23 @@ import {Config} from '../Config';
 @singleton()
 export class APIClient extends APIClientUnconfigured {
   constructor() {
-    const config = Config.getConfig();
-
     super({
       urls: {
-        name: config.ENVIRONMENT,
-        rest: config.BACKEND_REST,
-        ws: config.BACKEND_WS,
+        name: Config.getConfig().ENVIRONMENT,
+        rest: Config.getConfig().BACKEND_REST,
+        ws: Config.getConfig().BACKEND_WS,
       },
       cells: {
         pydio: {
-          apiKey: config.CELLS_PYDIO_API_KEY ?? '',
-          segment: config.CELLS_PYDIO_SEGMENT ?? '',
-          url: config.CELLS_PYDIO_URL ?? '',
+          apiKey: Config.getConfig().CELLS_PYDIO_API_KEY ?? '',
+          segment: Config.getConfig().CELLS_PYDIO_SEGMENT ?? '',
+          url: Config.getConfig().CELLS_PYDIO_URL ?? '',
         },
         s3: {
-          apiKey: config.CELLS_S3_API_KEY ?? '',
-          bucket: config.CELLS_S3_BUCKET ?? '',
-          endpoint: config.CELLS_S3_ENDPOINT ?? '',
-          region: config.CELLS_S3_REGION ?? '',
+          apiKey: Config.getConfig().CELLS_S3_API_KEY ?? '',
+          bucket: Config.getConfig().CELLS_S3_BUCKET ?? '',
+          endpoint: Config.getConfig().CELLS_S3_ENDPOINT ?? '',
+          region: Config.getConfig().CELLS_S3_REGION ?? '',
         },
       },
     });
