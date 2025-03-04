@@ -23,7 +23,9 @@ export const wrapperStyles: CSSObject = {
   gridColumn: 'span 3',
 };
 
-export const loadingStyles: CSSObject = {
-  color: 'var(--foreground)',
+export const loadingWrapperStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
   marginLeft: 'auto',
 };

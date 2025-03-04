@@ -21,10 +21,11 @@ import {ReactNode} from 'react';
 
 import {FileCard} from 'Components/FileCard/FileCard';
 
-import {loadingStyles, wrapperStyles} from './FilePreviewCard.styles';
+import {loadingWrapperStyles, wrapperStyles} from './FilePreviewCard.styles';
 
 import {FilePreviewDeleteButton} from '../common/FilePreviewDeleteButton/FilePreviewDeleteButton';
 import {FilePreviewErrorMoreButton} from '../common/FilePreviewErrorMoreButton/FilePreviewErrorMoreButton';
+import {FilePreviewSpinner} from '../common/FilePreviewSpinner/FilePreviewSpinner';
 
 interface FilePreviewCardProps {
   extension: string;
@@ -53,7 +54,11 @@ export const FilePreviewCard = ({
         <FileCard.Header>
           <FileCard.Icon />
           <FileCard.Type />
-          {isLoading && <div css={loadingStyles} className="icon-spinner spin"></div>}
+          {isLoading && (
+            <div css={loadingWrapperStyles}>
+              <FilePreviewSpinner />
+            </div>
+          )}
         </FileCard.Header>
         {!isLoading && isError && <FilePreviewErrorMoreButton onDelete={onDelete} onRetry={onRetry} />}
         {!isLoading && !isError && <FilePreviewDeleteButton onDelete={onDelete} />}

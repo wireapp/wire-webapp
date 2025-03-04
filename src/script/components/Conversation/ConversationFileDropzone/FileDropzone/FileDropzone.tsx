@@ -25,6 +25,7 @@ import {container} from 'tsyringe';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {Config} from 'src/script/Config';
 import {t} from 'Util/LocalizerUtil';
+import {getLogger} from 'Util/Logger';
 import {createUuid} from 'Util/uuid';
 
 import {wrapperStyles} from './FileDropzone.styles';
@@ -46,6 +47,8 @@ const MAX_FILES = 10;
 
 const CONFIG = Config.getConfig();
 
+const logger = getLogger('FileDropzone');
+
 export const FileDropzone = ({
   isTeam,
   cellsRepository = container.resolve(CellsRepository),
@@ -58,8 +61,13 @@ export const FileDropzone = ({
   const MAX_SIZE = isTeam ? CONFIG.MAXIMUM_ASSET_FILE_SIZE_TEAM : CONFIG.MAXIMUM_ASSET_FILE_SIZE_PERSONAL;
 
   const uploadFile = async (file: FileWithPreview) => {
-    const {uuid, versionId} = await cellsRepository.uploadFile(file);
-    updateFile(file.id, {remoteUuid: uuid, remoteVersionId: versionId, uploadStatus: 'success'});
+    try {
+      const {uuid, versionId} = await cellsRepository.uploadFile(file);
+      updateFile(file.id, {remoteUuid: uuid, remoteVersionId: versionId, uploadStatus: 'success'});
+    } catch (error) {
+      logger.error('Uploading file failed', error);
+      updateFile(file.id, {uploadStatus: 'error'});
+    }
   };
 
   const {getRootProps, getInputProps, isDragAccept} = useDropzone({
@@ -103,8 +111,7 @@ export const FileDropzone = ({
       });
     }),
     onError: (error: Error) => {
-      console.error('FileDropzone onError', error);
-
+      logger.error('Dropping files failed', error);
       showFileDropzoneErrorModal({
         title: t('conversationFileUploadFailedHeading'),
         message: t('conversationFileUploadFailedMessage'),

@@ -44,9 +44,13 @@ export const useFilePreview = ({file, cellsRepository}: FilePreviewParams) => {
   };
 
   const handleRetry = async () => {
-    updateFile(file.id, {uploadStatus: 'uploading'});
-    const {uuid, versionId} = await cellsRepository.uploadFile(file);
-    updateFile(file.id, {remoteUuid: uuid, remoteVersionId: versionId, uploadStatus: 'success'});
+    try {
+      updateFile(file.id, {uploadStatus: 'uploading'});
+      const {uuid, versionId} = await cellsRepository.uploadFile(file);
+      updateFile(file.id, {remoteUuid: uuid, remoteVersionId: versionId, uploadStatus: 'success'});
+    } catch (error) {
+      updateFile(file.id, {uploadStatus: 'error'});
+    }
   };
 
   return {
