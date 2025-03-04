@@ -67,7 +67,7 @@ export class CellsAPI {
     file: File;
     autoRename?: boolean;
   }): Promise<RestCreateCheckResponse> {
-    let path = `/${filePath}`.normalize('NFC');
+    let path = `${filePath}`.normalize('NFC');
 
     const result = await this.client.createCheck({
       Inputs: [{Type: 'LEAF', Locator: {Path: path, Uuid: uuid}, VersionId: versionId}],
