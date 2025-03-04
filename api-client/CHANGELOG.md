@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [27.20.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.20.1...@wireapp/api-client@27.20.2) (2025-03-04)
+
+### Bug Fixes
+
+* **api-client/cells:** tests ([#6967](https://github.com/wireapp/wire-web-packages/issues/6967)) ([fd6cd69](https://github.com/wireapp/wire-web-packages/commit/fd6cd691fb4a85981b89b66e8c5bdd68f2daaf22))
+* **api-client/cells:** upload path ([#6966](https://github.com/wireapp/wire-web-packages/issues/6966)) ([aa01284](https://github.com/wireapp/wire-web-packages/commit/aa01284528bce08a9153a41db8ba00d5f1bfcaa3))
+
 ## [27.20.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.20.0...@wireapp/api-client@27.20.1) (2025-03-03)
 
 **Note:** Version bump only for package @wireapp/api-client
