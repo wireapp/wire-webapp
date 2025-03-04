@@ -196,6 +196,9 @@ jobs:
               },
               "q1-2024": {
                 "targets": "[\"q1-2024\"]"
+              },
+              "feat/cells-service-api": {
+                "targets": "[\"wire-cells-dev\"]"
               }
             }
           export_to: log,output
