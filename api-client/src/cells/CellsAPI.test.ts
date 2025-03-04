@@ -119,12 +119,12 @@ describe('CellsAPI', () => {
       });
 
       expect(mockNodeServiceApi.createCheck).toHaveBeenCalledWith({
-        Inputs: [{Type: 'LEAF', Locator: {Path: `/${TEST_FILE_PATH}`, Uuid: MOCKED_UUID}, VersionId: MOCKED_UUID}],
+        Inputs: [{Type: 'LEAF', Locator: {Path: TEST_FILE_PATH, Uuid: MOCKED_UUID}, VersionId: MOCKED_UUID}],
         FindAvailablePath: true,
       });
 
       expect(mockStorage.putObject).toHaveBeenCalledWith({
-        filePath: `/${TEST_FILE_PATH}`,
+        filePath: TEST_FILE_PATH,
         file: testFile,
         metadata: {
           'Draft-Mode': 'true',
@@ -189,7 +189,7 @@ describe('CellsAPI', () => {
       });
 
       expect(mockStorage.putObject).toHaveBeenCalledWith({
-        filePath: `/${TEST_FILE_PATH}`,
+        filePath: TEST_FILE_PATH,
         file: testFile,
         metadata: {
           'Draft-Mode': 'true',
@@ -241,7 +241,7 @@ describe('CellsAPI', () => {
       await cellsAPI.uploadFileDraft({uuid: MOCKED_UUID, versionId: MOCKED_UUID, filePath: '', file: testFile});
 
       expect(mockNodeServiceApi.createCheck).toHaveBeenCalledWith({
-        Inputs: [{Type: 'LEAF', Locator: {Path: '/', Uuid: MOCKED_UUID}, VersionId: MOCKED_UUID}],
+        Inputs: [{Type: 'LEAF', Locator: {Path: '', Uuid: MOCKED_UUID}, VersionId: MOCKED_UUID}],
         FindAvailablePath: true,
       });
     });
@@ -251,7 +251,7 @@ describe('CellsAPI', () => {
     it('retrieves a file by ID', async () => {
       const fileId = 'file-uuid';
       const mockNode: Partial<RestNode> = {
-        Path: `/${TEST_FILE_PATH}`,
+        Path: TEST_FILE_PATH,
         Uuid: fileId,
       };
 
