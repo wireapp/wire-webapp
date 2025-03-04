@@ -45,6 +45,7 @@ import {formatBytes} from 'Util/util';
 import {ConversationFileDropzone} from './ConversationFileDropzone/ConversationFileDropzone';
 import {useReadReceiptSender} from './hooks/useReadReceipt';
 import {ReadOnlyConversationMessage} from './ReadOnlyConversationMessage';
+import {checkFileSharingPermission} from './utils/checkFileSharingPermission';
 
 import {ConversationState} from '../../conversation/ConversationState';
 import {Conversation as ConversationEntity} from '../../entity/Conversation';
@@ -466,7 +467,7 @@ export const Conversation = ({
       isCellsEnabled={false}
       isConversationLoaded={isConversationLoaded}
       activeConversationId={activeConversation?.id}
-      onFileDropped={uploadDroppedFiles}
+      onFileDropped={checkFileSharingPermission(uploadDroppedFiles)}
     >
       {activeConversation && (
         <>
