@@ -56,7 +56,12 @@ export const FilePreviewErrorMoreButton = ({onDelete, onRetry}: FilePreviewError
   };
 
   return (
-    <button css={buttonStyles} onKeyDown={handleKeyDown} onClick={showOptionsMenu}>
+    <button
+      css={buttonStyles}
+      onKeyDown={handleKeyDown}
+      onClick={showOptionsMenu}
+      aria-label={t('conversationFilePreviewErrorMoreOptions')}
+    >
       <MoreIcon css={iconStyles} />
     </button>
   );
