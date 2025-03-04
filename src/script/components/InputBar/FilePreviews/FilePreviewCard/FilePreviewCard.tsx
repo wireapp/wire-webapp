@@ -17,8 +17,6 @@
  *
  */
 
-import {ReactNode} from 'react';
-
 import {FileCard} from 'Components/FileCard/FileCard';
 
 import {loadingWrapperStyles, wrapperStyles} from './FilePreviewCard.styles';
@@ -31,11 +29,10 @@ interface FilePreviewCardProps {
   extension: string;
   name: string;
   size: string;
-  isError?: boolean;
-  isLoading?: boolean;
+  isError: boolean;
+  isLoading: boolean;
   onDelete: () => void;
   onRetry: () => void;
-  children?: ReactNode;
 }
 
 export const FilePreviewCard = ({
@@ -46,7 +43,6 @@ export const FilePreviewCard = ({
   isLoading,
   onDelete,
   onRetry,
-  children,
 }: FilePreviewCardProps) => {
   return (
     <div css={wrapperStyles}>
@@ -63,7 +59,6 @@ export const FilePreviewCard = ({
         {!isLoading && isError && <FilePreviewErrorMoreButton onDelete={onDelete} onRetry={onRetry} />}
         {!isLoading && !isError && <FilePreviewDeleteButton onDelete={onDelete} />}
         <FileCard.Name />
-        {children}
         {!isLoading && isError && <FileCard.Error />}
       </FileCard.Root>
     </div>

@@ -35,8 +35,8 @@ interface AudioPreviewCardProps {
   extension: string;
   name: string;
   size: string;
-  isError?: boolean;
-  isLoading?: boolean;
+  isError: boolean;
+  isLoading: boolean;
   onDelete: () => void;
   onRetry: () => void;
 }

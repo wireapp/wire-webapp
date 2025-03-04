@@ -28,8 +28,8 @@ interface ImagePreviewCardProps {
   src: string;
   onDelete: () => void;
   onRetry: () => void;
-  isLoading?: boolean;
-  isError?: boolean;
+  isLoading: boolean;
+  isError: boolean;
 }
 
 export const ImagePreviewCard = ({src, onDelete, onRetry, isLoading, isError}: ImagePreviewCardProps) => {

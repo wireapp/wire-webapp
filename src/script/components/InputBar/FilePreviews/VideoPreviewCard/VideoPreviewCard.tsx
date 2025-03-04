@@ -32,8 +32,8 @@ interface VideoPreviewCardProps {
   src: string;
   onDelete: () => void;
   onRetry: () => void;
-  isLoading?: boolean;
-  isError?: boolean;
+  isLoading: boolean;
+  isError: boolean;
 }
 
 export const VideoPreviewCard = ({src, onDelete, onRetry, isLoading, isError}: VideoPreviewCardProps) => {

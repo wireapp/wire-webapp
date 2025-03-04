@@ -38,10 +38,6 @@ interface FilePreviewsProps {
 export const FilePreviews = ({files}: FilePreviewsProps) => {
   const [wrapperRef] = useAutoAnimate();
 
-  if (!files || files.length === 0) {
-    return null;
-  }
-
   return (
     <div ref={wrapperRef} css={wrapperStyles}>
       {files.map(file => (
