@@ -33,8 +33,8 @@ import {FileDropzoneOverlay} from './FileDropzoneOverlay/FileDropzoneOverlay';
 import {validateFiles, ValidationResult} from './fileValidation/fileValidation';
 import {useIsDragging} from './useIsDragging/useIsDragging';
 
-import {FileWithPreview, useFileUploadState} from '../useFiles/useFiles';
-import {checkFileSharingPermission} from '../utils/checkFileSharingPermission';
+import {FileWithPreview, useFileUploadState} from '../../useFiles/useFiles';
+import {checkFileSharingPermission} from '../../utils/checkFileSharingPermission';
 
 interface FileDropzoneProps {
   children: ReactNode;
