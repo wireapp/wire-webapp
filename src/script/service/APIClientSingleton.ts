@@ -36,15 +36,15 @@ export class APIClient extends APIClientUnconfigured {
       },
       cells: {
         pydio: {
-          apiKey: config.CELLS_PYDIO_API_KEY,
-          segment: config.CELLS_PYDIO_SEGMENT,
-          url: config.CELLS_PYDIO_URL,
+          apiKey: config.CELLS_PYDIO_API_KEY ?? '',
+          segment: config.CELLS_PYDIO_SEGMENT ?? '',
+          url: config.CELLS_PYDIO_URL ?? '',
         },
         s3: {
-          apiKey: config.CELLS_S3_API_KEY,
-          bucket: config.CELLS_S3_BUCKET,
-          endpoint: config.CELLS_S3_ENDPOINT,
-          region: config.CELLS_S3_REGION,
+          apiKey: config.CELLS_S3_API_KEY ?? '',
+          bucket: config.CELLS_S3_BUCKET ?? '',
+          endpoint: config.CELLS_S3_ENDPOINT ?? '',
+          region: config.CELLS_S3_REGION ?? '',
         },
       },
     });
