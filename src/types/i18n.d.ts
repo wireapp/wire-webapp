@@ -506,6 +506,8 @@ declare module 'I18n/en-US.json' {
     'conversationFileUploadFailedTooLargeImagesMessage': `Please select images smaller than {maxSize}MB.`;
     'conversationFileUploadFailedTooLargeFilesAndImagesMessage': `Please select files smaller than {maxImageSize}MB and images smaller than {maxFileSize}MB.`;
     'conversationFileUploadOverlayTitle': `Upload files`;
+    'conversationFilePreviewErrorRetry': `Retry`;
+    'conversationFilePreviewErrorRemove': `Remove`;
     'conversationFileUploadOverlayDescription': `Drag & drop to add files`;
     'conversationFoldersEmptyText': `Add your conversations to folders to stay organized.`;
     'conversationFoldersEmptyTextLearnMore': `Learn more`;

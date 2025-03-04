@@ -23,6 +23,7 @@ import {MoreIcon} from '@wireapp/react-ui-kit';
 
 import {showContextMenu} from 'src/script/ui/ContextMenu';
 import {isSpaceOrEnterKey} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
 import {setContextMenuPosition} from 'Util/util';
 
 import {buttonStyles, iconStyles} from './FilePreviewErrorMoreButton.styles';
@@ -34,11 +35,14 @@ interface FilePreviewErrorMoreButtonProps {
 
 export const FilePreviewErrorMoreButton = ({onDelete, onRetry}: FilePreviewErrorMoreButtonProps) => {
   const showOptionsMenu = (event: ReactMouseEvent<HTMLButtonElement> | MouseEvent) => {
+    const retryLabel = t('conversationFilePreviewErrorRetry');
+    const removeLabel = t('conversationFilePreviewErrorRemove');
+
     showContextMenu({
       event,
       entries: [
-        {title: 'Retry', label: 'Retry', click: onRetry},
-        {title: 'Remove', label: 'Remove', click: onDelete},
+        {title: retryLabel, label: retryLabel, click: onRetry},
+        {title: removeLabel, label: removeLabel, click: onDelete},
       ],
       identifier: 'file-preview-error-more-button',
     });
