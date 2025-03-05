@@ -62,6 +62,7 @@ export * from './NotificationIcon';
 export * from './NotificationOffIcon';
 export * from './OptionsIcon';
 export * from './OpenDetachedWindowIcon';
+export * from './CloseDetachedWindowIcon';
 export * from './OutlineCheck';
 export * from './GridIcon';
 export * from './PeopleIcon';
