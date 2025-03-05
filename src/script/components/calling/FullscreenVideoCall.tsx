@@ -27,6 +27,7 @@ import {container} from 'tsyringe';
 import {
   Checkbox,
   CheckboxLabel,
+  CloseDetachedWindowIcon,
   IconButton,
   IconButtonVariant,
   OpenDetachedWindowIcon,
@@ -319,7 +320,7 @@ const FullscreenVideoCall = ({
                 data-uie-name="do-call-controls-video-minimize"
                 title={t('videoCallOverlayCloseFullScreen')}
               >
-                {viewMode === CallingViewMode.DETACHED_WINDOW ? <Icon.CloseDetachedWindowIcon /> : <Icon.MessageIcon />}
+                {viewMode === CallingViewMode.DETACHED_WINDOW ? <CloseDetachedWindowIcon /> : <Icon.MessageIcon />}
               </IconButton>
             )}
 
