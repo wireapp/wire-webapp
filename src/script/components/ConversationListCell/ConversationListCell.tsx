@@ -26,6 +26,7 @@ import {Avatar, AVATAR_SIZE, GroupAvatar} from 'Components/Avatar';
 import {UserBlockedBadge} from 'Components/Badge';
 import {CellDescription} from 'Components/ConversationListCell/components/CellDescription';
 import {UserInfo} from 'Components/UserInfo';
+import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isKey, isOneOfKeys, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -48,6 +49,7 @@ export interface ConversationListCellProps {
   isFocused?: boolean;
   // This method resetting the current focused conversation to first conversation on click outside or click tab or shift + tab
   resetConversationFocus: () => void;
+  propertiesRepository: PropertiesRepository;
 }
 
 export const ConversationListCell = ({
@@ -61,6 +63,7 @@ export const ConversationListCell = ({
   handleArrowKeyDown,
   isFocused = false,
   resetConversationFocus,
+  propertiesRepository,
 }: ConversationListCellProps) => {
   const {
     isGroup,
@@ -169,7 +172,13 @@ export const ConversationListCell = ({
             'conversation-list-cell-left-opaque': isSelfUserRemoved || users.length === 0,
           })}
         >
-          {isGroup && <GroupAvatar className="conversation-list-cell-avatar-arrow" users={users} />}
+          {isGroup && (
+            <GroupAvatar
+              conversationID={conversation.id}
+              propertiesRepository={propertiesRepository}
+              className="conversation-list-cell-avatar-arrow"
+            />
+          )}
 
           {!isGroup && !!users.length && <Avatar participant={users[0]} avatarSize={AVATAR_SIZE.SMALL} />}
         </div>

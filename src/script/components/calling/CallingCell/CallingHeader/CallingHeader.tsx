@@ -24,6 +24,7 @@ import {IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
 import {Avatar, AVATAR_SIZE, GroupAvatar} from 'Components/Avatar';
 import {Duration} from 'Components/calling/Duration';
 import * as Icon from 'Components/Icon';
+import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
 import {t} from 'Util/LocalizerUtil';
 
@@ -44,7 +45,6 @@ import {createNavigate, createNavigateKeyboard} from '../../../../router/routerB
 interface CallingHeaderProps {
   isOngoing: boolean;
   isGroup: boolean;
-
   showAlert: boolean;
   isVideoCall: boolean;
   clearShowAlert: () => void;
@@ -59,6 +59,8 @@ interface CallingHeaderProps {
   isCbrEnabled: boolean;
   toggleDetachedWindow: () => void;
   isDetachedWindow: boolean;
+  propertiesRepository: PropertiesRepository;
+  conversationID: string;
 }
 
 export const CallingHeader = ({
@@ -78,6 +80,8 @@ export const CallingHeader = ({
   isCbrEnabled,
   toggleDetachedWindow,
   isDetachedWindow,
+  propertiesRepository,
+  conversationID,
 }: CallingHeaderProps) => {
   return (
     <div css={callingHeaderContainer}>
@@ -105,7 +109,7 @@ export const CallingHeader = ({
       >
         {isDetachedWindow && !isTemporaryUser && (
           <div css={callAvatar}>
-            {isGroup && <GroupAvatar users={conversationParticipants} />}
+            {isGroup && <GroupAvatar conversationID={conversationID} propertiesRepository={propertiesRepository} />}
             {!isGroup && !!conversationParticipants.length && (
               <Avatar participant={conversationParticipants[0]} avatarSize={AVATAR_SIZE.SMALL} />
             )}
