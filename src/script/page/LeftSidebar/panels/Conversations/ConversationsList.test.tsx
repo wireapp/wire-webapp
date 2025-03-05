@@ -68,7 +68,7 @@ describe('ConversationsList', () => {
     resetConversationFocus = jest.fn();
     handleArrowKeyDown = jest.fn();
     clearSearchFilter = jest.fn();
-    propertiesRepository = new PropertiesRepository({} as PropertiesService, {} as SelfService);
+    propertiesRepository = new PropertiesRepository(new PropertiesService(), new SelfService());
     conversationLabelRepository = {} as ConversationLabelRepository;
   });
 

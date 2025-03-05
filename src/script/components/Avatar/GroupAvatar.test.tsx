@@ -28,7 +28,7 @@ import {GroupAvatar} from './GroupAvatar';
 
 describe('GroupAvatar', () => {
   it('renders avatar', async () => {
-    const propertiesRepository = new PropertiesRepository({} as PropertiesService, {} as SelfService);
+    const propertiesRepository = new PropertiesRepository(new PropertiesService(), new SelfService());
     propertiesRepository.savePreference(PROPERTIES_TYPE.INTERFACE.THEME, 'dark');
     const {getByTestId} = render(<GroupAvatar propertiesRepository={propertiesRepository} />);
     const avatarWrapper = getByTestId('group-avatar-box-wrapper');

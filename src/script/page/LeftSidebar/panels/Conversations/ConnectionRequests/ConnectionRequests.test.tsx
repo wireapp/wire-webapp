@@ -36,7 +36,7 @@ describe('ConnectionRequests', () => {
   });
 
   const user = generateUser({id: createUuid(), domain: 'test.wire.test'});
-  const propertiesRepository = new PropertiesRepository({} as PropertiesService, {} as SelfService);
+  const propertiesRepository = new PropertiesRepository(new PropertiesService(), new SelfService());
 
   it('should display the correct text for one connection request', () => {
     render(
