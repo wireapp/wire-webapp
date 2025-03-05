@@ -21,6 +21,8 @@ import {COLOR_V2} from '@wireapp/react-ui-kit';
 
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 
+// calculation of hash code for string based on this doc:
+// https://wearezeta.atlassian.net/wiki/spaces/AR/pages/1696858160/Consistent+Conversation+Colors+A+Hash-Based+Approach+for+Conversation+id
 function getHashCode(str: string) {
   let hash = 0;
   for (let counter = 0; counter < str.length; counter++) {
@@ -32,6 +34,7 @@ function getHashCode(str: string) {
   return hash;
 }
 
+// colors for group avatar in dark and light theme
 const groupAvatarDarkThemeOptions = [
   [COLOR_V2.GREEN_DARK_500, COLOR_V2.PURPLE_DARK_500, COLOR_V2.RED_DARK_500],
   [COLOR_V2.BLUE_DARK_500, COLOR_V2.GREEN_DARK_500, COLOR_V2.AMBER_DARK_500],
@@ -68,6 +71,12 @@ const groupAvatarLightThemeOptions = [
   [COLOR_V2.GREEN_LIGHT_500, COLOR_V2.AMBER_LIGHT_500, COLOR_V2.PURPLE_LIGHT_500],
 ];
 
+/**
+ *
+ * @param id - unique id
+ * @param theme - default or dark
+ * @returns - array of colors for group avatar
+ */
 export function getGroupAvatarColors(
   id = '',
   theme: typeof PropertiesRepository.prototype.properties.settings.interface.theme,
