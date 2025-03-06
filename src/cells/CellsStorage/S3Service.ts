@@ -48,18 +48,18 @@ export class S3Service implements CellsStorage {
   }
 
   async putObject({
-    filePath,
+    path,
     file,
     metadata,
   }: {
-    filePath: string;
+    path: string;
     file: File;
     metadata?: Record<string, string>;
   }): Promise<void> {
     const command = new PutObjectCommand({
       Bucket: this.bucket,
       Body: file,
-      Key: filePath,
+      Key: path,
       ContentType: file.type,
       ContentLength: file.size,
       Metadata: metadata,

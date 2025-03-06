@@ -54,7 +54,7 @@ describe('S3Service', () => {
 
   describe('putObject', () => {
     it('creates a PutObjectCommand with the correct parameters', async () => {
-      await service.putObject({filePath: testFilePath, file: testFile});
+      await service.putObject({path: testFilePath, file: testFile});
 
       expect(PutObjectCommand).toHaveBeenCalledWith({
         Bucket: testConfig.bucket,
@@ -73,7 +73,7 @@ describe('S3Service', () => {
         'another-key': 'another-value',
       };
 
-      await service.putObject({filePath: testFilePath, file: testFile, metadata});
+      await service.putObject({path: testFilePath, file: testFile, metadata});
 
       expect(PutObjectCommand).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -87,12 +87,10 @@ describe('S3Service', () => {
 
       mockSend.mockRejectedValueOnce(error);
 
-      await expect(service.putObject({filePath: testFilePath, file: testFile})).rejects.toThrow(CellsStorageError);
+      await expect(service.putObject({path: testFilePath, file: testFile})).rejects.toThrow(CellsStorageError);
 
       mockSend.mockRejectedValueOnce(error);
-      await expect(service.putObject({filePath: testFilePath, file: testFile})).rejects.toThrow(
-        /The object was too large/,
-      );
+      await expect(service.putObject({path: testFilePath, file: testFile})).rejects.toThrow(/The object was too large/);
     });
 
     it('handles other S3ServiceExceptions with a generic error message', async () => {
@@ -102,10 +100,10 @@ describe('S3Service', () => {
 
       mockSend.mockRejectedValueOnce(error);
 
-      await expect(service.putObject({filePath: testFilePath, file: testFile})).rejects.toThrow(CellsStorageError);
+      await expect(service.putObject({path: testFilePath, file: testFile})).rejects.toThrow(CellsStorageError);
 
       mockSend.mockRejectedValueOnce(error);
-      await expect(service.putObject({filePath: testFilePath, file: testFile})).rejects.toThrow(
+      await expect(service.putObject({path: testFilePath, file: testFile})).rejects.toThrow(
         new RegExp(`Error from S3 while uploading object to.*${errorName}: ${errorMessage}`),
       );
     });
@@ -114,7 +112,7 @@ describe('S3Service', () => {
       const error = new Error('Unexpected error');
       mockSend.mockRejectedValueOnce(error);
 
-      await expect(service.putObject({filePath: testFilePath, file: testFile})).rejects.toBe(error);
+      await expect(service.putObject({path: testFilePath, file: testFile})).rejects.toBe(error);
     });
   });
 });

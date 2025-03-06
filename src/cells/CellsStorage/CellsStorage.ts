@@ -18,15 +18,7 @@
  */
 
 export interface CellsStorage {
-  putObject({
-    filePath,
-    file,
-    metadata,
-  }: {
-    filePath: string;
-    file: File;
-    metadata?: Record<string, string>;
-  }): Promise<void>;
+  putObject({path, file, metadata}: {path: string; file: File; metadata?: Record<string, string>}): Promise<void>;
 }
 
 export class CellsStorageError extends Error {
