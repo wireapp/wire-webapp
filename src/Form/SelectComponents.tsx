@@ -71,12 +71,12 @@ export const CustomOption = (dataUieName: string) => (props: OptionProps<Option>
     <components.Option {...props}>
       <div
         css={{
-          ...((isMulti || isGroup) && {
+          ...((isMulti || isGroup(options)) && {
             display: 'grid',
             gridTemplateAreas: `"checkbox label"
                                 ". description"`,
             gridTemplateColumns: '22px 1fr',
-            columnGap: isGroup ? '5px' : '10px',
+            columnGap: isGroup(options) ? '5px' : '10px',
           }),
         }}
         {...(dataUieName && {
