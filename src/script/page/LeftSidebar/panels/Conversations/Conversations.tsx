@@ -29,10 +29,9 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {useConversationFocus} from 'Hooks/useConversationFocus';
 import {IntegrationRepository} from 'src/script/integration/IntegrationRepository';
 import {Preferences} from 'src/script/page/LeftSidebar/panels/Preferences';
-import {StartUI} from 'src/script/page/LeftSidebar/panels/StartUI';
 import {ANIMATED_PAGE_TRANSITION_DURATION} from 'src/script/page/MainContent';
 import {useAppMainState, ViewType} from 'src/script/page/state';
-import {ContentState, ListState} from 'src/script/page/useAppState';
+import {ContentState, ListState, useAppState} from 'src/script/page/useAppState';
 import {SearchRepository} from 'src/script/search/SearchRepository';
 import {TeamRepository} from 'src/script/team/TeamRepository';
 import {EventName} from 'src/script/tracking/EventName';
@@ -64,6 +63,7 @@ import {TeamState} from '../../../../team/TeamState';
 import {UserState} from '../../../../user/UserState';
 import {ListViewModel} from '../../../../view_model/ListViewModel';
 import {ListWrapper} from '../ListWrapper';
+import {StartUI} from '../StartUI';
 
 type ConversationsProps = {
   callState?: CallState;
@@ -142,6 +142,7 @@ export const Conversations: React.FC<ConversationsProps> = ({
   );
 
   const isPreferences = currentTab === SidebarTabs.PREFERENCES;
+  const isCells = currentTab === SidebarTabs.CELLS;
 
   const showSearchInput = [
     SidebarTabs.RECENT,
@@ -157,6 +158,8 @@ export const Conversations: React.FC<ConversationsProps> = ({
     useShallow(state => state),
   );
   const {currentFocus, handleKeyDown, resetConversationFocus} = useConversationFocus(conversations);
+
+  const setListState = useAppState(state => state.setListState);
 
   // false when screen is larger than 1000px
   // true when screen is smaller than 1000px
@@ -285,6 +288,11 @@ export const Conversations: React.FC<ConversationsProps> = ({
         onExitPreferences();
       }
 
+      if (nextTab === SidebarTabs.CELLS) {
+        switchList(ListState.CELLS);
+        switchContent(ContentState.CELLS);
+      }
+
       clearConversationFilter();
       setCurrentTab(nextTab);
     },
@@ -384,7 +392,7 @@ export const Conversations: React.FC<ConversationsProps> = ({
           />
         }
       >
-        {isPreferences ? (
+        {isCells ? null : isPreferences ? (
           <Preferences
             onPreferenceItemClick={onClickPreferences}
             teamRepository={teamRepository}

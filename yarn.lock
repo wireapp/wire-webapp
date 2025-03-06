@@ -6308,6 +6308,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tanstack/react-table@npm:^8.21.2":
+  version: 8.21.2
+  resolution: "@tanstack/react-table@npm:8.21.2"
+  dependencies:
+    "@tanstack/table-core": "npm:8.21.2"
+  peerDependencies:
+    react: ">=16.8"
+    react-dom: ">=16.8"
+  checksum: 10/62b944b79f0ac06b74921c1da4821a4f122f7b30e2bd3391b5eac2d15a8050f3ac7752282354520ec42a3fa382580ac88e28731121ad445bb65218614ab21fd1
+  languageName: node
+  linkType: hard
+
 "@tanstack/react-virtual@npm:^3.13.2":
   version: 3.13.2
   resolution: "@tanstack/react-virtual@npm:3.13.2"
@@ -6317,6 +6329,13 @@ __metadata:
     react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
     react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
   checksum: 10/7005b61f9d7d68c39d1023815360ed3917e7a38141d9c15cd2554c2d46cb083a2f0faec74181c9d1b0acd12c3fcca0cae6ba52256b59e8d787b030778d2701da
+  languageName: node
+  linkType: hard
+
+"@tanstack/table-core@npm:8.21.2":
+  version: 8.21.2
+  resolution: "@tanstack/table-core@npm:8.21.2"
+  checksum: 10/6a435905fcfa2ac0d06963f14125f313a08086cb0c71949d60fbd04c3a5e229779f94ff6783e35cf09f77fddfbe987cfdd74b18577ac7476b5a43729f3e4b9d5
   languageName: node
   linkType: hard
 
@@ -7398,9 +7417,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^27.20.1":
-  version: 27.20.1
-  resolution: "@wireapp/api-client@npm:27.20.1"
+"@wireapp/api-client@file:.yalc/@wireapp/api-client::locator=wire-webapp%40workspace%3A.":
+  version: 27.20.2
+  resolution: "@wireapp/api-client@file:.yalc/@wireapp/api-client#.yalc/@wireapp/api-client::hash=89bc65&locator=wire-webapp%40workspace%3A."
   dependencies:
     "@aws-sdk/client-s3": "npm:3.750.0"
     "@wireapp/commons": "npm:^5.4.2"
@@ -7418,7 +7437,31 @@ __metadata:
     uuid: "npm:11.1.0"
     ws: "npm:8.18.1"
     zod: "npm:3.24.2"
-  checksum: 10/9a92728cd1200d37c985b5f866e69b71a7f40026da5683f885643075eb89df49bf64ee096851e5d11773faa90ea39600651919016b8748f8fa18a764d2c8b938
+  checksum: 10/84a0e94d9617d69d30244fa076a8d37578b4a488cf053a3b2426a1bc813c30a0b300a427cdd05cb296504c28002fd0a5a902ad381cdb21c4b46c25e6d6508b46
+  languageName: node
+  linkType: hard
+
+"@wireapp/api-client@npm:^27.21.0":
+  version: 27.21.0
+  resolution: "@wireapp/api-client@npm:27.21.0"
+  dependencies:
+    "@aws-sdk/client-s3": "npm:3.750.0"
+    "@wireapp/commons": "npm:^5.4.2"
+    "@wireapp/priority-queue": "npm:^2.1.11"
+    "@wireapp/protocol-messaging": "npm:1.51.0"
+    axios: "npm:1.7.9"
+    axios-retry: "npm:4.5.0"
+    cells-sdk-ts: "https://github.com/pydio/cells-sdk-ts#dev"
+    http-status-codes: "npm:2.3.0"
+    logdown: "npm:3.3.1"
+    pako: "npm:2.1.0"
+    reconnecting-websocket: "npm:4.4.0"
+    spark-md5: "npm:3.0.2"
+    tough-cookie: "npm:4.1.4"
+    uuid: "npm:11.1.0"
+    ws: "npm:8.18.1"
+    zod: "npm:3.24.2"
+  checksum: 10/89124c59f762e3b8c871b6bedde454b99582695c31e16e5b150b6f0748b289f759a64ee67965bd15eddca24f639100d10d2c639e38304a268c1cfd20d86bdc62
   languageName: node
   linkType: hard
 
@@ -7483,11 +7526,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:46.19.5":
-  version: 46.19.5
-  resolution: "@wireapp/core@npm:46.19.5"
+"@wireapp/core@npm:46.19.7":
+  version: 46.19.7
+  resolution: "@wireapp/core@npm:46.19.7"
   dependencies:
-    "@wireapp/api-client": "npm:^27.20.1"
+    "@wireapp/api-client": "npm:^27.21.0"
     "@wireapp/commons": "npm:^5.4.2"
     "@wireapp/core-crypto": "npm:3.1.0"
     "@wireapp/cryptobox": "npm:12.8.0"
@@ -7505,7 +7548,7 @@ __metadata:
     long: "npm:^5.2.0"
     uuid: "npm:9.0.1"
     zod: "npm:3.24.2"
-  checksum: 10/7246eb2eb6ea4ee50df3606265e60d8348b8909b5ad615b40c32ccece0e3379541aee91cd9181b3bbe3675ab8d85c76d2190ddc1b2895a1fefa57ecab0386db8
+  checksum: 10/140c4775ed08337da5b88ecb1077cc49b580f25a448fc91004c6811614a61bcae5b9f26a4b767b797f74f7bacf228eb10c3e5c2c3a1c6758c1cbe1ce9df19baa
   languageName: node
   linkType: hard
 
@@ -20643,6 +20686,7 @@ __metadata:
     "@lexical/rich-text": "npm:0.26.0"
     "@mediapipe/tasks-vision": "npm:0.10.21"
     "@roamhq/wrtc": "npm:0.8.0"
+    "@tanstack/react-table": "npm:^8.21.2"
     "@tanstack/react-virtual": "npm:^3.13.2"
     "@testing-library/dom": "npm:^10.4.0"
     "@testing-library/jest-dom": "npm:^6.6.3"
@@ -20673,11 +20717,12 @@ __metadata:
     "@types/uuid": "npm:^10.0.0"
     "@types/webpack-env": "npm:1.18.8"
     "@types/wicg-file-system-access": "npm:^2023.10.5"
+    "@wireapp/api-client": "file:.yalc/@wireapp/api-client"
     "@wireapp/avs": "npm:9.10.25"
     "@wireapp/avs-debugger": "npm:0.0.7"
     "@wireapp/commons": "npm:5.4.2"
     "@wireapp/copy-config": "npm:2.3.0"
-    "@wireapp/core": "npm:46.19.5"
+    "@wireapp/core": "npm:46.19.7"
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/prettier-config": "npm:0.6.4"
     "@wireapp/react-ui-kit": "npm:9.39.0"

@@ -48,6 +48,7 @@ interface LeftListWrapperProps {
   /** A react element that will be inserted after the header but before the list */
   before?: ReactElement;
   children: React.ReactNode;
+  content?: React.ReactNode;
   sidebar?: React.ReactNode;
   footer?: ReactElement;
   header?: string;
@@ -69,6 +70,7 @@ const ListWrapper = memo(
     headerElement,
     onClose,
     children,
+    content,
     hasHeader = true,
     footer,
     before,
@@ -106,52 +108,54 @@ const ListWrapper = memo(
     return (
       <>
         {sidebar}
-        <div id={id} className={`left-list-${id} ${id}`} css={style}>
-          {hasHeader && (
-            <header className={`left-list-header left-list-header-${id}`} data-uie-name="conversation-list-header">
-              {isSlow && (
-                <p className="slow-connection-indicator">
-                  <Icon.NetworkIcon />
-                  <span>{t('internetConnectionSlow')}</span>
-                </p>
-              )}
-              <div className="left-list-header-title-wrapper">
-                {headerElement || (
-                  <>
-                    <h2 className="left-list-header-text" data-uie-name={headerUieName}>
-                      {header}
-                    </h2>
-
-                    {onClose && (
-                      <button
-                        type="button"
-                        className="left-list-header-close-button button-icon-large"
-                        onClick={onClose}
-                        title={t('tooltipSearchClose')}
-                        data-uie-name={`do-close-${id}`}
-                      >
-                        <Icon.CloseIcon />
-                      </button>
-                    )}
-                  </>
+        {children !== null ? (
+          <div id={id} className={`left-list-${id} ${id}`} css={style}>
+            {hasHeader && (
+              <header className={`left-list-header left-list-header-${id}`} data-uie-name="conversation-list-header">
+                {isSlow && (
+                  <p className="slow-connection-indicator">
+                    <Icon.NetworkIcon />
+                    <span>{t('internetConnectionSlow')}</span>
+                  </p>
                 )}
-              </div>
-            </header>
-          )}
+                <div className="left-list-header-title-wrapper">
+                  {headerElement || (
+                    <>
+                      <h2 className="left-list-header-text" data-uie-name={headerUieName}>
+                        {header}
+                      </h2>
 
-          {before ?? null}
+                      {onClose && (
+                        <button
+                          type="button"
+                          className="left-list-header-close-button button-icon-large"
+                          onClick={onClose}
+                          title={t('tooltipSearchClose')}
+                          data-uie-name={`do-close-${id}`}
+                        >
+                          <Icon.CloseIcon />
+                        </button>
+                      )}
+                    </>
+                  )}
+                </div>
+              </header>
+            )}
 
-          <FadingScrollbar
-            role="list"
-            aria-label={t('accessibility.conversation.sectionLabel')}
-            css={scrollStyle}
-            ref={initBorderedScroll}
-          >
-            {children}
-          </FadingScrollbar>
+            {before ?? null}
 
-          {footer ?? null}
-        </div>
+            <FadingScrollbar
+              role="list"
+              aria-label={t('accessibility.conversation.sectionLabel')}
+              css={scrollStyle}
+              ref={initBorderedScroll}
+            >
+              {children}
+            </FadingScrollbar>
+
+            {footer ?? null}
+          </div>
+        ) : null}
       </>
     );
   },

@@ -182,6 +182,8 @@ export const ConversationTabs = ({
           );
         })}
 
+        <div className="conversations-sidebar-divider" />
+
         <div className="conversations-sidebar-title" css={{marginBlock: '32px 0'}}>
           {t('conversationFooterContacts')}
         </div>
@@ -195,6 +197,32 @@ export const ConversationTabs = ({
           conversationTabIndex={conversationTabs.length + 1}
           dataUieName="go-people"
           isActive={currentTab === SidebarTabs.CONNECT}
+        />
+
+        <div className="conversations-sidebar-divider" />
+
+        <div className="conversations-sidebar-title" css={{marginBlock: '32px 0'}}>
+          Files
+        </div>
+
+        <ConversationTab
+          title={'All'}
+          label={'All'}
+          type={SidebarTabs.CELLS}
+          Icon={
+            <svg width="15" height="14" viewBox="0 0 15 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M2.42546 0C2.06043 0 1.76864 0.293813 1.76864 0.65625V1.3125H12.2686V0.65625C12.2686 0.291286 11.9746 0 11.6118 0H2.42546ZM0.893639 3.28125C0.893639 2.91881 1.18437 2.625 1.55225 2.625H12.485C12.8488 2.625 13.1436 2.91629 13.1436 3.28125V3.9375H0.893639V3.28125ZM0.105736 6.12097C0.0576338 5.63995 0.407691 5.25 0.894402 5.25H13.1429C13.6265 5.25 13.9799 5.63727 13.9315 6.12097L13.1436 14H0.893639L0.105736 6.12097Z"
+                fill={currentTab === SidebarTabs.CELLS ? 'white' : 'black'}
+              />
+            </svg>
+          }
+          onChangeTab={onChangeTab}
+          conversationTabIndex={conversationTabs.length + 2}
+          dataUieName="go-cells"
+          isActive={currentTab === SidebarTabs.CELLS}
         />
       </div>
 
