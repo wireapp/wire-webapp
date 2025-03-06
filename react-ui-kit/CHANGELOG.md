@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.39.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.39.1...@wireapp/react-ui-kit@9.39.2) (2025-03-06)
+
+### Bug Fixes
+
+* use isGroup as a function and pass options ([#6973](https://github.com/wireapp/wire-web-packages/issues/6973)) ([58b49c7](https://github.com/wireapp/wire-web-packages/commit/58b49c7bbed80592152f0cbf3cd97a84786ce5a5))
+
 ## [9.39.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.39.0...@wireapp/react-ui-kit@9.39.1) (2025-03-06)
 
 ### Bug Fixes
