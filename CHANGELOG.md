@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.21.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.20.2...@wireapp/api-client@27.21.0) (2025-03-06)
+
+### Features
+
+* **api-client/cells:** add path parameter for getAllFiles method ([#6970](https://github.com/wireapp/wire-web-packages/issues/6970)) ([5aaf087](https://github.com/wireapp/wire-web-packages/commit/5aaf087590379a429671b1b1833ecf5c7217d7f1))
+
 ## [27.20.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.20.1...@wireapp/api-client@27.20.2) (2025-03-04)
 
 ### Bug Fixes
