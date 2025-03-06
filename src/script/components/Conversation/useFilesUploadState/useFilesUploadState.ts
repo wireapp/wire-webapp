@@ -61,9 +61,9 @@ export const useFileUploadState = create<FileUploadState>(set => ({
     set(state => ({
       files: state.files.map(file => {
         if (file.id === fileId) {
-          file.remoteUuid = remoteUuid ?? file.remoteUuid;
-          file.remoteVersionId = remoteVersionId ?? file.remoteVersionId;
-          file.uploadStatus = uploadStatus ?? file.uploadStatus;
+          file.remoteUuid = remoteUuid || file.remoteUuid;
+          file.remoteVersionId = remoteVersionId || file.remoteVersionId;
+          file.uploadStatus = uploadStatus || file.uploadStatus;
         }
         return file;
       }),
