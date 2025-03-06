@@ -108,7 +108,10 @@ export class CellsAPI {
   }
 
   async lookupFileByPath({path}: {path: string}): Promise<RestNode | undefined> {
-    const result = await this.client.lookup({Locators: {Many: [{Path: path}]}});
+    const result = await this.client.lookup({
+      Locators: {Many: [{Path: path}]},
+      Flags: ['WithVersionsAll', 'WithPreSignedURLs'],
+    });
 
     const node = result.data.Nodes?.[0];
 
@@ -120,7 +123,10 @@ export class CellsAPI {
   }
 
   async lookupFileByUuid({uuid}: {uuid: string}): Promise<RestNode | undefined> {
-    const result = await this.client.lookup({Locators: {Many: [{Uuid: uuid}]}});
+    const result = await this.client.lookup({
+      Locators: {Many: [{Uuid: uuid}]},
+      Flags: ['WithVersionsAll', 'WithPreSignedURLs'],
+    });
 
     const node = result.data.Nodes?.[0];
 
@@ -146,7 +152,7 @@ export class CellsAPI {
   async getAllFiles({path}: {path: string}): Promise<RestNodeCollection> {
     const result = await this.client.lookup({
       Locators: {Many: [{Path: `${path}/*`}]},
-      Flags: ['WithVersionsAll'],
+      Flags: ['WithVersionsAll', 'WithPreSignedURLs'],
     });
 
     return result.data;
