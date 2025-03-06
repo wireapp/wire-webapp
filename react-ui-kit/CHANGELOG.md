@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.39.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.39.0...@wireapp/react-ui-kit@9.39.1) (2025-03-06)
+
+### Bug Fixes
+
+* **react-ui-kit:** update CloseDetachedWindowIcon SVG attributes ([#6971](https://github.com/wireapp/wire-web-packages/issues/6971)) ([fdc524b](https://github.com/wireapp/wire-web-packages/commit/fdc524bba647fb0c0fdcf0251405911fe5b1233d))
+
 # [9.39.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.38.0...@wireapp/react-ui-kit@9.39.0) (2025-03-05)
 
 ### Features
