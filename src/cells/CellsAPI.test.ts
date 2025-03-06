@@ -295,7 +295,7 @@ describe('CellsAPI', () => {
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
         Locators: {Many: [{Path: `${TEST_FILE_PATH}/*`}]},
-        Flags: ['WithVersionsAll'],
+        Flags: ['WithVersionsAll', 'WithPreSignedURLs'],
       });
       expect(result).toEqual(mockCollection);
     });
@@ -480,6 +480,7 @@ describe('CellsAPI', () => {
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
         Locators: {Many: [{Path: filePath}]},
+        Flags: ['WithVersionsAll', 'WithPreSignedURLs'],
       });
       expect(result).toEqual(mockNode);
     });
@@ -522,6 +523,7 @@ describe('CellsAPI', () => {
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
         Locators: {Many: [{Uuid: fileUuid}]},
+        Flags: ['WithVersionsAll', 'WithPreSignedURLs'],
       });
       expect(result).toEqual(mockNode);
     });
