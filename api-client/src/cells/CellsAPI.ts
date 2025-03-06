@@ -57,25 +57,25 @@ export class CellsAPI {
   async uploadFileDraft({
     uuid,
     versionId,
-    filePath,
+    path,
     file,
     autoRename = true,
   }: {
     uuid: string;
     versionId: string;
-    filePath: string;
+    path: string;
     file: File;
     autoRename?: boolean;
   }): Promise<RestCreateCheckResponse> {
-    let path = `${filePath}`.normalize('NFC');
+    let filePath = `${path}`.normalize('NFC');
 
     const result = await this.client.createCheck({
-      Inputs: [{Type: 'LEAF', Locator: {Path: path, Uuid: uuid}, VersionId: versionId}],
+      Inputs: [{Type: 'LEAF', Locator: {Path: filePath, Uuid: uuid}, VersionId: versionId}],
       FindAvailablePath: true,
     });
 
     if (autoRename && result.data.Results?.length && result.data.Results[0].Exists) {
-      path = result.data.Results[0].NextPath || path;
+      filePath = result.data.Results[0].NextPath || filePath;
     }
 
     const metadata = {
@@ -84,7 +84,7 @@ export class CellsAPI {
       'Create-Version-Id': versionId,
     };
 
-    await this.storageService.putObject({filePath: path, file, metadata});
+    await this.storageService.putObject({path: filePath, file, metadata});
 
     return result.data;
   }
@@ -101,13 +101,13 @@ export class CellsAPI {
     return result.data;
   }
 
-  async deleteFile(path: string): Promise<RestPerformActionResponse> {
+  async deleteFile({path}: {path: string}): Promise<RestPerformActionResponse> {
     const result = await this.client.performAction('delete', {Nodes: [{Path: path}]});
 
     return result.data;
   }
 
-  async lookupFileByPath(path: string): Promise<RestNode | undefined> {
+  async lookupFileByPath({path}: {path: string}): Promise<RestNode | undefined> {
     const result = await this.client.lookup({Locators: {Many: [{Path: path}]}});
 
     const node = result.data.Nodes?.[0];
@@ -119,7 +119,7 @@ export class CellsAPI {
     return node;
   }
 
-  async lookupFileByUuid(uuid: string): Promise<RestNode | undefined> {
+  async lookupFileByUuid({uuid}: {uuid: string}): Promise<RestNode | undefined> {
     const result = await this.client.lookup({Locators: {Many: [{Uuid: uuid}]}});
 
     const node = result.data.Nodes?.[0];
@@ -131,21 +131,21 @@ export class CellsAPI {
     return node;
   }
 
-  async getFileVersions(uuid: string): Promise<RestVersion[] | undefined> {
+  async getFileVersions({uuid}: {uuid: string}): Promise<RestVersion[] | undefined> {
     const result = await this.client.nodeVersions(uuid, {FilterBy: 'VersionsAll'});
 
     return result.data.Versions;
   }
 
-  async getFile(id: string): Promise<RestNode> {
+  async getFile({id}: {id: string}): Promise<RestNode> {
     const result = await this.client.getByUuid(id);
 
     return result.data;
   }
 
-  async getAllFiles(): Promise<RestNodeCollection> {
+  async getAllFiles({path}: {path: string}): Promise<RestNodeCollection> {
     const result = await this.client.lookup({
-      Locators: {Many: [{Path: `/*`}]},
+      Locators: {Many: [{Path: `${path}/*`}]},
       Flags: ['WithVersionsAll'],
     });
 
