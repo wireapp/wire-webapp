@@ -22,8 +22,8 @@ import {SVGIcon, SVGIconProps} from './SVGIcon';
 export const CloseDetachedWindowIcon = (props: SVGIconProps) => (
   <SVGIcon realWidth={16} realHeight={16} {...props}>
     <path
-      fill-rule="evenodd"
-      clip-rule="evenodd"
+      fillRule="evenodd"
+      clipRule="evenodd"
       d="M2.28571 1C1.65453 1 1.0831 1.22386 0.66947 1.58579C0.52867 1.70899 0.406153 1.84819 0.305788 2C0.129736 2.2663 0.0218406 2.57141 0.00297416 2.89708C0.000999365 2.93117 0 2.96548 0 3V13C0 14.1046 1.02335 15 2.28571 15H13.7143C14.9767 15 16 14.1046 16 13L16 3C16 1.89543 14.9767 1 13.7143 1H2.28571ZM2 8V3L14 3V13L9 13V9C9 8.44772 8.55229 8 8 8H2Z"
     />
   </SVGIcon>
