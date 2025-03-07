@@ -101,8 +101,8 @@ export class CellsAPI {
     return result.data;
   }
 
-  async deleteFile({path}: {path: string}): Promise<RestPerformActionResponse> {
-    const result = await this.client.performAction('delete', {Nodes: [{Path: path}]});
+  async deleteFile({uuid}: {uuid: string}): Promise<RestPerformActionResponse> {
+    const result = await this.client.performAction('delete', {Nodes: [{Uuid: uuid}]});
 
     return result.data;
   }
