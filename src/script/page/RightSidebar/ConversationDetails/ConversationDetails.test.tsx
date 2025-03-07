@@ -75,6 +75,8 @@ const getDefaultParams = () => {
     canLeaveGroup: () => true,
     canRenameGroup: () => true,
     canToggleTimeout: () => true,
+    canToggleGuests: () => true,
+    canToggleReadReceipts: () => true,
     isUserGroupAdmin: () => true,
   };
 
