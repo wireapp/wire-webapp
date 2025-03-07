@@ -140,3 +140,4 @@ export * from './PlayIcon';
 export * from './PauseIcon';
 export * from './AlertIcon';
 export * from './SaveIcon';
+export * from './CollectionIcon';
