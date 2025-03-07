@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [46.19.10](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.19.9...@wireapp/core@46.19.10) (2025-03-07)
+
+### Bug Fixes
+
+* **mls:** create specific error for trying to add proteus users [WPB-15301] ([#6976](https://github.com/wireapp/wire-web-packages/issues/6976)) ([0bc6bf6](https://github.com/wireapp/wire-web-packages/commit/0bc6bf6070dddba82e167957ae2ef72f51da17fc))
+
 ## [46.19.9](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.19.8...@wireapp/core@46.19.9) (2025-03-07)
 
 **Note:** Version bump only for package @wireapp/core
