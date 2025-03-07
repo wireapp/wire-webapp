@@ -20,6 +20,7 @@
 import React from 'react';
 
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
+import cx from 'classnames';
 
 import {t} from 'Util/LocalizerUtil';
 
@@ -45,7 +46,9 @@ const ReceiptModeToggle = ({receiptMode, onReceiptModeChanged, disabled = false}
   return (
     <>
       <div
-        className={`panel__action-item panel__action-item--toggle${disabled ? ' panel__action-item--disabled' : ''}`}
+        className={cx('panel__action-item', 'panel__action-item--toggle', {
+          'panel__action-item--disabled': disabled,
+        })}
       >
         <label
           htmlFor="receipt-toggle-input"
@@ -77,7 +80,6 @@ const ReceiptModeToggle = ({receiptMode, onReceiptModeChanged, disabled = false}
         <button
           className={`button-label${disabled ? ' disabled' : ''}`}
           aria-pressed={receiptMode !== RECEIPT_MODE.OFF}
-          aria-disabled={disabled}
           type="button"
           onClick={() => updateValue()}
           disabled={disabled}
