@@ -197,21 +197,12 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     this.emit('featureConfigUpdated', {prevFeatureList, newFeatureList});
 
     if (
-      !prevFeatureList?.[FEATURE_KEY.MLS]?.config.supportedProtocols.includes(ConversationProtocol.MLS) &&
-      newFeatureList?.[FEATURE_KEY.MLS]?.config.supportedProtocols.includes(ConversationProtocol.MLS)
+      prevFeatureList?.[FEATURE_KEY.MLS]?.status === FeatureStatus.DISABLED &&
+      newFeatureList?.[FEATURE_KEY.MLS]?.status === FeatureStatus.ENABLED
     ) {
       this.updatePersistedSupportedProtocols();
-
-      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-        primaryAction: {
-          action: () => window.location.reload(),
-          text: t('mlsWasEnabledReload'),
-        },
-        text: {
-          message: t('mlsWasEnabledDescription'),
-          title: t('mlsWasEnabledTitle'),
-        },
-      });
+      this.showReloadAppModal();
+      void this.scheduleReloadAppModal();
     }
 
     return {
@@ -237,6 +228,28 @@ export class TeamRepository extends TypedEventEmitter<Events> {
       task: updateTeam,
       key: 'team-refresh',
       addTaskOnWindowFocusEvent: true,
+    });
+  };
+
+  private showReloadAppModal = () => {
+    PrimaryModal.show(PrimaryModal.type.CONFIRM, {
+      primaryAction: {
+        action: () => window.location.reload(),
+        text: t('mlsWasEnabledReload'),
+      },
+      text: {
+        message: t('mlsWasEnabledDescription'),
+        title: t('mlsWasEnabledTitle'),
+      },
+    });
+  };
+
+  private readonly scheduleReloadAppModal = async (): Promise<void> => {
+    // We want to encourage the user to reload every 5 minutes
+    await scheduleRecurringTask({
+      every: TIME_IN_MILLIS.MINUTE * 5,
+      task: this.showReloadAppModal,
+      key: 'reload-app-modal',
     });
   };
 
