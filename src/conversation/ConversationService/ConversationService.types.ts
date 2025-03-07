@@ -119,6 +119,7 @@ export enum AddUsersFailureReasons {
   NON_FEDERATING_BACKENDS = 'NON_FEDERATING_BACKENDS',
   UNREACHABLE_BACKENDS = 'UNREACHABLE_BACKENDS',
   OFFLINE_FOR_TOO_LONG = 'OFFLINE_FOR_TOO_LONG',
+  NOT_MLS_CAPABLE = 'NOT_MLS_CAPABLE',
 }
 
 /**
@@ -141,6 +142,10 @@ export type AddUsersFailure =
     }
   | {
       reason: AddUsersFailureReasons.OFFLINE_FOR_TOO_LONG;
+      users: QualifiedId[];
+    }
+  | {
+      reason: AddUsersFailureReasons.NOT_MLS_CAPABLE;
       users: QualifiedId[];
     };
 

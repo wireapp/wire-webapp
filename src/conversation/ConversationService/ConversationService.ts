@@ -51,6 +51,7 @@ import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {
   AddUsersFailure,
+  AddUsersFailureReasons,
   AddUsersParams,
   KeyPackageClaimUser,
   MLSCreateConversationResponse,
@@ -364,7 +365,26 @@ export class ConversationService extends TypedEventEmitter<Events> {
     groupId,
     conversationId,
   }: Required<AddUsersParams>): Promise<MLSCreateConversationResponse> {
-    const {keyPackages, failures: keysClaimingFailures} = await this.mlsService.getKeyPackagesPayload(qualifiedUsers);
+    const notMLSCapableUserIds: string[] = [];
+    // Failure object for users that are not MLS capable
+    const notMLSCapableUserFailure: AddUsersFailure = {
+      reason: AddUsersFailureReasons.NOT_MLS_CAPABLE,
+      users: [],
+    };
+
+    // There is no blocker for adding users to a conversation that are not MLS capable
+    // We just need to skip them when claiming key packages and add them to the failedToAdd list
+    for (const user of qualifiedUsers) {
+      const protocols = await this.apiClient.api.user.getUserSupportedProtocols(user);
+      if (!protocols.includes(ConversationProtocol.MLS)) {
+        notMLSCapableUserIds.push(user.id);
+        notMLSCapableUserFailure.users.push(user);
+      }
+    }
+
+    // We need to claim key packages only for users that are MLS capable
+    const mlsCapableUsers: QualifiedId[] = qualifiedUsers.filter(user => !notMLSCapableUserIds.includes(user.id));
+    const {keyPackages, failures: keysClaimingFailures} = await this.mlsService.getKeyPackagesPayload(mlsCapableUsers);
 
     const {events, failures} =
       keyPackages.length > 0
@@ -379,7 +399,12 @@ export class ConversationService extends TypedEventEmitter<Events> {
     return {
       events,
       conversation,
-      failedToAdd: [...keysClaimingFailures, ...failures],
+      failedToAdd: [
+        ...keysClaimingFailures,
+        ...failures,
+        // In case we have users that are not MLS capable, we add them to the failedToAdd list
+        ...(notMLSCapableUserIds.length > 0 ? [notMLSCapableUserFailure] : []),
+      ],
     };
   }
 
