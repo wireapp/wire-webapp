@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.23.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.22.0...@wireapp/api-client@27.23.0) (2025-03-07)
+
+### Features
+
+* **api-client/cells:** replace path with uuid in the deleteFile method ([#6975](https://github.com/wireapp/wire-web-packages/issues/6975)) ([b70a502](https://github.com/wireapp/wire-web-packages/commit/b70a5020a1dd672f313374fccb151d0636fc5a23))
+
 # [27.22.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.21.0...@wireapp/api-client@27.22.0) (2025-03-06)
 
 ### Features
