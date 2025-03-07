@@ -321,34 +321,34 @@ describe('CellsAPI', () => {
   });
 
   describe('deleteFile', () => {
-    it('deletes a file with the correct path', async () => {
-      const filePath = `/${TEST_FILE_PATH}`;
+    it('deletes a file with the correct uuid', async () => {
+      const uuid = 'file-uuid';
 
       mockNodeServiceApi.performAction.mockResolvedValueOnce(createMockResponse({}));
 
-      await cellsAPI.deleteFile({path: filePath});
+      await cellsAPI.deleteFile({uuid});
 
       expect(mockNodeServiceApi.performAction).toHaveBeenCalledWith('delete', {
-        Nodes: [{Path: filePath}],
+        Nodes: [{Uuid: uuid}],
       });
     });
 
     it('propagates errors when deletion fails', async () => {
-      const filePath = `/${TEST_FILE_PATH}`;
+      const uuid = 'file-uuid';
       const errorMessage = 'Delete failed';
 
       mockNodeServiceApi.performAction.mockRejectedValueOnce(new Error(errorMessage));
 
-      await expect(cellsAPI.deleteFile({path: filePath})).rejects.toThrow(errorMessage);
+      await expect(cellsAPI.deleteFile({uuid})).rejects.toThrow(errorMessage);
     });
 
-    it('handles attempts to delete non-existent paths', async () => {
-      const nonExistentPath = '/does/not/exist.txt';
-      const errorMessage = 'Path not found';
+    it('handles attempts to delete with invalid uuid', async () => {
+      const invalidUuid = '';
+      const errorMessage = 'Invalid UUID';
 
       mockNodeServiceApi.performAction.mockRejectedValueOnce(new Error(errorMessage));
 
-      await expect(cellsAPI.deleteFile({path: nonExistentPath})).rejects.toThrow(errorMessage);
+      await expect(cellsAPI.deleteFile({uuid: invalidUuid})).rejects.toThrow(errorMessage);
     });
   });
 
