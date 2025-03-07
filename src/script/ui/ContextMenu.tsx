@@ -32,9 +32,8 @@ import {isEnterKey, isEscapeKey, isKey, isOneOfKeys, isSpaceKey, KEY} from 'Util
 
 import {useActiveWindowState} from '../hooks/useActiveWindow';
 
-export interface ContextMenuEntry {
+export interface BaseContextMenuEntry {
   availability?: Availability.Type;
-  click?: (event?: MouseEvent) => void;
   icon?: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   identifier?: string;
   isChecked?: boolean;
@@ -43,6 +42,20 @@ export interface ContextMenuEntry {
   label?: string;
   title?: string;
 }
+
+export interface ButtonContextMenuEntry extends BaseContextMenuEntry {
+  as?: 'button';
+  click: (event?: MouseEvent) => void;
+}
+
+export interface LinkContextMenuEntry extends BaseContextMenuEntry {
+  as: 'link';
+  href: string;
+  target?: string;
+  rel?: string;
+}
+
+export type ContextMenuEntry = ButtonContextMenuEntry | LinkContextMenuEntry;
 
 interface ContextMenuProps {
   defaultIdentifier?: string;
@@ -145,7 +158,13 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
         if (selected) {
           cleanUp();
           resetMsgMenuStates();
-          selected.click?.();
+          if (!selected.as || selected.as === 'button') {
+            selected.click?.();
+          } else {
+            // For links, we let the browser handle the navigation
+            const link = activeWindow.document.querySelector(`#${getButtonId(selected.label!)}`) as HTMLAnchorElement;
+            link?.click();
+          }
           previouslyFocused.focus();
         }
       }
@@ -210,35 +229,63 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
                   role="menuitem"
                   aria-haspopup="true"
                 >
-                  <button
-                    id={getButtonId(entry.label!)}
-                    className={`${contextMenuClassName}__button`}
-                    type="button"
-                    data-uie-name={entry.identifier || defaultIdentifier}
-                    title={entry.title || entry.label}
-                    {...(entry.isDisabled
-                      ? undefined
-                      : {
-                          onClick: event => {
-                            event.preventDefault();
-                            cleanUp();
-                            resetMsgMenuStates();
-                            entry.click?.(event.nativeEvent);
-                          },
-                          onMouseEnter: () => {
-                            setSelected(undefined);
-                          },
-                        })}
-                  >
-                    {entry.icon && <entry.icon className={`${contextMenuClassName}__icon`} />}
-                    <span>{entry.label}</span>
-                    {entry.isChecked && (
-                      <Icon.CheckIcon
-                        className={`${contextMenuClassName}__check`}
-                        data-uie-name={`${contextMenuClassName}-check`}
-                      />
-                    )}
-                  </button>
+                  {!entry.as || entry.as === 'button' ? (
+                    <button
+                      id={getButtonId(entry.label!)}
+                      className={`${contextMenuClassName}__button`}
+                      type="button"
+                      data-uie-name={entry.identifier || defaultIdentifier}
+                      title={entry.title || entry.label}
+                      {...(entry.isDisabled
+                        ? undefined
+                        : {
+                            onClick: event => {
+                              event.preventDefault();
+                              cleanUp();
+                              resetMsgMenuStates();
+                              entry.click(event.nativeEvent);
+                            },
+                            onMouseEnter: () => {
+                              setSelected(undefined);
+                            },
+                          })}
+                    >
+                      {entry.icon && <entry.icon className={`${contextMenuClassName}__icon`} />}
+                      <span>{entry.label}</span>
+                      {entry.isChecked && (
+                        <Icon.CheckIcon
+                          className={`${contextMenuClassName}__check`}
+                          data-uie-name={`${contextMenuClassName}-check`}
+                        />
+                      )}
+                    </button>
+                  ) : (
+                    <a
+                      id={getButtonId(entry.label!)}
+                      className={`${contextMenuClassName}__link`}
+                      href={entry.as === 'link' ? entry.href : undefined}
+                      target={entry.as === 'link' ? entry.target : undefined}
+                      rel={entry.as === 'link' ? entry.rel : undefined}
+                      data-uie-name={entry.identifier || defaultIdentifier}
+                      title={entry.title || entry.label}
+                      {...(entry.isDisabled
+                        ? undefined
+                        : {
+                            onMouseEnter: () => {
+                              setSelected(undefined);
+                            },
+                          })}
+                    >
+                      {entry.icon && <entry.icon className={`${contextMenuClassName}__icon`} />}
+                      <span>{entry.label}</span>
+                      {entry.isChecked && (
+                        <Icon.CheckIcon
+                          className={`${contextMenuClassName}__check`}
+                          data-uie-name={`${contextMenuClassName}-check`}
+                        />
+                      )}
+                    </a>
+                  )}
                 </li>
               ),
             )}
