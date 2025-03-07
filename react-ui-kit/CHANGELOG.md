@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.40.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.39.2...@wireapp/react-ui-kit@9.40.0) (2025-03-07)
+
+### Features
+
+* **react-ui-kit/icon:** add CollectionIcon ([#6974](https://github.com/wireapp/wire-web-packages/issues/6974)) ([9d94897](https://github.com/wireapp/wire-web-packages/commit/9d94897f91d4e536b5f8683583d5bb9df0d33f5d))
+
 ## [9.39.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.39.1...@wireapp/react-ui-kit@9.39.2) (2025-03-06)
 
 ### Bug Fixes
