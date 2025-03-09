@@ -113,7 +113,7 @@
     "@wireapp/prettier-config": "0.6.4",
     "@wireapp/store-engine": "5.1.11",
     "archiver": "7.0.1",
-    "autoprefixer": "10.4.20",
+    "autoprefixer": "10.4.21",
     "babel-loader": "10.0.0",
     "babel-plugin-transform-import-meta": "2.3.2",
     "cross-env": "7.0.3",
