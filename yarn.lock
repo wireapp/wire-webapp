@@ -4151,10 +4151,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@faker-js/faker@npm:9.5.1":
-  version: 9.5.1
-  resolution: "@faker-js/faker@npm:9.5.1"
-  checksum: 10/d1bf2ff96f05a0effa1f98eb68f18694d3aedfcaf8570cfe09a43dbc79a99444ef1baead5b385f69b121b7da440160ba68e554f123a97f7bc1e7e11f2b1bc466
+"@faker-js/faker@npm:9.6.0":
+  version: 9.6.0
+  resolution: "@faker-js/faker@npm:9.6.0"
+  checksum: 10/f53aeca972a16e7cbb26024c457cea7e1c6bff9dd60561f942a48eb3233863ed7b5fbb1392eb98a0901cb5bea23cf7dbb0793a30c1655478c6a76a43ebb6c360
   languageName: node
   linkType: hard
 
@@ -20632,7 +20632,7 @@ __metadata:
     "@datadog/browser-rum": "npm:5.35.1"
     "@emotion/eslint-plugin": "npm:11.11.0"
     "@emotion/react": "npm:11.11.4"
-    "@faker-js/faker": "npm:9.5.1"
+    "@faker-js/faker": "npm:9.6.0"
     "@formatjs/cli": "npm:6.6.1"
     "@formkit/auto-animate": "npm:0.8.2"
     "@lexical/code": "npm:0.26.0"
