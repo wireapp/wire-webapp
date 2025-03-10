@@ -158,6 +158,15 @@ export class CellsAPI {
     return result.data;
   }
 
+  async searchFiles({phrase}: {phrase: string}): Promise<RestNodeCollection> {
+    const result = await this.client.lookup({
+      Query: {FileName: phrase, Type: 'LEAF'},
+      Flags: ['WithVersionsAll', 'WithPreSignedURLs'],
+    });
+
+    return result.data;
+  }
+
   async deleteFilePublicLink({uuid}: {uuid: string}): Promise<RestPublicLinkDeleteSuccess> {
     const result = await this.client.deletePublicLink(uuid);
 
