@@ -214,6 +214,9 @@
 
   &__item {
     margin: 0 24px;
+    & .rtl {
+      margin: 24px 0;
+    }
 
     &--nested {
       list-style-type: none;
@@ -247,6 +250,19 @@
       list-style-position: outside;
       list-style-type: lower-roman;
     }
+  }
+
+  // keep the list indentation for the next paragraph after the list
+  & + .editor-paragraph,
+  // and for every paragraph with text with a parent with text
+  // the ltr class is present for a paragraph with left-to-right text
+  & ~ .ltr + .ltr {
+    margin-left: 24px;
+  }
+  // mirror for right-to-left languages
+  & + .rtl,
+  & ~ .rtl + .rtl {
+    margin-right: 24px;
   }
 }
 
