@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.24.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.23.0...@wireapp/api-client@27.24.0) (2025-03-10)
+
+### Features
+
+* **api-client/cells:** update cells sdk to alpha 07 + searchFiles method ([#6977](https://github.com/wireapp/wire-web-packages/issues/6977)) ([16bbf20](https://github.com/wireapp/wire-web-packages/commit/16bbf20f08abe0d9383b64824ae3f69d1be2fdb5))
+
 # [27.23.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.22.0...@wireapp/api-client@27.23.0) (2025-03-07)
 
 ### Features
