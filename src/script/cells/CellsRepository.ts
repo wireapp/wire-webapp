@@ -33,7 +33,7 @@ export class CellsRepository {
     const uuid = createUuid();
     const versionId = createUuid();
 
-    await this.apiClient.api.cells.uploadFileDraft({filePath: path, file, uuid, versionId});
+    await this.apiClient.api.cells.uploadFileDraft({path, file, uuid, versionId});
 
     return {
       uuid,
