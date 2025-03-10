@@ -63,6 +63,10 @@ const reasonToMessageDataMap = {
     link: {url: config.URL.SUPPORT.OFFLINE_BACKEND, name: 'go-offline-backend'},
     translationLabel: 'OfflineForTooLong',
   },
+  [AddUsersFailureReasons.NOT_MLS_CAPABLE]: {
+    link: {url: config.URL.SUPPORT.MLS_MIGRATION_FROM_PROTEUS, name: 'mls-learn-more'},
+    translationLabel: 'NotMlsCapable',
+  },
 } as const;
 
 interface MessageDetailsProps {

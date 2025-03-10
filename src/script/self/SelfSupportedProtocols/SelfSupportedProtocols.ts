@@ -104,6 +104,7 @@ const isMLSSupported = async (
 export const evaluateSelfSupportedProtocols = async (
   teamHandler: SelfSupportedProtocolsTeamHandler,
   selfClientsHandler: SelfSupportedProtocolsSelfClientsHandler,
+  previousSupportedProtocols: ConversationProtocol[] = [],
 ): Promise<ConversationProtocol[]> => {
   const supportedProtocols: ConversationProtocol[] = [];
 
@@ -116,7 +117,7 @@ export const evaluateSelfSupportedProtocols = async (
 
   const isMLSForced = await isMLSForcedWithoutMigration(teamHandler, selfClientsHandler);
 
-  if (isMLSProtocolSupported || isMLSForced) {
+  if (isMLSProtocolSupported || isMLSForced || previousSupportedProtocols.includes(ConversationProtocol.MLS)) {
     supportedProtocols.push(ConversationProtocol.MLS);
   }
 
