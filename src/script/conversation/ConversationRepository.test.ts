@@ -1956,6 +1956,10 @@ describe('ConversationRepository', () => {
           });
 
           jest.spyOn(container.resolve(Core).service!.mls!, 'conversationExists').mockResolvedValueOnce(true);
+
+          const conversationRepo = testFactory.conversation_repository!;
+          jest.spyOn(conversationRepo['conversationService'], 'mlsGroupExistsLocally').mockResolvedValue(false);
+
           return testFactory.conversation_repository['handleConversationEvent'](memberJoinEvent).then(() => {
             expect(testFactory.conversation_repository['onMemberJoin']).toHaveBeenCalled();
             expect(testFactory.conversation_repository.updateParticipatingUserEntities).toHaveBeenCalled();
@@ -1982,6 +1986,10 @@ describe('ConversationRepository', () => {
             Object.defineProperty(container.resolve(Core), 'clientId', {value: mockSelfClientId});
 
             jest.spyOn(container.resolve(Core).service!.mls!, 'conversationExists').mockResolvedValueOnce(true);
+
+            const conversationRepo = testFactory.conversation_repository!;
+            jest.spyOn(conversationRepo['conversationService'], 'mlsGroupExistsLocally').mockResolvedValue(false);
+
             return testFactory.conversation_repository['handleConversationEvent'](memberJoinEvent).then(() => {
               expect(testFactory.conversation_repository['onMemberJoin']).toHaveBeenCalled();
               expect(testFactory.conversation_repository.updateParticipatingUserEntities).toHaveBeenCalled();

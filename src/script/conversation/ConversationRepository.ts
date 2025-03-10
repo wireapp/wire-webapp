@@ -3737,13 +3737,15 @@ export class ConversationRepository {
 
     const doesMLSGroupExistLocally = await this.conversationService.mlsGroupExistsLocally(groupId);
 
-    if (!doesMLSGroupExistLocally) {
+    if (doesMLSGroupExistLocally) {
       return;
     }
 
     if (isSelfJoin) {
       // if user has joined and was also event creator (eg. joined via guest link) we need to add its other clients to mls group
+      // we also need to join the conversation with the current self client
       try {
+        await this.core.service?.conversation.joinByExternalCommit(conversation.qualifiedId);
         await addOtherSelfClientsToMLSConversation(
           conversation,
           this.userState.self().qualifiedId,

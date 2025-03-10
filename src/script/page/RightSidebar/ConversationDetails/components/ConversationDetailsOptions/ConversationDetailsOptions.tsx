@@ -112,20 +112,20 @@ const ConversationDetailsOptions = ({
   });
 
   const isActiveGroupParticipant = isGroup && !isSelfUserRemoved;
+  const isTeamConversation = !!teamId;
 
-  const showOptionGuests = isActiveGroupParticipant && !!teamId && roleRepository.canToggleGuests(activeConversation);
+  const showOptionGuests = isActiveGroupParticipant && isTeamConversation;
   const showOptionNotificationsGroup = isMutable && isGroup;
-  const showOptionTimedMessages =
-    isActiveGroupParticipant && roleRepository.canToggleTimeout(activeConversation) && isSelfDeletingMessagesEnabled;
-  const showOptionServices =
-    isActiveGroupParticipant &&
-    !!teamId &&
-    roleRepository.canToggleGuests(activeConversation) &&
-    !isMLSConversation(activeConversation);
+  const showOptionTimedMessages = isActiveGroupParticipant && isSelfDeletingMessagesEnabled;
+  const showOptionServices = isActiveGroupParticipant && isTeamConversation && !isMLSConversation(activeConversation);
   const showOptionNotifications1To1 = isMutable && !isGroup;
-  const showOptionReadReceipts = !!teamId && roleRepository.canToggleReadReceipts(activeConversation);
+  const showOptionReadReceipts = isTeamConversation;
 
   const hasReceiptsEnabled = conversationRepository.expectReadReceipt(activeConversation);
+
+  const canEditGuests = roleRepository.canToggleGuests(activeConversation);
+  const canEditTimeout = roleRepository.canToggleTimeout(activeConversation);
+  const canEditReadReceipts = roleRepository.canToggleReadReceipts(activeConversation);
 
   const openNotificationsPanel = () => togglePanel(PanelState.NOTIFICATIONS, activeConversation);
 
@@ -159,42 +159,49 @@ const ConversationDetailsOptions = ({
         {showOptionTimedMessages && (
           <ConversationDetailsOption
             className="conversation-details__timed-messages"
-            onClick={openTimedMessagePanel}
+            onClick={canEditTimeout ? openTimedMessagePanel : undefined}
             dataUieName="go-timed-messages"
             icon={<Icon.TimerIcon />}
             title={t('conversationDetailsActionTimedMessages')}
             statusUieName="status-timed-messages"
             statusText={timedMessagesText}
+            disabled={!canEditTimeout}
           />
         )}
 
         {showOptionGuests && (
           <ConversationDetailsOption
             className="conversation-details__guest-options"
-            onClick={openGuestPanel}
+            onClick={canEditGuests ? openGuestPanel : undefined}
             dataUieName="go-guest-options"
             icon={<Icon.GuestIcon />}
             title={t('conversationDetailsActionGuestOptions')}
             statusUieName="status-allow-guests"
             statusText={guestOptionsText}
+            disabled={!canEditGuests}
           />
         )}
 
         {showOptionServices && (
           <ConversationDetailsOption
             className="conversation-details__services-options"
-            onClick={openServicePanel}
+            onClick={canEditGuests ? openServicePanel : undefined}
             dataUieName="go-services-options"
             icon={<Icon.ServiceIcon className="service-icon" />}
             title={t('conversationDetailsActionServicesOptions')}
             statusUieName="status-allow-services"
             statusText={servicesOptionsText}
+            disabled={!canEditGuests}
           />
         )}
 
         {showOptionReadReceipts && (
           <li className="conversation-details__read-receipts">
-            <ReceiptModeToggle receiptMode={receiptMode} onReceiptModeChanged={updateConversationReceiptMode} />
+            <ReceiptModeToggle
+              receiptMode={receiptMode}
+              onReceiptModeChanged={updateConversationReceiptMode}
+              disabled={!canEditReadReceipts}
+            />
           </li>
         )}
 
