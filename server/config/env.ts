@@ -46,6 +46,16 @@ export type Env = {
   /** Specifies the name of the application, e.g. Webapp */
   APP_NAME: string;
 
+  /** Specifies configuration for Cells */
+  FEATURE_ENABLE_CELLS: string;
+  CELLS_PYDIO_API_KEY: string;
+  CELLS_PYDIO_SEGMENT: string;
+  CELLS_PYDIO_URL: string;
+  CELLS_S3_API_KEY: string;
+  CELLS_S3_BUCKET: string;
+  CELLS_S3_REGION: string;
+  CELLS_S3_ENDPOINT: string;
+
   /** Specifies the name of the backend, e.g. Wire */
   BACKEND_NAME: string;
 
@@ -288,6 +298,8 @@ export type Env = {
   URL_SUPPORT_LEGAL_HOLD_BLOCK: string;
 
   URL_SUPPORT_MLS_LEARN_MORE: string;
+
+  URL_SUPPORT_MLS_MIGRATION_FROM_PROTEUS: string;
 
   URL_SUPPORT_MICROPHONE_ACCESS_DENIED: string;
 

@@ -19,15 +19,32 @@
 
 import {create} from 'zustand';
 
+export type FileUploadStatus = 'pending' | 'uploading' | 'success' | 'error';
+
 export interface FileWithPreview extends File {
   id: string;
   preview: string;
+  remoteUuid: string;
+  remoteVersionId: string;
+  uploadStatus: FileUploadStatus;
 }
 
 interface FileUploadState {
   files: FileWithPreview[];
   addFiles: (files: FileWithPreview[]) => void;
   deleteFile: (fileId: string) => void;
+  updateFile: (
+    fileId: string,
+    {
+      remoteUuid,
+      remoteVersionId,
+      uploadStatus,
+    }: {
+      remoteUuid?: string;
+      remoteVersionId?: string;
+      uploadStatus?: FileUploadStatus;
+    },
+  ) => void;
 }
 
 export const useFileUploadState = create<FileUploadState>(set => ({
@@ -39,5 +56,16 @@ export const useFileUploadState = create<FileUploadState>(set => ({
   deleteFile: fileId =>
     set(state => ({
       files: state.files.filter(file => file.id !== fileId),
+    })),
+  updateFile: (fileId, {remoteUuid, remoteVersionId, uploadStatus}) =>
+    set(state => ({
+      files: state.files.map(file => {
+        if (file.id === fileId) {
+          file.remoteUuid = remoteUuid || file.remoteUuid;
+          file.remoteVersionId = remoteVersionId || file.remoteVersionId;
+          file.uploadStatus = uploadStatus || file.uploadStatus;
+        }
+        return file;
+      }),
     })),
 }));

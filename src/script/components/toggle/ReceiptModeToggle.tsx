@@ -20,6 +20,7 @@
 import React from 'react';
 
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
+import cx from 'classnames';
 
 import {t} from 'Util/LocalizerUtil';
 
@@ -28,12 +29,15 @@ import * as Icon from '../Icon';
 export interface ReceiptModeToggleProps {
   onReceiptModeChanged: (receiptMode: RECEIPT_MODE) => void;
   receiptMode: RECEIPT_MODE;
+  disabled?: boolean;
 }
 
-const ReceiptModeToggle = ({receiptMode, onReceiptModeChanged}: ReceiptModeToggleProps) => {
+const ReceiptModeToggle = ({receiptMode, onReceiptModeChanged, disabled = false}: ReceiptModeToggleProps) => {
   const updateValue = () => {
-    const newReceiptMode = receiptMode !== RECEIPT_MODE.ON ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF;
-    onReceiptModeChanged(newReceiptMode);
+    if (!disabled) {
+      const newReceiptMode = receiptMode !== RECEIPT_MODE.ON ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF;
+      onReceiptModeChanged(newReceiptMode);
+    }
   };
 
   const inputRef = React.useRef<HTMLInputElement>(null);
@@ -41,7 +45,11 @@ const ReceiptModeToggle = ({receiptMode, onReceiptModeChanged}: ReceiptModeToggl
 
   return (
     <>
-      <div className="panel__action-item panel__action-item--toggle">
+      <div
+        className={cx('panel__action-item', 'panel__action-item--toggle', {
+          'panel__action-item--disabled': disabled,
+        })}
+      >
         <label
           htmlFor="receipt-toggle-input"
           data-uie-name="do-toggle-receipt-mode"
@@ -66,13 +74,15 @@ const ReceiptModeToggle = ({receiptMode, onReceiptModeChanged}: ReceiptModeToggl
           name="preferences_device_verification_toggle"
           onChange={() => updateValue()}
           type="checkbox"
+          disabled={disabled}
         />
 
         <button
-          className="button-label"
+          className={`button-label${disabled ? ' disabled' : ''}`}
           aria-pressed={receiptMode !== RECEIPT_MODE.OFF}
           type="button"
           onClick={() => updateValue()}
+          disabled={disabled}
         >
           <span className="button-label__switch" />
           <span className="visually-hidden">{t('receiptToggleLabel')}</span>
