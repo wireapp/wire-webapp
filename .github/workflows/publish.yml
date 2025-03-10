@@ -2,7 +2,7 @@ name: Publish
 
 on:
   push:
-    branches: [master, dev, release/*, new-navigation]
+    branches: [master, dev, release/*, new-navigation, feat/cells-service-api-deploy-to-imai]
     tags:
       - '*q1-2024*'
       - '*staging*'
@@ -196,6 +196,9 @@ jobs:
               },
               "q1-2024": {
                 "targets": "[\"q1-2024\"]"
+              },
+              "feat/cells-service-api": {
+                "targets": "[\"wire-cells-dev\"]"
               }
             }
           export_to: log,output
