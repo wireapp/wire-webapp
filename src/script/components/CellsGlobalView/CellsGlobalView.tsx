@@ -17,138 +17,174 @@
  *
  */
 
+import {useCallback, useMemo} from 'react';
+
 import {createColumnHelper, flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
 import {container} from 'tsyringe';
 
-import {MoreIcon} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, ReloadIcon} from '@wireapp/react-ui-kit';
 
+import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
+import {getFileExtension} from 'Util/util';
 
 import {
   tableStyles,
   wrapperStyles,
   headerCellStyles,
   tableCellStyles,
-  actionButtonStyles,
+  headerStyles,
+  headingStyles,
+  reloadIconStyles,
+  loaderWrapperStyles,
 } from './CellsGlobalView.styles';
+import {showShareFileModal} from './CellsShareFileModal/CellsShareFileModal';
+import {CellsTableLoader} from './CellsTableLoader/CellsTableLoader';
+import {CellsTableRowOptions} from './CellsTableRowOptions/CellsTableRowOptions';
+import {useCellsStore} from './useCellsStore';
 import {useGetCellsFiles} from './useGetCellsFiles/useGetCellsFiles';
 
-type File = {
+interface File {
   id: string;
+  mimeType: string;
   name: string;
-  conversationName: string;
-  owner: string;
-  fileSize: string;
-  uploadDate: string;
-};
+  sizeMb: string;
+  previewUrl: string;
+  uploadedAt: string;
+  publicLink?: {
+    uuid: string;
+    url: string;
+  } | null;
+}
 
 const columnHelper = createColumnHelper<File>();
-
-const columns = [
-  columnHelper.accessor('name', {
-    header: 'Name',
-    cell: info => info.getValue(),
-  }),
-  columnHelper.accessor('conversationName', {
-    header: 'Conversation Name',
-    cell: info => info.getValue(),
-  }),
-  columnHelper.accessor('owner', {
-    header: 'Owner',
-    cell: info => info.getValue(),
-  }),
-  columnHelper.accessor('fileSize', {
-    header: 'File Size',
-    cell: info => info.getValue(),
-  }),
-  columnHelper.accessor('uploadDate', {
-    header: 'Upload Date',
-    cell: info => info.getValue(),
-  }),
-  columnHelper.accessor('id', {
-    header: 'Actions',
-    cell: () => (
-      <button css={actionButtonStyles}>
-        <MoreIcon />
-      </button>
-    ),
-  }),
-];
-
-const defaultData: File[] = [
-  {
-    id: '1',
-    name: 'Project_Report.pdf',
-    conversationName: 'Team Meeting Notes',
-    owner: 'John Doe',
-    fileSize: '2.5 MB',
-    uploadDate: '2024-03-20',
-  },
-  {
-    id: '2',
-    name: 'Design_Assets.zip',
-    conversationName: 'UI/UX Design',
-    owner: 'Jane Smith',
-    fileSize: '15.8 MB',
-    uploadDate: '2024-03-19',
-  },
-  {
-    id: '3',
-    name: 'Budget_2024.xlsx',
-    conversationName: 'Financial Planning',
-    owner: 'Mike Johnson',
-    fileSize: '1.2 MB',
-    uploadDate: '2024-03-18',
-  },
-  {
-    id: '4',
-    name: 'Presentation.pptx',
-    conversationName: 'Client Meeting',
-    owner: 'Sarah Wilson',
-    fileSize: '8.4 MB',
-    uploadDate: '2024-03-17',
-  },
-];
 
 export const CellsGlobalView = ({
   cellsRepository = container.resolve(CellsRepository),
 }: {
   cellsRepository?: CellsRepository;
 }) => {
-  const {files} = useGetCellsFiles({cellsRepository});
+  const {files, status, error, clearAll} = useCellsStore();
+  const {refresh} = useGetCellsFiles({cellsRepository});
+
+  const handleRefresh = useCallback(async () => {
+    clearAll();
+    await refresh();
+  }, [refresh, clearAll]);
+
+  const deleteFile = useCallback(
+    async (uuid: string) => {
+      await cellsRepository.deleteFile({uuid});
+      await refresh();
+    },
+    [refresh],
+  );
+
+  const showDeleteFileModal = useCallback(
+    ({uuid, name}: {uuid: string; name: string}) => {
+      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
+        primaryAction: {action: () => deleteFile(uuid), text: 'Delete'},
+        text: {message: `This will permanently delete the file ${name} for all participants.`, title: 'Delete File'},
+      });
+    },
+    [deleteFile],
+  );
+
+  const columns = useMemo(
+    () => [
+      columnHelper.accessor('name', {
+        header: 'Name',
+        cell: info => (
+          <div>
+            <FileTypeIcon extension={getFileExtension(info.getValue())} size={24} />
+            <span>{info.getValue()}</span>
+          </div>
+        ),
+      }),
+      columnHelper.accessor('name', {
+        header: 'Conversation Name',
+        cell: info => info.getValue(),
+      }),
+      columnHelper.accessor('mimeType', {
+        header: 'Mime Type',
+        cell: info => info.getValue(),
+      }),
+      columnHelper.accessor('sizeMb', {
+        header: 'Size',
+        cell: info => info.getValue(),
+      }),
+      columnHelper.accessor('uploadedAt', {
+        header: 'Uploaded At',
+        cell: info => info.getValue(),
+      }),
+      columnHelper.accessor('id', {
+        header: () => <span className="visually-hidden">Actions</span>,
+        cell: info => (
+          <CellsTableRowOptions
+            onOpen={() => {}}
+            onShare={() => showShareFileModal({uuid: info.getValue(), cellsRepository})}
+            downloadUrl=""
+            onDelete={() => showDeleteFileModal({uuid: info.getValue(), name: info.row.original.name})}
+          />
+        ),
+      }),
+    ],
+    [showDeleteFileModal, showShareFileModal],
+  );
 
   const table = useReactTable({
-    data: defaultData,
+    data: files,
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
 
+  const rows = table.getRowModel().rows;
+
   return (
     <div css={wrapperStyles}>
-      <table css={tableStyles}>
-        <thead>
-          {table.getHeaderGroups().map(headerGroup => (
-            <tr key={headerGroup.id}>
-              {headerGroup.headers.map(header => (
-                <th key={header.id} css={headerCellStyles}>
-                  {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                </th>
+      <div css={headerStyles}>
+        <h2 css={headingStyles}>All Files</h2>
+        <Button variant={ButtonVariant.TERTIARY} onClick={handleRefresh}>
+          <ReloadIcon css={reloadIconStyles} />
+          Refresh list
+        </Button>
+      </div>
+      {status === 'success' && (
+        <table css={tableStyles}>
+          <thead>
+            {table.getHeaderGroups().map(headerGroup => (
+              <tr key={headerGroup.id}>
+                {headerGroup.headers.map(header => (
+                  <th key={header.id} css={headerCellStyles}>
+                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </thead>
+          {rows.length > 0 && (
+            <tbody>
+              {rows.map(row => (
+                <tr key={row.id}>
+                  {row.getVisibleCells().map(cell => (
+                    <td key={cell.id} css={tableCellStyles}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </td>
+                  ))}
+                </tr>
               ))}
-            </tr>
-          ))}
-        </thead>
-        <tbody>
-          {table.getRowModel().rows.map(row => (
-            <tr key={row.id}>
-              {row.getVisibleCells().map(cell => (
-                <td key={cell.id} css={tableCellStyles}>
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+            </tbody>
+          )}
+        </table>
+      )}
+      {status === 'idle' && !rows.length && <div>No files found</div>}
+      {status === 'loading' && (
+        <div css={loaderWrapperStyles}>
+          <CellsTableLoader />
+        </div>
+      )}
+      {status === 'error' && <div>Error: {error?.message}</div>}
     </div>
   );
 };

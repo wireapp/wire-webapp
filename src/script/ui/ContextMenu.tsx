@@ -53,6 +53,7 @@ export interface LinkContextMenuEntry extends BaseContextMenuEntry {
   href: string;
   target?: string;
   rel?: string;
+  download?: string | boolean;
 }
 
 export type ContextMenuEntry = ButtonContextMenuEntry | LinkContextMenuEntry;
@@ -266,6 +267,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
                       href={entry.as === 'link' ? entry.href : undefined}
                       target={entry.as === 'link' ? entry.target : undefined}
                       rel={entry.as === 'link' ? entry.rel : undefined}
+                      download={entry.as === 'link' ? entry.download : undefined}
                       data-uie-name={entry.identifier || defaultIdentifier}
                       title={entry.title || entry.label}
                       {...(entry.isDisabled

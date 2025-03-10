@@ -7418,8 +7418,8 @@ __metadata:
   linkType: hard
 
 "@wireapp/api-client@file:.yalc/@wireapp/api-client::locator=wire-webapp%40workspace%3A.":
-  version: 27.20.2
-  resolution: "@wireapp/api-client@file:.yalc/@wireapp/api-client#.yalc/@wireapp/api-client::hash=89bc65&locator=wire-webapp%40workspace%3A."
+  version: 27.21.0
+  resolution: "@wireapp/api-client@file:.yalc/@wireapp/api-client#.yalc/@wireapp/api-client::hash=269b96&locator=wire-webapp%40workspace%3A."
   dependencies:
     "@aws-sdk/client-s3": "npm:3.750.0"
     "@wireapp/commons": "npm:^5.4.2"
@@ -7427,7 +7427,7 @@ __metadata:
     "@wireapp/protocol-messaging": "npm:1.51.0"
     axios: "npm:1.7.9"
     axios-retry: "npm:4.5.0"
-    cells-sdk-ts: "https://github.com/pydio/cells-sdk-ts#dev"
+    cells-sdk-ts: "https://github.com/pydio/cells-sdk-ts#v0.1.1-alpha06"
     http-status-codes: "npm:2.3.0"
     logdown: "npm:3.3.1"
     pako: "npm:2.1.0"
@@ -7437,13 +7437,13 @@ __metadata:
     uuid: "npm:11.1.0"
     ws: "npm:8.18.1"
     zod: "npm:3.24.2"
-  checksum: 10/84a0e94d9617d69d30244fa076a8d37578b4a488cf053a3b2426a1bc813c30a0b300a427cdd05cb296504c28002fd0a5a902ad381cdb21c4b46c25e6d6508b46
+  checksum: 10/a85b42e6fceb68781214dc29647caae9c360b6c353b4425bd04105d2f09622114dc222526df522cfff43cf955002b806cbb24a8c198e877dc1896b76a3a0f07a
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^27.21.0":
-  version: 27.21.0
-  resolution: "@wireapp/api-client@npm:27.21.0"
+"@wireapp/api-client@npm:^27.22.0":
+  version: 27.22.0
+  resolution: "@wireapp/api-client@npm:27.22.0"
   dependencies:
     "@aws-sdk/client-s3": "npm:3.750.0"
     "@wireapp/commons": "npm:^5.4.2"
@@ -7451,7 +7451,7 @@ __metadata:
     "@wireapp/protocol-messaging": "npm:1.51.0"
     axios: "npm:1.7.9"
     axios-retry: "npm:4.5.0"
-    cells-sdk-ts: "https://github.com/pydio/cells-sdk-ts#dev"
+    cells-sdk-ts: "https://github.com/pydio/cells-sdk-ts#v0.1.1-alpha06"
     http-status-codes: "npm:2.3.0"
     logdown: "npm:3.3.1"
     pako: "npm:2.1.0"
@@ -7461,7 +7461,7 @@ __metadata:
     uuid: "npm:11.1.0"
     ws: "npm:8.18.1"
     zod: "npm:3.24.2"
-  checksum: 10/89124c59f762e3b8c871b6bedde454b99582695c31e16e5b150b6f0748b289f759a64ee67965bd15eddca24f639100d10d2c639e38304a268c1cfd20d86bdc62
+  checksum: 10/7a48b59db5348b29dcd8808bb27d025fc6571789f87e7340fe93e520aa60d1086134399542a9eac8f7c119adfdb3b9933f17ae8d0171882c2ccb5ab5839180d1
   languageName: node
   linkType: hard
 
@@ -7526,11 +7526,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:46.19.7":
-  version: 46.19.7
-  resolution: "@wireapp/core@npm:46.19.7"
+"@wireapp/core@npm:46.19.8":
+  version: 46.19.8
+  resolution: "@wireapp/core@npm:46.19.8"
   dependencies:
-    "@wireapp/api-client": "npm:^27.21.0"
+    "@wireapp/api-client": "npm:^27.22.0"
     "@wireapp/commons": "npm:^5.4.2"
     "@wireapp/core-crypto": "npm:3.1.0"
     "@wireapp/cryptobox": "npm:12.8.0"
@@ -7548,7 +7548,7 @@ __metadata:
     long: "npm:^5.2.0"
     uuid: "npm:9.0.1"
     zod: "npm:3.24.2"
-  checksum: 10/140c4775ed08337da5b88ecb1077cc49b580f25a448fc91004c6811614a61bcae5b9f26a4b767b797f74f7bacf228eb10c3e5c2c3a1c6758c1cbe1ce9df19baa
+  checksum: 10/d33868629b3fc2db4f3518bbe0f8344ff75146320bccdb2108498c66edac7d93d53eb65fbb93671d3ad05704e21e21eece917a3918d9c00988e51f47517d368c
   languageName: node
   linkType: hard
 
@@ -9001,9 +9001,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cells-sdk-ts@https://github.com/pydio/cells-sdk-ts#dev":
+"cells-sdk-ts@https://github.com/pydio/cells-sdk-ts#v0.1.1-alpha06":
   version: 0.1.0
-  resolution: "cells-sdk-ts@https://github.com/pydio/cells-sdk-ts.git#commit=cb67063946f6c854c2901852096c64c896df8e2e"
+  resolution: "cells-sdk-ts@https://github.com/pydio/cells-sdk-ts.git#commit=25b77634d26e00c19883bab5ed51a19ee7657594"
   dependencies:
     axios: "npm:^1.6.0"
   checksum: 10/b2a430d95d55e8577e4debaa32568c3077c6ffdc794cc839a4992bf56e97a79dbcae7d609ec63b59be88f094f86e128b0a1e0fa96d82bb7fc4a782b99fbec9f0
@@ -20722,7 +20722,7 @@ __metadata:
     "@wireapp/avs-debugger": "npm:0.0.7"
     "@wireapp/commons": "npm:5.4.2"
     "@wireapp/copy-config": "npm:2.3.0"
-    "@wireapp/core": "npm:46.19.7"
+    "@wireapp/core": "npm:46.19.8"
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/prettier-config": "npm:0.6.4"
     "@wireapp/react-ui-kit": "npm:9.39.0"

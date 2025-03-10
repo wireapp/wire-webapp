@@ -20,56 +20,7 @@
 import {CSSObject} from '@emotion/react';
 
 export const wrapperStyles: CSSObject = {
-  padding: '20px',
-};
-
-export const headerStyles: CSSObject = {
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  marginBottom: '20px',
-};
-
-export const headingStyles: CSSObject = {
-  color: 'var(--main-color)',
-  fontWeight: 'var(--font-weight-semibold)',
-  fontSize: 'var(--font-size-medium)',
-};
-
-export const reloadIconStyles: CSSObject = {
-  marginRight: '8px',
-};
-
-export const tableStyles: CSSObject = {
-  width: '100%',
-  borderCollapse: 'collapse',
-};
-
-export const headerCellStyles: CSSObject = {
-  padding: '12px',
-  textAlign: 'left',
-  borderBottom: '1px solid var(--gray-70)',
-  fontSize: 'var(--font-size-small)',
-  fontWeight: 'var(--font-weight-medium)',
-};
-
-export const tableCellStyles: CSSObject = {
-  padding: '12px',
-  borderBottom: '1px solid var(--border-color)',
-  fontSize: 'var(--font-size-small)',
-};
-
-export const actionButtonStyles: CSSObject = {
-  width: '40px',
-  height: '40px',
-  cursor: 'pointer',
-  border: 'none',
-  backgroundColor: 'transparent',
-  color: 'var(--gray-70)',
-};
-
-export const spinnerStyles: CSSObject = {
-  color: 'var(--foreground)',
+  paddingTop: '8px',
 };
 
 export const labelStyles: CSSObject = {
@@ -112,12 +63,12 @@ export const copyButtonStyles: CSSObject = {
 };
 
 export const copyIconStyles: CSSObject = {
-  overflow: 'visible',
+  overflow: 'visible !important',
 };
 
 export const loaderWrapperStyles: CSSObject = {
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  marginTop: '48px',
+  height: '106px',
 };
