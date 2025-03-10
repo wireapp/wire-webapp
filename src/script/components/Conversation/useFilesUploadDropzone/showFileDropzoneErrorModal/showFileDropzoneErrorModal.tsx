@@ -21,7 +21,7 @@ import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileType
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {getFileExtension} from 'Util/util';
 
-import {fileNameStyles, itemStyles, listStyles} from './FileDropzoneErrorModal.styles';
+import {fileNameStyles, itemStyles, listStyles} from './showFileDropzoneErrorModal.styles';
 
 interface ShowFileDropzoneErrorModalParams {
   title: string;

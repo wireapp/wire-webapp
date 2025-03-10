@@ -507,6 +507,11 @@ declare module 'I18n/en-US.json' {
     'conversationFileUploadFailedTooLargeFilesHeading': `Files too large`;
     'conversationFileUploadFailedTooLargeFilesMessage': `Please select files smaller than {maxSize}MB.`;
     'conversationFileUploadFailedTooLargeImagesMessage': `Please select images smaller than {maxSize}MB.`;
+    'conversationFileUploadFailedTooLargeFilesAndImagesMessage': `Please select files smaller than {maxImageSize}MB and images smaller than {maxFileSize}MB.`;
+    'conversationFileUploadOverlayTitle': `Upload files`;
+    'conversationFilePreviewErrorMoreOptions': `More options`;
+    'conversationFilePreviewErrorRetry': `Retry`;
+    'conversationFilePreviewErrorRemove': `Remove`;
     'conversationFileUploadFailedTooManyFilesHeading': `Too many files`;
     'conversationFileUploadFailedTooManyFilesMessage': `Please select a maximum of {maxFiles} files.`;
     'conversationFileUploadOverlayDescription': `Drag & drop to add files`;

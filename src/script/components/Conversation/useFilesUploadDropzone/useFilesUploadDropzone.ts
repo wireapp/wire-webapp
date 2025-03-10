@@ -17,40 +17,47 @@
  *
  */
 
-import {ReactNode, useEffect} from 'react';
-
 import {FileRejection, useDropzone} from 'react-dropzone';
 
+import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {Config} from 'src/script/Config';
 import {t} from 'Util/LocalizerUtil';
+import {getLogger} from 'Util/Logger';
 import {createUuid} from 'Util/uuid';
 
-import {wrapperStyles} from './FileDropzone.styles';
-import {showFileDropzoneErrorModal} from './FileDropzoneErrorModal/FileDropzoneErrorModal';
-import {FileDropzoneOverlay} from './FileDropzoneOverlay/FileDropzoneOverlay';
 import {validateFiles, ValidationResult} from './fileValidation/fileValidation';
-import {useIsDragging} from './useIsDragging/useIsDragging';
+import {showFileDropzoneErrorModal} from './showFileDropzoneErrorModal/showFileDropzoneErrorModal';
 
-import {useFileUploadState} from '../useFiles/useFiles';
+import {FileWithPreview, useFileUploadState} from '../useFilesUploadState/useFilesUploadState';
 import {checkFileSharingPermission} from '../utils/checkFileSharingPermission';
-
-interface FileDropzoneProps {
-  children: ReactNode;
-  isTeam: boolean;
-}
 
 const MAX_FILES = 10;
 
 const CONFIG = Config.getConfig();
 
-export const FileDropzone = ({isTeam, children}: FileDropzoneProps) => {
-  const {isDragging, wrapperRef} = useIsDragging();
+const logger = getLogger('FileDropzone');
 
-  const {addFiles, files} = useFileUploadState();
+interface UseFilesUploadDropzoneParams {
+  isTeam: boolean;
+  cellsRepository: CellsRepository;
+}
+
+export const useFilesUploadDropzone = ({isTeam, cellsRepository}: UseFilesUploadDropzoneParams) => {
+  const {addFiles, files, updateFile} = useFileUploadState();
 
   const MAX_SIZE = isTeam ? CONFIG.MAXIMUM_ASSET_FILE_SIZE_TEAM : CONFIG.MAXIMUM_ASSET_FILE_SIZE_PERSONAL;
 
-  const {getRootProps, getInputProps, isDragAccept} = useDropzone({
+  const uploadFile = async (file: FileWithPreview) => {
+    try {
+      const {uuid, versionId} = await cellsRepository.uploadFile(file);
+      updateFile(file.id, {remoteUuid: uuid, remoteVersionId: versionId, uploadStatus: 'success'});
+    } catch (error) {
+      logger.error('Uploading file failed', error);
+      updateFile(file.id, {uploadStatus: 'error'});
+    }
+  };
+
+  const {getRootProps, getInputProps, open, isDragAccept} = useDropzone({
     maxSize: MAX_SIZE,
     noClick: true,
     noKeyboard: true,
@@ -78,12 +85,20 @@ export const FileDropzone = ({isTeam, children}: FileDropzoneProps) => {
         return Object.assign(file, {
           id: createUuid(),
           preview: URL.createObjectURL(file),
+          remoteUuid: '',
+          remoteVersionId: '',
+          uploadStatus: 'uploading' as const,
         });
       });
 
       addFiles(acceptedFilesWithPreview);
+
+      acceptedFilesWithPreview.forEach(file => {
+        void uploadFile(file);
+      });
     }),
-    onError: () => {
+    onError: (error: Error) => {
+      logger.error('Dropping files failed', error);
       showFileDropzoneErrorModal({
         title: t('conversationFileUploadFailedHeading'),
         message: t('conversationFileUploadFailedMessage'),
@@ -92,18 +107,5 @@ export const FileDropzone = ({isTeam, children}: FileDropzoneProps) => {
     },
   });
 
-  useEffect(() => {
-    // Make sure to revoke the data uris to avoid memory leaks, will run on unmount
-    return () => files.forEach(file => URL.revokeObjectURL(file.preview));
-  }, [files]);
-
-  return (
-    <div ref={wrapperRef} css={wrapperStyles}>
-      <div {...getRootProps()}>
-        <input {...getInputProps()} />
-        <FileDropzoneOverlay isActive={isDragging && isDragAccept} />
-        {children}
-      </div>
-    </div>
-  );
+  return {getRootProps, getInputProps, open, isDragAccept};
 };
