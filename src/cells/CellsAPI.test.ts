@@ -678,6 +678,77 @@ describe('CellsAPI', () => {
       await expect(cellsAPI.getFilePublicLink({uuid, label, alreadyShared})).rejects.toThrow(errorMessage);
     });
   });
+
+  describe('searchFiles', () => {
+    it('searches for files by filename phrase', async () => {
+      const searchPhrase = 'test';
+      const mockResponse: RestNodeCollection = {
+        Nodes: [
+          {
+            Path: '/test.txt',
+            Uuid: 'file-uuid-1',
+          },
+          {
+            Path: '/folder/test-file.txt',
+            Uuid: 'file-uuid-2',
+          },
+        ],
+      } as RestNodeCollection;
+
+      mockNodeServiceApi.lookup.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      const result = await cellsAPI.searchFiles({phrase: searchPhrase});
+
+      expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
+        Query: {FileName: searchPhrase, Type: 'LEAF'},
+        Flags: ['WithVersionsAll', 'WithPreSignedURLs'],
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('returns empty collection when no files match search phrase', async () => {
+      const searchPhrase = 'nonexistent';
+      const mockResponse: RestNodeCollection = {
+        Nodes: [],
+      } as RestNodeCollection;
+
+      mockNodeServiceApi.lookup.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      const result = await cellsAPI.searchFiles({phrase: searchPhrase});
+
+      expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
+        Query: {FileName: searchPhrase, Type: 'LEAF'},
+        Flags: ['WithVersionsAll', 'WithPreSignedURLs'],
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('propagates errors from the NodeServiceApi', async () => {
+      const searchPhrase = 'test';
+      const errorMessage = 'Search failed';
+
+      mockNodeServiceApi.lookup.mockRejectedValueOnce(new Error(errorMessage));
+
+      await expect(cellsAPI.searchFiles({phrase: searchPhrase})).rejects.toThrow(errorMessage);
+    });
+
+    it('handles empty search phrase', async () => {
+      const searchPhrase = '';
+      const mockResponse: RestNodeCollection = {
+        Nodes: [],
+      } as RestNodeCollection;
+
+      mockNodeServiceApi.lookup.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      const result = await cellsAPI.searchFiles({phrase: searchPhrase});
+
+      expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
+        Query: {FileName: searchPhrase, Type: 'LEAF'},
+        Flags: ['WithVersionsAll', 'WithPreSignedURLs'],
+      });
+      expect(result).toEqual(mockResponse);
+    });
+  });
 });
 
 const TEST_FILE_NAME = 'test.txt';
