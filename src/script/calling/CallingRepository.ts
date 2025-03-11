@@ -1044,9 +1044,56 @@ export class CallingRepository {
   }
 
   /**
-   * Toggles screenshare ON and OFF for the given call (does not switch between different screens)
+   * Toggles screenshare ON and OFF for the given call (depending on the feature flag)
    */
   toggleScreenshare = async (call: Call): Promise<void> => {
+    if (Config.getConfig().FEATURE.ENABLE_SCREEN_SHARE_WITH_VIDEO) {
+      await this.toggleScreenShareWithVideo(call);
+    } else {
+      await this.toggleOnlyScreenshare(call);
+    }
+  };
+
+  /**
+   * Toggles screenshare ON and OFF for the given call (does not switch between different screens)
+   */
+  toggleOnlyScreenshare = async (call: Call): Promise<void> => {
+    const {conversation} = call;
+
+    // The screen share was stopped by the user through the application. We clean up the state and stop the screen share
+    // video track. Note that stopping a track does not trigger an "ended" event.
+    const selfParticipant = call.getSelfParticipant();
+    if (selfParticipant.sharesScreen()) {
+      this.stopScreenShare(selfParticipant, conversation, call);
+      return;
+    }
+
+    try {
+      const mediaStream = await this.getMediaStream({audio: true, screen: true}, call.isGroupOrConference);
+
+      // If the screen share is stopped by the os system or the browser, an "ended" event is triggered. We listen for
+      // this event to clean up the screen share state in this case.
+      mediaStream.getVideoTracks()[0].onended = () => {
+        this.stopScreenShare(selfParticipant, conversation, call);
+      };
+
+      selfParticipant.videoState(VIDEO_STATE.SCREENSHARE);
+      selfParticipant.updateMediaStream(mediaStream, true);
+      this.wCall?.setVideoSendState(
+        this.wUser,
+        this.serializeQualifiedId(conversation.qualifiedId),
+        VIDEO_STATE.SCREENSHARE,
+      );
+      selfParticipant.startedScreenSharingAt(Date.now());
+    } catch (error) {
+      this.logger.info('Failed to get screen sharing stream', error);
+    }
+  };
+
+  /**
+   * Toggles screenshare with video for the given call
+   */
+  toggleScreenShareWithVideo = async (call: Call): Promise<void> => {
     const {conversation} = call;
     const selfParticipant = call.getSelfParticipant();
 
@@ -1129,7 +1176,7 @@ export class CallingRepository {
     if (joinedCall && isSharingScreen && isScreenSharingSourceFromDetachedWindow) {
       window.dispatchEvent(new CustomEvent(WebAppEvents.CALL.SCREEN_SHARING_ENDED));
       this.callState.isScreenSharingSourceFromDetachedWindow(false);
-      void this.toggleScreenshare(joinedCall);
+      void this.toggleOnlyScreenshare(joinedCall);
     }
   };
 
