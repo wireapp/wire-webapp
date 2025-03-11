@@ -129,6 +129,7 @@ const registerBlockquoteBackspaceCommand = (editor: LexicalEditor) => {
       editor.update(() => {
         lastChild.remove();
         editor.dispatchCommand(INSERT_PARAGRAPH_COMMAND, undefined);
+        editor.dispatchCommand(INSERT_PARAGRAPH_COMMAND, undefined);
       });
 
       return true;
