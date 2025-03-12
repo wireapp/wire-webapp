@@ -200,7 +200,7 @@ export const Conversations: React.FC<ConversationsProps> = ({
     ![SidebarTabs.DIRECTS, SidebarTabs.GROUPS, SidebarTabs.FAVORITES].includes(currentTab) &&
     groupParticipantsConversations.length > 0;
 
-  const showConnectionrequests = [SidebarTabs.RECENT, SidebarTabs.DIRECTS].includes(currentTab);
+  const showConnectionRequests = [SidebarTabs.RECENT, SidebarTabs.DIRECTS].includes(currentTab);
   const hasVisibleConnectionRequests = connectRequests.length > 0 && showConnectionrequests;
   const hasVisibleConversations = currentTabConversations.length > 0;
   const hasNoVisbleConversations = !hasVisibleConversations && !hasVisibleConnectionRequests;
