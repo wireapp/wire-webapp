@@ -48,7 +48,6 @@ interface LeftListWrapperProps {
   /** A react element that will be inserted after the header but before the list */
   before?: ReactElement;
   children: React.ReactNode;
-  content?: React.ReactNode;
   sidebar?: React.ReactNode;
   footer?: ReactElement;
   header?: string;
@@ -70,7 +69,6 @@ const ListWrapper = memo(
     headerElement,
     onClose,
     children,
-    content,
     hasHeader = true,
     footer,
     before,

@@ -30,7 +30,7 @@ export const inputWrapperStyles: CSSObject = {
 export const inputStyles: CSSObject = {
   height: '32px',
   borderRadius: 8,
-  paddingLeft: 36,
+  paddingLeft: '36px',
 };
 
 const commonIconStyles: CSSObject = {
@@ -41,12 +41,12 @@ const commonIconStyles: CSSObject = {
 
 export const searchIconStyles: CSSObject = {
   ...commonIconStyles,
-  left: 10,
+  left: '10px',
 };
 
 export const closeIconStyles: CSSObject = {
   ...commonIconStyles,
-  right: 10,
+  right: '10px',
 };
 
 export const closeButtonStyles: CSSObject = {

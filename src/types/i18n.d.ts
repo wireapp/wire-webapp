@@ -372,6 +372,7 @@ declare module 'I18n/en-US.json' {
     'cellsGlobalView.searchCloseButton': `Close`;
     'cellsGlobalView.deleteModalHeading': `Delete file`;
     'cellsGlobalView.deleteModalDescription': `This will permanently delete the file {name} for all participants.`;
+    'cellsGlobalView.deleteModalError': `Something went wrong, please try again later and refresh the list.`;
     'cellsGlobalView.optionsLabel': `More options`;
     'cellsGlobalView.optionDelete': `Delete`;
     'cellsGlobalView.optionOpen': `Open`;
@@ -386,13 +387,15 @@ declare module 'I18n/en-US.json' {
     'cellsGlobalView.shareFileModalHeading': `Share file via link`;
     'cellsGlobalView.shareFileModalEnablePublicLink': `Enable public link`;
     'cellsGlobalView.shareFileModalDisablePublicLink': `Disable public link`;
-    'cellsGlobalView.shareFileModalEnablePublicLinkDescription': `Enable public link`;
+    'cellsGlobalView.shareFileModalEnablePublicLinkDescription': `Your file will be uploaded and shared via a public link. Only those with the link can view it—ensure you trust your recipients.`;
     'cellsGlobalView.shareFileModalDisablePublicLinkDescription': `Disable public link`;
     'cellsGlobalView.shareFileModalCopyLink': `Copy link`;
     'cellsGlobalView.shareFileModalLinkCopied': `Link copied`;
     'cellsGlobalView.shareFileModalErrorLoadingLink': `Something went wrong, please try again later.`;
     'cellsGlobalView.shareFileModalGeneratedPublicLink': `Generated public link`;
     'cellsGlobalView.imageFullScreenModalCloseButton': `Close`;
+    'cellsSidebar.heading': `Files`;
+    'cellsSidebar.title': `All`;
     'chooseHandle.handlePlaceholder': `Username`;
     'chooseHandle.headline': `Set username`;
     'chooseHandle.subhead': `Your username helps people find you.`;
@@ -541,8 +544,6 @@ declare module 'I18n/en-US.json' {
     'conversationFileUploadFailedTooLargeFilesHeading': `Files too large`;
     'conversationFileUploadFailedTooLargeFilesMessage': `Please select files smaller than {maxSize}MB.`;
     'conversationFileUploadFailedTooLargeImagesMessage': `Please select images smaller than {maxSize}MB.`;
-    'conversationFileUploadFailedTooLargeFilesAndImagesMessage': `Please select files smaller than {maxImageSize}MB and images smaller than {maxFileSize}MB.`;
-    'conversationFileUploadOverlayTitle': `Upload files`;
     'conversationFilePreviewErrorMoreOptions': `More options`;
     'conversationFilePreviewErrorRetry': `Retry`;
     'conversationFilePreviewErrorRemove': `Remove`;

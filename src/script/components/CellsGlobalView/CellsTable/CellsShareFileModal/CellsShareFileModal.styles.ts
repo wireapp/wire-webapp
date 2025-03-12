@@ -21,6 +21,7 @@ import {CSSObject} from '@emotion/react';
 
 export const wrapperStyles: CSSObject = {
   paddingTop: '8px',
+  width: '100%',
 };
 
 export const labelStyles: CSSObject = {

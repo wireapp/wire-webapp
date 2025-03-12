@@ -31,6 +31,7 @@ interface CellsState {
   setStatus: (status: Status) => void;
   setError: (error: Error | null) => void;
   updateFile: (fileId: string, updates: Partial<CellFile>) => void;
+  removeFile: (fileId: string) => void;
   clearAll: () => void;
 }
 
@@ -44,6 +45,10 @@ export const useCellsStore = create<CellsState>(set => ({
   updateFile: (fileId, updates) =>
     set(state => ({
       files: state.files.map(file => (file.id === fileId ? {...file, ...updates} : file)),
+    })),
+  removeFile: fileId =>
+    set(state => ({
+      files: state.files.filter(file => file.id !== fileId),
     })),
   clearAll: () => set({files: [], status: 'idle', error: null}),
 }));

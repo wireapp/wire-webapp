@@ -21,6 +21,7 @@ import {useCallback, useMemo} from 'react';
 
 import {container} from 'tsyringe';
 
+import {useAppNotification} from 'Components/AppNotification/AppNotification';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
 
@@ -38,7 +39,7 @@ interface CellsGlobalViewProps {
 }
 
 export const CellsGlobalView = ({cellsRepository = container.resolve(CellsRepository)}: CellsGlobalViewProps) => {
-  const {files, status: filesStatus, clearAll} = useCellsStore();
+  const {files, status: filesStatus, clearAll, removeFile} = useCellsStore();
   const {refresh} = useGetAllCellsFiles({cellsRepository});
   const {
     searchValue,
@@ -50,20 +51,29 @@ export const CellsGlobalView = ({cellsRepository = container.resolve(CellsReposi
     cellsRepository,
   });
 
-  const handleRefresh = useCallback(async () => {
-    clearAll();
-    await refresh();
-  }, [refresh, clearAll]);
+  const deleteFileFailedNotification = useAppNotification({
+    message: t('cellsGlobalView.deleteModalError'),
+  });
 
   const handleDeleteFile = useCallback(
     async (uuid: string) => {
-      await cellsRepository.deleteFile({uuid});
-      void refresh();
+      try {
+        removeFile(uuid);
+        await cellsRepository.deleteFile({uuid});
+      } catch (error) {
+        deleteFileFailedNotification.show();
+        console.error(error);
+      }
     },
     // cellsRepository is not a dependency because it's a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [refresh],
   );
+
+  const handleRefresh = useCallback(async () => {
+    clearAll();
+    await refresh();
+  }, [refresh, clearAll]);
 
   const filteredFiles = useMemo(() => {
     if (!searchValue || !searchResults.length) {
@@ -89,10 +99,10 @@ export const CellsGlobalView = ({cellsRepository = container.resolve(CellsReposi
           description={t('cellsGlobalView.emptySearchResultsDescription')}
         />
       )}
-      {filesStatus === 'success' && !emptySearchResults && (
+      {filesStatus === 'success' && !emptySearchResults && !!filteredFiles.length && (
         <CellsTable files={filteredFiles} cellsRepository={cellsRepository} onDeleteFile={handleDeleteFile} />
       )}
-      {filesStatus === 'idle' && !filteredFiles.length && (
+      {!['loading', 'error'].includes(filesStatus) && !filteredFiles.length && (
         <CellsStateInfo
           heading={t('cellsGlobalView.noFilesHeading')}
           description={t('cellsGlobalView.noFilesDescription')}

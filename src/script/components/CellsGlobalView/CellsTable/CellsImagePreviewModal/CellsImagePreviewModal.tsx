@@ -115,5 +115,5 @@ export const CellsImagePreviewModal = ({imageSrc}: CellsImagePreviewModalProps) 
   );
 };
 
-// @ts-expect-error - TODO: investigate why this it is throwing an error
+// @ts-expect-error - TODO: investigate why this it is throwing a type error
 export const showCellsImagePreviewModal = renderElement<CellsImagePreviewModalProps>(CellsImagePreviewModal);
