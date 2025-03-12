@@ -17,15 +17,8 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {spinnerStyles} from './FilePreviewSpinner.styles';
 
-export const wrapperStyles: CSSObject = {
-  gridColumn: 'span 3',
-};
-
-export const loadingWrapperStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  marginLeft: 'auto',
+export const FilePreviewSpinner = () => {
+  return <div className="icon-spinner spin" css={spinnerStyles} />;
 };

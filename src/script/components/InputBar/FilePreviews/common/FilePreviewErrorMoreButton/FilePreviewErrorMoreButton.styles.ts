@@ -19,13 +19,23 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const wrapperStyles: CSSObject = {
-  gridColumn: 'span 3',
-};
-
-export const loadingWrapperStyles: CSSObject = {
+export const buttonStyles: CSSObject = {
+  position: 'absolute',
+  top: '-8px',
+  right: '-12px',
+  padding: '0',
+  margin: '0',
+  cursor: 'pointer',
+  width: '24px',
+  height: '24px',
+  background: 'var(--icon-button-primary-enabled-bg)',
+  border: '1px solid var(--icon-button-primary-border)',
+  borderRadius: '100%',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  marginLeft: 'auto',
+};
+
+export const iconStyles: CSSObject = {
+  fill: 'var(--main-color)',
 };

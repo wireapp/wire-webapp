@@ -452,6 +452,10 @@ button.panel__action-item,
 .panel__action-button {
   .button-states();
   .text-medium;
+
+  &:disabled {
+    cursor: not-allowed;
+  }
 }
 
 button.panel__action-item:focus-visible {

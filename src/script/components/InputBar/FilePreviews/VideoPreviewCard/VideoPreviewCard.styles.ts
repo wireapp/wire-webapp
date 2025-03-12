@@ -40,3 +40,21 @@ export const controlStyles: CSSObject = {
   left: '50%',
   transform: 'translate(-50%, -50%)',
 };
+
+export const iconWrapperStyles: CSSObject = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: '32px',
+  height: '32px',
+  backgroundColor: 'var(--white)',
+  borderRadius: '50%',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+};
+
+export const alertIconStyles: CSSObject = {
+  fill: 'var(--danger-color)',
+};

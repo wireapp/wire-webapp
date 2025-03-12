@@ -33,7 +33,12 @@ export class CellsRepository {
     const uuid = createUuid();
     const versionId = createUuid();
 
-    await this.apiClient.api.cells.uploadFileDraft({path, file, uuid, versionId});
+    await this.apiClient.api.cells.uploadFileDraft({
+      path,
+      file,
+      uuid,
+      versionId,
+    });
 
     return {
       uuid,
@@ -54,7 +59,11 @@ export class CellsRepository {
   }
 
   async getPublicLink({uuid}: {uuid: string}) {
-    return this.apiClient.api.cells.getFilePublicLink({uuid, label: 'test', alreadyShared: false});
+    return this.apiClient.api.cells.getFilePublicLink({
+      uuid,
+      label: 'test',
+      alreadyShared: false,
+    });
   }
 
   async deletePublicLink({uuid}: {uuid: string}) {
