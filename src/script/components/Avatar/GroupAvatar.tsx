@@ -19,19 +19,16 @@
 
 import React from 'react';
 
-import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {getGroupAvatarColors} from 'Util/avatarUtil';
 import {CSS_SQUARE} from 'Util/CSSMixin';
 
 export interface GroupAvatarProps {
   className?: string;
-  propertiesRepository: PropertiesRepository;
   conversationID?: string;
 }
 
-export const GroupAvatar: React.FC<GroupAvatarProps> = ({conversationID, className, propertiesRepository}) => {
-  const theme = propertiesRepository.properties.settings.interface.theme;
-  const colors = getGroupAvatarColors(conversationID, theme);
+export const GroupAvatar: React.FC<GroupAvatarProps> = ({conversationID, className}) => {
+  const colors = getGroupAvatarColors(conversationID);
 
   return (
     <div

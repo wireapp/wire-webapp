@@ -38,7 +38,6 @@ import {Call} from 'src/script/calling/Call';
 import {ConversationLabel, ConversationLabelRepository} from 'src/script/conversation/ConversationLabelRepository';
 import {User} from 'src/script/entity/User';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
-import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isKeyboardEvent} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -74,7 +73,6 @@ interface ConversationsListProps {
   isGroupParticipantsVisible: boolean;
   isEmpty: boolean;
   searchInputRef: MutableRefObject<HTMLInputElement | null>;
-  propertiesRepository: PropertiesRepository;
 }
 
 export const ConversationsList = ({
@@ -93,7 +91,6 @@ export const ConversationsList = ({
   isGroupParticipantsVisible,
   isEmpty,
   searchInputRef,
-  propertiesRepository,
 }: ConversationsListProps) => {
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
   const {currentTab} = useSidebarStore();
@@ -193,7 +190,6 @@ export const ConversationsList = ({
     onJoinCall: answerCall,
     rightClick: openContextMenu,
     showJoinButton: hasJoinableCall(conversation),
-    propertiesRepository: propertiesRepository,
   });
 
   useEffect(() => {
@@ -211,11 +207,7 @@ export const ConversationsList = ({
     <>
       <h2 className="visually-hidden">{t('conversationViewTooltip')}</h2>
 
-      <ConnectionRequests
-        propertiesRepository={propertiesRepository}
-        connectionRequests={connectRequests}
-        onConnectionRequestClick={onConnectionRequestClick}
-      />
+      <ConnectionRequests connectionRequests={connectRequests} onConnectionRequestClick={onConnectionRequestClick} />
 
       {conversationsFilter && !isEmpty && <h3 css={headingTitle}>{t('searchConversationNames')}</h3>}
 

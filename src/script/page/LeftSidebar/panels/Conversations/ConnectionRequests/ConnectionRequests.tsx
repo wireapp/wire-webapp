@@ -21,7 +21,6 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 
 import {Avatar, AVATAR_SIZE, GroupAvatar} from 'Components/Avatar';
-import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -31,14 +30,9 @@ import {ContentState, useAppState} from '../../../../useAppState';
 interface ConnectionRequestsProps {
   connectionRequests: User[];
   onConnectionRequestClick: () => void;
-  propertiesRepository: PropertiesRepository;
 }
 
-export const ConnectionRequests = ({
-  connectionRequests,
-  onConnectionRequestClick,
-  propertiesRepository,
-}: ConnectionRequestsProps) => {
+export const ConnectionRequests = ({connectionRequests, onConnectionRequestClick}: ConnectionRequestsProps) => {
   const contentState = useAppState(state => state.contentState);
   const isShowingConnectionRequests = contentState === ContentState.CONNECTION_REQUESTS;
   const connectionRequestsCount = connectionRequests.length;
@@ -74,7 +68,7 @@ export const ConnectionRequests = ({
             {connectionRequestsCount === 1 ? (
               <Avatar participant={connectionRequests[0]} avatarSize={AVATAR_SIZE.SMALL} />
             ) : (
-              <GroupAvatar propertiesRepository={propertiesRepository} />
+              <GroupAvatar />
             )}
           </div>
 

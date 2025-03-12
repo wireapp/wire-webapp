@@ -19,18 +19,11 @@
 
 import {render} from '@testing-library/react';
 
-import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
-import {PropertiesService} from 'src/script/properties/PropertiesService';
-import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
-import {SelfService} from 'src/script/self/SelfService';
-
 import {GroupAvatar} from './GroupAvatar';
 
 describe('GroupAvatar', () => {
   it('renders avatar', async () => {
-    const propertiesRepository = new PropertiesRepository(new PropertiesService(), new SelfService());
-    propertiesRepository.savePreference(PROPERTIES_TYPE.INTERFACE.THEME, 'dark');
-    const {getByTestId} = render(<GroupAvatar propertiesRepository={propertiesRepository} />);
+    const {getByTestId} = render(<GroupAvatar />);
     const avatarWrapper = getByTestId('group-avatar-box-wrapper');
 
     expect(avatarWrapper.children).toHaveLength(1);

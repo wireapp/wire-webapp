@@ -28,9 +28,6 @@ import {ConversationLabel, ConversationLabelRepository} from 'src/script/convers
 import {ConversationState} from 'src/script/conversation/ConversationState';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
-import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
-import {PropertiesService} from 'src/script/properties/PropertiesService';
-import {SelfService} from 'src/script/self/SelfService';
 import {ListViewModel} from 'src/script/view_model/ListViewModel';
 
 import {ConversationsList} from './ConversationsList';
@@ -56,7 +53,6 @@ describe('ConversationsList', () => {
   let handleArrowKeyDown: jest.Mock;
   let clearSearchFilter: jest.Mock;
   let conversationLabelRepository: ConversationLabelRepository;
-  let propertiesRepository: PropertiesRepository;
 
   beforeEach(async () => {
     listViewModel = {} as ListViewModel;
@@ -68,14 +64,12 @@ describe('ConversationsList', () => {
     resetConversationFocus = jest.fn();
     handleArrowKeyDown = jest.fn();
     clearSearchFilter = jest.fn();
-    propertiesRepository = new PropertiesRepository(new PropertiesService(), new SelfService());
     conversationLabelRepository = {} as ConversationLabelRepository;
   });
 
   const renderComponent = (conversations: Conversation[], searchFilter: string = '') =>
     render(
       <ConversationsList
-        propertiesRepository={propertiesRepository}
         conversationLabelRepository={conversationLabelRepository}
         conversations={conversations}
         conversationsFilter={searchFilter}

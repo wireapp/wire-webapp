@@ -17,9 +17,8 @@
  *
  */
 
-import {COLOR_V2} from '@wireapp/react-ui-kit';
-
-import {PropertiesRepository} from '../properties/PropertiesRepository';
+import {ACCENT_ID} from '../Config';
+import {User} from '../entity/User';
 
 // calculation of hash code for string based on this doc:
 // https://wearezeta.atlassian.net/wiki/spaces/AR/pages/1696858160/Consistent+Conversation+Colors+A+Hash-Based+Approach+for+Conversation+id
@@ -34,54 +33,37 @@ function getHashCode(str: string) {
   return hash;
 }
 
-// colors for group avatar in dark and light theme
-const groupAvatarDarkThemeOptions = [
-  [COLOR_V2.GREEN_DARK_500, COLOR_V2.PURPLE_DARK_500, COLOR_V2.RED_DARK_500],
-  [COLOR_V2.BLUE_DARK_500, COLOR_V2.GREEN_DARK_500, COLOR_V2.AMBER_DARK_500],
-  [COLOR_V2.BLUE_DARK_500, COLOR_V2.RED_DARK_500, COLOR_V2.PURPLE_DARK_500],
-  [COLOR_V2.AMBER_DARK_500, COLOR_V2.GREEN_DARK_500, COLOR_V2.PURPLE_DARK_500],
-  [COLOR_V2.GREEN_DARK_500, COLOR_V2.BLUE_DARK_500, COLOR_V2.PURPLE_DARK_500],
-  [COLOR_V2.BLUE_DARK_500, COLOR_V2.AMBER_DARK_500, COLOR_V2.GREEN_DARK_500],
-  [COLOR_V2.RED_DARK_500, COLOR_V2.BLUE_DARK_500, COLOR_V2.PURPLE_DARK_500],
-  [COLOR_V2.GREEN_DARK_500, COLOR_V2.RED_DARK_500, COLOR_V2.BLUE_DARK_500],
-  [COLOR_V2.AMBER_DARK_500, COLOR_V2.BLUE_DARK_500, COLOR_V2.PURPLE_DARK_500],
-  [COLOR_V2.PURPLE_DARK_500, COLOR_V2.BLUE_DARK_500, COLOR_V2.GREEN_DARK_500],
-  [COLOR_V2.GREEN_DARK_500, COLOR_V2.PURPLE_DARK_500, COLOR_V2.RED_DARK_500],
-  [COLOR_V2.GREEN_DARK_500, COLOR_V2.BLUE_DARK_500, COLOR_V2.RED_DARK_500],
-  [COLOR_V2.PURPLE_DARK_500, COLOR_V2.BLUE_DARK_500, COLOR_V2.GREEN_DARK_500],
-  [COLOR_V2.GREEN_DARK_500, COLOR_V2.BLUE_DARK_500, COLOR_V2.AMBER_DARK_500],
-  [COLOR_V2.GREEN_DARK_500, COLOR_V2.AMBER_DARK_500, COLOR_V2.PURPLE_DARK_500],
-];
+const green = User.ACCENT_COLOR[ACCENT_ID.GREEN];
+const amber = User.ACCENT_COLOR[ACCENT_ID.AMBER];
+const blue = User.ACCENT_COLOR[ACCENT_ID.BLUE];
+const purple = User.ACCENT_COLOR[ACCENT_ID.PURPLE];
+const red = User.ACCENT_COLOR[ACCENT_ID.RED];
+const turquoise = User.ACCENT_COLOR[ACCENT_ID.TURQUOISE];
 
-const groupAvatarLightThemeOptions = [
-  [COLOR_V2.GREEN_LIGHT_500, COLOR_V2.PURPLE_LIGHT_500, COLOR_V2.RED_LIGHT_500],
-  [COLOR_V2.BLUE_LIGHT_500, COLOR_V2.GREEN_LIGHT_500, COLOR_V2.AMBER_LIGHT_500],
-  [COLOR_V2.BLUE_LIGHT_500, COLOR_V2.RED_LIGHT_500, COLOR_V2.PURPLE_LIGHT_500],
-  [COLOR_V2.AMBER_LIGHT_500, COLOR_V2.GREEN_LIGHT_500, COLOR_V2.PURPLE_LIGHT_500],
-  [COLOR_V2.GREEN_LIGHT_500, COLOR_V2.BLUE_LIGHT_500, COLOR_V2.PURPLE_LIGHT_500],
-  [COLOR_V2.BLUE_LIGHT_500, COLOR_V2.AMBER_LIGHT_500, COLOR_V2.GREEN_LIGHT_500],
-  [COLOR_V2.RED_LIGHT_500, COLOR_V2.BLUE_LIGHT_500, COLOR_V2.PURPLE_LIGHT_500],
-  [COLOR_V2.GREEN_LIGHT_500, COLOR_V2.RED_LIGHT_500, COLOR_V2.BLUE_LIGHT_500],
-  [COLOR_V2.AMBER_LIGHT_500, COLOR_V2.BLUE_LIGHT_500, COLOR_V2.PURPLE_LIGHT_500],
-  [COLOR_V2.PURPLE_LIGHT_500, COLOR_V2.BLUE_LIGHT_500, COLOR_V2.GREEN_LIGHT_500],
-  [COLOR_V2.GREEN_LIGHT_500, COLOR_V2.PURPLE_LIGHT_500, COLOR_V2.RED_LIGHT_500],
-  [COLOR_V2.GREEN_LIGHT_500, COLOR_V2.BLUE_LIGHT_500, COLOR_V2.RED_LIGHT_500],
-  [COLOR_V2.PURPLE_LIGHT_500, COLOR_V2.BLUE_LIGHT_500, COLOR_V2.GREEN_LIGHT_500],
-  [COLOR_V2.GREEN_LIGHT_500, COLOR_V2.BLUE_LIGHT_500, COLOR_V2.AMBER_LIGHT_500],
-  [COLOR_V2.GREEN_LIGHT_500, COLOR_V2.AMBER_LIGHT_500, COLOR_V2.PURPLE_LIGHT_500],
+const groupAvatarOptions = [
+  [green, purple, red],
+  [blue, green, amber],
+  [blue, red, purple],
+  [amber, green, purple],
+  [green, blue, purple],
+  [blue, amber, green],
+  [red, turquoise, purple],
+  [green, red, blue],
+  [amber, blue, purple],
+  [purple, turquoise, green],
+  [green, purple, red],
+  [green, blue, red],
+  [purple, blue, green],
+  [green, blue, amber],
+  [green, amber, purple],
 ];
 
 /**
  *
  * @param id - unique id
- * @param theme - default or dark
  * @returns - array of colors for group avatar
  */
-export function getGroupAvatarColors(
-  id = '',
-  theme: typeof PropertiesRepository.prototype.properties.settings.interface.theme,
-) {
+export function getGroupAvatarColors(id = '') {
   const hash = getHashCode(id);
-  const options = theme === 'default' ? groupAvatarLightThemeOptions : groupAvatarDarkThemeOptions;
-  return options[Math.abs(hash) % options.length];
+  return groupAvatarOptions[Math.abs(hash) % groupAvatarOptions.length];
 }

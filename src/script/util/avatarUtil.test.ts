@@ -18,45 +18,32 @@
  */
 
 import {getGroupAvatarColors} from './avatarUtil';
-
 describe('AvatarUtil', () => {
-  it('should return correct colors for light theme', () => {
+  it('should return a valid color array for a given id', () => {
     const id = 'test-id';
-    const theme = 'default';
-    const colors = getGroupAvatarColors(id, theme);
-    expect(colors).toEqual(expect.arrayContaining([expect.stringMatching(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/)]));
+    const colors = getGroupAvatarColors(id);
+    expect(colors).toBeDefined();
+    expect(colors.length).toBe(3);
   });
 
-  it('should return correct colors for dark theme', () => {
-    const id = 'test-id';
-    const theme = 'dark';
-    const colors = getGroupAvatarColors(id, theme);
-    expect(colors).toEqual(expect.arrayContaining([expect.stringMatching(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/)]));
-  });
-
-  it('should return consistent colors for the same id and theme', () => {
+  it('should return the same color array for the same id', () => {
     const id = 'consistent-id';
-    const theme = 'default';
-    const colors1 = getGroupAvatarColors(id, theme);
-    const colors2 = getGroupAvatarColors(id, theme);
+    const colors1 = getGroupAvatarColors(id);
+    const colors2 = getGroupAvatarColors(id);
     expect(colors1).toEqual(colors2);
   });
 
-  it('should return different colors for different ids', () => {
+  it('should return different color arrays for different ids', () => {
     const id1 = 'id-1';
     const id2 = 'id-2';
-    const theme = 'default';
-    const colors1 = getGroupAvatarColors(id1, theme);
-    const colors2 = getGroupAvatarColors(id2, theme);
+    const colors1 = getGroupAvatarColors(id1);
+    const colors2 = getGroupAvatarColors(id2);
     expect(colors1).not.toEqual(colors2);
   });
 
-  it('should return different colors for different themes', () => {
-    const id = 'test-id';
-    const theme1 = 'default';
-    const theme2 = 'dark';
-    const colors1 = getGroupAvatarColors(id, theme1);
-    const colors2 = getGroupAvatarColors(id, theme2);
-    expect(colors1).not.toEqual(colors2);
+  it('should return a valid color array for an empty id', () => {
+    const colors = getGroupAvatarColors('');
+    expect(colors).toBeDefined();
+    expect(colors.length).toBe(3);
   });
 });

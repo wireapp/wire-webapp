@@ -19,9 +19,6 @@
 
 import {render, screen} from '@testing-library/react';
 
-import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
-import {PropertiesService} from 'src/script/properties/PropertiesService';
-import {SelfService} from 'src/script/self/SelfService';
 import {createUuid} from 'Util/uuid';
 
 import {ConnectionRequests} from './ConnectionRequests';
@@ -36,16 +33,9 @@ describe('ConnectionRequests', () => {
   });
 
   const user = generateUser({id: createUuid(), domain: 'test.wire.test'});
-  const propertiesRepository = new PropertiesRepository(new PropertiesService(), new SelfService());
 
   it('should display the correct text for one connection request', () => {
-    render(
-      <ConnectionRequests
-        connectionRequests={[user]}
-        propertiesRepository={propertiesRepository}
-        onConnectionRequestClick={mockOnConnectionRequestClick}
-      />,
-    );
+    render(<ConnectionRequests connectionRequests={[user]} onConnectionRequestClick={mockOnConnectionRequestClick} />);
     expect(screen.getByText('conversationsConnectionRequestOne')).not.toBeNull();
   });
 
@@ -53,11 +43,7 @@ describe('ConnectionRequests', () => {
     const user2 = generateUser({id: createUuid(), domain: 'test.wire.test'});
 
     render(
-      <ConnectionRequests
-        connectionRequests={[user, user2]}
-        propertiesRepository={propertiesRepository}
-        onConnectionRequestClick={mockOnConnectionRequestClick}
-      />,
+      <ConnectionRequests connectionRequests={[user, user2]} onConnectionRequestClick={mockOnConnectionRequestClick} />,
     );
     expect(screen.getByText('conversationsConnectionRequestMany')).not.toBeNull();
   });

@@ -434,7 +434,6 @@ export const Conversations: React.FC<ConversationsProps> = ({
                 groupParticipantsConversations={groupParticipantsConversations}
                 isGroupParticipantsVisible={isGroupParticipantsVisible}
                 searchInputRef={searchInputRef}
-                propertiesRepository={propertiesRepository}
               />
             )}
           </>
