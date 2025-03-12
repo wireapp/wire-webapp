@@ -47,7 +47,7 @@ export const CellsTableRowOptions = ({onOpen, onShare, onDownload, onDelete}: Ce
       entries: [
         {label: shareLabel, click: onShare},
         onOpen ? {label: openLabel, click: onOpen} : undefined,
-        {label: downloadLabel, click: onDownload},
+        onDownload ? {label: downloadLabel, click: onDownload} : undefined,
         {label: deleteLabel, click: onDelete},
       ].filter(Boolean) as ContextMenuEntry[],
       identifier: 'file-preview-error-more-button',
