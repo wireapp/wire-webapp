@@ -200,11 +200,15 @@ export const Conversations: React.FC<ConversationsProps> = ({
     ![SidebarTabs.DIRECTS, SidebarTabs.GROUPS, SidebarTabs.FAVORITES].includes(currentTab) &&
     groupParticipantsConversations.length > 0;
 
-  const hasNoConversations = conversations.length + connectRequests.length === 0;
+  const showConnectionRequests = [SidebarTabs.RECENT, SidebarTabs.DIRECTS].includes(currentTab);
+  const hasVisibleConnectionRequests = connectRequests.length > 0 && showConnectionRequests;
+  const hasVisibleConversations = currentTabConversations.length > 0;
+  const hasNoVisbleConversations = !hasVisibleConversations && !hasVisibleConnectionRequests;
+
   const hasEmptyConversationsList =
     !isGroupParticipantsVisible &&
-    ((showSearchInput && currentTabConversations.length === 0) ||
-      (hasNoConversations && currentTab !== SidebarTabs.ARCHIVES));
+    ((showSearchInput && hasNoVisbleConversations) ||
+      (hasNoVisbleConversations && currentTab !== SidebarTabs.ARCHIVES));
 
   const toggleSidebar = useCallback(() => {
     if (isFoldersTabOpen) {
@@ -339,7 +343,7 @@ export const Conversations: React.FC<ConversationsProps> = ({
             currentFolder={currentFolder}
             currentTab={currentTab}
             selfUser={selfUser}
-            showSearchInput={(showSearchInput && currentTabConversations.length !== 0) || !!conversationsFilter}
+            showSearchInput={(showSearchInput && hasVisibleConversations) || !!conversationsFilter}
             searchValue={conversationsFilter}
             setSearchValue={onSearch}
             searchInputPlaceholder={searchInputPlaceholder}
@@ -424,7 +428,7 @@ export const Conversations: React.FC<ConversationsProps> = ({
                 callState={callState}
                 currentFocus={currentFocus}
                 listViewModel={listViewModel}
-                connectRequests={connectRequests}
+                connectRequests={showConnectionRequests ? connectRequests : []}
                 handleArrowKeyDown={handleKeyDown}
                 conversationState={conversationState}
                 conversations={currentTabConversations}
