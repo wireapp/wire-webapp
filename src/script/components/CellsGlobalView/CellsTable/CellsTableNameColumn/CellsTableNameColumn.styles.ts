@@ -20,9 +20,13 @@
 import {CSSObject} from '@emotion/react';
 
 export const wrapperStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: '32px',
+  display: 'none',
+
+  '@media (min-width: 900px)': {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '32px',
+  },
 };
 
 export const imagePreviewWrapperStyles: CSSObject = {
@@ -45,4 +49,10 @@ export const playIconStyles: CSSObject = {
   left: '50%',
   transform: 'translate(-50%, -50%)',
   fill: 'var(--white)',
+};
+
+export const mobileName: CSSObject = {
+  '@media (min-width: 900px)': {
+    display: 'none',
+  },
 };

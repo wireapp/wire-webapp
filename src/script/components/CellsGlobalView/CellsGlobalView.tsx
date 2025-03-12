@@ -59,7 +59,7 @@ export const CellsGlobalView = ({cellsRepository = container.resolve(CellsReposi
     async (uuid: string) => {
       try {
         removeFile(uuid);
-        await cellsRepository.deleteFile({uuid});
+        // await cellsRepository.deleteFile({uuid});
       } catch (error) {
         deleteFileFailedNotification.show();
         console.error(error);

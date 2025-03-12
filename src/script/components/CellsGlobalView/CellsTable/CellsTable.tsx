@@ -27,7 +27,7 @@ import {t} from 'Util/LocalizerUtil';
 
 import {showCellsImagePreviewModal} from './CellsImagePreviewModal/CellsImagePreviewModal';
 import {showShareFileModal} from './CellsShareFileModal/CellsShareFileModal';
-import {headerCellStyles, tableCellActionsStyles, tableCellStyles, tableStyles} from './CellsTable.styles';
+import {headerCellStyles, tableCellRow, tableCellStyles, tableStyles, wrapperStyles} from './CellsTable.styles';
 import {CellsTableDateColumn} from './CellsTableDateColumn/CellsTableDateColumn';
 import {CellsTableNameColumn} from './CellsTableNameColumn/CellsTableNameColumn';
 import {CellsTableRowOptions} from './CellsTableRowOptions/CellsTableRowOptions';
@@ -138,31 +138,33 @@ export const CellsTable = ({files, cellsRepository, onDeleteFile}: CellsTablePro
   const rows = table.getRowModel().rows;
 
   return (
-    <table css={tableStyles}>
-      <thead>
-        {table.getHeaderGroups().map(headerGroup => (
-          <tr key={headerGroup.id}>
-            {headerGroup.headers.map(header => (
-              <th key={header.id} css={headerCellStyles}>
-                {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-              </th>
-            ))}
-          </tr>
-        ))}
-      </thead>
-      {rows.length > 0 && (
-        <tbody>
-          {rows.map(row => (
-            <tr key={row.id}>
-              {row.getVisibleCells().map(cell => (
-                <td key={cell.id} css={cell.column.id === 'id' ? tableCellActionsStyles : tableCellStyles}>
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </td>
+    <div css={wrapperStyles}>
+      <table css={tableStyles}>
+        <thead>
+          {table.getHeaderGroups().map(headerGroup => (
+            <tr key={headerGroup.id}>
+              {headerGroup.headers.map(header => (
+                <th key={header.id} css={headerCellStyles}>
+                  {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                </th>
               ))}
             </tr>
           ))}
-        </tbody>
-      )}
-    </table>
+        </thead>
+        {rows.length > 0 && (
+          <tbody>
+            {rows.map(row => (
+              <tr key={row.id} css={tableCellRow}>
+                {row.getVisibleCells().map(cell => (
+                  <td key={cell.id} css={tableCellStyles} data-cell={cell.column.columnDef.header}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        )}
+      </table>
+    </div>
   );
 };

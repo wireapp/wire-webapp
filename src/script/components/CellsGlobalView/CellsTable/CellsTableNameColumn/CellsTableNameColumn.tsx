@@ -25,6 +25,7 @@ import {getFileExtension} from 'Util/util';
 import {
   imagePreviewStyles,
   imagePreviewWrapperStyles,
+  mobileName,
   playIconStyles,
   wrapperStyles,
 } from './CellsTableNameColumn.styles';
@@ -42,16 +43,19 @@ export const CellsTableNameColumn = ({name, previewUrl, mimeType}: CellsTableNam
   const shouldDisplayImagePreview = (isImage || isVideo) && previewUrl;
 
   return (
-    <div css={wrapperStyles}>
-      {shouldDisplayImagePreview ? (
-        <div css={imagePreviewWrapperStyles}>
-          <img src={previewUrl} alt="" width={24} height={24} css={imagePreviewStyles} />
-          {isVideo && <PlayIcon css={playIconStyles} width={16} height={16} />}
-        </div>
-      ) : (
-        <FileTypeIcon extension={getFileExtension(name)} size={24} />
-      )}
-      <span>{name}</span>
-    </div>
+    <>
+      <span css={mobileName}>{name}</span>
+      <div css={wrapperStyles}>
+        {shouldDisplayImagePreview ? (
+          <div css={imagePreviewWrapperStyles}>
+            <img src={previewUrl} alt="" width={24} height={24} css={imagePreviewStyles} />
+            {isVideo && <PlayIcon css={playIconStyles} width={16} height={16} />}
+          </div>
+        ) : (
+          <FileTypeIcon extension={getFileExtension(name)} size={24} />
+        )}
+        <span>{name}</span>
+      </div>
+    </>
   );
 };

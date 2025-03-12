@@ -55,6 +55,7 @@
     position: relative;
     min-width: var(--screen-sm-min);
     flex: 1 1 auto;
+    overflow-y: auto;
 
     &__overlay {
       position: absolute;
@@ -116,11 +117,13 @@
     top: 64px;
   }
 
-  @media (max-width: 720px) {
-    .left-column,
-    .conversations,
-    .conversations-wrapper {
-      width: 100%;
+  &--hide-main-content-on-mobile {
+    @media (max-width: 720px) {
+      .left-column,
+      .conversations,
+      .conversations-wrapper {
+        width: 100%;
+      }
     }
   }
 }

@@ -19,7 +19,6 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const wrapperStyles: CSSObject = {
-  padding: '20px',
-  overflowY: 'auto',
+export const iconStyles: CSSObject = {
+  flexShrink: '0',
 };

@@ -19,6 +19,11 @@
 
 import {CSSObject} from '@emotion/react';
 
+export const wrapperStyles: CSSObject = {
+  maxWidth: '100%',
+  overflowX: 'auto',
+};
+
 export const tableStyles: CSSObject = {
   width: '100%',
   borderCollapse: 'collapse',
@@ -30,17 +35,33 @@ export const headerCellStyles: CSSObject = {
   borderBottom: '1px solid var(--gray-70)',
   fontSize: 'var(--font-size-small)',
   fontWeight: 'var(--font-weight-medium)',
+  whiteSpace: 'nowrap',
+
+  '@media (max-width: 900px)': {
+    display: 'none',
+  },
 };
 
 export const tableCellStyles: CSSObject = {
   padding: '12px',
   borderBottom: '1px solid var(--border-color)',
   fontSize: 'var(--font-size-small)',
+  whiteSpace: 'nowrap',
+
+  '@media (max-width: 900px)': {
+    display: 'block',
+
+    '&[data-cell]:before': {
+      content: 'attr(data-cell) ": "',
+      fontWeight: 'var(--font-weight-semibold)',
+    },
+  },
 };
 
-export const tableCellActionsStyles: CSSObject = {
-  ...tableCellStyles,
-  display: 'flex',
-  alignItems: 'flex-end',
-  justifyContent: 'flex-end',
+export const tableCellRow: CSSObject = {
+  display: 'block',
+  marginBottom: '32px',
+  '@media (min-width: 900px)': {
+    display: 'table-row',
+  },
 };

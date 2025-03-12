@@ -26,7 +26,7 @@ import {isSpaceOrEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {setContextMenuPosition} from 'Util/util';
 
-import {buttonStyles, iconStyles} from './CellsTableRowOptions.styles';
+import {buttonStyles, iconStyles, textStyles} from './CellsTableRowOptions.styles';
 
 interface CellsTableRowOptionsProps {
   onOpen?: () => void;
@@ -69,6 +69,7 @@ export const CellsTableRowOptions = ({onOpen, onShare, onDownload, onDelete}: Ce
       aria-label={t('cellsGlobalView.optionsLabel')}
     >
       <MoreIcon css={iconStyles} />
+      <span css={textStyles}>{t('cellsGlobalView.optionsLabel')}</span>
     </button>
   );
 };

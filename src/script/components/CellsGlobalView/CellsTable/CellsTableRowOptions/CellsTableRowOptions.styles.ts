@@ -25,10 +25,32 @@ export const buttonStyles: CSSObject = {
   cursor: 'pointer',
   padding: '0',
   margin: '0',
-  width: '32px',
-  height: '32px',
+  width: '100%',
+
+  '@media (min-width: 900px)': {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    width: '32px',
+    height: '32px',
+    marginLeft: 'auto',
+  },
 };
 
 export const iconStyles: CSSObject = {
   fill: 'var(--main-color)',
+  display: 'none',
+  '@media (min-width: 900px)': {
+    display: 'block',
+  },
+};
+
+export const textStyles: CSSObject = {
+  display: 'block',
+  textAlign: 'center',
+  fontWeight: 'var(--font-weight-semibold)',
+
+  '@media (min-width: 900px)': {
+    display: 'none',
+  },
 };
