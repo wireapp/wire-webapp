@@ -67,11 +67,10 @@ export const CustomHistoryModal = () => {
       data-uie-name="custom-history-modal"
       onKeyDown={event => handleEscDown(event, onCancel)}
     >
-      <Text>Select a custom conversation history time period:</Text>
+      <Text>{t('conversationHistoryModalText')}</Text>
       <FlexBox css={customHistorySharingFormContainerCss}>
         <Input
           wrapperCSS={customHistorySharingInputCss}
-          type="number"
           value={historySharingQuantity || ''}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
             setHistorySharingQuantity(Number(event.target.value))
@@ -98,7 +97,6 @@ export const CustomHistoryModal = () => {
           onKeyDown={event => handleEscDown(event, onCancel)}
         >
           {t('conversationHistoryModalCancel')}
-          Cancel
         </Button>
         <Button
           css={customHistorySharingButtonCss}

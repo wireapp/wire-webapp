@@ -67,11 +67,10 @@ export const conversationFeatureCss: CSSObject = {
 };
 
 export const conversationFeatureVerifiedIconCss: CSSObject = {
-  height: 16,
+  color: 'var(--accent-color)',
 };
 
 export const conversationFeatureIconCss: CSSObject = {
-  ...conversationFeatureVerifiedIconCss,
   fill: 'var(--success-color)',
 };
 
@@ -94,7 +93,7 @@ export const conversationOptionContainerCss = (isSelected: boolean) => ({
 });
 
 export const conversationOptionCss = (isSelected: boolean): CSSObject => ({
-  color: isSelected ? 'white' : 'var(--text-color)',
+  color: isSelected ? 'var(--app-bg-secondary)' : 'var(--text-color)',
   alignItems: 'center',
   gap: '12px',
 });
@@ -143,6 +142,7 @@ export const salesModalBodyButtonCss: CSSObject = {
   width: 'fit-content',
   backgroundColor: 'var(--gray-90)',
   marginTop: '1rem',
+  color: 'var(--white)',
 };
 
 // CustomHistorySharingModal
@@ -163,9 +163,9 @@ export const upgradeBadgeCss: CSSObject = {
   textTransform: 'uppercase',
   padding: '0px 6px',
   background: 'var(--accent-color)',
-  color: 'white',
+  color: 'var(--app-bg-secondary)',
   borderRadius: '4px',
   fontSize: 'var(--font-size-xsmall)',
   fontWeight: 'var(--font-weight-bold)',
-  border: '1px solid white',
+  border: '1px solid var(--app-bg-secondary)',
 };

@@ -17,7 +17,7 @@
  *
  */
 
-import {ProteusVerified} from '@wireapp/react-ui-kit';
+import {ShieldIcon} from '@wireapp/react-ui-kit';
 
 import {CheckIcon} from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
@@ -55,7 +55,7 @@ export const ConversationFeature = ({conversationType}: ConversationFeatureProps
           {index < features.length - 1 ? (
             <CheckIcon css={conversationFeatureIconCss} />
           ) : (
-            <ProteusVerified css={conversationFeatureVerifiedIconCss} />
+            <ShieldIcon css={conversationFeatureVerifiedIconCss} />
           )}
 
           <span

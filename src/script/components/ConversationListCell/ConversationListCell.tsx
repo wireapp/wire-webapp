@@ -23,6 +23,7 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 
 import {Avatar, AVATAR_SIZE, GroupAvatar} from 'Components/Avatar';
+import {ChannelAvatar} from 'Components/Avatar/ChannelAvatar';
 import {UserBlockedBadge} from 'Components/Badge';
 import {CellDescription} from 'Components/ConversationListCell/components/CellDescription';
 import {UserInfo} from 'Components/UserInfo';
@@ -63,6 +64,7 @@ export const ConversationListCell = ({
   resetConversationFocus,
 }: ConversationListCellProps) => {
   const {
+    display_name: conversationName,
     isGroup,
     is1to1,
     participating_user_ets: users,
@@ -73,6 +75,7 @@ export const ConversationListCell = ({
     isRequest,
     isConversationWithBlockedUser,
   } = useKoSubscribableChildren(conversation, [
+    'display_name',
     'isGroup',
     'is1to1',
     'participating_user_ets',
@@ -169,7 +172,17 @@ export const ConversationListCell = ({
             'conversation-list-cell-left-opaque': isSelfUserRemoved || users.length === 0,
           })}
         >
-          {isGroup && <GroupAvatar conversationID={conversation.id} className="conversation-list-cell-avatar-arrow" />}
+          {/* show channel avatar for testing purpose */}
+          {isGroup &&
+            (conversationName && conversationName?.toLowerCase().includes('channel') ? (
+              <ChannelAvatar
+                conversationID={conversation.id}
+                isLocked={conversationName.toLowerCase().includes('lock')}
+                className="conversation-list-cell-avatar-arrow"
+              />
+            ) : (
+              <GroupAvatar conversationID={conversation.id} className="conversation-list-cell-avatar-arrow" />
+            ))}
 
           {!isGroup && !!users.length && <Avatar participant={users[0]} avatarSize={AVATAR_SIZE.SMALL} />}
         </div>

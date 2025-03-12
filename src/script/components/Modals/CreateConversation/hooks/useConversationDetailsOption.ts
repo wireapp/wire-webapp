@@ -32,21 +32,21 @@ export const useConversationDetailsOption = () => {
       label:
         historySharingQuantity && historySharingQuantity > 1
           ? t('conversationHistoryModalOptionDays')
-          : t('conversationHistoryModalOptionDays'),
+          : t('conversationHistoryModalOptionDay'),
     },
     {
       value: HistorySharingUnit.Weeks,
       label:
         historySharingQuantity && historySharingQuantity > 1
-          ? t('conversationHistoryModalOptionWeek')
-          : t('conversationHistoryModalOptionWeeks'),
+          ? t('conversationHistoryModalOptionWeeks')
+          : t('conversationHistoryModalOptionWeek'),
     },
     {
       value: HistorySharingUnit.Months,
       label:
         historySharingQuantity && historySharingQuantity > 1
-          ? t('conversationHistoryModalOptionMonth')
-          : t('conversationHistoryModalOptionMonths'),
+          ? t('conversationHistoryModalOptionMonths')
+          : t('conversationHistoryModalOptionMonth'),
     },
   ];
 
