@@ -19,6 +19,10 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const wrapperStyles: CSSObject = {
-  padding: '20px',
+export const buttonStyles: CSSObject = {
+  marginBottom: '0',
+};
+
+export const iconStyles: CSSObject = {
+  marginRight: '8px',
 };

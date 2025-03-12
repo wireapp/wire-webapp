@@ -21,34 +21,35 @@ import {KeyboardEvent, MouseEvent as ReactMouseEvent} from 'react';
 
 import {MoreIcon} from '@wireapp/react-ui-kit';
 
-import {showContextMenu} from 'src/script/ui/ContextMenu';
+import {ContextMenuEntry, showContextMenu} from 'src/script/ui/ContextMenu';
 import {isSpaceOrEnterKey} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
 import {setContextMenuPosition} from 'Util/util';
 
 import {buttonStyles, iconStyles} from './CellsTableRowOptions.styles';
 
 interface CellsTableRowOptionsProps {
-  onOpen: () => void;
+  onOpen?: () => void;
   onShare: () => void;
-  downloadUrl: string;
+  onDownload?: () => void;
   onDelete: () => void;
 }
 
-export const CellsTableRowOptions = ({onOpen, onShare, downloadUrl, onDelete}: CellsTableRowOptionsProps) => {
+export const CellsTableRowOptions = ({onOpen, onShare, onDownload, onDelete}: CellsTableRowOptionsProps) => {
   const showOptionsMenu = (event: ReactMouseEvent<HTMLButtonElement> | MouseEvent) => {
-    const openLabel = 'Open';
-    const shareLabel = 'Share';
-    const downloadLabel = 'Download';
-    const deleteLabel = 'Delete';
+    const openLabel = t('cellsGlobalView.optionOpen');
+    const shareLabel = t('cellsGlobalView.optionShare');
+    const downloadLabel = t('cellsGlobalView.optionDownload');
+    const deleteLabel = t('cellsGlobalView.optionDelete');
 
     showContextMenu({
       event,
       entries: [
         {label: shareLabel, click: onShare},
-        {label: openLabel, click: onOpen},
-        {as: 'link', label: downloadLabel, href: downloadUrl, download: true},
+        onOpen ? {label: openLabel, click: onOpen} : undefined,
+        {label: downloadLabel, click: onDownload},
         {label: deleteLabel, click: onDelete},
-      ],
+      ].filter(Boolean) as ContextMenuEntry[],
       identifier: 'file-preview-error-more-button',
     });
   };
@@ -61,7 +62,12 @@ export const CellsTableRowOptions = ({onOpen, onShare, downloadUrl, onDelete}: C
   };
 
   return (
-    <button css={buttonStyles} onKeyDown={handleKeyDown} onClick={showOptionsMenu} aria-label="More options">
+    <button
+      css={buttonStyles}
+      onKeyDown={handleKeyDown}
+      onClick={showOptionsMenu}
+      aria-label={t('cellsGlobalView.optionsLabel')}
+    >
       <MoreIcon css={iconStyles} />
     </button>
   );

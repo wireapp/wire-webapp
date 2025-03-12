@@ -19,16 +19,30 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const buttonStyles: CSSObject = {
-  background: 'none',
-  border: 'none',
-  cursor: 'pointer',
-  padding: '0',
-  margin: '0',
-  width: '40px',
-  height: '40px',
+export const wrapperStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '32px',
 };
 
-export const iconStyles: CSSObject = {
-  fill: 'var(--main-color)',
+export const imagePreviewWrapperStyles: CSSObject = {
+  position: 'relative',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '24px',
+  height: '24px',
+};
+
+export const imagePreviewStyles: CSSObject = {
+  objectFit: 'cover',
+  borderRadius: '2px',
+};
+
+export const playIconStyles: CSSObject = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  fill: 'var(--white)',
 };

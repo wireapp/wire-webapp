@@ -17,8 +17,18 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {headingStyles, paragraphStyles, wrapperStyles} from './CellsStateInfo.styles';
 
-export const wrapperStyles: CSSObject = {
-  padding: '20px',
+interface CellsStateInfoProps {
+  heading: string;
+  description: string;
+}
+
+export const CellsStateInfo = ({heading, description}: CellsStateInfoProps) => {
+  return (
+    <div css={wrapperStyles}>
+      <h3 css={headingStyles}>{heading}</h3>
+      <p css={paragraphStyles}>{description}</p>
+    </div>
+  );
 };

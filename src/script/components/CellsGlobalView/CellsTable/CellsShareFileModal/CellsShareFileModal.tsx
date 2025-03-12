@@ -22,6 +22,7 @@ import {Input, Label, Switch} from '@wireapp/react-ui-kit';
 import {CopyToClipboardButton} from 'Components/CopyToClipboardButton/CopyToClipboardButton';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
+import {t} from 'Util/LocalizerUtil';
 
 import {
   inputStyles,
@@ -35,7 +36,7 @@ import {
 } from './CellsShareFileModal.styles';
 import {useCellPublicLink} from './useCellPublicLink';
 
-import {CellsTableLoader} from '../CellsTableLoader/CellsTableLoader';
+import {CellsTableLoader} from '../../common/CellsTableLoader/CellsTableLoader';
 
 interface ShareFileModalParams {
   uuid: string;
@@ -47,7 +48,7 @@ export const showShareFileModal = ({uuid, cellsRepository}: ShareFileModalParams
     primaryAction: {action: () => {}, text: 'Done'},
     text: {
       message: <CellsShareFileModalContent uuid={uuid} cellsRepository={cellsRepository} />,
-      title: 'Share file via link',
+      title: t('cellsGlobalView.shareFileModalHeading'),
     },
   });
 };
@@ -62,11 +63,10 @@ const CellsShareFileModalContent = ({uuid, cellsRepository}: ShareFileModalParam
       <div css={switchContainerStyles}>
         <div>
           <Label htmlFor="switch-public-link" css={labelStyles}>
-            Enable public link
+            {t('cellsGlobalView.shareFileModalEnablePublicLink')}
           </Label>
           <p id="switch-public-link-description" css={publicLinkDescriptionStyles}>
-            Your file will be uploaded and shared via a public link. Only those with the link can view it—ensure you
-            trust your recipients.
+            {t('cellsGlobalView.shareFileModalEnablePublicLinkDescription')}
           </p>
         </div>
         <div css={switchWrapperStyles}>
@@ -82,10 +82,14 @@ const CellsShareFileModalContent = ({uuid, cellsRepository}: ShareFileModalParam
       {isEnabled && status === 'success' && link && (
         <div css={inputWrapperStyles}>
           <label htmlFor="generated-public-link" className="visually-hidden">
-            Generated public link
+            {t('cellsGlobalView.shareFileModalGeneratedPublicLink')}
           </label>
           <Input id="generated-public-link" value={link} wrapperCSS={inputStyles} disabled={isInputDisabled} />
-          <CopyToClipboardButton textToCopy={link} displayText="Copy link" copySuccessText="Link copied!" />
+          <CopyToClipboardButton
+            textToCopy={link}
+            displayText={t('cellsGlobalView.shareFileModalCopyLink')}
+            copySuccessText={t('cellsGlobalView.shareFileModalLinkCopied')}
+          />
         </div>
       )}
       {status === 'loading' && (
@@ -93,7 +97,7 @@ const CellsShareFileModalContent = ({uuid, cellsRepository}: ShareFileModalParam
           <CellsTableLoader />
         </div>
       )}
-      {status === 'error' && <div>Error loading link</div>}
+      {status === 'error' && <div>{t('cellsGlobalView.shareFileModalErrorLoadingLink')}</div>}
     </div>
   );
 };

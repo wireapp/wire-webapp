@@ -20,5 +20,9 @@
 import {CSSObject} from '@emotion/react';
 
 export const wrapperStyles: CSSObject = {
-  padding: '20px',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginTop: '48px',
+  width: '100%',
 };

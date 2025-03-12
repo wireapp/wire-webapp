@@ -60,4 +60,8 @@ export class CellsRepository {
   async deletePublicLink({uuid}: {uuid: string}) {
     return this.apiClient.api.cells.deleteFilePublicLink({uuid});
   }
+
+  async searchFiles({query}: {query: string}) {
+    return this.apiClient.api.cells.searchFiles({phrase: query});
+  }
 }

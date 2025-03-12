@@ -20,5 +20,38 @@
 import {CSSObject} from '@emotion/react';
 
 export const wrapperStyles: CSSObject = {
-  padding: '20px',
+  width: '288px',
+};
+
+export const inputWrapperStyles: CSSObject = {
+  marginBottom: '0',
+};
+
+export const inputStyles: CSSObject = {
+  height: '32px',
+  borderRadius: 8,
+  paddingLeft: 36,
+};
+
+const commonIconStyles: CSSObject = {
+  top: '50%',
+  position: 'absolute',
+  transform: 'translateY(-50%)',
+};
+
+export const searchIconStyles: CSSObject = {
+  ...commonIconStyles,
+  left: 10,
+};
+
+export const closeIconStyles: CSSObject = {
+  ...commonIconStyles,
+  right: 10,
+};
+
+export const closeButtonStyles: CSSObject = {
+  background: 'none',
+  border: 'none',
+  padding: 0,
+  cursor: 'pointer',
 };

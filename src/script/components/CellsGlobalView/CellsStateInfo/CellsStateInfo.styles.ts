@@ -20,5 +20,26 @@
 import {CSSObject} from '@emotion/react';
 
 export const wrapperStyles: CSSObject = {
-  padding: '20px',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  flexDirection: 'column',
+  marginTop: '128px',
+  width: '100%',
+  height: '100%',
+};
+
+export const headingStyles: CSSObject = {
+  color: 'var(--main-color)',
+  fontWeight: 'var(--font-weight-semibold)',
+  fontSize: 'var(--font-size-base)',
+  marginBottom: '8px',
+};
+
+export const paragraphStyles: CSSObject = {
+  color: 'var(--main-color)',
+  fontWeight: 'var(--font-weight-regular)',
+  marginBottom: '8px',
+  maxWidth: '260px',
+  textAlign: 'center',
 };

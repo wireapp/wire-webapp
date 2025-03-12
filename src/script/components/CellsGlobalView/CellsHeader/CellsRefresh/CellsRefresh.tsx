@@ -17,8 +17,21 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {Button, ButtonVariant, ReloadIcon} from '@wireapp/react-ui-kit';
 
-export const wrapperStyles: CSSObject = {
-  padding: '20px',
+import {t} from 'Util/LocalizerUtil';
+
+import {buttonStyles, iconStyles} from './CellsRefresh.styles';
+
+interface CellsRefreshProps {
+  onRefresh: () => void;
+}
+
+export const CellsRefresh = ({onRefresh}: CellsRefreshProps) => {
+  return (
+    <Button variant={ButtonVariant.TERTIARY} onClick={onRefresh} css={buttonStyles}>
+      <ReloadIcon css={iconStyles} />
+      {t('cellsGlobalView.refreshButton')}
+    </Button>
+  );
 };

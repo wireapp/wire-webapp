@@ -19,6 +19,28 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const wrapperStyles: CSSObject = {
-  padding: '20px',
+export const tableStyles: CSSObject = {
+  width: '100%',
+  borderCollapse: 'collapse',
+};
+
+export const headerCellStyles: CSSObject = {
+  padding: '12px',
+  textAlign: 'left',
+  borderBottom: '1px solid var(--gray-70)',
+  fontSize: 'var(--font-size-small)',
+  fontWeight: 'var(--font-weight-medium)',
+};
+
+export const tableCellStyles: CSSObject = {
+  padding: '12px',
+  borderBottom: '1px solid var(--border-color)',
+  fontSize: 'var(--font-size-small)',
+};
+
+export const tableCellActionsStyles: CSSObject = {
+  ...tableCellStyles,
+  display: 'flex',
+  alignItems: 'flex-end',
+  justifyContent: 'flex-end',
 };

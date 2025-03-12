@@ -17,8 +17,18 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {MessageTime} from 'Components/MessagesList/Message/MessageTime';
+import {useRelativeTimestamp} from 'Hooks/useRelativeTimestamp';
 
-export const wrapperStyles: CSSObject = {
-  padding: '20px',
+interface CellsTableDateColumnProps {
+  timestamp: number;
+}
+
+export const CellsTableDateColumn = ({timestamp}: CellsTableDateColumnProps) => {
+  const timeAgo = useRelativeTimestamp(timestamp);
+  return (
+    <MessageTime timestamp={timestamp} data-timestamp-type="normal">
+      {timeAgo}
+    </MessageTime>
+  );
 };

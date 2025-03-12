@@ -22,7 +22,7 @@ import {useCallback, useEffect, useState} from 'react';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {Config} from 'src/script/Config';
 
-import {useCellsStore} from '../useCellsStore';
+import {useCellsStore} from '../../common/useCellsStore/useCellsStore';
 
 interface UseCellPublicLinkParams {
   uuid: string;
@@ -53,6 +53,8 @@ export const useCellPublicLink = ({uuid, cellsRepository}: UseCellPublicLinkPara
       setStatus('error');
       updateFile(uuid, {publicLink: undefined});
     }
+    // cellsRepository is not a dependency because it's a singleton
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uuid, updateFile]);
 
   const deletePublicLink = useCallback(async () => {
@@ -66,6 +68,8 @@ export const useCellPublicLink = ({uuid, cellsRepository}: UseCellPublicLinkPara
     } catch (err) {
       setStatus('error');
     }
+    // cellsRepository is not a dependency because it's a singleton
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uuid, file?.publicLink, updateFile]);
 
   const togglePublicLink = useCallback(() => {

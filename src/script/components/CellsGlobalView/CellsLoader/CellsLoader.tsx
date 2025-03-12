@@ -17,8 +17,14 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {wrapperStyles} from './CellsLoader.styles';
 
-export const wrapperStyles: CSSObject = {
-  padding: '20px',
+import {CellsTableLoader} from '../common/CellsTableLoader/CellsTableLoader';
+
+export const CellsLoader = () => {
+  return (
+    <div css={wrapperStyles}>
+      <CellsTableLoader />
+    </div>
+  );
 };

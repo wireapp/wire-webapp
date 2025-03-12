@@ -17,8 +17,18 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
-
-export const wrapperStyles: CSSObject = {
-  padding: '20px',
-};
+export interface CellFile {
+  id: string;
+  mimeType?: string;
+  name: string;
+  sizeMb: string;
+  previewImageUrl?: string;
+  uploadedAtTimestamp: number;
+  owner: string;
+  conversationName: string;
+  publicLink?: {
+    uuid: string;
+    url: string;
+  } | null;
+  fileUrl?: string;
+}

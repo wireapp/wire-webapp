@@ -19,53 +19,38 @@
 
 import {useEffect, useCallback} from 'react';
 
-import {RestNode} from 'cells-sdk-ts';
-
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 
-import {useCellsStore} from '../useCellsStore';
+import {transformNodesToCellsFiles} from './transformNodesToCellsFiles';
 
-interface UseGetCellsFilesProps {
+import {useCellsStore} from '../common/useCellsStore/useCellsStore';
+
+interface UseGetAllCellsFilesProps {
   cellsRepository: CellsRepository;
 }
 
-interface PublicLink {
-  uuid: string;
-  url: string;
-}
-
-interface File {
-  id: string;
-  mimeType: string;
-  name: string;
-  sizeMb: string;
-  previewUrl: string;
-  uploadedAt: string;
-  publicLink?: PublicLink;
-}
-
-type Status = 'idle' | 'loading' | 'success' | 'error';
-
-export const useGetCellsFiles = ({cellsRepository}: UseGetCellsFilesProps) => {
+export const useGetAllCellsFiles = ({cellsRepository}: UseGetAllCellsFilesProps) => {
   const {setFiles, setStatus, setError} = useCellsStore();
 
   const fetchFiles = useCallback(async () => {
     try {
       setStatus('loading');
 
-      const result = await cellsRepository.getAllFiles();
+      const result = await cellsRepository.searchFiles({query: '*'});
 
       if (!result.Nodes) {
         throw new Error('No files found');
       }
 
-      const transformedFiles = transformNodesToFiles(result.Nodes);
+      const transformedFiles = transformNodesToCellsFiles(result.Nodes);
       setFiles(transformedFiles);
       setStatus('success');
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Failed to fetch files', {cause: err}));
       setStatus('error');
     }
+    // cellsRepository is not a dependency because it's a singleton
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setFiles, setStatus, setError]);
 
   useEffect(() => {
@@ -75,17 +60,4 @@ export const useGetCellsFiles = ({cellsRepository}: UseGetCellsFilesProps) => {
   return {
     refresh: fetchFiles,
   };
-};
-
-const transformNodesToFiles = (nodes: RestNode[]) => {
-  return nodes
-    .filter(node => node.Type === 'LEAF')
-    .map(node => ({
-      id: node.Uuid,
-      mimeType: node.ContentType || '',
-      name: node.Path,
-      sizeMb: node.Size || '',
-      previewUrl: node.Previews?.[0]?.Url || '',
-      uploadedAt: node.Modified || '',
-    }));
 };

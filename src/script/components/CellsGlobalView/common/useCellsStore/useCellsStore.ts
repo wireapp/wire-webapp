@@ -19,29 +19,18 @@
 
 import {create} from 'zustand';
 
-interface PublicLink {
-  uuid: string;
-  url: string;
-}
+import {CellFile} from '../cellFile/cellFile';
 
-interface File {
-  id: string;
-  mimeType: string;
-  name: string;
-  sizeMb: string;
-  previewUrl: string;
-  uploadedAt: string;
-  publicLink?: PublicLink;
-}
+type Status = 'idle' | 'loading' | 'success' | 'error';
 
 interface CellsState {
-  files: File[];
-  status: 'idle' | 'loading' | 'success' | 'error';
+  files: CellFile[];
+  status: Status;
   error: Error | null;
-  setFiles: (files: File[]) => void;
-  setStatus: (status: 'idle' | 'loading' | 'success' | 'error') => void;
+  setFiles: (files: CellFile[]) => void;
+  setStatus: (status: Status) => void;
   setError: (error: Error | null) => void;
-  updateFile: (fileId: string, updates: Partial<File>) => void;
+  updateFile: (fileId: string, updates: Partial<CellFile>) => void;
   clearAll: () => void;
 }
 
