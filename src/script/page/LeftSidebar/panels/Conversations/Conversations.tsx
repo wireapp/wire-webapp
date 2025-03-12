@@ -201,7 +201,7 @@ export const Conversations: React.FC<ConversationsProps> = ({
     groupParticipantsConversations.length > 0;
 
   const showConnectionRequests = [SidebarTabs.RECENT, SidebarTabs.DIRECTS].includes(currentTab);
-  const hasVisibleConnectionRequests = connectRequests.length > 0 && showConnectionrequests;
+  const hasVisibleConnectionRequests = connectRequests.length > 0 && showConnectionRequests;
   const hasVisibleConversations = currentTabConversations.length > 0;
   const hasNoVisbleConversations = !hasVisibleConversations && !hasVisibleConnectionRequests;
 
@@ -428,7 +428,7 @@ export const Conversations: React.FC<ConversationsProps> = ({
                 callState={callState}
                 currentFocus={currentFocus}
                 listViewModel={listViewModel}
-                connectRequests={showConnectionrequests ? connectRequests : []}
+                connectRequests={showConnectionRequests ? connectRequests : []}
                 handleArrowKeyDown={handleKeyDown}
                 conversationState={conversationState}
                 conversations={currentTabConversations}
