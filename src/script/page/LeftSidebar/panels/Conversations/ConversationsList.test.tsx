@@ -64,7 +64,6 @@ describe('ConversationsList', () => {
     resetConversationFocus = jest.fn();
     handleArrowKeyDown = jest.fn();
     clearSearchFilter = jest.fn();
-    conversationLabelRepository = {} as ConversationLabelRepository;
   });
 
   const renderComponent = (conversations: Conversation[], searchFilter: string = '') =>
