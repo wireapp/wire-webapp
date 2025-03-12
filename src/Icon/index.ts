@@ -92,6 +92,9 @@ export * from './TriangleIcon';
 export * from './UploadIcon';
 export * from './VerificationShieldIcon';
 export * from './WireIcon';
+export * from './ShieldIcon';
+export * from './LockClosedIcon';
+export * from './ChannelIcon';
 
 // Brand Icons
 export * from './Brand/AndroidIcon';
