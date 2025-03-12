@@ -1,0 +1,155 @@
+/*
+ * Wire
+ * Copyright (C) 2025 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {useState, useContext} from 'react';
+
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
+import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
+import {isNonFederatingBackendsError} from '@wireapp/core/lib/errors';
+import {amplify} from 'amplify';
+import {container} from 'tsyringe';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {Config} from 'src/script/Config';
+import {ACCESS_STATE} from 'src/script/conversation/AccessState';
+import {
+  toggleFeature,
+  teamPermissionsForAccessState,
+  ACCESS_TYPES,
+} from 'src/script/conversation/ConversationAccessPermission';
+import {useSidebarStore, SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
+import {RootContext} from 'src/script/page/RootProvider';
+import {generateConversationUrl} from 'src/script/router/routeGenerator';
+import {createNavigateKeyboard, createNavigate} from 'src/script/router/routerBindings';
+import {TeamState} from 'src/script/team/TeamState';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {isKeyboardEvent} from 'Util/KeyboardUtil';
+import {replaceLink, t} from 'Util/LocalizerUtil';
+
+import {PrimaryModal} from '../../PrimaryModal';
+import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
+import {ConversationCreationStep} from '../types';
+
+export const useCreateConversation = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const {
+    conversationName,
+    hideModal,
+    showModal,
+    selectedContacts,
+    setConversationName,
+    setConversationCreationStep,
+    isReadReceiptsEnabled,
+    isServicesEnabled,
+    isGuestsEnabled,
+  } = useCreateConversationModal();
+  const {setCurrentTab: setCurrentSidebarTab} = useSidebarStore();
+
+  const mainViewModel = useContext(RootContext);
+  const {content: contentViewModel} = mainViewModel!;
+  const {conversation: conversationRepository} = contentViewModel.repositories;
+  const teamState = container.resolve(TeamState);
+  const {isTeam, isMLSEnabled} = useKoSubscribableChildren(teamState, ['isTeam', 'isMLSEnabled']);
+
+  const defaultProtocol = isMLSEnabled
+    ? teamState.teamFeatures()?.mls?.config.defaultProtocol
+    : ConversationProtocol.PROTEUS;
+
+  const getAccessState = () => {
+    let access = ACCESS_STATE.TEAM.TEAM_ONLY;
+    if (isGuestsEnabled) {
+      access = toggleFeature(teamPermissionsForAccessState(ACCESS_STATE.TEAM.GUEST_FEATURES), access);
+    }
+    if (isServicesEnabled) {
+      access = toggleFeature(ACCESS_TYPES.SERVICE, access);
+    }
+
+    return access;
+  };
+
+  const onSubmit = async (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.KeyboardEvent<HTMLInputElement>,
+  ): Promise<void> => {
+    setIsLoading(true);
+
+    try {
+      const conversation = await conversationRepository.createGroupConversation(
+        selectedContacts,
+        conversationName,
+        isTeam ? getAccessState() : undefined,
+        {
+          protocol: defaultProtocol,
+          receipt_mode: isReadReceiptsEnabled ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF,
+        },
+      );
+
+      setCurrentSidebarTab(SidebarTabs.RECENT);
+
+      if (isKeyboardEvent(event)) {
+        createNavigateKeyboard(generateConversationUrl(conversation.qualifiedId), true)(event);
+      } else {
+        createNavigate(generateConversationUrl(conversation.qualifiedId))(event);
+      }
+    } catch (error) {
+      if (isNonFederatingBackendsError(error)) {
+        const tempName = conversationName;
+        hideModal();
+
+        const backendString = error.backends.join(', and ');
+        const replaceBackends = replaceLink(
+          Config.getConfig().URL.SUPPORT.NON_FEDERATING_INFO,
+          'modal__text__read-more',
+          'read-more-backends',
+        );
+        return PrimaryModal.show(PrimaryModal.type.MULTI_ACTIONS, {
+          preventClose: true,
+          primaryAction: {
+            text: t('groupCreationPreferencesNonFederatingEditList'),
+            action: () => {
+              setConversationName(tempName);
+              showModal();
+              setIsLoading(false);
+              setConversationCreationStep(ConversationCreationStep.ParticipantsSelection);
+            },
+          },
+          secondaryAction: {
+            text: t('groupCreationPreferencesNonFederatingLeave'),
+            action: () => {
+              setIsLoading(false);
+            },
+          },
+          text: {
+            htmlMessage: t('groupCreationPreferencesNonFederatingMessage', {backends: backendString}, replaceBackends),
+            title: t('groupCreationPreferencesNonFederatingHeadline'),
+          },
+        });
+      }
+      amplify.publish(WebAppEvents.CONVERSATION.SHOW, undefined, {});
+      setIsLoading(false);
+    }
+
+    hideModal();
+  };
+
+  return {
+    isLoading,
+    onSubmit,
+  };
+};
