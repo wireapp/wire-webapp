@@ -68,7 +68,7 @@ export const ConnectionRequests = ({connectionRequests, onConnectionRequestClick
             {connectionRequestsCount === 1 ? (
               <Avatar participant={connectionRequests[0]} avatarSize={AVATAR_SIZE.SMALL} />
             ) : (
-              <GroupAvatar users={connectionRequests} />
+              <GroupAvatar />
             )}
           </div>
 
