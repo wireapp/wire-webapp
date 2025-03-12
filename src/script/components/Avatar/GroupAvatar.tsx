@@ -35,19 +35,19 @@ export const GroupAvatar: React.FC<GroupAvatarProps> = ({conversationID, classNa
       className={className}
       css={{
         ...CSS_SQUARE(32),
-        border: '1px solid var(--text-input-placeholder)',
-        borderRadius: 6,
+        border: '1px solid var(--border-color)',
+        borderRadius: 8,
       }}
     >
       <div
         css={{
           ...CSS_SQUARE(28),
-          backgroundColor: 'var(--app-bg)',
-          borderRadius: 5,
+          backgroundColor: 'var(--group-icon-bg)',
           display: 'flex',
           flexWrap: 'wrap',
           margin: 1,
           overflow: 'hidden',
+          borderRadius: 7,
         }}
         data-uie-name="group-avatar-box-wrapper"
       >
