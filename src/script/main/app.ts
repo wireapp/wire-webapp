@@ -52,6 +52,7 @@ import {BackupRepository} from '../backup/BackupRepository';
 import {BackupService} from '../backup/BackupService';
 import {CacheRepository} from '../cache/CacheRepository';
 import {CallingRepository} from '../calling/CallingRepository';
+import {CellsRepository} from '../cells/CellsRepository';
 import {ClientRepository, ClientService} from '../client';
 import {getClientMLSConfig} from '../client/clientMLSConfig';
 import {Configuration} from '../Config';
@@ -306,6 +307,8 @@ export class App {
       repositories.calling,
     );
     repositories.preferenceNotification = new PreferenceNotificationRepository(repositories.user['userState'].self);
+
+    repositories.cells = new CellsRepository();
 
     return repositories;
   }
