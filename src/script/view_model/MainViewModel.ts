@@ -56,7 +56,6 @@ export interface ViewModelRepositories {
   asset: AssetRepository;
   audio: AudioRepository;
   backup: BackupRepository;
-  cells: CellsRepository;
   calling: CallingRepository;
   cells: CellsRepository;
   client: ClientRepository;
