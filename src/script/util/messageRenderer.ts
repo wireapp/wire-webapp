@@ -102,7 +102,10 @@ markdownit.renderer.rules.paragraph_open = (tokens, idx) => {
 
   const previousToken = tokens[idx - 1];
   const isPreviousTokenList =
-    previousToken && (previousToken.type === 'bullet_list_close' || previousToken.type === 'ordered_list_close');
+    previousToken &&
+    (previousToken.type === 'bullet_list_close' ||
+      previousToken.type === 'ordered_list_close' ||
+      previousToken.type === 'blockquote_close');
 
   if (isPreviousTokenList) {
     return count > 1 ? `${'<br>'.repeat(count - 1)}` : '';

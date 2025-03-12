@@ -19,13 +19,11 @@
 
 import {UIEvent, useCallback, useEffect, useState} from 'react';
 
-import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import {useMatchMedia} from '@wireapp/react-ui-kit';
 
 import {CallingCell} from 'Components/calling/CallingCell';
-import {DropFileArea} from 'Components/DropFileArea';
 import {Giphy} from 'Components/Giphy';
 import {InputBar} from 'Components/InputBar';
 import {MessagesList} from 'Components/MessagesList';
@@ -42,10 +40,12 @@ import {isHittingUploadLimit} from 'Util/isHittingUploadLimit';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {safeMailOpen, safeWindowOpen} from 'Util/SanitizationUtil';
-import {formatBytes, incomingCssClass, removeAnimationsClass} from 'Util/util';
+import {formatBytes} from 'Util/util';
 
+import {ConversationFileDropzone} from './ConversationFileDropzone/ConversationFileDropzone';
 import {useReadReceiptSender} from './hooks/useReadReceipt';
 import {ReadOnlyConversationMessage} from './ReadOnlyConversationMessage';
+import {useFilesUploadDropzone} from './useFilesUploadDropzone/useFilesUploadDropzone';
 import {checkFileSharingPermission} from './utils/checkFileSharingPermission';
 
 import {ConversationState} from '../../conversation/ConversationState';
@@ -462,13 +462,22 @@ export const Conversation = ({
     [addReadReceiptToBatch, repositories.conversation, repositories.integration, updateConversationLastRead],
   );
 
+  const isCellsEnabled = Config.getConfig().FEATURE.ENABLE_CELLS;
+
+  const {getRootProps, getInputProps, open, isDragAccept} = useFilesUploadDropzone({
+    isTeam: inTeam,
+    cellsRepository: repositories.cells,
+  });
+
   return (
-    <DropFileArea
+    <ConversationFileDropzone
+      isDragAccept={isDragAccept}
+      isCellsEnabled={isCellsEnabled}
+      isConversationLoaded={isConversationLoaded}
+      activeConversationId={activeConversation?.id}
       onFileDropped={checkFileSharingPermission(uploadDroppedFiles)}
-      id="conversation"
-      className={cx('conversation', {[incomingCssClass]: isConversationLoaded, loading: !isConversationLoaded})}
-      ref={removeAnimationsClass}
-      key={activeConversation?.id}
+      rootProps={getRootProps()}
+      inputProps={getInputProps()}
     >
       {activeConversation && (
         <>
@@ -548,7 +557,7 @@ export const Conversation = ({
                 onShiftTab={() => setMsgElementsFocusable(false)}
                 uploadDroppedFiles={uploadDroppedFiles}
                 uploadImages={uploadImages}
-                uploadFiles={uploadFiles}
+                uploadFiles={isCellsEnabled ? () => open() : uploadFiles}
               />
             ))}
 
@@ -561,6 +570,6 @@ export const Conversation = ({
       {isGiphyModalOpen && inputValue && (
         <Giphy giphyRepository={repositories.giphy} inputValue={inputValue} onClose={closeGiphy} />
       )}
-    </DropFileArea>
+    </ConversationFileDropzone>
   );
 };

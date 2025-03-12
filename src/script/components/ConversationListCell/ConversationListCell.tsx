@@ -169,7 +169,7 @@ export const ConversationListCell = ({
             'conversation-list-cell-left-opaque': isSelfUserRemoved || users.length === 0,
           })}
         >
-          {isGroup && <GroupAvatar className="conversation-list-cell-avatar-arrow" />}
+          {isGroup && <GroupAvatar className="conversation-list-cell-avatar-arrow" users={users} />}
 
           {!isGroup && !!users.length && <Avatar participant={users[0]} avatarSize={AVATAR_SIZE.SMALL} />}
         </div>

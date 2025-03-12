@@ -71,6 +71,8 @@ const ControlButtons = ({
   onFormatClick,
   onEmojiClick,
 }: ControlButtonsProps) => {
+  const isCellsEnabled = Config.getConfig().FEATURE.ENABLE_CELLS;
+
   if (isEditing) {
     return (
       <>
@@ -113,12 +115,14 @@ const ControlButtons = ({
         )}
         {!disableFilesharing && (
           <>
-            <li>
-              <ImageUploadButton
-                onSelectImages={onSelectImages}
-                acceptedImageTypes={Config.getConfig().ALLOWED_IMAGE_TYPES}
-              />
-            </li>
+            {!isCellsEnabled && (
+              <li>
+                <ImageUploadButton
+                  onSelectImages={onSelectImages}
+                  acceptedImageTypes={Config.getConfig().ALLOWED_IMAGE_TYPES}
+                />
+              </li>
+            )}
             <li>
               <AssetUploadButton
                 onSelectFiles={onSelectFiles}

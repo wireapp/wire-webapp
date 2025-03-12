@@ -32,6 +32,19 @@ export class APIClient extends APIClientUnconfigured {
         rest: Config.getConfig().BACKEND_REST,
         ws: Config.getConfig().BACKEND_WS,
       },
+      cells: {
+        pydio: {
+          apiKey: Config.getConfig().CELLS_PYDIO_API_KEY,
+          segment: Config.getConfig().CELLS_PYDIO_SEGMENT,
+          url: Config.getConfig().CELLS_PYDIO_URL,
+        },
+        s3: {
+          apiKey: Config.getConfig().CELLS_S3_API_KEY,
+          bucket: Config.getConfig().CELLS_S3_BUCKET,
+          endpoint: Config.getConfig().CELLS_S3_ENDPOINT,
+          region: Config.getConfig().CELLS_S3_REGION,
+        },
+      },
     });
   }
 }

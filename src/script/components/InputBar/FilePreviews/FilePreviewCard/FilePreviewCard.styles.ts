@@ -22,3 +22,10 @@ import {CSSObject} from '@emotion/react';
 export const wrapperStyles: CSSObject = {
   gridColumn: 'span 3',
 };
+
+export const loadingWrapperStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  marginLeft: 'auto',
+};
