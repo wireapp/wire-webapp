@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2019 Wire Swiss GmbH
+ * Copyright (C) 2024 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,20 +17,13 @@
  *
  */
 
-export interface IdentityProvider {
-  extraInfo: {
-    apiVersion: string;
-    handle: string;
-    oldIssuers: [];
-    replacedBy: unknown;
-    team: string;
-  };
-  id: string;
-  metadata: IdentityProviderMetaData;
-}
-
-export interface IdentityProviderMetaData {
-  certAuthnResponse: string[];
-  issuer: string;
-  requestURI: string;
+export interface BackendConfig {
+  backendName: string;
+  backendURL: string;
+  backendWSURL: string;
+  blacklistURL: string;
+  teamsURL: string;
+  accountURL: string;
+  websiteURL: string;
+  webAppURL: string;
 }

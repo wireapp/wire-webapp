@@ -70,6 +70,7 @@ import {
 } from './team/';
 import {ScimAPI} from './team/scim/ScimAPI';
 import {TeamSearchAPI} from './team/search';
+import {SSOAPI} from './team/sso';
 import {UserAPI} from './user/';
 
 const {version}: {version: string} = require('../package.json');
@@ -120,6 +121,7 @@ type Apis = {
     scim: ScimAPI;
     search: TeamSearchAPI;
     service: ServiceAPI;
+    sso: SSOAPI;
     team: TeamAPI;
   };
   user: UserAPI;
@@ -247,6 +249,7 @@ export class APIClient extends EventEmitter {
         scim: new ScimAPI(this.transport.http),
         search: new TeamSearchAPI(this.transport.http),
         service: new ServiceAPI(this.transport.http),
+        sso: new SSOAPI(this.transport.http),
         team: new TeamAPI(this.transport.http),
       },
       user: new UserAPI(this.transport.http, backendFeatures),
