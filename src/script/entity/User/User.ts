@@ -104,7 +104,7 @@ export class User {
   public readonly isBlockedLegalHold: ko.PureComputed<boolean>;
   public readonly supportedProtocols: ko.Observable<null | ConversationProtocol[]>;
 
-  static get ACCENT_COLOR() {
+  public static get ACCENT_COLOR() {
     return {
       [ACCENT_ID.BLUE]: 'var(--blue-500)',
       [ACCENT_ID.GREEN]: 'var(--green-500)',
