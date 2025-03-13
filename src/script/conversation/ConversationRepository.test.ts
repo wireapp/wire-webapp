@@ -1108,14 +1108,14 @@ describe('ConversationRepository', () => {
       expect(conversationEntity?.readOnlyState()).toEqual(null);
     });
 
-    it('re-evaluates 1:1 conversation with user after their supported protocols are updated', async () => {
+    it('re-evaluates 1:1 conversation with user after their supported protocols are updated and mls is added', async () => {
       const conversationRepository = testFactory.conversation_repository!;
       const userRepository = testFactory.user_repository!;
       const mockedGroupId = 'groupId';
 
       const otherUserId = {id: 'f718410c-3833-479d-bd80-a5df03f38414', domain: 'test-domain'};
       const otherUser = new User(otherUserId.id, otherUserId.domain);
-      otherUser.supportedProtocols([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]);
+      otherUser.supportedProtocols([ConversationProtocol.PROTEUS]);
       userRepository['userState'].users.push(otherUser);
 
       const mockSelfClientId = 'client-id';
