@@ -17,8 +17,6 @@
  *
  */
 
-import React from 'react';
-
 import {ChannelIcon, LockClosedIcon} from '@wireapp/react-ui-kit';
 
 import {getChannelAvatarColors} from 'Util/avatarUtil';
@@ -31,7 +29,7 @@ export interface ChannelAvatarProps {
   isLocked?: boolean;
 }
 
-export const ChannelAvatar: React.FC<ChannelAvatarProps> = ({conversationID, className, isLocked = true}) => {
+export const ChannelAvatar = ({conversationID, className, isLocked = true}: ChannelAvatarProps) => {
   const colorPalette = getChannelAvatarColors(conversationID);
   return (
     <div className={className} css={channelAvatarContainerCss(colorPalette.border)}>
