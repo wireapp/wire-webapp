@@ -282,7 +282,7 @@ export const Conversations: React.FC<ConversationsProps> = ({
         void conversationRepository.updateArchivedConversations();
       }
 
-      if (nextTab !== SidebarTabs.PREFERENCES) {
+      if (![SidebarTabs.PREFERENCES, SidebarTabs.CELLS].includes(nextTab)) {
         onExitPreferences();
       }
 
