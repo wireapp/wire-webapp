@@ -58,6 +58,7 @@ export const useChatHistoryOptions = (
   chatHistory: ChatHistory,
   historySharingQuantity: number,
   historySharingUnit: HistorySharingUnit,
+  enableCustomHistory?: boolean,
 ) => {
   const teamState = container.resolve(TeamState);
   const {chatHistorySharingUnitOptions} = useChatHistorySharingUnitOptions(historySharingQuantity);
@@ -83,11 +84,14 @@ export const useChatHistoryOptions = (
         value: ChatHistory.Unlimited,
         label: t('conversationHistoryOptionUnlimited'),
       },
-      {
-        value: ChatHistory.Custom,
-        label: `${t('conversationHistoryOptionCustom')}${chatHistory === ChatHistory.Custom && historySharingQuantity ? ` (${historySharingQuantity} ${chatHistorySharingUnitOptions.find(option => option.value === historySharingUnit)?.label})` : ''}`,
-      },
     );
+  }
+
+  if (enableCustomHistory || teamState.isConferenceCallingEnabled()) {
+    chatHistoryOptions.push({
+      value: ChatHistory.Custom,
+      label: `${t('conversationHistoryOptionCustom')}${chatHistory === ChatHistory.Custom && historySharingQuantity ? ` (${historySharingQuantity} ${chatHistorySharingUnitOptions.find(option => option.value === historySharingUnit)?.label})` : ''}`,
+    });
   }
 
   return {chatHistoryOptions};
@@ -96,7 +100,7 @@ export const useChatHistoryOptions = (
 export const useConversationDetailsOption = () => {
   const {chatHistory, historySharingQuantity, historySharingUnit} = useCreateConversationModal();
   const {chatHistorySharingUnitOptions} = useChatHistorySharingUnitOptions(historySharingQuantity);
-  const {chatHistoryOptions} = useChatHistoryOptions(chatHistory, historySharingQuantity, historySharingUnit);
+  const {chatHistoryOptions} = useChatHistoryOptions(chatHistory, historySharingQuantity, historySharingUnit, true);
 
   const conversationAccessOptions = [
     {
