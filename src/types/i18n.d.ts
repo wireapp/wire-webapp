@@ -507,8 +507,6 @@ declare module 'I18n/en-US.json' {
     'conversationFileUploadFailedTooLargeFilesHeading': `Files too large`;
     'conversationFileUploadFailedTooLargeFilesMessage': `Please select files smaller than {maxSize}MB.`;
     'conversationFileUploadFailedTooLargeImagesMessage': `Please select images smaller than {maxSize}MB.`;
-    'conversationFileUploadFailedTooLargeFilesAndImagesMessage': `Please select files smaller than {maxImageSize}MB and images smaller than {maxFileSize}MB.`;
-    'conversationFileUploadOverlayTitle': `Upload files`;
     'conversationFilePreviewErrorMoreOptions': `More options`;
     'conversationFilePreviewErrorRetry': `Retry`;
     'conversationFilePreviewErrorRemove': `Remove`;
@@ -581,6 +579,10 @@ declare module 'I18n/en-US.json' {
     'conversationNotFoundTitle': `{brandName} can’t open this conversation.`;
     'conversationParticipantsSearchPlaceholder': `Search by name`;
     'conversationParticipantsTitle': `People`;
+    'conversationAccessTitle': `Access`;
+    'conversationHistoryTitle': `Conversation history`;
+    'conversationHistoryParagraph1': `You can share conversation history with new channel members. This way, they can also see older messages and files.`;
+    'conversationHistoryParagraph2': `When you set it to off, channel members won\'t see any conversation history.`;
     'conversationPdfAssetError': `Couldn’t generate preview`;
     'conversationPdfAssetRestricted': `Receiving PDFs is prohibited`;
     'conversationPing': ` pinged`;
@@ -1814,6 +1816,7 @@ declare module 'I18n/en-US.json' {
     'createConversationUpgradePlanModalText': `Upgrade to a paid plan to offer channel members the whole history.`;
     'createConversationUpgradePlanModalButton': `Upgrade now`;
     'createConversationUpgradeBadge': `Upgrade`;
+    'conversationAccessDisclaimer': `A private channel can not be changed to public.`;
   };
   export default translations;
 }
