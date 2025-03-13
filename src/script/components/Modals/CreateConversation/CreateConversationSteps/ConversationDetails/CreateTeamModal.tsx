@@ -60,7 +60,6 @@ export const CreateTeamModal = () => {
           </p>
           <Text block css={salesModalBodyTextCss}>
             {t('createConversationTeamCreationModalText')}
-            Create a team and start collaborating for free!
           </Text>
         </div>
         <Button

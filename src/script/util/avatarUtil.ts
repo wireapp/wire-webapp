@@ -58,12 +58,35 @@ const groupAvatarOptions = [
   [green, amber, purple],
 ];
 
+// The color options for the channel avatar.
+const channelAvatarColorOptions = ['blue', 'purple', 'red', 'green', 'amber', 'turquoise', 'black'];
+
+const borderIdentifier = 'border';
+const backgroundIdentifier = 'background';
+const colorIdentifier = 'color';
+
+const channelAvatarColorPalette = channelAvatarColorOptions.map(color => ({
+  background: `${color}-${backgroundIdentifier}`,
+  color: `${color}-${colorIdentifier}`,
+  border: `${color}-${borderIdentifier}`,
+}));
 /**
  *
- * @param id - unique id
+ * @param id - unique id - The ID used to generate a hash code for selecting a color.
  * @returns - array of colors for group avatar
  */
 export function getGroupAvatarColors(id = '') {
   const hash = getHashCode(id);
   return groupAvatarOptions[Math.abs(hash) % groupAvatarOptions.length];
 }
+
+/**
+ * Returns a color object from the channel avatar color palette based on the given ID.
+ *
+ * @param id - unique id - The ID used to generate a hash code for selecting a color.
+ * @returns {object} - An object containing background, color, and border properties.
+ */
+export const getChannelAvatarColors = (id = '') => {
+  const hash = getHashCode(id);
+  return channelAvatarColorPalette[Math.abs(hash) % channelAvatarColorPalette.length];
+};
