@@ -96,3 +96,19 @@
   font-weight: var(--font-weight-regular);
   white-space: normal;
 }
+
+.conversation-tabpanel {
+  &--message {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+
+  &--files {
+    overflow-y: auto;
+  }
+
+  &--hidden {
+    display: none;
+  }
+}
