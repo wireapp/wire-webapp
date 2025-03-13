@@ -17,15 +17,16 @@
  *
  */
 
+import {container} from 'tsyringe';
+
+import {TeamState} from 'src/script/team/TeamState';
 import {t} from 'Util/LocalizerUtil';
 
 import {useCreateConversationModal} from './useCreateConversationModal';
 
 import {HistorySharingUnit, ChatHistory, ConversationAccess, ConversationManager, ConversationType} from '../types';
 
-export const useConversationDetailsOption = () => {
-  const {chatHistory, historySharingQuantity, historySharingUnit} = useCreateConversationModal();
-
+export const useChatHistorySharingUnitOptions = (historySharingQuantity: number) => {
   const chatHistorySharingUnitOptions = [
     {
       value: HistorySharingUnit.Days,
@@ -50,6 +51,17 @@ export const useConversationDetailsOption = () => {
     },
   ];
 
+  return {chatHistorySharingUnitOptions};
+};
+
+export const useChatHistoryOptions = (
+  chatHistory: ChatHistory,
+  historySharingQuantity: number,
+  historySharingUnit: HistorySharingUnit,
+) => {
+  const teamState = container.resolve(TeamState);
+  const {chatHistorySharingUnitOptions} = useChatHistorySharingUnitOptions(historySharingQuantity);
+
   const chatHistoryOptions = [
     {
       value: ChatHistory.Off,
@@ -59,19 +71,32 @@ export const useConversationDetailsOption = () => {
       value: ChatHistory.OneDay,
       label: t('conversationHistoryOptionDay'),
     },
-    {
-      value: ChatHistory.OneWeek,
-      label: t('conversationHistoryOptionWeek'),
-    },
-    {
-      value: ChatHistory.Unlimited,
-      label: t('conversationHistoryOptionUnlimited'),
-    },
-    {
-      value: ChatHistory.Custom,
-      label: `${t('conversationHistoryOptionCustom')}${chatHistory === ChatHistory.Custom ? ` (${historySharingQuantity} ${chatHistorySharingUnitOptions.find(option => option.value === historySharingUnit)?.label})` : ''}`,
-    },
   ];
+
+  if (teamState.isConferenceCallingEnabled()) {
+    chatHistoryOptions.push(
+      {
+        value: ChatHistory.OneWeek,
+        label: t('conversationHistoryOptionWeek'),
+      },
+      {
+        value: ChatHistory.Unlimited,
+        label: t('conversationHistoryOptionUnlimited'),
+      },
+      {
+        value: ChatHistory.Custom,
+        label: `${t('conversationHistoryOptionCustom')}${chatHistory === ChatHistory.Custom && historySharingQuantity ? ` (${historySharingQuantity} ${chatHistorySharingUnitOptions.find(option => option.value === historySharingUnit)?.label})` : ''}`,
+      },
+    );
+  }
+
+  return {chatHistoryOptions};
+};
+
+export const useConversationDetailsOption = () => {
+  const {chatHistory, historySharingQuantity, historySharingUnit} = useCreateConversationModal();
+  const {chatHistorySharingUnitOptions} = useChatHistorySharingUnitOptions(historySharingQuantity);
+  const {chatHistoryOptions} = useChatHistoryOptions(chatHistory, historySharingQuantity, historySharingUnit);
 
   const conversationAccessOptions = [
     {

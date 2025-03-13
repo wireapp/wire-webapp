@@ -575,6 +575,10 @@
   "conversationNotFoundTitle": "{brandName} can’t open this conversation.",
   "conversationParticipantsSearchPlaceholder": "Search by name",
   "conversationParticipantsTitle": "People",
+  "conversationAccessTitle": "Access",
+  "conversationHistoryTitle": "Conversation history",
+  "conversationHistoryParagraph1": "You can share conversation history with new channel members. This way, they can also see older messages and files.",
+  "conversationHistoryParagraph2": "When you set it to off, channel members won't see any conversation history.",
   "conversationPdfAssetError": "Couldn’t generate preview",
   "conversationPdfAssetRestricted": "Receiving PDFs is prohibited",
   "conversationPing": " pinged",
@@ -1807,5 +1811,6 @@
   "createConversationUpgradePlanModalHeader": "Show older messages? ",
   "createConversationUpgradePlanModalText": "Upgrade to a paid plan to offer channel members the whole history.",
   "createConversationUpgradePlanModalButton": "Upgrade now",
-  "createConversationUpgradeBadge": "Upgrade"
+  "createConversationUpgradeBadge": "Upgrade",
+  "conversationAccessDisclaimer": "A private channel can not be changed to public."
 }
