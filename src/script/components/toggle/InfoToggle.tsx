@@ -47,9 +47,14 @@ const InfoToggle: React.FC<InfoToggleProps> = ({
   return (
     <div className={cx('info-toggle', className)}>
       <div className="info-toggle__row">
-        <label htmlFor={inputId} className="info-toggle__name">
-          {name}
-        </label>
+        <div>
+          <label htmlFor={inputId} className="heading-h3">
+            {name}
+          </label>
+          <p className="info-toggle__details" data-uie-name={dataUieNameInfoText}>
+            {info}
+          </p>
+        </div>
         <div className={cx('slider', {disabled: isDisabled})}>
           <input
             className="slider-input"
@@ -72,9 +77,6 @@ const InfoToggle: React.FC<InfoToggleProps> = ({
           </button>
         </div>
       </div>
-      <p className="info-toggle__details" data-uie-name={dataUieNameInfoText}>
-        {info}
-      </p>
     </div>
   );
 };

@@ -25,6 +25,7 @@ import {CircleCloseIcon, IconButton, Input, SearchIcon} from '@wireapp/react-ui-
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/Icon';
+import {useCreateConversationModal} from 'Components/Modals/CreateConversation/hooks/useCreateConversationModal';
 import {ConversationLabel} from 'src/script/conversation/ConversationLabelRepository';
 import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {handleEnterDown, handleEscDown} from 'Util/KeyboardUtil';
@@ -69,6 +70,7 @@ export const ConversationHeaderComponent = ({
   searchInputRef,
 }: ConversationHeaderProps) => {
   const {canCreateGroupConversation} = generatePermissionHelpers(selfUser.teamRole());
+  const {showModal} = useCreateConversationModal();
   const isFolderView = currentTab === SidebarTabs.FOLDER;
 
   const conversationsHeaderTitle: Partial<Record<SidebarTabs, string>> = {
@@ -108,7 +110,7 @@ export const ConversationHeaderComponent = ({
 
         {currentTab !== SidebarTabs.ARCHIVES && canCreateGroupConversation() && (
           <IconButton
-            onClick={() => amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, 'conversation_details')}
+            onClick={showModal}
             data-uie-name="go-create-group"
             css={button}
             title={t('conversationDetailsActionCreateGroup')}
