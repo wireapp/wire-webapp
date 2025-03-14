@@ -95,6 +95,8 @@ export * from './WireIcon';
 export * from './ShieldIcon';
 export * from './LockClosedIcon';
 export * from './ChannelIcon';
+export * from './UnlockedIcon';
+export * from './HistoryIcon';
 
 // Brand Icons
 export * from './Brand/AndroidIcon';
