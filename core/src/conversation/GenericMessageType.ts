@@ -44,4 +44,5 @@ export enum GenericMessageType {
   IN_CALL_EMOJI = 'inCallEmoji',
   IN_CALL_HAND_RAISE = 'inCallHandRaise',
   TEXT = 'text',
+  MULTIPART = 'multipart',
 }

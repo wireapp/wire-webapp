@@ -17,10 +17,9 @@
  *
  */
 
+import {GenericMessage, Text} from '@pydio/protocol-messaging';
 import {CONVERSATION_EVENT, ConversationMLSMessageAddEvent} from '@wireapp/api-client/lib/event';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-
-import {GenericMessage, Text} from '@wireapp/protocol-messaging';
 
 import {handleMLSMessageAdd} from './messageAdd';
 

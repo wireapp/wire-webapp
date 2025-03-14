@@ -17,6 +17,7 @@
  *
  */
 
+import {GenericMessage, Text} from '@pydio/protocol-messaging';
 import {AuthAPI} from '@wireapp/api-client/lib/auth';
 import {ClientAPI, ClientClassification, ClientType, RegisteredClient} from '@wireapp/api-client/lib/client';
 import {ConversationAPI} from '@wireapp/api-client/lib/conversation';
@@ -33,7 +34,6 @@ import {v4 as uuidv4} from 'uuid';
 
 import {APIClient} from '@wireapp/api-client';
 import {AccentColor, ValidationUtil} from '@wireapp/commons';
-import {GenericMessage, Text} from '@wireapp/protocol-messaging';
 
 import {Account, ConnectionState} from './Account';
 import {NotificationSource} from './notification';

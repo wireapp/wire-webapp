@@ -17,10 +17,10 @@
  *
  */
 
+import {proteus as ProtobufOTR} from '@pydio/protocol-messaging/web/otr';
 import {MessageSendingStatus, QualifiedOTRRecipients, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId, QualifiedUserPreKeyBundleMap} from '@wireapp/api-client/lib/user';
 import {uuidToBytes} from '@wireapp/commons/lib/util/StringUtil';
-import {proteus as ProtobufOTR} from '@wireapp/protocol-messaging/web/otr';
 import {AxiosError} from 'axios';
 import {deepmerge} from 'deepmerge-ts';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';

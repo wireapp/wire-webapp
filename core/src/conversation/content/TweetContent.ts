@@ -17,5 +17,5 @@
  *
  */
 
-import {ITweet} from '@wireapp/protocol-messaging';
+import {ITweet} from '@pydio/protocol-messaging';
 export {ITweet as TweetContent};

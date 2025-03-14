@@ -17,5 +17,5 @@
  *
  */
 
-import {ICleared} from '@wireapp/protocol-messaging';
+import {ICleared} from '@pydio/protocol-messaging';
 export {ICleared as ClearedContent};

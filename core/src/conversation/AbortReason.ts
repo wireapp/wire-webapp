@@ -17,6 +17,6 @@
  *
  */
 
-import {Asset} from '@wireapp/protocol-messaging';
+import {Asset} from '@pydio/protocol-messaging';
 
 export type AbortReason = Asset.NotUploaded;
