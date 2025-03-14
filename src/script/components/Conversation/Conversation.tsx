@@ -45,6 +45,7 @@ import {formatBytes} from 'Util/util';
 
 import {ConversationCells} from './ConversationCells/ConversationCells';
 import {ConversationFileDropzone} from './ConversationFileDropzone/ConversationFileDropzone';
+import {ConversationMessagesWrapper} from './ConversationMessagesWrapper/ConversationMessagesWrapper';
 import {ConversationTabs} from './ConversationTabBar/ConversationTabBar';
 import {useReadReceiptSender} from './hooks/useReadReceipt';
 import {ReadOnlyConversationMessage} from './ReadOnlyConversationMessage';
@@ -467,12 +468,12 @@ export const Conversation = ({
     [addReadReceiptToBatch, repositories.conversation, repositories.integration, updateConversationLastRead],
   );
 
-  const isCellsEnabled = Config.getConfig().FEATURE.ENABLE_CELLS;
-
   const {getRootProps, getInputProps, open, isDragAccept} = useFilesUploadDropzone({
     isTeam: inTeam,
     cellsRepository: repositories.cells,
   });
+
+  const isCellsEnabled = true;
 
   return (
     <ConversationFileDropzone
@@ -495,32 +496,27 @@ export const Conversation = ({
             openRightSidebar={openRightSidebar}
             isRightSidebarOpen={isRightSidebarOpen}
             isReadOnlyConversation={isReadOnlyConversation || isSelfUserRemoved}
-            withBottomDivider={false}
+            withBottomDivider={!isCellsEnabled}
           />
 
-          <ConversationTabs activeTabIndex={activeTabIndex} onIndexChange={setActiveTabIndex} />
+          {isCellsEnabled && (
+            <>
+              <ConversationTabs activeTabIndex={activeTabIndex} onIndexChange={setActiveTabIndex} />
+              <div
+                id="tabpanel-files"
+                role="tabpanel"
+                aria-labelledby="tab-files"
+                tabIndex={0}
+                className={cx('conversation-tabpanel conversation-tabpanel--files', {
+                  'conversation-tabpanel--hidden': activeTabIndex === 0,
+                })}
+              >
+                {activeTabIndex === 1 && <ConversationCells />}
+              </div>
+            </>
+          )}
 
-          <div
-            id="tabpanel-files"
-            role="tabpanel"
-            aria-labelledby="tab-files"
-            tabIndex={0}
-            className={cx('conversation-tabpanel conversation-tabpanel--files', {
-              'conversation-tabpanel--hidden': activeTabIndex === 0,
-            })}
-          >
-            <ConversationCells />
-          </div>
-
-          <div
-            id="tabpanel-conversation"
-            role="tabpanel"
-            aria-labelledby="tab-conversation"
-            tabIndex={0}
-            className={cx('conversation-tabpanel conversation-tabpanel--message', {
-              'conversation-tabpanel--hidden': activeTabIndex === 1,
-            })}
-          >
+          <ConversationMessagesWrapper isCellsEnabled={isCellsEnabled} isPanelHidden={activeTabIndex === 1}>
             {activeCalls.map(call => {
               const {conversation} = call;
               const callingViewModel = mainViewModel.calling;
@@ -593,7 +589,7 @@ export const Conversation = ({
             <div className="conversation-loading">
               <div className="icon-spinner spin accent-text"></div>
             </div>
-          </div>
+          </ConversationMessagesWrapper>
         </>
       )}
 

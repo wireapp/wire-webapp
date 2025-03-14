@@ -22,7 +22,7 @@ import {CSSObject} from '@emotion/react';
 export const wrapperStyles: CSSObject = {
   display: 'none',
 
-  '@media (min-width: 900px)': {
+  '@media (min-width: 1100px)': {
     display: 'flex',
     alignItems: 'center',
     gap: '32px',
@@ -51,8 +51,15 @@ export const playIconStyles: CSSObject = {
   fill: 'var(--white)',
 };
 
-export const mobileName: CSSObject = {
-  '@media (min-width: 900px)': {
+export const desktopNameStyles: CSSObject = {
+  textOverflow: 'ellipsis',
+  overflow: 'hidden',
+  maxWidth: '300px',
+  whiteSpace: 'nowrap',
+};
+
+export const mobileNameStyles: CSSObject = {
+  '@media (min-width: 1100px)': {
     display: 'none',
   },
 };
