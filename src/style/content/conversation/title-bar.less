@@ -26,11 +26,15 @@
   position: relative;
   width: 100%;
   height: var(--content-title-bar-height);
+  flex-shrink: 0;
   padding: 0 8px;
-  border-bottom: 1px solid var(--border-color);
   margin: 0;
   background-color: var(--app-bg);
   list-style-type: none;
+
+  &--with-bottom-divider {
+    border-bottom: 1px solid var(--border-color);
+  }
 }
 
 .conversation-title-bar-name {
