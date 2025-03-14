@@ -41,6 +41,11 @@
       fill: var(--black);
     }
 
+    &--shrinked {
+      min-width: auto;
+      border-right: none;
+    }
+
     .team-mode & {
       width: calc(var(--conversation-list-width) + var(--teams-width));
     }
@@ -50,6 +55,7 @@
     position: relative;
     min-width: var(--screen-sm-min);
     flex: 1 1 auto;
+    overflow-y: auto;
 
     &__overlay {
       position: absolute;
@@ -111,11 +117,13 @@
     top: 64px;
   }
 
-  @media (max-width: 720px) {
-    .left-column,
-    .conversations,
-    .conversations-wrapper {
-      width: 100%;
+  &--hide-main-content-on-mobile {
+    @media (max-width: 720px) {
+      .left-column,
+      .conversations,
+      .conversations-wrapper {
+        width: 100%;
+      }
     }
   }
 }

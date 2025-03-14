@@ -190,7 +190,11 @@ export class ListViewModel {
 
     // don't switch view for primary modal(ex: preferences->set status->modal opened)
     // when user press escape, only close the modal and stay within the preference screen
-    if (isEscapeKey(keyboardEvent) && currentModalId === null && currentTab !== SidebarTabs.PREFERENCES) {
+    if (
+      isEscapeKey(keyboardEvent) &&
+      currentModalId === null &&
+      ![SidebarTabs.PREFERENCES, SidebarTabs.CELLS].includes(currentTab)
+    ) {
       const newState = this.isActivatedAccount() ? ListState.CONVERSATIONS : ListState.TEMPORARY_GUEST;
       this.switchList(newState);
     }

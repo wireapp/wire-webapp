@@ -33,7 +33,12 @@ export class CellsRepository {
     const uuid = createUuid();
     const versionId = createUuid();
 
-    await this.apiClient.api.cells.uploadFileDraft({path, file, uuid, versionId});
+    await this.apiClient.api.cells.uploadFileDraft({
+      path,
+      file,
+      uuid,
+      versionId,
+    });
 
     return {
       uuid,
@@ -43,5 +48,29 @@ export class CellsRepository {
 
   async deleteFileDraft({uuid, versionId}: {uuid: string; versionId: string}) {
     return this.apiClient.api.cells.deleteFileDraft({uuid, versionId});
+  }
+
+  async deleteFile({uuid}: {uuid: string}) {
+    return this.apiClient.api.cells.deleteFile({uuid});
+  }
+
+  async getAllFiles() {
+    return this.apiClient.api.cells.getAllFiles({path: this.basePath});
+  }
+
+  async getPublicLink({uuid, label}: {uuid: string; label: string}) {
+    return this.apiClient.api.cells.getFilePublicLink({
+      uuid,
+      label,
+      alreadyShared: false,
+    });
+  }
+
+  async deletePublicLink({uuid}: {uuid: string}) {
+    return this.apiClient.api.cells.deleteFilePublicLink({uuid});
+  }
+
+  async searchFiles({query}: {query: string}) {
+    return this.apiClient.api.cells.searchFiles({phrase: query});
   }
 }
