@@ -17,5 +17,5 @@
  *
  */
 
-import {IKnock} from '@wireapp/protocol-messaging';
+import {IKnock} from '@pydio/protocol-messaging';
 export {IKnock as KnockContent};

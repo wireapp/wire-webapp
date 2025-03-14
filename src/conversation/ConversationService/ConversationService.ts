@@ -17,6 +17,7 @@
  *
  */
 
+import {GenericMessage} from '@pydio/protocol-messaging';
 import {
   Conversation,
   DefaultConversationRoleName,
@@ -47,7 +48,6 @@ import {Decoder} from 'bazinga64';
 
 import {APIClient} from '@wireapp/api-client';
 import {LogFactory, TypedEventEmitter} from '@wireapp/commons';
-import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {
   AddUsersFailure,

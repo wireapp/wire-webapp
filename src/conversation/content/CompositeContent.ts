@@ -17,5 +17,5 @@
  *
  */
 
-import {IComposite} from '@wireapp/protocol-messaging';
+import {IComposite} from '@pydio/protocol-messaging';
 export {IComposite as CompositeContent};

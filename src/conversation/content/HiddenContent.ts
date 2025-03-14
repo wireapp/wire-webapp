@@ -17,5 +17,5 @@
  *
  */
 
-import {IMessageHide} from '@wireapp/protocol-messaging';
+import {IMessageHide} from '@pydio/protocol-messaging';
 export {IMessageHide as HiddenContent};

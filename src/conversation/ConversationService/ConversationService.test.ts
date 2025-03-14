@@ -17,6 +17,7 @@
  *
  */
 
+import {GenericMessage} from '@pydio/protocol-messaging';
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client';
 import {
   Conversation,
@@ -35,7 +36,6 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {APIClient} from '@wireapp/api-client';
-import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {AddUsersFailure, AddUsersFailureReasons, ConversationService, MessageSendingState} from '..';
 import {MLSService} from '../../messagingProtocols/mls';

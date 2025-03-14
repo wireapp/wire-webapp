@@ -36,7 +36,7 @@ import {SendProteusMessageParams} from './ProteusService.types';
 import {buildProteusService} from './ProteusService.mocks';
 import {constructSessionId} from '../Utility/SessionHandler';
 import {CONVERSATION_EVENT, ConversationOtrMessageAddEvent} from '@wireapp/api-client/lib/event';
-import {GenericMessage} from '@wireapp/protocol-messaging';
+import {GenericMessage} from '@pydio/protocol-messaging';
 import {ProteusService} from './ProteusService';
 import {NonFederatingBackendsError} from '../../../errors';
 import {generateQualifiedId, generateQualifiedIds} from '../../../testUtils';

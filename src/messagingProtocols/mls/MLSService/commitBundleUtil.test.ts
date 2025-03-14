@@ -17,7 +17,7 @@
  *
  */
 
-import {mls} from '@wireapp/protocol-messaging/web/mls';
+import {mls} from '@pydio/protocol-messaging/web/mls';
 import {Encoder} from 'bazinga64';
 
 import {CommitBundle, RatchetTreeType, GroupInfoEncryptionType} from '@wireapp/core-crypto';

@@ -17,5 +17,5 @@
  *
  */
 
-import {IConfirmation} from '@wireapp/protocol-messaging';
+import {IConfirmation} from '@pydio/protocol-messaging';
 export {IConfirmation as ConfirmationContent};

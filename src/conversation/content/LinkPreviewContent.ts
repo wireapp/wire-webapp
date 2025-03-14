@@ -17,7 +17,7 @@
  *
  */
 
-import {ILinkPreview} from '@wireapp/protocol-messaging';
+import {ILinkPreview} from '@pydio/protocol-messaging';
 
 import {ImageAssetContent, ImageContent, LegalHoldStatus} from '.';
 

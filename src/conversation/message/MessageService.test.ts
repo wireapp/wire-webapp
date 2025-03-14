@@ -17,6 +17,7 @@
  *
  */
 
+import {GenericMessage, Text} from '@pydio/protocol-messaging';
 import {
   MessageSendingStatus,
   OTRRecipients,
@@ -27,7 +28,6 @@ import {StatusCodes} from 'http-status-codes';
 import {v4 as uuidv4} from 'uuid';
 
 import {APIClient} from '@wireapp/api-client';
-import {GenericMessage, Text} from '@wireapp/protocol-messaging';
 
 import {MessageService} from './MessageService';
 

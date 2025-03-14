@@ -26,7 +26,7 @@ import {WebSocketClient} from '@wireapp/api-client/lib/tcp/';
 import {ClientType} from '@wireapp/api-client/lib/client/ClientType';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {CONVERSATION_TYPING} from '@wireapp/api-client/lib/conversation/data/';
-import {LegalHoldStatus, Confirmation} from '@wireapp/protocol-messaging';
+import {LegalHoldStatus, Confirmation} from '@pydio/protocol-messaging';
 import {AssetContent} from '../main/conversation/content/AssetContent';
 import {LinkPreviewUploadedContent} from '../main/conversation/content';
 import {MessageBuilder} from '../main/conversation/message/MessageBuilder';

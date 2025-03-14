@@ -17,5 +17,5 @@
  *
  */
 
-import {IButtonAction} from '@wireapp/protocol-messaging';
+import {IButtonAction} from '@pydio/protocol-messaging';
 export {IButtonAction as ButtonActionContent};
