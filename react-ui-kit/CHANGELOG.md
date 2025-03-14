@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.42.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.41.0...@wireapp/react-ui-kit@9.42.0) (2025-03-14)
+
+### Features
+
+* update group icon and  add conversation related icons ([#6982](https://github.com/wireapp/wire-web-packages/issues/6982)) ([69c9646](https://github.com/wireapp/wire-web-packages/commit/69c9646f7b13c449068adbf6b14633336e5730a3))
+
 # [9.41.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.40.1...@wireapp/react-ui-kit@9.41.0) (2025-03-12)
 
 ### Features
