@@ -511,7 +511,7 @@ export const Conversation = ({
                   'conversation-tabpanel--hidden': activeTabIndex === 0,
                 })}
               >
-                {activeTabIndex === 1 && <ConversationCells />}
+                {activeTabIndex === 1 && <ConversationCells conversationId={activeConversation.id} />}
               </div>
             </>
           )}

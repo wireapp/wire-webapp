@@ -20,6 +20,7 @@
 import {useEffect, useCallback} from 'react';
 
 import {CellsRepository} from 'src/script/cells/CellsRepository';
+import {Config} from 'src/script/Config';
 
 import {transformNodesToCellsFiles} from './transformNodesToCellsFiles';
 
@@ -27,16 +28,19 @@ import {useCellsStore} from '../common/useCellsStore/useCellsStore';
 
 interface UseGetAllCellsFilesProps {
   cellsRepository: CellsRepository;
+  conversationId: string;
 }
 
-export const useGetAllCellsFiles = ({cellsRepository}: UseGetAllCellsFilesProps) => {
+export const useGetAllCellsFiles = ({cellsRepository, conversationId}: UseGetAllCellsFilesProps) => {
   const {setFiles, setStatus, setError} = useCellsStore();
 
   const fetchFiles = useCallback(async () => {
     try {
       setStatus('loading');
 
-      const result = await cellsRepository.searchFiles({query: '*'});
+      const result = await cellsRepository.getAllFiles({
+        path: `${conversationId}@${Config.getConfig().CELLS_WIRE_DOMAIN}`,
+      });
 
       if (!result.Nodes) {
         throw new Error('No files found');

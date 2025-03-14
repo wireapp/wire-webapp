@@ -35,11 +35,15 @@ import {useGetAllCellsFiles} from './useGetAllCellsFiles/useGetAllCellsFiles';
 
 interface ConversationCellsProps {
   cellsRepository?: CellsRepository;
+  conversationId: string;
 }
 
-export const ConversationCells = ({cellsRepository = container.resolve(CellsRepository)}: ConversationCellsProps) => {
+export const ConversationCells = ({
+  cellsRepository = container.resolve(CellsRepository),
+  conversationId,
+}: ConversationCellsProps) => {
   const {files, status: filesStatus, clearAll, removeFile} = useCellsStore();
-  const {refresh} = useGetAllCellsFiles({cellsRepository});
+  const {refresh} = useGetAllCellsFiles({cellsRepository, conversationId});
 
   const deleteFileFailedNotification = useAppNotification({
     message: t('cellsGlobalView.deleteModalError'),
