@@ -17,7 +17,7 @@
  *
  */
 
-import {proteus as ProtobufOTR} from '@wireapp/protocol-messaging/web/otr';
+import {proteus as ProtobufOTR} from '@pydio/protocol-messaging/web/otr';
 import {AxiosRequestConfig} from 'axios';
 
 import {MessageSendingStatus} from '../conversation/';
