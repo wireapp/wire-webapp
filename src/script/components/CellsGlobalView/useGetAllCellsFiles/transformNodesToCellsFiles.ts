@@ -19,6 +19,7 @@
 
 import {RestNode} from 'cells-sdk-ts';
 
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {formatBytes} from 'Util/util';
 
 import {CellFile} from '../common/cellFile/cellFile';
@@ -53,8 +54,7 @@ const getPreviewImageUrl = (node: RestNode): string | undefined => {
 };
 
 const getUploadedAtTimestamp = (node: RestNode): number => {
-  const millisecondsInSecond = 1000;
-  return (node.Modified as unknown as number) * millisecondsInSecond;
+  return (node.Modified as unknown as number) * TIME_IN_MILLIS.SECOND;
 };
 
 const getFileSize = (node: RestNode): string => {
