@@ -70,7 +70,7 @@ export class CellsRepository {
     return this.apiClient.api.cells.deleteFilePublicLink({uuid});
   }
 
-  async searchFiles({query, path}: {query: string; path: string}) {
-    return this.apiClient.api.cells.searchFiles({phrase: query, path});
+  async searchFiles({query}: {query: string}) {
+    return this.apiClient.api.cells.searchFiles({phrase: query});
   }
 }
