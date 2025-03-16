@@ -21,7 +21,7 @@
     "@wireapp/telemetry": "0.3.1",
     "@wireapp/webapp-events": "0.28.0",
     "amplify": "https://github.com/wireapp/amplify#head=master",
-    "beautiful-react-hooks": "5.0.2",
+    "beautiful-react-hooks": "5.0.3",
     "classnames": "2.5.1",
     "copy-webpack-plugin": "13.0.0",
     "core-js": "3.41.0",
