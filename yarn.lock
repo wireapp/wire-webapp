@@ -8589,18 +8589,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"beautiful-react-hooks@npm:5.0.2":
-  version: 5.0.2
-  resolution: "beautiful-react-hooks@npm:5.0.2"
+"beautiful-react-hooks@npm:5.0.3":
+  version: 5.0.3
+  resolution: "beautiful-react-hooks@npm:5.0.3"
   dependencies:
     lodash.debounce: "npm:^4.0.8"
     lodash.throttle: "npm:^4.1.1"
   peerDependencies:
-    react: ^18.2.0
-    react-dom: ^18.2.0
+    react: ">=18.2.0 <20.0.0"
+    react-dom: ">=18.2.0 <20.0.0"
     react-router-dom: ">=5.0.0"
     rxjs: ">=7.0.0"
-  checksum: 10/0d4a37642aa4886b39ef669d3ea91307dbb7b2ff864f28e3b12b085226319f6013e8b83cfc35f7022292095e139c3adea908e6f35d44551ec3e9394bc9e061f5
+  checksum: 10/ec77fa1f205ac2fd0e7eab69a86324d26818a5cc3d4f5810d26204dc47a3d9238a747a23a09fe96194496fc94e4802d113da00ac7e78105d149c0922e71c2532
   languageName: node
   linkType: hard
 
@@ -20697,7 +20697,7 @@ __metadata:
     autoprefixer: "npm:10.4.21"
     babel-loader: "npm:10.0.0"
     babel-plugin-transform-import-meta: "npm:2.3.2"
-    beautiful-react-hooks: "npm:5.0.2"
+    beautiful-react-hooks: "npm:5.0.3"
     classnames: "npm:2.5.1"
     copy-webpack-plugin: "npm:13.0.0"
     core-js: "npm:3.41.0"
