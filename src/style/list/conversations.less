@@ -64,6 +64,15 @@
         height: 16px;
       }
 
+      .conversations-sidebar-btn[data-uie-name='go-groups-view'] svg {
+        width: 20px;
+        height: 20px;
+      }
+
+      .conversations-sidebar-btn span {
+        justify-content: center;
+      }
+
       .conversations-sidebar-btn .folder-icon {
         display: flex;
         align-items: center;
@@ -306,9 +315,14 @@
 
 .conversations-sidebar-btn {
   svg {
-    width: 14px;
+    width: 18px;
     height: 14px;
     flex-shrink: 0;
+  }
+
+  &[data-uie-name='go-groups-view'] svg {
+    width: 18px;
+    height: 18px;
   }
 
   svg.folders-open-indicator {
