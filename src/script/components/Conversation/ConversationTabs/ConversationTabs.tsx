@@ -19,8 +19,6 @@
 
 import {useCallback, KeyboardEvent} from 'react';
 
-import {wrapperStyles, tabListStyles, tabButtonFocusStyles, tabButtonStyles} from './ConversationTabBar.styles';
-
 interface ConversationTabsProps {
   activeTabIndex: number;
   onIndexChange: (index: number) => void;
@@ -58,8 +56,8 @@ export const ConversationTabs = ({activeTabIndex, onIndexChange}: ConversationTa
   );
 
   return (
-    <div css={wrapperStyles}>
-      <div role="tablist" aria-label="Conversation tabs" css={tabListStyles}>
+    <div className="conversation-tabs">
+      <div className="conversation-tabs__list" role="tablist" aria-label="Conversation tabs">
         <ConversationTab
           id="conversation"
           label="Conversation"
@@ -90,15 +88,14 @@ interface ConversationTabProps {
 const ConversationTab = ({id, label, isActive, onClick, onKeyDown}: ConversationTabProps) => {
   return (
     <button
-      id={`tab-${id}`}
+      id={`conversation-tab-${id}`}
       role="tab"
       aria-selected={isActive}
-      aria-controls={`tabpanel-${id}`}
+      aria-controls={`conversation-tabpanel-${id}`}
       tabIndex={isActive ? 0 : -1}
       onClick={onClick}
       onKeyDown={onKeyDown}
-      css={[tabButtonStyles(isActive), tabButtonFocusStyles]}
-      className={isActive ? 'active' : ''}
+      className="conversation-tabs__button"
     >
       {label}
     </button>

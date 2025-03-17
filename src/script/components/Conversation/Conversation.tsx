@@ -19,7 +19,6 @@
 
 import {UIEvent, useCallback, useEffect, useState} from 'react';
 
-import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import {useMatchMedia} from '@wireapp/react-ui-kit';
@@ -46,7 +45,8 @@ import {formatBytes} from 'Util/util';
 import {ConversationCells} from './ConversationCells/ConversationCells';
 import {ConversationFileDropzone} from './ConversationFileDropzone/ConversationFileDropzone';
 import {ConversationMessagesWrapper} from './ConversationMessagesWrapper/ConversationMessagesWrapper';
-import {ConversationTabs} from './ConversationTabBar/ConversationTabBar';
+import {ConversationTabPanel} from './ConversationTabPanel/ConversationTabPanel';
+import {ConversationTabs} from './ConversationTabs/ConversationTabs';
 import {useReadReceiptSender} from './hooks/useReadReceipt';
 import {ReadOnlyConversationMessage} from './ReadOnlyConversationMessage';
 import {useFilesUploadDropzone} from './useFilesUploadDropzone/useFilesUploadDropzone';
@@ -502,17 +502,9 @@ export const Conversation = ({
           {isCellsEnabled && (
             <>
               <ConversationTabs activeTabIndex={activeTabIndex} onIndexChange={setActiveTabIndex} />
-              <div
-                id="tabpanel-files"
-                role="tabpanel"
-                aria-labelledby="tab-files"
-                tabIndex={0}
-                className={cx('conversation-tabpanel conversation-tabpanel--files', {
-                  'conversation-tabpanel--hidden': activeTabIndex === 0,
-                })}
-              >
+              <ConversationTabPanel id="files" isActive={activeTabIndex === 1}>
                 {activeTabIndex === 1 && <ConversationCells conversationId={activeConversation.id} />}
-              </div>
+              </ConversationTabPanel>
             </>
           )}
 

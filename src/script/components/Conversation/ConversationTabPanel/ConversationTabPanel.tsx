@@ -19,26 +19,26 @@
 
 import {ReactNode} from 'react';
 
-import {ConversationTabPanel} from '../ConversationTabPanel/ConversationTabPanel';
+import cx from 'classnames';
 
-interface ConversationMessagesWrapperProps {
-  isCellsEnabled: boolean;
-  isPanelHidden: boolean;
+interface ConversationTabPanelProps {
+  id: string;
+  isActive: boolean;
   children: ReactNode;
 }
 
-export const ConversationMessagesWrapper = ({
-  children,
-  isCellsEnabled,
-  isPanelHidden,
-}: ConversationMessagesWrapperProps) => {
-  if (!isCellsEnabled) {
-    return <>{children}</>;
-  }
-
+export const ConversationTabPanel = ({id, isActive, children}: ConversationTabPanelProps) => {
   return (
-    <ConversationTabPanel id="messages" isActive={!isPanelHidden}>
+    <div
+      id={`conversation-tabpanel-${id}`}
+      role="tabpanel"
+      aria-labelledby={`conversation-tab-${id}`}
+      tabIndex={0}
+      className={cx(`conversation-tabpanel conversation-tabpanel--${id}`, {
+        'conversation-tabpanel--hidden': !isActive,
+      })}
+    >
       {children}
-    </ConversationTabPanel>
+    </div>
   );
 };
