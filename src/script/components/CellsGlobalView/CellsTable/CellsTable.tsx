@@ -28,7 +28,14 @@ import {downloadFile} from 'Util/util';
 
 import {showCellsImagePreviewModal} from './CellsImagePreviewModal/CellsImagePreviewModal';
 import {showShareFileModal} from './CellsShareFileModal/CellsShareFileModal';
-import {headerCellStyles, tableCellRow, tableCellStyles, tableStyles, wrapperStyles} from './CellsTable.styles';
+import {
+  headerCellStyles,
+  tableActionsCellStyles,
+  tableCellRow,
+  tableCellStyles,
+  tableStyles,
+  wrapperStyles,
+} from './CellsTable.styles';
 import {CellsTableDateColumn} from './CellsTableDateColumn/CellsTableDateColumn';
 import {CellsTableNameColumn} from './CellsTableNameColumn/CellsTableNameColumn';
 import {CellsTableRowOptions} from './CellsTableRowOptions/CellsTableRowOptions';
@@ -139,7 +146,11 @@ export const CellsTable = ({files, cellsRepository, onDeleteFile}: CellsTablePro
             {rows.map(row => (
               <tr key={row.id} css={tableCellRow}>
                 {row.getVisibleCells().map(cell => (
-                  <td key={cell.id} css={tableCellStyles} data-cell={cell.column.columnDef.header}>
+                  <td
+                    key={cell.id}
+                    css={cell.column.id === 'id' ? tableActionsCellStyles : tableCellStyles}
+                    data-cell={cell.column.columnDef.header}
+                  >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}

@@ -50,6 +50,15 @@ export const tableCellStyles: CSSObject = {
 
   '@media (max-width: 900px)': {
     display: 'block',
+    padding: '12px 0',
+    borderBottom: '1px solid var(--border-color)',
+
+    '&[data-cell]': {
+      borderBottom: '1px solid var(--border-color)',
+      '&:nth-last-of-type(2)': {
+        borderBottom: 'none',
+      },
+    },
 
     '&[data-cell]:before': {
       content: 'attr(data-cell) ": "',
@@ -58,10 +67,31 @@ export const tableCellStyles: CSSObject = {
   },
 };
 
+export const tableActionsCellStyles: CSSObject = {
+  ...tableCellStyles,
+  '@media (max-width: 900px)': {
+    display: 'block',
+    background: 'var(--foreground-fade-8)',
+    border: 'none',
+    marginTop: '8px',
+    borderRadius: '8px',
+  },
+};
+
 export const tableCellRow: CSSObject = {
   display: 'block',
-  marginBottom: '32px',
+  border: '1px solid var(--border-color)',
+  padding: '8px 12px',
+  borderRadius: '8px',
+
+  '&:not(:last-of-type)': {
+    marginBottom: '32px',
+  },
+
   '@media (min-width: 900px)': {
     display: 'table-row',
+    padding: '0',
+    border: 'none',
+    borderRadius: '0',
   },
 };

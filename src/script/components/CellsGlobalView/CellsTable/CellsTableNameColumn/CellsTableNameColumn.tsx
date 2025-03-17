@@ -23,9 +23,10 @@ import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileType
 import {getFileExtension} from 'Util/util';
 
 import {
+  desktopNameStyles,
   imagePreviewStyles,
   imagePreviewWrapperStyles,
-  mobileName,
+  mobileNameStyles,
   playIconStyles,
   wrapperStyles,
 } from './CellsTableNameColumn.styles';
@@ -44,7 +45,7 @@ export const CellsTableNameColumn = ({name, previewUrl, mimeType}: CellsTableNam
 
   return (
     <>
-      <span css={mobileName}>{name}</span>
+      <span css={mobileNameStyles}>{name}</span>
       <div css={wrapperStyles}>
         {shouldDisplayImagePreview ? (
           <div css={imagePreviewWrapperStyles}>
@@ -54,7 +55,7 @@ export const CellsTableNameColumn = ({name, previewUrl, mimeType}: CellsTableNam
         ) : (
           <FileTypeIcon extension={getFileExtension(name)} size={24} />
         )}
-        <span>{name}</span>
+        <span css={desktopNameStyles}>{name}</span>
       </div>
     </>
   );

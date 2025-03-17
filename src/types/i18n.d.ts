@@ -382,7 +382,8 @@ declare module 'I18n/en-US.json' {
     'cellsGlobalView.tableRowConversationName': `Conversation Name`;
     'cellsGlobalView.tableRowOwner': `Owner`;
     'cellsGlobalView.tableRowSize': `Size`;
-    'cellsGlobalView.tableRowCreated': `Created`;
+    'cellsGlobalView.tableRowCreated': `Upload date`;
+    'cellsGlobalView.tableRowShared': `Shared`;
     'cellsGlobalView.tableRowActions': `Actions`;
     'cellsGlobalView.shareFileModalHeading': `Share file via link`;
     'cellsGlobalView.shareFileModalEnablePublicLink': `Enable public link`;
