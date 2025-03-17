@@ -125,7 +125,7 @@ export const ConversationTabs = ({
       type: SidebarTabs.GROUPS,
       title: t('conversationLabelGroups'),
       dataUieName: 'go-groups-view',
-      Icon: <GroupIcon />,
+      Icon: <GroupIcon height={20} width={20} />,
       unreadConversations: groupConversations.filter(filterUnreadAndArchivedConversations).length,
     },
     {
