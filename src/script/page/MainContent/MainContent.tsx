@@ -23,6 +23,7 @@ import cx from 'classnames';
 import {CSSTransition, SwitchTransition} from 'react-transition-group';
 import {container} from 'tsyringe';
 
+import {CellsGlobalView} from 'Components/CellsGlobalView/CellsGlobalView';
 import {ConnectRequests} from 'Components/ConnectRequests';
 import {Conversation} from 'Components/Conversation';
 import {HistoryExport} from 'Components/HistoryExport';
@@ -257,6 +258,8 @@ const MainContent: FC<MainContentProps> = ({
                 switchContent={switchContent}
               />
             )}
+
+            {contentState === ContentState.CELLS && <CellsGlobalView />}
           </>
         </Animated>
       </SwitchTransition>

@@ -5491,6 +5491,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@pydio/protocol-messaging@npm:1.51.0":
+  version: 1.51.0
+  resolution: "@pydio/protocol-messaging@npm:1.51.0"
+  dependencies:
+    long: "npm:5.2.0"
+    protobufjs: "npm:7.2.5"
+    protobufjs-cli: "npm:1.1.2"
+    typescript: "npm:4.8.4"
+  checksum: 10/91177fc8f6cbe2069c7832277a2c4cb96217c976495a2e4d70a0c355f9fde8a598e0587c0631a5bb8f5cc5158bae7b3c625691835a1b3e9bf0947c8bfde2f0d7
+  languageName: node
+  linkType: hard
+
 "@remix-run/router@npm:1.21.0":
   version: 1.21.0
   resolution: "@remix-run/router@npm:1.21.0"
@@ -6329,7 +6341,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tanstack/react-virtual@npm:^3.13.4":
+"@tanstack/react-table@npm:8.21.2":
+  version: 8.21.2
+  resolution: "@tanstack/react-table@npm:8.21.2"
+  dependencies:
+    "@tanstack/table-core": "npm:8.21.2"
+  peerDependencies:
+    react: ">=16.8"
+    react-dom: ">=16.8"
+  checksum: 10/62b944b79f0ac06b74921c1da4821a4f122f7b30e2bd3391b5eac2d15a8050f3ac7752282354520ec42a3fa382580ac88e28731121ad445bb65218614ab21fd1
+  languageName: node
+  linkType: hard
+
+"@tanstack/react-virtual@npm:3.13.4":
   version: 3.13.4
   resolution: "@tanstack/react-virtual@npm:3.13.4"
   dependencies:
@@ -6338,6 +6362,13 @@ __metadata:
     react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
     react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
   checksum: 10/bc32f7c30436133f0eae7c8560a22ded071972fe5baa19adde5a43921631f82707b9f2dcbb2d79882d34e163e73151980547d33970a46b1e26a2c0a3cfa0d6fd
+  languageName: node
+  linkType: hard
+
+"@tanstack/table-core@npm:8.21.2":
+  version: 8.21.2
+  resolution: "@tanstack/table-core@npm:8.21.2"
+  checksum: 10/6a435905fcfa2ac0d06963f14125f313a08086cb0c71949d60fbd04c3a5e229779f94ff6783e35cf09f77fddfbe987cfdd74b18577ac7476b5a43729f3e4b9d5
   languageName: node
   linkType: hard
 
@@ -7419,17 +7450,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^27.23.0":
-  version: 27.23.0
-  resolution: "@wireapp/api-client@npm:27.23.0"
+"@wireapp/api-client@npm:^27.24.0":
+  version: 27.26.0
+  resolution: "@wireapp/api-client@npm:27.26.0"
   dependencies:
     "@aws-sdk/client-s3": "npm:3.750.0"
+    "@pydio/protocol-messaging": "npm:1.51.0"
     "@wireapp/commons": "npm:^5.4.2"
     "@wireapp/priority-queue": "npm:^2.1.11"
-    "@wireapp/protocol-messaging": "npm:1.51.0"
     axios: "npm:1.7.9"
     axios-retry: "npm:4.5.0"
-    cells-sdk-ts: "https://github.com/pydio/cells-sdk-ts#v0.1.1-alpha06"
+    cells-sdk-ts: "https://github.com/pydio/cells-sdk-ts#v0.1.1-alpha07"
     http-status-codes: "npm:2.3.0"
     logdown: "npm:3.3.1"
     pako: "npm:2.1.0"
@@ -7439,7 +7470,7 @@ __metadata:
     uuid: "npm:11.1.0"
     ws: "npm:8.18.1"
     zod: "npm:3.24.2"
-  checksum: 10/77b93e27f9dfc0a14c56b6899647c854bfbe78ef7f886cb46262fb81cf6f038b499c5f57861b74f3578110087fdf86a6767ae40cfc5e657e685649b893151d95
+  checksum: 10/4d2cc9336305306bb3412da9cdc7bc49b8def448662567bc737fb116bfae3e62dbb539e78dd95a31d6f76f1b24e284beb9079358066e65093f1dbf37a7276cc2
   languageName: node
   linkType: hard
 
@@ -7504,11 +7535,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:46.19.10":
-  version: 46.19.10
-  resolution: "@wireapp/core@npm:46.19.10"
+"@wireapp/core@npm:46.19.11":
+  version: 46.19.11
+  resolution: "@wireapp/core@npm:46.19.11"
   dependencies:
-    "@wireapp/api-client": "npm:^27.23.0"
+    "@wireapp/api-client": "npm:^27.24.0"
     "@wireapp/commons": "npm:^5.4.2"
     "@wireapp/core-crypto": "npm:3.1.0"
     "@wireapp/cryptobox": "npm:12.8.0"
@@ -7526,7 +7557,7 @@ __metadata:
     long: "npm:^5.2.0"
     uuid: "npm:9.0.1"
     zod: "npm:3.24.2"
-  checksum: 10/cffb7dfbdfd68c018a5de5f86fd7dfecb68f734342836b63a1233e5492c014c59849c1c8458def47de64894922657b37c27afe13de343f2d24ab64e411e5cc6a
+  checksum: 10/ed8cbaff01304b9cb1b075e05fcffa3fd92a1e7a36bb4657f485dcdf2cb48c07bac960d9540c454a9fd2f36d130a96837bd58ad319fdc4d154a5cb485a8b113d
   languageName: node
   linkType: hard
 
@@ -8986,12 +9017,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cells-sdk-ts@https://github.com/pydio/cells-sdk-ts#v0.1.1-alpha06":
+"cells-sdk-ts@https://github.com/pydio/cells-sdk-ts#v0.1.1-alpha07":
   version: 0.1.0
-  resolution: "cells-sdk-ts@https://github.com/pydio/cells-sdk-ts.git#commit=25b77634d26e00c19883bab5ed51a19ee7657594"
+  resolution: "cells-sdk-ts@https://github.com/pydio/cells-sdk-ts.git#commit=689ae7e4e0d48eec2eaf945bf3fc1875f6e0458d"
   dependencies:
     axios: "npm:^1.6.0"
-  checksum: 10/b2a430d95d55e8577e4debaa32568c3077c6ffdc794cc839a4992bf56e97a79dbcae7d609ec63b59be88f094f86e128b0a1e0fa96d82bb7fc4a782b99fbec9f0
+  checksum: 10/bf4c7aa7a11344768c3e4d88d4af15accbc02a24edad71ee626d6125ff1a1aea26d596021e1a98498543a829e20436962038019741c10e5756dbc9a09a4c8c95
   languageName: node
   linkType: hard
 
@@ -20678,7 +20709,8 @@ __metadata:
     "@lexical/rich-text": "npm:0.27.2"
     "@mediapipe/tasks-vision": "npm:0.10.21"
     "@roamhq/wrtc": "npm:0.8.0"
-    "@tanstack/react-virtual": "npm:^3.13.4"
+    "@tanstack/react-table": "npm:8.21.2"
+    "@tanstack/react-virtual": "npm:3.13.4"
     "@testing-library/dom": "npm:^10.4.0"
     "@testing-library/jest-dom": "npm:^6.6.3"
     "@testing-library/react": "npm:16.2.0"
@@ -20712,7 +20744,7 @@ __metadata:
     "@wireapp/avs-debugger": "npm:0.0.7"
     "@wireapp/commons": "npm:5.4.2"
     "@wireapp/copy-config": "npm:2.3.0"
-    "@wireapp/core": "npm:46.19.10"
+    "@wireapp/core": "npm:46.19.11"
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/prettier-config": "npm:0.6.4"
     "@wireapp/react-ui-kit": "npm:9.42.0"
