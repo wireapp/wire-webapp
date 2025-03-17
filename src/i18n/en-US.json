@@ -355,7 +355,7 @@
   "callingRestrictedConferenceCallTeamMemberModalTitle": "Feature unavailable",
   "cameraStatusOff": "off",
   "cameraStatusOn": "on",
-   "cellsGlobalView.heading": "All Files",
+  "cellsGlobalView.heading": "All Files",
   "cellsGlobalView.emptySearchResultsHeading": "No matching files found",
   "cellsGlobalView.emptySearchResultsDescription": "Try adjusting your search or check for typos.",
   "cellsGlobalView.errorHeading": "Something went wrong",
