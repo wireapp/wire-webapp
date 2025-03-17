@@ -323,6 +323,7 @@ export const CallingCell = ({
             isCbrEnabled={isCbrEnabled}
             toggleDetachedWindow={toggleDetachedWindow}
             isDetachedWindow={isDetachedWindow}
+            conversationID={conversation.id}
           />
 
           {(isOngoing || selfHasActiveVideo) && !isDetachedWindow && !!videoGrid?.grid?.length && isFullUi ? (
