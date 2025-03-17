@@ -473,7 +473,7 @@ export const Conversation = ({
     cellsRepository: repositories.cells,
   });
 
-  const isCellsEnabled = true;
+  const isCellsEnabled = Config.getConfig().FEATURE.ENABLE_CELLS;
 
   return (
     <ConversationFileDropzone
