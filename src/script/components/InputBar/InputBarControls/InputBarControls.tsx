@@ -77,10 +77,9 @@ export const InputBarControls = ({
 
   const enableSending = useMemo(() => {
     const hasText = messageContent.text.length > 0;
-    const hasNoFiles = files.length === 0;
-    const hasNoLoadingFiles = files.length > 0 && !files.some(file => file.uploadStatus === 'uploading');
+    const hasSuccessfullyUploadedFiles = files.length > 0 && files.every(file => file.uploadStatus === 'success');
 
-    return hasText && (hasNoFiles || hasNoLoadingFiles);
+    return hasText || hasSuccessfullyUploadedFiles;
   }, [messageContent.text, files]);
 
   const isMessageFormatButtonsFlagEnabled = Config.getConfig().FEATURE.ENABLE_MESSAGE_FORMAT_BUTTONS;
