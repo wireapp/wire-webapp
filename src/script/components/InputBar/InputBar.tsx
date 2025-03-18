@@ -188,10 +188,11 @@ export const InputBar = ({
     uploadImages,
   });
 
-  const showMarkdownPreview = useUserPropertyValue<boolean>(
-    () => propertiesRepository.getPreference(PROPERTIES_TYPE.INTERFACE.MARKDOWN_PREVIEW),
-    WebAppEvents.PROPERTIES.UPDATE.INTERFACE.MARKDOWN_PREVIEW,
-  );
+  const showMarkdownPreview =
+    useUserPropertyValue<boolean>(
+      () => propertiesRepository.getPreference(PROPERTIES_TYPE.INTERFACE.MARKDOWN_PREVIEW),
+      WebAppEvents.PROPERTIES.UPDATE.INTERFACE.MARKDOWN_PREVIEW,
+    ) && Config.getConfig().FEATURE.ENABLE_MESSAGE_FORMAT_BUTTONS;
 
   const {
     editedMessage,
