@@ -24,7 +24,7 @@ import {createColumnHelper, flexRender, getCoreRowModel, useReactTable} from '@t
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
-import {downloadFile} from 'Util/util';
+import {forcedDownloadFile} from 'Util/util';
 
 import {showCellsImagePreviewModal} from './CellsImagePreviewModal/CellsImagePreviewModal';
 import {showShareFileModal} from './CellsShareFileModal/CellsShareFileModal';
@@ -112,7 +112,7 @@ export const CellsTable = ({files, cellsRepository, onDeleteFile}: CellsTablePro
                   : undefined
               }
               onShare={() => showShareFileModal({uuid, cellsRepository})}
-              onDownload={fileUrl ? () => downloadFile(fileUrl, info.row.original.name) : undefined}
+              onDownload={fileUrl ? () => forcedDownloadFile({url: fileUrl, name: info.row.original.name}) : undefined}
               onDelete={() => showDeleteFileModal({uuid, name: info.row.original.name})}
             />
           );
