@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 
 import {amplify} from 'amplify';
 
@@ -29,18 +29,21 @@ import {EventName} from '../../../../tracking/EventName';
 export const useCameraReloadOnCallEnd = (callingRepository: CallingRepository) => {
   const [shouldReloadCamera, setShouldReloadCamera] = useState(false);
 
-  useEffect(() => {
-    const handleCallEnd = (eventName: string) => {
+  const handleCallEnd = useCallback(
+    (eventName: string) => {
       if (eventName === EventName.CALLING.ENDED_CALL && !callingRepository.hasActiveCall()) {
         setShouldReloadCamera(prev => !prev);
       }
-    };
+    },
+    [callingRepository],
+  );
 
+  useEffect(() => {
     amplify.subscribe(WebAppEvents.ANALYTICS.EVENT, handleCallEnd);
     return () => {
       amplify.unsubscribe(WebAppEvents.ANALYTICS.EVENT, handleCallEnd);
     };
-  }, [callingRepository]);
+  }, [handleCallEnd]);
 
   return {shouldReloadCamera};
 };
