@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.28.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.27.0...@wireapp/api-client@27.28.0) (2025-03-18)
+
+### Features
+
+* Add domain_redirect to SSO API [WPB-15091] ([#6985](https://github.com/wireapp/wire-web-packages/issues/6985)) ([6bf5b71](https://github.com/wireapp/wire-web-packages/commit/6bf5b7181223fe608544cd4efc7145e9b93b5b86))
+
 # [27.27.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.26.0...@wireapp/api-client@27.27.0) (2025-03-18)
 
 ### Features
