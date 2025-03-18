@@ -96,12 +96,13 @@ export class SSOAPI {
     return response.data;
   }
 
-  public async updateTeamInvite({domain, sso, team, teamInvite}: TeamInviteConfig): Promise<void> {
+  public async updateTeamInvite({domain, sso, team, teamInvite, domainRedirect}: TeamInviteConfig): Promise<void> {
     const config: AxiosRequestConfig = {
       data: {
         sso,
         team,
         team_invite: teamInvite,
+        domain_redirect: domainRedirect,
       },
       method: 'post',
       url: `${SSOAPI.URL.DOMAIN_VERIFICATION}/${domain}/${SSOAPI.URL.TEAM}`,

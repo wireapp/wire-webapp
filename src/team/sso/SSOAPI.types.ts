@@ -40,22 +40,15 @@ export interface VerifyChallenge {
 }
 
 export type TeamInvite = 'allowed' | 'not-allowed' | 'team';
-
-export type TeamInviteConfig =
-  | {
-      domain: string;
-      sso?: string;
-      team?: string;
-      teamInvite: TeamInvite;
-    }
-  | {
-      domain: string;
-      teamInvite: 'team';
-      team: string;
-      sso?: string;
-    };
-
 export type DomainRedirect = 'none' | 'locked' | 'sso' | 'backend' | 'no-registration' | 'pre-authorized';
+
+export type TeamInviteConfig = {
+  domain: string;
+  sso?: string;
+  team?: string;
+  domainRedirect?: DomainRedirect;
+  teamInvite?: TeamInvite;
+};
 
 export interface GetAllRegisteredDomains {
   registered_domains: RegisteredDomain[];
