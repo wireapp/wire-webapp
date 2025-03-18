@@ -185,7 +185,11 @@ export const RichTextEditor = ({
           <PastePlugin getMentionCandidates={getMentionCandidates} isPreviewMode={showMarkdownPreview} />
         </div>
       </div>
-      <FormatToolbar isEditing={isEditing} showFormatButtons={showFormatToolbar && showMarkdownPreview} />
+      {showFormatToolbar && showMarkdownPreview && (
+        <div className="input-bar-toolbar">
+          <FormatToolbar isEditing={isEditing} />
+        </div>
+      )}
       {children}
     </LexicalComposer>
   );
