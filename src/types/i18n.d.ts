@@ -644,6 +644,7 @@ declare module 'I18n/en-US.json' {
     'conversationServicesWarning': `Services have access to the content of this conversation`;
     'conversationSomeone': `Someone`;
     'conversationStartNewConversation': `Create a Group`;
+    'conversationTabs': `Conversation tabs`;
     'conversationTeamLeft': `[bold]{name}[/bold] was removed from the team`;
     'conversationToday': `Today`;
     'conversationTweetAuthor': ` on Twitter`;

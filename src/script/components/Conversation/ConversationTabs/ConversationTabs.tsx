@@ -19,6 +19,8 @@
 
 import {useCallback, KeyboardEvent} from 'react';
 
+import {t} from 'Util/LocalizerUtil';
+
 interface ConversationTabsProps {
   activeTabIndex: number;
   onIndexChange: (index: number) => void;
@@ -57,7 +59,7 @@ export const ConversationTabs = ({activeTabIndex, onIndexChange}: ConversationTa
 
   return (
     <div className="conversation-tabs">
-      <div className="conversation-tabs__list" role="tablist" aria-label="Conversation tabs">
+      <div className="conversation-tabs__list" role="tablist" aria-label={t('conversationTabs')}>
         <ConversationTab
           id="conversation"
           label="Conversation"
