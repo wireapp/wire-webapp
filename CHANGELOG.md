@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.27.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.26.0...@wireapp/api-client@27.27.0) (2025-03-18)
+
+### Features
+
+* **api-client/cells:** add createFilePublicLink method and refactor getFilePublicLink ([#6983](https://github.com/wireapp/wire-web-packages/issues/6983)) ([ac6ee7e](https://github.com/wireapp/wire-web-packages/commit/ac6ee7e9305a374eacdbf98069bec6561dbc3ab9))
+
 # [27.26.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.25.0...@wireapp/api-client@27.26.0) (2025-03-14)
 
 ### Features
