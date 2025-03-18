@@ -17,13 +17,12 @@
  *
  */
 
-import {useEffect, useMemo} from 'react';
+import {useEffect} from 'react';
 
 import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {useFileUploadState} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
 import {Config} from 'src/script/Config';
 import {Conversation} from 'src/script/entity/Conversation';
 
@@ -38,6 +37,7 @@ interface InputBarControlsProps {
   pingDisabled: boolean;
   messageContent: MessageContent;
   isEditing: boolean;
+  isSendingDisabled: boolean;
   showMarkdownPreview: boolean;
   showGiphyButton: boolean;
   formatToolbar: {
@@ -62,6 +62,7 @@ export const InputBarControls = ({
   pingDisabled,
   messageContent,
   isEditing,
+  isSendingDisabled,
   showMarkdownPreview,
   showGiphyButton,
   formatToolbar,
@@ -73,15 +74,6 @@ export const InputBarControls = ({
   onSelectImages,
   onSend,
 }: InputBarControlsProps) => {
-  const {files} = useFileUploadState();
-
-  const enableSending = useMemo(() => {
-    const hasText = messageContent.text.length > 0;
-    const hasSuccessfullyUploadedFiles = files.length > 0 && files.every(file => file.uploadStatus === 'success');
-
-    return hasText || hasSuccessfullyUploadedFiles;
-  }, [messageContent.text, files]);
-
   const isMessageFormatButtonsFlagEnabled = Config.getConfig().FEATURE.ENABLE_MESSAGE_FORMAT_BUTTONS;
 
   useEffect(() => {
@@ -115,7 +107,7 @@ export const InputBarControls = ({
           onEmojiClick={emojiPicker.handleToggle}
         />
       </ul>
-      <SendMessageButton disabled={!enableSending} onSend={onSend} className="input-bar-buttons__send" />
+      <SendMessageButton disabled={isSendingDisabled} onSend={onSend} className="input-bar-buttons__send" />
     </div>
   );
 };

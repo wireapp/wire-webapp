@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useRef, useState} from 'react';
+import {useCallback, useMemo, useRef, useState} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
@@ -233,6 +233,26 @@ export const InputBar = ({
     cancelMesssageEditing,
   });
 
+  const isSendingDisabled = useMemo(() => {
+    const hasText = messageContent.text.length > 0;
+    const hasFiles = files.length > 0;
+    const hasSuccessfullyUploadedFiles = hasFiles && files.every(file => file.uploadStatus === 'success');
+
+    if (Config.getConfig().FEATURE.ENABLE_CELLS) {
+      return hasFiles ? !hasSuccessfullyUploadedFiles : !hasText;
+    }
+
+    return !hasText;
+  }, [messageContent.text, files]);
+
+  const handleSendMessage = useCallback(() => {
+    if (isSendingDisabled) {
+      return;
+    }
+
+    void sendMessage();
+  }, [isSendingDisabled, sendMessage]);
+
   const showAvatar = !!messageContent.text.length;
 
   return (
@@ -287,7 +307,7 @@ export const InputBar = ({
                   onShiftTab={onShiftTab}
                   onBlur={() => isTypingRef.current && conversationRepository.sendTypingStop(conversation)}
                   onUpdate={setMessageContent}
-                  onSend={sendMessage}
+                  onSend={handleSendMessage}
                   getMentionCandidates={getMentionCandidates}
                   saveDraftState={draftState.save}
                   loadDraftState={draftState.load}
@@ -299,6 +319,7 @@ export const InputBar = ({
                     pingDisabled={ping.isPingDisabled}
                     messageContent={messageContent}
                     isEditing={isEditing}
+                    isSendingDisabled={isSendingDisabled}
                     showMarkdownPreview={showMarkdownPreview}
                     showGiphyButton={giphy.showGiphyButton}
                     formatToolbar={formatToolbar}
@@ -308,7 +329,7 @@ export const InputBar = ({
                     onGifClick={giphy.handleGifClick}
                     onSelectFiles={uploadFiles}
                     onSelectImages={uploadImages}
-                    onSend={sendMessage}
+                    onSend={handleSendMessage}
                   />
                 </InputBarEditor>
               )}
