@@ -40,12 +40,12 @@ type FormatTypes =
   | 'codeBlock'
   | 'link';
 
-export const useToolbarState = () => {
+export const useFormatButtonsState = () => {
   const [editor] = useLexicalComposerContext();
 
   const [activeFormats, setActiveFormats] = useState<FormatTypes[]>([]);
 
-  const updateToolbar = useCallback(() => {
+  const updateFormats = useCallback(() => {
     editor.update(() => {
       const selection = $getSelection();
       if (!$isRangeSelection(selection)) {
@@ -84,10 +84,10 @@ export const useToolbarState = () => {
   useEffect(() => {
     return editor.registerUpdateListener(({editorState}) => {
       editorState.read(() => {
-        updateToolbar();
+        updateFormats();
       });
     });
-  }, [editor, updateToolbar]);
+  }, [editor, updateFormats]);
 
   return {activeFormats};
 };

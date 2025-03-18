@@ -18,14 +18,6 @@
  */
 
 import {
-  ConversationOtrMessageAddEvent,
-  ConversationMLSMessageAddEvent,
-  CONVERSATION_EVENT,
-} from '@wireapp/api-client/lib/event';
-import {GenericMessageType} from '@wireapp/core/lib/conversation';
-import {container} from 'tsyringe';
-
-import {
   Asset,
   Availability,
   ButtonActionConfirmation,
@@ -51,7 +43,14 @@ import {
   Text,
   InCallEmoji,
   InCallHandRaise,
-} from '@wireapp/protocol-messaging';
+} from '@pydio/protocol-messaging';
+import {
+  ConversationOtrMessageAddEvent,
+  ConversationMLSMessageAddEvent,
+  CONVERSATION_EVENT,
+} from '@wireapp/api-client/lib/event';
+import {GenericMessageType} from '@wireapp/core/lib/conversation';
+import {container} from 'tsyringe';
 
 import {CALL_MESSAGE_TYPE} from 'src/script/calling/enum/CallMessageType';
 import {getLogger, Logger} from 'Util/Logger';

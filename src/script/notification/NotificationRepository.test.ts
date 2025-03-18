@@ -17,6 +17,7 @@
  *
  */
 
+import {Availability} from '@pydio/protocol-messaging';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
@@ -25,7 +26,6 @@ import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
-import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingRepository} from 'src/script/calling/CallingRepository';

@@ -17,6 +17,7 @@
  *
  */
 
+import type {Asset, LegalHoldStatus} from '@pydio/protocol-messaging';
 import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data';
 import {
   CONVERSATION_EVENT,
@@ -29,7 +30,6 @@ import {ReactionType} from '@wireapp/core/lib/conversation/ReactionType';
 import {DecryptionError} from '@wireapp/core/lib/errors/DecryptionError';
 
 import type {REASON as AVS_REASON} from '@wireapp/avs';
-import type {Asset, LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {createUuid} from 'Util/uuid';
 

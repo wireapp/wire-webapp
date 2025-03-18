@@ -17,6 +17,7 @@
  *
  */
 
+import {LegalHoldStatus} from '@pydio/protocol-messaging';
 import {
   CONVERSATION_ACCESS_ROLE,
   CONVERSATION_ACCESS,
@@ -32,7 +33,6 @@ import ko from 'knockout';
 import {container} from 'tsyringe';
 import {Cancelable, debounce} from 'underscore';
 
-import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';

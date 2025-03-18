@@ -19,10 +19,9 @@
 
 import {useEffect, useState} from 'react';
 
+import {Availability} from '@pydio/protocol-messaging';
 import type {RichInfoField} from '@wireapp/api-client/lib/user/RichInfo';
 import {container} from 'tsyringe';
-
-import {Availability} from '@wireapp/protocol-messaging';
 
 import {availabilityStatus, availabilityTranslationKeys} from 'Util/AvailabilityStatus';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';

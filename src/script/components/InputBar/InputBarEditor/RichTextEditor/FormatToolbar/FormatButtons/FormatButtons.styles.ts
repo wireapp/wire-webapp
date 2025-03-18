@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2019 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,26 +17,33 @@
  *
  */
 
-import {LegalHoldStatus} from '@pydio/protocol-messaging';
+import {CSSObject} from '@emotion/react';
 
-import {Message} from './Message';
+export const wrapperStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  columnGap: '4px',
+  overflowX: 'auto',
+  scrollbarWidth: 'none',
+  '-ms-overflow-style': 'none',
 
-import {SuperType} from '../../message/SuperType';
+  '&::-webkit-scrollbar': {
+    width: 0,
+    height: 0,
+    display: 'none',
+  },
+};
 
-/**
- * Legal hold system message
- */
-export class LegalHoldMessage extends Message {
-  constructor(
-    public legalHoldStatus: LegalHoldStatus,
-    timestamp: number,
-  ) {
-    super();
-    this.super_type = SuperType.LEGALHOLD;
-    this.timestamp(timestamp);
-  }
+export const separatorStyles: CSSObject = {
+  width: '2px',
+  height: '24px',
+  backgroundColor: 'var(--gray-40)',
 
-  get isActivationMessage(): boolean {
-    return this.legalHoldStatus === LegalHoldStatus.ENABLED;
-  }
-}
+  'body.theme-dark &': {
+    backgroundColor: 'var(--gray-80)',
+  },
+};
+
+export const separatorStylesEditing: CSSObject = {
+  backgroundColor: 'var(--accent-color-200)',
+};
