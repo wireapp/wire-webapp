@@ -17,18 +17,25 @@
  *
  */
 
-export interface CellFile {
-  id: string;
-  mimeType?: string;
-  name: string;
-  sizeMb: string;
-  previewImageUrl?: string;
-  uploadedAtTimestamp: number;
-  owner: string;
-  conversationName: string;
-  publicLink?: {
-    uuid?: string;
-    url?: string;
-  };
-  fileUrl?: string;
+import {t} from 'i18next';
+
+import {LinkIcon} from 'Components/Icon';
+
+import {wrapperStyles, iconWrapperStyles, textStyles, wrapperStylesHidden} from './CellsTableSharedColumn.styles';
+
+interface CellsTableSharedColumnProps {
+  isShared: boolean;
 }
+
+export const CellsTableSharedColumn = ({isShared}: CellsTableSharedColumnProps) => {
+  return (
+    <div css={isShared ? wrapperStyles : wrapperStylesHidden}>
+      <div css={iconWrapperStyles}>
+        <LinkIcon width={10} height={10} />
+      </div>
+      <span css={textStyles}>
+        {isShared ? t('cellsGlobalView.tableRowSharedTruthyValue') : t('cellsGlobalView.tableRowSharedFalsyValue')}
+      </span>
+    </div>
+  );
+};

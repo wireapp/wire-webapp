@@ -38,6 +38,8 @@ export const useGetAllCellsFiles = ({cellsRepository}: UseGetAllCellsFilesProps)
 
       const result = await cellsRepository.searchFiles({query: '*'});
 
+      console.log('searchFiles', result);
+
       if (!result.Nodes) {
         throw new Error('No files found');
       }

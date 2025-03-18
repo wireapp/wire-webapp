@@ -40,7 +40,7 @@ export const useCellPublicLink = ({uuid, cellsRepository}: UseCellPublicLinkPara
   const getPublicLink = useCallback(async () => {
     try {
       setStatus('loading');
-      const link = await cellsRepository.getPublicLink({uuid, label: file?.name || ''});
+      const link = await cellsRepository.createPublicLink({uuid, label: file?.name || ''});
 
       if (!link.LinkUrl || !link.Uuid) {
         throw new Error('No link found');

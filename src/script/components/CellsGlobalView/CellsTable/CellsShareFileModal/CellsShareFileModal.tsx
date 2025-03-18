@@ -84,7 +84,7 @@ const CellsShareFileModalContent = ({uuid, cellsRepository}: ShareFileModalParam
           <label htmlFor="generated-public-link" className="visually-hidden">
             {t('cellsGlobalView.shareFileModalGeneratedPublicLink')}
           </label>
-          <Input id="generated-public-link" value={link} wrapperCSS={inputStyles} disabled={isInputDisabled} />
+          <Input id="generated-public-link" value={link} wrapperCSS={inputStyles} disabled={isInputDisabled} readOnly />
           <CopyToClipboardButton
             textToCopy={link}
             displayText={t('cellsGlobalView.shareFileModalCopyLink')}

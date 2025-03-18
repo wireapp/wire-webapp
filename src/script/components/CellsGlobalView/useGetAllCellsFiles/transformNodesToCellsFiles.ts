@@ -38,6 +38,10 @@ export const transformNodesToCellsFiles = (nodes: RestNode[]): CellFile[] => {
         previewImageUrl: getPreviewImageUrl(node),
         uploadedAtTimestamp: getUploadedAtTimestamp(node),
         fileUrl: node.PreSignedGET?.Url,
+        publicLink: {
+          uuid: node.Shares?.[0].Uuid || '',
+          url: undefined,
+        },
       }))
       // eslint-disable-next-line id-length
       .sort((a, b) => a.name.localeCompare(b.name))
