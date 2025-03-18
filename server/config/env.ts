@@ -55,6 +55,7 @@ export type Env = {
   CELLS_S3_BUCKET: string;
   CELLS_S3_REGION: string;
   CELLS_S3_ENDPOINT: string;
+  CELLS_WIRE_DOMAIN: string;
 
   /** Specifies the name of the backend, e.g. Wire */
   BACKEND_NAME: string;
