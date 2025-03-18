@@ -24,7 +24,7 @@ import {CSS_VISUALLY_HIDDEN} from 'Util/CSSMixin';
 export const wrapperStyles: CSSObject = {
   display: 'inline',
 
-  '@media (min-width: 900px)': {
+  '@media (min-width: 1100px)': {
     display: 'flex',
     alignItems: 'center',
     paddingLeft: '10px',
@@ -33,7 +33,7 @@ export const wrapperStyles: CSSObject = {
 
 export const wrapperStylesHidden: CSSObject = {
   ...wrapperStyles,
-  '@media (min-width: 900px)': {
+  '@media (min-width: 1100px)': {
     display: 'none',
   },
 };
@@ -47,13 +47,13 @@ export const iconWrapperStyles: CSSObject = {
   width: '20px',
   height: '20px',
 
-  '@media (max-width: 900px)': {
+  '@media (max-width: 1100px)': {
     display: 'none',
   },
 };
 
 export const textStyles: CSSObject = {
-  '@media (min-width: 900px)': {
+  '@media (min-width: 1100px)': {
     ...CSS_VISUALLY_HIDDEN,
   },
 };
