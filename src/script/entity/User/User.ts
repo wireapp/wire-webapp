@@ -17,13 +17,13 @@
  *
  */
 
+import {Availability} from '@pydio/protocol-messaging';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
-import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {t} from 'Util/LocalizerUtil';

@@ -17,9 +17,8 @@
  *
  */
 
+import type {Asset as ProtobufAsset} from '@pydio/protocol-messaging';
 import ko from 'knockout';
-
-import type {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 
 import {Logger, getLogger} from 'Util/Logger';
 

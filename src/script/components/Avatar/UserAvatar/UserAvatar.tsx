@@ -19,9 +19,9 @@
 
 import React, {MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent} from 'react';
 
+import {Availability as AvailabilityType} from '@pydio/protocol-messaging';
 import {container} from 'tsyringe';
 
-import {Availability as AvailabilityType} from '@wireapp/protocol-messaging';
 import {COLOR} from '@wireapp/react-ui-kit';
 
 import {AvailabilityIcon} from 'Components/AvailabilityIcon';

@@ -17,7 +17,7 @@
  *
  */
 
-import {Availability} from '@wireapp/protocol-messaging';
+import {Availability} from '@pydio/protocol-messaging';
 
 import {t} from 'Util/LocalizerUtil';
 import {loadValue, storeValue} from 'Util/StorageUtil';

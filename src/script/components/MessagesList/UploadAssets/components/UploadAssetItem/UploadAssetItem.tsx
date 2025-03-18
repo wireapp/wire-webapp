@@ -19,7 +19,7 @@
 
 import {useEffect, useState} from 'react';
 
-import {GenericMessage} from '@wireapp/protocol-messaging';
+import {GenericMessage} from '@pydio/protocol-messaging';
 
 import {LoadingBar} from 'Components/LoadingBar';
 import {t} from 'Util/LocalizerUtil';
