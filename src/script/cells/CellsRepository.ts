@@ -59,10 +59,9 @@ export class CellsRepository {
   }
 
   async getPublicLink({uuid, label}: {uuid: string; label: string}) {
-    return this.apiClient.api.cells.getFilePublicLink({
+    return this.apiClient.api.cells.createFilePublicLink({
       uuid,
       label,
-      alreadyShared: false,
     });
   }
 
