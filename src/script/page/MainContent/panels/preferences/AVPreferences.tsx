@@ -17,12 +17,6 @@
  *
  */
 
-import {useEffect, useState} from 'react';
-
-import {amplify} from 'amplify';
-
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {MediaDeviceType} from 'src/script/media/MediaDeviceType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -33,12 +27,12 @@ import {CameraPreferences} from './avPreferences/CameraPreferences';
 import {MicrophonePreferences} from './avPreferences/MicrophonePreferences';
 import {SaveCallLogs} from './avPreferences/SaveCallLogs';
 import {PreferencesPage} from './components/PreferencesPage';
+import {useCameraReloadOnCallEnd} from './useCameraReloadOnCallEnd';
 
 import type {CallingRepository} from '../../../../calling/CallingRepository';
 import {useInitializeMediaDevices} from '../../../../hooks/useInitializeMediaDevices';
 import type {MediaRepository} from '../../../../media/MediaRepository';
 import type {PropertiesRepository} from '../../../../properties/PropertiesRepository';
-import {EventName} from '../../../../tracking/EventName';
 
 interface AVPreferencesProps {
   callingRepository: CallingRepository;
@@ -51,27 +45,13 @@ const AVPreferences = ({
   propertiesRepository,
   callingRepository,
 }: AVPreferencesProps) => {
-  const [shouldReloadCamera, setShouldReloadCamera] = useState(false);
+  const {shouldReloadCamera} = useCameraReloadOnCallEnd(callingRepository);
   const deviceSupport = useKoSubscribableChildren(devicesHandler?.deviceSupport, [
     MediaDeviceType.AUDIO_INPUT,
     MediaDeviceType.AUDIO_OUTPUT,
     MediaDeviceType.VIDEO_INPUT,
   ]);
   const {isMediaDevicesAreInitialized} = useInitializeMediaDevices(devicesHandler, streamHandler);
-
-  // Reset camera component when call ends
-  useEffect(() => {
-    const handleCallEnd = (eventName: string, segmentations: any) => {
-      if (eventName === EventName.CALLING.ENDED_CALL && !callingRepository.hasActiveCall()) {
-        setShouldReloadCamera(prev => !prev);
-      }
-    };
-
-    amplify.subscribe(WebAppEvents.ANALYTICS.EVENT, handleCallEnd);
-    return () => {
-      amplify.unsubscribe(WebAppEvents.ANALYTICS.EVENT, handleCallEnd);
-    };
-  }, [callingRepository]);
 
   return (
     <PreferencesPage title={t('preferencesAV')}>
