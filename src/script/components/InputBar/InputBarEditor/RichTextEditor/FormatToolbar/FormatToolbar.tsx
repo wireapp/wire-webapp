@@ -17,21 +17,132 @@
  *
  */
 
-import {FormatButtons} from './FormatButtons/FormatButtons';
+import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
+import {FORMAT_TEXT_COMMAND, TextFormatType} from 'lexical';
+
+import {
+  CodeBlockIcon,
+  BlockquoteIcon,
+  BoldIcon,
+  CodeInlineIcon,
+  ItalicIcon,
+  StrikethroughIcon,
+  BulletListIcon,
+  NumberedListIcon,
+  HeadingIcon,
+  LinkIcon,
+} from '@wireapp/react-ui-kit';
+
+import {FormatSeparator} from 'Components/InputBar/common/FormatSeparator/FormatSeparator';
+import {t} from 'Util/LocalizerUtil';
+
+import {FormatButton} from './FormatButton/FormatButton';
+import {wrapperStyles} from './FormatToolbar.styles';
 import {LinkDialog} from './LinkDialog/LinkDialog';
+import {useBlockquoteState} from './useBlockquoteState/useBlockquoteState';
+import {useCodeBlockState} from './useCodeBlockState/useCodeBlockState';
+import {useHeadingState} from './useHeadingState/useHeadingState';
 import {useLinkState} from './useLinkState/useLinkState';
+import {useListState} from './useListState/useListState';
+import {useToolbarState} from './useToolbarState/useToolbarState';
 
 interface FormatToolbarProps {
   isEditing: boolean;
-  showFormatButtons: boolean;
 }
 
-export const FormatToolbar = ({isEditing, showFormatButtons}: FormatToolbarProps) => {
+export const FormatToolbar = ({isEditing}: FormatToolbarProps) => {
+  const [editor] = useLexicalComposerContext();
+
+  const {activeFormats} = useToolbarState();
+
+  const {formatHeading} = useHeadingState();
+
+  const {formatList} = useListState();
+
+  const {formatBlockquote} = useBlockquoteState();
+
+  const {formatCodeBlock} = useCodeBlockState();
+
   const {formatLink, insertLink, isModalOpen, closeModal, selectedText, linkUrl, linkNode} = useLinkState();
 
+  const formatText = (format: Extract<TextFormatType, 'bold' | 'italic' | 'strikethrough' | 'code'>) => {
+    editor.dispatchCommand(FORMAT_TEXT_COMMAND, format);
+  };
+
   return (
-    <>
-      {showFormatButtons && <FormatButtons isEditing={isEditing} onLinkFormat={formatLink} />}
+    <div css={wrapperStyles}>
+      <FormatButton
+        label={t('richTextFormatHeading')}
+        icon={HeadingIcon}
+        active={activeFormats.includes('heading')}
+        onClick={formatHeading}
+        isEditing={isEditing}
+      />
+      <FormatButton
+        label={t('richTextFormatBold')}
+        icon={BoldIcon}
+        active={activeFormats.includes('bold')}
+        onClick={() => formatText('bold')}
+        isEditing={isEditing}
+      />
+      <FormatButton
+        label={t('richTextFormatItalic')}
+        icon={ItalicIcon}
+        active={activeFormats.includes('italic')}
+        onClick={() => formatText('italic')}
+        isEditing={isEditing}
+      />
+      <FormatButton
+        label={t('richTextFormatStrikethrough')}
+        icon={StrikethroughIcon}
+        active={activeFormats.includes('strikethrough')}
+        onClick={() => formatText('strikethrough')}
+        isEditing={isEditing}
+      />
+      <FormatSeparator isEditing={isEditing} />
+      <FormatButton
+        label={t('richTextFormatOrderedList')}
+        icon={NumberedListIcon}
+        active={activeFormats.includes('orderedList')}
+        onClick={() => formatList('ordered')}
+        isEditing={isEditing}
+      />
+      <FormatButton
+        label={t('richTextFormatUnorderedList')}
+        icon={BulletListIcon}
+        active={activeFormats.includes('unorderedList')}
+        onClick={() => formatList('unordered')}
+        isEditing={isEditing}
+      />
+      <FormatButton
+        label={t('richTextFormatBlockquote')}
+        icon={BlockquoteIcon}
+        active={activeFormats.includes('blockquote')}
+        onClick={formatBlockquote}
+        isEditing={isEditing}
+      />
+      <FormatSeparator isEditing={isEditing} />
+      <FormatButton
+        label={t('richTextFormatLink')}
+        icon={LinkIcon}
+        active={activeFormats.includes('link')}
+        onClick={formatLink}
+        isEditing={isEditing}
+      />
+      <FormatButton
+        label={t('richTextFormatCodeBlock')}
+        icon={CodeBlockIcon}
+        active={activeFormats.includes('codeBlock')}
+        onClick={formatCodeBlock}
+        isEditing={isEditing}
+      />
+      <FormatButton
+        label={t('richTextFormatCodeInline')}
+        icon={CodeInlineIcon}
+        active={activeFormats.includes('code')}
+        onClick={() => formatText('code')}
+        isEditing={isEditing}
+      />
       <LinkDialog
         isOpen={isModalOpen}
         isEditing={!!linkNode}
@@ -40,6 +151,6 @@ export const FormatToolbar = ({isEditing, showFormatButtons}: FormatToolbarProps
         onSubmit={insertLink}
         onClose={closeModal}
       />
-    </>
+    </div>
   );
 };
