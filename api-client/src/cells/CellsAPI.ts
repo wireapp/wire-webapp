@@ -173,25 +173,19 @@ export class CellsAPI {
     return result.data;
   }
 
-  async getFilePublicLink({
-    uuid,
-    label,
-    alreadyShared,
-  }: {
-    uuid: string;
-    label: string;
-    alreadyShared: boolean;
-  }): Promise<RestShareLink> {
-    if (alreadyShared) {
-      await this.deleteFilePublicLink({uuid});
-    }
-
+  async createFilePublicLink({uuid, label}: {uuid: string; label?: string}): Promise<RestShareLink> {
     const result = await this.client.createPublicLink(uuid, {
       Link: {
         Label: label,
         Permissions: ['Preview', 'Download'],
       },
     });
+
+    return result.data;
+  }
+
+  async getFilePublicLink({uuid}: {uuid: string}): Promise<RestShareLink> {
+    const result = await this.client.getPublicLink(uuid);
 
     return result.data;
   }
