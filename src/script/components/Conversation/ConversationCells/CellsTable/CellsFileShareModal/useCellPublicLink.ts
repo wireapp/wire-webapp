@@ -37,7 +37,7 @@ export const useCellPublicLink = ({uuid, cellsRepository}: UseCellPublicLinkPara
   const [isEnabled, setIsEnabled] = useState(!!file?.publicLink);
   const [status, setStatus] = useState<PublicLinkStatus>(file?.publicLink ? 'success' : 'idle');
 
-  const getPublicLink = useCallback(async () => {
+  const createPublicLink = useCallback(async () => {
     try {
       setStatus('loading');
       const link = await cellsRepository.createPublicLink({uuid, label: file?.name || ''});
@@ -46,7 +46,7 @@ export const useCellPublicLink = ({uuid, cellsRepository}: UseCellPublicLinkPara
         throw new Error('No link found');
       }
 
-      const newLink = {uuid: link.Uuid, url: Config.getConfig().CELLS_PYDIO_URL + link.LinkUrl};
+      const newLink = {uuid: link.Uuid, url: Config.getConfig().CELLS_PYDIO_URL + link.LinkUrl, alreadyShared: true};
       updateFile(uuid, {publicLink: newLink});
       setStatus('success');
     } catch (err) {
@@ -57,8 +57,37 @@ export const useCellPublicLink = ({uuid, cellsRepository}: UseCellPublicLinkPara
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uuid, updateFile]);
 
+  const getPublicLink = useCallback(async () => {
+    const linkId = file?.publicLink?.uuid;
+    const linkUrl = file?.publicLink?.url;
+
+    if (!linkId || linkUrl) {
+      return;
+    }
+
+    try {
+      setStatus('loading');
+
+      const link = await cellsRepository.getPublicLink({uuid: linkId});
+
+      if (!link.LinkUrl || !link.Uuid) {
+        throw new Error('No link found');
+      }
+
+      const newLink = {uuid: link.Uuid, url: Config.getConfig().CELLS_PYDIO_URL + link.LinkUrl, alreadyShared: true};
+
+      updateFile(uuid, {publicLink: newLink});
+      setStatus('success');
+    } catch (err) {
+      setStatus('error');
+      updateFile(uuid, {publicLink: undefined});
+    }
+    // cellsRepository is not a dependency because it's a singleton
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [uuid, updateFile, file?.publicLink]);
+
   const deletePublicLink = useCallback(async () => {
-    if (!file?.publicLink) {
+    if (!file?.publicLink || !file.publicLink.uuid) {
       return;
     }
 
@@ -77,15 +106,24 @@ export const useCellPublicLink = ({uuid, cellsRepository}: UseCellPublicLinkPara
   }, []);
 
   useEffect(() => {
-    if (!isEnabled && file?.publicLink) {
+    const shouldDeleteLink = !isEnabled && file?.publicLink;
+    const shouldCreateNewLink = isEnabled && !file?.publicLink?.alreadyShared;
+    const shouldGetLink = isEnabled && file?.publicLink?.alreadyShared;
+
+    if (shouldGetLink) {
+      void getPublicLink();
+      return;
+    }
+
+    if (shouldDeleteLink) {
       void deletePublicLink();
       return;
     }
 
-    if (isEnabled && !file?.publicLink) {
-      void getPublicLink();
+    if (shouldCreateNewLink) {
+      void createPublicLink();
     }
-  }, [isEnabled, getPublicLink, deletePublicLink, file?.publicLink]);
+  }, [isEnabled, file?.publicLink, createPublicLink, deletePublicLink, getPublicLink]);
 
   return {
     status,

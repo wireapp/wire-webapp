@@ -39,6 +39,7 @@ export const transformNodesToCellsFiles = (nodes: RestNode[]): CellFile[] => {
         uploadedAtTimestamp: getUploadedAtTimestamp(node),
         fileUrl: node.PreSignedGET?.Url,
         publicLink: {
+          alreadyShared: !!node.Shares?.[0].Uuid,
           uuid: node.Shares?.[0].Uuid || '',
           url: undefined,
         },

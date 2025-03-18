@@ -25,9 +25,11 @@ export interface CellFile {
   previewImageUrl?: string;
   uploadedAtTimestamp: number;
   owner: string;
+  conversationName: string;
   publicLink?: {
-    uuid: string;
-    url: string;
-  } | null;
+    alreadyShared: boolean;
+    uuid?: string;
+    url?: string;
+  };
   fileUrl?: string;
 }

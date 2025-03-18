@@ -19,6 +19,7 @@
 
 import {RestNode} from 'cells-sdk-ts';
 
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {formatBytes} from 'Util/util';
 
 import {CellFile} from '../common/cellFile/cellFile';
@@ -30,12 +31,18 @@ export const transformNodesToCellsFiles = (nodes: RestNode[]): CellFile[] => {
       .map(node => ({
         id: node.Uuid,
         owner: getOwner(node),
+        conversationName: node.ContextWorkspace?.Label || '',
         mimeType: node.ContentType,
         name: getFileName(node.Path),
         sizeMb: getFileSize(node),
         previewImageUrl: getPreviewImageUrl(node),
         uploadedAtTimestamp: getUploadedAtTimestamp(node),
         fileUrl: node.PreSignedGET?.Url,
+        publicLink: {
+          alreadyShared: !!node.Shares?.[0].Uuid,
+          uuid: node.Shares?.[0].Uuid || '',
+          url: undefined,
+        },
       }))
       // eslint-disable-next-line id-length
       .sort((a, b) => a.name.localeCompare(b.name))
@@ -52,8 +59,7 @@ const getPreviewImageUrl = (node: RestNode): string | undefined => {
 };
 
 const getUploadedAtTimestamp = (node: RestNode): number => {
-  const millisecondsInSecond = 1000;
-  return (node.Modified as unknown as number) * millisecondsInSecond;
+  return (node.Modified as unknown as number) * TIME_IN_MILLIS.SECOND;
 };
 
 const getFileSize = (node: RestNode): string => {

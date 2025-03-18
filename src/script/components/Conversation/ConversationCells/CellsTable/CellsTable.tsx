@@ -39,6 +39,7 @@ import {
 import {CellsTableDateColumn} from './CellsTableDateColumn/CellsTableDateColumn';
 import {CellsTableNameColumn} from './CellsTableNameColumn/CellsTableNameColumn';
 import {CellsTableRowOptions} from './CellsTableRowOptions/CellsTableRowOptions';
+import {CellsTableSharedColumn} from './CellsTableSharedColumn/CellsTableSharedColumn';
 
 import {CellFile} from '../common/cellFile/cellFile';
 
@@ -87,6 +88,10 @@ export const CellsTable = ({files, cellsRepository, onDeleteFile}: CellsTablePro
       columnHelper.accessor('uploadedAtTimestamp', {
         header: t('cellsGlobalView.tableRowCreated'),
         cell: info => <CellsTableDateColumn timestamp={info.getValue()} />,
+      }),
+      columnHelper.accessor('publicLink', {
+        header: t('cellsGlobalView.tableRowPublicLink'),
+        cell: info => <CellsTableSharedColumn isShared={!!info.getValue()?.alreadyShared} />,
       }),
       columnHelper.accessor('id', {
         header: () => <span className="visually-hidden">{t('cellsGlobalView.tableRowActions')}</span>,
@@ -145,7 +150,7 @@ export const CellsTable = ({files, cellsRepository, onDeleteFile}: CellsTablePro
                   <td
                     key={cell.id}
                     css={cell.column.id === 'id' ? tableActionsCellStyles : tableCellStyles}
-                    data-cell={cell.column.columnDef.header}
+                    data-cell={cell.column.id === 'id' ? undefined : cell.column.columnDef.header}
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>

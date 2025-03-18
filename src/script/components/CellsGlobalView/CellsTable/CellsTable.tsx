@@ -95,7 +95,7 @@ export const CellsTable = ({files, cellsRepository, onDeleteFile}: CellsTablePro
       }),
       columnHelper.accessor('publicLink', {
         header: t('cellsGlobalView.tableRowPublicLink'),
-        cell: info => <CellsTableSharedColumn isShared={!!info.getValue()?.uuid} />,
+        cell: info => <CellsTableSharedColumn isShared={!!info.getValue()?.alreadyShared} />,
       }),
       columnHelper.accessor('id', {
         header: () => <span className="visually-hidden">{t('cellsGlobalView.tableRowActions')}</span>,
