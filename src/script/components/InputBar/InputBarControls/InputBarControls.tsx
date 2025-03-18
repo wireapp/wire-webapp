@@ -17,12 +17,13 @@
  *
  */
 
-import {useEffect} from 'react';
+import {useEffect, useMemo} from 'react';
 
 import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {useFileUploadState} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
 import {Config} from 'src/script/Config';
 import {Conversation} from 'src/script/entity/Conversation';
 
@@ -72,7 +73,15 @@ export const InputBarControls = ({
   onSelectImages,
   onSend,
 }: InputBarControlsProps) => {
-  const enableSending = messageContent.text.length > 0;
+  const {files} = useFileUploadState();
+
+  const enableSending = useMemo(() => {
+    const hasText = messageContent.text.length > 0;
+    const hasNoFiles = files.length === 0;
+    const hasNoLoadingFiles = files.length > 0 && !files.some(file => file.uploadStatus === 'uploading');
+
+    return hasText && (hasNoFiles || hasNoLoadingFiles);
+  }, [messageContent.text, files]);
 
   const isMessageFormatButtonsFlagEnabled = Config.getConfig().FEATURE.ENABLE_MESSAGE_FORMAT_BUTTONS;
 
