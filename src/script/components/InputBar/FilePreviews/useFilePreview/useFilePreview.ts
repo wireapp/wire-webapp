@@ -19,14 +19,16 @@
 
 import {FileWithPreview, useFileUploadState} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
+import {Config} from 'src/script/Config';
 import {getFileExtension, trimFileExtension, formatBytes} from 'Util/util';
 
 interface FilePreviewParams {
   file: FileWithPreview;
   cellsRepository: CellsRepository;
+  conversationId: string;
 }
 
-export const useFilePreview = ({file, cellsRepository}: FilePreviewParams) => {
+export const useFilePreview = ({file, cellsRepository, conversationId}: FilePreviewParams) => {
   const {deleteFile, updateFile} = useFileUploadState();
 
   const name = trimFileExtension(file.name);
@@ -46,7 +48,10 @@ export const useFilePreview = ({file, cellsRepository}: FilePreviewParams) => {
   const handleRetry = async () => {
     try {
       updateFile(file.id, {uploadStatus: 'uploading'});
-      const {uuid, versionId} = await cellsRepository.uploadFile(file);
+      const {uuid, versionId} = await cellsRepository.uploadFile({
+        file,
+        path: `${conversationId}@${Config.getConfig().CELLS_WIRE_DOMAIN}`,
+      });
       updateFile(file.id, {remoteUuid: uuid, remoteVersionId: versionId, uploadStatus: 'success'});
     } catch (error) {
       updateFile(file.id, {uploadStatus: 'error'});

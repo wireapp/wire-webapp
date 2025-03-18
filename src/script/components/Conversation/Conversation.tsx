@@ -467,6 +467,7 @@ export const Conversation = ({
   const {getRootProps, getInputProps, open, isDragAccept} = useFilesUploadDropzone({
     isTeam: inTeam,
     cellsRepository: repositories.cells,
+    conversationId: activeConversation?.id || '',
   });
 
   return (
