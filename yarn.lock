@@ -5491,7 +5491,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@pydio/protocol-messaging@npm:1.51.0":
+"@pydio/protocol-messaging@npm:1.51.0, @pydio/protocol-messaging@npm:^1.51.0":
   version: 1.51.0
   resolution: "@pydio/protocol-messaging@npm:1.51.0"
   dependencies:
@@ -7450,9 +7450,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^27.24.0":
-  version: 27.26.0
-  resolution: "@wireapp/api-client@npm:27.26.0"
+"@wireapp/api-client@npm:^27.27.0":
+  version: 27.27.0
+  resolution: "@wireapp/api-client@npm:27.27.0"
   dependencies:
     "@aws-sdk/client-s3": "npm:3.750.0"
     "@pydio/protocol-messaging": "npm:1.51.0"
@@ -7470,7 +7470,7 @@ __metadata:
     uuid: "npm:11.1.0"
     ws: "npm:8.18.1"
     zod: "npm:3.24.2"
-  checksum: 10/4d2cc9336305306bb3412da9cdc7bc49b8def448662567bc737fb116bfae3e62dbb539e78dd95a31d6f76f1b24e284beb9079358066e65093f1dbf37a7276cc2
+  checksum: 10/5d60eb8f6b45df4ec9db9b2408881b42f70d2948346070994a5ef929f18d82ae7c55a748a59a528249306fd78179b77e80ba9da035881bc8f451bf64e3c125d3
   languageName: node
   linkType: hard
 
@@ -7535,17 +7535,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:46.19.11":
-  version: 46.19.11
-  resolution: "@wireapp/core@npm:46.19.11"
+"@wireapp/core@npm:46.20.1":
+  version: 46.20.1
+  resolution: "@wireapp/core@npm:46.20.1"
   dependencies:
-    "@wireapp/api-client": "npm:^27.24.0"
+    "@pydio/protocol-messaging": "npm:^1.51.0"
+    "@wireapp/api-client": "npm:^27.27.0"
     "@wireapp/commons": "npm:^5.4.2"
     "@wireapp/core-crypto": "npm:3.1.0"
     "@wireapp/cryptobox": "npm:12.8.0"
     "@wireapp/priority-queue": "npm:^2.1.11"
     "@wireapp/promise-queue": "npm:^2.3.12"
-    "@wireapp/protocol-messaging": "npm:1.51.0"
     "@wireapp/store-engine": "npm:5.1.11"
     axios: "npm:1.7.9"
     bazinga64: "npm:^6.3.11"
@@ -7557,7 +7557,7 @@ __metadata:
     long: "npm:^5.2.0"
     uuid: "npm:9.0.1"
     zod: "npm:3.24.2"
-  checksum: 10/ed8cbaff01304b9cb1b075e05fcffa3fd92a1e7a36bb4657f485dcdf2cb48c07bac960d9540c454a9fd2f36d130a96837bd58ad319fdc4d154a5cb485a8b113d
+  checksum: 10/8eab667fe93c676e59cffc6f4055bb3078f91bca3c95474c50a3829a04c465bc3d5f4020e68d4ddc90346827da1770c8170f7c897075506bcc40506824a95d54
   languageName: node
   linkType: hard
 
@@ -7656,18 +7656,6 @@ __metadata:
     "@wireapp/cbor": "npm:4.7.3"
     libsodium-wrappers-sumo: "npm:0.7.9"
   checksum: 10/94bb7c599df64146cf7d4d6e03d11bb293152f7eff21ce26164fd8cfec9a134e3b5c48ec4555c4d93a1a203c735ad3ea5bc21c8cac7acc42458d6adbccf655f8
-  languageName: node
-  linkType: hard
-
-"@wireapp/protocol-messaging@npm:1.51.0":
-  version: 1.51.0
-  resolution: "@wireapp/protocol-messaging@npm:1.51.0"
-  dependencies:
-    long: "npm:5.2.0"
-    protobufjs: "npm:7.2.5"
-    protobufjs-cli: "npm:1.1.2"
-    typescript: "npm:4.8.4"
-  checksum: 10/8403a24dd8f58176993d30c40285a30ee0d03f146f8ef8813422338c92d745f18d19e856a0f42b5da095f091c284b9becd98e51428dd4bb636a22e5161af4f50
   languageName: node
   linkType: hard
 
@@ -20744,7 +20732,7 @@ __metadata:
     "@wireapp/avs-debugger": "npm:0.0.7"
     "@wireapp/commons": "npm:5.4.2"
     "@wireapp/copy-config": "npm:2.3.0"
-    "@wireapp/core": "npm:46.19.11"
+    "@wireapp/core": "npm:46.20.1"
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/prettier-config": "npm:0.6.4"
     "@wireapp/react-ui-kit": "npm:9.43.0"

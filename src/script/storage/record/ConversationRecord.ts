@@ -17,6 +17,7 @@
  *
  */
 
+import {LegalHoldStatus} from '@pydio/protocol-messaging';
 import {
   CONVERSATION_ACCESS_ROLE,
   CONVERSATION_ACCESS,
@@ -27,8 +28,6 @@ import {
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
-
-import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {CONVERSATION_READONLY_STATE} from 'src/script/conversation/ConversationRepository';
 

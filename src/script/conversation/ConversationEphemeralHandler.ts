@@ -17,10 +17,9 @@
  *
  */
 
+import {Article, LinkPreview} from '@pydio/protocol-messaging';
 import {ConversationMessageTimerUpdateEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import ko from 'knockout';
-
-import {Article, LinkPreview} from '@wireapp/protocol-messaging';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {clamp} from 'Util/NumberUtil';

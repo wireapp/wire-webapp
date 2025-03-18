@@ -17,12 +17,11 @@
  *
  */
 
+import {Asset as ProtobufAsset} from '@pydio/protocol-messaging';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import type {Dexie} from 'dexie';
 import {container} from 'tsyringe';
-
-import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 
 import {getLogger, Logger} from 'Util/Logger';
 
