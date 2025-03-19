@@ -82,6 +82,10 @@ export const CellsGlobalView = ({cellsRepository = container.resolve(CellsReposi
     return files.filter(file => searchResults.includes(file.id));
   }, [files, searchValue, searchResults]);
 
+  const isLoading = filesStatus === 'loading';
+  const isError = filesStatus === 'error';
+  const isSuccess = filesStatus === 'success';
+  const hasFiles = !!filteredFiles.length;
   const emptySearchResults = searchStatus === 'success' && !searchResults.length;
 
   return (
@@ -99,17 +103,17 @@ export const CellsGlobalView = ({cellsRepository = container.resolve(CellsReposi
           description={t('cellsGlobalView.emptySearchResultsDescription')}
         />
       )}
-      {filesStatus === 'success' && !emptySearchResults && !!filteredFiles.length && (
+      {isSuccess && !emptySearchResults && hasFiles && (
         <CellsTable files={filteredFiles} cellsRepository={cellsRepository} onDeleteFile={handleDeleteFile} />
       )}
-      {!['loading', 'error'].includes(filesStatus) && !filteredFiles.length && (
+      {!isLoading && !isError && !hasFiles && (
         <CellsStateInfo
           heading={t('cellsGlobalView.noFilesHeading')}
           description={t('cellsGlobalView.noFilesDescription')}
         />
       )}
-      {filesStatus === 'loading' && <CellsLoader />}
-      {filesStatus === 'error' && (
+      {isLoading && <CellsLoader />}
+      {isError && (
         <CellsStateInfo
           heading={t('cellsGlobalView.errorHeading')}
           description={t('cellsGlobalView.errorDescription')}

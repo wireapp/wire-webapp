@@ -45,6 +45,11 @@ export const ConversationCells = ({
   const {files, status: filesStatus, clearAll, removeFile} = useCellsStore();
   const {refresh} = useGetAllCellsFiles({cellsRepository, conversationId});
 
+  const isLoading = filesStatus === 'loading';
+  const isError = filesStatus === 'error';
+  const isSuccess = filesStatus === 'success';
+  const hasFiles = !!files.length;
+
   const deleteFileFailedNotification = useAppNotification({
     message: t('cellsGlobalView.deleteModalError'),
   });
@@ -72,17 +77,17 @@ export const ConversationCells = ({
   return (
     <div css={wrapperStyles}>
       <CellsHeader onRefresh={handleRefresh} />
-      {filesStatus === 'success' && !!files.length && (
+      {isSuccess && hasFiles && (
         <CellsTable files={files} cellsRepository={cellsRepository} onDeleteFile={handleDeleteFile} />
       )}
-      {!['loading', 'error'].includes(filesStatus) && !files.length && (
+      {!isLoading && !isError && !hasFiles && (
         <CellsStateInfo
           heading={t('cellsGlobalView.noFilesHeading')}
           description={t('cellsGlobalView.noFilesDescription')}
         />
       )}
-      {filesStatus === 'loading' && <CellsLoader />}
-      {filesStatus === 'error' && (
+      {isLoading && <CellsLoader />}
+      {isError && (
         <CellsStateInfo
           heading={t('cellsGlobalView.errorHeading')}
           description={t('cellsGlobalView.errorDescription')}
