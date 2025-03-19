@@ -10137,14 +10137,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dexie@npm:4.0.11":
-  version: 4.0.11
-  resolution: "dexie@npm:4.0.11"
-  checksum: 10/52011f03655ce90aa6701f1e0724a10a3fd6b33d6e1ec72ba27b4392f500df54788e6ed23fd692a62eb50a21ab4fe146e08a85ceca19bbeb62e12269b124b4e2
-  languageName: node
-  linkType: hard
-
-"dexie@npm:>3.2.0":
+"dexie@npm:4.0.7, dexie@npm:>3.2.0":
   version: 4.0.7
   resolution: "dexie@npm:4.0.7"
   checksum: 10/e95facd65d4cc1dd450a104d0b94b81c3a5fb5be559ab68e93af1af4df435639b41850727594aaa4d4e50239abf8626f79c03423a0d3dabf1391e311580e7400
@@ -20225,6 +20218,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"use-sync-external-store@npm:1.2.2":
+  version: 1.2.2
+  resolution: "use-sync-external-store@npm:1.2.2"
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0
+  checksum: 10/671e9c190aab9a8374a5d468c6ba17f52c38b6fae970110bc196fc1e2b57204149aea9619be49a1bb5207fb6e51d8afd19c3bcb94afe61813fed039821461dc0
+  languageName: node
+  linkType: hard
+
 "use-sync-external-store@npm:^1.4.0":
   version: 1.4.0
   resolution: "use-sync-external-store@npm:1.4.0"
@@ -20848,7 +20850,7 @@ __metadata:
     css-loader: "npm:7.1.2"
     cssnano: "npm:7.0.6"
     date-fns: "npm:4.1.0"
-    dexie: "npm:4.0.11"
+    dexie: "npm:4.0.7"
     dexie-batch: "npm:0.4.3"
     dexie-encrypted: "npm:2.0.0"
     dotenv: "npm:16.4.7"
@@ -20936,7 +20938,7 @@ __metadata:
     webpack-hot-middleware: "npm:2.26.1"
     webrtc-adapter: "npm:9.0.1"
     workbox-webpack-plugin: "npm:7.3.0"
-    zustand: "npm:5.0.3"
+    zustand: "npm:4.5.5"
   languageName: unknown
   linkType: soft
 
@@ -21397,14 +21399,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zustand@npm:5.0.3":
-  version: 5.0.3
-  resolution: "zustand@npm:5.0.3"
+"zustand@npm:4.5.5":
+  version: 4.5.5
+  resolution: "zustand@npm:4.5.5"
+  dependencies:
+    use-sync-external-store: "npm:1.2.2"
   peerDependencies:
-    "@types/react": ">=18.0.0"
+    "@types/react": ">=16.8"
     immer: ">=9.0.6"
-    react: ">=18.0.0"
-    use-sync-external-store: ">=1.2.0"
+    react: ">=16.8"
   peerDependenciesMeta:
     "@types/react":
       optional: true
@@ -21412,8 +21415,6 @@ __metadata:
       optional: true
     react:
       optional: true
-    use-sync-external-store:
-      optional: true
-  checksum: 10/35728fdaa68291ea3e469524316dda4fe1d8cc22d8be3df309ca99bda0dbc7e66a1c502f66c26f76abfb4bd49a6e1368160353eb3cb173c24042a5f252075462
+  checksum: 10/481b8210187b69678074a1ca51107654c2379688e90407bfcb7961e0803a259742bfd0d77171c3f07e290896ad55fe9659b3863f30d34cb2572650ead1249f25
   languageName: node
   linkType: hard
