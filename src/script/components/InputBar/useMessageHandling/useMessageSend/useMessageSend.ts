@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useMemo, useState} from 'react';
+import {useCallback, useMemo} from 'react';
 
 import {LexicalEditor} from 'lexical';
 
@@ -38,6 +38,8 @@ import {MentionEntity} from 'src/script/message/MentionEntity';
 import {MessageHasher} from 'src/script/message/MessageHasher';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
 import {t} from 'Util/LocalizerUtil';
+
+import {useSendFiles} from './useSendFiles/useSendFiles';
 
 interface UseMessageSendProps {
   replyMessageEntity: ContentMessage | null;
@@ -78,7 +80,11 @@ export const useMessageSend = ({
 }: UseMessageSendProps) => {
   const {files, clearAll} = useFileUploadState();
 
-  const [isSending, setIsSending] = useState(false);
+  const {
+    sendFiles,
+    clearFiles,
+    isLoading: filesSendingLoading,
+  } = useSendFiles({files, clearAllFiles: clearAll, cellsRepository});
 
   const generateQuote = useCallback(async (): Promise<OutgoingQuote | undefined> => {
     return !replyMessageEntity
@@ -142,20 +148,6 @@ export const useMessageSend = ({
     [cancelMessageReply, conversation, generateQuote, messageRepository],
   );
 
-  const sendCellsFiles = useCallback(() => {
-    setIsSending(true);
-    const promoteFilesPromise = Promise.allSettled(
-      files.map(file => {
-        return cellsRepository.promoteFileDraft({uuid: file.remoteUuid, versionId: file.remoteVersionId});
-      }),
-    ).then(() => {
-      clearAll();
-      setIsSending(false);
-    });
-
-    return promoteFilesPromise;
-  }, [cellsRepository, files, clearAll]);
-
   const isSendingDisabled = useMemo(() => {
     const hasText = messageContent.text.length > 0;
     const hasFiles = files.length > 0;
@@ -168,7 +160,7 @@ export const useMessageSend = ({
     return !hasText;
   }, [messageContent.text, files]);
 
-  const sendMessage = useCallback((): void => {
+  const sendMessage = useCallback(async (): Promise<void> => {
     if (isSendingDisabled) {
       return;
     }
@@ -197,9 +189,11 @@ export const useMessageSend = ({
     }
 
     if (editedMessage) {
-      void sendMessageEdit(messageText, mentions);
+      await sendMessageEdit(messageText, mentions);
     } else {
+      await sendFiles();
       sendTextMessage(messageText, mentions);
+      clearFiles();
     }
 
     editorRef.current?.focus();
@@ -215,6 +209,8 @@ export const useMessageSend = ({
     sendMessageEdit,
     sendTextMessage,
     isSendingDisabled,
+    sendFiles,
+    clearFiles,
   ]);
 
   const handleSendMessage = useCallback(async () => {
@@ -226,7 +222,7 @@ export const useMessageSend = ({
         secondaryAction: {
           action: () => {
             conversation.mlsVerificationState(ConversationVerificationState.UNVERIFIED);
-            sendMessage();
+            void sendMessage();
           },
           text: t('conversation.E2EISendAnyway'),
         },
@@ -240,13 +236,15 @@ export const useMessageSend = ({
         },
       });
     } else {
-      sendMessage();
+      void sendMessage();
     }
   }, [conversation, conversationRepository, sendMessage]);
 
   return {
     sendMessage: handleSendMessage,
     generateQuote,
-    isSending,
+    // Sending messages via messageRepository is synchronous, so we don't need to use a state to track the sending status
+    // Although, we need to track the sending status for the files, because it's an async operation
+    isSending: filesSendingLoading,
   };
 };

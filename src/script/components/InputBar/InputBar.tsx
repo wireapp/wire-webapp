@@ -208,6 +208,7 @@ export const InputBar = ({
     editMessage,
     draftState,
     generateQuote,
+    isSending,
   } = useMessageHandling({
     messageContent,
     conversation,
@@ -334,6 +335,7 @@ export const InputBar = ({
                     onSelectFiles={uploadFiles}
                     onSelectImages={uploadImages}
                     onSend={handleSendMessage}
+                    isSending={isSending}
                   />
                 </InputBarEditor>
               )}

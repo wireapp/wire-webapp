@@ -54,6 +54,7 @@ interface InputBarControlsProps {
   onSelectFiles: (files: File[]) => void;
   onSelectImages: (files: File[]) => void;
   onSend: () => void;
+  isSending: boolean;
 }
 
 export const InputBarControls = ({
@@ -73,6 +74,7 @@ export const InputBarControls = ({
   onSelectFiles,
   onSelectImages,
   onSend,
+  isSending,
 }: InputBarControlsProps) => {
   const isMessageFormatButtonsFlagEnabled = Config.getConfig().FEATURE.ENABLE_MESSAGE_FORMAT_BUTTONS;
 
@@ -107,7 +109,12 @@ export const InputBarControls = ({
           onEmojiClick={emojiPicker.handleToggle}
         />
       </ul>
-      <SendMessageButton disabled={isSendingDisabled} onSend={onSend} className="input-bar-buttons__send" />
+      <SendMessageButton
+        isDisabled={isSendingDisabled || isSending}
+        isLoading={isSending}
+        onSend={onSend}
+        className="input-bar-buttons__send"
+      />
     </div>
   );
 };
