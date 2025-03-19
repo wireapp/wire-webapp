@@ -48,7 +48,7 @@ export const FilePreviewCard = ({
     <div css={wrapperStyles}>
       <FileCard.Root extension={extension} name={name} size={size}>
         <FileCard.Header>
-          <FileCard.Icon />
+          <FileCard.Icon type={isError ? 'error' : 'file'} />
           <FileCard.Type />
         </FileCard.Header>
         <FileCard.Name />

@@ -17,15 +17,11 @@
  *
  */
 
-import {AlertIcon} from '@wireapp/react-ui-kit';
-
 import {t} from 'Util/LocalizerUtil';
 
-import {alertIconStyles, iconWrapperStyles, imageStyles, wrapperStyles} from './ImagePreviewCard.styles';
+import {imageStyles} from './ImagePreviewCard.styles';
 
-import {FilePreviewDeleteButton} from '../common/FilePreviewDeleteButton/FilePreviewDeleteButton';
-import {FilePreviewErrorMoreButton} from '../common/FilePreviewErrorMoreButton/FilePreviewErrorMoreButton';
-import {FilePreviewLoading} from '../common/FilePreviewLoading/FilePreviewLoading';
+import {MediaFilePreviewCard} from '../common/MediaFilePreviewCard/MediaFilePreviewCard';
 
 interface ImagePreviewCardProps {
   src: string;
@@ -37,7 +33,13 @@ interface ImagePreviewCardProps {
 
 export const ImagePreviewCard = ({src, onDelete, onRetry, isLoading, isError}: ImagePreviewCardProps) => {
   return (
-    <article css={wrapperStyles} aria-label={t('conversationFileImagePreviewLabel', {src})}>
+    <MediaFilePreviewCard
+      label={t('conversationFileImagePreviewLabel', {src})}
+      onDelete={onDelete}
+      onRetry={onRetry}
+      isLoading={isLoading}
+      isError={isError}
+    >
       <img
         src={src}
         alt=""
@@ -46,16 +48,6 @@ export const ImagePreviewCard = ({src, onDelete, onRetry, isLoading, isError}: I
           URL.revokeObjectURL(src);
         }}
       />
-      {isError && (
-        <>
-          <div css={iconWrapperStyles}>
-            <AlertIcon css={alertIconStyles} />
-          </div>
-          <FilePreviewErrorMoreButton onDelete={onDelete} onRetry={onRetry} />
-        </>
-      )}
-      {isLoading && <FilePreviewLoading />}
-      {!isLoading && !isError && <FilePreviewDeleteButton onDelete={onDelete} />}
-    </article>
+    </MediaFilePreviewCard>
   );
 };

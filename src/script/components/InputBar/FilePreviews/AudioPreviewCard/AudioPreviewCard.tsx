@@ -54,12 +54,12 @@ export const AudioPreviewCard = ({
     <div css={wrapperStyles}>
       <FileCard.Root extension={extension} name={name} size={size}>
         <FileCard.Header>
-          <FileCard.Icon />
+          <FileCard.Icon type={isError ? 'error' : 'file'} />
           <FileCard.Type />
           <FileCard.Name />
         </FileCard.Header>
         <div css={controlStyles}>
-          {!isLoading && <FilePreviewPlayButton />}
+          <FilePreviewPlayButton />
           <div css={playerWrapperStyles}>
             <AudioEmptySeekBar />
           </div>
