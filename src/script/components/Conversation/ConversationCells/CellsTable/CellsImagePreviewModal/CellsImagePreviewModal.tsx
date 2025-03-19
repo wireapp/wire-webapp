@@ -23,7 +23,7 @@ import cx from 'classnames';
 
 import {CloseIcon} from 'Components/Icon';
 import {ZoomableImage} from 'Components/ZoomableImage';
-import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
+import {handleEscDown, handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {renderElement} from 'Util/renderElement';
 import {preventFocusOutside} from 'Util/util';
@@ -50,11 +50,7 @@ export const CellsImagePreviewModal = ({imageSrc}: CellsImagePreviewModalProps) 
 
   const handleCloseOnEscape = useCallback(
     (event: KeyboardEvent) => {
-      if (event.key !== KEY.ESC) {
-        return;
-      }
-
-      onCloseClick();
+      handleEscDown(event, onCloseClick);
     },
     [onCloseClick],
   );
