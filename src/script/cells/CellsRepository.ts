@@ -72,4 +72,8 @@ export class CellsRepository {
   async searchFiles({query}: {query: string}) {
     return this.apiClient.api.cells.searchFiles({phrase: query});
   }
+
+  async promoteFileDraft({uuid, versionId}: {uuid: string; versionId: string}) {
+    return this.apiClient.api.cells.promoteFileDraft({uuid, versionId});
+  }
 }

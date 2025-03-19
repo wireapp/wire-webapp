@@ -45,6 +45,7 @@ interface FileUploadState {
       uploadStatus?: FileUploadStatus;
     },
   ) => void;
+  clearAll: () => void;
 }
 
 export const useFileUploadState = create<FileUploadState>(set => ({
@@ -68,4 +69,5 @@ export const useFileUploadState = create<FileUploadState>(set => ({
         return file;
       }),
     })),
+  clearAll: () => set({files: []}),
 }));

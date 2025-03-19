@@ -24,6 +24,7 @@ import {LexicalEditor} from 'lexical';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
 import {Conversation} from 'src/script/entity/Conversation';
@@ -46,6 +47,7 @@ interface UseMessageHandlingProps {
   eventRepository: EventRepository;
   messageRepository: MessageRepository;
   storageRepository: StorageRepository;
+  cellsRepository: CellsRepository;
   editorRef: React.RefObject<LexicalEditor>;
   pastedFile: File | null;
   sendPastedFile: () => void;
@@ -55,6 +57,7 @@ export const useMessageHandling = ({
   messageContent,
   conversation,
   conversationRepository,
+  cellsRepository,
   eventRepository,
   messageRepository,
   storageRepository,
@@ -119,6 +122,7 @@ export const useMessageHandling = ({
     messageRepository,
     conversation,
     conversationRepository,
+    cellsRepository,
     draftState,
     cancelMessageEditing,
     cancelMessageReply,

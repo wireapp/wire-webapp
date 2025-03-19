@@ -547,6 +547,7 @@ export const Conversation = ({
                 key={activeConversation?.id}
                 conversation={activeConversation}
                 conversationRepository={repositories.conversation}
+                cellsRepository={repositories.cells}
                 eventRepository={repositories.event}
                 messageRepository={repositories.message}
                 openGiphy={openGiphy}

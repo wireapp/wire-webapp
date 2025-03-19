@@ -17,13 +17,15 @@
  *
  */
 
-import {useCallback} from 'react';
+import {useCallback, useMemo, useState} from 'react';
 
 import {LexicalEditor} from 'lexical';
 
+import {useFileUploadState} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
 import {MessageContent} from 'Components/InputBar/common/messageContent/messageContent';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
+import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {Config} from 'src/script/Config';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
@@ -43,6 +45,7 @@ interface UseMessageSendProps {
   messageRepository: MessageRepository;
   conversation: Conversation;
   conversationRepository: ConversationRepository;
+  cellsRepository: CellsRepository;
   draftState: {
     reset: () => void;
   };
@@ -62,6 +65,7 @@ export const useMessageSend = ({
   messageRepository,
   conversation,
   conversationRepository,
+  cellsRepository,
   draftState,
   cancelMessageEditing,
   cancelMessageReply,
@@ -72,6 +76,10 @@ export const useMessageSend = ({
   sendPastedFile,
   messageContent,
 }: UseMessageSendProps) => {
+  const {files, clearAll} = useFileUploadState();
+
+  const [isSending, setIsSending] = useState(false);
+
   const generateQuote = useCallback(async (): Promise<OutgoingQuote | undefined> => {
     return !replyMessageEntity
       ? Promise.resolve(undefined)
@@ -134,7 +142,37 @@ export const useMessageSend = ({
     [cancelMessageReply, conversation, generateQuote, messageRepository],
   );
 
+  const sendCellsFiles = useCallback(() => {
+    setIsSending(true);
+    const promoteFilesPromise = Promise.allSettled(
+      files.map(file => {
+        return cellsRepository.promoteFileDraft({uuid: file.remoteUuid, versionId: file.remoteVersionId});
+      }),
+    ).then(() => {
+      clearAll();
+      setIsSending(false);
+    });
+
+    return promoteFilesPromise;
+  }, [cellsRepository, files, clearAll]);
+
+  const isSendingDisabled = useMemo(() => {
+    const hasText = messageContent.text.length > 0;
+    const hasFiles = files.length > 0;
+    const hasSuccessfullyUploadedFiles = hasFiles && files.every(file => file.uploadStatus === 'success');
+
+    if (Config.getConfig().FEATURE.ENABLE_CELLS) {
+      return hasFiles ? !hasSuccessfullyUploadedFiles : !hasText;
+    }
+
+    return !hasText;
+  }, [messageContent.text, files]);
+
   const sendMessage = useCallback((): void => {
+    if (isSendingDisabled) {
+      return;
+    }
+
     if (pastedFile) {
       return void sendPastedFile();
     }
@@ -176,6 +214,7 @@ export const useMessageSend = ({
     sendPastedFile,
     sendMessageEdit,
     sendTextMessage,
+    isSendingDisabled,
   ]);
 
   const handleSendMessage = useCallback(async () => {
@@ -208,5 +247,6 @@ export const useMessageSend = ({
   return {
     sendMessage: handleSendMessage,
     generateQuote,
+    isSending,
   };
 };

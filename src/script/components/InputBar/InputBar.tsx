@@ -30,6 +30,7 @@ import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import {useFileUploadState} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
 import {EmojiPicker} from 'Components/EmojiPicker/EmojiPicker';
+import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
 import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
 import {EventName} from 'src/script/tracking/EventName';
@@ -74,6 +75,7 @@ const CONFIG = {
 interface InputBarProps {
   readonly conversation: Conversation;
   readonly conversationRepository: ConversationRepository;
+  readonly cellsRepository: CellsRepository;
   readonly eventRepository: EventRepository;
   readonly messageRepository: MessageRepository;
   readonly openGiphy: (inputValue: string) => void;
@@ -91,6 +93,7 @@ interface InputBarProps {
 export const InputBar = ({
   conversation,
   conversationRepository,
+  cellsRepository,
   eventRepository,
   messageRepository,
   openGiphy,
@@ -209,6 +212,7 @@ export const InputBar = ({
     messageContent,
     conversation,
     conversationRepository,
+    cellsRepository,
     storageRepository,
     eventRepository,
     messageRepository,
