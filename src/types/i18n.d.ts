@@ -396,6 +396,7 @@ declare module 'I18n/en-US.json' {
     'cellsGlobalView.shareFileModalLinkCopied': `Link copied`;
     'cellsGlobalView.shareFileModalErrorLoadingLink': `Something went wrong, please try again later.`;
     'cellsGlobalView.shareFileModalGeneratedPublicLink': `Generated public link`;
+    'cellsGlobalView.shareFileModalPrimaryAction': `Done`;
     'cellsGlobalView.imageFullScreenModalCloseButton': `Close`;
     'cellsSidebar.heading': `Files`;
     'cellsSidebar.title': `All`;
