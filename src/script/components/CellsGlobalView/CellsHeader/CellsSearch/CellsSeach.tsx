@@ -43,6 +43,11 @@ export const CellsSearch = ({searchValue, onSearch, onClearSearch}: CellsSearchP
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const searchValue = formData.get('cells-global-view-search') as string;
+
+    if (!searchValue) {
+      return;
+    }
+
     onSearch(searchValue);
   };
 
