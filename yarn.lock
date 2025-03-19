@@ -7450,7 +7450,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^27.25.0":
+"@wireapp/api-client@npm:^27.27.0":
   version: 27.28.0
   resolution: "@wireapp/api-client@npm:27.28.0"
   dependencies:
@@ -7535,12 +7535,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@file:.yalc/@wireapp/core::locator=wire-webapp%40workspace%3A.":
-  version: 46.19.12
-  resolution: "@wireapp/core@file:.yalc/@wireapp/core#.yalc/@wireapp/core::hash=517be6&locator=wire-webapp%40workspace%3A."
+"@wireapp/core@npm:46.20.1":
+  version: 46.20.1
+  resolution: "@wireapp/core@npm:46.20.1"
   dependencies:
     "@pydio/protocol-messaging": "npm:^1.51.0"
-    "@wireapp/api-client": "npm:^27.25.0"
+    "@wireapp/api-client": "npm:^27.27.0"
     "@wireapp/commons": "npm:^5.4.2"
     "@wireapp/core-crypto": "npm:3.1.0"
     "@wireapp/cryptobox": "npm:12.8.0"
@@ -7557,7 +7557,7 @@ __metadata:
     long: "npm:^5.2.0"
     uuid: "npm:9.0.1"
     zod: "npm:3.24.2"
-  checksum: 10/d09f0a29877e579a4043d3a6591881494b97d38531f87d4c1032c037f9d234635967de97b63ae09a921df22ed52d201e3a06e8bb40d470184906a15a7bbad39c
+  checksum: 10/8eab667fe93c676e59cffc6f4055bb3078f91bca3c95474c50a3829a04c465bc3d5f4020e68d4ddc90346827da1770c8170f7c897075506bcc40506824a95d54
   languageName: node
   linkType: hard
 
@@ -20732,7 +20732,7 @@ __metadata:
     "@wireapp/avs-debugger": "npm:0.0.7"
     "@wireapp/commons": "npm:5.4.2"
     "@wireapp/copy-config": "npm:2.3.0"
-    "@wireapp/core": "file:.yalc/@wireapp/core"
+    "@wireapp/core": "npm:46.20.1"
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/prettier-config": "npm:0.6.4"
     "@wireapp/react-ui-kit": "npm:9.43.0"
