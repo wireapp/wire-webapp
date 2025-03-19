@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useMemo, useRef, useState} from 'react';
+import {useCallback, useRef, useState} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
@@ -209,6 +209,7 @@ export const InputBar = ({
     draftState,
     generateQuote,
     isSending,
+    isSendingDisabled,
   } = useMessageHandling({
     messageContent,
     conversation,
@@ -237,18 +238,6 @@ export const InputBar = ({
     conversation,
     cancelMesssageEditing,
   });
-
-  const isSendingDisabled = useMemo(() => {
-    const hasText = messageContent.text.length > 0;
-    const hasFiles = files.length > 0;
-    const hasSuccessfullyUploadedFiles = hasFiles && files.every(file => file.uploadStatus === 'success');
-
-    if (Config.getConfig().FEATURE.ENABLE_CELLS) {
-      return hasFiles ? !hasSuccessfullyUploadedFiles : !hasText;
-    }
-
-    return !hasText;
-  }, [messageContent.text, files]);
 
   const handleSendMessage = useCallback(() => {
     if (isSendingDisabled) {

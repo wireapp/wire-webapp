@@ -246,5 +246,6 @@ export const useMessageSend = ({
     // Sending messages via messageRepository is synchronous, so we don't need to use a state to track the sending status
     // Although, we need to track the sending status for the files, because it's an async operation
     isSending: filesSendingLoading,
+    isSendingDisabled,
   };
 };

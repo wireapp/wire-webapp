@@ -52,8 +52,7 @@ export const useSendFiles = ({files, clearAllFiles, cellsRepository}: UseSendFil
     } catch (error) {
       errorNotification.show();
       setStatus('error');
-      console.error('Error sending files', error);
-      return Promise.reject(error);
+      throw error;
     }
     // cellsRepository is not a dependency because it's a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps

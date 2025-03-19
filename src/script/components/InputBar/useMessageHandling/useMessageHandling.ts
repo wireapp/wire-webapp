@@ -116,7 +116,7 @@ export const useMessageHandling = ({
     });
   }, [cancelMessageEditing, draftState, replyMessageCallback]);
 
-  const {sendMessage, generateQuote, isSending} = useMessageSend({
+  const {sendMessage, generateQuote, isSending, isSendingDisabled} = useMessageSend({
     replyMessageEntity,
     eventRepository,
     messageRepository,
@@ -235,5 +235,6 @@ export const useMessageHandling = ({
     replyMessage,
     generateQuote,
     isSending,
+    isSendingDisabled,
   };
 };
