@@ -22,6 +22,7 @@ import {useCallback, useState} from 'react';
 import {useAppNotification} from 'Components/AppNotification';
 import {FileWithPreview} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
+import {t} from 'Util/LocalizerUtil';
 
 export type SendFilesStatus = 'idle' | 'loading' | 'success' | 'error';
 
@@ -35,7 +36,7 @@ export const useSendFiles = ({files, clearAllFiles, cellsRepository}: UseSendFil
   const [status, setStatus] = useState<SendFilesStatus>('idle');
 
   const errorNotification = useAppNotification({
-    message: 'Something went wrong, please try again.',
+    message: t('conversationSendFilesError'),
   });
 
   const sendFile = useCallback(async (file: FileWithPreview) => {

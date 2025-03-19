@@ -720,6 +720,7 @@ declare module 'I18n/en-US.json' {
     'conversationsSecondaryLineSummaryReply': `{number} reply`;
     'conversationsSecondaryLineYouLeft': `You left`;
     'conversationsSecondaryLineYouWereRemoved': `You were removed`;
+    'conversationSendFilesError': `Something went wrong, please try again.`;
     'conversationsWelcome': `Welcome to {brandName} 👋`;
     'cookiePolicyStrings.bannerText': `We use cookies to personalize your experience on our website. By continuing to use the website, you agree to the use of cookies.{newline}Further information on cookies can be found in our <strong>privacy policy</strong>.`;
     'createAccount.headLine': `Set up your account`;
