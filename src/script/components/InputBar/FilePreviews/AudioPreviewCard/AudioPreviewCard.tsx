@@ -24,12 +24,12 @@ import {
 } from 'Components/MessagesList/Message/ContentMessage/asset/AudioAsset/AudioAssetV2.styles';
 
 import {AudioEmptySeekBar} from './AudioEmptySeekBar/AudioEmptySeekBar';
-import {loaderWrapperStyles, wrapperStyles} from './AudioPreviewCard.styles';
+import {wrapperStyles} from './AudioPreviewCard.styles';
 
 import {FilePreviewDeleteButton} from '../common/FilePreviewDeleteButton/FilePreviewDeleteButton';
 import {FilePreviewErrorMoreButton} from '../common/FilePreviewErrorMoreButton/FilePreviewErrorMoreButton';
+import {FilePreviewLoading} from '../common/FilePreviewLoading/FilePreviewLoading';
 import {FilePreviewPlayButton} from '../common/FilePreviewPlayButton/FilePreviewPlayButton';
-import {FilePreviewSpinner} from '../common/FilePreviewSpinner/FilePreviewSpinner';
 
 interface AudioPreviewCardProps {
   extension: string;
@@ -59,13 +59,7 @@ export const AudioPreviewCard = ({
           <FileCard.Name />
         </FileCard.Header>
         <div css={controlStyles}>
-          {isLoading ? (
-            <div css={loaderWrapperStyles}>
-              <FilePreviewSpinner />
-            </div>
-          ) : (
-            <FilePreviewPlayButton />
-          )}
+          {!isLoading && <FilePreviewPlayButton />}
           <div css={playerWrapperStyles}>
             <AudioEmptySeekBar />
           </div>
@@ -76,6 +70,7 @@ export const AudioPreviewCard = ({
             <FilePreviewErrorMoreButton onDelete={onDelete} onRetry={onRetry} />
           </>
         )}
+        {isLoading && <FilePreviewLoading />}
         {!isError && !isLoading && <FilePreviewDeleteButton onDelete={onDelete} />}
       </FileCard.Root>
     </div>

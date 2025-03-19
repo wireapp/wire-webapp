@@ -25,8 +25,8 @@ import {controlStyles, imageStyles, iconWrapperStyles, wrapperStyles, alertIconS
 
 import {FilePreviewDeleteButton} from '../common/FilePreviewDeleteButton/FilePreviewDeleteButton';
 import {FilePreviewErrorMoreButton} from '../common/FilePreviewErrorMoreButton/FilePreviewErrorMoreButton';
+import {FilePreviewLoading} from '../common/FilePreviewLoading/FilePreviewLoading';
 import {FilePreviewPlayButton} from '../common/FilePreviewPlayButton/FilePreviewPlayButton';
-import {FilePreviewSpinner} from '../common/FilePreviewSpinner/FilePreviewSpinner';
 
 interface VideoPreviewCardProps {
   src: string;
@@ -43,11 +43,6 @@ export const VideoPreviewCard = ({src, onDelete, onRetry, isLoading, isError}: V
       <div css={controlStyles}>
         <FilePreviewPlayButton />
       </div>
-      {isLoading && (
-        <div css={iconWrapperStyles}>
-          <FilePreviewSpinner />
-        </div>
-      )}
       {isError && (
         <>
           <div css={iconWrapperStyles}>
@@ -56,6 +51,7 @@ export const VideoPreviewCard = ({src, onDelete, onRetry, isLoading, isError}: V
           <FilePreviewErrorMoreButton onDelete={onDelete} onRetry={onRetry} />
         </>
       )}
+      {isLoading && <FilePreviewLoading />}
       {!isLoading && !isError && <FilePreviewDeleteButton onDelete={onDelete} />}
     </article>
   );

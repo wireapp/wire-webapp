@@ -17,8 +17,12 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {wrapperStyles, iconStyles} from './FilePreviewLoading.styles';
 
-export const spinnerStyles: CSSObject = {
-  color: 'var(--foreground)',
+export const FilePreviewLoading = () => {
+  return (
+    <div css={wrapperStyles}>
+      <div className="icon-spinner spin" css={iconStyles} />
+    </div>
+  );
 };

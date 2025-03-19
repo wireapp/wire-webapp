@@ -25,7 +25,7 @@ import {alertIconStyles, iconWrapperStyles, imageStyles, wrapperStyles} from './
 
 import {FilePreviewDeleteButton} from '../common/FilePreviewDeleteButton/FilePreviewDeleteButton';
 import {FilePreviewErrorMoreButton} from '../common/FilePreviewErrorMoreButton/FilePreviewErrorMoreButton';
-import {FilePreviewSpinner} from '../common/FilePreviewSpinner/FilePreviewSpinner';
+import {FilePreviewLoading} from '../common/FilePreviewLoading/FilePreviewLoading';
 
 interface ImagePreviewCardProps {
   src: string;
@@ -46,11 +46,6 @@ export const ImagePreviewCard = ({src, onDelete, onRetry, isLoading, isError}: I
           URL.revokeObjectURL(src);
         }}
       />
-      {isLoading && (
-        <div css={iconWrapperStyles}>
-          <FilePreviewSpinner />
-        </div>
-      )}
       {isError && (
         <>
           <div css={iconWrapperStyles}>
@@ -59,6 +54,7 @@ export const ImagePreviewCard = ({src, onDelete, onRetry, isLoading, isError}: I
           <FilePreviewErrorMoreButton onDelete={onDelete} onRetry={onRetry} />
         </>
       )}
+      {isLoading && <FilePreviewLoading />}
       {!isLoading && !isError && <FilePreviewDeleteButton onDelete={onDelete} />}
     </article>
   );

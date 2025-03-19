@@ -19,11 +19,11 @@
 
 import {FileCard} from 'Components/FileCard/FileCard';
 
-import {loadingWrapperStyles, wrapperStyles} from './FilePreviewCard.styles';
+import {wrapperStyles} from './FilePreviewCard.styles';
 
 import {FilePreviewDeleteButton} from '../common/FilePreviewDeleteButton/FilePreviewDeleteButton';
 import {FilePreviewErrorMoreButton} from '../common/FilePreviewErrorMoreButton/FilePreviewErrorMoreButton';
-import {FilePreviewSpinner} from '../common/FilePreviewSpinner/FilePreviewSpinner';
+import {FilePreviewLoading} from '../common/FilePreviewLoading/FilePreviewLoading';
 
 interface FilePreviewCardProps {
   extension: string;
@@ -50,11 +50,6 @@ export const FilePreviewCard = ({
         <FileCard.Header>
           <FileCard.Icon />
           <FileCard.Type />
-          {isLoading && (
-            <div css={loadingWrapperStyles}>
-              <FilePreviewSpinner />
-            </div>
-          )}
         </FileCard.Header>
         <FileCard.Name />
         {isError && (
@@ -63,6 +58,7 @@ export const FilePreviewCard = ({
             <FilePreviewErrorMoreButton onDelete={onDelete} onRetry={onRetry} />
           </>
         )}
+        {isLoading && <FilePreviewLoading />}
         {!isError && !isLoading && <FilePreviewDeleteButton onDelete={onDelete} />}
       </FileCard.Root>
     </div>
