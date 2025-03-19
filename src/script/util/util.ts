@@ -231,6 +231,24 @@ export const downloadFile = (url: string, fileName: string, mimeType?: string): 
 };
 
 /**
+ * Forces file download instead of browser "preview".
+ * We use fetch + blob because native <a download> doesn't work reliably across browsers and file types (especially PDFs and images).
+ */
+export const forcedDownloadFile = async ({url, name}: {url: string; name: string}) => {
+  const response = await fetch(url);
+  const blob = await response.blob();
+  const newBlob = new Blob([blob], {type: 'application/octet-stream'});
+  const newUrl = window.URL.createObjectURL(newBlob);
+  const link = document.createElement('a');
+  link.href = newUrl;
+  link.setAttribute('download', name);
+  document.body.appendChild(link);
+  link.click();
+  link.parentNode?.removeChild(link);
+  window.URL.revokeObjectURL(newUrl);
+};
+
+/**
  * Add zero padding until limit is reached.
  */
 export const zeroPadding = (value: string | number, length = 2): string => {

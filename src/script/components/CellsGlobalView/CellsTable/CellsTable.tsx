@@ -24,14 +24,22 @@ import {createColumnHelper, flexRender, getCoreRowModel, useReactTable} from '@t
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
-import {downloadFile} from 'Util/util';
+import {forcedDownloadFile} from 'Util/util';
 
 import {showCellsImagePreviewModal} from './CellsImagePreviewModal/CellsImagePreviewModal';
 import {showShareFileModal} from './CellsShareFileModal/CellsShareFileModal';
-import {headerCellStyles, tableCellRow, tableCellStyles, tableStyles, wrapperStyles} from './CellsTable.styles';
+import {
+  headerCellStyles,
+  tableActionsCellStyles,
+  tableCellRow,
+  tableCellStyles,
+  tableStyles,
+  wrapperStyles,
+} from './CellsTable.styles';
 import {CellsTableDateColumn} from './CellsTableDateColumn/CellsTableDateColumn';
 import {CellsTableNameColumn} from './CellsTableNameColumn/CellsTableNameColumn';
 import {CellsTableRowOptions} from './CellsTableRowOptions/CellsTableRowOptions';
+import {CellsTableSharedColumn} from './CellsTableSharedColumn/CellsTableSharedColumn';
 
 import {CellFile} from '../common/cellFile/cellFile';
 
@@ -85,6 +93,10 @@ export const CellsTable = ({files, cellsRepository, onDeleteFile}: CellsTablePro
         header: t('cellsGlobalView.tableRowCreated'),
         cell: info => <CellsTableDateColumn timestamp={info.getValue()} />,
       }),
+      columnHelper.accessor('publicLink', {
+        header: t('cellsGlobalView.tableRowPublicLink'),
+        cell: info => <CellsTableSharedColumn isShared={!!info.getValue()?.alreadyShared} />,
+      }),
       columnHelper.accessor('id', {
         header: () => <span className="visually-hidden">{t('cellsGlobalView.tableRowActions')}</span>,
         cell: info => {
@@ -100,7 +112,7 @@ export const CellsTable = ({files, cellsRepository, onDeleteFile}: CellsTablePro
                   : undefined
               }
               onShare={() => showShareFileModal({uuid, cellsRepository})}
-              onDownload={fileUrl ? () => downloadFile(fileUrl, info.row.original.name) : undefined}
+              onDownload={fileUrl ? () => forcedDownloadFile({url: fileUrl, name: info.row.original.name}) : undefined}
               onDelete={() => showDeleteFileModal({uuid, name: info.row.original.name})}
             />
           );
@@ -139,7 +151,11 @@ export const CellsTable = ({files, cellsRepository, onDeleteFile}: CellsTablePro
             {rows.map(row => (
               <tr key={row.id} css={tableCellRow}>
                 {row.getVisibleCells().map(cell => (
-                  <td key={cell.id} css={tableCellStyles} data-cell={cell.column.columnDef.header}>
+                  <td
+                    key={cell.id}
+                    css={cell.column.id === 'id' ? tableActionsCellStyles : tableCellStyles}
+                    data-cell={cell.column.id === 'id' ? undefined : cell.column.columnDef.header}
+                  >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}
