@@ -56,7 +56,7 @@ export const showShareFileModal = ({uuid, cellsRepository}: ShareFileModalParams
 const CellsShareFileModalContent = ({uuid, cellsRepository}: ShareFileModalParams) => {
   const {status, link, isEnabled, togglePublicLink} = useCellPublicLink({uuid, cellsRepository});
 
-  const isInputDisabled = status === 'loading' || status === 'error';
+  const isInputDisabled = ['loading', 'error'].includes(status);
 
   return (
     <div css={wrapperStyles}>
