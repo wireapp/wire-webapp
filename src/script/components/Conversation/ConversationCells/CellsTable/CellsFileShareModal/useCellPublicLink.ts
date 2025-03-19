@@ -43,7 +43,7 @@ export const useCellPublicLink = ({uuid, cellsRepository}: UseCellPublicLinkPara
       const link = await cellsRepository.createPublicLink({uuid, label: file?.name || ''});
 
       if (!link.LinkUrl || !link.Uuid) {
-        throw new Error('No link found');
+        throw new Error('Link not found');
       }
 
       const newLink = {uuid: link.Uuid, url: Config.getConfig().CELLS_PYDIO_URL + link.LinkUrl, alreadyShared: true};
@@ -71,7 +71,7 @@ export const useCellPublicLink = ({uuid, cellsRepository}: UseCellPublicLinkPara
       const link = await cellsRepository.getPublicLink({uuid: linkId});
 
       if (!link.LinkUrl || !link.Uuid) {
-        throw new Error('No link found');
+        throw new Error('Link not found');
       }
 
       const newLink = {uuid: link.Uuid, url: Config.getConfig().CELLS_PYDIO_URL + link.LinkUrl, alreadyShared: true};
