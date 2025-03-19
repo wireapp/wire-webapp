@@ -38,6 +38,7 @@ export enum CONVERSATION {
   LEGAL_HOLD_UPDATE = 'conversation.legal-hold-update',
   LOCATION = 'conversation.location',
   MESSAGE_ADD = 'conversation.message-add',
+  MULTIPART_MESSAGE_ADD = 'conversation.multipart-message-add',
   MESSAGE_DELETE = 'conversation.message-delete',
   MESSAGE_HIDDEN = 'conversation.message-hidden',
   MISSED_MESSAGES = 'conversation.missed-messages',

@@ -26,6 +26,7 @@ import {
 } from '@wireapp/api-client/lib/event';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {AddUsersFailure} from '@wireapp/core/lib/conversation';
+import {MultiPartContent} from '@wireapp/core/lib/conversation/content';
 import {ReactionType} from '@wireapp/core/lib/conversation/ReactionType';
 import {DecryptionError} from '@wireapp/core/lib/errors/DecryptionError';
 
@@ -156,6 +157,9 @@ export type MessageAddEvent = ConversationEvent<
   status: StatusType;
   version?: number;
 };
+// ToDo: refine which data is needed, maybe we can reuse the same data as in MessageAddEvent
+// Currently, the Data which is defined here doesnt match the data in the event
+export type MultipartMessageAddEvent = ConversationEvent<CONVERSATION.MULTIPART_MESSAGE_ADD, MultiPartContent> & {};
 export type MissedEvent = BaseEvent & {id: string; type: CONVERSATION.MISSED_MESSAGES};
 export type JoinedAfterMLSMigrationFinalisationEvent = BaseEvent & {
   type: CONVERSATION.JOINED_AFTER_MLS_MIGRATION;
@@ -266,7 +270,8 @@ export type ClientConversationEvent =
   | MLSConversationRecoveredEvent
   | LocationEvent
   | VoiceChannelActivateEvent
-  | VerificationEvent;
+  | VerificationEvent
+  | MultipartMessageAddEvent;
 
 function buildQualifiedId(conversation: QualifiedId | string) {
   const qualifiedId = typeof conversation === 'string' ? {domain: '', id: conversation} : conversation;

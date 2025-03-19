@@ -385,6 +385,7 @@ export class EventRepository {
         let eventToProcess: IncomingEvent | undefined = event;
         if (event.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD || event.type === CONVERSATION_EVENT.MLS_MESSAGE_ADD) {
           eventToProcess = await this.mapEncryptedEvent(event, {decryptedData, decryptionError}, source);
+          console.log('adrian handleEvent', eventToProcess, event.type);
         }
         if (!eventToProcess) {
           return event;
@@ -451,6 +452,7 @@ export class EventRepository {
       throw error;
     }
 
+    console.log('adrian processEvent', event, source);
     return this.handleEventDistribution(event, source);
   }
 
@@ -476,6 +478,7 @@ export class EventRepository {
         await this.updateLastEventDate(eventDate as string);
       }
     }
+    console.log('adrian handleEventDistribution', event, source);
     return this.distributeEvent(event, source);
   }
 }

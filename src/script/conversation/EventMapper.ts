@@ -37,6 +37,7 @@ import {
   E2EIVerificationEvent,
   MessageAddEvent,
   CompositeMessageAddEvent,
+  MultipartMessageAddEvent,
 } from './EventBuilder';
 
 import {AssetRemoteData} from '../assets/AssetRemoteData';
@@ -328,6 +329,13 @@ export class EventMapper {
 
       case ClientEvent.CONVERSATION.MESSAGE_ADD: {
         const addMessage = this._mapEventMessageAdd(event);
+        messageEntity = addMetadata(addMessage, event);
+        break;
+      }
+
+      case ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD: {
+        console.log('MULTIPART_MESSAGE_ADD', event);
+        const addMessage = this._mapEventMultipartAdd(event);
         messageEntity = addMetadata(addMessage, event);
         break;
       }
@@ -639,6 +647,36 @@ export class EventMapper {
       const {message_id: messageId, user_id: userId, error} = eventData.quote as any;
       messageEntity.quote(new QuoteEntity({error, messageId, userId}));
     }
+
+    return messageEntity;
+  }
+
+  /**
+   * Maps JSON data of conversation.message_add message into message entity.
+   *
+   * @param event Message data
+   * @returns Content message entity
+   */
+  private _mapEventMultipartAdd(event: MultipartMessageAddEvent) {
+    const {data: eventData, from} = event;
+    const messageEntity = new ContentMessage();
+
+    console.log('adrian event', event);
+    console.log('adrian eventData', eventData);
+
+    const data: MessageAddEvent['data'] = {
+      content: eventData.text?.content ?? '',
+      expects_read_confirmation: eventData.text?.expectsReadConfirmation ?? undefined,
+      sender: from,
+      // `ToDo: fix these values if needed
+      quote: undefined,
+      mentions: [],
+      previews: [],
+      replacing_message_id: '',
+    };
+
+    const assets = this._mapAssetText(data);
+    messageEntity.assets.push(assets);
 
     return messageEntity;
   }

@@ -34,6 +34,7 @@ import {
   FileMetaDataContent,
   LinkPreviewContent,
   LinkPreviewUploadedContent,
+  MultiPartContent,
   TextContent,
 } from '@wireapp/core/lib/conversation/content';
 import * as MessageBuilder from '@wireapp/core/lib/conversation/message/MessageBuilder';
@@ -144,6 +145,10 @@ type TextMessagePayload = {
   quote?: OutgoingQuote;
 };
 type EditMessagePayload = TextMessagePayload & {originalMessageId: string};
+
+type MultipartMessagePayload = TextMessagePayload & {
+  attachments: MultiPartContent['attachments'];
+};
 
 const enum SendAndInjectSendingState {
   FAILED = 'FAILED',
@@ -273,6 +278,27 @@ export class MessageRepository {
     return this.sendAndInjectMessage(textMessage, conversation, {...options, enableEphemeral: true});
   }
 
+  /**
+   * @see https://wearezeta.atlassian.net/wiki/spaces/CORE/pages/300351887/Using+federation+environments
+   * @see https://github.com/wireapp/wire-docs/tree/master/src/understand/federation
+   * @see https://docs.wire.com/understand/federation/index.html
+   */
+  private async sendMultipartText(
+    {conversation, message, messageId, attachments, linkPreview, mentions = [], quote}: MultipartMessagePayload,
+    options?: {syncTimestamp?: boolean},
+  ) {
+    const text = this.decorateTextMessage(
+      {
+        text: message,
+      },
+      conversation,
+      {linkPreview, mentions, quote},
+    );
+    const textMessage = MessageBuilder.buildMultipartMessage(attachments, text, messageId);
+
+    return this.sendAndInjectMessage(textMessage, conversation, {...options, enableEphemeral: true});
+  }
+
   private async sendEdit({
     conversation,
     message,
@@ -344,6 +370,7 @@ export class MessageRepository {
     mentions: MentionEntity[],
     quoteEntity?: OutgoingQuote,
     messageId?: string,
+    attachments: MultiPartContent['attachments'] = [],
   ): Promise<void> {
     const textPayload = {
       conversation,
@@ -354,7 +381,18 @@ export class MessageRepository {
       // Similarly, we provide that same id when we retry to send a failed message in order to override the original
       messageId: messageId ?? createUuid(),
     };
-    const {state} = await this.sendText(textPayload);
+
+    attachments?.push({cellAsset: {uuid: textPayload.messageId, contentType: 'text/plain'}});
+    attachments?.push({cellAsset: {uuid: `${textPayload.messageId}hello`, contentType: 'text/plain'}});
+
+    // Adrian ToDo: change this back
+    let state;
+    if (attachments && attachments.length > 0) {
+      state = (await this.sendMultipartText({...textPayload, attachments})).state;
+    } else {
+      state = (await this.sendText(textPayload)).state;
+    }
+
     if (state !== MessageSendingState.CANCELED) {
       await this.handleLinkPreview(textPayload);
     }
@@ -825,6 +863,7 @@ export class MessageRepository {
           payload,
           optimisticEvent,
         );
+        console.log('adrian mappedEvent', mappedEvent);
         await this.eventRepository.injectEvent(mappedEvent);
       }
       return silentDegradationWarning ? true : this.requestUserSendingPermission(conversation, false, consentType);

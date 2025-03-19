@@ -100,6 +100,7 @@ const Collection = ({
 
   useEffect(() => {
     const addItem = (message: ContentMessage) => {
+      console.log('adrian - Collection.tsx - Adding message', message);
       setMessages(oldMessages => [message].concat(oldMessages));
     };
 
