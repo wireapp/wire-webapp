@@ -384,6 +384,9 @@ declare module 'I18n/en-US.json' {
     'cellsGlobalView.tableRowSize': `Size`;
     'cellsGlobalView.tableRowCreated': `Created`;
     'cellsGlobalView.tableRowActions': `Actions`;
+    'cellsGlobalView.tableRowPublicLink': `Shared`;
+    'cellsGlobalView.tableRowSharedTruthyValue': `Yes`;
+    'cellsGlobalView.tableRowSharedFalsyValue': `No`;
     'cellsGlobalView.shareFileModalHeading': `Share file via link`;
     'cellsGlobalView.shareFileModalEnablePublicLink': `Enable public link`;
     'cellsGlobalView.shareFileModalDisablePublicLink': `Disable public link`;
@@ -393,6 +396,7 @@ declare module 'I18n/en-US.json' {
     'cellsGlobalView.shareFileModalLinkCopied': `Link copied`;
     'cellsGlobalView.shareFileModalErrorLoadingLink': `Something went wrong, please try again later.`;
     'cellsGlobalView.shareFileModalGeneratedPublicLink': `Generated public link`;
+    'cellsGlobalView.shareFileModalPrimaryAction': `Done`;
     'cellsGlobalView.imageFullScreenModalCloseButton': `Close`;
     'cellsSidebar.heading': `Files`;
     'cellsSidebar.title': `All`;
@@ -641,6 +645,7 @@ declare module 'I18n/en-US.json' {
     'conversationServicesWarning': `Services have access to the content of this conversation`;
     'conversationSomeone': `Someone`;
     'conversationStartNewConversation': `Create a Group`;
+    'conversationTabs': `Conversation tabs`;
     'conversationTeamLeft': `[bold]{name}[/bold] was removed from the team`;
     'conversationToday': `Today`;
     'conversationTweetAuthor': ` on Twitter`;

@@ -54,15 +54,19 @@ export class CellsRepository {
     return this.apiClient.api.cells.deleteFile({uuid});
   }
 
-  async getAllFiles() {
-    return this.apiClient.api.cells.getAllFiles({path: this.basePath});
+  async getAllFiles({path}: {path: string}) {
+    return this.apiClient.api.cells.getAllFiles({path: path || this.basePath});
   }
 
-  async getPublicLink({uuid, label}: {uuid: string; label: string}) {
+  async createPublicLink({uuid, label}: {uuid: string; label?: string}) {
     return this.apiClient.api.cells.createFilePublicLink({
       uuid,
       label,
     });
+  }
+
+  async getPublicLink({uuid}: {uuid: string}) {
+    return this.apiClient.api.cells.getFilePublicLink({uuid});
   }
 
   async deletePublicLink({uuid}: {uuid: string}) {
