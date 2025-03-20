@@ -32,6 +32,7 @@ import {CellsAPI} from './CellsAPI';
 import {CellsStorage} from './CellsStorage/CellsStorage';
 import {S3Service} from './CellsStorage/S3Service';
 
+import {AccessTokenStore} from '../auth/AccessTokenStore';
 import {HttpClient} from '../http';
 import {cellsConfigMock} from '../mocks/cells';
 
@@ -81,20 +82,38 @@ describe('CellsAPI', () => {
     testFile = new File([TEST_FILE_CONTENT], TEST_FILE_NAME, {type: TEST_FILE_TYPE}) as File;
 
     cellsAPI = new CellsAPI({
-      httpClient: mockHttpClient,
-      storageService: mockStorage,
-      config: cellsConfigMock,
+      accessTokenStore: {} as AccessTokenStore,
+      httpClientConfig: {
+        urls: {
+          rest: cellsConfigMock.pydio.url + cellsConfigMock.pydio.segment,
+          name: 'cells',
+          ws: 'wss://cells.wire.com',
+        },
+        headers: {Authorization: `Bearer ${cellsConfigMock.pydio.apiKey}`},
+      },
     });
+    cellsAPI.initialize({cellsConfig: cellsConfigMock, httpClient: mockHttpClient, storageService: mockStorage});
   });
 
-  it('initializes with provided storage service and creates NodeServiceApi', () => {
-    expect(NodeServiceApi).toHaveBeenCalledWith(undefined, undefined, mockHttpClient.client);
+  it('initializes with provided config and creates NodeServiceApi', () => {
+    expect(NodeServiceApi).toHaveBeenCalledWith(undefined, undefined, expect.any(Object));
   });
 
   it('creates a default S3Service if none is provided', () => {
     (S3Service as jest.Mock).mockClear();
 
-    new CellsAPI({httpClient: mockHttpClient, config: cellsConfigMock});
+    const api = new CellsAPI({
+      accessTokenStore: {} as AccessTokenStore,
+      httpClientConfig: {
+        urls: {
+          rest: cellsConfigMock.pydio.url + cellsConfigMock.pydio.segment,
+          name: 'cells',
+          ws: 'wss://cells.wire.com',
+        },
+        headers: {Authorization: `Bearer ${cellsConfigMock.pydio.apiKey}`},
+      },
+    });
+    api.initialize({cellsConfig: cellsConfigMock, httpClient: mockHttpClient});
 
     expect(S3Service).toHaveBeenCalledTimes(1);
     expect(S3Service).toHaveBeenCalledWith(cellsConfigMock.s3);

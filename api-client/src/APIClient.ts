@@ -48,7 +48,6 @@ import {Backend} from './env/';
 import {GenericAPI} from './generic';
 import {GiphyAPI} from './giphy/';
 import {BackendError, HttpClient} from './http/';
-import {cellsConfigMock} from './mocks/cells';
 import {NotificationAPI} from './notification/';
 import {OAuthAPI} from './oauth/OAuthAPI';
 import {ObfuscationUtil} from './obfuscation/';
@@ -209,9 +208,6 @@ export class APIClient extends EventEmitter {
 
     const assetAPI = new AssetAPI(this.transport.http, backendFeatures);
 
-    // To not mark "cells" as optional, we use the mock config for APIClient instances that are not using the cells feature.
-    const cellsConfig = this.config.cells || cellsConfigMock;
-
     return {
       account: new AccountAPI(this.transport.http),
       asset: assetAPI,
@@ -219,15 +215,8 @@ export class APIClient extends EventEmitter {
       services: new ServicesAPI(this.transport.http, assetAPI),
       broadcast: new BroadcastAPI(this.transport.http),
       cells: new CellsAPI({
-        httpClient: new HttpClient(
-          {
-            ...this.config,
-            urls: {...this.config.urls, rest: cellsConfig.pydio.url + cellsConfig.pydio.segment},
-            headers: {...this.config.headers, Authorization: `Bearer ${cellsConfig.pydio.apiKey}`},
-          },
-          this.accessTokenStore,
-        ),
-        config: cellsConfig,
+        httpClientConfig: this.config,
+        accessTokenStore: this.accessTokenStore,
       }),
       client: new ClientAPI(this.transport.http),
       connection: new ConnectionAPI(this.transport.http),
