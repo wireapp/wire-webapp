@@ -21,18 +21,5 @@ import {BackendData} from './env/';
 
 export interface Config {
   urls: BackendData;
-  cells?: {
-    pydio: {
-      apiKey: string;
-      segment: string;
-      url: string;
-    };
-    s3: {
-      apiKey: string;
-      bucket: string;
-      endpoint: string;
-      region: string;
-    };
-  };
   headers?: Record<string, string>;
 }

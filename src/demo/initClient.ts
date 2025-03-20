@@ -37,19 +37,6 @@ export async function initClient(): Promise<APIClient> {
       rest: process.env.WIRE_BACKEND_REST!,
       ws: process.env.WIRE_BACKEND_WS!,
     },
-    cells: {
-      pydio: {
-        apiKey: process.env.CELLS_PYDIO_API_KEY!,
-        url: process.env.CELLS_PYDIO_URL!,
-        segment: process.env.CELLS_PYDIO_REST_SEGMENT!,
-      },
-      s3: {
-        apiKey: process.env.CELLS_S3_API_KEY!,
-        bucket: process.env.CELLS_S3_BUCKET!,
-        endpoint: process.env.CELLS_S3_ENDPOINT!,
-        region: process.env.CELLS_S3_REGION!,
-      },
-    },
   };
 
   const apiClient = new APIClient(apiConfig);

@@ -33,25 +33,66 @@ import {
 import {CellsStorage} from './CellsStorage/CellsStorage';
 import {S3Service} from './CellsStorage/S3Service';
 
-import {Config} from '../Config';
+import {AccessTokenStore} from '../auth';
 import {HttpClient} from '../http';
 
+const CONFIGURATION_ERROR = 'CellsAPI is not configured. Call configure() before using any methods.';
+
+interface CellsConfig {
+  pydio: {
+    apiKey: string;
+    segment: string;
+    url: string;
+  };
+  s3: {
+    apiKey: string;
+    bucket: string;
+    endpoint: string;
+    region: string;
+  };
+}
+
 export class CellsAPI {
-  private readonly storageService: CellsStorage;
-  private readonly client: NodeServiceApi;
+  private accessTokenStore: AccessTokenStore;
+  private httpClientConfig: HttpClient['config'];
+  private storageService: CellsStorage | null;
+  private client: NodeServiceApi | null;
 
   constructor({
+    accessTokenStore,
+    httpClientConfig,
+  }: {
+    accessTokenStore: AccessTokenStore;
+    httpClientConfig: HttpClient['config'];
+  }) {
+    this.accessTokenStore = accessTokenStore;
+    this.httpClientConfig = httpClientConfig;
+    this.storageService = null;
+    this.client = null;
+  }
+
+  initialize({
+    cellsConfig,
     httpClient,
     storageService,
-    config,
   }: {
-    httpClient: HttpClient;
+    cellsConfig: CellsConfig;
+    httpClient?: HttpClient;
     storageService?: CellsStorage;
-    config: NonNullable<Config['cells']>;
   }) {
-    this.storageService = storageService || new S3Service(config.s3);
+    const http =
+      httpClient ||
+      new HttpClient(
+        {
+          ...this.httpClientConfig,
+          urls: {...this.httpClientConfig.urls, rest: cellsConfig.pydio.url + cellsConfig.pydio.segment},
+          headers: {...this.httpClientConfig.headers, Authorization: `Bearer ${cellsConfig.pydio.apiKey}`},
+        },
+        this.accessTokenStore,
+      );
 
-    this.client = new NodeServiceApi(undefined, undefined, httpClient.client);
+    this.storageService = storageService || new S3Service(cellsConfig.s3);
+    this.client = new NodeServiceApi(undefined, undefined, http.client);
   }
 
   async uploadFileDraft({
@@ -67,6 +108,10 @@ export class CellsAPI {
     file: File;
     autoRename?: boolean;
   }): Promise<RestCreateCheckResponse> {
+    if (!this.client || !this.storageService) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
     let filePath = `${path}`.normalize('NFC');
 
     const result = await this.client.createCheck({
@@ -90,24 +135,40 @@ export class CellsAPI {
   }
 
   async promoteFileDraft({uuid, versionId}: {uuid: string; versionId: string}): Promise<RestPromoteVersionResponse> {
+    if (!this.client || !this.storageService) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
     const result = await this.client.promoteVersion(uuid, versionId, {Publish: true});
 
     return result.data;
   }
 
   async deleteFileDraft({uuid, versionId}: {uuid: string; versionId: string}): Promise<RestDeleteVersionResponse> {
+    if (!this.client || !this.storageService) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
     const result = await this.client.deleteVersion(uuid, versionId);
 
     return result.data;
   }
 
   async deleteFile({uuid}: {uuid: string}): Promise<RestPerformActionResponse> {
+    if (!this.client || !this.storageService) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
     const result = await this.client.performAction('delete', {Nodes: [{Uuid: uuid}]});
 
     return result.data;
   }
 
   async lookupFileByPath({path}: {path: string}): Promise<RestNode | undefined> {
+    if (!this.client || !this.storageService) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
     const result = await this.client.lookup({
       Locators: {Many: [{Path: path}]},
       Flags: ['WithVersionsAll', 'WithPreSignedURLs'],
@@ -123,6 +184,10 @@ export class CellsAPI {
   }
 
   async lookupFileByUuid({uuid}: {uuid: string}): Promise<RestNode | undefined> {
+    if (!this.client || !this.storageService) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
     const result = await this.client.lookup({
       Locators: {Many: [{Uuid: uuid}]},
       Flags: ['WithVersionsAll', 'WithPreSignedURLs'],
@@ -138,18 +203,30 @@ export class CellsAPI {
   }
 
   async getFileVersions({uuid}: {uuid: string}): Promise<RestVersion[] | undefined> {
+    if (!this.client || !this.storageService) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
     const result = await this.client.nodeVersions(uuid, {FilterBy: 'VersionsAll'});
 
     return result.data.Versions;
   }
 
   async getFile({id}: {id: string}): Promise<RestNode> {
+    if (!this.client || !this.storageService) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
     const result = await this.client.getByUuid(id);
 
     return result.data;
   }
 
   async getAllFiles({path}: {path: string}): Promise<RestNodeCollection> {
+    if (!this.client || !this.storageService) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
     const result = await this.client.lookup({
       Locators: {Many: [{Path: `${path}/*`}]},
       Flags: ['WithVersionsAll', 'WithPreSignedURLs'],
@@ -159,6 +236,10 @@ export class CellsAPI {
   }
 
   async searchFiles({phrase}: {phrase: string}): Promise<RestNodeCollection> {
+    if (!this.client || !this.storageService) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
     const result = await this.client.lookup({
       Query: {FileName: phrase, Type: 'LEAF'},
       Flags: ['WithVersionsAll', 'WithPreSignedURLs'],
@@ -168,12 +249,20 @@ export class CellsAPI {
   }
 
   async deleteFilePublicLink({uuid}: {uuid: string}): Promise<RestPublicLinkDeleteSuccess> {
+    if (!this.client || !this.storageService) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
     const result = await this.client.deletePublicLink(uuid);
 
     return result.data;
   }
 
   async createFilePublicLink({uuid, label}: {uuid: string; label?: string}): Promise<RestShareLink> {
+    if (!this.client || !this.storageService) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
     const result = await this.client.createPublicLink(uuid, {
       Link: {
         Label: label,
@@ -185,6 +274,10 @@ export class CellsAPI {
   }
 
   async getFilePublicLink({uuid}: {uuid: string}): Promise<RestShareLink> {
+    if (!this.client || !this.storageService) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
     const result = await this.client.getPublicLink(uuid);
 
     return result.data;
