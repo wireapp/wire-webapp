@@ -23,21 +23,19 @@ import {createUuid} from 'Util/uuid';
 
 import {APIClient} from '../service/APIClientSingleton';
 
-type CellsConfig = {
-  cellsConfig: {
-    pydio: {
-      apiKey: string;
-      segment: string;
-      url: string;
-    };
-    s3: {
-      apiKey: string;
-      bucket: string;
-      endpoint: string;
-      region: string;
-    };
+interface CellsConfig {
+  pydio: {
+    apiKey: string;
+    segment: string;
+    url: string;
   };
-};
+  s3: {
+    apiKey: string;
+    bucket: string;
+    endpoint: string;
+    region: string;
+  };
+}
 
 @singleton()
 export class CellsRepository {
@@ -53,14 +51,14 @@ export class CellsRepository {
     }
     this.config = config;
     this.isInitialized = true;
-    return this.apiClient.api.cells.initialize(config);
+    return this.apiClient.api.cells.initialize({cellsConfig: config});
   }
 
   private ensureInitialized() {
     if (!this.isInitialized || !this.config) {
       throw new Error('CellsRepository not initialized. Call initialize() first.');
     }
-    return this.apiClient.api.cells.initialize(this.config);
+    return this.apiClient.api.cells.initialize({cellsConfig: this.config});
   }
 
   async uploadFile(file: File): Promise<{uuid: string; versionId: string}> {

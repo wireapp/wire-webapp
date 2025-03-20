@@ -352,18 +352,16 @@ export class App {
         : `${cellPydioApiKey}:${selfUser.qualifiedId.id}@${selfUser.qualifiedId.domain}`;
 
     cellsRepository.initialize({
-      cellsConfig: {
-        pydio: {
-          apiKey: cellsApiKey,
-          segment: Config.getConfig().CELLS_PYDIO_SEGMENT,
-          url: Config.getConfig().CELLS_PYDIO_URL,
-        },
-        s3: {
-          apiKey: Config.getConfig().CELLS_S3_API_KEY,
-          bucket: Config.getConfig().CELLS_S3_BUCKET,
-          endpoint: Config.getConfig().CELLS_S3_ENDPOINT,
-          region: Config.getConfig().CELLS_S3_REGION,
-        },
+      pydio: {
+        apiKey: cellsApiKey,
+        segment: Config.getConfig().CELLS_PYDIO_SEGMENT,
+        url: Config.getConfig().CELLS_PYDIO_URL,
+      },
+      s3: {
+        apiKey: Config.getConfig().CELLS_S3_API_KEY,
+        bucket: Config.getConfig().CELLS_S3_BUCKET,
+        endpoint: Config.getConfig().CELLS_S3_ENDPOINT,
+        region: Config.getConfig().CELLS_S3_REGION,
       },
     });
   }
