@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.29.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.28.0...@wireapp/api-client@27.29.0) (2025-03-20)
+
+### Features
+
+* **api-client/cells:** dynamic cells configuration [WPB-16524] ([#6987](https://github.com/wireapp/wire-web-packages/issues/6987)) ([3a373c5](https://github.com/wireapp/wire-web-packages/commit/3a373c5bf44e05b0bd0f3268f611efaab5c4dae4))
+
 # [27.28.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.27.0...@wireapp/api-client@27.28.0) (2025-03-18)
 
 ### Features
