@@ -17,16 +17,12 @@
  *
  */
 
-import {AlertIcon} from '@wireapp/react-ui-kit';
-
 import {t} from 'Util/LocalizerUtil';
 
-import {controlStyles, imageStyles, iconWrapperStyles, wrapperStyles, alertIconStyles} from './VideoPreviewCard.styles';
+import {videoStyles, iconWrapperStyles} from './VideoPreviewCard.styles';
 
-import {FilePreviewDeleteButton} from '../common/FilePreviewDeleteButton/FilePreviewDeleteButton';
-import {FilePreviewErrorMoreButton} from '../common/FilePreviewErrorMoreButton/FilePreviewErrorMoreButton';
 import {FilePreviewPlayButton} from '../common/FilePreviewPlayButton/FilePreviewPlayButton';
-import {FilePreviewSpinner} from '../common/FilePreviewSpinner/FilePreviewSpinner';
+import {MediaFilePreviewCard} from '../common/MediaFilePreviewCard/MediaFilePreviewCard';
 
 interface VideoPreviewCardProps {
   src: string;
@@ -38,25 +34,17 @@ interface VideoPreviewCardProps {
 
 export const VideoPreviewCard = ({src, onDelete, onRetry, isLoading, isError}: VideoPreviewCardProps) => {
   return (
-    <article css={wrapperStyles} aria-label={t('conversationFileVideoPreviewLabel', {src})}>
-      <video src={src} preload="metadata" css={imageStyles} />
-      <div css={controlStyles}>
+    <MediaFilePreviewCard
+      label={t('conversationFileVideoPreviewLabel', {src})}
+      onDelete={onDelete}
+      onRetry={onRetry}
+      isLoading={isLoading}
+      isError={isError}
+    >
+      <video src={src} preload="metadata" css={videoStyles} />
+      <div css={iconWrapperStyles}>
         <FilePreviewPlayButton />
       </div>
-      {isLoading && (
-        <div css={iconWrapperStyles}>
-          <FilePreviewSpinner />
-        </div>
-      )}
-      {isError && (
-        <>
-          <div css={iconWrapperStyles}>
-            <AlertIcon css={alertIconStyles} />
-          </div>
-          <FilePreviewErrorMoreButton onDelete={onDelete} onRetry={onRetry} />
-        </>
-      )}
-      {!isLoading && !isError && <FilePreviewDeleteButton onDelete={onDelete} />}
-    </article>
+    </MediaFilePreviewCard>
   );
 };
