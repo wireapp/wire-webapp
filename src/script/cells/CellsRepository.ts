@@ -41,7 +41,6 @@ interface CellsConfig {
 export class CellsRepository {
   private readonly basePath = 'wire-cells-web';
   private isInitialized = false;
-  private config: CellsConfig | null = null;
 
   constructor(private readonly apiClient = container.resolve(APIClient)) {}
 
@@ -49,16 +48,9 @@ export class CellsRepository {
     if (this.isInitialized) {
       return;
     }
-    this.config = config;
-    this.isInitialized = true;
-    return this.apiClient.api.cells.initialize({cellsConfig: config});
-  }
 
-  private ensureInitialized() {
-    if (!this.isInitialized || !this.config) {
-      throw new Error('CellsRepository not initialized. Call initialize() first.');
-    }
-    return this.apiClient.api.cells.initialize({cellsConfig: this.config});
+    this.apiClient.api.cells.initialize({cellsConfig: config});
+    this.isInitialized = true;
   }
 
   async uploadFile({file, path}: {file: File; path: string}): Promise<{uuid: string; versionId: string}> {
@@ -89,7 +81,6 @@ export class CellsRepository {
   }
 
   async getAllFiles({path}: {path: string}) {
-    this.ensureInitialized();
     return this.apiClient.api.cells.getAllFiles({path: path || this.basePath});
   }
 
@@ -109,7 +100,6 @@ export class CellsRepository {
   }
 
   async searchFiles({query}: {query: string}) {
-    this.ensureInitialized();
     return this.apiClient.api.cells.searchFiles({phrase: query});
   }
 
