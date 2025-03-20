@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [27.29.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.29.0...@wireapp/api-client@27.29.1) (2025-03-20)
+
+### Bug Fixes
+
+* **api-client/cells:** single cells initialization ([#6988](https://github.com/wireapp/wire-web-packages/issues/6988)) ([52ff551](https://github.com/wireapp/wire-web-packages/commit/52ff55162cc65d5d8df1c7e66e961611e80ddd5d))
+
 # [27.29.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.28.0...@wireapp/api-client@27.29.0) (2025-03-20)
 
 ### Features
