@@ -68,6 +68,7 @@ import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {createUuid} from 'Util/uuid';
 
 import {Call, SerializedConversationId} from './Call';
+import {CallingEpochCache} from './CallingEpochCache';
 import {callingSubscriptions} from './callingSubscriptionsHandler';
 import {CallingViewMode, CallState, MuteState} from './CallState';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
@@ -158,6 +159,7 @@ export class CallingRepository {
   private wUser: number = 0;
   private nextMuteState: MuteState = MuteState.SELF_MUTED;
   private isConferenceCallingSupported = false;
+  private epochCache = new CallingEpochCache();
 
   static EMOJI_TIME_OUT_DURATION = TIME_IN_MILLIS.SECOND * 4;
 
@@ -958,6 +960,11 @@ export class CallingRepository {
           ? this.warmupMediaStreams(call, true, true)
           : Promise.resolve(true);
       const success = await loadPreviewPromise;
+
+      if (this.isMLSConference(conversation)) {
+        await this.joinMlsConferenceSubconversation(conversation);
+      }
+
       if (success) {
         /**
          * Since we might have been on a conference call before, which was started as muted, then we've hung up and started an outgoing call,
@@ -973,10 +980,6 @@ export class CallingRepository {
       } else {
         this.showNoCameraModal();
         this.removeCall(call);
-      }
-
-      if (this.isMLSConference(conversation)) {
-        await this.joinMlsConferenceSubconversation(conversation);
       }
 
       return call;
@@ -1277,6 +1280,7 @@ export class CallingRepository {
   };
 
   private readonly joinMlsConferenceSubconversation = async ({qualifiedId, groupId}: MLSConversation) => {
+    this.epochCache.enable();
     const unsubscribe = await this.subconversationService.subscribeToEpochUpdates(
       qualifiedId,
       groupId,
@@ -1358,6 +1362,10 @@ export class CallingRepository {
       convid: serializedConversationId,
       clients: members,
     };
+
+    if (this.epochCache.isEnabled()) {
+      return this.epochCache.store({serializedConversationId, epoch, clients, secretKey});
+    }
 
     return this.wCall?.setEpochInfo(this.wUser, serializedConversationId, epoch, JSON.stringify(clients), secretKey);
   };
