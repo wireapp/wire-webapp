@@ -38,8 +38,6 @@ export const useGetAllCellsFiles = ({cellsRepository}: UseGetAllCellsFilesProps)
 
       const result = await cellsRepository.searchFiles({query: '*'});
 
-      console.log('fetchFiles', result);
-
       if (!result.Nodes) {
         throw new Error('No files found');
       }
@@ -47,10 +45,10 @@ export const useGetAllCellsFiles = ({cellsRepository}: UseGetAllCellsFilesProps)
       const transformedFiles = transformNodesToCellsFiles(result.Nodes);
       setFiles(transformedFiles);
       setStatus('success');
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Failed to fetch files', {cause: err}));
+    } catch (error) {
+      setError(error instanceof Error ? error : new Error('Failed to fetch files', {cause: error}));
       setStatus('error');
-      console.error('fetchFiles', err);
+      throw error;
     }
     // cellsRepository is not a dependency because it's a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps
