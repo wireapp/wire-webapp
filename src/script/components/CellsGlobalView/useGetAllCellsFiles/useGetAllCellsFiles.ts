@@ -38,6 +38,8 @@ export const useGetAllCellsFiles = ({cellsRepository}: UseGetAllCellsFilesProps)
 
       const result = await cellsRepository.searchFiles({query: '*'});
 
+      console.log('fetchFiles', result);
+
       if (!result.Nodes) {
         throw new Error('No files found');
       }
@@ -48,6 +50,7 @@ export const useGetAllCellsFiles = ({cellsRepository}: UseGetAllCellsFilesProps)
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Failed to fetch files', {cause: err}));
       setStatus('error');
+      console.error('fetchFiles', err);
     }
     // cellsRepository is not a dependency because it's a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps

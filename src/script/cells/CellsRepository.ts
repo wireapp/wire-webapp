@@ -17,17 +17,54 @@
  *
  */
 
-import {container} from 'tsyringe';
+import {container, singleton} from 'tsyringe';
 
 import {createUuid} from 'Util/uuid';
 
 import {APIClient} from '../service/APIClientSingleton';
 
+type CellsConfig = {
+  cellsConfig: {
+    pydio: {
+      apiKey: string;
+      segment: string;
+      url: string;
+    };
+    s3: {
+      apiKey: string;
+      bucket: string;
+      endpoint: string;
+      region: string;
+    };
+  };
+};
+
+@singleton()
 export class CellsRepository {
   private readonly basePath = 'wire-cells-web';
+  private isInitialized = false;
+  private config: CellsConfig | null = null;
+
   constructor(private readonly apiClient = container.resolve(APIClient)) {}
 
+  initialize(config: CellsConfig) {
+    if (this.isInitialized) {
+      return;
+    }
+    this.config = config;
+    this.isInitialized = true;
+    return this.apiClient.api.cells.initialize(config);
+  }
+
+  private ensureInitialized() {
+    if (!this.isInitialized || !this.config) {
+      throw new Error('CellsRepository not initialized. Call initialize() first.');
+    }
+    return this.apiClient.api.cells.initialize(this.config);
+  }
+
   async uploadFile(file: File): Promise<{uuid: string; versionId: string}> {
+    this.ensureInitialized();
     const path = `${this.basePath}/${encodeURIComponent(file.name)}`;
 
     const uuid = createUuid();
@@ -47,18 +84,22 @@ export class CellsRepository {
   }
 
   async deleteFileDraft({uuid, versionId}: {uuid: string; versionId: string}) {
+    this.ensureInitialized();
     return this.apiClient.api.cells.deleteFileDraft({uuid, versionId});
   }
 
   async deleteFile({uuid}: {uuid: string}) {
+    this.ensureInitialized();
     return this.apiClient.api.cells.deleteFile({uuid});
   }
 
   async getAllFiles({path}: {path: string}) {
+    this.ensureInitialized();
     return this.apiClient.api.cells.getAllFiles({path: path || this.basePath});
   }
 
   async createPublicLink({uuid, label}: {uuid: string; label?: string}) {
+    this.ensureInitialized();
     return this.apiClient.api.cells.createFilePublicLink({
       uuid,
       label,
@@ -66,14 +107,17 @@ export class CellsRepository {
   }
 
   async getPublicLink({uuid}: {uuid: string}) {
+    this.ensureInitialized();
     return this.apiClient.api.cells.getFilePublicLink({uuid});
   }
 
   async deletePublicLink({uuid}: {uuid: string}) {
+    this.ensureInitialized();
     return this.apiClient.api.cells.deleteFilePublicLink({uuid});
   }
 
   async searchFiles({query}: {query: string}) {
+    this.ensureInitialized();
     return this.apiClient.api.cells.searchFiles({phrase: query});
   }
 }
