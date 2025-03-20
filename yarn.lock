@@ -7459,9 +7459,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^27.27.0":
-  version: 27.27.0
-  resolution: "@wireapp/api-client@npm:27.27.0"
+"@wireapp/api-client@npm:^27.29.0":
+  version: 27.29.0
+  resolution: "@wireapp/api-client@npm:27.29.0"
   dependencies:
     "@aws-sdk/client-s3": "npm:3.750.0"
     "@pydio/protocol-messaging": "npm:1.51.0"
@@ -7479,7 +7479,7 @@ __metadata:
     uuid: "npm:11.1.0"
     ws: "npm:8.18.1"
     zod: "npm:3.24.2"
-  checksum: 10/5d60eb8f6b45df4ec9db9b2408881b42f70d2948346070994a5ef929f18d82ae7c55a748a59a528249306fd78179b77e80ba9da035881bc8f451bf64e3c125d3
+  checksum: 10/7fe20cefadc43766f6ce7fc9b5d6929af7f8c1570687bffa8531be1fdef369b2d61f60f094d7ef6ae0a5bd75dd78bd3646ab92fa91b5cd42298053320db96999
   languageName: node
   linkType: hard
 
@@ -7544,12 +7544,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:46.20.1":
-  version: 46.20.1
-  resolution: "@wireapp/core@npm:46.20.1"
+"@wireapp/core@npm:46.20.3":
+  version: 46.20.3
+  resolution: "@wireapp/core@npm:46.20.3"
   dependencies:
     "@pydio/protocol-messaging": "npm:^1.51.0"
-    "@wireapp/api-client": "npm:^27.27.0"
+    "@wireapp/api-client": "npm:^27.29.0"
     "@wireapp/commons": "npm:^5.4.2"
     "@wireapp/core-crypto": "npm:3.1.0"
     "@wireapp/cryptobox": "npm:12.8.0"
@@ -7566,7 +7566,7 @@ __metadata:
     long: "npm:^5.2.0"
     uuid: "npm:9.0.1"
     zod: "npm:3.24.2"
-  checksum: 10/8eab667fe93c676e59cffc6f4055bb3078f91bca3c95474c50a3829a04c465bc3d5f4020e68d4ddc90346827da1770c8170f7c897075506bcc40506824a95d54
+  checksum: 10/feca747af8b123cb229e382c586928060f7daafe2b845f775b4c66859c7147bbefcc26a2d1f4712f04cfbcb9f32e305f0c4a6e5f8bbba2786bef4466e7cb2861
   languageName: node
   linkType: hard
 
@@ -20829,7 +20829,7 @@ __metadata:
     "@wireapp/avs-debugger": "npm:0.0.7"
     "@wireapp/commons": "npm:5.4.2"
     "@wireapp/copy-config": "npm:2.3.0"
-    "@wireapp/core": "npm:46.20.1"
+    "@wireapp/core": "npm:46.20.3"
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/prettier-config": "npm:0.6.4"
     "@wireapp/react-ui-kit": "npm:9.43.0"
