@@ -471,6 +471,7 @@ export const Conversation = ({
   const {getRootProps, getInputProps, open, isDragAccept} = useFilesUploadDropzone({
     isTeam: inTeam,
     cellsRepository: repositories.cells,
+    conversationId: activeConversation?.id || '',
   });
 
   const isCellsEnabled = Config.getConfig().FEATURE.ENABLE_CELLS;
@@ -563,6 +564,7 @@ export const Conversation = ({
                   key={activeConversation?.id}
                   conversation={activeConversation}
                   conversationRepository={repositories.conversation}
+                  cellsRepository={repositories.cells}
                   eventRepository={repositories.event}
                   messageRepository={repositories.message}
                   openGiphy={openGiphy}

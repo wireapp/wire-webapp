@@ -40,16 +40,20 @@ const logger = getLogger('FileDropzone');
 interface UseFilesUploadDropzoneParams {
   isTeam: boolean;
   cellsRepository: CellsRepository;
+  conversationId: string;
 }
 
-export const useFilesUploadDropzone = ({isTeam, cellsRepository}: UseFilesUploadDropzoneParams) => {
+export const useFilesUploadDropzone = ({isTeam, cellsRepository, conversationId}: UseFilesUploadDropzoneParams) => {
   const {addFiles, files, updateFile} = useFileUploadState();
 
   const MAX_SIZE = isTeam ? CONFIG.MAXIMUM_ASSET_FILE_SIZE_TEAM : CONFIG.MAXIMUM_ASSET_FILE_SIZE_PERSONAL;
 
   const uploadFile = async (file: FileWithPreview) => {
     try {
-      const {uuid, versionId} = await cellsRepository.uploadFile(file);
+      const {uuid, versionId} = await cellsRepository.uploadFile({
+        file,
+        path: `${conversationId}@${CONFIG.CELLS_WIRE_DOMAIN}`,
+      });
       updateFile(file.id, {remoteUuid: uuid, remoteVersionId: versionId, uploadStatus: 'success'});
     } catch (error) {
       logger.error('Uploading file failed', error);
