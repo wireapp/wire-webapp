@@ -63,6 +63,7 @@ export class CellsRepository {
 
   async uploadFile(file: File): Promise<{uuid: string; versionId: string}> {
     this.ensureInitialized();
+
     const path = `${this.basePath}/${encodeURIComponent(file.name)}`;
 
     const uuid = createUuid();
@@ -82,12 +83,10 @@ export class CellsRepository {
   }
 
   async deleteFileDraft({uuid, versionId}: {uuid: string; versionId: string}) {
-    this.ensureInitialized();
     return this.apiClient.api.cells.deleteFileDraft({uuid, versionId});
   }
 
   async deleteFile({uuid}: {uuid: string}) {
-    this.ensureInitialized();
     return this.apiClient.api.cells.deleteFile({uuid});
   }
 
@@ -97,7 +96,6 @@ export class CellsRepository {
   }
 
   async createPublicLink({uuid, label}: {uuid: string; label?: string}) {
-    this.ensureInitialized();
     return this.apiClient.api.cells.createFilePublicLink({
       uuid,
       label,
@@ -105,12 +103,10 @@ export class CellsRepository {
   }
 
   async getPublicLink({uuid}: {uuid: string}) {
-    this.ensureInitialized();
     return this.apiClient.api.cells.getFilePublicLink({uuid});
   }
 
   async deletePublicLink({uuid}: {uuid: string}) {
-    this.ensureInitialized();
     return this.apiClient.api.cells.deleteFilePublicLink({uuid});
   }
 
