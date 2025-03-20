@@ -18,13 +18,16 @@
  */
 
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
-import {EventBuilder} from 'src/script/conversation/EventBuilder';
+import {EventBuilder, OneToOneCreationEvent} from 'src/script/conversation/EventBuilder';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {UserRepository} from 'src/script/user/UserRepository';
 import {createUuid} from 'Util/uuid';
 
 import {ServiceMiddleware} from './ServiceMiddleware';
+
+import {createBaseEvent} from '../../conversation/EventNew';
+import {ClientEvent} from '../Client';
 
 function buildServiceMiddleware() {
   const selfUser = new User(createUuid());
@@ -119,7 +122,16 @@ describe('ServiceMiddleware', () => {
 
       it('adds meta when services are present in the event with qualified user ids', async () => {
         const [serviceMiddleware, {userRepository}] = buildServiceMiddleware();
-        const event = EventBuilder.build1to1Creation(conversation);
+        // const event = EventBuilder.build1to1Creation(conversation);
+        const event = createBaseEvent<OneToOneCreationEvent>({
+          conversation,
+          eventType: ClientEvent.CONVERSATION.ONE2ONE_CREATION,
+          additionalData: {
+            userIds: conversation.participating_user_ids(),
+          },
+          from: conversation.creator,
+          timestamp: 0,
+        });
 
         const service = new User();
         service.isService = true;
