@@ -154,6 +154,7 @@ export class APIClient extends EventEmitter {
 
   // APIs
   public api: Apis;
+  private cellsApi: CellsAPI | null = null;
 
   // Configuration
   private readonly accessTokenStore: AccessTokenStore;
@@ -208,16 +209,21 @@ export class APIClient extends EventEmitter {
 
     const assetAPI = new AssetAPI(this.transport.http, backendFeatures);
 
+    // Prevents the CellsAPI from being initialized multiple times
+    if (!this.cellsApi) {
+      this.cellsApi = new CellsAPI({
+        httpClientConfig: this.config,
+        accessTokenStore: this.accessTokenStore,
+      });
+    }
+
     return {
       account: new AccountAPI(this.transport.http),
       asset: assetAPI,
       auth: new AuthAPI(this.transport.http),
       services: new ServicesAPI(this.transport.http, assetAPI),
       broadcast: new BroadcastAPI(this.transport.http),
-      cells: new CellsAPI({
-        httpClientConfig: this.config,
-        accessTokenStore: this.accessTokenStore,
-      }),
+      cells: this.cellsApi,
       client: new ClientAPI(this.transport.http),
       connection: new ConnectionAPI(this.transport.http),
       conversation: new ConversationAPI(this.transport.http, backendFeatures),

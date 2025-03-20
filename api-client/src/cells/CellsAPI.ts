@@ -36,7 +36,7 @@ import {S3Service} from './CellsStorage/S3Service';
 import {AccessTokenStore} from '../auth';
 import {HttpClient} from '../http';
 
-const CONFIGURATION_ERROR = 'CellsAPI is not configured. Call configure() before using any methods.';
+const CONFIGURATION_ERROR = 'CellsAPI is not initialized. Call initialize() before using any methods.';
 
 interface CellsConfig {
   pydio: {
