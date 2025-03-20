@@ -64,6 +64,7 @@ export const useFilesUploadDropzone = ({isTeam, cellsRepository, conversation}: 
     } catch (error) {
       logger.error('Uploading file failed', error);
       updateFile(file.id, {uploadStatus: 'error'});
+      throw error;
     }
   };
 
