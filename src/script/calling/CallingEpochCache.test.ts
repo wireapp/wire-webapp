@@ -21,15 +21,36 @@ import {CallingEpochCache} from './CallingEpochCache';
 
 describe('CallingEpochCache', () => {
   let cache: CallingEpochCache;
+  const epochData = [
+    {
+      serializedConversationId: '12345@wire.com',
+      epoch: 1,
+      clients: {convid: '12345', clients: [{userid: '56', clientid: '561', in_subconv: true}]},
+      secretKey: 'xbnbvzfufzuewz',
+    },
+    {
+      serializedConversationId: '12345@wire.com',
+      epoch: 1,
+      clients: {
+        convid: '12345',
+        clients: [
+          {userid: '56', clientid: '561', in_subconv: false},
+          {userid: '44', clientid: '441', in_subconv: true},
+        ],
+      },
+      secretKey: 'abcdrsrsrsr',
+    },
+    {
+      serializedConversationId: '12345@wire.com',
+      epoch: 1,
+      clients: {convid: '12345', clients: [{userid: '56', clientid: '561', in_subconv: true}]},
+      secretKey: 'dsdsdsderer',
+    },
+  ];
   beforeEach(() => {
     cache = new CallingEpochCache();
+    epochData.forEach(d => cache.store(d));
   });
-
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
-
-  afterAll(() => {});
 
   describe('Cache', () => {
     it('starts disabled', async () => {
@@ -49,6 +70,27 @@ describe('CallingEpochCache', () => {
     it('can be cleaned', async () => {
       cache.clean();
       expect(cache.getEpochList()).toEqual([]);
+    });
+
+    it('can get epoch data', async () => {
+      expect(cache.getEpochList()).toEqual(epochData);
+    });
+
+    it('can store epoch data', async () => {
+      const newEpoch = {
+        serializedConversationId: '12345@wire.com',
+        epoch: 1,
+        clients: {
+          convid: '12345',
+          clients: [
+            {userid: '56', clientid: '561', in_subconv: false},
+            {userid: '22', clientid: '221', in_subconv: true},
+          ],
+        },
+        secretKey: 'dssdgsgsdgsdds',
+      };
+      cache.store(newEpoch);
+      expect(cache.getEpochList()).toEqual([...epochData, newEpoch]);
     });
   });
 });

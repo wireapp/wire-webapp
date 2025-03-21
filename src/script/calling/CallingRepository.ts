@@ -973,6 +973,9 @@ export class CallingRepository {
          */
         this.wCall?.setMute(this.wUser, 0);
         this.wCall?.start(this.wUser, convId, callType, conversationType, this.callState.cbrEncoding());
+        if (!!conversation && this.isMLSConference(conversation)) {
+          this.setCachedEpochInfos(call);
+        }
         this.sendCallingEvent(EventName.CALLING.INITIATED_CALL, call);
         this.sendCallingEvent(EventName.CONTRIBUTED, call, {
           [Segmentation.MESSAGE.ACTION]: callType === CALL_TYPE.VIDEO ? 'video_call' : 'audio_call',
@@ -1233,6 +1236,10 @@ export class CallingRepository {
       }
       this.setMute(call.muteState() !== MuteState.NOT_MUTED);
 
+      if (!!conversation && this.isMLSConference(conversation)) {
+        await this.joinMlsConferenceSubconversation(conversation);
+      }
+
       this.wCall?.answer(
         this.wUser,
         this.serializeQualifiedId(conversation.qualifiedId),
@@ -1240,15 +1247,13 @@ export class CallingRepository {
         this.callState.cbrEncoding(),
       );
 
+      if (!!conversation && this.isMLSConference(conversation)) {
+        this.setCachedEpochInfos(call);
+      }
+
       this.sendCallingEvent(EventName.CALLING.JOINED_CALL, call, {
         [Segmentation.CALL.DIRECTION]: this.getCallDirection(call),
       });
-
-      if (!conversation || !this.isMLSConference(conversation)) {
-        return;
-      }
-
-      await this.joinMlsConferenceSubconversation(conversation);
     } catch (error) {
       if (error) {
         this.logger.error('Failed answering call', error);
@@ -1355,6 +1360,13 @@ export class CallingRepository {
     }
   };
 
+  private setCachedEpochInfos(call: Call) {
+    call.epochCache.disable();
+    call.epochCache.getEpochList().forEach(d => {
+      this.wCall?.setEpochInfo(this.wUser, d.serializedConversationId, d.epoch, JSON.stringify(d.clients), d.secretKey);
+    });
+  }
+
   private readonly setEpochInfo = (conversationId: QualifiedId, subconversationData: SubconversationData) => {
     const serializedConversationId = this.serializeQualifiedId(conversationId);
     const {epoch, secretKey, members} = subconversationData;
@@ -1362,9 +1374,13 @@ export class CallingRepository {
       convid: serializedConversationId,
       clients: members,
     };
+    const call = this.findCall(conversationId);
+    if (!call) {
+      return -1;
+    }
 
-    if (this.epochCache.isEnabled()) {
-      return this.epochCache.store({serializedConversationId, epoch, clients, secretKey});
+    if (call.epochCache.isEnabled()) {
+      return call.epochCache.store({serializedConversationId, epoch, clients, secretKey});
     }
 
     return this.wCall?.setEpochInfo(this.wUser, serializedConversationId, epoch, JSON.stringify(clients), secretKey);
