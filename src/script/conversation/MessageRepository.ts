@@ -364,14 +364,21 @@ export class MessageRepository {
    * @param quoteEntity Quoted message
    * @returns Resolves after sending the message
    */
-  public async sendTextWithLinkPreview(
-    conversation: Conversation,
-    textMessage: string,
-    mentions: MentionEntity[],
-    quoteEntity?: OutgoingQuote,
-    messageId?: string,
-    attachments: MultiPartContent['attachments'] = [],
-  ): Promise<void> {
+  public async sendTextWithLinkPreview({
+    conversation,
+    textMessage,
+    mentions,
+    quoteEntity,
+    messageId,
+    attachments,
+  }: {
+    conversation: Conversation;
+    textMessage: string;
+    mentions: MentionEntity[];
+    quoteEntity?: OutgoingQuote;
+    messageId?: string;
+    attachments?: MultiPartContent['attachments'];
+  }): Promise<void> {
     const textPayload = {
       conversation,
       mentions,
@@ -382,8 +389,8 @@ export class MessageRepository {
       messageId: messageId ?? createUuid(),
     };
 
-    attachments?.push({cellAsset: {uuid: textPayload.messageId, contentType: 'text/plain'}});
-    attachments?.push({cellAsset: {uuid: `${textPayload.messageId}hello`, contentType: 'text/plain'}});
+    // attachments?.push({cellAsset: {uuid: textPayload.messageId, contentType: 'text/plain'}});
+    // attachments?.push({cellAsset: {uuid: `${textPayload.messageId}hello`, contentType: 'text/plain'}});
 
     // Adrian ToDo: change this back
     let state;

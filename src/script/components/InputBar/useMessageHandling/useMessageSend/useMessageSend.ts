@@ -19,6 +19,7 @@
 
 import {useCallback, useMemo} from 'react';
 
+import {IAttachment} from '@pydio/protocol-messaging';
 import {LexicalEditor} from 'lexical';
 
 import {useFileUploadState} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
@@ -134,18 +135,37 @@ export const useMessageSend = ({
     ],
   );
 
+  const getCellAssets = useCallback((): IAttachment[] => {
+    return files.map(file => {
+      return {
+        cellAsset: {
+          uuid: file.id,
+          contentType: file.type,
+          initialName: file.name,
+          initialSize: file.size,
+        },
+      };
+    });
+  }, [files]);
+
   const sendTextMessage = useCallback(
     (messageText: string, mentions: MentionEntity[]) => {
       if (messageText.length) {
         const mentionEntities = mentions.slice(0);
 
         void generateQuote().then(quoteEntity => {
-          void messageRepository.sendTextWithLinkPreview(conversation, messageText, mentionEntities, quoteEntity);
+          void messageRepository.sendTextWithLinkPreview({
+            conversation,
+            textMessage: messageText,
+            mentions: mentionEntities,
+            quoteEntity,
+            attachments: getCellAssets(),
+          });
           cancelMessageReply();
         });
       }
     },
-    [cancelMessageReply, conversation, generateQuote, messageRepository],
+    [cancelMessageReply, conversation, generateQuote, messageRepository, getCellAssets],
   );
 
   const isSendingDisabled = useMemo(() => {
