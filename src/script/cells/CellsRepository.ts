@@ -27,14 +27,14 @@ export class CellsRepository {
   private readonly basePath = 'wire-cells-web';
   constructor(private readonly apiClient = container.resolve(APIClient)) {}
 
-  async uploadFile(file: File): Promise<{uuid: string; versionId: string}> {
-    const path = `${this.basePath}/${encodeURIComponent(file.name)}`;
+  async uploadFile({file, path}: {file: File; path: string}): Promise<{uuid: string; versionId: string}> {
+    const filePath = `${path || this.basePath}/${encodeURIComponent(file.name)}`;
 
     const uuid = createUuid();
     const versionId = createUuid();
 
     await this.apiClient.api.cells.uploadFileDraft({
-      path,
+      path: filePath,
       file,
       uuid,
       versionId,
@@ -54,15 +54,19 @@ export class CellsRepository {
     return this.apiClient.api.cells.deleteFile({uuid});
   }
 
-  async getAllFiles() {
-    return this.apiClient.api.cells.getAllFiles({path: this.basePath});
+  async getAllFiles({path}: {path: string}) {
+    return this.apiClient.api.cells.getAllFiles({path: path || this.basePath});
   }
 
-  async getPublicLink({uuid, label}: {uuid: string; label: string}) {
+  async createPublicLink({uuid, label}: {uuid: string; label?: string}) {
     return this.apiClient.api.cells.createFilePublicLink({
       uuid,
       label,
     });
+  }
+
+  async getPublicLink({uuid}: {uuid: string}) {
+    return this.apiClient.api.cells.getFilePublicLink({uuid});
   }
 
   async deletePublicLink({uuid}: {uuid: string}) {
@@ -71,5 +75,9 @@ export class CellsRepository {
 
   async searchFiles({query}: {query: string}) {
     return this.apiClient.api.cells.searchFiles({phrase: query});
+  }
+
+  async promoteFileDraft({uuid, versionId}: {uuid: string; versionId: string}) {
+    return this.apiClient.api.cells.promoteFileDraft({uuid, versionId});
   }
 }

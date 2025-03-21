@@ -17,8 +17,19 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {contentStyles, wrapperStyles} from './CellsHeader.styles';
+import {CellsRefresh} from './CellsRefresh/CellsRefresh';
 
-export const spinnerStyles: CSSObject = {
-  color: 'var(--foreground)',
+interface CellsHeaderProps {
+  onRefresh: () => void;
+}
+
+export const CellsHeader = ({onRefresh}: CellsHeaderProps) => {
+  return (
+    <div css={wrapperStyles}>
+      <div css={contentStyles}>
+        <CellsRefresh onRefresh={onRefresh} />
+      </div>
+    </div>
+  );
 };

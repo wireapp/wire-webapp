@@ -37,16 +37,3 @@ export const playerWrapperStyles: CSSObject = {
   gap: '4px',
   width: '100%',
 };
-
-export const loaderWrapperStyles: CSSObject = {
-  width: '32px',
-  height: '32px',
-  backgroundColor: 'var(--white)',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-};
-
-export const loadingStyles: CSSObject = {
-  color: 'var(--foreground)',
-};

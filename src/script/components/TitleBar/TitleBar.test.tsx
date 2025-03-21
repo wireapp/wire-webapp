@@ -85,6 +85,7 @@ const getDefaultProps = (callingRepository: CallingRepository, conversation: Con
   } as ViewModelRepositories,
   teamState: new TeamState(),
   selfUser: new User(),
+  withBottomDivider: true,
 });
 
 describe('TitleBar', () => {

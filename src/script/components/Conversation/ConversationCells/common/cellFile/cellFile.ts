@@ -17,8 +17,19 @@
  *
  */
 
-import {spinnerStyles} from './FilePreviewSpinner.styles';
-
-export const FilePreviewSpinner = () => {
-  return <div className="icon-spinner spin" css={spinnerStyles} />;
-};
+export interface CellFile {
+  id: string;
+  mimeType?: string;
+  name: string;
+  sizeMb: string;
+  previewImageUrl?: string;
+  uploadedAtTimestamp: number;
+  owner: string;
+  conversationName: string;
+  publicLink?: {
+    alreadyShared: boolean;
+    uuid?: string;
+    url?: string;
+  };
+  fileUrl?: string;
+}

@@ -19,26 +19,11 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const wrapperStyles: CSSObject = {
-  width: '76px',
-  height: '76px',
-  borderRadius: '10px',
-  border: '1px solid var(--gray-40)',
-  position: 'relative',
-};
-
-export const imageStyles: CSSObject = {
+export const videoStyles: CSSObject = {
   width: '100%',
   height: '100%',
   objectFit: 'cover',
   borderRadius: '10px',
-};
-
-export const controlStyles: CSSObject = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
 };
 
 export const iconWrapperStyles: CSSObject = {
@@ -46,15 +31,4 @@ export const iconWrapperStyles: CSSObject = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: '32px',
-  height: '32px',
-  backgroundColor: 'var(--white)',
-  borderRadius: '50%',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-};
-
-export const alertIconStyles: CSSObject = {
-  fill: 'var(--danger-color)',
 };

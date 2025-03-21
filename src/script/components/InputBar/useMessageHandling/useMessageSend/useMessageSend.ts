@@ -17,13 +17,15 @@
  *
  */
 
-import {useCallback} from 'react';
+import {useCallback, useMemo} from 'react';
 
 import {LexicalEditor} from 'lexical';
 
+import {useFileUploadState} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
 import {MessageContent} from 'Components/InputBar/common/messageContent/messageContent';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
+import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {Config} from 'src/script/Config';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
@@ -37,12 +39,15 @@ import {MessageHasher} from 'src/script/message/MessageHasher';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
 import {t} from 'Util/LocalizerUtil';
 
+import {useSendFiles} from './useSendFiles/useSendFiles';
+
 interface UseMessageSendProps {
   replyMessageEntity: ContentMessage | null;
   eventRepository: EventRepository;
   messageRepository: MessageRepository;
   conversation: Conversation;
   conversationRepository: ConversationRepository;
+  cellsRepository: CellsRepository;
   draftState: {
     reset: () => void;
   };
@@ -62,6 +67,7 @@ export const useMessageSend = ({
   messageRepository,
   conversation,
   conversationRepository,
+  cellsRepository,
   draftState,
   cancelMessageEditing,
   cancelMessageReply,
@@ -72,6 +78,14 @@ export const useMessageSend = ({
   sendPastedFile,
   messageContent,
 }: UseMessageSendProps) => {
+  const {files, clearAll} = useFileUploadState();
+
+  const {
+    sendFiles,
+    clearFiles,
+    isLoading: filesSendingLoading,
+  } = useSendFiles({files, clearAllFiles: clearAll, cellsRepository});
+
   const generateQuote = useCallback(async (): Promise<OutgoingQuote | undefined> => {
     return !replyMessageEntity
       ? Promise.resolve(undefined)
@@ -134,7 +148,23 @@ export const useMessageSend = ({
     [cancelMessageReply, conversation, generateQuote, messageRepository],
   );
 
-  const sendMessage = useCallback((): void => {
+  const isSendingDisabled = useMemo(() => {
+    const hasText = messageContent.text.length > 0;
+    const hasFiles = files.length > 0;
+    const hasSuccessfullyUploadedFiles = hasFiles && files.every(file => file.uploadStatus === 'success');
+
+    if (Config.getConfig().FEATURE.ENABLE_CELLS) {
+      return hasFiles ? !hasSuccessfullyUploadedFiles : !hasText;
+    }
+
+    return !hasText;
+  }, [messageContent.text, files]);
+
+  const sendMessage = useCallback(async (): Promise<void> => {
+    if (isSendingDisabled) {
+      return;
+    }
+
     if (pastedFile) {
       return void sendPastedFile();
     }
@@ -159,9 +189,11 @@ export const useMessageSend = ({
     }
 
     if (editedMessage) {
-      void sendMessageEdit(messageText, mentions);
+      await sendMessageEdit(messageText, mentions);
     } else {
+      await sendFiles();
       sendTextMessage(messageText, mentions);
+      clearFiles();
     }
 
     editorRef.current?.focus();
@@ -176,6 +208,9 @@ export const useMessageSend = ({
     sendPastedFile,
     sendMessageEdit,
     sendTextMessage,
+    isSendingDisabled,
+    sendFiles,
+    clearFiles,
   ]);
 
   const handleSendMessage = useCallback(async () => {
@@ -187,7 +222,7 @@ export const useMessageSend = ({
         secondaryAction: {
           action: () => {
             conversation.mlsVerificationState(ConversationVerificationState.UNVERIFIED);
-            sendMessage();
+            void sendMessage();
           },
           text: t('conversation.E2EISendAnyway'),
         },
@@ -201,12 +236,16 @@ export const useMessageSend = ({
         },
       });
     } else {
-      sendMessage();
+      void sendMessage();
     }
   }, [conversation, conversationRepository, sendMessage]);
 
   return {
     sendMessage: handleSendMessage,
     generateQuote,
+    // Sending messages via messageRepository is synchronous, so we don't need to use a state to track the sending status
+    // Although, we need to track the sending status for the files, because it's an async operation
+    isSending: filesSendingLoading,
+    isSendingDisabled,
   };
 };

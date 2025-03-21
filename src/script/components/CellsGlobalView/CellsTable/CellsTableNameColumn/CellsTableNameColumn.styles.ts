@@ -51,7 +51,14 @@ export const playIconStyles: CSSObject = {
   fill: 'var(--white)',
 };
 
-export const mobileName: CSSObject = {
+export const desktopNameStyles: CSSObject = {
+  textOverflow: 'ellipsis',
+  overflow: 'hidden',
+  maxWidth: '300px',
+  whiteSpace: 'nowrap',
+};
+
+export const mobileNameStyles: CSSObject = {
   '@media (min-width: 900px)': {
     display: 'none',
   },

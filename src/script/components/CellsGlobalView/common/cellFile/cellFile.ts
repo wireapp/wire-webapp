@@ -27,8 +27,9 @@ export interface CellFile {
   owner: string;
   conversationName: string;
   publicLink?: {
-    uuid: string;
-    url: string;
-  } | null;
+    alreadyShared: boolean;
+    uuid?: string;
+    url?: string;
+  };
   fileUrl?: string;
 }
