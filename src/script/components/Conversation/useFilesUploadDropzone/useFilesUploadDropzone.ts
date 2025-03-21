@@ -21,6 +21,7 @@ import {FileRejection, useDropzone} from 'react-dropzone';
 
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {Config} from 'src/script/Config';
+import {Conversation} from 'src/script/entity/Conversation';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {createUuid} from 'Util/uuid';
@@ -40,15 +41,20 @@ const logger = getLogger('FileDropzone');
 interface UseFilesUploadDropzoneParams {
   isTeam: boolean;
   cellsRepository: CellsRepository;
-  conversationId: string;
+  conversation: Pick<Conversation, 'id' | 'qualifiedId'>;
 }
 
-export const useFilesUploadDropzone = ({isTeam, cellsRepository, conversationId}: UseFilesUploadDropzoneParams) => {
+export const useFilesUploadDropzone = ({isTeam, cellsRepository, conversation}: UseFilesUploadDropzoneParams) => {
   const {addFiles, files, updateFile} = useFileUploadState();
 
   const MAX_SIZE = isTeam ? CONFIG.MAXIMUM_ASSET_FILE_SIZE_TEAM : CONFIG.MAXIMUM_ASSET_FILE_SIZE_PERSONAL;
 
   const uploadFile = async (file: FileWithPreview) => {
+    const conversationId =
+      process.env.NODE_ENV === 'development'
+        ? conversation.id
+        : `${conversation.qualifiedId.id}@${conversation.qualifiedId.domain}`;
+
     try {
       const {uuid, versionId} = await cellsRepository.uploadFile({
         file,
@@ -58,6 +64,7 @@ export const useFilesUploadDropzone = ({isTeam, cellsRepository, conversationId}
     } catch (error) {
       logger.error('Uploading file failed', error);
       updateFile(file.id, {uploadStatus: 'error'});
+      throw error;
     }
   };
 

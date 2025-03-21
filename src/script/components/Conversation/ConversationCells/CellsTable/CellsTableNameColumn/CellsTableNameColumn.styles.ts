@@ -56,6 +56,7 @@ export const desktopNameStyles: CSSObject = {
   overflow: 'hidden',
   maxWidth: '300px',
   whiteSpace: 'nowrap',
+  fontWeight: 'var(--font-weight-semibold)',
 };
 
 export const mobileNameStyles: CSSObject = {
