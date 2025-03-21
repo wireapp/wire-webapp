@@ -990,6 +990,9 @@ export class CallingRepository {
       if (error) {
         this.logger.error('Failed starting call', error);
       }
+      if (!!conversation && this.isMLSConference(conversation)) {
+        await this.leaveMLSConferenceBecauseError(conversation);
+      }
     }
   }
 
@@ -1259,6 +1262,9 @@ export class CallingRepository {
         this.logger.error('Failed answering call', error);
       }
       this.rejectCall(conversation.qualifiedId);
+      if (!!conversation && this.isMLSConference(conversation)) {
+        await this.leaveMLSConferenceBecauseError(conversation);
+      }
     }
   }
 
@@ -1282,6 +1288,11 @@ export class CallingRepository {
 
   private readonly leaveMLSConference = async (conversationId: QualifiedId) => {
     await this.subconversationService.leaveConferenceSubconversation(conversationId);
+  };
+
+  private readonly leaveMLSConferenceBecauseError = async (conversationId: QualifiedId) => {
+    await this.leaveMLSConference(conversationId);
+    callingSubscriptions.removeCall(conversationId);
   };
 
   private readonly joinMlsConferenceSubconversation = async ({qualifiedId, groupId}: MLSConversation) => {
