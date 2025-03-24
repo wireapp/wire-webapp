@@ -315,22 +315,11 @@ export class Conversation {
       }
       const mutedState = this.mutedState();
 
-      const knownNotificationStates = Object.values(NOTIFICATION_STATE);
-      if (knownNotificationStates.includes(mutedState)) {
-        const isStateMentionsAndReplies = mutedState === NOTIFICATION_STATE.MENTIONS_AND_REPLIES;
-        const isInvalidState = isStateMentionsAndReplies && !this.selfUser()?.teamId;
-
-        return isInvalidState ? NOTIFICATION_STATE.NOTHING : mutedState;
-      }
-
       if (typeof mutedState === 'boolean') {
-        const migratedMutedState = !!this.selfUser()?.teamId
-          ? NOTIFICATION_STATE.MENTIONS_AND_REPLIES
-          : NOTIFICATION_STATE.NOTHING;
-        return this.mutedState() ? migratedMutedState : NOTIFICATION_STATE.EVERYTHING;
+        return mutedState ? NOTIFICATION_STATE.MENTIONS_AND_REPLIES : NOTIFICATION_STATE.EVERYTHING;
       }
 
-      return NOTIFICATION_STATE.EVERYTHING;
+      return mutedState;
     });
 
     this.is_archived = this.archivedState;
