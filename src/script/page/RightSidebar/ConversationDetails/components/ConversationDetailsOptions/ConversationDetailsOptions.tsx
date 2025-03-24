@@ -120,6 +120,8 @@ const ConversationDetailsOptions = ({
   const showOptionServices = isActiveGroupParticipant && isTeamConversation && !isMLSConversation(activeConversation);
   const showOptionNotifications1To1 = isMutable && !isGroup;
   const showOptionReadReceipts = isTeamConversation;
+  // TODO: only show channel options if the conversation is a channel
+  const showChannelOptions = isGroup;
 
   const hasReceiptsEnabled = conversationRepository.expectReadReceipt(activeConversation);
 
@@ -137,6 +139,10 @@ const ConversationDetailsOptions = ({
 
   const showNotifications = () => togglePanel(PanelState.NOTIFICATIONS, activeConversation);
 
+  const openAccessPanel = () => togglePanel(PanelState.ACCESS, activeConversation);
+
+  const openConversationHistoryPanel = () => togglePanel(PanelState.CONVERSATION_HISTORY, activeConversation);
+
   const openParticipantDevices = () => togglePanel(PanelState.PARTICIPANT_DEVICES, firstParticipant!, false, 'left');
 
   return (
@@ -144,6 +150,32 @@ const ConversationDetailsOptions = ({
       {isGroup && <h3 className="conversation-details__list-head">{t('conversationDetailsOptions')}</h3>}
 
       <ul>
+        {showChannelOptions && (
+          <>
+            <ConversationDetailsOption
+              className="conversation-details__access"
+              onClick={openAccessPanel}
+              dataUieName="go-access"
+              icon={<Icon.NotificationIcon />}
+              // add translation
+              title={'Access'}
+              statusUieName="status-access"
+              statusText={'Public'}
+            />
+
+            <ConversationDetailsOption
+              className="conversation-details__conversation-history"
+              onClick={openConversationHistoryPanel}
+              dataUieName="go-conversation-history"
+              icon={<Icon.TimerIcon />}
+              // add translation
+              title={'Conversation history'}
+              statusUieName="status-access"
+              statusText={'1 day'}
+            />
+          </>
+        )}
+
         {showOptionNotificationsGroup && (
           <ConversationDetailsOption
             className="conversation-details__notifications"
