@@ -89,7 +89,7 @@ export class SSOAPI {
         challenge_token: challengeToken,
       },
       method: 'post',
-      url: `${SSOAPI.URL.DOMAIN_VERIFICATION}/${domain}/${SSOAPI.URL.CHALLENGES}/${challengeId}`,
+      url: `${SSOAPI.URL.DOMAIN_VERIFICATION}/${domain}/${SSOAPI.URL.TEAM}/${SSOAPI.URL.CHALLENGES}/${challengeId}`,
     };
 
     const response = await this.client.sendJSON<VerifyChallenge>(config);
