@@ -38,7 +38,10 @@ function validateEditEvent(
     throwValidationError('Edit event without original event');
   }
 
-  if (originalEvent.type !== ClientEvent.CONVERSATION.MESSAGE_ADD) {
+  if (
+    originalEvent.type !== ClientEvent.CONVERSATION.MESSAGE_ADD &&
+    originalEvent.type !== ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD
+  ) {
     throwValidationError('Edit event for non-text message');
   }
 
@@ -67,9 +70,12 @@ function computeEventUpdates(originalEvent: StoredEvent<MessageAddEvent>, newEve
 }
 
 export const handleEditEvent: EventHandler = async (event, {findEvent}) => {
-  if (event.type !== CONVERSATION.MESSAGE_ADD) {
+  if (event.type !== CONVERSATION.MESSAGE_ADD && event.type !== CONVERSATION.MULTIPART_MESSAGE_ADD) {
     return undefined;
   }
+
+  console.log('handleEditEvent', event);
+
   const editedEventId = event.data.replacing_message_id;
   if (!editedEventId) {
     return undefined;
