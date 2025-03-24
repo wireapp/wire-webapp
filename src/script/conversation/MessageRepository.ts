@@ -866,7 +866,6 @@ export class MessageRepository {
           payload,
           optimisticEvent,
         );
-
         await this.eventRepository.injectEvent(mappedEvent);
       }
       return silentDegradationWarning ? true : this.requestUserSendingPermission(conversation, false, consentType);

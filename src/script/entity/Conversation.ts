@@ -729,7 +729,6 @@ export class Conversation {
         // If the conversation is not loaded, we will add this message to the incoming messages (but not to the messages displayed)
         this.incomingMessages.push(messageEntity);
       }
-
       amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.ADDED, messageEntity);
       return true;
     }

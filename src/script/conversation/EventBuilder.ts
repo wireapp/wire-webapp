@@ -157,8 +157,6 @@ export type MessageAddEvent = ConversationEvent<
   status: StatusType;
   version?: number;
 };
-// ToDo: refine which data is needed, maybe we can reuse the same data as in MessageAddEvent
-// Currently, the Data which is defined here doesnt match the data in the event
 export type MultipartMessageAddEvent = ConversationEvent<CONVERSATION.MULTIPART_MESSAGE_ADD, MultiPartContent> & {};
 export type MissedEvent = BaseEvent & {id: string; type: CONVERSATION.MISSED_MESSAGES};
 export type JoinedAfterMLSMigrationFinalisationEvent = BaseEvent & {

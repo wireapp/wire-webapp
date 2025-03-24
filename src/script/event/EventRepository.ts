@@ -476,7 +476,6 @@ export class EventRepository {
         await this.updateLastEventDate(eventDate as string);
       }
     }
-
     return this.distributeEvent(event, source);
   }
 }

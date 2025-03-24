@@ -34,16 +34,14 @@ export class Text extends Asset {
   public readonly mentions: ko.ObservableArray<MentionEntity>;
   public readonly previews: ko.ObservableArray<LinkPreview>;
   public readonly should_render_text: ko.PureComputed<boolean>;
-  public readonly files: ko.ObservableArray<{uuid: string}>;
 
-  constructor(id?: string, text: string = '', files: Array<{uuid: string}> = []) {
+  constructor(id?: string, text: string = '') {
     super(id);
     this.type = AssetType.TEXT;
 
     this.text = text;
     this.mentions = ko.observableArray();
     this.previews = ko.observableArray();
-    this.files = ko.observableArray(files);
 
     this.should_render_text = ko.pureComputed(() => {
       if (this.text === null || this.text.length === 0) {
@@ -56,13 +54,7 @@ export class Text extends Asset {
 
   // Process text before rendering it
   render(selfId: QualifiedId, themeColor?: string): string {
-    const message = renderMessage(
-      `${this.text} ${this.files()
-        .map(file => file.uuid)
-        .join(' ')}`,
-      selfId,
-      this.mentions(),
-    );
+    const message = renderMessage(this.text, selfId, this.mentions());
     return !this.previews().length ? mediaParser.renderMediaEmbeds(message, themeColor) : message;
   }
 

@@ -1037,10 +1037,10 @@ export class EventMapper {
    * @param eventData Asset data received as JSON
    * @returns Text asset entity
    */
-  private _mapAssetText(eventData: MessageAddEvent['data'], files: Array<{uuid: string}> = []) {
+  private _mapAssetText(eventData: MessageAddEvent['data']) {
     const {id, content, mentions, message, previews} = eventData;
     const messageText = content || message;
-    const assetEntity = new Text(id, messageText, files);
+    const assetEntity = new Text(id, messageText);
 
     if (mentions && mentions.length) {
       const mappedMentions = this._mapAssetMentions(mentions, messageText);
