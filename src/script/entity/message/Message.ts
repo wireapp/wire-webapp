@@ -162,6 +162,10 @@ export class Message {
     return formatDateNumeral(date);
   };
 
+  testGetAssets() {
+    return this.assets();
+  }
+
   /**
    * Check if message contains an asset of type file.
    * @returns Message contains any file type asset
@@ -192,14 +196,6 @@ export class Message {
    */
   hasAssetText(): boolean {
     return this.isContent() ? this.assets().some(assetEntity => assetEntity.isText()) : false;
-  }
-
-  /**
-   * Check if message contains a multipart asset.
-   * @returns Message contains a multipart
-   */
-  hasMultipart(): boolean {
-    return this.isContent() ? this.assets().some(assetEntity => assetEntity.isMultipart()) : false;
   }
 
   /**
@@ -358,7 +354,7 @@ export class Message {
    * @returns `true`, if message can be edited, `false` otherwise.
    */
   isEditable(): this is ContentMessage {
-    return (this.hasAssetText() || this.hasMultipart()) && this.user().isMe && !this.isEphemeral();
+    return this.hasAssetText() && this.user().isMe && !this.isEphemeral();
   }
 
   /**

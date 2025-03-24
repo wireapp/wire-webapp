@@ -99,11 +99,7 @@ const ContentAsset = ({
             />
           )}
 
-          <ul>
-            {filesMultipart.map(file => (
-              <li key={file.uuid}>{file.uuid}</li>
-            ))}
-          </ul>
+          {filesMultipart.map(file => file.uuid).join(' ')}
 
           {shouldRenderTextMultipart && (
             <ReadIndicator message={message} is1to1Conversation={is1to1Conversation} onClick={onClickDetails} />
