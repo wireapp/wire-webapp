@@ -55,7 +55,7 @@ import {CallingRepository} from '../calling/CallingRepository';
 import {CellsRepository} from '../cells/CellsRepository';
 import {ClientRepository, ClientService} from '../client';
 import {getClientMLSConfig} from '../client/clientMLSConfig';
-import {Configuration} from '../Config';
+import {Config, Configuration} from '../Config';
 import {ConnectionRepository} from '../connection/ConnectionRepository';
 import {ConnectionService} from '../connection/ConnectionService';
 import {ConversationRepository} from '../conversation/ConversationRepository';
@@ -308,7 +308,7 @@ export class App {
     );
     repositories.preferenceNotification = new PreferenceNotificationRepository(repositories.user['userState'].self);
 
-    repositories.cells = new CellsRepository();
+    repositories.cells = container.resolve(CellsRepository);
 
     return repositories;
   }
@@ -341,6 +341,29 @@ export class App {
    */
   private _subscribeToEvents() {
     amplify.subscribe(WebAppEvents.LIFECYCLE.SIGN_OUT, this.logout);
+  }
+
+  private initializeCells({cellsRepository, selfUser}: {cellsRepository: CellsRepository; selfUser: User}) {
+    const cellPydioApiKey = Config.getConfig().CELLS_PYDIO_API_KEY;
+
+    const cellsApiKey =
+      process.env.NODE_ENV === 'development'
+        ? cellPydioApiKey
+        : `${cellPydioApiKey}:${selfUser.qualifiedId.id}@${selfUser.qualifiedId.domain}`;
+
+    cellsRepository.initialize({
+      pydio: {
+        apiKey: cellsApiKey,
+        segment: Config.getConfig().CELLS_PYDIO_SEGMENT,
+        url: Config.getConfig().CELLS_PYDIO_URL,
+      },
+      s3: {
+        apiKey: Config.getConfig().CELLS_S3_API_KEY,
+        bucket: Config.getConfig().CELLS_S3_BUCKET,
+        endpoint: Config.getConfig().CELLS_S3_ENDPOINT,
+        region: Config.getConfig().CELLS_S3_REGION,
+      },
+    });
   }
 
   //##############################################################################
@@ -383,12 +406,15 @@ export class App {
         team: teamRepository,
         user: userRepository,
         self: selfRepository,
+        cells: cellsRepository,
       } = this.repository;
       await checkIndexedDb();
       onProgress(2.5);
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
 
       const selfUser = await this.repository.user.getSelf([{position: 'App.initiateSelfUser', vendor: 'webapp'}]);
+
+      this.initializeCells({cellsRepository, selfUser});
 
       await initializeDataDog(this.config, selfUser.qualifiedId);
       const eventLogger = new InitializationEventLogger(selfUser.id);

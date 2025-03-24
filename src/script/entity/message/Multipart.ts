@@ -17,6 +17,7 @@
  *
  */
 
+import {IAttachment, ICellAsset} from '@pydio/protocol-messaging';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 
@@ -30,20 +31,23 @@ import {containsOnlyLink} from '../../conversation/linkPreviews/helpers';
 import {mediaParser} from '../../media/MediaParser';
 import type {MentionEntity} from '../../message/MentionEntity';
 
-export class Text extends Asset {
+export class Multipart extends Asset {
   public readonly mentions: ko.ObservableArray<MentionEntity>;
   public readonly previews: ko.ObservableArray<LinkPreview>;
+  public readonly attachments?: ko.ObservableArray<IAttachment>;
   public readonly should_render_text: ko.PureComputed<boolean>;
-  public readonly files: ko.ObservableArray<{uuid: string}>;
 
-  constructor(id?: string, text: string = '', files: Array<{uuid: string}> = []) {
+  constructor({id, text, attachments}: {id?: string; text: string; attachments?: IAttachment[] | null}) {
     super(id);
-    this.type = AssetType.TEXT;
+    this.type = AssetType.MULTIPART;
 
     this.text = text;
     this.mentions = ko.observableArray();
     this.previews = ko.observableArray();
-    this.files = ko.observableArray(files);
+
+    if (attachments?.length) {
+      this.attachments = ko.observableArray(attachments);
+    }
 
     this.should_render_text = ko.pureComputed(() => {
       if (this.text === null || this.text.length === 0) {
@@ -56,17 +60,23 @@ export class Text extends Asset {
 
   // Process text before rendering it
   render(selfId: QualifiedId, themeColor?: string): string {
-    const message = renderMessage(
-      `${this.text} ${this.files()
-        .map(file => file.uuid)
-        .join(' ')}`,
-      selfId,
-      this.mentions(),
-    );
+    const message = renderMessage(this.text, selfId, this.mentions());
     return !this.previews().length ? mediaParser.renderMediaEmbeds(message, themeColor) : message;
   }
 
   isUserMentioned(userId: QualifiedId): boolean {
     return this.mentions().some(mentionEntity => mentionEntity.targetsUser(userId));
+  }
+
+  getAttachments(): Array<ICellAsset> {
+    const attachments = this.attachments?.();
+
+    if (!attachments) {
+      return [];
+    }
+
+    return attachments
+      .map(attachment => (attachment.cellAsset ? {...attachment.cellAsset} : null))
+      .filter(Boolean) as Array<ICellAsset>;
   }
 }

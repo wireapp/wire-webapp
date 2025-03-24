@@ -162,6 +162,10 @@ export class Message {
     return formatDateNumeral(date);
   };
 
+  testGetAssets() {
+    return this.assets();
+  }
+
   /**
    * Check if message contains an asset of type file.
    * @returns Message contains any file type asset

@@ -702,7 +702,7 @@ export class Conversation {
    */
   addMessage(messageEntity: Message): boolean | void {
     if (messageEntity) {
-      console.log('adrian addMessage', messageEntity);
+      console.log('adrian addMessage', {messageEntity, assets: messageEntity.testGetAssets()});
       const messageWithLinkPreview = () => this._findDuplicate(messageEntity.id, messageEntity.from);
       const editedMessage = () =>
         this._findDuplicate((messageEntity as ContentMessage).replacing_message_id, messageEntity.from);

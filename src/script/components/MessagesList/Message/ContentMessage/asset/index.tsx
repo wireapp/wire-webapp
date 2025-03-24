@@ -24,6 +24,7 @@ import {Asset} from 'src/script/entity/message/Asset';
 import type {FileAsset as FileAssetType} from 'src/script/entity/message/FileAsset';
 import type {Location} from 'src/script/entity/message/Location';
 import type {MediumImage} from 'src/script/entity/message/MediumImage';
+import {Multipart} from 'src/script/entity/message/Multipart';
 import {Text} from 'src/script/entity/message/Text';
 import {StatusType} from 'src/script/message/StatusType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -73,6 +74,47 @@ const ContentAsset = ({
   const {previews} = useKoSubscribableChildren(asset as Text, ['previews']);
 
   switch (asset.type) {
+    case AssetType.MULTIPART:
+      const shouldRenderTextMultipart = (asset as Multipart).should_render_text();
+      const renderTextMultipart = (asset as Multipart).render(selfId, message.accent_color());
+
+      const filesMultipart = (asset as Multipart).getAttachments();
+
+      console.log('adrian files', filesMultipart);
+
+      return (
+        <>
+          {shouldRenderTextMultipart && (
+            <TextMessageRenderer
+              onMessageClick={onClickMessage}
+              text={renderTextMultipart}
+              className={cx('text', {
+                'text-foreground': [StatusType.FAILED, StatusType.FEDERATION_ERROR, StatusType.SENDING].includes(
+                  status,
+                ),
+                'text-large': includesOnlyEmojis(asset.text),
+                'ephemeral-message-obfuscated': isObfuscated,
+              })}
+              isFocusable={isMessageFocused}
+            />
+          )}
+
+          {filesMultipart.map(file => file.uuid).join(' ')}
+
+          {shouldRenderTextMultipart && (
+            <ReadIndicator message={message} is1to1Conversation={is1to1Conversation} onClick={onClickDetails} />
+          )}
+          {previews.map(() => (
+            <div key={asset.id} className="message-asset">
+              <LinkPreviewAsset message={message} isFocusable={isMessageFocused} />
+
+              {!shouldRenderText && (
+                <ReadIndicator message={message} is1to1Conversation={is1to1Conversation} onClick={onClickDetails} />
+              )}
+            </div>
+          ))}
+        </>
+      );
     case AssetType.TEXT:
       const shouldRenderText = (asset as Text).should_render_text();
       const renderText = (asset as Text).render(selfId, message.accent_color());

@@ -68,6 +68,7 @@ import {MessageTimerUpdateMessage} from '../entity/message/MessageTimerUpdateMes
 import {MissedMessage} from '../entity/message/MissedMessage';
 import {MLSConversationRecoveredMessage} from '../entity/message/MLSConversationRecoveredMessage';
 import {MLSMigrationFinalisationOngoingCallMessage} from '../entity/message/MLSMigrationFinalisationOngoingCallMessage';
+import {Multipart} from '../entity/message/Multipart';
 import {OneToOneMigratedToMlsMessage} from '../entity/message/OneToOneMigratedToMlsMessage';
 import {PingMessage} from '../entity/message/PingMessage';
 import {ProtocolUpdateMessage} from '../entity/message/ProtocolUpdateMessage';
@@ -334,7 +335,7 @@ export class EventMapper {
       }
 
       case ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD: {
-        console.log('MULTIPART_MESSAGE_ADD', event);
+        console.log('adrian MULTIPART_MESSAGE_ADD', event);
         const addMessage = this._mapEventMultipartAdd(event);
         messageEntity = addMetadata(addMessage, event);
         break;
@@ -664,6 +665,13 @@ export class EventMapper {
     console.log('adrian event', event);
     console.log('adrian eventData', eventData);
 
+    const data2: MultipartMessageAddEvent['data'] = {
+      text: {
+        content: eventData.text?.content ?? '',
+      },
+      attachments: eventData.attachments,
+    };
+
     const data: MessageAddEvent['data'] = {
       content: eventData.text?.content ?? '',
       expects_read_confirmation: eventData.text?.expectsReadConfirmation ?? undefined,
@@ -675,10 +683,23 @@ export class EventMapper {
       replacing_message_id: '',
     };
 
-    const assets = this._mapAssetText(data);
+    console.log('adrian _mapEventMultipartAdd', eventData.attachments);
+
+    // const assets = this._mapAssetText(data, [eventData.attachments[0].cellAsset]);
+    // messageEntity.assets.push(assets);
+
+    const assets = this._mapAssetMultipart(eventData);
     messageEntity.assets.push(assets);
 
     return messageEntity;
+  }
+
+  private _mapAssetMultipart(eventData: MultipartMessageAddEvent['data']) {
+    const {text, attachments} = eventData;
+
+    const assetEntity = new Multipart({id: '', text: text?.content || '', attachments});
+
+    return assetEntity;
   }
 
   private _mapEventCompositeMessageAdd(event: CompositeMessageAddEvent) {
@@ -1043,10 +1064,10 @@ export class EventMapper {
    * @param eventData Asset data received as JSON
    * @returns Text asset entity
    */
-  private _mapAssetText(eventData: MessageAddEvent['data']) {
+  private _mapAssetText(eventData: MessageAddEvent['data'], files: Array<{uuid: string}> = []) {
     const {id, content, mentions, message, previews} = eventData;
     const messageText = content || message;
-    const assetEntity = new Text(id, messageText);
+    const assetEntity = new Text(id, messageText, files);
 
     if (mentions && mentions.length) {
       const mappedMentions = this._mapAssetMentions(mentions, messageText);

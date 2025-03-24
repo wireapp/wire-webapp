@@ -17,15 +17,41 @@
  *
  */
 
-import {container} from 'tsyringe';
+import {container, singleton} from 'tsyringe';
 
 import {createUuid} from 'Util/uuid';
 
 import {APIClient} from '../service/APIClientSingleton';
 
+interface CellsConfig {
+  pydio: {
+    apiKey: string;
+    segment: string;
+    url: string;
+  };
+  s3: {
+    apiKey: string;
+    bucket: string;
+    endpoint: string;
+    region: string;
+  };
+}
+
+@singleton()
 export class CellsRepository {
   private readonly basePath = 'wire-cells-web';
+  private isInitialized = false;
+
   constructor(private readonly apiClient = container.resolve(APIClient)) {}
+
+  initialize(config: CellsConfig) {
+    if (this.isInitialized) {
+      return;
+    }
+
+    this.apiClient.api.cells.initialize({cellsConfig: config});
+    this.isInitialized = true;
+  }
 
   async uploadFile({file, path}: {file: File; path: string}): Promise<{uuid: string; versionId: string}> {
     const filePath = `${path || this.basePath}/${encodeURIComponent(file.name)}`;

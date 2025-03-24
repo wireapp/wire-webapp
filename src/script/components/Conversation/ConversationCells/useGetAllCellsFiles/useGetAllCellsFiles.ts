@@ -49,9 +49,10 @@ export const useGetAllCellsFiles = ({cellsRepository, conversationId}: UseGetAll
       const transformedFiles = transformNodesToCellsFiles(result.Nodes);
       setFiles(transformedFiles);
       setStatus('success');
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Failed to fetch files', {cause: err}));
+    } catch (error) {
+      setError(error instanceof Error ? error : new Error('Failed to fetch files', {cause: error}));
       setStatus('error');
+      throw error;
     }
     // cellsRepository is not a dependency because it's a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps

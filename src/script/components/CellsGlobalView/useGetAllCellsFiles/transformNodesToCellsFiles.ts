@@ -45,7 +45,7 @@ export const transformNodesToCellsFiles = (nodes: RestNode[]): CellFile[] => {
         },
       }))
       // eslint-disable-next-line id-length
-      .sort((a, b) => a.name.localeCompare(b.name))
+      .sort((a, b) => b.uploadedAtTimestamp - a.uploadedAtTimestamp)
   );
 };
 
