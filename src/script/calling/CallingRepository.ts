@@ -980,6 +980,8 @@ export class CallingRepository {
       } else {
         this.showNoCameraModal();
         this.removeCall(call);
+        call.epochCache.clean();
+        call.epochCache.disable();
       }
 
       return call;
@@ -1261,6 +1263,8 @@ export class CallingRepository {
       this.rejectCall(conversation.qualifiedId);
       if (!!conversation && this.isMLSConference(conversation)) {
         await this.leaveMLSConferenceBecauseError(conversation);
+        call.epochCache.disable();
+        call.epochCache.clean();
       }
     }
   }
@@ -1288,6 +1292,11 @@ export class CallingRepository {
   };
 
   private readonly leaveMLSConferenceBecauseError = async (conversationId: QualifiedId) => {
+    const call = this.findCall(conversationId);
+    if (call !== undefined) {
+      call.epochCache.clean();
+      call.epochCache.disable();
+    }
     await this.leaveMLSConference(conversationId);
     callingSubscriptions.removeCall(conversationId);
   };
@@ -1372,6 +1381,7 @@ export class CallingRepository {
     call.epochCache.getEpochList().forEach(d => {
       this.wCall?.setEpochInfo(this.wUser, d.serializedConversationId, d.epoch, JSON.stringify(d.clients), d.secretKey);
     });
+    call.epochCache.clean();
   }
 
   private readonly setEpochInfo = (conversationId: QualifiedId, subconversationData: SubconversationData) => {
