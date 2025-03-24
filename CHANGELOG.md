@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.30.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.29.1...@wireapp/api-client@27.30.0) (2025-03-24)
+
+### Features
+
+* Update verify domain registration api path ([#6989](https://github.com/wireapp/wire-web-packages/issues/6989)) ([65277e4](https://github.com/wireapp/wire-web-packages/commit/65277e456b9f32a06b8714f998981742a29d6fec))
+
 ## [27.29.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.29.0...@wireapp/api-client@27.29.1) (2025-03-20)
 
 ### Bug Fixes
