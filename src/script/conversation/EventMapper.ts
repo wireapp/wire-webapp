@@ -659,7 +659,7 @@ export class EventMapper {
    * @returns Content message entity
    */
   private _mapEventMultipartAdd(event: MultipartMessageAddEvent) {
-    const {data: eventData, from, edited_time: editedTime} = event;
+    const {data: eventData, from} = event;
     const messageEntity = new ContentMessage();
 
     console.log('adrian event', event);
@@ -684,6 +684,9 @@ export class EventMapper {
     };
 
     console.log('adrian _mapEventMultipartAdd', eventData.attachments);
+
+    // const assets = this._mapAssetText(data, [eventData.attachments[0].cellAsset]);
+    // messageEntity.assets.push(assets);
 
     const assets = this._mapAssetMultipart(eventData);
     messageEntity.assets.push(assets);

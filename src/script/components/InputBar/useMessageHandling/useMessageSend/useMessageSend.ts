@@ -102,19 +102,6 @@ export const useMessageSend = ({
           });
   }, [eventRepository.eventService, replyMessageEntity]);
 
-  const getCellAssets = useCallback((): IAttachment[] => {
-    return files.map(file => {
-      return {
-        cellAsset: {
-          uuid: file.id,
-          contentType: file.type,
-          initialName: file.name,
-          initialSize: file.size,
-        },
-      };
-    });
-  }, [files]);
-
   const sendMessageEdit = useCallback(
     (messageText: string, mentions: MentionEntity[]): void | Promise<any> => {
       const mentionEntities = mentions.slice(0);
@@ -128,21 +115,11 @@ export const useMessageSend = ({
       }
 
       if (editedMessage) {
-        if (Config.getConfig().FEATURE.ENABLE_CELLS) {
-          messageRepository
-            .sendMultipartMessageEdit(conversation, messageText, editedMessage, mentionEntities, getCellAssets())
-            .catch(error => {
-              if (error.type !== ConversationError.TYPE.NO_MESSAGE_CHANGES) {
-                throw error;
-              }
-            });
-        } else {
-          messageRepository.sendMessageEdit(conversation, messageText, editedMessage, mentionEntities).catch(error => {
-            if (error.type !== ConversationError.TYPE.NO_MESSAGE_CHANGES) {
-              throw error;
-            }
-          });
-        }
+        messageRepository.sendMessageEdit(conversation, messageText, editedMessage, mentionEntities).catch(error => {
+          if (error.type !== ConversationError.TYPE.NO_MESSAGE_CHANGES) {
+            throw error;
+          }
+        });
 
         cancelMessageReply();
       }
@@ -155,9 +132,21 @@ export const useMessageSend = ({
       editedMessage,
       messageRepository,
       replyMessageCallback,
-      getCellAssets,
     ],
   );
+
+  const getCellAssets = useCallback((): IAttachment[] => {
+    return files.map(file => {
+      return {
+        cellAsset: {
+          uuid: file.id,
+          contentType: file.type,
+          initialName: file.name,
+          initialSize: file.size,
+        },
+      };
+    });
+  }, [files]);
 
   const sendTextMessage = useCallback(
     (messageText: string, mentions: MentionEntity[]) => {

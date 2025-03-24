@@ -133,8 +133,6 @@ export const MessageWrapper: React.FC<MessageParams> = ({
 
     const canEdit = message.isEditable() && !conversation.isSelfUserRemoved();
 
-    console.log('canEdit', canEdit);
-
     const hasDetails = !conversation.is1to1() && !message.isEphemeral() && !conversation.isSelfUserRemoved();
 
     if (message.isDownloadable() && !isFileShareRestricted) {

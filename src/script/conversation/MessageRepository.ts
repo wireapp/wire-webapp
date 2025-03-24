@@ -17,7 +17,7 @@
  *
  */
 
-import {Asset, Availability, Confirmation, GenericMessage, IAttachment} from '@pydio/protocol-messaging';
+import {Asset, Availability, Confirmation, GenericMessage} from '@pydio/protocol-messaging';
 import {ConversationProtocol, MessageSendingStatus, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import {QualifiedId, RequestCancellationError} from '@wireapp/api-client/lib/user';
@@ -37,9 +37,7 @@ import {
   MultiPartContent,
   TextContent,
 } from '@wireapp/core/lib/conversation/content';
-import {EditedMultipartContent} from '@wireapp/core/lib/conversation/content/EditedMultipartContent';
 import * as MessageBuilder from '@wireapp/core/lib/conversation/message/MessageBuilder';
-import {MultipartContentBuilder} from '@wireapp/core/lib/conversation/message/MultipartContentBuilder';
 import {OtrMessage} from '@wireapp/core/lib/conversation/message/OtrMessage';
 import {TextContentBuilder} from '@wireapp/core/lib/conversation/message/TextContentBuilder';
 import {isQualifiedUserClients} from '@wireapp/core/lib/util';
@@ -147,7 +145,6 @@ type TextMessagePayload = {
   quote?: OutgoingQuote;
 };
 type EditMessagePayload = TextMessagePayload & {originalMessageId: string};
-type EditMultipartMessagePayload = MultipartMessagePayload & {originalMessageId: string};
 
 type MultipartMessagePayload = TextMessagePayload & {
   attachments: MultiPartContent['attachments'];
@@ -325,33 +322,6 @@ export class MessageRepository {
     return this.sendAndInjectMessage(editMessage, conversation, {syncTimestamp: false});
   }
 
-  private async sendMultipartEdit({
-    conversation,
-    message,
-    messageId,
-    originalMessageId,
-    mentions = [],
-    quote,
-    attachments,
-  }: EditMultipartMessagePayload) {
-    const editMessage = MessageBuilder.buildEditedMultipartMessage(
-      this.decorateMultipartMessage(
-        {
-          attachments,
-          originalMessageId: originalMessageId,
-          text: {
-            content: message,
-          },
-        },
-        conversation,
-        {mentions, quote},
-      ),
-      messageId,
-    );
-
-    return this.sendAndInjectMessage(editMessage, conversation, {syncTimestamp: false});
-  }
-
   private decorateTextMessage<T extends TextContent | EditedTextContent>(
     baseMessage: T,
     conversation: Conversation,
@@ -370,39 +340,6 @@ export class MessageRepository {
     }
 
     return new TextContentBuilder(baseMessage)
-      .withMentions(
-        mentions.map(mention => ({
-          length: mention.length,
-          qualifiedUserId: mention.userQualifiedId,
-          start: mention.startIndex,
-          userId: mention.userId,
-        })),
-      )
-      .withQuote(quoteData)
-      .withLinkPreviews(linkPreview ? [linkPreview] : [])
-      .withReadConfirmation(this.expectReadReceipt(conversation))
-      .withLegalHoldStatus(conversation.legalHoldStatus())
-      .build();
-  }
-
-  private decorateMultipartMessage<T extends MultiPartContent | EditedMultipartContent>(
-    baseMessage: T,
-    conversation: Conversation,
-    {
-      mentions = [],
-      quote,
-      linkPreview,
-    }: {
-      linkPreview?: LinkPreviewUploadedContent;
-      mentions: MentionEntity[];
-      quote?: OutgoingQuote;
-    },
-  ): T {
-    const quoteData = quote && {quotedMessageId: quote.messageId, quotedMessageSha256: new Uint8Array(quote.hash)};
-    if (quote) {
-    }
-
-    return new MultipartContentBuilder(baseMessage)
       .withMentions(
         mentions.map(mention => ({
           length: mention.length,
@@ -508,59 +445,6 @@ export class MessageRepository {
     cancelSendingLinkPreview(originalMessageId);
     try {
       const {state} = await this.sendEdit(messagePayload);
-      if (state !== MessageSendingState.CANCELED) {
-        await this.handleLinkPreview(messagePayload);
-      }
-    } finally {
-      clearLinkPreviewSendingState(originalMessageId);
-    }
-  }
-
-  /**
-   * Send edited message in specified conversation.
-   *
-   * @param conversation Conversation entity
-   * @param textMessage Edited plain text message
-   * @param originalMessage Original message entity
-   * @param mentions Mentions as part of the message
-   * @returns Resolves after sending the message
-   */
-  public async sendMultipartMessageEdit(
-    conversation: Conversation,
-    textMessage: string,
-    originalMessage: ContentMessage,
-    mentions: MentionEntity[],
-    attachments: IAttachment[],
-  ): Promise<OtrMessage | void> {
-    const hasDifferentText = isTextDifferent(originalMessage, textMessage);
-    const hasDifferentMentions = areMentionsDifferent(originalMessage, mentions);
-    const wasEdited = hasDifferentText || hasDifferentMentions;
-
-    if (!wasEdited) {
-      throw new ConversationError(
-        ConversationError.TYPE.NO_MESSAGE_CHANGES,
-        ConversationError.MESSAGE.NO_MESSAGE_CHANGES,
-      );
-    }
-
-    const originalMessageId = originalMessage.id;
-    const messagePayload = {
-      conversation,
-      mentions,
-      message: textMessage,
-      messageId: createUuid(), // We set the id explicitely in order to be able to override the message if we generate a link preview
-      originalMessageId,
-      text: {
-        content: textMessage,
-      },
-      attachments: attachments,
-    };
-
-    // We cancel the sending of the link preview if the user has edited the message
-    // It prevents from sending a link preview for a message that has been replaced by another one
-    cancelSendingLinkPreview(originalMessageId);
-    try {
-      const {state} = await this.sendMultipartEdit(messagePayload);
       if (state !== MessageSendingState.CANCELED) {
         await this.handleLinkPreview(messagePayload);
       }
