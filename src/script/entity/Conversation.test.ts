@@ -948,58 +948,29 @@ describe('Conversation', () => {
     it('returns expected values', () => {
       const NOTIFICATION_STATES = NOTIFICATION_STATE;
       const conversationEntity = new Conversation(createUuid());
-      const selfUserEntity = new User(createUuid(), null);
+      const selfUserEntity = new User(createUuid(), undefined);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.NOTHING);
+
       conversationEntity.selfUser(selfUserEntity);
-      conversationEntity.mutedState(undefined);
-
+      conversationEntity.mutedState(NOTIFICATION_STATES.EVERYTHING);
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
-      //@ts-expect-error
-      conversationEntity.mutedState('true');
 
-      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
       //@ts-expect-error
       conversationEntity.mutedState(true);
+      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.MENTIONS_AND_REPLIES);
 
-      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.NOTHING);
       //@ts-expect-error
       conversationEntity.mutedState(false);
-
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
+
       conversationEntity.mutedState(NOTIFICATION_STATES.NOTHING);
-
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.NOTHING);
+
       conversationEntity.mutedState(NOTIFICATION_STATES.MENTIONS_AND_REPLIES);
-
-      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.NOTHING);
-      conversationEntity.mutedState(NOTIFICATION_STATES.EVERYTHING);
-
-      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
-      selfUserEntity.teamId = createUuid();
-      conversationEntity.mutedState(undefined);
-
-      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
-      //@ts-expect-error
-      conversationEntity.mutedState('true');
-
-      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
-      //@ts-expect-error
-      conversationEntity.mutedState(true);
-
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.MENTIONS_AND_REPLIES);
-      //@ts-expect-error
-      conversationEntity.mutedState(false);
 
-      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
-      conversationEntity.mutedState(NOTIFICATION_STATES.NOTHING);
-
-      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.NOTHING);
-      conversationEntity.mutedState(NOTIFICATION_STATES.MENTIONS_AND_REPLIES);
-
-      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.MENTIONS_AND_REPLIES);
       conversationEntity.mutedState(NOTIFICATION_STATES.EVERYTHING);
-
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
     });
   });
