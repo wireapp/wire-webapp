@@ -1263,8 +1263,6 @@ export class CallingRepository {
       this.rejectCall(conversation.qualifiedId);
       if (!!conversation && this.isMLSConference(conversation)) {
         await this.leaveMLSConferenceBecauseError(conversation);
-        call.epochCache.disable();
-        call.epochCache.clean();
       }
     }
   }
