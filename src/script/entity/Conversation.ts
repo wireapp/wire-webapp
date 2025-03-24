@@ -702,7 +702,6 @@ export class Conversation {
    */
   addMessage(messageEntity: Message): boolean | void {
     if (messageEntity) {
-      console.log('adrian addMessage', {messageEntity, assets: messageEntity.testGetAssets()});
       const messageWithLinkPreview = () => this._findDuplicate(messageEntity.id, messageEntity.from);
       const editedMessage = () =>
         this._findDuplicate((messageEntity as ContentMessage).replacing_message_id, messageEntity.from);
@@ -717,8 +716,6 @@ export class Conversation {
 
       const {contentState} = useAppState.getState();
 
-      console.log('adrian addMessage - mesage before adding', this.incomingMessages().length);
-
       // When the search tab is active, push message to incomming message and update the timestamps
       if (contentState === ContentState.COLLECTION) {
         this.incomingMessages.push(messageEntity);
@@ -732,7 +729,7 @@ export class Conversation {
         // If the conversation is not loaded, we will add this message to the incoming messages (but not to the messages displayed)
         this.incomingMessages.push(messageEntity);
       }
-      console.log('adrian addMessage - mesage added', this.incomingMessages().length);
+
       amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.ADDED, messageEntity);
       return true;
     }

@@ -335,7 +335,6 @@ export class EventMapper {
       }
 
       case ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD: {
-        console.log('adrian MULTIPART_MESSAGE_ADD', event);
         const addMessage = this._mapEventMultipartAdd(event);
         messageEntity = addMetadata(addMessage, event);
         break;
@@ -659,34 +658,8 @@ export class EventMapper {
    * @returns Content message entity
    */
   private _mapEventMultipartAdd(event: MultipartMessageAddEvent) {
-    const {data: eventData, from} = event;
+    const {data: eventData} = event;
     const messageEntity = new ContentMessage();
-
-    console.log('adrian event', event);
-    console.log('adrian eventData', eventData);
-
-    const data2: MultipartMessageAddEvent['data'] = {
-      text: {
-        content: eventData.text?.content ?? '',
-      },
-      attachments: eventData.attachments,
-    };
-
-    const data: MessageAddEvent['data'] = {
-      content: eventData.text?.content ?? '',
-      expects_read_confirmation: eventData.text?.expectsReadConfirmation ?? undefined,
-      sender: from,
-      // `ToDo: fix these values if needed
-      quote: undefined,
-      mentions: [],
-      previews: [],
-      replacing_message_id: '',
-    };
-
-    console.log('adrian _mapEventMultipartAdd', eventData.attachments);
-
-    // const assets = this._mapAssetText(data, [eventData.attachments[0].cellAsset]);
-    // messageEntity.assets.push(assets);
 
     const assets = this._mapAssetMultipart(eventData);
     messageEntity.assets.push(assets);

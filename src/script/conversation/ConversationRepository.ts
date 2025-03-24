@@ -3143,7 +3143,6 @@ export class ConversationRepository {
     eventJson: IncomingEvent,
     eventSource: EventSource = EventSource.NOTIFICATION_STREAM,
   ) {
-    console.log('adrian handleConversationEvent', eventJson, eventSource);
     if (!eventJson) {
       return Promise.reject(new Error('Conversation Repository Event Handling: Event missing'));
     }
@@ -4202,12 +4201,10 @@ export class ConversationRepository {
     conversationEntity: Conversation,
     eventJson: IncomingEvent,
   ): Promise<{conversationEntity: Conversation; messageEntity: Message}> {
-    console.log('adrian addEventToConversation', eventJson, conversationEntity);
     const messageEntity = (await this.initMessageEntity(conversationEntity, eventJson)) as Message;
     if (conversationEntity && messageEntity) {
       const wasAdded = conversationEntity.addMessage(messageEntity);
       if (wasAdded) {
-        console.log('adrian addEventToConversation wasadded');
         await this.ephemeralHandler.validateMessage(messageEntity as ContentMessage);
       }
     }

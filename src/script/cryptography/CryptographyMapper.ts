@@ -261,7 +261,7 @@ export class CryptographyMapper {
           genericMessage.multipart?.text as Text,
           genericMessage.multipart?.attachments,
         );
-        console.log('adrian specificContent', specificContent);
+
         break;
       }
 

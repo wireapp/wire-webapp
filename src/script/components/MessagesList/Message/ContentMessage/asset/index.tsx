@@ -80,8 +80,6 @@ const ContentAsset = ({
 
       const filesMultipart = (asset as Multipart).getAttachments();
 
-      console.log('adrian files', filesMultipart);
-
       return (
         <>
           {shouldRenderTextMultipart && (

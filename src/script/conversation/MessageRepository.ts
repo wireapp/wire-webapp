@@ -389,10 +389,6 @@ export class MessageRepository {
       messageId: messageId ?? createUuid(),
     };
 
-    // attachments?.push({cellAsset: {uuid: textPayload.messageId, contentType: 'text/plain'}});
-    // attachments?.push({cellAsset: {uuid: `${textPayload.messageId}hello`, contentType: 'text/plain'}});
-
-    // Adrian ToDo: change this back
     let state;
     if (attachments && attachments.length > 0) {
       state = (await this.sendMultipartText({...textPayload, attachments})).state;
@@ -870,7 +866,7 @@ export class MessageRepository {
           payload,
           optimisticEvent,
         );
-        console.log('adrian mappedEvent', mappedEvent);
+
         await this.eventRepository.injectEvent(mappedEvent);
       }
       return silentDegradationWarning ? true : this.requestUserSendingPermission(conversation, false, consentType);
