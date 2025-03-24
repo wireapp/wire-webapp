@@ -48,10 +48,9 @@ export type Env = {
 
   /** Specifies configuration for Cells */
   FEATURE_ENABLE_CELLS: string;
-  CELLS_PYDIO_API_KEY: string;
+  CELLS_TOKEN_SHARED_SECRET: string;
   CELLS_PYDIO_SEGMENT: string;
   CELLS_PYDIO_URL: string;
-  CELLS_S3_API_KEY: string;
   CELLS_S3_BUCKET: string;
   CELLS_S3_REGION: string;
   CELLS_S3_ENDPOINT: string;
