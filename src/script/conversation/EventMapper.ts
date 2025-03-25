@@ -664,6 +664,11 @@ export class EventMapper {
     const assets = this._mapAssetMultipart(eventData);
     messageEntity.assets.push(assets);
 
+    if (eventData.text?.quote) {
+      const {message_id: messageId, user_id: userId, error} = eventData.text.quote as any;
+      messageEntity.quote(new QuoteEntity({error, messageId, userId}));
+    }
+
     return messageEntity;
   }
 
