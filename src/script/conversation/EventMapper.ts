@@ -672,6 +672,13 @@ export class EventMapper {
 
     const assetEntity = new Multipart({id: '', text: text?.content || '', attachments});
 
+    const mentions = text?.mentions as string[] | undefined;
+
+    if (mentions && mentions.length) {
+      const mappedMentions = this._mapAssetMentions(mentions, text?.content || '');
+      assetEntity.mentions(mappedMentions);
+    }
+
     return assetEntity;
   }
 
