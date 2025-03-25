@@ -18,6 +18,7 @@
  */
 
 import {useAutoAnimate} from '@formkit/auto-animate/react';
+import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {container} from 'tsyringe';
 
 import {FileWithPreview} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
@@ -33,16 +34,16 @@ import {VideoPreviewCard} from './VideoPreviewCard/VideoPreviewCard';
 
 interface FilePreviewsProps {
   files: FileWithPreview[];
-  conversationId: string;
+  conversationQualifiedId: QualifiedId;
 }
 
-export const FilePreviews = ({files, conversationId}: FilePreviewsProps) => {
+export const FilePreviews = ({files, conversationQualifiedId}: FilePreviewsProps) => {
   const [wrapperRef] = useAutoAnimate();
 
   return (
     <div ref={wrapperRef} css={wrapperStyles}>
       {files.map(file => (
-        <FilePreview key={file.id} file={file} conversationId={conversationId} />
+        <FilePreview key={file.id} file={file} conversationQualifiedId={conversationQualifiedId} />
       ))}
     </div>
   );
@@ -51,18 +52,18 @@ export const FilePreviews = ({files, conversationId}: FilePreviewsProps) => {
 interface FilePreviewProps {
   file: FileWithPreview;
   cellsRepository?: CellsRepository;
-  conversationId: string;
+  conversationQualifiedId: QualifiedId;
 }
 
 const FilePreview = ({
   file,
   cellsRepository = container.resolve(CellsRepository),
-  conversationId,
+  conversationQualifiedId,
 }: FilePreviewProps) => {
   const {name, extension, size, isLoading, isError, handleDelete, handleRetry} = useFilePreview({
     file,
     cellsRepository,
-    conversationId,
+    conversationQualifiedId,
   });
 
   if (isImage(file)) {

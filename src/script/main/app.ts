@@ -344,7 +344,7 @@ export class App {
   }
 
   private initializeCells({cellsRepository, selfUser}: {cellsRepository: CellsRepository; selfUser: User}) {
-    const cellPydioApiKey = Config.getConfig().CELLS_PYDIO_API_KEY;
+    const cellPydioApiKey = Config.getConfig().CELLS_TOKEN_SHARED_SECRET;
 
     const cellsApiKey =
       process.env.NODE_ENV === 'development'
@@ -358,7 +358,7 @@ export class App {
         url: Config.getConfig().CELLS_PYDIO_URL,
       },
       s3: {
-        apiKey: Config.getConfig().CELLS_S3_API_KEY,
+        apiKey: cellsApiKey,
         bucket: Config.getConfig().CELLS_S3_BUCKET,
         endpoint: Config.getConfig().CELLS_S3_ENDPOINT,
         region: Config.getConfig().CELLS_S3_REGION,

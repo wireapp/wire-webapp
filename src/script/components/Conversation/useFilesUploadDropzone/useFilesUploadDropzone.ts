@@ -50,15 +50,17 @@ export const useFilesUploadDropzone = ({isTeam, cellsRepository, conversation}: 
   const MAX_SIZE = isTeam ? CONFIG.MAXIMUM_ASSET_FILE_SIZE_TEAM : CONFIG.MAXIMUM_ASSET_FILE_SIZE_PERSONAL;
 
   const uploadFile = async (file: FileWithPreview) => {
-    const conversationId =
+    // Temporary solution to handle the local development
+    // TODO: remove this once we have a proper way to handle the domain per env
+    const path =
       process.env.NODE_ENV === 'development'
-        ? conversation.id
+        ? `${conversation.id}@${CONFIG.CELLS_WIRE_DOMAIN}`
         : `${conversation.qualifiedId.id}@${conversation.qualifiedId.domain}`;
 
     try {
       const {uuid, versionId} = await cellsRepository.uploadFile({
         file,
-        path: `${conversationId}@${CONFIG.CELLS_WIRE_DOMAIN}`,
+        path,
       });
       updateFile(file.id, {remoteUuid: uuid, remoteVersionId: versionId, uploadStatus: 'success'});
     } catch (error) {
