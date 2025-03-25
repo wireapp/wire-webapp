@@ -302,7 +302,6 @@ describe('CellsAPI', () => {
   describe('getAllFiles', () => {
     it('retrieves all files with the correct parameters', async () => {
       const mockCollection: Partial<RestNodeCollection> = {
-        // Use appropriate properties based on the actual RestNodeCollection interface
         Nodes: [
           {Path: '/file1.txt', Uuid: 'uuid1'},
           {Path: '/file2.txt', Uuid: 'uuid2'},
@@ -315,7 +314,55 @@ describe('CellsAPI', () => {
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
         Locators: {Many: [{Path: `${TEST_FILE_PATH}/*`}]},
-        Flags: ['WithVersionsAll', 'WithPreSignedURLs'],
+        Flags: ['WithPreSignedURLs'],
+        Limit: '10',
+        Offset: '0',
+      });
+      expect(result).toEqual(mockCollection);
+    });
+
+    it('uses default values when limit and offset are not provided', async () => {
+      const mockCollection: Partial<RestNodeCollection> = {
+        Nodes: [
+          {Path: '/file1.txt', Uuid: 'uuid1'},
+          {Path: '/file2.txt', Uuid: 'uuid2'},
+        ],
+      };
+
+      mockNodeServiceApi.lookup.mockResolvedValueOnce(createMockResponse(mockCollection as RestNodeCollection));
+
+      const result = await cellsAPI.getAllFiles({path: TEST_FILE_PATH});
+
+      expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
+        Locators: {Many: [{Path: `${TEST_FILE_PATH}/*`}]},
+        Flags: ['WithPreSignedURLs'],
+        Limit: '10',
+        Offset: '0',
+      });
+      expect(result).toEqual(mockCollection);
+    });
+
+    it('respects custom limit and offset parameters', async () => {
+      const mockCollection: Partial<RestNodeCollection> = {
+        Nodes: [
+          {Path: '/file1.txt', Uuid: 'uuid1'},
+          {Path: '/file2.txt', Uuid: 'uuid2'},
+        ],
+      };
+
+      mockNodeServiceApi.lookup.mockResolvedValueOnce(createMockResponse(mockCollection as RestNodeCollection));
+
+      const result = await cellsAPI.getAllFiles({
+        path: TEST_FILE_PATH,
+        limit: 5,
+        offset: 10,
+      });
+
+      expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
+        Locators: {Many: [{Path: `${TEST_FILE_PATH}/*`}]},
+        Flags: ['WithPreSignedURLs'],
+        Limit: '5',
+        Offset: '10',
       });
       expect(result).toEqual(mockCollection);
     });
@@ -500,7 +547,7 @@ describe('CellsAPI', () => {
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
         Locators: {Many: [{Path: filePath}]},
-        Flags: ['WithVersionsAll', 'WithPreSignedURLs'],
+        Flags: ['WithPreSignedURLs'],
       });
       expect(result).toEqual(mockNode);
     });
@@ -543,7 +590,7 @@ describe('CellsAPI', () => {
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
         Locators: {Many: [{Uuid: fileUuid}]},
-        Flags: ['WithVersionsAll', 'WithPreSignedURLs'],
+        Flags: ['WithPreSignedURLs'],
       });
       expect(result).toEqual(mockNode);
     });
@@ -750,7 +797,69 @@ describe('CellsAPI', () => {
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
         Query: {FileName: searchPhrase, Type: 'LEAF'},
-        Flags: ['WithVersionsAll', 'WithPreSignedURLs'],
+        Flags: ['WithPreSignedURLs'],
+        Limit: '10',
+        Offset: '0',
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('uses default values when limit and offset are not provided', async () => {
+      const searchPhrase = 'test';
+      const mockResponse: RestNodeCollection = {
+        Nodes: [
+          {
+            Path: '/test.txt',
+            Uuid: 'file-uuid-1',
+          },
+          {
+            Path: '/folder/test-file.txt',
+            Uuid: 'file-uuid-2',
+          },
+        ],
+      } as RestNodeCollection;
+
+      mockNodeServiceApi.lookup.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      const result = await cellsAPI.searchFiles({phrase: searchPhrase});
+
+      expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
+        Query: {FileName: searchPhrase, Type: 'LEAF'},
+        Flags: ['WithPreSignedURLs'],
+        Limit: '10',
+        Offset: '0',
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('respects custom limit and offset parameters', async () => {
+      const searchPhrase = 'test';
+      const mockResponse: RestNodeCollection = {
+        Nodes: [
+          {
+            Path: '/test.txt',
+            Uuid: 'file-uuid-1',
+          },
+          {
+            Path: '/folder/test-file.txt',
+            Uuid: 'file-uuid-2',
+          },
+        ],
+      } as RestNodeCollection;
+
+      mockNodeServiceApi.lookup.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      const result = await cellsAPI.searchFiles({
+        phrase: searchPhrase,
+        limit: 5,
+        offset: 10,
+      });
+
+      expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
+        Query: {FileName: searchPhrase, Type: 'LEAF'},
+        Flags: ['WithPreSignedURLs'],
+        Limit: '5',
+        Offset: '10',
       });
       expect(result).toEqual(mockResponse);
     });
@@ -767,7 +876,9 @@ describe('CellsAPI', () => {
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
         Query: {FileName: searchPhrase, Type: 'LEAF'},
-        Flags: ['WithVersionsAll', 'WithPreSignedURLs'],
+        Flags: ['WithPreSignedURLs'],
+        Limit: '10',
+        Offset: '0',
       });
       expect(result).toEqual(mockResponse);
     });
@@ -793,7 +904,9 @@ describe('CellsAPI', () => {
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
         Query: {FileName: searchPhrase, Type: 'LEAF'},
-        Flags: ['WithVersionsAll', 'WithPreSignedURLs'],
+        Flags: ['WithPreSignedURLs'],
+        Limit: '10',
+        Offset: '0',
       });
       expect(result).toEqual(mockResponse);
     });
