@@ -17,7 +17,7 @@
  *
  */
 
-import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
+import {Asset as ProtobufAsset} from '@pydio/protocol-messaging';
 
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 import {ConversationState} from 'src/script/conversation/ConversationState';

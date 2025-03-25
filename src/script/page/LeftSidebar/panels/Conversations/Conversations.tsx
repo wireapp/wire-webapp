@@ -29,7 +29,6 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {useConversationFocus} from 'Hooks/useConversationFocus';
 import {IntegrationRepository} from 'src/script/integration/IntegrationRepository';
 import {Preferences} from 'src/script/page/LeftSidebar/panels/Preferences';
-import {StartUI} from 'src/script/page/LeftSidebar/panels/StartUI';
 import {ANIMATED_PAGE_TRANSITION_DURATION} from 'src/script/page/MainContent';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {ContentState, ListState} from 'src/script/page/useAppState';
@@ -65,6 +64,7 @@ import {TeamState} from '../../../../team/TeamState';
 import {UserState} from '../../../../user/UserState';
 import {ListViewModel} from '../../../../view_model/ListViewModel';
 import {ListWrapper} from '../ListWrapper';
+import {StartUI} from '../StartUI';
 
 type ConversationsProps = {
   callState?: CallState;
@@ -148,6 +148,7 @@ export const Conversations: React.FC<ConversationsProps> = ({
   );
 
   const isPreferences = currentTab === SidebarTabs.PREFERENCES;
+  const isCells = currentTab === SidebarTabs.CELLS;
 
   const showSearchInput = [
     SidebarTabs.RECENT,
@@ -295,8 +296,13 @@ export const Conversations: React.FC<ConversationsProps> = ({
         void conversationRepository.updateArchivedConversations();
       }
 
-      if (nextTab !== SidebarTabs.PREFERENCES) {
+      if (![SidebarTabs.PREFERENCES, SidebarTabs.CELLS].includes(nextTab)) {
         onExitPreferences();
+      }
+
+      if (nextTab === SidebarTabs.CELLS) {
+        switchList(ListState.CELLS);
+        switchContent(ContentState.CELLS);
       }
 
       clearConversationFilter();
@@ -399,7 +405,7 @@ export const Conversations: React.FC<ConversationsProps> = ({
           />
         }
       >
-        {isPreferences ? (
+        {isCells ? null : isPreferences ? (
           <Preferences
             onPreferenceItemClick={onClickPreferences}
             teamRepository={teamRepository}

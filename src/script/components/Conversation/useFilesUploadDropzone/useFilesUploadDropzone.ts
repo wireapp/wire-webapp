@@ -21,6 +21,7 @@ import {FileRejection, useDropzone} from 'react-dropzone';
 
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {Config} from 'src/script/Config';
+import {Conversation} from 'src/script/entity/Conversation';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {createUuid} from 'Util/uuid';
@@ -40,20 +41,32 @@ const logger = getLogger('FileDropzone');
 interface UseFilesUploadDropzoneParams {
   isTeam: boolean;
   cellsRepository: CellsRepository;
+  conversation: Pick<Conversation, 'id' | 'qualifiedId'>;
 }
 
-export const useFilesUploadDropzone = ({isTeam, cellsRepository}: UseFilesUploadDropzoneParams) => {
+export const useFilesUploadDropzone = ({isTeam, cellsRepository, conversation}: UseFilesUploadDropzoneParams) => {
   const {addFiles, files, updateFile} = useFileUploadState();
 
   const MAX_SIZE = isTeam ? CONFIG.MAXIMUM_ASSET_FILE_SIZE_TEAM : CONFIG.MAXIMUM_ASSET_FILE_SIZE_PERSONAL;
 
   const uploadFile = async (file: FileWithPreview) => {
+    // Temporary solution to handle the local development
+    // TODO: remove this once we have a proper way to handle the domain per env
+    const path =
+      process.env.NODE_ENV === 'development'
+        ? `${conversation.id}@${CONFIG.CELLS_WIRE_DOMAIN}`
+        : `${conversation.qualifiedId.id}@${conversation.qualifiedId.domain}`;
+
     try {
-      const {uuid, versionId} = await cellsRepository.uploadFile(file);
+      const {uuid, versionId} = await cellsRepository.uploadFile({
+        file,
+        path,
+      });
       updateFile(file.id, {remoteUuid: uuid, remoteVersionId: versionId, uploadStatus: 'success'});
     } catch (error) {
       logger.error('Uploading file failed', error);
       updateFile(file.id, {uploadStatus: 'error'});
+      throw error;
     }
   };
 

@@ -20,8 +20,8 @@
 import {CSSObject} from '@emotion/react';
 
 export const buttonStyles: CSSObject = {
-  width: '32px',
-  height: '32px',
+  width: '24px',
+  height: '24px',
   borderRadius: '50%',
   backgroundColor: 'var(--icon-button-primary-disabled-bg)',
   border: '1px solid var(--icon-button-primary-border)',
@@ -33,5 +33,5 @@ export const buttonStyles: CSSObject = {
 };
 
 export const playIconStyles: CSSObject = {
-  fill: 'var(--gray-70)',
+  fill: 'var(--main)',
 };

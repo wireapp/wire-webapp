@@ -17,16 +17,20 @@
  *
  */
 
+import {QualifiedId} from '@wireapp/api-client/lib/user/';
+
 import {FileWithPreview, useFileUploadState} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
+import {Config} from 'src/script/Config';
 import {getFileExtension, trimFileExtension, formatBytes} from 'Util/util';
 
 interface FilePreviewParams {
   file: FileWithPreview;
   cellsRepository: CellsRepository;
+  conversationQualifiedId: QualifiedId;
 }
 
-export const useFilePreview = ({file, cellsRepository}: FilePreviewParams) => {
+export const useFilePreview = ({file, cellsRepository, conversationQualifiedId}: FilePreviewParams) => {
   const {deleteFile, updateFile} = useFileUploadState();
 
   const name = trimFileExtension(file.name);
@@ -46,7 +50,17 @@ export const useFilePreview = ({file, cellsRepository}: FilePreviewParams) => {
   const handleRetry = async () => {
     try {
       updateFile(file.id, {uploadStatus: 'uploading'});
-      const {uuid, versionId} = await cellsRepository.uploadFile(file);
+      // Temporary solution to handle the local development
+      // TODO: remove this once we have a proper way to handle the domain per env
+      const path =
+        process.env.NODE_ENV === 'development'
+          ? `${conversationQualifiedId.id}@${Config.getConfig().CELLS_WIRE_DOMAIN}`
+          : `${conversationQualifiedId.id}@${conversationQualifiedId.domain}`;
+
+      const {uuid, versionId} = await cellsRepository.uploadFile({
+        file,
+        path,
+      });
       updateFile(file.id, {remoteUuid: uuid, remoteVersionId: versionId, uploadStatus: 'success'});
     } catch (error) {
       updateFile(file.id, {uploadStatus: 'error'});

@@ -17,6 +17,7 @@
  *
  */
 
+import {LegalHoldStatus} from '@pydio/protocol-messaging';
 import {
   CONVERSATION_ACCESS_ROLE,
   Conversation as ConversationBackendData,
@@ -31,8 +32,6 @@ import {
 } from '@wireapp/api-client/lib/conversation';
 import ko from 'knockout';
 import {isObject} from 'underscore';
-
-import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {ACCESS_STATE} from './AccessState';
 import {ConversationStatus} from './ConversationStatus';

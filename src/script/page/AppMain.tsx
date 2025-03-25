@@ -20,6 +20,7 @@
 import {FC, useEffect, useLayoutEffect} from 'react';
 
 import {amplify} from 'amplify';
+import cx from 'classnames';
 import {ErrorBoundary} from 'react-error-boundary';
 import {container} from 'tsyringe';
 
@@ -43,6 +44,7 @@ import {useE2EIFeatureConfigUpdate} from './components/FeatureConfigChange/Featu
 import {FeatureConfigChangeNotifier} from './components/FeatureConfigChange/FeatureConfigChangeNotifier';
 import {WindowTitleUpdater} from './components/WindowTitleUpdater';
 import {LeftSidebar} from './LeftSidebar';
+import {SidebarTabs, useSidebarStore} from './LeftSidebar/panels/Conversations/useSidebarStore';
 import {MainContent} from './MainContent';
 import {PanelEntity, PanelState, RightSidebar} from './RightSidebar';
 import {RootProvider} from './RootProvider';
@@ -125,6 +127,8 @@ export const AppMain: FC<AppMainProps> = ({
     goTo,
   } = useAppMainState(state => state.rightSidebar);
   const currentState = history[history.length - 1];
+
+  const {currentTab} = useSidebarStore();
 
   const toggleRightSidebar = (panelState: PanelState, params: RightSidebarParams, compareEntityId = false) => {
     const isDifferentState = currentState !== panelState;
@@ -235,7 +239,7 @@ export const AppMain: FC<AppMainProps> = ({
   useE2EIFeatureConfigUpdate(repositories.team);
 
   const showLeftSidebar = (isMobileView && isMobileLeftSidebarView) || (!isMobileView && !isLeftSidebarHidden);
-  const showMainContent = !isMobileView || isMobileCentralColumnView;
+  const showMainContent = currentTab === SidebarTabs.CELLS || !isMobileView || isMobileCentralColumnView;
 
   return (
     <StyledApp
@@ -250,7 +254,12 @@ export const AppMain: FC<AppMainProps> = ({
         <ErrorBoundary FallbackComponent={ErrorFallback}>
           {Config.getConfig().FEATURE.ENABLE_DEBUG && <ConfigToolbar />}
           {!locked && (
-            <div id="app" className="app">
+            <div
+              id="app"
+              className={cx('app', {
+                'app--hide-main-content-on-mobile': currentTab !== SidebarTabs.CELLS,
+              })}
+            >
               {showLeftSidebar && (
                 <LeftSidebar
                   listViewModel={mainView.list}

@@ -61,6 +61,7 @@ export interface TitleBarProps {
   isRightSidebarOpen?: boolean;
   callState?: CallState;
   isReadOnlyConversation?: boolean;
+  withBottomDivider: boolean;
 }
 
 export const TitleBar: React.FC<TitleBarProps> = ({
@@ -73,6 +74,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
   callState = container.resolve(CallState),
   teamState = container.resolve(TeamState),
   isReadOnlyConversation = false,
+  withBottomDivider,
 }) => {
   const {calling: callingRepository} = repositories;
   const {
@@ -220,7 +222,10 @@ export const TitleBar: React.FC<TitleBarProps> = ({
   return (
     <ul
       id="conversation-title-bar"
-      className={cx('conversation-title-bar', {'is-right-panel-open': isRightSidebarOpen})}
+      className={cx('conversation-title-bar', {
+        'is-right-panel-open': isRightSidebarOpen,
+        'conversation-title-bar--with-bottom-divider': withBottomDivider,
+      })}
     >
       <li className="conversation-title-bar-library">
         {smBreakpoint && (
