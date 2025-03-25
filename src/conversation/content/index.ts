@@ -20,7 +20,7 @@
 export {LegalHoldStatus} from '@pydio/protocol-messaging';
 export {Connection as ConnectionContent} from '@wireapp/api-client/lib/connection/';
 
-import * as ContentType from './ContentType';
+import * as ContentType from './ContentType.guards';
 export {ContentType};
 
 export * from './AssetContent';
@@ -49,3 +49,4 @@ export * from './TextContent';
 export * from './TweetContent';
 export * from './InCallEmojiContent';
 export * from './InCallHandRaiseContent';
+export * from './MultipartContent';

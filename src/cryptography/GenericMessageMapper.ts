@@ -31,6 +31,7 @@ import {
   HiddenContent,
   KnockContent,
   LocationContent,
+  MultiPartContent,
   ReactionContent,
   TextContent,
 } from '../conversation/content';
@@ -253,6 +254,17 @@ export class GenericMessageMapper {
           ...baseMessage,
           content,
           type: PayloadBundleType.REACTION,
+        };
+      }
+      case GenericMessageType.MULTIPART: {
+        const {text, attachments, legalHoldStatus} = genericMessage[GenericMessageType.MULTIPART];
+
+        const content: MultiPartContent = {attachments, legalHoldStatus, text};
+
+        return {
+          ...baseMessage,
+          content,
+          type: PayloadBundleType.MULTIPART,
         };
       }
       default: {

@@ -17,13 +17,8 @@
  *
  */
 
-import {IQuote} from '@pydio/protocol-messaging';
-
-import {AssetContent, LocationContent, MultiPartContent, TextContent} from '.';
-
-export {IQuote as QuoteContent};
-
-export interface QuoteMessageContent {
-  content: AssetContent | LocationContent | TextContent | MultiPartContent;
-  quotedMessageId: string;
-}
+import {IMultipart, IAttachment, ICellAsset, IAsset} from '@pydio/protocol-messaging';
+export {IMultipart as MultiPartContent};
+export {IAttachment as MultiPartAttachment};
+export {ICellAsset as MultiPartCellAsset};
+export {IAsset as MultiPartAsset};
