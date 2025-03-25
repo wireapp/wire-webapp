@@ -50,8 +50,9 @@ export const useGetAllCellsFiles = ({cellsRepository, conversationQualifiedId}: 
         path: `${id}@${domainPerEnv}`,
       });
 
-      if (!result.Nodes) {
-        throw new Error('No files found');
+      if (!result.Nodes?.length) {
+        setStatus('success');
+        return;
       }
 
       const transformedFiles = transformNodesToCellsFiles(result.Nodes);
