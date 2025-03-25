@@ -19,6 +19,7 @@
 
 import {useCallback} from 'react';
 
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
 import {useAppNotification} from 'Components/AppNotification/AppNotification';
@@ -35,15 +36,15 @@ import {useGetAllCellsFiles} from './useGetAllCellsFiles/useGetAllCellsFiles';
 
 interface ConversationCellsProps {
   cellsRepository?: CellsRepository;
-  conversationId: string;
+  conversationQualifiedId: QualifiedId;
 }
 
 export const ConversationCells = ({
   cellsRepository = container.resolve(CellsRepository),
-  conversationId,
+  conversationQualifiedId,
 }: ConversationCellsProps) => {
   const {files, status: filesStatus, clearAll, removeFile} = useCellsStore();
-  const {refresh} = useGetAllCellsFiles({cellsRepository, conversationId});
+  const {refresh} = useGetAllCellsFiles({cellsRepository, conversationQualifiedId});
 
   const isLoading = filesStatus === 'loading';
   const isError = filesStatus === 'error';

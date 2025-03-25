@@ -504,7 +504,7 @@ export const Conversation = ({
             <>
               <ConversationTabs activeTabIndex={activeTabIndex} onIndexChange={setActiveTabIndex} />
               <ConversationTabPanel id="files" isActive={activeTabIndex === 1}>
-                {activeTabIndex === 1 && <ConversationCells conversationId={activeConversation.id} />}
+                {activeTabIndex === 1 && <ConversationCells conversationQualifiedId={activeConversation.qualifiedId} />}
               </ConversationTabPanel>
             </>
           )}
