@@ -37,6 +37,8 @@ import {AccessTokenStore} from '../auth';
 import {HttpClient} from '../http';
 
 const CONFIGURATION_ERROR = 'CellsAPI is not initialized. Call initialize() before using any methods.';
+const DEFAULT_LIMIT = 10;
+const DEFAULT_OFFSET = 0;
 
 interface CellsConfig {
   pydio: {
@@ -171,7 +173,7 @@ export class CellsAPI {
 
     const result = await this.client.lookup({
       Locators: {Many: [{Path: path}]},
-      Flags: ['WithVersionsAll', 'WithPreSignedURLs'],
+      Flags: ['WithPreSignedURLs'],
     });
 
     const node = result.data.Nodes?.[0];
@@ -190,7 +192,7 @@ export class CellsAPI {
 
     const result = await this.client.lookup({
       Locators: {Many: [{Uuid: uuid}]},
-      Flags: ['WithVersionsAll', 'WithPreSignedURLs'],
+      Flags: ['WithPreSignedURLs'],
     });
 
     const node = result.data.Nodes?.[0];
@@ -222,27 +224,47 @@ export class CellsAPI {
     return result.data;
   }
 
-  async getAllFiles({path}: {path: string}): Promise<RestNodeCollection> {
+  async getAllFiles({
+    path,
+    limit = DEFAULT_LIMIT,
+    offset = DEFAULT_OFFSET,
+  }: {
+    path: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<RestNodeCollection> {
     if (!this.client || !this.storageService) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
     const result = await this.client.lookup({
       Locators: {Many: [{Path: `${path}/*`}]},
-      Flags: ['WithVersionsAll', 'WithPreSignedURLs'],
+      Flags: ['WithPreSignedURLs'],
+      Limit: `${limit}`,
+      Offset: `${offset}`,
     });
 
     return result.data;
   }
 
-  async searchFiles({phrase}: {phrase: string}): Promise<RestNodeCollection> {
+  async searchFiles({
+    phrase,
+    limit = DEFAULT_LIMIT,
+    offset = DEFAULT_OFFSET,
+  }: {
+    phrase: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<RestNodeCollection> {
     if (!this.client || !this.storageService) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
     const result = await this.client.lookup({
       Query: {FileName: phrase, Type: 'LEAF'},
-      Flags: ['WithVersionsAll', 'WithPreSignedURLs'],
+      Flags: ['WithPreSignedURLs'],
+      Limit: `${limit}`,
+      Offset: `${offset}`,
     });
 
     return result.data;
