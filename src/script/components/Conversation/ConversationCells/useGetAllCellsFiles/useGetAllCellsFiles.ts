@@ -19,6 +19,8 @@
 
 import {useEffect, useCallback} from 'react';
 
+import {QualifiedId} from '@wireapp/api-client/lib/user/';
+
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {Config} from 'src/script/Config';
 
@@ -28,18 +30,24 @@ import {useCellsStore} from '../common/useCellsStore/useCellsStore';
 
 interface UseGetAllCellsFilesProps {
   cellsRepository: CellsRepository;
-  conversationId: string;
+  conversationQualifiedId: QualifiedId;
 }
 
-export const useGetAllCellsFiles = ({cellsRepository, conversationId}: UseGetAllCellsFilesProps) => {
+export const useGetAllCellsFiles = ({cellsRepository, conversationQualifiedId}: UseGetAllCellsFilesProps) => {
   const {setFiles, setStatus, setError} = useCellsStore();
 
   const fetchFiles = useCallback(async () => {
     try {
       setStatus('loading');
 
+      const {domain, id} = conversationQualifiedId;
+
+      // Temporary solution to handle the local development
+      // TODO: remove this once we have a proper way to handle the domain per env
+      const domainPerEnv = process.env.NODE_ENV === 'development' ? Config.getConfig().CELLS_WIRE_DOMAIN : domain;
+
       const result = await cellsRepository.getAllFiles({
-        path: `${conversationId}@${Config.getConfig().CELLS_WIRE_DOMAIN}`,
+        path: `${id}@${domainPerEnv}`,
       });
 
       if (!result.Nodes) {
