@@ -22,11 +22,48 @@ import {container} from 'tsyringe';
 import {TeamState} from 'src/script/team/TeamState';
 import {t} from 'Util/LocalizerUtil';
 
-import {useCreateConversationModal} from './useCreateConversationModal';
+import {ChatHistory, ConversationAccess, ConversationManager, ConversationType, HistorySharingUnit} from './types';
 
-import {HistorySharingUnit, ChatHistory, ConversationAccess, ConversationManager, ConversationType} from '../types';
+export const getConversationAccessOptions = () => {
+  return [
+    {
+      value: ConversationAccess.Public,
+      label: t('createConversationAccessOptionPublic'),
+    },
+    {
+      value: ConversationAccess.Private,
+      label: t('createConversationAccessOptionPrivate'),
+    },
+  ];
+};
 
-export const useChatHistorySharingUnitOptions = (historySharingQuantity: number) => {
+export const getConversationManagerOptions = () => {
+  return [
+    {
+      value: ConversationManager.Admins,
+      label: t('createConversationManagerOptionAdmins'),
+    },
+    {
+      value: ConversationManager.AdminsAndMembers,
+      label: t('createConversationManagerOptionAdminsAndMembers'),
+    },
+  ];
+};
+
+export const getConversationTypeOptions = () => {
+  return [
+    {
+      conversationType: ConversationType.Channel,
+      label: t('conversationTypeChannelOption'),
+    },
+    {
+      conversationType: ConversationType.Group,
+      label: t('conversationTypeGroupOption'),
+    },
+  ];
+};
+
+export const getChatHistorySharingUnitOptions = (historySharingQuantity: number) => {
   const chatHistorySharingUnitOptions = [
     {
       value: HistorySharingUnit.Days,
@@ -51,17 +88,17 @@ export const useChatHistorySharingUnitOptions = (historySharingQuantity: number)
     },
   ];
 
-  return {chatHistorySharingUnitOptions};
+  return chatHistorySharingUnitOptions;
 };
 
-export const useChatHistoryOptions = (
+export const getChatHistoryOptions = (
   chatHistory: ChatHistory,
   historySharingQuantity: number,
   historySharingUnit: HistorySharingUnit,
   enableCustomHistory?: boolean,
 ) => {
   const teamState = container.resolve(TeamState);
-  const {chatHistorySharingUnitOptions} = useChatHistorySharingUnitOptions(historySharingQuantity);
+  const chatHistorySharingUnitOptions = getChatHistorySharingUnitOptions(historySharingQuantity);
 
   const chatHistoryOptions = [
     {
@@ -94,52 +131,5 @@ export const useChatHistoryOptions = (
     });
   }
 
-  return {chatHistoryOptions};
-};
-
-export const useConversationDetailsOption = () => {
-  const {chatHistory, historySharingQuantity, historySharingUnit} = useCreateConversationModal();
-  const {chatHistorySharingUnitOptions} = useChatHistorySharingUnitOptions(historySharingQuantity);
-  const {chatHistoryOptions} = useChatHistoryOptions(chatHistory, historySharingQuantity, historySharingUnit, true);
-
-  const conversationAccessOptions = [
-    {
-      value: ConversationAccess.Public,
-      label: t('createConversationAccessOptionPublic'),
-    },
-    {
-      value: ConversationAccess.Private,
-      label: t('createConversationAccessOptionPrivate'),
-    },
-  ];
-
-  const conversationManagerOptions = [
-    {
-      value: ConversationManager.Admins,
-      label: t('createConversationManagerOptionAdmins'),
-    },
-    {
-      value: ConversationManager.AdminsAndMembers,
-      label: t('createConversationManagerOptionAdminsAndMembers'),
-    },
-  ];
-
-  const conversationTypeOptions = [
-    {
-      conversationType: ConversationType.Channel,
-      label: t('conversationTypeChannelOption'),
-    },
-    {
-      conversationType: ConversationType.Group,
-      label: t('conversationTypeGroupOption'),
-    },
-  ];
-
-  return {
-    chatHistoryOptions,
-    chatHistorySharingUnitOptions,
-    conversationAccessOptions,
-    conversationManagerOptions,
-    conversationTypeOptions,
-  };
+  return chatHistoryOptions;
 };

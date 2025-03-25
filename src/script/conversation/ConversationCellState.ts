@@ -74,11 +74,11 @@ const _accumulateSummary = (conversationEntity: Conversation, prioritizeMentionA
         let summary;
 
         if (hasSingleMention) {
-          summary = conversationEntity.isGroup()
+          summary = conversationEntity.isGroupOrChannel()
             ? t('conversationsSecondaryLineEphemeralMentionGroup')
             : t('conversationsSecondaryLineEphemeralMention');
         } else {
-          summary = conversationEntity.isGroup()
+          summary = conversationEntity.isGroupOrChannel()
             ? t('conversationsSecondaryLineEphemeralReplyGroup')
             : t('conversationsSecondaryLineEphemeralReply');
         }
@@ -86,7 +86,7 @@ const _accumulateSummary = (conversationEntity: Conversation, prioritizeMentionA
         return summary;
       }
 
-      return conversationEntity.isGroup()
+      return conversationEntity.isGroupOrChannel()
         ? `${messageEntity.unsafeSenderName()}: ${(messageEntity.getFirstAsset() as Text)?.text}`
         : (messageEntity.getFirstAsset() as Text)?.text;
     }
@@ -260,7 +260,7 @@ const _getStateGroupActivity = {
     const isExpectedType = lastMessageEntity ? lastMessageEntity.isMember() || lastMessageEntity.isSystem() : false;
     const unreadEvents = conversationEntity.unreadState().allEvents;
 
-    return conversationEntity.isGroup() && unreadEvents.length > 0 && isExpectedType;
+    return conversationEntity.isGroupOrChannel() && unreadEvents.length > 0 && isExpectedType;
   },
 };
 
@@ -353,12 +353,12 @@ const _getStateUnreadMessage = {
 
       if (!!string) {
         if (messageEntity.isEphemeral()) {
-          return conversationEntity.isGroup()
+          return conversationEntity.isGroupOrChannel()
             ? t('conversationsSecondaryLineEphemeralMessageGroup')
             : t('conversationsSecondaryLineEphemeralMessage');
         }
 
-        return conversationEntity.isGroup() && !messageEntity.isE2EIVerification()
+        return conversationEntity.isGroupOrChannel() && !messageEntity.isE2EIVerification()
           ? `${messageEntity.unsafeSenderName()}: ${string}`
           : string;
       }

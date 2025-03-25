@@ -585,7 +585,7 @@ export class EventMapper {
     const isSingleModeConversation = conversationEntity.is1to1() || conversationEntity.isRequest();
     messageEntity.visible(!isSingleModeConversation);
 
-    if (conversationEntity.isGroup()) {
+    if (conversationEntity.isGroupOrChannel()) {
       const messageFromCreator = sender === conversationEntity.creator;
       const creatorIndex = userIds.findIndex(user => user.id === sender);
       const creatorIsJoiningMember = messageFromCreator && creatorIndex !== -1;

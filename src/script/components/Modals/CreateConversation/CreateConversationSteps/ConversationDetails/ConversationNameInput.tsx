@@ -23,9 +23,11 @@ import {handleEnterDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
+import {ConversationType} from '../../types';
 
 export const ConversationNameInput = () => {
-  const {conversationName, setConversationName, setError, error, gotoNextStep} = useCreateConversationModal();
+  const {conversationName, setConversationName, setError, error, gotoNextStep, conversationType} =
+    useCreateConversationModal();
 
   const maxNameLength = ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
 
@@ -57,12 +59,17 @@ export const ConversationNameInput = () => {
 
   const hasNameError = error.length > 0;
 
+  const label =
+    conversationType === ConversationType.Group
+      ? t('groupCreationPreferencesPlaceholder')
+      : t('channelCreationPreferencesPlaceholder');
+
   return (
     <TextInput
       /* eslint jsx-a11y/no-autofocus : "off" */
       autoFocus
-      label={t('groupCreationPreferencesPlaceholder')}
-      placeholder={t('groupCreationPreferencesPlaceholder')}
+      label={label}
+      placeholder={label}
       uieName="enter-group-name"
       name="enter-group-name"
       errorUieName="error-group-name"

@@ -30,6 +30,7 @@ import {ConversationLabel} from 'src/script/conversation/ConversationLabelReposi
 import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {handleEnterDown, handleEscDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
+import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {
   button,
@@ -70,6 +71,7 @@ export const ConversationHeaderComponent = ({
   searchInputRef,
 }: ConversationHeaderProps) => {
   const {canCreateGroupConversation} = generatePermissionHelpers(selfUser.teamRole());
+  const {isChannelsEnabled} = useChannelsFeatureFlag();
   const {showModal} = useCreateConversationModal();
   const isFolderView = currentTab === SidebarTabs.FOLDER;
 
@@ -77,6 +79,7 @@ export const ConversationHeaderComponent = ({
     [SidebarTabs.RECENT]: t('conversationViewAllConversations'),
     [SidebarTabs.FAVORITES]: t('conversationLabelFavorites'),
     [SidebarTabs.GROUPS]: t('conversationLabelGroups'),
+    [SidebarTabs.CHANNELS]: t('conversationLabelChannels'),
     [SidebarTabs.DIRECTS]: t('conversationLabelDirects'),
     [SidebarTabs.FOLDER]: t('folderViewTooltip'),
     [SidebarTabs.ARCHIVES]: t('conversationFooterArchive'),
@@ -101,6 +104,14 @@ export const ConversationHeaderComponent = ({
     };
   }, [searchInputRef, jumpToRecentSearch]);
 
+  const showCreateConversationModal = () => {
+    if (isChannelsEnabled) {
+      showModal();
+    } else {
+      amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, 'conversation_details');
+    }
+  };
+
   return (
     <>
       <div css={header}>
@@ -110,7 +121,7 @@ export const ConversationHeaderComponent = ({
 
         {currentTab !== SidebarTabs.ARCHIVES && canCreateGroupConversation() && (
           <IconButton
-            onClick={showModal}
+            onClick={showCreateConversationModal}
             data-uie-name="go-create-group"
             css={button}
             title={t('conversationDetailsActionCreateGroup')}

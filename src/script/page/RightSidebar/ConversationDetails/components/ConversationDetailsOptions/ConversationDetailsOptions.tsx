@@ -20,7 +20,7 @@
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/';
 import {amplify} from 'amplify';
 
-import {HideIcon} from '@wireapp/react-ui-kit';
+import {HideIcon, HistoryIcon, LockClosedIcon, UnlockedIcon} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/Icon';
@@ -29,6 +29,7 @@ import {ReceiptModeToggle} from 'Components/toggle/ReceiptModeToggle';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {replaceReactComponents} from 'Util/LocalizerUtil/ReactLocalizerUtil';
+import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {ConversationDetailsOption} from './ConversationDetailsOption';
 
@@ -56,6 +57,7 @@ interface ConversationDetailsOptionsProps {
   selfUser: User;
   teamState: TeamState;
   updateConversationReceiptMode: (receiptMode: RECEIPT_MODE) => void;
+  isChannelPublic?: boolean;
 }
 
 const ConversationDetailsOptions = ({
@@ -71,28 +73,32 @@ const ConversationDetailsOptions = ({
   timedMessagesText,
   teamState,
   updateConversationReceiptMode,
+  isChannelPublic,
 }: ConversationDetailsOptionsProps) => {
   const {
     isMutable,
-    isGroup,
     receiptMode,
     is1to1,
     isRequest,
     isSelfUserRemoved,
     firstUserEntity: firstParticipant,
+    isChannel,
+    isGroupOrChannel,
   } = useKoSubscribableChildren(activeConversation, [
     'isMutable',
-    'isGroup',
     'receiptMode',
     'is1to1',
     'isRequest',
     'isSelfUserRemoved',
     'firstUserEntity',
+    'isChannel',
+    'isGroupOrChannel',
   ]);
   const {isSelfDeletingMessagesEnabled, isTeam} = useKoSubscribableChildren(teamState, [
     'isSelfDeletingMessagesEnabled',
     'isTeam',
   ]);
+  const {isChannelsHistorySharingEnabled, isChannelsEnabled} = useChannelsFeatureFlag();
   const {isActivatedAccount, teamRole} = useKoSubscribableChildren(selfUser, ['isActivatedAccount', 'teamRole']);
   const {isBlocked: isParticipantBlocked} = useKoSubscribableChildren(firstParticipant!, ['isBlocked']);
 
@@ -111,17 +117,16 @@ const ConversationDetailsOptions = ({
     isParticipantBlocked,
   });
 
-  const isActiveGroupParticipant = isGroup && !isSelfUserRemoved;
+  const isActiveGroupParticipant = isGroupOrChannel && !isSelfUserRemoved;
   const isTeamConversation = !!teamId;
 
   const showOptionGuests = isActiveGroupParticipant && isTeamConversation;
-  const showOptionNotificationsGroup = isMutable && isGroup;
+  const showOptionNotificationsGroup = isMutable && isGroupOrChannel;
   const showOptionTimedMessages = isActiveGroupParticipant && isSelfDeletingMessagesEnabled;
   const showOptionServices = isActiveGroupParticipant && isTeamConversation && !isMLSConversation(activeConversation);
-  const showOptionNotifications1To1 = isMutable && !isGroup;
+  const showOptionNotifications1To1 = isMutable && !isGroupOrChannel;
   const showOptionReadReceipts = isTeamConversation;
-  // TODO: only show channel options if the conversation is a channel
-  const showChannelOptions = isGroup;
+  const showChannelOptions = isChannel && isChannelsEnabled;
 
   const hasReceiptsEnabled = conversationRepository.expectReadReceipt(activeConversation);
 
@@ -147,7 +152,7 @@ const ConversationDetailsOptions = ({
 
   return (
     <div className="conversation-details__options">
-      {isGroup && <h3 className="conversation-details__list-head">{t('conversationDetailsOptions')}</h3>}
+      {isGroupOrChannel && <h3 className="conversation-details__list-head">{t('conversationDetailsOptions')}</h3>}
 
       <ul>
         {showChannelOptions && (
@@ -156,23 +161,25 @@ const ConversationDetailsOptions = ({
               className="conversation-details__access"
               onClick={openAccessPanel}
               dataUieName="go-access"
-              icon={<Icon.NotificationIcon />}
-              // add translation
-              title={'Access'}
+              icon={isChannelPublic ? <UnlockedIcon /> : <LockClosedIcon width={14} height={14} />}
+              title={t('conversationAccessTitle')}
               statusUieName="status-access"
-              statusText={'Public'}
+              statusText={
+                isChannelPublic ? t('createConversationAccessOptionPublic') : t('createConversationAccessOptionPrivate')
+              }
             />
 
-            <ConversationDetailsOption
-              className="conversation-details__conversation-history"
-              onClick={openConversationHistoryPanel}
-              dataUieName="go-conversation-history"
-              icon={<Icon.TimerIcon />}
-              // add translation
-              title={'Conversation history'}
-              statusUieName="status-access"
-              statusText={'1 day'}
-            />
+            {isChannelsHistorySharingEnabled && (
+              <ConversationDetailsOption
+                className="conversation-details__conversation-history"
+                onClick={openConversationHistoryPanel}
+                dataUieName="go-conversation-history"
+                icon={<HistoryIcon />}
+                title={t('conversationHistoryTitle')}
+                statusUieName="status-conversation-history"
+                statusText={t('conversationHistoryOptionDay')}
+              />
+            )}
           </>
         )}
 

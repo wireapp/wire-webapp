@@ -25,7 +25,7 @@ export enum ConversationAccess {
 /**
  * Enum representing the manager type of a conversation.
  */
-export enum ConversationManager {
+export enum ConversationModerator {
   Admins,
   AdminsAndMembers,
 }

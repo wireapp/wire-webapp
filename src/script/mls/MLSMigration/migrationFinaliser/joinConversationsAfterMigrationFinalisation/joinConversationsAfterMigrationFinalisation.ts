@@ -54,7 +54,7 @@ export const joinConversationsAfterMigrationFinalisation = async ({
 
 const filterGroupConversationsAlreadyMigratedToMLS = (conversations: Conversation[]) => {
   return conversations.filter((conversation): conversation is MLSConversation => {
-    if (!conversation.isGroup()) {
+    if (!conversation.isGroupOrChannel()) {
       return false;
     }
 

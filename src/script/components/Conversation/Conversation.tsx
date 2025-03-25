@@ -433,7 +433,7 @@ export const Conversation = ({
         if (conversationEntity.is1to1()) {
           shouldSendReadReceipt = repositories.conversation.expectReadReceipt(conversationEntity);
         } else if (
-          conversationEntity.isGroup() &&
+          conversationEntity.isGroupOrChannel() &&
           (conversationEntity.inTeam() ||
             conversationEntity.isGuestRoom() ||
             conversationEntity.isGuestAndServicesRoom())

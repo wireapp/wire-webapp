@@ -909,7 +909,7 @@ export class CallingRepository {
     const useSFTForOneToOneCalls =
       this.teamState.teamFeatures()?.[FEATURE_KEY.CONFERENCE_CALLING]?.config?.useSFTForOneToOneCalls;
 
-    if (conversation.isGroup() || useSFTForOneToOneCalls) {
+    if (conversation.isGroupOrChannel() || useSFTForOneToOneCalls) {
       if (isMLSConversation(conversation)) {
         return CONV_TYPE.CONFERENCE_MLS;
       }

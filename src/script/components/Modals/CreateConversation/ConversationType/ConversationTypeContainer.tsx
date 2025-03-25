@@ -29,9 +29,9 @@ import {ConversationFeature} from './ConversationFeature';
 import {ConversationOption} from './ConversationOption';
 
 import {conversationTypeContainerCss} from '../CreateConversation.styles';
-import {useConversationDetailsOption} from '../hooks/useConversationDetailsOption';
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
 import {ConversationCreationStep, ConversationType} from '../types';
+import {getConversationTypeOptions} from '../utils';
 
 export const ConversationTypeContainer = () => {
   const teamState = container.resolve(TeamState);
@@ -44,7 +44,6 @@ export const ConversationTypeContainer = () => {
     setIsConfirmConversationTypeModalOpen,
     setIsCreateTeamModalOpen,
   } = useCreateConversationModal();
-  const {conversationTypeOptions} = useConversationDetailsOption();
 
   const isInTeam = teamState.isInTeam(self!);
 
@@ -73,7 +72,7 @@ export const ConversationTypeContainer = () => {
 
   return (
     <div css={conversationTypeContainerCss}>
-      {conversationTypeOptions.map(option => (
+      {getConversationTypeOptions().map(option => (
         <>
           <ConversationOption
             key={option.conversationType}

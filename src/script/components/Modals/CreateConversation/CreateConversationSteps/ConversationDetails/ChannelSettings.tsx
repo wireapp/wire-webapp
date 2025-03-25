@@ -24,13 +24,14 @@ import {Muted, Option, Select} from '@wireapp/react-ui-kit';
 import {RadioGroup} from 'Components/Radio';
 import {TeamState} from 'src/script/team/TeamState';
 import {t} from 'Util/LocalizerUtil';
+import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {CustomHistorySharingOption} from './CutomHistorySharingOption';
 
 import {channelSettingsTextCss} from '../../CreateConversation.styles';
-import {useConversationDetailsOption} from '../../hooks/useConversationDetailsOption';
 import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
 import {ChatHistory, ConversationAccess, ConversationManager} from '../../types';
+import {getConversationAccessOptions, getChatHistoryOptions, getConversationManagerOptions} from '../../utils';
 
 export const ChannelSettings = () => {
   const teamState = container.resolve(TeamState);
@@ -43,10 +44,12 @@ export const ChannelSettings = () => {
     setManager,
     setIsCustomHistoryModalOpen,
     setIsUpgradeTeamModalOpen,
+    historySharingQuantity,
+    historySharingUnit,
   } = useCreateConversationModal();
-  const {chatHistoryOptions, conversationAccessOptions, conversationManagerOptions} = useConversationDetailsOption();
   const isPremiumUser = teamState.isConferenceCallingEnabled();
-
+  const {isPublicChannelsEnabled, isChannelsHistorySharingEnabled} = useChannelsFeatureFlag();
+  const chatHistoryOptions = getChatHistoryOptions(chatHistory, historySharingQuantity, historySharingUnit, true);
   const onChatHistoryChange = (option?: Option | null) => {
     if (option?.value === ChatHistory.Custom) {
       if (!isPremiumUser) {
@@ -71,9 +74,10 @@ export const ChannelSettings = () => {
         onChange={setAccess}
         horizontal
         selectedValue={access}
-        options={conversationAccessOptions}
+        options={getConversationAccessOptions()}
         ariaLabelledBy="conversation-access"
         name="conversation-access"
+        disabled={!isPublicChannelsEnabled}
       />
 
       <Muted block muted={access === ConversationAccess.Public} css={channelSettingsTextCss}>
@@ -85,24 +89,27 @@ export const ChannelSettings = () => {
         onChange={setManager}
         horizontal
         selectedValue={manager}
-        options={conversationManagerOptions}
+        options={getConversationManagerOptions()}
         ariaLabelledBy="conversation-manager"
         name="conversation-manager"
       />
+      {isChannelsHistorySharingEnabled && (
+        <>
+          <p className="heading-h3">Conversation history</p>
+          <p className="subline" css={channelSettingsTextCss}>
+            {t('conversationHistoryText')}
+          </p>
 
-      <p className="heading-h3">Conversation history</p>
-      <p className="subline" css={channelSettingsTextCss}>
-        {t('conversationHistoryText')}
-      </p>
-
-      <Select
-        id="chat-history-select"
-        dataUieName="chat-history-select"
-        value={chatHistoryOptions.find(option => option.value === chatHistory)}
-        onChange={onChatHistoryChange}
-        formatOptionLabel={option => <CustomHistorySharingOption isPremiumUser={isPremiumUser} option={option} />}
-        options={chatHistoryOptions}
-      />
+          <Select
+            id="chat-history-select"
+            dataUieName="chat-history-select"
+            value={chatHistoryOptions.find(option => option.value === chatHistory)}
+            onChange={onChatHistoryChange}
+            formatOptionLabel={option => <CustomHistorySharingOption isPremiumUser={isPremiumUser} option={option} />}
+            options={chatHistoryOptions}
+          />
+        </>
+      )}
     </>
   );
 };

@@ -19,7 +19,15 @@
 
 import {container} from 'tsyringe';
 
-import {GroupIcon, MessageIcon, StarIcon, ExternalLinkIcon, Tooltip, SupportIcon} from '@wireapp/react-ui-kit';
+import {
+  GroupIcon,
+  MessageIcon,
+  StarIcon,
+  ExternalLinkIcon,
+  Tooltip,
+  SupportIcon,
+  ChannelIcon,
+} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
@@ -33,6 +41,7 @@ import {UserRepository} from 'src/script/user/UserRepository';
 import {isDataDogEnabled} from 'Util/DataDog';
 import {getWebEnvironment} from 'Util/Environment';
 import {replaceLink, t} from 'Util/LocalizerUtil';
+import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {
   footerDisclaimer,
@@ -54,6 +63,7 @@ interface ConversationTabsProps {
   archivedConversations: Conversation[];
   groupConversations: Conversation[];
   directConversations: Conversation[];
+  channelConversations: Conversation[];
   conversationRepository: ConversationRepository;
   onChangeTab: (tab: SidebarTabs, folderId?: string) => void;
   currentTab: SidebarTabs;
@@ -78,7 +88,9 @@ export const ConversationTabs = ({
   selfUser,
   userRepository,
   teamRepository,
+  channelConversations,
 }: ConversationTabsProps) => {
+  const {isChannelsEnabled} = useChannelsFeatureFlag();
   const core = container.resolve(Core);
   const teamState = container.resolve(TeamState);
   const totalUnreadConversations = unreadConversations.length;
@@ -97,6 +109,9 @@ export const ConversationTabs = ({
   const isTeamCreationEnabled =
     Config.getConfig().FEATURE.ENABLE_TEAM_CREATION &&
     core.backendFeatures.version >= Config.getConfig().MIN_TEAM_CREATION_SUPPORTED_API_VERSION;
+
+  const channelConversationsLength = channelConversations.filter(filterUnreadAndArchivedConversations).length;
+  const groupConversationsLength = groupConversations.filter(filterUnreadAndArchivedConversations).length;
 
   const conversationTabs = [
     {
@@ -118,7 +133,9 @@ export const ConversationTabs = ({
       title: t('conversationLabelGroups'),
       dataUieName: 'go-groups-view',
       Icon: <GroupIcon />,
-      unreadConversations: groupConversations.filter(filterUnreadAndArchivedConversations).length,
+      unreadConversations: isChannelsEnabled
+        ? groupConversationsLength
+        : groupConversationsLength + channelConversationsLength,
     },
     {
       type: SidebarTabs.DIRECTS,
@@ -143,6 +160,16 @@ export const ConversationTabs = ({
       unreadConversations: totalUnreadArchivedConversations,
     },
   ];
+
+  if (isChannelsEnabled) {
+    conversationTabs.splice(2, 0, {
+      type: SidebarTabs.CHANNELS,
+      title: t('conversationLabelChannels'),
+      dataUieName: 'go-groups-view',
+      Icon: <ChannelIcon />,
+      unreadConversations: channelConversationsLength,
+    });
+  }
 
   const replaceWireLink = replaceLink('https://app.wire.com', '', '');
 

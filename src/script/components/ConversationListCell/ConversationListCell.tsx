@@ -19,6 +19,7 @@
 
 import React, {useRef, useState, MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent} from 'react';
 
+import {CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conversation/';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 
@@ -30,6 +31,7 @@ import {UserInfo} from 'Components/UserInfo';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isKey, isOneOfKeys, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
+import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 import {noop, setContextMenuPosition} from 'Util/util';
 
 import {StatusIcon} from './components/StatusIcon';
@@ -64,7 +66,6 @@ export const ConversationListCell = ({
   resetConversationFocus,
 }: ConversationListCellProps) => {
   const {
-    display_name: conversationName,
     isGroup,
     is1to1,
     participating_user_ets: users,
@@ -74,8 +75,9 @@ export const ConversationListCell = ({
     mutedState,
     isRequest,
     isConversationWithBlockedUser,
+    isChannel,
+    isGroupOrChannel,
   } = useKoSubscribableChildren(conversation, [
-    'display_name',
     'isGroup',
     'is1to1',
     'participating_user_ets',
@@ -85,8 +87,11 @@ export const ConversationListCell = ({
     'mutedState',
     'isRequest',
     'isConversationWithBlockedUser',
+    'isChannel',
+    'isGroupOrChannel',
   ]);
 
+  const {isChannelsEnabled} = useChannelsFeatureFlag();
   const isActive = isSelected(conversation);
 
   const conversationRef = useRef<HTMLDivElement>(null);
@@ -172,19 +177,20 @@ export const ConversationListCell = ({
             'conversation-list-cell-left-opaque': isSelfUserRemoved || users.length === 0,
           })}
         >
-          {/* show channel avatar for testing purpose */}
-          {isGroup &&
-            (conversationName && conversationName?.toLowerCase().includes('channel') ? (
+          {isChannel &&
+            (isChannelsEnabled ? (
               <ChannelAvatar
                 conversationID={conversation.id}
-                isLocked={conversationName.toLowerCase().includes('lock')}
+                isLocked={!conversation.accessModes?.includes(CONVERSATION_ACCESS.LINK)}
                 className="conversation-list-cell-avatar-arrow"
               />
             ) : (
               <GroupAvatar conversationID={conversation.id} className="conversation-list-cell-avatar-arrow" />
             ))}
 
-          {!isGroup && !!users.length && <Avatar participant={users[0]} avatarSize={AVATAR_SIZE.SMALL} />}
+          {isGroup && <GroupAvatar conversationID={conversation.id} className="conversation-list-cell-avatar-arrow" />}
+
+          {!isGroupOrChannel && !!users.length && <Avatar participant={users[0]} avatarSize={AVATAR_SIZE.SMALL} />}
         </div>
 
         <div className="conversation-list-cell-center">
