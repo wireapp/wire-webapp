@@ -75,10 +75,11 @@ const ContentAsset = ({
 
   switch (asset.type) {
     case AssetType.MULTIPART:
-      const shouldRenderTextMultipart = (asset as Multipart).should_render_text();
-      const renderTextMultipart = (asset as Multipart).render(selfId, message.accent_color());
+      const multipartAsset = asset as Multipart;
+      const shouldRenderTextMultipart = multipartAsset.should_render_text();
+      const renderTextMultipart = multipartAsset.render(selfId, message.accent_color());
 
-      const filesMultipart = (asset as Multipart).getAttachments();
+      const filesMultipart = multipartAsset.getCellAssets();
 
       return (
         <>

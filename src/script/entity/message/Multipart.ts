@@ -68,7 +68,7 @@ export class Multipart extends Asset {
     return this.mentions().some(mentionEntity => mentionEntity.targetsUser(userId));
   }
 
-  getAttachments(): Array<ICellAsset> {
+  getCellAssets(): Array<ICellAsset> {
     const attachments = this.attachments?.();
 
     if (!attachments) {
