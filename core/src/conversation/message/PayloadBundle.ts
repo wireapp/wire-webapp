@@ -91,4 +91,5 @@ export enum PayloadBundleType {
   USER_LEGAL_HOLD_REQUEST = 'PayloadBundleType.USER_LEGAL_HOLD_REQUEST',
   USER_PROPERTIES_SET = 'PayloadBundleType.USER_PROPERTIES_SET',
   USER_UPDATE = 'PayloadBundleType.USER_UPDATE',
+  MULTIPART = 'PayloadBundleType.MULTIPART',
 }

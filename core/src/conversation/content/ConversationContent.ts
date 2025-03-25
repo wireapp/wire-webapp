@@ -45,6 +45,7 @@ import {
   TextContent,
   InCallEmojiContent,
   InCallHandRaiseContent,
+  MultiPartContent,
 } from '.';
 
 export type ConversationContent =
@@ -73,4 +74,5 @@ export type ConversationContent =
   | ReactionContent
   | InCallEmojiContent
   | InCallHandRaiseContent
-  | TextContent;
+  | TextContent
+  | MultiPartContent;

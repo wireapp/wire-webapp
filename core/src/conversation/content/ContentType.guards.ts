@@ -36,6 +36,7 @@ import {
   ImageAssetContent,
   ImageContent,
   LocationContent,
+  MultiPartContent,
   ReactionContent,
   TextContent,
 } from '.';
@@ -110,4 +111,8 @@ export function isReactionContent(content: ConversationContent): content is Reac
 
 export function isTextContent(content: ConversationContent): content is TextContent {
   return !!(content as TextContent).text;
+}
+
+export function isMultiPartContent(content: ConversationContent): content is MultiPartContent {
+  return !!(content as MultiPartContent).text && !!(content as MultiPartContent).attachments;
 }

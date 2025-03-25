@@ -41,7 +41,13 @@ import {
   TextContent,
   InCallEmojiContent,
   InCallHandRaiseContent,
+  MultiPartContent,
 } from '../content';
+
+export interface MultiPartMessage extends BasePayloadBundle {
+  content: MultiPartContent;
+  type: PayloadBundleType.MULTIPART;
+}
 
 export interface TextMessage extends BasePayloadBundle {
   content: TextContent;
@@ -168,6 +174,7 @@ export type OtrMessage =
   | PingMessage
   | ReactionMessage
   | ResetSessionMessage
-  | TextMessage;
+  | TextMessage
+  | MultiPartMessage;
 
-export type QuotableMessage = EditedTextMessage | ImageAssetMessage | LocationMessage | TextMessage;
+export type QuotableMessage = EditedTextMessage | ImageAssetMessage | LocationMessage | TextMessage | MultiPartMessage;

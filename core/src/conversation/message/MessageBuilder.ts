@@ -64,6 +64,7 @@ import {
 } from './OtrMessage';
 
 import {AssetTransferState} from '../AssetTransferState';
+import {MultiPartContent, TextContent} from '../content';
 import {GenericMessageType} from '../GenericMessageType';
 import {MessageToProtoMapper} from '../message/MessageToProtoMapper';
 
@@ -365,6 +366,20 @@ export function buildHideMessage(payload: HideMessage['content']): GenericMessag
   return GenericMessage.create({
     [GenericMessageType.HIDDEN]: content,
     messageId: createId(),
+  });
+}
+
+export function buildMultipartMessage(
+  attachments: MultiPartContent['attachments'],
+  textContent: TextContent,
+  messageId: string = createId(),
+): GenericMessage {
+  return GenericMessage.create({
+    [GenericMessageType.MULTIPART]: {
+      attachments,
+      text: MessageToProtoMapper.mapText(textContent),
+    },
+    messageId: messageId,
   });
 }
 
