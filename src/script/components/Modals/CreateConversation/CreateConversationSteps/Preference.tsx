@@ -23,6 +23,7 @@ import {InfoToggle} from 'Components/toggle/InfoToggle';
 import {t} from 'Util/LocalizerUtil';
 
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
+import {ConversationType} from '../types';
 
 export const Preference: React.FC = () => {
   const {
@@ -32,6 +33,7 @@ export const Preference: React.FC = () => {
     setIsReadReceiptsEnabled,
     isServicesEnabled,
     setIsServicesEnabled,
+    conversationType,
   } = useCreateConversationModal();
 
   return (
@@ -46,15 +48,18 @@ export const Preference: React.FC = () => {
         dataUieName="read-receipts"
       />
 
-      <InfoToggle
-        dataUieName="read-receipts"
-        info={t('servicesRoomToggleInfoExtended')}
-        setIsChecked={setIsServicesEnabled}
-        isDisabled={false}
-        name={t('servicesOptionsTitle')}
-        className="modal-style"
-        isChecked={isServicesEnabled}
-      />
+      {conversationType === ConversationType.Group && (
+        <InfoToggle
+          className="modal-style"
+          dataUieName="services"
+          info={t('servicesRoomToggleInfoExtended')}
+          setIsChecked={setIsServicesEnabled}
+          isDisabled={false}
+          name={t('servicesOptionsTitle')}
+          isChecked={isServicesEnabled}
+        />
+      )}
+
       <InfoToggle
         className="modal-style"
         dataUieName="read-receipts"

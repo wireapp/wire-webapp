@@ -19,7 +19,7 @@
 
 import {useState, useContext} from 'react';
 
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
+import {ADD_PERMISSION, ConversationProtocol, GROUP_CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {isNonFederatingBackendsError} from '@wireapp/core/lib/errors';
 import {amplify} from 'amplify';
@@ -33,6 +33,7 @@ import {
   toggleFeature,
   teamPermissionsForAccessState,
   ACCESS_TYPES,
+  ACCESS_MODES,
 } from 'src/script/conversation/ConversationAccessPermission';
 import {useSidebarStore, SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {RootContext} from 'src/script/page/RootProvider';
@@ -45,7 +46,7 @@ import {replaceLink, t} from 'Util/LocalizerUtil';
 
 import {PrimaryModal} from '../../PrimaryModal';
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
-import {ConversationCreationStep} from '../types';
+import {ConversationAccess, ConversationCreationStep, ConversationModerator, ConversationType} from '../types';
 
 export const useCreateConversation = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -59,6 +60,9 @@ export const useCreateConversation = () => {
     isReadReceiptsEnabled,
     isServicesEnabled,
     isGuestsEnabled,
+    conversationType,
+    access: conversationAccess,
+    moderator,
   } = useCreateConversationModal();
   const {setCurrentTab: setCurrentSidebarTab} = useSidebarStore();
 
@@ -77,7 +81,12 @@ export const useCreateConversation = () => {
     if (isGuestsEnabled) {
       access = toggleFeature(teamPermissionsForAccessState(ACCESS_STATE.TEAM.GUEST_FEATURES), access);
     }
-    if (isServicesEnabled) {
+
+    if (conversationAccess === ConversationAccess.Public && conversationType === ConversationType.Channel) {
+      access = toggleFeature(ACCESS_MODES.LINK, access);
+    }
+
+    if (isServicesEnabled && conversationType !== ConversationType.Channel) {
       access = toggleFeature(ACCESS_TYPES.SERVICE, access);
     }
 
@@ -95,8 +104,13 @@ export const useCreateConversation = () => {
         conversationName,
         isTeam ? getAccessState() : undefined,
         {
+          add_permission: moderator === ConversationModerator.Admins ? ADD_PERMISSION.ADMINS : ADD_PERMISSION.EVERYONE,
           protocol: defaultProtocol,
           receipt_mode: isReadReceiptsEnabled ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF,
+          group_conv_type:
+            conversationType === ConversationType.Channel
+              ? GROUP_CONVERSATION_TYPE.CHANNEL
+              : GROUP_CONVERSATION_TYPE.GROUP_CONVERSATION,
         },
       );
 

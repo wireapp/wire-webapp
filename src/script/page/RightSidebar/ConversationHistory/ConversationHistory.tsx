@@ -25,11 +25,8 @@ import {FlexBox, Input, Select} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {customHistorySharingInputCss} from 'Components/Modals/CreateConversation/CreateConversation.styles';
-import {
-  useChatHistoryOptions,
-  useChatHistorySharingUnitOptions,
-} from 'Components/Modals/CreateConversation/hooks/useConversationDetailsOption';
 import {ChatHistory, HistorySharingUnit} from 'Components/Modals/CreateConversation/types';
+import {getChatHistoryOptions, getChatHistorySharingUnitOptions} from 'Components/Modals/CreateConversation/utils';
 import {RadioGroup} from 'Components/Radio';
 import {TeamState} from 'src/script/team/TeamState';
 import {t} from 'Util/LocalizerUtil';
@@ -52,8 +49,8 @@ export const ConversationHistory = ({onGoBack, onClose}: AccessProps) => {
   const [chatHistory, setChatHistory] = useState<ChatHistory>(ChatHistory.OneDay);
   const [historySharingQuantity, setHistorySharingQuantity] = useState(1);
   const [historySharingUnit, setHistorySharingUnit] = useState<HistorySharingUnit>(HistorySharingUnit.Days);
-  const {chatHistorySharingUnitOptions} = useChatHistorySharingUnitOptions(historySharingQuantity);
-  const {chatHistoryOptions} = useChatHistoryOptions(chatHistory, historySharingQuantity, historySharingUnit);
+  const chatHistorySharingUnitOptions = getChatHistorySharingUnitOptions(historySharingQuantity);
+  const chatHistoryOptions = getChatHistoryOptions(chatHistory, historySharingQuantity, historySharingUnit);
   const teamState = container.resolve(TeamState);
 
   return (
@@ -97,7 +94,6 @@ export const ConversationHistory = ({onGoBack, onClose}: AccessProps) => {
               options={chatHistorySharingUnitOptions}
               value={chatHistorySharingUnitOptions.find(option => option.value === historySharingUnit)}
               onChange={option => {
-                debugger;
                 setHistorySharingUnit(option?.value as HistorySharingUnit);
               }}
             />

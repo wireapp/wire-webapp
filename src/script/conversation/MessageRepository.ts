@@ -1054,7 +1054,7 @@ export class MessageRepository {
       return !!this.propertyRepository.receiptMode();
     }
 
-    if (conversationEntity.teamId && conversationEntity.isGroup()) {
+    if (conversationEntity.teamId && conversationEntity.isGroupOrChannel()) {
       return !!conversationEntity.receiptMode();
     }
 

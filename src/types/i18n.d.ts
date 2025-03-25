@@ -496,6 +496,7 @@ declare module 'I18n/en-US.json' {
     'conversationDirectEmptyMessage': `You have no contacts yet. Search for people on {brandName} and get connected.`;
     'conversationEditTimestamp': `Edited: {date}`;
     'conversationFavoritesTabEmptyLinkText': `How to label conversations as favorites`;
+    'conversationLearnMoreChannels': `Learn more about channels`;
     'conversationFavoritesTabEmptyMessage': `Select your favorite conversations, and you’ll find them here 👍`;
     'conversationFederationIndicator': `Federated`;
     'conversationFileAssetRestricted': `Receiving files is prohibited`;
@@ -547,6 +548,7 @@ declare module 'I18n/en-US.json' {
     'conversationLabelDirects': `1:1 Conversations`;
     'conversationLabelFavorites': `Favorites`;
     'conversationLabelGroups': `Groups`;
+    'conversationLabelChannels': `Channels`;
     'conversationLabelPeople': `People`;
     'conversationLikesCaptionPlural': `[bold]{firstUser}[/bold] and [bold]{secondUser}[/bold]`;
     'conversationLikesCaptionPluralMoreThan2': `[bold]{userNames}[/bold] and [showmore]{number} more[/showmore]`;
@@ -784,6 +786,7 @@ declare module 'I18n/en-US.json' {
     'groupCreationPreferencesNonFederatingLeave': `Discard Group Creation`;
     'groupCreationPreferencesNonFederatingMessage': `People from backends {backends} can’t join the same group conversation, as their backends can’t communicate with each other. To create the group, remove affected participants. [link]Learn more[/link]`;
     'groupCreationPreferencesPlaceholder': `Group name`;
+    'channelCreationPreferencesPlaceholder': `Channel name`;
     'groupParticipantActionBlock': `Block…`;
     'groupParticipantActionCancelRequest': `Cancel request…`;
     'groupParticipantActionDevices': `Devices`;
@@ -1487,6 +1490,7 @@ declare module 'I18n/en-US.json' {
     'searchConversations': `Search conversations`;
     'searchConversationsNoResult': `No results found`;
     'searchConversationsNoResultConnectSuggestion': `Connect with new users or start a new conversation`;
+    'searchChannelsNoResult': `Start using channels to be more productive. Join public channels via the Browse tab. You’ll find your public and private channels listed here.`;
     'searchCreateGroup': `Create group`;
     'searchCreateGuestRoom': `Create guest room`;
     'searchDirectConversations': `Search 1:1 conversations`;
@@ -1494,6 +1498,7 @@ declare module 'I18n/en-US.json' {
     'searchFederatedDomainNotAvailable': `The federated domain is currently not available.`;
     'searchFederatedDomainNotAvailableLearnMore': `Learn more`;
     'searchGroupConversations': `Search group conversations`;
+    'searchChannelConversations': `Search channels`;
     'searchGroupParticipants': `Group participants`;
     'searchInvite': `Invite people to join {brandName}`;
     'searchInviteButtonContacts': `From Contacts`;

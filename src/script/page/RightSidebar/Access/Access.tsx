@@ -19,13 +19,17 @@
 
 import {useState} from 'react';
 
+import {ADD_PERMISSION, CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conversation/';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {useConversationDetailsOption} from 'Components/Modals/CreateConversation/hooks/useConversationDetailsOption';
-import {ConversationAccess, ConversationManager} from 'Components/Modals/CreateConversation/types';
+import {ConversationAccess, ConversationModerator} from 'Components/Modals/CreateConversation/types';
+import {getConversationAccessOptions, getConversationManagerOptions} from 'Components/Modals/CreateConversation/utils';
 import {RadioGroup} from 'Components/Radio';
+import {Conversation} from 'src/script/entity/Conversation';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
+import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {conversationAccessContainerCss, conversationAccessContentCss} from './Access.styles';
 
@@ -34,12 +38,22 @@ import {PanelHeader} from '../PanelHeader';
 export interface AccessProps {
   onClose: () => void;
   onGoBack: () => void;
+  activeConversation: Conversation;
 }
 
-export const Access = ({onGoBack, onClose}: AccessProps) => {
-  const [access, setAccess] = useState<ConversationAccess>(ConversationAccess.Public);
-  const [manager, setManager] = useState<ConversationManager>(ConversationManager.AdminsAndMembers);
-  const {conversationAccessOptions, conversationManagerOptions} = useConversationDetailsOption();
+export const Access = ({onGoBack, onClose, activeConversation}: AccessProps) => {
+  const {conversationModerator} = useKoSubscribableChildren(activeConversation, ['conversationModerator']);
+  const [access, setAccess] = useState<ConversationAccess>(
+    activeConversation.accessModes?.includes(CONVERSATION_ACCESS.LINK)
+      ? ConversationAccess.Public
+      : ConversationAccess.Private,
+  );
+  const [manager, setManager] = useState<ConversationModerator>(
+    conversationModerator === ADD_PERMISSION.ADMINS
+      ? ConversationModerator.Admins
+      : ConversationModerator.AdminsAndMembers,
+  );
+  const {isPublicChannelsEnabled} = useChannelsFeatureFlag();
 
   return (
     <div id="access-settings" className="panel__page">
@@ -62,20 +76,21 @@ export const Access = ({onGoBack, onClose}: AccessProps) => {
         <RadioGroup<ConversationAccess>
           onChange={setAccess}
           selectedValue={access}
-          options={conversationAccessOptions}
+          options={getConversationAccessOptions()}
           ariaLabelledBy="conversation-access"
           name="conversation-access"
+          disabled={!isPublicChannelsEnabled}
         />
 
         <p className="panel__info-text" tabIndex={TabIndex.FOCUSABLE} css={conversationAccessContentCss}>
           {t('createConversationManagerText')}
         </p>
 
-        <RadioGroup<ConversationManager>
+        <RadioGroup<ConversationModerator>
           disabled={access === ConversationAccess.Public}
           onChange={setManager}
           selectedValue={manager}
-          options={conversationManagerOptions}
+          options={getConversationManagerOptions()}
           ariaLabelledBy="conversation-manager"
           name="conversation-manager"
         />

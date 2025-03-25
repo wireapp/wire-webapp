@@ -32,7 +32,10 @@ interface GetTabConversationsProps {
   directConversations: Conversation[];
   favoriteConversations: Conversation[];
   archivedConversations: Conversation[];
+  channelConversations: Conversation[];
+  channelAndGroupConversations: Conversation[];
   conversationsFilter: string;
+  isChannelsEnabled: boolean;
 }
 
 export function getTabConversations({
@@ -43,6 +46,9 @@ export function getTabConversations({
   favoriteConversations,
   archivedConversations,
   conversationsFilter,
+  channelConversations,
+  isChannelsEnabled,
+  channelAndGroupConversations,
 }: GetTabConversationsProps) {
   const conversationSearchFilter = (conversation: Conversation) => {
     const filterWord = replaceAccents(conversationsFilter.toLowerCase());
@@ -61,9 +67,18 @@ export function getTabConversations({
   }
 
   if (currentTab === SidebarTabs.GROUPS) {
+    const conversations = isChannelsEnabled ? groupConversations : channelAndGroupConversations;
+
     return {
-      conversations: groupConversations.filter(conversationArchivedFilter).filter(conversationSearchFilter),
+      conversations: conversations.filter(conversationArchivedFilter).filter(conversationSearchFilter),
       searchInputPlaceholder: t('searchGroupConversations'),
+    };
+  }
+
+  if (currentTab === SidebarTabs.CHANNELS) {
+    return {
+      conversations: channelConversations.filter(conversationArchivedFilter).filter(conversationSearchFilter),
+      searchInputPlaceholder: t('searchChannelConversations'),
     };
   }
 

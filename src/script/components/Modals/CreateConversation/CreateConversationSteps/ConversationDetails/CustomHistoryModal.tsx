@@ -31,9 +31,9 @@ import {
   customHistorySharingModalCss,
   customHistorySharingSelectCss,
 } from '../../CreateConversation.styles';
-import {useConversationDetailsOption} from '../../hooks/useConversationDetailsOption';
 import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
 import {ChatHistory, HistorySharingUnit} from '../../types';
+import {getChatHistorySharingUnitOptions} from '../../utils';
 
 export const CustomHistoryModal = () => {
   const {
@@ -46,7 +46,7 @@ export const CustomHistoryModal = () => {
     isCustomHistoryModalOpen,
   } = useCreateConversationModal();
 
-  const {chatHistorySharingUnitOptions} = useConversationDetailsOption();
+  const chatHistorySharingUnitOptions = getChatHistorySharingUnitOptions(historySharingQuantity);
 
   const onCancel = () => {
     setHistorySharingQuantity(1);
