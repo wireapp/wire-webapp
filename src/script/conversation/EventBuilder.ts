@@ -157,7 +157,13 @@ export type MessageAddEvent = ConversationEvent<
   status: StatusType;
   version?: number;
 };
-export type MultipartMessageAddEvent = ConversationEvent<CONVERSATION.MULTIPART_MESSAGE_ADD, MultiPartContent> & {};
+export type MultipartMessageAddEvent = ConversationEvent<
+  CONVERSATION.MULTIPART_MESSAGE_ADD,
+  {
+    attachments: MultiPartContent['attachments'];
+    text: MultiPartContent['text'] & {mentions?: string[]; previews?: string[]};
+  }
+> & {};
 export type MissedEvent = BaseEvent & {id: string; type: CONVERSATION.MISSED_MESSAGES};
 export type JoinedAfterMLSMigrationFinalisationEvent = BaseEvent & {
   type: CONVERSATION.JOINED_AFTER_MLS_MIGRATION;
