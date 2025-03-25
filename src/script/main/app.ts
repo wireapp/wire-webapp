@@ -358,7 +358,7 @@ export class App {
         url: Config.getConfig().CELLS_PYDIO_URL,
       },
       s3: {
-        apiKey: Config.getConfig().CELLS_TOKEN_SHARED_SECRET,
+        apiKey: cellsApiKey,
         bucket: Config.getConfig().CELLS_S3_BUCKET,
         endpoint: Config.getConfig().CELLS_S3_ENDPOINT,
         region: Config.getConfig().CELLS_S3_REGION,
