@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.31.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.30.0...@wireapp/api-client@27.31.0) (2025-03-25)
+
+### Features
+
+* **api-client/cells:** add "offset" and "limit" configuration ([#6990](https://github.com/wireapp/wire-web-packages/issues/6990)) ([d7ed523](https://github.com/wireapp/wire-web-packages/commit/d7ed5231a1322d8da500b0a009e4e07ff2ba47ef))
+
 # [27.30.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.29.1...@wireapp/api-client@27.30.0) (2025-03-24)
 
 ### Features
