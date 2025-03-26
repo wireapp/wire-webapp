@@ -19,8 +19,6 @@
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 
-import {useMemo} from 'react';
-
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {RestrictedVideo} from 'Components/asset/RestrictedVideo';
@@ -46,13 +44,9 @@ export const ReplyBar = ({replyMessageEntity, onCancel}: ReplyBarProps) => {
   } = useKoSubscribableChildren(replyMessageEntity, ['assets', 'senderName', 'was_edited']);
   const replyAsset = assets?.[0];
 
-  const attachmentsCount = useMemo(() => {
-    if (!replyAsset?.isMultipart()) {
-      return 0;
-    }
+  const isMultipart = replyAsset?.isMultipart();
 
-    return replyAsset.attachments?.()?.length || 0;
-  }, [replyAsset]);
+  const attachmentsCount = isMultipart ? replyAsset.attachments?.()?.length ?? 0 : 0;
 
   const attachmentsCountCopy =
     attachmentsCount === 1
@@ -90,7 +84,7 @@ export const ReplyBar = ({replyMessageEntity, onCancel}: ReplyBarProps) => {
             )}
           </div>
 
-          {replyAsset?.isMultipart() && (
+          {isMultipart && (
             <>
               <div
                 className="input-bar__reply__message input-bar__reply__message__text"
