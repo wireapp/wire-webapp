@@ -50,7 +50,7 @@ export const useSendFiles = ({files, clearAllFiles, cellsRepository, conversatio
     try {
       setStatus('loading');
       await Promise.all(files.map(sendFile));
-      files.map(file => URL.revokeObjectURL(file.preview));
+      files.map(file => file.preview && URL.revokeObjectURL(file.preview));
       setStatus('success');
     } catch (error) {
       errorNotification.show();
