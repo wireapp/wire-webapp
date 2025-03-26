@@ -349,6 +349,7 @@ export class FeatureAPI {
     return response.data;
   }
 
+  // Get domainRegistration feature
   public async getDomainRegistrationFeature(teamId: string): Promise<FeatureDomainRegistration> {
     const config: AxiosRequestConfig = {
       method: 'get',
