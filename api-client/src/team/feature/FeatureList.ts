@@ -23,6 +23,7 @@ import {
   FeatureClassifiedDomains,
   FeatureConferenceCalling,
   FeatureDigitalSignature,
+  FeatureDomainRegistration,
   FeatureDownloadPath,
   FeatureFileSharing,
   FeatureLegalhold,
@@ -43,6 +44,7 @@ export enum FEATURE_KEY {
   CONFERENCE_CALLING = 'conferenceCalling',
   CONVERSATION_GUEST_LINKS = 'conversationGuestLinks',
   DIGITAL_SIGNATURES = 'digitalSignatures',
+  DOMAIN_REGISTRATION = 'domainRegistration',
   ENFORCE_DOWNLOAD_PATH = 'enforceFileDownloadLocation',
   FILE_SHARING = 'fileSharing',
   LEGALHOLD = 'legalhold',
@@ -63,6 +65,7 @@ export type FeatureList = {
   [FEATURE_KEY.CLASSIFIED_DOMAINS]?: FeatureClassifiedDomains;
   [FEATURE_KEY.CONFERENCE_CALLING]?: FeatureConferenceCalling;
   [FEATURE_KEY.DIGITAL_SIGNATURES]?: FeatureDigitalSignature;
+  [FEATURE_KEY.DOMAIN_REGISTRATION]?: FeatureDomainRegistration;
   [FEATURE_KEY.ENFORCE_DOWNLOAD_PATH]?: FeatureDownloadPath;
   [FEATURE_KEY.CONVERSATION_GUEST_LINKS]?: FeatureConversationGuestLink;
   [FEATURE_KEY.FILE_SHARING]?: FeatureFileSharing;
