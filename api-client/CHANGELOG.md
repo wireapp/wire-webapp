@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.32.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.31.0...@wireapp/api-client@27.32.0) (2025-03-26)
+
+### Features
+
+* update feature config and POST /conversations payload for channels [WPB-15758] ([#6991](https://github.com/wireapp/wire-web-packages/issues/6991)) ([025f02e](https://github.com/wireapp/wire-web-packages/commit/025f02ecd47c0a28cbec24f1f41002c38dbaefda))
+
 # [27.31.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.30.0...@wireapp/api-client@27.31.0) (2025-03-25)
 
 ### Features
