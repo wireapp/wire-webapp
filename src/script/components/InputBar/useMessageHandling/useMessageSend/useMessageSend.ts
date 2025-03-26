@@ -79,13 +79,14 @@ export const useMessageSend = ({
   sendPastedFile,
   messageContent,
 }: UseMessageSendProps) => {
-  const {files, clearAll} = useFileUploadState();
+  const {getFiles, clearAll} = useFileUploadState();
+  const files = getFiles({conversationId: conversation.id});
 
   const {
     sendFiles,
     clearFiles,
     isLoading: filesSendingLoading,
-  } = useSendFiles({files, clearAllFiles: clearAll, cellsRepository});
+  } = useSendFiles({files, clearAllFiles: clearAll, cellsRepository, conversationId: conversation.id});
 
   const cellsEnabled = Config.getConfig().FEATURE.ENABLE_CELLS;
 
