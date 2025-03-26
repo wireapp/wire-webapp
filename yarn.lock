@@ -7479,6 +7479,11 @@ __metadata:
     zod: "npm:3.24.2"
   checksum: 10/708c3d301089feb99f6075de308bd23c982b46a578c151e29adc25f3c7c030f93b7929067da15e13841632ff97c2cb5929075eca8e59fddca06476b9d9c1791f
   languageName: node
+  linkType: hard
+
+"@wireapp/avs-debugger@npm:0.0.7":
+  version: 0.0.7
+  resolution: "@wireapp/avs-debugger@npm:0.0.7"
   dependencies:
     debug: "npm:^4.3.5"
     uuid: "npm:^10.0.0"
