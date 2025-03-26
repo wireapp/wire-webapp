@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.33.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.32.0...@wireapp/api-client@27.33.0) (2025-03-26)
+
+### Features
+
+* **api-client:** Add comment to get domain registration ([#6995](https://github.com/wireapp/wire-web-packages/issues/6995)) ([46a223a](https://github.com/wireapp/wire-web-packages/commit/46a223abb06f6b9860817fd9093d8106959b7d58))
+
 # [27.32.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.31.0...@wireapp/api-client@27.32.0) (2025-03-26)
 
 ### Features
