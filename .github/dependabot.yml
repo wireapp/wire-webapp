@@ -41,6 +41,9 @@ updates:
           - '0.10.16'
       - dependency-name: '@types/node'
       - dependency-name: 'typescript'
+      # ignore lexical group minor version bumps, as they include breaking changes
+      - group: lexical
+        update-types: ['version-update:semver-major', 'version-update:semver-minor']
 
   # Server dependencies
   - package-ecosystem: npm
