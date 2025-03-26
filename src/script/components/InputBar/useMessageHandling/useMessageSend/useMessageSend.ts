@@ -19,6 +19,7 @@
 
 import {useCallback, useMemo} from 'react';
 
+import {IAttachment} from '@pydio/protocol-messaging';
 import {LexicalEditor} from 'lexical';
 
 import {useFileUploadState} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
@@ -87,6 +88,8 @@ export const useMessageSend = ({
     isLoading: filesSendingLoading,
   } = useSendFiles({files, clearAllFiles: clearAll, cellsRepository, conversationId: conversation.id});
 
+  const cellsEnabled = Config.getConfig().FEATURE.ENABLE_CELLS;
+
   const generateQuote = useCallback(async (): Promise<OutgoingQuote | undefined> => {
     return !replyMessageEntity
       ? Promise.resolve(undefined)
@@ -135,18 +138,41 @@ export const useMessageSend = ({
     ],
   );
 
+  const getCellAssets = useCallback((): IAttachment[] => {
+    return files.map(file => {
+      return {
+        cellAsset: {
+          uuid: file.id,
+          contentType: file.type,
+          initialName: file.name,
+          initialSize: file.size,
+        },
+      };
+    });
+  }, [files]);
+
   const sendTextMessage = useCallback(
     (messageText: string, mentions: MentionEntity[]) => {
-      if (messageText.length) {
-        const mentionEntities = mentions.slice(0);
+      const isEmpty = messageText.length === 0;
 
-        void generateQuote().then(quoteEntity => {
-          void messageRepository.sendTextWithLinkPreview(conversation, messageText, mentionEntities, quoteEntity);
-          cancelMessageReply();
-        });
+      if (isEmpty && !cellsEnabled) {
+        return;
       }
+
+      const mentionEntities = mentions.slice(0);
+
+      void generateQuote().then(quoteEntity => {
+        void messageRepository.sendTextWithLinkPreview({
+          conversation,
+          textMessage: messageText,
+          mentions: mentionEntities,
+          quoteEntity,
+          attachments: getCellAssets(),
+        });
+        cancelMessageReply();
+      });
     },
-    [cancelMessageReply, conversation, generateQuote, messageRepository],
+    [cancelMessageReply, conversation, generateQuote, messageRepository, getCellAssets, cellsEnabled],
   );
 
   const isSendingDisabled = useMemo(() => {
@@ -154,12 +180,12 @@ export const useMessageSend = ({
     const hasFiles = files.length > 0;
     const hasSuccessfullyUploadedFiles = hasFiles && files.every(file => file.uploadStatus === 'success');
 
-    if (Config.getConfig().FEATURE.ENABLE_CELLS) {
+    if (cellsEnabled) {
       return hasFiles ? !hasSuccessfullyUploadedFiles : !hasText;
     }
 
     return !hasText;
-  }, [messageContent.text, files]);
+  }, [messageContent.text, files, cellsEnabled]);
 
   const sendMessage = useCallback(async (): Promise<void> => {
     if (isSendingDisabled) {

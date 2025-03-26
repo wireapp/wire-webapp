@@ -72,12 +72,12 @@ export function ConfigToolbar() {
       isRequestInProgress = true;
 
       try {
-        await window.wire.app.repository.message.sendTextWithLinkPreview(
-          activeConversation,
-          `${prefix} ${messageCountRef.current}`,
-          [],
-          undefined,
-        );
+        await window.wire.app.repository.message.sendTextWithLinkPreview({
+          conversation: activeConversation,
+          textMessage: `${prefix} ${messageCountRef.current}`,
+          mentions: [],
+          quoteEntity: undefined,
+        });
 
         messageCountRef.current++;
       } catch (error) {

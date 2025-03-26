@@ -67,7 +67,8 @@ const _checkComposite = (event: any): MessageCategory | void => {
 const _checkText = (event: any): MessageCategory | void => {
   const {data: eventData, type: eventType} = event;
 
-  const isMessageAdd = eventType === ClientEvent.CONVERSATION.MESSAGE_ADD;
+  const isMessageAdd =
+    eventType === ClientEvent.CONVERSATION.MESSAGE_ADD || eventType === ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD;
   if (isMessageAdd) {
     let category = MessageCategory.TEXT;
 
