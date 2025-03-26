@@ -35,6 +35,7 @@ import {ImageAsset} from './ImageAsset';
 import {LinkPreviewAsset} from './LinkPreviewAssetComponent';
 import {LocationAsset} from './LocationAsset';
 import {MessageButton} from './MessageButton';
+import {MultiAssets} from './MultiAsset/MultiAssets';
 import {TextMessageRenderer} from './TextMessageRenderer';
 import {VideoAsset} from './VideoAsset/VideoAsset';
 
@@ -72,6 +73,21 @@ const ContentAsset = ({
   const {isObfuscated, status} = useKoSubscribableChildren(message, ['isObfuscated', 'status']);
   const {previews} = useKoSubscribableChildren(asset as Text, ['previews']);
 
+  const files = [
+    {
+      uuid: '1',
+      contentType: 'image/png',
+      initialName: 'test.png',
+      initialSize: 100,
+    },
+    {
+      uuid: '2',
+      contentType: 'application/pdf',
+      initialName: 'test2.pdf',
+      initialSize: 200,
+    },
+  ];
+
   switch (asset.type) {
     case AssetType.TEXT:
       const shouldRenderText = (asset as Text).should_render_text();
@@ -93,6 +109,8 @@ const ContentAsset = ({
               isFocusable={isMessageFocused}
             />
           )}
+
+          <MultiAssets assets={files} />
 
           {shouldRenderText && (
             <ReadIndicator message={message} is1to1Conversation={is1to1Conversation} onClick={onClickDetails} />
