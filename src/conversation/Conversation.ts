@@ -53,6 +53,16 @@ export enum CONVERSATION_ACCESS {
   PRIVATE = 'private',
 }
 
+export enum GROUP_CONVERSATION_TYPE {
+  CHANNEL = 'channel',
+  GROUP_CONVERSATION = 'group_conversation',
+}
+
+export enum ADD_PERMISSION {
+  EVERYONE = 'everyone',
+  ADMINS = 'admins',
+}
+
 type UUID = string;
 /**
  * A conversation object as returned from the server
@@ -64,7 +74,8 @@ export interface Conversation {
   type: CONVERSATION_TYPE;
   creator: UUID;
   access: CONVERSATION_ACCESS[];
-
+  group_conv_type?: GROUP_CONVERSATION_TYPE;
+  add_permission?: ADD_PERMISSION;
   /** How users can join conversations */
   //CONVERSATION_ACCESS_ROLE for api <= v2, ACCESS_ROLE_V2[] since api v3
   access_role: CONVERSATION_LEGACY_ACCESS_ROLE | CONVERSATION_ACCESS_ROLE[];

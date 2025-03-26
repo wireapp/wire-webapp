@@ -29,6 +29,12 @@ export enum FeatureLockStatus {
   UNLOCKED = 'unlocked',
 }
 
+export enum AccessType {
+  TEAM_MEMBERS = 'team-members',
+  EVERYONE = 'everyone',
+  ADMINS = 'admins',
+}
+
 export interface FeatureWithoutConfig {
   status: FeatureStatus;
   lockStatus?: FeatureLockStatus;
@@ -44,6 +50,11 @@ export interface FeatureConfig {}
 export interface FeatureAppLockConfig extends FeatureConfig {
   enforceAppLock: boolean;
   inactivityTimeoutSecs: number;
+}
+
+export interface FeatureChannelsConfig {
+  allowed_to_create_channels: AccessType;
+  allowed_to_open_channels: AccessType;
 }
 
 export enum SelfDeletingTimeout {
@@ -105,3 +116,4 @@ export type FeatureSSO = FeatureWithoutConfig;
 export type FeatureSndFactorPassword = FeatureWithoutConfig;
 export type FeatureValidateSAMLEmails = FeatureWithoutConfig;
 export type FeatureVideoCalling = FeatureWithoutConfig;
+export type FeatureChannels = Feature<FeatureChannelsConfig>;

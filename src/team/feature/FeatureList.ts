@@ -19,6 +19,7 @@
 
 import {
   FeatureAppLock,
+  FeatureChannels,
   FeatureClassifiedDomains,
   FeatureConferenceCalling,
   FeatureDigitalSignature,
@@ -54,6 +55,7 @@ export enum FEATURE_KEY {
   SSO = 'sso',
   VALIDATE_SAML_EMAILS = 'validateSAMLemails',
   VIDEO_CALLING = 'videoCalling',
+  CHANNELS = 'channels',
 }
 
 export type FeatureList = {
@@ -74,4 +76,5 @@ export type FeatureList = {
   [FEATURE_KEY.MLS_MIGRATION]?: FeatureMLSMigration;
   [FEATURE_KEY.VALIDATE_SAML_EMAILS]?: FeatureWithoutConfig;
   [FEATURE_KEY.VIDEO_CALLING]?: FeatureVideoCalling;
+  [FEATURE_KEY.CHANNELS]?: FeatureChannels;
 };
