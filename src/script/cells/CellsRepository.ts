@@ -80,8 +80,8 @@ export class CellsRepository {
     return this.apiClient.api.cells.deleteFile({uuid});
   }
 
-  async getAllFiles({path}: {path: string}) {
-    return this.apiClient.api.cells.getAllFiles({path: path || this.basePath});
+  async getAllFiles({path, limit}: {path: string; limit?: number}) {
+    return this.apiClient.api.cells.getAllFiles({path: path || this.basePath, limit});
   }
 
   async createPublicLink({uuid, label}: {uuid: string; label?: string}) {
@@ -99,8 +99,8 @@ export class CellsRepository {
     return this.apiClient.api.cells.deleteFilePublicLink({uuid});
   }
 
-  async searchFiles({query}: {query: string}) {
-    return this.apiClient.api.cells.searchFiles({phrase: query});
+  async searchFiles({query, limit}: {query: string; limit?: number}) {
+    return this.apiClient.api.cells.searchFiles({phrase: query, limit});
   }
 
   async promoteFileDraft({uuid, versionId}: {uuid: string; versionId: string}) {

@@ -29,6 +29,8 @@ interface UseGetAllCellsFilesProps {
   cellsRepository: CellsRepository;
 }
 
+const MAX_FILES_LIMIT = 100;
+
 export const useGetAllCellsFiles = ({cellsRepository}: UseGetAllCellsFilesProps) => {
   const {setFiles, setStatus, setError} = useCellsStore();
 
@@ -36,7 +38,7 @@ export const useGetAllCellsFiles = ({cellsRepository}: UseGetAllCellsFilesProps)
     try {
       setStatus('loading');
 
-      const result = await cellsRepository.searchFiles({query: '*'});
+      const result = await cellsRepository.searchFiles({query: '*', limit: MAX_FILES_LIMIT});
 
       if (!result.Nodes?.length) {
         setStatus('success');
