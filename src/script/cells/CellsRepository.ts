@@ -37,6 +37,8 @@ interface CellsConfig {
   };
 }
 
+const DEFAULT_MAX_FILES_LIMIT = 100;
+
 @singleton()
 export class CellsRepository {
   private readonly basePath = 'wire-cells-web';
@@ -80,7 +82,7 @@ export class CellsRepository {
     return this.apiClient.api.cells.deleteFile({uuid});
   }
 
-  async getAllFiles({path, limit}: {path: string; limit?: number}) {
+  async getAllFiles({path, limit = DEFAULT_MAX_FILES_LIMIT}: {path: string; limit?: number}) {
     return this.apiClient.api.cells.getAllFiles({path: path || this.basePath, limit});
   }
 
@@ -99,7 +101,7 @@ export class CellsRepository {
     return this.apiClient.api.cells.deleteFilePublicLink({uuid});
   }
 
-  async searchFiles({query, limit}: {query: string; limit?: number}) {
+  async searchFiles({query, limit = DEFAULT_MAX_FILES_LIMIT}: {query: string; limit?: number}) {
     return this.apiClient.api.cells.searchFiles({phrase: query, limit});
   }
 

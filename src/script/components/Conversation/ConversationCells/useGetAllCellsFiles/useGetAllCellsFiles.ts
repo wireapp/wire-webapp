@@ -33,8 +33,6 @@ interface UseGetAllCellsFilesProps {
   conversationQualifiedId: QualifiedId;
 }
 
-const MAX_FILES_LIMIT = 100;
-
 export const useGetAllCellsFiles = ({cellsRepository, conversationQualifiedId}: UseGetAllCellsFilesProps) => {
   const {setFiles, setStatus, setError} = useCellsStore();
 
@@ -50,7 +48,6 @@ export const useGetAllCellsFiles = ({cellsRepository, conversationQualifiedId}: 
 
       const result = await cellsRepository.getAllFiles({
         path: `${id}@${domainPerEnv}`,
-        limit: MAX_FILES_LIMIT,
       });
 
       if (!result.Nodes?.length) {
