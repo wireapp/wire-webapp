@@ -166,7 +166,7 @@ export const ConversationTabs = ({
     conversationTabs.splice(2, 0, {
       type: SidebarTabs.CHANNELS,
       title: t('conversationLabelChannels'),
-      dataUieName: 'go-groups-view',
+      dataUieName: 'go-channels-view',
       Icon: <ChannelIcon />,
       unreadConversations: channelConversationsLength,
     });
