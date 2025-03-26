@@ -20,6 +20,7 @@
 import type {FileAsset} from './FileAsset';
 import type {Location as LocationAsset} from './Location';
 import type {MediumImage as MediumImageAsset} from './MediumImage';
+import type {Multipart as MultipartAsset} from './Multipart';
 import type {Text as TextAsset} from './Text';
 
 import {AssetType} from '../../assets/AssetType';
@@ -57,6 +58,10 @@ export class Asset {
 
   isText(): this is TextAsset {
     return this.type === AssetType.TEXT;
+  }
+
+  isMultipart(): this is MultipartAsset {
+    return this.type === AssetType.MULTIPART;
   }
 
   isFile(): this is FileAsset {

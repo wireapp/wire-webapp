@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,11 +17,20 @@
  *
  */
 
-export enum AssetType {
-  BUTTON = 'Button',
-  FILE = 'File',
-  IMAGE = 'Image',
-  LOCATION = 'Location',
-  TEXT = 'Text',
-  MULTIPART = 'Multipart',
-}
+import {CSSObject} from '@emotion/react';
+
+export const listStyles: CSSObject = {
+  listStyle: 'none',
+  gridArea: 'files',
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fill, 74px)',
+  gridAutoFlow: 'dense',
+  gap: '24px',
+  width: '100%',
+  padding: '8px 8px 8px 0',
+  margin: '0',
+};
+
+export const itemStyles: CSSObject = {
+  gridColumn: 'span 3',
+};

@@ -43,13 +43,16 @@ export const useFilePreview = ({file, cellsRepository, conversationQualifiedId}:
   const transformedName = isError ? `Upload failed: ${name}` : name;
 
   const handleDelete = () => {
-    deleteFile(file.id);
+    if (file.preview) {
+      URL.revokeObjectURL(file.preview);
+    }
+    deleteFile({conversationId: conversationQualifiedId.id, fileId: file.id});
     void cellsRepository.deleteFileDraft({uuid: file.remoteUuid, versionId: file.remoteVersionId});
   };
 
   const handleRetry = async () => {
     try {
-      updateFile(file.id, {uploadStatus: 'uploading'});
+      updateFile({conversationId: conversationQualifiedId.id, fileId: file.id, data: {uploadStatus: 'uploading'}});
       // Temporary solution to handle the local development
       // TODO: remove this once we have a proper way to handle the domain per env
       const path =
@@ -61,9 +64,13 @@ export const useFilePreview = ({file, cellsRepository, conversationQualifiedId}:
         file,
         path,
       });
-      updateFile(file.id, {remoteUuid: uuid, remoteVersionId: versionId, uploadStatus: 'success'});
+      updateFile({
+        conversationId: conversationQualifiedId.id,
+        fileId: file.id,
+        data: {remoteUuid: uuid, remoteVersionId: versionId, uploadStatus: 'success'},
+      });
     } catch (error) {
-      updateFile(file.id, {uploadStatus: 'error'});
+      updateFile({conversationId: conversationQualifiedId.id, fileId: file.id, data: {uploadStatus: 'error'}});
     }
   };
 

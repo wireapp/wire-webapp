@@ -3404,6 +3404,9 @@ export class ConversationRepository {
         }
         return this.addEventToConversation(conversationEntity, eventJson);
 
+      case ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD:
+        return this.addEventToConversation(conversationEntity, eventJson);
+
       case CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE:
       case ClientEvent.CONVERSATION.COMPOSITE_MESSAGE_ADD:
       case ClientEvent.CONVERSATION.DELETE_EVERYWHERE:
