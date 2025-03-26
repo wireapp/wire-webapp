@@ -59,6 +59,7 @@ export const useFilesUploadDropzone = ({isTeam, cellsRepository, conversation}: 
 
     try {
       const {uuid, versionId} = await cellsRepository.uploadFile({
+        uuid: file.id,
         file,
         path,
       });
