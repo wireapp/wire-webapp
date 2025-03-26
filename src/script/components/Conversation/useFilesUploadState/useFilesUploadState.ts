@@ -75,16 +75,9 @@ export const useFileUploadState = create<FileUploadStore>()((set, get) => ({
         [conversationId]:
           state.filesByConversation[conversationId]?.map(file => {
             if (file.id === fileId) {
-              return {
-                ...file,
-                name: file.name,
-                type: file.type,
-                id: file.id,
-                preview: file.preview,
-                remoteUuid: data.remoteUuid ?? file.remoteUuid,
-                remoteVersionId: data.remoteVersionId ?? file.remoteVersionId,
-                uploadStatus: data.uploadStatus ?? file.uploadStatus,
-              };
+              file.remoteUuid = data.remoteUuid || file.remoteUuid;
+              file.remoteVersionId = data.remoteVersionId || file.remoteVersionId;
+              file.uploadStatus = data.uploadStatus || file.uploadStatus;
             }
             return file;
           }) || [],
