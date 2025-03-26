@@ -7459,9 +7459,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^27.29.1":
-  version: 27.29.1
-  resolution: "@wireapp/api-client@npm:27.29.1"
+"@wireapp/api-client@npm:^27.32.0":
+  version: 27.32.0
+  resolution: "@wireapp/api-client@npm:27.32.0"
   dependencies:
     "@aws-sdk/client-s3": "npm:3.750.0"
     "@pydio/protocol-messaging": "npm:1.51.0"
@@ -7479,7 +7479,7 @@ __metadata:
     uuid: "npm:11.1.0"
     ws: "npm:8.18.1"
     zod: "npm:3.24.2"
-  checksum: 10/5196f29ab1dc9c006d4b6bbebe56c625577e1c1bfe228daa0b46ea34989a24af8cb29ab728c8a99b6bbba2317be646dcfa6a7fc36098846b90c76138076b0e06
+  checksum: 10/708c3d301089feb99f6075de308bd23c982b46a578c151e29adc25f3c7c030f93b7929067da15e13841632ff97c2cb5929075eca8e59fddca06476b9d9c1791f
   languageName: node
   linkType: hard
 
@@ -7544,12 +7544,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:46.20.4":
-  version: 46.20.4
-  resolution: "@wireapp/core@npm:46.20.4"
+"@wireapp/core@npm:46.20.8":
+  version: 46.20.8
+  resolution: "@wireapp/core@npm:46.20.8"
   dependencies:
     "@pydio/protocol-messaging": "npm:^1.51.0"
-    "@wireapp/api-client": "npm:^27.29.1"
+    "@wireapp/api-client": "npm:^27.32.0"
     "@wireapp/commons": "npm:^5.4.2"
     "@wireapp/core-crypto": "npm:3.1.0"
     "@wireapp/cryptobox": "npm:12.8.0"
@@ -7566,7 +7566,7 @@ __metadata:
     long: "npm:^5.2.0"
     uuid: "npm:9.0.1"
     zod: "npm:3.24.2"
-  checksum: 10/b9e44554a892204413e627f34954845ba413a0234e2e4dc29783a1bd5b34d1d565c31e0b120a51e96e5516b454483b6b03692191a7fc7b7ea60aa56f29edb0e7
+  checksum: 10/e5655ee855e7933e284ae3f1e6989bf6f12ae3c4aa45ac7c37d5e092875aae0b966c9e6edc067ac70b12d16e9689c054c095683afb70be02d9e594650d425645
   languageName: node
   linkType: hard
 
@@ -7689,13 +7689,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/store-engine-dexie@npm:2.1.15, @wireapp/store-engine@npm:4.9.8":
+"@wireapp/store-engine-dexie@npm:2.1.15":
   version: 2.1.15
-  resolution: "@wireapp/store-engine@npm:4.9.8"
+  resolution: "@wireapp/store-engine-dexie@npm:2.1.15"
   dependencies:
     dexie: "npm:>3.2.0"
   peerDependencies:
     "@wireapp/store-engine": 5.x.x
+  checksum: 10/ab337a99ed7231de07caaa3ed29501c2f5c677a428972a61176ac090dd4e0d122bfe5272a434594cffd3da177b07ff7b614a81e894ae8def444e63de4e0460ed
+  languageName: node
+  linkType: hard
+
+"@wireapp/store-engine@npm:4.9.8":
+  version: 4.9.8
+  resolution: "@wireapp/store-engine@npm:4.9.8"
+  dependencies:
+    "@types/node": "npm:~14"
   checksum: 10/00f83ff076041005725e1ac490d110a27e04e2c0bed939fd8fe11baf1690e4373ef688012fd56ab0a307b3278490d446e7f33aa6fb81f59a57154555390059f4
   languageName: node
   linkType: hard
@@ -20820,7 +20829,7 @@ __metadata:
     "@wireapp/avs-debugger": "npm:0.0.7"
     "@wireapp/commons": "npm:5.4.2"
     "@wireapp/copy-config": "npm:2.3.0"
-    "@wireapp/core": "npm:46.20.4"
+    "@wireapp/core": "npm:46.20.8"
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/prettier-config": "npm:0.6.4"
     "@wireapp/react-ui-kit": "npm:9.43.0"

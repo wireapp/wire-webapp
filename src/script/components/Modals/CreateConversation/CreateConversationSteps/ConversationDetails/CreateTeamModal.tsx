@@ -20,8 +20,10 @@
 import {Button, Text} from '@wireapp/react-ui-kit';
 
 import {ModalComponent} from 'Components/Modals/ModalComponent';
+import {Config} from 'src/script/Config';
 import {handleEscDown, handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
+import {safeWindowOpen} from 'Util/SanitizationUtil';
 
 import {
   salesModalBodyButtonCss,
@@ -41,8 +43,8 @@ export const CreateTeamModal = () => {
   };
 
   const onSubmit = () => {
-    // TODO: Implement upgrade plan logic
     setIsCreateTeamModalOpen(false);
+    safeWindowOpen(Config.getConfig().URL.TEAMS_BASE);
   };
 
   return (

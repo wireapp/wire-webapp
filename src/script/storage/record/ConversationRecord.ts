@@ -50,7 +50,7 @@ export interface ConversationRecord {
   global_message_timer: number;
   group_id: string;
   group_conv_type?: GROUP_CONVERSATION_TYPE;
-  add_permission: ADD_PERMISSION;
+  add_permission?: ADD_PERMISSION;
   epoch: number;
   id: string;
   initial_protocol?: ConversationProtocol;
