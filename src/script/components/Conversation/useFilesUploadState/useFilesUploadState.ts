@@ -30,44 +30,74 @@ export interface FileWithPreview extends File {
 }
 
 interface FileUploadState {
-  files: FileWithPreview[];
-  addFiles: (files: FileWithPreview[]) => void;
-  deleteFile: (fileId: string) => void;
-  updateFile: (
-    fileId: string,
-    {
-      remoteUuid,
-      remoteVersionId,
-      uploadStatus,
-    }: {
+  filesByConversation: Record<string, FileWithPreview[]>;
+  addFiles: ({conversationId, files}: {conversationId: string; files: FileWithPreview[]}) => void;
+  deleteFile: ({conversationId, fileId}: {conversationId: string; fileId: string}) => void;
+  updateFile: ({
+    conversationId,
+    fileId,
+    data,
+  }: {
+    conversationId: string;
+    fileId: string;
+    data: {
       remoteUuid?: string;
       remoteVersionId?: string;
       uploadStatus?: FileUploadStatus;
-    },
-  ) => void;
-  clearAll: () => void;
+    };
+  }) => void;
+  clearAll: ({conversationId}: {conversationId: string}) => void;
+  getFiles: ({conversationId}: {conversationId: string}) => FileWithPreview[];
 }
 
-export const useFileUploadState = create<FileUploadState>(set => ({
-  files: [],
-  addFiles: newFiles =>
+type FileUploadStore = FileUploadState;
+
+export const useFileUploadState = create<FileUploadStore>()((set, get) => ({
+  filesByConversation: {},
+  addFiles: ({conversationId, files}) =>
     set(state => ({
-      files: [...newFiles, ...state.files],
+      filesByConversation: {
+        ...state.filesByConversation,
+        [conversationId]: [...(state.filesByConversation[conversationId] || []), ...files],
+      },
     })),
-  deleteFile: fileId =>
+  deleteFile: ({conversationId, fileId}) =>
     set(state => ({
-      files: state.files.filter(file => file.id !== fileId),
+      filesByConversation: {
+        ...state.filesByConversation,
+        [conversationId]: state.filesByConversation[conversationId]?.filter(file => file.id !== fileId) || [],
+      },
     })),
-  updateFile: (fileId, {remoteUuid, remoteVersionId, uploadStatus}) =>
+  updateFile: ({conversationId, fileId, data}) =>
     set(state => ({
-      files: state.files.map(file => {
-        if (file.id === fileId) {
-          file.remoteUuid = remoteUuid || file.remoteUuid;
-          file.remoteVersionId = remoteVersionId || file.remoteVersionId;
-          file.uploadStatus = uploadStatus || file.uploadStatus;
-        }
-        return file;
-      }),
+      filesByConversation: {
+        ...state.filesByConversation,
+        [conversationId]:
+          state.filesByConversation[conversationId]?.map(file => {
+            if (file.id === fileId) {
+              return {
+                ...file,
+                name: file.name,
+                type: file.type,
+                id: file.id,
+                preview: file.preview,
+                remoteUuid: data.remoteUuid ?? file.remoteUuid,
+                remoteVersionId: data.remoteVersionId ?? file.remoteVersionId,
+                uploadStatus: data.uploadStatus ?? file.uploadStatus,
+              };
+            }
+            return file;
+          }) || [],
+      },
     })),
-  clearAll: () => set({files: []}),
+  clearAll: ({conversationId}) => {
+    const state = get();
+    const updatedFilesByConversation = {...state.filesByConversation};
+    delete updatedFilesByConversation[conversationId];
+    set({filesByConversation: updatedFilesByConversation});
+  },
+  getFiles: ({conversationId}) => {
+    const state = get().filesByConversation;
+    return state[conversationId] || [];
+  },
 }));

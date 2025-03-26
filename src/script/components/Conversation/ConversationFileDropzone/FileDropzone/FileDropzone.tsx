@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode, useEffect} from 'react';
+import {ReactNode} from 'react';
 
 import {DropzoneRootProps, DropzoneInputProps} from 'react-dropzone';
 
@@ -25,24 +25,16 @@ import {wrapperStyles} from './FileDropzone.styles';
 import {FileDropzoneOverlay} from './FileDropzoneOverlay/FileDropzoneOverlay';
 import {useIsDragging} from './useIsDragging/useIsDragging';
 
-import {useFileUploadState} from '../../useFilesUploadState/useFilesUploadState';
-
 interface FileDropzoneProps {
   isDragAccept: boolean;
   rootProps: DropzoneRootProps;
   inputProps: DropzoneInputProps;
   children: ReactNode;
+  conversationId: string;
 }
 
-export const FileDropzone = ({isDragAccept, rootProps, inputProps, children}: FileDropzoneProps) => {
+export const FileDropzone = ({isDragAccept, rootProps, inputProps, children, conversationId}: FileDropzoneProps) => {
   const {isDragging, wrapperRef} = useIsDragging();
-
-  const {files} = useFileUploadState();
-
-  useEffect(() => {
-    // Make sure to revoke the data uris to avoid memory leaks, will run on unmount
-    return () => files.forEach(file => URL.revokeObjectURL(file.preview));
-  }, [files]);
 
   return (
     <div ref={wrapperRef} css={wrapperStyles}>

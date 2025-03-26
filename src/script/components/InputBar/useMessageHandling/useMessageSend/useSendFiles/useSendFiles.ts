@@ -29,10 +29,11 @@ export type SendFilesStatus = 'idle' | 'loading' | 'success' | 'error';
 interface UseSendFilesProps {
   files: FileWithPreview[];
   cellsRepository: CellsRepository;
-  clearAllFiles: () => void;
+  clearAllFiles: ({conversationId}: {conversationId: string}) => void;
+  conversationId: string;
 }
 
-export const useSendFiles = ({files, clearAllFiles, cellsRepository}: UseSendFilesProps) => {
+export const useSendFiles = ({files, clearAllFiles, cellsRepository, conversationId}: UseSendFilesProps) => {
   const [status, setStatus] = useState<SendFilesStatus>('idle');
 
   const errorNotification = useAppNotification({
@@ -49,6 +50,7 @@ export const useSendFiles = ({files, clearAllFiles, cellsRepository}: UseSendFil
     try {
       setStatus('loading');
       await Promise.all(files.map(sendFile));
+      files.map(file => URL.revokeObjectURL(file.preview));
       setStatus('success');
     } catch (error) {
       errorNotification.show();
@@ -60,9 +62,9 @@ export const useSendFiles = ({files, clearAllFiles, cellsRepository}: UseSendFil
   }, [files]);
 
   const clearFiles = useCallback(() => {
-    clearAllFiles();
+    clearAllFiles({conversationId});
     setStatus('idle');
-  }, [clearAllFiles]);
+  }, [clearAllFiles, conversationId]);
 
   return {
     sendFiles,

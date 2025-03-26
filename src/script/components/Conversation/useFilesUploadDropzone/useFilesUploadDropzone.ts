@@ -45,7 +45,8 @@ interface UseFilesUploadDropzoneParams {
 }
 
 export const useFilesUploadDropzone = ({isTeam, cellsRepository, conversation}: UseFilesUploadDropzoneParams) => {
-  const {addFiles, files, updateFile} = useFileUploadState();
+  const {addFiles, getFiles, updateFile} = useFileUploadState();
+  const files = getFiles({conversationId: conversation.id});
 
   const MAX_SIZE = isTeam ? CONFIG.MAXIMUM_ASSET_FILE_SIZE_TEAM : CONFIG.MAXIMUM_ASSET_FILE_SIZE_PERSONAL;
 
@@ -62,10 +63,14 @@ export const useFilesUploadDropzone = ({isTeam, cellsRepository, conversation}: 
         file,
         path,
       });
-      updateFile(file.id, {remoteUuid: uuid, remoteVersionId: versionId, uploadStatus: 'success'});
+      updateFile({
+        conversationId: conversation.id,
+        fileId: file.id,
+        data: {remoteUuid: uuid, remoteVersionId: versionId, uploadStatus: 'success'},
+      });
     } catch (error) {
       logger.error('Uploading file failed', error);
-      updateFile(file.id, {uploadStatus: 'error'});
+      updateFile({conversationId: conversation.id, fileId: file.id, data: {uploadStatus: 'error'}});
       throw error;
     }
   };
@@ -104,7 +109,7 @@ export const useFilesUploadDropzone = ({isTeam, cellsRepository, conversation}: 
         });
       });
 
-      addFiles(acceptedFilesWithPreview);
+      addFiles({conversationId: conversation.id, files: acceptedFilesWithPreview});
 
       acceptedFilesWithPreview.forEach(file => {
         void uploadFile(file);

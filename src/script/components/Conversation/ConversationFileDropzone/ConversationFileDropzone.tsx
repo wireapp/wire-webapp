@@ -50,12 +50,17 @@ export const ConversationFileDropzone = ({
 }: ConversationFileDropzoneProps) => {
   if (isCellsEnabled) {
     return (
-      <FileDropzone isDragAccept={isDragAccept} rootProps={rootProps} inputProps={inputProps}>
+      <FileDropzone
+        key={activeConversationId}
+        conversationId={activeConversationId as string}
+        isDragAccept={isDragAccept}
+        rootProps={rootProps}
+        inputProps={inputProps}
+      >
         <div
           id="conversation"
           className={cx('conversation', {[incomingCssClass]: isConversationLoaded, loading: !isConversationLoaded})}
           ref={removeAnimationsClass}
-          key={activeConversationId}
         >
           {children}
         </div>

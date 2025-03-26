@@ -40,14 +40,7 @@ export const ImagePreviewCard = ({src, onDelete, onRetry, isLoading, isError}: I
       isLoading={isLoading}
       isError={isError}
     >
-      <img
-        src={src}
-        alt=""
-        css={imageStyles}
-        onLoad={() => {
-          URL.revokeObjectURL(src);
-        }}
-      />
+      <img src={src} alt="" css={imageStyles} />
     </MediaFilePreviewCard>
   );
 };
