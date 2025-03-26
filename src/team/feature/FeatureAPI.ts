@@ -33,6 +33,7 @@ import {
   FeatureMLSE2EId,
   FeatureMLSMigration,
   FeatureDownloadPath,
+  FeatureDomainRegistration,
 } from './Feature';
 import {InvalidAppLockTimeoutError} from './FeatureError';
 import {FeatureList} from './FeatureList';
@@ -50,6 +51,7 @@ export class FeatureAPI {
     CALLING_VIDEO: 'videoCalling',
     SELF_DELETING_MESSAGES: 'selfDeletingMessages',
     DIGITAL_SIGNATURES: 'digitalSignatures',
+    DOMAIN_REGISTRATION: 'domainRegistration',
     DL_PATH: 'enforceFileDownloadLocation',
     CONVERSATION_GUEST_LINKS: 'conversationGuestLinks',
     FEATURE_CONFIGS: '/feature-configs',
@@ -344,6 +346,16 @@ export class FeatureAPI {
     };
 
     const response = await this.client.sendJSON<FeatureDigitalSignature>(config);
+    return response.data;
+  }
+
+  public async getDomainRegistrationFeature(teamId: string): Promise<FeatureDomainRegistration> {
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.DOMAIN_REGISTRATION}`,
+    };
+
+    const response = await this.client.sendJSON<FeatureDomainRegistration>(config);
     return response.data;
   }
 
