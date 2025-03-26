@@ -36,6 +36,7 @@ import {ImageAsset} from './ImageAsset';
 import {LinkPreviewAsset} from './LinkPreviewAssetComponent';
 import {LocationAsset} from './LocationAsset';
 import {MessageButton} from './MessageButton';
+import {MultipartAssets} from './MultipartAssets/MultipartAssets';
 import {TextMessageRenderer} from './TextMessageRenderer';
 import {VideoAsset} from './VideoAsset/VideoAsset';
 
@@ -98,11 +99,7 @@ const ContentAsset = ({
             />
           )}
 
-          <ul>
-            {filesMultipart.map(file => (
-              <li key={file.uuid}>{file.uuid}</li>
-            ))}
-          </ul>
+          <MultipartAssets assets={filesMultipart} />
 
           {shouldRenderTextMultipart && (
             <ReadIndicator message={message} is1to1Conversation={is1to1Conversation} onClick={onClickDetails} />
