@@ -30,10 +30,9 @@ interface FileDropzoneProps {
   rootProps: DropzoneRootProps;
   inputProps: DropzoneInputProps;
   children: ReactNode;
-  conversationId: string;
 }
 
-export const FileDropzone = ({isDragAccept, rootProps, inputProps, children, conversationId}: FileDropzoneProps) => {
+export const FileDropzone = ({isDragAccept, rootProps, inputProps, children}: FileDropzoneProps) => {
   const {isDragging, wrapperRef} = useIsDragging();
 
   return (
