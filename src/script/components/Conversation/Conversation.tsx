@@ -478,7 +478,6 @@ export const Conversation = ({
 
   return (
     <ConversationFileDropzone
-      key={activeConversation?.id}
       isDragAccept={isDragAccept}
       isCellsEnabled={isCellsEnabled}
       isConversationLoaded={isConversationLoaded}
@@ -504,7 +503,7 @@ export const Conversation = ({
           {isCellsEnabled && (
             <>
               <ConversationTabs activeTabIndex={activeTabIndex} onIndexChange={setActiveTabIndex} />
-              <ConversationTabPanel key={activeConversation.id} id="files" isActive={activeTabIndex === 1}>
+              <ConversationTabPanel id="files" isActive={activeTabIndex === 1}>
                 {activeTabIndex === 1 && <ConversationCells conversationQualifiedId={activeConversation.qualifiedId} />}
               </ConversationTabPanel>
             </>
