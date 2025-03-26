@@ -19,7 +19,8 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const wrapperStyles: CSSObject = {
+export const listStyles: CSSObject = {
+  listStyle: 'none',
   gridArea: 'files',
   display: 'grid',
   gridTemplateColumns: 'repeat(auto-fill, 74px)',
@@ -30,6 +31,6 @@ export const wrapperStyles: CSSObject = {
   margin: '0',
 };
 
-export const largeFileCardStyles: CSSObject = {
+export const itemStyles: CSSObject = {
   gridColumn: 'span 3',
 };

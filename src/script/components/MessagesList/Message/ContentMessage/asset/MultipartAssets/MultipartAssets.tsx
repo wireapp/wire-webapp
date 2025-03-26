@@ -17,43 +17,41 @@
  *
  */
 
+import {ICellAsset} from '@pydio/protocol-messaging';
+
 import {FileCard} from 'Components/FileCard/FileCard';
 import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 
-import {largeFileCardStyles, wrapperStyles} from './MultiAsset.styles';
+import {itemStyles, listStyles} from './MultipartAssets.styles';
 
-interface MultiAssetsProps {
-  assets: {uuid: string; contentType: string; initialName: string; initialSize: number}[];
+interface MultipartAssetsProps {
+  assets: ICellAsset[];
 }
 
-export const MultiAssets = ({assets}: MultiAssetsProps) => {
+export const MultipartAssets = ({assets}: MultipartAssetsProps) => {
   return (
-    <ul css={wrapperStyles}>
+    <ul css={listStyles}>
       {assets.map(asset => (
-        <MutliAsset key={asset.uuid} asset={asset} />
+        <li key={asset.uuid} css={itemStyles}>
+          <MultipartAsset {...asset} />
+        </li>
       ))}
     </ul>
   );
 };
 
-const MutliAsset = ({
-  asset,
-}: {
-  asset: {uuid: string; contentType: string; initialName: string; initialSize: number};
-}) => {
-  const name = trimFileExtension(asset.initialName);
-  const extension = getFileExtension(asset.initialName);
-  const size = formatBytes(asset.initialSize);
+const MultipartAsset = ({initialName, initialSize}: ICellAsset) => {
+  const name = trimFileExtension(initialName!);
+  const extension = getFileExtension(initialName!);
+  const size = formatBytes(Number(initialSize));
 
   return (
-    <div css={largeFileCardStyles} key={asset.uuid}>
-      <FileCard.Root extension={extension} name={name} size={size}>
-        <FileCard.Header>
-          <FileCard.Icon />
-          <FileCard.Type />
-        </FileCard.Header>
-        <FileCard.Name />
-      </FileCard.Root>
-    </div>
+    <FileCard.Root extension={extension} name={name} size={size}>
+      <FileCard.Header>
+        <FileCard.Icon />
+        <FileCard.Type />
+      </FileCard.Header>
+      <FileCard.Name />
+    </FileCard.Root>
   );
 };
