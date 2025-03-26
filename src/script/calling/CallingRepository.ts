@@ -68,6 +68,7 @@ import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {createUuid} from 'Util/uuid';
 
 import {Call, SerializedConversationId} from './Call';
+import {CallingEpochData} from './CallingEpochCache';
 import {callingSubscriptions} from './callingSubscriptionsHandler';
 import {CallingViewMode, CallState, MuteState} from './CallState';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
@@ -980,6 +981,8 @@ export class CallingRepository {
       } else {
         this.showNoCameraModal();
         this.removeCall(call);
+        call.epochCache.clean();
+        call.epochCache.disable();
       }
 
       return call;
@@ -1288,6 +1291,11 @@ export class CallingRepository {
   };
 
   private readonly leaveMLSConferenceBecauseError = async (conversationId: QualifiedId) => {
+    const call = this.findCall(conversationId);
+    if (call !== undefined) {
+      call.epochCache.clean();
+      call.epochCache.disable();
+    }
     await this.leaveMLSConference(conversationId);
     callingSubscriptions.removeCall(conversationId);
   };
@@ -1369,9 +1377,10 @@ export class CallingRepository {
 
   private setCachedEpochInfos(call: Call) {
     call.epochCache.disable();
-    call.epochCache.getEpochList().forEach(d => {
+    call.epochCache.getEpochList().forEach((d: CallingEpochData) => {
       this.wCall?.setEpochInfo(this.wUser, d.serializedConversationId, d.epoch, JSON.stringify(d.clients), d.secretKey);
     });
+    call.epochCache.clean();
   }
 
   private readonly setEpochInfo = (conversationId: QualifiedId, subconversationData: SubconversationData) => {

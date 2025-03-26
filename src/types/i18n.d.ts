@@ -1497,6 +1497,8 @@ declare module 'I18n/en-US.json' {
     'replyBarCancelMessage': `Cancel answer`;
     'replyBarEditMessage': `Edit`;
     'replyBarLocation': `Edit`;
+    'replyBarSingleAttachment': `+ 1 file`;
+    'replyBarMultipleAttachments': `+ {count} files`;
     'replyQuoteError': `You cannot see this message.`;
     'replyQuoteShowLess': `Show less`;
     'replyQuoteShowMore': `Show more`;

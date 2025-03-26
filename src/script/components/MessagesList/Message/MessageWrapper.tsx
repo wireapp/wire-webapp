@@ -111,7 +111,14 @@ export const MessageWrapper: React.FC<MessageParams> = ({
       const quote: OutgoingQuote | undefined =
         incomingQuote && isOutgoingQuote(incomingQuote) ? (incomingQuote as OutgoingQuote) : undefined;
 
-      await messageRepository.sendTextWithLinkPreview(conversation, messageText, mentions, quote, messageId);
+      await messageRepository.sendTextWithLinkPreview({
+        conversation,
+        textMessage: messageText,
+        mentions,
+        quoteEntity: quote,
+        messageId,
+        attachments: [],
+      });
     } else if (file) {
       await messageRepository.retryUploadFile(conversation, file, firstAsset.isImage(), message.id);
     }
