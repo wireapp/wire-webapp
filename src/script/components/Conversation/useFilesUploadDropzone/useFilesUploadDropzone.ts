@@ -41,10 +41,14 @@ const logger = getLogger('FileDropzone');
 interface UseFilesUploadDropzoneParams {
   isTeam: boolean;
   cellsRepository: CellsRepository;
-  conversation: Pick<Conversation, 'id' | 'qualifiedId'>;
+  conversation?: Pick<Conversation, 'id' | 'qualifiedId'>;
 }
 
-export const useFilesUploadDropzone = ({isTeam, cellsRepository, conversation}: UseFilesUploadDropzoneParams) => {
+export const useFilesUploadDropzone = ({
+  isTeam,
+  cellsRepository,
+  conversation = {id: '', qualifiedId: {id: '', domain: ''}},
+}: UseFilesUploadDropzoneParams) => {
   const {addFiles, getFiles, updateFile} = useFileUploadState();
   const files = getFiles({conversationId: conversation.id});
 
@@ -60,6 +64,7 @@ export const useFilesUploadDropzone = ({isTeam, cellsRepository, conversation}: 
 
     try {
       const {uuid, versionId} = await cellsRepository.uploadFile({
+        uuid: file.id,
         file,
         path,
       });

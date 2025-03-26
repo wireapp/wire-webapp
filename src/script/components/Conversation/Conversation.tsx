@@ -471,7 +471,7 @@ export const Conversation = ({
   const {getRootProps, getInputProps, open, isDragAccept} = useFilesUploadDropzone({
     isTeam: inTeam,
     cellsRepository: repositories.cells,
-    conversation: activeConversation!,
+    conversation: activeConversation,
   });
 
   const isCellsEnabled = Config.getConfig().FEATURE.ENABLE_CELLS;

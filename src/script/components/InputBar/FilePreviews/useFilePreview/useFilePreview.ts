@@ -61,6 +61,7 @@ export const useFilePreview = ({file, cellsRepository, conversationQualifiedId}:
           : `${conversationQualifiedId.id}@${conversationQualifiedId.domain}`;
 
       const {uuid, versionId} = await cellsRepository.uploadFile({
+        uuid: file.id,
         file,
         path,
       });

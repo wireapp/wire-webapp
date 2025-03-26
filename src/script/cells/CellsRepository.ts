@@ -55,10 +55,17 @@ export class CellsRepository {
     this.isInitialized = true;
   }
 
-  async uploadFile({file, path}: {file: File; path: string}): Promise<{uuid: string; versionId: string}> {
+  async uploadFile({
+    uuid,
+    file,
+    path,
+  }: {
+    uuid: string;
+    file: File;
+    path: string;
+  }): Promise<{uuid: string; versionId: string}> {
     const filePath = `${path || this.basePath}/${encodeURIComponent(file.name)}`;
 
-    const uuid = createUuid();
     const versionId = createUuid();
 
     await this.apiClient.api.cells.uploadFileDraft({
