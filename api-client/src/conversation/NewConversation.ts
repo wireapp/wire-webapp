@@ -31,7 +31,12 @@ export enum ConversationProtocol {
 }
 
 export interface NewConversation
-  extends Partial<Pick<Conversation, 'access' | 'access_role' | 'access_role_v2' | 'message_timer' | 'name'>> {
+  extends Partial<
+    Pick<
+      Conversation,
+      'access' | 'access_role' | 'access_role_v2' | 'message_timer' | 'name' | 'group_conv_type' | 'add_permission'
+    >
+  > {
   conversation_role?: DefaultConversationRoleName;
   qualified_users?: QualifiedId[];
   receipt_mode: RECEIPT_MODE | null;
