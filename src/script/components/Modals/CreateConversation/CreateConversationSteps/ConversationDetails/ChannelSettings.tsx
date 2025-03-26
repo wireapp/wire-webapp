@@ -30,7 +30,7 @@ import {CustomHistorySharingOption} from './CutomHistorySharingOption';
 
 import {channelSettingsTextCss} from '../../CreateConversation.styles';
 import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
-import {ChatHistory, ConversationAccess, ConversationManager} from '../../types';
+import {ChatHistory, ConversationAccess, ConversationModerator} from '../../types';
 import {getConversationAccessOptions, getChatHistoryOptions, getConversationManagerOptions} from '../../utils';
 
 export const ChannelSettings = () => {
@@ -40,8 +40,8 @@ export const ChannelSettings = () => {
     chatHistory,
     setChatHistory,
     setAccess,
-    manager,
-    setManager,
+    moderator,
+    setModerator,
     setIsCustomHistoryModalOpen,
     setIsUpgradeTeamModalOpen,
     historySharingQuantity,
@@ -84,11 +84,11 @@ export const ChannelSettings = () => {
         {t('createConversationManagerText')}
       </Muted>
 
-      <RadioGroup<ConversationManager>
+      <RadioGroup<ConversationModerator>
         disabled={access === ConversationAccess.Public}
-        onChange={setManager}
+        onChange={setModerator}
         horizontal
-        selectedValue={manager}
+        selectedValue={moderator}
         options={getConversationManagerOptions()}
         ariaLabelledBy="conversation-manager"
         name="conversation-manager"

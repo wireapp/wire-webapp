@@ -34,7 +34,7 @@ import {
  * Type representing the state of the Create Conversation Modal.
  */
 type CreateConversationModalState = {
-  isOpen: boolean;
+  isOpen?: boolean;
   conversationName: string;
   access: ConversationAccess;
   moderator: ConversationModerator;
@@ -92,7 +92,7 @@ const initialState = {
   isReadReceiptsEnabled: true,
   isServicesEnabled: true,
   isGuestsEnabled: true,
-  selectedContacts: [],
+  selectedContacts: [] as User[],
   historySharingUnit: HistorySharingUnit.Days,
   historySharingQuantity: 1,
   isCustomHistoryModalOpen: false,
