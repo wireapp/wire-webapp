@@ -64,7 +64,7 @@ export class CellsRepository {
     file: File;
     path: string;
   }): Promise<{uuid: string; versionId: string}> {
-    const filePath = `${path || this.basePath}/${encodeURIComponent(file.name)}`;
+    const filePath = `${path || this.basePath}/${file.name}`;
 
     const versionId = createUuid();
 
