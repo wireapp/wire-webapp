@@ -36,11 +36,11 @@ interface UseGetAllCellsFilesProps {
 export const useGetAllCellsFiles = ({cellsRepository, conversationQualifiedId}: UseGetAllCellsFilesProps) => {
   const {setFiles, setStatus, setError} = useCellsStore();
 
+  const {domain, id} = conversationQualifiedId;
+
   const fetchFiles = useCallback(async () => {
     try {
       setStatus('loading');
-
-      const {domain, id} = conversationQualifiedId;
 
       // Temporary solution to handle the local development
       // TODO: remove this once we have a proper way to handle the domain per env
@@ -65,7 +65,7 @@ export const useGetAllCellsFiles = ({cellsRepository, conversationQualifiedId}: 
     }
     // cellsRepository is not a dependency because it's a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setFiles, setStatus, setError]);
+  }, [setFiles, setStatus, setError, id, domain]);
 
   useEffect(() => {
     void fetchFiles();
