@@ -138,7 +138,7 @@ export const useGetMultipartAssetPreview = ({
 
   useEffect(() => {
     if (status !== 'retrying') {
-      return;
+      return undefined;
     }
 
     timeoutRef.current = window.setTimeout(() => {
