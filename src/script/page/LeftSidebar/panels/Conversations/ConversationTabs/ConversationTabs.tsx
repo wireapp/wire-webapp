@@ -19,7 +19,15 @@
 
 import {container} from 'tsyringe';
 
-import {GroupIcon, MessageIcon, StarIcon, ExternalLinkIcon, Tooltip, SupportIcon} from '@wireapp/react-ui-kit';
+import {
+  GroupIcon,
+  MessageIcon,
+  StarIcon,
+  ExternalLinkIcon,
+  Tooltip,
+  SupportIcon,
+  CollectionIcon,
+} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
@@ -117,7 +125,7 @@ export const ConversationTabs = ({
       type: SidebarTabs.GROUPS,
       title: t('conversationLabelGroups'),
       dataUieName: 'go-groups-view',
-      Icon: <GroupIcon />,
+      Icon: <GroupIcon height={20} width={20} />,
       unreadConversations: groupConversations.filter(filterUnreadAndArchivedConversations).length,
     },
     {
@@ -182,6 +190,8 @@ export const ConversationTabs = ({
           );
         })}
 
+        <div className="conversations-sidebar-divider" />
+
         <div className="conversations-sidebar-title" css={{marginBlock: '32px 0'}}>
           {t('conversationFooterContacts')}
         </div>
@@ -196,6 +206,27 @@ export const ConversationTabs = ({
           dataUieName="go-people"
           isActive={currentTab === SidebarTabs.CONNECT}
         />
+
+        {Config.getConfig().FEATURE.ENABLE_CELLS && (
+          <>
+            <div className="conversations-sidebar-divider" />
+
+            <div className="conversations-sidebar-title" css={{marginBlock: '32px 0'}}>
+              {t('cellsSidebar.heading')}
+            </div>
+
+            <ConversationTab
+              title={t('cellsSidebar.title')}
+              label={t('cellsSidebar.title')}
+              type={SidebarTabs.CELLS}
+              Icon={<CollectionIcon />}
+              onChangeTab={onChangeTab}
+              conversationTabIndex={conversationTabs.length + 2}
+              dataUieName="go-cells"
+              isActive={currentTab === SidebarTabs.CELLS}
+            />
+          </>
+        )}
       </div>
 
       <div

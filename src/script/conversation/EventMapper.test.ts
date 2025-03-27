@@ -17,7 +17,7 @@
  *
  */
 
-import {Article, LinkPreview, Mention} from '@wireapp/protocol-messaging';
+import {Article, LinkPreview, Mention} from '@pydio/protocol-messaging';
 
 import {AssetType} from 'src/script/assets/AssetType';
 import {Conversation} from 'src/script/entity/Conversation';

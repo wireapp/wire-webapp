@@ -17,7 +17,7 @@
  *
  */
 
-import {Quote} from '@wireapp/protocol-messaging';
+import {Quote} from '@pydio/protocol-messaging';
 
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';

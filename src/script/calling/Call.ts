@@ -26,6 +26,7 @@ import {chunk, getDifference, partition} from 'Util/ArrayUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
+import {CallingEpochCache} from './CallingEpochCache';
 import {MuteState} from './CallState';
 import type {ClientId, Participant} from './Participant';
 
@@ -63,7 +64,7 @@ export class Call {
   public numberOfParticipantsInOnePage: number = 9;
   public readonly maximizedParticipant: ko.Observable<Participant | null>;
   public readonly isActive: ko.PureComputed<boolean>;
-
+  public readonly epochCache = new CallingEpochCache();
   private readonly audios: Record<string, {audioElement: HTMLAudioElement; stream: MediaStream}> = {};
   /**
    * set to `true` if anyone has enabled their video during a call (used for analytics)
