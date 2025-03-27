@@ -18,35 +18,39 @@
  */
 
 import {ICellAsset} from '@pydio/protocol-messaging';
+import {container} from 'tsyringe';
 
-import {FileCard} from 'Components/FileCard/FileCard';
+import {useInView} from 'Hooks/useInView/useInView';
+import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 
-import {largeCardStyles, listStyles, smallCardStyles} from './MultipartAssets.styles';
+import {FileAssetCard} from './FileAssetCard/FileAssetCard';
 import {ImageAssetCard} from './ImageAssetCard/ImageAssetCard';
+import {largeCardStyles, listStyles, smallCardStyles} from './MultipartAssets.styles';
+import {useGetMultipartAssetPreview} from './useGetMultipartAssetPreview/useGetMultipartAssetPreview';
 import {VideoAssetCard} from './VideoAssetCard/VideoAssetCard';
-import {useEffect, useState} from 'react';
-import {CellsRepository} from 'src/script/cells/CellsRepository';
-import {container} from 'tsyringe';
-import {useInView} from 'Hooks/useInView/useInView';
 
 interface MultipartAssetsProps {
   assets: ICellAsset[];
   cellsRepository?: CellsRepository;
 }
 
-export const MultipartAssets = ({assets}: MultipartAssetsProps) => {
+export const MultipartAssets = ({
+  assets,
+  cellsRepository = container.resolve(CellsRepository),
+}: MultipartAssetsProps) => {
   return (
     <ul css={listStyles}>
       {assets.map(asset => (
-        <MultipartAsset key={asset.uuid} {...asset} />
+        <MultipartAsset key={asset.uuid} cellsRepository={cellsRepository} assetsCount={assets.length} {...asset} />
       ))}
     </ul>
   );
 };
 
 interface MultipartAssetProps extends ICellAsset {
-  cellsRepository?: CellsRepository;
+  cellsRepository: CellsRepository;
+  assetsCount: number;
 }
 
 const MultipartAsset = ({
@@ -54,34 +58,33 @@ const MultipartAsset = ({
   initialName,
   initialSize,
   contentType,
-  cellsRepository = container.resolve(CellsRepository),
+  cellsRepository,
+  assetsCount,
 }: MultipartAssetProps) => {
   const name = trimFileExtension(initialName!);
   const extension = getFileExtension(initialName!);
   const size = formatBytes(Number(initialSize));
-  const {elementRef, hasBeenInView} = useInView<HTMLLIElement>();
 
-  const [src, setSrc] = useState<string | undefined>(undefined);
-  const [isLoading, setIsLoading] = useState(true);
+  const {elementRef, hasBeenInView} = useInView<HTMLLIElement>();
 
   const isImage = contentType.startsWith('image');
   const isVideo = contentType.startsWith('video');
+  const isPdf = contentType.startsWith('application/pdf');
 
-  useEffect(() => {
-    if (!hasBeenInView) {
-      return;
-    }
+  const {src, status, refetch} = useGetMultipartAssetPreview({
+    uuid,
+    cellsRepository,
+    isEnabled: hasBeenInView,
+    retryUntilSuccess: isImage || isVideo || isPdf,
+  });
 
-    cellsRepository.getFile({uuid}).then(asset => {
-      setSrc(asset.PreSignedGET?.Url);
-      setIsLoading(false);
-    });
-  }, [hasBeenInView]);
+  const isLoading = status === 'loading';
+  const isError = status === 'error';
 
   if (isImage) {
     return (
       <li ref={elementRef} css={smallCardStyles}>
-        <ImageAssetCard src={src} onRetry={() => {}} isLoading={isLoading} isError={false} />
+        <ImageAssetCard src={src} onRetry={refetch} isLoading={isLoading} isError={isError} />
       </li>
     );
   }
@@ -89,20 +92,14 @@ const MultipartAsset = ({
   if (isVideo) {
     return (
       <li ref={elementRef} css={smallCardStyles}>
-        <VideoAssetCard src={src} onRetry={() => {}} isLoading={isLoading} isError={false} />
+        <VideoAssetCard src={src} onRetry={refetch} isLoading={isLoading} isError={isError} />
       </li>
     );
   }
 
   return (
     <li ref={elementRef} css={largeCardStyles}>
-      <FileCard.Root extension={extension} name={name} size={size}>
-        <FileCard.Header>
-          <FileCard.Icon />
-          <FileCard.Type />
-        </FileCard.Header>
-        <FileCard.Name />
-      </FileCard.Root>
+      <FileAssetCard extension={extension} name={name} size={size} />
     </li>
   );
 };
