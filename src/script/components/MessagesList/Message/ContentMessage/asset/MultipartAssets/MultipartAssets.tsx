@@ -69,13 +69,12 @@ const MultipartAsset = ({
 
   const isImage = contentType.startsWith('image');
   const isVideo = contentType.startsWith('video');
-  const isPdf = contentType.startsWith('application/pdf');
 
   const {src, status, refetch} = useGetMultipartAssetPreview({
     uuid,
     cellsRepository,
     isEnabled: hasBeenInView,
-    retryUntilSuccess: isImage || isVideo || isPdf,
+    retryUntilSuccess: isImage || isVideo,
   });
 
   const isLoading = status === 'loading';

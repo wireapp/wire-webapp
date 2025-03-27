@@ -65,12 +65,6 @@ export const useGetMultipartAssetPreview = ({
     uuidRef.current = uuid;
   }
 
-  const handleSuccess = useCallback((url: string) => {
-    setSrc(url);
-    setStatus('success');
-    setError(null);
-  }, []);
-
   const handleError = useCallback((err: unknown) => {
     setStatus('error');
     setError(err instanceof Error ? err : new Error('Failed to fetch asset'));
@@ -99,14 +93,16 @@ export const useGetMultipartAssetPreview = ({
         return;
       }
 
-      handleSuccess(asset.PreSignedGET.Url);
+      setSrc(asset.PreSignedGET.Url);
+      setStatus('success');
+      setError(null);
     } catch (err) {
       if (!isMounted.current) {
         return;
       }
       handleError(err);
     }
-  }, [status, retryUntilSuccess, maxRetries, handleSuccess, handleError, cellsRepository, uuid]);
+  }, [status, retryUntilSuccess, maxRetries, handleError, cellsRepository, uuid]);
 
   const refetch = useCallback(() => {
     if (timeoutRef.current) {
