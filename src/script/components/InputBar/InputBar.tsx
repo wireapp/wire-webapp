@@ -125,7 +125,8 @@ export const InputBar = ({
     'isIncomingRequest',
   ]);
 
-  const {files} = useFileUploadState();
+  const {getFiles} = useFileUploadState();
+  const files = getFiles({conversationId: conversation.id});
 
   const wrapperRef = useRef<HTMLDivElement>(null);
 
