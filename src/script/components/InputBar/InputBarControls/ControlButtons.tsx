@@ -115,14 +115,13 @@ const ControlButtons = ({
         )}
         {!disableFilesharing && (
           <>
-            {!isCellsEnabled && (
-              <li>
-                <ImageUploadButton
-                  onSelectImages={onSelectImages}
-                  acceptedImageTypes={Config.getConfig().ALLOWED_IMAGE_TYPES}
-                />
-              </li>
-            )}
+            <li>
+              <ImageUploadButton
+                onSelectImages={onSelectImages}
+                acceptedImageTypes={Config.getConfig().ALLOWED_IMAGE_TYPES}
+              />
+            </li>
+
             <li>
               <AssetUploadButton
                 onSelectFiles={onSelectFiles}
@@ -137,9 +136,11 @@ const ControlButtons = ({
         <li>
           <PingButton isDisabled={!!disablePing} onClick={onClickPing} />
         </li>
-        <li>
-          <MessageTimerButton conversation={conversation} />
-        </li>
+        {!isCellsEnabled && (
+          <li>
+            <MessageTimerButton conversation={conversation} />
+          </li>
+        )}
       </>
     );
   }
