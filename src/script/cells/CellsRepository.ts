@@ -93,6 +93,10 @@ export class CellsRepository {
     return this.apiClient.api.cells.getAllFiles({path: path || this.basePath, limit});
   }
 
+  async getFile({uuid}: {uuid: string}) {
+    return this.apiClient.api.cells.getFile({id: uuid});
+  }
+
   async createPublicLink({uuid, label}: {uuid: string; label?: string}) {
     return this.apiClient.api.cells.createFilePublicLink({
       uuid,

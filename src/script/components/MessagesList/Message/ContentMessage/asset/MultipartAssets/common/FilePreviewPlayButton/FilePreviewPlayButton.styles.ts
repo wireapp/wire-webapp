@@ -19,22 +19,19 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const listStyles: CSSObject = {
-  listStyle: 'none',
-  gridArea: 'files',
-  display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fill, 74px)',
-  gridAutoFlow: 'dense',
-  gap: '24px',
-  width: '100%',
-  padding: '8px 8px 8px 0',
-  margin: '0',
+export const buttonStyles: CSSObject = {
+  width: '24px',
+  height: '24px',
+  borderRadius: '50%',
+  backgroundColor: 'var(--icon-button-primary-disabled-bg)',
+  border: '1px solid var(--icon-button-primary-border)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  flexShrink: 0,
+  cursor: 'not-allowed',
 };
 
-export const largeCardStyles: CSSObject = {
-  gridColumn: 'span 3',
-};
-
-export const smallCardStyles: CSSObject = {
-  gridColumn: 'span 1',
+export const playIconStyles: CSSObject = {
+  fill: 'var(--main)',
 };

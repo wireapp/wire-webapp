@@ -17,24 +17,28 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {t} from 'Util/LocalizerUtil';
 
-export const listStyles: CSSObject = {
-  listStyle: 'none',
-  gridArea: 'files',
-  display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fill, 74px)',
-  gridAutoFlow: 'dense',
-  gap: '24px',
-  width: '100%',
-  padding: '8px 8px 8px 0',
-  margin: '0',
-};
+import {imageStyles} from './ImageAssetCard.styles';
 
-export const largeCardStyles: CSSObject = {
-  gridColumn: 'span 3',
-};
+import {MediaFilePreviewCard} from '../common/MediaFilePreviewCard/MediaFilePreviewCard';
 
-export const smallCardStyles: CSSObject = {
-  gridColumn: 'span 1',
+interface ImageAssetCardProps {
+  src?: string;
+  onRetry: () => void;
+  isLoading: boolean;
+  isError: boolean;
+}
+
+export const ImageAssetCard = ({src, onRetry, isLoading, isError}: ImageAssetCardProps) => {
+  return (
+    <MediaFilePreviewCard
+      label={src ? t('conversationFileImagePreviewLabel', {src}) : 'Loading...'}
+      onRetry={onRetry}
+      isLoading={isLoading}
+      isError={isError}
+    >
+      {!isLoading && src && <img src={src} alt="" css={imageStyles} />}
+    </MediaFilePreviewCard>
+  );
 };

@@ -17,24 +17,12 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {wrapperStyles, iconStyles} from './FilePreviewLoading.styles';
 
-export const listStyles: CSSObject = {
-  listStyle: 'none',
-  gridArea: 'files',
-  display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fill, 74px)',
-  gridAutoFlow: 'dense',
-  gap: '24px',
-  width: '100%',
-  padding: '8px 8px 8px 0',
-  margin: '0',
-};
-
-export const largeCardStyles: CSSObject = {
-  gridColumn: 'span 3',
-};
-
-export const smallCardStyles: CSSObject = {
-  gridColumn: 'span 1',
+export const FilePreviewLoading = () => {
+  return (
+    <div css={wrapperStyles}>
+      <div className="icon-spinner spin" css={iconStyles} />
+    </div>
+  );
 };

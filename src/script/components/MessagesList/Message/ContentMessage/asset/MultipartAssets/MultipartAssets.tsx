@@ -18,40 +18,87 @@
  */
 
 import {ICellAsset} from '@pydio/protocol-messaging';
+import {container} from 'tsyringe';
 
-import {FileCard} from 'Components/FileCard/FileCard';
+import {useInView} from 'Hooks/useInView/useInView';
+import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 
-import {itemStyles, listStyles} from './MultipartAssets.styles';
+import {FileAssetCard} from './FileAssetCard/FileAssetCard';
+import {ImageAssetCard} from './ImageAssetCard/ImageAssetCard';
+import {largeCardStyles, listStyles, smallCardStyles} from './MultipartAssets.styles';
+import {useGetMultipartAssetPreview} from './useGetMultipartAssetPreview/useGetMultipartAssetPreview';
+import {VideoAssetCard} from './VideoAssetCard/VideoAssetCard';
 
 interface MultipartAssetsProps {
   assets: ICellAsset[];
+  cellsRepository?: CellsRepository;
 }
 
-export const MultipartAssets = ({assets}: MultipartAssetsProps) => {
+export const MultipartAssets = ({
+  assets,
+  cellsRepository = container.resolve(CellsRepository),
+}: MultipartAssetsProps) => {
   return (
     <ul css={listStyles}>
       {assets.map(asset => (
-        <li key={asset.uuid} css={itemStyles}>
-          <MultipartAsset {...asset} />
-        </li>
+        <MultipartAsset key={asset.uuid} cellsRepository={cellsRepository} assetsCount={assets.length} {...asset} />
       ))}
     </ul>
   );
 };
 
-const MultipartAsset = ({initialName, initialSize}: ICellAsset) => {
+interface MultipartAssetProps extends ICellAsset {
+  cellsRepository: CellsRepository;
+  assetsCount: number;
+}
+
+const MultipartAsset = ({
+  uuid,
+  initialName,
+  initialSize,
+  contentType,
+  cellsRepository,
+  assetsCount,
+}: MultipartAssetProps) => {
   const name = trimFileExtension(initialName!);
   const extension = getFileExtension(initialName!);
   const size = formatBytes(Number(initialSize));
 
+  const {elementRef, hasBeenInView} = useInView<HTMLLIElement>();
+
+  const isImage = contentType.startsWith('image');
+  const isVideo = contentType.startsWith('video');
+
+  const {src, status, refetch} = useGetMultipartAssetPreview({
+    uuid,
+    cellsRepository,
+    isEnabled: hasBeenInView,
+    retryUntilSuccess: isImage || isVideo,
+  });
+
+  const isLoading = status === 'loading';
+  const isError = status === 'error';
+
+  if (isImage) {
+    return (
+      <li ref={elementRef} css={smallCardStyles}>
+        <ImageAssetCard src={src} onRetry={refetch} isLoading={isLoading} isError={isError} />
+      </li>
+    );
+  }
+
+  if (isVideo) {
+    return (
+      <li ref={elementRef} css={smallCardStyles}>
+        <VideoAssetCard src={src} onRetry={refetch} isLoading={isLoading} isError={isError} />
+      </li>
+    );
+  }
+
   return (
-    <FileCard.Root extension={extension} name={name} size={size}>
-      <FileCard.Header>
-        <FileCard.Icon />
-        <FileCard.Type />
-      </FileCard.Header>
-      <FileCard.Name />
-    </FileCard.Root>
+    <li ref={elementRef} css={largeCardStyles}>
+      <FileAssetCard extension={extension} name={name} size={size} />
+    </li>
   );
 };

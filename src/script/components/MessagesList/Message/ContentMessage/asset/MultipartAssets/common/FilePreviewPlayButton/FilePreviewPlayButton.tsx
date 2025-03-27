@@ -17,24 +17,14 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {PlayIcon} from '@wireapp/react-ui-kit';
 
-export const listStyles: CSSObject = {
-  listStyle: 'none',
-  gridArea: 'files',
-  display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fill, 74px)',
-  gridAutoFlow: 'dense',
-  gap: '24px',
-  width: '100%',
-  padding: '8px 8px 8px 0',
-  margin: '0',
-};
+import {buttonStyles, playIconStyles} from './FilePreviewPlayButton.styles';
 
-export const largeCardStyles: CSSObject = {
-  gridColumn: 'span 3',
-};
-
-export const smallCardStyles: CSSObject = {
-  gridColumn: 'span 1',
+export const FilePreviewPlayButton = () => {
+  return (
+    <div css={buttonStyles}>
+      <PlayIcon width={10} height={10} css={playIconStyles} />
+    </div>
+  );
 };

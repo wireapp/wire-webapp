@@ -17,24 +17,22 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {FileCard} from 'Components/FileCard/FileCard';
 
-export const listStyles: CSSObject = {
-  listStyle: 'none',
-  gridArea: 'files',
-  display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fill, 74px)',
-  gridAutoFlow: 'dense',
-  gap: '24px',
-  width: '100%',
-  padding: '8px 8px 8px 0',
-  margin: '0',
-};
+interface FileAssetCardProps {
+  extension: string;
+  name: string;
+  size: string;
+}
 
-export const largeCardStyles: CSSObject = {
-  gridColumn: 'span 3',
-};
-
-export const smallCardStyles: CSSObject = {
-  gridColumn: 'span 1',
+export const FileAssetCard = ({extension, name, size}: FileAssetCardProps) => {
+  return (
+    <FileCard.Root extension={extension} name={name} size={size}>
+      <FileCard.Header>
+        <FileCard.Icon />
+        <FileCard.Type />
+      </FileCard.Header>
+      <FileCard.Name />
+    </FileCard.Root>
+  );
 };
