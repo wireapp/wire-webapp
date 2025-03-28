@@ -92,6 +92,8 @@ describe('InputBar', () => {
     uploadDroppedFiles: jest.fn(),
     uploadImages: jest.fn(),
     uploadFiles: jest.fn(),
+    onCellImageUpload: jest.fn(),
+    onCellAssetUpload: jest.fn(),
   });
 
   beforeEach(() => {
