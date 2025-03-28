@@ -17,16 +17,16 @@
  *
  */
 
-import {AlertIcon} from '@wireapp/react-ui-kit';
+import {AlertIcon, UnavailableFileIcon} from '@wireapp/react-ui-kit';
 
 import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
 
-import {errorIconStyles} from './FileCardIcon.styles';
+import {errorIconStyles, unavailableIconStyles} from './FileCardIcon.styles';
 
 import {useFileCardContext} from '../common/FileCardContext/FileCardContext';
 
 interface FileCardIconProps {
-  type?: 'file' | 'error';
+  type?: 'file' | 'error' | 'unavailable';
 }
 
 export const FileCardIcon = ({type = 'file'}: FileCardIconProps) => {
@@ -34,6 +34,10 @@ export const FileCardIcon = ({type = 'file'}: FileCardIconProps) => {
 
   if (type === 'error') {
     return <AlertIcon css={errorIconStyles} width={14} height={14} />;
+  }
+
+  if (type === 'unavailable') {
+    return <UnavailableFileIcon css={unavailableIconStyles} width={14} height={14} />;
   }
 
   return <FileTypeIcon extension={extension} />;

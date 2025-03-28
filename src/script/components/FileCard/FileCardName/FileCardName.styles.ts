@@ -21,7 +21,6 @@ import {CSSObject} from '@emotion/react';
 
 export const textStyles: CSSObject = {
   fontSize: 'var(--font-size-medium)',
-  fontWeight: 'var(--font-weight-medium)',
   lineHeight: 'var(--line-height-md)',
   margin: 0,
   display: '-webkit-box',
@@ -32,5 +31,18 @@ export const textStyles: CSSObject = {
 
   '[data-file-card="header"] &': {
     marginTop: '0',
+  },
+};
+
+export const primaryStyles: CSSObject = {
+  fontWeight: 'var(--font-weight-medium)',
+};
+
+export const secondaryStyles: CSSObject = {
+  fontWeight: 'var(--font-weight-regular)',
+  color: 'var(--gray-70)',
+
+  'body.dark &': {
+    color: 'var(--gray-40)',
   },
 };

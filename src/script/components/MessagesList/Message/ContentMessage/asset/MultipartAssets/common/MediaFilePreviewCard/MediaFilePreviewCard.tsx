@@ -19,41 +19,32 @@
 
 import {ReactNode} from 'react';
 
-import {AlertIcon} from '@wireapp/react-ui-kit';
+import {UnavailableFileIcon} from '@wireapp/react-ui-kit';
 
 import {
-  alertIconStyles,
-  errorLineStyles,
-  errorLineWrapperStyles,
-  iconWrapperStyles,
+  errorIconStyles,
+  errorTextStyles,
   loadingIconStyles,
   loadingWrapperStyles,
+  wrapperErrorStyles,
   wrapperStyles,
 } from './MediaFilePreviewCard.styles';
 
-import {FilePreviewErrorMoreButton} from '../FilePreviewErrorMoreButton/FilePreviewErrorMoreButton';
-
 interface MediaFilePreviewCardProps {
   label: string;
-  onRetry: () => void;
   isLoading: boolean;
   isError: boolean;
   children: ReactNode;
 }
 
-export const MediaFilePreviewCard = ({label, onRetry, isLoading, isError, children}: MediaFilePreviewCardProps) => {
+export const MediaFilePreviewCard = ({label, isLoading, isError, children}: MediaFilePreviewCardProps) => {
   return (
-    <article css={wrapperStyles} aria-label={label}>
+    <article css={isError ? wrapperErrorStyles : wrapperStyles} aria-label={label}>
       {children}
       {isError && (
         <>
-          <div css={iconWrapperStyles}>
-            <AlertIcon css={alertIconStyles} width={14} height={14} />
-          </div>
-          <FilePreviewErrorMoreButton onRetry={onRetry} />
-          <div css={errorLineWrapperStyles}>
-            <div css={errorLineStyles} />
-          </div>
+          <UnavailableFileIcon css={errorIconStyles} width={14} height={14} />
+          <p css={errorTextStyles}>File not available</p>
         </>
       )}
       {isLoading && (

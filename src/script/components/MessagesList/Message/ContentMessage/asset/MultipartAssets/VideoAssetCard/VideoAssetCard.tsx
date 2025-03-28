@@ -26,20 +26,18 @@ import {MediaFilePreviewCard} from '../common/MediaFilePreviewCard/MediaFilePrev
 
 interface VideoAssetCardProps {
   src?: string;
-  onRetry: () => void;
   isLoading: boolean;
   isError: boolean;
 }
 
-export const VideoAssetCard = ({src, onRetry, isLoading, isError}: VideoAssetCardProps) => {
+export const VideoAssetCard = ({src, isLoading, isError}: VideoAssetCardProps) => {
   return (
     <MediaFilePreviewCard
       label={src ? t('conversationFileVideoPreviewLabel', {src}) : 'Loading...'}
-      onRetry={onRetry}
       isLoading={isLoading}
       isError={isError}
     >
-      {!isLoading && (
+      {!isLoading && !isError && (
         <>
           <video src={src} preload="metadata" css={videoStyles} />
           <div css={iconWrapperStyles}>

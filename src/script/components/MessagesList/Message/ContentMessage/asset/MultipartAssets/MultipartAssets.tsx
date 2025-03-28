@@ -70,7 +70,7 @@ const MultipartAsset = ({
   const isImage = contentType.startsWith('image');
   const isVideo = contentType.startsWith('video');
 
-  const {src, status, refetch} = useGetMultipartAssetPreview({
+  const {src, status} = useGetMultipartAssetPreview({
     uuid,
     cellsRepository,
     isEnabled: hasBeenInView,
@@ -83,7 +83,7 @@ const MultipartAsset = ({
   if (isImage) {
     return (
       <li ref={elementRef} css={smallCardStyles}>
-        <ImageAssetCard src={src} onRetry={refetch} isLoading={isLoading} isError={isError} />
+        <ImageAssetCard src={src} isLoading={isLoading} isError={isError} />
       </li>
     );
   }
@@ -91,14 +91,14 @@ const MultipartAsset = ({
   if (isVideo) {
     return (
       <li ref={elementRef} css={smallCardStyles}>
-        <VideoAssetCard src={src} onRetry={refetch} isLoading={isLoading} isError={isError} />
+        <VideoAssetCard src={src} isLoading={isLoading} isError={isError} />
       </li>
     );
   }
 
   return (
     <li ref={elementRef} css={largeCardStyles}>
-      <FileAssetCard extension={extension} name={name} size={size} />
+      <FileAssetCard extension={extension} name={name} size={size} isLoading={isLoading} isError={isError} />
     </li>
   );
 };
