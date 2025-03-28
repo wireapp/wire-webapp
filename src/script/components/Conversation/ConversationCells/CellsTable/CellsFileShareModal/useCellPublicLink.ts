@@ -26,14 +26,16 @@ import {useCellsStore} from '../../common/useCellsStore/useCellsStore';
 
 interface UseCellPublicLinkParams {
   uuid: string;
+  conversationId: string;
   cellsRepository: CellsRepository;
 }
 
 type PublicLinkStatus = 'idle' | 'loading' | 'error' | 'success';
 
-export const useCellPublicLink = ({uuid, cellsRepository}: UseCellPublicLinkParams) => {
-  const {files, updateFile} = useCellsStore();
-  const file = files.find(f => f.id === uuid);
+export const useCellPublicLink = ({uuid, conversationId, cellsRepository}: UseCellPublicLinkParams) => {
+  const {getFiles, updateFile} = useCellsStore();
+  const files = getFiles({conversationId});
+  const file = files.find(file => file.id === uuid);
   const [isEnabled, setIsEnabled] = useState(!!file?.publicLink);
   const [status, setStatus] = useState<PublicLinkStatus>(file?.publicLink ? 'success' : 'idle');
 
@@ -47,15 +49,15 @@ export const useCellPublicLink = ({uuid, cellsRepository}: UseCellPublicLinkPara
       }
 
       const newLink = {uuid: link.Uuid, url: Config.getConfig().CELLS_PYDIO_URL + link.LinkUrl, alreadyShared: true};
-      updateFile(uuid, {publicLink: newLink});
+      updateFile({conversationId, fileId: uuid, updates: {publicLink: newLink}});
       setStatus('success');
     } catch (err) {
       setStatus('error');
-      updateFile(uuid, {publicLink: undefined});
+      updateFile({conversationId, fileId: uuid, updates: {publicLink: undefined}});
     }
     // cellsRepository is not a dependency because it's a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [uuid, updateFile]);
+  }, [uuid, conversationId, updateFile]);
 
   const getPublicLink = useCallback(async () => {
     const linkId = file?.publicLink?.uuid;
@@ -76,15 +78,15 @@ export const useCellPublicLink = ({uuid, cellsRepository}: UseCellPublicLinkPara
 
       const newLink = {uuid: link.Uuid, url: Config.getConfig().CELLS_PYDIO_URL + link.LinkUrl, alreadyShared: true};
 
-      updateFile(uuid, {publicLink: newLink});
+      updateFile({conversationId, fileId: uuid, updates: {publicLink: newLink}});
       setStatus('success');
     } catch (err) {
       setStatus('error');
-      updateFile(uuid, {publicLink: undefined});
+      updateFile({conversationId, fileId: uuid, updates: {publicLink: undefined}});
     }
     // cellsRepository is not a dependency because it's a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [uuid, updateFile, file?.publicLink]);
+  }, [uuid, conversationId, updateFile, file?.publicLink]);
 
   const deletePublicLink = useCallback(async () => {
     if (!file?.publicLink || !file.publicLink.uuid) {
@@ -93,13 +95,13 @@ export const useCellPublicLink = ({uuid, cellsRepository}: UseCellPublicLinkPara
 
     try {
       await cellsRepository.deletePublicLink({uuid: file.publicLink.uuid});
-      updateFile(uuid, {publicLink: undefined});
+      updateFile({conversationId, fileId: uuid, updates: {publicLink: undefined}});
     } catch (err) {
       setStatus('error');
     }
     // cellsRepository is not a dependency because it's a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [uuid, file?.publicLink, updateFile]);
+  }, [uuid, conversationId, file?.publicLink, updateFile]);
 
   const togglePublicLink = useCallback(() => {
     setIsEnabled(prev => !prev);

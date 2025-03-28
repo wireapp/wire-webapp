@@ -40,21 +40,24 @@ import {CellsTableLoader} from '../../common/CellsTableLoader/CellsTableLoader';
 
 interface ShareFileModalParams {
   uuid: string;
+  conversationId: string;
   cellsRepository: CellsRepository;
 }
 
-export const showShareFileModal = ({uuid, cellsRepository}: ShareFileModalParams) => {
+export const showShareFileModal = ({uuid, conversationId, cellsRepository}: ShareFileModalParams) => {
   PrimaryModal.show(PrimaryModal.type.CONFIRM, {
     primaryAction: {action: () => {}, text: t('cellsGlobalView.shareFileModalPrimaryAction')},
     text: {
-      message: <CellsShareFileModalContent uuid={uuid} cellsRepository={cellsRepository} />,
+      message: (
+        <CellsShareFileModalContent uuid={uuid} conversationId={conversationId} cellsRepository={cellsRepository} />
+      ),
       title: t('cellsGlobalView.shareFileModalHeading'),
     },
   });
 };
 
-const CellsShareFileModalContent = ({uuid, cellsRepository}: ShareFileModalParams) => {
-  const {status, link, isEnabled, togglePublicLink} = useCellPublicLink({uuid, cellsRepository});
+const CellsShareFileModalContent = ({uuid, conversationId, cellsRepository}: ShareFileModalParams) => {
+  const {status, link, isEnabled, togglePublicLink} = useCellPublicLink({uuid, conversationId, cellsRepository});
 
   const isInputDisabled = ['loading', 'error'].includes(status);
 
