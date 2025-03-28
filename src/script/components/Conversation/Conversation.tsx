@@ -468,7 +468,12 @@ export const Conversation = ({
     [addReadReceiptToBatch, repositories.conversation, repositories.integration, updateConversationLastRead],
   );
 
-  const {getRootProps, getInputProps, open, isDragAccept} = useFilesUploadDropzone({
+  const {
+    getRootProps,
+    getInputProps,
+    open: openCellsUploadWindow,
+    isDragAccept,
+  } = useFilesUploadDropzone({
     isTeam: inTeam,
     cellsRepository: repositories.cells,
     conversation: activeConversation,
@@ -575,8 +580,10 @@ export const Conversation = ({
                   selfUser={selfUser}
                   onShiftTab={() => setMsgElementsFocusable(false)}
                   uploadDroppedFiles={uploadDroppedFiles}
-                  uploadImages={isCellsEnabled ? () => open() : uploadImages}
-                  uploadFiles={isCellsEnabled ? () => open() : uploadFiles}
+                  uploadImages={uploadImages}
+                  uploadFiles={uploadFiles}
+                  onCellImageUpload={openCellsUploadWindow}
+                  onCellAssetUpload={openCellsUploadWindow}
                 />
               ))}
 
