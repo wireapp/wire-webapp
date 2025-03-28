@@ -21,6 +21,8 @@ import {ReactNode} from 'react';
 
 import {UnavailableFileIcon} from '@wireapp/react-ui-kit';
 
+import {t} from 'Util/LocalizerUtil';
+
 import {
   errorIconStyles,
   errorTextStyles,
@@ -44,7 +46,7 @@ export const MediaFilePreviewCard = ({label, isLoading, isError, children}: Medi
       {isError && (
         <>
           <UnavailableFileIcon css={errorIconStyles} width={14} height={14} />
-          <p css={errorTextStyles}>File not available</p>
+          <p css={errorTextStyles}>{t('cellsUnavailableFile')}</p>
         </>
       )}
       {isLoading && (

@@ -396,6 +396,7 @@
   "cellsGlobalView.imageFullScreenModalCloseButton": "Close",
   "cellsSidebar.heading": "Files",
   "cellsSidebar.title": "All",
+  "cellsUnavailableFile": "File not available",
   "chooseHandle.handlePlaceholder": "Username",
   "chooseHandle.headline": "Set username",
   "chooseHandle.subhead": "Your username helps people find you.",
