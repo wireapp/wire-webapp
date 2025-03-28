@@ -19,18 +19,27 @@
 
 import {t} from 'Util/LocalizerUtil';
 
-import {imageStyles} from './ImageAssetCard.styles';
+import {imageLargeStyles, imageLargeWrapperStyle, imageStyles} from './ImageAssetCard.styles';
 
 import {MediaFilePreviewCard} from '../common/MediaFilePreviewCard/MediaFilePreviewCard';
 
 interface ImageAssetCardProps {
   src?: string;
+  size: 'small' | 'large';
   onRetry: () => void;
   isLoading: boolean;
   isError: boolean;
 }
 
-export const ImageAssetCard = ({src, onRetry, isLoading, isError}: ImageAssetCardProps) => {
+export const ImageAssetCard = ({src, size, onRetry, isLoading, isError}: ImageAssetCardProps) => {
+  if (size === 'large') {
+    return (
+      <div css={imageLargeWrapperStyle}>
+        <img src={src} alt="" css={imageLargeStyles} />
+      </div>
+    );
+  }
+
   return (
     <MediaFilePreviewCard
       label={src ? t('conversationFileImagePreviewLabel', {src}) : 'Loading...'}

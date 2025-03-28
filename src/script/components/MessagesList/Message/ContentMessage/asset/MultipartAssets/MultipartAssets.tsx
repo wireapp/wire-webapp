@@ -26,7 +26,7 @@ import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 
 import {FileAssetCard} from './FileAssetCard/FileAssetCard';
 import {ImageAssetCard} from './ImageAssetCard/ImageAssetCard';
-import {largeCardStyles, listStyles, smallCardStyles} from './MultipartAssets.styles';
+import {largeCardStyles, listSingleItemStyles, listStyles, smallCardStyles} from './MultipartAssets.styles';
 import {useGetMultipartAssetPreview} from './useGetMultipartAssetPreview/useGetMultipartAssetPreview';
 import {VideoAssetCard} from './VideoAssetCard/VideoAssetCard';
 
@@ -40,7 +40,7 @@ export const MultipartAssets = ({
   cellsRepository = container.resolve(CellsRepository),
 }: MultipartAssetsProps) => {
   return (
-    <ul css={listStyles}>
+    <ul css={assets.length === 1 ? listSingleItemStyles : listStyles}>
       {assets.map(asset => (
         <MultipartAsset key={asset.uuid} cellsRepository={cellsRepository} assetsCount={assets.length} {...asset} />
       ))}
@@ -83,7 +83,13 @@ const MultipartAsset = ({
   if (isImage) {
     return (
       <li ref={elementRef} css={smallCardStyles}>
-        <ImageAssetCard src={src} onRetry={refetch} isLoading={isLoading} isError={isError} />
+        <ImageAssetCard
+          src={src}
+          size={assetsCount === 1 ? 'large' : 'small'}
+          onRetry={refetch}
+          isLoading={isLoading}
+          isError={isError}
+        />
       </li>
     );
   }
