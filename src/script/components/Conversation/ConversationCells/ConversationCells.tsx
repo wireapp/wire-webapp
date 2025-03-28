@@ -44,7 +44,10 @@ export const ConversationCells = ({
   conversationQualifiedId,
 }: ConversationCellsProps) => {
   const {getFiles, status: filesStatus, clearAll, removeFile} = useCellsStore();
-  const files = getFiles({conversationId: conversationQualifiedId.id});
+
+  const conversationId = conversationQualifiedId.id;
+
+  const files = getFiles({conversationId});
   const {refresh} = useGetAllCellsFiles({cellsRepository, conversationQualifiedId});
 
   const isLoading = filesStatus === 'loading';
@@ -59,20 +62,22 @@ export const ConversationCells = ({
   const handleDeleteFile = useCallback(
     async (uuid: string) => {
       try {
-        removeFile({conversationId: conversationQualifiedId.id, fileId: uuid});
+        removeFile({conversationId, fileId: uuid});
         await cellsRepository.deleteFile({uuid});
       } catch (error) {
         deleteFileFailedNotification.show();
         console.error(error);
       }
     },
-    [conversationQualifiedId.id, removeFile, deleteFileFailedNotification],
+    // cellsRepository is not a dependency because it's a singleton
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [conversationId, removeFile, deleteFileFailedNotification],
   );
 
   const handleRefresh = useCallback(async () => {
-    clearAll({conversationId: conversationQualifiedId.id});
+    clearAll({conversationId});
     await refresh();
-  }, [refresh, clearAll, conversationQualifiedId.id]);
+  }, [refresh, clearAll, conversationId]);
 
   return (
     <div css={wrapperStyles}>
@@ -81,7 +86,7 @@ export const ConversationCells = ({
         <CellsTable
           files={files}
           cellsRepository={cellsRepository}
-          conversationId={conversationQualifiedId.id}
+          conversationId={conversationId}
           onDeleteFile={handleDeleteFile}
         />
       )}
