@@ -575,7 +575,7 @@ export const Conversation = ({
                   selfUser={selfUser}
                   onShiftTab={() => setMsgElementsFocusable(false)}
                   uploadDroppedFiles={uploadDroppedFiles}
-                  uploadImages={uploadImages}
+                  uploadImages={isCellsEnabled ? () => open() : uploadImages}
                   uploadFiles={isCellsEnabled ? () => open() : uploadFiles}
                 />
               ))}
