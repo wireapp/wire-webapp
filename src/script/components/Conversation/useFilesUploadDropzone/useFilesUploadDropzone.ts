@@ -84,7 +84,7 @@ export const useFilesUploadDropzone = ({
     maxSize: MAX_SIZE,
     noClick: true,
     noKeyboard: true,
-    onDrop: checkFileSharingPermission((acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
+    onDrop: checkFileSharingPermission(async (acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
       const newFiles = [...acceptedFiles, ...rejectedFiles.map(file => file.file)];
 
       const validationResult = validateFiles({
@@ -104,15 +104,84 @@ export const useFilesUploadDropzone = ({
         return;
       }
 
-      const acceptedFilesWithPreview = acceptedFiles.map(file => {
-        return Object.assign(file, {
-          id: createUuid(),
-          preview: URL.createObjectURL(file),
-          remoteUuid: '',
-          remoteVersionId: '',
-          uploadStatus: 'uploading' as const,
+      console.log('acceptedFiles', acceptedFiles);
+
+      const getMediaMetadata = (
+        file: File,
+      ): Promise<{
+        width?: number;
+        height?: number;
+        duration?: number;
+        waveform?: number[];
+      }> => {
+        return new Promise(resolve => {
+          const reader = new FileReader();
+          reader.onload = e => {
+            if (file.type.startsWith('video/')) {
+              const video = document.createElement('video');
+              video.onloadedmetadata = () => {
+                resolve({
+                  width: video.videoWidth,
+                  height: video.videoHeight,
+                  duration: video.duration,
+                });
+              };
+              video.src = e.target?.result as string;
+            } else if (file.type.startsWith('audio/')) {
+              const audio = document.createElement('audio');
+              audio.onloadedmetadata = () => {
+                // Create audio context to analyze the waveform
+                const audioContext = new AudioContext();
+                const source = audioContext.createMediaElementSource(audio);
+                const analyser = audioContext.createAnalyser();
+                analyser.fftSize = 2048; // Adjust this value to change the number of samples
+                source.connect(analyser);
+
+                // Get the waveform data
+                const bufferLength = analyser.frequencyBinCount;
+                const dataArray = new Uint8Array(bufferLength);
+                analyser.getByteTimeDomainData(dataArray);
+
+                // Normalize the waveform data to values between 0 and 1
+                const waveform = Array.from(dataArray).map(value => value / 128.0);
+
+                resolve({
+                  duration: audio.duration,
+                  waveform,
+                });
+              };
+              audio.src = e.target?.result as string;
+            } else {
+              const img = new Image();
+              img.onload = () => {
+                resolve({
+                  width: img.width,
+                  height: img.height,
+                });
+              };
+              img.src = e.target?.result as string;
+            }
+          };
+          reader.readAsDataURL(file);
         });
-      });
+      };
+
+      const acceptedFilesWithPreview = await Promise.all(
+        acceptedFiles.map(async file => {
+          const metadata = await getMediaMetadata(file);
+          return Object.assign(file, {
+            id: createUuid(),
+            preview: URL.createObjectURL(file),
+            remoteUuid: '',
+            remoteVersionId: '',
+            uploadStatus: 'uploading' as const,
+            width: metadata.width,
+            height: metadata.height,
+            duration: metadata.duration,
+            waveform: metadata.waveform,
+          });
+        }),
+      );
 
       addFiles({conversationId: conversation.id, files: acceptedFilesWithPreview});
 

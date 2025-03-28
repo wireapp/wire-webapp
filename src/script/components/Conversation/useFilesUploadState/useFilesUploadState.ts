@@ -27,6 +27,19 @@ export interface FileWithPreview extends File {
   remoteUuid: string;
   remoteVersionId: string;
   uploadStatus: FileUploadStatus;
+  image?: {
+    width: number;
+    height: number;
+  };
+  audio?: {
+    durationMs: number;
+    loudness: number[];
+  };
+  video?: {
+    width: number;
+    height: number;
+    durationMs: number;
+  };
 }
 
 interface FileUploadState {
