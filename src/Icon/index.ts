@@ -146,3 +146,4 @@ export * from './PauseIcon';
 export * from './AlertIcon';
 export * from './SaveIcon';
 export * from './CollectionIcon';
+export * from './UnavailableFileIcon';

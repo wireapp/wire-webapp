@@ -121,6 +121,10 @@ const light: () => CSSObject = () => ({
   // Multiple File Icon
   '--multiple-file-icon-bg': COLOR_V2.WHITE,
   '--multiple-file-icon-stroke': COLOR_V2.GRAY_70,
+
+  // File Unavailable Icon
+  '--unavailable-file-icon-bg': COLOR_V2.WHITE,
+  '--unavailable-file-icon-stroke': COLOR_V2.GRAY_70,
 });
 
 const dark: () => CSSObject = () => ({
@@ -223,6 +227,10 @@ const dark: () => CSSObject = () => ({
   // Multiple File Icon
   '--multiple-file-icon-bg': COLOR_V2.GRAY_95,
   '--multiple-file-icon-stroke': COLOR_V2.GRAY_60,
+
+  // File Unavailable Icon
+  '--unavailable-file-icon-bg': COLOR_V2.GRAY_95,
+  '--unavailable-file-icon-stroke': COLOR_V2.GRAY_60,
 });
 
 const accentColors: () => CSSObject = () => ({
