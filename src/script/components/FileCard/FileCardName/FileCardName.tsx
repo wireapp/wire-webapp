@@ -19,7 +19,7 @@
 
 import {CSSProperties} from 'react';
 
-import {textStyles} from './FileCardName.styles';
+import {primaryStyles, secondaryStyles, textStyles} from './FileCardName.styles';
 
 import {useFileCardContext} from '../common/FileCardContext/FileCardContext';
 
@@ -29,14 +29,15 @@ interface FileCardNameProps {
    * @default 1
    */
   truncateAfterLines?: number;
+  variant?: 'primary' | 'secondary';
 }
 
-export const FileCardName = ({truncateAfterLines = 1}: FileCardNameProps) => {
+export const FileCardName = ({truncateAfterLines = 1, variant = 'primary'}: FileCardNameProps) => {
   const {name} = useFileCardContext();
 
   return (
     <p
-      css={textStyles}
+      css={[textStyles, variant === 'primary' ? primaryStyles : secondaryStyles]}
       style={
         {
           '--truncate-after-lines': truncateAfterLines,
