@@ -56,7 +56,7 @@ export const useGetAllCellsFiles = ({cellsRepository, conversationQualifiedId}: 
       }
 
       const transformedFiles = transformNodesToCellsFiles(result.Nodes);
-      setFiles(transformedFiles);
+      setFiles({conversationId: id, files: transformedFiles});
       setStatus('success');
     } catch (error) {
       setError(error instanceof Error ? error : new Error('Failed to fetch files', {cause: error}));
