@@ -19,15 +19,16 @@
 
 import {ReactNode} from 'react';
 
-import {AlertIcon} from '@wireapp/react-ui-kit';
+import {UnavailableFileIcon} from '@wireapp/react-ui-kit';
+
+import {t} from 'Util/LocalizerUtil';
 
 import {
-  alertIconStyles,
-  errorLineStyles,
-  errorLineWrapperStyles,
-  iconWrapperStyles,
+  errorIconStyles,
+  errorTextStyles,
   loadingIconStyles,
   loadingWrapperStyles,
+  wrapperErrorStyles,
   wrapperStyles,
 } from './MediaFilePreviewCard.styles';
 
@@ -40,16 +41,12 @@ interface MediaFilePreviewCardProps {
 
 export const MediaFilePreviewCard = ({label, isLoading, isError, children}: MediaFilePreviewCardProps) => {
   return (
-    <article css={wrapperStyles} aria-label={label}>
+    <article css={isError ? wrapperErrorStyles : wrapperStyles} aria-label={label}>
       {children}
       {isError && (
         <>
-          <div css={iconWrapperStyles}>
-            <AlertIcon css={alertIconStyles} width={14} height={14} />
-          </div>
-          <div css={errorLineWrapperStyles}>
-            <div css={errorLineStyles} />
-          </div>
+          <UnavailableFileIcon css={errorIconStyles} width={14} height={14} />
+          <p css={errorTextStyles}>{t('cellsUnavailableFile')}</p>
         </>
       )}
       {isLoading && (

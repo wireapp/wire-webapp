@@ -42,7 +42,7 @@ export const VideoAssetCard = ({src, metadata, isLoading, isError}: VideoAssetCa
       isLoading={isLoading}
       isError={isError}
     >
-      {!isLoading && (
+      {!isLoading && !isError && (
         <>
           <video src={src} preload="metadata" css={videoStyles} />
           <div css={iconWrapperStyles}>

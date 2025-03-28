@@ -69,7 +69,7 @@ export const ImageAssetCard = ({src, metadata, size, isLoading, isError}: ImageA
       isLoading={isLoading}
       isError={isError}
     >
-      {!isLoading && src && <img src={src} alt="" css={imageStyles} />}
+      {!isLoading && !isError && src && <img src={src} alt="" css={imageStyles} />}
     </MediaFilePreviewCard>
   );
 };

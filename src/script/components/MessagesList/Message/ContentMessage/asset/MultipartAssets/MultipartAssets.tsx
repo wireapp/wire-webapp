@@ -73,7 +73,7 @@ const MultipartAsset = ({
   const isImage = contentType.startsWith('image');
   const isVideo = contentType.startsWith('video');
 
-  const {src, status, refetch} = useGetMultipartAssetPreview({
+  const {src, status} = useGetMultipartAssetPreview({
     uuid,
     cellsRepository,
     isEnabled: hasBeenInView,
@@ -107,7 +107,7 @@ const MultipartAsset = ({
 
   return (
     <li ref={elementRef} css={largeCardStyles}>
-      <FileAssetCard extension={extension} name={name} size={size} />
+      <FileAssetCard extension={extension} name={name} size={size} isLoading={isLoading} isError={isError} />
     </li>
   );
 };
