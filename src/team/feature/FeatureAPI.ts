@@ -34,6 +34,7 @@ import {
   FeatureMLSMigration,
   FeatureDownloadPath,
   FeatureDomainRegistration,
+  FeatureChannels,
 } from './Feature';
 import {InvalidAppLockTimeoutError} from './FeatureError';
 import {FeatureList} from './FeatureList';
@@ -53,6 +54,7 @@ export class FeatureAPI {
     DIGITAL_SIGNATURES: 'digitalSignatures',
     DOMAIN_REGISTRATION: 'domainRegistration',
     DL_PATH: 'enforceFileDownloadLocation',
+    CHANNELS: 'channels',
     CONVERSATION_GUEST_LINKS: 'conversationGuestLinks',
     FEATURE_CONFIGS: '/feature-configs',
     FEATURES: 'features',
@@ -406,6 +408,17 @@ export class FeatureAPI {
     };
 
     const response = await this.client.sendJSON<FeatureDownloadPath>(config);
+    return response.data;
+  }
+
+  public async putChannelsFeature(teamId: string, channelFeature: Partial<FeatureChannels>): Promise<FeatureChannels> {
+    const config: AxiosRequestConfig = {
+      data: channelFeature,
+      method: 'put',
+      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.CHANNELS}`,
+    };
+
+    const response = await this.client.sendJSON<FeatureChannels>(config);
     return response.data;
   }
 }
