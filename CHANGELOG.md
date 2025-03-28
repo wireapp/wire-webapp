@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.34.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.33.0...@wireapp/api-client@27.34.0) (2025-03-28)
+
+### Features
+
+* add API wrapper for updating channels feature config [WPB-16603] ([#6998](https://github.com/wireapp/wire-web-packages/issues/6998)) ([76ff145](https://github.com/wireapp/wire-web-packages/commit/76ff145f5f4fd1d503a3b94a6bb7d7d65623109a))
+
 # [27.33.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.32.0...@wireapp/api-client@27.33.0) (2025-03-26)
 
 ### Features
