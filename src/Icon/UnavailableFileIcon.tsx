@@ -20,7 +20,7 @@
 import {SVGIcon, SVGIconProps} from './SVGIcon';
 
 export const UnavailableFileIcon = (props: SVGIconProps) => (
-  <SVGIcon realWidth={13} realHeight={16} {...props}>
+  <SVGIcon realWidth={13} realHeight={16} {...props} fill="none">
     <path
       d="M0.5 2.5C0.5 1.39543 1.39543 0.5 2.5 0.5H10.5C11.6046 0.5 12.5 1.39543 12.5 2.5V11.5063C12.5 12.1626 12.2419 12.7926 11.7815 13.2603L10.3108 14.754C9.84094 15.2312 9.19916 15.5 8.52938 15.5H2.5C1.39543 15.5 0.5 14.6046 0.5 13.5V2.5Z"
       fill="var(--unavailable-file-icon-bg)"
