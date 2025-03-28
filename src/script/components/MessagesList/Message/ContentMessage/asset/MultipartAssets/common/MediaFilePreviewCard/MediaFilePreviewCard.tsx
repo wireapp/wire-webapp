@@ -31,17 +31,14 @@ import {
   wrapperStyles,
 } from './MediaFilePreviewCard.styles';
 
-import {FilePreviewErrorMoreButton} from '../FilePreviewErrorMoreButton/FilePreviewErrorMoreButton';
-
 interface MediaFilePreviewCardProps {
   label: string;
-  onRetry: () => void;
   isLoading: boolean;
   isError: boolean;
   children: ReactNode;
 }
 
-export const MediaFilePreviewCard = ({label, onRetry, isLoading, isError, children}: MediaFilePreviewCardProps) => {
+export const MediaFilePreviewCard = ({label, isLoading, isError, children}: MediaFilePreviewCardProps) => {
   return (
     <article css={wrapperStyles} aria-label={label}>
       {children}
@@ -50,7 +47,6 @@ export const MediaFilePreviewCard = ({label, onRetry, isLoading, isError, childr
           <div css={iconWrapperStyles}>
             <AlertIcon css={alertIconStyles} width={14} height={14} />
           </div>
-          <FilePreviewErrorMoreButton onRetry={onRetry} />
           <div css={errorLineWrapperStyles}>
             <div css={errorLineStyles} />
           </div>

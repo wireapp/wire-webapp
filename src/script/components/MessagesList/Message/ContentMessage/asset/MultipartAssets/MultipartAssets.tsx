@@ -60,6 +60,9 @@ const MultipartAsset = ({
   contentType,
   cellsRepository,
   assetsCount,
+  image: imageMetadata,
+  video: videoMetadata,
+  audio: audioMetadata,
 }: MultipartAssetProps) => {
   const name = trimFileExtension(initialName!);
   const extension = getFileExtension(initialName!);
@@ -86,7 +89,7 @@ const MultipartAsset = ({
         <ImageAssetCard
           src={src}
           size={assetsCount === 1 ? 'large' : 'small'}
-          onRetry={refetch}
+          metadata={imageMetadata}
           isLoading={isLoading}
           isError={isError}
         />
@@ -97,7 +100,7 @@ const MultipartAsset = ({
   if (isVideo) {
     return (
       <li ref={elementRef} css={smallCardStyles}>
-        <VideoAssetCard src={src} onRetry={refetch} isLoading={isLoading} isError={isError} />
+        <VideoAssetCard src={src} metadata={videoMetadata} isLoading={isLoading} isError={isError} />
       </li>
     );
   }
