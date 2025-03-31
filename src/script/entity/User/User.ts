@@ -17,13 +17,13 @@
  *
  */
 
+import {Availability} from '@pydio/protocol-messaging';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
-import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {t} from 'Util/LocalizerUtil';
@@ -104,7 +104,7 @@ export class User {
   public readonly isBlockedLegalHold: ko.PureComputed<boolean>;
   public readonly supportedProtocols: ko.Observable<null | ConversationProtocol[]>;
 
-  static get ACCENT_COLOR() {
+  public static get ACCENT_COLOR() {
     return {
       [ACCENT_ID.BLUE]: 'var(--blue-500)',
       [ACCENT_ID.GREEN]: 'var(--green-500)',

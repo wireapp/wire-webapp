@@ -51,3 +51,11 @@ export const CSS_ICON: (code: string, iconSize?: string | number) => CSSObject =
   speak: 'none',
   textTransform: 'none',
 });
+
+export const CSS_VISUALLY_HIDDEN: CSSObject = {
+  position: 'absolute',
+  left: '-10000px',
+  overflow: 'hidden',
+  width: '1px',
+  height: '1px',
+};
