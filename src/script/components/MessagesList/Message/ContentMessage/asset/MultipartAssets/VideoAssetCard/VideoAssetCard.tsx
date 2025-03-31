@@ -17,8 +17,6 @@
  *
  */
 
-import {ICellAsset} from '@pydio/protocol-messaging';
-
 import {t} from 'Util/LocalizerUtil';
 
 import {videoStyles, iconWrapperStyles} from './VideoAssetCard.styles';
@@ -28,14 +26,11 @@ import {MediaFilePreviewCard} from '../common/MediaFilePreviewCard/MediaFilePrev
 
 interface VideoAssetCardProps {
   src?: string;
-  metadata: ICellAsset['video'];
   isLoading: boolean;
   isError: boolean;
 }
 
-export const VideoAssetCard = ({src, metadata, isLoading, isError}: VideoAssetCardProps) => {
-  console.log('VideoAssetCard metadata', metadata);
-
+export const VideoAssetCard = ({src, isLoading, isError}: VideoAssetCardProps) => {
   return (
     <MediaFilePreviewCard
       label={src ? t('conversationFileVideoPreviewLabel', {src}) : 'Loading...'}

@@ -30,9 +30,7 @@ import {t} from 'Util/LocalizerUtil';
  * @param callback - function to be called if file sharing is enabled
  */
 
-export const checkFileSharingPermission = <T extends (...args: any[]) => void | Promise<void>>(
-  callback: T,
-): T | (() => void) => {
+export const checkFileSharingPermission = <T extends (...args: any[]) => void>(callback: T): T | (() => void) => {
   const teamState = container.resolve(TeamState);
 
   if (teamState.isFileSharingSendingEnabled()) {

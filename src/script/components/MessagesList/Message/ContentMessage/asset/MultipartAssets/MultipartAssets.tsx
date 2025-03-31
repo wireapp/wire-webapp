@@ -26,7 +26,7 @@ import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 
 import {FileAssetCard} from './FileAssetCard/FileAssetCard';
 import {ImageAssetCard} from './ImageAssetCard/ImageAssetCard';
-import {largeCardStyles, listSingleItemStyles, listStyles, smallCardStyles} from './MultipartAssets.styles';
+import {largeCardStyles, listStyles, smallCardStyles} from './MultipartAssets.styles';
 import {useGetMultipartAssetPreview} from './useGetMultipartAssetPreview/useGetMultipartAssetPreview';
 import {VideoAssetCard} from './VideoAssetCard/VideoAssetCard';
 
@@ -40,7 +40,7 @@ export const MultipartAssets = ({
   cellsRepository = container.resolve(CellsRepository),
 }: MultipartAssetsProps) => {
   return (
-    <ul css={assets.length === 1 ? listSingleItemStyles : listStyles}>
+    <ul css={listStyles}>
       {assets.map(asset => (
         <MultipartAsset key={asset.uuid} cellsRepository={cellsRepository} assetsCount={assets.length} {...asset} />
       ))}
@@ -60,9 +60,6 @@ const MultipartAsset = ({
   contentType,
   cellsRepository,
   assetsCount,
-  image: imageMetadata,
-  video: videoMetadata,
-  audio: audioMetadata,
 }: MultipartAssetProps) => {
   const name = trimFileExtension(initialName!);
   const extension = getFileExtension(initialName!);
@@ -86,13 +83,7 @@ const MultipartAsset = ({
   if (isImage) {
     return (
       <li ref={elementRef} css={smallCardStyles}>
-        <ImageAssetCard
-          src={src}
-          size={assetsCount === 1 ? 'large' : 'small'}
-          metadata={imageMetadata}
-          isLoading={isLoading}
-          isError={isError}
-        />
+        <ImageAssetCard src={src} isLoading={isLoading} isError={isError} />
       </li>
     );
   }
@@ -100,7 +91,7 @@ const MultipartAsset = ({
   if (isVideo) {
     return (
       <li ref={elementRef} css={smallCardStyles}>
-        <VideoAssetCard src={src} metadata={videoMetadata} isLoading={isLoading} isError={isError} />
+        <VideoAssetCard src={src} isLoading={isLoading} isError={isError} />
       </li>
     );
   }

@@ -19,17 +19,6 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const imageLargeWrapperStyle: CSSObject = {
-  maxWidth: '500px',
-  width: '100%',
-};
-
-export const imageLargeStyles: CSSObject = {
-  width: '100%',
-  height: '100%',
-  objectFit: 'contain',
-};
-
 export const imageStyles: CSSObject = {
   width: '100%',
   height: '100%',
