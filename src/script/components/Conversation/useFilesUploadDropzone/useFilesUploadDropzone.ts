@@ -26,6 +26,7 @@ import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {createUuid} from 'Util/uuid';
 
+import {buildCellFileMetadata} from './buildCellFileMetadata/buildCellFileMetadata';
 import {validateFiles, ValidationResult} from './fileValidation/fileValidation';
 import {showFileDropzoneErrorModal} from './showFileDropzoneErrorModal/showFileDropzoneErrorModal';
 
@@ -54,6 +55,48 @@ export const useFilesUploadDropzone = ({
 
   const MAX_SIZE = isTeam ? CONFIG.MAXIMUM_ASSET_FILE_SIZE_TEAM : CONFIG.MAXIMUM_ASSET_FILE_SIZE_PERSONAL;
 
+  const {getRootProps, getInputProps, open, isDragAccept} = useDropzone({
+    maxSize: MAX_SIZE,
+    noClick: true,
+    noKeyboard: true,
+    onDrop: checkFileSharingPermission(async (acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
+      const newFiles = [...acceptedFiles, ...rejectedFiles.map(file => file.file)];
+
+      const validationResult = validateFiles({
+        newFiles,
+        currentFiles: files,
+        maxSize: MAX_SIZE,
+        maxFiles: MAX_FILES,
+      });
+
+      if (!validationResult.isValid) {
+        const {error, invalidFiles} = validationResult as Extract<ValidationResult, {isValid: false}>;
+        showFileDropzoneErrorModal({
+          title: error.title,
+          message: error.message,
+          invalidFiles,
+        });
+        return;
+      }
+
+      const transformedAcceptedFiles = transformAcceptedFiles(acceptedFiles);
+
+      addFiles({conversationId: conversation.id, files: transformedAcceptedFiles});
+
+      await attatchMetadataToFiles(transformedAcceptedFiles);
+
+      await uploadFiles(transformedAcceptedFiles);
+    }),
+    onError: (error: Error) => {
+      logger.error('Dropping files failed', error);
+      showFileDropzoneErrorModal({
+        title: t('conversationFileUploadFailedHeading'),
+        message: t('conversationFileUploadFailedMessage'),
+        invalidFiles: [],
+      });
+    },
+  });
+
   const uploadFile = async (file: FileWithPreview) => {
     // Temporary solution to handle the local development
     // TODO: remove this once we have a proper way to handle the domain per env
@@ -80,55 +123,43 @@ export const useFilesUploadDropzone = ({
     }
   };
 
-  const {getRootProps, getInputProps, open, isDragAccept} = useDropzone({
-    maxSize: MAX_SIZE,
-    noClick: true,
-    noKeyboard: true,
-    onDrop: checkFileSharingPermission((acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
-      const newFiles = [...acceptedFiles, ...rejectedFiles.map(file => file.file)];
+  const uploadFiles = async (files: FileWithPreview[]) => {
+    await Promise.all(
+      files.map(async file => {
+        await uploadFile(file);
+      }),
+    );
+  };
 
-      const validationResult = validateFiles({
-        newFiles,
-        currentFiles: files,
-        maxSize: MAX_SIZE,
-        maxFiles: MAX_FILES,
-      });
+  const attatchMetadataToFiles = async (files: FileWithPreview[]) => {
+    await Promise.all(
+      files.map(async file => {
+        const metadata = await buildCellFileMetadata(file);
 
-      if (!validationResult.isValid) {
-        const {error, invalidFiles} = validationResult as Extract<ValidationResult, {isValid: false}>;
-        showFileDropzoneErrorModal({
-          title: error.title,
-          message: error.message,
-          invalidFiles,
+        if (!metadata) {
+          return;
+        }
+
+        updateFile({
+          conversationId: conversation.id,
+          fileId: file.id,
+          data: {...metadata},
         });
-        return;
-      }
+      }),
+    );
+  };
 
-      const acceptedFilesWithPreview = acceptedFiles.map(file => {
-        return Object.assign(file, {
-          id: createUuid(),
-          preview: URL.createObjectURL(file),
-          remoteUuid: '',
-          remoteVersionId: '',
-          uploadStatus: 'uploading' as const,
-        });
+  const transformAcceptedFiles = (files: File[]) => {
+    return files.map(file => {
+      return Object.assign(file, {
+        id: createUuid(),
+        preview: URL.createObjectURL(file),
+        remoteUuid: '',
+        remoteVersionId: '',
+        uploadStatus: 'uploading' as const,
       });
-
-      addFiles({conversationId: conversation.id, files: acceptedFilesWithPreview});
-
-      acceptedFilesWithPreview.forEach(file => {
-        void uploadFile(file);
-      });
-    }),
-    onError: (error: Error) => {
-      logger.error('Dropping files failed', error);
-      showFileDropzoneErrorModal({
-        title: t('conversationFileUploadFailedHeading'),
-        message: t('conversationFileUploadFailedMessage'),
-        invalidFiles: [],
-      });
-    },
-  });
+    });
+  };
 
   return {getRootProps, getInputProps, open, isDragAccept};
 };

@@ -57,7 +57,7 @@ export const buildMetadata = (file: File | Blob): Promise<Metadata | void> => {
   return Promise.resolve();
 };
 
-const buildMetadataAudio = async (audioFile: File | Blob): Promise<AudioMetadata> => {
+export const buildMetadataAudio = async (audioFile: File | Blob): Promise<AudioMetadata> => {
   const buffer = await loadFileBuffer(audioFile);
   const audioContext = new AudioContext();
   audioContext.close();
@@ -67,7 +67,7 @@ const buildMetadataAudio = async (audioFile: File | Blob): Promise<AudioMetadata
   return {durationInMillis, normalizedLoudness};
 };
 
-const buildMetadataImage = (imageFile: File | Blob): Promise<ImageMetadata> => {
+export const buildMetadataImage = (imageFile: File | Blob): Promise<ImageMetadata> => {
   return new Promise((resolve, reject) => {
     const url = window.URL.createObjectURL(imageFile);
     const image = new Image();
@@ -88,7 +88,7 @@ const buildMetadataImage = (imageFile: File | Blob): Promise<ImageMetadata> => {
   });
 };
 
-const buildMetadataVideo = (videoFile: File | Blob): Promise<VideoMetadata> => {
+export const buildMetadataVideo = (videoFile: File | Blob): Promise<VideoMetadata> => {
   return new Promise((resolve, reject) => {
     const url = window.URL.createObjectURL(videoFile);
     const video = document.createElement('video');
