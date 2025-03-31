@@ -17,23 +17,63 @@
  *
  */
 
-import {container} from 'tsyringe';
+import {container, singleton} from 'tsyringe';
 
 import {createUuid} from 'Util/uuid';
 
 import {APIClient} from '../service/APIClientSingleton';
 
+interface CellsConfig {
+  pydio: {
+    apiKey: string;
+    segment: string;
+    url: string;
+  };
+  s3: {
+    apiKey: string;
+    bucket: string;
+    endpoint: string;
+    region: string;
+  };
+}
+
+const DEFAULT_MAX_FILES_LIMIT = 100;
+
+@singleton()
 export class CellsRepository {
   private readonly basePath = 'wire-cells-web';
+  private isInitialized = false;
+
   constructor(private readonly apiClient = container.resolve(APIClient)) {}
 
-  async uploadFile(file: File): Promise<{uuid: string; versionId: string}> {
-    const path = `${this.basePath}/${encodeURIComponent(file.name)}`;
+  initialize(config: CellsConfig) {
+    if (this.isInitialized) {
+      return;
+    }
 
-    const uuid = createUuid();
+    this.apiClient.api.cells.initialize({cellsConfig: config});
+    this.isInitialized = true;
+  }
+
+  async uploadFile({
+    uuid,
+    file,
+    path,
+  }: {
+    uuid: string;
+    file: File;
+    path: string;
+  }): Promise<{uuid: string; versionId: string}> {
+    const filePath = `${path || this.basePath}/${encodeURIComponent(file.name)}`;
+
     const versionId = createUuid();
 
-    await this.apiClient.api.cells.uploadFileDraft({path, file, uuid, versionId});
+    await this.apiClient.api.cells.uploadFileDraft({
+      path: filePath,
+      file,
+      uuid,
+      versionId,
+    });
 
     return {
       uuid,
@@ -43,5 +83,36 @@ export class CellsRepository {
 
   async deleteFileDraft({uuid, versionId}: {uuid: string; versionId: string}) {
     return this.apiClient.api.cells.deleteFileDraft({uuid, versionId});
+  }
+
+  async deleteFile({uuid}: {uuid: string}) {
+    return this.apiClient.api.cells.deleteFile({uuid});
+  }
+
+  async getAllFiles({path, limit = DEFAULT_MAX_FILES_LIMIT}: {path: string; limit?: number}) {
+    return this.apiClient.api.cells.getAllFiles({path: path || this.basePath, limit});
+  }
+
+  async createPublicLink({uuid, label}: {uuid: string; label?: string}) {
+    return this.apiClient.api.cells.createFilePublicLink({
+      uuid,
+      label,
+    });
+  }
+
+  async getPublicLink({uuid}: {uuid: string}) {
+    return this.apiClient.api.cells.getFilePublicLink({uuid});
+  }
+
+  async deletePublicLink({uuid}: {uuid: string}) {
+    return this.apiClient.api.cells.deleteFilePublicLink({uuid});
+  }
+
+  async searchFiles({query, limit = DEFAULT_MAX_FILES_LIMIT}: {query: string; limit?: number}) {
+    return this.apiClient.api.cells.searchFiles({phrase: query, limit});
+  }
+
+  async promoteFileDraft({uuid, versionId}: {uuid: string; versionId: string}) {
+    return this.apiClient.api.cells.promoteFileDraft({uuid, versionId});
   }
 }

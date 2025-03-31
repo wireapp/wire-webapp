@@ -30,6 +30,7 @@ import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import {useFileUploadState} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
 import {EmojiPicker} from 'Components/EmojiPicker/EmojiPicker';
+import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
 import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
 import {EventName} from 'src/script/tracking/EventName';
@@ -74,6 +75,7 @@ const CONFIG = {
 interface InputBarProps {
   readonly conversation: Conversation;
   readonly conversationRepository: ConversationRepository;
+  readonly cellsRepository: CellsRepository;
   readonly eventRepository: EventRepository;
   readonly messageRepository: MessageRepository;
   readonly openGiphy: (inputValue: string) => void;
@@ -91,6 +93,7 @@ interface InputBarProps {
 export const InputBar = ({
   conversation,
   conversationRepository,
+  cellsRepository,
   eventRepository,
   messageRepository,
   openGiphy,
@@ -122,7 +125,8 @@ export const InputBar = ({
     'isIncomingRequest',
   ]);
 
-  const {files} = useFileUploadState();
+  const {getFiles} = useFileUploadState();
+  const files = getFiles({conversationId: conversation.id});
 
   const wrapperRef = useRef<HTMLDivElement>(null);
 
@@ -205,10 +209,13 @@ export const InputBar = ({
     editMessage,
     draftState,
     generateQuote,
+    isSending,
+    isSendingDisabled,
   } = useMessageHandling({
     messageContent,
     conversation,
     conversationRepository,
+    cellsRepository,
     storageRepository,
     eventRepository,
     messageRepository,
@@ -232,6 +239,14 @@ export const InputBar = ({
     conversation,
     cancelMesssageEditing,
   });
+
+  const handleSendMessage = useCallback(() => {
+    if (isSendingDisabled) {
+      return;
+    }
+
+    void sendMessage();
+  }, [isSendingDisabled, sendMessage]);
 
   const showAvatar = !!messageContent.text.length;
 
@@ -287,7 +302,7 @@ export const InputBar = ({
                   onShiftTab={onShiftTab}
                   onBlur={() => isTypingRef.current && conversationRepository.sendTypingStop(conversation)}
                   onUpdate={setMessageContent}
-                  onSend={sendMessage}
+                  onSend={handleSendMessage}
                   getMentionCandidates={getMentionCandidates}
                   saveDraftState={draftState.save}
                   loadDraftState={draftState.load}
@@ -299,6 +314,7 @@ export const InputBar = ({
                     pingDisabled={ping.isPingDisabled}
                     messageContent={messageContent}
                     isEditing={isEditing}
+                    isSendingDisabled={isSendingDisabled}
                     showMarkdownPreview={showMarkdownPreview}
                     showGiphyButton={giphy.showGiphyButton}
                     formatToolbar={formatToolbar}
@@ -308,7 +324,8 @@ export const InputBar = ({
                     onGifClick={giphy.handleGifClick}
                     onSelectFiles={uploadFiles}
                     onSelectImages={uploadImages}
-                    onSend={sendMessage}
+                    onSend={handleSendMessage}
+                    isSending={isSending}
                   />
                 </InputBarEditor>
               )}
@@ -323,7 +340,7 @@ export const InputBar = ({
             />
           )}
 
-          {!!files.length && <FilePreviews files={files} />}
+          {!!files.length && <FilePreviews files={files} conversationQualifiedId={conversation.qualifiedId} />}
         </div>
       </InputBarContainer>
       {emojiPicker.open ? (

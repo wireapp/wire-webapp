@@ -17,6 +17,7 @@
  *
  */
 
+import type {Asset, LegalHoldStatus} from '@pydio/protocol-messaging';
 import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data';
 import {
   CONVERSATION_EVENT,
@@ -25,11 +26,11 @@ import {
 } from '@wireapp/api-client/lib/event';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {AddUsersFailure} from '@wireapp/core/lib/conversation';
+import {MultiPartContent} from '@wireapp/core/lib/conversation/content';
 import {ReactionType} from '@wireapp/core/lib/conversation/ReactionType';
 import {DecryptionError} from '@wireapp/core/lib/errors/DecryptionError';
 
 import type {REASON as AVS_REASON} from '@wireapp/avs';
-import type {Asset, LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {createUuid} from 'Util/uuid';
 
@@ -156,6 +157,13 @@ export type MessageAddEvent = ConversationEvent<
   status: StatusType;
   version?: number;
 };
+export type MultipartMessageAddEvent = ConversationEvent<
+  CONVERSATION.MULTIPART_MESSAGE_ADD,
+  {
+    attachments: MultiPartContent['attachments'];
+    text: MultiPartContent['text'] & {mentions?: string[]; previews?: string[]};
+  }
+> & {};
 export type MissedEvent = BaseEvent & {id: string; type: CONVERSATION.MISSED_MESSAGES};
 export type JoinedAfterMLSMigrationFinalisationEvent = BaseEvent & {
   type: CONVERSATION.JOINED_AFTER_MLS_MIGRATION;
@@ -266,7 +274,8 @@ export type ClientConversationEvent =
   | MLSConversationRecoveredEvent
   | LocationEvent
   | VoiceChannelActivateEvent
-  | VerificationEvent;
+  | VerificationEvent
+  | MultipartMessageAddEvent;
 
 function buildQualifiedId(conversation: QualifiedId | string) {
   const qualifiedId = typeof conversation === 'string' ? {domain: '', id: conversation} : conversation;

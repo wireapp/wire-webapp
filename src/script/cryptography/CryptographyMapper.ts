@@ -18,14 +18,6 @@
  */
 
 import {
-  ConversationOtrMessageAddEvent,
-  ConversationMLSMessageAddEvent,
-  CONVERSATION_EVENT,
-} from '@wireapp/api-client/lib/event';
-import {GenericMessageType} from '@wireapp/core/lib/conversation';
-import {container} from 'tsyringe';
-
-import {
   Asset,
   Availability,
   ButtonActionConfirmation,
@@ -51,7 +43,15 @@ import {
   Text,
   InCallEmoji,
   InCallHandRaise,
-} from '@wireapp/protocol-messaging';
+} from '@pydio/protocol-messaging';
+import {
+  ConversationOtrMessageAddEvent,
+  ConversationMLSMessageAddEvent,
+  CONVERSATION_EVENT,
+} from '@wireapp/api-client/lib/event';
+import {GenericMessageType} from '@wireapp/core/lib/conversation';
+import {MultiPartContent} from '@wireapp/core/lib/conversation/content';
+import {container} from 'tsyringe';
 
 import {CALL_MESSAGE_TYPE} from 'src/script/calling/enum/CallMessageType';
 import {getLogger, Logger} from 'Util/Logger';
@@ -248,6 +248,20 @@ export class CryptographyMapper {
 
       case GenericMessageType.DATA_TRANSFER: {
         specificContent = this._mapDataTransfer(genericMessage.dataTransfer as DataTransfer);
+        break;
+      }
+
+      case GenericMessageType.MULTIPART: {
+        if (!genericMessage.multipart) {
+          const logMessage = `Skipped event '${genericMessage.messageId}' of type '${genericMessage.content}', no data found`;
+          this.logger.debug(logMessage, {event, generic_message: genericMessage});
+          return undefined;
+        }
+        specificContent = this._mapMultipart(
+          genericMessage.multipart?.text as Text,
+          genericMessage.multipart?.attachments,
+        );
+
         break;
       }
 
@@ -578,6 +592,17 @@ export class CryptographyMapper {
         type: CALL_MESSAGE_TYPE.HAND_RAISED,
       },
       type: ClientEvent.CALL.IN_CALL_HAND_RAISE,
+    };
+  }
+
+  private _mapMultipart(text: Text, attachments: MultiPartContent['attachments']) {
+    const mappedText = this._mapText(text);
+    return {
+      data: {
+        text: mappedText.data,
+        attachments,
+      },
+      type: ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD,
     };
   }
 

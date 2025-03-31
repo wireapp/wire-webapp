@@ -62,6 +62,17 @@ export async function initializeDataDog(config: Configuration, user: {id?: strin
 
   const {datadogRum} = await import('@datadog/browser-rum');
 
+  const allowedAVSLogs = (message: string): boolean => {
+    return (
+      message.includes('ccall_hash_user') ||
+      message.includes('c3_message_recv') ||
+      message.includes('c3_message_send') ||
+      message.includes('dce_message_recv') ||
+      message.includes('dce_message_send') ||
+      message.includes('WAPI wcall: create userid')
+    );
+  };
+
   datadogRum.init({
     ...commonConfig,
     applicationId,
@@ -84,7 +95,7 @@ export async function initializeDataDog(config: Configuration, user: {id?: strin
     forwardConsoleLogs: ['info', 'warn', 'error'], // For now those logs should be fine, we need to investigate if we need another logs in the future
     sessionSampleRate: 100,
     beforeSend: log => {
-      if (log.message.match(/@wireapp\/webapp\/avs/)) {
+      if (log.message.match(/@wireapp\/webapp\/avs/) && !allowedAVSLogs(log.message)) {
         // We filter avs logs as they are very verbose
         return false;
       }

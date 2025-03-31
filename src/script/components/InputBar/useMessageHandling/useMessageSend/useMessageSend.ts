@@ -17,13 +17,16 @@
  *
  */
 
-import {useCallback} from 'react';
+import {useCallback, useMemo} from 'react';
 
+import {IAttachment} from '@pydio/protocol-messaging';
 import {LexicalEditor} from 'lexical';
 
+import {useFileUploadState} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
 import {MessageContent} from 'Components/InputBar/common/messageContent/messageContent';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
+import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {Config} from 'src/script/Config';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
@@ -37,12 +40,15 @@ import {MessageHasher} from 'src/script/message/MessageHasher';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
 import {t} from 'Util/LocalizerUtil';
 
+import {useSendFiles} from './useSendFiles/useSendFiles';
+
 interface UseMessageSendProps {
   replyMessageEntity: ContentMessage | null;
   eventRepository: EventRepository;
   messageRepository: MessageRepository;
   conversation: Conversation;
   conversationRepository: ConversationRepository;
+  cellsRepository: CellsRepository;
   draftState: {
     reset: () => void;
   };
@@ -62,6 +68,7 @@ export const useMessageSend = ({
   messageRepository,
   conversation,
   conversationRepository,
+  cellsRepository,
   draftState,
   cancelMessageEditing,
   cancelMessageReply,
@@ -72,6 +79,17 @@ export const useMessageSend = ({
   sendPastedFile,
   messageContent,
 }: UseMessageSendProps) => {
+  const {getFiles, clearAll} = useFileUploadState();
+  const files = getFiles({conversationId: conversation.id});
+
+  const {
+    sendFiles,
+    clearFiles,
+    isLoading: filesSendingLoading,
+  } = useSendFiles({files, clearAllFiles: clearAll, cellsRepository, conversationId: conversation.id});
+
+  const cellsEnabled = Config.getConfig().FEATURE.ENABLE_CELLS;
+
   const generateQuote = useCallback(async (): Promise<OutgoingQuote | undefined> => {
     return !replyMessageEntity
       ? Promise.resolve(undefined)
@@ -120,21 +138,60 @@ export const useMessageSend = ({
     ],
   );
 
+  const getCellAssets = useCallback((): IAttachment[] => {
+    return files.map(file => {
+      return {
+        cellAsset: {
+          uuid: file.id,
+          contentType: file.type,
+          initialName: file.name,
+          initialSize: file.size,
+        },
+      };
+    });
+  }, [files]);
+
   const sendTextMessage = useCallback(
     (messageText: string, mentions: MentionEntity[]) => {
-      if (messageText.length) {
-        const mentionEntities = mentions.slice(0);
+      const isEmpty = messageText.length === 0;
 
-        void generateQuote().then(quoteEntity => {
-          void messageRepository.sendTextWithLinkPreview(conversation, messageText, mentionEntities, quoteEntity);
-          cancelMessageReply();
-        });
+      if (isEmpty && !cellsEnabled) {
+        return;
       }
+
+      const mentionEntities = mentions.slice(0);
+
+      void generateQuote().then(quoteEntity => {
+        void messageRepository.sendTextWithLinkPreview({
+          conversation,
+          textMessage: messageText,
+          mentions: mentionEntities,
+          quoteEntity,
+          attachments: getCellAssets(),
+        });
+        cancelMessageReply();
+      });
     },
-    [cancelMessageReply, conversation, generateQuote, messageRepository],
+    [cancelMessageReply, conversation, generateQuote, messageRepository, getCellAssets, cellsEnabled],
   );
 
-  const sendMessage = useCallback((): void => {
+  const isSendingDisabled = useMemo(() => {
+    const hasText = messageContent.text.length > 0;
+    const hasFiles = files.length > 0;
+    const hasSuccessfullyUploadedFiles = hasFiles && files.every(file => file.uploadStatus === 'success');
+
+    if (cellsEnabled) {
+      return hasFiles ? !hasSuccessfullyUploadedFiles : !hasText;
+    }
+
+    return !hasText;
+  }, [messageContent.text, files, cellsEnabled]);
+
+  const sendMessage = useCallback(async (): Promise<void> => {
+    if (isSendingDisabled) {
+      return;
+    }
+
     if (pastedFile) {
       return void sendPastedFile();
     }
@@ -159,9 +216,11 @@ export const useMessageSend = ({
     }
 
     if (editedMessage) {
-      void sendMessageEdit(messageText, mentions);
+      await sendMessageEdit(messageText, mentions);
     } else {
+      await sendFiles();
       sendTextMessage(messageText, mentions);
+      clearFiles();
     }
 
     editorRef.current?.focus();
@@ -176,6 +235,9 @@ export const useMessageSend = ({
     sendPastedFile,
     sendMessageEdit,
     sendTextMessage,
+    isSendingDisabled,
+    sendFiles,
+    clearFiles,
   ]);
 
   const handleSendMessage = useCallback(async () => {
@@ -187,7 +249,7 @@ export const useMessageSend = ({
         secondaryAction: {
           action: () => {
             conversation.mlsVerificationState(ConversationVerificationState.UNVERIFIED);
-            sendMessage();
+            void sendMessage();
           },
           text: t('conversation.E2EISendAnyway'),
         },
@@ -201,12 +263,16 @@ export const useMessageSend = ({
         },
       });
     } else {
-      sendMessage();
+      void sendMessage();
     }
   }, [conversation, conversationRepository, sendMessage]);
 
   return {
     sendMessage: handleSendMessage,
     generateQuote,
+    // Sending messages via messageRepository is synchronous, so we don't need to use a state to track the sending status
+    // Although, we need to track the sending status for the files, because it's an async operation
+    isSending: filesSendingLoading,
+    isSendingDisabled,
   };
 };

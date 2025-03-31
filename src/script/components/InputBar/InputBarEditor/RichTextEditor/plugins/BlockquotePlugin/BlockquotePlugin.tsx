@@ -128,6 +128,8 @@ const registerBlockquoteBackspaceCommand = (editor: LexicalEditor) => {
 
       editor.update(() => {
         lastChild.remove();
+        // in markdown rendering, a line directly after a blockquote will be considered inside it
+        // so we need to add a paragraph to escape the blockquote
         editor.dispatchCommand(INSERT_PARAGRAPH_COMMAND, undefined);
         editor.dispatchCommand(INSERT_PARAGRAPH_COMMAND, undefined);
       });

@@ -17,7 +17,7 @@
  *
  */
 
-import {Mention} from '@wireapp/protocol-messaging';
+import {Mention} from '@pydio/protocol-messaging';
 
 import {MentionEntity} from 'src/script/message/MentionEntity';
 import {base64ToArray} from 'Util/util';

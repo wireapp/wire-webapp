@@ -17,10 +17,6 @@
  *
  */
 
-import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
-import {GenericMessageType} from '@wireapp/core/lib/conversation';
-import {isObject} from 'underscore';
-
 import {
   Asset,
   Availability,
@@ -36,7 +32,10 @@ import {
   MessageHide,
   Reaction,
   Text,
-} from '@wireapp/protocol-messaging';
+} from '@pydio/protocol-messaging';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
+import {GenericMessageType} from '@wireapp/core/lib/conversation';
+import {isObject} from 'underscore';
 
 import {PROTO_MESSAGE_TYPE} from 'src/script/cryptography/ProtoMessageType';
 import {CryptographyError} from 'src/script/error/CryptographyError';

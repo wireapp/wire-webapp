@@ -56,8 +56,20 @@ export const LeftSidebar = ({listViewModel, selfUser, isActivatedAccount}: LeftS
   }, []);
 
   return (
-    <aside id="left-column" className={cx('left-column', {'left-column--light-theme': !isActivatedAccount})}>
-      {[ListState.CONVERSATIONS, ListState.START_UI, ListState.PREFERENCES, ListState.ARCHIVE].includes(listState) && (
+    <aside
+      id="left-column"
+      className={cx('left-column', {
+        'left-column--light-theme': !isActivatedAccount,
+        'left-column--shrinked': listState === ListState.CELLS,
+      })}
+    >
+      {[
+        ListState.CONVERSATIONS,
+        ListState.START_UI,
+        ListState.PREFERENCES,
+        ListState.ARCHIVE,
+        ListState.CELLS,
+      ].includes(listState) && (
         <Conversations
           selfUser={selfUser}
           listViewModel={listViewModel}

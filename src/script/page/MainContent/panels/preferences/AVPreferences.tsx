@@ -27,6 +27,7 @@ import {CameraPreferences} from './avPreferences/CameraPreferences';
 import {MicrophonePreferences} from './avPreferences/MicrophonePreferences';
 import {SaveCallLogs} from './avPreferences/SaveCallLogs';
 import {PreferencesPage} from './components/PreferencesPage';
+import {useCameraReloadOnCallEnd} from './useCameraReloadOnCallEnd';
 
 import type {CallingRepository} from '../../../../calling/CallingRepository';
 import {useInitializeMediaDevices} from '../../../../hooks/useInitializeMediaDevices';
@@ -44,6 +45,7 @@ const AVPreferences = ({
   propertiesRepository,
   callingRepository,
 }: AVPreferencesProps) => {
+  const {shouldReloadCamera} = useCameraReloadOnCallEnd(callingRepository);
   const deviceSupport = useKoSubscribableChildren(devicesHandler?.deviceSupport, [
     MediaDeviceType.AUDIO_INPUT,
     MediaDeviceType.AUDIO_OUTPUT,
@@ -68,6 +70,7 @@ const AVPreferences = ({
       {!isMediaDevicesAreInitialized && deviceSupport.audiooutput && <AudioOutPreferences {...{devicesHandler}} />}
       {!isMediaDevicesAreInitialized && deviceSupport.videoinput && (
         <CameraPreferences
+          key={`camera-${shouldReloadCamera}`} // Force remount when call ends
           {...{devicesHandler, streamHandler}}
           refreshStream={() => callingRepository.refreshVideoInput()}
           hasActiveCameraStream={callingRepository.hasActiveCameraStream()}

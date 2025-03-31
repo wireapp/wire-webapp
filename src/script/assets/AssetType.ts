@@ -23,4 +23,5 @@ export enum AssetType {
   IMAGE = 'Image',
   LOCATION = 'Location',
   TEXT = 'Text',
+  MULTIPART = 'Multipart',
 }
