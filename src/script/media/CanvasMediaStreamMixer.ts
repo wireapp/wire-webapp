@@ -17,9 +17,30 @@
  *
  */
 
-const WIDTH = 1920;
-const HEIGHT = 1080;
+// Canvas configuration
+const CANVAS_WIDTH = 1920;
+const CANVAS_HEIGHT = 1080;
+const FRAME_RATE = 30;
+
+// PiP configuration
 const PIP_VIDEO_ID = 'smallVideo';
+const PIP_WINDOW_WIDTH = 320;
+const PIP_WINDOW_HEIGHT = 180;
+
+// Video overlay configuration
+const CAMERA_OVERLAY_SCALE = 4; // divider for main canvas height
+const CAMERA_OVERLAY_PADDING = 20;
+
+// Update these constants
+const POSITION_THROTTLE = 100; // Increase throttle to 100ms
+const ANIMATION_FRAME_RATE = 1000 / 30; // Ensure consistent 30fps
+
+// Add new constant for position smoothing
+const POSITION_SMOOTHING = 0.5; // Value between 0 and 1 for smooth transitions
+
+// Add these constants
+const SHADOW_BLUR = 10;
+const SHADOW_COLOR = 'rgba(0,0,0,0.5)';
 
 export class CanvasMediaStreamMixer {
   private readonly canvas: HTMLCanvasElement;
@@ -31,61 +52,154 @@ export class CanvasMediaStreamMixer {
   private smallOffsetY = 0;
   private isPipActive = false;
 
+  // Add properties for smooth position tracking
+  private targetOffsetX = 0;
+  private targetOffsetY = 0;
+  private lastFrameTime = 0;
+
   constructor() {
     this.canvas = document.createElement('canvas');
-    this.canvas.width = WIDTH;
-    this.canvas.height = HEIGHT;
+    this.canvas.width = CANVAS_WIDTH;
+    this.canvas.height = CANVAS_HEIGHT;
     this.canvas.style.display = 'none';
     document.body.appendChild(this.canvas);
 
-    this.context = this.canvas.getContext('2d')!;
+    // Optimize canvas context for video mixing
+    this.context = this.canvas.getContext('2d', {
+      alpha: false,
+      desynchronized: true,
+      willReadFrequently: false,
+    })!;
+
+    // Enable high-quality image scaling
+    this.context.imageSmoothingEnabled = true;
+    this.context.imageSmoothingQuality = 'high';
   }
 
   async startMixing(screenShare: MediaStream, camera: MediaStream): Promise<MediaStream> {
-    this.screenVideo = document.createElement('video');
-    this.screenVideo.srcObject = screenShare;
-    this.screenVideo.muted = true;
-    await this.screenVideo.play();
+    try {
+      this.screenVideo = this.createVideoElement(screenShare, {
+        muted: true,
+        autoplay: true,
+      });
 
-    // Handle screen share track ending
-    screenShare.getVideoTracks().forEach(track => {
-      track.onended = () => {
-        this.releaseStreams();
-      };
-    });
+      // Handle screen share track ending
+      screenShare.getVideoTracks().forEach(track => {
+        track.onended = () => this.releaseStreams();
+      });
 
-    this.cameraVideo = document.createElement('video');
-    this.cameraVideo.srcObject = camera;
-    this.cameraVideo.muted = true;
-    this.cameraVideo.id = PIP_VIDEO_ID;
-    document.body.appendChild(this.cameraVideo);
-    await this.cameraVideo.play();
+      this.cameraVideo = this.createVideoElement(camera, {
+        muted: true,
+        autoplay: true,
+        id: PIP_VIDEO_ID,
+      });
+      document.body.appendChild(this.cameraVideo);
 
+      // Wait for both videos to be ready
+      await Promise.all([this.screenVideo.play(), this.cameraVideo.play()]);
+
+      this.startAnimation();
+      await this.togglePictureInPicture();
+
+      // Create and configure output stream
+      const outputStream = this.canvas.captureStream(FRAME_RATE);
+      const [videoTrack] = outputStream.getVideoTracks();
+
+      await videoTrack.applyConstraints({
+        width: {ideal: CANVAS_WIDTH},
+        height: {ideal: CANVAS_HEIGHT},
+        frameRate: {ideal: FRAME_RATE},
+      });
+
+      return outputStream;
+    } catch (error) {
+      this.releaseStreams();
+      throw error;
+    }
+  }
+
+  private createVideoElement(
+    stream: MediaStream,
+    options: {muted?: boolean; autoplay?: boolean; id?: string} = {},
+  ): HTMLVideoElement {
+    const video = document.createElement('video');
+    video.srcObject = stream;
+    video.muted = options.muted ?? false;
+    if (options.autoplay) {
+      video.playsInline = true;
+    }
+    if (options.id) {
+      video.id = options.id;
+    }
+    return video;
+  }
+
+  private startAnimation() {
     const mixFrames = () => {
-      if (this.screenVideo && this.cameraVideo) {
-        // Draw screen share
-        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.context.drawImage(this.screenVideo, 0, 0, this.canvas.width, this.canvas.height);
+      if (!this.screenVideo || !this.cameraVideo) {
+        return;
+      }
+
+      const now = performance.now();
+      if (now - this.lastFrameTime < ANIMATION_FRAME_RATE) {
+        this.animationFrame = requestAnimationFrame(mixFrames);
+        return;
+      }
+      this.lastFrameTime = now;
+
+      try {
+        // Smooth position transitions
+        if (this.isPipActive) {
+          this.smallOffsetX += (this.targetOffsetX - this.smallOffsetX) * POSITION_SMOOTHING;
+          this.smallOffsetY += (this.targetOffsetY - this.smallOffsetY) * POSITION_SMOOTHING;
+        }
+
+        // Clear and draw black background
+        this.context.fillStyle = '#000000';
+        this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+        // Draw screen share with double buffering
+        if (this.screenVideo.readyState >= this.screenVideo.HAVE_CURRENT_DATA) {
+          // Create temporary canvas for screen content
+          const tempCanvas = document.createElement('canvas');
+          tempCanvas.width = this.canvas.width;
+          tempCanvas.height = this.canvas.height;
+          const tempContext = tempCanvas.getContext('2d', {
+            alpha: false,
+            desynchronized: true,
+          });
+
+          if (tempContext) {
+            tempContext.drawImage(this.screenVideo, 0, 0, this.canvas.width, this.canvas.height);
+            this.context.drawImage(tempCanvas, 0, 0);
+          }
+        }
 
         // Draw camera overlay
-        const PADDING = 20;
-        const out_h = this.canvas.height / 4;
-        const out_w = (this.cameraVideo.videoWidth / this.cameraVideo.videoHeight) * out_h;
+        if (this.cameraVideo.readyState >= this.cameraVideo.HAVE_CURRENT_DATA) {
+          const out_h = this.canvas.height / CAMERA_OVERLAY_SCALE;
+          const out_w = (this.cameraVideo.videoWidth / this.cameraVideo.videoHeight) * out_h;
 
-        const x = this.isPipActive
-          ? this.canvas.width - out_w + this.smallOffsetX
-          : this.canvas.width - out_w - PADDING;
+          const x = this.isPipActive
+            ? Math.round(this.canvas.width - out_w + this.smallOffsetX)
+            : Math.round(this.canvas.width - out_w - CAMERA_OVERLAY_PADDING);
 
-        const y = this.isPipActive ? this.smallOffsetY : PADDING;
+          const y = this.isPipActive ? Math.round(this.smallOffsetY) : CAMERA_OVERLAY_PADDING;
 
-        this.context.drawImage(this.cameraVideo, x, y, out_w, out_h);
+          this.context.save();
+          this.context.shadowColor = SHADOW_COLOR;
+          this.context.shadowBlur = SHADOW_BLUR;
+          this.context.drawImage(this.cameraVideo, x, y, out_w, out_h);
+          this.context.restore();
+        }
+      } catch (error) {
+        console.error('Error in mixFrames:', error);
       }
+
       this.animationFrame = requestAnimationFrame(mixFrames);
     };
 
-    mixFrames();
-    await this.togglePictureInPicture();
-    return this.canvas.captureStream(60);
+    this.animationFrame = requestAnimationFrame(mixFrames);
   }
 
   async togglePictureInPicture(): Promise<void> {
@@ -97,70 +211,81 @@ export class CanvasMediaStreamMixer {
     try {
       if (window.documentPictureInPicture.window) {
         window.documentPictureInPicture.window.close();
-        this.isPipActive = false;
-        this.smallOffsetX = 0;
-        this.smallOffsetY = 0;
+        this.resetPipState();
         return;
       }
 
       const pipWindow = await window.documentPictureInPicture.requestWindow({
-        width: 320,
-        height: 180,
+        width: PIP_WINDOW_WIDTH,
+        height: PIP_WINDOW_HEIGHT,
       });
 
-      pipWindow.document.body.style.cssText = `
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: black;
-      `;
-
-      const video = document.getElementById('smallVideo') as HTMLVideoElement;
-      if (!video) {
-        throw new Error('Camera video element not found');
-      }
-
-      video.style.cssText = `
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-        display: block;
-      `;
-
-      pipWindow.document.body.appendChild(video);
-      this.isPipActive = true;
-
-      // Track PiP window position
-      const updatePosition = () => {
-        const mainWindow = window;
-        this.smallOffsetX = pipWindow.screenX - mainWindow.screenX;
-        this.smallOffsetY = pipWindow.screenY - mainWindow.screenY;
-      };
-
-      // Update position immediately and start tracking
-      updatePosition();
-      const positionInterval = setInterval(updatePosition, 16); // ~60fps
-
-      pipWindow.addEventListener('pagehide', () => {
-        clearInterval(positionInterval);
-        this.isPipActive = false;
-        this.smallOffsetX = 0;
-        this.smallOffsetY = 0;
-
-        const videoContainer = document.getElementById('videoContainer');
-        if (video && videoContainer && !videoContainer.contains(video)) {
-          videoContainer.appendChild(video);
-        }
-      });
+      this.setupPipWindow(pipWindow);
     } catch (error) {
       console.error('Failed to enter Picture-in-Picture mode:', error);
-      this.isPipActive = false;
-      this.smallOffsetX = 0;
-      this.smallOffsetY = 0;
+      this.resetPipState();
     }
+  }
+
+  private setupPipWindow(pipWindow: Window) {
+    pipWindow.document.body.style.cssText = `
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: black;
+    `;
+
+    const video = document.getElementById(PIP_VIDEO_ID) as HTMLVideoElement;
+    if (!video) {
+      throw new Error('Camera video element not found');
+    }
+
+    video.style.cssText = `
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    `;
+
+    pipWindow.document.body.appendChild(video);
+    this.isPipActive = true;
+
+    let lastUpdate = 0;
+
+    const updatePosition = () => {
+      const now = performance.now();
+      if (now - lastUpdate < POSITION_THROTTLE) {
+        return;
+      }
+
+      this.targetOffsetX = pipWindow.screenX - window.screenX;
+      this.targetOffsetY = pipWindow.screenY - window.screenY;
+      lastUpdate = now;
+    };
+
+    // Use setInterval instead of RAF for position updates
+    const positionInterval = setInterval(updatePosition, POSITION_THROTTLE);
+
+    pipWindow.addEventListener('pagehide', () => {
+      clearInterval(positionInterval);
+      this.resetPipState();
+
+      const videoContainer = document.getElementById('videoContainer');
+      if (video && videoContainer && !videoContainer.contains(video)) {
+        videoContainer.appendChild(video);
+      }
+    });
+  }
+
+  private resetPipState() {
+    this.isPipActive = false;
+    this.smallOffsetX = 0;
+    this.smallOffsetY = 0;
+    this.targetOffsetX = 0;
+    this.targetOffsetY = 0;
   }
 
   releaseStreams(): void {
@@ -173,26 +298,20 @@ export class CanvasMediaStreamMixer {
       window.documentPictureInPicture.window.close();
     }
 
-    if (this.screenVideo) {
-      const screenTracks = this.screenVideo.srcObject as MediaStream;
-      screenTracks?.getTracks().forEach(track => track.stop());
-      this.screenVideo.srcObject = null;
-      this.screenVideo = null;
-    }
-
-    if (this.cameraVideo) {
-      const cameraTracks = this.cameraVideo.srcObject as MediaStream;
-      cameraTracks?.getTracks().forEach(track => track.stop());
-      this.cameraVideo.srcObject = null;
-      if (document.body.contains(this.cameraVideo)) {
-        document.body.removeChild(this.cameraVideo);
+    [this.screenVideo, this.cameraVideo].forEach(video => {
+      if (video) {
+        const tracks = video.srcObject as MediaStream;
+        tracks?.getTracks().forEach(track => track.stop());
+        video.srcObject = null;
+        if (document.body.contains(video)) {
+          document.body.removeChild(video);
+        }
       }
-      this.cameraVideo = null;
-    }
+    });
 
-    this.isPipActive = false;
-    this.smallOffsetX = 0;
-    this.smallOffsetY = 0;
+    this.screenVideo = null;
+    this.cameraVideo = null;
+    this.resetPipState();
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
   }
 }
