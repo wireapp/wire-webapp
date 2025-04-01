@@ -1108,6 +1108,11 @@ export class CallingRepository {
     }
 
     try {
+      // If we're currently in a video call, release the camera resources first
+      if (selfParticipant.sharesCamera()) {
+        selfParticipant.releaseVideoStream(true);
+      }
+
       const screenStream = await this.getMediaStream({screen: true}, call.isGroupOrConference);
       if (!screenStream) {
         throw new Error('Failed to get screen share stream');
