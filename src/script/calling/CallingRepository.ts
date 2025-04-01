@@ -35,15 +35,15 @@ import 'webrtc-adapter';
 
 import {
   AUDIO_STATE,
+  ENV as AVS_ENV,
+  STATE as CALL_STATE,
   CALL_TYPE,
   CONV_TYPE,
-  ENV as AVS_ENV,
   ERROR,
   getAvsInstance,
   LOG_LEVEL,
   QUALITY,
   REASON,
-  STATE as CALL_STATE,
   VIDEO_STATE,
   VSTREAMS,
   Wcall,
@@ -88,7 +88,6 @@ import {NoAudioInputError} from '../error/NoAudioInputError';
 import {CallingEvent} from '../event/CallingEvent';
 import {EventRepository} from '../event/EventRepository';
 import {EventSource} from '../event/EventSource';
-import {CanvasMediaStreamMixer} from '../media/CanvasMediaStreamMixer';
 import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import type {MediaStreamHandler} from '../media/MediaStreamHandler';
 import {MediaType} from '../media/MediaType';
@@ -160,7 +159,6 @@ export class CallingRepository {
   private wUser: number = 0;
   private nextMuteState: MuteState = MuteState.SELF_MUTED;
   private isConferenceCallingSupported = false;
-  private readonly canvasMixer: CanvasMediaStreamMixer;
 
   static EMOJI_TIME_OUT_DURATION = TIME_IN_MILLIS.SECOND * 4;
 
@@ -269,8 +267,6 @@ export class CallingRepository {
         this.requestVideoStreams(call.conversation.qualifiedId, call.activeSpeakers());
       }
     });
-
-    this.canvasMixer = new CanvasMediaStreamMixer();
   }
 
   get subconversationService() {
@@ -1020,6 +1016,12 @@ export class CallingRepository {
     const selfParticipant = call.getSelfParticipant();
     const newState = selfParticipant.sharesCamera() ? VIDEO_STATE.STOPPED : VIDEO_STATE.STARTED;
     const callState = call.state();
+
+    // If screen sharing is active, stop it first
+    if (selfParticipant.sharesScreen()) {
+      this.stopScreenShare(selfParticipant, call.conversation, call);
+    }
+
     if (callState === CALL_STATE.INCOMING) {
       selfParticipant.videoState(newState);
       if (newState === VIDEO_STATE.STOPPED) {
@@ -1094,68 +1096,106 @@ export class CallingRepository {
    * Toggles screenshare with video for the given call
    */
   toggleScreenShareWithVideo = async (call: Call): Promise<void> => {
-    const {conversation} = call;
     const selfParticipant = call.getSelfParticipant();
+    if (!selfParticipant) {
+      this.logger.warn('No self participant found for screen share');
+      return;
+    }
 
+    // If screen sharing is already active, stop it
     if (selfParticipant.sharesScreen()) {
-      this.stopScreenShare(selfParticipant, conversation, call);
+      this.stopScreenShare(selfParticipant, call.conversation, call);
       return;
     }
 
     try {
-      // Explicitly release any existing camera stream before starting screen share
-      if (selfParticipant.sharesCamera()) {
-        selfParticipant.releaseVideoStream(true);
+      // First get the screen share stream
+      const screenStream = await this.getMediaStream({screen: true}, call.isGroupOrConference);
+      if (!screenStream) {
+        throw new Error('Failed to get screen share stream');
       }
 
-      // Get both screen and camera streams
-      const screenStream = await this.getMediaStream({audio: true, screen: true}, call.isGroupOrConference);
-      const cameraStream = await this.getMediaStream({camera: true}, call.isGroupOrConference);
+      // Then get the camera stream
+      let cameraStream: MediaStream | null = null;
+      try {
+        cameraStream = await this.getMediaStream({camera: true}, call.isGroupOrConference);
+        if (!cameraStream) {
+          throw new Error('Failed to get camera stream');
+        }
 
-      // Initialize mixer and get mixed stream
-      const mixedStream = await this.canvasMixer.startMixing(screenStream, cameraStream);
+        // Verify camera stream has video tracks
+        const videoTracks = cameraStream.getVideoTracks();
+        if (!videoTracks.length || videoTracks[0].readyState !== 'live') {
+          throw new Error('Camera stream has no active video tracks');
+        }
 
-      // If the screen share is stopped by the os system or the browser, an "ended" event is triggered. We listen for
-      // this event to clean up the screen share state in this case.
-      screenStream.getVideoTracks()[0].onended = () => {
-        this.stopScreenShare(selfParticipant, conversation, call);
-      };
+        // Log camera track details for debugging
+        this.logger.info('Camera track details:', {
+          enabled: videoTracks[0].enabled,
+          muted: videoTracks[0].muted,
+          readyState: videoTracks[0].readyState,
+          settings: videoTracks[0].getSettings(),
+          constraints: videoTracks[0].getConstraints(),
+          capabilities: videoTracks[0].getCapabilities(),
+        });
+      } catch (error) {
+        this.logger.error('Failed to get camera stream:', error);
+        // Stop screen share if camera access fails
+        screenStream.getTracks().forEach(track => track.stop());
+        this.showNoCameraModal();
+        return;
+      }
 
+      // Start mixing the streams
+      const mixedStream = await call.canvasMixer.startMixing(screenStream, cameraStream);
+      if (!mixedStream) {
+        throw new Error('Failed to create mixed stream');
+      }
+
+      // Update participant's video stream and screen sharing state
+      selfParticipant.videoStream(mixedStream);
       selfParticipant.videoState(VIDEO_STATE.SCREENSHARE);
-      selfParticipant.updateMediaStream(mixedStream, true);
       selfParticipant.startedScreenSharingAt(Date.now());
 
+      // Update the video state in the calling backend
       this.wCall?.setVideoSendState(
         this.wUser,
-        this.serializeQualifiedId(conversation.qualifiedId),
+        this.serializeQualifiedId(call.conversation.qualifiedId),
         VIDEO_STATE.SCREENSHARE,
       );
 
-      this.sendCallingEvent(EventName.CALLING.SCREEN_SHARE, call, {
-        [Segmentation.SCREEN_SHARE.DIRECTION]: 'outgoing',
-      });
+      // Handle screen share track ending
+      screenStream.getVideoTracks()[0].onended = () => {
+        this.stopScreenShare(selfParticipant, call.conversation, call);
+      };
+
+      // Update analytics
+      call.analyticsScreenSharing = true;
     } catch (error) {
-      this.logger.info('Failed to toggle screen sharing', error);
+      this.logger.error('Error in toggleScreenShareWithVideo:', error);
+      this.showNoCameraModal();
     }
   };
 
   private stopScreenShare(selfParticipant: Participant, conversation: Conversation, call: Call): void {
-    selfParticipant.videoState(VIDEO_STATE.STOPPED);
-    selfParticipant.releaseVideoStream(true);
-    this.canvasMixer.releaseStreams();
+    if (!selfParticipant.sharesScreen()) {
+      return;
+    }
 
     // Stop all video tracks from the mixed stream
     const mixedStream = selfParticipant.videoStream();
     if (mixedStream) {
-      mixedStream.getVideoTracks().forEach(track => track.stop());
+      mixedStream.getTracks().forEach(track => track.stop());
     }
 
-    this.sendCallingEvent(EventName.CALLING.SCREEN_SHARE, call, {
-      [Segmentation.SCREEN_SHARE.DIRECTION]: 'outgoing',
-      [Segmentation.SCREEN_SHARE.DURATION]:
-        Math.ceil((Date.now() - selfParticipant.startedScreenSharingAt()) / 5000) * 5,
-    });
+    // Release video stream and clean up canvas mixer
+    selfParticipant.releaseVideoStream(true);
+    call.canvasMixer.releaseStreams();
 
+    // Update video state to stopped instead of trying to write to sharesScreen
+    selfParticipant.videoState(VIDEO_STATE.STOPPED);
+
+    // Update the video state in the calling backend
     this.wCall?.setVideoSendState(this.wUser, this.serializeQualifiedId(conversation.qualifiedId), VIDEO_STATE.STOPPED);
   }
 
@@ -1568,12 +1608,48 @@ export class CallingRepository {
   };
 
   private getMediaStream({audio = false, camera = false, screen = false}: MediaStreamQuery, isGroup: boolean) {
-    return this.mediaStreamHandler.requestMediaStream(audio, camera, screen, isGroup).then(stream => {
-      return this.mediaDevicesHandler
-        .initializeMediaDevices(camera)
-        .then(() => stream)
-        .catch(() => stream);
-    });
+    return this.mediaStreamHandler
+      .requestMediaStream(audio, camera, screen, isGroup)
+      .then(stream => {
+        if (!stream) {
+          throw new Error('Failed to get media stream');
+        }
+
+        // For camera streams, verify we have video tracks
+        if (camera) {
+          const videoTracks = stream.getVideoTracks();
+          if (!videoTracks.length) {
+            throw new Error('No video tracks found in camera stream');
+          }
+
+          const videoTrack = videoTracks[0];
+          if (videoTrack.readyState !== 'live') {
+            throw new Error(`Camera track not live. State: ${videoTrack.readyState}`);
+          }
+
+          // Log camera track details for debugging
+          this.logger.info('Camera track details:', {
+            enabled: videoTrack.enabled,
+            muted: videoTrack.muted,
+            readyState: videoTrack.readyState,
+            settings: videoTrack.getSettings(),
+            constraints: videoTrack.getConstraints(),
+            capabilities: videoTrack.getCapabilities(),
+          });
+        }
+
+        return this.mediaDevicesHandler
+          .initializeMediaDevices(camera)
+          .then(() => stream)
+          .catch(error => {
+            this.logger.warn('Failed to initialize media devices:', error);
+            return stream;
+          });
+      })
+      .catch(error => {
+        this.logger.error('Failed to get media stream:', error);
+        throw error;
+      });
   }
 
   private handleMediaStreamError(call: Call, requestedStreams: MediaStreamQuery, error: Error | unknown): void {
