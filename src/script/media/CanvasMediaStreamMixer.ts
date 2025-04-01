@@ -143,7 +143,7 @@ export class CanvasMediaStreamMixer {
 
       const now = performance.now();
 
-      // Only update screen content at 5 FPS
+      // Update both screen and camera content at 5 FPS
       if (now - this.lastScreenFrameTime >= ANIMATION_FRAME_RATE) {
         this.lastScreenFrameTime = now;
 
@@ -168,33 +168,33 @@ export class CanvasMediaStreamMixer {
               this.context.drawImage(tempCanvas, 0, 0);
             }
           }
+
+          // Update camera overlay position
+          if (this.isPipActive) {
+            this.smallOffsetX += (this.targetOffsetX - this.smallOffsetX) * POSITION_SMOOTHING;
+            this.smallOffsetY += (this.targetOffsetY - this.smallOffsetY) * POSITION_SMOOTHING;
+          }
+
+          // Draw camera overlay
+          if (this.cameraVideo.readyState >= this.cameraVideo.HAVE_CURRENT_DATA) {
+            const out_h = this.canvas.height / CAMERA_OVERLAY_SCALE;
+            const out_w = (this.cameraVideo.videoWidth / this.cameraVideo.videoHeight) * out_h;
+
+            const x = this.isPipActive
+              ? Math.round(this.canvas.width - out_w + this.smallOffsetX)
+              : Math.round(this.canvas.width - out_w - CAMERA_OVERLAY_PADDING);
+
+            const y = this.isPipActive ? Math.round(this.smallOffsetY) : CAMERA_OVERLAY_PADDING;
+
+            this.context.save();
+            this.context.shadowColor = SHADOW_COLOR;
+            this.context.shadowBlur = SHADOW_BLUR;
+            this.context.drawImage(this.cameraVideo, x, y, out_w, out_h);
+            this.context.restore();
+          }
         } catch (error) {
           console.error('Error in mixFrames:', error);
         }
-      }
-
-      // Update camera overlay position and draw at full frame rate
-      if (this.isPipActive) {
-        this.smallOffsetX += (this.targetOffsetX - this.smallOffsetX) * POSITION_SMOOTHING;
-        this.smallOffsetY += (this.targetOffsetY - this.smallOffsetY) * POSITION_SMOOTHING;
-      }
-
-      // Draw camera overlay
-      if (this.cameraVideo.readyState >= this.cameraVideo.HAVE_CURRENT_DATA) {
-        const out_h = this.canvas.height / CAMERA_OVERLAY_SCALE;
-        const out_w = (this.cameraVideo.videoWidth / this.cameraVideo.videoHeight) * out_h;
-
-        const x = this.isPipActive
-          ? Math.round(this.canvas.width - out_w + this.smallOffsetX)
-          : Math.round(this.canvas.width - out_w - CAMERA_OVERLAY_PADDING);
-
-        const y = this.isPipActive ? Math.round(this.smallOffsetY) : CAMERA_OVERLAY_PADDING;
-
-        this.context.save();
-        this.context.shadowColor = SHADOW_COLOR;
-        this.context.shadowBlur = SHADOW_BLUR;
-        this.context.drawImage(this.cameraVideo, x, y, out_w, out_h);
-        this.context.restore();
       }
 
       this.animationFrame = requestAnimationFrame(mixFrames);
