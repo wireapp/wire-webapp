@@ -82,11 +82,6 @@ export class CanvasMediaStreamMixer {
         autoplay: true,
       });
 
-      // Handle screen share track ending
-      screenShare.getVideoTracks().forEach(track => {
-        track.onended = () => this.releaseStreams();
-      });
-
       this.cameraVideo = this.createVideoElement(camera, {
         muted: true,
         autoplay: true,
