@@ -20,7 +20,8 @@
 // Canvas configuration
 const DEFAULT_CANVAS_WIDTH = 1920;
 const DEFAULT_CANVAS_HEIGHT = 1080;
-const FRAME_RATE = 30;
+const SCREEN_SHARE_FPS = 5; // Native screen share frame rate
+const FRAME_RATE = 30; // Output stream frame rate
 
 // PiP configuration
 const PIP_VIDEO_ID = 'smallVideo';
@@ -33,7 +34,7 @@ const CAMERA_OVERLAY_PADDING = 20;
 
 // Update these constants
 const POSITION_THROTTLE = 100; // Increase throttle to 100ms
-const ANIMATION_FRAME_RATE = 1000 / 30; // Ensure consistent 30fps
+const ANIMATION_FRAME_RATE = 1000 / SCREEN_SHARE_FPS; // Match screen share's native frame rate
 
 // Add new constant for position smoothing
 const POSITION_SMOOTHING = 0.5; // Value between 0 and 1 for smooth transitions
@@ -51,11 +52,11 @@ export class CanvasMediaStreamMixer {
   private smallOffsetX = 0;
   private smallOffsetY = 0;
   private isPipActive = false;
+  private lastScreenFrameTime = 0;
 
   // Add properties for smooth position tracking
   private targetOffsetX = 0;
   private targetOffsetY = 0;
-  private lastFrameTime = 0;
 
   constructor() {
     this.canvas = document.createElement('canvas');
@@ -146,59 +147,59 @@ export class CanvasMediaStreamMixer {
       }
 
       const now = performance.now();
-      if (now - this.lastFrameTime < ANIMATION_FRAME_RATE) {
-        this.animationFrame = requestAnimationFrame(mixFrames);
-        return;
-      }
-      this.lastFrameTime = now;
 
-      try {
-        // Smooth position transitions
-        if (this.isPipActive) {
-          this.smallOffsetX += (this.targetOffsetX - this.smallOffsetX) * POSITION_SMOOTHING;
-          this.smallOffsetY += (this.targetOffsetY - this.smallOffsetY) * POSITION_SMOOTHING;
-        }
+      // Only update screen content at 5 FPS
+      if (now - this.lastScreenFrameTime >= ANIMATION_FRAME_RATE) {
+        this.lastScreenFrameTime = now;
 
-        // Clear and draw black background
-        this.context.fillStyle = '#000000';
-        this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        try {
+          // Clear and draw black background
+          this.context.fillStyle = '#000000';
+          this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-        // Draw screen share at native resolution
-        if (this.screenVideo.readyState >= this.screenVideo.HAVE_CURRENT_DATA) {
-          // Create temporary canvas for screen content
-          const tempCanvas = document.createElement('canvas');
-          tempCanvas.width = this.canvas.width;
-          tempCanvas.height = this.canvas.height;
-          const tempContext = tempCanvas.getContext('2d', {
-            alpha: false,
-            desynchronized: true,
-          });
+          // Draw screen share at native resolution
+          if (this.screenVideo.readyState >= this.screenVideo.HAVE_CURRENT_DATA) {
+            // Create temporary canvas for screen content
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = this.canvas.width;
+            tempCanvas.height = this.canvas.height;
+            const tempContext = tempCanvas.getContext('2d', {
+              alpha: false,
+              desynchronized: true,
+            });
 
-          if (tempContext) {
-            tempContext.drawImage(this.screenVideo, 0, 0, this.canvas.width, this.canvas.height);
-            this.context.drawImage(tempCanvas, 0, 0);
+            if (tempContext) {
+              tempContext.drawImage(this.screenVideo, 0, 0, this.canvas.width, this.canvas.height);
+              this.context.drawImage(tempCanvas, 0, 0);
+            }
           }
+        } catch (error) {
+          console.error('Error in mixFrames:', error);
         }
+      }
 
-        // Draw camera overlay
-        if (this.cameraVideo.readyState >= this.cameraVideo.HAVE_CURRENT_DATA) {
-          const out_h = this.canvas.height / CAMERA_OVERLAY_SCALE;
-          const out_w = (this.cameraVideo.videoWidth / this.cameraVideo.videoHeight) * out_h;
+      // Update camera overlay position and draw at full frame rate
+      if (this.isPipActive) {
+        this.smallOffsetX += (this.targetOffsetX - this.smallOffsetX) * POSITION_SMOOTHING;
+        this.smallOffsetY += (this.targetOffsetY - this.smallOffsetY) * POSITION_SMOOTHING;
+      }
 
-          const x = this.isPipActive
-            ? Math.round(this.canvas.width - out_w + this.smallOffsetX)
-            : Math.round(this.canvas.width - out_w - CAMERA_OVERLAY_PADDING);
+      // Draw camera overlay
+      if (this.cameraVideo.readyState >= this.cameraVideo.HAVE_CURRENT_DATA) {
+        const out_h = this.canvas.height / CAMERA_OVERLAY_SCALE;
+        const out_w = (this.cameraVideo.videoWidth / this.cameraVideo.videoHeight) * out_h;
 
-          const y = this.isPipActive ? Math.round(this.smallOffsetY) : CAMERA_OVERLAY_PADDING;
+        const x = this.isPipActive
+          ? Math.round(this.canvas.width - out_w + this.smallOffsetX)
+          : Math.round(this.canvas.width - out_w - CAMERA_OVERLAY_PADDING);
 
-          this.context.save();
-          this.context.shadowColor = SHADOW_COLOR;
-          this.context.shadowBlur = SHADOW_BLUR;
-          this.context.drawImage(this.cameraVideo, x, y, out_w, out_h);
-          this.context.restore();
-        }
-      } catch (error) {
-        console.error('Error in mixFrames:', error);
+        const y = this.isPipActive ? Math.round(this.smallOffsetY) : CAMERA_OVERLAY_PADDING;
+
+        this.context.save();
+        this.context.shadowColor = SHADOW_COLOR;
+        this.context.shadowBlur = SHADOW_BLUR;
+        this.context.drawImage(this.cameraVideo, x, y, out_w, out_h);
+        this.context.restore();
       }
 
       this.animationFrame = requestAnimationFrame(mixFrames);
