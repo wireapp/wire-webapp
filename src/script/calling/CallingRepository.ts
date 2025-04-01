@@ -1103,6 +1103,11 @@ export class CallingRepository {
     }
 
     try {
+      // Explicitly release any existing camera stream before starting screen share
+      if (selfParticipant.sharesCamera()) {
+        selfParticipant.releaseVideoStream(true);
+      }
+
       // Get both screen and camera streams
       const screenStream = await this.getMediaStream({audio: true, screen: true}, call.isGroupOrConference);
       const cameraStream = await this.getMediaStream({camera: true}, call.isGroupOrConference);
