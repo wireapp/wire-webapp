@@ -18,8 +18,8 @@
  */
 
 // Canvas configuration
-const CANVAS_WIDTH = 1920;
-const CANVAS_HEIGHT = 1080;
+const DEFAULT_CANVAS_WIDTH = 1920;
+const DEFAULT_CANVAS_HEIGHT = 1080;
 const FRAME_RATE = 30;
 
 // PiP configuration
@@ -59,8 +59,6 @@ export class CanvasMediaStreamMixer {
 
   constructor() {
     this.canvas = document.createElement('canvas');
-    this.canvas.width = CANVAS_WIDTH;
-    this.canvas.height = CANVAS_HEIGHT;
     this.canvas.style.display = 'none';
     document.body.appendChild(this.canvas);
 
@@ -98,6 +96,12 @@ export class CanvasMediaStreamMixer {
       // Wait for both videos to be ready
       await Promise.all([this.screenVideo.play(), this.cameraVideo.play()]);
 
+      // Set canvas dimensions to match screen share's native resolution
+      const screenTrack = screenShare.getVideoTracks()[0];
+      const settings = screenTrack.getSettings();
+      this.canvas.width = settings.width || DEFAULT_CANVAS_WIDTH;
+      this.canvas.height = settings.height || DEFAULT_CANVAS_HEIGHT;
+
       this.startAnimation();
       await this.togglePictureInPicture();
 
@@ -105,9 +109,10 @@ export class CanvasMediaStreamMixer {
       const outputStream = this.canvas.captureStream(FRAME_RATE);
       const [videoTrack] = outputStream.getVideoTracks();
 
+      // Apply constraints that preserve the original resolution
       await videoTrack.applyConstraints({
-        width: {ideal: CANVAS_WIDTH},
-        height: {ideal: CANVAS_HEIGHT},
+        width: {ideal: this.canvas.width},
+        height: {ideal: this.canvas.height},
         frameRate: {ideal: FRAME_RATE},
       });
 
@@ -158,7 +163,7 @@ export class CanvasMediaStreamMixer {
         this.context.fillStyle = '#000000';
         this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-        // Draw screen share with double buffering
+        // Draw screen share at native resolution
         if (this.screenVideo.readyState >= this.screenVideo.HAVE_CURRENT_DATA) {
           // Create temporary canvas for screen content
           const tempCanvas = document.createElement('canvas');
