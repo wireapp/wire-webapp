@@ -20,7 +20,7 @@
 // Canvas configuration
 const DEFAULT_CANVAS_WIDTH = 1920;
 const DEFAULT_CANVAS_HEIGHT = 1080;
-const SCREEN_SHARE_FPS = 5;
+const SCREEN_SHARE_FPS = 30;
 const FRAME_RATE = 30;
 
 // PiP configuration
@@ -33,8 +33,7 @@ const CAMERA_OVERLAY_SCALE = 4;
 const CAMERA_OVERLAY_PADDING = 20;
 
 // Position tracking configuration
-const POSITION_THROTTLE = 100;
-const POSITION_SMOOTHING = 0.5;
+const POSITION_SMOOTHING = 0.3;
 const SHADOW_BLUR = 10;
 const SHADOW_COLOR = 'rgba(0,0,0,0.5)';
 
@@ -50,6 +49,9 @@ export class CanvasMediaStreamMixer {
   private lastScreenFrameTime = 0;
   private targetOffsetX = 0;
   private targetOffsetY = 0;
+  private positionAnimationFrame: number | null = null;
+  private tempCanvas: HTMLCanvasElement | null = null;
+  private tempContext: CanvasRenderingContext2D | null = null;
 
   constructor() {
     this.canvas = document.createElement('canvas');
@@ -64,6 +66,13 @@ export class CanvasMediaStreamMixer {
 
     this.context.imageSmoothingEnabled = true;
     this.context.imageSmoothingQuality = 'high';
+
+    // Create temp canvas for better performance
+    this.tempCanvas = document.createElement('canvas');
+    this.tempContext = this.tempCanvas.getContext('2d', {
+      alpha: false,
+      desynchronized: true,
+    })!;
   }
 
   async startMixing(screenShare: MediaStream, camera: MediaStream): Promise<MediaStream> {
@@ -129,34 +138,33 @@ export class CanvasMediaStreamMixer {
       }
 
       const now = performance.now();
+      const frameInterval = 1000 / SCREEN_SHARE_FPS;
 
-      if (now - this.lastScreenFrameTime >= 1000 / SCREEN_SHARE_FPS) {
+      if (now - this.lastScreenFrameTime >= frameInterval) {
         this.lastScreenFrameTime = now;
 
         try {
+          // Clear main canvas
           this.context.fillStyle = '#000000';
           this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
+          // Draw screen share
           if (this.screenVideo.readyState >= this.screenVideo.HAVE_CURRENT_DATA) {
-            const tempCanvas = document.createElement('canvas');
-            tempCanvas.width = this.canvas.width;
-            tempCanvas.height = this.canvas.height;
-            const tempContext = tempCanvas.getContext('2d', {
-              alpha: false,
-              desynchronized: true,
-            });
-
-            if (tempContext) {
-              tempContext.drawImage(this.screenVideo, 0, 0, this.canvas.width, this.canvas.height);
-              this.context.drawImage(tempCanvas, 0, 0);
+            if (this.tempCanvas && this.tempContext) {
+              this.tempCanvas.width = this.canvas.width;
+              this.tempCanvas.height = this.canvas.height;
+              this.tempContext.drawImage(this.screenVideo, 0, 0, this.canvas.width, this.canvas.height);
+              this.context.drawImage(this.tempCanvas, 0, 0);
             }
           }
 
+          // Update PIP position with smoothing
           if (this.isPipActive) {
             this.smallOffsetX += (this.targetOffsetX - this.smallOffsetX) * POSITION_SMOOTHING;
             this.smallOffsetY += (this.targetOffsetY - this.smallOffsetY) * POSITION_SMOOTHING;
           }
 
+          // Draw camera overlay
           if (this.cameraVideo.readyState >= this.cameraVideo.HAVE_CURRENT_DATA) {
             const out_h = this.canvas.height / CAMERA_OVERLAY_SCALE;
             const out_w = (this.cameraVideo.videoWidth / this.cameraVideo.videoHeight) * out_h;
@@ -235,23 +243,19 @@ export class CanvasMediaStreamMixer {
     pipWindow.document.body.appendChild(video);
     this.isPipActive = true;
 
-    let lastUpdate = 0;
-
     const updatePosition = () => {
-      const now = performance.now();
-      if (now - lastUpdate < POSITION_THROTTLE) {
-        return;
-      }
-
       this.targetOffsetX = pipWindow.screenX - window.screenX;
       this.targetOffsetY = pipWindow.screenY - window.screenY;
-      lastUpdate = now;
+      this.positionAnimationFrame = requestAnimationFrame(updatePosition);
     };
 
-    const positionInterval = setInterval(updatePosition, POSITION_THROTTLE);
+    this.positionAnimationFrame = requestAnimationFrame(updatePosition);
 
     pipWindow.addEventListener('pagehide', () => {
-      clearInterval(positionInterval);
+      if (this.positionAnimationFrame) {
+        cancelAnimationFrame(this.positionAnimationFrame);
+        this.positionAnimationFrame = null;
+      }
       this.resetPipState();
 
       const videoContainer = document.getElementById('videoContainer');
@@ -267,12 +271,21 @@ export class CanvasMediaStreamMixer {
     this.smallOffsetY = 0;
     this.targetOffsetX = 0;
     this.targetOffsetY = 0;
+    if (this.positionAnimationFrame) {
+      cancelAnimationFrame(this.positionAnimationFrame);
+      this.positionAnimationFrame = null;
+    }
   }
 
   releaseStreams(): void {
     if (this.animationFrame) {
       cancelAnimationFrame(this.animationFrame);
       this.animationFrame = null;
+    }
+
+    if (this.positionAnimationFrame) {
+      cancelAnimationFrame(this.positionAnimationFrame);
+      this.positionAnimationFrame = null;
     }
 
     if (window.documentPictureInPicture?.window) {
@@ -294,5 +307,10 @@ export class CanvasMediaStreamMixer {
     this.cameraVideo = null;
     this.resetPipState();
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    if (this.tempCanvas) {
+      this.tempCanvas.width = 0;
+      this.tempCanvas.height = 0;
+    }
   }
 }
