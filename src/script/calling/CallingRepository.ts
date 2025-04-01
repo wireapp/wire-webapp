@@ -1107,43 +1107,38 @@ export class CallingRepository {
       return;
     }
 
+    let screenStream: MediaStream | null = null;
+    let cameraStream: MediaStream | null = null;
+
     try {
       // If we're currently in a video call, release the camera resources first
       if (selfParticipant.sharesCamera()) {
         selfParticipant.releaseVideoStream(true);
       }
 
-      const screenStream = await this.getMediaStream({screen: true}, call.isGroupOrConference);
+      screenStream = await this.getMediaStream({screen: true}, call.isGroupOrConference);
       if (!screenStream) {
         throw new Error('Failed to get screen share stream');
       }
 
-      let cameraStream: MediaStream | null = null;
-      try {
-        cameraStream = await this.getMediaStream({camera: true}, call.isGroupOrConference);
-        if (!cameraStream) {
-          throw new Error('Failed to get camera stream');
-        }
-
-        const videoTracks = cameraStream.getVideoTracks();
-        if (!videoTracks.length || videoTracks[0].readyState !== 'live') {
-          throw new Error('Camera stream has no active video tracks');
-        }
-
-        this.logger.info('Camera track details:', {
-          enabled: videoTracks[0].enabled,
-          muted: videoTracks[0].muted,
-          readyState: videoTracks[0].readyState,
-          settings: videoTracks[0].getSettings(),
-          constraints: videoTracks[0].getConstraints(),
-          capabilities: videoTracks[0].getCapabilities(),
-        });
-      } catch (error) {
-        this.logger.error('Failed to get camera stream:', error);
-        screenStream.getTracks().forEach(track => track.stop());
-        this.showNoCameraModal();
-        return;
+      cameraStream = await this.getMediaStream({camera: true}, call.isGroupOrConference);
+      if (!cameraStream) {
+        throw new Error('Failed to get camera stream');
       }
+
+      const videoTracks = cameraStream.getVideoTracks();
+      if (!videoTracks.length || videoTracks[0].readyState !== 'live') {
+        throw new Error('Camera stream has no active video tracks');
+      }
+
+      this.logger.info('Camera track details:', {
+        enabled: videoTracks[0].enabled,
+        muted: videoTracks[0].muted,
+        readyState: videoTracks[0].readyState,
+        settings: videoTracks[0].getSettings(),
+        constraints: videoTracks[0].getConstraints(),
+        capabilities: videoTracks[0].getCapabilities(),
+      });
 
       const mixedStream = await call.canvasMixer.startMixing(screenStream, cameraStream);
       if (!mixedStream) {
@@ -1167,7 +1162,12 @@ export class CallingRepository {
       call.analyticsScreenSharing = true;
     } catch (error) {
       this.logger.error('Error in toggleScreenShareWithVideo:', error);
-      this.showNoCameraModal();
+      if (screenStream) {
+        screenStream.getTracks().forEach(track => track.stop());
+      }
+      if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+      }
     }
   };
 
