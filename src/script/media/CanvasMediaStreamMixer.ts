@@ -20,8 +20,8 @@
 // Canvas configuration
 const DEFAULT_CANVAS_WIDTH = 1920;
 const DEFAULT_CANVAS_HEIGHT = 1080;
-const SCREEN_SHARE_FPS = 5; // Native screen share frame rate
-const FRAME_RATE = 30; // Output stream frame rate
+const SCREEN_SHARE_FPS = 5;
+const FRAME_RATE = 30;
 
 // PiP configuration
 const PIP_VIDEO_ID = 'smallVideo';
@@ -29,17 +29,12 @@ const PIP_WINDOW_WIDTH = 320;
 const PIP_WINDOW_HEIGHT = 180;
 
 // Video overlay configuration
-const CAMERA_OVERLAY_SCALE = 4; // divider for main canvas height
+const CAMERA_OVERLAY_SCALE = 4;
 const CAMERA_OVERLAY_PADDING = 20;
 
-// Update these constants
-const POSITION_THROTTLE = 100; // Increase throttle to 100ms
-const ANIMATION_FRAME_RATE = 1000 / SCREEN_SHARE_FPS; // Match screen share's native frame rate
-
-// Add new constant for position smoothing
-const POSITION_SMOOTHING = 0.5; // Value between 0 and 1 for smooth transitions
-
-// Add these constants
+// Position tracking configuration
+const POSITION_THROTTLE = 100;
+const POSITION_SMOOTHING = 0.5;
 const SHADOW_BLUR = 10;
 const SHADOW_COLOR = 'rgba(0,0,0,0.5)';
 
@@ -53,8 +48,6 @@ export class CanvasMediaStreamMixer {
   private smallOffsetY = 0;
   private isPipActive = false;
   private lastScreenFrameTime = 0;
-
-  // Add properties for smooth position tracking
   private targetOffsetX = 0;
   private targetOffsetY = 0;
 
@@ -63,14 +56,12 @@ export class CanvasMediaStreamMixer {
     this.canvas.style.display = 'none';
     document.body.appendChild(this.canvas);
 
-    // Optimize canvas context for video mixing
     this.context = this.canvas.getContext('2d', {
       alpha: false,
       desynchronized: true,
       willReadFrequently: false,
     })!;
 
-    // Enable high-quality image scaling
     this.context.imageSmoothingEnabled = true;
     this.context.imageSmoothingQuality = 'high';
   }
@@ -89,10 +80,8 @@ export class CanvasMediaStreamMixer {
       });
       document.body.appendChild(this.cameraVideo);
 
-      // Wait for both videos to be ready
       await Promise.all([this.screenVideo.play(), this.cameraVideo.play()]);
 
-      // Set canvas dimensions to match screen share's native resolution
       const screenTrack = screenShare.getVideoTracks()[0];
       const settings = screenTrack.getSettings();
       this.canvas.width = settings.width || DEFAULT_CANVAS_WIDTH;
@@ -101,11 +90,9 @@ export class CanvasMediaStreamMixer {
       this.startAnimation();
       await this.togglePictureInPicture();
 
-      // Create and configure output stream
       const outputStream = this.canvas.captureStream(FRAME_RATE);
       const [videoTrack] = outputStream.getVideoTracks();
 
-      // Apply constraints that preserve the original resolution
       await videoTrack.applyConstraints({
         width: {ideal: this.canvas.width},
         height: {ideal: this.canvas.height},
@@ -143,18 +130,14 @@ export class CanvasMediaStreamMixer {
 
       const now = performance.now();
 
-      // Update both screen and camera content at 5 FPS
-      if (now - this.lastScreenFrameTime >= ANIMATION_FRAME_RATE) {
+      if (now - this.lastScreenFrameTime >= 1000 / SCREEN_SHARE_FPS) {
         this.lastScreenFrameTime = now;
 
         try {
-          // Clear and draw black background
           this.context.fillStyle = '#000000';
           this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-          // Draw screen share at native resolution
           if (this.screenVideo.readyState >= this.screenVideo.HAVE_CURRENT_DATA) {
-            // Create temporary canvas for screen content
             const tempCanvas = document.createElement('canvas');
             tempCanvas.width = this.canvas.width;
             tempCanvas.height = this.canvas.height;
@@ -169,13 +152,11 @@ export class CanvasMediaStreamMixer {
             }
           }
 
-          // Update camera overlay position
           if (this.isPipActive) {
             this.smallOffsetX += (this.targetOffsetX - this.smallOffsetX) * POSITION_SMOOTHING;
             this.smallOffsetY += (this.targetOffsetY - this.smallOffsetY) * POSITION_SMOOTHING;
           }
 
-          // Draw camera overlay
           if (this.cameraVideo.readyState >= this.cameraVideo.HAVE_CURRENT_DATA) {
             const out_h = this.canvas.height / CAMERA_OVERLAY_SCALE;
             const out_w = (this.cameraVideo.videoWidth / this.cameraVideo.videoHeight) * out_h;
@@ -267,7 +248,6 @@ export class CanvasMediaStreamMixer {
       lastUpdate = now;
     };
 
-    // Use setInterval instead of RAF for position updates
     const positionInterval = setInterval(updatePosition, POSITION_THROTTLE);
 
     pipWindow.addEventListener('pagehide', () => {
