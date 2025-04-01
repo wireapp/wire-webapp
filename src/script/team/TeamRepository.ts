@@ -83,9 +83,6 @@ type Events = {
   };
 };
 
-(window as any).PrimaryModal = PrimaryModal;
-(window as any).t = t;
-
 export class TeamRepository extends TypedEventEmitter<Events> {
   private readonly logger: Logger;
   private readonly teamMapper: TeamMapper;
@@ -115,8 +112,6 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     amplify.subscribe(WebAppEvents.TEAM.EVENT_FROM_BACKEND, this.onTeamEvent);
     amplify.subscribe(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, this.updateTeamConfig);
     amplify.subscribe(WebAppEvents.TEAM.UPDATE_INFO, this.sendAccountInfo.bind(this));
-
-    (window as any).showReloadAppModal = this.showReloadAppModal;
   }
 
   getRoleBadge(userId: string): string {
