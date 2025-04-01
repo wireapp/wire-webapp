@@ -1144,6 +1144,12 @@ export class CallingRepository {
     selfParticipant.releaseVideoStream(true);
     this.canvasMixer.releaseStreams();
 
+    // Stop all video tracks from the mixed stream
+    const mixedStream = selfParticipant.videoStream();
+    if (mixedStream) {
+      mixedStream.getVideoTracks().forEach(track => track.stop());
+    }
+
     this.sendCallingEvent(EventName.CALLING.SCREEN_SHARE, call, {
       [Segmentation.SCREEN_SHARE.DIRECTION]: 'outgoing',
       [Segmentation.SCREEN_SHARE.DURATION]:
