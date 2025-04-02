@@ -53,6 +53,8 @@ interface InputBarControlsProps {
   onGifClick: () => void;
   onSelectFiles: (files: File[]) => void;
   onSelectImages: (files: File[]) => void;
+  onCellImageUpload: () => void;
+  onCellAssetUpload: () => void;
   onSend: () => void;
   isSending: boolean;
 }
@@ -73,6 +75,8 @@ export const InputBarControls = ({
   onGifClick,
   onSelectFiles,
   onSelectImages,
+  onCellImageUpload,
+  onCellAssetUpload,
   onSend,
   isSending,
 }: InputBarControlsProps) => {
@@ -107,6 +111,8 @@ export const InputBarControls = ({
           isEmojiActive={emojiPicker.open}
           onFormatClick={formatToolbar.handleClick}
           onEmojiClick={emojiPicker.handleToggle}
+          onCellImageUpload={onCellImageUpload}
+          onCellAssetUpload={onCellAssetUpload}
         />
       </ul>
       <SendMessageButton

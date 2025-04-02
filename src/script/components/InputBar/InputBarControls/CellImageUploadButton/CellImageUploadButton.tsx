@@ -17,25 +17,24 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import * as Icon from 'Components/Icon';
+import {t} from 'Util/LocalizerUtil';
 
-export const buttonStyles: CSSObject = {
-  position: 'absolute',
-  top: '-8px',
-  right: '-12px',
-  padding: '0',
-  margin: '0',
-  cursor: 'pointer',
-  width: '24px',
-  height: '24px',
-  background: 'var(--icon-button-primary-enabled-bg)',
-  border: '1px solid var(--icon-button-primary-border)',
-  borderRadius: '100%',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-};
+interface CellImageUploadButtonProps {
+  onClick: () => void;
+}
 
-export const iconStyles: CSSObject = {
-  fill: 'var(--main-color)',
+export const CellImageUploadButton = ({onClick}: CellImageUploadButtonProps) => {
+  return (
+    <button
+      type="button"
+      aria-label={t('tooltipConversationAddImage')}
+      title={t('tooltipConversationAddImage')}
+      className="input-bar-control file-button"
+      onClick={onClick}
+      data-uie-name="do-share-image"
+    >
+      <Icon.ImageIcon />
+    </button>
+  );
 };

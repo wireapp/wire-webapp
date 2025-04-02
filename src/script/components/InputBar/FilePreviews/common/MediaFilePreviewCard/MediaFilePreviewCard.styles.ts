@@ -25,6 +25,10 @@ export const wrapperStyles: CSSObject = {
   borderRadius: '10px',
   border: '1px solid var(--gray-40)',
   position: 'relative',
+
+  'body.theme-dark &': {
+    border: '1px solid transparent',
+  },
 };
 
 export const imageStyles: CSSObject = {

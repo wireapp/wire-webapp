@@ -40,6 +40,8 @@ const defaultParams: PropsType = {
   isEmojiActive: true,
   onFormatClick: jest.fn(),
   onEmojiClick: jest.fn(),
+  onCellImageUpload: jest.fn(),
+  onCellAssetUpload: jest.fn(),
 };
 
 const allButtonTitles = [
