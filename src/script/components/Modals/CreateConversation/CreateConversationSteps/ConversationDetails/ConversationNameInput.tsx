@@ -41,7 +41,9 @@ export const ConversationNameInput = () => {
     setConversationName(value);
     if (nameTooLong) {
       return setError(t('groupCreationPreferencesErrorNameLong'));
-    } else if (nameTooShort) {
+    }
+
+    if (nameTooShort) {
       return setError(t('groupCreationPreferencesErrorNameShort'));
     }
     setError('');
