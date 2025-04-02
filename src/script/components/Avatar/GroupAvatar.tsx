@@ -17,8 +17,6 @@
  *
  */
 
-import React from 'react';
-
 import {getGroupAvatarColors} from 'Util/avatarUtil';
 import {CSS_SQUARE} from 'Util/CSSMixin';
 
@@ -27,7 +25,7 @@ export interface GroupAvatarProps {
   conversationID?: string;
 }
 
-export const GroupAvatar: React.FC<GroupAvatarProps> = ({conversationID, className}) => {
+export const GroupAvatar = ({conversationID, className}: GroupAvatarProps) => {
   const colors = getGroupAvatarColors(conversationID);
 
   return (

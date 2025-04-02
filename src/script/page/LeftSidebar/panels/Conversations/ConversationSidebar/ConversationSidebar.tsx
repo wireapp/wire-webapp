@@ -48,6 +48,7 @@ type ConversationSidebarProps = {
   changeTab: (nextTab: SidebarTabs, folderId?: string) => void;
   currentTab: SidebarTabs;
   groupConversations: Conversation[];
+  channelConversations: Conversation[];
   directConversations: Conversation[];
   unreadConversations: Conversation[];
   favoriteConversations: Conversation[];
@@ -78,6 +79,7 @@ export const ConversationSidebar = ({
   showNotificationsBadge,
   teamRepository,
   userRepository,
+  channelConversations,
 }: ConversationSidebarProps) => {
   return (
     <nav className="conversations-sidebar" css={conversationsSidebarStyles(isScreenLessThanMdBreakpoint)}>
@@ -103,6 +105,7 @@ export const ConversationSidebar = ({
           selfUser={selfUser}
           userRepository={userRepository}
           teamRepository={teamRepository}
+          channelConversations={channelConversations}
         />
       </FadingScrollbar>
 

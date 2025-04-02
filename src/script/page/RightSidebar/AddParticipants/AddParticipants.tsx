@@ -87,7 +87,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
   const {
     firstUserEntity,
     inTeam,
-    isGroup,
+    isGroupOrChannel,
     isGuestAndServicesRoom,
     isServicesRoom,
     isTeamOnly,
@@ -95,7 +95,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
   } = useKoSubscribableChildren(activeConversation, [
     'firstUserEntity',
     'inTeam',
-    'isGroup',
+    'isGroupOrChannel',
     'isGuestAndServicesRoom',
     'isServicesRoom',
     'isTeamOnly',
@@ -133,7 +133,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
   const showIntegrations = useMemo(() => {
     const isServicesEnabled = isServicesRoom || isGuestAndServicesRoom;
     const isService = !!firstUserEntity?.isService;
-    const allowIntegrations = isGroup || isService;
+    const allowIntegrations = isGroupOrChannel || isService;
 
     return (
       isTeam &&
@@ -143,7 +143,15 @@ const AddParticipants: FC<AddParticipantsProps> = ({
       isServicesEnabled &&
       activeConversation.protocol !== ConversationProtocol.MLS
     );
-  }, [firstUserEntity?.isService, inTeam, isGroup, isGuestAndServicesRoom, isServicesRoom, isTeam, isTeamOnly]);
+  }, [
+    firstUserEntity?.isService,
+    inTeam,
+    isGroupOrChannel,
+    isGuestAndServicesRoom,
+    isServicesRoom,
+    isTeam,
+    isTeamOnly,
+  ]);
 
   const manageServicesUrl = getManageServicesUrl('client_landing');
   const isSearching = searchInput.length > ENABLE_IS_SEARCHING_LENGTH;

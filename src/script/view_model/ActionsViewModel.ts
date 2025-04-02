@@ -316,7 +316,7 @@ export class ActionsViewModel {
   };
 
   readonly removeConversation = (conversationEntity: Conversation) => {
-    if (!conversationEntity.isGroup() || !conversationEntity.isSelfUserRemoved()) {
+    if (!conversationEntity.isGroupOrChannel() || !conversationEntity.isSelfUserRemoved()) {
       return;
     }
 

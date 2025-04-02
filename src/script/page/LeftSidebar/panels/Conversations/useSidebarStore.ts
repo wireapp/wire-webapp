@@ -25,6 +25,7 @@ export enum SidebarTabs {
   FOLDER,
   FAVORITES,
   GROUPS,
+  CHANNELS,
   DIRECTS,
   ARCHIVES,
   CONNECT,

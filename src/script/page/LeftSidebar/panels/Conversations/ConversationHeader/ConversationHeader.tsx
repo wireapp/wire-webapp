@@ -25,10 +25,12 @@ import {CircleCloseIcon, IconButton, Input, SearchIcon} from '@wireapp/react-ui-
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/Icon';
+import {useCreateConversationModal} from 'Components/Modals/CreateConversation/hooks/useCreateConversationModal';
 import {ConversationLabel} from 'src/script/conversation/ConversationLabelRepository';
 import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {handleEnterDown, handleEscDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
+import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {
   button,
@@ -69,12 +71,15 @@ export const ConversationHeaderComponent = ({
   searchInputRef,
 }: ConversationHeaderProps) => {
   const {canCreateGroupConversation} = generatePermissionHelpers(selfUser.teamRole());
+  const {isChannelsEnabled} = useChannelsFeatureFlag();
+  const {showModal} = useCreateConversationModal();
   const isFolderView = currentTab === SidebarTabs.FOLDER;
 
   const conversationsHeaderTitle: Partial<Record<SidebarTabs, string>> = {
     [SidebarTabs.RECENT]: t('conversationViewAllConversations'),
     [SidebarTabs.FAVORITES]: t('conversationLabelFavorites'),
     [SidebarTabs.GROUPS]: t('conversationLabelGroups'),
+    [SidebarTabs.CHANNELS]: t('conversationLabelChannels'),
     [SidebarTabs.DIRECTS]: t('conversationLabelDirects'),
     [SidebarTabs.FOLDER]: t('folderViewTooltip'),
     [SidebarTabs.ARCHIVES]: t('conversationFooterArchive'),
@@ -99,6 +104,14 @@ export const ConversationHeaderComponent = ({
     };
   }, [searchInputRef, jumpToRecentSearch]);
 
+  const showCreateConversationModal = () => {
+    if (isChannelsEnabled) {
+      showModal();
+    } else {
+      amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, 'conversation_details');
+    }
+  };
+
   return (
     <>
       <div css={header}>
@@ -108,7 +121,7 @@ export const ConversationHeaderComponent = ({
 
         {currentTab !== SidebarTabs.ARCHIVES && canCreateGroupConversation() && (
           <IconButton
-            onClick={() => amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, 'conversation_details')}
+            onClick={showCreateConversationModal}
             data-uie-name="go-create-group"
             css={button}
             title={t('conversationDetailsActionCreateGroup')}
