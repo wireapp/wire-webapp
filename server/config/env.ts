@@ -385,4 +385,7 @@ export type Env = {
   DATADOG_APPLICATION_ID?: string;
   DATADOG_CLIENT_TOKEN?: string;
   FEATURE_DATADOG_ENVIRONMENT?: string;
+
+  /** Feature to enable screen sharing with video overlay */
+  FEATURE_ENABLE_SCREEN_SHARE_WITH_VIDEO: string;
 };
