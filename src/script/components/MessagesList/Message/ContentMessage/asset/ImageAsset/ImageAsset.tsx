@@ -50,10 +50,7 @@ export const ImageAsset = ({asset, message, onClick}: ImageAssetProps) => {
 
   const imageContainerStyle: CSSObject = {
     maxWidth: 'var(--conversation-message-asset-width)',
-    // Images should be in the viewport regardless of the window's size
-    // To ensure this, we calculate the maximum height as:
-    // 100vh - TitleBar(45px) - ImagePadding(12px) - TypingIndicator(40px) - ClassifiedBar(1rem) - InputBar(56px)
-    maxHeight: 'calc(100vh - 155px - 1rem)',
+    maxHeight: 'var(--conversation-message-image-asset-max-height)',
     width: asset.width,
     aspectRatio: asset.ratio,
   };

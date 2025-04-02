@@ -17,23 +17,22 @@
  *
  */
 
-import {ICellAsset} from '@pydio/protocol-messaging';
+import {CSSObject} from '@emotion/react';
 
-import {GridImageAsset} from './GridImageAsset/GridImageAsset';
-import {LargeImageAsset} from './LargeImageAsset/LargeImageAsset';
+export const containerStyle: CSSObject = {
+  maxWidth: 'var(--conversation-message-asset-width)',
+  maxHeight: 'var(--conversation-message-image-asset-max-height)',
+  border: 'none',
+};
 
-interface ImageAssetCardProps {
-  src?: string;
-  metadata: ICellAsset['image'];
-  size: 'small' | 'large';
-  isLoading: boolean;
-  isError: boolean;
-}
-
-export const ImageAssetCard = ({src, metadata, size, isLoading, isError}: ImageAssetCardProps) => {
-  if (size === 'large') {
-    return <LargeImageAsset src={src} metadata={metadata} isLoading={isLoading} isError={isError} />;
-  }
-
-  return <GridImageAsset src={src} metadata={metadata} size={size} isLoading={isLoading} isError={isError} />;
+export const imageStyle: CSSObject = {
+  maxWidth: '100%',
+  maxHeight: '100%',
+  objectFit: 'contain',
+  objectPosition: 'left',
+  backgroundColor: 'var(--foreground-fade-8)',
+  border: 'none',
+  padding: 0,
+  margin: 0,
+  boxShadow: 'none',
 };

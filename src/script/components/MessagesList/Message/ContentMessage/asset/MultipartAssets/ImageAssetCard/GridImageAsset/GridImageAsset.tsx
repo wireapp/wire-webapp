@@ -19,10 +19,13 @@
 
 import {ICellAsset} from '@pydio/protocol-messaging';
 
-import {GridImageAsset} from './GridImageAsset/GridImageAsset';
-import {LargeImageAsset} from './LargeImageAsset/LargeImageAsset';
+import {t} from 'Util/LocalizerUtil';
 
-interface ImageAssetCardProps {
+import {imageStyles} from './GridImageAsset.styles';
+
+import {MediaFilePreviewCard} from '../../common/MediaFilePreviewCard/MediaFilePreviewCard';
+
+interface GridImageAssetProps {
   src?: string;
   metadata: ICellAsset['image'];
   size: 'small' | 'large';
@@ -30,10 +33,14 @@ interface ImageAssetCardProps {
   isError: boolean;
 }
 
-export const ImageAssetCard = ({src, metadata, size, isLoading, isError}: ImageAssetCardProps) => {
-  if (size === 'large') {
-    return <LargeImageAsset src={src} metadata={metadata} isLoading={isLoading} isError={isError} />;
-  }
-
-  return <GridImageAsset src={src} metadata={metadata} size={size} isLoading={isLoading} isError={isError} />;
+export const GridImageAsset = ({src, metadata, size, isLoading, isError}: GridImageAssetProps) => {
+  return (
+    <MediaFilePreviewCard
+      label={src ? t('conversationFileImagePreviewLabel', {src}) : 'Loading...'}
+      isLoading={isLoading}
+      isError={isError}
+    >
+      {!isLoading && !isError && src && <img src={src} alt="" css={imageStyles} />}
+    </MediaFilePreviewCard>
+  );
 };
