@@ -17,15 +17,13 @@
  *
  */
 
-import React from 'react';
-
 import {InfoToggle} from 'Components/toggle/InfoToggle';
 import {t} from 'Util/LocalizerUtil';
 
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
 import {ConversationType} from '../types';
 
-export const Preference: React.FC = () => {
+export const Preference = () => {
   const {
     isGuestsEnabled,
     isReadReceiptsEnabled,

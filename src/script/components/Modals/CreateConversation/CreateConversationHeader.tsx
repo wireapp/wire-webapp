@@ -17,8 +17,6 @@
  *
  */
 
-import React from 'react';
-
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
@@ -29,7 +27,7 @@ import {CreateConversationSubmit} from './CreateConversationSubmit';
 import {useCreateConversationModal} from './hooks/useCreateConversationModal';
 import {ConversationType, ConversationCreationStep} from './types';
 
-export const CreateConversationHeader: React.FC = () => {
+export const CreateConversationHeader = () => {
   const {
     hideModal,
     error,
@@ -73,7 +71,6 @@ export const CreateConversationHeader: React.FC = () => {
           {conversationCreationStep === ConversationCreationStep.Preference && (
             <Button
               id="conversation-go-previous"
-              className="group-creation__action"
               css={{marginBottom: 0}}
               type="button"
               onClick={gotoPreviousStep}
@@ -87,7 +84,6 @@ export const CreateConversationHeader: React.FC = () => {
 
           <Button
             id="group-go-next"
-            className="group-creation__action"
             css={{marginBottom: 0}}
             disabled={!!error || !conversationName}
             type="button"

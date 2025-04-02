@@ -93,6 +93,49 @@ export const useCreateConversation = () => {
     return access;
   };
 
+  const showParticipantsListEditModal = (
+    conversationName: string,
+    backendString: string,
+    replaceBackends: Record<string, string>,
+  ) => {
+    PrimaryModal.show(PrimaryModal.type.MULTI_ACTIONS, {
+      preventClose: true,
+      primaryAction: {
+        text: t('groupCreationPreferencesNonFederatingEditList'),
+        action: () => {
+          setConversationName(conversationName);
+          showModal();
+          setIsLoading(false);
+          setConversationCreationStep(ConversationCreationStep.ParticipantsSelection);
+        },
+      },
+      secondaryAction: {
+        text: t('groupCreationPreferencesNonFederatingLeave'),
+        action: () => {
+          setIsLoading(false);
+        },
+      },
+      text: {
+        htmlMessage: t('groupCreationPreferencesNonFederatingMessage', {backends: backendString}, replaceBackends),
+        title: t('groupCreationPreferencesNonFederatingHeadline'),
+      },
+    });
+  };
+
+  const handleException = (error: Error, conversationName: string) => {
+    if (isNonFederatingBackendsError(error)) {
+      hideModal();
+
+      const backendString = error.backends.join(', and ');
+      const replaceBackends = replaceLink(
+        Config.getConfig().URL.SUPPORT.NON_FEDERATING_INFO,
+        'modal__text__read-more',
+        'read-more-backends',
+      );
+      showParticipantsListEditModal(conversationName, backendString, replaceBackends);
+    }
+  };
+
   const onSubmit = async (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.KeyboardEvent<HTMLInputElement>,
   ): Promise<void> => {
@@ -122,39 +165,7 @@ export const useCreateConversation = () => {
         createNavigate(generateConversationUrl(conversation.qualifiedId))(event);
       }
     } catch (error) {
-      if (isNonFederatingBackendsError(error)) {
-        const tempName = conversationName;
-        hideModal();
-
-        const backendString = error.backends.join(', and ');
-        const replaceBackends = replaceLink(
-          Config.getConfig().URL.SUPPORT.NON_FEDERATING_INFO,
-          'modal__text__read-more',
-          'read-more-backends',
-        );
-        return PrimaryModal.show(PrimaryModal.type.MULTI_ACTIONS, {
-          preventClose: true,
-          primaryAction: {
-            text: t('groupCreationPreferencesNonFederatingEditList'),
-            action: () => {
-              setConversationName(tempName);
-              showModal();
-              setIsLoading(false);
-              setConversationCreationStep(ConversationCreationStep.ParticipantsSelection);
-            },
-          },
-          secondaryAction: {
-            text: t('groupCreationPreferencesNonFederatingLeave'),
-            action: () => {
-              setIsLoading(false);
-            },
-          },
-          text: {
-            htmlMessage: t('groupCreationPreferencesNonFederatingMessage', {backends: backendString}, replaceBackends),
-            title: t('groupCreationPreferencesNonFederatingHeadline'),
-          },
-        });
-      }
+      handleException(error as Error, conversationName);
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, undefined, {});
       setIsLoading(false);
     }

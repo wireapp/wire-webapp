@@ -27,8 +27,8 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {ConversationFeature} from './ConversationFeature';
 import {ConversationOption} from './ConversationOption';
+import {conversationTypeContainerCss} from './ConversationType.styles';
 
-import {conversationTypeContainerCss} from '../CreateConversation.styles';
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
 import {ConversationCreationStep, ConversationType} from '../types';
 import {getConversationTypeOptions} from '../utils';

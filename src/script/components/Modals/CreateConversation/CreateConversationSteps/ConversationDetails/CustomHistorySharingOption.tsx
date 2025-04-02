@@ -19,13 +19,13 @@
 
 import {ChevronIcon, FlexBox, Option} from '@wireapp/react-ui-kit';
 
-import {UpgradeBadge} from './UpgradeBadge';
-
 import {
   customHistorySharingOptionContainerCss,
   customHistorySharingOptionLeftSectionCss,
   customHistorySharingOptionIconCss,
-} from '../../CreateConversation.styles';
+} from './ConversationDetails.styles';
+import {UpgradeBadge} from './UpgradeBadge';
+
 import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
 import {ChatHistory} from '../../types';
 

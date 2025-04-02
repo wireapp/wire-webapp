@@ -26,9 +26,9 @@ import {TeamState} from 'src/script/team/TeamState';
 import {t} from 'Util/LocalizerUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
-import {CustomHistorySharingOption} from './CutomHistorySharingOption';
+import {channelSettingsTextCss} from './ConversationDetails.styles';
+import {CustomHistorySharingOption} from './CustomHistorySharingOption';
 
-import {channelSettingsTextCss} from '../../CreateConversation.styles';
 import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
 import {ChatHistory, ConversationAccess, ConversationModerator} from '../../types';
 import {getConversationAccessOptions, getChatHistoryOptions, getConversationManagerOptions} from '../../utils';

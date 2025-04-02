@@ -32,7 +32,8 @@ import {
   salesModalBodyHeaderCss,
   salesModalBodyTextCss,
   salesModalBodyButtonCss,
-} from '../../CreateConversation.styles';
+} from './ConversationDetails.styles';
+
 import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
 
 export const UpgradePlanModal = () => {

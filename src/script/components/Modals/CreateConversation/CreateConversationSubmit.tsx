@@ -31,7 +31,6 @@ export const CreateConversationSubmit = () => {
   return (
     <Button
       id="group-go-next"
-      className="group-creation__action"
       css={{marginBottom: 0}}
       disabled={!!error || !conversationName}
       type="button"

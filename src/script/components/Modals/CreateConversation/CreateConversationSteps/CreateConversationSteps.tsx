@@ -20,14 +20,15 @@
 import {FlexBox} from '@wireapp/react-ui-kit';
 
 import {ConversationDetails} from './ConversationDetails/ConversationDetails';
+import {createConversationStepRightContainerCss} from './CreateConversationSteps.styles';
 import {ParticipantsSelection} from './ParticipantsSelection';
 import {Preference} from './Preference';
 
 import {ConversationTypeContainer} from '../ConversationType/ConversationTypeContainer';
-import {createConversationStepRightContainerCss} from '../CreateConversation.styles';
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
 import {ConversationCreationStep} from '../types';
-export const CreateConversationSteps: React.FC = () => {
+
+export const CreateConversationSteps = () => {
   const {conversationCreationStep} = useCreateConversationModal();
 
   if (conversationCreationStep === ConversationCreationStep.ParticipantsSelection) {

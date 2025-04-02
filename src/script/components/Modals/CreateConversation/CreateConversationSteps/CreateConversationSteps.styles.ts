@@ -19,15 +19,40 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const createConversationModalWrapperCss: CSSObject = {
-  overflow: 'unset',
-  overflowY: 'unset',
-  maxWidth: '760px',
-  width: '-webkit-fill-available',
-  margin: '1rem',
+export const createConversationStepRightContainerCss: CSSObject = {
+  margin: '1rem 1.5rem',
+  flex: 1,
 };
 
-export const createConversationHeaderContainerCss: CSSObject = {
-  borderBottom: '1px solid var(--border-color)',
-  marginBottom: '0px',
+export const participantsSelectionSearchCss = {
+  margin: '20px',
+};
+
+export const customHistorySharingModalCss: CSSObject = {
+  overflow: 'unset',
+  overflowY: 'unset',
+  padding: '24px',
+  borderRadius: '10px',
+};
+
+export const customHistorySharingFormContainerCss: CSSObject = {
+  gap: '0.5rem',
+  marginTop: '1rem',
+};
+
+export const customHistorySharingButtonContainerCss: CSSObject = {
+  gap: '0.5rem',
+};
+
+export const customHistorySharingInputCss: CSSObject = {
+  width: '5rem',
+};
+
+export const customHistorySharingSelectCss: CSSObject = {
+  display: 'block',
+};
+
+export const customHistorySharingButtonCss: CSSObject = {
+  flex: 1,
+  margin: 0,
 };

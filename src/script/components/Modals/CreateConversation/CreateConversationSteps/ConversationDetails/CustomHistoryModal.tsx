@@ -23,17 +23,17 @@ import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {handleEscDown, handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import {
-  customHistorySharingButtonContainerCss,
-  customHistorySharingButtonCss,
-  customHistorySharingFormContainerCss,
-  customHistorySharingInputCss,
-  customHistorySharingModalCss,
-  customHistorySharingSelectCss,
-} from '../../CreateConversation.styles';
 import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
 import {ChatHistory, HistorySharingUnit} from '../../types';
 import {getChatHistorySharingUnitOptions} from '../../utils';
+import {
+  customHistorySharingModalCss,
+  customHistorySharingFormContainerCss,
+  customHistorySharingInputCss,
+  customHistorySharingSelectCss,
+  customHistorySharingButtonContainerCss,
+  customHistorySharingButtonCss,
+} from '../CreateConversationSteps.styles';
 
 export const CustomHistoryModal = () => {
   const {

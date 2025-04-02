@@ -32,7 +32,8 @@ import {
   salesModalBodyTextCss,
   salesModalBodyWrapperCss,
   salesModalWrapperCss,
-} from '../../CreateConversation.styles';
+} from './ConversationDetails.styles';
+
 import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
 
 export const CreateTeamModal = () => {
