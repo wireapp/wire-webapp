@@ -24,12 +24,13 @@ import {handleEscDown, handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {
-  confirmConversationButtonContainerCss,
-  confirmConversationButtonCss,
+  confirmConversationTypeContainerCss,
   confirmConversationHeaderCss,
   confirmConversationTextCss,
-  confirmConversationTypeContainerCss,
-} from '../CreateConversation.styles';
+  confirmConversationButtonContainerCss,
+  confirmConversationButtonCss,
+} from './ConversationType.styles';
+
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
 import {ConversationType} from '../types';
 

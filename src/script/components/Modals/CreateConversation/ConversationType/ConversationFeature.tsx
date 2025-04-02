@@ -27,7 +27,8 @@ import {
   conversationFeatureCss,
   conversationFeatureIconCss,
   conversationFeatureVerifiedIconCss,
-} from '../CreateConversation.styles';
+} from './ConversationType.styles';
+
 import {ConversationType} from '../types';
 
 interface ConversationFeatureProps {

@@ -20,22 +20,44 @@
 import {CSSObject} from '@emotion/react';
 
 import {
-  customHistorySharingFormContainerCss,
-  salesModalBodyButtonCss,
-  salesModalBodyCss,
   salesModalWrapperCss,
-} from 'Components/Modals/CreateConversation/CreateConversation.styles';
+  salesModalBodyCss,
+  salesModalBodyButtonCss,
+} from 'Components/Modals/CreateConversation/CreateConversationSteps/ConversationDetails/ConversationDetails.styles';
+import {customHistorySharingFormContainerCss} from 'Components/Modals/CreateConversation/CreateConversationSteps/CreateConversationSteps.styles';
 
-export const teamCreationWrapperCss: CSSObject = {...salesModalWrapperCss, marginTop: '1rem', width: '100%'};
-export const teamCreationBodyCss: CSSObject = {...salesModalBodyCss, padding: '16px'};
+export const teamCreationWrapperCss: CSSObject = {
+  ...salesModalWrapperCss,
+  marginTop: '1rem',
+  width: '100%',
+};
+
+export const teamCreationBodyCss: CSSObject = {
+  ...salesModalBodyCss,
+  padding: '16px',
+};
+
 export const teamCreationTextCss: CSSObject = {
   margin: 0,
   marginBottom: '0.5rem',
   color: 'var(--white)',
   maxWidth: '78%',
 };
-export const teamCreationButtonCss: CSSObject = {...salesModalBodyButtonCss, marginTop: 0};
 
-export const conversationHistoryContainerCss: CSSObject = {padding: '24px 16px'};
-export const conversationHistoryParagraphCss: CSSObject = {margin: '16px 0'};
-export const conversationHistoryCustomCss: CSSObject = {...customHistorySharingFormContainerCss, marginLeft: '30px'};
+export const teamCreationButtonCss: CSSObject = {
+  ...salesModalBodyButtonCss,
+  marginTop: 0,
+};
+
+export const conversationHistoryContainerCss: CSSObject = {
+  padding: '24px 16px',
+};
+
+export const conversationHistoryParagraphCss: CSSObject = {
+  margin: '16px 0',
+};
+
+export const conversationHistoryCustomCss: CSSObject = {
+  ...customHistorySharingFormContainerCss,
+  marginLeft: '30px',
+};

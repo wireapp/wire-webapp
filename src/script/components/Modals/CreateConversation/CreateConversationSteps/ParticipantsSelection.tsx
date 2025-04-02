@@ -31,7 +31,8 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
-import {participantsSelectionSearchCss} from '../CreateConversation.styles';
+import {participantsSelectionSearchCss} from './CreateConversationSteps.styles';
+
 import {useCreateConversation} from '../hooks/useCreateConversation';
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
 
