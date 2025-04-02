@@ -169,16 +169,16 @@ export class CanvasMediaStreamMixer {
             const out_h = this.canvas.height / CAMERA_OVERLAY_SCALE;
             const out_w = (this.cameraVideo.videoWidth / this.cameraVideo.videoHeight) * out_h;
 
-            const x = this.isPipActive
+            const cameraOverlayX = this.isPipActive
               ? Math.round(this.canvas.width - out_w + this.smallOffsetX)
               : Math.round(this.canvas.width - out_w - CAMERA_OVERLAY_PADDING);
 
-            const y = this.isPipActive ? Math.round(this.smallOffsetY) : CAMERA_OVERLAY_PADDING;
+            const cameraOverlayY = this.isPipActive ? Math.round(this.smallOffsetY) : CAMERA_OVERLAY_PADDING;
 
             this.context.save();
             this.context.shadowColor = SHADOW_COLOR;
             this.context.shadowBlur = SHADOW_BLUR;
-            this.context.drawImage(this.cameraVideo, x, y, out_w, out_h);
+            this.context.drawImage(this.cameraVideo, cameraOverlayX, cameraOverlayY, out_w, out_h);
             this.context.restore();
           }
         } catch (error) {
