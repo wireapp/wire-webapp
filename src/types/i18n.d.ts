@@ -953,9 +953,9 @@ declare module 'I18n/en-US.json' {
     'mlsThumbprint': `MLS Thumbprint`;
     'mlsToggleInfo': `When this is on, conversation will use the new messaging layer security (MLS) protocol.`;
     'mlsToggleName': `MLS`;
-    'mlsWasEnabledDescription': `MLS messaging protocol was just enabled on your team, in order for your client to migrate to this protocol we recommend reloading the app`;
+    'mlsWasEnabledDescription': `Your team now uses the new Messaging Layer Security (MLS) protocol. To communicate seamlessly, we recommend reloading the app.<br/>[link]Learn more about MLS[/link]`;
     'mlsWasEnabledReload': `Reload`;
-    'mlsWasEnabledTitle': `New messaging protocol is enabled on your team`;
+    'mlsWasEnabledTitle': `New messaging protocol`;
     'modal1To1ConversationCreateErrorNoKeyPackagesHeadline': `Unable to start conversation`;
     'modal1To1ConversationCreateErrorNoKeyPackagesMessage': `You can’t start the conversation with {name} right now.<br/>{name} needs to open Wire or log in again first.<br/>Please try again later.`;
     'modalAccountCreateAction': `OK`;
