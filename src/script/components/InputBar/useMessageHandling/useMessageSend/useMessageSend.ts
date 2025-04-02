@@ -146,6 +146,9 @@ export const useMessageSend = ({
           contentType: file.type,
           initialName: file.name,
           initialSize: file.size,
+          image: file.image,
+          audio: file.audio,
+          video: file.video,
         },
       };
     });

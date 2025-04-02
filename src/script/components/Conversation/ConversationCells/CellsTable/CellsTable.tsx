@@ -46,12 +46,13 @@ import {CellFile} from '../common/cellFile/cellFile';
 interface CellsTableProps {
   files: CellFile[];
   cellsRepository: CellsRepository;
+  conversationId: string;
   onDeleteFile: (uuid: string) => void;
 }
 
 const columnHelper = createColumnHelper<CellFile>();
 
-export const CellsTable = ({files, cellsRepository, onDeleteFile}: CellsTableProps) => {
+export const CellsTable = ({files, cellsRepository, conversationId, onDeleteFile}: CellsTableProps) => {
   const showDeleteFileModal = useCallback(
     ({uuid, name}: {uuid: string; name: string}) => {
       PrimaryModal.show(PrimaryModal.type.CONFIRM, {
@@ -107,7 +108,7 @@ export const CellsTable = ({files, cellsRepository, onDeleteFile}: CellsTablePro
                     }
                   : undefined
               }
-              onShare={() => showShareFileModal({uuid, cellsRepository})}
+              onShare={() => showShareFileModal({uuid, conversationId, cellsRepository})}
               onDownload={fileUrl ? () => forcedDownloadFile({url: fileUrl, name: info.row.original.name}) : undefined}
               onDelete={() => showDeleteFileModal({uuid, name: info.row.original.name})}
             />

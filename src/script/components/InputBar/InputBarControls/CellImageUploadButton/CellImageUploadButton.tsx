@@ -17,17 +17,24 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import * as Icon from 'Components/Icon';
+import {t} from 'Util/LocalizerUtil';
 
-const iconStyles: CSSObject = {
-  flexShrink: 0,
-};
+interface CellImageUploadButtonProps {
+  onClick: () => void;
+}
 
-export const errorIconStyles: CSSObject = {
-  ...iconStyles,
-  fill: 'var(--danger-color)',
-};
-
-export const unavailableIconStyles: CSSObject = {
-  ...iconStyles,
+export const CellImageUploadButton = ({onClick}: CellImageUploadButtonProps) => {
+  return (
+    <button
+      type="button"
+      aria-label={t('tooltipConversationAddImage')}
+      title={t('tooltipConversationAddImage')}
+      className="input-bar-control file-button"
+      onClick={onClick}
+      data-uie-name="do-share-image"
+    >
+      <Icon.ImageIcon />
+    </button>
+  );
 };

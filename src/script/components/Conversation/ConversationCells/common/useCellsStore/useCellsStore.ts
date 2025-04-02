@@ -24,31 +24,55 @@ import {CellFile} from '../cellFile/cellFile';
 type Status = 'idle' | 'loading' | 'success' | 'error';
 
 interface CellsState {
-  files: CellFile[];
+  filesByConversation: Record<string, CellFile[]>;
   status: Status;
   error: Error | null;
-  setFiles: (files: CellFile[]) => void;
+  setFiles: (params: {conversationId: string; files: CellFile[]}) => void;
   setStatus: (status: Status) => void;
   setError: (error: Error | null) => void;
-  updateFile: (fileId: string, updates: Partial<CellFile>) => void;
-  removeFile: (fileId: string) => void;
-  clearAll: () => void;
+  updateFile: (params: {conversationId: string; fileId: string; updates: Partial<CellFile>}) => void;
+  removeFile: (params: {conversationId: string; fileId: string}) => void;
+  clearAll: (params: {conversationId: string}) => void;
+  getFiles: (params: {conversationId: string}) => CellFile[];
 }
 
-export const useCellsStore = create<CellsState>(set => ({
-  files: [],
+export const useCellsStore = create<CellsState>((set, get) => ({
+  filesByConversation: {},
   status: 'idle',
   error: null,
-  setFiles: files => set({files}),
+  setFiles: ({conversationId, files}) =>
+    set(state => ({
+      filesByConversation: {
+        ...state.filesByConversation,
+        [conversationId]: files,
+      },
+    })),
   setStatus: status => set({status}),
   setError: error => set({error}),
-  updateFile: (fileId, updates) =>
+  updateFile: ({conversationId, fileId, updates}) =>
     set(state => ({
-      files: state.files.map(file => (file.id === fileId ? {...file, ...updates} : file)),
+      filesByConversation: {
+        ...state.filesByConversation,
+        [conversationId]:
+          state.filesByConversation[conversationId]?.map(file => (file.id === fileId ? {...file, ...updates} : file)) ||
+          [],
+      },
     })),
-  removeFile: fileId =>
+  removeFile: ({conversationId, fileId}) =>
     set(state => ({
-      files: state.files.filter(file => file.id !== fileId),
+      filesByConversation: {
+        ...state.filesByConversation,
+        [conversationId]: state.filesByConversation[conversationId]?.filter(file => file.id !== fileId) || [],
+      },
     })),
-  clearAll: () => set({files: [], status: 'idle', error: null}),
+  clearAll: ({conversationId}) => {
+    const state = get();
+    const updatedFilesByConversation = {...state.filesByConversation};
+    delete updatedFilesByConversation[conversationId];
+    set({filesByConversation: updatedFilesByConversation, status: 'idle', error: null});
+  },
+  getFiles: ({conversationId}) => {
+    const state = get().filesByConversation;
+    return state[conversationId] || [];
+  },
 }));

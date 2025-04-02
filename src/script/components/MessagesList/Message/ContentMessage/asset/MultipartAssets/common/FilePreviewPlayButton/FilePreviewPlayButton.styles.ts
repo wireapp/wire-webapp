@@ -19,15 +19,19 @@
 
 import {CSSObject} from '@emotion/react';
 
-const iconStyles: CSSObject = {
+export const buttonStyles: CSSObject = {
+  width: '24px',
+  height: '24px',
+  borderRadius: '50%',
+  backgroundColor: 'var(--icon-button-primary-disabled-bg)',
+  border: '1px solid var(--icon-button-primary-border)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
   flexShrink: 0,
+  cursor: 'not-allowed',
 };
 
-export const errorIconStyles: CSSObject = {
-  ...iconStyles,
-  fill: 'var(--danger-color)',
-};
-
-export const unavailableIconStyles: CSSObject = {
-  ...iconStyles,
+export const playIconStyles: CSSObject = {
+  fill: 'var(--main)',
 };

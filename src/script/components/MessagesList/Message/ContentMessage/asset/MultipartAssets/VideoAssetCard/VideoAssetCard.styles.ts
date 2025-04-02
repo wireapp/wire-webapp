@@ -19,15 +19,16 @@
 
 import {CSSObject} from '@emotion/react';
 
-const iconStyles: CSSObject = {
-  flexShrink: 0,
+export const videoStyles: CSSObject = {
+  width: '100%',
+  height: '100%',
+  objectFit: 'cover',
+  borderRadius: '10px',
 };
 
-export const errorIconStyles: CSSObject = {
-  ...iconStyles,
-  fill: 'var(--danger-color)',
-};
-
-export const unavailableIconStyles: CSSObject = {
-  ...iconStyles,
+export const iconWrapperStyles: CSSObject = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
 };

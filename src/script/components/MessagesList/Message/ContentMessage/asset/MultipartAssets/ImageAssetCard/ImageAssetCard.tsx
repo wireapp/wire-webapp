@@ -17,17 +17,26 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {t} from 'Util/LocalizerUtil';
 
-const iconStyles: CSSObject = {
-  flexShrink: 0,
-};
+import {imageStyles} from './ImageAssetCard.styles';
 
-export const errorIconStyles: CSSObject = {
-  ...iconStyles,
-  fill: 'var(--danger-color)',
-};
+import {MediaFilePreviewCard} from '../common/MediaFilePreviewCard/MediaFilePreviewCard';
 
-export const unavailableIconStyles: CSSObject = {
-  ...iconStyles,
+interface ImageAssetCardProps {
+  src?: string;
+  isLoading: boolean;
+  isError: boolean;
+}
+
+export const ImageAssetCard = ({src, isLoading, isError}: ImageAssetCardProps) => {
+  return (
+    <MediaFilePreviewCard
+      label={src ? t('conversationFileImagePreviewLabel', {src}) : 'Loading...'}
+      isLoading={isLoading}
+      isError={isError}
+    >
+      {!isLoading && !isError && src && <img src={src} alt="" css={imageStyles} />}
+    </MediaFilePreviewCard>
+  );
 };

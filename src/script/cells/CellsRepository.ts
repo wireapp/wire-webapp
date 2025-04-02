@@ -64,7 +64,7 @@ export class CellsRepository {
     file: File;
     path: string;
   }): Promise<{uuid: string; versionId: string}> {
-    const filePath = `${path || this.basePath}/${encodeURIComponent(file.name)}`;
+    const filePath = `${path || this.basePath}/${file.name}`;
 
     const versionId = createUuid();
 
@@ -91,6 +91,10 @@ export class CellsRepository {
 
   async getAllFiles({path, limit = DEFAULT_MAX_FILES_LIMIT}: {path: string; limit?: number}) {
     return this.apiClient.api.cells.getAllFiles({path: path || this.basePath, limit});
+  }
+
+  async getFile({uuid}: {uuid: string}) {
+    return this.apiClient.api.cells.getFile({id: uuid});
   }
 
   async createPublicLink({uuid, label}: {uuid: string; label?: string}) {

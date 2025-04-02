@@ -17,17 +17,12 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {wrapperStyles, iconStyles} from './FilePreviewLoading.styles';
 
-const iconStyles: CSSObject = {
-  flexShrink: 0,
-};
-
-export const errorIconStyles: CSSObject = {
-  ...iconStyles,
-  fill: 'var(--danger-color)',
-};
-
-export const unavailableIconStyles: CSSObject = {
-  ...iconStyles,
+export const FilePreviewLoading = () => {
+  return (
+    <div css={wrapperStyles}>
+      <div className="icon-spinner spin" css={iconStyles} />
+    </div>
+  );
 };

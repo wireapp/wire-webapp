@@ -17,17 +17,14 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {PlayIcon} from '@wireapp/react-ui-kit';
 
-const iconStyles: CSSObject = {
-  flexShrink: 0,
-};
+import {buttonStyles, playIconStyles} from './FilePreviewPlayButton.styles';
 
-export const errorIconStyles: CSSObject = {
-  ...iconStyles,
-  fill: 'var(--danger-color)',
-};
-
-export const unavailableIconStyles: CSSObject = {
-  ...iconStyles,
+export const FilePreviewPlayButton = () => {
+  return (
+    <div css={buttonStyles}>
+      <PlayIcon width={10} height={10} css={playIconStyles} />
+    </div>
+  );
 };

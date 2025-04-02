@@ -31,6 +31,21 @@ export const wrapperStyles: CSSObject = {
   },
 };
 
+export const wrapperErrorStyles: CSSObject = {
+  ...wrapperStyles,
+  display: 'flex',
+  alignItems: 'flex-start',
+  justifyContent: 'space-between',
+  flexDirection: 'column',
+  backgroundColor: 'var(--app-bg-secondary)',
+  padding: '8px 8px 6px',
+
+  'body.theme-dark &': {
+    backgroundColor: 'var(--foreground-fade-8)',
+    border: '1px solid transparent',
+  },
+};
+
 export const imageStyles: CSSObject = {
   width: '100%',
   height: '100%',
@@ -38,48 +53,40 @@ export const imageStyles: CSSObject = {
   borderRadius: '10px',
 };
 
-export const controlStyles: CSSObject = {
+export const loadingWrapperStyles: CSSObject = {
   position: 'absolute',
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-};
-
-export const iconWrapperStyles: CSSObject = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
+  padding: '0',
+  margin: '0',
+  cursor: 'pointer',
   width: '24px',
   height: '24px',
+  background: 'var(--icon-button-primary-enabled-bg)',
   border: '1px solid var(--icon-button-primary-border)',
-  backgroundColor: 'var(--white)',
-  borderRadius: '50%',
+  borderRadius: '100%',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
 };
 
-export const alertIconStyles: CSSObject = {
-  fill: 'var(--danger-color)',
+export const loadingIconStyles: CSSObject = {
+  fontSize: 'var(--font-size-medium)',
+  color: 'var(--main)',
 };
 
-export const errorLineWrapperStyles: CSSObject = {
-  width: '100%',
-  height: '100%',
-  borderRadius: '10px',
-  position: 'absolute',
-  left: 0,
-  top: 0,
-  pointerEvents: 'none',
-  overflow: 'hidden',
+export const errorIconStyles: CSSObject = {
+  flexShrink: 0,
 };
 
-export const errorLineStyles: CSSObject = {
-  height: '3px',
-  width: '100%',
-  position: 'absolute',
-  bottom: 0,
-  left: 0,
-  backgroundColor: 'var(--danger-color)',
+export const errorTextStyles: CSSObject = {
+  fontSize: 'var(--font-size-medium)',
+  fontWeight: 'var(--line-height-md)',
+  lineHeight: 'var(--line-height-sm)',
+  color: 'var(--gray-70)',
+
+  'body.dark &': {
+    color: 'var(--gray-40)',
+  },
 };
