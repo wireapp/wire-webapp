@@ -369,7 +369,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/lib-storage@npm:3.779.0, @aws-sdk/lib-storage@npm:^3.779.0":
+"@aws-sdk/lib-storage@npm:3.779.0":
   version: 3.779.0
   resolution: "@aws-sdk/lib-storage@npm:3.779.0"
   dependencies:
@@ -7750,31 +7750,6 @@ __metadata:
     webpack-dev-server:
       optional: true
   checksum: 10/688138f7b2f96ed7a5aae2798bd647e4db0fdf8e86850a493c987049eec6faf63ba78d8f08b4f0a9e41dc459cba80abfb621ae1a45890bb0fa2c09baef4db75b
-  languageName: node
-  linkType: hard
-
-"@wireapp/api-client@file:.yalc/@wireapp/api-client::locator=wire-webapp%40workspace%3A.":
-  version: 27.34.0
-  resolution: "@wireapp/api-client@file:.yalc/@wireapp/api-client#.yalc/@wireapp/api-client::hash=6c0b87&locator=wire-webapp%40workspace%3A."
-  dependencies:
-    "@aws-sdk/client-s3": "npm:3.750.0"
-    "@aws-sdk/lib-storage": "npm:3.779.0"
-    "@pydio/protocol-messaging": "npm:1.51.0"
-    "@wireapp/commons": "npm:^5.4.2"
-    "@wireapp/priority-queue": "npm:^2.1.11"
-    axios: "npm:1.7.9"
-    axios-retry: "npm:4.5.0"
-    cells-sdk-ts: "https://github.com/pydio/cells-sdk-ts#v0.1.1-alpha07"
-    http-status-codes: "npm:2.3.0"
-    logdown: "npm:3.3.1"
-    pako: "npm:2.1.0"
-    reconnecting-websocket: "npm:4.4.0"
-    spark-md5: "npm:3.0.2"
-    tough-cookie: "npm:4.1.4"
-    uuid: "npm:11.1.0"
-    ws: "npm:8.18.1"
-    zod: "npm:3.24.2"
-  checksum: 10/3bd9f11df3630f59d94e130b28d8132bea14d5a43bbc158c25b4c1b3a40f733fd631ae0e053948742f3a43f3fa398e15c6b0bc04050d0744b04773aba5ef2abd
   languageName: node
   linkType: hard
 
@@ -21114,7 +21089,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "wire-webapp@workspace:."
   dependencies:
-    "@aws-sdk/lib-storage": "npm:^3.779.0"
     "@babel/core": "npm:7.26.10"
     "@babel/plugin-proposal-decorators": "npm:7.25.9"
     "@babel/preset-env": "npm:7.26.9"
@@ -21166,7 +21140,6 @@ __metadata:
     "@types/uuid": "npm:^10.0.0"
     "@types/webpack-env": "npm:1.18.8"
     "@types/wicg-file-system-access": "npm:^2023.10.5"
-    "@wireapp/api-client": "file:.yalc/@wireapp/api-client"
     "@wireapp/avs": "npm:9.10.25"
     "@wireapp/avs-debugger": "npm:0.0.7"
     "@wireapp/commons": "npm:5.4.2"
