@@ -7129,10 +7129,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/wicg-file-system-access@npm:^2023.10.5":
-  version: 2023.10.5
-  resolution: "@types/wicg-file-system-access@npm:2023.10.5"
-  checksum: 10/f161b76d0c53b3e72238acf7ed5af3893018a845cd9e0a507394ba219607808d34957f6247e1ef091a8ea9131495dca8f12804c6bd75c5c34bf0b990f561be57
+"@types/wicg-file-system-access@npm:^2023.10.6":
+  version: 2023.10.6
+  resolution: "@types/wicg-file-system-access@npm:2023.10.6"
+  checksum: 10/500ea4874dad6902b5a529b53b65b73f72c75b93b5b1593176d3e3679a35bcd17120a863a4eb5ec1e33ad583708eff7b2e6a92cb42b0bd66242281b322fb03be
   languageName: node
   linkType: hard
 
@@ -20889,7 +20889,7 @@ __metadata:
     "@types/underscore": "npm:1.13.0"
     "@types/uuid": "npm:^10.0.0"
     "@types/webpack-env": "npm:1.18.8"
-    "@types/wicg-file-system-access": "npm:^2023.10.5"
+    "@types/wicg-file-system-access": "npm:^2023.10.6"
     "@wireapp/avs": "npm:9.10.25"
     "@wireapp/avs-debugger": "npm:0.0.7"
     "@wireapp/commons": "npm:5.4.2"

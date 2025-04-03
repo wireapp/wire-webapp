@@ -108,7 +108,7 @@
     "@types/underscore": "1.13.0",
     "@types/uuid": "^10.0.0",
     "@types/webpack-env": "1.18.8",
-    "@types/wicg-file-system-access": "^2023.10.5",
+    "@types/wicg-file-system-access": "^2023.10.6",
     "@wireapp/copy-config": "2.3.0",
     "@wireapp/eslint-config": "3.0.7",
     "@wireapp/prettier-config": "0.6.4",
