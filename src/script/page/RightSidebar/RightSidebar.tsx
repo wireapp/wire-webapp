@@ -335,7 +335,13 @@ const RightSidebar: FC<RightSidebarProps> = ({
           )}
 
           {currentState === PanelState.ACCESS && (
-            <Access onClose={closePanel} onGoBack={onBackClick} activeConversation={activeConversation} />
+            <Access
+              onClose={closePanel}
+              onGoBack={onBackClick}
+              activeConversation={activeConversation}
+              conversationRepository={conversationRepository}
+              conversationRoleRepository={conversationRoleRepository}
+            />
           )}
           {currentState === PanelState.CONVERSATION_HISTORY && (
             <ConversationHistory onClose={closePanel} onGoBack={onBackClick} />

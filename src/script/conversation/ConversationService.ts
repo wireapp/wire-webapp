@@ -24,6 +24,7 @@ import type {
   CONVERSATION_ACCESS,
   RemoteConversations,
   ConversationProtocol,
+  ADD_PERMISSION,
 } from '@wireapp/api-client/lib/conversation';
 import type {
   ConversationJoinData,
@@ -309,6 +310,10 @@ export class ConversationService {
 
   deleteConversation(teamId: string, conversationId: string): Promise<void> {
     return this.apiClient.api.teams.conversation.deleteConversation(teamId, conversationId);
+  }
+
+  putAddPermission(conversationId: QualifiedId, addPermission: ADD_PERMISSION) {
+    return this.apiClient.api.conversation.putAddPermission(conversationId, addPermission);
   }
 
   /**

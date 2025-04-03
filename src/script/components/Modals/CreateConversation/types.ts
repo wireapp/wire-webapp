@@ -23,14 +23,6 @@ export enum ConversationAccess {
 }
 
 /**
- * Enum representing the manager type of a conversation.
- */
-export enum ConversationModerator {
-  Admins,
-  AdminsAndMembers,
-}
-
-/**
  * Enum representing the chat history options for a conversation.
  */
 export enum ChatHistory {
