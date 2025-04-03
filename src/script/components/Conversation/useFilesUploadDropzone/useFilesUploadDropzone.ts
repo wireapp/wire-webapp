@@ -105,13 +105,19 @@ export const useFilesUploadDropzone = ({
         ? `${conversation.id}@${CONFIG.CELLS_WIRE_DOMAIN}`
         : `${conversation.qualifiedId.id}@${conversation.qualifiedId.domain}`;
 
+    const decimalMultiplier = 100;
+
     try {
       const {uuid, versionId} = await cellsRepository.uploadFile({
         uuid: file.id,
         file,
         path,
         progressCallback: (progress: number) => {
-          console.log('progressCallback', progress);
+          updateFile({
+            conversationId: conversation.id,
+            fileId: file.id,
+            data: {uploadProgress: progress * decimalMultiplier},
+          });
         },
       });
       updateFile({
@@ -160,6 +166,7 @@ export const useFilesUploadDropzone = ({
         remoteUuid: '',
         remoteVersionId: '',
         uploadStatus: 'uploading' as const,
+        uploadProgress: 0,
       });
     });
   };

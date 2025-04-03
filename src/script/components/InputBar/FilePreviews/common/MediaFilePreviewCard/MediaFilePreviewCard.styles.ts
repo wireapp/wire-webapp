@@ -64,7 +64,7 @@ export const alertIconStyles: CSSObject = {
   fill: 'var(--danger-color)',
 };
 
-export const errorLineWrapperStyles: CSSObject = {
+export const lineWrapperStyles: CSSObject = {
   width: '100%',
   height: '100%',
   borderRadius: '10px',
@@ -82,4 +82,13 @@ export const errorLineStyles: CSSObject = {
   bottom: 0,
   left: 0,
   backgroundColor: 'var(--danger-color)',
+};
+
+export const progressLineStyles: CSSObject = {
+  height: '3px',
+  position: 'absolute',
+  bottom: 0,
+  left: 0,
+  backgroundColor: 'var(--accent-color)',
+  transition: 'width 0.3s ease-in-out',
 };

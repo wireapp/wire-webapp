@@ -23,7 +23,6 @@ import {wrapperStyles} from './FilePreviewCard.styles';
 
 import {FilePreviewDeleteButton} from '../common/FilePreviewDeleteButton/FilePreviewDeleteButton';
 import {FilePreviewErrorMoreButton} from '../common/FilePreviewErrorMoreButton/FilePreviewErrorMoreButton';
-import {FilePreviewLoading} from '../common/FilePreviewLoading/FilePreviewLoading';
 
 interface FilePreviewCardProps {
   extension: string;
@@ -33,6 +32,7 @@ interface FilePreviewCardProps {
   isLoading: boolean;
   onDelete: () => void;
   onRetry: () => void;
+  uploadProgress: number;
 }
 
 export const FilePreviewCard = ({
@@ -43,6 +43,7 @@ export const FilePreviewCard = ({
   isLoading,
   onDelete,
   onRetry,
+  uploadProgress,
 }: FilePreviewCardProps) => {
   return (
     <div css={wrapperStyles}>
@@ -58,8 +59,8 @@ export const FilePreviewCard = ({
             <FilePreviewErrorMoreButton onDelete={onDelete} onRetry={onRetry} />
           </>
         )}
-        {isLoading && <FilePreviewLoading />}
-        {!isError && !isLoading && <FilePreviewDeleteButton onDelete={onDelete} />}
+        {!isError && <FilePreviewDeleteButton onDelete={onDelete} />}
+        <FileCard.Loading progress={uploadProgress} />
       </FileCard.Root>
     </div>
   );
