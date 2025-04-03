@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.35.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.34.0...@wireapp/api-client@27.35.0) (2025-04-03)
+
+### Features
+
+* **api-client/cells:** file upload progress [WPB-16866] ([#6999](https://github.com/wireapp/wire-web-packages/issues/6999)) ([13efba5](https://github.com/wireapp/wire-web-packages/commit/13efba5e8a8270fe54dc7be02ddf8b89d6203a07))
+
 # [27.34.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.33.0...@wireapp/api-client@27.34.0) (2025-03-28)
 
 ### Features
