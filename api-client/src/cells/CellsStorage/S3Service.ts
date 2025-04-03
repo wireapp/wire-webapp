@@ -29,8 +29,8 @@ interface S3ServiceConfig {
   region: string;
 }
 
-const MAX_QUEUE_SIZE = 3;
-const PART_SIZE = 5 * 1024 * 1024; // 5MB
+export const MAX_QUEUE_SIZE = 3;
+export const PART_SIZE = 10 * 1024 * 1024; // 10MB
 
 export class S3Service implements CellsStorage {
   private client: S3Client;
