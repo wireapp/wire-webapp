@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.37.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.36.0...@wireapp/api-client@27.37.0) (2025-04-03)
+
+### Features
+
+* add api wrapper for add_permissions update call [WPB-16728] ([#7001](https://github.com/wireapp/wire-web-packages/issues/7001)) ([3ff5ec2](https://github.com/wireapp/wire-web-packages/commit/3ff5ec21dd2443db99dac3f61b176dee7d3c0d85))
+
 # [27.36.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.35.0...@wireapp/api-client@27.36.0) (2025-04-03)
 
 ### Features
