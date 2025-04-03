@@ -1863,5 +1863,6 @@
   "createConversationUpgradePlanModalText": "Upgrade to a paid plan to offer channel members the whole history.",
   "createConversationUpgradePlanModalButton": "Upgrade now",
   "createConversationUpgradeBadge": "Upgrade",
-  "conversationAccessDisclaimer": "A private channel can not be changed to public."
+  "conversationAccessDisclaimer": "A private channel can not be changed to public.",
+  "systemMessageLearnMore": "Learn more"
 }
