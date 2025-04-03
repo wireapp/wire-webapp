@@ -35,7 +35,7 @@ const FAKE_PROGRESS = 20;
 const FAKE_PROGRESS_DELAY = 200;
 
 export const FileCardLoading = ({progress = MAX_PROGRESS}: FileCardLoadingProps) => {
-  const [loadingProgress, setLoadingProgress] = useState(INITIAL_PROGRESS);
+  const [fakeProgress, setFakeProgress] = useState(INITIAL_PROGRESS);
 
   // After the timeout, we set progress to a small value to indicate that the file is loading
   // This is to avoid the progress bar from not showing up when progress is 0 for a longer time
@@ -44,7 +44,7 @@ export const FileCardLoading = ({progress = MAX_PROGRESS}: FileCardLoadingProps)
       return undefined;
     }
     const timer = setTimeout(() => {
-      setLoadingProgress(FAKE_PROGRESS);
+      setFakeProgress(FAKE_PROGRESS);
     }, FAKE_PROGRESS_DELAY);
 
     return () => clearTimeout(timer);
@@ -54,7 +54,7 @@ export const FileCardLoading = ({progress = MAX_PROGRESS}: FileCardLoadingProps)
     <div css={wrapperStyles}>
       <div
         css={[loadingStyles, progress === MAX_PROGRESS && easeOutStyles]}
-        style={{'--progress': `${!progress ? loadingProgress : progress}%`} as CSSProperties}
+        style={{'--progress': `${!progress ? fakeProgress : progress}%`} as CSSProperties}
       />
     </div>
   );
