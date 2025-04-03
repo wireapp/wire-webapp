@@ -22,6 +22,7 @@ import {chunk} from '@wireapp/commons/lib/util/ArrayUtil';
 import {AxiosRequestConfig, isAxiosError} from 'axios';
 
 import {
+  ADD_PERMISSION,
   Conversation,
   ConversationCode,
   ConversationProtocol,
@@ -40,6 +41,7 @@ import {
 import {BackendFeatures} from '../../APIClient';
 import {
   ConversationAccessUpdateEvent,
+  ConversationAddPermissionUpdateEvent,
   ConversationCodeDeleteEvent,
   ConversationCodeUpdateEvent,
   ConversationEvent,
@@ -115,6 +117,7 @@ export class ConversationAPI {
     TYPING: 'typing',
     V2: 'v2',
     ONE_2_ONE: 'one2one',
+    ADD_PERMISSION: 'add-permission',
   };
 
   constructor(
@@ -918,6 +921,28 @@ export class ConversationAPI {
     };
 
     await this.client.sendJSON(config);
+  }
+
+  /**
+   *
+   * Update add_permission for channel.
+   * @param conversationId The Conversation ID
+   * @param addPermission The new add_permission
+   */
+  public async putAddPermission(
+    conversationId: QualifiedId,
+    addPermission: ADD_PERMISSION,
+  ): Promise<ConversationAddPermissionUpdateEvent> {
+    const config: AxiosRequestConfig = {
+      data: {
+        add_permission: addPermission,
+      },
+      method: 'put',
+      url: `${this.generateBaseConversationUrl(conversationId)}/${ConversationAPI.URL.ADD_PERMISSION}`,
+    };
+
+    const response = await this.client.sendJSON<ConversationAddPermissionUpdateEvent>(config);
+    return response.data;
   }
 
   /**

@@ -34,6 +34,7 @@ import {
   ConversationMLSWelcomeData,
   ConversationMLSMessageAddData,
 } from '../conversation/data/';
+import {ConversationAddPermissionUpdateData} from '../conversation/data/ConversationAddPermissionUpdateData';
 import {ConversationProtocolUpdateData} from '../conversation/data/ConversationProtocolUpdateData';
 import {QualifiedId} from '../user';
 
@@ -53,6 +54,7 @@ export enum CONVERSATION_EVENT {
   MLS_MESSAGE_ADD = 'conversation.mls-message-add',
   MLS_WELCOME_MESSAGE = 'conversation.mls-welcome',
   RECEIPT_MODE_UPDATE = 'conversation.receipt-mode-update',
+  ADD_PERMISSION_UPDATE = 'conversation.add-permission-update',
   RENAME = 'conversation.rename',
   TYPING = 'conversation.typing',
 }
@@ -73,6 +75,7 @@ export type ConversationEventData =
   | ConversationReceiptModeUpdateData
   | ConversationRenameData
   | ConversationTypingData
+  | ConversationAddPermissionUpdateData
   | null;
 
 export type ConversationEvent =
@@ -91,7 +94,8 @@ export type ConversationEvent =
   | ConversationMLSWelcomeEvent
   | ConversationReceiptModeUpdateEvent
   | ConversationRenameEvent
-  | ConversationTypingEvent;
+  | ConversationTypingEvent
+  | ConversationAddPermissionUpdateEvent;
 
 export interface BaseConversationEvent {
   conversation: string;
@@ -190,4 +194,9 @@ export interface ConversationRenameEvent extends BaseConversationEvent {
 export interface ConversationTypingEvent extends BaseConversationEvent {
   data: ConversationTypingData;
   type: CONVERSATION_EVENT.TYPING;
+}
+
+export interface ConversationAddPermissionUpdateEvent extends BaseConversationEvent {
+  data: ConversationAddPermissionUpdateData;
+  type: CONVERSATION_EVENT.ADD_PERMISSION_UPDATE;
 }
