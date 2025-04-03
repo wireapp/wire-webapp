@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode} from 'react';
+import {ReactNode, useState} from 'react';
 
 import {AlertIcon} from '@wireapp/react-ui-kit';
 
@@ -50,8 +50,15 @@ export const MediaFilePreviewCard = ({
   isError,
   children,
 }: MediaFilePreviewCardProps) => {
+  const [isHovered, setIsHovered] = useState(false);
+
   return (
-    <article css={wrapperStyles} aria-label={label}>
+    <article
+      css={wrapperStyles}
+      aria-label={label}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       {children}
       {isError && (
         <>
@@ -65,7 +72,7 @@ export const MediaFilePreviewCard = ({
         </>
       )}
       {isLoading && <FilePreviewLoading />}
-      {!isLoading && !isError && <FilePreviewDeleteButton onDelete={onDelete} />}
+      {(!isError && !isLoading) || (isLoading && isHovered) ? <FilePreviewDeleteButton onDelete={onDelete} /> : null}
     </article>
   );
 };

@@ -17,6 +17,8 @@
  *
  */
 
+import {useState} from 'react';
+
 import {FileCard} from 'Components/FileCard/FileCard';
 
 import {wrapperStyles} from './FilePreviewCard.styles';
@@ -44,8 +46,10 @@ export const FilePreviewCard = ({
   onDelete,
   onRetry,
 }: FilePreviewCardProps) => {
+  const [isHovered, setIsHovered] = useState(false);
+
   return (
-    <div css={wrapperStyles}>
+    <div css={wrapperStyles} onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
       <FileCard.Root extension={extension} name={name} size={size}>
         <FileCard.Header>
           <FileCard.Icon type={isError ? 'error' : 'file'} />
@@ -59,7 +63,7 @@ export const FilePreviewCard = ({
           </>
         )}
         {isLoading && <FilePreviewLoading />}
-        {!isError && !isLoading && <FilePreviewDeleteButton onDelete={onDelete} />}
+        {(!isError && !isLoading) || (isLoading && isHovered) ? <FilePreviewDeleteButton onDelete={onDelete} /> : null}
       </FileCard.Root>
     </div>
   );
