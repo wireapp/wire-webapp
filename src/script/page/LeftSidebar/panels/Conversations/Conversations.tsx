@@ -37,6 +37,7 @@ import {TeamRepository} from 'src/script/team/TeamRepository';
 import {EventName} from 'src/script/tracking/EventName';
 import {UserRepository} from 'src/script/user/UserRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {ConversationCallingView} from './ConversationCallingView/ConversationCallingView';
 import {ConversationHeader} from './ConversationHeader';
@@ -105,6 +106,7 @@ export const Conversations: React.FC<ConversationsProps> = ({
     setStatus: setSidebarStatus,
     setCurrentTab,
   } = useSidebarStore(useShallow(state => state));
+  const {isChannelsEnabled} = useChannelsFeatureFlag();
   const [conversationsFilter, setConversationsFilter] = useState<string>('');
   const {classifiedDomains, isTeam} = useKoSubscribableChildren(teamState, ['classifiedDomains', 'isTeam']);
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
@@ -119,6 +121,8 @@ export const Conversations: React.FC<ConversationsProps> = ({
     groupConversations,
     directConversations,
     visibleConversations,
+    channelConversations,
+    channelAndGroupConversations,
   } = useKoSubscribableChildren(conversationState, [
     'activeConversation',
     'archivedConversations',
@@ -126,6 +130,8 @@ export const Conversations: React.FC<ConversationsProps> = ({
     'directConversations',
     'unreadConversations',
     'visibleConversations',
+    'channelConversations',
+    'channelAndGroupConversations',
   ]);
 
   const conversations = useMemo(() => visibleConversations, [visibleConversations]);
@@ -149,6 +155,7 @@ export const Conversations: React.FC<ConversationsProps> = ({
     SidebarTabs.FOLDER,
     SidebarTabs.FAVORITES,
     SidebarTabs.GROUPS,
+    SidebarTabs.CHANNELS,
     SidebarTabs.DIRECTS,
     SidebarTabs.ARCHIVES,
   ].includes(currentTab);
@@ -179,6 +186,9 @@ export const Conversations: React.FC<ConversationsProps> = ({
     groupConversations,
     directConversations,
     favoriteConversations,
+    channelConversations,
+    isChannelsEnabled,
+    channelAndGroupConversations,
   });
 
   const currentFolder = labels
@@ -382,6 +392,7 @@ export const Conversations: React.FC<ConversationsProps> = ({
               showNotificationsBadge={notifications.length > 0}
               userRepository={userRepository}
               teamRepository={teamRepository}
+              channelConversations={channelConversations}
             />
           )
         }

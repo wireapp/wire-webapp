@@ -103,6 +103,24 @@ export const EmptyConversationList = ({currentTab, onChangeTab, searchValue = ''
     );
   }
 
+  if (currentTab === SidebarTabs.CHANNELS) {
+    return (
+      <div css={wrapper} className="empty-conversations-list">
+        <div>
+          <p css={paragraph}>{t('searchChannelsNoResult')}</p>
+          <Link
+            variant={LinkVariant.PRIMARY}
+            href={Config.getConfig().URL.WEBSITE_BASE}
+            target="_blank"
+            data-uie-name="learn-more-about-channels"
+          >
+            {t('conversationLearnMoreChannels')}
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   if (currentTab === SidebarTabs.DIRECTS) {
     return (
       <div css={wrapper} className="empty-conversations-list">

@@ -24,6 +24,8 @@ import {
   CONVERSATION_LEGACY_ACCESS_ROLE,
   CONVERSATION_TYPE,
   DefaultConversationRoleName,
+  GROUP_CONVERSATION_TYPE,
+  ADD_PERMISSION,
 } from '@wireapp/api-client/lib/conversation/';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
@@ -137,6 +139,8 @@ export class Conversation {
   public readonly isClearable: ko.PureComputed<boolean>;
   public readonly isCreatedBySelf: ko.PureComputed<boolean>;
   public readonly isGroup: ko.PureComputed<boolean>;
+  public readonly isChannel: ko.PureComputed<boolean>;
+  public readonly isGroupOrChannel: ko.PureComputed<boolean>;
   public readonly isGuest: ko.Observable<boolean>;
   public readonly isGuestRoom: ko.PureComputed<boolean>;
   public readonly isGuestAndServicesRoom: ko.PureComputed<boolean>;
@@ -182,6 +186,8 @@ export class Conversation {
   public accessModes?: CONVERSATION_ACCESS[];
   public accessRole?: CONVERSATION_LEGACY_ACCESS_ROLE | CONVERSATION_ACCESS_ROLE[];
   public domain: string;
+  public readonly groupConversationType: ko.Observable<GROUP_CONVERSATION_TYPE>;
+  public readonly conversationModerator: ko.Observable<ADD_PERMISSION>;
 
   static get TIMESTAMP_TYPE(): typeof TIMESTAMP_TYPE {
     return TIMESTAMP_TYPE;
@@ -207,6 +213,8 @@ export class Conversation {
     this.name = ko.observable();
     this.teamId = undefined;
     this.type = ko.observable();
+    this.groupConversationType = ko.observable<GROUP_CONVERSATION_TYPE>(GROUP_CONVERSATION_TYPE.GROUP_CONVERSATION);
+    this.conversationModerator = ko.observable<ADD_PERMISSION>(ADD_PERMISSION.EVERYONE);
 
     this.isLastMessageVisible = ko.observable(true);
     this.isLoadingMessages = ko.observable(false);
@@ -255,9 +263,20 @@ export class Conversation {
     );
 
     this.isGroup = ko.pureComputed(() => {
-      const isGroupConversation = this.type() === CONVERSATION_TYPE.REGULAR;
+      const isGroupConversation =
+        this.type() === CONVERSATION_TYPE.REGULAR &&
+        this.groupConversationType() === GROUP_CONVERSATION_TYPE.GROUP_CONVERSATION;
       return isGroupConversation && !this.isProteusTeam1to1();
     });
+
+    this.isChannel = ko.pureComputed(() => {
+      return this.groupConversationType() === GROUP_CONVERSATION_TYPE.CHANNEL;
+    });
+
+    this.isGroupOrChannel = ko.pureComputed(() => {
+      return this.isGroup() || this.isChannel();
+    });
+
     this.is1to1 = ko.pureComputed(() => {
       const is1to1Conversation = this.type() === CONVERSATION_TYPE.ONE_TO_ONE;
       return is1to1Conversation || this.isProteusTeam1to1();
@@ -270,11 +289,11 @@ export class Conversation {
 
     this.hasDirectGuest = ko.pureComputed(() => {
       const hasGuestUser = this.participating_user_ets().some(userEntity => userEntity.isDirectGuest());
-      return hasGuestUser && this.isGroup();
+      return hasGuestUser && this.isGroupOrChannel();
     });
     this.hasGuest = ko.pureComputed(() => {
       const hasGuestUser = this.participating_user_ets().some(userEntity => userEntity.isGuest());
-      return hasGuestUser && this.isGroup();
+      return hasGuestUser && this.isGroupOrChannel();
     });
     this.hasService = ko.pureComputed(() => this.participating_user_ets().some(userEntity => userEntity.isService));
     this.hasExternal = ko.pureComputed(() => this.participating_user_ets().some(userEntity => userEntity.isExternal()));
@@ -380,7 +399,7 @@ export class Conversation {
     });
     this.isActiveParticipant = ko.pureComputed(() => !this.isSelfUserRemoved() && !this.isGuest());
     this.isClearable = ko.pureComputed(() => !this.isRequest() && !this.is_cleared());
-    this.isLeavable = ko.pureComputed(() => this.isGroup() && !this.isSelfUserRemoved());
+    this.isLeavable = ko.pureComputed(() => this.isGroupOrChannel() && !this.isSelfUserRemoved());
     this.isMutable = ko.pureComputed(() => !this.isRequest() && !this.isSelfUserRemoved());
 
     // Messages
@@ -524,7 +543,7 @@ export class Conversation {
         return userName || t('unavailableUser');
       }
 
-      if (this.isGroup()) {
+      if (this.isGroupOrChannel()) {
         if (this.name()) {
           return this.name();
         }
@@ -1043,6 +1062,7 @@ export class Conversation {
       type: this.type(),
       verification_state: this.verification_state(),
       mlsVerificationState: this.mlsVerificationState(),
+      group_conv_type: this.groupConversationType(),
     };
   }
 }

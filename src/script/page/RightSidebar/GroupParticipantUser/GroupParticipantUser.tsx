@@ -75,7 +75,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
   selfUser,
   isFederated = false,
 }) => {
-  const {isGroup, roles} = useKoSubscribableChildren(activeConversation, ['isGroup', 'roles']);
+  const {isGroupOrChannel, roles} = useKoSubscribableChildren(activeConversation, ['isGroupOrChannel', 'roles']);
   const {isTemporaryGuest, isAvailable} = useKoSubscribableChildren(currentUser, ['isTemporaryGuest', 'isAvailable']);
   const {classifiedDomains, team, isTeam} = useKoSubscribableChildren(teamState, [
     'classifiedDomains',
@@ -87,7 +87,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
   const canChangeRole =
     conversationRoleRepository.canChangeParticipantRoles(activeConversation) && !currentUser.isMe && !isTemporaryGuest;
 
-  const isAdmin = isGroup && conversationRoleRepository.isUserGroupAdmin(activeConversation, currentUser);
+  const isAdmin = isGroupOrChannel && conversationRoleRepository.isUserGroupAdmin(activeConversation, currentUser);
 
   const toggleAdmin = async () => {
     if (currentUser.isFederated) {

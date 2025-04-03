@@ -53,7 +53,10 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
   isTeam = false,
   conversation,
 }) => {
-  const {isGroup, display_name: displayName} = useKoSubscribableChildren(conversation, ['isGroup', 'display_name']);
+  const {isGroupOrChannel, display_name: displayName} = useKoSubscribableChildren(conversation, [
+    'isGroupOrChannel',
+    'display_name',
+  ]);
 
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
   const isEditGroupNameTouched = useRef(false);
@@ -160,7 +163,7 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
         </div>
       )}
 
-      {isGroup && (
+      {isGroupOrChannel && (
         <GroupDetails
           userParticipants={userParticipants}
           serviceParticipants={serviceParticipants}

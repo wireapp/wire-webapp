@@ -24,6 +24,8 @@ import {
   CONVERSATION_LEGACY_ACCESS_ROLE,
   CONVERSATION_TYPE,
   DefaultConversationRoleName,
+  GROUP_CONVERSATION_TYPE,
+  ADD_PERMISSION,
 } from '@wireapp/api-client/lib/conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
@@ -47,6 +49,8 @@ export interface ConversationRecord {
   ephemeral_timer: number;
   global_message_timer: number;
   group_id: string;
+  group_conv_type?: GROUP_CONVERSATION_TYPE;
+  add_permission?: ADD_PERMISSION;
   epoch: number;
   id: string;
   initial_protocol?: ConversationProtocol;

@@ -172,7 +172,7 @@ const UserActions: React.FC<UserActionsProps> = ({
   const leaveConversation: MenuItem | undefined =
     user.isMe &&
     isSelfActivated &&
-    conversation?.isGroup() &&
+    conversation?.isGroupOrChannel() &&
     !conversation.isSelfUserRemoved() &&
     conversationRoleRepository?.canLeaveGroup(conversation)
       ? {
