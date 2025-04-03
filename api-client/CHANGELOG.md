@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.36.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.35.0...@wireapp/api-client@27.36.0) (2025-04-03)
+
+### Features
+
+* **api-client/cells:** add support for abort signal [WPB-16843] ([#7000](https://github.com/wireapp/wire-web-packages/issues/7000)) ([7610a85](https://github.com/wireapp/wire-web-packages/commit/7610a85567e1f689d19869a200c64d704ac5b9ac))
+
 # [27.35.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.34.0...@wireapp/api-client@27.35.0) (2025-04-03)
 
 ### Features
