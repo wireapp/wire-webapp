@@ -62,7 +62,7 @@
     "sonner": "^2.0.1",
     "speakingurl": "14.0.1",
     "switch-path": "1.2.0",
-    "tsyringe": "4.8.0",
+    "tsyringe": "4.9.1",
     "underscore": "1.13.7",
     "use-debounce": "^10.0.4",
     "uuid": "11.1.0",
