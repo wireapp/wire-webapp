@@ -18738,13 +18738,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sonner@npm:^2.0.1":
-  version: 2.0.1
-  resolution: "sonner@npm:2.0.1"
+"sonner@npm:^2.0.3":
+  version: 2.0.3
+  resolution: "sonner@npm:2.0.3"
   peerDependencies:
     react: ^18.0.0 || ^19.0.0 || ^19.0.0-rc
     react-dom: ^18.0.0 || ^19.0.0 || ^19.0.0-rc
-  checksum: 10/9213bc2d3da62075a4b8e7d20f56c8fd8d2d36ee793e68f3eba7c49c084755b61a158a4fb028a27c7e9c8ad54e584c77c22a3b3dfd6ea40798c1a703c6eb6506
+  checksum: 10/e7e4233c9ef96f2db4f5516a181d0b464104a6b8554ac36b403a53d14f21baddae48187ce48d22a7821eb1e3e9168f7df471405001652ab3abfcfe8930f7a6fa
   languageName: node
   linkType: hard
 
@@ -20981,7 +20981,7 @@ __metadata:
     seedrandom: "npm:3.0.5"
     simple-git: "npm:3.27.0"
     sinon: "npm:18.0.0"
-    sonner: "npm:^2.0.1"
+    sonner: "npm:^2.0.3"
     speakingurl: "npm:14.0.1"
     style-loader: "npm:4.0.0"
     stylelint: "npm:16.16.0"
