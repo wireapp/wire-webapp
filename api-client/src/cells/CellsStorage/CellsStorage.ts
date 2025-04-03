@@ -18,7 +18,17 @@
  */
 
 export interface CellsStorage {
-  putObject({path, file, metadata}: {path: string; file: File; metadata?: Record<string, string>}): Promise<void>;
+  putObject({
+    path,
+    file,
+    metadata,
+    progressCallback,
+  }: {
+    path: string;
+    file: File;
+    metadata?: Record<string, string>;
+    progressCallback?: (progress: number) => void;
+  }): Promise<void>;
 }
 
 export class CellsStorageError extends Error {

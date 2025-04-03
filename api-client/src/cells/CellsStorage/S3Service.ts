@@ -17,7 +17,8 @@
  *
  */
 
-import {S3Client, PutObjectCommand, S3ServiceException} from '@aws-sdk/client-s3';
+import {S3Client, S3ServiceException} from '@aws-sdk/client-s3';
+import {Upload} from '@aws-sdk/lib-storage';
 
 import {CellsStorage, CellsStorageError} from './CellsStorage';
 
@@ -27,6 +28,9 @@ interface S3ServiceConfig {
   endpoint: string;
   region: string;
 }
+
+const MAX_QUEUE_SIZE = 3;
+const PART_SIZE = 5 * 1024 * 1024; // 5MB
 
 export class S3Service implements CellsStorage {
   private client: S3Client;
@@ -51,22 +55,39 @@ export class S3Service implements CellsStorage {
     path,
     file,
     metadata,
+    progressCallback,
   }: {
     path: string;
     file: File;
     metadata?: Record<string, string>;
+    progressCallback?: (progress: number) => void;
   }): Promise<void> {
-    const command = new PutObjectCommand({
-      Bucket: this.bucket,
-      Body: file,
-      Key: path,
-      ContentType: file.type,
-      ContentLength: file.size,
-      Metadata: metadata,
+    const upload = new Upload({
+      client: this.client,
+      partSize: PART_SIZE,
+      queueSize: MAX_QUEUE_SIZE,
+      leavePartsOnError: true,
+      params: {
+        Bucket: this.bucket,
+        Body: file,
+        Key: path,
+        ContentType: file.type,
+        ContentLength: file.size,
+        Metadata: metadata,
+      },
     });
 
+    if (progressCallback) {
+      upload.on('httpUploadProgress', progress => {
+        if (!progress?.loaded || !progress?.total) {
+          return;
+        }
+        progressCallback(progress.loaded / progress.total);
+      });
+    }
+
     try {
-      await this.client.send(command);
+      await upload.done();
     } catch (caught) {
       if (caught instanceof S3ServiceException && caught.name === 'EntityTooLarge') {
         throw new CellsStorageError(
