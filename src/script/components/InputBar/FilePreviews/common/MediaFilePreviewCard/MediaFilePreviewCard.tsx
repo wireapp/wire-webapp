@@ -27,7 +27,7 @@ import {
   alertIconStyles,
   errorLineStyles,
   iconWrapperStyles,
-  lineWrapperStyles,
+  errorLineWrapperStyles,
   wrapperStyles,
 } from './MediaFilePreviewCard.styles';
 
@@ -62,7 +62,7 @@ export const MediaFilePreviewCard = ({
             <AlertIcon css={alertIconStyles} width={14} height={14} />
           </div>
           <FilePreviewErrorMoreButton onDelete={onDelete} onRetry={onRetry} />
-          <div css={lineWrapperStyles}>
+          <div css={errorLineWrapperStyles}>
             <div css={errorLineStyles} />
           </div>
         </>
