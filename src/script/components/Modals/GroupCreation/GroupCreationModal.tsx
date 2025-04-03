@@ -287,7 +287,9 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
     setGroupName(value);
     if (nameTooLong) {
       return setNameError(t('groupCreationPreferencesErrorNameLong'));
-    } else if (nameTooShort) {
+    }
+
+    if (nameTooShort) {
       return setNameError(t('groupCreationPreferencesErrorNameShort'));
     }
     setNameError('');
@@ -365,7 +367,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
             </h2>
 
             <Button
-              className="group-creation__action enabled accent-text"
+              className="enabled accent-text"
               css={{marginBottom: 0}}
               type="button"
               onClick={clickOnCreate}
@@ -395,7 +397,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
 
             <Button
               id="group-go-next"
-              className={cx('group-creation__action', {
+              className={cx({
                 'accent-text': groupNameLength,
                 enabled: isInputValid,
               })}

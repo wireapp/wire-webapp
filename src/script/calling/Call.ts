@@ -32,6 +32,7 @@ import type {ClientId, Participant} from './Participant';
 
 import {Config} from '../Config';
 import {Conversation} from '../entity/Conversation';
+import {CanvasMediaStreamMixer} from '../media/CanvasMediaStreamMixer';
 import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 
 export type SerializedConversationId = string;
@@ -79,6 +80,7 @@ export class Call {
    */
   public analyticsMaximumParticipants: number = 0;
   activeAudioOutput: string;
+  public readonly canvasMixer: CanvasMediaStreamMixer;
 
   constructor(
     public readonly initiator: QualifiedId,
@@ -97,6 +99,7 @@ export class Call {
         .filter(participant => Boolean(participant.handRaisedAt()))
         .sort((p1, p2) => p1.handRaisedAt()! - p2.handRaisedAt()!),
     );
+    this.canvasMixer = new CanvasMediaStreamMixer();
 
     this.activeAudioOutput = this.mediaDevicesHandler.currentAvailableDeviceId.audiooutput();
     this.mediaDevicesHandler.currentAvailableDeviceId.audiooutput.subscribe((newActiveAudioOutput: string) => {

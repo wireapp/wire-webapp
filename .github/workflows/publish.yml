@@ -5,6 +5,7 @@ on:
     branches: [master, dev, release/*, new-navigation]
     tags:
       - '*q1-2024*'
+      - '*q2-2025*'
       - '*staging*'
       - '*production*'
 
@@ -196,6 +197,9 @@ jobs:
               },
               "q1-2024": {
                 "targets": "[\"q1-2024\"]"
+              },
+              "q2-2025": {
+                "targets": "[\"q2-2025\"]"
               }
             }
           export_to: log,output
@@ -294,9 +298,6 @@ jobs:
               },
               "production": {
                 "targets": "[\"wire-webapp-prod\"]"
-              },
-              "release/q1-2024": {
-                "targets": "[\"wire-webapp-mls\"]"
               },
               "staging": {
                 "targets": "[\"wire-webapp-staging\"]"
