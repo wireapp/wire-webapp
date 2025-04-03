@@ -104,6 +104,7 @@ export class CellsAPI {
     file,
     autoRename = true,
     progressCallback,
+    signal,
   }: {
     uuid: string;
     versionId: string;
@@ -111,6 +112,7 @@ export class CellsAPI {
     file: File;
     autoRename?: boolean;
     progressCallback?: (progress: number) => void;
+    signal?: AbortSignal;
   }): Promise<RestCreateCheckResponse> {
     if (!this.client || !this.storageService) {
       throw new Error(CONFIGURATION_ERROR);
@@ -118,10 +120,13 @@ export class CellsAPI {
 
     let filePath = `${path}`.normalize('NFC');
 
-    const result = await this.client.createCheck({
-      Inputs: [{Type: 'LEAF', Locator: {Path: filePath, Uuid: uuid}, VersionId: versionId}],
-      FindAvailablePath: true,
-    });
+    const result = await this.client.createCheck(
+      {
+        Inputs: [{Type: 'LEAF', Locator: {Path: filePath, Uuid: uuid}, VersionId: versionId}],
+        FindAvailablePath: true,
+      },
+      {signal},
+    );
 
     if (autoRename && result.data.Results?.length && result.data.Results[0].Exists) {
       filePath = result.data.Results[0].NextPath || filePath;

@@ -21,7 +21,7 @@ import {S3Client, S3ServiceException} from '@aws-sdk/client-s3';
 import {Upload} from '@aws-sdk/lib-storage';
 
 import {CellsStorageError} from './CellsStorage';
-import {S3Service} from './S3Service';
+import {MAX_QUEUE_SIZE, PART_SIZE, S3Service} from './S3Service';
 
 jest.mock('@aws-sdk/client-s3');
 jest.mock('@aws-sdk/lib-storage');
@@ -69,8 +69,8 @@ describe('S3Service', () => {
         client: expect.objectContaining({
           send: expect.any(Function),
         }),
-        partSize: 5 * 1024 * 1024,
-        queueSize: 3,
+        partSize: PART_SIZE,
+        queueSize: MAX_QUEUE_SIZE,
         leavePartsOnError: true,
         params: {
           Bucket: testConfig.bucket,

@@ -138,10 +138,13 @@ describe('CellsAPI', () => {
         file: testFile,
       });
 
-      expect(mockNodeServiceApi.createCheck).toHaveBeenCalledWith({
-        Inputs: [{Type: 'LEAF', Locator: {Path: TEST_FILE_PATH, Uuid: MOCKED_UUID}, VersionId: MOCKED_UUID}],
-        FindAvailablePath: true,
-      });
+      expect(mockNodeServiceApi.createCheck).toHaveBeenCalledWith(
+        {
+          Inputs: [{Type: 'LEAF', Locator: {Path: TEST_FILE_PATH, Uuid: MOCKED_UUID}, VersionId: MOCKED_UUID}],
+          FindAvailablePath: true,
+        },
+        {signal: undefined},
+      );
 
       expect(mockStorage.putObject).toHaveBeenCalledWith({
         path: TEST_FILE_PATH,
@@ -151,6 +154,7 @@ describe('CellsAPI', () => {
           'Create-Resource-Uuid': MOCKED_UUID,
           'Create-Version-Id': MOCKED_UUID,
         },
+        signal: undefined,
       });
     });
 
@@ -260,9 +264,23 @@ describe('CellsAPI', () => {
 
       await cellsAPI.uploadFileDraft({uuid: MOCKED_UUID, versionId: MOCKED_UUID, path: '', file: testFile});
 
-      expect(mockNodeServiceApi.createCheck).toHaveBeenCalledWith({
-        Inputs: [{Type: 'LEAF', Locator: {Path: '', Uuid: MOCKED_UUID}, VersionId: MOCKED_UUID}],
-        FindAvailablePath: true,
+      expect(mockNodeServiceApi.createCheck).toHaveBeenCalledWith(
+        {
+          Inputs: [{Type: 'LEAF', Locator: {Path: '', Uuid: MOCKED_UUID}, VersionId: MOCKED_UUID}],
+          FindAvailablePath: true,
+        },
+        {signal: undefined},
+      );
+
+      expect(mockStorage.putObject).toHaveBeenCalledWith({
+        path: '',
+        file: testFile,
+        metadata: {
+          'Draft-Mode': 'true',
+          'Create-Resource-Uuid': MOCKED_UUID,
+          'Create-Version-Id': MOCKED_UUID,
+        },
+        signal: undefined,
       });
     });
   });
