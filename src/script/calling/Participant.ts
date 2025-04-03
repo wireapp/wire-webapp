@@ -146,6 +146,15 @@ export class Participant {
     this.releaseAudioStream();
   }
 
+  setTemporarilyVideoScreenOff(): void {
+    // This is a temporary solution. The SFT does not send a response when a track change has occurred.
+    // To prevent the wrong video from being briefly displayed, we introduce a timeout here.
+    this.isSwitchingVideoResolution(true);
+    window.setTimeout(() => {
+      this.isSwitchingVideoResolution(false);
+    }, 1000);
+  }
+
   private releaseStream(mediaStream: MediaStream | undefined, stopTracks: boolean): void {
     if (!mediaStream) {
       return;
