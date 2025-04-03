@@ -110,6 +110,9 @@ export const useFilesUploadDropzone = ({
         uuid: file.id,
         file,
         path,
+        progressCallback: (progress: number) => {
+          console.log('progressCallback', progress);
+        },
       });
       updateFile({
         conversationId: conversation.id,
