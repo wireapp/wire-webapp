@@ -28,7 +28,7 @@ import type {TeamData} from '@wireapp/api-client/lib/team/';
 import {LowDiskSpaceError} from '@wireapp/store-engine/lib/engine/error';
 import {StatusCodes as HTTP_STATUS, StatusCodes} from 'http-status-codes';
 
-import {isAxiosError, isBackendError} from 'Util/TypePredicateUtil';
+import {isBackendError} from 'Util/TypePredicateUtil';
 
 import {AuthActionCreator} from './creator/';
 import {LabeledError} from './LabeledError';
@@ -156,7 +156,7 @@ export class AuthAction {
          * We don't want to block the user from logging in if they have already received a code in the last few minutes.
          * Any other error should still be thrown.
          */
-        if (isAxiosError(error) && error.response?.status === StatusCodes.TOO_MANY_REQUESTS) {
+        if (isBackendError(error) && SyntheticErrorLabel.TOO_MANY_REQUESTS === error.label) {
           dispatch(AuthActionCreator.successfulSendTwoFactorCode());
           return;
         }
