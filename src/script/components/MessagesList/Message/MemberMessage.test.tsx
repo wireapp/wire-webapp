@@ -23,6 +23,7 @@ import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 import {randomInt} from 'crypto';
 
 import en from 'I18n/en-US.json';
+import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {MemberMessage as MemberMessageEntity} from 'src/script/entity/message/MemberMessage';
 import {User} from 'src/script/entity/User';
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
@@ -77,7 +78,7 @@ describe('MemberMessage', () => {
       message: createMemberMessage({systemType: SystemMessageType.CONNECTION_ACCEPTED}, [new User('id')]),
     };
 
-    const {getByTestId} = render(<MemberMessage {...props} />);
+    const {getByTestId} = render(withTheme(<MemberMessage {...props} />));
     expect(getByTestId('element-connected-message')).not.toBeNull();
   });
 
@@ -91,7 +92,7 @@ describe('MemberMessage', () => {
         message,
       };
 
-      const {getByText} = render(<MemberMessage {...props} />);
+      const {getByText} = render(withTheme(<MemberMessage {...props} />));
       users.forEach(user => {
         expect(getByText(user.name())).not.toBeNull();
       });
@@ -108,7 +109,7 @@ describe('MemberMessage', () => {
         message,
       };
 
-      const {getByText, container} = render(<MemberMessage {...props} />);
+      const {getByText, container} = render(withTheme(<MemberMessage {...props} />));
 
       // We expect to see the first 15 users + the user that created the conversation
       expect(container.querySelectorAll('strong')).toHaveLength(CONFIG.REDUCED_USERS_COUNT + 1);
@@ -130,7 +131,7 @@ describe('MemberMessage', () => {
         message,
       };
 
-      const {getByText} = render(<MemberMessage {...props} />);
+      const {getByText} = render(withTheme(<MemberMessage {...props} />));
       const showMoreButton = getByText(`all team members`);
       showMoreButton.click();
 
@@ -151,7 +152,7 @@ describe('MemberMessage', () => {
         message,
       };
 
-      const {getByText} = render(<MemberMessage {...props} />);
+      const {getByText} = render(withTheme(<MemberMessage {...props} />));
       expect(getByText(`all team members and one guest`)).not.toBeNull();
     });
 
@@ -175,7 +176,7 @@ describe('MemberMessage', () => {
         message,
       };
 
-      const {getByText} = render(<MemberMessage {...props} />);
+      const {getByText} = render(withTheme(<MemberMessage {...props} />));
       expect(getByText(`all team members and ${nbGuests} guests`)).not.toBeNull();
     });
 
@@ -190,7 +191,7 @@ describe('MemberMessage', () => {
         message,
       };
 
-      const {container} = render(<MemberMessage {...props} />);
+      const {container} = render(withTheme(<MemberMessage {...props} />));
       expect(container.textContent).toContain(`Creator started a conversation with`);
     });
 
@@ -205,7 +206,7 @@ describe('MemberMessage', () => {
         message,
       };
 
-      const {container} = render(<MemberMessage {...props} />);
+      const {container} = render(withTheme(<MemberMessage {...props} />));
       expect(container.textContent).toContain(`You started a conversation with`);
     });
   });
@@ -221,7 +222,7 @@ describe('MemberMessage', () => {
         message,
       };
 
-      const {container} = render(<MemberMessage {...props} />);
+      const {container} = render(withTheme(<MemberMessage {...props} />));
       expect(container.textContent).toContain(`You added `);
     });
 
@@ -234,7 +235,7 @@ describe('MemberMessage', () => {
         message,
       };
 
-      const {container} = render(<MemberMessage {...props} />);
+      const {container} = render(withTheme(<MemberMessage {...props} />));
       expect(container.textContent).toContain(`${message.user().name()} added `);
     });
 
@@ -245,7 +246,7 @@ describe('MemberMessage', () => {
         message,
       };
 
-      const {container} = render(<MemberMessage {...props} />);
+      const {container} = render(withTheme(<MemberMessage {...props} />));
       expect(container.textContent).toContain(`${message.user().name()} joined`);
     });
   });
@@ -259,7 +260,7 @@ describe('MemberMessage', () => {
         message,
       };
 
-      const {container} = render(<MemberMessage {...props} />);
+      const {container} = render(withTheme(<MemberMessage {...props} />));
       expect(container.textContent).toContain(`You left`);
     });
 
@@ -270,7 +271,7 @@ describe('MemberMessage', () => {
         message,
       };
 
-      const {container} = render(<MemberMessage {...props} />);
+      const {container} = render(withTheme(<MemberMessage {...props} />));
       expect(container.textContent).toContain(`${message.user().name()} left`);
     });
 
@@ -282,7 +283,7 @@ describe('MemberMessage', () => {
         message,
       };
 
-      const {container} = render(<MemberMessage {...props} />);
+      const {container} = render(withTheme(<MemberMessage {...props} />));
       expect(container.textContent).toContain(`${message.user().name()} removed ${removedUser.name()}`);
     });
 
@@ -296,7 +297,7 @@ describe('MemberMessage', () => {
         message,
       };
 
-      const {container} = render(<MemberMessage {...props} />);
+      const {container} = render(withTheme(<MemberMessage {...props} />));
       expect(container.textContent).toContain(`were removed`);
     });
   });
