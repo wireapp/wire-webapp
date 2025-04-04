@@ -312,6 +312,7 @@ export const InputBar = ({
                   loadDraftState={draftState.load}
                   replaceEmojis={shouldReplaceEmoji}
                 >
+                  {!!files.length && <FilePreviews files={files} conversationQualifiedId={conversation.qualifiedId} />}
                   <InputBarControls
                     conversation={conversation}
                     isFileSharingSendingEnabled={isFileSharingSendingEnabled}
@@ -345,8 +346,6 @@ export const InputBar = ({
               onSend={fileHandling.sendPastedFile}
             />
           )}
-
-          {!!files.length && <FilePreviews files={files} conversationQualifiedId={conversation.qualifiedId} />}
         </div>
       </InputBarContainer>
       {emojiPicker.open ? (
