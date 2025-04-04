@@ -27,6 +27,7 @@ export interface FileWithPreview extends File {
   remoteUuid: string;
   remoteVersionId: string;
   uploadStatus: FileUploadStatus;
+  uploadProgress: number;
   image?: {
     width: number;
     height: number;
@@ -70,6 +71,7 @@ interface FileUploadState {
         height: number;
         durationInMillis?: number;
       };
+      uploadProgress?: number;
     };
   }) => void;
   clearAll: ({conversationId}: {conversationId: string}) => void;
@@ -107,6 +109,7 @@ export const useFileUploadState = create<FileUploadStore>()((set, get) => ({
               file.image = data.image || file.image;
               file.audio = data.audio || file.audio;
               file.video = data.video || file.video;
+              file.uploadProgress = data.uploadProgress || file.uploadProgress;
             }
             return file;
           }) || [],

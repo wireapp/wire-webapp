@@ -29,9 +29,17 @@ interface ImagePreviewCardProps {
   onRetry: () => void;
   isLoading: boolean;
   isError: boolean;
+  uploadProgress: number;
 }
 
-export const ImagePreviewCard = ({src, onDelete, onRetry, isLoading, isError}: ImagePreviewCardProps) => {
+export const ImagePreviewCard = ({
+  src,
+  onDelete,
+  onRetry,
+  isLoading,
+  isError,
+  uploadProgress,
+}: ImagePreviewCardProps) => {
   return (
     <MediaFilePreviewCard
       label={t('conversationFileImagePreviewLabel', {src})}
@@ -39,6 +47,7 @@ export const ImagePreviewCard = ({src, onDelete, onRetry, isLoading, isError}: I
       onRetry={onRetry}
       isLoading={isLoading}
       isError={isError}
+      uploadProgress={uploadProgress}
     >
       <img src={src} alt="" css={imageStyles} />
     </MediaFilePreviewCard>
