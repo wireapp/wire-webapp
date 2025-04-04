@@ -1656,7 +1656,7 @@
   "startedGroupCallingAlert": "Вы начали групповой вызов с {conversationName}.",
   "startedVideoCallingAlert": "Вы звоните {conversationName}, ваша камера {cameraStatus}.",
   "startedVideoGroupCallingAlert": "Вы начали групповой вызов с {conversationName}, ваша камера {cameraStatus}.",
-  "systemMessageLearnMore": "Learn more",
+  "systemMessageLearnMore": "Подробнее",
   "takeoverButtonChoose": "Выбрать свое",
   "takeoverButtonKeep": "Оставить это",
   "takeoverLink": "Подробнее",
