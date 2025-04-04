@@ -46,7 +46,7 @@ import {replaceLink, t} from 'Util/LocalizerUtil';
 
 import {PrimaryModal} from '../../PrimaryModal';
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
-import {ConversationAccess, ConversationCreationStep, ConversationModerator, ConversationType} from '../types';
+import {ConversationAccess, ConversationCreationStep, ConversationType} from '../types';
 
 export const useCreateConversation = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -147,7 +147,7 @@ export const useCreateConversation = () => {
         conversationName,
         isTeam ? getAccessState() : undefined,
         {
-          add_permission: moderator === ConversationModerator.Admins ? ADD_PERMISSION.ADMINS : ADD_PERMISSION.EVERYONE,
+          add_permission: moderator === ADD_PERMISSION.ADMINS ? ADD_PERMISSION.ADMINS : ADD_PERMISSION.EVERYONE,
           protocol: defaultProtocol,
           receipt_mode: isReadReceiptsEnabled ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF,
           group_conv_type:

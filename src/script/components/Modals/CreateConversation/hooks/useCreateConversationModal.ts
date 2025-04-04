@@ -17,13 +17,13 @@
  *
  */
 
+import {ADD_PERMISSION} from '@wireapp/api-client/lib/conversation';
 import {create} from 'zustand';
 
 import {User} from 'src/script/entity/User';
 
 import {
   ConversationAccess,
-  ConversationModerator,
   ChatHistory,
   ConversationType,
   ConversationCreationStep,
@@ -37,7 +37,7 @@ type CreateConversationModalState = {
   isOpen?: boolean;
   conversationName: string;
   access: ConversationAccess;
-  moderator: ConversationModerator;
+  moderator: ADD_PERMISSION;
   chatHistory: ChatHistory;
   conversationType: ConversationType;
   conversationCreationStep: ConversationCreationStep;
@@ -57,7 +57,7 @@ type CreateConversationModalState = {
   hideModal: () => void;
   setConversationName: (name: string) => void;
   setAccess: (access: ConversationAccess) => void;
-  setModerator: (access: ConversationModerator) => void;
+  setModerator: (access: ADD_PERMISSION) => void;
   setChatHistory: (history: ChatHistory) => void;
   setConversationType: (type: ConversationType) => void;
   setConversationCreationStep: (step: ConversationCreationStep) => void;
@@ -84,7 +84,7 @@ const initialState = {
   isOpen: false,
   conversationName: '',
   access: ConversationAccess.Private,
-  moderator: ConversationModerator.AdminsAndMembers,
+  moderator: ADD_PERMISSION.EVERYONE,
   chatHistory: ChatHistory.Off,
   conversationType: ConversationType.Channel,
   conversationCreationStep: ConversationCreationStep.ConversationDetails,
@@ -112,9 +112,9 @@ export const useCreateConversationModal = create<CreateConversationModalState>(s
   setAccess: (access: ConversationAccess) =>
     set(state => ({
       access,
-      manager: access === ConversationAccess.Public ? ConversationModerator.AdminsAndMembers : state.moderator,
+      manager: access === ConversationAccess.Public ? ADD_PERMISSION.EVERYONE : state.moderator,
     })),
-  setModerator: (moderator: ConversationModerator) => set({moderator}),
+  setModerator: (moderator: ADD_PERMISSION) => set({moderator}),
   setChatHistory: (history?: ChatHistory) => set({chatHistory: history || ChatHistory.Off}),
   setConversationType: (type: ConversationType) => set({conversationType: type}),
   setConversationCreationStep: (step: ConversationCreationStep) => set({conversationCreationStep: step}),

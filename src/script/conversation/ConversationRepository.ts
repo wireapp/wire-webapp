@@ -26,6 +26,7 @@ import {
   NewConversation,
   MessageSendingStatus,
   RemoteConversations,
+  ADD_PERMISSION,
 } from '@wireapp/api-client/lib/conversation';
 import {
   MemberLeaveReason,
@@ -45,6 +46,7 @@ import {
   ConversationTypingEvent,
   CONVERSATION_EVENT,
   ConversationProtocolUpdateEvent,
+  ConversationAddPermissionUpdateEvent,
 } from '@wireapp/api-client/lib/event';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import type {BackendError} from '@wireapp/api-client/lib/http/';
@@ -2816,6 +2818,14 @@ export class ConversationRepository {
     return response;
   }
 
+  public async updateAddPermission(conversationId: QualifiedId, addPermission: ADD_PERMISSION) {
+    const response = await this.conversationService.putAddPermission(conversationId, addPermission);
+    if (response) {
+      this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
+    }
+    return response;
+  }
+
   /**
    * Team member was removed.
    * @param teamId ID of team that member was removed from
@@ -3392,6 +3402,9 @@ export class ConversationRepository {
 
       case CONVERSATION_EVENT.RECEIPT_MODE_UPDATE:
         return this.onReceiptModeChanged(conversationEntity, eventJson);
+
+      case CONVERSATION_EVENT.ADD_PERMISSION_UPDATE:
+        return this.onAddPermissionChanged(conversationEntity, eventJson);
 
       case ClientEvent.CONVERSATION.BUTTON_ACTION_CONFIRMATION:
         return this.onButtonActionConfirmation(conversationEntity, eventJson);
@@ -4143,6 +4156,15 @@ export class ConversationRepository {
     const {messageEntity} = await this.addEventToConversation(conversationEntity, eventJson);
     ConversationMapper.updateSelfStatus(conversationEntity, {receipt_mode: eventJson.data.receipt_mode});
     return {conversationEntity, messageEntity};
+  }
+
+  private async onAddPermissionChanged(
+    conversationEntity: Conversation,
+    eventJson: ConversationAddPermissionUpdateEvent,
+  ) {
+    return ConversationMapper.updateProperties(conversationEntity, {
+      conversationModerator: eventJson.data.add_permission,
+    });
   }
 
   private readonly handleMessageExpiration = (messageEntity: ContentMessage) => {

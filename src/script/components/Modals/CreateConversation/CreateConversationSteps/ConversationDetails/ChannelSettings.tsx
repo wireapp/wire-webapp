@@ -17,6 +17,7 @@
  *
  */
 
+import {ADD_PERMISSION} from '@wireapp/api-client/lib/conversation';
 import {container} from 'tsyringe';
 
 import {Muted, Option, Select} from '@wireapp/react-ui-kit';
@@ -30,7 +31,7 @@ import {channelSettingsTextCss} from './ConversationDetails.styles';
 import {CustomHistorySharingOption} from './CustomHistorySharingOption';
 
 import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
-import {ChatHistory, ConversationAccess, ConversationModerator} from '../../types';
+import {ChatHistory, ConversationAccess} from '../../types';
 import {getConversationAccessOptions, getChatHistoryOptions, getConversationManagerOptions} from '../../utils';
 
 export const ChannelSettings = () => {
@@ -84,7 +85,7 @@ export const ChannelSettings = () => {
         {t('createConversationManagerText')}
       </Muted>
 
-      <RadioGroup<ConversationModerator>
+      <RadioGroup<ADD_PERMISSION>
         disabled={access === ConversationAccess.Public}
         onChange={setModerator}
         horizontal
