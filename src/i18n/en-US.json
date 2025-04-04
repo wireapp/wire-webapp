@@ -1656,6 +1656,7 @@
   "startedGroupCallingAlert": "You started a conference call with {conversationName}.",
   "startedVideoCallingAlert": "You are calling {conversationName}, you camera is {cameraStatus}.",
   "startedVideoGroupCallingAlert": "You started a conference call with {conversationName}, your camera is {cameraStatus}.",
+  "systemMessageLearnMore": "Learn more",
   "takeoverButtonChoose": "Choose your own",
   "takeoverButtonKeep": "Keep this one",
   "takeoverLink": "Learn more",
@@ -1863,6 +1864,5 @@
   "wireLinux": "{brandName} for Linux",
   "wireMacos": "{brandName} for macOS",
   "wireWindows": "{brandName} for Windows",
-  "wire_for_web": "{brandName} for Web",
-  "systemMessageLearnMore": "Learn more"
+  "wire_for_web": "{brandName} for Web"
 }
