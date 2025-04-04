@@ -21,54 +21,55 @@ import {useState} from 'react';
 
 import {useDebouncedCallback} from 'use-debounce';
 
+import {transformNodesToCellsFiles} from 'Components/CellsGlobalView/useGetAllCellsFiles/transformNodesToCellsFiles';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
+
+import {useCellsStore} from '../common/useCellsStore/useCellsStore';
 
 interface UseSearchCellsFilesProps {
   cellsRepository: CellsRepository;
 }
 
-type SearchStatus = 'idle' | 'loading' | 'success' | 'error';
-
+const PAGE_SIZE = 100;
 const DEBOUNCE_TIME = 300;
 
 export const useSearchCellsFiles = ({cellsRepository}: UseSearchCellsFilesProps) => {
+  const {setFiles, setStatus, setPagination} = useCellsStore();
+
   const [searchValue, setSearchValue] = useState('');
-  const [searchResults, setSearchResults] = useState<string[]>([]);
-  const [status, setStatus] = useState<SearchStatus>('idle');
+  const [pageSize, setPageSize] = useState<number>(PAGE_SIZE);
 
   const searchFiles = useDebouncedCallback(async (query: string) => {
     try {
       setStatus('loading');
-      const result = await cellsRepository.searchFiles({query});
-      const searchedFileIds = result.Nodes?.map(node => node.Uuid) || [];
-      setSearchResults(searchedFileIds);
+      const result = await cellsRepository.searchFiles({query, limit: pageSize});
+      setFiles(transformNodesToCellsFiles(result.Nodes || []));
+      setPagination(result.Pagination || null);
       setStatus('success');
     } catch (error) {
       setStatus('error');
-      setSearchResults([]);
+      setFiles([]);
+      setPagination(null);
     }
   }, DEBOUNCE_TIME);
 
   const handleSearch = async (value: string) => {
     setSearchValue(value);
     if (!value) {
-      setStatus('idle');
-      setSearchResults([]);
+      await searchFiles('*');
       return;
     }
     await searchFiles(value);
   };
 
-  const handleClearSearch = () => {
+  const handleClearSearch = async () => {
     setSearchValue('');
-    setSearchResults([]);
-    setStatus('idle');
+    await searchFiles('*');
   };
 
   return {
     searchValue,
-    searchResults,
-    status,
+    setPageSize,
     handleSearch,
     handleClearSearch,
   };
