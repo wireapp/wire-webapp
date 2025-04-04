@@ -28,6 +28,7 @@ import {t} from 'Util/LocalizerUtil';
 
 import {CellsHeader} from './CellsHeader/CellsHeader';
 import {CellsLoader} from './CellsLoader/CellsLoader';
+import {CellsPagination} from './CellsPagination/CellsPagination';
 import {CellsStateInfo} from './CellsStateInfo/CellsStateInfo';
 import {CellsTable} from './CellsTable/CellsTable';
 import {useCellsStore} from './common/useCellsStore/useCellsStore';
@@ -43,12 +44,16 @@ export const ConversationCells = ({
   cellsRepository = container.resolve(CellsRepository),
   conversationQualifiedId,
 }: ConversationCellsProps) => {
-  const {getFiles, status: filesStatus, clearAll, removeFile} = useCellsStore();
+  const {getFiles, status: filesStatus, getPagination, clearAll, removeFile, pageSize} = useCellsStore();
+
+  conversationQualifiedId.id = '2448cb71-e411-4b26-93b8-e15e29ee0a10';
+  conversationQualifiedId.domain = 'imai.wire.link';
 
   const conversationId = conversationQualifiedId.id;
 
   const files = getFiles({conversationId});
-  const {refresh} = useGetAllCellsFiles({cellsRepository, conversationQualifiedId});
+  const pagination = getPagination({conversationId});
+  const {refresh, setOffset} = useGetAllCellsFiles({cellsRepository, conversationQualifiedId});
 
   const isLoading = filesStatus === 'loading';
   const isError = filesStatus === 'error';
@@ -79,12 +84,23 @@ export const ConversationCells = ({
     await refresh();
   }, [refresh, clearAll, conversationId]);
 
+  const currentPage = pagination?.CurrentPage || 0;
+  const totalPages = pagination?.TotalPages || 1;
+  const totalRows = pagination?.Total || pageSize;
+
+  const goToPage = useCallback(
+    (page: number) => {
+      setOffset(page * pageSize);
+    },
+    [pagination, pageSize, setOffset],
+  );
+
   return (
     <div css={wrapperStyles}>
       <CellsHeader onRefresh={handleRefresh} />
-      {isSuccess && hasFiles && (
+      {(isSuccess || isLoading) && hasFiles && (
         <CellsTable
-          files={files}
+          files={isLoading ? [] : files}
           cellsRepository={cellsRepository}
           conversationId={conversationId}
           onDeleteFile={handleDeleteFile}
@@ -101,6 +117,25 @@ export const ConversationCells = ({
         <CellsStateInfo
           heading={t('cellsGlobalView.errorHeading')}
           description={t('cellsGlobalView.errorDescription')}
+        />
+      )}
+      {totalPages > 1 ? (
+        <CellsPagination
+          currentPage={currentPage ? currentPage - 1 : 0}
+          numberOfPages={pagination?.TotalPages}
+          goPage={goToPage}
+          totalRows={pagination?.Total}
+          firstRow={(currentPage - 1) * pageSize + 1}
+          lastRow={Math.min(currentPage * pageSize, totalRows)}
+        />
+      ) : (
+        <CellsPagination
+          currentPage={0}
+          numberOfPages={1}
+          goPage={goToPage}
+          totalRows={files && files.length}
+          firstRow={1}
+          lastRow={files && files.length}
         />
       )}
     </div>

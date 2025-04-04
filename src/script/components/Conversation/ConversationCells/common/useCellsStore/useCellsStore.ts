@@ -17,34 +17,52 @@
  *
  */
 
+import {RestPagination} from 'cells-sdk-ts';
 import {create} from 'zustand';
 
 import {CellFile} from '../cellFile/cellFile';
 
 type Status = 'idle' | 'loading' | 'success' | 'error';
 
+const DEFAULT_PAGE_SIZE = 10;
+
 interface CellsState {
   filesByConversation: Record<string, CellFile[]>;
+  paginationByConversation: Record<string, RestPagination | null>;
   status: Status;
   error: Error | null;
+  pageSize: number;
+  setPageSize: (pageSize: number) => void;
   setFiles: (params: {conversationId: string; files: CellFile[]}) => void;
+  setPagination: (params: {conversationId: string; pagination: RestPagination | null}) => void;
   setStatus: (status: Status) => void;
   setError: (error: Error | null) => void;
   updateFile: (params: {conversationId: string; fileId: string; updates: Partial<CellFile>}) => void;
   removeFile: (params: {conversationId: string; fileId: string}) => void;
   clearAll: (params: {conversationId: string}) => void;
   getFiles: (params: {conversationId: string}) => CellFile[];
+  getPagination: (params: {conversationId: string}) => RestPagination | null;
 }
 
 export const useCellsStore = create<CellsState>((set, get) => ({
   filesByConversation: {},
+  paginationByConversation: {},
   status: 'idle',
   error: null,
+  pageSize: DEFAULT_PAGE_SIZE,
   setFiles: ({conversationId, files}) =>
     set(state => ({
       filesByConversation: {
         ...state.filesByConversation,
         [conversationId]: files,
+      },
+    })),
+  setPageSize: pageSize => set({pageSize}),
+  setPagination: ({conversationId, pagination}) =>
+    set(state => ({
+      paginationByConversation: {
+        ...state.paginationByConversation,
+        [conversationId]: pagination,
       },
     })),
   setStatus: status => set({status}),
@@ -73,6 +91,10 @@ export const useCellsStore = create<CellsState>((set, get) => ({
   },
   getFiles: ({conversationId}) => {
     const state = get().filesByConversation;
+    return state[conversationId] || [];
+  },
+  getPagination: ({conversationId}) => {
+    const state = get().paginationByConversation;
     return state[conversationId] || [];
   },
 }));
