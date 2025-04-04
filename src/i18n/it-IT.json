@@ -1656,6 +1656,7 @@
   "startedGroupCallingAlert": "You started a conference call with {conversationName}.",
   "startedVideoCallingAlert": "You are calling {conversationName}, you camera is {cameraStatus}.",
   "startedVideoGroupCallingAlert": "You started a conference call with {conversationName}, your camera is {cameraStatus}.",
+  "systemMessageLearnMore": "Learn more",
   "takeoverButtonChoose": "Scegli il tuo",
   "takeoverButtonKeep": "Tieni questo",
   "takeoverLink": "Ulteriori informazioni",

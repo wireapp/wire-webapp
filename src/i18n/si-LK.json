@@ -1656,6 +1656,7 @@
   "startedGroupCallingAlert": "{conversationName} සමඟ සම්මන්ත්‍රණ ඇමතුමක් අරඹා ඇත",
   "startedVideoCallingAlert": "ඔබ {conversationName} අමතයි, ඔබගේ රූගතය {cameraStatus} වේ.",
   "startedVideoGroupCallingAlert": "{conversationName} සමඟ සම්මන්ත්‍රණ ඇමතුමක් අරඹා ඇත, ඔබගේ රූගතය {cameraStatus} වේ.",
+  "systemMessageLearnMore": "Learn more",
   "takeoverButtonChoose": "ඔබම තෝරන්න",
   "takeoverButtonKeep": "මෙය තබා ගන්න",
   "takeoverLink": "තව දැනගන්න",
