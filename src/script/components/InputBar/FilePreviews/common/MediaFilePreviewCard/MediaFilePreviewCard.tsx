@@ -17,21 +17,22 @@
  *
  */
 
-import {ReactNode, useState} from 'react';
+import {ReactNode} from 'react';
 
 import {AlertIcon} from '@wireapp/react-ui-kit';
+
+import {FileCard} from 'Components/FileCard/FileCard';
 
 import {
   alertIconStyles,
   errorLineStyles,
-  errorLineWrapperStyles,
   iconWrapperStyles,
+  errorLineWrapperStyles,
   wrapperStyles,
 } from './MediaFilePreviewCard.styles';
 
 import {FilePreviewDeleteButton} from '../FilePreviewDeleteButton/FilePreviewDeleteButton';
 import {FilePreviewErrorMoreButton} from '../FilePreviewErrorMoreButton/FilePreviewErrorMoreButton';
-import {FilePreviewLoading} from '../FilePreviewLoading/FilePreviewLoading';
 
 interface MediaFilePreviewCardProps {
   label: string;
@@ -40,6 +41,7 @@ interface MediaFilePreviewCardProps {
   isLoading: boolean;
   isError: boolean;
   children: ReactNode;
+  uploadProgress: number;
 }
 
 export const MediaFilePreviewCard = ({
@@ -49,16 +51,10 @@ export const MediaFilePreviewCard = ({
   isLoading,
   isError,
   children,
+  uploadProgress,
 }: MediaFilePreviewCardProps) => {
-  const [isHovered, setIsHovered] = useState(false);
-
   return (
-    <article
-      css={wrapperStyles}
-      aria-label={label}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
+    <article css={wrapperStyles} aria-label={label}>
       {children}
       {isError && (
         <>
@@ -71,8 +67,8 @@ export const MediaFilePreviewCard = ({
           </div>
         </>
       )}
-      {isLoading && <FilePreviewLoading />}
-      {(!isError && !isLoading) || (isLoading && isHovered) ? <FilePreviewDeleteButton onDelete={onDelete} /> : null}
+      {!isError && <FilePreviewDeleteButton onDelete={onDelete} />}
+      <FileCard.Loading progress={uploadProgress} />
     </article>
   );
 };

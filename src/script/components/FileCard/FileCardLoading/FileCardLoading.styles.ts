@@ -37,4 +37,10 @@ export const loadingStyles: CSSObject = {
   bottom: 0,
   left: 0,
   backgroundColor: 'var(--accent-color)',
+  transition: 'width 0.5s ease-in-out, opacity 0.5s ease-in-out',
+  opacity: 1,
+};
+
+export const easeOutStyles: CSSObject = {
+  opacity: 0,
 };

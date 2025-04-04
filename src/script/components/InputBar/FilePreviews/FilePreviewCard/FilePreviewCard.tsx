@@ -17,15 +17,12 @@
  *
  */
 
-import {useState} from 'react';
-
 import {FileCard} from 'Components/FileCard/FileCard';
 
 import {wrapperStyles} from './FilePreviewCard.styles';
 
 import {FilePreviewDeleteButton} from '../common/FilePreviewDeleteButton/FilePreviewDeleteButton';
 import {FilePreviewErrorMoreButton} from '../common/FilePreviewErrorMoreButton/FilePreviewErrorMoreButton';
-import {FilePreviewLoading} from '../common/FilePreviewLoading/FilePreviewLoading';
 
 interface FilePreviewCardProps {
   extension: string;
@@ -35,6 +32,7 @@ interface FilePreviewCardProps {
   isLoading: boolean;
   onDelete: () => void;
   onRetry: () => void;
+  uploadProgress: number;
 }
 
 export const FilePreviewCard = ({
@@ -45,11 +43,10 @@ export const FilePreviewCard = ({
   isLoading,
   onDelete,
   onRetry,
+  uploadProgress,
 }: FilePreviewCardProps) => {
-  const [isHovered, setIsHovered] = useState(false);
-
   return (
-    <div css={wrapperStyles} onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
+    <div css={wrapperStyles}>
       <FileCard.Root extension={extension} name={name} size={size}>
         <FileCard.Header>
           <FileCard.Icon type={isError ? 'error' : 'file'} />
@@ -62,8 +59,8 @@ export const FilePreviewCard = ({
             <FilePreviewErrorMoreButton onDelete={onDelete} onRetry={onRetry} />
           </>
         )}
-        {isLoading && <FilePreviewLoading />}
-        {(!isError && !isLoading) || (isLoading && isHovered) ? <FilePreviewDeleteButton onDelete={onDelete} /> : null}
+        {!isError && <FilePreviewDeleteButton onDelete={onDelete} />}
+        <FileCard.Loading progress={uploadProgress} />
       </FileCard.Root>
     </div>
   );
