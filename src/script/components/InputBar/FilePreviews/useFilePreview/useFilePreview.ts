@@ -44,16 +44,7 @@ export const useFilePreview = ({file, cellsRepository, conversationQualifiedId}:
 
   const cancelUpload = () => {
     cellsRepository.cancelUpload(file.id);
-
-    updateFile({
-      conversationId: conversationQualifiedId.id,
-      fileId: file.id,
-      data: {uploadStatus: 'error'},
-    });
-
-    if (file.remoteUuid && file.remoteVersionId) {
-      void cellsRepository.deleteFileDraft({uuid: file.remoteUuid, versionId: file.remoteVersionId});
-    }
+    deleteFile({conversationId: conversationQualifiedId.id, fileId: file.id});
   };
 
   const handleDelete = () => {
@@ -63,9 +54,11 @@ export const useFilePreview = ({file, cellsRepository, conversationQualifiedId}:
 
     if (isLoading) {
       cancelUpload();
+      return;
     }
 
     deleteFile({conversationId: conversationQualifiedId.id, fileId: file.id});
+    void cellsRepository.deleteFileDraft({uuid: file.remoteUuid, versionId: file.remoteVersionId});
   };
 
   const handleRetry = async () => {

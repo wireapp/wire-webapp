@@ -106,34 +106,11 @@ export const useFilesUploadDropzone = ({
         : `${conversation.qualifiedId.id}@${conversation.qualifiedId.domain}`;
 
     try {
-      // Check if the file has been canceled before starting the upload
-      const currentFiles = getFiles({conversationId: conversation.id});
-      const currentFile = currentFiles.find(f => f.id === file.id);
-
-      // If the file is no longer in the state or its status is not 'uploading', it has been canceled
-      if (!currentFile || currentFile.uploadStatus !== 'uploading') {
-        logger.info('File upload canceled', {fileId: file.id});
-        return;
-      }
-
       const {uuid, versionId} = await cellsRepository.uploadFile({
         uuid: file.id,
         file,
         path,
       });
-
-      // Check again if the file has been canceled during the upload
-      const updatedFiles = getFiles({conversationId: conversation.id});
-      const updatedFile = updatedFiles.find(f => f.id === file.id);
-
-      if (!updatedFile || updatedFile.uploadStatus !== 'uploading') {
-        logger.info('File upload canceled after completion', {fileId: file.id});
-        // Delete the uploaded file since it was canceled
-        if (uuid && versionId) {
-          void cellsRepository.deleteFileDraft({uuid, versionId});
-        }
-        return;
-      }
 
       updateFile({
         conversationId: conversation.id,
@@ -141,9 +118,7 @@ export const useFilesUploadDropzone = ({
         data: {remoteUuid: uuid, remoteVersionId: versionId, uploadStatus: 'success'},
       });
     } catch (error) {
-      // Check if the error is due to cancellation
       if (error instanceof Error && error.name === 'AbortError') {
-        logger.info('File upload aborted', {fileId: file.id});
         return;
       }
 

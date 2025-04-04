@@ -68,7 +68,6 @@ export class CellsRepository {
     const filePath = `${path || this.basePath}/${file.name}`;
     const versionId = createUuid();
 
-    // Create a new AbortController for this upload
     const controller = new AbortController();
     this.uploadControllers.set(uuid, controller);
 
@@ -78,7 +77,7 @@ export class CellsRepository {
         file,
         uuid,
         versionId,
-        signal: controller.signal,
+        abortController: controller,
       });
 
       return {
@@ -86,7 +85,6 @@ export class CellsRepository {
         versionId,
       };
     } finally {
-      // Clean up the controller after the upload completes or fails
       this.uploadControllers.delete(uuid);
     }
   }
