@@ -21,6 +21,4 @@ import {CSSObject} from '@emotion/react';
 
 export const wrapperStyles: CSSObject = {
   gridColumn: 'span 3',
-  outline: 'none',
-  position: 'relative',
 };
