@@ -42,30 +42,29 @@ export const useFilePreview = ({file, cellsRepository, conversationQualifiedId}:
 
   const transformedName = isError ? `Upload failed: ${name}` : name;
 
+  const cancelUpload = () => {
+    cellsRepository.cancelUpload(file.id);
+
+    updateFile({
+      conversationId: conversationQualifiedId.id,
+      fileId: file.id,
+      data: {uploadStatus: 'error'},
+    });
+
+    if (file.remoteUuid && file.remoteVersionId) {
+      void cellsRepository.deleteFileDraft({uuid: file.remoteUuid, versionId: file.remoteVersionId});
+    }
+  };
+
   const handleDelete = () => {
     if (file.preview) {
       URL.revokeObjectURL(file.preview);
     }
 
-    // If the file is currently uploading, we need to cancel the upload
     if (isLoading) {
-      // Cancel the upload request
-      cellsRepository.cancelUpload(file.id);
-
-      // Update the file status to indicate it's been canceled
-      updateFile({
-        conversationId: conversationQualifiedId.id,
-        fileId: file.id,
-        data: {uploadStatus: 'error'},
-      });
-
-      // If there's a remote UUID and version ID, we need to delete the draft
-      if (file.remoteUuid && file.remoteVersionId) {
-        void cellsRepository.deleteFileDraft({uuid: file.remoteUuid, versionId: file.remoteVersionId});
-      }
+      cancelUpload();
     }
 
-    // Delete the file from the state
     deleteFile({conversationId: conversationQualifiedId.id, fileId: file.id});
   };
 
