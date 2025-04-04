@@ -104,7 +104,7 @@ export class CellsAPI {
     file,
     autoRename = true,
     progressCallback,
-    signal,
+    abortController,
   }: {
     uuid: string;
     versionId: string;
@@ -112,7 +112,7 @@ export class CellsAPI {
     file: File;
     autoRename?: boolean;
     progressCallback?: (progress: number) => void;
-    signal?: AbortSignal;
+    abortController?: AbortController;
   }): Promise<RestCreateCheckResponse> {
     if (!this.client || !this.storageService) {
       throw new Error(CONFIGURATION_ERROR);
@@ -125,7 +125,7 @@ export class CellsAPI {
         Inputs: [{Type: 'LEAF', Locator: {Path: filePath, Uuid: uuid}, VersionId: versionId}],
         FindAvailablePath: true,
       },
-      {signal},
+      {signal: abortController?.signal},
     );
 
     if (autoRename && result.data.Results?.length && result.data.Results[0].Exists) {
@@ -138,7 +138,7 @@ export class CellsAPI {
       'Create-Version-Id': versionId,
     };
 
-    await this.storageService.putObject({path: filePath, file, metadata, progressCallback});
+    await this.storageService.putObject({path: filePath, file, metadata, progressCallback, abortController});
 
     return result.data;
   }
