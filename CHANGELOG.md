@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [27.37.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.37.0...@wireapp/api-client@27.37.1) (2025-04-04)
+
+### Bug Fixes
+
+* **api-client/cells:** change leavePartsOnError to false in S3Service [WPB-16843] ([#7002](https://github.com/wireapp/wire-web-packages/issues/7002)) ([145ed44](https://github.com/wireapp/wire-web-packages/commit/145ed448faad404e87fecc268478a929f57d173b))
+
 # [27.37.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.36.0...@wireapp/api-client@27.37.0) (2025-04-03)
 
 ### Features
