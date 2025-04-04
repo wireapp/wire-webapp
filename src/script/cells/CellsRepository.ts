@@ -89,8 +89,16 @@ export class CellsRepository {
     return this.apiClient.api.cells.deleteFile({uuid});
   }
 
-  async getAllFiles({path, limit = DEFAULT_MAX_FILES_LIMIT}: {path: string; limit?: number}) {
-    return this.apiClient.api.cells.getAllFiles({path: path || this.basePath, limit});
+  async getAllFiles({
+    path,
+    limit = DEFAULT_MAX_FILES_LIMIT,
+    offset = 0,
+  }: {
+    path: string;
+    limit?: number;
+    offset?: number;
+  }) {
+    return this.apiClient.api.cells.getAllFiles({path: path || this.basePath, limit, offset});
   }
 
   async getFile({uuid}: {uuid: string}) {
