@@ -23,9 +23,11 @@ import {ADD_PERMISSION, CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conve
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {ConversationAccess, ConversationModerator} from 'Components/Modals/CreateConversation/types';
+import {ConversationAccess} from 'Components/Modals/CreateConversation/types';
 import {getConversationAccessOptions, getConversationManagerOptions} from 'Components/Modals/CreateConversation/utils';
 import {RadioGroup} from 'Components/Radio';
+import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
+import {ConversationRoleRepository} from 'src/script/conversation/ConversationRoleRepository';
 import {Conversation} from 'src/script/entity/Conversation';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -38,22 +40,33 @@ import {PanelHeader} from '../PanelHeader';
 export interface AccessProps {
   onClose: () => void;
   onGoBack: () => void;
+  conversationRepository: ConversationRepository;
+  conversationRoleRepository: ConversationRoleRepository;
   activeConversation: Conversation;
 }
 
-export const Access = ({onGoBack, onClose, activeConversation}: AccessProps) => {
+export const Access = ({
+  onGoBack,
+  onClose,
+  activeConversation,
+  conversationRepository,
+  conversationRoleRepository,
+}: AccessProps) => {
   const {conversationModerator} = useKoSubscribableChildren(activeConversation, ['conversationModerator']);
   const [access, setAccess] = useState<ConversationAccess>(
     activeConversation.accessModes?.includes(CONVERSATION_ACCESS.LINK)
       ? ConversationAccess.Public
       : ConversationAccess.Private,
   );
-  const [manager, setManager] = useState<ConversationModerator>(
-    conversationModerator === ADD_PERMISSION.ADMINS
-      ? ConversationModerator.Admins
-      : ConversationModerator.AdminsAndMembers,
-  );
+
   const {isPublicChannelsEnabled} = useChannelsFeatureFlag();
+
+  const updateAddPermission = async (addPermission: ADD_PERMISSION) => {
+    if (activeConversation.qualifiedId) {
+      await conversationRepository.updateAddPermission(activeConversation.qualifiedId, addPermission);
+    }
+  };
+  const canUpdateAddPermission = conversationRoleRepository.canToggleAddPermission(activeConversation);
 
   return (
     <div id="access-settings" className="panel__page">
@@ -86,10 +99,10 @@ export const Access = ({onGoBack, onClose, activeConversation}: AccessProps) => 
           {t('createConversationManagerText')}
         </p>
 
-        <RadioGroup<ConversationModerator>
-          disabled={access === ConversationAccess.Public}
-          onChange={setManager}
-          selectedValue={manager}
+        <RadioGroup<ADD_PERMISSION>
+          disabled={access === ConversationAccess.Public || !canUpdateAddPermission}
+          onChange={updateAddPermission}
+          selectedValue={conversationModerator}
           options={getConversationManagerOptions()}
           ariaLabelledBy="conversation-manager"
           name="conversation-manager"
