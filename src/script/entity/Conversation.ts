@@ -187,7 +187,7 @@ export class Conversation {
   public accessRole?: CONVERSATION_LEGACY_ACCESS_ROLE | CONVERSATION_ACCESS_ROLE[];
   public domain: string;
   public readonly groupConversationType: ko.Observable<GROUP_CONVERSATION_TYPE>;
-  public conversationModerator: ko.PureComputed<ADD_PERMISSION>;
+  public conversationModerator: ko.Observable<ADD_PERMISSION>;
 
   static get TIMESTAMP_TYPE(): typeof TIMESTAMP_TYPE {
     return TIMESTAMP_TYPE;
@@ -214,7 +214,7 @@ export class Conversation {
     this.teamId = undefined;
     this.type = ko.observable();
     this.groupConversationType = ko.observable<GROUP_CONVERSATION_TYPE>(GROUP_CONVERSATION_TYPE.GROUP_CONVERSATION);
-    this.conversationModerator = ko.pureComputed(() => ADD_PERMISSION.EVERYONE);
+    this.conversationModerator = ko.observable(() => ADD_PERMISSION.EVERYONE);
 
     this.isLastMessageVisible = ko.observable(true);
     this.isLoadingMessages = ko.observable(false);
