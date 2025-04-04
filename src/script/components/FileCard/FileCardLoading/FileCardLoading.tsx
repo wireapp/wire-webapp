@@ -17,9 +17,9 @@
  *
  */
 
-import {CSSProperties} from 'react';
+import {CSSProperties, useEffect, useState} from 'react';
 
-import {loadingStyles, wrapperStyles} from './FileCardLoading.styles';
+import {easeOutStyles, loadingStyles, wrapperStyles} from './FileCardLoading.styles';
 
 interface FileCardLoadingProps {
   /**
@@ -29,10 +29,33 @@ interface FileCardLoadingProps {
   progress?: number;
 }
 
-export const FileCardLoading = ({progress = 100}: FileCardLoadingProps) => {
+const MAX_PROGRESS = 100;
+const INITIAL_PROGRESS = 0;
+const FAKE_PROGRESS = 20;
+const FAKE_PROGRESS_DELAY = 200;
+
+export const FileCardLoading = ({progress = MAX_PROGRESS}: FileCardLoadingProps) => {
+  const [fakeProgress, setFakeProgress] = useState(INITIAL_PROGRESS);
+
+  // After the timeout, we set progress to a small value to indicate that the file is loading
+  // This is to avoid the progress bar from not showing up when progress is 0 for a longer time
+  useEffect(() => {
+    if (progress !== INITIAL_PROGRESS) {
+      return undefined;
+    }
+    const timer = setTimeout(() => {
+      setFakeProgress(FAKE_PROGRESS);
+    }, FAKE_PROGRESS_DELAY);
+
+    return () => clearTimeout(timer);
+  }, [progress]);
+
   return (
     <div css={wrapperStyles}>
-      <div css={loadingStyles} style={{'--progress': `${progress}%`} as CSSProperties} />
+      <div
+        css={[loadingStyles, progress === MAX_PROGRESS && easeOutStyles]}
+        style={{'--progress': `${!progress ? fakeProgress : progress}%`} as CSSProperties}
+      />
     </div>
   );
 };

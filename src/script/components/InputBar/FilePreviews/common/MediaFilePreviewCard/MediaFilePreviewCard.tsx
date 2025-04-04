@@ -21,17 +21,18 @@ import {ReactNode} from 'react';
 
 import {AlertIcon} from '@wireapp/react-ui-kit';
 
+import {FileCard} from 'Components/FileCard/FileCard';
+
 import {
   alertIconStyles,
   errorLineStyles,
-  errorLineWrapperStyles,
   iconWrapperStyles,
+  errorLineWrapperStyles,
   wrapperStyles,
 } from './MediaFilePreviewCard.styles';
 
 import {FilePreviewDeleteButton} from '../FilePreviewDeleteButton/FilePreviewDeleteButton';
 import {FilePreviewErrorMoreButton} from '../FilePreviewErrorMoreButton/FilePreviewErrorMoreButton';
-import {FilePreviewLoading} from '../FilePreviewLoading/FilePreviewLoading';
 
 interface MediaFilePreviewCardProps {
   label: string;
@@ -40,6 +41,7 @@ interface MediaFilePreviewCardProps {
   isLoading: boolean;
   isError: boolean;
   children: ReactNode;
+  uploadProgress: number;
 }
 
 export const MediaFilePreviewCard = ({
@@ -49,6 +51,7 @@ export const MediaFilePreviewCard = ({
   isLoading,
   isError,
   children,
+  uploadProgress,
 }: MediaFilePreviewCardProps) => {
   return (
     <article css={wrapperStyles} aria-label={label}>
@@ -64,8 +67,8 @@ export const MediaFilePreviewCard = ({
           </div>
         </>
       )}
-      {isLoading && <FilePreviewLoading />}
-      {!isLoading && !isError && <FilePreviewDeleteButton onDelete={onDelete} />}
+      {!isError && <FilePreviewDeleteButton onDelete={onDelete} />}
+      <FileCard.Loading progress={uploadProgress} />
     </article>
   );
 };
