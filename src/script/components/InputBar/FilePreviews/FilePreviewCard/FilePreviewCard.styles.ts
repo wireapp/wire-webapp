@@ -17,19 +17,10 @@
  *
  */
 
-import {CSSObject, css} from '@emotion/react';
+import {CSSObject} from '@emotion/react';
 
-export const wrapperStyles = css`
-  grid-column: span 3;
-  outline: none;
-  position: relative;
-
-  &:focus-visible {
-    border-radius: 4px;
-    box-shadow: 0 0 0 2px var(--accent-color);
-  }
-`;
-
-export const cardStyles: CSSObject = {
+export const wrapperStyles: CSSObject = {
+  gridColumn: 'span 3',
+  outline: 'none',
   position: 'relative',
 };
