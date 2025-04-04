@@ -19,6 +19,7 @@
 
 import {forwardRef, useEffect, useMemo, useState} from 'react';
 
+import {ADD_PERMISSION, CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
@@ -95,7 +96,6 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       isMutable,
       showNotificationsNothing,
       verification_state: verificationState,
-      isGroup,
       isSelfUserRemoved,
       notificationState,
       hasGlobalMessageTimer,
@@ -107,11 +107,14 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       isRequest,
       participating_user_ets: participatingUserEts,
       firstUserEntity: firstParticipant,
+      isGroup,
+      isChannel,
+      isGroupOrChannel,
+      conversationModerator,
     } = useKoSubscribableChildren(activeConversation, [
       'isMutable',
       'showNotificationsNothing',
       'verification_state',
-      'isGroup',
       'isSelfUserRemoved',
       'notificationState',
       'hasGlobalMessageTimer',
@@ -124,6 +127,10 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       'isRequest',
       'participating_user_ets',
       'firstUserEntity',
+      'isGroup',
+      'isChannel',
+      'isGroupOrChannel',
+      'conversationModerator',
     ]);
 
     const {isTemporaryGuest} = useKoSubscribableChildren(firstParticipant!, ['isTemporaryGuest']);
@@ -137,9 +144,15 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
         'team',
       ]);
 
-    const isActiveGroupParticipant = isGroup && !isSelfUserRemoved;
+    const isActiveGroupParticipant = isGroupOrChannel && !isSelfUserRemoved;
 
-    const showActionAddParticipants = isActiveGroupParticipant && roleRepository.canAddParticipants(activeConversation);
+    const showActionAddParticipantsForGroup = isGroup && roleRepository.canAddParticipants(activeConversation);
+    const showActionAddParticipantsForChannel =
+      isChannel &&
+      (roleRepository.canAddParticipants(activeConversation) || conversationModerator === ADD_PERMISSION.EVERYONE);
+
+    const showActionAddParticipants =
+      isActiveGroupParticipant && (showActionAddParticipantsForGroup || showActionAddParticipantsForChannel);
 
     const hasTimer = hasGlobalMessageTimer;
 
@@ -148,6 +161,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
 
     const guestOptionsText = isTeamOnly ? t('conversationDetailsOff') : t('conversationDetailsOn');
     const servicesOptionsText = isServicesRoom ? t('conversationDetailsOn') : t('conversationDetailsOff');
+    const isChannelPublic = activeConversation.accessModes?.includes(CONVERSATION_ACCESS.LINK);
 
     const notificationStatusText = getNotificationText(notificationState);
     const timedMessagesText = isSelfDeletingMessagesEnforced
@@ -307,7 +321,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
                 </div>
               )}
 
-              {isGroup && (!!userParticipants.length || !!serviceParticipants.length) && (
+              {isGroupOrChannel && (!!userParticipants.length || !!serviceParticipants.length) && (
                 <ConversationDetailsParticipants
                   activeConversation={activeConversation}
                   allUsersCount={allUsersCount}
@@ -336,6 +350,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
             teamState={teamState}
             timedMessagesText={timedMessagesText}
             updateConversationReceiptMode={updateConversationReceiptMode}
+            isChannelPublic={isChannelPublic}
           />
 
           <ConversationProtocolDetails

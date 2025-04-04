@@ -100,11 +100,16 @@ export const CallingCell = ({
   ]);
 
   const {
-    isGroup,
+    isGroupOrChannel,
     participating_user_ets: userEts,
     selfUser,
     display_name: conversationName,
-  } = useKoSubscribableChildren(conversation, ['isGroup', 'participating_user_ets', 'selfUser', 'display_name']);
+  } = useKoSubscribableChildren(conversation, [
+    'isGroupOrChannel',
+    'participating_user_ets',
+    'selfUser',
+    'display_name',
+  ]);
   const {activeCallViewTab, viewMode} = useKoSubscribableChildren(callState, ['activeCallViewTab', 'viewMode']);
 
   const selfParticipant = call.getSelfParticipant();
@@ -307,14 +312,14 @@ export const CallingCell = ({
           )}
 
           <CallingHeader
-            isGroup={isGroup}
+            isGroup={isGroupOrChannel}
             isOngoing={isOngoing}
             showAlert={showAlert}
             isVideoCall={isVideoCall}
             clearShowAlert={clearShowAlert}
             conversationUrl={conversationUrl}
-            callStartedAlert={isGroup ? callGroupStartedAlert : call1To1StartedAlert}
-            ongoingCallAlert={isGroup ? onGoingGroupCallAlert : onGoingCallAlert}
+            callStartedAlert={isGroupOrChannel ? callGroupStartedAlert : call1To1StartedAlert}
+            ongoingCallAlert={isGroupOrChannel ? onGoingGroupCallAlert : onGoingCallAlert}
             isTemporaryUser={!!isTemporaryUser}
             conversationParticipants={conversationParticipants}
             conversationName={conversationName}
@@ -382,7 +387,7 @@ export const CallingCell = ({
             isIncoming={isIncoming}
             isOutgoing={isOutgoing}
             isDeclined={isDeclined}
-            isGroup={isGroup}
+            isGroup={isGroupOrChannel}
             isVideoCall={isVideoCall}
             isOngoing={isOngoing}
             selfParticipant={selfParticipant}

@@ -59,10 +59,12 @@ export class CellsRepository {
     uuid,
     file,
     path,
+    progressCallback,
   }: {
     uuid: string;
     file: File;
     path: string;
+    progressCallback?: (progress: number) => void;
   }): Promise<{uuid: string; versionId: string}> {
     const filePath = `${path || this.basePath}/${file.name}`;
 
@@ -73,6 +75,7 @@ export class CellsRepository {
       file,
       uuid,
       versionId,
+      progressCallback,
     });
 
     return {

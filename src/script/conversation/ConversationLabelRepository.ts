@@ -165,13 +165,13 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
 
   readonly getGroupsWithoutLabel = (conversations = this.conversations()) => {
     return conversations.filter(
-      conversation => conversation.isGroup() && !this.allLabeledConversations().includes(conversation),
+      conversation => conversation.isGroupOrChannel() && !this.allLabeledConversations().includes(conversation),
     );
   };
 
   readonly getContactsWithoutLabel = (conversations = this.conversations()) => {
     return conversations.filter(
-      conversation => !conversation.isGroup() && !this.allLabeledConversations().includes(conversation),
+      conversation => !conversation.isGroupOrChannel() && !this.allLabeledConversations().includes(conversation),
     );
   };
 
@@ -239,7 +239,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
 
     if (isInCustomFolder) {
       ids.push(this.getConversationCustomLabel(conversation).id);
-    } else if (conversation.isGroup()) {
+    } else if (conversation.isGroupOrChannel()) {
       ids.push(DefaultLabelIds.Groups);
     } else {
       ids.push(DefaultLabelIds.Contacts);

@@ -26,6 +26,6 @@ export function getEnterpriseLoginV2FF() {
   const core = container.resolve(Core);
   return (
     Config.getConfig().FEATURE.ENABLE_ENTERPRISE_LOGIN_V2 &&
-    core.backendFeatures.version >= Config.getConfig().MIN_ENTERPRISE_LOGIN_V2_SUPPORTED_API_VERSION
+    core.backendFeatures.version >= Config.getConfig().MIN_ENTERPRISE_LOGIN_V2_AND_CHANNELS_SUPPORTED_API_VERSION
   );
 }

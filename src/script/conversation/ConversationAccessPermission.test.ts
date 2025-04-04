@@ -53,6 +53,14 @@ describe('ConversationAccessPermissions', () => {
     LEGACY: 0,
     GUEST_FEATURES: ACCESS_TYPES.GUEST | ACCESS_TYPES.NON_TEAM_MEMBER | ACCESS_MODES.CODE,
     ONE2ONE: 0,
+    PUBLIC: ACCESS_MODES.INVITE | ACCESS_TYPES.TEAM_MEMBER | ACCESS_MODES.LINK,
+    PUBLIC_GUESTS:
+      ACCESS_MODES.INVITE |
+      ACCESS_TYPES.TEAM_MEMBER |
+      ACCESS_TYPES.GUEST |
+      ACCESS_MODES.CODE |
+      ACCESS_TYPES.NON_TEAM_MEMBER |
+      ACCESS_MODES.LINK,
   };
 
   const accessStateMapper = <V>(teamObject: {[state in keyof typeof ACCESS_STATE.TEAM]: V}): [TEAM, V][] =>
@@ -76,7 +84,7 @@ describe('ConversationAccessPermissions', () => {
   });
 
   describe('hasAccessToFeature & toggleFeature', () => {
-    it.each(mockAccessTeam.slice(0, -3))('%s has correct features and can toggle', state => {
+    it.each(mockAccessTeam.slice(0, -5))('%s has correct features and can toggle', state => {
       const features = [ACCESS_TYPES.SERVICE, ACCESS_TYPES.GUEST | ACCESS_TYPES.NON_TEAM_MEMBER | ACCESS_MODES.CODE];
       features.forEach(feature =>
         // toggling the feature should mean the current access state no longer has access to it.
@@ -106,9 +114,10 @@ describe('ConversationAccessPermissions', () => {
   });
 
   describe('featureFromStateChange', () => {
-    it.each(mockAccessTeam.slice(0, -3))('gives feature information for %s', (prev, feat) => {
-      mockAccessTeam.slice(0, -3).forEach(([team]) => {
+    it.each(mockAccessTeam.slice(0, -5))('gives feature information for %s', (prev, feat) => {
+      mockAccessTeam.slice(0, -5).forEach(([team]) => {
         const result = featureFromStateChange(prev, team);
+
         if (prev === team) {
           // eslint-disable-next-line jest/no-conditional-expect
           return Object.values(result).forEach(value => expect(value).toBeFalsy());
@@ -122,7 +131,7 @@ describe('ConversationAccessPermissions', () => {
   });
 
   describe('accessFromPermissions', () => {
-    it.each(mockAccessTeam.slice(0, -2))('gives %s for %d', (team, permissions) => {
+    it.each(mockAccessTeam.slice(0, -4))('gives %s for %d', (team, permissions) => {
       expect(accessFromPermissions(permissions)).toBe(team);
     });
     it('gives z.conversation.ACCESS_STATE.TEAM.LEGACY for unknown permissions', () => {
@@ -160,6 +169,18 @@ describe('ConversationAccessPermissions', () => {
         accessModes: [CONVERSATION_ACCESS.CODE],
       },
       ONE2ONE: {accessModes: [], accessRole: []} as UpdatedAccessRights,
+      PUBLIC: {
+        accessModes: [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.LINK],
+        accessRole: [CONVERSATION_ACCESS_ROLE.TEAM_MEMBER],
+      },
+      PUBLIC_GUESTS: {
+        accessModes: [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.CODE, CONVERSATION_ACCESS.LINK],
+        accessRole: [
+          CONVERSATION_ACCESS_ROLE.GUEST,
+          CONVERSATION_ACCESS_ROLE.NON_TEAM_MEMBER,
+          CONVERSATION_ACCESS_ROLE.TEAM_MEMBER,
+        ],
+      },
     };
 
     const mockAccessRights = accessStateMapper(mockRights);

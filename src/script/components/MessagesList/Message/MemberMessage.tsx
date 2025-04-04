@@ -28,6 +28,7 @@ import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
+import {E2eEncryptionMessage} from './E2eEncryptionMessage/E2eEncryptionMessage';
 import {ConnectedMessage} from './MemberMessage/ConnectedMessage';
 import {MessageContent} from './MemberMessage/MessageContent';
 import {MessageTime} from './MessageTime';
@@ -163,20 +164,7 @@ export const MemberMessage: React.FC<MemberMessageProps> = ({
         </div>
       )}
 
-      {isGroupCreation && (
-        <>
-          <div className="message-header">
-            <div className="message-header-icon" />
-            <p className="message-header-label">{t('conversationNewConversation')}</p>
-          </div>
-          <div className="message-header">
-            <div className="message-header-icon message-header-icon--svg text-foreground">
-              <Icon.InfoIcon />
-            </div>
-            <p className="message-header-label">{t('conversationUnverifiedUserWarning')}</p>
-          </div>
-        </>
-      )}
+      {isGroupCreation && <E2eEncryptionMessage />}
     </>
   );
 };

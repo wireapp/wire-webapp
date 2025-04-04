@@ -167,7 +167,7 @@ const getConversationActions = ({
     },
     {
       condition:
-        conversationEntity.isGroup() &&
+        conversationEntity.isGroupOrChannel() &&
         conversationEntity.isSelfUserRemoved() &&
         Config.getConfig().FEATURE.ENABLE_REMOVE_GROUP_CONVERSATION,
       item: {
