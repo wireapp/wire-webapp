@@ -1868,6 +1868,7 @@ declare module 'I18n/en-US.json' {
     'createConversationUpgradePlanModalButton': `Upgrade now`;
     'createConversationUpgradeBadge': `Upgrade`;
     'conversationAccessDisclaimer': `A private channel can not be changed to public.`;
+    'systemMessageLearnMore': `Learn more`;
   };
   export default translations;
 }
