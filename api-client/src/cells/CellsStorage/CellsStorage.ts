@@ -23,11 +23,13 @@ export interface CellsStorage {
     file,
     metadata,
     progressCallback,
+    abortController,
   }: {
     path: string;
     file: File;
     metadata?: Record<string, string>;
     progressCallback?: (progress: number) => void;
+    abortController?: AbortController;
   }): Promise<void>;
 }
 

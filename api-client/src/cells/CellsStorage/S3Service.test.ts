@@ -71,7 +71,7 @@ describe('S3Service', () => {
         }),
         partSize: PART_SIZE,
         queueSize: MAX_QUEUE_SIZE,
-        leavePartsOnError: true,
+        leavePartsOnError: false,
         params: {
           Bucket: testConfig.bucket,
           Body: testFile,
@@ -80,6 +80,7 @@ describe('S3Service', () => {
           ContentLength: testFile.size,
           Metadata: undefined,
         },
+        abortController: undefined,
       });
     });
 

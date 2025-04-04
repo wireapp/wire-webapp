@@ -143,7 +143,7 @@ describe('CellsAPI', () => {
           Inputs: [{Type: 'LEAF', Locator: {Path: TEST_FILE_PATH, Uuid: MOCKED_UUID}, VersionId: MOCKED_UUID}],
           FindAvailablePath: true,
         },
-        {signal: undefined},
+        {abortController: undefined},
       );
 
       expect(mockStorage.putObject).toHaveBeenCalledWith({
@@ -154,7 +154,7 @@ describe('CellsAPI', () => {
           'Create-Resource-Uuid': MOCKED_UUID,
           'Create-Version-Id': MOCKED_UUID,
         },
-        signal: undefined,
+        abortController: undefined,
       });
     });
 
@@ -269,7 +269,7 @@ describe('CellsAPI', () => {
           Inputs: [{Type: 'LEAF', Locator: {Path: '', Uuid: MOCKED_UUID}, VersionId: MOCKED_UUID}],
           FindAvailablePath: true,
         },
-        {signal: undefined},
+        {abortControllerntroller: undefined},
       );
 
       expect(mockStorage.putObject).toHaveBeenCalledWith({
@@ -280,7 +280,7 @@ describe('CellsAPI', () => {
           'Create-Resource-Uuid': MOCKED_UUID,
           'Create-Version-Id': MOCKED_UUID,
         },
-        signal: undefined,
+        abortController: undefined,
       });
     });
   });
