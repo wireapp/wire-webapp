@@ -55,6 +55,7 @@ export const UpgradePlanModal = () => {
       isShown={isUpgradeTeamModalOpen}
       data-uie-name="custom-history-modal"
       onKeyDown={event => handleEscDown(event, onCancel)}
+      onBgClick={onCancel}
     >
       <div css={salesModalBodyCss}>
         <div css={salesModalBodyWrapperCss}>
