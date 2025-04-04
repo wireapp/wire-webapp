@@ -90,7 +90,6 @@ export const useFilePreview = ({file, cellsRepository, conversationQualifiedId}:
     name: transformedName,
     extension,
     size,
-    isLoading,
     isError,
     handleDelete,
     handleRetry,
