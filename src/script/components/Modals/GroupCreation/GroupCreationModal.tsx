@@ -504,6 +504,15 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                     info={t('servicesRoomToggleInfo')}
                   />
                 )}
+                <InfoToggle
+                  className="modal-style"
+                  dataUieName="read-receipts"
+                  info={t('readReceiptsToggleInfo')}
+                  isChecked={enableReadReceipts}
+                  setIsChecked={setEnableReadReceipts}
+                  isDisabled={false}
+                  name={t('readReceiptsToggleName')}
+                />
                 {Config.getConfig().FEATURE.ENABLE_CELLS && (
                   <InfoToggle
                     className="modal-style"
@@ -515,15 +524,6 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                     info={t('modalCreateGroupCellsToggleInfo')}
                   />
                 )}
-                <InfoToggle
-                  className="modal-style"
-                  dataUieName="read-receipts"
-                  info={t('readReceiptsToggleInfo')}
-                  isChecked={enableReadReceipts}
-                  setIsChecked={setEnableReadReceipts}
-                  isDisabled={false}
-                  name={t('readReceiptsToggleName')}
-                />
                 {enableMLSToggle && (
                   <>
                     <Select
