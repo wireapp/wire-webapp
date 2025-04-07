@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.38.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.37.1...@wireapp/api-client@27.38.0) (2025-04-07)
+
+### Features
+
+* **api-client/conversation:** add the cells option ([#7003](https://github.com/wireapp/wire-web-packages/issues/7003)) ([d99e027](https://github.com/wireapp/wire-web-packages/commit/d99e0274ab6ad3fe817c82262ce37accfd8cae7b))
+
 ## [27.37.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.37.0...@wireapp/api-client@27.37.1) (2025-04-04)
 
 ### Bug Fixes
