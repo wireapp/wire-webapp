@@ -1656,7 +1656,7 @@
   "startedGroupCallingAlert": "Sie haben eine Telefonkonferenz mit {conversationName} begonnen.",
   "startedVideoCallingAlert": "Sie rufen {conversationName} an, Ihre Kamera ist {cameraStatus}.",
   "startedVideoGroupCallingAlert": "Sie haben eine Telefonkonferenz mit {conversationName} begonnen, Ihre Kamera ist {cameraStatus}.",
-  "systemMessageLearnMore": "Learn more",
+  "systemMessageLearnMore": "Mehr erfahren",
   "takeoverButtonChoose": "Wählen Sie Ihren eigenen",
   "takeoverButtonKeep": "Diesen behalten",
   "takeoverLink": "Mehr erfahren",
