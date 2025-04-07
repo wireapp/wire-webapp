@@ -1655,19 +1655,6 @@ export class ConversationRepository {
         await this.blacklistConversation(conversationId);
       }
 
-      /*
-        when we fetch this new MLS conversation
-        we get last_event_time equal to 1970-01-01T00:00:00.000Z as there
-        haven't been any events for this particular new conversation yet
-        since there are no previous proteus conversation there is no last_event_time
-        we can copy from so we set it to Date.now() to avoid
-        having a conversation with last_event_time equal to 1970-01-01T00:00:00.000Z
-        this is important because we use last_event_time to sort our list of conversations
-      */
-      if (mlsConversation.last_event_timestamp() < 10) {
-        mlsConversation.last_event_timestamp(Date.now());
-      }
-
       return {shouldOpenMLS1to1Conversation: false};
     }
 
