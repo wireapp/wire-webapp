@@ -111,7 +111,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   const [groupCreationState, setGroupCreationState] = useState<GroupCreationModalState>(
     GroupCreationModalState.DEFAULT,
   );
-  const [isCellsOptionEnabled, setIsCellsOptionEnabled] = useState<boolean>(true);
+  const [isCellsOptionEnabled, setIsCellsOptionEnabled] = useState(true);
 
   const mainViewModel = useContext(RootContext);
 
@@ -474,7 +474,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
               />
             </div>
 
-            {true && (
+            {isTeam && (
               <>
                 <p
                   className="modal__info"
@@ -541,7 +541,6 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                     </p>
                   </>
                 )}
-
                 <br />
               </>
             )}
