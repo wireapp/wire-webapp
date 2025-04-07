@@ -34,7 +34,6 @@ import * as Icon from 'Components/Icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {SearchInput} from 'Components/SearchInput';
 import {TextInput} from 'Components/TextInput';
-import {BaseToggle} from 'Components/toggle/BaseToggle';
 import {InfoToggle} from 'Components/toggle/InfoToggle';
 import {UserSearchableList} from 'Components/UserSearchableList';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
@@ -485,26 +484,24 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                   {t('groupSizeInfo', {count: maxSize})}
                 </p>
                 <hr className="group-creation__modal__separator" />
-                <BaseToggle
+                <InfoToggle
                   className="modal-style"
+                  dataUieName="guests"
                   isChecked={isGuestEnabled}
                   setIsChecked={clickOnToggleGuestMode}
-                  extendedInfo
-                  extendedInfoText={t('guestRoomToggleInfoExtended')}
-                  infoText={t('guestRoomToggleInfo')}
-                  toggleName={t('guestOptionsTitle')}
-                  toggleId="guests"
+                  isDisabled={false}
+                  name={t('guestOptionsTitle')}
+                  info={t('guestRoomToggleInfo')}
                 />
                 {selectedProtocol.value !== ConversationProtocol.MLS && (
-                  <BaseToggle
+                  <InfoToggle
                     className="modal-style"
+                    dataUieName="services"
                     isChecked={isServicesEnabled}
                     setIsChecked={clickOnToggleServicesMode}
-                    extendedInfo
-                    extendedInfoText={t('servicesRoomToggleInfoExtended')}
-                    infoText={t('servicesRoomToggleInfo')}
-                    toggleName={t('servicesOptionsTitle')}
-                    toggleId="services"
+                    isDisabled={false}
+                    name={t('servicesOptionsTitle')}
+                    info={t('servicesRoomToggleInfo')}
                   />
                 )}
                 {Config.getConfig().FEATURE.ENABLE_CELLS && (
