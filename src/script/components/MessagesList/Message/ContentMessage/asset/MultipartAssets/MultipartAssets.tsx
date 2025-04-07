@@ -100,7 +100,7 @@ const MultipartAsset = ({
   if (isVideo) {
     return (
       <li ref={elementRef} css={smallCardStyles}>
-        <VideoAssetCard src={src} metadata={videoMetadata} isLoading={isLoading} isError={isError} />{' '}
+        <VideoAssetCard src={src} isLoading={isLoading} isError={isError} />
       </li>
     );
   }
