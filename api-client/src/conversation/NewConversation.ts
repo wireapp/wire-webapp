@@ -43,4 +43,5 @@ export interface NewConversation
   protocol?: ConversationProtocol;
   team?: TeamInfo;
   users?: string[]; // users must be empty for creating MLS conversations
+  cells?: boolean;
 }
