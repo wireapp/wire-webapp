@@ -69,16 +69,26 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
   isMaximized,
   onTileDoubleClick,
 }) => {
-  const {isMuted, videoState, handRaisedAt, videoStream, blurredVideoStream, isActivelySpeaking, isAudioEstablished} =
-    useKoSubscribableChildren(participant, [
-      'isMuted',
-      'handRaisedAt',
-      'videoStream',
-      'blurredVideoStream',
-      'isActivelySpeaking',
-      'videoState',
-      'isAudioEstablished',
-    ]);
+  const {
+    isMuted,
+    videoState,
+    handRaisedAt,
+    videoStream,
+    blurredVideoStream,
+    isActivelySpeaking,
+    isAudioEstablished,
+    isSwitchingVideoResolution,
+  } = useKoSubscribableChildren(participant, [
+    'isMuted',
+    'handRaisedAt',
+    'videoStream',
+    'blurredVideoStream',
+    'isActivelySpeaking',
+    'videoState',
+    'isAudioEstablished',
+    'isSwitchingVideoResolution',
+  ]);
+
   const {name} = useKoSubscribableChildren(participant?.user, ['name']);
 
   const sharesScreen = videoState === VIDEO_STATE.SCREENSHARE;
@@ -223,7 +233,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
 
       {nameContainer}
 
-      {hasPausedVideo && (
+      {(hasPausedVideo || isSwitchingVideoResolution) && (
         <div className="group-video-grid__pause-overlay">
           <div className="background">
             <div className="background-image"></div>
@@ -235,7 +245,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
             css={{fontsize: minimized ? '0.6875rem' : '0.875rem'}}
             data-uie-name="status-video-paused"
           >
-            {t('videoCallPaused')}
+            {hasPausedVideo ? t('videoCallPaused') : t('videoCallParticipantConnecting')}
           </div>
           {nameContainer}
         </div>
