@@ -141,7 +141,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   const isGuestEnabled = isGuestRoom || isGuestAndServicesRoom;
   const isServicesEnabled = isServicesRoom || isGuestAndServicesRoom;
 
-  const isCellsFeatureEnabled = Config.getConfig().FEATURE.ENABLE_CELLS;
+  const isCellsEnabled = Config.getConfig().FEATURE.ENABLE_CELLS && isCellsOptionEnabled;
 
   const {setCurrentTab: setCurrentSidebarTab} = useSidebarStore();
 
@@ -223,7 +223,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
           {
             protocol: enableMLSToggle ? selectedProtocol.value : defaultProtocol,
             receipt_mode: enableReadReceipts ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF,
-            cells: isCellsFeatureEnabled ? isCellsOptionEnabled : false,
+            cells: isCellsEnabled,
           },
         );
 
