@@ -33,7 +33,7 @@ interface GridImageAssetProps {
   isError: boolean;
 }
 
-export const GridImageAsset = ({src, metadata, size, isLoading, isError}: GridImageAssetProps) => {
+export const GridImageAsset = ({src, isLoading, isError}: GridImageAssetProps) => {
   return (
     <MediaFilePreviewCard
       label={src ? t('conversationFileImagePreviewLabel', {src}) : ''}
