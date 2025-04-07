@@ -112,6 +112,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   const [groupCreationState, setGroupCreationState] = useState<GroupCreationModalState>(
     GroupCreationModalState.DEFAULT,
   );
+  const [isCellsOptionEnabled, setIsCellsOptionEnabled] = useState<boolean>(true);
 
   const mainViewModel = useContext(RootContext);
 
@@ -140,6 +141,8 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   const isGuestRoom = accessState === ACCESS_STATE.TEAM.GUEST_ROOM;
   const isGuestEnabled = isGuestRoom || isGuestAndServicesRoom;
   const isServicesEnabled = isServicesRoom || isGuestAndServicesRoom;
+
+  const isCellsFeatureEnabled = Config.getConfig().FEATURE.ENABLE_CELLS;
 
   const {setCurrentTab: setCurrentSidebarTab} = useSidebarStore();
 
@@ -221,6 +224,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
           {
             protocol: enableMLSToggle ? selectedProtocol.value : defaultProtocol,
             receipt_mode: enableReadReceipts ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF,
+            cells: isCellsFeatureEnabled ? isCellsOptionEnabled : false,
           },
         );
 
@@ -471,7 +475,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
               />
             </div>
 
-            {isTeam && (
+            {true && (
               <>
                 <p
                   className="modal__info"
@@ -503,6 +507,17 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                     toggleId="services"
                   />
                 )}
+                {Config.getConfig().FEATURE.ENABLE_CELLS && (
+                  <InfoToggle
+                    className="modal-style"
+                    dataUieName="cells"
+                    isChecked={isCellsOptionEnabled}
+                    setIsChecked={setIsCellsOptionEnabled}
+                    isDisabled={false}
+                    name={t('modalCreateGroupCellsToggleHeading')}
+                    info={t('modalCreateGroupCellsToggleInfo')}
+                  />
+                )}
                 <InfoToggle
                   className="modal-style"
                   dataUieName="read-receipts"
@@ -529,6 +544,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                     </p>
                   </>
                 )}
+
                 <br />
               </>
             )}
