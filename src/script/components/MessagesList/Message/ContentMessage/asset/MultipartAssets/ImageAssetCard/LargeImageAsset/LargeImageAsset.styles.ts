@@ -19,20 +19,45 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const containerStyle: CSSObject = {
+export const containerStyles: CSSObject = {
+  display: 'flex',
+  position: 'relative',
+  aspectRatio: 'var(--aspect-ratio)',
+  backgroundColor: 'var(--foreground-fade-8)',
   maxWidth: 'var(--conversation-message-asset-width)',
   maxHeight: 'var(--conversation-message-image-asset-max-height)',
-  border: 'none',
+};
+
+export const loaderOverlayStyles: CSSObject = {
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  width: '100%',
+  height: '100%',
+};
+
+export const loaderWrapperStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  height: '100%',
+};
+
+export const loaderIconStyles: CSSObject = {
+  color: 'var(--main)',
+  fontSize: 'var(--font-size-medium)',
+};
+
+export const imageWrapperStyles: CSSObject = {
+  minWidth: '1px',
+  width: '100%',
 };
 
 export const imageStyle: CSSObject = {
+  aspectRatio: 'var(--aspect-ratio)',
   maxWidth: '100%',
   maxHeight: '100%',
   objectFit: 'contain',
-  objectPosition: 'left',
-  backgroundColor: 'var(--foreground-fade-8)',
-  border: 'none',
-  padding: 0,
-  margin: 0,
-  boxShadow: 'none',
+  objectPosition: 'left center',
+  opacity: 'var(--opacity)',
 };

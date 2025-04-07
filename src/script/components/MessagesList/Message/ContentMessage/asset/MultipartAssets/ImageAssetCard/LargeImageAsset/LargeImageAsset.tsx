@@ -21,7 +21,14 @@ import {CSSProperties, useState} from 'react';
 
 import {ICellAsset} from '@pydio/protocol-messaging';
 
-import {containerStyle, imageStyle} from './LargeImageAsset.styles';
+import {
+  containerStyles,
+  imageStyle,
+  imageWrapperStyles,
+  loaderIconStyles,
+  loaderOverlayStyles,
+  loaderWrapperStyles,
+} from './LargeImageAsset.styles';
 
 interface LargeImageAssetProps {
   src?: string;
@@ -35,27 +42,34 @@ export const LargeImageAsset = ({src, metadata, isLoading, isError}: LargeImageA
 
   return (
     <div
-      css={containerStyle}
+      css={containerStyles}
       style={
         {
-          aspectRatio: metadata?.height ? metadata?.width / metadata?.height : undefined,
-          backgroundColor: isLoading ? 'var(--foreground-fade-8)' : 'transparent',
+          '--aspect-ratio': metadata?.height ? metadata?.width / metadata?.height : undefined,
         } as CSSProperties
       }
     >
-      <img
-        src={src}
-        alt=""
-        css={imageStyle}
-        style={
-          {
-            aspectRatio: metadata?.height ? metadata?.width / metadata?.height : undefined,
-            width: metadata?.width,
-          } as CSSProperties
-        }
-        onLoad={() => setIsImageLoaded(true)}
-        onError={() => setIsImageLoaded(false)}
-      />
+      {!isImageLoaded && (
+        <div css={loaderOverlayStyles}>
+          <div css={loaderWrapperStyles}>
+            <div className="icon-spinner spin" css={loaderIconStyles} />
+          </div>
+        </div>
+      )}
+      <div css={imageWrapperStyles}>
+        <img
+          src={src}
+          alt=""
+          css={imageStyle}
+          style={
+            {
+              '--opacity': isImageLoaded ? 1 : 0,
+            } as CSSProperties
+          }
+          width={metadata?.width}
+          onLoad={() => setIsImageLoaded(true)}
+        />
+      </div>
     </div>
   );
 };
