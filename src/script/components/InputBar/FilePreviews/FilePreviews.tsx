@@ -74,6 +74,7 @@ const FilePreview = ({
         onRetry={handleRetry}
         isLoading={isLoading}
         isError={isError}
+        uploadProgress={file.uploadProgress}
       />
     );
   }
@@ -100,6 +101,7 @@ const FilePreview = ({
         onRetry={handleRetry}
         isLoading={isLoading}
         isError={isError}
+        uploadProgress={file.uploadProgress}
       />
     );
   }
@@ -113,6 +115,7 @@ const FilePreview = ({
       onRetry={handleRetry}
       isLoading={isLoading}
       isError={isError}
+      uploadProgress={file.uploadProgress}
     />
   );
 };

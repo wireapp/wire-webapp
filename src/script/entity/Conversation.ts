@@ -187,7 +187,7 @@ export class Conversation {
   public accessRole?: CONVERSATION_LEGACY_ACCESS_ROLE | CONVERSATION_ACCESS_ROLE[];
   public domain: string;
   public readonly groupConversationType: ko.Observable<GROUP_CONVERSATION_TYPE>;
-  public readonly conversationModerator: ko.Observable<ADD_PERMISSION>;
+  public conversationModerator: ko.Observable<ADD_PERMISSION>;
 
   static get TIMESTAMP_TYPE(): typeof TIMESTAMP_TYPE {
     return TIMESTAMP_TYPE;

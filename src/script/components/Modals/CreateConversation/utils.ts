@@ -17,12 +17,13 @@
  *
  */
 
+import {ADD_PERMISSION} from '@wireapp/api-client/lib/conversation';
 import {container} from 'tsyringe';
 
 import {TeamState} from 'src/script/team/TeamState';
 import {t} from 'Util/LocalizerUtil';
 
-import {ChatHistory, ConversationAccess, ConversationModerator, ConversationType, HistorySharingUnit} from './types';
+import {ChatHistory, ConversationAccess, ConversationType, HistorySharingUnit} from './types';
 
 export const getConversationAccessOptions = () => {
   return [
@@ -40,11 +41,11 @@ export const getConversationAccessOptions = () => {
 export const getConversationManagerOptions = () => {
   return [
     {
-      value: ConversationModerator.Admins,
+      value: ADD_PERMISSION.ADMINS,
       label: t('createConversationManagerOptionAdmins'),
     },
     {
-      value: ConversationModerator.AdminsAndMembers,
+      value: ADD_PERMISSION.EVERYONE,
       label: t('createConversationManagerOptionAdminsAndMembers'),
     },
   ];

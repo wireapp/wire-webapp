@@ -41,6 +41,7 @@ export enum Permissions {
   toggleEphemeralTimer = 'modify_conversation_message_timer',
   toggleGuestsAndServices = 'modify_conversation_access',
   toggleReadReceipts = 'modify_conversation_receipt_mode',
+  toggleAddPermission = 'modify_add_permission',
 }
 
 const defaultAdminRole: ConversationRole = {
@@ -54,6 +55,7 @@ const defaultAdminRole: ConversationRole = {
     Permissions.toggleReadReceipts,
     Permissions.deleteConversation,
     Permissions.leaveConversation,
+    Permissions.toggleAddPermission,
   ],
   conversation_role: DefaultRole.WIRE_ADMIN,
 };
@@ -177,5 +179,9 @@ export class ConversationRoleRepository {
 
   readonly canLeaveGroup = (conversation: Conversation, user: User = this.userState.self()): boolean => {
     return this.hasPermission(conversation, user, Permissions.leaveConversation);
+  };
+
+  readonly canToggleAddPermission = (conversation: Conversation, user: User = this.userState.self()): boolean => {
+    return this.hasPermission(conversation, user, Permissions.toggleAddPermission);
   };
 }
