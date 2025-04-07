@@ -26,7 +26,6 @@ import {MediaFilePreviewCard} from '../common/MediaFilePreviewCard/MediaFilePrev
 
 interface VideoAssetCardProps {
   src?: string;
-
   isLoading: boolean;
   isError: boolean;
 }
