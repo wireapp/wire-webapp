@@ -1233,6 +1233,8 @@
   "modalCreateFolderHeadline": "Criar nova pasta",
   "modalCreateFolderMessage": "Mova sua conversa para uma nova pasta.",
   "modalCreateFolderPlaceholder": "Nome da pasta",
+  "modalCreateGroupCellsToggleHeading": "Files",
+  "modalCreateGroupCellsToggleInfo": "Enable a shared Files section accessible to all group’s participants. This setting cannot be disabled once activated.",
   "modalCreateGroupProtocolHeading": "Protocolo",
   "modalCreateGroupProtocolInfo": "Select MLS to create a group conversation using the Messaging Layer Security protocol.",
   "modalCreateGroupProtocolSelect.default": " (padrão)",

@@ -1233,6 +1233,8 @@
   "modalCreateFolderHeadline": "Создать новую папку",
   "modalCreateFolderMessage": "Переместить вашу беседу в новую папку.",
   "modalCreateFolderPlaceholder": "Название папки",
+  "modalCreateGroupCellsToggleHeading": "Files",
+  "modalCreateGroupCellsToggleInfo": "Enable a shared Files section accessible to all group’s participants. This setting cannot be disabled once activated.",
   "modalCreateGroupProtocolHeading": "Протокол",
   "modalCreateGroupProtocolInfo": "Выберите MLS для создания групповой беседы с использованием протокола Messaging Layer Security.",
   "modalCreateGroupProtocolSelect.default": " (по умолчанию)",
