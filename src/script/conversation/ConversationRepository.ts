@@ -1635,7 +1635,7 @@ export class ConversationRepository {
    * All the events will be moved to the new conversation and proteus conversation will be deleted locally.
    * Proteus 1:1 conversation will be hidden in the UI and replaced with mls 1:1 conversation.
    *
-   * @param proteusConversation - proteus 1:1 conversation
+   * @param otherUserId - id of the other user in the conversation which will be migrated
    * @param mlsConversation - mls 1:1 conversation
    * @returns {shouldOpenMLS1to1Conversation} - whether it was an active conversation and mls 1:1 conversation should be opened in the UI
    */
@@ -1654,6 +1654,20 @@ export class ConversationRepository {
       if (conversationId) {
         await this.blacklistConversation(conversationId);
       }
+
+      /*
+        when we fetch this new MLS conversation
+        we get last_event_time equal to 1970-01-01T00:00:00.000Z as there
+        haven't been any events for this particular new conversation yet
+        since there are no previous proteus conversation there is no last_event_time
+        we can copy from so we set it to Date.now() to avoid
+        having a conversation with last_event_time equal to 1970-01-01T00:00:00.000Z
+        this is important because we use last_event_time to sort our list of conversations
+      */
+      if (mlsConversation.last_event_timestamp() < 10) {
+        mlsConversation.last_event_timestamp(Date.now());
+      }
+
       return {shouldOpenMLS1to1Conversation: false};
     }
 
@@ -1672,37 +1686,26 @@ export class ConversationRepository {
     )[0];
 
     // Before we delete the proteus 1:1 conversation, we need to make sure all the local properties are also migrated
-    const {
-      archivedState,
-      archivedTimestamp,
-      cleared_timestamp,
-      localMessageTimer,
-      last_event_timestamp,
-      last_read_timestamp,
-      last_server_timestamp,
-      legalHoldStatus,
-      mutedState,
-      mutedTimestamp,
-      status,
-      verification_state,
-    } = proteusConversationToBeKept;
-
-    const updates: Partial<Record<keyof Conversation, any>> = {
-      archivedState: archivedState(),
-      archivedTimestamp: archivedTimestamp(),
-      cleared_timestamp: cleared_timestamp(),
-      localMessageTimer: localMessageTimer(),
-      last_event_timestamp: last_event_timestamp(),
-      last_read_timestamp: last_read_timestamp(),
-      last_server_timestamp: last_server_timestamp(),
-      legalHoldStatus: legalHoldStatus(),
-      mutedState: mutedState(),
-      mutedTimestamp: mutedTimestamp(),
-      status: status(),
-      verification_state: verification_state(),
-    };
-
-    ConversationMapper.updateProperties(mlsConversation, updates);
+    try {
+      mlsConversation.last_event_timestamp(proteusConversationToBeKept.last_event_timestamp());
+      mlsConversation.last_read_timestamp(proteusConversationToBeKept.last_read_timestamp());
+      mlsConversation.last_server_timestamp(proteusConversationToBeKept.last_server_timestamp());
+      mlsConversation.archivedState(proteusConversationToBeKept.archivedState());
+      mlsConversation.archivedTimestamp(proteusConversationToBeKept.archivedTimestamp());
+      mlsConversation.cleared_timestamp(proteusConversationToBeKept.cleared_timestamp());
+      mlsConversation.localMessageTimer(proteusConversationToBeKept.localMessageTimer());
+      mlsConversation.legalHoldStatus(proteusConversationToBeKept.legalHoldStatus());
+      mlsConversation.mutedState(proteusConversationToBeKept.mutedState());
+      mlsConversation.mutedTimestamp(proteusConversationToBeKept.mutedTimestamp());
+      mlsConversation.status(proteusConversationToBeKept.status());
+      mlsConversation.verification_state(proteusConversationToBeKept.verification_state());
+    } catch (error) {
+      this.logger.warn('Failed to migrate conversation properties', {
+        error,
+        proteusConversationToBeKept: JSON.stringify(proteusConversationToBeKept),
+        mlsConversation: JSON.stringify(mlsConversation),
+      });
+    }
 
     const wasProteus1to1ActiveConversation = proteusConversations.some(conversation =>
       this.conversationState.isActiveConversation(conversation),
