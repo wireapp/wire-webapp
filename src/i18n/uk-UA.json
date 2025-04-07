@@ -1233,6 +1233,8 @@
   "modalCreateFolderHeadline": "Створити нову теку",
   "modalCreateFolderMessage": "Перенести розмову до нової теки.",
   "modalCreateFolderPlaceholder": "Ім'я теки",
+  "modalCreateGroupCellsToggleHeading": "Files",
+  "modalCreateGroupCellsToggleInfo": "Enable a shared Files section accessible to all group’s participants. This setting cannot be disabled once activated.",
   "modalCreateGroupProtocolHeading": "Protocol",
   "modalCreateGroupProtocolInfo": "Select MLS to create a group conversation using the Messaging Layer Security protocol.",
   "modalCreateGroupProtocolSelect.default": " (default)",
