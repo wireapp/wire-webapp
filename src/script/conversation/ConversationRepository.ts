@@ -199,6 +199,7 @@ export class ConversationRepository {
   public readonly stateHandler: ConversationStateHandler;
   public readonly proteusVerificationStateHandler: ProteusConversationVerificationStateHandler;
   private mlsConversationVerificationStateHandler?: MLSConversationVerificationStateHandler;
+  private initiatingMlsConversationQualifiedIds: QualifiedId[] = [];
 
   static get CONFIG() {
     return {
@@ -1802,8 +1803,24 @@ export class ConversationRepository {
       );
     }
 
-    this.logger.debug(`Initialising MLS 1:1 conversation with user ${otherUserId.id}...`);
     const mlsConversation = await this.getMLS1to1Conversation(otherUserId);
+
+    this.logger.debug(
+      `Initialising MLS 1:1 conversation with user ${otherUserId.id} for mls conversation ${mlsConversation.id}`,
+    );
+
+    if (
+      this.initiatingMlsConversationQualifiedIds.some(qualifiedId =>
+        matchQualifiedIds(qualifiedId, mlsConversation.qualifiedId),
+      )
+    ) {
+      this.logger.debug(
+        `Skipped initialising MLS 1:1 conversation with user ${otherUserId.id} for mls conversation ${mlsConversation.id}`,
+      );
+      return mlsConversation;
+    }
+
+    this.initiatingMlsConversationQualifiedIds.push(mlsConversation.qualifiedId);
 
     const otherUser = await this.userRepository.getUserById(otherUserId);
 
@@ -1840,6 +1857,9 @@ export class ConversationRepository {
         amplify.publish(WebAppEvents.CONVERSATION.SHOW, mlsConversation, {});
       }
 
+      this.initiatingMlsConversationQualifiedIds = this.initiatingMlsConversationQualifiedIds.filter(qualifiedId =>
+        matchQualifiedIds(qualifiedId, mlsConversation.qualifiedId),
+      );
       return mlsConversation;
     }
 
@@ -1872,6 +1892,10 @@ export class ConversationRepository {
       // If proteus conversation was previously active conversaiton, we want to make mls 1:1 conversation active.
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, initialisedMLSConversation, {});
     }
+
+    this.initiatingMlsConversationQualifiedIds = this.initiatingMlsConversationQualifiedIds.filter(qualifiedId =>
+      matchQualifiedIds(qualifiedId, mlsConversation.qualifiedId),
+    );
     return initialisedMLSConversation;
   };
 
