@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [46.21.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.21.0...@wireapp/core@46.21.1) (2025-04-08)
+
+### Bug Fixes
+
+* **ConversationService:** correct typo ([#7005](https://github.com/wireapp/wire-web-packages/issues/7005)) ([b72400d](https://github.com/wireapp/wire-web-packages/commit/b72400dde96b8defce439a65712ad6a903b18073))
+
 # [46.21.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.20.15...@wireapp/core@46.21.0) (2025-04-08)
 
 ### Features
