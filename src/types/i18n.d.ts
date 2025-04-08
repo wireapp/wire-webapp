@@ -511,11 +511,13 @@ declare module 'I18n/en-US.json' {
     'conversationDetailsActionClear': `Clear content`;
     'conversationDetailsActionConversationParticipants': `Show all ({number})`;
     'conversationDetailsActionCreateGroup': `Create group`;
-    'conversationDetailsActionDelete': `Delete group`;
+    'groupDetailsActionDelete': `Delete group`;
+    'channelDetailsActionDelete': `Delete channel`;
     'conversationDetailsActionDeleteForMe': `Delete for Me`;
     'conversationDetailsActionDevices': `Devices`;
     'conversationDetailsActionGuestOptions': `Guests`;
-    'conversationDetailsActionLeave': `Leave group`;
+    'groupDetailsActionLeave': `Leave group`;
+    'channelDetailsActionLeave': `Leave channel`;
     'conversationDetailsActionNotifications': `Notifications`;
     'conversationDetailsActionServicesOptions': `Services`;
     'conversationDetailsActionTimedMessages': `Self-deleting messages`;
@@ -718,7 +720,8 @@ declare module 'I18n/en-US.json' {
     'conversationsPopoverCancel': `Cancel request`;
     'conversationsPopoverClear': `Clear content`;
     'conversationsPopoverDeleteForMe': `Delete for Me`;
-    'conversationsPopoverLeave': `Leave group`;
+    'channelsPopoverLeave': `Leave channel`;
+    'groupsPopoverLeave': `Leave group`;
     'conversationsPopoverMoveTo': `Move to`;
     'conversationsPopoverNewFolder': `Create new folder`;
     'conversationsPopoverNoCustomFolders': `No custom folders`;
@@ -890,6 +893,7 @@ declare module 'I18n/en-US.json' {
     'groupParticipantActionIgnoreRequest': `Ignore request`;
     'groupParticipantActionIncomingRequest': `Accept request`;
     'groupParticipantActionLeave': `Leave group…`;
+    'channelParticipantActionLeave': `Leave channel…`;
     'groupParticipantActionOpenConversation': `Open conversation`;
     'groupParticipantActionPending': `Pending`;
     'groupParticipantActionRemove': `Remove from group…`;
@@ -1173,8 +1177,9 @@ declare module 'I18n/en-US.json' {
     'modalConversationDeleteErrorHeadline': `Group not deleted`;
     'modalConversationDeleteErrorMessage': `An error occurred while trying to delete the group {name}. Please try again.`;
     'modalConversationDeleteGroupAction': `Delete`;
-    'modalConversationDeleteGroupHeadline': `Delete group conversation?`;
-    'modalConversationDeleteGroupMessage': `This will delete the group and all content for all participants on all devices. There is no option to restore the content. All participants will be notified.`;
+    'modalGroupDeleteGroupHeadline': `Delete group conversation?`;
+    'modalChannelDeleteGroupHeadline': `Delete channel?`;
+    'modalConversationDeleteGroupMessage': `This will delete the conversation and all content for all participants on all devices. There is no option to restore the content. All participants will be notified.`;
     'modalConversationDeleteMessageAction': `Delete`;
     'modalConversationDeleteMessageAllCloseBtn': `Close window \'Delete for everyone\'`;
     'modalConversationDeleteMessageCloseBtn': `Close window \'Delete only for me\'`;

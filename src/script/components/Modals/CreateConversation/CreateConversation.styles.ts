@@ -28,6 +28,7 @@ export const createConversationModalWrapperCss: CSSObject = {
 };
 
 export const createConversationHeaderContainerCss: CSSObject = {
+  height: '64px',
   borderBottom: '1px solid var(--border-color)',
   marginBottom: '0px',
 };
