@@ -22,5 +22,6 @@ export interface ScimTokenInfo {
   id: string;
   created_at: string;
   idp?: string;
+  name?: string;
   description: string;
 }

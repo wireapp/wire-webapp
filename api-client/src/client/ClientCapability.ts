@@ -19,4 +19,5 @@
 
 export enum ClientCapability {
   LEGAL_HOLD_IMPLICIT_CONSENT = 'legalhold-implicit-consent',
+  CONSUMABLE_NOTIFICATIONS = 'consumable-notifications',
 }

@@ -83,8 +83,9 @@ type ConversationGuestLinkStatus = {status: 'enabled' | 'disabled'};
 
 const apiBreakpoint = {
   version2: 2,
-  // API V7 introduces new endpoints to conversations and users
+  // API V7 and up introduce new endpoints to conversations and users
   version7: 7,
+  version8: 8,
 };
 
 export class ConversationAPI {
@@ -792,13 +793,16 @@ export class ConversationAPI {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/updateConversation
    */
   public async putConversation(
-    conversationId: string,
+    conversationId: QualifiedId,
     conversationNameData: ConversationNameUpdateData,
   ): Promise<ConversationRenameEvent> {
     const config: AxiosRequestConfig = {
       data: conversationNameData,
       method: 'put',
-      url: `/${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.NAME}`,
+      url:
+        this.backendFeatures.version >= apiBreakpoint.version8
+          ? `/${ConversationAPI.URL.CONVERSATIONS}/${conversationId.domain}/${conversationId}/${ConversationAPI.URL.NAME}`
+          : `/${ConversationAPI.URL.CONVERSATIONS}/${conversationId.id}/${ConversationAPI.URL.NAME}`,
     };
 
     const response = await this.client.sendJSON<ConversationRenameEvent>(config);
@@ -818,7 +822,10 @@ export class ConversationAPI {
     const config: AxiosRequestConfig = {
       data: messageTimerData,
       method: 'put',
-      url: `/${ConversationAPI.URL.CONVERSATIONS}/${conversationId.id}/${ConversationAPI.URL.MESSAGE_TIMER}`,
+      url:
+        this.backendFeatures.version >= apiBreakpoint.version8
+          ? `/${ConversationAPI.URL.CONVERSATIONS}/${conversationId.domain}/${conversationId.id}/${ConversationAPI.URL.MESSAGE_TIMER}`
+          : `/${ConversationAPI.URL.CONVERSATIONS}/${conversationId.id}/${ConversationAPI.URL.MESSAGE_TIMER}`,
     };
 
     const response = await this.client.sendJSON<ConversationMessageTimerUpdateEvent>(config);
