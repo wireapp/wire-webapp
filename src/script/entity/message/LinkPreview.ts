@@ -17,7 +17,7 @@
  *
  */
 
-import type {ITweet} from '@pydio/protocol-messaging';
+import type {ITweet} from '@wireapp/protocol-messaging';
 
 import {obfuscate} from 'Util/StringUtil';
 

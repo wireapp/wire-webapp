@@ -17,7 +17,7 @@
  *
  */
 
-import {Quote} from '@pydio/protocol-messaging';
+import {Quote} from '@wireapp/protocol-messaging';
 
 import {MessageAddEvent} from 'src/script/conversation/EventBuilder';
 import {getLogger, Logger} from 'Util/Logger';

@@ -17,8 +17,9 @@
  *
  */
 
-import {Availability} from '@pydio/protocol-messaging';
 import {render} from '@testing-library/react';
+
+import {Availability} from '@wireapp/protocol-messaging';
 
 import {Participant} from 'src/script/calling/Participant';
 import {User} from 'src/script/entity/User';
