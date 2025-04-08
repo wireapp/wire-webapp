@@ -17,9 +17,12 @@
  *
  */
 
+import {container} from 'tsyringe';
+
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
+import {UserState} from 'src/script/user/UserState';
 import {t} from 'Util/LocalizerUtil';
 
 import {createConversationHeaderContainerCss} from './CreateConversation.styles';
@@ -38,6 +41,8 @@ export const CreateConversationHeader = () => {
     conversationType,
     gotoLastStep,
   } = useCreateConversationModal();
+  const userState = container.resolve(UserState);
+  const selfUser = userState.self();
 
   const onNextClick = () => {
     if (conversationType === ConversationType.Group) {
@@ -47,6 +52,9 @@ export const CreateConversationHeader = () => {
 
     gotoNextStep();
   };
+
+  const isNextButtonDisabled =
+    !!error || !conversationName || (selfUser?.isExternal() && conversationType === ConversationType.Group);
 
   return (
     <div className="modal__header modal__header--list" css={createConversationHeaderContainerCss}>
@@ -85,7 +93,7 @@ export const CreateConversationHeader = () => {
           <Button
             id="group-go-next"
             css={{marginBottom: 0}}
-            disabled={!!error || !conversationName}
+            disabled={isNextButtonDisabled}
             type="button"
             onClick={onNextClick}
             aria-label={t('groupCreationPreferencesAction')}
