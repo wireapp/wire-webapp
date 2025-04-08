@@ -125,7 +125,7 @@ export class ConversationService {
    * @param name new name of the conversation
    * @returns Resolves with the server response
    */
-  updateConversationName(conversationId: string, name: string): Promise<ConversationRenameEvent> {
+  updateConversationName(conversationId: QualifiedId, name: string): Promise<ConversationRenameEvent> {
     return this.apiClient.api.conversation.putConversation(conversationId, {
       name,
     });
