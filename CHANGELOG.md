@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [46.21.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.20.15...@wireapp/core@46.21.0) (2025-04-08)
+
+### Features
+
+* @pydio/protocol-messaging to @wireapp/protocol-messaging [WPB-16845] ([#7004](https://github.com/wireapp/wire-web-packages/issues/7004)) ([df3f0d3](https://github.com/wireapp/wire-web-packages/commit/df3f0d3d807f08ec2da5ffb48e705adec27dc9d5))
+
 ## [46.20.15](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.20.14...@wireapp/core@46.20.15) (2025-04-07)
 
 **Note:** Version bump only for package @wireapp/core
