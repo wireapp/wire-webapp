@@ -17,6 +17,9 @@
  *
  */
 
+import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {v4 as uuidv4} from 'uuid';
+
 import {
   IComposite,
   Asset,
@@ -40,9 +43,7 @@ import {
   Cleared,
   ICalling,
   InCallHandRaise,
-} from '@pydio/protocol-messaging';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {v4 as uuidv4} from 'uuid';
+} from '@wireapp/protocol-messaging';
 
 import {
   ButtonActionConfirmationMessage,

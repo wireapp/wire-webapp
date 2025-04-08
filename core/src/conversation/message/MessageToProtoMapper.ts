@@ -17,7 +17,7 @@
  *
  */
 
-import {Article, Asset, LinkPreview, Mention, Quote, Text, Tweet} from '@pydio/protocol-messaging';
+import {Article, Asset, LinkPreview, Mention, Quote, Text, Tweet} from '@wireapp/protocol-messaging';
 
 import {EditedTextContent, LinkPreviewUploadedContent, TextContent} from '../content';
 import {GenericMessageType} from '../GenericMessageType';

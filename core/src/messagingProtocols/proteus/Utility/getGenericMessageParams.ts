@@ -17,10 +17,11 @@
  *
  */
 
-import {GenericMessage} from '@pydio/protocol-messaging';
 import {APIClient} from '@wireapp/api-client/lib/APIClient';
 import {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId, QualifiedUserPreKeyBundleMap} from '@wireapp/api-client/lib/user';
+
+import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {getRecipientsForConversation} from './Recipients';
 import {extractQualifiedUserIds} from './UserIds';

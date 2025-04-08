@@ -11,13 +11,13 @@
     "./lib/cryptography/AssetCryptography/crypto.node": "./lib/cryptography/AssetCryptography/crypto.browser.js"
   },
   "dependencies": {
-    "@pydio/protocol-messaging": "^1.51.0",
     "@wireapp/api-client": "workspace:^",
     "@wireapp/commons": "workspace:^",
     "@wireapp/core-crypto": "3.1.0",
     "@wireapp/cryptobox": "12.8.0",
     "@wireapp/priority-queue": "workspace:^",
     "@wireapp/promise-queue": "workspace:^",
+    "@wireapp/protocol-messaging": "1.52.0",
     "@wireapp/store-engine": "workspace:*",
     "axios": "1.7.9",
     "bazinga64": "workspace:^",

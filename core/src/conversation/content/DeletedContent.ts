@@ -17,5 +17,5 @@
  *
  */
 
-import {IMessageDelete} from '@pydio/protocol-messaging';
+import {IMessageDelete} from '@wireapp/protocol-messaging';
 export {IMessageDelete as DeletedContent};

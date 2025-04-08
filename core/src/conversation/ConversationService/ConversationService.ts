@@ -17,7 +17,6 @@
  *
  */
 
-import {GenericMessage} from '@pydio/protocol-messaging';
 import {
   Conversation,
   DefaultConversationRoleName,
@@ -48,6 +47,7 @@ import {Decoder} from 'bazinga64';
 
 import {APIClient} from '@wireapp/api-client';
 import {LogFactory, TypedEventEmitter} from '@wireapp/commons';
+import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {
   AddUsersFailure,
@@ -271,7 +271,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
    * Will create a conversation on backend and register it to CoreCrypto once created
    * @param conversationData
    */
-  public async createMLSConversation(
+  public async createMLSConvcersation(
     conversationData: NewConversation,
     selfUserId: QualifiedId,
     selfClientId: string,

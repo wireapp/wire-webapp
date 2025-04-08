@@ -17,7 +17,7 @@
  *
  */
 
-export {LegalHoldStatus} from '@pydio/protocol-messaging';
+export {LegalHoldStatus} from '@wireapp/protocol-messaging';
 export {Connection as ConnectionContent} from '@wireapp/api-client/lib/connection/';
 
 import * as ContentType from './ContentType.guards';

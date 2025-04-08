@@ -17,7 +17,7 @@
  *
  */
 
-import {mls} from '@pydio/protocol-messaging/web/mls';
+import {mls} from '@wireapp/protocol-messaging/web/mls';
 
 import {CommitBundle, GroupInfoEncryptionType, RatchetTreeType} from '@wireapp/core-crypto';
 

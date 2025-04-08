@@ -17,7 +17,7 @@
  *
  */
 
-import {IQuote} from '@pydio/protocol-messaging';
+import {IQuote} from '@wireapp/protocol-messaging';
 
 import {AssetContent, LocationContent, MultiPartContent, TextContent} from '.';
 
