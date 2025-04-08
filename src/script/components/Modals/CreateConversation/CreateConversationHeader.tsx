@@ -40,6 +40,7 @@ export const CreateConversationHeader = () => {
     gotoPreviousStep,
     conversationType,
     gotoLastStep,
+    gotoFirstStep,
   } = useCreateConversationModal();
   const userState = container.resolve(UserState);
   const selfUser = userState.self();
@@ -51,6 +52,15 @@ export const CreateConversationHeader = () => {
     }
 
     gotoNextStep();
+  };
+
+  const onBackClick = () => {
+    if (conversationType === ConversationType.Group) {
+      gotoFirstStep();
+      return;
+    }
+
+    gotoPreviousStep();
   };
 
   const isNextButtonDisabled =
@@ -78,7 +88,7 @@ export const CreateConversationHeader = () => {
             id="conversation-go-previous"
             css={{marginBottom: 0}}
             type="button"
-            onClick={gotoPreviousStep}
+            onClick={onBackClick}
             aria-label={'Back'}
             data-uie-name="go-to-previous-step"
             variant={ButtonVariant.TERTIARY}

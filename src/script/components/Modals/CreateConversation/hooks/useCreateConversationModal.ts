@@ -74,6 +74,7 @@ type CreateConversationModalState = {
   setIsCreateTeamModalOpen: (isOpen: boolean) => void;
   setIsUpgradeTeamModalOpen: (isOpen: boolean) => void;
   gotoLastStep: () => void;
+  gotoFirstStep: () => void;
   setIsServicesEnabled: (isServicesEnabled: boolean) => void;
 };
 
@@ -133,4 +134,5 @@ export const useCreateConversationModal = create<CreateConversationModalState>(s
   setIsCreateTeamModalOpen: (isOpen: boolean) => set({isCreateTeamModalOpen: isOpen}),
   setIsUpgradeTeamModalOpen: (isOpen: boolean) => set({isUpgradeTeamModalOpen: isOpen}),
   setIsServicesEnabled: (isServicesEnabled: boolean) => set({isServicesEnabled}),
+  gotoFirstStep: () => set({conversationCreationStep: ConversationCreationStep.ConversationDetails}),
 }));
