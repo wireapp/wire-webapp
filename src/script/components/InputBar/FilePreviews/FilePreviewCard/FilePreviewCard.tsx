@@ -29,7 +29,6 @@ interface FilePreviewCardProps {
   name: string;
   size: string;
   isError: boolean;
-  isLoading: boolean;
   onDelete: () => void;
   onRetry: () => void;
   uploadProgress: number;
@@ -40,7 +39,6 @@ export const FilePreviewCard = ({
   name,
   size,
   isError,
-  isLoading,
   onDelete,
   onRetry,
   uploadProgress,

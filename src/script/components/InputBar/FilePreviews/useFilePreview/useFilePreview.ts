@@ -42,10 +42,21 @@ export const useFilePreview = ({file, cellsRepository, conversationQualifiedId}:
 
   const transformedName = isError ? `Upload failed: ${name}` : name;
 
+  const cancelUpload = () => {
+    cellsRepository.cancelUpload(file.id);
+    deleteFile({conversationId: conversationQualifiedId.id, fileId: file.id});
+  };
+
   const handleDelete = () => {
     if (file.preview) {
       URL.revokeObjectURL(file.preview);
     }
+
+    if (isLoading) {
+      cancelUpload();
+      return;
+    }
+
     deleteFile({conversationId: conversationQualifiedId.id, fileId: file.id});
     void cellsRepository.deleteFileDraft({uuid: file.remoteUuid, versionId: file.remoteVersionId});
   };
@@ -79,7 +90,6 @@ export const useFilePreview = ({file, cellsRepository, conversationQualifiedId}:
     name: transformedName,
     extension,
     size,
-    isLoading,
     isError,
     handleDelete,
     handleRetry,
