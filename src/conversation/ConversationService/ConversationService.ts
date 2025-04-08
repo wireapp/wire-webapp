@@ -271,7 +271,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
    * Will create a conversation on backend and register it to CoreCrypto once created
    * @param conversationData
    */
-  public async createMLSConvcersation(
+  public async createMLSConversation(
     conversationData: NewConversation,
     selfUserId: QualifiedId,
     selfClientId: string,
