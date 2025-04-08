@@ -25,7 +25,7 @@ export const headingTitle: CSSObject = {
   fontWeight: 'var(--font-weight-semibold)',
   paddingBottom: '4px',
   paddingLeft: '16px',
-  marginTop: '16px',
+  marginTop: '24px',
   marginBottom: '0',
   borderBottom: '1px solid var(--border-color)',
   textTransform: 'uppercase',

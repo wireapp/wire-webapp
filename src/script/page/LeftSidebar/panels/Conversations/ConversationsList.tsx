@@ -134,7 +134,14 @@ export const ConversationsList = ({
   const isFolderView = currentTab === SidebarTabs.FOLDER;
   const filteredConversations =
     (isFolderView && currentFolder?.conversations().filter(conversationSearchFilter(conversationsFilter))) || [];
-  const conversationsToDisplay = filteredConversations.length ? filteredConversations : conversations;
+
+  const filterConversationWithHeaders = (conversation: Conversation & {isHeader?: boolean}) => {
+    return conversationsFilter ? true : !conversation?.isHeader;
+  };
+
+  const conversationsToDisplay = filteredConversations.length
+    ? filteredConversations
+    : conversations.filter(filterConversationWithHeaders);
 
   const parentRef = useRef(null);
 
@@ -209,8 +216,6 @@ export const ConversationsList = ({
 
       <ConnectionRequests connectionRequests={connectRequests} onConnectionRequestClick={onConnectionRequestClick} />
 
-      {conversationsFilter && !isEmpty && <h3 css={headingTitle}>{t('searchConversationNames')}</h3>}
-
       {conversations.length === 0 && groupParticipantsConversations.length > 0 && (
         <p css={noResultsMessage}>{t('searchConversationsNoResult')}</p>
       )}
@@ -233,6 +238,26 @@ export const ConversationsList = ({
         >
           {rowVirtualizer.getVirtualItems().map(virtualItem => {
             const conversation = conversationsToDisplay[virtualItem.index];
+            // Have to use some hacky way to display properly heading while filtering conversations, can be improved
+            // in the future
+            if (conversationsFilter && !isEmpty && 'isHeader' in conversation && 'heading' in conversation) {
+              const translationKey = conversation.heading as 'searchConversationNames' | 'searchGroupParticipants';
+              return (
+                <div
+                  key={virtualItem.key}
+                  css={headingTitle}
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    transform: `translateY(${virtualItem.start}px)`,
+                  }}
+                >
+                  {t(translationKey)}
+                </div>
+              );
+            }
 
             return (
               <div

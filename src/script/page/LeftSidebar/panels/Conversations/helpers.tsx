@@ -60,8 +60,23 @@ export function getTabConversations({
   const conversationArchivedFilter = (conversation: Conversation) => !archivedConversations.includes(conversation);
 
   if ([SidebarTabs.FOLDER, SidebarTabs.RECENT].includes(currentTab)) {
+    const filterWord = replaceAccents(conversationsFilter.toLowerCase());
+    const filteredGroupConversations = groupConversations.filter(group => {
+      return group.participating_user_ets().some(user => {
+        const conversationDisplayName = replaceAccents(user.name().toLowerCase());
+        return conversationDisplayName.includes(filterWord);
+      });
+    });
+
+    const filteredConversations = conversations.filter(conversationSearchFilter);
+
     return {
-      conversations: conversations.filter(conversationSearchFilter),
+      conversations: [
+        {isHeader: true, heading: 'searchConversationNames'},
+        ...filteredConversations,
+        {isHeader: true, heading: 'searchGroupParticipants'},
+        ...filteredGroupConversations,
+      ],
       searchInputPlaceholder: t('searchConversations'),
     };
   }
