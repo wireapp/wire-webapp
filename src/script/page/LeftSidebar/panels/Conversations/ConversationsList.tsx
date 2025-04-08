@@ -42,6 +42,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isKeyboardEvent} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
+import {isConversationEntity} from 'Util/TypePredicateUtil';
 
 import {ConnectionRequests} from './ConnectionRequests';
 import {conversationsList, headingTitle, noResultsMessage} from './ConversationsList.styles';
@@ -197,7 +198,9 @@ export const ConversationsList = ({
 
   useEffect(() => {
     if (!conversationsFilter && clickedFilteredConversationId) {
-      const conversationIndex = conversationsToDisplay.findIndex(conv => conv.id === clickedFilteredConversationId);
+      const conversationIndex = conversationsToDisplay
+        .filter(conv => isConversationEntity(conv))
+        .findIndex(conv => conv.id === clickedFilteredConversationId);
       if (conversationIndex !== -1) {
         rowVirtualizer.scrollToIndex(conversationIndex, {align: 'auto'});
       }
@@ -236,7 +239,13 @@ export const ConversationsList = ({
             const conversation = conversationsToDisplay[virtualItem.index];
             // Have to use some hacky way to display properly heading while filtering conversations, can be improved
             // in the future
-            if (conversationsFilter && !isEmpty && 'isHeader' in conversation && 'heading' in conversation) {
+            if (
+              !isConversationEntity(conversation) &&
+              conversationsFilter &&
+              !isEmpty &&
+              'isHeader' in conversation &&
+              'heading' in conversation
+            ) {
               const translationKey = conversation.heading as 'searchConversationNames' | 'searchGroupParticipants';
               return (
                 <div
@@ -255,24 +264,28 @@ export const ConversationsList = ({
               );
             }
 
-            return (
-              <div
-                key={virtualItem.key}
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  height: `${virtualItem.size}px`,
-                  transform: `translateY(${virtualItem.start}px)`,
-                }}
-              >
-                <ConversationListCell
-                  key={conversation.id}
-                  {...getCommonConversationCellProps(conversation, virtualItem.index)}
-                />
-              </div>
-            );
+            if (isConversationEntity(conversation)) {
+              return (
+                <div
+                  key={virtualItem.key}
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: `${virtualItem.size}px`,
+                    transform: `translateY(${virtualItem.start}px)`,
+                  }}
+                >
+                  <ConversationListCell
+                    key={conversation.id}
+                    {...getCommonConversationCellProps(conversation, virtualItem.index)}
+                  />
+                </div>
+              );
+            }
+
+            return null;
           })}
         </div>
       </ul>
