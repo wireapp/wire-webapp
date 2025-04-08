@@ -28,7 +28,7 @@ export const containerStyles: CSSObject = {
   maxHeight: 'var(--conversation-message-image-asset-max-height)',
 };
 
-export const loaderOverlayStyles: CSSObject = {
+export const infoOverlayStyles: CSSObject = {
   position: 'absolute',
   top: 0,
   left: 0,
@@ -36,7 +36,7 @@ export const loaderOverlayStyles: CSSObject = {
   height: '100%',
 };
 
-export const loaderWrapperStyles: CSSObject = {
+export const infoWrapperStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -44,8 +44,12 @@ export const loaderWrapperStyles: CSSObject = {
 };
 
 export const loaderIconStyles: CSSObject = {
-  color: 'var(--main)',
+  color: 'var(--gray-70)',
   fontSize: 'var(--font-size-medium)',
+
+  'body.theme-dark &': {
+    color: 'var(--gray-40)',
+  },
 };
 
 export const imageWrapperStyles: CSSObject = {
@@ -60,4 +64,20 @@ export const imageStyle: CSSObject = {
   objectFit: 'contain',
   objectPosition: 'left center',
   opacity: 'var(--opacity)',
+};
+
+export const errorIconStyles: CSSObject = {
+  flexShrink: 0,
+  marginRight: '8px',
+};
+
+export const errorTextStyles: CSSObject = {
+  fontSize: 'var(--font-size-medium)',
+  fontWeight: 'var(--line-height-md)',
+  lineHeight: 'var(--line-height-sm)',
+  color: 'var(--gray-70)',
+
+  'body.theme-dark &': {
+    color: 'var(--gray-40)',
+  },
 };

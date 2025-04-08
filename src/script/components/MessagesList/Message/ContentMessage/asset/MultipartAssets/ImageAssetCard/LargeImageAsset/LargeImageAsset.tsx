@@ -21,23 +21,28 @@ import {CSSProperties, useState} from 'react';
 
 import {ICellAsset} from '@pydio/protocol-messaging';
 
+import {UnavailableFileIcon} from '@wireapp/react-ui-kit';
+
+import {t} from 'Util/LocalizerUtil';
+
 import {
   containerStyles,
+  errorIconStyles,
+  errorTextStyles,
   imageStyle,
   imageWrapperStyles,
+  infoOverlayStyles,
+  infoWrapperStyles,
   loaderIconStyles,
-  loaderOverlayStyles,
-  loaderWrapperStyles,
 } from './LargeImageAsset.styles';
 
 interface LargeImageAssetProps {
   src?: string;
   metadata: ICellAsset['image'];
-  isLoading: boolean;
   isError: boolean;
 }
 
-export const LargeImageAsset = ({src, metadata, isLoading, isError}: LargeImageAssetProps) => {
+export const LargeImageAsset = ({src, metadata, isError}: LargeImageAssetProps) => {
   const [isImageLoaded, setIsImageLoaded] = useState(false);
 
   return (
@@ -49,13 +54,18 @@ export const LargeImageAsset = ({src, metadata, isLoading, isError}: LargeImageA
         } as CSSProperties
       }
     >
-      {!isImageLoaded && (
-        <div css={loaderOverlayStyles}>
-          <div css={loaderWrapperStyles}>
-            <div className="icon-spinner spin" css={loaderIconStyles} />
-          </div>
+      <div css={infoOverlayStyles}>
+        <div css={infoWrapperStyles}>
+          {!isImageLoaded && !isError && <div className="icon-spinner spin" css={loaderIconStyles} />}
+          {isError && (
+            <>
+              <UnavailableFileIcon css={errorIconStyles} width={14} height={14} />
+              <p css={errorTextStyles}>{t('cellsUnavailableFile')}</p>
+            </>
+          )}
         </div>
-      )}
+      </div>
+
       <div css={imageWrapperStyles}>
         <img
           src={src}

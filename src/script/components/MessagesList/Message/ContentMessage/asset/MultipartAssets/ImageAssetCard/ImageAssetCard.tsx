@@ -32,7 +32,7 @@ interface ImageAssetCardProps {
 
 export const ImageAssetCard = ({src, metadata, size, isLoading, isError}: ImageAssetCardProps) => {
   if (size === 'large') {
-    return <LargeImageAsset src={src} metadata={metadata} isLoading={isLoading} isError={isError} />;
+    return <LargeImageAsset src={src} metadata={metadata} isError={isError} />;
   }
 
   return <GridImageAsset src={src} metadata={metadata} size={size} isLoading={isLoading} isError={isError} />;
