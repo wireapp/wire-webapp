@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.39.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.38.0...@wireapp/api-client@27.39.0) (2025-04-08)
+
+### Features
+
+* @pydio/protocol-messaging to @wireapp/protocol-messaging [WPB-16845] ([#7004](https://github.com/wireapp/wire-web-packages/issues/7004)) ([df3f0d3](https://github.com/wireapp/wire-web-packages/commit/df3f0d3d807f08ec2da5ffb48e705adec27dc9d5))
+
 # [27.38.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.37.1...@wireapp/api-client@27.38.0) (2025-04-07)
 
 ### Features
