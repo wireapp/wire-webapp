@@ -17,7 +17,6 @@
  *
  */
 
-import {GenericMessage} from '@pydio/protocol-messaging';
 import {
   QualifiedUserClients,
   ConversationProtocol,
@@ -26,6 +25,8 @@ import {
 } from '@wireapp/api-client/lib/conversation';
 import {ConversationEvent, ConversationMemberJoinEvent} from '@wireapp/api-client/lib/event';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+
+import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {MessageSendingState} from '..';
 

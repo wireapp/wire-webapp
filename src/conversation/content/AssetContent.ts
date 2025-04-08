@@ -17,7 +17,7 @@
  *
  */
 
-import {Asset} from '@pydio/protocol-messaging';
+import {Asset} from '@wireapp/protocol-messaging';
 
 import {AbortReason, AssetTransferState} from '..';
 import {EncryptedAssetUploaded} from '../../cryptography';

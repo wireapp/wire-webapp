@@ -17,6 +17,6 @@
  *
  */
 
-import {Availability} from '@pydio/protocol-messaging';
+import {Availability} from '@wireapp/protocol-messaging';
 
 export type AvailabilityType = Availability.Type;

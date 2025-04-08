@@ -17,5 +17,5 @@
  *
  */
 
-import {IButtonActionConfirmation} from '@pydio/protocol-messaging';
+import {IButtonActionConfirmation} from '@wireapp/protocol-messaging';
 export {IButtonActionConfirmation as ButtonActionConfirmationContent};

@@ -17,12 +17,12 @@
  *
  */
 
-import {GenericMessage} from '@pydio/protocol-messaging';
 import {BackendEvent} from '@wireapp/api-client/lib/event';
 import {Notification} from '@wireapp/api-client/lib/notification/';
 
 import {APIClient} from '@wireapp/api-client';
 import {LogFactory, TypedEventEmitter} from '@wireapp/commons';
+import {GenericMessage} from '@wireapp/protocol-messaging';
 import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
 
 import {NotificationBackendRepository} from './NotificationBackendRepository';

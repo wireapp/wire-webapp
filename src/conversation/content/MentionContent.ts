@@ -17,5 +17,5 @@
  *
  */
 
-import {IMention} from '@pydio/protocol-messaging';
+import {IMention} from '@wireapp/protocol-messaging';
 export {IMention as MentionContent};

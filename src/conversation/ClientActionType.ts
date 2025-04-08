@@ -17,4 +17,4 @@
  *
  */
 
-export {ClientAction as ClientActionType} from '@pydio/protocol-messaging';
+export {ClientAction as ClientActionType} from '@wireapp/protocol-messaging';
