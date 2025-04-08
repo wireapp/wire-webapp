@@ -38,6 +38,11 @@ interface GetTabConversationsProps {
   isChannelsEnabled: boolean;
 }
 
+type GetTabConversations = {
+  conversations: Conversation[];
+  searchInputPlaceholder: string;
+};
+
 export function getTabConversations({
   currentTab,
   conversations,
@@ -49,7 +54,7 @@ export function getTabConversations({
   channelConversations,
   isChannelsEnabled,
   channelAndGroupConversations,
-}: GetTabConversationsProps) {
+}: GetTabConversationsProps): GetTabConversations {
   const conversationSearchFilter = (conversation: Conversation) => {
     const filterWord = replaceAccents(conversationsFilter.toLowerCase());
     const conversationDisplayName = replaceAccents(conversation.display_name().toLowerCase());
@@ -71,12 +76,7 @@ export function getTabConversations({
     const filteredConversations = conversations.filter(conversationSearchFilter);
 
     return {
-      conversations: [
-        {isHeader: true, heading: 'searchConversationNames'},
-        ...filteredConversations,
-        {isHeader: true, heading: 'searchGroupParticipants'},
-        ...filteredGroupConversations,
-      ],
+      conversations: [...filteredConversations, ...filteredGroupConversations],
       searchInputPlaceholder: t('searchConversations'),
     };
   }
@@ -149,4 +149,26 @@ export const scrollToConversation = (conversationId: string) => {
   if (!isVisible) {
     element.scrollIntoView({behavior: 'instant', block: 'center', inline: 'nearest'});
   }
+};
+
+export const getConversationsWithHeadings = (currentConversations: Conversation[], conversationsFilter: string) => {
+  const newConversationsWithHeadings = [];
+
+  let peopleHeadingAdded = !conversationsFilter;
+  let conversationsHeadingAdded = !conversationsFilter;
+
+  for (const conversation of currentConversations) {
+    if (!conversation.isGroup() && !peopleHeadingAdded) {
+      newConversationsWithHeadings.push({isHeader: true, heading: 'searchConversationNames'});
+      peopleHeadingAdded = true;
+    }
+    if (conversation.isGroup() && !conversationsHeadingAdded) {
+      newConversationsWithHeadings.push({isHeader: true, heading: 'searchGroupParticipants'});
+      conversationsHeadingAdded = true;
+    }
+
+    newConversationsWithHeadings.push(conversation);
+  }
+
+  return newConversationsWithHeadings;
 };

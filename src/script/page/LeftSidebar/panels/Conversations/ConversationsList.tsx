@@ -45,7 +45,7 @@ import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {ConnectionRequests} from './ConnectionRequests';
 import {conversationsList, headingTitle, noResultsMessage} from './ConversationsList.styles';
-import {conversationSearchFilter} from './helpers';
+import {conversationSearchFilter, getConversationsWithHeadings} from './helpers';
 
 import {CallState} from '../../../../calling/CallState';
 import {ConversationState} from '../../../../conversation/ConversationState';
@@ -135,13 +135,9 @@ export const ConversationsList = ({
   const filteredConversations =
     (isFolderView && currentFolder?.conversations().filter(conversationSearchFilter(conversationsFilter))) || [];
 
-  const filterConversationWithHeaders = (conversation: Conversation & {isHeader?: boolean}) => {
-    return conversationsFilter ? true : !conversation?.isHeader;
-  };
-
   const conversationsToDisplay = filteredConversations.length
     ? filteredConversations
-    : conversations.filter(filterConversationWithHeaders);
+    : getConversationsWithHeadings(conversations, conversationsFilter);
 
   const parentRef = useRef(null);
 
