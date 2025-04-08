@@ -72,24 +72,24 @@ export const CreateConversationHeader = () => {
         {t('createConversationModalHeader')}
       </h2>
 
-      {conversationCreationStep === ConversationCreationStep.ParticipantsSelection ? (
-        <CreateConversationSubmit />
-      ) : (
-        <div css={{display: 'flex', gap: '8px'}}>
-          {conversationCreationStep === ConversationCreationStep.Preference && (
-            <Button
-              id="conversation-go-previous"
-              css={{marginBottom: 0}}
-              type="button"
-              onClick={gotoPreviousStep}
-              aria-label={'Back'}
-              data-uie-name="go-to-previous-step"
-              variant={ButtonVariant.TERTIARY}
-            >
-              {t('createConversationModalHeaderBack')}
-            </Button>
-          )}
+      <div css={{display: 'flex', gap: '8px'}}>
+        {conversationCreationStep !== ConversationCreationStep.ConversationDetails && (
+          <Button
+            id="conversation-go-previous"
+            css={{marginBottom: 0}}
+            type="button"
+            onClick={gotoPreviousStep}
+            aria-label={'Back'}
+            data-uie-name="go-to-previous-step"
+            variant={ButtonVariant.TERTIARY}
+          >
+            {t('createConversationModalHeaderBack')}
+          </Button>
+        )}
 
+        {conversationCreationStep === ConversationCreationStep.ParticipantsSelection ? (
+          <CreateConversationSubmit />
+        ) : (
           <Button
             id="group-go-next"
             css={{marginBottom: 0}}
@@ -102,8 +102,8 @@ export const CreateConversationHeader = () => {
           >
             {t('createConversationModalHeaderNext')}
           </Button>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };
