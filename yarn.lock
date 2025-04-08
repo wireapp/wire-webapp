@@ -7853,7 +7853,11 @@ __metadata:
     zod: "npm:3.24.2"
   checksum: 10/f2ac924bc9954c9fbbb1f2162e2cda751430eaac665738a8e7a9f116caf72108254076ce070b6d24a86a0d711b613e0ea0dae6a6f3da2ad6d79e2e9a94fdbe45
   languageName: node
+  linkType: hard
+
+"@wireapp/cryptobox@npm:12.8.0":
   version: 12.8.0
+  resolution: "@wireapp/cryptobox@npm:12.8.0"
   dependencies:
     "@wireapp/lru-cache": "npm:3.8.1"
     "@wireapp/priority-queue": "npm:1.6.38"
