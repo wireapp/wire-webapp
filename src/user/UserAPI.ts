@@ -66,8 +66,9 @@ function isUsersResponse(object: any): object is UsersReponse {
 
 const apiBreakpoint = {
   version2: 2,
-  // API V7 introduces new endpoints to conversations and users
+  // API V7 and up introduce new endpoints to conversations and users
   version7: 7,
+  version8: 8,
 };
 
 export class UserAPI {
@@ -157,7 +158,10 @@ export class UserAPI {
   public async getCallsConfiguration(): Promise<RTCConfiguration> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `/${UserAPI.URL.CALLS}/${UserAPI.URL.CONFIG}`,
+      url:
+        this.backendFeatures.version >= apiBreakpoint.version8
+          ? `/${UserAPI.URL.CALLS}/${UserAPI.URL.CONFIG}/${UserAPI.URL.V2}`
+          : `/${UserAPI.URL.CALLS}/${UserAPI.URL.CONFIG}`,
     };
 
     const response = await this.client.sendJSON<RTCConfiguration>(config);
