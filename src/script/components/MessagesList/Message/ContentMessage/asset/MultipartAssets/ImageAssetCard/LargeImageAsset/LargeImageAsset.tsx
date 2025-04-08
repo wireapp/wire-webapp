@@ -45,12 +45,15 @@ interface LargeImageAssetProps {
 export const LargeImageAsset = ({src, metadata, isError}: LargeImageAssetProps) => {
   const [isLoaded, setIsLoaded] = useState(false);
 
+  const aspectRatio = metadata?.width && metadata?.height ? metadata?.width / metadata?.height : undefined;
+  const opacity = isLoaded ? 1 : 0;
+
   return (
     <div
       css={containerStyles}
       style={
         {
-          '--aspect-ratio': metadata?.height ? metadata?.width / metadata?.height : undefined,
+          '--aspect-ratio': aspectRatio,
         } as CSSProperties
       }
     >
@@ -73,7 +76,7 @@ export const LargeImageAsset = ({src, metadata, isError}: LargeImageAssetProps) 
           css={imageStyle}
           style={
             {
-              '--opacity': isLoaded ? 1 : 0,
+              '--opacity': opacity,
             } as CSSProperties
           }
           width={metadata?.width}
