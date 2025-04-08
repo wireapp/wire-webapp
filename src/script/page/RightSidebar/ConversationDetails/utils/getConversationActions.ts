@@ -148,7 +148,7 @@ const getConversationActions = ({
         click: async () => actionsViewModel.leaveConversation(conversationEntity),
         Icon: Icon.LeaveIcon,
         identifier: 'do-leave',
-        label: t('conversationDetailsActionLeave'),
+        label: conversationEntity.isChannel() ? t('channelDetailsActionLeave') : t('groupDetailsActionLeave'),
       },
     },
     {
@@ -162,7 +162,7 @@ const getConversationActions = ({
         click: () => actionsViewModel.deleteConversation(conversationEntity),
         Icon: Icon.DeleteIcon,
         identifier: 'do-delete',
-        label: t('conversationDetailsActionDelete'),
+        label: conversationEntity.isChannel() ? t('channelDetailsActionDelete') : t('groupDetailsActionDelete'),
       },
     },
     {
