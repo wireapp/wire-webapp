@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [46.21.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.21.1...@wireapp/core@46.21.2) (2025-04-08)
+
+### Bug Fixes
+
+* remove additional protocol check while inviting users [WPB-16998] ([#7006](https://github.com/wireapp/wire-web-packages/issues/7006)) ([1a987b7](https://github.com/wireapp/wire-web-packages/commit/1a987b785da2dfc899f3d46905835263bc9e6a8a))
+
 ## [46.21.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.21.0...@wireapp/core@46.21.1) (2025-04-08)
 
 ### Bug Fixes
