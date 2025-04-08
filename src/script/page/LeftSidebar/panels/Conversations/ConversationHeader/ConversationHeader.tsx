@@ -72,6 +72,7 @@ export const ConversationHeaderComponent = ({
 }: ConversationHeaderProps) => {
   const {canCreateGroupConversation} = generatePermissionHelpers(selfUser.teamRole());
   const {isChannelsEnabled} = useChannelsFeatureFlag();
+  const canExternalUserCreateConversation = isChannelsEnabled && selfUser.isExternal();
   const {showModal} = useCreateConversationModal();
   const isFolderView = currentTab === SidebarTabs.FOLDER;
 
@@ -119,7 +120,7 @@ export const ConversationHeaderComponent = ({
           {isFolderView && currentFolder ? currentFolder.name : conversationsHeaderTitle[currentTab]}
         </h2>
 
-        {currentTab !== SidebarTabs.ARCHIVES && canCreateGroupConversation() && (
+        {currentTab !== SidebarTabs.ARCHIVES && (canCreateGroupConversation() || canExternalUserCreateConversation) && (
           <IconButton
             onClick={showCreateConversationModal}
             data-uie-name="go-create-group"

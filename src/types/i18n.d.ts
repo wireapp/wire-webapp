@@ -782,6 +782,9 @@ declare module 'I18n/en-US.json' {
     'createConversationUpgradePlanModalButton': `Upgrade now`;
     'createConversationUpgradePlanModalHeader': `Show older messages? `;
     'createConversationUpgradePlanModalText': `Upgrade to a paid plan to offer channel members the whole history.`;
+    'createConversationGroupNotAllowedHeader': `You can’t create groups`;
+    'createConversationGroupNotAllowedContent1': `Group creation is not allowed for externals.`;
+    'createConversationGroupNotAllowedContent2': `Please reach out to your team admin.`;
     'createPersonalAccount.goBack': `Go back`;
     'createPersonalAccount.headLine': `New account`;
     'createPersonalAccount.nextButton': `Register`;
@@ -1237,13 +1240,13 @@ declare module 'I18n/en-US.json' {
     'modalCreateFolderHeadline': `Create new folder`;
     'modalCreateFolderMessage': `Move your conversation to a new folder.`;
     'modalCreateFolderPlaceholder': `Folder name`;
+    'modalCreateGroupCellsToggleHeading': `Files`;
+    'modalCreateGroupCellsToggleInfo': `Enable a shared Files section accessible to all group’s participants. This setting cannot be disabled once activated.`;
     'modalCreateGroupProtocolHeading': `Protocol`;
     'modalCreateGroupProtocolInfo': `Select MLS to create a group conversation using the Messaging Layer Security protocol.`;
     'modalCreateGroupProtocolSelect.default': ` (default)`;
     'modalCreateGroupProtocolSelect.mls': `MLS`;
     'modalCreateGroupProtocolSelect.proteus': `Proteus`;
-    'modalCreateGroupCellsToggleInfo': `Enable a shared Files section accessible to all group’s participants. This setting cannot be disabled once activated.`;
-    'modalCreateGroupCellsToggleHeading': `Files`;
     'modalGifTooLargeHeadline': `Selected animation is too large`;
     'modalGifTooLargeMessage': `Maximum size is {number} MB.`;
     'modalGuestLinkJoinConfirmLabel': `Confirm password`;
