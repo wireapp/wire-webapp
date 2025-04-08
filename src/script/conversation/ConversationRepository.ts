@@ -2700,7 +2700,7 @@ export class ConversationRepository {
     conversationEntity: Conversation,
     name: string,
   ): Promise<ConversationRenameEvent | undefined> {
-    const response = await this.conversationService.updateConversationName(conversationEntity.id, name);
+    const response = await this.conversationService.updateConversationName(conversationEntity.qualifiedId, name);
     if (response) {
       this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
       return response;
