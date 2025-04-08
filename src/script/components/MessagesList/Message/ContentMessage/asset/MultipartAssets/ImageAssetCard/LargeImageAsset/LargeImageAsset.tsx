@@ -43,7 +43,7 @@ interface LargeImageAssetProps {
 }
 
 export const LargeImageAsset = ({src, metadata, isError}: LargeImageAssetProps) => {
-  const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   return (
     <div
@@ -56,7 +56,7 @@ export const LargeImageAsset = ({src, metadata, isError}: LargeImageAssetProps) 
     >
       <div css={infoOverlayStyles}>
         <div css={infoWrapperStyles}>
-          {!isImageLoaded && !isError && <div className="icon-spinner spin" css={loaderIconStyles} />}
+          {!isLoaded && !isError && <div className="icon-spinner spin" css={loaderIconStyles} />}
           {isError && (
             <>
               <UnavailableFileIcon css={errorIconStyles} width={14} height={14} />
@@ -73,11 +73,11 @@ export const LargeImageAsset = ({src, metadata, isError}: LargeImageAssetProps) 
           css={imageStyle}
           style={
             {
-              '--opacity': isImageLoaded ? 1 : 0,
+              '--opacity': isLoaded ? 1 : 0,
             } as CSSProperties
           }
           width={metadata?.width}
-          onLoad={() => setIsImageLoaded(true)}
+          onLoad={() => setIsLoaded(true)}
         />
       </div>
     </div>
