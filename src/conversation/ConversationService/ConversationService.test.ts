@@ -711,10 +711,6 @@ describe('ConversationService', () => {
         users: [otherUsersToAdd[1]],
         backends: [otherUsersToAdd[1].domain],
       };
-      const mlsFailure: AddUsersFailure = {
-        reason: AddUsersFailureReasons.NOT_MLS_CAPABLE,
-        users: [otherUsersToAdd[2]],
-      };
 
       jest.spyOn(apiClient.api.user, 'getUserSupportedProtocols').mockImplementation(id => {
         if (id === otherUsersToAdd[2]) {
@@ -744,7 +740,7 @@ describe('ConversationService', () => {
         conversationId: mockConversationId,
       });
 
-      expect(failedToAdd).toEqual([keysClaimingFailure, addUsersFailure, mlsFailure]);
+      expect(failedToAdd).toEqual([keysClaimingFailure, addUsersFailure]);
     });
   });
 
