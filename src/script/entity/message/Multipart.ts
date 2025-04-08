@@ -17,9 +17,10 @@
  *
  */
 
-import {IAttachment, ICellAsset} from '@pydio/protocol-messaging';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
+
+import {IAttachment, ICellAsset} from '@wireapp/protocol-messaging';
 
 import {renderMessage} from 'Util/messageRenderer';
 

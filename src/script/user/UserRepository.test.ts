@@ -18,7 +18,6 @@
  */
 
 import {generateUUID} from '@datadog/browser-core';
-import {Availability} from '@pydio/protocol-messaging';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {USER_EVENT, UserUpdateEvent} from '@wireapp/api-client/lib/event';
@@ -26,6 +25,7 @@ import type {User as APIClientUser} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
+import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {entities} from 'test/api/payloads';

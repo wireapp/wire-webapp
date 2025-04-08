@@ -5587,18 +5587,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@pydio/protocol-messaging@npm:1.51.0, @pydio/protocol-messaging@npm:^1.51.0":
-  version: 1.51.0
-  resolution: "@pydio/protocol-messaging@npm:1.51.0"
-  dependencies:
-    long: "npm:5.2.0"
-    protobufjs: "npm:7.2.5"
-    protobufjs-cli: "npm:1.1.2"
-    typescript: "npm:4.8.4"
-  checksum: 10/91177fc8f6cbe2069c7832277a2c4cb96217c976495a2e4d70a0c355f9fde8a598e0587c0631a5bb8f5cc5158bae7b3c625691835a1b3e9bf0947c8bfde2f0d7
-  languageName: node
-  linkType: hard
-
 "@remix-run/router@npm:1.21.0":
   version: 1.21.0
   resolution: "@remix-run/router@npm:1.21.0"
@@ -7753,15 +7741,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^27.38.0":
-  version: 27.38.0
-  resolution: "@wireapp/api-client@npm:27.38.0"
+"@wireapp/api-client@npm:^27.39.0":
+  version: 27.39.0
+  resolution: "@wireapp/api-client@npm:27.39.0"
   dependencies:
     "@aws-sdk/client-s3": "npm:3.750.0"
     "@aws-sdk/lib-storage": "npm:3.779.0"
-    "@pydio/protocol-messaging": "npm:1.51.0"
     "@wireapp/commons": "npm:^5.4.2"
     "@wireapp/priority-queue": "npm:^2.1.11"
+    "@wireapp/protocol-messaging": "npm:1.52.0"
     axios: "npm:1.7.9"
     axios-retry: "npm:4.5.0"
     cells-sdk-ts: "https://github.com/pydio/cells-sdk-ts#v0.1.1-alpha07"
@@ -7774,7 +7762,7 @@ __metadata:
     uuid: "npm:11.1.0"
     ws: "npm:8.18.1"
     zod: "npm:3.24.2"
-  checksum: 10/cea6ae271de7f4a0ae6a94f3803845f599598c36111e063a3a8990dad430a03c35bdcf649b879ed81af3656a3e05447c118af22afcac45d7d5fe911613b85889
+  checksum: 10/34e55d837038ffc602e2fe07dd4829b4ee815818b93345c8fd77bd6d5d6e8a4b785545fad9290bb796c0e821dde49ef8d32d24abfe1c28b8e34d3aff0bb91acc
   languageName: node
   linkType: hard
 
@@ -7839,17 +7827,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:46.20.15":
-  version: 46.20.15
-  resolution: "@wireapp/core@npm:46.20.15"
+"@wireapp/core@npm:46.21.1":
+  version: 46.21.1
+  resolution: "@wireapp/core@npm:46.21.1"
   dependencies:
-    "@pydio/protocol-messaging": "npm:^1.51.0"
-    "@wireapp/api-client": "npm:^27.38.0"
+    "@wireapp/api-client": "npm:^27.39.0"
     "@wireapp/commons": "npm:^5.4.2"
     "@wireapp/core-crypto": "npm:3.1.0"
     "@wireapp/cryptobox": "npm:12.8.0"
     "@wireapp/priority-queue": "npm:^2.1.11"
     "@wireapp/promise-queue": "npm:^2.3.12"
+    "@wireapp/protocol-messaging": "npm:1.52.0"
     "@wireapp/store-engine": "npm:5.1.11"
     axios: "npm:1.7.9"
     bazinga64: "npm:^6.3.11"
@@ -7861,7 +7849,7 @@ __metadata:
     long: "npm:^5.2.0"
     uuid: "npm:9.0.1"
     zod: "npm:3.24.2"
-  checksum: 10/74e66983773aac8ccbbfd89ac46127cbf3b020e0acd128fb3f758062c9b708abda4a97124e47c8fd77c914e476f2b44a3550e2f1456e6916ab691b74f82cf9f6
+  checksum: 10/92c27d42b9ae4bcbfc373119026c6acf826b3555effbfa5f02a1535ccc95df33796547516f947a2499ada02ed23def420f6f53045e564787269a2a8fe0561bd6
   languageName: node
   linkType: hard
 
@@ -7960,6 +7948,18 @@ __metadata:
     "@wireapp/cbor": "npm:4.7.3"
     libsodium-wrappers-sumo: "npm:0.7.9"
   checksum: 10/94bb7c599df64146cf7d4d6e03d11bb293152f7eff21ce26164fd8cfec9a134e3b5c48ec4555c4d93a1a203c735ad3ea5bc21c8cac7acc42458d6adbccf655f8
+  languageName: node
+  linkType: hard
+
+"@wireapp/protocol-messaging@npm:1.52.0":
+  version: 1.52.0
+  resolution: "@wireapp/protocol-messaging@npm:1.52.0"
+  dependencies:
+    long: "npm:5.2.0"
+    protobufjs: "npm:7.2.5"
+    protobufjs-cli: "npm:1.1.2"
+    typescript: "npm:4.8.4"
+  checksum: 10/2b75bfba3008ccc2ed5a2e3c799d562e82360901d5a08a23f72aafdd581e6c44e718013fccd367ca645318a0182e363b4f520686c99dd84a376271ffa87e3609
   languageName: node
   linkType: hard
 
@@ -21144,7 +21144,7 @@ __metadata:
     "@wireapp/avs-debugger": "npm:0.0.7"
     "@wireapp/commons": "npm:5.4.2"
     "@wireapp/copy-config": "npm:2.3.0"
-    "@wireapp/core": "npm:46.20.15"
+    "@wireapp/core": "npm:46.21.1"
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/prettier-config": "npm:0.6.4"
     "@wireapp/react-ui-kit": "npm:9.44.1"
