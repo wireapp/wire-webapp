@@ -1233,6 +1233,8 @@
   "modalCreateFolderHeadline": "Créer un nouveau dossier",
   "modalCreateFolderMessage": "Déplacer la conversation vers un nouveau dossier.",
   "modalCreateFolderPlaceholder": "Nom de dossier",
+  "modalCreateGroupCellsToggleHeading": "Files",
+  "modalCreateGroupCellsToggleInfo": "Enable a shared Files section accessible to all group’s participants. This setting cannot be disabled once activated.",
   "modalCreateGroupProtocolHeading": "Protocol",
   "modalCreateGroupProtocolInfo": "Select MLS to create a group conversation using the Messaging Layer Security protocol.",
   "modalCreateGroupProtocolSelect.default": " (default)",

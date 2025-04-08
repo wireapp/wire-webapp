@@ -29,15 +29,10 @@ import {UserState} from '../user/UserState';
 interface Config {
   CONSTRAINTS: {
     SCREEN: {
-      DESKTOP_CAPTURER_FULL: MediaTrackConstraints & {
-        mandatory: {chromeMediaSource: string; chromeMediaSourceId?: string; maxHeight?: number; minHeight?: number};
-      };
       DESKTOP_CAPTURER: MediaTrackConstraints & {
-        mandatory: {chromeMediaSource: string; chromeMediaSourceId?: string; maxHeight: number; minHeight: number};
+        mandatory?: {chromeMediaSource: string; chromeMediaSourceId?: string; maxFrameRate?: number};
       };
-      DISPLAY_MEDIA_FULL: MediaTrackConstraints;
       DISPLAY_MEDIA: MediaTrackConstraints;
-      USER_MEDIA_FULL: MediaTrackConstraints & {mediaSource: string};
       USER_MEDIA: MediaTrackConstraints & {mediaSource: string};
     };
     VIDEO: Record<VIDEO_QUALITY_MODE, MediaTrackConstraints> & {PREFERRED_FACING_MODE: string};
@@ -59,35 +54,17 @@ export class MediaConstraintsHandler {
     return {
       CONSTRAINTS: {
         SCREEN: {
-          DESKTOP_CAPTURER_FULL: {
-            mandatory: {
-              chromeMediaSource: 'desktop',
-            },
-          },
           DESKTOP_CAPTURER: {
             mandatory: {
               chromeMediaSource: 'desktop',
-              maxHeight: 1080,
-              minHeight: 1080,
+              maxFrameRate: 5,
             },
-          },
-          DISPLAY_MEDIA_FULL: {
-            frameRate: 12,
           },
           DISPLAY_MEDIA: {
             frameRate: 5,
-            height: {
-              ideal: 1080,
-              max: 1080,
-            },
-          },
-          USER_MEDIA_FULL: {
-            frameRate: 12,
-            mediaSource: 'screen',
           },
           USER_MEDIA: {
             frameRate: 5,
-            height: {exact: 720},
             mediaSource: 'screen',
           },
         },
@@ -153,14 +130,12 @@ export class MediaConstraintsHandler {
     };
   }
 
-  getScreenStreamConstraints(method: ScreensharingMethods, isGroup: boolean): MediaStreamConstraints | undefined {
+  getScreenStreamConstraints(method: ScreensharingMethods): MediaStreamConstraints | undefined {
     switch (method) {
       case ScreensharingMethods.DESKTOP_CAPTURER:
-        this.logger.info(`Enabling screen sharing from desktopCapturer (with fULL resolution: ${isGroup})`);
+        this.logger.info(`Enabling screen sharing from desktopCapturer (with FULL resolution)`);
 
-        const desktopCapturer = isGroup
-          ? MediaConstraintsHandler.CONFIG.CONSTRAINTS.SCREEN.DESKTOP_CAPTURER
-          : MediaConstraintsHandler.CONFIG.CONSTRAINTS.SCREEN.DESKTOP_CAPTURER_FULL;
+        const desktopCapturer = MediaConstraintsHandler.CONFIG.CONSTRAINTS.SCREEN.DESKTOP_CAPTURER;
 
         const streamConstraints = {
           audio: false,
@@ -172,22 +147,18 @@ export class MediaConstraintsHandler {
 
         return streamConstraints;
       case ScreensharingMethods.DISPLAY_MEDIA:
-        this.logger.info(`Enabling screen sharing from getDisplayMedia (with fULL resolution: ${isGroup})`);
+        this.logger.info(`Enabling screen sharing from getDisplayMedia (with FULL resolution)`);
 
-        const display = isGroup
-          ? MediaConstraintsHandler.CONFIG.CONSTRAINTS.SCREEN.DISPLAY_MEDIA
-          : MediaConstraintsHandler.CONFIG.CONSTRAINTS.SCREEN.DISPLAY_MEDIA_FULL;
+        const display = MediaConstraintsHandler.CONFIG.CONSTRAINTS.SCREEN.DISPLAY_MEDIA;
 
         return {
           audio: false,
           video: display,
         };
       case ScreensharingMethods.USER_MEDIA:
-        this.logger.info(`Enabling screen sharing from getUserMedia (with fULL resolution: ${isGroup})`);
+        this.logger.info(`Enabling screen sharing from getUserMedia (with FULL resolution)`);
 
-        const userMedia = isGroup
-          ? MediaConstraintsHandler.CONFIG.CONSTRAINTS.SCREEN.USER_MEDIA
-          : MediaConstraintsHandler.CONFIG.CONSTRAINTS.SCREEN.USER_MEDIA_FULL;
+        const userMedia = MediaConstraintsHandler.CONFIG.CONSTRAINTS.SCREEN.USER_MEDIA;
 
         return {
           audio: false,
