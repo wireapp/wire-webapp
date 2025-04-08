@@ -17,7 +17,7 @@
  *
  */
 
-import {LegalHoldStatus} from '@pydio/protocol-messaging';
+import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {Message} from './Message';
 

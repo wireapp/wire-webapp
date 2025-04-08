@@ -17,7 +17,6 @@
  *
  */
 
-import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@pydio/protocol-messaging';
 import {
   Conversation as BackendConversation,
   ConversationProtocol,
@@ -58,6 +57,7 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
 import {flatten} from 'underscore';
 
+import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {TYPING_TIMEOUT, useTypingIndicatorState} from 'Components/InputBar/TypingIndicator';

@@ -71,7 +71,7 @@ describe('videoGridHandler', () => {
         selfUser.isMe = true;
         const selfParticipant = new Participant(selfUser, 'selfdevice');
         selfParticipant.videoState(VIDEO_STATE.STARTED);
-        selfParticipant.videoStream({});
+        selfParticipant.videoStream({getVideoTracks: () => []});
         const call = new Call('', '', undefined, selfParticipant, CALL_TYPE.NORMAL, {
           currentAvailableDeviceId: {
             audiooutput: ko.pureComputed(() => 'test'),

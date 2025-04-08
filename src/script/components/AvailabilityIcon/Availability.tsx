@@ -19,7 +19,7 @@
 
 import {ReactNode} from 'react';
 
-import {Availability as AvailabilityProp} from '@pydio/protocol-messaging';
+import {Availability as AvailabilityProp} from '@wireapp/protocol-messaging';
 
 import {AVATAR_SIZE} from 'Components/Avatar';
 

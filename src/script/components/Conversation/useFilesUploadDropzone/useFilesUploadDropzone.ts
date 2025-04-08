@@ -120,12 +120,17 @@ export const useFilesUploadDropzone = ({
           });
         },
       });
+
       updateFile({
         conversationId: conversation.id,
         fileId: file.id,
         data: {remoteUuid: uuid, remoteVersionId: versionId, uploadStatus: 'success'},
       });
     } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        return;
+      }
+
       logger.error('Uploading file failed', error);
       updateFile({conversationId: conversation.id, fileId: file.id, data: {uploadStatus: 'error'}});
       throw error;
