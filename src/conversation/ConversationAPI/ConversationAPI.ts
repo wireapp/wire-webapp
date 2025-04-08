@@ -801,7 +801,7 @@ export class ConversationAPI {
       method: 'put',
       url:
         this.backendFeatures.version >= apiBreakpoint.version8
-          ? `/${ConversationAPI.URL.CONVERSATIONS}/${conversationId.domain}/${conversationId}/${ConversationAPI.URL.NAME}`
+          ? `/${ConversationAPI.URL.CONVERSATIONS}/${conversationId.domain}/${conversationId.id}/${ConversationAPI.URL.NAME}`
           : `/${ConversationAPI.URL.CONVERSATIONS}/${conversationId.id}/${ConversationAPI.URL.NAME}`,
     };
 
