@@ -21,73 +21,68 @@ import {AccessType, FEATURE_KEY, FeatureStatus, Role} from '@wireapp/api-client/
 import {container} from 'tsyringe';
 
 import {Config} from 'src/script/Config';
-import {User} from 'src/script/entity/User';
 import {TeamState} from 'src/script/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {Core} from '../service/CoreSingleton';
-import {UserState} from '../user/UserState';
-
 const accessTypeRoleMap = {
   [AccessType.ADMINS]: [Role.ADMIN, Role.OWNER],
   [AccessType.TEAM_MEMBERS]: [Role.ADMIN, Role.MEMBER, Role.OWNER],
   [AccessType.EVERYONE]: [Role.ADMIN, Role.MEMBER, Role.EXTERNAL, Role.OWNER],
 };
 
-const useCanCreateChannels = (selfUser: User) => {
+const useChannelFeature = () => {
   const teamState = container.resolve(TeamState);
   const {teamFeatures} = useKoSubscribableChildren(teamState, ['teamFeatures']);
+  return teamFeatures ? teamFeatures[FEATURE_KEY.CHANNELS] : null;
+};
+
+const useCanCreateChannels = () => {
+  const teamState = container.resolve(TeamState);
   const {selfRole} = useKoSubscribableChildren(teamState, ['selfRole']);
+  const channelFeature = useChannelFeature();
 
-  const isTeamUser = teamState.isInTeam(selfUser);
-  const channelFeature = teamFeatures ? teamFeatures[FEATURE_KEY.CHANNELS] : null;
-
-  // Private user
-  if (!isTeamUser) {
+  if (
+    channelFeature &&
+    channelFeature.status === FeatureStatus.ENABLED &&
+    selfRole &&
+    accessTypeRoleMap[channelFeature.config.allowed_to_create_channels].includes(selfRole)
+  ) {
     return true;
   }
 
-  // Feature disabled from BE
-  if (!channelFeature || channelFeature.status === FeatureStatus.DISABLED) {
-    return false;
-  }
-
-  // Check if user has permission to create channels
-  if (selfRole && accessTypeRoleMap[channelFeature.config.allowed_to_create_channels].includes(selfRole)) {
-    return true;
-  }
   return false;
 };
 
-const useCanCreatePublicChannels = (selfUser: User) => {
+const useCanCreatePublicChannels = () => {
   const teamState = container.resolve(TeamState);
-  const {teamFeatures} = useKoSubscribableChildren(teamState, ['teamFeatures']);
   const {selfRole} = useKoSubscribableChildren(teamState, ['selfRole']);
-  const channelFeature = teamFeatures ? teamFeatures[FEATURE_KEY.CHANNELS] : null;
+  const channelFeature = useChannelFeature();
 
-  if (!channelFeature) {
-    return false;
-  }
-
-  // Check if user has permission to create public channels
-  if (selfRole && accessTypeRoleMap[channelFeature.config.allowed_to_open_channels].includes(selfRole)) {
+  if (
+    channelFeature &&
+    selfRole &&
+    accessTypeRoleMap[channelFeature.config.allowed_to_open_channels].includes(selfRole)
+  ) {
     return true;
   }
+
   return false;
 };
 
 export const useChannelsFeatureFlag = () => {
-  const userState = container.resolve(UserState);
-  const canCreatePublicChannels = useCanCreatePublicChannels(userState.self()!);
+  const canCreatePublicChannels = useCanCreatePublicChannels();
+  const channelFeature = useChannelFeature();
   const core = container.resolve(Core);
   const isChannelsEnabled =
     Config.getConfig().FEATURE.ENABLE_CHANNELS &&
     core.backendFeatures.version >= Config.getConfig().MIN_ENTERPRISE_LOGIN_V2_AND_CHANNELS_SUPPORTED_API_VERSION;
-  const canCreateChannels = useCanCreateChannels(userState.self()!) && isChannelsEnabled;
+  const canCreateChannels = useCanCreateChannels();
 
   return {
     canCreateChannels,
     isChannelsEnabled,
+    isChannelsFeatureEnabled: channelFeature?.status === FeatureStatus.ENABLED,
     isChannelsHistorySharingEnabled: Config.getConfig().FEATURE.ENABLE_CHANNELS_HISTORY_SHARING,
     isPublicChannelsEnabled: canCreatePublicChannels && Config.getConfig().FEATURE.ENABLE_PUBLIC_CHANNELS,
   };
