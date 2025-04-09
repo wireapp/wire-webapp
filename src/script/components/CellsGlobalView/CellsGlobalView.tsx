@@ -96,7 +96,7 @@ export const CellsGlobalView = ({cellsRepository = container.resolve(CellsReposi
       {(isSuccess || isLoading) && !emptySearchResults && (
         <CellsTable files={files} cellsRepository={cellsRepository} onDeleteFile={handleDeleteFile} />
       )}
-      {!isLoading && !isError && !hasFiles && (
+      {!isLoading && !isError && !hasFiles && !emptySearchResults && (
         <CellsStateInfo
           heading={t('cellsGlobalView.noFilesHeading')}
           description={t('cellsGlobalView.noFilesDescription')}
