@@ -17,8 +17,6 @@
  *
  */
 
-import {ICellAsset} from '@pydio/protocol-messaging';
-
 import {t} from 'Util/LocalizerUtil';
 
 import {imageStyles} from './GridImageAsset.styles';
@@ -27,8 +25,6 @@ import {MediaFilePreviewCard} from '../../common/MediaFilePreviewCard/MediaFileP
 
 interface GridImageAssetProps {
   src?: string;
-  metadata: ICellAsset['image'];
-  size: 'small' | 'large';
   isLoading: boolean;
   isError: boolean;
 }
