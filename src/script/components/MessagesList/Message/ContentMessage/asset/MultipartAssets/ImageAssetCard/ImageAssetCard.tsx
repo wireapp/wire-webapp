@@ -17,6 +17,8 @@
  *
  */
 
+import {useState} from 'react';
+
 import {t} from 'Util/LocalizerUtil';
 
 import {imageStyles} from './ImageAssetCard.styles';
@@ -30,13 +32,15 @@ interface ImageAssetCardProps {
 }
 
 export const ImageAssetCard = ({src, isLoading, isError}: ImageAssetCardProps) => {
+  const [isLoaded, setIsLoaded] = useState(false);
+
   return (
     <MediaFilePreviewCard
       label={src ? t('conversationFileImagePreviewLabel', {src}) : 'Loading...'}
-      isLoading={isLoading}
+      isLoading={!isLoaded}
       isError={isError}
     >
-      {!isLoading && !isError && src && <img src={src} alt="" css={imageStyles} />}
+      {!isLoading && !isError && src && <img src={src} alt="" css={imageStyles} onLoad={() => setIsLoaded(true)} />}
     </MediaFilePreviewCard>
   );
 };

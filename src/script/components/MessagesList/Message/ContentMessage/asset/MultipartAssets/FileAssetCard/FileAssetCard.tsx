@@ -20,16 +20,41 @@
 import {FileCard} from 'Components/FileCard/FileCard';
 import {t} from 'Util/LocalizerUtil';
 
+import {LargeAssetCard} from './LargeAssetCard/LargeAssetCard';
+
 interface FileAssetCardProps {
+  variant: 'large' | 'small';
   extension: string;
   name: string;
   size: string;
   isLoading: boolean;
   isError: boolean;
+  previewImageUrl?: string;
 }
 
-export const FileAssetCard = ({extension, name, size, isLoading, isError}: FileAssetCardProps) => {
+export const FileAssetCard = ({
+  variant,
+  extension,
+  name,
+  size,
+  isLoading,
+  isError,
+  previewImageUrl,
+}: FileAssetCardProps) => {
   const formattedName = isError ? t('cellsUnavailableFile') : name;
+
+  if (variant === 'large') {
+    return (
+      <LargeAssetCard
+        extension={extension}
+        name={formattedName}
+        size={size}
+        isError={isError}
+        isLoading={isLoading}
+        previewImageUrl={previewImageUrl}
+      />
+    );
+  }
 
   return (
     <FileCard.Root extension={extension} name={formattedName} size={size}>

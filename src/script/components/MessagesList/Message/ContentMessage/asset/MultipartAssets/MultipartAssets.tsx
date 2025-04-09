@@ -27,7 +27,7 @@ import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 
 import {FileAssetCard} from './FileAssetCard/FileAssetCard';
 import {ImageAssetCard} from './ImageAssetCard/ImageAssetCard';
-import {largeCardStyles, listStyles, smallCardStyles} from './MultipartAssets.styles';
+import {largeCardStyles, listSingleItemStyles, listStyles, smallCardStyles} from './MultipartAssets.styles';
 import {useGetMultipartAssetPreview} from './useGetMultipartAssetPreview/useGetMultipartAssetPreview';
 import {VideoAssetCard} from './VideoAssetCard/VideoAssetCard';
 
@@ -41,7 +41,7 @@ export const MultipartAssets = ({
   cellsRepository = container.resolve(CellsRepository),
 }: MultipartAssetsProps) => {
   return (
-    <ul css={listStyles}>
+    <ul css={assets.length === 1 ? listSingleItemStyles : listStyles}>
       {assets.map(asset => (
         <MultipartAsset key={asset.uuid} cellsRepository={cellsRepository} assetsCount={assets.length} {...asset} />
       ))}
@@ -71,7 +71,7 @@ const MultipartAsset = ({
   const isImage = contentType.startsWith('image');
   const isVideo = contentType.startsWith('video');
 
-  const {src, status} = useGetMultipartAssetPreview({
+  const {src, status, previewImageUrl} = useGetMultipartAssetPreview({
     uuid,
     cellsRepository,
     isEnabled: hasBeenInView,
@@ -99,7 +99,15 @@ const MultipartAsset = ({
 
   return (
     <li ref={elementRef} css={largeCardStyles}>
-      <FileAssetCard extension={extension} name={name} size={size} isLoading={isLoading} isError={isError} />
+      <FileAssetCard
+        variant={assetsCount === 1 ? 'large' : 'small'}
+        extension={extension}
+        name={name}
+        size={size}
+        isLoading={isLoading}
+        isError={isError}
+        previewImageUrl={previewImageUrl}
+      />
     </li>
   );
 };

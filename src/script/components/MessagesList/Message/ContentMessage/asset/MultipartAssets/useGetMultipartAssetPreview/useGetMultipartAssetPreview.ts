@@ -53,6 +53,7 @@ export const useGetMultipartAssetPreview = ({
 }: UseGetMultipartAssetPreviewProps) => {
   const uuidRef = useRef(uuid);
   const [src, setSrc] = useState<string | undefined>(undefined);
+  const [previewImageUrl, setPreviewImageUrl] = useState<string | undefined>(undefined);
   const [status, setStatus] = useState<Status>('idle');
   const [error, setError] = useState<Error | null>(null);
 
@@ -94,6 +95,7 @@ export const useGetMultipartAssetPreview = ({
       }
 
       setSrc(asset.PreSignedGET.Url);
+      setPreviewImageUrl(asset.Previews?.[0]?.PreSignedGET?.Url);
       setStatus('success');
       setError(null);
     } catch (err) {
@@ -154,6 +156,7 @@ export const useGetMultipartAssetPreview = ({
 
   return {
     src,
+    previewImageUrl,
     status,
     error,
     refetch,
