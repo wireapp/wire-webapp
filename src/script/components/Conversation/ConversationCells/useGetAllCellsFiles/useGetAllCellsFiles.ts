@@ -24,7 +24,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {Config} from 'src/script/Config';
 
-import {transformNodesToCellsFiles} from './transformNodesToCellsFiles';
+import {transformNodesToCellsFiles, transformToCellPagination} from './transformNodesToCellsFiles';
 
 import {useCellsStore} from '../common/useCellsStore/useCellsStore';
 
@@ -62,7 +62,11 @@ export const useGetAllCellsFiles = ({cellsRepository, conversationQualifiedId}: 
 
       const transformedFiles = transformNodesToCellsFiles(result.Nodes);
       setFiles({conversationId: id, files: transformedFiles});
-      setPagination({conversationId: id, pagination: result.Pagination || null});
+      let pagination = null;
+      if (result.Pagination) {
+        pagination = transformToCellPagination(result.Pagination);
+      }
+      setPagination({conversationId: id, pagination});
       setStatus('success');
     } catch (error) {
       setError(error instanceof Error ? error : new Error('Failed to fetch files', {cause: error}));

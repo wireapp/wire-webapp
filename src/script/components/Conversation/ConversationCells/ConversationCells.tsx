@@ -89,9 +89,9 @@ export const ConversationCells = ({
     await refresh();
   }, [refresh, clearAll, conversationId]);
 
-  const currentPage = pagination?.CurrentPage || 0;
-  const totalPages = pagination?.TotalPages || 1;
-  const totalRows = pagination?.Total || pageSize;
+  const currentPage = pagination?.currentPage || 0;
+  const totalPages = pagination?.totalPages || 1;
+  const totalRows = pagination?.total || pageSize;
 
   const goToPage = useCallback(
     (page: number) => {
@@ -147,9 +147,9 @@ export const ConversationCells = ({
       {totalPages > 1 ? (
         <CellsPagination
           currentPage={currentPage ? currentPage - 1 : 0}
-          numberOfPages={pagination?.TotalPages}
+          numberOfPages={pagination?.totalPages}
           goPage={goToPage}
-          totalRows={pagination?.Total}
+          totalRows={pagination?.total}
           firstRow={(currentPage - 1) * pageSize + 1}
           lastRow={Math.min(currentPage * pageSize, totalRows)}
         />

@@ -17,10 +17,10 @@
  *
  */
 
-import {RestPagination} from 'cells-sdk-ts';
 import {create} from 'zustand';
 
 import {CellFile} from '../cellFile/cellFile';
+import {CellPagination} from '../cellPagination/cellPagination';
 
 type Status = 'idle' | 'loading' | 'success' | 'error';
 
@@ -28,20 +28,20 @@ const DEFAULT_PAGE_SIZE = 10;
 
 interface CellsState {
   filesByConversation: Record<string, CellFile[]>;
-  paginationByConversation: Record<string, RestPagination | null>;
+  paginationByConversation: Record<string, CellPagination | null>;
   status: Status;
   error: Error | null;
   pageSize: number;
   setPageSize: (pageSize: number) => void;
   setFiles: (params: {conversationId: string; files: CellFile[]}) => void;
-  setPagination: (params: {conversationId: string; pagination: RestPagination | null}) => void;
+  setPagination: (params: {conversationId: string; pagination: CellPagination | null}) => void;
   setStatus: (status: Status) => void;
   setError: (error: Error | null) => void;
   updateFile: (params: {conversationId: string; fileId: string; updates: Partial<CellFile>}) => void;
   removeFile: (params: {conversationId: string; fileId: string}) => void;
   clearAll: (params: {conversationId: string}) => void;
   getFiles: (params: {conversationId: string}) => CellFile[];
-  getPagination: (params: {conversationId: string}) => RestPagination | null;
+  getPagination: (params: {conversationId: string}) => CellPagination | null;
 }
 
 export const useCellsStore = create<CellsState>((set, get) => ({
