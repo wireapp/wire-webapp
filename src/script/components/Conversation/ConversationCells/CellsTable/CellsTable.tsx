@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useMemo} from 'react';
+import {useCallback, useState, useMemo, useRef, useEffect} from 'react';
 
 import {createColumnHelper, flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
 
@@ -47,12 +47,60 @@ interface CellsTableProps {
   files: CellFile[];
   cellsRepository: CellsRepository;
   conversationId: string;
+  fixedWidths: number[] | undefined;
   onDeleteFile: (uuid: string) => void;
+  onUpdateBodyHeight: (height: number) => void;
+  onUpdateColumnWidths: (widths: number[]) => void;
 }
 
 const columnHelper = createColumnHelper<CellFile>();
 
-export const CellsTable = ({files, cellsRepository, conversationId, onDeleteFile}: CellsTableProps) => {
+export const CellsTable = ({
+  files,
+  cellsRepository,
+  conversationId,
+  fixedWidths,
+  onDeleteFile,
+  onUpdateBodyHeight,
+  onUpdateColumnWidths,
+}: CellsTableProps) => {
+  // Create refs to keep track of table height and columns widths
+  const divRef = useRef<HTMLTableSectionElement>(null);
+  const columnRefs = useRef<HTMLTableHeaderCellElement[]>([]); // Array of refs for each column
+  const [widths, setWidths] = useState<number[]>([]);
+
+  useEffect(() => {
+    const updateHeight = () => {
+      if (divRef.current && onUpdateBodyHeight) {
+        onUpdateBodyHeight(divRef.current.clientHeight);
+      }
+    };
+    updateHeight();
+
+    // Set up ResizeObserver for each column
+    const observers = columnRefs.current.map((ref: HTMLElement, index) => {
+      const observer = new ResizeObserver(() => {
+        if (files && files.length && ref) {
+          setWidths(prev => {
+            const updated = [...prev];
+            updated[index] = ref.offsetWidth;
+            return updated;
+          });
+        }
+      });
+      if (ref) {
+        observer.observe(ref);
+      }
+      return observer;
+    });
+
+    return () => observers.forEach(observer => observer.disconnect());
+  }, [files]);
+
+  useEffect(() => {
+    onUpdateColumnWidths(widths);
+  }, [onUpdateColumnWidths, widths]);
+
   const showDeleteFileModal = useCallback(
     ({uuid, name}: {uuid: string; name: string}) => {
       PrimaryModal.show(PrimaryModal.type.CONFIRM, {
@@ -135,16 +183,22 @@ export const CellsTable = ({files, cellsRepository, conversationId, onDeleteFile
         <thead>
           {table.getHeaderGroups().map(headerGroup => (
             <tr key={headerGroup.id}>
-              {headerGroup.headers.map(header => (
-                <th key={header.id} css={headerCellStyles}>
-                  {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                </th>
-              ))}
+              {headerGroup.headers.map((header, index) => {
+                const style = {...headerCellStyles};
+                if (fixedWidths && fixedWidths[index] && index < headerGroup.headers.length - 1) {
+                  style.width = `${fixedWidths[index]}px`;
+                }
+                return (
+                  <th key={header.id} css={style} ref={el => el && (columnRefs.current[index] = el)}>
+                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                  </th>
+                );
+              })}
             </tr>
           ))}
         </thead>
         {rows.length > 0 && (
-          <tbody>
+          <tbody ref={divRef}>
             {rows.map(row => (
               <tr key={row.id} css={tableCellRow}>
                 {row.getVisibleCells().map(cell => (

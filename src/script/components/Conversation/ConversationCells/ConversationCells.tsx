@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
@@ -55,6 +55,11 @@ export const ConversationCells = ({
   const pagination = getPagination({conversationId});
   const {refresh, setOffset} = useGetAllCellsFiles({cellsRepository, conversationQualifiedId});
 
+  const [tableHeight, setTableHeight] = useState(-1);
+  const [loaderHeight, setLoaderHeight] = useState<number | undefined>(-1);
+  const [tableColumnsWidths, setTableColumnsWidth] = useState<number[]>([]);
+  const [fixedColumnsWidths, setFixedColumnsWidth] = useState<number[] | undefined>([]);
+
   const isLoading = filesStatus === 'loading';
   const isError = filesStatus === 'error';
   const isSuccess = filesStatus === 'success';
@@ -90,10 +95,27 @@ export const ConversationCells = ({
 
   const goToPage = useCallback(
     (page: number) => {
+      setLoaderHeight(tableHeight);
+      setFixedColumnsWidth(tableColumnsWidths);
       setOffset(page * pageSize);
     },
-    [pagination, pageSize, setOffset],
+    [pagination, pageSize, setOffset, tableHeight, tableColumnsWidths],
   );
+
+  useEffect(() => {
+    if (files) {
+      setFixedColumnsWidth(undefined);
+      setLoaderHeight(undefined);
+    }
+  }, [files]);
+
+  const handleHeight = useCallback((h: number) => {
+    setTableHeight(h);
+  }, []);
+
+  const handleWidths = useCallback((ww: number[]) => {
+    setTableColumnsWidth(ww);
+  }, []);
 
   return (
     <div css={wrapperStyles}>
@@ -101,9 +123,12 @@ export const ConversationCells = ({
       {(isSuccess || isLoading) && hasFiles && (
         <CellsTable
           files={isLoading ? [] : files}
+          fixedWidths={fixedColumnsWidths}
           cellsRepository={cellsRepository}
           conversationId={conversationId}
           onDeleteFile={handleDeleteFile}
+          onUpdateBodyHeight={handleHeight}
+          onUpdateColumnWidths={handleWidths}
         />
       )}
       {!isLoading && !isError && !hasFiles && (
@@ -112,7 +137,7 @@ export const ConversationCells = ({
           description={t('cellsGlobalView.noFilesDescription')}
         />
       )}
-      {isLoading && <CellsLoader />}
+      {isLoading && <CellsLoader minHeight={loaderHeight} />}
       {isError && (
         <CellsStateInfo
           heading={t('cellsGlobalView.errorHeading')}
