@@ -114,6 +114,33 @@ export const ConversationCells = ({
     setTableColumnsWidth(ww);
   }, []);
 
+  let paginationComponent;
+  if (!isError) {
+    if (totalPages > 1) {
+      paginationComponent = (
+        <CellsPagination
+          currentPage={currentPage ? currentPage - 1 : 0}
+          numberOfPages={pagination?.totalPages}
+          goPage={goToPage}
+          totalRows={pagination?.total}
+          firstRow={(currentPage - 1) * pageSize + 1}
+          lastRow={Math.min(currentPage * pageSize, totalRows)}
+        />
+      );
+    } else {
+      paginationComponent = (
+        <CellsPagination
+          currentPage={0}
+          numberOfPages={1}
+          goPage={goToPage}
+          totalRows={files && files.length}
+          firstRow={1}
+          lastRow={files && files.length}
+        />
+      );
+    }
+  }
+
   return (
     <div css={wrapperStyles}>
       <CellsHeader onRefresh={handleRefresh} />
@@ -141,25 +168,7 @@ export const ConversationCells = ({
           description={t('cellsGlobalView.errorDescription')}
         />
       )}
-      {totalPages > 1 ? (
-        <CellsPagination
-          currentPage={currentPage ? currentPage - 1 : 0}
-          numberOfPages={pagination?.totalPages}
-          goPage={goToPage}
-          totalRows={pagination?.total}
-          firstRow={(currentPage - 1) * pageSize + 1}
-          lastRow={Math.min(currentPage * pageSize, totalRows)}
-        />
-      ) : (
-        <CellsPagination
-          currentPage={0}
-          numberOfPages={1}
-          goPage={goToPage}
-          totalRows={files && files.length}
-          firstRow={1}
-          lastRow={files && files.length}
-        />
-      )}
+      {paginationComponent}
     </div>
   );
 };
