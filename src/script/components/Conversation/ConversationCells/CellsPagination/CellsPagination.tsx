@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useCallback} from 'react';
+import {useCallback} from 'react';
 
 import {FlexBox, Bold, Link, IconButton, Select} from '@wireapp/react-ui-kit';
 
@@ -37,17 +37,68 @@ import {
 
 import {useCellsStore} from '../common/useCellsStore/useCellsStore';
 
+type goPageFunc = (pageIndex: number) => void;
+
 interface CellsPaginationProps {
   currentPage?: number;
   numberOfPages?: number;
   firstRow?: number;
   lastRow?: number;
   totalRows?: number;
-  goPage: (pageIndex: number) => void;
-  [key: string]: any;
+  goPage: goPageFunc;
 }
 
-export const CellsPagination: React.FC<CellsPaginationProps> = ({
+const PageNumber = ({
+  pageIndex = 1,
+  isCurrent = false,
+  goPage,
+}: {
+  pageIndex: number;
+  isCurrent: boolean;
+  goPage: goPageFunc;
+}) =>
+  isCurrent ? (
+    <Bold key={pageIndex} css={{...numberStyles, ...numberActiveStyles}} data-uie-name="status-active-page">
+      {pageIndex + 1}
+    </Bold>
+  ) : (
+    <Link css={numberStyles} key={pageIndex} onClick={() => goPage(pageIndex)} data-uie-name="go-page">
+      {pageIndex + 1}
+    </Link>
+  );
+
+const PageList = ({currentPage = 0, numberOfPages = 1, goPage}: CellsPaginationProps) => {
+  const lastPageIndex = numberOfPages - 1;
+  const spanLength = 1;
+  const endLength = 1;
+  const skipLength = 1;
+  const normalizeCount = endLength + skipLength + spanLength;
+
+  const dots = (key: string) => (
+    <Bold css={numberStyles} key={key}>
+      …
+    </Bold>
+  );
+
+  const normalizedCurrent = Math.min(Math.max(currentPage, normalizeCount), lastPageIndex - normalizeCount);
+  const beforeCount = normalizedCurrent - spanLength - endLength;
+  const afterCount = lastPageIndex - endLength - normalizedCurrent - spanLength;
+
+  const pages = Array.from({length: numberOfPages}, (key, index) => (
+    <PageNumber pageIndex={index} isCurrent={currentPage === index} goPage={goPage} key={index} />
+  ));
+
+  if (afterCount > skipLength) {
+    pages.splice(normalizedCurrent + spanLength + 1, afterCount, dots('dots-end'));
+  }
+  if (beforeCount > skipLength) {
+    pages.splice(endLength, beforeCount, dots('dots-start'));
+  }
+
+  return pages;
+};
+
+export const CellsPagination = ({
   currentPage = 0,
   numberOfPages = 1,
   goPage,
@@ -55,58 +106,18 @@ export const CellsPagination: React.FC<CellsPaginationProps> = ({
   lastRow,
   totalRows,
   ...props
-}) => {
+}: CellsPaginationProps) => {
   const isLastPage = currentPage === numberOfPages - 1;
   const isFirstPage = currentPage === 0;
 
   const {pageSize, setPageSize} = useCellsStore();
 
   const onSizeChange = useCallback(
-    (value: {value: string; label: string}) => {
-      setPageSize(parseInt(value.value));
+    ({value}: {value: string}) => {
+      setPageSize(parseInt(value));
     },
     [setPageSize],
   );
-
-  const renderPageList = () => {
-    const lastPageIndex = numberOfPages - 1;
-    const spanLength = 1;
-    const endLength = 1;
-    const skipLength = 1;
-    const normalizeCount = endLength + skipLength + spanLength;
-
-    const dots = (key: string) => (
-      <Bold css={numberStyles} key={key}>
-        …
-      </Bold>
-    );
-
-    const renderPageNumber = (pageIndex: number) =>
-      currentPage === pageIndex ? (
-        <Bold key={pageIndex} css={{...numberStyles, ...numberActiveStyles}} data-uie-name="status-active-page">
-          {pageIndex + 1}
-        </Bold>
-      ) : (
-        <Link css={numberStyles} key={pageIndex} onClick={() => goPage(pageIndex)} data-uie-name="go-page">
-          {pageIndex + 1}
-        </Link>
-      );
-
-    const normalizedCurrent = Math.min(Math.max(currentPage, normalizeCount), lastPageIndex - normalizeCount);
-    const beforeCount = normalizedCurrent - spanLength - endLength;
-    const afterCount = lastPageIndex - endLength - normalizedCurrent - spanLength;
-
-    const pages = Array.from({length: numberOfPages}, (_, index) => renderPageNumber(index));
-
-    if (afterCount > skipLength) {
-      pages.splice(normalizedCurrent + spanLength + 1, afterCount, dots('dots-end'));
-    }
-    if (beforeCount > skipLength) {
-      pages.splice(endLength, beforeCount, dots('dots-start'));
-    }
-
-    return pages;
-  };
 
   const options = [
     {value: '10', label: '10'},
@@ -114,9 +125,8 @@ export const CellsPagination: React.FC<CellsPaginationProps> = ({
     {value: '50', label: '50'},
     {value: '100', label: '100'},
   ];
-  const crtValue = {value: `${pageSize}`, label: `${pageSize}`};
+  const currentOption = {value: `${pageSize}`, label: `${pageSize}`};
 
-  // @ts-ignore
   return (
     <FlexBox css={containerStyles}>
       <div style={{flex: 1}}>
@@ -138,7 +148,7 @@ export const CellsPagination: React.FC<CellsPaginationProps> = ({
           </div>
 
           <div className={'list-pages'} data-uie-name="list-pages">
-            {renderPageList()}
+            <PageList currentPage={currentPage} numberOfPages={numberOfPages} goPage={goPage} />
           </div>
 
           <div className={'next-page'}>
@@ -163,9 +173,8 @@ export const CellsPagination: React.FC<CellsPaginationProps> = ({
             dataUieName={'row-page-size'}
             options={options}
             css={selectorStyles}
-            value={crtValue}
+            value={currentOption}
             menuPlacement={'top'}
-            // @ts-ignore
             onChange={onSizeChange}
           />
         </div>

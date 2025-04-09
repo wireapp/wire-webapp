@@ -36,7 +36,7 @@ interface UseGetAllCellsFilesProps {
 export const useGetAllCellsFiles = ({cellsRepository, conversationQualifiedId}: UseGetAllCellsFilesProps) => {
   const {setFiles, pageSize, setStatus, setPagination, setError} = useCellsStore();
 
-  const [offset, setOffset] = useState<number>(0);
+  const [offset, setOffset] = useState(0);
 
   const {domain, id} = conversationQualifiedId;
 

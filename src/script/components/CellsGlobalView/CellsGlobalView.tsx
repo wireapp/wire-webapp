@@ -46,7 +46,7 @@ export const CellsGlobalView = ({cellsRepository = container.resolve(CellsReposi
 
   useEffect(() => {
     void handleSearch('');
-  }, [cellsRepository]);
+  }, []);
 
   const deleteFileFailedNotification = useAppNotification({
     message: t('cellsGlobalView.deleteModalError'),
@@ -70,7 +70,7 @@ export const CellsGlobalView = ({cellsRepository = container.resolve(CellsReposi
   const handleRefresh = useCallback(async () => {
     clearAll();
     await handleSearch(searchValue);
-  }, [clearAll]);
+  }, [clearAll, handleSearch]);
 
   const isLoading = filesStatus === 'loading';
   const isError = filesStatus === 'error';
