@@ -17,34 +17,39 @@
  *
  */
 
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 
 import {useDebouncedCallback} from 'use-debounce';
 
-import {transformNodesToCellsFiles} from 'Components/CellsGlobalView/useGetAllCellsFiles/transformNodesToCellsFiles';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 
 import {useCellsStore} from '../common/useCellsStore/useCellsStore';
+import {transformNodesToCellsFiles, transformToCellPagination} from '../useGetAllCellsFiles/transformNodesToCellsFiles';
 
 interface UseSearchCellsFilesProps {
   cellsRepository: CellsRepository;
 }
 
-const PAGE_SIZE = 100;
+const PAGE_INITIAL_SIZE = 50;
+const PAGE_SIZE_INCREMENT = 20;
 const DEBOUNCE_TIME = 300;
 
 export const useSearchCellsFiles = ({cellsRepository}: UseSearchCellsFilesProps) => {
-  const {setFiles, setStatus, setPagination} = useCellsStore();
+  const {setFiles, setStatus, setPagination, clearAll} = useCellsStore();
 
   const [searchValue, setSearchValue] = useState('');
-  const [pageSize, setPageSize] = useState<number>(PAGE_SIZE);
+  const [pageSize, setPageSize] = useState<number>(PAGE_INITIAL_SIZE);
 
   const searchFiles = useDebouncedCallback(async (query: string) => {
     try {
       setStatus('loading');
       const result = await cellsRepository.searchFiles({query, limit: pageSize});
       setFiles(transformNodesToCellsFiles(result.Nodes || []));
-      setPagination(result.Pagination || null);
+      if (result.Pagination) {
+        setPagination(transformToCellPagination(result.Pagination));
+      } else {
+        setPagination(null);
+      }
       setStatus('success');
     } catch (error) {
       setStatus('error');
@@ -53,24 +58,33 @@ export const useSearchCellsFiles = ({cellsRepository}: UseSearchCellsFilesProps)
     }
   }, DEBOUNCE_TIME);
 
-  const handleSearch = async (value: string) => {
+  useEffect(() => {
+    const value = searchValue || '*';
+    searchFiles(value);
+  }, [pageSize, searchValue]);
+
+  const handleSearch = (value: string) => {
     setSearchValue(value);
-    if (!value) {
-      await searchFiles('*');
-      return;
-    }
-    await searchFiles(value);
+    setPageSize(PAGE_INITIAL_SIZE);
   };
 
-  const handleClearSearch = async () => {
+  const handleClearSearch = () => {
     setSearchValue('');
-    await searchFiles('*');
+    setPageSize(PAGE_INITIAL_SIZE);
+  };
+
+  const handleReload = async () => {
+    clearAll();
+    await searchFiles(searchValue || '*');
   };
 
   return {
     searchValue,
+    pageSize,
+    pageIncrement: PAGE_SIZE_INCREMENT,
     setPageSize,
     handleSearch,
+    handleReload,
     handleClearSearch,
   };
 };

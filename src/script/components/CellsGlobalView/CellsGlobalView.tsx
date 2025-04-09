@@ -21,11 +21,13 @@ import {useCallback, useEffect} from 'react';
 
 import {container} from 'tsyringe';
 
+import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
+
 import {useAppNotification} from 'Components/AppNotification/AppNotification';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
 
-import {wrapperStyles} from './CellsGlobalView.styles';
+import {loadMoreWrapperStyles, wrapperStyles} from './CellsGlobalView.styles';
 import {CellsHeader} from './CellsHeader/CellsHeader';
 import {CellsLoader} from './CellsLoader/CellsLoader';
 import {CellsStateInfo} from './CellsStateInfo/CellsStateInfo';
@@ -38,11 +40,12 @@ interface CellsGlobalViewProps {
 }
 
 export const CellsGlobalView = ({cellsRepository = container.resolve(CellsRepository)}: CellsGlobalViewProps) => {
-  const {files, status: filesStatus, clearAll, removeFile} = useCellsStore();
+  const {files, status: filesStatus, removeFile, pagination} = useCellsStore();
 
-  const {searchValue, handleSearch, handleClearSearch} = useSearchCellsFiles({
-    cellsRepository,
-  });
+  const {searchValue, handleSearch, handleClearSearch, handleReload, pageSize, setPageSize, pageIncrement} =
+    useSearchCellsFiles({
+      cellsRepository,
+    });
 
   useEffect(() => {
     void handleSearch('');
@@ -68,9 +71,8 @@ export const CellsGlobalView = ({cellsRepository = container.resolve(CellsReposi
   );
 
   const handleRefresh = useCallback(async () => {
-    clearAll();
-    await handleSearch(searchValue);
-  }, [clearAll, handleSearch]);
+    await handleReload();
+  }, [handleReload]);
 
   const isLoading = filesStatus === 'loading';
   const isError = filesStatus === 'error';
@@ -93,7 +95,7 @@ export const CellsGlobalView = ({cellsRepository = container.resolve(CellsReposi
           description={t('cellsGlobalView.emptySearchResultsDescription')}
         />
       )}
-      {(isSuccess || isLoading) && !emptySearchResults && (
+      {(isSuccess || (pagination && isLoading)) && !emptySearchResults && (
         <CellsTable files={files} cellsRepository={cellsRepository} onDeleteFile={handleDeleteFile} />
       )}
       {!isLoading && !isError && !hasFiles && !emptySearchResults && (
@@ -109,6 +111,21 @@ export const CellsGlobalView = ({cellsRepository = container.resolve(CellsReposi
           description={t('cellsGlobalView.errorDescription')}
         />
       )}
+      {!isLoading &&
+        !emptySearchResults &&
+        isSuccess &&
+        pagination &&
+        pagination.currentPage < pagination.totalPages && (
+          <div css={loadMoreWrapperStyles}>
+            <Button
+              variant={ButtonVariant.TERTIARY}
+              onClick={() => setPageSize(pageSize + pageIncrement)}
+              aria-label={t('cellsGlobalView.pagination.loadMoreResults')}
+            >
+              {t('cellsGlobalView.pagination.loadMoreResults')}
+            </Button>
+          </div>
+        )}
     </div>
   );
 };

@@ -405,6 +405,7 @@ declare module 'I18n/en-US.json' {
     'cellsGlobalView.pagination.previousPage': `Previous Page`;
     'cellsGlobalView.pagination.rowsPerPage': `Rows Per Page`;
     'cellsGlobalView.pagination.resultsOutOf': `{start}-{end} out of {total}`;
+    'cellsGlobalView.pagination.loadMoreResults': `Load More Results`;
     'chooseHandle.handlePlaceholder': `Username`;
     'chooseHandle.headline': `Set username`;
     'chooseHandle.subhead': `Your username helps people find you.`;

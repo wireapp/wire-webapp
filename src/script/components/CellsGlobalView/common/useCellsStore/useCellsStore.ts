@@ -17,22 +17,22 @@
  *
  */
 
-import {RestPagination} from 'cells-sdk-ts';
 import {create} from 'zustand';
 
 import {CellFile} from '../cellFile/cellFile';
+import {CellPagination} from '../cellPagination/cellPagination';
 
 export type Status = 'idle' | 'loading' | 'success' | 'error';
 
 interface CellsState {
   files: CellFile[];
   status: Status;
-  pagination: RestPagination | null;
+  pagination: CellPagination | null;
   error: Error | null;
   setFiles: (files: CellFile[]) => void;
   setStatus: (status: Status) => void;
   setError: (error: Error | null) => void;
-  setPagination: (pagination: RestPagination | null) => void;
+  setPagination: (pagination: CellPagination | null) => void;
   updateFile: (fileId: string, updates: Partial<CellFile>) => void;
   removeFile: (fileId: string) => void;
   clearAll: () => void;
