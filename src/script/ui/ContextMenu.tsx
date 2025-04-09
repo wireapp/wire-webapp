@@ -19,10 +19,10 @@
 
 import React, {ReactNode, useEffect, useMemo, useRef, useState} from 'react';
 
-import {Availability} from '@pydio/protocol-messaging';
 import cx from 'classnames';
 import {createRoot, Root} from 'react-dom/client';
 
+import {Availability} from '@wireapp/protocol-messaging';
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';

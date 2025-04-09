@@ -17,7 +17,6 @@
  *
  */
 
-import {LegalHoldStatus} from '@pydio/protocol-messaging';
 import {
   CONVERSATION_ACCESS_ROLE,
   CONVERSATION_ACCESS,
@@ -35,6 +34,7 @@ import ko from 'knockout';
 import {container} from 'tsyringe';
 import {Cancelable, debounce} from 'underscore';
 
+import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
@@ -214,7 +214,7 @@ export class Conversation {
     this.teamId = undefined;
     this.type = ko.observable();
     this.groupConversationType = ko.observable<GROUP_CONVERSATION_TYPE>(GROUP_CONVERSATION_TYPE.GROUP_CONVERSATION);
-    this.conversationModerator = ko.observable<ADD_PERMISSION>(ADD_PERMISSION.EVERYONE);
+    this.conversationModerator = ko.observable<ADD_PERMISSION>(ADD_PERMISSION.ADMINS);
 
     this.isLastMessageVisible = ko.observable(true);
     this.isLoadingMessages = ko.observable(false);

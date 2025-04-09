@@ -78,15 +78,16 @@ const useCanCreatePublicChannels = (selfUser: User) => {
 
 export const useChannelsFeatureFlag = () => {
   const userState = container.resolve(UserState);
-  const canCreateChannels = useCanCreateChannels(userState.self()!);
   const canCreatePublicChannels = useCanCreatePublicChannels(userState.self()!);
   const core = container.resolve(Core);
+  const isChannelsEnabled =
+    Config.getConfig().FEATURE.ENABLE_CHANNELS &&
+    core.backendFeatures.version >= Config.getConfig().MIN_ENTERPRISE_LOGIN_V2_AND_CHANNELS_SUPPORTED_API_VERSION;
+  const canCreateChannels = useCanCreateChannels(userState.self()!) && isChannelsEnabled;
 
   return {
-    isChannelsEnabled:
-      canCreateChannels &&
-      Config.getConfig().FEATURE.ENABLE_CHANNELS &&
-      core.backendFeatures.version >= Config.getConfig().MIN_ENTERPRISE_LOGIN_V2_AND_CHANNELS_SUPPORTED_API_VERSION,
+    canCreateChannels,
+    isChannelsEnabled,
     isChannelsHistorySharingEnabled: Config.getConfig().FEATURE.ENABLE_CHANNELS_HISTORY_SHARING,
     isPublicChannelsEnabled: canCreatePublicChannels && Config.getConfig().FEATURE.ENABLE_PUBLIC_CHANNELS,
   };

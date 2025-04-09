@@ -38,7 +38,6 @@ interface MediaFilePreviewCardProps {
   label: string;
   onDelete: () => void;
   onRetry: () => void;
-  isLoading: boolean;
   isError: boolean;
   children: ReactNode;
   uploadProgress: number;
@@ -48,7 +47,6 @@ export const MediaFilePreviewCard = ({
   label,
   onDelete,
   onRetry,
-  isLoading,
   isError,
   children,
   uploadProgress,

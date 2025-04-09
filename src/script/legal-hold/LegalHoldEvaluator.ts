@@ -17,8 +17,9 @@
  *
  */
 
-import {LegalHoldStatus} from '@pydio/protocol-messaging';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
+
+import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import type {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';

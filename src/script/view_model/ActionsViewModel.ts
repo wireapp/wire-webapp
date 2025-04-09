@@ -310,7 +310,9 @@ export class ActionsViewModel {
       },
       text: {
         message: t('modalConversationDeleteGroupMessage'),
-        title: t('modalConversationDeleteGroupHeadline'),
+        title: conversationEntity.isChannel()
+          ? t('modalChannelDeleteGroupHeadline')
+          : t('modalGroupDeleteGroupHeadline'),
       },
     });
   };

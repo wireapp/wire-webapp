@@ -31,7 +31,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
-import {participantsSelectionSearchCss} from './CreateConversationSteps.styles';
+import {participantsSelectionListCss, participantsSelectionSearchCss} from './CreateConversationSteps.styles';
 
 import {useCreateConversation} from '../hooks/useCreateConversation';
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
@@ -80,7 +80,7 @@ export const ParticipantsSelection = () => {
           onEnter={onSubmit}
         />
       </div>
-      <div className="modal__body">
+      <div className="modal__body" css={participantsSelectionListCss}>
         <FadingScrollbar>
           <UserSearchableList
             selfUser={selfUser!}

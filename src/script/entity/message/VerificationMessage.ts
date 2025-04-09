@@ -17,8 +17,9 @@
  *
  */
 
-import {QualifiedUserId} from '@pydio/protocol-messaging';
 import ko from 'knockout';
+
+import {QualifiedUserId} from '@wireapp/protocol-messaging';
 
 import {matchQualifiedIds} from 'Util/QualifiedId';
 

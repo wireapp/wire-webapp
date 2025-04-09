@@ -60,7 +60,7 @@ const FilePreview = ({
   cellsRepository = container.resolve(CellsRepository),
   conversationQualifiedId,
 }: FilePreviewProps) => {
-  const {name, extension, size, isLoading, isError, handleDelete, handleRetry} = useFilePreview({
+  const {name, extension, size, isError, handleDelete, handleRetry} = useFilePreview({
     file,
     cellsRepository,
     conversationQualifiedId,
@@ -72,7 +72,6 @@ const FilePreview = ({
         src={file.preview}
         onDelete={handleDelete}
         onRetry={handleRetry}
-        isLoading={isLoading}
         isError={isError}
         uploadProgress={file.uploadProgress}
       />
@@ -87,8 +86,8 @@ const FilePreview = ({
         size={size}
         onDelete={handleDelete}
         onRetry={handleRetry}
-        isLoading={isLoading}
         isError={isError}
+        uploadProgress={file.uploadProgress}
       />
     );
   }
@@ -99,7 +98,6 @@ const FilePreview = ({
         src={file.preview}
         onDelete={handleDelete}
         onRetry={handleRetry}
-        isLoading={isLoading}
         isError={isError}
         uploadProgress={file.uploadProgress}
       />
@@ -113,7 +111,6 @@ const FilePreview = ({
       size={size}
       onDelete={handleDelete}
       onRetry={handleRetry}
-      isLoading={isLoading}
       isError={isError}
       uploadProgress={file.uploadProgress}
     />
