@@ -54,7 +54,7 @@ export const FileCardLoading = ({progress = MAX_PROGRESS}: FileCardLoadingProps)
     <div css={wrapperStyles}>
       <div
         css={[loadingStyles, progress === MAX_PROGRESS && easeOutStyles]}
-        style={{'--progress': `${!progress ? fakeProgress : progress}%`} as CSSProperties}
+        style={{'--progress': `${progress > fakeProgress ? progress : fakeProgress}%`} as CSSProperties}
       />
     </div>
   );

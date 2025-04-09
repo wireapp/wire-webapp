@@ -18,9 +18,10 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import ko, {observable, pureComputed} from 'knockout';
+import ko, {computed, observable, pureComputed} from 'knockout';
 
 import {VIDEO_STATE} from '@wireapp/avs';
+import {AvsDebugger} from '@wireapp/avs-debugger';
 
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
@@ -39,6 +40,7 @@ export class Participant {
   public readonly hasPausedVideo: ko.PureComputed<boolean>;
   public readonly sharesScreen: ko.PureComputed<boolean>;
   public readonly sharesCamera: ko.PureComputed<boolean>;
+  public readonly isSwitchingVideoResolution = observable(false);
   public readonly startedScreenSharingAt = observable<number>(0);
   public readonly isActivelySpeaking = observable(false);
   public readonly isSendingVideo: ko.PureComputed<boolean>;
@@ -67,6 +69,18 @@ export class Participant {
     });
     this.isSendingVideo = pureComputed(() => {
       return this.videoState() !== VIDEO_STATE.STOPPED;
+    });
+    this.isSwitchingVideoResolution(false);
+
+    computed(() => {
+      const stream = this.videoStream();
+
+      if (stream && stream.getVideoTracks().length > 0) {
+        if (AvsDebugger.hasTrack(this.user.id)) {
+          AvsDebugger.removeTrack(this.user.id);
+        }
+        AvsDebugger.addTrack(this.user.id, this.user.name(), stream.getVideoTracks()[0], this.sharesScreen());
+      }
     });
   }
 
@@ -132,6 +146,15 @@ export class Participant {
     this.releaseAudioStream();
   }
 
+  setTemporarilyVideoScreenOff(): void {
+    // This is a temporary solution. The SFT does not send a response when a track change has occurred.
+    // To prevent the wrong video from being briefly displayed, we introduce a timeout here.
+    this.isSwitchingVideoResolution(true);
+    window.setTimeout(() => {
+      this.isSwitchingVideoResolution(false);
+    }, 1000);
+  }
+
   private releaseStream(mediaStream: MediaStream | undefined, stopTracks: boolean): void {
     if (!mediaStream) {
       return;
@@ -142,6 +165,9 @@ export class Participant {
         track.stop();
       }
       mediaStream.removeTrack(track);
+      if (track.kind == 'video' && AvsDebugger.hasTrack(this.user.id)) {
+        AvsDebugger.removeTrack(this.user.id);
+      }
     });
   }
 }

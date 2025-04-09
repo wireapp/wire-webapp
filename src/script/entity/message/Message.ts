@@ -17,9 +17,10 @@
  *
  */
 
-import type {LegalHoldStatus} from '@pydio/protocol-messaging';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
+
+import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {t, getUserName} from 'Util/LocalizerUtil';
 import {formatDateNumeral, formatDurationCaption, formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from 'Util/TimeUtil';

@@ -17,8 +17,9 @@
  *
  */
 
-import {Availability} from '@pydio/protocol-messaging';
 import {UserAsset, UserAssetType} from '@wireapp/api-client/lib/user';
+
+import {Availability} from '@wireapp/protocol-messaging';
 
 import {ACCENT_ID} from 'src/script/Config';
 import {User} from 'src/script/entity/User';

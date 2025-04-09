@@ -18,7 +18,8 @@
  */
 
 import {CSSObject} from '@emotion/react';
-import {Availability as AvailabilityProp} from '@pydio/protocol-messaging';
+
+import {Availability as AvailabilityProp} from '@wireapp/protocol-messaging';
 
 import {AVATAR_SIZE} from 'Components/Avatar';
 import {CSS_SQUARE} from 'Util/CSSMixin';

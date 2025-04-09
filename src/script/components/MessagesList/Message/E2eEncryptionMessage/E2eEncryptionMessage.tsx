@@ -44,7 +44,7 @@ export const E2eEncryptionMessage = () => {
         <Link
           css={e2eMessageContentLinkCss}
           variant={LinkVariant.PRIMARY}
-          href={Config.getConfig().URL.WEBSITE_BASE}
+          href={Config.getConfig().URL.SUPPORT.E2E_ENCRYPTION}
           target="_blank"
           data-uie-name="how-to-label-conversation-as-favorites"
         >

@@ -55,6 +55,7 @@ export const CreateTeamModal = () => {
       isShown={isCreateTeamModalOpen}
       data-uie-name="custom-history-modal"
       onKeyDown={event => handleEscDown(event, onCancel)}
+      onBgClick={onCancel}
     >
       <div css={salesModalBodyCss}>
         <div css={salesModalBodyWrapperCss}>

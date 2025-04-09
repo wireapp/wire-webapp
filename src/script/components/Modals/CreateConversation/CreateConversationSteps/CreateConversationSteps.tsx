@@ -20,7 +20,10 @@
 import {FlexBox} from '@wireapp/react-ui-kit';
 
 import {ConversationDetails} from './ConversationDetails/ConversationDetails';
-import {createConversationStepRightContainerCss} from './CreateConversationSteps.styles';
+import {
+  createConversationStepRightContainerCss,
+  createConversationStepWrapperCss,
+} from './CreateConversationSteps.styles';
 import {ParticipantsSelection} from './ParticipantsSelection';
 import {Preference} from './Preference';
 
@@ -32,11 +35,15 @@ export const CreateConversationSteps = () => {
   const {conversationCreationStep} = useCreateConversationModal();
 
   if (conversationCreationStep === ConversationCreationStep.ParticipantsSelection) {
-    return <ParticipantsSelection />;
+    return (
+      <div css={createConversationStepWrapperCss}>
+        <ParticipantsSelection />
+      </div>
+    );
   }
 
   return (
-    <FlexBox>
+    <FlexBox css={createConversationStepWrapperCss}>
       <ConversationTypeContainer />
       <div css={createConversationStepRightContainerCss}>
         {conversationCreationStep === ConversationCreationStep.Preference ? <Preference /> : <ConversationDetails />}

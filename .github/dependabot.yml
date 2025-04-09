@@ -26,9 +26,6 @@ updates:
       eslint:
         patterns:
           - '*eslint*'
-      lexical:
-        patterns:
-          - '*lexical*'
       datadog:
         patterns:
           - '*@datadog*'
@@ -41,12 +38,12 @@ updates:
           - '0.10.16'
       - dependency-name: '@types/node'
       - dependency-name: 'typescript'
-      - dependency-name: 'lexical-@lexical/code'
-      - dependency-name: 'lexical-@lexical/history'
-      - dependency-name: 'lexical-@lexical/list'
-      - dependency-name: 'lexical-@lexical/markdown'
-      - dependency-name: 'lexical-@lexical/react'
-      - dependency-name: 'lexical-@lexical/rich-text'
+      - dependency-name: '@lexical/code'
+      - dependency-name: '@lexical/history'
+      - dependency-name: '@lexical/list'
+      - dependency-name: '@lexical/markdown'
+      - dependency-name: '@lexical/react'
+      - dependency-name: '@lexical/rich-text'
 
   # Server dependencies
   - package-ecosystem: npm

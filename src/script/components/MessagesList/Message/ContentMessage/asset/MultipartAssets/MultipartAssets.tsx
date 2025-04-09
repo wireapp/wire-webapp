@@ -17,8 +17,9 @@
  *
  */
 
-import {ICellAsset} from '@pydio/protocol-messaging';
 import {container} from 'tsyringe';
+
+import {ICellAsset} from '@wireapp/protocol-messaging';
 
 import {useInView} from 'Hooks/useInView/useInView';
 import {CellsRepository} from 'src/script/cells/CellsRepository';

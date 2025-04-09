@@ -19,7 +19,7 @@
 
 import {forwardRef, useEffect, useMemo, useState} from 'react';
 
-import {ADD_PERMISSION, CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
@@ -107,10 +107,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       isRequest,
       participating_user_ets: participatingUserEts,
       firstUserEntity: firstParticipant,
-      isGroup,
-      isChannel,
       isGroupOrChannel,
-      conversationModerator,
     } = useKoSubscribableChildren(activeConversation, [
       'isMutable',
       'showNotificationsNothing',
@@ -127,10 +124,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       'isRequest',
       'participating_user_ets',
       'firstUserEntity',
-      'isGroup',
-      'isChannel',
       'isGroupOrChannel',
-      'conversationModerator',
     ]);
 
     const {isTemporaryGuest} = useKoSubscribableChildren(firstParticipant!, ['isTemporaryGuest']);
@@ -146,13 +140,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
 
     const isActiveGroupParticipant = isGroupOrChannel && !isSelfUserRemoved;
 
-    const showActionAddParticipantsForGroup = isGroup && roleRepository.canAddParticipants(activeConversation);
-    const showActionAddParticipantsForChannel =
-      isChannel &&
-      (roleRepository.canAddParticipants(activeConversation) || conversationModerator === ADD_PERMISSION.EVERYONE);
-
-    const showActionAddParticipants =
-      isActiveGroupParticipant && (showActionAddParticipantsForGroup || showActionAddParticipantsForChannel);
+    const showActionAddParticipants = isActiveGroupParticipant && roleRepository.canAddParticipants(activeConversation);
 
     const hasTimer = hasGlobalMessageTimer;
 

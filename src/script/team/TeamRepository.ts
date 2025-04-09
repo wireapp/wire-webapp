@@ -17,7 +17,6 @@
  *
  */
 
-import {Availability} from '@pydio/protocol-messaging';
 import {ConversationProtocol, ConversationRolesList} from '@wireapp/api-client/lib/conversation';
 import type {
   TeamConversationDeleteEvent,
@@ -35,6 +34,7 @@ import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
 import {Runtime, TypedEventEmitter} from '@wireapp/commons';
+import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
