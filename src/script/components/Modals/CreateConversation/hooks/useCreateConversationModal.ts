@@ -74,6 +74,7 @@ type CreateConversationModalState = {
   setIsCreateTeamModalOpen: (isOpen: boolean) => void;
   setIsUpgradeTeamModalOpen: (isOpen: boolean) => void;
   gotoLastStep: () => void;
+  gotoFirstStep: () => void;
   setIsServicesEnabled: (isServicesEnabled: boolean) => void;
 };
 
@@ -89,7 +90,7 @@ const initialState = {
   conversationType: ConversationType.Channel,
   conversationCreationStep: ConversationCreationStep.ConversationDetails,
   error: '',
-  isReadReceiptsEnabled: true,
+  isReadReceiptsEnabled: false,
   isServicesEnabled: true,
   isGuestsEnabled: true,
   selectedContacts: [] as User[],
@@ -116,7 +117,8 @@ export const useCreateConversationModal = create<CreateConversationModalState>(s
     })),
   setModerator: (moderator: ADD_PERMISSION) => set({moderator}),
   setChatHistory: (history?: ChatHistory) => set({chatHistory: history || ChatHistory.Off}),
-  setConversationType: (type: ConversationType) => set({conversationType: type}),
+  setConversationType: (conversationType: ConversationType) =>
+    set({conversationType, isReadReceiptsEnabled: conversationType === ConversationType.Group}),
   setConversationCreationStep: (step: ConversationCreationStep) => set({conversationCreationStep: step}),
   gotoNextStep: () => set(state => ({...state, conversationCreationStep: state.conversationCreationStep + 1})),
   gotoLastStep: () => set({conversationCreationStep: ConversationCreationStep.ParticipantsSelection}),
@@ -132,4 +134,5 @@ export const useCreateConversationModal = create<CreateConversationModalState>(s
   setIsCreateTeamModalOpen: (isOpen: boolean) => set({isCreateTeamModalOpen: isOpen}),
   setIsUpgradeTeamModalOpen: (isOpen: boolean) => set({isUpgradeTeamModalOpen: isOpen}),
   setIsServicesEnabled: (isServicesEnabled: boolean) => set({isServicesEnabled}),
+  gotoFirstStep: () => set({conversationCreationStep: ConversationCreationStep.ConversationDetails}),
 }));
