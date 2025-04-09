@@ -145,8 +145,8 @@ export class ConversationRoleRepository {
   };
 
   readonly hasPermission = (conversation: Conversation, user: User, permissionName: Permissions): boolean => {
-    // Bypass permission check for admin or owner and when conversation is a channel
-    if (user.isAdminOrOwner() && conversation.isChannel()) {
+    // Bypass permission check for admin or owner and when conversation is a channel and teamId matches
+    if (user.isAdminOrOwner() && conversation.teamId === user.teamId && conversation.isChannel()) {
       return true;
     }
 
