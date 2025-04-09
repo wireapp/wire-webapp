@@ -19,8 +19,7 @@
 
 import {CSSProperties, useState} from 'react';
 
-import {ICellAsset} from '@pydio/protocol-messaging';
-
+import {ICellAsset} from '@wireapp/protocol-messaging';
 import {UnavailableFileIcon} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/LocalizerUtil';

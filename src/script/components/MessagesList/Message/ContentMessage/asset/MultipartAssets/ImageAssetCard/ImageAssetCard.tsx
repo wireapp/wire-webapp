@@ -17,7 +17,7 @@
  *
  */
 
-import {ICellAsset} from '@pydio/protocol-messaging';
+import {ICellAsset} from '@wireapp/protocol-messaging';
 
 import {GridImageAsset} from './GridImageAsset/GridImageAsset';
 import {LargeImageAsset} from './LargeImageAsset/LargeImageAsset';
