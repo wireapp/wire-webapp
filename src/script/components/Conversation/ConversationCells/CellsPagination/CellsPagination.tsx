@@ -32,7 +32,12 @@ import {
   arrowPreviousIconStyles,
   containerStyles,
   selectorStyles,
-  pageSelectorContainer,
+  pageSelectorContainerStyles,
+  previousPageStyles,
+  listPagesStyles,
+  nextPageStyles,
+  pageSelectorLabelStyles,
+  pageSelectorSelectStyles,
 } from './CellsPagination.styles';
 
 import {useCellsStore} from '../common/useCellsStore/useCellsStore';
@@ -134,7 +139,7 @@ export const CellsPagination = ({
       </div>
       {numberOfPages > 1 && (
         <FlexBox css={pagesContainerStyles} align="flex-end" data-uie-name="element-pagination" {...props}>
-          <div className={'previous-page'}>
+          <div css={previousPageStyles}>
             {!isFirstPage && (
               <IconButton
                 onClick={() => goPage(currentPage - 1)}
@@ -147,11 +152,11 @@ export const CellsPagination = ({
             )}
           </div>
 
-          <div className={'list-pages'} data-uie-name="list-pages">
+          <div css={listPagesStyles} data-uie-name="list-pages">
             <PageList currentPage={currentPage} numberOfPages={numberOfPages} goPage={goPage} />
           </div>
 
-          <div className={'next-page'}>
+          <div css={nextPageStyles}>
             {!isLastPage && (
               <IconButton
                 onClick={() => goPage(currentPage + 1)}
@@ -165,9 +170,9 @@ export const CellsPagination = ({
           </div>
         </FlexBox>
       )}
-      <div css={pageSelectorContainer}>
-        <div className={'rows-per-page-label'}>Rows per page</div>
-        <div style={{paddingTop: 20}}>
+      <div css={pageSelectorContainerStyles}>
+        <div css={pageSelectorLabelStyles}>Rows per page</div>
+        <div css={pageSelectorSelectStyles}>
           <Select
             id={'page-size'}
             dataUieName={'row-page-size'}

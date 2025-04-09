@@ -22,35 +22,41 @@ import {CSSObject} from '@emotion/react';
 import {COLOR} from '@wireapp/react-ui-kit';
 
 export const containerStyles: CSSObject = {
-  marginTop: 20,
+  marginTop: '20px',
   alignItems: 'center',
-  fontSize: 14,
+  fontSize: '14px',
 };
+
 export const pagesContainerStyles: CSSObject = {
   alignItems: 'center',
-  '.previous-page': {flexBasis: 100},
-  '.list-pages': {
-    alignItems: 'flex-end',
-    display: 'flex',
-    flexDirection: 'row',
-    margin: '0 auto',
-  },
-  '.next-page': {
-    display: 'flex',
-    flexBasis: 100,
-    justifyContent: 'flex-end',
-  },
+};
+
+export const previousPageStyles: CSSObject = {
+  flexBasis: '100%',
+};
+
+export const listPagesStyles: CSSObject = {
+  alignItems: 'flex-end',
+  display: 'flex',
+  flexDirection: 'row',
+  margin: '0 auto',
+};
+
+export const nextPageStyles: CSSObject = {
+  display: 'flex',
+  flexBasis: 100,
+  justifyContent: 'flex-end',
 };
 
 export const numberStyles: CSSObject = {
-  fontSize: 14,
+  fontSize: '14px',
   display: 'block',
-  width: 24,
-  height: 24,
-  margin: 4,
+  width: '24px',
+  height: '24px',
+  margin: '4px',
   textAlign: 'center',
   lineHeight: '24px',
-  borderRadius: 8,
+  borderRadius: '8px',
 };
 
 export const numberActiveStyles: CSSObject = {
@@ -59,44 +65,50 @@ export const numberActiveStyles: CSSObject = {
 };
 
 export const arrowButtonStyles: CSSObject = {
-  width: 32,
-  height: 32,
-  borderRadius: 8,
-  margin: 4,
+  width: '32px',
+  height: '32px',
+  borderRadius: '8px',
+  margin: '4px',
 };
 
 export const arrowPreviousIconStyles: CSSObject = {
-  height: 32,
+  height: '32px',
   path: {
     fill: 'var(--main-color)',
   },
-  marginTop: 2,
-  marginRight: 3,
+  marginTop: '2px',
+  marginRight: '3px',
   rotate: '180deg',
 };
 
 export const arrowNextIconStyles: CSSObject = {
-  height: 32,
+  height: '32px',
   path: {
     fill: 'var(--main-color)',
   },
-  marginBottom: 2,
+  marginBottom: '2px',
 };
 
-export const pageSelectorContainer: CSSObject = {
+export const pageSelectorContainerStyles: CSSObject = {
   flex: 1,
   display: 'flex',
   alignItems: 'center',
-  '.rows-per-page-label': {
-    flex: 1,
-    textAlign: 'right',
-    paddingRight: 10,
-  },
+};
+
+export const pageSelectorLabelStyles: CSSObject = {
+  flex: 1,
+  textAlign: 'right',
+  paddingRight: '10px',
+};
+
+export const pageSelectorSelectStyles: CSSObject = {
+  paddingTop: '20px',
 };
 
 export const selectorStyles: CSSObject = {
-  height: 32,
-  minHeight: 32,
+  height: '32px',
+  minHeight: '32px',
+  // This is hacking inside the react-ui-kit component
   '&>div>div:first-of-type': {
     height: '32px !important',
     minHeight: '32px !important',
