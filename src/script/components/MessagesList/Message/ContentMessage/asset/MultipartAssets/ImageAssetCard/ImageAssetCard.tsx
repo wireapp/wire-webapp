@@ -35,5 +35,5 @@ export const ImageAssetCard = ({src, metadata, size, isLoading, isError}: ImageA
     return <LargeImageAsset src={src} metadata={metadata} isError={isError} />;
   }
 
-  return <GridImageAsset src={src} metadata={metadata} size={size} isLoading={isLoading} isError={isError} />;
+  return <GridImageAsset src={src} isLoading={isLoading} isError={isError} />;
 };
