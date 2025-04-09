@@ -332,13 +332,7 @@ export class Conversation {
       if (!this.selfUser()) {
         return NOTIFICATION_STATE.NOTHING;
       }
-      const mutedState = this.mutedState();
-
-      if (typeof mutedState === 'boolean') {
-        return mutedState ? NOTIFICATION_STATE.MENTIONS_AND_REPLIES : NOTIFICATION_STATE.EVERYTHING;
-      }
-
-      return mutedState;
+      return this.mutedState();
     });
 
     this.is_archived = this.archivedState;

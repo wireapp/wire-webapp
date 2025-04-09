@@ -37,6 +37,7 @@ import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {ACCESS_STATE} from './AccessState';
 import {ConversationStatus} from './ConversationStatus';
 import {ConversationVerificationState} from './ConversationVerificationState';
+import {NOTIFICATION_STATE} from './NotificationSetting';
 
 import {Conversation} from '../entity/Conversation';
 import {BaseError, BASE_ERROR_TYPE} from '../error/BaseError';
@@ -282,6 +283,10 @@ export class ConversationMapper {
     if (!conversationEntity.last_event_timestamp() && initialTimestamp) {
       conversationEntity.last_event_timestamp(initialTimestamp);
       conversationEntity.last_server_timestamp(initialTimestamp);
+    }
+
+    if (conversationEntity.mutedState() === null) {
+      conversationEntity.mutedState(NOTIFICATION_STATE.EVERYTHING);
     }
 
     // Active participants from database or backend payload
