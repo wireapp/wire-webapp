@@ -46,9 +46,6 @@ export const ConversationCells = ({
 }: ConversationCellsProps) => {
   const {getFiles, status: filesStatus, getPagination, clearAll, removeFile, pageSize} = useCellsStore();
 
-  conversationQualifiedId.id = '2448cb71-e411-4b26-93b8-e15e29ee0a10';
-  conversationQualifiedId.domain = 'imai.wire.link';
-
   const conversationId = conversationQualifiedId.id;
 
   const files = getFiles({conversationId});
