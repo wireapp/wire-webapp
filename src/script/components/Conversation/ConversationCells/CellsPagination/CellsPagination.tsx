@@ -22,6 +22,7 @@ import {useCallback} from 'react';
 import {FlexBox, Bold, Link, IconButton, Select} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
+import {t} from 'Util/LocalizerUtil';
 
 import {
   pagesContainerStyles,
@@ -135,7 +136,9 @@ export const CellsPagination = ({
   return (
     <FlexBox css={containerStyles}>
       <div style={{flex: 1}}>
-        {firstRow}-{lastRow} out of {totalRows}
+        {totalRows && lastRow
+          ? t('cellsGlobalView.pagination.resultsOutOf', {start: firstRow, end: lastRow, total: totalRows})
+          : null}
       </div>
       {numberOfPages > 1 && (
         <FlexBox css={pagesContainerStyles} align="flex-end" data-uie-name="element-pagination" {...props}>
@@ -145,7 +148,8 @@ export const CellsPagination = ({
                 onClick={() => goPage(currentPage - 1)}
                 data-uie-name="go-previous-page"
                 css={arrowButtonStyles}
-                title={'Previous page - TODO TRANSLATE ME'}
+                aria-label={t('cellsGlobalView.pagination.previousPage')}
+                title={t('cellsGlobalView.pagination.previousPage')}
               >
                 <Icon.ArrowNextIcon css={arrowPreviousIconStyles} />
               </IconButton>
@@ -162,7 +166,8 @@ export const CellsPagination = ({
                 onClick={() => goPage(currentPage + 1)}
                 data-uie-name="go-next-page"
                 css={arrowButtonStyles}
-                title={'Next page - TODO TRANSLATE ME'}
+                aria-label={t('cellsGlobalView.pagination.nextPage')}
+                title={t('cellsGlobalView.pagination.nextPage')}
               >
                 <Icon.ArrowNextIcon css={arrowNextIconStyles} />
               </IconButton>
@@ -171,7 +176,7 @@ export const CellsPagination = ({
         </FlexBox>
       )}
       <div css={pageSelectorContainerStyles}>
-        <div css={pageSelectorLabelStyles}>Rows per page</div>
+        <div css={pageSelectorLabelStyles}>{t('cellsGlobalView.pagination.rowsPerPage')}</div>
         <div css={pageSelectorSelectStyles}>
           <Select
             id={'page-size'}

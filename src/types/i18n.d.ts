@@ -401,6 +401,10 @@ declare module 'I18n/en-US.json' {
     'cellsSidebar.heading': `Files`;
     'cellsSidebar.title': `All`;
     'cellsUnavailableFile': `File not available`;
+    'cellsGlobalView.pagination.nextPage': `Next Page`;
+    'cellsGlobalView.pagination.previousPage': `Previous Page`;
+    'cellsGlobalView.pagination.rowsPerPage': `Rows Per Page`;
+    'cellsGlobalView.pagination.resultsOutOf': `{start}-{end} out of {total}`;
     'chooseHandle.handlePlaceholder': `Username`;
     'chooseHandle.headline': `Set username`;
     'chooseHandle.subhead': `Your username helps people find you.`;
