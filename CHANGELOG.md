@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.40.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.39.2...@wireapp/api-client@27.40.0) (2025-04-10)
+
+### Features
+
+* **api-client:** upgrade cells-sdk-ts to v0.1.1-alpha09 ([#7010](https://github.com/wireapp/wire-web-packages/issues/7010)) ([4b413f4](https://github.com/wireapp/wire-web-packages/commit/4b413f43f8376a1157abedbd3b949ade94337309))
+
 ## [27.39.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.39.1...@wireapp/api-client@27.39.2) (2025-04-08)
 
 ### Bug Fixes
