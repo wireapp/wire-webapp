@@ -20,6 +20,8 @@
 import {CSSObject} from '@emotion/react';
 
 export const e2eMessageContainerCss: CSSObject = {
+  width: '100%',
+  marginTop: '1rem',
   background: 'var(--green-background)',
   padding: '12px 0',
   display: 'flex',

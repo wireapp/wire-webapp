@@ -17,23 +17,11 @@
  *
  */
 
-import {ICellAsset} from '@wireapp/protocol-messaging';
+import {CSSObject} from '@emotion/react';
 
-import {GridImageAsset} from './GridImageAsset/GridImageAsset';
-import {LargeImageAsset} from './LargeImageAsset/LargeImageAsset';
-
-interface ImageAssetCardProps {
-  src?: string;
-  metadata: ICellAsset['image'];
-  size: 'small' | 'large';
-  isLoading: boolean;
-  isError: boolean;
-}
-
-export const ImageAssetCard = ({src, metadata, size, isLoading, isError}: ImageAssetCardProps) => {
-  if (size === 'large') {
-    return <LargeImageAsset src={src} metadata={metadata} isError={isError} />;
-  }
-
-  return <GridImageAsset src={src} isLoading={isLoading} isError={isError} />;
+export const imageStyles: CSSObject = {
+  width: '100%',
+  height: '100%',
+  objectFit: 'cover',
+  borderRadius: '10px',
 };
