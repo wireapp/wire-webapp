@@ -163,9 +163,9 @@ declare module 'I18n/en-US.json' {
     'accessibility.searchInput.cancel': `Delete entry`;
     'accessibility.userProfileDeleteEntry': `Delete entry`;
     'accountAlreadyExistsModal.changeEmailLink': `Change your email address`;
-    'accountAlreadyExistsModal.content': `This email\'s domain belongs to a Wire Enterprise Instance, but the email address is associated with a Wire Cloud account. To proceed with the Enterprise instance login, please update your email address to another domain, or delete your account. If the account is part of a team, please reach out to the Team Administrator.`;
+    'accountAlreadyExistsModal.content': `This email\'s domain belongs to an on-premises backend. Please change your email in the account settings or delete your account. If you are part of a team please contact your team admin.`;
     'accountAlreadyExistsModal.deletePersonalAccount': `Delete personal account`;
-    'accountAlreadyExistsModal.header': `Email already in use`;
+    'accountAlreadyExistsModal.header': `Email claimed by an on-premises backend`;
     'accountAlreadyExistsModal.removeTeamMember': `remove team member`;
     'accountForm.emailPersonalPlaceholder': `you@email.com`;
     'accountForm.emailTeamPlaceholder': `you@yourcompany.com`;
