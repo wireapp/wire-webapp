@@ -88,6 +88,8 @@ interface InputBarProps {
   uploadDroppedFiles: (droppedFiles: File[]) => void;
   uploadImages: (images: File[]) => void;
   uploadFiles: (files: File[]) => void;
+  onCellImageUpload: () => void;
+  onCellAssetUpload: () => void;
 }
 
 export const InputBar = ({
@@ -106,6 +108,8 @@ export const InputBar = ({
   uploadDroppedFiles,
   uploadImages,
   uploadFiles,
+  onCellImageUpload,
+  onCellAssetUpload,
 }: InputBarProps) => {
   const {classifiedDomains, isSelfDeletingMessagesEnabled, isFileSharingSendingEnabled} = useKoSubscribableChildren(
     teamState,
@@ -308,6 +312,7 @@ export const InputBar = ({
                   loadDraftState={draftState.load}
                   replaceEmojis={shouldReplaceEmoji}
                 >
+                  {!!files.length && <FilePreviews files={files} conversationQualifiedId={conversation.qualifiedId} />}
                   <InputBarControls
                     conversation={conversation}
                     isFileSharingSendingEnabled={isFileSharingSendingEnabled}
@@ -326,6 +331,8 @@ export const InputBar = ({
                     onSelectImages={uploadImages}
                     onSend={handleSendMessage}
                     isSending={isSending}
+                    onCellImageUpload={onCellImageUpload}
+                    onCellAssetUpload={onCellAssetUpload}
                   />
                 </InputBarEditor>
               )}
@@ -339,8 +346,6 @@ export const InputBar = ({
               onSend={fileHandling.sendPastedFile}
             />
           )}
-
-          {!!files.length && <FilePreviews files={files} conversationQualifiedId={conversation.qualifiedId} />}
         </div>
       </InputBarContainer>
       {emojiPicker.open ? (

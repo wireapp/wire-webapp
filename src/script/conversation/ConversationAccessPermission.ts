@@ -22,7 +22,6 @@ import {CONVERSATION_ACCESS_ROLE, CONVERSATION_ACCESS} from '@wireapp/api-client
 import {ACCESS_STATE, TEAM} from './AccessState';
 
 import {combinePermissions, hasPermissions} from '../user/UserPermission';
-
 export const ACCESS_TYPES = {
   GUEST: 1 << 0,
   NON_TEAM_MEMBER: 1 << 1,
@@ -33,6 +32,7 @@ export const ACCESS_TYPES = {
 export const ACCESS_MODES = {
   INVITE: 1 << 4,
   CODE: 1 << 5,
+  LINK: 1 << 6,
 };
 
 const ACCESS = {...ACCESS_TYPES, ...ACCESS_MODES};
@@ -41,6 +41,12 @@ export function teamPermissionsForAccessState(state: ACCESS_STATE): number {
   switch (state) {
     case ACCESS_STATE.TEAM.GUESTS_SERVICES: {
       return combinePermissions([teamPermissionsForAccessState(ACCESS_STATE.TEAM.GUEST_ROOM), ACCESS_TYPES.SERVICE]);
+    }
+    case ACCESS_STATE.TEAM.PUBLIC: {
+      return combinePermissions([teamPermissionsForAccessState(ACCESS_STATE.TEAM.TEAM_ONLY), ACCESS_MODES.LINK]);
+    }
+    case ACCESS_STATE.TEAM.PUBLIC_GUESTS: {
+      return combinePermissions([teamPermissionsForAccessState(ACCESS_STATE.TEAM.GUEST_ROOM), ACCESS_MODES.LINK]);
     }
     case ACCESS_STATE.TEAM.GUEST_ROOM: {
       return combinePermissions([
@@ -91,7 +97,9 @@ export function featureFromStateChange(prevState: ACCESS_STATE, current: ACCESS_
 /** AccessStates sorted by permissions. most first */
 const AccessStatesByPerm = [
   ACCESS_STATE.TEAM.GUESTS_SERVICES,
+  ACCESS_STATE.TEAM.PUBLIC_GUESTS,
   ACCESS_STATE.TEAM.GUEST_ROOM,
+  ACCESS_STATE.TEAM.PUBLIC,
   ACCESS_STATE.TEAM.SERVICES,
   ACCESS_STATE.TEAM.TEAM_ONLY,
   ACCESS_STATE.TEAM.ONE2ONE,

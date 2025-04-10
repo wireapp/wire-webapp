@@ -28,18 +28,18 @@ interface VideoPreviewCardProps {
   src: string;
   onDelete: () => void;
   onRetry: () => void;
-  isLoading: boolean;
   isError: boolean;
+  uploadProgress: number;
 }
 
-export const VideoPreviewCard = ({src, onDelete, onRetry, isLoading, isError}: VideoPreviewCardProps) => {
+export const VideoPreviewCard = ({src, onDelete, onRetry, isError, uploadProgress}: VideoPreviewCardProps) => {
   return (
     <MediaFilePreviewCard
       label={t('conversationFileVideoPreviewLabel', {src})}
       onDelete={onDelete}
       onRetry={onRetry}
-      isLoading={isLoading}
       isError={isError}
+      uploadProgress={uploadProgress}
     >
       <video src={src} preload="metadata" css={videoStyles} />
       <div css={iconWrapperStyles}>

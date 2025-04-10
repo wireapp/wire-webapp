@@ -29,12 +29,22 @@ export const logoCss: CSSObject = {
   },
 };
 
-export const headerCss: CSSObject = {fontSize: '1.5rem', marginBottom: '1rem'};
+export const headerCss: CSSObject = {
+  fontSize: '1.5rem',
+  marginBottom: '0.5rem',
+};
 
 export const buttonContainerCss: CSSObject = {
-  marginTop: '2rem',
+  marginTop: '1rem',
   gap: '1rem',
   display: 'flex',
 };
 
-export const containerCss: CSSObject = {width: '100%', maxWidth: '23rem'};
+export const containerCss: CSSObject = {
+  width: '100%',
+  maxWidth: '310px',
+};
+
+export const paragraphCss: CSSObject = {
+  marginTop: '1.5rem',
+};

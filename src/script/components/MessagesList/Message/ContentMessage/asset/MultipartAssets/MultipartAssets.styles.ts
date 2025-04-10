@@ -31,6 +31,19 @@ export const listStyles: CSSObject = {
   margin: '0',
 };
 
-export const itemStyles: CSSObject = {
+export const listSingleItemStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'flex-start',
+  justifyContent: 'flex-start',
+  listStyle: 'none',
+  margin: '0',
+  padding: '0',
+};
+
+export const largeCardStyles: CSSObject = {
   gridColumn: 'span 3',
+};
+
+export const smallCardStyles: CSSObject = {
+  gridColumn: 'span 1',
 };

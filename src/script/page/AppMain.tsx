@@ -31,6 +31,7 @@ import {CallingContainer} from 'Components/calling/CallingOverlayContainer';
 import {ChooseScreen} from 'Components/calling/ChooseScreen';
 import {ConfigToolbar} from 'Components/ConfigToolbar/ConfigToolbar';
 import {ErrorFallback} from 'Components/ErrorFallback';
+import {CreateConversationModal} from 'Components/Modals/CreateConversation/CreateConversaionModal';
 import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationModal';
 import {LegalHoldModal} from 'Components/Modals/LegalHoldModal/LegalHoldModal';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -324,6 +325,7 @@ export const AppMain: FC<AppMainProps> = ({
           {/*The order of these elements matter to show proper modals stack upon each other*/}
           <UserModal selfUser={selfUser} userRepository={repositories.user} />
           <GroupCreationModal userState={userState} teamState={teamState} />
+          <CreateConversationModal />
         </ErrorBoundary>
       </RootProvider>
 

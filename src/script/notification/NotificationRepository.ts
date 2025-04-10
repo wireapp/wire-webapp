@@ -17,7 +17,6 @@
  *
  */
 
-import {Availability} from '@pydio/protocol-messaging';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {NotificationPreference, WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
@@ -25,6 +24,7 @@ import ko from 'knockout';
 import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
+import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingRepository} from 'src/script/calling/CallingRepository';
@@ -392,11 +392,11 @@ export class NotificationRepository {
    * @param conversationEntity Conversation entity
    */
   private createBodyMemberUpdate(messageEntity?: MemberMessage, conversationEntity?: Conversation): string | void {
-    const isGroup = conversationEntity && conversationEntity.isGroup();
+    const isGroupOrChannel = conversationEntity && conversationEntity.isGroupOrChannel();
 
     switch (messageEntity?.memberMessageType) {
       case SystemMessageType.NORMAL:
-        if (isGroup) {
+        if (isGroupOrChannel) {
           if (messageEntity.isMemberJoin()) {
             return this.createBodyMemberJoin(messageEntity);
           }
@@ -635,7 +635,7 @@ export class NotificationRepository {
 
     let title;
     if (conversationName) {
-      title = conversationEntity.isGroup()
+      title = conversationEntity.isGroupOrChannel()
         ? t('notificationTitleGroup', {conversation: truncatedConversationName, user: truncatedName}, {}, true)
         : conversationName;
     }

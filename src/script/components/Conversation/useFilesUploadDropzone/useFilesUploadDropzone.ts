@@ -26,6 +26,7 @@ import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {createUuid} from 'Util/uuid';
 
+import {buildCellFileMetadata} from './buildCellFileMetadata/buildCellFileMetadata';
 import {validateFiles, ValidationResult} from './fileValidation/fileValidation';
 import {showFileDropzoneErrorModal} from './showFileDropzoneErrorModal/showFileDropzoneErrorModal';
 
@@ -54,37 +55,11 @@ export const useFilesUploadDropzone = ({
 
   const MAX_SIZE = isTeam ? CONFIG.MAXIMUM_ASSET_FILE_SIZE_TEAM : CONFIG.MAXIMUM_ASSET_FILE_SIZE_PERSONAL;
 
-  const uploadFile = async (file: FileWithPreview) => {
-    // Temporary solution to handle the local development
-    // TODO: remove this once we have a proper way to handle the domain per env
-    const path =
-      process.env.NODE_ENV === 'development'
-        ? `${conversation.id}@${CONFIG.CELLS_WIRE_DOMAIN}`
-        : `${conversation.qualifiedId.id}@${conversation.qualifiedId.domain}`;
-
-    try {
-      const {uuid, versionId} = await cellsRepository.uploadFile({
-        uuid: file.id,
-        file,
-        path,
-      });
-      updateFile({
-        conversationId: conversation.id,
-        fileId: file.id,
-        data: {remoteUuid: uuid, remoteVersionId: versionId, uploadStatus: 'success'},
-      });
-    } catch (error) {
-      logger.error('Uploading file failed', error);
-      updateFile({conversationId: conversation.id, fileId: file.id, data: {uploadStatus: 'error'}});
-      throw error;
-    }
-  };
-
   const {getRootProps, getInputProps, open, isDragAccept} = useDropzone({
     maxSize: MAX_SIZE,
     noClick: true,
     noKeyboard: true,
-    onDrop: checkFileSharingPermission((acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
+    onDrop: checkFileSharingPermission(async (acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
       const newFiles = [...acceptedFiles, ...rejectedFiles.map(file => file.file)];
 
       const validationResult = validateFiles({
@@ -104,21 +79,13 @@ export const useFilesUploadDropzone = ({
         return;
       }
 
-      const acceptedFilesWithPreview = acceptedFiles.map(file => {
-        return Object.assign(file, {
-          id: createUuid(),
-          preview: URL.createObjectURL(file),
-          remoteUuid: '',
-          remoteVersionId: '',
-          uploadStatus: 'uploading' as const,
-        });
-      });
+      const transformedAcceptedFiles = transformAcceptedFiles(acceptedFiles);
 
-      addFiles({conversationId: conversation.id, files: acceptedFilesWithPreview});
+      addFiles({conversationId: conversation.id, files: transformedAcceptedFiles});
 
-      acceptedFilesWithPreview.forEach(file => {
-        void uploadFile(file);
-      });
+      await attatchMetadataToFiles(transformedAcceptedFiles);
+
+      await uploadFiles(transformedAcceptedFiles);
     }),
     onError: (error: Error) => {
       logger.error('Dropping files failed', error);
@@ -129,6 +96,85 @@ export const useFilesUploadDropzone = ({
       });
     },
   });
+
+  const uploadFile = async (file: FileWithPreview) => {
+    // Temporary solution to handle the local development
+    // TODO: remove this once we have a proper way to handle the domain per env
+    const path =
+      process.env.NODE_ENV === 'development'
+        ? `${conversation.id}@${CONFIG.CELLS_WIRE_DOMAIN}`
+        : `${conversation.qualifiedId.id}@${conversation.qualifiedId.domain}`;
+
+    const decimalMultiplier = 100;
+
+    try {
+      const {uuid, versionId} = await cellsRepository.uploadFile({
+        uuid: file.id,
+        file,
+        path,
+        progressCallback: (progress: number) => {
+          updateFile({
+            conversationId: conversation.id,
+            fileId: file.id,
+            data: {uploadProgress: progress * decimalMultiplier},
+          });
+        },
+      });
+
+      updateFile({
+        conversationId: conversation.id,
+        fileId: file.id,
+        data: {remoteUuid: uuid, remoteVersionId: versionId, uploadStatus: 'success'},
+      });
+    } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        return;
+      }
+
+      logger.error('Uploading file failed', error);
+      updateFile({conversationId: conversation.id, fileId: file.id, data: {uploadStatus: 'error'}});
+      throw error;
+    }
+  };
+
+  const uploadFiles = async (files: FileWithPreview[]) => {
+    await Promise.all(
+      files.map(async file => {
+        await uploadFile(file);
+      }),
+    );
+  };
+
+  const attatchMetadataToFiles = async (files: FileWithPreview[]) => {
+    await Promise.all(
+      files.map(async file => {
+        const metadata = await buildCellFileMetadata(file);
+
+        if (!metadata) {
+          return;
+        }
+
+        updateFile({
+          conversationId: conversation.id,
+          fileId: file.id,
+          data: {...metadata},
+        });
+      }),
+    );
+  };
+
+  const transformAcceptedFiles = (files: File[]) => {
+    return files.map(file => {
+      return Object.assign(file, {
+        id: createUuid(),
+        preview: URL.createObjectURL(file),
+        remoteUuid: '',
+        remoteVersionId: '',
+        uploadStatus: 'uploading' as const,
+        uploadProgress: 0,
+      });
+    });
+  };
 
   return {getRootProps, getInputProps, open, isDragAccept};
 };

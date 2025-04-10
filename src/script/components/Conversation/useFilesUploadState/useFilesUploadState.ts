@@ -27,6 +27,20 @@ export interface FileWithPreview extends File {
   remoteUuid: string;
   remoteVersionId: string;
   uploadStatus: FileUploadStatus;
+  uploadProgress: number;
+  image?: {
+    width: number;
+    height: number;
+  };
+  audio?: {
+    durationInMillis?: number;
+    normalizedLoudness?: Uint8Array;
+  };
+  video?: {
+    width: number;
+    height: number;
+    durationInMillis?: number;
+  };
 }
 
 interface FileUploadState {
@@ -44,6 +58,20 @@ interface FileUploadState {
       remoteUuid?: string;
       remoteVersionId?: string;
       uploadStatus?: FileUploadStatus;
+      image?: {
+        width: number;
+        height: number;
+      };
+      audio?: {
+        durationInMillis?: number;
+        normalizedLoudness?: Uint8Array;
+      };
+      video?: {
+        width: number;
+        height: number;
+        durationInMillis?: number;
+      };
+      uploadProgress?: number;
     };
   }) => void;
   clearAll: ({conversationId}: {conversationId: string}) => void;
@@ -78,6 +106,10 @@ export const useFileUploadState = create<FileUploadStore>()((set, get) => ({
               file.remoteUuid = data.remoteUuid || file.remoteUuid;
               file.remoteVersionId = data.remoteVersionId || file.remoteVersionId;
               file.uploadStatus = data.uploadStatus || file.uploadStatus;
+              file.image = data.image || file.image;
+              file.audio = data.audio || file.audio;
+              file.video = data.video || file.video;
+              file.uploadProgress = data.uploadProgress || file.uploadProgress;
             }
             return file;
           }) || [],

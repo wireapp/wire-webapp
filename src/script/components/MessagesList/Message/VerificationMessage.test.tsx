@@ -17,9 +17,10 @@
  *
  */
 
-import {QualifiedUserId} from '@pydio/protocol-messaging';
 import {render} from '@testing-library/react';
 import ko from 'knockout';
+
+import {QualifiedUserId} from '@wireapp/protocol-messaging';
 
 import {VerificationMessage as VerificationMessageEntity} from 'src/script/entity/message/VerificationMessage';
 import {VerificationMessageType} from 'src/script/message/VerificationMessageType';

@@ -17,7 +17,6 @@
  *
  */
 
-import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@pydio/protocol-messaging';
 import {
   Conversation as BackendConversation,
   ConversationProtocol,
@@ -26,6 +25,7 @@ import {
   NewConversation,
   MessageSendingStatus,
   RemoteConversations,
+  ADD_PERMISSION,
 } from '@wireapp/api-client/lib/conversation';
 import {
   MemberLeaveReason,
@@ -45,6 +45,7 @@ import {
   ConversationTypingEvent,
   CONVERSATION_EVENT,
   ConversationProtocolUpdateEvent,
+  ConversationAddPermissionUpdateEvent,
 } from '@wireapp/api-client/lib/event';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import type {BackendError} from '@wireapp/api-client/lib/http/';
@@ -56,6 +57,7 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
 import {flatten} from 'underscore';
 
+import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {TYPING_TIMEOUT, useTypingIndicatorState} from 'Components/InputBar/TypingIndicator';
@@ -915,7 +917,7 @@ export class ConversationRepository {
       const checkCreationMessage = isMemberMessage(firstMessage) && firstMessage?.isCreation();
       if (checkCreationMessage) {
         const groupCreationMessageIn1to1 = conversationEntity.is1to1() && firstMessage?.isGroupCreation();
-        const one2oneConnectionMessageInGroup = conversationEntity.isGroup() && firstMessage?.isConnection();
+        const one2oneConnectionMessageInGroup = conversationEntity.isGroupOrChannel() && firstMessage?.isConnection();
         const wrongMessageTypeForConversation = groupCreationMessageIn1to1 || one2oneConnectionMessageInGroup;
 
         if (wrongMessageTypeForConversation) {
@@ -955,7 +957,7 @@ export class ConversationRepository {
       conversationEntity.withAllTeamMembers(allTeamMembersParticipate);
     }
 
-    const creationEvent = conversationEntity.isGroup()
+    const creationEvent = conversationEntity.isGroupOrChannel()
       ? EventBuilder.buildGroupCreation(conversationEntity, isTemporaryGuest, timestamp)
       : EventBuilder.build1to1Creation(conversationEntity);
 
@@ -1237,7 +1239,7 @@ export class ConversationRepository {
     }
     const {teamId: selfUserTeamId} = selfUser;
     return this.conversationState.conversations().filter(conversation => {
-      return conversation.isGroup() && !!selfUserTeamId && conversation.teamId === selfUserTeamId;
+      return conversation.isGroupOrChannel() && !!selfUserTeamId && conversation.teamId === selfUserTeamId;
     });
   };
 
@@ -1245,7 +1247,7 @@ export class ConversationRepository {
    * Get all the group conversations owned by self user's team from the local state.
    */
   public readonly getAllGroupConversations = (): Conversation[] => {
-    return this.conversationState.conversations().filter(conversation => conversation.isGroup());
+    return this.conversationState.conversations().filter(conversation => conversation.isGroupOrChannel());
   };
 
   /**
@@ -1259,7 +1261,7 @@ export class ConversationRepository {
     return this.conversationState
       .filteredConversations()
       .filter(conversationEntity => {
-        if (!conversationEntity.isGroup()) {
+        if (!conversationEntity.isGroupOrChannel()) {
           return false;
         }
 
@@ -2698,7 +2700,7 @@ export class ConversationRepository {
     conversationEntity: Conversation,
     name: string,
   ): Promise<ConversationRenameEvent | undefined> {
-    const response = await this.conversationService.updateConversationName(conversationEntity.id, name);
+    const response = await this.conversationService.updateConversationName(conversationEntity.qualifiedId, name);
     if (response) {
       this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
       return response;
@@ -2810,6 +2812,14 @@ export class ConversationRepository {
       conversationEntity.qualifiedId,
       receiptMode,
     );
+    if (response) {
+      this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
+    }
+    return response;
+  }
+
+  public async updateAddPermission(conversationId: QualifiedId, addPermission: ADD_PERMISSION) {
+    const response = await this.conversationService.putAddPermission(conversationId, addPermission);
     if (response) {
       this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
     }
@@ -3392,6 +3402,9 @@ export class ConversationRepository {
 
       case CONVERSATION_EVENT.RECEIPT_MODE_UPDATE:
         return this.onReceiptModeChanged(conversationEntity, eventJson);
+
+      case CONVERSATION_EVENT.ADD_PERMISSION_UPDATE:
+        return this.onAddPermissionChanged(conversationEntity, eventJson);
 
       case ClientEvent.CONVERSATION.BUTTON_ACTION_CONFIRMATION:
         return this.onButtonActionConfirmation(conversationEntity, eventJson);
@@ -4145,6 +4158,15 @@ export class ConversationRepository {
     return {conversationEntity, messageEntity};
   }
 
+  private async onAddPermissionChanged(
+    conversationEntity: Conversation,
+    eventJson: ConversationAddPermissionUpdateEvent,
+  ) {
+    return ConversationMapper.updateProperties(conversationEntity, {
+      conversationModerator: eventJson.data.add_permission,
+    });
+  }
+
   private readonly handleMessageExpiration = (messageEntity: ContentMessage) => {
     amplify.publish(WebAppEvents.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, messageEntity);
     const shouldDeleteMessage = !messageEntity.user().isMe || messageEntity.isPing();
@@ -4157,7 +4179,7 @@ export class ConversationRepository {
           return this.messageRepository.deleteMessage(conversationEntity, messageEntity);
         }
 
-        const userIds = conversationEntity.isGroup()
+        const userIds = conversationEntity.isGroupOrChannel()
           ? [this.userState.self().qualifiedId, {domain: messageEntity.fromDomain ?? '', id: messageEntity.from}]
           : undefined;
         return this.messageRepository.deleteMessageForEveryone(conversationEntity, messageEntity, {
@@ -4332,7 +4354,7 @@ export class ConversationRepository {
       return this.propertyRepository.receiptMode() === RECEIPT_MODE.ON;
     }
 
-    if (conversationEntity.teamId && conversationEntity.isGroup()) {
+    if (conversationEntity.teamId && conversationEntity.isGroupOrChannel()) {
       return conversationEntity.receiptMode() === RECEIPT_MODE.ON;
     }
 

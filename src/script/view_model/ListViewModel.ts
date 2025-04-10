@@ -426,7 +426,7 @@ export class ListViewModel {
       });
     }
 
-    if (!conversationEntity.isGroup()) {
+    if (!conversationEntity.isGroupOrChannel()) {
       const userEntity = conversationEntity.firstUserEntity();
       const canBlock = userEntity && (userEntity.isConnected() || userEntity.isRequest());
       const canUnblock = userEntity && userEntity.isBlocked();
@@ -447,13 +447,13 @@ export class ListViewModel {
     if (conversationEntity.isLeavable()) {
       entries.push({
         click: () => this.clickToLeave(conversationEntity),
-        label: t('conversationsPopoverLeave'),
+        label: conversationEntity.isChannel() ? t('channelsPopoverLeave') : t('groupsPopoverLeave'),
       });
     }
 
     if (
       Config.getConfig().FEATURE.ENABLE_REMOVE_GROUP_CONVERSATION &&
-      conversationEntity.isGroup() &&
+      conversationEntity.isGroupOrChannel() &&
       conversationEntity.isSelfUserRemoved()
     ) {
       entries.push({

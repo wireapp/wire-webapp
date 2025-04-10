@@ -17,7 +17,6 @@
  *
  */
 
-import {Availability} from '@pydio/protocol-messaging';
 import {ConversationProtocol, ConversationRolesList} from '@wireapp/api-client/lib/conversation';
 import type {
   TeamConversationDeleteEvent,
@@ -35,11 +34,13 @@ import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
 import {Runtime, TypedEventEmitter} from '@wireapp/commons';
+import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {Config} from 'src/script/Config';
 import {Environment} from 'Util/Environment';
-import {t} from 'Util/LocalizerUtil';
+import {replaceLink, t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {loadDataUrl} from 'Util/util';
@@ -232,13 +233,14 @@ export class TeamRepository extends TypedEventEmitter<Events> {
   };
 
   private showReloadAppModal = () => {
+    const replaceLinkMls = replaceLink(Config.getConfig().URL.SUPPORT.MLS_LEARN_MORE, '', 'learn-more-mls');
     PrimaryModal.show(PrimaryModal.type.CONFIRM, {
       primaryAction: {
         action: () => window.location.reload(),
         text: t('mlsWasEnabledReload'),
       },
       text: {
-        message: t('mlsWasEnabledDescription'),
+        htmlMessage: t('mlsWasEnabledDescription', undefined, replaceLinkMls),
         title: t('mlsWasEnabledTitle'),
       },
     });

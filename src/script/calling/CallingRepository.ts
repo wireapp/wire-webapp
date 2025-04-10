@@ -35,21 +35,23 @@ import 'webrtc-adapter';
 
 import {
   AUDIO_STATE,
+  ENV as AVS_ENV,
+  STATE as CALL_STATE,
   CALL_TYPE,
   CONV_TYPE,
-  ENV as AVS_ENV,
   ERROR,
   getAvsInstance,
   LOG_LEVEL,
   QUALITY,
   REASON,
-  STATE as CALL_STATE,
+  RESOLUTION,
   VIDEO_STATE,
   VSTREAMS,
   Wcall,
   WcallClient,
   WcallMember,
 } from '@wireapp/avs';
+import {AvsDebugger} from '@wireapp/avs-debugger';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -159,6 +161,7 @@ export class CallingRepository {
   private wUser: number = 0;
   private nextMuteState: MuteState = MuteState.SELF_MUTED;
   private isConferenceCallingSupported = false;
+
   static EMOJI_TIME_OUT_DURATION = TIME_IN_MILLIS.SECOND * 4;
 
   /**
@@ -256,6 +259,7 @@ export class CallingRepository {
 
     this.onChooseScreen = (deviceId: string) => {};
 
+    // Request the video streams whenever the mode changes to active speaker
     ko.computed(() => {
       const call = this.callState.joinedCall();
       if (!call) {
@@ -263,7 +267,29 @@ export class CallingRepository {
       }
       const isSpeakersViewActive = this.callState.isSpeakersViewActive();
       if (isSpeakersViewActive) {
-        this.requestVideoStreams(call.conversation.qualifiedId, call.activeSpeakers());
+        const videoQuality = call.activeSpeakers().length > 2 ? RESOLUTION.LOW : RESOLUTION.HIGH;
+
+        const speakers = call.activeSpeakers();
+        speakers.forEach(speaker => {
+          speaker.setTemporarilyVideoScreenOff();
+        });
+
+        this.requestVideoStreams(call.conversation.qualifiedId, speakers, videoQuality);
+      }
+    });
+
+    // Request the video streams whenever toggle display maximised Participant.
+    ko.computed(() => {
+      const call = this.callState.joinedCall();
+      if (!call) {
+        return;
+      }
+      const maximizedParticipant = call.maximizedParticipant();
+      if (maximizedParticipant !== null) {
+        maximizedParticipant.setTemporarilyVideoScreenOff();
+        this.requestVideoStreams(call.conversation.qualifiedId, [maximizedParticipant], RESOLUTION.HIGH);
+      } else {
+        this.requestCurrentPageVideoStreams(call);
       }
     });
   }
@@ -909,7 +935,7 @@ export class CallingRepository {
     const useSFTForOneToOneCalls =
       this.teamState.teamFeatures()?.[FEATURE_KEY.CONFERENCE_CALLING]?.config?.useSFTForOneToOneCalls;
 
-    if (conversation.isGroup() || useSFTForOneToOneCalls) {
+    if (conversation.isGroupOrChannel() || useSFTForOneToOneCalls) {
       if (isMLSConversation(conversation)) {
         return CONV_TYPE.CONFERENCE_MLS;
       }
@@ -1015,6 +1041,12 @@ export class CallingRepository {
     const selfParticipant = call.getSelfParticipant();
     const newState = selfParticipant.sharesCamera() ? VIDEO_STATE.STOPPED : VIDEO_STATE.STARTED;
     const callState = call.state();
+
+    // If screen sharing is active, stop it first
+    if (selfParticipant.sharesScreen()) {
+      this.stopScreenShare(selfParticipant, call.conversation, call);
+    }
+
     if (callState === CALL_STATE.INCOMING) {
       selfParticipant.videoState(newState);
       if (newState === VIDEO_STATE.STOPPED) {
@@ -1039,9 +1071,20 @@ export class CallingRepository {
   }
 
   /**
-   * Toggles screenshare ON and OFF for the given call (does not switch between different screens)
+   * Toggles screenshare ON and OFF for the given call (depending on the feature flag)
    */
   toggleScreenshare = async (call: Call): Promise<void> => {
+    if (Config.getConfig().FEATURE.ENABLE_SCREEN_SHARE_WITH_VIDEO) {
+      await this.toggleScreenShareWithVideo(call);
+    } else {
+      await this.toggleOnlyScreenshare(call);
+    }
+  };
+
+  /**
+   * Toggles screenshare ON and OFF for the given call (does not switch between different screens)
+   */
+  toggleOnlyScreenshare = async (call: Call): Promise<void> => {
     const {conversation} = call;
 
     // The screen share was stopped by the user through the application. We clean up the state and stop the screen share
@@ -1054,6 +1097,9 @@ export class CallingRepository {
 
     try {
       const mediaStream = await this.getMediaStream({audio: true, screen: true}, call.isGroupOrConference);
+      if ('contentHint' in mediaStream.getVideoTracks()[0]) {
+        mediaStream.getVideoTracks()[0].contentHint = 'detail';
+      }
 
       // If the screen share is stopped by the os system or the browser, an "ended" event is triggered. We listen for
       // this event to clean up the screen share state in this case.
@@ -1075,25 +1121,99 @@ export class CallingRepository {
   };
 
   /**
-   * This method ends the screen share regardless of the event that triggered it.
-   * There are two ways to end a screen share: one by clicking the Applications button, and the other by stopping it
-   * through the os system ore browser's sharing option.
+   * Toggles screenshare with video for the given call
    */
+  toggleScreenShareWithVideo = async (call: Call): Promise<void> => {
+    const selfParticipant = call.getSelfParticipant();
+    if (!selfParticipant) {
+      this.logger.warn('No self participant found for screen share');
+      return;
+    }
+
+    if (selfParticipant.sharesScreen()) {
+      this.stopScreenShare(selfParticipant, call.conversation, call);
+      return;
+    }
+
+    let screenStream: MediaStream | null = null;
+    let cameraStream: MediaStream | null = null;
+
+    try {
+      // If we're currently in a video call, release the camera resources first
+      if (selfParticipant.sharesCamera()) {
+        selfParticipant.releaseVideoStream(true);
+      }
+
+      screenStream = await this.getMediaStream({screen: true}, call.isGroupOrConference);
+      if (!screenStream) {
+        throw new Error('Failed to get screen share stream');
+      }
+
+      cameraStream = await this.getMediaStream({camera: true}, call.isGroupOrConference);
+      if (!cameraStream) {
+        throw new Error('Failed to get camera stream');
+      }
+
+      const videoTracks = cameraStream.getVideoTracks();
+      if (!videoTracks.length || videoTracks[0].readyState !== 'live') {
+        throw new Error('Camera stream has no active video tracks');
+      }
+
+      this.logger.info('Camera track details:', {
+        enabled: videoTracks[0].enabled,
+        muted: videoTracks[0].muted,
+        readyState: videoTracks[0].readyState,
+        settings: videoTracks[0].getSettings(),
+        constraints: videoTracks[0].getConstraints(),
+        capabilities: videoTracks[0].getCapabilities(),
+      });
+
+      const mixedStream = await call.canvasMixer.startMixing(screenStream, cameraStream);
+      if (!mixedStream) {
+        throw new Error('Failed to create mixed stream');
+      }
+
+      selfParticipant.videoStream(mixedStream);
+      selfParticipant.videoState(VIDEO_STATE.SCREENSHARE);
+      selfParticipant.startedScreenSharingAt(Date.now());
+
+      this.wCall?.setVideoSendState(
+        this.wUser,
+        this.serializeQualifiedId(call.conversation.qualifiedId),
+        VIDEO_STATE.SCREENSHARE,
+      );
+
+      screenStream.getVideoTracks()[0].onended = () => {
+        this.stopScreenShare(selfParticipant, call.conversation, call);
+      };
+
+      call.analyticsScreenSharing = true;
+    } catch (error) {
+      this.logger.error('Error in toggleScreenShareWithVideo:', error);
+      if (screenStream) {
+        screenStream.getTracks().forEach(track => track.stop());
+      }
+      if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+      }
+    }
+  };
+
   private stopScreenShare(selfParticipant: Participant, conversation: Conversation, call: Call): void {
-    selfParticipant.videoState(VIDEO_STATE.STOPPED);
+    if (!selfParticipant.sharesScreen()) {
+      return;
+    }
+
+    const mixedStream = selfParticipant.videoStream();
+    if (mixedStream) {
+      mixedStream.getTracks().forEach(track => track.stop());
+    }
+
     selfParticipant.releaseVideoStream(true);
+    call.canvasMixer.releaseStreams();
+    selfParticipant.videoState(VIDEO_STATE.STOPPED);
 
-    this.sendCallingEvent(EventName.CALLING.SCREEN_SHARE, call, {
-      [Segmentation.SCREEN_SHARE.DIRECTION]: 'outgoing',
-      [Segmentation.SCREEN_SHARE.DURATION]:
-        Math.ceil((Date.now() - selfParticipant.startedScreenSharingAt()) / 5000) * 5,
-    });
-
-    return this.wCall?.setVideoSendState(
-      this.wUser,
-      this.serializeQualifiedId(conversation.qualifiedId),
-      VIDEO_STATE.STOPPED,
-    );
+    this.wCall?.setVideoSendState(this.wUser, this.serializeQualifiedId(conversation.qualifiedId), VIDEO_STATE.STOPPED);
   }
 
   onPageHide = (event: PageTransitionEvent) => {
@@ -1124,7 +1244,7 @@ export class CallingRepository {
     if (joinedCall && isSharingScreen && isScreenSharingSourceFromDetachedWindow) {
       window.dispatchEvent(new CustomEvent(WebAppEvents.CALL.SCREEN_SHARING_ENDED));
       this.callState.isScreenSharingSourceFromDetachedWindow(false);
-      void this.toggleScreenshare(joinedCall);
+      void this.toggleOnlyScreenshare(joinedCall);
     }
   };
 
@@ -1284,6 +1404,7 @@ export class CallingRepository {
     const conversationIdStr = this.serializeQualifiedId(conversationId);
     this.wCall?.end(this.wUser, conversationIdStr);
     callingSubscriptions.removeCall(conversationId);
+    AvsDebugger.reset();
   };
 
   private readonly leaveMLSConference = async (conversationId: QualifiedId) => {
@@ -1406,24 +1527,47 @@ export class CallingRepository {
     this.wCall?.reject(this.wUser, this.serializeQualifiedId(conversationId));
   }
 
+  /**
+   * This method monitors every change in the call and is therefore the main method for handling video requests.
+   * These changes include mute/unmute, screen sharing, or camera switching, joining or leaving of participants, or...
+   * @param call
+   * @param newPage
+   */
   changeCallPage(call: Call, newPage: number): void {
     call.currentPage(newPage);
-    if (!this.callState.isSpeakersViewActive()) {
+    if (!this.callState.isSpeakersViewActive() && !this.callState.isMaximisedViewActive()) {
       this.requestCurrentPageVideoStreams(call);
     }
   }
 
+  /**
+   * This method queries streams for the participants who are displayed on the active page! This can include up to nine
+   * participants and is used when flipping pages or starting a call.
+   * @param call
+   */
   requestCurrentPageVideoStreams(call: Call): void {
-    const currentPageParticipants = call.pages()[call.currentPage()];
-    this.requestVideoStreams(call.conversation.qualifiedId, currentPageParticipants);
+    const currentPageParticipants = call.pages()[call.currentPage()] ?? [];
+    const videoQuality: RESOLUTION = currentPageParticipants.length <= 2 ? RESOLUTION.HIGH : RESOLUTION.LOW;
+    this.requestVideoStreams(call.conversation.qualifiedId, currentPageParticipants, videoQuality);
   }
 
-  requestVideoStreams(conversationId: QualifiedId, participants: Participant[]) {
+  requestVideoStreams(conversationId: QualifiedId, participants: Participant[], videoQuality: RESOLUTION) {
+    if (participants.length === 0) {
+      return;
+    }
+    // Filter myself out and do not request my own stream.
+    const requestParticipants = participants.filter(p => !this.isSelfUser(p));
+    if (requestParticipants.length === 0) {
+      return;
+    }
+
     const convId = this.serializeQualifiedId(conversationId);
+
     const payload = {
-      clients: participants.map(participant => ({
+      clients: requestParticipants.map(participant => ({
         clientid: participant.clientId,
         userid: this.serializeQualifiedId(participant.user.qualifiedId),
+        quality: videoQuality,
       })),
       convid: convId,
     };
@@ -1465,7 +1609,14 @@ export class CallingRepository {
 
   readonly leaveCall = (conversationId: QualifiedId, reason: LEAVE_CALL_REASON): void => {
     const call = this.findCall(conversationId);
-    call?.endedAt(Date.now());
+    if (call) {
+      call.endedAt(Date.now());
+      // Stop screen sharing if active
+      if (call.getSelfParticipant().sharesScreen()) {
+        this.stopScreenShare(call.getSelfParticipant(), call.conversation, call);
+      }
+    }
+
     if (isTelemetryEnabledAtCurrentEnvironment()) {
       this.showCallQualityFeedbackModal(conversationId);
     }
@@ -1474,6 +1625,7 @@ export class CallingRepository {
     const conversationIdStr = this.serializeQualifiedId(conversationId);
     delete this.poorCallQualityUsers[conversationIdStr];
     this.wCall?.end(this.wUser, conversationIdStr);
+    AvsDebugger.reset();
   };
 
   muteCall(call: Call, shouldMute: boolean, reason?: MuteState): void {
@@ -1498,12 +1650,48 @@ export class CallingRepository {
   };
 
   private getMediaStream({audio = false, camera = false, screen = false}: MediaStreamQuery, isGroup: boolean) {
-    return this.mediaStreamHandler.requestMediaStream(audio, camera, screen, isGroup).then(stream => {
-      return this.mediaDevicesHandler
-        .initializeMediaDevices(camera)
-        .then(() => stream)
-        .catch(() => stream);
-    });
+    return this.mediaStreamHandler
+      .requestMediaStream(audio, camera, screen, isGroup)
+      .then(stream => {
+        if (!stream) {
+          throw new Error('Failed to get media stream');
+        }
+
+        // For camera streams, verify we have video tracks
+        if (camera) {
+          const videoTracks = stream.getVideoTracks();
+          if (!videoTracks.length) {
+            throw new Error('No video tracks found in camera stream');
+          }
+
+          const videoTrack = videoTracks[0];
+          if (videoTrack.readyState !== 'live') {
+            throw new Error(`Camera track not live. State: ${videoTrack.readyState}`);
+          }
+
+          // Log camera track details for debugging
+          this.logger.info('Camera track details:', {
+            enabled: videoTrack.enabled,
+            muted: videoTrack.muted,
+            readyState: videoTrack.readyState,
+            settings: videoTrack.getSettings(),
+            constraints: videoTrack.getConstraints(),
+            capabilities: videoTrack.getCapabilities(),
+          });
+        }
+
+        return this.mediaDevicesHandler
+          .initializeMediaDevices(camera)
+          .then(() => stream)
+          .catch(error => {
+            this.logger.warn('Failed to initialize media devices:', error);
+            return stream;
+          });
+      })
+      .catch(error => {
+        this.logger.error('Failed to get media stream:', error);
+        throw error;
+      });
   }
 
   private handleMediaStreamError(call: Call, requestedStreams: MediaStreamQuery, error: Error | unknown): void {
@@ -2385,6 +2573,8 @@ export class CallingRepository {
     this.callState
       .calls()
       .forEach((call: Call) => this.wCall?.end(this.wUser, this.serializeQualifiedId(call.conversation.qualifiedId)));
+
+    AvsDebugger.reset();
     this.wCall?.destroy(this.wUser);
   }
 
@@ -2435,6 +2625,13 @@ export class CallingRepository {
     PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, modalOptions);
   }
 
+  private isSelfUser(participant: Participant): boolean {
+    if (this.selfUser == null || this.selfClientId == null) {
+      return false;
+    }
+    return participant.doesMatchIds(this.selfUser.qualifiedId, this.selfClientId);
+  }
+
   //##############################################################################
   // Logging
   //##############################################################################
@@ -2445,5 +2642,9 @@ export class CallingRepository {
    */
   public getCallLog(): string[] | undefined {
     return this.callLog.length > this.avsInitLogLength ? this.callLog : undefined;
+  }
+
+  public getMediaStreamHandler() {
+    return this.mediaStreamHandler;
   }
 }

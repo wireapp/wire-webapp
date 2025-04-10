@@ -439,7 +439,7 @@ export const Conversation = ({
         if (conversationEntity.is1to1()) {
           shouldSendReadReceipt = repositories.conversation.expectReadReceipt(conversationEntity);
         } else if (
-          conversationEntity.isGroup() &&
+          conversationEntity.isGroupOrChannel() &&
           (conversationEntity.inTeam() ||
             conversationEntity.isGuestRoom() ||
             conversationEntity.isGuestAndServicesRoom())
@@ -468,7 +468,12 @@ export const Conversation = ({
     [addReadReceiptToBatch, repositories.conversation, repositories.integration, updateConversationLastRead],
   );
 
-  const {getRootProps, getInputProps, open, isDragAccept} = useFilesUploadDropzone({
+  const {
+    getRootProps,
+    getInputProps,
+    open: openCellsUploadWindow,
+    isDragAccept,
+  } = useFilesUploadDropzone({
     isTeam: inTeam,
     cellsRepository: repositories.cells,
     conversation: activeConversation,
@@ -576,7 +581,9 @@ export const Conversation = ({
                   onShiftTab={() => setMsgElementsFocusable(false)}
                   uploadDroppedFiles={uploadDroppedFiles}
                   uploadImages={uploadImages}
-                  uploadFiles={isCellsEnabled ? () => open() : uploadFiles}
+                  uploadFiles={uploadFiles}
+                  onCellImageUpload={openCellsUploadWindow}
+                  onCellAssetUpload={openCellsUploadWindow}
                 />
               ))}
 

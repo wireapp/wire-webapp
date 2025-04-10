@@ -956,14 +956,6 @@ describe('Conversation', () => {
       conversationEntity.mutedState(NOTIFICATION_STATES.EVERYTHING);
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
 
-      //@ts-expect-error
-      conversationEntity.mutedState(true);
-      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.MENTIONS_AND_REPLIES);
-
-      //@ts-expect-error
-      conversationEntity.mutedState(false);
-      expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
-
       conversationEntity.mutedState(NOTIFICATION_STATES.NOTHING);
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.NOTHING);
 

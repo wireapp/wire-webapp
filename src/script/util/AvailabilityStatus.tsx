@@ -18,7 +18,8 @@
  */
 
 import {CSSObject} from '@emotion/serialize';
-import {Availability} from '@pydio/protocol-messaging';
+
+import {Availability} from '@wireapp/protocol-messaging';
 
 import * as Icon from 'Components/Icon';
 import {CSS_SQUARE} from 'Util/CSSMixin';

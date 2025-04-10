@@ -19,8 +19,9 @@
 
 import {useCallback, useMemo} from 'react';
 
-import {IAttachment} from '@pydio/protocol-messaging';
 import {LexicalEditor} from 'lexical';
+
+import {IAttachment} from '@wireapp/protocol-messaging';
 
 import {useFileUploadState} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
 import {MessageContent} from 'Components/InputBar/common/messageContent/messageContent';
@@ -146,6 +147,9 @@ export const useMessageSend = ({
           contentType: file.type,
           initialName: file.name,
           initialSize: file.size,
+          image: file.image,
+          audio: file.audio,
+          video: file.video,
         },
       };
     });

@@ -72,6 +72,14 @@
 @blue-dark-800: #224266;
 @blue-dark-900: #19324d;
 
+@black-50: @w-gray-30;
+@black-100: @w-gray-40;
+@black-500: @w-gray-80;
+
+@black-dark-500: @w-gray-40;
+@black-dark-800: @w-gray-80;
+@black-dark-900: @w-gray-90;
+
 @green-50: #e8f1ea;
 @green-100: #d2e4d6;
 @green-200: #a5c9ad;
@@ -191,21 +199,38 @@
   turquoise: 6;
 }
 
+@colors: amber, blue, green, purple, red, turquoise;
+@colorsWithBlack: amber, blue, green, purple, red, turquoise, black;
+
 @color-index: 50, 100, 200, 300, 400, 500, 600, 700, 800, 900;
 
 body {
   &.theme-default {
-    each(.colors(), .(@color-key, @color-name) {
-      @name: @color-name;
-      @accent-color: '@{color-name}-500';
-      --@{name}-500: @@accent-color;
+    each(@colors, {
+      @accent-color: "@{value}-500";
+      --@{value}-500: @@accent-color;
+    });
+    each(@colorsWithBlack, {
+      @border-color: "@{value}-100";
+      @background-color: "@{value}-50";
+      @color: "@{value}-500";
+      --@{value}-border: @@border-color;
+      --@{value}-background: @@background-color;
+      --@{value}-color: @@color;
     });
   }
   &.theme-dark {
-    each(.colors(), .(@color-key, @color-name) {
-      @name: @color-name;
-      @accent-dark-color:'@{color-name}-dark-500';
-        --@{name}-500: @@accent-dark-color;
+    each(@colors, {
+      @accent-dark-color: "@{value}-dark-500";
+      --@{value}-500: @@accent-dark-color;
+    });
+    each(@colorsWithBlack, {
+      @border-color: "@{value}-dark-900";
+      @background-color: "@{value}-dark-800";
+      @color: "@{value}-dark-500";
+      --@{value}-border: @@border-color;
+      --@{value}-background: @@background-color;
+      --@{value}-color: @@color;
     });
   }
 }
