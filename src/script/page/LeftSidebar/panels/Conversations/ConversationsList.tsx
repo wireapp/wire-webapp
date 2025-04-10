@@ -42,11 +42,10 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isKeyboardEvent} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
-import {isConversationEntity} from 'Util/TypePredicateUtil';
 
 import {ConnectionRequests} from './ConnectionRequests';
-import {conversationsList, headingTitle, noResultsMessage, virtualizationStyles} from './ConversationsList.styles';
-import {conversationSearchFilter, getConversationsWithHeadings} from './helpers';
+import {conversationsList, headingTitle, noResultsMessage} from './ConversationsList.styles';
+import {conversationSearchFilter} from './helpers';
 
 import {CallState} from '../../../../calling/CallState';
 import {ConversationState} from '../../../../conversation/ConversationState';
@@ -135,10 +134,7 @@ export const ConversationsList = ({
   const isFolderView = currentTab === SidebarTabs.FOLDER;
   const filteredConversations =
     (isFolderView && currentFolder?.conversations().filter(conversationSearchFilter(conversationsFilter))) || [];
-
-  const conversationsToDisplay = filteredConversations.length
-    ? filteredConversations
-    : getConversationsWithHeadings(conversations, conversationsFilter);
+  const conversationsToDisplay = filteredConversations.length ? filteredConversations : conversations;
 
   const parentRef = useRef(null);
 
@@ -198,9 +194,7 @@ export const ConversationsList = ({
 
   useEffect(() => {
     if (!conversationsFilter && clickedFilteredConversationId) {
-      const conversationIndex = conversationsToDisplay
-        .filter(conv => isConversationEntity(conv))
-        .findIndex(conv => conv.id === clickedFilteredConversationId);
+      const conversationIndex = conversationsToDisplay.findIndex(conv => conv.id === clickedFilteredConversationId);
       if (conversationIndex !== -1) {
         rowVirtualizer.scrollToIndex(conversationIndex, {align: 'auto'});
       }
@@ -214,6 +208,8 @@ export const ConversationsList = ({
       <h2 className="visually-hidden">{t('conversationViewTooltip')}</h2>
 
       <ConnectionRequests connectionRequests={connectRequests} onConnectionRequestClick={onConnectionRequestClick} />
+
+      {conversationsFilter && !isEmpty && <h3 css={headingTitle}>{t('searchConversationNames')}</h3>}
 
       {conversations.length === 0 && groupParticipantsConversations.length > 0 && (
         <p css={noResultsMessage}>{t('searchConversationsNoResult')}</p>
@@ -238,44 +234,24 @@ export const ConversationsList = ({
           {rowVirtualizer.getVirtualItems().map(virtualItem => {
             const conversation = conversationsToDisplay[virtualItem.index];
 
-            // Have to use some hacky way to display properly heading while filtering conversations, can be improved
-            // in the future
-            const isHeading = 'isHeader' in conversation && 'heading' in conversation;
-
-            if (!isConversationEntity(conversation) && conversationsFilter && !isEmpty && isHeading) {
-              const translationKey = conversation.heading as 'searchConversationNames' | 'searchGroupParticipants';
-              return (
-                <div
-                  key={virtualItem.key}
-                  css={[headingTitle, virtualizationStyles]}
-                  style={{
-                    transform: `translateY(${virtualItem.start}px)`,
-                  }}
-                >
-                  {t(translationKey)}
-                </div>
-              );
-            }
-
-            if (isConversationEntity(conversation)) {
-              return (
-                <div
-                  key={virtualItem.key}
-                  css={virtualizationStyles}
-                  style={{
-                    height: `${virtualItem.size}px`,
-                    transform: `translateY(${virtualItem.start}px)`,
-                  }}
-                >
-                  <ConversationListCell
-                    key={conversation.id}
-                    {...getCommonConversationCellProps(conversation, virtualItem.index)}
-                  />
-                </div>
-              );
-            }
-
-            return null;
+            return (
+              <div
+                key={virtualItem.key}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: `${virtualItem.size}px`,
+                  transform: `translateY(${virtualItem.start}px)`,
+                }}
+              >
+                <ConversationListCell
+                  key={conversation.id}
+                  {...getCommonConversationCellProps(conversation, virtualItem.index)}
+                />
+              </div>
+            );
           })}
         </div>
       </ul>
