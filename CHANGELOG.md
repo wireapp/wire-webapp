@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [46.22.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.21.5...@wireapp/core@46.22.0) (2025-04-10)
+
+### Features
+
+* **mls:** detect a client mismatch and emit an specific event [WPB-16934] ([#7007](https://github.com/wireapp/wire-web-packages/issues/7007)) ([f55aaec](https://github.com/wireapp/wire-web-packages/commit/f55aaec584c08bf57612c13e9e5014ad36af0a15))
+
 ## [46.21.5](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.21.4...@wireapp/core@46.21.5) (2025-04-10)
 
 **Note:** Version bump only for package @wireapp/core
