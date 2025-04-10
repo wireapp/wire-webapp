@@ -35,14 +35,14 @@ interface ConversationFeatureProps {
   conversationType: ConversationType;
 }
 
-const generalFeatures = [
-  t('conversationCommonFeature1'),
-  t('conversationCommonFeature2'),
-  t('conversationCommonFeature3'),
-];
-const channelFeatures = [t('channelConversationFeature1'), t('channelConversationFeature2')];
-
 export const ConversationFeature = ({conversationType}: ConversationFeatureProps) => {
+  const generalFeatures = [
+    t('conversationCommonFeature1'),
+    t('conversationCommonFeature2'),
+    t('conversationCommonFeature3'),
+  ];
+  const channelFeatures = [t('channelConversationFeature1'), t('channelConversationFeature2')];
+
   const features = [...generalFeatures];
 
   if (conversationType === ConversationType.Channel) {
