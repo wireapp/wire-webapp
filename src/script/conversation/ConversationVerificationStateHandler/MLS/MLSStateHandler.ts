@@ -19,7 +19,7 @@
 
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {E2eiConversationState} from '@wireapp/core/lib/messagingProtocols/mls';
+import {E2eiConversationState, MLSServiceEvents} from '@wireapp/core/lib/messagingProtocols/mls';
 import {StringifiedQualifiedId, stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 
 import {
@@ -64,7 +64,7 @@ export class MLSConversationVerificationStateHandler {
     }
 
     // We hook into the newEpoch event of the MLS service to check if the conversation needs to be verified or degraded
-    this.core.service?.mls?.on('newEpoch', this.onEpochChanged);
+    this.core.service?.mls?.on(MLSServiceEvents.NEW_EPOCH, this.onEpochChanged);
     this.core.service.e2eIdentity.on('crlChanged', ({domain}) => this.handleNewRevocationList(domain));
   }
 

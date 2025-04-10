@@ -117,6 +117,10 @@ import {UserService} from '../user/UserService';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
 import {Warnings} from '../view_model/WarningsContainer';
 
+import {MLSServiceEvents} from '@wireapp/core/lib/messagingProtocols/mls';
+import { E2EIHandler } from '../E2EIdentity';
+
+
 pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
 
 export function doRedirect(signOutReason: SIGN_OUT_REASON) {
@@ -430,8 +434,13 @@ export class App {
       }
       this.core.on(CoreEvents.NEW_SESSION, ({userId, clientId}) => {
         const newClient = {class: ClientClassification.UNKNOWN, id: clientId};
-        userRepository.addClientToUser(userId, newClient, true);
+        void userRepository.addClientToUser(userId, newClient, true);
       });
+
+      this.core.service?.mls?.on(
+        MLSServiceEvents.MLS_CLIENT_MISMATCH,
+        async () => await this.showForceLogoutModal(SIGN_OUT_REASON.MLS_CLIENT_MISMATCH),
+      );
 
       await this.initiateSelfUser(selfUser);
       eventLogger.log(AppInitializationStep.UserInitialize);
@@ -443,21 +452,7 @@ export class App {
       try {
         await this.core.initClient(localClient, getClientMLSConfig(teamFeatures));
       } catch (error) {
-        PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-          hideCloseBtn: true,
-          preventClose: true,
-          hideSecondary: true,
-          primaryAction: {
-            action: async () => {
-              await this.logout(SIGN_OUT_REASON.CLIENT_REMOVED, false);
-            },
-            text: t('modalAccountLogoutAction'),
-          },
-          text: {
-            title: t('unknownApplicationErrorTitle'),
-            message: t('modalUnableToReceiveMessages'),
-          },
-        });
+        await this.showForceLogoutModal(SIGN_OUT_REASON.CLIENT_REMOVED);
       }
 
       const e2eiHandler = await configureE2EI(teamFeatures);
@@ -818,13 +813,19 @@ export class App {
         const deletedKeys = CacheRepository.clearLocalStorage(keepConversationInput, keysToKeep);
         this.logger.debug(`Deleted "${deletedKeys.length}" keys from localStorage.`, deletedKeys);
       }
-      const shouldWipeIdentity = clearData || signOutReason === SIGN_OUT_REASON.CLIENT_REMOVED;
 
-      if (shouldWipeIdentity) {
+      const shouldWipeIdentity = clearData || signOutReason === SIGN_OUT_REASON.CLIENT_REMOVED;
+      const shouldWipeCrypto = signOutReason === SIGN_OUT_REASON.MLS_CLIENT_MISMATCH;
+      if (shouldWipeCrypto) {
+        this.logger.error('Client mismatch detected. Wiping crypto data and local client.');
+      }
+
+      if (shouldWipeIdentity || shouldWipeCrypto) {
         localStorage.clear();
       }
 
-      await this.core.logout(shouldWipeIdentity);
+      await this.core.logout({clearAllData: shouldWipeIdentity, clearCryptoData: shouldWipeCrypto});
+
       if (clearData) {
         // Info: This async call cannot be awaited in an "beforeunload" scenario, so we call it without waiting for it in order to delete the CacheStorage in the background.
         CacheRepository.clearCacheStorage();
@@ -940,4 +941,29 @@ export class App {
 
     PrimaryModal.show(modalType, modalOptions);
   };
+
+  // Todo: Move this to a separate hook or service
+  private showForceLogoutModal = async (reason: SIGN_OUT_REASON) => {
+
+    // ToDo: Extract the softlock logic to a separate hook instead of using the E2EIHandler directly
+    // This is a temporary solution until we have a proper softlock implementation
+    const e2eiHandler = E2EIHandler.getInstance();
+    e2eiHandler.emit('deviceStatusUpdated', {status: 'locked'});
+
+    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
+      hideCloseBtn: true,
+      preventClose: true,
+      hideSecondary: true,
+      primaryAction: {
+        action: async () => {
+          await this.logout(reason, false);
+        },
+        text: t('modalAccountLogoutAction'),
+      },
+      text: {
+        title: t('unknownApplicationErrorTitle'),
+        message: t('modalUnableToReceiveMessages'),
+      },
+    });
+  }
 }
