@@ -17,7 +17,13 @@
  *
  */
 
+import {container} from 'tsyringe';
+
+import {UserState} from 'src/script/user/UserState';
+import {t} from 'Util/LocalizerUtil';
+
 import {ChannelSettings} from './ChannelSettings';
+import {groupsNotAllowedSectionCss} from './ConversationDetails.styles';
 import {ConversationNameInput} from './ConversationNameInput';
 
 import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
@@ -26,7 +32,16 @@ import {Preference} from '../Preference';
 
 export const ConversationDetails = () => {
   const {conversationType} = useCreateConversationModal();
-  return (
+  const userState = container.resolve(UserState);
+  const selfUser = userState.self();
+
+  return selfUser?.isExternal() && conversationType === ConversationType.Group ? (
+    <div css={groupsNotAllowedSectionCss}>
+      <p className="heading-h3">{t('createConversationGroupNotAllowedHeader')}</p>
+      <p className="subline">{t('createConversationGroupNotAllowedContent1')}</p>
+      <p className="subline">{t('createConversationGroupNotAllowedContent2')}</p>
+    </div>
+  ) : (
     <>
       <ConversationNameInput />
       {conversationType === ConversationType.Group ? <Preference /> : <ChannelSettings />}

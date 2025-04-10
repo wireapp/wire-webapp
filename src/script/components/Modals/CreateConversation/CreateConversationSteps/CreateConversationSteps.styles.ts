@@ -19,6 +19,16 @@
 
 import {CSSObject} from '@emotion/react';
 
+export const createConversationGroupCreationContainerCss: CSSObject = {
+  alignSelf: 'center',
+  textAlign: 'center',
+  flex: 1,
+};
+
+export const createConversationStepWrapperCss: CSSObject = {
+  height: '456px',
+};
+
 export const createConversationStepRightContainerCss: CSSObject = {
   margin: '1rem 1.5rem',
   flex: 1,
@@ -26,6 +36,10 @@ export const createConversationStepRightContainerCss: CSSObject = {
 
 export const participantsSelectionSearchCss = {
   margin: '20px',
+};
+
+export const participantsSelectionListCss = {
+  height: '374px',
 };
 
 export const customHistorySharingModalCss: CSSObject = {

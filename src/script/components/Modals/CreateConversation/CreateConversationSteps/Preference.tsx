@@ -64,7 +64,9 @@ export const Preference = () => {
         info={t('readReceiptsToggleInfo')}
         isChecked={isReadReceiptsEnabled}
         setIsChecked={setIsReadReceiptsEnabled}
-        isDisabled={false}
+        // Temporarily disabled read receipts toggle for channels
+        // until it is supported by MLS
+        isDisabled={conversationType === ConversationType.Channel}
         name={t('readReceiptsToggleName')}
       />
     </>

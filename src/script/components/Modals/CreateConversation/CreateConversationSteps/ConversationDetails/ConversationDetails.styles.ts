@@ -84,3 +84,8 @@ export const salesModalBodyButtonCss: CSSObject = {
   marginTop: '1rem',
   color: 'var(--white)',
 };
+
+export const groupsNotAllowedSectionCss: CSSObject = {
+  marginTop: '35%',
+  textAlign: 'center',
+};
