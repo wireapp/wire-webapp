@@ -941,7 +941,7 @@ export class App {
   };
 
   // Todo: Move this to a separate hook or service
-  private showForceLogoutModal = async (reason: SIGN_OUT_REASON) => {
+  private showForceLogoutModal = (reason: SIGN_OUT_REASON) => {
     // ToDo: Extract the softlock logic to a separate hook instead of using the E2EIHandler directly
     // This is a temporary solution until we have a proper softlock implementation
     const e2eiHandler = E2EIHandler.getInstance();
