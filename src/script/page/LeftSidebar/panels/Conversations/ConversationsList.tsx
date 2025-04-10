@@ -45,7 +45,7 @@ import {matchQualifiedIds} from 'Util/QualifiedId';
 import {isConversationEntity} from 'Util/TypePredicateUtil';
 
 import {ConnectionRequests} from './ConnectionRequests';
-import {conversationsList, headingTitle, noResultsMessage} from './ConversationsList.styles';
+import {conversationsList, headingTitle, noResultsMessage, virtualizationStyles} from './ConversationsList.styles';
 import {conversationSearchFilter, getConversationsWithHeadings} from './helpers';
 
 import {CallState} from '../../../../calling/CallState';
@@ -237,25 +237,18 @@ export const ConversationsList = ({
         >
           {rowVirtualizer.getVirtualItems().map(virtualItem => {
             const conversation = conversationsToDisplay[virtualItem.index];
+
             // Have to use some hacky way to display properly heading while filtering conversations, can be improved
             // in the future
-            if (
-              !isConversationEntity(conversation) &&
-              conversationsFilter &&
-              !isEmpty &&
-              'isHeader' in conversation &&
-              'heading' in conversation
-            ) {
+            const isHeading = 'isHeader' in conversation && 'heading' in conversation;
+
+            if (!isConversationEntity(conversation) && conversationsFilter && !isEmpty && isHeading) {
               const translationKey = conversation.heading as 'searchConversationNames' | 'searchGroupParticipants';
               return (
                 <div
                   key={virtualItem.key}
-                  css={headingTitle}
+                  css={[headingTitle, virtualizationStyles]}
                   style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
                     transform: `translateY(${virtualItem.start}px)`,
                   }}
                 >
@@ -268,11 +261,8 @@ export const ConversationsList = ({
               return (
                 <div
                   key={virtualItem.key}
+                  css={virtualizationStyles}
                   style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
                     height: `${virtualItem.size}px`,
                     transform: `translateY(${virtualItem.start}px)`,
                   }}

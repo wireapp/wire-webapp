@@ -43,3 +43,10 @@ export const noResultsMessage: CSSObject = {
   letterSpacing: '0.05px',
   textAlign: 'center',
 };
+
+export const virtualizationStyles: CSSObject = {
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  width: '100%',
+};
