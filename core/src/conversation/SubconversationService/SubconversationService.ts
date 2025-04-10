@@ -26,7 +26,7 @@ import {LogFactory, TypedEventEmitter} from '@wireapp/commons';
 
 import {generateSubconversationStoreKey} from './subconversationUtil';
 
-import {MLSService} from '../../messagingProtocols/mls';
+import {MLSService, MLSServiceEvents} from '../../messagingProtocols/mls';
 import {CoreDatabase} from '../../storage/CoreDB';
 import {constructFullyQualifiedClientId} from '../../util/fullyQualifiedClientIdUtils';
 
@@ -255,11 +255,11 @@ export class SubconversationService extends TypedEventEmitter<Events> {
       });
     };
 
-    this.mlsService.on('newEpoch', forwardNewEpoch);
+    this.mlsService.on(MLSServiceEvents.NEW_EPOCH, forwardNewEpoch);
 
     await forwardNewEpoch({groupId: subconversationGroupId, epoch: initialEpoch});
 
-    return () => this.mlsService.off('newEpoch', forwardNewEpoch);
+    return () => this.mlsService.off(MLSServiceEvents.NEW_EPOCH, forwardNewEpoch);
   }
 
   public async removeClientFromConferenceSubconversation(

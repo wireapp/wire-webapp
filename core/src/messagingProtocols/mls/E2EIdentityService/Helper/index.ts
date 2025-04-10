@@ -64,4 +64,26 @@ export const isMLSDevice = ({mls_public_keys}: RegisteredClient, ciphersuite: Ci
   return typeof signature === 'string' && signature.length > 0;
 };
 
+export enum MLSDeviceStatus {
+  REGISTERED = 'registered',
+  FRESH = 'fresh',
+  MISMATCH = 'mismatch',
+}
+export const getMLSDeviceStatus = (
+  {mls_public_keys}: RegisteredClient,
+  ciphersuite: Ciphersuite,
+  existingClientSignature: string,
+): MLSDeviceStatus => {
+  const signatureAlogrithm = getSignatureAlgorithmForCiphersuite(ciphersuite);
+  const signature = mls_public_keys[signatureAlogrithm];
+
+  if (!signature || !existingClientSignature) {
+    return MLSDeviceStatus.FRESH;
+  }
+  if (signature !== existingClientSignature) {
+    return MLSDeviceStatus.MISMATCH;
+  }
+  return MLSDeviceStatus.REGISTERED;
+};
+
 export const isResponseStatusValid = (status: string | undefined) => status && status === 'valid';
