@@ -17,23 +17,26 @@
  *
  */
 
-import {ICellAsset} from '@wireapp/protocol-messaging';
+import {t} from 'Util/LocalizerUtil';
 
-import {GridImageAsset} from './GridImageAsset/GridImageAsset';
-import {LargeImageAsset} from './LargeImageAsset/LargeImageAsset';
+import {imageStyles} from './GridImageAsset.styles';
 
-interface ImageAssetCardProps {
+import {MediaFilePreviewCard} from '../../common/MediaFilePreviewCard/MediaFilePreviewCard';
+
+interface GridImageAssetProps {
   src?: string;
-  metadata: ICellAsset['image'];
-  size: 'small' | 'large';
   isLoading: boolean;
   isError: boolean;
 }
 
-export const ImageAssetCard = ({src, metadata, size, isLoading, isError}: ImageAssetCardProps) => {
-  if (size === 'large') {
-    return <LargeImageAsset src={src} metadata={metadata} isError={isError} />;
-  }
-
-  return <GridImageAsset src={src} isLoading={isLoading} isError={isError} />;
+export const GridImageAsset = ({src, isLoading, isError}: GridImageAssetProps) => {
+  return (
+    <MediaFilePreviewCard
+      label={src ? t('conversationFileImagePreviewLabel', {src}) : ''}
+      isLoading={isLoading}
+      isError={isError}
+    >
+      {!isLoading && !isError && src && <img src={src} alt="" css={imageStyles} />}
+    </MediaFilePreviewCard>
+  );
 };
