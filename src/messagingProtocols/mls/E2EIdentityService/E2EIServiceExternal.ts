@@ -34,7 +34,7 @@ import {parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUt
 import {LowPrecisionTaskScheduler} from '../../../util/LowPrecisionTaskScheduler';
 import {StringifiedQualifiedId, stringifyQualifiedId} from '../../../util/qualifiedIdUtil';
 import {RecurringTaskScheduler} from '../../../util/RecurringTaskScheduler';
-import {MLSService} from '../MLSService';
+import {MLSService, MLSServiceEvents} from '../MLSService';
 
 export type DeviceIdentity = Omit<WireIdentity, 'free' | 'status'> & {
   status?: DeviceStatus;
@@ -205,7 +205,7 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
   public async initialize(discoveryUrl: string): Promise<void> {
     this._acmeService = new AcmeService(discoveryUrl);
 
-    this.mlsService.on('newCrlDistributionPoints', distributionPoints =>
+    this.mlsService.on(MLSServiceEvents.NEW_CRL_DISTRIBUTION_POINTS, distributionPoints =>
       this.handleNewCrlDistributionPoints(distributionPoints),
     );
 

@@ -21,7 +21,7 @@ import {ConversationMLSWelcomeEvent} from '@wireapp/api-client/lib/event';
 import {Decoder, Encoder} from 'bazinga64';
 
 import {HandledEventPayload} from '../../../../../notification';
-import {MLSService} from '../../../MLSService';
+import {MLSService, MLSServiceEvents} from '../../../MLSService';
 
 interface HandleWelcomeMessageParams {
   event: ConversationMLSWelcomeEvent;
@@ -43,7 +43,7 @@ export const handleMLSWelcomeMessage = async ({
   await mlsService.scheduleKeyMaterialRenewal(groupIdStr);
 
   const newEpoch = await mlsService.getEpoch(groupIdStr);
-  mlsService.emit('newEpoch', {groupId: groupIdStr, epoch: newEpoch});
+  mlsService.emit(MLSServiceEvents.NEW_EPOCH, {groupId: groupIdStr, epoch: newEpoch});
 
   return {
     event: {...event, data: groupIdStr},

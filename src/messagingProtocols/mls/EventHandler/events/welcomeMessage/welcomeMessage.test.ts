@@ -21,7 +21,7 @@ import {ConversationMLSWelcomeEvent, CONVERSATION_EVENT} from '@wireapp/api-clie
 
 import {handleMLSWelcomeMessage} from './welcomeMessage';
 
-import {MLSService} from '../../..';
+import {MLSService, MLSServiceEvents} from '../../..';
 import {NotificationSource} from '../../../../../notification';
 
 jest.mock('bazinga64', () => ({
@@ -71,7 +71,10 @@ describe('MLS welcomeMessage eventHandler', () => {
 
       await handleMLSWelcomeMessage(mockParams);
 
-      expect(mockParams.mlsService.emit).toHaveBeenCalledWith('newEpoch', {groupId: 'conversationId', epoch: 1});
+      expect(mockParams.mlsService.emit).toHaveBeenCalledWith(MLSServiceEvents.NEW_EPOCH, {
+        groupId: 'conversationId',
+        epoch: 1,
+      });
     });
   });
 });

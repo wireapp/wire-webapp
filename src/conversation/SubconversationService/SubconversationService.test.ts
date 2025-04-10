@@ -25,7 +25,7 @@ import {APIClient} from '@wireapp/api-client';
 
 import {SubconversationService} from './SubconversationService';
 
-import {MLSService} from '../../messagingProtocols/mls';
+import {MLSService, MLSServiceEvents} from '../../messagingProtocols/mls';
 import {openDB} from '../../storage/CoreDB';
 import {constructFullyQualifiedClientId} from '../../util/fullyQualifiedClientIdUtils';
 
@@ -491,7 +491,7 @@ describe('SubconversationService', () => {
       );
 
       expect(mlsService.getEpoch).toHaveBeenCalledWith(subconversationGroupId);
-      expect(mlsService.on).toHaveBeenCalledWith('newEpoch', expect.any(Function));
+      expect(mlsService.on).toHaveBeenCalledWith(MLSServiceEvents.NEW_EPOCH, expect.any(Function));
       expect(subconversationService.getSubconversationEpochInfo).toHaveBeenCalledWith(
         parentConversationId,
         parentConversationGroupId,
@@ -499,7 +499,7 @@ describe('SubconversationService', () => {
       expect(onEpochUpdateCallback).toHaveBeenCalledWith(mockedEpochInfo);
 
       unsubscribe();
-      expect(mlsService.off).toHaveBeenCalledWith('newEpoch', expect.any(Function));
+      expect(mlsService.off).toHaveBeenCalledWith(MLSServiceEvents.NEW_EPOCH, expect.any(Function));
     });
   });
 
