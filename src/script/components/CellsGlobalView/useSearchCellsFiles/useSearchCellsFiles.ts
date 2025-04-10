@@ -17,20 +17,20 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 
 import {useDebouncedCallback} from 'use-debounce';
 
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 
-import {useCellsStore} from '../common/useCellsStore/useCellsStore';
+import {useCellsStore, Status} from '../common/useCellsStore/useCellsStore';
 import {transformNodesToCellsFiles, transformToCellPagination} from '../useGetAllCellsFiles/transformNodesToCellsFiles';
 
 interface UseSearchCellsFilesProps {
   cellsRepository: CellsRepository;
 }
 
-const PAGE_INITIAL_SIZE = 50;
+const PAGE_INITIAL_SIZE = 30;
 const PAGE_SIZE_INCREMENT = 20;
 const DEBOUNCE_TIME = 300;
 
@@ -40,48 +40,60 @@ export const useSearchCellsFiles = ({cellsRepository}: UseSearchCellsFilesProps)
   const [searchValue, setSearchValue] = useState('');
   const [pageSize, setPageSize] = useState<number>(PAGE_INITIAL_SIZE);
 
-  const searchFiles = useDebouncedCallback(async (query: string) => {
-    try {
-      setStatus('loading');
-      const result = await cellsRepository.searchFiles({query, limit: pageSize});
-      setFiles(transformNodesToCellsFiles(result.Nodes || []));
-      if (result.Pagination) {
-        setPagination(transformToCellPagination(result.Pagination));
-      } else {
+  const searchNow = useCallback(
+    async (query: string, status: Status, limit = pageSize) => {
+      try {
+        setStatus(status);
+        const result = await cellsRepository.searchFiles({query, limit});
+        setFiles(transformNodesToCellsFiles(result.Nodes || []));
+        if (result.Pagination) {
+          setPagination(transformToCellPagination(result.Pagination));
+        } else {
+          setPagination(null);
+        }
+        setStatus('success');
+      } catch (error) {
+        setStatus('error');
+        setFiles([]);
         setPagination(null);
       }
-      setStatus('success');
-    } catch (error) {
-      setStatus('error');
-      setFiles([]);
-      setPagination(null);
-    }
-  }, DEBOUNCE_TIME);
+    },
+    [pageSize],
+  );
+
+  const searchFiles = useDebouncedCallback(searchNow, DEBOUNCE_TIME);
 
   useEffect(() => {
     const value = searchValue || '*';
-    searchFiles(value);
-  }, [pageSize, searchValue]);
+    searchFiles(value, 'loading');
+  }, [searchValue]);
 
   const handleSearch = (value: string) => {
-    setSearchValue(value);
     setPageSize(PAGE_INITIAL_SIZE);
+    setSearchValue(value);
   };
 
   const handleClearSearch = () => {
-    setSearchValue('');
     setPageSize(PAGE_INITIAL_SIZE);
+    setSearchValue('');
   };
 
   const handleReload = async () => {
+    setStatus('loading');
     clearAll();
-    await searchFiles(searchValue || '*');
+    await searchNow(searchValue || '*', 'loading');
   };
+
+  const increasePageSize = useCallback(async () => {
+    setStatus('load-more');
+    setPageSize(pageSize + PAGE_SIZE_INCREMENT);
+    await searchNow(searchValue || '*', 'load-more', pageSize + PAGE_SIZE_INCREMENT);
+  }, [pageSize, searchValue]);
 
   return {
     searchValue,
     pageSize,
-    pageIncrement: PAGE_SIZE_INCREMENT,
+    increasePageSize,
     setPageSize,
     handleSearch,
     handleReload,

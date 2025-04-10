@@ -42,13 +42,12 @@ interface CellsGlobalViewProps {
 export const CellsGlobalView = ({cellsRepository = container.resolve(CellsRepository)}: CellsGlobalViewProps) => {
   const {files, status: filesStatus, removeFile, pagination} = useCellsStore();
 
-  const {searchValue, handleSearch, handleClearSearch, handleReload, pageSize, setPageSize, pageIncrement} =
-    useSearchCellsFiles({
-      cellsRepository,
-    });
+  const {searchValue, handleSearch, handleClearSearch, handleReload, increasePageSize} = useSearchCellsFiles({
+    cellsRepository,
+  });
 
   useEffect(() => {
-    void handleSearch('');
+    void handleReload();
   }, []);
 
   const deleteFileFailedNotification = useAppNotification({
@@ -75,6 +74,7 @@ export const CellsGlobalView = ({cellsRepository = container.resolve(CellsReposi
   }, [handleReload]);
 
   const isLoading = filesStatus === 'loading';
+  const isLoadingMore = filesStatus === 'load-more';
   const isError = filesStatus === 'error';
   const isSuccess = filesStatus === 'success';
   const hasFiles = !!files.length;
@@ -95,16 +95,16 @@ export const CellsGlobalView = ({cellsRepository = container.resolve(CellsReposi
           description={t('cellsGlobalView.emptySearchResultsDescription')}
         />
       )}
-      {(isSuccess || (pagination && isLoading)) && !emptySearchResults && (
+      {(isSuccess || (pagination && isLoadingMore)) && !emptySearchResults && (
         <CellsTable files={files} cellsRepository={cellsRepository} onDeleteFile={handleDeleteFile} />
       )}
-      {!isLoading && !isError && !hasFiles && !emptySearchResults && (
+      {!isLoading && !isLoadingMore && !isError && !hasFiles && !emptySearchResults && (
         <CellsStateInfo
           heading={t('cellsGlobalView.noFilesHeading')}
           description={t('cellsGlobalView.noFilesDescription')}
         />
       )}
-      {isLoading && <CellsLoader />}
+      {isLoadingMore && files && files.length > 0 && <CellsLoader />}
       {isError && (
         <CellsStateInfo
           heading={t('cellsGlobalView.errorHeading')}
@@ -112,6 +112,7 @@ export const CellsGlobalView = ({cellsRepository = container.resolve(CellsReposi
         />
       )}
       {!isLoading &&
+        !isLoadingMore &&
         !emptySearchResults &&
         isSuccess &&
         pagination &&
@@ -119,7 +120,7 @@ export const CellsGlobalView = ({cellsRepository = container.resolve(CellsReposi
           <div css={loadMoreWrapperStyles}>
             <Button
               variant={ButtonVariant.TERTIARY}
-              onClick={() => setPageSize(pageSize + pageIncrement)}
+              onClick={() => increasePageSize()}
               aria-label={t('cellsGlobalView.pagination.loadMoreResults')}
             >
               {t('cellsGlobalView.pagination.loadMoreResults')}

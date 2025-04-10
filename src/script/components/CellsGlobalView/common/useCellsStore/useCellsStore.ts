@@ -22,7 +22,7 @@ import {create} from 'zustand';
 import {CellFile} from '../cellFile/cellFile';
 import {CellPagination} from '../cellPagination/cellPagination';
 
-export type Status = 'idle' | 'loading' | 'success' | 'error';
+export type Status = 'idle' | 'loading' | 'load-more' | 'success' | 'error';
 
 interface CellsState {
   files: CellFile[];
@@ -55,5 +55,5 @@ export const useCellsStore = create<CellsState>(set => ({
     set(state => ({
       files: state.files.filter(file => file.id !== fileId),
     })),
-  clearAll: () => set({files: [], status: 'idle', error: null}),
+  clearAll: () => set({files: [], error: null}),
 }));
