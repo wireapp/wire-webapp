@@ -163,9 +163,9 @@ declare module 'I18n/en-US.json' {
     'accessibility.searchInput.cancel': `Delete entry`;
     'accessibility.userProfileDeleteEntry': `Delete entry`;
     'accountAlreadyExistsModal.changeEmailLink': `Change your email address`;
-    'accountAlreadyExistsModal.content': `This email\'s domain belongs to a Wire Enterprise Instance, but the email address is associated with a Wire Cloud account. To proceed with the Enterprise instance login, please update your email address to another domain, or delete your account. If the account is part of a team, please reach out to the Team Administrator.`;
+    'accountAlreadyExistsModal.content': `This email\'s domain belongs to an on-premises backend. Please change your email in the account settings or delete your account. If you are part of a team please contact your team admin.`;
     'accountAlreadyExistsModal.deletePersonalAccount': `Delete personal account`;
-    'accountAlreadyExistsModal.header': `Email already in use`;
+    'accountAlreadyExistsModal.header': `Email claimed by an on-premises backend`;
     'accountAlreadyExistsModal.removeTeamMember': `remove team member`;
     'accountForm.emailPersonalPlaceholder': `you@email.com`;
     'accountForm.emailTeamPlaceholder': `you@yourcompany.com`;
@@ -771,6 +771,9 @@ declare module 'I18n/en-US.json' {
     'createConversationConfirmTypeChangeModalContinue': `Continue`;
     'createConversationConfirmTypeChangeModalHeader': `Conversation history`;
     'createConversationConfirmTypeChangeModalText': `If you create a group, the previous conversation history setting selection will be discarded.`;
+    'createConversationGroupNotAllowedContent1': `Group creation is not allowed for externals.`;
+    'createConversationGroupNotAllowedContent2': `Please reach out to your team admin.`;
+    'createConversationGroupNotAllowedHeader': `You can’t create groups`;
     'createConversationManagerOptionAdmins': `Admins`;
     'createConversationManagerOptionAdminsAndMembers': `Admins and members`;
     'createConversationManagerText': `Select who can add participants to this private channel:`;
@@ -785,9 +788,6 @@ declare module 'I18n/en-US.json' {
     'createConversationUpgradePlanModalButton': `Upgrade now`;
     'createConversationUpgradePlanModalHeader': `Show older messages? `;
     'createConversationUpgradePlanModalText': `Upgrade to a paid plan to offer channel members the whole history.`;
-    'createConversationGroupNotAllowedHeader': `You can’t create groups`;
-    'createConversationGroupNotAllowedContent1': `Group creation is not allowed for externals.`;
-    'createConversationGroupNotAllowedContent2': `Please reach out to your team admin.`;
     'createPersonalAccount.goBack': `Go back`;
     'createPersonalAccount.headLine': `New account`;
     'createPersonalAccount.nextButton': `Register`;
