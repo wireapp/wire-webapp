@@ -38,11 +38,6 @@ interface GetTabConversationsProps {
   isChannelsEnabled: boolean;
 }
 
-type GetTabConversations = {
-  conversations: Conversation[];
-  searchInputPlaceholder: string;
-};
-
 export function getTabConversations({
   currentTab,
   conversations,
@@ -54,7 +49,7 @@ export function getTabConversations({
   channelConversations,
   isChannelsEnabled,
   channelAndGroupConversations,
-}: GetTabConversationsProps): GetTabConversations {
+}: GetTabConversationsProps) {
   const conversationSearchFilter = (conversation: Conversation) => {
     const filterWord = replaceAccents(conversationsFilter.toLowerCase());
     const conversationDisplayName = replaceAccents(conversation.display_name().toLowerCase());
@@ -65,18 +60,8 @@ export function getTabConversations({
   const conversationArchivedFilter = (conversation: Conversation) => !archivedConversations.includes(conversation);
 
   if ([SidebarTabs.FOLDER, SidebarTabs.RECENT].includes(currentTab)) {
-    const filterWord = replaceAccents(conversationsFilter.toLowerCase());
-    const filteredGroupConversations = groupConversations.filter(group => {
-      return group.participating_user_ets().some(user => {
-        const conversationDisplayName = replaceAccents(user.name().toLowerCase());
-        return conversationDisplayName.includes(filterWord);
-      });
-    });
-
-    const filteredConversations = conversations.filter(conversationSearchFilter);
-
     return {
-      conversations: [...filteredConversations, ...filteredGroupConversations],
+      conversations: conversations.filter(conversationSearchFilter),
       searchInputPlaceholder: t('searchConversations'),
     };
   }
@@ -149,26 +134,4 @@ export const scrollToConversation = (conversationId: string) => {
   if (!isVisible) {
     element.scrollIntoView({behavior: 'instant', block: 'center', inline: 'nearest'});
   }
-};
-
-export const getConversationsWithHeadings = (currentConversations: Conversation[], conversationsFilter: string) => {
-  const newConversationsWithHeadings = [];
-
-  let peopleHeadingAdded = !conversationsFilter;
-  let conversationsHeadingAdded = !conversationsFilter;
-
-  for (const conversation of currentConversations) {
-    if (!conversation.isGroup() && !peopleHeadingAdded) {
-      newConversationsWithHeadings.push({isHeader: true, heading: 'searchConversationNames'});
-      peopleHeadingAdded = true;
-    }
-    if (conversation.isGroup() && !conversationsHeadingAdded) {
-      newConversationsWithHeadings.push({isHeader: true, heading: 'searchGroupParticipants'});
-      conversationsHeadingAdded = true;
-    }
-
-    newConversationsWithHeadings.push(conversation);
-  }
-
-  return newConversationsWithHeadings;
 };

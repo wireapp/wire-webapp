@@ -25,7 +25,7 @@ export const headingTitle: CSSObject = {
   fontWeight: 'var(--font-weight-semibold)',
   paddingBottom: '4px',
   paddingLeft: '16px',
-  marginTop: '24px',
+  marginTop: '16px',
   marginBottom: '0',
   borderBottom: '1px solid var(--border-color)',
   textTransform: 'uppercase',
@@ -42,11 +42,4 @@ export const noResultsMessage: CSSObject = {
   lineHeight: 'var(--line-height-md)',
   letterSpacing: '0.05px',
   textAlign: 'center',
-};
-
-export const virtualizationStyles: CSSObject = {
-  position: 'absolute',
-  top: 0,
-  left: 0,
-  width: '100%',
 };
