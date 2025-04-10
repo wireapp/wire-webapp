@@ -31,13 +31,13 @@ export enum DomainRedirect {
 export type DomainRedirectPayload =
   | {
       domain_redirect: DomainRedirect.NONE;
-      due_to_existing_account: boolean;
     }
   | {
       domain_redirect: DomainRedirect.LOCKED;
     }
   | {
       domain_redirect: DomainRedirect.NO_REGISTRATION;
+      due_to_existing_account?: boolean;
     }
   | {
       domain_redirect: DomainRedirect.PRE_AUTHORIZED;
