@@ -45,7 +45,8 @@ export const useEnterpriseLoginV2 = ({
           state: {
             email,
             accountCreationEnabled: response.domain_redirect !== DomainRedirect.NO_REGISTRATION,
-            shouldDisplayWarning: response.domain_redirect === DomainRedirect.NONE && response.due_to_existing_account,
+            shouldDisplayWarning:
+              response.domain_redirect === DomainRedirect.NO_REGISTRATION && response.due_to_existing_account,
           },
         });
 
