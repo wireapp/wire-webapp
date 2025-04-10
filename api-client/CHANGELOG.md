@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [27.40.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.40.0...@wireapp/api-client@27.40.1) (2025-04-10)
+
+### Bug Fixes
+
+* update DomainRedirectPayload, sync with BE [WPB-14366] ([#7011](https://github.com/wireapp/wire-web-packages/issues/7011)) ([8519f6d](https://github.com/wireapp/wire-web-packages/commit/8519f6df99a0dbdc665e23116a3877b923f9a45d))
+
 # [27.40.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.39.2...@wireapp/api-client@27.40.0) (2025-04-10)
 
 ### Features
