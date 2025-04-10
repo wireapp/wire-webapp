@@ -19,12 +19,13 @@
 
 // Polyfill for "tsyringe" dependency injection
 // eslint-disable-next-line import/order
-import 'core-js/full/reflect';
 
 import {Context} from '@wireapp/api-client/lib/auth';
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
 import {EVENTS as CoreEvents} from '@wireapp/core/lib/Account';
+import {MLSServiceEvents} from '@wireapp/core/lib/messagingProtocols/mls';
 import {amplify} from 'amplify';
+import 'core-js/full/reflect';
 import platform from 'platform';
 import {pdfjs} from 'react-pdf';
 import {container} from 'tsyringe';
@@ -65,12 +66,13 @@ import {OnConversationE2EIVerificationStateChange} from '../conversation/Convers
 import {EventBuilder} from '../conversation/EventBuilder';
 import {MessageRepository} from '../conversation/MessageRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
+import {E2EIHandler} from '../E2EIdentity';
 import {getModalOptions, ModalType} from '../E2EIdentity/Modals';
 import {User} from '../entity/User';
 import {AccessTokenError} from '../error/AccessTokenError';
 import {AuthError} from '../error/AuthError';
 import {BaseError} from '../error/BaseError';
-import {ClientError, CLIENT_ERROR_TYPE} from '../error/ClientError';
+import {CLIENT_ERROR_TYPE, ClientError} from '../error/ClientError';
 import {TeamError} from '../error/TeamError';
 import {EventRepository} from '../event/EventRepository';
 import {EventService} from '../event/EventService';
@@ -89,7 +91,7 @@ import {IntegrationService} from '../integration/IntegrationService';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {scheduleApiVersionUpdate, updateApiVersion} from '../lifecycle/updateRemoteConfigs';
 import {MediaRepository} from '../media/MediaRepository';
-import {initMLSGroupConversations, initialiseSelfAndTeamConversations} from '../mls';
+import {initialiseSelfAndTeamConversations, initMLSGroupConversations} from '../mls';
 import {joinConversationsAfterMigrationFinalisation} from '../mls/MLSMigration/migrationFinaliser';
 import {NotificationRepository} from '../notification/NotificationRepository';
 import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
@@ -116,10 +118,6 @@ import {UserRepository} from '../user/UserRepository';
 import {UserService} from '../user/UserService';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
 import {Warnings} from '../view_model/WarningsContainer';
-
-import {MLSServiceEvents} from '@wireapp/core/lib/messagingProtocols/mls';
-import { E2EIHandler } from '../E2EIdentity';
-
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
 
@@ -944,7 +942,6 @@ export class App {
 
   // Todo: Move this to a separate hook or service
   private showForceLogoutModal = async (reason: SIGN_OUT_REASON) => {
-
     // ToDo: Extract the softlock logic to a separate hook instead of using the E2EIHandler directly
     // This is a temporary solution until we have a proper softlock implementation
     const e2eiHandler = E2EIHandler.getInstance();
@@ -965,5 +962,5 @@ export class App {
         message: t('modalUnableToReceiveMessages'),
       },
     });
-  }
+  };
 }
