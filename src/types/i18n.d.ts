@@ -771,6 +771,9 @@ declare module 'I18n/en-US.json' {
     'createConversationConfirmTypeChangeModalContinue': `Continue`;
     'createConversationConfirmTypeChangeModalHeader': `Conversation history`;
     'createConversationConfirmTypeChangeModalText': `If you create a group, the previous conversation history setting selection will be discarded.`;
+    'createConversationGroupNotAllowedContent1': `Group creation is not allowed for externals.`;
+    'createConversationGroupNotAllowedContent2': `Please reach out to your team admin.`;
+    'createConversationGroupNotAllowedHeader': `You can’t create groups`;
     'createConversationManagerOptionAdmins': `Admins`;
     'createConversationManagerOptionAdminsAndMembers': `Admins and members`;
     'createConversationManagerText': `Select who can add participants to this private channel:`;
@@ -785,9 +788,6 @@ declare module 'I18n/en-US.json' {
     'createConversationUpgradePlanModalButton': `Upgrade now`;
     'createConversationUpgradePlanModalHeader': `Show older messages? `;
     'createConversationUpgradePlanModalText': `Upgrade to a paid plan to offer channel members the whole history.`;
-    'createConversationGroupNotAllowedHeader': `You can’t create groups`;
-    'createConversationGroupNotAllowedContent1': `Group creation is not allowed for externals.`;
-    'createConversationGroupNotAllowedContent2': `Please reach out to your team admin.`;
     'createPersonalAccount.goBack': `Go back`;
     'createPersonalAccount.headLine': `New account`;
     'createPersonalAccount.nextButton': `Register`;
@@ -1547,10 +1547,11 @@ declare module 'I18n/en-US.json' {
     'redirectBlacklistURL': `Blacklist URL:`;
     'redirectCancel': `Cancel`;
     'redirectConnect': `Connect`;
-    'redirectHeader': `Connect to your custom backend?`;
+    'redirectHeader': `Connect to your organization\'s backend?`;
     'redirectHideDetails': `Hide details`;
     'redirectShowDetails': `Show details`;
-    'redirectSubHeader': `If you continue, we will redirect you to your team’s customized backend {backendName} to log in.`;
+    'redirectParagraph1': `Your email address is associated with another backend. If you continue, you\'ll leave the official Wire server and we\'ll redirect you to {url}.`;
+    'redirectParagraph2': `This Wire backend is administered by your IT team. If you have any questions, reach out to them or to your team admin.`;
     'redirectTeamsURL': `Teams URL:`;
     'redirectWebsiteURL': `Website URL:`;
     'replyAudioMessage': `Audio Message`;

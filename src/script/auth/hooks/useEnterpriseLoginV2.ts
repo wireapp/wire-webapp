@@ -23,7 +23,7 @@ import {container} from 'tsyringe';
 
 import {APIClient} from '../../service/APIClientSingleton';
 import {ROUTE} from '../route';
-import {getValidatedBackendConfig} from '../util/configUtil';
+import {getRedirectURL} from '../util/configUtil';
 
 export const useEnterpriseLoginV2 = ({
   loginWithSSO,
@@ -58,12 +58,12 @@ export const useEnterpriseLoginV2 = ({
       }
 
       case DomainRedirect.BACKEND: {
-        const config = await getValidatedBackendConfig(response.backend_url);
+        const url = await getRedirectURL(response.backend_url);
 
         navigate(ROUTE.CUSTOM_BACKEND, {
           state: {
             email,
-            config,
+            url,
           },
         });
         break;
