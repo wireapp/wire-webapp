@@ -44,7 +44,7 @@ export const useCellsPagination = ({pagination, conversationId, setOffset, onPag
     [pageSize, setOffset, onPageChange],
   );
 
-  const handlePageSize = useCallback(
+  const handleSetPageSize = useCallback(
     (page: number) => {
       clearAll({conversationId});
       setOffset(0);
@@ -68,7 +68,7 @@ export const useCellsPagination = ({pagination, conversationId, setOffset, onPag
         firstRow: (currentPage - 1) * pageSize + 1,
         lastRow: Math.min(currentPage * pageSize, totalRows),
         pageSize,
-        setPageSize: handlePageSize,
+        setPageSize: handleSetPageSize,
       };
     }
 
@@ -79,7 +79,7 @@ export const useCellsPagination = ({pagination, conversationId, setOffset, onPag
       firstRow: 1,
       lastRow: totalRows,
       pageSize,
-      setPageSize: handlePageSize,
+      setPageSize: handleSetPageSize,
     };
   };
 
@@ -89,6 +89,5 @@ export const useCellsPagination = ({pagination, conversationId, setOffset, onPag
     currentPage,
     totalPages,
     totalRows,
-    handlePageSize,
   };
 };
