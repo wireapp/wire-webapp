@@ -199,6 +199,7 @@ export class ConversationRepository {
   public readonly stateHandler: ConversationStateHandler;
   public readonly proteusVerificationStateHandler: ProteusConversationVerificationStateHandler;
   private mlsConversationVerificationStateHandler?: MLSConversationVerificationStateHandler;
+  private initiatingMlsConversationQualifiedIds: QualifiedId[] = [];
 
   static get CONFIG() {
     return {
@@ -228,7 +229,6 @@ export class ConversationRepository {
     private readonly conversationState = container.resolve(ConversationState),
     private readonly connectionState = container.resolve(ConnectionState),
     private readonly core = container.resolve(Core),
-    private dedupe1to1MigratedToMlsMessage: string[] = [],
   ) {
     this.eventService = eventRepository.eventService;
     // we register a client mismatch handler agains the message repository so that we can react to missing members
@@ -1635,7 +1635,7 @@ export class ConversationRepository {
    * All the events will be moved to the new conversation and proteus conversation will be deleted locally.
    * Proteus 1:1 conversation will be hidden in the UI and replaced with mls 1:1 conversation.
    *
-   * @param proteusConversation - proteus 1:1 conversation
+   * @param otherUserId - id of the other user in the conversation which will be migrated
    * @param mlsConversation - mls 1:1 conversation
    * @returns {shouldOpenMLS1to1Conversation} - whether it was an active conversation and mls 1:1 conversation should be opened in the UI
    */
@@ -1654,6 +1654,7 @@ export class ConversationRepository {
       if (conversationId) {
         await this.blacklistConversation(conversationId);
       }
+
       return {shouldOpenMLS1to1Conversation: false};
     }
 
@@ -1672,37 +1673,26 @@ export class ConversationRepository {
     )[0];
 
     // Before we delete the proteus 1:1 conversation, we need to make sure all the local properties are also migrated
-    const {
-      archivedState,
-      archivedTimestamp,
-      cleared_timestamp,
-      localMessageTimer,
-      last_event_timestamp,
-      last_read_timestamp,
-      last_server_timestamp,
-      legalHoldStatus,
-      mutedState,
-      mutedTimestamp,
-      status,
-      verification_state,
-    } = proteusConversationToBeKept;
-
-    const updates: Partial<Record<keyof Conversation, any>> = {
-      archivedState: archivedState(),
-      archivedTimestamp: archivedTimestamp(),
-      cleared_timestamp: cleared_timestamp(),
-      localMessageTimer: localMessageTimer(),
-      last_event_timestamp: last_event_timestamp(),
-      last_read_timestamp: last_read_timestamp(),
-      last_server_timestamp: last_server_timestamp(),
-      legalHoldStatus: legalHoldStatus(),
-      mutedState: mutedState(),
-      mutedTimestamp: mutedTimestamp(),
-      status: status(),
-      verification_state: verification_state(),
-    };
-
-    ConversationMapper.updateProperties(mlsConversation, updates);
+    try {
+      mlsConversation.last_event_timestamp(proteusConversationToBeKept.last_event_timestamp());
+      mlsConversation.last_read_timestamp(proteusConversationToBeKept.last_read_timestamp());
+      mlsConversation.last_server_timestamp(proteusConversationToBeKept.last_server_timestamp());
+      mlsConversation.archivedState(proteusConversationToBeKept.archivedState());
+      mlsConversation.archivedTimestamp(proteusConversationToBeKept.archivedTimestamp());
+      mlsConversation.cleared_timestamp(proteusConversationToBeKept.cleared_timestamp());
+      mlsConversation.localMessageTimer(proteusConversationToBeKept.localMessageTimer());
+      mlsConversation.legalHoldStatus(proteusConversationToBeKept.legalHoldStatus());
+      mlsConversation.mutedState(proteusConversationToBeKept.mutedState());
+      mlsConversation.mutedTimestamp(proteusConversationToBeKept.mutedTimestamp());
+      mlsConversation.status(proteusConversationToBeKept.status());
+      mlsConversation.verification_state(proteusConversationToBeKept.verification_state());
+    } catch (error) {
+      this.logger.warn('Failed to migrate conversation properties', {
+        error,
+        proteusConversationToBeKept: JSON.stringify(proteusConversationToBeKept),
+        mlsConversation: JSON.stringify(mlsConversation),
+      });
+    }
 
     const wasProteus1to1ActiveConversation = proteusConversations.some(conversation =>
       this.conversationState.isActiveConversation(conversation),
@@ -1813,8 +1803,24 @@ export class ConversationRepository {
       );
     }
 
-    this.logger.debug(`Initialising MLS 1:1 conversation with user ${otherUserId.id}...`);
     const mlsConversation = await this.getMLS1to1Conversation(otherUserId);
+
+    this.logger.debug(
+      `Initialising MLS 1:1 conversation with user ${otherUserId.id} for mls conversation ${mlsConversation.id}`,
+    );
+
+    if (
+      this.initiatingMlsConversationQualifiedIds.some(qualifiedId =>
+        matchQualifiedIds(qualifiedId, mlsConversation.qualifiedId),
+      )
+    ) {
+      this.logger.debug(
+        `Skipped initialising MLS 1:1 conversation with user ${otherUserId.id} for mls conversation ${mlsConversation.id}`,
+      );
+      return mlsConversation;
+    }
+
+    this.initiatingMlsConversationQualifiedIds.push(mlsConversation.qualifiedId);
 
     const otherUser = await this.userRepository.getUserById(otherUserId);
 
@@ -1851,6 +1857,9 @@ export class ConversationRepository {
         amplify.publish(WebAppEvents.CONVERSATION.SHOW, mlsConversation, {});
       }
 
+      this.initiatingMlsConversationQualifiedIds = this.initiatingMlsConversationQualifiedIds.filter(qualifiedId =>
+        matchQualifiedIds(qualifiedId, mlsConversation.qualifiedId),
+      );
       return mlsConversation;
     }
 
@@ -1883,6 +1892,10 @@ export class ConversationRepository {
       // If proteus conversation was previously active conversaiton, we want to make mls 1:1 conversation active.
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, initialisedMLSConversation, {});
     }
+
+    this.initiatingMlsConversationQualifiedIds = this.initiatingMlsConversationQualifiedIds.filter(qualifiedId =>
+      matchQualifiedIds(qualifiedId, mlsConversation.qualifiedId),
+    );
     return initialisedMLSConversation;
   };
 
@@ -3441,12 +3454,6 @@ export class ConversationRepository {
       case ClientEvent.CONVERSATION.VOICE_CHANNEL_ACTIVATE:
       case ClientEvent.CONVERSATION.VOICE_CHANNEL_DEACTIVATE:
         return this.addEventToConversation(conversationEntity, eventJson);
-
-      case ClientEvent.CONVERSATION.ONE2ONE_MIGRATED_TO_MLS:
-        if (!this.dedupe1to1MigratedToMlsMessage.includes(conversationEntity.id)) {
-          this.dedupe1to1MigratedToMlsMessage.push(conversationEntity.id);
-          return this.inject1to1MigratedToMLS(conversationEntity);
-        }
     }
   }
 

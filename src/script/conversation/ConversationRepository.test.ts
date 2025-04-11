@@ -457,6 +457,8 @@ describe('ConversationRepository', () => {
     beforeEach(() => {
       testFactory.conversation_repository['conversationState'].conversations([]);
       testFactory.conversation_repository['userState'].users([]);
+      testFactory.conversation_repository['initiatingMlsConversationQualifiedIds'] = [];
+
       jest.clearAllMocks();
     });
 
