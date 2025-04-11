@@ -17,9 +17,9 @@
  *
  */
 
-import {Bold, Link} from '@wireapp/react-ui-kit';
+import {Bold} from '@wireapp/react-ui-kit';
 
-import {numberActiveStyles, numberStyles} from './CellsPageList.styles';
+import {listStyles, numberActiveStyles, numberStyles} from './CellsPageList.styles';
 
 interface CellsPageListProps {
   currentPage?: number;
@@ -46,7 +46,7 @@ export const CellsPageList = ({currentPage = 0, numberOfPages = 1, goToPage}: Ce
   const visibleEnd = normalizedCurrent + VISIBLE_PAGES_AROUND_CURRENT;
 
   return (
-    <>
+    <ul css={listStyles}>
       {/* eslint-disable-next-line id-length */}
       {Array.from({length: numberOfPages}, (_, index) => {
         const isFirstOrLastPage = index === 0 || index === lastPageIndex;
@@ -76,7 +76,7 @@ export const CellsPageList = ({currentPage = 0, numberOfPages = 1, goToPage}: Ce
 
         return null;
       })}
-    </>
+    </ul>
   );
 };
 
@@ -91,17 +91,27 @@ const PaginationPageNumber = ({pageIndex, isCurrent, goToPage}: PaginationPageNu
 
   if (isCurrent) {
     return (
-      <Bold css={{...numberStyles, ...numberActiveStyles}} data-uie-name="status-active-page">
-        {pageNumber}
-      </Bold>
+      <li>
+        <Bold css={{...numberStyles, ...numberActiveStyles}} data-uie-name="status-active-page">
+          {pageNumber}
+        </Bold>
+      </li>
     );
   }
 
   return (
-    <Link css={numberStyles} onClick={() => goToPage(pageIndex)} data-uie-name="go-page">
-      {pageNumber}
-    </Link>
+    <li>
+      <button type="button" css={numberStyles} onClick={() => goToPage(pageIndex)} data-uie-name="go-page">
+        {pageNumber}
+      </button>
+    </li>
   );
 };
 
-const PaginationEllipsis = () => <Bold css={numberStyles}>...</Bold>;
+const PaginationEllipsis = () => {
+  return (
+    <li>
+      <Bold css={numberStyles}>...</Bold>
+    </li>
+  );
+};

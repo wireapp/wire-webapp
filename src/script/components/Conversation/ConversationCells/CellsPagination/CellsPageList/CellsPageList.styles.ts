@@ -19,6 +19,15 @@
 
 import {CSSObject} from '@emotion/react';
 
+export const listStyles: CSSObject = {
+  alignItems: 'flex-end',
+  display: 'flex',
+  flexDirection: 'row',
+  margin: '0 auto',
+  listStyle: 'none',
+  padding: 0,
+};
+
 export const numberStyles: CSSObject = {
   fontSize: 'var(--font-size-medium)',
   display: 'block',
@@ -28,6 +37,9 @@ export const numberStyles: CSSObject = {
   textAlign: 'center',
   lineHeight: 'var(--line-height-lg)',
   borderRadius: '8px',
+  border: 'none',
+  backgroundColor: 'transparent',
+  cursor: 'pointer',
 };
 
 export const numberActiveStyles: CSSObject = {

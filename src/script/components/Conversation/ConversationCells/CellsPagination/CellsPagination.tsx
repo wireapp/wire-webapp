@@ -33,8 +33,8 @@ import {
   arrowPreviousIconStyles,
   containerStyles,
   previousPageStyles,
-  listPagesStyles,
   nextPageStyles,
+  pageResultStyles,
 } from './CellsPagination.styles';
 
 interface CellsPaginationProps {
@@ -70,11 +70,11 @@ export const CellsPagination = ({
 
   return (
     <FlexBox css={containerStyles}>
-      <div style={{flex: 1}}>
+      <p css={pageResultStyles}>
         {totalRows && lastRow
           ? t('cellsGlobalView.pagination.resultsOutOf', {start: firstRow, end: lastRow, total: totalRows})
           : null}
-      </div>
+      </p>
       {numberOfPages > 1 && (
         <FlexBox css={pagesContainerStyles} align="flex-end" data-uie-name="element-pagination">
           <div css={previousPageStyles}>
@@ -91,9 +91,7 @@ export const CellsPagination = ({
             )}
           </div>
 
-          <div css={listPagesStyles} data-uie-name="list-pages">
-            <CellsPageList currentPage={currentPage} numberOfPages={numberOfPages} goToPage={goToPage} />
-          </div>
+          <CellsPageList currentPage={currentPage} numberOfPages={numberOfPages} goToPage={goToPage} />
 
           <div css={nextPageStyles}>
             {!isLastPage && (

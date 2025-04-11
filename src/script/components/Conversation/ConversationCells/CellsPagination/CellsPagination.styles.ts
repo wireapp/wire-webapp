@@ -70,3 +70,7 @@ export const arrowNextIconStyles: CSSObject = {
   },
   marginBottom: '2px',
 };
+
+export const pageResultStyles: CSSObject = {
+  flex: 1,
+};

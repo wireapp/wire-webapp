@@ -122,7 +122,7 @@ export const ConversationCells = ({
           description={t('cellsGlobalView.errorDescription')}
         />
       )}
-      {!isError && <CellsPagination {...getPaginationProps()} goPage={goToPage} />}
+      {!isError && <CellsPagination {...getPaginationProps()} goToPage={goToPage} />}
     </div>
   );
 };
