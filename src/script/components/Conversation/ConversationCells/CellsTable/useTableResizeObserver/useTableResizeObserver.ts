@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useRef, useState, useCallback} from 'react';
+import {useRef, useState, useEffect, useCallback} from 'react';
 
 /*
  * Wire
@@ -51,39 +51,12 @@ export const useTableResizeObserver = ({
   onUpdateBodyHeight,
   onUpdateColumnWidths,
 }: UseTableResizeObserverProps) => {
+  // Create refs to keep track of table height and columns widths
   const tableBodyRef = useRef<HTMLTableSectionElement>(null);
-  const [columnWidths, setColumnWidths] = useState<number[]>([]);
-  const columnObservers = useRef<Map<number, ResizeObserver>>(new Map());
+  // Array of refs for each column
+  const columnRefs = useRef<HTMLTableHeaderCellElement[]>([]);
 
-  const handleColumnResize = useCallback((index: number, width: number) => {
-    setColumnWidths(prev => {
-      const updated = [...prev];
-      updated[index] = width;
-      return updated;
-    });
-  }, []);
-
-  const columnRefCallback = useCallback(
-    (index: number) => (element: HTMLTableHeaderCellElement | null) => {
-      // Clean up previous observer if it exists
-      const previousObserver = columnObservers.current.get(index);
-      if (previousObserver) {
-        previousObserver.disconnect();
-        columnObservers.current.delete(index);
-      }
-
-      if (element) {
-        const observer = new ResizeObserver(() => {
-          if (files && files.length) {
-            handleColumnResize(index, element.offsetWidth);
-          }
-        });
-        observer.observe(element);
-        columnObservers.current.set(index, observer);
-      }
-    },
-    [files, handleColumnResize],
-  );
+  const [widths, setWidths] = useState<number[]>([]);
 
   useEffect(() => {
     const updateHeight = () => {
@@ -92,19 +65,36 @@ export const useTableResizeObserver = ({
       }
     };
     updateHeight();
-  }, [onUpdateBodyHeight]);
+
+    // Set up ResizeObserver for each column
+    const observers = columnRefs.current.map((ref: HTMLElement, index) => {
+      const observer = new ResizeObserver(() => {
+        if (files && files.length && ref) {
+          setWidths(prev => {
+            const updated = [...prev];
+            updated[index] = ref.offsetWidth;
+            return updated;
+          });
+        }
+      });
+      if (ref) {
+        observer.observe(ref);
+      }
+      return observer;
+    });
+
+    return () => observers.forEach(observer => observer.disconnect());
+  }, [files, onUpdateBodyHeight]);
 
   useEffect(() => {
-    onUpdateColumnWidths(columnWidths);
-  }, [onUpdateColumnWidths, columnWidths]);
+    onUpdateColumnWidths(widths);
+  }, [onUpdateColumnWidths, widths]);
 
-  useEffect(() => {
-    return () => {
-      // Clean up all observers on unmount
-      columnObservers.current.forEach(observer => observer.disconnect());
-      columnObservers.current.clear();
-    };
+  const callbackRef = useCallback((element: HTMLTableHeaderCellElement | null, index: number) => {
+    if (element) {
+      columnRefs.current[index] = element;
+    }
   }, []);
 
-  return {tableBodyRef, columnRefCallback};
+  return {tableBodyRef, callbackRef};
 };

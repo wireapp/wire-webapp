@@ -59,7 +59,11 @@ export const numberStyles: CSSObject = {
 
 export const numberActiveStyles: CSSObject = {
   backgroundColor: 'var(--accent-color)',
-  color: 'var(--main-color)',
+  color: 'var(--white)',
+
+  'body.theme--dark &': {
+    color: 'var(--main)',
+  },
 };
 
 export const arrowButtonStyles: CSSObject = {

@@ -65,7 +65,7 @@ export const CellsTable = ({
   onUpdateBodyHeight,
   onUpdateColumnWidths,
 }: CellsTableProps) => {
-  const {tableBodyRef, columnRefCallback} = useTableResizeObserver({
+  const {tableBodyRef, callbackRef} = useTableResizeObserver({
     files,
     onUpdateBodyHeight,
     onUpdateColumnWidths,
@@ -165,7 +165,7 @@ export const CellsTable = ({
                         '--column-width': shouldSetFixedWidth ? `${fixedWidths[index]}px` : undefined,
                       } as CSSProperties
                     }
-                    ref={columnRefCallback(index)}
+                    ref={element => callbackRef(element, index)}
                   >
                     {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                   </th>
