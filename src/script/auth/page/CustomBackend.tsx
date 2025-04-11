@@ -17,75 +17,32 @@
  *
  */
 
-import {useState} from 'react';
-
 import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
 import {useLocation, useNavigate} from 'react-router-dom';
 
-import {Button, ButtonVariant, Container, Muted, Text} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, Container, Text} from '@wireapp/react-ui-kit';
 
 import {LogoFullIcon} from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
-import {buttonContainerCss, containerCss, headerCss, logoCss} from './CustomBackend.styles';
+import {buttonContainerCss, containerCss, headerCss, logoCss, paragraphCss} from './CustomBackend.styles';
 import {Page} from './Page';
 
 import {QUERY_KEY, ROUTE} from '../route';
-import {BackendConfig} from '../util/configUtil';
 import {getSearchParams, navigateTo} from '../util/urlUtil';
 
 export const CustomBackend = () => {
   const navigate = useNavigate();
   const {state} = useLocation();
-  const config = state?.config as BackendConfig;
-  const [isDetailVisible, setIsDetailVisible] = useState(false);
+  const url = state?.url as string;
 
   const navigateToIndex = () => {
     navigate(ROUTE.SSO);
   };
 
-  if (!config) {
-    navigateToIndex();
-  }
-
-  const details = [
-    {
-      label: t('redirectBackendName'),
-      text: config?.title,
-    },
-    {
-      label: t('redirectBackendURL'),
-      text: config?.endpoints.backendURL,
-    },
-    {
-      label: t('redirectBackendWSURL'),
-      text: config?.endpoints.backendWSURL,
-    },
-    {
-      label: t('redirectBlacklistURL'),
-      text: config?.endpoints.blackListURL,
-    },
-    {
-      label: t('redirectTeamsURL'),
-      text: config?.endpoints.teamsURL,
-    },
-    {
-      label: t('redirectAccountURL'),
-      text: config?.endpoints.accountsURL,
-    },
-    {
-      label: t('redirectWebsiteURL'),
-      text: config?.endpoints.websiteURL,
-    },
-  ];
-
-  const toggleDetails = () => {
-    setIsDetailVisible(visibility => !visibility);
-  };
-
   const onConnect = () => {
-    if (config?.endpoints.websiteURL) {
-      const welcomeUrl = pathWithParams(config.webAppUrl, {[QUERY_KEY.SSO_AUTO_LOGIN]: true});
+    if (url) {
+      const welcomeUrl = pathWithParams(url, {[QUERY_KEY.SSO_AUTO_LOGIN]: true});
       navigateTo(
         `/auth?${getSearchParams({[QUERY_KEY.DESTINATION_URL]: encodeURIComponent(welcomeUrl)})}#${
           ROUTE.CUSTOM_ENV_REDIRECT
@@ -102,22 +59,12 @@ export const CustomBackend = () => {
           {t('redirectHeader')}
         </Text>
         <Text block center>
-          {t('redirectSubHeader', {backendName: config?.title || ''})}
+          {t('redirectParagraph1', {url})}
         </Text>
-        {isDetailVisible && (
-          <div>
-            {details.map(({label, text}) => (
-              <div css={{margin: '1rem'}} key={label}>
-                <Muted>{label}</Muted>
-                <br />
-                <Text>{text}</Text>
-              </div>
-            ))}
-          </div>
-        )}
-        <Text css={{textDecoration: 'underline', cursor: 'pointer'}} onClick={toggleDetails}>
-          {isDetailVisible ? t('redirectHideDetails') : t('redirectShowDetails')}
+        <Text block center css={paragraphCss}>
+          {t('redirectParagraph2')}
         </Text>
+
         <div css={buttonContainerCss}>
           <Button css={{flex: '1'}} onClick={navigateToIndex} variant={ButtonVariant.SECONDARY}>
             {t('redirectCancel')}

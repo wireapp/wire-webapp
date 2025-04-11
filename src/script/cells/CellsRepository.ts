@@ -43,6 +43,7 @@ const DEFAULT_MAX_FILES_LIMIT = 100;
 export class CellsRepository {
   private readonly basePath = 'wire-cells-web';
   private isInitialized = false;
+  private uploadControllers: Map<string, AbortController> = new Map();
 
   constructor(private readonly apiClient = container.resolve(APIClient)) {}
 
@@ -59,26 +60,43 @@ export class CellsRepository {
     uuid,
     file,
     path,
+    progressCallback,
   }: {
     uuid: string;
     file: File;
     path: string;
+    progressCallback?: (progress: number) => void;
   }): Promise<{uuid: string; versionId: string}> {
     const filePath = `${path || this.basePath}/${file.name}`;
-
     const versionId = createUuid();
 
-    await this.apiClient.api.cells.uploadFileDraft({
-      path: filePath,
-      file,
-      uuid,
-      versionId,
-    });
+    const controller = new AbortController();
+    this.uploadControllers.set(uuid, controller);
 
-    return {
-      uuid,
-      versionId,
-    };
+    try {
+      await this.apiClient.api.cells.uploadFileDraft({
+        path: filePath,
+        file,
+        uuid,
+        versionId,
+        progressCallback,
+        abortController: controller,
+      });
+
+      return {
+        uuid,
+        versionId,
+      };
+    } finally {
+      this.uploadControllers.delete(uuid);
+    }
+  }
+
+  cancelUpload(uuid: string): void {
+    const controller = this.uploadControllers.get(uuid);
+    if (controller) {
+      controller.abort();
+    }
   }
 
   async deleteFileDraft({uuid, versionId}: {uuid: string; versionId: string}) {

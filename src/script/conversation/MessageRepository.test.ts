@@ -17,13 +17,13 @@
  *
  */
 
-import {LegalHoldStatus} from '@pydio/protocol-messaging';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
 import {MessageSendingState} from '@wireapp/core/lib/conversation';
 
 import {Account} from '@wireapp/core';
+import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';

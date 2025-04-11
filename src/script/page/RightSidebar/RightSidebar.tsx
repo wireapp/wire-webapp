@@ -27,8 +27,10 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
+import {Access} from './Access/Access';
 import {AddParticipants} from './AddParticipants';
 import {ConversationDetails} from './ConversationDetails';
+import {ConversationHistory} from './ConversationHistory/ConversationHistory';
 import {ConversationParticipants} from './ConversationParticipants';
 import {GroupParticipantService} from './GroupParticipantService';
 import {GroupParticipantUser} from './GroupParticipantUser';
@@ -76,6 +78,8 @@ export enum PanelState {
   PARTICIPANT_DEVICES = 'DEVICES',
   SERVICES_OPTIONS = 'SERVICES_OPTIONS',
   TIMED_MESSAGES = 'TIMED_MESSAGES',
+  ACCESS = 'ACCESS',
+  CONVERSATION_HISTORY = 'CONVERSATION_HISTORY',
 }
 
 export type PanelEntity = Conversation | User | Message | ServiceEntity;
@@ -328,6 +332,19 @@ const RightSidebar: FC<RightSidebarProps> = ({
               onBack={onBackClick}
               onClose={closePanel}
             />
+          )}
+
+          {currentState === PanelState.ACCESS && (
+            <Access
+              onClose={closePanel}
+              onGoBack={onBackClick}
+              activeConversation={activeConversation}
+              conversationRepository={conversationRepository}
+              conversationRoleRepository={conversationRoleRepository}
+            />
+          )}
+          {currentState === PanelState.CONVERSATION_HISTORY && (
+            <ConversationHistory onClose={closePanel} onGoBack={onBackClick} />
           )}
         </>
       </Animated>

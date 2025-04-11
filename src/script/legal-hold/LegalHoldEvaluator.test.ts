@@ -17,8 +17,9 @@
  *
  */
 
-import {GenericMessage, LegalHoldStatus, Text} from '@pydio/protocol-messaging';
 import {GenericMessageType} from '@wireapp/core/lib/conversation';
+
+import {GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging';
 
 import {createMessageAddEvent} from 'test/helper/EventGenerator';
 import {createUuid} from 'Util/uuid';

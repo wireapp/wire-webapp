@@ -154,7 +154,7 @@ export class MediaStreamHandler {
     hasPermission: boolean,
   ): Promise<MediaStream> {
     const mediaConstraints = screen
-      ? this.constraintsHandler.getScreenStreamConstraints(this.screensharingMethod, isGroup)
+      ? this.constraintsHandler.getScreenStreamConstraints(this.screensharingMethod)
       : this.constraintsHandler.getMediaStreamConstraints(audio, video, isGroup);
 
     const willPromptForPermission = !hasPermission && !Runtime.isDesktopApp();

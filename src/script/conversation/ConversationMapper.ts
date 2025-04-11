@@ -17,7 +17,6 @@
  *
  */
 
-import {LegalHoldStatus} from '@pydio/protocol-messaging';
 import {
   CONVERSATION_ACCESS_ROLE,
   Conversation as ConversationBackendData,
@@ -27,13 +26,18 @@ import {
   CONVERSATION_TYPE,
   DefaultConversationRoleName,
   RemoteConversations,
+  GROUP_CONVERSATION_TYPE,
+  ADD_PERMISSION,
 } from '@wireapp/api-client/lib/conversation';
 import ko from 'knockout';
 import {isObject} from 'underscore';
 
+import {LegalHoldStatus} from '@wireapp/protocol-messaging';
+
 import {ACCESS_STATE} from './AccessState';
 import {ConversationStatus} from './ConversationStatus';
 import {ConversationVerificationState} from './ConversationVerificationState';
+import {NOTIFICATION_STATE} from './NotificationSetting';
 
 import {Conversation} from '../entity/Conversation';
 import {BaseError, BASE_ERROR_TYPE} from '../error/BaseError';
@@ -252,6 +256,8 @@ export class ConversationMapper {
       protocol,
       cipher_suite,
       initial_protocol,
+      group_conv_type,
+      add_permission,
     } = conversationData;
 
     let conversationEntity = new Conversation(
@@ -268,6 +274,8 @@ export class ConversationMapper {
     conversationEntity.cipherSuite = cipher_suite;
     conversationEntity.type(type);
     conversationEntity.name(name || '');
+    conversationEntity.groupConversationType(group_conv_type || GROUP_CONVERSATION_TYPE.GROUP_CONVERSATION);
+    conversationEntity.conversationModerator(add_permission || ADD_PERMISSION.EVERYONE);
 
     const selfState = members?.self || conversationData;
     conversationEntity = ConversationMapper.updateSelfStatus(conversationEntity, selfState as any);
@@ -275,6 +283,10 @@ export class ConversationMapper {
     if (!conversationEntity.last_event_timestamp() && initialTimestamp) {
       conversationEntity.last_event_timestamp(initialTimestamp);
       conversationEntity.last_server_timestamp(initialTimestamp);
+    }
+
+    if (conversationEntity.mutedState() === null) {
+      conversationEntity.mutedState(NOTIFICATION_STATE.EVERYTHING);
     }
 
     // Active participants from database or backend payload
@@ -385,6 +397,8 @@ export class ConversationMapper {
       epoch,
       cipher_suite,
       protocol,
+      group_conv_type,
+      add_permission,
     } = remoteConversationData;
     const {others: othersStates, self: selfState} = members;
 
@@ -404,6 +418,8 @@ export class ConversationMapper {
       status: (selfState as any).status,
       team_id: team,
       type,
+      group_conv_type,
+      add_permission,
     };
 
     const qualified_others = othersStates?.filter(other => !!other.qualified_id).map(({qualified_id}) => qualified_id);
@@ -525,7 +541,7 @@ export class ConversationMapper {
       return conversationEntity.accessState(ACCESS_STATE.OTHER.SELF);
     }
 
-    const personalAccessState = conversationEntity.isGroup()
+    const personalAccessState = conversationEntity.isGroupOrChannel()
       ? ACCESS_STATE.PERSONAL.GROUP
       : ACCESS_STATE.PERSONAL.ONE2ONE;
 

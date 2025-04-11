@@ -51,7 +51,7 @@ export function isMLSCapableConversation(conversation: Conversation): conversati
 }
 
 export function isGroupMLSConversation(conversation: Conversation): conversation is MLSConversation {
-  return isMLSConversation(conversation) && conversation.isGroup();
+  return isMLSConversation(conversation) && conversation.isGroupOrChannel();
 }
 
 export function isSelfConversation(conversation: Conversation): boolean {

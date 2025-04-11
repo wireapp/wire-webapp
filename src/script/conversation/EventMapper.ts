@@ -17,9 +17,10 @@
  *
  */
 
-import {LinkPreview, Mention} from '@pydio/protocol-messaging';
 import {CONVERSATION_EVENT, ConversationEvent, ConversationProtocolUpdateEvent} from '@wireapp/api-client/lib/event/';
 import {container} from 'tsyringe';
+
+import {LinkPreview, Mention} from '@wireapp/protocol-messaging';
 
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
@@ -592,7 +593,7 @@ export class EventMapper {
     const isSingleModeConversation = conversationEntity.is1to1() || conversationEntity.isRequest();
     messageEntity.visible(!isSingleModeConversation);
 
-    if (conversationEntity.isGroup()) {
+    if (conversationEntity.isGroupOrChannel()) {
       const messageFromCreator = sender === conversationEntity.creator;
       const creatorIndex = userIds.findIndex(user => user.id === sender);
       const creatorIsJoiningMember = messageFromCreator && creatorIndex !== -1;

@@ -17,17 +17,20 @@
  *
  */
 
-import {LegalHoldStatus} from '@pydio/protocol-messaging';
 import {
   CONVERSATION_ACCESS_ROLE,
   CONVERSATION_ACCESS,
   CONVERSATION_LEGACY_ACCESS_ROLE,
   CONVERSATION_TYPE,
   DefaultConversationRoleName,
+  GROUP_CONVERSATION_TYPE,
+  ADD_PERMISSION,
 } from '@wireapp/api-client/lib/conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
+
+import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {CONVERSATION_READONLY_STATE} from 'src/script/conversation/ConversationRepository';
 
@@ -47,6 +50,8 @@ export interface ConversationRecord {
   ephemeral_timer: number;
   global_message_timer: number;
   group_id: string;
+  group_conv_type?: GROUP_CONVERSATION_TYPE;
+  add_permission?: ADD_PERMISSION;
   epoch: number;
   id: string;
   initial_protocol?: ConversationProtocol;

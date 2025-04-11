@@ -28,7 +28,6 @@ import {wrapperStyles} from './AudioPreviewCard.styles';
 
 import {FilePreviewDeleteButton} from '../common/FilePreviewDeleteButton/FilePreviewDeleteButton';
 import {FilePreviewErrorMoreButton} from '../common/FilePreviewErrorMoreButton/FilePreviewErrorMoreButton';
-import {FilePreviewLoading} from '../common/FilePreviewLoading/FilePreviewLoading';
 import {FilePreviewPlayButton} from '../common/FilePreviewPlayButton/FilePreviewPlayButton';
 
 interface AudioPreviewCardProps {
@@ -36,9 +35,9 @@ interface AudioPreviewCardProps {
   name: string;
   size: string;
   isError: boolean;
-  isLoading: boolean;
   onDelete: () => void;
   onRetry: () => void;
+  uploadProgress: number;
 }
 
 export const AudioPreviewCard = ({
@@ -46,9 +45,9 @@ export const AudioPreviewCard = ({
   name,
   size,
   isError,
-  isLoading,
   onDelete,
   onRetry,
+  uploadProgress,
 }: AudioPreviewCardProps) => {
   return (
     <div css={wrapperStyles}>
@@ -70,8 +69,8 @@ export const AudioPreviewCard = ({
             <FilePreviewErrorMoreButton onDelete={onDelete} onRetry={onRetry} />
           </>
         )}
-        {isLoading && <FilePreviewLoading />}
-        {!isError && !isLoading && <FilePreviewDeleteButton onDelete={onDelete} />}
+        {!isError && <FilePreviewDeleteButton onDelete={onDelete} />}
+        <FileCard.Loading progress={uploadProgress} />
       </FileCard.Root>
     </div>
   );

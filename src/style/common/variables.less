@@ -150,9 +150,9 @@ body {
   // Framework
   --teams-width: 78px;
   --conversation-list-width: 320px;
-  --right-width: 304px;
+  --right-width: 320px;
   --panel-content-min-height: 150px;
-  --panel-width: 304px;
+  --panel-width: 320px;
   --badge-height: 24px;
 
   --delivered-state-width: 56px;
@@ -185,6 +185,10 @@ body {
   --conversation-message-max-width: 640px;
   --conversation-message-sender-width: 64px;
   --conversation-message-asset-width: 800px;
+  // Images should be in the viewport regardless of the window's size
+  // To ensure this, we calculate the maximum height as:
+  // 100vh - TitleBar(45px) - ImagePadding(12px) - TypingIndicator(40px) - ClassifiedBar(1rem) - InputBar(56px)
+  --conversation-message-image-asset-max-height: calc(100vh - 155px - 1rem);
 
   // Conversation Input
   --conversation-input-min-height: 56px;

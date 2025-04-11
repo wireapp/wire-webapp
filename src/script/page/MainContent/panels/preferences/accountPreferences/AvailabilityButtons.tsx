@@ -20,10 +20,10 @@
 import React from 'react';
 
 import {CSSObject} from '@emotion/serialize';
-import {Availability} from '@pydio/protocol-messaging';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 
+import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {availabilityStatus} from 'Util/AvailabilityStatus';

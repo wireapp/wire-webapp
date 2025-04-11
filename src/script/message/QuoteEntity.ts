@@ -17,7 +17,7 @@
  *
  */
 
-import {Quote} from '@pydio/protocol-messaging';
+import {Quote} from '@wireapp/protocol-messaging';
 
 export interface QuoteEntityOptions {
   error?: Error;

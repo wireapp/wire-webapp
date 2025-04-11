@@ -17,7 +17,6 @@
  *
  */
 
-import {Availability} from '@pydio/protocol-messaging';
 import type {AddedClient, PublicClient} from '@wireapp/api-client/lib/client';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {
@@ -42,6 +41,7 @@ import {container} from 'tsyringe';
 import {flatten, uniq} from 'underscore';
 
 import {TypedEventEmitter, type AccentColor} from '@wireapp/commons';
+import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';

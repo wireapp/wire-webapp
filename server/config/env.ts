@@ -184,6 +184,15 @@ export type Env = {
   /** Feature to enable Enterprise login v2 */
   FEATURE_ENABLE_ENTERPRISE_LOGIN_V2: string;
 
+  /** Feature to enable channels */
+  FEATURE_ENABLE_CHANNELS: string;
+
+  /** Feature to enable channels history sharing */
+  FEATURE_ENABLE_CHANNELS_HISTORY_SHARING: string;
+
+  /** Feature to enable channels public channels */
+  FEATURE_ENABLE_PUBLIC_CHANNELS: string;
+
   /** Feature to enable team creation flow for individual users */
   FEATURE_ENABLE_TEAM_CREATION: string;
 
@@ -309,6 +318,8 @@ export type Env = {
 
   URL_SUPPORT_SYSTEM_KEYCHAIN_ACCESS: string;
 
+  URL_SUPPORT_E2E_ENCRYPTION: string;
+
   URL_SUPPORT_FAVORITES: string;
 
   URL_LEARN_MORE_ABOUT_GUEST_LINKS: string;
@@ -376,4 +387,7 @@ export type Env = {
   DATADOG_APPLICATION_ID?: string;
   DATADOG_CLIENT_TOKEN?: string;
   FEATURE_DATADOG_ENVIRONMENT?: string;
+
+  /** Feature to enable screen sharing with video overlay */
+  FEATURE_ENABLE_SCREEN_SHARE_WITH_VIDEO: string;
 };

@@ -23,11 +23,12 @@ import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {UserClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
-import * as Icon from 'Components/Icon';
 import {UnverifiedUserWarning} from 'Components/Modals/UserModal';
 import {User} from 'src/script/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
+
+import {E2eEncryptionMessage} from '../E2eEncryptionMessage/E2eEncryptionMessage';
 
 interface ConnectedMessageProps {
   classifiedDomains?: string[];
@@ -89,20 +90,7 @@ export const ConnectedMessage: React.FC<ConnectedMessageProps> = ({
         </div>
       )}
 
-      {!isOutgoingRequest && (
-        <>
-          <div className="message-header" css={{marginTop: '1em'}}>
-            <div className="message-header-icon" />
-            <p className="message-header-label">{t('conversationNewConversation')}</p>
-          </div>
-          <div className="message-header">
-            <div className="message-header-icon message-header-icon--svg text-foreground">
-              <Icon.InfoIcon />
-            </div>
-            <p className="message-header-label">{t('conversationUnverifiedUserWarning')}</p>
-          </div>
-        </>
-      )}
+      {!isOutgoingRequest && <E2eEncryptionMessage />}
     </div>
   );
 };
