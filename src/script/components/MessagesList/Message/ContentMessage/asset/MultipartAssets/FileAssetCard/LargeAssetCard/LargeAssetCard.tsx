@@ -39,11 +39,15 @@ interface LargeAssetCardProps {
   name: string;
   size: string;
   previewImageUrl?: string;
+  isLoading: boolean;
   isError: boolean;
 }
 
-export const LargeAssetCard = ({extension, name, size, previewImageUrl, isError}: LargeAssetCardProps) => {
+export const LargeAssetCard = ({extension, name, size, previewImageUrl, isError, isLoading}: LargeAssetCardProps) => {
   const [isLoaded, setIsLoaded] = useState(false);
+
+  const shouldDisplayLoading = (previewImageUrl ? !isLoaded : isLoading) && !isError;
+  const shouldDisplayError = isError && !previewImageUrl;
 
   return (
     <FileCard.Root variant="large" extension={extension} name={name} size={size}>
@@ -56,15 +60,15 @@ export const LargeAssetCard = ({extension, name, size, previewImageUrl, isError}
         <div css={contentWrapperStyles}>
           <img
             src={previewImageUrl}
-            style={{'--opacity': isLoaded ? 1 : 0} as CSSProperties}
+            style={{'--opacity': isLoaded && previewImageUrl ? 1 : 0} as CSSProperties}
             alt=""
             css={imageStyles}
             onLoad={() => setIsLoaded(true)}
           />
           <div css={infoOverlayStyles}>
             <div css={infoWrapperStyles}>
-              {!isLoaded && !isError && <div className="icon-spinner spin" css={loaderIconStyles} />}
-              {isError && (
+              {shouldDisplayLoading && <div className="icon-spinner spin" css={loaderIconStyles} />}
+              {shouldDisplayError && (
                 <>
                   <UnavailableFileIcon css={errorIconStyles} width={14} height={14} />
                   <p css={errorTextStyles}>{t('cellsUnavailableFile')}</p>
