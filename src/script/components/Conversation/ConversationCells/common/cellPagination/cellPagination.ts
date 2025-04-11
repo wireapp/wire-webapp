@@ -18,39 +18,11 @@
  */
 
 export interface CellPagination {
-  /**
-   *
-   * @type {number}
-   */
   currentOffset?: number;
-  /**
-   *
-   * @type {number}
-   */
   currentPage?: number;
-  /**
-   *
-   * @type {number}
-   */
   limit?: number;
-  /**
-   *
-   * @type {number}
-   */
   nextOffset?: number;
-  /**
-   *
-   * @type {number}
-   */
   prevOffset?: number;
-  /**
-   *
-   * @type {number}
-   */
   total?: number;
-  /**
-   *
-   * @type {number}
-   */
   totalPages?: number;
 }
