@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [27.43.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.43.0...@wireapp/api-client@27.43.1) (2025-04-11)
+
+### Reverts
+
+* "feat(CellsAPI): rename cells search sort param ([#7014](https://github.com/wireapp/wire-web-packages/issues/7014))" ([#7016](https://github.com/wireapp/wire-web-packages/issues/7016)) ([f7e4bec](https://github.com/wireapp/wire-web-packages/commit/f7e4becd9ee2d396dd3e8bd69737c3fe25e20ba9))
+
 # [27.43.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.42.0...@wireapp/api-client@27.43.0) (2025-04-11)
 
 ### Features
