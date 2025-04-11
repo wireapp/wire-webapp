@@ -28,7 +28,7 @@ import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 import {FileAssetCard} from './FileAssetCard/FileAssetCard';
 import {ImageAssetCard} from './ImageAssetCard/ImageAssetCard';
 import {largeCardStyles, listSingleItemStyles, listStyles, smallCardStyles} from './MultipartAssets.styles';
-import {useGetMultipartAssetPreview} from './useGetMultipartAssetPreview/useGetMultipartAssetPreview';
+import {useGetMultipartAsset} from './useGetMultipartAsset/useGetMultipartAsset';
 import {VideoAssetCard} from './VideoAssetCard/VideoAssetCard';
 
 interface MultipartAssetsProps {
@@ -72,28 +72,20 @@ const MultipartAsset = ({
   const isImage = contentType.startsWith('image');
   const isVideo = contentType.startsWith('video');
 
-  const {src, status, previewImageUrl} = useGetMultipartAssetPreview({
+  const isSingleAsset = assetsCount === 1;
+  const variant = isSingleAsset ? 'large' : 'small';
+
+  const {src, isLoading, isError, previewUrl} = useGetMultipartAsset({
     uuid,
     cellsRepository,
     isEnabled: hasBeenInView,
-    retryUntilSuccess: true,
+    retryPreviewUntilSuccess: isSingleAsset && !isImage && !isVideo,
   });
-
-  const isLoading = status === 'loading';
-  const isError = status === 'error';
-
-  const isSingleAsset = assetsCount === 1;
 
   if (isImage) {
     return (
       <li ref={elementRef} css={smallCardStyles}>
-        <ImageAssetCard
-          src={src}
-          size={isSingleAsset ? 'large' : 'small'}
-          metadata={imageMetadata}
-          isLoading={isLoading}
-          isError={isError}
-        />
+        <ImageAssetCard src={src} variant={variant} metadata={imageMetadata} isLoading={isLoading} isError={isError} />
       </li>
     );
   }
@@ -102,7 +94,7 @@ const MultipartAsset = ({
     return (
       <li ref={elementRef} css={isSingleAsset ? largeCardStyles : smallCardStyles}>
         <VideoAssetCard
-          variant={isSingleAsset ? 'large' : 'small'}
+          variant={variant}
           src={src}
           extension={extension}
           name={name}
@@ -117,13 +109,13 @@ const MultipartAsset = ({
   return (
     <li ref={elementRef} css={isSingleAsset ? largeCardStyles : smallCardStyles}>
       <FileAssetCard
-        variant={isSingleAsset ? 'large' : 'small'}
+        variant={variant}
         extension={extension}
         name={name}
         size={size}
+        previewUrl={previewUrl}
         isLoading={isLoading}
         isError={isError}
-        previewImageUrl={previewImageUrl}
       />
     </li>
   );

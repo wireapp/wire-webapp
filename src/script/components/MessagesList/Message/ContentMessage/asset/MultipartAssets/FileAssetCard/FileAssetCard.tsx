@@ -29,18 +29,10 @@ interface FileAssetCardProps {
   size: string;
   isLoading: boolean;
   isError: boolean;
-  previewImageUrl?: string;
+  previewUrl?: string;
 }
 
-export const FileAssetCard = ({
-  variant,
-  extension,
-  name,
-  size,
-  isLoading,
-  isError,
-  previewImageUrl,
-}: FileAssetCardProps) => {
+export const FileAssetCard = ({variant, extension, name, size, isLoading, isError, previewUrl}: FileAssetCardProps) => {
   const formattedName = isError ? t('cellsUnavailableFile') : name;
 
   if (variant === 'large') {
@@ -51,7 +43,7 @@ export const FileAssetCard = ({
         size={size}
         isError={isError}
         isLoading={isLoading}
-        previewImageUrl={previewImageUrl}
+        previewUrl={previewUrl}
       />
     );
   }

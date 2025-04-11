@@ -25,13 +25,13 @@ import {LargeImageAsset} from './LargeImageAsset/LargeImageAsset';
 interface ImageAssetCardProps {
   src?: string;
   metadata: ICellAsset['image'];
-  size: 'small' | 'large';
+  variant: 'small' | 'large';
   isLoading: boolean;
   isError: boolean;
 }
 
-export const ImageAssetCard = ({src, metadata, size, isLoading, isError}: ImageAssetCardProps) => {
-  if (size === 'large') {
+export const ImageAssetCard = ({src, metadata, variant, isLoading, isError}: ImageAssetCardProps) => {
+  if (variant === 'large') {
     return <LargeImageAsset src={src} metadata={metadata} isError={isError} />;
   }
 

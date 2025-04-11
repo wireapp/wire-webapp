@@ -38,16 +38,16 @@ interface LargeAssetCardProps {
   extension: string;
   name: string;
   size: string;
-  previewImageUrl?: string;
+  previewUrl?: string;
   isLoading: boolean;
   isError: boolean;
 }
 
-export const LargeAssetCard = ({extension, name, size, previewImageUrl, isError, isLoading}: LargeAssetCardProps) => {
+export const LargeAssetCard = ({extension, name, size, previewUrl, isError, isLoading}: LargeAssetCardProps) => {
   const [isLoaded, setIsLoaded] = useState(false);
 
-  const shouldDisplayLoading = (previewImageUrl ? !isLoaded : isLoading) && !isError;
-  const shouldDisplayError = isError && !previewImageUrl;
+  const shouldDisplayLoading = (previewUrl ? !isLoaded : isLoading) && !isError;
+  const shouldDisplayError = isError && !previewUrl;
 
   return (
     <FileCard.Root variant="large" extension={extension} name={name} size={size}>
@@ -59,8 +59,8 @@ export const LargeAssetCard = ({extension, name, size, previewImageUrl, isError,
       <FileCard.Content>
         <div css={contentWrapperStyles}>
           <img
-            src={previewImageUrl}
-            style={{'--opacity': isLoaded && previewImageUrl ? 1 : 0} as CSSProperties}
+            src={previewUrl}
+            style={{'--opacity': isLoaded && previewUrl ? 1 : 0} as CSSProperties}
             alt=""
             css={imageStyles}
             onLoad={() => setIsLoaded(true)}
