@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.41.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.40.1...@wireapp/api-client@27.41.0) (2025-04-11)
+
+### Features
+
+* include api versioning to endpoints with credentials [WPB-16119] ([#7012](https://github.com/wireapp/wire-web-packages/issues/7012)) ([39818b5](https://github.com/wireapp/wire-web-packages/commit/39818b5cea41dffea46fa74d8ee046fa5b7e1d12))
+
 ## [27.40.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.40.0...@wireapp/api-client@27.40.1) (2025-04-10)
 
 ### Bug Fixes
