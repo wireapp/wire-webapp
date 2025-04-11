@@ -42,6 +42,7 @@ export const listSingleItemStyles: CSSObject = {
 
 export const largeCardStyles: CSSObject = {
   gridColumn: 'span 3',
+  width: '100%',
 };
 
 export const smallCardStyles: CSSObject = {

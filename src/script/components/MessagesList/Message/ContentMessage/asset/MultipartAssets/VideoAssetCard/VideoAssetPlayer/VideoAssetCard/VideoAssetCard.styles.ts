@@ -19,29 +19,13 @@
 
 import {CSSObject} from '@emotion/react';
 
-const overlayStyles: CSSObject = {
-  position: 'absolute',
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-};
-
-export const wrapperStyles: CSSObject = {
-  ...overlayStyles,
-  borderRadius: '10px',
-  overflow: 'hidden',
-};
-
-export const controlsWrapperStyles: CSSObject = {
-  ...overlayStyles,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-};
-
-export const videoStyles: CSSObject = {
-  backgroundColor: 'var(--black)',
+export const contentWrapperStyles: CSSObject = {
+  position: 'relative',
+  aspectRatio: '16/9',
   width: '100%',
-  height: '100%',
+
+  // Fallback for the above  aspect-ratio
+  '@supports not (aspect-ratio: 16/9)': {
+    paddingBottom: '56.25%',
+  },
 };

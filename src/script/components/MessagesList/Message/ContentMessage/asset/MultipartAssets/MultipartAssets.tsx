@@ -28,7 +28,7 @@ import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 import {FileAssetCard} from './FileAssetCard/FileAssetCard';
 import {ImageAssetCard} from './ImageAssetCard/ImageAssetCard';
 import {largeCardStyles, listSingleItemStyles, listStyles, smallCardStyles} from './MultipartAssets.styles';
-import {useGetMultipartAssetPreview} from './useGetMultipartAssetPreview/useGetMultipartAssetPreview';
+import {useGetMultipartAsset} from './useGetMultipartAsset/useGetMultipartAsset';
 import {VideoAssetCard} from './VideoAssetCard/VideoAssetCard';
 
 interface MultipartAssetsProps {
@@ -72,25 +72,33 @@ const MultipartAsset = ({
   const isImage = contentType.startsWith('image');
   const isVideo = contentType.startsWith('video');
 
-  const {src, status} = useGetMultipartAssetPreview({
+  const isSingleAsset = assetsCount === 1;
+  const variant = isSingleAsset ? 'large' : 'small';
+
+  const {src, isLoading, isError, previewUrl} = useGetMultipartAsset({
     uuid,
     cellsRepository,
     isEnabled: hasBeenInView,
-    retryUntilSuccess: isImage || isVideo,
+    retryPreviewUntilSuccess: isSingleAsset && !isImage && !isVideo,
   });
-
-  const isLoading = status === 'loading';
-  const isError = status === 'error';
-
-  const isSingleAsset = assetsCount === 1;
 
   if (isImage) {
     return (
       <li ref={elementRef} css={smallCardStyles}>
-        <ImageAssetCard
+        <ImageAssetCard src={src} variant={variant} metadata={imageMetadata} isLoading={isLoading} isError={isError} />
+      </li>
+    );
+  }
+
+  if (isVideo) {
+    return (
+      <li ref={elementRef} css={isSingleAsset ? largeCardStyles : smallCardStyles}>
+        <VideoAssetCard
+          variant={variant}
           src={src}
-          size={isSingleAsset ? 'large' : 'small'}
-          metadata={imageMetadata}
+          extension={extension}
+          name={name}
+          size={size}
           isLoading={isLoading}
           isError={isError}
         />
@@ -98,17 +106,17 @@ const MultipartAsset = ({
     );
   }
 
-  if (isVideo) {
-    return (
-      <li ref={elementRef} css={smallCardStyles}>
-        <VideoAssetCard src={src} isLoading={isLoading} isError={isError} />
-      </li>
-    );
-  }
-
   return (
-    <li ref={elementRef} css={largeCardStyles}>
-      <FileAssetCard extension={extension} name={name} size={size} isLoading={isLoading} isError={isError} />
+    <li ref={elementRef} css={isSingleAsset ? largeCardStyles : smallCardStyles}>
+      <FileAssetCard
+        variant={variant}
+        extension={extension}
+        name={name}
+        size={size}
+        previewUrl={previewUrl}
+        isLoading={isLoading}
+        isError={isError}
+      />
     </li>
   );
 };

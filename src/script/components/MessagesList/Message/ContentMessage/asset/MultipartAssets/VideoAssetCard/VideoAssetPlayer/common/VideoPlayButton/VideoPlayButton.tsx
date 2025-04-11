@@ -19,10 +19,9 @@
 
 import {ReactNode, useEffect} from 'react';
 
-import {CloseIcon, PauseIcon, PlayIcon} from '@wireapp/react-ui-kit';
+import {PauseIcon, PlayIcon} from '@wireapp/react-ui-kit';
 
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
-import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 import {t} from 'Util/LocalizerUtil';
 
 import {wrapperStyles, playButtonStyles, wrapperStylesFullscreen} from './VideoPlayButton.styles';
@@ -31,8 +30,6 @@ export interface VideoPlayButtonProps {
   mediaElement?: HTMLMediaElement;
   onPause: () => void;
   onPlay: () => void;
-  onCancel?: () => void;
-  transferState: AssetTransferState;
   isPlaying: boolean;
   isFocusable?: boolean;
   isDisabled?: boolean;
@@ -41,20 +38,14 @@ export interface VideoPlayButtonProps {
 
 export const VideoPlayButton = ({
   mediaElement,
-  transferState,
   onPlay,
   onPause,
-  onCancel,
   isPlaying,
   isFocusable = true,
   isFullscreen = false,
   isDisabled = false,
 }: VideoPlayButtonProps) => {
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isFocusable);
-
-  const isUploaded = transferState === AssetTransferState.UPLOADED;
-  const isDownloading = transferState === AssetTransferState.DOWNLOADING;
-  const isUploading = transferState === AssetTransferState.UPLOADING;
 
   useEffect(() => {
     if (!mediaElement) {
@@ -70,35 +61,17 @@ export const VideoPlayButton = ({
     };
   }, [mediaElement, onPlay, onPause]);
 
-  if (isUploading || isDownloading) {
-    return (
-      <VideoButton
-        label={t('conversationAudioAssetCancel')}
-        onClick={onCancel}
-        tabIndex={messageFocusedTabIndex}
-        isDisabled
-        isFullscreen={isFullscreen}
-      >
-        <CloseIcon width={10} height={10} />
-      </VideoButton>
-    );
-  }
-
-  if (isUploaded) {
-    return (
-      <VideoButton
-        label={isPlaying ? t('conversationAudioAssetPause') : t('conversationAudioAssetPlay')}
-        onClick={isPlaying ? onPause : onPlay}
-        tabIndex={messageFocusedTabIndex}
-        isDisabled={isDisabled}
-        isFullscreen={isFullscreen}
-      >
-        {isPlaying ? <PauseIcon width={10} height={10} /> : <PlayIcon width={10} height={10} />}
-      </VideoButton>
-    );
-  }
-
-  return null;
+  return (
+    <VideoButton
+      label={isPlaying ? t('conversationAudioAssetPause') : t('conversationAudioAssetPlay')}
+      onClick={isPlaying ? onPause : onPlay}
+      tabIndex={messageFocusedTabIndex}
+      isDisabled={isDisabled}
+      isFullscreen={isFullscreen}
+    >
+      {isPlaying ? <PauseIcon width={10} height={10} /> : <PlayIcon width={10} height={10} />}
+    </VideoButton>
+  );
 };
 
 interface VideoButtonProps {

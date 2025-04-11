@@ -20,17 +20,36 @@
 import {t} from 'Util/LocalizerUtil';
 
 import {videoStyles, iconWrapperStyles} from './VideoAssetCard.styles';
+import {VideoAssetPlayer} from './VideoAssetPlayer/VideoAssetPlayer';
 
 import {FilePreviewPlayButton} from '../common/FilePreviewPlayButton/FilePreviewPlayButton';
 import {MediaFilePreviewCard} from '../common/MediaFilePreviewCard/MediaFilePreviewCard';
 
 interface VideoAssetCardProps {
+  variant: 'large' | 'small';
   src?: string;
+  extension: string;
+  name: string;
+  size: string;
   isLoading: boolean;
   isError: boolean;
 }
 
-export const VideoAssetCard = ({src, isLoading, isError}: VideoAssetCardProps) => {
+export const VideoAssetCard = ({variant, src, extension, name, size, isLoading, isError}: VideoAssetCardProps) => {
+  if (variant === 'large') {
+    return (
+      <VideoAssetPlayer
+        url={src}
+        isFileShareRestricted={false}
+        extension={extension}
+        name={name}
+        size={size}
+        isLoading={isLoading}
+        isError={isError}
+      />
+    );
+  }
+
   return (
     <MediaFilePreviewCard
       label={src ? t('conversationFileVideoPreviewLabel', {src}) : 'Loading...'}

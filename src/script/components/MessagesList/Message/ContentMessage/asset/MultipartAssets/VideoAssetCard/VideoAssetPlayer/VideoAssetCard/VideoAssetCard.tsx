@@ -29,12 +29,11 @@ interface VideoAssetCardProps {
   size: string;
   isError?: boolean;
   isLoading?: boolean;
-  loadingProgress?: number;
   children: ReactNode;
 }
 
 export const VideoAssetCard = forwardRef<HTMLDivElement, VideoAssetCardProps>(
-  ({extension, name, size, isError, isLoading, loadingProgress, children}, ref) => {
+  ({extension, name, size, isError, isLoading, children}, ref) => {
     return (
       <FileCard.Root variant="large" extension={extension} name={name} size={size}>
         <FileCard.Header>
@@ -48,7 +47,6 @@ export const VideoAssetCard = forwardRef<HTMLDivElement, VideoAssetCardProps>(
           </div>
         </FileCard.Content>
         {isError && <FileCard.Error />}
-        {isLoading && <FileCard.Loading progress={loadingProgress} />}
       </FileCard.Root>
     );
   },
