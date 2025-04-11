@@ -41,11 +41,20 @@ import {
   pageSelectorSelectStyles,
 } from './CellsPagination.styles';
 
-import {useCellsStore} from '../common/useCellsStore/useCellsStore';
-
 type goPageFunc = (pageIndex: number) => void;
 
 interface CellsPaginationProps {
+  currentPage?: number;
+  numberOfPages?: number;
+  firstRow?: number;
+  lastRow?: number;
+  totalRows?: number;
+  goPage: goPageFunc;
+  pageSize: number;
+  setPageSize: (page: number) => void;
+}
+
+interface PageListProps {
   currentPage?: number;
   numberOfPages?: number;
   firstRow?: number;
@@ -78,7 +87,7 @@ const PageNumber = ({
   );
 };
 
-const PageList = ({currentPage = 0, numberOfPages = 1, goPage}: CellsPaginationProps) => {
+const PageList = ({currentPage = 0, numberOfPages = 1, goPage}: PageListProps) => {
   const lastPageIndex = numberOfPages - 1;
   const spanLength = 1;
   const endLength = 1;
@@ -116,12 +125,13 @@ export const CellsPagination = ({
   firstRow = 1,
   lastRow,
   totalRows,
-  ...props
+  pageSize,
+  setPageSize,
 }: CellsPaginationProps) => {
   const isLastPage = currentPage === numberOfPages - 1;
   const isFirstPage = currentPage === 0;
 
-  const {pageSize, setPageSize} = useCellsStore();
+  //const {pageSize, setPageSize} = useCellsStore();
 
   const onSizeChange = useCallback(
     ({value}: {value: string}) => {
@@ -146,7 +156,7 @@ export const CellsPagination = ({
           : null}
       </div>
       {numberOfPages > 1 && (
-        <FlexBox css={pagesContainerStyles} align="flex-end" data-uie-name="element-pagination" {...props}>
+        <FlexBox css={pagesContainerStyles} align="flex-end" data-uie-name="element-pagination">
           <div css={previousPageStyles}>
             {!isFirstPage && (
               <IconButton

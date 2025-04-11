@@ -44,7 +44,7 @@ export const ConversationCells = ({
   cellsRepository = container.resolve(CellsRepository),
   conversationQualifiedId,
 }: ConversationCellsProps) => {
-  const {getFiles, status: filesStatus, getPagination, clearAll, removeFile, pageSize} = useCellsStore();
+  const {getFiles, status: filesStatus, getPagination, clearAll, removeFile, pageSize, setPageSize} = useCellsStore();
 
   const conversationId = conversationQualifiedId.id;
 
@@ -61,6 +61,21 @@ export const ConversationCells = ({
   const isError = filesStatus === 'error';
   const isSuccess = filesStatus === 'success';
   const hasFiles = !!files.length;
+
+  useEffect(() => {
+    return () => {
+      clearAll({conversationId});
+    };
+  }, [conversationId]);
+
+  const handlePageSize = useCallback(
+    (page: number) => {
+      clearAll({conversationId});
+      setOffset(0);
+      setPageSize(page);
+    },
+    [setPageSize, conversationId],
+  );
 
   const deleteFileFailedNotification = useAppNotification({
     message: t('cellsGlobalView.deleteModalError'),
@@ -125,6 +140,8 @@ export const ConversationCells = ({
           totalRows={pagination?.total}
           firstRow={(currentPage - 1) * pageSize + 1}
           lastRow={Math.min(currentPage * pageSize, totalRows)}
+          pageSize={pageSize}
+          setPageSize={handlePageSize}
         />
       );
     } else {
@@ -136,6 +153,8 @@ export const ConversationCells = ({
           totalRows={files && files.length}
           firstRow={1}
           lastRow={files && files.length}
+          pageSize={pageSize}
+          setPageSize={handlePageSize}
         />
       );
     }
