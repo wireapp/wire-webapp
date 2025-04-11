@@ -62,11 +62,10 @@ export const useGetAllCellsFiles = ({cellsRepository, conversationQualifiedId}: 
 
       const transformedFiles = transformNodesToCellsFiles(result.Nodes);
       setFiles({conversationId: id, files: transformedFiles});
-      let pagination = null;
-      if (result.Pagination) {
-        pagination = transformToCellPagination(result.Pagination);
-      }
+
+      const pagination = result.Pagination ? transformToCellPagination(result.Pagination) : null;
       setPagination({conversationId: id, pagination});
+
       setStatus('success');
     } catch (error) {
       setError(error instanceof Error ? error : new Error('Failed to fetch files', {cause: error}));
