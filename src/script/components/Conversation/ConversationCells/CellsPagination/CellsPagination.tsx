@@ -19,29 +19,23 @@
 
 import {useCallback} from 'react';
 
-import {FlexBox, Bold, Link, IconButton, Select} from '@wireapp/react-ui-kit';
+import {FlexBox, IconButton} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
+import {CellsPageList} from './CellsPageList/CellsPageList';
+import {CellsPageSizeSelect} from './CellsPageSizeSelect/CellsPageSizeSelect';
 import {
   pagesContainerStyles,
-  numberStyles,
-  numberActiveStyles,
   arrowButtonStyles,
   arrowNextIconStyles,
   arrowPreviousIconStyles,
   containerStyles,
-  selectorStyles,
-  pageSelectorContainerStyles,
   previousPageStyles,
   listPagesStyles,
   nextPageStyles,
-  pageSelectorLabelStyles,
-  pageSelectorSelectStyles,
 } from './CellsPagination.styles';
-
-type goPageFunc = (pageIndex: number) => void;
 
 interface CellsPaginationProps {
   currentPage?: number;
@@ -49,79 +43,15 @@ interface CellsPaginationProps {
   firstRow?: number;
   lastRow?: number;
   totalRows?: number;
-  goPage: goPageFunc;
+  goToPage: (pageIndex: number) => void;
   pageSize: number;
   setPageSize: (page: number) => void;
 }
 
-interface PageListProps {
-  currentPage?: number;
-  numberOfPages?: number;
-  firstRow?: number;
-  lastRow?: number;
-  totalRows?: number;
-  goPage: goPageFunc;
-}
-
-const PageNumber = ({
-  pageIndex = 1,
-  isCurrent = false,
-  goPage,
-}: {
-  pageIndex: number;
-  isCurrent: boolean;
-  goPage: goPageFunc;
-}) => {
-  if (isCurrent) {
-    return (
-      <Bold key={pageIndex} css={{...numberStyles, ...numberActiveStyles}} data-uie-name="status-active-page">
-        {pageIndex + 1}
-      </Bold>
-    );
-  }
-
-  return (
-    <Link css={numberStyles} key={pageIndex} onClick={() => goPage(pageIndex)} data-uie-name="go-page">
-      {pageIndex + 1}
-    </Link>
-  );
-};
-
-const PageList = ({currentPage = 0, numberOfPages = 1, goPage}: PageListProps) => {
-  const lastPageIndex = numberOfPages - 1;
-  const spanLength = 1;
-  const endLength = 1;
-  const skipLength = 1;
-  const normalizeCount = endLength + skipLength + spanLength;
-
-  const dots = (key: string) => (
-    <Bold css={numberStyles} key={key}>
-      …
-    </Bold>
-  );
-
-  const normalizedCurrent = Math.min(Math.max(currentPage, normalizeCount), lastPageIndex - normalizeCount);
-  const beforeCount = normalizedCurrent - spanLength - endLength;
-  const afterCount = lastPageIndex - endLength - normalizedCurrent - spanLength;
-
-  const pages = Array.from({length: numberOfPages}, (key, index) => (
-    <PageNumber pageIndex={index} isCurrent={currentPage === index} goPage={goPage} key={index} />
-  ));
-
-  if (afterCount > skipLength) {
-    pages.splice(normalizedCurrent + spanLength + 1, afterCount, dots('dots-end'));
-  }
-  if (beforeCount > skipLength) {
-    pages.splice(endLength, beforeCount, dots('dots-start'));
-  }
-
-  return pages;
-};
-
 export const CellsPagination = ({
   currentPage = 0,
   numberOfPages = 1,
-  goPage,
+  goToPage,
   firstRow = 1,
   lastRow,
   totalRows,
@@ -138,14 +68,6 @@ export const CellsPagination = ({
     [setPageSize],
   );
 
-  const options = [
-    {value: '10', label: '10'},
-    {value: '20', label: '20'},
-    {value: '50', label: '50'},
-    {value: '100', label: '100'},
-  ];
-  const currentOption = {value: `${pageSize}`, label: `${pageSize}`};
-
   return (
     <FlexBox css={containerStyles}>
       <div style={{flex: 1}}>
@@ -158,7 +80,7 @@ export const CellsPagination = ({
           <div css={previousPageStyles}>
             {!isFirstPage && (
               <IconButton
-                onClick={() => goPage(currentPage - 1)}
+                onClick={() => goToPage(currentPage - 1)}
                 data-uie-name="go-previous-page"
                 css={arrowButtonStyles}
                 aria-label={t('cellsGlobalView.pagination.previousPage')}
@@ -170,13 +92,13 @@ export const CellsPagination = ({
           </div>
 
           <div css={listPagesStyles} data-uie-name="list-pages">
-            <PageList currentPage={currentPage} numberOfPages={numberOfPages} goPage={goPage} />
+            <CellsPageList currentPage={currentPage} numberOfPages={numberOfPages} goToPage={goToPage} />
           </div>
 
           <div css={nextPageStyles}>
             {!isLastPage && (
               <IconButton
-                onClick={() => goPage(currentPage + 1)}
+                onClick={() => goToPage(currentPage + 1)}
                 data-uie-name="go-next-page"
                 css={arrowButtonStyles}
                 aria-label={t('cellsGlobalView.pagination.nextPage')}
@@ -188,20 +110,7 @@ export const CellsPagination = ({
           </div>
         </FlexBox>
       )}
-      <div css={pageSelectorContainerStyles}>
-        <div css={pageSelectorLabelStyles}>{t('cellsGlobalView.pagination.rowsPerPage')}</div>
-        <div css={pageSelectorSelectStyles}>
-          <Select
-            id={'page-size'}
-            dataUieName={'row-page-size'}
-            options={options}
-            css={selectorStyles}
-            value={currentOption}
-            menuPlacement={'top'}
-            onChange={onSizeChange}
-          />
-        </div>
-      </div>
+      <CellsPageSizeSelect pageSize={pageSize} onSizeChange={onSizeChange} />
     </FlexBox>
   );
 };

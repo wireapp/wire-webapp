@@ -46,26 +46,6 @@ export const nextPageStyles: CSSObject = {
   justifyContent: 'flex-end',
 };
 
-export const numberStyles: CSSObject = {
-  fontSize: 'var(--font-size-medium)',
-  display: 'block',
-  width: '24px',
-  height: '24px',
-  margin: '4px',
-  textAlign: 'center',
-  lineHeight: 'var(--line-height-lg)',
-  borderRadius: '8px',
-};
-
-export const numberActiveStyles: CSSObject = {
-  backgroundColor: 'var(--accent-color)',
-  color: 'var(--white)',
-
-  'body.theme--dark &': {
-    color: 'var(--main)',
-  },
-};
-
 export const arrowButtonStyles: CSSObject = {
   width: '32px',
   height: '32px',
@@ -89,30 +69,4 @@ export const arrowNextIconStyles: CSSObject = {
     fill: 'var(--main-color)',
   },
   marginBottom: '2px',
-};
-
-export const pageSelectorContainerStyles: CSSObject = {
-  flex: 1,
-  display: 'flex',
-  alignItems: 'center',
-};
-
-export const pageSelectorLabelStyles: CSSObject = {
-  flex: 1,
-  textAlign: 'right',
-  paddingRight: '10px',
-};
-
-export const pageSelectorSelectStyles: CSSObject = {
-  paddingTop: '20px',
-};
-
-export const selectorStyles: CSSObject = {
-  height: '32px',
-  minHeight: '32px',
-  // This is hacking inside the react-ui-kit component
-  '&>div>div:first-of-type': {
-    height: '32px !important',
-    minHeight: '32px !important',
-  },
 };
