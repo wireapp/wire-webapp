@@ -36,7 +36,7 @@ export const headerCellStyles: CSSObject = {
   fontSize: 'var(--font-size-small)',
   fontWeight: 'var(--font-weight-medium)',
   whiteSpace: 'nowrap',
-
+  width: 'var(--column-width)',
   '@media (max-width: 1100px)': {
     display: 'none',
   },

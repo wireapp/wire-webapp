@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useState, useMemo, useRef, useEffect} from 'react';
+import {CSSProperties, useCallback, useMemo} from 'react';
 
 import {createColumnHelper, flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
 
@@ -40,6 +40,7 @@ import {CellsTableDateColumn} from './CellsTableDateColumn/CellsTableDateColumn'
 import {CellsTableNameColumn} from './CellsTableNameColumn/CellsTableNameColumn';
 import {CellsTableRowOptions} from './CellsTableRowOptions/CellsTableRowOptions';
 import {CellsTableSharedColumn} from './CellsTableSharedColumn/CellsTableSharedColumn';
+import {useTableResizeObserver} from './useTableResizeObserver/useTableResizeObserver';
 
 import {CellFile} from '../common/cellFile/cellFile';
 
@@ -64,42 +65,11 @@ export const CellsTable = ({
   onUpdateBodyHeight,
   onUpdateColumnWidths,
 }: CellsTableProps) => {
-  // Create refs to keep track of table height and columns widths
-  const divRef = useRef<HTMLTableSectionElement>(null);
-  const columnRefs = useRef<HTMLTableHeaderCellElement[]>([]); // Array of refs for each column
-  const [widths, setWidths] = useState<number[]>([]);
-
-  useEffect(() => {
-    const updateHeight = () => {
-      if (divRef.current && onUpdateBodyHeight) {
-        onUpdateBodyHeight(divRef.current.clientHeight);
-      }
-    };
-    updateHeight();
-
-    // Set up ResizeObserver for each column
-    const observers = columnRefs.current.map((ref: HTMLElement, index) => {
-      const observer = new ResizeObserver(() => {
-        if (files && files.length && ref) {
-          setWidths(prev => {
-            const updated = [...prev];
-            updated[index] = ref.offsetWidth;
-            return updated;
-          });
-        }
-      });
-      if (ref) {
-        observer.observe(ref);
-      }
-      return observer;
-    });
-
-    return () => observers.forEach(observer => observer.disconnect());
-  }, [files, onUpdateBodyHeight]);
-
-  useEffect(() => {
-    onUpdateColumnWidths(widths);
-  }, [onUpdateColumnWidths, widths]);
+  const {tableBodyRef, columnRefCallback} = useTableResizeObserver({
+    files,
+    onUpdateBodyHeight,
+    onUpdateColumnWidths,
+  });
 
   const showDeleteFileModal = useCallback(
     ({uuid, name}: {uuid: string; name: string}) => {
@@ -184,12 +154,19 @@ export const CellsTable = ({
           {table.getHeaderGroups().map(headerGroup => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header, index) => {
-                const style = {...headerCellStyles};
-                if (fixedWidths && fixedWidths[index] && index < headerGroup.headers.length - 1) {
-                  style.width = `${fixedWidths[index]}px`;
-                }
+                const shouldSetFixedWidth = fixedWidths && fixedWidths[index] && index < headerGroup.headers.length - 1;
+
                 return (
-                  <th key={header.id} css={style} ref={el => el && (columnRefs.current[index] = el)}>
+                  <th
+                    key={header.id}
+                    css={headerCellStyles}
+                    style={
+                      {
+                        '--column-width': shouldSetFixedWidth ? `${fixedWidths[index]}px` : undefined,
+                      } as CSSProperties
+                    }
+                    ref={columnRefCallback(index)}
+                  >
                     {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                   </th>
                 );
@@ -198,7 +175,7 @@ export const CellsTable = ({
           ))}
         </thead>
         {rows.length > 0 && (
-          <tbody ref={divRef}>
+          <tbody ref={tableBodyRef}>
             {rows.map(row => (
               <tr key={row.id} css={tableCellRow}>
                 {row.getVisibleCells().map(cell => (
