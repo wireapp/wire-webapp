@@ -17,6 +17,8 @@
  *
  */
 
+import {useState} from 'react';
+
 import {t} from 'Util/LocalizerUtil';
 
 import {imageStyles} from './GridImageAsset.styles';
@@ -30,13 +32,15 @@ interface GridImageAssetProps {
 }
 
 export const GridImageAsset = ({src, isLoading, isError}: GridImageAssetProps) => {
+  const [isLoaded, setIsLoaded] = useState(false);
+
   return (
     <MediaFilePreviewCard
       label={src ? t('conversationFileImagePreviewLabel', {src}) : ''}
-      isLoading={isLoading}
+      isLoading={!isLoaded}
       isError={isError}
     >
-      {!isLoading && !isError && src && <img src={src} alt="" css={imageStyles} />}
+      {!isLoading && !isError && src && <img src={src} alt="" css={imageStyles} onLoad={() => setIsLoaded(true)} />}
     </MediaFilePreviewCard>
   );
 };
