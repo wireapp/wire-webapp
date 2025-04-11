@@ -19,7 +19,6 @@
 
 import {
   NodeServiceApi,
-  RestLookupRequest,
   RestCreateCheckResponse,
   RestDeleteVersionResponse,
   RestNode,
@@ -37,13 +36,9 @@ import {S3Service} from './CellsStorage/S3Service';
 import {AccessTokenStore} from '../auth';
 import {HttpClient} from '../http';
 
-export type SortDirection = 'asc' | 'desc';
-
 const CONFIGURATION_ERROR = 'CellsAPI is not initialized. Call initialize() before using any methods.';
 const DEFAULT_LIMIT = 10;
 const DEFAULT_OFFSET = 0;
-const DEFAULT_SEARCH_SORT_FIELD = 'mtime';
-const DEFAULT_SEARCH_SORT_DIRECTION: SortDirection = 'desc';
 
 interface CellsConfig {
   pydio: {
@@ -263,31 +258,21 @@ export class CellsAPI {
     phrase,
     limit = DEFAULT_LIMIT,
     offset = DEFAULT_OFFSET,
-    sortBy = DEFAULT_SEARCH_SORT_FIELD,
-    sortDirection = DEFAULT_SEARCH_SORT_DIRECTION,
   }: {
     phrase: string;
     limit?: number;
     offset?: number;
-    sortBy?: string;
-    sortDirection?: SortDirection;
   }): Promise<RestNodeCollection> {
     if (!this.client || !this.storageService) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
-    const request: RestLookupRequest = {
+    const result = await this.client.lookup({
       Query: {FileName: phrase, Type: 'LEAF'},
       Flags: ['WithPreSignedURLs'],
       Limit: `${limit}`,
       Offset: `${offset}`,
-    };
-    if (sortBy) {
-      request.SortField = sortBy;
-      request.SortDirDesc = sortDirection === 'desc';
-    }
-
-    const result = await this.client.lookup(request);
+    });
 
     return result.data;
   }
