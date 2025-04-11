@@ -62,16 +62,21 @@ const PageNumber = ({
   pageIndex: number;
   isCurrent: boolean;
   goPage: goPageFunc;
-}) =>
-  isCurrent ? (
-    <Bold key={pageIndex} css={{...numberStyles, ...numberActiveStyles}} data-uie-name="status-active-page">
-      {pageIndex + 1}
-    </Bold>
-  ) : (
+}) => {
+  if (isCurrent) {
+    return (
+      <Bold key={pageIndex} css={{...numberStyles, ...numberActiveStyles}} data-uie-name="status-active-page">
+        {pageIndex + 1}
+      </Bold>
+    );
+  }
+
+  return (
     <Link css={numberStyles} key={pageIndex} onClick={() => goPage(pageIndex)} data-uie-name="go-page">
       {pageIndex + 1}
     </Link>
   );
+};
 
 const PageList = ({currentPage = 0, numberOfPages = 1, goPage}: CellsPaginationProps) => {
   const lastPageIndex = numberOfPages - 1;
