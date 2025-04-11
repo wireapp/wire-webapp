@@ -19,12 +19,10 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {COLOR} from '@wireapp/react-ui-kit';
-
 export const containerStyles: CSSObject = {
   marginTop: '20px',
   alignItems: 'center',
-  fontSize: '14px',
+  fontSize: 'var(--font-size-medium)',
 };
 
 export const pagesContainerStyles: CSSObject = {
@@ -49,19 +47,19 @@ export const nextPageStyles: CSSObject = {
 };
 
 export const numberStyles: CSSObject = {
-  fontSize: '14px',
+  fontSize: 'var(--font-size-medium)',
   display: 'block',
   width: '24px',
   height: '24px',
   margin: '4px',
   textAlign: 'center',
-  lineHeight: '24px',
+  lineHeight: 'var(--line-height-lg)',
   borderRadius: '8px',
 };
 
 export const numberActiveStyles: CSSObject = {
-  backgroundColor: COLOR.BLUE,
-  color: COLOR.WHITE,
+  backgroundColor: 'var(--accent-color)',
+  color: 'var(--main-color)',
 };
 
 export const arrowButtonStyles: CSSObject = {
