@@ -1550,8 +1550,8 @@ declare module 'I18n/en-US.json' {
     'redirectHeader': `Connect to your organization\'s backend?`;
     'redirectHideDetails': `Hide details`;
     'redirectShowDetails': `Show details`;
-    'redirectParagraph1': `Your email address is associated with another backend. If you continue, you\'ll leave the official Wire server and we\'ll redirect you to {url}.`;
-    'redirectParagraph2': `This Wire backend is administered by your IT team. If you have any questions, reach out to them or to your team admin.`;
+    'redirectParagraph1': `Your email belongs to another backend. If you continue, you\'ll leave the official Wire server and we\'ll redirect you to {url}.`;
+    'redirectParagraph2': `Your IT team administers this Wire backend. If you have any questions, reach out to them or your team admin.`;
     'redirectTeamsURL': `Teams URL:`;
     'redirectWebsiteURL': `Website URL:`;
     'replyAudioMessage': `Audio Message`;
