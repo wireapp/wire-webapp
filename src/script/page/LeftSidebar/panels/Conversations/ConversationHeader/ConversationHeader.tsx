@@ -71,7 +71,8 @@ export const ConversationHeaderComponent = ({
   searchInputRef,
 }: ConversationHeaderProps) => {
   const {canCreateGroupConversation} = generatePermissionHelpers(selfUser.teamRole());
-  const {isChannelsEnabled} = useChannelsFeatureFlag();
+  const {canCreateChannels, isChannelsEnabled} = useChannelsFeatureFlag();
+  const canExternalUserCreateChannel = canCreateChannels && isChannelsEnabled && selfUser.isExternal();
   const {showModal} = useCreateConversationModal();
   const isFolderView = currentTab === SidebarTabs.FOLDER;
 
@@ -105,7 +106,7 @@ export const ConversationHeaderComponent = ({
   }, [searchInputRef, jumpToRecentSearch]);
 
   const showCreateConversationModal = () => {
-    if (isChannelsEnabled) {
+    if (isChannelsEnabled && (canCreateChannels || !selfUser.teamId)) {
       showModal();
     } else {
       amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, 'conversation_details');
@@ -119,7 +120,7 @@ export const ConversationHeaderComponent = ({
           {isFolderView && currentFolder ? currentFolder.name : conversationsHeaderTitle[currentTab]}
         </h2>
 
-        {currentTab !== SidebarTabs.ARCHIVES && canCreateGroupConversation() && (
+        {currentTab !== SidebarTabs.ARCHIVES && (canCreateGroupConversation() || canExternalUserCreateChannel) && (
           <IconButton
             onClick={showCreateConversationModal}
             data-uie-name="go-create-group"

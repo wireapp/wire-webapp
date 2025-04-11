@@ -71,6 +71,7 @@ export class User {
   public readonly isConnected: ko.PureComputed<boolean>;
   public readonly isExpired: ko.Observable<boolean>;
   public readonly isExternal: ko.PureComputed<boolean>;
+  public readonly isAdminOrOwner: ko.PureComputed<boolean>;
   public readonly isGuest: ko.Observable<boolean>;
   public readonly isActivatedAccount: ko.PureComputed<boolean>;
   /** indicates whether that user entity is available (if we have metadata for the user, it's considered available) */
@@ -183,6 +184,7 @@ export class User {
       return !connection || connection.isUnknown();
     });
     this.isExternal = ko.pureComputed(() => this.teamRole() === TEAM_ROLE.PARTNER);
+    this.isAdminOrOwner = ko.pureComputed(() => [TEAM_ROLE.ADMIN, TEAM_ROLE.OWNER].includes(this.teamRole()));
     this.isRequest = ko.pureComputed(() => !!this.connection()?.isRequest());
 
     this.isGuest = ko.observable(false);

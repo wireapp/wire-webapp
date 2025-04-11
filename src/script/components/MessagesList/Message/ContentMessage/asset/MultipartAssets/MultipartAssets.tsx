@@ -61,6 +61,7 @@ const MultipartAsset = ({
   contentType,
   cellsRepository,
   assetsCount,
+  image: imageMetadata,
 }: MultipartAssetProps) => {
   const name = trimFileExtension(initialName!);
   const extension = getFileExtension(initialName!);
@@ -86,7 +87,13 @@ const MultipartAsset = ({
   if (isImage) {
     return (
       <li ref={elementRef} css={smallCardStyles}>
-        <ImageAssetCard src={src} isLoading={isLoading} isError={isError} />
+        <ImageAssetCard
+          src={src}
+          size={isSingleAsset ? 'large' : 'small'}
+          metadata={imageMetadata}
+          isLoading={isLoading}
+          isError={isError}
+        />
       </li>
     );
   }

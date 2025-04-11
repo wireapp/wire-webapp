@@ -17,7 +17,11 @@
  *
  */
 
-import {DefaultConversationRoleName as DefaultRole, ConversationRole} from '@wireapp/api-client/lib/conversation/';
+import {
+  DefaultConversationRoleName as DefaultRole,
+  ConversationRole,
+  ADD_PERMISSION,
+} from '@wireapp/api-client/lib/conversation/';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
@@ -141,6 +145,11 @@ export class ConversationRoleRepository {
   };
 
   readonly hasPermission = (conversation: Conversation, user: User, permissionName: Permissions): boolean => {
+    // Bypass permission check for admin or owner and when conversation is a channel and teamId matches
+    if (user.isAdminOrOwner() && conversation.teamId === user.teamId && conversation.isChannel()) {
+      return true;
+    }
+
     const userRole = this.getUserPermissions(conversation, user);
     return userRole.actions.includes(permissionName);
   };
@@ -150,7 +159,10 @@ export class ConversationRoleRepository {
   };
 
   readonly canAddParticipants = (conversation: Conversation, user: User = this.userState.self()): boolean => {
-    return this.hasPermission(conversation, user, Permissions.addParticipants);
+    return (
+      conversation.conversationModerator() === ADD_PERMISSION.EVERYONE ||
+      this.hasPermission(conversation, user, Permissions.addParticipants)
+    );
   };
 
   readonly canRemoveParticipants = (conversation: Conversation, user: User = this.userState.self()): boolean => {

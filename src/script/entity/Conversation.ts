@@ -214,7 +214,7 @@ export class Conversation {
     this.teamId = undefined;
     this.type = ko.observable();
     this.groupConversationType = ko.observable<GROUP_CONVERSATION_TYPE>(GROUP_CONVERSATION_TYPE.GROUP_CONVERSATION);
-    this.conversationModerator = ko.observable<ADD_PERMISSION>(ADD_PERMISSION.EVERYONE);
+    this.conversationModerator = ko.observable<ADD_PERMISSION>(ADD_PERMISSION.ADMINS);
 
     this.isLastMessageVisible = ko.observable(true);
     this.isLoadingMessages = ko.observable(false);
@@ -332,13 +332,7 @@ export class Conversation {
       if (!this.selfUser()) {
         return NOTIFICATION_STATE.NOTHING;
       }
-      const mutedState = this.mutedState();
-
-      if (typeof mutedState === 'boolean') {
-        return mutedState ? NOTIFICATION_STATE.MENTIONS_AND_REPLIES : NOTIFICATION_STATE.EVERYTHING;
-      }
-
-      return mutedState;
+      return this.mutedState();
     });
 
     this.is_archived = this.archivedState;
