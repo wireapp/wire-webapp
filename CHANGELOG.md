@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.42.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.41.0...@wireapp/api-client@27.42.0) (2025-04-11)
+
+### Features
+
+* **CellsAPI:** add sorting parameters to searchFiles() method ([#7013](https://github.com/wireapp/wire-web-packages/issues/7013)) ([8d36900](https://github.com/wireapp/wire-web-packages/commit/8d36900240f474638ee58c3e12de10063ddcbafd))
+
 # [27.41.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.40.1...@wireapp/api-client@27.41.0) (2025-04-11)
 
 ### Features
