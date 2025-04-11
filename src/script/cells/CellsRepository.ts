@@ -38,6 +38,8 @@ interface CellsConfig {
 }
 
 const DEFAULT_MAX_FILES_LIMIT = 100;
+const SEARCH_DEFAULT_SORT_FIELD = 'mtime';
+const SEARCH_DEFAULT_SORT_DIR = 'desc';
 
 @singleton()
 export class CellsRepository {
@@ -139,7 +141,12 @@ export class CellsRepository {
   }
 
   async searchFiles({query, limit = DEFAULT_MAX_FILES_LIMIT}: {query: string; limit?: number}) {
-    return this.apiClient.api.cells.searchFiles({phrase: query, limit});
+    return this.apiClient.api.cells.searchFiles({
+      phrase: query,
+      limit,
+      sortBy: SEARCH_DEFAULT_SORT_FIELD,
+      sortDirection: SEARCH_DEFAULT_SORT_DIR,
+    });
   }
 
   async promoteFileDraft({uuid, versionId}: {uuid: string; versionId: string}) {
