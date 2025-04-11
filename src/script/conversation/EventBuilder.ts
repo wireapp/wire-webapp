@@ -296,7 +296,7 @@ export const EventBuilder = {
   build1to1MigratedToMLS(conversationEntity: Conversation): OneToOneMigratedToMlsEvent {
     return {
       ...buildQualifiedId(conversationEntity),
-      time: new Date(conversationEntity.getNextTimestamp()).toISOString(),
+      time: new Date().toISOString(),
       type: ClientEvent.CONVERSATION.ONE2ONE_MIGRATED_TO_MLS,
       from: conversationEntity.selfUser().id,
       data: undefined,
