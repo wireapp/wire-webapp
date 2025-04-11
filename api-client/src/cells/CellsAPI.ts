@@ -42,7 +42,7 @@ export type SortDirection = 'asc' | 'desc';
 const CONFIGURATION_ERROR = 'CellsAPI is not initialized. Call initialize() before using any methods.';
 const DEFAULT_LIMIT = 10;
 const DEFAULT_OFFSET = 0;
-const DEFAULT_SEARCH_SORT_BY = 'mtime';
+const DEFAULT_SEARCH_SORT_FIELD = 'mtime';
 const DEFAULT_SEARCH_SORT_DIRECTION: SortDirection = 'desc';
 
 interface CellsConfig {
@@ -263,7 +263,7 @@ export class CellsAPI {
     phrase,
     limit = DEFAULT_LIMIT,
     offset = DEFAULT_OFFSET,
-    sortBy = DEFAULT_SEARCH_SORT_BY,
+    sortBy = DEFAULT_SEARCH_SORT_FIELD,
     sortDirection = DEFAULT_SEARCH_SORT_DIRECTION,
   }: {
     phrase: string;
@@ -282,7 +282,6 @@ export class CellsAPI {
       Limit: `${limit}`,
       Offset: `${offset}`,
     };
-
     if (sortBy) {
       request.SortField = sortBy;
       request.SortDirDesc = sortDirection === 'desc';
