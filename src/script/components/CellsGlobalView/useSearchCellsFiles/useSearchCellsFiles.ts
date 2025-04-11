@@ -40,8 +40,8 @@ export const useSearchCellsFiles = ({cellsRepository}: UseSearchCellsFilesProps)
   const [searchValue, setSearchValue] = useState('');
   const [pageSize, setPageSize] = useState<number>(PAGE_INITIAL_SIZE);
 
-  const searchNow = useCallback(
-    async (query: string, status: Status, limit = pageSize) => {
+  const searchFiles = useCallback(
+    async ({query, status, limit = pageSize}: {query: string; status: Status; limit?: number}) => {
       try {
         setStatus(status);
         const result = await cellsRepository.searchFiles({query, limit});
@@ -58,19 +58,17 @@ export const useSearchCellsFiles = ({cellsRepository}: UseSearchCellsFilesProps)
         setPagination(null);
       }
     },
-    [pageSize],
+    // cellsRepository is not a dependency because it's a singleton
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [pageSize, setFiles, setPagination, setStatus],
   );
 
-  const searchFiles = useDebouncedCallback(searchNow, DEBOUNCE_TIME);
-
-  useEffect(() => {
-    const value = searchValue || '*';
-    searchFiles(value, 'loading');
-  }, [searchValue]);
+  const searchFilesDebounced = useDebouncedCallback(searchFiles, DEBOUNCE_TIME);
 
   const handleSearch = (value: string) => {
     setPageSize(PAGE_INITIAL_SIZE);
     setSearchValue(value);
+    void searchFilesDebounced({query: value, status: 'loading'});
   };
 
   const handleClearSearch = () => {
@@ -81,14 +79,19 @@ export const useSearchCellsFiles = ({cellsRepository}: UseSearchCellsFilesProps)
   const handleReload = async () => {
     setStatus('loading');
     clearAll();
-    await searchNow(searchValue || '*', 'loading');
+    await searchFiles({query: searchValue || '*', status: 'loading'});
   };
 
   const increasePageSize = useCallback(async () => {
     setStatus('load-more');
     setPageSize(pageSize + PAGE_SIZE_INCREMENT);
-    await searchNow(searchValue || '*', 'load-more', pageSize + PAGE_SIZE_INCREMENT);
-  }, [pageSize, searchValue]);
+    await searchFiles({query: searchValue || '*', status: 'load-more', limit: pageSize + PAGE_SIZE_INCREMENT});
+  }, [pageSize, searchFiles, searchValue, setStatus]);
+
+  useEffect(() => {
+    setStatus('loading');
+    void searchFiles({query: '*', status: 'loading'});
+  }, [searchFiles, setStatus]);
 
   return {
     searchValue,

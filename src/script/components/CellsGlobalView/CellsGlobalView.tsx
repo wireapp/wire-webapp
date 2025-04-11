@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect} from 'react';
+import {useCallback} from 'react';
 
 import {container} from 'tsyringe';
 
@@ -45,10 +45,6 @@ export const CellsGlobalView = ({cellsRepository = container.resolve(CellsReposi
   const {searchValue, handleSearch, handleClearSearch, handleReload, increasePageSize} = useSearchCellsFiles({
     cellsRepository,
   });
-
-  useEffect(() => {
-    void handleReload();
-  }, []);
 
   const deleteFileFailedNotification = useAppNotification({
     message: t('cellsGlobalView.deleteModalError'),
