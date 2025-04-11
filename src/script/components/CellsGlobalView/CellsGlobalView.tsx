@@ -70,19 +70,19 @@ export const CellsGlobalView = ({cellsRepository = container.resolve(CellsReposi
   }, [handleReload]);
 
   const isLoading = filesStatus === 'loading';
-  const isLoadingMore = filesStatus === 'load-more';
+  const isFetchingMore = filesStatus === 'fetchingMore';
   const isError = filesStatus === 'error';
   const isSuccess = filesStatus === 'success';
   const hasFiles = !!files.length;
   const emptySearchResults = searchValue && filesStatus === 'success' && !files.length;
 
-  const showTable = (isSuccess || (pagination && isLoadingMore)) && !emptySearchResults;
-  const showNoFiles = !isLoading && !isLoadingMore && !isError && !hasFiles && !emptySearchResults;
-  const showLoader = isLoadingMore && files && files.length > 0;
+  const showTable = (isSuccess || (pagination && isFetchingMore)) && !emptySearchResults;
+  const showNoFiles = !isLoading && !isFetchingMore && !isError && !hasFiles && !emptySearchResults;
+  const showLoader = isFetchingMore && files && files.length > 0;
 
   const showLoadMore =
     !isLoading &&
-    !isLoadingMore &&
+    !isFetchingMore &&
     !emptySearchResults &&
     isSuccess &&
     pagination &&

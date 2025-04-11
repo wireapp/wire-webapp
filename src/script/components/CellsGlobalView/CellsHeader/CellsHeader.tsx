@@ -30,7 +30,7 @@ interface CellsHeaderProps {
   onSearch: (value: string) => void;
   onClearSearch: () => void;
   onRefresh: () => void;
-  searchStatus: 'idle' | 'loading' | 'load-more' | 'success' | 'error';
+  searchStatus: 'idle' | 'loading' | 'fetchingMore' | 'success' | 'error';
 }
 
 export const CellsHeader = ({searchValue, onSearch, onClearSearch, onRefresh, searchStatus}: CellsHeaderProps) => {

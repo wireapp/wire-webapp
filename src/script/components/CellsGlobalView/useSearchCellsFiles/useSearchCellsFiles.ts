@@ -83,9 +83,9 @@ export const useSearchCellsFiles = ({cellsRepository}: UseSearchCellsFilesProps)
   };
 
   const increasePageSize = useCallback(async () => {
-    setStatus('load-more');
+    setStatus('fetchingMore');
     setPageSize(pageSize + PAGE_SIZE_INCREMENT);
-    await searchFiles({query: searchValue || '*', status: 'load-more', limit: pageSize + PAGE_SIZE_INCREMENT});
+    await searchFiles({query: searchValue || '*', status: 'fetchingMore', limit: pageSize + PAGE_SIZE_INCREMENT});
   }, [pageSize, searchFiles, searchValue, setStatus]);
 
   useEffect(() => {

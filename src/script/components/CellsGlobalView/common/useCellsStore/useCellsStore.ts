@@ -22,7 +22,7 @@ import {create} from 'zustand';
 import {CellFile} from '../cellFile/cellFile';
 import {CellPagination} from '../cellPagination/cellPagination';
 
-export type Status = 'idle' | 'loading' | 'load-more' | 'success' | 'error';
+export type Status = 'idle' | 'loading' | 'fetchingMore' | 'success' | 'error';
 
 interface CellsState {
   files: CellFile[];
