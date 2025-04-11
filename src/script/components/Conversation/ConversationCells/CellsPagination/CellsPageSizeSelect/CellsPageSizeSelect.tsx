@@ -51,7 +51,9 @@ export const CellsPageSizeSelect = ({pageSize, onSizeChange}: CellsPageSizeSelec
           css={selectStyles}
           value={currentOption}
           menuPlacement={'top'}
-          onChange={onSizeChange}
+          onChange={change => {
+            onSizeChange({value: change?.value as string});
+          }}
         />
       </div>
     </div>
