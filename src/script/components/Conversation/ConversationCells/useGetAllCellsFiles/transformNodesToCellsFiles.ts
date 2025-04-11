@@ -17,8 +17,9 @@
  *
  */
 
-import {RestNode} from 'cells-sdk-ts';
+import {RestNode, RestPagination} from 'cells-sdk-ts';
 
+import {CellPagination} from 'Components/Conversation/ConversationCells/common/cellPagination/cellPagination';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {formatBytes} from 'Util/util';
 
@@ -47,6 +48,18 @@ export const transformNodesToCellsFiles = (nodes: RestNode[]): CellFile[] => {
       // eslint-disable-next-line id-length
       .sort((a, b) => b.uploadedAtTimestamp - a.uploadedAtTimestamp)
   );
+};
+
+export const transformToCellPagination = (pagination: RestPagination): CellPagination => {
+  return {
+    limit: pagination.Limit,
+    total: pagination.Total,
+    totalPages: pagination.TotalPages,
+    currentOffset: pagination.CurrentOffset,
+    prevOffset: pagination.PrevOffset,
+    nextOffset: pagination.NextOffset,
+    currentPage: pagination.CurrentPage,
+  };
 };
 
 const getFileName = (filePath: string): string => {

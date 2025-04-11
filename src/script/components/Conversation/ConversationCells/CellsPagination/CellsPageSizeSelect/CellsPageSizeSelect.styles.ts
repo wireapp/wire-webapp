@@ -20,12 +20,27 @@
 import {CSSObject} from '@emotion/react';
 
 export const wrapperStyles: CSSObject = {
-  padding: '20px',
-  overflowY: 'auto',
+  flex: 1,
+  display: 'flex',
+  alignItems: 'center',
 };
 
-export const loadMoreWrapperStyles: CSSObject = {
-  padding: '20px',
-  display: 'flex',
-  justifyContent: 'center',
+export const labelStyles: CSSObject = {
+  flex: 1,
+  textAlign: 'right',
+  paddingRight: '10px',
+};
+
+export const selectWrapperStyles: CSSObject = {
+  paddingTop: '20px',
+};
+
+export const selectStyles: CSSObject = {
+  height: '32px',
+  minHeight: '32px',
+  // This is hacking inside the react-ui-kit component
+  '&>div>div:first-of-type': {
+    height: '32px !important',
+    minHeight: '32px !important',
+  },
 };

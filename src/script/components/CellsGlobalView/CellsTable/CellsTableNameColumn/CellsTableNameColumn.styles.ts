@@ -40,7 +40,8 @@ export const imagePreviewWrapperStyles: CSSObject = {
 
 export const imagePreviewStyles: CSSObject = {
   objectFit: 'cover',
-  borderRadius: '2px',
+  borderRadius: '4px',
+  border: '1px solid var(--border-color)',
 };
 
 export const playIconStyles: CSSObject = {

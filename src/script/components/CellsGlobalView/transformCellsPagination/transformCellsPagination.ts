@@ -17,15 +17,18 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {RestPagination} from 'cells-sdk-ts';
 
-export const wrapperStyles: CSSObject = {
-  padding: '20px',
-  overflowY: 'auto',
-};
+import {CellPagination} from '../common/cellPagination/cellPagination';
 
-export const loadMoreWrapperStyles: CSSObject = {
-  padding: '20px',
-  display: 'flex',
-  justifyContent: 'center',
+export const transformCellsPagination = (pagination: RestPagination): CellPagination => {
+  return {
+    limit: pagination.Limit || 0,
+    total: pagination.Total || 0,
+    totalPages: pagination.TotalPages || 0,
+    currentOffset: pagination.CurrentOffset || 0,
+    prevOffset: pagination.PrevOffset || 0,
+    nextOffset: pagination.NextOffset || 0,
+    currentPage: pagination.CurrentPage || 0,
+  };
 };

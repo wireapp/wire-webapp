@@ -36,14 +36,14 @@ export const headerCellStyles: CSSObject = {
   fontSize: 'var(--font-size-small)',
   fontWeight: 'var(--font-weight-medium)',
   whiteSpace: 'nowrap',
-
+  width: 'var(--column-width)',
   '@media (max-width: 1100px)': {
     display: 'none',
   },
 };
 
 export const tableCellStyles: CSSObject = {
-  padding: '12px',
+  padding: '8px 12px',
   borderBottom: '1px solid var(--border-color)',
   fontSize: 'var(--font-size-small)',
   whiteSpace: 'nowrap',

@@ -19,13 +19,34 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const wrapperStyles: CSSObject = {
-  padding: '20px',
-  overflowY: 'auto',
+export const listStyles: CSSObject = {
+  alignItems: 'flex-end',
+  display: 'flex',
+  flexDirection: 'row',
+  margin: '0 auto',
+  listStyle: 'none',
+  padding: 0,
 };
 
-export const loadMoreWrapperStyles: CSSObject = {
-  padding: '20px',
-  display: 'flex',
-  justifyContent: 'center',
+export const numberStyles: CSSObject = {
+  fontSize: 'var(--font-size-medium)',
+  display: 'block',
+  width: '24px',
+  height: '24px',
+  margin: '4px',
+  textAlign: 'center',
+  lineHeight: 'var(--line-height-lg)',
+  borderRadius: '8px',
+  border: 'none',
+  backgroundColor: 'transparent',
+  cursor: 'pointer',
+};
+
+export const numberActiveStyles: CSSObject = {
+  backgroundColor: 'var(--accent-color)',
+  color: 'var(--white)',
+
+  'body.theme--dark &': {
+    color: 'var(--main)',
+  },
 };

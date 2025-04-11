@@ -24,29 +24,25 @@ import {formatBytes} from 'Util/util';
 
 import {CellFile} from '../common/cellFile/cellFile';
 
-export const transformNodesToCellsFiles = (nodes: RestNode[]): CellFile[] => {
-  return (
-    nodes
-      .filter(node => node.Type === 'LEAF')
-      .map(node => ({
-        id: node.Uuid,
-        owner: getOwner(node),
-        conversationName: node.ContextWorkspace?.Label || '',
-        mimeType: node.ContentType,
-        name: getFileName(node.Path),
-        sizeMb: getFileSize(node),
-        previewImageUrl: getPreviewImageUrl(node),
-        uploadedAtTimestamp: getUploadedAtTimestamp(node),
-        fileUrl: node.PreSignedGET?.Url,
-        publicLink: {
-          alreadyShared: !!node.Shares?.[0].Uuid,
-          uuid: node.Shares?.[0].Uuid || '',
-          url: undefined,
-        },
-      }))
-      // eslint-disable-next-line id-length
-      .sort((a, b) => b.uploadedAtTimestamp - a.uploadedAtTimestamp)
-  );
+export const transformCellsFiles = (nodes: RestNode[]): CellFile[] => {
+  return nodes
+    .filter(node => node.Type === 'LEAF')
+    .map(node => ({
+      id: node.Uuid,
+      owner: getOwner(node),
+      conversationName: node.ContextWorkspace?.Label || '',
+      mimeType: node.ContentType,
+      name: getFileName(node.Path),
+      sizeMb: getFileSize(node),
+      previewImageUrl: getPreviewImageUrl(node),
+      uploadedAtTimestamp: getUploadedAtTimestamp(node),
+      fileUrl: node.PreSignedGET?.Url,
+      publicLink: {
+        alreadyShared: !!node.Shares?.[0].Uuid,
+        uuid: node.Shares?.[0].Uuid || '',
+        url: undefined,
+      },
+    }));
 };
 
 const getFileName = (filePath: string): string => {

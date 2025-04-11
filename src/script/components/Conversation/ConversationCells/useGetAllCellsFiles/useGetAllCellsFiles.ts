@@ -17,14 +17,14 @@
  *
  */
 
-import {useEffect, useCallback} from 'react';
+import {useEffect, useCallback, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {Config} from 'src/script/Config';
 
-import {transformNodesToCellsFiles} from './transformNodesToCellsFiles';
+import {transformNodesToCellsFiles, transformToCellPagination} from './transformNodesToCellsFiles';
 
 import {useCellsStore} from '../common/useCellsStore/useCellsStore';
 
@@ -34,7 +34,9 @@ interface UseGetAllCellsFilesProps {
 }
 
 export const useGetAllCellsFiles = ({cellsRepository, conversationQualifiedId}: UseGetAllCellsFilesProps) => {
-  const {setFiles, setStatus, setError} = useCellsStore();
+  const {setFiles, pageSize, setStatus, setPagination, setError} = useCellsStore();
+
+  const [offset, setOffset] = useState(0);
 
   const {domain, id} = conversationQualifiedId;
 
@@ -48,24 +50,32 @@ export const useGetAllCellsFiles = ({cellsRepository, conversationQualifiedId}: 
 
       const result = await cellsRepository.getAllFiles({
         path: `${id}@${domainPerEnv}`,
+        limit: pageSize,
+        offset,
       });
 
       if (!result.Nodes?.length) {
         setStatus('success');
+        setPagination({conversationId: id, pagination: null});
         return;
       }
 
       const transformedFiles = transformNodesToCellsFiles(result.Nodes);
       setFiles({conversationId: id, files: transformedFiles});
+
+      const pagination = result.Pagination ? transformToCellPagination(result.Pagination) : null;
+      setPagination({conversationId: id, pagination});
+
       setStatus('success');
     } catch (error) {
       setError(error instanceof Error ? error : new Error('Failed to fetch files', {cause: error}));
+      setPagination({conversationId: id, pagination: null});
       setStatus('error');
       throw error;
     }
     // cellsRepository is not a dependency because it's a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setFiles, setStatus, setError, id, domain]);
+  }, [setFiles, setStatus, setError, id, domain, offset, pageSize]);
 
   useEffect(() => {
     void fetchFiles();
@@ -73,5 +83,6 @@ export const useGetAllCellsFiles = ({cellsRepository, conversationQualifiedId}: 
 
   return {
     refresh: fetchFiles,
+    setOffset,
   };
 };
