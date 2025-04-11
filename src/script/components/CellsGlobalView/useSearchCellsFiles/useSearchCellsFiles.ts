@@ -92,7 +92,8 @@ export const useSearchCellsFiles = ({cellsRepository}: UseSearchCellsFilesProps)
   useEffect(() => {
     setStatus('loading');
     void searchFiles({query: '*', status: 'loading'});
-  }, [searchFiles, setStatus]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return {
     searchValue,
