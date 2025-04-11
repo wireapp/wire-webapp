@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
@@ -33,6 +33,8 @@ import {CellsStateInfo} from './CellsStateInfo/CellsStateInfo';
 import {CellsTable} from './CellsTable/CellsTable';
 import {useCellsStore} from './common/useCellsStore/useCellsStore';
 import {wrapperStyles} from './ConversationCells.styles';
+import {useCellsPagination} from './useCellsPagination/useCellsPagination';
+import {useCellsTableDimensions} from './useCellsTableDimentions/useCellsTableDimentions';
 import {useGetAllCellsFiles} from './useGetAllCellsFiles/useGetAllCellsFiles';
 
 interface ConversationCellsProps {
@@ -45,17 +47,23 @@ export const ConversationCells = ({
   conversationQualifiedId,
 }: ConversationCellsProps) => {
   const {getFiles, status: filesStatus, getPagination, clearAll, removeFile, pageSize} = useCellsStore();
-
   const conversationId = conversationQualifiedId.id;
+
+  const {refresh, setOffset} = useGetAllCellsFiles({cellsRepository, conversationQualifiedId});
 
   const files = getFiles({conversationId});
   const pagination = getPagination({conversationId});
-  const {refresh, setOffset} = useGetAllCellsFiles({cellsRepository, conversationQualifiedId});
 
-  const [tableHeight, setTableHeight] = useState(-1);
-  const [loaderHeight, setLoaderHeight] = useState<number | undefined>(-1);
-  const [tableColumnsWidths, setTableColumnsWidth] = useState<number[]>([]);
-  const [fixedColumnsWidths, setFixedColumnsWidth] = useState<number[] | undefined>([]);
+  const {loaderHeight, fixedColumnsWidths, handleHeight, handleWidths, updateDimensions} = useCellsTableDimensions({
+    files,
+  });
+
+  const {goToPage, getPaginationProps} = useCellsPagination({
+    pagination,
+    pageSize,
+    setOffset,
+    onPageChange: updateDimensions,
+  });
 
   const isLoading = filesStatus === 'loading';
   const isError = filesStatus === 'error';
@@ -86,61 +94,6 @@ export const ConversationCells = ({
     await refresh();
   }, [refresh, clearAll, conversationId]);
 
-  const currentPage = pagination?.currentPage || 0;
-  const totalPages = pagination?.totalPages || 1;
-  const totalRows = pagination?.total || pageSize;
-
-  const goToPage = useCallback(
-    (page: number) => {
-      setLoaderHeight(tableHeight);
-      setFixedColumnsWidth(tableColumnsWidths);
-      setOffset(page * pageSize);
-    },
-    [pagination, pageSize, setOffset, tableHeight, tableColumnsWidths],
-  );
-
-  useEffect(() => {
-    if (files) {
-      setFixedColumnsWidth(undefined);
-      setLoaderHeight(undefined);
-    }
-  }, [files]);
-
-  const handleHeight = useCallback((h: number) => {
-    setTableHeight(h);
-  }, []);
-
-  const handleWidths = useCallback((ww: number[]) => {
-    setTableColumnsWidth(ww);
-  }, []);
-
-  let paginationComponent;
-  if (!isError) {
-    if (totalPages > 1) {
-      paginationComponent = (
-        <CellsPagination
-          currentPage={currentPage ? currentPage - 1 : 0}
-          numberOfPages={pagination?.totalPages}
-          goPage={goToPage}
-          totalRows={pagination?.total}
-          firstRow={(currentPage - 1) * pageSize + 1}
-          lastRow={Math.min(currentPage * pageSize, totalRows)}
-        />
-      );
-    } else {
-      paginationComponent = (
-        <CellsPagination
-          currentPage={0}
-          numberOfPages={1}
-          goPage={goToPage}
-          totalRows={files && files.length}
-          firstRow={1}
-          lastRow={files && files.length}
-        />
-      );
-    }
-  }
-
   return (
     <div css={wrapperStyles}>
       <CellsHeader onRefresh={handleRefresh} />
@@ -168,7 +121,7 @@ export const ConversationCells = ({
           description={t('cellsGlobalView.errorDescription')}
         />
       )}
-      {paginationComponent}
+      {!isError && <CellsPagination {...getPaginationProps()} goPage={goToPage} />}
     </div>
   );
 };
