@@ -72,9 +72,10 @@ export const useSearchCellsFiles = ({cellsRepository}: UseSearchCellsFilesProps)
     void searchFilesDebounced({query: value, status: 'loading'});
   };
 
-  const handleClearSearch = () => {
+  const handleClearSearch = async () => {
     setPageSize(PAGE_INITIAL_SIZE);
     setSearchValue('');
+    await searchFiles({query: '*', status: 'loading'});
   };
 
   const handleReload = async () => {
