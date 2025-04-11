@@ -46,6 +46,16 @@ export type Env = {
   /** Specifies the name of the application, e.g. Webapp */
   APP_NAME: string;
 
+  /** Specifies configuration for Cells */
+  FEATURE_ENABLE_CELLS: string;
+  CELLS_TOKEN_SHARED_SECRET: string;
+  CELLS_PYDIO_SEGMENT: string;
+  CELLS_PYDIO_URL: string;
+  CELLS_S3_BUCKET: string;
+  CELLS_S3_REGION: string;
+  CELLS_S3_ENDPOINT: string;
+  CELLS_WIRE_DOMAIN: string;
+
   /** Specifies the name of the backend, e.g. Wire */
   BACKEND_NAME: string;
 
@@ -174,6 +184,15 @@ export type Env = {
   /** Feature to enable Enterprise login v2 */
   FEATURE_ENABLE_ENTERPRISE_LOGIN_V2: string;
 
+  /** Feature to enable channels */
+  FEATURE_ENABLE_CHANNELS: string;
+
+  /** Feature to enable channels history sharing */
+  FEATURE_ENABLE_CHANNELS_HISTORY_SHARING: string;
+
+  /** Feature to enable channels public channels */
+  FEATURE_ENABLE_PUBLIC_CHANNELS: string;
+
   /** Feature to enable team creation flow for individual users */
   FEATURE_ENABLE_TEAM_CREATION: string;
 
@@ -289,6 +308,8 @@ export type Env = {
 
   URL_SUPPORT_MLS_LEARN_MORE: string;
 
+  URL_SUPPORT_MLS_MIGRATION_FROM_PROTEUS: string;
+
   URL_SUPPORT_MICROPHONE_ACCESS_DENIED: string;
 
   URL_SUPPORT_PRIVACY_VERIFY_FINGERPRINT: string;
@@ -296,6 +317,8 @@ export type Env = {
   URL_SUPPORT_SCREEN_ACCESS_DENIED: string;
 
   URL_SUPPORT_SYSTEM_KEYCHAIN_ACCESS: string;
+
+  URL_SUPPORT_E2E_ENCRYPTION: string;
 
   URL_SUPPORT_FAVORITES: string;
 
@@ -364,4 +387,7 @@ export type Env = {
   DATADOG_APPLICATION_ID?: string;
   DATADOG_CLIENT_TOKEN?: string;
   FEATURE_DATADOG_ENVIRONMENT?: string;
+
+  /** Feature to enable screen sharing with video overlay */
+  FEATURE_ENABLE_SCREEN_SHARE_WITH_VIDEO: string;
 };

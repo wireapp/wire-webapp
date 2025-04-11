@@ -19,13 +19,11 @@
 
 import {UIEvent, useCallback, useEffect, useState} from 'react';
 
-import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import {useMatchMedia} from '@wireapp/react-ui-kit';
 
 import {CallingCell} from 'Components/calling/CallingCell';
-import {DropFileArea} from 'Components/DropFileArea';
 import {Giphy} from 'Components/Giphy';
 import {InputBar} from 'Components/InputBar';
 import {MessagesList} from 'Components/MessagesList';
@@ -42,10 +40,16 @@ import {isHittingUploadLimit} from 'Util/isHittingUploadLimit';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {safeMailOpen, safeWindowOpen} from 'Util/SanitizationUtil';
-import {formatBytes, incomingCssClass, removeAnimationsClass} from 'Util/util';
+import {formatBytes} from 'Util/util';
 
+import {ConversationCells} from './ConversationCells/ConversationCells';
+import {ConversationFileDropzone} from './ConversationFileDropzone/ConversationFileDropzone';
+import {ConversationMessagesWrapper} from './ConversationMessagesWrapper/ConversationMessagesWrapper';
+import {ConversationTabPanel} from './ConversationTabPanel/ConversationTabPanel';
+import {ConversationTabs} from './ConversationTabs/ConversationTabs';
 import {useReadReceiptSender} from './hooks/useReadReceipt';
 import {ReadOnlyConversationMessage} from './ReadOnlyConversationMessage';
+import {useFilesUploadDropzone} from './useFilesUploadDropzone/useFilesUploadDropzone';
 import {checkFileSharingPermission} from './utils/checkFileSharingPermission';
 
 import {ConversationState} from '../../conversation/ConversationState';
@@ -122,6 +126,8 @@ export const Conversation = ({
 
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
   const smBreakpoint = useMatchMedia('max-width: 640px');
+
+  const [activeTabIndex, setActiveTabIndex] = useState(0);
 
   const {addReadReceiptToBatch} = useReadReceiptSender(repositories.message);
 
@@ -433,7 +439,7 @@ export const Conversation = ({
         if (conversationEntity.is1to1()) {
           shouldSendReadReceipt = repositories.conversation.expectReadReceipt(conversationEntity);
         } else if (
-          conversationEntity.isGroup() &&
+          conversationEntity.isGroupOrChannel() &&
           (conversationEntity.inTeam() ||
             conversationEntity.isGuestRoom() ||
             conversationEntity.isGuestAndServicesRoom())
@@ -462,13 +468,28 @@ export const Conversation = ({
     [addReadReceiptToBatch, repositories.conversation, repositories.integration, updateConversationLastRead],
   );
 
+  const {
+    getRootProps,
+    getInputProps,
+    open: openCellsUploadWindow,
+    isDragAccept,
+  } = useFilesUploadDropzone({
+    isTeam: inTeam,
+    cellsRepository: repositories.cells,
+    conversation: activeConversation,
+  });
+
+  const isCellsEnabled = Config.getConfig().FEATURE.ENABLE_CELLS;
+
   return (
-    <DropFileArea
+    <ConversationFileDropzone
+      isDragAccept={isDragAccept}
+      isCellsEnabled={isCellsEnabled}
+      isConversationLoaded={isConversationLoaded}
+      activeConversationId={activeConversation?.id}
       onFileDropped={checkFileSharingPermission(uploadDroppedFiles)}
-      id="conversation"
-      className={cx('conversation', {[incomingCssClass]: isConversationLoaded, loading: !isConversationLoaded})}
-      ref={removeAnimationsClass}
-      key={activeConversation?.id}
+      rootProps={getRootProps()}
+      inputProps={getInputProps()}
     >
       {activeConversation && (
         <>
@@ -481,86 +502,101 @@ export const Conversation = ({
             openRightSidebar={openRightSidebar}
             isRightSidebarOpen={isRightSidebarOpen}
             isReadOnlyConversation={isReadOnlyConversation || isSelfUserRemoved}
+            withBottomDivider={!isCellsEnabled}
           />
 
-          {activeCalls.map(call => {
-            const {conversation} = call;
-            const callingViewModel = mainViewModel.calling;
-            const callingRepository = callingViewModel.callingRepository;
+          {isCellsEnabled && (
+            <>
+              <ConversationTabs activeTabIndex={activeTabIndex} onIndexChange={setActiveTabIndex} />
+              <ConversationTabPanel id="files" isActive={activeTabIndex === 1}>
+                {activeTabIndex === 1 && <ConversationCells conversationQualifiedId={activeConversation.qualifiedId} />}
+              </ConversationTabPanel>
+            </>
+          )}
 
-            if (!smBreakpoint) {
-              return null;
-            }
+          <ConversationMessagesWrapper isCellsEnabled={isCellsEnabled} isPanelHidden={activeTabIndex === 1}>
+            {activeCalls.map(call => {
+              const {conversation} = call;
+              const callingViewModel = mainViewModel.calling;
+              const callingRepository = callingViewModel.callingRepository;
 
-            return (
-              <CallingCell
-                key={conversation.id}
-                classifiedDomains={classifiedDomains}
-                call={call}
-                callActions={callingViewModel.callActions}
-                callingRepository={callingRepository}
-                propertiesRepository={repositories.properties}
-              />
-            );
-          })}
+              if (!smBreakpoint) {
+                return null;
+              }
 
-          <MessagesList
-            conversation={activeConversation}
-            selfUser={selfUser}
-            conversationRepository={conversationRepository}
-            assetRepository={repositories.asset}
-            messageRepository={repositories.message}
-            messageActions={mainViewModel.actions}
-            invitePeople={clickOnInvitePeople}
-            cancelConnectionRequest={clickOnCancelRequest}
-            showUserDetails={showUserDetails}
-            showMessageDetails={showMessageDetails}
-            showMessageReactions={showMessageReactions}
-            showParticipants={showParticipants}
-            showImageDetails={showDetail}
-            resetSession={onSessionResetClick}
-            onClickMessage={handleClickOnMessage}
-            onLoading={loading => setIsConversationLoaded(!loading)}
-            getVisibleCallback={getInViewportCallback}
-            isMsgElementsFocusable={isMsgElementsFocusable}
-            setMsgElementsFocusable={setMsgElementsFocusable}
-            isRightSidebarOpen={isRightSidebarOpen}
-            updateConversationLastRead={updateConversationLastRead}
-          />
+              return (
+                <CallingCell
+                  key={conversation.id}
+                  classifiedDomains={classifiedDomains}
+                  call={call}
+                  callActions={callingViewModel.callActions}
+                  callingRepository={callingRepository}
+                  propertiesRepository={repositories.properties}
+                />
+              );
+            })}
 
-          {isConversationLoaded &&
-            !isSelfUserRemoved &&
-            (isReadOnlyConversation ? (
-              <ReadOnlyConversationMessage reloadApp={reloadApp} conversation={activeConversation} />
-            ) : (
-              <InputBar
-                key={activeConversation?.id}
-                conversation={activeConversation}
-                conversationRepository={repositories.conversation}
-                eventRepository={repositories.event}
-                messageRepository={repositories.message}
-                openGiphy={openGiphy}
-                propertiesRepository={repositories.properties}
-                searchRepository={repositories.search}
-                storageRepository={repositories.storage}
-                teamState={teamState}
-                selfUser={selfUser}
-                onShiftTab={() => setMsgElementsFocusable(false)}
-                uploadDroppedFiles={uploadDroppedFiles}
-                uploadImages={uploadImages}
-                uploadFiles={uploadFiles}
-              />
-            ))}
+            <MessagesList
+              conversation={activeConversation}
+              selfUser={selfUser}
+              conversationRepository={conversationRepository}
+              assetRepository={repositories.asset}
+              messageRepository={repositories.message}
+              messageActions={mainViewModel.actions}
+              invitePeople={clickOnInvitePeople}
+              cancelConnectionRequest={clickOnCancelRequest}
+              showUserDetails={showUserDetails}
+              showMessageDetails={showMessageDetails}
+              showMessageReactions={showMessageReactions}
+              showParticipants={showParticipants}
+              showImageDetails={showDetail}
+              resetSession={onSessionResetClick}
+              onClickMessage={handleClickOnMessage}
+              onLoading={loading => setIsConversationLoaded(!loading)}
+              getVisibleCallback={getInViewportCallback}
+              isMsgElementsFocusable={isMsgElementsFocusable}
+              setMsgElementsFocusable={setMsgElementsFocusable}
+              isRightSidebarOpen={isRightSidebarOpen}
+              updateConversationLastRead={updateConversationLastRead}
+            />
 
-          <div className="conversation-loading">
-            <div className="icon-spinner spin accent-text"></div>
-          </div>
+            {isConversationLoaded &&
+              !isSelfUserRemoved &&
+              (isReadOnlyConversation ? (
+                <ReadOnlyConversationMessage reloadApp={reloadApp} conversation={activeConversation} />
+              ) : (
+                <InputBar
+                  key={activeConversation?.id}
+                  conversation={activeConversation}
+                  conversationRepository={repositories.conversation}
+                  cellsRepository={repositories.cells}
+                  eventRepository={repositories.event}
+                  messageRepository={repositories.message}
+                  openGiphy={openGiphy}
+                  propertiesRepository={repositories.properties}
+                  searchRepository={repositories.search}
+                  storageRepository={repositories.storage}
+                  teamState={teamState}
+                  selfUser={selfUser}
+                  onShiftTab={() => setMsgElementsFocusable(false)}
+                  uploadDroppedFiles={uploadDroppedFiles}
+                  uploadImages={uploadImages}
+                  uploadFiles={uploadFiles}
+                  onCellImageUpload={openCellsUploadWindow}
+                  onCellAssetUpload={openCellsUploadWindow}
+                />
+              ))}
+
+            <div className="conversation-loading">
+              <div className="icon-spinner spin accent-text"></div>
+            </div>
+          </ConversationMessagesWrapper>
         </>
       )}
 
       {isGiphyModalOpen && inputValue && (
         <Giphy giphyRepository={repositories.giphy} inputValue={inputValue} onClose={closeGiphy} />
       )}
-    </DropFileArea>
+    </ConversationFileDropzone>
   );
 };

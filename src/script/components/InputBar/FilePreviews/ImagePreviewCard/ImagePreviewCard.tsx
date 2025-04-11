@@ -19,26 +19,28 @@
 
 import {t} from 'Util/LocalizerUtil';
 
-import {imageStyles, wrapperStyles} from './ImagePreviewCard.styles';
+import {imageStyles} from './ImagePreviewCard.styles';
 
-import {FilePreviewDeleteButton} from '../common/FilePreviewDeleteButton/FilePreviewDeleteButton';
+import {MediaFilePreviewCard} from '../common/MediaFilePreviewCard/MediaFilePreviewCard';
+
 interface ImagePreviewCardProps {
   src: string;
   onDelete: () => void;
+  onRetry: () => void;
+  isError: boolean;
+  uploadProgress: number;
 }
 
-export const ImagePreviewCard = ({src, onDelete}: ImagePreviewCardProps) => {
+export const ImagePreviewCard = ({src, onDelete, onRetry, isError, uploadProgress}: ImagePreviewCardProps) => {
   return (
-    <article css={wrapperStyles} aria-label={t('conversationFileImagePreviewLabel', {src})}>
-      <img
-        src={src}
-        alt=""
-        css={imageStyles}
-        onLoad={() => {
-          URL.revokeObjectURL(src);
-        }}
-      />
-      <FilePreviewDeleteButton onDelete={onDelete} />
-    </article>
+    <MediaFilePreviewCard
+      label={t('conversationFileImagePreviewLabel', {src})}
+      onDelete={onDelete}
+      onRetry={onRetry}
+      isError={isError}
+      uploadProgress={uploadProgress}
+    >
+      <img src={src} alt="" css={imageStyles} />
+    </MediaFilePreviewCard>
   );
 };

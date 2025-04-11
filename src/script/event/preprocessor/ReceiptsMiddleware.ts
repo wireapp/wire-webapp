@@ -52,7 +52,7 @@ export class ReceiptsMiddleware implements EventMiddleware {
       case ClientEvent.CONVERSATION.MESSAGE_ADD: {
         const qualifiedConversation = event.qualified_conversation || {domain: '', id: event.conversation};
         const conversation = await this.conversationRepository.getConversationById(qualifiedConversation);
-        if (conversation?.isGroup()) {
+        if (conversation?.isGroupOrChannel()) {
           // We only override the value of expects_read_confirmation for group conversations (one to one conversation use the value set by the sender)
           event.data.expects_read_confirmation = conversation.receiptMode() === RECEIPT_MODE.ON;
         }

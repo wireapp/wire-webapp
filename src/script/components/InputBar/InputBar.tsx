@@ -28,7 +28,9 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
+import {useFileUploadState} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
 import {EmojiPicker} from 'Components/EmojiPicker/EmojiPicker';
+import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
 import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
 import {EventName} from 'src/script/tracking/EventName';
@@ -38,6 +40,7 @@ import {t} from 'Util/LocalizerUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {MessageContent} from './common/messageContent/messageContent';
+import {FilePreviews} from './FilePreviews/FilePreviews';
 import {InputBarContainer} from './InputBarContainer/InputBarContainer';
 import {InputBarControls} from './InputBarControls/InputBarControls';
 import {InputBarEditor} from './InputBarEditor/InputBarEditor';
@@ -72,6 +75,7 @@ const CONFIG = {
 interface InputBarProps {
   readonly conversation: Conversation;
   readonly conversationRepository: ConversationRepository;
+  readonly cellsRepository: CellsRepository;
   readonly eventRepository: EventRepository;
   readonly messageRepository: MessageRepository;
   readonly openGiphy: (inputValue: string) => void;
@@ -84,11 +88,14 @@ interface InputBarProps {
   uploadDroppedFiles: (droppedFiles: File[]) => void;
   uploadImages: (images: File[]) => void;
   uploadFiles: (files: File[]) => void;
+  onCellImageUpload: () => void;
+  onCellAssetUpload: () => void;
 }
 
 export const InputBar = ({
   conversation,
   conversationRepository,
+  cellsRepository,
   eventRepository,
   messageRepository,
   openGiphy,
@@ -101,6 +108,8 @@ export const InputBar = ({
   uploadDroppedFiles,
   uploadImages,
   uploadFiles,
+  onCellImageUpload,
+  onCellAssetUpload,
 }: InputBarProps) => {
   const {classifiedDomains, isSelfDeletingMessagesEnabled, isFileSharingSendingEnabled} = useKoSubscribableChildren(
     teamState,
@@ -119,6 +128,9 @@ export const InputBar = ({
     'isOutgoingRequest',
     'isIncomingRequest',
   ]);
+
+  const {getFiles} = useFileUploadState();
+  const files = getFiles({conversationId: conversation.id});
 
   const wrapperRef = useRef<HTMLDivElement>(null);
 
@@ -201,10 +213,13 @@ export const InputBar = ({
     editMessage,
     draftState,
     generateQuote,
+    isSending,
+    isSendingDisabled,
   } = useMessageHandling({
     messageContent,
     conversation,
     conversationRepository,
+    cellsRepository,
     storageRepository,
     eventRepository,
     messageRepository,
@@ -229,6 +244,14 @@ export const InputBar = ({
     cancelMesssageEditing,
   });
 
+  const handleSendMessage = useCallback(() => {
+    if (isSendingDisabled) {
+      return;
+    }
+
+    void sendMessage();
+  }, [isSendingDisabled, sendMessage]);
+
   const showAvatar = !!messageContent.text.length;
 
   return (
@@ -248,7 +271,7 @@ export const InputBar = ({
           className={cx(`conversation-input-bar__input input-bar-container`, {
             [`conversation-input-bar__input--editing`]: isEditing,
             'input-bar-container--with-toolbar': formatToolbar.open && showMarkdownPreview,
-            'input-bar-container--with-files': false,
+            'input-bar-container--with-files': !!files.length,
           })}
         >
           {!isOutgoingRequest && (
@@ -283,18 +306,20 @@ export const InputBar = ({
                   onShiftTab={onShiftTab}
                   onBlur={() => isTypingRef.current && conversationRepository.sendTypingStop(conversation)}
                   onUpdate={setMessageContent}
-                  onSend={sendMessage}
+                  onSend={handleSendMessage}
                   getMentionCandidates={getMentionCandidates}
                   saveDraftState={draftState.save}
                   loadDraftState={draftState.load}
                   replaceEmojis={shouldReplaceEmoji}
                 >
+                  {!!files.length && <FilePreviews files={files} conversationQualifiedId={conversation.qualifiedId} />}
                   <InputBarControls
                     conversation={conversation}
                     isFileSharingSendingEnabled={isFileSharingSendingEnabled}
                     pingDisabled={ping.isPingDisabled}
                     messageContent={messageContent}
                     isEditing={isEditing}
+                    isSendingDisabled={isSendingDisabled}
                     showMarkdownPreview={showMarkdownPreview}
                     showGiphyButton={giphy.showGiphyButton}
                     formatToolbar={formatToolbar}
@@ -304,7 +329,10 @@ export const InputBar = ({
                     onGifClick={giphy.handleGifClick}
                     onSelectFiles={uploadFiles}
                     onSelectImages={uploadImages}
-                    onSend={sendMessage}
+                    onSend={handleSendMessage}
+                    isSending={isSending}
+                    onCellImageUpload={onCellImageUpload}
+                    onCellAssetUpload={onCellAssetUpload}
                   />
                 </InputBarEditor>
               )}

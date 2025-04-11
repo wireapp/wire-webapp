@@ -25,10 +25,12 @@ export enum SidebarTabs {
   FOLDER,
   FAVORITES,
   GROUPS,
+  CHANNELS,
   DIRECTS,
   ARCHIVES,
   CONNECT,
   PREFERENCES,
+  CELLS,
 }
 
 export const SidebarStatus = {
@@ -60,7 +62,7 @@ const useSidebarStore = create<SidebarStore>()(
       storage: createJSONStorage(() => localStorage),
       partialize: state => ({
         status: state.status,
-        currentTab: [SidebarTabs.PREFERENCES, SidebarTabs.CONNECT].includes(state.currentTab)
+        currentTab: [SidebarTabs.PREFERENCES, SidebarTabs.CONNECT, SidebarTabs.CELLS].includes(state.currentTab)
           ? SidebarTabs.RECENT
           : state.currentTab,
       }),

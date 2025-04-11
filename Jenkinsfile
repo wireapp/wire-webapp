@@ -33,7 +33,7 @@ pipeline {
 
     environment {
         CREDENTIALS = credentials('GITHUB_TOKEN_WEB')
-        WIRE_BOT_SECRET = credentials('JENKINSBOT_WEBAPP_DEV')
+        // WIRE_BOT_SECRET = credentials('JENKINSBOT_WEBAPP_DEV')
         webappApplicationPath = 'https://wire-webapp-precommit.zinfra.io/'
     }
 
@@ -144,11 +144,11 @@ pipeline {
                   ${commitMsg}
                   **Reason:** ${e}
                   ${reason}"""
-                  wireSend secret: env.WIRE_BOT_SECRET, message: errorMessage
+                  // wireSend secret: env.WIRE_BOT_SECRET, message: errorMessage
                 }
                 def successMessage = """✅ **Deployment successful on** ${webappApplicationPath}
               ${commitMsg}"""
-                wireSend secret: env.WIRE_BOT_SECRET, message: successMessage
+                // wireSend secret: env.WIRE_BOT_SECRET, message: successMessage
             }
         }
     }
@@ -160,14 +160,14 @@ pipeline {
         }
     }
 
-  post {
-      success {
-          wireSend secret: env.WIRE_BOT_SECRET, message: "✅ **Build finished for branch '$env.webappApplicationPath'**"
-      }
-      failure {
-          script {
-              wireSend(secret: env.WIRE_BOT_SECRET, message: "❌ **$BRANCH_NAME**\n[$CHANGE_TITLE](${CHANGE_URL})\nBuild aborted or failed! See [Github Actions](${env.GITHUB_ACTION_URL})")
-          }
-      }
-  }
+  // post {
+  //     success {
+  //         wireSend secret: env.WIRE_BOT_SECRET, message: "✅ **Build finished for branch '$env.webappApplicationPath'**"
+  //     }
+  //     failure {
+  //         script {
+  //             wireSend(secret: env.WIRE_BOT_SECRET, message: "❌ **$BRANCH_NAME**\n[$CHANGE_TITLE](${CHANGE_URL})\nBuild aborted or failed! See [Github Actions](${env.GITHUB_ACTION_URL})")
+  //         }
+  //     }
+  // }
 }

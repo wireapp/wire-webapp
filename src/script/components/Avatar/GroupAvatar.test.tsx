@@ -19,14 +19,11 @@
 
 import {render} from '@testing-library/react';
 
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
-
 import {GroupAvatar} from './GroupAvatar';
 
 describe('GroupAvatar', () => {
   it('renders avatar', async () => {
-    const {getByTestId} = render(withTheme(<GroupAvatar />));
-
+    const {getByTestId} = render(<GroupAvatar />);
     const avatarWrapper = getByTestId('group-avatar-box-wrapper');
 
     expect(avatarWrapper.children).toHaveLength(1);

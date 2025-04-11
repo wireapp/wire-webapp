@@ -32,8 +32,16 @@ interface GetTabConversationsProps {
   directConversations: Conversation[];
   favoriteConversations: Conversation[];
   archivedConversations: Conversation[];
+  channelConversations: Conversation[];
+  channelAndGroupConversations: Conversation[];
   conversationsFilter: string;
+  isChannelsEnabled: boolean;
 }
+
+type GetTabConversations = {
+  conversations: Conversation[];
+  searchInputPlaceholder: string;
+};
 
 export function getTabConversations({
   currentTab,
@@ -43,7 +51,10 @@ export function getTabConversations({
   favoriteConversations,
   archivedConversations,
   conversationsFilter,
-}: GetTabConversationsProps) {
+  channelConversations,
+  isChannelsEnabled,
+  channelAndGroupConversations,
+}: GetTabConversationsProps): GetTabConversations {
   const conversationSearchFilter = (conversation: Conversation) => {
     const filterWord = replaceAccents(conversationsFilter.toLowerCase());
     const conversationDisplayName = replaceAccents(conversation.display_name().toLowerCase());
@@ -54,16 +65,42 @@ export function getTabConversations({
   const conversationArchivedFilter = (conversation: Conversation) => !archivedConversations.includes(conversation);
 
   if ([SidebarTabs.FOLDER, SidebarTabs.RECENT].includes(currentTab)) {
+    if (!conversationsFilter) {
+      return {
+        conversations,
+        searchInputPlaceholder: t('searchConversations'),
+      };
+    }
+
+    const filterWord = replaceAccents(conversationsFilter.toLowerCase());
+    const filteredGroupConversations = groupConversations.filter(group => {
+      return group.participating_user_ets().some(user => {
+        const conversationDisplayName = replaceAccents(user.name().toLowerCase());
+        return conversationDisplayName.includes(filterWord);
+      });
+    });
+
+    const filteredConversations = conversations.filter(conversationSearchFilter);
+
     return {
-      conversations: conversations.filter(conversationSearchFilter),
+      conversations: [...filteredConversations, ...filteredGroupConversations],
       searchInputPlaceholder: t('searchConversations'),
     };
   }
 
   if (currentTab === SidebarTabs.GROUPS) {
+    const conversations = isChannelsEnabled ? groupConversations : channelAndGroupConversations;
+
     return {
-      conversations: groupConversations.filter(conversationArchivedFilter).filter(conversationSearchFilter),
+      conversations: conversations.filter(conversationArchivedFilter).filter(conversationSearchFilter),
       searchInputPlaceholder: t('searchGroupConversations'),
+    };
+  }
+
+  if (currentTab === SidebarTabs.CHANNELS) {
+    return {
+      conversations: channelConversations.filter(conversationArchivedFilter).filter(conversationSearchFilter),
+      searchInputPlaceholder: t('searchChannelConversations'),
     };
   }
 
@@ -119,4 +156,41 @@ export const scrollToConversation = (conversationId: string) => {
   if (!isVisible) {
     element.scrollIntoView({behavior: 'instant', block: 'center', inline: 'nearest'});
   }
+};
+
+export const getConversationsWithHeadings = (
+  currentConversations: Conversation[],
+  conversationsFilter: string,
+  currentTab: SidebarTabs,
+) => {
+  if (!conversationsFilter || currentTab !== SidebarTabs.RECENT) {
+    return currentConversations;
+  }
+
+  const newConversationsWithHeadings = [];
+
+  let peopleHeadingAdded = false;
+  let groupHeadingAdded = false;
+
+  for (const conversation of currentConversations) {
+    if (!conversation.isGroup()) {
+      if (!peopleHeadingAdded) {
+        newConversationsWithHeadings.push({isHeader: true, heading: 'searchConversationNames'});
+        peopleHeadingAdded = true;
+      }
+      newConversationsWithHeadings.push(conversation);
+    }
+  }
+
+  for (const conversation of currentConversations) {
+    if (conversation.isGroup()) {
+      if (!groupHeadingAdded) {
+        newConversationsWithHeadings.push({isHeader: true, heading: 'searchGroupParticipants'});
+        groupHeadingAdded = true;
+      }
+      newConversationsWithHeadings.push(conversation);
+    }
+  }
+
+  return newConversationsWithHeadings;
 };

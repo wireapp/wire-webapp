@@ -54,6 +54,9 @@ describe('getTabConversations', () => {
       favoriteConversations,
       archivedConversations,
       conversationsFilter,
+      channelAndGroupConversations: groupConversations,
+      channelConversations: [],
+      isChannelsEnabled: false,
     });
   };
 
@@ -116,6 +119,9 @@ describe('getTabConversations', () => {
       favoriteConversations,
       archivedConversations,
       conversationsFilter: '',
+      channelAndGroupConversations: newGroupConversations,
+      channelConversations: [],
+      isChannelsEnabled: false,
     });
 
     const {conversations: filteredDirectConversations} = getTabConversations({
@@ -126,6 +132,9 @@ describe('getTabConversations', () => {
       favoriteConversations,
       archivedConversations,
       conversationsFilter: '',
+      channelAndGroupConversations: groupConversations,
+      channelConversations: [],
+      isChannelsEnabled: false,
     });
 
     expect(filteredGroupConversations).toEqual(groupConversations);

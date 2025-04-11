@@ -61,6 +61,7 @@ export interface TitleBarProps {
   isRightSidebarOpen?: boolean;
   callState?: CallState;
   isReadOnlyConversation?: boolean;
+  withBottomDivider: boolean;
 }
 
 export const TitleBar: React.FC<TitleBarProps> = ({
@@ -73,13 +74,14 @@ export const TitleBar: React.FC<TitleBarProps> = ({
   callState = container.resolve(CallState),
   teamState = container.resolve(TeamState),
   isReadOnlyConversation = false,
+  withBottomDivider,
 }) => {
   const {calling: callingRepository} = repositories;
   const {
     is1to1,
     isRequest,
     isActiveParticipant,
-    isGroup,
+    isGroupOrChannel,
     hasExternal,
     hasDirectGuest,
     hasService,
@@ -91,7 +93,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
     'is1to1',
     'isRequest',
     'isActiveParticipant',
-    'isGroup',
+    'isGroupOrChannel',
     'hasExternal',
     'hasDirectGuest',
     'hasService',
@@ -171,12 +173,12 @@ export const TitleBar: React.FC<TitleBarProps> = ({
       return showDetails(false);
     }
 
-    if (isGroup) {
+    if (isGroupOrChannel) {
       showDetails(true);
     } else {
       amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, 'conversation_details', firstUserEntity);
     }
-  }, [firstUserEntity, isActiveParticipant, isGroup, showDetails, is1to1]);
+  }, [firstUserEntity, isActiveParticipant, isGroupOrChannel, showDetails, is1to1]);
 
   useEffect(() => {
     // TODO remove the titlebar for now to ensure that buttons are clickable in macOS wrappers
@@ -201,7 +203,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
 
   const onClickStartAudio = () => {
     callActions.startAudio(conversation);
-    showStartedCallAlert(isGroup);
+    showStartedCallAlert(isGroupOrChannel);
 
     if (smBreakpoint) {
       setLeftSidebar();
@@ -220,7 +222,10 @@ export const TitleBar: React.FC<TitleBarProps> = ({
   return (
     <ul
       id="conversation-title-bar"
-      className={cx('conversation-title-bar', {'is-right-panel-open': isRightSidebarOpen})}
+      className={cx('conversation-title-bar', {
+        'is-right-panel-open': isRightSidebarOpen,
+        'conversation-title-bar--with-bottom-divider': withBottomDivider,
+      })}
     >
       <li className="conversation-title-bar-library">
         {smBreakpoint && (
@@ -297,7 +302,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
                 onClick={event => {
                   currentFocusedElementRef.current = event.target as HTMLButtonElement;
                   callActions.startVideo(conversation);
-                  showStartedCallAlert(isGroup, true);
+                  showStartedCallAlert(isGroupOrChannel, true);
                 }}
                 data-uie-name="do-video-call"
                 disabled={isReadOnlyConversation}
@@ -314,7 +319,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
               onClick={event => {
                 currentFocusedElementRef.current = event.target as HTMLButtonElement;
                 callActions.startAudio(conversation);
-                showStartedCallAlert(isGroup);
+                showStartedCallAlert(isGroupOrChannel);
               }}
               data-uie-name="do-call"
               disabled={isReadOnlyConversation}

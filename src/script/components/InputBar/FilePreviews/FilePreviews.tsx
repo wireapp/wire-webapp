@@ -18,59 +18,101 @@
  */
 
 import {useAutoAnimate} from '@formkit/auto-animate/react';
+import {QualifiedId} from '@wireapp/api-client/lib/user/';
+import {container} from 'tsyringe';
 
-import {FileWithPreview, useFileUploadState} from 'Components/Conversation/useFiles/useFiles';
-import {isAudio, isImage, isVideo} from 'src/script/assets/AssetMetaDataBuilder';
-import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
+import {FileWithPreview} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
+import {isAudio, isVideo, isImage} from 'src/script/assets/AssetMetaDataBuilder';
+import {CellsRepository} from 'src/script/cells/CellsRepository';
 
 import {AudioPreviewCard} from './AudioPreviewCard/AudioPreviewCard';
 import {FilePreviewCard} from './FilePreviewCard/FilePreviewCard';
 import {wrapperStyles} from './FilePreviews.styles';
 import {ImagePreviewCard} from './ImagePreviewCard/ImagePreviewCard';
+import {useFilePreview} from './useFilePreview/useFilePreview';
 import {VideoPreviewCard} from './VideoPreviewCard/VideoPreviewCard';
 
 interface FilePreviewsProps {
   files: FileWithPreview[];
+  conversationQualifiedId: QualifiedId;
 }
 
-export const FilePreviews = ({files}: FilePreviewsProps) => {
+export const FilePreviews = ({files, conversationQualifiedId}: FilePreviewsProps) => {
   const [wrapperRef] = useAutoAnimate();
-
-  if (files.length === 0) {
-    return null;
-  }
 
   return (
     <div ref={wrapperRef} css={wrapperStyles}>
       {files.map(file => (
-        <FilePreview key={file.id} file={file} />
+        <FilePreview key={file.id} file={file} conversationQualifiedId={conversationQualifiedId} />
       ))}
     </div>
   );
 };
 
-const FilePreview = ({file}: {file: FileWithPreview}) => {
-  const name = trimFileExtension(file.name);
-  const extension = getFileExtension(file.name);
-  const size = formatBytes(file.size);
+interface FilePreviewProps {
+  file: FileWithPreview;
+  cellsRepository?: CellsRepository;
+  conversationQualifiedId: QualifiedId;
+}
 
-  const {deleteFile} = useFileUploadState();
-
-  const handleDelete = () => {
-    deleteFile(file.id);
-  };
+const FilePreview = ({
+  file,
+  cellsRepository = container.resolve(CellsRepository),
+  conversationQualifiedId,
+}: FilePreviewProps) => {
+  const {name, extension, size, isError, handleDelete, handleRetry} = useFilePreview({
+    file,
+    cellsRepository,
+    conversationQualifiedId,
+  });
 
   if (isImage(file)) {
-    return <ImagePreviewCard src={file.preview} onDelete={handleDelete} />;
+    return (
+      <ImagePreviewCard
+        src={file.preview}
+        onDelete={handleDelete}
+        onRetry={handleRetry}
+        isError={isError}
+        uploadProgress={file.uploadProgress}
+      />
+    );
   }
 
   if (isAudio(file)) {
-    return <AudioPreviewCard extension={extension} name={name} size={size} onDelete={handleDelete} />;
+    return (
+      <AudioPreviewCard
+        extension={extension}
+        name={name}
+        size={size}
+        onDelete={handleDelete}
+        onRetry={handleRetry}
+        isError={isError}
+        uploadProgress={file.uploadProgress}
+      />
+    );
   }
 
   if (isVideo(file)) {
-    return <VideoPreviewCard src={file.preview} onDelete={handleDelete} />;
+    return (
+      <VideoPreviewCard
+        src={file.preview}
+        onDelete={handleDelete}
+        onRetry={handleRetry}
+        isError={isError}
+        uploadProgress={file.uploadProgress}
+      />
+    );
   }
 
-  return <FilePreviewCard extension={extension} name={name} size={size} onDelete={handleDelete} />;
+  return (
+    <FilePreviewCard
+      extension={extension}
+      name={name}
+      size={size}
+      onDelete={handleDelete}
+      onRetry={handleRetry}
+      isError={isError}
+      uploadProgress={file.uploadProgress}
+    />
+  );
 };

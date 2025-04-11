@@ -26,22 +26,18 @@ import {buttonCss, containerCss, headerCss, linkCss} from './AccountAlreadyExist
 
 export interface AccountAlreadyExistsModalProps {
   onClose: () => void;
-  backendName: string;
 }
 
-export const AccountAlreadyExistsModal = ({onClose, backendName}: AccountAlreadyExistsModalProps) => {
-  const {
-    CHANGE_EMAIL_ADDRESS: changeEmailAddressUrl,
-    DELETE_PERSONAL_ACCOUNT: deletePersonalAccountUrl,
-    REMOVE_TEAM_MEMBER: removeTeamMemberUrl,
-  } = Config.getConfig().URL.SUPPORT;
+export const AccountAlreadyExistsModal = ({onClose}: AccountAlreadyExistsModalProps) => {
+  const {CHANGE_EMAIL_ADDRESS: changeEmailAddressUrl, DELETE_PERSONAL_ACCOUNT: deletePersonalAccountUrl} =
+    Config.getConfig().URL.SUPPORT;
 
   return (
     <Modal onClose={onClose}>
       <Container css={containerCss}>
         <H2 css={headerCss}>{t('accountAlreadyExistsModal.header')}</H2>
         <Text block fontSize="var(--font-size-base)" style={{marginBottom: 24}}>
-          {t('accountAlreadyExistsModal.content', {backendName})}
+          {t('accountAlreadyExistsModal.content')}
         </Text>
         <Text block>
           👉{' '}
@@ -53,10 +49,6 @@ export const AccountAlreadyExistsModal = ({onClose, backendName}: AccountAlready
           👉{' '}
           <Link href={deletePersonalAccountUrl} target="_blank" css={linkCss}>
             {t('accountAlreadyExistsModal.deletePersonalAccount')}
-          </Link>{' '}
-          {t('index.or')}{' '}
-          <Link href={removeTeamMemberUrl} target="_blank" css={linkCss}>
-            {t('accountAlreadyExistsModal.removeTeamMember')}
           </Link>
         </Text>
         <Button css={buttonCss} block type="button" onClick={onClose} data-uie-name="guest-link-join-submit-button">

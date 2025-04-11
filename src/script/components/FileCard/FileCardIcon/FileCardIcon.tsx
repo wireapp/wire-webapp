@@ -17,48 +17,28 @@
  *
  */
 
-import {ComponentType} from 'react';
+import {AlertIcon, UnavailableFileIcon} from '@wireapp/react-ui-kit';
 
-import {SVGIconProps} from '@wireapp/react-ui-kit/lib/Icon/SVGIcon';
+import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
 
-import {
-  PdfFileIcon,
-  ImageFileIcon,
-  VideoFileIcon,
-  AudioFileIcon,
-  DocumentFileIcon,
-  PresentationFileIcon,
-  SpreadsheetFileIcon,
-  TextFileIcon,
-  CodeFileIcon,
-  ArchiveFileIcon,
-  OtherFileIcon,
-} from '@wireapp/react-ui-kit';
-
-import {iconStyles} from './FileCardIcon.styles';
-import {getFileTypeFromExtension} from './getFileTypeFromExtension/getFileTypeFromExtension';
+import {errorIconStyles, unavailableIconStyles} from './FileCardIcon.styles';
 
 import {useFileCardContext} from '../common/FileCardContext/FileCardContext';
-import {FileType} from '../common/fileType/fileType';
 
-export const FileCardIcon = () => {
+interface FileCardIconProps {
+  type?: 'file' | 'error' | 'unavailable';
+}
+
+export const FileCardIcon = ({type = 'file'}: FileCardIconProps) => {
   const {extension} = useFileCardContext();
-  const type = getFileTypeFromExtension(extension);
-  const Icon = fileIcons[type];
 
-  return <Icon css={iconStyles} />;
-};
+  if (type === 'error') {
+    return <AlertIcon css={errorIconStyles} width={14} height={14} />;
+  }
 
-const fileIcons: Record<FileType, ComponentType<SVGIconProps>> = {
-  pdf: PdfFileIcon,
-  image: ImageFileIcon,
-  video: VideoFileIcon,
-  audio: AudioFileIcon,
-  document: DocumentFileIcon,
-  presentation: PresentationFileIcon,
-  spreadsheet: SpreadsheetFileIcon,
-  text: TextFileIcon,
-  code: CodeFileIcon,
-  archive: ArchiveFileIcon,
-  other: OtherFileIcon,
+  if (type === 'unavailable') {
+    return <UnavailableFileIcon css={unavailableIconStyles} width={14} height={14} />;
+  }
+
+  return <FileTypeIcon extension={extension} />;
 };

@@ -17,7 +17,7 @@
  *
  */
 
-import {ConversationRolesList, ConversationProtocol} from '@wireapp/api-client/lib/conversation';
+import {ConversationProtocol, ConversationRolesList} from '@wireapp/api-client/lib/conversation';
 import type {
   TeamConversationDeleteEvent,
   TeamDeleteEvent,
@@ -26,7 +26,7 @@ import type {
   TeamMemberLeaveEvent,
 } from '@wireapp/api-client/lib/event';
 import {TEAM_EVENT} from '@wireapp/api-client/lib/event/TeamEvent';
-import {FeatureStatus, FeatureList, FEATURE_KEY} from '@wireapp/api-client/lib/team/feature/';
+import {FEATURE_KEY, FeatureList, FeatureStatus} from '@wireapp/api-client/lib/team/feature/';
 import type {PermissionsData} from '@wireapp/api-client/lib/team/member/PermissionsData';
 import type {TeamData} from '@wireapp/api-client/lib/team/team/TeamData';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
@@ -38,8 +38,9 @@ import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {Config} from 'src/script/Config';
 import {Environment} from 'Util/Environment';
-import {t} from 'Util/LocalizerUtil';
+import {replaceLink, t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {loadDataUrl} from 'Util/util';
@@ -57,11 +58,13 @@ import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {IntegrationMapper} from '../integration/IntegrationMapper';
 import {ServiceEntity} from '../integration/ServiceEntity';
 import {scheduleRecurringTask, updateRemoteConfigLogger} from '../lifecycle/updateRemoteConfigs';
-import {MLSMigrationStatus, getMLSMigrationStatus} from '../mls/MLSMigration/migrationStatus';
+import {getMLSMigrationStatus, MLSMigrationStatus} from '../mls/MLSMigration/migrationStatus';
 import {APIClient} from '../service/APIClientSingleton';
 import {ROLE, ROLE as TEAM_ROLE, roleFromTeamPermissions} from '../user/UserPermission';
 import {UserRepository} from '../user/UserRepository';
 import {UserState} from '../user/UserState';
+
+export const HAS_PERSISTED_SUPPORTED_PROTOCOLS = 'HAS_PERSISTED_SUPPORTED_PROTOCOLS';
 
 export interface AccountInfo {
   accentID: number;
@@ -86,6 +89,8 @@ export class TeamRepository extends TypedEventEmitter<Events> {
   private readonly userRepository: UserRepository;
   private readonly assetRepository: AssetRepository;
   private backendSupportsMLS: boolean | null = null;
+
+  private hasPersistedSupportedProtocols: boolean = localStorage.getItem(HAS_PERSISTED_SUPPORTED_PROTOCOLS) === 'true';
 
   constructor(
     userRepository: UserRepository,
@@ -120,6 +125,10 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     );
   }
 
+  private updatePersistedSupportedProtocols() {
+    localStorage.setItem(HAS_PERSISTED_SUPPORTED_PROTOCOLS, 'true');
+  }
+
   /**
    * Will init the team configuration and all the team members from the contact list.
    * @param teamId the Id of the team to init
@@ -133,6 +142,17 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     const newFeatureList = await this.teamService.getAllTeamFeatures();
 
     this.teamState.teamFeatures(newFeatureList);
+
+    if (newFeatureList[FEATURE_KEY.MLS]?.config?.supportedProtocols?.includes(ConversationProtocol.MLS)) {
+      this.updatePersistedSupportedProtocols();
+    }
+
+    if (this.hasPersistedSupportedProtocols && newFeatureList?.[FEATURE_KEY.MLS]?.config.supportedProtocols) {
+      newFeatureList[FEATURE_KEY.MLS].config.supportedProtocols = [
+        ConversationProtocol.MLS,
+        ConversationProtocol.PROTEUS,
+      ];
+    }
 
     if (!teamId) {
       return {team: undefined, features: {}, members: []};
@@ -157,24 +177,33 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     const prevFeatureList = this.teamState.teamFeatures();
     const newFeatureList = await this.teamService.getAllTeamFeatures();
 
+    if (
+      this.hasPersistedSupportedProtocols &&
+      prevFeatureList?.[FEATURE_KEY.MLS]?.config.supportedProtocols &&
+      newFeatureList?.[FEATURE_KEY.MLS]?.config.supportedProtocols
+    ) {
+      prevFeatureList[FEATURE_KEY.MLS].config.supportedProtocols = [
+        ConversationProtocol.MLS,
+        ConversationProtocol.PROTEUS,
+      ];
+
+      newFeatureList[FEATURE_KEY.MLS].config.supportedProtocols = [
+        ConversationProtocol.MLS,
+        ConversationProtocol.PROTEUS,
+      ];
+    }
+
     this.teamState.teamFeatures(newFeatureList);
 
     this.emit('featureConfigUpdated', {prevFeatureList, newFeatureList});
 
     if (
-      !prevFeatureList?.[FEATURE_KEY.MLS]?.config.supportedProtocols.includes(ConversationProtocol.MLS) &&
-      newFeatureList?.[FEATURE_KEY.MLS]?.config.supportedProtocols.includes(ConversationProtocol.MLS)
+      prevFeatureList?.[FEATURE_KEY.MLS]?.status === FeatureStatus.DISABLED &&
+      newFeatureList?.[FEATURE_KEY.MLS]?.status === FeatureStatus.ENABLED
     ) {
-      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-        primaryAction: {
-          action: () => window.location.reload(),
-          text: t('mlsWasEnabledReload'),
-        },
-        text: {
-          message: t('mlsWasEnabledDescription'),
-          title: t('mlsWasEnabledTitle'),
-        },
-      });
+      this.updatePersistedSupportedProtocols();
+      this.showReloadAppModal();
+      void this.scheduleReloadAppModal();
     }
 
     return {
@@ -200,6 +229,29 @@ export class TeamRepository extends TypedEventEmitter<Events> {
       task: updateTeam,
       key: 'team-refresh',
       addTaskOnWindowFocusEvent: true,
+    });
+  };
+
+  private showReloadAppModal = () => {
+    const replaceLinkMls = replaceLink(Config.getConfig().URL.SUPPORT.MLS_LEARN_MORE, '', 'learn-more-mls');
+    PrimaryModal.show(PrimaryModal.type.CONFIRM, {
+      primaryAction: {
+        action: () => window.location.reload(),
+        text: t('mlsWasEnabledReload'),
+      },
+      text: {
+        htmlMessage: t('mlsWasEnabledDescription', undefined, replaceLinkMls),
+        title: t('mlsWasEnabledTitle'),
+      },
+    });
+  };
+
+  private readonly scheduleReloadAppModal = async (): Promise<void> => {
+    // We want to encourage the user to reload every 5 minutes
+    await scheduleRecurringTask({
+      every: TIME_IN_MILLIS.MINUTE * 5,
+      task: this.showReloadAppModal,
+      key: 'reload-app-modal',
     });
   };
 
@@ -501,6 +553,10 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     }
 
     const teamSupportedProtocols = mlsFeature.config.supportedProtocols;
+
+    if (this.hasPersistedSupportedProtocols && teamSupportedProtocols?.length > 0) {
+      return [...new Set([...teamSupportedProtocols, ConversationProtocol.MLS])];
+    }
 
     // For old teams (created on some older backend versions) supportedProtocols field might not exist or be empty,
     // we fallback to proteus in this case.

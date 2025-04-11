@@ -44,7 +44,6 @@ import {createNavigate, createNavigateKeyboard} from '../../../../router/routerB
 interface CallingHeaderProps {
   isOngoing: boolean;
   isGroup: boolean;
-
   showAlert: boolean;
   isVideoCall: boolean;
   clearShowAlert: () => void;
@@ -59,6 +58,7 @@ interface CallingHeaderProps {
   isCbrEnabled: boolean;
   toggleDetachedWindow: () => void;
   isDetachedWindow: boolean;
+  conversationID: string;
 }
 
 export const CallingHeader = ({
@@ -78,6 +78,7 @@ export const CallingHeader = ({
   isCbrEnabled,
   toggleDetachedWindow,
   isDetachedWindow,
+  conversationID,
 }: CallingHeaderProps) => {
   return (
     <div css={callingHeaderContainer}>
@@ -105,7 +106,7 @@ export const CallingHeader = ({
       >
         {isDetachedWindow && !isTemporaryUser && (
           <div css={callAvatar}>
-            {isGroup && <GroupAvatar />}
+            {isGroup && <GroupAvatar conversationID={conversationID} />}
             {!isGroup && !!conversationParticipants.length && (
               <Avatar participant={conversationParticipants[0]} avatarSize={AVATAR_SIZE.SMALL} />
             )}

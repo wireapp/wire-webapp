@@ -19,23 +19,32 @@
 
 import {t} from 'Util/LocalizerUtil';
 
-import {controlStyles, imageStyles, wrapperStyles} from './VideoPreviewCard.styles';
+import {videoStyles, iconWrapperStyles} from './VideoPreviewCard.styles';
 
-import {FilePreviewDeleteButton} from '../common/FilePreviewDeleteButton/FilePreviewDeleteButton';
 import {FilePreviewPlayButton} from '../common/FilePreviewPlayButton/FilePreviewPlayButton';
+import {MediaFilePreviewCard} from '../common/MediaFilePreviewCard/MediaFilePreviewCard';
+
 interface VideoPreviewCardProps {
   src: string;
   onDelete: () => void;
+  onRetry: () => void;
+  isError: boolean;
+  uploadProgress: number;
 }
 
-export const VideoPreviewCard = ({src, onDelete}: VideoPreviewCardProps) => {
+export const VideoPreviewCard = ({src, onDelete, onRetry, isError, uploadProgress}: VideoPreviewCardProps) => {
   return (
-    <article css={wrapperStyles} aria-label={t('conversationFileVideoPreviewLabel', {src})}>
-      <video src={src} preload="metadata" css={imageStyles} playsInline />
-      <div css={controlStyles}>
+    <MediaFilePreviewCard
+      label={t('conversationFileVideoPreviewLabel', {src})}
+      onDelete={onDelete}
+      onRetry={onRetry}
+      isError={isError}
+      uploadProgress={uploadProgress}
+    >
+      <video src={src} preload="metadata" css={videoStyles} />
+      <div css={iconWrapperStyles}>
         <FilePreviewPlayButton />
       </div>
-      <FilePreviewDeleteButton onDelete={onDelete} />
-    </article>
+    </MediaFilePreviewCard>
   );
 };

@@ -29,7 +29,6 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {useConversationFocus} from 'Hooks/useConversationFocus';
 import {IntegrationRepository} from 'src/script/integration/IntegrationRepository';
 import {Preferences} from 'src/script/page/LeftSidebar/panels/Preferences';
-import {StartUI} from 'src/script/page/LeftSidebar/panels/StartUI';
 import {ANIMATED_PAGE_TRANSITION_DURATION} from 'src/script/page/MainContent';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {ContentState, ListState} from 'src/script/page/useAppState';
@@ -38,6 +37,7 @@ import {TeamRepository} from 'src/script/team/TeamRepository';
 import {EventName} from 'src/script/tracking/EventName';
 import {UserRepository} from 'src/script/user/UserRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {ConversationCallingView} from './ConversationCallingView/ConversationCallingView';
 import {ConversationHeader} from './ConversationHeader';
@@ -64,6 +64,7 @@ import {TeamState} from '../../../../team/TeamState';
 import {UserState} from '../../../../user/UserState';
 import {ListViewModel} from '../../../../view_model/ListViewModel';
 import {ListWrapper} from '../ListWrapper';
+import {StartUI} from '../StartUI';
 
 type ConversationsProps = {
   callState?: CallState;
@@ -105,6 +106,7 @@ export const Conversations: React.FC<ConversationsProps> = ({
     setStatus: setSidebarStatus,
     setCurrentTab,
   } = useSidebarStore(useShallow(state => state));
+  const {isChannelsEnabled} = useChannelsFeatureFlag();
   const [conversationsFilter, setConversationsFilter] = useState<string>('');
   const {classifiedDomains, isTeam} = useKoSubscribableChildren(teamState, ['classifiedDomains', 'isTeam']);
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
@@ -119,6 +121,8 @@ export const Conversations: React.FC<ConversationsProps> = ({
     groupConversations,
     directConversations,
     visibleConversations,
+    channelConversations,
+    channelAndGroupConversations,
   } = useKoSubscribableChildren(conversationState, [
     'activeConversation',
     'archivedConversations',
@@ -126,6 +130,8 @@ export const Conversations: React.FC<ConversationsProps> = ({
     'directConversations',
     'unreadConversations',
     'visibleConversations',
+    'channelConversations',
+    'channelAndGroupConversations',
   ]);
 
   const conversations = useMemo(() => visibleConversations, [visibleConversations]);
@@ -142,12 +148,14 @@ export const Conversations: React.FC<ConversationsProps> = ({
   );
 
   const isPreferences = currentTab === SidebarTabs.PREFERENCES;
+  const isCells = currentTab === SidebarTabs.CELLS;
 
   const showSearchInput = [
     SidebarTabs.RECENT,
     SidebarTabs.FOLDER,
     SidebarTabs.FAVORITES,
     SidebarTabs.GROUPS,
+    SidebarTabs.CHANNELS,
     SidebarTabs.DIRECTS,
     SidebarTabs.ARCHIVES,
   ].includes(currentTab);
@@ -178,6 +186,9 @@ export const Conversations: React.FC<ConversationsProps> = ({
     groupConversations,
     directConversations,
     favoriteConversations,
+    channelConversations,
+    isChannelsEnabled,
+    channelAndGroupConversations,
   });
 
   const currentFolder = labels
@@ -200,11 +211,15 @@ export const Conversations: React.FC<ConversationsProps> = ({
     ![SidebarTabs.DIRECTS, SidebarTabs.GROUPS, SidebarTabs.FAVORITES].includes(currentTab) &&
     groupParticipantsConversations.length > 0;
 
-  const hasNoConversations = conversations.length + connectRequests.length === 0;
+  const showConnectionRequests = [SidebarTabs.RECENT, SidebarTabs.DIRECTS].includes(currentTab);
+  const hasVisibleConnectionRequests = connectRequests.length > 0 && showConnectionRequests;
+  const hasVisibleConversations = currentTabConversations.length > 0;
+  const hasNoVisbleConversations = !hasVisibleConversations && !hasVisibleConnectionRequests;
+
   const hasEmptyConversationsList =
     !isGroupParticipantsVisible &&
-    ((showSearchInput && currentTabConversations.length === 0) ||
-      (hasNoConversations && currentTab !== SidebarTabs.ARCHIVES));
+    ((showSearchInput && hasNoVisbleConversations) ||
+      (hasNoVisbleConversations && currentTab !== SidebarTabs.ARCHIVES));
 
   const toggleSidebar = useCallback(() => {
     if (isFoldersTabOpen) {
@@ -281,8 +296,13 @@ export const Conversations: React.FC<ConversationsProps> = ({
         void conversationRepository.updateArchivedConversations();
       }
 
-      if (nextTab !== SidebarTabs.PREFERENCES) {
+      if (![SidebarTabs.PREFERENCES, SidebarTabs.CELLS].includes(nextTab)) {
         onExitPreferences();
+      }
+
+      if (nextTab === SidebarTabs.CELLS) {
+        switchList(ListState.CELLS);
+        switchContent(ContentState.CELLS);
       }
 
       clearConversationFilter();
@@ -339,7 +359,7 @@ export const Conversations: React.FC<ConversationsProps> = ({
             currentFolder={currentFolder}
             currentTab={currentTab}
             selfUser={selfUser}
-            showSearchInput={(showSearchInput && currentTabConversations.length !== 0) || !!conversationsFilter}
+            showSearchInput={(showSearchInput && hasVisibleConversations) || !!conversationsFilter}
             searchValue={conversationsFilter}
             setSearchValue={onSearch}
             searchInputPlaceholder={searchInputPlaceholder}
@@ -372,6 +392,7 @@ export const Conversations: React.FC<ConversationsProps> = ({
               showNotificationsBadge={notifications.length > 0}
               userRepository={userRepository}
               teamRepository={teamRepository}
+              channelConversations={channelConversations}
             />
           )
         }
@@ -384,7 +405,7 @@ export const Conversations: React.FC<ConversationsProps> = ({
           />
         }
       >
-        {isPreferences ? (
+        {isCells ? null : isPreferences ? (
           <Preferences
             onPreferenceItemClick={onClickPreferences}
             teamRepository={teamRepository}
@@ -424,7 +445,7 @@ export const Conversations: React.FC<ConversationsProps> = ({
                 callState={callState}
                 currentFocus={currentFocus}
                 listViewModel={listViewModel}
-                connectRequests={connectRequests}
+                connectRequests={showConnectionRequests ? connectRequests : []}
                 handleArrowKeyDown={handleKeyDown}
                 conversationState={conversationState}
                 conversations={currentTabConversations}

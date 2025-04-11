@@ -19,6 +19,15 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const iconStyles: CSSObject = {
+const iconStyles: CSSObject = {
   flexShrink: 0,
+};
+
+export const errorIconStyles: CSSObject = {
+  ...iconStyles,
+  fill: 'var(--danger-color)',
+};
+
+export const unavailableIconStyles: CSSObject = {
+  ...iconStyles,
 };

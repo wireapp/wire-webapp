@@ -17,23 +17,21 @@
  *
  */
 
-import {ReactNode} from 'react';
-
 import {FileCard} from 'Components/FileCard/FileCard';
 
 import {wrapperStyles} from './FilePreviewCard.styles';
 
 import {FilePreviewDeleteButton} from '../common/FilePreviewDeleteButton/FilePreviewDeleteButton';
+import {FilePreviewErrorMoreButton} from '../common/FilePreviewErrorMoreButton/FilePreviewErrorMoreButton';
 
 interface FilePreviewCardProps {
   extension: string;
   name: string;
   size: string;
-  isError?: boolean;
-  isLoading?: boolean;
-  loadingProgress?: number;
+  isError: boolean;
   onDelete: () => void;
-  children?: ReactNode;
+  onRetry: () => void;
+  uploadProgress: number;
 }
 
 export const FilePreviewCard = ({
@@ -41,23 +39,26 @@ export const FilePreviewCard = ({
   name,
   size,
   isError,
-  isLoading,
-  loadingProgress,
   onDelete,
-  children,
+  onRetry,
+  uploadProgress,
 }: FilePreviewCardProps) => {
   return (
     <div css={wrapperStyles}>
       <FileCard.Root extension={extension} name={name} size={size}>
         <FileCard.Header>
-          <FileCard.Icon />
+          <FileCard.Icon type={isError ? 'error' : 'file'} />
           <FileCard.Type />
         </FileCard.Header>
         <FileCard.Name />
-        <FilePreviewDeleteButton onDelete={onDelete} />
-        {children}
-        {isError && <FileCard.Error />}
-        {isLoading && <FileCard.Loading progress={loadingProgress} />}
+        {isError && (
+          <>
+            <FileCard.Error />
+            <FilePreviewErrorMoreButton onDelete={onDelete} onRetry={onRetry} />
+          </>
+        )}
+        {!isError && <FilePreviewDeleteButton onDelete={onDelete} />}
+        <FileCard.Loading progress={uploadProgress} />
       </FileCard.Root>
     </div>
   );

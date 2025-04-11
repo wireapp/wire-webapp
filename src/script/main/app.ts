@@ -19,12 +19,13 @@
 
 // Polyfill for "tsyringe" dependency injection
 // eslint-disable-next-line import/order
-import 'core-js/full/reflect';
 
 import {Context} from '@wireapp/api-client/lib/auth';
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
 import {EVENTS as CoreEvents} from '@wireapp/core/lib/Account';
+import {MLSServiceEvents} from '@wireapp/core/lib/messagingProtocols/mls';
 import {amplify} from 'amplify';
+import 'core-js/full/reflect';
 import platform from 'platform';
 import {pdfjs} from 'react-pdf';
 import {container} from 'tsyringe';
@@ -52,9 +53,10 @@ import {BackupRepository} from '../backup/BackupRepository';
 import {BackupService} from '../backup/BackupService';
 import {CacheRepository} from '../cache/CacheRepository';
 import {CallingRepository} from '../calling/CallingRepository';
+import {CellsRepository} from '../cells/CellsRepository';
 import {ClientRepository, ClientService} from '../client';
 import {getClientMLSConfig} from '../client/clientMLSConfig';
-import {Configuration} from '../Config';
+import {Config, Configuration} from '../Config';
 import {ConnectionRepository} from '../connection/ConnectionRepository';
 import {ConnectionService} from '../connection/ConnectionService';
 import {ConversationRepository} from '../conversation/ConversationRepository';
@@ -64,12 +66,13 @@ import {OnConversationE2EIVerificationStateChange} from '../conversation/Convers
 import {EventBuilder} from '../conversation/EventBuilder';
 import {MessageRepository} from '../conversation/MessageRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
+import {E2EIHandler} from '../E2EIdentity';
 import {getModalOptions, ModalType} from '../E2EIdentity/Modals';
 import {User} from '../entity/User';
 import {AccessTokenError} from '../error/AccessTokenError';
 import {AuthError} from '../error/AuthError';
 import {BaseError} from '../error/BaseError';
-import {ClientError, CLIENT_ERROR_TYPE} from '../error/ClientError';
+import {CLIENT_ERROR_TYPE, ClientError} from '../error/ClientError';
 import {TeamError} from '../error/TeamError';
 import {EventRepository} from '../event/EventRepository';
 import {EventService} from '../event/EventService';
@@ -88,7 +91,7 @@ import {IntegrationService} from '../integration/IntegrationService';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {scheduleApiVersionUpdate, updateApiVersion} from '../lifecycle/updateRemoteConfigs';
 import {MediaRepository} from '../media/MediaRepository';
-import {initMLSGroupConversations, initialiseSelfAndTeamConversations} from '../mls';
+import {initialiseSelfAndTeamConversations, initMLSGroupConversations} from '../mls';
 import {joinConversationsAfterMigrationFinalisation} from '../mls/MLSMigration/migrationFinaliser';
 import {NotificationRepository} from '../notification/NotificationRepository';
 import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
@@ -307,6 +310,8 @@ export class App {
     );
     repositories.preferenceNotification = new PreferenceNotificationRepository(repositories.user['userState'].self);
 
+    repositories.cells = container.resolve(CellsRepository);
+
     return repositories;
   }
 
@@ -338,6 +343,29 @@ export class App {
    */
   private _subscribeToEvents() {
     amplify.subscribe(WebAppEvents.LIFECYCLE.SIGN_OUT, this.logout);
+  }
+
+  private initializeCells({cellsRepository, selfUser}: {cellsRepository: CellsRepository; selfUser: User}) {
+    const cellPydioApiKey = Config.getConfig().CELLS_TOKEN_SHARED_SECRET;
+
+    const cellsApiKey =
+      process.env.NODE_ENV === 'development'
+        ? cellPydioApiKey
+        : `${cellPydioApiKey}:${selfUser.qualifiedId.id}@${selfUser.qualifiedId.domain}`;
+
+    cellsRepository.initialize({
+      pydio: {
+        apiKey: cellsApiKey,
+        segment: Config.getConfig().CELLS_PYDIO_SEGMENT,
+        url: Config.getConfig().CELLS_PYDIO_URL,
+      },
+      s3: {
+        apiKey: cellsApiKey,
+        bucket: Config.getConfig().CELLS_S3_BUCKET,
+        endpoint: Config.getConfig().CELLS_S3_ENDPOINT,
+        region: Config.getConfig().CELLS_S3_REGION,
+      },
+    });
   }
 
   //##############################################################################
@@ -380,12 +408,15 @@ export class App {
         team: teamRepository,
         user: userRepository,
         self: selfRepository,
+        cells: cellsRepository,
       } = this.repository;
       await checkIndexedDb();
       onProgress(2.5);
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
 
       const selfUser = await this.repository.user.getSelf([{position: 'App.initiateSelfUser', vendor: 'webapp'}]);
+
+      this.initializeCells({cellsRepository, selfUser});
 
       await initializeDataDog(this.config, selfUser.qualifiedId);
       const eventLogger = new InitializationEventLogger(selfUser.id);
@@ -401,8 +432,13 @@ export class App {
       }
       this.core.on(CoreEvents.NEW_SESSION, ({userId, clientId}) => {
         const newClient = {class: ClientClassification.UNKNOWN, id: clientId};
-        userRepository.addClientToUser(userId, newClient, true);
+        void userRepository.addClientToUser(userId, newClient, true);
       });
+
+      this.core.service?.mls?.on(
+        MLSServiceEvents.MLS_CLIENT_MISMATCH,
+        async () => await this.showForceLogoutModal(SIGN_OUT_REASON.MLS_CLIENT_MISMATCH),
+      );
 
       await this.initiateSelfUser(selfUser);
       eventLogger.log(AppInitializationStep.UserInitialize);
@@ -414,21 +450,7 @@ export class App {
       try {
         await this.core.initClient(localClient, getClientMLSConfig(teamFeatures));
       } catch (error) {
-        PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-          hideCloseBtn: true,
-          preventClose: true,
-          hideSecondary: true,
-          primaryAction: {
-            action: async () => {
-              await this.logout(SIGN_OUT_REASON.CLIENT_REMOVED, false);
-            },
-            text: t('modalAccountLogoutAction'),
-          },
-          text: {
-            title: t('unknownApplicationErrorTitle'),
-            message: t('modalUnableToReceiveMessages'),
-          },
-        });
+        await this.showForceLogoutModal(SIGN_OUT_REASON.CLIENT_REMOVED);
       }
 
       const e2eiHandler = await configureE2EI(teamFeatures);
@@ -789,13 +811,19 @@ export class App {
         const deletedKeys = CacheRepository.clearLocalStorage(keepConversationInput, keysToKeep);
         this.logger.debug(`Deleted "${deletedKeys.length}" keys from localStorage.`, deletedKeys);
       }
-      const shouldWipeIdentity = clearData || signOutReason === SIGN_OUT_REASON.CLIENT_REMOVED;
 
-      if (shouldWipeIdentity) {
+      const shouldWipeIdentity = clearData || signOutReason === SIGN_OUT_REASON.CLIENT_REMOVED;
+      const shouldWipeCrypto = signOutReason === SIGN_OUT_REASON.MLS_CLIENT_MISMATCH;
+      if (shouldWipeCrypto) {
+        this.logger.error('Client mismatch detected. Wiping crypto data and local client.');
+      }
+
+      if (shouldWipeIdentity || shouldWipeCrypto) {
         localStorage.clear();
       }
 
-      await this.core.logout(shouldWipeIdentity);
+      await this.core.logout({clearAllData: shouldWipeIdentity, clearCryptoData: shouldWipeCrypto});
+
       if (clearData) {
         // Info: This async call cannot be awaited in an "beforeunload" scenario, so we call it without waiting for it in order to delete the CacheStorage in the background.
         CacheRepository.clearCacheStorage();
@@ -910,5 +938,29 @@ export class App {
     });
 
     PrimaryModal.show(modalType, modalOptions);
+  };
+
+  // Todo: Move this to a separate hook or service
+  private showForceLogoutModal = (reason: SIGN_OUT_REASON) => {
+    // ToDo: Extract the softlock logic to a separate hook instead of using the E2EIHandler directly
+    // This is a temporary solution until we have a proper softlock implementation
+    const e2eiHandler = E2EIHandler.getInstance();
+    e2eiHandler.emit('deviceStatusUpdated', {status: 'locked'});
+
+    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
+      hideCloseBtn: true,
+      preventClose: true,
+      hideSecondary: true,
+      primaryAction: {
+        action: async () => {
+          await this.logout(reason, false);
+        },
+        text: t('modalAccountLogoutAction'),
+      },
+      text: {
+        title: t('unknownApplicationErrorTitle'),
+        message: t('modalUnableToReceiveMessages'),
+      },
+    });
   };
 }

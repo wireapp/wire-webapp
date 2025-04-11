@@ -38,6 +38,7 @@ import {
   E2EIVerificationEvent,
   MessageAddEvent,
   CompositeMessageAddEvent,
+  MultipartMessageAddEvent,
 } from './EventBuilder';
 
 import {AssetRemoteData} from '../assets/AssetRemoteData';
@@ -68,6 +69,7 @@ import {MessageTimerUpdateMessage} from '../entity/message/MessageTimerUpdateMes
 import {MissedMessage} from '../entity/message/MissedMessage';
 import {MLSConversationRecoveredMessage} from '../entity/message/MLSConversationRecoveredMessage';
 import {MLSMigrationFinalisationOngoingCallMessage} from '../entity/message/MLSMigrationFinalisationOngoingCallMessage';
+import {Multipart} from '../entity/message/Multipart';
 import {OneToOneMigratedToMlsMessage} from '../entity/message/OneToOneMigratedToMlsMessage';
 import {PingMessage} from '../entity/message/PingMessage';
 import {ProtocolUpdateMessage} from '../entity/message/ProtocolUpdateMessage';
@@ -333,6 +335,12 @@ export class EventMapper {
         break;
       }
 
+      case ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD: {
+        const addMessage = this._mapEventMultipartAdd(event);
+        messageEntity = addMetadata(addMessage, event);
+        break;
+      }
+
       case ClientEvent.CONVERSATION.MISSED_MESSAGES: {
         messageEntity = this._mapEventMissedMessages();
         break;
@@ -585,7 +593,7 @@ export class EventMapper {
     const isSingleModeConversation = conversationEntity.is1to1() || conversationEntity.isRequest();
     messageEntity.visible(!isSingleModeConversation);
 
-    if (conversationEntity.isGroup()) {
+    if (conversationEntity.isGroupOrChannel()) {
       const messageFromCreator = sender === conversationEntity.creator;
       const creatorIndex = userIds.findIndex(user => user.id === sender);
       const creatorIsJoiningMember = messageFromCreator && creatorIndex !== -1;
@@ -642,6 +650,42 @@ export class EventMapper {
     }
 
     return messageEntity;
+  }
+
+  /**
+   * Maps JSON data of conversation.message_add message into message entity.
+   *
+   * @param event Message data
+   * @returns Content message entity
+   */
+  private _mapEventMultipartAdd(event: MultipartMessageAddEvent) {
+    const {data: eventData} = event;
+    const messageEntity = new ContentMessage();
+
+    const assets = this._mapAssetMultipart(eventData);
+    messageEntity.assets.push(assets);
+
+    if (eventData.text?.quote) {
+      const {message_id: messageId, user_id: userId, error} = eventData.text.quote as any;
+      messageEntity.quote(new QuoteEntity({error, messageId, userId}));
+    }
+
+    return messageEntity;
+  }
+
+  private _mapAssetMultipart(eventData: MultipartMessageAddEvent['data']) {
+    const {text, attachments} = eventData;
+
+    const assetEntity = new Multipart({id: '', text: text?.content || '', attachments});
+
+    const mentions = text?.mentions;
+
+    if (mentions && mentions.length) {
+      const mappedMentions = this._mapAssetMentions(mentions, text?.content || '');
+      assetEntity.mentions(mappedMentions);
+    }
+
+    return assetEntity;
   }
 
   private _mapEventCompositeMessageAdd(event: CompositeMessageAddEvent) {

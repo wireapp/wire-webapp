@@ -554,7 +554,8 @@ describe('CallingRepository', () => {
         spyOn(wCall, 'setVideoSendState');
         call.state(CALL_STATE.MEDIA_ESTAB);
         callingRepository.toggleCamera(call);
-        expect(selfParticipant.releaseVideoStream).toHaveBeenCalledTimes(0);
+        // Screen sharing should be stopped first
+        expect(selfParticipant.releaseVideoStream).toHaveBeenCalledTimes(1);
         expect(wCall.setVideoSendState).toHaveBeenCalledWith(wUser, conv.id, VIDEO_STATE.STARTED);
       });
     });

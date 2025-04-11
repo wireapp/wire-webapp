@@ -190,7 +190,11 @@ export class ListViewModel {
 
     // don't switch view for primary modal(ex: preferences->set status->modal opened)
     // when user press escape, only close the modal and stay within the preference screen
-    if (isEscapeKey(keyboardEvent) && currentModalId === null && currentTab !== SidebarTabs.PREFERENCES) {
+    if (
+      isEscapeKey(keyboardEvent) &&
+      currentModalId === null &&
+      ![SidebarTabs.PREFERENCES, SidebarTabs.CELLS].includes(currentTab)
+    ) {
       const newState = this.isActivatedAccount() ? ListState.CONVERSATIONS : ListState.TEMPORARY_GUEST;
       this.switchList(newState);
     }
@@ -422,7 +426,7 @@ export class ListViewModel {
       });
     }
 
-    if (!conversationEntity.isGroup()) {
+    if (!conversationEntity.isGroupOrChannel()) {
       const userEntity = conversationEntity.firstUserEntity();
       const canBlock = userEntity && (userEntity.isConnected() || userEntity.isRequest());
       const canUnblock = userEntity && userEntity.isBlocked();
@@ -443,13 +447,13 @@ export class ListViewModel {
     if (conversationEntity.isLeavable()) {
       entries.push({
         click: () => this.clickToLeave(conversationEntity),
-        label: t('conversationsPopoverLeave'),
+        label: conversationEntity.isChannel() ? t('channelsPopoverLeave') : t('groupsPopoverLeave'),
       });
     }
 
     if (
       Config.getConfig().FEATURE.ENABLE_REMOVE_GROUP_CONVERSATION &&
-      conversationEntity.isGroup() &&
+      conversationEntity.isGroupOrChannel() &&
       conversationEntity.isSelfUserRemoved()
     ) {
       entries.push({

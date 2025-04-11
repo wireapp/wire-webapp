@@ -19,9 +19,10 @@
 
 import {act, fireEvent, render, waitFor} from '@testing-library/react';
 
-import {FileWithPreview} from 'Components/Conversation/useFiles/useFiles';
+import {FileWithPreview} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
 import {InputBar} from 'Components/InputBar/index';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {Config} from 'src/script/Config';
 import {PropertiesService} from 'src/script/properties/PropertiesService';
 import {SelfService} from 'src/script/self/SelfService';
@@ -73,6 +74,7 @@ describe('InputBar', () => {
   const getDefaultProps = () => ({
     assetRepository: new AssetRepository(),
     conversation: new Conversation(createUuid()),
+    cellsRepository: new CellsRepository(),
     files: [] as FileWithPreview[],
     conversationRepository: {
       sendTypingStart: jest.fn(),
@@ -90,6 +92,8 @@ describe('InputBar', () => {
     uploadDroppedFiles: jest.fn(),
     uploadImages: jest.fn(),
     uploadFiles: jest.fn(),
+    onCellImageUpload: jest.fn(),
+    onCellAssetUpload: jest.fn(),
   });
 
   beforeEach(() => {

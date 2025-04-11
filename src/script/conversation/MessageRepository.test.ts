@@ -193,7 +193,7 @@ describe('MessageRepository', () => {
       jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
       spyOn(eventRepository, 'injectEvent').and.returnValue(Promise.resolve());
       const conversation = generateConversation();
-      await messageRepository.sendTextWithLinkPreview(conversation, 'hello there', []);
+      await messageRepository.sendTextWithLinkPreview({conversation, textMessage: 'hello there', mentions: []});
       expect(core.service!.conversation.send).toHaveBeenCalledWith({
         ...commonSendResponse,
         conversationId: conversation.qualifiedId,

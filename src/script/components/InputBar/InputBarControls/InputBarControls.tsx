@@ -37,6 +37,7 @@ interface InputBarControlsProps {
   pingDisabled: boolean;
   messageContent: MessageContent;
   isEditing: boolean;
+  isSendingDisabled: boolean;
   showMarkdownPreview: boolean;
   showGiphyButton: boolean;
   formatToolbar: {
@@ -52,7 +53,10 @@ interface InputBarControlsProps {
   onGifClick: () => void;
   onSelectFiles: (files: File[]) => void;
   onSelectImages: (files: File[]) => void;
+  onCellImageUpload: () => void;
+  onCellAssetUpload: () => void;
   onSend: () => void;
+  isSending: boolean;
 }
 
 export const InputBarControls = ({
@@ -61,6 +65,7 @@ export const InputBarControls = ({
   pingDisabled,
   messageContent,
   isEditing,
+  isSendingDisabled,
   showMarkdownPreview,
   showGiphyButton,
   formatToolbar,
@@ -70,10 +75,11 @@ export const InputBarControls = ({
   onGifClick,
   onSelectFiles,
   onSelectImages,
+  onCellImageUpload,
+  onCellAssetUpload,
   onSend,
+  isSending,
 }: InputBarControlsProps) => {
-  const enableSending = messageContent.text.length > 0;
-
   const isMessageFormatButtonsFlagEnabled = Config.getConfig().FEATURE.ENABLE_MESSAGE_FORMAT_BUTTONS;
 
   useEffect(() => {
@@ -105,9 +111,16 @@ export const InputBarControls = ({
           isEmojiActive={emojiPicker.open}
           onFormatClick={formatToolbar.handleClick}
           onEmojiClick={emojiPicker.handleToggle}
+          onCellImageUpload={onCellImageUpload}
+          onCellAssetUpload={onCellAssetUpload}
         />
       </ul>
-      <SendMessageButton disabled={!enableSending} onSend={onSend} className="input-bar-buttons__send" />
+      <SendMessageButton
+        isDisabled={isSendingDisabled || isSending}
+        isLoading={isSending}
+        onSend={onSend}
+        className="input-bar-buttons__send"
+      />
     </div>
   );
 };

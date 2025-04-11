@@ -27,16 +27,17 @@ import {AudioEmptySeekBar} from './AudioEmptySeekBar/AudioEmptySeekBar';
 import {wrapperStyles} from './AudioPreviewCard.styles';
 
 import {FilePreviewDeleteButton} from '../common/FilePreviewDeleteButton/FilePreviewDeleteButton';
+import {FilePreviewErrorMoreButton} from '../common/FilePreviewErrorMoreButton/FilePreviewErrorMoreButton';
 import {FilePreviewPlayButton} from '../common/FilePreviewPlayButton/FilePreviewPlayButton';
 
 interface AudioPreviewCardProps {
   extension: string;
   name: string;
   size: string;
-  isError?: boolean;
-  isLoading?: boolean;
-  loadingProgress?: number;
+  isError: boolean;
   onDelete: () => void;
+  onRetry: () => void;
+  uploadProgress: number;
 }
 
 export const AudioPreviewCard = ({
@@ -44,27 +45,32 @@ export const AudioPreviewCard = ({
   name,
   size,
   isError,
-  isLoading,
-  loadingProgress,
   onDelete,
+  onRetry,
+  uploadProgress,
 }: AudioPreviewCardProps) => {
   return (
     <div css={wrapperStyles}>
       <FileCard.Root extension={extension} name={name} size={size}>
         <FileCard.Header>
-          <FileCard.Icon />
+          <FileCard.Icon type={isError ? 'error' : 'file'} />
           <FileCard.Type />
           <FileCard.Name />
         </FileCard.Header>
-        <FilePreviewDeleteButton onDelete={onDelete} />
         <div css={controlStyles}>
           <FilePreviewPlayButton />
           <div css={playerWrapperStyles}>
             <AudioEmptySeekBar />
           </div>
         </div>
-        {isError && <FileCard.Error />}
-        {isLoading && <FileCard.Loading progress={loadingProgress} />}
+        {isError && (
+          <>
+            <FileCard.Error />
+            <FilePreviewErrorMoreButton onDelete={onDelete} onRetry={onRetry} />
+          </>
+        )}
+        {!isError && <FilePreviewDeleteButton onDelete={onDelete} />}
+        <FileCard.Loading progress={uploadProgress} />
       </FileCard.Root>
     </div>
   );

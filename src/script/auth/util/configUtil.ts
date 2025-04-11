@@ -24,28 +24,10 @@ const configSchema = z.object({
   webapp_welcome_url: z.string().url(),
 });
 
-const backendConfigSchema = z.object({
-  endpoints: z.object({
-    backendURL: z.string().url(),
-    backendWSURL: z.string().url(),
-    blackListURL: z.string().url(),
-    teamsURL: z.string().url(),
-    accountsURL: z.string().url(),
-    websiteURL: z.string().url(),
-  }),
-  title: z.string(),
-});
-
-export type BackendConfig = z.infer<typeof backendConfigSchema> & {webAppUrl: string};
-
-export const getValidatedBackendConfig = async (url: string): Promise<BackendConfig> => {
+export const getRedirectURL = async (url: string): Promise<string> => {
   const domainConfigResponse = await fetch(url);
   const domainConfig = await domainConfigResponse.json();
   const parsedDomainConfig = configSchema.parse(domainConfig);
 
-  const backendConfigResponse = await fetch(parsedDomainConfig.config_json_url);
-  const backendConfig = await backendConfigResponse.json();
-  const parsedBackendConfig = backendConfigSchema.parse(backendConfig);
-
-  return {...parsedBackendConfig, webAppUrl: parsedDomainConfig.webapp_welcome_url};
+  return parsedDomainConfig.webapp_welcome_url;
 };

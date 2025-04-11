@@ -17,48 +17,21 @@
  *
  */
 
-import {useState} from 'react';
-
 import {DomainRedirect} from '@wireapp/api-client/lib/account/DomainRedirect';
 import {useNavigate} from 'react-router';
 import {container} from 'tsyringe';
 
-import {Config} from 'src/script/Config';
-
 import {APIClient} from '../../service/APIClientSingleton';
 import {ROUTE} from '../route';
-import {getValidatedBackendConfig} from '../util/configUtil';
+import {getRedirectURL} from '../util/configUtil';
 
 export const useEnterpriseLoginV2 = ({
-  codeOrMail,
   loginWithSSO,
 }: {
-  codeOrMail: string;
   loginWithSSO: (code: string, password?: string) => Promise<void>;
 }) => {
   const apiClient = container.resolve(APIClient);
   const navigate = useNavigate();
-  const [isAccountAlreadyExistsModalOpen, setIsAccountAlreadyExistsModalOpen] = useState(false);
-  const [isLoginFlowAllowed, setIsLoginFlowAllowed] = useState(false);
-  const [backendName, setBackendName] = useState('');
-
-  const hideAccountAlreadyExistsModal = () => {
-    setIsAccountAlreadyExistsModalOpen(false);
-    setBackendName('');
-    if (isLoginFlowAllowed) {
-      navigate(ROUTE.LOGIN, {
-        state: {
-          email: codeOrMail,
-          accountCreationEnabled: true,
-        },
-      });
-    }
-  };
-
-  const showAccountAlreadyExistsModal = (backendName = Config.getConfig().BACKEND_NAME) => {
-    setIsAccountAlreadyExistsModalOpen(true);
-    setBackendName(backendName);
-  };
 
   const loginV2 = async (email: string, password?: string) => {
     const response = await apiClient.api.account.getDomainRegistration(email);
@@ -68,16 +41,12 @@ export const useEnterpriseLoginV2 = ({
       case DomainRedirect.NO_REGISTRATION:
       case DomainRedirect.LOCKED:
       case DomainRedirect.PRE_AUTHORIZED: {
-        if (response.domain_redirect === DomainRedirect.NONE && response.due_to_existing_account) {
-          setIsLoginFlowAllowed(true);
-          showAccountAlreadyExistsModal();
-          return;
-        }
-
         navigate(ROUTE.LOGIN, {
           state: {
             email,
             accountCreationEnabled: response.domain_redirect !== DomainRedirect.NO_REGISTRATION,
+            shouldDisplayWarning:
+              response.domain_redirect === DomainRedirect.NO_REGISTRATION && response.due_to_existing_account,
           },
         });
 
@@ -85,25 +54,17 @@ export const useEnterpriseLoginV2 = ({
       }
 
       case DomainRedirect.SSO: {
-        if (response.due_to_existing_account) {
-          showAccountAlreadyExistsModal();
-          return;
-        }
         await loginWithSSO(response.sso_code, password);
         break;
       }
 
       case DomainRedirect.BACKEND: {
-        if (response.due_to_existing_account) {
-          showAccountAlreadyExistsModal();
-          return;
-        }
-        const config = await getValidatedBackendConfig(response.backend_url);
+        const url = await getRedirectURL(response.backend_url);
 
         navigate(ROUTE.CUSTOM_BACKEND, {
           state: {
             email,
-            config,
+            url,
           },
         });
         break;
@@ -116,8 +77,5 @@ export const useEnterpriseLoginV2 = ({
 
   return {
     loginV2,
-    hideAccountAlreadyExistsModal,
-    isAccountAlreadyExistsModalOpen,
-    backendName,
   };
 };

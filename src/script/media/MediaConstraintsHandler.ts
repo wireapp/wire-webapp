@@ -133,7 +133,7 @@ export class MediaConstraintsHandler {
   getScreenStreamConstraints(method: ScreensharingMethods): MediaStreamConstraints | undefined {
     switch (method) {
       case ScreensharingMethods.DESKTOP_CAPTURER:
-        this.logger.info(`Enabling screen sharing from desktopCapturer (with fULL resolution)`);
+        this.logger.info(`Enabling screen sharing from desktopCapturer (with FULL resolution)`);
 
         const desktopCapturer = MediaConstraintsHandler.CONFIG.CONSTRAINTS.SCREEN.DESKTOP_CAPTURER;
 
@@ -147,7 +147,7 @@ export class MediaConstraintsHandler {
 
         return streamConstraints;
       case ScreensharingMethods.DISPLAY_MEDIA:
-        this.logger.info(`Enabling screen sharing from getDisplayMedia (with fULL resolution)`);
+        this.logger.info(`Enabling screen sharing from getDisplayMedia (with FULL resolution)`);
 
         const display = MediaConstraintsHandler.CONFIG.CONSTRAINTS.SCREEN.DISPLAY_MEDIA;
 
@@ -156,7 +156,7 @@ export class MediaConstraintsHandler {
           video: display,
         };
       case ScreensharingMethods.USER_MEDIA:
-        this.logger.info(`Enabling screen sharing from getUserMedia (with fULL resolution)`);
+        this.logger.info(`Enabling screen sharing from getUserMedia (with FULL resolution)`);
 
         const userMedia = MediaConstraintsHandler.CONFIG.CONSTRAINTS.SCREEN.USER_MEDIA;
 

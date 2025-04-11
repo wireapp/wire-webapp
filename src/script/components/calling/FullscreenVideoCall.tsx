@@ -24,7 +24,15 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {Checkbox, CheckboxLabel, IconButton, IconButtonVariant, QUERY} from '@wireapp/react-ui-kit';
+import {
+  Checkbox,
+  CheckboxLabel,
+  CloseDetachedWindowIcon,
+  IconButton,
+  IconButtonVariant,
+  OpenDetachedWindowIcon,
+  QUERY,
+} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useAppNotification} from 'Components/AppNotification/AppNotification';
@@ -312,7 +320,7 @@ const FullscreenVideoCall = ({
                 data-uie-name="do-call-controls-video-minimize"
                 title={t('videoCallOverlayCloseFullScreen')}
               >
-                {viewMode === CallingViewMode.DETACHED_WINDOW ? <Icon.CloseDetachedWindowIcon /> : <Icon.MessageIcon />}
+                {viewMode === CallingViewMode.DETACHED_WINDOW ? <CloseDetachedWindowIcon /> : <Icon.MessageIcon />}
               </IconButton>
             )}
 
@@ -332,7 +340,7 @@ const FullscreenVideoCall = ({
                 data-uie-name="do-call-controls-video-maximize"
                 title={t('videoCallOverlayOpenPopupWindow')}
               >
-                <Icon.OpenDetachedWindowIcon />
+                <OpenDetachedWindowIcon />
               </IconButton>
             )}
           </div>
@@ -360,6 +368,19 @@ const FullscreenVideoCall = ({
               style={{
                 ...classifiedBarStyles,
               }}
+            />
+          )}
+
+          {isMobile && isParticipantsListOpen && (
+            <CallingParticipantList
+              handRaisedParticipants={handRaisedParticipants}
+              callingRepository={callingRepository}
+              conversation={conversation}
+              participants={participants}
+              isModerator={isModerator}
+              isSelfVerified={selfUser?.is_verified()}
+              showParticipants={true}
+              onClose={toggleParticipantsList}
             />
           )}
         </div>
@@ -421,7 +442,7 @@ const FullscreenVideoCall = ({
           </>
         )}
       </div>
-      {isParticipantsListOpen && (
+      {!isMobile && isParticipantsListOpen && (
         <CallingParticipantList
           handRaisedParticipants={handRaisedParticipants}
           callingRepository={callingRepository}
@@ -430,6 +451,7 @@ const FullscreenVideoCall = ({
           isModerator={isModerator}
           isSelfVerified={selfUser?.is_verified()}
           showParticipants={true}
+          onClose={toggleParticipantsList}
         />
       )}
       <ModalComponent

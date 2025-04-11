@@ -44,6 +44,15 @@ export const ReplyBar = ({replyMessageEntity, onCancel}: ReplyBarProps) => {
   } = useKoSubscribableChildren(replyMessageEntity, ['assets', 'senderName', 'was_edited']);
   const replyAsset = assets?.[0];
 
+  const isMultipart = replyAsset?.isMultipart();
+
+  const attachmentsCount = isMultipart ? replyAsset.attachments?.()?.length ?? 0 : 0;
+
+  const attachmentsCountCopy =
+    attachmentsCount === 1
+      ? t('replyBarSingleAttachment')
+      : t('replyBarMultipleAttachments', {count: attachmentsCount});
+
   return (
     <div className="input-bar__reply" data-uie-name="input-bar-reply-box">
       <button
@@ -74,6 +83,19 @@ export const ReplyBar = ({replyMessageEntity, onCancel}: ReplyBarProps) => {
               />
             )}
           </div>
+
+          {isMultipart && (
+            <>
+              <div
+                className="input-bar__reply__message input-bar__reply__message__text"
+                data-uie-name="media-text-reply-box"
+                dangerouslySetInnerHTML={{__html: renderMessage(replyAsset.text, undefined, replyAsset.mentions())}}
+                aria-label={replyAsset.text}
+                tabIndex={TabIndex.FOCUSABLE}
+              />
+              {attachmentsCount > 0 && <p className="input-bar__reply__attachments-count">{attachmentsCountCopy}</p>}
+            </>
+          )}
 
           {replyAsset?.isText() && (
             <div
