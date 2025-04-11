@@ -95,7 +95,7 @@ export const CellsTable = ({
     });
 
     return () => observers.forEach(observer => observer.disconnect());
-  }, [files]);
+  }, [files, onUpdateBodyHeight]);
 
   useEffect(() => {
     onUpdateColumnWidths(widths);

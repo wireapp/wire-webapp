@@ -66,7 +66,7 @@ export const CellsGlobalView = ({cellsRepository = container.resolve(CellsReposi
     },
     // cellsRepository is not a dependency because it's a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+    [deleteFileFailedNotification, removeFile],
   );
 
   const handleRefresh = useCallback(async () => {
