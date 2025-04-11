@@ -76,6 +76,18 @@ export const CellsGlobalView = ({cellsRepository = container.resolve(CellsReposi
   const hasFiles = !!files.length;
   const emptySearchResults = searchValue && filesStatus === 'success' && !files.length;
 
+  const showTable = (isSuccess || (pagination && isLoadingMore)) && !emptySearchResults;
+  const showNoFiles = !isLoading && !isLoadingMore && !isError && !hasFiles && !emptySearchResults;
+  const showLoader = isLoadingMore && files && files.length > 0;
+
+  const showLoadMore =
+    !isLoading &&
+    !isLoadingMore &&
+    !emptySearchResults &&
+    isSuccess &&
+    pagination &&
+    pagination.currentPage < pagination.totalPages;
+
   return (
     <div css={wrapperStyles}>
       <CellsHeader
@@ -91,38 +103,27 @@ export const CellsGlobalView = ({cellsRepository = container.resolve(CellsReposi
           description={t('cellsGlobalView.emptySearchResultsDescription')}
         />
       )}
-      {(isSuccess || (pagination && isLoadingMore)) && !emptySearchResults && (
-        <CellsTable files={files} cellsRepository={cellsRepository} onDeleteFile={handleDeleteFile} />
-      )}
-      {!isLoading && !isLoadingMore && !isError && !hasFiles && !emptySearchResults && (
+      {showTable && <CellsTable files={files} cellsRepository={cellsRepository} onDeleteFile={handleDeleteFile} />}
+      {showNoFiles && (
         <CellsStateInfo
           heading={t('cellsGlobalView.noFilesHeading')}
           description={t('cellsGlobalView.noFilesDescription')}
         />
       )}
-      {isLoadingMore && files && files.length > 0 && <CellsLoader />}
+      {showLoader && <CellsLoader />}
       {isError && (
         <CellsStateInfo
           heading={t('cellsGlobalView.errorHeading')}
           description={t('cellsGlobalView.errorDescription')}
         />
       )}
-      {!isLoading &&
-        !isLoadingMore &&
-        !emptySearchResults &&
-        isSuccess &&
-        pagination &&
-        pagination.currentPage < pagination.totalPages && (
-          <div css={loadMoreWrapperStyles}>
-            <Button
-              variant={ButtonVariant.TERTIARY}
-              onClick={() => increasePageSize()}
-              aria-label={t('cellsGlobalView.pagination.loadMoreResults')}
-            >
-              {t('cellsGlobalView.pagination.loadMoreResults')}
-            </Button>
-          </div>
-        )}
+      {showLoadMore && (
+        <div css={loadMoreWrapperStyles}>
+          <Button variant={ButtonVariant.TERTIARY} onClick={increasePageSize}>
+            {t('cellsGlobalView.pagination.loadMoreResults')}
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
