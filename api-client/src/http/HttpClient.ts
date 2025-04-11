@@ -150,8 +150,8 @@ export class HttpClient extends EventEmitter {
       const response = await this.client.request<T>({
         ...config,
         signal: abortController?.signal,
-        // We want to prefix all urls, except the ones with cookies which are attached to unprefixed urls
-        url: config.withCredentials ? config.url : `${this.versionPrefix}${config.url}`,
+        // We want to prefix all urls, except for the "access" endpoint
+        url: config.url === `${AuthAPI.URL.ACCESS}` ? config.url : `${this.versionPrefix}${config.url}`,
         maxBodyLength: FILE_SIZE_100_MB,
         maxContentLength: FILE_SIZE_100_MB,
       });
