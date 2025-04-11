@@ -17,12 +17,11 @@
  *
  */
 
-import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 import {formatSeconds} from 'Util/TimeUtil';
 
 import {wrapperStyles, playButtonWrapperStyles, seekbarStyles, timeStyles} from './VideoControls.styles';
 
-import {SeekBar} from '../../common/SeekBar/SeekBar';
+import {SeekBar} from '../../../../common/SeekBar/SeekBar';
 import {VideoPlayButton} from '../common/VideoPlayButton/VideoPlayButton';
 
 interface VideoControlsProps {
@@ -31,17 +30,9 @@ interface VideoControlsProps {
   isFocusable: boolean;
   handlePlay: () => void;
   handlePause: () => void;
-  transferState: AssetTransferState;
 }
 
-export const VideoControls = ({
-  videoElement,
-  isPlaying,
-  isFocusable,
-  handlePlay,
-  handlePause,
-  transferState,
-}: VideoControlsProps) => {
+export const VideoControls = ({videoElement, isPlaying, isFocusable, handlePlay, handlePause}: VideoControlsProps) => {
   const currentTime = formatSeconds(videoElement.currentTime);
   const duration = formatSeconds(videoElement.duration);
 
@@ -53,7 +44,6 @@ export const VideoControls = ({
           isPlaying={isPlaying}
           onPlay={handlePlay}
           onPause={handlePause}
-          transferState={transferState}
           isFocusable={isFocusable}
         />
       </div>

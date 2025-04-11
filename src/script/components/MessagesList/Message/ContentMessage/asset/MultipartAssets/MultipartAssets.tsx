@@ -75,11 +75,13 @@ const MultipartAsset = ({
     uuid,
     cellsRepository,
     isEnabled: hasBeenInView,
-    retryUntilSuccess: isImage || isVideo,
+    retryUntilSuccess: true,
   });
 
   const isLoading = status === 'loading';
   const isError = status === 'error';
+
+  const isSingleAsset = assetsCount === 1;
 
   if (isImage) {
     return (
@@ -91,16 +93,24 @@ const MultipartAsset = ({
 
   if (isVideo) {
     return (
-      <li ref={elementRef} css={smallCardStyles}>
-        <VideoAssetCard src={src} isLoading={isLoading} isError={isError} />
+      <li ref={elementRef} css={isSingleAsset ? largeCardStyles : smallCardStyles}>
+        <VideoAssetCard
+          variant={isSingleAsset ? 'large' : 'small'}
+          src={src}
+          extension={extension}
+          name={name}
+          size={size}
+          isLoading={isLoading}
+          isError={isError}
+        />
       </li>
     );
   }
 
   return (
-    <li ref={elementRef} css={largeCardStyles}>
+    <li ref={elementRef} css={isSingleAsset ? largeCardStyles : smallCardStyles}>
       <FileAssetCard
-        variant={assetsCount === 1 ? 'large' : 'small'}
+        variant={isSingleAsset ? 'large' : 'small'}
         extension={extension}
         name={name}
         size={size}
