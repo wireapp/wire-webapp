@@ -80,22 +80,32 @@ export const useGetMultipartAssetPreview = ({
       setStatus('loading');
       const asset = await cellsRepository.getFile({uuid});
 
+      console.log('useGetMultipartAssetPreview', asset);
+
       if (!isMounted.current) {
         return;
       }
 
-      if (!asset.PreSignedGET?.Url) {
-        if (retryUntilSuccess && attemptRef.current < maxRetries) {
+      const imagePreview = asset.Previews?.find(preview => preview?.ContentType?.startsWith('image/'));
+
+      if (imagePreview) {
+        if (retryUntilSuccess && attemptRef.current < maxRetries && imagePreview.Processing) {
           attemptRef.current += 1;
           setStatus('retrying');
           return;
         }
+
+        if (imagePreview.Error) {
+          handleError(new Error('No preview available'));
+          return;
+        }
+      } else {
         handleError(new Error('No URL available'));
         return;
       }
 
-      setSrc(asset.PreSignedGET.Url);
-      setPreviewImageUrl(asset.Previews?.[0]?.PreSignedGET?.Url);
+      setSrc(asset.PreSignedGET?.Url);
+      setPreviewImageUrl(imagePreview.PreSignedGET?.Url);
       setStatus('success');
       setError(null);
     } catch (err) {
