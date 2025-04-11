@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.44.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.43.3...@wireapp/api-client@27.44.0) (2025-04-11)
+
+### Features
+
+* **cells:** api search sorting ([#7018](https://github.com/wireapp/wire-web-packages/issues/7018)) ([1250f9c](https://github.com/wireapp/wire-web-packages/commit/1250f9c96efd863f51f3fc65ca9f8a1125277d64))
+
 ## [27.43.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.43.2...@wireapp/api-client@27.43.3) (2025-04-11)
 
 ### Reverts
