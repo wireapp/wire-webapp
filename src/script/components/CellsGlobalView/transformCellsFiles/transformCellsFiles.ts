@@ -17,15 +17,14 @@
  *
  */
 
-import {RestNode, RestPagination} from 'cells-sdk-ts';
+import {RestNode} from 'cells-sdk-ts';
 
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {formatBytes} from 'Util/util';
 
 import {CellFile} from '../common/cellFile/cellFile';
-import {CellPagination} from '../common/cellPagination/cellPagination';
 
-export const transformNodesToCellsFiles = (nodes: RestNode[]): CellFile[] => {
+export const transformCellsFiles = (nodes: RestNode[]): CellFile[] => {
   return (
     nodes
       .filter(node => node.Type === 'LEAF')
@@ -48,18 +47,6 @@ export const transformNodesToCellsFiles = (nodes: RestNode[]): CellFile[] => {
       // eslint-disable-next-line id-length
       .sort((a, b) => b.uploadedAtTimestamp - a.uploadedAtTimestamp)
   );
-};
-
-export const transformToCellPagination = (pagination: RestPagination): CellPagination => {
-  return {
-    limit: pagination.Limit || 0,
-    total: pagination.Total || 0,
-    totalPages: pagination.TotalPages || 0,
-    currentOffset: pagination.CurrentOffset || 0,
-    prevOffset: pagination.PrevOffset || 0,
-    nextOffset: pagination.NextOffset || 0,
-    currentPage: pagination.CurrentPage || 0,
-  };
 };
 
 const getFileName = (filePath: string): string => {

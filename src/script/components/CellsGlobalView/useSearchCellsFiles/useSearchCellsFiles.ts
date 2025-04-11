@@ -24,7 +24,8 @@ import {useDebouncedCallback} from 'use-debounce';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 
 import {useCellsStore, Status} from '../common/useCellsStore/useCellsStore';
-import {transformNodesToCellsFiles, transformToCellPagination} from '../useGetAllCellsFiles/transformNodesToCellsFiles';
+import {transformCellsFiles} from '../transformCellsFiles/transformCellsFiles';
+import {transformCellsPagination} from '../transformCellsPagination/transformCellsPagination';
 
 interface UseSearchCellsFilesProps {
   cellsRepository: CellsRepository;
@@ -45,9 +46,9 @@ export const useSearchCellsFiles = ({cellsRepository}: UseSearchCellsFilesProps)
       try {
         setStatus(status);
         const result = await cellsRepository.searchFiles({query, limit});
-        setFiles(transformNodesToCellsFiles(result.Nodes || []));
+        setFiles(transformCellsFiles(result.Nodes || []));
         if (result.Pagination) {
-          setPagination(transformToCellPagination(result.Pagination));
+          setPagination(transformCellsPagination(result.Pagination));
         } else {
           setPagination(null);
         }
