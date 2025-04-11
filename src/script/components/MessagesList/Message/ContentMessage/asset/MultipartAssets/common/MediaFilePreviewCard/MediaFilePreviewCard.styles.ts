@@ -25,6 +25,7 @@ export const wrapperStyles: CSSObject = {
   borderRadius: '10px',
   border: '1px solid var(--gray-40)',
   position: 'relative',
+  backgroundColor: 'var(--foreground-fade-8)',
 
   'body.theme-dark &': {
     border: '1px solid transparent',
@@ -60,20 +61,20 @@ export const loadingWrapperStyles: CSSObject = {
   transform: 'translate(-50%, -50%)',
   padding: '0',
   margin: '0',
-  cursor: 'pointer',
   width: '24px',
   height: '24px',
-  background: 'var(--icon-button-primary-enabled-bg)',
-  border: '1px solid var(--icon-button-primary-border)',
-  borderRadius: '100%',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
 };
 
 export const loadingIconStyles: CSSObject = {
+  color: 'var(--gray-70)',
   fontSize: 'var(--font-size-medium)',
-  color: 'var(--main)',
+
+  'body.theme-dark &': {
+    color: 'var(--gray-40)',
+  },
 };
 
 export const errorIconStyles: CSSObject = {
