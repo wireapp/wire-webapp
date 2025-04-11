@@ -17,18 +17,21 @@
  *
  */
 
-import {useCallback} from 'react';
+import {useCallback, useEffect} from 'react';
 
 import {CellPagination} from '../common/cellPagination/cellPagination';
+import {useCellsStore} from '../common/useCellsStore/useCellsStore';
 
 interface UsePaginationProps {
   pagination: CellPagination | null;
-  pageSize: number;
+  conversationId: string;
   setOffset: (offset: number) => void;
   onPageChange?: () => void;
 }
 
-export const useCellsPagination = ({pagination, pageSize, setOffset, onPageChange}: UsePaginationProps) => {
+export const useCellsPagination = ({pagination, conversationId, setOffset, onPageChange}: UsePaginationProps) => {
+  const {clearAll, pageSize, setPageSize} = useCellsStore();
+
   const currentPage = pagination?.currentPage || 0;
   const totalPages = pagination?.totalPages || 1;
   const totalRows = pagination?.total || pageSize;
@@ -41,6 +44,21 @@ export const useCellsPagination = ({pagination, pageSize, setOffset, onPageChang
     [pageSize, setOffset, onPageChange],
   );
 
+  const handlePageSize = useCallback(
+    (page: number) => {
+      clearAll({conversationId});
+      setOffset(0);
+      setPageSize(page);
+    },
+    [clearAll, conversationId, setOffset, setPageSize],
+  );
+
+  useEffect(() => {
+    return () => {
+      clearAll({conversationId});
+    };
+  }, [clearAll, conversationId]);
+
   const getPaginationProps = () => {
     if (totalPages > 1) {
       return {
@@ -49,6 +67,8 @@ export const useCellsPagination = ({pagination, pageSize, setOffset, onPageChang
         totalRows: pagination?.total,
         firstRow: (currentPage - 1) * pageSize + 1,
         lastRow: Math.min(currentPage * pageSize, totalRows),
+        pageSize,
+        setPageSize: handlePageSize,
       };
     }
 
@@ -58,6 +78,8 @@ export const useCellsPagination = ({pagination, pageSize, setOffset, onPageChang
       totalRows: totalRows,
       firstRow: 1,
       lastRow: totalRows,
+      pageSize,
+      setPageSize: handlePageSize,
     };
   };
 
@@ -67,5 +89,6 @@ export const useCellsPagination = ({pagination, pageSize, setOffset, onPageChang
     currentPage,
     totalPages,
     totalRows,
+    handlePageSize,
   };
 };

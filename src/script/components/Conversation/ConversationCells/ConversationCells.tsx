@@ -46,7 +46,8 @@ export const ConversationCells = ({
   cellsRepository = container.resolve(CellsRepository),
   conversationQualifiedId,
 }: ConversationCellsProps) => {
-  const {getFiles, status: filesStatus, getPagination, clearAll, removeFile, pageSize} = useCellsStore();
+  const {getFiles, status: filesStatus, getPagination, clearAll, removeFile} = useCellsStore();
+
   const conversationId = conversationQualifiedId.id;
 
   const {refresh, setOffset} = useGetAllCellsFiles({cellsRepository, conversationQualifiedId});
@@ -60,7 +61,7 @@ export const ConversationCells = ({
 
   const {goToPage, getPaginationProps} = useCellsPagination({
     pagination,
-    pageSize,
+    conversationId,
     setOffset,
     onPageChange: updateDimensions,
   });
