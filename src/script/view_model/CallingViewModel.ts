@@ -22,7 +22,7 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {CALL_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
+import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -60,7 +60,6 @@ export interface CallActions {
   leave: (call: Call) => void;
   reject: (call: Call) => void;
   startAudio: (conversationEntity: Conversation) => Promise<void>;
-  startVideo: (conversationEntity: Conversation) => Promise<void>;
   switchCameraInput: (deviceId: string) => void;
   switchScreenInput: (deviceId: string) => void;
   toggleCamera: (call: Call) => void;
@@ -115,18 +114,17 @@ export class CallingViewModel {
       }),
     );
 
-    const toggleState = async (withVideo: boolean): Promise<void> => {
+    const toggleState = async (): Promise<void> => {
       const conversation = this.conversationState.activeConversation();
       if (conversation) {
         const isActiveCall = this.callingRepository.findCall(conversation.qualifiedId);
-        const callType = withVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
 
         if (isActiveCall) {
           this.callingRepository.leaveCall(conversation.qualifiedId, LEAVE_CALL_REASON.ELECTRON_TRAY_MENU_MESSAGE);
           return;
         }
 
-        await handleCallAction(conversation, callType);
+        await handleCallAction(conversation);
       }
     };
 
@@ -155,7 +153,7 @@ export class CallingViewModel {
       });
     };
 
-    const startCall = async (conversation: Conversation, callType: CALL_TYPE): Promise<void> => {
+    const startCall = async (conversation: Conversation): Promise<void> => {
       const canStart = await this.canInitiateCall(conversation.qualifiedId, {
         action: t('modalCallSecondOutgoingAction'),
         message: t('modalCallSecondOutgoingMessage'),
@@ -166,7 +164,7 @@ export class CallingViewModel {
         return;
       }
 
-      const call = await this.callingRepository.startCall(conversation, callType);
+      const call = await this.callingRepository.startCall(conversation);
       if (!call) {
         return;
       }
@@ -202,7 +200,7 @@ export class CallingViewModel {
       }
     });
 
-    const showE2EICallModal = (conversationEntity: Conversation, callType: CALL_TYPE) => {
+    const showE2EICallModal = (conversationEntity: Conversation) => {
       const memberCount = conversationEntity.participating_user_ets().length;
 
       PrimaryModal.show(PrimaryModal.type.CONFIRM, {
@@ -211,9 +209,9 @@ export class CallingViewModel {
             conversationEntity.mlsVerificationState(ConversationVerificationState.UNVERIFIED);
 
             if (memberCount > MAX_USERS_TO_CALL_WITHOUT_CONFIRM) {
-              showMaxUsersToCallModalWithoutConfirm(conversationEntity, callType);
+              showMaxUsersToCallModalWithoutConfirm(conversationEntity);
             } else {
-              await startCall(conversationEntity, callType);
+              await startCall(conversationEntity);
             }
           },
           text: t('conversation.E2EICallAnyway'),
@@ -229,13 +227,13 @@ export class CallingViewModel {
       });
     };
 
-    const showMaxUsersToCallModalWithoutConfirm = (conversationEntity: Conversation, callType: CALL_TYPE) => {
+    const showMaxUsersToCallModalWithoutConfirm = (conversationEntity: Conversation) => {
       const memberCount = conversationEntity.participating_user_ets().length;
 
       PrimaryModal.show(PrimaryModal.type.WITHOUT_TITLE, {
         preventClose: true,
         primaryAction: {
-          action: async () => await startCall(conversationEntity, callType),
+          action: async () => await startCall(conversationEntity),
           text: t('groupCallModalPrimaryBtnName'),
         },
         secondaryAction: {
@@ -250,16 +248,16 @@ export class CallingViewModel {
       });
     };
 
-    const handleCallAction = async (conversationEntity: Conversation, callType: CALL_TYPE): Promise<void> => {
+    const handleCallAction = async (conversationEntity: Conversation): Promise<void> => {
       const memberCount = conversationEntity.participating_user_ets().length;
       const isE2EIDegraded = conversationEntity.mlsVerificationState() === ConversationVerificationState.DEGRADED;
 
       if (isE2EIDegraded) {
-        showE2EICallModal(conversationEntity, callType);
+        showE2EICallModal(conversationEntity);
       } else if (memberCount > MAX_USERS_TO_CALL_WITHOUT_CONFIRM) {
-        showMaxUsersToCallModalWithoutConfirm(conversationEntity, callType);
+        showMaxUsersToCallModalWithoutConfirm(conversationEntity);
       } else {
-        await startCall(conversationEntity, callType);
+        await startCall(conversationEntity);
       }
     };
 
@@ -297,14 +295,7 @@ export class CallingViewModel {
         if (conversationEntity.isGroupOrChannel() && !this.teamState.isConferenceCallingEnabled()) {
           this.showRestrictedConferenceCallingModal();
         } else {
-          await handleCallAction(conversationEntity, CALL_TYPE.NORMAL);
-        }
-      },
-      startVideo: async (conversationEntity: Conversation) => {
-        if (conversationEntity.isGroupOrChannel() && !this.teamState.isConferenceCallingEnabled()) {
-          this.showRestrictedConferenceCallingModal();
-        } else {
-          await handleCallAction(conversationEntity, CALL_TYPE.VIDEO);
+          await handleCallAction(conversationEntity);
         }
       },
       switchCameraInput: (deviceId: string) => {
