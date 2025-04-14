@@ -48,7 +48,8 @@ export const CellsPageSizeSelect = ({pageSize, onSizeChange}: CellsPageSizeSelec
           id={'page-size'}
           dataUieName={'row-page-size'}
           options={options}
-          css={selectStyles}
+          selectContainerCSS={selectStyles}
+          selectControlCSS={selectStyles}
           value={currentOption}
           menuPlacement={'top'}
           onChange={change => {
