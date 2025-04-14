@@ -947,7 +947,6 @@ export class CallingRepository {
   }
 
   async startCall(conversation: Conversation): Promise<void | Call> {
-    const callType = CALL_TYPE.NORMAL;
     void this.setViewModeMinimized();
     if (!this.selfUser || !this.selfClientId) {
       this.logger.warn(
@@ -961,7 +960,7 @@ export class CallingRepository {
     }
     const conversationId = conversation.qualifiedId;
     const convId = this.serializeQualifiedId(conversationId);
-    this.logger.log(`Starting a call of type "${callType}" in conversation ID "${convId}"...`);
+    this.logger.log(`Starting a call of type "${CALL_TYPE.NORMAL}" in conversation ID "${convId}"...`);
     try {
       const rejectedCallInConversation = this.findCall(conversationId);
       if (rejectedCallInConversation) {
@@ -976,7 +975,7 @@ export class CallingRepository {
         conversation,
         conversationType,
         selfParticipant,
-        callType,
+        CALL_TYPE.NORMAL,
         this.mediaDevicesHandler,
       );
       this.storeCall(call);
@@ -991,7 +990,7 @@ export class CallingRepository {
        * Further info: https://wearezeta.atlassian.net/browse/SQCALL-551
        */
       this.wCall?.setMute(this.wUser, 0);
-      this.wCall?.start(this.wUser, convId, callType, conversationType, this.callState.cbrEncoding());
+      this.wCall?.start(this.wUser, convId, CALL_TYPE.NORMAL, conversationType, this.callState.cbrEncoding());
       if (!!conversation && this.isMLSConference(conversation)) {
         this.setCachedEpochInfos(call);
       }
