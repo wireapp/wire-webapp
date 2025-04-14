@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.45.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.44.1...@wireapp/react-ui-kit@9.45.0) (2025-04-14)
+
+### Features
+
+* **react-ui-kit/Select:** add additional css props [WPB-16997] ([#7021](https://github.com/wireapp/wire-web-packages/issues/7021)) ([6caf1e8](https://github.com/wireapp/wire-web-packages/commit/6caf1e8385398d4dbeb6a914ba12c673393fe4c5))
+
 ## [9.44.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.44.0...@wireapp/react-ui-kit@9.44.1) (2025-03-28)
 
 ### Bug Fixes
