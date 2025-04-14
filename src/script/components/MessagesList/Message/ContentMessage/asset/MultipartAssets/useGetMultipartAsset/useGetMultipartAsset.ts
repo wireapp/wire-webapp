@@ -36,7 +36,7 @@ const DEFAULT_MAX_RETRIES = 10;
 const DEFAULT_RETRY_DELAY = 1000;
 
 /**
- * Hook for fetching and managing multipart asset previews with optional retry logic.
+ * Fetching and managing multipart asset previews with optional retry logic.
  *
  * This hook fetches an asset and looks for an image preview in its Previews array.
  *
