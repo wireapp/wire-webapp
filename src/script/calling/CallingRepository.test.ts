@@ -842,7 +842,7 @@ describe.skip('E2E audio call', () => {
         })
         .catch(done.fail);
     };
-    client.startCall(conversation, CALL_TYPE.NORMAL).catch(done.fail);
+    client.startCall(conversation).catch(done.fail);
   });
 
   it('answers an incoming call and connect with the remote peer', done => {
