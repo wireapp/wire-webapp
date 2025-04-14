@@ -21,17 +21,17 @@ import {useState} from 'react';
 
 import {t} from 'Util/LocalizerUtil';
 
-import {imageStyles} from './GridImageAsset.styles';
+import {imageStyles} from './ImageAssetSmall.styles';
 
 import {MediaFilePreviewCard} from '../../common/MediaFilePreviewCard/MediaFilePreviewCard';
 
-interface GridImageAssetProps {
+interface ImageAssetSmallProps {
   src?: string;
   isLoading: boolean;
   isError: boolean;
 }
 
-export const GridImageAsset = ({src, isLoading, isError}: GridImageAssetProps) => {
+export const ImageAssetSmall = ({src, isLoading, isError}: ImageAssetSmallProps) => {
   const [isLoaded, setIsLoaded] = useState(false);
 
   return (

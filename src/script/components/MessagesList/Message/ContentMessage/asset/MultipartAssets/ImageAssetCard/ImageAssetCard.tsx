@@ -19,8 +19,8 @@
 
 import {ICellAsset} from '@wireapp/protocol-messaging';
 
-import {GridImageAsset} from './GridImageAsset/GridImageAsset';
-import {LargeImageAsset} from './LargeImageAsset/LargeImageAsset';
+import {ImageAssetLarge} from './ImageAssetLarge/ImageAssetSmall';
+import {ImageAssetSmall} from './ImageAssetSmall/ImageAssetSmall';
 
 interface ImageAssetCardProps {
   src?: string;
@@ -32,8 +32,8 @@ interface ImageAssetCardProps {
 
 export const ImageAssetCard = ({src, metadata, variant, isLoading, isError}: ImageAssetCardProps) => {
   if (variant === 'large') {
-    return <LargeImageAsset src={src} metadata={metadata} isError={isError} />;
+    return <ImageAssetLarge src={src} metadata={metadata} isError={isError} />;
   }
 
-  return <GridImageAsset src={src} isLoading={isLoading} isError={isError} />;
+  return <ImageAssetSmall src={src} isLoading={isLoading} isError={isError} />;
 };
