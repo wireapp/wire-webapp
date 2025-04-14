@@ -27,7 +27,13 @@ import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 
 import {FileAssetCard} from './FileAssetCard/FileAssetCard';
 import {ImageAssetCard} from './ImageAssetCard/ImageAssetCard';
-import {largeCardStyles, listSingleItemStyles, listStyles, smallCardStyles} from './MultipartAssets.styles';
+import {
+  fileCardStyles,
+  imageCardStyles,
+  listSingleItemStyles,
+  listStyles,
+  videoCardStyles,
+} from './MultipartAssets.styles';
 import {useGetMultipartAsset} from './useGetMultipartAsset/useGetMultipartAsset';
 import {VideoAssetCard} from './VideoAssetCard/VideoAssetCard';
 
@@ -84,7 +90,7 @@ const MultipartAsset = ({
 
   if (isImage) {
     return (
-      <li ref={elementRef} css={smallCardStyles}>
+      <li ref={elementRef} css={imageCardStyles}>
         <ImageAssetCard src={src} variant={variant} metadata={imageMetadata} isLoading={isLoading} isError={isError} />
       </li>
     );
@@ -92,7 +98,7 @@ const MultipartAsset = ({
 
   if (isVideo) {
     return (
-      <li ref={elementRef} css={isSingleAsset ? largeCardStyles : smallCardStyles}>
+      <li ref={elementRef} css={videoCardStyles(isSingleAsset)}>
         <VideoAssetCard
           variant={variant}
           src={src}
@@ -107,7 +113,7 @@ const MultipartAsset = ({
   }
 
   return (
-    <li ref={elementRef} css={isSingleAsset ? largeCardStyles : smallCardStyles}>
+    <li ref={elementRef} css={fileCardStyles(isSingleAsset)}>
       <FileAssetCard
         variant={variant}
         extension={extension}
