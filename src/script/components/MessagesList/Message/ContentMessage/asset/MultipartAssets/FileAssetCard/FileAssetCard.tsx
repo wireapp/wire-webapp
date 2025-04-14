@@ -17,10 +17,10 @@
  *
  */
 
-import {FileCard} from 'Components/FileCard/FileCard';
 import {t} from 'Util/LocalizerUtil';
 
-import {LargeAssetCard} from './LargeAssetCard/LargeAssetCard';
+import {FileAssetSmall} from './FileAssetSmall/FileAsseetSmall';
+import {FileAssetWithPreview} from './FileAssetWithPreview/FileAssetWithPreview';
 
 interface FileAssetCardProps {
   variant: 'large' | 'small';
@@ -37,7 +37,7 @@ export const FileAssetCard = ({variant, extension, name, size, isLoading, isErro
 
   if (variant === 'large') {
     return (
-      <LargeAssetCard
+      <FileAssetWithPreview
         extension={extension}
         name={formattedName}
         size={size}
@@ -48,13 +48,5 @@ export const FileAssetCard = ({variant, extension, name, size, isLoading, isErro
     );
   }
 
-  return (
-    <FileCard.Root extension={extension} name={formattedName} size={size}>
-      <FileCard.Header>
-        <FileCard.Icon type={isError ? 'unavailable' : 'file'} />
-        {!isError && <FileCard.Type />}
-      </FileCard.Header>
-      <FileCard.Name variant={isError ? 'secondary' : 'primary'} />
-    </FileCard.Root>
-  );
+  return <FileAssetSmall extension={extension} name={formattedName} size={size} isError={isError} />;
 };
