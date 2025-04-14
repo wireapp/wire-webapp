@@ -17,15 +17,12 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
-
-export const wrapperStyles: CSSObject = {
-  padding: '20px',
-  overflowY: 'auto',
-};
-
-export const loadMoreWrapperStyles: CSSObject = {
-  padding: '20px',
-  display: 'flex',
-  justifyContent: 'center',
-};
+export interface CellPagination {
+  currentOffset?: number;
+  currentPage?: number;
+  limit?: number;
+  nextOffset?: number;
+  prevOffset?: number;
+  total?: number;
+  totalPages?: number;
+}
