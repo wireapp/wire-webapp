@@ -50,8 +50,8 @@ export const CellsPageList = ({currentPage = 0, numberOfPages = 1, goToPage}: Ce
       {/* eslint-disable-next-line id-length */}
       {Array.from({length: numberOfPages}, (_, index) => {
         const isFirstOrLastPage = index === 0 || index === lastPageIndex;
-        const isBeforeCurrent = index === normalizedCurrent - VISIBLE_PAGES_AROUND_CURRENT - 1;
-        const isAfterCurrent = index === normalizedCurrent + VISIBLE_PAGES_AROUND_CURRENT + 1;
+        const isBeforeCurrent = index === visibleStart - 1;
+        const isAfterCurrent = index === visibleEnd + 1;
         const isInVisibleRange = index >= visibleStart && index <= visibleEnd;
 
         if (isFirstOrLastPage) {
