@@ -48,7 +48,7 @@ interface CellsTableProps {
   files: CellFile[];
   cellsRepository: CellsRepository;
   conversationId: string;
-  fixedWidths: number[] | undefined;
+  fixedWidths?: number[];
   onDeleteFile: (uuid: string) => void;
   onUpdateBodyHeight: (height: number) => void;
   onUpdateColumnWidths: (widths: number[]) => void;
