@@ -70,7 +70,7 @@ function getMessageMarkerType(
 }
 
 export function isMarker(object: any): object is Marker {
-  return object && object.type && object.timestamp;
+  return object && object.type && object.timestamp && ['unread', 'day', 'hour'].includes(object.type);
 }
 
 /**
@@ -109,7 +109,7 @@ function shouldGroupMessagesByTimestamp(
  * @param messages - the sorted list of messages
  * @param lastReadTimestamp - the timestamp of the last read message (used to mark unread messages)
  */
-export function groupMessagesBySenderAndTime(messages: Message[], lastReadTimestamp: number) {
+export function groupMessagesBySenderAndTimeOld(messages: Message[], lastReadTimestamp: number) {
   return messages.reduce<Array<MessagesGroup | Marker>>((acc, message, index) => {
     const previousMessage = messages[index - 1];
 
@@ -145,6 +145,28 @@ export function groupMessagesBySenderAndTime(messages: Message[], lastReadTimest
         messages: [message],
       });
     }
+    return acc;
+  }, []);
+}
+
+/**
+ * Will group a list of ordered messages in groups of messages from the same sender and close in time
+ * @param messages - the sorted list of messages
+ * @param lastReadTimestamp - the timestamp of the last read message (used to mark unread messages)
+ */
+export function groupMessagesBySenderAndTime(messages: Message[], lastReadTimestamp: number) {
+  return messages.reduce<(Message | Marker)[]>((acc, message, index) => {
+    const previousMessage = messages[index - 1];
+
+    const marker = getMessageMarkerType(message, lastReadTimestamp, previousMessage);
+
+    if (marker) {
+      // insert marker before the current message if needed
+      acc.push({type: marker, timestamp: message.timestamp()});
+    }
+
+    acc.push(message);
+
     return acc;
   }, []);
 }

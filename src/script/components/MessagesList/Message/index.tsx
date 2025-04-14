@@ -55,8 +55,6 @@ export interface MessageActions {
 }
 
 export interface MessageParams extends MessageActions {
-  measureElement: any;
-  dataIndex: any;
   conversation: Conversation;
   hasReadReceiptsTurnedOn: boolean;
   isLastDeliveredMessage: boolean;
@@ -85,11 +83,9 @@ export interface MessageParams extends MessageActions {
 
 export const Message = (props: MessageParams & {scrollTo?: ScrollToElement}) => {
   const {
-    measureElement,
     message,
     isHighlighted,
     hideHeader,
-    dataIndex,
     onVisibilityLost,
     scrollTo,
     isFocused,
@@ -166,15 +162,7 @@ export const Message = (props: MessageParams & {scrollTo?: ScrollToElement}) => 
         'content-message': message.isContent(),
         'system-message': !message.isContent(),
       })}
-      ref={element => {
-        if (!element) {
-          return;
-        }
-
-        messageElementRef.current = element;
-        measureElement(element);
-      }}
-      data-index={dataIndex}
+      ref={messageElementRef}
       data-uie-uid={message.id}
       data-uie-value={message.super_type}
       data-uie-expired-status={ephemeral_expires}

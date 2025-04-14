@@ -33,17 +33,13 @@ const markerStyles: Partial<Record<Marker['type'], SerializedStyles>> = {
   day: dayMarkerStyle,
 };
 
-export function MarkerComponent({
-  marker,
-  scrollTo,
-  measureElement,
-  dataIndex,
-}: {
+interface Props {
   marker: Marker;
   scrollTo: ScrollToElement;
-  measureElement: any;
-  dataIndex: any;
-}) {
+  // scrollToElement: (isUnread: boolean) => void;
+}
+
+export const MarkerComponent = ({marker, scrollTo}: Props) => {
   const timeAgo = useRelativeTimestamp(marker.timestamp, marker.type === 'day');
   const elementRef = useRef<HTMLDivElement>(null);
 
@@ -53,24 +49,13 @@ export function MarkerComponent({
 
   useLayoutEffect(() => {
     if (marker.type === 'unread' && elementRef.current) {
+      // scrollToElement(true);
       scrollTo({element: elementRef.current}, true);
     }
   }, []);
 
   return (
-    <div
-      className="message-header"
-      css={style}
-      ref={element => {
-        if (!element) {
-          return;
-        }
-
-        elementRef.current = element;
-        measureElement(element);
-      }}
-      data-index={dataIndex}
-    >
+    <div className="message-header" css={style} ref={elementRef}>
       <div className="message-header-icon">
         {marker.type === 'unread' && <span className="message-unread-dot dot-md" />}
       </div>
@@ -86,4 +71,4 @@ export function MarkerComponent({
       </h3>
     </div>
   );
-}
+};

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2024 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,30 +17,13 @@
  *
  */
 
-import {css} from '@emotion/react';
+import {Message} from 'src/script/entity/message/Message';
 
-export const baseMarkerStyle = css`
-  padding-top: 8px; // TODO margin top is not working because of collapsing margins
-  line-height: 2.5rem;
-  user-select: none;
-
-  .message-header-icon {
-    max-height: 40px;
+export const verticallyCenterMessage = (messages: Message[]): boolean => {
+  const filteredMessagesLength = messages.length;
+  if (filteredMessagesLength === 1) {
+    const [firstMessage] = messages;
+    return firstMessage.isMember() && firstMessage.isConnection();
   }
-
-  .message-header-label {
-    border-bottom: 1px dotted var(--foreground-fade-24);
-  }
-
-  .message-unread-dot {
-    background-color: var(--accent-color);
-  }
-`;
-
-export const dayMarkerStyle = css`
-  border-bottom: 1px solid var(--foreground-fade-24);
-
-  .message-header-label {
-    border: 0;
-  }
-`;
+  return false;
+};

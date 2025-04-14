@@ -17,6 +17,8 @@
  *
  */
 
+import {Virtualizer} from '@tanstack/react-virtual';
+
 import {Message} from 'src/script/entity/message/Message';
 import {StatusType} from 'src/script/message/StatusType';
 
@@ -63,4 +65,44 @@ export function updateScroll(
     container.scrollTo?.({behavior: 'smooth', top: container.scrollHeight});
   }
   return container.scrollHeight;
+}
+
+export function updateScrollTanStack(
+  virtualizer: Virtualizer<HTMLDivElement, Element>,
+  {focusedElement, prevNbMessages, messages, selfUserId}: Omit<MessageListContext, 'prevScrollHeight'>,
+) {
+  const newNbMessages = messages.length;
+  const lastMessage = messages[newNbMessages - 1];
+
+  if (focusedElement) {
+    const {element, center} = focusedElement;
+    const index = Number(element.getAttribute('data-index'));
+
+    if (!isNaN(index)) {
+      virtualizer.scrollToIndex(index, {
+        align: center ? 'center' : 'start',
+        behavior: 'auto',
+      });
+    }
+  } else {
+    const totalSize = virtualizer.getTotalSize();
+    const scrollOffset = virtualizer.scrollOffset || 0;
+    const clientHeight = virtualizer.scrollRect?.height || 0;
+    const atBottom = totalSize - (scrollOffset + clientHeight) <= 5;
+
+    if (atBottom) {
+      virtualizer.scrollToOffset(totalSize, {behavior: 'auto'});
+    } else {
+      const shouldStickToBottom = totalSize - (scrollOffset + clientHeight) < 100;
+      if (shouldStickToBottom) {
+        const nbNewMessages = newNbMessages - prevNbMessages;
+        if (nbNewMessages <= 1) {
+          const behavior = prevNbMessages !== newNbMessages ? 'smooth' : 'auto';
+          virtualizer.scrollToIndex(newNbMessages - 1, {align: 'end', behavior});
+        }
+      } else if (lastMessage && lastMessage.status() === StatusType.SENDING && lastMessage.user().id === selfUserId) {
+        virtualizer.scrollToIndex(newNbMessages - 1, {align: 'end', behavior: 'smooth'});
+      }
+    }
+  }
 }
