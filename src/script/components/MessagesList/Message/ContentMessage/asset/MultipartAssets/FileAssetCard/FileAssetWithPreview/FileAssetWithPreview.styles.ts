@@ -72,15 +72,16 @@ export const loaderIconStyles: CSSObject = {
 export const errorIconStyles: CSSObject = {
   flexShrink: 0,
   marginRight: '8px',
+  fill: 'var(--gray-70)',
+
+  'body.theme-dark &': {
+    fill: 'var(--gray-40)',
+  },
 };
 
 export const errorTextStyles: CSSObject = {
   fontSize: 'var(--font-size-medium)',
   fontWeight: 'var(--line-height-md)',
   lineHeight: 'var(--line-height-sm)',
-  color: 'var(--gray-70)',
-
-  'body.theme-dark &': {
-    color: 'var(--gray-40)',
-  },
+  color: 'var(--main-color)',
 };

@@ -27,6 +27,10 @@ export const wrapperStyles: CSSObject = {
 
 export const iconStyles: CSSObject = {
   fill: 'var(--gray-70)',
+
+  'body.theme-dark &': {
+    fill: 'var(--gray-40)',
+  },
 };
 
 export const textStyles: CSSObject = {

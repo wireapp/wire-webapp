@@ -79,18 +79,18 @@ export const VideoAssetPlayer = ({
     isEnabled,
   });
 
-  if (isLoading || !url) {
-    return (
-      <VideoAssetCard ref={wrapperRef} extension={extension} name={name} size={size} isLoading>
-        <VideoAssetLoading />
-      </VideoAssetCard>
-    );
-  }
-
   if (isError || isFileShareRestricted || isPlaybackError) {
     return (
       <VideoAssetCard ref={wrapperRef} extension={extension} name={name} size={size} isError>
         <VideoAssetError isFileShareRestricted={isFileShareRestricted} />
+      </VideoAssetCard>
+    );
+  }
+
+  if (isLoading || !url) {
+    return (
+      <VideoAssetCard ref={wrapperRef} extension={extension} name={name} size={size} isLoading>
+        <VideoAssetLoading />
       </VideoAssetCard>
     );
   }

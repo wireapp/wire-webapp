@@ -401,6 +401,7 @@ declare module 'I18n/en-US.json' {
     'cellsSidebar.heading': `Files`;
     'cellsSidebar.title': `All`;
     'cellsUnavailableFile': `File not available`;
+    'cellsUnavailableFilePreview': `Couldn\'t generate preview`;
     'channelConversationFeature1': `[bold]Public[/bold] or [bold]private[/bold] channels`;
     'channelConversationFeature2': `[bold]Conversation history[/bold]`;
     'channelCreationPreferencesPlaceholder': `Channel name`;
@@ -1550,7 +1551,7 @@ declare module 'I18n/en-US.json' {
     'redirectHeader': `Connect to your organization\'s backend?`;
     'redirectHideDetails': `Hide details`;
     'redirectShowDetails': `Show details`;
-    'redirectParagraph1': `Your email address is associated with another backend. If you continue, you\'ll leave the official Wire server and we\'ll redirect you to {url}.`;
+    'redirectParagraph1': `Your email address is associated with another backend. If you continue, you\'ll leave the official Wire server and we\'ll redirect you to {url}`;
     'redirectParagraph2': `This Wire backend is administered by your IT team. If you have any questions, reach out to them or to your team admin.`;
     'redirectTeamsURL': `Teams URL:`;
     'redirectWebsiteURL': `Website URL:`;

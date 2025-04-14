@@ -20,6 +20,7 @@
 import {forwardRef, ReactNode} from 'react';
 
 import {FileCard} from 'Components/FileCard/FileCard';
+import {t} from 'Util/LocalizerUtil';
 
 import {contentWrapperStyles} from './VideoAssetCard.styles';
 
@@ -33,20 +34,21 @@ interface VideoAssetCardProps {
 }
 
 export const VideoAssetCard = forwardRef<HTMLDivElement, VideoAssetCardProps>(
-  ({extension, name, size, isError, isLoading, children}, ref) => {
+  ({extension, name, size, isError, children}, ref) => {
+    const formattedName = isError ? t('cellsUnavailableFile') : name;
+
     return (
-      <FileCard.Root variant="large" extension={extension} name={name} size={size}>
+      <FileCard.Root variant="large" extension={extension} name={formattedName} size={size}>
         <FileCard.Header>
-          <FileCard.Icon />
-          <FileCard.Type />
-          <FileCard.Name />
+          <FileCard.Icon type={isError ? 'unavailable' : 'file'} />
+          {!isError && <FileCard.Type />}
+          <FileCard.Name variant={isError ? 'secondary' : 'primary'} />
         </FileCard.Header>
         <FileCard.Content>
           <div ref={ref} css={contentWrapperStyles}>
             {children}
           </div>
         </FileCard.Content>
-        {isError && <FileCard.Error />}
       </FileCard.Root>
     );
   },

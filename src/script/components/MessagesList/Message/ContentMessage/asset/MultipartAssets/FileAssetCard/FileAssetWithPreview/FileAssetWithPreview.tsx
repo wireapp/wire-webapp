@@ -19,7 +19,7 @@
 
 import {CSSProperties, useState} from 'react';
 
-import {UnavailableFileIcon} from '@wireapp/react-ui-kit';
+import {AlertIcon} from '@wireapp/react-ui-kit';
 
 import {FileCard} from 'Components/FileCard/FileCard';
 import {t} from 'Util/LocalizerUtil';
@@ -51,10 +51,10 @@ export const FileAssetWithPreview = ({
   isError,
   isLoading,
 }: FileAssetWithPreviewProps) => {
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
 
-  const shouldDisplayLoading = (previewUrl ? !isLoaded : isLoading) && !isError;
-  const shouldDisplayError = isError && !previewUrl;
+  const shouldDisplayLoading = (previewUrl ? !isImageLoaded : isLoading) && !isError;
+  const shouldDisplayPreviewError = isError || (!isLoading && !previewUrl);
 
   return (
     <FileCard.Root variant="large" extension={extension} name={name} size={size}>
@@ -67,18 +67,19 @@ export const FileAssetWithPreview = ({
         <div css={contentWrapperStyles}>
           <img
             src={previewUrl}
-            style={{'--opacity': isLoaded && previewUrl ? 1 : 0} as CSSProperties}
+            style={{'--opacity': isImageLoaded && previewUrl ? 1 : 0} as CSSProperties}
             alt=""
             css={imageStyles}
-            onLoad={() => setIsLoaded(true)}
+            onLoad={() => setIsImageLoaded(true)}
           />
+
           <div css={infoOverlayStyles}>
             <div css={infoWrapperStyles}>
               {shouldDisplayLoading && <div className="icon-spinner spin" css={loaderIconStyles} />}
-              {shouldDisplayError && (
+              {shouldDisplayPreviewError && (
                 <>
-                  <UnavailableFileIcon css={errorIconStyles} width={14} height={14} />
-                  <p css={errorTextStyles}>{t('cellsUnavailableFile')}</p>
+                  <AlertIcon css={errorIconStyles} width={14} height={14} />
+                  <p css={errorTextStyles}>{t('cellsUnavailableFilePreview')}</p>
                 </>
               )}
             </div>

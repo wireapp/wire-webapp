@@ -41,7 +41,6 @@ export const controlsWrapperStyles: CSSObject = {
 };
 
 export const videoStyles: CSSObject = {
-  // backgroundColor: 'var(--black)',
   backgroundColor: 'var(--foreground-fade-8)',
   width: '100%',
   height: '100%',
