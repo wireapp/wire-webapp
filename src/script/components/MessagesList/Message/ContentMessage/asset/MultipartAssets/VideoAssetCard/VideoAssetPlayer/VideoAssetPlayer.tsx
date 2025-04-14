@@ -17,8 +17,6 @@
  *
  */
 
-import {useState} from 'react';
-
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {useInView} from 'src/script/hooks/useInView/useInView';
@@ -59,8 +57,6 @@ export const VideoAssetPlayer = ({
   isLoading,
   isError,
 }: VideoAssetPlayerProps) => {
-  const [isLoaded, setIsLoaded] = useState(false);
-
   const [videoElement, setVideoElement] = useEffectRef<HTMLVideoElement>();
 
   const {elementRef: wrapperRef, isInView} = useInView({
@@ -110,11 +106,7 @@ export const VideoAssetPlayer = ({
           playsInline
           onError={handleError}
           onTimeUpdate={handleTimeUpdate}
-          onLoadedMetadata={() => {
-            console.log('onLoadedMetadata');
-            setIsLoaded(true);
-            handleTimeUpdate();
-          }}
+          onLoadedMetadata={handleTimeUpdate}
           tabIndex={TabIndex.UNFOCUSABLE}
         />
         <div css={controlsWrapperStyles}>

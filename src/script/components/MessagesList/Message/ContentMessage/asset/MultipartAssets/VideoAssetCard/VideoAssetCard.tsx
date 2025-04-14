@@ -17,13 +17,8 @@
  *
  */
 
-import {t} from 'Util/LocalizerUtil';
-
-import {videoStyles, iconWrapperStyles} from './VideoAssetCard.styles';
 import {VideoAssetPlayer} from './VideoAssetPlayer/VideoAssetPlayer';
-
-import {FilePreviewPlayButton} from '../common/FilePreviewPlayButton/FilePreviewPlayButton';
-import {MediaFilePreviewCard} from '../common/MediaFilePreviewCard/MediaFilePreviewCard';
+import {VideoAssetSmall} from './VideoAssetSmall/VideoAssetSmall';
 
 interface VideoAssetCardProps {
   variant: 'large' | 'small';
@@ -50,20 +45,5 @@ export const VideoAssetCard = ({variant, src, extension, name, size, isLoading, 
     );
   }
 
-  return (
-    <MediaFilePreviewCard
-      label={src ? t('conversationFileVideoPreviewLabel', {src}) : 'Loading...'}
-      isLoading={isLoading}
-      isError={isError}
-    >
-      {!isLoading && !isError && (
-        <>
-          <video src={src} preload="metadata" css={videoStyles} />
-          <div css={iconWrapperStyles}>
-            <FilePreviewPlayButton />
-          </div>
-        </>
-      )}
-    </MediaFilePreviewCard>
-  );
+  return <VideoAssetSmall src={src} isLoading={isLoading} isError={isError} />;
 };
