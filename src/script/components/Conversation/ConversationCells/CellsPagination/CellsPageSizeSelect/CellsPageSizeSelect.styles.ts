@@ -38,9 +38,4 @@ export const selectWrapperStyles: CSSObject = {
 export const selectStyles: CSSObject = {
   height: '32px',
   minHeight: '32px',
-  // This is hacking inside the react-ui-kit component
-  '&>div>div:first-of-type': {
-    height: '32px !important',
-    minHeight: '32px !important',
-  },
 };
