@@ -45,35 +45,8 @@ export const customStyles = ({
   indicatorsContainer: provided => ({
     ...provided,
   }),
-  container: (_, {isDisabled, selectProps, options}) => {
-    const {menuIsOpen} = selectProps;
-    const isSelectDisabled = selectProps.isDisabled;
-
+  container: (_, {options}) => {
     return {
-      '& > div > div[class$="-Control"]': {
-        ...inputStyle(theme, {disabled: isSelectDisabled, markInvalid}),
-        borderRadius: 12,
-        minHeight: 48,
-        ...(isDisabled && {
-          backgroundColor: theme.Input.backgroundColorDisabled,
-          color: theme.Select.disabledColor,
-          cursor: 'default',
-        }),
-        ...(markInvalid && {
-          boxShadow: `0 0 0 1px ${theme.general.dangerColor}`,
-        }),
-        ...(menuIsOpen && {
-          boxShadow: `0 0 0 1px ${theme.general.primaryColor}`,
-          '&:hover': {
-            boxShadow: `0 0 0 1px ${theme.general.primaryColor}`,
-          },
-        }),
-        cursor: !isSelectDisabled && 'pointer',
-        '&:focus:visible, active': {
-          boxShadow: !isSelectDisabled && `0 0 0 1px ${theme.general.primaryColor}`,
-        },
-        ...controlCSS,
-      },
       '& > div': isGroup(options)
         ? {
             display: 'inline',
@@ -94,7 +67,7 @@ export const customStyles = ({
           },
     };
   },
-  control: (_provided, {options}) => ({
+  control: (_provided, {isDisabled, selectProps, options}) => ({
     display: 'flex',
     alignItems: 'center',
     appearance: 'none',
@@ -105,6 +78,26 @@ export const customStyles = ({
       position: 'absolute',
       zIndex: -9999,
     }),
+    ...inputStyle(theme, {disabled: selectProps.isDisabled, markInvalid}),
+    borderRadius: 12,
+    ...(isDisabled && {
+      backgroundColor: theme.Input.backgroundColorDisabled,
+      color: theme.Select.disabledColor,
+      cursor: 'default',
+    }),
+    ...(markInvalid && {
+      boxShadow: `0 0 0 1px ${theme.general.dangerColor}`,
+    }),
+    ...(selectProps.menuIsOpen && {
+      boxShadow: `0 0 0 1px ${theme.general.primaryColor}`,
+      '&:hover': {
+        boxShadow: `0 0 0 1px ${theme.general.primaryColor}`,
+      },
+    }),
+    cursor: !selectProps.isDisabled && 'pointer',
+    '&:focus:visible, active': {
+      boxShadow: !selectProps.isDisabled && `0 0 0 1px ${theme.general.primaryColor}`,
+    },
     ...controlCSS,
   }),
   dropdownIndicator: (provided, selectProps) => {

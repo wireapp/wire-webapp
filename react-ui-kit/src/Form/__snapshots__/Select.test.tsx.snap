@@ -16,80 +16,6 @@ exports[`"Select" renders 1`] = `
   color: #0667c8;
 }
 
-.emotion-2>div>div[class$="-Control"] {
-  background: #fff;
-  border: none;
-  border-radius: 12px;
-  box-shadow: 0 0 0 1px #dce0e3;
-  caret-color: #0667c8;
-  color: rgb(29, 30, 31);
-  font-weight: 400;
-  height: 48px;
-  line-height: 1.5rem;
-  outline: none;
-  padding: 0 16px;
-  width: 100%;
-  min-height: 48px;
-  cursor: pointer;
-}
-
-.emotion-2>div>div[class$="-Control"]::-moz-placeholder {
-  color: rgb(80, 82, 84);
-  font-size: 1rem;
-  text-transform: none;
-  opacity: 1;
-}
-
-.emotion-2>div>div[class$="-Control"]::-ms-input-placeholder {
-  color: rgb(80, 82, 84);
-  font-size: 1rem;
-  text-transform: none;
-}
-
-.emotion-2>div>div[class$="-Control"]::-webkit-input-placeholder {
-  color: rgb(80, 82, 84);
-  font-size: 1rem;
-  text-transform: none;
-}
-
-.emotion-2>div>div[class$="-Control"]:hover {
-  box-shadow: 0 0 0 1px var(--text-input-border-hover);
-}
-
-.emotion-2>div>div[class$="-Control"]:focus-visible,
-.emotion-2>div>div[class$="-Control"]:focus,
-.emotion-2>div>div[class$="-Control"]:active {
-  box-shadow: 0 0 0 1px #0667c8;
-}
-
-.emotion-2>div>div[class$="-Control"]:invalid:not(:focus, :hover) {
-  box-shadow: 0 0 0 1px #dce0e3;
-}
-
-.emotion-2>div>div[class$="-Control"]:-webkit-autofill {
-  box-shadow: 0 0 0 1px #dce0e3,0 0 0 24px #e7f0fa inset;
-  -webkit-text-fill-color: rgb(29, 30, 31);
-}
-
-.emotion-2>div>div[class$="-Control"]:-webkit-autofill:hover {
-  box-shadow: 0 0 0 1px var(--text-input-border-hover),0 0 0 24px #e7f0fa inset;
-}
-
-.emotion-2>div>div[class$="-Control"]:-webkit-autofill:focus-visible,
-.emotion-2>div>div[class$="-Control"]:-webkit-autofill:focus,
-.emotion-2>div>div[class$="-Control"]:-webkit-autofill:active {
-  box-shadow: 0 0 0 1px #0667c8,0 0 0 24px #e7f0fa inset;
-}
-
-.emotion-2>div>div[class$="-Control"]:-webkit-autofill:invalid:not(:focus, :hover) {
-  box-shadow: 0 0 0 1px #dce0e3,0 0 0 24px #e7f0fa inset;
-}
-
-.emotion-2>div>div[class$="-Control"]:focus:visible,
-.emotion-2>div>div[class$="-Control"] active {
-  box-shadow: 0 0 0 1px #0667c8;
-}
-
 .emotion-2>div {
   padding: 0;
   height: auto;
@@ -127,9 +53,77 @@ exports[`"Select" renders 1`] = `
   -moz-appearance: none;
   -ms-appearance: none;
   appearance: none;
-  padding: 0 8px 0 16px;
-  height: auto;
+  padding: 0 16px;
+  height: 48px;
   min-height: 48px;
+  background: #fff;
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 0 0 1px #dce0e3;
+  caret-color: #0667c8;
+  color: rgb(29, 30, 31);
+  font-weight: 400;
+  line-height: 1.5rem;
+  outline: none;
+  width: 100%;
+  cursor: pointer;
+}
+
+.emotion-5::-moz-placeholder {
+  color: rgb(80, 82, 84);
+  font-size: 1rem;
+  text-transform: none;
+  opacity: 1;
+}
+
+.emotion-5::-ms-input-placeholder {
+  color: rgb(80, 82, 84);
+  font-size: 1rem;
+  text-transform: none;
+}
+
+.emotion-5::-webkit-input-placeholder {
+  color: rgb(80, 82, 84);
+  font-size: 1rem;
+  text-transform: none;
+}
+
+.emotion-5:hover {
+  box-shadow: 0 0 0 1px var(--text-input-border-hover);
+}
+
+.emotion-5:focus-visible,
+.emotion-5:focus,
+.emotion-5:active {
+  box-shadow: 0 0 0 1px #0667c8;
+}
+
+.emotion-5:invalid:not(:focus, :hover) {
+  box-shadow: 0 0 0 1px #dce0e3;
+}
+
+.emotion-5:-webkit-autofill {
+  box-shadow: 0 0 0 1px #dce0e3,0 0 0 24px #e7f0fa inset;
+  -webkit-text-fill-color: rgb(29, 30, 31);
+}
+
+.emotion-5:-webkit-autofill:hover {
+  box-shadow: 0 0 0 1px var(--text-input-border-hover),0 0 0 24px #e7f0fa inset;
+}
+
+.emotion-5:-webkit-autofill:focus-visible,
+.emotion-5:-webkit-autofill:focus,
+.emotion-5:-webkit-autofill:active {
+  box-shadow: 0 0 0 1px #0667c8,0 0 0 24px #e7f0fa inset;
+}
+
+.emotion-5:-webkit-autofill:invalid:not(:focus, :hover) {
+  box-shadow: 0 0 0 1px #dce0e3,0 0 0 24px #e7f0fa inset;
+}
+
+.emotion-5:focus:visible,
+.emotion-5 active {
+  box-shadow: 0 0 0 1px #0667c8;
 }
 
 .emotion-6 {
@@ -332,67 +326,6 @@ exports[`"Select" renders as disabled 1`] = `
   color: #0667c8;
 }
 
-.emotion-2>div>div[class$="-Control"] {
-  background: #edeff0;
-  border: none;
-  border-radius: 12px;
-  box-shadow: 0 0 0 1px #dce0e3;
-  caret-color: #0667c8;
-  color: #676b71;
-  font-weight: 400;
-  height: 48px;
-  line-height: 1.5rem;
-  outline: none;
-  padding: 0 16px;
-  width: 100%;
-  min-height: 48px;
-  background-color: #edeff0;
-}
-
-.emotion-2>div>div[class$="-Control"]::-moz-placeholder {
-  color: rgb(80, 82, 84);
-  font-size: 1rem;
-  text-transform: none;
-  opacity: 1;
-}
-
-.emotion-2>div>div[class$="-Control"]::-ms-input-placeholder {
-  color: rgb(80, 82, 84);
-  font-size: 1rem;
-  text-transform: none;
-}
-
-.emotion-2>div>div[class$="-Control"]::-webkit-input-placeholder {
-  color: rgb(80, 82, 84);
-  font-size: 1rem;
-  text-transform: none;
-}
-
-.emotion-2>div>div[class$="-Control"]:focus-visible,
-.emotion-2>div>div[class$="-Control"]:focus,
-.emotion-2>div>div[class$="-Control"]:active {
-  box-shadow: 0 0 0 1px #0667c8;
-}
-
-.emotion-2>div>div[class$="-Control"]:invalid:not(:focus, :hover) {
-  box-shadow: 0 0 0 1px #dce0e3;
-}
-
-.emotion-2>div>div[class$="-Control"]:-webkit-autofill {
-  box-shadow: 0 0 0 1px #dce0e3,0 0 0 24px #e7f0fa inset;
-  -webkit-text-fill-color: rgb(29, 30, 31);
-}
-
-.emotion-2>div>div[class$="-Control"]:-webkit-autofill:focus-visible,
-.emotion-2>div>div[class$="-Control"]:-webkit-autofill:focus,
-.emotion-2>div>div[class$="-Control"]:-webkit-autofill:active {
-  box-shadow: 0 0 0 1px #0667c8,0 0 0 24px #e7f0fa inset;
-}
-
-.emotion-2>div>div[class$="-Control"]:-webkit-autofill:invalid:not(:focus, :hover) {
-  box-shadow: 0 0 0 1px #dce0e3,0 0 0 24px #e7f0fa inset;
-}
-
 .emotion-2>div {
   padding: 0;
   height: auto;
@@ -430,9 +363,64 @@ exports[`"Select" renders as disabled 1`] = `
   -moz-appearance: none;
   -ms-appearance: none;
   appearance: none;
-  padding: 0 8px 0 16px;
-  height: auto;
+  padding: 0 16px;
+  height: 48px;
   min-height: 48px;
+  background: #edeff0;
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 0 0 1px #dce0e3;
+  caret-color: #0667c8;
+  color: #676b71;
+  font-weight: 400;
+  line-height: 1.5rem;
+  outline: none;
+  width: 100%;
+  background-color: #edeff0;
+}
+
+.emotion-5::-moz-placeholder {
+  color: rgb(80, 82, 84);
+  font-size: 1rem;
+  text-transform: none;
+  opacity: 1;
+}
+
+.emotion-5::-ms-input-placeholder {
+  color: rgb(80, 82, 84);
+  font-size: 1rem;
+  text-transform: none;
+}
+
+.emotion-5::-webkit-input-placeholder {
+  color: rgb(80, 82, 84);
+  font-size: 1rem;
+  text-transform: none;
+}
+
+.emotion-5:focus-visible,
+.emotion-5:focus,
+.emotion-5:active {
+  box-shadow: 0 0 0 1px #0667c8;
+}
+
+.emotion-5:invalid:not(:focus, :hover) {
+  box-shadow: 0 0 0 1px #dce0e3;
+}
+
+.emotion-5:-webkit-autofill {
+  box-shadow: 0 0 0 1px #dce0e3,0 0 0 24px #e7f0fa inset;
+  -webkit-text-fill-color: rgb(29, 30, 31);
+}
+
+.emotion-5:-webkit-autofill:focus-visible,
+.emotion-5:-webkit-autofill:focus,
+.emotion-5:-webkit-autofill:active {
+  box-shadow: 0 0 0 1px #0667c8,0 0 0 24px #e7f0fa inset;
+}
+
+.emotion-5:-webkit-autofill:invalid:not(:focus, :hover) {
+  box-shadow: 0 0 0 1px #dce0e3,0 0 0 24px #e7f0fa inset;
 }
 
 .emotion-6 {
@@ -640,72 +628,6 @@ exports[`"Select" renders as invalid 1`] = `
   color: #0667c8;
 }
 
-.emotion-2>div>div[class$="-Control"] {
-  background: #fff;
-  border: none;
-  border-radius: 12px;
-  box-shadow: 0 0 0 1px #c20013;
-  caret-color: #0667c8;
-  color: rgb(29, 30, 31);
-  font-weight: 400;
-  height: 48px;
-  line-height: 1.5rem;
-  outline: none;
-  padding: 0 16px;
-  width: 100%;
-  min-height: 48px;
-  cursor: pointer;
-}
-
-.emotion-2>div>div[class$="-Control"]::-moz-placeholder {
-  color: rgb(80, 82, 84);
-  font-size: 1rem;
-  text-transform: none;
-  opacity: 1;
-}
-
-.emotion-2>div>div[class$="-Control"]::-ms-input-placeholder {
-  color: rgb(80, 82, 84);
-  font-size: 1rem;
-  text-transform: none;
-}
-
-.emotion-2>div>div[class$="-Control"]::-webkit-input-placeholder {
-  color: rgb(80, 82, 84);
-  font-size: 1rem;
-  text-transform: none;
-}
-
-.emotion-2>div>div[class$="-Control"]:hover {
-  box-shadow: 0 0 0 1px var(--text-input-border-hover);
-}
-
-.emotion-2>div>div[class$="-Control"]:focus-visible,
-.emotion-2>div>div[class$="-Control"]:focus,
-.emotion-2>div>div[class$="-Control"]:active {
-  box-shadow: 0 0 0 1px #0667c8;
-}
-
-.emotion-2>div>div[class$="-Control"]:-webkit-autofill {
-  box-shadow: 0 0 0 1px #dce0e3,0 0 0 24px #e7f0fa inset;
-  -webkit-text-fill-color: rgb(29, 30, 31);
-}
-
-.emotion-2>div>div[class$="-Control"]:-webkit-autofill:hover {
-  box-shadow: 0 0 0 1px var(--text-input-border-hover),0 0 0 24px #e7f0fa inset;
-}
-
-.emotion-2>div>div[class$="-Control"]:-webkit-autofill:focus-visible,
-.emotion-2>div>div[class$="-Control"]:-webkit-autofill:focus,
-.emotion-2>div>div[class$="-Control"]:-webkit-autofill:active {
-  box-shadow: 0 0 0 1px #0667c8,0 0 0 24px #e7f0fa inset;
-}
-
-.emotion-2>div>div[class$="-Control"]:focus:visible,
-.emotion-2>div>div[class$="-Control"] active {
-  box-shadow: 0 0 0 1px #0667c8;
-}
-
 .emotion-2>div {
   padding: 0;
   height: auto;
@@ -743,9 +665,69 @@ exports[`"Select" renders as invalid 1`] = `
   -moz-appearance: none;
   -ms-appearance: none;
   appearance: none;
-  padding: 0 8px 0 16px;
-  height: auto;
+  padding: 0 16px;
+  height: 48px;
   min-height: 48px;
+  background: #fff;
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 0 0 1px #c20013;
+  caret-color: #0667c8;
+  color: rgb(29, 30, 31);
+  font-weight: 400;
+  line-height: 1.5rem;
+  outline: none;
+  width: 100%;
+  cursor: pointer;
+}
+
+.emotion-5::-moz-placeholder {
+  color: rgb(80, 82, 84);
+  font-size: 1rem;
+  text-transform: none;
+  opacity: 1;
+}
+
+.emotion-5::-ms-input-placeholder {
+  color: rgb(80, 82, 84);
+  font-size: 1rem;
+  text-transform: none;
+}
+
+.emotion-5::-webkit-input-placeholder {
+  color: rgb(80, 82, 84);
+  font-size: 1rem;
+  text-transform: none;
+}
+
+.emotion-5:hover {
+  box-shadow: 0 0 0 1px var(--text-input-border-hover);
+}
+
+.emotion-5:focus-visible,
+.emotion-5:focus,
+.emotion-5:active {
+  box-shadow: 0 0 0 1px #0667c8;
+}
+
+.emotion-5:-webkit-autofill {
+  box-shadow: 0 0 0 1px #dce0e3,0 0 0 24px #e7f0fa inset;
+  -webkit-text-fill-color: rgb(29, 30, 31);
+}
+
+.emotion-5:-webkit-autofill:hover {
+  box-shadow: 0 0 0 1px var(--text-input-border-hover),0 0 0 24px #e7f0fa inset;
+}
+
+.emotion-5:-webkit-autofill:focus-visible,
+.emotion-5:-webkit-autofill:focus,
+.emotion-5:-webkit-autofill:active {
+  box-shadow: 0 0 0 1px #0667c8,0 0 0 24px #e7f0fa inset;
+}
+
+.emotion-5:focus:visible,
+.emotion-5 active {
+  box-shadow: 0 0 0 1px #0667c8;
 }
 
 .emotion-6 {
