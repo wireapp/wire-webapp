@@ -17,27 +17,36 @@
  *
  */
 
-import {FileCard} from 'Components/FileCard/FileCard';
 import {t} from 'Util/LocalizerUtil';
 
+import {FileAssetSmall} from './FileAssetSmall/FileAsseetSmall';
+import {FileAssetWithPreview} from './FileAssetWithPreview/FileAssetWithPreview';
+
 interface FileAssetCardProps {
+  variant: 'large' | 'small';
   extension: string;
   name: string;
   size: string;
   isLoading: boolean;
   isError: boolean;
+  previewUrl?: string;
 }
 
-export const FileAssetCard = ({extension, name, size, isLoading, isError}: FileAssetCardProps) => {
+export const FileAssetCard = ({variant, extension, name, size, isLoading, isError, previewUrl}: FileAssetCardProps) => {
   const formattedName = isError ? t('cellsUnavailableFile') : name;
 
-  return (
-    <FileCard.Root extension={extension} name={formattedName} size={size}>
-      <FileCard.Header>
-        <FileCard.Icon type={isError ? 'unavailable' : 'file'} />
-        {!isError && <FileCard.Type />}
-      </FileCard.Header>
-      <FileCard.Name variant={isError ? 'secondary' : 'primary'} />
-    </FileCard.Root>
-  );
+  if (variant === 'large') {
+    return (
+      <FileAssetWithPreview
+        extension={extension}
+        name={formattedName}
+        size={size}
+        isError={isError}
+        isLoading={isLoading}
+        previewUrl={previewUrl}
+      />
+    );
+  }
+
+  return <FileAssetSmall extension={extension} name={formattedName} size={size} isError={isError} />;
 };

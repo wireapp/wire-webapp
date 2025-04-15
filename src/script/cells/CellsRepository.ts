@@ -38,6 +38,8 @@ interface CellsConfig {
 }
 
 const DEFAULT_MAX_FILES_LIMIT = 100;
+const SEARCH_DEFAULT_SORT_FIELD = 'mtime';
+const SEARCH_DEFAULT_SORT_DIR = 'desc';
 
 @singleton()
 export class CellsRepository {
@@ -107,8 +109,16 @@ export class CellsRepository {
     return this.apiClient.api.cells.deleteFile({uuid});
   }
 
-  async getAllFiles({path, limit = DEFAULT_MAX_FILES_LIMIT}: {path: string; limit?: number}) {
-    return this.apiClient.api.cells.getAllFiles({path: path || this.basePath, limit});
+  async getAllFiles({
+    path,
+    limit = DEFAULT_MAX_FILES_LIMIT,
+    offset = 0,
+  }: {
+    path: string;
+    limit?: number;
+    offset?: number;
+  }) {
+    return this.apiClient.api.cells.getAllFiles({path: path || this.basePath, limit, offset});
   }
 
   async getFile({uuid}: {uuid: string}) {
@@ -131,7 +141,12 @@ export class CellsRepository {
   }
 
   async searchFiles({query, limit = DEFAULT_MAX_FILES_LIMIT}: {query: string; limit?: number}) {
-    return this.apiClient.api.cells.searchFiles({phrase: query, limit});
+    return this.apiClient.api.cells.searchFiles({
+      phrase: query,
+      limit,
+      sortBy: SEARCH_DEFAULT_SORT_FIELD,
+      sortDirection: SEARCH_DEFAULT_SORT_DIR,
+    });
   }
 
   async promoteFileDraft({uuid, versionId}: {uuid: string; versionId: string}) {

@@ -24,7 +24,7 @@ import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {IconButton, IconButtonVariant, QUERY, useMatchMedia} from '@wireapp/react-ui-kit';
+import {IconButton, IconButtonVariant, QUERY, useMatchMedia, CallIcon} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ConversationVerificationBadges} from 'Components/Badge';
@@ -76,7 +76,6 @@ export const TitleBar: React.FC<TitleBarProps> = ({
   isReadOnlyConversation = false,
   withBottomDivider,
 }) => {
-  const {calling: callingRepository} = repositories;
   const {
     is1to1,
     isRequest,
@@ -105,7 +104,6 @@ export const TitleBar: React.FC<TitleBarProps> = ({
 
   const {isActivatedAccount} = useKoSubscribableChildren(selfUser, ['isActivatedAccount']);
   const {joinedCall, activeCalls} = useKoSubscribableChildren(callState, ['joinedCall', 'activeCalls']);
-  const {isVideoCallingEnabled} = useKoSubscribableChildren(teamState, ['isVideoCallingEnabled']);
 
   const currentFocusedElementRef = useRef<HTMLButtonElement | null>(null);
 
@@ -134,8 +132,6 @@ export const TitleBar: React.FC<TitleBarProps> = ({
   }, [conversation, joinedCall]);
 
   const showCallControls = ConversationFilter.showCallControls(conversation, hasCall);
-
-  const supportsVideoCall = conversation.supportsVideoCall(callingRepository.supportsConferenceCalling);
 
   const conversationSubtitle = is1to1 && firstUserEntity?.isFederated ? firstUserEntity?.handle ?? '' : '';
 
@@ -292,41 +288,21 @@ export const TitleBar: React.FC<TitleBarProps> = ({
 
       <li className="conversation-title-bar-icons">
         {showCallControls && !mdBreakpoint && (
-          <div className="buttons-group">
-            {supportsVideoCall && isVideoCallingEnabled && (
-              <button
-                type="button"
-                className="conversation-title-bar-icon"
-                title={t('tooltipConversationVideoCall')}
-                aria-label={t('tooltipConversationVideoCall')}
-                onClick={event => {
-                  currentFocusedElementRef.current = event.target as HTMLButtonElement;
-                  callActions.startVideo(conversation);
-                  showStartedCallAlert(isGroupOrChannel, true);
-                }}
-                data-uie-name="do-video-call"
-                disabled={isReadOnlyConversation}
-              >
-                <Icon.CameraIcon />
-              </button>
-            )}
-
-            <button
-              type="button"
-              className="conversation-title-bar-icon"
-              title={t('tooltipConversationCall')}
-              aria-label={t('tooltipConversationCall')}
-              onClick={event => {
-                currentFocusedElementRef.current = event.target as HTMLButtonElement;
-                callActions.startAudio(conversation);
-                showStartedCallAlert(isGroupOrChannel);
-              }}
-              data-uie-name="do-call"
-              disabled={isReadOnlyConversation}
-            >
-              <Icon.PickupIcon />
-            </button>
-          </div>
+          <button
+            type="button"
+            className="conversation-title-bar-icon"
+            title={t('tooltipConversationCall')}
+            aria-label={t('tooltipConversationCall')}
+            onClick={event => {
+              currentFocusedElementRef.current = event.target as HTMLButtonElement;
+              callActions.startAudio(conversation);
+              showStartedCallAlert(isGroupOrChannel);
+            }}
+            data-uie-name="do-call"
+            disabled={isReadOnlyConversation}
+          >
+            <CallIcon />
+          </button>
         )}
 
         {mdBreakpoint ? (
@@ -350,7 +326,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
                 data-uie-name="do-call"
                 disabled={isReadOnlyConversation}
               >
-                <Icon.PickupIcon />
+                <CallIcon />
               </IconButton>
             )}
           </>
