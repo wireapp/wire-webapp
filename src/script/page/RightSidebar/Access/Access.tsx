@@ -89,10 +89,9 @@ export const Access = ({
         <RadioGroup<ConversationAccess>
           onChange={setAccess}
           selectedValue={access}
-          options={getConversationAccessOptions()}
+          options={getConversationAccessOptions(isPublicChannelsEnabled)}
           ariaLabelledBy="conversation-access"
           name="conversation-access"
-          disabled={!isPublicChannelsEnabled}
         />
 
         <p className="panel__info-text" tabIndex={TabIndex.FOCUSABLE} css={conversationAccessContentCss}>
