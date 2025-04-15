@@ -17,31 +17,23 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {FileCard} from 'Components/FileCard/FileCard';
 
-const overlayStyles: CSSObject = {
-  position: 'absolute',
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-};
+interface FileAssetSmallProps {
+  extension: string;
+  name: string;
+  size: string;
+  isError: boolean;
+}
 
-export const wrapperStyles: CSSObject = {
-  ...overlayStyles,
-  borderRadius: '10px',
-  overflow: 'hidden',
-};
-
-export const controlsWrapperStyles: CSSObject = {
-  ...overlayStyles,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-};
-
-export const videoStyles: CSSObject = {
-  backgroundColor: 'var(--black)',
-  width: '100%',
-  height: '100%',
+export const FileAssetSmall = ({extension, name, size, isError}: FileAssetSmallProps) => {
+  return (
+    <FileCard.Root extension={extension} name={name} size={size}>
+      <FileCard.Header>
+        <FileCard.Icon type={isError ? 'unavailable' : 'file'} />
+        {!isError && <FileCard.Type />}
+      </FileCard.Header>
+      <FileCard.Name variant={isError ? 'secondary' : 'primary'} />
+    </FileCard.Root>
+  );
 };

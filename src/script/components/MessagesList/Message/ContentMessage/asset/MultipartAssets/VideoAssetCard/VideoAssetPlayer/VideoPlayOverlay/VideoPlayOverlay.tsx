@@ -17,8 +17,6 @@
  *
  */
 
-import {AssetTransferState} from 'src/script/assets/AssetTransferState';
-
 import {wrapperStyles} from './VideoPlayOverlay.styles';
 
 import {VideoPlayButton} from '../common/VideoPlayButton/VideoPlayButton';
@@ -28,9 +26,6 @@ interface VideoPlayOverlayProps {
   videoElement?: HTMLVideoElement;
   handlePlay: () => void;
   handlePause: () => void;
-  handleCancelUpload: () => void;
-  handleCancelDownload: () => void;
-  transferState: AssetTransferState;
   isFocusable: boolean;
 }
 
@@ -39,9 +34,6 @@ export const VideoPlayOverlay = ({
   videoElement,
   handlePlay,
   handlePause,
-  handleCancelUpload,
-  handleCancelDownload,
-  transferState,
   isFocusable,
 }: VideoPlayOverlayProps) => {
   return (
@@ -51,8 +43,6 @@ export const VideoPlayOverlay = ({
         mediaElement={videoElement}
         onPlay={handlePlay}
         onPause={handlePause}
-        onCancel={transferState === AssetTransferState.UPLOADING ? handleCancelUpload : handleCancelDownload}
-        transferState={transferState}
         isFocusable={isFocusable}
         isFullscreen
       />

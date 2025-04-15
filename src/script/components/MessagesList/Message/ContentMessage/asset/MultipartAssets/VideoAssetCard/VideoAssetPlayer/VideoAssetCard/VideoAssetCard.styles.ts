@@ -17,26 +17,15 @@
  *
  */
 
-import {t} from 'Util/LocalizerUtil';
+import {CSSObject} from '@emotion/react';
 
-import {imageStyles} from './GridImageAsset.styles';
+export const contentWrapperStyles: CSSObject = {
+  position: 'relative',
+  aspectRatio: '16/9',
+  width: '100%',
 
-import {MediaFilePreviewCard} from '../../common/MediaFilePreviewCard/MediaFilePreviewCard';
-
-interface GridImageAssetProps {
-  src?: string;
-  isLoading: boolean;
-  isError: boolean;
-}
-
-export const GridImageAsset = ({src, isLoading, isError}: GridImageAssetProps) => {
-  return (
-    <MediaFilePreviewCard
-      label={src ? t('conversationFileImagePreviewLabel', {src}) : ''}
-      isLoading={isLoading}
-      isError={isError}
-    >
-      {!isLoading && !isError && src && <img src={src} alt="" css={imageStyles} />}
-    </MediaFilePreviewCard>
-  );
+  // Fallback for the above  aspect-ratio
+  '@supports not (aspect-ratio: 16/9)': {
+    paddingBottom: '56.25%',
+  },
 };

@@ -19,12 +19,22 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const contentWrapperStyles: CSSObject = {
-  position: 'relative',
-  aspectRatio: '16/9',
+export const wrapperStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '16px',
+};
 
-  // Fallback for the above  aspect-ratio
-  '@supports not (aspect-ratio: 16/9)': {
-    paddingBottom: '56.25%',
+export const iconStyles: CSSObject = {
+  fill: 'var(--gray-70)',
+
+  'body.theme-dark &': {
+    fill: 'var(--gray-40)',
   },
+};
+
+export const textStyles: CSSObject = {
+  color: 'var(--main-color)',
+  fontSize: 'var(--font-size-medium)',
+  fontWeight: 'var(--font-weight-regular)',
 };

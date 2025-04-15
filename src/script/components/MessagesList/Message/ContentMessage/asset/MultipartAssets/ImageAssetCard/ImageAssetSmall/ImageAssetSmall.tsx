@@ -17,33 +17,30 @@
  *
  */
 
-import {VideoAssetPlayer} from './VideoAssetPlayer/VideoAssetPlayer';
-import {VideoAssetSmall} from './VideoAssetSmall/VideoAssetSmall';
+import {useState} from 'react';
 
-interface VideoAssetCardProps {
-  variant: 'large' | 'small';
+import {t} from 'Util/LocalizerUtil';
+
+import {imageStyles} from './ImageAssetSmall.styles';
+
+import {MediaFilePreviewCard} from '../../common/MediaFilePreviewCard/MediaFilePreviewCard';
+
+interface ImageAssetSmallProps {
   src?: string;
-  extension: string;
-  name: string;
-  size: string;
   isLoading: boolean;
   isError: boolean;
 }
 
-export const VideoAssetCard = ({variant, src, extension, name, size, isLoading, isError}: VideoAssetCardProps) => {
-  if (variant === 'large') {
-    return (
-      <VideoAssetPlayer
-        url={src}
-        isFileShareRestricted={false}
-        extension={extension}
-        name={name}
-        size={size}
-        isLoading={isLoading}
-        isError={isError}
-      />
-    );
-  }
+export const ImageAssetSmall = ({src, isLoading, isError}: ImageAssetSmallProps) => {
+  const [isLoaded, setIsLoaded] = useState(false);
 
-  return <VideoAssetSmall src={src} isLoading={isLoading} isError={isError} />;
+  return (
+    <MediaFilePreviewCard
+      label={src ? t('conversationFileImagePreviewLabel', {src}) : ''}
+      isLoading={!isLoaded}
+      isError={isError}
+    >
+      {!isLoading && !isError && src && <img src={src} alt="" css={imageStyles} onLoad={() => setIsLoaded(true)} />}
+    </MediaFilePreviewCard>
+  );
 };
