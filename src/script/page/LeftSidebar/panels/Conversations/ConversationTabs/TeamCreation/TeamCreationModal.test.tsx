@@ -24,6 +24,7 @@ import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {setStrings} from 'Util/LocalizerUtil';
 
 import {TeamCreationModal} from './TeamCreationModal';
+import {useTeamCreationModal} from './useTeamCreationModal';
 
 jest.mock('src/script/team/TeamService');
 
@@ -44,8 +45,10 @@ describe('TeamCreationModal', () => {
   const userName = 'testUser';
   setStrings({en});
 
-  const renderTeamCreationModal = () =>
-    render(withTheme(<TeamCreationModal onClose={onCloseMock} onSuccess={onSuccessMock} userName={userName} />));
+  const renderTeamCreationModal = () => {
+    useTeamCreationModal.setState({isModalOpen: true});
+    return render(withTheme(<TeamCreationModal onClose={onCloseMock} onSuccess={onSuccessMock} userName={userName} />));
+  };
 
   beforeEach(() => {
     onCloseMock.mockClear();
