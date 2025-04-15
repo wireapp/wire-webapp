@@ -398,6 +398,11 @@ declare module 'I18n/en-US.json' {
     'cellsGlobalView.tableRowSharedFalsyValue': `No`;
     'cellsGlobalView.tableRowSharedTruthyValue': `Yes`;
     'cellsGlobalView.tableRowSize': `Size`;
+    'cellsGlobalView.pagination.nextPage': `Next Page`;
+    'cellsGlobalView.pagination.previousPage': `Previous Page`;
+    'cellsGlobalView.pagination.rowsPerPage': `Rows Per Page`;
+    'cellsGlobalView.pagination.resultsOutOf': `{start}-{end} out of {total}`;
+    'cellsGlobalView.pagination.loadMoreResults': `Load More Results`;
     'cellsSidebar.heading': `Files`;
     'cellsSidebar.title': `All`;
     'cellsUnavailableFile': `File not available`;

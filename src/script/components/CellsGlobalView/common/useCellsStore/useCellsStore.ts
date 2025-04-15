@@ -20,16 +20,19 @@
 import {create} from 'zustand';
 
 import {CellFile} from '../cellFile/cellFile';
+import {CellPagination} from '../cellPagination/cellPagination';
 
-type Status = 'idle' | 'loading' | 'success' | 'error';
+export type Status = 'idle' | 'loading' | 'fetchingMore' | 'success' | 'error';
 
 interface CellsState {
   files: CellFile[];
   status: Status;
+  pagination: CellPagination | null;
   error: Error | null;
   setFiles: (files: CellFile[]) => void;
   setStatus: (status: Status) => void;
   setError: (error: Error | null) => void;
+  setPagination: (pagination: CellPagination | null) => void;
   updateFile: (fileId: string, updates: Partial<CellFile>) => void;
   removeFile: (fileId: string) => void;
   clearAll: () => void;
@@ -39,9 +42,11 @@ export const useCellsStore = create<CellsState>(set => ({
   files: [],
   status: 'idle',
   error: null,
+  pagination: null,
   setFiles: files => set({files}),
   setStatus: status => set({status}),
   setError: error => set({error}),
+  setPagination: pagination => set({pagination}),
   updateFile: (fileId, updates) =>
     set(state => ({
       files: state.files.map(file => (file.id === fileId ? {...file, ...updates} : file)),
@@ -50,5 +55,5 @@ export const useCellsStore = create<CellsState>(set => ({
     set(state => ({
       files: state.files.filter(file => file.id !== fileId),
     })),
-  clearAll: () => set({files: [], status: 'idle', error: null}),
+  clearAll: () => set({files: [], error: null}),
 }));

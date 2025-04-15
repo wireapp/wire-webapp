@@ -229,7 +229,7 @@ describe('CallingRepository', () => {
         const conversation = createConversation(CONVERSATION_TYPE.ONE_TO_ONE, protocol);
         const callType = CALL_TYPE.NORMAL;
         spyOn(wCall, 'start');
-        await callingRepository.startCall(conversation, callType);
+        await callingRepository.startCall(conversation);
         expect(wCall.start).toHaveBeenCalledWith(wUser, conversation.id, callType, CONV_TYPE.ONEONONE, 0);
       },
     );
@@ -239,7 +239,7 @@ describe('CallingRepository', () => {
       const conversation = createConversation(CONVERSATION_TYPE.REGULAR, ConversationProtocol.PROTEUS);
       const callType = CALL_TYPE.NORMAL;
       spyOn(wCall, 'start');
-      await callingRepository.startCall(conversation, callType);
+      await callingRepository.startCall(conversation);
       expect(wCall.start).toHaveBeenCalledWith(wUser, conversation.id, callType, CONV_TYPE.CONFERENCE, 0);
     });
 
@@ -248,7 +248,7 @@ describe('CallingRepository', () => {
       const conversation = createConversation(CONVERSATION_TYPE.REGULAR, ConversationProtocol.MLS);
       const callType = CALL_TYPE.NORMAL;
       spyOn(wCall, 'start');
-      await callingRepository.startCall(conversation, callType);
+      await callingRepository.startCall(conversation);
       expect(wCall.start).toHaveBeenCalledWith(wUser, conversation.id, callType, CONV_TYPE.CONFERENCE_MLS, 0);
     });
 
@@ -263,7 +263,7 @@ describe('CallingRepository', () => {
         groupId,
       );
 
-      await callingRepository.startCall(mlsConversation, CALL_TYPE.NORMAL);
+      await callingRepository.startCall(mlsConversation);
 
       expect(container.resolve(Core).service?.subconversation.subscribeToEpochUpdates).toHaveBeenCalledWith(
         conversationId,
@@ -284,7 +284,7 @@ describe('CallingRepository', () => {
         groupId,
       );
 
-      await callingRepository.startCall(mlsConversation, CALL_TYPE.NORMAL);
+      await callingRepository.startCall(mlsConversation);
 
       expect(container.resolve(Core).service?.subconversation.subscribeToEpochUpdates).not.toHaveBeenCalled();
     });
@@ -842,7 +842,7 @@ describe.skip('E2E audio call', () => {
         })
         .catch(done.fail);
     };
-    client.startCall(conversation, CALL_TYPE.NORMAL).catch(done.fail);
+    client.startCall(conversation).catch(done.fail);
   });
 
   it('answers an incoming call and connect with the remote peer', done => {
