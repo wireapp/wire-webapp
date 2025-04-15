@@ -22,6 +22,7 @@ import {CSSProperties, useState} from 'react';
 import {ICellAsset} from '@wireapp/protocol-messaging';
 import {UnavailableFileIcon} from '@wireapp/react-ui-kit';
 
+import {FullscreenModal} from 'Components/FullscreenModal/FullscreenModal';
 import {t} from 'Util/LocalizerUtil';
 
 import {
@@ -44,12 +45,15 @@ interface LargeImageAssetProps {
 export const LargeImageAsset = ({src, metadata, isError}: LargeImageAssetProps) => {
   const [isLoaded, setIsLoaded] = useState(false);
 
+  const [isFullscreenModalOpen, setIsFullscreenModalOpen] = useState(false);
+
   const aspectRatio = metadata?.width && metadata?.height ? metadata?.width / metadata?.height : undefined;
   const opacity = isLoaded ? 1 : 0;
 
   return (
-    <div
+    <button
       css={containerStyles}
+      onClick={() => setIsFullscreenModalOpen(true)}
       style={
         {
           '--aspect-ratio': aspectRatio,
@@ -82,6 +86,9 @@ export const LargeImageAsset = ({src, metadata, isError}: LargeImageAssetProps) 
           onLoad={() => setIsLoaded(true)}
         />
       </div>
-    </div>
+      <FullscreenModal isOpen={isFullscreenModalOpen} onClose={() => setIsFullscreenModalOpen(false)}>
+        hello
+      </FullscreenModal>
+    </button>
   );
 };
