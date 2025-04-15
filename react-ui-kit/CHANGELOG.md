@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.46.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.46.0...@wireapp/react-ui-kit@9.46.1) (2025-04-15)
+
+### Bug Fixes
+
+* **react-ui-kit/select:** control styles [WPB-16997] ([#7022](https://github.com/wireapp/wire-web-packages/issues/7022)) ([b4940d6](https://github.com/wireapp/wire-web-packages/commit/b4940d6de781b6282f1988429e5fe59c1d49f74f))
+
 # [9.46.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.45.0...@wireapp/react-ui-kit@9.46.0) (2025-04-14)
 
 ### Features
