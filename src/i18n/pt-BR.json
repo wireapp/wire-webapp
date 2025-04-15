@@ -402,6 +402,7 @@
   "cellsSidebar.heading": "Files",
   "cellsSidebar.title": "All",
   "cellsUnavailableFile": "File not available",
+  "cellsUnavailableFilePreview": "Couldn't generate preview",
   "channelConversationFeature1": "Canais [bold]públicos[/bold] ou [bold]privados[/bold]",
   "channelConversationFeature2": "[bold]Histórico da conversa[/bold]",
   "channelCreationPreferencesPlaceholder": "Nome do canal",

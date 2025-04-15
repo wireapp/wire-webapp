@@ -402,6 +402,7 @@
   "cellsSidebar.heading": "Файлы",
   "cellsSidebar.title": "Все",
   "cellsUnavailableFile": "Файл недоступен",
+  "cellsUnavailableFilePreview": "Couldn't generate preview",
   "channelConversationFeature1": "[bold]Публичные[/bold] или [bold]приватные[/bold] каналы",
   "channelConversationFeature2": "[bold]История беседы[/bold]",
   "channelCreationPreferencesPlaceholder": "Название канала",
