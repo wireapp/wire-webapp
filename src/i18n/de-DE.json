@@ -402,7 +402,7 @@
   "cellsSidebar.heading": "Dateien",
   "cellsSidebar.title": "All",
   "cellsUnavailableFile": "Datei nicht verfügbar",
-  "cellsUnavailableFilePreview": "Couldn't generate preview",
+  "cellsUnavailableFilePreview": "Vorschau konnte nicht erstellt werden",
   "channelConversationFeature1": "[bold]Öffentliche[/bold] oder [bold]private[/bold] Channels",
   "channelConversationFeature2": "[bold]Gesprächsverlauf[/bold]",
   "channelCreationPreferencesPlaceholder": "Channel-Name",
