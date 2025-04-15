@@ -25,24 +25,22 @@ import {UserRepository} from 'src/script/user/UserRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {ConfirmLeaveModal} from './ConfirmLeaveModal';
-import {TeamCreationAccountHeader} from './TeamCreationAccountHeader';
-import {TeamCreationBanner} from './TeamCreationBanner';
 import {TeamCreationModal} from './TeamCreationModal';
+import {useTeamCreationModal} from './useTeamCreationModal';
 
 interface Props {
   selfUser: User;
   teamRepository: TeamRepository;
   userRepository: UserRepository;
-  isAccountPage?: boolean;
 }
 
-export const TeamCreation = ({selfUser, userRepository, teamRepository, isAccountPage = false}: Props) => {
-  const [isTeamCreationModalVisible, setIsTeamCreationModalVisible] = useState(false);
+export const TeamCreationModalContainer = ({selfUser, userRepository, teamRepository}: Props) => {
+  const {isModalOpen, hideModal} = useTeamCreationModal();
   const [isLeaveConfirmModalVisible, setIsLeaveConfirmModalVisible] = useState(false);
   const {name} = useKoSubscribableChildren(selfUser, ['name']);
 
   const modalCloseHandler = async () => {
-    setIsTeamCreationModalVisible(false);
+    hideModal();
     setIsLeaveConfirmModalVisible(false);
 
     // updating cache (selfUser and team data)
@@ -50,18 +48,9 @@ export const TeamCreation = ({selfUser, userRepository, teamRepository, isAccoun
     await teamRepository.getTeam();
   };
 
-  const modalOpenHandler = () => {
-    setIsTeamCreationModalVisible(true);
-  };
-
   return (
     <>
-      {isAccountPage ? (
-        <TeamCreationAccountHeader onClick={modalOpenHandler} />
-      ) : (
-        <TeamCreationBanner onClick={modalOpenHandler} />
-      )}
-      {isTeamCreationModalVisible && (
+      {isModalOpen && (
         <TeamCreationModal
           userName={name}
           onSuccess={modalCloseHandler}
