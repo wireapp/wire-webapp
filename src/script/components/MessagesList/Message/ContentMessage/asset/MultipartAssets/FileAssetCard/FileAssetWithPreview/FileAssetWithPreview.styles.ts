@@ -19,31 +19,21 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const wrapperStyles: CSSObject = {
-  width: '76px',
-  height: '76px',
-  borderRadius: '10px',
-  border: '1px solid var(--gray-40)',
-  position: 'relative',
-  backgroundColor: 'var(--foreground-fade-8)',
-
-  'body.theme-dark &': {
-    border: '1px solid transparent',
-  },
-};
-
-export const wrapperErrorStyles: CSSObject = {
-  ...wrapperStyles,
+export const contentWrapperStyles: CSSObject = {
   display: 'flex',
-  alignItems: 'flex-start',
-  justifyContent: 'space-between',
-  flexDirection: 'column',
-  backgroundColor: 'var(--app-bg-secondary)',
-  padding: '8px 8px 6px',
+  justifyContent: 'center',
+  alignItems: 'center',
+  width: '100%',
+  backgroundColor: 'var(--foreground-fade-8)',
+  border: '1px solid var(--border-color)',
+  borderRadius: '10px',
+  color: 'var(--gray-70)',
+  aspectRatio: '16/9',
+  overflow: 'hidden',
 
-  'body.theme-dark &': {
-    backgroundColor: 'var(--foreground-fade-8)',
-    border: '1px solid transparent',
+  // Fallback for the above aspect-ratio
+  '@supports not (aspect-ratio: 16/9)': {
+    paddingBottom: '56.25%',
   },
 };
 
@@ -51,24 +41,26 @@ export const imageStyles: CSSObject = {
   width: '100%',
   height: '100%',
   objectFit: 'cover',
-  borderRadius: '10px',
+  objectPosition: 'top',
+  opacity: 'var(--opacity)',
 };
 
-export const loadingWrapperStyles: CSSObject = {
+export const infoOverlayStyles: CSSObject = {
   position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  padding: '0',
-  margin: '0',
-  width: '24px',
-  height: '24px',
+  top: 0,
+  left: 0,
+  width: '100%',
+  height: '100%',
+};
+
+export const infoWrapperStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
+  height: '100%',
 };
 
-export const loadingIconStyles: CSSObject = {
+export const loaderIconStyles: CSSObject = {
   color: 'var(--gray-70)',
   fontSize: 'var(--font-size-medium)',
 
@@ -79,15 +71,17 @@ export const loadingIconStyles: CSSObject = {
 
 export const errorIconStyles: CSSObject = {
   flexShrink: 0,
+  marginRight: '8px',
+  fill: 'var(--gray-70)',
+
+  'body.theme-dark &': {
+    fill: 'var(--gray-40)',
+  },
 };
 
 export const errorTextStyles: CSSObject = {
   fontSize: 'var(--font-size-medium)',
   fontWeight: 'var(--line-height-md)',
   lineHeight: 'var(--line-height-sm)',
-  color: 'var(--gray-70)',
-
-  'body.dark &': {
-    color: 'var(--gray-40)',
-  },
+  color: 'var(--main-color)',
 };

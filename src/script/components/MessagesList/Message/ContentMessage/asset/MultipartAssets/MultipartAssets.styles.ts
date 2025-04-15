@@ -40,10 +40,23 @@ export const listSingleItemStyles: CSSObject = {
   padding: '0',
 };
 
-export const largeCardStyles: CSSObject = {
+const largeCardStyles: CSSObject = {
   gridColumn: 'span 3',
+  width: '100%',
 };
 
-export const smallCardStyles: CSSObject = {
+const smallCardStyles: CSSObject = {
   gridColumn: 'span 1',
 };
+
+export const imageCardStyles: CSSObject = {
+  ...smallCardStyles,
+};
+
+export const videoCardStyles = (isSingleAsset: boolean) => ({
+  ...(isSingleAsset ? largeCardStyles : smallCardStyles),
+});
+
+export const fileCardStyles = (isSingleAsset: boolean) => ({
+  ...(isSingleAsset ? largeCardStyles : smallCardStyles),
+});

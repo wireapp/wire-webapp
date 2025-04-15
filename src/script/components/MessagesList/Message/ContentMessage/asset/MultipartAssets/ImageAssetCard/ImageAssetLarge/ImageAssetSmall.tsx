@@ -34,15 +34,15 @@ import {
   infoOverlayStyles,
   infoWrapperStyles,
   loaderIconStyles,
-} from './LargeImageAsset.styles';
+} from './ImageAssetSmall.styles';
 
-interface LargeImageAssetProps {
+interface ImageAssetLargeProps {
   src?: string;
   metadata: ICellAsset['image'];
   isError: boolean;
 }
 
-export const LargeImageAsset = ({src, metadata, isError}: LargeImageAssetProps) => {
+export const ImageAssetLarge = ({src, metadata, isError}: ImageAssetLargeProps) => {
   const [isLoaded, setIsLoaded] = useState(false);
 
   const [isFullscreenModalOpen, setIsFullscreenModalOpen] = useState(false);

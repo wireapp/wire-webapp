@@ -27,34 +27,38 @@ interface UseGetMultipartAssetPreviewProps {
   uuid: string;
   cellsRepository: CellsRepository;
   isEnabled: boolean;
-  retryUntilSuccess?: boolean;
+  retryPreviewUntilSuccess?: boolean;
   maxRetries?: number;
   retryDelay?: number;
 }
 
 const DEFAULT_MAX_RETRIES = 10;
-const DEFAULT_RETRY_DELAY = 500;
+const DEFAULT_RETRY_DELAY = 1000;
 
 /**
- * Hook for fetching asset previews.
- * Retries when asset url is missing, waiting retryDelay ms between attempts.
+ * Fetching and managing multipart asset previews with optional retry logic.
  *
- * When enabled, fetches the asset and checks for PreSignedGET.Url.
- * If URL is missing and retries are enabled, schedules next attempt after retryDelay.
- * Stops retrying after maxRetries attempts or on success.
+ * This hook fetches an asset and looks for an image preview in its Previews array.
+ *
+ * When retryPreviewUntilSuccess is false, it returns the asset data immediately regardless of the preview state.
+ *
+ * When retryPreviewUntilSuccess is true, it will retry fetching the asset up to maxRetries times if the preview is still processing.
+ * If maxRetries is reached while the preview is still processing, it returns the current state.
+ *
+ * The hook only returns a success state when the preview is ready and not processing anymore.
  */
-export const useGetMultipartAssetPreview = ({
+export const useGetMultipartAsset = ({
   uuid,
   cellsRepository,
   isEnabled,
-  retryUntilSuccess = false,
+  retryPreviewUntilSuccess = false,
   maxRetries = DEFAULT_MAX_RETRIES,
   retryDelay = DEFAULT_RETRY_DELAY,
 }: UseGetMultipartAssetPreviewProps) => {
   const uuidRef = useRef(uuid);
   const [src, setSrc] = useState<string | undefined>(undefined);
+  const [previewUrl, setPreviewUrl] = useState<string | undefined>(undefined);
   const [status, setStatus] = useState<Status>('idle');
-  const [error, setError] = useState<Error | null>(null);
 
   const timeoutRef = useRef<number>();
   const isMounted = useRef(true);
@@ -64,11 +68,6 @@ export const useGetMultipartAssetPreview = ({
   if (uuidRef.current !== uuid) {
     uuidRef.current = uuid;
   }
-
-  const handleError = useCallback((err: unknown) => {
-    setStatus('error');
-    setError(err instanceof Error ? err : new Error('Failed to fetch asset'));
-  }, []);
 
   const fetchData = useCallback(async () => {
     if (!isMounted.current || status === 'success') {
@@ -83,36 +82,36 @@ export const useGetMultipartAssetPreview = ({
         return;
       }
 
-      if (!asset.PreSignedGET?.Url) {
-        if (retryUntilSuccess && attemptRef.current < maxRetries) {
-          attemptRef.current += 1;
-          setStatus('retrying');
-          return;
-        }
-        handleError(new Error('No URL available'));
+      const imagePreview = asset.Previews?.find(preview => preview?.ContentType?.startsWith('image/'));
+
+      const shouldReturnImmediately = !retryPreviewUntilSuccess || !imagePreview || imagePreview.Error;
+
+      if (shouldReturnImmediately) {
+        setSrc(asset.PreSignedGET?.Url);
+        setPreviewUrl(imagePreview?.PreSignedGET?.Url);
+        setStatus('success');
+
         return;
       }
 
-      setSrc(asset.PreSignedGET.Url);
+      const shouldRetry = imagePreview.Processing && attemptRef.current < maxRetries;
+
+      if (shouldRetry) {
+        attemptRef.current += 1;
+        setStatus('retrying');
+        return;
+      }
+
+      setSrc(asset.PreSignedGET?.Url);
+      setPreviewUrl(imagePreview.PreSignedGET?.Url);
       setStatus('success');
-      setError(null);
     } catch (err) {
       if (!isMounted.current) {
         return;
       }
-      handleError(err);
+      setStatus('error');
     }
-  }, [status, retryUntilSuccess, maxRetries, handleError, cellsRepository, uuid]);
-
-  const refetch = useCallback(() => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-    attemptRef.current = 1;
-    hasStartedFetchRef.current = false;
-    setError(null);
-    void fetchData();
-  }, [fetchData]);
+  }, [status, retryPreviewUntilSuccess, maxRetries, cellsRepository, uuid]);
 
   useEffect(() => {
     isMounted.current = true;
@@ -154,9 +153,8 @@ export const useGetMultipartAssetPreview = ({
 
   return {
     src,
-    status,
-    error,
-    refetch,
-    retryCount: attemptRef.current - 1,
+    previewUrl,
+    isLoading: status === 'loading' || status === 'retrying',
+    isError: status === 'error',
   };
 };
