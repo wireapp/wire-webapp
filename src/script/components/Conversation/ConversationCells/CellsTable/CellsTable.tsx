@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useMemo} from 'react';
+import {CSSProperties, useCallback, useMemo} from 'react';
 
 import {createColumnHelper, flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
 
@@ -40,6 +40,7 @@ import {CellsTableDateColumn} from './CellsTableDateColumn/CellsTableDateColumn'
 import {CellsTableNameColumn} from './CellsTableNameColumn/CellsTableNameColumn';
 import {CellsTableRowOptions} from './CellsTableRowOptions/CellsTableRowOptions';
 import {CellsTableSharedColumn} from './CellsTableSharedColumn/CellsTableSharedColumn';
+import {useTableResizeObserver} from './useTableResizeObserver/useTableResizeObserver';
 
 import {CellFile} from '../common/cellFile/cellFile';
 
@@ -47,12 +48,29 @@ interface CellsTableProps {
   files: CellFile[];
   cellsRepository: CellsRepository;
   conversationId: string;
+  fixedWidths?: number[];
   onDeleteFile: (uuid: string) => void;
+  onUpdateBodyHeight: (height: number) => void;
+  onUpdateColumnWidths: (widths: number[]) => void;
 }
 
 const columnHelper = createColumnHelper<CellFile>();
 
-export const CellsTable = ({files, cellsRepository, conversationId, onDeleteFile}: CellsTableProps) => {
+export const CellsTable = ({
+  files,
+  cellsRepository,
+  conversationId,
+  fixedWidths,
+  onDeleteFile,
+  onUpdateBodyHeight,
+  onUpdateColumnWidths,
+}: CellsTableProps) => {
+  const {tableBodyRef, callbackRef} = useTableResizeObserver({
+    files,
+    onUpdateBodyHeight,
+    onUpdateColumnWidths,
+  });
+
   const showDeleteFileModal = useCallback(
     ({uuid, name}: {uuid: string; name: string}) => {
       PrimaryModal.show(PrimaryModal.type.CONFIRM, {
@@ -135,16 +153,29 @@ export const CellsTable = ({files, cellsRepository, conversationId, onDeleteFile
         <thead>
           {table.getHeaderGroups().map(headerGroup => (
             <tr key={headerGroup.id}>
-              {headerGroup.headers.map(header => (
-                <th key={header.id} css={headerCellStyles}>
-                  {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                </th>
-              ))}
+              {headerGroup.headers.map((header, index) => {
+                const shouldSetFixedWidth = fixedWidths && fixedWidths[index] && index < headerGroup.headers.length - 1;
+
+                return (
+                  <th
+                    key={header.id}
+                    css={headerCellStyles}
+                    style={
+                      {
+                        '--column-width': shouldSetFixedWidth ? `${fixedWidths[index]}px` : undefined,
+                      } as CSSProperties
+                    }
+                    ref={element => callbackRef(element, index)}
+                  >
+                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                  </th>
+                );
+              })}
             </tr>
           ))}
         </thead>
         {rows.length > 0 && (
-          <tbody>
+          <tbody ref={tableBodyRef}>
             {rows.map(row => (
               <tr key={row.id} css={tableCellRow}>
                 {row.getVisibleCells().map(cell => (

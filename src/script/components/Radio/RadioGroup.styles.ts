@@ -42,7 +42,7 @@ export const radioLabelStyles = (isDisabled: boolean): CSSObject => ({
   display: 'flex',
   alignItems: 'center',
   color: isDisabled ? 'var(--text-input-placeholder)' : 'var(--main-color)',
-  cursor: 'pointer',
+  cursor: isDisabled ? 'not-allowed' : 'pointer',
   whiteSpace: 'pre',
   fontSize: '1rem',
 
@@ -51,13 +51,13 @@ export const radioLabelStyles = (isDisabled: boolean): CSSObject => ({
     borderRadius: '50%',
     marginRight: '6px',
     content: '""',
-    cursor: 'pointer',
   },
 
   ['&::before']: {
     width: '22px',
     height: '22px',
-    border: '2px solid var(--checkbox-border)',
+    border: '2px solid',
+    borderColor: isDisabled ? 'var(--checkbox-background-disabled-selected)' : 'var(--checkbox-border)',
     background: 'var(--app-bg)',
     transition: 'all 0.15s',
   },
