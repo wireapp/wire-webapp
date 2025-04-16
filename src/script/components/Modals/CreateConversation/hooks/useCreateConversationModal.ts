@@ -34,7 +34,7 @@ import {
  * Type representing the state of the Create Conversation Modal.
  */
 type CreateConversationModalState = {
-  isOpen?: boolean;
+  isOpen: boolean;
   conversationName: string;
   access: ConversationAccess;
   moderator: ADD_PERMISSION;
@@ -48,10 +48,11 @@ type CreateConversationModalState = {
   historySharingQuantity: number;
   historySharingUnit: HistorySharingUnit;
   isCustomHistoryModalOpen: boolean;
-  isConfirmConversationTypeModalOpen: boolean;
+  isConfirmDiscardModalOpen: boolean;
   isCreateTeamModalOpen: boolean;
   isUpgradeTeamModalOpen: boolean;
   isServicesEnabled: boolean;
+  discardTrigger?: 'modalClose' | 'conversationTypeChange';
 
   showModal: () => void;
   hideModal: () => void;
@@ -70,12 +71,13 @@ type CreateConversationModalState = {
   setHistorySharingQuantity: (quantity: number) => void;
   setHistorySharingUnit: (unit: HistorySharingUnit) => void;
   setIsCustomHistoryModalOpen: (isOpen: boolean) => void;
-  setIsConfirmConversationTypeModalOpen: (isOpen: boolean) => void;
+  setIsConfirmDiscardModalOpen: (isOpen: boolean) => void;
   setIsCreateTeamModalOpen: (isOpen: boolean) => void;
   setIsUpgradeTeamModalOpen: (isOpen: boolean) => void;
   gotoLastStep: () => void;
   gotoFirstStep: () => void;
   setIsServicesEnabled: (isServicesEnabled: boolean) => void;
+  setDiscardTrigger: (trigger: 'modalClose' | 'conversationTypeChange') => void;
 };
 
 /**
@@ -97,7 +99,7 @@ const initialState = {
   historySharingUnit: HistorySharingUnit.Days,
   historySharingQuantity: 1,
   isCustomHistoryModalOpen: false,
-  isConfirmConversationTypeModalOpen: false,
+  isConfirmDiscardModalOpen: false,
   isCreateTeamModalOpen: false,
   isUpgradeTeamModalOpen: false,
 };
@@ -130,9 +132,10 @@ export const useCreateConversationModal = create<CreateConversationModalState>(s
   setHistorySharingQuantity: (quantity: number) => set({historySharingQuantity: quantity}),
   setHistorySharingUnit: (unit: HistorySharingUnit) => set({historySharingUnit: unit}),
   setIsCustomHistoryModalOpen: (isOpen: boolean) => set({isCustomHistoryModalOpen: isOpen}),
-  setIsConfirmConversationTypeModalOpen: (isOpen: boolean) => set({isConfirmConversationTypeModalOpen: isOpen}),
+  setIsConfirmDiscardModalOpen: (isOpen: boolean) => set({isConfirmDiscardModalOpen: isOpen}),
   setIsCreateTeamModalOpen: (isOpen: boolean) => set({isCreateTeamModalOpen: isOpen}),
   setIsUpgradeTeamModalOpen: (isOpen: boolean) => set({isUpgradeTeamModalOpen: isOpen}),
   setIsServicesEnabled: (isServicesEnabled: boolean) => set({isServicesEnabled}),
   gotoFirstStep: () => set({conversationCreationStep: ConversationCreationStep.ConversationDetails}),
+  setDiscardTrigger: (trigger: 'modalClose' | 'conversationTypeChange') => set({discardTrigger: trigger}),
 }));

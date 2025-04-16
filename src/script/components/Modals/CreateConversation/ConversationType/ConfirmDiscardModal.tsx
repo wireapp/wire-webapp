@@ -32,38 +32,27 @@ import {
 } from './ConversationType.styles';
 
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
-import {ConversationType} from '../types';
 
-export const ConfirmConversationTypeModal = () => {
-  const {
-    setConversationType,
-    setIsConfirmConversationTypeModalOpen,
-    isConfirmConversationTypeModalOpen,
-    gotoPreviousStep,
-  } = useCreateConversationModal();
+export interface ConfirmDiscardModalProps {
+  onCancel: () => void;
+  onSubmit: () => void;
+}
 
-  const onCancel = () => {
-    setIsConfirmConversationTypeModalOpen(false);
-  };
-
-  const onSubmit = () => {
-    setConversationType(ConversationType.Group);
-    setIsConfirmConversationTypeModalOpen(false);
-    gotoPreviousStep();
-  };
+export const ConfirmDiscardModal = ({onCancel, onSubmit}: ConfirmDiscardModalProps) => {
+  const {isConfirmDiscardModalOpen} = useCreateConversationModal();
 
   return (
     <ModalComponent
       wrapperCSS={confirmConversationTypeContainerCss}
       id="custom-history-modal"
-      isShown={isConfirmConversationTypeModalOpen}
+      isShown={isConfirmDiscardModalOpen}
       data-uie-name="custom-history-modal"
       onKeyDown={event => handleEscDown(event, onCancel)}
     >
       <p css={confirmConversationHeaderCss} className="heading-h2">
-        {t('createConversationConfirmTypeChangeModalHeader')}
+        {t('createConversationConfirmDiscardModalHeader')}
       </p>
-      <Text css={confirmConversationTextCss}>{t('createConversationConfirmTypeChangeModalText')}</Text>
+      <Text css={confirmConversationTextCss}>{t('createConversationConfirmDiscardModalText')}</Text>
       <FlexBox css={confirmConversationButtonContainerCss}>
         <Button
           css={confirmConversationButtonCss}
@@ -73,7 +62,7 @@ export const ConfirmConversationTypeModal = () => {
           data-uie-name="do-cancel"
           onKeyDown={event => handleEscDown(event, onCancel)}
         >
-          {t('createConversationConfirmTypeChangeModalCancel')}
+          {t('createConversationConfirmDiscardModalCancel')}
         </Button>
         <Button
           css={confirmConversationButtonCss}
@@ -82,7 +71,7 @@ export const ConfirmConversationTypeModal = () => {
           data-uie-name="do-submit"
           onKeyDown={event => handleKeyDown({event, callback: onSubmit, keys: [KEY.ENTER, KEY.SPACE]})}
         >
-          {t('createConversationConfirmTypeChangeModalContinue')}
+          {t('createConversationConfirmDiscardModalContinue')}
         </Button>
       </FlexBox>
     </ModalComponent>
