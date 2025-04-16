@@ -36,9 +36,7 @@ import {User} from 'src/script/entity/User';
 import {ConversationFolderTab} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTab/ConversationFolderTab';
 import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {Core} from 'src/script/service/CoreSingleton';
-import {TeamRepository} from 'src/script/team/TeamRepository';
 import {TeamState} from 'src/script/team/TeamState';
-import {UserRepository} from 'src/script/user/UserRepository';
 import {isDataDogEnabled} from 'Util/DataDog';
 import {getWebEnvironment} from 'Util/Environment';
 import {replaceLink, t} from 'Util/LocalizerUtil';
@@ -51,7 +49,7 @@ import {
   iconStyle,
 } from './ConversationTabs.styles';
 import {FolderIcon} from './FolderIcon';
-import {TeamCreation} from './TeamCreation/TeamCreation';
+import {TeamCreationBanner} from './TeamCreation/TeamCreationBanner';
 
 import {Config} from '../../../../../Config';
 import {Conversation} from '../../../../../entity/Conversation';
@@ -71,8 +69,6 @@ interface ConversationTabsProps {
   onClickPreferences: (contentState: ContentState) => void;
   showNotificationsBadge?: boolean;
   selfUser: User;
-  teamRepository: TeamRepository;
-  userRepository: UserRepository;
 }
 
 export const ConversationTabs = ({
@@ -87,8 +83,6 @@ export const ConversationTabs = ({
   onClickPreferences,
   showNotificationsBadge = false,
   selfUser,
-  userRepository,
-  teamRepository,
   channelConversations,
 }: ConversationTabsProps) => {
   const {isChannelsEnabled, isChannelsFeatureEnabled} = useChannelsFeatureFlag();
@@ -255,9 +249,7 @@ export const ConversationTabs = ({
         aria-owns="tab-1 tab-2"
         className="conversations-sidebar-list-footer"
       >
-        {isTeamCreationEnabled && !teamState.isInTeam(selfUser) && (
-          <TeamCreation teamRepository={teamRepository} userRepository={userRepository} selfUser={selfUser} />
-        )}
+        {isTeamCreationEnabled && !teamState.isInTeam(selfUser) && <TeamCreationBanner />}
 
         {!getWebEnvironment().isProduction && isDataDogEnabled() && (
           <div css={footerDisclaimer}>

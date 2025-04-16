@@ -44,6 +44,7 @@ import {useE2EIFeatureConfigUpdate} from './components/FeatureConfigChange/Featu
 import {FeatureConfigChangeNotifier} from './components/FeatureConfigChange/FeatureConfigChangeNotifier';
 import {WindowTitleUpdater} from './components/WindowTitleUpdater';
 import {LeftSidebar} from './LeftSidebar';
+import {TeamCreationModalContainer} from './LeftSidebar/panels/Conversations/ConversationTabs/TeamCreation/TeamCreationModalContainer';
 import {SidebarTabs, useSidebarStore} from './LeftSidebar/panels/Conversations/useSidebarStore';
 import {MainContent} from './MainContent';
 import {PanelEntity, PanelState, RightSidebar} from './RightSidebar';
@@ -326,6 +327,11 @@ export const AppMain: FC<AppMainProps> = ({
           <UserModal selfUser={selfUser} userRepository={repositories.user} />
           <GroupCreationModal userState={userState} teamState={teamState} />
           <CreateConversationModal />
+          <TeamCreationModalContainer
+            selfUser={selfUser}
+            teamRepository={repositories.team}
+            userRepository={repositories.user}
+          />
         </ErrorBoundary>
       </RootProvider>
 
