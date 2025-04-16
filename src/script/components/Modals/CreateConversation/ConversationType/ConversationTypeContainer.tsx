@@ -41,8 +41,9 @@ export const ConversationTypeContainer = () => {
     conversationType,
     setConversationType,
     conversationCreationStep,
-    setIsConfirmConversationTypeModalOpen,
     setIsCreateTeamModalOpen,
+    setDiscardTrigger,
+    setIsConfirmDiscardModalOpen,
   } = useCreateConversationModal();
 
   const isInTeam = teamState.isInTeam(self!);
@@ -59,7 +60,8 @@ export const ConversationTypeContainer = () => {
       conversationType === ConversationType.Group &&
       conversationCreationStep === ConversationCreationStep.Preference
     ) {
-      setIsConfirmConversationTypeModalOpen(true);
+      setDiscardTrigger('conversationTypeChange');
+      setIsConfirmDiscardModalOpen(true);
       return;
     }
     if (conversationType === ConversationType.Channel && !isInTeam) {
