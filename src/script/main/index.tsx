@@ -52,7 +52,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   const enforceDesktopApplication = config.FEATURE.ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY && !Runtime.isDesktopApp();
 
   if (enforceDesktopApplication) {
-    doRedirect(SIGN_OUT_REASON.APP_INIT);
+    const unSupportedPageUrl = `${window.location.origin}/unsupported`;
+    window.location.replace(unSupportedPageUrl);
+    return;
   }
 
   const shouldPersist = loadValue<boolean>(StorageKey.AUTH.PERSIST);
