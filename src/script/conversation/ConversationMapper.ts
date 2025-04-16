@@ -275,7 +275,7 @@ export class ConversationMapper {
     conversationEntity.type(type);
     conversationEntity.name(name || '');
     conversationEntity.groupConversationType(group_conv_type || GROUP_CONVERSATION_TYPE.GROUP_CONVERSATION);
-    conversationEntity.conversationModerator(add_permission || ADD_PERMISSION.EVERYONE);
+    conversationEntity.conversationModerator(add_permission || ADD_PERMISSION.ADMINS);
 
     const selfState = members?.self || conversationData;
     conversationEntity = ConversationMapper.updateSelfStatus(conversationEntity, selfState as any);
