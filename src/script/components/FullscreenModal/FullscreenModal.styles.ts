@@ -56,12 +56,6 @@ export const modalStyles = (isAnimating: boolean): CSSObject => ({
   },
 });
 
-export const modalFadeinStyles: CSSObject = {
-  '&::before': {
-    opacity: 1,
-  },
-};
-
 export const contentStyles = (isAnimating: boolean): CSSObject => ({
   position: 'relative',
   display: 'flex',
