@@ -17,37 +17,51 @@
  *
  */
 
-import {useId, useState} from 'react';
+import {CSSProperties, useState, useId} from 'react';
+
+import {ICellAsset} from '@wireapp/protocol-messaging';
+import {UnavailableFileIcon} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/LocalizerUtil';
 
-import {containerStyles, imageStyles} from './ImageAssetSmall.styles';
+import {
+  containerStyles,
+  errorIconStyles,
+  errorTextStyles,
+  imageStyle,
+  imageWrapperStyles,
+  infoOverlayStyles,
+  infoWrapperStyles,
+  loaderIconStyles,
+} from './ImageAssetLarge.styles';
 
-import {MediaFilePreviewCard} from '../../common/MediaFilePreviewCard/MediaFilePreviewCard';
 import {ImageFullscreenModal} from '../common/ImageFullscreenModal/ImageFullscreenModal';
 
-interface ImageAssetSmallProps {
+interface ImageAssetLargeProps {
   src?: string;
   name: string;
   extension: string;
-  isLoading: boolean;
+  metadata: ICellAsset['image'];
   isError: boolean;
   senderName: string;
   timestamp: number;
 }
 
-export const ImageAssetSmall = ({
+export const ImageAssetLarge = ({
   src,
   name,
   extension,
-  isLoading,
+  metadata,
   isError,
   senderName,
   timestamp,
-}: ImageAssetSmallProps) => {
+}: ImageAssetLargeProps) => {
+  const id = useId();
   const [isLoaded, setIsLoaded] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const id = useId();
+
+  const aspectRatio = metadata?.width && metadata?.height ? metadata?.width / metadata?.height : undefined;
+  const opacity = isLoaded ? 1 : 0;
 
   return (
     <>
@@ -58,14 +72,37 @@ export const ImageAssetSmall = ({
         aria-haspopup="dialog"
         aria-expanded={isOpen}
         aria-controls={id}
+        style={
+          {
+            '--aspect-ratio': aspectRatio,
+          } as CSSProperties
+        }
       >
-        <MediaFilePreviewCard
-          label={src ? t('conversationFileImagePreviewLabel', {src}) : ''}
-          isLoading={!isLoaded}
-          isError={isError}
-        >
-          {!isLoading && !isError && src && <img src={src} alt="" css={imageStyles} onLoad={() => setIsLoaded(true)} />}
-        </MediaFilePreviewCard>
+        <div css={infoOverlayStyles}>
+          <div css={infoWrapperStyles}>
+            {!isLoaded && !isError && <div className="icon-spinner spin" css={loaderIconStyles} />}
+            {isError && (
+              <>
+                <UnavailableFileIcon css={errorIconStyles} width={14} height={14} />
+                <p css={errorTextStyles}>{t('cellsUnavailableFile')}</p>
+              </>
+            )}
+          </div>
+        </div>
+        <div css={imageWrapperStyles}>
+          <img
+            src={src}
+            alt=""
+            css={imageStyle}
+            style={
+              {
+                '--opacity': opacity,
+              } as CSSProperties
+            }
+            width={metadata?.width}
+            onLoad={() => setIsLoaded(true)}
+          />
+        </div>
       </button>
       <ImageFullscreenModal
         id={id}

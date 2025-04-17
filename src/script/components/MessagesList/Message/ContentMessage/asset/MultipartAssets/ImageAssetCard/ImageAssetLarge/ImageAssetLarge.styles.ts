@@ -26,6 +26,9 @@ export const containerStyles: CSSObject = {
   backgroundColor: 'var(--foreground-fade-8)',
   maxWidth: 'var(--conversation-message-asset-width)',
   maxHeight: 'var(--conversation-message-image-asset-max-height)',
+  border: 'none',
+  padding: 0,
+  margin: 0,
 };
 
 export const infoOverlayStyles: CSSObject = {

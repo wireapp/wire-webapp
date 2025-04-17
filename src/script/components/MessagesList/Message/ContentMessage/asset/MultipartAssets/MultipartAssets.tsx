@@ -38,18 +38,29 @@ import {useGetMultipartAsset} from './useGetMultipartAsset/useGetMultipartAsset'
 import {VideoAssetCard} from './VideoAssetCard/VideoAssetCard';
 
 interface MultipartAssetsProps {
+  senderName: string;
+  timestamp: number;
   assets: ICellAsset[];
   cellsRepository?: CellsRepository;
 }
 
 export const MultipartAssets = ({
+  senderName,
+  timestamp,
   assets,
   cellsRepository = container.resolve(CellsRepository),
 }: MultipartAssetsProps) => {
   return (
     <ul css={assets.length === 1 ? listSingleItemStyles : listStyles}>
       {assets.map(asset => (
-        <MultipartAsset key={asset.uuid} cellsRepository={cellsRepository} assetsCount={assets.length} {...asset} />
+        <MultipartAsset
+          key={asset.uuid}
+          cellsRepository={cellsRepository}
+          assetsCount={assets.length}
+          senderName={senderName}
+          timestamp={timestamp}
+          {...asset}
+        />
       ))}
     </ul>
   );
@@ -58,6 +69,8 @@ export const MultipartAssets = ({
 interface MultipartAssetProps extends ICellAsset {
   cellsRepository: CellsRepository;
   assetsCount: number;
+  senderName: string;
+  timestamp: number;
 }
 
 const MultipartAsset = ({
@@ -68,6 +81,8 @@ const MultipartAsset = ({
   cellsRepository,
   assetsCount,
   image: imageMetadata,
+  senderName,
+  timestamp,
 }: MultipartAssetProps) => {
   const name = trimFileExtension(initialName!);
   const extension = getFileExtension(initialName!);
@@ -91,7 +106,17 @@ const MultipartAsset = ({
   if (isImage) {
     return (
       <li ref={elementRef} css={imageCardStyles}>
-        <ImageAssetCard src={src} variant={variant} metadata={imageMetadata} isLoading={isLoading} isError={isError} />
+        <ImageAssetCard
+          src={src}
+          name={name}
+          extension={extension}
+          variant={variant}
+          metadata={imageMetadata}
+          isLoading={isLoading}
+          isError={isError}
+          senderName={senderName}
+          timestamp={timestamp}
+        />
       </li>
     );
   }
