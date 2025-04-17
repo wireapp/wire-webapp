@@ -92,7 +92,10 @@ export const ImageAssetLarge = ({
         <div css={imageWrapperStyles}>
           <img
             src={src}
-            alt=""
+            alt={t('accessibility.conversationAssetImageAlt', {
+              username: senderName,
+              messageDate: timestamp,
+            })}
             css={imageStyle}
             style={
               {

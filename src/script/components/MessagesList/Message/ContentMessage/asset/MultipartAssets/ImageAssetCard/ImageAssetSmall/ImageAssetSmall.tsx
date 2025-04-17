@@ -64,7 +64,17 @@ export const ImageAssetSmall = ({
           isLoading={!isLoaded}
           isError={isError}
         >
-          {!isLoading && !isError && src && <img src={src} alt="" css={imageStyles} onLoad={() => setIsLoaded(true)} />}
+          {!isLoading && !isError && src && (
+            <img
+              src={src}
+              alt={t('accessibility.conversationAssetImageAlt', {
+                username: senderName,
+                messageDate: timestamp,
+              })}
+              css={imageStyles}
+              onLoad={() => setIsLoaded(true)}
+            />
+          )}
         </MediaFilePreviewCard>
       </button>
       <ImageFullscreenModal
