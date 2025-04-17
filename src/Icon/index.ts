@@ -147,3 +147,5 @@ export * from './AlertIcon';
 export * from './SaveIcon';
 export * from './CollectionIcon';
 export * from './UnavailableFileIcon';
+export * from './SidebarActiveIcon';
+export * from './SidebarInactiveIcon';
