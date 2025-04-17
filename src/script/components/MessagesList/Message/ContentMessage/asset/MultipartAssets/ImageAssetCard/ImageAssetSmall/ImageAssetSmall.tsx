@@ -54,6 +54,10 @@ export const ImageAssetSmall = ({
       <button
         css={containerStyles}
         onClick={() => setIsOpen(true)}
+        aria-label={t('accessibility.conversationAssetImageAlt', {
+          username: senderName,
+          messageDate: timestamp,
+        })}
         aria-haspopup="dialog"
         aria-expanded={isOpen}
         aria-controls={id}
@@ -63,17 +67,7 @@ export const ImageAssetSmall = ({
           isLoading={!isLoaded}
           isError={isError}
         >
-          {!isLoading && !isError && src && (
-            <img
-              src={src}
-              alt={t('accessibility.conversationAssetImageAlt', {
-                username: senderName,
-                messageDate: timestamp,
-              })}
-              css={imageStyles}
-              onLoad={() => setIsLoaded(true)}
-            />
-          )}
+          {!isLoading && !isError && src && <img src={src} alt="" css={imageStyles} onLoad={() => setIsLoaded(true)} />}
         </MediaFilePreviewCard>
       </button>
       <ImageFullscreenModal

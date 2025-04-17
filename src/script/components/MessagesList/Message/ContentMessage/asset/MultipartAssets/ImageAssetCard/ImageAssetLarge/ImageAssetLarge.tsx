@@ -68,6 +68,10 @@ export const ImageAssetLarge = ({
       <button
         css={containerStyles}
         onClick={() => setIsOpen(true)}
+        aria-label={t('accessibility.conversationAssetImageAlt', {
+          username: senderName,
+          messageDate: timestamp,
+        })}
         aria-haspopup="dialog"
         aria-expanded={isOpen}
         aria-controls={id}
@@ -91,10 +95,7 @@ export const ImageAssetLarge = ({
         <div css={imageWrapperStyles}>
           <img
             src={src}
-            alt={t('accessibility.conversationAssetImageAlt', {
-              username: senderName,
-              messageDate: timestamp,
-            })}
+            alt=""
             css={imageStyle}
             style={
               {
