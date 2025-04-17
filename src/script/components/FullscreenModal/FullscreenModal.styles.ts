@@ -31,7 +31,7 @@ export const modalStyles = (isAnimating: boolean): CSSObject => ({
   justifyContent: 'center',
   overflowX: 'hidden',
   overflowY: 'auto',
-  animationDelay: 'var(--animation-timing-slower)',
+  animationDelay: 'var(--animation-timing-faster)',
   animation: `modalFadeIn var(--animation-timing-slower) var(--ease-out-expo)`,
 
   '&::before': {
@@ -71,7 +71,7 @@ export const contentStyles = (isAnimating: boolean): CSSObject => ({
   alignItems: 'center',
   opacity: isAnimating ? 1 : 0,
   transform: isAnimating ? 'scale(1)' : 'scale(0.9)',
-  transitionDelay: isAnimating ? 'var(--animation-timing-slower), var(--animation-timing-slower)' : '0s, 0s',
+  transitionDelay: isAnimating ? 'var(--animation-timing-faster), var(--animation-timing-faster)' : '0s, 0s',
   transitionDuration: isAnimating
     ? `var(--animation-timing-slower), var(--animation-timing-slower)`
     : 'var(--animation-timing-faster), var(--animation-timing-faster)',
