@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.47.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.46.1...@wireapp/react-ui-kit@9.47.0) (2025-04-17)
+
+### Features
+
+* **react-ui-kit/icon:** sidebar icons [WPB-15678] ([#7028](https://github.com/wireapp/wire-web-packages/issues/7028)) ([1e66679](https://github.com/wireapp/wire-web-packages/commit/1e6667963e86e08f848f2da0151e45b45306d77f))
+
 ## [9.46.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.46.0...@wireapp/react-ui-kit@9.46.1) (2025-04-15)
 
 ### Bug Fixes
