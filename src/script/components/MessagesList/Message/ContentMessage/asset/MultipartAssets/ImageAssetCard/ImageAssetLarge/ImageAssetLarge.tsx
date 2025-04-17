@@ -68,7 +68,6 @@ export const ImageAssetLarge = ({
       <button
         css={containerStyles}
         onClick={() => setIsOpen(true)}
-        aria-label={t('cellsGlobalView.imageFullScreenModalCloseButton')}
         aria-haspopup="dialog"
         aria-expanded={isOpen}
         aria-controls={id}
