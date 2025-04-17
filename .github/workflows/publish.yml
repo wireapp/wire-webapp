@@ -2,7 +2,7 @@ name: Publish
 
 on:
   push:
-    branches: [master, dev, release/*, new-navigation]
+    branches: [master, dev, release/*, new-navigation, bundid-demo]
     tags:
       - '*q1-2024*'
       - '*q2-2025*'
@@ -296,6 +296,9 @@ jobs:
               },
               "staging": {
                 "targets": "[\"wire-webapp-staging\"]"
+              },
+              "bundid-demo": {
+                "targets": "[\"wire-webapp-bundid-demo\"]"
               }
             }
           export_to: env
