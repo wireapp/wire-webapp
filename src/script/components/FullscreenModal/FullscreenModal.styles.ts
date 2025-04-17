@@ -19,15 +19,9 @@
 
 import {CSSObject} from '@emotion/react';
 
-const ANIMATION_DURATION = {
-  OPEN: '0.75s',
-  CLOSE: '0.15s',
-  DELAY: '0.15s',
-};
-
 export const modalStyles = (isAnimating: boolean): CSSObject => ({
   position: 'fixed',
-  zIndex: 10000000,
+  zIndex: 'var(--z-index-modal)',
   top: 0,
   right: 0,
   bottom: 0,
@@ -37,8 +31,8 @@ export const modalStyles = (isAnimating: boolean): CSSObject => ({
   justifyContent: 'center',
   overflowX: 'hidden',
   overflowY: 'auto',
-  animationDelay: ANIMATION_DURATION.DELAY,
-  animation: `modalFadeIn ${ANIMATION_DURATION.OPEN} var(--ease-out-expo)`,
+  animationDelay: 'var(--animation-timing-slower)',
+  animation: `modalFadeIn var(--animation-timing-slower) var(--ease-out-expo)`,
 
   '&::before': {
     position: 'fixed',
@@ -49,7 +43,7 @@ export const modalStyles = (isAnimating: boolean): CSSObject => ({
     backgroundColor: 'var(--app-bg)',
     content: '" "',
     opacity: isAnimating ? 1 : 0,
-    transition: `opacity ${ANIMATION_DURATION.OPEN} var(--ease-out-quart)`,
+    transition: `opacity var(--animation-timing-slower) var(--ease-out-quart)`,
   },
 
   '@keyframes modalFadeIn': {
@@ -77,10 +71,10 @@ export const contentStyles = (isAnimating: boolean): CSSObject => ({
   alignItems: 'center',
   opacity: isAnimating ? 1 : 0,
   transform: isAnimating ? 'scale(1)' : 'scale(0.9)',
-  transitionDelay: isAnimating ? `${ANIMATION_DURATION.DELAY}, ${ANIMATION_DURATION.DELAY}` : '0s, 0s',
+  transitionDelay: isAnimating ? 'var(--animation-timing-slower), var(--animation-timing-slower)' : '0s, 0s',
   transitionDuration: isAnimating
-    ? `${ANIMATION_DURATION.OPEN}, ${ANIMATION_DURATION.OPEN}`
-    : `${ANIMATION_DURATION.CLOSE}, ${ANIMATION_DURATION.CLOSE}`,
+    ? `var(--animation-timing-slower), var(--animation-timing-slower)`
+    : 'var(--animation-timing-faster), var(--animation-timing-faster)',
   transitionProperty: 'transform, opacity',
   transitionTimingFunction: isAnimating
     ? 'var(--ease-out-expo), var(--ease-out-expo)'
