@@ -17,32 +17,61 @@
  *
  */
 
-import {useEffect, KeyboardEvent as ReactKeyboardEvent, useCallback} from 'react';
+import {useEffect, useCallback, ReactNode, useState} from 'react';
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
-import cx from 'classnames';
 import {createPortal} from 'react-dom';
 
-import {CloseIcon} from 'Components/Icon';
-import {handleEscDown, handleKeyDown, KEY} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {handleEscDown} from 'Util/KeyboardUtil';
 import {preventFocusOutside} from 'Util/util';
 
-const modalId = 'detail-view';
+import {modalStyles, contentStyles} from './FullscreenModal.styles';
+
+const ANIMATION_OPEN_TIMEOUT = 50;
+const ANIMATION_CLOSE_TIMEOUT = 350;
 
 interface FullscreenModalProps {
+  id: string;
   isOpen: boolean;
   onClose: () => void;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 /**
- * The most of this component is taken from the DetailsViewModal
- * Although the original component contains a lot of domain specific logic (related to a message and conversation)
- * In the future, we should create a common fullscreen modal component, and use it in both cases
- * TODO: refactor this component to use a common modal
+ * Barebone, animated fullscreen modal component.
+ * The close button is not provided, so it must be added to the content, although the escape key is handled.
+ *
+ * Usage:
+ * ```tsx
+ * const Component = () => {
+ *  const [isOpen, setIsOpen] = useState(false);
+ *  const id = useId();
+ *  return (
+ *    <>
+ *      <button aria-haspopup="dialog" aria-expanded={isOpen} aria-controls={id} onClick={() => setIsOpen(true)}>Open Modal</button>
+ *      <FullscreenModal id={id} isOpen={isOpen} onClose={() => setIsOpen(false)}>
+ *        <div>Content</div>
+ *      </FullscreenModal>
+ *    </>
+ *  );
+ * };
+ * ```
  */
-export const FullscreenModal = ({isOpen, children, onClose}: FullscreenModalProps) => {
+export const FullscreenModal = ({id, isOpen, children, onClose}: FullscreenModalProps) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setIsAnimating(false);
+      const timer = setTimeout(() => setIsVisible(false), ANIMATION_CLOSE_TIMEOUT);
+      return () => clearTimeout(timer);
+    }
+
+    setIsVisible(true);
+    const timer = setTimeout(() => setIsAnimating(true), ANIMATION_OPEN_TIMEOUT);
+    return () => clearTimeout(timer);
+  }, [isOpen]);
+
   const handleCloseOnEscape = useCallback(
     (event: KeyboardEvent) => {
       handleEscDown(event, onClose);
@@ -52,61 +81,28 @@ export const FullscreenModal = ({isOpen, children, onClose}: FullscreenModalProp
 
   useEffect(() => {
     document.addEventListener('keydown', handleCloseOnEscape);
-
-    return () => document.removeEventListener('keydown', handleCloseOnEscape);
+    return () => {
+      document.removeEventListener('keydown', handleCloseOnEscape);
+    };
   }, [handleCloseOnEscape]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent): void => {
-      preventFocusOutside(event, modalId);
+      preventFocusOutside(event, id);
     };
-
     document.addEventListener('keydown', onKeyDown);
-
     return () => {
       document.removeEventListener('keydown', onKeyDown);
     };
-  }, []);
+  }, [id]);
 
-  const handleOnClosePress = (event: KeyboardEvent | ReactKeyboardEvent<HTMLButtonElement>) => {
-    handleKeyDown({
-      event,
-      callback: onClose,
-      keys: [KEY.ENTER, KEY.SPACE],
-    });
-  };
-
-  if (!isOpen) {
+  if (!isVisible) {
     return null;
   }
 
   return createPortal(
-    <div
-      role="dialog"
-      aria-modal="true"
-      id={modalId}
-      tabIndex={TabIndex.FOCUSABLE}
-      className={cx('modal detail-view modal-show', {'modal-fadein': isOpen})}
-    >
-      <div
-        className={cx('detail-view-content modal-content-anim-close', {
-          'modal-content-anim-open': isOpen,
-        })}
-      >
-        <header className="detail-view-header">
-          <button
-            type="button"
-            className="detail-view-header-close-button icon-button"
-            aria-label={t('cellsGlobalView.imageFullScreenModalCloseButton')}
-            onClick={onClose}
-            onKeyDown={handleOnClosePress}
-            data-uie-name="do-close-detail-view"
-          >
-            <CloseIcon />
-          </button>
-        </header>
-        {children}
-      </div>
+    <div role="dialog" aria-modal="true" id={id} css={modalStyles(isAnimating)}>
+      <div css={contentStyles(isAnimating)}>{children}</div>
     </div>,
     document.body,
   );
