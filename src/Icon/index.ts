@@ -149,3 +149,7 @@ export * from './CollectionIcon';
 export * from './UnavailableFileIcon';
 export * from './SidebarActiveIcon';
 export * from './SidebarInactiveIcon';
+export * from './ChevronDownIcon';
+export * from './ChevronUpIcon';
+export * from './ZoomInIcon';
+export * from './ZoomOutIcon';
