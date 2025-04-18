@@ -64,6 +64,7 @@ export const ConversationCells = ({
     conversationId,
     setOffset,
     onPageChange: updateDimensions,
+    currentFilesCount: files.length,
   });
 
   const isLoading = filesStatus === 'loading';
@@ -95,6 +96,8 @@ export const ConversationCells = ({
     await refresh();
   }, [refresh, clearAll, conversationId]);
 
+  const emptyView = !isError && !hasFiles;
+
   return (
     <div css={wrapperStyles}>
       <CellsHeader onRefresh={handleRefresh} />
@@ -109,7 +112,7 @@ export const ConversationCells = ({
           onUpdateColumnWidths={handleWidths}
         />
       )}
-      {!isLoading && !isError && !hasFiles && (
+      {!isLoading && emptyView && (
         <CellsStateInfo
           heading={t('cellsGlobalView.noFilesHeading')}
           description={t('cellsGlobalView.noFilesDescription')}
@@ -122,7 +125,7 @@ export const ConversationCells = ({
           description={t('cellsGlobalView.errorDescription')}
         />
       )}
-      {!isError && <CellsPagination {...getPaginationProps()} goToPage={goToPage} />}
+      {!emptyView && <CellsPagination {...getPaginationProps()} goToPage={goToPage} />}
     </div>
   );
 };

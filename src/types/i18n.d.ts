@@ -379,7 +379,7 @@ declare module 'I18n/en-US.json' {
     'cellsGlobalView.pagination.nextPage': `Next Page`;
     'cellsGlobalView.pagination.previousPage': `Previous Page`;
     'cellsGlobalView.pagination.resultsOutOf': `{start}-{end} out of {total}`;
-    'cellsGlobalView.pagination.rowsPerPage': `Rows Per Page`;
+    'cellsGlobalView.pagination.rowsPerPage': `Rows per page`;
     'cellsGlobalView.refreshButton': `Refresh list`;
     'cellsGlobalView.searchCloseButton': `Close`;
     'cellsGlobalView.searchFailed': `Something went wrong, please try again later.`;
