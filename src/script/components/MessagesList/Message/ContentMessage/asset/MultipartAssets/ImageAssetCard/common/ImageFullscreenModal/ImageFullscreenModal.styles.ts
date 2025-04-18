@@ -19,18 +19,30 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const containerStyles: CSSObject = {
-  display: 'flex',
+export const wrapperStyles: CSSObject = {
   alignItems: 'center',
+  contain: 'strict',
+  cursor: 'default',
+  display: 'flex',
+  flex: '1 1',
   justifyContent: 'center',
-  border: 'none',
-  padding: 0,
-  margin: 0,
+  maxWidth: '84%',
+  overflow: 'hidden',
+  width: '100%',
 };
 
-export const imageStyles: CSSObject = {
+export const imageWrapperStyles: CSSObject = {
   width: '100%',
   height: '100%',
-  objectFit: 'cover',
-  borderRadius: '10px',
+  display: 'flex',
+  justifyContent: 'center',
+  alignContent: 'center',
+};
+
+export const imageStyle: CSSObject = {
+  aspectRatio: 'var(--aspect-ratio)',
+  maxWidth: '100%',
+  maxHeight: '100%',
+  objectFit: 'contain',
+  objectPosition: 'left center',
 };
