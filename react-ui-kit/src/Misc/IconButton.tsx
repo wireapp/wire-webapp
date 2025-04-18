@@ -31,12 +31,13 @@ export enum IconButtonVariant {
 
 export interface IconButtonProps<T = HTMLButtonElement> extends TextProps<T> {
   variant?: IconButtonVariant;
+  group?: boolean;
   backgroundColor?: string;
 }
 
 export const iconButtonStyle: <T>(theme: Theme, props: IconButtonProps<T>) => CSSObject = (
   theme,
-  {variant = IconButtonVariant.PRIMARY, backgroundColor, disabled = false},
+  {variant = IconButtonVariant.PRIMARY, group = false, backgroundColor, disabled = false},
 ) => ({
   border: 0,
   borderRadius: '12px',
@@ -52,6 +53,7 @@ export const iconButtonStyle: <T>(theme: Theme, props: IconButtonProps<T>) => CS
   transition: defaultTransition,
   width: '40px',
   height: '32px',
+
   '&:hover, &:focus': {
     textDecoration: 'none',
   },
@@ -106,6 +108,16 @@ export const iconButtonStyle: <T>(theme: Theme, props: IconButtonProps<T>) => CS
         backgroundColor: theme.Input.backgroundColor,
       },
     }),
+  }),
+  ...(group && {
+    borderRadius: '0',
+
+    '&:first-of-type': {
+      borderRadius: '12px 0 0 12px',
+    },
+    '&:last-of-type': {
+      borderRadius: '0 12px 12px 0',
+    },
   }),
 });
 
