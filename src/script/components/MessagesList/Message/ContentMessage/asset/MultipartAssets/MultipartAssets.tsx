@@ -40,16 +40,27 @@ import {VideoAssetCard} from './VideoAssetCard/VideoAssetCard';
 interface MultipartAssetsProps {
   assets: ICellAsset[];
   cellsRepository?: CellsRepository;
+  senderName: string;
+  timestamp: number;
 }
 
 export const MultipartAssets = ({
   assets,
   cellsRepository = container.resolve(CellsRepository),
+  senderName,
+  timestamp,
 }: MultipartAssetsProps) => {
   return (
     <ul css={assets.length === 1 ? listSingleItemStyles : listStyles}>
       {assets.map(asset => (
-        <MultipartAsset key={asset.uuid} cellsRepository={cellsRepository} assetsCount={assets.length} {...asset} />
+        <MultipartAsset
+          key={asset.uuid}
+          cellsRepository={cellsRepository}
+          assetsCount={assets.length}
+          senderName={senderName}
+          timestamp={timestamp}
+          {...asset}
+        />
       ))}
     </ul>
   );
@@ -58,6 +69,8 @@ export const MultipartAssets = ({
 interface MultipartAssetProps extends ICellAsset {
   cellsRepository: CellsRepository;
   assetsCount: number;
+  senderName: string;
+  timestamp: number;
 }
 
 const MultipartAsset = ({
@@ -68,6 +81,8 @@ const MultipartAsset = ({
   cellsRepository,
   assetsCount,
   image: imageMetadata,
+  senderName,
+  timestamp,
 }: MultipartAssetProps) => {
   const name = trimFileExtension(initialName!);
   const extension = getFileExtension(initialName!);
@@ -115,6 +130,7 @@ const MultipartAsset = ({
   return (
     <li ref={elementRef} css={fileCardStyles(isSingleAsset)}>
       <FileAssetCard
+        src={src}
         variant={variant}
         extension={extension}
         name={name}
@@ -122,6 +138,8 @@ const MultipartAsset = ({
         previewUrl={previewUrl}
         isLoading={isLoading}
         isError={isError}
+        senderName={senderName}
+        timestamp={timestamp}
       />
     </li>
   );

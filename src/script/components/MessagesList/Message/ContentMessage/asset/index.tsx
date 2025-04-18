@@ -71,7 +71,12 @@ const ContentAsset = ({
   is1to1Conversation,
   onClickDetails,
 }: ContentAssetProps) => {
-  const {isObfuscated, status} = useKoSubscribableChildren(message, ['isObfuscated', 'status']);
+  const {isObfuscated, status, senderName, timestamp} = useKoSubscribableChildren(message, [
+    'isObfuscated',
+    'status',
+    'senderName',
+    'timestamp',
+  ]);
   const {previews} = useKoSubscribableChildren(asset as Text, ['previews']);
 
   switch (asset.type) {
@@ -99,7 +104,7 @@ const ContentAsset = ({
             />
           )}
 
-          <MultipartAssets assets={filesMultipart} />
+          <MultipartAssets senderName={senderName} timestamp={timestamp} assets={filesMultipart} />
 
           {shouldRenderTextMultipart && (
             <ReadIndicator message={message} is1to1Conversation={is1to1Conversation} onClick={onClickDetails} />

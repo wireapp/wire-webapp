@@ -17,12 +17,15 @@
  *
  */
 
-import {CSSProperties, useState} from 'react';
+import {CSSProperties, useState, MouseEvent as ReactMouseEvent, KeyboardEvent} from 'react';
 
-import {AlertIcon} from '@wireapp/react-ui-kit';
+import {AlertIcon, MoreIcon} from '@wireapp/react-ui-kit';
 
 import {FileCard} from 'Components/FileCard/FileCard';
+import {showContextMenu} from 'src/script/ui/ContextMenu';
+import {isSpaceOrEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
+import {setContextMenuPosition} from 'Util/util';
 
 import {
   contentWrapperStyles,
@@ -32,60 +35,116 @@ import {
   infoOverlayStyles,
   infoWrapperStyles,
   loaderIconStyles,
+  moreButtonStyles,
+  moreIconStyles,
 } from './FileAssetWithPreview.styles';
+import {PDFViewer} from './PDFViewer';
+
+import {FileFullscreenModal} from '../../common/FileFullscreenModal/FileFullscreenModal';
 
 interface FileAssetWithPreviewProps {
+  src?: string;
   extension: string;
   name: string;
   size: string;
   previewUrl?: string;
   isLoading: boolean;
   isError: boolean;
+  senderName: string;
+  timestamp: number;
 }
 
 export const FileAssetWithPreview = ({
+  src,
   extension,
   name,
   size,
   previewUrl,
   isError,
   isLoading,
+  senderName,
+  timestamp,
 }: FileAssetWithPreviewProps) => {
   const [isImageLoaded, setIsImageLoaded] = useState(false);
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const shouldDisplayLoading = (previewUrl ? !isImageLoaded : isLoading) && !isError;
   const shouldDisplayPreviewError = isError || (!isLoading && !previewUrl);
 
-  return (
-    <FileCard.Root variant="large" extension={extension} name={name} size={size}>
-      <FileCard.Header>
-        <FileCard.Icon type={isError ? 'unavailable' : 'file'} />
-        {!isError && <FileCard.Type />}
-        <FileCard.Name variant={isError ? 'secondary' : 'primary'} />
-      </FileCard.Header>
-      <FileCard.Content>
-        <div css={contentWrapperStyles}>
-          <img
-            src={previewUrl}
-            style={{'--opacity': isImageLoaded && previewUrl ? 1 : 0} as CSSProperties}
-            alt=""
-            css={imageStyles}
-            onLoad={() => setIsImageLoaded(true)}
-          />
+  const showOptionsMenu = (event: ReactMouseEvent<HTMLButtonElement> | MouseEvent) => {
+    showContextMenu({
+      event,
+      entries: [
+        {
+          label: 'Open',
+          click: () => {
+            setIsModalOpen(true);
+          },
+        },
+      ],
+      identifier: 'file-preview-error-more-button',
+    });
+  };
 
-          <div css={infoOverlayStyles}>
-            <div css={infoWrapperStyles}>
-              {shouldDisplayLoading && <div className="icon-spinner spin" css={loaderIconStyles} />}
-              {shouldDisplayPreviewError && (
-                <>
-                  <AlertIcon css={errorIconStyles} width={14} height={14} />
-                  <p css={errorTextStyles}>{t('cellsUnavailableFilePreview')}</p>
-                </>
-              )}
+  const handleKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
+    if (isSpaceOrEnterKey(event.key)) {
+      const newEvent = setContextMenuPosition(event);
+      showOptionsMenu(newEvent);
+    }
+  };
+
+  return (
+    <>
+      <FileCard.Root variant="large" extension={extension} name={name} size={size}>
+        <FileCard.Header>
+          <FileCard.Icon type={isError ? 'unavailable' : 'file'} />
+          {!isError && <FileCard.Type />}
+          <FileCard.Name variant={isError ? 'secondary' : 'primary'} />
+          <button
+            css={moreButtonStyles}
+            onKeyDown={handleKeyDown}
+            onClick={showOptionsMenu}
+            aria-label={t('cellsGlobalView.optionsLabel')}
+          >
+            <MoreIcon css={moreIconStyles} />
+          </button>
+        </FileCard.Header>
+        <FileCard.Content>
+          <div css={contentWrapperStyles}>
+            <img
+              src={previewUrl}
+              style={{'--opacity': isImageLoaded && previewUrl ? 1 : 0} as CSSProperties}
+              alt=""
+              css={imageStyles}
+              onLoad={() => setIsImageLoaded(true)}
+            />
+
+            <div css={infoOverlayStyles}>
+              <div css={infoWrapperStyles}>
+                {shouldDisplayLoading && <div className="icon-spinner spin" css={loaderIconStyles} />}
+                {shouldDisplayPreviewError && (
+                  <>
+                    <AlertIcon css={errorIconStyles} width={14} height={14} />
+                    <p css={errorTextStyles}>{t('cellsUnavailableFilePreview')}</p>
+                  </>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      </FileCard.Content>
-    </FileCard.Root>
+        </FileCard.Content>
+      </FileCard.Root>
+      <FileFullscreenModal
+        id="file-preview-error-modal"
+        fileName={name}
+        fileExtension={extension}
+        senderName={senderName}
+        timestamp={timestamp}
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+        }}
+      >
+        {src && <PDFViewer src={src} />}
+      </FileFullscreenModal>
+    </>
   );
 };
