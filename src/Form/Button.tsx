@@ -36,6 +36,7 @@ export enum ButtonVariant {
 
 export interface ButtonProps<T = HTMLButtonElement> extends TextProps<T> {
   variant?: ButtonVariant;
+  group?: boolean;
   backgroundColor?: string;
   loadingColor?: string;
   noCapital?: boolean;
