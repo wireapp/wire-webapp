@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.49.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.48.0...@wireapp/react-ui-kit@9.49.0) (2025-04-18)
+
+### Features
+
+* **react-ui-kit/icon:** chevron and zoom icons ([#7030](https://github.com/wireapp/wire-web-packages/issues/7030)) ([a6e0baa](https://github.com/wireapp/wire-web-packages/commit/a6e0baab808c9cec9fba4a0024ecd677b79c2451))
+
 # [9.48.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.47.0...@wireapp/react-ui-kit@9.48.0) (2025-04-18)
 
 ### Features
