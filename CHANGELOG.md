@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.48.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.47.0...@wireapp/react-ui-kit@9.48.0) (2025-04-18)
+
+### Features
+
+* **react-ui-kit:** ButtonsGroup ([#7029](https://github.com/wireapp/wire-web-packages/issues/7029)) ([9e378bb](https://github.com/wireapp/wire-web-packages/commit/9e378bb6122d57f90e36fb475e0fb31c6fcac6ab))
+
 # [9.47.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.46.1...@wireapp/react-ui-kit@9.47.0) (2025-04-17)
 
 ### Features
