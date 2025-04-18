@@ -468,12 +468,7 @@ export const Conversation = ({
     [addReadReceiptToBatch, repositories.conversation, repositories.integration, updateConversationLastRead],
   );
 
-  const {
-    getRootProps,
-    getInputProps,
-    open: openCellsUploadWindow,
-    isDragAccept,
-  } = useFilesUploadDropzone({
+  const {getRootProps, getInputProps, openAllFilesView, openImageFilesView, isDragAccept} = useFilesUploadDropzone({
     isTeam: inTeam,
     cellsRepository: repositories.cells,
     conversation: activeConversation,
@@ -582,8 +577,8 @@ export const Conversation = ({
                   uploadDroppedFiles={uploadDroppedFiles}
                   uploadImages={uploadImages}
                   uploadFiles={uploadFiles}
-                  onCellImageUpload={openCellsUploadWindow}
-                  onCellAssetUpload={openCellsUploadWindow}
+                  onCellImageUpload={openImageFilesView}
+                  onCellAssetUpload={openAllFilesView}
                 />
               ))}
 

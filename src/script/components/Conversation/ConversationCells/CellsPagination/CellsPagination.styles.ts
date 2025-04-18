@@ -63,12 +63,26 @@ export const arrowPreviousIconStyles: CSSObject = {
   rotate: '180deg',
 };
 
+export const arrowPreviousIconDisabledStyles: CSSObject = {
+  ...arrowPreviousIconStyles,
+  path: {
+    fill: 'var(--disabled-call-button-svg)',
+  },
+};
+
 export const arrowNextIconStyles: CSSObject = {
   height: '32px',
   path: {
     fill: 'var(--main-color)',
   },
   marginBottom: '2px',
+};
+
+export const arrowNextIconDisabledStyles: CSSObject = {
+  ...arrowNextIconStyles,
+  path: {
+    fill: 'var(--disabled-call-button-svg)',
+  },
 };
 
 export const pageResultStyles: CSSObject = {

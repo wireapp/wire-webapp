@@ -375,6 +375,11 @@ declare module 'I18n/en-US.json' {
     'cellsGlobalView.optionOpen': `Open`;
     'cellsGlobalView.optionShare': `Share`;
     'cellsGlobalView.optionsLabel': `More options`;
+    'cellsGlobalView.pagination.loadMoreResults': `Load More Results`;
+    'cellsGlobalView.pagination.nextPage': `Next Page`;
+    'cellsGlobalView.pagination.previousPage': `Previous Page`;
+    'cellsGlobalView.pagination.resultsOutOf': `{start}-{end} out of {total}`;
+    'cellsGlobalView.pagination.rowsPerPage': `Rows Per Page`;
     'cellsGlobalView.refreshButton': `Refresh list`;
     'cellsGlobalView.searchCloseButton': `Close`;
     'cellsGlobalView.searchFailed': `Something went wrong, please try again later.`;
@@ -398,11 +403,6 @@ declare module 'I18n/en-US.json' {
     'cellsGlobalView.tableRowSharedFalsyValue': `No`;
     'cellsGlobalView.tableRowSharedTruthyValue': `Yes`;
     'cellsGlobalView.tableRowSize': `Size`;
-    'cellsGlobalView.pagination.nextPage': `Next Page`;
-    'cellsGlobalView.pagination.previousPage': `Previous Page`;
-    'cellsGlobalView.pagination.rowsPerPage': `Rows Per Page`;
-    'cellsGlobalView.pagination.resultsOutOf': `{start}-{end} out of {total}`;
-    'cellsGlobalView.pagination.loadMoreResults': `Load More Results`;
     'cellsSidebar.heading': `Files`;
     'cellsSidebar.title': `All`;
     'cellsUnavailableFile': `File not available`;
@@ -410,6 +410,10 @@ declare module 'I18n/en-US.json' {
     'channelConversationFeature1': `[bold]Public[/bold] or [bold]private[/bold] channels`;
     'channelConversationFeature2': `[bold]Conversation history[/bold]`;
     'channelCreationPreferencesPlaceholder': `Channel name`;
+    'channelDetailsActionDelete': `Delete channel`;
+    'channelDetailsActionLeave': `Leave channel`;
+    'channelParticipantActionLeave': `Leave channel…`;
+    'channelsPopoverLeave': `Leave channel`;
     'chooseHandle.handlePlaceholder': `Username`;
     'chooseHandle.headline': `Set username`;
     'chooseHandle.subhead': `Your username helps people find you.`;
@@ -517,13 +521,9 @@ declare module 'I18n/en-US.json' {
     'conversationDetailsActionClear': `Clear content`;
     'conversationDetailsActionConversationParticipants': `Show all ({number})`;
     'conversationDetailsActionCreateGroup': `Create group`;
-    'groupDetailsActionDelete': `Delete group`;
-    'channelDetailsActionDelete': `Delete channel`;
     'conversationDetailsActionDeleteForMe': `Delete for Me`;
     'conversationDetailsActionDevices': `Devices`;
     'conversationDetailsActionGuestOptions': `Guests`;
-    'groupDetailsActionLeave': `Leave group`;
-    'channelDetailsActionLeave': `Leave channel`;
     'conversationDetailsActionNotifications': `Notifications`;
     'conversationDetailsActionServicesOptions': `Services`;
     'conversationDetailsActionTimedMessages': `Self-deleting messages`;
@@ -726,8 +726,6 @@ declare module 'I18n/en-US.json' {
     'conversationsPopoverCancel': `Cancel request`;
     'conversationsPopoverClear': `Clear content`;
     'conversationsPopoverDeleteForMe': `Delete for Me`;
-    'channelsPopoverLeave': `Leave channel`;
-    'groupsPopoverLeave': `Leave group`;
     'conversationsPopoverMoveTo': `Move to`;
     'conversationsPopoverNewFolder': `Create new folder`;
     'conversationsPopoverNoCustomFolders': `No custom folders`;
@@ -773,10 +771,10 @@ declare module 'I18n/en-US.json' {
     'createConversationAccessOptionPrivate': `Private`;
     'createConversationAccessOptionPublic': `Public`;
     'createConversationAccessText': `All team members can join public channels. But, only channel admins or members can add people to a private channel.`;
-    'createConversationConfirmTypeChangeModalCancel': `Cancel`;
-    'createConversationConfirmTypeChangeModalContinue': `Continue`;
-    'createConversationConfirmTypeChangeModalHeader': `Conversation history`;
-    'createConversationConfirmTypeChangeModalText': `If you create a group, the previous conversation history setting selection will be discarded.`;
+    'createConversationConfirmDiscardModalCancel': `Cancel`;
+    'createConversationConfirmDiscardModalContinue': `Continue`;
+    'createConversationConfirmDiscardModalHeader': `Discard selection?`;
+    'createConversationConfirmDiscardModalText': `If you continue, your previous selection will be discarded.`;
     'createConversationGroupNotAllowedContent1': `Group creation is not allowed for externals.`;
     'createConversationGroupNotAllowedContent2': `Please reach out to your team admin.`;
     'createConversationGroupNotAllowedHeader': `You can’t create groups`;
@@ -892,6 +890,8 @@ declare module 'I18n/en-US.json' {
     'groupCreationPreferencesNonFederatingLeave': `Discard Group Creation`;
     'groupCreationPreferencesNonFederatingMessage': `People from backends {backends} can’t join the same group conversation, as their backends can’t communicate with each other. To create the group, remove affected participants. [link]Learn more[/link]`;
     'groupCreationPreferencesPlaceholder': `Group name`;
+    'groupDetailsActionDelete': `Delete group`;
+    'groupDetailsActionLeave': `Leave group`;
     'groupParticipantActionBlock': `Block…`;
     'groupParticipantActionCancelRequest': `Cancel request…`;
     'groupParticipantActionDevices': `Devices`;
@@ -899,7 +899,6 @@ declare module 'I18n/en-US.json' {
     'groupParticipantActionIgnoreRequest': `Ignore request`;
     'groupParticipantActionIncomingRequest': `Accept request`;
     'groupParticipantActionLeave': `Leave group…`;
-    'channelParticipantActionLeave': `Leave channel…`;
     'groupParticipantActionOpenConversation': `Open conversation`;
     'groupParticipantActionPending': `Pending`;
     'groupParticipantActionRemove': `Remove from group…`;
@@ -908,6 +907,7 @@ declare module 'I18n/en-US.json' {
     'groupParticipantActionStartConversation': `Start conversation`;
     'groupParticipantActionUnblock': `Unblock…`;
     'groupSizeInfo': `Up to {count} people can join a group conversation.`;
+    'groupsPopoverLeave': `Leave group`;
     'guestLinkDisabled': `Generating guest links is not allowed in your team.`;
     'guestLinkDisabledByOtherTeam': `You can\'t generate a guest link in this conversation, as it has been created by someone from another team and this team is not allowed to use guest links.`;
     'guestLinkPasswordModal.conversationPasswordProtected': `This conversation is password protected.`;
@@ -1162,6 +1162,7 @@ declare module 'I18n/en-US.json' {
     'modalCallSecondOutgoingMessage': `A call is active in another conversation. Calling here will hang up the other call.`;
     'modalCallUpdateClientHeadline': `Please update {brandName}`;
     'modalCallUpdateClientMessage': `You received a call that isn\'t supported by this version of {brandName}.`;
+    'modalChannelDeleteGroupHeadline': `Delete channel?`;
     'modalCloseButton': `Close`;
     'modalConferenceCallNotSupportedHeadline': `Conference calling is unavailable.`;
     'modalConferenceCallNotSupportedJoinMessage': `To join a group call, please switch to a compatible browser.`;
@@ -1183,8 +1184,6 @@ declare module 'I18n/en-US.json' {
     'modalConversationDeleteErrorHeadline': `Group not deleted`;
     'modalConversationDeleteErrorMessage': `An error occurred while trying to delete the group {name}. Please try again.`;
     'modalConversationDeleteGroupAction': `Delete`;
-    'modalGroupDeleteGroupHeadline': `Delete group conversation?`;
-    'modalChannelDeleteGroupHeadline': `Delete channel?`;
     'modalConversationDeleteGroupMessage': `This will delete the conversation and all content for all participants on all devices. There is no option to restore the content. All participants will be notified.`;
     'modalConversationDeleteMessageAction': `Delete`;
     'modalConversationDeleteMessageAllCloseBtn': `Close window \'Delete for everyone\'`;
@@ -1260,6 +1259,7 @@ declare module 'I18n/en-US.json' {
     'modalCreateGroupProtocolSelect.proteus': `Proteus`;
     'modalGifTooLargeHeadline': `Selected animation is too large`;
     'modalGifTooLargeMessage': `Maximum size is {number} MB.`;
+    'modalGroupDeleteGroupHeadline': `Delete group conversation?`;
     'modalGuestLinkJoinConfirmLabel': `Confirm password`;
     'modalGuestLinkJoinConfirmPlaceholder': `Confirm your password`;
     'modalGuestLinkJoinHelperText': `Use at least {minPasswordLength} characters, with one lowercase letter, one capital letter, a number, and a special character.`;
@@ -1555,9 +1555,9 @@ declare module 'I18n/en-US.json' {
     'redirectConnect': `Connect`;
     'redirectHeader': `Connect to your organization\'s backend?`;
     'redirectHideDetails': `Hide details`;
-    'redirectShowDetails': `Show details`;
     'redirectParagraph1': `Your email belongs to another backend. If you continue, you\'ll leave the official Wire server and we\'ll redirect you to {url}.`;
     'redirectParagraph2': `Your IT team administers this Wire backend. If you have any questions, reach out to them or your team admin.`;
+    'redirectShowDetails': `Show details`;
     'redirectTeamsURL': `Teams URL:`;
     'redirectWebsiteURL': `Website URL:`;
     'replyAudioMessage': `Audio Message`;

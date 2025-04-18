@@ -32,7 +32,6 @@ import {ConversationType, ConversationCreationStep} from './types';
 
 export const CreateConversationHeader = () => {
   const {
-    hideModal,
     error,
     gotoNextStep,
     conversationName,
@@ -41,6 +40,9 @@ export const CreateConversationHeader = () => {
     conversationType,
     gotoLastStep,
     gotoFirstStep,
+    setDiscardTrigger,
+    setIsConfirmDiscardModalOpen,
+    hideModal,
   } = useCreateConversationModal();
   const userState = container.resolve(UserState);
   const selfUser = userState.self();
@@ -63,6 +65,15 @@ export const CreateConversationHeader = () => {
     gotoPreviousStep();
   };
 
+  const onModalClose = () => {
+    if (conversationCreationStep !== ConversationCreationStep.ConversationDetails) {
+      setDiscardTrigger('modalClose');
+      setIsConfirmDiscardModalOpen(true);
+      return;
+    }
+    hideModal();
+  };
+
   const isNextButtonDisabled =
     !!error || !conversationName || (selfUser?.isExternal() && conversationType === ConversationType.Group);
 
@@ -71,7 +82,7 @@ export const CreateConversationHeader = () => {
       <button
         className="button-reset-default"
         type="button"
-        onClick={hideModal}
+        onClick={onModalClose}
         aria-label={t('accessibility.groupCreationActionCloseModal')}
         data-uie-name="do-close"
       >
