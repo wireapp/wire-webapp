@@ -184,7 +184,7 @@ export class CellsAPI {
     }
 
     const result = await this.client.lookup({
-      Locators: {Many: [{Path: path}]},
+      Scope: {Nodes: [{Path: path}]},
       Flags: ['WithPreSignedURLs'],
     });
 
@@ -203,7 +203,7 @@ export class CellsAPI {
     }
 
     const result = await this.client.lookup({
-      Locators: {Many: [{Uuid: uuid}]},
+      Scope: {Nodes: [{Uuid: uuid}]},
       Flags: ['WithPreSignedURLs'],
     });
 
@@ -250,7 +250,7 @@ export class CellsAPI {
     }
 
     const result = await this.client.lookup({
-      Locators: {Many: [{Path: `${path}/*`}]},
+      Scope: {Root: {Path: path}},
       Flags: ['WithPreSignedURLs'],
       Limit: `${limit}`,
       Offset: `${offset}`,
@@ -277,7 +277,11 @@ export class CellsAPI {
     }
 
     const request: RestLookupRequest = {
-      Query: {FileName: phrase, Type: 'LEAF'},
+      Scope: {Root: {Path: '/'}, Recursive: true},
+      Filters: {
+        Text: {SearchIn: 'BaseName', Term: phrase},
+        Type: 'LEAF',
+      },
       Flags: ['WithPreSignedURLs'],
       Limit: `${limit}`,
       Offset: `${offset}`,
