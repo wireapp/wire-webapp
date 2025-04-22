@@ -1,0 +1,21 @@
+{
+  "name": "kalium-backup",
+  "version": "0.0.1-SNAPSHOT",
+  "main": "kalium-backup.js",
+  "types": "kalium-backup.d.ts",
+  "devDependencies": {
+    "typescript": "5.0.4"
+  },
+  "dependencies": {
+    "protobufjs": "^7.3.2",
+    "format-util": "^1.0.5",
+    "@js-joda/core": "3.2.0",
+    "libsodium-wrappers-sumo": "0.7.9",
+    "node-fetch": "2.6.7",
+    "abort-controller": "3.0.0",
+    "ws": "8.5.0"
+  },
+  "peerDependencies": {},
+  "optionalDependencies": {},
+  "bundledDependencies": []
+}
