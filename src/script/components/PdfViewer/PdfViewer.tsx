@@ -23,6 +23,7 @@ import {Document, Page} from 'react-pdf';
 
 import {PdfLoader} from './common/PdfLoader/PdfLoader';
 import {PdfControls} from './PdfControls/PdfControls';
+import {PdfError} from './PdfError/PdfError';
 import {PdfSidebar} from './PdfSidebar/PdfSidebar';
 import {mainContentStyles, pageWrapperStyles, wrapperStyles} from './PdfViewer.styles';
 import {usePageControls} from './usePageControls/usePageControls';
@@ -46,7 +47,13 @@ export const PDFViewer = ({src}: PDFViewerProps) => {
 
   return (
     <div css={wrapperStyles}>
-      <Document file={src} onLoadSuccess={({numPages}) => setPagesCount(numPages)} loading={<PdfLoader />}>
+      <Document
+        file={src}
+        onLoadSuccess={({numPages}) => setPagesCount(numPages)}
+        loading={<PdfLoader />}
+        error={<PdfError />}
+        noData={<PdfError />}
+      >
         <PdfSidebar
           ref={thumbnailsRef}
           sidebarOpen={sidebarOpen}

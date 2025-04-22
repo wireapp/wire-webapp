@@ -1400,6 +1400,8 @@ declare module 'I18n/en-US.json' {
     'pdfViewerNextPage': `Next page`;
     'pdfViewerOpenSidebar': `Open sidebar`;
     'pdfViewerCloseSidebar': `Close sidebar`;
+    'pdfViewerErrorTitle': `Something went wrong`;
+    'pdfViewerErrorDescription': `File preview not available, please try again later.`;
     'preferencesAV': `Audio / Video`;
     'preferencesAVCamera': `Camera`;
     'preferencesAVMicrophone': `Microphone`;
