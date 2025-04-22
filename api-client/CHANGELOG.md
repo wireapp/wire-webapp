@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.46.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.45.0...@wireapp/api-client@27.46.0) (2025-04-22)
+
+### Features
+
+* **react-ui-kit/api-client:** bump cells SDK to alpha10 and re-adapt payloads ([#7031](https://github.com/wireapp/wire-web-packages/issues/7031)) ([4d23313](https://github.com/wireapp/wire-web-packages/commit/4d233138edb903d1f064169b9986c6f76da086c9))
+
 # [27.45.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.44.0...@wireapp/api-client@27.45.0) (2025-04-11)
 
 ### Features
