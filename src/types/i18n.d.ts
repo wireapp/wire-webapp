@@ -1393,6 +1393,13 @@ declare module 'I18n/en-US.json' {
     'participantDevicesWhyVerify': `Why verify conversations?`;
     'pastedFileCloseMessage': `Close`;
     'pastedFileSendMessage': `Send`;
+    'pdfViewerZoomIn': `Zoom in`;
+    'pdfViewerZoomOut': `Zoom out`;
+    'pdfViewerPageNumber': `Page {page} of {total}`;
+    'pdfViewerPreviousPage': `Previous page`;
+    'pdfViewerNextPage': `Next page`;
+    'pdfViewerOpenSidebar': `Open sidebar`;
+    'pdfViewerCloseSidebar': `Close sidebar`;
     'preferencesAV': `Audio / Video`;
     'preferencesAVCamera': `Camera`;
     'preferencesAVMicrophone': `Microphone`;
