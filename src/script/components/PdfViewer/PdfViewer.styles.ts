@@ -27,11 +27,13 @@ export const wrapperStyles: CSSObject = {
 };
 
 export const mainContentStyles: CSSObject = {
+  position: 'relative',
+  height: '100%',
   flex: 1,
   display: 'flex',
   flexDirection: 'column',
-  height: '100%',
-  position: 'relative',
+  alignItems: 'center',
+  justifyContent: 'center',
 };
 
 export const pageWrapperStyles: CSSObject = {
