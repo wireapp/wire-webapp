@@ -73,3 +73,11 @@ testLib.configure({testIdAttribute: 'data-uie-name'});
 jest.mock('@formkit/auto-animate/react', () => ({
   useAutoAnimate: () => [null, () => {}],
 }));
+
+jest.mock('react-pdf', () => ({
+  pdfjs: {
+    GlobalWorkerOptions: {
+      workerSrc: 'pdf.worker.js',
+    },
+  },
+}));
