@@ -331,7 +331,7 @@ describe('CellsAPI', () => {
       const result = await cellsAPI.getAllFiles({path: TEST_FILE_PATH});
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
-        Locators: {Many: [{Path: `${TEST_FILE_PATH}/*`}]},
+        Scope: {Root: {Path: TEST_FILE_PATH}},
         Flags: ['WithPreSignedURLs'],
         Limit: '10',
         Offset: '0',
@@ -352,7 +352,7 @@ describe('CellsAPI', () => {
       const result = await cellsAPI.getAllFiles({path: TEST_FILE_PATH});
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
-        Locators: {Many: [{Path: `${TEST_FILE_PATH}/*`}]},
+        Scope: {Root: {Path: TEST_FILE_PATH}},
         Flags: ['WithPreSignedURLs'],
         Limit: '10',
         Offset: '0',
@@ -377,7 +377,7 @@ describe('CellsAPI', () => {
       });
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
-        Locators: {Many: [{Path: `${TEST_FILE_PATH}/*`}]},
+        Scope: {Root: {Path: TEST_FILE_PATH}},
         Flags: ['WithPreSignedURLs'],
         Limit: '5',
         Offset: '10',
@@ -564,7 +564,7 @@ describe('CellsAPI', () => {
       const result = await cellsAPI.lookupFileByPath({path: filePath});
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
-        Locators: {Many: [{Path: filePath}]},
+        Scope: {Nodes: [{Path: filePath}]},
         Flags: ['WithPreSignedURLs'],
       });
       expect(result).toEqual(mockNode);
@@ -607,7 +607,7 @@ describe('CellsAPI', () => {
       const result = await cellsAPI.lookupFileByUuid({uuid: fileUuid});
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
-        Locators: {Many: [{Uuid: fileUuid}]},
+        Scope: {Nodes: [{Uuid: fileUuid}]},
         Flags: ['WithPreSignedURLs'],
       });
       expect(result).toEqual(mockNode);
@@ -814,7 +814,8 @@ describe('CellsAPI', () => {
       const result = await cellsAPI.searchFiles({phrase: searchPhrase});
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
-        Query: {FileName: searchPhrase, Type: 'LEAF'},
+        Scope: {Root: {Path: '/'}, Recursive: true},
+        Filters: {Text: {SearchIn: 'BaseName', Term: searchPhrase}, Type: 'LEAF'},
         Flags: ['WithPreSignedURLs'],
         Limit: '10',
         Offset: '0',
@@ -844,7 +845,8 @@ describe('CellsAPI', () => {
       const result = await cellsAPI.searchFiles({phrase: searchPhrase});
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
-        Query: {FileName: searchPhrase, Type: 'LEAF'},
+        Scope: {Root: {Path: '/'}, Recursive: true},
+        Filters: {Text: {SearchIn: 'BaseName', Term: searchPhrase}, Type: 'LEAF'},
         Flags: ['WithPreSignedURLs'],
         Limit: '10',
         Offset: '0',
@@ -878,7 +880,8 @@ describe('CellsAPI', () => {
       });
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
-        Query: {FileName: searchPhrase, Type: 'LEAF'},
+        Scope: {Root: {Path: '/'}, Recursive: true},
+        Filters: {Text: {SearchIn: 'BaseName', Term: searchPhrase}, Type: 'LEAF'},
         Flags: ['WithPreSignedURLs'],
         Limit: '5',
         Offset: '10',
@@ -899,7 +902,8 @@ describe('CellsAPI', () => {
       const result = await cellsAPI.searchFiles({phrase: searchPhrase});
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
-        Query: {FileName: searchPhrase, Type: 'LEAF'},
+        Scope: {Root: {Path: '/'}, Recursive: true},
+        Filters: {Text: {SearchIn: 'BaseName', Term: searchPhrase}, Type: 'LEAF'},
         Flags: ['WithPreSignedURLs'],
         Limit: '10',
         Offset: '0',
@@ -929,7 +933,8 @@ describe('CellsAPI', () => {
       const result = await cellsAPI.searchFiles({phrase: searchPhrase});
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
-        Query: {FileName: searchPhrase, Type: 'LEAF'},
+        Scope: {Root: {Path: '/'}, Recursive: true},
+        Filters: {Text: {SearchIn: 'BaseName', Term: searchPhrase}, Type: 'LEAF'},
         Flags: ['WithPreSignedURLs'],
         Limit: '10',
         Offset: '0',
