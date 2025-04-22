@@ -22,6 +22,7 @@ import {CSSProperties, useState, MouseEvent as ReactMouseEvent, KeyboardEvent} f
 import {AlertIcon, MoreIcon} from '@wireapp/react-ui-kit';
 
 import {FileCard} from 'Components/FileCard/FileCard';
+import {PDFViewer} from 'Components/PdfViewer/PdfViewer';
 import {showContextMenu} from 'src/script/ui/ContextMenu';
 import {isSpaceOrEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -38,7 +39,6 @@ import {
   moreButtonStyles,
   moreIconStyles,
 } from './FileAssetWithPreview.styles';
-import {PDFViewer} from './PDFViewer';
 
 import {FileFullscreenModal} from '../../common/FileFullscreenModal/FileFullscreenModal';
 
