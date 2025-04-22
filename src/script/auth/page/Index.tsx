@@ -48,6 +48,8 @@ import {logoutReasonStrings} from '../util/logoutUtil';
 import {getPrefixedSSOCode} from '../util/urlUtil';
 
 type Props = React.HTMLProps<HTMLDivElement>;
+// Hardcoded SSO code for BundID login
+const BUND_SSO_CODE = '8a48f179-f6ed-4fd5-a27a-4dec419ff1e1';
 
 const IndexComponent = ({defaultSSOCode, doInit}: Props & ConnectedProps & DispatchProps) => {
   const navigate = useNavigate();
@@ -153,16 +155,31 @@ const IndexComponent = ({defaultSSOCode, doInit}: Props & ConnectedProps & Dispa
           </ErrorMessage>
         )}
         {(features.ENABLE_SSO || features.ENABLE_DOMAIN_DISCOVERY) && (
-          <Button
-            type="button"
-            variant={ButtonVariant.SECONDARY}
-            onClick={() => navigate(ROUTE.SSO)}
-            block
-            style={{marginTop: '120px'}}
-            data-uie-name="go-sso-login"
-          >
-            {t(features.ENABLE_DOMAIN_DISCOVERY ? 'index.enterprise' : 'index.ssoLogin')}
-          </Button>
+          <>
+            <Button
+              type="button"
+              variant={ButtonVariant.SECONDARY}
+              onClick={() => navigate(ROUTE.SSO)}
+              block
+              style={{marginTop: '120px'}}
+              data-uie-name="go-sso-login"
+            >
+              {t(features.ENABLE_DOMAIN_DISCOVERY ? 'index.enterprise' : 'index.ssoLogin')}
+            </Button>
+            <Button
+              type="button"
+              variant={ButtonVariant.SECONDARY}
+              onClick={() =>
+                navigate(`${ROUTE.SSO}/${getPrefixedSSOCode(BUND_SSO_CODE)}`, {
+                  state: {shouldLogin: true},
+                })
+              }
+              block
+              data-uie-name="go-bund-id-login"
+            >
+              Login with BundID
+            </Button>
+          </>
         )}
       </ContainerXS>
     </Page>
