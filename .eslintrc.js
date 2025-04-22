@@ -9,7 +9,6 @@ module.exports = {
     amplify: 'readonly',
   },
   ignorePatterns: [
-    'TEMP-crossplatform-backup/',
     '.git/',
     'docs/',
     'bin/',
