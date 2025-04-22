@@ -38,8 +38,6 @@ import {useGetMultipartAsset} from './useGetMultipartAsset/useGetMultipartAsset'
 import {VideoAssetCard} from './VideoAssetCard/VideoAssetCard';
 
 interface MultipartAssetsProps {
-  senderName: string;
-  timestamp: number;
   assets: ICellAsset[];
   cellsRepository?: CellsRepository;
   senderName: string;
@@ -47,8 +45,6 @@ interface MultipartAssetsProps {
 }
 
 export const MultipartAssets = ({
-  senderName,
-  timestamp,
   assets,
   cellsRepository = container.resolve(CellsRepository),
   senderName,

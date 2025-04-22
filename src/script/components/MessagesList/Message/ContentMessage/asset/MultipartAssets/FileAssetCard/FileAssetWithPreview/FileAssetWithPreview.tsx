@@ -17,16 +17,12 @@
  *
  */
 
-import {CSSProperties, useState, MouseEvent as ReactMouseEvent, KeyboardEvent} from 'react';
+import {CSSProperties, useState} from 'react';
 
-import {AlertIcon, MoreIcon} from '@wireapp/react-ui-kit';
+import {AlertIcon} from '@wireapp/react-ui-kit';
 
 import {FileCard} from 'Components/FileCard/FileCard';
-import {PDFViewer} from 'Components/PdfViewer/PdfViewer';
-import {showContextMenu} from 'src/script/ui/ContextMenu';
-import {isSpaceOrEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
-import {setContextMenuPosition} from 'Util/util';
 
 import {
   contentWrapperStyles,
@@ -36,11 +32,9 @@ import {
   infoOverlayStyles,
   infoWrapperStyles,
   loaderIconStyles,
-  moreButtonStyles,
-  moreIconStyles,
 } from './FileAssetWithPreview.styles';
 
-import {FileFullscreenModal} from '../../common/FileFullscreenModal/FileFullscreenModal';
+import {FileAssetOptions} from '../common/FileAssetOptions/FileAssetOptions';
 
 interface FileAssetWithPreviewProps {
   src?: string;
@@ -66,31 +60,8 @@ export const FileAssetWithPreview = ({
   timestamp,
 }: FileAssetWithPreviewProps) => {
   const [isImageLoaded, setIsImageLoaded] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const shouldDisplayLoading = (previewUrl ? !isImageLoaded : isLoading) && !isError;
   const shouldDisplayPreviewError = isError || (!isLoading && !previewUrl);
-
-  const showOptionsMenu = (event: ReactMouseEvent<HTMLButtonElement> | MouseEvent) => {
-    showContextMenu({
-      event,
-      entries: [
-        {
-          label: 'Open',
-          click: () => {
-            setIsModalOpen(true);
-          },
-        },
-      ],
-      identifier: 'file-preview-error-more-button',
-    });
-  };
-
-  const handleKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
-    if (isSpaceOrEnterKey(event.key)) {
-      const newEvent = setContextMenuPosition(event);
-      showOptionsMenu(newEvent);
-    }
-  };
 
   return (
     <>
@@ -99,14 +70,7 @@ export const FileAssetWithPreview = ({
           <FileCard.Icon type={isError ? 'unavailable' : 'file'} />
           {!isError && <FileCard.Type />}
           <FileCard.Name variant={isError ? 'secondary' : 'primary'} />
-          <button
-            css={moreButtonStyles}
-            onKeyDown={handleKeyDown}
-            onClick={showOptionsMenu}
-            aria-label={t('cellsGlobalView.optionsLabel')}
-          >
-            <MoreIcon css={moreIconStyles} />
-          </button>
+          <FileAssetOptions src={src} name={name} extension={extension} senderName={senderName} timestamp={timestamp} />
         </FileCard.Header>
         <FileCard.Content>
           <div css={contentWrapperStyles}>
@@ -132,19 +96,6 @@ export const FileAssetWithPreview = ({
           </div>
         </FileCard.Content>
       </FileCard.Root>
-      <FileFullscreenModal
-        id="file-preview-error-modal"
-        fileName={name}
-        fileExtension={extension}
-        senderName={senderName}
-        timestamp={timestamp}
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-        }}
-      >
-        {src && <PDFViewer src={src} />}
-      </FileFullscreenModal>
     </>
   );
 };

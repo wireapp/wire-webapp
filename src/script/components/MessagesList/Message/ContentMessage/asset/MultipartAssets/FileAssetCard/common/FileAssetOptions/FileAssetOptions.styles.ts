@@ -19,22 +19,16 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const wrapperStyles: CSSObject = {
-  '--header-height': '45px',
-  height: 'calc(100% - var(--header-height))',
-  width: '100%',
-  display: 'flex',
+export const buttonStyles: CSSObject = {
+  background: 'none',
+  border: 'none',
+  cursor: 'pointer',
+  padding: '0',
+  marginLeft: 'auto',
+  zIndex: '1',
 };
 
-export const mainContentStyles: CSSObject = {
-  flex: 1,
-  display: 'flex',
-  flexDirection: 'column',
-  height: '100%',
-  position: 'relative',
-};
-
-export const pageWrapperStyles: CSSObject = {
-  overflow: 'auto',
-  margin: '0 auto',
+export const iconStyles: CSSObject = {
+  fill: 'var(--main-color)',
+  display: 'block',
 };
