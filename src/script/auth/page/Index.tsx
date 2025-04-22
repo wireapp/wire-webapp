@@ -153,16 +153,31 @@ const IndexComponent = ({defaultSSOCode, doInit}: Props & ConnectedProps & Dispa
           </ErrorMessage>
         )}
         {(features.ENABLE_SSO || features.ENABLE_DOMAIN_DISCOVERY) && (
-          <Button
-            type="button"
-            variant={ButtonVariant.SECONDARY}
-            onClick={() => navigate(ROUTE.SSO)}
-            block
-            style={{marginTop: '120px'}}
-            data-uie-name="go-sso-login"
-          >
-            {t(features.ENABLE_DOMAIN_DISCOVERY ? 'index.enterprise' : 'index.ssoLogin')}
-          </Button>
+          <>
+            <Button
+              type="button"
+              variant={ButtonVariant.SECONDARY}
+              onClick={() => navigate(ROUTE.SSO)}
+              block
+              style={{marginTop: '120px'}}
+              data-uie-name="go-sso-login"
+            >
+              {t(features.ENABLE_DOMAIN_DISCOVERY ? 'index.enterprise' : 'index.ssoLogin')}
+            </Button>
+            <Button
+              type="button"
+              variant={ButtonVariant.SECONDARY}
+              onClick={() =>
+                navigate(`${ROUTE.SSO}/${getPrefixedSSOCode(Config.getConfig().CUSTOM_SSO_CODE)}`, {
+                  state: {shouldLogin: true},
+                })
+              }
+              block
+              data-uie-name="go-bund-id-login"
+            >
+              {t('index.loginWithBundID')}
+            </Button>
+          </>
         )}
       </ContainerXS>
     </Page>

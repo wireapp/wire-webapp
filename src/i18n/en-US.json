@@ -972,6 +972,7 @@
   "index.or": "or",
   "index.ssoLogin": "Log in with SSO",
   "index.welcome": "Welcome to {brandName}!",
+  "index.loginWithBundID": "Login with BundID",
   "initDecryption": "Decrypting messages",
   "initEvents": "Loading messages",
   "initProgress": " — {number1} of {number2}",
