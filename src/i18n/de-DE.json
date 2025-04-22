@@ -972,7 +972,7 @@
   "index.or": "oder",
   "index.ssoLogin": "Anmelden mit SSO",
   "index.welcome": "Willkommen bei {brandName}!",
-  "index.loginWithBundID": "Login mit BundID",
+  "index.loginWithBundID": "Anmeldung mit BundID",
   "initDecryption": "Entschlüssele Events",
   "initEvents": "Nachrichten werden geladen",
   "initProgress": " — {number1} von {number2}",
