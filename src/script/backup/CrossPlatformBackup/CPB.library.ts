@@ -17,7 +17,7 @@
  *
  */
 
-import {com} from 'kalium-backup';
+import {com} from '@wireapp/kalium-backup';
 
 // Importing classes from the Java library
 /* eslint-disable */

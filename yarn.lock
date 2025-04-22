@@ -14649,21 +14649,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"kalium-backup@file:./TEMP-crossplatform-backup::locator=wire-webapp%40workspace%3A.":
-  version: 0.0.1-SNAPSHOT
-  resolution: "kalium-backup@file:./TEMP-crossplatform-backup#./TEMP-crossplatform-backup::hash=fc41d0&locator=wire-webapp%40workspace%3A."
-  dependencies:
-    "@js-joda/core": "npm:3.2.0"
-    abort-controller: "npm:3.0.0"
-    format-util: "npm:^1.0.5"
-    libsodium-wrappers-sumo: "npm:0.7.9"
-    node-fetch: "npm:2.6.7"
-    protobufjs: "npm:^7.3.2"
-    ws: "npm:8.5.0"
-  checksum: 10/2fcac36a053b8e541fd763321596f981d583c30ae3e95e19cef79c105c6f484c514149c2c533959867ef94a6eef32863799089758fa7621080714f02f324c816
-  languageName: node
-  linkType: hard
-
 "keyboardjs@npm:2.7.0":
   version: 2.7.0
   resolution: "keyboardjs@npm:2.7.0"
@@ -21264,7 +21249,6 @@ __metadata:
     js-cookie: "npm:3.0.5"
     jsdom-worker: "npm:0.3.0"
     jszip: "npm:3.10.1"
-    kalium-backup: ./TEMP-crossplatform-backup
     keyboardjs: "npm:2.7.0"
     knockout: "npm:3.5.1"
     less: "npm:4.2.2"
