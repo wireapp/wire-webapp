@@ -23,9 +23,9 @@ export const buttonStyles: CSSObject = {
   background: 'none',
   border: 'none',
   cursor: 'pointer',
-  padding: '0',
   margin: '0',
   width: '100%',
+  padding: '12px 0',
 
   '@media (min-width: 1100px)': {
     display: 'flex',
@@ -33,6 +33,7 @@ export const buttonStyles: CSSObject = {
     justifyContent: 'center',
     width: '40px',
     height: '40px',
+    padding: '0',
   },
 };
 

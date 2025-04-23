@@ -23,7 +23,7 @@ export const buttonStyles: CSSObject = {
   background: 'none',
   border: 'none',
   cursor: 'pointer',
-  padding: '0',
+  padding: '12px 0',
   margin: '0',
   width: '100%',
 
@@ -33,6 +33,7 @@ export const buttonStyles: CSSObject = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+    padding: '0',
   },
 };
 
