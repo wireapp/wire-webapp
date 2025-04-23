@@ -17,39 +17,28 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {useCallback, useState} from 'react';
 
-export const buttonStyles: CSSObject = {
-  background: 'none',
-  border: 'none',
-  cursor: 'pointer',
-  padding: '0',
-  margin: '0',
-  width: '100%',
+import {CellFile} from '../common/cellFile/cellFile';
 
-  '@media (min-width: 1100px)': {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '40px',
-    height: '40px',
-  },
-};
+interface UseCellsLoaderSizeProps {
+  files: CellFile[];
+}
 
-export const iconStyles: CSSObject = {
-  fill: 'var(--main-color)',
-  display: 'none',
-  '@media (min-width: 1100px)': {
-    display: 'block',
-  },
-};
+export const useCellsLoaderSize = ({files}: UseCellsLoaderSizeProps) => {
+  const [loaderHeight, setLoaderHeight] = useState<number | undefined>(() => {
+    if (files) {
+      return undefined;
+    }
+    return 0;
+  });
 
-export const textStyles: CSSObject = {
-  display: 'block',
-  textAlign: 'center',
-  fontWeight: 'var(--font-weight-semibold)',
+  const updateHeight = useCallback((height: number) => {
+    setLoaderHeight(height);
+  }, []);
 
-  '@media (min-width: 1100px)': {
-    display: 'none',
-  },
+  return {
+    loaderHeight,
+    updateHeight,
+  };
 };

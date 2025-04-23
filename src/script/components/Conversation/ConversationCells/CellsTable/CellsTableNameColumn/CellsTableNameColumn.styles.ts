@@ -55,7 +55,6 @@ export const playIconStyles: CSSObject = {
 export const desktopNameStyles: CSSObject = {
   textOverflow: 'ellipsis',
   overflow: 'hidden',
-  maxWidth: '300px',
   whiteSpace: 'nowrap',
   fontWeight: 'var(--font-weight-semibold)',
 };

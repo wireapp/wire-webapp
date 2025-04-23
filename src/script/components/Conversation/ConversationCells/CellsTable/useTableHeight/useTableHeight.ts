@@ -17,39 +17,23 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {useRef, useEffect} from 'react';
 
-export const buttonStyles: CSSObject = {
-  background: 'none',
-  border: 'none',
-  cursor: 'pointer',
-  padding: '0',
-  margin: '0',
-  width: '100%',
+interface UseTableHeightProps {
+  onUpdate: (height: number) => void;
+}
 
-  '@media (min-width: 1100px)': {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '40px',
-    height: '40px',
-  },
-};
+export const useTableHeight = ({onUpdate}: UseTableHeightProps) => {
+  const tableBodyRef = useRef<HTMLTableSectionElement>(null);
 
-export const iconStyles: CSSObject = {
-  fill: 'var(--main-color)',
-  display: 'none',
-  '@media (min-width: 1100px)': {
-    display: 'block',
-  },
-};
+  useEffect(() => {
+    const updateHeight = () => {
+      if (tableBodyRef.current && onUpdate) {
+        onUpdate(tableBodyRef.current.clientHeight);
+      }
+    };
+    updateHeight();
+  }, [onUpdate]);
 
-export const textStyles: CSSObject = {
-  display: 'block',
-  textAlign: 'center',
-  fontWeight: 'var(--font-weight-semibold)',
-
-  '@media (min-width: 1100px)': {
-    display: 'none',
-  },
+  return {tableBodyRef};
 };
