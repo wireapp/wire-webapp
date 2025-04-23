@@ -53,8 +53,6 @@ export const tableCellStyles: CSSObject = {
     padding: '12px 0',
     borderBottom: '1px solid var(--border-color)',
     width: '100% !important',
-    minWidth: '100% !important',
-    maxWidth: '100% !important',
 
     '&[data-cell]': {
       borderBottom: '1px solid var(--border-color)',

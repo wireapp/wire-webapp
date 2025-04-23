@@ -86,7 +86,7 @@ export const CellsTable = ({files, cellsRepository, onDeleteFile}: CellsTablePro
       columnHelper.accessor('owner', {
         header: t('cellsGlobalView.tableRowOwner'),
         cell: info => <span css={textWithEllipsisStyles}>{info.getValue()}</span>,
-        size: 170,
+        size: 175,
       }),
       columnHelper.accessor('sizeMb', {
         header: t('cellsGlobalView.tableRowSize'),
