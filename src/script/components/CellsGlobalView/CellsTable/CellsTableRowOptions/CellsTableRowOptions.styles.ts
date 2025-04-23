@@ -27,20 +27,19 @@ export const buttonStyles: CSSObject = {
   margin: '0',
   width: '100%',
 
-  '@media (min-width: 900px)': {
+  '@media (min-width: 1000px)': {
+    width: '40px',
+    height: '40px',
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'flex-end',
-    width: '32px',
-    height: '32px',
-    marginLeft: 'auto',
+    justifyContent: 'center',
   },
 };
 
 export const iconStyles: CSSObject = {
   fill: 'var(--main-color)',
   display: 'none',
-  '@media (min-width: 900px)': {
+  '@media (min-width: 1000px)': {
     display: 'block',
   },
 };
@@ -50,7 +49,7 @@ export const textStyles: CSSObject = {
   textAlign: 'center',
   fontWeight: 'var(--font-weight-semibold)',
 
-  '@media (min-width: 900px)': {
+  '@media (min-width: 1000px)': {
     display: 'none',
   },
 };

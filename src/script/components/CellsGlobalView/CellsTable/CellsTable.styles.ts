@@ -21,12 +21,12 @@ import {CSSObject} from '@emotion/react';
 
 export const wrapperStyles: CSSObject = {
   maxWidth: '100%',
-  overflowX: 'auto',
 };
 
 export const tableStyles: CSSObject = {
   width: '100%',
   borderCollapse: 'collapse',
+  tableLayout: 'fixed',
 };
 
 export const headerCellStyles: CSSObject = {
@@ -37,7 +37,7 @@ export const headerCellStyles: CSSObject = {
   fontWeight: 'var(--font-weight-medium)',
   whiteSpace: 'nowrap',
 
-  '@media (max-width: 900px)': {
+  '@media (max-width: 1000px)': {
     display: 'none',
   },
 };
@@ -48,10 +48,13 @@ export const tableCellStyles: CSSObject = {
   fontSize: 'var(--font-size-small)',
   whiteSpace: 'nowrap',
 
-  '@media (max-width: 900px)': {
+  '@media (max-width: 1000px)': {
     display: 'block',
     padding: '12px 0',
     borderBottom: '1px solid var(--border-color)',
+    width: '100% !important',
+    minWidth: '100% !important',
+    maxWidth: '100% !important',
 
     '&[data-cell]': {
       borderBottom: '1px solid var(--border-color)',
@@ -69,12 +72,14 @@ export const tableCellStyles: CSSObject = {
 
 export const tableActionsCellStyles: CSSObject = {
   ...tableCellStyles,
-  '@media (max-width: 900px)': {
+  padding: 0,
+  '@media (max-width: 1000px)': {
     display: 'block',
     background: 'var(--foreground-fade-8)',
     border: 'none',
     marginTop: '8px',
     borderRadius: '8px',
+    width: '100% !important',
   },
 };
 
@@ -88,7 +93,7 @@ export const tableCellRow: CSSObject = {
     marginBottom: '32px',
   },
 
-  '@media (min-width: 900px)': {
+  '@media (min-width: 1000px)': {
     display: 'table-row',
     padding: '0',
     border: 'none',
