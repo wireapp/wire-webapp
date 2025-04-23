@@ -138,7 +138,7 @@ const MultipartAsset = ({
   }
 
   return (
-    <li ref={elementRef} css={fileCardStyles(isSingleAsset)}>
+    <li ref={elementRef} css={fileCardStyles}>
       <FileAssetCard
         variant={variant}
         extension={extension}
