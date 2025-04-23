@@ -100,3 +100,10 @@ export const tableCellRow: CSSObject = {
     borderRadius: '0',
   },
 };
+
+export const textWithEllipsisStyles: CSSObject = {
+  display: 'block',
+  textOverflow: 'ellipsis',
+  overflow: 'hidden',
+  whiteSpace: 'nowrap',
+};

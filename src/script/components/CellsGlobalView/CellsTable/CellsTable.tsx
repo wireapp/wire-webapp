@@ -34,6 +34,7 @@ import {
   tableCellRow,
   tableCellStyles,
   tableStyles,
+  textWithEllipsisStyles,
   wrapperStyles,
 } from './CellsTable.styles';
 import {CellsTableDateColumn} from './CellsTableDateColumn/CellsTableDateColumn';
@@ -79,12 +80,12 @@ export const CellsTable = ({files, cellsRepository, onDeleteFile}: CellsTablePro
       }),
       columnHelper.accessor('conversationName', {
         header: t('cellsGlobalView.tableRowConversationName'),
-        cell: info => info.getValue(),
+        cell: info => <span css={textWithEllipsisStyles}>{info.getValue()}</span>,
         size: 190,
       }),
       columnHelper.accessor('owner', {
         header: t('cellsGlobalView.tableRowOwner'),
-        cell: info => info.getValue(),
+        cell: info => <span css={textWithEllipsisStyles}>{info.getValue()}</span>,
         size: 170,
       }),
       columnHelper.accessor('sizeMb', {

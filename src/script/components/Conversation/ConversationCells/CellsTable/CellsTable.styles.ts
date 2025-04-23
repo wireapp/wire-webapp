@@ -21,12 +21,12 @@ import {CSSObject} from '@emotion/react';
 
 export const wrapperStyles: CSSObject = {
   maxWidth: '100%',
-  overflowX: 'auto',
 };
 
 export const tableStyles: CSSObject = {
   width: '100%',
   borderCollapse: 'collapse',
+  tableLayout: 'fixed',
 };
 
 export const headerCellStyles: CSSObject = {
@@ -36,17 +36,18 @@ export const headerCellStyles: CSSObject = {
   fontSize: 'var(--font-size-small)',
   fontWeight: 'var(--font-weight-medium)',
   whiteSpace: 'nowrap',
-  width: 'var(--column-width)',
+  //   width: 'var(--column-width)',
   '@media (max-width: 1100px)': {
     display: 'none',
   },
 };
 
 export const tableCellStyles: CSSObject = {
-  padding: '8px 12px',
+  padding: '12px',
   borderBottom: '1px solid var(--border-color)',
   fontSize: 'var(--font-size-small)',
   whiteSpace: 'nowrap',
+  width: '100% !important',
 
   '@media (max-width: 1100px)': {
     display: 'block',
@@ -69,12 +70,14 @@ export const tableCellStyles: CSSObject = {
 
 export const tableActionsCellStyles: CSSObject = {
   ...tableCellStyles,
+  padding: '0',
   '@media (max-width: 1100px)': {
     display: 'block',
     background: 'var(--foreground-fade-8)',
     border: 'none',
     marginTop: '8px',
     borderRadius: '8px',
+    width: '100% !important',
   },
 };
 
@@ -93,5 +96,14 @@ export const tableCellRow: CSSObject = {
     padding: '0',
     border: 'none',
     borderRadius: '0',
+  },
+};
+
+export const textWithEllipsisStyles: CSSObject = {
+  '@media (min-width: 1100px)': {
+    display: 'block',
+    textOverflow: 'ellipsis',
+    overflow: 'hidden',
+    whiteSpace: 'nowrap',
   },
 };
