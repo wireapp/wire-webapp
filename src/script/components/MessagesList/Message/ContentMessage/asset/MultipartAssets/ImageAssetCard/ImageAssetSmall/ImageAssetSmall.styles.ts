@@ -26,6 +26,8 @@ export const containerStyles: CSSObject = {
   border: 'none',
   padding: 0,
   margin: 0,
+  borderRadius: '10px',
+  backgroundColor: 'var(--foreground-fade-8)',
 };
 
 export const imageStyles: CSSObject = {
