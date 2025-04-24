@@ -23,6 +23,7 @@ import {FileAssetSmall} from './FileAssetSmall/FileAsseetSmall';
 import {FileAssetWithPreview} from './FileAssetWithPreview/FileAssetWithPreview';
 
 interface FileAssetCardProps {
+  src?: string;
   variant: 'large' | 'small';
   extension: string;
   name: string;
@@ -30,20 +31,36 @@ interface FileAssetCardProps {
   isLoading: boolean;
   isError: boolean;
   previewUrl?: string;
+  senderName: string;
+  timestamp: number;
 }
 
-export const FileAssetCard = ({variant, extension, name, size, isLoading, isError, previewUrl}: FileAssetCardProps) => {
+export const FileAssetCard = ({
+  src,
+  variant,
+  extension,
+  name,
+  size,
+  isLoading,
+  isError,
+  previewUrl,
+  senderName,
+  timestamp,
+}: FileAssetCardProps) => {
   const formattedName = isError ? t('cellsUnavailableFile') : name;
 
   if (variant === 'large') {
     return (
       <FileAssetWithPreview
+        src={src}
         extension={extension}
         name={formattedName}
         size={size}
         isError={isError}
         isLoading={isLoading}
         previewUrl={previewUrl}
+        senderName={senderName}
+        timestamp={timestamp}
       />
     );
   }
