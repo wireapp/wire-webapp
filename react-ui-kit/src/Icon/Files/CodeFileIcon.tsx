@@ -21,7 +21,7 @@ import {SVGIcon, SVGIconProps} from '../SVGIcon';
 
 export const CodeFileIcon = ({...props}: SVGIconProps) => {
   return (
-    <SVGIcon realWidth={14} realHeight={16} fill="none" {...props}>
+    <SVGIcon realWidth={13} realHeight={16} fill="none" {...props}>
       <path
         fill="var(--code-file-icon-bg)"
         stroke="var(--code-file-icon-stroke)"

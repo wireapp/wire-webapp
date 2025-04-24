@@ -21,7 +21,7 @@ import {SVGIcon, SVGIconProps} from '../SVGIcon';
 
 export const AudioFileIcon = ({...props}: SVGIconProps) => {
   return (
-    <SVGIcon realWidth={14} realHeight={16} fill="none" {...props}>
+    <SVGIcon realWidth={13} realHeight={16} fill="none" {...props}>
       <path
         fill="var(--audio-file-icon-bg)"
         stroke="var(--audio-file-icon-stroke)"

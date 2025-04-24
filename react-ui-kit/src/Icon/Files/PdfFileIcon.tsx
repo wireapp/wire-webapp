@@ -21,7 +21,7 @@ import {SVGIcon, SVGIconProps} from '../SVGIcon';
 
 export const PdfFileIcon = ({...props}: SVGIconProps) => {
   return (
-    <SVGIcon realWidth={14} realHeight={16} fill="none" {...props}>
+    <SVGIcon realWidth={13} realHeight={16} fill="none" {...props}>
       <path
         fill="var(--pdf-file-icon-bg)"
         stroke="var(--pdf-file-icon-stroke)"
