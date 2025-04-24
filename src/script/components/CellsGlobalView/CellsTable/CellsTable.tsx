@@ -24,10 +24,8 @@ import {createColumnHelper, flexRender, getCoreRowModel, useReactTable} from '@t
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
-import {forcedDownloadFile} from 'Util/util';
+import {getFileExtension} from 'Util/util';
 
-import {showCellsImagePreviewModal} from './CellsImagePreviewModal/CellsImagePreviewModal';
-import {showShareFileModal} from './CellsShareFileModal/CellsShareFileModal';
 import {
   headerCellStyles,
   tableActionsCellStyles,
@@ -100,20 +98,17 @@ export const CellsTable = ({files, cellsRepository, onDeleteFile}: CellsTablePro
       columnHelper.accessor('id', {
         header: () => <span className="visually-hidden">{t('cellsGlobalView.tableRowActions')}</span>,
         cell: info => {
-          const {previewImageUrl, fileUrl} = info.row.original;
-          const uuid = info.getValue();
+          const {name, owner, fileUrl, uploadedAtTimestamp} = info.row.original;
           return (
             <CellsTableRowOptions
-              onOpen={
-                previewImageUrl
-                  ? () => {
-                      showCellsImagePreviewModal({imageSrc: previewImageUrl});
-                    }
-                  : undefined
-              }
-              onShare={() => showShareFileModal({uuid, cellsRepository})}
-              onDownload={fileUrl ? () => forcedDownloadFile({url: fileUrl, name: info.row.original.name}) : undefined}
-              onDelete={() => showDeleteFileModal({uuid, name: info.row.original.name})}
+              fileUuid={info.getValue()}
+              fileUrl={fileUrl ?? ''}
+              fileName={name}
+              fileExtension={getFileExtension(name)}
+              senderName={owner}
+              timestamp={uploadedAtTimestamp}
+              onDelete={onDeleteFile}
+              cellsRepository={cellsRepository}
             />
           );
         },

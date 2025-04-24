@@ -17,25 +17,59 @@
  *
  */
 
-import {KeyboardEvent, MouseEvent as ReactMouseEvent} from 'react';
+import {KeyboardEvent, MouseEvent as ReactMouseEvent, useCallback, useId, useState} from 'react';
 
 import {MoreIcon} from '@wireapp/react-ui-kit';
 
+import {ImageFullscreenModal} from 'Components/MessagesList/Message/ContentMessage/asset/MultipartAssets/ImageAssetCard/common/ImageFullscreenModal/ImageFullscreenModal';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/ContextMenu';
 import {isSpaceOrEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
-import {setContextMenuPosition} from 'Util/util';
+import {forcedDownloadFile, setContextMenuPosition} from 'Util/util';
 
 import {buttonStyles, iconStyles, textStyles} from './CellsTableRowOptions.styles';
 
+import {showShareFileModal} from '../CellsShareFileModal/CellsShareFileModal';
+
 interface CellsTableRowOptionsProps {
-  onOpen?: () => void;
-  onShare: () => void;
-  onDownload?: () => void;
-  onDelete: () => void;
+  fileUuid: string;
+  fileUrl: string;
+  fileName: string;
+  fileExtension: string;
+  timestamp: number;
+  senderName: string;
+  onDelete: (uuid: string) => void;
+  cellsRepository: CellsRepository;
 }
 
-export const CellsTableRowOptions = ({onOpen, onShare, onDownload, onDelete}: CellsTableRowOptionsProps) => {
+export const CellsTableRowOptions = ({
+  fileUuid,
+  fileUrl,
+  fileName,
+  fileExtension,
+  senderName,
+  timestamp,
+  onDelete,
+  cellsRepository,
+}: CellsTableRowOptionsProps) => {
+  const [fileModalOpen, setFileModalOpen] = useState(false);
+  const id = useId();
+
+  const showDeleteFileModal = useCallback(
+    ({uuid, name}: {uuid: string; name: string}) => {
+      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
+        primaryAction: {action: () => onDelete(uuid), text: t('cellsGlobalView.optionDelete')},
+        text: {
+          message: t('cellsGlobalView.deleteModalDescription', {name}),
+          title: t('cellsGlobalView.deleteModalHeading'),
+        },
+      });
+    },
+    [onDelete],
+  );
+
   const showOptionsMenu = (event: ReactMouseEvent<HTMLButtonElement> | MouseEvent) => {
     const openLabel = t('cellsGlobalView.optionOpen');
     const shareLabel = t('cellsGlobalView.optionShare');
@@ -45,10 +79,13 @@ export const CellsTableRowOptions = ({onOpen, onShare, onDownload, onDelete}: Ce
     showContextMenu({
       event,
       entries: [
-        {label: shareLabel, click: onShare},
-        onOpen ? {label: openLabel, click: onOpen} : undefined,
-        onDownload ? {label: downloadLabel, click: onDownload} : undefined,
-        {label: deleteLabel, click: onDelete},
+        {
+          label: shareLabel,
+          click: () => showShareFileModal({uuid: fileUuid, cellsRepository}),
+        },
+        {label: openLabel, click: () => setFileModalOpen(true)},
+        fileUrl ? {label: downloadLabel, click: () => forcedDownloadFile({url: fileUrl, name: fileName})} : undefined,
+        {label: deleteLabel, click: () => showDeleteFileModal({uuid: fileUuid, name: fileName})},
       ].filter(Boolean) as ContextMenuEntry[],
       identifier: 'file-preview-error-more-button',
     });
@@ -62,14 +99,26 @@ export const CellsTableRowOptions = ({onOpen, onShare, onDownload, onDelete}: Ce
   };
 
   return (
-    <button
-      css={buttonStyles}
-      onKeyDown={handleKeyDown}
-      onClick={showOptionsMenu}
-      aria-label={t('cellsGlobalView.optionsLabel')}
-    >
-      <MoreIcon css={iconStyles} />
-      <span css={textStyles}>{t('cellsGlobalView.optionsLabel')}</span>
-    </button>
+    <>
+      <button
+        css={buttonStyles}
+        onKeyDown={handleKeyDown}
+        onClick={showOptionsMenu}
+        aria-label={t('cellsGlobalView.optionsLabel')}
+      >
+        <MoreIcon css={iconStyles} />
+        <span css={textStyles}>{t('cellsGlobalView.optionsLabel')}</span>
+      </button>
+      <ImageFullscreenModal
+        id={id}
+        isOpen={fileModalOpen}
+        onClose={() => setFileModalOpen(false)}
+        imageSrc={fileUrl}
+        imageName={fileName}
+        imageExtension={fileExtension}
+        senderName={senderName}
+        timestamp={timestamp}
+      />
+    </>
   );
 };
