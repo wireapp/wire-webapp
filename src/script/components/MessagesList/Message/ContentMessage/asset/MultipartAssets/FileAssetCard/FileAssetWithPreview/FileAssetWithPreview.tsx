@@ -34,58 +34,68 @@ import {
   loaderIconStyles,
 } from './FileAssetWithPreview.styles';
 
+import {FileAssetOptions} from '../common/FileAssetOptions/FileAssetOptions';
+
 interface FileAssetWithPreviewProps {
+  src?: string;
   extension: string;
   name: string;
   size: string;
   previewUrl?: string;
   isLoading: boolean;
   isError: boolean;
+  senderName: string;
+  timestamp: number;
 }
 
 export const FileAssetWithPreview = ({
+  src,
   extension,
   name,
   size,
   previewUrl,
   isError,
   isLoading,
+  senderName,
+  timestamp,
 }: FileAssetWithPreviewProps) => {
   const [isImageLoaded, setIsImageLoaded] = useState(false);
-
   const shouldDisplayLoading = (previewUrl ? !isImageLoaded : isLoading) && !isError;
   const shouldDisplayPreviewError = isError || (!isLoading && !previewUrl);
 
   return (
-    <FileCard.Root variant="large" extension={extension} name={name} size={size}>
-      <FileCard.Header>
-        <FileCard.Icon type={isError ? 'unavailable' : 'file'} />
-        {!isError && <FileCard.Type />}
-        <FileCard.Name variant={isError ? 'secondary' : 'primary'} />
-      </FileCard.Header>
-      <FileCard.Content>
-        <div css={contentWrapperStyles}>
-          <img
-            src={previewUrl}
-            style={{'--opacity': isImageLoaded && previewUrl ? 1 : 0} as CSSProperties}
-            alt=""
-            css={imageStyles}
-            onLoad={() => setIsImageLoaded(true)}
-          />
+    <>
+      <FileCard.Root variant="large" extension={extension} name={name} size={size}>
+        <FileCard.Header>
+          <FileCard.Icon type={isError ? 'unavailable' : 'file'} />
+          {!isError && <FileCard.Type />}
+          <FileCard.Name variant={isError ? 'secondary' : 'primary'} />
+          <FileAssetOptions src={src} name={name} extension={extension} senderName={senderName} timestamp={timestamp} />
+        </FileCard.Header>
+        <FileCard.Content>
+          <div css={contentWrapperStyles}>
+            <img
+              src={previewUrl}
+              style={{'--opacity': isImageLoaded && previewUrl ? 1 : 0} as CSSProperties}
+              alt=""
+              css={imageStyles}
+              onLoad={() => setIsImageLoaded(true)}
+            />
 
-          <div css={infoOverlayStyles}>
-            <div css={infoWrapperStyles}>
-              {shouldDisplayLoading && <div className="icon-spinner spin" css={loaderIconStyles} />}
-              {shouldDisplayPreviewError && (
-                <>
-                  <AlertIcon css={errorIconStyles} width={14} height={14} />
-                  <p css={errorTextStyles}>{t('cellsUnavailableFilePreview')}</p>
-                </>
-              )}
+            <div css={infoOverlayStyles}>
+              <div css={infoWrapperStyles}>
+                {shouldDisplayLoading && <div className="icon-spinner spin" css={loaderIconStyles} />}
+                {shouldDisplayPreviewError && (
+                  <>
+                    <AlertIcon css={errorIconStyles} width={14} height={14} />
+                    <p css={errorTextStyles}>{t('cellsUnavailableFilePreview')}</p>
+                  </>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      </FileCard.Content>
-    </FileCard.Root>
+        </FileCard.Content>
+      </FileCard.Root>
+    </>
   );
 };
