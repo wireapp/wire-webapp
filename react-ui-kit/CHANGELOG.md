@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.50.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.49.0...@wireapp/react-ui-kit@9.50.0) (2025-04-24)
+
+### Features
+
+* add hamburger icon [WPB-17114] ([#7032](https://github.com/wireapp/wire-web-packages/issues/7032)) ([1e058aa](https://github.com/wireapp/wire-web-packages/commit/1e058aaae8aaef279d64d5c21653c5a1088e499b))
+
 # [9.49.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.48.0...@wireapp/react-ui-kit@9.49.0) (2025-04-18)
 
 ### Features
