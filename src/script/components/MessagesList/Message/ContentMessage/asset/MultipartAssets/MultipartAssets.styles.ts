@@ -36,8 +36,8 @@ export const listSingleItemStyles: CSSObject = {
   alignItems: 'flex-start',
   justifyContent: 'flex-start',
   listStyle: 'none',
+  padding: '8px 8px 8px 0',
   margin: '0',
-  padding: '0',
 };
 
 const largeCardStyles: CSSObject = {
