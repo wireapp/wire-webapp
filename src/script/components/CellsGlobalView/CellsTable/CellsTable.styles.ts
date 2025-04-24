@@ -19,6 +19,8 @@
 
 import {CSSObject} from '@emotion/react';
 
+import {styleBreakpoint} from '../common/styleBreakpoint/styleBreakpoint';
+
 export const wrapperStyles: CSSObject = {
   maxWidth: '100%',
 };
@@ -37,7 +39,7 @@ export const headerCellStyles: CSSObject = {
   fontWeight: 'var(--font-weight-medium)',
   whiteSpace: 'nowrap',
 
-  '@media (max-width: 1000px)': {
+  [`@media (max-width: ${styleBreakpoint}px)`]: {
     display: 'none',
   },
 };
@@ -48,7 +50,7 @@ export const tableCellStyles: CSSObject = {
   fontSize: 'var(--font-size-small)',
   whiteSpace: 'nowrap',
 
-  '@media (max-width: 1000px)': {
+  [`@media (max-width: ${styleBreakpoint}px)`]: {
     display: 'block',
     padding: '12px 0',
     borderBottom: '1px solid var(--border-color)',
@@ -71,7 +73,7 @@ export const tableCellStyles: CSSObject = {
 export const tableActionsCellStyles: CSSObject = {
   ...tableCellStyles,
   padding: 0,
-  '@media (max-width: 1000px)': {
+  [`@media (max-width: ${styleBreakpoint}px)`]: {
     display: 'block',
     background: 'var(--foreground-fade-8)',
     border: 'none',
@@ -91,7 +93,7 @@ export const tableCellRow: CSSObject = {
     marginBottom: '32px',
   },
 
-  '@media (min-width: 1000px)': {
+  [`@media (min-width: ${styleBreakpoint}px)`]: {
     display: 'table-row',
     padding: '0',
     border: 'none',

@@ -19,10 +19,12 @@
 
 import {CSSObject} from '@emotion/react';
 
+import {styleBreakpoint} from '../../common/styleBreakpoint/styleBreakpoint';
+
 export const wrapperStyles: CSSObject = {
   display: 'none',
 
-  '@media (min-width: 1000px)': {
+  [`@media (min-width: ${styleBreakpoint}px)`]: {
     display: 'flex',
     alignItems: 'center',
     gap: '32px',
@@ -61,7 +63,7 @@ export const desktopNameStyles: CSSObject = {
 };
 
 export const mobileNameStyles: CSSObject = {
-  '@media (min-width: 1000px)': {
+  [`@media (min-width: ${styleBreakpoint}px)`]: {
     display: 'none',
   },
 };

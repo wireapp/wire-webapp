@@ -19,6 +19,8 @@
 
 import {CSSObject} from '@emotion/react';
 
+import {styleBreakpoint} from '../../common/styleBreakpoint/styleBreakpoint';
+
 export const buttonStyles: CSSObject = {
   background: 'none',
   border: 'none',
@@ -27,7 +29,7 @@ export const buttonStyles: CSSObject = {
   margin: '0',
   width: '100%',
 
-  '@media (min-width: 1000px)': {
+  [`@media (min-width: ${styleBreakpoint}px)`]: {
     width: '40px',
     height: '40px',
     display: 'flex',
@@ -40,7 +42,7 @@ export const buttonStyles: CSSObject = {
 export const iconStyles: CSSObject = {
   fill: 'var(--main-color)',
   display: 'none',
-  '@media (min-width: 1000px)': {
+  [`@media (min-width: ${styleBreakpoint}px)`]: {
     display: 'block',
   },
 };
@@ -50,7 +52,7 @@ export const textStyles: CSSObject = {
   textAlign: 'center',
   fontWeight: 'var(--font-weight-semibold)',
 
-  '@media (min-width: 1000px)': {
+  [`@media (min-width: ${styleBreakpoint}px)`]: {
     display: 'none',
   },
 };
