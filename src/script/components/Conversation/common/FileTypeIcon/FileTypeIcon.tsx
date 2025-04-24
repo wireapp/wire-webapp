@@ -17,7 +17,7 @@
  *
  */
 
-import {ComponentType} from 'react';
+import {ComponentType, CSSProperties} from 'react';
 
 import {SVGIconProps} from '@wireapp/react-ui-kit/lib/Icon/SVGIcon';
 
@@ -36,7 +36,7 @@ import {
 } from '@wireapp/react-ui-kit';
 
 import {FileType} from './fileType';
-import {iconStyles} from './FileTypeIcon.styles';
+import {iconStyles, wrapperStyles} from './FileTypeIcon.styles';
 import {getFileTypeFromExtension} from './getFileTypeFromExtension/getFileTypeFromExtension';
 
 interface FileTypeIconProps {
@@ -48,7 +48,11 @@ export const FileTypeIcon = ({extension, size = 16}: FileTypeIconProps) => {
   const type = getFileTypeFromExtension(extension);
   const Icon = fileIcons[type];
 
-  return <Icon width={size} height={size} css={iconStyles} />;
+  return (
+    <div css={wrapperStyles} style={{'--size': `${size}px`} as CSSProperties}>
+      <Icon width={size} height={size} css={iconStyles} />
+    </div>
+  );
 };
 
 const fileIcons: Record<FileType, ComponentType<SVGIconProps>> = {
