@@ -25,10 +25,10 @@ export const wrapperStyles: CSSObject = {
   borderRadius: '10px',
   border: '1px solid var(--gray-40)',
   position: 'relative',
-  backgroundColor: 'var(--foreground-fade-8)',
 
   'body.theme-dark &': {
-    border: '1px solid transparent',
+    backgroundColor: 'var(--foreground-fade-8)',
+    border: 'none',
   },
 };
 
@@ -43,7 +43,7 @@ export const wrapperErrorStyles: CSSObject = {
 
   'body.theme-dark &': {
     backgroundColor: 'var(--foreground-fade-8)',
-    border: '1px solid transparent',
+    border: 'none',
   },
 };
 
