@@ -26,10 +26,9 @@ interface UsePaginationProps {
   pagination: CellPagination | null;
   conversationId: string;
   setOffset: (offset: number) => void;
-  onPageChange?: () => void;
 }
 
-export const useCellsPagination = ({pagination, conversationId, setOffset, onPageChange}: UsePaginationProps) => {
+export const useCellsPagination = ({pagination, conversationId, setOffset}: UsePaginationProps) => {
   const {clearAll, pageSize, setPageSize} = useCellsStore();
 
   const currentPage = pagination?.currentPage || 0;
@@ -38,10 +37,9 @@ export const useCellsPagination = ({pagination, conversationId, setOffset, onPag
 
   const goToPage = useCallback(
     (page: number) => {
-      onPageChange?.();
       setOffset(page * pageSize);
     },
-    [pageSize, setOffset, onPageChange],
+    [pageSize, setOffset],
   );
 
   const handleSetPageSize = useCallback(
