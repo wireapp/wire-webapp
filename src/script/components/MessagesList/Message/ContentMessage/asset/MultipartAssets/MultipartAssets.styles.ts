@@ -25,7 +25,7 @@ export const listStyles: CSSObject = {
   display: 'grid',
   gridTemplateColumns: 'repeat(auto-fill, 74px)',
   gridAutoFlow: 'dense',
-  gap: '24px',
+  gap: '16px',
   width: '100%',
   padding: '8px 8px 8px 0',
   margin: '0',
