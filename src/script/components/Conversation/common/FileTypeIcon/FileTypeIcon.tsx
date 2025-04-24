@@ -35,9 +35,10 @@ import {
   OtherFileIcon,
 } from '@wireapp/react-ui-kit';
 
-import {FileType} from './fileType';
+import {FileType} from 'Util/getFileTypeFromExtension/fileType';
+import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTypeFromExtension';
+
 import {iconStyles} from './FileTypeIcon.styles';
-import {getFileTypeFromExtension} from './getFileTypeFromExtension/getFileTypeFromExtension';
 
 interface FileTypeIconProps {
   extension: string;

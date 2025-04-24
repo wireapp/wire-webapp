@@ -23,8 +23,8 @@ import {t} from 'Util/LocalizerUtil';
 
 import {containerStyles, imageStyles} from './ImageAssetSmall.styles';
 
+import {FileFullscreenModal} from '../../common/FileFullscreenModal/FileFullscreenModal';
 import {MediaFilePreviewCard} from '../../common/MediaFilePreviewCard/MediaFilePreviewCard';
-import {ImageFullscreenModal} from '../common/ImageFullscreenModal/ImageFullscreenModal';
 
 interface ImageAssetSmallProps {
   src?: string;
@@ -70,13 +70,13 @@ export const ImageAssetSmall = ({
           {!isLoading && !isError && src && <img src={src} alt="" css={imageStyles} onLoad={() => setIsLoaded(true)} />}
         </MediaFilePreviewCard>
       </button>
-      <ImageFullscreenModal
+      <FileFullscreenModal
         id={id}
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
-        imageSrc={src}
-        imageName={name}
-        imageExtension={extension}
+        fileUrl={src}
+        fileExtension={extension}
+        fileName={name}
         senderName={senderName}
         timestamp={timestamp}
       />

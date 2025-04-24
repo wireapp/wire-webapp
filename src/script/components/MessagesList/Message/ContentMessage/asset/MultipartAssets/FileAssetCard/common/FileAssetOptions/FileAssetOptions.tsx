@@ -21,7 +21,6 @@ import {MouseEvent as ReactMouseEvent, KeyboardEvent, useState} from 'react';
 
 import {MoreIcon} from '@wireapp/react-ui-kit';
 
-import {PDFViewer} from 'Components/PdfViewer/PdfViewer';
 import {showContextMenu} from 'src/script/ui/ContextMenu';
 import {isSpaceOrEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -75,14 +74,13 @@ export const FileAssetOptions = ({name, extension, senderName, timestamp, src}: 
       <FileFullscreenModal
         id="file-asset-options"
         fileName={name}
+        fileUrl={src}
         fileExtension={extension}
         senderName={senderName}
         timestamp={timestamp}
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
-      >
-        {src && <PDFViewer src={src} />}
-      </FileFullscreenModal>
+      />
     </>
   );
 };

@@ -21,7 +21,7 @@ import {KeyboardEvent, MouseEvent as ReactMouseEvent, useCallback, useId, useSta
 
 import {MoreIcon} from '@wireapp/react-ui-kit';
 
-import {ImageFullscreenModal} from 'Components/MessagesList/Message/ContentMessage/asset/MultipartAssets/ImageAssetCard/common/ImageFullscreenModal/ImageFullscreenModal';
+import {FileFullscreenModal} from 'Components/MessagesList/Message/ContentMessage/asset/MultipartAssets/common/FileFullscreenModal/FileFullscreenModal';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/ContextMenu';
@@ -109,13 +109,13 @@ export const CellsTableRowOptions = ({
         <MoreIcon css={iconStyles} />
         <span css={textStyles}>{t('cellsGlobalView.optionsLabel')}</span>
       </button>
-      <ImageFullscreenModal
+      <FileFullscreenModal
         id={id}
         isOpen={fileModalOpen}
         onClose={() => setFileModalOpen(false)}
-        imageSrc={fileUrl}
-        imageName={fileName}
-        imageExtension={fileExtension}
+        fileUrl={fileUrl}
+        fileExtension={fileExtension}
+        fileName={fileName}
         senderName={senderName}
         timestamp={timestamp}
       />

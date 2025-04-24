@@ -17,7 +17,7 @@
  *
  */
 
-import {FileType} from '../fileType';
+import {FileType} from './fileType';
 
 const extensions: Record<Exclude<FileType, 'other'>, string[]> = {
   pdf: ['pdf'],

@@ -17,71 +17,64 @@
  *
  */
 
-import {ReactNode} from 'react';
-
-import {CloseIcon} from '@wireapp/react-ui-kit';
-
-import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
 import {FullscreenModal} from 'Components/FullscreenModal/FullscreenModal';
-import {MessageTime} from 'Components/MessagesList/Message/MessageTime';
-import {useRelativeTimestamp} from 'Hooks/useRelativeTimestamp';
-import {t} from 'Util/LocalizerUtil';
+import {PDFViewer} from 'Components/PdfViewer/PdfViewer';
+import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTypeFromExtension';
 
-import {
-  closeButtonStyles,
-  headerStyles,
-  leftColumnStyles,
-  metadataStyles,
-  nameStyles,
-  textStyles,
-} from './FileFullscreenModal.styles';
+import {FileHeader} from './FileHeader/FileHeader';
+import {ImageFileView} from './ImageFileView/ImageFileView';
 
 interface FileFullscreenModalProps {
   id: string;
   isOpen: boolean;
   onClose: () => void;
+  fileUrl?: string;
   fileName: string;
   fileExtension: string;
   senderName: string;
   timestamp: number;
-  children: ReactNode;
 }
 
 export const FileFullscreenModal = ({
   id,
   isOpen,
   onClose,
+  fileUrl,
   fileName,
   fileExtension,
   senderName,
   timestamp,
-  children,
 }: FileFullscreenModalProps) => {
-  const timeAgo = useRelativeTimestamp(timestamp);
-
   return (
     <FullscreenModal id={id} isOpen={isOpen} onClose={onClose}>
-      <header css={headerStyles}>
-        <div css={leftColumnStyles}>
-          <button
-            type="button"
-            css={closeButtonStyles}
-            aria-label={t('cellsGlobalView.imageFullScreenModalCloseButton')}
-            onClick={onClose}
-          >
-            <CloseIcon />
-          </button>
-          <div css={metadataStyles}>
-            <FileTypeIcon extension={fileExtension} />
-            <h3 css={nameStyles}>{fileName}</h3>
-            <p css={textStyles}>{senderName}</p>
-            <MessageTime timestamp={timestamp} data-timestamp-type="normal" css={textStyles}>
-              {timeAgo}
-            </MessageTime>
-          </div>
-        </div>
-      </header>
-      {children}
+      <FileHeader
+        onClose={onClose}
+        fileName={fileName}
+        fileExtension={fileExtension}
+        senderName={senderName}
+        timestamp={timestamp}
+      />
+      <ModalContent fileExtension={fileExtension} fileUrl={fileUrl} senderName={senderName} timestamp={timestamp} />
     </FullscreenModal>
   );
+};
+
+interface ModalContentProps {
+  fileUrl?: string;
+  fileExtension: string;
+  senderName: string;
+  timestamp: number;
+}
+
+const ModalContent = ({fileExtension, fileUrl, senderName, timestamp}: ModalContentProps) => {
+  const fileType = getFileTypeFromExtension(fileExtension);
+
+  switch (fileType) {
+    case 'image':
+      return <ImageFileView src={fileUrl} senderName={senderName} timestamp={timestamp} />;
+    case 'pdf':
+      return <PDFViewer src={fileUrl} />;
+    default:
+      return null;
+  }
 };
