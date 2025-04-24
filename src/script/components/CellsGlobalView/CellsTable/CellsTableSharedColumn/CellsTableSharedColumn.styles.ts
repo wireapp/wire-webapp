@@ -55,8 +55,6 @@ export const iconWrapperStyles: CSSObject = {
 };
 
 export const textStyles: CSSObject = {
-  ...CSS_VISUALLY_HIDDEN,
-
   [`@media (min-width: ${styleBreakpoint}px)`]: {
     ...CSS_VISUALLY_HIDDEN,
   },
