@@ -33,7 +33,7 @@ export const FileAssetSmall = ({extension, name, size, isError}: FileAssetSmallP
         <FileCard.Icon type={isError ? 'unavailable' : 'file'} />
         {!isError && <FileCard.Type />}
       </FileCard.Header>
-      <FileCard.Name variant={isError ? 'secondary' : 'primary'} />
+      <FileCard.Name variant={isError ? 'secondary' : 'primary'} truncateAfterLines={2} />
     </FileCard.Root>
   );
 };
