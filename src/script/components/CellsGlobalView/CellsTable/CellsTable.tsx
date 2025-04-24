@@ -34,6 +34,7 @@ import {
   tableCellRow,
   tableCellStyles,
   tableStyles,
+  textWithEllipsisStyles,
   wrapperStyles,
 } from './CellsTable.styles';
 import {CellsTableDateColumn} from './CellsTableDateColumn/CellsTableDateColumn';
@@ -79,26 +80,32 @@ export const CellsTable = ({files, cellsRepository, onDeleteFile}: CellsTablePro
       }),
       columnHelper.accessor('conversationName', {
         header: t('cellsGlobalView.tableRowConversationName'),
-        cell: info => info.getValue(),
+        cell: info => <span css={textWithEllipsisStyles}>{info.getValue()}</span>,
+        size: 190,
       }),
       columnHelper.accessor('owner', {
         header: t('cellsGlobalView.tableRowOwner'),
-        cell: info => info.getValue(),
+        cell: info => <span css={textWithEllipsisStyles}>{info.getValue()}</span>,
+        size: 175,
       }),
       columnHelper.accessor('sizeMb', {
         header: t('cellsGlobalView.tableRowSize'),
         cell: info => info.getValue(),
+        size: 100,
       }),
       columnHelper.accessor('uploadedAtTimestamp', {
         header: t('cellsGlobalView.tableRowCreated'),
         cell: info => <CellsTableDateColumn timestamp={info.getValue()} />,
+        size: 125,
       }),
       columnHelper.accessor('publicLink', {
         header: t('cellsGlobalView.tableRowPublicLink'),
         cell: info => <CellsTableSharedColumn isShared={!!info.getValue()?.alreadyShared} />,
+        size: 60,
       }),
       columnHelper.accessor('id', {
         header: () => <span className="visually-hidden">{t('cellsGlobalView.tableRowActions')}</span>,
+        size: 40,
         cell: info => {
           const {previewImageUrl, fileUrl} = info.row.original;
           const uuid = info.getValue();
@@ -139,7 +146,14 @@ export const CellsTable = ({files, cellsRepository, onDeleteFile}: CellsTablePro
           {table.getHeaderGroups().map(headerGroup => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map(header => (
-                <th key={header.id} css={headerCellStyles}>
+                <th
+                  key={header.id}
+                  css={headerCellStyles}
+                  colSpan={header.colSpan}
+                  style={{
+                    width: header.id == 'name' ? undefined : header.getSize(),
+                  }}
+                >
                   {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                 </th>
               ))}
@@ -155,6 +169,9 @@ export const CellsTable = ({files, cellsRepository, onDeleteFile}: CellsTablePro
                     key={cell.id}
                     css={cell.column.id === 'id' ? tableActionsCellStyles : tableCellStyles}
                     data-cell={cell.column.id === 'id' ? undefined : cell.column.columnDef.header}
+                    style={{
+                      width: cell.column.id == 'name' ? undefined : cell.column.getSize(),
+                    }}
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>

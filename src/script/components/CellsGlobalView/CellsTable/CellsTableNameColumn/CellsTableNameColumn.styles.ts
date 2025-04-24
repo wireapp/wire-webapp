@@ -19,10 +19,12 @@
 
 import {CSSObject} from '@emotion/react';
 
+import {styleBreakpoint} from '../../common/styleBreakpoint/styleBreakpoint';
+
 export const wrapperStyles: CSSObject = {
   display: 'none',
 
-  '@media (min-width: 900px)': {
+  [`@media (min-width: ${styleBreakpoint}px)`]: {
     display: 'flex',
     alignItems: 'center',
     gap: '32px',
@@ -55,13 +57,13 @@ export const playIconStyles: CSSObject = {
 export const desktopNameStyles: CSSObject = {
   textOverflow: 'ellipsis',
   overflow: 'hidden',
-  maxWidth: '300px',
+  maxWidth: '100%',
   whiteSpace: 'nowrap',
   fontWeight: 'var(--font-weight-semibold)',
 };
 
 export const mobileNameStyles: CSSObject = {
-  '@media (min-width: 900px)': {
+  [`@media (min-width: ${styleBreakpoint}px)`]: {
     display: 'none',
   },
 };
