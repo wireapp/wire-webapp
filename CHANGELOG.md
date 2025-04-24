@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.50.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.50.0...@wireapp/react-ui-kit@9.50.1) (2025-04-24)
+
+### Bug Fixes
+
+* **react-ui-kit/icon:** adjust file icon sizes ([#7033](https://github.com/wireapp/wire-web-packages/issues/7033)) ([a38589d](https://github.com/wireapp/wire-web-packages/commit/a38589d5a9f20583d673f1991af124bb0ec17d90))
+
 # [9.50.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.49.0...@wireapp/react-ui-kit@9.50.0) (2025-04-24)
 
 ### Features
