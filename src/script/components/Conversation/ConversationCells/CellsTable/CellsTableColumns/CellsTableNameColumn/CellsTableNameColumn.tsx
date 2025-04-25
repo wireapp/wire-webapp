@@ -20,6 +20,7 @@
 import {PlayIcon} from '@wireapp/react-ui-kit';
 
 import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
+import {CellFile} from 'Components/Conversation/ConversationCells/common/cellFile/cellFile';
 import {getFileExtension} from 'Util/util';
 
 import {
@@ -31,31 +32,44 @@ import {
   wrapperStyles,
 } from './CellsTableNameColumn.styles';
 
+import {useCellsFilePreviewModal} from '../../common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
+
 interface CellsTableNameColumnProps {
-  name: string;
-  previewUrl?: string | null;
-  mimeType?: string | null;
+  file: CellFile;
 }
 
-export const CellsTableNameColumn = ({name, previewUrl, mimeType}: CellsTableNameColumnProps) => {
-  const isImage = mimeType?.startsWith('image');
-  const isVideo = mimeType?.startsWith('video');
+export const CellsTableNameColumn = ({file}: CellsTableNameColumnProps) => {
+  const {id, handleOpenFile, selectedFile} = useCellsFilePreviewModal();
 
-  const shouldDisplayImagePreview = (isImage || isVideo) && previewUrl;
+  const isImage = file.mimeType?.startsWith('image');
+  const isVideo = file.mimeType?.startsWith('video');
+
+  const shouldDisplayImagePreview = (isImage || isVideo) && file.previewImageUrl;
+
+  const {previewImageUrl, name} = file;
 
   return (
     <>
-      <span css={mobileNameStyles}>{name}</span>
+      <span css={mobileNameStyles}>{file.name}</span>
       <div css={wrapperStyles}>
         {shouldDisplayImagePreview ? (
           <div css={imagePreviewWrapperStyles}>
-            <img src={previewUrl} alt="" width={24} height={24} css={imagePreviewStyles} />
+            <img src={previewImageUrl} alt="" width={24} height={24} css={imagePreviewStyles} />
             {isVideo && <PlayIcon css={playIconStyles} width={16} height={16} />}
           </div>
         ) : (
           <FileTypeIcon extension={getFileExtension(name)} size={24} />
         )}
-        <span css={desktopNameStyles}>{name}</span>
+        <button
+          type="button"
+          css={desktopNameStyles}
+          onClick={() => handleOpenFile(file)}
+          aria-controls={id}
+          aria-expanded={!!selectedFile}
+          aria-haspopup="dialog"
+        >
+          {name}
+        </button>
       </div>
     </>
   );

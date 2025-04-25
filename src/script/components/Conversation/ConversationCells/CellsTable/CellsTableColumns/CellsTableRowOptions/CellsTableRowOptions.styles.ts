@@ -19,49 +19,44 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {styleBreakpoint} from '../../common/styleBreakpoint/styleBreakpoint';
+import {styleBreakpoint} from '../../../common/styleBreakpoint/styleBreakpoint';
 
-export const wrapperStyles: CSSObject = {
-  display: 'none',
+export const buttonStyles: CSSObject = {
+  background: 'none',
+  border: 'none',
+  cursor: 'pointer',
+  margin: '0',
+  width: '100%',
+  padding: '12px 0',
+  borderRadius: '8px',
+
+  '&:hover, &:focus-visible': {
+    backgroundColor: 'var(--foreground-fade-8)',
+  },
 
   [`@media (min-width: ${styleBreakpoint}px)`]: {
     display: 'flex',
     alignItems: 'center',
-    gap: '32px',
+    justifyContent: 'center',
+    width: '40px',
+    height: '40px',
+    padding: '0',
   },
 };
 
-export const imagePreviewWrapperStyles: CSSObject = {
-  position: 'relative',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  width: '24px',
-  height: '24px',
+export const iconStyles: CSSObject = {
+  fill: 'var(--main-color)',
+  display: 'none',
+  [`@media (min-width: ${styleBreakpoint}px)`]: {
+    display: 'block',
+  },
 };
 
-export const imagePreviewStyles: CSSObject = {
-  objectFit: 'cover',
-  borderRadius: '4px',
-  border: '1px solid var(--border-color)',
-};
-
-export const playIconStyles: CSSObject = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  fill: 'var(--white)',
-};
-
-export const desktopNameStyles: CSSObject = {
-  textOverflow: 'ellipsis',
-  overflow: 'hidden',
-  whiteSpace: 'nowrap',
+export const textStyles: CSSObject = {
+  display: 'block',
+  textAlign: 'center',
   fontWeight: 'var(--font-weight-semibold)',
-};
 
-export const mobileNameStyles: CSSObject = {
   [`@media (min-width: ${styleBreakpoint}px)`]: {
     display: 'none',
   },

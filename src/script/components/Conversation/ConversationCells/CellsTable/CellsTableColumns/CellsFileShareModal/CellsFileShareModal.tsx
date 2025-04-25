@@ -36,7 +36,7 @@ import {
 } from './CellsFileShareModal.styles';
 import {useCellPublicLink} from './useCellPublicLink';
 
-import {CellsTableLoader} from '../../common/CellsTableLoader/CellsTableLoader';
+import {CellsTableLoader} from '../../../common/CellsTableLoader/CellsTableLoader';
 
 interface ShareFileModalParams {
   uuid: string;

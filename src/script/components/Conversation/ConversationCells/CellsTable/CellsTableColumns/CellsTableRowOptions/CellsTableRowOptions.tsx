@@ -17,38 +17,64 @@
  *
  */
 
-import {KeyboardEvent, MouseEvent as ReactMouseEvent} from 'react';
+import {KeyboardEvent, MouseEvent as ReactMouseEvent, useCallback} from 'react';
 
 import {MoreIcon} from '@wireapp/react-ui-kit';
 
+import {CellFile} from 'Components/Conversation/ConversationCells/common/cellFile/cellFile';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/ContextMenu';
 import {isSpaceOrEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
-import {setContextMenuPosition} from 'Util/util';
+import {forcedDownloadFile, setContextMenuPosition} from 'Util/util';
 
 import {buttonStyles, iconStyles, textStyles} from './CellsTableRowOptions.styles';
 
+import {useCellsFilePreviewModal} from '../../common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
+import {showShareFileModal} from '../CellsFileShareModal/CellsFileShareModal';
+
 interface CellsTableRowOptionsProps {
-  onOpen?: () => void;
-  onShare: () => void;
-  onDownload?: () => void;
-  onDelete: () => void;
+  file: CellFile;
+  onDelete: (uuid: string) => void;
+  cellsRepository: CellsRepository;
+  conversationId: string;
 }
 
-export const CellsTableRowOptions = ({onOpen, onShare, onDownload, onDelete}: CellsTableRowOptionsProps) => {
+export const CellsTableRowOptions = ({file, onDelete, cellsRepository, conversationId}: CellsTableRowOptionsProps) => {
+  const {id, selectedFile, handleOpenFile} = useCellsFilePreviewModal();
+
+  const showDeleteFileModal = useCallback(
+    ({uuid, name}: {uuid: string; name: string}) => {
+      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
+        primaryAction: {action: () => onDelete(uuid), text: t('cellsGlobalView.optionDelete')},
+        text: {
+          message: t('cellsGlobalView.deleteModalDescription', {name}),
+          title: t('cellsGlobalView.deleteModalHeading'),
+        },
+      });
+    },
+    [onDelete],
+  );
+
   const showOptionsMenu = (event: ReactMouseEvent<HTMLButtonElement> | MouseEvent) => {
     const openLabel = t('cellsGlobalView.optionOpen');
     const shareLabel = t('cellsGlobalView.optionShare');
     const downloadLabel = t('cellsGlobalView.optionDownload');
     const deleteLabel = t('cellsGlobalView.optionDelete');
 
+    const {fileUrl, name} = file;
+
     showContextMenu({
       event,
       entries: [
-        {label: shareLabel, click: onShare},
-        onOpen ? {label: openLabel, click: onOpen} : undefined,
-        onDownload ? {label: downloadLabel, click: onDownload} : undefined,
-        {label: deleteLabel, click: onDelete},
+        {
+          label: shareLabel,
+          click: () => showShareFileModal({uuid: file.id, conversationId, cellsRepository}),
+        },
+        {label: openLabel, click: () => handleOpenFile(file)},
+        fileUrl ? {label: downloadLabel, click: () => forcedDownloadFile({url: fileUrl, name})} : undefined,
+        {label: deleteLabel, click: () => showDeleteFileModal({uuid: file.id, name})},
       ].filter(Boolean) as ContextMenuEntry[],
       identifier: 'file-preview-error-more-button',
     });
@@ -67,6 +93,9 @@ export const CellsTableRowOptions = ({onOpen, onShare, onDownload, onDelete}: Ce
       onKeyDown={handleKeyDown}
       onClick={showOptionsMenu}
       aria-label={t('cellsGlobalView.optionsLabel')}
+      aria-controls={id}
+      aria-expanded={!!selectedFile}
+      aria-haspopup="dialog"
     >
       <MoreIcon css={iconStyles} />
       <span css={textStyles}>{t('cellsGlobalView.optionsLabel')}</span>
