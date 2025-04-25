@@ -22,7 +22,7 @@ import {useCallback, useEffect, useState} from 'react';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {Config} from 'src/script/Config';
 
-import {useCellsStore} from '../../common/useCellsStore/useCellsStore';
+import {useCellsStore} from '../../../common/useCellsStore/useCellsStore';
 
 interface UseCellPublicLinkParams {
   uuid: string;

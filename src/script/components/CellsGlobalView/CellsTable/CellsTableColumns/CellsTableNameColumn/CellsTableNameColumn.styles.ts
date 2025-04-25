@@ -19,7 +19,7 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {styleBreakpoint} from '../../common/styleBreakpoint/styleBreakpoint';
+import {styleBreakpoint} from '../../../common/styleBreakpoint/styleBreakpoint';
 
 export const wrapperStyles: CSSObject = {
   display: 'none',
@@ -29,6 +29,14 @@ export const wrapperStyles: CSSObject = {
     alignItems: 'center',
     gap: '32px',
   },
+};
+
+export const buttonStyles: CSSObject = {
+  padding: '0',
+  margin: '0',
+  border: 'none',
+  background: 'none',
+  cursor: 'pointer',
 };
 
 export const imagePreviewWrapperStyles: CSSObject = {
@@ -60,6 +68,11 @@ export const desktopNameStyles: CSSObject = {
   maxWidth: '100%',
   whiteSpace: 'nowrap',
   fontWeight: 'var(--font-weight-semibold)',
+  cursor: 'pointer',
+  background: 'none',
+  border: 'none',
+  padding: '0',
+  margin: '0',
 };
 
 export const mobileNameStyles: CSSObject = {

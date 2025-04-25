@@ -17,11 +17,10 @@
  *
  */
 
-import {KeyboardEvent, MouseEvent as ReactMouseEvent, useCallback, useId, useState} from 'react';
+import {KeyboardEvent, MouseEvent as ReactMouseEvent, useCallback} from 'react';
 
 import {MoreIcon} from '@wireapp/react-ui-kit';
 
-import {FileFullscreenModal} from 'Components/MessagesList/Message/ContentMessage/asset/MultipartAssets/common/FileFullscreenModal/FileFullscreenModal';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/ContextMenu';
@@ -31,31 +30,18 @@ import {forcedDownloadFile, setContextMenuPosition} from 'Util/util';
 
 import {buttonStyles, iconStyles, textStyles} from './CellsTableRowOptions.styles';
 
+import {CellFile} from '../../../common/cellFile/cellFile';
+import {useCellsFilePreviewModal} from '../../common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
 import {showShareFileModal} from '../CellsShareFileModal/CellsShareFileModal';
 
 interface CellsTableRowOptionsProps {
-  fileUuid: string;
-  fileUrl: string;
-  fileName: string;
-  fileExtension: string;
-  timestamp: number;
-  senderName: string;
+  file: CellFile;
   onDelete: (uuid: string) => void;
   cellsRepository: CellsRepository;
 }
 
-export const CellsTableRowOptions = ({
-  fileUuid,
-  fileUrl,
-  fileName,
-  fileExtension,
-  senderName,
-  timestamp,
-  onDelete,
-  cellsRepository,
-}: CellsTableRowOptionsProps) => {
-  const [fileModalOpen, setFileModalOpen] = useState(false);
-  const id = useId();
+export const CellsTableRowOptions = ({file, onDelete, cellsRepository}: CellsTableRowOptionsProps) => {
+  const {id, selectedFile, handleOpenFile} = useCellsFilePreviewModal();
 
   const showDeleteFileModal = useCallback(
     ({uuid, name}: {uuid: string; name: string}) => {
@@ -76,16 +62,18 @@ export const CellsTableRowOptions = ({
     const downloadLabel = t('cellsGlobalView.optionDownload');
     const deleteLabel = t('cellsGlobalView.optionDelete');
 
+    const fileUrl = file.fileUrl;
+
     showContextMenu({
       event,
       entries: [
         {
           label: shareLabel,
-          click: () => showShareFileModal({uuid: fileUuid, cellsRepository}),
+          click: () => showShareFileModal({uuid: file.id, cellsRepository}),
         },
-        {label: openLabel, click: () => setFileModalOpen(true)},
-        fileUrl ? {label: downloadLabel, click: () => forcedDownloadFile({url: fileUrl, name: fileName})} : undefined,
-        {label: deleteLabel, click: () => showDeleteFileModal({uuid: fileUuid, name: fileName})},
+        {label: openLabel, click: () => handleOpenFile(file)},
+        fileUrl ? {label: downloadLabel, click: () => forcedDownloadFile({url: fileUrl, name: file.name})} : undefined,
+        {label: deleteLabel, click: () => showDeleteFileModal({uuid: file.id, name: file.name})},
       ].filter(Boolean) as ContextMenuEntry[],
       identifier: 'file-preview-error-more-button',
     });
@@ -105,20 +93,13 @@ export const CellsTableRowOptions = ({
         onKeyDown={handleKeyDown}
         onClick={showOptionsMenu}
         aria-label={t('cellsGlobalView.optionsLabel')}
+        aria-controls={id}
+        aria-expanded={!!selectedFile}
+        aria-haspopup="dialog"
       >
         <MoreIcon css={iconStyles} />
         <span css={textStyles}>{t('cellsGlobalView.optionsLabel')}</span>
       </button>
-      <FileFullscreenModal
-        id={id}
-        isOpen={fileModalOpen}
-        onClose={() => setFileModalOpen(false)}
-        fileUrl={fileUrl}
-        fileExtension={fileExtension}
-        fileName={fileName}
-        senderName={senderName}
-        timestamp={timestamp}
-      />
     </>
   );
 };

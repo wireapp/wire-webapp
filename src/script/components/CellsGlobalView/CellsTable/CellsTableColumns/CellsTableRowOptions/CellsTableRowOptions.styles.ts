@@ -19,7 +19,7 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {styleBreakpoint} from '../../common/styleBreakpoint/styleBreakpoint';
+import {styleBreakpoint} from '../../../common/styleBreakpoint/styleBreakpoint';
 
 export const buttonStyles: CSSObject = {
   background: 'none',

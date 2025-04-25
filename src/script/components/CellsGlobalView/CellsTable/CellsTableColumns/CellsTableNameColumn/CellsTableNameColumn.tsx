@@ -31,17 +31,21 @@ import {
   wrapperStyles,
 } from './CellsTableNameColumn.styles';
 
+import {CellFile} from '../../../common/cellFile/cellFile';
+import {useCellsFilePreviewModal} from '../../common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
+
 interface CellsTableNameColumnProps {
-  name: string;
-  previewUrl?: string | null;
-  mimeType?: string | null;
+  file: CellFile;
 }
 
-export const CellsTableNameColumn = ({name, previewUrl, mimeType}: CellsTableNameColumnProps) => {
-  const isImage = mimeType?.startsWith('image');
-  const isVideo = mimeType?.startsWith('video');
+export const CellsTableNameColumn = ({file}: CellsTableNameColumnProps) => {
+  const {id, handleOpenFile, selectedFile} = useCellsFilePreviewModal();
+  const isImage = file.mimeType?.startsWith('image');
+  const isVideo = file.mimeType?.startsWith('video');
 
-  const shouldDisplayImagePreview = (isImage || isVideo) && previewUrl;
+  const shouldDisplayImagePreview = (isImage || isVideo) && file.previewImageUrl;
+
+  const name = file.name;
 
   return (
     <>
@@ -49,13 +53,22 @@ export const CellsTableNameColumn = ({name, previewUrl, mimeType}: CellsTableNam
       <div css={wrapperStyles}>
         {shouldDisplayImagePreview ? (
           <div css={imagePreviewWrapperStyles}>
-            <img src={previewUrl} alt="" width={24} height={24} css={imagePreviewStyles} />
+            <img src={file.previewImageUrl} alt="" width={24} height={24} css={imagePreviewStyles} />
             {isVideo && <PlayIcon css={playIconStyles} width={16} height={16} />}
           </div>
         ) : (
           <FileTypeIcon extension={getFileExtension(name)} size={24} />
         )}
-        <span css={desktopNameStyles}>{name}</span>
+        <button
+          type="button"
+          css={desktopNameStyles}
+          onClick={() => handleOpenFile(file)}
+          aria-controls={id}
+          aria-expanded={!!selectedFile}
+          aria-haspopup="dialog"
+        >
+          {name}
+        </button>
       </div>
     </>
   );
