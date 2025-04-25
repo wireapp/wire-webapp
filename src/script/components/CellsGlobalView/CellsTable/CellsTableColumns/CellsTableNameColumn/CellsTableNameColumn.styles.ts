@@ -31,14 +31,6 @@ export const wrapperStyles: CSSObject = {
   },
 };
 
-export const buttonStyles: CSSObject = {
-  padding: '0',
-  margin: '0',
-  border: 'none',
-  background: 'none',
-  cursor: 'pointer',
-};
-
 export const imagePreviewWrapperStyles: CSSObject = {
   position: 'relative',
   display: 'flex',
@@ -73,6 +65,10 @@ export const desktopNameStyles: CSSObject = {
   border: 'none',
   padding: '0',
   margin: '0',
+
+  '&:hover': {
+    textDecoration: 'underline',
+  },
 };
 
 export const mobileNameStyles: CSSObject = {
