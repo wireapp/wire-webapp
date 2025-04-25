@@ -19,7 +19,7 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {fileHeaderHeight} from '../../common/fileHeaderHeight/fileHeaderHeight';
+import {fileHeaderHeight} from '../fileHeaderHeight';
 
 export const wrapperStyles: CSSObject = {
   display: 'flex',

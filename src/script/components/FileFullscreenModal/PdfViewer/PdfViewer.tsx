@@ -41,9 +41,7 @@ export const PDFViewer = ({src}: PDFViewerProps) => {
 
   const {currentPage, thumbnailsRef, handleNextPage, handlePreviousPage, handlePageChange} = usePageControls();
 
-  const isError = true;
-
-  if (isError) {
+  if (!src) {
     return <PdfError />;
   }
 
