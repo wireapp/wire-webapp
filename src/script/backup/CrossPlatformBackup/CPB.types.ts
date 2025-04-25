@@ -26,6 +26,7 @@ export interface ExportHistoryFromDatabaseParams {
   backupService: BackupService;
   progressCallback: ProgressCallback;
   user: User;
+  password: string;
   checkCancelStatus: () => boolean;
 }
 

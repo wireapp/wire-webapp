@@ -23,7 +23,7 @@ import zod from 'zod';
 export const ConversationTableEntrySchema = zod.object({
   domain: zod.string(),
   id: zod.string(),
-  name: zod.string(),
+  name: zod.string().nullable().optional(),
   // accessModes: zod.array(zod.string()).optional(),
   // accessRole: zod.array(zod.any()).optional(),
   // accessRoleV2: zod.string().optional(),
@@ -51,7 +51,7 @@ export type ConversationTableEntry = zod.infer<typeof ConversationTableEntrySche
 export const UserTableEntrySchema = zod.object({
   handle: zod.string().optional(),
   id: zod.string(),
-  name: zod.string(),
+  name: zod.string().optional(),
   qualified_id: zod
     .object({
       domain: zod.string(),
