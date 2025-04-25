@@ -21,10 +21,12 @@ import {CSSObject} from '@emotion/react';
 
 import {CSS_VISUALLY_HIDDEN} from 'Util/CSSMixin';
 
+import {styleBreakpoint} from '../../common/styleBreakpoint/styleBreakpoint';
+
 export const wrapperStyles: CSSObject = {
   display: 'inline',
 
-  '@media (min-width: 1100px)': {
+  [`@media (min-width: ${styleBreakpoint}px)`]: {
     display: 'flex',
     alignItems: 'center',
     paddingLeft: '10px',
@@ -33,7 +35,7 @@ export const wrapperStyles: CSSObject = {
 
 export const wrapperStylesHidden: CSSObject = {
   ...wrapperStyles,
-  '@media (min-width: 1100px)': {
+  [`@media (min-width: ${styleBreakpoint}px)`]: {
     display: 'none',
   },
 };
@@ -47,13 +49,13 @@ export const iconWrapperStyles: CSSObject = {
   width: '20px',
   height: '20px',
 
-  '@media (max-width: 1100px)': {
+  [`@media (max-width: ${styleBreakpoint}px)`]: {
     display: 'none',
   },
 };
 
 export const textStyles: CSSObject = {
-  '@media (min-width: 1100px)': {
+  [`@media (min-width: ${styleBreakpoint}px)`]: {
     ...CSS_VISUALLY_HIDDEN,
   },
 };

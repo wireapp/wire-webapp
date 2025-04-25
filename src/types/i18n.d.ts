@@ -379,7 +379,7 @@ declare module 'I18n/en-US.json' {
     'cellsGlobalView.pagination.nextPage': `Next Page`;
     'cellsGlobalView.pagination.previousPage': `Previous Page`;
     'cellsGlobalView.pagination.resultsOutOf': `{start}-{end} out of {total}`;
-    'cellsGlobalView.pagination.rowsPerPage': `Rows Per Page`;
+    'cellsGlobalView.pagination.rowsPerPage': `Rows per page`;
     'cellsGlobalView.refreshButton': `Refresh list`;
     'cellsGlobalView.searchCloseButton': `Close`;
     'cellsGlobalView.searchFailed': `Something went wrong, please try again later.`;
@@ -1393,6 +1393,15 @@ declare module 'I18n/en-US.json' {
     'participantDevicesWhyVerify': `Why verify conversations?`;
     'pastedFileCloseMessage': `Close`;
     'pastedFileSendMessage': `Send`;
+    'pdfViewerZoomIn': `Zoom in`;
+    'pdfViewerZoomOut': `Zoom out`;
+    'pdfViewerPageNumber': `Page {page} of {total}`;
+    'pdfViewerPreviousPage': `Previous page`;
+    'pdfViewerNextPage': `Next page`;
+    'pdfViewerOpenSidebar': `Open sidebar`;
+    'pdfViewerCloseSidebar': `Close sidebar`;
+    'pdfViewerErrorTitle': `Something went wrong`;
+    'pdfViewerErrorDescription': `File preview not available, please try again later.`;
     'preferencesAV': `Audio / Video`;
     'preferencesAVCamera': `Camera`;
     'preferencesAVMicrophone': `Microphone`;

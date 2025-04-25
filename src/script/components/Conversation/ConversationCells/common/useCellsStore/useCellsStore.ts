@@ -24,7 +24,7 @@ import {CellPagination} from '../cellPagination/cellPagination';
 
 type Status = 'idle' | 'loading' | 'success' | 'error';
 
-const DEFAULT_PAGE_SIZE = 10;
+const DEFAULT_PAGE_SIZE = 50;
 
 interface CellsState {
   filesByConversation: Record<string, CellFile[]>;

@@ -33,8 +33,8 @@ import {CellsStateInfo} from './CellsStateInfo/CellsStateInfo';
 import {CellsTable} from './CellsTable/CellsTable';
 import {useCellsStore} from './common/useCellsStore/useCellsStore';
 import {wrapperStyles} from './ConversationCells.styles';
+import {useCellsLoaderSize} from './useCellsLoaderSize/useCellsLoaderSize';
 import {useCellsPagination} from './useCellsPagination/useCellsPagination';
-import {useCellsTableDimensions} from './useCellsTableDimentions/useCellsTableDimentions';
 import {useGetAllCellsFiles} from './useGetAllCellsFiles/useGetAllCellsFiles';
 
 interface ConversationCellsProps {
@@ -55,7 +55,7 @@ export const ConversationCells = ({
   const files = getFiles({conversationId});
   const pagination = getPagination({conversationId});
 
-  const {loaderHeight, fixedColumnsWidths, handleHeight, handleWidths, updateDimensions} = useCellsTableDimensions({
+  const {loaderHeight, updateHeight} = useCellsLoaderSize({
     files,
   });
 
@@ -63,7 +63,7 @@ export const ConversationCells = ({
     pagination,
     conversationId,
     setOffset,
-    onPageChange: updateDimensions,
+    currentFilesCount: files.length,
   });
 
   const isLoading = filesStatus === 'loading';
@@ -95,21 +95,21 @@ export const ConversationCells = ({
     await refresh();
   }, [refresh, clearAll, conversationId]);
 
+  const emptyView = !isError && !hasFiles;
+
   return (
     <div css={wrapperStyles}>
       <CellsHeader onRefresh={handleRefresh} />
       {(isSuccess || isLoading) && hasFiles && (
         <CellsTable
           files={isLoading ? [] : files}
-          fixedWidths={fixedColumnsWidths}
           cellsRepository={cellsRepository}
           conversationId={conversationId}
           onDeleteFile={handleDeleteFile}
-          onUpdateBodyHeight={handleHeight}
-          onUpdateColumnWidths={handleWidths}
+          onUpdateBodyHeight={updateHeight}
         />
       )}
-      {!isLoading && !isError && !hasFiles && (
+      {!isLoading && emptyView && (
         <CellsStateInfo
           heading={t('cellsGlobalView.noFilesHeading')}
           description={t('cellsGlobalView.noFilesDescription')}
@@ -122,7 +122,7 @@ export const ConversationCells = ({
           description={t('cellsGlobalView.errorDescription')}
         />
       )}
-      {!isError && <CellsPagination {...getPaginationProps()} goToPage={goToPage} />}
+      {!emptyView && <CellsPagination {...getPaginationProps()} goToPage={goToPage} />}
     </div>
   );
 };
