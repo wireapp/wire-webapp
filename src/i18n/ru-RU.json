@@ -375,7 +375,7 @@
   "cellsGlobalView.pagination.nextPage": "Следующая страница",
   "cellsGlobalView.pagination.previousPage": "Предыдущая страница",
   "cellsGlobalView.pagination.resultsOutOf": "{start}-{end} из {total}",
-  "cellsGlobalView.pagination.rowsPerPage": "Строк на странице",
+  "cellsGlobalView.pagination.rowsPerPage": "Rows per page",
   "cellsGlobalView.refreshButton": "Обновить список",
   "cellsGlobalView.searchCloseButton": "Закрыть",
   "cellsGlobalView.searchFailed": "Что-то пошло не так. Пожалуйста, попробуйте еще раз позже",
