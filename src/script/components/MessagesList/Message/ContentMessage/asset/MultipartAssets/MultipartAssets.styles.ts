@@ -57,6 +57,6 @@ export const videoCardStyles = (isSingleAsset: boolean) => ({
   ...(isSingleAsset ? largeCardStyles : smallCardStyles),
 });
 
-export const fileCardStyles = (isSingleAsset: boolean) => ({
-  ...(isSingleAsset ? largeCardStyles : smallCardStyles),
-});
+export const fileCardStyles = {
+  ...largeCardStyles,
+};

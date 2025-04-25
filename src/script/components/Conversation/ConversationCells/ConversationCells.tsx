@@ -33,8 +33,8 @@ import {CellsStateInfo} from './CellsStateInfo/CellsStateInfo';
 import {CellsTable} from './CellsTable/CellsTable';
 import {useCellsStore} from './common/useCellsStore/useCellsStore';
 import {wrapperStyles} from './ConversationCells.styles';
+import {useCellsLoaderSize} from './useCellsLoaderSize/useCellsLoaderSize';
 import {useCellsPagination} from './useCellsPagination/useCellsPagination';
-import {useCellsTableDimensions} from './useCellsTableDimentions/useCellsTableDimentions';
 import {useGetAllCellsFiles} from './useGetAllCellsFiles/useGetAllCellsFiles';
 
 interface ConversationCellsProps {
@@ -55,7 +55,7 @@ export const ConversationCells = ({
   const files = getFiles({conversationId});
   const pagination = getPagination({conversationId});
 
-  const {loaderHeight, fixedColumnsWidths, handleHeight, handleWidths, updateDimensions} = useCellsTableDimensions({
+  const {loaderHeight, updateHeight} = useCellsLoaderSize({
     files,
   });
 
@@ -63,7 +63,6 @@ export const ConversationCells = ({
     pagination,
     conversationId,
     setOffset,
-    onPageChange: updateDimensions,
     currentFilesCount: files.length,
   });
 
@@ -104,12 +103,10 @@ export const ConversationCells = ({
       {(isSuccess || isLoading) && hasFiles && (
         <CellsTable
           files={isLoading ? [] : files}
-          fixedWidths={fixedColumnsWidths}
           cellsRepository={cellsRepository}
           conversationId={conversationId}
           onDeleteFile={handleDeleteFile}
-          onUpdateBodyHeight={handleHeight}
-          onUpdateColumnWidths={handleWidths}
+          onUpdateBodyHeight={updateHeight}
         />
       )}
       {!isLoading && emptyView && (

@@ -17,7 +17,7 @@
  *
  */
 
-import {CSSProperties, useCallback, useMemo} from 'react';
+import {useCallback, useMemo} from 'react';
 
 import {createColumnHelper, flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
 
@@ -34,13 +34,14 @@ import {
   tableCellRow,
   tableCellStyles,
   tableStyles,
+  textWithEllipsisStyles,
   wrapperStyles,
 } from './CellsTable.styles';
 import {CellsTableDateColumn} from './CellsTableDateColumn/CellsTableDateColumn';
 import {CellsTableNameColumn} from './CellsTableNameColumn/CellsTableNameColumn';
 import {CellsTableRowOptions} from './CellsTableRowOptions/CellsTableRowOptions';
 import {CellsTableSharedColumn} from './CellsTableSharedColumn/CellsTableSharedColumn';
-import {useTableResizeObserver} from './useTableResizeObserver/useTableResizeObserver';
+import {useTableHeight} from './useTableHeight/useTableHeight';
 
 import {CellFile} from '../common/cellFile/cellFile';
 
@@ -48,10 +49,8 @@ interface CellsTableProps {
   files: CellFile[];
   cellsRepository: CellsRepository;
   conversationId: string;
-  fixedWidths?: number[];
   onDeleteFile: (uuid: string) => void;
   onUpdateBodyHeight: (height: number) => void;
-  onUpdateColumnWidths: (widths: number[]) => void;
 }
 
 const columnHelper = createColumnHelper<CellFile>();
@@ -60,15 +59,11 @@ export const CellsTable = ({
   files,
   cellsRepository,
   conversationId,
-  fixedWidths,
   onDeleteFile,
   onUpdateBodyHeight,
-  onUpdateColumnWidths,
 }: CellsTableProps) => {
-  const {tableBodyRef, callbackRef} = useTableResizeObserver({
-    files,
-    onUpdateBodyHeight,
-    onUpdateColumnWidths,
+  const {tableBodyRef} = useTableHeight({
+    onUpdate: onUpdateBodyHeight,
   });
 
   const showDeleteFileModal = useCallback(
@@ -98,22 +93,27 @@ export const CellsTable = ({
       }),
       columnHelper.accessor('owner', {
         header: t('cellsGlobalView.tableRowOwner'),
-        cell: info => info.getValue(),
+        cell: info => <span css={textWithEllipsisStyles}>{info.getValue()}</span>,
+        size: 170,
       }),
       columnHelper.accessor('sizeMb', {
         header: t('cellsGlobalView.tableRowSize'),
         cell: info => info.getValue(),
+        size: 100,
       }),
       columnHelper.accessor('uploadedAtTimestamp', {
         header: t('cellsGlobalView.tableRowCreated'),
         cell: info => <CellsTableDateColumn timestamp={info.getValue()} />,
+        size: 125,
       }),
       columnHelper.accessor('publicLink', {
         header: t('cellsGlobalView.tableRowPublicLink'),
         cell: info => <CellsTableSharedColumn isShared={!!info.getValue()?.alreadyShared} />,
+        size: 60,
       }),
       columnHelper.accessor('id', {
         header: () => <span className="visually-hidden">{t('cellsGlobalView.tableRowActions')}</span>,
+        size: 40,
         cell: info => {
           const {previewImageUrl, fileUrl} = info.row.original;
           const uuid = info.getValue();
@@ -154,18 +154,13 @@ export const CellsTable = ({
           {table.getHeaderGroups().map(headerGroup => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header, index) => {
-                const shouldSetFixedWidth = fixedWidths && fixedWidths[index] && index < headerGroup.headers.length - 1;
-
                 return (
                   <th
                     key={header.id}
                     css={headerCellStyles}
-                    style={
-                      {
-                        '--column-width': shouldSetFixedWidth ? `${fixedWidths[index]}px` : undefined,
-                      } as CSSProperties
-                    }
-                    ref={element => callbackRef(element, index)}
+                    style={{
+                      width: header.id == 'name' ? undefined : header.getSize(),
+                    }}
                   >
                     {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                   </th>
@@ -183,6 +178,9 @@ export const CellsTable = ({
                     key={cell.id}
                     css={cell.column.id === 'id' ? tableActionsCellStyles : tableCellStyles}
                     data-cell={cell.column.id === 'id' ? undefined : cell.column.columnDef.header}
+                    style={{
+                      width: cell.column.id == 'name' ? undefined : cell.column.getSize(),
+                    }}
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
