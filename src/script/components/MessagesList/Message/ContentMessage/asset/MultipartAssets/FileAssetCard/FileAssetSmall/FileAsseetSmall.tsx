@@ -19,19 +19,25 @@
 
 import {FileCard} from 'Components/FileCard/FileCard';
 
+import {FileAssetOptions} from '../common/FileAssetOptions/FileAssetOptions';
+
 interface FileAssetSmallProps {
+  src?: string;
   extension: string;
   name: string;
   size: string;
   isError: boolean;
+  senderName: string;
+  timestamp: number;
 }
 
-export const FileAssetSmall = ({extension, name, size, isError}: FileAssetSmallProps) => {
+export const FileAssetSmall = ({src, extension, name, size, isError, senderName, timestamp}: FileAssetSmallProps) => {
   return (
     <FileCard.Root extension={extension} name={name} size={size}>
       <FileCard.Header>
         <FileCard.Icon type={isError ? 'unavailable' : 'file'} />
         {!isError && <FileCard.Type />}
+        <FileAssetOptions src={src} name={name} extension={extension} senderName={senderName} timestamp={timestamp} />
       </FileCard.Header>
       <FileCard.Name variant={isError ? 'secondary' : 'primary'} />
     </FileCard.Root>

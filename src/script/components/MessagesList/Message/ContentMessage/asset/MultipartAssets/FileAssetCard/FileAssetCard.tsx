@@ -65,5 +65,15 @@ export const FileAssetCard = ({
     );
   }
 
-  return <FileAssetSmall extension={extension} name={formattedName} size={size} isError={isError} />;
+  return (
+    <FileAssetSmall
+      src={src}
+      extension={extension}
+      name={formattedName}
+      size={size}
+      isError={isError}
+      senderName={senderName}
+      timestamp={timestamp}
+    />
+  );
 };
