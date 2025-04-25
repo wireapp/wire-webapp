@@ -17,7 +17,7 @@
  *
  */
 
-import {CPBackup, CPBackupImporter, BackupImportResult} from './CPB.library';
+import {CPBackupImporter, BackupImportResult} from './CPB.library';
 import {ImportHistoryToDatabaseParams} from './CPB.types';
 import {mapConversationRecord, mapUserRecord} from './importMappers';
 import {mapEventRecord} from './importMappers/mapEventRecord';
@@ -38,43 +38,54 @@ export const importCPBHistoryToDatabase = async ({
   fileDescriptors: FileDescriptor[];
 }> => {
   const backupImporter = new CPBackupImporter();
-  const backupRawData = fileData[CPBackup.ZIP_ENTRY_DATA];
+  const backupRawData = fileData;
   const FileDescriptor: FileDescriptor[] = [];
 
   // Import the backup
-  const result = backupImporter.importBackup(new Int8Array(backupRawData.buffer));
+
+  const result = backupImporter.importFromFileData(backupRawData, null);
 
   if (result instanceof BackupImportResult.Success) {
+    const pager = result.pager;
     // import events
     const eventRecords: EventRecord[] = [];
-    result.backupData.messages.forEach(message => {
-      const eventRecord = mapEventRecord(message);
-      if (eventRecord) {
-        eventRecords.push(eventRecord);
-      }
-    });
+    while (pager.messagesPager.hasMorePages()) {
+      const messages = pager.messagesPager.nextPage();
+      messages.forEach(message => {
+        const eventRecord = mapEventRecord(message);
+        if (eventRecord) {
+          eventRecords.push(eventRecord);
+        }
+      });
+    }
     FileDescriptor.push({entities: eventRecords, filename: Filename.EVENTS});
     CPBLogger.log(`IMPORTED ${eventRecords.length} EVENTS`);
 
     // import conversations
     const conversationRecords: ConversationRecord[] = [];
-    result.backupData.conversations.forEach(conversation => {
-      const conversationRecord = mapConversationRecord(conversation);
-      if (conversationRecord) {
-        conversationRecords.push(conversationRecord);
-      }
-    });
+    while (pager.conversationsPager.hasMorePages()) {
+      const conversations = pager.conversationsPager.nextPage();
+      conversations.forEach(conversation => {
+        const conversationRecord = mapConversationRecord(conversation);
+        if (conversationRecord) {
+          conversationRecords.push(conversationRecord);
+        }
+      });
+    }
     FileDescriptor.push({entities: conversationRecords, filename: Filename.CONVERSATIONS});
     CPBLogger.log(`IMPORTED ${conversationRecords.length} CONVERSATIONS`);
 
     // import users
     const userRecords: UserRecord[] = [];
-    result.backupData.users.forEach(user => {
-      const userRecord = mapUserRecord(user);
-      if (userRecord) {
-        userRecords.push(userRecord);
-      }
-    });
+    while (pager.usersPager.hasMorePages()) {
+      const users = pager.usersPager.nextPage();
+      users.forEach(user => {
+        const userRecord = mapUserRecord(user);
+        if (userRecord) {
+          userRecords.push(userRecord);
+        }
+      });
+    }
     FileDescriptor.push({entities: userRecords, filename: Filename.USERS});
     CPBLogger.log(`IMPORTED ${userRecords.length} USERS`);
   } else {
