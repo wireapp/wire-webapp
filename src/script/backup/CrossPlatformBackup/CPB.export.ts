@@ -38,7 +38,7 @@ import {
   UserTableEntrySchema,
 } from './data.schema';
 
-import {CancelError} from '../Error';
+import {CancelError, ExportError} from '../Error';
 import {preprocessConversations, preprocessUsers, preprocessEvents} from '../recordPreprocessors';
 
 import {CPBLogger, exportTable, isAssetAddEvent, isMessageAddEvent, isSupportedEventType} from '.';
@@ -221,6 +221,12 @@ export const exportCPBHistoryFromDatabase = async ({
   if (result instanceof BackupExportResult.Success) {
     return result.bytes;
   }
-  CPBLogger.error(`ERROR DURING BACKUP EXPORT: ${result}`);
-  throw new Error('Incompatible cross-platform backup');
+
+  if (result instanceof BackupExportResult.Failure) {
+    CPBLogger.error(`Backup export failed: ${result.message}`);
+    throw new ExportError(result.message);
+  }
+
+  CPBLogger.error(`Backup export failed.`);
+  throw new ExportError('Backup export failed');
 };
