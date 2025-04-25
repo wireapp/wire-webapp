@@ -19,9 +19,10 @@
 
 import {CSSObject} from '@emotion/react';
 
+import {fileHeaderHeight} from '../common/fileHeaderHeight/fileHeaderHeight';
+
 export const wrapperStyles: CSSObject = {
-  '--header-height': '45px',
-  height: 'calc(100% - var(--header-height))',
+  height: `calc(100% - ${fileHeaderHeight}px)`,
   width: '100%',
   display: 'flex',
 };

@@ -28,7 +28,7 @@ import {setContextMenuPosition} from 'Util/util';
 
 import {buttonStyles, iconStyles} from './FileAssetOptions.styles';
 
-import {FileFullscreenModal} from '../../../common/FileFullscreenModal/FileFullscreenModal';
+import {FileFullscreenModal} from '../../../../../../../../FileFullscreenModal/FileFullscreenModal';
 
 interface FileAssetOptionsProps {
   name: string;

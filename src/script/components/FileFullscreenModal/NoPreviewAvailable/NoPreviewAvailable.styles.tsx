@@ -17,15 +17,30 @@
  *
  */
 
-import {t} from 'Util/LocalizerUtil';
+import {CSSObject} from '@emotion/react';
 
-import {descriptionStyles, titleStyles, wrapperStyles} from './PdfError.styles';
+import {fileHeaderHeight} from '../common/fileHeaderHeight/fileHeaderHeight';
 
-export const PdfError = () => {
-  return (
-    <section css={wrapperStyles}>
-      <h3 css={titleStyles}>{t('pdfViewerErrorTitle')}</h3>
-      <p css={descriptionStyles}>{t('pdfViewerErrorDescription')}</p>
-    </section>
-  );
+export const wrapperStyles: CSSObject = {
+  display: 'flex',
+  height: `calc(100% - ${fileHeaderHeight}px)`,
+  width: '100%',
+};
+
+export const contentStyles: CSSObject = {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '100%',
+  gap: '16px',
+};
+
+export const titleStyles: CSSObject = {
+  fontSize: 'var(--font-size-large)',
+  fontWeight: 'var(--font-weight-semibold)',
+};
+
+export const descriptionStyles: CSSObject = {
+  fontSize: 'var(--font-size-base)',
 };

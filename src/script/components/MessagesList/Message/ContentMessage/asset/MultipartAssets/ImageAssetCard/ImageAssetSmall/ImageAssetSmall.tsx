@@ -23,7 +23,7 @@ import {t} from 'Util/LocalizerUtil';
 
 import {containerStyles, imageStyles} from './ImageAssetSmall.styles';
 
-import {FileFullscreenModal} from '../../common/FileFullscreenModal/FileFullscreenModal';
+import {FileFullscreenModal} from '../../../../../../../FileFullscreenModal/FileFullscreenModal';
 import {MediaFilePreviewCard} from '../../common/MediaFilePreviewCard/MediaFilePreviewCard';
 
 interface ImageAssetSmallProps {

@@ -19,11 +19,13 @@
 
 import {CSSObject} from '@emotion/react';
 
+import {fileHeaderHeight} from '../common/fileHeaderHeight/fileHeaderHeight';
+
 export const headerStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  height: '45px',
+  height: fileHeaderHeight,
   width: '100%',
   lineHeight: 'var(--line-height-sm)',
   borderBottom: '1px solid var(--border-color)',

@@ -17,7 +17,7 @@
  *
  */
 
-import {FileFullscreenModal} from 'Components/MessagesList/Message/ContentMessage/asset/MultipartAssets/common/FileFullscreenModal/FileFullscreenModal';
+import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
 import {getFileExtension} from 'Util/util';
 
 import {useCellsFilePreviewModal} from '../common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';

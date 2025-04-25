@@ -17,20 +17,4 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
-
-export const wrapperStyles: CSSObject = {
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  gap: '16px',
-};
-
-export const titleStyles: CSSObject = {
-  fontSize: 'var(--font-size-large)',
-  fontWeight: 'var(--font-weight-semibold)',
-};
-
-export const descriptionStyles: CSSObject = {
-  fontSize: 'var(--font-size-base)',
-};
+export const fileHeaderHeight = 45;

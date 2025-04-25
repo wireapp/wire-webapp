@@ -17,12 +17,13 @@
  *
  */
 
+import {PDFViewer} from 'Components/FileFullscreenModal/PdfViewer/PdfViewer';
 import {FullscreenModal} from 'Components/FullscreenModal/FullscreenModal';
-import {PDFViewer} from 'Components/PdfViewer/PdfViewer';
 import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTypeFromExtension';
 
 import {FileHeader} from './FileHeader/FileHeader';
 import {ImageFileView} from './ImageFileView/ImageFileView';
+import {NoPreviewAvailable} from './NoPreviewAvailable/NoPreviewAvailable';
 
 interface FileFullscreenModalProps {
   id: string;
@@ -54,7 +55,13 @@ export const FileFullscreenModal = ({
         senderName={senderName}
         timestamp={timestamp}
       />
-      <ModalContent fileExtension={fileExtension} fileUrl={fileUrl} senderName={senderName} timestamp={timestamp} />
+      <ModalContent
+        fileExtension={fileExtension}
+        fileUrl={fileUrl}
+        fileName={fileName}
+        senderName={senderName}
+        timestamp={timestamp}
+      />
     </FullscreenModal>
   );
 };
@@ -62,11 +69,12 @@ export const FileFullscreenModal = ({
 interface ModalContentProps {
   fileUrl?: string;
   fileExtension: string;
+  fileName: string;
   senderName: string;
   timestamp: number;
 }
 
-const ModalContent = ({fileExtension, fileUrl, senderName, timestamp}: ModalContentProps) => {
+const ModalContent = ({fileExtension, fileUrl, fileName, senderName, timestamp}: ModalContentProps) => {
   const fileType = getFileTypeFromExtension(fileExtension);
 
   switch (fileType) {
@@ -75,6 +83,6 @@ const ModalContent = ({fileExtension, fileUrl, senderName, timestamp}: ModalCont
     case 'pdf':
       return <PDFViewer src={fileUrl} />;
     default:
-      return null;
+      return <NoPreviewAvailable fileUrl={fileUrl} fileName={fileName} />;
   }
 };

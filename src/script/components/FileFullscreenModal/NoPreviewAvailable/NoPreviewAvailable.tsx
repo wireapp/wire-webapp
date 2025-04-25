@@ -17,30 +17,23 @@
  *
  */
 
-import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
-import {getFileExtension} from 'Util/util';
+import {Button} from '@wireapp/react-ui-kit';
 
-import {useCellsFilePreviewModal} from '../common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
+import {forcedDownloadFile} from 'Util/util';
 
-export const CellsFilePreviewModal = () => {
-  const {id, selectedFile, handleCloseFile} = useCellsFilePreviewModal();
+import {FilePlaceholder} from '../common/FilePlaceholder/FilePlaceholder';
 
-  if (!selectedFile) {
-    return null;
-  }
+interface NoPreviewAvailableProps {
+  fileUrl?: string;
+  fileName: string;
+}
 
-  const {fileUrl, name, owner, uploadedAtTimestamp} = selectedFile;
-
+export const NoPreviewAvailable = ({fileUrl, fileName}: NoPreviewAvailableProps) => {
   return (
-    <FileFullscreenModal
-      id={id}
-      isOpen={!!selectedFile}
-      onClose={handleCloseFile}
-      fileUrl={fileUrl}
-      fileName={name}
-      fileExtension={getFileExtension(name)}
-      senderName={owner}
-      timestamp={uploadedAtTimestamp}
+    <FilePlaceholder
+      title="File has no preview"
+      description="There is no preview available for this file. Download the fle instead."
+      callToAction={<Button onClick={() => forcedDownloadFile({url: fileUrl || '', name: fileName})}>Download</Button>}
     />
   );
 };

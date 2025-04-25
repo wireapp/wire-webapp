@@ -35,7 +35,7 @@ import {
   loaderIconStyles,
 } from './ImageAssetLarge.styles';
 
-import {FileFullscreenModal} from '../../common/FileFullscreenModal/FileFullscreenModal';
+import {FileFullscreenModal} from '../../../../../../../FileFullscreenModal/FileFullscreenModal';
 
 interface ImageAssetLargeProps {
   src?: string;
