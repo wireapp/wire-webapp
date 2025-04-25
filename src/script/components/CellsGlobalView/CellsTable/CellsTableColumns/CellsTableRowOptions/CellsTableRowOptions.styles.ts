@@ -28,6 +28,11 @@ export const buttonStyles: CSSObject = {
   padding: '12px 0',
   margin: '0',
   width: '100%',
+  borderRadius: '8px',
+
+  '&:hover, &:focus-visible': {
+    backgroundColor: 'var(--foreground-fade-8)',
+  },
 
   [`@media (min-width: ${styleBreakpoint}px)`]: {
     width: '40px',

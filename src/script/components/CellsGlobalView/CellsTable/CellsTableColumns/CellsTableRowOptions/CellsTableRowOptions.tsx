@@ -87,19 +87,17 @@ export const CellsTableRowOptions = ({file, onDelete, cellsRepository}: CellsTab
   };
 
   return (
-    <>
-      <button
-        css={buttonStyles}
-        onKeyDown={handleKeyDown}
-        onClick={showOptionsMenu}
-        aria-label={t('cellsGlobalView.optionsLabel')}
-        aria-controls={id}
-        aria-expanded={!!selectedFile}
-        aria-haspopup="dialog"
-      >
-        <MoreIcon css={iconStyles} />
-        <span css={textStyles}>{t('cellsGlobalView.optionsLabel')}</span>
-      </button>
-    </>
+    <button
+      css={buttonStyles}
+      onKeyDown={handleKeyDown}
+      onClick={showOptionsMenu}
+      aria-label={t('cellsGlobalView.optionsLabel')}
+      aria-controls={id}
+      aria-expanded={!!selectedFile}
+      aria-haspopup="dialog"
+    >
+      <MoreIcon css={iconStyles} />
+      <span css={textStyles}>{t('cellsGlobalView.optionsLabel')}</span>
+    </button>
   );
 };
