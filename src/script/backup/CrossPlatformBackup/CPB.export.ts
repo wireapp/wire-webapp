@@ -216,7 +216,7 @@ export const exportCPBHistoryFromDatabase = async ({
 
   // ------------------------------
 
-  const result = await backupExporter.finalize(password ?? null);
+  const result = await backupExporter.finalize(password);
 
   if (result instanceof BackupExportResult.Success) {
     return result.bytes;
