@@ -28,6 +28,7 @@ import {
   BackupDateTime,
   BackupMessageContent,
   BackupMessage,
+  BackupExportResult,
 } from './CPB.library';
 import {ExportHistoryFromDatabaseParams} from './CPB.types';
 import {
@@ -37,10 +38,13 @@ import {
   UserTableEntrySchema,
 } from './data.schema';
 
-import {CancelError} from '../Error';
+import {CancelError, ExportError} from '../Error';
 import {preprocessConversations, preprocessUsers, preprocessEvents} from '../recordPreprocessors';
 
 import {CPBLogger, exportTable, isAssetAddEvent, isMessageAddEvent, isSupportedEventType} from '.';
+
+const PROGRESSION_STEP = 10;
+const PROGRESSION_COMPLETE = 100;
 
 // Helper function to transform an Int8Array to an object
 const transformObjectToArray = (array: {[key: number]: number}): Int8Array => {
@@ -58,8 +62,9 @@ export const exportCPBHistoryFromDatabase = async ({
   backupService,
   progressCallback,
   user,
+  password,
   checkCancelStatus,
-}: ExportHistoryFromDatabaseParams): Promise<Int8Array> => {
+}: ExportHistoryFromDatabaseParams): Promise<Uint8Array> => {
   const [conversationTable, eventsTable, usersTable] = backupService.getTables();
   const backupExporter = new CPBackupExporter(new BackupQualifiedId(user.id, user.domain));
 
@@ -86,12 +91,14 @@ export const exportCPBHistoryFromDatabase = async ({
     const {success, data, error} = ConversationTableEntrySchema.safeParse(record);
 
     if (success) {
-      backupExporter.addConversation(new BackUpConversation(new BackupQualifiedId(data.id, data.domain), data.name));
+      backupExporter.addConversation(
+        new BackUpConversation(new BackupQualifiedId(data.id, data.domain), data.name ?? ''),
+      );
     } else {
       CPBLogger.error('Conversation data schema validation failed', error);
     }
 
-    if (index % 10 === 0) {
+    if (index % PROGRESSION_STEP === 0) {
       checkIfCancelled();
     }
   });
@@ -110,7 +117,7 @@ export const exportCPBHistoryFromDatabase = async ({
       backupExporter.addUser(
         new BackupUser(
           new BackupQualifiedId(data?.qualified_id?.id ?? data.id, data?.qualified_id?.domain ?? ''),
-          data.name,
+          data.name ?? '',
           data.handle ?? '',
         ),
       );
@@ -118,7 +125,7 @@ export const exportCPBHistoryFromDatabase = async ({
       CPBLogger.error('User data schema validation failed', error);
     }
 
-    if (index % 10 === 0) {
+    if (index % PROGRESSION_STEP === 0) {
       checkIfCancelled();
     }
   });
@@ -202,12 +209,24 @@ export const exportCPBHistoryFromDatabase = async ({
       CPBLogger.error('Event data schema validation failed', error);
     }
 
-    if (index % 100 === 0) {
+    if (index % PROGRESSION_COMPLETE === 0) {
       checkIfCancelled();
     }
   });
 
   // ------------------------------
 
-  return backupExporter.serialize();
+  const result = await backupExporter.finalize(password);
+
+  if (result instanceof BackupExportResult.Success) {
+    return result.bytes;
+  }
+
+  if (result instanceof BackupExportResult.Failure) {
+    CPBLogger.error(`Backup export failed: ${result.message}`);
+    throw new ExportError(result.message);
+  }
+
+  CPBLogger.error(`Backup export failed.`);
+  throw new ExportError('Backup export failed');
 };

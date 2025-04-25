@@ -27,7 +27,7 @@ import {WebWorker} from 'Util/worker';
 import {ProgressCallback, Filename, FileDescriptor} from './Backup.types';
 import {BackUpHeader, ERROR_TYPES} from './BackUpHeader';
 import {BackupService} from './BackupService';
-import {exportCPBHistoryFromDatabase, importCPBHistoryToDatabase, CPBackup, isCPBackup} from './CrossPlatformBackup';
+import {exportCPBHistoryFromDatabase, importCPBHistoryToDatabase, isCPBackup} from './CrossPlatformBackup';
 import {
   CancelError,
   DifferentAccountError,
@@ -102,12 +102,15 @@ export class BackupRepository {
           progressCallback,
           user,
           backupService: this.backupService,
+          password,
           checkCancelStatus,
         });
-        // If the feature flag is disabled, export the history as a legacy backup
-      } else {
-        exportedData = await exportHistory(progressCallback, this.backupService, checkCancelStatus);
+        // Compression and encryption are handled by the kalium-backup library
+        return new Blob([exportedData], {type: 'application/zip'});
       }
+
+      // If the feature flag is disabled, export the history as a legacy backup
+      exportedData = await exportHistory(progressCallback, this.backupService, checkCancelStatus);
 
       if (exportedData === null) {
         throw new Error('Exported data is null');
@@ -124,8 +127,8 @@ export class BackupRepository {
 
   private async compressHistoryFiles(
     user: User,
-    clientId: string, // TODO: Add clientId to metadata
-    exportedData: Int8Array | Record<string, any[]>,
+    clientId: string,
+    exportedData: Record<string, any[]>,
     password: string,
   ): Promise<Blob> {
     const files: Record<string, Uint8Array> = {};
@@ -134,24 +137,18 @@ export class BackupRepository {
       throw new CancelError();
     }
 
-    // If the exported data is an Int8Array, it is a cross-platform backup
-    if (exportedData instanceof Int8Array) {
-      files[CPBackup.ZIP_ENTRY_DATA] = new Uint8Array(exportedData.buffer, 0, exportedData.byteLength);
-      // If the exported data is an object, it is a legacy backup
-    } else {
-      const metaData = createMetaData(user, clientId, this.backupService);
+    const metaData = createMetaData(user, clientId, this.backupService);
 
-      const stringifiedMetadata = JSON.stringify(metaData, null, 2);
-      const encodedMetadata = new TextEncoder().encode(stringifiedMetadata);
+    const stringifiedMetadata = JSON.stringify(metaData, null, 2);
+    const encodedMetadata = new TextEncoder().encode(stringifiedMetadata);
 
-      for (const tableName in exportedData) {
-        const stringifiedData = JSON.stringify(exportedData[tableName]);
-        const encodedData = new TextEncoder().encode(stringifiedData);
-        const fileName = `${tableName}.json`;
-        files[fileName] = encodedData;
-      }
-      files[Filename.METADATA] = encodedMetadata;
+    for (const tableName in exportedData) {
+      const stringifiedData = JSON.stringify(exportedData[tableName]);
+      const encodedData = new TextEncoder().encode(stringifiedData);
+      const fileName = `${tableName}.json`;
+      files[fileName] = encodedData;
     }
+    files[Filename.METADATA] = encodedMetadata;
 
     if (password) {
       return this.createEncryptedBackup(files, user, password);

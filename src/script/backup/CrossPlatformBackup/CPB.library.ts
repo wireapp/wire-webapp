@@ -24,6 +24,7 @@ import {com} from '@wireapp/kalium-backup';
 import CPBackup = com.wire.backup.MPBackup;
 import CPBackupImporter = com.wire.backup.ingest.MPBackupImporter;
 import BackupImportResult = com.wire.backup.ingest.BackupImportResult;
+import BackupExportResult = com.wire.backup.dump.BackupExportResult;
 import CPBackupExporter = com.wire.backup.dump.MPBackupExporter;
 import BackupQualifiedId = com.wire.backup.data.BackupQualifiedId;
 import BackupMessage = com.wire.backup.data.BackupMessage;
@@ -38,6 +39,7 @@ import AssetMetaData = com.wire.backup.data.BackupMessageContent.Asset.AssetMeta
 export {
   CPBackup,
   CPBackupImporter,
+  BackupExportResult,
   BackupImportResult,
   CPBackupExporter,
   BackupQualifiedId,
