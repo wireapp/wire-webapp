@@ -23,28 +23,46 @@ import {CellPagination} from 'Components/Conversation/ConversationCells/common/c
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {formatBytes} from 'Util/util';
 
-import {CellFile} from '../common/cellFile/cellFile';
+import {CellFile, CellFolder} from '../common/cellFile/cellFile';
 
-export const transformNodesToCellsFiles = (nodes: RestNode[]): CellFile[] => {
+export const transformNodesToCellsFiles = (nodes: RestNode[]): Array<CellFile | CellFolder> => {
   return (
     nodes
-      .filter(node => node.Type === 'LEAF')
-      .map(node => ({
-        id: node.Uuid,
-        owner: getOwner(node),
-        conversationName: node.ContextWorkspace?.Label || '',
-        mimeType: node.ContentType,
-        name: getFileName(node.Path),
-        sizeMb: getFileSize(node),
-        previewImageUrl: getPreviewImageUrl(node),
-        uploadedAtTimestamp: getUploadedAtTimestamp(node),
-        fileUrl: node.PreSignedGET?.Url,
-        publicLink: {
-          alreadyShared: !!node.Shares?.[0].Uuid,
-          uuid: node.Shares?.[0].Uuid || '',
-          url: undefined,
-        },
-      }))
+      .map(node => {
+        if (node.Type === 'COLLECTION') {
+          return {
+            id: node.Uuid,
+            type: 'folder' as const,
+            owner: getOwner(node),
+            name: getFileName(node.Path),
+            sizeMb: getFileSize(node),
+            uploadedAtTimestamp: getUploadedAtTimestamp(node),
+            publicLink: {
+              alreadyShared: !!node.Shares?.[0].Uuid,
+              uuid: node.Shares?.[0].Uuid || '',
+              url: undefined,
+            },
+          };
+        }
+
+        return {
+          id: node.Uuid,
+          type: 'file' as const,
+          owner: getOwner(node),
+          conversationName: node.ContextWorkspace?.Label || '',
+          mimeType: node.ContentType,
+          name: getFileName(node.Path),
+          sizeMb: getFileSize(node),
+          previewImageUrl: getPreviewImageUrl(node),
+          uploadedAtTimestamp: getUploadedAtTimestamp(node),
+          fileUrl: node.PreSignedGET?.Url,
+          publicLink: {
+            alreadyShared: !!node.Shares?.[0].Uuid,
+            uuid: node.Shares?.[0].Uuid || '',
+            url: undefined,
+          },
+        };
+      })
       // eslint-disable-next-line id-length
       .sort((a, b) => b.uploadedAtTimestamp - a.uploadedAtTimestamp)
   );

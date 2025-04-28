@@ -43,17 +43,17 @@ import {CellsTableRowOptions} from './CellsTableRowOptions/CellsTableRowOptions'
 import {CellsTableSharedColumn} from './CellsTableSharedColumn/CellsTableSharedColumn';
 import {useTableHeight} from './useTableHeight/useTableHeight';
 
-import {CellFile} from '../common/cellFile/cellFile';
+import {CellFile, CellFolder} from '../common/cellFile/cellFile';
 
 interface CellsTableProps {
-  files: CellFile[];
+  files: Array<CellFile | CellFolder>;
   cellsRepository: CellsRepository;
   conversationId: string;
   onDeleteFile: (uuid: string) => void;
   onUpdateBodyHeight: (height: number) => void;
 }
 
-const columnHelper = createColumnHelper<CellFile>();
+const columnHelper = createColumnHelper<CellFile | CellFolder>();
 
 export const CellsTable = ({
   files,
@@ -83,13 +83,7 @@ export const CellsTable = ({
     () => [
       columnHelper.accessor('name', {
         header: t('cellsGlobalView.tableRowName'),
-        cell: info => (
-          <CellsTableNameColumn
-            name={info.getValue()}
-            previewUrl={info.row.original.previewImageUrl}
-            mimeType={info.row.original.mimeType}
-          />
-        ),
+        cell: info => <CellsTableNameColumn name={info.row.original.name} type={info.row.original.type} />,
       }),
       columnHelper.accessor('owner', {
         header: t('cellsGlobalView.tableRowOwner'),
@@ -115,6 +109,10 @@ export const CellsTable = ({
         header: () => <span className="visually-hidden">{t('cellsGlobalView.tableRowActions')}</span>,
         size: 40,
         cell: info => {
+          if (info.row.original.type === 'folder') {
+            return null;
+          }
+
           const {previewImageUrl, fileUrl} = info.row.original;
           const uuid = info.getValue();
           return (

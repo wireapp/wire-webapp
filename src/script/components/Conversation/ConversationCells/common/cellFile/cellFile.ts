@@ -19,6 +19,7 @@
 
 export interface CellFile {
   id: string;
+  type: 'file';
   mimeType?: string;
   name: string;
   sizeMb: string;
@@ -32,4 +33,18 @@ export interface CellFile {
     url?: string;
   };
   fileUrl?: string;
+}
+
+export interface CellFolder {
+  id: string;
+  type: 'folder';
+  name: string;
+  sizeMb: string;
+  uploadedAtTimestamp: number;
+  owner: string;
+  publicLink?: {
+    alreadyShared: boolean;
+    uuid?: string;
+    url?: string;
+  };
 }

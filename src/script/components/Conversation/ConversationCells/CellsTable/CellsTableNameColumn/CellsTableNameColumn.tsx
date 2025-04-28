@@ -17,7 +17,7 @@
  *
  */
 
-import {PlayIcon} from '@wireapp/react-ui-kit';
+import {FolderIcon, PlayIcon} from '@wireapp/react-ui-kit';
 
 import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
 import {getFileExtension} from 'Util/util';
@@ -35,9 +35,10 @@ interface CellsTableNameColumnProps {
   name: string;
   previewUrl?: string | null;
   mimeType?: string | null;
+  type: 'file' | 'folder';
 }
 
-export const CellsTableNameColumn = ({name, previewUrl, mimeType}: CellsTableNameColumnProps) => {
+export const CellsTableNameColumn = ({name, previewUrl, mimeType, type}: CellsTableNameColumnProps) => {
   const isImage = mimeType?.startsWith('image');
   const isVideo = mimeType?.startsWith('video');
 
@@ -52,8 +53,10 @@ export const CellsTableNameColumn = ({name, previewUrl, mimeType}: CellsTableNam
             <img src={previewUrl} alt="" width={24} height={24} css={imagePreviewStyles} />
             {isVideo && <PlayIcon css={playIconStyles} width={16} height={16} />}
           </div>
-        ) : (
+        ) : type === 'file' ? (
           <FileTypeIcon extension={getFileExtension(name)} size={24} />
+        ) : (
+          <FolderIcon width={24} height={24} />
         )}
         <span css={desktopNameStyles}>{name}</span>
       </div>

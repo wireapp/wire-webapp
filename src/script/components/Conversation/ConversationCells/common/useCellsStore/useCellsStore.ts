@@ -19,7 +19,7 @@
 
 import {create} from 'zustand';
 
-import {CellFile} from '../cellFile/cellFile';
+import {CellFile, CellFolder} from '../cellFile/cellFile';
 import {CellPagination} from '../cellPagination/cellPagination';
 
 type Status = 'idle' | 'loading' | 'success' | 'error';
@@ -27,20 +27,20 @@ type Status = 'idle' | 'loading' | 'success' | 'error';
 const DEFAULT_PAGE_SIZE = 50;
 
 interface CellsState {
-  filesByConversation: Record<string, CellFile[]>;
+  filesByConversation: Record<string, Array<CellFile | CellFolder>>;
   paginationByConversation: Record<string, CellPagination | null>;
   status: Status;
   error: Error | null;
   pageSize: number;
   setPageSize: (pageSize: number) => void;
-  setFiles: (params: {conversationId: string; files: CellFile[]}) => void;
+  setFiles: (params: {conversationId: string; files: Array<CellFile | CellFolder>}) => void;
   setPagination: (params: {conversationId: string; pagination: CellPagination | null}) => void;
   setStatus: (status: Status) => void;
   setError: (error: Error | null) => void;
   updateFile: (params: {conversationId: string; fileId: string; updates: Partial<CellFile>}) => void;
   removeFile: (params: {conversationId: string; fileId: string}) => void;
   clearAll: (params: {conversationId: string}) => void;
-  getFiles: (params: {conversationId: string}) => CellFile[];
+  getFiles: (params: {conversationId: string}) => Array<CellFile | CellFolder>;
   getPagination: (params: {conversationId: string}) => CellPagination | null;
 }
 
@@ -72,8 +72,9 @@ export const useCellsStore = create<CellsState>((set, get) => ({
       filesByConversation: {
         ...state.filesByConversation,
         [conversationId]:
-          state.filesByConversation[conversationId]?.map(file => (file.id === fileId ? {...file, ...updates} : file)) ||
-          [],
+          state.filesByConversation[conversationId]?.map(file =>
+            file.id === fileId && file.type === 'file' ? {...file, ...updates} : file,
+          ) || [],
       },
     })),
   removeFile: ({conversationId, fileId}) =>

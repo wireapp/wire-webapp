@@ -19,10 +19,10 @@
 
 import {useCallback, useState} from 'react';
 
-import {CellFile} from '../common/cellFile/cellFile';
+import {CellFile, CellFolder} from '../common/cellFile/cellFile';
 
 interface UseCellsLoaderSizeProps {
-  files: CellFile[];
+  files: Array<CellFile | CellFolder>;
 }
 
 export const useCellsLoaderSize = ({files}: UseCellsLoaderSizeProps) => {
