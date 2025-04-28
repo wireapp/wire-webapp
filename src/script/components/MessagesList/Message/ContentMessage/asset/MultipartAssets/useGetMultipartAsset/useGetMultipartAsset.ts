@@ -57,7 +57,8 @@ export const useGetMultipartAsset = ({
 }: UseGetMultipartAssetPreviewProps) => {
   const uuidRef = useRef(uuid);
   const [src, setSrc] = useState<string | undefined>(undefined);
-  const [previewUrl, setPreviewUrl] = useState<string | undefined>(undefined);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | undefined>(undefined);
+  const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | undefined>(undefined);
   const [status, setStatus] = useState<Status>('idle');
 
   const timeoutRef = useRef<number>();
@@ -83,18 +84,21 @@ export const useGetMultipartAsset = ({
       }
 
       const imagePreview = asset.Previews?.find(preview => preview?.ContentType?.startsWith('image/'));
+      const pdfPreview = asset.Previews?.find(preview => preview?.ContentType?.startsWith('application/pdf'));
 
-      const shouldReturnImmediately = !retryPreviewUntilSuccess || !imagePreview || imagePreview.Error;
+      const shouldReturnImmediately =
+        !retryPreviewUntilSuccess || (!imagePreview && !pdfPreview) || (imagePreview?.Error && pdfPreview?.Error);
 
       if (shouldReturnImmediately) {
         setSrc(asset.PreSignedGET?.Url);
-        setPreviewUrl(imagePreview?.PreSignedGET?.Url);
+        setImagePreviewUrl(imagePreview?.PreSignedGET?.Url);
+        setPdfPreviewUrl(pdfPreview?.PreSignedGET?.Url);
         setStatus('success');
 
         return;
       }
 
-      const shouldRetry = imagePreview.Processing && attemptRef.current < maxRetries;
+      const shouldRetry = (imagePreview?.Processing || pdfPreview?.Processing) && attemptRef.current < maxRetries;
 
       if (shouldRetry) {
         attemptRef.current += 1;
@@ -103,7 +107,8 @@ export const useGetMultipartAsset = ({
       }
 
       setSrc(asset.PreSignedGET?.Url);
-      setPreviewUrl(imagePreview.PreSignedGET?.Url);
+      setImagePreviewUrl(imagePreview?.PreSignedGET?.Url);
+      setPdfPreviewUrl(pdfPreview?.PreSignedGET?.Url);
       setStatus('success');
     } catch (err) {
       if (!isMounted.current) {
@@ -153,7 +158,8 @@ export const useGetMultipartAsset = ({
 
   return {
     src,
-    previewUrl,
+    imagePreviewUrl,
+    pdfPreviewUrl,
     isLoading: status === 'loading' || status === 'retrying',
     isError: status === 'error',
   };

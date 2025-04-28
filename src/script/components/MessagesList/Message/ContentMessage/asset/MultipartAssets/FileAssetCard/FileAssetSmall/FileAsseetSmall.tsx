@@ -48,6 +48,7 @@ export const FileAssetSmall = ({src, extension, name, size, isError, senderName,
       <FileCard.Name variant={isError ? 'secondary' : 'primary'} truncateAfterLines={2} />
       <FileFullscreenModal
         id={id}
+        type={extension === 'pdf' ? 'pdf' : 'image'}
         fileName={name}
         fileUrl={src}
         fileExtension={extension}

@@ -42,7 +42,8 @@ interface FileAssetWithPreviewProps {
   extension: string;
   name: string;
   size: string;
-  previewUrl?: string;
+  imagePreviewUrl?: string;
+  pdfPreviewUrl?: string;
   isLoading: boolean;
   isError: boolean;
   senderName: string;
@@ -54,7 +55,8 @@ export const FileAssetWithPreview = ({
   extension,
   name,
   size,
-  previewUrl,
+  imagePreviewUrl,
+  pdfPreviewUrl,
   isError,
   isLoading,
   senderName,
@@ -63,10 +65,34 @@ export const FileAssetWithPreview = ({
   const [isOpen, setIsOpen] = useState(false);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
 
-  const shouldDisplayLoading = (previewUrl ? !isImageLoaded : isLoading) && !isError;
-  const shouldDisplayPreviewError = isError || (!isLoading && !previewUrl);
+  const shouldDisplayLoading = (imagePreviewUrl ? !isImageLoaded : isLoading) && !isError;
+  const shouldDisplayPreviewError = isError || (!isLoading && !imagePreviewUrl);
 
   const id = useId();
+
+  const getType = () => {
+    if (extension === 'pdf') {
+      return 'pdf';
+    }
+
+    if (pdfPreviewUrl) {
+      return 'pdf';
+    }
+
+    return 'image';
+  };
+
+  const getFileUrl = () => {
+    if (isLoading || extension === 'pdf') {
+      return src;
+    }
+
+    if (pdfPreviewUrl) {
+      return pdfPreviewUrl;
+    }
+
+    return imagePreviewUrl;
+  };
 
   return (
     <>
@@ -87,8 +113,8 @@ export const FileAssetWithPreview = ({
             aria-expanded={isOpen}
           >
             <img
-              src={previewUrl}
-              style={{'--opacity': isImageLoaded && previewUrl ? 1 : 0} as CSSProperties}
+              src={imagePreviewUrl}
+              style={{'--opacity': isImageLoaded && imagePreviewUrl ? 1 : 0} as CSSProperties}
               alt=""
               css={imageStyles}
               onLoad={() => setIsImageLoaded(true)}
@@ -109,8 +135,9 @@ export const FileAssetWithPreview = ({
         </FileCard.Content>
         <FileFullscreenModal
           id={id}
+          type={getType()}
+          fileUrl={getFileUrl()}
           fileName={name}
-          fileUrl={src}
           fileExtension={extension}
           senderName={senderName}
           timestamp={timestamp}

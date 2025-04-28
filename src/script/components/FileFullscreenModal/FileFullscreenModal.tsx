@@ -19,7 +19,6 @@
 
 import {PDFViewer} from 'Components/FileFullscreenModal/PdfViewer/PdfViewer';
 import {FullscreenModal} from 'Components/FullscreenModal/FullscreenModal';
-import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTypeFromExtension';
 
 import {FileHeader} from './FileHeader/FileHeader';
 import {ImageFileView} from './ImageFileView/ImageFileView';
@@ -32,6 +31,7 @@ interface FileFullscreenModalProps {
   fileUrl?: string;
   fileName: string;
   fileExtension: string;
+  type: 'image' | 'pdf';
   senderName: string;
   timestamp: number;
 }
@@ -56,7 +56,7 @@ export const FileFullscreenModal = ({
         timestamp={timestamp}
       />
       <ModalContent
-        fileExtension={fileExtension}
+        type={fileExtension === 'pdf' ? 'pdf' : 'image'}
         fileUrl={fileUrl}
         fileName={fileName}
         senderName={senderName}
@@ -68,21 +68,24 @@ export const FileFullscreenModal = ({
 
 interface ModalContentProps {
   fileUrl?: string;
-  fileExtension: string;
   fileName: string;
+  type: 'image' | 'pdf';
   senderName: string;
   timestamp: number;
 }
 
-const ModalContent = ({fileExtension, fileUrl, fileName, senderName, timestamp}: ModalContentProps) => {
-  const fileType = getFileTypeFromExtension(fileExtension);
-
-  switch (fileType) {
-    case 'image':
-      return <ImageFileView src={fileUrl} senderName={senderName} timestamp={timestamp} />;
-    case 'pdf':
-      return <PDFViewer src={fileUrl} />;
-    default:
-      return <NoPreviewAvailable fileUrl={fileUrl} fileName={fileName} />;
+const ModalContent = ({type, fileUrl, fileName, senderName, timestamp}: ModalContentProps) => {
+  if (!fileUrl) {
+    return <NoPreviewAvailable fileUrl={fileUrl} fileName={fileName} />;
   }
+
+  if (type === 'image') {
+    return <ImageFileView src={fileUrl} senderName={senderName} timestamp={timestamp} />;
+  }
+
+  if (type === 'pdf') {
+    return <PDFViewer src={fileUrl} />;
+  }
+
+  return <NoPreviewAvailable fileUrl={fileUrl} fileName={fileName} />;
 };
