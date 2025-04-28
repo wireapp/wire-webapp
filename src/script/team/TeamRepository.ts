@@ -155,11 +155,14 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     }
 
     if (!teamId) {
+      const mlsFeature = newFeatureList[FEATURE_KEY.MLS];
       return {
         team: undefined,
-        features: {
-          mls: newFeatureList[FEATURE_KEY.MLS],
-        },
+        features: mlsFeature
+          ? {
+              mls: newFeatureList[FEATURE_KEY.MLS],
+            }
+          : {},
         members: [],
       };
     }
