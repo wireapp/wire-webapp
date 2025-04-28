@@ -17,7 +17,10 @@
  *
  */
 
+import {useId, useState} from 'react';
+
 import {FileCard} from 'Components/FileCard/FileCard';
+import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
 
 import {FileAssetOptions} from '../common/FileAssetOptions/FileAssetOptions';
 
@@ -32,14 +35,27 @@ interface FileAssetSmallProps {
 }
 
 export const FileAssetSmall = ({src, extension, name, size, isError, senderName, timestamp}: FileAssetSmallProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const id = useId();
+
   return (
     <FileCard.Root extension={extension} name={name} size={size}>
       <FileCard.Header>
         <FileCard.Icon type={isError ? 'unavailable' : 'file'} />
         {!isError && <FileCard.Type />}
-        <FileAssetOptions src={src} name={name} extension={extension} senderName={senderName} timestamp={timestamp} />
+        <FileAssetOptions onOpen={() => setIsOpen(true)} />
       </FileCard.Header>
       <FileCard.Name variant={isError ? 'secondary' : 'primary'} truncateAfterLines={2} />
+      <FileFullscreenModal
+        id={id}
+        fileName={name}
+        fileUrl={src}
+        fileExtension={extension}
+        senderName={senderName}
+        timestamp={timestamp}
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+      />
     </FileCard.Root>
   );
 };

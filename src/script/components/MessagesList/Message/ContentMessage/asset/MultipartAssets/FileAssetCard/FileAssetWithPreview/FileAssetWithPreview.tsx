@@ -17,11 +17,12 @@
  *
  */
 
-import {CSSProperties, useState} from 'react';
+import {CSSProperties, useId, useState} from 'react';
 
 import {AlertIcon} from '@wireapp/react-ui-kit';
 
 import {FileCard} from 'Components/FileCard/FileCard';
+import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
 import {t} from 'Util/LocalizerUtil';
 
 import {
@@ -59,9 +60,13 @@ export const FileAssetWithPreview = ({
   senderName,
   timestamp,
 }: FileAssetWithPreviewProps) => {
+  const [isOpen, setIsOpen] = useState(false);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
+
   const shouldDisplayLoading = (previewUrl ? !isImageLoaded : isLoading) && !isError;
   const shouldDisplayPreviewError = isError || (!isLoading && !previewUrl);
+
+  const id = useId();
 
   return (
     <>
@@ -70,10 +75,17 @@ export const FileAssetWithPreview = ({
           <FileCard.Icon type={isError ? 'unavailable' : 'file'} />
           {!isError && <FileCard.Type />}
           <FileCard.Name variant={isError ? 'secondary' : 'primary'} />
-          <FileAssetOptions src={src} name={name} extension={extension} senderName={senderName} timestamp={timestamp} />
+          <FileAssetOptions onOpen={() => setIsOpen(true)} />
         </FileCard.Header>
         <FileCard.Content>
-          <div css={contentWrapperStyles}>
+          <button
+            css={contentWrapperStyles}
+            onClick={() => setIsOpen(true)}
+            aria-label={t('cellsGlobalView.optionOpen')}
+            aria-controls={id}
+            aria-haspopup="dialog"
+            aria-expanded={isOpen}
+          >
             <img
               src={previewUrl}
               style={{'--opacity': isImageLoaded && previewUrl ? 1 : 0} as CSSProperties}
@@ -93,8 +105,18 @@ export const FileAssetWithPreview = ({
                 )}
               </div>
             </div>
-          </div>
+          </button>
         </FileCard.Content>
+        <FileFullscreenModal
+          id={id}
+          fileName={name}
+          fileUrl={src}
+          fileExtension={extension}
+          senderName={senderName}
+          timestamp={timestamp}
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+        />
       </FileCard.Root>
     </>
   );

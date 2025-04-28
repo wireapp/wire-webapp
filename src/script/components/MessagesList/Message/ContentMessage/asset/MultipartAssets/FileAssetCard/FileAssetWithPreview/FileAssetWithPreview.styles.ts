@@ -30,6 +30,9 @@ export const contentWrapperStyles: CSSObject = {
   color: 'var(--gray-70)',
   aspectRatio: '16/9',
   overflow: 'hidden',
+  padding: 0,
+  margin: 0,
+  cursor: 'pointer',
 
   // Fallback for the above aspect-ratio
   '@supports not (aspect-ratio: 16/9)': {
