@@ -19,7 +19,11 @@
 
 import {create} from 'zustand';
 
+<<<<<<< HEAD
 import {CellItem} from '../cellFile/cellFile';
+=======
+import {CellFile, CellFolder} from '../cellFile/cellFile';
+>>>>>>> 98649367b (feat: fetch folders)
 import {CellPagination} from '../cellPagination/cellPagination';
 
 type Status = 'idle' | 'loading' | 'success' | 'error';
