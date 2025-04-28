@@ -155,18 +155,8 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     }
 
     if (!teamId) {
-      const mlsFeature = newFeatureList[FEATURE_KEY.MLS];
-      return {
-        team: undefined,
-        features: mlsFeature
-          ? {
-              mls: newFeatureList[FEATURE_KEY.MLS],
-            }
-          : {},
-        members: [],
-      };
+      return {team: undefined, features: {}, members: []};
     }
-
     // Subscribe to team members change and update the user role and guest status
     this.teamState.teamMembers.subscribe(members => {
       this.userRepository.mapGuestStatus(members);

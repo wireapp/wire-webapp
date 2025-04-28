@@ -22,6 +22,8 @@
 
 import {Context} from '@wireapp/api-client/lib/auth';
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
+import {FeatureList} from '@wireapp/api-client/lib/team';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {EVENTS as CoreEvents} from '@wireapp/core/lib/Account';
 import {MLSServiceEvents} from '@wireapp/core/lib/messagingProtocols/mls';
 import {amplify} from 'amplify';
@@ -453,7 +455,19 @@ export class App {
       if (!localClient) {
         throw new ClientError(CLIENT_ERROR_TYPE.NO_VALID_CLIENT, 'Client has been deleted on backend');
       }
-      const {features: teamFeatures, members: teamMembers} = await teamRepository.initTeam(selfUser.teamId);
+
+      let teamFeatures: FeatureList = {};
+      let teamMembers: QualifiedId[] = [];
+
+      if (selfUser.teamId) {
+        const {features, members} = await teamRepository.initTeam(selfUser.teamId);
+        teamFeatures = features;
+        teamMembers = members;
+      } else {
+        const features = await this.apiClient.api.teams.feature.getAllFeatures();
+        teamFeatures = features;
+      }
+
       try {
         await this.core.initClient(localClient, getClientMLSConfig(teamFeatures));
       } catch (error) {
