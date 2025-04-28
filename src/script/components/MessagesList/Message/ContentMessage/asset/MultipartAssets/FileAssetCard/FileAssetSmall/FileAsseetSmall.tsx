@@ -39,7 +39,7 @@ export const FileAssetSmall = ({src, extension, name, size, isError, senderName,
         {!isError && <FileCard.Type />}
         <FileAssetOptions src={src} name={name} extension={extension} senderName={senderName} timestamp={timestamp} />
       </FileCard.Header>
-      <FileCard.Name variant={isError ? 'secondary' : 'primary'} />
+      <FileCard.Name variant={isError ? 'secondary' : 'primary'} truncateAfterLines={2} />
     </FileCard.Root>
   );
 };

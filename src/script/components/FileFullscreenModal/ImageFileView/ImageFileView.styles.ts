@@ -39,10 +39,6 @@ export const imageWrapperStyles: CSSObject = {
   alignContent: 'center',
 };
 
-export const imageStyle: CSSObject = {
-  aspectRatio: 'var(--aspect-ratio)',
-  maxWidth: '100%',
-  maxHeight: '100%',
-  objectFit: 'contain',
-  objectPosition: 'left center',
+export const imageStyles: CSSObject = {
+  borderRadius: '10px',
 };
