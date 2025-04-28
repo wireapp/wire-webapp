@@ -86,6 +86,7 @@ export const errorTextStyles: CSSObject = {
   fontWeight: 'var(--line-height-md)',
   lineHeight: 'var(--line-height-sm)',
   color: 'var(--gray-70)',
+  textAlign: 'left',
 
   'body.dark &': {
     color: 'var(--gray-40)',

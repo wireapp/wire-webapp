@@ -20,7 +20,7 @@
 import {ZoomableImage} from 'Components/ZoomableImage/ZoomableImage';
 import {t} from 'Util/LocalizerUtil';
 
-import {imageWrapperStyles, wrapperStyles} from './ImageFullscreenModal.styles';
+import {imageWrapperStyles, wrapperStyles, imageStyles} from './ImageFullscreenModal.styles';
 
 import {FileFullscreenModal} from '../../../common/FileFullscreenModal/FileFullscreenModal';
 
@@ -63,6 +63,7 @@ export const ImageFullscreenModal = ({
               username: senderName,
               messageDate: timestamp,
             })}
+            imageCSS={imageStyles}
           />
         </div>
       </div>
