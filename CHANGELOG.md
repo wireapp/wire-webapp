@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.47.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.46.0...@wireapp/api-client@27.47.0) (2025-04-28)
+
+### Features
+
+* Add new billing API [WPB-16307] ([#7035](https://github.com/wireapp/wire-web-packages/issues/7035)) ([524e07f](https://github.com/wireapp/wire-web-packages/commit/524e07fd116d56cb0c419b02227144edb7c427eb))
+
 # [27.46.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.45.0...@wireapp/api-client@27.46.0) (2025-04-22)
 
 ### Features
