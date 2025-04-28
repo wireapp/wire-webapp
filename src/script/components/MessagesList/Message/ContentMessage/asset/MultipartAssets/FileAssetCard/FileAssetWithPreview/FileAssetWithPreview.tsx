@@ -22,7 +22,6 @@ import {CSSProperties, useId, useState} from 'react';
 import {AlertIcon} from '@wireapp/react-ui-kit';
 
 import {FileCard} from 'Components/FileCard/FileCard';
-import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
 import {t} from 'Util/LocalizerUtil';
 
 import {
@@ -36,6 +35,7 @@ import {
 } from './FileAssetWithPreview.styles';
 
 import {FileAssetOptions} from '../common/FileAssetOptions/FileAssetOptions';
+import {FilePreviewModal} from '../common/FilePreviewModal/FilePreviewModal';
 
 interface FileAssetWithPreviewProps {
   src?: string;
@@ -70,81 +70,58 @@ export const FileAssetWithPreview = ({
 
   const id = useId();
 
-  const getType = () => {
-    if (extension === 'pdf') {
-      return 'pdf';
-    }
-
-    if (pdfPreviewUrl) {
-      return 'pdf';
-    }
-
-    return 'image';
-  };
-
-  const getFileUrl = () => {
-    if (isLoading || extension === 'pdf') {
-      return src;
-    }
-
-    if (pdfPreviewUrl) {
-      return pdfPreviewUrl;
-    }
-
-    return imagePreviewUrl;
-  };
-
   return (
-    <>
-      <FileCard.Root variant="large" extension={extension} name={name} size={size}>
-        <FileCard.Header>
-          <FileCard.Icon type={isError ? 'unavailable' : 'file'} />
-          {!isError && <FileCard.Type />}
-          <FileCard.Name variant={isError ? 'secondary' : 'primary'} />
-          <FileAssetOptions onOpen={() => setIsOpen(true)} />
-        </FileCard.Header>
-        <FileCard.Content>
-          <button
-            css={contentWrapperStyles}
-            onClick={() => setIsOpen(true)}
-            aria-label={t('cellsGlobalView.optionOpen')}
-            aria-controls={id}
-            aria-haspopup="dialog"
-            aria-expanded={isOpen}
-          >
-            <img
-              src={imagePreviewUrl}
-              style={{'--opacity': isImageLoaded && imagePreviewUrl ? 1 : 0} as CSSProperties}
-              alt=""
-              css={imageStyles}
-              onLoad={() => setIsImageLoaded(true)}
-            />
+    <FileCard.Root variant="large" extension={extension} name={name} size={size}>
+      <FileCard.Header>
+        <FileCard.Icon type={isError ? 'unavailable' : 'file'} />
+        {!isError && <FileCard.Type />}
+        <FileCard.Name variant={isError ? 'secondary' : 'primary'} />
+        <FileAssetOptions onOpen={() => setIsOpen(true)} />
+      </FileCard.Header>
+      <FileCard.Content>
+        <button
+          css={contentWrapperStyles}
+          onClick={() => setIsOpen(true)}
+          aria-label={t('cellsGlobalView.optionOpen')}
+          aria-controls={id}
+          aria-haspopup="dialog"
+          aria-expanded={isOpen}
+        >
+          <img
+            src={imagePreviewUrl}
+            style={{'--opacity': isImageLoaded && imagePreviewUrl ? 1 : 0} as CSSProperties}
+            alt=""
+            css={imageStyles}
+            onLoad={() => setIsImageLoaded(true)}
+          />
 
-            <div css={infoOverlayStyles}>
-              <div css={infoWrapperStyles}>
-                {shouldDisplayLoading && <div className="icon-spinner spin" css={loaderIconStyles} />}
-                {shouldDisplayPreviewError && (
-                  <>
-                    <AlertIcon css={errorIconStyles} width={14} height={14} />
-                    <p css={errorTextStyles}>{t('cellsUnavailableFilePreview')}</p>
-                  </>
-                )}
-              </div>
+          <div css={infoOverlayStyles}>
+            <div css={infoWrapperStyles}>
+              {shouldDisplayLoading && <div className="icon-spinner spin" css={loaderIconStyles} />}
+              {shouldDisplayPreviewError && (
+                <>
+                  <AlertIcon css={errorIconStyles} width={14} height={14} />
+                  <p css={errorTextStyles}>{t('cellsUnavailableFilePreview')}</p>
+                </>
+              )}
             </div>
-          </button>
-        </FileCard.Content>
-        <FileFullscreenModal
-          id={id}
-          type={getType()}
-          fileUrl={getFileUrl()}
-          fileName={name}
-          fileExtension={extension}
-          senderName={senderName}
-          timestamp={timestamp}
-          isOpen={isOpen}
-          onClose={() => setIsOpen(false)}
-        />
-      </FileCard.Root>
-    </>
+          </div>
+        </button>
+      </FileCard.Content>
+      <FilePreviewModal
+        id={id}
+        fileUrl={src}
+        filePdfPreviewUrl={pdfPreviewUrl}
+        fileImagePreviewUrl={imagePreviewUrl}
+        fileName={name}
+        fileExtension={extension}
+        senderName={senderName}
+        timestamp={timestamp}
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        isLoading={isLoading}
+        isError={isError}
+      />
+    </FileCard.Root>
   );
 };

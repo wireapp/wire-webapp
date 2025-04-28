@@ -77,6 +77,9 @@ export const FileAssetCard = ({
       isError={isError}
       senderName={senderName}
       timestamp={timestamp}
+      pdfPreviewUrl={pdfPreviewUrl}
+      imagePreviewUrl={imagePreviewUrl}
+      isLoading={isLoading}
     />
   );
 };

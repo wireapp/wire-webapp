@@ -20,21 +20,35 @@
 import {useId, useState} from 'react';
 
 import {FileCard} from 'Components/FileCard/FileCard';
-import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
 
 import {FileAssetOptions} from '../common/FileAssetOptions/FileAssetOptions';
+import {FilePreviewModal} from '../common/FilePreviewModal/FilePreviewModal';
 
 interface FileAssetSmallProps {
   src?: string;
+  pdfPreviewUrl?: string;
+  imagePreviewUrl?: string;
   extension: string;
   name: string;
   size: string;
   isError: boolean;
   senderName: string;
   timestamp: number;
+  isLoading: boolean;
 }
 
-export const FileAssetSmall = ({src, extension, name, size, isError, senderName, timestamp}: FileAssetSmallProps) => {
+export const FileAssetSmall = ({
+  src,
+  extension,
+  name,
+  size,
+  senderName,
+  timestamp,
+  pdfPreviewUrl,
+  imagePreviewUrl,
+  isLoading,
+  isError,
+}: FileAssetSmallProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const id = useId();
 
@@ -46,16 +60,19 @@ export const FileAssetSmall = ({src, extension, name, size, isError, senderName,
         <FileAssetOptions onOpen={() => setIsOpen(true)} />
       </FileCard.Header>
       <FileCard.Name variant={isError ? 'secondary' : 'primary'} truncateAfterLines={2} />
-      <FileFullscreenModal
+      <FilePreviewModal
         id={id}
-        type={extension === 'pdf' ? 'pdf' : 'image'}
-        fileName={name}
         fileUrl={src}
+        filePdfPreviewUrl={pdfPreviewUrl}
+        fileImagePreviewUrl={imagePreviewUrl}
+        fileName={name}
         fileExtension={extension}
         senderName={senderName}
         timestamp={timestamp}
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
+        isError={isError}
+        isLoading={isLoading}
       />
     </FileCard.Root>
   );

@@ -160,7 +160,7 @@ export const useGetMultipartAsset = ({
     src,
     imagePreviewUrl,
     pdfPreviewUrl,
-    isLoading: status === 'loading' || status === 'retrying',
+    isLoading: status === 'loading' || status === 'retrying' || status === 'idle',
     isError: status === 'error',
   };
 };

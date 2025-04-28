@@ -21,8 +21,12 @@ import {PDFViewer} from 'Components/FileFullscreenModal/PdfViewer/PdfViewer';
 import {FullscreenModal} from 'Components/FullscreenModal/FullscreenModal';
 
 import {FileHeader} from './FileHeader/FileHeader';
+import {FileLoader} from './FileLoader/FileLoader';
 import {ImageFileView} from './ImageFileView/ImageFileView';
 import {NoPreviewAvailable} from './NoPreviewAvailable/NoPreviewAvailable';
+
+type Type = 'image' | 'pdf' | 'loading' | 'unavailable';
+type Status = 'loading' | 'error' | 'success';
 
 interface FileFullscreenModalProps {
   id: string;
@@ -31,7 +35,8 @@ interface FileFullscreenModalProps {
   fileUrl?: string;
   fileName: string;
   fileExtension: string;
-  type: 'image' | 'pdf';
+  type: Type;
+  status?: Status;
   senderName: string;
   timestamp: number;
 }
@@ -40,6 +45,8 @@ export const FileFullscreenModal = ({
   id,
   isOpen,
   onClose,
+  type,
+  status = 'success',
   fileUrl,
   fileName,
   fileExtension,
@@ -56,11 +63,12 @@ export const FileFullscreenModal = ({
         timestamp={timestamp}
       />
       <ModalContent
-        type={fileExtension === 'pdf' ? 'pdf' : 'image'}
+        type={type}
         fileUrl={fileUrl}
         fileName={fileName}
         senderName={senderName}
         timestamp={timestamp}
+        status={status}
       />
     </FullscreenModal>
   );
@@ -69,22 +77,27 @@ export const FileFullscreenModal = ({
 interface ModalContentProps {
   fileUrl?: string;
   fileName: string;
-  type: 'image' | 'pdf';
+  type: Type;
+  status: Status;
   senderName: string;
   timestamp: number;
 }
 
-const ModalContent = ({type, fileUrl, fileName, senderName, timestamp}: ModalContentProps) => {
-  if (!fileUrl) {
-    return <NoPreviewAvailable fileUrl={fileUrl} fileName={fileName} />;
+const ModalContent = ({type, fileUrl, fileName, senderName, timestamp, status}: ModalContentProps) => {
+  if (status === 'loading') {
+    return <FileLoader />;
   }
 
-  if (type === 'image') {
-    return <ImageFileView src={fileUrl} senderName={senderName} timestamp={timestamp} />;
+  if (status === 'error') {
+    return <NoPreviewAvailable fileUrl={fileUrl} fileName={fileName} />;
   }
 
   if (type === 'pdf') {
     return <PDFViewer src={fileUrl} />;
+  }
+
+  if (type === 'image') {
+    return <ImageFileView src={fileUrl} senderName={senderName} timestamp={timestamp} />;
   }
 
   return <NoPreviewAvailable fileUrl={fileUrl} fileName={fileName} />;
