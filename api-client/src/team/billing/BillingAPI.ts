@@ -34,24 +34,33 @@ export class BillingAPI {
   public static readonly DEFAULT_INVOICES_CHUNK_SIZE = 10;
   constructor(private readonly client: HttpClient) {}
 
-  public static readonly URL = {
-    BILLING: 'billing',
-    CURRENCIES: 'currencies',
-    INFO: 'info',
-    CARD: 'card',
-    COUPON: 'coupon',
-    INVOICES: 'invoices',
-    PLAN: 'plan',
-    LIST: 'list',
-    TEAMS: '/teams',
-    TEAM: 'team',
-    UPCOMING: 'upcoming',
-  };
+  public async getBilling(teamId: string): Promise<any> {
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      url: `/teams/${teamId}/billing/checkout`,
+    };
+
+    const response = await this.client.sendJSON<any>(config);
+    return response.data;
+  }
+
+  public async getBillingEmbedded(teamId: string, planId: string): Promise<any> {
+    const config: AxiosRequestConfig = {
+      method: 'POST',
+      url: `/teams/${teamId}/billing/checkout/embedded`,
+      data: {
+        planId,
+      },
+    };
+
+    const response = await this.client.sendJSON<any>(config);
+    return response.data;
+  }
 
   public async getBillingTeam(teamId: string): Promise<BillingTeamData> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${BillingAPI.URL.TEAMS}/${teamId}/${BillingAPI.URL.BILLING}/${BillingAPI.URL.TEAM}`,
+      url: `/teams/${teamId}/billing/team`,
     };
 
     const response = await this.client.sendJSON<BillingTeamData>(config);
@@ -62,7 +71,7 @@ export class BillingAPI {
     const config: AxiosRequestConfig = {
       data: billingInfo,
       method: 'put',
-      url: `${BillingAPI.URL.TEAMS}/${teamId}/${BillingAPI.URL.BILLING}/${BillingAPI.URL.INFO}`,
+      url: `/teams/${teamId}/billing/info`,
     };
 
     const response = await this.client.sendJSON<BillingData>(config);
@@ -72,7 +81,7 @@ export class BillingAPI {
   public async getBillingInfo(teamId: string): Promise<BillingData> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${BillingAPI.URL.TEAMS}/${teamId}/${BillingAPI.URL.BILLING}/${BillingAPI.URL.INFO}`,
+      url: `/teams/${teamId}/billing/info`,
     };
 
     const response = await this.client.sendJSON<BillingData>(config);
@@ -85,7 +94,7 @@ export class BillingAPI {
         paymentMethod: paymentMethodId,
       },
       method: 'put',
-      url: `${BillingAPI.URL.TEAMS}/${teamId}/${BillingAPI.URL.BILLING}/${BillingAPI.URL.CARD}`,
+      url: `/teams/${teamId}/billing/card`,
     };
 
     const response = await this.client.sendJSON<CardData>(config);
@@ -95,7 +104,7 @@ export class BillingAPI {
   public async deleteCard(teamId: string): Promise<CardData> {
     const config: AxiosRequestConfig = {
       method: 'delete',
-      url: `${BillingAPI.URL.TEAMS}/${teamId}/${BillingAPI.URL.BILLING}/${BillingAPI.URL.CARD}`,
+      url: `/teams/${teamId}/billing/card`,
     };
 
     const response = await this.client.sendJSON<CardData>(config);
@@ -105,7 +114,7 @@ export class BillingAPI {
   public async getCard(teamId: string): Promise<CardData> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${BillingAPI.URL.TEAMS}/${teamId}/${BillingAPI.URL.BILLING}/${BillingAPI.URL.CARD}`,
+      url: `/teams/${teamId}/billing/card`,
     };
 
     const response = await this.client.sendJSON<CardData>(config);
@@ -118,7 +127,7 @@ export class BillingAPI {
         coupon,
       },
       method: 'post',
-      url: `${BillingAPI.URL.TEAMS}/${teamId}/${BillingAPI.URL.BILLING}/${BillingAPI.URL.COUPON}`,
+      url: `/teams/${teamId}/billing/coupon`,
     };
 
     const response = await this.client.sendJSON<Coupon>(config);
@@ -131,7 +140,7 @@ export class BillingAPI {
         coupon,
       },
       method: 'delete',
-      url: `${BillingAPI.URL.TEAMS}/${teamId}/${BillingAPI.URL.BILLING}/${BillingAPI.URL.COUPON}`,
+      url: `/teams/${teamId}/billing/coupon`,
     };
 
     await this.client.sendJSON(config);
@@ -140,7 +149,7 @@ export class BillingAPI {
   public async getCurrentPlan(teamId: string): Promise<PlanData> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${BillingAPI.URL.TEAMS}/${teamId}/${BillingAPI.URL.BILLING}/${BillingAPI.URL.PLAN}`,
+      url: `/teams/${teamId}/billing/plan`,
     };
 
     const response = await this.client.sendJSON<PlanData>(config);
@@ -151,7 +160,7 @@ export class BillingAPI {
     const config: AxiosRequestConfig = {
       data: {planId},
       method: 'put',
-      url: `${BillingAPI.URL.TEAMS}/${teamId}/${BillingAPI.URL.BILLING}/subscription`,
+      url: `/teams/${teamId}/billing/subscription`,
     };
 
     const response = await this.client.sendJSON<Subscription>(config);
@@ -162,7 +171,7 @@ export class BillingAPI {
     const config: AxiosRequestConfig = {
       data: {planId},
       method: 'put',
-      url: `${BillingAPI.URL.TEAMS}/${teamId}/${BillingAPI.URL.BILLING}/${BillingAPI.URL.PLAN}`,
+      url: `/teams/${teamId}/billing/plan`,
     };
 
     const response = await this.client.sendJSON<PlanData>(config);
@@ -179,7 +188,7 @@ export class BillingAPI {
     const config: AxiosRequestConfig = {
       params: filter,
       method: 'get',
-      url: `${BillingAPI.URL.TEAMS}/${teamId}/${BillingAPI.URL.BILLING}/${BillingAPI.URL.PLAN}/${BillingAPI.URL.LIST}`,
+      url: `/teams/${teamId}/billing/plan/list`,
     };
 
     const response = await this.client.sendJSON<PlanData[]>(config);
@@ -189,7 +198,7 @@ export class BillingAPI {
   public async getSupportedCurrencies(teamId: string): Promise<SupportedCurrency[]> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${BillingAPI.URL.TEAMS}/${teamId}/${BillingAPI.URL.BILLING}/${BillingAPI.URL.CURRENCIES}`,
+      url: `/teams/${teamId}/billing/currencies`,
     };
 
     const response = await this.client.sendJSON<SupportedCurrency[]>(config);
@@ -199,7 +208,7 @@ export class BillingAPI {
   public async getUpcomingInvoice(teamId: string): Promise<InvoiceUpcomingData> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${BillingAPI.URL.TEAMS}/${teamId}/${BillingAPI.URL.BILLING}/${BillingAPI.URL.INVOICES}/${BillingAPI.URL.UPCOMING}`,
+      url: `/teams/${teamId}/billing/invoices/upcoming`,
     };
 
     const response = await this.client.sendJSON<InvoiceUpcomingData>(config);
@@ -217,10 +226,20 @@ export class BillingAPI {
         size: limit,
         start: startAfterInvoiceId,
       },
-      url: `${BillingAPI.URL.TEAMS}/${teamId}/${BillingAPI.URL.BILLING}/${BillingAPI.URL.INVOICES}`,
+      url: `/teams/${teamId}/billing/invoices`,
     };
 
     const response = await this.client.sendJSON<InvoiceListData>(config);
+    return response.data;
+  }
+
+  public async getPortalUrl(teamId: string): Promise<any> {
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      url: `/teams/${teamId}/billing/checkout/portal`,
+    };
+
+    const response = await this.client.sendJSON<any>(config);
     return response.data;
   }
 }
