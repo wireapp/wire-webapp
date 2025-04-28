@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.51.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.50.1...@wireapp/react-ui-kit@9.51.0) (2025-04-28)
+
+### Features
+
+* **react-ui-kit:** team members sort, filter and dropdown icons [WPB-16799] ([#7034](https://github.com/wireapp/wire-web-packages/issues/7034)) ([e2c8dc1](https://github.com/wireapp/wire-web-packages/commit/e2c8dc1786a6c474d9c2dd7af6fa6fc7188d8379))
+
 ## [9.50.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.50.0...@wireapp/react-ui-kit@9.50.1) (2025-04-24)
 
 ### Bug Fixes
