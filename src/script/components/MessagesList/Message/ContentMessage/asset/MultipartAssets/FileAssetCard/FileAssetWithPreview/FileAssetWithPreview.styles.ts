@@ -54,6 +54,8 @@ export const infoOverlayStyles: CSSObject = {
   left: 0,
   width: '100%',
   height: '100%',
+  userSelect: 'none',
+  pointerEvents: 'none',
 };
 
 export const infoWrapperStyles: CSSObject = {
