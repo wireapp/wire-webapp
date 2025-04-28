@@ -22,7 +22,7 @@
 
 import {Context} from '@wireapp/api-client/lib/auth';
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
-import {FeatureList} from '@wireapp/api-client/lib/team';
+import {FEATURE_KEY, FeatureList} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {EVENTS as CoreEvents} from '@wireapp/core/lib/Account';
 import {MLSServiceEvents} from '@wireapp/core/lib/messagingProtocols/mls';
@@ -464,8 +464,8 @@ export class App {
         teamFeatures = features;
         teamMembers = members;
       } else {
-        const features = await this.apiClient.api.teams.feature.getAllFeatures();
-        teamFeatures = features;
+        const commonFeatures = (await this.core.service?.team.getCommonFeatureConfig()) ?? {};
+        teamFeatures = {mls: commonFeatures[FEATURE_KEY.MLS]};
       }
 
       try {
