@@ -35,7 +35,7 @@ import {
   loaderIconStyles,
 } from './ImageAssetLarge.styles';
 
-import {ImageFullscreenModal} from '../common/ImageFullscreenModal/ImageFullscreenModal';
+import {FileFullscreenModal} from '../../../../../../../FileFullscreenModal/FileFullscreenModal';
 
 interface ImageAssetLargeProps {
   src?: string;
@@ -107,13 +107,13 @@ export const ImageAssetLarge = ({
           />
         </div>
       </button>
-      <ImageFullscreenModal
+      <FileFullscreenModal
         id={id}
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
-        imageSrc={src}
-        imageName={name}
-        imageExtension={extension}
+        fileUrl={src}
+        fileExtension={extension}
+        fileName={name}
         senderName={senderName}
         timestamp={timestamp}
       />

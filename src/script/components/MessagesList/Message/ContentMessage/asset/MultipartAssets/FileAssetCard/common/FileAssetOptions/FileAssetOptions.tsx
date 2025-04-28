@@ -17,11 +17,10 @@
  *
  */
 
-import {MouseEvent as ReactMouseEvent, KeyboardEvent, useState} from 'react';
+import {MouseEvent as ReactMouseEvent, KeyboardEvent, useState, useId} from 'react';
 
 import {MoreIcon} from '@wireapp/react-ui-kit';
 
-import {PDFViewer} from 'Components/PdfViewer/PdfViewer';
 import {showContextMenu} from 'src/script/ui/ContextMenu';
 import {isSpaceOrEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -29,7 +28,7 @@ import {setContextMenuPosition} from 'Util/util';
 
 import {buttonStyles, iconStyles} from './FileAssetOptions.styles';
 
-import {FileFullscreenModal} from '../../../common/FileFullscreenModal/FileFullscreenModal';
+import {FileFullscreenModal} from '../../../../../../../../FileFullscreenModal/FileFullscreenModal';
 
 interface FileAssetOptionsProps {
   name: string;
@@ -41,6 +40,8 @@ interface FileAssetOptionsProps {
 
 export const FileAssetOptions = ({name, extension, senderName, timestamp, src}: FileAssetOptionsProps) => {
   const [isOpen, setIsOpen] = useState(false);
+
+  const id = useId();
 
   const showOptionsMenu = (event: ReactMouseEvent<HTMLButtonElement> | MouseEvent) => {
     showContextMenu({
@@ -69,20 +70,22 @@ export const FileAssetOptions = ({name, extension, senderName, timestamp, src}: 
         onKeyDown={handleKeyDown}
         onClick={showOptionsMenu}
         aria-label={t('cellsGlobalView.optionsLabel')}
+        aria-controls={id}
+        aria-expanded={isOpen}
+        aria-haspopup="dialog"
       >
         <MoreIcon css={iconStyles} />
       </button>
       <FileFullscreenModal
-        id="file-asset-options"
+        id={id}
         fileName={name}
+        fileUrl={src}
         fileExtension={extension}
         senderName={senderName}
         timestamp={timestamp}
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
-      >
-        {src && <PDFViewer src={src} />}
-      </FileFullscreenModal>
+      />
     </>
   );
 };

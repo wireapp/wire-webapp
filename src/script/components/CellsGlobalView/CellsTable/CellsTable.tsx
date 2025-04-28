@@ -17,30 +17,20 @@
  *
  */
 
-import {useCallback, useMemo} from 'react';
+import {flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
 
-import {createColumnHelper, flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
-
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
-import {t} from 'Util/LocalizerUtil';
-import {forcedDownloadFile} from 'Util/util';
 
-import {showCellsImagePreviewModal} from './CellsImagePreviewModal/CellsImagePreviewModal';
-import {showShareFileModal} from './CellsShareFileModal/CellsShareFileModal';
+import {CellsFilePreviewModal} from './CellsFilePreviewModal/CellsFilePreviewModal';
 import {
   headerCellStyles,
   tableActionsCellStyles,
   tableCellRow,
   tableCellStyles,
   tableStyles,
-  textWithEllipsisStyles,
-  wrapperStyles,
 } from './CellsTable.styles';
-import {CellsTableDateColumn} from './CellsTableDateColumn/CellsTableDateColumn';
-import {CellsTableNameColumn} from './CellsTableNameColumn/CellsTableNameColumn';
-import {CellsTableRowOptions} from './CellsTableRowOptions/CellsTableRowOptions';
-import {CellsTableSharedColumn} from './CellsTableSharedColumn/CellsTableSharedColumn';
+import {getCellsTableColumns} from './CellsTableColumns/CellsTableColumns';
+import {FilePreviewProvider} from './common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
 
 import {CellFile} from '../common/cellFile/cellFile';
 
@@ -50,97 +40,17 @@ interface CellsTableProps {
   onDeleteFile: (uuid: string) => void;
 }
 
-const columnHelper = createColumnHelper<CellFile>();
-
 export const CellsTable = ({files, cellsRepository, onDeleteFile}: CellsTableProps) => {
-  const showDeleteFileModal = useCallback(
-    ({uuid, name}: {uuid: string; name: string}) => {
-      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-        primaryAction: {action: () => onDeleteFile(uuid), text: t('cellsGlobalView.optionDelete')},
-        text: {
-          message: t('cellsGlobalView.deleteModalDescription', {name}),
-          title: t('cellsGlobalView.deleteModalHeading'),
-        },
-      });
-    },
-    [onDeleteFile],
-  );
-
-  const columns = useMemo(
-    () => [
-      columnHelper.accessor('name', {
-        header: t('cellsGlobalView.tableRowName'),
-        cell: info => (
-          <CellsTableNameColumn
-            name={info.getValue()}
-            previewUrl={info.row.original.previewImageUrl}
-            mimeType={info.row.original.mimeType}
-          />
-        ),
-      }),
-      columnHelper.accessor('conversationName', {
-        header: t('cellsGlobalView.tableRowConversationName'),
-        cell: info => <span css={textWithEllipsisStyles}>{info.getValue()}</span>,
-        size: 190,
-      }),
-      columnHelper.accessor('owner', {
-        header: t('cellsGlobalView.tableRowOwner'),
-        cell: info => <span css={textWithEllipsisStyles}>{info.getValue()}</span>,
-        size: 175,
-      }),
-      columnHelper.accessor('sizeMb', {
-        header: t('cellsGlobalView.tableRowSize'),
-        cell: info => info.getValue(),
-        size: 100,
-      }),
-      columnHelper.accessor('uploadedAtTimestamp', {
-        header: t('cellsGlobalView.tableRowCreated'),
-        cell: info => <CellsTableDateColumn timestamp={info.getValue()} />,
-        size: 125,
-      }),
-      columnHelper.accessor('publicLink', {
-        header: t('cellsGlobalView.tableRowPublicLink'),
-        cell: info => <CellsTableSharedColumn isShared={!!info.getValue()?.alreadyShared} />,
-        size: 60,
-      }),
-      columnHelper.accessor('id', {
-        header: () => <span className="visually-hidden">{t('cellsGlobalView.tableRowActions')}</span>,
-        size: 40,
-        cell: info => {
-          const {previewImageUrl, fileUrl} = info.row.original;
-          const uuid = info.getValue();
-          return (
-            <CellsTableRowOptions
-              onOpen={
-                previewImageUrl
-                  ? () => {
-                      showCellsImagePreviewModal({imageSrc: previewImageUrl});
-                    }
-                  : undefined
-              }
-              onShare={() => showShareFileModal({uuid, cellsRepository})}
-              onDownload={fileUrl ? () => forcedDownloadFile({url: fileUrl, name: info.row.original.name}) : undefined}
-              onDelete={() => showDeleteFileModal({uuid, name: info.row.original.name})}
-            />
-          );
-        },
-      }),
-    ],
-    // cellsRepository is not a dependency because it's a singleton
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [showDeleteFileModal],
-  );
-
   const table = useReactTable({
     data: files,
-    columns,
+    columns: getCellsTableColumns({onDeleteFile, cellsRepository}),
     getCoreRowModel: getCoreRowModel(),
   });
 
   const rows = table.getRowModel().rows;
 
   return (
-    <div css={wrapperStyles}>
+    <FilePreviewProvider>
       <table css={tableStyles}>
         <thead>
           {table.getHeaderGroups().map(headerGroup => (
@@ -181,6 +91,7 @@ export const CellsTable = ({files, cellsRepository, onDeleteFile}: CellsTablePro
           </tbody>
         )}
       </table>
-    </div>
+      <CellsFilePreviewModal />
+    </FilePreviewProvider>
   );
 };
