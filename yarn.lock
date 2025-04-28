@@ -7911,9 +7911,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/kalium-backup@npm:0.0.1-alpha.0":
-  version: 0.0.1-alpha.0
-  resolution: "@wireapp/kalium-backup@npm:0.0.1-alpha.0"
+"@wireapp/kalium-backup@npm:0.0.1-alpha.1":
+  version: 0.0.1-alpha.1
+  resolution: "@wireapp/kalium-backup@npm:0.0.1-alpha.1"
   dependencies:
     "@js-joda/core": "npm:3.2.0"
     abort-controller: "npm:3.0.0"
@@ -7923,7 +7923,7 @@ __metadata:
     node-fetch: "npm:2.6.7"
     protobufjs: "npm:^7.3.2"
     ws: "npm:8.5.0"
-  checksum: 10/1efd9d9ea9a1876836df473367043fe7a8e3ad96f3a80f29656dcf9f50cb74e097893bc15084589d8cafac17a41fbd96bea81494d494836a6be3f96a9a53adf1
+  checksum: 10/0df39a4bde383b3758d59fe55db9e19e5aabda9c85659ace083e09fb5bfa367cd52af37c1e0ed9441cb68f35446499ef43931417f1ca996833c5805efee469c6
   languageName: node
   linkType: hard
 
@@ -21205,7 +21205,7 @@ __metadata:
     "@wireapp/copy-config": "npm:2.3.0"
     "@wireapp/core": "npm:46.23.1"
     "@wireapp/eslint-config": "npm:3.0.7"
-    "@wireapp/kalium-backup": "npm:0.0.1-alpha.0"
+    "@wireapp/kalium-backup": "npm:0.0.1-alpha.1"
     "@wireapp/prettier-config": "npm:0.6.4"
     "@wireapp/react-ui-kit": "npm:9.50.1"
     "@wireapp/store-engine": "npm:5.1.11"
