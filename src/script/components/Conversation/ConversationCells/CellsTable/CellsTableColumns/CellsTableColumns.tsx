@@ -29,7 +29,9 @@ import {CellsTableNameColumn} from './CellsTableNameColumn/CellsTableNameColumn'
 import {CellsTableRowOptions} from './CellsTableRowOptions/CellsTableRowOptions';
 import {CellsTableSharedColumn} from './CellsTableSharedColumn/CellsTableSharedColumn';
 
-const columnHelper = createColumnHelper<CellFile>();
+import {CellFolder} from '../../common/cellFile/cellFile';
+
+const columnHelper = createColumnHelper<CellFile | CellFolder>();
 
 export const getCellsTableColumns = ({
   cellsRepository,
@@ -68,9 +70,14 @@ export const getCellsTableColumns = ({
     header: () => <span className="visually-hidden">{t('cellsGlobalView.tableRowActions')}</span>,
     size: 40,
     cell: info => {
+      if (info.row.original.type === 'folder') {
+        return null;
+      }
+
       return (
         <CellsTableRowOptions
-          file={info.row.original}
+          type="file"
+          file={info.row.original as CellFile}
           onDelete={uuid => onDeleteFile(uuid)}
           cellsRepository={cellsRepository}
           conversationId={conversationId}

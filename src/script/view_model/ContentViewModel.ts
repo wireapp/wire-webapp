@@ -54,11 +54,13 @@ interface ShowConversationOptions {
   exposeMessage?: Message;
   openFirstSelfMention?: boolean;
   openNotificationSettings?: boolean;
+  view?: string;
 }
 
 interface ShowConversationOverload {
   (conversation: Conversation | undefined, options?: ShowConversationOptions): Promise<void>;
   (conversationId: QualifiedId, options?: ShowConversationOptions): Promise<void>;
+  (conversation: {id: string; domain?: string}, options?: ShowConversationOptions): Promise<void>;
 }
 
 export class ContentViewModel {
@@ -132,11 +134,18 @@ export class ContentViewModel {
   }
 
   private readonly getConversationEntity = async (
-    conversation: Conversation | QualifiedId,
+    conversation: Conversation | QualifiedId | {id: string; domain?: string},
   ): Promise<Conversation | null> => {
-    const conversationEntity = isConversationEntity(conversation)
-      ? conversation
-      : await this.conversationRepository.getConversationById(conversation);
+    if (isConversationEntity(conversation)) {
+      return conversation;
+    }
+
+    const qualifiedId: QualifiedId = {
+      id: conversation.id,
+      domain: conversation.domain ?? this.userState.self()?.domain ?? '',
+    };
+
+    const conversationEntity = await this.conversationRepository.getConversationById(qualifiedId);
 
     if (!conversationEntity.is1to1()) {
       return conversationEntity;
@@ -186,12 +195,12 @@ export class ContentViewModel {
 
     this.mainViewModel.list.openConversations(conversationEntity.archivedState());
   }
-  private showAndNavigate(conversationEntity: Conversation, openNotificationSettings: boolean): void {
+  private showAndNavigate(conversationEntity: Conversation, openNotificationSettings: boolean, view?: string): void {
     const {rightSidebar} = useAppMainState.getState();
     this.showContent(ContentState.CONVERSATION);
     this.previousConversation = this.conversationState.activeConversation();
     setHistoryParam(
-      generateConversationUrl({id: conversationEntity?.id ?? '', domain: conversationEntity?.domain ?? ''}),
+      generateConversationUrl({id: conversationEntity?.id ?? '', domain: conversationEntity?.domain ?? ''}, view),
       history.state,
     );
     if (openNotificationSettings) {
@@ -226,13 +235,14 @@ export class ContentViewModel {
    * @param domain Domain name
    */
   readonly showConversation: ShowConversationOverload = async (
-    conversation: Conversation | QualifiedId | undefined,
+    conversation: Conversation | QualifiedId | {id: string; domain?: string} | undefined,
     options?: ShowConversationOptions,
   ) => {
     const {
       exposeMessage: exposeMessageEntity,
       openFirstSelfMention = false,
       openNotificationSettings = false,
+      view,
     } = options || {};
 
     if (!conversation) {
@@ -266,7 +276,7 @@ export class ContentViewModel {
       void this.conversationRepository.refreshMLSConversationVerificationState(conversationEntity);
       const messageEntity = openFirstSelfMention ? conversationEntity.getFirstUnreadSelfMention() : exposeMessageEntity;
       this.changeConversation(conversationEntity, messageEntity);
-      this.showAndNavigate(conversationEntity, openNotificationSettings);
+      this.showAndNavigate(conversationEntity, openNotificationSettings, view);
     } catch (error: any) {
       if (this.isConversationNotFoundError(error)) {
         return this.showConversationNotFoundErrorModal();

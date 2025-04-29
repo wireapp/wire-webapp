@@ -17,16 +17,47 @@
  *
  */
 
-import {useCallback, KeyboardEvent} from 'react';
+import {useCallback, KeyboardEvent, useEffect} from 'react';
 
+import {QualifiedId} from '@wireapp/api-client/lib/user';
+
+import {generateConversationUrl} from 'src/script/router/routeGenerator';
+import {createNavigate} from 'src/script/router/routerBindings';
 import {t} from 'Util/LocalizerUtil';
 
 interface ConversationTabsProps {
   activeTabIndex: number;
   onIndexChange: (index: number) => void;
+  conversationQualifiedId: QualifiedId;
 }
 
-export const ConversationTabs = ({activeTabIndex, onIndexChange}: ConversationTabsProps) => {
+export const ConversationTabs = ({activeTabIndex, onIndexChange, conversationQualifiedId}: ConversationTabsProps) => {
+  const navigateToFilesTab = (event: React.MouseEvent<HTMLButtonElement>) => {
+    createNavigate(generateConversationUrl(conversationQualifiedId, 'files'))(event);
+  };
+
+  const navigateToMessageTab = (event: React.MouseEvent<HTMLButtonElement>) => {
+    createNavigate(generateConversationUrl(conversationQualifiedId))(event);
+  };
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const currentPath = window.location.hash;
+      if (currentPath.includes('files')) {
+        onIndexChange(1);
+      } else {
+        onIndexChange(0);
+      }
+    };
+
+    // Check initial route
+    handleHashChange();
+
+    // Listen for route changes
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, [onIndexChange]);
+
   const handleKeyDown = useCallback(
     (event: KeyboardEvent<HTMLButtonElement>) => {
       const tabCount = 2;
@@ -64,14 +95,20 @@ export const ConversationTabs = ({activeTabIndex, onIndexChange}: ConversationTa
           id="conversation"
           label="Conversation"
           isActive={activeTabIndex === 0}
-          onClick={() => onIndexChange(0)}
+          onClick={event => {
+            navigateToMessageTab(event);
+            onIndexChange(0);
+          }}
           onKeyDown={handleKeyDown}
         />
         <ConversationTab
           id="files"
           label="Files"
           isActive={activeTabIndex === 1}
-          onClick={() => onIndexChange(1)}
+          onClick={event => {
+            navigateToFilesTab(event);
+            onIndexChange(1);
+          }}
           onKeyDown={handleKeyDown}
         />
       </div>
@@ -83,7 +120,7 @@ interface ConversationTabProps {
   id: string;
   label: string;
   isActive: boolean;
-  onClick: () => void;
+  onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onKeyDown: (event: KeyboardEvent<HTMLButtonElement>) => void;
 }
 

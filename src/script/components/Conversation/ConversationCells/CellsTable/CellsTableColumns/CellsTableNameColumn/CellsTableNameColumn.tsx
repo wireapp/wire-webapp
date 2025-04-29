@@ -20,7 +20,9 @@
 import {FolderIcon, PlayIcon} from '@wireapp/react-ui-kit';
 
 import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
-import {CellFile} from 'Components/Conversation/ConversationCells/common/cellFile/cellFile';
+import {CellFile, CellFolder} from 'Components/Conversation/ConversationCells/common/cellFile/cellFile';
+import {generateConversationUrl} from 'src/script/router/routeGenerator';
+import {createNavigate} from 'src/script/router/routerBindings';
 import {getFileExtension} from 'Util/util';
 
 import {
@@ -35,7 +37,7 @@ import {
 import {useCellsFilePreviewModal} from '../../common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
 
 interface CellsTableNameColumnProps {
-  file: CellFile;
+  file: CellFile | CellFolder;
 }
 
 export const CellsTableNameColumn = ({file}: CellsTableNameColumnProps) => {
@@ -44,7 +46,7 @@ export const CellsTableNameColumn = ({file}: CellsTableNameColumnProps) => {
   const isImage = file.mimeType?.startsWith('image');
   const isVideo = file.mimeType?.startsWith('video');
 
-  const shouldDisplayImagePreview = (isImage || isVideo) && file.previewImageUrl;
+  const shouldDisplayImagePreview = (isImage || isVideo) && file?.previewImageUrl;
 
   const {previewImageUrl, name} = file;
 
@@ -62,16 +64,36 @@ export const CellsTableNameColumn = ({file}: CellsTableNameColumnProps) => {
         ) : (
           <FolderIcon width={24} height={24} />
         )}
-        <button
-          type="button"
-          css={desktopNameStyles}
-          onClick={() => handleOpenFile(file)}
-          aria-controls={id}
-          aria-expanded={!!selectedFile}
-          aria-haspopup="dialog"
-        >
-          {name}
-        </button>
+        {file.type === 'file' ? (
+          <button
+            type="button"
+            css={desktopNameStyles}
+            onClick={() => handleOpenFile(file)}
+            aria-controls={id}
+            aria-expanded={!!selectedFile}
+            aria-haspopup="dialog"
+          >
+            {name}
+          </button>
+        ) : (
+          <button
+            type="button"
+            css={desktopNameStyles}
+            onClick={event => {
+              createNavigate(
+                generateConversationUrl(
+                  {
+                    id: 'c7cdd32e-321e-4017-aec7-fef1ad22ee90',
+                    domain: 'staging.zinfra.io',
+                  },
+                  'files',
+                ),
+              )(event);
+            }}
+          >
+            {name}
+          </button>
+        )}
       </div>
     </>
   );

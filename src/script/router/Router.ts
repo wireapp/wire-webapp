@@ -17,21 +17,58 @@
  *
  */
 
-import switchPath from 'switch-path';
-
-export type Routes = Record<string, ((x: any) => void) | null>;
+export type Routes = Record<string, ((...args: any[]) => void) | null>;
 
 const defaultRoute: Routes = {
-  // do nothing if url was not matched
   '*': null,
 };
+
 let routes: Routes = {};
+
+function matchRoute(path: string): {handler: ((...args: any[]) => void) | null; params: string[]} {
+  const pathWithoutQuery = path.split('?')[0];
+  const pathSegments = pathWithoutQuery.split('/').filter(Boolean);
+
+  for (const [pattern, handler] of Object.entries(routes)) {
+    if (pattern === '*') {
+      continue;
+    }
+
+    const patternSegments = pattern.split('/').filter(Boolean);
+    if (patternSegments.length !== pathSegments.length) {
+      continue;
+    }
+
+    const params: string[] = [];
+    let match = true;
+
+    for (let i = 0; i < patternSegments.length; i++) {
+      const patternSegment = patternSegments[i];
+      const pathSegment = pathSegments[i];
+
+      if (patternSegment.startsWith(':')) {
+        params.push(pathSegment);
+      } else if (patternSegment !== pathSegment) {
+        match = false;
+        break;
+      }
+    }
+
+    if (match) {
+      return {handler, params};
+    }
+  }
+
+  return {handler: routes['*'], params: []};
+}
 
 function parseRoute() {
   const currentPath = window.location.hash.replace('#', '') || '/';
+  const {handler, params} = matchRoute(currentPath);
 
-  const {value} = switchPath(currentPath, routes);
-  return typeof value === 'function' ? value() : value;
+  if (handler) {
+    handler(...params);
+  }
 }
 
 export const configureRoutes = (routeDefinitions: Routes): void => {
@@ -46,5 +83,20 @@ export const navigate = (path: string, stateObj?: {}) => {
 };
 
 export const setHistoryParam = (path: string, stateObj: {} = window.history.state) => {
-  window.history.replaceState(stateObj, '', `#${path}`);
+  // Get current query parameters
+  const currentHash = window.location.hash;
+  const [, currentQuery] = currentHash.split('?');
+
+  // Get new path and query parameters
+  const [newPath, newQuery] = path.split('?');
+
+  // Check if we're switching between files and conversation views
+  const isSwitchingViews =
+    (currentHash.includes('/files') && !newPath.includes('/files')) ||
+    (!currentHash.includes('/files') && newPath.includes('/files'));
+
+  // Use new query parameters if provided, otherwise keep current ones only if we're not switching views
+  const query = newQuery || (!isSwitchingViews && currentQuery ? `?${currentQuery}` : '');
+
+  window.history.replaceState(stateObj, '', `#${newPath}${query}`);
 };

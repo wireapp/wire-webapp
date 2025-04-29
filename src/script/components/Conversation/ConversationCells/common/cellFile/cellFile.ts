@@ -40,6 +40,7 @@ export interface CellFile {
 export interface CellFolder {
   id: string;
   type: 'folder';
+  mimeType?: string;
   name: string;
   sizeMb: string;
   uploadedAtTimestamp: number;

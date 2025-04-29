@@ -19,9 +19,11 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-export const generateConversationUrl = ({id, domain}: QualifiedId): string => {
-  if (domain) {
-    return `/conversation/${id}/${domain}`;
+export const generateConversationUrl = ({id, domain}: QualifiedId, view?: string): string => {
+  const basePath = domain ? `/conversation/${id}/${domain}` : `/conversation/${id}`;
+  if (view) {
+    // Ensure view is part of the path, not a query parameter
+    return `${basePath}/${view}`;
   }
-  return `/conversation/${id}`;
+  return basePath;
 };
