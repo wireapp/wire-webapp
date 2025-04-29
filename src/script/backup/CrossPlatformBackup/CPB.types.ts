@@ -33,7 +33,8 @@ export interface ExportHistoryFromDatabaseParams {
 export interface ImportHistoryToDatabaseParams {
   user: User;
   backupService: BackupService;
-  fileData: Uint8Array;
+  fileBytes: ArrayBuffer;
+  password: string | undefined;
   progressCallback: ProgressCallback;
 }
 
