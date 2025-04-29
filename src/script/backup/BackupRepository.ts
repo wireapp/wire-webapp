@@ -247,35 +247,36 @@ export class BackupRepository {
     let fileDescriptors: FileDescriptor[];
     let archiveVersion: number;
 
-    if (password) {
-      files = await this.createDecryptedBackup(data, user, password);
-    } else {
-      files = await this.worker.post<Record<string, Uint8Array>>({
-        type: 'unzip',
-        bytes: data,
-      });
-    }
-
-    if (files.error) {
-      const error = files.error.toString();
-      if (error === 'WRONG_PASSWORD') {
-        throw new InvalidPassword(error);
-      }
-      throw new ImportError(files.error as unknown as string);
-    }
-
     // Check for cross-platform backup
-    if (isCPBackup(files)) {
+    if (data instanceof ArrayBuffer && (await isCPBackup(data))) {
       // Import cross-platform backup
       const cpbData = await importCPBHistoryToDatabase({
         backupService: this.backupService,
         progressCallback,
-        fileData: files,
+        fileBytes: data,
+        password,
         user,
       });
       fileDescriptors = cpbData.fileDescriptors;
       archiveVersion = cpbData.archiveVersion;
     } else {
+      // Decrypt and unzip the legacy backup
+      if (password) {
+        files = await this.createDecryptedBackup(data, user, password);
+      } else {
+        files = await this.worker.post<Record<string, Uint8Array>>({
+          type: 'unzip',
+          bytes: data,
+        });
+      }
+
+      if (files.error) {
+        const error = files.error.toString();
+        if (error === 'WRONG_PASSWORD') {
+          throw new InvalidPassword(error);
+        }
+        throw new ImportError(files.error as unknown as string);
+      }
       // Import legacy backup
       const legacyData = await importLegacyBackupToDatabase({
         backupService: this.backupService,

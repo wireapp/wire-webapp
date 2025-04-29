@@ -26,24 +26,26 @@ import {ConversationRecord, EventRecord, UserRecord} from '../../storage';
 import {FileDescriptor, Filename} from '../Backup.types';
 import {IncompatibleBackupError} from '../Error';
 
-import {CPBLogger} from '.';
+import {CPBLogger, peekCrossPlatformData} from '.';
 
 /**
  * Imports the history from a Multi-Platform backup to the Database
  */
 export const importCPBHistoryToDatabase = async ({
-  fileData,
+  fileBytes,
+  password,
 }: ImportHistoryToDatabaseParams): Promise<{
   archiveVersion: number;
   fileDescriptors: FileDescriptor[];
 }> => {
   const backupImporter = new CPBackupImporter();
-  const backupRawData = fileData;
+  const backupData = new Uint8Array(fileBytes);
+  const peekedData = await peekCrossPlatformData(fileBytes);
   const FileDescriptor: FileDescriptor[] = [];
 
   // Import the backup
 
-  const result = backupImporter.importFromFileData(backupRawData, null);
+  const result = await backupImporter.importFromFileData(backupData, password);
 
   if (result instanceof BackupImportResult.Success) {
     const pager = result.pager;
@@ -88,10 +90,12 @@ export const importCPBHistoryToDatabase = async ({
     }
     FileDescriptor.push({entities: userRecords, filename: Filename.USERS});
     CPBLogger.log(`IMPORTED ${userRecords.length} USERS`);
-  } else {
-    CPBLogger.log(`ERROR DURING BACKUP IMPORT: ${result}`);
+  }
+
+  if (result instanceof BackupImportResult.Failure) {
+    CPBLogger.log(`Backup import failed: ${result}`);
     throw new IncompatibleBackupError('Incompatible cross-platform backup');
   }
 
-  return {archiveVersion: 0, fileDescriptors: FileDescriptor};
+  return {archiveVersion: parseInt(peekedData.archiveVersion), fileDescriptors: FileDescriptor};
 };
