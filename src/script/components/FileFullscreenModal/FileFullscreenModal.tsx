@@ -19,23 +19,23 @@
 
 import {PDFViewer} from 'Components/FileFullscreenModal/PdfViewer/PdfViewer';
 import {FullscreenModal} from 'Components/FullscreenModal/FullscreenModal';
+import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTypeFromExtension';
+import {getFileExtensionFromUrl} from 'Util/util';
 
 import {FileHeader} from './FileHeader/FileHeader';
 import {FileLoader} from './FileLoader/FileLoader';
 import {ImageFileView} from './ImageFileView/ImageFileView';
 import {NoPreviewAvailable} from './NoPreviewAvailable/NoPreviewAvailable';
 
-type Type = 'image' | 'pdf' | 'loading' | 'unavailable';
-type Status = 'loading' | 'error' | 'success';
+type Status = 'loading' | 'unavailable' | 'success';
 
 interface FileFullscreenModalProps {
   id: string;
   isOpen: boolean;
   onClose: () => void;
-  fileUrl?: string;
+  filePreviewUrl?: string;
   fileName: string;
   fileExtension: string;
-  type: Type;
   status?: Status;
   senderName: string;
   timestamp: number;
@@ -45,9 +45,8 @@ export const FileFullscreenModal = ({
   id,
   isOpen,
   onClose,
-  type,
+  filePreviewUrl,
   status = 'success',
-  fileUrl,
   fileName,
   fileExtension,
   senderName,
@@ -63,8 +62,7 @@ export const FileFullscreenModal = ({
         timestamp={timestamp}
       />
       <ModalContent
-        type={type}
-        fileUrl={fileUrl}
+        filePreviewUrl={filePreviewUrl}
         fileName={fileName}
         senderName={senderName}
         timestamp={timestamp}
@@ -75,30 +73,32 @@ export const FileFullscreenModal = ({
 };
 
 interface ModalContentProps {
-  fileUrl?: string;
+  filePreviewUrl?: string;
   fileName: string;
-  type: Type;
   status: Status;
   senderName: string;
   timestamp: number;
 }
 
-const ModalContent = ({type, fileUrl, fileName, senderName, timestamp, status}: ModalContentProps) => {
-  if (status === 'loading') {
+const ModalContent = ({filePreviewUrl, fileName, senderName, timestamp, status}: ModalContentProps) => {
+  if (status === 'loading' && !filePreviewUrl) {
     return <FileLoader />;
   }
 
-  if (status === 'error') {
-    return <NoPreviewAvailable fileUrl={fileUrl} fileName={fileName} />;
+  if (status === 'unavailable' || !filePreviewUrl) {
+    return <NoPreviewAvailable fileUrl={filePreviewUrl} fileName={fileName} />;
   }
 
+  const extension = getFileExtensionFromUrl(filePreviewUrl);
+  const type = getFileTypeFromExtension(extension);
+
   if (type === 'pdf') {
-    return <PDFViewer src={fileUrl} />;
+    return <PDFViewer src={filePreviewUrl} />;
   }
 
   if (type === 'image') {
-    return <ImageFileView src={fileUrl} senderName={senderName} timestamp={timestamp} />;
+    return <ImageFileView src={filePreviewUrl} senderName={senderName} timestamp={timestamp} />;
   }
 
-  return <NoPreviewAvailable fileUrl={fileUrl} fileName={fileName} />;
+  return <NoPreviewAvailable fileUrl={filePreviewUrl} fileName={fileName} />;
 };
