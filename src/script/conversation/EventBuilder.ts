@@ -302,10 +302,10 @@ export const EventBuilder = {
     };
   },
 
-  build1to1MigratedToMLS(conversationEntity: Conversation): OneToOneMigratedToMlsEvent {
+  build1to1MigratedToMLS(conversationEntity: Conversation, currentTimestamp: number): OneToOneMigratedToMlsEvent {
     return {
       ...buildQualifiedId(conversationEntity),
-      time: new Date().toISOString(),
+      time: conversationEntity.getNextIsoDate(currentTimestamp),
       type: ClientEvent.CONVERSATION.ONE2ONE_MIGRATED_TO_MLS,
       from: conversationEntity.selfUser().id,
       data: undefined,
