@@ -22,14 +22,52 @@ import Dexie from 'dexie';
 import {ClientEvent} from 'src/script/event/Client';
 import {getLogger} from 'Util/Logger';
 
-import {CPBackup} from './CPB.library';
+import {CPBackupImporter, BackupPeekResult} from './CPB.library';
 
-import {FileData} from '../Backup.types';
 import {BackupService} from '../BackupService';
+import {IncompatibleBackupError} from '../Error';
 
 export const CPBLogger = getLogger('wire:backup:CPB');
 
-export const isCPBackup = (data: FileData): boolean => !!data[CPBackup.ZIP_ENTRY_DATA];
+export const isCPBackup = async (data: ArrayBuffer | Blob): Promise<boolean> => {
+  if (data instanceof ArrayBuffer) {
+    const backupImporter = new CPBackupImporter();
+    const backupData = new Uint8Array(data);
+    const result = await backupImporter.peekFileData(backupData);
+    if (result instanceof BackupPeekResult.Failure) {
+      return false;
+    }
+    if (result instanceof BackupPeekResult.Success) {
+      CPBLogger.log(`Backup version: ${result.version}`);
+      return true;
+    }
+    return false;
+  }
+  return false;
+};
+
+export const peekCrossPlatformData = async (
+  fileBytes: ArrayBuffer,
+): Promise<{
+  archiveVersion: string;
+  isEncrypted: boolean;
+}> => {
+  const backupImporter = new CPBackupImporter();
+  const backupData = new Uint8Array(fileBytes);
+  const result = await backupImporter.peekFileData(backupData);
+  if (result instanceof BackupPeekResult.Failure) {
+    CPBLogger.log(`Could not peek into backup: ${result}`);
+    throw new IncompatibleBackupError('Incompatible cross-platform backup');
+  }
+  if (result instanceof BackupPeekResult.Success) {
+    CPBLogger.log(`Backup version: ${result.version}`);
+    return {
+      archiveVersion: result.version,
+      isEncrypted: result.isEncrypted,
+    };
+  }
+  throw new IncompatibleBackupError('Incompatible cross-platform backup');
+};
 
 export const isMessageAddEvent = (eventType: unknown): boolean =>
   eventType === ClientEvent.CONVERSATION.MESSAGE_ADD.toString();
