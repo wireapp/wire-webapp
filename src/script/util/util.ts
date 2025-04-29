@@ -142,6 +142,11 @@ export const getFileExtension = (filename: string): string => {
   return foundExtension || '';
 };
 
+export const getFileExtensionFromUrl = (url: string): string => {
+  const cleanUrl = url.split(/[?#]/)[0];
+  return getFileExtension(cleanUrl);
+};
+
 export const trimFileExtension = (filename?: string): string => {
   if (typeof filename === 'string') {
     if (filename.endsWith('.tar.gz')) {

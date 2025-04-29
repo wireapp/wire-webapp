@@ -22,6 +22,8 @@
 
 import {Context} from '@wireapp/api-client/lib/auth';
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
+import {FEATURE_KEY, FeatureList} from '@wireapp/api-client/lib/team';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {EVENTS as CoreEvents} from '@wireapp/core/lib/Account';
 import {MLSServiceEvents} from '@wireapp/core/lib/messagingProtocols/mls';
 import {amplify} from 'amplify';
@@ -119,7 +121,8 @@ import {UserService} from '../user/UserService';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
 import {Warnings} from '../view_model/WarningsContainer';
 
-pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
+// Initialize PDF.js worker for react-pdf package
+pdfjs.GlobalWorkerOptions.workerSrc = '/min/pdf.worker.mjs';
 
 export function doRedirect(signOutReason: SIGN_OUT_REASON) {
   let url = `/auth/${location.search}`;
@@ -446,7 +449,19 @@ export class App {
       if (!localClient) {
         throw new ClientError(CLIENT_ERROR_TYPE.NO_VALID_CLIENT, 'Client has been deleted on backend');
       }
-      const {features: teamFeatures, members: teamMembers} = await teamRepository.initTeam(selfUser.teamId);
+
+      let teamFeatures: FeatureList = {};
+      let teamMembers: QualifiedId[] = [];
+
+      if (selfUser.teamId) {
+        const {features, members} = await teamRepository.initTeam(selfUser.teamId);
+        teamFeatures = features;
+        teamMembers = members;
+      } else {
+        const commonFeatures = (await this.core.service?.team.getCommonFeatureConfig()) ?? {};
+        teamFeatures = {mls: commonFeatures[FEATURE_KEY.MLS]};
+      }
+
       try {
         await this.core.initClient(localClient, getClientMLSConfig(teamFeatures));
       } catch (error) {
