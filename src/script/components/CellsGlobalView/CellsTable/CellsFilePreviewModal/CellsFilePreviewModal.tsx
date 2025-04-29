@@ -18,7 +18,7 @@
  */
 
 import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
-import {getFileExtension} from 'Util/util';
+import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTypeFromExtension';
 
 import {useCellsFilePreviewModal} from '../common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
 
@@ -29,16 +29,31 @@ export const CellsFilePreviewModal = () => {
     return null;
   }
 
-  const {fileUrl, name, owner, uploadedAtTimestamp} = selectedFile;
+  const {fileUrl, extension, name, owner, uploadedAtTimestamp, previewPdfUrl, previewImageUrl} = selectedFile;
+
+  const getFileUrl = () => {
+    const type = getFileTypeFromExtension(extension);
+
+    if (['pdf', 'image'].includes(type)) {
+      return fileUrl;
+    }
+
+    if (['audio', 'video'].includes(type)) {
+      return undefined;
+    }
+
+    return previewPdfUrl || previewImageUrl;
+  };
 
   return (
     <FileFullscreenModal
       id={id}
       isOpen={!!selectedFile}
       onClose={handleCloseFile}
-      fileUrl={fileUrl}
+      filePreviewUrl={getFileUrl()}
       fileName={name}
-      fileExtension={getFileExtension(name)}
+      fileExtension={extension}
+      status={!getFileUrl() ? 'unavailable' : 'success'}
       senderName={owner}
       timestamp={uploadedAtTimestamp}
     />

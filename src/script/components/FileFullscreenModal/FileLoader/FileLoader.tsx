@@ -17,21 +17,12 @@
  *
  */
 
-export interface CellFile {
-  id: string;
-  mimeType?: string;
-  name: string;
-  extension: string;
-  sizeMb: string;
-  previewImageUrl?: string;
-  previewPdfUrl?: string;
-  uploadedAtTimestamp: number;
-  owner: string;
-  conversationName: string;
-  publicLink?: {
-    alreadyShared: boolean;
-    uuid?: string;
-    url?: string;
-  };
-  fileUrl?: string;
-}
+import {loaderIconStyles, wrapperStyles} from './FileLoader.styles';
+
+export const FileLoader = () => {
+  return (
+    <div css={wrapperStyles}>
+      <div className="icon-spinner spin" css={loaderIconStyles} />
+    </div>
+  );
+};

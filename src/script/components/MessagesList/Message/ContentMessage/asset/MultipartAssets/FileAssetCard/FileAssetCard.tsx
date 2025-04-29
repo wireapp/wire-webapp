@@ -30,7 +30,8 @@ interface FileAssetCardProps {
   size: string;
   isLoading: boolean;
   isError: boolean;
-  previewUrl?: string;
+  imagePreviewUrl?: string;
+  pdfPreviewUrl?: string;
   senderName: string;
   timestamp: number;
 }
@@ -43,7 +44,8 @@ export const FileAssetCard = ({
   size,
   isLoading,
   isError,
-  previewUrl,
+  imagePreviewUrl,
+  pdfPreviewUrl,
   senderName,
   timestamp,
 }: FileAssetCardProps) => {
@@ -58,7 +60,8 @@ export const FileAssetCard = ({
         size={size}
         isError={isError}
         isLoading={isLoading}
-        previewUrl={previewUrl}
+        imagePreviewUrl={imagePreviewUrl}
+        pdfPreviewUrl={pdfPreviewUrl}
         senderName={senderName}
         timestamp={timestamp}
       />
@@ -74,6 +77,9 @@ export const FileAssetCard = ({
       isError={isError}
       senderName={senderName}
       timestamp={timestamp}
+      pdfPreviewUrl={pdfPreviewUrl}
+      imagePreviewUrl={imagePreviewUrl}
+      isLoading={isLoading}
     />
   );
 };

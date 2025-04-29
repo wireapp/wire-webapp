@@ -74,7 +74,7 @@ export const ImageAssetSmall = ({
         id={id}
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
-        fileUrl={src}
+        filePreviewUrl={src}
         fileExtension={extension}
         fileName={name}
         senderName={senderName}

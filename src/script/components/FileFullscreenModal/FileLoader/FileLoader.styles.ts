@@ -17,21 +17,20 @@
  *
  */
 
-export interface CellFile {
-  id: string;
-  mimeType?: string;
-  name: string;
-  extension: string;
-  sizeMb: string;
-  previewImageUrl?: string;
-  previewPdfUrl?: string;
-  uploadedAtTimestamp: number;
-  owner: string;
-  conversationName: string;
-  publicLink?: {
-    alreadyShared: boolean;
-    uuid?: string;
-    url?: string;
-  };
-  fileUrl?: string;
-}
+import {CSSObject} from '@emotion/react';
+
+export const wrapperStyles: CSSObject = {
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  height: '100%',
+};
+
+export const loaderIconStyles: CSSObject = {
+  color: 'var(--gray-70)',
+  fontSize: 'var(--font-size-medium)',
+
+  'body.theme-dark &': {
+    color: 'var(--gray-40)',
+  },
+};
