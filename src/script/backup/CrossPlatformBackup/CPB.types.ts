@@ -19,7 +19,7 @@
 
 import {User} from 'src/script/entity/User';
 
-import {FileData, ProgressCallback} from '../Backup.types';
+import {ProgressCallback} from '../Backup.types';
 import {BackupService} from '../BackupService';
 
 export interface ExportHistoryFromDatabaseParams {
@@ -33,7 +33,8 @@ export interface ExportHistoryFromDatabaseParams {
 export interface ImportHistoryToDatabaseParams {
   user: User;
   backupService: BackupService;
-  fileData: FileData;
+  fileBytes: ArrayBuffer;
+  password: string | undefined;
   progressCallback: ProgressCallback;
 }
 

@@ -17,7 +17,7 @@
  *
  */
 
-import {CPBackup, CPBackupImporter, BackupImportResult} from './CPB.library';
+import {CPBackupImporter, BackupImportResult} from './CPB.library';
 import {ImportHistoryToDatabaseParams} from './CPB.types';
 import {mapConversationRecord, mapUserRecord} from './importMappers';
 import {mapEventRecord} from './importMappers/mapEventRecord';
@@ -26,61 +26,76 @@ import {ConversationRecord, EventRecord, UserRecord} from '../../storage';
 import {FileDescriptor, Filename} from '../Backup.types';
 import {IncompatibleBackupError} from '../Error';
 
-import {CPBLogger} from '.';
+import {CPBLogger, peekCrossPlatformData} from '.';
 
 /**
  * Imports the history from a Multi-Platform backup to the Database
  */
 export const importCPBHistoryToDatabase = async ({
-  fileData,
+  fileBytes,
+  password,
 }: ImportHistoryToDatabaseParams): Promise<{
   archiveVersion: number;
   fileDescriptors: FileDescriptor[];
 }> => {
   const backupImporter = new CPBackupImporter();
-  const backupRawData = fileData[CPBackup.ZIP_ENTRY_DATA];
+  const backupData = new Uint8Array(fileBytes);
+  const peekedData = await peekCrossPlatformData(fileBytes);
   const FileDescriptor: FileDescriptor[] = [];
 
   // Import the backup
-  const result = backupImporter.importBackup(new Int8Array(backupRawData.buffer));
+
+  const result = await backupImporter.importFromFileData(backupData, password);
 
   if (result instanceof BackupImportResult.Success) {
+    const pager = result.pager;
     // import events
     const eventRecords: EventRecord[] = [];
-    result.backupData.messages.forEach(message => {
-      const eventRecord = mapEventRecord(message);
-      if (eventRecord) {
-        eventRecords.push(eventRecord);
-      }
-    });
+    while (pager.messagesPager.hasMorePages()) {
+      const messages = pager.messagesPager.nextPage();
+      messages.forEach(message => {
+        const eventRecord = mapEventRecord(message);
+        if (eventRecord) {
+          eventRecords.push(eventRecord);
+        }
+      });
+    }
     FileDescriptor.push({entities: eventRecords, filename: Filename.EVENTS});
     CPBLogger.log(`IMPORTED ${eventRecords.length} EVENTS`);
 
     // import conversations
     const conversationRecords: ConversationRecord[] = [];
-    result.backupData.conversations.forEach(conversation => {
-      const conversationRecord = mapConversationRecord(conversation);
-      if (conversationRecord) {
-        conversationRecords.push(conversationRecord);
-      }
-    });
+    while (pager.conversationsPager.hasMorePages()) {
+      const conversations = pager.conversationsPager.nextPage();
+      conversations.forEach(conversation => {
+        const conversationRecord = mapConversationRecord(conversation);
+        if (conversationRecord) {
+          conversationRecords.push(conversationRecord);
+        }
+      });
+    }
     FileDescriptor.push({entities: conversationRecords, filename: Filename.CONVERSATIONS});
     CPBLogger.log(`IMPORTED ${conversationRecords.length} CONVERSATIONS`);
 
     // import users
     const userRecords: UserRecord[] = [];
-    result.backupData.users.forEach(user => {
-      const userRecord = mapUserRecord(user);
-      if (userRecord) {
-        userRecords.push(userRecord);
-      }
-    });
+    while (pager.usersPager.hasMorePages()) {
+      const users = pager.usersPager.nextPage();
+      users.forEach(user => {
+        const userRecord = mapUserRecord(user);
+        if (userRecord) {
+          userRecords.push(userRecord);
+        }
+      });
+    }
     FileDescriptor.push({entities: userRecords, filename: Filename.USERS});
     CPBLogger.log(`IMPORTED ${userRecords.length} USERS`);
-  } else {
-    CPBLogger.log(`ERROR DURING BACKUP IMPORT: ${result}`);
+  }
+
+  if (result instanceof BackupImportResult.Failure) {
+    CPBLogger.log(`Backup import failed: ${result}`);
     throw new IncompatibleBackupError('Incompatible cross-platform backup');
   }
 
-  return {archiveVersion: 0, fileDescriptors: FileDescriptor};
+  return {archiveVersion: parseInt(peekedData.archiveVersion), fileDescriptors: FileDescriptor};
 };
