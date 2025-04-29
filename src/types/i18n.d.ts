@@ -379,7 +379,7 @@ declare module 'I18n/en-US.json' {
     'cellsGlobalView.pagination.nextPage': `Next Page`;
     'cellsGlobalView.pagination.previousPage': `Previous Page`;
     'cellsGlobalView.pagination.resultsOutOf': `{start}-{end} out of {total}`;
-    'cellsGlobalView.pagination.rowsPerPage': `Rows Per Page`;
+    'cellsGlobalView.pagination.rowsPerPage': `Rows per page`;
     'cellsGlobalView.refreshButton': `Refresh list`;
     'cellsGlobalView.searchCloseButton': `Close`;
     'cellsGlobalView.searchFailed': `Something went wrong, please try again later.`;
@@ -387,8 +387,8 @@ declare module 'I18n/en-US.json' {
     'cellsGlobalView.shareFileModalCopyLink': `Copy link`;
     'cellsGlobalView.shareFileModalDisablePublicLink': `Disable public link`;
     'cellsGlobalView.shareFileModalDisablePublicLinkDescription': `Disable public link`;
-    'cellsGlobalView.shareFileModalEnablePublicLink': `Enable public link`;
-    'cellsGlobalView.shareFileModalEnablePublicLinkDescription': `Your file will be uploaded and shared via a public link. Only those with the link can view it—ensure you trust your recipients.`;
+    'cellsGlobalView.shareFileModalEnablePublicLink': `Create public link`;
+    'cellsGlobalView.shareFileModalEnablePublicLinkDescription': `Upload and share your file via a public link. All recipients can view and download it.`;
     'cellsGlobalView.shareFileModalErrorLoadingLink': `Something went wrong, please try again later.`;
     'cellsGlobalView.shareFileModalGeneratedPublicLink': `Generated public link`;
     'cellsGlobalView.shareFileModalHeading': `Share file via link`;
@@ -1393,6 +1393,15 @@ declare module 'I18n/en-US.json' {
     'participantDevicesWhyVerify': `Why verify conversations?`;
     'pastedFileCloseMessage': `Close`;
     'pastedFileSendMessage': `Send`;
+    'pdfViewerCloseSidebar': `Close sidebar`;
+    'pdfViewerErrorDescription': `File preview not available, please try again later.`;
+    'pdfViewerErrorTitle': `Something went wrong`;
+    'pdfViewerNextPage': `Next page`;
+    'pdfViewerOpenSidebar': `Open sidebar`;
+    'pdfViewerPageNumber': `Page {page} of {total}`;
+    'pdfViewerPreviousPage': `Previous page`;
+    'pdfViewerZoomIn': `Zoom in`;
+    'pdfViewerZoomOut': `Zoom out`;
     'preferencesAV': `Audio / Video`;
     'preferencesAVCamera': `Camera`;
     'preferencesAVMicrophone': `Microphone`;

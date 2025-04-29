@@ -44,12 +44,14 @@ const logger = getLogger('FileDropzone');
 
 interface UseFilesUploadDropzoneParams {
   isTeam: boolean;
+  isDisabled: boolean;
   cellsRepository: CellsRepository;
   conversation?: Pick<Conversation, 'id' | 'qualifiedId'>;
 }
 
 export const useFilesUploadDropzone = ({
   isTeam,
+  isDisabled,
   cellsRepository,
   conversation = {id: '', qualifiedId: {id: '', domain: ''}},
 }: UseFilesUploadDropzoneParams) => {
@@ -64,6 +66,7 @@ export const useFilesUploadDropzone = ({
     maxSize: MAX_SIZE,
     noClick: true,
     noKeyboard: true,
+    disabled: isDisabled,
     accept,
     onDrop: checkFileSharingPermission(async (acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
       const newFiles = [...acceptedFiles, ...rejectedFiles.map(file => file.file)];

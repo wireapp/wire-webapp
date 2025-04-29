@@ -17,7 +17,7 @@
  *
  */
 
-import {CSSProperties, useState} from 'react';
+import {CSSProperties, useId, useState} from 'react';
 
 import {AlertIcon} from '@wireapp/react-ui-kit';
 
@@ -34,27 +34,41 @@ import {
   loaderIconStyles,
 } from './FileAssetWithPreview.styles';
 
+import {FileAssetOptions} from '../common/FileAssetOptions/FileAssetOptions';
+import {FilePreviewModal} from '../common/FilePreviewModal/FilePreviewModal';
+
 interface FileAssetWithPreviewProps {
+  src?: string;
   extension: string;
   name: string;
   size: string;
-  previewUrl?: string;
+  imagePreviewUrl?: string;
+  pdfPreviewUrl?: string;
   isLoading: boolean;
   isError: boolean;
+  senderName: string;
+  timestamp: number;
 }
 
 export const FileAssetWithPreview = ({
+  src,
   extension,
   name,
   size,
-  previewUrl,
+  imagePreviewUrl,
+  pdfPreviewUrl,
   isError,
   isLoading,
+  senderName,
+  timestamp,
 }: FileAssetWithPreviewProps) => {
+  const [isOpen, setIsOpen] = useState(false);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
 
-  const shouldDisplayLoading = (previewUrl ? !isImageLoaded : isLoading) && !isError;
-  const shouldDisplayPreviewError = isError || (!isLoading && !previewUrl);
+  const shouldDisplayLoading = (imagePreviewUrl ? !isImageLoaded : isLoading) && !isError;
+  const shouldDisplayPreviewError = isError || (!isLoading && !imagePreviewUrl);
+
+  const id = useId();
 
   return (
     <FileCard.Root variant="large" extension={extension} name={name} size={size}>
@@ -62,12 +76,20 @@ export const FileAssetWithPreview = ({
         <FileCard.Icon type={isError ? 'unavailable' : 'file'} />
         {!isError && <FileCard.Type />}
         <FileCard.Name variant={isError ? 'secondary' : 'primary'} />
+        <FileAssetOptions onOpen={() => setIsOpen(true)} />
       </FileCard.Header>
       <FileCard.Content>
-        <div css={contentWrapperStyles}>
+        <button
+          css={contentWrapperStyles}
+          onClick={() => setIsOpen(true)}
+          aria-label={t('cellsGlobalView.optionOpen')}
+          aria-controls={id}
+          aria-haspopup="dialog"
+          aria-expanded={isOpen}
+        >
           <img
-            src={previewUrl}
-            style={{'--opacity': isImageLoaded && previewUrl ? 1 : 0} as CSSProperties}
+            src={imagePreviewUrl}
+            style={{'--opacity': isImageLoaded && imagePreviewUrl ? 1 : 0} as CSSProperties}
             alt=""
             css={imageStyles}
             onLoad={() => setIsImageLoaded(true)}
@@ -84,8 +106,22 @@ export const FileAssetWithPreview = ({
               )}
             </div>
           </div>
-        </div>
+        </button>
       </FileCard.Content>
+      <FilePreviewModal
+        id={id}
+        fileUrl={src}
+        filePdfPreviewUrl={pdfPreviewUrl}
+        fileImagePreviewUrl={imagePreviewUrl}
+        fileName={name}
+        fileExtension={extension}
+        senderName={senderName}
+        timestamp={timestamp}
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        isLoading={isLoading}
+        isError={isError}
+      />
     </FileCard.Root>
   );
 };

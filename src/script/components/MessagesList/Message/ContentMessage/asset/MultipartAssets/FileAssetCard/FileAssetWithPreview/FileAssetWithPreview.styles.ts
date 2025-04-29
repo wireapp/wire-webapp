@@ -30,6 +30,9 @@ export const contentWrapperStyles: CSSObject = {
   color: 'var(--gray-70)',
   aspectRatio: '16/9',
   overflow: 'hidden',
+  padding: 0,
+  margin: 0,
+  cursor: 'pointer',
 
   // Fallback for the above aspect-ratio
   '@supports not (aspect-ratio: 16/9)': {
@@ -51,6 +54,8 @@ export const infoOverlayStyles: CSSObject = {
   left: 0,
   width: '100%',
   height: '100%',
+  userSelect: 'none',
+  pointerEvents: 'none',
 };
 
 export const infoWrapperStyles: CSSObject = {
@@ -84,4 +89,18 @@ export const errorTextStyles: CSSObject = {
   fontWeight: 'var(--line-height-md)',
   lineHeight: 'var(--line-height-sm)',
   color: 'var(--main-color)',
+};
+
+export const moreButtonStyles: CSSObject = {
+  background: 'none',
+  border: 'none',
+  cursor: 'pointer',
+  padding: '0',
+  marginLeft: 'auto',
+  zIndex: '1',
+};
+
+export const moreIconStyles: CSSObject = {
+  fill: 'var(--main-color)',
+  display: 'block',
 };

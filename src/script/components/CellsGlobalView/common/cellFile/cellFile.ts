@@ -21,8 +21,10 @@ export interface CellFile {
   id: string;
   mimeType?: string;
   name: string;
+  extension: string;
   sizeMb: string;
   previewImageUrl?: string;
+  previewPdfUrl?: string;
   uploadedAtTimestamp: number;
   owner: string;
   conversationName: string;

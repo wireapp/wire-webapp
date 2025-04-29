@@ -24,24 +24,23 @@ import {useCellsStore} from '../common/useCellsStore/useCellsStore';
 
 interface UsePaginationProps {
   pagination: CellPagination | null;
+  currentFilesCount: number;
   conversationId: string;
   setOffset: (offset: number) => void;
-  onPageChange?: () => void;
 }
 
-export const useCellsPagination = ({pagination, conversationId, setOffset, onPageChange}: UsePaginationProps) => {
+export const useCellsPagination = ({pagination, conversationId, setOffset, currentFilesCount}: UsePaginationProps) => {
   const {clearAll, pageSize, setPageSize} = useCellsStore();
 
   const currentPage = pagination?.currentPage || 0;
   const totalPages = pagination?.totalPages || 1;
-  const totalRows = pagination?.total || pageSize;
+  const totalRows = pagination?.total || currentFilesCount;
 
   const goToPage = useCallback(
     (page: number) => {
-      onPageChange?.();
       setOffset(page * pageSize);
     },
-    [pageSize, setOffset, onPageChange],
+    [pageSize, setOffset],
   );
 
   const handleSetPageSize = useCallback(

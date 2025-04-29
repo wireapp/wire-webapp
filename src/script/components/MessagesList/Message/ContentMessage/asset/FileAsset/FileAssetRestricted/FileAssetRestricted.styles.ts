@@ -21,7 +21,7 @@ import {CSSObject} from '@emotion/react';
 
 export const wrapperStyles: CSSObject = {
   width: '100%',
-  maxWidth: '268px',
+  maxWidth: '254px',
   height: '74px',
   backgroundColor: 'var(--app-bg-secondary)',
   border: '1px solid var(--border-color)',
