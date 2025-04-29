@@ -60,6 +60,7 @@ interface ShowConversationOptions {
 interface ShowConversationOverload {
   (conversation: Conversation | undefined, options?: ShowConversationOptions): Promise<void>;
   (conversationId: QualifiedId, options?: ShowConversationOptions): Promise<void>;
+  (conversation: {id: string; domain?: string}, options?: ShowConversationOptions): Promise<void>;
 }
 
 export class ContentViewModel {
@@ -133,11 +134,18 @@ export class ContentViewModel {
   }
 
   private readonly getConversationEntity = async (
-    conversation: Conversation | QualifiedId,
+    conversation: Conversation | QualifiedId | {id: string; domain?: string},
   ): Promise<Conversation | null> => {
-    const conversationEntity = isConversationEntity(conversation)
-      ? conversation
-      : await this.conversationRepository.getConversationById(conversation);
+    if (isConversationEntity(conversation)) {
+      return conversation;
+    }
+
+    const qualifiedId: QualifiedId = {
+      id: conversation.id,
+      domain: conversation.domain ?? this.userState.self()?.domain ?? '',
+    };
+
+    const conversationEntity = await this.conversationRepository.getConversationById(qualifiedId);
 
     if (!conversationEntity.is1to1()) {
       return conversationEntity;
@@ -232,7 +240,7 @@ export class ContentViewModel {
    * @param domain Domain name
    */
   readonly showConversation: ShowConversationOverload = async (
-    conversation: Conversation | QualifiedId | undefined,
+    conversation: Conversation | QualifiedId | {id: string; domain?: string} | undefined,
     options?: ShowConversationOptions,
   ) => {
     const {
