@@ -19,6 +19,7 @@
 
 export interface CellFile {
   id: string;
+  type: 'file' | 'folder';
   mimeType?: string;
   name: string;
   extension: string;
