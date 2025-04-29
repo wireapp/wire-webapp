@@ -17,7 +17,7 @@
  *
  */
 
-import {PlayIcon} from '@wireapp/react-ui-kit';
+import {FolderIcon, PlayIcon} from '@wireapp/react-ui-kit';
 
 import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
 import {CellFile} from 'Components/Conversation/ConversationCells/common/cellFile/cellFile';
@@ -57,8 +57,10 @@ export const CellsTableNameColumn = ({file}: CellsTableNameColumnProps) => {
             <img src={previewImageUrl} alt="" width={24} height={24} css={imagePreviewStyles} />
             {isVideo && <PlayIcon css={playIconStyles} width={16} height={16} />}
           </div>
-        ) : (
+        ) : file.type === 'file' ? (
           <FileTypeIcon extension={getFileExtension(name)} size={24} />
+        ) : (
+          <FolderIcon width={24} height={24} />
         )}
         <button
           type="button"
