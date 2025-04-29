@@ -48,18 +48,6 @@ export const FilePreviewModal = ({
   isLoading,
   isError,
 }: FilePreviewModalProps) => {
-  const getFileType = () => {
-    if (fileExtension === 'pdf' || filePdfPreviewUrl) {
-      return 'pdf';
-    }
-
-    if (fileImagePreviewUrl) {
-      return 'image';
-    }
-
-    return 'unavailable';
-  };
-
   const getFileUrl = () => {
     if (fileExtension === 'pdf') {
       return fileUrl;
@@ -73,8 +61,8 @@ export const FilePreviewModal = ({
       return 'loading';
     }
 
-    if (isError) {
-      return 'error';
+    if (isError || (!getFileUrl() && !isLoading)) {
+      return 'unavailable';
     }
 
     return 'success';
@@ -83,8 +71,7 @@ export const FilePreviewModal = ({
   return (
     <FileFullscreenModal
       id={id}
-      type={getFileType()}
-      fileUrl={getFileUrl()}
+      filePreviewUrl={getFileUrl()}
       fileName={fileName}
       fileExtension={fileExtension}
       senderName={senderName}
