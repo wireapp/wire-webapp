@@ -175,6 +175,13 @@ module.exports = {
         {from: `assets`, to: `${dist}/assets`},
         {from: 'src/page/basicBrowserFeatureCheck.js', to: `${dist}/min/`},
         {from: 'src/page/loader.js', to: `${dist}/min/`},
+        // Copy PDF worker for react-pdf package
+        {
+          from: path.dirname(require.resolve('pdfjs-dist/package.json')) + '/build/pdf.worker.mjs',
+          to: `${dist}/min/pdf.worker.mjs`,
+          // Prevents content hashing
+          info: {minimized: true},
+        },
       ],
     }),
     new webpack.IgnorePlugin({resourceRegExp: /.*\.wasm/}),

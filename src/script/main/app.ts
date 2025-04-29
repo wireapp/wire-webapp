@@ -121,7 +121,8 @@ import {UserService} from '../user/UserService';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
 import {Warnings} from '../view_model/WarningsContainer';
 
-pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
+// Initialize PDF.js worker for react-pdf package
+pdfjs.GlobalWorkerOptions.workerSrc = '/min/pdf.worker.mjs';
 
 export function doRedirect(signOutReason: SIGN_OUT_REASON) {
   let url = `/auth/${location.search}`;
