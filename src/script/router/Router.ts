@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2019 Wire Swiss GmbH
+ * Copyright (C) 2024 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,37 +17,61 @@
  *
  */
 
-// Re-export the enhanced router implementation
-export * from './EnhancedRouter';
+import {matchRoute} from './routeMatcher';
 
-// import switchPath from 'switch-path';
+export type Routes = Record<string, ((...args: any[]) => void) | null>;
 
-// export type Routes = Record<string, ((x: any) => void) | null>;
+const defaultRoute: Routes = {
+  // do nothing if url was not matched
+  '*': null,
+};
 
-// const defaultRoute: Routes = {
-//   // do nothing if url was not matched
-//   '*': null,
-// };
-// let routes: Routes = {};
+let routes: Routes = {};
 
-// function parseRoute() {
-//   const currentPath = window.location.hash.replace('#', '') || '/';
+/**
+ * Matches the current URL path against configured routes and triggers the appropriate handler.
+ */
+const parseCurrentUrlRoute = () => {
+  const currentPath = window.location.hash.replace('#', '') || '/';
 
-//   const {value} = switchPath(currentPath, routes);
-//   return typeof value === 'function' ? value() : value;
-// }
+  const exactMatch = routes[currentPath];
+  if (exactMatch) {
+    return exactMatch();
+  }
 
-// export const configureRoutes = (routeDefinitions: Routes): void => {
-//   routes = {...defaultRoute, ...routeDefinitions};
-//   window.addEventListener('hashchange', parseRoute);
-//   parseRoute();
-// };
+  for (const [pattern, handler] of Object.entries(routes)) {
+    if (pattern === '*') {
+      continue;
+    }
 
-// export const navigate = (path: string, stateObj?: {}) => {
-//   setHistoryParam(path, stateObj);
-//   parseRoute();
-// };
+    const {match, params} = matchRoute({path: currentPath, pattern});
+    if (!match || !handler) {
+      continue;
+    }
 
-// export const setHistoryParam = (path: string, stateObj: {} = window.history.state) => {
-//   window.history.replaceState(stateObj, '', `#${path}`);
-// };
+    const paramNames = Object.keys(params);
+    if (paramNames.length === 0) {
+      return handler(params);
+    }
+
+    const paramValues = paramNames.map(name => params[name]);
+    return handler(...paramValues);
+  }
+
+  return routes['*']?.();
+};
+
+export const configureRoutes = (routeDefinitions: Routes): void => {
+  routes = {...defaultRoute, ...routeDefinitions};
+  window.addEventListener('hashchange', parseCurrentUrlRoute);
+  parseCurrentUrlRoute();
+};
+
+export const navigate = (path: string, stateObj?: {}) => {
+  setHistoryParam(path, stateObj);
+  parseCurrentUrlRoute();
+};
+
+export const setHistoryParam = (path: string, stateObj: {} = window.history.state) => {
+  window.history.replaceState(stateObj, '', `#${path}`);
+};

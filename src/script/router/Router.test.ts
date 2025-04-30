@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2019 Wire Swiss GmbH
+ * Copyright (C) 2024 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,13 +27,40 @@ describe('Router', () => {
   });
 
   describe('configureRoutes', () => {
-    it('parse the current URL when instantiated', () => {
+    it('parses the current URL when instantiated', () => {
       const routes = {'/conv': jest.fn()};
 
       window.location.hash = '#/conv';
       configureRoutes(routes);
 
       expect(routes['/conv']).toHaveBeenCalled();
+    });
+
+    it('handles exact matches with parameters', () => {
+      const routes = {'/conversation/:id': jest.fn()};
+
+      window.location.hash = '#/conversation/123';
+      configureRoutes(routes);
+
+      expect(routes['/conversation/:id']).toHaveBeenCalledWith('123');
+    });
+
+    it('handles optional parameters', () => {
+      const routes = {'/conversation/:id(/:domain)': jest.fn()};
+
+      window.location.hash = '#/conversation/123/example.com';
+      configureRoutes(routes);
+
+      expect(routes['/conversation/:id(/:domain)']).toHaveBeenCalledWith('123', 'example.com');
+    });
+
+    it('handles wildcard segments', () => {
+      const routes = {'/conversation/:id/files/*': jest.fn()};
+
+      window.location.hash = '#/conversation/123/files/some/path';
+      configureRoutes(routes);
+
+      expect(routes['/conversation/:id/files/*']).toHaveBeenCalledWith('123', 'some/path');
     });
   });
 
@@ -53,12 +80,24 @@ describe('Router', () => {
 
       navigate('/conversation/uuid');
 
-      expect(routes.conversation).toHaveBeenCalled();
+      expect(routes.conversation).toHaveBeenCalledWith('uuid');
       expect(routes.user).not.toHaveBeenCalled();
 
       navigate('/user/uuid');
 
-      expect(routes.user).toHaveBeenCalled();
+      expect(routes.user).toHaveBeenCalledWith('uuid');
+    });
+
+    it('handles complex routes with multiple parameters', () => {
+      const routes = {complex: jest.fn()};
+
+      configureRoutes({
+        '/conversation/:id(/:domain)/files/*': routes.complex,
+      });
+
+      navigate('/conversation/123/example.com/files/some/path');
+
+      expect(routes.complex).toHaveBeenCalledWith('123', 'example.com', 'some/path');
     });
   });
 
@@ -72,19 +111,17 @@ describe('Router', () => {
 
       window.location.hash = '#/conversation/uuid';
 
-      waitFor(() => {
-        expect(handlers.conversation).toHaveBeenCalled();
+      await waitFor(() => {
+        expect(handlers.conversation).toHaveBeenCalledWith('uuid');
       });
     });
   });
 
   describe('setHistoryParam', () => {
-    // Mock window.history.replaceState before each test
     beforeEach(() => {
       global.history.replaceState = jest.fn();
     });
 
-    // Restore the original method after each test
     afterEach(() => {
       (global.history.replaceState as jest.Mock).mockRestore();
     });
@@ -106,7 +143,7 @@ describe('Router', () => {
       expect(global.history.replaceState).toHaveBeenCalledWith(newStateObj, '', '#/path');
     });
 
-    it('explicitely resetting the state is allowed', () => {
+    it('explicitly resetting the state is allowed', () => {
       const mockState = {eventKey: 'Tab'};
       Object.defineProperty(window.history, 'state', {value: mockState, writable: true});
 

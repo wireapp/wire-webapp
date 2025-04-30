@@ -197,14 +197,23 @@ export class ContentViewModel {
     const {rightSidebar} = useAppMainState.getState();
     this.showContent(ContentState.CONVERSATION);
     this.previousConversation = this.conversationState.activeConversation();
-    setHistoryParam(
-      generateConversationUrl(
-        {id: conversationEntity?.id ?? '', domain: conversationEntity?.domain ?? ''},
-        showFiles,
-        filePath,
-      ),
-      history.state,
-    );
+
+    // Generate the base URL without any trailing slash
+    const baseUrl = generateConversationUrl(
+      {id: conversationEntity?.id ?? '', domain: conversationEntity?.domain ?? ''},
+      showFiles,
+      filePath,
+    ).replace(/\/+$/, '');
+
+    // Get the current path and check if it has a trailing slash
+    const currentPath = window.location.hash.replace('#', '');
+    const hasTrailingSlash = currentPath.endsWith('/');
+
+    // If the current path has a trailing slash, preserve it in the new URL
+    const newUrl = hasTrailingSlash ? `${baseUrl}/` : baseUrl;
+
+    setHistoryParam(newUrl, history.state);
+
     if (openNotificationSettings) {
       rightSidebar.goTo(PanelState.NOTIFICATIONS, {entity: this.conversationState.activeConversation() ?? null});
     }

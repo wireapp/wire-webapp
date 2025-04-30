@@ -190,10 +190,6 @@ export const AppMain: FC<AppMainProps> = ({
         conversationId: string,
         domain: string = apiContext.domain ?? '',
       ) => mainView.content.showConversation({id: conversationId, domain}, {showFiles: true}),
-      '/conversation/:conversationId(/:domain)/files/': (
-        conversationId: string,
-        domain: string = apiContext.domain ?? '',
-      ) => mainView.content.showConversation({id: conversationId, domain}, {showFiles: true}),
       '/conversation/:conversationId(/:domain)/files/*': (
         conversationId: string,
         domain: string = apiContext.domain ?? '',

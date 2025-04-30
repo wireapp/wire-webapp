@@ -19602,13 +19602,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"switch-path@npm:1.2.0":
-  version: 1.2.0
-  resolution: "switch-path@npm:1.2.0"
-  checksum: 10/28ae47f4d58cc33ef3a676f148f816b3ef5220363292fd338162731eb1c23fe644c0d03bf5b41a536390825c7b6ef4e66e3e773a0ceb262ee77a8995f844d65a
-  languageName: node
-  linkType: hard
-
 "symbol-tree@npm:^3.2.4":
   version: 3.2.4
   resolution: "symbol-tree@npm:3.2.4"
@@ -21239,7 +21232,6 @@ __metadata:
     stylelint: "npm:16.16.0"
     stylelint-config-idiomatic-order: "npm:10.0.0"
     svg-inline-loader: "npm:0.8.2"
-    switch-path: "npm:1.2.0"
     text-encoding: "npm:0.7.0"
     ts-node: "npm:10.9.2"
     tsc-watch: "npm:6.2.1"
