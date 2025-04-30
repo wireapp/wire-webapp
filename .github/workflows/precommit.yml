@@ -63,12 +63,12 @@ jobs:
 
       - name: Check total PR additions
         id: check_additions
-        shell: bash
         run: |
-          echo "Raw PR data:"
-          echo '${{ steps.pr_details.outputs.data }}'
           # Store response data in variable
-          response="${{ steps.pr_details.outputs.data }}"
+          response='${{ steps.pr_details.outputs.data }}'
+          echo "Response: $response"
+          # remove new lines and quotes
+          response=$(echo "$response" | tr -d '\n')
           # Parse additions from response
           total_additions=$(echo "$response" | jq -r '.additions')
           echo "Found total additions: $total_additions"
