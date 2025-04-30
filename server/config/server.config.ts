@@ -44,7 +44,7 @@ const defaultCSP = {
   mediaSrc: ["'self'", 'blob:', 'data:', 'https://service.zeta.pydiocells.com'],
   scriptSrc: ["'self'", "'unsafe-eval'"],
   styleSrc: ["'self'", "'unsafe-inline'"],
-  workerSrc: ["'self'", 'blob:'],
+  workerSrc: ["'self'", 'blob:', 'data:'],
 };
 const logger = logdown('config', {
   logger: console,

@@ -17,7 +17,7 @@
  *
  */
 
-import {MouseEvent as ReactMouseEvent, KeyboardEvent, useState, useId} from 'react';
+import {MouseEvent as ReactMouseEvent, KeyboardEvent, useId} from 'react';
 
 import {MoreIcon} from '@wireapp/react-ui-kit';
 
@@ -28,19 +28,11 @@ import {setContextMenuPosition} from 'Util/util';
 
 import {buttonStyles, iconStyles} from './FileAssetOptions.styles';
 
-import {FileFullscreenModal} from '../../../../../../../../FileFullscreenModal/FileFullscreenModal';
-
 interface FileAssetOptionsProps {
-  name: string;
-  extension: string;
-  senderName: string;
-  timestamp: number;
-  src?: string;
+  onOpen: () => void;
 }
 
-export const FileAssetOptions = ({name, extension, senderName, timestamp, src}: FileAssetOptionsProps) => {
-  const [isOpen, setIsOpen] = useState(false);
-
+export const FileAssetOptions = ({onOpen}: FileAssetOptionsProps) => {
   const id = useId();
 
   const showOptionsMenu = (event: ReactMouseEvent<HTMLButtonElement> | MouseEvent) => {
@@ -49,10 +41,10 @@ export const FileAssetOptions = ({name, extension, senderName, timestamp, src}: 
       entries: [
         {
           label: t('cellsGlobalView.optionOpen'),
-          click: () => setIsOpen(true),
+          click: () => onOpen(),
         },
       ],
-      identifier: 'file-asset-options',
+      identifier: id,
     });
   };
 
@@ -67,25 +59,13 @@ export const FileAssetOptions = ({name, extension, senderName, timestamp, src}: 
     <>
       <button
         css={buttonStyles}
+        id={id}
         onKeyDown={handleKeyDown}
         onClick={showOptionsMenu}
         aria-label={t('cellsGlobalView.optionsLabel')}
-        aria-controls={id}
-        aria-expanded={isOpen}
-        aria-haspopup="dialog"
       >
         <MoreIcon css={iconStyles} />
       </button>
-      <FileFullscreenModal
-        id={id}
-        fileName={name}
-        fileUrl={src}
-        fileExtension={extension}
-        senderName={senderName}
-        timestamp={timestamp}
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-      />
     </>
   );
 };

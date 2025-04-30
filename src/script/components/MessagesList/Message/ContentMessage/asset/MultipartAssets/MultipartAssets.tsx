@@ -96,7 +96,7 @@ const MultipartAsset = ({
   const isSingleAsset = assetsCount === 1;
   const variant = isSingleAsset ? 'large' : 'small';
 
-  const {src, isLoading, isError, previewUrl} = useGetMultipartAsset({
+  const {src, isLoading, isError, imagePreviewUrl, pdfPreviewUrl} = useGetMultipartAsset({
     uuid,
     cellsRepository,
     isEnabled: hasBeenInView,
@@ -145,7 +145,8 @@ const MultipartAsset = ({
         extension={extension}
         name={name}
         size={size}
-        previewUrl={previewUrl}
+        imagePreviewUrl={imagePreviewUrl}
+        pdfPreviewUrl={pdfPreviewUrl}
         isLoading={isLoading}
         isError={isError}
         senderName={senderName}
