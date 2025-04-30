@@ -182,10 +182,22 @@ export const AppMain: FC<AppMainProps> = ({
       window.history.replaceState(historyState, '', window.location.hash);
     }
 
+    const showConversationMessages = (conversationId: string, domain = apiContext.domain ?? '') => {
+      void mainView.content.showConversation({id: conversationId, domain});
+    };
+
+    const showConversationFiles = (conversationId: string, domain = apiContext.domain ?? '', filePath = '') => {
+      void mainView.content.showConversation({id: conversationId, domain}, {filePath: `files/${filePath}`});
+    };
+
     configureRoutes({
       '/': showMostRecentConversation,
-      '/conversation/:conversationId(/:domain)': (conversationId: string, domain: string = apiContext.domain ?? '') =>
-        mainView.content.showConversation({id: conversationId, domain}),
+      '/conversation/:conversationId/:domain': showConversationMessages,
+      '/conversation/:conversationId': showConversationMessages,
+      '/conversation/:conversationId/:domain/files': showConversationFiles,
+      '/conversation/:conversationId/files': showConversationFiles,
+      '/conversation/:conversationId/:domain/files/:path*': showConversationFiles,
+      '/conversation/:conversationId/files/:path*': showConversationFiles,
       '/preferences/about': () => mainView.list.openPreferencesAbout(),
       '/preferences/account': () => mainView.list.openPreferencesAccount(),
       '/preferences/av': () => mainView.list.openPreferencesAudioVideo(),
