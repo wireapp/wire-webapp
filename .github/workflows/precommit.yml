@@ -64,7 +64,8 @@ jobs:
       - name: Check total PR additions
         id: check_additions
         run: |
-          total_additions=$(echo '${{ steps.pr_details.outputs.data }}' | jq -r '.additions')
+          echo "${{ steps.pr_details.outputs.data }}" > pr.json
+          total_additions=$(jq -r '.additions' pr.json)
           echo "Found total additions: $total_additions"
           echo "total_additions=$total_additions" >> $GITHUB_OUTPUT
 
