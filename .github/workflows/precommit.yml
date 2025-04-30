@@ -64,16 +64,25 @@ jobs:
       - name: Check total PR additions
         id: check_additions
         run: |
-          # Store response data in variable
-          response='${{ steps.pr_details.outputs.data }}'
-          echo "Response: $response"
-          # remove new lines and quotes
-          response=$(echo "$response" | tr -d '\n')
-          # Parse additions from response
+          echo "Raw PR data:"
+          echo '${{ steps.pr_details.outputs.data }}'
+
+          # Assign JSON using HEREDOC to avoid quoting issues
+          response=$(cat <<EOF
+          ${{ steps.pr_details.outputs.data }}
+          EOF
+          )
+
+          echo "Response captured:"
+          echo "$response"
+
+          # Parse additions from JSON
           total_additions=$(echo "$response" | jq -r '.additions')
           echo "Found total additions: $total_additions"
+
           # Output for subsequent steps
           echo "total_additions=$total_additions" >> $GITHUB_OUTPUT
+        shell: bash
 
   deploy_to_aws:
     name: 'Deploy to live environments'
