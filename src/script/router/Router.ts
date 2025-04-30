@@ -17,7 +17,7 @@
  *
  */
 
-import {matchRoute} from './routeMatcher';
+import {match} from 'path-to-regexp';
 
 export type Routes = Record<string, ((...args: any[]) => void) | null>;
 
@@ -33,6 +33,7 @@ let routes: Routes = {};
  */
 const parseCurrentUrlRoute = () => {
   const currentPath = window.location.hash.replace('#', '') || '/';
+  console.log('Current path:', currentPath);
 
   const exactMatch = routes[currentPath];
   if (exactMatch) {
@@ -44,18 +45,36 @@ const parseCurrentUrlRoute = () => {
       continue;
     }
 
-    const {match, params} = matchRoute({path: currentPath, pattern});
-    if (!match || !handler) {
+    try {
+      console.log('Trying pattern:', pattern);
+      const matcher = match(pattern, {decode: decodeURIComponent});
+      const result = matcher(currentPath);
+      console.log('Match result:', result);
+
+      if (!result || !handler) {
+        continue;
+      }
+
+      const params = result.params;
+      const paramNames = Object.keys(params);
+      console.log('Matched params:', params);
+
+      // Handle wildcard parameter
+      if (params['*']) {
+        return handler(...Object.values(params));
+      }
+
+      // Handle optional parameters
+      if (paramNames.length === 0) {
+        return handler(params);
+      }
+
+      const paramValues = paramNames.map(name => params[name]);
+      return handler(...paramValues);
+    } catch (error) {
+      console.warn(`Failed to match route pattern "${pattern}":`, error);
       continue;
     }
-
-    const paramNames = Object.keys(params);
-    if (paramNames.length === 0) {
-      return handler(params);
-    }
-
-    const paramValues = paramNames.map(name => params[name]);
-    return handler(...paramValues);
   }
 
   return routes['*']?.();
