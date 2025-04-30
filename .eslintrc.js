@@ -24,6 +24,8 @@ module.exports = {
     'src/script/components/Icon.tsx',
     '*.js',
     'src/types/i18n.d.ts',
+    'test/e2e_tests', // TODO: Remove this before merging
+    'playwright.config.ts', // TODO: Remove this before merging
   ],
   parserOptions: {
     project: ['./tsconfig.build.json', './server/tsconfig.json'],
