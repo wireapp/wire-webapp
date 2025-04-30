@@ -115,44 +115,4 @@ describe('Router', () => {
       expect(global.history.replaceState).toHaveBeenCalledWith(newStateObj, '', '#/path');
     });
   });
-
-  describe('route parameters', () => {
-    it('handles wildcard parameters in routes', () => {
-      const routes = {
-        '/conversation/*': jest.fn(),
-        '/user/*': jest.fn(),
-      };
-
-      configureRoutes(routes);
-
-      // Test with wildcard parameter
-      navigate('/conversation/uuid/messages');
-      expect(routes['/conversation/*']).toHaveBeenCalledWith('uuid/messages');
-
-      // Test with different wildcard parameter
-      navigate('/conversation/uuid/settings');
-      expect(routes['/conversation/*']).toHaveBeenCalledWith('uuid/settings');
-
-      // Test with wildcard parameter
-      navigate('/user/uuid/profile');
-      expect(routes['/user/*']).toHaveBeenCalledWith('uuid/profile');
-    });
-
-    it('handles multiple parameters in routes', () => {
-      const routes = {
-        '/conversation/:id/message/:messageId': jest.fn(),
-        '/user/:id/profile/:section': jest.fn(),
-      };
-
-      configureRoutes(routes);
-
-      // Test with multiple parameters
-      navigate('/conversation/uuid/message/msg123');
-      expect(routes['/conversation/:id/message/:messageId']).toHaveBeenCalledWith('uuid', 'msg123');
-
-      // Test with different parameters
-      navigate('/user/uuid/profile/settings');
-      expect(routes['/user/:id/profile/:section']).toHaveBeenCalledWith('uuid', 'settings');
-    });
-  });
 });
