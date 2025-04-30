@@ -36,4 +36,36 @@ describe('generateConversationUrl', () => {
       expect(url).toContain('/conversation');
     });
   });
+
+  it('generates an URL with domain when provided', () => {
+    const conversationId = '16177651-5307-421a-acc6-69d4016195f7';
+    const domain = 'example.com';
+    const url = generateConversationUrl({id: conversationId, domain});
+
+    expect(url).toContain(conversationId);
+    expect(url).toContain(domain);
+    expect(url).toBe(`/conversation/${conversationId}/${domain}`);
+  });
+
+  it('generates an URL with files segment when showFiles is true', () => {
+    const conversationId = '16177651-5307-421a-acc6-69d4016195f7';
+    const domain = 'example.com';
+    const url = generateConversationUrl({id: conversationId, domain}, true);
+
+    expect(url).toContain(conversationId);
+    expect(url).toContain(domain);
+    expect(url).toBe(`/conversation/${conversationId}/${domain}/files`);
+  });
+
+  it('generates an URL with files segment and file path when both showFiles and filePath are provided', () => {
+    const conversationId = '16177651-5307-421a-acc6-69d4016195f7';
+    const domain = 'example.com';
+    const filePath = 'document.pdf';
+    const url = generateConversationUrl({id: conversationId, domain}, true, filePath);
+
+    expect(url).toContain(conversationId);
+    expect(url).toContain(domain);
+    expect(url).toContain(filePath);
+    expect(url).toBe(`/conversation/${conversationId}/${domain}/files/${filePath}`);
+  });
 });

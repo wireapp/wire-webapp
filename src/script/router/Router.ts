@@ -17,34 +17,37 @@
  *
  */
 
-import switchPath from 'switch-path';
+// Re-export the enhanced router implementation
+export * from './EnhancedRouter';
 
-export type Routes = Record<string, ((x: any) => void) | null>;
+// import switchPath from 'switch-path';
 
-const defaultRoute: Routes = {
-  // do nothing if url was not matched
-  '*': null,
-};
-let routes: Routes = {};
+// export type Routes = Record<string, ((x: any) => void) | null>;
 
-function parseRoute() {
-  const currentPath = window.location.hash.replace('#', '') || '/';
+// const defaultRoute: Routes = {
+//   // do nothing if url was not matched
+//   '*': null,
+// };
+// let routes: Routes = {};
 
-  const {value} = switchPath(currentPath, routes);
-  return typeof value === 'function' ? value() : value;
-}
+// function parseRoute() {
+//   const currentPath = window.location.hash.replace('#', '') || '/';
 
-export const configureRoutes = (routeDefinitions: Routes): void => {
-  routes = {...defaultRoute, ...routeDefinitions};
-  window.addEventListener('hashchange', parseRoute);
-  parseRoute();
-};
+//   const {value} = switchPath(currentPath, routes);
+//   return typeof value === 'function' ? value() : value;
+// }
 
-export const navigate = (path: string, stateObj?: {}) => {
-  setHistoryParam(path, stateObj);
-  parseRoute();
-};
+// export const configureRoutes = (routeDefinitions: Routes): void => {
+//   routes = {...defaultRoute, ...routeDefinitions};
+//   window.addEventListener('hashchange', parseRoute);
+//   parseRoute();
+// };
 
-export const setHistoryParam = (path: string, stateObj: {} = window.history.state) => {
-  window.history.replaceState(stateObj, '', `#${path}`);
-};
+// export const navigate = (path: string, stateObj?: {}) => {
+//   setHistoryParam(path, stateObj);
+//   parseRoute();
+// };
+
+// export const setHistoryParam = (path: string, stateObj: {} = window.history.state) => {
+//   window.history.replaceState(stateObj, '', `#${path}`);
+// };

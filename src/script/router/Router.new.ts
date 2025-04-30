@@ -17,18 +17,5 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-
-export const generateConversationUrl = ({id, domain}: QualifiedId, showFiles?: boolean, filePath?: string): string => {
-  let baseUrl = `/conversation/${id}`;
-  if (domain) {
-    baseUrl += `/${domain}`;
-  }
-  if (showFiles) {
-    baseUrl += '/files';
-    if (filePath) {
-      baseUrl += `/${filePath}`;
-    }
-  }
-  return baseUrl;
-};
+// Re-export the enhanced router implementation
+export * from './EnhancedRouter';

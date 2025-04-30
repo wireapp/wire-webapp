@@ -186,6 +186,19 @@ export const AppMain: FC<AppMainProps> = ({
       '/': showMostRecentConversation,
       '/conversation/:conversationId(/:domain)': (conversationId: string, domain: string = apiContext.domain ?? '') =>
         mainView.content.showConversation({id: conversationId, domain}),
+      '/conversation/:conversationId(/:domain)/files': (
+        conversationId: string,
+        domain: string = apiContext.domain ?? '',
+      ) => mainView.content.showConversation({id: conversationId, domain}, {showFiles: true}),
+      '/conversation/:conversationId(/:domain)/files/': (
+        conversationId: string,
+        domain: string = apiContext.domain ?? '',
+      ) => mainView.content.showConversation({id: conversationId, domain}, {showFiles: true}),
+      '/conversation/:conversationId(/:domain)/files/*': (
+        conversationId: string,
+        domain: string = apiContext.domain ?? '',
+        path: string,
+      ) => mainView.content.showConversation({id: conversationId, domain}, {showFiles: true, filePath: path}),
       '/preferences/about': () => mainView.list.openPreferencesAbout(),
       '/preferences/account': () => mainView.list.openPreferencesAccount(),
       '/preferences/av': () => mainView.list.openPreferencesAudioVideo(),
