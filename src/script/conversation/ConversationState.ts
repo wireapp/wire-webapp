@@ -208,6 +208,16 @@ export class ConversationState {
         });
   }
 
+  upsertConversation(conversationEntity: Conversation): void {
+    const existingConversation = this.findConversation(conversationEntity.qualifiedId);
+
+    if (existingConversation) {
+      this.conversations.replace(existingConversation, conversationEntity);
+    } else {
+      this.conversations.push(conversationEntity);
+    }
+  }
+
   /**
    * Indicates whether the selfUser has a conversation (1:1 or group conversation) with this other user
    * @param user the user to check
