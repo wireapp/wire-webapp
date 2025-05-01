@@ -64,8 +64,7 @@ jobs:
       - name: Check total PR additions
         id: check_additions
         run: |
-          echo '${{ steps.pr_details.outputs.data }}' > pr.json
-          total_additions=$(grep -o '"additions": *[0-9]*' pr.json | sed -E 's/.*: *([0-9]+)/\1/')
+          total_additions=$(grep -o '"additions": *[0-9]*' <<< '${{ steps.pr_details.outputs.data }}' | sed -E 's/.*: *([0-9]+)/\1/')
           echo "Found total additions: $total_additions"
           echo "total_additions=$total_additions" >> $GITHUB_OUTPUT
 
