@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.49.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.48.0...@wireapp/api-client@27.49.0) (2025-05-05)
+
+### Features
+
+* **api-client/cells:** getAllFiles sorting [WPB-17384] ([#7039](https://github.com/wireapp/wire-web-packages/issues/7039)) ([ce58502](https://github.com/wireapp/wire-web-packages/commit/ce585021e558de7ee06f8ded91c71c58d526c65f))
+
 # [27.48.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.47.0...@wireapp/api-client@27.48.0) (2025-05-05)
 
 ### Features
