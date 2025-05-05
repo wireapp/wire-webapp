@@ -33,7 +33,13 @@ const markerStyles: Partial<Record<Marker['type'], SerializedStyles>> = {
   day: dayMarkerStyle,
 };
 
-export function MarkerComponent({marker, scrollTo}: {marker: Marker; scrollTo: ScrollToElement}) {
+interface Props {
+  marker: Marker;
+  scrollTo: ScrollToElement;
+  // scrollToElement: (isUnread: boolean) => void;
+}
+
+export const MarkerComponent = ({marker, scrollTo}: Props) => {
   const timeAgo = useRelativeTimestamp(marker.timestamp, marker.type === 'day');
   const elementRef = useRef<HTMLDivElement>(null);
 
@@ -43,6 +49,7 @@ export function MarkerComponent({marker, scrollTo}: {marker: Marker; scrollTo: S
 
   useLayoutEffect(() => {
     if (marker.type === 'unread' && elementRef.current) {
+      // scrollToElement(true);
       scrollTo({element: elementRef.current}, true);
     }
   }, []);
@@ -64,4 +71,4 @@ export function MarkerComponent({marker, scrollTo}: {marker: Marker; scrollTo: S
       </h3>
     </div>
   );
-}
+};
