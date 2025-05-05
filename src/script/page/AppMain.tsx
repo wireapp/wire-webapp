@@ -36,6 +36,7 @@ import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationM
 import {LegalHoldModal} from 'Components/Modals/LegalHoldModal/LegalHoldModal';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showUserModal, UserModal} from 'Components/Modals/UserModal';
+import {isUUID} from 'src/script/auth/util/stringUtil';
 import {Config} from 'src/script/Config';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
@@ -190,6 +191,20 @@ export const AppMain: FC<AppMainProps> = ({
       void mainView.content.showConversation({id: conversationId, domain}, {filePath: `files/${filePath}`});
     };
 
+    const showUserProfile = (param1: string, param2?: string) => {
+      // If param1 is a UUID, it's the userId, otherwise param2 must be the userId
+      const userId = isUUID(param1) ? param1 : param2;
+      const domain = isUUID(param1) ? param2 || apiContext.domain || '' : param1;
+
+      if (!userId) {
+        navigate('/');
+        return;
+      }
+
+      showMostRecentConversation();
+      showUserModal({domain, id: userId}, () => navigate('/'));
+    };
+
     configureRoutes({
       '/': showMostRecentConversation,
       '/conversation/:conversationId/:domain': showConversationMessages,
@@ -203,10 +218,9 @@ export const AppMain: FC<AppMainProps> = ({
       '/preferences/av': () => mainView.list.openPreferencesAudioVideo(),
       '/preferences/devices': () => mainView.list.openPreferencesDevices(),
       '/preferences/options': () => mainView.list.openPreferencesOptions(),
-      '/user/:userId(/:domain)': (userId: string, domain: string = apiContext.domain ?? '') => {
-        showMostRecentConversation();
-        showUserModal({domain, id: userId}, () => navigate('/'));
-      },
+      '/user/:userId/:domain': showUserProfile,
+      '/user/:domain/:userId': showUserProfile,
+      '/user/:userId': showUserProfile,
     });
 
     const redirect = localStorage.getItem(App.LOCAL_STORAGE_LOGIN_REDIRECT_KEY);
