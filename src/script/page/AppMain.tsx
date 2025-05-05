@@ -191,20 +191,12 @@ export const AppMain: FC<AppMainProps> = ({
       void mainView.content.showConversation({id: conversationId, domain}, {filePath: `files/${filePath}`});
     };
 
-    const showUserProfile = (param1: string, param2?: string) => {
-      let domain: string;
-      let userId: string;
+  const showUserProfile = (param1: string, param2?: string) => {
+      // If param1 is a UUID, it's the userId, otherwise param2 must be the userId
+      const userId = isUUID(param1) ? param1 : param2;
+      const domain = isUUID(param1) ? param2 || apiContext.domain || '' : param1;
 
-      if (isUUID(param1)) {
-        // Pattern: /user/:userId/:domain
-        userId = param1;
-        domain = param2 || apiContext.domain || '';
-      } else if (param2 && isUUID(param2)) {
-        // Pattern: /user/:domain/:userId
-        domain = param1;
-        userId = param2;
-      } else {
-        // Invalid pattern
+      if (!userId) {
         navigate('/');
         return;
       }
