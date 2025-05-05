@@ -209,7 +209,7 @@ export const AccountPreferences = ({
 
           <AccountLink
             label={t('preferencesAccountLink')}
-            value={`${Config.getConfig().URL.ACCOUNT_BASE}/user-profile/?id=${selfUser.id}`}
+            value={`${Config.getConfig().URL.ACCOUNT_BASE}/user-profile/?id=${selfUser.id}@${selfUser.domain}`}
             data-uie-name="element-profile-link"
           />
         </PreferencesSection>

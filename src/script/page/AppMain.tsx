@@ -36,6 +36,7 @@ import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationM
 import {LegalHoldModal} from 'Components/Modals/LegalHoldModal/LegalHoldModal';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showUserModal, UserModal} from 'Components/Modals/UserModal';
+import {isUUID} from 'src/script/auth/util/stringUtil';
 import {Config} from 'src/script/Config';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
@@ -190,7 +191,24 @@ export const AppMain: FC<AppMainProps> = ({
       void mainView.content.showConversation({id: conversationId, domain}, {filePath: `files/${filePath}`});
     };
 
-    const showUserProfile = (userId: string, domain = apiContext.domain ?? '') => {
+    const showUserProfile = (param1: string, param2?: string) => {
+      let domain: string;
+      let userId: string;
+
+      if (isUUID(param1)) {
+        // Pattern: /user/:userId/:domain
+        userId = param1;
+        domain = param2 || apiContext.domain || '';
+      } else if (param2 && isUUID(param2)) {
+        // Pattern: /user/:domain/:userId
+        domain = param1;
+        userId = param2;
+      } else {
+        // Invalid pattern
+        navigate('/');
+        return;
+      }
+
       showMostRecentConversation();
       showUserModal({domain, id: userId}, () => navigate('/'));
     };
