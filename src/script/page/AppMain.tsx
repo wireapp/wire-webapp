@@ -219,7 +219,9 @@ export const AppMain: FC<AppMainProps> = ({
       '/preferences/devices': () => mainView.list.openPreferencesDevices(),
       '/preferences/options': () => mainView.list.openPreferencesOptions(),
       '/user/:userId/:domain': showUserProfile,
+      '/user/:userId/:domain': showUserProfile,
       '/user/:userId': showUserProfile,
+      'user/:domain/:userId': showUserProfile
     });
 
     const redirect = localStorage.getItem(App.LOCAL_STORAGE_LOGIN_REDIRECT_KEY);
