@@ -167,6 +167,17 @@ export class BillingAPI {
     return response.data;
   }
 
+  public async getCurrentSubscription(teamId: string, planId: string) {
+    const config: AxiosRequestConfig = {
+      data: {planId},
+      method: 'GET',
+      url: `/teams/${teamId}/billing/subscription`,
+    };
+
+    const response = await this.client.sendJSON<Subscription>(config);
+    return response.data;
+  }
+
   public async putPlan(teamId: string, planId: string): Promise<PlanData> {
     const config: AxiosRequestConfig = {
       data: {planId},
