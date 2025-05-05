@@ -196,14 +196,6 @@ export class ConversationState {
   }
 
   /**
-   * Check if the conversation state is initialized
-   * @returns true if the conversation state is ready
-   */
-  isInitialized(): boolean {
-    return this.conversations().length > 0;
-  }
-
-  /**
    * Find a local conversation by ID.
    * @returns Conversation is locally available
    */

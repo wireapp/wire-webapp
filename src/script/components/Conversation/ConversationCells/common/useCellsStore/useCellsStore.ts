@@ -96,6 +96,6 @@ export const useCellsStore = create<CellsState>((set, get) => ({
   },
   getPagination: ({conversationId}) => {
     const state = get().paginationByConversation;
-    return state[conversationId] || null;
+    return state[conversationId] || [];
   },
 }));

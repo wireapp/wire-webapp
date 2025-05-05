@@ -32,20 +32,10 @@ let routes: Routes = {};
  */
 export const parseRoute = () => {
   const currentPath = window.location.hash.replace('#', '') || '/';
-  console.log('Current path:', currentPath);
-  console.log('Current path type:', typeof currentPath);
-  console.log('Current path length:', currentPath.length);
-  console.log(
-    'Current path characters:',
-    currentPath.split('').map(c => `${c} (${c.charCodeAt(0)})`),
-  );
-  console.log('Available routes:', Object.keys(routes));
 
   // Try to match the path directly
   const exactMatch = routes[currentPath];
-  console.log('Exact match result:', exactMatch);
   if (exactMatch) {
-    console.log('Found exact match');
     return exactMatch();
   }
 
@@ -55,31 +45,21 @@ export const parseRoute = () => {
       continue;
     }
 
-    console.log('Trying pattern:', pattern);
     const matcher = match(pattern, {decode: decodeURIComponent});
     const result = matcher(currentPath);
-    console.log('Pattern match result:', result);
 
     if (!result || !handler) {
-      console.log('No match for pattern:', pattern);
       continue;
     }
 
-    console.log('Matched pattern:', pattern);
-    console.log('Match result:', result);
-
     const params = result.params;
     const paramNames = Object.keys(params);
-    console.log('Parameter names:', paramNames);
 
     // Handle wildcard parameter
     if (paramNames.some(name => name.startsWith('*'))) {
       const wildcardName = paramNames.find(name => name.startsWith('*'));
       if (wildcardName) {
         const segments = params[wildcardName];
-        console.log('Wildcard segments:', segments);
-        console.log('Wildcard segments type:', typeof segments);
-        console.log('Wildcard segments length:', Array.isArray(segments) ? segments.length : 0);
         return handler(...Object.values(params).filter(param => param !== segments), segments);
       }
     }
@@ -90,11 +70,10 @@ export const parseRoute = () => {
     }
 
     const paramValues = paramNames.map(name => params[name]);
-    console.log('Parameter values:', paramValues);
+
     return handler(...paramValues);
   }
 
-  console.log('No matching route found, using default route');
   return routes['*']?.();
 };
 

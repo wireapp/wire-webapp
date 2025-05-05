@@ -53,8 +53,6 @@ export const useGetAllCellsFiles = ({cellsRepository, conversationQualifiedId}: 
   const fetchFiles = useCallback(async () => {
     try {
       setStatus('loading');
-      // Clear the store for this conversation before fetching new files
-      clearAll({conversationId: id});
 
       // Temporary solution to handle the local development
       // TODO: remove this once we have a proper way to handle the domain per env
