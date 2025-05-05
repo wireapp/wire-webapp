@@ -17,29 +17,65 @@
  *
  */
 
-import switchPath from 'switch-path';
+import {match} from 'path-to-regexp';
 
-export type Routes = Record<string, ((x: any) => void) | null>;
+export type Routes = Record<string, ((...args: any[]) => void) | null>;
 
 const defaultRoute: Routes = {
   // do nothing if url was not matched
   '*': null,
 };
+
 let routes: Routes = {};
 
-function parseRoute() {
+/**
+ * Matches the current URL path against configured routes and triggers the appropriate handler.
+ */
+const parseRoute = () => {
   const currentPath = window.location.hash.replace('#', '') || '/';
 
-  const {value} = switchPath(currentPath, routes);
-  return typeof value === 'function' ? value() : value;
-}
+  const exactMatch = routes[currentPath];
+  if (exactMatch) {
+    return exactMatch();
+  }
+
+  for (const [pattern, handler] of Object.entries(routes)) {
+    if (pattern === '*') {
+      continue;
+    }
+
+    const matcher = match(pattern, {decode: decodeURIComponent});
+    const result = matcher(currentPath);
+
+    if (!result || !handler) {
+      continue;
+    }
+
+    const params = result.params;
+    const paramNames = Object.keys(params);
+
+    // Handle wildcard parameter
+    if (params['*']) {
+      return handler(...Object.values(params));
+    }
+
+    // Handle optional parameters
+    if (paramNames.length === 0) {
+      return handler(params);
+    }
+
+    const paramValues = paramNames.map(name => params[name]);
+    return handler(...paramValues);
+  }
+
+  return routes['*']?.();
+};
 
 export const configureRoutes = (routeDefinitions: Routes): void => {
   routes = {...defaultRoute, ...routeDefinitions};
   window.addEventListener('hashchange', parseRoute);
   parseRoute();
 };
-
 export const navigate = (path: string, stateObj?: {}) => {
   setHistoryParam(path, stateObj);
   parseRoute();
