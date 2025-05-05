@@ -190,9 +190,9 @@ export const AppMain: FC<AppMainProps> = ({
       void mainView.content.showConversation({id: conversationId, domain}, {filePath: `files/${filePath}`});
     };
 
-    const showUserProfile = (userId: string) => {
+    const showUserProfile = (userId: string, domain = apiContext.domain ?? '') => {
       showMostRecentConversation();
-      showUserModal({domain: apiContext.domain ?? '', id: userId}, () => navigate('/'));
+      showUserModal({domain, id: userId}, () => navigate('/'));
     };
 
     configureRoutes({
