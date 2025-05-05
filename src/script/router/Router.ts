@@ -17,6 +17,8 @@
  *
  */
 
+import {match} from 'path-to-regexp';
+
 export type Routes = Record<string, ((...args: any[]) => void) | null>;
 
 const defaultRoute: Routes = {
@@ -25,78 +27,87 @@ const defaultRoute: Routes = {
 
 let routes: Routes = {};
 
-function matchRoute(path: string): {handler: ((...args: any[]) => void) | null; params: string[]} {
-  const pathWithoutQuery = path.split('?')[0];
-  const pathSegments = pathWithoutQuery.split('/').filter(Boolean);
+/**
+ * Matches the current URL path against configured routes and triggers the appropriate handler.
+ */
+export const parseRoute = () => {
+  const currentPath = window.location.hash.replace('#', '') || '/';
+  console.log('Current path:', currentPath);
+  console.log('Current path type:', typeof currentPath);
+  console.log('Current path length:', currentPath.length);
+  console.log(
+    'Current path characters:',
+    currentPath.split('').map(c => `${c} (${c.charCodeAt(0)})`),
+  );
+  console.log('Available routes:', Object.keys(routes));
 
+  // Try to match the path directly
+  const exactMatch = routes[currentPath];
+  console.log('Exact match result:', exactMatch);
+  if (exactMatch) {
+    console.log('Found exact match');
+    return exactMatch();
+  }
+
+  // Try to match with path-to-regexp
   for (const [pattern, handler] of Object.entries(routes)) {
     if (pattern === '*') {
       continue;
     }
 
-    const patternSegments = pattern.split('/').filter(Boolean);
-    if (patternSegments.length !== pathSegments.length) {
+    console.log('Trying pattern:', pattern);
+    const matcher = match(pattern, {decode: decodeURIComponent});
+    const result = matcher(currentPath);
+    console.log('Pattern match result:', result);
+
+    if (!result || !handler) {
+      console.log('No match for pattern:', pattern);
       continue;
     }
 
-    const params: string[] = [];
-    let match = true;
+    console.log('Matched pattern:', pattern);
+    console.log('Match result:', result);
 
-    for (let i = 0; i < patternSegments.length; i++) {
-      const patternSegment = patternSegments[i];
-      const pathSegment = pathSegments[i];
+    const params = result.params;
+    const paramNames = Object.keys(params);
+    console.log('Parameter names:', paramNames);
 
-      if (patternSegment.startsWith(':')) {
-        params.push(pathSegment);
-      } else if (patternSegment !== pathSegment) {
-        match = false;
-        break;
+    // Handle wildcard parameter
+    if (paramNames.some(name => name.startsWith('*'))) {
+      const wildcardName = paramNames.find(name => name.startsWith('*'));
+      if (wildcardName) {
+        const segments = params[wildcardName];
+        console.log('Wildcard segments:', segments);
+        console.log('Wildcard segments type:', typeof segments);
+        console.log('Wildcard segments length:', Array.isArray(segments) ? segments.length : 0);
+        return handler(...Object.values(params).filter(param => param !== segments), segments);
       }
     }
 
-    if (match) {
-      return {handler, params};
+    // Handle optional parameters
+    if (paramNames.length === 0) {
+      return handler(params);
     }
+
+    const paramValues = paramNames.map(name => params[name]);
+    console.log('Parameter values:', paramValues);
+    return handler(...paramValues);
   }
 
-  return {handler: routes['*'], params: []};
-}
-
-function parseRoute() {
-  const currentPath = window.location.hash.replace('#', '') || '/';
-  const {handler, params} = matchRoute(currentPath);
-
-  if (handler) {
-    handler(...params);
-  }
-}
+  console.log('No matching route found, using default route');
+  return routes['*']?.();
+};
 
 export const configureRoutes = (routeDefinitions: Routes): void => {
   routes = {...defaultRoute, ...routeDefinitions};
   window.addEventListener('hashchange', parseRoute);
   parseRoute();
 };
-
 export const navigate = (path: string, stateObj?: {}) => {
   setHistoryParam(path, stateObj);
   parseRoute();
 };
 
 export const setHistoryParam = (path: string, stateObj: {} = window.history.state) => {
-  // Get current query parameters
-  const currentHash = window.location.hash;
-  const [, currentQuery] = currentHash.split('?');
-
-  // Get new path and query parameters
-  const [newPath, newQuery] = path.split('?');
-
-  // Check if we're switching between files and conversation views
-  const isSwitchingViews =
-    (currentHash.includes('/files') && !newPath.includes('/files')) ||
-    (!currentHash.includes('/files') && newPath.includes('/files'));
-
-  // Use new query parameters if provided, otherwise keep current ones only if we're not switching views
-  const query = newQuery || (!isSwitchingViews && currentQuery ? `?${currentQuery}` : '');
-
-  window.history.replaceState(stateObj, '', `#${newPath}${query}`);
+  window.location.hash = path;
 };

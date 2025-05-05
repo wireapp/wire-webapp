@@ -34,22 +34,35 @@ interface UseGetAllCellsFilesProps {
 }
 
 export const useGetAllCellsFiles = ({cellsRepository, conversationQualifiedId}: UseGetAllCellsFilesProps) => {
-  const {setFiles, pageSize, setStatus, setPagination, setError} = useCellsStore();
-
+  const {setFiles, pageSize, setStatus, setPagination, setError, clearAll} = useCellsStore();
   const [offset, setOffset] = useState(0);
 
   const {domain, id} = conversationQualifiedId;
 
+  // Extract path from URL hash
+  const getPathFromUrl = useCallback(() => {
+    const hash = window.location.hash.replace('#', '');
+    // Split by /files/ and take everything after it
+    const parts = hash.split('/files/');
+    if (parts.length < 2) {
+      return '';
+    }
+    return decodeURIComponent(parts[1]);
+  }, []);
+
   const fetchFiles = useCallback(async () => {
     try {
       setStatus('loading');
+      // Clear the store for this conversation before fetching new files
+      clearAll({conversationId: id});
 
       // Temporary solution to handle the local development
       // TODO: remove this once we have a proper way to handle the domain per env
       const domainPerEnv = process.env.NODE_ENV === 'development' ? Config.getConfig().CELLS_WIRE_DOMAIN : domain;
+      const currentPath = getPathFromUrl();
 
       const result = await cellsRepository.getAllFiles({
-        path: `${id}@${domainPerEnv}`,
+        path: `${id}@${domainPerEnv}${currentPath ? `/${currentPath}` : ''}`,
         limit: pageSize,
         offset,
       });
@@ -75,11 +88,24 @@ export const useGetAllCellsFiles = ({cellsRepository, conversationQualifiedId}: 
     }
     // cellsRepository is not a dependency because it's a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setFiles, setStatus, setError, id, domain, offset, pageSize]);
+  }, [setFiles, setStatus, setError, id, domain, offset, pageSize, setPagination, getPathFromUrl, clearAll]);
 
+  // Initial fetch and refetch when dependencies change
   useEffect(() => {
     void fetchFiles();
   }, [fetchFiles]);
+
+  // Listen for hash changes
+  useEffect(() => {
+    const handleHashChange = () => {
+      // Reset offset when path changes
+      setOffset(0);
+      void fetchFiles();
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, [fetchFiles, setOffset]);
 
   return {
     refresh: fetchFiles,

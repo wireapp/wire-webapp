@@ -60,7 +60,7 @@ import {useInitializeRootFontSize} from '../hooks/useRootFontSize';
 import {App} from '../main/app';
 import {initialiseMLSMigrationFlow} from '../mls/MLSMigration';
 import {generateConversationUrl} from '../router/routeGenerator';
-import {configureRoutes, navigate} from '../router/Router';
+import {configureRoutes, navigate, parseRoute} from '../router/Router';
 import {TeamState} from '../team/TeamState';
 import {showInitialModal} from '../user/AvailabilityModal';
 import {UserState} from '../user/UserState';
@@ -182,16 +182,57 @@ export const AppMain: FC<AppMainProps> = ({
       window.history.replaceState(historyState, '', window.location.hash);
     }
 
+    const showConversationMessages = (conversationId: string, domain = apiContext.domain ?? '') => {
+      void mainView.content.showConversation({id: conversationId, domain});
+    };
+
+    const showConversationFiles = async (
+      conversationId: string,
+      domain = apiContext.domain ?? '',
+      path: string | string[] = '',
+    ) => {
+      console.log('showConversationFiles called with:', {conversationId, domain, path});
+
+      // Convert path array to string if needed
+      const pathString = Array.isArray(path) ? path.join('/') : path;
+
+      // Check if we're already in the correct conversation and files view
+      const currentPath = window.location.hash.replace('#', '');
+      const isAlreadyInFilesView = currentPath.includes('/files');
+      const isSameConversation = currentPath.includes(`/conversation/${conversationId}`);
+
+      if (isAlreadyInFilesView && isSameConversation) {
+        // We're already in the correct view, just update the path if needed
+        await mainView.content.showConversation(
+          {id: conversationId, domain},
+          {filePath: `files${pathString ? `/${pathString}` : ''}`},
+        );
+        return;
+      }
+
+      // First ensure we're in the conversation view
+      await mainView.content.showConversation({id: conversationId, domain});
+
+      // Then show the files view with the path
+      await mainView.content.showConversation(
+        {id: conversationId, domain},
+        {filePath: `files${pathString ? `/${pathString}` : ''}`},
+      );
+    };
+
+    // Wait for app initialization
+    await repositories.properties.checkTelemetrySharingPermission();
+    await repositories.notification.checkPermission();
+
+    // Configure routes after initialization
     configureRoutes({
       '/': showMostRecentConversation,
-      '/conversation/:conversationId(/:domain)': (conversationId: string, domain: string = apiContext.domain ?? '') =>
-        mainView.content.showConversation({id: conversationId, domain}),
-      '/conversation/:conversationId(/:domain)/files': (
-        conversationId: string,
-        domain: string = apiContext.domain ?? '',
-      ) => {
-        mainView.content.showConversation({id: conversationId, domain}, {view: 'files'});
-      },
+      '/conversation/:conversationId/:domain': showConversationMessages,
+      '/conversation/:conversationId': showConversationMessages,
+      '/conversation/:conversationId/:domain/files': showConversationFiles,
+      '/conversation/:conversationId/files': showConversationFiles,
+      '/conversation/:conversationId/:domain/files/*path': showConversationFiles,
+      '/conversation/:conversationId/files/*path': showConversationFiles,
       '/preferences/about': () => mainView.list.openPreferencesAbout(),
       '/preferences/account': () => mainView.list.openPreferencesAccount(),
       '/preferences/av': () => mainView.list.openPreferencesAudioVideo(),
@@ -218,9 +259,6 @@ export const AppMain: FC<AppMainProps> = ({
       window.location.replace(`#/conversation/${conversation}${domain ? `/${domain}` : ''}`);
     }
 
-    repositories.properties.checkTelemetrySharingPermission();
-    window.setTimeout(() => repositories.notification.checkPermission(), App.CONFIG.NOTIFICATION_CHECK);
-
     //after app is loaded, check mls migration configuration and start migration if needed
     await initialiseMLSMigrationFlow({
       selfUser,
@@ -228,6 +266,9 @@ export const AppMain: FC<AppMainProps> = ({
       getTeamMLSMigrationStatus: repositories.team.getTeamMLSMigrationStatus,
       refreshAllKnownUsers: repositories.user.refreshAllKnownUsers,
     });
+
+    // Trigger initial route after everything is initialized
+    parseRoute();
   };
 
   useEffect(() => {

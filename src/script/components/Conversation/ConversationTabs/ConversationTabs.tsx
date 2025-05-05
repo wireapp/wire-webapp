@@ -33,7 +33,7 @@ interface ConversationTabsProps {
 
 export const ConversationTabs = ({activeTabIndex, onIndexChange, conversationQualifiedId}: ConversationTabsProps) => {
   const navigateToFilesTab = (event: React.MouseEvent<HTMLButtonElement>) => {
-    createNavigate(generateConversationUrl(conversationQualifiedId, 'files'))(event);
+    createNavigate(generateConversationUrl({...conversationQualifiedId, filePath: 'files'}))(event);
   };
 
   const navigateToMessageTab = (event: React.MouseEvent<HTMLButtonElement>) => {

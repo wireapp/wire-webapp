@@ -26,6 +26,7 @@ import {useAppNotification} from 'Components/AppNotification/AppNotification';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
 
+import {CellsBreadcrumbs} from './CellsBreadcrumbs/CellsBreadcrumbs';
 import {CellsHeader} from './CellsHeader/CellsHeader';
 import {CellsLoader} from './CellsLoader/CellsLoader';
 import {CellsPagination} from './CellsPagination/CellsPagination';
@@ -100,11 +101,12 @@ export const ConversationCells = ({
   return (
     <div css={wrapperStyles}>
       <CellsHeader onRefresh={handleRefresh} />
+      <CellsBreadcrumbs conversationQualifiedId={conversationQualifiedId} />
       {(isSuccess || isLoading) && hasFiles && (
         <CellsTable
           files={isLoading ? [] : files}
           cellsRepository={cellsRepository}
-          conversationId={conversationId}
+          conversationQualifiedId={conversationQualifiedId}
           onDeleteFile={handleDeleteFile}
           onUpdateBodyHeight={updateHeight}
         />

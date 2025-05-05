@@ -17,6 +17,8 @@
  *
  */
 
+import {QualifiedId} from '@wireapp/api-client/lib/user/';
+
 import {FolderIcon, PlayIcon} from '@wireapp/react-ui-kit';
 
 import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
@@ -38,9 +40,25 @@ import {useCellsFilePreviewModal} from '../../common/CellsFilePreviewModalContex
 
 interface CellsTableNameColumnProps {
   file: CellFile | CellFolder;
+  conversationQualifiedId: QualifiedId;
 }
 
-export const CellsTableNameColumn = ({file}: CellsTableNameColumnProps) => {
+export const CellsTableNameColumn = ({file, conversationQualifiedId}: CellsTableNameColumnProps) => {
+  return (
+    <>
+      <span css={mobileNameStyles}>{file.name}</span>
+      <div css={wrapperStyles}>
+        {file.type === 'file' ? (
+          <FileNameColumn file={file} />
+        ) : (
+          <FolderNameColumn name={file.name} conversationQualifiedId={conversationQualifiedId} />
+        )}
+      </div>
+    </>
+  );
+};
+
+const FileNameColumn = ({file}: {file: CellFile}) => {
   const {id, handleOpenFile, selectedFile} = useCellsFilePreviewModal();
 
   const isImage = file.mimeType?.startsWith('image');
@@ -50,51 +68,62 @@ export const CellsTableNameColumn = ({file}: CellsTableNameColumnProps) => {
 
   const {previewImageUrl, name} = file;
 
+  if (shouldDisplayImagePreview) {
+    <div css={imagePreviewWrapperStyles}>
+      <img src={previewImageUrl} alt="" width={24} height={24} css={imagePreviewStyles} />
+      {isVideo && <PlayIcon css={playIconStyles} width={16} height={16} />}
+    </div>;
+  }
+
   return (
     <>
-      <span css={mobileNameStyles}>{file.name}</span>
-      <div css={wrapperStyles}>
-        {shouldDisplayImagePreview ? (
-          <div css={imagePreviewWrapperStyles}>
-            <img src={previewImageUrl} alt="" width={24} height={24} css={imagePreviewStyles} />
-            {isVideo && <PlayIcon css={playIconStyles} width={16} height={16} />}
-          </div>
-        ) : file.type === 'file' ? (
-          <FileTypeIcon extension={getFileExtension(name)} size={24} />
-        ) : (
-          <FolderIcon width={24} height={24} />
-        )}
-        {file.type === 'file' ? (
-          <button
-            type="button"
-            css={desktopNameStyles}
-            onClick={() => handleOpenFile(file)}
-            aria-controls={id}
-            aria-expanded={!!selectedFile}
-            aria-haspopup="dialog"
-          >
-            {name}
-          </button>
-        ) : (
-          <button
-            type="button"
-            css={desktopNameStyles}
-            onClick={event => {
-              createNavigate(
-                generateConversationUrl(
-                  {
-                    id: 'c7cdd32e-321e-4017-aec7-fef1ad22ee90',
-                    domain: 'staging.zinfra.io',
-                  },
-                  'files',
-                ),
-              )(event);
-            }}
-          >
-            {name}
-          </button>
-        )}
-      </div>
+      <FileTypeIcon extension={getFileExtension(name)} size={24} />
+      <button
+        type="button"
+        css={desktopNameStyles}
+        onClick={() => handleOpenFile(file)}
+        aria-controls={id}
+        aria-expanded={!!selectedFile}
+        aria-haspopup="dialog"
+      >
+        {name}
+      </button>
+    </>
+  );
+};
+
+const FolderNameColumn = ({name, conversationQualifiedId}: {name: string; conversationQualifiedId: QualifiedId}) => {
+  // Get current path from URL hash
+  const hash = window.location.hash.replace('#', '');
+  const parts = hash.split('/files/');
+  const currentPath = parts.length < 2 ? '' : decodeURIComponent(parts[1]);
+
+  // Split the current path into segments and add the new folder name
+  const pathSegments = currentPath ? currentPath.split('/') : [];
+  pathSegments.push(name);
+
+  // Encode each segment individually
+  const encodedSegments = pathSegments.map(segment => encodeURIComponent(segment));
+  const newPath = encodedSegments.join('/');
+
+  return (
+    <>
+      <FolderIcon width={24} height={24} />
+      <button
+        type="button"
+        css={desktopNameStyles}
+        onClick={event => {
+          createNavigate(
+            generateConversationUrl({
+              id: conversationQualifiedId.id,
+              domain: conversationQualifiedId.domain,
+              filePath: `files/${newPath}`,
+            }),
+          )(event);
+        }}
+      >
+        {name}
+      </button>
     </>
   );
 };

@@ -18,6 +18,7 @@
  */
 
 import {createColumnHelper} from '@tanstack/react-table';
+import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {CellFile} from 'Components/CellsGlobalView/common/cellFile/cellFile';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
@@ -35,16 +36,16 @@ const columnHelper = createColumnHelper<CellFile | CellFolder>();
 
 export const getCellsTableColumns = ({
   cellsRepository,
-  conversationId,
+  conversationQualifiedId,
   onDeleteFile,
 }: {
   cellsRepository: CellsRepository;
-  conversationId: string;
+  conversationQualifiedId: QualifiedId;
   onDeleteFile: (uuid: string) => void;
 }) => [
   columnHelper.accessor('name', {
     header: t('cellsGlobalView.tableRowName'),
-    cell: info => <CellsTableNameColumn file={info.row.original} />,
+    cell: info => <CellsTableNameColumn file={info.row.original} conversationQualifiedId={conversationQualifiedId} />,
   }),
   columnHelper.accessor('owner', {
     header: t('cellsGlobalView.tableRowOwner'),
@@ -80,7 +81,7 @@ export const getCellsTableColumns = ({
           file={info.row.original as CellFile}
           onDelete={uuid => onDeleteFile(uuid)}
           cellsRepository={cellsRepository}
-          conversationId={conversationId}
+          conversationId={conversationQualifiedId.id}
         />
       );
     },

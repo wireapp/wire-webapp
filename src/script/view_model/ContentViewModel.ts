@@ -54,7 +54,7 @@ interface ShowConversationOptions {
   exposeMessage?: Message;
   openFirstSelfMention?: boolean;
   openNotificationSettings?: boolean;
-  view?: string;
+  filePath?: string;
 }
 
 interface ShowConversationOverload {
@@ -195,14 +195,20 @@ export class ContentViewModel {
 
     this.mainViewModel.list.openConversations(conversationEntity.archivedState());
   }
-  private showAndNavigate(conversationEntity: Conversation, openNotificationSettings: boolean, view?: string): void {
+
+  private showAndNavigate(
+    conversationEntity: Conversation,
+    openNotificationSettings: boolean,
+    filePath?: string,
+  ): void {
     const {rightSidebar} = useAppMainState.getState();
     this.showContent(ContentState.CONVERSATION);
     this.previousConversation = this.conversationState.activeConversation();
     setHistoryParam(
-      generateConversationUrl({id: conversationEntity?.id ?? '', domain: conversationEntity?.domain ?? ''}, view),
+      generateConversationUrl({id: conversationEntity?.id ?? '', domain: conversationEntity?.domain ?? '', filePath}),
       history.state,
     );
+
     if (openNotificationSettings) {
       rightSidebar.goTo(PanelState.NOTIFICATIONS, {entity: this.conversationState.activeConversation() ?? null});
     }
@@ -242,7 +248,7 @@ export class ContentViewModel {
       exposeMessage: exposeMessageEntity,
       openFirstSelfMention = false,
       openNotificationSettings = false,
-      view,
+      filePath,
     } = options || {};
 
     if (!conversation) {
@@ -276,7 +282,7 @@ export class ContentViewModel {
       void this.conversationRepository.refreshMLSConversationVerificationState(conversationEntity);
       const messageEntity = openFirstSelfMention ? conversationEntity.getFirstUnreadSelfMention() : exposeMessageEntity;
       this.changeConversation(conversationEntity, messageEntity);
-      this.showAndNavigate(conversationEntity, openNotificationSettings, view);
+      this.showAndNavigate(conversationEntity, openNotificationSettings, filePath);
     } catch (error: any) {
       if (this.isConversationNotFoundError(error)) {
         return this.showConversationNotFoundErrorModal();

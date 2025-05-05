@@ -18,6 +18,7 @@
  */
 
 import {flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
+import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 
@@ -39,7 +40,7 @@ import {CellFile, CellFolder} from '../common/cellFile/cellFile';
 interface CellsTableProps {
   files: Array<CellFile | CellFolder>;
   cellsRepository: CellsRepository;
-  conversationId: string;
+  conversationQualifiedId: QualifiedId;
   onDeleteFile: (uuid: string) => void;
   onUpdateBodyHeight: (height: number) => void;
 }
@@ -47,7 +48,7 @@ interface CellsTableProps {
 export const CellsTable = ({
   files,
   cellsRepository,
-  conversationId,
+  conversationQualifiedId,
   onDeleteFile,
   onUpdateBodyHeight,
 }: CellsTableProps) => {
@@ -57,7 +58,7 @@ export const CellsTable = ({
 
   const table = useReactTable({
     data: files,
-    columns: getCellsTableColumns({cellsRepository, conversationId, onDeleteFile}),
+    columns: getCellsTableColumns({cellsRepository, conversationQualifiedId, onDeleteFile}),
     getCoreRowModel: getCoreRowModel(),
   });
 
