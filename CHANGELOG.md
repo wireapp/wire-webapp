@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.48.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.47.0...@wireapp/api-client@27.48.0) (2025-05-05)
+
+### Features
+
+* Add getCurrentSubscription endpoint ([#7037](https://github.com/wireapp/wire-web-packages/issues/7037)) ([2a7d200](https://github.com/wireapp/wire-web-packages/commit/2a7d200048e3f848d545871efeda0b0fe3c7bc8a))
+
 # [27.47.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.46.0...@wireapp/api-client@27.47.0) (2025-04-28)
 
 ### Features
