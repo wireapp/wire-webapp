@@ -219,6 +219,7 @@ export const AppMain: FC<AppMainProps> = ({
       '/preferences/devices': () => mainView.list.openPreferencesDevices(),
       '/preferences/options': () => mainView.list.openPreferencesOptions(),
       '/user/:userId/:domain': showUserProfile,
+      '/user/:domain/:userId': showUserProfile,
       '/user/:userId': showUserProfile,
     });
 
