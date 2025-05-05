@@ -190,6 +190,11 @@ export const AppMain: FC<AppMainProps> = ({
       void mainView.content.showConversation({id: conversationId, domain}, {filePath: `files/${filePath}`});
     };
 
+    const showUserProfile = (userId: string) => {
+      showMostRecentConversation();
+      showUserModal({domain: apiContext.domain ?? '', id: userId}, () => navigate('/'));
+    };
+
     configureRoutes({
       '/': showMostRecentConversation,
       '/conversation/:conversationId/:domain': showConversationMessages,
@@ -203,10 +208,8 @@ export const AppMain: FC<AppMainProps> = ({
       '/preferences/av': () => mainView.list.openPreferencesAudioVideo(),
       '/preferences/devices': () => mainView.list.openPreferencesDevices(),
       '/preferences/options': () => mainView.list.openPreferencesOptions(),
-      '/user/:userId(/:domain)': (userId: string, domain: string = apiContext.domain ?? '') => {
-        showMostRecentConversation();
-        showUserModal({domain, id: userId}, () => navigate('/'));
-      },
+      '/user/:userId/:domain': showUserProfile,
+      '/user/:userId': showUserProfile,
     });
 
     const redirect = localStorage.getItem(App.LOCAL_STORAGE_LOGIN_REDIRECT_KEY);
