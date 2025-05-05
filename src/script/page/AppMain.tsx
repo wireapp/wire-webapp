@@ -191,7 +191,7 @@ export const AppMain: FC<AppMainProps> = ({
       void mainView.content.showConversation({id: conversationId, domain}, {filePath: `files/${filePath}`});
     };
 
-  const showUserProfile = (param1: string, param2?: string) => {
+    const showUserProfile = (param1: string, param2?: string) => {
       // If param1 is a UUID, it's the userId, otherwise param2 must be the userId
       const userId = isUUID(param1) ? param1 : param2;
       const domain = isUUID(param1) ? param2 || apiContext.domain || '' : param1;
@@ -219,9 +219,7 @@ export const AppMain: FC<AppMainProps> = ({
       '/preferences/devices': () => mainView.list.openPreferencesDevices(),
       '/preferences/options': () => mainView.list.openPreferencesOptions(),
       '/user/:userId/:domain': showUserProfile,
-      '/user/:userId/:domain': showUserProfile,
       '/user/:userId': showUserProfile,
-      'user/:domain/:userId': showUserProfile
     });
 
     const redirect = localStorage.getItem(App.LOCAL_STORAGE_LOGIN_REDIRECT_KEY);
