@@ -26,6 +26,7 @@ import {Config} from 'src/script/Config';
 
 import {transformNodesToCellsFiles, transformToCellPagination} from './transformNodesToCellsFiles';
 
+import {getCellsFilesPath} from '../common/getCellsFilesPath/getCellsFilesPath';
 import {useCellsStore} from '../common/useCellsStore/useCellsStore';
 
 interface UseGetAllCellsFilesProps {
@@ -34,21 +35,10 @@ interface UseGetAllCellsFilesProps {
 }
 
 export const useGetAllCellsFiles = ({cellsRepository, conversationQualifiedId}: UseGetAllCellsFilesProps) => {
-  const {setFiles, pageSize, setStatus, setPagination, setError, clearAll} = useCellsStore();
+  const {setFiles, pageSize, setStatus, setPagination, setError} = useCellsStore();
   const [offset, setOffset] = useState(0);
 
   const {domain, id} = conversationQualifiedId;
-
-  // Extract path from URL hash
-  const getPathFromUrl = useCallback(() => {
-    const hash = window.location.hash.replace('#', '');
-    // Split by /files/ and take everything after it
-    const parts = hash.split('/files/');
-    if (parts.length < 2) {
-      return '';
-    }
-    return decodeURIComponent(parts[1]);
-  }, []);
 
   const fetchFiles = useCallback(async () => {
     try {
@@ -57,7 +47,8 @@ export const useGetAllCellsFiles = ({cellsRepository, conversationQualifiedId}: 
       // Temporary solution to handle the local development
       // TODO: remove this once we have a proper way to handle the domain per env
       const domainPerEnv = process.env.NODE_ENV === 'development' ? Config.getConfig().CELLS_WIRE_DOMAIN : domain;
-      const currentPath = getPathFromUrl();
+
+      const currentPath = getCellsFilesPath();
 
       const result = await cellsRepository.getAllFiles({
         path: `${id}@${domainPerEnv}${currentPath ? `/${currentPath}` : ''}`,
@@ -86,9 +77,8 @@ export const useGetAllCellsFiles = ({cellsRepository, conversationQualifiedId}: 
     }
     // cellsRepository is not a dependency because it's a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setFiles, setStatus, setError, id, domain, offset, pageSize, setPagination, getPathFromUrl, clearAll]);
+  }, [setFiles, setStatus, setError, id, domain, offset, pageSize, setPagination]);
 
-  // Initial fetch and refetch when dependencies change
   useEffect(() => {
     void fetchFiles();
   }, [fetchFiles]);
