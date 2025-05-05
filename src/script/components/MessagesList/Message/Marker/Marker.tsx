@@ -59,11 +59,8 @@ function customDayTimestampCalculator(ts: number): string {
 }
 
 export function MarkerComponent({marker, scrollTo}: {marker: Marker; scrollTo: ScrollToElement}) {
-  const timeAgo = useRelativeTimestamp(
-    marker.timestamp,
-    marker.type === 'day',
-    marker.type === 'day' ? customDayTimestampCalculator : undefined,
-  );
+  const isDay = marker.type === 'day';
+  const timeAgo = useRelativeTimestamp(marker.timestamp, isDay, isDay ? customDayTimestampCalculator : undefined);
   const elementRef = useRef<HTMLDivElement>(null);
 
   const style = css`
