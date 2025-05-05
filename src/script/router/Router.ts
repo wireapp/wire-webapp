@@ -32,7 +32,6 @@ let routes: Routes = {};
  */
 export const parseRoute = () => {
   const currentPath = window.location.hash.replace('#', '') || '/';
-  const {handler, params} = matchRoute(currentPath);
 
   const exactMatch = routes[currentPath];
   if (exactMatch) {
