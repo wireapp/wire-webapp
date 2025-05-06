@@ -46,18 +46,3 @@ export const openFolder = ({conversationQualifiedId, name, event}: OpenFolderPar
     }),
   )(event);
 };
-
-interface OpenBaseFolderParams {
-  conversationQualifiedId: QualifiedId;
-  event?: ReactMouseEvent<Element, MouseEvent>;
-}
-
-export const openBaseFolder = ({conversationQualifiedId, event}: OpenBaseFolderParams) => {
-  createNavigate(
-    generateConversationUrl({
-      id: conversationQualifiedId.id,
-      domain: conversationQualifiedId.domain,
-      filePath: 'files',
-    }),
-  )(event);
-};

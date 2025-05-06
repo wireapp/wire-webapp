@@ -17,14 +17,14 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {ChevronUpIcon} from '@wireapp/react-ui-kit';
 
-export const listStyles: CSSObject = {
-  display: 'flex',
-  padding: '0',
-  margin: '0',
-  alignItems: 'center',
-  listStyle: 'none',
-  flexGrow: 1,
-  overflowX: 'auto',
+import {iconStyles} from './BreadcrumbLeaf.styles';
+
+export const BreadcrumbLeaf = () => {
+  return (
+    <li aria-hidden="true">
+      <ChevronUpIcon css={iconStyles} width={12} height={12} />
+    </li>
+  );
 };

@@ -19,12 +19,15 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const listStyles: CSSObject = {
-  display: 'flex',
-  padding: '0',
-  margin: '0',
-  alignItems: 'center',
-  listStyle: 'none',
-  flexGrow: 1,
-  overflowX: 'auto',
+export const buttonStyles: CSSObject = {
+  background: 'none',
+  border: 'none',
+  padding: '0 8px',
+  cursor: 'pointer',
+  fontSize: 'var(--font-size-medium)',
+  color: 'var(--gray-70)',
+
+  '&:hover': {
+    color: 'var(--main-color)',
+  },
 };
