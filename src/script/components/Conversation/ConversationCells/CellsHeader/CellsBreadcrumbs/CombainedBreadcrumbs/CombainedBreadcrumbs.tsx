@@ -23,6 +23,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {showContextMenu} from 'src/script/ui/ContextMenu';
 import {isSpaceOrEnterKey} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
 import {setContextMenuPosition} from 'Util/util';
 
 import {buttonStyles} from './CombainedBreadcrumbs.styles';
@@ -56,7 +57,13 @@ export const CombainedBreadcrumbs = ({path, conversationQualifiedId, items}: Com
 
   return (
     <li>
-      <button type="button" css={buttonStyles} onKeyDown={handleKeyDown} onClick={showOptionsMenu}>
+      <button
+        type="button"
+        css={buttonStyles}
+        onKeyDown={handleKeyDown}
+        onClick={showOptionsMenu}
+        aria-label={t('cellsFolderBreadcrumbCombained')}
+      >
         ...
       </button>
     </li>
