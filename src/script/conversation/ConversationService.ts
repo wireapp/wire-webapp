@@ -44,6 +44,7 @@ import type {
   ConversationRenameEvent,
 } from '@wireapp/api-client/lib/event';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {MLSServiceEvents} from '@wireapp/core/lib/messagingProtocols/mls';
 import {container} from 'tsyringe';
 
 import {MLSCapableConversation} from './ConversationSelectors';
@@ -445,6 +446,12 @@ export class ConversationService {
 
   public addMLSConversationRecoveredListener(onRecovered: (conversationId: QualifiedId) => void) {
     this.coreConversationService.on('MLSConversationRecovered', ({conversationId}) => onRecovered(conversationId));
+  }
+
+  public addMLSEventDistributedListener(onDistributed: (events: any, time: string) => void) {
+    this.coreConversationService.on(MLSServiceEvents.MLS_EVENT_DISTRIBUTED, ({events, time}) =>
+      onDistributed(events, time),
+    );
   }
 
   /**

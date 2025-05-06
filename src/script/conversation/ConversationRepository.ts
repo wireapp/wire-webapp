@@ -50,7 +50,7 @@ import {
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import type {BackendError} from '@wireapp/api-client/lib/http/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
-import {MLSCreateConversationResponse} from '@wireapp/core/lib/conversation';
+import {BaseCreateConversationResponse} from '@wireapp/core/lib/conversation';
 import {ClientMLSError, ClientMLSErrorLabel} from '@wireapp/core/lib/messagingProtocols/mls';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
@@ -391,6 +391,10 @@ export class ConversationRepository {
     return this.conversationService.addMLSConversationRecoveredListener(this.onMLSConversationRecovered);
   }
 
+  public initMLSEventDistributedListener() {
+    return this.conversationService.addMLSEventDistributedListener(this.onMLSEventDistributed);
+  }
+
   private readonly updateLocalMessageEntity = async ({
     obj: updatedEvent,
     oldObj: oldEvent,
@@ -474,7 +478,7 @@ export class ConversationRepository {
        * ToDo: Fetch all MLS Events from backend before doing anything else
        * Needs to be done to receive the latest epoch and avoid epoch mismatch errors
        */
-      let response: MLSCreateConversationResponse;
+      let response: BaseCreateConversationResponse;
       const isMLSConversation = payload.protocol === ConversationProtocol.MLS;
       if (isMLSConversation) {
         response = await this.core.service!.conversation.createMLSConversation(
@@ -484,7 +488,7 @@ export class ConversationRepository {
         );
       } else {
         const {conversation, failedToAdd} = await this.core.service!.conversation.createProteusConversation(payload);
-        response = {conversation, events: [], failedToAdd};
+        response = {conversation, failedToAdd};
       }
 
       const {conversationEntity} = await this.onCreate({
@@ -2412,17 +2416,13 @@ export class ConversationRepository {
       }
 
       if (isMLSCapableConversation(conversation)) {
-        const {failedToAdd, events} = await this.core.service!.conversation.addUsersToMLSConversation({
+        const {failedToAdd} = await this.core.service!.conversation.addUsersToMLSConversation({
           conversationId: conversation.qualifiedId,
           groupId: conversation.groupId,
           qualifiedUsers,
         });
 
         if (isMLSConversation(conversation)) {
-          if (events.length) {
-            events.forEach(event => this.eventRepository.injectEvent(event));
-          }
-
           if (failedToAdd && failedToAdd.length) {
             await this.eventRepository.injectEvent(
               EventBuilder.buildFailedToAddUsersEvent(failedToAdd, conversation, this.userState.self().id),
@@ -2624,13 +2624,11 @@ export class ConversationRepository {
    */
   private async removeMembersFromMLSConversation(conversationEntity: MLSConversation, userIds: QualifiedId[]) {
     const {groupId, qualifiedId} = conversationEntity;
-    const {events} = await this.core.service!.conversation.removeUsersFromMLSConversation({
+    await this.core.service!.conversation.removeUsersFromMLSConversation({
       conversationId: qualifiedId,
       groupId,
       qualifiedUserIds: userIds,
     });
-
-    return events;
   }
 
   /**
@@ -2677,11 +2675,12 @@ export class ConversationRepository {
    * @returns Resolves when member was removed from the conversation
    */
   public async removeMembers(conversationEntity: Conversation, userIds: QualifiedId[]) {
-    const events = isMLSConversation(conversationEntity)
-      ? await this.removeMembersFromMLSConversation(conversationEntity, userIds)
-      : await this.removeMembersFromConversation(conversationEntity, userIds);
-
-    await this.eventRepository.injectEvents(events, EventRepository.SOURCE.BACKEND_RESPONSE);
+    if (isMLSConversation(conversationEntity)) {
+      await this.removeMembersFromMLSConversation(conversationEntity, userIds);
+    } else {
+      const events = await this.removeMembersFromConversation(conversationEntity, userIds);
+      await this.eventRepository.injectEvents(events, EventRepository.SOURCE.BACKEND_RESPONSE);
+    }
   }
 
   /**
@@ -3571,6 +3570,13 @@ export class ConversationRepository {
     const event = EventBuilder.buildMLSConversationRecovered(conversation, currentTimestamp);
 
     void this.eventRepository.injectEvent(event);
+  };
+
+  /**
+   * Add "mls" system message to conversation.
+   */
+  private readonly onMLSEventDistributed = async (events: any): Promise<void> => {
+    await this.eventRepository.injectEvents(events, EventRepository.SOURCE.BACKEND_RESPONSE);
   };
 
   private on1to1Creation(conversationEntity: Conversation, eventJson: OneToOneCreationEvent) {

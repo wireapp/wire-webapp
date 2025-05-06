@@ -161,11 +161,6 @@ module.exports = {
     new CopyPlugin({
       patterns: [
         {
-          context: 'node_modules/@wireapp/core-crypto/platforms/web',
-          from: '*.wasm',
-          to: `${dist}/min/core-crypto.wasm`,
-        },
-        {
           context: 'node_modules/@mediapipe/tasks-vision/wasm',
           from: '*',
           to: `${dist}/min/mediapipe/wasm`,
@@ -182,9 +177,13 @@ module.exports = {
           // Prevents content hashing
           info: {minimized: true},
         },
+        // Copy Core-Crypto worker for @wireapp/core-crypto package
+        {
+          from: path.dirname(require.resolve('@wireapp/core-crypto/package.json')) + '/src/*.wasm',
+          to: `${dist}/min`,
+        },
       ],
     }),
-    new webpack.IgnorePlugin({resourceRegExp: /.*\.wasm/}),
     // @todo: We should merge these when main & auth app are merged.
     new HtmlWebpackPlugin({
       inject: false,

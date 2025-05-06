@@ -64,8 +64,9 @@ const generateWireIdentity = (
   selfClientId: string,
   credentialType: CredentialType = CredentialType.X509,
   status: e2EIdentityVerification.MLSStatuses = e2EIdentityVerification.MLSStatuses.NOT_ACTIVATED,
-) => ({
+): e2EIdentityVerification.WireIdentity => ({
   x509Identity: {
+    free: jest.fn(),
     certificate: '',
     displayName: 'John Doe',
     domain: 'domain',
