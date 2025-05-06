@@ -79,21 +79,19 @@ export const useGetAllCellsFiles = ({cellsRepository, conversationQualifiedId}: 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setFiles, setStatus, setError, id, domain, offset, pageSize, setPagination]);
 
+  const handleHashChange = useCallback(() => {
+    setOffset(0);
+    void fetchFiles();
+  }, [fetchFiles, setOffset]);
+
   useEffect(() => {
     void fetchFiles();
   }, [fetchFiles]);
 
-  // Listen for hash changes
   useEffect(() => {
-    const handleHashChange = () => {
-      // Reset offset when path changes
-      setOffset(0);
-      void fetchFiles();
-    };
-
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
-  }, [fetchFiles, setOffset]);
+  }, [handleHashChange]);
 
   return {
     refresh: fetchFiles,
