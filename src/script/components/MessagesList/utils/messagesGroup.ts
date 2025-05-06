@@ -18,7 +18,7 @@
  */
 
 import {Message} from 'src/script/entity/message/Message';
-import {differenceInMinutes, isSameDay, fromUnixTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {isSameDay, fromUnixTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 export type MessagesGroup = {
   sender: string;
@@ -28,7 +28,7 @@ export type MessagesGroup = {
 };
 
 export type Marker = {
-  type: 'unread' | 'day' | 'hour';
+  type: 'unread' | 'day';
   timestamp: number;
 };
 
@@ -60,10 +60,6 @@ function getMessageMarkerType(
 
   if (!isSameDay(previousMessageTimestamp, currentMessageTimestamp)) {
     return 'day';
-  }
-
-  if (differenceInMinutes(currentMessageTimestamp, previousMessageTimestamp) > 60) {
-    return 'hour';
   }
 
   return undefined;
