@@ -35,10 +35,10 @@ import {getCellsTableColumns} from './CellsTableColumns/CellsTableColumns';
 import {CellsFilePreviewModalProvider} from './common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
 import {useTableHeight} from './useTableHeight/useTableHeight';
 
-import {CellFile, CellFolder} from '../common/cellFile/cellFile';
+import {CellItem} from '../common/cellFile/cellFile';
 
 interface CellsTableProps {
-  files: Array<CellFile | CellFolder>;
+  files: Array<CellItem>;
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
   onDeleteFile: (uuid: string) => void;
@@ -71,7 +71,7 @@ export const CellsTable = ({
           <thead>
             {table.getHeaderGroups().map(headerGroup => (
               <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header, index) => {
+                {headerGroup.headers.map(header => {
                   return (
                     <th
                       key={header.id}

@@ -22,9 +22,8 @@ import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {FolderIcon, PlayIcon} from '@wireapp/react-ui-kit';
 
 import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
-import {CellFile, CellFolder} from 'Components/Conversation/ConversationCells/common/cellFile/cellFile';
-import {generateConversationUrl} from 'src/script/router/routeGenerator';
-import {createNavigate} from 'src/script/router/routerBindings';
+import {CellFile, CellItem} from 'Components/Conversation/ConversationCells/common/cellFile/cellFile';
+import {openFolder} from 'Components/Conversation/ConversationCells/common/openFolder/openFolder';
 import {getFileExtension} from 'Util/util';
 
 import {
@@ -39,7 +38,7 @@ import {
 import {useCellsFilePreviewModal} from '../../common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
 
 interface CellsTableNameColumnProps {
-  file: CellFile | CellFolder;
+  file: CellItem;
   conversationQualifiedId: QualifiedId;
 }
 
@@ -93,34 +92,13 @@ const FileNameColumn = ({file}: {file: CellFile}) => {
 };
 
 const FolderNameColumn = ({name, conversationQualifiedId}: {name: string; conversationQualifiedId: QualifiedId}) => {
-  // Get current path from URL hash
-  const hash = window.location.hash.replace('#', '');
-  const parts = hash.split('/files/');
-  const currentPath = parts.length < 2 ? '' : decodeURIComponent(parts[1]);
-
-  // Split the current path into segments and add the new folder name
-  const pathSegments = currentPath ? currentPath.split('/') : [];
-  pathSegments.push(name);
-
-  // Encode each segment individually
-  const encodedSegments = pathSegments.map(segment => encodeURIComponent(segment));
-  const newPath = encodedSegments.join('/');
-
   return (
     <>
       <FolderIcon width={24} height={24} />
       <button
         type="button"
         css={desktopNameStyles}
-        onClick={event => {
-          createNavigate(
-            generateConversationUrl({
-              id: conversationQualifiedId.id,
-              domain: conversationQualifiedId.domain,
-              filePath: `files/${newPath}`,
-            }),
-          )(event);
-        }}
+        onClick={event => openFolder({conversationQualifiedId, name, event})}
       >
         {name}
       </button>

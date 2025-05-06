@@ -51,3 +51,5 @@ export interface CellFolder {
     url?: string;
   };
 }
+
+export type CellItem = CellFile | CellFolder;

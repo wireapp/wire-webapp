@@ -19,9 +19,11 @@
 
 import {KeyboardEvent, MouseEvent as ReactMouseEvent, useCallback} from 'react';
 
+import {QualifiedId} from '@wireapp/api-client/lib/user';
+
 import {MoreIcon} from '@wireapp/react-ui-kit';
 
-import {CellFile} from 'Components/Conversation/ConversationCells/common/cellFile/cellFile';
+import {CellItem} from 'Components/Conversation/ConversationCells/common/cellFile/cellFile';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/ContextMenu';
@@ -31,17 +33,23 @@ import {forcedDownloadFile, setContextMenuPosition} from 'Util/util';
 
 import {buttonStyles, iconStyles, textStyles} from './CellsTableRowOptions.styles';
 
+import {openFolder} from '../../../common/openFolder/openFolder';
 import {useCellsFilePreviewModal} from '../../common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
 import {showShareFileModal} from '../CellsFileShareModal/CellsFileShareModal';
 
 interface CellsTableRowOptionsProps {
-  file: CellFile;
+  file: CellItem;
   onDelete: (uuid: string) => void;
   cellsRepository: CellsRepository;
-  conversationId: string;
+  conversationQualifiedId: QualifiedId;
 }
 
-export const CellsTableRowOptions = ({file, onDelete, cellsRepository, conversationId}: CellsTableRowOptionsProps) => {
+export const CellsTableRowOptions = ({
+  file,
+  onDelete,
+  cellsRepository,
+  conversationQualifiedId,
+}: CellsTableRowOptionsProps) => {
   const {id, selectedFile, handleOpenFile} = useCellsFilePreviewModal();
 
   const showDeleteFileModal = useCallback(
@@ -63,18 +71,22 @@ export const CellsTableRowOptions = ({file, onDelete, cellsRepository, conversat
     const downloadLabel = t('cellsGlobalView.optionDownload');
     const deleteLabel = t('cellsGlobalView.optionDelete');
 
-    const {fileUrl, name} = file;
+    const fileUrl = file.type === 'file' ? file.fileUrl : undefined;
 
     showContextMenu({
       event,
       entries: [
         {
           label: shareLabel,
-          click: () => showShareFileModal({uuid: file.id, conversationId, cellsRepository}),
+          click: () => showShareFileModal({uuid: file.id, conversationId: conversationQualifiedId.id, cellsRepository}),
         },
-        {label: openLabel, click: () => handleOpenFile(file)},
-        fileUrl ? {label: downloadLabel, click: () => forcedDownloadFile({url: fileUrl, name})} : undefined,
-        {label: deleteLabel, click: () => showDeleteFileModal({uuid: file.id, name})},
+        {
+          label: openLabel,
+          click: () =>
+            file.type === 'folder' ? openFolder({conversationQualifiedId, name: file.name}) : handleOpenFile(file),
+        },
+        fileUrl ? {label: downloadLabel, click: () => forcedDownloadFile({url: fileUrl, name: file.name})} : undefined,
+        {label: deleteLabel, click: () => showDeleteFileModal({uuid: file.id, name: file.name})},
       ].filter(Boolean) as ContextMenuEntry[],
       identifier: 'file-preview-error-more-button',
     });

@@ -20,7 +20,6 @@
 import {createColumnHelper} from '@tanstack/react-table';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {CellFile} from 'Components/CellsGlobalView/common/cellFile/cellFile';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
 
@@ -30,9 +29,9 @@ import {CellsTableNameColumn} from './CellsTableNameColumn/CellsTableNameColumn'
 import {CellsTableRowOptions} from './CellsTableRowOptions/CellsTableRowOptions';
 import {CellsTableSharedColumn} from './CellsTableSharedColumn/CellsTableSharedColumn';
 
-import {CellFolder} from '../../common/cellFile/cellFile';
+import {CellItem} from '../../common/cellFile/cellFile';
 
-const columnHelper = createColumnHelper<CellFile | CellFolder>();
+const columnHelper = createColumnHelper<CellItem>();
 
 export const getCellsTableColumns = ({
   cellsRepository,
@@ -71,17 +70,12 @@ export const getCellsTableColumns = ({
     header: () => <span className="visually-hidden">{t('cellsGlobalView.tableRowActions')}</span>,
     size: 40,
     cell: info => {
-      if (info.row.original.type === 'folder') {
-        return null;
-      }
-
       return (
         <CellsTableRowOptions
-          type="file"
-          file={info.row.original as CellFile}
+          file={info.row.original}
           onDelete={uuid => onDeleteFile(uuid)}
           cellsRepository={cellsRepository}
-          conversationId={conversationQualifiedId.id}
+          conversationQualifiedId={conversationQualifiedId}
         />
       );
     },

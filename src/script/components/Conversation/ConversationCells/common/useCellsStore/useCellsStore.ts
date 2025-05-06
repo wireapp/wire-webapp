@@ -19,7 +19,7 @@
 
 import {create} from 'zustand';
 
-import {CellFile, CellFolder} from '../cellFile/cellFile';
+import {CellItem} from '../cellFile/cellFile';
 import {CellPagination} from '../cellPagination/cellPagination';
 
 type Status = 'idle' | 'loading' | 'success' | 'error';
@@ -27,20 +27,20 @@ type Status = 'idle' | 'loading' | 'success' | 'error';
 const DEFAULT_PAGE_SIZE = 50;
 
 interface CellsState {
-  filesByConversation: Record<string, Array<CellFile | CellFolder>>;
+  filesByConversation: Record<string, Array<CellItem>>;
   paginationByConversation: Record<string, CellPagination | null>;
   status: Status;
   error: Error | null;
   pageSize: number;
   setPageSize: (pageSize: number) => void;
-  setFiles: (params: {conversationId: string; files: Array<CellFile | CellFolder>}) => void;
+  setFiles: (params: {conversationId: string; files: Array<CellItem>}) => void;
   setPagination: (params: {conversationId: string; pagination: CellPagination | null}) => void;
   setStatus: (status: Status) => void;
   setError: (error: Error | null) => void;
-  updateFile: (params: {conversationId: string; fileId: string; updates: Partial<CellFile>}) => void;
+  setPublicLink: (params: {conversationId: string; fileId: string; data: CellItem['publicLink']}) => void;
   removeFile: (params: {conversationId: string; fileId: string}) => void;
   clearAll: (params: {conversationId: string}) => void;
-  getFiles: (params: {conversationId: string}) => Array<CellFile | CellFolder>;
+  getFiles: (params: {conversationId: string}) => Array<CellItem>;
   getPagination: (params: {conversationId: string}) => CellPagination | null;
 }
 
@@ -67,13 +67,18 @@ export const useCellsStore = create<CellsState>((set, get) => ({
     })),
   setStatus: status => set({status}),
   setError: error => set({error}),
-  updateFile: ({conversationId, fileId, updates}) =>
+  setPublicLink: ({conversationId, fileId, data}) =>
     set(state => ({
       filesByConversation: {
         ...state.filesByConversation,
         [conversationId]:
           state.filesByConversation[conversationId]?.map(file =>
-            file.id === fileId && file.type === 'file' ? {...file, ...updates} : file,
+            file.id === fileId
+              ? {
+                  ...file,
+                  publicLink: data,
+                }
+              : file,
           ) || [],
       },
     })),

@@ -23,9 +23,9 @@ import {CellPagination} from 'Components/Conversation/ConversationCells/common/c
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {formatBytes, getFileExtension} from 'Util/util';
 
-import {CellFile, CellFolder} from '../common/cellFile/cellFile';
+import {CellItem} from '../common/cellFile/cellFile';
 
-export const transformNodesToCellsFiles = (nodes: RestNode[]): Array<CellFile | CellFolder> => {
+export const transformNodesToCellsFiles = (nodes: RestNode[]): Array<CellItem> => {
   return nodes.map(node => {
     if (node.Type === 'COLLECTION') {
       return {
