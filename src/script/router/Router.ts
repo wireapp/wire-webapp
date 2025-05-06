@@ -84,11 +84,11 @@ export const configureRoutes = (routeDefinitions: Routes): void => {
   window.addEventListener('hashchange', parseRoute);
   parseRoute();
 };
-export const navigate = (path: string, stateObj?: {}) => {
-  setHistoryParam(path, stateObj);
+export const navigate = (path: string) => {
+  setHistoryParam(path);
   parseRoute();
 };
 
-export const setHistoryParam = (path: string, stateObj: {} = window.history.state) => {
+export const setHistoryParam = (path: string) => {
   window.location.hash = path;
 };

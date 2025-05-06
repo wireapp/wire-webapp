@@ -46,7 +46,7 @@ export const createNavigateKeyboard =
     const isSupportedKey = supportedKeys.includes('*') || supportedKeys.includes(event.key);
 
     if (isSupportedKey) {
-      navigate(link, {eventKey: event.key});
+      navigate(link);
       event.preventDefault();
     }
   };
