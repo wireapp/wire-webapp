@@ -27,40 +27,43 @@ import {CellItem} from '../common/cellFile/cellFile';
 
 export const transformNodesToCellsFiles = (nodes: RestNode[]): Array<CellItem> => {
   return nodes.map(node => {
+    const id = node.Uuid;
+    const owner = getOwner(node);
+    const name = getFileName(node.Path);
+    const sizeMb = getFileSize(node);
+    const uploadedAtTimestamp = getUploadedAtTimestamp(node);
+    const publicLink = {
+      alreadyShared: !!node.Shares?.[0].Uuid,
+      uuid: node.Shares?.[0].Uuid || '',
+      url: undefined,
+    };
+
     if (node.Type === 'COLLECTION') {
       return {
-        id: node.Uuid,
+        id,
         type: 'folder' as const,
-        owner: getOwner(node),
-        name: getFileName(node.Path),
-        sizeMb: getFileSize(node),
-        uploadedAtTimestamp: getUploadedAtTimestamp(node),
-        publicLink: {
-          alreadyShared: !!node.Shares?.[0].Uuid,
-          uuid: node.Shares?.[0].Uuid || '',
-          url: undefined,
-        },
+        owner,
+        name,
+        sizeMb,
+        uploadedAtTimestamp,
+        publicLink,
       };
     }
 
     return {
-      id: node.Uuid,
+      id,
       type: 'file' as const,
-      owner: getOwner(node),
+      owner,
       conversationName: node.ContextWorkspace?.Label || '',
       mimeType: node.ContentType,
       extension: getFileExtension(node.Path),
-      name: getFileName(node.Path),
-      sizeMb: getFileSize(node),
+      name,
+      sizeMb,
       previewImageUrl: getPreviewImageUrl(node),
       previewPdfUrl: getPreviewPdfUrl(node),
-      uploadedAtTimestamp: getUploadedAtTimestamp(node),
+      uploadedAtTimestamp,
       fileUrl: node.PreSignedGET?.Url,
-      publicLink: {
-        alreadyShared: !!node.Shares?.[0].Uuid,
-        uuid: node.Shares?.[0].Uuid || '',
-        url: undefined,
-      },
+      publicLink,
     };
   });
 };
