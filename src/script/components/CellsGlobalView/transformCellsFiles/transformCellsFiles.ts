@@ -29,7 +29,6 @@ export const transformCellsFiles = (nodes: RestNode[]): CellFile[] => {
     .filter(node => node.Type === 'LEAF')
     .map(node => ({
       id: node.Uuid,
-      type: 'file' as const,
       owner: getOwner(node),
       conversationName: node.ContextWorkspace?.Label || '',
       mimeType: node.ContentType,
