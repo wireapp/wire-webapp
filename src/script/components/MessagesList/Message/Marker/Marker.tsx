@@ -42,10 +42,6 @@ const markerStyles: Partial<Record<Marker['type'], SerializedStyles>> = {
 */
 function getMessagesGroupLabelCallback(ts: number): string {
   const date = new Date(ts);
-  const today = new Date();
-
-  const isCurrentYear = date.getFullYear() === today.getFullYear();
-  const pattern = isCurrentYear ? 'EEEE, MMMM d' : 'EEEE, MMMM d yyyy';
 
   if (isToday(date)) {
     return t('conversationToday');
@@ -54,6 +50,10 @@ function getMessagesGroupLabelCallback(ts: number): string {
   if (isYesterday(date)) {
     return t('conversationYesterday');
   }
+
+  const today = new Date();
+  const isCurrentYear = date.getFullYear() === today.getFullYear();
+  const pattern = isCurrentYear ? 'EEEE, MMMM d' : 'EEEE, MMMM d yyyy';
 
   return formatLocale(date, pattern);
 }
