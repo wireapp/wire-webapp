@@ -265,31 +265,6 @@ describe('TitleBar', () => {
     expect(videoCallButton).toBeNull();
   });
 
-  it('starts video call on video call button click', async () => {
-    mockedUiKit.useMatchMedia.mockReturnValue(false);
-
-    const firstUser = new User();
-    const teamState = createTeamState({isVideoCallingEnabled: ko.pureComputed(() => true)});
-    const conversation = createConversationEntity({
-      firstUserEntity: ko.pureComputed(() => firstUser),
-      is1to1: ko.pureComputed(() => true),
-      participating_user_ids: ko.observableArray([
-        {domain: '', id: ''},
-        {domain: '', id: ''},
-      ] as QualifiedId[]),
-    });
-
-    const {getByLabelText} = render(
-      withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} teamState={teamState} />),
-    );
-
-    const videoCallButton = getByLabelText('tooltipConversationVideoCall');
-    expect(videoCallButton).toBeDefined();
-
-    fireEvent.click(videoCallButton);
-    expect(callActions.startVideo).toHaveBeenCalledWith(conversation);
-  });
-
   it('displays warning badge', async () => {
     const conversation = createConversationEntity({
       hasDirectGuest: ko.pureComputed(() => true),

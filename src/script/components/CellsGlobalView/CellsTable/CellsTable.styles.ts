@@ -19,14 +19,16 @@
 
 import {CSSObject} from '@emotion/react';
 
+import {styleBreakpoint} from '../common/styleBreakpoint/styleBreakpoint';
+
 export const wrapperStyles: CSSObject = {
   maxWidth: '100%',
-  overflowX: 'auto',
 };
 
 export const tableStyles: CSSObject = {
   width: '100%',
   borderCollapse: 'collapse',
+  tableLayout: 'fixed',
 };
 
 export const headerCellStyles: CSSObject = {
@@ -37,7 +39,7 @@ export const headerCellStyles: CSSObject = {
   fontWeight: 'var(--font-weight-medium)',
   whiteSpace: 'nowrap',
 
-  '@media (max-width: 900px)': {
+  [`@media (max-width: ${styleBreakpoint}px)`]: {
     display: 'none',
   },
 };
@@ -48,10 +50,11 @@ export const tableCellStyles: CSSObject = {
   fontSize: 'var(--font-size-small)',
   whiteSpace: 'nowrap',
 
-  '@media (max-width: 900px)': {
+  [`@media (max-width: ${styleBreakpoint}px)`]: {
     display: 'block',
     padding: '12px 0',
     borderBottom: '1px solid var(--border-color)',
+    width: '100% !important',
 
     '&[data-cell]': {
       borderBottom: '1px solid var(--border-color)',
@@ -69,12 +72,14 @@ export const tableCellStyles: CSSObject = {
 
 export const tableActionsCellStyles: CSSObject = {
   ...tableCellStyles,
-  '@media (max-width: 900px)': {
+  padding: 0,
+  [`@media (max-width: ${styleBreakpoint}px)`]: {
     display: 'block',
     background: 'var(--foreground-fade-8)',
     border: 'none',
     marginTop: '8px',
     borderRadius: '8px',
+    width: '100% !important',
   },
 };
 
@@ -84,14 +89,29 @@ export const tableCellRow: CSSObject = {
   padding: '8px 12px',
   borderRadius: '8px',
 
+  '&:hover': {
+    backgroundColor: 'var(--white)',
+
+    'body.theme-dark &': {
+      backgroundColor: 'var(--gray-90)',
+    },
+  },
+
   '&:not(:last-of-type)': {
     marginBottom: '32px',
   },
 
-  '@media (min-width: 900px)': {
+  [`@media (min-width: ${styleBreakpoint}px)`]: {
     display: 'table-row',
     padding: '0',
     border: 'none',
     borderRadius: '0',
   },
+};
+
+export const textWithEllipsisStyles: CSSObject = {
+  display: 'block',
+  textOverflow: 'ellipsis',
+  overflow: 'hidden',
+  whiteSpace: 'nowrap',
 };

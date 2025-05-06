@@ -946,7 +946,7 @@ export class CallingRepository {
     return CONV_TYPE.ONEONONE;
   }
 
-  async startCall(conversation: Conversation, callType: CALL_TYPE): Promise<void | Call> {
+  async startCall(conversation: Conversation): Promise<void | Call> {
     void this.setViewModeMinimized();
     if (!this.selfUser || !this.selfClientId) {
       this.logger.warn(
@@ -960,7 +960,7 @@ export class CallingRepository {
     }
     const conversationId = conversation.qualifiedId;
     const convId = this.serializeQualifiedId(conversationId);
-    this.logger.log(`Starting a call of type "${callType}" in conversation ID "${convId}"...`);
+    this.logger.log(`Starting a call of type "${CALL_TYPE.NORMAL}" in conversation ID "${convId}"...`);
     try {
       const rejectedCallInConversation = this.findCall(conversationId);
       if (rejectedCallInConversation) {
@@ -975,41 +975,29 @@ export class CallingRepository {
         conversation,
         conversationType,
         selfParticipant,
-        callType,
+        CALL_TYPE.NORMAL,
         this.mediaDevicesHandler,
       );
       this.storeCall(call);
-      const loadPreviewPromise =
-        call.isGroupOrConference && callType === CALL_TYPE.VIDEO
-          ? this.warmupMediaStreams(call, true, true)
-          : Promise.resolve(true);
-      const success = await loadPreviewPromise;
 
       if (this.isMLSConference(conversation)) {
         await this.joinMlsConferenceSubconversation(conversation);
       }
 
-      if (success) {
-        /**
-         * Since we might have been on a conference call before, which was started as muted, then we've hung up and started an outgoing call,
-         * we are stuck in muted state so we should call the AVS function setMute(this.wUser, 0) before initiating the call to fix this
-         * Further info: https://wearezeta.atlassian.net/browse/SQCALL-551
-         */
-        this.wCall?.setMute(this.wUser, 0);
-        this.wCall?.start(this.wUser, convId, callType, conversationType, this.callState.cbrEncoding());
-        if (!!conversation && this.isMLSConference(conversation)) {
-          this.setCachedEpochInfos(call);
-        }
-        this.sendCallingEvent(EventName.CALLING.INITIATED_CALL, call);
-        this.sendCallingEvent(EventName.CONTRIBUTED, call, {
-          [Segmentation.MESSAGE.ACTION]: callType === CALL_TYPE.VIDEO ? 'video_call' : 'audio_call',
-        });
-      } else {
-        this.showNoCameraModal();
-        this.removeCall(call);
-        call.epochCache.clean();
-        call.epochCache.disable();
+      /**
+       * Since we might have been on a conference call before, which was started as muted, then we've hung up and started an outgoing call,
+       * we are stuck in muted state so we should call the AVS function setMute(this.wUser, 0) before initiating the call to fix this
+       * Further info: https://wearezeta.atlassian.net/browse/SQCALL-551
+       */
+      this.wCall?.setMute(this.wUser, 0);
+      this.wCall?.start(this.wUser, convId, CALL_TYPE.NORMAL, conversationType, this.callState.cbrEncoding());
+      if (!!conversation && this.isMLSConference(conversation)) {
+        this.setCachedEpochInfos(call);
       }
+      this.sendCallingEvent(EventName.CALLING.INITIATED_CALL, call);
+      this.sendCallingEvent(EventName.CONTRIBUTED, call, {
+        [Segmentation.MESSAGE.ACTION]: 'audio_call',
+      });
 
       return call;
     } catch (error) {

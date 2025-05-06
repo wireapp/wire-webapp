@@ -390,8 +390,6 @@ export const Conversations: React.FC<ConversationsProps> = ({
               conversationRepository={conversationRepository}
               onClickPreferences={onClickPreferences}
               showNotificationsBadge={notifications.length > 0}
-              userRepository={userRepository}
-              teamRepository={teamRepository}
               channelConversations={channelConversations}
             />
           )

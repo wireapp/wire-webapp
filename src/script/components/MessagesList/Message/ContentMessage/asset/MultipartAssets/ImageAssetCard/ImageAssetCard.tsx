@@ -19,21 +19,55 @@
 
 import {ICellAsset} from '@wireapp/protocol-messaging';
 
-import {GridImageAsset} from './GridImageAsset/GridImageAsset';
-import {LargeImageAsset} from './LargeImageAsset/LargeImageAsset';
+import {ImageAssetLarge} from './ImageAssetLarge/ImageAssetLarge';
+import {ImageAssetSmall} from './ImageAssetSmall/ImageAssetSmall';
 
 interface ImageAssetCardProps {
   src?: string;
+  name: string;
+  extension: string;
+  senderName: string;
+  timestamp: number;
   metadata: ICellAsset['image'];
-  size: 'small' | 'large';
+  variant: 'small' | 'large';
   isLoading: boolean;
   isError: boolean;
 }
 
-export const ImageAssetCard = ({src, metadata, size, isLoading, isError}: ImageAssetCardProps) => {
-  if (size === 'large') {
-    return <LargeImageAsset src={src} metadata={metadata} isError={isError} />;
+export const ImageAssetCard = ({
+  src,
+  name,
+  extension,
+  senderName,
+  timestamp,
+  metadata,
+  variant,
+  isLoading,
+  isError,
+}: ImageAssetCardProps) => {
+  if (variant === 'large') {
+    return (
+      <ImageAssetLarge
+        src={src}
+        name={name}
+        extension={extension}
+        metadata={metadata}
+        isError={isError}
+        senderName={senderName}
+        timestamp={timestamp}
+      />
+    );
   }
 
-  return <GridImageAsset src={src} isLoading={isLoading} isError={isError} />;
+  return (
+    <ImageAssetSmall
+      src={src}
+      name={name}
+      extension={extension}
+      isLoading={isLoading}
+      isError={isError}
+      senderName={senderName}
+      timestamp={timestamp}
+    />
+  );
 };

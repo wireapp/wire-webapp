@@ -17,34 +17,33 @@
  *
  */
 
-import {t} from 'Util/LocalizerUtil';
-
-import {videoStyles, iconWrapperStyles} from './VideoAssetCard.styles';
-
-import {FilePreviewPlayButton} from '../common/FilePreviewPlayButton/FilePreviewPlayButton';
-import {MediaFilePreviewCard} from '../common/MediaFilePreviewCard/MediaFilePreviewCard';
+import {VideoAssetPlayer} from './VideoAssetPlayer/VideoAssetPlayer';
+import {VideoAssetSmall} from './VideoAssetSmall/VideoAssetSmall';
 
 interface VideoAssetCardProps {
+  variant: 'large' | 'small';
   src?: string;
+  extension: string;
+  name: string;
+  size: string;
   isLoading: boolean;
   isError: boolean;
 }
 
-export const VideoAssetCard = ({src, isLoading, isError}: VideoAssetCardProps) => {
-  return (
-    <MediaFilePreviewCard
-      label={src ? t('conversationFileVideoPreviewLabel', {src}) : 'Loading...'}
-      isLoading={isLoading}
-      isError={isError}
-    >
-      {!isLoading && !isError && (
-        <>
-          <video src={src} preload="metadata" css={videoStyles} />
-          <div css={iconWrapperStyles}>
-            <FilePreviewPlayButton />
-          </div>
-        </>
-      )}
-    </MediaFilePreviewCard>
-  );
+export const VideoAssetCard = ({variant, src, extension, name, size, isLoading, isError}: VideoAssetCardProps) => {
+  if (variant === 'large') {
+    return (
+      <VideoAssetPlayer
+        url={src}
+        isFileShareRestricted={false}
+        extension={extension}
+        name={name}
+        size={size}
+        isLoading={isLoading}
+        isError={isError}
+      />
+    );
+  }
+
+  return <VideoAssetSmall src={src} isLoading={isLoading} isError={isError} />;
 };

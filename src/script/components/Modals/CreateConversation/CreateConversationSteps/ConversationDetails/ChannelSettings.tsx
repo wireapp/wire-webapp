@@ -75,10 +75,9 @@ export const ChannelSettings = () => {
         onChange={setAccess}
         horizontal
         selectedValue={access}
-        options={getConversationAccessOptions()}
+        options={getConversationAccessOptions(isPublicChannelsEnabled)}
         ariaLabelledBy="conversation-access"
         name="conversation-access"
-        disabled={!isPublicChannelsEnabled}
       />
 
       <Muted block muted={access === ConversationAccess.Public} css={channelSettingsTextCss}>

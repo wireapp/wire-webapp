@@ -32,5 +32,6 @@ export class OneToOneMigratedToMlsMessage extends SystemMessage {
       undefined,
       replaceLink(Config.getConfig().URL.SUPPORT.MLS_LEARN_MORE),
     );
+    this.affect_order(false);
   }
 }

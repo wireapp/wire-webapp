@@ -468,15 +468,13 @@ export const Conversation = ({
     [addReadReceiptToBatch, repositories.conversation, repositories.integration, updateConversationLastRead],
   );
 
-  const {
-    getRootProps,
-    getInputProps,
-    open: openCellsUploadWindow,
-    isDragAccept,
-  } = useFilesUploadDropzone({
+  const isFileTabActive = activeTabIndex === 1;
+
+  const {getRootProps, getInputProps, openAllFilesView, openImageFilesView, isDragAccept} = useFilesUploadDropzone({
     isTeam: inTeam,
     cellsRepository: repositories.cells,
     conversation: activeConversation,
+    isDisabled: isFileTabActive,
   });
 
   const isCellsEnabled = Config.getConfig().FEATURE.ENABLE_CELLS;
@@ -508,13 +506,13 @@ export const Conversation = ({
           {isCellsEnabled && (
             <>
               <ConversationTabs activeTabIndex={activeTabIndex} onIndexChange={setActiveTabIndex} />
-              <ConversationTabPanel id="files" isActive={activeTabIndex === 1}>
-                {activeTabIndex === 1 && <ConversationCells conversationQualifiedId={activeConversation.qualifiedId} />}
+              <ConversationTabPanel id="files" isActive={isFileTabActive}>
+                {isFileTabActive && <ConversationCells conversationQualifiedId={activeConversation.qualifiedId} />}
               </ConversationTabPanel>
             </>
           )}
 
-          <ConversationMessagesWrapper isCellsEnabled={isCellsEnabled} isPanelHidden={activeTabIndex === 1}>
+          <ConversationMessagesWrapper isCellsEnabled={isCellsEnabled} isPanelHidden={isFileTabActive}>
             {activeCalls.map(call => {
               const {conversation} = call;
               const callingViewModel = mainViewModel.calling;
@@ -582,8 +580,8 @@ export const Conversation = ({
                   uploadDroppedFiles={uploadDroppedFiles}
                   uploadImages={uploadImages}
                   uploadFiles={uploadFiles}
-                  onCellImageUpload={openCellsUploadWindow}
-                  onCellAssetUpload={openCellsUploadWindow}
+                  onCellImageUpload={openImageFilesView}
+                  onCellAssetUpload={openAllFilesView}
                 />
               ))}
 

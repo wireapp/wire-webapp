@@ -17,10 +17,11 @@
  *
  */
 
-import {RestNode} from 'cells-sdk-ts';
+import {RestNode, RestPagination} from 'cells-sdk-ts';
 
+import {CellPagination} from 'Components/Conversation/ConversationCells/common/cellPagination/cellPagination';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {formatBytes} from 'Util/util';
+import {formatBytes, getFileExtension} from 'Util/util';
 
 import {CellFile} from '../common/cellFile/cellFile';
 
@@ -33,9 +34,11 @@ export const transformNodesToCellsFiles = (nodes: RestNode[]): CellFile[] => {
         owner: getOwner(node),
         conversationName: node.ContextWorkspace?.Label || '',
         mimeType: node.ContentType,
+        extension: getFileExtension(node.Path),
         name: getFileName(node.Path),
         sizeMb: getFileSize(node),
         previewImageUrl: getPreviewImageUrl(node),
+        previewPdfUrl: getPreviewPdfUrl(node),
         uploadedAtTimestamp: getUploadedAtTimestamp(node),
         fileUrl: node.PreSignedGET?.Url,
         publicLink: {
@@ -49,6 +52,18 @@ export const transformNodesToCellsFiles = (nodes: RestNode[]): CellFile[] => {
   );
 };
 
+export const transformToCellPagination = (pagination: RestPagination): CellPagination => {
+  return {
+    limit: pagination.Limit,
+    total: pagination.Total,
+    totalPages: pagination.TotalPages,
+    currentOffset: pagination.CurrentOffset,
+    prevOffset: pagination.PrevOffset,
+    nextOffset: pagination.NextOffset,
+    currentPage: pagination.CurrentPage,
+  };
+};
+
 const getFileName = (filePath: string): string => {
   const parts = filePath.split('/');
   return parts[parts.length - 1];
@@ -56,6 +71,10 @@ const getFileName = (filePath: string): string => {
 
 const getPreviewImageUrl = (node: RestNode): string | undefined => {
   return node.Previews?.find(preview => preview.ContentType?.startsWith('image/'))?.PreSignedGET?.Url;
+};
+
+const getPreviewPdfUrl = (node: RestNode): string | undefined => {
+  return node.Previews?.find(preview => preview.ContentType?.startsWith('application/pdf'))?.PreSignedGET?.Url;
 };
 
 const getUploadedAtTimestamp = (node: RestNode): number => {
