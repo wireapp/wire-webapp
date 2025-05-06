@@ -47,10 +47,6 @@ export const buttonStyles: CSSObject = {
   '&:hover': {
     color: 'var(--main-color)',
   },
-
-  'body.theme-dark': {
-    color: 'var(--gray-40)',
-  },
 };
 
 export const activeItemStyles: CSSObject = {
