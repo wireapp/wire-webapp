@@ -32,7 +32,7 @@ export const transformNodesToCellsFiles = (nodes: RestNode[]): Array<CellItem> =
     const name = getFileName(node.Path);
     const sizeMb = getFileSize(node);
     const uploadedAtTimestamp = getUploadedAtTimestamp(node);
-    const publicLink = {
+    const publicLink: CellItem['publicLink'] = {
       alreadyShared: !!node.Shares?.[0].Uuid,
       uuid: node.Shares?.[0].Uuid || '',
       url: undefined,
