@@ -22,7 +22,7 @@ import {useCallback, useState} from 'react';
 import {CellItem} from '../common/cellFile/cellFile';
 
 interface UseCellsLoaderSizeProps {
-  files: Array<CellItem>;
+  files: CellItem[];
 }
 
 export const useCellsLoaderSize = ({files}: UseCellsLoaderSizeProps) => {

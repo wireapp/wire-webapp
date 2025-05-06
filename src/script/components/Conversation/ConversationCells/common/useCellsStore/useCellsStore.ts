@@ -27,20 +27,20 @@ type Status = 'idle' | 'loading' | 'success' | 'error';
 const DEFAULT_PAGE_SIZE = 50;
 
 interface CellsState {
-  filesByConversation: Record<string, Array<CellItem>>;
+  filesByConversation: Record<string, CellItem[]>;
   paginationByConversation: Record<string, CellPagination | null>;
   status: Status;
   error: Error | null;
   pageSize: number;
   setPageSize: (pageSize: number) => void;
-  setFiles: (params: {conversationId: string; files: Array<CellItem>}) => void;
+  setFiles: (params: {conversationId: string; files: CellItem[]}) => void;
   setPagination: (params: {conversationId: string; pagination: CellPagination | null}) => void;
   setStatus: (status: Status) => void;
   setError: (error: Error | null) => void;
   setPublicLink: (params: {conversationId: string; fileId: string; data: CellItem['publicLink']}) => void;
   removeFile: (params: {conversationId: string; fileId: string}) => void;
   clearAll: (params: {conversationId: string}) => void;
-  getFiles: (params: {conversationId: string}) => Array<CellItem>;
+  getFiles: (params: {conversationId: string}) => CellItem[];
   getPagination: (params: {conversationId: string}) => CellPagination | null;
 }
 
