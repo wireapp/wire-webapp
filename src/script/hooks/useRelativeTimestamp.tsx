@@ -65,12 +65,16 @@ const calculateTimestamp = (ts: number, isDay: boolean) => {
   return isDay ? `${weekDay}, ${dayMonth}${year}, ${time}` : `${dayMonth}${year}, ${time}`;
 };
 
-export function useRelativeTimestamp(timestamp: number, asDay = false, calculateTimestampFn = calculateTimestamp) {
-  const [timeago, setTimeago] = useState<string>(calculateTimestampFn(timestamp, asDay));
+export function useRelativeTimestamp(
+  timestamp: number,
+  asDay = false,
+  getMessagesGroupLabelCallBack = calculateTimestamp,
+) {
+  const [timeago, setTimeago] = useState<string>(getMessagesGroupLabelCallBack(timestamp, asDay));
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setTimeago(calculateTimestampFn(timestamp, asDay));
+      setTimeago(getMessagesGroupLabelCallBack(timestamp, asDay));
     }, TIME_IN_MILLIS.MINUTE);
     return () => clearInterval(interval);
   });

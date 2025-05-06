@@ -40,7 +40,7 @@ const markerStyles: Partial<Record<Marker['type'], SerializedStyles>> = {
   If yesterday: “Yesterday”
   Any other day: <Week day>, <date> (e.g. “Monday, April 12” or “Friday, January 6 2023”)
 */
-function getMessagesGroupLabelCallback(ts: number): string {
+function getMessagesGroupLabel(ts: number): string {
   const date = new Date(ts);
 
   if (isToday(date)) {
@@ -60,7 +60,7 @@ function getMessagesGroupLabelCallback(ts: number): string {
 
 export function MarkerComponent({marker, scrollTo}: {marker: Marker; scrollTo: ScrollToElement}) {
   const isDay = marker.type === 'day';
-  const timeAgo = useRelativeTimestamp(marker.timestamp, isDay, isDay ? getMessagesGroupLabelCallback : undefined);
+  const timeAgo = useRelativeTimestamp(marker.timestamp, isDay, isDay ? getMessagesGroupLabel : undefined);
   const elementRef = useRef<HTMLDivElement>(null);
 
   const style = css`
