@@ -22,6 +22,7 @@ import {match} from 'path-to-regexp';
 export type Routes = Record<string, ((...args: any[]) => void) | null>;
 
 const defaultRoute: Routes = {
+  // do nothing if url was not matched
   '*': null,
 };
 
@@ -33,50 +34,51 @@ let routes: Routes = {};
 export const parseRoute = () => {
   const currentPath = window.location.hash.replace('#', '') || '/';
 
-  // Try to match the path directly
   const exactMatch = routes[currentPath];
   if (exactMatch) {
     return exactMatch();
   }
 
-  // Try to match with path-to-regexp
   for (const [pattern, handler] of Object.entries(routes)) {
     if (pattern === '*') {
       continue;
     }
 
-    const matcher = match(pattern, {decode: decodeURIComponent});
-    const result = matcher(currentPath);
+    try {
+      const matcher = match(pattern, {decode: decodeURIComponent});
+      const result = matcher(currentPath);
 
-    if (!result || !handler) {
+      if (!result || !handler) {
+        continue;
+      }
+
+      const params = result.params;
+      const paramNames = Object.keys(params);
+
+      // Handle wildcard parameter
+      if (paramNames.some(name => name.startsWith('*'))) {
+        const wildcardName = paramNames.find(name => name.startsWith('*'));
+        if (wildcardName) {
+          const segments = params[wildcardName];
+          return handler(...Object.values(params).filter(param => param !== segments), segments);
+        }
+      }
+
+      // Handle optional parameters
+      if (paramNames.length === 0) {
+        return handler(params);
+      }
+
+      const paramValues = paramNames.map(name => params[name]);
+      return handler(...paramValues);
+    } catch (error) {
+      console.error('Error matching pattern:', pattern, error);
       continue;
     }
-
-    const params = result.params;
-    const paramNames = Object.keys(params);
-
-    // Handle wildcard parameter
-    if (paramNames.some(name => name.startsWith('*'))) {
-      const wildcardName = paramNames.find(name => name.startsWith('*'));
-      if (wildcardName) {
-        const segments = params[wildcardName];
-        return handler(...Object.values(params).filter(param => param !== segments), segments);
-      }
-    }
-
-    // Handle optional parameters
-    if (paramNames.length === 0) {
-      return handler(params);
-    }
-
-    const paramValues = paramNames.map(name => params[name]);
-
-    return handler(...paramValues);
   }
 
   return routes['*']?.();
 };
-
 export const configureRoutes = (routeDefinitions: Routes): void => {
   routes = {...defaultRoute, ...routeDefinitions};
   window.addEventListener('hashchange', parseRoute);

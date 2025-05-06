@@ -17,7 +17,7 @@
  *
  */
 
-import {getCellsFilesPath} from 'Components/Conversation/ConversationCells/common/getCellsFilesPath/getCellsFilesPath';
+import {getCellsFilesPath} from '../../../common/getCellsFilesPath/getCellsFilesPath';
 
 export const getBreadcrumbsFromUrl = ({baseCrumb}: {baseCrumb: string}) => {
   const currentPath = getCellsFilesPath();

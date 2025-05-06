@@ -21,11 +21,9 @@ import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {ChevronUpIcon} from '@wireapp/react-ui-kit';
 
-import {generateConversationUrl} from 'src/script/router/routeGenerator';
-import {createNavigate} from 'src/script/router/routerBindings';
-
 import {activeItemStyles, buttonStyles, iconStyles, listItemStyles, listStyles} from './CellsBreadcrumbs.styles';
 import {getBreadcrumbsFromUrl} from './getBreadcrumbsFromUrl/getBreadcrumbsFromUrl';
+import {openBreadcrumb} from './openBreadcrumb/openBreadcrumb';
 
 interface CellsBreadcrumbsProps {
   conversationQualifiedId: QualifiedId;
@@ -48,15 +46,7 @@ export const CellsBreadcrumbs = ({conversationQualifiedId, conversationName}: Ce
             <button
               type="button"
               css={buttonStyles}
-              onClick={event => {
-                createNavigate(
-                  generateConversationUrl({
-                    id: conversationQualifiedId.id,
-                    domain: conversationQualifiedId.domain,
-                    filePath: crumb.path ? `files/${encodeURIComponent(crumb.path)}` : 'files',
-                  }),
-                )(event);
-              }}
+              onClick={event => openBreadcrumb({conversationQualifiedId, path: crumb.path, event})}
             >
               {crumb.name}
             </button>

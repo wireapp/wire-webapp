@@ -33,12 +33,19 @@ export const createNavigate = (link: string) => (event?: React.MouseEvent<Elemen
 };
 
 export const createNavigateKeyboard =
-  (link: string, setIsResponsive = false): React.KeyboardEventHandler =>
+  (
+    link: string,
+    setIsResponsive = false,
+    supportedKeys: string[] = [KEY.ENTER, KEY.SPACE],
+  ): React.KeyboardEventHandler =>
   (event: React.KeyboardEvent<Element>) => {
     if (setIsResponsive) {
       setResponsiveView();
     }
-    if (event.key === KEY.ENTER || event.key === KEY.SPACE) {
+
+    const isSupportedKey = supportedKeys.includes('*') || supportedKeys.includes(event.key);
+
+    if (isSupportedKey) {
       navigate(link, {eventKey: event.key});
       event.preventDefault();
     }

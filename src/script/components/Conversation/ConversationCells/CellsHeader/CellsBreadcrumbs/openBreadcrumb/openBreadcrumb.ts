@@ -24,40 +24,18 @@ import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate} from 'src/script/router/routerBindings';
 
-import {getCellsFilesPath} from '../getCellsFilesPath/getCellsFilesPath';
-
-interface OpenFolderParams {
+interface OpenBreadcrumbParams {
   conversationQualifiedId: QualifiedId;
-  name: string;
+  path: string;
   event?: ReactMouseEvent<Element, MouseEvent>;
 }
 
-export const openFolder = ({conversationQualifiedId, name, event}: OpenFolderParams) => {
-  const currentPath = getCellsFilesPath();
-  const pathSegments = currentPath ? currentPath.split('/') : [];
-  const encodedSegments = [...pathSegments, name].map(segment => encodeURIComponent(segment));
-  const newPath = encodedSegments.join('/');
-
+export const openBreadcrumb = ({conversationQualifiedId, path, event}: OpenBreadcrumbParams) => {
   createNavigate(
     generateConversationUrl({
       id: conversationQualifiedId.id,
       domain: conversationQualifiedId.domain,
-      filePath: `files/${newPath}`,
-    }),
-  )(event);
-};
-
-interface OpenBaseFolderParams {
-  conversationQualifiedId: QualifiedId;
-  event?: ReactMouseEvent<Element, MouseEvent>;
-}
-
-export const openBaseFolder = ({conversationQualifiedId, event}: OpenBaseFolderParams) => {
-  createNavigate(
-    generateConversationUrl({
-      id: conversationQualifiedId.id,
-      domain: conversationQualifiedId.domain,
-      filePath: 'files',
+      filePath: path ? `files/${encodeURIComponent(path)}` : 'files',
     }),
   )(event);
 };
