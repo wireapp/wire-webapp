@@ -70,14 +70,9 @@ export const getCellsTableColumns = ({
     header: () => <span className="visually-hidden">{t('cellsGlobalView.tableRowActions')}</span>,
     size: 40,
     cell: info => {
-      if (info.row.original.type === 'folder') {
-        return null;
-      }
-
       return (
         <CellsTableRowOptions
-          type="file"
-          file={info.row.original as CellFile}
+          file={info.row.original}
           onDelete={uuid => onDeleteFile(uuid)}
           cellsRepository={cellsRepository}
           conversationQualifiedId={conversationQualifiedId}
