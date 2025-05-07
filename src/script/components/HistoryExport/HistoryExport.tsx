@@ -50,7 +50,7 @@ enum ExportState {
 
 export const CONFIG = {
   LEGACY_FILE_EXTENSION: 'desktop_wbu',
-  UNIVERSAL_FILE_EXTENSION: 'wirebackup',
+  UNIVERSAL_FILE_EXTENSION: 'wbu',
 };
 
 interface HistoryExportProps {
