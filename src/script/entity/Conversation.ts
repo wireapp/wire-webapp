@@ -455,7 +455,10 @@ export class Conversation {
       for (let index = messages.length - 1; index >= 0; index--) {
         const messageEntity = messages[index];
         if (messageEntity.visible()) {
-          const isReadMessage = messageEntity.timestamp() <= this.last_read_timestamp() || messageEntity.user().isMe;
+          const isReadMessage =
+            messageEntity.timestamp() <= this.last_read_timestamp() ||
+            (messageEntity.user().isMe && !messageEntity.isSystem());
+
           if (isReadMessage) {
             break;
           }
