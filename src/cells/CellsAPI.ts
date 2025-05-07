@@ -291,7 +291,6 @@ export class CellsAPI {
       Scope: {Root: {Path: '/'}, Recursive: true},
       Filters: {
         Text: {SearchIn: 'BaseName', Term: phrase},
-        Type: 'LEAF',
       },
       Flags: ['WithPreSignedURLs'],
       Limit: `${limit}`,

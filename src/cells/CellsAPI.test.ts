@@ -875,7 +875,7 @@ describe('CellsAPI', () => {
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
         Scope: {Root: {Path: '/'}, Recursive: true},
-        Filters: {Text: {SearchIn: 'BaseName', Term: searchPhrase}, Type: 'LEAF'},
+        Filters: {Text: {SearchIn: 'BaseName', Term: searchPhrase}},
         Flags: ['WithPreSignedURLs'],
         Limit: '10',
         Offset: '0',
@@ -906,7 +906,7 @@ describe('CellsAPI', () => {
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
         Scope: {Root: {Path: '/'}, Recursive: true},
-        Filters: {Text: {SearchIn: 'BaseName', Term: searchPhrase}, Type: 'LEAF'},
+        Filters: {Text: {SearchIn: 'BaseName', Term: searchPhrase}},
         Flags: ['WithPreSignedURLs'],
         Limit: '10',
         Offset: '0',
@@ -941,7 +941,7 @@ describe('CellsAPI', () => {
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
         Scope: {Root: {Path: '/'}, Recursive: true},
-        Filters: {Text: {SearchIn: 'BaseName', Term: searchPhrase}, Type: 'LEAF'},
+        Filters: {Text: {SearchIn: 'BaseName', Term: searchPhrase}},
         Flags: ['WithPreSignedURLs'],
         Limit: '5',
         Offset: '10',
@@ -976,7 +976,7 @@ describe('CellsAPI', () => {
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
         Scope: {Root: {Path: '/'}, Recursive: true},
-        Filters: {Text: {SearchIn: 'BaseName', Term: searchPhrase}, Type: 'LEAF'},
+        Filters: {Text: {SearchIn: 'BaseName', Term: searchPhrase}},
         Flags: ['WithPreSignedURLs'],
         Limit: '10',
         Offset: '0',
@@ -1011,7 +1011,7 @@ describe('CellsAPI', () => {
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
         Scope: {Root: {Path: '/'}, Recursive: true},
-        Filters: {Text: {SearchIn: 'BaseName', Term: searchPhrase}, Type: 'LEAF'},
+        Filters: {Text: {SearchIn: 'BaseName', Term: searchPhrase}},
         Flags: ['WithPreSignedURLs'],
         Limit: '10',
         Offset: '0',
@@ -1033,7 +1033,7 @@ describe('CellsAPI', () => {
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
         Scope: {Root: {Path: '/'}, Recursive: true},
-        Filters: {Text: {SearchIn: 'BaseName', Term: searchPhrase}, Type: 'LEAF'},
+        Filters: {Text: {SearchIn: 'BaseName', Term: searchPhrase}},
         Flags: ['WithPreSignedURLs'],
         Limit: '10',
         Offset: '0',
@@ -1064,7 +1064,7 @@ describe('CellsAPI', () => {
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
         Scope: {Root: {Path: '/'}, Recursive: true},
-        Filters: {Text: {SearchIn: 'BaseName', Term: searchPhrase}, Type: 'LEAF'},
+        Filters: {Text: {SearchIn: 'BaseName', Term: searchPhrase}},
         Flags: ['WithPreSignedURLs'],
         Limit: '10',
         Offset: '0',
