@@ -30,12 +30,12 @@ import {forcedDownloadFile, setContextMenuPosition} from 'Util/util';
 
 import {buttonStyles, iconStyles, textStyles} from './CellsTableRowOptions.styles';
 
-import {CellFile} from '../../../common/cellFile/cellFile';
+import {CellItem} from '../../../common/cellFile/cellFile';
 import {useCellsFilePreviewModal} from '../../common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
 import {showShareFileModal} from '../CellsShareFileModal/CellsShareFileModal';
 
 interface CellsTableRowOptionsProps {
-  file: CellFile;
+  file: CellItem;
   onDelete: (uuid: string) => void;
   cellsRepository: CellsRepository;
 }
@@ -62,7 +62,7 @@ export const CellsTableRowOptions = ({file, onDelete, cellsRepository}: CellsTab
     const downloadLabel = t('cellsGlobalView.optionDownload');
     const deleteLabel = t('cellsGlobalView.optionDelete');
 
-    const fileUrl = file.fileUrl;
+    const fileUrl = file.type === 'file' ? file.fileUrl : undefined;
 
     showContextMenu({
       event,
@@ -71,7 +71,7 @@ export const CellsTableRowOptions = ({file, onDelete, cellsRepository}: CellsTab
           label: shareLabel,
           click: () => showShareFileModal({uuid: file.id, cellsRepository}),
         },
-        {label: openLabel, click: () => handleOpenFile(file)},
+        {label: openLabel, click: () => file.type === 'file' && handleOpenFile(file)},
         fileUrl ? {label: downloadLabel, click: () => forcedDownloadFile({url: fileUrl, name: file.name})} : undefined,
         {label: deleteLabel, click: () => showDeleteFileModal({uuid: file.id, name: file.name})},
       ].filter(Boolean) as ContextMenuEntry[],
