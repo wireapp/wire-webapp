@@ -51,7 +51,7 @@ export type ConversationTableEntry = zod.infer<typeof ConversationTableEntrySche
 export const UserTableEntrySchema = zod.object({
   handle: zod.string().optional(),
   id: zod.string(),
-  name: zod.string().optional(),
+  name: zod.string().optional().nullable(),
   qualified_id: zod
     .object({
       domain: zod.string(),
@@ -71,7 +71,7 @@ export const EventTableEntrySchema = zod.object({
   category: zod.number().int().optional(),
   conversation: zod.string().min(1, 'Conversation is required'),
   data: zod.any(),
-  from: zod.string().optional(),
+  from: zod.string().optional().nullable(),
   from_client_id: zod.string().optional(),
   id: zod.string().optional(),
   primary_key: zod.number().int().positive('Primary key must be a positive integer'),
