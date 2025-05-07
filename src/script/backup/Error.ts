@@ -17,9 +17,26 @@
  *
  */
 
+export enum ErrorType {
+  ExportError = 'ExportError',
+  CancelError = 'CancelError',
+  ImportError = 'ImportError',
+  InvalidMetaDataError = 'InvalidMetaDataError',
+  DifferentAccountError = 'DifferentAccountError',
+  IncompatibleBackupError = 'IncompatibleBackupError',
+  IncompatibleBackupFormatError = 'IncompatibleBackupFormatError',
+  IncompatiblePlatformError = 'IncompatiblePlatformError',
+  InvalidPassword = 'InvalidPassword',
+}
+
+export const isErrorOfType = (error: unknown, type: ErrorType): boolean => {
+  return error instanceof Error && error.name === type;
+};
+
 export class ExportError extends Error {
   constructor(message = 'Something went wrong.') {
     super(message);
+    super.name = ErrorType.ExportError;
     Object.setPrototypeOf(this, ExportError.prototype);
   }
 }
@@ -27,6 +44,7 @@ export class ExportError extends Error {
 export class CancelError extends Error {
   constructor(message = 'Action was cancelled') {
     super(message);
+    super.name = ErrorType.CancelError;
     Object.setPrototypeOf(this, CancelError.prototype);
   }
 }
@@ -34,6 +52,7 @@ export class CancelError extends Error {
 export class ImportError extends Error {
   constructor(message = 'Something went wrong.') {
     super(message);
+    super.name = ErrorType.ImportError;
     Object.setPrototypeOf(this, ImportError.prototype);
   }
 }
@@ -41,6 +60,7 @@ export class ImportError extends Error {
 export class InvalidMetaDataError extends ImportError {
   constructor(message = 'Meta data file is corrupt or missing properties.') {
     super(message);
+    super.name = ErrorType.InvalidMetaDataError;
     Object.setPrototypeOf(this, InvalidMetaDataError.prototype);
   }
 }
@@ -48,6 +68,7 @@ export class InvalidMetaDataError extends ImportError {
 export class DifferentAccountError extends ImportError {
   constructor(message = 'You cannot restore history from a different account.') {
     super(message);
+    super.name = ErrorType.DifferentAccountError;
     Object.setPrototypeOf(this, DifferentAccountError.prototype);
   }
 }
@@ -55,6 +76,7 @@ export class DifferentAccountError extends ImportError {
 export class IncompatibleBackupError extends ImportError {
   constructor(message = 'Backup created by incompatible database version') {
     super(message);
+    super.name = ErrorType.IncompatibleBackupError;
     Object.setPrototypeOf(this, IncompatibleBackupError.prototype);
   }
 }
@@ -62,6 +84,7 @@ export class IncompatibleBackupError extends ImportError {
 export class IncompatibleBackupFormatError extends ImportError {
   constructor(message = 'The provided backup format is not supported') {
     super(message);
+    super.name = ErrorType.IncompatibleBackupFormatError;
     Object.setPrototypeOf(this, IncompatibleBackupFormatError.prototype);
   }
 }
@@ -69,6 +92,7 @@ export class IncompatibleBackupFormatError extends ImportError {
 export class IncompatiblePlatformError extends ImportError {
   constructor(message = 'Backup created by incompatible platform') {
     super(message);
+    super.name = ErrorType.IncompatiblePlatformError;
     Object.setPrototypeOf(this, IncompatiblePlatformError.prototype);
   }
 }
@@ -76,6 +100,7 @@ export class IncompatiblePlatformError extends ImportError {
 export class InvalidPassword extends ImportError {
   constructor(message = 'Wrong Password') {
     super(message);
+    super.name = ErrorType.InvalidPassword;
     Object.setPrototypeOf(this, InvalidPassword.prototype);
   }
 }
