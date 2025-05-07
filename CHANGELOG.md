@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.50.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.49.0...@wireapp/api-client@27.50.0) (2025-05-07)
+
+### Features
+
+* **api-client/cells:** remove type filter from search [WPB-17388] ([#7041](https://github.com/wireapp/wire-web-packages/issues/7041)) ([bade74a](https://github.com/wireapp/wire-web-packages/commit/bade74a3e7aa68e72a537f881f7bf2863f7793de))
+
 # [27.49.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.48.0...@wireapp/api-client@27.49.0) (2025-05-05)
 
 ### Features
