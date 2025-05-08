@@ -355,6 +355,7 @@
   "callingRestrictedConferenceCallTeamMemberModalTitle": "Возможность недоступна",
   "cameraStatusOff": "отключена",
   "cameraStatusOn": "включена",
+  "cellsFolderBreadcrumbCombained": "Show more",
   "cellsGlobalView.deleteModalDescription": "Это навсегда удалит файл {name} для всех участников.",
   "cellsGlobalView.deleteModalError": "Что-то пошло не так. Повторите попытку позже и обновите список.",
   "cellsGlobalView.deleteModalHeading": "Удалить файл",
