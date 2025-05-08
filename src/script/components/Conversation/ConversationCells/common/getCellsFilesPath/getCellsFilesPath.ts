@@ -17,39 +17,17 @@
  *
  */
 
-export interface CellFile {
-  id: string;
-  type: 'file';
-  mimeType?: string;
-  name: string;
-  sizeMb: string;
-  extension: string;
-  previewImageUrl?: string;
-  previewPdfUrl?: string;
-  uploadedAtTimestamp: number;
-  owner: string;
-  conversationName: string;
-  publicLink?: {
-    alreadyShared: boolean;
-    uuid?: string;
-    url?: string;
-  };
-  fileUrl?: string;
-}
+const MIN_PARTS_LENGTH = 2;
 
-export interface CellFolder {
-  id: string;
-  type: 'folder';
-  mimeType?: string;
-  name: string;
-  sizeMb: string;
-  uploadedAtTimestamp: number;
-  owner: string;
-  publicLink?: {
-    alreadyShared: boolean;
-    uuid?: string;
-    url?: string;
-  };
-}
+export const getCellsFilesPath = () => {
+  const hash = window.location.hash.replace('#', '');
 
-export type CellItem = CellFile | CellFolder;
+  const parts = hash.split('/files/');
+  const hasFilesPath = parts.length >= MIN_PARTS_LENGTH;
+
+  if (!hasFilesPath) {
+    return '';
+  }
+
+  return decodeURIComponent(parts[1]);
+};

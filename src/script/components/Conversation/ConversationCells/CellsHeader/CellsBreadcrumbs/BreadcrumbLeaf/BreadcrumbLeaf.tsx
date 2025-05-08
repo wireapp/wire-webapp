@@ -17,39 +17,14 @@
  *
  */
 
-export interface CellFile {
-  id: string;
-  type: 'file';
-  mimeType?: string;
-  name: string;
-  sizeMb: string;
-  extension: string;
-  previewImageUrl?: string;
-  previewPdfUrl?: string;
-  uploadedAtTimestamp: number;
-  owner: string;
-  conversationName: string;
-  publicLink?: {
-    alreadyShared: boolean;
-    uuid?: string;
-    url?: string;
-  };
-  fileUrl?: string;
-}
+import {ChevronUpIcon} from '@wireapp/react-ui-kit';
 
-export interface CellFolder {
-  id: string;
-  type: 'folder';
-  mimeType?: string;
-  name: string;
-  sizeMb: string;
-  uploadedAtTimestamp: number;
-  owner: string;
-  publicLink?: {
-    alreadyShared: boolean;
-    uuid?: string;
-    url?: string;
-  };
-}
+import {iconStyles} from './BreadcrumbLeaf.styles';
 
-export type CellItem = CellFile | CellFolder;
+export const BreadcrumbLeaf = () => {
+  return (
+    <li aria-hidden="true">
+      <ChevronUpIcon css={iconStyles} width={12} height={12} />
+    </li>
+  );
+};

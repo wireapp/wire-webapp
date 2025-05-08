@@ -17,28 +17,25 @@
  *
  */
 
-import {useCallback, useState} from 'react';
+import {MouseEvent as ReactMouseEvent} from 'react';
 
-import {CellItem} from '../common/cellFile/cellFile';
+import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-interface UseCellsLoaderSizeProps {
-  files: CellItem[];
+import {generateConversationUrl} from 'src/script/router/routeGenerator';
+import {createNavigate} from 'src/script/router/routerBindings';
+
+interface OpenBreadcrumbParams {
+  conversationQualifiedId: QualifiedId;
+  path: string;
+  event?: ReactMouseEvent<Element, MouseEvent>;
 }
 
-export const useCellsLoaderSize = ({files}: UseCellsLoaderSizeProps) => {
-  const [loaderHeight, setLoaderHeight] = useState<number | undefined>(() => {
-    if (files) {
-      return undefined;
-    }
-    return 0;
-  });
-
-  const updateHeight = useCallback((height: number) => {
-    setLoaderHeight(height);
-  }, []);
-
-  return {
-    loaderHeight,
-    updateHeight,
-  };
+export const openBreadcrumb = ({conversationQualifiedId, path, event}: OpenBreadcrumbParams) => {
+  createNavigate(
+    generateConversationUrl({
+      id: conversationQualifiedId.id,
+      domain: conversationQualifiedId.domain,
+      filePath: path ? `files/${encodeURIComponent(path)}` : 'files',
+    }),
+  )(event);
 };

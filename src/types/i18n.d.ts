@@ -407,6 +407,7 @@ declare module 'I18n/en-US.json' {
     'cellsSidebar.title': `All`;
     'cellsUnavailableFile': `File not available`;
     'cellsUnavailableFilePreview': `Couldn\'t generate preview`;
+    'cellsFolderBreadcrumbCombained': `Show more`;
     'channelConversationFeature1': `[bold]Public[/bold] or [bold]private[/bold] channels`;
     'channelConversationFeature2': `[bold]Conversation history[/bold]`;
     'channelCreationPreferencesPlaceholder': `Channel name`;

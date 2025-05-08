@@ -18,8 +18,8 @@
  */
 
 import {createColumnHelper} from '@tanstack/react-table';
+import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {CellFile} from 'Components/CellsGlobalView/common/cellFile/cellFile';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
 
@@ -29,20 +29,22 @@ import {CellsTableNameColumn} from './CellsTableNameColumn/CellsTableNameColumn'
 import {CellsTableRowOptions} from './CellsTableRowOptions/CellsTableRowOptions';
 import {CellsTableSharedColumn} from './CellsTableSharedColumn/CellsTableSharedColumn';
 
-const columnHelper = createColumnHelper<CellFile>();
+import {CellItem} from '../../common/cellFile/cellFile';
+
+const columnHelper = createColumnHelper<CellItem>();
 
 export const getCellsTableColumns = ({
   cellsRepository,
-  conversationId,
+  conversationQualifiedId,
   onDeleteFile,
 }: {
   cellsRepository: CellsRepository;
-  conversationId: string;
+  conversationQualifiedId: QualifiedId;
   onDeleteFile: (uuid: string) => void;
 }) => [
   columnHelper.accessor('name', {
     header: t('cellsGlobalView.tableRowName'),
-    cell: info => <CellsTableNameColumn file={info.row.original} />,
+    cell: info => <CellsTableNameColumn file={info.row.original} conversationQualifiedId={conversationQualifiedId} />,
   }),
   columnHelper.accessor('owner', {
     header: t('cellsGlobalView.tableRowOwner'),
@@ -73,7 +75,7 @@ export const getCellsTableColumns = ({
           file={info.row.original}
           onDelete={uuid => onDeleteFile(uuid)}
           cellsRepository={cellsRepository}
-          conversationId={conversationId}
+          conversationQualifiedId={conversationQualifiedId}
         />
       );
     },

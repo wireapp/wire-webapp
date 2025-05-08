@@ -17,39 +17,20 @@
  *
  */
 
-export interface CellFile {
-  id: string;
-  type: 'file';
-  mimeType?: string;
-  name: string;
-  sizeMb: string;
-  extension: string;
-  previewImageUrl?: string;
-  previewPdfUrl?: string;
-  uploadedAtTimestamp: number;
-  owner: string;
-  conversationName: string;
-  publicLink?: {
-    alreadyShared: boolean;
-    uuid?: string;
-    url?: string;
-  };
-  fileUrl?: string;
-}
+import {getCellsFilesPath} from '../../../common/getCellsFilesPath/getCellsFilesPath';
 
-export interface CellFolder {
-  id: string;
-  type: 'folder';
-  mimeType?: string;
-  name: string;
-  sizeMb: string;
-  uploadedAtTimestamp: number;
-  owner: string;
-  publicLink?: {
-    alreadyShared: boolean;
-    uuid?: string;
-    url?: string;
-  };
-}
+export const getBreadcrumbsFromUrl = ({baseCrumb}: {baseCrumb: string}) => {
+  const currentPath = getCellsFilesPath();
+  const segments = currentPath.split('/').filter(Boolean);
 
-export type CellItem = CellFile | CellFolder;
+  return [
+    {
+      name: baseCrumb,
+      path: '',
+    },
+    ...segments.map((segment, index) => ({
+      name: segment,
+      path: segments.slice(0, index + 1).join('/'),
+    })),
+  ];
+};

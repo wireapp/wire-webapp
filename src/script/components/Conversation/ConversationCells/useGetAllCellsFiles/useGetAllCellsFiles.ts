@@ -26,6 +26,7 @@ import {Config} from 'src/script/Config';
 
 import {transformNodesToCellsFiles, transformToCellPagination} from './transformNodesToCellsFiles';
 
+import {getCellsFilesPath} from '../common/getCellsFilesPath/getCellsFilesPath';
 import {useCellsStore} from '../common/useCellsStore/useCellsStore';
 
 interface UseGetAllCellsFilesProps {
@@ -35,7 +36,6 @@ interface UseGetAllCellsFilesProps {
 
 export const useGetAllCellsFiles = ({cellsRepository, conversationQualifiedId}: UseGetAllCellsFilesProps) => {
   const {setFiles, pageSize, setStatus, setPagination, setError} = useCellsStore();
-
   const [offset, setOffset] = useState(0);
 
   const {domain, id} = conversationQualifiedId;
@@ -48,8 +48,10 @@ export const useGetAllCellsFiles = ({cellsRepository, conversationQualifiedId}: 
       // TODO: remove this once we have a proper way to handle the domain per env
       const domainPerEnv = process.env.NODE_ENV === 'development' ? Config.getConfig().CELLS_WIRE_DOMAIN : domain;
 
+      const currentPath = getCellsFilesPath();
+
       const result = await cellsRepository.getAllFiles({
-        path: `${id}@${domainPerEnv}`,
+        path: `${id}@${domainPerEnv}${currentPath ? `/${currentPath}` : ''}`,
         limit: pageSize,
         offset,
       });
@@ -75,11 +77,21 @@ export const useGetAllCellsFiles = ({cellsRepository, conversationQualifiedId}: 
     }
     // cellsRepository is not a dependency because it's a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setFiles, setStatus, setError, id, domain, offset, pageSize]);
+  }, [setFiles, setStatus, setError, id, domain, offset, pageSize, setPagination]);
+
+  const handleHashChange = useCallback(() => {
+    setOffset(0);
+    void fetchFiles();
+  }, [fetchFiles, setOffset]);
 
   useEffect(() => {
     void fetchFiles();
   }, [fetchFiles]);
+
+  useEffect(() => {
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, [handleHashChange]);
 
   return {
     refresh: fetchFiles,

@@ -23,33 +23,49 @@ import {CellPagination} from 'Components/Conversation/ConversationCells/common/c
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {formatBytes, getFileExtension} from 'Util/util';
 
-import {CellFile} from '../common/cellFile/cellFile';
+import {CellItem} from '../common/cellFile/cellFile';
 
-export const transformNodesToCellsFiles = (nodes: RestNode[]): CellFile[] => {
-  return (
-    nodes
-      .filter(node => node.Type === 'LEAF')
-      .map(node => ({
-        id: node.Uuid,
-        owner: getOwner(node),
-        conversationName: node.ContextWorkspace?.Label || '',
-        mimeType: node.ContentType,
-        extension: getFileExtension(node.Path),
-        name: getFileName(node.Path),
-        sizeMb: getFileSize(node),
-        previewImageUrl: getPreviewImageUrl(node),
-        previewPdfUrl: getPreviewPdfUrl(node),
-        uploadedAtTimestamp: getUploadedAtTimestamp(node),
-        fileUrl: node.PreSignedGET?.Url,
-        publicLink: {
-          alreadyShared: !!node.Shares?.[0].Uuid,
-          uuid: node.Shares?.[0].Uuid || '',
-          url: undefined,
-        },
-      }))
-      // eslint-disable-next-line id-length
-      .sort((a, b) => b.uploadedAtTimestamp - a.uploadedAtTimestamp)
-  );
+export const transformNodesToCellsFiles = (nodes: RestNode[]): Array<CellItem> => {
+  return nodes.map(node => {
+    const id = node.Uuid;
+    const owner = getOwner(node);
+    const name = getFileName(node.Path);
+    const sizeMb = getFileSize(node);
+    const uploadedAtTimestamp = getUploadedAtTimestamp(node);
+    const publicLink: CellItem['publicLink'] = {
+      alreadyShared: !!node.Shares?.[0].Uuid,
+      uuid: node.Shares?.[0].Uuid || '',
+      url: undefined,
+    };
+
+    if (node.Type === 'COLLECTION') {
+      return {
+        id,
+        type: 'folder' as const,
+        owner,
+        name,
+        sizeMb,
+        uploadedAtTimestamp,
+        publicLink,
+      };
+    }
+
+    return {
+      id,
+      type: 'file' as const,
+      owner,
+      conversationName: node.ContextWorkspace?.Label || '',
+      mimeType: node.ContentType,
+      extension: getFileExtension(node.Path),
+      name,
+      sizeMb,
+      previewImageUrl: getPreviewImageUrl(node),
+      previewPdfUrl: getPreviewPdfUrl(node),
+      uploadedAtTimestamp,
+      fileUrl: node.PreSignedGET?.Url,
+      publicLink,
+    };
+  });
 };
 
 export const transformToCellPagination = (pagination: RestPagination): CellPagination => {

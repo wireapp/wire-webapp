@@ -17,39 +17,17 @@
  *
  */
 
-export interface CellFile {
-  id: string;
-  type: 'file';
-  mimeType?: string;
-  name: string;
-  sizeMb: string;
-  extension: string;
-  previewImageUrl?: string;
-  previewPdfUrl?: string;
-  uploadedAtTimestamp: number;
-  owner: string;
-  conversationName: string;
-  publicLink?: {
-    alreadyShared: boolean;
-    uuid?: string;
-    url?: string;
-  };
-  fileUrl?: string;
-}
+import {CSSObject} from '@emotion/react';
 
-export interface CellFolder {
-  id: string;
-  type: 'folder';
-  mimeType?: string;
-  name: string;
-  sizeMb: string;
-  uploadedAtTimestamp: number;
-  owner: string;
-  publicLink?: {
-    alreadyShared: boolean;
-    uuid?: string;
-    url?: string;
-  };
-}
+export const buttonStyles: CSSObject = {
+  background: 'none',
+  border: 'none',
+  padding: '0 8px',
+  cursor: 'pointer',
+  fontSize: 'var(--font-size-medium)',
+  color: 'var(--gray-70)',
 
-export type CellItem = CellFile | CellFolder;
+  '&:hover': {
+    color: 'var(--main-color)',
+  },
+};

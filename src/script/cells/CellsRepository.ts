@@ -118,7 +118,13 @@ export class CellsRepository {
     limit?: number;
     offset?: number;
   }) {
-    return this.apiClient.api.cells.getAllFiles({path: path || this.basePath, limit, offset});
+    return this.apiClient.api.cells.getAllFiles({
+      path: path || this.basePath,
+      limit,
+      offset,
+      sortBy: SEARCH_DEFAULT_SORT_FIELD,
+      sortDirection: SEARCH_DEFAULT_SORT_DIR,
+    });
   }
 
   async getFile({uuid}: {uuid: string}) {
