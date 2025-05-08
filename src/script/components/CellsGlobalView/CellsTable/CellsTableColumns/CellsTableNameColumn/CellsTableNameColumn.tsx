@@ -43,26 +43,7 @@ export const CellsTableNameColumn = ({file}: CellsTableNameColumnProps) => {
     <>
       <span css={mobileNameStyles}>{file.name}</span>
       <div css={wrapperStyles}>
-        {shouldDisplayImagePreview ? (
-          <div css={imagePreviewWrapperStyles}>
-            <img src={file.previewImageUrl} alt="" width={24} height={24} css={imagePreviewStyles} />
-            {isVideo && <PlayIcon css={playIconStyles} width={16} height={16} />}
-          </div>
-        ) : file.type === 'file' ? (
-          <FileTypeIcon extension={getFileExtension(name)} size={24} />
-        ) : (
-          <FileTypeIcon extension={getFileExtension(name)} size={24} />
-        )}
-        <button
-          type="button"
-          css={desktopNameStyles}
-          onClick={() => handleOpenFile(file)}
-          aria-controls={id}
-          aria-expanded={!!selectedFile}
-          aria-haspopup="dialog"
-        >
-          {name}
-        </button>
+        {file.type === 'file' ? <FileNameColumn file={file} /> : <FolderNameColumn name={file.name} path={file.path} />}
       </div>
     </>
   );

@@ -22,6 +22,7 @@ import {match} from 'path-to-regexp';
 export type Routes = Record<string, ((...args: any[]) => void) | null>;
 
 const defaultRoute: Routes = {
+  // do nothing if url was not matched
   '*': null,
 };
 
