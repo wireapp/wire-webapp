@@ -21,7 +21,6 @@ export interface CellFile {
   id: string;
   type: 'file';
   url?: string;
-
   path: string;
   mimeType?: string;
   name: string;
