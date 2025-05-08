@@ -38,11 +38,13 @@ export const transformCellsFiles = (nodes: RestNode[]): CellItem[] => {
     };
     const conversationName = node.ContextWorkspace?.Label || '';
     const path = node.Path;
+    const url = node.PreSignedGET?.Url;
 
     if (node.Type === 'COLLECTION') {
       return {
         id,
         type: 'folder' as const,
+        url,
         path,
         owner,
         conversationName,
@@ -56,6 +58,7 @@ export const transformCellsFiles = (nodes: RestNode[]): CellItem[] => {
     return {
       id,
       type: 'file' as const,
+      url,
       path,
       owner,
       conversationName,
@@ -66,7 +69,6 @@ export const transformCellsFiles = (nodes: RestNode[]): CellItem[] => {
       previewImageUrl: getPreviewImageUrl(node),
       previewPdfUrl: getPreviewPdfUrl(node),
       uploadedAtTimestamp,
-      fileUrl: node.PreSignedGET?.Url,
       publicLink,
     };
   });

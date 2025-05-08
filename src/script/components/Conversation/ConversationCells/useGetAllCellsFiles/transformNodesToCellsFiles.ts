@@ -37,11 +37,13 @@ export const transformNodesToCellsFiles = (nodes: RestNode[]): Array<CellItem> =
       uuid: node.Shares?.[0].Uuid || '',
       url: undefined,
     };
+    const url = node.PreSignedGET?.Url;
 
     if (node.Type === 'COLLECTION') {
       return {
         id,
         type: 'folder' as const,
+        url,
         owner,
         name,
         sizeMb,
@@ -53,6 +55,7 @@ export const transformNodesToCellsFiles = (nodes: RestNode[]): Array<CellItem> =
     return {
       id,
       type: 'file' as const,
+      url,
       owner,
       conversationName: node.ContextWorkspace?.Label || '',
       mimeType: node.ContentType,
@@ -62,7 +65,6 @@ export const transformNodesToCellsFiles = (nodes: RestNode[]): Array<CellItem> =
       previewImageUrl: getPreviewImageUrl(node),
       previewPdfUrl: getPreviewPdfUrl(node),
       uploadedAtTimestamp,
-      fileUrl: node.PreSignedGET?.Url,
       publicLink,
     };
   });
