@@ -29,13 +29,13 @@ export const CellsFilePreviewModal = () => {
     return null;
   }
 
-  const {fileUrl, extension, name, owner, uploadedAtTimestamp, previewPdfUrl, previewImageUrl} = selectedFile;
+  const {url, extension, name, owner, uploadedAtTimestamp, previewPdfUrl, previewImageUrl} = selectedFile;
 
   const getFileUrl = () => {
     const type = getFileTypeFromExtension(extension);
 
     if (['pdf', 'image'].includes(type)) {
-      return fileUrl;
+      return url;
     }
 
     if (['audio', 'video'].includes(type)) {

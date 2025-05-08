@@ -19,9 +19,8 @@
 
 import {FolderIcon, PlayIcon} from '@wireapp/react-ui-kit';
 
+import {openFolder} from 'Components/CellsGlobalView/common/openFolder/openFolder';
 import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
-import {generateConversationUrl} from 'src/script/router/routeGenerator';
-import {createNavigate} from 'src/script/router/routerBindings';
 import {getFileExtension} from 'Util/util';
 
 import {
@@ -35,7 +34,6 @@ import {
 
 import {CellFile, CellItem} from '../../../common/cellFile/cellFile';
 import {useCellsFilePreviewModal} from '../../common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
-
 interface CellsTableNameColumnProps {
   file: CellItem;
 }
@@ -105,26 +103,10 @@ const FileNameColumn = ({file}: {file: CellFile}) => {
 };
 
 const FolderNameColumn = ({name, path}: {name: string; path: string}) => {
-  const [idWithDomain, ...filePathParts] = path.split('/');
-  const [id, domain] = idWithDomain.split('@');
-  const filePath = `files/${filePathParts.join('/')}`;
-
   return (
     <>
       <FolderIcon width={24} height={24} />
-      <button
-        type="button"
-        css={desktopNameStyles}
-        onClick={event => {
-          createNavigate(
-            generateConversationUrl({
-              id,
-              domain: 'staging.zinfra.io',
-              filePath,
-            }),
-          )(event);
-        }}
-      >
+      <button type="button" css={desktopNameStyles} onClick={event => openFolder({path, event})}>
         {name}
       </button>
     </>
