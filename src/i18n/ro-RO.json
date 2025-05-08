@@ -355,6 +355,7 @@
   "callingRestrictedConferenceCallTeamMemberModalTitle": "Feature unavailable",
   "cameraStatusOff": "off",
   "cameraStatusOn": "on",
+  "cellsFolderBreadcrumbCombained": "Show more",
   "cellsGlobalView.deleteModalDescription": "This will permanently delete the file {name} for all participants.",
   "cellsGlobalView.deleteModalError": "Something went wrong, please try again later and refresh the list.",
   "cellsGlobalView.deleteModalHeading": "Delete file",
