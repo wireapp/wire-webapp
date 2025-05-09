@@ -18,7 +18,9 @@
  */
 
 // Polyfill for "tsyringe" dependency injection
+
 // eslint-disable-next-line import/order
+//import '@wireapp/core-crypto';
 
 import {Context} from '@wireapp/api-client/lib/auth';
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
@@ -520,6 +522,7 @@ export class App {
       if (this.core.hasMLSDevice) {
         //if mls is supported, we need to initialize the callbacks (they are used when decrypting messages)
         conversationRepository.initMLSConversationRecoveredListener();
+        conversationRepository.initMLSEventDistributedListener();
         conversationRepository.registerMLSConversationVerificationStateHandler(
           selfUser.qualifiedId.domain,
           this.updateConversationE2EIVerificationState,
