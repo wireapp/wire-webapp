@@ -19,6 +19,12 @@
 
 import {CSSObject} from '@emotion/react';
 
+import {WIDTH} from '@wireapp/react-ui-kit';
+
+const breakpoints = [WIDTH.TABLET_MAX, WIDTH.DESKTOP_MAX];
+
+const [mediaQueryTablet, mediaQueryDesktop] = breakpoints.map(bp => `@media (max-width: ${bp}px)`);
+
 export const styles: {
   container: CSSObject;
   button: CSSObject;
@@ -42,6 +48,9 @@ export const styles: {
     margin: 'auto',
     marginBottom: '10vw',
     flexDirection: 'column',
+    [mediaQueryTablet]: {
+      padding: '18px',
+    },
   },
   button: {
     position: 'absolute',
@@ -74,6 +83,10 @@ export const styles: {
   },
   optionWrapper: {
     gap: '3%',
+    [mediaQueryDesktop]: {
+      display: 'block',
+      width: '100%',
+    },
   },
   optionContainer: {
     padding: '24px',
@@ -82,6 +95,9 @@ export const styles: {
     flex: 1,
     height: 360,
     position: 'relative',
+    [mediaQueryDesktop]: {
+      margin: '16px 0',
+    },
   },
   optionFeatureContainer: {
     gap: '8px',

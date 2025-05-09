@@ -17,9 +17,7 @@
  *
  */
 
-import React from 'react';
-
-import {Navigate, useNavigate} from 'react-router-dom';
+import {Navigate, useLocation, useNavigate} from 'react-router-dom';
 
 import {ArrowIcon, Button, ButtonVariant, CheckRoundIcon, COLOR, FlexBox} from '@wireapp/react-ui-kit';
 
@@ -33,11 +31,11 @@ import {RouterLink} from '../component/RouterLink';
 import {ROUTE} from '../route';
 import {getEnterpriseLoginV2FF} from '../util/helpers';
 import {pathWithParams} from '../util/urlUtil';
-type Props = React.HTMLProps<HTMLDivElement>;
 
-export const SetAccountType = ({}: Props) => {
+export const SetAccountType = () => {
   const isEnterpriseLoginV2Enabled = getEnterpriseLoginV2FF();
   const navigate = useNavigate();
+  const {state} = useLocation();
 
   const onCreatePersonalAccount = () => {
     navigate(ROUTE.CREATE_ACCOUNT);
@@ -74,7 +72,7 @@ export const SetAccountType = ({}: Props) => {
       <FlexBox css={styles.container}>
         <FlexBox css={styles.header}>
           <FlexBox>
-            <RouterLink to={ROUTE.INDEX} data-uie-name="go-index" aria-label={t('index.goBack')}>
+            <RouterLink to={ROUTE.LOGIN} state={state} data-uie-name="go-index" aria-label={t('index.goBack')}>
               <ArrowIcon direction="left" color={COLOR.TEXT} />
             </RouterLink>
           </FlexBox>
