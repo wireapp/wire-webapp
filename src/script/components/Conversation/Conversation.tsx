@@ -505,9 +505,18 @@ export const Conversation = ({
 
           {isCellsEnabled && (
             <>
-              <ConversationTabs activeTabIndex={activeTabIndex} onIndexChange={setActiveTabIndex} />
+              <ConversationTabs
+                activeTabIndex={activeTabIndex}
+                onIndexChange={setActiveTabIndex}
+                conversationQualifiedId={activeConversation.qualifiedId}
+              />
               <ConversationTabPanel id="files" isActive={isFileTabActive}>
-                {isFileTabActive && <ConversationCells conversationQualifiedId={activeConversation.qualifiedId} />}
+                {isFileTabActive && (
+                  <ConversationCells
+                    conversationQualifiedId={activeConversation.qualifiedId}
+                    conversationName={activeConversation.name()}
+                  />
+                )}
               </ConversationTabPanel>
             </>
           )}

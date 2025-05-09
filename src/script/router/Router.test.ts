@@ -79,40 +79,17 @@ describe('Router', () => {
   });
 
   describe('setHistoryParam', () => {
-    // Mock window.history.replaceState before each test
-    beforeEach(() => {
-      global.history.replaceState = jest.fn();
+    it('sets the window location hash with the provided path', () => {
+      setHistoryParam('/test-path');
+      expect(window.location.hash).toBe('#/test-path');
     });
 
-    // Restore the original method after each test
-    afterEach(() => {
-      (global.history.replaceState as jest.Mock).mockRestore();
-    });
+    it('handles paths with or without leading slash', () => {
+      setHistoryParam('test-path');
+      expect(window.location.hash).toBe('#test-path');
 
-    it('uses history.state if it is not empty and stateObj is not provided', () => {
-      const mockState = {eventKey: 'Enter'};
-      Object.defineProperty(window.history, 'state', {value: mockState, writable: true});
-
-      setHistoryParam('/path');
-      expect(global.history.replaceState).toHaveBeenCalledWith(mockState, '', '#/path');
-    });
-
-    it('uses stateObj even if history.state is not empty', () => {
-      const mockState = {eventKey: 'Tab'};
-      Object.defineProperty(window.history, 'state', {value: mockState, writable: true});
-
-      const newStateObj = {newState: 'state'};
-      setHistoryParam('/path', newStateObj);
-      expect(global.history.replaceState).toHaveBeenCalledWith(newStateObj, '', '#/path');
-    });
-
-    it('explicitely resetting the state is allowed', () => {
-      const mockState = {eventKey: 'Tab'};
-      Object.defineProperty(window.history, 'state', {value: mockState, writable: true});
-
-      const newStateObj = {};
-      setHistoryParam('/path', newStateObj);
-      expect(global.history.replaceState).toHaveBeenCalledWith(newStateObj, '', '#/path');
+      setHistoryParam('/test-path');
+      expect(window.location.hash).toBe('#/test-path');
     });
   });
 });

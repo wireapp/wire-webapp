@@ -54,6 +54,7 @@ interface ShowConversationOptions {
   exposeMessage?: Message;
   openFirstSelfMention?: boolean;
   openNotificationSettings?: boolean;
+  filePath?: string;
 }
 
 interface ShowConversationOverload {
@@ -152,7 +153,7 @@ export class ContentViewModel {
 
   private handleMissingConversation(): void {
     this.closeRightSidebar();
-    setHistoryParam('/', history.state);
+    setHistoryParam('/');
     return this.switchContent(ContentState.CONNECTION_REQUESTS);
   }
 
@@ -186,14 +187,19 @@ export class ContentViewModel {
 
     this.mainViewModel.list.openConversations(conversationEntity.archivedState());
   }
-  private showAndNavigate(conversationEntity: Conversation, openNotificationSettings: boolean): void {
+
+  private showAndNavigate(
+    conversationEntity: Conversation,
+    openNotificationSettings: boolean,
+    filePath?: string,
+  ): void {
     const {rightSidebar} = useAppMainState.getState();
     this.showContent(ContentState.CONVERSATION);
     this.previousConversation = this.conversationState.activeConversation();
     setHistoryParam(
-      generateConversationUrl({id: conversationEntity?.id ?? '', domain: conversationEntity?.domain ?? ''}),
-      history.state,
+      generateConversationUrl({id: conversationEntity?.id ?? '', domain: conversationEntity?.domain ?? '', filePath}),
     );
+
     if (openNotificationSettings) {
       rightSidebar.goTo(PanelState.NOTIFICATIONS, {entity: this.conversationState.activeConversation() ?? null});
     }
@@ -233,6 +239,7 @@ export class ContentViewModel {
       exposeMessage: exposeMessageEntity,
       openFirstSelfMention = false,
       openNotificationSettings = false,
+      filePath,
     } = options || {};
 
     if (!conversation) {
@@ -266,7 +273,7 @@ export class ContentViewModel {
       void this.conversationRepository.refreshMLSConversationVerificationState(conversationEntity);
       const messageEntity = openFirstSelfMention ? conversationEntity.getFirstUnreadSelfMention() : exposeMessageEntity;
       this.changeConversation(conversationEntity, messageEntity);
-      this.showAndNavigate(conversationEntity, openNotificationSettings);
+      this.showAndNavigate(conversationEntity, openNotificationSettings, filePath);
     } catch (error: any) {
       if (this.isConversationNotFoundError(error)) {
         return this.showConversationNotFoundErrorModal();
