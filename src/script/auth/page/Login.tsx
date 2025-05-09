@@ -537,7 +537,7 @@ const LoginComponent = ({
                             variant={ButtonVariant.SECONDARY}
                             onClick={async () => {
                               await resetAuthError();
-                              navigate(ROUTE.SET_ACCOUNT_TYPE);
+                              navigate(ROUTE.SET_ACCOUNT_TYPE, {state});
                             }}
                             data-uie-name="go-create-account"
                           >
