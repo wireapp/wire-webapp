@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.51.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.50.0...@wireapp/api-client@27.51.0) (2025-05-09)
+
+### Features
+
+* **api-client/cells:** createFile & createFolder [WPB-17571] ([#7042](https://github.com/wireapp/wire-web-packages/issues/7042)) ([33f2323](https://github.com/wireapp/wire-web-packages/commit/33f232346a0fa24892744a19c3c597e5c4f3ab55))
+
 # [27.50.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.49.0...@wireapp/api-client@27.50.0) (2025-05-07)
 
 ### Features
