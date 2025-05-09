@@ -22,6 +22,8 @@ import {useLayoutEffect, useRef} from 'react';
 import {SerializedStyles, css} from '@emotion/react';
 
 import {useRelativeTimestamp} from 'src/script/hooks/useRelativeTimestamp';
+import {t} from 'Util/LocalizerUtil';
+import {formatLocale, isToday, isYesterday} from 'Util/TimeUtil';
 
 import {dayMarkerStyle, baseMarkerStyle} from './Marker.styles';
 
@@ -33,8 +35,32 @@ const markerStyles: Partial<Record<Marker['type'], SerializedStyles>> = {
   day: dayMarkerStyle,
 };
 
+/**
+  If today: “Today”
+  If yesterday: “Yesterday”
+  Any other day: <Week day>, <date> (e.g. “Monday, April 12” or “Friday, January 6 2023”)
+*/
+function getMessagesGroupLabel(ts: number): string {
+  const date = new Date(ts);
+
+  if (isToday(date)) {
+    return t('conversationToday');
+  }
+
+  if (isYesterday(date)) {
+    return t('conversationYesterday');
+  }
+
+  const today = new Date();
+  const isCurrentYear = date.getFullYear() === today.getFullYear();
+  const pattern = isCurrentYear ? 'EEEE, MMMM d' : 'EEEE, MMMM d yyyy';
+
+  return formatLocale(date, pattern);
+}
+
 export function MarkerComponent({marker, scrollTo}: {marker: Marker; scrollTo: ScrollToElement}) {
-  const timeAgo = useRelativeTimestamp(marker.timestamp, marker.type === 'day');
+  const isDay = marker.type === 'day';
+  const timeAgo = useRelativeTimestamp(marker.timestamp, isDay, isDay ? getMessagesGroupLabel : undefined);
   const elementRef = useRef<HTMLDivElement>(null);
 
   const style = css`

@@ -17,17 +17,23 @@
  *
  */
 
+import {QualifiedId} from '@wireapp/api-client/lib/user/';
+
+import {CellsBreadcrumbs} from './CellsBreadcrumbs/CellsBreadcrumbs';
 import {contentStyles, wrapperStyles} from './CellsHeader.styles';
 import {CellsRefresh} from './CellsRefresh/CellsRefresh';
 
 interface CellsHeaderProps {
   onRefresh: () => void;
+  conversationName: string;
+  conversationQualifiedId: QualifiedId;
 }
 
-export const CellsHeader = ({onRefresh}: CellsHeaderProps) => {
+export const CellsHeader = ({onRefresh, conversationQualifiedId, conversationName}: CellsHeaderProps) => {
   return (
     <div css={wrapperStyles}>
       <div css={contentStyles}>
+        <CellsBreadcrumbs conversationQualifiedId={conversationQualifiedId} conversationName={conversationName} />
         <CellsRefresh onRefresh={onRefresh} />
       </div>
     </div>
