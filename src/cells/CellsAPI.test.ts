@@ -1074,6 +1074,174 @@ describe('CellsAPI', () => {
       expect(result).toEqual(mockResponse);
     });
   });
+
+  describe('createFile', () => {
+    it('creates a file with the correct parameters and returns the response', async () => {
+      const path = '/test.txt';
+      const uuid = 'file-uuid';
+      const versionId = 'version-uuid';
+      const mockResponse = {
+        Nodes: [
+          {
+            Path: path,
+            Uuid: uuid,
+            Type: 'LEAF',
+          },
+        ],
+      } as RestNodeCollection;
+
+      mockNodeServiceApi.create.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      const result = await cellsAPI.createFile({path, uuid, versionId});
+
+      expect(mockNodeServiceApi.create).toHaveBeenCalledWith({
+        Inputs: [
+          {
+            Type: 'LEAF',
+            Locator: {Path: path.normalize('NFC')},
+            ResourceUuid: uuid,
+            VersionId: versionId,
+          },
+        ],
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('propagates errors when file creation fails', async () => {
+      const path = '/test.txt';
+      const uuid = 'file-uuid';
+      const versionId = 'version-uuid';
+      const errorMessage = 'File creation failed';
+
+      mockNodeServiceApi.create.mockRejectedValueOnce(new Error(errorMessage));
+
+      await expect(cellsAPI.createFile({path, uuid, versionId})).rejects.toThrow(errorMessage);
+    });
+
+    it('handles empty path and returns the response', async () => {
+      const path = '';
+      const uuid = 'file-uuid';
+      const versionId = 'version-uuid';
+      const mockResponse = {
+        Nodes: [
+          {
+            Path: path,
+            Uuid: uuid,
+            Type: 'LEAF',
+          },
+        ],
+      } as RestNodeCollection;
+
+      mockNodeServiceApi.create.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      const result = await cellsAPI.createFile({path, uuid, versionId});
+
+      expect(mockNodeServiceApi.create).toHaveBeenCalledWith({
+        Inputs: [
+          {
+            Type: 'LEAF',
+            Locator: {Path: path.normalize('NFC')},
+            ResourceUuid: uuid,
+            VersionId: versionId,
+          },
+        ],
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('handles empty UUID', async () => {
+      const path = '/test.txt';
+      const uuid = '';
+      const versionId = 'version-uuid';
+      const errorMessage = 'Invalid UUID';
+
+      mockNodeServiceApi.create.mockRejectedValueOnce(new Error(errorMessage));
+
+      await expect(cellsAPI.createFile({path, uuid, versionId})).rejects.toThrow(errorMessage);
+    });
+  });
+
+  describe('createFolder', () => {
+    it('creates a folder with the correct parameters and returns the response', async () => {
+      const path = '/test-folder';
+      const uuid = 'folder-uuid';
+      const mockResponse = {
+        Nodes: [
+          {
+            Path: path,
+            Uuid: uuid,
+            Type: 'COLLECTION',
+          },
+        ],
+      } as RestNodeCollection;
+
+      mockNodeServiceApi.create.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      const result = await cellsAPI.createFolder({path, uuid});
+
+      expect(mockNodeServiceApi.create).toHaveBeenCalledWith({
+        Inputs: [
+          {
+            Type: 'COLLECTION',
+            Locator: {Path: path.normalize('NFC')},
+            ResourceUuid: uuid,
+            VersionId: '',
+          },
+        ],
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('propagates errors when folder creation fails', async () => {
+      const path = '/test-folder';
+      const uuid = 'folder-uuid';
+      const errorMessage = 'Folder creation failed';
+
+      mockNodeServiceApi.create.mockRejectedValueOnce(new Error(errorMessage));
+
+      await expect(cellsAPI.createFolder({path, uuid})).rejects.toThrow(errorMessage);
+    });
+
+    it('handles empty path and returns the response', async () => {
+      const path = '';
+      const uuid = 'folder-uuid';
+      const mockResponse = {
+        Nodes: [
+          {
+            Path: path,
+            Uuid: uuid,
+            Type: 'COLLECTION',
+          },
+        ],
+      } as RestNodeCollection;
+
+      mockNodeServiceApi.create.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      const result = await cellsAPI.createFolder({path, uuid});
+
+      expect(mockNodeServiceApi.create).toHaveBeenCalledWith({
+        Inputs: [
+          {
+            Type: 'COLLECTION',
+            Locator: {Path: path.normalize('NFC')},
+            ResourceUuid: uuid,
+            VersionId: '',
+          },
+        ],
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('handles empty UUID', async () => {
+      const path = '/test-folder';
+      const uuid = '';
+      const errorMessage = 'Invalid UUID';
+
+      mockNodeServiceApi.create.mockRejectedValueOnce(new Error(errorMessage));
+
+      await expect(cellsAPI.createFolder({path, uuid})).rejects.toThrow(errorMessage);
+    });
+  });
 });
 
 const TEST_FILE_NAME = 'test.txt';

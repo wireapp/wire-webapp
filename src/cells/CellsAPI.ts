@@ -29,6 +29,8 @@ import {
   RestPublicLinkDeleteSuccess,
   RestShareLink,
   RestVersion,
+  RestIncomingNode,
+  RestNodeLocator,
 } from 'cells-sdk-ts';
 
 import {CellsStorage} from './CellsStorage/CellsStorage';
@@ -304,6 +306,66 @@ export class CellsAPI {
     const result = await this.client.lookup(request);
 
     return result.data;
+  }
+
+  private async createNode({
+    path,
+    uuid,
+    type,
+    versionId = '',
+  }: {
+    path: NonNullable<RestNodeLocator['Path']>;
+    uuid: NonNullable<RestIncomingNode['ResourceUuid']>;
+    type: RestIncomingNode['Type'];
+    versionId?: RestIncomingNode['VersionId'];
+  }): Promise<RestNodeCollection> {
+    if (!this.client || !this.storageService) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    const response = await this.client.create({
+      Inputs: [
+        {
+          Type: type,
+          Locator: {Path: path.normalize('NFC')},
+          ResourceUuid: uuid,
+          VersionId: versionId,
+        },
+      ],
+    });
+
+    return response.data;
+  }
+
+  async createFile({
+    path,
+    uuid,
+    versionId,
+  }: {
+    path: NonNullable<RestNodeLocator['Path']>;
+    uuid: NonNullable<RestIncomingNode['ResourceUuid']>;
+    versionId: NonNullable<RestIncomingNode['VersionId']>;
+  }): Promise<RestNodeCollection> {
+    return this.createNode({
+      path,
+      uuid,
+      type: 'LEAF',
+      versionId,
+    });
+  }
+
+  async createFolder({
+    path,
+    uuid,
+  }: {
+    path: NonNullable<RestNodeLocator['Path']>;
+    uuid: NonNullable<RestIncomingNode['ResourceUuid']>;
+  }): Promise<RestNodeCollection> {
+    return this.createNode({
+      path,
+      uuid,
+      type: 'COLLECTION',
+    });
   }
 
   async deleteFilePublicLink({uuid}: {uuid: string}): Promise<RestPublicLinkDeleteSuccess> {
