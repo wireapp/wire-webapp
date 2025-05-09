@@ -22,6 +22,8 @@ import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTyp
 
 import {useCellsFilePreviewModal} from '../common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
 
+// This component is duplicated across global view and conversation view
+// TODO: Abstract when it starts to grow / feels right
 export const CellsFilePreviewModal = () => {
   const {id, selectedFile, handleCloseFile} = useCellsFilePreviewModal();
 
