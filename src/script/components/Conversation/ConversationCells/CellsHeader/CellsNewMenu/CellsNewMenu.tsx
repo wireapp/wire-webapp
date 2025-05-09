@@ -26,11 +26,13 @@ import {Button, ButtonVariant, PlusIcon} from '@wireapp/react-ui-kit';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {showContextMenu} from 'src/script/ui/ContextMenu';
 import {isSpaceOrEnterKey} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
 import {setContextMenuPosition} from 'Util/util';
 
-import {showNewCellsItemModal} from './CellsNewItemModal/CellsNewItemModal';
+import {CellsNewItemModal} from './CellsNewItemModal/CellsNewItemModal';
 import {buttonStyles, iconStyles} from './CellsNewMenu.styles';
 
+import {CellItem} from '../../common/cellFile/cellFile';
 import {getCellsApiPath} from '../../common/getCellsApiPath/getCellsApiPath';
 
 interface CellsNewMenuProps {
@@ -40,44 +42,29 @@ interface CellsNewMenuProps {
 }
 
 export const CellsNewMenu = ({cellsRepository, conversationQualifiedId, onRefresh}: CellsNewMenuProps) => {
-  const [name, setName] = useState('X folder');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalType, setModalType] = useState<CellItem['type']>('file');
 
   const showOptionsMenu = (event: ReactMouseEvent<HTMLButtonElement> | MouseEvent) => {
     showContextMenu({
       event,
       entries: [
         {
-          label: 'Create folder',
-          click: () =>
-            showNewCellsItemModal({
-              onSubmit: async () => {
-                await cellsRepository.createFolder({
-                  path: getCellsApiPath({conversationQualifiedId}),
-                  name,
-                });
-                onRefresh();
-              },
-              type: 'folder',
-              onChange: setName,
-            }),
+          label: t('cellsNewItemMenu.folder'),
+          click: () => {
+            setModalType('folder');
+            setIsModalOpen(true);
+          },
         },
         {
-          label: 'Create file',
-          click: () =>
-            showNewCellsItemModal({
-              onSubmit: async () => {
-                await cellsRepository.createFile({
-                  path: getCellsApiPath({conversationQualifiedId}),
-                  name,
-                });
-                onRefresh();
-              },
-              type: 'file',
-              onChange: setName,
-            }),
+          label: t('cellsNewItemMenu.file'),
+          click: () => {
+            setModalType('file');
+            setIsModalOpen(true);
+          },
         },
       ],
-      identifier: 'file-preview-error-more-button',
+      identifier: 'cells-new-file-menu',
     });
   };
 
@@ -88,10 +75,43 @@ export const CellsNewMenu = ({cellsRepository, conversationQualifiedId, onRefres
     }
   };
 
+  const handleCreateFolder = async (name: string) => {
+    await cellsRepository.createFolder({
+      path: getCellsApiPath({conversationQualifiedId}),
+      name,
+    });
+    onRefresh();
+  };
+
+  const handleCreateFile = async (name: string) => {
+    await cellsRepository.createFile({
+      path: getCellsApiPath({conversationQualifiedId}),
+      name,
+    });
+    onRefresh();
+  };
+
+  const handleSubmit = async (name: string) => {
+    if (modalType === 'folder') {
+      await handleCreateFolder(name);
+    } else {
+      await handleCreateFile(name);
+    }
+    setIsModalOpen(false);
+  };
+
   return (
-    <Button variant={ButtonVariant.TERTIARY} onKeyDown={handleKeyDown} onClick={showOptionsMenu} css={buttonStyles}>
-      <PlusIcon css={iconStyles} />
-      New
-    </Button>
+    <>
+      <Button variant={ButtonVariant.TERTIARY} onKeyDown={handleKeyDown} onClick={showOptionsMenu} css={buttonStyles}>
+        <PlusIcon css={iconStyles} />
+        {t('cellsNewItemMenu.button')}
+      </Button>
+      <CellsNewItemModal
+        type={modalType}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleSubmit}
+      />
+    </>
   );
 };

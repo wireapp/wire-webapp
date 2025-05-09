@@ -20,36 +20,25 @@
 import {CSSObject} from '@emotion/react';
 
 export const wrapperStyles: CSSObject = {
-  paddingTop: '8px',
+  padding: '8px',
   width: '100%',
+  position: 'relative',
 };
-
-export const labelStyles: CSSObject = {
-  fontSize: 'var(--font-size-base)',
-  fontWeight: 'var(--font-weight-regular)',
-  marginBottom: '8px',
-};
-
-export const publicLinkDescriptionStyles: CSSObject = {
-  fontSize: 'var(--font-size-small)',
-  color: 'var(--gray-70)',
-};
-
-export const switchContainerStyles: CSSObject = {
+export const headerStyles: CSSObject = {
   display: 'flex',
-  alignItems: 'flex-start',
-  gap: '16px',
-  marginBottom: '16px',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  flexDirection: 'column',
+  marginTop: '16px',
 };
-
-export const switchWrapperStyles: CSSObject = {
-  flexShrink: 0,
+export const closeButtonStyles: CSSObject = {
+  position: 'absolute',
+  right: '8px',
+  top: '8px',
 };
-
-export const inputStyles: CSSObject = {
-  marginBottom: '0',
+export const formStyles: CSSObject = {
+  padding: '16px',
 };
-
 export const inputWrapperStyles: CSSObject = {
   display: 'flex',
   flexDirection: 'column',
@@ -57,19 +46,16 @@ export const inputWrapperStyles: CSSObject = {
   gap: '8px',
 };
 
-export const copyButtonStyles: CSSObject = {
+export const buttonWrapperStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
+  flexDirection: 'row',
   gap: '8px',
+  padding: '0 16px',
+  marginBottom: '8px',
 };
 
-export const copyIconStyles: CSSObject = {
-  overflow: 'visible !important',
-};
-
-export const loaderWrapperStyles: CSSObject = {
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  height: '106px',
+export const buttonStyles: CSSObject = {
+  width: '100%',
+  margin: '0',
 };

@@ -19,67 +19,82 @@
 
 import {useState} from 'react';
 
-import {Input, Label} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, CloseIcon, IconButton, IconButtonVariant, Input, Label} from '@wireapp/react-ui-kit';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {ModalComponent} from 'Components/Modals/ModalComponent';
+import {t} from 'Util/LocalizerUtil';
 
-import {inputStyles, inputWrapperStyles, wrapperStyles} from './CellsNewItemModal.styles';
+import {
+  buttonStyles,
+  buttonWrapperStyles,
+  closeButtonStyles,
+  formStyles,
+  headerStyles,
+  inputWrapperStyles,
+  wrapperStyles,
+} from './CellsNewItemModal.styles';
+
+import {CellItem} from '../../../common/cellFile/cellFile';
 
 interface CellsNewItemModalProps {
-  type: 'folder' | 'file';
-  onSubmit: () => void;
-  onChange: (name: string) => void;
+  isOpen: boolean;
+  onClose: () => void;
+  type: CellItem['type'];
+  onSubmit: (name: string) => void;
 }
 
-export const showNewCellsItemModal = ({onSubmit, type, onChange}: CellsNewItemModalProps) => {
-  //   PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-  //     primaryAction: {action: onSubmit, text: 'Create'},
-  //     text: {
-  //       message: <CellsNewItemModalContent type={type} onSubmit={onSubmit} onChange={onChange} />,
-  //       title: type === 'folder' ? 'Create new folder' : 'Create new file',
-  //     },
-  //   });
-  PrimaryModal.show(PrimaryModal.type.INPUT, {
-    primaryAction: {
-      action: (name: string) => {
-        console.log(name);
-      },
-      text: 'Create',
-    },
-    text: {
-      closeBtnLabel: 'Close',
-      input: 'Enter name',
-      title: 'Create new folder',
-      message: 'Enter name ads',
-      inputLabel: 'Name',
-    },
-  });
-};
-
-const CellsNewItemModalContent = ({type, onSubmit, onChange}: CellsNewItemModalProps) => {
-  const [name, setName] = useState(type === 'folder' ? 'Empty folder' : 'Empty file.txt');
+export const CellsNewItemModal = ({isOpen, onClose, type, onSubmit}: CellsNewItemModalProps) => {
+  const [name, setName] = useState('');
 
   return (
-    <div css={wrapperStyles}>
-      <form
-        onSubmit={event => {
-          event.preventDefault();
-          onSubmit();
-        }}
-      >
-        <div css={inputWrapperStyles}>
-          <Label htmlFor="generated-public-link">Name</Label>
-          <Input
-            id="generated-public-link"
-            value={name}
-            onChange={event => {
-              setName(event.currentTarget.value);
-              onChange(event.currentTarget.value);
-            }}
-            wrapperCSS={inputStyles}
-          />
+    <ModalComponent isShown={isOpen} onClosed={onClose} onBgClick={onClose}>
+      <div css={wrapperStyles}>
+        <header css={headerStyles}>
+          <h2 className="modal__header__title">
+            {t(type === 'folder' ? 'cellNewItemMenuModal.headlineFolder' : 'cellNewItemMenuModal.headlineFile')}
+          </h2>
+          <IconButton
+            variant={IconButtonVariant.SECONDARY}
+            type="button"
+            css={closeButtonStyles}
+            onClick={onClose}
+            aria-label={t('cellNewItemMenuModal.closeButton')}
+          >
+            <CloseIcon />
+          </IconButton>
+        </header>
+        <form
+          css={formStyles}
+          onSubmit={event => {
+            event.preventDefault();
+            onSubmit(name);
+          }}
+        >
+          <div css={inputWrapperStyles}>
+            <Label htmlFor="cells-new-item-name">{t('cellNewItemMenuModal.label')}</Label>
+            <Input
+              id="cells-new-item-name"
+              value={name}
+              placeholder={
+                type === 'folder'
+                  ? t('cellNewItemMenuModal.placeholderFolder')
+                  : t('cellNewItemMenuModal.placeholderFile')
+              }
+              onChange={event => {
+                setName(event.currentTarget.value);
+              }}
+            />
+          </div>
+        </form>
+        <div css={buttonWrapperStyles}>
+          <Button variant={ButtonVariant.SECONDARY} onClick={onClose} css={buttonStyles}>
+            {t('cellNewItemMenuModal.secondaryAction')}
+          </Button>
+          <Button variant={ButtonVariant.PRIMARY} onClick={() => onSubmit(name)} css={buttonStyles}>
+            {t('cellNewItemMenuModal.primaryAction')}
+          </Button>
         </div>
-      </form>
-    </div>
+      </div>
+    </ModalComponent>
   );
 };
