@@ -30,11 +30,12 @@ export const styles: {
   button: CSSObject;
   header: CSSObject;
   headerText: CSSObject;
+  headerIcon: CSSObject;
   featureIcon: CSSObject;
   featureText: CSSObject;
   option: CSSObject;
   optionWrapper: CSSObject;
-  optionContainer: CSSObject;
+  optionContainer: (isHighlighted?: boolean) => CSSObject;
   optionFeatureContainer: CSSObject;
   optionHeading: CSSObject;
   optionDescription: CSSObject;
@@ -69,6 +70,11 @@ export const styles: {
     fontSize: '24px',
     fontWeight: 500,
   },
+  headerIcon: {
+    marginTop: '6px',
+    position: 'absolute',
+  },
+
   featureIcon: {
     height: 20,
     width: 16,
@@ -88,22 +94,23 @@ export const styles: {
       width: '100%',
     },
   },
-  optionContainer: {
+  optionContainer: (isHighlighted?: boolean) => ({
     padding: '24px',
     borderRadius: 12,
-    border: '1px solid #DCE0E3',
+    border: '1px solid',
+    borderColor: isHighlighted ? 'var(--accent-color)' : 'var(--text-input-border)',
     flex: 1,
     height: 360,
     position: 'relative',
     [mediaQueryDesktop]: {
       margin: '16px 0',
     },
-  },
+  }),
   optionFeatureContainer: {
     gap: '8px',
   },
   optionHeading: {
-    color: '#0667C8',
+    color: 'var(--accent-color)',
     fontSize: '14px',
     fontWeight: 500,
     textAlign: 'center',

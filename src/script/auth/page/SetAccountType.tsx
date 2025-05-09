@@ -71,8 +71,8 @@ export const SetAccountType = () => {
     <Page withSideBar={isEnterpriseLoginV2Enabled}>
       <FlexBox css={styles.container}>
         <FlexBox css={styles.header}>
-          <FlexBox>
-            <RouterLink to={ROUTE.LOGIN} state={state} data-uie-name="go-index" aria-label={t('index.goBack')}>
+          <FlexBox css={styles.headerIcon}>
+            <RouterLink to={ROUTE.LOGIN} state={state} data-uie-name="go-login" aria-label={t('index.goBack')}>
               <ArrowIcon direction="left" color={COLOR.TEXT} />
             </RouterLink>
           </FlexBox>
@@ -107,7 +107,7 @@ interface AccountTypeOptionProps {
 
 const AccountTypeOption = ({action, buttonText, description, heading, features, isPrimary}: AccountTypeOptionProps) => {
   return (
-    <FlexBox data-uie-name="account-type-option" css={styles.optionContainer}>
+    <FlexBox data-uie-name="account-type-option" css={styles.optionContainer(isPrimary)}>
       <div css={styles.option}>
         <p css={styles.optionHeading}>{heading}</p>
         <p css={styles.optionDescription}>{description}</p>
