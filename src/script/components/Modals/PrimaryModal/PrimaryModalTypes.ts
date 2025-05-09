@@ -32,7 +32,6 @@ export interface ButtonAction {
 export interface Text {
   htmlMessage?: string;
   input?: string;
-  inputLabel?: string;
   message?: React.ReactNode;
   option?: string;
   title?: string;
@@ -88,7 +87,6 @@ export interface ModalContent {
   copyPassword?: boolean;
   currentType: string | PrimaryModalType;
   inputPlaceholder: string;
-  inputLabel: string;
   message: React.ReactNode;
   /** @deprecated please use `message` instead */
   messageHtml?: string;
