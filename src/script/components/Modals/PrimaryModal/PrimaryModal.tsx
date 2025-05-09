@@ -69,6 +69,7 @@ export const PrimaryModalComponent: FC = () => {
     closeOnSecondaryAction,
     currentType,
     inputPlaceholder,
+    inputLabel,
     message,
     messageHtml,
     modalUie,
@@ -340,6 +341,7 @@ export const PrimaryModalComponent: FC = () => {
             onSubmit={performAction(confirm, !!closeOnConfirm)}
             inputValue={inputValue}
             inputPlaceholder={inputPlaceholder}
+            inputLabel={inputLabel}
             onInputChange={updateInputValue}
           />
         )}

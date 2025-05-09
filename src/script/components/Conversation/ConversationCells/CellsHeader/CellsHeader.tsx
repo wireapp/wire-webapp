@@ -19,22 +19,39 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
+import {CellsRepository} from 'src/script/cells/CellsRepository';
+
 import {CellsBreadcrumbs} from './CellsBreadcrumbs/CellsBreadcrumbs';
-import {contentStyles, wrapperStyles} from './CellsHeader.styles';
+import {actionsStyles, contentStyles, wrapperStyles} from './CellsHeader.styles';
+import {CellsNewMenu} from './CellsNewMenu/CellsNewMenu';
 import {CellsRefresh} from './CellsRefresh/CellsRefresh';
 
 interface CellsHeaderProps {
   onRefresh: () => void;
   conversationName: string;
   conversationQualifiedId: QualifiedId;
+
+  cellsRepository: CellsRepository;
 }
 
-export const CellsHeader = ({onRefresh, conversationQualifiedId, conversationName}: CellsHeaderProps) => {
+export const CellsHeader = ({
+  onRefresh,
+  conversationQualifiedId,
+  conversationName,
+  cellsRepository,
+}: CellsHeaderProps) => {
   return (
     <div css={wrapperStyles}>
       <div css={contentStyles}>
         <CellsBreadcrumbs conversationQualifiedId={conversationQualifiedId} conversationName={conversationName} />
-        <CellsRefresh onRefresh={onRefresh} />
+        <div css={actionsStyles}>
+          <CellsNewMenu
+            cellsRepository={cellsRepository}
+            conversationQualifiedId={conversationQualifiedId}
+            onRefresh={onRefresh}
+          />
+          <CellsRefresh onRefresh={onRefresh} />
+        </div>
       </div>
     </div>
   );

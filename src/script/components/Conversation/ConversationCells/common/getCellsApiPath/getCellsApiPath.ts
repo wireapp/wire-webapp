@@ -17,8 +17,18 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-export const buttonStyles: CSSObject = {
-  marginBottom: '0',
+import {Config} from 'src/script/Config';
+
+import {getCellsFilesPath} from '../getCellsFilesPath/getCellsFilesPath';
+
+export const getCellsApiPath = ({conversationQualifiedId}: {conversationQualifiedId: QualifiedId}) => {
+  const {domain, id} = conversationQualifiedId;
+
+  const domainPerEnv = process.env.NODE_ENV === 'development' ? Config.getConfig().CELLS_WIRE_DOMAIN : domain;
+
+  const currentPath = getCellsFilesPath();
+
+  return `${id}@${domainPerEnv}${currentPath ? `/${currentPath}` : ''}`;
 };

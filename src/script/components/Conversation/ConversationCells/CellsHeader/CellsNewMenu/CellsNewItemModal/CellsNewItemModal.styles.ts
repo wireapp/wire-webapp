@@ -20,37 +20,56 @@
 import {CSSObject} from '@emotion/react';
 
 export const wrapperStyles: CSSObject = {
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'flex-start',
-  flexDirection: 'column',
-  marginBottom: '20px',
+  paddingTop: '8px',
   width: '100%',
 };
 
-export const headingStyles: CSSObject = {
-  color: 'var(--main-color)',
-  fontWeight: 'var(--font-weight-semibold)',
-  fontSize: 'var(--font-size-medium)',
+export const labelStyles: CSSObject = {
+  fontSize: 'var(--font-size-base)',
+  fontWeight: 'var(--font-weight-regular)',
   marginBottom: '8px',
 };
 
-export const searchWrapperStyles: CSSObject = {
+export const publicLinkDescriptionStyles: CSSObject = {
+  fontSize: 'var(--font-size-small)',
+  color: 'var(--gray-70)',
+};
+
+export const switchContainerStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'flex-start',
+  gap: '16px',
+  marginBottom: '16px',
+};
+
+export const switchWrapperStyles: CSSObject = {
+  flexShrink: 0,
+};
+
+export const inputStyles: CSSObject = {
+  marginBottom: '0',
+};
+
+export const inputWrapperStyles: CSSObject = {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'flex-start',
+  gap: '8px',
+};
+
+export const copyButtonStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
   gap: '8px',
 };
 
-export const contentStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  gap: '8px',
-  width: '100%',
+export const copyIconStyles: CSSObject = {
+  overflow: 'visible !important',
 };
 
-export const actionsStyles: CSSObject = {
+export const loaderWrapperStyles: CSSObject = {
   display: 'flex',
+  justifyContent: 'center',
   alignItems: 'center',
-  gap: '8px',
+  height: '106px',
 };

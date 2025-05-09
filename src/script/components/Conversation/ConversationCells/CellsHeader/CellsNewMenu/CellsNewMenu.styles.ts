@@ -22,3 +22,7 @@ import {CSSObject} from '@emotion/react';
 export const buttonStyles: CSSObject = {
   marginBottom: '0',
 };
+
+export const iconStyles: CSSObject = {
+  marginRight: '8px',
+};

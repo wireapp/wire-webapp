@@ -24,13 +24,14 @@ interface InputFormProps {
   inputValue: string;
   inputPlaceholder: string;
   onInputChange: (value: string) => void;
+  inputLabel: string;
 }
 
-export const InputForm = ({onSubmit, inputValue, inputPlaceholder, onInputChange}: InputFormProps) => {
+export const InputForm = ({onSubmit, inputValue, inputPlaceholder, onInputChange, inputLabel}: InputFormProps) => {
   return (
     <form onSubmit={onSubmit}>
       <label htmlFor="modal-input" className="visually-hidden">
-        {inputPlaceholder}
+        {inputLabel || inputPlaceholder}
       </label>
 
       <input
