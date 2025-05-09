@@ -1504,6 +1504,7 @@ declare module 'I18n/en-US.json' {
     'preferencesOptionsBackupHeader': `History`;
     'preferencesOptionsBackupImportHeadline': `Restore`;
     'preferencesOptionsBackupImportSecondary': `You can only restore history from a backup of the same platform. Your backup will overwrite the conversations that you may have on this device.`;
+    'preferencesOptionsBackupImportCrossPlatformSecondary': `The existing history on this device remains and will be completed by the new backup. You can restore history from all your devices and different platforms but not from another account.`;
     'preferencesOptionsBackupTryAgain': `Try Again`;
     'preferencesOptionsCall': `Calls`;
     'preferencesOptionsCallLogs': `Troubleshooting`;
