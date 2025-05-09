@@ -26,46 +26,53 @@ import {formatBytes, getFileExtension} from 'Util/util';
 import {CellItem} from '../common/cellFile/cellFile';
 
 export const transformNodesToCellsFiles = (nodes: RestNode[]): Array<CellItem> => {
-  return nodes.map(node => {
-    const id = node.Uuid;
-    const owner = getOwner(node);
-    const name = getFileName(node.Path);
-    const sizeMb = getFileSize(node);
-    const uploadedAtTimestamp = getUploadedAtTimestamp(node);
-    const publicLink: CellItem['publicLink'] = {
-      alreadyShared: !!node.Shares?.[0].Uuid,
-      uuid: node.Shares?.[0].Uuid || '',
-      url: undefined,
-    };
+  return (
+    nodes
+      .map(node => {
+        const id = node.Uuid;
+        const owner = getOwner(node);
+        const name = getFileName(node.Path);
+        const sizeMb = getFileSize(node);
+        const uploadedAtTimestamp = getUploadedAtTimestamp(node);
+        const publicLink: CellItem['publicLink'] = {
+          alreadyShared: !!node.Shares?.[0].Uuid,
+          uuid: node.Shares?.[0].Uuid || '',
+          url: undefined,
+        };
+        const url = node.PreSignedGET?.Url;
 
-    if (node.Type === 'COLLECTION') {
-      return {
-        id,
-        type: 'folder' as const,
-        owner,
-        name,
-        sizeMb,
-        uploadedAtTimestamp,
-        publicLink,
-      };
-    }
+        if (node.Type === 'COLLECTION') {
+          return {
+            id,
+            type: 'folder' as const,
+            url,
+            owner,
+            name,
+            sizeMb,
+            uploadedAtTimestamp,
+            publicLink,
+          };
+        }
 
-    return {
-      id,
-      type: 'file' as const,
-      owner,
-      conversationName: node.ContextWorkspace?.Label || '',
-      mimeType: node.ContentType,
-      extension: getFileExtension(node.Path),
-      name,
-      sizeMb,
-      previewImageUrl: getPreviewImageUrl(node),
-      previewPdfUrl: getPreviewPdfUrl(node),
-      uploadedAtTimestamp,
-      fileUrl: node.PreSignedGET?.Url,
-      publicLink,
-    };
-  });
+        return {
+          id,
+          type: 'file' as const,
+          url,
+          owner,
+          conversationName: node.ContextWorkspace?.Label || '',
+          mimeType: node.ContentType,
+          extension: getFileExtension(node.Path),
+          name,
+          sizeMb,
+          previewImageUrl: getPreviewImageUrl(node),
+          previewPdfUrl: getPreviewPdfUrl(node),
+          uploadedAtTimestamp,
+          publicLink,
+        };
+      })
+      // eslint-disable-next-line id-length
+      .sort((a, b) => (a.type === 'folder' ? -1 : b.type === 'folder' ? 1 : 0))
+  );
 };
 
 export const transformToCellPagination = (pagination: RestPagination): CellPagination => {
