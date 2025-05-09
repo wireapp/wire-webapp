@@ -94,6 +94,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
   const sharesScreen = videoState === VIDEO_STATE.SCREENSHARE;
   const sharesCamera = [VIDEO_STATE.STARTED, VIDEO_STATE.PAUSED].includes(videoState);
   const hasPausedVideo = videoState === VIDEO_STATE.PAUSED;
+  const doVideoReconnecting = videoState === VIDEO_STATE.RECONNECTING;
   const hasActiveVideo = (sharesCamera || sharesScreen) && !!videoStream;
   const activelySpeakingBoxShadow = `inset 0px 0px 0px 1px var(--group-video-bg), inset 0px 0px 0px 4px var(--accent-color), inset 0px 0px 0px 7px var(--app-bg-secondary)`;
   const groupVideoBoxShadow = participantCount > 1 ? 'inset 0px 0px 0px 2px var(--group-video-bg)' : 'initial';
@@ -246,6 +247,23 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
             data-uie-name="status-video-paused"
           >
             {hasPausedVideo ? t('videoCallPaused') : t('videoCallParticipantConnecting')}
+          </div>
+          {nameContainer}
+        </div>
+      )}
+      {doVideoReconnecting && (
+        <div className="group-video-grid__pause-overlay">
+          <div className="background">
+            <div className="background-image"></div>
+            <div className="background-darken"></div>
+          </div>
+
+          <div
+            className="group-video-grid__pause-overlay__label"
+            css={{fontsize: minimized ? '0.6875rem' : '0.875rem'}}
+            data-uie-name="status-video-paused"
+          >
+            {t('videoCallParticipantConnecting')}
           </div>
           {nameContainer}
         </div>
