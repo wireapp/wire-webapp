@@ -1030,6 +1030,7 @@
   "login.publicComputer": "Ez egy nyilvános számítógép",
   "login.ssoLogin": "Vállalati bejelentkezés",
   "login.subhead": "Add meg az e-mail címed vagy felhasználóneved.",
+  "login.subheadsso": "Enter your password to log in",
   "login.submitTwoFactorButton": "Submit",
   "login.twoFactorLoginSubHead": "Please check your email {email} for the verification code and enter it below.",
   "login.twoFactorLoginTitle": "Verify your account",

@@ -1030,6 +1030,7 @@
   "login.publicComputer": "これは共有のコンピューターです",
   "login.ssoLogin": "企業アカウントでログイン",
   "login.subhead": "メールアドレスまたはユーザー名を入力してください",
+  "login.subheadsso": "Enter your password to log in",
   "login.submitTwoFactorButton": "Submit",
   "login.twoFactorLoginSubHead": "Please check your email {email} for the verification code and enter it below.",
   "login.twoFactorLoginTitle": "Verify your account",
