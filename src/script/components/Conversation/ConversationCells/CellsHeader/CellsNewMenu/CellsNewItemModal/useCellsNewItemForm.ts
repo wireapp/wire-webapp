@@ -27,6 +27,7 @@ import {t} from 'Util/LocalizerUtil';
 import {isAxiosError} from 'Util/TypePredicateUtil';
 
 import {getCellsApiPath} from '../../../common/getCellsApiPath/getCellsApiPath';
+
 interface UseCellsNewItemFormProps {
   type: CellItem['type'];
   cellsRepository: CellsRepository;
