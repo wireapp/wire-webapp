@@ -409,8 +409,8 @@ declare module 'I18n/en-US.json' {
     'cellsNewItemMenu.folder': `Create a folder`;
     'cellNewItemMenuModal.secondaryAction': `Cancel`;
     'cellNewItemMenuModal.primaryAction': `Create`;
-    'cellNewItemMenuModal.headlineFile': `Create file`;
-    'cellNewItemMenuModal.headlineFolder': `Create folder`;
+    'cellNewItemMenuModal.headlineFile': `New empty file`;
+    'cellNewItemMenuModal.headlineFolder': `New folder`;
     'cellNewItemMenuModal.closeButton': `Close`;
     'cellNewItemMenuModal.label': `Name`;
     'cellNewItemMenuModal.placeholderFolder': `Empty folder name`;
