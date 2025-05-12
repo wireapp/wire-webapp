@@ -21,6 +21,7 @@ import {KeyboardEvent, MouseEvent as ReactMouseEvent, useCallback} from 'react';
 
 import {MoreIcon} from '@wireapp/react-ui-kit';
 
+import {openFolder} from 'Components/CellsGlobalView/common/openFolder/openFolder';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/ContextMenu';
@@ -30,12 +31,12 @@ import {forcedDownloadFile, setContextMenuPosition} from 'Util/util';
 
 import {buttonStyles, iconStyles, textStyles} from './CellsTableRowOptions.styles';
 
-import {CellFile} from '../../../common/cellFile/cellFile';
+import {CellItem} from '../../../common/cellFile/cellFile';
 import {useCellsFilePreviewModal} from '../../common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
 import {showShareFileModal} from '../CellsShareFileModal/CellsShareFileModal';
 
 interface CellsTableRowOptionsProps {
-  file: CellFile;
+  file: CellItem;
   onDelete: (uuid: string) => void;
   cellsRepository: CellsRepository;
 }
@@ -56,13 +57,21 @@ export const CellsTableRowOptions = ({file, onDelete, cellsRepository}: CellsTab
     [onDelete],
   );
 
+  const getDownloadName = (file: CellItem) => {
+    if (file.type === 'folder') {
+      return `${file.name}.zip`;
+    }
+    return file.name;
+  };
+
   const showOptionsMenu = (event: ReactMouseEvent<HTMLButtonElement> | MouseEvent) => {
     const openLabel = t('cellsGlobalView.optionOpen');
     const shareLabel = t('cellsGlobalView.optionShare');
     const downloadLabel = t('cellsGlobalView.optionDownload');
     const deleteLabel = t('cellsGlobalView.optionDelete');
 
-    const fileUrl = file.fileUrl;
+    const url = file.url;
+    const name = getDownloadName(file);
 
     showContextMenu({
       event,
@@ -71,8 +80,20 @@ export const CellsTableRowOptions = ({file, onDelete, cellsRepository}: CellsTab
           label: shareLabel,
           click: () => showShareFileModal({uuid: file.id, cellsRepository}),
         },
-        {label: openLabel, click: () => handleOpenFile(file)},
-        fileUrl ? {label: downloadLabel, click: () => forcedDownloadFile({url: fileUrl, name: file.name})} : undefined,
+        {
+          label: openLabel,
+          click: () => (file.type === 'folder' ? openFolder({path: file.path}) : handleOpenFile(file)),
+        },
+        url
+          ? {
+              label: downloadLabel,
+              click: () =>
+                forcedDownloadFile({
+                  url,
+                  name,
+                }),
+            }
+          : undefined,
         {label: deleteLabel, click: () => showDeleteFileModal({uuid: file.id, name: file.name})},
       ].filter(Boolean) as ContextMenuEntry[],
       identifier: 'file-preview-error-more-button',

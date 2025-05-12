@@ -19,6 +19,9 @@
 
 export interface CellFile {
   id: string;
+  type: 'file';
+  url?: string;
+  path: string;
   mimeType?: string;
   name: string;
   extension: string;
@@ -33,5 +36,24 @@ export interface CellFile {
     uuid?: string;
     url?: string;
   };
-  fileUrl?: string;
 }
+
+export interface CellFolder {
+  id: string;
+  type: 'folder';
+  url?: string;
+  path: string;
+  mimeType?: string;
+  name: string;
+  sizeMb: string;
+  uploadedAtTimestamp: number;
+  conversationName: string;
+  owner: string;
+  publicLink?: {
+    alreadyShared: boolean;
+    uuid?: string;
+    url?: string;
+  };
+}
+
+export type CellItem = CellFile | CellFolder;

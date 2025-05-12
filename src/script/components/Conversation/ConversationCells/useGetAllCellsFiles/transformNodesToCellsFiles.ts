@@ -23,32 +23,55 @@ import {CellPagination} from 'Components/Conversation/ConversationCells/common/c
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {formatBytes, getFileExtension} from 'Util/util';
 
-import {CellFile} from '../common/cellFile/cellFile';
+import {CellItem} from '../common/cellFile/cellFile';
 
-export const transformNodesToCellsFiles = (nodes: RestNode[]): CellFile[] => {
+export const transformNodesToCellsFiles = (nodes: RestNode[]): Array<CellItem> => {
   return (
     nodes
-      .filter(node => node.Type === 'LEAF')
-      .map(node => ({
-        id: node.Uuid,
-        owner: getOwner(node),
-        conversationName: node.ContextWorkspace?.Label || '',
-        mimeType: node.ContentType,
-        extension: getFileExtension(node.Path),
-        name: getFileName(node.Path),
-        sizeMb: getFileSize(node),
-        previewImageUrl: getPreviewImageUrl(node),
-        previewPdfUrl: getPreviewPdfUrl(node),
-        uploadedAtTimestamp: getUploadedAtTimestamp(node),
-        fileUrl: node.PreSignedGET?.Url,
-        publicLink: {
+      .map(node => {
+        const id = node.Uuid;
+        const owner = getOwner(node);
+        const name = getFileName(node.Path);
+        const sizeMb = getFileSize(node);
+        const uploadedAtTimestamp = getUploadedAtTimestamp(node);
+        const publicLink: CellItem['publicLink'] = {
           alreadyShared: !!node.Shares?.[0].Uuid,
           uuid: node.Shares?.[0].Uuid || '',
           url: undefined,
-        },
-      }))
+        };
+        const url = node.PreSignedGET?.Url;
+
+        if (node.Type === 'COLLECTION') {
+          return {
+            id,
+            type: 'folder' as const,
+            url,
+            owner,
+            name,
+            sizeMb,
+            uploadedAtTimestamp,
+            publicLink,
+          };
+        }
+
+        return {
+          id,
+          type: 'file' as const,
+          url,
+          owner,
+          conversationName: node.ContextWorkspace?.Label || '',
+          mimeType: node.ContentType,
+          extension: getFileExtension(node.Path),
+          name,
+          sizeMb,
+          previewImageUrl: getPreviewImageUrl(node),
+          previewPdfUrl: getPreviewPdfUrl(node),
+          uploadedAtTimestamp,
+          publicLink,
+        };
+      })
       // eslint-disable-next-line id-length
-      .sort((a, b) => b.uploadedAtTimestamp - a.uploadedAtTimestamp)
+      .sort((a, b) => (a.type === 'folder' ? -1 : b.type === 'folder' ? 1 : 0))
   );
 };
 

@@ -32,10 +32,10 @@ import {
 import {getCellsTableColumns} from './CellsTableColumns/CellsTableColumns';
 import {FilePreviewProvider} from './common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
 
-import {CellFile} from '../common/cellFile/cellFile';
+import {CellItem} from '../common/cellFile/cellFile';
 
 interface CellsTableProps {
-  files: CellFile[];
+  files: CellItem[];
   cellsRepository: CellsRepository;
   onDeleteFile: (uuid: string) => void;
 }

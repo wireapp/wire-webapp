@@ -407,6 +407,7 @@ declare module 'I18n/en-US.json' {
     'cellsSidebar.title': `All`;
     'cellsUnavailableFile': `File not available`;
     'cellsUnavailableFilePreview': `Couldn\'t generate preview`;
+    'cellsFolderBreadcrumbCombained': `Show more`;
     'channelConversationFeature1': `[bold]Public[/bold] or [bold]private[/bold] channels`;
     'channelConversationFeature2': `[bold]Conversation history[/bold]`;
     'channelCreationPreferencesPlaceholder': `Channel name`;
@@ -1896,6 +1897,17 @@ declare module 'I18n/en-US.json' {
     'wireMacos': `{brandName} for macOS`;
     'wireWindows': `{brandName} for Windows`;
     'wire_for_web': `{brandName} for Web`;
+    'selectAccountTypeHeading': `How will you use Wire?`;
+    'selectTeamAccountTypeOptionHeading': `For collaboration`;
+    'selectTeamAccountTypeOptionDescription': `Work securely with your team.`;
+    'selectTeamAccountTypeOptionButtonText': `Create Team`;
+    'selectTeamAccountTypeOptionFeature1': `Communicate with your colleagues and share documents via a single app`;
+    'selectTeamAccountTypeOptionFeature2': `Start for free, upgrade anytime`;
+    'selectPersonalAccountTypeOptionHeading': `For private use`;
+    'selectPersonalAccountTypeOptionDescription': `Chat with friends and family.`;
+    'selectPersonalAccountTypeOptionButtonText': `Create Personal Account`;
+    'selectPersonalAccountTypeOptionFeature1': `Send messages and share pictures`;
+    'selectPersonalAccountTypeOptionFeature2': `Always free`;
   };
   export default translations;
 }

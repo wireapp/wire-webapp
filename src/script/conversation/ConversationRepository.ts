@@ -591,7 +591,7 @@ export class ConversationRepository {
     try {
       const response = await this.conversationService.getConversationById(qualifiedId);
       const [conversationEntity] = this.mapConversations([response]);
-
+      await this.updateParticipatingUserEntities(conversationEntity);
       await this.saveConversation(conversationEntity);
 
       fetching_conversations[conversationId].forEach(({resolveFn}) => resolveFn(conversationEntity));
@@ -1642,7 +1642,7 @@ export class ConversationRepository {
   private readonly migrateProteus1to1MLS = async (
     otherUserId: QualifiedId,
     mlsConversation: MLSConversation,
-  ): Promise<{shouldOpenMLS1to1Conversation: boolean}> => {
+  ): Promise<{shouldOpenMLS1to1Conversation: boolean; shouldInjectMigrationMessage: boolean}> => {
     const proteusConversations = this.conversationState.findProteus1to1Conversations(otherUserId);
 
     if (!proteusConversations || proteusConversations.length < 1) {
@@ -1655,7 +1655,7 @@ export class ConversationRepository {
         await this.blacklistConversation(conversationId);
       }
 
-      return {shouldOpenMLS1to1Conversation: false};
+      return {shouldOpenMLS1to1Conversation: false, shouldInjectMigrationMessage: false};
     }
 
     this.logger.info(`Replacing proteus 1:1 conversation(s) with mls 1:1 conversation ${mlsConversation.id}`);
@@ -1708,17 +1708,15 @@ export class ConversationRepository {
       }),
     );
 
-    // Because of the current architecture and the fact that we present a connection request as a conversation of connect type,
-    // we don't want to inject conversation migrated event if the only proteus 1:1 conversation we had was a connection request.
-    if (!wasProteusConnectionIncomingRequest) {
-      await this.inject1to1MigratedToMLS(mlsConversation);
-    }
-
     const isMLS1to1ActiveConversation = this.conversationState.isActiveConversation(mlsConversation);
-
     const shouldOpenMLS1to1Conversation = wasProteus1to1ActiveConversation && !isMLS1to1ActiveConversation;
 
-    return {shouldOpenMLS1to1Conversation};
+    return {
+      shouldOpenMLS1to1Conversation,
+      // Because of the current architecture and the fact that we present a connection request as a conversation of connect type,
+      // we don't want to inject conversation migrated event if the only proteus 1:1 conversation we had was a connection request.
+      shouldInjectMigrationMessage: !wasProteusConnectionIncomingRequest,
+    };
   };
 
   private async blacklistConversation(conversationId: QualifiedId) {
@@ -1831,7 +1829,10 @@ export class ConversationRepository {
     }
 
     // If proteus 1:1 conversation with the same user is known, we have to make sure it is replaced with mls 1:1 conversation.
-    const {shouldOpenMLS1to1Conversation} = await this.migrateProteus1to1MLS(otherUserId, mlsConversation);
+    const {shouldOpenMLS1to1Conversation, shouldInjectMigrationMessage} = await this.migrateProteus1to1MLS(
+      otherUserId,
+      mlsConversation,
+    );
 
     // If mls is not supported by the other user we do not establish the group yet.
     if (!isMLSSupportedByTheOtherUser) {
@@ -1896,6 +1897,11 @@ export class ConversationRepository {
     this.initiatingMlsConversationQualifiedIds = this.initiatingMlsConversationQualifiedIds.filter(qualifiedId =>
       matchQualifiedIds(qualifiedId, mlsConversation.qualifiedId),
     );
+
+    if (shouldInjectMigrationMessage) {
+      await this.inject1to1MigratedToMLS(initialisedMLSConversation);
+    }
+
     return initialisedMLSConversation;
   };
 
@@ -2271,12 +2277,9 @@ export class ConversationRepository {
    * @returns Resolves when conversation was saved
    */
   saveConversation(conversationEntity: Conversation) {
-    const localEntity = this.conversationState.findConversation(conversationEntity);
-    if (!localEntity) {
-      this.conversationState.conversations.push(conversationEntity);
-      return this.saveConversationStateInDb(conversationEntity);
-    }
-    return Promise.resolve(localEntity);
+    this.conversationState.upsertConversation(conversationEntity);
+
+    return this.saveConversationStateInDb(conversationEntity);
   }
 
   /**
@@ -2722,7 +2725,8 @@ export class ConversationRepository {
   }
 
   private readonly inject1to1MigratedToMLS = async (conversation: Conversation) => {
-    const protocolUpdateEvent = EventBuilder.build1to1MigratedToMLS(conversation);
+    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
+    const protocolUpdateEvent = EventBuilder.build1to1MigratedToMLS(conversation, currentTimestamp);
     await this.eventRepository.injectEvent(protocolUpdateEvent);
   };
 
@@ -3453,6 +3457,7 @@ export class ConversationRepository {
       case ClientEvent.CONVERSATION.E2EI_VERIFICATION:
       case ClientEvent.CONVERSATION.VOICE_CHANNEL_ACTIVATE:
       case ClientEvent.CONVERSATION.VOICE_CHANNEL_DEACTIVATE:
+      case ClientEvent.CONVERSATION.ONE2ONE_MIGRATED_TO_MLS:
         return this.addEventToConversation(conversationEntity, eventJson);
     }
   }
