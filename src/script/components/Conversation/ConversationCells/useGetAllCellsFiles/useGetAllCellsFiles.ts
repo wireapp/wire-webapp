@@ -73,7 +73,7 @@ export const useGetAllCellsFiles = ({cellsRepository, conversationQualifiedId}: 
   }, [setFiles, setStatus, setError, id, offset, pageSize, setPagination]);
 
   const handleHashChange = useCallback(() => {
-    // clearAll({conversationId: id});
+    clearAll({conversationId: id});
     setOffset(0);
     void fetchFiles();
   }, [fetchFiles, setOffset, clearAll, id]);
