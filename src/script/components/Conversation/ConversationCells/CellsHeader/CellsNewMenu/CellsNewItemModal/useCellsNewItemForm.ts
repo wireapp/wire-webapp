@@ -90,7 +90,7 @@ export const useCellsNewItemForm = ({
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     setName(event.currentTarget.value);
-    if (error) {
+    if (error === t('cellNewItemMenuModalForm.nameRequired')) {
       setError(null);
     }
   };
