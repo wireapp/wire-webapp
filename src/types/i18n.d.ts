@@ -359,6 +359,7 @@ declare module 'I18n/en-US.json' {
     'callingRestrictedConferenceCallTeamMemberModalTitle': `Feature unavailable`;
     'cameraStatusOff': `off`;
     'cameraStatusOn': `on`;
+    'cellsFolderBreadcrumbCombained': `Show more`;
     'cellsGlobalView.deleteModalDescription': `This will permanently delete the file {name} for all participants.`;
     'cellsGlobalView.deleteModalError': `Something went wrong, please try again later and refresh the list.`;
     'cellsGlobalView.deleteModalHeading': `Delete file`;
@@ -407,7 +408,6 @@ declare module 'I18n/en-US.json' {
     'cellsSidebar.title': `All`;
     'cellsUnavailableFile': `File not available`;
     'cellsUnavailableFilePreview': `Couldn\'t generate preview`;
-    'cellsFolderBreadcrumbCombained': `Show more`;
     'channelConversationFeature1': `[bold]Public[/bold] or [bold]private[/bold] channels`;
     'channelConversationFeature2': `[bold]Conversation history[/bold]`;
     'channelCreationPreferencesPlaceholder': `Channel name`;
@@ -1034,6 +1034,7 @@ declare module 'I18n/en-US.json' {
     'login.publicComputer': `This is a public computer`;
     'login.ssoLogin': `Company log in`;
     'login.subhead': `Enter your email address or username.`;
+    'login.subheadsso': `Enter your password to log in`;
     'login.submitTwoFactorButton': `Submit`;
     'login.twoFactorLoginSubHead': `Please check your email {email} for the verification code and enter it below.`;
     'login.twoFactorLoginTitle': `Verify your account`;
@@ -1654,6 +1655,17 @@ declare module 'I18n/en-US.json' {
     'searchTrySearch': `Find people by\nname or username`;
     'searchTrySearchFederation': `Find people in Wire by name or\n@username\n\nFind people from another domain\nby @username@domainname`;
     'searchTrySearchLearnMore': `Learn more`;
+    'selectAccountTypeHeading': `How will you use Wire?`;
+    'selectPersonalAccountTypeOptionButtonText': `Create Personal Account`;
+    'selectPersonalAccountTypeOptionDescription': `Chat with friends and family.`;
+    'selectPersonalAccountTypeOptionFeature1': `Send messages and share pictures`;
+    'selectPersonalAccountTypeOptionFeature2': `Always free`;
+    'selectPersonalAccountTypeOptionHeading': `For private use`;
+    'selectTeamAccountTypeOptionButtonText': `Create Team`;
+    'selectTeamAccountTypeOptionDescription': `Work securely with your team.`;
+    'selectTeamAccountTypeOptionFeature1': `Communicate with your colleagues and share documents via a single app`;
+    'selectTeamAccountTypeOptionFeature2': `Start for free, upgrade anytime`;
+    'selectTeamAccountTypeOptionHeading': `For collaboration`;
     'selfNotSupportMLSMsgPart1': `You can\'t communicate with {selfUserName}, as your device doesn\'t support the suitable protocol.`;
     'selfNotSupportMLSMsgPart2': `to call, and send messages and files.`;
     'selfProfileImageAlt': `Your profile picture`;
@@ -1680,6 +1692,7 @@ declare module 'I18n/en-US.json' {
     'ssoLogin.overlayFocusLink': `Click to continue`;
     'ssoLogin.pasteButton': `Paste code`;
     'ssoLogin.subhead': `Enter the company SSO access code.`;
+    'ssoLogin.subheadsso': `Enter your password to log in`;
     'ssoLogin.subheadCode': `Please enter your SSO code`;
     'ssoLogin.subheadCodeOrEmail': `Please enter your email or SSO code.`;
     'ssoLogin.subheadEmailEnvironmentSwitchWarning': `If your email matches an enterprise installation of {brandName}, this app will connect to that server.`;
@@ -1896,17 +1909,6 @@ declare module 'I18n/en-US.json' {
     'wireMacos': `{brandName} for macOS`;
     'wireWindows': `{brandName} for Windows`;
     'wire_for_web': `{brandName} for Web`;
-    'selectAccountTypeHeading': `How will you use Wire?`;
-    'selectTeamAccountTypeOptionHeading': `For collaboration`;
-    'selectTeamAccountTypeOptionDescription': `Work securely with your team.`;
-    'selectTeamAccountTypeOptionButtonText': `Create Team`;
-    'selectTeamAccountTypeOptionFeature1': `Communicate with your colleagues and share documents via a single app`;
-    'selectTeamAccountTypeOptionFeature2': `Start for free, upgrade anytime`;
-    'selectPersonalAccountTypeOptionHeading': `For private use`;
-    'selectPersonalAccountTypeOptionDescription': `Chat with friends and family.`;
-    'selectPersonalAccountTypeOptionButtonText': `Create Personal Account`;
-    'selectPersonalAccountTypeOptionFeature1': `Send messages and share pictures`;
-    'selectPersonalAccountTypeOptionFeature2': `Always free`;
   };
   export default translations;
 }
