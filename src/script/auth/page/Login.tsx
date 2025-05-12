@@ -479,7 +479,7 @@ const LoginComponent = ({
                           {t('login.headline')}
                         </Heading>
                       )}
-                      <Text>{t('login.subhead')}</Text>
+                      <Text>{isEnterpriseLoginV2Enabled ? t('login.subheadsso') : t('login.subhead')}</Text>
                       <Form style={{marginTop: 30}} data-uie-name="login">
                         <LoginForm isFetching={isFetching} onSubmit={handleSubmit} />
                         {validationErrors.length

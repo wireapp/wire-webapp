@@ -1030,6 +1030,7 @@
   "login.publicComputer": "Es un ordenador público",
   "login.ssoLogin": "Acceso empresarial",
   "login.subhead": "Escriba su dirección de correo o nombre de usuario.",
+  "login.subheadsso": "Enter your password to log in",
   "login.submitTwoFactorButton": "Submit",
   "login.twoFactorLoginSubHead": "Please check your email {email} for the verification code and enter it below.",
   "login.twoFactorLoginTitle": "Verify your account",

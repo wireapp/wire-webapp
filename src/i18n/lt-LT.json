@@ -1030,6 +1030,7 @@
   "login.publicComputer": "Tai yra viešas kompiuteris",
   "login.ssoLogin": "Įmonės prisijungimas",
   "login.subhead": "Įrašykite savo el. pašto adresą arba naudotojo vardą.",
+  "login.subheadsso": "Enter your password to log in",
   "login.submitTwoFactorButton": "Submit",
   "login.twoFactorLoginSubHead": "Please check your email {email} for the verification code and enter it below.",
   "login.twoFactorLoginTitle": "Verify your account",
