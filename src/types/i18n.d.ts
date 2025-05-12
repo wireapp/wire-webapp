@@ -415,6 +415,9 @@ declare module 'I18n/en-US.json' {
     'cellNewItemMenuModal.label': `Name`;
     'cellNewItemMenuModal.placeholderFolder': `Empty folder name`;
     'cellNewItemMenuModal.placeholderFile': `Empty file.txt`;
+    'cellNewItemMenuModalForm.alreadyExistsError': `A file or folder with this name already exists`;
+    'cellNewItemMenuModalForm.nameRequired': `Name is required`;
+    'cellNewItemMenuModalForm.genericError': `Something went wrong. Please try again`;
     'cellsSidebar.heading': `Files`;
     'cellsSidebar.title': `All`;
     'cellsUnavailableFile': `File not available`;

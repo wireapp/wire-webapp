@@ -17,22 +17,32 @@
  *
  */
 
-import {useState} from 'react';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {Button, ButtonVariant, CloseIcon, IconButton, IconButtonVariant, Input, Label} from '@wireapp/react-ui-kit';
+import {
+  Button,
+  ButtonVariant,
+  CloseIcon,
+  ErrorMessage,
+  IconButton,
+  IconButtonVariant,
+  Input,
+  Label,
+} from '@wireapp/react-ui-kit';
 
 import {ModalComponent} from 'Components/Modals/ModalComponent';
+import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
 
 import {
   buttonStyles,
   buttonWrapperStyles,
   closeButtonStyles,
-  formStyles,
   headerStyles,
   inputWrapperStyles,
   wrapperStyles,
 } from './CellsNewItemModal.styles';
+import {useCellsNewItemForm} from './useCellsNewItemForm';
 
 import {CellItem} from '../../../common/cellFile/cellFile';
 
@@ -40,11 +50,28 @@ interface CellsNewItemModalProps {
   isOpen: boolean;
   onClose: () => void;
   type: CellItem['type'];
-  onSubmit: (name: string) => void;
+  cellsRepository: CellsRepository;
+  conversationQualifiedId: QualifiedId;
+  onRefresh: () => void;
 }
 
-export const CellsNewItemModal = ({isOpen, onClose, type, onSubmit}: CellsNewItemModalProps) => {
-  const [name, setName] = useState('');
+export const CellsNewItemModal = ({
+  isOpen,
+  onClose,
+  type,
+  cellsRepository,
+  conversationQualifiedId,
+  onRefresh,
+}: CellsNewItemModalProps) => {
+  const {name, error, isSubmitting, handleSubmit, handleChange} = useCellsNewItemForm({
+    type,
+    cellsRepository,
+    conversationQualifiedId,
+    onSuccess: () => {
+      onRefresh();
+      onClose();
+    },
+  });
 
   return (
     <ModalComponent isShown={isOpen} onClosed={onClose} onBgClick={onClose}>
@@ -63,13 +90,7 @@ export const CellsNewItemModal = ({isOpen, onClose, type, onSubmit}: CellsNewIte
             <CloseIcon />
           </IconButton>
         </header>
-        <form
-          css={formStyles}
-          onSubmit={event => {
-            event.preventDefault();
-            onSubmit(name);
-          }}
-        >
+        <form onSubmit={handleSubmit}>
           <div css={inputWrapperStyles}>
             <Label htmlFor="cells-new-item-name">{t('cellNewItemMenuModal.label')}</Label>
             <Input
@@ -80,20 +101,19 @@ export const CellsNewItemModal = ({isOpen, onClose, type, onSubmit}: CellsNewIte
                   ? t('cellNewItemMenuModal.placeholderFolder')
                   : t('cellNewItemMenuModal.placeholderFile')
               }
-              onChange={event => {
-                setName(event.currentTarget.value);
-              }}
+              onChange={handleChange}
+              error={error ? <ErrorMessage>{error}</ErrorMessage> : undefined}
             />
           </div>
+          <div css={buttonWrapperStyles}>
+            <Button variant={ButtonVariant.SECONDARY} onClick={onClose} css={buttonStyles}>
+              {t('cellNewItemMenuModal.secondaryAction')}
+            </Button>
+            <Button variant={ButtonVariant.PRIMARY} type="submit" css={buttonStyles} disabled={isSubmitting}>
+              {t('cellNewItemMenuModal.primaryAction')}
+            </Button>
+          </div>
         </form>
-        <div css={buttonWrapperStyles}>
-          <Button variant={ButtonVariant.SECONDARY} onClick={onClose} css={buttonStyles}>
-            {t('cellNewItemMenuModal.secondaryAction')}
-          </Button>
-          <Button variant={ButtonVariant.PRIMARY} onClick={() => onSubmit(name)} css={buttonStyles}>
-            {t('cellNewItemMenuModal.primaryAction')}
-          </Button>
-        </div>
       </div>
     </ModalComponent>
   );

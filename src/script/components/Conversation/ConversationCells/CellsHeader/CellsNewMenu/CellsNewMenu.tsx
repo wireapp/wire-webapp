@@ -33,7 +33,6 @@ import {CellsNewItemModal} from './CellsNewItemModal/CellsNewItemModal';
 import {buttonStyles, iconStyles} from './CellsNewMenu.styles';
 
 import {CellItem} from '../../common/cellFile/cellFile';
-import {getCellsApiPath} from '../../common/getCellsApiPath/getCellsApiPath';
 
 interface CellsNewMenuProps {
   cellsRepository: CellsRepository;
@@ -75,43 +74,22 @@ export const CellsNewMenu = ({cellsRepository, conversationQualifiedId, onRefres
     }
   };
 
-  const handleCreateFolder = async (name: string) => {
-    await cellsRepository.createFolder({
-      path: getCellsApiPath({conversationQualifiedId}),
-      name,
-    });
-    onRefresh();
-  };
-
-  const handleCreateFile = async (name: string) => {
-    await cellsRepository.createFile({
-      path: getCellsApiPath({conversationQualifiedId}),
-      name,
-    });
-    onRefresh();
-  };
-
-  const handleSubmit = async (name: string) => {
-    if (modalType === 'folder') {
-      await handleCreateFolder(name);
-    } else {
-      await handleCreateFile(name);
-    }
-    setIsModalOpen(false);
-  };
-
   return (
     <>
       <Button variant={ButtonVariant.TERTIARY} onKeyDown={handleKeyDown} onClick={showOptionsMenu} css={buttonStyles}>
         <PlusIcon css={iconStyles} />
         {t('cellsNewItemMenu.button')}
       </Button>
-      <CellsNewItemModal
-        type={modalType}
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSubmit={handleSubmit}
-      />
+      {isModalOpen && (
+        <CellsNewItemModal
+          type={modalType}
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          cellsRepository={cellsRepository}
+          conversationQualifiedId={conversationQualifiedId}
+          onRefresh={onRefresh}
+        />
+      )}
     </>
   );
 };
