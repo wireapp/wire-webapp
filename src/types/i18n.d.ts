@@ -405,8 +405,8 @@ declare module 'I18n/en-US.json' {
     'cellsGlobalView.tableRowSharedTruthyValue': `Yes`;
     'cellsGlobalView.tableRowSize': `Size`;
     'cellsNewItemMenu.button': `New`;
-    'cellsNewItemMenu.file': `Create file`;
-    'cellsNewItemMenu.folder': `Create folder`;
+    'cellsNewItemMenu.file': `Create an empty file`;
+    'cellsNewItemMenu.folder': `Create a folder`;
     'cellNewItemMenuModal.secondaryAction': `Cancel`;
     'cellNewItemMenuModal.primaryAction': `Create`;
     'cellNewItemMenuModal.headlineFile': `Create file`;
@@ -1668,6 +1668,17 @@ declare module 'I18n/en-US.json' {
     'searchTrySearch': `Find people by\nname or username`;
     'searchTrySearchFederation': `Find people in Wire by name or\n@username\n\nFind people from another domain\nby @username@domainname`;
     'searchTrySearchLearnMore': `Learn more`;
+    'selectAccountTypeHeading': `How will you use Wire?`;
+    'selectPersonalAccountTypeOptionButtonText': `Create Personal Account`;
+    'selectPersonalAccountTypeOptionDescription': `Chat with friends and family.`;
+    'selectPersonalAccountTypeOptionFeature1': `Send messages and share pictures`;
+    'selectPersonalAccountTypeOptionFeature2': `Always free`;
+    'selectPersonalAccountTypeOptionHeading': `For private use`;
+    'selectTeamAccountTypeOptionButtonText': `Create Team`;
+    'selectTeamAccountTypeOptionDescription': `Work securely with your team.`;
+    'selectTeamAccountTypeOptionFeature1': `Communicate with your colleagues and share documents via a single app`;
+    'selectTeamAccountTypeOptionFeature2': `Start for free, upgrade anytime`;
+    'selectTeamAccountTypeOptionHeading': `For collaboration`;
     'selfNotSupportMLSMsgPart1': `You can\'t communicate with {selfUserName}, as your device doesn\'t support the suitable protocol.`;
     'selfNotSupportMLSMsgPart2': `to call, and send messages and files.`;
     'selfProfileImageAlt': `Your profile picture`;
@@ -1910,17 +1921,6 @@ declare module 'I18n/en-US.json' {
     'wireMacos': `{brandName} for macOS`;
     'wireWindows': `{brandName} for Windows`;
     'wire_for_web': `{brandName} for Web`;
-    'selectAccountTypeHeading': `How will you use Wire?`;
-    'selectTeamAccountTypeOptionHeading': `For collaboration`;
-    'selectTeamAccountTypeOptionDescription': `Work securely with your team.`;
-    'selectTeamAccountTypeOptionButtonText': `Create Team`;
-    'selectTeamAccountTypeOptionFeature1': `Communicate with your colleagues and share documents via a single app`;
-    'selectTeamAccountTypeOptionFeature2': `Start for free, upgrade anytime`;
-    'selectPersonalAccountTypeOptionHeading': `For private use`;
-    'selectPersonalAccountTypeOptionDescription': `Chat with friends and family.`;
-    'selectPersonalAccountTypeOptionButtonText': `Create Personal Account`;
-    'selectPersonalAccountTypeOptionFeature1': `Send messages and share pictures`;
-    'selectPersonalAccountTypeOptionFeature2': `Always free`;
   };
   export default translations;
 }
