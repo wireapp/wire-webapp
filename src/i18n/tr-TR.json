@@ -1029,6 +1029,7 @@
   "login.publicComputer": "Bu ortak bir bilgisayar",
   "login.ssoLogin": "Şirket olarak giriş yapın",
   "login.subhead": "E-posta adresi veya kullanıcı adı girin.",
+  "login.subheadsso": "Enter your password to log in",
   "login.submitTwoFactorButton": "Submit",
   "login.twoFactorLoginSubHead": "Please check your email {email} for the verification code and enter it below.",
   "login.twoFactorLoginTitle": "Verify your account",

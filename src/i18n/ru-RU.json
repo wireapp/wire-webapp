@@ -1029,6 +1029,7 @@
   "login.publicComputer": "Это общедоступный компьютер",
   "login.ssoLogin": "Вход для компаний",
   "login.subhead": "Введите свой email или псевдоним.",
+  "login.subheadsso": "Enter your password to log in",
   "login.submitTwoFactorButton": "Подтвердить",
   "login.twoFactorLoginSubHead": "Пожалуйста, введите ниже код проверки, отправленный на ваш email {email}.",
   "login.twoFactorLoginTitle": "Подтвердите учетную запись",

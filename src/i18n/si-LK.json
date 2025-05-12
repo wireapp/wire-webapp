@@ -1029,6 +1029,7 @@
   "login.publicComputer": "මෙය පොදු පරිගණකයකි",
   "login.ssoLogin": "සමාගම් පිවිසුම",
   "login.subhead": "වි-තැපෑල හෝ පරිශ්‍රීලක නාමය යොදන්න.",
+  "login.subheadsso": "Enter your password to log in",
   "login.submitTwoFactorButton": "යොමන්න",
   "login.twoFactorLoginSubHead": "සත්‍යාපන කේතය සඳහා ඔබගේ {email} වි-තැපෑල පරීක්‍ෂා කර එය පහතින් යොදන්න.",
   "login.twoFactorLoginTitle": "ගිණුම සත්‍යාපනය කරන්න",
