@@ -44,23 +44,22 @@ export const CellsNewMenu = ({cellsRepository, conversationQualifiedId, onRefres
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState<CellItem['type']>('file');
 
+  const openModal = (type: CellItem['type']) => {
+    setModalType(type);
+    setIsModalOpen(true);
+  };
+
   const showOptionsMenu = (event: ReactMouseEvent<HTMLButtonElement> | MouseEvent) => {
     showContextMenu({
       event,
       entries: [
         {
           label: t('cellsNewItemMenu.folder'),
-          click: () => {
-            setModalType('folder');
-            setIsModalOpen(true);
-          },
+          click: () => openModal('folder'),
         },
         {
           label: t('cellsNewItemMenu.file'),
-          click: () => {
-            setModalType('file');
-            setIsModalOpen(true);
-          },
+          click: () => openModal('file'),
         },
       ],
       identifier: 'cells-new-file-menu',
