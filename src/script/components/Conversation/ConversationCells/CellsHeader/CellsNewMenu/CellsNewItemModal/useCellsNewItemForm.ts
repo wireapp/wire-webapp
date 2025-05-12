@@ -73,13 +73,13 @@ export const useCellsNewItemForm = ({
       return;
     }
 
+    setError(null);
+    setIsSubmitting(true);
+
     if (!name.trim()) {
       setError(t('cellNewItemMenuModalForm.nameRequired'));
       return;
     }
-
-    setError(null);
-    setIsSubmitting(true);
 
     try {
       await createItem(name);
