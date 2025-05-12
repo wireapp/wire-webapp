@@ -377,7 +377,7 @@ const LoginComponent = ({
   };
 
   return (
-    <Page withSideBar={isEnterpriseLoginV2Enabled}>
+    <Page withSideBar={isEnterpriseLoginV2Enabled && !embedded}>
       {isAccountAlreadyExistsModalOpen && <AccountAlreadyExistsModal onClose={hideAccountAlreadyExistsModal} />}
       {showBackButton && (
         <IsMobile>
