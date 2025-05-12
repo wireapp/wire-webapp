@@ -31,6 +31,13 @@ export const headerStyles: CSSObject = {
   flexDirection: 'column',
   marginTop: '16px',
 };
+
+export const headingStyles: CSSObject = {
+  fontSize: 'var(--font-size-large)',
+  fontWeight: 'var(--font-weight-semibold)',
+  margin: '0',
+};
+
 export const closeButtonStyles: CSSObject = {
   position: 'absolute',
   right: '8px',

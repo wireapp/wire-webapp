@@ -39,6 +39,7 @@ import {
   buttonWrapperStyles,
   closeButtonStyles,
   headerStyles,
+  headingStyles,
   inputWrapperStyles,
   wrapperStyles,
 } from './CellsNewItemModal.styles';
@@ -77,9 +78,9 @@ export const CellsNewItemModal = ({
     <ModalComponent isShown={isOpen} onClosed={onClose} onBgClick={onClose}>
       <div css={wrapperStyles}>
         <header css={headerStyles}>
-          <h2 className="modal__header__title">
+          <h3 css={headingStyles}>
             {t(type === 'folder' ? 'cellNewItemMenuModal.headlineFolder' : 'cellNewItemMenuModal.headlineFile')}
-          </h2>
+          </h3>
           <IconButton
             variant={IconButtonVariant.SECONDARY}
             type="button"
