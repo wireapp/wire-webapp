@@ -62,7 +62,7 @@ export const CellsNewMenu = ({cellsRepository, conversationQualifiedId, onRefres
           click: () => openModal('file'),
         },
       ],
-      identifier: 'cells-new-file-menu',
+      identifier: 'cells-new-menu',
     });
   };
 
