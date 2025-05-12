@@ -53,13 +53,13 @@ export const CellsTable = ({
   onUpdateBodyHeight,
 }: CellsTableProps) => {
   const {tableBodyRef} = useTableHeight({
+    files,
     onUpdate: onUpdateBodyHeight,
   });
 
-  const columns = getCellsTableColumns({cellsRepository, conversationQualifiedId, onDeleteFile});
   const table = useReactTable({
     data: files,
-    columns,
+    columns: getCellsTableColumns({cellsRepository, conversationQualifiedId, onDeleteFile}),
     getCoreRowModel: getCoreRowModel(),
   });
 
