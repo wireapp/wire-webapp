@@ -28,9 +28,9 @@ import {CellsTableNameColumn} from './CellsTableNameColumn/CellsTableNameColumn'
 import {CellsTableRowOptions} from './CellsTableRowOptions/CellsTableRowOptions';
 import {CellsTableSharedColumn} from './CellsTableSharedColumn/CellsTableSharedColumn';
 
-import {CellFile} from '../../common/cellFile/cellFile';
+import {CellItem} from '../../common/cellFile/cellFile';
 
-const columnHelper = createColumnHelper<CellFile>();
+const columnHelper = createColumnHelper<CellItem>();
 
 export const getCellsTableColumns = ({
   onDeleteFile,

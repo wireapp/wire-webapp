@@ -65,13 +65,21 @@ export const CellsTableRowOptions = ({
     [onDelete],
   );
 
+  const getDownloadName = (file: CellItem) => {
+    if (file.type === 'folder') {
+      return `${file.name}.zip`;
+    }
+    return file.name;
+  };
+
   const showOptionsMenu = (event: ReactMouseEvent<HTMLButtonElement> | MouseEvent) => {
     const openLabel = t('cellsGlobalView.optionOpen');
     const shareLabel = t('cellsGlobalView.optionShare');
     const downloadLabel = t('cellsGlobalView.optionDownload');
     const deleteLabel = t('cellsGlobalView.optionDelete');
 
-    const fileUrl = file.type === 'file' ? file.fileUrl : undefined;
+    const url = file.url;
+    const name = getDownloadName(file);
 
     showContextMenu({
       event,
@@ -85,7 +93,16 @@ export const CellsTableRowOptions = ({
           click: () =>
             file.type === 'folder' ? openFolder({conversationQualifiedId, name: file.name}) : handleOpenFile(file),
         },
-        fileUrl ? {label: downloadLabel, click: () => forcedDownloadFile({url: fileUrl, name: file.name})} : undefined,
+        url
+          ? {
+              label: downloadLabel,
+              click: () =>
+                forcedDownloadFile({
+                  url,
+                  name,
+                }),
+            }
+          : undefined,
         {label: deleteLabel, click: () => showDeleteFileModal({uuid: file.id, name: file.name})},
       ].filter(Boolean) as ContextMenuEntry[],
       identifier: 'file-preview-error-more-button',
