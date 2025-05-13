@@ -1048,6 +1048,7 @@ declare module 'I18n/en-US.json' {
     'login.publicComputer': `This is a public computer`;
     'login.ssoLogin': `Company log in`;
     'login.subhead': `Enter your email address or username.`;
+    'login.subheadsso': `Enter your password to log in`;
     'login.submitTwoFactorButton': `Submit`;
     'login.twoFactorLoginSubHead': `Please check your email {email} for the verification code and enter it below.`;
     'login.twoFactorLoginTitle': `Verify your account`;
@@ -1705,6 +1706,7 @@ declare module 'I18n/en-US.json' {
     'ssoLogin.overlayFocusLink': `Click to continue`;
     'ssoLogin.pasteButton': `Paste code`;
     'ssoLogin.subhead': `Enter the company SSO access code.`;
+    'ssoLogin.subheadsso': `Enter your password to log in`;
     'ssoLogin.subheadCode': `Please enter your SSO code`;
     'ssoLogin.subheadCodeOrEmail': `Please enter your email or SSO code.`;
     'ssoLogin.subheadEmailEnvironmentSwitchWarning': `If your email matches an enterprise installation of {brandName}, this app will connect to that server.`;
