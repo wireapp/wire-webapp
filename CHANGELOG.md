@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [46.23.7](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.23.6...@wireapp/core@46.23.7) (2025-05-13)
+
+### Bug Fixes
+
+* **core:** allow database deletion on logout [WPB-17316] ([#7043](https://github.com/wireapp/wire-web-packages/issues/7043)) ([23d8fed](https://github.com/wireapp/wire-web-packages/commit/23d8fedbbdfebbc0ca210db71ab7c7b52f50a708))
+
 ## [46.23.6](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.23.5...@wireapp/core@46.23.6) (2025-05-09)
 
 **Note:** Version bump only for package @wireapp/core
