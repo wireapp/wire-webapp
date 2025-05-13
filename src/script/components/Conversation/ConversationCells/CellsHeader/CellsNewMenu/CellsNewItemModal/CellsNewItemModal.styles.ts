@@ -17,40 +17,57 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {CSSObject, css} from '@emotion/react';
 
 export const wrapperStyles: CSSObject = {
+  padding: '8px',
+  width: '100%',
+  position: 'relative',
+};
+export const headerStyles: CSSObject = {
   display: 'flex',
   justifyContent: 'space-between',
-  alignItems: 'flex-start',
+  alignItems: 'center',
   flexDirection: 'column',
-  marginBottom: '20px',
-  width: '100%',
+  marginTop: '16px',
 };
 
 export const headingStyles: CSSObject = {
-  color: 'var(--main-color)',
+  fontSize: 'var(--font-size-large)',
   fontWeight: 'var(--font-weight-semibold)',
-  fontSize: 'var(--font-size-medium)',
+  margin: '0',
+};
+
+export const closeButtonStyles: CSSObject = {
+  position: 'absolute',
+  right: '8px',
+  top: '8px',
+};
+
+export const inputWrapperStyles: CSSObject = {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'flex-start',
+  padding: '16px',
+  gap: '8px',
+};
+
+export const buttonWrapperStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  flexDirection: 'row',
+  gap: '8px',
+  padding: '0 16px',
   marginBottom: '8px',
 };
 
-export const searchWrapperStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: '8px',
-};
-
-export const contentStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  gap: '8px',
+export const buttonStyles: CSSObject = {
   width: '100%',
+  margin: '0',
 };
 
-export const actionsStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: '8px',
-};
+export const errorMessageStyles = css`
+  color: var(--red-500);
+  font-size: 12px;
+  margin-top: 4px;
+`;

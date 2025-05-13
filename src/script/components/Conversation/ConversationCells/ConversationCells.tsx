@@ -105,8 +105,9 @@ export const ConversationCells = ({
         onRefresh={handleRefresh}
         conversationQualifiedId={conversationQualifiedId}
         conversationName={conversationName}
+        cellsRepository={cellsRepository}
       />
-      {(isSuccess || isLoading) && hasFiles && (
+      {(isSuccess || isLoading) && (
         <CellsTable
           files={isLoading ? [] : files}
           cellsRepository={cellsRepository}

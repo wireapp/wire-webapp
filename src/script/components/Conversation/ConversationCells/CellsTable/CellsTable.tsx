@@ -53,6 +53,7 @@ export const CellsTable = ({
   onUpdateBodyHeight,
 }: CellsTableProps) => {
   const {tableBodyRef} = useTableHeight({
+    files,
     onUpdate: onUpdateBodyHeight,
   });
 
