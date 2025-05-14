@@ -475,7 +475,7 @@
   "conversationAudioAssetUploading": "Выгрузка: {name}",
   "conversationButtonSeparator": "или",
   "conversationClassified": "Уровень безопасности: VS-NfD",
-  "conversationCommonFeature1": "До [bold]500[/bold] пользователей",
+  "conversationCommonFeature1": "Up to [bold]{capacity}[/bold] people",
   "conversationCommonFeature2": "Видеоконференции",
   "conversationCommonFeature3": "Сквозное шифрование всегда",
   "conversationConnectWithNewUsers": "Связаться с друзьями",

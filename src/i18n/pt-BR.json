@@ -475,7 +475,7 @@
   "conversationAudioAssetUploading": "Uploading: {name}",
   "conversationButtonSeparator": "or",
   "conversationClassified": "Nível de segurança: VS-NfD",
-  "conversationCommonFeature1": "Até [bold]500[/bold] pessoas",
+  "conversationCommonFeature1": "Up to [bold]{capacity}[/bold] people",
   "conversationCommonFeature2": "Videoconferência",
   "conversationCommonFeature3": "Sempre criptografado de ponta a ponta",
   "conversationConnectWithNewUsers": "Connect with People",
