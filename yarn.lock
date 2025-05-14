@@ -7627,9 +7627,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^27.45.0":
-  version: 27.45.0
-  resolution: "@wireapp/api-client@npm:27.45.0"
+"@wireapp/api-client@npm:^27.51.0":
+  version: 27.51.0
+  resolution: "@wireapp/api-client@npm:27.51.0"
   dependencies:
     "@aws-sdk/client-s3": "npm:3.750.0"
     "@aws-sdk/lib-storage": "npm:3.779.0"
@@ -7638,7 +7638,7 @@ __metadata:
     "@wireapp/protocol-messaging": "npm:1.52.0"
     axios: "npm:1.7.9"
     axios-retry: "npm:4.5.0"
-    cells-sdk-ts: "https://github.com/pydio/cells-sdk-ts#v0.1.1-alpha09"
+    cells-sdk-ts: "https://github.com/pydio/cells-sdk-ts#v0.1.1-alpha10"
     http-status-codes: "npm:2.3.0"
     logdown: "npm:3.3.1"
     pako: "npm:2.1.0"
@@ -7648,7 +7648,7 @@ __metadata:
     uuid: "npm:11.1.0"
     ws: "npm:8.18.1"
     zod: "npm:3.24.2"
-  checksum: 10/2ff8756250d86aae2e0371f9dacee382c1d32f1bce808757a0267d514b07e1a5cff8a320a372780f3d3c40428c8320026aa3fdefc111eb494ba67522a991b13f
+  checksum: 10/044dda7a54706eb70c20faf56efaad652380461b5ce210b85dd19e0ed8692ec74d6503a4be96cc36d6817fe1a0d5eaaa989f1d9f7a6f7b25a171a5ad8f58038d
   languageName: node
   linkType: hard
 
@@ -7713,11 +7713,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:46.23.0":
-  version: 46.23.0
-  resolution: "@wireapp/core@npm:46.23.0"
+"@wireapp/core@npm:46.23.7":
+  version: 46.23.7
+  resolution: "@wireapp/core@npm:46.23.7"
   dependencies:
-    "@wireapp/api-client": "npm:^27.45.0"
+    "@wireapp/api-client": "npm:^27.51.0"
     "@wireapp/commons": "npm:^5.4.2"
     "@wireapp/core-crypto": "npm:3.1.1"
     "@wireapp/cryptobox": "npm:12.8.0"
@@ -7735,7 +7735,7 @@ __metadata:
     long: "npm:^5.2.0"
     uuid: "npm:9.0.1"
     zod: "npm:3.24.2"
-  checksum: 10/42d167531dc4702170d850883708ce6ed4ab2bfd9060e5b57eb1c8f015628532edc95de4eea9f6d602d67d83f198a9de55479356fb60ca84e30f88b281e57e7a
+  checksum: 10/e1f12b9fa485a64660d4b074b8cb3d79629560d05ad8dab5d652ba1f3f372eb9d684a4c3dc73a957582a00e39ff48b800cb91ca486f7eb604b5aff77ab8e1977
   languageName: node
   linkType: hard
 
@@ -9205,12 +9205,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cells-sdk-ts@https://github.com/pydio/cells-sdk-ts#v0.1.1-alpha09":
+"cells-sdk-ts@https://github.com/pydio/cells-sdk-ts#v0.1.1-alpha10":
   version: 0.1.0
-  resolution: "cells-sdk-ts@https://github.com/pydio/cells-sdk-ts.git#commit=122cac9139231bef5445c435906c16d04b98e94b"
+  resolution: "cells-sdk-ts@https://github.com/pydio/cells-sdk-ts.git#commit=f48c3950202f903d54ec3ec695859b99449ead0b"
   dependencies:
     axios: "npm:^1.6.0"
-  checksum: 10/0eefa731723e1875fe1c0a6f1c72d2b61086b4acd75b1ed0fe28a35671d4e54a4d3288bfa1a932abc9524a373729c489caeb6ae52e678a14e0f58883477ef14f
+  checksum: 10/cc8612bf9e7a4cc271411b1c6af6eda56dd2ccdc757ddfb094d5af72fe05d0c4ee92f86254e90f8c8c243d01b5d15b147d8f11f9caf5977958f4a9c2e243ca32
   languageName: node
   linkType: hard
 
@@ -20934,7 +20934,7 @@ __metadata:
     "@wireapp/avs-debugger": "npm:0.0.7"
     "@wireapp/commons": "npm:5.4.2"
     "@wireapp/copy-config": "npm:2.3.0"
-    "@wireapp/core": "npm:46.23.0"
+    "@wireapp/core": "npm:46.23.7"
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/prettier-config": "npm:0.6.4"
     "@wireapp/react-ui-kit": "npm:9.44.1"
