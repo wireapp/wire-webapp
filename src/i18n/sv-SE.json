@@ -490,7 +490,7 @@
   "conversationAudioAssetUploading": "Uploading: {name}",
   "conversationButtonSeparator": "eller",
   "conversationClassified": "Security level: VS-NfD",
-  "conversationCommonFeature1": "Up to [bold]500[/bold] people",
+  "conversationCommonFeature1": "Up to [bold]{capacity}[/bold] people",
   "conversationCommonFeature2": "Video conferencing",
   "conversationCommonFeature3": "Always end-to-end encrypted",
   "conversationConnectWithNewUsers": "Connect with People",

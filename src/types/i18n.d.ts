@@ -501,7 +501,7 @@ declare module 'I18n/en-US.json' {
     'conversationAudioAssetUploading': `Uploading: {name}`;
     'conversationButtonSeparator': `or`;
     'conversationClassified': `Security level: VS-NfD`;
-    'conversationCommonFeature1': `Up to [bold]500[/bold] people`;
+    'conversationCommonFeature1': `Up to [bold]{capacity}[/bold] people`;
     'conversationCommonFeature2': `Video conferencing`;
     'conversationCommonFeature3': `Always end-to-end encrypted`;
     'conversationConnectWithNewUsers': `Connect with People`;
