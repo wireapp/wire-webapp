@@ -31,6 +31,7 @@ import {
   RestVersion,
   RestIncomingNode,
   RestNodeLocator,
+  RestActionOptionsCopyMove,
 } from 'cells-sdk-ts';
 
 import {CellsStorage} from './CellsStorage/CellsStorage';
@@ -176,6 +177,27 @@ export class CellsAPI {
     }
 
     const result = await this.client.performAction('delete', {Nodes: [{Uuid: uuid}]});
+
+    return result.data;
+  }
+
+  async moveNode({
+    currentPath,
+    targetPath,
+  }: {
+    currentPath: RestNodeLocator['Path'];
+    targetPath: RestActionOptionsCopyMove['TargetPath'];
+  }): Promise<RestPerformActionResponse> {
+    if (!this.client || !this.storageService) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    const result = await this.client.performAction('move', {
+      Nodes: [{Path: currentPath}],
+      CopyMoveOptions: {TargetIsParent: true, TargetPath: targetPath},
+      AwaitStatus: 'Finished',
+      AwaitTimeout: '5000ms',
+    });
 
     return result.data;
   }
