@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.53.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.52.0...@wireapp/api-client@27.53.0) (2025-05-14)
+
+### Features
+
+* **api-client/cells:** add type param for getting nodes ([#7046](https://github.com/wireapp/wire-web-packages/issues/7046)) ([4ae93e5](https://github.com/wireapp/wire-web-packages/commit/4ae93e517ce22a75a31bbb43f2e7aa9a466692d1))
+
 # [27.52.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.51.0...@wireapp/api-client@27.52.0) (2025-05-14)
 
 ### Features
