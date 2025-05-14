@@ -490,7 +490,7 @@
   "conversationAudioAssetUploading": "Hochladen: {name}",
   "conversationButtonSeparator": "oder",
   "conversationClassified": " Sicherheitsniveau: VS-NfD",
-  "conversationCommonFeature1": "Bis zu [bold]500[/bold] Personen",
+  "conversationCommonFeature1": "Up to [bold]{capacity}[/bold] people",
   "conversationCommonFeature2": "Videokonferenzen",
   "conversationCommonFeature3": "Immer Ende-zu-Ende verschlüsselt",
   "conversationConnectWithNewUsers": "Mit Personen verbinden",
