@@ -1029,6 +1029,7 @@
   "login.publicComputer": "Dies ist ein öffentlicher Computer",
   "login.ssoLogin": "Anmeldung für Unternehmen",
   "login.subhead": "E-Mail-Adresse oder Benutzernamen eingeben.",
+  "login.subheadsso": "Geben Sie Ihr Passwort ein, um sich anzumelden",
   "login.submitTwoFactorButton": "Absenden",
   "login.twoFactorLoginSubHead": "Bitte prüfen Sie Ihren Posteingang und geben Sie den Bestätigungscode unten ein.",
   "login.twoFactorLoginTitle": "E-Mail-Adresse bestätigen",
