@@ -25,8 +25,8 @@ export const leftSectionCss: CSSObject = {
   background: 'black',
   margin: 0,
   height: '100vh',
-  maxWidth: '26rem',
-  padding: '6rem 3.75rem',
+  width: '460px',
+  padding: '6rem 4rem',
   position: 'relative',
   minHeight: '42rem',
   [media.tabletDown]: {
@@ -39,6 +39,7 @@ export const contentContainerCss: CSSObject = {
   overflowY: 'auto',
   width: '100%',
   alignSelf: 'center',
+  flex: '1',
 };
 
 export const whiteFontCss: CSSObject = {
@@ -51,4 +52,26 @@ export const bodyCss: CSSObject = {
   background: COLOR_V2.WHITE,
   height: '100%',
   minHeight: '100vh',
+};
+
+export const registrationLayoutContainerCss: CSSObject = {
+  margin: '4rem 0',
+};
+
+export const registrationLayoutSubHeaderContainerCss: CSSObject = {
+  marginTop: '0.75rem',
+};
+
+export const registrationLayoutSubHeaderCss: CSSObject = {
+  ...whiteFontCss,
+  lineHeight: '1.5rem',
+};
+export const registrationLayoutListItemContainerCss: CSSObject = {
+  display: 'flex',
+  gap: '6px',
+  marginTop: '0.75rem',
+};
+
+export const registrationLayoutListItemIconCss: CSSObject = {
+  marginTop: '4px',
 };
