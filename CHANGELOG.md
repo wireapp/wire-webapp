@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.52.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.51.0...@wireapp/react-ui-kit@9.52.0) (2025-05-14)
+
+### Features
+
+* **react-ui-kit:** dropdown menu & breadcrumbs components ([#7044](https://github.com/wireapp/wire-web-packages/issues/7044)) ([6a6de4a](https://github.com/wireapp/wire-web-packages/commit/6a6de4a106d9060aca2be558d1598f8a1464b86d))
+
 # [9.51.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.50.1...@wireapp/react-ui-kit@9.51.0) (2025-04-28)
 
 ### Features
