@@ -308,6 +308,7 @@ jobs:
   deploy_to_aws:
     name: 'Deploy to live environments'
     runs-on: ubuntu-latest
+    environment: ${{ matrix.target }}
     needs: [build, set_deployment_targets]
     if: ${{needs.set_deployment_targets.outputs.deployment_targets}}
 
