@@ -37,7 +37,7 @@ interface ConversationFeatureProps {
 
 export const ConversationFeature = ({conversationType}: ConversationFeatureProps) => {
   const generalFeatures = [
-    t('conversationCommonFeature1'),
+    t('conversationCommonFeature1', {capacity: conversationType === ConversationType.Channel ? 2000 : 500}),
     t('conversationCommonFeature2'),
     t('conversationCommonFeature3'),
   ];
