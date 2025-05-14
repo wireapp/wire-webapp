@@ -25,6 +25,7 @@ import {
   RestPublicLinkDeleteSuccess,
   RestShareLink,
   RestVersion,
+  RestPerformActionResponse,
 } from 'cells-sdk-ts';
 import {v4 as uuidv4} from 'uuid';
 
@@ -494,6 +495,100 @@ describe('CellsAPI', () => {
       mockNodeServiceApi.performAction.mockRejectedValueOnce(new Error(errorMessage));
 
       await expect(cellsAPI.deleteFile({uuid: invalidUuid})).rejects.toThrow(errorMessage);
+    });
+  });
+
+  describe('moveNode', () => {
+    it('moves a file to the target path', async () => {
+      const currentPath = '/current/file.txt';
+      const targetPath = '/new-location/file.txt';
+      const mockResponse: RestPerformActionResponse = {
+        Nodes: [
+          {
+            Path: targetPath,
+          },
+        ],
+      } as RestPerformActionResponse;
+
+      mockNodeServiceApi.performAction.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      const result = await cellsAPI.moveNode({currentPath, targetPath});
+
+      expect(mockNodeServiceApi.performAction).toHaveBeenCalledWith('move', {
+        Nodes: [{Path: currentPath}],
+        CopyMoveOptions: {TargetIsParent: true, TargetPath: targetPath},
+        AwaitStatus: 'Finished',
+        AwaitTimeout: '5000ms',
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('propagates errors when move operation fails', async () => {
+      const currentPath = '/current/file.txt';
+      const targetPath = '/new-location/file.txt';
+      const errorMessage = 'Move operation failed';
+
+      mockNodeServiceApi.performAction.mockRejectedValueOnce(new Error(errorMessage));
+
+      await expect(cellsAPI.moveNode({currentPath, targetPath})).rejects.toThrow(errorMessage);
+    });
+
+    it('handles empty current path', async () => {
+      const emptyCurrentPath = '';
+      const targetPath = '/new-location/file.txt';
+      const errorMessage = 'Invalid path';
+
+      mockNodeServiceApi.performAction.mockRejectedValueOnce(new Error(errorMessage));
+
+      await expect(cellsAPI.moveNode({currentPath: emptyCurrentPath, targetPath})).rejects.toThrow(errorMessage);
+    });
+
+    it('handles empty target path', async () => {
+      const currentPath = '/current/file.txt';
+      const emptyTargetPath = '';
+      const mockResponse: RestPerformActionResponse = {
+        Nodes: [
+          {
+            Path: emptyTargetPath,
+          },
+        ],
+      } as RestPerformActionResponse;
+
+      mockNodeServiceApi.performAction.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      const result = await cellsAPI.moveNode({currentPath, targetPath: emptyTargetPath});
+
+      expect(mockNodeServiceApi.performAction).toHaveBeenCalledWith('move', {
+        Nodes: [{Path: currentPath}],
+        CopyMoveOptions: {TargetIsParent: true, TargetPath: emptyTargetPath},
+        AwaitStatus: 'Finished',
+        AwaitTimeout: '5000ms',
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('handles move to root directory', async () => {
+      const currentPath = '/current/file.txt';
+      const rootPath = '/';
+      const mockResponse: RestPerformActionResponse = {
+        Nodes: [
+          {
+            Path: rootPath,
+          },
+        ],
+      } as RestPerformActionResponse;
+
+      mockNodeServiceApi.performAction.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      const result = await cellsAPI.moveNode({currentPath, targetPath: rootPath});
+
+      expect(mockNodeServiceApi.performAction).toHaveBeenCalledWith('move', {
+        Nodes: [{Path: currentPath}],
+        CopyMoveOptions: {TargetIsParent: true, TargetPath: rootPath},
+        AwaitStatus: 'Finished',
+        AwaitTimeout: '5000ms',
+      });
+      expect(result).toEqual(mockResponse);
     });
   });
 
