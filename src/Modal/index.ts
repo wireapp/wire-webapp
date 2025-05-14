@@ -19,3 +19,4 @@
 
 export * from './Modal';
 export {Overlay} from './Overlay';
+export * from './DropdownMenu';

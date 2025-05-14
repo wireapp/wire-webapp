@@ -69,6 +69,10 @@ const light: () => CSSObject = () => ({
   '--success-color': COLOR_V2.GREEN_LIGHT_500,
   '--app-bg': COLOR_V2.GRAY_10,
   '--main-color': COLOR.BLACK,
+  '--modal-bg': '#f8f8f8',
+
+  // Foreground
+  '--foreground-fade-16': '#676b7129',
 
   // Archive File Icon
   '--archive-file-icon-bg': COLOR_V2.AMBER_LIGHT_50,
@@ -175,6 +179,10 @@ const dark: () => CSSObject = () => ({
   '--success-color': COLOR_V2.GREEN_DARK_500,
   '--app-bg': COLOR_V2.GRAY_95,
   '--main-color': COLOR.WHITE,
+  '--modal-bg': '#26272c',
+
+  // Foreground
+  '--foreground-fade-16': '#9fa1a729',
 
   // Archive File Icon
   '--archive-file-icon-bg': COLOR_V2.AMBER_DARK_50,
@@ -251,8 +259,28 @@ const accentColors: () => CSSObject = () => ({
   '--indicator-range-input-thumb': COLOR_V2.BLUE_LIGHT_700,
 });
 
+const zIndexes: () => CSSObject = () => ({
+  '--z-index-level-0': 0,
+  '--z-index-level-1': 10,
+  '--z-index-level-2': 100,
+  '--z-index-level-3': 1000,
+  '--z-index-level-4': 10000,
+  '--z-index-level-5': 100000,
+  '--z-index-level-6': 1000000,
+  '--z-index-level-7': 10000000,
+  '--z-index-badge': 'var(--z-index-level-2)',
+  '--z-index-panel': 'var(--z-index-level-3)',
+  '--z-index-bubble': 'var(--z-index-level-3)',
+  '--z-index-video': 'var(--z-index-level-4)',
+  '--z-index-choosescreen': 'var(--z-index-level-5)',
+  '--z-index-context': 'var(--z-index-level-5)',
+  '--z-index-warnings': 'var(--z-index-level-6)',
+  '--z-index-modal': 'var(--z-index-level-7)',
+});
+
 export const GlobalCssVariables = {
   light,
   dark,
   accentColors,
+  zIndexes,
 };
