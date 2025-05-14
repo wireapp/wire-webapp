@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.52.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.51.0...@wireapp/api-client@27.52.0) (2025-05-14)
+
+### Features
+
+* **api-client/cells:** move method [WPB-17386] ([#7045](https://github.com/wireapp/wire-web-packages/issues/7045)) ([a3f3597](https://github.com/wireapp/wire-web-packages/commit/a3f359725453a8342ab7355058b38256b01f0da8))
+
 # [27.51.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.50.0...@wireapp/api-client@27.51.0) (2025-05-09)
 
 ### Features
