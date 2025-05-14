@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,13 +17,8 @@
  *
  */
 
-export * from './ButtonGroup';
-export * from './childrenWithDefaultProps';
-export * from './IconButton';
-export * from './IsInViewport';
-export * from './Loading';
-export * from './Pagination';
-export * from './Pill';
-export * from './useLongTouch';
-export * from './useTimeout';
-export * from './Breadcrumbs';
+import {CSSObject} from '@emotion/react';
+
+export const iconStyles: CSSObject = {
+  transform: 'rotate(90deg)',
+};

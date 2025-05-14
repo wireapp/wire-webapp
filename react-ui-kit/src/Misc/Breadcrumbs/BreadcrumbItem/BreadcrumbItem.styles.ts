@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,13 +17,32 @@
  *
  */
 
-export * from './ButtonGroup';
-export * from './childrenWithDefaultProps';
-export * from './IconButton';
-export * from './IsInViewport';
-export * from './Loading';
-export * from './Pagination';
-export * from './Pill';
-export * from './useLongTouch';
-export * from './useTimeout';
-export * from './Breadcrumbs';
+import {CSSObject} from '@emotion/react';
+
+import {COLOR_V2} from '../../../Identity/colors-v2';
+
+export const listItemStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  flexShrink: 0,
+};
+
+export const buttonStyles: CSSObject = {
+  background: 'none',
+  border: 'none',
+  padding: '0 8px',
+  cursor: 'pointer',
+  fontSize: '14px',
+  color: COLOR_V2.GRAY_70,
+
+  '&:hover': {
+    color: 'var(--main-color)',
+  },
+};
+
+export const activeItemStyles: CSSObject = {
+  display: 'inline-block',
+  padding: '0 8px',
+  fontSize: '14px',
+  color: 'var(--main-color)',
+};

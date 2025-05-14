@@ -38,3 +38,9 @@ export const manySelectors = (selectors: string[], css: CSSObject) =>
     acc[selector] = css;
     return acc;
   }, {});
+
+export const ellipsis = (): CSSObject => ({
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+});
