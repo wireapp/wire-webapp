@@ -153,7 +153,7 @@ pipeline {
         }
     }
 
-        stage('Trigger smoke test') {
+        stage('Trigger critical flow tests') {
           steps {
             build job: 'Webapp_Smoke_Chrome', parameters: [string(name: 'TAGS', value: '@flow-web'), string(name: 'GIT_BRANCH', value: 'web-dev'), string(name: 'webappApplicationPath', value: "$webappApplicationPath")]
           }
