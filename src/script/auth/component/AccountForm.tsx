@@ -237,8 +237,8 @@ const AccountFormComponent = ({
           id="confirmPassword"
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
             inputs.confirmPassword.current?.setCustomValidity('');
-            setRegistrationData({...registrationData, confirmPassword: event.target.value});
-            setValidInputs({...validInputs, confirmPassword: true});
+            setRegistrationData(prevState => ({...prevState, confirmPassword: event.target.value}));
+            setValidInputs(prevState => ({...prevState, confirmPassword: true}));
           }}
           ref={inputs.confirmPassword}
           markInvalid={!validInputs.confirmPassword}
