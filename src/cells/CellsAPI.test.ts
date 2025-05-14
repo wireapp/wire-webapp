@@ -318,7 +318,7 @@ describe('CellsAPI', () => {
     });
   });
 
-  describe('getAllFiles', () => {
+  describe('getAllNodes', () => {
     it('retrieves all files with the correct parameters', async () => {
       const mockCollection: Partial<RestNodeCollection> = {
         Nodes: [
@@ -329,7 +329,7 @@ describe('CellsAPI', () => {
 
       mockNodeServiceApi.lookup.mockResolvedValueOnce(createMockResponse(mockCollection as RestNodeCollection));
 
-      const result = await cellsAPI.getAllFiles({path: TEST_FILE_PATH});
+      const result = await cellsAPI.getAllNodes({path: TEST_FILE_PATH});
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
         Scope: {Root: {Path: TEST_FILE_PATH}},
@@ -352,7 +352,7 @@ describe('CellsAPI', () => {
 
       mockNodeServiceApi.lookup.mockResolvedValueOnce(createMockResponse(mockCollection as RestNodeCollection));
 
-      const result = await cellsAPI.getAllFiles({path: TEST_FILE_PATH});
+      const result = await cellsAPI.getAllNodes({path: TEST_FILE_PATH});
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
         Scope: {Root: {Path: TEST_FILE_PATH}},
@@ -375,7 +375,7 @@ describe('CellsAPI', () => {
 
       mockNodeServiceApi.lookup.mockResolvedValueOnce(createMockResponse(mockCollection as RestNodeCollection));
 
-      const result = await cellsAPI.getAllFiles({
+      const result = await cellsAPI.getAllNodes({
         path: TEST_FILE_PATH,
         limit: 5,
         offset: 10,
@@ -402,7 +402,7 @@ describe('CellsAPI', () => {
 
       mockNodeServiceApi.lookup.mockResolvedValueOnce(createMockResponse(mockCollection as RestNodeCollection));
 
-      const result = await cellsAPI.getAllFiles({
+      const result = await cellsAPI.getAllNodes({
         path: TEST_FILE_PATH,
         sortBy: 'name',
         sortDirection: 'asc',
@@ -429,7 +429,7 @@ describe('CellsAPI', () => {
 
       mockNodeServiceApi.lookup.mockResolvedValueOnce(createMockResponse(mockCollection as RestNodeCollection));
 
-      const result = await cellsAPI.getAllFiles({
+      const result = await cellsAPI.getAllNodes({
         path: TEST_FILE_PATH,
         sortBy: 'size',
         sortDirection: 'desc',
@@ -446,22 +446,48 @@ describe('CellsAPI', () => {
       expect(result).toEqual(mockCollection);
     });
 
+    it('filters by type when provided', async () => {
+      const mockCollection: Partial<RestNodeCollection> = {
+        Nodes: [{Path: '/file1.txt', Uuid: 'uuid1', Type: 'LEAF'}],
+      };
+
+      mockNodeServiceApi.lookup.mockResolvedValueOnce(createMockResponse(mockCollection as RestNodeCollection));
+
+      const result = await cellsAPI.getAllNodes({
+        path: TEST_FILE_PATH,
+        type: 'LEAF',
+      });
+
+      expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
+        Scope: {Root: {Path: TEST_FILE_PATH}},
+        Flags: ['WithPreSignedURLs'],
+        Limit: '10',
+        Offset: '0',
+        SortField: 'mtime',
+        SortDirDesc: true,
+        Filters: {
+          Type: 'LEAF',
+        },
+      });
+      expect(result).toEqual(mockCollection);
+    });
+
     it('propagates errors when lookup fails', async () => {
       const errorMessage = 'Lookup failed';
 
       mockNodeServiceApi.lookup.mockRejectedValueOnce(new Error(errorMessage));
 
-      await expect(cellsAPI.getAllFiles({path: TEST_FILE_PATH})).rejects.toThrow(errorMessage);
+      await expect(cellsAPI.getAllNodes({path: TEST_FILE_PATH})).rejects.toThrow(errorMessage);
     });
 
     it('returns empty collection when no files exist', async () => {
       const emptyCollection: Partial<RestNodeCollection> = {
         Nodes: [],
-      };
+      } as RestNodeCollection;
 
       mockNodeServiceApi.lookup.mockResolvedValueOnce(createMockResponse(emptyCollection as RestNodeCollection));
 
-      const result = await cellsAPI.getAllFiles({path: TEST_FILE_PATH});
+      const result = await cellsAPI.getAllNodes({path: TEST_FILE_PATH});
       expect(result).toEqual(emptyCollection);
     });
   });
@@ -948,7 +974,7 @@ describe('CellsAPI', () => {
     });
   });
 
-  describe('searchFiles', () => {
+  describe('searchNodes', () => {
     it('searches for files by filename phrase', async () => {
       const searchPhrase = 'test';
       const mockResponse: RestNodeCollection = {
@@ -966,7 +992,7 @@ describe('CellsAPI', () => {
 
       mockNodeServiceApi.lookup.mockResolvedValueOnce(createMockResponse(mockResponse));
 
-      const result = await cellsAPI.searchFiles({phrase: searchPhrase});
+      const result = await cellsAPI.searchNodes({phrase: searchPhrase});
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
         Scope: {Root: {Path: '/'}, Recursive: true},
@@ -997,7 +1023,7 @@ describe('CellsAPI', () => {
 
       mockNodeServiceApi.lookup.mockResolvedValueOnce(createMockResponse(mockResponse));
 
-      const result = await cellsAPI.searchFiles({phrase: searchPhrase});
+      const result = await cellsAPI.searchNodes({phrase: searchPhrase});
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
         Scope: {Root: {Path: '/'}, Recursive: true},
@@ -1028,7 +1054,7 @@ describe('CellsAPI', () => {
 
       mockNodeServiceApi.lookup.mockResolvedValueOnce(createMockResponse(mockResponse));
 
-      const result = await cellsAPI.searchFiles({
+      const result = await cellsAPI.searchNodes({
         phrase: searchPhrase,
         limit: 5,
         offset: 10,
@@ -1063,7 +1089,7 @@ describe('CellsAPI', () => {
 
       mockNodeServiceApi.lookup.mockResolvedValueOnce(createMockResponse(mockResponse));
 
-      const result = await cellsAPI.searchFiles({
+      const result = await cellsAPI.searchNodes({
         phrase: searchPhrase,
         sortBy: 'name',
         sortDirection: 'asc',
@@ -1098,7 +1124,7 @@ describe('CellsAPI', () => {
 
       mockNodeServiceApi.lookup.mockResolvedValueOnce(createMockResponse(mockResponse));
 
-      const result = await cellsAPI.searchFiles({
+      const result = await cellsAPI.searchNodes({
         phrase: searchPhrase,
         sortBy: 'size',
         sortDirection: 'desc',
@@ -1116,6 +1142,39 @@ describe('CellsAPI', () => {
       expect(result).toEqual(mockResponse);
     });
 
+    it('filters by type when provided', async () => {
+      const searchPhrase = 'test';
+      const mockResponse: RestNodeCollection = {
+        Nodes: [
+          {
+            Path: '/test.txt',
+            Uuid: 'file-uuid-1',
+            Type: 'LEAF',
+          },
+        ],
+      } as RestNodeCollection;
+
+      mockNodeServiceApi.lookup.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      const result = await cellsAPI.searchNodes({
+        phrase: searchPhrase,
+        type: 'LEAF',
+      });
+
+      expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
+        Scope: {Root: {Path: '/'}, Recursive: true},
+        Filters: {
+          Type: 'LEAF',
+        },
+        Flags: ['WithPreSignedURLs'],
+        Limit: '10',
+        Offset: '0',
+        SortDirDesc: true,
+        SortField: 'mtime',
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
     it('returns empty collection when no files match search phrase', async () => {
       const searchPhrase = 'nonexistent';
       const mockResponse: RestNodeCollection = {
@@ -1124,7 +1183,7 @@ describe('CellsAPI', () => {
 
       mockNodeServiceApi.lookup.mockResolvedValueOnce(createMockResponse(mockResponse));
 
-      const result = await cellsAPI.searchFiles({phrase: searchPhrase});
+      const result = await cellsAPI.searchNodes({phrase: searchPhrase});
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
         Scope: {Root: {Path: '/'}, Recursive: true},
@@ -1144,7 +1203,7 @@ describe('CellsAPI', () => {
 
       mockNodeServiceApi.lookup.mockRejectedValueOnce(new Error(errorMessage));
 
-      await expect(cellsAPI.searchFiles({phrase: searchPhrase})).rejects.toThrow(errorMessage);
+      await expect(cellsAPI.searchNodes({phrase: searchPhrase})).rejects.toThrow(errorMessage);
     });
 
     it('handles empty search phrase', async () => {
@@ -1155,7 +1214,7 @@ describe('CellsAPI', () => {
 
       mockNodeServiceApi.lookup.mockResolvedValueOnce(createMockResponse(mockResponse));
 
-      const result = await cellsAPI.searchFiles({phrase: searchPhrase});
+      const result = await cellsAPI.searchNodes({phrase: searchPhrase});
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
         Scope: {Root: {Path: '/'}, Recursive: true},
