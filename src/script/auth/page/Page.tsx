@@ -38,18 +38,11 @@ interface Props extends React.HTMLProps<HTMLDivElement> {
 
 const hasInvalidAccountData = (account: RegistrationDataState) => !account.name || !account.email || !account.password;
 
-const hasInvalidTeamData = ({team}: {team: TeamData}) => !team || !team.name;
-
-const redirects = {
-  [AuthSelector.REGISTER_FLOW.PERSONAL]: ROUTE.CREATE_ACCOUNT,
-  [AuthSelector.REGISTER_FLOW.GENERIC_INVITATION]: ROUTE.CREATE_ACCOUNT,
-  [AuthSelector.REGISTER_FLOW.TEAM]: ROUTE.CREATE_TEAM,
-};
+const hasInvalidTeamData = ({team}: {team?: TeamData}) => !team || !team.name;
 
 const PageComponent = ({
   hasAccountData,
   hasTeamData,
-  currentFlow,
   isAuthenticated,
   isStateAuthenticated,
   account,
@@ -61,7 +54,7 @@ const PageComponent = ({
     (hasTeamData && hasInvalidTeamData(account) && !isStateAuthenticated) ||
     (isAuthenticated && !isStateAuthenticated)
   ) {
-    return <Navigate to={redirects[currentFlow] || ROUTE.INDEX} replace />;
+    return <Navigate to={ROUTE.CREATE_ACCOUNT} replace />;
   }
 
   if (withSideBar) {
@@ -74,7 +67,6 @@ const PageComponent = ({
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
   account: AuthSelector.getAccount(state),
-  currentFlow: AuthSelector.getCurrentFlow(state),
   isStateAuthenticated: AuthSelector.isAuthenticated(state),
 });
 
