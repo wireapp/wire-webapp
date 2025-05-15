@@ -118,11 +118,32 @@ export class CellsRepository {
     limit?: number;
     offset?: number;
   }) {
-    return this.apiClient.api.cells.getAllFiles({path: path || this.basePath, limit, offset});
+    return this.apiClient.api.cells.getAllFiles({
+      path: path || this.basePath,
+      limit,
+      offset,
+      sortBy: SEARCH_DEFAULT_SORT_FIELD,
+      sortDirection: SEARCH_DEFAULT_SORT_DIR,
+    });
   }
 
   async getFile({uuid}: {uuid: string}) {
     return this.apiClient.api.cells.getFile({id: uuid});
+  }
+
+  async createFolder({path, name}: {path: string; name: string}) {
+    const filePath = `${path || this.basePath}/${name}`;
+    const uuid = createUuid();
+
+    return this.apiClient.api.cells.createFolder({path: filePath, uuid});
+  }
+
+  async createFile({path, name}: {path: string; name: string}) {
+    const filePath = `${path || this.basePath}/${name}`;
+    const uuid = createUuid();
+    const versionId = createUuid();
+
+    return this.apiClient.api.cells.createFile({path: filePath, uuid, versionId});
   }
 
   async createPublicLink({uuid, label}: {uuid: string; label?: string}) {

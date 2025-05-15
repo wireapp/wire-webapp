@@ -22,21 +22,9 @@ import React, {useEffect, useState} from 'react';
 import {BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
 import {ConsentType} from '@wireapp/api-client/lib/self/index';
 import {connect} from 'react-redux';
-import {useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 
-import {
-  ArrowIcon,
-  ContainerXS,
-  Form,
-  H1,
-  Input,
-  InputBlock,
-  InputSubmitCombo,
-  Muted,
-  RoundIconButton,
-  Text,
-} from '@wireapp/react-ui-kit';
+import {Button, ContainerXS, Form, Input, InputBlock, InputSubmitCombo, Text} from '@wireapp/react-ui-kit';
 
 import {StorageKey} from 'src/script/storage';
 import {t} from 'Util/LocalizerUtil';
@@ -46,12 +34,15 @@ import {isBackendError} from 'Util/TypePredicateUtil';
 import {Page} from './Page';
 
 import {AcceptNewsModal} from '../component/AcceptNewsModal';
+import {AccountRegistrationLayout} from '../component/AccountRegistrationLayout';
+import {EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action';
 import {bindActionCreators, RootState} from '../module/reducer';
 import * as SelfSelector from '../module/selector/SelfSelector';
-import {ROUTE} from '../route';
+import {QUERY_KEY} from '../route';
 import {parseError} from '../util/errorUtil';
 import {createSuggestions} from '../util/handleUtil';
+import {pathWithParams} from '../util/urlUtil';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
@@ -64,14 +55,15 @@ const SetHandleComponent = ({
   checkHandles,
   isFetching,
   name,
+  removeLocalStorage,
 }: Props & ConnectedProps & DispatchProps) => {
-  const navigate = useNavigate();
   const [error, setError] = useState(null);
   const [handle, setHandle] = useState('');
 
   useEffect(() => {
     if (hasSelfHandle) {
-      navigate(ROUTE.INITIAL_INVITE);
+      void removeLocalStorage(QUERY_KEY.JOIN_EXPIRES);
+      window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP));
     }
   }, [hasSelfHandle]);
 
@@ -123,40 +115,41 @@ const SetHandleComponent = ({
 
   return (
     <Page>
-      <ContainerXS centerText verticalCenter style={{display: 'flex', flexDirection: 'column', minHeight: 428}}>
-        <H1 center>{t('chooseHandle.headline')}</H1>
-        <Muted center>{t('chooseHandle.subhead')}</Muted>
-        <Form style={{marginTop: 30}} onSubmit={onSetHandle}>
-          <InputBlock>
-            <InputSubmitCombo style={{paddingLeft: 0}}>
-              <Text center style={{minWidth: 38}}>
-                {'@'}
-              </Text>
-              <Input
-                id="handle"
-                name="handle"
-                placeholder={t('chooseHandle.handlePlaceholder')}
-                type="text"
-                onChange={onHandleChange}
-                value={handle}
-                data-uie-name="enter-handle"
-              />
-              <RoundIconButton
-                disabled={!handle || isFetching}
-                type="submit"
-                data-uie-name="do-send-handle"
-                formNoValidate
-              >
-                <ArrowIcon />
-              </RoundIconButton>
-            </InputSubmitCombo>
-          </InputBlock>
-        </Form>
-        {error && parseError(error)}
-      </ContainerXS>
-      {!isFetching && hasUnsetMarketingConsent && (
-        <AcceptNewsModal onConfirm={handleAcceptNewletterConsent} onDecline={handleDeclineNewletterConsent} />
-      )}
+      <AccountRegistrationLayout>
+        <ContainerXS centerText verticalCenter style={{display: 'flex', flexDirection: 'column', padding: '16px'}}>
+          <Text fontSize="24px" css={{fontWeight: '500', marginBottom: '8px'}} center>
+            {t('chooseHandle.headline')}
+          </Text>
+          <Text block center>
+            {t('chooseHandle.subhead')}
+          </Text>
+          <Form style={{marginTop: 24}} onSubmit={onSetHandle}>
+            <InputBlock>
+              <InputSubmitCombo style={{paddingLeft: 0}}>
+                <Text center style={{minWidth: 38}} bold>
+                  {'@'}
+                </Text>
+                <Input
+                  id="handle"
+                  name="handle"
+                  placeholder={t('chooseHandle.handlePlaceholder')}
+                  type="text"
+                  onChange={onHandleChange}
+                  value={handle}
+                  data-uie-name="enter-handle"
+                />
+              </InputSubmitCombo>
+            </InputBlock>
+            <Button disabled={!handle || isFetching} type="submit" data-uie-name="do-send-handle" block>
+              {t('chooseHandle.submitButton')}
+            </Button>
+          </Form>
+          {error && parseError(error)}
+        </ContainerXS>
+        {!isFetching && hasUnsetMarketingConsent && (
+          <AcceptNewsModal onConfirm={handleAcceptNewletterConsent} onDecline={handleDeclineNewletterConsent} />
+        )}
+      </AccountRegistrationLayout>
     </Page>
   );
 };
@@ -177,6 +170,7 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
       doGetConsents: ROOT_ACTIONS.selfAction.doGetConsents,
       doSetConsent: ROOT_ACTIONS.selfAction.doSetConsent,
       doSetHandle: ROOT_ACTIONS.selfAction.setHandle,
+      removeLocalStorage: ROOT_ACTIONS.localStorageAction.deleteLocalStorage,
     },
     dispatch,
   );

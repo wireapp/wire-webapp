@@ -24,18 +24,16 @@ import {ClientType} from '@wireapp/api-client/lib/client/index';
 import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
 import {StatusCodes} from 'http-status-codes';
 import {connect} from 'react-redux';
-import {useLocation, useNavigate} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 
 import {Runtime, UrlUtil} from '@wireapp/commons';
 import {
-  ArrowIcon,
   Button,
   ButtonVariant,
   Checkbox,
   CheckboxLabel,
   CodeInput,
-  COLOR,
   Column,
   Columns,
   Container,
@@ -67,10 +65,10 @@ import {Page} from './Page';
 import {Config} from '../../Config';
 import {AccountAlreadyExistsModal} from '../component/AccountAlreadyExistsModal';
 import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
+import {BackButton} from '../component/BackButton';
 import {Exception} from '../component/Exception';
 import {JoinGuestLinkPasswordModal} from '../component/JoinGuestLinkPasswordModal';
 import {LoginForm} from '../component/LoginForm';
-import {RouterLink} from '../component/RouterLink';
 import {EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot} from '../module/action/';
 import {LabeledError} from '../module/action/LabeledError';
@@ -108,14 +106,13 @@ const LoginComponent = ({
   conversationInfo,
   conversationInfoFetching,
   embedded,
+  account,
 }: Props & ConnectedProps & DispatchProps) => {
   const logger = getLogger('Login');
   const navigate = useNavigate();
   const isTablet = useMatchMedia(QUERY[QueryKeys.TABLET_DOWN]);
 
-  const {state} = useLocation();
-  const accountCreationEnabled = state?.accountCreationEnabled;
-  const shouldDisplayWarning = state?.shouldDisplayWarning;
+  const {accountCreationEnabled, shouldDisplayWarning} = account;
 
   const [conversationCode, setConversationCode] = useState<string | null>(null);
   const [conversationKey, setConversationKey] = useState<string | null>(null);
@@ -357,12 +354,6 @@ const LoginComponent = ({
     onEntropyGenerated.current?.(entropyData);
   };
 
-  const backArrow = (
-    <RouterLink to={ROUTE.INDEX} data-uie-name="go-index" aria-label={t('login.goBack')}>
-      <ArrowIcon direction="left" color={COLOR.TEXT} />
-    </RouterLink>
-  );
-
   const submitJoinCodeWithPassword = async (password: string) => {
     if (!conversationSubmitData) {
       setIsLinkPasswordModalOpen(false);
@@ -377,11 +368,13 @@ const LoginComponent = ({
   };
 
   return (
-    <Page withSideBar={isEnterpriseLoginV2Enabled}>
+    <Page withSideBar={isEnterpriseLoginV2Enabled && !embedded}>
       {isAccountAlreadyExistsModalOpen && <AccountAlreadyExistsModal onClose={hideAccountAlreadyExistsModal} />}
       {showBackButton && (
         <IsMobile>
-          <div style={{margin: 16}}>{backArrow}</div>
+          <div style={{margin: 16}}>
+            <BackButton />
+          </div>
         </IsMobile>
       )}
       {isEntropyRequired && showEntropyForm ? (
@@ -417,7 +410,7 @@ const LoginComponent = ({
                 <Column style={{display: 'flex'}}>
                   {showBackButton && (
                     <div style={{margin: isEnterpriseLoginV2Enabled ? '0.75rem 0px auto auto' : 'auto'}}>
-                      {backArrow}
+                      <BackButton />
                     </div>
                   )}
                 </Column>
@@ -426,7 +419,7 @@ const LoginComponent = ({
             <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
               <ContainerXS
                 centerText
-                style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between'}}
+                style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '16px'}}
               >
                 {twoFactorLoginData ? (
                   <div>
@@ -479,7 +472,7 @@ const LoginComponent = ({
                           {t('login.headline')}
                         </Heading>
                       )}
-                      <Text>{t('login.subhead')}</Text>
+                      <Text>{isEnterpriseLoginV2Enabled ? t('login.subheadsso') : t('login.subhead')}</Text>
                       <Form style={{marginTop: 30}} data-uie-name="login">
                         <LoginForm isFetching={isFetching} onSubmit={handleSubmit} />
                         {validationErrors.length
@@ -571,6 +564,7 @@ const mapStateToProps = (state: RootState) => ({
   authError: AuthSelector.getError(state),
   conversationInfo: ConversationSelector.conversationInfo(state),
   conversationInfoFetching: ConversationSelector.conversationInfoFetching(state),
+  account: AuthSelector.getAccount(state),
 });
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;

@@ -187,8 +187,17 @@ export const AppMain: FC<AppMainProps> = ({
       void mainView.content.showConversation({id: conversationId, domain});
     };
 
-    const showConversationFiles = (conversationId: string, domain = apiContext.domain ?? '', filePath = '') => {
-      void mainView.content.showConversation({id: conversationId, domain}, {filePath: `files/${filePath}`});
+    const showConversationFiles = async (
+      conversationId: string,
+      domain = apiContext.domain ?? '',
+      path: string | string[] = '',
+    ) => {
+      const pathString = Array.isArray(path) ? path.join('/') : path;
+
+      await mainView.content.showConversation(
+        {id: conversationId, domain},
+        {filePath: `files${pathString ? `/${pathString}` : ''}`},
+      );
     };
 
     const showUserProfile = (param1: string, param2?: string) => {
@@ -211,8 +220,8 @@ export const AppMain: FC<AppMainProps> = ({
       '/conversation/:conversationId': showConversationMessages,
       '/conversation/:conversationId/:domain/files': showConversationFiles,
       '/conversation/:conversationId/files': showConversationFiles,
-      '/conversation/:conversationId/:domain/files/:path*': showConversationFiles,
-      '/conversation/:conversationId/files/:path*': showConversationFiles,
+      '/conversation/:conversationId/:domain/files/*path': showConversationFiles,
+      '/conversation/:conversationId/files/*path': showConversationFiles,
       '/preferences/about': () => mainView.list.openPreferencesAbout(),
       '/preferences/account': () => mainView.list.openPreferencesAccount(),
       '/preferences/av': () => mainView.list.openPreferencesAudioVideo(),

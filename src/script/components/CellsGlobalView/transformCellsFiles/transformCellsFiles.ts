@@ -22,29 +22,56 @@ import {RestNode} from 'cells-sdk-ts';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {formatBytes, getFileExtension} from 'Util/util';
 
-import {CellFile} from '../common/cellFile/cellFile';
+import {CellItem} from '../common/cellFile/cellFile';
 
-export const transformCellsFiles = (nodes: RestNode[]): CellFile[] => {
-  return nodes
-    .filter(node => node.Type === 'LEAF')
-    .map(node => ({
-      id: node.Uuid,
-      owner: getOwner(node),
-      conversationName: node.ContextWorkspace?.Label || '',
+export const transformCellsFiles = (nodes: RestNode[]): CellItem[] => {
+  return nodes.map(node => {
+    const id = node.Uuid;
+    const owner = getOwner(node);
+    const name = getFileName(node.Path);
+    const sizeMb = getFileSize(node);
+    const uploadedAtTimestamp = getUploadedAtTimestamp(node);
+    const publicLink: CellItem['publicLink'] = {
+      alreadyShared: !!node.Shares?.[0].Uuid,
+      uuid: node.Shares?.[0].Uuid || '',
+      url: undefined,
+    };
+    const conversationName = node.ContextWorkspace?.Label || '';
+    const path = node.Path;
+    const url = node.PreSignedGET?.Url;
+
+    if (node.Type === 'COLLECTION') {
+      return {
+        id,
+        type: 'folder' as const,
+        url,
+        path,
+        owner,
+        conversationName,
+        name,
+        sizeMb,
+        uploadedAtTimestamp,
+        publicLink,
+      };
+    }
+
+    return {
+      id,
+      type: 'file' as const,
+      url,
+      path,
+      owner,
+      conversationName,
       mimeType: node.ContentType,
-      name: getFileName(node.Path),
+      name,
       extension: getFileExtension(node.Path),
-      sizeMb: getFileSize(node),
+      sizeMb,
       previewImageUrl: getPreviewImageUrl(node),
       previewPdfUrl: getPreviewPdfUrl(node),
-      uploadedAtTimestamp: getUploadedAtTimestamp(node),
-      fileUrl: node.PreSignedGET?.Url,
-      publicLink: {
-        alreadyShared: !!node.Shares?.[0].Uuid,
-        uuid: node.Shares?.[0].Uuid || '',
-        url: undefined,
-      },
-    }));
+      uploadedAtTimestamp,
+      publicLink,
+    };
+  });
 };
 
 const getFileName = (filePath: string): string => {
@@ -65,7 +92,7 @@ const getUploadedAtTimestamp = (node: RestNode): number => {
 };
 
 const getFileSize = (node: RestNode): string => {
-  return formatBytes(node.Size as unknown as number);
+  return node.Size ? formatBytes(node.Size as unknown as number) : '0 MB';
 };
 
 const getOwner = (node: RestNode): string => {
