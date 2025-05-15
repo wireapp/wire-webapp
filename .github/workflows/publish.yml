@@ -77,11 +77,6 @@ jobs:
           name: 'unit-tests-report'
           path: ${{env.UNIT_TEST_REPORT_FILE}}
 
-      - name: Install AWS CLI
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y awscli
-
       - name: Upload unit-tests.log to S3
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
