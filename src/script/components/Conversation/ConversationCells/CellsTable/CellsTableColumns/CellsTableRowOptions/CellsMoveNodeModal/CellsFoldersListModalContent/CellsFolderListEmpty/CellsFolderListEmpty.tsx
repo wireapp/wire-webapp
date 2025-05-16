@@ -17,12 +17,14 @@
  *
  */
 
+import {t} from 'Util/LocalizerUtil';
+
 import {textStyles, wrapperStyles} from './CellsFolderListEmpty.styles';
 
 export const CellsFolderListEmpty = () => {
   return (
     <div css={wrapperStyles}>
-      <p css={textStyles}>There are no subfolders in this folder.</p>
+      <p css={textStyles}>{t('cellsMoveNodeModal.emptyList')}</p>
     </div>
   );
 };

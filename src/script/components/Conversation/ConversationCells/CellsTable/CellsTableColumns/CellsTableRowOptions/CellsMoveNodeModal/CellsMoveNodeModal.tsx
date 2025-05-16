@@ -25,6 +25,7 @@ import {CellItem} from 'Components/Conversation/ConversationCells/common/cellFil
 import {getCellsFilesPath} from 'Components/Conversation/ConversationCells/common/getCellsFilesPath/getCellsFilesPath';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
+import {t} from 'Util/LocalizerUtil';
 
 import {CellsFoldersListModalContent} from './CellsFoldersListModalContent/CellsFoldersListModalContent';
 import {modalStyles, wrapperStyles} from './CellsMoveNodeModal.styles';
@@ -64,7 +65,9 @@ export const CellsMoveNodeModal = ({
       <div css={wrapperStyles}>
         <CellsMoveNodeModalHeader
           onClose={onClose}
-          title={activeModalContent === 'move' ? 'Move to folder' : 'Create folder'}
+          title={
+            activeModalContent === 'move' ? t('cellsMoveNodeModal.moveTitle') : t('cellsMoveNodeModal.createTitle')
+          }
         />
         {activeModalContent === 'move' ? (
           <CellsFoldersListModalContent

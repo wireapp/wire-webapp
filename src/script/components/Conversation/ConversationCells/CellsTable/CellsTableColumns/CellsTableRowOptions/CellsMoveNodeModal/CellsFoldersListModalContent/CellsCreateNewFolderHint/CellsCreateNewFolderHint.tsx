@@ -19,6 +19,8 @@
 
 import {Button, ButtonVariant, PlusIcon} from '@wireapp/react-ui-kit';
 
+import {t} from 'Util/LocalizerUtil';
+
 import {iconStyles, textStyles, wrapperStyles, buttonStyles} from './CellsCreateNewFolderHint.styles';
 
 interface CellsCreateNewFolderHintProps {
@@ -28,10 +30,10 @@ interface CellsCreateNewFolderHintProps {
 export const CellsCreateNewFolderHint = ({onCreate}: CellsCreateNewFolderHintProps) => {
   return (
     <div css={wrapperStyles}>
-      <p css={textStyles}>Cant find a suitable folder?</p>
+      <p css={textStyles}>{t('cellsMoveNodeModal.createFolderHintText')}</p>
       <Button variant={ButtonVariant.TERTIARY} type="submit" css={buttonStyles} onClick={onCreate}>
         <PlusIcon css={iconStyles} />
-        Create a new folder
+        {t('cellsMoveNodeModal.createFolderHintButton')}
       </Button>
     </div>
   );

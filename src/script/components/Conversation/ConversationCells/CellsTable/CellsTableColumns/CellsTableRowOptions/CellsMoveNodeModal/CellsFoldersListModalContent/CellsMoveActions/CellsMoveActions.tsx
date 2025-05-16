@@ -19,6 +19,8 @@
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
+import {t} from 'Util/LocalizerUtil';
+
 import {buttonStyles, wrapperStyles} from './CellsMoveActions.styles';
 
 interface CellsMoveActionsProps {
@@ -31,7 +33,7 @@ export const CellsMoveActions = ({onCancel, onMove, movingDisabled}: CellsMoveAc
   return (
     <div css={wrapperStyles}>
       <Button variant={ButtonVariant.SECONDARY} onClick={onCancel} css={buttonStyles}>
-        Cancel
+        {t('cellsMoveNodeModal.cancelButton')}
       </Button>
       <Button
         variant={ButtonVariant.PRIMARY}
@@ -40,7 +42,7 @@ export const CellsMoveActions = ({onCancel, onMove, movingDisabled}: CellsMoveAc
         onClick={onMove}
         disabled={movingDisabled}
       >
-        Move here
+        {t('cellsMoveNodeModal.moveButton')}
       </Button>
     </div>
   );
