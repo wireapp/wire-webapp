@@ -115,7 +115,7 @@ export const CellsFoldersListModalContent = ({
       <CellsMoveActions
         onCancel={onClose}
         onMove={handleMove}
-        moveDisabled={movingDisabled}
+        moveDisabled={movingDisabled || shouldShowLoadingSpinner}
         moveLoading={moveNodeStatus === 'loading'}
       />
     </>
