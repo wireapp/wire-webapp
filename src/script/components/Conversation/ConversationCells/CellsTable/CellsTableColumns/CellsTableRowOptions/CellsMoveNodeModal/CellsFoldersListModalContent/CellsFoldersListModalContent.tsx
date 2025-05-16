@@ -32,6 +32,7 @@ import {CellsFolderListEmpty} from './CellsFolderListEmpty/CellsFolderListEmpty'
 import {CellsFolderListLoading} from './CellsFolderListLoading/CellsFolderListLoading';
 import {breadcrumbsWrapperStyles, listWrapperStyles} from './CellsFoldersListModalContent.styles';
 import {CellsMoveActions} from './CellsMoveActions/CellsMoveActions';
+import {useMoveCellsNode} from './useMoveCellNode/useMoveCellsNode';
 
 interface CellsFoldersListModalContentProps {
   nodeToMove: CellItem;
@@ -66,6 +67,8 @@ export const CellsFoldersListModalContent = ({
   onChangeModalContent,
   onClose,
 }: CellsFoldersListModalContentProps) => {
+  const {moveNode, status: moveNodeStatus} = useMoveCellsNode({cellsRepository});
+
   const breadcrumbs = getBreadcrumbsFromPath({baseCrumb: `${conversationName} files`, currentPath});
 
   const nodeToMoveParent = nodeToMove.path.split('/').slice(0, -1).join('/');
@@ -75,7 +78,7 @@ export const CellsFoldersListModalContent = ({
   const shouldDisplayEmptyItems = status === 'success' && !items.length;
 
   const handleMove = async () => {
-    await cellsRepository.moveNode({
+    await moveNode({
       currentPath: nodeToMove.path,
       targetPath,
     });
@@ -109,7 +112,12 @@ export const CellsFoldersListModalContent = ({
         )}
       </div>
       <CellsCreateNewFolderHint onCreate={() => onChangeModalContent('create')} />
-      <CellsMoveActions onCancel={onClose} onMove={handleMove} movingDisabled={movingDisabled} />
+      <CellsMoveActions
+        onCancel={onClose}
+        onMove={handleMove}
+        moveDisabled={movingDisabled}
+        moveLoading={moveNodeStatus === 'loading'}
+      />
     </>
   );
 };

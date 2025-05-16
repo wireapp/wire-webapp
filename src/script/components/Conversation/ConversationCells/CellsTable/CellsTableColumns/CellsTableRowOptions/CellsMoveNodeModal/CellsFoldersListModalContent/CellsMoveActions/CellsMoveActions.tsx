@@ -26,10 +26,12 @@ import {buttonStyles, wrapperStyles} from './CellsMoveActions.styles';
 interface CellsMoveActionsProps {
   onCancel: () => void;
   onMove: () => void;
-  movingDisabled: boolean;
+  moveDisabled: boolean;
+
+  moveLoading: boolean;
 }
 
-export const CellsMoveActions = ({onCancel, onMove, movingDisabled}: CellsMoveActionsProps) => {
+export const CellsMoveActions = ({onCancel, onMove, moveDisabled, moveLoading}: CellsMoveActionsProps) => {
   return (
     <div css={wrapperStyles}>
       <Button variant={ButtonVariant.SECONDARY} onClick={onCancel} css={buttonStyles}>
@@ -40,7 +42,8 @@ export const CellsMoveActions = ({onCancel, onMove, movingDisabled}: CellsMoveAc
         type="submit"
         css={buttonStyles}
         onClick={onMove}
-        disabled={movingDisabled}
+        disabled={moveDisabled}
+        showLoading={moveLoading}
       >
         {t('cellsMoveNodeModal.moveButton')}
       </Button>
