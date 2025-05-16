@@ -70,9 +70,11 @@ const SingleSignOnFormComponent = ({
   doJoinConversationByCode,
   doGetConversationInfoByCode,
   doNavigate,
+  pushAccountRegistrationData,
+  account,
 }: SingleSignOnFormProps & ConnectedProps & DispatchProps) => {
   const codeOrMailInput = useRef<HTMLInputElement>();
-  const [codeOrMail, setCodeOrMail] = useState('');
+  const [codeOrMail, setCodeOrMail] = useState(account.email || '');
   const [disableInput, setDisableInput] = useState(false);
   const navigate = useNavigate();
   const [clientType, setClientType] = useState<ClientType | null>(null);
@@ -219,6 +221,7 @@ const SingleSignOnFormComponent = ({
       }
       const email = codeOrMail.trim();
       if (isValidEmail(email)) {
+        await pushAccountRegistrationData({email});
         if (isEnterpriseLoginV2Enabled) {
           await loginV2(email, password);
         } else {
@@ -389,6 +392,7 @@ const SingleSignOnFormComponent = ({
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
   isFetching: AuthSelector.isFetching(state),
+  account: AuthSelector.getAccount(state),
   authError: AuthSelector.getError(state),
   conversationError: ConversationSelector.getError(state),
   conversationInfo: ConversationSelector.conversationInfo(state),
@@ -407,6 +411,7 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
       doNavigate: ROOT_ACTIONS.navigationAction.doNavigate,
       resetAuthError: ROOT_ACTIONS.authAction.resetAuthError,
       validateSSOCode: ROOT_ACTIONS.authAction.validateSSOCode,
+      pushAccountRegistrationData: ROOT_ACTIONS.authAction.pushAccountRegistrationData,
     },
     dispatch,
   );

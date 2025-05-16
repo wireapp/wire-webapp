@@ -40,11 +40,13 @@ import {useGetAllCellsFiles} from './useGetAllCellsFiles/useGetAllCellsFiles';
 interface ConversationCellsProps {
   cellsRepository?: CellsRepository;
   conversationQualifiedId: QualifiedId;
+  conversationName: string;
 }
 
 export const ConversationCells = ({
   cellsRepository = container.resolve(CellsRepository),
   conversationQualifiedId,
+  conversationName,
 }: ConversationCellsProps) => {
   const {getFiles, status: filesStatus, getPagination, clearAll, removeFile} = useCellsStore();
 
@@ -63,6 +65,7 @@ export const ConversationCells = ({
     pagination,
     conversationId,
     setOffset,
+    currentFilesCount: files.length,
   });
 
   const isLoading = filesStatus === 'loading';
@@ -94,19 +97,26 @@ export const ConversationCells = ({
     await refresh();
   }, [refresh, clearAll, conversationId]);
 
+  const emptyView = !isError && !hasFiles;
+
   return (
     <div css={wrapperStyles}>
-      <CellsHeader onRefresh={handleRefresh} />
-      {(isSuccess || isLoading) && hasFiles && (
+      <CellsHeader
+        onRefresh={handleRefresh}
+        conversationQualifiedId={conversationQualifiedId}
+        conversationName={conversationName}
+        cellsRepository={cellsRepository}
+      />
+      {(isSuccess || isLoading) && (
         <CellsTable
           files={isLoading ? [] : files}
           cellsRepository={cellsRepository}
-          conversationId={conversationId}
+          conversationQualifiedId={conversationQualifiedId}
           onDeleteFile={handleDeleteFile}
           onUpdateBodyHeight={updateHeight}
         />
       )}
-      {!isLoading && !isError && !hasFiles && (
+      {!isLoading && emptyView && (
         <CellsStateInfo
           heading={t('cellsGlobalView.noFilesHeading')}
           description={t('cellsGlobalView.noFilesDescription')}
@@ -119,7 +129,7 @@ export const ConversationCells = ({
           description={t('cellsGlobalView.errorDescription')}
         />
       )}
-      {!isError && <CellsPagination {...getPaginationProps()} goToPage={goToPage} />}
+      {!emptyView && <CellsPagination {...getPaginationProps()} goToPage={goToPage} />}
     </div>
   );
 };

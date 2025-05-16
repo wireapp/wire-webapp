@@ -36,4 +36,28 @@ describe('generateConversationUrl', () => {
       expect(url).toContain('/conversation');
     });
   });
+
+  it('generates an URL that includes the filePath when provided', () => {
+    const conversationId = '16177651-5307-421a-acc6-69d4016195f7';
+    const filePath = 'some/file/path';
+
+    const url = generateConversationUrl({id: conversationId, domain: '', filePath});
+
+    expect(url).toContain(conversationId);
+    expect(url).toContain('/conversation');
+    expect(url).toContain(filePath);
+  });
+
+  it('generates an URL that includes both domain and filePath when provided', () => {
+    const conversationId = '16177651-5307-421a-acc6-69d4016195f7';
+    const domain = 'example.com';
+    const filePath = 'some/file/path';
+
+    const url = generateConversationUrl({id: conversationId, domain, filePath});
+
+    expect(url).toContain(conversationId);
+    expect(url).toContain('/conversation');
+    expect(url).toContain(domain);
+    expect(url).toContain(filePath);
+  });
 });

@@ -27,6 +27,8 @@ export const containerStyles: CSSObject = {
   maxWidth: 'var(--conversation-message-asset-width)',
   maxHeight: 'var(--conversation-message-image-asset-max-height)',
   border: 'none',
+  borderRadius: '10px',
+  overflow: 'hidden',
   padding: 0,
   margin: 0,
 };

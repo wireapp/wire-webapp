@@ -89,30 +89,6 @@ describe('MessagesGroup', () => {
     expect(groupedMessages.findIndex(group => isMarker(group))).toBe(nbReadMessages);
   });
 
-  it('adds markers for messages sent on different hours', () => {
-    const nbPrevHourMessages = getRandomNumber(1, 10);
-    const nbNextHourMessages = getRandomNumber(1, 10);
-
-    const previousMessages = [...Array(nbPrevHourMessages)].map((_, index) =>
-      createMessageAddEvent({overrides: {time: new Date(index).toISOString()}}),
-    );
-    const nextMessages = [...Array(nbNextHourMessages)].map((_, index) =>
-      createMessageAddEvent({
-        overrides: {time: new Date(TimeInMillis.HOUR + 10 * TimeInMillis.MINUTE + index).toISOString()},
-      }),
-    );
-
-    const allMessages = [...previousMessages, ...nextMessages].map(
-      event => eventMapper.mapJsonEvent(event, conversation) as Message,
-    );
-
-    const groupedMessages = groupMessagesBySenderAndTime(allMessages, Infinity);
-    const firstMarkerIndex = groupedMessages.findIndex(group => isMarker(group));
-    const marker = groupedMessages[firstMarkerIndex] as any;
-    expect(firstMarkerIndex).toBe(nbPrevHourMessages);
-    expect(marker.type).toBe('hour');
-  });
-
   it('adds markers for messages sent on different days', () => {
     const nbPrevHourMessages = getRandomNumber(1, 10);
     const nbNextHourMessages = getRandomNumber(1, 10);

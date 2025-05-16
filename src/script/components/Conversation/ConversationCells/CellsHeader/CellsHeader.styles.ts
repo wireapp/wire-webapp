@@ -48,3 +48,9 @@ export const contentStyles: CSSObject = {
   gap: '8px',
   width: '100%',
 };
+
+export const actionsStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
+};

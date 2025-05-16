@@ -89,6 +89,14 @@ export const tableCellRow: CSSObject = {
   padding: '8px 12px',
   borderRadius: '8px',
 
+  '&:hover': {
+    backgroundColor: 'var(--white)',
+
+    'body.theme-dark &': {
+      backgroundColor: 'var(--gray-90)',
+    },
+  },
+
   '&:not(:last-of-type)': {
     marginBottom: '32px',
   },
