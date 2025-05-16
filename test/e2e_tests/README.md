@@ -13,7 +13,7 @@ E2E tests can be run via
 1. Executing `yarn e2e-test` in the root folder of the repo. Running it with `--ui` flag will open Playwright app that can be handy for debugging. Providing `--grep "@{TAG_NAME}"` will result in running only tests with @{TAG_NAME}. For example:
 
 ```
-npx playwright test --grep "@regression"
+yarn e2e-test --grep "@regression"
 ```
 
 2. via VSCode extension in IDE.
