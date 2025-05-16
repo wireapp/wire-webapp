@@ -294,6 +294,7 @@ const AccountFormComponent = ({
                   {chunks}
                 </a>
               ),
+              brandName: Config.getConfig().BRAND_NAME,
             }}
           />
         </CheckboxLabel>

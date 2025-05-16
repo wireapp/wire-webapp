@@ -178,7 +178,7 @@
   "accountForm.confirmPasswordPlaceholder": "Confirm password",
   "accountForm.submitButton": "Next",
   "accountForm.terms": "I accept the <terms>terms and conditions</terms>",
-  "accountForm.termsAndPrivacyPolicy": "I accept the <terms>terms and conditions</terms> and <privacypolicy>privacy policy</privacypolicy>",
+  "accountForm.termsAndPrivacyPolicy": "I accept {brandName}'s <terms>Terms & Conditions</terms> and <privacypolicy>Privacy Policy</privacypolicy>",
   "accountForm.emailLabel": "Email",
   "accountForm.nameLabel": "Name",
   "accountForm.passwordLabel": "Password",
