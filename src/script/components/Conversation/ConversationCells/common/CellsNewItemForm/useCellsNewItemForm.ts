@@ -26,13 +26,14 @@ import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
 import {isAxiosError} from 'Util/TypePredicateUtil';
 
-import {getCellsApiPath} from '../../../common/getCellsApiPath/getCellsApiPath';
+import {getCellsApiPath} from '../getCellsApiPath/getCellsApiPath';
 
 interface UseCellsNewItemFormProps {
   type: CellItem['type'];
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
   onSuccess: () => void;
+  currentPath: string;
 }
 
 const ITEM_ALREADY_EXISTS_ERROR = 409;
@@ -42,13 +43,14 @@ export const useCellsNewItemForm = ({
   cellsRepository,
   conversationQualifiedId,
   onSuccess,
+  currentPath,
 }: UseCellsNewItemFormProps) => {
   const [name, setName] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const createItem = async (name: string) => {
-    const path = getCellsApiPath({conversationQualifiedId});
+    const path = getCellsApiPath({conversationQualifiedId, currentPath});
 
     try {
       if (type === 'folder') {

@@ -17,30 +17,15 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user/';
-
 import {Breadcrumbs} from '@wireapp/react-ui-kit';
 
-import {getBreadcrumbsFromUrl} from './getBreadcrumbsFromUrl/getBreadcrumbsFromUrl';
-import {openBreadcrumb} from './openBreadcrumb/openBreadcrumb';
-
 interface CellsBreadcrumbsProps {
-  conversationQualifiedId: QualifiedId;
-  conversationName: string;
+  maxNotCombinedItems?: number;
+  items: Array<{name: string; path: string}>;
+
+  onItemClick: (item: {name: string}) => void;
 }
 
-export const CellsBreadcrumbs = ({conversationQualifiedId, conversationName}: CellsBreadcrumbsProps) => {
-  const breadcrumbs = getBreadcrumbsFromUrl({baseCrumb: `${conversationName} files`});
-
-  return (
-    <Breadcrumbs
-      items={breadcrumbs}
-      onItemClick={item =>
-        openBreadcrumb({
-          conversationQualifiedId,
-          path: breadcrumbs.find(crumb => crumb.name === item.name)?.path ?? '',
-        })
-      }
-    />
-  );
+export const CellsBreadcrumbs = ({maxNotCombinedItems, items, onItemClick}: CellsBreadcrumbsProps) => {
+  return <Breadcrumbs items={items} maxNotCombinedItems={maxNotCombinedItems} onItemClick={onItemClick} />;
 };

@@ -41,6 +41,7 @@ interface CellsTableProps {
   files: Array<CellItem>;
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
+  conversationName: string;
   onDeleteFile: (uuid: string) => void;
   onUpdateBodyHeight: (height: number) => void;
 }
@@ -49,6 +50,7 @@ export const CellsTable = ({
   files,
   cellsRepository,
   conversationQualifiedId,
+  conversationName,
   onDeleteFile,
   onUpdateBodyHeight,
 }: CellsTableProps) => {
@@ -59,7 +61,7 @@ export const CellsTable = ({
 
   const table = useReactTable({
     data: files,
-    columns: getCellsTableColumns({cellsRepository, conversationQualifiedId, onDeleteFile}),
+    columns: getCellsTableColumns({cellsRepository, conversationQualifiedId, conversationName, onDeleteFile}),
     getCoreRowModel: getCoreRowModel(),
   });
 

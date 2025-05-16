@@ -17,22 +17,12 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {spinnerStyles, wrapperStyles} from './CellsFolderListLoading.styles';
 
-import {Config} from 'src/script/Config';
-
-import {getCellsFilesPath} from '../getCellsFilesPath/getCellsFilesPath';
-
-export const getCellsApiPath = ({
-  conversationQualifiedId,
-  currentPath = getCellsFilesPath(),
-}: {
-  conversationQualifiedId: QualifiedId;
-  currentPath?: string;
-}) => {
-  const {domain, id} = conversationQualifiedId;
-
-  const domainPerEnv = process.env.NODE_ENV === 'development' ? Config.getConfig().CELLS_WIRE_DOMAIN : domain;
-
-  return `${id}@${domainPerEnv}${currentPath ? `/${currentPath}` : ''}`;
+export const CellsFolderListLoading = () => {
+  return (
+    <div css={wrapperStyles}>
+      <div className="icon-spinner spin" css={spinnerStyles} />
+    </div>
+  );
 };

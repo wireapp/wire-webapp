@@ -17,22 +17,18 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {RestNode} from 'cells-sdk-ts';
 
-import {Config} from 'src/script/Config';
-
-import {getCellsFilesPath} from '../getCellsFilesPath/getCellsFilesPath';
-
-export const getCellsApiPath = ({
-  conversationQualifiedId,
-  currentPath = getCellsFilesPath(),
-}: {
-  conversationQualifiedId: QualifiedId;
-  currentPath?: string;
-}) => {
-  const {domain, id} = conversationQualifiedId;
-
-  const domainPerEnv = process.env.NODE_ENV === 'development' ? Config.getConfig().CELLS_WIRE_DOMAIN : domain;
-
-  return `${id}@${domainPerEnv}${currentPath ? `/${currentPath}` : ''}`;
+export const transformNodesToCellsFolders = (nodes: RestNode[]) => {
+  return nodes
+    .filter(node => node.Type === 'COLLECTION')
+    .map(node => {
+      const pathParts = node.Path.split('/');
+      const name = pathParts[pathParts.length - 1];
+      return {
+        id: node.Uuid,
+        name,
+        path: node.Path,
+      };
+    });
 };

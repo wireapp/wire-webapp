@@ -17,20 +17,14 @@
  *
  */
 
-import {getCellsFilesPath} from '../../../common/getCellsFilesPath/getCellsFilesPath';
+import {CSSObject} from '@emotion/react';
 
-export const getBreadcrumbsFromUrl = ({baseCrumb}: {baseCrumb: string}) => {
-  const currentPath = getCellsFilesPath();
-  const segments = currentPath.split('/').filter(Boolean);
+export const breadcrumbsWrapperStyles: CSSObject = {
+  padding: '0 8px',
+  marginBottom: '24px',
+};
 
-  return [
-    {
-      name: baseCrumb,
-      path: '',
-    },
-    ...segments.map((segment, index) => ({
-      name: segment,
-      path: segments.slice(0, index + 1).join('/'),
-    })),
-  ];
+export const listWrapperStyles: CSSObject = {
+  marginBottom: '16px',
+  height: '240px',
 };

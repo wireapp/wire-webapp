@@ -17,7 +17,7 @@
  *
  */
 
-import {KeyboardEvent, MouseEvent as ReactMouseEvent, useCallback} from 'react';
+import {KeyboardEvent, MouseEvent as ReactMouseEvent, useCallback, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
@@ -31,6 +31,7 @@ import {isSpaceOrEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {forcedDownloadFile, setContextMenuPosition} from 'Util/util';
 
+import {CellsMoveNodeModal} from './CellsMoveNodeModal/CellsMoveNodeModal';
 import {buttonStyles, iconStyles, textStyles} from './CellsTableRowOptions.styles';
 
 import {openFolder} from '../../../common/openFolder/openFolder';
@@ -42,6 +43,7 @@ interface CellsTableRowOptionsProps {
   onDelete: (uuid: string) => void;
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
+  conversationName: string;
 }
 
 export const CellsTableRowOptions = ({
@@ -49,8 +51,10 @@ export const CellsTableRowOptions = ({
   onDelete,
   cellsRepository,
   conversationQualifiedId,
+  conversationName,
 }: CellsTableRowOptionsProps) => {
   const {id, selectedFile, handleOpenFile} = useCellsFilePreviewModal();
+  const [isMoveNodeModalOpen, setIsMoveNodeModalOpen] = useState(false);
 
   const showDeleteFileModal = useCallback(
     ({uuid, name}: {uuid: string; name: string}) => {
@@ -85,6 +89,10 @@ export const CellsTableRowOptions = ({
       event,
       entries: [
         {
+          label: 'Move',
+          click: () => setIsMoveNodeModalOpen(true),
+        },
+        {
           label: shareLabel,
           click: () => showShareFileModal({uuid: file.id, conversationId: conversationQualifiedId.id, cellsRepository}),
         },
@@ -117,17 +125,27 @@ export const CellsTableRowOptions = ({
   };
 
   return (
-    <button
-      css={buttonStyles}
-      onKeyDown={handleKeyDown}
-      onClick={showOptionsMenu}
-      aria-label={t('cellsGlobalView.optionsLabel')}
-      aria-controls={id}
-      aria-expanded={!!selectedFile}
-      aria-haspopup="dialog"
-    >
-      <MoreIcon css={iconStyles} />
-      <span css={textStyles}>{t('cellsGlobalView.optionsLabel')}</span>
-    </button>
+    <>
+      <button
+        css={buttonStyles}
+        onKeyDown={handleKeyDown}
+        onClick={showOptionsMenu}
+        aria-label={t('cellsGlobalView.optionsLabel')}
+        aria-controls={id}
+        aria-expanded={!!selectedFile}
+        aria-haspopup="dialog"
+      >
+        <MoreIcon css={iconStyles} />
+        <span css={textStyles}>{t('cellsGlobalView.optionsLabel')}</span>
+      </button>
+      <CellsMoveNodeModal
+        nodeToMove={file}
+        isOpen={isMoveNodeModalOpen}
+        onClose={() => setIsMoveNodeModalOpen(false)}
+        cellsRepository={cellsRepository}
+        conversationQualifiedId={conversationQualifiedId}
+        conversationName={conversationName}
+      />
+    </>
   );
 };

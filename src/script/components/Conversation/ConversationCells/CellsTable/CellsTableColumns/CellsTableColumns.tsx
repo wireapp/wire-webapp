@@ -36,10 +36,12 @@ const columnHelper = createColumnHelper<CellItem>();
 export const getCellsTableColumns = ({
   cellsRepository,
   conversationQualifiedId,
+  conversationName,
   onDeleteFile,
 }: {
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
+  conversationName: string;
   onDeleteFile: (uuid: string) => void;
 }) => [
   columnHelper.accessor('name', {
@@ -76,6 +78,7 @@ export const getCellsTableColumns = ({
           onDelete={uuid => onDeleteFile(uuid)}
           cellsRepository={cellsRepository}
           conversationQualifiedId={conversationQualifiedId}
+          conversationName={conversationName}
         />
       );
     },

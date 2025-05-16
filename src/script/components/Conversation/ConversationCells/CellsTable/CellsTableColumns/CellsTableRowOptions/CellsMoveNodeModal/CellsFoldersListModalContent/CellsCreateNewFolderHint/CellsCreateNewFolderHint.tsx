@@ -17,22 +17,22 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {Button, ButtonVariant, PlusIcon} from '@wireapp/react-ui-kit';
 
-import {Config} from 'src/script/Config';
+import {iconStyles, textStyles, wrapperStyles, buttonStyles} from './CellsCreateNewFolderHint.styles';
 
-import {getCellsFilesPath} from '../getCellsFilesPath/getCellsFilesPath';
+interface CellsCreateNewFolderHintProps {
+  onCreate: () => void;
+}
 
-export const getCellsApiPath = ({
-  conversationQualifiedId,
-  currentPath = getCellsFilesPath(),
-}: {
-  conversationQualifiedId: QualifiedId;
-  currentPath?: string;
-}) => {
-  const {domain, id} = conversationQualifiedId;
-
-  const domainPerEnv = process.env.NODE_ENV === 'development' ? Config.getConfig().CELLS_WIRE_DOMAIN : domain;
-
-  return `${id}@${domainPerEnv}${currentPath ? `/${currentPath}` : ''}`;
+export const CellsCreateNewFolderHint = ({onCreate}: CellsCreateNewFolderHintProps) => {
+  return (
+    <div css={wrapperStyles}>
+      <p css={textStyles}>Cant find a suitable folder?</p>
+      <Button variant={ButtonVariant.TERTIARY} type="submit" css={buttonStyles} onClick={onCreate}>
+        <PlusIcon css={iconStyles} />
+        Create a new folder
+      </Button>
+    </div>
+  );
 };
