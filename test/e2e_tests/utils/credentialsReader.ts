@@ -1,3 +1,22 @@
+/*
+ * Wire
+ * Copyright (C) 2025 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
 import {spawnSync} from 'child_process';
 import * as os from 'os';
 
@@ -5,10 +24,9 @@ export function getCredentials(itemName: string, fieldName: string = 'password')
   const environmentVariable = process.env[itemName];
   if (!environmentVariable) {
     // if environment variable is not set search in 1password
-    console.log(`Please approve 1Password prompt to read ${itemName}`);
     return readFrom1Password(itemName, fieldName);
-  } else {
   }
+
   return environmentVariable;
 }
 
@@ -18,7 +36,8 @@ function readFrom1Password(itemName: string, fieldName: string): string {
   const args = ['item', 'get', '--vault', 'Test Automation', itemName, '--fields', fieldName, '--reveal'];
   const options = {
     cwd: homeDir,
-    encoding: 'utf-8' as BufferEncoding,
+    // eslint-disable-next-line no-undef
+    encoding: 'utf8' as BufferEncoding,
   };
 
   const result = spawnSync(command, args, options);

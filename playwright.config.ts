@@ -1,17 +1,29 @@
-import {defineConfig, devices} from '@playwright/test';
-
-/**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
+/*
+ * Wire
+ * Copyright (C) 2025 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
  */
-// import dotenv from 'dotenv';
-// import path from 'path';
-// dotenv.config({ path: path.resolve(__dirname, '/.env') });
+
+import {defineConfig, devices} from '@playwright/test';
 
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
-export default defineConfig({
+// export default defineConfig({
+module.exports = defineConfig({
   testDir: './test/e2e_tests',
   /* Run tests in files in parallel */
   fullyParallel: true,
@@ -64,10 +76,10 @@ export default defineConfig({
     //   name: 'Microsoft Edge',
     //   use: { ...devices['Desktop Edge'], channel: 'msedge' },
     // },
-    {
-      name: 'Google Chrome',
-      use: {...devices['Desktop Chrome'], channel: 'chrome'},
-    },
+    // {
+    //   name: 'Google Chrome',
+    //   use: {...devices['Desktop Chrome'], channel: 'chrome'},
+    // },
   ],
 
   /* Run your local dev server before starting the tests */
