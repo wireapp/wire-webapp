@@ -169,7 +169,7 @@
   "accountForm.namePlaceholder": "Name",
   "accountForm.passwordHelp": "Use at least {minPasswordLength} characters, with one lowercase letter, one capital letter, a number, and a special character.",
   "accountForm.passwordPlaceholder": "Password",
-  "accountForm.confirmPasswordPlaceholder": "Confirm Password",
+  "accountForm.confirmPasswordPlaceholder": "Confirm password",
   "accountForm.submitButton": "Next",
   "accountForm.terms": "I accept the <terms>terms and conditions</terms>",
   "accountForm.termsAndPrivacyPolicy": "I accept the <terms>terms and conditions</terms> and <privacypolicy>privacy policy</privacypolicy>",
