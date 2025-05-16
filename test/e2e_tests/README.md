@@ -10,7 +10,7 @@ E2E tests (login.spec.ts and credentialsReader.spec.ts) can be found inside [tes
 
 E2E tests can be run via
 
-1. Executing `npx playwright test` in the root folder of the repo. Running it with `--ui` flag will open Playwright app that can be handy for debugging. Providing `--grep "@{TAG_NAME}"` will result in running only tests with @{TAG_NAME}. For example:
+1. Executing `yarn e2e-test` in the root folder of the repo. Running it with `--ui` flag will open Playwright app that can be handy for debugging. Providing `--grep "@{TAG_NAME}"` will result in running only tests with @{TAG_NAME}. For example:
 
 ```
 npx playwright test --grep "@regression"
