@@ -70,7 +70,7 @@ const DropdownMenuTrigger = ({
   cssObj?: CSSObject;
 }) => {
   return (
-    <DropdownMenuPrimitive.Trigger asChild={asChild} css={{...triggerStyles, ...cssObj}}>
+    <DropdownMenuPrimitive.Trigger asChild={asChild} css={!asChild && {...triggerStyles, ...cssObj}}>
       {children}
     </DropdownMenuPrimitive.Trigger>
   );

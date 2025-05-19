@@ -21,7 +21,9 @@ import {Meta, StoryObj} from '@storybook/react/*';
 
 import {DropdownMenu} from './DropdownMenu';
 
+import {Button, ButtonVariant} from '../../Form';
 import {PlusIcon} from '../../Icon';
+import {IconButton, IconButtonVariant} from '../../Misc';
 
 const meta: Meta<typeof DropdownMenu> = {
   component: DropdownMenu,
@@ -65,18 +67,28 @@ export const WithLongItems: Story = {
   ),
 };
 
-export const WithCustomTrigger: Story = {
+export const WithCustomButton: Story = {
   render: () => (
     <DropdownMenu>
       <DropdownMenu.Trigger asChild>
-        <button
-          css={{
-            width: '200px',
-            height: '40px',
-          }}
-        >
-          show menu
-        </button>
+        <Button variant={ButtonVariant.PRIMARY}>Open menu</Button>
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Content>
+        <DropdownMenu.Item onClick={() => {}}>Copy</DropdownMenu.Item>
+        <DropdownMenu.Item onClick={() => {}}>Details</DropdownMenu.Item>
+        <DropdownMenu.Item onClick={() => {}}>Delete for me</DropdownMenu.Item>
+      </DropdownMenu.Content>
+    </DropdownMenu>
+  ),
+};
+
+export const WithCustomIconButton: Story = {
+  render: () => (
+    <DropdownMenu>
+      <DropdownMenu.Trigger asChild>
+        <IconButton variant={IconButtonVariant.PRIMARY}>
+          <PlusIcon />
+        </IconButton>
       </DropdownMenu.Trigger>
       <DropdownMenu.Content>
         <DropdownMenu.Item onClick={() => {}}>Copy</DropdownMenu.Item>

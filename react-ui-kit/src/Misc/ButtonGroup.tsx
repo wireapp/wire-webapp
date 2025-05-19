@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode} from 'react';
+import {forwardRef, ReactNode} from 'react';
 
 import {CSSObject} from '@emotion/react';
 
@@ -89,9 +89,9 @@ const ButtonGroup = ({children}: ButtonGroupProps) => (
   </div>
 );
 
-const Button = ({children, icon, ...props}: GroupButtonProps) => {
+const Button = forwardRef<HTMLButtonElement, GroupButtonProps>(({children, icon, ...props}, ref) => {
   return (
-    <button css={(theme: Theme) => buttonStyle(theme, props)} {...props}>
+    <button ref={ref} css={(theme: Theme) => buttonStyle(theme, props)} {...props}>
       {icon}
       {children && (
         <span
@@ -108,7 +108,9 @@ const Button = ({children, icon, ...props}: GroupButtonProps) => {
       )}
     </button>
   );
-};
+});
+
+Button.displayName = 'Button';
 
 ButtonGroup.Button = Button;
 

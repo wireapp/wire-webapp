@@ -17,6 +17,8 @@
  *
  */
 
+import {forwardRef} from 'react';
+
 import {buttonStyle} from './Button.styles';
 
 import {COLOR} from '../Identity';
@@ -44,11 +46,15 @@ export interface ButtonProps<T = HTMLButtonElement> extends TextProps<T> {
   isActive?: boolean;
 }
 
-export const Button = ({showLoading, children, loadingColor = COLOR.WHITE, ...props}: ButtonProps) => (
-  <button css={(theme: Theme) => buttonStyle(theme, props)} {...filterButtonProps(props)}>
-    {showLoading ? <Loading size={30} color={loadingColor} style={{display: 'flex', margin: 'auto'}} /> : children}
-  </button>
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  ({showLoading, children, loadingColor = COLOR.WHITE, ...props}, ref) => (
+    <button ref={ref} css={(theme: Theme) => buttonStyle(theme, props)} {...filterButtonProps(props)}>
+      {showLoading ? <Loading size={30} color={loadingColor} style={{display: 'flex', margin: 'auto'}} /> : children}
+    </button>
+  ),
 );
+
+Button.displayName = 'Button';
 
 export const filterButtonProps = (props: ButtonProps) => {
   return filterProps(filterTextProps(props) as ButtonProps, ['backgroundColor', 'noCapital']);
