@@ -26,5 +26,5 @@ export const breadcrumbsWrapperStyles: CSSObject = {
 
 export const listWrapperStyles: CSSObject = {
   marginBottom: '16px',
-  height: '240px',
+  height: '260px',
 };

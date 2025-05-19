@@ -27,7 +27,6 @@ interface CellsMoveActionsProps {
   onCancel: () => void;
   onMove: () => void;
   moveDisabled: boolean;
-
   moveLoading: boolean;
 }
 

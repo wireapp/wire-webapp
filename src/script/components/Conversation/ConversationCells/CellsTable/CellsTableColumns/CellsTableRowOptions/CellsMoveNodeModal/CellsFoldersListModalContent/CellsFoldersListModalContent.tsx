@@ -37,17 +37,11 @@ import {useMoveCellsNode} from './useMoveCellNode/useMoveCellsNode';
 interface CellsFoldersListModalContentProps {
   nodeToMove: CellItem;
   items: Array<{id: string; name: string; path: string}>;
-
   status: 'idle' | 'loading' | 'success' | 'error';
-
   shouldShowLoadingSpinner: boolean;
-
   conversationQualifiedId: QualifiedId;
-
   conversationName: string;
-
   cellsRepository: CellsRepository;
-
   currentPath: string;
   onPathChange: (path: string) => void;
   onChangeModalContent: (content: 'move' | 'create') => void;
