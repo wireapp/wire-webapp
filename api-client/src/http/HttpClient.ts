@@ -151,7 +151,7 @@ export class HttpClient extends EventEmitter {
         ...config,
         signal: abortController?.signal,
         // We want to prefix all urls, except for the "access" endpoint
-        url: config.url === `${AuthAPI.URL.ACCESS}` ? config.url : `${this.versionPrefix}${config.url}`,
+        url: config.url?.startsWith(AuthAPI.URL.ACCESS) ? config.url : `${this.versionPrefix}${config.url}`,
         maxBodyLength: FILE_SIZE_100_MB,
         maxContentLength: FILE_SIZE_100_MB,
       });
