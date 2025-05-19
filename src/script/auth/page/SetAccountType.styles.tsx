@@ -60,6 +60,7 @@ export const styles: {
     left: '24px',
   },
   header: {
+    position: 'relative',
     alignItems: 'center',
     marginBottom: '24px',
     width: '100%',

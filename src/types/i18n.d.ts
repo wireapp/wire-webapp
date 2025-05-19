@@ -92,6 +92,7 @@ declare module 'I18n/en-US.json' {
     'ValidationError.FIELD.NAME.PATTERN_MISMATCH': `Enter a name with at least 2 characters`;
     'ValidationError.FIELD.NAME.VALUE_MISSING': `Enter a name with at least 2 characters`;
     'ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH': `Use at least {minPasswordLength} characters, with one lowercase letter, one capital letter, a number, and a special character.`;
+    'ValidationError.FIELD.CONFIRM_PASSWORD.PATTERN_MISMATCH': `Please confirm your password`;
     'ValidationError.FIELD.PASSWORD_LOGIN.PATTERN_MISMATCH': `Wrong password. Please try again.`;
     'ValidationError.FIELD.SSO_CODE.PATTERN_MISMATCH': `Please enter a valid SSO code`;
     'ValidationError.FIELD.SSO_EMAIL_CODE.PATTERN_MISMATCH': `Please enter a valid email or SSO code`;
@@ -172,9 +173,14 @@ declare module 'I18n/en-US.json' {
     'accountForm.namePlaceholder': `Name`;
     'accountForm.passwordHelp': `Use at least {minPasswordLength} characters, with one lowercase letter, one capital letter, a number, and a special character.`;
     'accountForm.passwordPlaceholder': `Password`;
+    'accountForm.confirmPasswordPlaceholder': `Confirm Password`;
     'accountForm.submitButton': `Next`;
     'accountForm.terms': `I accept the <terms>terms and conditions</terms>`;
-    'accountForm.termsAndPrivacyPolicy': `I accept the <privacypolicy>privacy policy</privacypolicy> and <terms>terms and conditions</terms>`;
+    'accountForm.termsAndPrivacyPolicy': `I accept the <terms>terms and conditions</terms> and <privacypolicy>privacy policy</privacypolicy>`;
+    'accountForm.emailLabel': `Email`;
+    'accountForm.nameLabel': `Name`;
+    'accountForm.passwordLabel': `Password`;
+    'accountForm.continueButtonText': `Continue`;
     'acme.done.button': `Ok`;
     'acme.done.button.close': `Close window \'Certificate Downloaded\'`;
     'acme.done.button.secondary': `Certificate details`;
@@ -437,8 +443,9 @@ declare module 'I18n/en-US.json' {
     'channelParticipantActionLeave': `Leave channel…`;
     'channelsPopoverLeave': `Leave channel`;
     'chooseHandle.handlePlaceholder': `Username`;
-    'chooseHandle.headline': `Set username`;
+    'chooseHandle.headline': `Set your username`;
     'chooseHandle.subhead': `Your username helps people find you.`;
+    'chooseHandle.submitButton': `Continue`;
     'clientItem.passwordPlaceholder': `Password`;
     'clientManager.headline': `Remove a device`;
     'clientManager.logout': `Cancel process`;
@@ -501,7 +508,7 @@ declare module 'I18n/en-US.json' {
     'conversationAudioAssetUploading': `Uploading: {name}`;
     'conversationButtonSeparator': `or`;
     'conversationClassified': `Security level: VS-NfD`;
-    'conversationCommonFeature1': `Up to [bold]500[/bold] people`;
+    'conversationCommonFeature1': `Up to [bold]{capacity}[/bold] people`;
     'conversationCommonFeature2': `Video conferencing`;
     'conversationCommonFeature3': `Always end-to-end encrypted`;
     'conversationConnectWithNewUsers': `Connect with People`;
@@ -815,8 +822,10 @@ declare module 'I18n/en-US.json' {
     'createConversationUpgradePlanModalHeader': `Show older messages? `;
     'createConversationUpgradePlanModalText': `Upgrade to a paid plan to offer channel members the whole history.`;
     'createPersonalAccount.goBack': `Go back`;
-    'createPersonalAccount.headLine': `New account`;
+    'createPersonalAccount.headLine': `Create a personal account`;
+    'createPersonalAccount.subHeader': `Want to use Wire for team collaboration?`;
     'createPersonalAccount.nextButton': `Register`;
+    'createPersonalAccount.createTeamButton': `Create a team`;
     'customEnvRedirect.credentialsInfo': `Provide credentials only if you\'re sure this is your organization\'s login.`;
     'customEnvRedirect.redirectHeadline': `Redirecting...`;
     'customEnvRedirect.redirectTo': `You are being redirected to your dedicated enterprise service.`;
@@ -1028,6 +1037,12 @@ declare module 'I18n/en-US.json' {
     'layoutSidebarContent': `Connect, message, and share files with ease, protected by the industry\'s most secure end-to-end encryption`;
     'layoutSidebarHeader': `Collaborate without Compromise`;
     'layoutSidebarLink': `Learn more`;
+    'registrationLayout.header': `For Private use`;
+    'registrationLayout.subhead': `Chat with friends and family.`;
+    'registrationLayout.listItem1': `Stay secure with end-to-end encryption`;
+    'registrationLayout.listItem2': `Send messages, enjoy calls with your loved ones, and share files`;
+    'registrationLayout.listItem3': `Always free`;
+    'registrationLayout.footer': `Upgrade to a team anytime to get all the benefits of secure collaboration.`;
     'legalHoldActivated': `This conversation is under legal hold`;
     'legalHoldActivatedLearnMore': `Learn more`;
     'legalHoldDeactivated': `Legal hold deactivated for this conversation`;

@@ -20,7 +20,7 @@
 import React, {useRef, useState} from 'react';
 
 import {LoginData} from '@wireapp/api-client/lib/auth';
-import {useLocation} from 'react-router-dom';
+import {useSelector} from 'react-redux';
 
 import {Button, Input, Loading} from '@wireapp/react-ui-kit';
 
@@ -28,6 +28,8 @@ import {t} from 'Util/LocalizerUtil';
 import {isValidEmail, isValidUsername} from 'Util/ValidationUtil';
 
 import {ValidationError} from '../module/action/ValidationError';
+import {RootState} from '../module/reducer';
+import * as AuthSelector from '../module/selector/AuthSelector';
 
 interface LoginFormProps {
   isFetching: boolean;
@@ -37,11 +39,10 @@ interface LoginFormProps {
 const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
   const emailInput = useRef<HTMLInputElement>(null);
   const passwordInput = useRef<HTMLInputElement>(null);
-  const {state} = useLocation();
-  const defaultEmail = state?.email;
 
   const [validEmailInput, setValidEmailInput] = useState(true);
   const [validPasswordInput, setValidPasswordInput] = useState(true);
+  const {email: defaultEmail} = useSelector((state: RootState) => AuthSelector.getAccount(state));
 
   const [email, setEmail] = useState(defaultEmail || '');
   const [password, setPassword] = useState('');
