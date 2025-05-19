@@ -17,21 +17,14 @@
  *
  */
 
-import {getCellsFilesPath} from '../../../common/getCellsFilesPath/getCellsFilesPath';
-import {isRecycleBinCrumb} from '../common/isRecycleBinCrumb/isRecycleBinCrumb';
+import {CSSObject} from '@emotion/react';
 
-export const getBreadcrumbsFromUrl = ({baseCrumb}: {baseCrumb: string}) => {
-  const currentPath = getCellsFilesPath();
-  const segments = currentPath.split('/').filter(Boolean);
+export const buttonStyles: CSSObject = {
+  marginBottom: '0',
+};
 
-  return [
-    {
-      name: baseCrumb,
-      path: '',
-    },
-    ...segments.map((segment, index) => ({
-      name: isRecycleBinCrumb(segment) ? 'Recycle Bin' : segment,
-      path: segments.slice(0, index + 1).join('/'),
-    })),
-  ];
+export const itemStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
 };

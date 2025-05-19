@@ -17,21 +17,14 @@
  *
  */
 
-import {getCellsFilesPath} from '../../../common/getCellsFilesPath/getCellsFilesPath';
-import {isRecycleBinCrumb} from '../common/isRecycleBinCrumb/isRecycleBinCrumb';
+export const RECYCLE_BIN_PATH = 'recycle_bin';
 
-export const getBreadcrumbsFromUrl = ({baseCrumb}: {baseCrumb: string}) => {
-  const currentPath = getCellsFilesPath();
-  const segments = currentPath.split('/').filter(Boolean);
+export const isRecycleBinPath = () => {
+  const hash = window.location.hash.replace('#', '');
 
-  return [
-    {
-      name: baseCrumb,
-      path: '',
-    },
-    ...segments.map((segment, index) => ({
-      name: isRecycleBinCrumb(segment) ? 'Recycle Bin' : segment,
-      path: segments.slice(0, index + 1).join('/'),
-    })),
-  ];
+  const parts = hash.split('/files/');
+
+  const path = decodeURIComponent(parts[1]);
+
+  return path === RECYCLE_BIN_PATH;
 };

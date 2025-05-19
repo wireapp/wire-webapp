@@ -17,21 +17,6 @@
  *
  */
 
-import {getCellsFilesPath} from '../../../common/getCellsFilesPath/getCellsFilesPath';
-import {isRecycleBinCrumb} from '../common/isRecycleBinCrumb/isRecycleBinCrumb';
-
-export const getBreadcrumbsFromUrl = ({baseCrumb}: {baseCrumb: string}) => {
-  const currentPath = getCellsFilesPath();
-  const segments = currentPath.split('/').filter(Boolean);
-
-  return [
-    {
-      name: baseCrumb,
-      path: '',
-    },
-    ...segments.map((segment, index) => ({
-      name: isRecycleBinCrumb(segment) ? 'Recycle Bin' : segment,
-      path: segments.slice(0, index + 1).join('/'),
-    })),
-  ];
+export const isRecycleBinCrumb = (name: string) => {
+  return name === 'recycle_bin';
 };

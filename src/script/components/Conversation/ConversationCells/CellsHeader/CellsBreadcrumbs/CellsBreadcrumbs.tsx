@@ -19,6 +19,7 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
+import {BreadcrumbIcon} from './BreadcrumbIcon/BreadcrumbIcon';
 import {BreadcrumbItem} from './BreadcrumbItem/BreadcrumbItem';
 import {BreadcrumbLeaf} from './BreadcrumbLeaf/BreadcrumbLeaf';
 import {listStyles} from './CellsBreadcrumbs.styles';
@@ -47,6 +48,7 @@ export const CellsBreadcrumbs = ({conversationQualifiedId, conversationName}: Ce
               path={crumb.path}
               isActive={index === breadcrumbs.length - 1}
               conversationQualifiedId={conversationQualifiedId}
+              icon={<BreadcrumbIcon name={crumb.path} />}
             />
           </>
         ))}
@@ -83,6 +85,7 @@ export const CellsBreadcrumbs = ({conversationQualifiedId, conversationName}: Ce
             path={crumb.path}
             isActive={index === lastTwoCrumbs.length - 1}
             conversationQualifiedId={conversationQualifiedId}
+            icon={<BreadcrumbIcon name={crumb.path} />}
           />
         </>
       ))}

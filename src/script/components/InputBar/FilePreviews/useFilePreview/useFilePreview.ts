@@ -58,7 +58,7 @@ export const useFilePreview = ({file, cellsRepository, conversationQualifiedId}:
     }
 
     deleteFile({conversationId: conversationQualifiedId.id, fileId: file.id});
-    void cellsRepository.deleteFileDraft({uuid: file.remoteUuid, versionId: file.remoteVersionId});
+    void cellsRepository.deleteNodeDraft({uuid: file.remoteUuid, versionId: file.remoteVersionId});
   };
 
   const handleRetry = async () => {
@@ -71,7 +71,7 @@ export const useFilePreview = ({file, cellsRepository, conversationQualifiedId}:
           ? `${conversationQualifiedId.id}@${Config.getConfig().CELLS_WIRE_DOMAIN}`
           : `${conversationQualifiedId.id}@${conversationQualifiedId.domain}`;
 
-      const {uuid, versionId} = await cellsRepository.uploadFile({
+      const {uuid, versionId} = await cellsRepository.uploadNode({
         uuid: file.id,
         file,
         path,

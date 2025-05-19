@@ -17,6 +17,8 @@
  *
  */
 
+import {ReactNode} from 'react';
+
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {activeItemStyles, buttonStyles, listItemStyles} from './BreadcrumbItem.styles';
@@ -28,13 +30,16 @@ interface BreadcrumbItemProps {
   path: string;
   isActive: boolean;
   conversationQualifiedId: QualifiedId;
+
+  icon?: ReactNode;
 }
 
-export const BreadcrumbItem = ({name, path, isActive, conversationQualifiedId}: BreadcrumbItemProps) => {
+export const BreadcrumbItem = ({name, path, isActive, conversationQualifiedId, icon}: BreadcrumbItemProps) => {
   return (
     <li css={listItemStyles}>
       {isActive ? (
         <span aria-current="page" css={activeItemStyles}>
+          {icon}
           {name}
         </span>
       ) : (
@@ -43,6 +48,7 @@ export const BreadcrumbItem = ({name, path, isActive, conversationQualifiedId}: 
           css={buttonStyles}
           onClick={event => openBreadcrumb({conversationQualifiedId, path, event})}
         >
+          {icon}
           {name}
         </button>
       )}

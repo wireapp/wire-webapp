@@ -24,6 +24,8 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {MoreIcon} from '@wireapp/react-ui-kit';
 
 import {CellItem} from 'Components/Conversation/ConversationCells/common/cellFile/cellFile';
+import {openFolder} from 'Components/Conversation/ConversationCells/common/openFolder/openFolder';
+import {isRecycleBinPath} from 'Components/Conversation/ConversationCells/common/recycleBin/recycleBin';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/ContextMenu';
@@ -33,7 +35,6 @@ import {forcedDownloadFile, setContextMenuPosition} from 'Util/util';
 
 import {buttonStyles, iconStyles, textStyles} from './CellsTableRowOptions.styles';
 
-import {openFolder} from '../../../common/openFolder/openFolder';
 import {useCellsFilePreviewModal} from '../../common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
 import {showShareFileModal} from '../CellsFileShareModal/CellsFileShareModal';
 
@@ -65,14 +66,31 @@ export const CellsTableRowOptions = ({
     [onDelete],
   );
 
-  const getDownloadName = (file: CellItem) => {
+  const showRestoreFileModal = useCallback((file: CellItem) => {
+    PrimaryModal.show(PrimaryModal.type.CONFIRM, {
+      primaryAction: {
+        action: async () => {
+          await cellsRepository.restoreNode({uuid: file.id});
+        },
+        text: 'Restore',
+      },
+      text: {
+        message: `This file ${file.name} will be restored and available to everyone in this conversation.`,
+        title: 'Restore',
+      },
+    });
+    // cellsRepository is not a dependency because it's a singleton
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const getDownloadName = useCallback((file: CellItem) => {
     if (file.type === 'folder') {
       return `${file.name}.zip`;
     }
     return file.name;
-  };
+  }, []);
 
-  const showOptionsMenu = (event: ReactMouseEvent<HTMLButtonElement> | MouseEvent) => {
+  const getDefaultOptions = useCallback(() => {
     const openLabel = t('cellsGlobalView.optionOpen');
     const shareLabel = t('cellsGlobalView.optionShare');
     const downloadLabel = t('cellsGlobalView.optionDownload');
@@ -81,33 +99,52 @@ export const CellsTableRowOptions = ({
     const url = file.url;
     const name = getDownloadName(file);
 
-    showContextMenu({
-      event,
-      entries: [
-        {
-          label: shareLabel,
-          click: () => showShareFileModal({uuid: file.id, conversationId: conversationQualifiedId.id, cellsRepository}),
-        },
-        {
-          label: openLabel,
-          click: () =>
-            file.type === 'folder' ? openFolder({conversationQualifiedId, name: file.name}) : handleOpenFile(file),
-        },
-        url
-          ? {
-              label: downloadLabel,
-              click: () =>
-                forcedDownloadFile({
-                  url,
-                  name,
-                }),
-            }
-          : undefined,
-        {label: deleteLabel, click: () => showDeleteFileModal({uuid: file.id, name: file.name})},
-      ].filter(Boolean) as ContextMenuEntry[],
-      identifier: 'file-preview-error-more-button',
-    });
-  };
+    return [
+      {
+        label: shareLabel,
+        click: () => showShareFileModal({uuid: file.id, conversationId: conversationQualifiedId.id, cellsRepository}),
+      },
+      {
+        label: openLabel,
+        click: () =>
+          file.type === 'folder' ? openFolder({conversationQualifiedId, name: file.name}) : handleOpenFile(file),
+      },
+      url
+        ? {
+            label: downloadLabel,
+            click: () =>
+              forcedDownloadFile({
+                url,
+                name,
+              }),
+          }
+        : undefined,
+      {label: deleteLabel, click: () => showDeleteFileModal({uuid: file.id, name: file.name})},
+    ].filter(Boolean) as ContextMenuEntry[];
+    // cellsRepository is not a dependency because it's a singleton
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [file, getDownloadName, conversationQualifiedId, handleOpenFile, showDeleteFileModal]);
+
+  const getRecycleBinOptions = useCallback(() => {
+    const restoreLabel = 'Restore';
+    const deleteLabel = 'Delete permanently';
+
+    return [
+      {label: restoreLabel, click: () => showRestoreFileModal(file)},
+      {label: deleteLabel, click: () => {}},
+    ];
+  }, [showRestoreFileModal, file]);
+
+  const showOptionsMenu = useCallback(
+    (event: ReactMouseEvent<HTMLButtonElement> | MouseEvent) => {
+      showContextMenu({
+        event,
+        entries: isRecycleBinPath() ? getRecycleBinOptions() : getDefaultOptions(),
+        identifier: 'file-preview-error-more-button',
+      });
+    },
+    [getDefaultOptions, getRecycleBinOptions],
+  );
 
   const handleKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
     if (isSpaceOrEnterKey(event.key)) {

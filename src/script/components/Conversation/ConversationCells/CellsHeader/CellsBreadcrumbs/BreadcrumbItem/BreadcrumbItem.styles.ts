@@ -32,6 +32,9 @@ export const buttonStyles: CSSObject = {
   cursor: 'pointer',
   fontSize: 'var(--font-size-medium)',
   color: 'var(--gray-70)',
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
 
   '&:hover': {
     color: 'var(--main-color)',
@@ -39,7 +42,9 @@ export const buttonStyles: CSSObject = {
 };
 
 export const activeItemStyles: CSSObject = {
-  display: 'inline-block',
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: '8px',
   padding: '0 8px',
   fontSize: 'var(--font-size-medium)',
   color: 'var(--main-color)',

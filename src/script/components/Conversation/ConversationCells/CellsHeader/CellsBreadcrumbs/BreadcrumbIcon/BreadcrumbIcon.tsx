@@ -17,42 +17,18 @@
  *
  */
 
-export interface CellFile {
-  id: string;
-  type: 'file';
-  path: string;
-  url?: string;
-  mimeType?: string;
+import {TrashIcon} from '@wireapp/react-ui-kit';
+
+import {isRecycleBinCrumb} from '../common/isRecycleBinCrumb/isRecycleBinCrumb';
+
+interface BreadcrumbIconProps {
   name: string;
-  sizeMb: string;
-  extension: string;
-  previewImageUrl?: string;
-  previewPdfUrl?: string;
-  uploadedAtTimestamp: number;
-  owner: string;
-  conversationName: string;
-  publicLink?: {
-    alreadyShared: boolean;
-    uuid?: string;
-    url?: string;
-  };
 }
 
-export interface CellFolder {
-  id: string;
-  type: 'folder';
-  path: string;
-  url?: string;
-  mimeType?: string;
-  name: string;
-  sizeMb: string;
-  uploadedAtTimestamp: number;
-  owner: string;
-  publicLink?: {
-    alreadyShared: boolean;
-    uuid?: string;
-    url?: string;
-  };
-}
+export const BreadcrumbIcon = ({name}: BreadcrumbIconProps) => {
+  if (isRecycleBinCrumb(name)) {
+    return <TrashIcon width={12} height={12} />;
+  }
 
-export type CellItem = CellFile | CellFolder;
+  return null;
+};

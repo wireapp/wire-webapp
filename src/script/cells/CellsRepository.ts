@@ -58,7 +58,7 @@ export class CellsRepository {
     this.isInitialized = true;
   }
 
-  async uploadFile({
+  async uploadNode({
     uuid,
     file,
     path,
@@ -76,7 +76,7 @@ export class CellsRepository {
     this.uploadControllers.set(uuid, controller);
 
     try {
-      await this.apiClient.api.cells.uploadFileDraft({
+      await this.apiClient.api.cells.uploadNodeDraft({
         path: filePath,
         file,
         uuid,
@@ -101,15 +101,15 @@ export class CellsRepository {
     }
   }
 
-  async deleteFileDraft({uuid, versionId}: {uuid: string; versionId: string}) {
-    return this.apiClient.api.cells.deleteFileDraft({uuid, versionId});
+  async deleteNodeDraft({uuid, versionId}: {uuid: string; versionId: string}) {
+    return this.apiClient.api.cells.deleteNodeDraft({uuid, versionId});
   }
 
-  async deleteFile({uuid}: {uuid: string}) {
-    return this.apiClient.api.cells.deleteFile({uuid});
+  async deleteNode({uuid, permanently = false}: {uuid: string; permanently?: boolean}) {
+    return this.apiClient.api.cells.deleteNode({uuid, permanently});
   }
 
-  async getAllFiles({
+  async getAllNodes({
     path,
     limit = DEFAULT_MAX_FILES_LIMIT,
     offset = 0,
@@ -118,7 +118,7 @@ export class CellsRepository {
     limit?: number;
     offset?: number;
   }) {
-    return this.apiClient.api.cells.getAllFiles({
+    return this.apiClient.api.cells.getAllNodes({
       path: path || this.basePath,
       limit,
       offset,
@@ -127,8 +127,8 @@ export class CellsRepository {
     });
   }
 
-  async getFile({uuid}: {uuid: string}) {
-    return this.apiClient.api.cells.getFile({id: uuid});
+  async getNode({uuid}: {uuid: string}) {
+    return this.apiClient.api.cells.getNode({id: uuid});
   }
 
   async createFolder({path, name}: {path: string; name: string}) {
@@ -147,22 +147,22 @@ export class CellsRepository {
   }
 
   async createPublicLink({uuid, label}: {uuid: string; label?: string}) {
-    return this.apiClient.api.cells.createFilePublicLink({
+    return this.apiClient.api.cells.createNodePublicLink({
       uuid,
       label,
     });
   }
 
   async getPublicLink({uuid}: {uuid: string}) {
-    return this.apiClient.api.cells.getFilePublicLink({uuid});
+    return this.apiClient.api.cells.getNodePublicLink({uuid});
   }
 
   async deletePublicLink({uuid}: {uuid: string}) {
-    return this.apiClient.api.cells.deleteFilePublicLink({uuid});
+    return this.apiClient.api.cells.deleteNodePublicLink({uuid});
   }
 
-  async searchFiles({query, limit = DEFAULT_MAX_FILES_LIMIT}: {query: string; limit?: number}) {
-    return this.apiClient.api.cells.searchFiles({
+  async searchNodes({query, limit = DEFAULT_MAX_FILES_LIMIT}: {query: string; limit?: number}) {
+    return this.apiClient.api.cells.searchNodes({
       phrase: query,
       limit,
       sortBy: SEARCH_DEFAULT_SORT_FIELD,
@@ -170,7 +170,11 @@ export class CellsRepository {
     });
   }
 
-  async promoteFileDraft({uuid, versionId}: {uuid: string; versionId: string}) {
-    return this.apiClient.api.cells.promoteFileDraft({uuid, versionId});
+  async promoteNodeDraft({uuid, versionId}: {uuid: string; versionId: string}) {
+    return this.apiClient.api.cells.promoteNodeDraft({uuid, versionId});
+  }
+
+  async restoreNode({uuid}: {uuid: string}) {
+    return this.apiClient.api.cells.restoreNode({uuid});
   }
 }
