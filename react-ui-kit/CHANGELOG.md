@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.52.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.52.0...@wireapp/react-ui-kit@9.52.1) (2025-05-19)
+
+### Bug Fixes
+
+* **react-ui-kit:** dropdown menu composition trigger ([#7050](https://github.com/wireapp/wire-web-packages/issues/7050)) ([d4da91e](https://github.com/wireapp/wire-web-packages/commit/d4da91e3116f694f39fb0672e0e13ebfa9240b75))
+
 # [9.52.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.51.0...@wireapp/react-ui-kit@9.52.0) (2025-05-14)
 
 ### Features
