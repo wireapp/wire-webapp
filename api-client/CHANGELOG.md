@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [27.53.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.53.0...@wireapp/api-client@27.53.1) (2025-05-19)
+
+### Bug Fixes
+
+* **api-client:** remove version prefix for all access endpoints ([#7048](https://github.com/wireapp/wire-web-packages/issues/7048)) ([416613b](https://github.com/wireapp/wire-web-packages/commit/416613b94afbfbbba390c6546ccb719b9597dc9b))
+
 # [27.53.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.52.0...@wireapp/api-client@27.53.0) (2025-05-14)
 
 ### Features
