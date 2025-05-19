@@ -27,7 +27,6 @@ import {useParams} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 
 import {
-  ArrowIcon,
   COLOR,
   Column,
   Columns,
@@ -56,10 +55,9 @@ import {SingleSignOnForm} from './SingleSignOnForm';
 
 import {Config} from '../../Config';
 import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
-import {RouterLink} from '../component/RouterLink';
+import {BackButton} from '../component/BackButton';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
-import {ROUTE} from '../route';
 import {getEnterpriseLoginV2FF} from '../util/helpers';
 
 type Props = React.HTMLAttributes<HTMLDivElement>;
@@ -189,12 +187,6 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
     ssoWindowRef.current?.focus();
   };
 
-  const backArrow = (
-    <RouterLink to={ROUTE.INDEX} data-uie-name="go-login">
-      <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
-    </RouterLink>
-  );
-
   return (
     <Page withSideBar={isEnterpriseLoginV2Enabled}>
       {isOverlayOpen && (
@@ -232,7 +224,9 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
 
       {!isEnterpriseLoginV2Enabled && !hasDefaultSSOCode && (
         <IsMobile>
-          <div style={{margin: 16}}>{backArrow}</div>
+          <div style={{margin: 16}}>
+            <BackButton />
+          </div>
         </IsMobile>
       )}
 
@@ -250,7 +244,11 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
         <Columns>
           <IsMobile not>
             <Column style={{display: 'flex'}}>
-              {!isEnterpriseLoginV2Enabled && !hasDefaultSSOCode && <div style={{margin: 'auto'}}>{backArrow}</div>}
+              {!isEnterpriseLoginV2Enabled && !hasDefaultSSOCode && (
+                <div style={{margin: 'auto'}}>
+                  <BackButton />
+                </div>
+              )}
             </Column>
           </IsMobile>
           <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>

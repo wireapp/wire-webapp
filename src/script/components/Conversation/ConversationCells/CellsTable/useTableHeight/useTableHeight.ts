@@ -19,11 +19,14 @@
 
 import {useRef, useEffect} from 'react';
 
+import {CellItem} from '../../common/cellFile/cellFile';
+
 interface UseTableHeightProps {
   onUpdate: (height: number) => void;
+  files: CellItem[];
 }
 
-export const useTableHeight = ({onUpdate}: UseTableHeightProps) => {
+export const useTableHeight = ({onUpdate, files}: UseTableHeightProps) => {
   const tableBodyRef = useRef<HTMLTableSectionElement>(null);
 
   useEffect(() => {
@@ -33,7 +36,7 @@ export const useTableHeight = ({onUpdate}: UseTableHeightProps) => {
       }
     };
     updateHeight();
-  }, [onUpdate]);
+  }, [onUpdate, files]);
 
   return {tableBodyRef};
 };

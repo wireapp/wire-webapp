@@ -131,6 +131,21 @@ export class CellsRepository {
     return this.apiClient.api.cells.getFile({id: uuid});
   }
 
+  async createFolder({path, name}: {path: string; name: string}) {
+    const filePath = `${path || this.basePath}/${name}`;
+    const uuid = createUuid();
+
+    return this.apiClient.api.cells.createFolder({path: filePath, uuid});
+  }
+
+  async createFile({path, name}: {path: string; name: string}) {
+    const filePath = `${path || this.basePath}/${name}`;
+    const uuid = createUuid();
+    const versionId = createUuid();
+
+    return this.apiClient.api.cells.createFile({path: filePath, uuid, versionId});
+  }
+
   async createPublicLink({uuid, label}: {uuid: string; label?: string}) {
     return this.apiClient.api.cells.createFilePublicLink({
       uuid,

@@ -1,0 +1,106 @@
+/*
+ * Wire
+ * Copyright (C) 2025 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {ChangeEvent, FormEvent, useState} from 'react';
+
+import {QualifiedId} from '@wireapp/api-client/lib/user';
+
+import {CellItem} from 'Components/Conversation/ConversationCells/common/cellFile/cellFile';
+import {CellsRepository} from 'src/script/cells/CellsRepository';
+import {t} from 'Util/LocalizerUtil';
+import {isAxiosError} from 'Util/TypePredicateUtil';
+
+import {getCellsApiPath} from '../../../common/getCellsApiPath/getCellsApiPath';
+
+interface UseCellsNewItemFormProps {
+  type: CellItem['type'];
+  cellsRepository: CellsRepository;
+  conversationQualifiedId: QualifiedId;
+  onSuccess: () => void;
+}
+
+const ITEM_ALREADY_EXISTS_ERROR = 409;
+
+export const useCellsNewItemForm = ({
+  type,
+  cellsRepository,
+  conversationQualifiedId,
+  onSuccess,
+}: UseCellsNewItemFormProps) => {
+  const [name, setName] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const createItem = async (name: string) => {
+    const path = getCellsApiPath({conversationQualifiedId});
+
+    try {
+      if (type === 'folder') {
+        await cellsRepository.createFolder({path, name});
+      } else {
+        await cellsRepository.createFile({path, name});
+      }
+      onSuccess();
+    } catch (error) {
+      if (isAxiosError(error) && error.response?.status === ITEM_ALREADY_EXISTS_ERROR) {
+        setError(t('cellNewItemMenuModalForm.alreadyExistsError'));
+      } else {
+        setError(t('cellNewItemMenuModalForm.genericError'));
+      }
+    }
+  };
+
+  const handleSubmit = async (formEvent: FormEvent<HTMLFormElement>) => {
+    formEvent.preventDefault();
+
+    if (isSubmitting) {
+      return;
+    }
+
+    setError(null);
+    setIsSubmitting(true);
+
+    if (!name.trim()) {
+      setError(t('cellNewItemMenuModalForm.nameRequired'));
+      setIsSubmitting(false);
+      return;
+    }
+
+    try {
+      await createItem(name);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setName(event.currentTarget.value);
+    if (error === t('cellNewItemMenuModalForm.nameRequired')) {
+      setError(null);
+    }
+  };
+
+  return {
+    name,
+    error,
+    isSubmitting,
+    handleSubmit,
+    handleChange,
+  };
+};
