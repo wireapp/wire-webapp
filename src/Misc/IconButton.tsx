@@ -17,6 +17,8 @@
  *
  */
 
+import {forwardRef} from 'react';
+
 import {CSSObject} from '@emotion/react';
 
 import {defaultTransition} from '../Identity/motions';
@@ -121,11 +123,13 @@ export const iconButtonStyle: <T>(theme: Theme, props: IconButtonProps<T>) => CS
   }),
 });
 
-export const IconButton = ({children, ...props}: IconButtonProps) => (
-  <button css={(theme: Theme) => iconButtonStyle(theme, props)} {...filterButtonProps(props)}>
+export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(({children, ...props}, ref) => (
+  <button ref={ref} css={(theme: Theme) => iconButtonStyle(theme, props)} {...filterButtonProps(props)}>
     {children}
   </button>
-);
+));
+
+IconButton.displayName = 'IconButton';
 
 const filterButtonProps = (props: IconButtonProps) => {
   return filterProps(filterTextProps(props) as IconButtonProps, ['backgroundColor']);
