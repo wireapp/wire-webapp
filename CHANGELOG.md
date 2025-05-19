@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.54.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.53.1...@wireapp/api-client@27.54.0) (2025-05-19)
+
+### Features
+
+* **api-client/cell:** permanent delete + restore + rename methods [WPB-17716] ([#7049](https://github.com/wireapp/wire-web-packages/issues/7049)) ([0f6cf98](https://github.com/wireapp/wire-web-packages/commit/0f6cf98c17185d4f6883ac571627405cdb5adc30))
+
 ## [27.53.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.53.0...@wireapp/api-client@27.53.1) (2025-05-19)
 
 ### Bug Fixes
