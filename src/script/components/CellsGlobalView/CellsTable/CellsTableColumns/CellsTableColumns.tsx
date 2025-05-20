@@ -32,13 +32,7 @@ import {CellItem} from '../../common/cellFile/cellFile';
 
 const columnHelper = createColumnHelper<CellItem>();
 
-export const getCellsTableColumns = ({
-  onDeleteFile,
-  cellsRepository,
-}: {
-  onDeleteFile: (uuid: string) => void;
-  cellsRepository: CellsRepository;
-}) => [
+export const getCellsTableColumns = ({cellsRepository}: {cellsRepository: CellsRepository}) => [
   columnHelper.accessor('name', {
     header: t('cellsGlobalView.tableRowName'),
     cell: info => <CellsTableNameColumn file={info.row.original} />,
@@ -71,8 +65,6 @@ export const getCellsTableColumns = ({
   columnHelper.accessor('id', {
     header: () => <span className="visually-hidden">{t('cellsGlobalView.tableRowActions')}</span>,
     size: 40,
-    cell: info => (
-      <CellsTableRowOptions file={info.row.original} onDelete={onDeleteFile} cellsRepository={cellsRepository} />
-    ),
+    cell: info => <CellsTableRowOptions file={info.row.original} cellsRepository={cellsRepository} />,
   }),
 ];

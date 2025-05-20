@@ -37,13 +37,12 @@ import {CellItem} from '../common/cellFile/cellFile';
 interface CellsTableProps {
   files: CellItem[];
   cellsRepository: CellsRepository;
-  onDeleteFile: (uuid: string) => void;
 }
 
-export const CellsTable = ({files, cellsRepository, onDeleteFile}: CellsTableProps) => {
+export const CellsTable = ({files, cellsRepository}: CellsTableProps) => {
   const table = useReactTable({
     data: files,
-    columns: getCellsTableColumns({onDeleteFile, cellsRepository}),
+    columns: getCellsTableColumns({cellsRepository}),
     getCoreRowModel: getCoreRowModel(),
   });
 
