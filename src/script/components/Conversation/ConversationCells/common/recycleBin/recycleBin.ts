@@ -19,7 +19,7 @@
 
 export const RECYCLE_BIN_PATH = 'recycle_bin';
 
-export const isRecycleBinPath = () => {
+export const isRootRecycleBinPath = () => {
   const hash = window.location.hash.replace('#', '');
 
   const parts = hash.split('/files/');
@@ -27,4 +27,12 @@ export const isRecycleBinPath = () => {
   const path = decodeURIComponent(parts[1]);
 
   return path === RECYCLE_BIN_PATH;
+};
+
+export const isInRecycleBin = () => {
+  const hash = window.location.hash.replace('#', '');
+
+  const parts = hash.split('/files/');
+
+  return parts[1]?.includes(RECYCLE_BIN_PATH);
 };

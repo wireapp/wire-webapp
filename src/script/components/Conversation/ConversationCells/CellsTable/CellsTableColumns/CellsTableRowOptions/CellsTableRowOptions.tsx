@@ -26,7 +26,10 @@ import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 import {useAppNotification} from 'Components/AppNotification/AppNotification';
 import {CellItem} from 'Components/Conversation/ConversationCells/common/cellFile/cellFile';
 import {openFolder} from 'Components/Conversation/ConversationCells/common/openFolder/openFolder';
-import {isRecycleBinPath} from 'Components/Conversation/ConversationCells/common/recycleBin/recycleBin';
+import {
+  isInRecycleBin,
+  isRootRecycleBinPath,
+} from 'Components/Conversation/ConversationCells/common/recycleBin/recycleBin';
 import {useCellsStore} from 'Components/Conversation/ConversationCells/common/useCellsStore/useCellsStore';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
@@ -110,7 +113,7 @@ const CellsTableRowOptionsContent = ({node, cellsRepository, conversationQualifi
     [conversationId, removeFile, restoreNodeFailedNotification],
   );
 
-  if (isRecycleBinPath()) {
+  if (isRootRecycleBinPath()) {
     return (
       <DropdownMenu.Content>
         <DropdownMenu.Item
@@ -123,6 +126,23 @@ const CellsTableRowOptionsContent = ({node, cellsRepository, conversationQualifi
         >
           {t('cellsGlobalView.optionRestore')}
         </DropdownMenu.Item>
+        <DropdownMenu.Item
+          onClick={() =>
+            showDeletePermanentlyModal({
+              node,
+              onDeletePermanently: () => handleDeleteNode({uuid: node.id, permanently: true}),
+            })
+          }
+        >
+          {t('cellsGlobalView.optionDeletePermanently')}
+        </DropdownMenu.Item>
+      </DropdownMenu.Content>
+    );
+  }
+
+  if (isInRecycleBin()) {
+    return (
+      <DropdownMenu.Content>
         <DropdownMenu.Item
           onClick={() =>
             showDeletePermanentlyModal({
