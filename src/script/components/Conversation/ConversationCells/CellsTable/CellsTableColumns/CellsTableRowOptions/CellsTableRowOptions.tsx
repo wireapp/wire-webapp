@@ -39,6 +39,7 @@ import {showShareFileModal} from '../CellsFileShareModal/CellsFileShareModal';
 interface CellsTableRowOptionsProps {
   node: CellItem;
   onDelete: ({uuid, permanently}: {uuid: string; permanently?: boolean}) => void;
+  onRestoreNode: ({uuid}: {uuid: string}) => void;
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
 }
@@ -46,6 +47,7 @@ interface CellsTableRowOptionsProps {
 export const CellsTableRowOptions = ({
   node,
   onDelete,
+  onRestoreNode,
   cellsRepository,
   conversationQualifiedId,
 }: CellsTableRowOptionsProps) => {
@@ -60,6 +62,7 @@ export const CellsTableRowOptions = ({
       <CellsTableRowOptionsContent
         node={node}
         onDelete={onDelete}
+        onRestoreNode={onRestoreNode}
         cellsRepository={cellsRepository}
         conversationQualifiedId={conversationQualifiedId}
       />
@@ -70,6 +73,7 @@ export const CellsTableRowOptions = ({
 const CellsTableRowOptionsContent = ({
   node,
   onDelete,
+  onRestoreNode,
   cellsRepository,
   conversationQualifiedId,
 }: CellsTableRowOptionsProps) => {
@@ -85,9 +89,7 @@ const CellsTableRowOptionsContent = ({
           onClick={() =>
             showRestoreNodeModal({
               node,
-              onRestoreNode: async () => {
-                await cellsRepository.restoreNode({uuid: node.id});
-              },
+              onRestoreNode: () => onRestoreNode({uuid: node.id}),
             })
           }
         >

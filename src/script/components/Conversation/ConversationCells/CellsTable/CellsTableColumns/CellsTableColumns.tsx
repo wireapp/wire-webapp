@@ -37,10 +37,12 @@ export const getCellsTableColumns = ({
   cellsRepository,
   conversationQualifiedId,
   onDeleteNode,
+  onRestoreNode,
 }: {
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
   onDeleteNode: ({uuid, permanently}: {uuid: string; permanently?: boolean}) => void;
+  onRestoreNode: ({uuid}: {uuid: string}) => void;
 }) => [
   columnHelper.accessor('name', {
     header: t('cellsGlobalView.tableRowName'),
@@ -74,6 +76,7 @@ export const getCellsTableColumns = ({
         <CellsTableRowOptions
           node={info.row.original}
           onDelete={onDeleteNode}
+          onRestoreNode={onRestoreNode}
           cellsRepository={cellsRepository}
           conversationQualifiedId={conversationQualifiedId}
         />

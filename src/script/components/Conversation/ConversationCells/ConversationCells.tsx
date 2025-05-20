@@ -77,6 +77,10 @@ export const ConversationCells = ({
     message: t('cellsGlobalView.deleteModalError'),
   });
 
+  const restoreNodeFailedNotification = useAppNotification({
+    message: t('cellsRestoreError'),
+  });
+
   const handleDeleteNode = useCallback(
     async ({uuid, permanently = false}: {uuid: string; permanently?: boolean}) => {
       try {
@@ -90,6 +94,21 @@ export const ConversationCells = ({
     // cellsRepository is not a dependency because it's a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [conversationId, removeFile, deleteFileFailedNotification],
+  );
+
+  const handleRestoreNode = useCallback(
+    async ({uuid}: {uuid: string}) => {
+      try {
+        removeFile({conversationId, fileId: uuid});
+        await cellsRepository.restoreNode({uuid});
+      } catch (error) {
+        restoreNodeFailedNotification.show();
+        console.error(error);
+      }
+    },
+    // cellsRepository is not a dependency because it's a singleton
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [conversationId, removeFile, restoreNodeFailedNotification],
   );
 
   const handleRefresh = useCallback(async () => {
@@ -113,6 +132,7 @@ export const ConversationCells = ({
           cellsRepository={cellsRepository}
           conversationQualifiedId={conversationQualifiedId}
           onDeleteNode={handleDeleteNode}
+          onRestoreNode={handleRestoreNode}
           onUpdateBodyHeight={updateHeight}
         />
       )}

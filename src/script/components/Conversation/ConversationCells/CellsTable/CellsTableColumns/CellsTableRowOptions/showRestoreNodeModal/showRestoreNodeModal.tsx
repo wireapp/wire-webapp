@@ -22,18 +22,10 @@ import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {t} from 'Util/LocalizerUtil';
 import {replaceReactComponents} from 'Util/LocalizerUtil/ReactLocalizerUtil';
 
-export const showRestoreNodeModal = ({
-  node,
-  onRestoreNode,
-}: {
-  node: CellItem;
-  onRestoreNode: (uuid: string) => Promise<void>;
-}) => {
+export const showRestoreNodeModal = ({node, onRestoreNode}: {node: CellItem; onRestoreNode: () => void}) => {
   PrimaryModal.show(PrimaryModal.type.CONFIRM, {
     primaryAction: {
-      action: async () => {
-        await onRestoreNode(node.id);
-      },
+      action: onRestoreNode,
       text: t('cellsRestoreNodeModal.button'),
     },
     text: {

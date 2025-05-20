@@ -438,6 +438,7 @@ declare module 'I18n/en-US.json' {
     'cellsNewItemMenu.folder': `Create a folder`;
     'cellsRecycleBin.breadcrumb': `Recycle bin`;
     'cellsRecycleBin.moreMenu': `Open Recycle Bin`;
+    'cellsRestoreError': `Something went wrong, please try again later and refresh the list.`;
     'cellsRestoreNodeModal.button': `Restore`;
     'cellsRestoreNodeModal.fileHeadline': `Restore file?`;
     'cellsRestoreNodeModal.folderHeadline': `Restore folder?`;
