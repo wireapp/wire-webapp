@@ -22,7 +22,6 @@ import {useCallback} from 'react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
-import {useAppNotification} from 'Components/AppNotification/AppNotification';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
 
@@ -48,7 +47,7 @@ export const ConversationCells = ({
   conversationQualifiedId,
   conversationName,
 }: ConversationCellsProps) => {
-  const {getFiles, status: filesStatus, getPagination, clearAll, removeFile} = useCellsStore();
+  const {getFiles, status: filesStatus, getPagination, clearAll} = useCellsStore();
 
   const conversationId = conversationQualifiedId.id;
 
@@ -73,44 +72,6 @@ export const ConversationCells = ({
   const isSuccess = filesStatus === 'success';
   const hasFiles = !!files.length;
 
-  const deleteFileFailedNotification = useAppNotification({
-    message: t('cellsGlobalView.deleteModalError'),
-  });
-
-  const restoreNodeFailedNotification = useAppNotification({
-    message: t('cellsRestoreError'),
-  });
-
-  const handleDeleteNode = useCallback(
-    async ({uuid, permanently = false}: {uuid: string; permanently?: boolean}) => {
-      try {
-        removeFile({conversationId, fileId: uuid});
-        await cellsRepository.deleteNode({uuid, permanently});
-      } catch (error) {
-        deleteFileFailedNotification.show();
-        console.error(error);
-      }
-    },
-    // cellsRepository is not a dependency because it's a singleton
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [conversationId, removeFile, deleteFileFailedNotification],
-  );
-
-  const handleRestoreNode = useCallback(
-    async ({uuid}: {uuid: string}) => {
-      try {
-        removeFile({conversationId, fileId: uuid});
-        await cellsRepository.restoreNode({uuid});
-      } catch (error) {
-        restoreNodeFailedNotification.show();
-        console.error(error);
-      }
-    },
-    // cellsRepository is not a dependency because it's a singleton
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [conversationId, removeFile, restoreNodeFailedNotification],
-  );
-
   const handleRefresh = useCallback(async () => {
     clearAll({conversationId});
     await refresh();
@@ -131,8 +92,6 @@ export const ConversationCells = ({
           files={isLoading ? [] : files}
           cellsRepository={cellsRepository}
           conversationQualifiedId={conversationQualifiedId}
-          onDeleteNode={handleDeleteNode}
-          onRestoreNode={handleRestoreNode}
           onUpdateBodyHeight={updateHeight}
         />
       )}
