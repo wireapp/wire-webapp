@@ -17,6 +17,8 @@
  *
  */
 
+import {t} from 'Util/LocalizerUtil';
+
 import {getCellsFilesPath} from '../../../common/getCellsFilesPath/getCellsFilesPath';
 import {isRecycleBinCrumb} from '../common/isRecycleBinCrumb/isRecycleBinCrumb';
 
@@ -30,7 +32,7 @@ export const getBreadcrumbsFromUrl = ({baseCrumb}: {baseCrumb: string}) => {
       path: '',
     },
     ...segments.map((segment, index) => ({
-      name: isRecycleBinCrumb(segment) ? 'Recycle Bin' : segment,
+      name: isRecycleBinCrumb(segment) ? t('cellsRecycleBin.breadcrumb') : segment,
       path: segments.slice(0, index + 1).join('/'),
     })),
   ];

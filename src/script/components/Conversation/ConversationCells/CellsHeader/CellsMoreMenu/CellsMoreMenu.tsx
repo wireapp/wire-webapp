@@ -21,6 +21,8 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {DropdownMenu, IconButton, IconButtonVariant, MoreIcon, TrashIcon} from '@wireapp/react-ui-kit';
 
+import {t} from 'Util/LocalizerUtil';
+
 import {buttonStyles, itemStyles} from './CellsMoreMenu.styles';
 
 import {RECYCLE_BIN_PATH} from '../../common/recycleBin/recycleBin';
@@ -49,7 +51,7 @@ export const CellsMoreMenu = ({conversationQualifiedId}: CellsMoreMenuProps) => 
         >
           <div css={itemStyles}>
             <TrashIcon />
-            Recycle Bin
+            {t('cellsRecycleBin.moreMenu')}
           </div>
         </DropdownMenu.Item>
       </DropdownMenu.Content>

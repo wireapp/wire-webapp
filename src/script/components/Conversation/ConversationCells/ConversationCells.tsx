@@ -77,11 +77,11 @@ export const ConversationCells = ({
     message: t('cellsGlobalView.deleteModalError'),
   });
 
-  const handleDeleteFile = useCallback(
-    async (uuid: string) => {
+  const handleDeleteNode = useCallback(
+    async ({uuid, permanently = false}: {uuid: string; permanently?: boolean}) => {
       try {
         removeFile({conversationId, fileId: uuid});
-        await cellsRepository.deleteNode({uuid});
+        await cellsRepository.deleteNode({uuid, permanently});
       } catch (error) {
         deleteFileFailedNotification.show();
         console.error(error);
@@ -112,7 +112,7 @@ export const ConversationCells = ({
           files={isLoading ? [] : files}
           cellsRepository={cellsRepository}
           conversationQualifiedId={conversationQualifiedId}
-          onDeleteFile={handleDeleteFile}
+          onDeleteNode={handleDeleteNode}
           onUpdateBodyHeight={updateHeight}
         />
       )}

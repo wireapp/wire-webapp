@@ -36,11 +36,11 @@ const columnHelper = createColumnHelper<CellItem>();
 export const getCellsTableColumns = ({
   cellsRepository,
   conversationQualifiedId,
-  onDeleteFile,
+  onDeleteNode,
 }: {
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
-  onDeleteFile: (uuid: string) => void;
+  onDeleteNode: ({uuid, permanently}: {uuid: string; permanently?: boolean}) => void;
 }) => [
   columnHelper.accessor('name', {
     header: t('cellsGlobalView.tableRowName'),
@@ -72,8 +72,8 @@ export const getCellsTableColumns = ({
     cell: info => {
       return (
         <CellsTableRowOptions
-          file={info.row.original}
-          onDelete={uuid => onDeleteFile(uuid)}
+          node={info.row.original}
+          onDelete={onDeleteNode}
           cellsRepository={cellsRepository}
           conversationQualifiedId={conversationQualifiedId}
         />
