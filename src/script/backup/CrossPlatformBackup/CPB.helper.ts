@@ -30,18 +30,18 @@ import {IncompatibleBackupError} from '../Error';
 export const CPBLogger = getLogger('wire:backup:CPB');
 
 export const isCPBackup = async (data: ArrayBuffer | Blob): Promise<boolean> => {
-  if (data instanceof ArrayBuffer) {
-    const backupImporter = new CPBackupImporter();
-    const backupData = new Uint8Array(data);
-    const result = await backupImporter.peekFileData(backupData);
-    if (result instanceof BackupPeekResult.Failure) {
-      return false;
-    }
-    if (result instanceof BackupPeekResult.Success) {
-      CPBLogger.log(`Backup version: ${result.version}`);
-      return true;
-    }
+  if (!(data instanceof ArrayBuffer)) {
     return false;
+  }
+  const backupImporter = new CPBackupImporter();
+  const backupData = new Uint8Array(data);
+  const result = await backupImporter.peekFileData(backupData);
+  if (result instanceof BackupPeekResult.Failure) {
+    return false;
+  }
+  if (result instanceof BackupPeekResult.Success) {
+    CPBLogger.log(`Backup version: ${result.version}`);
+    return true;
   }
   return false;
 };
