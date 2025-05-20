@@ -51,10 +51,7 @@ export const showDeletePermanentlyModal = ({
           },
         ],
       ),
-      title:
-        node.type === 'file'
-          ? t('cellsDeletePermanentlyModal.fileHeadline')
-          : t('cellsDeletePermanentlyModal.folderHeadline'),
+      title: t('cellsDeletePermanentlyModal.headline'),
     },
   });
 };
