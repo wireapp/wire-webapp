@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.53.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.52.1...@wireapp/react-ui-kit@9.53.0) (2025-05-21)
+
+### Features
+
+* **react-ui-kit:** breadcrubms with icons ([#7052](https://github.com/wireapp/wire-web-packages/issues/7052)) ([cbb77d0](https://github.com/wireapp/wire-web-packages/commit/cbb77d05ea9d71b22b4744df7b4c0b08d28fc8de))
+
 ## [9.52.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.52.0...@wireapp/react-ui-kit@9.52.1) (2025-05-19)
 
 ### Bug Fixes
