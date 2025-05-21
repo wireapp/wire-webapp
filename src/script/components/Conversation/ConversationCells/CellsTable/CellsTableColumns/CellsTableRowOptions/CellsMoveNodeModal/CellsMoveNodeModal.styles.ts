@@ -19,15 +19,12 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const buttonStyles: CSSObject = {
-  background: 'none',
-  border: 'none',
-  padding: '0 8px',
-  cursor: 'pointer',
-  fontSize: 'var(--font-size-medium)',
-  color: 'var(--gray-70)',
+export const modalStyles: CSSObject = {
+  width: '508px',
+};
 
-  '&:hover': {
-    color: 'var(--main-color)',
-  },
+export const wrapperStyles: CSSObject = {
+  padding: '8px',
+  width: '100%',
+  position: 'relative',
 };

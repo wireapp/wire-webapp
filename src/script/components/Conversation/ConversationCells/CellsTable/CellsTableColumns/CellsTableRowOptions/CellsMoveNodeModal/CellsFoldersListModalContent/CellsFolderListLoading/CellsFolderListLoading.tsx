@@ -17,8 +17,12 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {spinnerStyles, wrapperStyles} from './CellsFolderListLoading.styles';
 
-export const iconStyles: CSSObject = {
-  transform: 'rotate(90deg)',
+export const CellsFolderListLoading = () => {
+  return (
+    <div css={wrapperStyles}>
+      <div className="icon-spinner spin" css={spinnerStyles} />
+    </div>
+  );
 };

@@ -421,6 +421,13 @@ declare module 'I18n/en-US.json' {
     'cellsGlobalView.tableRowSharedFalsyValue': `No`;
     'cellsGlobalView.tableRowSharedTruthyValue': `Yes`;
     'cellsGlobalView.tableRowSize': `Size`;
+    'cellsMoveNodeModal.moveTitle': `Move to folder`;
+    'cellsMoveNodeModal.createTitle': `Create folder`;
+    'cellsMoveNodeModal.cancelButton': `Cancel`;
+    'cellsMoveNodeModal.moveButton': `Move here`;
+    'cellsMoveNodeModal.emptyList': `There are no subfolders in this folder.`;
+    'cellsMoveNodeModal.createFolderHintText': `Cant find a suitable folder?`;
+    'cellsMoveNodeModal.createFolderHintButton': `Create a new folder`;
     'cellsNewItemMenu.button': `New`;
     'cellsNewItemMenu.file': `Create an empty file`;
     'cellsNewItemMenu.folder': `Create a folder`;

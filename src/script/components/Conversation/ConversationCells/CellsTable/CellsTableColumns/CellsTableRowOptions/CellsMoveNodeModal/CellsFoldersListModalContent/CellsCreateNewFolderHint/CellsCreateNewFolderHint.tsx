@@ -17,14 +17,24 @@
  *
  */
 
-import {ChevronUpIcon} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, PlusIcon} from '@wireapp/react-ui-kit';
 
-import {iconStyles} from './BreadcrumbLeaf.styles';
+import {t} from 'Util/LocalizerUtil';
 
-export const BreadcrumbLeaf = () => {
+import {iconStyles, textStyles, wrapperStyles, buttonStyles} from './CellsCreateNewFolderHint.styles';
+
+interface CellsCreateNewFolderHintProps {
+  onCreate: () => void;
+}
+
+export const CellsCreateNewFolderHint = ({onCreate}: CellsCreateNewFolderHintProps) => {
   return (
-    <li aria-hidden="true">
-      <ChevronUpIcon css={iconStyles} width={12} height={12} />
-    </li>
+    <div css={wrapperStyles}>
+      <p css={textStyles}>{t('cellsMoveNodeModal.createFolderHintText')}</p>
+      <Button variant={ButtonVariant.TERTIARY} type="submit" css={buttonStyles} onClick={onCreate}>
+        <PlusIcon css={iconStyles} />
+        {t('cellsMoveNodeModal.createFolderHintButton')}
+      </Button>
+    </div>
   );
 };

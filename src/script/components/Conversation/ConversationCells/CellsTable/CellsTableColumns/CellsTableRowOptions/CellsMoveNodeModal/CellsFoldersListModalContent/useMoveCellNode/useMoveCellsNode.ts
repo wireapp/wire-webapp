@@ -17,22 +17,25 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {useState} from 'react';
 
-import {Config} from 'src/script/Config';
+import {CellsRepository} from 'src/script/cells/CellsRepository';
 
-import {getCellsFilesPath} from '../getCellsFilesPath/getCellsFilesPath';
+export const useMoveCellsNode = ({cellsRepository}: {cellsRepository: CellsRepository}) => {
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
-export const getCellsApiPath = ({
-  conversationQualifiedId,
-  currentPath = getCellsFilesPath(),
-}: {
-  conversationQualifiedId: QualifiedId;
-  currentPath?: string;
-}) => {
-  const {domain, id} = conversationQualifiedId;
+  const moveNode = async ({currentPath, targetPath}: {currentPath: string; targetPath: string}) => {
+    setStatus('loading');
+    try {
+      await cellsRepository.moveNode({
+        currentPath,
+        targetPath,
+      });
+      setStatus('success');
+    } catch (error) {
+      setStatus('error');
+    }
+  };
 
-  const domainPerEnv = process.env.NODE_ENV === 'development' ? Config.getConfig().CELLS_WIRE_DOMAIN : domain;
-
-  return `${id}@${domainPerEnv}${currentPath ? `/${currentPath}` : ''}`;
+  return {moveNode, status};
 };

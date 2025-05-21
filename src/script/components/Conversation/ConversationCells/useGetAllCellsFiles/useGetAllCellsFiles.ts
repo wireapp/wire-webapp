@@ -43,7 +43,7 @@ export const useGetAllCellsFiles = ({cellsRepository, conversationQualifiedId}: 
     try {
       setStatus('loading');
 
-      const result = await cellsRepository.getAllFiles({
+      const result = await cellsRepository.getAllNodes({
         path: getCellsApiPath({conversationQualifiedId}),
         limit: pageSize,
         offset,

@@ -17,22 +17,17 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+export const getBreadcrumbsFromPath = ({baseCrumb, currentPath}: {baseCrumb: string; currentPath: string}) => {
+  const segments = currentPath.split('/').filter(Boolean);
 
-import {Config} from 'src/script/Config';
-
-import {getCellsFilesPath} from '../getCellsFilesPath/getCellsFilesPath';
-
-export const getCellsApiPath = ({
-  conversationQualifiedId,
-  currentPath = getCellsFilesPath(),
-}: {
-  conversationQualifiedId: QualifiedId;
-  currentPath?: string;
-}) => {
-  const {domain, id} = conversationQualifiedId;
-
-  const domainPerEnv = process.env.NODE_ENV === 'development' ? Config.getConfig().CELLS_WIRE_DOMAIN : domain;
-
-  return `${id}@${domainPerEnv}${currentPath ? `/${currentPath}` : ''}`;
+  return [
+    {
+      name: baseCrumb,
+      path: '',
+    },
+    ...segments.map((segment, index) => ({
+      name: segment,
+      path: segments.slice(0, index + 1).join('/'),
+    })),
+  ];
 };

@@ -19,28 +19,12 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const listItemStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  flexShrink: 0,
+export const breadcrumbsWrapperStyles: CSSObject = {
+  padding: '0 8px',
+  marginBottom: '24px',
 };
 
-export const buttonStyles: CSSObject = {
-  background: 'none',
-  border: 'none',
-  padding: '0 8px',
-  cursor: 'pointer',
-  fontSize: 'var(--font-size-medium)',
-  color: 'var(--gray-70)',
-
-  '&:hover': {
-    color: 'var(--main-color)',
-  },
-};
-
-export const activeItemStyles: CSSObject = {
-  display: 'inline-block',
-  padding: '0 8px',
-  fontSize: 'var(--font-size-medium)',
-  color: 'var(--main-color)',
+export const listWrapperStyles: CSSObject = {
+  marginBottom: '16px',
+  height: '260px',
 };

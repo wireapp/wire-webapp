@@ -17,20 +17,18 @@
  *
  */
 
-import {getCellsFilesPath} from '../../../common/getCellsFilesPath/getCellsFilesPath';
+import {RestNode} from 'cells-sdk-ts';
 
-export const getBreadcrumbsFromUrl = ({baseCrumb}: {baseCrumb: string}) => {
-  const currentPath = getCellsFilesPath();
-  const segments = currentPath.split('/').filter(Boolean);
-
-  return [
-    {
-      name: baseCrumb,
-      path: '',
-    },
-    ...segments.map((segment, index) => ({
-      name: segment,
-      path: segments.slice(0, index + 1).join('/'),
-    })),
-  ];
+export const transformNodesToCellsFolders = (nodes: RestNode[]) => {
+  return nodes
+    .filter(node => node.Type === 'COLLECTION')
+    .map(node => {
+      const pathParts = node.Path.split('/');
+      const name = pathParts[pathParts.length - 1];
+      return {
+        id: node.Uuid,
+        name,
+        path: node.Path,
+      };
+    });
 };

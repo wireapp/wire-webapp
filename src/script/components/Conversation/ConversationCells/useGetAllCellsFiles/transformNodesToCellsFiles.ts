@@ -40,11 +40,13 @@ export const transformNodesToCellsFiles = (nodes: RestNode[]): Array<CellItem> =
           url: undefined,
         };
         const url = node.PreSignedGET?.Url;
+        const path = node.Path;
 
         if (node.Type === 'COLLECTION') {
           return {
             id,
             type: 'folder' as const,
+            path,
             url,
             owner,
             name,
@@ -58,6 +60,7 @@ export const transformNodesToCellsFiles = (nodes: RestNode[]): Array<CellItem> =
           id,
           type: 'file' as const,
           url,
+          path,
           owner,
           conversationName: node.ContextWorkspace?.Label || '',
           mimeType: node.ContentType,

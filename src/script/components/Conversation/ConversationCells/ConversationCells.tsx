@@ -112,6 +112,7 @@ export const ConversationCells = ({
           files={isLoading ? [] : files}
           cellsRepository={cellsRepository}
           conversationQualifiedId={conversationQualifiedId}
+          conversationName={conversationName}
           onDeleteFile={handleDeleteFile}
           onUpdateBodyHeight={updateHeight}
         />

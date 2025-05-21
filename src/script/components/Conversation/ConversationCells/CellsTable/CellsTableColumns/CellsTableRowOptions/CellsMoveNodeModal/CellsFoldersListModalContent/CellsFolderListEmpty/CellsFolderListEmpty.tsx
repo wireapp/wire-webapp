@@ -17,22 +17,14 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {t} from 'Util/LocalizerUtil';
 
-import {Config} from 'src/script/Config';
+import {textStyles, wrapperStyles} from './CellsFolderListEmpty.styles';
 
-import {getCellsFilesPath} from '../getCellsFilesPath/getCellsFilesPath';
-
-export const getCellsApiPath = ({
-  conversationQualifiedId,
-  currentPath = getCellsFilesPath(),
-}: {
-  conversationQualifiedId: QualifiedId;
-  currentPath?: string;
-}) => {
-  const {domain, id} = conversationQualifiedId;
-
-  const domainPerEnv = process.env.NODE_ENV === 'development' ? Config.getConfig().CELLS_WIRE_DOMAIN : domain;
-
-  return `${id}@${domainPerEnv}${currentPath ? `/${currentPath}` : ''}`;
+export const CellsFolderListEmpty = () => {
+  return (
+    <div css={wrapperStyles}>
+      <p css={textStyles}>{t('cellsMoveNodeModal.emptyList')}</p>
+    </div>
+  );
 };

@@ -17,22 +17,15 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {Breadcrumbs} from '@wireapp/react-ui-kit';
 
-import {Config} from 'src/script/Config';
+interface CellsBreadcrumbsProps {
+  maxNotCombinedItems?: number;
+  items: Array<{name: string; path: string}>;
 
-import {getCellsFilesPath} from '../getCellsFilesPath/getCellsFilesPath';
+  onItemClick: (item: {name: string}) => void;
+}
 
-export const getCellsApiPath = ({
-  conversationQualifiedId,
-  currentPath = getCellsFilesPath(),
-}: {
-  conversationQualifiedId: QualifiedId;
-  currentPath?: string;
-}) => {
-  const {domain, id} = conversationQualifiedId;
-
-  const domainPerEnv = process.env.NODE_ENV === 'development' ? Config.getConfig().CELLS_WIRE_DOMAIN : domain;
-
-  return `${id}@${domainPerEnv}${currentPath ? `/${currentPath}` : ''}`;
+export const CellsBreadcrumbs = ({maxNotCombinedItems, items, onItemClick}: CellsBreadcrumbsProps) => {
+  return <Breadcrumbs items={items} maxNotCombinedItems={maxNotCombinedItems} onItemClick={onItemClick} />;
 };

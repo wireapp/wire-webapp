@@ -17,22 +17,16 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {CSSObject} from '@emotion/react';
 
-import {Config} from 'src/script/Config';
+export const wrapperStyles: CSSObject = {
+  width: '100%',
+  height: '100%',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+};
 
-import {getCellsFilesPath} from '../getCellsFilesPath/getCellsFilesPath';
-
-export const getCellsApiPath = ({
-  conversationQualifiedId,
-  currentPath = getCellsFilesPath(),
-}: {
-  conversationQualifiedId: QualifiedId;
-  currentPath?: string;
-}) => {
-  const {domain, id} = conversationQualifiedId;
-
-  const domainPerEnv = process.env.NODE_ENV === 'development' ? Config.getConfig().CELLS_WIRE_DOMAIN : domain;
-
-  return `${id}@${domainPerEnv}${currentPath ? `/${currentPath}` : ''}`;
+export const textStyles: CSSObject = {
+  fontSize: 'var(--font-size-medium)',
 };

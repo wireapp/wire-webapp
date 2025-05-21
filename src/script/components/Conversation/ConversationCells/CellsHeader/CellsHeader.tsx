@@ -21,10 +21,14 @@ import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 
-import {CellsBreadcrumbs} from './CellsBreadcrumbs/CellsBreadcrumbs';
 import {actionsStyles, contentStyles, wrapperStyles} from './CellsHeader.styles';
 import {CellsNewMenu} from './CellsNewMenu/CellsNewMenu';
 import {CellsRefresh} from './CellsRefresh/CellsRefresh';
+
+import {CellsBreadcrumbs} from '../common/CellsBreadcrumbs/CellsBreadcrumbs';
+import {getBreadcrumbsFromPath} from '../common/getBreadcrumbsFromPath/getBreadcrumbsFromPath';
+import {getCellsFilesPath} from '../common/getCellsFilesPath/getCellsFilesPath';
+import {openBreadcrumb} from '../common/openBreadcrumb/openBreadcrumb';
 
 interface CellsHeaderProps {
   onRefresh: () => void;
@@ -40,10 +44,23 @@ export const CellsHeader = ({
   conversationName,
   cellsRepository,
 }: CellsHeaderProps) => {
+  const breadcrumbs = getBreadcrumbsFromPath({
+    baseCrumb: `${conversationName} files`,
+    currentPath: getCellsFilesPath(),
+  });
+
   return (
     <div css={wrapperStyles}>
       <div css={contentStyles}>
-        <CellsBreadcrumbs conversationQualifiedId={conversationQualifiedId} conversationName={conversationName} />
+        <CellsBreadcrumbs
+          items={breadcrumbs}
+          onItemClick={item =>
+            openBreadcrumb({
+              conversationQualifiedId,
+              path: breadcrumbs.find(crumb => crumb.name === item.name)?.path ?? '',
+            })
+          }
+        />
         <div css={actionsStyles}>
           <CellsNewMenu
             cellsRepository={cellsRepository}

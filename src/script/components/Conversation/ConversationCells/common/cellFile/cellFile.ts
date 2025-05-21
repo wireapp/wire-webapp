@@ -20,6 +20,7 @@
 export interface CellFile {
   id: string;
   type: 'file';
+  path: string;
   url?: string;
   mimeType?: string;
   name: string;
@@ -40,6 +41,7 @@ export interface CellFile {
 export interface CellFolder {
   id: string;
   type: 'folder';
+  path: string;
   url?: string;
   mimeType?: string;
   name: string;
