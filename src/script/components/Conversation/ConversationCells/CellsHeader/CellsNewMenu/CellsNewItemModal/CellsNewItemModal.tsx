@@ -21,23 +21,22 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {CloseIcon, IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
 
-import {CellsNewItemForm} from 'Components/Conversation/ConversationCells/common/CellsNewItemForm/CellsNewItemForm';
+import {CellsNewNodeForm} from 'Components/Conversation/ConversationCells/common/CellsNewNodeForm/CellsNewNodeForm';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
 
 import {closeButtonStyles, headerStyles, headingStyles, wrapperStyles} from './CellsNewItemModal.styles';
 
-import {CellItem} from '../../../common/cellFile/cellFile';
+import {CellNode} from '../../../common/cellNode/cellNode';
 
 interface CellsNewItemModalProps {
   isOpen: boolean;
   onClose: () => void;
-  type: CellItem['type'];
+  type: CellNode['type'];
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
   onSuccess: () => void;
-
   currentPath: string;
 }
 
@@ -67,7 +66,7 @@ export const CellsNewItemModal = ({
             <CloseIcon />
           </IconButton>
         </header>
-        <CellsNewItemForm
+        <CellsNewNodeForm
           type={type}
           cellsRepository={cellsRepository}
           conversationQualifiedId={conversationQualifiedId}

@@ -24,13 +24,13 @@ import {Button, ButtonVariant, ErrorMessage, Input, Label} from '@wireapp/react-
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
 
-import {buttonStyles, buttonWrapperStyles, inputWrapperStyles} from './CellsNewItemForm.styles';
-import {useCellsNewItemForm} from './useCellsNewItemForm';
+import {buttonStyles, buttonWrapperStyles, inputWrapperStyles} from './CellsNewNodeForm.styles';
+import {useCellsNewItemForm} from './useCellsNewNodeForm';
 
-import {CellItem} from '../cellFile/cellFile';
+import {CellNode} from '../cellNode/cellNode';
 
-interface CellsNewItemFormProps {
-  type: CellItem['type'];
+interface CellsNewNodeFormProps {
+  type: CellNode['type'];
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
   onSuccess: () => void;
@@ -38,14 +38,14 @@ interface CellsNewItemFormProps {
   currentPath: string;
 }
 
-export const CellsNewItemForm = ({
+export const CellsNewNodeForm = ({
   type,
   cellsRepository,
   conversationQualifiedId,
   onSuccess,
   onSecondaryButtonClick,
   currentPath,
-}: CellsNewItemFormProps) => {
+}: CellsNewNodeFormProps) => {
   const {name, error, isSubmitting, handleSubmit, handleChange} = useCellsNewItemForm({
     type,
     cellsRepository,

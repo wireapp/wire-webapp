@@ -33,35 +33,35 @@ interface UseCellPublicLinkParams {
 type PublicLinkStatus = 'idle' | 'loading' | 'error' | 'success';
 
 export const useCellPublicLink = ({uuid, conversationId, cellsRepository}: UseCellPublicLinkParams) => {
-  const {getFiles, setPublicLink} = useCellsStore();
-  const files = getFiles({conversationId});
-  const file = files.find(file => file.id === uuid);
-  const [isEnabled, setIsEnabled] = useState(!!file?.publicLink);
-  const [status, setStatus] = useState<PublicLinkStatus>(file?.publicLink ? 'success' : 'idle');
+  const {getNodes, setPublicLink} = useCellsStore();
+  const nodes = getNodes({conversationId});
+  const node = nodes.find(n => n.id === uuid);
+  const [isEnabled, setIsEnabled] = useState(!!node?.publicLink);
+  const [status, setStatus] = useState<PublicLinkStatus>(node?.publicLink ? 'success' : 'idle');
 
   const createPublicLink = useCallback(async () => {
     try {
       setStatus('loading');
-      const link = await cellsRepository.createPublicLink({uuid, label: file?.name || ''});
+      const link = await cellsRepository.createPublicLink({uuid, label: node?.name || ''});
 
       if (!link.LinkUrl || !link.Uuid) {
         throw new Error('Link not found');
       }
 
       const newLink = {uuid: link.Uuid, url: Config.getConfig().CELLS_PYDIO_URL + link.LinkUrl, alreadyShared: true};
-      setPublicLink({conversationId, fileId: uuid, data: newLink});
+      setPublicLink({conversationId, nodeId: uuid, data: newLink});
       setStatus('success');
     } catch (err) {
       setStatus('error');
-      setPublicLink({conversationId, fileId: uuid, data: undefined});
+      setPublicLink({conversationId, nodeId: uuid, data: undefined});
     }
     // cellsRepository is not a dependency because it's a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uuid, conversationId, setPublicLink]);
 
   const getPublicLink = useCallback(async () => {
-    const linkId = file?.publicLink?.uuid;
-    const linkUrl = file?.publicLink?.url;
+    const linkId = node?.publicLink?.uuid;
+    const linkUrl = node?.publicLink?.url;
 
     if (!linkId || linkUrl) {
       return;
@@ -78,39 +78,39 @@ export const useCellPublicLink = ({uuid, conversationId, cellsRepository}: UseCe
 
       const newLink = {uuid: link.Uuid, url: Config.getConfig().CELLS_PYDIO_URL + link.LinkUrl, alreadyShared: true};
 
-      setPublicLink({conversationId, fileId: uuid, data: newLink});
+      setPublicLink({conversationId, nodeId: uuid, data: newLink});
       setStatus('success');
     } catch (err) {
       setStatus('error');
-      setPublicLink({conversationId, fileId: uuid, data: undefined});
+      setPublicLink({conversationId, nodeId: uuid, data: undefined});
     }
     // cellsRepository is not a dependency because it's a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [uuid, conversationId, setPublicLink, file?.publicLink]);
+  }, [uuid, conversationId, setPublicLink, node?.publicLink]);
 
   const deletePublicLink = useCallback(async () => {
-    if (!file?.publicLink || !file.publicLink.uuid) {
+    if (!node?.publicLink || !node.publicLink.uuid) {
       return;
     }
 
     try {
-      await cellsRepository.deletePublicLink({uuid: file.publicLink.uuid});
-      setPublicLink({conversationId, fileId: uuid, data: undefined});
+      await cellsRepository.deletePublicLink({uuid: node.publicLink.uuid});
+      setPublicLink({conversationId, nodeId: uuid, data: undefined});
     } catch (err) {
       setStatus('error');
     }
     // cellsRepository is not a dependency because it's a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [uuid, conversationId, file?.publicLink, setPublicLink]);
+  }, [uuid, conversationId, node?.publicLink, setPublicLink]);
 
   const togglePublicLink = useCallback(() => {
     setIsEnabled(prev => !prev);
   }, []);
 
   useEffect(() => {
-    const shouldDeleteLink = !isEnabled && file?.publicLink;
-    const shouldCreateNewLink = isEnabled && !file?.publicLink?.alreadyShared;
-    const shouldGetLink = isEnabled && file?.publicLink?.alreadyShared;
+    const shouldDeleteLink = !isEnabled && node?.publicLink;
+    const shouldCreateNewLink = isEnabled && !node?.publicLink?.alreadyShared;
+    const shouldGetLink = isEnabled && node?.publicLink?.alreadyShared;
 
     if (shouldGetLink) {
       void getPublicLink();
@@ -125,11 +125,11 @@ export const useCellPublicLink = ({uuid, conversationId, cellsRepository}: UseCe
     if (shouldCreateNewLink) {
       void createPublicLink();
     }
-  }, [isEnabled, file?.publicLink, createPublicLink, deletePublicLink, getPublicLink]);
+  }, [isEnabled, node?.publicLink, createPublicLink, deletePublicLink, getPublicLink]);
 
   return {
     status,
-    link: file?.publicLink?.url,
+    link: node?.publicLink?.url,
     isEnabled,
     togglePublicLink,
   };

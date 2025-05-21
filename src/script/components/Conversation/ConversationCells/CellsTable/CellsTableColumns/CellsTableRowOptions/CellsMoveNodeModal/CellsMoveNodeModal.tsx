@@ -21,7 +21,7 @@ import {useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {CellItem} from 'Components/Conversation/ConversationCells/common/cellFile/cellFile';
+import {CellNode} from 'Components/Conversation/ConversationCells/common/cellNode/cellNode';
 import {getCellsFilesPath} from 'Components/Conversation/ConversationCells/common/getCellsFilesPath/getCellsFilesPath';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
@@ -39,7 +39,7 @@ interface CellsMoveNodeModalProps {
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
   conversationName: string;
-  nodeToMove: CellItem;
+  nodeToMove: CellNode;
 }
 
 export const CellsMoveNodeModal = ({
