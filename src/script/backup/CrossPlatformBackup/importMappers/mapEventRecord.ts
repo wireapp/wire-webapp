@@ -77,6 +77,8 @@ const isTextContent = (content: BackupMessageContent): content is BackupMessageC
   content instanceof BackupMessageContent.Text;
 const isAssetContent = (content: BackupMessageContent): content is BackupMessageContent.Asset =>
   content instanceof BackupMessageContent.Asset;
+const isLocationContent = (content: BackupMessageContent): content is BackupMessageContent.Location =>
+  content instanceof BackupMessageContent.Location;
 
 type TextBackupMessage = BackupMessage & {content: BackupMessageContent.Text};
 const mapTextMessageToEventRecord = (message: TextBackupMessage): EventRecord => ({
@@ -115,6 +117,22 @@ const mapAssetMessageToEventRecord = (message: AssetBackupMessage): EventRecord 
   category: 128,
 });
 
+type LocationBackupMessage = BackupMessage & {content: BackupMessageContent.Location};
+// Maps a LocationBackupMessage to an EventRecord
+const mapLocationMessageToEventRecord = (message: LocationBackupMessage): EventRecord => ({
+  ...mapCommonMessageFields(message),
+  data: {
+    location: {
+      latitude: message.content.latitude,
+      longitude: message.content.longitude,
+      name: message.content.name,
+      zoom: message.content.zoom,
+    },
+  },
+  type: ClientEvent.CONVERSATION.LOCATION as any,
+  category: 4096,
+});
+
 /**
  * Maps a BackupMessage to an EventRecord
  * @param message
@@ -123,6 +141,10 @@ const mapAssetMessageToEventRecord = (message: AssetBackupMessage): EventRecord 
 export const mapEventRecord = (message: BackupMessage): EventRecord | undefined => {
   if (isAssetContent(message.content)) {
     return mapAssetMessageToEventRecord(message as AssetBackupMessage);
+  }
+
+  if (isLocationContent(message.content)) {
+    return mapLocationMessageToEventRecord(message as LocationBackupMessage);
   }
 
   if (isTextContent(message.content)) {
