@@ -37,13 +37,12 @@ import {CellNode} from '../common/cellNode/cellNode';
 interface CellsTableProps {
   nodes: CellNode[];
   cellsRepository: CellsRepository;
-  onDeleteNode: (uuid: string) => void;
 }
 
-export const CellsTable = ({nodes, cellsRepository, onDeleteNode}: CellsTableProps) => {
+export const CellsTable = ({nodes, cellsRepository}: CellsTableProps) => {
   const table = useReactTable({
     data: nodes,
-    columns: getCellsTableColumns({onDeleteNode, cellsRepository}),
+    columns: getCellsTableColumns({cellsRepository}),
     getCoreRowModel: getCoreRowModel(),
   });
 

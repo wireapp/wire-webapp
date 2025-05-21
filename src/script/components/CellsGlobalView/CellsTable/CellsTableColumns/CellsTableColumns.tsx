@@ -32,13 +32,7 @@ import {CellNode} from '../../common/cellNode/cellNode';
 
 const columnHelper = createColumnHelper<CellNode>();
 
-export const getCellsTableColumns = ({
-  onDeleteNode,
-  cellsRepository,
-}: {
-  onDeleteNode: (uuid: string) => void;
-  cellsRepository: CellsRepository;
-}) => [
+export const getCellsTableColumns = ({cellsRepository}: {cellsRepository: CellsRepository}) => [
   columnHelper.accessor('name', {
     header: t('cellsGlobalView.tableRowName'),
     cell: info => <CellsTableNameColumn node={info.row.original} />,
@@ -71,8 +65,6 @@ export const getCellsTableColumns = ({
   columnHelper.accessor('id', {
     header: () => <span className="visually-hidden">{t('cellsGlobalView.tableRowActions')}</span>,
     size: 40,
-    cell: info => (
-      <CellsTableRowOptions node={info.row.original} onDelete={onDeleteNode} cellsRepository={cellsRepository} />
-    ),
+    cell: info => <CellsTableRowOptions node={info.row.original} cellsRepository={cellsRepository} />,
   }),
 ];
