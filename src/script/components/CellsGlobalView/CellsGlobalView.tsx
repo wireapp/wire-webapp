@@ -23,7 +23,6 @@ import {container} from 'tsyringe';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {useAppNotification} from 'Components/AppNotification/AppNotification';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
 
@@ -40,30 +39,11 @@ interface CellsGlobalViewProps {
 }
 
 export const CellsGlobalView = ({cellsRepository = container.resolve(CellsRepository)}: CellsGlobalViewProps) => {
-  const {files, status: filesStatus, removeFile, pagination} = useCellsStore();
+  const {files, status: filesStatus, pagination} = useCellsStore();
 
   const {searchValue, handleSearch, handleClearSearch, handleReload, increasePageSize} = useSearchCellsFiles({
     cellsRepository,
   });
-
-  const deleteFileFailedNotification = useAppNotification({
-    message: t('cellsGlobalView.deleteModalError'),
-  });
-
-  const handleDeleteFile = useCallback(
-    async (uuid: string) => {
-      try {
-        removeFile(uuid);
-        await cellsRepository.deleteFile({uuid});
-      } catch (error) {
-        deleteFileFailedNotification.show();
-        console.error(error);
-      }
-    },
-    // cellsRepository is not a dependency because it's a singleton
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [deleteFileFailedNotification, removeFile],
-  );
 
   const handleRefresh = useCallback(async () => {
     await handleReload();
@@ -103,7 +83,7 @@ export const CellsGlobalView = ({cellsRepository = container.resolve(CellsReposi
           description={t('cellsGlobalView.emptySearchResultsDescription')}
         />
       )}
-      {showTable && <CellsTable files={files} cellsRepository={cellsRepository} onDeleteFile={handleDeleteFile} />}
+      {showTable && <CellsTable files={files} cellsRepository={cellsRepository} />}
       {showNoFiles && (
         <CellsStateInfo
           heading={t('cellsGlobalView.noFilesHeading')}
