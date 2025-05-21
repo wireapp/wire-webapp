@@ -44,6 +44,7 @@ export const importCPBHistoryToDatabase = async ({
   const peekedData = await peekCrossPlatformData(fileBytes, new BackupQualifiedId(user.id, user.domain));
   const FileDescriptor: FileDescriptor[] = [];
 
+  // Check if the backup was created by the same user
   if (!peekedData.isUserBackup) {
     CPBLogger.log('Backup is not created by the same user');
     throw new DifferentAccountError('Backup is not created by the same user');
