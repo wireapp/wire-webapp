@@ -174,7 +174,9 @@ const CellsTableRowOptionsContent = ({
   return (
     <>
       <DropdownMenu.Content>
-        <DropdownMenu.Item onClick={() => setIsMoveNodeModalOpen(true)}>Move</DropdownMenu.Item>
+        <DropdownMenu.Item onClick={() => setIsMoveNodeModalOpen(true)}>
+          {t('cellsGlobalView.optionMove')}
+        </DropdownMenu.Item>
         <DropdownMenu.Item
           onClick={() =>
             showShareFileModal({uuid: node.id, conversationId: conversationQualifiedId.id, cellsRepository})

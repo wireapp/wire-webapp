@@ -397,6 +397,7 @@
   "cellsGlobalView.optionDeletePermanently": "Delete permanently",
   "cellsGlobalView.optionDownload": "Download",
   "cellsGlobalView.optionOpen": "Open",
+  "cellsGlobalView.optionMove": "Move",
   "cellsGlobalView.optionShare": "Share",
   "cellsGlobalView.optionRestore": "Restore",
   "cellsGlobalView.optionsLabel": "More options",
