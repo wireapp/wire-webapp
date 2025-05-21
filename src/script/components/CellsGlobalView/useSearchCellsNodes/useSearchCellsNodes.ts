@@ -36,7 +36,7 @@ const PAGE_SIZE_INCREMENT = 20;
 const DEBOUNCE_TIME = 300;
 
 export const useSearchCellsNodes = ({cellsRepository}: UseSearchCellsNodesProps) => {
-  const {setNodes: setFiles, setStatus, setPagination, clearAll} = useCellsStore();
+  const {setNodes, setStatus, setPagination, clearAll} = useCellsStore();
 
   const [searchValue, setSearchValue] = useState('');
   const [pageSize, setPageSize] = useState<number>(PAGE_INITIAL_SIZE);
@@ -46,7 +46,7 @@ export const useSearchCellsNodes = ({cellsRepository}: UseSearchCellsNodesProps)
       try {
         setStatus(status);
         const result = await cellsRepository.searchNodes({query, limit});
-        setFiles(transformCellsNodes(result.Nodes || []));
+        setNodes(transformCellsNodes(result.Nodes || []));
         if (result.Pagination) {
           setPagination(transformCellsPagination(result.Pagination));
         } else {
@@ -55,13 +55,13 @@ export const useSearchCellsNodes = ({cellsRepository}: UseSearchCellsNodesProps)
         setStatus('success');
       } catch (error) {
         setStatus('error');
-        setFiles([]);
+        setNodes([]);
         setPagination(null);
       }
     },
     // cellsRepository is not a dependency because it's a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [pageSize, setFiles, setPagination, setStatus],
+    [pageSize, setNodes, setPagination, setStatus],
   );
 
   const searchNodesDebounced = useDebouncedCallback(searchNodes, DEBOUNCE_TIME);
