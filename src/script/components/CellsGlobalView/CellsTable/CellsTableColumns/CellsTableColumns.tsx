@@ -65,6 +65,6 @@ export const getCellsTableColumns = ({cellsRepository}: {cellsRepository: CellsR
   columnHelper.accessor('id', {
     header: () => <span className="visually-hidden">{t('cellsGlobalView.tableRowActions')}</span>,
     size: 40,
-    cell: info => <CellsTableRowOptions file={info.row.original} cellsRepository={cellsRepository} />,
+    cell: info => <CellsTableRowOptions node={info.row.original} cellsRepository={cellsRepository} />,
   }),
 ];
