@@ -25,8 +25,8 @@ import {t} from 'Util/LocalizerUtil';
 
 import {buttonStyles, itemStyles} from './CellsMoreMenu.styles';
 
+import {openBreadcrumb} from '../../common/openBreadcrumb/openBreadcrumb';
 import {RECYCLE_BIN_PATH} from '../../common/recycleBin/recycleBin';
-import {openBreadcrumb} from '../CellsBreadcrumbs/openBreadcrumb/openBreadcrumb';
 
 interface CellsMoreMenuProps {
   conversationQualifiedId: QualifiedId;
