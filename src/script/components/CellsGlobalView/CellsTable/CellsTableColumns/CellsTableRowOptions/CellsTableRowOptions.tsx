@@ -32,6 +32,7 @@ import {showShareNodeModal} from '../CellsShareFileModal/CellsShareFileModal';
 
 interface CellsTableRowOptionsProps {
   node: CellNode;
+
   cellsRepository: CellsRepository;
 }
 
