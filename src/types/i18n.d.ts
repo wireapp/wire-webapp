@@ -401,6 +401,7 @@ declare module 'I18n/en-US.json' {
     'cellsGlobalView.optionDeletePermanently': `Delete permanently`;
     'cellsGlobalView.optionDownload': `Download`;
     'cellsGlobalView.optionOpen': `Open`;
+    'cellsGlobalView.optionMove': `Move`;
     'cellsGlobalView.optionShare': `Share`;
     'cellsGlobalView.optionRestore': `Restore`;
     'cellsGlobalView.optionsLabel': `More options`;
@@ -432,13 +433,13 @@ declare module 'I18n/en-US.json' {
     'cellsGlobalView.tableRowSharedFalsyValue': `No`;
     'cellsGlobalView.tableRowSharedTruthyValue': `Yes`;
     'cellsGlobalView.tableRowSize': `Size`;
-    'cellsMoveNodeModal.moveTitle': `Move to folder`;
-    'cellsMoveNodeModal.createTitle': `Create folder`;
     'cellsMoveNodeModal.cancelButton': `Cancel`;
-    'cellsMoveNodeModal.moveButton': `Move here`;
-    'cellsMoveNodeModal.emptyList': `There are no subfolders in this folder.`;
-    'cellsMoveNodeModal.createFolderHintText': `Cant find a suitable folder?`;
     'cellsMoveNodeModal.createFolderHintButton': `Create a new folder`;
+    'cellsMoveNodeModal.createFolderHintText': `Cant find a suitable folder?`;
+    'cellsMoveNodeModal.createTitle': `Create folder`;
+    'cellsMoveNodeModal.emptyList': `There are no subfolders in this folder.`;
+    'cellsMoveNodeModal.moveButton': `Move here`;
+    'cellsMoveNodeModal.moveTitle': `Move to folder`;
     'cellsNewItemMenu.button': `New`;
     'cellsNewItemMenu.file': `Create an empty file`;
     'cellsNewItemMenu.folder': `Create a folder`;
