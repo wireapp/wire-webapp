@@ -32,16 +32,16 @@ import {
 import {getCellsTableColumns} from './CellsTableColumns/CellsTableColumns';
 import {FilePreviewProvider} from './common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
 
-import {CellItem} from '../common/cellFile/cellFile';
+import {CellNode} from '../common/cellNode/cellNode';
 
 interface CellsTableProps {
-  files: CellItem[];
+  nodes: CellNode[];
   cellsRepository: CellsRepository;
 }
 
-export const CellsTable = ({files, cellsRepository}: CellsTableProps) => {
+export const CellsTable = ({nodes, cellsRepository}: CellsTableProps) => {
   const table = useReactTable({
-    data: files,
+    data: nodes,
     columns: getCellsTableColumns({cellsRepository}),
     getCoreRowModel: getCoreRowModel(),
   });

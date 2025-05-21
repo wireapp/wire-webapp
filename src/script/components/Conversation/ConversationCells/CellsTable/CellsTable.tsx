@@ -35,24 +35,31 @@ import {getCellsTableColumns} from './CellsTableColumns/CellsTableColumns';
 import {CellsFilePreviewModalProvider} from './common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
 import {useTableHeight} from './useTableHeight/useTableHeight';
 
-import {CellItem} from '../common/cellFile/cellFile';
+import {CellNode} from '../common/cellNode/cellNode';
 
 interface CellsTableProps {
-  files: Array<CellItem>;
+  nodes: Array<CellNode>;
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
+  conversationName: string;
   onUpdateBodyHeight: (height: number) => void;
 }
 
-export const CellsTable = ({files, cellsRepository, conversationQualifiedId, onUpdateBodyHeight}: CellsTableProps) => {
+export const CellsTable = ({
+  nodes,
+  cellsRepository,
+  conversationQualifiedId,
+  conversationName,
+  onUpdateBodyHeight,
+}: CellsTableProps) => {
   const {tableBodyRef} = useTableHeight({
-    files,
+    nodes,
     onUpdate: onUpdateBodyHeight,
   });
 
   const table = useReactTable({
-    data: files,
-    columns: getCellsTableColumns({cellsRepository, conversationQualifiedId}),
+    data: nodes,
+    columns: getCellsTableColumns({cellsRepository, conversationQualifiedId, conversationName}),
     getCoreRowModel: getCoreRowModel(),
   });
 

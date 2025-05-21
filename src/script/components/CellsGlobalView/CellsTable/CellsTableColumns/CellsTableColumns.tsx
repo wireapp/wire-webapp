@@ -28,14 +28,14 @@ import {CellsTableNameColumn} from './CellsTableNameColumn/CellsTableNameColumn'
 import {CellsTableRowOptions} from './CellsTableRowOptions/CellsTableRowOptions';
 import {CellsTableSharedColumn} from './CellsTableSharedColumn/CellsTableSharedColumn';
 
-import {CellItem} from '../../common/cellFile/cellFile';
+import {CellNode} from '../../common/cellNode/cellNode';
 
-const columnHelper = createColumnHelper<CellItem>();
+const columnHelper = createColumnHelper<CellNode>();
 
 export const getCellsTableColumns = ({cellsRepository}: {cellsRepository: CellsRepository}) => [
   columnHelper.accessor('name', {
     header: t('cellsGlobalView.tableRowName'),
-    cell: info => <CellsTableNameColumn file={info.row.original} />,
+    cell: info => <CellsTableNameColumn node={info.row.original} />,
   }),
   columnHelper.accessor('conversationName', {
     header: t('cellsGlobalView.tableRowConversationName'),
@@ -65,6 +65,6 @@ export const getCellsTableColumns = ({cellsRepository}: {cellsRepository: CellsR
   columnHelper.accessor('id', {
     header: () => <span className="visually-hidden">{t('cellsGlobalView.tableRowActions')}</span>,
     size: 40,
-    cell: info => <CellsTableRowOptions file={info.row.original} cellsRepository={cellsRepository} />,
+    cell: info => <CellsTableRowOptions node={info.row.original} cellsRepository={cellsRepository} />,
   }),
 ];

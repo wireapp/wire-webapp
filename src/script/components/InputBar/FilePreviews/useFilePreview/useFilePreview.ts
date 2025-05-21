@@ -71,7 +71,7 @@ export const useFilePreview = ({file, cellsRepository, conversationQualifiedId}:
           ? `${conversationQualifiedId.id}@${Config.getConfig().CELLS_WIRE_DOMAIN}`
           : `${conversationQualifiedId.id}@${conversationQualifiedId.domain}`;
 
-      const {uuid, versionId} = await cellsRepository.uploadNode({
+      const {uuid, versionId} = await cellsRepository.uploadNodeDraft({
         uuid: file.id,
         file,
         path,

@@ -123,7 +123,7 @@ export const useFilesUploadDropzone = ({
     const decimalMultiplier = 100;
 
     try {
-      const {uuid, versionId} = await cellsRepository.uploadNode({
+      const {uuid, versionId} = await cellsRepository.uploadNodeDraft({
         uuid: file.id,
         file,
         path,

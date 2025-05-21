@@ -17,14 +17,14 @@
  *
  */
 
-import {useCallback} from 'react';
+import {useCallback, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 
 import {useAppNotification} from 'Components/AppNotification/AppNotification';
-import {CellItem} from 'Components/Conversation/ConversationCells/common/cellFile/cellFile';
+import {CellNode} from 'Components/Conversation/ConversationCells/common/cellNode/cellNode';
 import {openFolder} from 'Components/Conversation/ConversationCells/common/openFolder/openFolder';
 import {
   isInRecycleBin,
@@ -35,21 +35,28 @@ import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
 import {forcedDownloadFile} from 'Util/util';
 
+import {CellsMoveNodeModal} from './CellsMoveNodeModal/CellsMoveNodeModal';
 import {buttonStyles, iconStyles, textStyles} from './CellsTableRowOptions.styles';
 import {showDeletePermanentlyModal} from './showDeletePermanentlyModal/showDeletePermanentlyModal';
 import {showMoveToRecycleBinModal} from './showMoveToRecycleBinModal/showMoveToRecycleBinModal';
 import {showRestoreNodeModal} from './showRestoreNodeModal/showRestoreNodeModal';
 
 import {useCellsFilePreviewModal} from '../../common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
-import {showShareFileModal} from '../CellsFileShareModal/CellsFileShareModal';
+import {showShareFileModal} from '../CellsNodeShareModal/CellsNodeShareModal';
 
 interface CellsTableRowOptionsProps {
-  node: CellItem;
+  node: CellNode;
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
+  conversationName: string;
 }
 
-export const CellsTableRowOptions = ({node, cellsRepository, conversationQualifiedId}: CellsTableRowOptionsProps) => {
+export const CellsTableRowOptions = ({
+  node,
+  cellsRepository,
+  conversationQualifiedId,
+  conversationName,
+}: CellsTableRowOptionsProps) => {
   return (
     <DropdownMenu>
       <DropdownMenu.Trigger asChild>
@@ -62,14 +69,21 @@ export const CellsTableRowOptions = ({node, cellsRepository, conversationQualifi
         node={node}
         cellsRepository={cellsRepository}
         conversationQualifiedId={conversationQualifiedId}
+        conversationName={conversationName}
       />
     </DropdownMenu>
   );
 };
 
-const CellsTableRowOptionsContent = ({node, cellsRepository, conversationQualifiedId}: CellsTableRowOptionsProps) => {
+const CellsTableRowOptionsContent = ({
+  node,
+  cellsRepository,
+  conversationQualifiedId,
+  conversationName,
+}: CellsTableRowOptionsProps) => {
   const {handleOpenFile} = useCellsFilePreviewModal();
-  const {removeFile} = useCellsStore();
+  const {removeNode} = useCellsStore();
+  const [isMoveNodeModalOpen, setIsMoveNodeModalOpen] = useState(false);
 
   const url = node.url;
   const name = node.type === 'folder' ? `${node.name}.zip` : node.name;
@@ -82,7 +96,7 @@ const CellsTableRowOptionsContent = ({node, cellsRepository, conversationQualifi
   const handleDeleteNode = useCallback(
     async ({uuid, permanently = false}: {uuid: string; permanently?: boolean}) => {
       try {
-        removeFile({conversationId, fileId: uuid});
+        removeNode({conversationId, nodeId: uuid});
         await cellsRepository.deleteNode({uuid, permanently});
       } catch (error) {
         deleteFileFailedNotification.show();
@@ -91,7 +105,7 @@ const CellsTableRowOptionsContent = ({node, cellsRepository, conversationQualifi
     },
     // cellsRepository is not a dependency because it's a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [conversationId, removeFile, deleteFileFailedNotification],
+    [conversationId, removeNode, deleteFileFailedNotification],
   );
 
   const restoreNodeFailedNotification = useAppNotification({
@@ -101,7 +115,7 @@ const CellsTableRowOptionsContent = ({node, cellsRepository, conversationQualifi
   const handleRestoreNode = useCallback(
     async ({uuid}: {uuid: string}) => {
       try {
-        removeFile({conversationId, fileId: uuid});
+        removeNode({conversationId, nodeId: uuid});
         await cellsRepository.restoreNode({uuid});
       } catch (error) {
         restoreNodeFailedNotification.show();
@@ -110,7 +124,7 @@ const CellsTableRowOptionsContent = ({node, cellsRepository, conversationQualifi
     },
     // cellsRepository is not a dependency because it's a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [conversationId, removeFile, restoreNodeFailedNotification],
+    [conversationId, removeNode, restoreNodeFailedNotification],
   );
 
   if (isRootRecycleBinPath()) {
@@ -158,34 +172,47 @@ const CellsTableRowOptionsContent = ({node, cellsRepository, conversationQualifi
   }
 
   return (
-    <DropdownMenu.Content>
-      <DropdownMenu.Item
-        onClick={() => showShareFileModal({uuid: node.id, conversationId: conversationQualifiedId.id, cellsRepository})}
-      >
-        {t('cellsGlobalView.optionShare')}
-      </DropdownMenu.Item>
-      <DropdownMenu.Item
-        onClick={() =>
-          node.type === 'folder' ? openFolder({conversationQualifiedId, name: node.name}) : handleOpenFile(node)
-        }
-      >
-        {t('cellsGlobalView.optionOpen')}
-      </DropdownMenu.Item>
-      {url && (
-        <DropdownMenu.Item onClick={() => forcedDownloadFile({url, name})}>
-          {t('cellsGlobalView.optionDownload')}
+    <>
+      <DropdownMenu.Content>
+        <DropdownMenu.Item onClick={() => setIsMoveNodeModalOpen(true)}>Move</DropdownMenu.Item>
+        <DropdownMenu.Item
+          onClick={() =>
+            showShareFileModal({uuid: node.id, conversationId: conversationQualifiedId.id, cellsRepository})
+          }
+        >
+          {t('cellsGlobalView.optionShare')}
         </DropdownMenu.Item>
-      )}
-      <DropdownMenu.Item
-        onClick={() =>
-          showMoveToRecycleBinModal({
-            node,
-            onMoveToRecycleBin: () => handleDeleteNode({uuid: node.id, permanently: false}),
-          })
-        }
-      >
-        {t('cellsGlobalView.optionDelete')}
-      </DropdownMenu.Item>
-    </DropdownMenu.Content>
+        <DropdownMenu.Item
+          onClick={() =>
+            node.type === 'folder' ? openFolder({conversationQualifiedId, name: node.name}) : handleOpenFile(node)
+          }
+        >
+          {t('cellsGlobalView.optionOpen')}
+        </DropdownMenu.Item>
+        {url && (
+          <DropdownMenu.Item onClick={() => forcedDownloadFile({url, name})}>
+            {t('cellsGlobalView.optionDownload')}
+          </DropdownMenu.Item>
+        )}
+        <DropdownMenu.Item
+          onClick={() =>
+            showMoveToRecycleBinModal({
+              node,
+              onMoveToRecycleBin: () => handleDeleteNode({uuid: node.id, permanently: false}),
+            })
+          }
+        >
+          {t('cellsGlobalView.optionDelete')}
+        </DropdownMenu.Item>
+      </DropdownMenu.Content>
+      <CellsMoveNodeModal
+        nodeToMove={node}
+        isOpen={isMoveNodeModalOpen}
+        onClose={() => setIsMoveNodeModalOpen(false)}
+        cellsRepository={cellsRepository}
+        conversationQualifiedId={conversationQualifiedId}
+        conversationName={conversationName}
+      />
+    </>
   );
 };

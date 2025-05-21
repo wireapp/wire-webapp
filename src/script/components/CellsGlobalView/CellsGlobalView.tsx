@@ -32,16 +32,16 @@ import {CellsLoader} from './CellsLoader/CellsLoader';
 import {CellsStateInfo} from './CellsStateInfo/CellsStateInfo';
 import {CellsTable} from './CellsTable/CellsTable';
 import {useCellsStore} from './common/useCellsStore/useCellsStore';
-import {useSearchCellsFiles} from './useSearchCellsFiles/useSearchCellsFiles';
+import {useSearchCellsNodes} from './useSearchCellsNodes/useSearchCellsNodes';
 
 interface CellsGlobalViewProps {
   cellsRepository?: CellsRepository;
 }
 
 export const CellsGlobalView = ({cellsRepository = container.resolve(CellsRepository)}: CellsGlobalViewProps) => {
-  const {files, status: filesStatus, pagination} = useCellsStore();
+  const {nodes, status: nodesStatus, pagination} = useCellsStore();
 
-  const {searchValue, handleSearch, handleClearSearch, handleReload, increasePageSize} = useSearchCellsFiles({
+  const {searchValue, handleSearch, handleClearSearch, handleReload, increasePageSize} = useSearchCellsNodes({
     cellsRepository,
   });
 
@@ -49,16 +49,16 @@ export const CellsGlobalView = ({cellsRepository = container.resolve(CellsReposi
     await handleReload();
   }, [handleReload]);
 
-  const isLoading = filesStatus === 'loading';
-  const isFetchingMore = filesStatus === 'fetchingMore';
-  const isError = filesStatus === 'error';
-  const isSuccess = filesStatus === 'success';
-  const hasFiles = !!files.length;
-  const emptySearchResults = searchValue && filesStatus === 'success' && !files.length;
+  const isLoading = nodesStatus === 'loading';
+  const isFetchingMore = nodesStatus === 'fetchingMore';
+  const isError = nodesStatus === 'error';
+  const isSuccess = nodesStatus === 'success';
+  const hasFiles = !!nodes.length;
+  const emptySearchResults = searchValue && nodesStatus === 'success' && !nodes.length;
 
   const showTable = (isSuccess || (pagination && isFetchingMore)) && !emptySearchResults;
   const showNoFiles = !isLoading && !isFetchingMore && !isError && !hasFiles && !emptySearchResults;
-  const showLoader = isFetchingMore && files && files.length > 0;
+  const showLoader = isFetchingMore && nodes && nodes.length > 0;
 
   const showLoadMore =
     !isLoading &&
@@ -75,7 +75,7 @@ export const CellsGlobalView = ({cellsRepository = container.resolve(CellsReposi
         onSearch={handleSearch}
         onClearSearch={handleClearSearch}
         onRefresh={handleRefresh}
-        searchStatus={filesStatus}
+        searchStatus={nodesStatus}
       />
       {emptySearchResults && (
         <CellsStateInfo
@@ -83,7 +83,7 @@ export const CellsGlobalView = ({cellsRepository = container.resolve(CellsReposi
           description={t('cellsGlobalView.emptySearchResultsDescription')}
         />
       )}
-      {showTable && <CellsTable files={files} cellsRepository={cellsRepository} />}
+      {showTable && <CellsTable nodes={nodes} cellsRepository={cellsRepository} />}
       {showNoFiles && (
         <CellsStateInfo
           heading={t('cellsGlobalView.noFilesHeading')}

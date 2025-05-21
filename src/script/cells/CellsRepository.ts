@@ -58,7 +58,7 @@ export class CellsRepository {
     this.isInitialized = true;
   }
 
-  async uploadNode({
+  async uploadNodeDraft({
     uuid,
     file,
     path,
@@ -109,14 +109,20 @@ export class CellsRepository {
     return this.apiClient.api.cells.deleteNode({uuid, permanently});
   }
 
+  async moveNode({currentPath, targetPath}: {currentPath: string; targetPath: string}) {
+    return this.apiClient.api.cells.moveNode({currentPath, targetPath});
+  }
+
   async getAllNodes({
     path,
     limit = DEFAULT_MAX_FILES_LIMIT,
     offset = 0,
+    type,
   }: {
     path: string;
     limit?: number;
     offset?: number;
+    type?: 'file' | 'folder';
   }) {
     return this.apiClient.api.cells.getAllNodes({
       path: path || this.basePath,
@@ -124,6 +130,7 @@ export class CellsRepository {
       offset,
       sortBy: SEARCH_DEFAULT_SORT_FIELD,
       sortDirection: SEARCH_DEFAULT_SORT_DIR,
+      ...(type ? {type: type === 'file' ? 'LEAF' : 'COLLECTION'} : {}),
     });
   }
 
