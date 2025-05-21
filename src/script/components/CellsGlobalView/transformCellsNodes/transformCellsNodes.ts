@@ -22,16 +22,16 @@ import {RestNode} from 'cells-sdk-ts';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {formatBytes, getFileExtension} from 'Util/util';
 
-import {CellItem} from '../common/cellFile/cellFile';
+import {CellNode} from '../common/cellNode/cellNode';
 
-export const transformCellsFiles = (nodes: RestNode[]): CellItem[] => {
+export const transformCellsNodes = (nodes: RestNode[]): CellNode[] => {
   return nodes.map(node => {
     const id = node.Uuid;
     const owner = getOwner(node);
-    const name = getFileName(node.Path);
+    const name = getName(node.Path);
     const sizeMb = getFileSize(node);
     const uploadedAtTimestamp = getUploadedAtTimestamp(node);
-    const publicLink: CellItem['publicLink'] = {
+    const publicLink: CellNode['publicLink'] = {
       alreadyShared: !!node.Shares?.[0].Uuid,
       uuid: node.Shares?.[0].Uuid || '',
       url: undefined,
@@ -74,8 +74,8 @@ export const transformCellsFiles = (nodes: RestNode[]): CellItem[] => {
   });
 };
 
-const getFileName = (filePath: string): string => {
-  const parts = filePath.split('/');
+const getName = (nodePath: string): string => {
+  const parts = nodePath.split('/');
   return parts[parts.length - 1];
 };
 

@@ -24,10 +24,10 @@ import {useDebouncedCallback} from 'use-debounce';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 
 import {useCellsStore, Status} from '../common/useCellsStore/useCellsStore';
-import {transformCellsFiles} from '../transformCellsFiles/transformCellsFiles';
+import {transformCellsNodes} from '../transformCellsNodes/transformCellsNodes';
 import {transformCellsPagination} from '../transformCellsPagination/transformCellsPagination';
 
-interface UseSearchCellsFilesProps {
+interface UseSearchCellsNodesProps {
   cellsRepository: CellsRepository;
 }
 
@@ -35,18 +35,18 @@ const PAGE_INITIAL_SIZE = 30;
 const PAGE_SIZE_INCREMENT = 20;
 const DEBOUNCE_TIME = 300;
 
-export const useSearchCellsFiles = ({cellsRepository}: UseSearchCellsFilesProps) => {
-  const {setFiles, setStatus, setPagination, clearAll} = useCellsStore();
+export const useSearchCellsNodes = ({cellsRepository}: UseSearchCellsNodesProps) => {
+  const {setNodes: setFiles, setStatus, setPagination, clearAll} = useCellsStore();
 
   const [searchValue, setSearchValue] = useState('');
   const [pageSize, setPageSize] = useState<number>(PAGE_INITIAL_SIZE);
 
-  const searchFiles = useCallback(
+  const searchNodes = useCallback(
     async ({query, status, limit = pageSize}: {query: string; status: Status; limit?: number}) => {
       try {
         setStatus(status);
         const result = await cellsRepository.searchNodes({query, limit});
-        setFiles(transformCellsFiles(result.Nodes || []));
+        setFiles(transformCellsNodes(result.Nodes || []));
         if (result.Pagination) {
           setPagination(transformCellsPagination(result.Pagination));
         } else {
@@ -64,35 +64,35 @@ export const useSearchCellsFiles = ({cellsRepository}: UseSearchCellsFilesProps)
     [pageSize, setFiles, setPagination, setStatus],
   );
 
-  const searchFilesDebounced = useDebouncedCallback(searchFiles, DEBOUNCE_TIME);
+  const searchNodesDebounced = useDebouncedCallback(searchNodes, DEBOUNCE_TIME);
 
   const handleSearch = (value: string) => {
     setPageSize(PAGE_INITIAL_SIZE);
     setSearchValue(value);
-    void searchFilesDebounced({query: value, status: 'loading'});
+    void searchNodesDebounced({query: value, status: 'loading'});
   };
 
   const handleClearSearch = async () => {
     setPageSize(PAGE_INITIAL_SIZE);
     setSearchValue('');
-    await searchFiles({query: '*', status: 'loading'});
+    await searchNodes({query: '*', status: 'loading'});
   };
 
   const handleReload = async () => {
     setStatus('loading');
     clearAll();
-    await searchFiles({query: searchValue || '*', status: 'loading'});
+    await searchNodes({query: searchValue || '*', status: 'loading'});
   };
 
   const increasePageSize = useCallback(async () => {
     setStatus('fetchingMore');
     setPageSize(pageSize + PAGE_SIZE_INCREMENT);
-    await searchFiles({query: searchValue || '*', status: 'fetchingMore', limit: pageSize + PAGE_SIZE_INCREMENT});
-  }, [pageSize, searchFiles, searchValue, setStatus]);
+    await searchNodes({query: searchValue || '*', status: 'fetchingMore', limit: pageSize + PAGE_SIZE_INCREMENT});
+  }, [pageSize, searchNodes, searchValue, setStatus]);
 
   useEffect(() => {
     setStatus('loading');
-    void searchFiles({query: '*', status: 'loading'});
+    void searchNodes({query: '*', status: 'loading'});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

@@ -81,7 +81,7 @@ export const ConversationCells = ({
     async (uuid: string) => {
       try {
         removeFile({conversationId, fileId: uuid});
-        await cellsRepository.deleteFile({uuid});
+        await cellsRepository.deleteNode({uuid});
       } catch (error) {
         deleteFileFailedNotification.show();
         console.error(error);

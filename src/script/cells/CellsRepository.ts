@@ -58,7 +58,7 @@ export class CellsRepository {
     this.isInitialized = true;
   }
 
-  async uploadFile({
+  async uploadNodeDraft({
     uuid,
     file,
     path,
@@ -101,11 +101,11 @@ export class CellsRepository {
     }
   }
 
-  async deleteFileDraft({uuid, versionId}: {uuid: string; versionId: string}) {
+  async deleteNodeDraft({uuid, versionId}: {uuid: string; versionId: string}) {
     return this.apiClient.api.cells.deleteNodeDraft({uuid, versionId});
   }
 
-  async deleteFile({uuid}: {uuid: string}) {
+  async deleteNode({uuid}: {uuid: string}) {
     return this.apiClient.api.cells.deleteNode({uuid});
   }
 
@@ -134,7 +134,7 @@ export class CellsRepository {
     });
   }
 
-  async getFile({uuid}: {uuid: string}) {
+  async getNode({uuid}: {uuid: string}) {
     return this.apiClient.api.cells.getNode({id: uuid});
   }
 
@@ -177,7 +177,7 @@ export class CellsRepository {
     });
   }
 
-  async promoteFileDraft({uuid, versionId}: {uuid: string; versionId: string}) {
+  async promoteNodeDraft({uuid, versionId}: {uuid: string; versionId: string}) {
     return this.apiClient.api.cells.promoteNodeDraft({uuid, versionId});
   }
 }
