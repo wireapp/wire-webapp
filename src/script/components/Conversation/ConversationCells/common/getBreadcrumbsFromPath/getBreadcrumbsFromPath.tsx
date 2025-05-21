@@ -17,6 +17,8 @@
  *
  */
 
+import {TrashIcon} from '@wireapp/react-ui-kit';
+
 import {t} from 'Util/LocalizerUtil';
 
 import {RECYCLE_BIN_PATH} from '../recycleBin/recycleBin';
@@ -32,6 +34,7 @@ export const getBreadcrumbsFromPath = ({baseCrumb, currentPath}: {baseCrumb: str
     ...segments.map((segment, index) => ({
       name: segment === RECYCLE_BIN_PATH ? t('cellsRecycleBin.breadcrumb') : segment,
       path: segments.slice(0, index + 1).join('/'),
+      icon: segment === RECYCLE_BIN_PATH ? <TrashIcon width={12} height={12} /> : undefined,
     })),
   ];
 };
