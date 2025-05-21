@@ -34,7 +34,7 @@ export interface ImportHistoryToDatabaseParams {
   user: User;
   backupService: BackupService;
   fileBytes: ArrayBuffer;
-  password: string | undefined;
+  password?: string;
   progressCallback: ProgressCallback;
 }
 

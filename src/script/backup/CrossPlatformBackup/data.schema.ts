@@ -19,10 +19,13 @@
 
 import zod from 'zod';
 
-// For now we just check for the data we urgently need for the backup
-export const ConversationTableEntrySchema = zod.object({
+export const QualifiedIdSchema = zod.object({
   domain: zod.string(),
   id: zod.string(),
+});
+
+// For now we just check for the data we urgently need for the backup
+export const ConversationTableEntrySchema = QualifiedIdSchema.extend({
   name: zod.string().nullable().optional(),
   // accessModes: zod.array(zod.string()).optional(),
   // accessRole: zod.array(zod.any()).optional(),
@@ -52,12 +55,7 @@ export const UserTableEntrySchema = zod.object({
   handle: zod.string().optional(),
   id: zod.string(),
   name: zod.string().optional(),
-  qualified_id: zod
-    .object({
-      domain: zod.string(),
-      id: zod.string(),
-    })
-    .optional(),
+  qualified_id: QualifiedIdSchema.optional(),
   // accent_id: zod.number().optional(),
   // assets: zod.array(zod.any()).optional(),
   // legalhold_status: zod.string().optional(),
