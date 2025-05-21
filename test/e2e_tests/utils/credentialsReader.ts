@@ -21,13 +21,7 @@ import {spawnSync} from 'child_process';
 import * as os from 'os';
 
 export function getCredentials(itemName: string, fieldName: string = 'password'): string {
-  const environmentVariable = process.env[itemName];
-  if (!environmentVariable) {
-    // if environment variable is not set search in 1password
-    return readFrom1Password(itemName, fieldName);
-  }
-
-  return environmentVariable;
+  return process.env[itemName] || readFrom1Password(itemName, fieldName);
 }
 
 function readFrom1Password(itemName: string, fieldName: string): string {
