@@ -156,7 +156,10 @@ export const exportCPBHistoryFromDatabase = async ({
       }
 
       const conversationId = new BackupQualifiedId(qualified_conversation.id, qualified_conversation.domain ?? '');
-      const senderUserId = new BackupQualifiedId(qualified_from?.id ?? from ?? '', qualified_from?.domain ?? '');
+      const senderUserId = new BackupQualifiedId(
+        qualified_from?.id ?? from ?? user.id,
+        qualified_from?.domain ?? user.domain,
+      );
       const senderClientId = from_client_id ?? '';
       const creationDate = new BackupDateTime(new Date(time));
       // for debugging purposes
@@ -178,7 +181,7 @@ export const exportCPBHistoryFromDatabase = async ({
         const asset = new BackupMessageContent.Asset(
           assetParseData.content_type,
           Number.parseInt(`${assetParseData.content_length}`),
-          assetParseData.info.name,
+          assetParseData.info?.name ?? '',
           transformObjectToArray(assetParseData.otr_key),
           transformObjectToArray(assetParseData.sha256),
           assetParseData.key,
