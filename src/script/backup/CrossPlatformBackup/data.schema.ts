@@ -102,3 +102,12 @@ export const AssetContentSchema = zod.object({
   // status: zod.string().optional(),
   // legal_hold_status: zod.number(),
 });
+
+export const LocationContentSchema = zod.object({
+  location: zod.object({
+    latitude: zod.number(),
+    longitude: zod.number(),
+    name: zod.string().optional().nullable(),
+    zoom: zod.number().optional().nullable(),
+  }),
+});
