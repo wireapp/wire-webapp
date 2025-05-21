@@ -19,8 +19,8 @@
 
 import {test, expect} from '@playwright/test';
 
-import {createPersonalUserViaBackdoor, deleteUser} from './backend/backend';
-import {ClientUser} from './backend/clientUser';
+import {createPersonalUser, deleteUser} from './backend/backend';
+import {User, getUser} from './backend/user';
 import {DataShareConsentModal} from './pages/dataShareConsentModal.page';
 import {LoginPage} from './pages/login.page';
 import {WelcomePage} from './pages/welcome.page';
@@ -28,10 +28,10 @@ import {getCredentials} from './utils/credentialsReader';
 
 const onePasswordItemName = 'BackendConnection staging-with-webapp-master';
 const webAppPath = getCredentials(onePasswordItemName, 'webappUrl');
-const createdUsers: ClientUser[] = [];
+const createdUsers: User[] = [];
 
 test('Verify sign in error appearance in case of wrong credentials', {tag: ['@TC-3465', '@smoke']}, async ({page}) => {
-  const incorrectEmail = 'blablabla@gmail.com';
+  const incorrectEmail = 'blablabla@wire.engineering';
   const incorrectPassword = 'pass#$12367!';
 
   const welcomePage = new WelcomePage(page);
@@ -50,8 +50,8 @@ test('Verify sign in error appearance in case of wrong credentials', {tag: ['@TC
 
 test('Verify you can sign in by username', {tag: ['@TC-3461', '@regression']}, async ({page}) => {
   // Create user with random password, email, username, lastName, firstName
-  const user = new ClientUser();
-  await createPersonalUserViaBackdoor(user);
+  const user = getUser();
+  await createPersonalUser(user);
 
   // Adding created user to the list for later cleanup
   createdUsers.push(user);

@@ -30,7 +30,7 @@ export class WelcomePage {
     this.loginButton = page.locator('[data-uie-name="go-login"]');
   }
 
-  async clickLogin(): Promise<void> {
+  async clickLogin() {
     await this.loginButton.click();
   }
 }

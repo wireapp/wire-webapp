@@ -19,7 +19,7 @@
 
 import axios from 'axios';
 
-import {ClientUser} from './clientUser';
+import {User} from './user';
 
 import {getCredentials} from '../utils/credentialsReader';
 
@@ -27,7 +27,7 @@ const onePasswordItemName = 'BackendConnection staging-with-webapp-master';
 
 const BASE_URL = getCredentials(onePasswordItemName, 'backendUrl');
 
-export async function createPersonalUserViaBackdoor(user: ClientUser) {
+export async function createPersonalUser(user: User) {
   const axiosInstance = axios.create({
     baseURL: BASE_URL,
     withCredentials: true,
@@ -39,7 +39,7 @@ export async function createPersonalUserViaBackdoor(user: ClientUser) {
   // 1. Register
   const registerPayload = {
     password: user.password,
-    name: user.fullName,
+    name: `${user.firstName} ${user.lastName}`,
     email: user.email,
   };
 
@@ -55,7 +55,7 @@ export async function createPersonalUserViaBackdoor(user: ClientUser) {
     throw new Error('zuid cookie not found in register response');
   }
 
-  // 2. Get activation code
+  // 2. Get activation code via brig
   const stagingBasicAuth = getCredentials(onePasswordItemName, 'basicAuth');
   const basicAuthHeader = `Basic ${stagingBasicAuth}`;
 
@@ -110,7 +110,7 @@ export async function createPersonalUserViaBackdoor(user: ClientUser) {
   });
 }
 
-export async function deleteUser(user: ClientUser) {
+export async function deleteUser(user: User) {
   const axiosInstance = axios.create({
     baseURL: BASE_URL,
     withCredentials: true,

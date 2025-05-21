@@ -2,7 +2,7 @@
 
 # Tests
 
-E2E tests (login.spec.ts and credentialsReader.spec.ts) can be found inside [test folder](/test/e2e_tests/). The folder contains [page objects](/test/e2e_tests/pages), [backend classes](/test/e2e_tests/backend), and [credentialsReader.ts](/test//e2e_tests/utils/credentialsReader.ts) for access 1Password credentials.
+E2E tests can be found inside [test folder](/test/e2e_tests/). The folder contains [page objects](/test/e2e_tests/pages), [backend classes](/test/e2e_tests/backend), and [credentialsReader.ts](/test//e2e_tests/utils/credentialsReader.ts) for access 1Password credentials.
 
 [Playwright config can be found in the root folder of the repo](/playwright.config.ts)
 

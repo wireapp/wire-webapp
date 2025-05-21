@@ -38,7 +38,7 @@ export class DataShareConsentModal {
     this.cancelButton = this.modal.locator("[data-uie-name='do-secondary']");
   }
 
-  async isModalPresent(): Promise<boolean> {
+  async isModalPresent() {
     const modalLocator = this.page.locator(
       "[aria-label='Consent to share user data'], [aria-label='Einwilligung zum Teilen von Nutzungsdaten']",
     );
@@ -48,15 +48,15 @@ export class DataShareConsentModal {
       .catch(() => false);
   }
 
-  async getModalTitle(): Promise<string> {
+  async getModalTitle() {
     return (await this.modalTitle.textContent()) ?? '';
   }
 
-  async getModalText(): Promise<string> {
+  async getModalText() {
     return (await this.modalText.textContent()) ?? '';
   }
 
-  async isActionButtonVisible(): Promise<boolean> {
+  async isActionButtonVisible() {
     try {
       return await this.actionButton.isVisible({timeout: 1000});
     } catch {
@@ -64,11 +64,11 @@ export class DataShareConsentModal {
     }
   }
 
-  async clickDecline(): Promise<void> {
+  async clickDecline() {
     await this.cancelButton.click();
   }
 
-  async clickConfirm(): Promise<void> {
+  async clickConfirm() {
     await this.actionButton.click();
   }
 }

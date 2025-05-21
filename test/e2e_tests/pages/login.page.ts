@@ -40,15 +40,15 @@ export class LoginPage {
     this.loginErrorText = page.locator('[data-uie-name="error-message"]');
   }
 
-  async isEmailFieldVisible(): Promise<boolean> {
+  async isEmailFieldVisible() {
     return await this.emailInput.isVisible();
   }
 
-  async inputEmail(email: string): Promise<void> {
+  async inputEmail(email: string) {
     await this.emailInput.fill(email);
   }
 
-  async inputPassword(password: string): Promise<void> {
+  async inputPassword(password: string) {
     await this.passwordInput.fill(password);
   }
 
