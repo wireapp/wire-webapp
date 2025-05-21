@@ -40,7 +40,7 @@ interface CellsGlobalViewProps {
 }
 
 export const CellsGlobalView = ({cellsRepository = container.resolve(CellsRepository)}: CellsGlobalViewProps) => {
-  const {nodes, status: filesStatus, removeNode, pagination} = useCellsStore();
+  const {nodes, status: nodesStatus, removeNode, pagination} = useCellsStore();
 
   const {searchValue, handleSearch, handleClearSearch, handleReload, increasePageSize} = useSearchCellsNodes({
     cellsRepository,
@@ -69,12 +69,12 @@ export const CellsGlobalView = ({cellsRepository = container.resolve(CellsReposi
     await handleReload();
   }, [handleReload]);
 
-  const isLoading = filesStatus === 'loading';
-  const isFetchingMore = filesStatus === 'fetchingMore';
-  const isError = filesStatus === 'error';
-  const isSuccess = filesStatus === 'success';
+  const isLoading = nodesStatus === 'loading';
+  const isFetchingMore = nodesStatus === 'fetchingMore';
+  const isError = nodesStatus === 'error';
+  const isSuccess = nodesStatus === 'success';
   const hasFiles = !!nodes.length;
-  const emptySearchResults = searchValue && filesStatus === 'success' && !nodes.length;
+  const emptySearchResults = searchValue && nodesStatus === 'success' && !nodes.length;
 
   const showTable = (isSuccess || (pagination && isFetchingMore)) && !emptySearchResults;
   const showNoFiles = !isLoading && !isFetchingMore && !isError && !hasFiles && !emptySearchResults;
@@ -95,7 +95,7 @@ export const CellsGlobalView = ({cellsRepository = container.resolve(CellsReposi
         onSearch={handleSearch}
         onClearSearch={handleClearSearch}
         onRefresh={handleRefresh}
-        searchStatus={filesStatus}
+        searchStatus={nodesStatus}
       />
       {emptySearchResults && (
         <CellsStateInfo
