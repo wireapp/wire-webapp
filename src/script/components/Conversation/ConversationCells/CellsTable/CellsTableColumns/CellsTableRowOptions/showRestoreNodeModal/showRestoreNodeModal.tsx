@@ -17,12 +17,12 @@
  *
  */
 
-import {CellItem} from 'Components/Conversation/ConversationCells/common/cellFile/cellFile';
+import {CellNode} from 'Components/Conversation/ConversationCells/common/cellNode/cellNode';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {t} from 'Util/LocalizerUtil';
 import {replaceReactComponents} from 'Util/LocalizerUtil/ReactLocalizerUtil';
 
-export const showRestoreNodeModal = ({node, onRestoreNode}: {node: CellItem; onRestoreNode: () => void}) => {
+export const showRestoreNodeModal = ({node, onRestoreNode}: {node: CellNode; onRestoreNode: () => void}) => {
   PrimaryModal.show(PrimaryModal.type.CONFIRM, {
     primaryAction: {
       action: onRestoreNode,

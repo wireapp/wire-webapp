@@ -17,7 +17,7 @@
  *
  */
 
-import {CellItem} from 'Components/Conversation/ConversationCells/common/cellFile/cellFile';
+import {CellNode} from 'Components/Conversation/ConversationCells/common/cellNode/cellNode';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {t} from 'Util/LocalizerUtil';
 import {replaceReactComponents} from 'Util/LocalizerUtil/ReactLocalizerUtil';
@@ -26,7 +26,7 @@ export const showMoveToRecycleBinModal = ({
   node,
   onMoveToRecycleBin,
 }: {
-  node: CellItem;
+  node: CellNode;
   onMoveToRecycleBin: (uuid: string) => void;
 }) => {
   PrimaryModal.show(PrimaryModal.type.CONFIRM, {
