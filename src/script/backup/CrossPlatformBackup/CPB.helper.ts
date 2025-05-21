@@ -78,8 +78,10 @@ export const isMessageAddEvent = (eventType: unknown): boolean =>
   eventType === ClientEvent.CONVERSATION.MESSAGE_ADD.toString();
 export const isAssetAddEvent = (eventType: unknown): boolean =>
   eventType === ClientEvent.CONVERSATION.ASSET_ADD.toString();
+export const isLocationAddEvent = (eventType: unknown): boolean =>
+  eventType === ClientEvent.CONVERSATION.LOCATION.toString();
 export const isSupportedEventType = (eventType: string): boolean =>
-  isMessageAddEvent(eventType) || isAssetAddEvent(eventType);
+  isMessageAddEvent(eventType) || isAssetAddEvent(eventType) || isLocationAddEvent(eventType);
 
 interface ExportTableParams<T> {
   backupService: BackupService;

@@ -35,13 +35,14 @@ import {
   AssetContentSchema,
   ConversationTableEntrySchema,
   EventTableEntrySchema,
+  LocationContentSchema,
   UserTableEntrySchema,
 } from './data.schema';
 
 import {CancelError, ExportError} from '../Error';
 import {preprocessConversations, preprocessUsers, preprocessEvents} from '../recordPreprocessors';
 
-import {CPBLogger, exportTable, isAssetAddEvent, isMessageAddEvent, isSupportedEventType} from '.';
+import {CPBLogger, exportTable, isAssetAddEvent, isLocationAddEvent, isMessageAddEvent, isSupportedEventType} from '.';
 
 const PROGRESSION_STEP = 10;
 const PROGRESSION_COMPLETE = 100;
@@ -196,6 +197,27 @@ export const exportCPBHistoryFromDatabase = async ({
         const text = new BackupMessageContent.Text(eventData.data.content);
         backupExporter.addMessage(
           new BackupMessage(id, conversationId, senderUserId, senderClientId, creationDate, text, webPrimaryKey),
+        );
+      }
+
+      if (isLocationAddEvent(type)) {
+        const {
+          success: locationParseSuccess,
+          error: locationParseError,
+          data: locationParseData,
+        } = LocationContentSchema.safeParse(eventData.data);
+        if (!locationParseSuccess) {
+          CPBLogger.error('Location data schema validation failed', locationParseError);
+          return;
+        }
+        const location = new BackupMessageContent.Location(
+          locationParseData.location.latitude,
+          locationParseData.location.longitude,
+          locationParseData.location.name,
+          locationParseData.location.zoom,
+        );
+        backupExporter.addMessage(
+          new BackupMessage(id, conversationId, senderUserId, senderClientId, creationDate, location, webPrimaryKey),
         );
       }
     } else {
