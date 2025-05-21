@@ -19,7 +19,7 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {WIDTH} from '@wireapp/react-ui-kit';
+import {COLOR_V2, WIDTH} from '@wireapp/react-ui-kit';
 
 const breakpoints = [WIDTH.TABLET_MAX, WIDTH.DESKTOP_MAX];
 
@@ -41,6 +41,7 @@ export const styles: {
   optionDescription: CSSObject;
   featureList: CSSObject;
   optionButton: CSSObject;
+  horizontalLine: CSSObject;
 } = {
   container: {
     width: '100%',
@@ -60,6 +61,7 @@ export const styles: {
     left: '24px',
   },
   header: {
+    position: 'relative',
     alignItems: 'center',
     marginBottom: '24px',
     width: '100%',
@@ -82,6 +84,7 @@ export const styles: {
     fill: 'var(--success-color)',
   },
   featureText: {
+    marginBottom: '0px',
     textAlign: 'left',
   },
   option: {
@@ -121,12 +124,18 @@ export const styles: {
     textAlign: 'center',
   },
   featureList: {
-    padding: '8px 24px',
+    padding: '0px 24px',
   },
   optionButton: {
     position: 'absolute',
     bottom: '6px',
     right: '24px',
     left: '24px',
+  },
+  horizontalLine: {
+    width: '100%',
+    height: '0.5px',
+    background: COLOR_V2.GRAY_40,
+    margin: '12px 0px',
   },
 };

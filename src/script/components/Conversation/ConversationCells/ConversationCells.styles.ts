@@ -20,6 +20,6 @@
 import {CSSObject} from '@emotion/react';
 
 export const wrapperStyles: CSSObject = {
-  padding: '20px',
+  padding: '16px 8px',
   overflowY: 'auto',
 };

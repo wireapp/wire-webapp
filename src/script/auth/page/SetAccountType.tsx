@@ -17,9 +17,9 @@
  *
  */
 
-import {Navigate, useLocation, useNavigate} from 'react-router-dom';
+import {Navigate, useNavigate} from 'react-router-dom';
 
-import {ArrowIcon, Button, ButtonVariant, CheckRoundIcon, COLOR, FlexBox} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, CheckRoundIcon, FlexBox} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/LocalizerUtil';
 
@@ -27,15 +27,12 @@ import {Page} from './Page';
 import {styles} from './SetAccountType.styles';
 
 import {Config} from '../../Config';
-import {RouterLink} from '../component/RouterLink';
+import {BackButton} from '../component/BackButton';
 import {ROUTE} from '../route';
-import {getEnterpriseLoginV2FF} from '../util/helpers';
 import {pathWithParams} from '../util/urlUtil';
 
 export const SetAccountType = () => {
-  const isEnterpriseLoginV2Enabled = getEnterpriseLoginV2FF();
   const navigate = useNavigate();
-  const {state} = useLocation();
 
   const onCreatePersonalAccount = () => {
     navigate(ROUTE.CREATE_ACCOUNT);
@@ -68,13 +65,11 @@ export const SetAccountType = () => {
   ];
 
   return (
-    <Page withSideBar={isEnterpriseLoginV2Enabled}>
+    <Page withSideBar>
       <FlexBox css={styles.container}>
         <FlexBox css={styles.header}>
           <FlexBox css={styles.headerIcon}>
-            <RouterLink to={ROUTE.LOGIN} state={state} data-uie-name="go-login" aria-label={t('index.goBack')}>
-              <ArrowIcon direction="left" color={COLOR.TEXT} />
-            </RouterLink>
+            <BackButton />
           </FlexBox>
           <FlexBox css={styles.headerText}>{t('selectAccountTypeHeading')}</FlexBox>
         </FlexBox>
@@ -112,11 +107,15 @@ const AccountTypeOption = ({action, buttonText, description, heading, features, 
         <p css={styles.optionHeading}>{heading}</p>
         <p css={styles.optionDescription}>{description}</p>
         <div css={styles.featureList}>
+          <div css={styles.horizontalLine} />
           {features.map((feature, index) => (
-            <FlexBox key={index} css={styles.optionFeatureContainer}>
-              <CheckRoundIcon css={styles.featureIcon} />
-              <p css={styles.featureText}>{feature}</p>
-            </FlexBox>
+            <>
+              <FlexBox key={index} css={styles.optionFeatureContainer}>
+                <CheckRoundIcon css={styles.featureIcon} />
+                <p css={styles.featureText}>{feature}</p>
+              </FlexBox>
+              <div css={styles.horizontalLine} />
+            </>
           ))}
         </div>
         <Button
