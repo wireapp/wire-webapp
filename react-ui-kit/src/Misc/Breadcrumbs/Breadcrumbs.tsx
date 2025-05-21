@@ -17,6 +17,8 @@
  *
  */
 
+import {ReactNode} from 'react';
+
 import {BreadcrumbItem} from './BreadcrumbItem/BreadcrumbItem';
 import {BreadcrumbLeaf} from './BreadcrumbLeaf/BreadcrumbLeaf';
 import {listStyles} from './Breadcrumbs.styles';
@@ -31,7 +33,7 @@ interface BreadcrumbsProps {
    */
   maxNotCombinedItems?: number;
 
-  items: Array<{name: string}>;
+  items: Array<{name: string; icon?: ReactNode}>;
 
   onItemClick: (item: {name: string}) => void;
 }
@@ -60,6 +62,7 @@ export const Breadcrumbs = ({
             <BreadcrumbItem
               key={crumb.name}
               name={crumb.name}
+              icon={crumb.icon}
               isActive={index === items.length - 1}
               onClick={() => onItemClick(crumb)}
             />
@@ -78,7 +81,12 @@ export const Breadcrumbs = ({
 
   return (
     <ol css={listStyles}>
-      <BreadcrumbItem name={firstCrumb.name} isActive={false} onClick={() => onItemClick(firstCrumb)} />
+      <BreadcrumbItem
+        name={firstCrumb.name}
+        icon={firstCrumb.icon}
+        isActive={false}
+        onClick={() => onItemClick(firstCrumb)}
+      />
       <BreadcrumbLeaf />
       <CombainedBreadcrumbs items={middleCrumbs} onItemClick={onItemClick} />
       <BreadcrumbLeaf />
@@ -88,6 +96,7 @@ export const Breadcrumbs = ({
           <BreadcrumbItem
             key={crumb.name}
             name={crumb.name}
+            icon={crumb.icon}
             isActive={index === lastTwoCrumbs.length - 1}
             onClick={() => onItemClick(crumb)}
           />

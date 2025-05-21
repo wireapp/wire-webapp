@@ -21,6 +21,8 @@ import {Meta, StoryObj} from '@storybook/react/*';
 
 import {Breadcrumbs} from './Breadcrumbs';
 
+import {TrashIcon} from '../../Icon';
+
 const meta: Meta<typeof Breadcrumbs> = {
   component: Breadcrumbs,
   title: 'Misc/Breadcrumbs',
@@ -41,6 +43,30 @@ export const WithCombinedItems: Story = {
   render: () => (
     <Breadcrumbs
       items={[{name: 'Home'}, {name: 'Folder'}, {name: 'Subfolder 1'}, {name: 'Subfolder 2'}, {name: 'Subfolder 3'}]}
+      onItemClick={() => {}}
+    />
+  ),
+};
+
+export const WithIcons: Story = {
+  render: () => (
+    <Breadcrumbs
+      items={[{name: 'Home'}, {name: 'Folder', icon: <TrashIcon />}, {name: 'Subfolder'}]}
+      onItemClick={() => {}}
+    />
+  ),
+};
+
+export const WithIconsAndCombinedItems: Story = {
+  render: () => (
+    <Breadcrumbs
+      items={[
+        {name: 'Home'},
+        {name: 'Folder', icon: <TrashIcon />},
+        {name: 'Subfolder 1'},
+        {name: 'Subfolder 2'},
+        {name: 'Subfolder 3'},
+      ]}
       onItemClick={() => {}}
     />
   ),
