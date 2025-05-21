@@ -31,7 +31,7 @@ export class DataShareConsentModal {
   constructor(page: Page) {
     this.page = page;
 
-    this.modal = page.locator("[data-uie-name='modal-template-confirm']");
+    this.modal = page.locator("[data-uie-name='primary-modals-container'][aria-label='Consent to share user data']");
     this.modalTitle = this.modal.locator("[data-uie-name='status-modal-title']");
     this.modalText = this.modal.locator("[data-uie-name='status-modal-text']");
     this.actionButton = this.modal.locator("[data-uie-name='do-action']");
@@ -39,13 +39,7 @@ export class DataShareConsentModal {
   }
 
   async isModalPresent() {
-    const modalLocator = this.page.locator(
-      "[aria-label='Consent to share user data'], [aria-label='Einwilligung zum Teilen von Nutzungsdaten']",
-    );
-    return await modalLocator
-      .first()
-      .isVisible({timeout: 1000})
-      .catch(() => false);
+    return this.modal.isVisible();
   }
 
   async getModalTitle() {
@@ -57,11 +51,7 @@ export class DataShareConsentModal {
   }
 
   async isActionButtonVisible() {
-    try {
-      return await this.actionButton.isVisible({timeout: 1000});
-    } catch {
-      return false;
-    }
+    return await this.actionButton.isVisible();
   }
 
   async clickDecline() {

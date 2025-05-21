@@ -52,13 +52,11 @@ export class LoginPage {
     await this.passwordInput.fill(password);
   }
 
-  async clickSignInButton(): Promise<void> {
-    await this.signInButton.waitFor({state: 'visible'});
+  async clickSignInButton() {
     await this.signInButton.click();
   }
 
-  async getErrorMessage(): Promise<string> {
-    await this.loginErrorText.waitFor({state: 'visible'});
+  async getErrorMessage() {
     return (await this.loginErrorText.textContent()) ?? '';
   }
 }
