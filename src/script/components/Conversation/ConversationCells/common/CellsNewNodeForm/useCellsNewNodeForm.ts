@@ -21,7 +21,7 @@ import {ChangeEvent, FormEvent, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {CellItem} from 'Components/Conversation/ConversationCells/common/cellFile/cellFile';
+import {CellNode} from 'Components/Conversation/ConversationCells/common/cellNode/cellNode';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
 import {isAxiosError} from 'Util/TypePredicateUtil';
@@ -29,7 +29,7 @@ import {isAxiosError} from 'Util/TypePredicateUtil';
 import {getCellsApiPath} from '../getCellsApiPath/getCellsApiPath';
 
 interface UseCellsNewItemFormProps {
-  type: CellItem['type'];
+  type: CellNode['type'];
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
   onSuccess: () => void;
@@ -49,7 +49,7 @@ export const useCellsNewItemForm = ({
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const createItem = async (name: string) => {
+  const createNode = async (name: string) => {
     const path = getCellsApiPath({conversationQualifiedId, currentPath});
 
     try {
@@ -85,7 +85,7 @@ export const useCellsNewItemForm = ({
     }
 
     try {
-      await createItem(name);
+      await createNode(name);
     } finally {
       setIsSubmitting(false);
     }

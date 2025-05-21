@@ -43,7 +43,7 @@ interface ShareFileModalParams {
   cellsRepository: CellsRepository;
 }
 
-export const showShareFileModal = ({uuid, cellsRepository}: ShareFileModalParams) => {
+export const showShareNodeModal = ({uuid, cellsRepository}: ShareFileModalParams) => {
   PrimaryModal.show(PrimaryModal.type.CONFIRM, {
     primaryAction: {action: () => {}, text: t('cellsGlobalView.shareFileModalPrimaryAction')},
     text: {

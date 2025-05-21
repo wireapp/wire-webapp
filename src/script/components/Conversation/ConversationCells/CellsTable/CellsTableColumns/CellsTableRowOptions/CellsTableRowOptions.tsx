@@ -23,7 +23,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {MoreIcon} from '@wireapp/react-ui-kit';
 
-import {CellItem} from 'Components/Conversation/ConversationCells/common/cellFile/cellFile';
+import {CellNode} from 'Components/Conversation/ConversationCells/common/cellNode/cellNode';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/ContextMenu';
@@ -36,10 +36,10 @@ import {buttonStyles, iconStyles, textStyles} from './CellsTableRowOptions.style
 
 import {openFolder} from '../../../common/openFolder/openFolder';
 import {useCellsFilePreviewModal} from '../../common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
-import {showShareFileModal} from '../CellsFileShareModal/CellsFileShareModal';
+import {showShareFileModal} from '../CellsNodeShareModal/CellsNodeShareModal';
 
 interface CellsTableRowOptionsProps {
-  file: CellItem;
+  node: CellNode;
   onDelete: (uuid: string) => void;
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
@@ -47,7 +47,7 @@ interface CellsTableRowOptionsProps {
 }
 
 export const CellsTableRowOptions = ({
-  file,
+  node,
   onDelete,
   cellsRepository,
   conversationQualifiedId,
@@ -69,7 +69,7 @@ export const CellsTableRowOptions = ({
     [onDelete],
   );
 
-  const getDownloadName = (file: CellItem) => {
+  const getDownloadName = (file: CellNode) => {
     if (file.type === 'folder') {
       return `${file.name}.zip`;
     }
@@ -82,8 +82,8 @@ export const CellsTableRowOptions = ({
     const downloadLabel = t('cellsGlobalView.optionDownload');
     const deleteLabel = t('cellsGlobalView.optionDelete');
 
-    const url = file.url;
-    const name = getDownloadName(file);
+    const url = node.url;
+    const name = getDownloadName(node);
 
     showContextMenu({
       event,
@@ -94,12 +94,12 @@ export const CellsTableRowOptions = ({
         },
         {
           label: shareLabel,
-          click: () => showShareFileModal({uuid: file.id, conversationId: conversationQualifiedId.id, cellsRepository}),
+          click: () => showShareFileModal({uuid: node.id, conversationId: conversationQualifiedId.id, cellsRepository}),
         },
         {
           label: openLabel,
           click: () =>
-            file.type === 'folder' ? openFolder({conversationQualifiedId, name: file.name}) : handleOpenFile(file),
+            node.type === 'folder' ? openFolder({conversationQualifiedId, name: node.name}) : handleOpenFile(node),
         },
         url
           ? {
@@ -111,7 +111,7 @@ export const CellsTableRowOptions = ({
                 }),
             }
           : undefined,
-        {label: deleteLabel, click: () => showDeleteFileModal({uuid: file.id, name: file.name})},
+        {label: deleteLabel, click: () => showDeleteFileModal({uuid: node.id, name: node.name})},
       ].filter(Boolean) as ContextMenuEntry[],
       identifier: 'file-preview-error-more-button',
     });
@@ -139,7 +139,7 @@ export const CellsTableRowOptions = ({
         <span css={textStyles}>{t('cellsGlobalView.optionsLabel')}</span>
       </button>
       <CellsMoveNodeModal
-        nodeToMove={file}
+        nodeToMove={node}
         isOpen={isMoveNodeModalOpen}
         onClose={() => setIsMoveNodeModalOpen(false)}
         cellsRepository={cellsRepository}

@@ -33,7 +33,7 @@ import {
   switchContainerStyles,
   switchWrapperStyles,
   wrapperStyles,
-} from './CellsFileShareModal.styles';
+} from './CellsNodeShareModal.styles';
 import {useCellPublicLink} from './useCellPublicLink';
 
 import {CellsTableLoader} from '../../../common/CellsTableLoader/CellsTableLoader';

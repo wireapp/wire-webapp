@@ -32,18 +32,18 @@ import {
 import {getCellsTableColumns} from './CellsTableColumns/CellsTableColumns';
 import {FilePreviewProvider} from './common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
 
-import {CellItem} from '../common/cellFile/cellFile';
+import {CellNode} from '../common/cellNode/cellNode';
 
 interface CellsTableProps {
-  files: CellItem[];
+  nodes: CellNode[];
   cellsRepository: CellsRepository;
-  onDeleteFile: (uuid: string) => void;
+  onDeleteNode: (uuid: string) => void;
 }
 
-export const CellsTable = ({files, cellsRepository, onDeleteFile}: CellsTableProps) => {
+export const CellsTable = ({nodes, cellsRepository, onDeleteNode}: CellsTableProps) => {
   const table = useReactTable({
-    data: files,
-    columns: getCellsTableColumns({onDeleteFile, cellsRepository}),
+    data: nodes,
+    columns: getCellsTableColumns({onDeleteNode, cellsRepository}),
     getCoreRowModel: getCoreRowModel(),
   });
 
