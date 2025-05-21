@@ -34,6 +34,9 @@ import BackupMessageContent = com.wire.backup.data.BackupMessageContent;
 import BackupDateTime = com.wire.backup.data.BackupDateTime;
 import EncryptionAlgorithm = BackupMessageContent.Asset.EncryptionAlgorithm;
 import AssetMetaData = com.wire.backup.data.BackupMessageContent.Asset.AssetMetadata;
+
+// Importing functions from the Java library
+import isCreatedBySameUser = com.wire.backup.ingest.isCreatedBySameUser;
 /* eslint-enable */
 
 export {
@@ -50,4 +53,5 @@ export {
   BackupDateTime,
   EncryptionAlgorithm,
   AssetMetaData,
+  isCreatedBySameUser,
 };

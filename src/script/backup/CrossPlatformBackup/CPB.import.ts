@@ -17,14 +17,14 @@
  *
  */
 
-import {CPBackupImporter, BackupImportResult} from './CPB.library';
+import {CPBackupImporter, BackupImportResult, BackupQualifiedId} from './CPB.library';
 import {ImportHistoryToDatabaseParams} from './CPB.types';
 import {mapConversationRecord, mapUserRecord} from './importMappers';
 import {mapEventRecord} from './importMappers/mapEventRecord';
 
 import {ConversationRecord, EventRecord, UserRecord} from '../../storage';
 import {FileDescriptor, Filename} from '../Backup.types';
-import {IncompatibleBackupError} from '../Error';
+import {DifferentAccountError, IncompatibleBackupError} from '../Error';
 
 import {CPBLogger, peekCrossPlatformData} from '.';
 
@@ -34,14 +34,21 @@ import {CPBLogger, peekCrossPlatformData} from '.';
 export const importCPBHistoryToDatabase = async ({
   fileBytes,
   password,
+  user,
 }: ImportHistoryToDatabaseParams): Promise<{
   archiveVersion: number;
   fileDescriptors: FileDescriptor[];
 }> => {
   const backupImporter = new CPBackupImporter();
   const backupData = new Uint8Array(fileBytes);
-  const peekedData = await peekCrossPlatformData(fileBytes);
+  const peekedData = await peekCrossPlatformData(fileBytes, new BackupQualifiedId(user.id, user.domain));
   const FileDescriptor: FileDescriptor[] = [];
+
+  // Check if the backup was created by the same user
+  if (!peekedData.isUserBackup) {
+    CPBLogger.log('Backup is not created by the same user');
+    throw new DifferentAccountError('Backup is not created by the same user');
+  }
 
   // Import the backup
 
