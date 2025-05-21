@@ -22,6 +22,7 @@ import {FC} from 'react';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {BackupFileUpload} from 'Components/HistoryImport/BackupFileUpload';
+import {Config} from 'src/script/Config';
 import {ContentState} from 'src/script/page/useAppState';
 import {t} from 'Util/LocalizerUtil';
 
@@ -32,6 +33,10 @@ interface HistoryBackupSectionProps {
   importFile: (file: File) => void;
   switchContent: (contentState: ContentState) => void;
 }
+
+const {
+  FEATURE: {ENABLE_CROSS_PLATFORM_BACKUP_EXPORT},
+} = Config.getConfig();
 
 const HistoryBackupSection: FC<HistoryBackupSectionProps> = ({brandName, importFile, switchContent}) => {
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -66,7 +71,9 @@ const HistoryBackupSection: FC<HistoryBackupSectionProps> = ({brandName, importF
         cssClassName="preferences-history-restore-button"
       />
       <p id="preferences-history-describe-2" className="preferences-detail">
-        {t('preferencesOptionsBackupImportSecondary')}
+        {ENABLE_CROSS_PLATFORM_BACKUP_EXPORT
+          ? t('preferencesOptionsBackupImportCrossPlatformSecondary')
+          : t('preferencesOptionsBackupImportSecondary')}
       </p>
     </PreferencesSection>
   );
