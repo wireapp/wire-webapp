@@ -141,32 +141,25 @@ export const exportCPBHistoryFromDatabase = async ({
   eventRecords.forEach((record, index) => {
     const {success, data: eventData, error} = EventTableEntrySchema.safeParse(record);
     if (success) {
-      const {type} = eventData;
+      const {from, from_client_id, id, qualified_conversation, qualified_from, primary_key, time, type} = eventData;
+      if (!id) {
+        // eslint-disable-next-line no-console
+        CPBLogger.log('Event without id', eventData);
+        return;
+      }
       // ToDo: Add support for other types of messages and different types of content. Also figure out which fields are required.
       if (!isSupportedEventType(type)) {
         // eslint-disable-next-line no-console
         CPBLogger.log('Unsupported message type', type);
         return;
       }
-      if (!eventData.id) {
-        // eslint-disable-next-line no-console
-        CPBLogger.log('Event without id', eventData);
-        return;
-      }
 
-      const id = eventData.id;
-      const conversationId = new BackupQualifiedId(
-        eventData.qualified_conversation.id,
-        eventData.qualified_conversation.domain ?? '',
-      );
-      const senderUserId = new BackupQualifiedId(
-        eventData.qualified_from?.id ?? eventData.from ?? '',
-        eventData.qualified_from?.domain ?? '',
-      );
-      const senderClientId = eventData.from_client_id ?? '';
-      const creationDate = new BackupDateTime(new Date(eventData.time));
+      const conversationId = new BackupQualifiedId(qualified_conversation.id, qualified_conversation.domain ?? '');
+      const senderUserId = new BackupQualifiedId(qualified_from?.id ?? from ?? '', qualified_from?.domain ?? '');
+      const senderClientId = from_client_id ?? '';
+      const creationDate = new BackupDateTime(new Date(time));
       // for debugging purposes
-      const webPrimaryKey = eventData.primary_key;
+      const webPrimaryKey = primary_key;
 
       if (isAssetAddEvent(type)) {
         const {
