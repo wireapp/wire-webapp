@@ -23,18 +23,18 @@ import {CellPagination} from 'Components/Conversation/ConversationCells/common/c
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {formatBytes, getFileExtension} from 'Util/util';
 
-import {CellItem} from '../common/cellFile/cellFile';
+import {CellNode} from '../common/cellNode/cellNode';
 
-export const transformNodesToCellsFiles = (nodes: RestNode[]): Array<CellItem> => {
+export const transformDataToCellsNodes = (nodes: RestNode[]): Array<CellNode> => {
   return (
     nodes
       .map(node => {
         const id = node.Uuid;
         const owner = getOwner(node);
-        const name = getFileName(node.Path);
-        const sizeMb = getFileSize(node);
+        const name = getName(node.Path);
+        const sizeMb = getSize(node);
         const uploadedAtTimestamp = getUploadedAtTimestamp(node);
-        const publicLink: CellItem['publicLink'] = {
+        const publicLink: CellNode['publicLink'] = {
           alreadyShared: !!node.Shares?.[0].Uuid,
           uuid: node.Shares?.[0].Uuid || '',
           url: undefined,
@@ -90,7 +90,7 @@ export const transformToCellPagination = (pagination: RestPagination): CellPagin
   };
 };
 
-const getFileName = (filePath: string): string => {
+const getName = (filePath: string): string => {
   const parts = filePath.split('/');
   return parts[parts.length - 1];
 };
@@ -107,7 +107,7 @@ const getUploadedAtTimestamp = (node: RestNode): number => {
   return (node.Modified as unknown as number) * TIME_IN_MILLIS.SECOND;
 };
 
-const getFileSize = (node: RestNode): string => {
+const getSize = (node: RestNode): string => {
   return node.Size ? formatBytes(node.Size as unknown as number) : '0 MB';
 };
 

@@ -56,4 +56,4 @@ export interface CellFolder {
   };
 }
 
-export type CellItem = CellFile | CellFolder;
+export type CellNode = CellFile | CellFolder;

@@ -19,7 +19,7 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {CellsNewItemForm} from 'Components/Conversation/ConversationCells/common/CellsNewItemForm/CellsNewItemForm';
+import {CellsNewNodeForm} from 'Components/Conversation/ConversationCells/common/CellsNewNodeForm/CellsNewNodeForm';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 
 interface CellsNewFolderModalContentProps {
@@ -38,7 +38,7 @@ export const CellsNewFolderModalContent = ({
   onRefresh,
 }: CellsNewFolderModalContentProps) => {
   return (
-    <CellsNewItemForm
+    <CellsNewNodeForm
       type="folder"
       cellsRepository={cellsRepository}
       conversationQualifiedId={conversationQualifiedId}

@@ -26,21 +26,21 @@ import {forcedDownloadFile} from 'Util/util';
 
 import {buttonStyles, iconStyles, textStyles} from './CellsTableRowOptions.styles';
 
-import {CellItem} from '../../../common/cellFile/cellFile';
+import {CellNode} from '../../../common/cellNode/cellNode';
 import {useCellsFilePreviewModal} from '../../common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
-import {showShareFileModal} from '../CellsShareFileModal/CellsShareFileModal';
+import {showShareNodeModal} from '../CellsShareFileModal/CellsShareFileModal';
 
 interface CellsTableRowOptionsProps {
-  file: CellItem;
+  node: CellNode;
 
   cellsRepository: CellsRepository;
 }
 
-export const CellsTableRowOptions = ({file, cellsRepository}: CellsTableRowOptionsProps) => {
+export const CellsTableRowOptions = ({node, cellsRepository}: CellsTableRowOptionsProps) => {
   const {handleOpenFile} = useCellsFilePreviewModal();
 
-  const url = file.url;
-  const name = file.type === 'folder' ? `${file.name}.zip` : file.name;
+  const url = node.url;
+  const name = node.type === 'folder' ? `${node.name}.zip` : node.name;
 
   return (
     <DropdownMenu>
@@ -51,11 +51,11 @@ export const CellsTableRowOptions = ({file, cellsRepository}: CellsTableRowOptio
         </button>
       </DropdownMenu.Trigger>
       <DropdownMenu.Content>
-        <DropdownMenu.Item onClick={() => showShareFileModal({uuid: file.id, cellsRepository})}>
+        <DropdownMenu.Item onClick={() => showShareNodeModal({uuid: node.id, cellsRepository})}>
           {t('cellsGlobalView.optionShare')}
         </DropdownMenu.Item>
         <DropdownMenu.Item
-          onClick={() => (file.type === 'folder' ? openFolder({path: file.path}) : handleOpenFile(file))}
+          onClick={() => (node.type === 'folder' ? openFolder({path: node.path}) : handleOpenFile(node))}
         >
           {t('cellsGlobalView.optionOpen')}
         </DropdownMenu.Item>

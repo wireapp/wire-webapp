@@ -19,7 +19,7 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {CellItem} from 'Components/Conversation/ConversationCells/common/cellFile/cellFile';
+import {CellNode} from 'Components/Conversation/ConversationCells/common/cellNode/cellNode';
 import {CellsBreadcrumbs} from 'Components/Conversation/ConversationCells/common/CellsBreadcrumbs/CellsBreadcrumbs';
 import {getBreadcrumbsFromPath} from 'Components/Conversation/ConversationCells/common/getBreadcrumbsFromPath/getBreadcrumbsFromPath';
 import {getCellsApiPath} from 'Components/Conversation/ConversationCells/common/getCellsApiPath/getCellsApiPath';
@@ -35,7 +35,7 @@ import {CellsMoveActions} from './CellsMoveActions/CellsMoveActions';
 import {useMoveCellsNode} from './useMoveCellNode/useMoveCellsNode';
 
 interface CellsFoldersListModalContentProps {
-  nodeToMove: CellItem;
+  nodeToMove: CellNode;
   items: Array<{id: string; name: string; path: string}>;
   status: 'idle' | 'loading' | 'success' | 'error';
   shouldShowLoadingSpinner: boolean;

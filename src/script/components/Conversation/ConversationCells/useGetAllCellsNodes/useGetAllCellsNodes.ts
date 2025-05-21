@@ -23,23 +23,23 @@ import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 
-import {transformNodesToCellsFiles, transformToCellPagination} from './transformNodesToCellsFiles';
+import {transformDataToCellsNodes, transformToCellPagination} from './transformDataToCellsNodes';
 
 import {getCellsApiPath} from '../common/getCellsApiPath/getCellsApiPath';
 import {useCellsStore} from '../common/useCellsStore/useCellsStore';
 
-interface UseGetAllCellsFilesProps {
+interface UseGetAllCellsNodesProps {
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
 }
 
-export const useGetAllCellsFiles = ({cellsRepository, conversationQualifiedId}: UseGetAllCellsFilesProps) => {
-  const {setFiles, pageSize, setStatus, setPagination, setError, clearAll} = useCellsStore();
+export const useGetAllCellsNodes = ({cellsRepository, conversationQualifiedId}: UseGetAllCellsNodesProps) => {
+  const {setNodes, pageSize, setStatus, setPagination, setError, clearAll} = useCellsStore();
   const [offset, setOffset] = useState(0);
 
   const {id} = conversationQualifiedId;
 
-  const fetchFiles = useCallback(async () => {
+  const fetchNodes = useCallback(async () => {
     try {
       setStatus('loading');
 
@@ -55,8 +55,8 @@ export const useGetAllCellsFiles = ({cellsRepository, conversationQualifiedId}: 
         return;
       }
 
-      const transformedFiles = transformNodesToCellsFiles(result.Nodes);
-      setFiles({conversationId: id, files: transformedFiles});
+      const transformedNodes = transformDataToCellsNodes(result.Nodes);
+      setNodes({conversationId: id, nodes: transformedNodes});
 
       const pagination = result.Pagination ? transformToCellPagination(result.Pagination) : null;
       setPagination({conversationId: id, pagination});
@@ -70,17 +70,17 @@ export const useGetAllCellsFiles = ({cellsRepository, conversationQualifiedId}: 
     }
     // cellsRepository is not a dependency because it's a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setFiles, setStatus, setError, id, offset, pageSize, setPagination]);
+  }, [setNodes, setStatus, setError, id, offset, pageSize, setPagination]);
 
   const handleHashChange = useCallback(() => {
     clearAll({conversationId: id});
     setOffset(0);
-    void fetchFiles();
-  }, [fetchFiles, setOffset, clearAll, id]);
+    void fetchNodes();
+  }, [fetchNodes, setOffset, clearAll, id]);
 
   useEffect(() => {
-    void fetchFiles();
-  }, [fetchFiles]);
+    void fetchNodes();
+  }, [fetchNodes]);
 
   useEffect(() => {
     window.addEventListener('hashchange', handleHashChange);
@@ -88,7 +88,7 @@ export const useGetAllCellsFiles = ({cellsRepository, conversationQualifiedId}: 
   }, [handleHashChange]);
 
   return {
-    refresh: fetchFiles,
+    refresh: fetchNodes,
     setOffset,
   };
 };
