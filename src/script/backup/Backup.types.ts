@@ -31,19 +31,22 @@ export interface Metadata {
 
 export type ProgressCallback = (done: number) => void;
 
-export type FileDescriptor =
-  | {
-      entities: UserRecord[];
-      filename: Filename.USERS;
-    }
-  | {
-      entities: EventRecord[];
-      filename: Filename.EVENTS;
-    }
-  | {
-      entities: ConversationRecord[];
-      filename: Filename.CONVERSATIONS;
-    };
+export type UserDescriptor = {
+  entities: UserRecord[];
+  filename: Filename.USERS;
+};
+
+export type EventDescriptor = {
+  entities: EventRecord[];
+  filename: Filename.EVENTS;
+};
+
+export type ConversationDescriptor = {
+  entities: ConversationRecord[];
+  filename: Filename.CONVERSATIONS;
+};
+
+export type FileDescriptor = UserDescriptor | EventDescriptor | ConversationDescriptor;
 
 export enum Filename {
   CONVERSATIONS = 'conversations.json',
