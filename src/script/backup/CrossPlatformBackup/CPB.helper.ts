@@ -22,7 +22,7 @@ import Dexie from 'dexie';
 import {ClientEvent} from 'src/script/event/Client';
 import {getLogger} from 'Util/Logger';
 
-import {CPBackupImporter, BackupPeekResult} from './CPB.library';
+import {CPBackupImporter, BackupPeekResult, isCreatedBySameUser, BackupQualifiedId} from './CPB.library';
 
 import {BackupService} from '../BackupService';
 import {IncompatibleBackupError} from '../Error';
@@ -48,9 +48,11 @@ export const isCPBackup = async (data: ArrayBuffer | Blob): Promise<boolean> => 
 
 export const peekCrossPlatformData = async (
   fileBytes: ArrayBuffer,
+  userId?: BackupQualifiedId,
 ): Promise<{
   archiveVersion: string;
   isEncrypted: boolean;
+  isUserBackup: boolean;
 }> => {
   const backupImporter = new CPBackupImporter();
   const backupData = new Uint8Array(fileBytes);
@@ -60,10 +62,13 @@ export const peekCrossPlatformData = async (
     throw new IncompatibleBackupError('Incompatible cross-platform backup');
   }
   if (result instanceof BackupPeekResult.Success) {
+    const isUserBackup = userId ? await isCreatedBySameUser(result, userId) : false;
+
     CPBLogger.log(`Backup version: ${result.version}`);
     return {
       archiveVersion: result.version,
       isEncrypted: result.isEncrypted,
+      isUserBackup: isUserBackup,
     };
   }
   throw new IncompatibleBackupError('Incompatible cross-platform backup');
