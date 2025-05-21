@@ -17,12 +17,14 @@
  *
  */
 
-import {buttonStyles} from './CombainedBreadcrumbs.styles';
+import {ReactNode} from 'react';
+
+import {buttonStyles, itemStyles} from './CombainedBreadcrumbs.styles';
 
 import {DropdownMenu} from '../../../Modal/DropdownMenu';
 
 interface CombainedBreadcrumbsProps {
-  items: Array<{name: string}>;
+  items: Array<{name: string; icon?: ReactNode}>;
   onItemClick: (item: {name: string}) => void;
 }
 
@@ -39,7 +41,10 @@ export const CombainedBreadcrumbs = ({items, onItemClick}: CombainedBreadcrumbsP
       <DropdownMenu.Content>
         {items.map(crumb => (
           <DropdownMenu.Item key={crumb.name} onClick={() => onItemClick(crumb)}>
-            {crumb.name}
+            <div css={itemStyles}>
+              {crumb.icon}
+              {crumb.name}
+            </div>
           </DropdownMenu.Item>
         ))}
       </DropdownMenu.Content>

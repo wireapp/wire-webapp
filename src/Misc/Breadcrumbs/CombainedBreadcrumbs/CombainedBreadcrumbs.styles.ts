@@ -33,3 +33,9 @@ export const buttonStyles: CSSObject = {
     color: 'var(--main-color)',
   },
 };
+
+export const itemStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
+};

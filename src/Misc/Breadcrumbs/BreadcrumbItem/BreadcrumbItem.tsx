@@ -17,23 +17,28 @@
  *
  */
 
-import {MouseEvent as ReactMouseEvent} from 'react';
+import {MouseEvent as ReactMouseEvent, ReactNode} from 'react';
 
 import {activeItemStyles, buttonStyles, listItemStyles} from './BreadcrumbItem.styles';
 
 interface BreadcrumbItemProps {
   name: string;
+  icon?: ReactNode;
   isActive: boolean;
   onClick: (event: ReactMouseEvent<HTMLButtonElement, MouseEvent>) => void;
 }
 
-export const BreadcrumbItem = ({name, isActive, onClick}: BreadcrumbItemProps) => {
+export const BreadcrumbItem = ({name, icon, isActive, onClick}: BreadcrumbItemProps) => {
   return (
     <li css={listItemStyles}>
       {isActive ? (
-        <span css={activeItemStyles}>{name}</span>
+        <span css={activeItemStyles}>
+          {icon}
+          {name}
+        </span>
       ) : (
         <button type="button" css={buttonStyles} onClick={onClick}>
+          {icon}
           {name}
         </button>
       )}

@@ -34,6 +34,9 @@ export const buttonStyles: CSSObject = {
   cursor: 'pointer',
   fontSize: '14px',
   color: COLOR_V2.GRAY_70,
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
 
   '&:hover': {
     color: 'var(--main-color)',
@@ -41,7 +44,9 @@ export const buttonStyles: CSSObject = {
 };
 
 export const activeItemStyles: CSSObject = {
-  display: 'inline-block',
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: '8px',
   padding: '0 8px',
   fontSize: '14px',
   color: 'var(--main-color)',
