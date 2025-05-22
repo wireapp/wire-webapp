@@ -67,6 +67,10 @@ export const useSearchCellsNodes = ({cellsRepository}: UseSearchCellsNodesProps)
   const searchNodesDebounced = useDebouncedCallback(searchNodes, DEBOUNCE_TIME);
 
   const handleSearch = (value: string) => {
+    if (!value) {
+      void handleClearSearch();
+      return;
+    }
     setPageSize(PAGE_INITIAL_SIZE);
     setSearchValue(value);
     void searchNodesDebounced({query: value, status: 'loading'});
@@ -93,8 +97,7 @@ export const useSearchCellsNodes = ({cellsRepository}: UseSearchCellsNodesProps)
   useEffect(() => {
     setStatus('loading');
     void searchNodes({query: '*', status: 'loading'});
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [searchNodes, setStatus]);
 
   return {
     searchValue,
