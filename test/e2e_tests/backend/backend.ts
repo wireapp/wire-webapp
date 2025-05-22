@@ -21,15 +21,12 @@ import axios from 'axios';
 
 import {User} from './user';
 
-import {getCredentials} from '../utils/credentialsReader';
-
-const onePasswordItemName = 'BackendConnection staging-with-webapp-master';
-
-const BASE_URL = getCredentials(onePasswordItemName, 'backendUrl');
+const BACKEND_URL = process.env.BACKEND_URL;
+const BASIC_AUTH = process.env.BASIC_AUTH;
 
 export async function createPersonalUser(user: User) {
   const axiosInstance = axios.create({
-    baseURL: BASE_URL,
+    baseURL: BACKEND_URL,
     withCredentials: true,
     headers: {
       'Content-Type': 'application/json',
@@ -56,8 +53,7 @@ export async function createPersonalUser(user: User) {
   }
 
   // 2. Get activation code via brig
-  const stagingBasicAuth = getCredentials(onePasswordItemName, 'basicAuth');
-  const basicAuthHeader = `Basic ${stagingBasicAuth}`;
+  const basicAuthHeader = `Basic ${BASIC_AUTH}`;
 
   const activationCodeResponse = await axiosInstance.get(`/i/users/activation-code`, {
     params: {email: user.email},
@@ -112,7 +108,7 @@ export async function createPersonalUser(user: User) {
 
 export async function deleteUser(user: User) {
   const axiosInstance = axios.create({
-    baseURL: BASE_URL,
+    baseURL: BACKEND_URL,
     withCredentials: true,
     headers: {
       'Content-Type': 'application/json',

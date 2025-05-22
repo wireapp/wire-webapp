@@ -24,10 +24,8 @@ import {User, getUser} from './backend/user';
 import {DataShareConsentModal} from './pages/dataShareConsentModal.page';
 import {LoginPage} from './pages/login.page';
 import {WelcomePage} from './pages/welcome.page';
-import {getCredentials} from './utils/credentialsReader';
 
-const onePasswordItemName = 'BackendConnection staging-with-webapp-master';
-const webAppPath = getCredentials(onePasswordItemName, 'webappUrl');
+const webAppPath = process.env.WEBAPP_URL ?? '';
 const createdUsers: User[] = [];
 
 test('Verify sign in error appearance in case of wrong credentials', {tag: ['@TC-3465', '@smoke']}, async ({page}) => {
