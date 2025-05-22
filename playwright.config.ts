@@ -18,9 +18,9 @@
  */
 
 import {defineConfig} from '@playwright/test';
-import dotenv from 'dotenv';
+import {config} from 'dotenv';
 
-dotenv.config({path: './test/e2e_tests/.env'});
+config({path: './test/e2e_tests/.env'});
 
 const browserList = (process.env.BROWSERS || 'chromium')
   .split(',')

@@ -17,13 +17,11 @@
  *
  */
 
-import {test, expect} from '@playwright/test';
-
-import {createPersonalUser, deleteUser} from './backend/backend';
 import {User, getUser} from './backend/user';
 import {DataShareConsentModal} from './pages/dataShareConsentModal.page';
 import {LoginPage} from './pages/login.page';
 import {WelcomePage} from './pages/welcome.page';
+import {test, expect} from './test.fixtures';
 
 const webAppPath = process.env.WEBAPP_URL ?? '';
 const createdUsers: User[] = [];
@@ -46,10 +44,10 @@ test('Verify sign in error appearance in case of wrong credentials', {tag: ['@TC
   expect(errorMessage).toBe('Please verify your details and try again');
 });
 
-test('Verify you can sign in by username', {tag: ['@TC-3461', '@regression']}, async ({page}) => {
+test('Verify you can sign in by username', {tag: ['@TC-3461', '@regression']}, async ({page, api}) => {
   // Create user with random password, email, username, lastName, firstName
   const user = getUser();
-  await createPersonalUser(user);
+  await api.createPersonalUser(user);
 
   // Adding created user to the list for later cleanup
   createdUsers.push(user);
@@ -68,11 +66,11 @@ test('Verify you can sign in by username', {tag: ['@TC-3461', '@regression']}, a
   await dataShareConsentModal.clickDecline();
 });
 
-test.afterAll(async () => {
+test.afterAll(async ({api}) => {
   for (const user of createdUsers) {
     if (!user.token) {
       throw new Error(`User ${user.username} has no token and can't be deleted`);
     }
-    await deleteUser(user.password, user.token);
+    await api.deleteUser(user.password, user.token);
   }
 });
