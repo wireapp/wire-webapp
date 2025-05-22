@@ -78,7 +78,7 @@ export const CellsNewNodeForm = ({
         />
       </div>
       <div css={buttonWrapperStyles}>
-        <Button variant={ButtonVariant.SECONDARY} onClick={onSecondaryButtonClick} css={buttonStyles}>
+        <Button variant={ButtonVariant.SECONDARY} type="button" onClick={onSecondaryButtonClick} css={buttonStyles}>
           {t('cellNewItemMenuModal.secondaryAction')}
         </Button>
         <Button variant={ButtonVariant.PRIMARY} type="submit" css={buttonStyles} disabled={isSubmitting}>
