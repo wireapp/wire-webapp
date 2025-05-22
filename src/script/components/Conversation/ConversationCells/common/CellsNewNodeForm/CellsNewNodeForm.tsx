@@ -17,6 +17,8 @@
  *
  */
 
+import {useEffect, useRef} from 'react';
+
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {Button, ButtonVariant, ErrorMessage, Input, Label} from '@wireapp/react-ui-kit';
@@ -46,6 +48,8 @@ export const CellsNewNodeForm = ({
   onSecondaryButtonClick,
   currentPath,
 }: CellsNewNodeFormProps) => {
+  const inputRef = useRef<HTMLInputElement>(null);
+
   const {name, error, isSubmitting, handleSubmit, handleChange} = useCellsNewItemForm({
     type,
     cellsRepository,
@@ -54,6 +58,10 @@ export const CellsNewNodeForm = ({
     currentPath,
   });
 
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
   return (
     <form onSubmit={handleSubmit}>
       <div css={inputWrapperStyles}>
@@ -61,6 +69,7 @@ export const CellsNewNodeForm = ({
         <Input
           id="cells-new-item-name"
           value={name}
+          ref={inputRef}
           placeholder={
             type === 'folder' ? t('cellNewItemMenuModal.placeholderFolder') : t('cellNewItemMenuModal.placeholderFile')
           }
