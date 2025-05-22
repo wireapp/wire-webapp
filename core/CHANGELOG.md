@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [46.23.12](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.23.11...@wireapp/core@46.23.12) (2025-05-22)
+
+### Bug Fixes
+
+* **core:** MLS - Filter already exisiting client ids when trying trying to add users to MLS conversation (WPB-17095) ([#7053](https://github.com/wireapp/wire-web-packages/issues/7053)) ([6a6daef](https://github.com/wireapp/wire-web-packages/commit/6a6daef8debbe6f60f7aae60623da2bbf764a3cf))
+
 ## [46.23.11](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.23.10...@wireapp/core@46.23.11) (2025-05-19)
 
 **Note:** Version bump only for package @wireapp/core
