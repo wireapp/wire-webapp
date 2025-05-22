@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useRef, useState} from 'react';
 
 import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {FormattedMessage} from 'react-intl';
@@ -25,12 +25,13 @@ import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 
 import {ValidationUtil} from '@wireapp/commons';
-import {Button, Checkbox, CheckboxLabel, Form, Input, Small} from '@wireapp/react-ui-kit';
+import {Button, Checkbox, CheckboxLabel, Form, Input, Text} from '@wireapp/react-ui-kit';
 
 import {handleEnterDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 
+import {styles} from './AccountForm.styles';
 import {Exception} from './Exception';
 
 import {Config} from '../../Config';
@@ -42,25 +43,34 @@ import * as AccentColor from '../util/AccentColor';
 
 const logger = getLogger('AccountForm');
 
-interface Props extends React.HTMLProps<HTMLFormElement> {
+interface Props {
   beforeSubmit?: () => Promise<void>;
   onSubmit: () => void;
-  submitText?: string;
 }
 
-const AccountFormComponent = ({account, ...props}: Props & ConnectedProps & DispatchProps) => {
+const AccountFormComponent = ({
+  account,
+  authError,
+  doSendActivationCode,
+  isFetching,
+  onSubmit,
+  pushAccountRegistrationData,
+  beforeSubmit,
+}: Props & ConnectedProps & DispatchProps) => {
   const [registrationData, setRegistrationData] = useState({
     accent_id: AccentColor.STRONG_BLUE.id,
-    email: '',
-    name: '',
-    password: '',
-    termsAccepted: false,
+    email: account.email || '',
+    name: account.name,
+    password: account.password,
+    termsAccepted: account.termsAccepted,
+    confirmPassword: account.password,
   });
 
   const [validInputs, setValidInputs] = useState<Record<string, boolean>>({
     email: true,
     name: true,
     password: true,
+    confirmPassword: true,
     terms: true,
   });
 
@@ -70,28 +80,18 @@ const AccountFormComponent = ({account, ...props}: Props & ConnectedProps & Disp
     email: useRef<HTMLInputElement | null>(null),
     name: useRef<HTMLInputElement | null>(null),
     password: useRef<HTMLInputElement | null>(null),
+    confirmPassword: useRef<HTMLInputElement | null>(null),
     terms: useRef<HTMLInputElement | null>(null),
   };
-
-  useEffect(() => {
-    setRegistrationData(prevState => ({
-      ...prevState,
-      email: account?.email || '',
-      name: account?.name || '',
-      password: account?.password || '',
-      termsAccepted: !!account?.termsAccepted,
-    }));
-  }, [account]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const errors: Error[] | ValidationError[] = [];
     const newValidInputs: Record<string, boolean> = {};
-
     Object.entries(inputs).forEach(([inputKey, currentInput]) => {
       const currentInputNode = currentInput.current;
       if (currentInputNode) {
-        if (!['password', 'terms'].includes(inputKey)) {
+        if (!['password', 'terms', 'confirmPassword'].includes(inputKey)) {
           currentInputNode.value = currentInputNode.value.trim();
         }
 
@@ -116,11 +116,11 @@ const AccountFormComponent = ({account, ...props}: Props & ConnectedProps & Disp
         throw errors[0];
       }
 
-      await (props.beforeSubmit && props.beforeSubmit());
-      await props.pushAccountRegistrationData({...registrationData});
-      await props.doSendActivationCode(registrationData.email);
+      await (beforeSubmit && beforeSubmit());
+      await pushAccountRegistrationData({...registrationData});
+      await doSendActivationCode(registrationData.email);
 
-      return props.onSubmit();
+      return onSubmit();
     } catch (error) {
       const label = (error as BackendError)?.label;
       if (label) {
@@ -152,10 +152,21 @@ const AccountFormComponent = ({account, ...props}: Props & ConnectedProps & Disp
       }
     }
   };
+
+  const isSubmitDisabled =
+    !(
+      registrationData.email &&
+      registrationData.name &&
+      registrationData.password &&
+      registrationData.termsAccepted &&
+      registrationData.confirmPassword
+    ) || isFetching;
+
   return (
-    <Form onSubmit={handleSubmit} style={{display: 'flex', flexDirection: 'column'}}>
-      <div>
+    <Form onSubmit={handleSubmit} css={styles.form}>
+      <div css={styles.formBody}>
         <Input
+          label={t('accountForm.nameLabel')}
           name="name"
           id="name"
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -177,6 +188,7 @@ const AccountFormComponent = ({account, ...props}: Props & ConnectedProps & Disp
         />
 
         <Input
+          label={t('accountForm.emailLabel')}
           name="email"
           id="email"
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -188,9 +200,7 @@ const AccountFormComponent = ({account, ...props}: Props & ConnectedProps & Disp
           markInvalid={!validInputs.email}
           value={registrationData.email}
           autoComplete="section-create-team email"
-          placeholder={t(
-            props.isPersonalFlow ? 'accountForm.emailPersonalPlaceholder' : 'accountForm.emailTeamPlaceholder',
-          )}
+          placeholder={t('accountForm.emailPersonalPlaceholder')}
           onKeyDown={event => handleEnterDown(event, () => inputs.password.current?.focus())}
           maxLength={128}
           type="email"
@@ -199,6 +209,7 @@ const AccountFormComponent = ({account, ...props}: Props & ConnectedProps & Disp
         />
 
         <Input
+          label={t('accountForm.passwordLabel')}
           name="password"
           id="password"
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -216,19 +227,30 @@ const AccountFormComponent = ({account, ...props}: Props & ConnectedProps & Disp
           required
           data-uie-name="enter-password"
         />
-
-        <Small
-          style={{
-            display: validationErrors.length ? 'none' : 'block',
-            marginBottom: '32px',
-            padding: '0 16px',
-          }}
-          data-uie-name="element-password-help"
-        >
+        <Text muted css={styles.passwordInfo(!!validationErrors.length)} data-uie-name="element-password-help">
           {t('accountForm.passwordHelp', {minPasswordLength: String(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH)})}
-        </Small>
+        </Text>
 
-        <Exception errors={[props.authError, ...validationErrors]} />
+        <Input
+          label={t('accountForm.passwordLabel')}
+          name="confirmPassword"
+          id="confirmPassword"
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            inputs.confirmPassword.current?.setCustomValidity('');
+            setRegistrationData(prevState => ({...prevState, confirmPassword: event.target.value}));
+            setValidInputs(prevState => ({...prevState, confirmPassword: true}));
+          }}
+          ref={inputs.confirmPassword}
+          markInvalid={!validInputs.confirmPassword}
+          value={registrationData.confirmPassword}
+          type="password"
+          placeholder={t('accountForm.confirmPasswordPlaceholder')}
+          pattern={`^${registrationData.password?.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`}
+          required
+          data-uie-name="enter-confirm-password"
+        />
+
+        <Exception errors={[authError, ...validationErrors]} />
       </div>
 
       <Checkbox
@@ -245,78 +267,46 @@ const AccountFormComponent = ({account, ...props}: Props & ConnectedProps & Disp
         required
         checked={registrationData.termsAccepted}
         data-uie-name="do-terms"
-        style={{justifyContent: 'center'}}
       >
-        <CheckboxLabel htmlFor="accept">
-          {Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION_ACCEPT_TERMS_AND_PRIVACY_POLICY ? (
-            <FormattedMessage
-              id="accountForm.termsAndPrivacyPolicy"
-              values={{
-                privacypolicy: (...chunks: string[] | React.ReactNode[]) => (
-                  <a
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    data-uie-name="go-privacy-policy"
-                    href={Config.getConfig().URL.PRIVACY_POLICY}
-                  >
-                    {chunks}
-                  </a>
-                ),
-                terms: (...chunks: string[] | React.ReactNode[]) => (
-                  <a
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    data-uie-name="go-terms"
-                    href={
-                      props.isPersonalFlow
-                        ? Config.getConfig().URL.TERMS_OF_USE_PERSONAL
-                        : Config.getConfig().URL.TERMS_OF_USE_TEAMS
-                    }
-                  >
-                    {chunks}
-                  </a>
-                ),
-              }}
-            />
-          ) : (
-            <FormattedMessage
-              id="accountForm.terms"
-              values={{
-                terms: (...chunks: string[] | React.ReactNode[]) => (
-                  <a
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    data-uie-name="go-terms"
-                    href={
-                      props.isPersonalFlow
-                        ? Config.getConfig().URL.TERMS_OF_USE_PERSONAL
-                        : Config.getConfig().URL.TERMS_OF_USE_TEAMS
-                    }
-                  >
-                    {chunks}
-                  </a>
-                ),
-              }}
-            />
-          )}
+        <CheckboxLabel htmlFor="accept" css={styles.checkboxLabel}>
+          <FormattedMessage
+            id="accountForm.termsAndPrivacyPolicy"
+            values={{
+              terms: (...chunks: string[] | React.ReactNode[]) => (
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-uie-name="go-terms"
+                  href={Config.getConfig().URL.TERMS_OF_USE_PERSONAL}
+                  css={styles.checkboxLink}
+                >
+                  {chunks}
+                </a>
+              ),
+              privacypolicy: (...chunks: string[] | React.ReactNode[]) => (
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-uie-name="go-privacy-policy"
+                  href={Config.getConfig().URL.PRIVACY_POLICY}
+                  css={styles.checkboxLink}
+                >
+                  {chunks}
+                </a>
+              ),
+            }}
+          />
         </CheckboxLabel>
       </Checkbox>
 
       <Button
-        disabled={
-          !(
-            registrationData.email &&
-            registrationData.name &&
-            registrationData.password &&
-            registrationData.termsAccepted
-          ) || props.isFetching
-        }
+        disabled={isSubmitDisabled}
         formNoValidate
         type="submit"
-        style={{margin: '16px auto'}}
+        css={styles.submitButton}
         data-uie-name="do-next"
       >
-        {props.submitText || t('accountForm.submitButton')}
+        {t('accountForm.continueButtonText')}
       </Button>
     </Form>
   );
@@ -327,7 +317,6 @@ const mapStateToProps = (state: RootState) => ({
   account: AuthSelector.getAccount(state),
   authError: AuthSelector.getError(state),
   isFetching: AuthSelector.isFetching(state),
-  isPersonalFlow: AuthSelector.isPersonalFlow(state),
 });
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;

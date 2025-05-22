@@ -36,6 +36,7 @@ import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationM
 import {LegalHoldModal} from 'Components/Modals/LegalHoldModal/LegalHoldModal';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showUserModal, UserModal} from 'Components/Modals/UserModal';
+import {isUUID} from 'src/script/auth/util/stringUtil';
 import {Config} from 'src/script/Config';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
@@ -44,6 +45,7 @@ import {useE2EIFeatureConfigUpdate} from './components/FeatureConfigChange/Featu
 import {FeatureConfigChangeNotifier} from './components/FeatureConfigChange/FeatureConfigChangeNotifier';
 import {WindowTitleUpdater} from './components/WindowTitleUpdater';
 import {LeftSidebar} from './LeftSidebar';
+import {TeamCreationModalContainer} from './LeftSidebar/panels/Conversations/ConversationTabs/TeamCreation/TeamCreationModalContainer';
 import {SidebarTabs, useSidebarStore} from './LeftSidebar/panels/Conversations/useSidebarStore';
 import {MainContent} from './MainContent';
 import {PanelEntity, PanelState, RightSidebar} from './RightSidebar';
@@ -181,19 +183,53 @@ export const AppMain: FC<AppMainProps> = ({
       window.history.replaceState(historyState, '', window.location.hash);
     }
 
+    const showConversationMessages = (conversationId: string, domain = apiContext.domain ?? '') => {
+      void mainView.content.showConversation({id: conversationId, domain});
+    };
+
+    const showConversationFiles = async (
+      conversationId: string,
+      domain = apiContext.domain ?? '',
+      path: string | string[] = '',
+    ) => {
+      const pathString = Array.isArray(path) ? path.join('/') : path;
+
+      await mainView.content.showConversation(
+        {id: conversationId, domain},
+        {filePath: `files${pathString ? `/${pathString}` : ''}`},
+      );
+    };
+
+    const showUserProfile = (param1: string, param2?: string) => {
+      // If param1 is a UUID, it's the userId, otherwise param2 must be the userId
+      const userId = isUUID(param1) ? param1 : param2;
+      const domain = isUUID(param1) ? param2 || apiContext.domain || '' : param1;
+
+      if (!userId) {
+        navigate('/');
+        return;
+      }
+
+      showMostRecentConversation();
+      showUserModal({domain, id: userId}, () => navigate('/'));
+    };
+
     configureRoutes({
       '/': showMostRecentConversation,
-      '/conversation/:conversationId(/:domain)': (conversationId: string, domain: string = apiContext.domain ?? '') =>
-        mainView.content.showConversation({id: conversationId, domain}),
+      '/conversation/:conversationId/:domain': showConversationMessages,
+      '/conversation/:conversationId': showConversationMessages,
+      '/conversation/:conversationId/:domain/files': showConversationFiles,
+      '/conversation/:conversationId/files': showConversationFiles,
+      '/conversation/:conversationId/:domain/files/*path': showConversationFiles,
+      '/conversation/:conversationId/files/*path': showConversationFiles,
       '/preferences/about': () => mainView.list.openPreferencesAbout(),
       '/preferences/account': () => mainView.list.openPreferencesAccount(),
       '/preferences/av': () => mainView.list.openPreferencesAudioVideo(),
       '/preferences/devices': () => mainView.list.openPreferencesDevices(),
       '/preferences/options': () => mainView.list.openPreferencesOptions(),
-      '/user/:userId(/:domain)': (userId: string, domain: string = apiContext.domain ?? '') => {
-        showMostRecentConversation();
-        showUserModal({domain, id: userId}, () => navigate('/'));
-      },
+      '/user/:userId/:domain': showUserProfile,
+      '/user/:domain/:userId': showUserProfile,
+      '/user/:userId': showUserProfile,
     });
 
     const redirect = localStorage.getItem(App.LOCAL_STORAGE_LOGIN_REDIRECT_KEY);
@@ -326,6 +362,11 @@ export const AppMain: FC<AppMainProps> = ({
           <UserModal selfUser={selfUser} userRepository={repositories.user} />
           <GroupCreationModal userState={userState} teamState={teamState} />
           <CreateConversationModal />
+          <TeamCreationModalContainer
+            selfUser={selfUser}
+            teamRepository={repositories.team}
+            userRepository={repositories.user}
+          />
         </ErrorBoundary>
       </RootProvider>
 

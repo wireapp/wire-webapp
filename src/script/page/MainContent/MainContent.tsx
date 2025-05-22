@@ -171,7 +171,6 @@ const MainContent: FC<MainContentProps> = ({
                   conversationRepository={repositories.conversation}
                   propertiesRepository={repositories.properties}
                   userRepository={repositories.user}
-                  teamRepository={repositories.team}
                   selfUser={selfUser}
                   isActivatedAccount={isActivatedAccount}
                 />

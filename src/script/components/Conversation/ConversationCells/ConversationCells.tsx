@@ -33,53 +33,55 @@ import {CellsStateInfo} from './CellsStateInfo/CellsStateInfo';
 import {CellsTable} from './CellsTable/CellsTable';
 import {useCellsStore} from './common/useCellsStore/useCellsStore';
 import {wrapperStyles} from './ConversationCells.styles';
+import {useCellsLoaderSize} from './useCellsLoaderSize/useCellsLoaderSize';
 import {useCellsPagination} from './useCellsPagination/useCellsPagination';
-import {useCellsTableDimensions} from './useCellsTableDimentions/useCellsTableDimentions';
-import {useGetAllCellsFiles} from './useGetAllCellsFiles/useGetAllCellsFiles';
+import {useGetAllCellsNodes} from './useGetAllCellsNodes/useGetAllCellsNodes';
 
 interface ConversationCellsProps {
   cellsRepository?: CellsRepository;
   conversationQualifiedId: QualifiedId;
+  conversationName: string;
 }
 
 export const ConversationCells = ({
   cellsRepository = container.resolve(CellsRepository),
   conversationQualifiedId,
+  conversationName,
 }: ConversationCellsProps) => {
-  const {getFiles, status: filesStatus, getPagination, clearAll, removeFile} = useCellsStore();
+  const {getNodes, status: nodesStatus, getPagination, clearAll, removeNode} = useCellsStore();
 
   const conversationId = conversationQualifiedId.id;
 
-  const {refresh, setOffset} = useGetAllCellsFiles({cellsRepository, conversationQualifiedId});
+  const {refresh, setOffset} = useGetAllCellsNodes({cellsRepository, conversationQualifiedId});
 
-  const files = getFiles({conversationId});
+  const nodes = getNodes({conversationId});
   const pagination = getPagination({conversationId});
 
-  const {loaderHeight, fixedColumnsWidths, handleHeight, handleWidths, updateDimensions} = useCellsTableDimensions({
-    files,
+  const {loaderHeight, updateHeight} = useCellsLoaderSize({
+    nodes,
   });
 
   const {goToPage, getPaginationProps} = useCellsPagination({
     pagination,
     conversationId,
     setOffset,
-    onPageChange: updateDimensions,
+    currentNodesCount: nodes.length,
   });
 
-  const isLoading = filesStatus === 'loading';
-  const isError = filesStatus === 'error';
-  const isSuccess = filesStatus === 'success';
-  const hasFiles = !!files.length;
+  const isLoading = nodesStatus === 'loading';
+  const isError = nodesStatus === 'error';
+  const isSuccess = nodesStatus === 'success';
+  const hasNodes = !!nodes.length;
 
   const deleteFileFailedNotification = useAppNotification({
     message: t('cellsGlobalView.deleteModalError'),
   });
 
-  const handleDeleteFile = useCallback(
+  const handleDeleteNode = useCallback(
     async (uuid: string) => {
       try {
-        removeFile({conversationId, fileId: uuid});
-        await cellsRepository.deleteFile({uuid});
+        removeNode({conversationId, nodeId: uuid});
+        await cellsRepository.deleteNode({uuid});
       } catch (error) {
         deleteFileFailedNotification.show();
         console.error(error);
@@ -87,7 +89,7 @@ export const ConversationCells = ({
     },
     // cellsRepository is not a dependency because it's a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [conversationId, removeFile, deleteFileFailedNotification],
+    [conversationId, removeNode, deleteFileFailedNotification],
   );
 
   const handleRefresh = useCallback(async () => {
@@ -95,21 +97,27 @@ export const ConversationCells = ({
     await refresh();
   }, [refresh, clearAll, conversationId]);
 
+  const emptyView = !isError && !hasNodes;
+
   return (
     <div css={wrapperStyles}>
-      <CellsHeader onRefresh={handleRefresh} />
-      {(isSuccess || isLoading) && hasFiles && (
+      <CellsHeader
+        onRefresh={handleRefresh}
+        conversationQualifiedId={conversationQualifiedId}
+        conversationName={conversationName}
+        cellsRepository={cellsRepository}
+      />
+      {(isSuccess || isLoading) && (
         <CellsTable
-          files={isLoading ? [] : files}
-          fixedWidths={fixedColumnsWidths}
+          nodes={isLoading ? [] : nodes}
           cellsRepository={cellsRepository}
-          conversationId={conversationId}
-          onDeleteFile={handleDeleteFile}
-          onUpdateBodyHeight={handleHeight}
-          onUpdateColumnWidths={handleWidths}
+          conversationQualifiedId={conversationQualifiedId}
+          conversationName={conversationName}
+          onDeleteNode={handleDeleteNode}
+          onUpdateBodyHeight={updateHeight}
         />
       )}
-      {!isLoading && !isError && !hasFiles && (
+      {!isLoading && emptyView && (
         <CellsStateInfo
           heading={t('cellsGlobalView.noFilesHeading')}
           description={t('cellsGlobalView.noFilesDescription')}
@@ -122,7 +130,7 @@ export const ConversationCells = ({
           description={t('cellsGlobalView.errorDescription')}
         />
       )}
-      {!isError && <CellsPagination {...getPaginationProps()} goToPage={goToPage} />}
+      {!emptyView && <CellsPagination {...getPaginationProps()} goToPage={goToPage} />}
     </div>
   );
 };

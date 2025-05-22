@@ -23,30 +23,63 @@ import {FileAssetSmall} from './FileAssetSmall/FileAsseetSmall';
 import {FileAssetWithPreview} from './FileAssetWithPreview/FileAssetWithPreview';
 
 interface FileAssetCardProps {
+  src?: string;
   variant: 'large' | 'small';
   extension: string;
   name: string;
   size: string;
   isLoading: boolean;
   isError: boolean;
-  previewUrl?: string;
+  imagePreviewUrl?: string;
+  pdfPreviewUrl?: string;
+  senderName: string;
+  timestamp: number;
 }
 
-export const FileAssetCard = ({variant, extension, name, size, isLoading, isError, previewUrl}: FileAssetCardProps) => {
+export const FileAssetCard = ({
+  src,
+  variant,
+  extension,
+  name,
+  size,
+  isLoading,
+  isError,
+  imagePreviewUrl,
+  pdfPreviewUrl,
+  senderName,
+  timestamp,
+}: FileAssetCardProps) => {
   const formattedName = isError ? t('cellsUnavailableFile') : name;
 
   if (variant === 'large') {
     return (
       <FileAssetWithPreview
+        src={src}
         extension={extension}
         name={formattedName}
         size={size}
         isError={isError}
         isLoading={isLoading}
-        previewUrl={previewUrl}
+        imagePreviewUrl={imagePreviewUrl}
+        pdfPreviewUrl={pdfPreviewUrl}
+        senderName={senderName}
+        timestamp={timestamp}
       />
     );
   }
 
-  return <FileAssetSmall extension={extension} name={formattedName} size={size} isError={isError} />;
+  return (
+    <FileAssetSmall
+      src={src}
+      extension={extension}
+      name={formattedName}
+      size={size}
+      isError={isError}
+      senderName={senderName}
+      timestamp={timestamp}
+      pdfPreviewUrl={pdfPreviewUrl}
+      imagePreviewUrl={imagePreviewUrl}
+      isLoading={isLoading}
+    />
+  );
 };

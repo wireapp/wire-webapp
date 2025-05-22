@@ -40,16 +40,27 @@ import {VideoAssetCard} from './VideoAssetCard/VideoAssetCard';
 interface MultipartAssetsProps {
   assets: ICellAsset[];
   cellsRepository?: CellsRepository;
+  senderName: string;
+  timestamp: number;
 }
 
 export const MultipartAssets = ({
   assets,
   cellsRepository = container.resolve(CellsRepository),
+  senderName,
+  timestamp,
 }: MultipartAssetsProps) => {
   return (
     <ul css={assets.length === 1 ? listSingleItemStyles : listStyles}>
       {assets.map(asset => (
-        <MultipartAsset key={asset.uuid} cellsRepository={cellsRepository} assetsCount={assets.length} {...asset} />
+        <MultipartAsset
+          key={asset.uuid}
+          cellsRepository={cellsRepository}
+          assetsCount={assets.length}
+          senderName={senderName}
+          timestamp={timestamp}
+          {...asset}
+        />
       ))}
     </ul>
   );
@@ -58,6 +69,8 @@ export const MultipartAssets = ({
 interface MultipartAssetProps extends ICellAsset {
   cellsRepository: CellsRepository;
   assetsCount: number;
+  senderName: string;
+  timestamp: number;
 }
 
 const MultipartAsset = ({
@@ -68,6 +81,8 @@ const MultipartAsset = ({
   cellsRepository,
   assetsCount,
   image: imageMetadata,
+  senderName,
+  timestamp,
 }: MultipartAssetProps) => {
   const name = trimFileExtension(initialName!);
   const extension = getFileExtension(initialName!);
@@ -81,7 +96,7 @@ const MultipartAsset = ({
   const isSingleAsset = assetsCount === 1;
   const variant = isSingleAsset ? 'large' : 'small';
 
-  const {src, isLoading, isError, previewUrl} = useGetMultipartAsset({
+  const {src, isLoading, isError, imagePreviewUrl, pdfPreviewUrl} = useGetMultipartAsset({
     uuid,
     cellsRepository,
     isEnabled: hasBeenInView,
@@ -91,7 +106,17 @@ const MultipartAsset = ({
   if (isImage) {
     return (
       <li ref={elementRef} css={imageCardStyles}>
-        <ImageAssetCard src={src} variant={variant} metadata={imageMetadata} isLoading={isLoading} isError={isError} />
+        <ImageAssetCard
+          src={src}
+          name={name}
+          extension={extension}
+          variant={variant}
+          metadata={imageMetadata}
+          isLoading={isLoading}
+          isError={isError}
+          senderName={senderName}
+          timestamp={timestamp}
+        />
       </li>
     );
   }
@@ -113,15 +138,19 @@ const MultipartAsset = ({
   }
 
   return (
-    <li ref={elementRef} css={fileCardStyles(isSingleAsset)}>
+    <li ref={elementRef} css={fileCardStyles}>
       <FileAssetCard
+        src={src}
         variant={variant}
         extension={extension}
         name={name}
         size={size}
-        previewUrl={previewUrl}
+        imagePreviewUrl={imagePreviewUrl}
+        pdfPreviewUrl={pdfPreviewUrl}
         isLoading={isLoading}
         isError={isError}
+        senderName={senderName}
+        timestamp={timestamp}
       />
     </li>
   );

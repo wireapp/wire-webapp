@@ -17,30 +17,69 @@
  *
  */
 
-import {useState} from 'react';
+import {useId, useState} from 'react';
 
 import {t} from 'Util/LocalizerUtil';
 
-import {imageStyles} from './ImageAssetSmall.styles';
+import {containerStyles, imageStyles} from './ImageAssetSmall.styles';
 
+import {FileFullscreenModal} from '../../../../../../../FileFullscreenModal/FileFullscreenModal';
 import {MediaFilePreviewCard} from '../../common/MediaFilePreviewCard/MediaFilePreviewCard';
 
 interface ImageAssetSmallProps {
   src?: string;
+  name: string;
+  extension: string;
   isLoading: boolean;
   isError: boolean;
+  senderName: string;
+  timestamp: number;
 }
 
-export const ImageAssetSmall = ({src, isLoading, isError}: ImageAssetSmallProps) => {
+export const ImageAssetSmall = ({
+  src,
+  name,
+  extension,
+  isLoading,
+  isError,
+  senderName,
+  timestamp,
+}: ImageAssetSmallProps) => {
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const id = useId();
 
   return (
-    <MediaFilePreviewCard
-      label={src ? t('conversationFileImagePreviewLabel', {src}) : ''}
-      isLoading={!isLoaded}
-      isError={isError}
-    >
-      {!isLoading && !isError && src && <img src={src} alt="" css={imageStyles} onLoad={() => setIsLoaded(true)} />}
-    </MediaFilePreviewCard>
+    <>
+      <button
+        css={containerStyles}
+        onClick={() => setIsOpen(true)}
+        aria-label={t('accessibility.conversationAssetImageAlt', {
+          username: senderName,
+          messageDate: timestamp,
+        })}
+        aria-haspopup="dialog"
+        aria-expanded={isOpen}
+        aria-controls={id}
+      >
+        <MediaFilePreviewCard
+          label={src ? t('conversationFileImagePreviewLabel', {src}) : ''}
+          isLoading={!isLoaded}
+          isError={isError}
+        >
+          {!isLoading && !isError && src && <img src={src} alt="" css={imageStyles} onLoad={() => setIsLoaded(true)} />}
+        </MediaFilePreviewCard>
+      </button>
+      <FileFullscreenModal
+        id={id}
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        filePreviewUrl={src}
+        fileExtension={extension}
+        fileName={name}
+        senderName={senderName}
+        timestamp={timestamp}
+      />
+    </>
   );
 };

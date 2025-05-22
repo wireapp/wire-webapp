@@ -19,6 +19,17 @@
 
 import {CSSObject} from '@emotion/react';
 
+export const containerStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  border: 'none',
+  padding: 0,
+  margin: 0,
+  borderRadius: '10px',
+  backgroundColor: 'var(--foreground-fade-8)',
+};
+
 export const imageStyles: CSSObject = {
   width: '100%',
   height: '100%',

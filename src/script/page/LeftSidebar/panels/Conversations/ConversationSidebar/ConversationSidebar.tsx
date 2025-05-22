@@ -23,8 +23,6 @@ import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {ConversationState} from 'src/script/conversation/ConversationState';
 import {Conversation} from 'src/script/entity/Conversation';
-import {TeamRepository} from 'src/script/team/TeamRepository';
-import {UserRepository} from 'src/script/user/UserRepository';
 
 import {
   conversationsSidebarHandleStyles,
@@ -56,8 +54,6 @@ type ConversationSidebarProps = {
   conversationRepository: ConversationRepository;
   onClickPreferences: (contentState: ContentState) => void;
   showNotificationsBadge: boolean;
-  teamRepository: TeamRepository;
-  userRepository: UserRepository;
 };
 
 export const ConversationSidebar = ({
@@ -77,8 +73,6 @@ export const ConversationSidebar = ({
   conversationRepository,
   onClickPreferences,
   showNotificationsBadge,
-  teamRepository,
-  userRepository,
   channelConversations,
 }: ConversationSidebarProps) => {
   return (
@@ -103,8 +97,6 @@ export const ConversationSidebar = ({
           onClickPreferences={onClickPreferences}
           showNotificationsBadge={showNotificationsBadge}
           selfUser={selfUser}
-          userRepository={userRepository}
-          teamRepository={teamRepository}
           channelConversations={channelConversations}
         />
       </FadingScrollbar>

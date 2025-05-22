@@ -19,21 +19,55 @@
 
 import {ICellAsset} from '@wireapp/protocol-messaging';
 
-import {ImageAssetLarge} from './ImageAssetLarge/ImageAssetSmall';
+import {ImageAssetLarge} from './ImageAssetLarge/ImageAssetLarge';
 import {ImageAssetSmall} from './ImageAssetSmall/ImageAssetSmall';
 
 interface ImageAssetCardProps {
   src?: string;
+  name: string;
+  extension: string;
+  senderName: string;
+  timestamp: number;
   metadata: ICellAsset['image'];
   variant: 'small' | 'large';
   isLoading: boolean;
   isError: boolean;
 }
 
-export const ImageAssetCard = ({src, metadata, variant, isLoading, isError}: ImageAssetCardProps) => {
+export const ImageAssetCard = ({
+  src,
+  name,
+  extension,
+  senderName,
+  timestamp,
+  metadata,
+  variant,
+  isLoading,
+  isError,
+}: ImageAssetCardProps) => {
   if (variant === 'large') {
-    return <ImageAssetLarge src={src} metadata={metadata} isError={isError} />;
+    return (
+      <ImageAssetLarge
+        src={src}
+        name={name}
+        extension={extension}
+        metadata={metadata}
+        isError={isError}
+        senderName={senderName}
+        timestamp={timestamp}
+      />
+    );
   }
 
-  return <ImageAssetSmall src={src} isLoading={isLoading} isError={isError} />;
+  return (
+    <ImageAssetSmall
+      src={src}
+      name={name}
+      extension={extension}
+      isLoading={isLoading}
+      isError={isError}
+      senderName={senderName}
+      timestamp={timestamp}
+    />
+  );
 };

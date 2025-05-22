@@ -28,12 +28,11 @@ import {
   teamUpgradeBannerButtonCss,
   teamUpgradeBannerHeaderCss,
 } from './TeamCreation.styles';
+import {useTeamCreationModal} from './useTeamCreationModal';
 
-interface Props {
-  onClick: () => void;
-}
+export const TeamCreationAccountHeader = () => {
+  const {showModal} = useTeamCreationModal();
 
-export const TeamCreationAccountHeader = ({onClick}: Props) => {
   return (
     <div css={teamUpgradeAccountBannerContainerCss}>
       <div css={{flex: '1'}}>
@@ -45,7 +44,7 @@ export const TeamCreationAccountHeader = ({onClick}: Props) => {
         </div>
         <div className="subline">{t('teamUpgradeBannerContent')}</div>
       </div>
-      <Button css={teamUpgradeBannerButtonCss} variant={ButtonVariant.SECONDARY} onClick={onClick}>
+      <Button css={teamUpgradeBannerButtonCss} variant={ButtonVariant.SECONDARY} onClick={showModal}>
         {t('teamUpgradeBannerButtonText')}
       </Button>
     </div>

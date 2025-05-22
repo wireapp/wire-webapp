@@ -35,6 +35,8 @@ import {
   previousPageStyles,
   nextPageStyles,
   pageResultStyles,
+  arrowPreviousIconDisabledStyles,
+  arrowNextIconDisabledStyles,
 } from './CellsPagination.styles';
 
 interface CellsPaginationProps {
@@ -78,33 +80,33 @@ export const CellsPagination = ({
       {numberOfPages > 1 && (
         <FlexBox css={pagesContainerStyles} align="flex-end" data-uie-name="element-pagination">
           <div css={previousPageStyles}>
-            {!isFirstPage && (
-              <IconButton
-                onClick={() => goToPage(currentPage - 1)}
-                data-uie-name="go-previous-page"
-                css={arrowButtonStyles}
-                aria-label={t('cellsGlobalView.pagination.previousPage')}
-                title={t('cellsGlobalView.pagination.previousPage')}
-              >
-                <Icon.ArrowNextIcon css={arrowPreviousIconStyles} />
-              </IconButton>
-            )}
+            <IconButton
+              onClick={() => goToPage(currentPage - 1)}
+              data-uie-name="go-previous-page"
+              disabled={isFirstPage}
+              aria-disabled={isFirstPage}
+              css={arrowButtonStyles}
+              aria-label={t('cellsGlobalView.pagination.previousPage')}
+              title={t('cellsGlobalView.pagination.previousPage')}
+            >
+              <Icon.ArrowNextIcon css={isFirstPage ? arrowPreviousIconDisabledStyles : arrowPreviousIconStyles} />
+            </IconButton>
           </div>
 
           <CellsPageList currentPage={currentPage} numberOfPages={numberOfPages} goToPage={goToPage} />
 
           <div css={nextPageStyles}>
-            {!isLastPage && (
-              <IconButton
-                onClick={() => goToPage(currentPage + 1)}
-                data-uie-name="go-next-page"
-                css={arrowButtonStyles}
-                aria-label={t('cellsGlobalView.pagination.nextPage')}
-                title={t('cellsGlobalView.pagination.nextPage')}
-              >
-                <Icon.ArrowNextIcon css={arrowNextIconStyles} />
-              </IconButton>
-            )}
+            <IconButton
+              onClick={() => goToPage(currentPage + 1)}
+              data-uie-name="go-next-page"
+              disabled={isLastPage}
+              aria-disabled={isLastPage}
+              css={arrowButtonStyles}
+              aria-label={t('cellsGlobalView.pagination.nextPage')}
+              title={t('cellsGlobalView.pagination.nextPage')}
+            >
+              <Icon.ArrowNextIcon css={isLastPage ? arrowNextIconDisabledStyles : arrowNextIconStyles} />
+            </IconButton>
           </div>
         </FlexBox>
       )}
