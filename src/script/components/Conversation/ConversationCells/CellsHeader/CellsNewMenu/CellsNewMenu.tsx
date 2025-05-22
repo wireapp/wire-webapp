@@ -32,7 +32,8 @@ import {setContextMenuPosition} from 'Util/util';
 import {CellsNewItemModal} from './CellsNewItemModal/CellsNewItemModal';
 import {buttonStyles, iconStyles} from './CellsNewMenu.styles';
 
-import {CellItem} from '../../common/cellFile/cellFile';
+import {CellNode} from '../../common/cellNode/cellNode';
+import {getCellsFilesPath} from '../../common/getCellsFilesPath/getCellsFilesPath';
 
 interface CellsNewMenuProps {
   cellsRepository: CellsRepository;
@@ -42,9 +43,9 @@ interface CellsNewMenuProps {
 
 export const CellsNewMenu = ({cellsRepository, conversationQualifiedId, onRefresh}: CellsNewMenuProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalType, setModalType] = useState<CellItem['type']>('file');
+  const [modalType, setModalType] = useState<CellNode['type']>('file');
 
-  const openModal = (type: CellItem['type']) => {
+  const openModal = (type: CellNode['type']) => {
     setModalType(type);
     setIsModalOpen(true);
   };
@@ -82,11 +83,15 @@ export const CellsNewMenu = ({cellsRepository, conversationQualifiedId, onRefres
       {isModalOpen && (
         <CellsNewItemModal
           type={modalType}
+          currentPath={getCellsFilesPath()}
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           cellsRepository={cellsRepository}
           conversationQualifiedId={conversationQualifiedId}
-          onRefresh={onRefresh}
+          onSuccess={() => {
+            onRefresh();
+            setIsModalOpen(false);
+          }}
         />
       )}
     </>

@@ -22,7 +22,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {FolderIcon, PlayIcon} from '@wireapp/react-ui-kit';
 
 import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
-import {CellFile, CellItem} from 'Components/Conversation/ConversationCells/common/cellFile/cellFile';
+import {CellFile, CellNode} from 'Components/Conversation/ConversationCells/common/cellNode/cellNode';
 import {openFolder} from 'Components/Conversation/ConversationCells/common/openFolder/openFolder';
 import {getFileExtension} from 'Util/util';
 
@@ -38,19 +38,19 @@ import {
 import {useCellsFilePreviewModal} from '../../common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
 
 interface CellsTableNameColumnProps {
-  file: CellItem;
+  node: CellNode;
   conversationQualifiedId: QualifiedId;
 }
 
-export const CellsTableNameColumn = ({file, conversationQualifiedId}: CellsTableNameColumnProps) => {
+export const CellsTableNameColumn = ({node, conversationQualifiedId}: CellsTableNameColumnProps) => {
   return (
     <>
-      <span css={mobileNameStyles}>{file.name}</span>
+      <span css={mobileNameStyles}>{node.name}</span>
       <div css={wrapperStyles}>
-        {file.type === 'file' ? (
-          <FileNameColumn file={file} />
+        {node.type === 'file' ? (
+          <FileNameColumn file={node} />
         ) : (
-          <FolderNameColumn name={file.name} conversationQualifiedId={conversationQualifiedId} />
+          <FolderNameColumn name={node.name} conversationQualifiedId={conversationQualifiedId} />
         )}
       </div>
     </>

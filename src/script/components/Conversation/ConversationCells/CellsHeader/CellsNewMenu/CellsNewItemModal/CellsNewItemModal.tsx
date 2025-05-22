@@ -19,41 +19,25 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {
-  Button,
-  ButtonVariant,
-  CloseIcon,
-  ErrorMessage,
-  IconButton,
-  IconButtonVariant,
-  Input,
-  Label,
-} from '@wireapp/react-ui-kit';
+import {CloseIcon, IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
 
+import {CellsNewNodeForm} from 'Components/Conversation/ConversationCells/common/CellsNewNodeForm/CellsNewNodeForm';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
 
-import {
-  buttonStyles,
-  buttonWrapperStyles,
-  closeButtonStyles,
-  headerStyles,
-  headingStyles,
-  inputWrapperStyles,
-  wrapperStyles,
-} from './CellsNewItemModal.styles';
-import {useCellsNewItemForm} from './useCellsNewItemForm';
+import {closeButtonStyles, headerStyles, headingStyles, wrapperStyles} from './CellsNewItemModal.styles';
 
-import {CellItem} from '../../../common/cellFile/cellFile';
+import {CellNode} from '../../../common/cellNode/cellNode';
 
 interface CellsNewItemModalProps {
   isOpen: boolean;
   onClose: () => void;
-  type: CellItem['type'];
+  type: CellNode['type'];
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
-  onRefresh: () => void;
+  onSuccess: () => void;
+  currentPath: string;
 }
 
 export const CellsNewItemModal = ({
@@ -62,18 +46,9 @@ export const CellsNewItemModal = ({
   type,
   cellsRepository,
   conversationQualifiedId,
-  onRefresh,
+  onSuccess,
+  currentPath,
 }: CellsNewItemModalProps) => {
-  const {name, error, isSubmitting, handleSubmit, handleChange} = useCellsNewItemForm({
-    type,
-    cellsRepository,
-    conversationQualifiedId,
-    onSuccess: () => {
-      onRefresh();
-      onClose();
-    },
-  });
-
   return (
     <ModalComponent isShown={isOpen} onClosed={onClose} onBgClick={onClose}>
       <div css={wrapperStyles}>
@@ -91,30 +66,14 @@ export const CellsNewItemModal = ({
             <CloseIcon />
           </IconButton>
         </header>
-        <form onSubmit={handleSubmit}>
-          <div css={inputWrapperStyles}>
-            <Label htmlFor="cells-new-item-name">{t('cellNewItemMenuModal.label')}</Label>
-            <Input
-              id="cells-new-item-name"
-              value={name}
-              placeholder={
-                type === 'folder'
-                  ? t('cellNewItemMenuModal.placeholderFolder')
-                  : t('cellNewItemMenuModal.placeholderFile')
-              }
-              onChange={handleChange}
-              error={error ? <ErrorMessage>{error}</ErrorMessage> : undefined}
-            />
-          </div>
-          <div css={buttonWrapperStyles}>
-            <Button variant={ButtonVariant.SECONDARY} onClick={onClose} css={buttonStyles}>
-              {t('cellNewItemMenuModal.secondaryAction')}
-            </Button>
-            <Button variant={ButtonVariant.PRIMARY} type="submit" css={buttonStyles} disabled={isSubmitting}>
-              {t('cellNewItemMenuModal.primaryAction')}
-            </Button>
-          </div>
-        </form>
+        <CellsNewNodeForm
+          type={type}
+          cellsRepository={cellsRepository}
+          conversationQualifiedId={conversationQualifiedId}
+          onSuccess={onSuccess}
+          currentPath={currentPath}
+          onSecondaryButtonClick={onClose}
+        />
       </div>
     </ModalComponent>
   );
