@@ -253,7 +253,7 @@ export class ClientRepository {
         throw new ClientError(ClientError.TYPE.CLIENT_NOT_SET, ClientError.MESSAGE.CLIENT_NOT_SET);
       }
       await this.clientService.putClientCapabilities(currentClient.id, {
-        capabilities: [ClientCapability.LEGAL_HOLD_IMPLICIT_CONSENT],
+        capabilities: [ClientCapability.LEGAL_HOLD_IMPLICIT_CONSENT, ClientCapability.CONSUMABLE_NOTIFICATIONS],
       });
 
       return currentClient;

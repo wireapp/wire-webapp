@@ -7743,9 +7743,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^27.46.0":
-  version: 27.46.0
-  resolution: "@wireapp/api-client@npm:27.46.0"
+"@wireapp/api-client@npm:^27.47.0":
+  version: 27.49.0
+  resolution: "@wireapp/api-client@npm:27.49.0"
   dependencies:
     "@aws-sdk/client-s3": "npm:3.750.0"
     "@aws-sdk/lib-storage": "npm:3.779.0"
@@ -7764,7 +7764,7 @@ __metadata:
     uuid: "npm:11.1.0"
     ws: "npm:8.18.1"
     zod: "npm:3.24.2"
-  checksum: 10/bcd0c1871735c144eacada5f64d3ef65fb7eaf7133031d0107e70189a29928b5e6a198a22332235bec11418144ff426c944be7ccbfdcae6def5613a3d511e312
+  checksum: 10/97879a213aed0594e50af60dfdd3d8e73ea2ed5653d6b8cd8a8f95b83cdfa27ce04dc02e3e77db1df8ff3b22b034969ce45a77561a6c535851ba9c6109d795e8
   languageName: node
   linkType: hard
 
@@ -7829,11 +7829,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:46.23.1":
-  version: 46.23.1
-  resolution: "@wireapp/core@npm:46.23.1"
+"@wireapp/core@file:.yalc/@wireapp/core::locator=wire-webapp%40workspace%3A.":
+  version: 46.23.2
+  resolution: "@wireapp/core@file:.yalc/@wireapp/core#.yalc/@wireapp/core::hash=f89c66&locator=wire-webapp%40workspace%3A."
   dependencies:
-    "@wireapp/api-client": "npm:^27.46.0"
+    "@wireapp/api-client": "npm:^27.47.0"
     "@wireapp/commons": "npm:^5.4.2"
     "@wireapp/core-crypto": "npm:3.1.1"
     "@wireapp/cryptobox": "npm:12.8.0"
@@ -7851,7 +7851,7 @@ __metadata:
     long: "npm:^5.2.0"
     uuid: "npm:9.0.1"
     zod: "npm:3.24.2"
-  checksum: 10/67ba4ed7eafcbd6ee24838a17119ca6209e98f34eeaa95865942a242b4e9f78ae18b28ee53ecce97547e0b9d34bac3be099754a19e2e3eb6d9b4d442df6f6d20
+  checksum: 10/da559f5af730fd9e9649867df06649361b7e1bab6581739e4a7852a461b052276cdabf992a3e598d6b98835bb682b5c72ab62e02873b158c73916b770e731d88
   languageName: node
   linkType: hard
 
@@ -21146,7 +21146,7 @@ __metadata:
     "@wireapp/avs-debugger": "npm:0.0.7"
     "@wireapp/commons": "npm:5.4.2"
     "@wireapp/copy-config": "npm:2.3.0"
-    "@wireapp/core": "npm:46.23.1"
+    "@wireapp/core": "file:.yalc/@wireapp/core"
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/prettier-config": "npm:0.6.4"
     "@wireapp/react-ui-kit": "npm:9.50.1"

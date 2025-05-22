@@ -31,7 +31,6 @@ import type {Notification, NotificationList} from '@wireapp/api-client/lib/notif
 import {FeatureStatus} from '@wireapp/api-client/lib/team/feature/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {NotificationSource} from '@wireapp/core/lib/notification';
-import {DatabaseKeys} from '@wireapp/core/lib/notification/NotificationDatabaseRepository';
 import Dexie from 'dexie';
 import keyboardjs from 'keyboardjs';
 import {observable} from 'knockout';
@@ -44,7 +43,6 @@ import {getStorage} from 'Util/localStorage';
 import {getLogger, Logger} from 'Util/Logger';
 
 import {TIME_IN_MILLIS} from './TimeUtil';
-import {createUuid} from './uuid';
 
 import {CallingRepository} from '../calling/CallingRepository';
 import {CallState} from '../calling/CallState';
@@ -65,7 +63,7 @@ import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
-import {EventRecord, StorageRepository, StorageSchemata} from '../storage';
+import {EventRecord, StorageRepository} from '../storage';
 import {TeamState} from '../team/TeamState';
 import {disableForcedErrorReporting} from '../tracking/Telemetry.helpers';
 import {UserRepository} from '../user/UserRepository';
@@ -226,25 +224,12 @@ export class DebugUtil {
     }
   };
 
-  breakLastNotificationId() {
-    return this.storageRepository.storageService.update(
-      StorageSchemata.OBJECT_STORE.AMPLIFY,
-      DatabaseKeys.PRIMARY_KEY_LAST_NOTIFICATION,
-      {value: createUuid(1)},
-    );
-  }
-
   enableCameraBlur(flag: boolean) {
     return this.callingRepository.switchVideoBackgroundBlur(flag);
   }
 
   reconnectWebSocket({dryRun} = {dryRun: false}) {
     return this.eventRepository.connectWebSocket(this.core, () => {}, dryRun);
-  }
-
-  async reconnectWebSocketWithLastNotificationIdFromBackend({dryRun} = {dryRun: false}) {
-    await this.core.service?.notification.initializeNotificationStream(this.clientState.currentClient!.id);
-    return this.reconnectWebSocket({dryRun});
   }
 
   async updateActiveConversationKeyPackages() {
@@ -453,11 +438,12 @@ export class DebugUtil {
       notification.time === dateTime.toISOString();
     const conversation = await this.conversationRepository.getConversationById({domain: '', id: conversationId});
     const message = await this.messageRepository.getMessageInConversationById(conversation, messageId);
-    const notificationList = await this.eventRepository.notificationService.getNotifications(
-      undefined,
-      undefined,
-      EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX,
-    );
+    // const notificationList = await this.eventRepository.notificationService.getNotifications(
+    //   undefined,
+    //   undefined,
+    //   EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX,
+    // );
+    const notificationList = [] as unknown as NotificationList;
     const dateTime = new Date(message.timestamp());
     const filteredEvents: ConversationOtrMessageAddEvent[] = notificationList.notifications
       .flatMap((notification: Notification) => notification.payload)

@@ -127,7 +127,7 @@ export class EventRepository {
   // WebSocket handling
   //##############################################################################
 
-  private readonly updateConnectivitityStatus = (state: ConnectionState) => {
+  private readonly updateConnectivityStatus = (state: ConnectionState) => {
     this.logger.log('Websocket connection state changed to', state);
     switch (state) {
       case ConnectionState.CONNECTING: {
@@ -187,15 +187,10 @@ export class EventRepository {
    * connects to the websocket with the given account
    *
    * @param account the account to connect to
-   * @param onNotificationStreamProgress callback when a notification for the notification stream has been processed
    * @param dryRun when set will not decrypt and not store the last notification ID. This is useful if you only want to subscribe to unencrypted backend events
    * @returns Resolves when the notification stream has fully been processed
    */
-  async connectWebSocket(
-    account: Account,
-    onNotificationStreamProgress: (progress: {done: number; total: number}) => void,
-    dryRun = false,
-  ): Promise<void> {
+  async connectWebSocket(account: Account, dryRun = false): Promise<void> {
     await this.handleTimeDrift();
     const connect = () => {
       // We make sure there is only be a single active connection to the WebSocket.
@@ -203,14 +198,13 @@ export class EventRepository {
       return new Promise<void>(async resolve => {
         this.disconnectWebSocket = account.listen({
           onConnectionStateChanged: connectionState => {
-            this.updateConnectivitityStatus(connectionState);
+            this.updateConnectivityStatus(connectionState);
             if (connectionState === ConnectionState.LIVE) {
               resolve();
             }
           },
           onEvent: this.handleIncomingEvent,
           onMissedNotifications: this.triggerMissedSystemEventMessageRendering,
-          onNotificationStreamProgress: onNotificationStreamProgress,
           dryRun,
         });
       });
@@ -266,13 +260,13 @@ export class EventRepository {
     }
   }
 
-  private readonly triggerMissedSystemEventMessageRendering = async (missedNotificationId: string) => {
-    const notificationId = await this.notificationService.getMissedIdFromDb();
-    const shouldUpdatePersistedId = missedNotificationId !== notificationId;
-    if (shouldUpdatePersistedId) {
-      amplify.publish(WebAppEvents.CONVERSATION.MISSED_EVENTS);
-      this.notificationService.saveMissedIdToDb(missedNotificationId);
-    }
+  private readonly triggerMissedSystemEventMessageRendering = async () => {
+    // const notificationId = await this.notificationService.getMissedIdFromDb();
+    // const shouldUpdatePersistedId = missedNotificationId !== notificationId;
+    // if (shouldUpdatePersistedId) {
+    amplify.publish(WebAppEvents.CONVERSATION.MISSED_EVENTS);
+    // this.notificationService.saveMissedIdToDb(missedNotificationId);
+    // }
   };
 
   /**

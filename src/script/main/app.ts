@@ -535,17 +535,11 @@ export class App {
 
       await conversationRepository.conversationRoleRepository.loadTeamRoles();
 
-      let totalNotifications = 0;
-      await eventRepository.connectWebSocket(this.core, ({done, total}) => {
-        const baseMessage = t('initDecryption');
-        const extraInfo = this.config.FEATURE.SHOW_LOADING_INFORMATION
-          ? ` ${t('initProgress', {number1: done.toString(), number2: total.toString()})}`
-          : '';
+      const totalNotifications = 0;
+      onProgress(25 + 50, t('initDecryption'));
+      await eventRepository.connectWebSocket(this.core);
 
-        totalNotifications = total;
-        onProgress(25 + 50 * (done / total), `${baseMessage}${extraInfo}`);
-      });
-      eventLogger.log(AppInitializationStep.DecryptionCompleted, {count: totalNotifications});
+      eventLogger.log(AppInitializationStep.DecryptionCompleted, {count: 0});
 
       await conversationRepository.init1To1Conversations(connections, conversations);
       if (this.core.hasMLSDevice) {
