@@ -70,6 +70,9 @@ test('Verify you can sign in by username', {tag: ['@TC-3461', '@regression']}, a
 
 test.afterAll(async () => {
   for (const user of createdUsers) {
-    await deleteUser(user);
+    if (!user.token) {
+      throw new Error(`User ${user.username} has no token and can't be deleted`);
+    }
+    await deleteUser(user.password, user.token);
   }
 });

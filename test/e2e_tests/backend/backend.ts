@@ -17,65 +17,102 @@
  *
  */
 
-import axios from 'axios';
+import axios, {AxiosInstance, AxiosResponse} from 'axios';
 
 import {User} from './user';
 
 const BACKEND_URL = process.env.BACKEND_URL;
 const BASIC_AUTH = process.env.BASIC_AUTH;
 
+let axiosInstance: AxiosInstance | null = null;
+
 export async function createPersonalUser(user: User) {
-  const axiosInstance = axios.create({
-    baseURL: BACKEND_URL,
-    withCredentials: true,
+  // 1. Register
+  const registerResponse = await registerUser(user);
+  const zuidCookie = extractCookieFromRegisterResponse(registerResponse);
+
+  // 2. Get activation code via brig
+  const activationCode = await getActivationCodeForEmail(user.email);
+
+  // 3. Activate Account
+  await activateAccount(user.email, activationCode);
+
+  // 4. Request Access Token
+  user.token = await requestAccessToken(zuidCookie);
+
+  // 5. Set Unique Username (Handle)
+  await setUniqueUsername(user.username, user.token);
+}
+
+export async function deleteUser(userPassword: string, token: string) {
+  await getAxiosInstance().request({
+    url: '/self',
+    method: 'DELETE',
     headers: {
-      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    data: {
+      password: userPassword,
     },
   });
+}
 
-  // 1. Register
-  const registerPayload = {
+function getAxiosInstance(): AxiosInstance {
+  if (!axiosInstance) {
+    axiosInstance = axios.create({
+      baseURL: BACKEND_URL,
+      withCredentials: true,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  }
+  return axiosInstance;
+}
+
+async function registerUser(user: User): Promise<AxiosResponse> {
+  return await getAxiosInstance().post('register', {
     password: user.password,
     name: `${user.firstName} ${user.lastName}`,
     email: user.email,
-  };
+  });
+}
 
-  const registerResponse = await axiosInstance.post('register', registerPayload);
+function extractCookieFromRegisterResponse(registerResponse: AxiosResponse): string {
   const setCookieHeader = registerResponse.headers['set-cookie'];
 
   // Find the zuid cookie string in setCookieHeader
   if (!setCookieHeader) {
-    throw Error('Cookies were not provided in register response');
+    throw Error('Cookies were not found in register response');
   }
   const zuidCookie = setCookieHeader.find(cookieStr => cookieStr.startsWith('zuid='));
   if (!zuidCookie) {
     throw new Error('zuid cookie not found in register response');
   }
+  return zuidCookie;
+}
 
-  // 2. Get activation code via brig
-  const basicAuthHeader = `Basic ${BASIC_AUTH}`;
-
-  const activationCodeResponse = await axiosInstance.get(`/i/users/activation-code`, {
-    params: {email: user.email},
+async function getActivationCodeForEmail(email: string): Promise<string> {
+  const activationCodeResponse = await getAxiosInstance().get(`/i/users/activation-code`, {
+    params: {email: email},
     headers: {
-      Authorization: basicAuthHeader,
+      Authorization: `Basic ${BASIC_AUTH}`,
     },
   });
 
-  const activationCodeData = activationCodeResponse.data;
-  const code = activationCodeData.code;
+  return activationCodeResponse.data.code;
+}
 
-  // 3. Activate Account
-  const activatePayload = {
+async function activateAccount(email: string, code: string) {
+  await getAxiosInstance().post('activate', {
     code,
     dryrun: false,
-    email: user.email,
-  };
+    email: email,
+  });
+}
 
-  await axiosInstance.post('activate', activatePayload);
-
-  // 4. Request Access Token
-  const accessResponse = await axiosInstance.post(
+async function requestAccessToken(zuidCookie: string): Promise<string> {
+  const accessResponse = await getAxiosInstance().post(
     'access',
     {
       withCredentials: true,
@@ -87,48 +124,18 @@ export async function createPersonalUser(user: User) {
     },
   );
 
-  const accessData = accessResponse.data;
-  const token = accessData.access_token;
-
-  // Setting Access Token in Client User
-  user.token = token;
-
-  // 5. Set Unique Username (Handle)
-  const handlePayload = {
-    handle: user.username,
-  };
-
-  await axiosInstance.put('self/handle', handlePayload, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
-  });
+  return accessResponse.data.access_token;
 }
 
-export async function deleteUser(user: User) {
-  const axiosInstance = axios.create({
-    baseURL: BACKEND_URL,
-    withCredentials: true,
-    headers: {
-      'Content-Type': 'application/json',
+async function setUniqueUsername(username: string, token: string) {
+  await getAxiosInstance().put(
+    'self/handle',
+    {handle: username},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
     },
-  });
-
-  const deletePayload = {
-    password: user.password,
-  };
-
-  const deleteResponse = await axiosInstance.request({
-    url: '/self',
-    method: 'DELETE',
-    headers: {
-      Authorization: `Bearer ${user.token}`,
-    },
-    data: deletePayload,
-  });
-
-  if (deleteResponse.status != 200) {
-    throw new Error(`Couldn't delete user ${user.token}`);
-  }
+  );
 }
