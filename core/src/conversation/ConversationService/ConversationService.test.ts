@@ -134,6 +134,7 @@ describe('ConversationService', () => {
       conversationExists: jest.fn(),
       isConversationEstablished: jest.fn(),
       tryEstablishingMLSGroup: jest.fn(),
+      getClientIdsInGroup: jest.fn(),
       getKeyPackagesPayload: jest.fn(),
       addUsersToExistingConversation: jest.fn(),
       resetKeyMaterialRenewal: jest.fn(),
@@ -684,7 +685,7 @@ describe('ConversationService', () => {
         conversationId: mockConversationId,
       });
 
-      expect(mlsService.getKeyPackagesPayload).toHaveBeenCalledWith(qualifiedUsers);
+      expect(mlsService.getKeyPackagesPayload).toHaveBeenCalledWith(qualifiedUsers, undefined);
       expect(mlsService.resetKeyMaterialRenewal).toHaveBeenCalledWith(mockGroupId);
     });
 
