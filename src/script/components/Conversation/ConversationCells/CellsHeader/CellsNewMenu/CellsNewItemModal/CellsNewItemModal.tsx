@@ -24,6 +24,7 @@ import {CloseIcon, IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
 import {CellsNewNodeForm} from 'Components/Conversation/ConversationCells/common/CellsNewNodeForm/CellsNewNodeForm';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
+import {handleEscDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {closeButtonStyles, headerStyles, headingStyles, wrapperStyles} from './CellsNewItemModal.styles';
@@ -50,7 +51,12 @@ export const CellsNewItemModal = ({
   currentPath,
 }: CellsNewItemModalProps) => {
   return (
-    <ModalComponent isShown={isOpen} onClosed={onClose} onBgClick={onClose}>
+    <ModalComponent
+      isShown={isOpen}
+      onClosed={onClose}
+      onBgClick={onClose}
+      onKeyDown={event => handleEscDown(event, onClose)}
+    >
       <div css={wrapperStyles}>
         <header css={headerStyles}>
           <h3 css={headingStyles}>
