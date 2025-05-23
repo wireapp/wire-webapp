@@ -291,10 +291,16 @@ export class ConversationMapper {
 
     // Active participants from database or backend payload
     const participatingUserIds =
-      qualified_others ||
-      (members?.others
-        ? members.others.map(other => ({domain: other.qualified_id?.domain || '', id: other.id}))
-        : others.map(userId => ({domain: '', id: userId})));
+      qualified_others ??
+      (members?.others?.length
+        ? members.others.map(other => ({
+            domain: other.qualified_id?.domain ?? '',
+            id: other.id,
+          }))
+        : others?.map(userId => ({
+            domain: '',
+            id: userId,
+          })) ?? []);
 
     conversationEntity.participating_user_ids(participatingUserIds);
 
