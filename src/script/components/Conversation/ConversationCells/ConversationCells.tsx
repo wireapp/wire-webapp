@@ -22,7 +22,6 @@ import {useCallback} from 'react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
-import {useAppNotification} from 'Components/AppNotification/AppNotification';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
 
@@ -48,7 +47,7 @@ export const ConversationCells = ({
   conversationQualifiedId,
   conversationName,
 }: ConversationCellsProps) => {
-  const {getNodes, status: nodesStatus, getPagination, clearAll, removeNode} = useCellsStore();
+  const {getNodes, status: nodesStatus, getPagination, clearAll} = useCellsStore();
 
   const conversationId = conversationQualifiedId.id;
 
@@ -73,25 +72,6 @@ export const ConversationCells = ({
   const isSuccess = nodesStatus === 'success';
   const hasNodes = !!nodes.length;
 
-  const deleteFileFailedNotification = useAppNotification({
-    message: t('cellsGlobalView.deleteModalError'),
-  });
-
-  const handleDeleteNode = useCallback(
-    async (uuid: string) => {
-      try {
-        removeNode({conversationId, nodeId: uuid});
-        await cellsRepository.deleteNode({uuid});
-      } catch (error) {
-        deleteFileFailedNotification.show();
-        console.error(error);
-      }
-    },
-    // cellsRepository is not a dependency because it's a singleton
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [conversationId, removeNode, deleteFileFailedNotification],
-  );
-
   const handleRefresh = useCallback(async () => {
     clearAll({conversationId});
     await refresh();
@@ -113,7 +93,6 @@ export const ConversationCells = ({
           cellsRepository={cellsRepository}
           conversationQualifiedId={conversationQualifiedId}
           conversationName={conversationName}
-          onDeleteNode={handleDeleteNode}
           onUpdateBodyHeight={updateHeight}
         />
       )}
