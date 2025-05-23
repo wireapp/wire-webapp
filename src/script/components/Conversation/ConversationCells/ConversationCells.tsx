@@ -97,7 +97,7 @@ export const ConversationCells = ({
         />
       )}
       {!isLoading && emptyView && (
-        <CellsStateInfo heading={t('cells.noFiles.heading')} description={t('cells.noFiles.description')} />
+        <CellsStateInfo heading={t('cells.noNodes.heading')} description={t('cells.noNodes.description')} />
       )}
       {isLoading && <CellsLoader minHeight={loaderHeight} />}
       {isError && <CellsStateInfo heading={t('cells.error.heading')} description={t('cells.error.description')} />}

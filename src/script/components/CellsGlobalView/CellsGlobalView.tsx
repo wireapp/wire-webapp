@@ -85,7 +85,7 @@ export const CellsGlobalView = ({cellsRepository = container.resolve(CellsReposi
       )}
       {showTable && <CellsTable nodes={nodes} cellsRepository={cellsRepository} />}
       {showNoFiles && (
-        <CellsStateInfo heading={t('cells.noFiles.heading')} description={t('cells.noFiles.description')} />
+        <CellsStateInfo heading={t('cells.noNodes.heading')} description={t('cells.noNodes.description')} />
       )}
       {showLoader && <CellsLoader />}
       {isError && <CellsStateInfo heading={t('cells.error.heading')} description={t('cells.error.description')} />}
