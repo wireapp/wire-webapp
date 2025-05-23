@@ -17,117 +17,204 @@
  *
  */
 
-import {KeyboardEvent, MouseEvent as ReactMouseEvent, useCallback} from 'react';
+import {useCallback, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {MoreIcon} from '@wireapp/react-ui-kit';
+import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 
-import {CellItem} from 'Components/Conversation/ConversationCells/common/cellFile/cellFile';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {useAppNotification} from 'Components/AppNotification/AppNotification';
+import {CellNode} from 'Components/Conversation/ConversationCells/common/cellNode/cellNode';
+import {openFolder} from 'Components/Conversation/ConversationCells/common/openFolder/openFolder';
+import {
+  isInRecycleBin,
+  isRootRecycleBinPath,
+} from 'Components/Conversation/ConversationCells/common/recycleBin/recycleBin';
+import {useCellsStore} from 'Components/Conversation/ConversationCells/common/useCellsStore/useCellsStore';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
-import {ContextMenuEntry, showContextMenu} from 'src/script/ui/ContextMenu';
-import {isSpaceOrEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
-import {forcedDownloadFile, setContextMenuPosition} from 'Util/util';
+import {forcedDownloadFile} from 'Util/util';
 
+import {CellsMoveNodeModal} from './CellsMoveNodeModal/CellsMoveNodeModal';
 import {buttonStyles, iconStyles, textStyles} from './CellsTableRowOptions.styles';
+import {showDeletePermanentlyModal} from './showDeletePermanentlyModal/showDeletePermanentlyModal';
+import {showMoveToRecycleBinModal} from './showMoveToRecycleBinModal/showMoveToRecycleBinModal';
+import {showRestoreNodeModal} from './showRestoreNodeModal/showRestoreNodeModal';
 
-import {openFolder} from '../../../common/openFolder/openFolder';
 import {useCellsFilePreviewModal} from '../../common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
-import {showShareFileModal} from '../CellsFileShareModal/CellsFileShareModal';
+import {showShareFileModal} from '../CellsNodeShareModal/CellsNodeShareModal';
 
 interface CellsTableRowOptionsProps {
-  file: CellItem;
-  onDelete: (uuid: string) => void;
+  node: CellNode;
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
+  conversationName: string;
 }
 
 export const CellsTableRowOptions = ({
-  file,
-  onDelete,
+  node,
   cellsRepository,
   conversationQualifiedId,
+  conversationName,
 }: CellsTableRowOptionsProps) => {
-  const {id, selectedFile, handleOpenFile} = useCellsFilePreviewModal();
+  return (
+    <DropdownMenu>
+      <DropdownMenu.Trigger asChild>
+        <button css={buttonStyles} aria-label={t('cellsGlobalView.optionsLabel')}>
+          <MoreIcon css={iconStyles} />
+          <span css={textStyles}>{t('cellsGlobalView.optionsLabel')}</span>
+        </button>
+      </DropdownMenu.Trigger>
+      <CellsTableRowOptionsContent
+        node={node}
+        cellsRepository={cellsRepository}
+        conversationQualifiedId={conversationQualifiedId}
+        conversationName={conversationName}
+      />
+    </DropdownMenu>
+  );
+};
 
-  const showDeleteFileModal = useCallback(
-    ({uuid, name}: {uuid: string; name: string}) => {
-      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-        primaryAction: {action: () => onDelete(uuid), text: t('cellsGlobalView.optionDelete')},
-        text: {
-          message: t('cellsGlobalView.deleteModalDescription', {name}),
-          title: t('cellsGlobalView.deleteModalHeading'),
-        },
-      });
+const CellsTableRowOptionsContent = ({
+  node,
+  cellsRepository,
+  conversationQualifiedId,
+  conversationName,
+}: CellsTableRowOptionsProps) => {
+  const {handleOpenFile} = useCellsFilePreviewModal();
+  const {removeNode} = useCellsStore();
+  const [isMoveNodeModalOpen, setIsMoveNodeModalOpen] = useState(false);
+
+  const url = node.url;
+  const name = node.type === 'folder' ? `${node.name}.zip` : node.name;
+  const conversationId = conversationQualifiedId.id;
+
+  const deleteFileFailedNotification = useAppNotification({
+    message: t('cellsGlobalView.deleteModalError'),
+  });
+
+  const handleDeleteNode = useCallback(
+    async ({uuid, permanently = false}: {uuid: string; permanently?: boolean}) => {
+      try {
+        removeNode({conversationId, nodeId: uuid});
+        await cellsRepository.deleteNode({uuid, permanently});
+      } catch (error) {
+        deleteFileFailedNotification.show();
+        console.error(error);
+      }
     },
-    [onDelete],
+    // cellsRepository is not a dependency because it's a singleton
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [conversationId, removeNode, deleteFileFailedNotification],
   );
 
-  const getDownloadName = (file: CellItem) => {
-    if (file.type === 'folder') {
-      return `${file.name}.zip`;
-    }
-    return file.name;
-  };
+  const restoreNodeFailedNotification = useAppNotification({
+    message: t('cellsRestoreError'),
+  });
 
-  const showOptionsMenu = (event: ReactMouseEvent<HTMLButtonElement> | MouseEvent) => {
-    const openLabel = t('cellsGlobalView.optionOpen');
-    const shareLabel = t('cellsGlobalView.optionShare');
-    const downloadLabel = t('cellsGlobalView.optionDownload');
-    const deleteLabel = t('cellsGlobalView.optionDelete');
+  const handleRestoreNode = useCallback(
+    async ({uuid}: {uuid: string}) => {
+      try {
+        removeNode({conversationId, nodeId: uuid});
+        await cellsRepository.restoreNode({uuid});
+      } catch (error) {
+        restoreNodeFailedNotification.show();
+        console.error(error);
+      }
+    },
+    // cellsRepository is not a dependency because it's a singleton
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [conversationId, removeNode, restoreNodeFailedNotification],
+  );
 
-    const url = file.url;
-    const name = getDownloadName(file);
+  if (isRootRecycleBinPath()) {
+    return (
+      <DropdownMenu.Content>
+        <DropdownMenu.Item
+          onClick={() =>
+            showRestoreNodeModal({
+              node,
+              onRestoreNode: () => handleRestoreNode({uuid: node.id}),
+            })
+          }
+        >
+          {t('cellsGlobalView.optionRestore')}
+        </DropdownMenu.Item>
+        <DropdownMenu.Item
+          onClick={() =>
+            showDeletePermanentlyModal({
+              node,
+              onDeletePermanently: () => handleDeleteNode({uuid: node.id, permanently: true}),
+            })
+          }
+        >
+          {t('cellsGlobalView.optionDeletePermanently')}
+        </DropdownMenu.Item>
+      </DropdownMenu.Content>
+    );
+  }
 
-    showContextMenu({
-      event,
-      entries: [
-        {
-          label: shareLabel,
-          click: () => showShareFileModal({uuid: file.id, conversationId: conversationQualifiedId.id, cellsRepository}),
-        },
-        {
-          label: openLabel,
-          click: () =>
-            file.type === 'folder' ? openFolder({conversationQualifiedId, name: file.name}) : handleOpenFile(file),
-        },
-        url
-          ? {
-              label: downloadLabel,
-              click: () =>
-                forcedDownloadFile({
-                  url,
-                  name,
-                }),
-            }
-          : undefined,
-        {label: deleteLabel, click: () => showDeleteFileModal({uuid: file.id, name: file.name})},
-      ].filter(Boolean) as ContextMenuEntry[],
-      identifier: 'file-preview-error-more-button',
-    });
-  };
-
-  const handleKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
-    if (isSpaceOrEnterKey(event.key)) {
-      const newEvent = setContextMenuPosition(event);
-      showOptionsMenu(newEvent);
-    }
-  };
+  if (isInRecycleBin()) {
+    return (
+      <DropdownMenu.Content>
+        <DropdownMenu.Item
+          onClick={() =>
+            showDeletePermanentlyModal({
+              node,
+              onDeletePermanently: () => handleDeleteNode({uuid: node.id, permanently: true}),
+            })
+          }
+        >
+          {t('cellsGlobalView.optionDeletePermanently')}
+        </DropdownMenu.Item>
+      </DropdownMenu.Content>
+    );
+  }
 
   return (
-    <button
-      css={buttonStyles}
-      onKeyDown={handleKeyDown}
-      onClick={showOptionsMenu}
-      aria-label={t('cellsGlobalView.optionsLabel')}
-      aria-controls={id}
-      aria-expanded={!!selectedFile}
-      aria-haspopup="dialog"
-    >
-      <MoreIcon css={iconStyles} />
-      <span css={textStyles}>{t('cellsGlobalView.optionsLabel')}</span>
-    </button>
+    <>
+      <DropdownMenu.Content>
+        <DropdownMenu.Item onClick={() => setIsMoveNodeModalOpen(true)}>
+          {t('cellsGlobalView.optionMove')}
+        </DropdownMenu.Item>
+        <DropdownMenu.Item
+          onClick={() =>
+            showShareFileModal({uuid: node.id, conversationId: conversationQualifiedId.id, cellsRepository})
+          }
+        >
+          {t('cellsGlobalView.optionShare')}
+        </DropdownMenu.Item>
+        <DropdownMenu.Item
+          onClick={() =>
+            node.type === 'folder' ? openFolder({conversationQualifiedId, name: node.name}) : handleOpenFile(node)
+          }
+        >
+          {t('cellsGlobalView.optionOpen')}
+        </DropdownMenu.Item>
+        {url && (
+          <DropdownMenu.Item onClick={() => forcedDownloadFile({url, name})}>
+            {t('cellsGlobalView.optionDownload')}
+          </DropdownMenu.Item>
+        )}
+        <DropdownMenu.Item
+          onClick={() =>
+            showMoveToRecycleBinModal({
+              node,
+              onMoveToRecycleBin: () => handleDeleteNode({uuid: node.id, permanently: false}),
+            })
+          }
+        >
+          {t('cellsGlobalView.optionDelete')}
+        </DropdownMenu.Item>
+      </DropdownMenu.Content>
+      <CellsMoveNodeModal
+        nodeToMove={node}
+        isOpen={isMoveNodeModalOpen}
+        onClose={() => setIsMoveNodeModalOpen(false)}
+        cellsRepository={cellsRepository}
+        conversationQualifiedId={conversationQualifiedId}
+        conversationName={conversationName}
+      />
+    </>
   );
 };

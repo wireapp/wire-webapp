@@ -32,18 +32,18 @@ import {
   wrapperStyles,
 } from './CellsTableNameColumn.styles';
 
-import {CellFile, CellItem} from '../../../common/cellFile/cellFile';
+import {CellFile, CellNode} from '../../../common/cellNode/cellNode';
 import {useCellsFilePreviewModal} from '../../common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
 interface CellsTableNameColumnProps {
-  file: CellItem;
+  node: CellNode;
 }
 
-export const CellsTableNameColumn = ({file}: CellsTableNameColumnProps) => {
+export const CellsTableNameColumn = ({node}: CellsTableNameColumnProps) => {
   return (
     <>
-      <span css={mobileNameStyles}>{file.name}</span>
+      <span css={mobileNameStyles}>{node.name}</span>
       <div css={wrapperStyles}>
-        {file.type === 'file' ? <FileNameColumn file={file} /> : <FolderNameColumn name={file.name} path={file.path} />}
+        {node.type === 'file' ? <FileNameColumn file={node} /> : <FolderNameColumn name={node.name} path={node.path} />}
       </div>
     </>
   );

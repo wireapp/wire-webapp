@@ -41,7 +41,7 @@ export const useSendFiles = ({files, clearAllFiles, cellsRepository, conversatio
   });
 
   const sendFile = useCallback(async (file: FileWithPreview) => {
-    return cellsRepository.promoteFileDraft({uuid: file.remoteUuid, versionId: file.remoteVersionId});
+    return cellsRepository.promoteNodeDraft({uuid: file.remoteUuid, versionId: file.remoteVersionId});
     // cellsRepository is not a dependency because it's a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
