@@ -74,7 +74,6 @@ export class Participant {
 
     computed(() => {
       const stream = this.videoStream();
-
       if (stream && stream.getVideoTracks().length > 0) {
         if (AvsDebugger.hasTrack(this.user.id)) {
           AvsDebugger.removeTrack(this.user.id);
