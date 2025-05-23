@@ -29,22 +29,22 @@ import {CellsTableNameColumn} from './CellsTableNameColumn/CellsTableNameColumn'
 import {CellsTableRowOptions} from './CellsTableRowOptions/CellsTableRowOptions';
 import {CellsTableSharedColumn} from './CellsTableSharedColumn/CellsTableSharedColumn';
 
-import {CellItem} from '../../common/cellFile/cellFile';
+import {CellNode} from '../../common/cellNode/cellNode';
 
-const columnHelper = createColumnHelper<CellItem>();
+const columnHelper = createColumnHelper<CellNode>();
 
 export const getCellsTableColumns = ({
   cellsRepository,
   conversationQualifiedId,
-  onDeleteFile,
+  conversationName,
 }: {
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
-  onDeleteFile: (uuid: string) => void;
+  conversationName: string;
 }) => [
   columnHelper.accessor('name', {
     header: t('cellsGlobalView.tableRowName'),
-    cell: info => <CellsTableNameColumn file={info.row.original} conversationQualifiedId={conversationQualifiedId} />,
+    cell: info => <CellsTableNameColumn node={info.row.original} conversationQualifiedId={conversationQualifiedId} />,
   }),
   columnHelper.accessor('owner', {
     header: t('cellsGlobalView.tableRowOwner'),
@@ -72,10 +72,10 @@ export const getCellsTableColumns = ({
     cell: info => {
       return (
         <CellsTableRowOptions
-          file={info.row.original}
-          onDelete={uuid => onDeleteFile(uuid)}
+          node={info.row.original}
           cellsRepository={cellsRepository}
           conversationQualifiedId={conversationQualifiedId}
+          conversationName={conversationName}
         />
       );
     },
