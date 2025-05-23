@@ -58,7 +58,13 @@ function getMessagesGroupLabel(ts: number): string {
   return formatLocale(date, pattern);
 }
 
-export function MarkerComponent({marker, scrollTo}: {marker: Marker; scrollTo: ScrollToElement}) {
+interface Props {
+  marker: Marker;
+  scrollTo: ScrollToElement;
+  // scrollToElement: (isUnread: boolean) => void;
+}
+
+export const MarkerComponent = ({marker, scrollTo}: Props) => {
   const isDay = marker.type === 'day';
   const timeAgo = useRelativeTimestamp(marker.timestamp, isDay, isDay ? getMessagesGroupLabel : undefined);
   const elementRef = useRef<HTMLDivElement>(null);
@@ -69,6 +75,7 @@ export function MarkerComponent({marker, scrollTo}: {marker: Marker; scrollTo: S
 
   useLayoutEffect(() => {
     if (marker.type === 'unread' && elementRef.current) {
+      // scrollToElement(true);
       scrollTo({element: elementRef.current}, true);
     }
   }, []);
@@ -90,4 +97,4 @@ export function MarkerComponent({marker, scrollTo}: {marker: Marker; scrollTo: S
       </h3>
     </div>
   );
-}
+};

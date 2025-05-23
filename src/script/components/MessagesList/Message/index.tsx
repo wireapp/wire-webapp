@@ -22,7 +22,6 @@ import React, {useLayoutEffect, useRef, useEffect} from 'react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
 
-import {InViewport} from 'Components/InViewport';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getAllFocusableElements, setElementsTabIndex} from 'Util/focusUtil';
@@ -68,7 +67,6 @@ export interface MessageParams extends MessageActions {
     deleteMessageEveryone: (conversation: Conversation, message: BaseMessage) => void;
   };
   messageRepository: MessageRepository;
-  onVisible?: () => void;
   onVisibilityLost?: () => void;
   selfId: QualifiedId;
   shouldShowInvitePeople: boolean;
@@ -88,7 +86,6 @@ export const Message = (props: MessageParams & {scrollTo?: ScrollToElement}) => 
     message,
     isHighlighted,
     hideHeader,
-    onVisible,
     onVisibilityLost,
     scrollTo,
     isFocused,
@@ -176,19 +173,7 @@ export const Message = (props: MessageParams & {scrollTo?: ScrollToElement}) => 
       onKeyDown={handleDivKeyDown}
       onClick={() => handleFocus(message.id)}
     >
-      {onVisible ? (
-        <InViewport
-          requireFullyInView
-          allowBiggerThanViewport
-          checkOverlay
-          onVisible={onVisible}
-          onVisibilityLost={onVisibilityLost}
-        >
-          {messageContent}
-        </InViewport>
-      ) : (
-        messageContent
-      )}
+      {messageContent}
     </div>
   );
 };
