@@ -42,7 +42,7 @@ import {showMoveToRecycleBinModal} from './showMoveToRecycleBinModal/showMoveToR
 import {showRestoreNodeModal} from './showRestoreNodeModal/showRestoreNodeModal';
 
 import {useCellsFilePreviewModal} from '../../common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
-import {showShareFileModal} from '../CellsNodeShareModal/CellsNodeShareModal';
+import {showShareModal} from '../CellsNodeShareModal/CellsNodeShareModal';
 
 interface CellsTableRowOptionsProps {
   node: CellNode;
@@ -177,7 +177,12 @@ const CellsTableRowOptionsContent = ({
         <DropdownMenu.Item onClick={() => setIsMoveNodeModalOpen(true)}>{t('cells.options.move')}</DropdownMenu.Item>
         <DropdownMenu.Item
           onClick={() =>
-            showShareFileModal({uuid: node.id, conversationId: conversationQualifiedId.id, cellsRepository})
+            showShareModal({
+              type: node.type,
+              uuid: node.id,
+              conversationId: conversationQualifiedId.id,
+              cellsRepository,
+            })
           }
         >
           {t('cells.options.share')}

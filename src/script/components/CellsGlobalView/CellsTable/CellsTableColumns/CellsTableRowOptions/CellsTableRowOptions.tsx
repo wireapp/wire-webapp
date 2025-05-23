@@ -28,7 +28,7 @@ import {buttonStyles, iconStyles, textStyles} from './CellsTableRowOptions.style
 
 import {CellNode} from '../../../common/cellNode/cellNode';
 import {useCellsFilePreviewModal} from '../../common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
-import {showShareNodeModal} from '../CellsShareFileModal/CellsShareFileModal';
+import {showShareModal} from '../CellsShareModal/CellsShareModal';
 
 interface CellsTableRowOptionsProps {
   node: CellNode;
@@ -51,7 +51,7 @@ export const CellsTableRowOptions = ({node, cellsRepository}: CellsTableRowOptio
         </button>
       </DropdownMenu.Trigger>
       <DropdownMenu.Content>
-        <DropdownMenu.Item onClick={() => showShareNodeModal({uuid: node.id, cellsRepository})}>
+        <DropdownMenu.Item onClick={() => showShareModal({type: node.type, uuid: node.id, cellsRepository})}>
           {t('cells.options.share')}
         </DropdownMenu.Item>
         <DropdownMenu.Item

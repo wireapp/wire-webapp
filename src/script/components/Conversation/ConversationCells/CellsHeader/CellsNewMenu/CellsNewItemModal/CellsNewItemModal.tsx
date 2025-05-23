@@ -27,7 +27,14 @@ import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {handleEscDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import {closeButtonStyles, headerStyles, headingStyles, wrapperStyles} from './CellsNewItemModal.styles';
+import {
+  closeButtonStyles,
+  descriptionStyles,
+  headerStyles,
+  headingStyles,
+  modalStyles,
+  wrapperStyles,
+} from './CellsNewItemModal.styles';
 
 import {CellNode} from '../../../common/cellNode/cellNode';
 
@@ -56,12 +63,14 @@ export const CellsNewItemModal = ({
       onClosed={onClose}
       onBgClick={onClose}
       onKeyDown={event => handleEscDown(event, onClose)}
+      wrapperCSS={modalStyles}
     >
       <div css={wrapperStyles}>
         <header css={headerStyles}>
           <h3 css={headingStyles}>
             {t(type === 'folder' ? 'cells.newItemMenuModal.headlineFolder' : 'cells.newItemMenuModal.headlineFile')}
           </h3>
+
           <IconButton
             variant={IconButtonVariant.SECONDARY}
             type="button"
@@ -72,6 +81,9 @@ export const CellsNewItemModal = ({
             <CloseIcon />
           </IconButton>
         </header>
+        <p css={descriptionStyles}>
+          {t(type === 'folder' ? 'cells.newItemMenuModal.descriptionFolder' : 'cells.newItemMenuModal.descriptionFile')}
+        </p>
         <CellsNewNodeForm
           type={type}
           cellsRepository={cellsRepository}
