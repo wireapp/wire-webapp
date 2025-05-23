@@ -30,13 +30,13 @@ export const showMoveToRecycleBinModal = ({
   onMoveToRecycleBin: (uuid: string) => void;
 }) => {
   PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-    primaryAction: {action: () => onMoveToRecycleBin(node.id), text: t('cellsMoveToRecycleBinModal.button')},
+    primaryAction: {action: () => onMoveToRecycleBin(node.id), text: t('cells.moveToRecycleBinModal.button')},
     text: {
       message: replaceReactComponents(
         t(
           node.type === 'file'
-            ? 'cellsMoveToRecycleBinModal.fileDescription'
-            : 'cellsMoveToRecycleBinModal.folderDescription',
+            ? 'cells.moveToRecycleBinModal.file.description'
+            : 'cellsMoveToRecycleBinModal.folder.description',
           {
             name: '{name}',
           },
@@ -50,8 +50,8 @@ export const showMoveToRecycleBinModal = ({
       ),
       title:
         node.type === 'file'
-          ? t('cellsMoveToRecycleBinModal.fileHeadline')
-          : t('cellsMoveToRecycleBinModal.folderHeadline'),
+          ? t('cellsMoveToRecycleBinModal.file.headline')
+          : t('cellsMoveToRecycleBinModal.folder.headline'),
     },
   });
 };
