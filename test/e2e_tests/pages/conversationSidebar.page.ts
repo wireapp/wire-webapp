@@ -17,20 +17,26 @@
  *
  */
 
-import {test as baseTest} from '@playwright/test';
+import {Page, Locator} from '@playwright/test';
 
-import {Backend} from './backend/backend';
+export class ConversationSidebar {
+  readonly page: Page;
 
-// Define custom test type with axios fixture
-type Fixtures = {
-  api: Backend;
-};
+  readonly personalStatusName: Locator;
+  readonly personalUserName: Locator;
 
-export const test = baseTest.extend<Fixtures>({
-  api: async ({request}, use) => {
-    // Create a new instance of Backend for each test
-    await use(new Backend());
-  },
-});
+  constructor(page: Page) {
+    this.page = page;
 
-export {expect} from '@playwright/test';
+    this.personalStatusName = page.locator('[data-uie-name="status-name"]');
+    this.personalUserName = page.locator('[data-uie-name="user-handle"]');
+  }
+
+  async getPersonalStatusName() {
+    return (await this.personalStatusName.textContent()) ?? '';
+  }
+
+  async getPersonalUserName() {
+    return (await this.personalUserName.textContent()) ?? '';
+  }
+}

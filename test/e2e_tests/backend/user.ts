@@ -28,12 +28,17 @@ export interface User {
   token: string | null;
 }
 
-export const getUser = (user: Partial<User> = {}): User => ({
-  ...user,
-  email: user?.email ?? faker.internet.email({lastName: user?.lastName, provider: 'wire.engineering'}).toLowerCase(),
-  password: user?.password ?? faker.internet.password({length: 8, pattern: /[A-Za-z\d!@#$]/}),
-  firstName: user?.firstName ?? faker.person.firstName(),
-  lastName: user?.lastName ?? faker.person.lastName(),
-  username: user?.username ?? `${user?.lastName}${faker.string.alpha({length: 5, casing: 'lower'})}`.toLowerCase(),
-  token: user?.token ?? null,
-});
+export const getUser = (user: Partial<User> = {}): User => {
+  const firstName = user.firstName ?? faker.person.firstName();
+  const lastName = user.lastName ?? faker.person.lastName();
+
+  return {
+    ...user,
+    email: user.email ?? faker.internet.email({lastName, provider: 'wire.engineering'}).toLowerCase(),
+    password: user.password ?? faker.internet.password({length: 8, pattern: /[A-Za-z\d!@#$]/}),
+    firstName,
+    lastName,
+    username: user.username ?? `${lastName}${faker.string.alpha({length: 5, casing: 'lower'})}`.toLowerCase(),
+    token: user.token ?? null,
+  };
+};

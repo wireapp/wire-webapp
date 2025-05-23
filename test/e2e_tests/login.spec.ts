@@ -18,6 +18,7 @@
  */
 
 import {User, getUser} from './backend/user';
+import {ConversationSidebar} from './pages/conversationSidebar.page';
 import {DataShareConsentModal} from './pages/dataShareConsentModal.page';
 import {LoginPage} from './pages/login.page';
 import {WelcomePage} from './pages/welcome.page';
@@ -55,15 +56,17 @@ test('Verify you can sign in by username', {tag: ['@TC-3461', '@regression']}, a
   const welcomePage = new WelcomePage(page);
   const loginPage = new LoginPage(page);
   const dataShareConsentModal = new DataShareConsentModal(page);
+  const conversationSidebar = new ConversationSidebar(page);
 
   await page.goto(webAppPath);
   await welcomePage.clickLogin();
   await loginPage.inputEmail(user.email);
   await loginPage.inputPassword(user.password);
   await loginPage.clickSignInButton();
-
-  expect(await dataShareConsentModal.isModalPresent());
   await dataShareConsentModal.clickDecline();
+
+  expect(await conversationSidebar.getPersonalStatusName()).toBe(`${user.firstName} ${user.lastName}`);
+  expect(await conversationSidebar.getPersonalUserName()).toContain(user.username);
 });
 
 test.afterAll(async ({api}) => {
