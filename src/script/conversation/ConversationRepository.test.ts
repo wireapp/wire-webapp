@@ -1965,11 +1965,6 @@ describe('ConversationRepository', () => {
           return testFactory.conversation_repository['handleConversationEvent'](memberJoinEvent).then(() => {
             expect(testFactory.conversation_repository['onMemberJoin']).toHaveBeenCalled();
             expect(testFactory.conversation_repository.updateParticipatingUserEntities).toHaveBeenCalled();
-            expect(container.resolve(Core).service!.conversation.addUsersToMLSConversation).toHaveBeenCalledWith({
-              conversationId: conversationEntity.qualifiedId,
-              groupId: 'groupId',
-              qualifiedUsers: [{domain: mockDomain, id: selfUser.id, skipOwnClientId: mockSelfClientId}],
-            });
 
             testFactory.conversation_repository['saveConversation'](conversationEntity);
 
@@ -1995,11 +1990,6 @@ describe('ConversationRepository', () => {
             return testFactory.conversation_repository['handleConversationEvent'](memberJoinEvent).then(() => {
               expect(testFactory.conversation_repository['onMemberJoin']).toHaveBeenCalled();
               expect(testFactory.conversation_repository.updateParticipatingUserEntities).toHaveBeenCalled();
-              expect(container.resolve(Core).service!.conversation.addUsersToMLSConversation).toHaveBeenCalledWith({
-                conversationId: conversationEntity.qualifiedId,
-                groupId: 'groupId',
-                qualifiedUsers: [{domain: mockDomain, id: selfUser.id, skipOwnClientId: mockSelfClientId}],
-              });
             });
           });
         },

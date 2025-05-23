@@ -61,7 +61,7 @@ export const joinUnestablishedMixedConversation = async (
   shouldRetry = true,
 ) => {
   if (mixedConversation.epoch > 0) {
-    return initMLSGroupConversation(mixedConversation, {
+    return initMLSGroupConversation(mixedConversation, selfUserId, {
       core,
       onError: ({id}, error) =>
         mlsMigrationLogger.error(`Failed when joining a mls group of mixed conversation with id ${id}, error: `, error),

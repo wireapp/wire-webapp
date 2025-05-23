@@ -54,7 +54,7 @@ describe('MLSConversations', () => {
       jest.spyOn(core.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(false);
       jest.spyOn(core.service!.conversation, 'joinByExternalCommit');
 
-      await initMLSGroupConversations(mlsConversations, {core});
+      await initMLSGroupConversations(mlsConversations, new User(), {core});
 
       for (const conversation of mlsConversations) {
         expect(core.service?.conversation.joinByExternalCommit).toHaveBeenCalledWith(conversation.qualifiedId);
@@ -71,7 +71,7 @@ describe('MLSConversations', () => {
     jest.spyOn(core.service!.conversation!, 'mlsGroupExistsLocally').mockResolvedValue(true);
     jest.spyOn(core.service!.mls!, 'scheduleKeyMaterialRenewal');
 
-    await initMLSGroupConversations(mlsConversations, {core});
+    await initMLSGroupConversations(mlsConversations, new User(), {core});
 
     for (const conversation of mlsConversations) {
       expect(core.service!.mls!.scheduleKeyMaterialRenewal).toHaveBeenCalledWith(conversation.groupId);

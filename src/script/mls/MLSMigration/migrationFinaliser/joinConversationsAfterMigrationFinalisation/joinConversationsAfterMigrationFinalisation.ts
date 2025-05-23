@@ -23,6 +23,7 @@ import {Account} from '@wireapp/core';
 
 import {MLSConversation, isMLSConversation} from 'src/script/conversation/ConversationSelectors';
 import {Conversation} from 'src/script/entity/Conversation';
+import {User} from 'src/script/entity/User';
 import {initMLSGroupConversations} from 'src/script/mls/MLSConversations';
 
 /**
@@ -35,11 +36,13 @@ import {initMLSGroupConversations} from 'src/script/mls/MLSConversations';
 export const joinConversationsAfterMigrationFinalisation = async ({
   conversations,
   core,
+  selfUser,
   onSuccess,
   onError,
 }: {
   conversations: Conversation[];
   core: Account;
+  selfUser: User;
   onSuccess: (conversation: Conversation) => void;
   onError?: (conversation: Conversation, error: unknown) => void;
 }) => {
@@ -49,7 +52,11 @@ export const joinConversationsAfterMigrationFinalisation = async ({
   //we have to join the conversation with external commit and let user know that they might have missed some messages
   const alreadyMigratedConversations = filterGroupConversationsAlreadyMigratedToMLS(conversations);
 
-  await initMLSGroupConversations(alreadyMigratedConversations, {core, onSuccessfulJoin: onSuccess, onError});
+  await initMLSGroupConversations(alreadyMigratedConversations, selfUser, {
+    core,
+    onSuccessfulJoin: onSuccess,
+    onError,
+  });
 };
 
 const filterGroupConversationsAlreadyMigratedToMLS = (conversations: Conversation[]) => {
