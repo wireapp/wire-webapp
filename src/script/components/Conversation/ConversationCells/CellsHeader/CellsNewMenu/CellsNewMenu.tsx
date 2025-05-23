@@ -17,22 +17,20 @@
  *
  */
 
-import {KeyboardEvent, MouseEvent as ReactMouseEvent, useState} from 'react';
+import {useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {Button, ButtonVariant, PlusIcon} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, DropdownMenu, PlusIcon} from '@wireapp/react-ui-kit';
 
 import {CellsRepository} from 'src/script/cells/CellsRepository';
-import {showContextMenu} from 'src/script/ui/ContextMenu';
-import {isSpaceOrEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
-import {setContextMenuPosition} from 'Util/util';
 
 import {CellsNewItemModal} from './CellsNewItemModal/CellsNewItemModal';
 import {buttonStyles, iconStyles} from './CellsNewMenu.styles';
 
-import {CellItem} from '../../common/cellFile/cellFile';
+import {CellNode} from '../../common/cellNode/cellNode';
+import {getCellsFilesPath} from '../../common/getCellsFilesPath/getCellsFilesPath';
 
 interface CellsNewMenuProps {
   cellsRepository: CellsRepository;
@@ -42,51 +40,39 @@ interface CellsNewMenuProps {
 
 export const CellsNewMenu = ({cellsRepository, conversationQualifiedId, onRefresh}: CellsNewMenuProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalType, setModalType] = useState<CellItem['type']>('file');
+  const [modalType, setModalType] = useState<CellNode['type']>('file');
 
-  const openModal = (type: CellItem['type']) => {
+  const openModal = (type: CellNode['type']) => {
     setModalType(type);
     setIsModalOpen(true);
   };
 
-  const showOptionsMenu = (event: ReactMouseEvent<HTMLButtonElement> | MouseEvent) => {
-    showContextMenu({
-      event,
-      entries: [
-        {
-          label: t('cellsNewItemMenu.folder'),
-          click: () => openModal('folder'),
-        },
-        {
-          label: t('cellsNewItemMenu.file'),
-          click: () => openModal('file'),
-        },
-      ],
-      identifier: 'cells-new-menu',
-    });
-  };
-
-  const handleKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
-    if (isSpaceOrEnterKey(event.key)) {
-      const newEvent = setContextMenuPosition(event);
-      showOptionsMenu(newEvent);
-    }
-  };
-
   return (
     <>
-      <Button variant={ButtonVariant.TERTIARY} onKeyDown={handleKeyDown} onClick={showOptionsMenu} css={buttonStyles}>
-        <PlusIcon css={iconStyles} />
-        {t('cellsNewItemMenu.button')}
-      </Button>
+      <DropdownMenu>
+        <DropdownMenu.Trigger asChild>
+          <Button variant={ButtonVariant.TERTIARY} css={buttonStyles}>
+            <PlusIcon css={iconStyles} />
+            {t('cellsNewItemMenu.button')}
+          </Button>
+        </DropdownMenu.Trigger>
+        <DropdownMenu.Content>
+          <DropdownMenu.Item onClick={() => openModal('folder')}>{t('cellsNewItemMenu.folder')}</DropdownMenu.Item>
+          <DropdownMenu.Item onClick={() => openModal('file')}>{t('cellsNewItemMenu.file')}</DropdownMenu.Item>
+        </DropdownMenu.Content>
+      </DropdownMenu>
       {isModalOpen && (
         <CellsNewItemModal
           type={modalType}
+          currentPath={getCellsFilesPath()}
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           cellsRepository={cellsRepository}
           conversationQualifiedId={conversationQualifiedId}
-          onRefresh={onRefresh}
+          onSuccess={() => {
+            onRefresh();
+            setIsModalOpen(false);
+          }}
         />
       )}
     </>

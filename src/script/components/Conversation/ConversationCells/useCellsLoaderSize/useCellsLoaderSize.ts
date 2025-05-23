@@ -19,15 +19,15 @@
 
 import {useCallback, useState} from 'react';
 
-import {CellItem} from '../common/cellFile/cellFile';
+import {CellNode} from '../common/cellNode/cellNode';
 
 interface UseCellsLoaderSizeProps {
-  files: CellItem[];
+  nodes: CellNode[];
 }
 
-export const useCellsLoaderSize = ({files}: UseCellsLoaderSizeProps) => {
+export const useCellsLoaderSize = ({nodes}: UseCellsLoaderSizeProps) => {
   const [loaderHeight, setLoaderHeight] = useState<number | undefined>(() => {
-    if (files) {
+    if (nodes) {
       return undefined;
     }
     return 0;
