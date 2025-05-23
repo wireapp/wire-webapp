@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.55.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.54.0...@wireapp/api-client@27.55.0) (2025-05-23)
+
+### Features
+
+* **api-client:** bump cells-sdk to v0.1.1-alpha11 ([#7054](https://github.com/wireapp/wire-web-packages/issues/7054)) ([83bb710](https://github.com/wireapp/wire-web-packages/commit/83bb7100eb719588c1c45b4cc48c9cfb5614cf36))
+
 # [27.54.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.53.1...@wireapp/api-client@27.54.0) (2025-05-19)
 
 ### Features
