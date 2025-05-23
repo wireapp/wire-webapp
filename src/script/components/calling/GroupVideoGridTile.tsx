@@ -234,7 +234,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
 
       {nameContainer}
 
-      {(hasPausedVideo || isSwitchingVideoResolution) && (
+      {(hasPausedVideo || isSwitchingVideoResolution || doVideoReconnecting) && (
         <div className="group-video-grid__pause-overlay">
           <div className="background">
             <div className="background-image"></div>
@@ -247,23 +247,6 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
             data-uie-name="status-video-paused"
           >
             {hasPausedVideo ? t('videoCallPaused') : t('videoCallParticipantConnecting')}
-          </div>
-          {nameContainer}
-        </div>
-      )}
-      {doVideoReconnecting && (
-        <div className="group-video-grid__pause-overlay">
-          <div className="background">
-            <div className="background-image"></div>
-            <div className="background-darken"></div>
-          </div>
-
-          <div
-            className="group-video-grid__pause-overlay__label"
-            css={{fontsize: minimized ? '0.6875rem' : '0.875rem'}}
-            data-uie-name="status-video-paused"
-          >
-            {t('videoCallParticipantConnecting')}
           </div>
           {nameContainer}
         </div>
