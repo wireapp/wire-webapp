@@ -25,7 +25,7 @@ const BACKEND_URL = process.env.BACKEND_URL;
 const BASIC_AUTH = process.env.BASIC_AUTH;
 
 export class Backend {
-  private axiosInstance: AxiosInstance;
+  private readonly axiosInstance: AxiosInstance;
 
   constructor() {
     this.axiosInstance = axios.create({

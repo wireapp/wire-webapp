@@ -22,7 +22,7 @@ import {config} from 'dotenv';
 
 config({path: './test/e2e_tests/.env'});
 
-const browserList = (process.env.BROWSERS || 'chromium')
+const browserList = (process.env.BROWSERS ?? 'chromium')
   .split(',')
   .map(browser => browser.trim())
   .filter(browser => ['chromium', 'firefox', 'webkit'].includes(browser)) as ('chromium' | 'firefox' | 'webkit')[];
