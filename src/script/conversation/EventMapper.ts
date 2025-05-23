@@ -866,9 +866,11 @@ export class EventMapper {
 
   _mapAsset(event: LegacyEventRecord) {
     const eventData = event.data;
-    const assetInfo = eventData.info;
-    const isMediumImage = assetInfo && assetInfo.tag === 'medium';
-    return isMediumImage ? this._mapAssetImage(event) : this._mapAssetFile(event);
+    const category = event.category;
+    const isFile = category === 512;
+    const mimeType = eventData.content_type;
+    const isImage = mimeType && mimeType.startsWith('image/');
+    return isImage && !isFile ? this._mapAssetImage(event) : this._mapAssetFile(event);
   }
 
   /**
