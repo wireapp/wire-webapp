@@ -17,17 +17,14 @@
  *
  */
 
-import {KeyboardEvent, MouseEvent as ReactMouseEvent, useState} from 'react';
+import {useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {Button, ButtonVariant, PlusIcon} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, DropdownMenu, PlusIcon} from '@wireapp/react-ui-kit';
 
 import {CellsRepository} from 'src/script/cells/CellsRepository';
-import {showContextMenu} from 'src/script/ui/ContextMenu';
-import {isSpaceOrEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
-import {setContextMenuPosition} from 'Util/util';
 
 import {CellsNewItemModal} from './CellsNewItemModal/CellsNewItemModal';
 import {buttonStyles, iconStyles} from './CellsNewMenu.styles';
@@ -50,36 +47,20 @@ export const CellsNewMenu = ({cellsRepository, conversationQualifiedId, onRefres
     setIsModalOpen(true);
   };
 
-  const showOptionsMenu = (event: ReactMouseEvent<HTMLButtonElement> | MouseEvent) => {
-    showContextMenu({
-      event,
-      entries: [
-        {
-          label: t('cells.newItemMenu.folder'),
-          click: () => openModal('folder'),
-        },
-        {
-          label: t('cells.newItemMenu.file'),
-          click: () => openModal('file'),
-        },
-      ],
-      identifier: 'cells-new-menu',
-    });
-  };
-
-  const handleKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
-    if (isSpaceOrEnterKey(event.key)) {
-      const newEvent = setContextMenuPosition(event);
-      showOptionsMenu(newEvent);
-    }
-  };
-
   return (
     <>
-      <Button variant={ButtonVariant.TERTIARY} onKeyDown={handleKeyDown} onClick={showOptionsMenu} css={buttonStyles}>
-        <PlusIcon css={iconStyles} />
-        {t('cells.newItemMenu.button')}
-      </Button>
+      <DropdownMenu>
+        <DropdownMenu.Trigger asChild>
+          <Button variant={ButtonVariant.TERTIARY} css={buttonStyles}>
+            <PlusIcon css={iconStyles} />
+            {t('cells.newItemMenu.button')}
+          </Button>
+        </DropdownMenu.Trigger>
+        <DropdownMenu.Content>
+          <DropdownMenu.Item onClick={() => openModal('folder')}>{t('cells.newItemMenu.folder')}</DropdownMenu.Item>
+          <DropdownMenu.Item onClick={() => openModal('file')}>{t('cells.newItemMenu.file')}</DropdownMenu.Item>
+        </DropdownMenu.Content>
+      </DropdownMenu>
       {isModalOpen && (
         <CellsNewItemModal
           type={modalType}
