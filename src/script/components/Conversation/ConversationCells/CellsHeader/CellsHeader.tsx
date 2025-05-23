@@ -22,6 +22,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 
 import {actionsStyles, contentStyles, wrapperStyles} from './CellsHeader.styles';
+import {CellsMoreMenu} from './CellsMoreMenu/CellsMoreMenu';
 import {CellsNewMenu} from './CellsNewMenu/CellsNewMenu';
 import {CellsRefresh} from './CellsRefresh/CellsRefresh';
 
@@ -68,6 +69,7 @@ export const CellsHeader = ({
             onRefresh={onRefresh}
           />
           <CellsRefresh onRefresh={onRefresh} />
+          <CellsMoreMenu conversationQualifiedId={conversationQualifiedId} />
         </div>
       </div>
     </div>

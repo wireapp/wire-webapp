@@ -17,17 +17,22 @@
  *
  */
 
-export const getBreadcrumbsFromPath = ({baseCrumb, currentPath}: {baseCrumb: string; currentPath: string}) => {
-  const segments = currentPath.split('/').filter(Boolean);
+export const RECYCLE_BIN_PATH = 'recycle_bin';
 
-  return [
-    {
-      name: baseCrumb,
-      path: '',
-    },
-    ...segments.map((segment, index) => ({
-      name: segment,
-      path: segments.slice(0, index + 1).join('/'),
-    })),
-  ];
+export const isRootRecycleBinPath = () => {
+  const hash = window.location.hash.replace('#', '');
+
+  const parts = hash.split('/files/');
+
+  const path = decodeURIComponent(parts[1]);
+
+  return path === RECYCLE_BIN_PATH;
+};
+
+export const isInRecycleBin = () => {
+  const hash = window.location.hash.replace('#', '');
+
+  const parts = hash.split('/files/');
+
+  return parts[1]?.includes(RECYCLE_BIN_PATH);
 };

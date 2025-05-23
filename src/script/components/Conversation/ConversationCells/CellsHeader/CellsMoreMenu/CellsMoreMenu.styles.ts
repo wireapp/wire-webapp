@@ -19,47 +19,12 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const wrapperStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  gap: '8px',
-  width: '100%',
-  padding: '0 16px',
-  marginBottom: '24px',
-};
-
-export const textStyles: CSSObject = {
-  fontSize: 'var(--font-size-medium)',
-};
-
 export const buttonStyles: CSSObject = {
-  background: 'none',
-  border: 'none',
-  padding: '0 8px',
-  cursor: 'pointer',
-  fontSize: 'var(--font-size-medium)',
-  color: 'var(--gray-70)',
+  marginBottom: '0',
+};
+
+export const itemStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
   gap: '8px',
-
-  '&:hover': {
-    color: 'var(--main-color)',
-  },
-};
-
-export const activeItemStyles: CSSObject = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: '8px',
-  padding: '0 8px',
-  fontSize: 'var(--font-size-medium)',
-  color: 'var(--main-color)',
-  height: '32px',
-  margin: '0',
-};
-
-export const iconStyles: CSSObject = {
-  marginRight: '8px',
 };

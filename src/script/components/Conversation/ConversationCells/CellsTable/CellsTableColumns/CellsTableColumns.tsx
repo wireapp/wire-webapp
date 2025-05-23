@@ -37,12 +37,10 @@ export const getCellsTableColumns = ({
   cellsRepository,
   conversationQualifiedId,
   conversationName,
-  onDeleteNode,
 }: {
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
   conversationName: string;
-  onDeleteNode: (uuid: string) => void;
 }) => [
   columnHelper.accessor('name', {
     header: t('cellsGlobalView.tableRowName'),
@@ -75,7 +73,6 @@ export const getCellsTableColumns = ({
       return (
         <CellsTableRowOptions
           node={info.row.original}
-          onDelete={uuid => onDeleteNode(uuid)}
           cellsRepository={cellsRepository}
           conversationQualifiedId={conversationQualifiedId}
           conversationName={conversationName}

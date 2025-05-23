@@ -105,8 +105,8 @@ export class CellsRepository {
     return this.apiClient.api.cells.deleteNodeDraft({uuid, versionId});
   }
 
-  async deleteNode({uuid}: {uuid: string}) {
-    return this.apiClient.api.cells.deleteNode({uuid});
+  async deleteNode({uuid, permanently = false}: {uuid: string; permanently?: boolean}) {
+    return this.apiClient.api.cells.deleteNode({uuid, permanently});
   }
 
   async moveNode({currentPath, targetPath}: {currentPath: string; targetPath: string}) {
@@ -179,5 +179,9 @@ export class CellsRepository {
 
   async promoteNodeDraft({uuid, versionId}: {uuid: string; versionId: string}) {
     return this.apiClient.api.cells.promoteNodeDraft({uuid, versionId});
+  }
+
+  async restoreNode({uuid}: {uuid: string}) {
+    return this.apiClient.api.cells.restoreNode({uuid});
   }
 }
