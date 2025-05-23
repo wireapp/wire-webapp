@@ -74,7 +74,7 @@ export const CellsPagination = ({
     <FlexBox css={containerStyles}>
       <p css={pageResultStyles}>
         {totalRows && lastRow
-          ? t('cellsGlobalView.pagination.resultsOutOf', {start: firstRow, end: lastRow, total: totalRows})
+          ? t('cells.pagination.resultsOutOf', {start: firstRow, end: lastRow, total: totalRows})
           : null}
       </p>
       {numberOfPages > 1 && (
@@ -86,8 +86,8 @@ export const CellsPagination = ({
               disabled={isFirstPage}
               aria-disabled={isFirstPage}
               css={arrowButtonStyles}
-              aria-label={t('cellsGlobalView.pagination.previousPage')}
-              title={t('cellsGlobalView.pagination.previousPage')}
+              aria-label={t('cells.pagination.previousPage')}
+              title={t('cells.pagination.previousPage')}
             >
               <Icon.ArrowNextIcon css={isFirstPage ? arrowPreviousIconDisabledStyles : arrowPreviousIconStyles} />
             </IconButton>
@@ -102,8 +102,8 @@ export const CellsPagination = ({
               disabled={isLastPage}
               aria-disabled={isLastPage}
               css={arrowButtonStyles}
-              aria-label={t('cellsGlobalView.pagination.nextPage')}
-              title={t('cellsGlobalView.pagination.nextPage')}
+              aria-label={t('cells.pagination.nextPage')}
+              title={t('cells.pagination.nextPage')}
             >
               <Icon.ArrowNextIcon css={isLastPage ? arrowNextIconDisabledStyles : arrowNextIconStyles} />
             </IconButton>

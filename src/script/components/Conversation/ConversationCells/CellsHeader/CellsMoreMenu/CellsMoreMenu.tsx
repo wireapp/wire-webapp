@@ -51,7 +51,7 @@ export const CellsMoreMenu = ({conversationQualifiedId}: CellsMoreMenuProps) => 
         >
           <div css={itemStyles}>
             <TrashIcon />
-            {t('cellsRecycleBin.moreMenu')}
+            {t('cells.recycleBin.moreMenu')}
           </div>
         </DropdownMenu.Item>
       </DropdownMenu.Content>

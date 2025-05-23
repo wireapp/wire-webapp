@@ -33,7 +33,7 @@ export const CellsRefresh = ({onRefresh}: CellsRefreshProps) => {
       variant={IconButtonVariant.PRIMARY}
       onClick={onRefresh}
       css={buttonStyles}
-      aria-label={t('cellsGlobalView.refreshButton')}
+      aria-label={t('cells.refreshButton')}
     >
       <ReloadIcon />
     </IconButton>

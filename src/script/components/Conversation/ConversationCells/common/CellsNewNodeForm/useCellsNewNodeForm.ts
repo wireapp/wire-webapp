@@ -61,9 +61,9 @@ export const useCellsNewItemForm = ({
       onSuccess();
     } catch (error) {
       if (isAxiosError(error) && error.response?.status === ITEM_ALREADY_EXISTS_ERROR) {
-        setError(t('cellNewItemMenuModalForm.alreadyExistsError'));
+        setError(t('cells.newItemMenuModalForm.alreadyExistsError'));
       } else {
-        setError(t('cellNewItemMenuModalForm.genericError'));
+        setError(t('cells.newItemMenuModalForm.genericError'));
       }
     }
   };
@@ -79,7 +79,7 @@ export const useCellsNewItemForm = ({
     setIsSubmitting(true);
 
     if (!name.trim()) {
-      setError(t('cellNewItemMenuModalForm.nameRequired'));
+      setError(t('cells.newItemMenuModalForm.nameRequired'));
       setIsSubmitting(false);
       return;
     }
@@ -93,7 +93,7 @@ export const useCellsNewItemForm = ({
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     setName(event.currentTarget.value);
-    if (error === t('cellNewItemMenuModalForm.nameRequired')) {
+    if (error === t('cells.newItemMenuModalForm.nameRequired')) {
       setError(null);
     }
   };

@@ -53,12 +53,12 @@ export const CellsNewMenu = ({cellsRepository, conversationQualifiedId, onRefres
         <DropdownMenu.Trigger asChild>
           <Button variant={ButtonVariant.TERTIARY} css={buttonStyles}>
             <PlusIcon css={iconStyles} />
-            {t('cellsNewItemMenu.button')}
+            {t('cells.newItemMenu.button')}
           </Button>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content>
-          <DropdownMenu.Item onClick={() => openModal('folder')}>{t('cellsNewItemMenu.folder')}</DropdownMenu.Item>
-          <DropdownMenu.Item onClick={() => openModal('file')}>{t('cellsNewItemMenu.file')}</DropdownMenu.Item>
+          <DropdownMenu.Item onClick={() => openModal('file')}>{t('cells.newItemMenu.file')}</DropdownMenu.Item>
+          <DropdownMenu.Item onClick={() => openModal('folder')}>{t('cells.newItemMenu.folder')}</DropdownMenu.Item>
         </DropdownMenu.Content>
       </DropdownMenu>
       {isModalOpen && (

@@ -87,7 +87,7 @@ export const ImageAssetLarge = ({
             {isError && (
               <>
                 <UnavailableFileIcon css={errorIconStyles} width={14} height={14} />
-                <p css={errorTextStyles}>{t('cellsUnavailableFile')}</p>
+                <p css={errorTextStyles}>{t('cells.unavailableFile')}</p>
               </>
             )}
           </div>

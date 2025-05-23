@@ -96,7 +96,7 @@ export const CellsImagePreviewModal = ({imageSrc}: CellsImagePreviewModalProps) 
           <button
             type="button"
             className="detail-view-header-close-button icon-button"
-            aria-label={t('cellsGlobalView.imageFullScreenModalCloseButton')}
+            aria-label={t('cells.imageFullScreenModal.closeButton')}
             onClick={onCloseClick}
             data-uie-name="do-close-detail-view"
           >
