@@ -54,14 +54,14 @@ export const CellsNewItemModal = ({
       <div css={wrapperStyles}>
         <header css={headerStyles}>
           <h3 css={headingStyles}>
-            {t(type === 'folder' ? 'cellNewItemMenuModal.headlineFolder' : 'cellNewItemMenuModal.headlineFile')}
+            {t(type === 'folder' ? 'cells.newItemMenuModal.headlineFolder' : 'cells.newItemMenuModal.headlineFile')}
           </h3>
           <IconButton
             variant={IconButtonVariant.SECONDARY}
             type="button"
             css={closeButtonStyles}
             onClick={onClose}
-            aria-label={t('cellNewItemMenuModal.closeButton')}
+            aria-label={t('cells.newItemMenuModal.closeButton')}
           >
             <CloseIcon />
           </IconButton>

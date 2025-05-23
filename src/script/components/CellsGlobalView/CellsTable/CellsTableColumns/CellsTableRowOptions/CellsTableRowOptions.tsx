@@ -45,19 +45,19 @@ export const CellsTableRowOptions = ({node, cellsRepository}: CellsTableRowOptio
   return (
     <DropdownMenu>
       <DropdownMenu.Trigger asChild>
-        <button css={buttonStyles} aria-label={t('cellsGlobalView.optionsLabel')}>
+        <button css={buttonStyles} aria-label={t('cells.options.label')}>
           <MoreIcon css={iconStyles} />
-          <span css={textStyles}>{t('cellsGlobalView.optionsLabel')}</span>
+          <span css={textStyles}>{t('cells.options.label')}</span>
         </button>
       </DropdownMenu.Trigger>
       <DropdownMenu.Content>
         <DropdownMenu.Item onClick={() => showShareNodeModal({uuid: node.id, cellsRepository})}>
-          {t('cellsGlobalView.optionShare')}
+          {t('cells.options.share')}
         </DropdownMenu.Item>
         <DropdownMenu.Item
           onClick={() => (node.type === 'folder' ? openFolder({path: node.path}) : handleOpenFile(node))}
         >
-          {t('cellsGlobalView.optionOpen')}
+          {t('cells.options.open')}
         </DropdownMenu.Item>
         {url && (
           <DropdownMenu.Item
@@ -68,7 +68,7 @@ export const CellsTableRowOptions = ({node, cellsRepository}: CellsTableRowOptio
               })
             }
           >
-            {t('cellsGlobalView.optionDownload')}
+            {t('cells.options.download')}
           </DropdownMenu.Item>
         )}
       </DropdownMenu.Content>

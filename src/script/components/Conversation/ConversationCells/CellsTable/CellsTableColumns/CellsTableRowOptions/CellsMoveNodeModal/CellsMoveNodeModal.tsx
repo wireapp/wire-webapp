@@ -66,7 +66,7 @@ export const CellsMoveNodeModal = ({
         <CellsMoveNodeModalHeader
           onClose={onClose}
           title={
-            activeModalContent === 'move' ? t('cellsMoveNodeModal.moveTitle') : t('cellsMoveNodeModal.createTitle')
+            activeModalContent === 'move' ? t('cells.moveNodeModal.moveTitle') : t('cells.moveNodeModal.createTitle')
           }
         />
         {activeModalContent === 'move' ? (

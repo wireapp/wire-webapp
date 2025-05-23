@@ -57,12 +57,14 @@ export const CellsNewNodeForm = ({
   return (
     <form onSubmit={handleSubmit}>
       <div css={inputWrapperStyles}>
-        <Label htmlFor="cells-new-item-name">{t('cellNewItemMenuModal.label')}</Label>
+        <Label htmlFor="cells-new-item-name">{t('cells.newItemMenuModal.label')}</Label>
         <Input
           id="cells-new-item-name"
           value={name}
           placeholder={
-            type === 'folder' ? t('cellNewItemMenuModal.placeholderFolder') : t('cellNewItemMenuModal.placeholderFile')
+            type === 'folder'
+              ? t('cells.newItemMenuModal.placeholderFolder')
+              : t('cells.newItemMenuModal.placeholderFile')
           }
           onChange={handleChange}
           error={error ? <ErrorMessage>{error}</ErrorMessage> : undefined}
@@ -70,10 +72,10 @@ export const CellsNewNodeForm = ({
       </div>
       <div css={buttonWrapperStyles}>
         <Button variant={ButtonVariant.SECONDARY} onClick={onSecondaryButtonClick} css={buttonStyles}>
-          {t('cellNewItemMenuModal.secondaryAction')}
+          {t('cells.newItemMenuModal.secondaryAction')}
         </Button>
         <Button variant={ButtonVariant.PRIMARY} type="submit" css={buttonStyles} disabled={isSubmitting}>
-          {t('cellNewItemMenuModal.primaryAction')}
+          {t('cells.newItemMenuModal.primaryAction')}
         </Button>
       </div>
     </form>

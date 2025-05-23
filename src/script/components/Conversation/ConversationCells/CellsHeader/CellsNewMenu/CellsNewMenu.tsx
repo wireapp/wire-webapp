@@ -55,11 +55,11 @@ export const CellsNewMenu = ({cellsRepository, conversationQualifiedId, onRefres
       event,
       entries: [
         {
-          label: t('cellsNewItemMenu.folder'),
+          label: t('cells.newItemMenu.folder'),
           click: () => openModal('folder'),
         },
         {
-          label: t('cellsNewItemMenu.file'),
+          label: t('cells.newItemMenu.file'),
           click: () => openModal('file'),
         },
       ],
@@ -78,7 +78,7 @@ export const CellsNewMenu = ({cellsRepository, conversationQualifiedId, onRefres
     <>
       <Button variant={ButtonVariant.TERTIARY} onKeyDown={handleKeyDown} onClick={showOptionsMenu} css={buttonStyles}>
         <PlusIcon css={iconStyles} />
-        {t('cellsNewItemMenu.button')}
+        {t('cells.newItemMenu.button')}
       </Button>
       {isModalOpen && (
         <CellsNewItemModal

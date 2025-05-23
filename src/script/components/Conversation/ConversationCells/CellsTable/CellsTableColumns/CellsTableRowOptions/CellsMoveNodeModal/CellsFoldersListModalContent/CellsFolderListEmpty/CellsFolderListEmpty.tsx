@@ -24,7 +24,7 @@ import {textStyles, wrapperStyles} from './CellsFolderListEmpty.styles';
 export const CellsFolderListEmpty = () => {
   return (
     <div css={wrapperStyles}>
-      <p css={textStyles}>{t('cellsMoveNodeModal.emptyList')}</p>
+      <p css={textStyles}>{t('cells.moveNodeModal.emptyList')}</p>
     </div>
   );
 };

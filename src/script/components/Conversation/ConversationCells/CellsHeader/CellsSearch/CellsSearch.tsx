@@ -55,8 +55,8 @@ export const CellsSearch = ({searchValue, onSearch, onClearSearch}: CellsSearchP
     <form css={wrapperStyles} onSubmit={handleSubmit}>
       <Input
         value={searchValue}
-        placeholder={t('cellsGlobalView.searchPlaceholder')}
-        aria-label={t('cellsGlobalView.searchPlaceholder')}
+        placeholder={t('cells.search.placeholder')}
+        aria-label={t('cells.search.placeholder')}
         name="cells-global-view-search"
         onChange={event => onSearch(event.currentTarget.value)}
         startContent={<SearchIcon width={14} height={14} css={searchIconStyles} />}
@@ -67,7 +67,7 @@ export const CellsSearch = ({searchValue, onSearch, onClearSearch}: CellsSearchP
                 type="button"
                 onClick={onClearSearch}
                 css={closeButtonStyles}
-                aria-label={t('cellsGlobalView.searchCloseButton')}
+                aria-label={t('cells.search.closeButton')}
               >
                 <CircleCloseIcon className="cursor-pointer" css={closeIconStyles} />
               </button>

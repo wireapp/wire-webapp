@@ -59,10 +59,10 @@ export const CellsTableRowOptions = ({
   const showDeleteFileModal = useCallback(
     ({uuid, name}: {uuid: string; name: string}) => {
       PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-        primaryAction: {action: () => onDelete(uuid), text: t('cellsGlobalView.optionDelete')},
+        primaryAction: {action: () => onDelete(uuid), text: t('cells.options.delete')},
         text: {
-          message: t('cellsGlobalView.deleteModalDescription', {name}),
-          title: t('cellsGlobalView.deleteModalHeading'),
+          message: t('cells.deleteModal.description', {name}),
+          title: t('cells.deleteModal.heading'),
         },
       });
     },
@@ -77,10 +77,10 @@ export const CellsTableRowOptions = ({
   };
 
   const showOptionsMenu = (event: ReactMouseEvent<HTMLButtonElement> | MouseEvent) => {
-    const openLabel = t('cellsGlobalView.optionOpen');
-    const shareLabel = t('cellsGlobalView.optionShare');
-    const downloadLabel = t('cellsGlobalView.optionDownload');
-    const deleteLabel = t('cellsGlobalView.optionDelete');
+    const openLabel = t('cells.options.open');
+    const shareLabel = t('cells.options.share');
+    const downloadLabel = t('cells.options.download');
+    const deleteLabel = t('cells.options.delete');
 
     const url = node.url;
     const name = getDownloadName(node);
@@ -130,13 +130,13 @@ export const CellsTableRowOptions = ({
         css={buttonStyles}
         onKeyDown={handleKeyDown}
         onClick={showOptionsMenu}
-        aria-label={t('cellsGlobalView.optionsLabel')}
+        aria-label={t('cells.options.label')}
         aria-controls={id}
         aria-expanded={!!selectedFile}
         aria-haspopup="dialog"
       >
         <MoreIcon css={iconStyles} />
-        <span css={textStyles}>{t('cellsGlobalView.optionsLabel')}</span>
+        <span css={textStyles}>{t('cells.options.label')}</span>
       </button>
       <CellsMoveNodeModal
         nodeToMove={node}
