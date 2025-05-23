@@ -27,3 +27,10 @@ yarn-error.log
 
 yalc.lock
 .yalc
+
+# playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/test/e2e_tests/.env
