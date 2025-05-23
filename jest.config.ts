@@ -39,7 +39,7 @@ const config: Config = {
   testEnvironmentOptions: {
     customExportConditions: ['node', 'node-addons'],
   },
-  testPathIgnorePatterns: ['<rootDir>/server'],
+  testPathIgnorePatterns: ['<rootDir>/server', '<rootDir>/.yalc'],
   testRegex: '(test|Spec)\\.[tj]sx?$',
   testRunner: 'jest-jasmine2',
 };

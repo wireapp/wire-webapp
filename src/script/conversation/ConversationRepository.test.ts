@@ -33,7 +33,6 @@ import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
 import {
   ConversationProtocolUpdateEvent,
-  ConversationMemberLeaveEvent,
   ConversationCreateEvent,
   ConversationMemberJoinEvent,
   CONVERSATION_EVENT,
@@ -3164,19 +3163,12 @@ describe('ConversationRepository', () => {
 
       jest
         .spyOn(coreConversationService, 'removeUsersFromMLSConversation')
-        .mockResolvedValueOnce({events: [], conversation: {} as BackendConversation});
+        .mockResolvedValueOnce({} as BackendConversation);
       jest.spyOn(conversationRepository['eventRepository'], 'injectEvent').mockImplementation(jest.fn());
 
-      const mockedMemberLeaveEvent: ConversationMemberLeaveEvent = {
-        conversation: conversation.id,
-        data: {qualified_user_ids: [], user_ids: []},
-        from: '',
-        time: '',
-        type: CONVERSATION_EVENT.MEMBER_LEAVE,
-      };
       jest
         .spyOn(coreConversationService, 'removeUsersFromMLSConversation')
-        .mockResolvedValueOnce({events: [mockedMemberLeaveEvent], conversation: {} as BackendConversation});
+        .mockResolvedValueOnce({} as BackendConversation);
       await conversationRepository.removeMembers(conversation, [user1.qualifiedId]);
 
       expect(coreConversationService.removeUsersFromMLSConversation).toHaveBeenCalledWith({
