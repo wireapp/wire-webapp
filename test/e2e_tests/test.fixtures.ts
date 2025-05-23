@@ -27,7 +27,7 @@ type Fixtures = {
 };
 
 export const test = baseTest.extend<Fixtures>({
-  api: async ({}, use) => {
+  api: async (_, use) => {
     // Create a new instance of Backend for each test
     await use(new Backend());
   },
