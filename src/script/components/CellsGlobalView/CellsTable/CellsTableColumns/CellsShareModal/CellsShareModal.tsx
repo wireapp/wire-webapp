@@ -33,27 +33,28 @@ import {
   switchContainerStyles,
   switchWrapperStyles,
   wrapperStyles,
-} from './CellsShareFileModal.styles';
+} from './CellsShareModal.styles';
 import {useCellPublicLink} from './useCellPublicLink';
 
 import {CellsTableLoader} from '../../../common/CellsTableLoader/CellsTableLoader';
 
-interface ShareFileModalParams {
+interface ShareModalParams {
+  type: 'file' | 'folder';
   uuid: string;
   cellsRepository: CellsRepository;
 }
 
-export const showShareNodeModal = ({uuid, cellsRepository}: ShareFileModalParams) => {
+export const showShareModal = ({type, uuid, cellsRepository}: ShareModalParams) => {
   PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-    primaryAction: {action: () => {}, text: t('cellsGlobalView.shareFileModalPrimaryAction')},
+    primaryAction: {action: () => {}, text: t('cells.shareModal.primaryAction')},
     text: {
-      message: <CellsShareFileModalContent uuid={uuid} cellsRepository={cellsRepository} />,
-      title: t('cellsGlobalView.shareFileModalHeading'),
+      message: <CellsShareModalContent type={type} uuid={uuid} cellsRepository={cellsRepository} />,
+      title: t('cells.shareModal.heading'),
     },
   });
 };
 
-const CellsShareFileModalContent = ({uuid, cellsRepository}: ShareFileModalParams) => {
+const CellsShareModalContent = ({type, uuid, cellsRepository}: ShareModalParams) => {
   const {status, link, isEnabled, togglePublicLink} = useCellPublicLink({uuid, cellsRepository});
 
   const isInputDisabled = ['loading', 'error'].includes(status);
@@ -63,10 +64,14 @@ const CellsShareFileModalContent = ({uuid, cellsRepository}: ShareFileModalParam
       <div css={switchContainerStyles}>
         <div>
           <Label htmlFor="switch-public-link" css={labelStyles}>
-            {t('cellsGlobalView.shareFileModalEnablePublicLink')}
+            {t('cells.shareModal.enablePublicLink')}
           </Label>
           <p id="switch-public-link-description" css={publicLinkDescriptionStyles}>
-            {t('cellsGlobalView.shareFileModalEnablePublicLinkDescription')}
+            {t(
+              type === 'file'
+                ? 'cells.shareModal.enablePublicLink.file.description'
+                : 'cells.shareModal.enablePublicLink.folder.description',
+            )}
           </p>
         </div>
         <div css={switchWrapperStyles}>
@@ -82,13 +87,13 @@ const CellsShareFileModalContent = ({uuid, cellsRepository}: ShareFileModalParam
       {isEnabled && status === 'success' && link && (
         <div css={inputWrapperStyles}>
           <label htmlFor="generated-public-link" className="visually-hidden">
-            {t('cellsGlobalView.shareFileModalGeneratedPublicLink')}
+            {t('cells.shareModal.generatedPublicLink')}
           </label>
           <Input id="generated-public-link" value={link} wrapperCSS={inputStyles} disabled={isInputDisabled} readOnly />
           <CopyToClipboardButton
             textToCopy={link}
-            displayText={t('cellsGlobalView.shareFileModalCopyLink')}
-            copySuccessText={t('cellsGlobalView.shareFileModalLinkCopied')}
+            displayText={t('cells.shareModal.copyLink')}
+            copySuccessText={t('cells.shareModal.linkCopied')}
           />
         </div>
       )}
@@ -97,7 +102,7 @@ const CellsShareFileModalContent = ({uuid, cellsRepository}: ShareFileModalParam
           <CellsTableLoader />
         </div>
       )}
-      {status === 'error' && <div>{t('cellsGlobalView.shareFileModalErrorLoadingLink')}</div>}
+      {status === 'error' && <div>{t('cells.shareModal.error.loadingLink')}</div>}
     </div>
   );
 };

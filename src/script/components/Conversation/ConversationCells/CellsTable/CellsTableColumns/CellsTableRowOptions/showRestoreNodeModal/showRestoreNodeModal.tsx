@@ -26,13 +26,18 @@ export const showRestoreNodeModal = ({node, onRestoreNode}: {node: CellNode; onR
   PrimaryModal.show(PrimaryModal.type.CONFIRM, {
     primaryAction: {
       action: onRestoreNode,
-      text: t('cellsRestoreNodeModal.button'),
+      text: t('cells.restoreNodeModal.button'),
     },
     text: {
       message: replaceReactComponents(
-        t(node.type === 'file' ? 'cellsRestoreNodeModal.fileDescription' : 'cellsRestoreNodeModal.folderDescription', {
-          name: '{name}',
-        }),
+        t(
+          node.type === 'file'
+            ? 'cells.restoreNodeModal.file.description'
+            : 'cells.restoreNodeModal.folder.description',
+          {
+            name: '{name}',
+          },
+        ),
         [
           {
             exactMatch: '{name}',
@@ -40,7 +45,8 @@ export const showRestoreNodeModal = ({node, onRestoreNode}: {node: CellNode; onR
           },
         ],
       ),
-      title: node.type === 'file' ? t('cellsRestoreNodeModal.fileHeadline') : t('cellsRestoreNodeModal.folderHeadline'),
+      title:
+        node.type === 'file' ? t('cells.restoreNodeModal.file.headline') : t('cells.restoreNodeModal.folder.headline'),
     },
   });
 };

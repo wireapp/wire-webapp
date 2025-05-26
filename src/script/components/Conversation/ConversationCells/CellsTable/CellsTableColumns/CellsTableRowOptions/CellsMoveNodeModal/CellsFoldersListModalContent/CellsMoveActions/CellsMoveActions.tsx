@@ -34,7 +34,7 @@ export const CellsMoveActions = ({onCancel, onMove, moveDisabled, moveLoading}: 
   return (
     <div css={wrapperStyles}>
       <Button variant={ButtonVariant.SECONDARY} onClick={onCancel} css={buttonStyles}>
-        {t('cellsMoveNodeModal.cancelButton')}
+        {t('cells.moveNodeModal.cancelButton')}
       </Button>
       <Button
         variant={ButtonVariant.PRIMARY}
@@ -44,7 +44,7 @@ export const CellsMoveActions = ({onCancel, onMove, moveDisabled, moveLoading}: 
         disabled={moveDisabled}
         showLoading={moveLoading}
       >
-        {t('cellsMoveNodeModal.moveButton')}
+        {t('cells.moveNodeModal.moveButton')}
       </Button>
     </div>
   );

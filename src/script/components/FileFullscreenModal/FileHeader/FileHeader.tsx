@@ -50,7 +50,7 @@ export const FileHeader = ({onClose, fileName, fileExtension, senderName, timest
         <button
           type="button"
           css={closeButtonStyles}
-          aria-label={t('cellsGlobalView.imageFullScreenModalCloseButton')}
+          aria-label={t('cells.imageFullScreenModal.closeButton')}
           onClick={onClose}
         >
           <CloseIcon />

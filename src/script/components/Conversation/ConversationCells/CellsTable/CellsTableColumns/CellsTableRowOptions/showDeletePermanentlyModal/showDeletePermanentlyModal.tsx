@@ -32,14 +32,14 @@ export const showDeletePermanentlyModal = ({
   PrimaryModal.show(PrimaryModal.type.CONFIRM, {
     primaryAction: {
       action: () => onDeletePermanently(node.id),
-      text: t('cellsDeletePermanentlyModal.button'),
+      text: t('cells.deletePermanentlyModal.button'),
     },
     text: {
       message: replaceReactComponents(
         t(
           node.type === 'file'
-            ? 'cellsDeletePermanentlyModal.fileDescription'
-            : 'cellsDeletePermanentlyModal.folderDescription',
+            ? 'cells.deletePermanentlyModal.file.description'
+            : 'cells.deletePermanentlyModal.folder.description',
           {
             name: '{name}',
           },
@@ -51,7 +51,7 @@ export const showDeletePermanentlyModal = ({
           },
         ],
       ),
-      title: t('cellsDeletePermanentlyModal.headline'),
+      title: t('cells.deletePermanentlyModal.headline'),
     },
   });
 };
