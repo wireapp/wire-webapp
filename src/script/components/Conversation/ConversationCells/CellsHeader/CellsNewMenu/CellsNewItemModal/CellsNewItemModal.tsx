@@ -57,6 +57,7 @@ export const CellsNewItemModal = ({
   onSuccess,
   currentPath,
 }: CellsNewItemModalProps) => {
+  const isFolder = type === 'folder';
   return (
     <ModalComponent
       isShown={isOpen}
@@ -68,7 +69,7 @@ export const CellsNewItemModal = ({
       <div css={wrapperStyles}>
         <header css={headerStyles}>
           <h3 css={headingStyles}>
-            {t(type === 'folder' ? 'cells.newItemMenuModal.headlineFolder' : 'cells.newItemMenuModal.headlineFile')}
+            {t(isFolder ? 'cells.newItemMenuModal.headlineFolder' : 'cells.newItemMenuModal.headlineFile')}
           </h3>
 
           <IconButton
@@ -82,7 +83,7 @@ export const CellsNewItemModal = ({
           </IconButton>
         </header>
         <p css={descriptionStyles}>
-          {t(type === 'folder' ? 'cells.newItemMenuModal.descriptionFolder' : 'cells.newItemMenuModal.descriptionFile')}
+          {t(isFolder ? 'cells.newItemMenuModal.descriptionFolder' : 'cells.newItemMenuModal.descriptionFile')}
         </p>
         <CellsNewNodeForm
           type={type}
