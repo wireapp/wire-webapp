@@ -35,7 +35,7 @@ interface VideoAssetCardProps {
 
 export const VideoAssetCard = forwardRef<HTMLDivElement, VideoAssetCardProps>(
   ({extension, name, size, isError, children}, ref) => {
-    const formattedName = isError ? t('cellsUnavailableFile') : name;
+    const formattedName = isError ? t('cells.unavailableFile') : name;
 
     return (
       <FileCard.Root variant="large" extension={extension} name={formattedName} size={size}>

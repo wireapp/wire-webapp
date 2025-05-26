@@ -28,51 +28,43 @@ import {CellsTableNameColumn} from './CellsTableNameColumn/CellsTableNameColumn'
 import {CellsTableRowOptions} from './CellsTableRowOptions/CellsTableRowOptions';
 import {CellsTableSharedColumn} from './CellsTableSharedColumn/CellsTableSharedColumn';
 
-import {CellFile} from '../../common/cellFile/cellFile';
+import {CellNode} from '../../common/cellNode/cellNode';
 
-const columnHelper = createColumnHelper<CellFile>();
+const columnHelper = createColumnHelper<CellNode>();
 
-export const getCellsTableColumns = ({
-  onDeleteFile,
-  cellsRepository,
-}: {
-  onDeleteFile: (uuid: string) => void;
-  cellsRepository: CellsRepository;
-}) => [
+export const getCellsTableColumns = ({cellsRepository}: {cellsRepository: CellsRepository}) => [
   columnHelper.accessor('name', {
-    header: t('cellsGlobalView.tableRowName'),
-    cell: info => <CellsTableNameColumn file={info.row.original} />,
+    header: t('cells.tableRow.name'),
+    cell: info => <CellsTableNameColumn node={info.row.original} />,
   }),
   columnHelper.accessor('conversationName', {
-    header: t('cellsGlobalView.tableRowConversationName'),
+    header: t('cells.tableRow.conversationName'),
     cell: info => <span css={textWithEllipsisStyles}>{info.getValue()}</span>,
     size: 190,
   }),
   columnHelper.accessor('owner', {
-    header: t('cellsGlobalView.tableRowOwner'),
+    header: t('cells.tableRow.owner'),
     cell: info => <span css={textWithEllipsisStyles}>{info.getValue()}</span>,
     size: 175,
   }),
   columnHelper.accessor('sizeMb', {
-    header: t('cellsGlobalView.tableRowSize'),
+    header: t('cells.tableRow.size'),
     cell: info => info.getValue(),
     size: 100,
   }),
   columnHelper.accessor('uploadedAtTimestamp', {
-    header: t('cellsGlobalView.tableRowCreated'),
+    header: t('cells.tableRow.created'),
     cell: info => <CellsTableDateColumn timestamp={info.getValue()} />,
     size: 125,
   }),
   columnHelper.accessor('publicLink', {
-    header: t('cellsGlobalView.tableRowPublicLink'),
+    header: t('cells.tableRow.publicLink'),
     cell: info => <CellsTableSharedColumn isShared={!!info.getValue()?.alreadyShared} />,
     size: 60,
   }),
   columnHelper.accessor('id', {
-    header: () => <span className="visually-hidden">{t('cellsGlobalView.tableRowActions')}</span>,
+    header: () => <span className="visually-hidden">{t('cells.tableRow.actions')}</span>,
     size: 40,
-    cell: info => (
-      <CellsTableRowOptions file={info.row.original} onDelete={onDeleteFile} cellsRepository={cellsRepository} />
-    ),
+    cell: info => <CellsTableRowOptions node={info.row.original} cellsRepository={cellsRepository} />,
   }),
 ];

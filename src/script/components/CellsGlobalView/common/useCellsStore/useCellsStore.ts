@@ -19,41 +19,41 @@
 
 import {create} from 'zustand';
 
-import {CellFile} from '../cellFile/cellFile';
+import {CellNode} from '../cellNode/cellNode';
 import {CellPagination} from '../cellPagination/cellPagination';
 
 export type Status = 'idle' | 'loading' | 'fetchingMore' | 'success' | 'error';
 
 interface CellsState {
-  files: CellFile[];
+  nodes: CellNode[];
   status: Status;
   pagination: CellPagination | null;
   error: Error | null;
-  setFiles: (files: CellFile[]) => void;
+  setNodes: (nodes: CellNode[]) => void;
   setStatus: (status: Status) => void;
   setError: (error: Error | null) => void;
   setPagination: (pagination: CellPagination | null) => void;
-  updateFile: (fileId: string, updates: Partial<CellFile>) => void;
-  removeFile: (fileId: string) => void;
+  setPublicLink: (nodeId: string, data: CellNode['publicLink']) => void;
+  removeNode: (nodeId: string) => void;
   clearAll: () => void;
 }
 
 export const useCellsStore = create<CellsState>(set => ({
-  files: [],
+  nodes: [],
   status: 'idle',
   error: null,
   pagination: null,
-  setFiles: files => set({files}),
+  setNodes: nodes => set({nodes}),
   setStatus: status => set({status}),
   setError: error => set({error}),
   setPagination: pagination => set({pagination}),
-  updateFile: (fileId, updates) =>
+  setPublicLink: (nodeId, updates) =>
     set(state => ({
-      files: state.files.map(file => (file.id === fileId ? {...file, ...updates} : file)),
+      nodes: state.nodes.map(node => (node.id === nodeId ? {...node, ...updates} : node)),
     })),
-  removeFile: fileId =>
+  removeNode: nodeId =>
     set(state => ({
-      files: state.files.filter(file => file.id !== fileId),
+      nodes: state.nodes.filter(node => node.id !== nodeId),
     })),
-  clearAll: () => set({files: [], error: null}),
+  clearAll: () => set({nodes: [], error: null}),
 }));

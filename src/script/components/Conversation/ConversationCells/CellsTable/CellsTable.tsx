@@ -18,6 +18,7 @@
  */
 
 import {flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
+import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 
@@ -34,30 +35,31 @@ import {getCellsTableColumns} from './CellsTableColumns/CellsTableColumns';
 import {CellsFilePreviewModalProvider} from './common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
 import {useTableHeight} from './useTableHeight/useTableHeight';
 
-import {CellFile} from '../common/cellFile/cellFile';
+import {CellNode} from '../common/cellNode/cellNode';
 
 interface CellsTableProps {
-  files: CellFile[];
+  nodes: Array<CellNode>;
   cellsRepository: CellsRepository;
-  conversationId: string;
-  onDeleteFile: (uuid: string) => void;
+  conversationQualifiedId: QualifiedId;
+  conversationName: string;
   onUpdateBodyHeight: (height: number) => void;
 }
 
 export const CellsTable = ({
-  files,
+  nodes,
   cellsRepository,
-  conversationId,
-  onDeleteFile,
+  conversationQualifiedId,
+  conversationName,
   onUpdateBodyHeight,
 }: CellsTableProps) => {
   const {tableBodyRef} = useTableHeight({
+    nodes,
     onUpdate: onUpdateBodyHeight,
   });
 
   const table = useReactTable({
-    data: files,
-    columns: getCellsTableColumns({cellsRepository, conversationId, onDeleteFile}),
+    data: nodes,
+    columns: getCellsTableColumns({cellsRepository, conversationQualifiedId, conversationName}),
     getCoreRowModel: getCoreRowModel(),
   });
 
@@ -70,7 +72,7 @@ export const CellsTable = ({
           <thead>
             {table.getHeaderGroups().map(headerGroup => (
               <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header, index) => {
+                {headerGroup.headers.map(header => {
                   return (
                     <th
                       key={header.id}
