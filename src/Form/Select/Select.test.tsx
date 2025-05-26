@@ -23,7 +23,7 @@ import * as React from 'react';
 
 import {Select} from './Select';
 
-import {matchComponent} from '../test/testUtil';
+import {matchComponent} from '../../test/testUtil';
 
 const props: React.ComponentProps<typeof Select> = {
   options: [],

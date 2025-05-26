@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,23 +17,19 @@
  *
  */
 
-export * from './Button';
-export * from './ButtonLink';
-export * from './Checkbox';
-export * from './CodeInput';
-export * from './DropFileInput';
-export * from './ErrorMessage';
-export * from './Form';
-export * from './IndicatorRangeInput';
-export * from './Input';
-export * from './InputBlock';
-export * from './InputSubmitCombo';
-export * from './RangeInput';
-export * from './RoundIconButton';
-export * from './Select/Select';
-export * from './ShakeBox';
-export * from './Switch';
-export * from './TextArea';
-export * from './Tooltip';
-export * from './InputLabel';
-export * from './ButtonsGroup/ButtonsGroup';
+import {components, IndicatorsContainerProps} from 'react-select';
+
+import {Option} from '../Select';
+
+export const BaseSelectIndicatorsContainer = ({children, ...restProps}: IndicatorsContainerProps<Option>) => {
+  const value = restProps.getValue();
+  const displaySelectedOptionsCount = Array.isArray(value) && value.length > 1;
+
+  return (
+    <components.IndicatorsContainer {...restProps}>
+      {displaySelectedOptionsCount && <div css={{fontWeight: 600}}>(+{value.length - 1})</div>}
+
+      {children}
+    </components.IndicatorsContainer>
+  );
+};
