@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2024 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,23 +18,21 @@
  */
 
 import {CSSObject} from '@emotion/react';
+import {components, MenuProps} from 'react-select';
 
-import {Theme} from '../Theme/Theme';
+// eslint-disable-next-line react/display-name
+export const BaseSelectMenu = (dataUieName: string, css?: CSSObject) => (props: MenuProps) => {
+  const {children} = props;
 
-export const menuListHeadingContainerStyles = (theme: Theme): CSSObject => ({
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  fontSize: theme.fontSizes.medium,
-  fontWeight: 600,
-  padding: '8px 16px',
-});
-
-export const menuListCloseButtonStyles: CSSObject = {
-  background: 'transparent',
-  border: 'none',
-  cursor: 'pointer',
-  padding: 0,
-  display: 'flex',
-  alignItems: 'center',
+  return (
+    <components.Menu {...props} css={css}>
+      <div
+        {...(dataUieName && {
+          'data-uie-name': `dropdown-${dataUieName}`,
+        })}
+      >
+        {children}
+      </div>
+    </components.Menu>
+  );
 };

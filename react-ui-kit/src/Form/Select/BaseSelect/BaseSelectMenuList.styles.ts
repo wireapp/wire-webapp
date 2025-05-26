@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,23 +17,24 @@
  *
  */
 
-export * from './Button';
-export * from './ButtonLink';
-export * from './Checkbox';
-export * from './CodeInput';
-export * from './DropFileInput';
-export * from './ErrorMessage';
-export * from './Form';
-export * from './IndicatorRangeInput';
-export * from './Input';
-export * from './InputBlock';
-export * from './InputSubmitCombo';
-export * from './RangeInput';
-export * from './RoundIconButton';
-export * from './Select/Select';
-export * from './ShakeBox';
-export * from './Switch';
-export * from './TextArea';
-export * from './Tooltip';
-export * from './InputLabel';
-export * from './ButtonsGroup/ButtonsGroup';
+import {CSSObject} from '@emotion/react';
+
+import {Theme} from '../../../Layout';
+
+export const headingContainerStyles = (theme: Theme): CSSObject => ({
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  fontSize: theme.fontSizes.medium,
+  fontWeight: 600,
+  padding: '8px 16px',
+});
+
+export const closeButtonStyles: CSSObject = {
+  background: 'transparent',
+  border: 'none',
+  cursor: 'pointer',
+  padding: 0,
+  display: 'flex',
+  alignItems: 'center',
+};
