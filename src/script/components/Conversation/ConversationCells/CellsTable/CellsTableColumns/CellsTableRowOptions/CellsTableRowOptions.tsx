@@ -42,7 +42,7 @@ import {showMoveToRecycleBinModal} from './showMoveToRecycleBinModal/showMoveToR
 import {showRestoreNodeModal} from './showRestoreNodeModal/showRestoreNodeModal';
 
 import {useCellsFilePreviewModal} from '../../common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
-import {showShareFileModal} from '../CellsNodeShareModal/CellsNodeShareModal';
+import {showShareModal} from '../CellsNodeShareModal/CellsNodeShareModal';
 
 interface CellsTableRowOptionsProps {
   node: CellNode;
@@ -60,9 +60,9 @@ export const CellsTableRowOptions = ({
   return (
     <DropdownMenu>
       <DropdownMenu.Trigger asChild>
-        <button css={buttonStyles} aria-label={t('cellsGlobalView.optionsLabel')}>
+        <button css={buttonStyles} aria-label={t('cells.options.label')}>
           <MoreIcon css={iconStyles} />
-          <span css={textStyles}>{t('cellsGlobalView.optionsLabel')}</span>
+          <span css={textStyles}>{t('cells.options.label')}</span>
         </button>
       </DropdownMenu.Trigger>
       <CellsTableRowOptionsContent
@@ -90,7 +90,7 @@ const CellsTableRowOptionsContent = ({
   const conversationId = conversationQualifiedId.id;
 
   const deleteFileFailedNotification = useAppNotification({
-    message: t('cellsGlobalView.deleteModalError'),
+    message: t('cells.deleteModal.error'),
   });
 
   const handleDeleteNode = useCallback(
@@ -109,7 +109,7 @@ const CellsTableRowOptionsContent = ({
   );
 
   const restoreNodeFailedNotification = useAppNotification({
-    message: t('cellsRestoreError'),
+    message: t('cells.restore.error'),
   });
 
   const handleRestoreNode = useCallback(
@@ -138,7 +138,7 @@ const CellsTableRowOptionsContent = ({
             })
           }
         >
-          {t('cellsGlobalView.optionRestore')}
+          {t('cells.options.restore')}
         </DropdownMenu.Item>
         <DropdownMenu.Item
           onClick={() =>
@@ -148,7 +148,7 @@ const CellsTableRowOptionsContent = ({
             })
           }
         >
-          {t('cellsGlobalView.optionDeletePermanently')}
+          {t('cells.options.deletePermanently')}
         </DropdownMenu.Item>
       </DropdownMenu.Content>
     );
@@ -165,7 +165,7 @@ const CellsTableRowOptionsContent = ({
             })
           }
         >
-          {t('cellsGlobalView.optionDeletePermanently')}
+          {t('cells.options.deletePermanently')}
         </DropdownMenu.Item>
       </DropdownMenu.Content>
     );
@@ -174,26 +174,29 @@ const CellsTableRowOptionsContent = ({
   return (
     <>
       <DropdownMenu.Content>
-        <DropdownMenu.Item onClick={() => setIsMoveNodeModalOpen(true)}>
-          {t('cellsGlobalView.optionMove')}
-        </DropdownMenu.Item>
+        <DropdownMenu.Item onClick={() => setIsMoveNodeModalOpen(true)}>{t('cells.options.move')}</DropdownMenu.Item>
         <DropdownMenu.Item
           onClick={() =>
-            showShareFileModal({uuid: node.id, conversationId: conversationQualifiedId.id, cellsRepository})
+            showShareModal({
+              type: node.type,
+              uuid: node.id,
+              conversationId: conversationQualifiedId.id,
+              cellsRepository,
+            })
           }
         >
-          {t('cellsGlobalView.optionShare')}
+          {t('cells.options.share')}
         </DropdownMenu.Item>
         <DropdownMenu.Item
           onClick={() =>
             node.type === 'folder' ? openFolder({conversationQualifiedId, name: node.name}) : handleOpenFile(node)
           }
         >
-          {t('cellsGlobalView.optionOpen')}
+          {t('cells.options.open')}
         </DropdownMenu.Item>
         {url && (
           <DropdownMenu.Item onClick={() => forcedDownloadFile({url, name})}>
-            {t('cellsGlobalView.optionDownload')}
+            {t('cells.options.download')}
           </DropdownMenu.Item>
         )}
         <DropdownMenu.Item
@@ -204,7 +207,7 @@ const CellsTableRowOptionsContent = ({
             })
           }
         >
-          {t('cellsGlobalView.optionDelete')}
+          {t('cells.options.delete')}
         </DropdownMenu.Item>
       </DropdownMenu.Content>
       <CellsMoveNodeModal
