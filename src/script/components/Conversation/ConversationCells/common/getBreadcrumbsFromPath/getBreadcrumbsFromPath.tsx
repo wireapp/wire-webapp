@@ -32,7 +32,7 @@ export const getBreadcrumbsFromPath = ({baseCrumb, currentPath}: {baseCrumb: str
       path: '',
     },
     ...segments.map((segment, index) => ({
-      name: segment === RECYCLE_BIN_PATH ? t('cellsRecycleBin.breadcrumb') : segment,
+      name: segment === RECYCLE_BIN_PATH ? t('cells.recycleBin.breadcrumb') : segment,
       path: segments.slice(0, index + 1).join('/'),
       icon: segment === RECYCLE_BIN_PATH ? <TrashIcon width={12} height={12} /> : undefined,
     })),

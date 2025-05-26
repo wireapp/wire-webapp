@@ -37,7 +37,7 @@ export const CellsMoveNodeModalHeader = ({title, onClose}: CellsMoveNodeModalHea
         type="button"
         css={closeButtonStyles}
         onClick={onClose}
-        aria-label={t('cellNewItemMenuModal.closeButton')}
+        aria-label={t('cells.newItemMenuModal.closeButton')}
       >
         <CloseIcon />
       </IconButton>
