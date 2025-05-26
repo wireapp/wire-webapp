@@ -29,14 +29,14 @@ export interface User {
 }
 
 export const getUser = (user: Partial<User> = {}): User => {
-  const firstName = user.firstName ?? faker.person.firstName();
+  // Ensure lastName is always defined, as it is used in email and username generation
   const lastName = user.lastName ?? faker.person.lastName();
 
   return {
     ...user,
     email: user.email ?? faker.internet.email({lastName, provider: 'wire.engineering'}).toLowerCase(),
     password: user.password ?? faker.internet.password({length: 8, pattern: /[A-Za-z\d!@#$]/}),
-    firstName,
+    firstName: user.firstName ?? faker.person.firstName(),
     lastName,
     username: user.username ?? `${lastName}${faker.string.alpha({length: 5, casing: 'lower'})}`.toLowerCase(),
     token: user.token ?? null,
