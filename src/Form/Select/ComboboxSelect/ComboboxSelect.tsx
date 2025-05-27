@@ -21,7 +21,7 @@ import {useTheme} from '@emotion/react';
 import {components, MultiValueRemoveProps, NoticeProps} from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 
-import {customStyles, noOptionsMessageStyles, wrapperStyles} from './ComboboxSelect.styles';
+import {selectStyles, noOptionsMessageStyles, wrapperStyles} from './ComboboxSelect.styles';
 
 import {CloseIcon} from '../../../Icon/CloseIcon';
 import {Theme} from '../../../Layout';
@@ -76,7 +76,7 @@ export const ComboboxSelect = ({
         isSearchable={true}
         isDisabled={isDisabled}
         placeholder={placeholder}
-        styles={customStyles({theme})}
+        styles={selectStyles({theme})}
         classNamePrefix="select"
         formatCreateLabel={createOptionLabel}
         onCreateOption={onCreateOption}
