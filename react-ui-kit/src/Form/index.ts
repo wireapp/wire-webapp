@@ -31,6 +31,7 @@ export * from './InputSubmitCombo';
 export * from './RangeInput';
 export * from './RoundIconButton';
 export * from './Select/Select';
+export * from './Select/ComboboxSelect/ComboboxSelect';
 export * from './ShakeBox';
 export * from './Switch';
 export * from './TextArea';
