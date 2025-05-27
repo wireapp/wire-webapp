@@ -22,6 +22,7 @@ import type {Meta, StoryObj} from '@storybook/react';
 import {Select} from './Select';
 
 const options = [
+  {value: '', label: 'Select an option'},
   {value: '1', label: 'Option 1'},
   {value: '2', label: 'Option 2'},
   {value: '3', label: 'Option 3'},
@@ -33,13 +34,6 @@ const meta = {
   parameters: {
     layout: 'centered',
   },
-  decorators: [
-    Story => (
-      <div style={{width: '350px'}}>
-        <Story />
-      </div>
-    ),
-  ],
   tags: ['autodocs'],
 } satisfies Meta<typeof Select>;
 
@@ -48,7 +42,6 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    placeholder: 'Select an option',
     id: 'default-select',
     dataUieName: 'default-select',
     options,
@@ -57,7 +50,6 @@ export const Default: Story = {
 
 export const WithLabel: Story = {
   args: {
-    placeholder: 'Select an option',
     id: 'select-example',
     dataUieName: 'select-with-label',
     options,
@@ -67,7 +59,6 @@ export const WithLabel: Story = {
 
 export const Invalid: Story = {
   args: {
-    placeholder: 'Select an option',
     id: 'invalid-select',
     dataUieName: 'invalid-select',
     options,
@@ -77,7 +68,6 @@ export const Invalid: Story = {
 
 export const Disabled: Story = {
   args: {
-    placeholder: 'Select an option',
     id: 'disabled-select',
     dataUieName: 'disabled-select',
     options,

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2025 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,28 @@
  *
  */
 
-import {components, ContainerProps} from 'react-select';
+/* eslint-disable jest/expect-expect */
 
-import {TabIndex} from '../../../types/enums';
+import * as React from 'react';
 
-export const SelectContainer = (props: ContainerProps) => {
-  return (
-    <components.SelectContainer {...props}>
-      <div tabIndex={TabIndex.FOCUSABLE}>{props.children}</div>
-    </components.SelectContainer>
-  );
+import {Select} from './Select';
+
+import {matchComponent} from '../test/testUtil';
+
+const props: React.ComponentProps<typeof Select> = {
+  options: [],
+  id: 'test',
+  dataUieName: 'test',
 };
+
+describe('"Select"', () => {
+  it('renders', () =>
+    matchComponent(
+      <Select {...props}>
+        <option>a</option>
+        <option>b</option>
+      </Select>,
+    ));
+  it('renders as disabled', () => matchComponent(<Select {...props} disabled></Select>));
+  it('renders as invalid', () => matchComponent(<Select {...props} markInvalid></Select>));
+});
