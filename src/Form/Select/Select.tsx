@@ -30,7 +30,7 @@ import {BaseSelectMenu} from './BaseSelect/BaseSelectMenu';
 import {BaseSelectMenuList} from './BaseSelect/BaseSelectMenuList';
 import {BaseSelectOption, isGroup} from './BaseSelect/BaseSelectOption';
 import {BaseSelectValueContainer} from './BaseSelect/BaseSelectValueContainer';
-import {customStyles} from './SelectStyles';
+import {customStyles} from './Select.styles';
 
 import {Theme} from '../../Layout';
 import {TabIndex} from '../../types/enums';
