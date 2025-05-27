@@ -19,13 +19,13 @@
 
 import {components, MenuListProps} from 'react-select';
 
-import {closeButtonStyles, headingContainerStyles} from './BaseSelectMenuList.styles';
+import {closeButtonStyles, headingContainerStyles} from './SelectMenuList.styles';
 
 import {CloseIcon} from '../../../Icon';
 import {Theme} from '../../../Layout';
 
 // eslint-disable-next-line react/display-name
-export const BaseSelectMenuList = (menuListHeading: string, dataUieName: string) => (props: MenuListProps) => {
+export const SelectMenuList = (menuListHeading: string, dataUieName: string) => (props: MenuListProps) => {
   const {selectProps, children} = props;
 
   const handleClose = () => {
@@ -52,4 +52,4 @@ export const BaseSelectMenuList = (menuListHeading: string, dataUieName: string)
     </components.MenuList>
   );
 };
-BaseSelectMenuList.displayName = 'BaseSelectMenuList';
+SelectMenuList.displayName = 'SelectMenuList';

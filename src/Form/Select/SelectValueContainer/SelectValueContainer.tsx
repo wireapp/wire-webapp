@@ -23,7 +23,7 @@ import {components, ValueContainerProps} from 'react-select';
 
 import {Option} from '../Select';
 
-export const BaseSelectValueContainer = ({children, ...restProps}: ValueContainerProps<Option>) => (
+export const SelectValueContainer = ({children, ...restProps}: ValueContainerProps<Option>) => (
   <components.ValueContainer {...restProps}>
     {renderValue(children[0])} {children[1]}
   </components.ValueContainer>

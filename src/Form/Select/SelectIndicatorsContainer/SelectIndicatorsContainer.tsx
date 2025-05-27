@@ -21,7 +21,7 @@ import {components, IndicatorsContainerProps} from 'react-select';
 
 import {Option} from '../Select';
 
-export const BaseSelectIndicatorsContainer = ({children, ...restProps}: IndicatorsContainerProps<Option>) => {
+export const SelectIndicatorsContainer = ({children, ...restProps}: IndicatorsContainerProps<Option>) => {
   const value = restProps.getValue();
   const displaySelectedOptionsCount = Array.isArray(value) && value.length > 1;
 
