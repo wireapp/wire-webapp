@@ -25,10 +25,6 @@ const options = [
   {value: '1', label: 'Option 1'},
   {value: '2', label: 'Option 2'},
   {value: '3', label: 'Option 3'},
-  {value: '4', label: 'Option 4'},
-  {value: '5', label: 'Option 5'},
-  {value: '6', label: 'Option 6'},
-  {value: '7', label: 'Option 7'},
 ];
 
 const meta = {
@@ -56,6 +52,9 @@ export const Default: Story = {
     options,
     placeholder: 'Select options...',
     dataUieName: 'default-select',
+    createOptionLabel: inputValue => `Create item "${inputValue}"`,
+    onCreateOption: () => {},
+    noOptionsMessage: 'No options available',
   },
 };
 
@@ -66,6 +65,9 @@ export const WithValue: Story = {
     value: [options[0], options[1]],
     placeholder: 'Select options...',
     dataUieName: 'with-value-select',
+    createOptionLabel: inputValue => `Create item "${inputValue}"`,
+    onCreateOption: () => {},
+    noOptionsMessage: 'No options available',
   },
 };
 
@@ -76,6 +78,9 @@ export const Disabled: Story = {
     isDisabled: true,
     placeholder: 'Select options...',
     dataUieName: 'disabled-select',
+    createOptionLabel: inputValue => `Create item "${inputValue}"`,
+    onCreateOption: () => {},
+    noOptionsMessage: 'No options available',
   },
 };
 
@@ -85,6 +90,10 @@ export const Creatable: Story = {
     options,
     placeholder: 'Select or create options...',
     dataUieName: 'creatable-select',
+    createOptionLabel: inputValue => `Create item "${inputValue}"`,
+    onCreateOption: () => {},
+    noOptionsMessage: 'No options available',
+    required: true,
   },
 };
 
@@ -93,5 +102,8 @@ export const WithLabel: Story = {
     id: 'with-label-select',
     label: 'Select options',
     options,
+    createOptionLabel: inputValue => `Create item "${inputValue}"`,
+    onCreateOption: () => {},
+    noOptionsMessage: 'No options available',
   },
 };

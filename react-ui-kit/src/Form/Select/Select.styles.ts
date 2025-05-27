@@ -29,8 +29,8 @@ import {
   baseMenuStyles,
   baseOptionStyles,
 } from './BaseSelect/BaseSelect.styles';
-import {isGroup} from './BaseSelect/BaseSelectOption';
 import {Option} from './Select';
+import {isGroup} from './SelectOption/SelectOption';
 
 import {Theme} from '../../Layout';
 

@@ -24,7 +24,7 @@ import {Theme} from '../../../Layout';
 import {Option} from '../Select';
 
 // eslint-disable-next-line react/display-name
-export const BaseSelectOption = (dataUieName: string) => (props: OptionProps<Option>) => {
+export const SelectOption = (dataUieName: string) => (props: OptionProps<Option>) => {
   const {children, data, isMulti, isSelected, options} = props;
 
   return (

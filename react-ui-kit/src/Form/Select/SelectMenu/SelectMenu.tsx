@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2025 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,22 @@
  *
  */
 
-import {components, ContainerProps} from 'react-select';
+import {CSSObject} from '@emotion/react';
+import {components, MenuProps} from 'react-select';
 
-import {TabIndex} from '../../../types/enums';
+// eslint-disable-next-line react/display-name
+export const SelectMenu = (dataUieName: string, css?: CSSObject) => (props: MenuProps) => {
+  const {children} = props;
 
-export const BaseSelectContainer = (props: ContainerProps) => {
   return (
-    <components.SelectContainer {...props}>
-      <div tabIndex={TabIndex.FOCUSABLE}>{props.children}</div>
-    </components.SelectContainer>
+    <components.Menu {...props} css={css}>
+      <div
+        {...(dataUieName && {
+          'data-uie-name': `dropdown-${dataUieName}`,
+        })}
+      >
+        {children}
+      </div>
+    </components.Menu>
   );
 };
