@@ -23,21 +23,18 @@ import {CSSObject, useTheme} from '@emotion/react';
 import ReactSelect, {GroupBase, StylesConfig} from 'react-select';
 import type {StateManagerProps} from 'react-select/dist/declarations/src/stateManager';
 
-import {InputLabel} from './InputLabel';
-import {
-  CustomOption,
-  DropdownIndicator,
-  IndicatorsContainer,
-  Menu,
-  MenuList,
-  SelectContainer,
-  ValueContainer,
-  isGroup,
-} from './SelectComponents';
-import {customStyles} from './SelectStyles';
+import {BaseSelectDropdownIndicator} from './BaseSelect/BaseSelectDropdownIndicator';
+import {customStyles} from './Select.styles';
+import {SelectContainer} from './SelectContainer/SelectContainer';
+import {SelectIndicatorsContainer} from './SelectIndicatorsContainer/SelectIndicatorsContainer';
+import {SelectMenu} from './SelectMenu/SelectMenu';
+import {SelectMenuList} from './SelectMenuList/SelectMenuList';
+import {isGroup, SelectOption} from './SelectOption/SelectOption';
+import {SelectValueContainer} from './SelectValueContainer/SelectValueContainer';
 
-import {Theme} from '../Layout';
-import {TabIndex} from '../types/enums';
+import {Theme} from '../../Layout';
+import {TabIndex} from '../../types/enums';
+import {InputLabel} from '../InputLabel';
 
 export type Option = {
   value: string | number;
@@ -122,13 +119,13 @@ export const Select = <IsMulti extends boolean = false, Group extends GroupBase<
           }) as StylesConfig
         }
         components={{
-          SelectContainer,
-          DropdownIndicator,
-          Option: CustomOption(dataUieName),
-          Menu: Menu(dataUieName, menuCSS),
-          ValueContainer,
-          IndicatorsContainer,
-          ...(menuListHeading && {MenuList: MenuList(menuListHeading, dataUieName)}),
+          SelectContainer: SelectContainer,
+          DropdownIndicator: BaseSelectDropdownIndicator,
+          Option: SelectOption(dataUieName),
+          Menu: SelectMenu(dataUieName, menuCSS),
+          ValueContainer: SelectValueContainer,
+          IndicatorsContainer: SelectIndicatorsContainer,
+          ...(menuListHeading && {MenuList: SelectMenuList(menuListHeading, dataUieName)}),
         }}
         tabIndex={TabIndex.UNFOCUSABLE}
         isDisabled={disabled}

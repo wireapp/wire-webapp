@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2024 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,24 +17,28 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+/* eslint-disable jest/expect-expect */
 
-import {Theme} from '../Theme/Theme';
+import * as React from 'react';
 
-export const menuListHeadingContainerStyles = (theme: Theme): CSSObject => ({
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  fontSize: theme.fontSizes.medium,
-  fontWeight: 600,
-  padding: '8px 16px',
-});
+import {Select} from './Select';
 
-export const menuListCloseButtonStyles: CSSObject = {
-  background: 'transparent',
-  border: 'none',
-  cursor: 'pointer',
-  padding: 0,
-  display: 'flex',
-  alignItems: 'center',
+import {matchComponent} from '../../test/testUtil';
+
+const props: React.ComponentProps<typeof Select> = {
+  options: [],
+  id: 'test',
+  dataUieName: 'test',
 };
+
+describe('"Select"', () => {
+  it('renders', () =>
+    matchComponent(
+      <Select {...props}>
+        <option>a</option>
+        <option>b</option>
+      </Select>,
+    ));
+  it('renders as disabled', () => matchComponent(<Select {...props} disabled></Select>));
+  it('renders as invalid', () => matchComponent(<Select {...props} markInvalid></Select>));
+});
