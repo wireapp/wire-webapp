@@ -17,8 +17,8 @@
  *
  */
 
-import {useTheme} from '@emotion/react';
-import {components, MultiValueRemoveProps, NoticeProps} from 'react-select';
+import {CSSObject, useTheme} from '@emotion/react';
+import {components, MenuPosition, MultiValueRemoveProps, NoticeProps} from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 
 import {selectStyles, noOptionsMessageStyles, wrapperStyles} from './ComboboxSelect.styles';
@@ -27,13 +27,18 @@ import {CloseIcon} from '../../../Icon/CloseIcon';
 import {Theme} from '../../../Layout';
 import {InputLabel} from '../../InputLabel';
 import {BaseSelectDropdownIndicator} from '../BaseSelect/BaseSelectDropdownIndicator';
-import {Option} from '../Select';
+
+export type ComboboxSelectOption = {
+  value: string | number;
+  label: string;
+  description?: string;
+};
 
 export interface ComboboxSelectProps {
   id: string;
-  options: Option[];
-  value?: Option | Option[];
-  onChange?: (value: Option | Option[]) => void;
+  options: ComboboxSelectOption[];
+  value?: ComboboxSelectOption | ComboboxSelectOption[];
+  onChange?: (value: ComboboxSelectOption | ComboboxSelectOption[]) => void;
   isDisabled?: boolean;
   placeholder?: string;
   dataUieName?: string;
@@ -42,6 +47,9 @@ export interface ComboboxSelectProps {
   noOptionsMessage: string;
   label?: string;
   required?: boolean;
+  menuPotralTarget?: HTMLElement;
+  menuPosition?: MenuPosition;
+  menuListCSS?: CSSObject;
 }
 
 export const ComboboxSelect = ({
@@ -57,6 +65,9 @@ export const ComboboxSelect = ({
   noOptionsMessage,
   label,
   required,
+  menuPotralTarget,
+  menuPosition = 'absolute',
+  menuListCSS,
 }: ComboboxSelectProps) => {
   const theme = useTheme() as Theme;
 
@@ -76,7 +87,9 @@ export const ComboboxSelect = ({
         isSearchable
         isDisabled={isDisabled}
         placeholder={placeholder}
-        styles={selectStyles({theme})}
+        menuPortalTarget={menuPotralTarget}
+        menuPosition={menuPosition}
+        styles={selectStyles({theme, menuListCSS})}
         classNamePrefix="select"
         formatCreateLabel={createOptionLabel}
         onCreateOption={onCreateOption}

@@ -38,6 +38,7 @@ interface SelectStylesParams {
   menuPosition?: 'absolute' | 'relative';
   controlCSS?: CSSObject;
   containerCSS?: CSSObject;
+  menuListCSS?: CSSObject;
 }
 
 export const wrapperStyles: CSSObject = {
@@ -54,6 +55,7 @@ export const selectStyles = ({
   markInvalid = false,
   controlCSS = {},
   containerCSS = {},
+  menuListCSS = {},
 }: SelectStylesParams): StylesConfig => ({
   indicatorSeparator: () => baseIndicatorSeparatorStyles(),
   indicatorsContainer: provided => provided,
@@ -70,6 +72,7 @@ export const selectStyles = ({
   menuList: provided => ({
     ...provided,
     ...baseMenuListStyles(),
+    ...menuListCSS,
   }),
   option: (provided, {isDisabled, isFocused, isSelected, isMulti}) => ({
     ...provided,
@@ -94,8 +97,12 @@ export const selectStyles = ({
     ...provided,
     ...baseMenuStyles({theme, menuPosition: 'absolute'}),
     width: '100%',
-    zIndex: 1,
+    zIndex: 'var(--z-index-modal)',
     position: 'absolute',
+  }),
+  menuPortal: provided => ({
+    ...provided,
+    zIndex: 'var(--z-index-modal)',
   }),
   multiValue: provided => ({
     ...provided,
