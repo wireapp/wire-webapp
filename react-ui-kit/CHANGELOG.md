@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.54.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.54.0...@wireapp/react-ui-kit@9.54.1) (2025-05-29)
+
+### Bug Fixes
+
+* **ComboboxSelect:** position and z-index [WPB-17810] ([#7058](https://github.com/wireapp/wire-web-packages/issues/7058)) ([9a3f2a6](https://github.com/wireapp/wire-web-packages/commit/9a3f2a64964f34dde82b5b4d0f51d5dd66d7b4fe))
+
 # [9.54.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.53.0...@wireapp/react-ui-kit@9.54.0) (2025-05-28)
 
 ### Features
