@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.55.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.54.1...@wireapp/react-ui-kit@9.55.0) (2025-05-30)
+
+### Features
+
+* **react-ui-kit/combobox-select:** loading ([#7060](https://github.com/wireapp/wire-web-packages/issues/7060)) ([f53f8a8](https://github.com/wireapp/wire-web-packages/commit/f53f8a8bc01a2865067557c85d8783fbc053959b))
+
 ## [9.54.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.54.0...@wireapp/react-ui-kit@9.54.1) (2025-05-29)
 
 ### Bug Fixes
