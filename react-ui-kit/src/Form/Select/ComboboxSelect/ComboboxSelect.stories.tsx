@@ -140,3 +140,15 @@ export const WithLabel: Story = {
     noOptionsMessage: 'No options available',
   },
 };
+
+export const Loading: Story = {
+  args: {
+    id: 'loading-select',
+    isLoading: true,
+    options: [],
+    createOptionLabel: inputValue => `Create item "${inputValue}"`,
+    onCreateOption: () => {},
+    noOptionsMessage: 'No options available',
+    loadingMessage: 'Loading options...',
+  },
+};
