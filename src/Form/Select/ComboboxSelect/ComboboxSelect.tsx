@@ -21,7 +21,7 @@ import {CSSObject, useTheme} from '@emotion/react';
 import {components, MenuPosition, MultiValueRemoveProps, NoticeProps} from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 
-import {selectStyles, noOptionsMessageStyles, wrapperStyles} from './ComboboxSelect.styles';
+import {selectStyles, noOptionsMessageStyles, wrapperStyles, loadingMessageStyles} from './ComboboxSelect.styles';
 
 import {CloseIcon} from '../../../Icon/CloseIcon';
 import {Theme} from '../../../Layout';
@@ -50,6 +50,8 @@ export interface ComboboxSelectProps {
   menuPotralTarget?: HTMLElement;
   menuPosition?: MenuPosition;
   menuListCSS?: CSSObject;
+  isLoading?: boolean;
+  loadingMessage?: string;
 }
 
 export const ComboboxSelect = ({
@@ -68,6 +70,8 @@ export const ComboboxSelect = ({
   menuPotralTarget,
   menuPosition = 'absolute',
   menuListCSS,
+  isLoading = false,
+  loadingMessage,
 }: ComboboxSelectProps) => {
   const theme = useTheme() as Theme;
 
@@ -94,11 +98,13 @@ export const ComboboxSelect = ({
         formatCreateLabel={createOptionLabel}
         onCreateOption={onCreateOption}
         closeMenuOnSelect={false}
+        isLoading={isLoading}
         components={{
           ClearIndicator: () => null,
           DropdownIndicator: BaseSelectDropdownIndicator,
           MultiValueRemove: props => <MultiValueRemove {...props} />,
           NoOptionsMessage: props => <NoOptionsMessage {...props} message={noOptionsMessage} />,
+          LoadingMessage: props => <LoadingMessage {...props} message={loadingMessage} />,
         }}
       />
     </div>
@@ -115,4 +121,10 @@ const NoOptionsMessage = ({message, ...props}: NoticeProps & {message: string}) 
   <components.NoOptionsMessage {...props}>
     <div css={noOptionsMessageStyles}>{message}</div>
   </components.NoOptionsMessage>
+);
+
+const LoadingMessage = ({message, ...props}: NoticeProps & {message: string}) => (
+  <components.LoadingMessage {...props}>
+    <div css={loadingMessageStyles}>{message}</div>
+  </components.LoadingMessage>
 );

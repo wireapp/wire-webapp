@@ -146,3 +146,7 @@ export const selectStyles = ({
 export const noOptionsMessageStyles = {
   padding: '8px 12px',
 };
+
+export const loadingMessageStyles = {
+  padding: '8px 12px',
+};
