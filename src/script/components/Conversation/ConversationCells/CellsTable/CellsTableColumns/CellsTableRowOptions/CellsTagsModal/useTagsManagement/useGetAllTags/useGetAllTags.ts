@@ -45,8 +45,9 @@ export const useGetAllTags = ({
     } finally {
       setIsLoading(false);
     }
+    // cellsRepository is not a dependency because it's a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [onSuccess]);
 
   useEffect(() => {
     if (!enabled) {
@@ -54,8 +55,7 @@ export const useGetAllTags = ({
     }
 
     void fetchTags();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [enabled]);
+  }, [enabled, fetchTags]);
 
   return {tags, isLoading, error};
 };

@@ -120,9 +120,11 @@ const getOwner = (node: RestNode): string => {
 
 const getTags = (node: RestNode): string[] => {
   const tags = node.UserMetadata?.find(meta => meta.Namespace === 'usermeta-tags')?.JsonValue;
+
   if (!tags) {
     return [];
   }
+
   const parsedTags = JSON.parse(tags);
   return parsedTags.split(',').map((tag: string) => tag.trim());
 };

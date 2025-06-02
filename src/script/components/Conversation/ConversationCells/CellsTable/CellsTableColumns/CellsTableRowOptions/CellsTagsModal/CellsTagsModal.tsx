@@ -52,7 +52,6 @@ interface CellsTagsModalProps {
   isOpen: boolean;
   onClose: () => void;
   cellsRepository: CellsRepository;
-
   selectedTags: string[];
   onRefresh: () => void;
 }
