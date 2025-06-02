@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.56.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.56.0...@wireapp/react-ui-kit@9.56.1) (2025-06-02)
+
+### Bug Fixes
+
+* **react-ui-kit:** Badge export [WPB-17811] ([#7062](https://github.com/wireapp/wire-web-packages/issues/7062)) ([4adb136](https://github.com/wireapp/wire-web-packages/commit/4adb1369134d03c0fb56028194d7fd98d1cdfa4c))
+
 # [9.56.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.55.0...@wireapp/react-ui-kit@9.56.0) (2025-06-02)
 
 ### Features
