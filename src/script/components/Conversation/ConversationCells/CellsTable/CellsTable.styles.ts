@@ -25,6 +25,7 @@ export const wrapperStyles: CSSObject = {
   maxWidth: '100%',
   overflowX: 'auto',
   overflowY: 'auto',
+  marginBottom: 'auto',
 };
 
 export const tableStyles: CSSObject = {

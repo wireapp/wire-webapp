@@ -23,6 +23,5 @@ export const wrapperStyles: CSSObject = {
   padding: '16px 8px',
   display: 'flex',
   flexDirection: 'column',
-  justifyContent: 'space-between',
   height: '100%',
 };
