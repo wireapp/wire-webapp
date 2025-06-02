@@ -43,6 +43,7 @@ interface CellsTableProps {
   conversationQualifiedId: QualifiedId;
   conversationName: string;
   onUpdateBodyHeight: (height: number) => void;
+  onRefresh: () => void;
 }
 
 export const CellsTable = ({
@@ -51,6 +52,7 @@ export const CellsTable = ({
   conversationQualifiedId,
   conversationName,
   onUpdateBodyHeight,
+  onRefresh,
 }: CellsTableProps) => {
   const {tableBodyRef} = useTableHeight({
     nodes,
@@ -59,7 +61,7 @@ export const CellsTable = ({
 
   const table = useReactTable({
     data: nodes,
-    columns: getCellsTableColumns({cellsRepository, conversationQualifiedId, conversationName}),
+    columns: getCellsTableColumns({cellsRepository, conversationQualifiedId, conversationName, onRefresh}),
     getCoreRowModel: getCoreRowModel(),
   });
 

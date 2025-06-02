@@ -402,6 +402,7 @@ declare module 'I18n/en-US.json' {
     'cells.options.delete': `Delete`;
     'cells.options.deletePermanently': `Delete permanently`;
     'cells.options.download': `Download`;
+    'cells.options.editTags': `Edit tags`;
     'cells.options.open': `Open`;
     'cells.options.move': `Move`;
     'cells.options.share': `Share`;
@@ -436,6 +437,18 @@ declare module 'I18n/en-US.json' {
     'cells.tableRow.shared.falsyValue': `No`;
     'cells.tableRow.shared.truthyValue': `Yes`;
     'cells.tableRow.size': `Size`;
+    'cells.tableRow.tags': `Tags`;
+    'cells.tagsModal.cancelButton': `Cancel`;
+    'cells.tagsModal.closeButton': `Close`;
+    'cells.tagsModal.saveButton': `Save`;
+    'cells.tagsModal.error': `Something went wrong`;
+    'cells.tagsModal.label': `Tags`;
+    'cells.tagsModal.loading': `Loading tags...`;
+    'cells.tagsModal.noTagsFound': `No tags found`;
+    'cells.tagsModal.placeholder': `Type or select a tag`;
+    'cells.tagsModal.title': `Edit tags`;
+    'cells.tagsModal.createOptionLabel': `Create tag "{name}"`;
+    'cells.tagsModal.description': `Tags are shared across the team and available for others to use.`;
     'cells.moveNodeModal.cancelButton': `Cancel`;
     'cells.moveNodeModal.createFolder.hintButton': `Create a new folder`;
     'cells.moveNodeModal.createFolder.hintText': `No suitable folder?`;

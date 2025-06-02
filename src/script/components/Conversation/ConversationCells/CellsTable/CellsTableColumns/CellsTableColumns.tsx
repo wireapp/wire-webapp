@@ -28,6 +28,7 @@ import {CellsTableDateColumn} from './CellsTableDateColumn/CellsTableDateColumn'
 import {CellsTableNameColumn} from './CellsTableNameColumn/CellsTableNameColumn';
 import {CellsTableRowOptions} from './CellsTableRowOptions/CellsTableRowOptions';
 import {CellsTableSharedColumn} from './CellsTableSharedColumn/CellsTableSharedColumn';
+import {CellsTagsColumn} from './CellsTagsColumn/CellsTagsColumn';
 
 import {CellNode} from '../../common/cellNode/cellNode';
 
@@ -37,10 +38,12 @@ export const getCellsTableColumns = ({
   cellsRepository,
   conversationQualifiedId,
   conversationName,
+  onRefresh,
 }: {
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
   conversationName: string;
+  onRefresh: () => void;
 }) => [
   columnHelper.accessor('name', {
     header: t('cells.tableRow.name'),
@@ -55,6 +58,11 @@ export const getCellsTableColumns = ({
     header: t('cells.tableRow.size'),
     cell: info => info.getValue(),
     size: 100,
+  }),
+  columnHelper.accessor('tags', {
+    header: t('cells.tableRow.tags'),
+    cell: info => <CellsTagsColumn tags={info.getValue()} />,
+    size: 120,
   }),
   columnHelper.accessor('uploadedAtTimestamp', {
     header: t('cells.tableRow.created'),
@@ -76,6 +84,7 @@ export const getCellsTableColumns = ({
           cellsRepository={cellsRepository}
           conversationQualifiedId={conversationQualifiedId}
           conversationName={conversationName}
+          onRefresh={onRefresh}
         />
       );
     },

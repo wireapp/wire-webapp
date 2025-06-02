@@ -31,6 +31,7 @@ export interface CellFile {
   uploadedAtTimestamp: number;
   owner: string;
   conversationName: string;
+  tags: string[];
   publicLink?: {
     alreadyShared: boolean;
     uuid?: string;
@@ -48,6 +49,7 @@ export interface CellFolder {
   sizeMb: string;
   uploadedAtTimestamp: number;
   owner: string;
+  tags: string[];
   publicLink?: {
     alreadyShared: boolean;
     uuid?: string;

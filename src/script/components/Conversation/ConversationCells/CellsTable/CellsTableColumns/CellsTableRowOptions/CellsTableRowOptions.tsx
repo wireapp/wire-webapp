@@ -37,6 +37,7 @@ import {forcedDownloadFile} from 'Util/util';
 
 import {CellsMoveNodeModal} from './CellsMoveNodeModal/CellsMoveNodeModal';
 import {buttonStyles, iconStyles, textStyles} from './CellsTableRowOptions.styles';
+import {CellsTagsModal} from './CellsTagsModal/CellsTagsModal';
 import {showDeletePermanentlyModal} from './showDeletePermanentlyModal/showDeletePermanentlyModal';
 import {showMoveToRecycleBinModal} from './showMoveToRecycleBinModal/showMoveToRecycleBinModal';
 import {showRestoreNodeModal} from './showRestoreNodeModal/showRestoreNodeModal';
@@ -49,6 +50,7 @@ interface CellsTableRowOptionsProps {
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
   conversationName: string;
+  onRefresh: () => void;
 }
 
 export const CellsTableRowOptions = ({
@@ -56,6 +58,7 @@ export const CellsTableRowOptions = ({
   cellsRepository,
   conversationQualifiedId,
   conversationName,
+  onRefresh,
 }: CellsTableRowOptionsProps) => {
   return (
     <DropdownMenu>
@@ -70,6 +73,7 @@ export const CellsTableRowOptions = ({
         cellsRepository={cellsRepository}
         conversationQualifiedId={conversationQualifiedId}
         conversationName={conversationName}
+        onRefresh={onRefresh}
       />
     </DropdownMenu>
   );
@@ -80,11 +84,12 @@ const CellsTableRowOptionsContent = ({
   cellsRepository,
   conversationQualifiedId,
   conversationName,
+  onRefresh,
 }: CellsTableRowOptionsProps) => {
   const {handleOpenFile} = useCellsFilePreviewModal();
   const {removeNode} = useCellsStore();
   const [isMoveNodeModalOpen, setIsMoveNodeModalOpen] = useState(false);
-
+  const [isTagsModalOpen, setIsTagsModalOpen] = useState(false);
   const url = node.url;
   const name = node.type === 'folder' ? `${node.name}.zip` : node.name;
   const conversationId = conversationQualifiedId.id;
@@ -199,6 +204,7 @@ const CellsTableRowOptionsContent = ({
             {t('cells.options.download')}
           </DropdownMenu.Item>
         )}
+        <DropdownMenu.Item onClick={() => setIsTagsModalOpen(true)}>{t('cells.options.editTags')}</DropdownMenu.Item>
         <DropdownMenu.Item
           onClick={() =>
             showMoveToRecycleBinModal({
@@ -217,6 +223,14 @@ const CellsTableRowOptionsContent = ({
         cellsRepository={cellsRepository}
         conversationQualifiedId={conversationQualifiedId}
         conversationName={conversationName}
+      />
+      <CellsTagsModal
+        uuid={node.id}
+        isOpen={isTagsModalOpen}
+        onClose={() => setIsTagsModalOpen(false)}
+        cellsRepository={cellsRepository}
+        selectedTags={node.tags}
+        onRefresh={onRefresh}
       />
     </>
   );
