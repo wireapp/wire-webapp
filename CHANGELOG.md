@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.56.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.55.0...@wireapp/api-client@27.56.0) (2025-06-03)
+
+### Features
+
+* **CellsAPI:** tags [WPB-17811] ([#7059](https://github.com/wireapp/wire-web-packages/issues/7059)) ([754426a](https://github.com/wireapp/wire-web-packages/commit/754426af04cf0d0a3a94cc8588046ea8bdb21d85))
+
 # [27.55.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.54.0...@wireapp/api-client@27.55.0) (2025-05-23)
 
 ### Features
