@@ -179,11 +179,13 @@ module.exports = {
         },
         // Copy Core-Crypto worker for @wireapp/core-crypto package
         {
-          from: path.dirname(require.resolve('@wireapp/core-crypto/package.json')) + '/src/*.wasm',
-          to: `${dist}/min`,
+          context: 'node_modules/@wireapp/core-crypto/src',
+          from: '*',
+          to: `${dist}/min/`,
         },
       ],
     }),
+    new webpack.IgnorePlugin({resourceRegExp: /.*\.wasm/}),
     // @todo: We should merge these when main & auth app are merged.
     new HtmlWebpackPlugin({
       inject: false,
