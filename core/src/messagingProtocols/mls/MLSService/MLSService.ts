@@ -18,17 +18,14 @@
  */
 
 import type {ClaimedKeyPackages, MLSPublicKeyRecord, RegisteredClient} from '@wireapp/api-client/lib/client';
-import {PostMlsMessageResponse, SUBCONVERSATION_ID} from '@wireapp/api-client/lib/conversation';
+import {SUBCONVERSATION_ID} from '@wireapp/api-client/lib/conversation';
 import {ConversationMLSMessageAddEvent, ConversationMLSWelcomeEvent} from '@wireapp/api-client/lib/event';
-import {BackendError, StatusCode} from '@wireapp/api-client/lib/http';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import {Converter, Decoder, Encoder} from 'bazinga64';
 
 import {APIClient} from '@wireapp/api-client';
 import {LogFactory, TimeUtil, TypedEventEmitter} from '@wireapp/commons';
 import {
-  AddProposalArgs,
   Ciphersuite,
   CommitBundle,
   ConversationConfiguration,
@@ -36,25 +33,27 @@ import {
   CoreCrypto,
   CredentialType,
   DecryptedMessage,
-  ProposalArgs,
-  ProposalType,
-  RemoveProposalArgs,
+  EpochObserver,
+  MlsTransport,
+  MlsTransportResponse,
+  NewCrlDistributionPoints,
 } from '@wireapp/core-crypto';
-import {PriorityQueue} from '@wireapp/priority-queue';
 
 import {ClientMLSError, ClientMLSErrorLabel} from './ClientMLSError';
 import {isCoreCryptoMLSConversationAlreadyExistsError, shouldMLSDecryptionErrorBeIgnored} from './CoreCryptoMLSError';
-import {NewCrlDistributionPointsPayload, UploadCommitOptions} from './MLSService.types';
 
 import {AddUsersFailure, AddUsersFailureReasons, KeyPackageClaimUser} from '../../../conversation';
-import {sendMessage} from '../../../conversation/message/messageSender';
 import {CoreDatabase} from '../../../storage/CoreDB';
 import {parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUtils';
 import {numberToHex} from '../../../util/numberToHex';
 import {RecurringTaskScheduler} from '../../../util/RecurringTaskScheduler';
 import {TaskScheduler} from '../../../util/TaskScheduler';
 import {User} from '../E2EIdentityService';
-import {E2EIServiceInternal, getTokenCallback} from '../E2EIdentityService/E2EIServiceInternal';
+import {
+  E2EIServiceInternal,
+  getAllConversationsCallback,
+  getTokenCallback,
+} from '../E2EIdentityService/E2EIServiceInternal';
 import {
   getMLSDeviceStatus,
   getSignatureAlgorithmForCiphersuite,
@@ -62,11 +61,7 @@ import {
   MLSDeviceStatus,
 } from '../E2EIdentityService/Helper';
 import {handleMLSMessageAdd, handleMLSWelcomeMessage} from '../EventHandler/events';
-import {
-  deleteMLSMessagesQueue,
-  queueIncomingMLSMessage,
-  withLockedMLSMessagesQueue,
-} from '../EventHandler/events/messageAdd';
+import {deleteMLSMessagesQueue, queueIncomingMLSMessage} from '../EventHandler/events/messageAdd';
 import {ClientId, HandlePendingProposalsParams} from '../types';
 import {generateMLSDeviceId} from '../utils/MLSId';
 
@@ -105,24 +100,23 @@ export enum MLSServiceEvents {
   NEW_EPOCH = 'newEpoch',
   MLS_CLIENT_MISMATCH = 'mlsClientMismatch',
   NEW_CRL_DISTRIBUTION_POINTS = 'newCrlDistributionPoints',
+  MLS_EVENT_DISTRIBUTED = 'mlsEventDistributed',
 }
 
 type Events = {
   [MLSServiceEvents.NEW_EPOCH]: {epoch: number; groupId: string};
   [MLSServiceEvents.NEW_CRL_DISTRIBUTION_POINTS]: string[];
   [MLSServiceEvents.MLS_CLIENT_MISMATCH]: void;
+  [MLSServiceEvents.MLS_EVENT_DISTRIBUTED]: {
+    events: any;
+    time: string;
+  };
 };
 export class MLSService extends TypedEventEmitter<Events> {
   logger = LogFactory.getLogger('@wireapp/core/MLSService');
   private _config?: MLSConfig;
   private readonly textEncoder = new TextEncoder();
   private readonly textDecoder = new TextDecoder();
-  private readonly conflictBackoffQueue = new PriorityQueue({
-    maxRetries: 10,
-    retryDelay: 500,
-    maxRetryDelay: TimeInMillis.SECOND * 32,
-    shouldRetry: error => error instanceof BackendError && error.code === StatusCode.CONFLICT,
-  });
 
   constructor(
     private readonly apiClient: APIClient,
@@ -131,6 +125,24 @@ export class MLSService extends TypedEventEmitter<Events> {
     private readonly recurringTaskScheduler: RecurringTaskScheduler,
   ) {
     super();
+
+    const mlsTransport: MlsTransport = {
+      sendCommitBundle: this._uploadCommitBundle,
+      // Info: This is not used for now, but we need to implement it to be able to use the mls transport
+      sendMessage: async () => {
+        return 'success';
+      },
+    };
+
+    const epochObserver: EpochObserver = {
+      epochChanged: async (groupId, epoch) => {
+        const groupIdStr = Encoder.toBase64(groupId).asString;
+        this.emit(MLSServiceEvents.NEW_EPOCH, {epoch, groupId: groupIdStr});
+      },
+    };
+
+    void this.coreCryptoClient.registerEpochObserver(epochObserver);
+    void this.coreCryptoClient.provideTransport(mlsTransport);
   }
 
   /**
@@ -172,18 +184,9 @@ export class MLSService extends TypedEventEmitter<Events> {
       ...filteredMLSConfig,
     };
 
-    await this.coreCryptoClient.mlsInit(
-      generateMLSDeviceId(userId, client.id),
-      this.config.ciphersuites,
-      this.config.nbKeyPackages,
+    await this.coreCryptoClient.transaction(cx =>
+      cx.mlsInit(generateMLSDeviceId(userId, client.id), this.config.ciphersuites, this.config.nbKeyPackages),
     );
-
-    await this.coreCryptoClient.registerCallbacks({
-      // All authorization/membership rules are enforced on backend
-      clientIsExistingGroupUser: async () => true,
-      authorize: async () => true,
-      userAuthorize: async () => true,
-    });
 
     try {
       const ccClientSignature = await this.getCCClientSignatureString();
@@ -227,57 +230,33 @@ export class MLSService extends TypedEventEmitter<Events> {
       : CredentialType.Basic;
   }
 
-  private uploadCommitBundle = async (
-    groupId: Uint8Array,
-    commitBundle: CommitBundle,
-    {isExternalCommit = false, regenerateCommitBundle}: UploadCommitOptions = {},
-  ) => {
-    try {
-      return await this._uploadCommitBundle(groupId, async () => commitBundle, isExternalCommit);
-    } catch (error) {
-      if (error instanceof BackendError && error.code === StatusCode.CONFLICT && regenerateCommitBundle) {
-        return this.conflictBackoffQueue.add(async () =>
-          this._uploadCommitBundle(groupId, regenerateCommitBundle, isExternalCommit),
-        );
-      }
-      throw error;
-    }
-  };
-
-  private readonly _uploadCommitBundle = async (
-    groupId: Uint8Array,
-    generateCommitBundle: () => Promise<CommitBundle>,
-    isExternalCommit: boolean,
-  ): Promise<PostMlsMessageResponse> => {
-    const groupIdStr = Encoder.toBase64(groupId).asString;
-
+  private readonly _uploadCommitBundle = async ({
+    commit,
+    groupInfo,
+    welcome,
+  }: CommitBundle): Promise<MlsTransportResponse> => {
     // We need to lock the incoming mls messages queue while we are uploading the commit bundle
     // it's possible that we will be sent some mls messages before we receive the response from backend and accept a commit locally.
-    return withLockedMLSMessagesQueue(groupIdStr, async () => {
-      const {commit, groupInfo, welcome} = await generateCommitBundle();
-      const bundlePayload = new Uint8Array([...commit, ...groupInfo.payload, ...(welcome || [])]);
-      try {
-        const response = await this.apiClient.api.conversation.postMlsCommitBundle(bundlePayload);
 
-        if (isExternalCommit) {
-          await this.coreCryptoClient.mergePendingGroupFromExternalCommit(groupId);
-        } else {
-          await this.coreCryptoClient.commitAccepted(groupId);
-        }
-        const newEpoch = await this.getEpoch(groupId);
+    const bundlePayload = new Uint8Array([...commit, ...groupInfo.payload, ...(welcome || [])]);
+    try {
+      const response = await this.apiClient.api.conversation.postMlsCommitBundle(bundlePayload);
 
-        this.emit(MLSServiceEvents.NEW_EPOCH, {epoch: newEpoch, groupId: groupIdStr});
-        return response;
-      } catch (error) {
-        if (isExternalCommit) {
-          await this.coreCryptoClient.clearPendingGroupFromExternalCommit(groupId);
-        } else {
-          await this.coreCryptoClient.clearPendingCommit(groupId);
-        }
-
-        throw error;
+      if (response.failed_to_send) {
+        this.logger.warn(`Failed to send commit bundle to backend`);
+        return 'retry';
       }
-    });
+
+      const {events, time} = response;
+
+      this.emit(MLSServiceEvents.MLS_EVENT_DISTRIBUTED, {events, time});
+
+      return 'success';
+    } catch (error) {
+      return {
+        abort: {reason: error instanceof Error ? error.message : 'unknown error'},
+      };
+    }
   };
 
   /**
@@ -287,36 +266,17 @@ export class MLSService extends TypedEventEmitter<Events> {
    * @param groupId - the group id of the MLS group
    * @param keyPackages - the list of keys of clients to add to the MLS group
    */
-  public async addUsersToExistingConversation(
-    groupId: string,
-    keyPackages: Uint8Array[],
-  ): Promise<PostMlsMessageResponse & {failures: AddUsersFailure[]}> {
+  public async addUsersToExistingConversation(groupId: string, keyPackages: Uint8Array[]) {
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
 
     if (keyPackages.length < 1) {
       throw new Error('Empty list of keys provided to addUsersToExistingConversation');
     }
 
-    // TODO: handle federation error when sending a commit bundle to backend like we do in ProteusService
-    const response = await this.processCommitAction(groupIdBytes, async () => {
-      const commitBundle = await this.coreCryptoClient.addClientsToConversation(groupIdBytes, keyPackages);
-      this.dispatchNewCrlDistributionPoints(commitBundle);
-      return commitBundle;
-    });
-
-    const failedUsers = response.failed;
-
-    const failures = failedUsers
-      ? [
-          {
-            users: failedUsers,
-            backends: failedUsers.map(({domain}) => domain),
-            reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS,
-          },
-        ]
-      : [];
-
-    return {...response, failures};
+    const crlNewDistributionPoints = await this.coreCryptoClient.transaction(cx =>
+      cx.addClientsToConversation(groupIdBytes, keyPackages),
+    );
+    this.dispatchNewCrlDistributionPoints(crlNewDistributionPoints);
   }
 
   /**
@@ -420,32 +380,20 @@ export class MLSService extends TypedEventEmitter<Events> {
     return this.coreCryptoClient.conversationEpoch(groupIdBytes);
   }
 
-  public async newProposal(proposalType: ProposalType, args: ProposalArgs | AddProposalArgs | RemoveProposalArgs) {
-    return this.coreCryptoClient.newProposal(proposalType, args);
-  }
-
   public async joinByExternalCommit(getGroupInfo: () => Promise<Uint8Array>) {
     const credentialType = await this.getCredentialType();
-    const generateCommit = async () => {
-      const groupInfo = await getGroupInfo();
-      const joinRequest = await this.coreCryptoClient.joinByExternalCommit(groupInfo, credentialType);
-      this.dispatchNewCrlDistributionPoints(joinRequest);
-      const {conversationId, ...commitBundle} = joinRequest;
-      return {groupId: conversationId, commitBundle};
-    };
-    const {commitBundle, groupId} = await generateCommit();
-    const mlsResponse = await this.uploadCommitBundle(groupId, commitBundle, {
-      isExternalCommit: true,
-      regenerateCommitBundle: async () => (await generateCommit()).commitBundle,
-    });
 
-    if (mlsResponse) {
+    const groupInfo = await getGroupInfo();
+    const welcomeBundle = await this.coreCryptoClient.transaction(cx =>
+      cx.joinByExternalCommit(groupInfo, credentialType),
+    );
+    await this.dispatchNewCrlDistributionPoints(welcomeBundle.crlNewDistributionPoints);
+
+    if (welcomeBundle.id) {
       //after we've successfully joined via external commit, we schedule periodic key material renewal
-      const groupIdStr = Encoder.toBase64(groupId).asString;
+      const groupIdStr = Encoder.toBase64(welcomeBundle.id).asString;
       await this.scheduleKeyMaterialRenewal(groupIdStr);
     }
-
-    return mlsResponse;
   }
 
   public async exportSecretKey(groupId: string, keyLength: number): Promise<string> {
@@ -454,66 +402,47 @@ export class MLSService extends TypedEventEmitter<Events> {
     return Encoder.toBase64(key).asString;
   }
 
-  private dispatchNewCrlDistributionPoints(payload: NewCrlDistributionPointsPayload) {
-    const {crlNewDistributionPoints} = payload;
+  private dispatchNewCrlDistributionPoints(crlNewDistributionPoints: NewCrlDistributionPoints) {
     if (crlNewDistributionPoints && crlNewDistributionPoints.length > 0) {
       this.emit(MLSServiceEvents.NEW_CRL_DISTRIBUTION_POINTS, crlNewDistributionPoints);
     }
   }
 
   public async processWelcomeMessage(welcomeMessage: Uint8Array): Promise<ConversationId> {
-    const welcomeBundle = await this.coreCryptoClient.processWelcomeMessage(welcomeMessage);
-    this.dispatchNewCrlDistributionPoints(welcomeBundle);
+    const welcomeBundle = await this.coreCryptoClient.transaction(cx => cx.processWelcomeMessage(welcomeMessage));
+    this.dispatchNewCrlDistributionPoints(welcomeBundle.crlNewDistributionPoints);
     return welcomeBundle.id;
   }
 
-  public async decryptMessage(conversationId: ConversationId, payload: Uint8Array): Promise<DecryptedMessage> {
-    return await this.coreCryptoClient.transaction(async cx => {
-      try {
-        const decryptedMessage = await cx.decryptMessage(conversationId, payload);
-        this.dispatchNewCrlDistributionPoints(decryptedMessage);
-        return decryptedMessage;
-      } catch (error) {
-        // According to CoreCrypto JS doc on .decryptMessage method, we should ignore some errors (corecrypto handle them internally)
-        if (shouldMLSDecryptionErrorBeIgnored(error)) {
-          return {
-            hasEpochChanged: false,
-            isActive: false,
-            proposals: [],
-          };
-        }
-        throw error;
+  public async decryptMessage(
+    conversationId: ConversationId,
+    payload: Uint8Array,
+  ): Promise<DecryptedMessage | undefined> {
+    try {
+      const decryptedMessage = await this.coreCryptoClient.transaction(cx =>
+        cx.decryptMessage(conversationId, payload),
+      );
+      this.dispatchNewCrlDistributionPoints(decryptedMessage.crlNewDistributionPoints);
+      return decryptedMessage;
+    } catch (error) {
+      // According to CoreCrypto JS doc on .decryptMessage method, we should ignore some errors (corecrypto handle them internally)
+      if (shouldMLSDecryptionErrorBeIgnored(error)) {
+        return {
+          hasEpochChanged: false,
+          isActive: false,
+        };
       }
-    });
+      return undefined;
+    }
   }
 
   public async encryptMessage(conversationId: ConversationId, message: Uint8Array): Promise<Uint8Array> {
-    return this.coreCryptoClient.encryptMessage(conversationId, message);
+    return this.coreCryptoClient.transaction(cx => cx.encryptMessage(conversationId, message));
   }
 
-  /**
-   * Will wrap a coreCrypto call that generates a CommitBundle and do all the necessary work so that commitbundle is handled the right way.
-   * It does:
-   *   - commit the pending proposal
-   *   - then generates the commitBundle with the given function
-   *   - uploads the commitBundle to backend
-   *   - warns coreCrypto that the commit was successfully processed
-   * @param groupId
-   * @param generateCommit The function that will generate a coreCrypto CommitBundle
-   */
-  private async processCommitAction(groupId: ConversationId, generateCommit: () => Promise<CommitBundle>) {
-    const groupIdStr = Encoder.toBase64(groupId).asString;
-
-    return sendMessage<PostMlsMessageResponse>(async () => {
-      await this.commitPendingProposals(groupIdStr);
-      const commitBundle = await generateCommit();
-      return this.uploadCommitBundle(groupId, commitBundle, {regenerateCommitBundle: generateCommit});
-    });
-  }
-
-  private updateKeyingMaterial(groupId: string) {
+  private async updateKeyingMaterial(groupId: string) {
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
-    return this.processCommitAction(groupIdBytes, () => this.coreCryptoClient.updateKeyingMaterial(groupIdBytes));
+    await this.coreCryptoClient.transaction(cx => cx.updateKeyingMaterial(groupIdBytes));
   }
 
   /**
@@ -551,7 +480,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     };
 
     const credentialType = await this.getCredentialType();
-    return this.coreCryptoClient.createConversation(groupIdBytes, credentialType, configuration);
+    return this.coreCryptoClient.transaction(cx => cx.createConversation(groupIdBytes, credentialType, configuration));
   }
 
   /**
@@ -565,7 +494,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     groupId: string,
     users: QualifiedId[],
     options?: {creator?: {user: QualifiedId; client?: string}; parentGroupId?: string},
-  ): Promise<PostMlsMessageResponse & {failures: AddUsersFailure[]}> {
+  ): Promise<AddUsersFailure[]> {
     await this.registerEmptyConversation(groupId, options?.parentGroupId);
 
     const creator = options?.creator;
@@ -585,13 +514,11 @@ export class MLSService extends TypedEventEmitter<Events> {
 
     if (keyPackages.length <= 0) {
       // If there are no clients to add, just update the keying material
-      const response = await this.updateKeyingMaterial(groupId);
+      await this.updateKeyingMaterial(groupId);
       await this.scheduleKeyMaterialRenewal(groupId);
 
-      return {...response, failures: keysClaimingFailures};
+      return keysClaimingFailures;
     }
-
-    const response = await this.addUsersToExistingConversation(groupId, keyPackages);
 
     // We schedule a periodic key material renewal
     await this.scheduleKeyMaterialRenewal(groupId);
@@ -600,8 +527,7 @@ export class MLSService extends TypedEventEmitter<Events> {
      * @note If we can't fetch a user's key packages then we can not add them to mls conversation
      * so we're adding them to the list of failed users.
      */
-    response.failures = [...keysClaimingFailures, ...response.failures];
-    return response;
+    return keysClaimingFailures;
   }
 
   /**
@@ -615,7 +541,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     userId: QualifiedId,
     selfUser: {user: QualifiedId; client: string},
     removalKeyFor1to1Signature?: MLSPublicKeyRecord,
-  ): Promise<PostMlsMessageResponse & {failures: AddUsersFailure[]}> {
+  ): Promise<AddUsersFailure[]> {
     try {
       await this.registerEmptyConversation(groupId, undefined, removalKeyFor1to1Signature);
 
@@ -637,16 +563,12 @@ export class MLSService extends TypedEventEmitter<Events> {
         {...selfUser.user, skipOwnClientId: selfUser.client},
       ]);
 
-      const response = await this.addUsersToExistingConversation(groupId, [
-        ...otherUserKeyPackages,
-        ...selfKeyPackages,
-      ]);
+      await this.addUsersToExistingConversation(groupId, [...otherUserKeyPackages, ...selfKeyPackages]);
 
       // We schedule a periodic key material renewal
       await this.scheduleKeyMaterialRenewal(groupId);
 
-      response.failures = [...otherUserKeysClaimingFailures, ...selfKeysClaimingFailures, ...response.failures];
-      return response;
+      return [...otherUserKeysClaimingFailures, ...selfKeysClaimingFailures];
     } catch (error) {
       await this.wipeConversation(groupId);
       throw error;
@@ -696,8 +618,8 @@ export class MLSService extends TypedEventEmitter<Events> {
   public removeClientsFromConversation(groupId: string, clientIds: ClientId[]) {
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
 
-    return this.processCommitAction(groupIdBytes, () =>
-      this.coreCryptoClient.removeClientsFromConversation(
+    return this.coreCryptoClient.transaction(cx =>
+      cx.removeClientsFromConversation(
         groupIdBytes,
         clientIds.map(id => this.textEncoder.encode(id)),
       ),
@@ -725,12 +647,16 @@ export class MLSService extends TypedEventEmitter<Events> {
 
   public async clientValidKeypackagesCount(): Promise<number> {
     const credentialType = await this.getCredentialType();
-    return this.coreCryptoClient.clientValidKeypackagesCount(this.config.defaultCiphersuite, credentialType);
+    return this.coreCryptoClient.transaction(cx =>
+      cx.clientValidKeypackagesCount(this.config.defaultCiphersuite, credentialType),
+    );
   }
 
   public async clientKeypackages(amountRequested: number): Promise<Uint8Array[]> {
     const credentialType = await this.getCredentialType();
-    return this.coreCryptoClient.clientKeypackages(this.config.defaultCiphersuite, credentialType, amountRequested);
+    return this.coreCryptoClient.transaction(cx =>
+      cx.clientKeypackages(this.config.defaultCiphersuite, credentialType, amountRequested),
+    );
   }
 
   /**
@@ -905,7 +831,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     }
 
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
-    return this.coreCryptoClient.wipeConversation(groupIdBytes);
+    return this.coreCryptoClient.transaction(cx => cx.wipeConversation(groupIdBytes));
   }
 
   /**
@@ -955,12 +881,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
 
     try {
-      const commitBundle = await this.coreCryptoClient.commitPendingProposals(groupIdBytes);
-
-      if (commitBundle) {
-        await this.uploadCommitBundle(groupIdBytes, commitBundle);
-      }
-
+      await this.coreCryptoClient.transaction(cx => cx.commitPendingProposals(groupIdBytes));
       await this.cancelPendingProposalsTask(groupId);
     } catch (error) {
       if (!shouldRetry) {
@@ -968,12 +889,6 @@ export class MLSService extends TypedEventEmitter<Events> {
       }
 
       this.logger.warn('Failed to commit proposals, clearing the pending commit and retrying', error);
-
-      // If we failed to commit the proposals, we need to clear the pending commit and retry
-      // this is to avoid a situation where we are stuck with pending proposals that we can't commit.
-      // If there's nothing to clear the methods might throw an error, which we can ignore.
-      await this.coreCryptoClient.clearPendingCommit(groupIdBytes).catch(() => undefined);
-      await this.coreCryptoClient.clearPendingGroupFromExternalCommit(groupIdBytes).catch(() => undefined);
 
       return this.commitPendingProposals(groupId, false);
     }
@@ -1069,6 +984,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     nbPrekeys: number,
     certificateTtl: number,
     getOAuthToken: getTokenCallback,
+    getAllConversations: getAllConversationsCallback,
   ): Promise<void> {
     const isCertificateRenewal = await this.coreCryptoClient.e2eiIsEnabled(this.config.defaultCiphersuite);
     const e2eiServiceInternal = new E2EIServiceInternal(
@@ -1080,34 +996,22 @@ export class MLSService extends TypedEventEmitter<Events> {
       {user, clientId: client.id, discoveryUrl},
     );
 
-    const rotateBundle = await e2eiServiceInternal.generateCertificate(
+    const {keyPackages, newCrlDistributionPoints} = await e2eiServiceInternal.generateCertificate(
       getOAuthToken,
       isCertificateRenewal,
+      getAllConversations,
       this.config.defaultCiphersuite,
     );
 
-    this.dispatchNewCrlDistributionPoints(rotateBundle);
+    this.dispatchNewCrlDistributionPoints(newCrlDistributionPoints);
     // upload the clients public keys
     if (!this.isInitializedMLSClient(client)) {
       // we only upload public keys for the initial certification process if the device is not already a registered MLS device.
       await this.uploadMLSPublicKeys(client);
     }
     // replace old key packages with new key packages with x509 certificate
-    await this.replaceKeyPackages(client.id, rotateBundle.newKeyPackages);
+    await this.replaceKeyPackages(client.id, keyPackages);
     // Verify that we have enough key packages
     await this.verifyRemoteMLSKeyPackagesAmount(client.id);
-    // Update keying material
-    for (const [groupId, commitBundle] of rotateBundle.commits) {
-      const groupIdAsBytes = Converter.hexStringToArrayBufferView(groupId);
-      // manual copy of the commit bundle data because of a problem while cloning it
-      const newCommitBundle = {
-        commit: commitBundle.commit,
-        // @ts-ignore
-        groupInfo: commitBundle?.group_info || commitBundle.groupInfo,
-        welcome: commitBundle?.welcome,
-      };
-
-      await this.uploadCommitBundle(groupIdAsBytes, newCommitBundle);
-    }
   }
 }

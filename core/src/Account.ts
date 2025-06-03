@@ -53,6 +53,7 @@ import {getQueueLength, pauseMessageSending, resumeMessageSending} from './conve
 import {SubconversationService} from './conversation/SubconversationService/SubconversationService';
 import {GiphyService} from './giphy/';
 import {LinkPreviewService} from './linkPreview';
+import {CoreCryptoConfig} from './messagingProtocols/common.types';
 import {InitClientOptions, MLSService} from './messagingProtocols/mls';
 import {
   pauseRejoiningMLSConversations,
@@ -60,8 +61,11 @@ import {
   resumeRejoiningMLSConversations,
 } from './messagingProtocols/mls/conversationRejoinQueue';
 import {E2EIServiceExternal, User} from './messagingProtocols/mls/E2EIdentityService';
-import {getTokenCallback} from './messagingProtocols/mls/E2EIdentityService/E2EIServiceInternal';
-import {CoreCallbacks, CoreCryptoConfig, SecretCrypto} from './messagingProtocols/mls/types';
+import {
+  getAllConversationsCallback,
+  getTokenCallback,
+} from './messagingProtocols/mls/E2EIdentityService/E2EIServiceInternal';
+import {CoreCallbacks, SecretCrypto} from './messagingProtocols/mls/types';
 import {NewClient, ProteusService} from './messagingProtocols/proteus';
 import {CryptoClientType} from './messagingProtocols/proteus/ProteusService/CryptoClient';
 import {deleteIdentity} from './messagingProtocols/proteus/ProteusService/identityClearer';
@@ -93,6 +97,7 @@ interface AccountOptions {
   /** Used to store info in the database (will create a inMemory engine if returns undefined) */
   createStore?: CreateStoreFn;
   systemCrypto?: SecretCrypto;
+  coreCryptoConfig?: CoreCryptoConfig;
 
   /** Number of prekeys to generate when creating a new device (defaults to 2)
    * Prekeys are Diffie-Hellmann public keys which allow offline initiation of a secure Proteus session between two devices.
@@ -104,11 +109,6 @@ interface AccountOptions {
    *    - make it likely that all prekeys get consumed while the device is offline and the last resort prekey will be used to create new session
    */
   nbPrekeys: number;
-
-  /**
-   * Config for coreCrypto in case it supposed to be used. Will fallback to the old cryptobox logic if not provided
-   */
-  coreCryptoConfig?: CoreCryptoConfig;
 }
 
 type InitOptions = {
@@ -137,7 +137,6 @@ type Events = {
 export class Account extends TypedEventEmitter<Events> {
   private readonly apiClient: APIClient;
   private readonly logger: logdown.Logger;
-  private readonly coreCryptoConfig?: CoreCryptoConfig;
   /** this is the client the consumer is currently using. Will be set as soon as `initClient` is called and will be rest upon logout */
   private currentClient?: RegisteredClient;
   private storeEngine?: CRUDEngine;
@@ -172,12 +171,11 @@ export class Account extends TypedEventEmitter<Events> {
    */
   constructor(
     apiClient: APIClient = new APIClient(),
-    private options: AccountOptions = {nbPrekeys: 100},
+    private options: AccountOptions = {nbPrekeys: 100, coreCryptoConfig: {wasmFilePath: '', enabled: false}},
   ) {
     super();
     this.apiClient = apiClient;
     this.backendFeatures = this.apiClient.backendFeatures;
-    this.coreCryptoConfig = options.coreCryptoConfig;
     this.recurringTaskScheduler = new RecurringTaskScheduler({
       get: async key => {
         const task = await this.db?.get('recurringTasks', key);
@@ -233,6 +231,7 @@ export class Account extends TypedEventEmitter<Events> {
     teamId,
     discoveryUrl,
     getOAuthToken,
+    getAllConversations,
     certificateTtl = 90 * (TimeInMillis.DAY / 1000),
   }: {
     /** display name of the user (should match the identity provider) */
@@ -244,6 +243,8 @@ export class Account extends TypedEventEmitter<Events> {
     discoveryUrl: string;
     /** function called to get the oauth token */
     getOAuthToken: getTokenCallback;
+    /** function called to get all conversations */
+    getAllConversations: getAllConversationsCallback;
     /** number of seconds the certificate should be valid (default 90 days) */
     certificateTtl?: number;
   }) {
@@ -273,6 +274,7 @@ export class Account extends TypedEventEmitter<Events> {
       this.options.nbPrekeys,
       certificateTtl,
       getOAuthToken,
+      getAllConversations,
     );
   }
 
@@ -364,7 +366,7 @@ export class Account extends TypedEventEmitter<Events> {
     // Call /access endpoint with client_id after client initialisation
     await this.apiClient.transport.http.associateClientWithSession(client.id);
 
-    await this.service.proteus.initClient(this.storeEngine, this.apiClient.context);
+    await this.service.proteus.initClient(this.apiClient.context);
 
     if ((await this.isMLSActiveForClient()) && this.service.mls && mlsConfig) {
       const {userId, domain = ''} = this.apiClient.context;
@@ -394,14 +396,16 @@ export class Account extends TypedEventEmitter<Events> {
       },
     };
 
-    const coreCryptoConfig = this.coreCryptoConfig;
-    if (coreCryptoConfig) {
+    if (this.options.coreCryptoConfig?.enabled) {
       const {buildClient} = await import('./messagingProtocols/proteus/ProteusService/CryptoClient/CoreCryptoWrapper');
-      const client = await buildClient(storeEngine, {
-        ...baseConfig,
-        ...coreCryptoConfig,
-        generateSecretKey: keyId => generateSecretKey({keyId, keySize: 16, secretsDb: encryptedStore}),
-      });
+      const client = await buildClient(
+        storeEngine,
+        {
+          ...baseConfig,
+          generateSecretKey: (keyId, keySize) => generateSecretKey({keyId, keySize, secretsDb: encryptedStore}),
+        },
+        this.options.coreCryptoConfig,
+      );
       return [CryptoClientType.CORE_CRYPTO, client] as const;
     }
 
@@ -438,10 +442,15 @@ export class Account extends TypedEventEmitter<Events> {
     let mlsService: MLSService | undefined;
     let e2eServiceExternal: E2EIServiceExternal | undefined;
 
-    const proteusService = new ProteusService(this.apiClient, cryptoClient, {
-      onNewClient: payload => this.emit(EVENTS.NEW_SESSION, payload),
-      nbPrekeys: this.options.nbPrekeys,
-    });
+    const proteusService = new ProteusService(
+      this.apiClient,
+      cryptoClient,
+      {
+        onNewClient: payload => this.emit(EVENTS.NEW_SESSION, payload),
+        nbPrekeys: this.options.nbPrekeys,
+      },
+      this.storeEngine,
+    );
 
     const clientService = new ClientService(this.apiClient, proteusService, this.storeEngine);
 
@@ -529,7 +538,9 @@ export class Account extends TypedEventEmitter<Events> {
    * Will delete the identity and history of the current user
    */
   private async wipeAllData(): Promise<void> {
-    await this.service?.proteus.wipe(this.storeEngine);
+    if (this.storeEngine) {
+      await deleteIdentity(this.storeEngine, false);
+    }
     if (this.db) {
       await deleteDB(this.db);
     }
@@ -541,7 +552,6 @@ export class Account extends TypedEventEmitter<Events> {
    * Will keep the history intact
    */
   private async wipeCryptoData(): Promise<void> {
-    await this.service?.proteus.wipe();
     if (this.storeEngine) {
       await deleteIdentity(this.storeEngine, true);
     }
@@ -744,22 +754,23 @@ export class Account extends TypedEventEmitter<Events> {
   };
 
   public async isMLSActiveForClient(): Promise<boolean> {
-    // MLS service is initialized
-    const isMLSServiceInitialized = this.service?.mls !== undefined;
-    if (!isMLSServiceInitialized) {
+    // Check for CoreCrypto library, it is required for MLS
+    if (!this.options.coreCryptoConfig?.enabled) {
       return false;
     }
 
-    // Backend Supports MLS trough removal keys
-    const isMLSSupported = await this.apiClient.supportsMLS();
-    if (!isMLSSupported) {
+    // Check if the MLS service is initialized
+    if (this.service?.mls === undefined) {
       return false;
     }
 
-    // MLS is enabled for the public via feature flag
+    // Check if the backend supports MLS trough removal keys
+    if (!(await this.apiClient.supportsMLS())) {
+      return false;
+    }
+
+    // Check if MLS is enabled for the public via backend feature flag
     const commonConfig = (await this.service?.team.getCommonFeatureConfig()) ?? {};
-    const isMLSForTeamEnabled = commonConfig[FEATURE_KEY.MLS]?.status === FeatureStatus.ENABLED;
-
-    return isMLSSupported && isMLSForTeamEnabled && isMLSServiceInitialized;
+    return commonConfig[FEATURE_KEY.MLS]?.status === FeatureStatus.ENABLED;
   }
 }

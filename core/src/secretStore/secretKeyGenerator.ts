@@ -24,6 +24,7 @@ export class CorruptedKeyError extends Error {}
 export type GeneratedKey = {
   key: Uint8Array;
   deleteKey: () => Promise<void>;
+  freshlyGenerated: boolean;
 };
 
 /**
@@ -41,6 +42,7 @@ export async function generateSecretKey({
   /** name of the database that will hold the secrets */
   secretsDb: EncryptedStore<any>;
 }): Promise<GeneratedKey> {
+  let freshlyGenerated = false;
   try {
     let key;
     try {
@@ -65,8 +67,9 @@ export async function generateSecretKey({
       );
       key = new Uint8Array(await crypto.subtle.exportKey('raw', key));
       await secretsDb.saveSecretValue(keyId, key);
+      freshlyGenerated = true;
     }
-    return {key, deleteKey: () => secretsDb.deleteSecretValue(keyId)};
+    return {key, deleteKey: () => secretsDb.deleteSecretValue(keyId), freshlyGenerated};
   } catch (error) {
     throw error;
   }

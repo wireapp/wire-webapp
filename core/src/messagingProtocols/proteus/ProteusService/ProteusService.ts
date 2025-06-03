@@ -77,13 +77,16 @@ export type EncryptionResult = {
 export class ProteusService {
   private readonly messageService: MessageService;
   private readonly logger = LogFactory.getLogger('@wireapp/core/ProteusService');
+  private readonly dbName: string;
 
   constructor(
     private readonly apiClient: APIClient,
     private readonly cryptoClient: CryptoClient,
     private readonly config: ProteusServiceConfig,
+    private readonly storeEngine: CRUDEngine,
   ) {
     this.messageService = new MessageService(this.apiClient, this);
+    this.dbName = storeEngine.storeName;
   }
 
   public async handleOtrMessageAddEvent(event: ConversationOtrMessageAddEvent): Promise<HandledEventPayload> {
@@ -93,24 +96,23 @@ export class ProteusService {
     });
   }
 
-  public async initClient(storeEngine: CRUDEngine, context: Context) {
-    const dbName = storeEngine.storeName;
+  public async initClient(context: Context) {
     if (context.domain) {
       // We want sessions to be fully qualified from now on
-      if (!cryptoMigrationStore.qualifiedSessions.isReady(dbName)) {
+      if (!cryptoMigrationStore.qualifiedSessions.isReady(this.dbName)) {
         this.logger.info(`Migrating existing session ids to qualified ids.`);
-        await migrateToQualifiedSessionIds(storeEngine, context.domain);
-        cryptoMigrationStore.qualifiedSessions.markAsReady(dbName);
+        await migrateToQualifiedSessionIds(this.storeEngine, context.domain);
+        cryptoMigrationStore.qualifiedSessions.markAsReady(this.dbName);
         this.logger.info(`Successfully migrated session ids to qualified ids.`);
       }
     }
 
-    if (!cryptoMigrationStore.coreCrypto.isReady(dbName) && this.cryptoClient.migrateFromCryptobox) {
+    if (!cryptoMigrationStore.coreCrypto.isReady(this.dbName) && this.cryptoClient.migrateFromCryptobox) {
       this.logger.info(`Migrating from cryptobox to corecrypto.`);
       try {
         const startTime = Date.now();
-        await this.cryptoClient.migrateFromCryptobox(dbName);
-        cryptoMigrationStore.coreCrypto.markAsReady(dbName);
+        await this.cryptoClient.migrateFromCryptobox(this.dbName);
+        cryptoMigrationStore.coreCrypto.markAsReady(this.dbName);
         this.logger.info(`Successfully migrated from cryptobox to corecrypto (took ${Date.now() - startTime}ms).`);
       } catch (error) {
         this.logger.error('Client was not able to perform DB migration: ', error);
@@ -358,10 +360,7 @@ export class ProteusService {
     };
   }
 
-  async wipe(storeEngine?: CRUDEngine) {
-    if (storeEngine) {
-      await deleteIdentity(storeEngine);
-    }
-    return this.cryptoClient.wipe();
+  async wipe() {
+    await deleteIdentity(this.storeEngine);
   }
 }

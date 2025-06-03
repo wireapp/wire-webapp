@@ -54,49 +54,6 @@ const createMockedMessage = () => {
 };
 
 describe('handleMLSMessageAdd', () => {
-  it('does not handle pending proposals if message does not contain proposals', async () => {
-    const event = createMLSMessageAddEventMock({id: 'conversationId', domain: 'staging.zinfra.io'});
-    const mockGroupId = 'AAEAAH87aajaQ011i+rNLmwpy0sAZGl5YS53aXJlLmxpbms=';
-
-    const message = createMockedMessage();
-
-    jest.spyOn(mockedMLSService, 'decryptMessage').mockResolvedValueOnce({
-      proposals: [],
-      commitDelay: undefined,
-      message,
-      hasEpochChanged: false,
-      isActive: true,
-    });
-
-    await handleMLSMessageAdd({event, mlsService: mockedMLSService, groupId: mockGroupId});
-
-    expect(mockedMLSService.handlePendingProposals).not.toHaveBeenCalled();
-  });
-
-  it('handles pending proposals if message includes proposals', async () => {
-    const event = createMLSMessageAddEventMock({id: 'conversationId', domain: 'staging.zinfra.io'});
-    const mockGroupId = 'AAEAAH87aajaQ011i+rNLmwpy0sAZGl5YS53aXJlLmxpbms=';
-
-    const message = createMockedMessage();
-
-    jest.spyOn(mockedMLSService, 'decryptMessage').mockResolvedValueOnce({
-      proposals: [{proposal: new Uint8Array(), proposalRef: new Uint8Array(), crlNewDistributionPoints: []}],
-      commitDelay: 2000,
-      crlNewDistributionPoints: [],
-      message,
-      hasEpochChanged: false,
-      isActive: true,
-    });
-
-    await handleMLSMessageAdd({event, mlsService: mockedMLSService, groupId: mockGroupId});
-
-    expect(mockedMLSService.handlePendingProposals).toHaveBeenCalledWith({
-      groupId: mockGroupId,
-      delayInMs: 2000,
-      eventTime: event.time,
-    });
-  });
-
   it('emits "newEpoch" event if incoming message has advanced epoch number', async () => {
     const event = createMLSMessageAddEventMock({id: 'conversationId', domain: 'staging.zinfra.io'});
     const mockGroupId = 'AAEAAH87aajaQ011i+rNLmwpy0sAZGl5YS53aXJlLmxpbms=';
@@ -104,7 +61,6 @@ describe('handleMLSMessageAdd', () => {
     const message = createMockedMessage();
 
     jest.spyOn(mockedMLSService, 'decryptMessage').mockResolvedValueOnce({
-      proposals: [],
       message,
       hasEpochChanged: true,
       isActive: true,

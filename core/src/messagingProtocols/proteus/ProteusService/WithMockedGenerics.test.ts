@@ -57,6 +57,10 @@ const prepareProteusService = async () => {
   return proteusService;
 };
 
+afterAll(() => {
+  jest.clearAllTimers();
+});
+
 describe('sendGenericMessage', () => {
   describe('targetted messages', () => {
     it(`indicates when sending was canceled`, async () => {
