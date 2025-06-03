@@ -204,7 +204,7 @@ const CellsTableRowOptionsContent = ({
             {t('cells.options.download')}
           </DropdownMenu.Item>
         )}
-        <DropdownMenu.Item onClick={() => setIsTagsModalOpen(true)}>{t('cells.options.editTags')}</DropdownMenu.Item>
+        <DropdownMenu.Item onClick={() => setIsTagsModalOpen(true)}>{t('cells.options.tags')}</DropdownMenu.Item>
         <DropdownMenu.Item
           onClick={() =>
             showMoveToRecycleBinModal({
