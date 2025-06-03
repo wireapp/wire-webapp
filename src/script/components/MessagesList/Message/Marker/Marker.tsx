@@ -17,71 +17,43 @@
  *
  */
 
-import {useLayoutEffect, useRef} from 'react';
+import {useLayoutEffect} from 'react';
 
 import {SerializedStyles, css} from '@emotion/react';
 
 import {useRelativeTimestamp} from 'src/script/hooks/useRelativeTimestamp';
-import {t} from 'Util/LocalizerUtil';
-import {formatLocale, isToday, isYesterday} from 'Util/TimeUtil';
 
 import {dayMarkerStyle, baseMarkerStyle} from './Marker.styles';
+import {getMessagesGroupLabel} from './utils';
 
 import {Marker} from '../../utils/messagesGroup';
 import {MessageTime} from '../MessageTime';
-import {ScrollToElement} from '../types';
 
 const markerStyles: Partial<Record<Marker['type'], SerializedStyles>> = {
   day: dayMarkerStyle,
 };
 
-/**
-  If today: “Today”
-  If yesterday: “Yesterday”
-  Any other day: <Week day>, <date> (e.g. “Monday, April 12” or “Friday, January 6 2023”)
-*/
-function getMessagesGroupLabel(ts: number): string {
-  const date = new Date(ts);
-
-  if (isToday(date)) {
-    return t('conversationToday');
-  }
-
-  if (isYesterday(date)) {
-    return t('conversationYesterday');
-  }
-
-  const today = new Date();
-  const isCurrentYear = date.getFullYear() === today.getFullYear();
-  const pattern = isCurrentYear ? 'EEEE, MMMM d' : 'EEEE, MMMM d yyyy';
-
-  return formatLocale(date, pattern);
-}
-
 interface Props {
   marker: Marker;
-  scrollTo: ScrollToElement;
-  // scrollToElement: (isUnread: boolean) => void;
+  scrollTo: (isUnread: boolean) => void;
 }
 
 export const MarkerComponent = ({marker, scrollTo}: Props) => {
   const isDay = marker.type === 'day';
   const timeAgo = useRelativeTimestamp(marker.timestamp, isDay, isDay ? getMessagesGroupLabel : undefined);
-  const elementRef = useRef<HTMLDivElement>(null);
 
   const style = css`
     ${baseMarkerStyle} ${markerStyles[marker.type]}
   `;
 
   useLayoutEffect(() => {
-    if (marker.type === 'unread' && elementRef.current) {
-      // scrollToElement(true);
-      scrollTo({element: elementRef.current}, true);
+    if (marker.type === 'unread') {
+      scrollTo(true);
     }
   }, []);
 
   return (
-    <div className="message-header" css={style} ref={elementRef}>
+    <div className="message-header" css={style}>
       <div className="message-header-icon">
         {marker.type === 'unread' && <span className="message-unread-dot dot-md" />}
       </div>
@@ -89,8 +61,8 @@ export const MarkerComponent = ({marker, scrollTo}: Props) => {
       <h3 className="message-header-label">
         <MessageTime
           timestamp={marker.timestamp}
-          data-timestamp-type={marker.type === 'day' ? 'day' : 'normal'}
-          className={marker.type === 'day' ? 'label-bold-xs' : 'label-xs'}
+          data-timestamp-type={isDay ? 'day' : 'normal'}
+          className={isDay ? 'label-bold-xs' : 'label-xs'}
         >
           {timeAgo}
         </MessageTime>

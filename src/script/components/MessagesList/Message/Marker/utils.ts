@@ -17,19 +17,28 @@
  *
  */
 
-import {Message} from 'src/script/entity/message/Message';
+import {t} from 'Util/LocalizerUtil';
+import {formatLocale, isToday, isYesterday} from 'Util/TimeUtil';
 
-import {GroupedMessage, Marker} from './messagesGroup';
+/**
+ If today: “Today”
+ If yesterday: “Yesterday”
+ Any other day: <Week day>, <date> (e.g. “Monday, April 12” or “Friday, January 6 2023”)
+ */
+export const getMessagesGroupLabel = (timestamp: number) => {
+  const date = new Date(timestamp);
 
-export const verticallyCenterMessage = (messages: Message[]): boolean => {
-  const filteredMessagesLength = messages.length;
-  if (filteredMessagesLength === 1) {
-    const [firstMessage] = messages;
-    return firstMessage.isMember() && firstMessage.isConnection();
+  if (isToday(date)) {
+    return t('conversationToday');
   }
-  return false;
-};
 
-export const getLastUnreadMessageIndex = (lastReadTimestamp: number, messages: (Marker | GroupedMessage)[]) => {
-  return messages.findIndex(message => message.timestamp > lastReadTimestamp);
+  if (isYesterday(date)) {
+    return t('conversationYesterday');
+  }
+
+  const today = new Date();
+  const isCurrentYear = date.getFullYear() === today.getFullYear();
+  const pattern = isCurrentYear ? 'EEEE, MMMM d' : 'EEEE, MMMM d yyyy';
+
+  return formatLocale(date, pattern);
 };

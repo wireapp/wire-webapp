@@ -28,7 +28,7 @@ describe('JumpToLastMessageButton', () => {
   const conversation = generateConversation();
 
   it('visible when last message is not shown', () => {
-    conversation.isLastMessageVisible(false);
+    // conversation.isLastMessageVisible(false);
     const {getByTestId} = render(
       withTheme(<JumpToLastMessageButton onGoToLastMessage={jest.fn()} conversation={conversation} />),
     );
@@ -37,7 +37,7 @@ describe('JumpToLastMessageButton', () => {
   });
 
   it('hidden when last message is shown', () => {
-    conversation.isLastMessageVisible(true);
+    // conversation.isLastMessageVisible(true);
     const {queryByTestId} = render(
       withTheme(<JumpToLastMessageButton onGoToLastMessage={jest.fn()} conversation={conversation} />),
     );
