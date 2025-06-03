@@ -34,6 +34,28 @@ export const textStyles: CSSObject = {
 };
 
 export const buttonStyles: CSSObject = {
+  background: 'none',
+  border: 'none',
+  padding: '0 8px',
+  cursor: 'pointer',
+  fontSize: 'var(--font-size-medium)',
+  color: 'var(--gray-70)',
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
+
+  '&:hover': {
+    color: 'var(--main-color)',
+  },
+};
+
+export const activeItemStyles: CSSObject = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: '8px',
+  padding: '0 8px',
+  fontSize: 'var(--font-size-medium)',
+  color: 'var(--main-color)',
   height: '32px',
   margin: '0',
 };

@@ -17,17 +17,20 @@
  *
  */
 
-export const getBreadcrumbsFromPath = ({baseCrumb, currentPath}: {baseCrumb: string; currentPath: string}) => {
-  const segments = currentPath.split('/').filter(Boolean);
+import {test as baseTest} from '@playwright/test';
 
-  return [
-    {
-      name: baseCrumb,
-      path: '',
-    },
-    ...segments.map((segment, index) => ({
-      name: segment,
-      path: segments.slice(0, index + 1).join('/'),
-    })),
-  ];
+import {Backend} from './backend/backend';
+
+// Define custom test type with axios fixture
+type Fixtures = {
+  api: Backend;
 };
+
+export const test = baseTest.extend<Fixtures>({
+  api: async ({request}, use) => {
+    // Create a new instance of Backend for each test
+    await use(new Backend());
+  },
+});
+
+export {expect} from '@playwright/test';

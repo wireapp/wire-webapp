@@ -19,6 +19,10 @@
 
 import {CSSObject, css} from '@emotion/react';
 
+export const modalStyles: CSSObject = {
+  width: '508px',
+};
+
 export const wrapperStyles: CSSObject = {
   padding: '8px',
   width: '100%',
@@ -29,7 +33,11 @@ export const headerStyles: CSSObject = {
   justifyContent: 'space-between',
   alignItems: 'center',
   flexDirection: 'column',
-  marginTop: '16px',
+  margin: '16px 0',
+};
+
+export const descriptionStyles: CSSObject = {
+  padding: '0 16px',
 };
 
 export const headingStyles: CSSObject = {

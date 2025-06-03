@@ -17,7 +17,7 @@
  *
  */
 
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
@@ -25,6 +25,7 @@ import {CellNode} from 'Components/Conversation/ConversationCells/common/cellNod
 import {getCellsFilesPath} from 'Components/Conversation/ConversationCells/common/getCellsFilesPath/getCellsFilesPath';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
+import {handleEscDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {CellsFoldersListModalContent} from './CellsFoldersListModalContent/CellsFoldersListModalContent';
@@ -60,13 +61,25 @@ export const CellsMoveNodeModal = ({
     enabled: isOpen,
   });
 
+  useEffect(() => {
+    if (isOpen) {
+      setActiveModalContent('move');
+    }
+  }, [isOpen]);
+
   return (
-    <ModalComponent isShown={isOpen} onClosed={onClose} onBgClick={onClose} wrapperCSS={modalStyles}>
+    <ModalComponent
+      isShown={isOpen}
+      onClosed={onClose}
+      onBgClick={onClose}
+      wrapperCSS={modalStyles}
+      onKeyDown={event => handleEscDown(event, onClose)}
+    >
       <div css={wrapperStyles}>
         <CellsMoveNodeModalHeader
           onClose={onClose}
           title={
-            activeModalContent === 'move' ? t('cellsMoveNodeModal.moveTitle') : t('cellsMoveNodeModal.createTitle')
+            activeModalContent === 'move' ? t('cells.moveNodeModal.moveTitle') : t('cells.moveNodeModal.createTitle')
           }
         />
         {activeModalContent === 'move' ? (

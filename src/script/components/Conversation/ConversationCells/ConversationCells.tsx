@@ -22,7 +22,6 @@ import {useCallback} from 'react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
-import {useAppNotification} from 'Components/AppNotification/AppNotification';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
 
@@ -33,7 +32,6 @@ import {CellsStateInfo} from './CellsStateInfo/CellsStateInfo';
 import {CellsTable} from './CellsTable/CellsTable';
 import {useCellsStore} from './common/useCellsStore/useCellsStore';
 import {wrapperStyles} from './ConversationCells.styles';
-import {useCellsLoaderSize} from './useCellsLoaderSize/useCellsLoaderSize';
 import {useCellsPagination} from './useCellsPagination/useCellsPagination';
 import {useGetAllCellsNodes} from './useGetAllCellsNodes/useGetAllCellsNodes';
 
@@ -48,7 +46,7 @@ export const ConversationCells = ({
   conversationQualifiedId,
   conversationName,
 }: ConversationCellsProps) => {
-  const {getNodes, status: nodesStatus, getPagination, clearAll, removeNode} = useCellsStore();
+  const {getNodes, status: nodesStatus, getPagination, clearAll} = useCellsStore();
 
   const conversationId = conversationQualifiedId.id;
 
@@ -56,10 +54,6 @@ export const ConversationCells = ({
 
   const nodes = getNodes({conversationId});
   const pagination = getPagination({conversationId});
-
-  const {loaderHeight, updateHeight} = useCellsLoaderSize({
-    nodes,
-  });
 
   const {goToPage, getPaginationProps} = useCellsPagination({
     pagination,
@@ -72,25 +66,6 @@ export const ConversationCells = ({
   const isError = nodesStatus === 'error';
   const isSuccess = nodesStatus === 'success';
   const hasNodes = !!nodes.length;
-
-  const deleteFileFailedNotification = useAppNotification({
-    message: t('cellsGlobalView.deleteModalError'),
-  });
-
-  const handleDeleteNode = useCallback(
-    async (uuid: string) => {
-      try {
-        removeNode({conversationId, nodeId: uuid});
-        await cellsRepository.deleteNode({uuid});
-      } catch (error) {
-        deleteFileFailedNotification.show();
-        console.error(error);
-      }
-    },
-    // cellsRepository is not a dependency because it's a singleton
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [conversationId, removeNode, deleteFileFailedNotification],
-  );
 
   const handleRefresh = useCallback(async () => {
     clearAll({conversationId});
@@ -113,23 +88,13 @@ export const ConversationCells = ({
           cellsRepository={cellsRepository}
           conversationQualifiedId={conversationQualifiedId}
           conversationName={conversationName}
-          onDeleteNode={handleDeleteNode}
-          onUpdateBodyHeight={updateHeight}
         />
       )}
       {!isLoading && emptyView && (
-        <CellsStateInfo
-          heading={t('cellsGlobalView.noFilesHeading')}
-          description={t('cellsGlobalView.noFilesDescription')}
-        />
+        <CellsStateInfo heading={t('cells.noNodes.heading')} description={t('cells.noNodes.description')} />
       )}
-      {isLoading && <CellsLoader minHeight={loaderHeight} />}
-      {isError && (
-        <CellsStateInfo
-          heading={t('cellsGlobalView.errorHeading')}
-          description={t('cellsGlobalView.errorDescription')}
-        />
-      )}
+      {isLoading && <CellsLoader />}
+      {isError && <CellsStateInfo heading={t('cells.error.heading')} description={t('cells.error.description')} />}
       {!emptyView && <CellsPagination {...getPaginationProps()} goToPage={goToPage} />}
     </div>
   );

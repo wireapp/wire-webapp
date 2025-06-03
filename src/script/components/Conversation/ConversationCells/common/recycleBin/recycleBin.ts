@@ -17,26 +17,22 @@
  *
  */
 
-import {useRef, useEffect} from 'react';
+export const RECYCLE_BIN_PATH = 'recycle_bin';
 
-import {CellNode} from '../../common/cellNode/cellNode';
+export const isRootRecycleBinPath = () => {
+  const hash = window.location.hash.replace('#', '');
 
-interface UseTableHeightProps {
-  onUpdate: (height: number) => void;
-  nodes: CellNode[];
-}
+  const parts = hash.split('/files/');
 
-export const useTableHeight = ({onUpdate, nodes}: UseTableHeightProps) => {
-  const tableBodyRef = useRef<HTMLTableSectionElement>(null);
+  const path = decodeURIComponent(parts[1]);
 
-  useEffect(() => {
-    const updateHeight = () => {
-      if (tableBodyRef.current && onUpdate) {
-        onUpdate(tableBodyRef.current.clientHeight);
-      }
-    };
-    updateHeight();
-  }, [onUpdate, nodes]);
+  return path === RECYCLE_BIN_PATH;
+};
 
-  return {tableBodyRef};
+export const isInRecycleBin = () => {
+  const hash = window.location.hash.replace('#', '');
+
+  const parts = hash.split('/files/');
+
+  return parts[1]?.includes(RECYCLE_BIN_PATH);
 };

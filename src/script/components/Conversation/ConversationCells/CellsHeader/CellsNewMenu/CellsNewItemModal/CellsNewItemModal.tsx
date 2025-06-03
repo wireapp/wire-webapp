@@ -24,9 +24,17 @@ import {CloseIcon, IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
 import {CellsNewNodeForm} from 'Components/Conversation/ConversationCells/common/CellsNewNodeForm/CellsNewNodeForm';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
+import {handleEscDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import {closeButtonStyles, headerStyles, headingStyles, wrapperStyles} from './CellsNewItemModal.styles';
+import {
+  closeButtonStyles,
+  descriptionStyles,
+  headerStyles,
+  headingStyles,
+  modalStyles,
+  wrapperStyles,
+} from './CellsNewItemModal.styles';
 
 import {CellNode} from '../../../common/cellNode/cellNode';
 
@@ -49,23 +57,34 @@ export const CellsNewItemModal = ({
   onSuccess,
   currentPath,
 }: CellsNewItemModalProps) => {
+  const isFolder = type === 'folder';
   return (
-    <ModalComponent isShown={isOpen} onClosed={onClose} onBgClick={onClose}>
+    <ModalComponent
+      isShown={isOpen}
+      onClosed={onClose}
+      onBgClick={onClose}
+      onKeyDown={event => handleEscDown(event, onClose)}
+      wrapperCSS={modalStyles}
+    >
       <div css={wrapperStyles}>
         <header css={headerStyles}>
           <h3 css={headingStyles}>
-            {t(type === 'folder' ? 'cellNewItemMenuModal.headlineFolder' : 'cellNewItemMenuModal.headlineFile')}
+            {t(isFolder ? 'cells.newItemMenuModal.headlineFolder' : 'cells.newItemMenuModal.headlineFile')}
           </h3>
+
           <IconButton
             variant={IconButtonVariant.SECONDARY}
             type="button"
             css={closeButtonStyles}
             onClick={onClose}
-            aria-label={t('cellNewItemMenuModal.closeButton')}
+            aria-label={t('cells.newItemMenuModal.closeButton')}
           >
             <CloseIcon />
           </IconButton>
         </header>
+        <p css={descriptionStyles}>
+          {t(isFolder ? 'cells.newItemMenuModal.descriptionFolder' : 'cells.newItemMenuModal.descriptionFile')}
+        </p>
         <CellsNewNodeForm
           type={type}
           cellsRepository={cellsRepository}

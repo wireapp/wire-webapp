@@ -17,28 +17,20 @@
  *
  */
 
-import {useCallback, useState} from 'react';
+import {Locator, Page} from '@playwright/test';
 
-import {CellNode} from '../common/cellNode/cellNode';
+export class WelcomePage {
+  readonly page: Page;
 
-interface UseCellsLoaderSizeProps {
-  nodes: CellNode[];
+  readonly loginButton: Locator;
+
+  constructor(page: Page) {
+    this.page = page;
+
+    this.loginButton = page.locator('[data-uie-name="go-login"]');
+  }
+
+  async clickLogin() {
+    await this.loginButton.click();
+  }
 }
-
-export const useCellsLoaderSize = ({nodes}: UseCellsLoaderSizeProps) => {
-  const [loaderHeight, setLoaderHeight] = useState<number | undefined>(() => {
-    if (nodes) {
-      return undefined;
-    }
-    return 0;
-  });
-
-  const updateHeight = useCallback((height: number) => {
-    setLoaderHeight(height);
-  }, []);
-
-  return {
-    loaderHeight,
-    updateHeight,
-  };
-};

@@ -49,7 +49,7 @@ export const FileAssetCard = ({
   senderName,
   timestamp,
 }: FileAssetCardProps) => {
-  const formattedName = isError ? t('cellsUnavailableFile') : name;
+  const formattedName = isError ? t('cells.unavailableFile') : name;
 
   if (variant === 'large') {
     return (
