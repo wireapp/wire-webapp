@@ -30,7 +30,6 @@ import {CellsStateInfo} from './CellsStateInfo/CellsStateInfo';
 import {CellsTable} from './CellsTable/CellsTable';
 import {useCellsStore} from './common/useCellsStore/useCellsStore';
 import {wrapperStyles} from './ConversationCells.styles';
-import {useCellsLoaderSize} from './useCellsLoaderSize/useCellsLoaderSize';
 import {useCellsPagination} from './useCellsPagination/useCellsPagination';
 import {useGetAllCellsNodes} from './useGetAllCellsNodes/useGetAllCellsNodes';
 
@@ -53,10 +52,6 @@ export const ConversationCells = ({
 
   const nodes = getNodes({conversationId});
   const pagination = getPagination({conversationId});
-
-  const {loaderHeight, updateHeight} = useCellsLoaderSize({
-    nodes,
-  });
 
   const {goToPage, getPaginationProps} = useCellsPagination({
     pagination,
@@ -86,14 +81,13 @@ export const ConversationCells = ({
           cellsRepository={cellsRepository}
           conversationQualifiedId={conversationQualifiedId}
           conversationName={conversationName}
-          onUpdateBodyHeight={updateHeight}
           onRefresh={refresh}
         />
       )}
       {!isLoading && emptyView && (
         <CellsStateInfo heading={t('cells.noNodes.heading')} description={t('cells.noNodes.description')} />
       )}
-      {isLoading && <CellsLoader minHeight={loaderHeight} />}
+      {isLoading && <CellsLoader />}
       {isError && <CellsStateInfo heading={t('cells.error.heading')} description={t('cells.error.description')} />}
       {!emptyView && <CellsPagination {...getPaginationProps()} goToPage={goToPage} />}
     </div>
