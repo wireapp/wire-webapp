@@ -17,7 +17,7 @@
  *
  */
 
-import {useState} from 'react';
+import {useCallback, useState} from 'react';
 
 import {ComboboxSelectOption} from '@wireapp/react-ui-kit';
 
@@ -44,10 +44,14 @@ export const useTagsManagement = ({
     initialSelectedTags.map(transformTagToSelectOption),
   );
 
+  const handleSetAllTags = useCallback((tags: string[]) => {
+    setAllTags(tags.map(transformTagToSelectOption));
+  }, []);
+
   const {isLoading, error} = useGetAllTags({
     cellsRepository,
     enabled: fetchTagsEnabled,
-    onSuccess: tags => setAllTags(tags.map(transformTagToSelectOption)),
+    onSuccess: handleSetAllTags,
   });
 
   const handleCreateOption = (inputValue: string) => {
