@@ -8093,9 +8093,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^27.56.0":
+"@wireapp/api-client@file:.yalc/@wireapp/api-client::locator=wire-webapp%40workspace%3A.":
   version: 27.56.0
-  resolution: "@wireapp/api-client@npm:27.56.0"
+  resolution: "@wireapp/api-client@file:.yalc/@wireapp/api-client#.yalc/@wireapp/api-client::hash=d32d2a&locator=wire-webapp%40workspace%3A."
   dependencies:
     "@aws-sdk/client-s3": "npm:3.750.0"
     "@aws-sdk/lib-storage": "npm:3.779.0"
@@ -8114,7 +8114,32 @@ __metadata:
     uuid: "npm:11.1.0"
     ws: "npm:8.18.1"
     zod: "npm:3.24.2"
-  checksum: 10/d20805647ed7ac139c85838020c34b497d29f5d873111d38925f37727f91c953970b6ef61248ac0e8d2c8c6e1f25cb88e7b2dade4a43f9969ab9ce036ef66d71
+  checksum: 10/dfd996df8bc8bf6dfbff0072645af17a7df0c62ac647ccafa65d593b207d59889fa9ce37479e7931b99749bab47c5b78794f678af2fc90cc8d3d3b00a64e4908
+  languageName: node
+  linkType: hard
+
+"@wireapp/api-client@npm:^27.56.1":
+  version: 27.56.1
+  resolution: "@wireapp/api-client@npm:27.56.1"
+  dependencies:
+    "@aws-sdk/client-s3": "npm:3.750.0"
+    "@aws-sdk/lib-storage": "npm:3.779.0"
+    "@wireapp/commons": "npm:^5.4.2"
+    "@wireapp/priority-queue": "npm:^2.1.11"
+    "@wireapp/protocol-messaging": "npm:1.52.0"
+    axios: "npm:1.9.0"
+    axios-retry: "npm:4.5.0"
+    cells-sdk-ts: "https://github.com/pydio/cells-sdk-ts#v0.1.1-alpha12"
+    http-status-codes: "npm:2.3.0"
+    logdown: "npm:3.3.1"
+    pako: "npm:2.1.0"
+    reconnecting-websocket: "npm:4.4.0"
+    spark-md5: "npm:3.0.2"
+    tough-cookie: "npm:4.1.4"
+    uuid: "npm:11.1.0"
+    ws: "npm:8.18.1"
+    zod: "npm:3.24.2"
+  checksum: 10/270ba86b73d31312e8edaffcc0c01be550fda9fa92278588018bd7115e95d999631284ce6a5ce59cadd01d1930948589701383876d2fa5c8d9369188b82afcfe
   languageName: node
   linkType: hard
 
@@ -8179,11 +8204,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:46.23.14":
-  version: 46.23.14
-  resolution: "@wireapp/core@npm:46.23.14"
+"@wireapp/core@npm:46.23.15":
+  version: 46.23.15
+  resolution: "@wireapp/core@npm:46.23.15"
   dependencies:
-    "@wireapp/api-client": "npm:^27.56.0"
+    "@wireapp/api-client": "npm:^27.56.1"
     "@wireapp/commons": "npm:^5.4.2"
     "@wireapp/core-crypto": "npm:3.1.1"
     "@wireapp/cryptobox": "npm:12.8.0"
@@ -8201,7 +8226,7 @@ __metadata:
     long: "npm:^5.2.0"
     uuid: "npm:9.0.1"
     zod: "npm:3.24.2"
-  checksum: 10/b64c02c2d7e6723b86b7ca7db88ca399a1456a6d8886ed712b091dc94deaae00a152ac38a654a334f7d22d3b13dd7821a8d80850c5b1667ab8dba5a5fe13a767
+  checksum: 10/e3126ceffbc5448d5ef2449153fab5372d35f8da0a988118af86ff97541dd3ceb1bfb4e59e75a8ce0c2494c80dd2e9c60714faa72689291ff58c2b18b513e59d
   languageName: node
   linkType: hard
 
@@ -21616,11 +21641,12 @@ __metadata:
     "@types/uuid": "npm:^10.0.0"
     "@types/webpack-env": "npm:1.18.8"
     "@types/wicg-file-system-access": "npm:^2023.10.5"
+    "@wireapp/api-client": "file:.yalc/@wireapp/api-client"
     "@wireapp/avs": "npm:10.0.46"
     "@wireapp/avs-debugger": "npm:0.0.7"
     "@wireapp/commons": "npm:5.4.2"
     "@wireapp/copy-config": "npm:2.3.0"
-    "@wireapp/core": "npm:46.23.14"
+    "@wireapp/core": "npm:46.23.15"
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/prettier-config": "npm:0.6.4"
     "@wireapp/react-ui-kit": "npm:9.57.0"
