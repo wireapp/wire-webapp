@@ -552,20 +552,21 @@ export class App {
 
       await conversationRepository.init1To1Conversations(connections, conversations);
       if (this.core.hasMLSDevice) {
-        //add the potential `self` and `team` conversations
+        // add the potential `self` and `team` conversations
         await initialiseSelfAndTeamConversations(conversations, selfUser, clientEntity.id, this.core);
 
-        //join all the mls groups that are known by the user but were migrated to mls
+        // join all the mls groups that are known by the user but were migrated to mls
         await joinConversationsAfterMigrationFinalisation({
           conversations,
+          selfUser,
           core: this.core,
           onSuccess: conversationRepository.injectJoinedAfterMigrationFinalisationMessage,
           onError: ({id}, error) =>
             this.logger.error(`Failed when joining a migrated mls conversation with id ${id}, error: `, error),
         });
 
-        //join all the mls groups we're member of and have not yet joined (eg. we were not send welcome message)
-        await initMLSGroupConversations(conversations, {
+        // join all the mls groups we're member of and have not yet joined (eg. we were not send welcome message)
+        await initMLSGroupConversations(conversations, selfUser, {
           core: this.core,
           onError: ({id}, error) =>
             this.logger.error(`Failed when initialising mls conversation with id ${id}, error: `, error),

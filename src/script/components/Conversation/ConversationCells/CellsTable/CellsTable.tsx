@@ -18,6 +18,7 @@
  */
 
 import {flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
+import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 
@@ -32,32 +33,20 @@ import {
 } from './CellsTable.styles';
 import {getCellsTableColumns} from './CellsTableColumns/CellsTableColumns';
 import {CellsFilePreviewModalProvider} from './common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
-import {useTableHeight} from './useTableHeight/useTableHeight';
 
-import {CellFile} from '../common/cellFile/cellFile';
+import {CellNode} from '../common/cellNode/cellNode';
 
 interface CellsTableProps {
-  files: CellFile[];
+  nodes: Array<CellNode>;
   cellsRepository: CellsRepository;
-  conversationId: string;
-  onDeleteFile: (uuid: string) => void;
-  onUpdateBodyHeight: (height: number) => void;
+  conversationQualifiedId: QualifiedId;
+  conversationName: string;
 }
 
-export const CellsTable = ({
-  files,
-  cellsRepository,
-  conversationId,
-  onDeleteFile,
-  onUpdateBodyHeight,
-}: CellsTableProps) => {
-  const {tableBodyRef} = useTableHeight({
-    onUpdate: onUpdateBodyHeight,
-  });
-
+export const CellsTable = ({nodes, cellsRepository, conversationQualifiedId, conversationName}: CellsTableProps) => {
   const table = useReactTable({
-    data: files,
-    columns: getCellsTableColumns({cellsRepository, conversationId, onDeleteFile}),
+    data: nodes,
+    columns: getCellsTableColumns({cellsRepository, conversationQualifiedId, conversationName}),
     getCoreRowModel: getCoreRowModel(),
   });
 
@@ -70,7 +59,7 @@ export const CellsTable = ({
           <thead>
             {table.getHeaderGroups().map(headerGroup => (
               <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header, index) => {
+                {headerGroup.headers.map(header => {
                   return (
                     <th
                       key={header.id}
@@ -87,7 +76,7 @@ export const CellsTable = ({
             ))}
           </thead>
           {rows.length > 0 && (
-            <tbody ref={tableBodyRef}>
+            <tbody>
               {rows.map(row => (
                 <tr key={row.id} css={tableCellRow}>
                   {row.getVisibleCells().map(cell => (

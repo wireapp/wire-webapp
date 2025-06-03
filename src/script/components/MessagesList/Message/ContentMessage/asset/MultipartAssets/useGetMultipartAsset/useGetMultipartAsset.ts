@@ -77,7 +77,7 @@ export const useGetMultipartAsset = ({
 
     try {
       setStatus('loading');
-      const asset = await cellsRepository.getFile({uuid});
+      const asset = await cellsRepository.getNode({uuid});
 
       if (!isMounted.current) {
         return;

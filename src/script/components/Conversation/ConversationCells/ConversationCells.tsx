@@ -22,7 +22,6 @@ import {useCallback} from 'react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
-import {useAppNotification} from 'Components/AppNotification/AppNotification';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
 
@@ -33,95 +32,69 @@ import {CellsStateInfo} from './CellsStateInfo/CellsStateInfo';
 import {CellsTable} from './CellsTable/CellsTable';
 import {useCellsStore} from './common/useCellsStore/useCellsStore';
 import {wrapperStyles} from './ConversationCells.styles';
-import {useCellsLoaderSize} from './useCellsLoaderSize/useCellsLoaderSize';
 import {useCellsPagination} from './useCellsPagination/useCellsPagination';
-import {useGetAllCellsFiles} from './useGetAllCellsFiles/useGetAllCellsFiles';
+import {useGetAllCellsNodes} from './useGetAllCellsNodes/useGetAllCellsNodes';
 
 interface ConversationCellsProps {
   cellsRepository?: CellsRepository;
   conversationQualifiedId: QualifiedId;
+  conversationName: string;
 }
 
 export const ConversationCells = ({
   cellsRepository = container.resolve(CellsRepository),
   conversationQualifiedId,
+  conversationName,
 }: ConversationCellsProps) => {
-  const {getFiles, status: filesStatus, getPagination, clearAll, removeFile} = useCellsStore();
+  const {getNodes, status: nodesStatus, getPagination, clearAll} = useCellsStore();
 
   const conversationId = conversationQualifiedId.id;
 
-  const {refresh, setOffset} = useGetAllCellsFiles({cellsRepository, conversationQualifiedId});
+  const {refresh, setOffset} = useGetAllCellsNodes({cellsRepository, conversationQualifiedId});
 
-  const files = getFiles({conversationId});
+  const nodes = getNodes({conversationId});
   const pagination = getPagination({conversationId});
-
-  const {loaderHeight, updateHeight} = useCellsLoaderSize({
-    files,
-  });
 
   const {goToPage, getPaginationProps} = useCellsPagination({
     pagination,
     conversationId,
     setOffset,
-    currentFilesCount: files.length,
+    currentNodesCount: nodes.length,
   });
 
-  const isLoading = filesStatus === 'loading';
-  const isError = filesStatus === 'error';
-  const isSuccess = filesStatus === 'success';
-  const hasFiles = !!files.length;
-
-  const deleteFileFailedNotification = useAppNotification({
-    message: t('cellsGlobalView.deleteModalError'),
-  });
-
-  const handleDeleteFile = useCallback(
-    async (uuid: string) => {
-      try {
-        removeFile({conversationId, fileId: uuid});
-        await cellsRepository.deleteFile({uuid});
-      } catch (error) {
-        deleteFileFailedNotification.show();
-        console.error(error);
-      }
-    },
-    // cellsRepository is not a dependency because it's a singleton
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [conversationId, removeFile, deleteFileFailedNotification],
-  );
+  const isLoading = nodesStatus === 'loading';
+  const isError = nodesStatus === 'error';
+  const isSuccess = nodesStatus === 'success';
+  const hasNodes = !!nodes.length;
 
   const handleRefresh = useCallback(async () => {
     clearAll({conversationId});
     await refresh();
   }, [refresh, clearAll, conversationId]);
 
-  const emptyView = !isError && !hasFiles;
+  const emptyView = !isError && !hasNodes;
 
   return (
     <div css={wrapperStyles}>
-      <CellsHeader onRefresh={handleRefresh} />
-      {(isSuccess || isLoading) && hasFiles && (
+      <CellsHeader
+        onRefresh={handleRefresh}
+        conversationQualifiedId={conversationQualifiedId}
+        conversationName={conversationName}
+        cellsRepository={cellsRepository}
+      />
+      {(isSuccess || isLoading) && (
         <CellsTable
-          files={isLoading ? [] : files}
+          nodes={isLoading ? [] : nodes}
           cellsRepository={cellsRepository}
-          conversationId={conversationId}
-          onDeleteFile={handleDeleteFile}
-          onUpdateBodyHeight={updateHeight}
+          conversationQualifiedId={conversationQualifiedId}
+          conversationName={conversationName}
         />
       )}
       {!isLoading && emptyView && (
-        <CellsStateInfo
-          heading={t('cellsGlobalView.noFilesHeading')}
-          description={t('cellsGlobalView.noFilesDescription')}
-        />
+        <CellsStateInfo heading={t('cells.noNodes.heading')} description={t('cells.noNodes.description')} />
       )}
-      {isLoading && <CellsLoader minHeight={loaderHeight} />}
-      {isError && (
-        <CellsStateInfo
-          heading={t('cellsGlobalView.errorHeading')}
-          description={t('cellsGlobalView.errorDescription')}
-        />
-      )}
+      {isLoading && <CellsLoader />}
+      {isError && <CellsStateInfo heading={t('cells.error.heading')} description={t('cells.error.description')} />}
       {!emptyView && <CellsPagination {...getPaginationProps()} goToPage={goToPage} />}
     </div>
   );

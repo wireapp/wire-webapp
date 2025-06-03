@@ -17,45 +17,66 @@
  *
  */
 
-import {useCallback, KeyboardEvent} from 'react';
+import {useCallback, KeyboardEvent, MouseEvent, useEffect} from 'react';
 
+import {QualifiedId} from '@wireapp/api-client/lib/user';
+
+import {generateConversationUrl} from 'src/script/router/routeGenerator';
+import {createNavigate, createNavigateKeyboard} from 'src/script/router/routerBindings';
+import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 interface ConversationTabsProps {
   activeTabIndex: number;
   onIndexChange: (index: number) => void;
+  conversationQualifiedId: QualifiedId;
 }
 
-export const ConversationTabs = ({activeTabIndex, onIndexChange}: ConversationTabsProps) => {
+const FILE_PATH = 'files';
+
+export const ConversationTabs = ({activeTabIndex, onIndexChange, conversationQualifiedId}: ConversationTabsProps) => {
+  const filesUrl = generateConversationUrl({...conversationQualifiedId, filePath: FILE_PATH});
+  const messagesUrl = generateConversationUrl(conversationQualifiedId);
+
   const handleKeyDown = useCallback(
     (event: KeyboardEvent<HTMLButtonElement>) => {
       const tabCount = 2;
 
       switch (event.key) {
-        case 'ArrowRight':
+        case KEY.ARROW_RIGHT:
           event.preventDefault();
           const nextTab = (activeTabIndex + 1) % tabCount;
           onIndexChange(nextTab);
+          createNavigateKeyboard(nextTab === 0 ? messagesUrl : filesUrl, false, ['*'])(event);
           break;
-        case 'ArrowLeft':
+        case KEY.ARROW_LEFT:
           event.preventDefault();
           const prevTab = (activeTabIndex - 1 + tabCount) % tabCount;
           onIndexChange(prevTab);
-          break;
-        case 'Home':
-          event.preventDefault();
-          onIndexChange(0);
-          break;
-        case 'End':
-          event.preventDefault();
-          onIndexChange(tabCount - 1);
+          createNavigateKeyboard(prevTab === 0 ? messagesUrl : filesUrl, false, ['*'])(event);
           break;
         default:
           break;
       }
     },
-    [activeTabIndex, onIndexChange],
+    [activeTabIndex, onIndexChange, messagesUrl, filesUrl],
   );
+
+  const handleHashChange = useCallback(() => {
+    const currentPath = window.location.hash;
+
+    if (currentPath.includes(FILE_PATH)) {
+      onIndexChange(1);
+    } else {
+      onIndexChange(0);
+    }
+  }, [onIndexChange]);
+
+  useEffect(() => {
+    handleHashChange();
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, [handleHashChange]);
 
   return (
     <div className="conversation-tabs">
@@ -64,14 +85,20 @@ export const ConversationTabs = ({activeTabIndex, onIndexChange}: ConversationTa
           id="conversation"
           label="Conversation"
           isActive={activeTabIndex === 0}
-          onClick={() => onIndexChange(0)}
+          onClick={event => {
+            createNavigate(messagesUrl)(event);
+            onIndexChange(0);
+          }}
           onKeyDown={handleKeyDown}
         />
         <ConversationTab
           id="files"
           label="Files"
           isActive={activeTabIndex === 1}
-          onClick={() => onIndexChange(1)}
+          onClick={event => {
+            createNavigate(filesUrl)(event);
+            onIndexChange(1);
+          }}
           onKeyDown={handleKeyDown}
         />
       </div>
@@ -83,7 +110,7 @@ interface ConversationTabProps {
   id: string;
   label: string;
   isActive: boolean;
-  onClick: () => void;
+  onClick: (event: MouseEvent<HTMLButtonElement>) => void;
   onKeyDown: (event: KeyboardEvent<HTMLButtonElement>) => void;
 }
 

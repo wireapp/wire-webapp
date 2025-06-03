@@ -40,7 +40,7 @@ export const FileAssetOptions = ({onOpen}: FileAssetOptionsProps) => {
       event,
       entries: [
         {
-          label: t('cellsGlobalView.optionOpen'),
+          label: t('cells.options.open'),
           click: () => onOpen(),
         },
       ],
@@ -62,7 +62,7 @@ export const FileAssetOptions = ({onOpen}: FileAssetOptionsProps) => {
         id={id}
         onKeyDown={handleKeyDown}
         onClick={showOptionsMenu}
-        aria-label={t('cellsGlobalView.optionsLabel')}
+        aria-label={t('cells.options.label')}
       >
         <MoreIcon css={iconStyles} />
       </button>

@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useMemo} from 'react';
+import React from 'react';
 
 import cx from 'classnames';
 
@@ -89,12 +89,6 @@ export const CallingParticipantList = ({
     showContextMenu({event, entries, identifier: 'participant-moderator-menu'});
   };
 
-  const participantsList = useMemo(() => {
-    return participants
-      .slice()
-      .sort((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user));
-  }, [participants]);
-
   return (
     <div
       className={cx('call-ui__participant-list__wrapper', {
@@ -140,18 +134,21 @@ export const CallingParticipantList = ({
         )}
         <p css={labelStyles}>{t('videoCallOverlayParticipantsListLabel', {count: participants.length})}</p>
         <ul className="call-ui__participant-list" data-uie-name="list-call-ui-participants">
-          {participantsList.map((participant, index, participantsArray) => (
-            <li key={participant.clientId} className="call-ui__participant-list__participant">
-              <CallParticipantsListItem
-                key={participant.clientId}
-                callParticipant={participant}
-                isSelfVerified={isSelfVerified}
-                showContextMenu={!!isModerator}
-                onContextMenu={event => getParticipantContext(event, participant)}
-                isLast={participantsArray.length === index}
-              />
-            </li>
-          ))}
+          {participants
+            .slice()
+            .sort((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user))
+            .map((participant, index, participantsArray) => (
+              <li key={participant.clientId} className="call-ui__participant-list__participant">
+                <CallParticipantsListItem
+                  key={participant.clientId}
+                  callParticipant={participant}
+                  isSelfVerified={isSelfVerified}
+                  showContextMenu={!!isModerator}
+                  onContextMenu={event => getParticipantContext(event, participant)}
+                  isLast={participantsArray.length === index}
+                />
+              </li>
+            ))}
         </ul>
       </FadingScrollbar>
     </div>

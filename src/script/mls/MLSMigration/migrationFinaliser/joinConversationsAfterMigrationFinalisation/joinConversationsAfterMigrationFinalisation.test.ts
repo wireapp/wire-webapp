@@ -147,6 +147,7 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
 
     await joinConversationsAfterMigrationFinalisation({
       conversations: [mockedConversation],
+      selfUser,
       core: mockCore,
       onSuccess,
     });
@@ -183,6 +184,7 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
 
     await joinConversationsAfterMigrationFinalisation({
       conversations: [mockedConversations],
+      selfUser,
       core: mockCore,
       onSuccess,
     });
@@ -216,6 +218,7 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
 
     await joinConversationsAfterMigrationFinalisation({
       conversations: [mockedConversation],
+      selfUser,
       core: mockCore,
       onSuccess,
     });
@@ -249,6 +252,7 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
 
     await joinConversationsAfterMigrationFinalisation({
       conversations: [mockedConversation],
+      selfUser,
       core: mockCore,
       onSuccess,
     });

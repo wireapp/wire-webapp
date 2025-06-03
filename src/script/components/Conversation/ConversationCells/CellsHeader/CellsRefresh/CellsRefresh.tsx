@@ -17,11 +17,11 @@
  *
  */
 
-import {Button, ButtonVariant, ReloadIcon} from '@wireapp/react-ui-kit';
+import {IconButton, IconButtonVariant, ReloadIcon} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/LocalizerUtil';
 
-import {buttonStyles, iconStyles} from './CellsRefresh.styles';
+import {buttonStyles} from './CellsRefresh.styles';
 
 interface CellsRefreshProps {
   onRefresh: () => void;
@@ -29,9 +29,13 @@ interface CellsRefreshProps {
 
 export const CellsRefresh = ({onRefresh}: CellsRefreshProps) => {
   return (
-    <Button variant={ButtonVariant.TERTIARY} onClick={onRefresh} css={buttonStyles}>
-      <ReloadIcon css={iconStyles} />
-      {t('cellsGlobalView.refreshButton')}
-    </Button>
+    <IconButton
+      variant={IconButtonVariant.PRIMARY}
+      onClick={onRefresh}
+      css={buttonStyles}
+      aria-label={t('cells.refreshButton')}
+    >
+      <ReloadIcon />
+    </IconButton>
   );
 };
