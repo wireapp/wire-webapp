@@ -17,9 +17,7 @@
  *
  */
 
-import {Badge, Tooltip} from '@wireapp/react-ui-kit';
-
-import {tagCountStyles, tagListItemStyles, tagListStyles, tagWrapperStyles} from './CellsTagsColumn.styles';
+import {BadgesWithTooltip} from '@wireapp/react-ui-kit';
 
 interface CellsTagsColumnProps {
   tags: string[];
@@ -30,34 +28,5 @@ export const CellsTagsColumn = ({tags}: CellsTagsColumnProps) => {
     return null;
   }
 
-  if (tags.length === 1) {
-    return <TagWithCount tag={tags[0]} count={tags.length} />;
-  }
-
-  return (
-    <Tooltip body={<TagsList tags={tags} />}>
-      <TagWithCount tag={tags[0]} count={tags.length} />
-    </Tooltip>
-  );
-};
-
-const TagWithCount = ({tag, count}: {tag: string; count: number}) => {
-  return (
-    <div css={tagWrapperStyles}>
-      <Badge>{tag}</Badge>
-      {count > 1 && <div css={tagCountStyles}>+{count - 1}</div>}
-    </div>
-  );
-};
-
-const TagsList = ({tags}: {tags: string[]}) => {
-  return (
-    <ul css={tagListStyles}>
-      {tags.map(tag => (
-        <li css={tagListItemStyles} key={tag}>
-          <Badge>{tag}</Badge>
-        </li>
-      ))}
-    </ul>
-  );
+  return <BadgesWithTooltip items={tags} />;
 };
