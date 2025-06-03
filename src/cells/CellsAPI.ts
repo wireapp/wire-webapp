@@ -483,7 +483,7 @@ export class CellsAPI {
     const result = await this.client.patchNode(uuid, {
       MetaUpdates: [
         {
-          Operation: 'PUT',
+          Operation: tags.length > 0 ? 'PUT' : 'DELETE',
           UserMeta: {Namespace: USER_META_TAGS_NAMESPACE, JsonValue: JSON.stringify(tags.join(','))},
         },
       ],

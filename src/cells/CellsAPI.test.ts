@@ -1685,7 +1685,7 @@ describe('CellsAPI', () => {
       expect(mockNodeServiceApi.patchNode).toHaveBeenCalledWith(uuid, {
         MetaUpdates: [
           {
-            Operation: 'PUT',
+            Operation: 'DELETE',
             UserMeta: {Namespace: 'usermeta-tags', JsonValue: '""'},
           },
         ],
