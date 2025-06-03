@@ -58,6 +58,7 @@ export const CellsFilePreviewModal = () => {
       status={!getFileUrl() ? 'unavailable' : 'success'}
       senderName={owner}
       timestamp={uploadedAtTimestamp}
+      tags={['test', 'test2', 'test3']}
     />
   );
 };
