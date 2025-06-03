@@ -20,7 +20,6 @@
 // Polyfill for "tsyringe" dependency injection
 
 // eslint-disable-next-line import/order
-//import '@wireapp/core-crypto';
 
 import {Context} from '@wireapp/api-client/lib/auth';
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
