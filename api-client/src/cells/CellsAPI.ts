@@ -32,6 +32,7 @@ import {
   RestIncomingNode,
   RestNodeLocator,
   RestActionOptionsCopyMove,
+  RestNamespaceValuesResponse,
 } from 'cells-sdk-ts';
 
 import {CellsStorage} from './CellsStorage/CellsStorage';
@@ -47,6 +48,7 @@ const DEFAULT_LIMIT = 10;
 const DEFAULT_OFFSET = 0;
 const DEFAULT_SEARCH_SORT_FIELD = 'mtime';
 const DEFAULT_SEARCH_SORT_DIRECTION: SortDirection = 'desc';
+const USER_META_TAGS_NAMESPACE = 'usermeta-tags';
 
 interface CellsConfig {
   pydio: {
@@ -459,6 +461,33 @@ export class CellsAPI {
     }
 
     const result = await this.client.getPublicLink(uuid);
+
+    return result.data;
+  }
+
+  async getAllTags(): Promise<RestNamespaceValuesResponse> {
+    if (!this.client || !this.storageService) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    const result = await this.client.listNamespaceValues(USER_META_TAGS_NAMESPACE);
+
+    return result.data;
+  }
+
+  async setNodeTags({uuid, tags}: {uuid: string; tags: string[]}): Promise<RestNode> {
+    if (!this.client || !this.storageService) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    const result = await this.client.patchNode(uuid, {
+      MetaUpdates: [
+        {
+          Operation: 'PUT',
+          UserMeta: {Namespace: USER_META_TAGS_NAMESPACE, JsonValue: JSON.stringify(tags.join(','))},
+        },
+      ],
+    });
 
     return result.data;
   }
