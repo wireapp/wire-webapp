@@ -48,7 +48,7 @@ describe('e2ei delays', () => {
       {
         x509Identity: {
           certificate: ' ',
-          notAfter: (Date.now() + validityPeriod) / 1000,
+          not_after: (Date.now() + validityPeriod) / 1000,
         },
       } as any,
       Date.now(),
@@ -67,7 +67,7 @@ describe('e2ei delays', () => {
       {
         x509Identity: {
           certificate: ' ',
-          notAfter: deadline / 1000,
+          not_after: deadline / 1000,
         },
       } as any,
       Date.now(),
@@ -85,7 +85,7 @@ describe('e2ei delays', () => {
       {
         x509Identity: {
           certificate: ' ',
-          notAfter: deadline / 1000,
+          not_after: deadline / 1000,
         },
       } as any,
       Date.now(),
