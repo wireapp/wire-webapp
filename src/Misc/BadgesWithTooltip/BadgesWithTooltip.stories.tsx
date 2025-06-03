@@ -17,43 +17,59 @@
  *
  */
 
-import {Meta, StoryObj} from '@storybook/react';
+import type {Meta, StoryObj} from '@storybook/react';
 
-import {Badge} from './Badge';
+import {BadgesWithTooltip} from './BadgesWithTooltip';
 
-const meta: Meta<typeof Badge> = {
-  component: Badge,
-  title: 'Misc/Badge',
+const meta = {
+  title: 'Misc/BadgesWithTooltip',
+  component: BadgesWithTooltip,
   parameters: {
     layout: 'centered',
   },
   tags: ['autodocs'],
   decorators: [
     Story => (
-      <div style={{padding: '24px', maxWidth: '300px', margin: '0 auto', background: 'white'}}>
+      <div
+        id="wire-app"
+        style={{
+          position: 'relative',
+          minHeight: '200px',
+          padding: '24px',
+          maxWidth: '300px',
+          margin: '0 auto',
+          background: 'white',
+        }}
+      >
         <Story />
       </div>
     ),
   ],
-};
+} satisfies Meta<typeof BadgesWithTooltip>;
 
 export default meta;
-type Story = StoryObj<typeof Badge>;
+type Story = StoryObj<typeof BadgesWithTooltip>;
 
-export const Default: Story = {
+export const SingleItem: Story = {
   args: {
-    children: 'Default Badge',
+    items: ['Admin'],
   },
 };
 
-export const ShortText: Story = {
+export const TwoItems: Story = {
   args: {
-    children: 'New',
+    items: ['Admin', 'Moderator'],
   },
 };
 
-export const TruncatedText: Story = {
+export const MultipleItems: Story = {
   args: {
-    children: 'This is a very long badge text that should be truncated',
+    items: ['Admin', 'Moderator', 'User', 'Guest'],
+  },
+};
+
+export const LongItems: Story = {
+  args: {
+    items: ['Administrator', 'Super Moderator', 'Power User', 'Regular User', 'Guest User'],
   },
 };
