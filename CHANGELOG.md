@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.57.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.56.1...@wireapp/react-ui-kit@9.57.0) (2025-06-03)
+
+### Features
+
+* **react-ui-kit:** BadgesWithTooltip [WPB-17811] ([#7063](https://github.com/wireapp/wire-web-packages/issues/7063)) ([caf2797](https://github.com/wireapp/wire-web-packages/commit/caf279748c0013beeff6c7909318aa0f4e7cb5c2))
+
 ## [9.56.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.56.0...@wireapp/react-ui-kit@9.56.1) (2025-06-02)
 
 ### Bug Fixes
