@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.4.0](https://github.com/wireapp/wire-web-packages/compare/bazinga64@6.3.11...bazinga64@6.4.0) (2025-06-03)
+
+### Features
+
+* update to CC v4.x [WPB-16269] ([#6969](https://github.com/wireapp/wire-web-packages/issues/6969)) ([e0b14f2](https://github.com/wireapp/wire-web-packages/commit/e0b14f2a9443e4704aed9b4d7481cfaef8305f5e)), closes [#7051](https://github.com/wireapp/wire-web-packages/issues/7051)
+
 ## [6.3.11](https://github.com/wireapp/wire-web-packages/compare/bazinga64@6.3.8...bazinga64@6.3.11) (2024-10-16)
 
 ### Bug Fixes
