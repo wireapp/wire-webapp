@@ -268,6 +268,7 @@ const zIndexes: () => CSSObject = () => ({
   '--z-index-level-5': 100000,
   '--z-index-level-6': 1000000,
   '--z-index-level-7': 10000000,
+  '--z-index-level-8': 100000000,
   '--z-index-badge': 'var(--z-index-level-2)',
   '--z-index-panel': 'var(--z-index-level-3)',
   '--z-index-bubble': 'var(--z-index-level-3)',

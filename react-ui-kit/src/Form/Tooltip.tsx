@@ -29,7 +29,7 @@ const paddingDistance = 8;
 
 const tooltipStyle: (theme: Theme) => CSSObject = theme => ({
   position: 'fixed',
-  zIndex: '99999',
+  zIndex: 'var(--z-index-level-8)',
   maxWidth: '300px',
   filter: 'drop-shadow(1px 2px 6px rgba(0, 0, 0, 0.3))',
   borderRadius: '4px',
