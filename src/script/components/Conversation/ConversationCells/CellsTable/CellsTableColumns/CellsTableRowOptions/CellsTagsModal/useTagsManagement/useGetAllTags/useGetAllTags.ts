@@ -38,10 +38,11 @@ export const useGetAllTags = ({
     setIsLoading(true);
     try {
       const tags = await cellsRepository.getAllTags();
-      setTags(tags.Values?.map(tag => tag).filter(Boolean) ?? []);
-      onSuccess(tags.Values?.map(tag => tag).filter(Boolean) ?? []);
+      const filteredTags = tags.Values?.map(tag => tag).filter(Boolean) ?? [];
+      setTags(filteredTags);
+      onSuccess(filteredTags);
     } catch (error) {
-      setError(error as Error);
+      setError(error instanceof Error ? error : new Error('Unknown error'));
     } finally {
       setIsLoading(false);
     }
