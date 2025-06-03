@@ -67,7 +67,8 @@ export const CellsTagsModal = ({
   const {
     allTags,
     selectedTags,
-    isLoading: isLoadingTags,
+    isLoadingAllTags,
+    isUpdatingTags,
     error,
     handleCreateOption,
     handleChange,
@@ -118,7 +119,7 @@ export const CellsTagsModal = ({
               options={allTags}
               value={selectedTags}
               menuListCSS={menuListCSS}
-              isLoading={isLoadingTags}
+              isLoading={isLoadingAllTags}
               onChange={handleChange}
               onCreateOption={handleCreateOption}
               createOptionLabel={name => t('cells.tagsModal.createOptionLabel', {name})}
@@ -132,7 +133,7 @@ export const CellsTagsModal = ({
           <Button variant={ButtonVariant.SECONDARY} onClick={onClose} css={buttonStyles}>
             {t('cells.tagsModal.cancelButton')}
           </Button>
-          <Button variant={ButtonVariant.PRIMARY} css={buttonStyles} onClick={handleSave}>
+          <Button variant={ButtonVariant.PRIMARY} css={buttonStyles} onClick={handleSave} disabled={isUpdatingTags}>
             {t('cells.tagsModal.saveButton')}
           </Button>
         </div>

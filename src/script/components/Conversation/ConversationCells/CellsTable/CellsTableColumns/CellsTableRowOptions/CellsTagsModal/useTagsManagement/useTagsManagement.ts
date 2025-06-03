@@ -43,12 +43,13 @@ export const useTagsManagement = ({
   const [selectedTags, setSelectedTags] = useState<ComboboxSelectOption[]>(
     initialSelectedTags.map(transformTagToSelectOption),
   );
+  const [isUpdatingTags, setIsUpdatingTags] = useState(false);
 
   const handleSetAllTags = useCallback((tags: string[]) => {
     setAllTags(tags.map(transformTagToSelectOption));
   }, []);
 
-  const {isLoading, error} = useGetAllTags({
+  const {isLoading: isLoadingAllTags, error} = useGetAllTags({
     cellsRepository,
     enabled: fetchTagsEnabled,
     onSuccess: handleSetAllTags,
@@ -69,17 +70,20 @@ export const useTagsManagement = ({
   };
 
   const handleUpdateTags = async (uuid: string) => {
+    setIsUpdatingTags(true);
     await cellsRepository.setNodeTags({
       uuid,
       tags: selectedTags.map(option => option.value as string).filter(Boolean),
     });
     onSuccess?.();
+    setIsUpdatingTags(false);
   };
 
   return {
     allTags,
     selectedTags,
-    isLoading,
+    isUpdatingTags,
+    isLoadingAllTags,
     error,
     handleCreateOption,
     handleChange,
