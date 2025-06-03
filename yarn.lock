@@ -8093,9 +8093,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^27.55.0":
-  version: 27.55.0
-  resolution: "@wireapp/api-client@npm:27.55.0"
+"@wireapp/api-client@npm:^27.56.0":
+  version: 27.56.0
+  resolution: "@wireapp/api-client@npm:27.56.0"
   dependencies:
     "@aws-sdk/client-s3": "npm:3.750.0"
     "@aws-sdk/lib-storage": "npm:3.779.0"
@@ -8104,7 +8104,7 @@ __metadata:
     "@wireapp/protocol-messaging": "npm:1.52.0"
     axios: "npm:1.9.0"
     axios-retry: "npm:4.5.0"
-    cells-sdk-ts: "https://github.com/pydio/cells-sdk-ts#v0.1.1-alpha11"
+    cells-sdk-ts: "https://github.com/pydio/cells-sdk-ts#v0.1.1-alpha12"
     http-status-codes: "npm:2.3.0"
     logdown: "npm:3.3.1"
     pako: "npm:2.1.0"
@@ -8114,7 +8114,7 @@ __metadata:
     uuid: "npm:11.1.0"
     ws: "npm:8.18.1"
     zod: "npm:3.24.2"
-  checksum: 10/2ad165f1a912610141a7f3174079bd2ec5624a07bc6efbbe42784cf380613d396396bdc811dc68eb0df474d57a4a57bdff638c8bae434ad0a448946932cce547
+  checksum: 10/d20805647ed7ac139c85838020c34b497d29f5d873111d38925f37727f91c953970b6ef61248ac0e8d2c8c6e1f25cb88e7b2dade4a43f9969ab9ce036ef66d71
   languageName: node
   linkType: hard
 
@@ -8179,11 +8179,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:46.23.13":
-  version: 46.23.13
-  resolution: "@wireapp/core@npm:46.23.13"
+"@wireapp/core@npm:46.23.14":
+  version: 46.23.14
+  resolution: "@wireapp/core@npm:46.23.14"
   dependencies:
-    "@wireapp/api-client": "npm:^27.55.0"
+    "@wireapp/api-client": "npm:^27.56.0"
     "@wireapp/commons": "npm:^5.4.2"
     "@wireapp/core-crypto": "npm:3.1.1"
     "@wireapp/cryptobox": "npm:12.8.0"
@@ -8201,7 +8201,7 @@ __metadata:
     long: "npm:^5.2.0"
     uuid: "npm:9.0.1"
     zod: "npm:3.24.2"
-  checksum: 10/64ae236c64927a79431f947ab46c4911f5cb21c16567605c0abd844a57a61da69f3295d4a2720762f532df17a9b671ab5a7193857e503424ca3915f54e044dac
+  checksum: 10/b64c02c2d7e6723b86b7ca7db88ca399a1456a6d8886ed712b091dc94deaae00a152ac38a654a334f7d22d3b13dd7821a8d80850c5b1667ab8dba5a5fe13a767
   languageName: node
   linkType: hard
 
@@ -8315,9 +8315,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/react-ui-kit@npm:9.56.1":
-  version: 9.56.1
-  resolution: "@wireapp/react-ui-kit@npm:9.56.1"
+"@wireapp/react-ui-kit@npm:9.57.0":
+  version: 9.57.0
+  resolution: "@wireapp/react-ui-kit@npm:9.57.0"
   dependencies:
     "@radix-ui/react-dropdown-menu": "npm:2.1.14"
     "@types/color": "npm:3.0.6"
@@ -8333,7 +8333,7 @@ __metadata:
   peerDependenciesMeta:
     "@types/react":
       optional: true
-  checksum: 10/e02c3be217d8018e3d126f7f3a43e1937201ff0141315faa8dc3a31bc799655a254294b7ea5260fadc4d2371d9b6f74a6cd1420a0dee6860bde9cdf1180a567b
+  checksum: 10/8d23f9631012b1014037cf7782175014ec779c283359b2f4be6f3726839ddff0072811fb7ae8392a7d7e6ef6e2dac5199512f0dd9802d899ff673bdd7b746839
   languageName: node
   linkType: hard
 
@@ -9670,12 +9670,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cells-sdk-ts@https://github.com/pydio/cells-sdk-ts#v0.1.1-alpha11":
+"cells-sdk-ts@https://github.com/pydio/cells-sdk-ts#v0.1.1-alpha12":
   version: 0.1.0
-  resolution: "cells-sdk-ts@https://github.com/pydio/cells-sdk-ts.git#commit=a8e1f4c2c30e9efbabdf9bf12c691b3690ced9cd"
+  resolution: "cells-sdk-ts@https://github.com/pydio/cells-sdk-ts.git#commit=7df0cf67605e2d53ab22a3c7b3deb1e04196db67"
   dependencies:
     axios: "npm:^1.9.0"
-  checksum: 10/06e54fdbe36ba9962b6f98a6f4632cf64604b3b3b8168117705efac1deaeb12c1278137dc438f6b073e9a383671f025f16e59fea650d57299a0e1efec44a13d7
+  checksum: 10/ef1762834c08c4b9a8f1b563a9b53403131c8a190157f23c9cbef8b7265f3d605a20893bc7b5e800f61bfec7846711b99b241b63e9cfdf16bc1b1af705df9393
   languageName: node
   linkType: hard
 
@@ -21620,10 +21620,10 @@ __metadata:
     "@wireapp/avs-debugger": "npm:0.0.7"
     "@wireapp/commons": "npm:5.4.2"
     "@wireapp/copy-config": "npm:2.3.0"
-    "@wireapp/core": "npm:46.23.13"
+    "@wireapp/core": "npm:46.23.14"
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/prettier-config": "npm:0.6.4"
-    "@wireapp/react-ui-kit": "npm:9.56.1"
+    "@wireapp/react-ui-kit": "npm:9.57.0"
     "@wireapp/store-engine": "npm:5.1.11"
     "@wireapp/store-engine-dexie": "npm:2.1.15"
     "@wireapp/telemetry": "npm:0.3.1"
