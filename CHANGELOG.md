@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.57.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.57.0...@wireapp/react-ui-kit@9.57.1) (2025-06-04)
+
+### Bug Fixes
+
+* **react-ui-kit:** new OptionsIcon ([#7067](https://github.com/wireapp/wire-web-packages/issues/7067)) ([0dbbe17](https://github.com/wireapp/wire-web-packages/commit/0dbbe17986e04f08ec3213a630ae53bfcf51e0c2))
+
 # [9.57.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.56.1...@wireapp/react-ui-kit@9.57.0) (2025-06-03)
 
 ### Features
