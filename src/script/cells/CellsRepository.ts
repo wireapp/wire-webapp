@@ -184,4 +184,12 @@ export class CellsRepository {
   async restoreNode({uuid}: {uuid: string}) {
     return this.apiClient.api.cells.restoreNode({uuid});
   }
+
+  async getAllTags() {
+    return this.apiClient.api.cells.getAllTags();
+  }
+
+  async setNodeTags({uuid, tags}: {uuid: string; tags: string[]}) {
+    return this.apiClient.api.cells.setNodeTags({uuid, tags});
+  }
 }
