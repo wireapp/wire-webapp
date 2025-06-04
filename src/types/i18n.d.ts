@@ -432,6 +432,7 @@ declare module 'I18n/en-US.json' {
     'cells.tableRow.created': `Created`;
     'cells.tableRow.name': `Name`;
     'cells.tableRow.owner': `Owner`;
+    'cells.tableRow.tags': `Tags`;
     'cells.tableRow.publicLink': `Shared`;
     'cells.tableRow.shared.falsyValue': `No`;
     'cells.tableRow.shared.truthyValue': `Yes`;
