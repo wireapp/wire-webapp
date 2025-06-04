@@ -17,8 +17,10 @@
  *
  */
 
+import {useMemo} from 'react';
+
 import {CSSObject, useTheme} from '@emotion/react';
-import {components, MenuPosition, MultiValueRemoveProps, NoticeProps} from 'react-select';
+import BaseSelect, {components, MenuPosition, MultiValueRemoveProps, NoticeProps} from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 
 import {selectStyles, noOptionsMessageStyles, wrapperStyles, loadingMessageStyles} from './ComboboxSelect.styles';
@@ -42,12 +44,12 @@ export interface ComboboxSelectProps {
   isDisabled?: boolean;
   placeholder?: string;
   dataUieName?: string;
-  onCreateOption: (inputValue: string) => void;
-  createOptionLabel: (inputValue: string) => string;
+  onCreateOption?: (inputValue: string) => void;
+  createOptionLabel?: (inputValue: string) => string;
   noOptionsMessage: string;
   label?: string;
   required?: boolean;
-  menuPotralTarget?: HTMLElement;
+  menuPortalTarget?: HTMLElement;
   menuPosition?: MenuPosition;
   menuListCSS?: CSSObject;
   isLoading?: boolean;
@@ -67,14 +69,12 @@ export const ComboboxSelect = ({
   noOptionsMessage,
   label,
   required,
-  menuPotralTarget,
+  menuPortalTarget,
   menuPosition = 'absolute',
   menuListCSS,
   isLoading = false,
   loadingMessage,
 }: ComboboxSelectProps) => {
-  const theme = useTheme() as Theme;
-
   return (
     <div css={wrapperStyles} data-uie-name={dataUieName}>
       {label && (
@@ -82,7 +82,59 @@ export const ComboboxSelect = ({
           {label}
         </InputLabel>
       )}
-      <CreatableSelect
+      <Select
+        id={id}
+        options={options}
+        value={value}
+        onChange={onChange}
+        isDisabled={isDisabled}
+        placeholder={placeholder}
+        menuPortalTarget={menuPortalTarget}
+        menuPosition={menuPosition}
+        createOptionLabel={createOptionLabel}
+        onCreateOption={onCreateOption}
+        creatable={!!onCreateOption}
+        isLoading={isLoading}
+        noOptionsMessage={noOptionsMessage}
+        loadingMessage={loadingMessage}
+        menuListCSS={menuListCSS}
+      />
+    </div>
+  );
+};
+
+const Select = ({
+  id,
+  options,
+  value,
+  onChange,
+  isDisabled = false,
+  placeholder,
+  onCreateOption,
+  createOptionLabel,
+  noOptionsMessage,
+  menuPortalTarget,
+  menuPosition = 'absolute',
+  menuListCSS,
+  isLoading = false,
+  loadingMessage,
+  creatable = false,
+}: ComboboxSelectProps & {creatable?: boolean}) => {
+  const theme = useTheme() as Theme;
+
+  const components = useMemo(() => {
+    return {
+      ClearIndicator: () => null,
+      DropdownIndicator: BaseSelectDropdownIndicator,
+      MultiValueRemove: (props: MultiValueRemoveProps) => <MultiValueRemove {...props} />,
+      NoOptionsMessage: (props: NoticeProps) => <NoOptionsMessage {...props} message={noOptionsMessage} />,
+      LoadingMessage: (props: NoticeProps) => <LoadingMessage {...props} message={loadingMessage} />,
+    };
+  }, [loadingMessage, noOptionsMessage]);
+
+  if (!creatable) {
+    return (
+      <BaseSelect
         id={id}
         options={options}
         value={value}
@@ -91,23 +143,36 @@ export const ComboboxSelect = ({
         isSearchable
         isDisabled={isDisabled}
         placeholder={placeholder}
-        menuPortalTarget={menuPotralTarget}
+        menuPortalTarget={menuPortalTarget}
         menuPosition={menuPosition}
         styles={selectStyles({theme, menuListCSS})}
         classNamePrefix="select"
-        formatCreateLabel={createOptionLabel}
-        onCreateOption={onCreateOption}
         closeMenuOnSelect={false}
-        isLoading={isLoading}
-        components={{
-          ClearIndicator: () => null,
-          DropdownIndicator: BaseSelectDropdownIndicator,
-          MultiValueRemove: props => <MultiValueRemove {...props} />,
-          NoOptionsMessage: props => <NoOptionsMessage {...props} message={noOptionsMessage} />,
-          LoadingMessage: props => <LoadingMessage {...props} message={loadingMessage} />,
-        }}
+        components={components}
       />
-    </div>
+    );
+  }
+
+  return (
+    <CreatableSelect
+      id={id}
+      options={options}
+      value={value}
+      onChange={onChange}
+      isMulti
+      isSearchable
+      isDisabled={isDisabled}
+      placeholder={placeholder}
+      menuPortalTarget={menuPortalTarget}
+      menuPosition={menuPosition}
+      styles={selectStyles({theme, menuListCSS})}
+      classNamePrefix="select"
+      formatCreateLabel={createOptionLabel}
+      onCreateOption={onCreateOption}
+      closeMenuOnSelect={false}
+      isLoading={isLoading}
+      components={components}
+    />
   );
 };
 
