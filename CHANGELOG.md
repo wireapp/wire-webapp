@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.59.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.58.0...@wireapp/react-ui-kit@9.59.0) (2025-06-04)
+
+### Features
+
+* **react-ui-kit:** ComboboxSelect without the creatable option ([#7069](https://github.com/wireapp/wire-web-packages/issues/7069)) ([69357c5](https://github.com/wireapp/wire-web-packages/commit/69357c5e2857eceb5ea04df26df141a4b75ff1ac))
+
 # [9.58.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.57.1...@wireapp/react-ui-kit@9.58.0) (2025-06-04)
 
 ### Features
