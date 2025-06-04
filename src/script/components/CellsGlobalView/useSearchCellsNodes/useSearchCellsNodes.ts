@@ -95,9 +95,9 @@ export const useSearchCellsNodes = ({cellsRepository}: UseSearchCellsNodesProps)
   }, [pageSize, searchNodes, searchValue, setStatus]);
 
   useEffect(() => {
-    setStatus('loading');
     void searchNodes({query: '*', status: 'loading'});
-  }, [searchNodes, setStatus]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return {
     searchValue,
