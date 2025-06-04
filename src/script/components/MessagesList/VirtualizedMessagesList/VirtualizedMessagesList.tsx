@@ -37,7 +37,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {Conversation} from '../../../entity/Conversation';
 import {JumpToLastMessageButton} from '../JumpToLastMessageButton';
 
-const ESTIMATED_ELEMENT_SIZE = 60;
+const ESTIMATED_ELEMENT_SIZE = 36;
 
 interface Props extends Omit<MessagesListParams, 'isRightSidebarOpen'> {
   parentElement: HTMLDivElement;
@@ -100,7 +100,7 @@ export const VirtualizedMessagesList = ({
     count: groupedMessages.length,
     getScrollElement: () => parentElement,
     estimateSize: () => ESTIMATED_ELEMENT_SIZE,
-    measureElement: element => element?.getBoundingClientRect().height,
+    measureElement: element => element?.getBoundingClientRect().height || ESTIMATED_ELEMENT_SIZE,
     initialOffset: parentElement.scrollHeight,
   });
 
@@ -159,30 +159,29 @@ export const VirtualizedMessagesList = ({
 
   const lastUnreadMessageIndex = getLastUnreadMessageIndex(conversationLastReadTimestamp.current, groupedMessages);
 
+  const virtualItems = virtualizer.getVirtualItems();
+
+  const lastIndex = groupedMessages.length - 1;
+
+  const isLastMessageVisible = virtualItems.some(item => item.index === lastIndex);
+
   const onJumpToLastMessageClick = () => {
     setHighlightedMessage(undefined);
     conversation.initialMessage(undefined);
 
-    requestAnimationFrame(() => {
-      if (!conversation.hasLastReceivedMessageLoaded()) {
-        updateConversationLastRead(conversation);
-        conversation.release();
-        loadConversation(conversation);
-      }
+    if (!conversation.hasLastReceivedMessageLoaded()) {
+      updateConversationLastRead(conversation);
+      conversation.release();
+      loadConversation(conversation);
+    }
 
-      if (lastUnreadMessageIndex !== -1) {
-        virtualizer.scrollToIndex(lastUnreadMessageIndex, {behavior: 'smooth', align: 'start'});
-        conversationLastReadTimestamp.current = groupedMessages[lastUnreadMessageIndex].timestamp;
-      } else {
-        virtualizer.scrollToIndex(groupedMessages.length - 1, {behavior: 'smooth'});
-      }
-    });
+    if (lastUnreadMessageIndex !== -1) {
+      virtualizer.scrollToIndex(lastUnreadMessageIndex, {align: 'start'});
+      conversationLastReadTimestamp.current = groupedMessages[lastUnreadMessageIndex].timestamp;
+    } else {
+      virtualizer.scrollToIndex(groupedMessages.length - 1, {align: 'end'});
+    }
   };
-
-  const virtualItems = virtualizer.getVirtualItems();
-  const lastIndex = groupedMessages.length - 1;
-
-  const isLastMessageVisible = virtualItems.some(item => item.index === lastIndex);
 
   return (
     <>
@@ -207,6 +206,8 @@ export const VirtualizedMessagesList = ({
             getVisibleCallback(conversation, item.message)?.();
           }
 
+          const isLast = virtualItem.index === groupedMessages.length - 1;
+
           return (
             <div
               data-index={virtualItem.index}
@@ -216,13 +217,7 @@ export const VirtualizedMessagesList = ({
                 position: 'absolute',
                 width: '100%',
                 transform: `translateY(${virtualItem.start}px)`,
-              }}
-              css={{
-                ...(groupedMessages.length - 1 === virtualItem.index && {
-                  '.message': {
-                    marginBottom: '40px',
-                  },
-                }),
+                paddingBottom: isLast ? '40px' : '0px',
               }}
             >
               {isMarker(item) ? (
