@@ -41,12 +41,19 @@ interface CellsTableProps {
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
   conversationName: string;
+  onRefresh: () => void;
 }
 
-export const CellsTable = ({nodes, cellsRepository, conversationQualifiedId, conversationName}: CellsTableProps) => {
+export const CellsTable = ({
+  nodes,
+  cellsRepository,
+  conversationQualifiedId,
+  conversationName,
+  onRefresh,
+}: CellsTableProps) => {
   const table = useReactTable({
     data: nodes,
-    columns: getCellsTableColumns({cellsRepository, conversationQualifiedId, conversationName}),
+    columns: getCellsTableColumns({cellsRepository, conversationQualifiedId, conversationName, onRefresh}),
     getCoreRowModel: getCoreRowModel(),
   });
 
