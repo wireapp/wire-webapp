@@ -19,6 +19,7 @@
 
 import {t} from 'Util/LocalizerUtil';
 
+import {CellsFilters} from './CellsFilters/CellsFilters';
 import {contentStyles, headingStyles, searchWrapperStyles, wrapperStyles} from './CellsHeader.styles';
 import {CellsRefresh} from './CellsRefresh/CellsRefresh';
 import {CellsSearch} from './CellsSearch/CellsSeach';
@@ -40,6 +41,7 @@ export const CellsHeader = ({searchValue, onSearch, onClearSearch, onRefresh, se
       <div css={contentStyles}>
         <div css={searchWrapperStyles}>
           <CellsSearch searchValue={searchValue} onSearch={onSearch} onClearSearch={onClearSearch} />
+          <CellsFilters />
           {searchStatus === 'loading' && <CellsTableLoader />}
           {searchStatus === 'error' && <p>{t('cells.search.failed')}</p>}
         </div>

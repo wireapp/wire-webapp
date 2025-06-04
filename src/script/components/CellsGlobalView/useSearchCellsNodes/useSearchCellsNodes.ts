@@ -45,7 +45,7 @@ export const useSearchCellsNodes = ({cellsRepository}: UseSearchCellsNodesProps)
     async ({query, status, limit = pageSize}: {query: string; status: Status; limit?: number}) => {
       try {
         setStatus(status);
-        const result = await cellsRepository.searchNodes({query, limit});
+        const result = await cellsRepository.searchNodes({query, limit, tags: ['kkk']});
         setNodes(transformCellsNodes(result.Nodes || []));
         if (result.Pagination) {
           setPagination(transformCellsPagination(result.Pagination));
