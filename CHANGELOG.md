@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.58.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.57.1...@wireapp/react-ui-kit@9.58.0) (2025-06-04)
+
+### Features
+
+* **react-ui-kit:** Accordion component ([#7065](https://github.com/wireapp/wire-web-packages/issues/7065)) ([3df072b](https://github.com/wireapp/wire-web-packages/commit/3df072b6ac3639048016942287ed487cd5cc8e67))
+
 ## [9.57.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.57.0...@wireapp/react-ui-kit@9.57.1) (2025-06-04)
 
 ### Bug Fixes
