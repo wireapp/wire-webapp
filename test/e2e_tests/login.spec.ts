@@ -19,9 +19,9 @@
 
 import {User, getUser} from './backend/user';
 import {ConversationSidebar} from './pages/conversationSidebar.page';
-import {DataShareConsentModal} from './pages/dataShareConsentModal.page';
+import {DataShareConsentModal} from './pages/dataShareConsent.modal';
 import {LoginPage} from './pages/login.page';
-import {WelcomePage} from './pages/welcome.page';
+import {SingleSignOnPage} from './pages/singleSignOn.page';
 import {test, expect} from './test.fixtures';
 
 const webAppPath = process.env.WEBAPP_URL ?? '';
@@ -31,12 +31,11 @@ test('Verify sign in error appearance in case of wrong credentials', {tag: ['@TC
   const incorrectEmail = 'blablabla@wire.engineering';
   const incorrectPassword = 'pass#$12367!';
 
-  const welcomePage = new WelcomePage(page);
+  const signleSignOnPage = new SingleSignOnPage(page);
   const loginPage = new LoginPage(page);
 
   await page.goto(webAppPath);
-  await welcomePage.clickLogin();
-  await loginPage.inputEmail(incorrectEmail);
+  await signleSignOnPage.enterEmailOnSSOPage(incorrectEmail);
   await loginPage.inputPassword(incorrectPassword);
   await loginPage.clickSignInButton();
 
@@ -53,14 +52,13 @@ test('Verify you can sign in by username', {tag: ['@TC-3461', '@regression']}, a
   // Adding created user to the list for later cleanup
   createdUsers.push(user);
 
-  const welcomePage = new WelcomePage(page);
   const loginPage = new LoginPage(page);
+  const signleSignOnPage = new SingleSignOnPage(page);
   const dataShareConsentModal = new DataShareConsentModal(page);
   const conversationSidebar = new ConversationSidebar(page);
 
   await page.goto(webAppPath);
-  await welcomePage.clickLogin();
-  await loginPage.inputEmail(user.email);
+  await signleSignOnPage.enterEmailOnSSOPage(user.email);
   await loginPage.inputPassword(user.password);
   await loginPage.clickSignInButton();
   await dataShareConsentModal.clickDecline();
@@ -74,6 +72,6 @@ test.afterAll(async ({api}) => {
     if (!user.token) {
       throw new Error(`User ${user.username} has no token and can't be deleted`);
     }
-    await api.deleteUser(user.password, user.token);
+    await api.user.deleteUser(user.password, user.token);
   }
 });

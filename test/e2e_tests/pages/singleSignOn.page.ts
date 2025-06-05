@@ -17,20 +17,23 @@
  *
  */
 
-import {test as baseTest} from '@playwright/test';
+import {Locator, Page} from '@playwright/test';
 
-import {ApiManager} from './backend/apiManager';
+export class SingleSignOnPage {
+  readonly page: Page;
 
-// Define custom test type with axios fixture
-type Fixtures = {
-  api: ApiManager;
-};
+  readonly ssoCodeEmailInput: Locator;
+  readonly ssoSignInButton: Locator;
 
-export const test = baseTest.extend<Fixtures>({
-  api: async ({request}, use) => {
-    // Create a new instance of ApiManager for each test
-    await use(new ApiManager());
-  },
-});
+  constructor(page: Page) {
+    this.page = page;
 
-export {expect} from '@playwright/test';
+    this.ssoCodeEmailInput = page.locator('#sso-code-email');
+    this.ssoSignInButton = page.locator('[data-uie-name="do-sso-sign-in"]');
+  }
+
+  async enterEmailOnSSOPage(email: string) {
+    await this.ssoCodeEmailInput.fill(email);
+    await this.ssoSignInButton.click();
+  }
+}

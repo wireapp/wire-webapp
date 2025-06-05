@@ -17,20 +17,18 @@
  *
  */
 
-import {test as baseTest} from '@playwright/test';
+import axios, {AxiosInstance} from 'axios';
 
-import {ApiManager} from './backend/apiManager';
+export class BackendClient {
+  readonly axiosInstance: AxiosInstance;
 
-// Define custom test type with axios fixture
-type Fixtures = {
-  api: ApiManager;
-};
-
-export const test = baseTest.extend<Fixtures>({
-  api: async ({request}, use) => {
-    // Create a new instance of ApiManager for each test
-    await use(new ApiManager());
-  },
-});
-
-export {expect} from '@playwright/test';
+  constructor() {
+    this.axiosInstance = axios.create({
+      baseURL: process.env.BACKEND_URL,
+      withCredentials: true,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  }
+}

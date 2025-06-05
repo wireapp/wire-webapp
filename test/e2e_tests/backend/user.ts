@@ -20,12 +20,15 @@
 import {faker} from '@faker-js/faker';
 
 export interface User {
+  id?: string;
   email: string;
   password: string;
   firstName: string;
   lastName: string;
   username: string;
-  token: string | null;
+  teamId?: string;
+  // token: string | null;
+  token?: string;
 }
 
 export const getUser = (user: Partial<User> = {}): User => {
@@ -39,6 +42,6 @@ export const getUser = (user: Partial<User> = {}): User => {
     firstName: user.firstName ?? faker.person.firstName(),
     lastName,
     username: user.username ?? `${lastName}${faker.string.alpha({length: 5, casing: 'lower'})}`.toLowerCase(),
-    token: user.token ?? null,
+    token: user.token ?? undefined,
   };
 };

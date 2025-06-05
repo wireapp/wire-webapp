@@ -17,20 +17,20 @@
  *
  */
 
-import {test as baseTest} from '@playwright/test';
+import {Locator, Page} from '@playwright/test';
 
-import {ApiManager} from './backend/apiManager';
+export class CreateGroupModal {
+  readonly page: Page;
 
-// Define custom test type with axios fixture
-type Fixtures = {
-  api: ApiManager;
-};
+  readonly createGroupModal: Locator;
+  readonly createGroupNameInput: Locator;
+  readonly createGroupSubmitButton: Locator;
 
-export const test = baseTest.extend<Fixtures>({
-  api: async ({request}, use) => {
-    // Create a new instance of ApiManager for each test
-    await use(new ApiManager());
-  },
-});
+  constructor(page: Page) {
+    this.page = page;
 
-export {expect} from '@playwright/test';
+    this.createGroupModal = page.locator('[data-uie-name="group-creation-label"]');
+    this.createGroupNameInput = this.createGroupModal.locator('[data-uie-name="enter-group-name"]');
+    this.createGroupSubmitButton = this.createGroupModal.locator('[data-uie-name="submit"]');
+  }
+}

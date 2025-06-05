@@ -17,9 +17,11 @@
 //
 
 # Define browsers [chromium, firefox, webkit]
-BROWSERS=chromium,firefox
+BROWSERS=chromium
 HEADLESS=true
+# Do we store test service URL in 1Password?
+TEST_SERVICE_URL=http://192.168.2.18:8080
 
-BACKEND_URL=op://Test Automation/BackendConnection staging-with-webapp-master/backendUrl
-WEBAPP_URL=op://Test Automation/BackendConnection staging-with-webapp-master/webappUrl
-BASIC_AUTH=op://Test Automation/BackendConnection staging-with-webapp-master/basicAuth
+BACKEND_URL=op://Test Automation/BackendConnection staging/backendUrl
+WEBAPP_URL=op://Test Automation/BackendConnection staging/webappUrl
+BASIC_AUTH=op://Test Automation/BackendConnection staging/basicAuth
