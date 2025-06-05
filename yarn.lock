@@ -8202,7 +8202,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^27.55.0":
+"@wireapp/api-client@npm:^27.56.1":
   version: 27.56.1
   resolution: "@wireapp/api-client@npm:27.56.1"
   dependencies:
@@ -8288,11 +8288,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:46.23.13":
-  version: 46.23.13
-  resolution: "@wireapp/core@npm:46.23.13"
+"@wireapp/core@npm:46.23.15":
+  version: 46.23.15
+  resolution: "@wireapp/core@npm:46.23.15"
   dependencies:
-    "@wireapp/api-client": "npm:^27.55.0"
+    "@wireapp/api-client": "npm:^27.56.1"
     "@wireapp/commons": "npm:^5.4.2"
     "@wireapp/core-crypto": "npm:3.1.1"
     "@wireapp/cryptobox": "npm:12.8.0"
@@ -8310,7 +8310,7 @@ __metadata:
     long: "npm:^5.2.0"
     uuid: "npm:9.0.1"
     zod: "npm:3.24.2"
-  checksum: 10/64ae236c64927a79431f947ab46c4911f5cb21c16567605c0abd844a57a61da69f3295d4a2720762f532df17a9b671ab5a7193857e503424ca3915f54e044dac
+  checksum: 10/e3126ceffbc5448d5ef2449153fab5372d35f8da0a988118af86ff97541dd3ceb1bfb4e59e75a8ce0c2494c80dd2e9c60714faa72689291ff58c2b18b513e59d
   languageName: node
   linkType: hard
 
@@ -8424,9 +8424,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/react-ui-kit@npm:9.58.0":
-  version: 9.58.0
-  resolution: "@wireapp/react-ui-kit@npm:9.58.0"
+"@wireapp/react-ui-kit@npm:9.59.0":
+  version: 9.59.0
+  resolution: "@wireapp/react-ui-kit@npm:9.59.0"
   dependencies:
     "@radix-ui/react-accordion": "npm:1.2.11"
     "@radix-ui/react-dropdown-menu": "npm:2.1.14"
@@ -8443,7 +8443,7 @@ __metadata:
   peerDependenciesMeta:
     "@types/react":
       optional: true
-  checksum: 10/e029e2ef18bf9405145d49cbae1aa8089482b2065a30b0bcfa28d359c23298a37eb1d953d6a7fdaa8efc4d26f2e7c736e0460e344c8dde7442cdc9ac6c07b242
+  checksum: 10/47f4c87e7a87004b55511160b35fdd0a3516f4890915ef74a0624ad546425dd405c550f31c3d891aa601e8f44586239d6dc578159e4c56e0d60ac716f937f2a1
   languageName: node
   linkType: hard
 
@@ -9388,9 +9388,9 @@ __metadata:
   linkType: hard
 
 "bazinga64@npm:^6.3.11":
-  version: 6.4.0
-  resolution: "bazinga64@npm:6.4.0"
-  checksum: 10/c650983b2a37c27fd01aede0bd678c02f2b0cdf6d7970567374d1a37988a2e3cf3ee601b237587abdfa9e9a23bdfba99678f71a077a3da676714e45cc0c1d684
+  version: 6.3.11
+  resolution: "bazinga64@npm:6.3.11"
+  checksum: 10/e7bc5e549366c1e9996347bd59848396cf471b2f5605ecae6ff0268c46ef097a7bcb45839c520834def7667ff04a0fef6f1f8a7dd2f736dbfdb9f66969818e8f
   languageName: node
   linkType: hard
 
@@ -21730,10 +21730,10 @@ __metadata:
     "@wireapp/avs-debugger": "npm:0.0.7"
     "@wireapp/commons": "npm:5.4.2"
     "@wireapp/copy-config": "npm:2.3.0"
-    "@wireapp/core": "npm:46.23.13"
+    "@wireapp/core": "npm:46.23.15"
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/prettier-config": "npm:0.6.4"
-    "@wireapp/react-ui-kit": "npm:9.58.0"
+    "@wireapp/react-ui-kit": "npm:9.59.0"
     "@wireapp/store-engine": "npm:5.1.11"
     "@wireapp/store-engine-dexie": "npm:2.1.15"
     "@wireapp/telemetry": "npm:0.3.1"

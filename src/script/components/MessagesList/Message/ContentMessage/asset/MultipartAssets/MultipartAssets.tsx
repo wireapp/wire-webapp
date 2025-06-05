@@ -84,7 +84,7 @@ const MultipartAsset = ({
   senderName,
   timestamp,
 }: MultipartAssetProps) => {
-  const name = trimFileExtension(initialName!);
+  const name = getName(initialName!);
   const extension = getFileExtension(initialName!);
   const size = formatBytes(Number(initialSize));
 
@@ -154,4 +154,10 @@ const MultipartAsset = ({
       />
     </li>
   );
+};
+
+const getName = (name: string): string => {
+  const parts = name.split('/');
+  const lastPart = parts[parts.length - 1];
+  return trimFileExtension(lastPart);
 };
