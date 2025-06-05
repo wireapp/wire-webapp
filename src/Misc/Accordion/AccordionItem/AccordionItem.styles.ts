@@ -51,8 +51,8 @@ export const wrapperStyles: CSSObject = {
 export const itemStyles: CSSObject = {
   overflow: 'hidden',
   borderBottom: `1px solid var(--text-input-border)`,
-  '&:last-child': {
-    borderBottom: 'none',
+  '&:not(:last-child)': {
+    marginBottom: '8px',
   },
 };
 
@@ -62,11 +62,11 @@ export const triggerStyles: CSSObject = {
   alignItems: 'center',
   justifyContent: 'space-between',
   background: 'none',
-  padding: '16px',
+  padding: '0',
   border: 'none',
   cursor: 'pointer',
   transition: 'background-color 0.2s ease',
-  height: '48px',
+  height: '40px',
 };
 
 export const triggerTextStyles: CSSObject = {
@@ -87,7 +87,7 @@ export const contentStyles: CSSObject = {
 
 export const contentTextStyles: CSSObject = {
   width: '100%',
-  padding: '0 16px 16px',
+  padding: '16px 0',
 };
 
 export const chevronStyles: CSSObject = {
