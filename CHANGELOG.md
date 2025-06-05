@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.59.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.59.0...@wireapp/react-ui-kit@9.59.1) (2025-06-05)
+
+### Bug Fixes
+
+* **react-ui-kit:** Accordion spacing ([#7070](https://github.com/wireapp/wire-web-packages/issues/7070)) ([f7fc37a](https://github.com/wireapp/wire-web-packages/commit/f7fc37a95e69fb158054a1e6f16f89e7a88b266e))
+
 # [9.59.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.58.0...@wireapp/react-ui-kit@9.59.0) (2025-06-04)
 
 ### Features
