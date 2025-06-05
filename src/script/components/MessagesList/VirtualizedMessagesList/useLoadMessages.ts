@@ -93,7 +93,7 @@ export const useLoadMessages = (
     const scrollElement = virtualizer.scrollElement;
 
     if (!scrollElement) {
-      return;
+      return () => undefined;
     }
 
     let ticking = false;
