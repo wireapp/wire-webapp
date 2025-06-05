@@ -66,7 +66,6 @@ export interface MessageParams extends MessageActions {
     deleteMessageEveryone: (conversation: Conversation, message: BaseMessage) => void;
   };
   messageRepository: MessageRepository;
-  // onVisibilityLost?: () => void;
   selfId: QualifiedId;
   shouldShowInvitePeople: boolean;
   teamState?: TeamState;
@@ -85,7 +84,6 @@ export const Message = (props: MessageParams & {scrollTo?: () => void}) => {
     message,
     isHighlighted,
     hideHeader,
-    // onVisibilityLost,
     scrollTo,
     isFocused,
     handleFocus,
@@ -130,9 +128,6 @@ export const Message = (props: MessageParams & {scrollTo?: () => void}) => {
       messageElementRef.current?.focus();
     }
   }, [isFocused]);
-
-  // When component is unmounted, it's not visible anymore
-  // useEffect(() => onVisibilityLost, [onVisibilityLost]);
 
   // set message elements focus for non content type mesages
   // some non content type message has interactive element like invite people for member message

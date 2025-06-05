@@ -24,7 +24,7 @@ import {SerializedStyles, css} from '@emotion/react';
 import {useRelativeTimestamp} from 'src/script/hooks/useRelativeTimestamp';
 
 import {dayMarkerStyle, baseMarkerStyle} from './Marker.styles';
-import {getMessagesGroupLabel} from './utils';
+import {getMessagesGroupLabel} from './Marker.utils';
 
 import {Marker} from '../../utils/messagesGroup';
 import {MessageTime} from '../MessageTime';

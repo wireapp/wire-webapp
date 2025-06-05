@@ -149,11 +149,9 @@ export const VirtualizedMessagesList = ({
     const messageIsLoaded = conversation.getMessage(messageId);
 
     if (!messageIsLoaded) {
-      // TODO: this will block automatic scroll triggers (like loading extra messages)
       const messageEntity = await messageRepository.getMessageInConversationById(conversation, messageId);
       conversation.removeMessages();
       conversationRepository.getMessagesWithOffset(conversation, messageEntity);
-      // TODO: unblock automatic scroll triggers
     }
   };
 

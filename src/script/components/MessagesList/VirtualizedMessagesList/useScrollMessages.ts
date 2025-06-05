@@ -39,6 +39,7 @@ export const useScrollMessages = (
 ) => {
   const hasInitialScrollRef = useRef(false);
 
+  // This function scroll to currently send message by self user.
   useEffect(() => {
     if (messages.length === 0) {
       return;
@@ -55,6 +56,7 @@ export const useScrollMessages = (
     }
   }, [messages, userId, virtualizer]);
 
+  // This function scrolling to the first unread message or bottom to the message list on initialization.
   useEffect(() => {
     if (highlightedMessage || hasInitialScrollRef.current) {
       return;

@@ -76,6 +76,9 @@ export const useLoadMessages = (
     }
   }, [conversation, conversationRepository, onLoadingMessages]);
 
+  // This function ensures that after messages are loaded, the UI scrolls to the correct position in a
+  // virtualized list — likely to show newly loaded messages in a chat or feed.
+  // It waits for layout updates to ensure the DOM is in a stable state before scrolling.
   useLayoutEffect(() => {
     if (loadingMessages || !nbOfMessages.current) {
       return;
@@ -89,6 +92,8 @@ export const useLoadMessages = (
     virtualizer.scrollToIndex(itemsLength - nbOfMessages.current, {align: 'start'});
   }, [itemsLength, loadingMessages]);
 
+  // This function ensures that after user scroll to top or bottom content,
+  // the preceding / following messages will be loaded.
   useEffect(() => {
     const scrollElement = virtualizer.scrollElement;
 
