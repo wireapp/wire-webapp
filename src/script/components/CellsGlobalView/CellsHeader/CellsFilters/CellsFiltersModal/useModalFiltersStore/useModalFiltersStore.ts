@@ -17,26 +17,25 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {create} from 'zustand';
 
-export const buttonStyles: CSSObject = {
-  marginBottom: 0,
-  position: 'relative',
+interface Filters {
+  tags: string[];
+}
+
+interface ModalFiltersState extends Filters {
+  setTags: (tags: string[]) => void;
+  initialize: (filters: Filters) => void;
+  reset: () => void;
+}
+
+const initialState: Filters = {
+  tags: [],
 };
 
-export const counterStyles: CSSObject = {
-  alignItems: 'center',
-  backgroundColor: 'var(--accent-color)',
-  borderRadius: '50%',
-  color: 'var(--white)',
-  display: 'flex',
-  fontSize: '11px',
-  fontWeight: 600,
-  height: '18px',
-  justifyContent: 'center',
-  minWidth: '18px',
-  padding: '0 4px',
-  position: 'absolute',
-  right: '-8px',
-  top: '-8px',
-};
+export const useModalFiltersStore = create<ModalFiltersState>(set => ({
+  ...initialState,
+  setTags: tags => set({tags}),
+  initialize: filters => set(filters),
+  reset: () => set(initialState),
+}));

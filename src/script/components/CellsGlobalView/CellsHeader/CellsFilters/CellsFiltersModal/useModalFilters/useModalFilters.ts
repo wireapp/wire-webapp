@@ -17,26 +17,29 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {useEffect} from 'react';
 
-export const buttonStyles: CSSObject = {
-  marginBottom: 0,
-  position: 'relative',
-};
+import {useCellsStore} from '../../../../common/useCellsStore/useCellsStore';
+import {useModalFiltersStore} from '../useModalFiltersStore/useModalFiltersStore';
 
-export const counterStyles: CSSObject = {
-  alignItems: 'center',
-  backgroundColor: 'var(--accent-color)',
-  borderRadius: '50%',
-  color: 'var(--white)',
-  display: 'flex',
-  fontSize: '11px',
-  fontWeight: 600,
-  height: '18px',
-  justifyContent: 'center',
-  minWidth: '18px',
-  padding: '0 4px',
-  position: 'absolute',
-  right: '-8px',
-  top: '-8px',
+export const useModalFilters = (isOpen: boolean) => {
+  const {filters} = useCellsStore();
+  const {tags, setTags, initialize} = useModalFiltersStore();
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+    initialize({tags: filters.tags});
+  }, [isOpen, filters.tags, initialize]);
+
+  const handleSave = () => {
+    filters.setTags(tags);
+  };
+
+  return {
+    tags,
+    setTags,
+    handleSave,
+  };
 };

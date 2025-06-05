@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 
 import {useDebouncedCallback} from 'use-debounce';
 
@@ -36,22 +36,28 @@ const PAGE_SIZE_INCREMENT = 20;
 const DEBOUNCE_TIME = 300;
 
 export const useSearchCellsNodes = ({cellsRepository}: UseSearchCellsNodesProps) => {
-  const {setNodes, setStatus, setPagination, clearAll} = useCellsStore();
+  const {setNodes, setStatus, setPagination, clearAll, filters} = useCellsStore();
 
   const [searchValue, setSearchValue] = useState('');
   const [pageSize, setPageSize] = useState<number>(PAGE_INITIAL_SIZE);
+  const isInitialSearch = useRef(true);
 
   const searchNodes = useCallback(
     async ({query, status, limit = pageSize}: {query: string; status: Status; limit?: number}) => {
       try {
         setStatus(status);
-        const result = await cellsRepository.searchNodes({query, limit, tags: ['kkk']});
+        const result = await cellsRepository.searchNodes({query, limit, tags: filters.tags});
         setNodes(transformCellsNodes(result.Nodes || []));
         if (result.Pagination) {
           setPagination(transformCellsPagination(result.Pagination));
         } else {
           setPagination(null);
         }
+
+        if (isInitialSearch.current) {
+          isInitialSearch.current = false;
+        }
+
         setStatus('success');
       } catch (error) {
         setStatus('error');
@@ -61,7 +67,7 @@ export const useSearchCellsNodes = ({cellsRepository}: UseSearchCellsNodesProps)
     },
     // cellsRepository is not a dependency because it's a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [pageSize, setNodes, setPagination, setStatus],
+    [pageSize, setNodes, setPagination, setStatus, filters],
   );
 
   const searchNodesDebounced = useDebouncedCallback(searchNodes, DEBOUNCE_TIME);
@@ -95,9 +101,8 @@ export const useSearchCellsNodes = ({cellsRepository}: UseSearchCellsNodesProps)
   }, [pageSize, searchNodes, searchValue, setStatus]);
 
   useEffect(() => {
-    void searchNodes({query: '*', status: 'loading'});
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    void searchNodes({query: '*', status: isInitialSearch.current ? 'loading' : 'fetchingMore'});
+  }, [searchNodes, isInitialSearch]);
 
   return {
     searchValue,
