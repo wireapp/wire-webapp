@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [46.24.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.24.1...@wireapp/core@46.24.2) (2025-06-06)
+
+### Reverts
+
+* Revert "feat: update to CC v4.x [WPB-16269] (#6969)" (#7071) ([aeac62e](https://github.com/wireapp/wire-web-packages/commit/aeac62e413c664898b3f2c4014ea03bf9dfe0ba8)), closes [#6969](https://github.com/wireapp/wire-web-packages/issues/6969) [#7071](https://github.com/wireapp/wire-web-packages/issues/7071)
+
 ## [46.24.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.24.0...@wireapp/core@46.24.1) (2025-06-06)
 
 **Note:** Version bump only for package @wireapp/core
