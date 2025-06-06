@@ -332,6 +332,7 @@ export class CellsAPI {
     sortBy = DEFAULT_SEARCH_SORT_FIELD,
     sortDirection = DEFAULT_SEARCH_SORT_DIRECTION,
     type,
+    tags,
     deleted = false,
   }: {
     phrase: string;
@@ -340,6 +341,7 @@ export class CellsAPI {
     sortBy?: string;
     sortDirection?: SortDirection;
     type?: RestIncomingNode['Type'];
+    tags?: string[];
     deleted?: boolean;
   }): Promise<RestNodeCollection> {
     if (!this.client || !this.storageService) {
@@ -354,6 +356,7 @@ export class CellsAPI {
         Status: {
           Deleted: deleted ? 'Only' : 'Not',
         },
+        Metadata: tags?.length ? [{Namespace: USER_META_TAGS_NAMESPACE, Term: tags.join(',')}] : [],
       },
       Flags: ['WithPreSignedURLs'],
       Limit: `${limit}`,

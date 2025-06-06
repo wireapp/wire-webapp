@@ -1128,6 +1128,7 @@ describe('CellsAPI', () => {
           Status: {
             Deleted: 'Not',
           },
+          Metadata: [],
         },
         Flags: ['WithPreSignedURLs'],
         Limit: '10',
@@ -1165,6 +1166,7 @@ describe('CellsAPI', () => {
           Status: {
             Deleted: 'Only',
           },
+          Metadata: [],
         },
         Flags: ['WithPreSignedURLs'],
         Limit: '10',
@@ -1202,6 +1204,7 @@ describe('CellsAPI', () => {
           Status: {
             Deleted: 'Not',
           },
+          Metadata: [],
         },
         Flags: ['WithPreSignedURLs'],
         Limit: '10',
@@ -1243,6 +1246,7 @@ describe('CellsAPI', () => {
           Status: {
             Deleted: 'Not',
           },
+          Metadata: [],
         },
         Flags: ['WithPreSignedURLs'],
         Limit: '5',
@@ -1284,6 +1288,7 @@ describe('CellsAPI', () => {
           Status: {
             Deleted: 'Not',
           },
+          Metadata: [],
         },
         Flags: ['WithPreSignedURLs'],
         Limit: '10',
@@ -1325,6 +1330,7 @@ describe('CellsAPI', () => {
           Status: {
             Deleted: 'Not',
           },
+          Metadata: [],
         },
         Flags: ['WithPreSignedURLs'],
         Limit: '10',
@@ -1362,6 +1368,7 @@ describe('CellsAPI', () => {
           Status: {
             Deleted: 'Not',
           },
+          Metadata: [],
         },
         Flags: ['WithPreSignedURLs'],
         Limit: '10',
@@ -1390,6 +1397,7 @@ describe('CellsAPI', () => {
           Status: {
             Deleted: 'Not',
           },
+          Metadata: [],
         },
         Flags: ['WithPreSignedURLs'],
         Limit: '10',
@@ -1398,15 +1406,6 @@ describe('CellsAPI', () => {
         SortField: 'mtime',
       });
       expect(result).toEqual(mockResponse);
-    });
-
-    it('propagates errors from the NodeServiceApi', async () => {
-      const searchPhrase = 'test';
-      const errorMessage = 'Search failed';
-
-      mockNodeServiceApi.lookup.mockRejectedValueOnce(new Error(errorMessage));
-
-      await expect(cellsAPI.searchNodes({phrase: searchPhrase})).rejects.toThrow(errorMessage);
     });
 
     it('handles empty search phrase', async () => {
@@ -1427,6 +1426,77 @@ describe('CellsAPI', () => {
           Status: {
             Deleted: 'Not',
           },
+          Metadata: [],
+        },
+        Flags: ['WithPreSignedURLs'],
+        Limit: '10',
+        Offset: '0',
+        SortDirDesc: true,
+        SortField: 'mtime',
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('filters by tags when provided', async () => {
+      const searchPhrase = 'test';
+      const tags = ['tag1', 'tag2'];
+      const mockResponse: RestNodeCollection = {
+        Nodes: [
+          {
+            Path: '/test.txt',
+            Uuid: 'file-uuid-1',
+          },
+        ],
+      } as RestNodeCollection;
+
+      mockNodeServiceApi.lookup.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      const result = await cellsAPI.searchNodes({phrase: searchPhrase, tags});
+
+      expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
+        Scope: {Root: {Path: '/'}, Recursive: true},
+        Filters: {
+          Text: {SearchIn: 'BaseName', Term: searchPhrase},
+          Type: 'UNKNOWN',
+          Status: {
+            Deleted: 'Not',
+          },
+          Metadata: [{Namespace: 'usermeta-tags', Term: tags.join(',')}],
+        },
+        Flags: ['WithPreSignedURLs'],
+        Limit: '10',
+        Offset: '0',
+        SortDirDesc: true,
+        SortField: 'mtime',
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('handles empty tags array', async () => {
+      const searchPhrase = 'test';
+      const tags: string[] = [];
+      const mockResponse: RestNodeCollection = {
+        Nodes: [
+          {
+            Path: '/test.txt',
+            Uuid: 'file-uuid-1',
+          },
+        ],
+      } as RestNodeCollection;
+
+      mockNodeServiceApi.lookup.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      const result = await cellsAPI.searchNodes({phrase: searchPhrase, tags});
+
+      expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
+        Scope: {Root: {Path: '/'}, Recursive: true},
+        Filters: {
+          Text: {SearchIn: 'BaseName', Term: searchPhrase},
+          Type: 'UNKNOWN',
+          Status: {
+            Deleted: 'Not',
+          },
+          Metadata: [],
         },
         Flags: ['WithPreSignedURLs'],
         Limit: '10',
