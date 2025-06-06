@@ -70,10 +70,6 @@ describe('SessionHandler', () => {
     jest.spyOn(apiClient.api.user, 'postMultiPreKeyBundles').mockImplementation(generatePrekeys);
   });
 
-  afterAll(() => {
-    jest.clearAllTimers();
-  });
-
   describe('constructSessionId', () => {
     describe('constructs a session ID', () => {
       it('without a domain', () => {

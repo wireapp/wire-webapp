@@ -121,7 +121,7 @@ export class ClientService {
       const notFoundOnBackend = axios.isAxiosError(error) ? error.response?.status === StatusCodes.NOT_FOUND : false;
       if (notFoundOnBackend && this.storeEngine) {
         const shouldDeleteWholeDatabase = loadedClient.type === ClientType.TEMPORARY;
-        await this.proteusService.wipe();
+        await this.proteusService.wipe(this.storeEngine);
         if (shouldDeleteWholeDatabase) {
           await this.storeEngine.clearTables();
         }

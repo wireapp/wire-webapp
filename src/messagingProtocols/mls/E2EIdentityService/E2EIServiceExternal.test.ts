@@ -20,7 +20,7 @@
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import axios from 'axios';
 
-import {CoreCrypto, CoreCryptoContext, CredentialType, WireIdentity} from '@wireapp/core-crypto';
+import {CoreCrypto, CredentialType, WireIdentity} from '@wireapp/core-crypto';
 
 import {E2EIServiceExternal} from './E2EIServiceExternal';
 
@@ -32,19 +32,14 @@ import {RecurringTaskScheduler} from '../../../util/RecurringTaskScheduler';
 import {MLSService} from '../MLSService';
 
 async function buildE2EIService(dbName = 'core-test-db') {
-  const transactionContext = {
-    e2eiIsPKIEnvSetup: jest.fn(),
-    e2eiRegisterAcmeCA: jest.fn(),
-    e2eiRegisterIntermediateCA: jest.fn(),
-  } as unknown as jest.Mocked<CoreCryptoContext>;
-
   const coreCrypto = {
     getUserIdentities: jest.fn(),
     getClientIds: jest.fn().mockResolvedValue([]),
-    transaction: jest.fn(fn => {
-      return fn(transactionContext);
-    }),
+    e2eiIsPKIEnvSetup: jest.fn(),
+    e2eiRegisterAcmeCA: jest.fn(),
+    e2eiRegisterIntermediateCA: jest.fn(),
   } as unknown as jest.Mocked<CoreCrypto>;
+
   const clientService = {} as jest.Mocked<ClientService>;
 
   const mockedDb = await openDB(dbName);
@@ -65,7 +60,7 @@ async function buildE2EIService(dbName = 'core-test-db') {
 
   return [
     new E2EIServiceExternal(coreCrypto, mockedDb, recurringTaskScheduler, clientService, mockedMLSService),
-    {coreCrypto, mlsService: mockedMLSService, recurringTaskScheduler, transactionContext},
+    {coreCrypto, mlsService: mockedMLSService, recurringTaskScheduler},
   ] as const;
 }
 
@@ -247,32 +242,34 @@ describe('E2EIServiceExternal', () => {
     it('registers the server certificates and shedules a timer to refresh intermediate certs every', async () => {
       jest.useFakeTimers();
 
-      const [service, {transactionContext}] = await buildE2EIService('mockedDB1');
-      jest.spyOn(transactionContext, 'e2eiIsPKIEnvSetup').mockResolvedValueOnce(false);
+      const [service, {coreCrypto}] = await buildE2EIService('mockedDB1');
+
+      jest.spyOn(coreCrypto, 'e2eiIsPKIEnvSetup').mockResolvedValueOnce(false);
+
       await service.initialize('https://some.crl.discovery.url');
 
-      expect(transactionContext.e2eiRegisterAcmeCA).toHaveBeenCalledWith(mockedRootCA);
-      expect(transactionContext.e2eiRegisterIntermediateCA).toHaveBeenCalledWith(federatedCerts[0]);
-      expect(transactionContext.e2eiRegisterIntermediateCA).toHaveBeenCalledWith(federatedCerts[1]);
-      expect(transactionContext.e2eiRegisterIntermediateCA).toHaveBeenCalledTimes(2);
+      expect(coreCrypto.e2eiRegisterAcmeCA).toHaveBeenCalledWith(mockedRootCA);
+      expect(coreCrypto.e2eiRegisterIntermediateCA).toHaveBeenCalledWith(federatedCerts[0]);
+      expect(coreCrypto.e2eiRegisterIntermediateCA).toHaveBeenCalledWith(federatedCerts[1]);
+      expect(coreCrypto.e2eiRegisterIntermediateCA).toHaveBeenCalledTimes(2);
 
       await jest.advanceTimersByTimeAsync(TimeInMillis.DAY);
       await jest.runAllTimersAsync();
 
-      expect(transactionContext.e2eiRegisterIntermediateCA).toHaveBeenCalledTimes(4);
+      expect(coreCrypto.e2eiRegisterIntermediateCA).toHaveBeenCalledTimes(4);
     });
 
     it('does not register the root cert if it was already registered', async () => {
       jest.useFakeTimers();
 
-      const [service, {transactionContext}] = await buildE2EIService('mockedDB2');
+      const [service, {coreCrypto}] = await buildE2EIService('mockedDB2');
 
-      jest.spyOn(transactionContext, 'e2eiIsPKIEnvSetup').mockResolvedValueOnce(true);
+      jest.spyOn(coreCrypto, 'e2eiIsPKIEnvSetup').mockResolvedValueOnce(true);
 
       await service.initialize('https://some.crl.discovery.url');
 
-      expect(transactionContext.e2eiRegisterAcmeCA).not.toHaveBeenCalled();
-      expect(transactionContext.e2eiRegisterIntermediateCA).toHaveBeenCalledTimes(2);
+      expect(coreCrypto.e2eiRegisterAcmeCA).not.toHaveBeenCalled();
+      expect(coreCrypto.e2eiRegisterIntermediateCA).toHaveBeenCalledTimes(2);
     });
   });
 });
