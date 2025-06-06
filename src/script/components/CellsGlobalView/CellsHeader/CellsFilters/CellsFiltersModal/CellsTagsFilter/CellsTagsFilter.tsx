@@ -17,7 +17,7 @@
  *
  */
 
-import {ComboboxSelect} from '@wireapp/react-ui-kit';
+import {ComboboxSelect, ComboboxSelectOption} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/LocalizerUtil';
 
@@ -30,6 +30,14 @@ interface CellsTagsFilterProps {
 }
 
 export const CellsTagsFilter = ({allTags, selectedTags, onTagsChange}: CellsTagsFilterProps) => {
+  const transformTags = (tags: string[]) => {
+    return tags.map(tag => ({label: tag, value: tag}));
+  };
+
+  const handleChange = (value: ComboboxSelectOption | ComboboxSelectOption[]) => {
+    onTagsChange(Array.isArray(value) ? value.map(option => option.value as string) : []);
+  };
+
   return (
     <div css={wrapperStyles}>
       <ComboboxSelect
@@ -37,11 +45,11 @@ export const CellsTagsFilter = ({allTags, selectedTags, onTagsChange}: CellsTags
         label={t('cells.filtersModal.tags.label')}
         placeholder={t('cells.filtersModal.tags.placeholder')}
         menuPortalTarget={document.body}
-        options={allTags.map(tag => ({label: tag, value: tag}))}
-        value={selectedTags.map(tag => ({label: tag, value: tag}))}
+        options={transformTags(allTags)}
+        value={transformTags(selectedTags)}
         menuListCSS={menuListCSS}
         isLoading={false}
-        onChange={value => onTagsChange(Array.isArray(value) ? value.map(option => option.value as string) : [])}
+        onChange={handleChange}
         noOptionsMessage={t('cells.filtersModal.tags.noTagsFound')}
         loadingMessage={t('cells.filtersModal.tags.loading')}
       />

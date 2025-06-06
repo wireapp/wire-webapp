@@ -24,6 +24,7 @@ export const wrapperStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
+  padding: '0 2px',
 };
 
 export const menuListCSS: CSSObject = {
