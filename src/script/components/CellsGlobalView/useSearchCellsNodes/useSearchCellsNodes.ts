@@ -39,8 +39,10 @@ export const useSearchCellsNodes = ({cellsRepository}: UseSearchCellsNodesProps)
   const {setNodes, setStatus, setPagination, clearAll, filters} = useCellsStore();
 
   const [searchValue, setSearchValue] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [pageSize, setPageSize] = useState<number>(PAGE_INITIAL_SIZE);
-  const isInitialSearch = useRef(true);
+  const isInitialLoad = useRef(true);
+  const shouldPerformFullReload = useRef(true);
 
   const searchNodes = useCallback(
     async ({query, status, limit = pageSize}: {query: string; status: Status; limit?: number}) => {
@@ -54,8 +56,8 @@ export const useSearchCellsNodes = ({cellsRepository}: UseSearchCellsNodesProps)
           setPagination(null);
         }
 
-        if (isInitialSearch.current) {
-          isInitialSearch.current = false;
+        if (isInitialLoad.current) {
+          isInitialLoad.current = false;
         }
 
         setStatus('success');
@@ -70,7 +72,12 @@ export const useSearchCellsNodes = ({cellsRepository}: UseSearchCellsNodesProps)
     [pageSize, setNodes, setPagination, setStatus, filters],
   );
 
-  const searchNodesDebounced = useDebouncedCallback(searchNodes, DEBOUNCE_TIME);
+  const searchNodesDebounced = useDebouncedCallback(async (value: string) => {
+    shouldPerformFullReload.current = false;
+    setSearchQuery(value);
+    await searchNodes({query: value, status: 'loading'});
+    shouldPerformFullReload.current = true;
+  }, DEBOUNCE_TIME);
 
   const handleSearch = (value: string) => {
     if (!value) {
@@ -79,30 +86,35 @@ export const useSearchCellsNodes = ({cellsRepository}: UseSearchCellsNodesProps)
     }
     setPageSize(PAGE_INITIAL_SIZE);
     setSearchValue(value);
-    void searchNodesDebounced({query: value, status: 'loading'});
+    void searchNodesDebounced(value);
   };
 
   const handleClearSearch = async () => {
     setPageSize(PAGE_INITIAL_SIZE);
     setSearchValue('');
+    setSearchQuery('');
     await searchNodes({query: '*', status: 'loading'});
   };
 
   const handleReload = async () => {
     setStatus('loading');
     clearAll();
-    await searchNodes({query: searchValue || '*', status: 'loading'});
+    await searchNodes({query: searchQuery || '*', status: 'loading'});
   };
 
   const increasePageSize = useCallback(async () => {
+    shouldPerformFullReload.current = false;
     setStatus('fetchingMore');
     setPageSize(pageSize + PAGE_SIZE_INCREMENT);
-    await searchNodes({query: searchValue || '*', status: 'fetchingMore', limit: pageSize + PAGE_SIZE_INCREMENT});
-  }, [pageSize, searchNodes, searchValue, setStatus]);
+    await searchNodes({query: searchQuery || '*', status: 'fetchingMore', limit: pageSize + PAGE_SIZE_INCREMENT});
+    shouldPerformFullReload.current = true;
+  }, [pageSize, searchNodes, searchQuery, setStatus]);
 
   useEffect(() => {
-    void searchNodes({query: '*', status: isInitialSearch.current ? 'loading' : 'fetchingMore'});
-  }, [searchNodes, isInitialSearch]);
+    if (isInitialLoad.current || shouldPerformFullReload.current) {
+      void searchNodes({query: searchQuery || '*', status: 'loading'});
+    }
+  }, [searchNodes, searchQuery]);
 
   return {
     searchValue,
