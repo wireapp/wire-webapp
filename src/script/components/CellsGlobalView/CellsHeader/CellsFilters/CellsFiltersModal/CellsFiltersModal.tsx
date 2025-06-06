@@ -17,25 +17,16 @@
  *
  */
 
-import {Accordion, Button, ButtonVariant, ComboboxSelect, IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
+import {Accordion} from '@wireapp/react-ui-kit';
 
-import {CloseIcon} from 'Components/Icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {handleEscDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import {
-  actionsWrapperStyles,
-  buttonStyles,
-  closeButtonStyles,
-  contentStyles,
-  headerStyles,
-  headingStyles,
-  menuListCSS,
-  modalStyles,
-  selectWrapperStyles,
-  wrapperStyles,
-} from './CellsFiltersModal.styles';
+import {CellsFilterModalHeader} from './CellsFilterModalHeader/CellsFilterModalHeader';
+import {contentStyles, modalStyles, wrapperStyles} from './CellsFiltersModal.styles';
+import {CellsFiltersModalActions} from './CellsFiltersModalActions/CellsFiltersModalActions';
+import {CellsTagsFilter} from './CellsTagsFilter/CellsTagsFilter';
 import {useModalFilters} from './useModalFilters/useModalFilters';
 
 interface CellsFiltersModalProps {
@@ -45,12 +36,7 @@ interface CellsFiltersModalProps {
 }
 
 export const CellsFiltersModal = ({isOpen, onClose, tags}: CellsFiltersModalProps) => {
-  const {tags: selectedTags, setTags, handleSave} = useModalFilters(isOpen);
-
-  const handleSaveAndClose = () => {
-    handleSave();
-    onClose();
-  };
+  const {tags: selectedTags, setTags, handleSave} = useModalFilters({enabled: isOpen});
 
   return (
     <ModalComponent
@@ -61,52 +47,21 @@ export const CellsFiltersModal = ({isOpen, onClose, tags}: CellsFiltersModalProp
       onKeyDown={event => handleEscDown(event, onClose)}
     >
       <div css={wrapperStyles}>
-        <header css={headerStyles}>
-          <h3 css={headingStyles}>{t('cells.tagsModal.title')}</h3>
-          <IconButton
-            variant={IconButtonVariant.SECONDARY}
-            type="button"
-            css={closeButtonStyles}
-            onClick={onClose}
-            aria-label={t('cells.tagsModal.closeButton')}
-          >
-            <CloseIcon />
-          </IconButton>
-        </header>
+        <CellsFilterModalHeader onClose={onClose} />
         <div css={contentStyles}>
-          <Accordion>
-            <Accordion.Item title="Type" value="type">
-              test
-            </Accordion.Item>
-            <Accordion.Item title="Tags" value="tags">
-              <div css={selectWrapperStyles}>
-                <ComboboxSelect
-                  id="tags"
-                  label={t('cells.tagsModal.label')}
-                  placeholder={t('cells.tagsModal.placeholder')}
-                  menuPortalTarget={document.body}
-                  options={tags.map(tag => ({label: tag, value: tag}))}
-                  value={selectedTags.map(tag => ({label: tag, value: tag}))}
-                  menuListCSS={menuListCSS}
-                  isLoading={false}
-                  onChange={value => setTags(Array.isArray(value) ? value.map(option => option.value as string) : [])}
-                  onCreateOption={() => {}}
-                  createOptionLabel={name => t('cells.tagsModal.createOptionLabel', {name})}
-                  noOptionsMessage={t('cells.tagsModal.noTagsFound')}
-                  loadingMessage={t('cells.tagsModal.loading')}
-                />
-              </div>
+          <Accordion defaultValue="tags">
+            <Accordion.Item title={t('cells.filtersModal.accordion.tags')} value="tags">
+              <CellsTagsFilter allTags={tags} selectedTags={selectedTags} onTagsChange={setTags} />
             </Accordion.Item>
           </Accordion>
         </div>
-        <div css={actionsWrapperStyles}>
-          <Button variant={ButtonVariant.SECONDARY} onClick={onClose} css={buttonStyles}>
-            {t('cells.tagsModal.cancelButton')}
-          </Button>
-          <Button variant={ButtonVariant.PRIMARY} css={buttonStyles} onClick={handleSaveAndClose}>
-            {t('cells.tagsModal.saveButton')}
-          </Button>
-        </div>
+        <CellsFiltersModalActions
+          onSecondaryAction={onClose}
+          onPrimaryAction={() => {
+            handleSave();
+            onClose();
+          }}
+        />
       </div>
     </ModalComponent>
   );

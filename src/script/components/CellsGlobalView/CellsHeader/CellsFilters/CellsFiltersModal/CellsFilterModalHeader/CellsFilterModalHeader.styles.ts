@@ -17,29 +17,25 @@
  *
  */
 
-import {useEffect} from 'react';
+import {CSSObject} from '@emotion/react';
 
-import {useCellsStore} from '../../../../common/useCellsStore/useCellsStore';
-import {useModalFiltersStore} from '../useModalFiltersStore/useModalFiltersStore';
+export const headerStyles: CSSObject = {
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  flexDirection: 'column',
+  marginTop: '16px',
+  marginBottom: '24px',
+};
 
-export const useModalFilters = ({enabled}: {enabled: boolean}) => {
-  const {filters} = useCellsStore();
-  const {tags, setTags, initialize} = useModalFiltersStore();
+export const headingStyles: CSSObject = {
+  fontSize: 'var(--font-size-large)',
+  fontWeight: 'var(--font-weight-semibold)',
+  margin: '0',
+};
 
-  useEffect(() => {
-    if (!enabled) {
-      return;
-    }
-    initialize({tags: filters.tags});
-  }, [enabled, filters.tags, initialize]);
-
-  const handleSave = () => {
-    filters.setTags(tags);
-  };
-
-  return {
-    tags,
-    setTags,
-    handleSave,
-  };
+export const closeButtonStyles: CSSObject = {
+  position: 'absolute',
+  right: '8px',
+  top: '8px',
 };

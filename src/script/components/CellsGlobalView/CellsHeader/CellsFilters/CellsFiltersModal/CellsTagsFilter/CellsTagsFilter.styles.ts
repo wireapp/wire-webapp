@@ -17,29 +17,15 @@
  *
  */
 
-import {useEffect} from 'react';
+import {CSSObject} from '@emotion/react';
 
-import {useCellsStore} from '../../../../common/useCellsStore/useCellsStore';
-import {useModalFiltersStore} from '../useModalFiltersStore/useModalFiltersStore';
+export const wrapperStyles: CSSObject = {
+  height: '66px',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+};
 
-export const useModalFilters = ({enabled}: {enabled: boolean}) => {
-  const {filters} = useCellsStore();
-  const {tags, setTags, initialize} = useModalFiltersStore();
-
-  useEffect(() => {
-    if (!enabled) {
-      return;
-    }
-    initialize({tags: filters.tags});
-  }, [enabled, filters.tags, initialize]);
-
-  const handleSave = () => {
-    filters.setTags(tags);
-  };
-
-  return {
-    tags,
-    setTags,
-    handleSave,
-  };
+export const menuListCSS: CSSObject = {
+  maxHeight: '200px',
 };

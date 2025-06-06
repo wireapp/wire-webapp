@@ -40,7 +40,7 @@ export const useSearchCellsNodes = ({cellsRepository}: UseSearchCellsNodesProps)
 
   const [searchValue, setSearchValue] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [pageSize, setPageSize] = useState<number>(PAGE_INITIAL_SIZE);
+  const [pageSize, setPageSize] = useState(PAGE_INITIAL_SIZE);
   const isInitialLoad = useRef(true);
   const shouldPerformFullReload = useRef(true);
 
