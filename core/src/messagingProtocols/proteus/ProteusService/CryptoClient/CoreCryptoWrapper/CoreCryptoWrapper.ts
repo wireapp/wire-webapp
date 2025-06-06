@@ -22,31 +22,22 @@ import {Encoder} from 'bazinga64';
 import {deleteDB} from 'idb';
 
 import {LogFactory} from '@wireapp/commons';
-import {
-  CoreCrypto,
-  CoreCryptoLogLevel,
-  setLogger,
-  setMaxLogLevel,
-  version as CCVersion,
-  initWasmModule,
-  migrateDatabaseKeyTypeToBytes,
-  DatabaseKey,
-} from '@wireapp/core-crypto';
+import {CoreCrypto, CoreCryptoLogLevel, setLogger, setMaxLogLevel} from '@wireapp/core-crypto';
 import type {CRUDEngine} from '@wireapp/store-engine';
 
 import {PrekeyTracker} from './PrekeysTracker';
 
 import {CorruptedKeyError, GeneratedKey} from '../../../../../secretStore/secretKeyGenerator';
-import {CoreCryptoConfig} from '../../../../common.types';
 import {CryptoClient} from '../CryptoClient.types';
 
 type Config = {
-  generateSecretKey: (keyId: string, keySize: 16 | 32) => Promise<GeneratedKey>;
+  generateSecretKey: (keyId: string) => Promise<GeneratedKey>;
   nbPrekeys: number;
   onNewPrekeys: (prekeys: PreKey[]) => void;
+  wasmFilePath: string;
 };
 
-type ClientConfig = Omit<Config, 'generateSecretKey'> & {
+type ClientConfig = Omit<Config, 'generateSecretKey' | 'wasmFilePath'> & {
   onWipe: () => Promise<void>;
 };
 
@@ -67,96 +58,34 @@ const coreCryptoLogger = {
   },
 };
 
-const getKey = async (generateSecretKey: Config['generateSecretKey'], keyName: string, keySize: 16 | 32) => {
-  return await generateSecretKey(keyName, keySize);
-};
-
-type MigrateOnceAndGetKeyReturnType = {
-  key: DatabaseKey;
-  deleteKey: () => Promise<void>;
-};
-const migrateOnceAndGetKey = async (
-  generateSecretKey: Config['generateSecretKey'],
-  coreCryptoDbName: string,
-): Promise<MigrateOnceAndGetKeyReturnType> => {
-  const coreCryptoNewKeyId = 'corecrypto-key-v2';
-  const coreCryptoKeyId = 'corecrypto-key';
-
-  // We retrieve the old key if it exists or generate a new one
-  const keyOld = await getKey(generateSecretKey, coreCryptoKeyId, 16);
-  // We retrieve the new key if it exists or generate a new one
-  const keyNew = await getKey(generateSecretKey, coreCryptoNewKeyId, 32);
-
-  // If we dont retreive any key, we throw an error
-  // This should not happen since we generate a new key if it does not exist
-  if (!keyNew || !keyOld) {
-    throw new Error('Key not found and could not be generated');
-  }
-
-  /**
-   * If the old key is freshly generated we dont need to migrate and return the new key
-   * If the old key exists and the new key is freshly generated, we need to migrate and then return the new key (This should only happen once !!!!)
-   * If the old key exists and the new key exists we return the new key
-   */
-  if (!keyOld.freshlyGenerated && keyNew.freshlyGenerated) {
-    // Create the new key in the format used by coreCrypto
-    const databaseKey = new DatabaseKey(keyNew.key);
-    // Run the migration
-    await migrateDatabaseKeyTypeToBytes(coreCryptoDbName, Encoder.toBase64(keyOld.key).asString, databaseKey);
-    // delete the old key, it will be freshly generated in the next call and ensure we dont run the migration again
-    await keyOld.deleteKey();
-  }
-
-  return {
-    key: new DatabaseKey(keyNew.key),
-    deleteKey: keyNew.deleteKey,
-  };
-};
-
 export async function buildClient(
   storeEngine: CRUDEngine,
-  {generateSecretKey, nbPrekeys, onNewPrekeys}: Config,
-  {wasmFilePath}: CoreCryptoConfig,
+  {wasmFilePath, generateSecretKey, nbPrekeys, onNewPrekeys}: Config,
 ): Promise<CoreCryptoWrapper> {
-  return (
-    // We need to initialize the coreCrypto package with the path to the wasm file
-    // before we can use it. This is a one time operation and should be done
-    // before we create the CoreCrypto instance.
-    initWasmModule(wasmFilePath)
-      .then(async output => {
-        logger.log('info', 'CoreCrypto initialized', {output});
-        const coreCryptoDbName = `corecrypto-${storeEngine.storeName}`;
-        // New key format used by coreCrypto
-        let key: MigrateOnceAndGetKeyReturnType;
+  let key;
+  const coreCryptoDbName = `corecrypto-${storeEngine.storeName}`;
+  const coreCryptoKeyId = 'corecrypto-key';
+  try {
+    key = await generateSecretKey(coreCryptoKeyId);
+  } catch (error) {
+    if (error instanceof CorruptedKeyError) {
+      // If we are dealing with a corrupted key, we wipe the key and the coreCrypto DB to start fresh
+      await deleteDB(coreCryptoDbName);
+      key = await generateSecretKey(coreCryptoKeyId);
+    } else {
+      throw error;
+    }
+  }
+  const coreCrypto = await CoreCrypto.deferredInit({
+    databaseName: coreCryptoDbName,
+    key: Encoder.toBase64(key.key).asString,
+    wasmFilePath,
+  });
 
-        try {
-          key = await migrateOnceAndGetKey(generateSecretKey, coreCryptoDbName);
-        } catch (error) {
-          if (error instanceof CorruptedKeyError) {
-            // If we are dealing with a corrupted key, we wipe the key and the coreCrypto DB to start fresh
-            await deleteDB(coreCryptoDbName);
-            key = await migrateOnceAndGetKey(generateSecretKey, coreCryptoDbName);
-          } else {
-            throw error;
-          }
-        }
+  setLogger(coreCryptoLogger);
+  setMaxLogLevel(CoreCryptoLogLevel.Info);
 
-        const coreCrypto = await CoreCrypto.deferredInit({
-          databaseName: coreCryptoDbName,
-          key: key.key,
-        });
-
-        setLogger(coreCryptoLogger);
-        setMaxLogLevel(CoreCryptoLogLevel.Info);
-
-        return new CoreCryptoWrapper(coreCrypto, {nbPrekeys, onNewPrekeys, onWipe: key.deleteKey});
-      })
-      // if the coreCrypto initialization fails, can not use the crypto client and throw an error
-      .catch(error => {
-        logger.error('error', 'CoreCrypto initialization failed', {error});
-        throw error;
-      })
-  );
+  return new CoreCryptoWrapper(coreCrypto, {nbPrekeys, onNewPrekeys, onWipe: key.deleteKey});
 }
 
 export class CoreCryptoWrapper implements CryptoClient {
@@ -165,9 +94,9 @@ export class CoreCryptoWrapper implements CryptoClient {
 
   constructor(
     private readonly coreCrypto: CoreCrypto,
-    config: ClientConfig,
+    private readonly config: ClientConfig,
   ) {
-    this.version = CCVersion();
+    this.version = CoreCrypto.version();
     this.prekeyTracker = new PrekeyTracker(this, config);
   }
 
@@ -176,18 +105,18 @@ export class CoreCryptoWrapper implements CryptoClient {
   }
 
   encrypt(sessions: string[], plainText: Uint8Array) {
-    return this.coreCrypto.transaction(cx => cx.proteusEncryptBatched(sessions, plainText));
+    return this.coreCrypto.proteusEncryptBatched(sessions, plainText);
   }
 
   decrypt(sessionId: string, message: Uint8Array) {
-    return this.coreCrypto.transaction(cx => cx.proteusDecrypt(sessionId, message));
+    return this.coreCrypto.proteusDecrypt(sessionId, message);
   }
 
   init(nbInitialPrekeys?: number) {
     if (nbInitialPrekeys) {
       this.prekeyTracker.setInitialState(nbInitialPrekeys);
     }
-    return this.coreCrypto.transaction(cx => cx.proteusInit());
+    return this.coreCrypto.proteusInit();
   }
 
   async create(nbPrekeys: number, entropy?: Uint8Array) {
@@ -200,7 +129,7 @@ export class CoreCryptoWrapper implements CryptoClient {
       prekeys.push(await this.newPrekey());
     }
 
-    const lastPrekeyBytes = await this.coreCrypto.transaction(cx => cx.proteusLastResortPrekey());
+    const lastPrekeyBytes = await this.coreCrypto.proteusLastResortPrekey();
     const lastPrekey = Encoder.toBase64(lastPrekeyBytes).asString;
 
     const lastPrekeyId = CoreCrypto.proteusLastResortPrekeyId();
@@ -221,11 +150,11 @@ export class CoreCryptoWrapper implements CryptoClient {
 
   async sessionFromMessage(sessionId: string, message: Uint8Array) {
     await this.consumePrekey(); // we need to mark a prekey as consumed since if we create a session from a message, it means the sender has consumed one of our prekeys
-    return this.coreCrypto.transaction(cx => cx.proteusSessionFromMessage(sessionId, message));
+    return this.coreCrypto.proteusSessionFromMessage(sessionId, message);
   }
 
   sessionFromPrekey(sessionId: string, prekey: Uint8Array) {
-    return this.coreCrypto.transaction(cx => cx.proteusSessionFromPrekey(sessionId, prekey));
+    return this.coreCrypto.proteusSessionFromPrekey(sessionId, prekey);
   }
 
   sessionExists(sessionId: string) {
@@ -233,11 +162,11 @@ export class CoreCryptoWrapper implements CryptoClient {
   }
 
   saveSession(sessionId: string) {
-    return this.coreCrypto.transaction(cx => cx.proteusSessionSave(sessionId));
+    return this.coreCrypto.proteusSessionSave(sessionId);
   }
 
   deleteSession(sessionId: string) {
-    return this.coreCrypto.transaction(cx => cx.proteusSessionDelete(sessionId));
+    return this.coreCrypto.proteusSessionDelete(sessionId);
   }
 
   consumePrekey() {
@@ -245,7 +174,7 @@ export class CoreCryptoWrapper implements CryptoClient {
   }
 
   async newPrekey() {
-    const {id, pkb} = await this.coreCrypto.transaction(cx => cx.proteusNewPrekeyAuto());
+    const {id, pkb} = await this.coreCrypto.proteusNewPrekeyAuto();
     return {id, key: Encoder.toBase64(pkb).asString};
   }
 
@@ -256,10 +185,40 @@ export class CoreCryptoWrapper implements CryptoClient {
       200, 16, 166, 184, 70, 21, 81, 43, 80, 21, 231, 182, 142, 51, 220, 131, 162, 11, 255, 162, 74, 78, 162, 95, 156,
       131, 48, 203, 5, 77, 122, 4, 246,
     ];
-    await this.coreCrypto.transaction(cx => cx.proteusSessionFromPrekey(sessionId, Uint8Array.from(fakePrekey)));
+    await this.coreCrypto.proteusSessionFromPrekey(sessionId, Uint8Array.from(fakePrekey));
+  }
+
+  async debugResetIdentity() {
+    await this.coreCrypto.wipe();
   }
 
   async migrateFromCryptobox(dbName: string) {
-    return this.coreCrypto.transaction(cx => cx.proteusCryptoboxMigrate(dbName));
+    return this.coreCrypto.proteusCryptoboxMigrate(dbName);
+  }
+
+  /**
+   * Will call the callback once corecrypto is ready.
+   * @param callback - Function to be called once corecrypto is ready.
+   * @see https://github.com/wireapp/wire-web-packages/pull/4972
+   */
+  private onReady(callback: () => Promise<void>) {
+    if (!this.coreCrypto.isLocked()) {
+      return callback();
+    }
+
+    return new Promise<void>(resolve => {
+      const intervalId = setInterval(async () => {
+        if (!this.coreCrypto.isLocked()) {
+          clearInterval(intervalId);
+          await callback();
+          return resolve();
+        }
+      }, 100);
+    });
+  }
+
+  async wipe() {
+    await this.config.onWipe();
+    await this.onReady(() => this.coreCrypto.wipe());
   }
 }

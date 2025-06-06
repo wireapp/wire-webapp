@@ -21,8 +21,8 @@ import {ConversationMLSWelcomeEvent, CONVERSATION_EVENT} from '@wireapp/api-clie
 
 import {handleMLSWelcomeMessage} from './welcomeMessage';
 
+import {MLSService, MLSServiceEvents} from '../../..';
 import {NotificationSource} from '../../../../../notification';
-import {MLSService, MLSServiceEvents} from '../../../MLSService';
 
 jest.mock('bazinga64', () => ({
   ...jest.requireActual('bazinga64'),

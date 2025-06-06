@@ -21,7 +21,7 @@ import {APIClient} from '@wireapp/api-client';
 import {LogFactory} from '@wireapp/commons';
 
 import {AcmeService} from './Connection/AcmeServer';
-import {AcmeDirectory, Ciphersuite, CoreCrypto, CredentialType, E2eiEnrollment} from './E2EIService.types';
+import {AcmeDirectory, Ciphersuite, CoreCrypto, E2eiEnrollment} from './E2EIService.types';
 import {isResponseStatusValid} from './Helper';
 import {createNewAccount} from './Steps/Account';
 import {getAuthorizationChallenges} from './Steps/Authorization';
@@ -35,12 +35,6 @@ import {EnrollmentFlowData, InitialData, UnidentifiedEnrollmentFlowData} from '.
 import {CoreDatabase} from '../../../storage/CoreDB';
 
 export type getTokenCallback = (challengesData?: {challenge: any; keyAuth: string}) => Promise<string | undefined>;
-
-export type getAllConversationsCallback = () => Promise<
-  {
-    group_id: string;
-  }[]
->;
 export class E2EIServiceInternal {
   private readonly logger = LogFactory.getLogger('@wireapp/core/E2EIdentityServiceInternal');
   private acmeService: AcmeService;
@@ -65,12 +59,7 @@ export class E2EIServiceInternal {
    * @param getOAuthToken function called when the process needs an oauth token
    * @param refresh should the process refresh the current certificate or get a new one
    */
-  public async generateCertificate(
-    getOAuthToken: getTokenCallback,
-    refresh: boolean,
-    getAllConversations: getAllConversationsCallback,
-    ciphersuite: Ciphersuite,
-  ) {
+  public async generateCertificate(getOAuthToken: getTokenCallback, refresh: boolean, ciphersuite: Ciphersuite) {
     const stashedEnrollmentData = await this.enrollmentStorage.getPendingEnrollmentData();
 
     if (stashedEnrollmentData) {
@@ -79,7 +68,7 @@ export class E2EIServiceInternal {
       if (!oAuthToken) {
         throw new Error('No OAuthToken received for in progress enrollment process');
       }
-      return this.continueCertificateGeneration(oAuthToken, stashedEnrollmentData, getAllConversations, ciphersuite);
+      return this.continueCertificateGeneration(oAuthToken, stashedEnrollmentData);
     }
 
     // We first get the challenges needed to validate the user identity
@@ -89,8 +78,7 @@ export class E2EIServiceInternal {
     const challengeData = {challenge: oidcChallenge, keyAuth: keyauth};
 
     // store auth data for continuing the flow later on (in case we are redirected to the identity provider)
-    const handle = await this.coreCryptoClient.transaction(cx => cx.e2eiEnrollmentStash(identity));
-
+    const handle = await this.coreCryptoClient.e2eiEnrollmentStash(identity);
     const enrollmentData = {
       handle,
       ...enrollmentChallenges,
@@ -102,18 +90,13 @@ export class E2EIServiceInternal {
     if (!oAuthToken) {
       throw new Error('No OAuthToken received for in initial enrollment process');
     }
-    return this.continueCertificateGeneration(oAuthToken, enrollmentData, getAllConversations, ciphersuite);
+    return this.continueCertificateGeneration(oAuthToken, enrollmentData);
   }
 
-  private async continueCertificateGeneration(
-    oAuthToken: string,
-    enrollmentData: EnrollmentFlowData,
-    getAllConversations: getAllConversationsCallback,
-    cipherSuite: Ciphersuite,
-  ) {
+  private async continueCertificateGeneration(oAuthToken: string, enrollmentData: EnrollmentFlowData) {
     const handle = enrollmentData.handle;
-    const identity = await this.coreCryptoClient.transaction(cx => cx.e2eiEnrollmentStashPop(handle));
-    return this.getKeyPackages(identity, oAuthToken, enrollmentData, getAllConversations, cipherSuite);
+    const identity = await this.coreCryptoClient.e2eiEnrollmentStashPop(handle);
+    return this.getRotateBundle(identity, oAuthToken, enrollmentData);
   }
 
   // ############ Internal Functions ############
@@ -122,11 +105,19 @@ export class E2EIServiceInternal {
     const {user} = this.initialData;
 
     return hasActiveCertificate
-      ? this.coreCryptoClient.transaction(cx =>
-          cx.e2eiNewRotateEnrollment(this.certificateTtl, ciphersuite, user.displayName, user.handle, user.teamId),
+      ? this.coreCryptoClient.e2eiNewRotateEnrollment(
+          this.certificateTtl,
+          ciphersuite,
+          user.displayName,
+          user.handle,
+          user.teamId,
         )
-      : this.coreCryptoClient.transaction(cx =>
-          cx.e2eiNewActivationEnrollment(user.displayName, user.handle, this.certificateTtl, ciphersuite, user.teamId),
+      : this.coreCryptoClient.e2eiNewActivationEnrollment(
+          user.displayName,
+          user.handle,
+          this.certificateTtl,
+          ciphersuite,
+          user.teamId,
         );
   }
 
@@ -201,14 +192,12 @@ export class E2EIServiceInternal {
    * Stores the received certificate data in local storage for later use
    *
    * @param oAuthIdToken
-   * @returns KeyPackages
+   * @returns RotateBundle
    */
-  private async getKeyPackages(
+  private async getRotateBundle(
     identity: E2eiEnrollment,
     oAuthIdToken: string,
     enrollmentData: UnidentifiedEnrollmentFlowData,
-    getAllConversations: getAllConversationsCallback,
-    cipherSuite: Ciphersuite,
   ) {
     // Step 7: Do OIDC client challenge
     const oidcData = await doWireOidcChallenge({
@@ -267,24 +256,6 @@ export class E2EIServiceInternal {
     }
 
     // Step 10: Initialize MLS with the certificate
-    return this.coreCryptoClient.transaction(async cx => {
-      const conversations = await getAllConversations();
-      const newCrlDistributionPoints = await cx.saveX509Credential(identity, certificate);
-      for (const conversation of conversations) {
-        if (Boolean(conversation.group_id?.length)) {
-          const idAsBytes = new TextEncoder().encode(conversation.group_id);
-          await cx.e2eiRotate(idAsBytes);
-        } else {
-          this.logger.error('No group id found in conversation');
-        }
-      }
-
-      const keyPackages = await cx.clientKeypackages(cipherSuite, CredentialType.X509, this.keyPackagesAmount);
-
-      return {
-        newCrlDistributionPoints,
-        keyPackages,
-      };
-    });
+    return this.coreCryptoClient.e2eiRotateAll(identity, certificate, this.keyPackagesAmount);
   }
 }

@@ -51,8 +51,10 @@ export interface CryptoClient<T = unknown> {
   deleteSession(sessionId: string): Promise<void>;
   newPrekey(): Promise<PreKey>;
   debugBreakSession(sessionId: string): void;
+  debugResetIdentity(): Promise<void>;
   /**
    * Will migrate the database from a different client type
    */
   migrateFromCryptobox?(dbName: string): Promise<void>;
+  wipe(): Promise<void>;
 }

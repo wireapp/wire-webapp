@@ -32,24 +32,6 @@ export class Converter {
     }
   }
 
-  public static toString(data: number[] | number | string | Uint8Array): string {
-    switch (data.constructor.name) {
-      case 'Array':
-        const arrayBufferView = this.numberArrayToArrayBufferView(data as number[]);
-        return this.arrayBufferViewToStringUTF8(arrayBufferView);
-      case 'Number':
-        return data.toString();
-      case 'String':
-        return data as string;
-      case 'Uint8Array':
-        return this.arrayBufferViewToStringUTF8(data as Uint8Array);
-      default:
-        throw new UnsupportedInputError(
-          `${data.constructor.name} is unsupported.` + ` Please provide a 'String', 'Uint8Array' or 'Array'.`,
-        );
-    }
-  }
-
   public static arrayBufferViewToBaselineString(arrayBufferView: Uint8Array): string {
     // https://stackoverflow.com/questions/22747068/is-there-a-max-number-of-arguments-javascript-functions-can-accept/22747272#22747272
     const chunkSize = 32000;
@@ -96,21 +78,42 @@ export class Converter {
   }
 
   public static toArrayBufferView(data: number | string | number[] | Buffer | ArrayBuffer | Uint8Array): Uint8Array {
-    if (typeof data === 'string') {
-      return this.stringToArrayBufferViewUTF8(data);
-    } else if (typeof data === 'number') {
-      return this.stringToArrayBufferViewUTF8(data.toString());
-    } else if (Array.isArray(data) || Buffer.isBuffer(data)) {
-      return this.numberArrayToArrayBufferView(data);
-    } else if (data instanceof ArrayBuffer) {
-      return new Uint8Array(data);
-    } else if (data instanceof Uint8Array) {
-      return data;
+    switch (data.constructor.name) {
+      case 'ArrayBuffer':
+        return new Uint8Array(data as ArrayBuffer);
+      case 'Array':
+      case 'Buffer':
+        return this.numberArrayToArrayBufferView(data as number[] | Buffer);
+      case 'Number':
+        return this.stringToArrayBufferViewUTF8(data.toString());
+      case 'String':
+        return this.stringToArrayBufferViewUTF8(data as string);
+      case 'Uint8Array':
+        return data as Uint8Array;
+      default:
+        throw new UnsupportedInputError(
+          `${data.constructor.name} is unsupported.` +
+            ` Please provide a type of 'ArrayBuffer', 'Array', 'Buffer', 'Number', 'String' or 'Uint8Array'.`,
+        );
     }
-    throw new UnsupportedInputError(
-      `${typeof data} is unsupported.` +
-        ` Please provide a type of 'ArrayBuffer', 'Array', 'Buffer', 'Number', 'String' or 'Uint8Array'.`,
-    );
+  }
+
+  public static toString(data: number[] | number | string | Uint8Array): string {
+    switch (data.constructor.name) {
+      case 'Array':
+        const arrayBufferView = this.numberArrayToArrayBufferView(data as number[]);
+        return this.arrayBufferViewToStringUTF8(arrayBufferView);
+      case 'Number':
+        return data.toString();
+      case 'String':
+        return data as string;
+      case 'Uint8Array':
+        return this.arrayBufferViewToStringUTF8(data as Uint8Array);
+      default:
+        throw new UnsupportedInputError(
+          `${data.constructor.name} is unsupported.` + ` Please provide a 'String', 'Uint8Array' or 'Array'.`,
+        );
+    }
   }
 
   // https://coolaj86.com/articles/unicode-string-to-a-utf-8-typed-array-buffer-in-javascript/
