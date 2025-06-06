@@ -33,14 +33,3 @@ export const contentStyles: CSSObject = {
   padding: '0 16px',
   marginBottom: '24px',
 };
-
-export const selectWrapperStyles: CSSObject = {
-  height: '66px',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-};
-
-export const menuListCSS: CSSObject = {
-  maxHeight: '200px',
-};
