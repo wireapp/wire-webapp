@@ -45,6 +45,7 @@ export const useLoadMessages = (
     'hasAdditionalMessages',
   ]);
 
+  // Declared number of messages
   const nbOfMessages = useRef(0);
 
   const loadPrecedingMessages = useCallback(async () => {

@@ -115,12 +115,12 @@ export function groupMessagesBySenderAndTime(messages: Message[], lastReadTimest
   return messages.reduce<Array<Marker | GroupedMessage>>((acc, message, index) => {
     const previousMessage = messages[index - 1];
 
-    const marker = getMessageMarkerType(message, lastReadTimestamp, previousMessage);
+    const markerMessage = getMessageMarkerType(message, lastReadTimestamp, previousMessage);
 
-    if (marker) {
+    if (markerMessage) {
       acc.push({
         messageType: 'marker',
-        type: marker,
+        type: markerMessage,
         timestamp: message.timestamp(),
         firstMessageTimestamp: message.timestamp(),
         lastMessageTimestamp: message.timestamp(),

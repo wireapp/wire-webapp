@@ -38,19 +38,18 @@ export const useLoadConversation = ({
 }: Props) => {
   const loadConversation = async (conversationToLoad: Conversation): Promise<MessageEntity[]> => {
     onLoading(true);
-    conversationLastReadTimestamp.current = conversationToLoad.last_read_timestamp();
+    try {
+      conversationLastReadTimestamp.current = conversationToLoad.last_read_timestamp();
+      await conversationRepository.updateParticipatingUserEntities(conversationToLoad, false, true);
 
-    await conversationRepository.updateParticipatingUserEntities(conversationToLoad, false, true);
+      const initialMessage = conversationToLoad.initialMessage();
 
-    const initialMessage = conversationToLoad.initialMessage();
-
-    const messages = initialMessage
-      ? await conversationRepository.getMessagesWithOffset(conversationToLoad, initialMessage)
-      : await conversationRepository.getPrecedingMessages(conversationToLoad);
-
-    onLoading(false);
-
-    return messages;
+      return initialMessage
+        ? await conversationRepository.getMessagesWithOffset(conversationToLoad, initialMessage)
+        : await conversationRepository.getPrecedingMessages(conversationToLoad);
+    } finally {
+      onLoading(false);
+    }
   };
 
   useEffect(() => {
