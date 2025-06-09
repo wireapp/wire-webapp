@@ -8288,7 +8288,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:^46.24.2":
+"@wireapp/core@npm:46.24.2":
   version: 46.24.2
   resolution: "@wireapp/core@npm:46.24.2"
   dependencies:
@@ -8424,7 +8424,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/react-ui-kit@npm:^9.59.1":
+"@wireapp/react-ui-kit@npm:9.59.1":
   version: 9.59.1
   resolution: "@wireapp/react-ui-kit@npm:9.59.1"
   dependencies:
@@ -21730,10 +21730,10 @@ __metadata:
     "@wireapp/avs-debugger": "npm:0.0.7"
     "@wireapp/commons": "npm:5.4.2"
     "@wireapp/copy-config": "npm:2.3.0"
-    "@wireapp/core": "npm:^46.24.2"
+    "@wireapp/core": "npm:46.24.2"
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/prettier-config": "npm:0.6.4"
-    "@wireapp/react-ui-kit": "npm:^9.59.1"
+    "@wireapp/react-ui-kit": "npm:9.59.1"
     "@wireapp/store-engine": "npm:5.1.11"
     "@wireapp/store-engine-dexie": "npm:2.1.15"
     "@wireapp/telemetry": "npm:0.3.1"
