@@ -19,10 +19,10 @@
 
 import React, {useEffect} from 'react';
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {amplify} from 'amplify';
 
 import {Runtime} from '@wireapp/commons';
+import {TabIndex} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/Icon';
