@@ -22,18 +22,18 @@ import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {t} from 'Util/LocalizerUtil';
 import {replaceReactComponents} from 'Util/LocalizerUtil/ReactLocalizerUtil';
 
-export const showRestoreNodeModal = ({node, onRestoreNode}: {node: CellNode; onRestoreNode: () => void}) => {
+export const showRestoreRootNodeModal = ({node, onRestoreNode}: {node: CellNode; onRestoreNode: () => void}) => {
   PrimaryModal.show(PrimaryModal.type.CONFIRM, {
     primaryAction: {
       action: onRestoreNode,
-      text: t('cells.restoreNodeModal.button'),
+      text: t('cells.restoreRootNodeModal.button'),
     },
     text: {
       message: replaceReactComponents(
         t(
           node.type === 'file'
-            ? 'cells.restoreNodeModal.file.description'
-            : 'cells.restoreNodeModal.folder.description',
+            ? 'cells.restoreRootNodeModal.file.description'
+            : 'cells.restoreRootNodeModal.folder.description',
           {
             name: '{name}',
           },
@@ -46,7 +46,9 @@ export const showRestoreNodeModal = ({node, onRestoreNode}: {node: CellNode; onR
         ],
       ),
       title:
-        node.type === 'file' ? t('cells.restoreNodeModal.file.headline') : t('cells.restoreNodeModal.folder.headline'),
+        node.type === 'file'
+          ? t('cells.restoreRootNodeModal.file.headline')
+          : t('cells.restoreRootNodeModal.folder.headline'),
     },
   });
 };
