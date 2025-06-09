@@ -58,8 +58,8 @@ export const useRestoreParentNode = ({
           throw new Error('Root parent node not found');
         }
 
-        removeNode({conversationId: conversationQualifiedId.id, nodeId: rootParentNode.Uuid});
         await cellsRepository.restoreNode({uuid: rootParentNode.Uuid});
+        removeNode({conversationId: conversationQualifiedId.id, nodeId: rootParentNode.Uuid});
 
         setTimeout(() => {
           openBreadcrumb({
