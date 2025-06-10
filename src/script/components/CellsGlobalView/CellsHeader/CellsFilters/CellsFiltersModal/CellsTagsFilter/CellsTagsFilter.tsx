@@ -30,10 +30,6 @@ interface CellsTagsFilterProps {
 }
 
 export const CellsTagsFilter = ({allTags, selectedTags, onTagsChange}: CellsTagsFilterProps) => {
-  const transformTags = (tags: string[]) => {
-    return tags.map(tag => ({label: tag, value: tag}));
-  };
-
   const handleChange = (value: ComboboxSelectOption | ComboboxSelectOption[]) => {
     onTagsChange(Array.isArray(value) ? value.map(option => option.value as string) : []);
   };
@@ -55,4 +51,8 @@ export const CellsTagsFilter = ({allTags, selectedTags, onTagsChange}: CellsTags
       />
     </div>
   );
+};
+
+const transformTags = (tags: string[]) => {
+  return tags.map(tag => ({label: tag, value: tag}));
 };
