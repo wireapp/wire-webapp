@@ -17,34 +17,29 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {useEffect} from 'react';
 
-export const wrapperStyles: CSSObject = {
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'flex-start',
-  flexDirection: 'column',
-  marginBottom: '20px',
-  width: '100%',
-};
+import {useCellsStore} from '../../../../common/useCellsStore/useCellsStore';
+import {useModalFiltersStore} from '../useModalFiltersStore/useModalFiltersStore';
 
-export const headingStyles: CSSObject = {
-  color: 'var(--main-color)',
-  fontWeight: 'var(--font-weight-semibold)',
-  fontSize: 'var(--font-size-medium)',
-  marginBottom: '8px',
-};
+export const useModalFilters = ({enabled}: {enabled: boolean}) => {
+  const {filters} = useCellsStore();
+  const {tags, setTags, initialize} = useModalFiltersStore(state => state);
 
-export const searchWrapperStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: '16px',
-};
+  useEffect(() => {
+    if (!enabled) {
+      return;
+    }
+    initialize({tags: filters.tags});
+  }, [enabled, filters.tags, initialize]);
 
-export const contentStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  gap: '8px',
-  width: '100%',
+  const handleSave = () => {
+    filters.setTags(tags);
+  };
+
+  return {
+    tags,
+    setTags,
+    handleSave,
+  };
 };

@@ -39,6 +39,7 @@ export const transformCellsNodes = (nodes: RestNode[]): CellNode[] => {
     const conversationName = node.ContextWorkspace?.Label || '';
     const path = node.Path;
     const url = node.PreSignedGET?.Url;
+    const tags = getTags(node);
 
     if (node.Type === 'COLLECTION') {
       return {
@@ -52,6 +53,7 @@ export const transformCellsNodes = (nodes: RestNode[]): CellNode[] => {
         sizeMb,
         uploadedAtTimestamp,
         publicLink,
+        tags,
       };
     }
 
@@ -70,6 +72,7 @@ export const transformCellsNodes = (nodes: RestNode[]): CellNode[] => {
       previewPdfUrl: getPreviewPdfUrl(node),
       uploadedAtTimestamp,
       publicLink,
+      tags,
     };
   });
 };
@@ -98,4 +101,15 @@ const getFileSize = (node: RestNode): string => {
 const getOwner = (node: RestNode): string => {
   const name = node.UserMetadata?.find(meta => meta.Namespace === 'usermeta-owner')?.JsonValue;
   return name ? JSON.parse(name) : '';
+};
+
+const getTags = (node: RestNode): string[] => {
+  const tags = node.UserMetadata?.find(meta => meta.Namespace === 'usermeta-tags')?.JsonValue;
+
+  if (!tags) {
+    return [];
+  }
+
+  const parsedTags = JSON.parse(tags);
+  return parsedTags.split(',').map((tag: string) => tag.trim());
 };

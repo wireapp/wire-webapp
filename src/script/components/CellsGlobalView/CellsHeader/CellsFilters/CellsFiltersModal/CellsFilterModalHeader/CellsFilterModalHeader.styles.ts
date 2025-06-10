@@ -19,32 +19,23 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const wrapperStyles: CSSObject = {
+export const headerStyles: CSSObject = {
   display: 'flex',
   justifyContent: 'space-between',
-  alignItems: 'flex-start',
+  alignItems: 'center',
   flexDirection: 'column',
-  marginBottom: '20px',
-  width: '100%',
+  marginTop: '16px',
+  marginBottom: '24px',
 };
 
 export const headingStyles: CSSObject = {
-  color: 'var(--main-color)',
+  fontSize: 'var(--font-size-large)',
   fontWeight: 'var(--font-weight-semibold)',
-  fontSize: 'var(--font-size-medium)',
-  marginBottom: '8px',
+  margin: '0',
 };
 
-export const searchWrapperStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: '16px',
-};
-
-export const contentStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  gap: '8px',
-  width: '100%',
+export const closeButtonStyles: CSSObject = {
+  position: 'absolute',
+  right: '8px',
+  top: '8px',
 };
