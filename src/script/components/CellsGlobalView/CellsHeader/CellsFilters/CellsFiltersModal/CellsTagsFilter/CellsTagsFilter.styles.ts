@@ -17,28 +17,16 @@
  *
  */
 
-import {useCallback, useState} from 'react';
+import {CSSObject} from '@emotion/react';
 
-import {CellNode} from '../common/cellNode/cellNode';
+export const wrapperStyles: CSSObject = {
+  height: '66px',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: '0 2px',
+};
 
-interface UseCellsLoaderSizeProps {
-  nodes: CellNode[];
-}
-
-export const useCellsLoaderSize = ({nodes}: UseCellsLoaderSizeProps) => {
-  const [loaderHeight, setLoaderHeight] = useState<number | undefined>(() => {
-    if (nodes) {
-      return undefined;
-    }
-    return 0;
-  });
-
-  const updateHeight = useCallback((height: number) => {
-    setLoaderHeight(height);
-  }, []);
-
-  return {
-    loaderHeight,
-    updateHeight,
-  };
+export const menuListCSS: CSSObject = {
+  maxHeight: '200px',
 };

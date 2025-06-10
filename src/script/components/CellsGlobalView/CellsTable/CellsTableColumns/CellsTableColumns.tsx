@@ -27,6 +27,7 @@ import {CellsTableDateColumn} from './CellsTableDateColumn/CellsTableDateColumn'
 import {CellsTableNameColumn} from './CellsTableNameColumn/CellsTableNameColumn';
 import {CellsTableRowOptions} from './CellsTableRowOptions/CellsTableRowOptions';
 import {CellsTableSharedColumn} from './CellsTableSharedColumn/CellsTableSharedColumn';
+import {CellsTableTagsColumn} from './CellsTableTagsColumn/CellsTableTagsColumn';
 
 import {CellNode} from '../../common/cellNode/cellNode';
 
@@ -46,6 +47,11 @@ export const getCellsTableColumns = ({cellsRepository}: {cellsRepository: CellsR
     header: t('cells.tableRow.owner'),
     cell: info => <span css={textWithEllipsisStyles}>{info.getValue()}</span>,
     size: 175,
+  }),
+  columnHelper.accessor('tags', {
+    header: t('cells.tableRow.tags'),
+    cell: info => <CellsTableTagsColumn tags={info.getValue()} />,
+    size: 120,
   }),
   columnHelper.accessor('sizeMb', {
     header: t('cells.tableRow.size'),

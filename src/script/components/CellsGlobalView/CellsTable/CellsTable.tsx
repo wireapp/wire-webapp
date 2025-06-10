@@ -28,6 +28,7 @@ import {
   tableCellRow,
   tableCellStyles,
   tableStyles,
+  wrapperStyles,
 } from './CellsTable.styles';
 import {getCellsTableColumns} from './CellsTableColumns/CellsTableColumns';
 import {FilePreviewProvider} from './common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
@@ -50,46 +51,48 @@ export const CellsTable = ({nodes, cellsRepository}: CellsTableProps) => {
 
   return (
     <FilePreviewProvider>
-      <table css={tableStyles}>
-        <thead>
-          {table.getHeaderGroups().map(headerGroup => (
-            <tr key={headerGroup.id}>
-              {headerGroup.headers.map(header => (
-                <th
-                  key={header.id}
-                  css={headerCellStyles}
-                  colSpan={header.colSpan}
-                  style={{
-                    width: header.id == 'name' ? undefined : header.getSize(),
-                  }}
-                >
-                  {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                </th>
-              ))}
-            </tr>
-          ))}
-        </thead>
-        {rows.length > 0 && (
-          <tbody>
-            {rows.map(row => (
-              <tr key={row.id} css={tableCellRow}>
-                {row.getVisibleCells().map(cell => (
-                  <td
-                    key={cell.id}
-                    css={cell.column.id === 'id' ? tableActionsCellStyles : tableCellStyles}
-                    data-cell={cell.column.id === 'id' ? undefined : cell.column.columnDef.header}
+      <div css={wrapperStyles}>
+        <table css={tableStyles}>
+          <thead>
+            {table.getHeaderGroups().map(headerGroup => (
+              <tr key={headerGroup.id}>
+                {headerGroup.headers.map(header => (
+                  <th
+                    key={header.id}
+                    css={headerCellStyles}
+                    colSpan={header.colSpan}
                     style={{
-                      width: cell.column.id == 'name' ? undefined : cell.column.getSize(),
+                      width: header.id == 'name' ? undefined : header.getSize(),
                     }}
                   >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
+                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                  </th>
                 ))}
               </tr>
             ))}
-          </tbody>
-        )}
-      </table>
+          </thead>
+          {rows.length > 0 && (
+            <tbody>
+              {rows.map(row => (
+                <tr key={row.id} css={tableCellRow}>
+                  {row.getVisibleCells().map(cell => (
+                    <td
+                      key={cell.id}
+                      css={cell.column.id === 'id' ? tableActionsCellStyles : tableCellStyles}
+                      data-cell={cell.column.id === 'id' ? undefined : cell.column.columnDef.header}
+                      style={{
+                        width: cell.column.id == 'name' ? undefined : cell.column.getSize(),
+                      }}
+                    >
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          )}
+        </table>
+      </div>
       <CellsFilePreviewModal />
     </FilePreviewProvider>
   );
