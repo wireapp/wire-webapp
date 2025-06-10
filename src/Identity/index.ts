@@ -18,8 +18,11 @@
  */
 
 export * from './Animation';
-export * from './Avatar';
-export * from './AvatarGrid';
 export * from './colors';
 export * from './colors-v2';
+export * from './GlobalCssVariables';
+export * from './GlobalStyle';
 export * from './Logo';
+export * from './motions';
+export * from './Sizes';
+export * from './Theme';
