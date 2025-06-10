@@ -537,6 +537,11 @@ export class App {
 
       let totalNotifications = 0;
       await eventRepository.connectWebSocket(this.core, ({done, total}) => {
+        /**
+         * NOTE: this call back is now also called when client was already open but websocket
+         * was offline for a while hence it can be used to demonstrate number of pending messages
+         * even when app is already loaded and in the main screen view
+         */
         const baseMessage = t('initDecryption');
         const extraInfo = this.config.FEATURE.SHOW_LOADING_INFORMATION
           ? ` ${t('initProgress', {number1: done.toString(), number2: total.toString()})}`

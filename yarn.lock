@@ -8093,6 +8093,31 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@wireapp/api-client@file:.yalc/@wireapp/api-client::locator=wire-webapp%40workspace%3A.":
+  version: 27.55.0
+  resolution: "@wireapp/api-client@file:.yalc/@wireapp/api-client#.yalc/@wireapp/api-client::hash=81dbaf&locator=wire-webapp%40workspace%3A."
+  dependencies:
+    "@aws-sdk/client-s3": "npm:3.750.0"
+    "@aws-sdk/lib-storage": "npm:3.779.0"
+    "@wireapp/commons": "npm:^5.4.2"
+    "@wireapp/priority-queue": "npm:^2.1.11"
+    "@wireapp/protocol-messaging": "npm:1.52.0"
+    axios: "npm:1.9.0"
+    axios-retry: "npm:4.5.0"
+    cells-sdk-ts: "https://github.com/pydio/cells-sdk-ts#v0.1.1-alpha11"
+    http-status-codes: "npm:2.3.0"
+    logdown: "npm:3.3.1"
+    pako: "npm:2.1.0"
+    reconnecting-websocket: "npm:4.4.0"
+    spark-md5: "npm:3.0.2"
+    tough-cookie: "npm:4.1.4"
+    uuid: "npm:11.1.0"
+    ws: "npm:8.18.1"
+    zod: "npm:3.24.2"
+  checksum: 10/7334a60e4b36cfd3eabb5384ea998850e0fa114a694a55b0003206f9dd65d475aedaa8d78fa145f5c6de1064f7f873928343a60c7a8269d799db6d3556da2b3f
+  languageName: node
+  linkType: hard
+
 "@wireapp/api-client@npm:^27.55.0":
   version: 27.55.0
   resolution: "@wireapp/api-client@npm:27.55.0"
@@ -8179,9 +8204,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:46.23.13":
+"@wireapp/core@file:.yalc/@wireapp/core::locator=wire-webapp%40workspace%3A.":
   version: 46.23.13
-  resolution: "@wireapp/core@npm:46.23.13"
+  resolution: "@wireapp/core@file:.yalc/@wireapp/core#.yalc/@wireapp/core::hash=b7877d&locator=wire-webapp%40workspace%3A."
   dependencies:
     "@wireapp/api-client": "npm:^27.55.0"
     "@wireapp/commons": "npm:^5.4.2"
@@ -8201,7 +8226,7 @@ __metadata:
     long: "npm:^5.2.0"
     uuid: "npm:9.0.1"
     zod: "npm:3.24.2"
-  checksum: 10/64ae236c64927a79431f947ab46c4911f5cb21c16567605c0abd844a57a61da69f3295d4a2720762f532df17a9b671ab5a7193857e503424ca3915f54e044dac
+  checksum: 10/f55b17aebe99abd4d19185b2fb5549b5204fe10e175a4121c93ff81a22c02b7d6e75ab6a66713881118a9a9df1815b6cd6a88b0b0ee772923d217b1ac626e9bd
   languageName: node
   linkType: hard
 
@@ -21616,11 +21641,12 @@ __metadata:
     "@types/uuid": "npm:^10.0.0"
     "@types/webpack-env": "npm:1.18.8"
     "@types/wicg-file-system-access": "npm:^2023.10.5"
+    "@wireapp/api-client": "file:.yalc/@wireapp/api-client"
     "@wireapp/avs": "npm:10.0.45"
     "@wireapp/avs-debugger": "npm:0.0.7"
     "@wireapp/commons": "npm:5.4.2"
     "@wireapp/copy-config": "npm:2.3.0"
-    "@wireapp/core": "npm:46.23.13"
+    "@wireapp/core": "file:.yalc/@wireapp/core"
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/prettier-config": "npm:0.6.4"
     "@wireapp/react-ui-kit": "npm:9.53.0"
