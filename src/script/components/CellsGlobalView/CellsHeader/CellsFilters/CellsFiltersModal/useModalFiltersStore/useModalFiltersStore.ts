@@ -17,7 +17,8 @@
  *
  */
 
-import {create} from 'zustand';
+import {useStore} from 'zustand';
+import {createStore} from 'zustand/vanilla';
 
 interface Filters {
   tags: string[];
@@ -33,9 +34,12 @@ const initialState: Filters = {
   tags: [],
 };
 
-export const useModalFiltersStore = create<ModalFiltersState>(set => ({
+export const filtersStore = createStore<ModalFiltersState>(set => ({
   ...initialState,
   setTags: tags => set({tags}),
   initialize: filters => set(filters),
   reset: () => set(initialState),
 }));
+
+export const useModalFiltersStore = (selector: (state: ModalFiltersState) => ModalFiltersState): ModalFiltersState =>
+  useStore(filtersStore, selector);

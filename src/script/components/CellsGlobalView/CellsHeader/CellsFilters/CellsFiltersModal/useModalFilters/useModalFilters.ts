@@ -24,7 +24,7 @@ import {useModalFiltersStore} from '../useModalFiltersStore/useModalFiltersStore
 
 export const useModalFilters = ({enabled}: {enabled: boolean}) => {
   const {filters} = useCellsStore();
-  const {tags, setTags, initialize} = useModalFiltersStore();
+  const {tags, setTags, initialize} = useModalFiltersStore(state => state);
 
   useEffect(() => {
     if (!enabled) {
