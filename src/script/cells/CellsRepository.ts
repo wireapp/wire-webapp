@@ -185,6 +185,10 @@ export class CellsRepository {
     return this.apiClient.api.cells.restoreNode({uuid});
   }
 
+  async renameNode({currentPath, newName}: {currentPath: string; newName: string}) {
+    return this.apiClient.api.cells.renameNode({currentPath, newName});
+  }
+
   async getAllTags() {
     return this.apiClient.api.cells.getAllTags();
   }

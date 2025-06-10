@@ -132,6 +132,10 @@ const CellsTableRowOptionsContent = ({
     [conversationId, removeNode, restoreNodeFailedNotification],
   );
 
+  const handleRenameNode = async () => {
+    await cellsRepository.renameNode({currentPath: node.path, newName: 'renamed-sss.txt'});
+  };
+
   if (isRootRecycleBinPath()) {
     return (
       <DropdownMenu.Content>
@@ -205,6 +209,7 @@ const CellsTableRowOptionsContent = ({
           </DropdownMenu.Item>
         )}
         <DropdownMenu.Item onClick={() => setIsTagsModalOpen(true)}>{t('cells.options.tags')}</DropdownMenu.Item>
+        <DropdownMenu.Item onClick={() => handleRenameNode()}>Rename</DropdownMenu.Item>
         <DropdownMenu.Item
           onClick={() =>
             showMoveToRecycleBinModal({
