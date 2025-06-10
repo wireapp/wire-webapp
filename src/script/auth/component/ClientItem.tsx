@@ -20,9 +20,9 @@
 import {ChangeEvent, FormEvent, HTMLProps, useEffect, useRef, useState, MouseEvent, KeyboardEvent} from 'react';
 
 import {RegisteredClient} from '@wireapp/api-client/lib/client/index';
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {
+  TabIndex,
   COLOR,
   ContainerXS,
   DeviceIcon,
