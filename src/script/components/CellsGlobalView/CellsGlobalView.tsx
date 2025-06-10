@@ -76,6 +76,7 @@ export const CellsGlobalView = ({cellsRepository = container.resolve(CellsReposi
         onClearSearch={handleClearSearch}
         onRefresh={handleRefresh}
         searchStatus={nodesStatus}
+        cellsRepository={cellsRepository}
       />
       {emptySearchResults && (
         <CellsStateInfo

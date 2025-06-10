@@ -17,34 +17,16 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {BadgesWithTooltip} from '@wireapp/react-ui-kit';
 
-export const wrapperStyles: CSSObject = {
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'flex-start',
-  flexDirection: 'column',
-  marginBottom: '20px',
-  width: '100%',
-};
+interface CellsTableTagsColumnProps {
+  tags: string[];
+}
 
-export const headingStyles: CSSObject = {
-  color: 'var(--main-color)',
-  fontWeight: 'var(--font-weight-semibold)',
-  fontSize: 'var(--font-size-medium)',
-  marginBottom: '8px',
-};
+export const CellsTableTagsColumn = ({tags}: CellsTableTagsColumnProps) => {
+  if (tags.length === 0) {
+    return null;
+  }
 
-export const searchWrapperStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: '16px',
-};
-
-export const contentStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  gap: '8px',
-  width: '100%',
+  return <BadgesWithTooltip items={tags} />;
 };

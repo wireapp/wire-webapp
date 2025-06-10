@@ -17,34 +17,29 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {useStore} from 'zustand';
+import {createStore} from 'zustand/vanilla';
 
-export const wrapperStyles: CSSObject = {
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'flex-start',
-  flexDirection: 'column',
-  marginBottom: '20px',
-  width: '100%',
+interface Filters {
+  tags: string[];
+}
+
+interface ModalFiltersState extends Filters {
+  setTags: (tags: string[]) => void;
+  initialize: (filters: Filters) => void;
+  reset: () => void;
+}
+
+const initialState: Filters = {
+  tags: [],
 };
 
-export const headingStyles: CSSObject = {
-  color: 'var(--main-color)',
-  fontWeight: 'var(--font-weight-semibold)',
-  fontSize: 'var(--font-size-medium)',
-  marginBottom: '8px',
-};
+export const filtersStore = createStore<ModalFiltersState>(set => ({
+  ...initialState,
+  setTags: tags => set({tags}),
+  initialize: filters => set(filters),
+  reset: () => set(initialState),
+}));
 
-export const searchWrapperStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: '16px',
-};
-
-export const contentStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  gap: '8px',
-  width: '100%',
-};
+export const useModalFiltersStore = (selector: (state: ModalFiltersState) => ModalFiltersState): ModalFiltersState =>
+  useStore(filtersStore, selector);

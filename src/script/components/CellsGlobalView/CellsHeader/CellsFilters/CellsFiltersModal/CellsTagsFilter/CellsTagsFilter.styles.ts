@@ -20,31 +20,13 @@
 import {CSSObject} from '@emotion/react';
 
 export const wrapperStyles: CSSObject = {
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'flex-start',
-  flexDirection: 'column',
-  marginBottom: '20px',
-  width: '100%',
-};
-
-export const headingStyles: CSSObject = {
-  color: 'var(--main-color)',
-  fontWeight: 'var(--font-weight-semibold)',
-  fontSize: 'var(--font-size-medium)',
-  marginBottom: '8px',
-};
-
-export const searchWrapperStyles: CSSObject = {
+  height: '66px',
   display: 'flex',
   alignItems: 'center',
-  gap: '16px',
+  justifyContent: 'center',
+  padding: '0 2px',
 };
 
-export const contentStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  gap: '8px',
-  width: '100%',
+export const menuListCSS: CSSObject = {
+  maxHeight: '200px',
 };

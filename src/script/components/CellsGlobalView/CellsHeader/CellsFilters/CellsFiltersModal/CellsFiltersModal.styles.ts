@@ -19,32 +19,17 @@
 
 import {CSSObject} from '@emotion/react';
 
+export const modalStyles: CSSObject = {
+  width: '508px',
+};
+
 export const wrapperStyles: CSSObject = {
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'flex-start',
-  flexDirection: 'column',
-  marginBottom: '20px',
+  padding: '8px',
   width: '100%',
-};
-
-export const headingStyles: CSSObject = {
-  color: 'var(--main-color)',
-  fontWeight: 'var(--font-weight-semibold)',
-  fontSize: 'var(--font-size-medium)',
-  marginBottom: '8px',
-};
-
-export const searchWrapperStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: '16px',
+  position: 'relative',
 };
 
 export const contentStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  gap: '8px',
-  width: '100%',
+  padding: '0 16px',
+  marginBottom: '24px',
 };
