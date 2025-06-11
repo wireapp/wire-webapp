@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.59.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.59.2...@wireapp/react-ui-kit@9.59.3) (2025-06-11)
+
+### Bug Fixes
+
+* **react-ui-kit:** include zIndexes in GlobalStyles ([#7074](https://github.com/wireapp/wire-web-packages/issues/7074)) ([63ed7a9](https://github.com/wireapp/wire-web-packages/commit/63ed7a99d27dfd3cc3a976e67fc7cb8af8c4d06d))
+
 ## [9.59.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.59.1...@wireapp/react-ui-kit@9.59.2) (2025-06-10)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
