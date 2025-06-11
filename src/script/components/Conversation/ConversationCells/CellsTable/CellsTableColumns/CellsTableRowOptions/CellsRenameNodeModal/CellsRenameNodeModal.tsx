@@ -17,53 +17,68 @@
  *
  */
 
-import React from 'react';
+import {CloseIcon, IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
 
+import {CellNode} from 'Components/Conversation/ConversationCells/common/cellNode/cellNode';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
+import {CellsRepository} from 'src/script/cells/CellsRepository';
+import {handleEscDown} from 'Util/KeyboardUtil';
 
-import {modalStyles} from './CellsRenameNodeModal.styles';
+import {CellsRenameForm} from './CellsRenameForm/CellsRenameForm';
+import {
+  modalStyles,
+  wrapperStyles,
+  headerStyles,
+  headingStyles,
+  closeButtonStyles,
+} from './CellsRenameNodeModal.styles';
 
-export const CellsRenameNodeModal = () => {
-  const [isOpen, setIsOpen] = useState(false);
+interface CellsRenameNodeModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  node: CellNode;
+  cellsRepository: CellsRepository;
+  onRefresh: () => void;
+}
 
+export const CellsRenameNodeModal = ({
+  isOpen,
+  onClose,
+  node,
+  cellsRepository,
+  onRefresh,
+}: CellsRenameNodeModalProps) => {
   return (
     <ModalComponent
       isShown={isOpen}
       onClosed={onClose}
       onBgClick={onClose}
-      wrapperCSS={modalStyles}
       onKeyDown={event => handleEscDown(event, onClose)}
+      wrapperCSS={modalStyles}
     >
       <div css={wrapperStyles}>
-        <CellsMoveNodeModalHeader
-          onClose={onClose}
-          title={
-            activeModalContent === 'move' ? t('cells.moveNodeModal.moveTitle') : t('cells.moveNodeModal.createTitle')
-          }
+        <header css={headerStyles}>
+          <h3 css={headingStyles}>Rename</h3>
+          <IconButton
+            variant={IconButtonVariant.SECONDARY}
+            type="button"
+            css={closeButtonStyles}
+            onClick={onClose}
+            aria-label="Close"
+          >
+            <CloseIcon />
+          </IconButton>
+        </header>
+        <CellsRenameForm
+          node={node}
+          cellsRepository={cellsRepository}
+          onSuccess={() => {
+            onClose();
+            onRefresh();
+          }}
+          onSecondaryButtonClick={onClose}
+          isOpen={isOpen}
         />
-        {activeModalContent === 'move' ? (
-          <CellsFoldersListModalContent
-            nodeToMove={nodeToMove}
-            items={folders}
-            status={status}
-            shouldShowLoadingSpinner={shouldShowLoadingSpinner}
-            conversationQualifiedId={conversationQualifiedId}
-            conversationName={conversationName}
-            cellsRepository={cellsRepository}
-            currentPath={currentPath}
-            onPathChange={setCurrentPath}
-            onChangeModalContent={setActiveModalContent}
-            onClose={onClose}
-          />
-        ) : (
-          <CellsNewFolderModalContent
-            cellsRepository={cellsRepository}
-            conversationQualifiedId={conversationQualifiedId}
-            currentPath={currentPath}
-            onRefresh={refresh}
-            onChangeModalContent={setActiveModalContent}
-          />
-        )}
       </div>
     </ModalComponent>
   );

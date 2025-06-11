@@ -36,6 +36,7 @@ import {t} from 'Util/LocalizerUtil';
 import {forcedDownloadFile} from 'Util/util';
 
 import {CellsMoveNodeModal} from './CellsMoveNodeModal/CellsMoveNodeModal';
+import {CellsRenameNodeModal} from './CellsRenameNodeModal/CellsRenameNodeModal';
 import {buttonStyles, iconStyles, textStyles} from './CellsTableRowOptions.styles';
 import {CellsTagsModal} from './CellsTagsModal/CellsTagsModal';
 import {showDeletePermanentlyModal} from './showDeletePermanentlyModal/showDeletePermanentlyModal';
@@ -88,8 +89,11 @@ const CellsTableRowOptionsContent = ({
 }: CellsTableRowOptionsProps) => {
   const {handleOpenFile} = useCellsFilePreviewModal();
   const {removeNode} = useCellsStore();
+
   const [isMoveNodeModalOpen, setIsMoveNodeModalOpen] = useState(false);
   const [isTagsModalOpen, setIsTagsModalOpen] = useState(false);
+  const [isRenameNodeModalOpen, setIsRenameNodeModalOpen] = useState(false);
+
   const url = node.url;
   const name = node.type === 'folder' ? `${node.name}.zip` : node.name;
   const conversationId = conversationQualifiedId.id;
@@ -132,9 +136,9 @@ const CellsTableRowOptionsContent = ({
     [conversationId, removeNode, restoreNodeFailedNotification],
   );
 
-  const handleRenameNode = async () => {
-    await cellsRepository.renameNode({currentPath: node.path, newName: 'renamed-sss.txt'});
-  };
+  //   const handleRenameNode = async () => {
+  //     await cellsRepository.renameNode({currentPath: node.path, newName: 'renamed-sss.txt'});
+  //   };
 
   if (isRootRecycleBinPath()) {
     return (
@@ -209,7 +213,7 @@ const CellsTableRowOptionsContent = ({
           </DropdownMenu.Item>
         )}
         <DropdownMenu.Item onClick={() => setIsTagsModalOpen(true)}>{t('cells.options.tags')}</DropdownMenu.Item>
-        <DropdownMenu.Item onClick={() => handleRenameNode()}>Rename</DropdownMenu.Item>
+        <DropdownMenu.Item onClick={() => setIsRenameNodeModalOpen(true)}>Rename</DropdownMenu.Item>
         <DropdownMenu.Item
           onClick={() =>
             showMoveToRecycleBinModal({
@@ -235,6 +239,13 @@ const CellsTableRowOptionsContent = ({
         onClose={() => setIsTagsModalOpen(false)}
         cellsRepository={cellsRepository}
         selectedTags={node.tags}
+        onRefresh={onRefresh}
+      />
+      <CellsRenameNodeModal
+        isOpen={isRenameNodeModalOpen}
+        onClose={() => setIsRenameNodeModalOpen(false)}
+        node={node}
+        cellsRepository={cellsRepository}
         onRefresh={onRefresh}
       />
     </>

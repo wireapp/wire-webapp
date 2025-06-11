@@ -17,14 +17,23 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {useEffect, useRef} from 'react';
 
-export const modalStyles: CSSObject = {
-  width: '508px',
-};
+export const useInputAutoFocus = ({enabled}: {enabled: boolean}) => {
+  const inputRef = useRef<HTMLInputElement>(null);
 
-export const wrapperStyles: CSSObject = {
-  padding: '8px',
-  width: '100%',
-  position: 'relative',
+  useEffect(() => {
+    if (!enabled) {
+      return;
+    }
+
+    // Ensure the input is fully rendered
+    setTimeout(() => {
+      inputRef.current?.focus();
+    });
+  }, [enabled]);
+
+  return {
+    inputRef,
+  };
 };
