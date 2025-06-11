@@ -57,6 +57,7 @@ export const metadataStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
   gap: '16px',
+  fontSize: 'var(--font-size-small)',
 };
 
 export const nameStyles: CSSObject = {
@@ -87,34 +88,4 @@ export const loaderIconStyles: CSSObject = {
   'body.theme-dark &': {
     color: 'var(--gray-40)',
   },
-};
-
-export const tagWrapperStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: '4px',
-  maxWidth: '100px',
-  minWidth: 0,
-  fontSize: 'var(--font-size-small)',
-};
-
-export const tagCountStyles: CSSObject = {
-  color: 'gray',
-  flexShrink: 0,
-};
-
-export const tagListStyles: CSSObject = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '8px',
-  maxWidth: '200px',
-  maxHeight: '200px',
-  overflowY: 'auto',
-  listStyle: 'none',
-  padding: 0,
-  margin: 0,
-};
-
-export const tagListItemStyles: CSSObject = {
-  flexShrink: 0,
 };

@@ -17,7 +17,7 @@
  *
  */
 
-import {Badge, CloseIcon, Tooltip} from '@wireapp/react-ui-kit';
+import {BadgesWithTooltip, CloseIcon} from '@wireapp/react-ui-kit';
 
 import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
 import {MessageTime} from 'Components/MessagesList/Message/MessageTime';
@@ -31,10 +31,6 @@ import {
   metadataStyles,
   nameStyles,
   textStyles,
-  tagListStyles,
-  tagListItemStyles,
-  tagCountStyles,
-  tagWrapperStyles,
 } from './FileHeader.styles';
 
 interface FileHeaderProps {
@@ -43,10 +39,10 @@ interface FileHeaderProps {
   fileExtension: string;
   senderName: string;
   timestamp: number;
-  tags?: string[];
+  badges?: string[];
 }
 
-export const FileHeader = ({onClose, fileName, fileExtension, senderName, timestamp, tags}: FileHeaderProps) => {
+export const FileHeader = ({onClose, fileName, fileExtension, senderName, timestamp, badges}: FileHeaderProps) => {
   const timeAgo = useRelativeTimestamp(timestamp);
 
   return (
@@ -67,46 +63,9 @@ export const FileHeader = ({onClose, fileName, fileExtension, senderName, timest
           <MessageTime timestamp={timestamp} data-timestamp-type="normal" css={textStyles}>
             {timeAgo}
           </MessageTime>
-          <Tags tags={tags} />
+          {badges && badges.length > 0 && <BadgesWithTooltip items={badges} />}
         </div>
       </div>
     </header>
-  );
-};
-
-const Tags = ({tags}: {tags?: string[]}) => {
-  if (!tags || tags.length === 0) {
-    return null;
-  }
-
-  if (tags.length === 1) {
-    return <TagWithCount tag={tags[0]} count={tags.length} />;
-  }
-
-  return (
-    <Tooltip body={<TagsList tags={tags} />} selector="#file-fullscreen-modal">
-      <TagWithCount tag={tags[0]} count={tags.length} />
-    </Tooltip>
-  );
-};
-
-const TagWithCount = ({tag, count}: {tag: string; count: number}) => {
-  return (
-    <div css={tagWrapperStyles}>
-      <Badge>{tag}</Badge>
-      {count > 1 && <div css={tagCountStyles}>+{count - 1}</div>}
-    </div>
-  );
-};
-
-const TagsList = ({tags}: {tags: string[]}) => {
-  return (
-    <ul css={tagListStyles}>
-      {tags.map(tag => (
-        <li css={tagListItemStyles} key={tag}>
-          <Badge>{tag}</Badge>
-        </li>
-      ))}
-    </ul>
   );
 };

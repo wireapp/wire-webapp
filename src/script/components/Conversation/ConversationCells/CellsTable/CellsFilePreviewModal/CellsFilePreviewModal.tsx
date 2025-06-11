@@ -24,6 +24,7 @@ import {useCellsFilePreviewModal} from '../common/CellsFilePreviewModalContext/C
 
 // This component is duplicated across global view and conversation view
 // TODO: Abstract when it starts to grow / feels right
+
 export const CellsFilePreviewModal = () => {
   const {id, selectedFile, handleCloseFile} = useCellsFilePreviewModal();
 
@@ -31,7 +32,7 @@ export const CellsFilePreviewModal = () => {
     return null;
   }
 
-  const {url, extension, name, owner, uploadedAtTimestamp, previewPdfUrl, previewImageUrl} = selectedFile;
+  const {url, extension, name, owner, uploadedAtTimestamp, previewPdfUrl, previewImageUrl, tags} = selectedFile;
 
   const getFileUrl = () => {
     const type = getFileTypeFromExtension(extension);
@@ -58,7 +59,7 @@ export const CellsFilePreviewModal = () => {
       status={!getFileUrl() ? 'unavailable' : 'success'}
       senderName={owner}
       timestamp={uploadedAtTimestamp}
-      tags={['test', 'test2', 'test3']}
+      badges={tags}
     />
   );
 };
