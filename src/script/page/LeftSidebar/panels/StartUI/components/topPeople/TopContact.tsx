@@ -20,7 +20,8 @@
 import React, {useEffect, useState} from 'react';
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+
+import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';

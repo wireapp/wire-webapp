@@ -17,8 +17,6 @@
  *
  */
 
-import {useCallback} from 'react';
-
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
@@ -46,7 +44,7 @@ export const ConversationCells = ({
   conversationQualifiedId,
   conversationName,
 }: ConversationCellsProps) => {
-  const {getNodes, status: nodesStatus, getPagination, clearAll} = useCellsStore();
+  const {getNodes, status: nodesStatus, getPagination} = useCellsStore();
 
   const conversationId = conversationQualifiedId.id;
 
@@ -67,17 +65,12 @@ export const ConversationCells = ({
   const isSuccess = nodesStatus === 'success';
   const hasNodes = !!nodes.length;
 
-  const handleRefresh = useCallback(async () => {
-    clearAll({conversationId});
-    await refresh();
-  }, [refresh, clearAll, conversationId]);
-
   const emptyView = !isError && !hasNodes;
 
   return (
     <div css={wrapperStyles}>
       <CellsHeader
-        onRefresh={handleRefresh}
+        onRefresh={refresh}
         conversationQualifiedId={conversationQualifiedId}
         conversationName={conversationName}
         cellsRepository={cellsRepository}
@@ -88,6 +81,7 @@ export const ConversationCells = ({
           cellsRepository={cellsRepository}
           conversationQualifiedId={conversationQualifiedId}
           conversationName={conversationName}
+          onRefresh={refresh}
         />
       )}
       {!isLoading && emptyView && (

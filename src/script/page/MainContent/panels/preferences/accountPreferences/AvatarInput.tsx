@@ -19,8 +19,9 @@
 
 import {useState, useRef} from 'react';
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
+
+import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';

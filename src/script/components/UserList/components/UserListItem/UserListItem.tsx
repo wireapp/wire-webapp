@@ -19,9 +19,7 @@
 
 import React, {ChangeEvent, useId} from 'react';
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
-
-import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
+import {TabIndex, Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {UserStatusBadges} from 'Components/Badge';

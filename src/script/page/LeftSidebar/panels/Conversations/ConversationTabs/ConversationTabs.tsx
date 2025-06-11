@@ -302,7 +302,7 @@ export const ConversationTabs = ({
           type="button"
           className="conversations-sidebar-btn"
           title={t('preferencesAboutSupport')}
-          data-uie-name="go-people"
+          data-uie-name="go-support"
         >
           <span className="conversations-sidebar-btn--text-wrapper">
             <SupportIcon viewBox="0 0 16 16" />
