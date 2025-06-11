@@ -23,10 +23,10 @@ import {CustomBackendNotFoundError} from './AccountError';
 import {BackendConfigData} from './BackendConfigData';
 import {CallConfigData} from './CallConfigData';
 import {DomainData} from './DomainData';
-import {DomainRedirectPayload} from './DomainRedirect';
+import {DomainRedirect, DomainRedirectPayload} from './DomainRedirect';
 import {SSOSettings} from './SSOSettings';
 
-import {HttpClient, BackendErrorLabel, BackendError} from '../http';
+import {HttpClient, BackendErrorLabel, BackendError, StatusCode} from '../http';
 
 export class AccountAPI {
   constructor(private readonly client: HttpClient) {}
@@ -234,7 +234,17 @@ export class AccountAPI {
       url: AccountAPI.URL.GET_DOMAIN_REGISTRATION,
     };
 
-    const response = await this.client.sendJSON<DomainRedirectPayload>(config);
-    return response.data;
+    try {
+      const response = await this.client.sendJSON<DomainRedirectPayload>(config);
+      return response.data;
+    } catch (error) {
+      const backendError = error as BackendError;
+      if (backendError.code === StatusCode.SERVICE_UNAVAILABLE) {
+        return {
+          domain_redirect: DomainRedirect.NONE,
+        };
+      }
+      throw error;
+    }
   }
 }
