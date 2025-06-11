@@ -61,6 +61,7 @@ export const useRestoreParentNode = ({
         await cellsRepository.restoreNode({uuid: rootParentNode.Uuid});
         removeNode({conversationId: conversationQualifiedId.id, nodeId: rootParentNode.Uuid});
 
+        // Workaround to ensure UI updates complete before navigation
         setTimeout(() => {
           openBreadcrumb({
             conversationQualifiedId,
