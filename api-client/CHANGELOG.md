@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.58.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.57.0...@wireapp/api-client@27.58.0) (2025-06-11)
+
+### Features
+
+* **api-client:** cells rename node ([#7073](https://github.com/wireapp/wire-web-packages/issues/7073)) ([c6dd227](https://github.com/wireapp/wire-web-packages/commit/c6dd227696d7a25c264b65e20751291be80a1224))
+
 # [27.57.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.56.1...@wireapp/api-client@27.57.0) (2025-06-06)
 
 ### Features
