@@ -55,25 +55,23 @@ export const FileFullscreenModal = ({
   badges,
 }: FileFullscreenModalProps) => {
   return (
-    <div id="file-fullscreen-modal" data-testid="file-fullscreen-modal">
-      <FullscreenModal id={id} isOpen={isOpen} onClose={onClose}>
-        <FileHeader
-          onClose={onClose}
-          fileName={fileName}
-          fileExtension={fileExtension}
-          senderName={senderName}
-          timestamp={timestamp}
-          badges={badges}
-        />
-        <ModalContent
-          filePreviewUrl={filePreviewUrl}
-          fileName={fileName}
-          senderName={senderName}
-          timestamp={timestamp}
-          status={status}
-        />
-      </FullscreenModal>
-    </div>
+    <FullscreenModal id={id} isOpen={isOpen} onClose={onClose}>
+      <FileHeader
+        onClose={onClose}
+        fileName={fileName}
+        fileExtension={fileExtension}
+        senderName={senderName}
+        timestamp={timestamp}
+        badges={badges}
+      />
+      <ModalContent
+        filePreviewUrl={filePreviewUrl}
+        fileName={fileName}
+        senderName={senderName}
+        timestamp={timestamp}
+        status={status}
+      />
+    </FullscreenModal>
   );
 };
 
