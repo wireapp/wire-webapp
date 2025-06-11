@@ -20,8 +20,9 @@
 import React, {useRef, useState, MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent} from 'react';
 
 import {CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conversation/';
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
+
+import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE, GroupAvatar} from 'Components/Avatar';
 import {ChannelAvatar} from 'Components/Avatar/ChannelAvatar';

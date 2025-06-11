@@ -17,8 +17,9 @@
  *
  */
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
+
+import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE, GroupAvatar} from 'Components/Avatar';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';

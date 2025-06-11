@@ -19,11 +19,10 @@
 
 import React, {useContext, useEffect, useState} from 'react';
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {Link, LinkVariant} from '@wireapp/react-ui-kit';
+import {TabIndex, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import * as Icon from 'Components/Icon';
