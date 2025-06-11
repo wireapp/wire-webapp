@@ -17,21 +17,12 @@
  *
  */
 
-import {CloseIcon, IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
-
 import {CellNode} from 'Components/Conversation/ConversationCells/common/cellNode/cellNode';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
+import {CellsModal} from 'Components/Conversation/ConversationCells/common/CellsModal/CellsModal';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
-import {handleEscDown} from 'Util/KeyboardUtil';
 
 import {CellsRenameForm} from './CellsRenameForm/CellsRenameForm';
-import {
-  modalStyles,
-  wrapperStyles,
-  headerStyles,
-  headingStyles,
-  closeButtonStyles,
-} from './CellsRenameNodeModal.styles';
+import {useCellsRenameForm} from './useCellsRenameNodeForm/useCellsNewNodeForm';
 
 interface CellsRenameNodeModalProps {
   isOpen: boolean;
@@ -48,38 +39,31 @@ export const CellsRenameNodeModal = ({
   cellsRepository,
   onRefresh,
 }: CellsRenameNodeModalProps) => {
+  const {name, error, isSubmitting, handleRename, handleNameChange} = useCellsRenameForm({
+    node,
+    cellsRepository,
+    onSuccess: () => {
+      onClose();
+      onRefresh();
+    },
+  });
+
   return (
-    <ModalComponent
-      isShown={isOpen}
-      onClosed={onClose}
-      onBgClick={onClose}
-      onKeyDown={event => handleEscDown(event, onClose)}
-      wrapperCSS={modalStyles}
-    >
-      <div css={wrapperStyles}>
-        <header css={headerStyles}>
-          <h3 css={headingStyles}>Rename</h3>
-          <IconButton
-            variant={IconButtonVariant.SECONDARY}
-            type="button"
-            css={closeButtonStyles}
-            onClick={onClose}
-            aria-label="Close"
-          >
-            <CloseIcon />
-          </IconButton>
-        </header>
-        <CellsRenameForm
-          node={node}
-          cellsRepository={cellsRepository}
-          onSuccess={() => {
-            onClose();
-            onRefresh();
-          }}
-          onSecondaryButtonClick={onClose}
-          isOpen={isOpen}
-        />
-      </div>
-    </ModalComponent>
+    <CellsModal isOpen={isOpen} onClose={onClose}>
+      <CellsModal.Header />
+      <CellsRenameForm
+        isOpen={isOpen}
+        onSubmit={handleRename}
+        inputValue={name}
+        onChange={handleNameChange}
+        error={error}
+      />
+      <CellsModal.Actions>
+        <CellsModal.SecondaryButton onClick={onClose}>Close</CellsModal.SecondaryButton>
+        <CellsModal.PrimaryButton onClick={handleRename} isDisabled={isSubmitting}>
+          Save
+        </CellsModal.PrimaryButton>
+      </CellsModal.Actions>
+    </CellsModal>
   );
 };

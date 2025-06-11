@@ -17,14 +17,28 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {CloseIcon, IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
 
-export const largeModalStyles: CSSObject = {
-  width: '508px',
-};
+import {headerStyles, headingStyles, closeButtonStyles} from './CellsModalHeader.styles';
 
-export const wrapperStyles: CSSObject = {
-  padding: '8px',
-  width: '100%',
-  position: 'relative',
+import {useCellsModal} from '../CellsModalContext/CellsModalContext';
+
+export const CellsModalHeader = () => {
+  const {onClose} = useCellsModal();
+
+  return (
+    <header css={headerStyles}>
+      <h3 css={headingStyles}>test </h3>
+
+      <IconButton
+        variant={IconButtonVariant.SECONDARY}
+        type="button"
+        css={closeButtonStyles}
+        onClick={onClose}
+        aria-label={'close'}
+      >
+        <CloseIcon />
+      </IconButton>
+    </header>
+  );
 };

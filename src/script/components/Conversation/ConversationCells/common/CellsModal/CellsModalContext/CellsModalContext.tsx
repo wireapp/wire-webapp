@@ -17,14 +17,27 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {createContext, useContext, ReactNode} from 'react';
 
-export const largeModalStyles: CSSObject = {
-  width: '508px',
+interface CellsModalContextType {
+  onClose: () => void;
+}
+
+export const CellsModalContext = createContext<CellsModalContextType | null>(null);
+
+export const useCellsModal = () => {
+  const context = useContext(CellsModalContext);
+  if (!context) {
+    throw new Error('useCellsModal must be used within a CellsModalProvider');
+  }
+  return context;
 };
 
-export const wrapperStyles: CSSObject = {
-  padding: '8px',
-  width: '100%',
-  position: 'relative',
+interface CellsModalProviderProps {
+  children: ReactNode;
+  onClose: () => void;
+}
+
+export const CellsModalProvider = ({children, onClose}: CellsModalProviderProps) => {
+  return <CellsModalContext.Provider value={{onClose}}>{children}</CellsModalContext.Provider>;
 };

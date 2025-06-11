@@ -19,12 +19,16 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const largeModalStyles: CSSObject = {
-  width: '508px',
+export const actionsWrapperStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  flexDirection: 'row',
+  gap: '8px',
+  padding: '0 16px',
+  marginBottom: '8px',
 };
 
-export const wrapperStyles: CSSObject = {
-  padding: '8px',
+export const buttonStyles: CSSObject = {
   width: '100%',
-  position: 'relative',
+  margin: '0',
 };

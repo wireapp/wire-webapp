@@ -17,60 +17,37 @@
  *
  */
 
-import {Button, ButtonVariant, ErrorMessage, Input, Label} from '@wireapp/react-ui-kit';
+import {ChangeEvent, FormEvent} from 'react';
 
-import {CellNode} from 'Components/Conversation/ConversationCells/common/cellNode/cellNode';
+import {ErrorMessage, Input, Label} from '@wireapp/react-ui-kit';
+
 import {useInputAutoFocus} from 'Components/Conversation/ConversationCells/common/useInputAutoFocus/useInputAutoFocus';
-import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
 
-import {buttonStyles, buttonWrapperStyles, inputWrapperStyles} from './CellsRenameForm.styles';
-import {useCellsRenameForm} from './useCellsNewNodeForm';
+import {formStyles} from './CellsRenameForm.styles';
 
 interface CellsRenameFormProps {
-  node: CellNode;
-  cellsRepository: CellsRepository;
-  onSuccess: () => void;
-  onSecondaryButtonClick: () => void;
   isOpen: boolean;
+  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+  inputValue: string;
+  onChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  error: string | null;
 }
 
-export const CellsRenameForm = ({
-  cellsRepository,
-  onSuccess,
-  onSecondaryButtonClick,
-  node,
-  isOpen,
-}: CellsRenameFormProps) => {
+export const CellsRenameForm = ({isOpen, onSubmit, inputValue, onChange, error}: CellsRenameFormProps) => {
   const {inputRef} = useInputAutoFocus({enabled: isOpen});
 
-  const {name, error, isSubmitting, handleSubmit, handleChange} = useCellsRenameForm({
-    node,
-    cellsRepository,
-    onSuccess,
-  });
-
   return (
-    <form onSubmit={handleSubmit}>
-      <div css={inputWrapperStyles}>
-        <Label htmlFor="cells-new-item-name">{t('cells.newItemMenuModal.label')}</Label>
-        <Input
-          id="cells-new-item-name"
-          value={name}
-          ref={inputRef}
-          placeholder="New name"
-          onChange={handleChange}
-          error={error ? <ErrorMessage>{error}</ErrorMessage> : undefined}
-        />
-      </div>
-      <div css={buttonWrapperStyles}>
-        <Button variant={ButtonVariant.SECONDARY} type="button" onClick={onSecondaryButtonClick} css={buttonStyles}>
-          {t('cells.newItemMenuModal.secondaryAction')}
-        </Button>
-        <Button variant={ButtonVariant.PRIMARY} type="submit" css={buttonStyles} disabled={isSubmitting}>
-          {t('cells.newItemMenuModal.primaryAction')}
-        </Button>
-      </div>
+    <form onSubmit={onSubmit} css={formStyles}>
+      <Label htmlFor="cells-new-item-name">{t('cells.newItemMenuModal.label')}</Label>
+      <Input
+        id="cells-new-item-name"
+        value={inputValue}
+        ref={inputRef}
+        placeholder="New name"
+        onChange={onChange}
+        error={error ? <ErrorMessage>{error}</ErrorMessage> : undefined}
+      />
     </form>
   );
 };

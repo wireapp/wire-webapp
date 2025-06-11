@@ -19,84 +19,38 @@
 
 import {ReactNode} from 'react';
 
-import {Button, ButtonVariant, CloseIcon, IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
-
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {handleEscDown} from 'Util/KeyboardUtil';
 
+import {largeModalStyles, wrapperStyles} from './CellsModal.styles';
 import {
-  buttonStyles,
-  buttonWrapperStyles,
-  closeButtonStyles,
-  headerStyles,
-  headingStyles,
-  modalStyles,
-  wrapperStyles,
-} from './CellsModal.styles';
+  CellsModalActions,
+  CellsModalPrimaryButton,
+  CellsModalSecondaryButton,
+} from './CellsModalActions/CellsModalActions';
+import {CellsModalProvider} from './CellsModalContext/CellsModalContext';
+import {CellsModalHeader} from './CellsModalHeader/CellsModalHeader';
 
 interface CellsModalProps {
+  size?: 'small' | 'large';
   isOpen: boolean;
   onClose: () => void;
   children: ReactNode;
 }
 
-export const CellsModal = ({isOpen, onClose, children}: CellsModalProps) => {
+export const CellsModal = ({size = 'small', isOpen, onClose, children}: CellsModalProps) => {
   return (
     <ModalComponent
       isShown={isOpen}
       onClosed={onClose}
       onBgClick={onClose}
       onKeyDown={event => handleEscDown(event, onClose)}
-      wrapperCSS={modalStyles}
+      wrapperCSS={size === 'large' ? largeModalStyles : undefined}
     >
-      <div css={wrapperStyles}>{children}</div>
+      <CellsModalProvider onClose={onClose}>
+        <div css={wrapperStyles}>{children}</div>
+      </CellsModalProvider>
     </ModalComponent>
-  );
-};
-
-const CellsModalHeader = ({onClose}: {onClose: () => void}) => {
-  return (
-    <header css={headerStyles}>
-      <h3 css={headingStyles}>test </h3>
-
-      <IconButton
-        variant={IconButtonVariant.SECONDARY}
-        type="button"
-        css={closeButtonStyles}
-        onClick={onClose}
-        aria-label={'close'}
-      >
-        <CloseIcon />
-      </IconButton>
-    </header>
-  );
-};
-
-const CellsModalActions = ({children}: {children: ReactNode}) => {
-  return <div css={buttonWrapperStyles}>{children}</div>;
-};
-
-const CellsModalSecondaryButton = ({children, onClick}: {children: ReactNode; onClick: () => void}) => {
-  return (
-    <Button variant={ButtonVariant.SECONDARY} type="button" onClick={onClick} css={buttonStyles}>
-      {children}
-    </Button>
-  );
-};
-
-const CellsModalPrimaryButton = ({
-  children,
-  onClick,
-  isDisabled,
-}: {
-  children: ReactNode;
-  onClick: () => void;
-  isDisabled: boolean;
-}) => {
-  return (
-    <Button variant={ButtonVariant.PRIMARY} css={buttonStyles} disabled={isDisabled} onClick={onClick}>
-      {children}
-    </Button>
   );
 };
 

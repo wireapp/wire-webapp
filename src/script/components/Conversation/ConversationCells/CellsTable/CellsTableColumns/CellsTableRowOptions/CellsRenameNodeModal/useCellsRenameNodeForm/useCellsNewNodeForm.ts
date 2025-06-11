@@ -17,7 +17,7 @@
  *
  */
 
-import {ChangeEvent, FormEvent, useState} from 'react';
+import {ChangeEvent, FormEvent, MouseEvent, useState} from 'react';
 
 import {CellNode} from 'Components/Conversation/ConversationCells/common/cellNode/cellNode';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
@@ -50,8 +50,8 @@ export const useCellsRenameForm = ({node, cellsRepository, onSuccess}: UseCellsR
     }
   };
 
-  const handleSubmit = async (formEvent: FormEvent<HTMLFormElement>) => {
-    formEvent.preventDefault();
+  const handleRename = async (event: FormEvent<HTMLFormElement> | MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
 
     if (isSubmitting) {
       return;
@@ -73,7 +73,7 @@ export const useCellsRenameForm = ({node, cellsRepository, onSuccess}: UseCellsR
     }
   };
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleNameChange = (event: ChangeEvent<HTMLInputElement>) => {
     setName(event.currentTarget.value);
     if (error === t('cells.newItemMenuModalForm.nameRequired')) {
       setError(null);
@@ -84,7 +84,7 @@ export const useCellsRenameForm = ({node, cellsRepository, onSuccess}: UseCellsR
     name,
     error,
     isSubmitting,
-    handleSubmit,
-    handleChange,
+    handleRename,
+    handleNameChange,
   };
 };
