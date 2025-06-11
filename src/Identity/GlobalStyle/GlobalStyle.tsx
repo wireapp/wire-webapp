@@ -32,6 +32,7 @@ const getGlobalStyles: (theme: Theme) => CSSObject = (theme: Theme) => ({
   },
   body: {
     ...GlobalCssVariables.accentColors(),
+    ...GlobalCssVariables.zIndexes(),
     MozOsxFontSmoothing: 'grayscale',
     WebkitFontSmoothing: 'antialiased',
     background: theme.general.backgroundColor,
