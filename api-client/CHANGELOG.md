@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.59.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.58.0...@wireapp/api-client@27.59.0) (2025-06-11)
+
+### Features
+
+* handle 503 from get-domain-reg [WPB-17940] ([#7075](https://github.com/wireapp/wire-web-packages/issues/7075)) ([50ce558](https://github.com/wireapp/wire-web-packages/commit/50ce5584a7b452c53a20ca464cbd966af95c9c91))
+
 # [27.58.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.57.0...@wireapp/api-client@27.58.0) (2025-06-11)
 
 ### Features
