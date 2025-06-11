@@ -22,6 +22,7 @@ import {useEffect, useCallback, useState} from 'react';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {CellsRepository} from 'src/script/cells/CellsRepository';
+import {UserRepository} from 'src/script/user/UserRepository';
 
 import {transformDataToCellsNodes, transformToCellPagination} from './transformDataToCellsNodes';
 
@@ -30,10 +31,15 @@ import {useCellsStore} from '../common/useCellsStore/useCellsStore';
 
 interface UseGetAllCellsNodesProps {
   cellsRepository: CellsRepository;
+  userRepository: UserRepository;
   conversationQualifiedId: QualifiedId;
 }
 
-export const useGetAllCellsNodes = ({cellsRepository, conversationQualifiedId}: UseGetAllCellsNodesProps) => {
+export const useGetAllCellsNodes = ({
+  cellsRepository,
+  userRepository,
+  conversationQualifiedId,
+}: UseGetAllCellsNodesProps) => {
   const {setNodes, pageSize, setStatus, setPagination, setError, clearAll} = useCellsStore();
   const [offset, setOffset] = useState(0);
 
@@ -48,6 +54,15 @@ export const useGetAllCellsNodes = ({cellsRepository, conversationQualifiedId}: 
         limit: pageSize,
         offset,
       });
+
+      const users = await userRepository.getUsersById([
+        {
+          domain: 'staging.zinfra.io',
+          id: 'bc8bda7a-cc18-4d54-96d8-09e6dff6ee14',
+        },
+      ]);
+
+      console.log('users', users[0].previewPictureResource());
 
       if (!result.Nodes?.length) {
         setStatus('success');

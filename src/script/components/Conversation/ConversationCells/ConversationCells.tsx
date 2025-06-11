@@ -21,6 +21,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
 import {CellsRepository} from 'src/script/cells/CellsRepository';
+import {UserRepository} from 'src/script/user/UserRepository';
 import {t} from 'Util/LocalizerUtil';
 
 import {CellsHeader} from './CellsHeader/CellsHeader';
@@ -35,12 +36,14 @@ import {useGetAllCellsNodes} from './useGetAllCellsNodes/useGetAllCellsNodes';
 
 interface ConversationCellsProps {
   cellsRepository?: CellsRepository;
+  userRepository?: UserRepository;
   conversationQualifiedId: QualifiedId;
   conversationName: string;
 }
 
 export const ConversationCells = ({
   cellsRepository = container.resolve(CellsRepository),
+  userRepository = container.resolve(UserRepository),
   conversationQualifiedId,
   conversationName,
 }: ConversationCellsProps) => {
@@ -48,7 +51,7 @@ export const ConversationCells = ({
 
   const conversationId = conversationQualifiedId.id;
 
-  const {refresh, setOffset} = useGetAllCellsNodes({cellsRepository, conversationQualifiedId});
+  const {refresh, setOffset} = useGetAllCellsNodes({cellsRepository, userRepository, conversationQualifiedId});
 
   const nodes = getNodes({conversationId});
   const pagination = getPagination({conversationId});
