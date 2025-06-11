@@ -744,6 +744,124 @@ describe('CellsAPI', () => {
     });
   });
 
+  describe('renameNode', () => {
+    it('renames a node with the correct parameters', async () => {
+      const currentPath = '/folder/old-name.txt';
+      const newName = 'new-name.txt';
+      const mockResponse: RestPerformActionResponse = {
+        Nodes: [
+          {
+            Path: '/folder/new-name.txt',
+          },
+        ],
+      } as RestPerformActionResponse;
+
+      mockNodeServiceApi.performAction.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      const result = await cellsAPI.renameNode({currentPath, newName});
+
+      expect(mockNodeServiceApi.performAction).toHaveBeenCalledWith('move', {
+        Nodes: [{Path: currentPath}],
+        CopyMoveOptions: {TargetIsParent: false, TargetPath: '/folder/new-name.txt'},
+        AwaitStatus: 'Finished',
+        AwaitTimeout: '5000ms',
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('handles root level files', async () => {
+      const currentPath = '/file.txt';
+      const newName = 'renamed.txt';
+      const mockResponse: RestPerformActionResponse = {
+        Nodes: [
+          {
+            Path: '/renamed.txt',
+          },
+        ],
+      } as RestPerformActionResponse;
+
+      mockNodeServiceApi.performAction.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      const result = await cellsAPI.renameNode({currentPath, newName});
+
+      expect(mockNodeServiceApi.performAction).toHaveBeenCalledWith('move', {
+        Nodes: [{Path: currentPath}],
+        CopyMoveOptions: {TargetIsParent: false, TargetPath: '/renamed.txt'},
+        AwaitStatus: 'Finished',
+        AwaitTimeout: '5000ms',
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('handles files in nested directories', async () => {
+      const currentPath = '/folder/subfolder/file.txt';
+      const newName = 'renamed.txt';
+      const mockResponse: RestPerformActionResponse = {
+        Nodes: [
+          {
+            Path: '/folder/subfolder/renamed.txt',
+          },
+        ],
+      } as RestPerformActionResponse;
+
+      mockNodeServiceApi.performAction.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      const result = await cellsAPI.renameNode({currentPath, newName});
+
+      expect(mockNodeServiceApi.performAction).toHaveBeenCalledWith('move', {
+        Nodes: [{Path: currentPath}],
+        CopyMoveOptions: {TargetIsParent: false, TargetPath: '/folder/subfolder/renamed.txt'},
+        AwaitStatus: 'Finished',
+        AwaitTimeout: '5000ms',
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('propagates errors when rename operation fails', async () => {
+      const currentPath = '/folder/file.txt';
+      const newName = 'renamed.txt';
+      const errorMessage = 'Rename operation failed';
+
+      mockNodeServiceApi.performAction.mockRejectedValueOnce(new Error(errorMessage));
+
+      await expect(cellsAPI.renameNode({currentPath, newName})).rejects.toThrow(errorMessage);
+    });
+
+    it('handles empty current path', async () => {
+      const currentPath = '';
+      const newName = 'renamed.txt';
+      const errorMessage = 'Invalid path';
+
+      mockNodeServiceApi.performAction.mockRejectedValueOnce(new Error(errorMessage));
+
+      await expect(cellsAPI.renameNode({currentPath, newName})).rejects.toThrow(errorMessage);
+    });
+
+    it('handles empty new name', async () => {
+      const currentPath = '/folder/file.txt';
+      const newName = '';
+      const mockResponse: RestPerformActionResponse = {
+        Nodes: [
+          {
+            Path: '/folder/',
+          },
+        ],
+      } as RestPerformActionResponse;
+
+      mockNodeServiceApi.performAction.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      const result = await cellsAPI.renameNode({currentPath, newName});
+
+      expect(mockNodeServiceApi.performAction).toHaveBeenCalledWith('move', {
+        Nodes: [{Path: currentPath}],
+        CopyMoveOptions: {TargetIsParent: false, TargetPath: '/folder/'},
+        AwaitStatus: 'Finished',
+        AwaitTimeout: '5000ms',
+      });
+      expect(result).toEqual(mockResponse);
+    });
+  });
+
   describe('promoteNodeDraft', () => {
     it('promotes a file draft with the correct parameters', async () => {
       const uuid = 'file-uuid';
