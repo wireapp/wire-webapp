@@ -21,7 +21,8 @@ import {FC, useCallback, useRef, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {ReactionType} from '@wireapp/core/lib/conversation';
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+
+import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {DownloadButton} from 'Components/MessagesList/Message/ContentMessage/MessageActions/DownloadButton';
 import {useMessageActionsState} from 'Components/MessagesList/Message/ContentMessage/MessageActions/MessageActions.state';

@@ -33,7 +33,6 @@ import {
 } from './CellsTable.styles';
 import {getCellsTableColumns} from './CellsTableColumns/CellsTableColumns';
 import {CellsFilePreviewModalProvider} from './common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
-import {useTableHeight} from './useTableHeight/useTableHeight';
 
 import {CellNode} from '../common/cellNode/cellNode';
 
@@ -42,8 +41,7 @@ interface CellsTableProps {
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
   conversationName: string;
-  onDeleteNode: (uuid: string) => void;
-  onUpdateBodyHeight: (height: number) => void;
+  onRefresh: () => void;
 }
 
 export const CellsTable = ({
@@ -51,17 +49,11 @@ export const CellsTable = ({
   cellsRepository,
   conversationQualifiedId,
   conversationName,
-  onDeleteNode,
-  onUpdateBodyHeight,
+  onRefresh,
 }: CellsTableProps) => {
-  const {tableBodyRef} = useTableHeight({
-    nodes,
-    onUpdate: onUpdateBodyHeight,
-  });
-
   const table = useReactTable({
     data: nodes,
-    columns: getCellsTableColumns({cellsRepository, conversationQualifiedId, conversationName, onDeleteNode}),
+    columns: getCellsTableColumns({cellsRepository, conversationQualifiedId, conversationName, onRefresh}),
     getCoreRowModel: getCoreRowModel(),
   });
 
@@ -91,7 +83,7 @@ export const CellsTable = ({
             ))}
           </thead>
           {rows.length > 0 && (
-            <tbody ref={tableBodyRef}>
+            <tbody>
               {rows.map(row => (
                 <tr key={row.id} css={tableCellRow}>
                   {row.getVisibleCells().map(cell => (

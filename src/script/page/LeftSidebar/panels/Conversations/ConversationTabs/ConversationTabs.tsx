@@ -226,12 +226,12 @@ export const ConversationTabs = ({
             <div className="conversations-sidebar-divider" />
 
             <div className="conversations-sidebar-title" css={{marginBlock: '32px 0'}}>
-              {t('cellsSidebar.heading')}
+              {t('cells.sidebar.heading')}
             </div>
 
             <ConversationTab
-              title={t('cellsSidebar.title')}
-              label={t('cellsSidebar.title')}
+              title={t('cells.sidebar.title')}
+              label={t('cells.sidebar.title')}
               type={SidebarTabs.CELLS}
               Icon={<CollectionIcon />}
               onChangeTab={onChangeTab}
@@ -302,7 +302,7 @@ export const ConversationTabs = ({
           type="button"
           className="conversations-sidebar-btn"
           title={t('preferencesAboutSupport')}
-          data-uie-name="go-people"
+          data-uie-name="go-support"
         >
           <span className="conversations-sidebar-btn--text-wrapper">
             <SupportIcon viewBox="0 0 16 16" />

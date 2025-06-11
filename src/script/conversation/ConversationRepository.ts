@@ -153,7 +153,6 @@ import {isMemberMessage} from '../guards/Message';
 import * as LegalHoldEvaluator from '../legal-hold/LegalHoldEvaluator';
 import {MessageCategory} from '../message/MessageCategory';
 import {SystemMessageType} from '../message/SystemMessageType';
-import {addOtherSelfClientsToMLSConversation} from '../mls';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {SelfRepository} from '../self/SelfRepository';
 import {Core} from '../service/CoreSingleton';
@@ -3713,9 +3712,6 @@ export class ConversationRepository {
       }
     }
 
-    // Self user is a creator of the event
-    const isFromSelf = eventJson.from === this.userState.self().id;
-
     const containsSelfId = eventData.user_ids.includes(this.userState.self().id);
     const containsSelfQualifiedId = !!eventData.users?.some(
       ({qualified_id: qualifiedId}) => qualifiedId && matchQualifiedIds(qualifiedId, this.userState.self().qualifiedId),
@@ -3736,11 +3732,6 @@ export class ConversationRepository {
     const qualifiedUserIds =
       eventData.users?.map(user => user.qualified_id) || eventData.user_ids.map(userId => ({domain: '', id: userId}));
 
-    if (isMLSCapableConversation(conversationEntity)) {
-      const isSelfJoin = isFromSelf && selfUserJoins;
-      await this.handleMLSConversationMemberJoin(conversationEntity, isSelfJoin);
-    }
-
     return updateSequence
       .then(() => this.updateParticipatingUserEntities(conversationEntity, false, true))
       .then(() => this.addEventToConversation(conversationEntity, eventJson))
@@ -3748,42 +3739,6 @@ export class ConversationRepository {
         this.proteusVerificationStateHandler.onMemberJoined(conversationEntity, qualifiedUserIds);
         return {conversationEntity, messageEntity};
       });
-  }
-
-  /**
-   * Handles member join event on mls group - updating mls conversation state and adding other self clients if user has joined by itself.
-   *
-   * @param conversation Conversation member joined to
-   * @param isSelfJoin whether user has joined by itself, if so we need to add other self clients to mls group
-   */
-  private async handleMLSConversationMemberJoin(conversation: MLSCapableConversation, isSelfJoin: boolean) {
-    const {groupId} = conversation;
-
-    if (!groupId) {
-      throw new Error(`groupId not found for MLS conversation ${conversation.id}`);
-    }
-
-    const doesMLSGroupExistLocally = await this.conversationService.mlsGroupExistsLocally(groupId);
-
-    if (doesMLSGroupExistLocally) {
-      return;
-    }
-
-    if (isSelfJoin) {
-      // if user has joined and was also event creator (eg. joined via guest link) we need to add its other clients to mls group
-      // we also need to join the conversation with the current self client
-      try {
-        await this.core.service?.conversation.joinByExternalCommit(conversation.qualifiedId);
-        await addOtherSelfClientsToMLSConversation(
-          conversation,
-          this.userState.self().qualifiedId,
-          this.core.clientId,
-          this.core,
-        );
-      } catch (error) {
-        this.logger.warn(`Failed to add other self clients to MLS conversation: ${conversation.id}`, error);
-      }
-    }
   }
 
   /**

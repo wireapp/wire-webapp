@@ -2464,6 +2464,15 @@ export class CallingRepository {
 
     const [stream] = streams;
     if (stream.getVideoTracks().length > 0 && participant?.videoStream() !== stream) {
+      const call = this.findCall(conversationId);
+      if (call?.conversationType !== CONV_TYPE.ONEONONE) {
+        stream?.getVideoTracks().forEach(track => {
+          track.onended = () => {
+            participant?.videoState(VIDEO_STATE.RECONNECTING);
+            participant?.releaseVideoStream(true);
+          };
+        });
+      }
       participant?.videoStream(stream);
     }
   };

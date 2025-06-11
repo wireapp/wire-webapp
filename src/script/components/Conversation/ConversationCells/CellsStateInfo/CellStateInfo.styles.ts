@@ -24,9 +24,9 @@ export const wrapperStyles: CSSObject = {
   justifyContent: 'center',
   alignItems: 'center',
   flexDirection: 'column',
-  marginTop: '128px',
   width: '100%',
   height: '100%',
+  flex: 1,
 };
 
 export const headingStyles: CSSObject = {

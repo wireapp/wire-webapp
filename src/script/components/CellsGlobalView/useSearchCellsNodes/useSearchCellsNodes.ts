@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 
 import {useDebouncedCallback} from 'use-debounce';
 
@@ -36,22 +36,30 @@ const PAGE_SIZE_INCREMENT = 20;
 const DEBOUNCE_TIME = 300;
 
 export const useSearchCellsNodes = ({cellsRepository}: UseSearchCellsNodesProps) => {
-  const {setNodes, setStatus, setPagination, clearAll} = useCellsStore();
+  const {setNodes, setStatus, setPagination, clearAll, filters} = useCellsStore();
 
   const [searchValue, setSearchValue] = useState('');
-  const [pageSize, setPageSize] = useState<number>(PAGE_INITIAL_SIZE);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [pageSize, setPageSize] = useState(PAGE_INITIAL_SIZE);
+  const isInitialLoad = useRef(true);
+  const shouldPerformFullReload = useRef(true);
 
   const searchNodes = useCallback(
     async ({query, status, limit = pageSize}: {query: string; status: Status; limit?: number}) => {
       try {
         setStatus(status);
-        const result = await cellsRepository.searchNodes({query, limit});
+        const result = await cellsRepository.searchNodes({query, limit, tags: filters.tags});
         setNodes(transformCellsNodes(result.Nodes || []));
         if (result.Pagination) {
           setPagination(transformCellsPagination(result.Pagination));
         } else {
           setPagination(null);
         }
+
+        if (isInitialLoad.current) {
+          isInitialLoad.current = false;
+        }
+
         setStatus('success');
       } catch (error) {
         setStatus('error');
@@ -61,40 +69,52 @@ export const useSearchCellsNodes = ({cellsRepository}: UseSearchCellsNodesProps)
     },
     // cellsRepository is not a dependency because it's a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [pageSize, setNodes, setPagination, setStatus],
+    [pageSize, setNodes, setPagination, setStatus, filters],
   );
 
-  const searchNodesDebounced = useDebouncedCallback(searchNodes, DEBOUNCE_TIME);
+  const searchNodesDebounced = useDebouncedCallback(async (value: string) => {
+    shouldPerformFullReload.current = false;
+    setSearchQuery(value);
+    await searchNodes({query: value, status: 'loading'});
+    shouldPerformFullReload.current = true;
+  }, DEBOUNCE_TIME);
 
   const handleSearch = (value: string) => {
+    if (!value) {
+      void handleClearSearch();
+      return;
+    }
     setPageSize(PAGE_INITIAL_SIZE);
     setSearchValue(value);
-    void searchNodesDebounced({query: value, status: 'loading'});
+    void searchNodesDebounced(value);
   };
 
   const handleClearSearch = async () => {
     setPageSize(PAGE_INITIAL_SIZE);
     setSearchValue('');
+    setSearchQuery('');
     await searchNodes({query: '*', status: 'loading'});
   };
 
   const handleReload = async () => {
     setStatus('loading');
     clearAll();
-    await searchNodes({query: searchValue || '*', status: 'loading'});
+    await searchNodes({query: searchQuery || '*', status: 'loading'});
   };
 
   const increasePageSize = useCallback(async () => {
+    shouldPerformFullReload.current = false;
     setStatus('fetchingMore');
     setPageSize(pageSize + PAGE_SIZE_INCREMENT);
-    await searchNodes({query: searchValue || '*', status: 'fetchingMore', limit: pageSize + PAGE_SIZE_INCREMENT});
-  }, [pageSize, searchNodes, searchValue, setStatus]);
+    await searchNodes({query: searchQuery || '*', status: 'fetchingMore', limit: pageSize + PAGE_SIZE_INCREMENT});
+    shouldPerformFullReload.current = true;
+  }, [pageSize, searchNodes, searchQuery, setStatus]);
 
   useEffect(() => {
-    setStatus('loading');
-    void searchNodes({query: '*', status: 'loading'});
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (isInitialLoad.current || shouldPerformFullReload.current) {
+      void searchNodes({query: searchQuery || '*', status: 'loading'});
+    }
+  }, [searchNodes, searchQuery]);
 
   return {
     searchValue,

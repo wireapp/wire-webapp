@@ -76,31 +76,24 @@ export const CellsGlobalView = ({cellsRepository = container.resolve(CellsReposi
         onClearSearch={handleClearSearch}
         onRefresh={handleRefresh}
         searchStatus={nodesStatus}
+        cellsRepository={cellsRepository}
       />
       {emptySearchResults && (
         <CellsStateInfo
-          heading={t('cellsGlobalView.emptySearchResultsHeading')}
-          description={t('cellsGlobalView.emptySearchResultsDescription')}
+          heading={t('cells.emptySearchResults.heading')}
+          description={t('cells.emptySearchResults.description')}
         />
       )}
       {showTable && <CellsTable nodes={nodes} cellsRepository={cellsRepository} />}
       {showNoFiles && (
-        <CellsStateInfo
-          heading={t('cellsGlobalView.noFilesHeading')}
-          description={t('cellsGlobalView.noFilesDescription')}
-        />
+        <CellsStateInfo heading={t('cells.noNodes.heading')} description={t('cells.noNodes.description')} />
       )}
       {showLoader && <CellsLoader />}
-      {isError && (
-        <CellsStateInfo
-          heading={t('cellsGlobalView.errorHeading')}
-          description={t('cellsGlobalView.errorDescription')}
-        />
-      )}
+      {isError && <CellsStateInfo heading={t('cells.error.heading')} description={t('cells.error.description')} />}
       {showLoadMore && (
         <div css={loadMoreWrapperStyles}>
           <Button variant={ButtonVariant.TERTIARY} onClick={increasePageSize}>
-            {t('cellsGlobalView.pagination.loadMoreResults')}
+            {t('cells.pagination.loadMoreResults')}
           </Button>
         </div>
       )}

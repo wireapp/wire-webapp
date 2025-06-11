@@ -19,12 +19,11 @@
 
 import React, {useMemo, useEffect, useCallback, useRef} from 'react';
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {IconButton, IconButtonVariant, QUERY, useMatchMedia, CallIcon} from '@wireapp/react-ui-kit';
+import {TabIndex, IconButton, IconButtonVariant, QUERY, useMatchMedia, CallIcon} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ConversationVerificationBadges} from 'Components/Badge';

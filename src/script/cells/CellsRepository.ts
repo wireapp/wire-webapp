@@ -105,8 +105,8 @@ export class CellsRepository {
     return this.apiClient.api.cells.deleteNodeDraft({uuid, versionId});
   }
 
-  async deleteNode({uuid}: {uuid: string}) {
-    return this.apiClient.api.cells.deleteNode({uuid});
+  async deleteNode({uuid, permanently = false}: {uuid: string; permanently?: boolean}) {
+    return this.apiClient.api.cells.deleteNode({uuid, permanently});
   }
 
   async moveNode({currentPath, targetPath}: {currentPath: string; targetPath: string}) {
@@ -168,16 +168,29 @@ export class CellsRepository {
     return this.apiClient.api.cells.deleteNodePublicLink({uuid});
   }
 
-  async searchNodes({query, limit = DEFAULT_MAX_FILES_LIMIT}: {query: string; limit?: number}) {
+  async searchNodes({query, limit = DEFAULT_MAX_FILES_LIMIT, tags}: {query: string; limit?: number; tags?: string[]}) {
     return this.apiClient.api.cells.searchNodes({
       phrase: query,
       limit,
       sortBy: SEARCH_DEFAULT_SORT_FIELD,
       sortDirection: SEARCH_DEFAULT_SORT_DIR,
+      tags,
     });
   }
 
   async promoteNodeDraft({uuid, versionId}: {uuid: string; versionId: string}) {
     return this.apiClient.api.cells.promoteNodeDraft({uuid, versionId});
+  }
+
+  async restoreNode({uuid}: {uuid: string}) {
+    return this.apiClient.api.cells.restoreNode({uuid});
+  }
+
+  async getAllTags() {
+    return this.apiClient.api.cells.getAllTags();
+  }
+
+  async setNodeTags({uuid, tags}: {uuid: string; tags: string[]}) {
+    return this.apiClient.api.cells.setNodeTags({uuid, tags});
   }
 }

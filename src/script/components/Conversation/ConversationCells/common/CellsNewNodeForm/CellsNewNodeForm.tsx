@@ -17,6 +17,8 @@
  *
  */
 
+import {useEffect, useRef} from 'react';
+
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {Button, ButtonVariant, ErrorMessage, Input, Label} from '@wireapp/react-ui-kit';
@@ -46,6 +48,8 @@ export const CellsNewNodeForm = ({
   onSecondaryButtonClick,
   currentPath,
 }: CellsNewNodeFormProps) => {
+  const inputRef = useRef<HTMLInputElement>(null);
+
   const {name, error, isSubmitting, handleSubmit, handleChange} = useCellsNewItemForm({
     type,
     cellsRepository,
@@ -54,26 +58,33 @@ export const CellsNewNodeForm = ({
     currentPath,
   });
 
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
   return (
     <form onSubmit={handleSubmit}>
       <div css={inputWrapperStyles}>
-        <Label htmlFor="cells-new-item-name">{t('cellNewItemMenuModal.label')}</Label>
+        <Label htmlFor="cells-new-item-name">{t('cells.newItemMenuModal.label')}</Label>
         <Input
           id="cells-new-item-name"
           value={name}
+          ref={inputRef}
           placeholder={
-            type === 'folder' ? t('cellNewItemMenuModal.placeholderFolder') : t('cellNewItemMenuModal.placeholderFile')
+            type === 'folder'
+              ? t('cells.newItemMenuModal.placeholderFolder')
+              : t('cells.newItemMenuModal.placeholderFile')
           }
           onChange={handleChange}
           error={error ? <ErrorMessage>{error}</ErrorMessage> : undefined}
         />
       </div>
       <div css={buttonWrapperStyles}>
-        <Button variant={ButtonVariant.SECONDARY} onClick={onSecondaryButtonClick} css={buttonStyles}>
-          {t('cellNewItemMenuModal.secondaryAction')}
+        <Button variant={ButtonVariant.SECONDARY} type="button" onClick={onSecondaryButtonClick} css={buttonStyles}>
+          {t('cells.newItemMenuModal.secondaryAction')}
         </Button>
         <Button variant={ButtonVariant.PRIMARY} type="submit" css={buttonStyles} disabled={isSubmitting}>
-          {t('cellNewItemMenuModal.primaryAction')}
+          {t('cells.newItemMenuModal.primaryAction')}
         </Button>
       </div>
     </form>

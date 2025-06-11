@@ -27,6 +27,7 @@ import {CellsTableDateColumn} from './CellsTableDateColumn/CellsTableDateColumn'
 import {CellsTableNameColumn} from './CellsTableNameColumn/CellsTableNameColumn';
 import {CellsTableRowOptions} from './CellsTableRowOptions/CellsTableRowOptions';
 import {CellsTableSharedColumn} from './CellsTableSharedColumn/CellsTableSharedColumn';
+import {CellsTableTagsColumn} from './CellsTableTagsColumn/CellsTableTagsColumn';
 
 import {CellNode} from '../../common/cellNode/cellNode';
 
@@ -34,36 +35,41 @@ const columnHelper = createColumnHelper<CellNode>();
 
 export const getCellsTableColumns = ({cellsRepository}: {cellsRepository: CellsRepository}) => [
   columnHelper.accessor('name', {
-    header: t('cellsGlobalView.tableRowName'),
+    header: t('cells.tableRow.name'),
     cell: info => <CellsTableNameColumn node={info.row.original} />,
   }),
   columnHelper.accessor('conversationName', {
-    header: t('cellsGlobalView.tableRowConversationName'),
+    header: t('cells.tableRow.conversationName'),
     cell: info => <span css={textWithEllipsisStyles}>{info.getValue()}</span>,
     size: 190,
   }),
   columnHelper.accessor('owner', {
-    header: t('cellsGlobalView.tableRowOwner'),
+    header: t('cells.tableRow.owner'),
     cell: info => <span css={textWithEllipsisStyles}>{info.getValue()}</span>,
     size: 175,
   }),
+  columnHelper.accessor('tags', {
+    header: t('cells.tableRow.tags'),
+    cell: info => <CellsTableTagsColumn tags={info.getValue()} />,
+    size: 120,
+  }),
   columnHelper.accessor('sizeMb', {
-    header: t('cellsGlobalView.tableRowSize'),
+    header: t('cells.tableRow.size'),
     cell: info => info.getValue(),
     size: 100,
   }),
   columnHelper.accessor('uploadedAtTimestamp', {
-    header: t('cellsGlobalView.tableRowCreated'),
+    header: t('cells.tableRow.created'),
     cell: info => <CellsTableDateColumn timestamp={info.getValue()} />,
     size: 125,
   }),
   columnHelper.accessor('publicLink', {
-    header: t('cellsGlobalView.tableRowPublicLink'),
+    header: t('cells.tableRow.publicLink'),
     cell: info => <CellsTableSharedColumn isShared={!!info.getValue()?.alreadyShared} />,
     size: 60,
   }),
   columnHelper.accessor('id', {
-    header: () => <span className="visually-hidden">{t('cellsGlobalView.tableRowActions')}</span>,
+    header: () => <span className="visually-hidden">{t('cells.tableRow.actions')}</span>,
     size: 40,
     cell: info => <CellsTableRowOptions node={info.row.original} cellsRepository={cellsRepository} />,
   }),

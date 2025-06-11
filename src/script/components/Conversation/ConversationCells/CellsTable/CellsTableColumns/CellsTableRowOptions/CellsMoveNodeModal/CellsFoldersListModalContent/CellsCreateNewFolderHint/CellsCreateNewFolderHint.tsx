@@ -30,10 +30,10 @@ interface CellsCreateNewFolderHintProps {
 export const CellsCreateNewFolderHint = ({onCreate}: CellsCreateNewFolderHintProps) => {
   return (
     <div css={wrapperStyles}>
-      <p css={textStyles}>{t('cellsMoveNodeModal.createFolderHintText')}</p>
+      <p css={textStyles}>{t('cells.moveNodeModal.createFolder.hintText')}</p>
       <Button variant={ButtonVariant.TERTIARY} type="submit" css={buttonStyles} onClick={onCreate}>
         <PlusIcon css={iconStyles} />
-        {t('cellsMoveNodeModal.createFolderHintButton')}
+        {t('cells.moveNodeModal.createFolder.hintButton')}
       </Button>
     </div>
   );

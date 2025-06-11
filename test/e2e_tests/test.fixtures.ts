@@ -17,28 +17,20 @@
  *
  */
 
-import {useCallback, useState} from 'react';
+import {test as baseTest} from '@playwright/test';
 
-import {CellNode} from '../common/cellNode/cellNode';
+import {Backend} from './backend/backend';
 
-interface UseCellsLoaderSizeProps {
-  nodes: CellNode[];
-}
-
-export const useCellsLoaderSize = ({nodes}: UseCellsLoaderSizeProps) => {
-  const [loaderHeight, setLoaderHeight] = useState<number | undefined>(() => {
-    if (nodes) {
-      return undefined;
-    }
-    return 0;
-  });
-
-  const updateHeight = useCallback((height: number) => {
-    setLoaderHeight(height);
-  }, []);
-
-  return {
-    loaderHeight,
-    updateHeight,
-  };
+// Define custom test type with axios fixture
+type Fixtures = {
+  api: Backend;
 };
+
+export const test = baseTest.extend<Fixtures>({
+  api: async ({request}, use) => {
+    // Create a new instance of Backend for each test
+    await use(new Backend());
+  },
+});
+
+export {expect} from '@playwright/test';

@@ -17,26 +17,16 @@
  *
  */
 
-import {useRef, useEffect} from 'react';
+import {BadgesWithTooltip} from '@wireapp/react-ui-kit';
 
-import {CellNode} from '../../common/cellNode/cellNode';
-
-interface UseTableHeightProps {
-  onUpdate: (height: number) => void;
-  nodes: CellNode[];
+interface CellsTableTagsColumnProps {
+  tags: string[];
 }
 
-export const useTableHeight = ({onUpdate, nodes}: UseTableHeightProps) => {
-  const tableBodyRef = useRef<HTMLTableSectionElement>(null);
+export const CellsTableTagsColumn = ({tags}: CellsTableTagsColumnProps) => {
+  if (tags.length === 0) {
+    return null;
+  }
 
-  useEffect(() => {
-    const updateHeight = () => {
-      if (tableBodyRef.current && onUpdate) {
-        onUpdate(tableBodyRef.current.clientHeight);
-      }
-    };
-    updateHeight();
-  }, [onUpdate, nodes]);
-
-  return {tableBodyRef};
+  return <BadgesWithTooltip items={tags} />;
 };
