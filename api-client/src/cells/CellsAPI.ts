@@ -223,6 +223,24 @@ export class CellsAPI {
     return result.data;
   }
 
+  async renameNode({currentPath, newName}: {currentPath: string; newName: string}): Promise<RestPerformActionResponse> {
+    if (!this.client || !this.storageService) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    const basePath = currentPath.split('/').slice(0, -1).join('/');
+    const newPath = `${basePath}/${newName}`;
+
+    const result = await this.client.performAction('move', {
+      Nodes: [{Path: currentPath}],
+      CopyMoveOptions: {TargetIsParent: false, TargetPath: newPath},
+      AwaitStatus: 'Finished',
+      AwaitTimeout: '5000ms',
+    });
+
+    return result.data;
+  }
+
   async lookupNodeByPath({path}: {path: string}): Promise<RestNode | undefined> {
     if (!this.client || !this.storageService) {
       throw new Error(CONFIGURATION_ERROR);
