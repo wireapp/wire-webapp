@@ -19,7 +19,7 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const modalStyles: CSSObject = {
+export const largeModalStyles: CSSObject = {
   width: '508px',
 };
 
