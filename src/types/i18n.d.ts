@@ -408,6 +408,7 @@ declare module 'I18n/en-US.json' {
     'cells.imageFullScreenModal.closeButton': `Close`;
     'cells.noNodes.description': `You\'ll find all files and folders shared in this conversation here.`;
     'cells.noNodes.heading': `There are no files or folders yet`;
+    'cells.modal.closeButton': `Close`;
     'cells.options.delete': `Delete`;
     'cells.options.deletePermanently': `Delete permanently`;
     'cells.options.download': `Download`;
