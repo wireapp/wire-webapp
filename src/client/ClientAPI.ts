@@ -46,7 +46,7 @@ export enum MLSPublicKeyAlgorithmKeys {
 }
 export type MLSPublicKeyRecord = Partial<Record<MLSPublicKeyAlgorithmKeys, string>>;
 
-type GetMLSPublicKeysResponseData = {
+export type GetMLSPublicKeysResponseData = {
   removal: MLSPublicKeyRecord;
 };
 
@@ -259,14 +259,27 @@ export class ClientAPI {
    * In the future this may be used for other purposes as well.
    * @see https://staging-nginz-https.zinfra.io/api/swagger-ui/#/default/get_mls_public_keys
    */
+  private publicKeys: GetMLSPublicKeysResponseData | null = null;
+  private publicKeysFetchedAt: number | null = null;
+  private readonly CACHE_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
   public async getPublicKeys(): Promise<GetMLSPublicKeysResponseData> {
-    const config: AxiosRequestConfig = {
-      method: 'GET',
-      url: `/${ClientAPI.URL.MLS_CLIENTS}/${ClientAPI.URL.PUBLIC_KEYS}`,
-    };
+    const now = Date.now();
+    if (
+      this.publicKeys === null ||
+      this.publicKeysFetchedAt === null ||
+      now - this.publicKeysFetchedAt > this.CACHE_DURATION_MS
+    ) {
+      const config: AxiosRequestConfig = {
+        method: 'GET',
+        url: `/${ClientAPI.URL.MLS_CLIENTS}/${ClientAPI.URL.PUBLIC_KEYS}`,
+      };
 
-    const response = await this.client.sendJSON<GetMLSPublicKeysResponseData>(config, true);
-    return response.data;
+      const response = await this.client.sendJSON<GetMLSPublicKeysResponseData>(config, true);
+      this.publicKeys = response.data;
+      this.publicKeysFetchedAt = now;
+    }
+
+    return this.publicKeys;
   }
 
   public async getNonce(clientId: string): Promise<string> {
