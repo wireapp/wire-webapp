@@ -63,7 +63,7 @@ describe('useDatePassed', () => {
     expect(callback).toHaveBeenCalledTimes(1);
   });
 
-  it('does not call onPassed when hook is disabled', () => {
+  it('does not call callback when hook is disabled', () => {
     const callback = jest.fn();
     const target = new Date(baseDate.getTime() + 1000);
 
