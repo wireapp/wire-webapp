@@ -63,7 +63,11 @@ export const CellsRenameNodeModal = ({
         <CellsModal.SecondaryButton onClick={onClose}>
           {t('cells.renameNodeModal.cancelButton')}
         </CellsModal.SecondaryButton>
-        <CellsModal.PrimaryButton onClick={handleRename} isDisabled={isSubmitting || name === node.name}>
+        <CellsModal.PrimaryButton
+          onClick={handleRename}
+          isDisabled={isSubmitting || name === node.name}
+          isLoading={isSubmitting}
+        >
           {t('cells.renameNodeModal.saveButton')}
         </CellsModal.PrimaryButton>
       </CellsModal.Actions>
