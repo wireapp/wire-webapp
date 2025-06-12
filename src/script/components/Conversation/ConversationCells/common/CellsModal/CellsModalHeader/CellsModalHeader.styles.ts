@@ -24,8 +24,7 @@ export const headerStyles: CSSObject = {
   justifyContent: 'space-between',
   alignItems: 'center',
   flexDirection: 'column',
-  marginTop: '16px',
-  marginBottom: '24px',
+  margin: '16px 0',
 };
 
 export const headingStyles: CSSObject = {
