@@ -33,7 +33,7 @@ describe('useDatePassed', () => {
     jest.useRealTimers();
   });
 
-  it('does not call callback when target date is in the future', () => {
+  it('does not call the callback when target date is in the future', () => {
     const callback = jest.fn();
     const target = new Date(baseDate.getTime() + 2000);
 
@@ -43,7 +43,7 @@ describe('useDatePassed', () => {
     expect(callback).not.toHaveBeenCalled();
   });
 
-  it('calls callback when target date has passed', () => {
+  it('calls the callback when target date has passed', () => {
     const callback = jest.fn();
     const target = new Date(baseDate.getTime() + 1000);
 
@@ -53,7 +53,7 @@ describe('useDatePassed', () => {
     expect(callback).toHaveBeenCalledTimes(1);
   });
 
-  it('calls callback when dates are equal', () => {
+  it('calls the callback when dates are equal', () => {
     const callback = jest.fn();
     const target = new Date(baseDate);
 
@@ -63,7 +63,7 @@ describe('useDatePassed', () => {
     expect(callback).toHaveBeenCalledTimes(1);
   });
 
-  it('does not call callback when hook is disabled', () => {
+  it('does not call the callback when hook is disabled', () => {
     const callback = jest.fn();
     const target = new Date(baseDate.getTime() + 1000);
 
@@ -81,7 +81,7 @@ describe('useDatePassed', () => {
     expect(callback).toHaveBeenCalledTimes(1);
   });
 
-  it('resets and works again when target changes after date has passed', () => {
+  it('resets and works again when the target changes after the date has passed', () => {
     const callback = jest.fn();
     const target = new Date(baseDate.getTime() + 1000);
 
