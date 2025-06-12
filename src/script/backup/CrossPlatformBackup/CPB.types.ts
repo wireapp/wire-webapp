@@ -49,6 +49,6 @@ export type ImageAsset = commonAsset & {
 export type FileAsset = commonAsset;
 export type AudioAsset = commonAsset;
 export type VideoAsset = commonAsset;
-export type TexttAsset = commonAsset;
+export type TextAsset = commonAsset;
 export type UndefinedAsset = commonAsset;
 export type OtherAsset = commonAsset;

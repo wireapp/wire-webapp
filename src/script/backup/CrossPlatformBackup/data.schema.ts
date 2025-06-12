@@ -24,44 +24,16 @@ export const QualifiedIdSchema = zod.object({
   id: zod.string(),
 });
 
-// For now we just check for the data we urgently need for the backup
 export const ConversationTableEntrySchema = QualifiedIdSchema.extend({
   name: zod.string().nullable().optional(),
-  // accessModes: zod.array(zod.string()).optional(),
-  // accessRole: zod.array(zod.any()).optional(),
-  // accessRoleV2: zod.string().optional(),
-  // archived_state: zod.boolean(),
-  // archived_timestamp: zod.number(),
-  // cipher_suite: zod.number().optional(),
-  // creator: zod.string(),
-  // group_id: zod.string().optional(),
-  // last_event_timestamp: zod.number(),
-  // last_server_timestamp: zod.number(),
-  // message_timer: zod.string().nullable().optional(),
-  // muted_state: zod.number().nullable(),
-  // muted_timestamp: zod.number(),
-  // others: zod.array(zod.any()),
-  // protocol: zod.string(),
-  // receipt_mode: zod.number().nullable(),
-  // roles: zod.object({}).passthrough(),
-  // status: zod.number(),
-  // team_id: zod.string().nullable().optional(),
-  // type: zod.number(),
 });
 export type ConversationTableEntry = zod.infer<typeof ConversationTableEntrySchema>;
 
-// For now we just check for the data we urgently need for the backup
 export const UserTableEntrySchema = zod.object({
   handle: zod.string().optional(),
   id: zod.string(),
   name: zod.string().optional(),
   qualified_id: QualifiedIdSchema.optional(),
-  // accent_id: zod.number().optional(),
-  // assets: zod.array(zod.any()).optional(),
-  // legalhold_status: zod.string().optional(),
-  // picture: zod.array(zod.any()).optional(),
-  // supported_protocols: zod.array(zod.string()).optional(),
-  // team: zod.string().optional(),
 });
 export type UserTableEntry = zod.infer<typeof UserTableEntrySchema>;
 
@@ -98,9 +70,6 @@ export const AssetContentSchema = zod.object({
   otr_key: zod.record(zod.string(), zod.number()),
   sha256: zod.record(zod.string(), zod.number()),
   token: zod.string().optional(),
-  // expects_read_confirmation: zod.boolean(),
-  // status: zod.string().optional(),
-  // legal_hold_status: zod.number(),
 });
 
 export const LocationContentSchema = zod.object({

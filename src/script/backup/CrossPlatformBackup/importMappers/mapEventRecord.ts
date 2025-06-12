@@ -85,12 +85,6 @@ const mapTextMessageToEventRecord = (message: TextBackupMessage): EventRecord =>
   ...mapCommonMessageFields(message),
   data: {
     content: isTextContent(message.content) ? message.content.text : '',
-    /*
-    mentions: [],
-    previews: [],
-    expects_read_confirmation: true,
-    legal_hold_status: 1,
-    */
   },
   // there is a type mismatch here, but it is not relevant for the import
   type: ClientEvent.CONVERSATION.MESSAGE_ADD as any,
