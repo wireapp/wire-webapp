@@ -55,7 +55,7 @@ export const useDatePassed = ({target, callback, enabled = true}: UseDatePassedP
       if (intervalId.current) {
         clearInterval(intervalId.current);
       }
-      return;
+      return undefined;
     }
 
     const newTargetTime = target.getTime();
@@ -74,7 +74,7 @@ export const useDatePassed = ({target, callback, enabled = true}: UseDatePassedP
     if (currentTime >= newTargetTime) {
       hasPassed.current = true;
       callback();
-      return;
+      return undefined;
     }
 
     intervalId.current = setInterval(checkTime, TIME_IN_MILLIS.SECOND);
