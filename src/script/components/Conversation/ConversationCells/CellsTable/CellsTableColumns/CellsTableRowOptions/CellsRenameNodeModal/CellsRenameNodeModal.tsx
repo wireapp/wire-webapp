@@ -49,8 +49,8 @@ export const CellsRenameNodeModal = ({
   });
 
   return (
-    <CellsModal isOpen={isOpen} onClose={onClose}>
-      <CellsModal.Header />
+    <CellsModal isOpen={isOpen} onClose={onClose} size="large">
+      <CellsModal.Header>Rename</CellsModal.Header>
       <CellsRenameForm
         isOpen={isOpen}
         onSubmit={handleRename}
