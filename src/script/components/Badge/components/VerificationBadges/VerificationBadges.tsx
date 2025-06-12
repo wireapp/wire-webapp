@@ -22,10 +22,10 @@ import {CSSProperties, useEffect, useMemo, useRef, useState} from 'react';
 import {CSSObject} from '@emotion/react';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {container} from 'tsyringe';
 
 import {
+  TabIndex,
   CertificateExpiredIcon,
   CertificateRevoked,
   ExpiresSoon,

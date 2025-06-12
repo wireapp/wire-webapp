@@ -19,8 +19,9 @@
 
 import {FC, useEffect, useRef} from 'react';
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
+
+import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {DraggableClickWrapper} from 'Components/DraggableClickWrapper';
 import * as Icon from 'Components/Icon';

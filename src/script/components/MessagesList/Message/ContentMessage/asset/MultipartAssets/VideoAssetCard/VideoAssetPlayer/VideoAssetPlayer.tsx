@@ -17,7 +17,7 @@
  *
  */
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {useInView} from 'src/script/hooks/useInView/useInView';
 import {useEffectRef} from 'Util/useEffectRef';

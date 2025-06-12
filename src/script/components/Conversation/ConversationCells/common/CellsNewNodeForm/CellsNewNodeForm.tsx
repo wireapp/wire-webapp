@@ -17,75 +17,47 @@
  *
  */
 
-import {useEffect, useRef} from 'react';
+import {ChangeEvent, FormEvent, useEffect, useRef} from 'react';
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {ErrorMessage, Input, Label} from '@wireapp/react-ui-kit';
 
-import {Button, ButtonVariant, ErrorMessage, Input, Label} from '@wireapp/react-ui-kit';
-
-import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
 
-import {buttonStyles, buttonWrapperStyles, inputWrapperStyles} from './CellsNewNodeForm.styles';
-import {useCellsNewItemForm} from './useCellsNewNodeForm';
+import {inputWrapperStyles} from './CellsNewNodeForm.styles';
 
 import {CellNode} from '../cellNode/cellNode';
 
 interface CellsNewNodeFormProps {
   type: CellNode['type'];
-  cellsRepository: CellsRepository;
-  conversationQualifiedId: QualifiedId;
-  onSuccess: () => void;
-  onSecondaryButtonClick: () => void;
-  currentPath: string;
+  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+  inputValue: string;
+  onChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  error: string | null;
 }
 
-export const CellsNewNodeForm = ({
-  type,
-  cellsRepository,
-  conversationQualifiedId,
-  onSuccess,
-  onSecondaryButtonClick,
-  currentPath,
-}: CellsNewNodeFormProps) => {
+export const CellsNewNodeForm = ({type, onSubmit, inputValue, onChange, error}: CellsNewNodeFormProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
-
-  const {name, error, isSubmitting, handleSubmit, handleChange} = useCellsNewItemForm({
-    type,
-    cellsRepository,
-    conversationQualifiedId,
-    onSuccess,
-    currentPath,
-  });
 
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={onSubmit}>
       <div css={inputWrapperStyles}>
         <Label htmlFor="cells-new-item-name">{t('cells.newItemMenuModal.label')}</Label>
         <Input
           id="cells-new-item-name"
-          value={name}
+          value={inputValue}
           ref={inputRef}
           placeholder={
             type === 'folder'
               ? t('cells.newItemMenuModal.placeholderFolder')
               : t('cells.newItemMenuModal.placeholderFile')
           }
-          onChange={handleChange}
+          onChange={onChange}
           error={error ? <ErrorMessage>{error}</ErrorMessage> : undefined}
         />
-      </div>
-      <div css={buttonWrapperStyles}>
-        <Button variant={ButtonVariant.SECONDARY} type="button" onClick={onSecondaryButtonClick} css={buttonStyles}>
-          {t('cells.newItemMenuModal.secondaryAction')}
-        </Button>
-        <Button variant={ButtonVariant.PRIMARY} type="submit" css={buttonStyles} disabled={isSubmitting}>
-          {t('cells.newItemMenuModal.primaryAction')}
-        </Button>
       </div>
     </form>
   );

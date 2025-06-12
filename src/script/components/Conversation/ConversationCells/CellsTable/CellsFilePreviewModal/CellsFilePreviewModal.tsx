@@ -31,7 +31,7 @@ export const CellsFilePreviewModal = () => {
     return null;
   }
 
-  const {url, extension, name, owner, uploadedAtTimestamp, previewPdfUrl, previewImageUrl} = selectedFile;
+  const {url, extension, name, owner, uploadedAtTimestamp, previewPdfUrl, previewImageUrl, tags} = selectedFile;
 
   const getFileUrl = () => {
     const type = getFileTypeFromExtension(extension);
@@ -58,6 +58,7 @@ export const CellsFilePreviewModal = () => {
       status={!getFileUrl() ? 'unavailable' : 'success'}
       senderName={owner}
       timestamp={uploadedAtTimestamp}
+      badges={tags}
     />
   );
 };

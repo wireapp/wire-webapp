@@ -17,14 +17,16 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {BadgesWithTooltip} from '@wireapp/react-ui-kit';
 
-export const modalStyles: CSSObject = {
-  width: '508px',
-};
+interface CellsTableTagsColumnProps {
+  tags: string[];
+}
 
-export const wrapperStyles: CSSObject = {
-  padding: '8px',
-  width: '100%',
-  position: 'relative',
+export const CellsTableTagsColumn = ({tags}: CellsTableTagsColumnProps) => {
+  if (tags.length === 0) {
+    return null;
+  }
+
+  return <BadgesWithTooltip items={tags} />;
 };

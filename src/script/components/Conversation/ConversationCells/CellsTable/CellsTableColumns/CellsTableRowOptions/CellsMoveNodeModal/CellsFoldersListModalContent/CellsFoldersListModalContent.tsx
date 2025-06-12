@@ -17,71 +17,37 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-
-import {CellNode} from 'Components/Conversation/ConversationCells/common/cellNode/cellNode';
 import {CellsBreadcrumbs} from 'Components/Conversation/ConversationCells/common/CellsBreadcrumbs/CellsBreadcrumbs';
 import {getBreadcrumbsFromPath} from 'Components/Conversation/ConversationCells/common/getBreadcrumbsFromPath/getBreadcrumbsFromPath';
-import {getCellsApiPath} from 'Components/Conversation/ConversationCells/common/getCellsApiPath/getCellsApiPath';
-import {openBreadcrumb} from 'Components/Conversation/ConversationCells/common/openBreadcrumb/openBreadcrumb';
-import {CellsRepository} from 'src/script/cells/CellsRepository';
 
 import {CellsCreateNewFolderHint} from './CellsCreateNewFolderHint/CellsCreateNewFolderHint';
 import {CellsFolderList} from './CellsFolderList/CellsFolderList';
 import {CellsFolderListEmpty} from './CellsFolderListEmpty/CellsFolderListEmpty';
 import {CellsFolderListLoading} from './CellsFolderListLoading/CellsFolderListLoading';
 import {breadcrumbsWrapperStyles, listWrapperStyles} from './CellsFoldersListModalContent.styles';
-import {CellsMoveActions} from './CellsMoveActions/CellsMoveActions';
-import {useMoveCellsNode} from './useMoveCellNode/useMoveCellsNode';
 
 interface CellsFoldersListModalContentProps {
-  nodeToMove: CellNode;
   items: Array<{id: string; name: string; path: string}>;
   status: 'idle' | 'loading' | 'success' | 'error';
   shouldShowLoadingSpinner: boolean;
-  conversationQualifiedId: QualifiedId;
   conversationName: string;
-  cellsRepository: CellsRepository;
   currentPath: string;
   onPathChange: (path: string) => void;
   onChangeModalContent: (content: 'move' | 'create') => void;
-  onClose: () => void;
 }
 
 export const CellsFoldersListModalContent = ({
-  nodeToMove,
   items,
   status,
   shouldShowLoadingSpinner,
-  conversationQualifiedId,
   conversationName,
-  cellsRepository,
   currentPath,
   onPathChange,
   onChangeModalContent,
-  onClose,
 }: CellsFoldersListModalContentProps) => {
-  const {moveNode, status: moveNodeStatus} = useMoveCellsNode({cellsRepository});
-
   const breadcrumbs = getBreadcrumbsFromPath({baseCrumb: `${conversationName} files`, currentPath});
 
-  const nodeToMoveParent = nodeToMove.path.split('/').slice(0, -1).join('/');
-  const targetPath = getCellsApiPath({conversationQualifiedId, currentPath});
-  const movingDisabled = nodeToMoveParent === targetPath;
-
   const shouldDisplayEmptyItems = status === 'success' && !items.length;
-
-  const handleMove = async () => {
-    await moveNode({
-      currentPath: nodeToMove.path,
-      targetPath,
-    });
-    onClose();
-    openBreadcrumb({
-      conversationQualifiedId,
-      path: currentPath,
-    });
-  };
 
   const handleFolderNavigate = (path: string) => {
     const newPath = path.split('/').slice(1).join('/');
@@ -106,12 +72,6 @@ export const CellsFoldersListModalContent = ({
         )}
       </div>
       <CellsCreateNewFolderHint onCreate={() => onChangeModalContent('create')} />
-      <CellsMoveActions
-        onCancel={onClose}
-        onMove={handleMove}
-        moveDisabled={movingDisabled || shouldShowLoadingSpinner}
-        moveLoading={moveNodeStatus === 'loading'}
-      />
     </>
   );
 };

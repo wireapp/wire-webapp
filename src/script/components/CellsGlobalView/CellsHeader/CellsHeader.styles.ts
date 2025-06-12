@@ -38,7 +38,7 @@ export const headingStyles: CSSObject = {
 export const searchWrapperStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
-  gap: '8px',
+  gap: '16px',
 };
 
 export const contentStyles: CSSObject = {

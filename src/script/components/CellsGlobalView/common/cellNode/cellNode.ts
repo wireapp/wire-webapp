@@ -36,6 +36,7 @@ export interface CellFile {
     uuid?: string;
     url?: string;
   };
+  tags: string[];
 }
 
 export interface CellFolder {
@@ -54,6 +55,7 @@ export interface CellFolder {
     uuid?: string;
     url?: string;
   };
+  tags: string[];
 }
 
 export type CellNode = CellFile | CellFolder;

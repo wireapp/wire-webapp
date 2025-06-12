@@ -138,6 +138,10 @@ export class CellsRepository {
     return this.apiClient.api.cells.getNode({id: uuid});
   }
 
+  async lookupNodeByPath({path}: {path: string}) {
+    return this.apiClient.api.cells.lookupNodeByPath({path});
+  }
+
   async createFolder({path, name}: {path: string; name: string}) {
     const filePath = `${path || this.basePath}/${name}`;
     const uuid = createUuid();
@@ -168,12 +172,13 @@ export class CellsRepository {
     return this.apiClient.api.cells.deleteNodePublicLink({uuid});
   }
 
-  async searchNodes({query, limit = DEFAULT_MAX_FILES_LIMIT}: {query: string; limit?: number}) {
+  async searchNodes({query, limit = DEFAULT_MAX_FILES_LIMIT, tags}: {query: string; limit?: number; tags?: string[]}) {
     return this.apiClient.api.cells.searchNodes({
       phrase: query,
       limit,
       sortBy: SEARCH_DEFAULT_SORT_FIELD,
       sortDirection: SEARCH_DEFAULT_SORT_DIR,
+      tags,
     });
   }
 
@@ -183,5 +188,13 @@ export class CellsRepository {
 
   async restoreNode({uuid}: {uuid: string}) {
     return this.apiClient.api.cells.restoreNode({uuid});
+  }
+
+  async getAllTags() {
+    return this.apiClient.api.cells.getAllTags();
+  }
+
+  async setNodeTags({uuid, tags}: {uuid: string; tags: string[]}) {
+    return this.apiClient.api.cells.setNodeTags({uuid, tags});
   }
 }

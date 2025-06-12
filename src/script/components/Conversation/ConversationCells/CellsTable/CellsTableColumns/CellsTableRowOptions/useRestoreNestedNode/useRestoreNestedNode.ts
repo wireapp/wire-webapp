@@ -19,35 +19,34 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {CellsNewNodeForm} from 'Components/Conversation/ConversationCells/common/CellsNewNodeForm/CellsNewNodeForm';
+import {CellNode} from 'Components/Conversation/ConversationCells/common/cellNode/cellNode';
+import {useCellsStore} from 'Components/Conversation/ConversationCells/common/useCellsStore/useCellsStore';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 
-interface CellsNewFolderModalContentProps {
-  currentPath: string;
-  cellsRepository: CellsRepository;
+interface UseRestoreNestedNodeProps {
+  node: CellNode;
   conversationQualifiedId: QualifiedId;
-  onRefresh: () => Promise<void>;
-  onChangeModalContent: (content: 'move' | 'create') => void;
+  cellsRepository: CellsRepository;
+  onError: () => void;
 }
 
-export const CellsNewFolderModalContent = ({
-  cellsRepository,
+export const useRestoreNestedNode = ({
+  node,
   conversationQualifiedId,
-  currentPath,
-  onChangeModalContent,
-  onRefresh,
-}: CellsNewFolderModalContentProps) => {
-  return (
-    <CellsNewNodeForm
-      type="folder"
-      cellsRepository={cellsRepository}
-      conversationQualifiedId={conversationQualifiedId}
-      onSuccess={() => {
-        void onRefresh();
-        onChangeModalContent('move');
-      }}
-      currentPath={currentPath}
-      onSecondaryButtonClick={() => onChangeModalContent('move')}
-    />
-  );
+  cellsRepository,
+  onError,
+}: UseRestoreNestedNodeProps) => {
+  const {removeNode} = useCellsStore();
+
+  return {
+    restoreNestedNode: async () => {
+      try {
+        removeNode({conversationId: conversationQualifiedId.id, nodeId: node.id});
+        await cellsRepository.restoreNode({uuid: node.id});
+      } catch (error) {
+        console.error(error);
+        onError();
+      }
+    },
+  };
 };

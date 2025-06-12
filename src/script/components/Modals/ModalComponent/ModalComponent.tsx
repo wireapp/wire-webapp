@@ -20,7 +20,8 @@
 import React, {useEffect, useId, useRef, useState, useCallback, HTMLProps} from 'react';
 
 import {CSSObject} from '@emotion/react';
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+
+import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {noop, preventFocusOutside} from 'Util/util';
 
