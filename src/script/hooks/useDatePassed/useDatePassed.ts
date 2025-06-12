@@ -17,25 +17,63 @@
  *
  */
 
-import {useEffect, useRef} from 'react';
+import {useCallback, useEffect, useRef} from 'react';
+
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 interface UseDatePassedProps {
-  now: Date;
-  target: Date;
+  target: Date | null;
   onPassed: () => void;
 }
 
-export const useDatePassed = ({now, target, onPassed}: UseDatePassedProps) => {
+export const useDatePassed = ({target, onPassed}: UseDatePassedProps) => {
   const hasPassed = useRef(false);
+  const intervalId = useRef<ReturnType<typeof setInterval>>();
+  const targetTime = useRef(target?.getTime());
+
+  const checkTime = useCallback(() => {
+    if (!target) {
+      return;
+    }
+
+    const currentTime = Date.now();
+    if (currentTime >= target.getTime()) {
+      hasPassed.current = true;
+      if (intervalId.current) {
+        clearInterval(intervalId.current);
+      }
+      onPassed();
+    }
+  }, [target, onPassed]);
 
   useEffect(() => {
+    if (!target) {
+      if (intervalId.current) {
+        clearInterval(intervalId.current);
+      }
+      return;
+    }
+
+    // Reset hasPassed if target changes
+    if (target.getTime() !== targetTime.current) {
+      hasPassed.current = false;
+      targetTime.current = target.getTime();
+    }
+
     if (hasPassed.current) {
       return;
     }
 
-    if (now.getTime() >= target.getTime()) {
-      hasPassed.current = true;
-      onPassed();
+    if (intervalId.current) {
+      clearInterval(intervalId.current);
     }
-  }, [now, target, onPassed]);
+
+    intervalId.current = setInterval(checkTime, TIME_IN_MILLIS.SECOND);
+
+    return () => {
+      if (intervalId.current) {
+        clearInterval(intervalId.current);
+      }
+    };
+  }, [checkTime, target]);
 };

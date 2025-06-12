@@ -22,8 +22,11 @@ import {renderHook} from '@testing-library/react';
 import {useDatePassed} from './useDatePassed';
 
 describe('useDatePassed', () => {
+  const baseDate = new Date('2024-01-01T00:00:00.000Z');
+
   beforeEach(() => {
     jest.useFakeTimers();
+    jest.setSystemTime(baseDate);
   });
 
   afterEach(() => {
@@ -32,65 +35,76 @@ describe('useDatePassed', () => {
 
   it('does not call onPassed when target date is in the future', () => {
     const onPassed = jest.fn();
-    const now = new Date('2024-01-01');
-    const target = new Date('2024-12-31');
+    const target = new Date(baseDate.getTime() + 2000);
 
-    renderHook(() => useDatePassed({now, target, onPassed}));
+    renderHook(() => useDatePassed({target, onPassed}));
 
+    jest.advanceTimersByTime(1000);
     expect(onPassed).not.toHaveBeenCalled();
   });
 
   it('calls onPassed when target date has passed', () => {
     const onPassed = jest.fn();
-    const now = new Date('2024-12-31');
-    const target = new Date('2024-01-01');
+    const target = new Date(baseDate.getTime() + 1000);
 
-    renderHook(() => useDatePassed({now, target, onPassed}));
+    renderHook(() => useDatePassed({target, onPassed}));
 
+    jest.advanceTimersByTime(1000);
     expect(onPassed).toHaveBeenCalledTimes(1);
   });
 
   it('calls onPassed when dates are equal', () => {
     const onPassed = jest.fn();
-    const now = new Date('2024-01-01');
-    const target = new Date('2024-01-01');
+    const target = new Date(baseDate);
 
-    renderHook(() => useDatePassed({now, target, onPassed}));
+    renderHook(() => useDatePassed({target, onPassed}));
 
+    jest.advanceTimersByTime(1000);
     expect(onPassed).toHaveBeenCalledTimes(1);
   });
 
-  it('calls onPassed only once when target date has passed', () => {
+  it('resets and works again when target changes after date has passed', () => {
     const onPassed = jest.fn();
-    const now = new Date('2024-12-31');
-    const target = new Date('2024-01-01');
+    const target = new Date(baseDate.getTime() + 1000);
 
-    const {rerender} = renderHook(() => useDatePassed({now, target, onPassed}));
+    const {rerender} = renderHook(() => useDatePassed({target, onPassed}));
 
+    // First target passes
+    jest.advanceTimersByTime(1000);
     expect(onPassed).toHaveBeenCalledTimes(1);
 
-    // Rerender with same dates
-    rerender();
-    expect(onPassed).toHaveBeenCalledTimes(1);
+    // Clear the mock to start fresh
+    onPassed.mockClear();
 
-    // Rerender with different now date
-    rerender({now: new Date('2025-01-01'), target, onPassed});
+    // Change target to a new future time
+    const newTarget = new Date(baseDate.getTime() + 2000);
+    rerender({target: newTarget, onPassed});
+
+    // Advance time to reach new target
+    jest.advanceTimersByTime(1000);
     expect(onPassed).toHaveBeenCalledTimes(1);
   });
 
-  it('handles date updates correctly', () => {
+  it('does not set up interval when target is null', () => {
     const onPassed = jest.fn();
-    const now = new Date('2024-01-01');
-    const target = new Date('2024-06-01');
+    const target = null;
 
-    const {rerender} = renderHook(({now, target, onPassed}) => useDatePassed({now, target, onPassed}), {
-      initialProps: {now, target, onPassed},
-    });
+    renderHook(() => useDatePassed({target, onPassed}));
 
+    jest.advanceTimersByTime(1000);
     expect(onPassed).not.toHaveBeenCalled();
+  });
 
-    // Update now to a date after target
-    rerender({now: new Date('2024-07-01'), target, onPassed});
-    expect(onPassed).toHaveBeenCalledTimes(1);
+  it('cleans up interval when target changes to null', () => {
+    const onPassed = jest.fn();
+    const target = new Date(baseDate.getTime() + 1000);
+
+    const {rerender} = renderHook(() => useDatePassed({target, onPassed}));
+
+    // Change target to null
+    rerender({target: null, onPassed});
+
+    jest.advanceTimersByTime(1000);
+    expect(onPassed).not.toHaveBeenCalled();
   });
 });
