@@ -17,28 +17,8 @@
  *
  */
 
-export const RECYCLE_BIN_PATH = 'recycle_bin';
+import {CSSObject} from '@emotion/react';
 
-export const isRootRecycleBinPath = () => {
-  const hash = window.location.hash.replace('#', '');
-
-  const parts = hash.split('/files/');
-
-  const path = decodeURIComponent(parts[1]);
-
-  return path === RECYCLE_BIN_PATH;
-};
-
-export const isInRecycleBin = () => {
-  const hash = window.location.hash.replace('#', '');
-
-  const parts = hash.split('/files/');
-
-  return parts[1]?.includes(RECYCLE_BIN_PATH);
-};
-
-export const getNodeRootParentPath = ({nodePath}: {nodePath: string}) => {
-  const segments = nodePath.split('/');
-  const recycleBinIndex = segments.indexOf(RECYCLE_BIN_PATH);
-  return segments[recycleBinIndex + 1] || '';
+export const largeModalStyles: CSSObject = {
+  width: '508px',
 };

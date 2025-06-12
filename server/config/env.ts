@@ -181,9 +181,6 @@ export type Env = {
   /** Feature to enable calling popout window */
   FEATURE_ENABLE_DETACHED_CALLING_WINDOW: string;
 
-  /** Feature to enable Enterprise login v2 */
-  FEATURE_ENABLE_ENTERPRISE_LOGIN_V2: string;
-
   /** Feature to enable channels */
   FEATURE_ENABLE_CHANNELS: string;
 
