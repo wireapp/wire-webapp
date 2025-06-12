@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [46.25.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.24.4...@wireapp/core@46.25.0) (2025-06-12)
+
+### Features
+
+* **core-crypto:** Update CC to 7.0.1  ([#7076](https://github.com/wireapp/wire-web-packages/issues/7076)) ([8ff8aec](https://github.com/wireapp/wire-web-packages/commit/8ff8aec8b9bdb9f01f9104c93997d219325ff151)), closes [#7051](https://github.com/wireapp/wire-web-packages/issues/7051)
+
 ## [46.24.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.24.3...@wireapp/core@46.24.4) (2025-06-11)
 
 **Note:** Version bump only for package @wireapp/core
