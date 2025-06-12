@@ -33,78 +33,73 @@ describe('useDatePassed', () => {
     jest.useRealTimers();
   });
 
-  it('does not call onPassed when target date is in the future', () => {
-    const onPassed = jest.fn();
+  it('does not call callback when target date is in the future', () => {
+    const callback = jest.fn();
     const target = new Date(baseDate.getTime() + 2000);
 
-    renderHook(() => useDatePassed({target, onPassed}));
+    renderHook(() => useDatePassed({target, callback}));
 
     jest.advanceTimersByTime(1000);
-    expect(onPassed).not.toHaveBeenCalled();
+    expect(callback).not.toHaveBeenCalled();
   });
 
-  it('calls onPassed when target date has passed', () => {
-    const onPassed = jest.fn();
+  it('calls callback when target date has passed', () => {
+    const callback = jest.fn();
     const target = new Date(baseDate.getTime() + 1000);
 
-    renderHook(() => useDatePassed({target, onPassed}));
+    renderHook(() => useDatePassed({target, callback}));
 
     jest.advanceTimersByTime(1000);
-    expect(onPassed).toHaveBeenCalledTimes(1);
+    expect(callback).toHaveBeenCalledTimes(1);
   });
 
-  it('calls onPassed when dates are equal', () => {
-    const onPassed = jest.fn();
+  it('calls callback when dates are equal', () => {
+    const callback = jest.fn();
     const target = new Date(baseDate);
 
-    renderHook(() => useDatePassed({target, onPassed}));
+    renderHook(() => useDatePassed({target, callback}));
 
     jest.advanceTimersByTime(1000);
-    expect(onPassed).toHaveBeenCalledTimes(1);
+    expect(callback).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not call onPassed when hook is disabled', () => {
+    const callback = jest.fn();
+    const target = new Date(baseDate.getTime() + 1000);
+
+    const {rerender} = renderHook(({enabled, target}) => useDatePassed({target, callback, enabled}), {
+      initialProps: {enabled: false, target},
+    });
+
+    jest.advanceTimersByTime(1000);
+    expect(callback).not.toHaveBeenCalled();
+
+    const newTarget = new Date(baseDate.getTime() + 2000);
+    rerender({enabled: true, target: newTarget});
+
+    jest.advanceTimersByTime(1000);
+    expect(callback).toHaveBeenCalledTimes(1);
   });
 
   it('resets and works again when target changes after date has passed', () => {
-    const onPassed = jest.fn();
+    const callback = jest.fn();
     const target = new Date(baseDate.getTime() + 1000);
 
-    const {rerender} = renderHook(() => useDatePassed({target, onPassed}));
+    const {rerender} = renderHook(({target, enabled}) => useDatePassed({target, callback, enabled}), {
+      initialProps: {target, enabled: true},
+    });
 
-    // First target passes
     jest.advanceTimersByTime(1000);
-    expect(onPassed).toHaveBeenCalledTimes(1);
+    expect(callback).toHaveBeenCalledTimes(1);
 
-    // Clear the mock to start fresh
-    onPassed.mockClear();
+    callback.mockClear();
 
-    // Change target to a new future time
+    rerender({target, enabled: false});
+
     const newTarget = new Date(baseDate.getTime() + 2000);
-    rerender({target: newTarget, onPassed});
-
-    // Advance time to reach new target
-    jest.advanceTimersByTime(1000);
-    expect(onPassed).toHaveBeenCalledTimes(1);
-  });
-
-  it('does not set up interval when target is null', () => {
-    const onPassed = jest.fn();
-    const target = null;
-
-    renderHook(() => useDatePassed({target, onPassed}));
+    rerender({target: newTarget, enabled: true});
 
     jest.advanceTimersByTime(1000);
-    expect(onPassed).not.toHaveBeenCalled();
-  });
-
-  it('cleans up interval when target changes to null', () => {
-    const onPassed = jest.fn();
-    const target = new Date(baseDate.getTime() + 1000);
-
-    const {rerender} = renderHook(() => useDatePassed({target, onPassed}));
-
-    // Change target to null
-    rerender({target: null, onPassed});
-
-    jest.advanceTimersByTime(1000);
-    expect(onPassed).not.toHaveBeenCalled();
+    expect(callback).toHaveBeenCalledTimes(1);
   });
 });

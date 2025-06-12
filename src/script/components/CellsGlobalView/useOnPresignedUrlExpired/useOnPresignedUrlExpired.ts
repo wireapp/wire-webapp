@@ -27,8 +27,11 @@ import {useCellsStore} from '../common/useCellsStore/useCellsStore';
 export const useOnPresignedUrlExpired = ({refreshCallback}: {refreshCallback: () => void}) => {
   const {nodes} = useCellsStore();
 
+  const nodesAvailable = nodes.length > 0;
+
   useDatePassed({
-    target: nodes.length > 0 ? nodes[0].presignedUrlExpiresAt : null,
-    onPassed: refreshCallback,
+    enabled: nodesAvailable,
+    target: nodesAvailable ? nodes[0].presignedUrlExpiresAt : null,
+    callback: refreshCallback,
   });
 };

@@ -34,9 +34,11 @@ export const useOnPresignedUrlExpired = ({
   const {getNodes} = useCellsStore();
 
   const nodes = getNodes({conversationId});
+  const nodesAvailable = nodes.length > 0;
 
   useDatePassed({
-    target: nodes.length > 0 ? nodes[0].presignedUrlExpiresAt : null,
-    onPassed: refreshCallback,
+    enabled: nodesAvailable,
+    target: nodesAvailable ? nodes[0].presignedUrlExpiresAt : null,
+    callback: refreshCallback,
   });
 };

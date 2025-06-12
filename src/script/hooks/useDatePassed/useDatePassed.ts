@@ -23,16 +23,17 @@ import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 interface UseDatePassedProps {
   target: Date | null;
-  onPassed: () => void;
+  callback: () => void;
+  enabled?: boolean;
 }
 
-export const useDatePassed = ({target, onPassed}: UseDatePassedProps) => {
+export const useDatePassed = ({target, callback, enabled = true}: UseDatePassedProps) => {
   const hasPassed = useRef(false);
   const intervalId = useRef<ReturnType<typeof setInterval>>();
-  const targetTime = useRef(target?.getTime());
+  const targetTime = useRef<number | null>(null);
 
   const checkTime = useCallback(() => {
-    if (!target) {
+    if (!target || !enabled) {
       return;
     }
 
@@ -42,30 +43,38 @@ export const useDatePassed = ({target, onPassed}: UseDatePassedProps) => {
       if (intervalId.current) {
         clearInterval(intervalId.current);
       }
-      onPassed();
+      callback();
     }
-  }, [target, onPassed]);
+  }, [target, callback, enabled]);
 
   useEffect(() => {
-    if (!target) {
+    // Clear interval if disabled or no target
+    if (!enabled || !target) {
+      hasPassed.current = false;
+      targetTime.current = null;
       if (intervalId.current) {
         clearInterval(intervalId.current);
       }
       return;
     }
 
-    // Reset hasPassed if target changes
-    if (target.getTime() !== targetTime.current) {
+    const newTargetTime = target.getTime();
+
+    // Reset state when target changes
+    if (newTargetTime !== targetTime.current) {
       hasPassed.current = false;
-      targetTime.current = target.getTime();
+      targetTime.current = newTargetTime;
+
+      if (intervalId.current) {
+        clearInterval(intervalId.current);
+      }
     }
 
-    if (hasPassed.current) {
+    const currentTime = Date.now();
+    if (currentTime >= newTargetTime) {
+      hasPassed.current = true;
+      callback();
       return;
-    }
-
-    if (intervalId.current) {
-      clearInterval(intervalId.current);
     }
 
     intervalId.current = setInterval(checkTime, TIME_IN_MILLIS.SECOND);
@@ -75,5 +84,5 @@ export const useDatePassed = ({target, onPassed}: UseDatePassedProps) => {
         clearInterval(intervalId.current);
       }
     };
-  }, [checkTime, target]);
+  }, [checkTime, target, callback, enabled]);
 };
