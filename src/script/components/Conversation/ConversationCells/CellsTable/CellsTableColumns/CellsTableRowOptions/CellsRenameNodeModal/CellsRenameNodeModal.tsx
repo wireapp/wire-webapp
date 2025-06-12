@@ -20,6 +20,7 @@
 import {CellNode} from 'Components/Conversation/ConversationCells/common/cellNode/cellNode';
 import {CellsModal} from 'Components/Conversation/ConversationCells/common/CellsModal/CellsModal';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
+import {t} from 'Util/LocalizerUtil';
 
 import {CellsRenameForm} from './CellsRenameForm/CellsRenameForm';
 import {useCellsRenameForm} from './useCellsRenameNodeForm/useCellsNewNodeForm';
@@ -50,7 +51,7 @@ export const CellsRenameNodeModal = ({
 
   return (
     <CellsModal isOpen={isOpen} onClose={onClose} size="large">
-      <CellsModal.Header>Rename</CellsModal.Header>
+      <CellsModal.Header>{t('cells.renameNodeModal.headline')}</CellsModal.Header>
       <CellsRenameForm
         isOpen={isOpen}
         onSubmit={handleRename}
@@ -59,9 +60,11 @@ export const CellsRenameNodeModal = ({
         error={error}
       />
       <CellsModal.Actions>
-        <CellsModal.SecondaryButton onClick={onClose}>Close</CellsModal.SecondaryButton>
-        <CellsModal.PrimaryButton onClick={handleRename} isDisabled={isSubmitting}>
-          Save
+        <CellsModal.SecondaryButton onClick={onClose}>
+          {t('cells.renameNodeModal.cancelButton')}
+        </CellsModal.SecondaryButton>
+        <CellsModal.PrimaryButton onClick={handleRename} isDisabled={isSubmitting || name === node.name}>
+          {t('cells.renameNodeModal.saveButton')}
         </CellsModal.PrimaryButton>
       </CellsModal.Actions>
     </CellsModal>

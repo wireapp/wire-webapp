@@ -39,12 +39,12 @@ export const CellsRenameForm = ({isOpen, onSubmit, inputValue, onChange, error}:
 
   return (
     <form onSubmit={onSubmit} css={formStyles}>
-      <Label htmlFor="cells-new-item-name">{t('cells.newItemMenuModal.label')}</Label>
+      <Label htmlFor="cells-new-item-name">{t('cells.renameNodeModal.label')}</Label>
       <Input
         id="cells-new-item-name"
         value={inputValue}
         ref={inputRef}
-        placeholder="New name"
+        placeholder={t('cells.renameNodeModal.placeholder')}
         onChange={onChange}
         error={error ? <ErrorMessage>{error}</ErrorMessage> : undefined}
       />

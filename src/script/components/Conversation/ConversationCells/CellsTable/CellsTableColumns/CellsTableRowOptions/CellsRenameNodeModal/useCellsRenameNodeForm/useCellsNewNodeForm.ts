@@ -22,15 +22,12 @@ import {ChangeEvent, FormEvent, MouseEvent, useState} from 'react';
 import {CellNode} from 'Components/Conversation/ConversationCells/common/cellNode/cellNode';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
-import {isAxiosError} from 'Util/TypePredicateUtil';
 
 interface UseCellsRenameFormProps {
   node: CellNode;
   cellsRepository: CellsRepository;
   onSuccess: () => void;
 }
-
-const ITEM_ALREADY_EXISTS_ERROR = 409;
 
 export const useCellsRenameForm = ({node, cellsRepository, onSuccess}: UseCellsRenameFormProps) => {
   const [name, setName] = useState(node.name);
@@ -42,16 +39,16 @@ export const useCellsRenameForm = ({node, cellsRepository, onSuccess}: UseCellsR
       await cellsRepository.renameNode({currentPath: node.path, newName: name});
       onSuccess();
     } catch (error) {
-      if (isAxiosError(error) && error.response?.status === ITEM_ALREADY_EXISTS_ERROR) {
-        setError(t('cells.newItemMenuModalForm.alreadyExistsError'));
-      } else {
-        setError(t('cells.newItemMenuModalForm.genericError'));
-      }
+      setError(t('cells.renameNodeModal.error'));
     }
   };
 
   const handleRename = async (event: FormEvent<HTMLFormElement> | MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
+
+    if (name === node.name) {
+      return;
+    }
 
     if (isSubmitting) {
       return;
@@ -61,7 +58,7 @@ export const useCellsRenameForm = ({node, cellsRepository, onSuccess}: UseCellsR
     setIsSubmitting(true);
 
     if (!name.trim()) {
-      setError(t('cells.newItemMenuModalForm.nameRequired'));
+      setError(t('cells.renameNodeModal.nameRequired'));
       setIsSubmitting(false);
       return;
     }
@@ -75,7 +72,7 @@ export const useCellsRenameForm = ({node, cellsRepository, onSuccess}: UseCellsR
 
   const handleNameChange = (event: ChangeEvent<HTMLInputElement>) => {
     setName(event.currentTarget.value);
-    if (error === t('cells.newItemMenuModalForm.nameRequired')) {
+    if (error === t('cells.renameNodeModal.nameRequired')) {
       setError(null);
     }
   };
