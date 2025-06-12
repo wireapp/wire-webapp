@@ -26,6 +26,7 @@ import {CoreCryptoWrapper} from './CryptoClient/CoreCryptoWrapper/CoreCryptoWrap
 import {ProteusService} from './ProteusService';
 
 import {getUUID} from '../../../test/PayloadHelper';
+import {createMemoryEngine} from '../../../test/StoreHelper';
 
 export const buildProteusService = async (): Promise<
   [ProteusService, {apiClient: APIClient; cryptoClient: CryptoClient}]
@@ -40,8 +41,16 @@ export const buildProteusService = async (): Promise<
 
   const cryptoClient = new CoreCryptoWrapper({} as any, {} as any);
 
-  const proteusService = new ProteusService(apiClient, cryptoClient, {
-    nbPrekeys: 0,
-  });
+  const storeEngine = await createMemoryEngine('proteus-service-test');
+
+  const proteusService = new ProteusService(
+    apiClient,
+    cryptoClient,
+    {
+      nbPrekeys: 0,
+    },
+    storeEngine,
+  );
+
   return [proteusService, {apiClient, cryptoClient}];
 };

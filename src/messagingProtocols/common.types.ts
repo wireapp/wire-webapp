@@ -20,3 +20,13 @@
 import {HandledEventPayload} from '../notification';
 
 export type EventHandlerResult = Promise<HandledEventPayload | void>;
+
+export interface CoreCryptoConfig {
+  /**
+   * path on the public server to the core crypto wasm file.
+   * This file will be downloaded lazily when corecrypto is needed.
+   * It, thus, needs to know where, on the server, the file can be found
+   */
+  wasmFilePath: string;
+  enabled: boolean;
+}

@@ -21,7 +21,6 @@ import {
   E2eiEnrollment,
   Ciphersuite,
   CoreCrypto,
-  RotateBundle,
   WireIdentity,
   E2eiConversationState,
   DeviceStatus,
@@ -40,16 +39,7 @@ export type NewAcmeAuthz = Pick<
   Awaited<ReturnType<E2eiEnrollment['newAuthzResponse']>>,
   'identifier' | 'keyauth' | 'challenge'
 >;
-export {
-  E2eiEnrollment,
-  Ciphersuite,
-  CoreCrypto,
-  RotateBundle,
-  DeviceStatus,
-  WireIdentity,
-  E2eiConversationState,
-  CredentialType,
-};
+export {E2eiEnrollment, Ciphersuite, CoreCrypto, DeviceStatus, WireIdentity, E2eiConversationState, CredentialType};
 
 export type User = {
   id: string;

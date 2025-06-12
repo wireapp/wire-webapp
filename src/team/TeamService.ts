@@ -17,7 +17,15 @@
  *
  */
 
-import {MemberData, Members, NewTeamData, TeamChunkData, TeamData, UpdateTeamData} from '@wireapp/api-client/lib/team/';
+import {
+  FeatureList,
+  MemberData,
+  Members,
+  NewTeamData,
+  TeamChunkData,
+  TeamData,
+  UpdateTeamData,
+} from '@wireapp/api-client/lib/team/';
 
 import {APIClient} from '@wireapp/api-client';
 
@@ -60,7 +68,21 @@ export class TeamService {
     return this.apiClient.api.teams.team.putTeam(teamId, teamData);
   }
 
-  public getCommonFeatureConfig() {
-    return this.apiClient.api.teams.feature.getAllFeatures();
+  private commonConfig: FeatureList | null = null;
+  private commonConfigFetchedAt: number | null = null;
+  private readonly CACHE_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
+  public async getCommonFeatureConfig() {
+    const now = Date.now();
+
+    if (
+      this.commonConfig == null ||
+      this.commonConfigFetchedAt == null ||
+      now - this.commonConfigFetchedAt > this.CACHE_DURATION_MS
+    ) {
+      this.commonConfig = await this.apiClient.api.teams.feature.getAllFeatures();
+      this.commonConfigFetchedAt = now;
+    }
+
+    return this.commonConfig;
   }
 }

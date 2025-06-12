@@ -40,13 +40,14 @@ export const handleMLSMessageAdd = async ({
 
   const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
 
-  const {
-    proposals,
-    commitDelay,
-    message,
-    senderClientId: encodedSenderClientId,
-    hasEpochChanged,
-  } = await mlsService.decryptMessage(groupIdBytes, encryptedData);
+  const decryptedMessage = await mlsService.decryptMessage(groupIdBytes, encryptedData);
+
+  if (!decryptedMessage) {
+    // If the message is not decrypted, we return null
+    return null;
+  }
+
+  const {message, commitDelay, hasEpochChanged, senderClientId: encodedSenderClientId} = decryptedMessage;
 
   if (encodedSenderClientId) {
     const decoder = new TextDecoder();
@@ -55,7 +56,7 @@ export const handleMLSMessageAdd = async ({
   }
 
   // Check if the message includes proposals
-  if (typeof commitDelay === 'number' || proposals.length > 0) {
+  if (typeof commitDelay === 'number') {
     // we are dealing with a proposal, add a task to process this proposal later on
     // Those proposals are stored inside of coreCrypto and will be handled after a timeout
     await mlsService.handlePendingProposals({
