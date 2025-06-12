@@ -449,6 +449,7 @@ export class ConversationService {
   }
 
   public addMLSEventDistributedListener(onDistributed: (events: any, time: string) => void) {
+    // Listen to the MLS distributed event to handle events that were distributed
     this.coreConversationService.on(MLSServiceEvents.MLS_EVENT_DISTRIBUTED, ({events, time}) =>
       onDistributed(events, time),
     );

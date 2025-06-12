@@ -490,7 +490,7 @@ export class ConversationRepository {
         response = {conversation, failedToAdd};
       }
 
-      const {conversationEntity} = await this.onCreate({
+      const conversationEntity = await this.onCreate({
         conversation: response.conversation.qualified_id.id,
         data: {
           last_event: '0.0',
@@ -503,6 +503,11 @@ export class ConversationRepository {
         time: new Date().toISOString(),
         type: CONVERSATION_EVENT.CREATE,
       });
+
+      // ConversationEntity could be undefined if the conversation was not created
+      if (!conversationEntity) {
+        throw new ConversationError(ConversationError.TYPE.NOT_CREATED, ConversationError.MESSAGE.NOT_CREATED);
+      }
 
       const {failedToAdd} = response;
 
@@ -3602,7 +3607,7 @@ export class ConversationRepository {
   private async onCreate(
     eventJson: ConversationCreateEvent,
     eventSource?: EventSource,
-  ): Promise<{conversationEntity: Conversation}> {
+  ): Promise<Conversation | undefined> {
     const {conversation, data: eventData, qualified_conversation, time} = eventJson;
     const eventTimestamp = new Date(time).getTime();
     const initialTimestamp = isNaN(eventTimestamp) ? this.getLatestEventTimestamp(true) : eventTimestamp;
@@ -3610,12 +3615,8 @@ export class ConversationRepository {
       domain: eventJson.qualified_conversation?.domain ?? '',
       id: conversation,
     };
-    try {
-      const existingConversationEntity = this.conversationState.findConversation(conversationId);
-      if (existingConversationEntity) {
-        throw new ConversationError(ConversationError.TYPE.NO_CHANGES, ConversationError.MESSAGE.NO_CHANGES);
-      }
 
+    try {
       const conversationData = !eventSource
         ? // If there is no source, it means its a conversation created locally, no need to fetch it again
           eventData
@@ -3630,7 +3631,7 @@ export class ConversationRepository {
         this.proteusVerificationStateHandler.onConversationCreate(conversationEntity);
         await this.saveConversation(conversationEntity);
       }
-      return {conversationEntity};
+      return conversationEntity;
     } catch (error) {
       const isNoChanges = error.type === ConversationError.TYPE.NO_CHANGES;
       if (!isNoChanges) {
