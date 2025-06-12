@@ -138,6 +138,10 @@ export class CellsRepository {
     return this.apiClient.api.cells.getNode({id: uuid});
   }
 
+  async lookupNodeByPath({path}: {path: string}) {
+    return this.apiClient.api.cells.lookupNodeByPath({path});
+  }
+
   async createFolder({path, name}: {path: string; name: string}) {
     const filePath = `${path || this.basePath}/${name}`;
     const uuid = createUuid();
