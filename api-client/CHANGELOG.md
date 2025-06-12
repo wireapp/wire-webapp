@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.61.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.60.0...@wireapp/api-client@27.61.0) (2025-06-12)
+
+### Features
+
+* add billing/plan/available API call [WPB-18092] ([#7077](https://github.com/wireapp/wire-web-packages/issues/7077)) ([f6b39ef](https://github.com/wireapp/wire-web-packages/commit/f6b39ef2fc322477faff4faa010df8cf8bc4bca8))
+
 # [27.60.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.59.0...@wireapp/api-client@27.60.0) (2025-06-12)
 
 ### Features
