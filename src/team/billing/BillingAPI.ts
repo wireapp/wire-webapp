@@ -189,7 +189,7 @@ export class BillingAPI {
     return response.data;
   }
 
-  public async getAvailablePlans(
+  public async getPlans(
     teamId: string,
     filter: {
       currency?: SupportedCurrency;
@@ -200,6 +200,23 @@ export class BillingAPI {
       params: filter,
       method: 'get',
       url: `/teams/${teamId}/billing/plan/list`,
+    };
+
+    const response = await this.client.sendJSON<PlanData[]>(config);
+    return response.data;
+  }
+
+  public async getAvailablePlans(
+    teamId: string,
+    filter: {
+      currency?: SupportedCurrency;
+      interval?: PlanInterval;
+    },
+  ): Promise<PlanData[]> {
+    const config: AxiosRequestConfig = {
+      params: filter,
+      method: 'get',
+      url: `/teams/${teamId}/billing/plan/available`,
     };
 
     const response = await this.client.sendJSON<PlanData[]>(config);
