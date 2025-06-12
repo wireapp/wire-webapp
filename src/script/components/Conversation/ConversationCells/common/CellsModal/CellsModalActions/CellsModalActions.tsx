@@ -45,13 +45,21 @@ export const CellsModalPrimaryButton = ({
   children,
   onClick,
   isDisabled,
+  isLoading,
 }: {
   children: ReactNode;
   onClick: (event: MouseEvent<HTMLButtonElement>) => void;
-  isDisabled: boolean;
+  isDisabled?: boolean;
+  isLoading?: boolean;
 }) => {
   return (
-    <Button variant={ButtonVariant.PRIMARY} css={buttonStyles} disabled={isDisabled} onClick={onClick}>
+    <Button
+      variant={ButtonVariant.PRIMARY}
+      css={buttonStyles}
+      disabled={isDisabled}
+      onClick={onClick}
+      showLoading={isLoading}
+    >
       {children}
     </Button>
   );

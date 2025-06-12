@@ -8202,9 +8202,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^27.58.0":
-  version: 27.58.0
-  resolution: "@wireapp/api-client@npm:27.58.0"
+"@wireapp/api-client@npm:^27.59.0":
+  version: 27.59.0
+  resolution: "@wireapp/api-client@npm:27.59.0"
   dependencies:
     "@aws-sdk/client-s3": "npm:3.750.0"
     "@aws-sdk/lib-storage": "npm:3.779.0"
@@ -8223,7 +8223,7 @@ __metadata:
     uuid: "npm:11.1.0"
     ws: "npm:8.18.1"
     zod: "npm:3.24.2"
-  checksum: 10/3a26b13993b2ba1f6c997576a19eff10373fff29adafc32e94c196f96877cc34e61dcdda548753feda0333bd37ee5d22b68b97ca3e67a51ad4173d612ec5183c
+  checksum: 10/1911b99bc30d938a10bed9fdd38d9ac9c899924583fdfc7464ec7f68888edac49cd93de3b4e80dca2a0675795cbd64ad633b423c343c7b01680f60c241e396d2
   languageName: node
   linkType: hard
 
@@ -8288,11 +8288,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:46.24.3":
-  version: 46.24.3
-  resolution: "@wireapp/core@npm:46.24.3"
+"@wireapp/core@npm:46.24.4":
+  version: 46.24.4
+  resolution: "@wireapp/core@npm:46.24.4"
   dependencies:
-    "@wireapp/api-client": "npm:^27.58.0"
+    "@wireapp/api-client": "npm:^27.59.0"
     "@wireapp/commons": "npm:^5.4.2"
     "@wireapp/core-crypto": "npm:3.1.1"
     "@wireapp/cryptobox": "npm:12.8.0"
@@ -8310,7 +8310,7 @@ __metadata:
     long: "npm:^5.2.0"
     uuid: "npm:9.0.1"
     zod: "npm:3.24.2"
-  checksum: 10/4a2bd47000d1140500077ac437a7401531cdcdba4df90d6da927ed09cecea7776f1cc4a98a6788dcb3fbb41331c7708cd9c2fb3413fa050fe0b9993829e0d595
+  checksum: 10/d3c59c1a78aa2094bfcbc1f1e5249e4b8750d9e4b43769d8d0bff2c660b357ea12ffce400f71cd5f288e783f9300e6059658cae98bb6133ebfdb9b2ac4002c77
   languageName: node
   linkType: hard
 
@@ -8424,9 +8424,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/react-ui-kit@npm:9.59.2":
-  version: 9.59.2
-  resolution: "@wireapp/react-ui-kit@npm:9.59.2"
+"@wireapp/react-ui-kit@npm:9.59.3":
+  version: 9.59.3
+  resolution: "@wireapp/react-ui-kit@npm:9.59.3"
   dependencies:
     "@radix-ui/react-accordion": "npm:1.2.11"
     "@radix-ui/react-dropdown-menu": "npm:2.1.14"
@@ -8443,7 +8443,7 @@ __metadata:
   peerDependenciesMeta:
     "@types/react":
       optional: true
-  checksum: 10/8a03b83517b5d30aa7b377f6fcf439a07e9b9b3405fc1cc067fd1cc95184b53bf5056a97486ec21065b757761280f3e051ac4b207077b076c5a91cc75ca38d01
+  checksum: 10/6a170e00f84c354c6232434058db717c9990983b169b0561c005f1f288b8b41135296fea89055233788d8ffa416134162a8a11f8318506500b07b38fbb75a234
   languageName: node
   linkType: hard
 
@@ -21730,10 +21730,10 @@ __metadata:
     "@wireapp/avs-debugger": "npm:0.0.7"
     "@wireapp/commons": "npm:5.4.2"
     "@wireapp/copy-config": "npm:2.3.0"
-    "@wireapp/core": "npm:46.24.3"
+    "@wireapp/core": "npm:46.24.4"
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/prettier-config": "npm:0.6.4"
-    "@wireapp/react-ui-kit": "npm:9.59.2"
+    "@wireapp/react-ui-kit": "npm:9.59.3"
     "@wireapp/store-engine": "npm:5.1.11"
     "@wireapp/store-engine-dexie": "npm:2.1.15"
     "@wireapp/telemetry": "npm:0.3.1"

@@ -22,31 +22,46 @@ import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {t} from 'Util/LocalizerUtil';
 import {replaceReactComponents} from 'Util/LocalizerUtil/ReactLocalizerUtil';
 
-export const showRestoreNodeModal = ({node, onRestoreNode}: {node: CellNode; onRestoreNode: () => void}) => {
+import {modalContentStyles} from './showRestoreNestedNodeModal.styles';
+
+export const showRestoreNestedNodeModal = ({
+  node,
+  onRestoreNode,
+  parentNodeName,
+}: {
+  node: CellNode;
+  onRestoreNode: () => void;
+  parentNodeName: string;
+}) => {
   PrimaryModal.show(PrimaryModal.type.CONFIRM, {
+    size: 'large',
     primaryAction: {
       action: onRestoreNode,
-      text: t('cells.restoreNodeModal.button'),
+      text: t('cells.restoreNestedNodeModal.button'),
     },
     text: {
-      message: replaceReactComponents(
-        t(
-          node.type === 'file'
-            ? 'cells.restoreNodeModal.file.description'
-            : 'cells.restoreNodeModal.folder.description',
-          {
-            name: '{name}',
-          },
-        ),
-        [
-          {
-            exactMatch: '{name}',
-            render: () => <b>{node.name}</b>,
-          },
-        ],
+      message: (
+        <div css={modalContentStyles}>
+          <p>{t('cells.restoreNestedNodeModal.description1')}</p>
+          <p>
+            {replaceReactComponents(
+              t('cells.restoreNestedNodeModal.description2', {
+                name: '{name}',
+              }),
+              [
+                {
+                  exactMatch: '{name}',
+                  render: () => <b>{parentNodeName}</b>,
+                },
+              ],
+            )}
+          </p>
+        </div>
       ),
       title:
-        node.type === 'file' ? t('cells.restoreNodeModal.file.headline') : t('cells.restoreNodeModal.folder.headline'),
+        node.type === 'file'
+          ? t('cells.restoreNestedNodeModal.file.headline')
+          : t('cells.restoreNestedNodeModal.folder.headline'),
     },
   });
 };

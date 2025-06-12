@@ -17,7 +17,7 @@
  *
  */
 
-import {createContext, useContext, ReactNode} from 'react';
+import {createContext, useContext, ReactNode, useMemo} from 'react';
 
 interface CellsModalContextType {
   onClose: () => void;
@@ -39,5 +39,7 @@ interface CellsModalProviderProps {
 }
 
 export const CellsModalProvider = ({children, onClose}: CellsModalProviderProps) => {
-  return <CellsModalContext.Provider value={{onClose}}>{children}</CellsModalContext.Provider>;
+  return (
+    <CellsModalContext.Provider value={useMemo(() => ({onClose}), [onClose])}>{children}</CellsModalContext.Provider>
+  );
 };

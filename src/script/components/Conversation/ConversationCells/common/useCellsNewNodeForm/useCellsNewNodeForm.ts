@@ -17,7 +17,7 @@
  *
  */
 
-import {ChangeEvent, FormEvent, useState} from 'react';
+import {ChangeEvent, FormEvent, MouseEvent, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
@@ -68,7 +68,7 @@ export const useCellsNewItemForm = ({
     }
   };
 
-  const handleSubmit = async (formEvent: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (formEvent: FormEvent<HTMLFormElement> | MouseEvent<HTMLButtonElement>) => {
     formEvent.preventDefault();
 
     if (isSubmitting) {

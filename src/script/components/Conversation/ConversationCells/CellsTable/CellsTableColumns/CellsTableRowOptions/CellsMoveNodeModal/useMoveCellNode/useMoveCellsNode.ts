@@ -19,9 +19,28 @@
 
 import {useState} from 'react';
 
+import {QualifiedId} from '@wireapp/api-client/lib/user';
+
+import {CellNode} from 'Components/Conversation/ConversationCells/common/cellNode/cellNode';
+import {getCellsApiPath} from 'Components/Conversation/ConversationCells/common/getCellsApiPath/getCellsApiPath';
+import {openBreadcrumb} from 'Components/Conversation/ConversationCells/common/openBreadcrumb/openBreadcrumb';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 
-export const useMoveCellsNode = ({cellsRepository}: {cellsRepository: CellsRepository}) => {
+interface UseMoveCellsNodeProps {
+  cellsRepository: CellsRepository;
+  nodeToMove: CellNode;
+  conversationQualifiedId: QualifiedId;
+  currentPath: string;
+  onClose: () => void;
+}
+
+export const useMoveCellsNode = ({
+  cellsRepository,
+  nodeToMove,
+  conversationQualifiedId,
+  currentPath,
+  onClose,
+}: UseMoveCellsNodeProps) => {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
   const moveNode = async ({currentPath, targetPath}: {currentPath: string; targetPath: string}) => {
@@ -37,5 +56,21 @@ export const useMoveCellsNode = ({cellsRepository}: {cellsRepository: CellsRepos
     }
   };
 
-  return {moveNode, status};
+  const nodeToMoveParent = nodeToMove.path.split('/').slice(0, -1).join('/');
+  const targetPath = getCellsApiPath({conversationQualifiedId, currentPath});
+  const movingDisabled = nodeToMoveParent === targetPath;
+
+  const handleMove = async () => {
+    await moveNode({
+      currentPath: nodeToMove.path,
+      targetPath,
+    });
+    onClose();
+    openBreadcrumb({
+      conversationQualifiedId,
+      path: currentPath,
+    });
+  };
+
+  return {handleMove, movingDisabled, status};
 };

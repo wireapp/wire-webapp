@@ -19,12 +19,6 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const modalStyles: CSSObject = {
+export const largeModalStyles: CSSObject = {
   width: '508px',
-};
-
-export const wrapperStyles: CSSObject = {
-  padding: '8px',
-  width: '100%',
-  position: 'relative',
 };
