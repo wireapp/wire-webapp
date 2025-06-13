@@ -28,9 +28,13 @@ export const useInputAutoFocus = ({enabled}: {enabled: boolean}) => {
     }
 
     // Ensure the input is fully rendered
-    setTimeout(() => {
+    const timeoutId = setTimeout(() => {
       inputRef.current?.focus();
     });
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
   }, [enabled]);
 
   return {
