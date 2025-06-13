@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [46.25.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.25.2...@wireapp/core@46.25.3) (2025-06-13)
+
+### Bug Fixes
+
+* **cc:** make sure to delete the cc database when wiping data ([#7079](https://github.com/wireapp/wire-web-packages/issues/7079)) ([1357962](https://github.com/wireapp/wire-web-packages/commit/1357962d7cc8a75fd2cc4443e9367912f231d07b))
+
 ## [46.25.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.25.1...@wireapp/core@46.25.2) (2025-06-13)
 
 ### Bug Fixes
