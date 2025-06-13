@@ -370,6 +370,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
     conversationId,
   }: Required<AddUsersParams>): Promise<BaseCreateConversationResponse> {
     const exisitingClientIdsInGroup = await this.mlsService.getClientIdsInGroup(groupId);
+    const conversation = await this.getConversation(conversationId);
 
     const {keyPackages, failures: keysClaimingFailures} = await this.mlsService.getKeyPackagesPayload(
       qualifiedUsers,
@@ -379,12 +380,10 @@ export class ConversationService extends TypedEventEmitter<Events> {
     // We had cases where did not get any key packages, but still used core-crypto to call the backend (which results in failure).
     if (keyPackages && keyPackages.length > 0) {
       await this.mlsService.addUsersToExistingConversation(groupId, keyPackages);
+
+      //We store the info when user was added (and key material was created), so we will know when to renew it
+      await this.mlsService.resetKeyMaterialRenewal(groupId);
     }
-
-    const conversation = await this.getConversation(conversationId);
-
-    //We store the info when user was added (and key material was created), so we will know when to renew it
-    await this.mlsService.resetKeyMaterialRenewal(groupId);
 
     return {
       conversation,

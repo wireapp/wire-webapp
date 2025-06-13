@@ -668,7 +668,9 @@ describe('ConversationService', () => {
 
       const qualifiedUsers = [...otherUsersToAdd, selfUserToAdd];
 
-      jest.spyOn(mlsService, 'getKeyPackagesPayload').mockResolvedValueOnce({keyPackages: [], failures: []});
+      jest
+        .spyOn(mlsService, 'getKeyPackagesPayload')
+        .mockResolvedValueOnce({keyPackages: [new Uint8Array(0)], failures: []});
 
       jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValueOnce({
         qualified_id: mockConversationId,
