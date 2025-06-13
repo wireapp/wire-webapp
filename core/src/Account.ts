@@ -336,8 +336,15 @@ export class Account extends TypedEventEmitter<Events> {
     if (!this.service || !this.apiClient.context || !this.storeEngine) {
       throw new Error('Services are not set or context not initialized.');
     }
+
     // we reset the services to re-instantiate a new CryptoClient instance
     await this.initServices(this.apiClient.context);
+
+    // make sure we wipe the proteus client before creating a new one in case the client already exists
+    // if a client exists and we dont wipe, the proteus client will try to reuse the existing identity and will fail to create a new one
+    // which results in an unrecoverable state for the user
+    await this.service.proteus.wipe();
+
     const initialPreKeys = await this.service.proteus.createClient(entropyData);
 
     const client = await this.service.client.register(loginData, clientInfo, initialPreKeys);
