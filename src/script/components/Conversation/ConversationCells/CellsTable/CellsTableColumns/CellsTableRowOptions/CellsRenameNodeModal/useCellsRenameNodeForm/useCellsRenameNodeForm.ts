@@ -34,6 +34,8 @@ export const useCellsRenameForm = ({node, cellsRepository, onSuccess}: UseCellsR
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const isDisabled = isSubmitting || name === node.name;
+
   const renameNode = async (name: string) => {
     try {
       await cellsRepository.renameNode({currentPath: node.path, newName: name});
@@ -46,11 +48,7 @@ export const useCellsRenameForm = ({node, cellsRepository, onSuccess}: UseCellsR
   const handleRename = async (event: FormEvent<HTMLFormElement> | MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
 
-    if (name === node.name) {
-      return;
-    }
-
-    if (isSubmitting) {
+    if (isDisabled) {
       return;
     }
 
@@ -77,11 +75,18 @@ export const useCellsRenameForm = ({node, cellsRepository, onSuccess}: UseCellsR
     }
   };
 
+  const handleClearName = () => {
+    setName('');
+    setError(null);
+  };
+
   return {
     name,
     error,
     isSubmitting,
+    isDisabled,
     handleRename,
     handleNameChange,
+    handleClearName,
   };
 };

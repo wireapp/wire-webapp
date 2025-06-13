@@ -19,22 +19,23 @@
 
 import {ChangeEvent, FormEvent} from 'react';
 
-import {ErrorMessage, Input, Label} from '@wireapp/react-ui-kit';
+import {CircleCloseIcon, ErrorMessage, Input, Label} from '@wireapp/react-ui-kit';
 
 import {useInputAutoFocus} from 'Components/Conversation/ConversationCells/common/useInputAutoFocus/useInputAutoFocus';
 import {t} from 'Util/LocalizerUtil';
 
-import {formStyles} from './CellsRenameForm.styles';
+import {closeIconStyles, formStyles} from './CellsRenameForm.styles';
 
 interface CellsRenameFormProps {
   isOpen: boolean;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
-  inputValue: string;
-  onChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  name: string;
+  onChangeName: (event: ChangeEvent<HTMLInputElement>) => void;
   error: string | null;
+  onClearName: () => void;
 }
 
-export const CellsRenameForm = ({isOpen, onSubmit, inputValue, onChange, error}: CellsRenameFormProps) => {
+export const CellsRenameForm = ({isOpen, onSubmit, name, onChangeName, onClearName, error}: CellsRenameFormProps) => {
   const {inputRef} = useInputAutoFocus({enabled: isOpen});
 
   return (
@@ -42,11 +43,18 @@ export const CellsRenameForm = ({isOpen, onSubmit, inputValue, onChange, error}:
       <Label htmlFor="cells-new-item-name">{t('cells.renameNodeModal.label')}</Label>
       <Input
         id="cells-new-item-name"
-        value={inputValue}
+        value={name}
         ref={inputRef}
         placeholder={t('cells.renameNodeModal.placeholder')}
-        onChange={onChange}
+        onChange={onChangeName}
         error={error ? <ErrorMessage>{error}</ErrorMessage> : undefined}
+        endContent={
+          name && (
+            <button type="button" onClick={onClearName} css={closeIconStyles}>
+              <CircleCloseIcon />
+            </button>
+          )
+        }
       />
     </form>
   );

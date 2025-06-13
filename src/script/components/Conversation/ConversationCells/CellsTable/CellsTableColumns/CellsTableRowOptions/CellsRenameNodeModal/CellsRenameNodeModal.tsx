@@ -23,7 +23,7 @@ import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
 
 import {CellsRenameForm} from './CellsRenameForm/CellsRenameForm';
-import {useCellsRenameForm} from './useCellsRenameNodeForm/useCellsNewNodeForm';
+import {useCellsRenameForm} from './useCellsRenameNodeForm/useCellsRenameNodeForm';
 
 interface CellsRenameNodeModalProps {
   isOpen: boolean;
@@ -40,7 +40,7 @@ export const CellsRenameNodeModal = ({
   cellsRepository,
   onRefresh,
 }: CellsRenameNodeModalProps) => {
-  const {name, error, isSubmitting, handleRename, handleNameChange} = useCellsRenameForm({
+  const {name, error, isSubmitting, isDisabled, handleRename, handleNameChange, handleClearName} = useCellsRenameForm({
     node,
     cellsRepository,
     onSuccess: () => {
@@ -55,19 +55,16 @@ export const CellsRenameNodeModal = ({
       <CellsRenameForm
         isOpen={isOpen}
         onSubmit={handleRename}
-        inputValue={name}
-        onChange={handleNameChange}
+        name={name}
+        onChangeName={handleNameChange}
+        onClearName={handleClearName}
         error={error}
       />
       <CellsModal.Actions>
         <CellsModal.SecondaryButton onClick={onClose}>
           {t('cells.renameNodeModal.cancelButton')}
         </CellsModal.SecondaryButton>
-        <CellsModal.PrimaryButton
-          onClick={handleRename}
-          isDisabled={isSubmitting || name === node.name}
-          isLoading={isSubmitting}
-        >
+        <CellsModal.PrimaryButton onClick={handleRename} isDisabled={isDisabled} isLoading={isSubmitting}>
           {t('cells.renameNodeModal.saveButton')}
         </CellsModal.PrimaryButton>
       </CellsModal.Actions>

@@ -26,3 +26,20 @@ export const formStyles: CSSObject = {
   padding: '16px',
   gap: '8px',
 };
+
+export const closeIconStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  cursor: 'pointer',
+  height: '100%',
+  width: '32px',
+  right: '8px',
+  top: '50%',
+  position: 'absolute',
+  transform: 'translateY(-50%)',
+  background: 'transparent',
+  border: 'none',
+  padding: '0',
+  margin: '0',
+};
