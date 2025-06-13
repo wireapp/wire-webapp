@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [46.25.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.25.1...@wireapp/core@46.25.2) (2025-06-13)
+
+### Bug Fixes
+
+* **CC:** unrecoverable client error and avoiding unnecessary backend calls ([#7078](https://github.com/wireapp/wire-web-packages/issues/7078)) ([560be72](https://github.com/wireapp/wire-web-packages/commit/560be72153bfe97a9f9f464dcbd9836ab3c7a984))
+
 ## [46.25.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.25.0...@wireapp/core@46.25.1) (2025-06-12)
 
 **Note:** Version bump only for package @wireapp/core
