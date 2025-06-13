@@ -113,6 +113,22 @@ const migrateOnceAndGetKey = async (
   };
 };
 
+export const getCoreCryptoDbName = (storeEngine: CRUDEngine): string => {
+  return `corecrypto-${storeEngine.storeName}`;
+};
+
+export const wipeCoreCryptoDb = async (storeEngine: CRUDEngine): Promise<void> => {
+  const coreCryptoDbName = getCoreCryptoDbName(storeEngine);
+  try {
+    await coreCryptoInstance?.close();
+    await deleteDB(coreCryptoDbName);
+    logger.log('info', 'CoreCrypto DB wiped successfully');
+  } catch (error) {
+    logger.error('error', 'Failed to wipe CoreCrypto DB');
+  }
+};
+
+let coreCryptoInstance: CoreCrypto | undefined;
 export async function buildClient(
   storeEngine: CRUDEngine,
   {generateSecretKey, nbPrekeys, onNewPrekeys}: Config,
@@ -125,7 +141,7 @@ export async function buildClient(
     initWasmModule(wasmFilePath)
       .then(async output => {
         logger.log('info', 'CoreCrypto initialized', {output});
-        const coreCryptoDbName = `corecrypto-${storeEngine.storeName}`;
+        const coreCryptoDbName = getCoreCryptoDbName(storeEngine);
         // New key format used by coreCrypto
         let key: MigrateOnceAndGetKeyReturnType;
 
@@ -134,14 +150,14 @@ export async function buildClient(
         } catch (error) {
           if (error instanceof CorruptedKeyError) {
             // If we are dealing with a corrupted key, we wipe the key and the coreCrypto DB to start fresh
-            await deleteDB(coreCryptoDbName);
+            await wipeCoreCryptoDb(storeEngine);
             key = await migrateOnceAndGetKey(generateSecretKey, coreCryptoDbName);
           } else {
             throw error;
           }
         }
 
-        const coreCrypto = await CoreCrypto.deferredInit({
+        coreCryptoInstance = await CoreCrypto.deferredInit({
           databaseName: coreCryptoDbName,
           key: key.key,
         });
@@ -149,11 +165,13 @@ export async function buildClient(
         setLogger(coreCryptoLogger);
         setMaxLogLevel(CoreCryptoLogLevel.Info);
 
-        return new CoreCryptoWrapper(coreCrypto, {nbPrekeys, onNewPrekeys, onWipe: key.deleteKey});
+        return new CoreCryptoWrapper(coreCryptoInstance, {nbPrekeys, onNewPrekeys, onWipe: key.deleteKey});
       })
       // if the coreCrypto initialization fails, can not use the crypto client and throw an error
-      .catch(error => {
+      .catch(async error => {
         logger.error('error', 'CoreCrypto initialization failed', {error});
+        // If the initialization fails, we wipe the coreCrypto DB to start fresh
+        await wipeCoreCryptoDb(storeEngine);
         throw error;
       })
   );
