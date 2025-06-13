@@ -24,7 +24,7 @@ export const useInputAutoFocus = ({enabled}: {enabled: boolean}) => {
 
   useEffect(() => {
     if (!enabled) {
-      return;
+      return undefined;
     }
 
     // Ensure the input is fully rendered
