@@ -29,6 +29,12 @@ export enum ErrorType {
   InvalidPassword = 'InvalidPassword',
 }
 
+export const hasErrorProperty = (obj: unknown): obj is {error: string} => {
+  return (
+    typeof obj === 'object' && obj !== null && 'error' in obj && typeof (obj as {error: string}).error === 'string'
+  );
+};
+
 export const isErrorOfType = (error: unknown, type: ErrorType): boolean => {
   return error instanceof Error && error.name === type;
 };

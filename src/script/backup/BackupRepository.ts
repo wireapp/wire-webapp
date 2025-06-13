@@ -33,6 +33,7 @@ import {
   DifferentAccountError,
   ErrorType,
   ExportError,
+  hasErrorProperty,
   ImportError,
   IncompatibleBackupError,
   IncompatibleBackupFormatError,
@@ -269,13 +270,12 @@ export class BackupRepository {
           bytes: data,
         });
       }
-
-      if (files.error) {
-        const error = files.error.toString();
+      if (hasErrorProperty(files)) {
+        const error = files.error;
         if (error === 'WRONG_PASSWORD') {
           throw new InvalidPassword(error);
         }
-        throw new ImportError(files.error as unknown as string);
+        throw new ImportError(error);
       }
       // Import legacy backup
       const legacyData = await importLegacyBackupToDatabase({
