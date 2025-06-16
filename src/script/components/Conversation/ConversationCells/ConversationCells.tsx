@@ -17,8 +17,6 @@
  *
  */
 
-import {useCallback} from 'react';
-
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
@@ -32,9 +30,9 @@ import {CellsStateInfo} from './CellsStateInfo/CellsStateInfo';
 import {CellsTable} from './CellsTable/CellsTable';
 import {useCellsStore} from './common/useCellsStore/useCellsStore';
 import {wrapperStyles} from './ConversationCells.styles';
-import {useCellsLoaderSize} from './useCellsLoaderSize/useCellsLoaderSize';
 import {useCellsPagination} from './useCellsPagination/useCellsPagination';
 import {useGetAllCellsNodes} from './useGetAllCellsNodes/useGetAllCellsNodes';
+import {useOnPresignedUrlExpired} from './useOnPresignedUrlExpired/useOnPresignedUrlExpired';
 
 interface ConversationCellsProps {
   cellsRepository?: CellsRepository;
@@ -47,7 +45,7 @@ export const ConversationCells = ({
   conversationQualifiedId,
   conversationName,
 }: ConversationCellsProps) => {
-  const {getNodes, status: nodesStatus, getPagination, clearAll} = useCellsStore();
+  const {getNodes, status: nodesStatus, getPagination} = useCellsStore();
 
   const conversationId = conversationQualifiedId.id;
 
@@ -56,10 +54,6 @@ export const ConversationCells = ({
   const nodes = getNodes({conversationId});
   const pagination = getPagination({conversationId});
 
-  const {loaderHeight, updateHeight} = useCellsLoaderSize({
-    nodes,
-  });
-
   const {goToPage, getPaginationProps} = useCellsPagination({
     pagination,
     conversationId,
@@ -67,22 +61,19 @@ export const ConversationCells = ({
     currentNodesCount: nodes.length,
   });
 
+  useOnPresignedUrlExpired({conversationId, refreshCallback: refresh});
+
   const isLoading = nodesStatus === 'loading';
   const isError = nodesStatus === 'error';
   const isSuccess = nodesStatus === 'success';
   const hasNodes = !!nodes.length;
-
-  const handleRefresh = useCallback(async () => {
-    clearAll({conversationId});
-    await refresh();
-  }, [refresh, clearAll, conversationId]);
 
   const emptyView = !isError && !hasNodes;
 
   return (
     <div css={wrapperStyles}>
       <CellsHeader
-        onRefresh={handleRefresh}
+        onRefresh={refresh}
         conversationQualifiedId={conversationQualifiedId}
         conversationName={conversationName}
         cellsRepository={cellsRepository}
@@ -93,13 +84,13 @@ export const ConversationCells = ({
           cellsRepository={cellsRepository}
           conversationQualifiedId={conversationQualifiedId}
           conversationName={conversationName}
-          onUpdateBodyHeight={updateHeight}
+          onRefresh={refresh}
         />
       )}
       {!isLoading && emptyView && (
         <CellsStateInfo heading={t('cells.noNodes.heading')} description={t('cells.noNodes.description')} />
       )}
-      {isLoading && <CellsLoader minHeight={loaderHeight} />}
+      {isLoading && <CellsLoader />}
       {isError && <CellsStateInfo heading={t('cells.error.heading')} description={t('cells.error.description')} />}
       {!emptyView && <CellsPagination {...getPaginationProps()} goToPage={goToPage} />}
     </div>

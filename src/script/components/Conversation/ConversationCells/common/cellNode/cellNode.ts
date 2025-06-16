@@ -31,11 +31,13 @@ export interface CellFile {
   uploadedAtTimestamp: number;
   owner: string;
   conversationName: string;
+  tags: string[];
   publicLink?: {
     alreadyShared: boolean;
     uuid?: string;
     url?: string;
   };
+  presignedUrlExpiresAt: Date | null;
 }
 
 export interface CellFolder {
@@ -48,11 +50,13 @@ export interface CellFolder {
   sizeMb: string;
   uploadedAtTimestamp: number;
   owner: string;
+  tags: string[];
   publicLink?: {
     alreadyShared: boolean;
     uuid?: string;
     url?: string;
   };
+  presignedUrlExpiresAt: Date | null;
 }
 
 export type CellNode = CellFile | CellFolder;

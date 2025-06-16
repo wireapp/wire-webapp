@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useState} from 'react';
+import {useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
@@ -30,16 +30,21 @@ import {
   isInRecycleBin,
   isRootRecycleBinPath,
 } from 'Components/Conversation/ConversationCells/common/recycleBin/recycleBin';
-import {useCellsStore} from 'Components/Conversation/ConversationCells/common/useCellsStore/useCellsStore';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
 import {forcedDownloadFile} from 'Util/util';
 
 import {CellsMoveNodeModal} from './CellsMoveNodeModal/CellsMoveNodeModal';
+import {CellsRenameNodeModal} from './CellsRenameNodeModal/CellsRenameNodeModal';
 import {buttonStyles, iconStyles, textStyles} from './CellsTableRowOptions.styles';
+import {CellsTagsModal} from './CellsTagsModal/CellsTagsModal';
 import {showDeletePermanentlyModal} from './showDeletePermanentlyModal/showDeletePermanentlyModal';
 import {showMoveToRecycleBinModal} from './showMoveToRecycleBinModal/showMoveToRecycleBinModal';
-import {showRestoreNodeModal} from './showRestoreNodeModal/showRestoreNodeModal';
+import {showRestoreNestedNodeModal} from './showRestoreNestedNodeModal/showRestoreNestedNodeModal';
+import {showRestoreRootNodeModal} from './showRestoreRootNodeModal/showRestoreRootNodeModal';
+import {useDeleteNode} from './useDeleteNode/useDeleteNode';
+import {useRestoreNestedNode} from './useRestoreNestedNode/useRestoreNestedNode';
+import {useRestoreParentNode} from './useRestoreParentNode/useRestoreParentNode';
 
 import {useCellsFilePreviewModal} from '../../common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
 import {showShareModal} from '../CellsNodeShareModal/CellsNodeShareModal';
@@ -49,6 +54,7 @@ interface CellsTableRowOptionsProps {
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
   conversationName: string;
+  onRefresh: () => void;
 }
 
 export const CellsTableRowOptions = ({
@@ -56,6 +62,7 @@ export const CellsTableRowOptions = ({
   cellsRepository,
   conversationQualifiedId,
   conversationName,
+  onRefresh,
 }: CellsTableRowOptionsProps) => {
   return (
     <DropdownMenu>
@@ -70,6 +77,7 @@ export const CellsTableRowOptions = ({
         cellsRepository={cellsRepository}
         conversationQualifiedId={conversationQualifiedId}
         conversationName={conversationName}
+        onRefresh={onRefresh}
       />
     </DropdownMenu>
   );
@@ -80,62 +88,57 @@ const CellsTableRowOptionsContent = ({
   cellsRepository,
   conversationQualifiedId,
   conversationName,
+  onRefresh,
 }: CellsTableRowOptionsProps) => {
   const {handleOpenFile} = useCellsFilePreviewModal();
-  const {removeNode} = useCellsStore();
   const [isMoveNodeModalOpen, setIsMoveNodeModalOpen] = useState(false);
+  const [isTagsModalOpen, setIsTagsModalOpen] = useState(false);
+  const [isRenameNodeModalOpen, setIsRenameNodeModalOpen] = useState(false);
 
   const url = node.url;
   const name = node.type === 'folder' ? `${node.name}.zip` : node.name;
-  const conversationId = conversationQualifiedId.id;
-
-  const deleteFileFailedNotification = useAppNotification({
-    message: t('cells.deleteModal.error'),
-  });
-
-  const handleDeleteNode = useCallback(
-    async ({uuid, permanently = false}: {uuid: string; permanently?: boolean}) => {
-      try {
-        removeNode({conversationId, nodeId: uuid});
-        await cellsRepository.deleteNode({uuid, permanently});
-      } catch (error) {
-        deleteFileFailedNotification.show();
-        console.error(error);
-      }
-    },
-    // cellsRepository is not a dependency because it's a singleton
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [conversationId, removeNode, deleteFileFailedNotification],
-  );
 
   const restoreNodeFailedNotification = useAppNotification({
     message: t('cells.restore.error'),
   });
 
-  const handleRestoreNode = useCallback(
-    async ({uuid}: {uuid: string}) => {
-      try {
-        removeNode({conversationId, nodeId: uuid});
-        await cellsRepository.restoreNode({uuid});
-      } catch (error) {
-        restoreNodeFailedNotification.show();
-        console.error(error);
-      }
-    },
-    // cellsRepository is not a dependency because it's a singleton
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [conversationId, removeNode, restoreNodeFailedNotification],
-  );
+  const {restoreNestedNode} = useRestoreNestedNode({
+    node,
+    conversationQualifiedId,
+    cellsRepository,
+    onError: restoreNodeFailedNotification.show,
+  });
 
-  if (isRootRecycleBinPath()) {
+  const {restoreParentNode, rootParentName} = useRestoreParentNode({
+    childNode: node,
+    conversationQualifiedId,
+    cellsRepository,
+    onError: restoreNodeFailedNotification.show,
+  });
+
+  const {deleteNode} = useDeleteNode({
+    conversationQualifiedId,
+    cellsRepository,
+  });
+
+  const isRootRecycleBin = isRootRecycleBinPath();
+  const isNestedRecycleBin = isInRecycleBin();
+
+  if (isRootRecycleBin || isNestedRecycleBin) {
     return (
       <DropdownMenu.Content>
         <DropdownMenu.Item
           onClick={() =>
-            showRestoreNodeModal({
-              node,
-              onRestoreNode: () => handleRestoreNode({uuid: node.id}),
-            })
+            isRootRecycleBin
+              ? showRestoreRootNodeModal({
+                  node,
+                  onRestoreNode: restoreNestedNode,
+                })
+              : showRestoreNestedNodeModal({
+                  node,
+                  onRestoreNode: restoreParentNode,
+                  parentNodeName: rootParentName,
+                })
           }
         >
           {t('cells.options.restore')}
@@ -144,24 +147,7 @@ const CellsTableRowOptionsContent = ({
           onClick={() =>
             showDeletePermanentlyModal({
               node,
-              onDeletePermanently: () => handleDeleteNode({uuid: node.id, permanently: true}),
-            })
-          }
-        >
-          {t('cells.options.deletePermanently')}
-        </DropdownMenu.Item>
-      </DropdownMenu.Content>
-    );
-  }
-
-  if (isInRecycleBin()) {
-    return (
-      <DropdownMenu.Content>
-        <DropdownMenu.Item
-          onClick={() =>
-            showDeletePermanentlyModal({
-              node,
-              onDeletePermanently: () => handleDeleteNode({uuid: node.id, permanently: true}),
+              onDeletePermanently: () => deleteNode({uuid: node.id, permanently: true}),
             })
           }
         >
@@ -199,11 +185,13 @@ const CellsTableRowOptionsContent = ({
             {t('cells.options.download')}
           </DropdownMenu.Item>
         )}
+        <DropdownMenu.Item onClick={() => setIsTagsModalOpen(true)}>{t('cells.options.tags')}</DropdownMenu.Item>
+        <DropdownMenu.Item onClick={() => setIsRenameNodeModalOpen(true)}>Rename</DropdownMenu.Item>
         <DropdownMenu.Item
           onClick={() =>
             showMoveToRecycleBinModal({
               node,
-              onMoveToRecycleBin: () => handleDeleteNode({uuid: node.id, permanently: false}),
+              onMoveToRecycleBin: () => deleteNode({uuid: node.id, permanently: false}),
             })
           }
         >
@@ -217,6 +205,21 @@ const CellsTableRowOptionsContent = ({
         cellsRepository={cellsRepository}
         conversationQualifiedId={conversationQualifiedId}
         conversationName={conversationName}
+      />
+      <CellsTagsModal
+        uuid={node.id}
+        isOpen={isTagsModalOpen}
+        onClose={() => setIsTagsModalOpen(false)}
+        cellsRepository={cellsRepository}
+        selectedTags={node.tags}
+        onRefresh={onRefresh}
+      />
+      <CellsRenameNodeModal
+        isOpen={isRenameNodeModalOpen}
+        onClose={() => setIsRenameNodeModalOpen(false)}
+        node={node}
+        cellsRepository={cellsRepository}
+        onRefresh={onRefresh}
       />
     </>
   );

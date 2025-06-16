@@ -22,10 +22,10 @@ import {CSSProperties, useEffect, useMemo, useRef, useState} from 'react';
 import {CSSObject} from '@emotion/react';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {container} from 'tsyringe';
 
 import {
+  TabIndex,
   CertificateExpiredIcon,
   CertificateRevoked,
   ExpiresSoon,
@@ -88,7 +88,7 @@ const getMLSStatuses = ({identities, user}: {identities?: WireIdentity[]; user?:
   }
 
   return identities.map(identity => {
-    const matchingName = identity.x509Identity?.displayName === user.name();
+    const matchingName = identity.x509Identity?.display_name === user.name();
     const matchingHandle = checkUserHandle(identity, user);
 
     if (!matchingName || !matchingHandle) {
