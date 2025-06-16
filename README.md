@@ -8,7 +8,7 @@ You can find the published source code at [github.com/wireapp/wire](https://gith
 
 For licensing information, see the attached LICENSE file and the list of third-party licenses at [wire.com/legal/licenses/](https://wire.com/legal/licenses/).
 
-If you compile the open source software that we make available from time to time to develop your own mobile, desktop or web application, and cause that application to connect to our servers for any purposes, we refer to that resulting application as an “Open Source App”. All Open Source Apps are subject to, and may only be used and/or commercialized in accordance with, the Terms of Use applicable to the Wire Application, which can be found at https://wire.com/legal/#terms. Additionally, if you choose to build an Open Source App, certain restrictions apply, as follows:
+If you compile the open source software that we make available from time to time to develop your own mobile, desktop or web application, and cause that application to connect to our servers for any purposes, we refer to that resulting application as an "Open Source App". All Open Source Apps are subject to, and may only be used and/or commercialized in accordance with, the Terms of Use applicable to the Wire Application, which can be found at https://wire.com/legal/#terms. Additionally, if you choose to build an Open Source App, certain restrictions apply, as follows:
 
 a. You agree not to change the way the Open Source App connects and interacts with our servers; b. You agree not to weaken any of the security features of the Open Source App; c. You agree not to use our servers to store data for purposes other than the intended and original functionality of the Open Source App; d. You acknowledge that you are solely responsible for any and all updates to your Open Source App.
 
@@ -48,9 +48,27 @@ If you would like your browser to trust the certificate from "local.wire.com"/"l
 1. Set the `CAROOT` environment variable to `<WebApp Dir>/server/certificate`
 1. Run `mkcert -install`
 
-## Imai Environment
+#### Environment Configuration
 
-To connect to the [Imai environment](https://webapp.imai.wire.link), change the following environment variables:
+The application can be configured to connect to different environments by modifying the following environment variables in your `.env` file:
+
+**Production:**
+
+```
+APP_BASE="https://local.wire.com:8081"
+BACKEND_REST="https://nginz-https.wire.com"
+BACKEND_WS="https://nginz-ssl.wire.com"
+```
+
+**Staging:**
+
+```
+APP_BASE="https://local.zinfra.io:8081"
+BACKEND_REST="https://nginz-https.zinfra.io"
+BACKEND_WS="https://nginz-ssl.zinfra.io"
+```
+
+**Imai:**
 
 ```
 APP_BASE="https://local.imai.wire.link:8081"
@@ -58,7 +76,15 @@ BACKEND_REST="https://nginz-https.imai.wire.link"
 BACKEND_WS="https://nginz-ssl.imai.wire.link"
 ```
 
-The app will be available under https://local.imai.wire.link:8081.
+**Local:**
+
+```
+APP_BASE="http://localhost:8081"
+BACKEND_REST="http://localhost:8080"
+BACKEND_WS="ws://localhost:8080"
+```
+
+After updating the environment variables, the app will be available at the corresponding `APP_BASE` URL.
 
 ### Production
 
