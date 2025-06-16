@@ -423,6 +423,13 @@ declare module 'I18n/en-US.json' {
     'cells.pagination.resultsOutOf': `{start}-{end} out of {total}`;
     'cells.pagination.rowsPerPage': `Rows per page`;
     'cells.refreshButton': `Refresh list`;
+    'cells.renameNodeModal.headline': `Rename`;
+    'cells.renameNodeModal.saveButton': `Save`;
+    'cells.renameNodeModal.cancelButton': `Cancel`;
+    'cells.renameNodeModal.placeholder': `Enter a new name`;
+    'cells.renameNodeModal.label': `Name`;
+    'cells.renameNodeModal.error': `Something went wrong, please try again later.`;
+    'cells.renameNodeModal.nameRequired': `Name is required`;
     'cells.search.closeButton': `Close`;
     'cells.search.failed': `Something went wrong, please try again later.`;
     'cells.search.placeholder': `Search files and folders`;
