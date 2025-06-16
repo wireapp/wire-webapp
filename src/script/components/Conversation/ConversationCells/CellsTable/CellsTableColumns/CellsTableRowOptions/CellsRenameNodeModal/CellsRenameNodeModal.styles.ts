@@ -19,34 +19,14 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const contentStyles: CSSObject = {
-  padding: '0 16px',
-  marginBottom: '24px',
-};
-
 export const descriptionStyles: CSSObject = {
-  marginBottom: '24px',
+  padding: '0 16px',
 };
 
-export const selectWrapperStyles: CSSObject = {
-  height: '66px',
+export const inputWrapperStyles: CSSObject = {
   display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-};
-
-export const spinnerWrapperStyles: CSSObject = {
-  width: '32px',
-  height: '32px',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-};
-
-export const spinnerStyles: CSSObject = {
-  color: 'var(--foreground)',
-};
-
-export const menuListCSS: CSSObject = {
-  maxHeight: '200px',
+  flexDirection: 'column',
+  alignItems: 'flex-start',
+  padding: '16px',
+  gap: '8px',
 };

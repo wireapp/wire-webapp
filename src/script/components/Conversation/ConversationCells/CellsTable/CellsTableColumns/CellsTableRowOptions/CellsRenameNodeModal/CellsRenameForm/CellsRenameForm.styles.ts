@@ -19,23 +19,27 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const headerStyles: CSSObject = {
+export const formStyles: CSSObject = {
   display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
   flexDirection: 'column',
-  marginTop: '16px',
-  marginBottom: '24px',
+  alignItems: 'flex-start',
+  padding: '16px',
+  gap: '8px',
 };
 
-export const headingStyles: CSSObject = {
-  fontSize: 'var(--font-size-large)',
-  fontWeight: 'var(--font-weight-semibold)',
-  margin: '0',
-};
-
-export const closeButtonStyles: CSSObject = {
-  position: 'absolute',
+export const closeIconStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  cursor: 'pointer',
+  height: '100%',
+  width: '32px',
   right: '8px',
-  top: '8px',
+  top: '50%',
+  position: 'absolute',
+  transform: 'translateY(-50%)',
+  background: 'transparent',
+  border: 'none',
+  padding: '0',
+  margin: '0',
 };

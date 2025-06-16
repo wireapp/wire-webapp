@@ -17,25 +17,18 @@
  *
  */
 
-import {useState} from 'react';
+import {CSSObject} from '@emotion/react';
 
-import {CellsRepository} from 'src/script/cells/CellsRepository';
+export const actionsWrapperStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  flexDirection: 'row',
+  gap: '8px',
+  padding: '0 16px',
+  marginBottom: '8px',
+};
 
-export const useMoveCellsNode = ({cellsRepository}: {cellsRepository: CellsRepository}) => {
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-
-  const moveNode = async ({currentPath, targetPath}: {currentPath: string; targetPath: string}) => {
-    setStatus('loading');
-    try {
-      await cellsRepository.moveNode({
-        currentPath,
-        targetPath,
-      });
-      setStatus('success');
-    } catch (error) {
-      setStatus('error');
-    }
-  };
-
-  return {moveNode, status};
+export const buttonStyles: CSSObject = {
+  width: '100%',
+  margin: '0',
 };

@@ -374,7 +374,6 @@ declare module 'I18n/en-US.json' {
     'cellsMoveToRecycleBinModal.folder.description': `The folder {name} and its contents will move to this conversation\'s recycling bin.`;
     'cellsMoveToRecycleBinModal.file.headline': `Delete file?`;
     'cellsMoveToRecycleBinModal.folder.headline': `Delete folder?`;
-    'cells.newItemMenuModal.closeButton': `Close`;
     'cells.newItemMenuModal.headlineFile': `Create file`;
     'cells.newItemMenuModal.headlineFolder': `Create folder`;
     'cells.newItemMenuModal.descriptionFile': `All participants in this conversation can see this file.`;
@@ -408,6 +407,7 @@ declare module 'I18n/en-US.json' {
     'cells.imageFullScreenModal.closeButton': `Close`;
     'cells.noNodes.description': `You\'ll find all files and folders shared in this conversation here.`;
     'cells.noNodes.heading': `There are no files or folders yet`;
+    'cells.modal.closeButton': `Close`;
     'cells.options.delete': `Delete`;
     'cells.options.deletePermanently': `Delete permanently`;
     'cells.options.download': `Download`;
@@ -423,6 +423,13 @@ declare module 'I18n/en-US.json' {
     'cells.pagination.resultsOutOf': `{start}-{end} out of {total}`;
     'cells.pagination.rowsPerPage': `Rows per page`;
     'cells.refreshButton': `Refresh list`;
+    'cells.renameNodeModal.headline': `Rename`;
+    'cells.renameNodeModal.saveButton': `Save`;
+    'cells.renameNodeModal.cancelButton': `Cancel`;
+    'cells.renameNodeModal.placeholder': `Enter a new name`;
+    'cells.renameNodeModal.label': `Name`;
+    'cells.renameNodeModal.error': `Something went wrong, please try again later.`;
+    'cells.renameNodeModal.nameRequired': `Name is required`;
     'cells.search.closeButton': `Close`;
     'cells.search.failed': `Something went wrong, please try again later.`;
     'cells.search.placeholder': `Search files and folders`;
@@ -448,7 +455,6 @@ declare module 'I18n/en-US.json' {
     'cells.tableRow.size': `Size`;
     'cells.tableRow.tags': `Tags`;
     'cells.tagsModal.cancelButton': `Cancel`;
-    'cells.tagsModal.closeButton': `Close`;
     'cells.tagsModal.saveButton': `Save`;
     'cells.tagsModal.error': `Something went wrong`;
     'cells.tagsModal.label': `Tags`;
