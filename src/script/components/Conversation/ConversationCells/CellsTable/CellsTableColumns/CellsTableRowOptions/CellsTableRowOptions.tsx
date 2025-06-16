@@ -35,6 +35,7 @@ import {t} from 'Util/LocalizerUtil';
 import {forcedDownloadFile} from 'Util/util';
 
 import {CellsMoveNodeModal} from './CellsMoveNodeModal/CellsMoveNodeModal';
+import {CellsRenameNodeModal} from './CellsRenameNodeModal/CellsRenameNodeModal';
 import {buttonStyles, iconStyles, textStyles} from './CellsTableRowOptions.styles';
 import {CellsTagsModal} from './CellsTagsModal/CellsTagsModal';
 import {showDeletePermanentlyModal} from './showDeletePermanentlyModal/showDeletePermanentlyModal';
@@ -92,6 +93,8 @@ const CellsTableRowOptionsContent = ({
   const {handleOpenFile} = useCellsFilePreviewModal();
   const [isMoveNodeModalOpen, setIsMoveNodeModalOpen] = useState(false);
   const [isTagsModalOpen, setIsTagsModalOpen] = useState(false);
+  const [isRenameNodeModalOpen, setIsRenameNodeModalOpen] = useState(false);
+
   const url = node.url;
   const name = node.type === 'folder' ? `${node.name}.zip` : node.name;
 
@@ -183,6 +186,7 @@ const CellsTableRowOptionsContent = ({
           </DropdownMenu.Item>
         )}
         <DropdownMenu.Item onClick={() => setIsTagsModalOpen(true)}>{t('cells.options.tags')}</DropdownMenu.Item>
+        <DropdownMenu.Item onClick={() => setIsRenameNodeModalOpen(true)}>Rename</DropdownMenu.Item>
         <DropdownMenu.Item
           onClick={() =>
             showMoveToRecycleBinModal({
@@ -208,6 +212,13 @@ const CellsTableRowOptionsContent = ({
         onClose={() => setIsTagsModalOpen(false)}
         cellsRepository={cellsRepository}
         selectedTags={node.tags}
+        onRefresh={onRefresh}
+      />
+      <CellsRenameNodeModal
+        isOpen={isRenameNodeModalOpen}
+        onClose={() => setIsRenameNodeModalOpen(false)}
+        node={node}
+        cellsRepository={cellsRepository}
         onRefresh={onRefresh}
       />
     </>

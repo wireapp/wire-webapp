@@ -95,6 +95,8 @@ export const CellsMoveNodeModal = ({
     }
   }, [isOpen]);
 
+  const isMoveLoading = moveNodeStatus === 'loading';
+
   return (
     <CellsModal isOpen={isOpen} onClose={onClose} size="large">
       <CellsModal.Header>
@@ -117,8 +119,8 @@ export const CellsMoveNodeModal = ({
             </CellsModal.SecondaryButton>
             <CellsModal.PrimaryButton
               onClick={handleMove}
-              isDisabled={movingDisabled || shouldShowLoadingSpinner}
-              isLoading={moveNodeStatus === 'loading'}
+              isDisabled={movingDisabled || shouldShowLoadingSpinner || isMoveLoading}
+              isLoading={isMoveLoading}
             >
               {t('cells.moveNodeModal.moveButton')}
             </CellsModal.PrimaryButton>
