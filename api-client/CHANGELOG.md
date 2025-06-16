@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.63.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.62.0...@wireapp/api-client@27.63.0) (2025-06-16)
+
+### Features
+
+* revert "feat(api-client/conversation): add cells_state type field [WPB-18135]…" ([#7081](https://github.com/wireapp/wire-web-packages/issues/7081)) ([0afb38f](https://github.com/wireapp/wire-web-packages/commit/0afb38fd19c34c7ee7a603c613593b50972cc27c))
+
 # [27.62.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.61.0...@wireapp/api-client@27.62.0) (2025-06-16)
 
 ### Features
