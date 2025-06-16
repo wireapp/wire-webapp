@@ -41,6 +41,9 @@ export const transformDataToCellsNodes = (nodes: RestNode[]): Array<CellNode> =>
         };
         const url = node.PreSignedGET?.Url;
         const path = node.Path;
+        const presignedUrlExpiresAt = node.PreSignedGET?.ExpiresAt
+          ? new Date(Number(node.PreSignedGET?.ExpiresAt) * TIME_IN_MILLIS.SECOND)
+          : null;
 
         if (node.Type === 'COLLECTION') {
           return {
@@ -54,6 +57,7 @@ export const transformDataToCellsNodes = (nodes: RestNode[]): Array<CellNode> =>
             uploadedAtTimestamp,
             publicLink,
             tags: getTags(node),
+            presignedUrlExpiresAt,
           };
         }
 
@@ -73,6 +77,7 @@ export const transformDataToCellsNodes = (nodes: RestNode[]): Array<CellNode> =>
           uploadedAtTimestamp,
           publicLink,
           tags: getTags(node),
+          presignedUrlExpiresAt,
         };
       })
       // eslint-disable-next-line id-length
