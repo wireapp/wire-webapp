@@ -151,6 +151,7 @@ import {EventSource} from '../event/EventSource';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {isMemberMessage} from '../guards/Message';
 import * as LegalHoldEvaluator from '../legal-hold/LegalHoldEvaluator';
+import {scheduleRecurringTask} from '../lifecycle/updateRemoteConfigs';
 import {MessageCategory} from '../message/MessageCategory';
 import {SystemMessageType} from '../message/SystemMessageType';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
@@ -357,9 +358,21 @@ export class ConversationRepository {
   };
 
   public refreshMLSConversationVerificationState = async (conversation: Conversation) => {
-    if (this.mlsConversationVerificationStateHandler) {
-      await this.mlsConversationVerificationStateHandler.checkConversationVerificationState(conversation);
+    if (!this.mlsConversationVerificationStateHandler) {
+      return;
     }
+
+    const checkConversationVerificationState = async () => {
+      await this.mlsConversationVerificationStateHandler?.checkConversationVerificationState(conversation);
+    };
+
+    // We want to poll the latest team data every time the app is focused and every day
+    await scheduleRecurringTask({
+      every: TIME_IN_MILLIS.DAY,
+      task: checkConversationVerificationState,
+      key: 'check-conversation-verification-state',
+      addTaskOnWindowFocusEvent: true,
+    });
   };
 
   checkMessageTimer(messageEntity: ContentMessage): void {
