@@ -37,15 +37,28 @@ Prerequisites:
 1. Add the following entries to your hosts file (macOS / Linux: `/etc/hosts`, Windows 10: `%WINDIR%\system32\drivers\etc\hosts`):
    - `127.0.0.1 local.wire.com` (to connect with production backend)
    - `127.0.0.1 local.zinfra.io` (to connect with staging backend)
+   - `127.0.0.1 local.imai.wire.link` (to connect with imai backend)
 1. Run `yarn start` and Wire's web app will be available at: https://local.zinfra.io:8081/auth/
 
 #### Install the self-signed certificate
 
-If you would like your browser to trust the certificate from "local.wire.com" or "local.zinfra.io":
+If you would like your browser to trust the certificate from "local.wire.com"/"local.zinfra.io"/"local.imai.wire.link":
 
 1. Download [mkcert](https://github.com/FiloSottile/mkcert/releases/latest)
 1. Set the `CAROOT` environment variable to `<WebApp Dir>/server/certificate`
 1. Run `mkcert -install`
+
+## Imai Environment
+
+To connect to the [imai environment](https://webapp.imai.wire.link), change following environment variables:
+
+```
+APP_BASE="https://local.imai.wire.link:8081"
+BACKEND_REST="https://nginz-https.imai.wire.link"
+BACKEND_WS="https://nginz-ssl.imai.wire.link"
+```
+
+The app will be available under https://local.imai.wire.link:8081.
 
 ### Production
 
