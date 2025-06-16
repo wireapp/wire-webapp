@@ -50,7 +50,7 @@ If you would like your browser to trust the certificate from "local.wire.com"/"l
 
 ## Imai Environment
 
-To connect to the [imai environment](https://webapp.imai.wire.link), change following environment variables:
+To connect to the [Imai environment](https://webapp.imai.wire.link), change the following environment variables:
 
 ```
 APP_BASE="https://local.imai.wire.link:8081"
