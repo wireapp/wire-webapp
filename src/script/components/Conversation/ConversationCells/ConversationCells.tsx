@@ -32,6 +32,7 @@ import {useCellsStore} from './common/useCellsStore/useCellsStore';
 import {wrapperStyles} from './ConversationCells.styles';
 import {useCellsPagination} from './useCellsPagination/useCellsPagination';
 import {useGetAllCellsNodes} from './useGetAllCellsNodes/useGetAllCellsNodes';
+import {useOnPresignedUrlExpired} from './useOnPresignedUrlExpired/useOnPresignedUrlExpired';
 
 interface ConversationCellsProps {
   cellsRepository?: CellsRepository;
@@ -59,6 +60,8 @@ export const ConversationCells = ({
     setOffset,
     currentNodesCount: nodes.length,
   });
+
+  useOnPresignedUrlExpired({conversationId, refreshCallback: refresh});
 
   const isLoading = nodesStatus === 'loading';
   const isError = nodesStatus === 'error';
