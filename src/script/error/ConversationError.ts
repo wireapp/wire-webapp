@@ -33,6 +33,7 @@ enum CONVERSATION_ERROR_TYPE {
   WRONG_CONVERSATION = 'WRONG_CONVERSATION',
   WRONG_TYPE = 'WRONG_TYPE',
   WRONG_USER = 'WRONG_USER',
+  NOT_CREATED = 'NOT_CREATED',
 }
 
 export class ConversationError extends BaseError {
@@ -58,6 +59,7 @@ export class ConversationError extends BaseError {
       WRONG_CONVERSATION: 'Message was sent in the wrong conversation',
       WRONG_TYPE: 'Wrong message to for action',
       WRONG_USER: 'Wrong user tried to change or delete a message',
+      NOT_CREATED: 'Conversation was not created',
     };
   }
 
@@ -76,6 +78,7 @@ export class ConversationError extends BaseError {
       WRONG_CONVERSATION: CONVERSATION_ERROR_TYPE.WRONG_CONVERSATION,
       WRONG_TYPE: CONVERSATION_ERROR_TYPE.WRONG_TYPE,
       WRONG_USER: CONVERSATION_ERROR_TYPE.WRONG_USER,
+      NOT_CREATED: CONVERSATION_ERROR_TYPE.NOT_CREATED,
     };
   }
 }
