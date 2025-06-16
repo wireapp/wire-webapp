@@ -65,6 +65,24 @@ export class AuthRepository extends BackendClient {
     });
   }
 
+  public async loginUser(user: User): Promise<AxiosResponse> {
+    const response = await this.axiosInstance.post(
+      'login',
+      {
+        email: user.email,
+        password: user.password,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+    user.token = response.data.access_token;
+    user.id = response.data.user;
+    return response;
+  }
+
   public async requestAccessToken(zuidCookie: string): Promise<string> {
     const accessResponse = await this.axiosInstance.post(
       'access',

@@ -19,30 +19,32 @@
 
 import {Page, Locator} from '@playwright/test';
 
-export class AccountPage {
+export class StartUIPage {
   readonly page: Page;
 
-  readonly sendUsageDataCheckbox: Locator;
-  readonly appLockCheckbox: Locator;
-  readonly deleteAccountButton: Locator;
+  readonly searchInput: Locator;
+  readonly searchResults: Locator;
 
   constructor(page: Page) {
     this.page = page;
 
-    this.sendUsageDataCheckbox = page.locator("[data-uie-name='status-preference-telemetry']+label");
-    this.appLockCheckbox = page.locator("[data-uie-name='status-preference-applock']+label");
-    this.deleteAccountButton = page.locator("[data-uie-name='go-delete-account']");
+    this.searchInput = page.locator('#start-ui [data-uie-name="enter-users"]');
+    this.searchResults = page.locator('#start-ui [data-uie-name="item-user"] [data-uie-name="status-username"]');
   }
 
-  async clickDeleteAccountButton() {
-    await this.deleteAccountButton.click();
+  async searchForUser(username: string) {
+    await this.searchInput.fill(username);
   }
 
-  async toggleSendUsageData() {
-    await this.sendUsageDataCheckbox.click();
-  }
-
-  async toggleAppLock() {
-    await this.appLockCheckbox.click();
+  async clickUserFromSearchResults(username: string) {
+    await this.searchResults.first().waitFor({state: 'visible'});
+    for (const result of await this.searchResults.all()) {
+      const text = await result.textContent();
+      if (text && text.includes(username)) {
+        await result.click();
+        return;
+      }
+    }
+    throw new Error(`User ${username} not found in search results`);
   }
 }

@@ -20,11 +20,7 @@
 import {BackendClient} from './backendClient';
 
 export class ConversationRepository extends BackendClient {
-  //  POST https://staging-nginz-https.zinfra.io/conversations
-  //  >>> Request: {"access":["invite","code"],"conversation_role":"wire_member","access_role_v2":["team_member","non_team_member","guest","service"],"name":"Tracking","team":{"managed":false,"teamid":"b1a4d1d0-2502-4e9b-9455-b5323745eee7"},"qualified_users":[],"users":["ec653fd3-ea6e-4ebd-80ac-36d8fcb50e07"]}
-  // >>> Response (201): {"access":["invite","code"],"access_role":"non_activated","access_role_v2":["team_member","non_team_member","guest","service"],"add_permission":null,"cells_state":"disabled","creator":"3d24c4a8-e625-4f8b-ae64-db5b0e28ec47","group_conv_type":"group_conversation","id":"38d5084c-45d1-46e5-9a9c-002613bd3700","last_event":"0.0","last_event_time":"1970-01-01T00:00:00.000Z","members":{"others":[{"conversation_role":"wire_member","id":"ec653fd3-ea6e-4ebd-80ac-36d8fcb50e07","qualified_id":{"domain":"staging.zinfra.io","id":"ec653fd3-ea6e-4ebd-80ac-36d8fcb50e07"},"status":0}],"self":{"conversation_role":"wire_admin","hidden":false,"hidden_ref":null,"id":"3d24c4a8-e625-4f8b-ae64-db5b0e28ec47","otr_archived":false,"otr_archived_ref":null,"otr_muted_ref":null,"otr_muted_status":null,"qualified_id":{"domain":"staging.zinfra.io","id":"3d24c4a8-e625-4f8b-ae64-db5b0e28ec47"},"service":null,"status":0,"status_ref":"0.0","status_time":"1970-01-01T00:00:00.000Z"}},"message_timer":null,"name":"Tracking","protocol":"proteus","qualified_id":{"domain":"staging.zinfra.io","id":"38d5084c-45d1-46e5-9a9c-002613bd3700"},"receipt_mode":null,"team":"b1a4d1d0-2502-4e9b-9455-b5323745eee7","type":0}
-
-  public async inviteToConversation(inviteeId: string, inviterToken: string, teamId: string, conversationName: string) {
+  async inviteToConversation(inviteeId: string, inviterToken: string, teamId: string, conversationName: string) {
     await this.axiosInstance.post(
       'conversations',
       {
@@ -46,5 +42,60 @@ export class ConversationRepository extends BackendClient {
         },
       },
     );
+  }
+
+  async getMLSConversationWithUser(token: string, conversationPartnerId: string, timeout = 10000) {
+    const retryDelay = 1000;
+    const maxRetries = timeout / retryDelay;
+    let mlsConversationId = null;
+
+    for (let attempt = 0; attempt < maxRetries && !mlsConversationId; attempt++) {
+      const listIdsResponse = await this.axiosInstance.post(
+        'conversations/list-ids',
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const qualifiedIds = listIdsResponse.data.qualified_conversations;
+
+      if (!qualifiedIds) {
+        throw new Error('No qualified conversations found');
+      }
+
+      const response = await this.axiosInstance.post(
+        'v4/conversations/list',
+        {
+          qualified_ids: qualifiedIds,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+
+      // Filtering out conversations that are not MLS;
+      const responseData = response.data;
+      mlsConversationId =
+        responseData.found.find(
+          (conversation: {protocol: string; members: {others: {conversation_role: string; id: string}[]}}) =>
+            conversation.protocol === 'mls' &&
+            conversation.members.others.some(
+              (member: {conversation_role: string; id: string}) =>
+                member.conversation_role === 'wire_member' && member.id === conversationPartnerId,
+            ),
+        )?.qualified_id?.id || null;
+
+      await new Promise(resolve => setTimeout(resolve, retryDelay));
+    }
+    if (!mlsConversationId) {
+      throw new Error(`No MLS conversation found with user ID: ${conversationPartnerId}`);
+    }
+    return mlsConversationId;
   }
 }

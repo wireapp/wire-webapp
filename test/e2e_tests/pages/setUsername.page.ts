@@ -19,30 +19,28 @@
 
 import {Page, Locator} from '@playwright/test';
 
-export class AccountPage {
+export class SetUsernamePage {
   readonly page: Page;
 
-  readonly sendUsageDataCheckbox: Locator;
-  readonly appLockCheckbox: Locator;
-  readonly deleteAccountButton: Locator;
+  readonly handleInput: Locator;
+  readonly nextButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
 
-    this.sendUsageDataCheckbox = page.locator("[data-uie-name='status-preference-telemetry']+label");
-    this.appLockCheckbox = page.locator("[data-uie-name='status-preference-applock']+label");
-    this.deleteAccountButton = page.locator("[data-uie-name='go-delete-account']");
+    this.handleInput = page.locator('[data-uie-name="enter-handle"]');
+    this.nextButton = page.locator('[data-uie-name="do-send-handle"]');
   }
 
-  async clickDeleteAccountButton() {
-    await this.deleteAccountButton.click();
+  async setUsername(username: string) {
+    await this.handleInput.fill(username);
   }
 
-  async toggleSendUsageData() {
-    await this.sendUsageDataCheckbox.click();
+  async getHandleInputValue() {
+    return (await this.handleInput.inputValue()) ?? '';
   }
 
-  async toggleAppLock() {
-    await this.appLockCheckbox.click();
+  async clickNextButton() {
+    await this.nextButton.click();
   }
 }

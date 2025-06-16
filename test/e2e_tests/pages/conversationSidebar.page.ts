@@ -26,6 +26,7 @@ export class ConversationSidebar {
   readonly personalUserName: Locator;
   readonly preferencesButton: Locator;
   readonly allConverationsButton: Locator;
+  readonly connectButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -34,6 +35,7 @@ export class ConversationSidebar {
     this.personalUserName = page.locator('[data-uie-name="user-handle"]');
     this.preferencesButton = page.locator('[data-uie-name="go-preferences"]');
     this.allConverationsButton = page.locator('[data-uie-name="go-recent-view"]');
+    this.connectButton = page.locator('button[data-uie-name="go-people"]');
   }
 
   async getPersonalStatusName() {
@@ -50,5 +52,9 @@ export class ConversationSidebar {
 
   async clickAllConversationsButton() {
     await this.allConverationsButton.click();
+  }
+
+  async clickConnectButton() {
+    await this.connectButton.click();
   }
 }

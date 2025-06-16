@@ -17,32 +17,32 @@
  *
  */
 
-import {Page, Locator} from '@playwright/test';
+import {Locator, Page} from '@playwright/test';
 
-export class AccountPage {
+export class OutgoingConnectionPage {
   readonly page: Page;
 
-  readonly sendUsageDataCheckbox: Locator;
-  readonly appLockCheckbox: Locator;
-  readonly deleteAccountButton: Locator;
+  readonly uniqueUsernameOutgoing: Locator;
 
   constructor(page: Page) {
     this.page = page;
 
-    this.sendUsageDataCheckbox = page.locator("[data-uie-name='status-preference-telemetry']+label");
-    this.appLockCheckbox = page.locator("[data-uie-name='status-preference-applock']+label");
-    this.deleteAccountButton = page.locator("[data-uie-name='go-delete-account']");
+    this.uniqueUsernameOutgoing = this.page.locator('.message-connected-username.label-username');
   }
 
-  async clickDeleteAccountButton() {
-    await this.deleteAccountButton.click();
+  async getOutgoingConnectionUsername() {
+    return this.uniqueUsernameOutgoing.textContent();
   }
 
-  async toggleSendUsageData() {
-    await this.sendUsageDataCheckbox.click();
+  async isPendingIconVisible(fullName: string) {
+    return await this.page
+      .locator(`[data-uie-name='item-conversation'][data-uie-value='${fullName}'] [data-uie-name='status-pending']`)
+      .isVisible();
   }
 
-  async toggleAppLock() {
-    await this.appLockCheckbox.click();
+  async isPendingIconHidden(fullName: string) {
+    return await this.page
+      .locator(`[data-uie-name='item-conversation'][data-uie-value='${fullName}'] [data-uie-name='status-pending']`)
+      .waitFor({state: 'hidden'});
   }
 }

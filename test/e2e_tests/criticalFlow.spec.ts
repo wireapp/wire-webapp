@@ -20,11 +20,23 @@
 import {getUser, User} from './backend/user';
 import {AccountPage} from './pages/account.page';
 import {AppLockModal} from './pages/appLock.modal';
+import {BlockWarningModal} from './pages/blockWarning.modal';
 import {ConversationPage} from './pages/conversation.page';
+import {ConversationListPage} from './pages/conversationList.page';
 import {ConversationSidebar} from './pages/conversationSidebar.page';
 import {DataShareConsentModal} from './pages/dataShareConsent.modal';
+import {DeleteAccountModal} from './pages/deleteAccount.modal';
+import {DeleteAccountPage} from './pages/deleteAccount.page';
+import {EmailVerificationPage} from './pages/emailVerification.page';
 import {LoginPage} from './pages/login.page';
+import {MarketingConsentModal} from './pages/marketingConsent.modal';
+import {OutgoingConnectionPage} from './pages/outgoingConnection.page';
+import {RegistrationPage} from './pages/registration.page';
+import {SetUsernamePage} from './pages/setUsername.page';
 import {SingleSignOnPage} from './pages/singleSignOn.page';
+import {StartUIPage} from './pages/startUI.page';
+import {UserProfileModal} from './pages/userProfile.modal';
+import {WelcomePage} from './pages/welcome.page';
 import {test, expect} from './test.fixtures';
 
 const webAppPath = process.env.WEBAPP_URL ?? '';
@@ -32,6 +44,8 @@ const createdUsers: User[] = [];
 const createdTeams: Map<User, string> = new Map();
 
 test('Account Management', {tag: ['@TC-8639', '@crit-flow']}, async ({page, api}) => {
+  test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
+  // Creating preconditions for the test via API
   const owner = getUser();
   const member = getUser();
   const teamName = 'Critical';
@@ -39,28 +53,35 @@ test('Account Management', {tag: ['@TC-8639', '@crit-flow']}, async ({page, api}
   const appLockPassphrase = 'Aqa123456!';
 
   await api.createTeamOwner(owner, teamName);
-  createdUsers.push(owner);
+  if (!owner.token) {
+    throw new Error(`Owner ${owner.username} has no token and can't be used for team creation`);
+  }
   const teamId = await api.team.getTeamIdForUser(owner);
   createdTeams.set(owner, teamId);
   const invitationId = await api.team.inviteUserToTeam(
     teamId,
     member.email,
     `${owner.firstName} ${owner.lastName}`,
-    owner.token!,
+    owner.token,
   );
   const invitationCode = await api.brig.getTeamInvitationCodeForEmail(teamId, invitationId);
 
   await api.createPersonalUser(member, invitationCode);
-  await api.conversation.inviteToConversation(member.id!, owner.token!, teamId, conversationName);
+  if (!member.id) {
+    throw new Error(`Member ${member.username} has no ID and can't be invited to the conversation`);
+  }
+  await api.conversation.inviteToConversation(member.id, owner.token, teamId, conversationName);
 
+  // Initializing page objects
   const singleSignOnPage = new SingleSignOnPage(page);
   const loginPage = new LoginPage(page);
   const dataShareConsentModal = new DataShareConsentModal(page);
   const conversationSidebar = new ConversationSidebar(page);
   const accountPage = new AccountPage(page);
   const appLockModal = new AppLockModal(page);
-  const conversationPage = new ConversationPage(page);
+  const conversationListPage = new ConversationListPage(page);
 
+  // Test steps
   await page.goto(webAppPath);
   await singleSignOnPage.enterEmailOnSSOPage(owner.email);
   await loginPage.inputPassword(owner.password);
@@ -73,7 +94,7 @@ test('Account Management', {tag: ['@TC-8639', '@crit-flow']}, async ({page, api}
   //     And User <Owner> pinged in the conversation with Tracking
   //     Then There are no added reported events
   //
-  // but these are not a part of the original test case, so we skip them here.
+  // but these are not a part of the original test case, so I skip them here.
 
   await dataShareConsentModal.clickDecline();
   await conversationSidebar.clickPreferencesButton();
@@ -81,26 +102,154 @@ test('Account Management', {tag: ['@TC-8639', '@crit-flow']}, async ({page, api}
   await accountPage.toggleAppLock();
   await appLockModal.setPasscode(appLockPassphrase);
   await conversationSidebar.clickAllConversationsButton();
-  expect(await conversationPage.isConversationVisible(conversationName));
+  expect(await conversationListPage.isConversationItemVisible(conversationName));
 
   await page.reload();
-
   expect(await appLockModal.isVisible());
-  expect(await conversationPage.isConversationVisible(conversationName)).toBeFalsy();
+  expect(await conversationListPage.isConversationItemVisible(conversationName)).toBeFalsy();
   expect(await appLockModal.getAppLockModalHeader()).toContain('Enter passcode to unlock');
   expect(await appLockModal.getAppLockModalText()).toContain('Passcode');
 
   await appLockModal.unlockAppWithPasscode(appLockPassphrase);
   expect(await appLockModal.isHidden());
-  expect(await conversationPage.isConversationVisible(conversationName));
+  expect(await conversationListPage.isConversationItemVisible(conversationName));
 
   // TODO: Missing test steps for TC-8639 from testiny:
   // Member changes their email address to a new email address
   // Member resets their password
+  //
+  // These steps were not implemented in zautomation, so I skipped them here for the time being.
+});
+
+test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow']}, async ({page, api}) => {
+  test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
+
+  // Creating preconditions for the test via API
+  // userB is the contact user, userA is the user who registers
+  const userB = getUser();
+  const userA = getUser();
+  await api.createPersonalUser(userB);
+  createdUsers.push(userB);
+  await api.addDevicesToUser(userB, 1);
+
+  // Initializing page objects
+  const singleSignOnPage = new SingleSignOnPage(page);
+  const welcomePage = new WelcomePage(page);
+  const registrationPage = new RegistrationPage(page);
+  const verificationPage = new EmailVerificationPage(page);
+  const marketingConsentModal = new MarketingConsentModal(page);
+  const setUsernamePage = new SetUsernamePage(page);
+  const dataShareConsentModal = new DataShareConsentModal(page);
+  const conversationSidebar = new ConversationSidebar(page);
+  const conversationPage = new ConversationPage(page);
+  const startUIPage = new StartUIPage(page);
+  const userProfileModal = new UserProfileModal(page);
+  const conversationListPage = new ConversationListPage(page);
+  const outgoingConnectionPage = new OutgoingConnectionPage(page);
+  const blockWarningModal = new BlockWarningModal(page);
+  const deleteAccountModal = new DeleteAccountModal(page);
+  const accountPage = new AccountPage(page);
+
+  // Test steps
+  await page.goto(webAppPath);
+  await singleSignOnPage.enterEmailOnSSOPage(userA.email);
+  await welcomePage.clickCreateAccountButton();
+  await welcomePage.clickCreatePersonalAccountButton();
+  expect(await registrationPage.isPasswordPolicyInfoVisible());
+
+  await registrationPage.fillInUserInfo(userA);
+  expect(await registrationPage.isSubmitButtonEnabled()).toBeFalsy();
+
+  await registrationPage.toggleTermsCheckbox();
+  expect(await registrationPage.isSubmitButtonEnabled()).toBeTruthy();
+
+  await registrationPage.clickSubmitButton();
+  const verificationCode = await api.inbucket.getVerificationCode(userA.email);
+  await verificationPage.enterVerificationCode(verificationCode);
+  await marketingConsentModal.clickConfirmButton();
+
+  const autoGeneratedUsername = `${userA.firstName}${userA.lastName.replaceAll('-', '')}`.toLowerCase();
+  const truncatedAutoGeneratedUsername = autoGeneratedUsername.substring(0, 20);
+  expect(await setUsernamePage.getHandleInputValue()).toBe(truncatedAutoGeneratedUsername);
+
+  await setUsernamePage.setUsername(userA.username);
+  await setUsernamePage.clickNextButton();
+  await dataShareConsentModal.isModalPresent();
+  await dataShareConsentModal.clickDecline();
+  expect(await conversationSidebar.getPersonalStatusName()).toBe(`${userA.firstName} ${userA.lastName}`);
+  expect(await conversationSidebar.getPersonalUserName()).toContain(userA.username);
+  expect(await conversationPage.isWatermarkVisible());
+
+  await conversationSidebar.clickConnectButton();
+  await startUIPage.searchForUser(userB.username);
+  await startUIPage.clickUserFromSearchResults(userB.username);
+  expect(await userProfileModal.isVisible());
+
+  await userProfileModal.clickConnectButton();
+  await conversationListPage.openConversation(userB.fullName);
+  expect(await outgoingConnectionPage.getOutgoingConnectionUsername()).toContain(userB.username);
+  expect(await outgoingConnectionPage.isPendingIconVisible(userB.fullName));
+
+  await api.acceptConnectionRequest(userB);
+  expect(await outgoingConnectionPage.isPendingIconHidden(userB.fullName));
+
+  // TODO: Conversation sometimes closes after connection request was approved, so we need to reopen it
+  await conversationListPage.openConversation(userB.fullName);
+  expect(await conversationPage.isConversationOpen(userB.fullName));
+
+  await conversationPage.sendMessage('Hello there');
+  expect(await conversationPage.isMessageVisible(userA, 'Hello there')).toBeTruthy();
+
+  // TODO: Sending message through test service (Kalium) is not working properly, needs investigation
+  // await api.sendMessageToPersonalConversation(userB, userA, 'Heya');
+  // expect(await conversationPage.isMessageVisible(userB, 'Heya')).toBeTruthy();
+
+  await conversationListPage.clickConversationOptions(userB.fullName);
+  await conversationListPage.clickBlockConversation();
+  expect(await blockWarningModal.isModalPresent());
+  expect(await blockWarningModal.getModalTitle()).toContain(`Block ${userB.fullName}`);
+  expect(await blockWarningModal.getModalText()).toContain(
+    `${userB.fullName} won’t be able to contact you or add you to group conversations.`,
+  );
+
+  await blockWarningModal.clickBlock();
+  expect(await conversationListPage.isConversationBlocked(userB.fullName));
+
+  // [WPB-18093] Backend not returning the blocked 1:1 in conversations list
+  // When User <Contact> sends message "See this?" to personal MLS conversation <Name>
+  // Then I do not see text message See this?
+
+  await conversationSidebar.clickPreferencesButton();
+  await accountPage.clickDeleteAccountButton();
+  expect(await deleteAccountModal.isModalPresent());
+  expect(await deleteAccountModal.getModalTitle()).toContain('Delete account');
+  expect(await deleteAccountModal.getModalText()).toContain(
+    'We will send you an email. Follow the link to delete your account permanently.',
+  );
+
+  await deleteAccountModal.clickDelete();
+  const url = await api.inbucket.getAccountDeletionURL(userA.email);
+
+  const newTab = await page.context().newPage();
+  await newTab.goto(url);
+  const deleteAccountPage = new DeleteAccountPage(newTab);
+  await deleteAccountPage.clickDeleteAccountButton();
+  expect(await deleteAccountPage.isAccountDeletedHeadlineVisible());
+
+  await newTab.close();
+  expect(await welcomePage.getLogoutReasonText()).toContain('You were signed out because your account was deleted');
 });
 
 test.afterAll(async ({api}) => {
   for (const [user, teamId] of createdTeams.entries()) {
     await api.team.deleteTeam(user, teamId);
+  }
+
+  for (const user of createdUsers) {
+    const token = user.token || (await api.auth.loginUser(user)).data.access_token;
+    if (!token) {
+      throw new Error(`Couldn't fetch token for ${user.username} and therefore can't delete the user`);
+    }
+    await api.user.deleteUser(user.password, token);
   }
 });

@@ -19,30 +19,23 @@
 
 import {Page, Locator} from '@playwright/test';
 
-export class AccountPage {
+export class UserProfileModal {
   readonly page: Page;
 
-  readonly sendUsageDataCheckbox: Locator;
-  readonly appLockCheckbox: Locator;
-  readonly deleteAccountButton: Locator;
+  readonly modal: Locator;
+  readonly connectButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
-
-    this.sendUsageDataCheckbox = page.locator("[data-uie-name='status-preference-telemetry']+label");
-    this.appLockCheckbox = page.locator("[data-uie-name='status-preference-applock']+label");
-    this.deleteAccountButton = page.locator("[data-uie-name='go-delete-account']");
+    this.modal = page.locator('[data-uie-name="modal-user-profile"]');
+    this.connectButton = page.locator('[data-uie-name="modal-user-profile"] [data-uie-name="do-send-request"]');
   }
 
-  async clickDeleteAccountButton() {
-    await this.deleteAccountButton.click();
+  async isVisible() {
+    await this.modal.isVisible();
   }
 
-  async toggleSendUsageData() {
-    await this.sendUsageDataCheckbox.click();
-  }
-
-  async toggleAppLock() {
-    await this.appLockCheckbox.click();
+  async clickConnectButton() {
+    await this.connectButton.click();
   }
 }

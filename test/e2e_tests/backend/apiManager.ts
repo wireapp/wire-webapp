@@ -21,7 +21,10 @@ import {AxiosResponse} from 'axios';
 
 import {AuthRepository} from './authRepository';
 import {BrigRepository} from './brigRepository';
+import {ConnectionsRepository as ConnectionRepository} from './connectionRepository';
 import {ConversationRepository} from './conversationRepository';
+import {FeatureConfigRepository} from './featureConfigRepository';
+import {InbucketClient} from './inbucketClient';
 import {TeamRepository} from './teamRepository';
 import {TestServiceClient} from './testServiceClient';
 import {User} from './user';
@@ -31,20 +34,45 @@ export class ApiManager {
   user: UserRepository;
   auth: AuthRepository;
   brig: BrigRepository;
-  kalium: TestServiceClient;
+  testService: TestServiceClient;
   team: TeamRepository;
   conversation: ConversationRepository;
+  featureConfig: FeatureConfigRepository;
+  inbucket: InbucketClient;
+  connection: ConnectionRepository;
 
   constructor() {
     this.user = new UserRepository();
     this.auth = new AuthRepository();
     this.brig = new BrigRepository();
-    this.kalium = new TestServiceClient();
+    this.testService = new TestServiceClient();
     this.team = new TeamRepository();
     this.conversation = new ConversationRepository();
+    this.featureConfig = new FeatureConfigRepository();
+    this.inbucket = new InbucketClient();
+    this.connection = new ConnectionRepository();
   }
 
-  public async createPersonalUser(user: User, invitationCode?: string) {
+  async addDevicesToUser(user: User, numberOfDevices: number) {
+    const token = user.token || (await this.auth.loginUser(user)).data.access_token;
+    const isMlsEnabled = await this.featureConfig.isMlsEnabled(token);
+    for (let i = 0; i < numberOfDevices; i++) {
+      const deviceName = `Device${i + 1}`;
+      const response = await this.testService.createInstance(user.password, user.email, deviceName, isMlsEnabled);
+      user.devices.push(response.instanceId);
+    }
+  }
+
+  async sendMessageToPersonalConversation(sender: User, receiver: User, text: string) {
+    const senderToken = sender.token || (await this.auth.loginUser(sender)).data.access_token;
+    const receiverId = receiver.id || (await this.auth.loginUser(receiver)).data.user;
+    const conversationId = await this.conversation.getMLSConversationWithUser(senderToken, receiverId);
+
+    // Using the first device from the list of devices
+    await this.testService.sendText(sender.devices[0], conversationId, text);
+  }
+
+  async createPersonalUser(user: User, invitationCode?: string) {
     // 1. Register
     const registerResponse = await this.auth.registerUser(user, invitationCode);
     const zuidCookie = this.extractCookieFromRegisterResponse(registerResponse);
@@ -64,7 +92,7 @@ export class ApiManager {
     await this.user.setUniqueUsername(user.username, user.token);
   }
 
-  public async createTeamOwner(user: User, teamName: string) {
+  async createTeamOwner(user: User, teamName: string) {
     // 1. Book email
     await this.auth.bookEmail(user.email);
 
@@ -80,6 +108,12 @@ export class ApiManager {
 
     // 5. Set Unique Username (Handle)
     await this.user.setUniqueUsername(user.username, user.token);
+  }
+
+  async acceptConnectionRequest(user: User) {
+    const token = user.token || (await this.auth.loginUser(user)).data.access_token;
+    const listOfConnections = await this.connection.getConnectionsList(token);
+    await this.connection.acceptConnectionRequest(token, listOfConnections.data.connections[0].to);
   }
 
   private extractCookieFromRegisterResponse(registerResponse: AxiosResponse): string {

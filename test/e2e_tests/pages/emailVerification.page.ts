@@ -17,32 +17,31 @@
  *
  */
 
-import {Page, Locator} from '@playwright/test';
+import {Locator, Page} from '@playwright/test';
 
-export class AccountPage {
+export class EmailVerificationPage {
   readonly page: Page;
 
-  readonly sendUsageDataCheckbox: Locator;
-  readonly appLockCheckbox: Locator;
-  readonly deleteAccountButton: Locator;
+  readonly verificationCodeInput: Locator;
 
   constructor(page: Page) {
     this.page = page;
 
-    this.sendUsageDataCheckbox = page.locator("[data-uie-name='status-preference-telemetry']+label");
-    this.appLockCheckbox = page.locator("[data-uie-name='status-preference-applock']+label");
-    this.deleteAccountButton = page.locator("[data-uie-name='go-delete-account']");
+    this.verificationCodeInput = page.locator('input');
   }
 
-  async clickDeleteAccountButton() {
-    await this.deleteAccountButton.click();
-  }
+  // Doesn't work with headless chromium
+  async enterVerificationCode(code: string) {
+    if (code.length !== 6) {
+      throw new Error('Verification code must be exactly 6 characters long');
+    }
 
-  async toggleSendUsageData() {
-    await this.sendUsageDataCheckbox.click();
-  }
-
-  async toggleAppLock() {
-    await this.appLockCheckbox.click();
+    const inputs = await this.page.locator('input').all();
+    for (let i = 0; i < code.length; i++) {
+      await inputs[i].focus();
+      await this.page.keyboard.press(code[i]); // Clear any existing input
+    }
+    // await this.page.keyboard.type(code); // Doesn't work!
+    await this.page.keyboard.press('Enter');
   }
 }

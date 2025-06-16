@@ -19,30 +19,24 @@
 
 import {Page, Locator} from '@playwright/test';
 
-export class AccountPage {
+export class DeleteAccountPage {
   readonly page: Page;
 
-  readonly sendUsageDataCheckbox: Locator;
-  readonly appLockCheckbox: Locator;
   readonly deleteAccountButton: Locator;
+  readonly accountDeletedHeadline: Locator;
 
   constructor(page: Page) {
     this.page = page;
 
-    this.sendUsageDataCheckbox = page.locator("[data-uie-name='status-preference-telemetry']+label");
-    this.appLockCheckbox = page.locator("[data-uie-name='status-preference-applock']+label");
-    this.deleteAccountButton = page.locator("[data-uie-name='go-delete-account']");
+    this.deleteAccountButton = page.locator("[data-uie-name='do-delete-account']");
+    this.accountDeletedHeadline = page.locator("[data-uie-name='successful-delete-account-headline']");
   }
 
   async clickDeleteAccountButton() {
     await this.deleteAccountButton.click();
   }
 
-  async toggleSendUsageData() {
-    await this.sendUsageDataCheckbox.click();
-  }
-
-  async toggleAppLock() {
-    await this.appLockCheckbox.click();
+  async isAccountDeletedHeadlineVisible() {
+    return (await this.accountDeletedHeadline.textContent()) === 'Account deleted';
   }
 }

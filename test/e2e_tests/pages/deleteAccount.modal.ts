@@ -19,27 +19,27 @@
 
 import {Page, Locator} from '@playwright/test';
 
-export class DataShareConsentModal {
+export class DeleteAccountModal {
   readonly page: Page;
 
   readonly modal: Locator;
   readonly modalTitle: Locator;
   readonly modalText: Locator;
-  readonly agreeButton: Locator;
-  readonly declineButton: Locator;
+  readonly deleteButton: Locator;
+  readonly cancelButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
 
-    this.modal = page.locator("[data-uie-name='primary-modals-container'][aria-label='Consent to share user data']");
+    this.modal = page.locator("[data-uie-name='primary-modals-container'][aria-label='Delete account']");
     this.modalTitle = this.modal.locator("[data-uie-name='status-modal-title']");
     this.modalText = this.modal.locator("[data-uie-name='status-modal-text']");
-    this.agreeButton = this.modal.locator("[data-uie-name='do-action']");
-    this.declineButton = this.modal.locator("[data-uie-name='do-secondary']");
+    this.deleteButton = this.modal.locator("[data-uie-name='do-action']");
+    this.cancelButton = this.modal.locator("[data-uie-name='do-secondary']");
   }
 
   async isModalPresent() {
-    return this.modal.isVisible();
+    return await this.modal.isVisible();
   }
 
   async getModalTitle() {
@@ -50,16 +50,15 @@ export class DataShareConsentModal {
     return (await this.modalText.textContent()) ?? '';
   }
 
-  async isActionButtonVisible() {
-    return await this.agreeButton.isVisible();
+  async isDeleteButtonVisible() {
+    return await this.deleteButton.isVisible();
   }
 
-  async clickDecline() {
-    await this.declineButton.isVisible();
-    await this.declineButton.click();
+  async clickCancel() {
+    await this.cancelButton.click();
   }
 
-  async clickConfirm() {
-    await this.agreeButton.click();
+  async clickDelete() {
+    await this.deleteButton.click();
   }
 }

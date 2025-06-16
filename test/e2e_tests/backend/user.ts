@@ -25,23 +25,47 @@ export interface User {
   password: string;
   firstName: string;
   lastName: string;
+  fullName: string;
   username: string;
+  devices: string[];
   teamId?: string;
-  // token: string | null;
   token?: string;
 }
 
 export const getUser = (user: Partial<User> = {}): User => {
   // Ensure lastName is always defined, as it is used in email and username generation
-  const lastName = user.lastName ?? faker.person.lastName();
+  const lastName = user.lastName ?? faker.person.lastName().replaceAll("'", '');
+  const firstName = user.firstName ?? faker.person.firstName().replaceAll("'", '');
 
   return {
     ...user,
     email: user.email ?? faker.internet.email({lastName, provider: 'wire.engineering'}).toLowerCase(),
-    password: user.password ?? faker.internet.password({length: 8, pattern: /[A-Za-z\d!@#$]/}),
-    firstName: user.firstName ?? faker.person.firstName(),
+    password: user.password ?? generateSecurePassword(),
+    firstName,
     lastName,
-    username: user.username ?? `${lastName}${faker.string.alpha({length: 5, casing: 'lower'})}`.toLowerCase(),
+    fullName: user.fullName ?? `${firstName} ${lastName}`,
+    username:
+      user.username ??
+      `${lastName}${faker.string.alpha({length: 5, casing: 'lower'})}`.replaceAll("'", '').toLowerCase(),
     token: user.token ?? undefined,
+    devices: user.devices ?? [],
   };
+
+  function generateSecurePassword(length: number = 8): string {
+    if (length < 8) {
+      throw new Error('Password length must be at least 8 characters.');
+    }
+    // Leave 2 characters for a special symbol and a number
+    const numberOfLetters = length - 2;
+    const lowerCaseLetters = faker.string.alpha({length: numberOfLetters / 2, casing: 'lower'});
+    const upperCaseLetters = faker.string.alpha({length: numberOfLetters / 2, casing: 'upper'});
+    const number = faker.string.numeric({length: 1});
+    const symbol = faker.helpers.arrayElement(['!', '@', '#', '$', '%', '&', '*']);
+
+    // Combine and shuffle the characters
+    const allChars = [...(lowerCaseLetters + upperCaseLetters + number + symbol)];
+    const shuffled = faker.helpers.shuffle(allChars);
+
+    return shuffled.join('');
+  }
 };

@@ -31,4 +31,24 @@ export class TestServiceClient {
       },
     });
   }
+
+  async createInstance(password: string, email: string, deviceName: string, developmentApiEnabled: boolean) {
+    const response = await this.axiosInstance.put('/api/v1/instance', {
+      password,
+      name: 'Generic Test Name',
+      backend: 'staging',
+      developmentApiEnabled,
+      deviceName,
+      email,
+    });
+    return response.data;
+  }
+
+  async sendText(instanceId: string, conversationId: string, text: string) {
+    return await this.axiosInstance.post(`/api/v1/instance/${instanceId}/sendText`, {
+      legalHoldStatus: 1,
+      conversationId,
+      text,
+    });
+  }
 }
