@@ -685,7 +685,6 @@ describe('ProteusService', () => {
       id: '',
       type: CONVERSATION_TYPE.REGULAR,
       creator: '',
-      cells_state: 'disabled',
       access: [],
       access_role: [CONVERSATION_ACCESS_ROLE.GUEST],
       members: {
