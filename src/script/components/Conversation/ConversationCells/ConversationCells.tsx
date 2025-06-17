@@ -51,13 +51,13 @@ export const ConversationCells = ({
   const {getNodes, status: nodesStatus, getPagination} = useCellsStore();
 
   const conversationId = conversationQualifiedId.id;
-  const cellStateReady = cellsState === CONVERSATION_CELLS_STATE.READY;
-  const cellStatePending = cellsState === CONVERSATION_CELLS_STATE.PENDING;
+  const isCellsStateReady = cellsState === CONVERSATION_CELLS_STATE.READY;
+  const isCellsStatePending = cellsState === CONVERSATION_CELLS_STATE.PENDING;
 
   const {refresh, setOffset} = useGetAllCellsNodes({
     cellsRepository,
     conversationQualifiedId,
-    enabled: cellStateReady,
+    enabled: isCellsStateReady,
   });
 
   const nodes = getNodes({conversationId});
@@ -77,11 +77,11 @@ export const ConversationCells = ({
   const isSuccess = nodesStatus === 'success';
 
   const hasNodes = !!nodes.length;
-  const emptyView = !isError && !hasNodes && cellStateReady;
+  const emptyView = !isError && !hasNodes && isCellsStateReady;
 
-  const isTableVisible = (isSuccess || isLoading) && cellStateReady;
-  const isLoadingVisible = isLoading && cellStateReady;
-  const isNoNodesVisible = !isLoading && emptyView && cellStateReady;
+  const isTableVisible = (isSuccess || isLoading) && isCellsStateReady;
+  const isLoadingVisible = isLoading && isCellsStateReady;
+  const isNoNodesVisible = !isLoading && emptyView && isCellsStateReady;
   const isPaginationVisible = !emptyView;
 
   return (
@@ -101,7 +101,7 @@ export const ConversationCells = ({
           onRefresh={refresh}
         />
       )}
-      {cellStatePending && (
+      {isCellsStatePending && (
         <CellsStateInfo heading={t('cells.pending.heading')} description={t('cells.pending.description')} />
       )}
       {isNoNodesVisible && (
