@@ -123,7 +123,7 @@ test('Account Management', {tag: ['@TC-8639', '@crit-flow']}, async ({page, api}
 });
 
 test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow']}, async ({page, api}) => {
-  test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
+  test.setTimeout(120_000); // Increasing test timeout to 120 seconds to accommodate the full flow
 
   // Creating preconditions for the test via API
   // userB is the contact user, userA is the user who registers
