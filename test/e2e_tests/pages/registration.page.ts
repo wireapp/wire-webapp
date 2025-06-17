@@ -19,7 +19,7 @@
 
 import {Locator, Page} from '@playwright/test';
 
-import {User} from '../backend/user';
+import {User} from '../data/user';
 
 export class RegistrationPage {
   readonly page: Page;

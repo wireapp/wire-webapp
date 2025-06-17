@@ -18,7 +18,8 @@
  */
 
 import {BackendClient} from './backendClient';
-import {User} from './user';
+
+import {User} from '../data/user';
 
 export class TeamRepository extends BackendClient {
   async getTeamIdForUser(user: User): Promise<string> {

@@ -19,6 +19,8 @@
 
 import {Locator, Page} from '@playwright/test';
 
+import {escapeHtml} from '../utils/userDataProcessor';
+
 export class ConversationListPage {
   readonly page: Page;
 
@@ -31,7 +33,7 @@ export class ConversationListPage {
   }
 
   async isConversationItemVisible(conversationName: string) {
-    const conversation = this.page.locator(`[data-uie-name='item-conversation'][data-uie-value='${conversationName}']`);
+    const conversation = this.getConversationLocator(conversationName);
     return await conversation.isVisible();
   }
 
@@ -58,7 +60,7 @@ export class ConversationListPage {
 
   private getConversationLocator(conversationName: string) {
     return this.page.locator(
-      `#conversations [data-uie-name='item-conversation'][data-uie-value='${conversationName}']`,
+      `#conversations [data-uie-name='item-conversation'][data-uie-value='${escapeHtml(conversationName)}']`,
     );
   }
 }

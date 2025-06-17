@@ -19,8 +19,6 @@
 
 import {Locator, Page} from '@playwright/test';
 
-import {User} from '../backend/user';
-
 export class ConversationPage {
   readonly page: Page;
 
@@ -60,7 +58,7 @@ export class ConversationPage {
     await this.messageInput.press('Enter');
   }
 
-  async isMessageVisible(fromUser: User, messageText: string) {
+  async isMessageVisible(messageText: string) {
     // Trying multiple times for the message to appear
     for (let i = 0; i < 30; i++) {
       await this.page.waitForTimeout(500); // Wait for 0.5 second before checking

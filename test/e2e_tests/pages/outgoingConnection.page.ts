@@ -19,6 +19,8 @@
 
 import {Locator, Page} from '@playwright/test';
 
+import {escapeHtml} from '../utils/userDataProcessor';
+
 export class OutgoingConnectionPage {
   readonly page: Page;
 
@@ -35,14 +37,20 @@ export class OutgoingConnectionPage {
   }
 
   async isPendingIconVisible(fullName: string) {
-    return await this.page
-      .locator(`[data-uie-name='item-conversation'][data-uie-value='${fullName}'] [data-uie-name='status-pending']`)
-      .isVisible();
+    const pendingIcon = this.getPendingConnectionIconLocator(fullName);
+    await pendingIcon.waitFor({state: 'visible'});
+    return pendingIcon.isVisible();
   }
 
   async isPendingIconHidden(fullName: string) {
-    return await this.page
-      .locator(`[data-uie-name='item-conversation'][data-uie-value='${fullName}'] [data-uie-name='status-pending']`)
-      .waitFor({state: 'hidden'});
+    const pendingIcon = this.getPendingConnectionIconLocator(fullName);
+    await pendingIcon.waitFor({state: 'hidden'});
+    return pendingIcon.isVisible();
+  }
+
+  private getPendingConnectionIconLocator(fullName: string) {
+    return this.page.locator(
+      `[data-uie-name='item-conversation'][data-uie-value='${escapeHtml(fullName)}'] [data-uie-name='status-pending']`,
+    );
   }
 }

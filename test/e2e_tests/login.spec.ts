@@ -17,7 +17,7 @@
  *
  */
 
-import {User, getUser} from './backend/user';
+import {User, getUser} from './data/user';
 import {ConversationSidebar} from './pages/conversationSidebar.page';
 import {DataShareConsentModal} from './pages/dataShareConsent.modal';
 import {LoginPage} from './pages/login.page';

@@ -20,7 +20,8 @@
 import {AxiosResponse} from 'axios';
 
 import {BackendClient} from './backendClient';
-import {User} from './user';
+
+import {User} from '../data/user';
 
 export class AuthRepository extends BackendClient {
   public async registerUser(user: User, invitationCode?: string): Promise<AxiosResponse> {

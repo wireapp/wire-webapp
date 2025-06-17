@@ -39,9 +39,8 @@ export class EmailVerificationPage {
     const inputs = await this.page.locator('input').all();
     for (let i = 0; i < code.length; i++) {
       await inputs[i].focus();
-      await this.page.keyboard.press(code[i]); // Clear any existing input
+      await this.page.keyboard.press(code[i]);
     }
-    // await this.page.keyboard.type(code); // Doesn't work!
     await this.page.keyboard.press('Enter');
   }
 }

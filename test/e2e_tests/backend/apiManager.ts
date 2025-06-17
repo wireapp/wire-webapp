@@ -27,8 +27,9 @@ import {FeatureConfigRepository} from './featureConfigRepository';
 import {InbucketClient} from './inbucketClient';
 import {TeamRepository} from './teamRepository';
 import {TestServiceClient} from './testServiceClient';
-import {User} from './user';
 import {UserRepository} from './userRepository';
+
+import {User} from '../data/user';
 
 export class ApiManager {
   user: UserRepository;
