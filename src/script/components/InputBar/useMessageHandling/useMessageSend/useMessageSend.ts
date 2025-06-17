@@ -245,6 +245,7 @@ export const useMessageSend = ({
   ]);
 
   const handleSendMessage = useCallback(async () => {
+    await conversationRepository.refreshMLSConversationVerificationState(conversation);
     const isE2EIDegraded = conversation.mlsVerificationState() === ConversationVerificationState.DEGRADED;
 
     if (isE2EIDegraded) {
