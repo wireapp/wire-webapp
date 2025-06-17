@@ -21,9 +21,10 @@ import axios, {AxiosInstance} from 'axios';
 
 export class InbucketClient {
   private readonly axiosInstance: AxiosInstance;
-  private readonly inbucketUsername = process.env.INBUCKET_USERNAME;
-  private readonly inbucketPassword = process.env.INBUCKET_PASSWORD;
-  private readonly authHeader: string = `Basic ${Buffer.from(`${this.inbucketUsername}:${this.inbucketPassword}`).toString('base64')}`;
+  private readonly inbucketUsername;
+  private readonly inbucketPassword;
+  private readonly encodedCredentials;
+  private readonly authHeader;
 
   constructor() {
     this.axiosInstance = axios.create({
@@ -33,6 +34,10 @@ export class InbucketClient {
         'Content-Type': 'application/json',
       },
     });
+    this.inbucketUsername = process.env.INBUCKET_USERNAME;
+    this.inbucketPassword = process.env.INBUCKET_PASSWORD;
+    this.encodedCredentials = Buffer.from(`${this.inbucketUsername}:${this.inbucketPassword}`).toString('base64');
+    this.authHeader = `Basic ${this.encodedCredentials}`;
   }
 
   async getVerificationCode(email: string) {
