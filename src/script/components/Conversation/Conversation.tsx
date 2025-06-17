@@ -477,7 +477,7 @@ export const Conversation = ({
     isDisabled: isFileTabActive,
   });
 
-  const isCellsEnabled = Config.getConfig().FEATURE.ENABLE_CELLS;
+  const isCellsEnabled = Config.getConfig().FEATURE.ENABLE_CELLS && activeConversation?.cellsState() !== 'disabled';
 
   return (
     <ConversationFileDropzone
@@ -513,8 +513,10 @@ export const Conversation = ({
               <ConversationTabPanel id="files" isActive={isFileTabActive}>
                 {isFileTabActive && (
                   <ConversationCells
+                    conversationRepository={repositories.conversation}
                     conversationQualifiedId={activeConversation.qualifiedId}
                     conversationName={activeConversation.name()}
+                    cellsState={activeConversation.cellsState()}
                   />
                 )}
               </ConversationTabPanel>

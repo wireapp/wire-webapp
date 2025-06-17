@@ -258,6 +258,7 @@ export class ConversationMapper {
       initial_protocol,
       group_conv_type,
       add_permission,
+      cells_state,
     } = conversationData;
 
     let conversationEntity = new Conversation(
@@ -276,7 +277,7 @@ export class ConversationMapper {
     conversationEntity.name(name || '');
     conversationEntity.groupConversationType(group_conv_type || GROUP_CONVERSATION_TYPE.GROUP_CONVERSATION);
     conversationEntity.conversationModerator(add_permission || ADD_PERMISSION.ADMINS);
-
+    conversationEntity.cellsState(cells_state || 'disabled');
     const selfState = members?.self || conversationData;
     conversationEntity = ConversationMapper.updateSelfStatus(conversationEntity, selfState as any);
 
@@ -399,6 +400,7 @@ export class ConversationMapper {
       protocol,
       group_conv_type,
       add_permission,
+      cells_state,
     } = remoteConversationData;
     const {others: othersStates, self: selfState} = members;
 
@@ -420,6 +422,7 @@ export class ConversationMapper {
       type,
       group_conv_type,
       add_permission,
+      cells_state,
     };
 
     const qualified_others = othersStates?.filter(other => !!other.qualified_id).map(({qualified_id}) => qualified_id);

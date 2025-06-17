@@ -17,10 +17,12 @@
  *
  */
 
+import {Conversation} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
 import {CellsRepository} from 'src/script/cells/CellsRepository';
+import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {t} from 'Util/LocalizerUtil';
 
 import {CellsHeader} from './CellsHeader/CellsHeader';
@@ -35,15 +37,19 @@ import {useGetAllCellsNodes} from './useGetAllCellsNodes/useGetAllCellsNodes';
 import {useOnPresignedUrlExpired} from './useOnPresignedUrlExpired/useOnPresignedUrlExpired';
 
 interface ConversationCellsProps {
+  conversationRepository: ConversationRepository;
   cellsRepository?: CellsRepository;
   conversationQualifiedId: QualifiedId;
   conversationName: string;
+  cellsState: Conversation['cells_state'];
 }
 
 export const ConversationCells = ({
   cellsRepository = container.resolve(CellsRepository),
   conversationQualifiedId,
   conversationName,
+  conversationRepository,
+  cellsState,
 }: ConversationCellsProps) => {
   const {getNodes, status: nodesStatus, getPagination} = useCellsStore();
 

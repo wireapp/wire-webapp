@@ -188,6 +188,7 @@ export class Conversation {
   public domain: string;
   public readonly groupConversationType: ko.Observable<GROUP_CONVERSATION_TYPE>;
   public conversationModerator: ko.Observable<ADD_PERMISSION>;
+  public cellsState: ko.Observable<'disabled' | 'pending' | 'ready'>;
 
   static get TIMESTAMP_TYPE(): typeof TIMESTAMP_TYPE {
     return TIMESTAMP_TYPE;
@@ -215,7 +216,7 @@ export class Conversation {
     this.type = ko.observable();
     this.groupConversationType = ko.observable<GROUP_CONVERSATION_TYPE>(GROUP_CONVERSATION_TYPE.GROUP_CONVERSATION);
     this.conversationModerator = ko.observable<ADD_PERMISSION>(ADD_PERMISSION.ADMINS);
-
+    this.cellsState = ko.observable<'disabled' | 'pending' | 'ready'>('disabled');
     this.isLastMessageVisible = ko.observable(true);
     this.isLoadingMessages = ko.observable(false);
     this.isTextInputReady = ko.observable(false);
