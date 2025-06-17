@@ -198,8 +198,15 @@ export class MLSConversationVerificationStateHandler {
   };
 
   public checkConversationVerificationState = async (conversation: Conversation): Promise<void> => {
+    // Is the E2EI feature enabled?
+    const isE2EIEnabled = E2EIHandler.getInstance().isE2EIEnabled();
+
+    if (!isE2EIEnabled) {
+      return;
+    }
+
     // Is the feature supported and enabled?
-    const isMLSAndE2EIEnabled = (await this.core.isMLSActiveForClient()) && E2EIHandler.getInstance().isE2EIEnabled();
+    const isMLSAndE2EIEnabled = await this.core.isMLSActiveForClient();
     // We only want to check MLS conversations that are not self conversations
     const isMLSAndNotSelfConversation =
       isMLSConversation(conversation) && conversation.type() !== CONVERSATION_TYPE.SELF;
