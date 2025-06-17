@@ -264,8 +264,9 @@ export class Conversation {
 
     this.isGroup = ko.pureComputed(() => {
       const isGroupConversation =
-        this.type() === CONVERSATION_TYPE.REGULAR &&
-        this.groupConversationType() === GROUP_CONVERSATION_TYPE.GROUP_CONVERSATION;
+        (this.type() === CONVERSATION_TYPE.REGULAR &&
+          this.groupConversationType() === GROUP_CONVERSATION_TYPE.GROUP_CONVERSATION) ||
+        this.type() === undefined;
       return isGroupConversation && !this.isProteusTeam1to1();
     });
 
