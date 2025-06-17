@@ -513,7 +513,6 @@ export const Conversation = ({
               <ConversationTabPanel id="files" isActive={isFileTabActive}>
                 {isFileTabActive && (
                   <ConversationCells
-                    conversationRepository={repositories.conversation}
                     conversationQualifiedId={activeConversation.qualifiedId}
                     conversationName={activeConversation.name()}
                     cellsState={activeConversation.cellsState()}
