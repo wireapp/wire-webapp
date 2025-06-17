@@ -217,7 +217,7 @@ export class Conversation {
     this.type = ko.observable();
     this.groupConversationType = ko.observable<GROUP_CONVERSATION_TYPE>(GROUP_CONVERSATION_TYPE.GROUP_CONVERSATION);
     this.conversationModerator = ko.observable<ADD_PERMISSION>(ADD_PERMISSION.ADMINS);
-    this.cellsState = ko.observable<'disabled' | 'pending' | 'ready'>('disabled');
+    this.cellsState = ko.observable<CONVERSATION_CELLS_STATE>(CONVERSATION_CELLS_STATE.DISABLED);
     this.isLastMessageVisible = ko.observable(true);
     this.isLoadingMessages = ko.observable(false);
     this.isTextInputReady = ko.observable(false);
