@@ -56,8 +56,8 @@ The application can be configured to connect to different environments by modify
 
 ```
 APP_BASE="https://local.wire.com:8081"
-BACKEND_REST="https://nginz-https.wire.com"
-BACKEND_WS="https://nginz-ssl.wire.com"
+BACKEND_REST="https://prod-nginz-https.wire.com"
+BACKEND_WS="https://prod-nginz-ssl.wire.com"
 ```
 
 **Staging:**
