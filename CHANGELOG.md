@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [46.28.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.27.0...@wireapp/core@46.28.0) (2025-06-17)
+
+### Features
+
+* **api-client:** conversation cells state [WPB-18135] ([#7082](https://github.com/wireapp/wire-web-packages/issues/7082)) ([2461647](https://github.com/wireapp/wire-web-packages/commit/24616470ceb0274252b4ab8afea5f1a9834195ee))
+
 # [46.27.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.26.0...@wireapp/core@46.27.0) (2025-06-16)
 
 ### Features
