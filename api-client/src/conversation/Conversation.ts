@@ -73,6 +73,7 @@ export interface Conversation {
   id: UUID;
   type: CONVERSATION_TYPE;
   creator: UUID;
+  cells_state: 'disabled' | 'pending' | 'ready';
   access: CONVERSATION_ACCESS[];
   group_conv_type?: GROUP_CONVERSATION_TYPE;
   add_permission?: ADD_PERMISSION;
