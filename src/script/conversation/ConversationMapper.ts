@@ -28,6 +28,7 @@ import {
   RemoteConversations,
   GROUP_CONVERSATION_TYPE,
   ADD_PERMISSION,
+  CONVERSATION_CELLS_STATE,
 } from '@wireapp/api-client/lib/conversation';
 import ko from 'knockout';
 import {isObject} from 'underscore';
@@ -277,7 +278,7 @@ export class ConversationMapper {
     conversationEntity.name(name || '');
     conversationEntity.groupConversationType(group_conv_type || GROUP_CONVERSATION_TYPE.GROUP_CONVERSATION);
     conversationEntity.conversationModerator(add_permission || ADD_PERMISSION.ADMINS);
-    conversationEntity.cellsState(cells_state || 'disabled');
+    conversationEntity.cellsState(cells_state || CONVERSATION_CELLS_STATE.DISABLED);
     const selfState = members?.self || conversationData;
     conversationEntity = ConversationMapper.updateSelfStatus(conversationEntity, selfState as any);
 
