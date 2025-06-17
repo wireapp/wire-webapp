@@ -55,7 +55,7 @@ export class ApiManager {
   }
 
   async addDevicesToUser(user: User, numberOfDevices: number) {
-    const token = user.token || (await this.auth.loginUser(user)).data.access_token;
+    const token = user.token ?? (await this.auth.loginUser(user)).data.access_token;
     const isMlsEnabled = await this.featureConfig.isMlsEnabled(token);
     for (let i = 0; i < numberOfDevices; i++) {
       const deviceName = `Device${i + 1}`;
@@ -65,8 +65,8 @@ export class ApiManager {
   }
 
   async sendMessageToPersonalConversation(sender: User, receiver: User, text: string) {
-    const senderToken = sender.token || (await this.auth.loginUser(sender)).data.access_token;
-    const receiverId = receiver.id || (await this.auth.loginUser(receiver)).data.user;
+    const senderToken = sender.token ?? (await this.auth.loginUser(sender)).data.access_token;
+    const receiverId = receiver.id ?? (await this.auth.loginUser(receiver)).data.user;
     const conversationId = await this.conversation.getMLSConversationWithUser(senderToken, receiverId);
 
     // Using the first device from the list of devices
@@ -112,7 +112,7 @@ export class ApiManager {
   }
 
   async acceptConnectionRequest(user: User) {
-    const token = user.token || (await this.auth.loginUser(user)).data.access_token;
+    const token = user.token ?? (await this.auth.loginUser(user)).data.access_token;
     const listOfConnections = await this.connection.getConnectionsList(token);
     await this.connection.acceptConnectionRequest(token, listOfConnections.data.connections[0].to);
   }

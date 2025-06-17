@@ -243,7 +243,7 @@ test.afterAll(async ({api}) => {
   }
 
   for (const user of createdUsers) {
-    const token = user.token || (await api.auth.loginUser(user)).data.access_token;
+    const token = user.token ?? (await api.auth.loginUser(user)).data.access_token;
     if (!token) {
       throw new Error(`Couldn't fetch token for ${user.username} and therefore can't delete the user`);
     }

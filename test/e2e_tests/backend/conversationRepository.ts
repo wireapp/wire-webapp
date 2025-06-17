@@ -89,7 +89,7 @@ export class ConversationRepository extends BackendClient {
               (member: {conversation_role: string; id: string}) =>
                 member.conversation_role === 'wire_member' && member.id === conversationPartnerId,
             ),
-        )?.qualified_id?.id || null;
+        )?.qualified_id?.id ?? null;
 
       await new Promise(resolve => setTimeout(resolve, retryDelay));
     }

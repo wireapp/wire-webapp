@@ -33,21 +33,9 @@ export class BlockWarningModal {
 
     this.modal = page.locator("[data-uie-name='primary-modals-container'][aria-label*='Block']");
     this.modalTitle = this.modal.locator("[data-uie-name='status-modal-title']");
-    // this.modalTitle = page.locator(
-    //   "[data-uie-name='primary-modals-container'][aria-label*='Block'] [data-uie-name='status-modal-title']",
-    // );
     this.modalText = this.modal.locator("[data-uie-name='status-modal-text']");
-    // this.modalText = page.locator(
-    //   "[data-uie-name='primary-modals-container'][aria-label*='Block'] [data-uie-name='status-modal-text']",
-    // );
     this.blockButton = this.modal.locator("[data-uie-name='do-action']");
     this.cancelButton = this.modal.locator("[data-uie-name='do-secondary']");
-    // this.blockButton = page.locator(
-    //   "[data-uie-name='primary-modals-container'][aria-label*='Block'] [data-uie-name='do-action']",
-    // );
-    // this.cancelButton = page.locator(
-    //   "[data-uie-name='primary-modals-container'][aria-label*='Block'] [data-uie-name='do-secondary']",
-    // );
   }
 
   async isModalPresent() {
