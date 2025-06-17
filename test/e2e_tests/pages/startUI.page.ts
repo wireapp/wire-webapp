@@ -40,7 +40,7 @@ export class StartUIPage {
     await this.searchResults.first().waitFor({state: 'visible'});
     for (const result of await this.searchResults.all()) {
       const text = await result.textContent();
-      if (text && text.includes(username)) {
+      if (text?.includes(username)) {
         await result.click();
         return;
       }

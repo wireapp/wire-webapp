@@ -1,4 +1,4 @@
-name: Playwright Smoke Tests
+name: Playwright Critical Flow Tests
 
 on:
   pull_request:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   smoke-tests:
-    name: Run Playwright Smoke Tests
+    name: Run Playwright Critical Flow Tests
     runs-on: ubuntu-latest
 
     steps:

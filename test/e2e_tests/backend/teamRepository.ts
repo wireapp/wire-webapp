@@ -29,7 +29,7 @@ export class TeamRepository extends BackendClient {
       },
     });
 
-    if (response.data && response.data.teams && response.data.teams.length > 0) {
+    if (response.data.teams.length > 0) {
       // Pick the first team for the user
       return (user.teamId = response.data.teams[0].id);
     }
