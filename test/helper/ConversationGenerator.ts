@@ -88,6 +88,7 @@ export function generateAPIConversation({
     creator: '',
     access_role: [CONVERSATION_ACCESS_ROLE.TEAM_MEMBER],
     members: {others: [], self: {} as Member},
+    cells_state: 'disabled',
     ...overwites,
   };
 }
