@@ -59,8 +59,10 @@ export class Core extends Account {
        * When in a browser context, then this systemCrypto will be undefined and the key generator will then use it's internal encryption system
        */
       systemCrypto: window.systemCrypto ? wrapSystemCrypto(window.systemCrypto) : undefined,
-      coreCryptoConfig: enableCoreCrypto ? {wasmFilePath: '/min/core-crypto.wasm'} : undefined,
-
+      coreCryptoConfig: {
+        enabled: enableCoreCrypto,
+        wasmFilePath: `/min/`,
+      },
       nbPrekeys: 100,
     });
   }

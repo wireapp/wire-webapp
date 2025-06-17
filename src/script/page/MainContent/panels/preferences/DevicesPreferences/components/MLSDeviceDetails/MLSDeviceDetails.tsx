@@ -49,10 +49,6 @@ export const MLSDeviceDetails = ({
   const showE2EICertificateDetails =
     isE2EIEnabled && (isSelfUser || (!isSelfUser && certificateState !== MLSStatuses.NOT_ACTIVATED));
 
-  if (!isSelfUser && certificateState === MLSStatuses.NOT_ACTIVATED) {
-    return null;
-  }
-
   if (!showE2EICertificateDetails && !identity?.thumbprint) {
     return null;
   }
