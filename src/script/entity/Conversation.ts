@@ -25,6 +25,7 @@ import {
   DefaultConversationRoleName,
   GROUP_CONVERSATION_TYPE,
   ADD_PERMISSION,
+  CONVERSATION_CELLS_STATE,
 } from '@wireapp/api-client/lib/conversation/';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
@@ -188,7 +189,7 @@ export class Conversation {
   public domain: string;
   public readonly groupConversationType: ko.Observable<GROUP_CONVERSATION_TYPE>;
   public conversationModerator: ko.Observable<ADD_PERMISSION>;
-  public cellsState: ko.Observable<'disabled' | 'pending' | 'ready'>;
+  public cellsState: ko.Observable<CONVERSATION_CELLS_STATE>;
 
   static get TIMESTAMP_TYPE(): typeof TIMESTAMP_TYPE {
     return TIMESTAMP_TYPE;
