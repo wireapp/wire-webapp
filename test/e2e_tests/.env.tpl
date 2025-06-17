@@ -18,7 +18,7 @@
 
 # Define browsers [chromium, firefox, webkit]
 BROWSERS=chromium
-HEADLESS=false
+HEADLESS=true
 TEST_SERVICE_URL=http://192.168.2.18:8080
 
 INBUCKET_USERNAME=op://Test Automation/BackendConnection staging/inbucketUsername
