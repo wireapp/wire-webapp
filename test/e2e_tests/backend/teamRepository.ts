@@ -31,7 +31,10 @@ export class TeamRepository extends BackendClient {
 
     if (response.data.teams.length > 0) {
       // Pick the first team for the user
-      return (user.teamId = response.data.teams[0].id);
+      const firstTeam = response.data.teams[0];
+      // Update the user's teamId to the first team's id
+      user.teamId = firstTeam.id;
+      return firstTeam.id;
     }
     throw new Error('No teams found for the user');
   }

@@ -21,7 +21,9 @@ import axios, {AxiosInstance} from 'axios';
 
 export class InbucketClient {
   private readonly axiosInstance: AxiosInstance;
-  private readonly authHeader: string;
+  private readonly inbucketUsername = process.env.INBUCKET_USERNAME;
+  private readonly inbucketPassword = process.env.INBUCKET_PASSWORD;
+  private readonly authHeader: string = `Basic ${Buffer.from(`${this.inbucketUsername}:${this.inbucketPassword}`).toString('base64')}`;
 
   constructor() {
     this.axiosInstance = axios.create({
@@ -31,7 +33,6 @@ export class InbucketClient {
         'Content-Type': 'application/json',
       },
     });
-    this.authHeader = `Basic ${Buffer.from(`${process.env.INBUCKET_USERNAME}:${process.env.INBUCKET_PASSWORD}`).toString('base64')}`;
   }
 
   async getVerificationCode(email: string) {
@@ -39,18 +40,7 @@ export class InbucketClient {
 
     let timeout = 0;
     while (!verificationCode && timeout < 100) {
-      let response = await this.axiosInstance.get(`/api/v1/mailbox/${email}/latest`, {
-        headers: {
-          Authorization: this.authHeader,
-        },
-        validateStatus: () => true,
-      });
-      response = await this.axiosInstance.get(`/api/v1/mailbox/${email}/latest`, {
-        headers: {
-          Authorization: this.authHeader,
-        },
-        validateStatus: () => true,
-      });
+      const response = await this.getLatestEmail(email);
       if (response.status === 200) {
         const message = await response.data;
         verificationCode = message.subject.substring(0, 6);
@@ -74,18 +64,7 @@ export class InbucketClient {
 
     let timeout = 0;
     while (!accountDeletionURL && timeout < 100) {
-      let response = await this.axiosInstance.get(`/api/v1/mailbox/${email}/latest`, {
-        headers: {
-          Authorization: this.authHeader,
-        },
-        validateStatus: () => true,
-      });
-      response = await this.axiosInstance.get(`/api/v1/mailbox/${email}/latest`, {
-        headers: {
-          Authorization: this.authHeader,
-        },
-        validateStatus: () => true,
-      });
+      const response = await this.getLatestEmail(email);
       if (response.status === 200) {
         const regex = 'https://[a-zA-Z_0-9.=-]+/d/\\?key=[a-zA-Z_0-9.\\-\\\\&_=]+';
         const message = response.data;
@@ -105,11 +84,20 @@ export class InbucketClient {
     return accountDeletionURL;
   }
 
-  isValidURL(url: string): boolean {
+  private async getLatestEmail(email: string) {
+    return await this.axiosInstance.get(`/api/v1/mailbox/${email}/latest`, {
+      headers: {
+        Authorization: this.authHeader,
+      },
+      validateStatus: () => true,
+    });
+  }
+
+  private isValidURL(url: string): boolean {
     try {
       new URL(url);
       return true;
-    } catch (e) {
+    } catch {
       return false;
     }
   }
