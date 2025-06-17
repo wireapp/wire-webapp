@@ -17,6 +17,8 @@
  *
  */
 
+import {faker} from '@faker-js/faker';
+
 import {getUser, User} from './data/user';
 import {AccountPage} from './pages/account.page';
 import {AppLockModal} from './pages/appLock.modal';
@@ -83,10 +85,14 @@ test('Account Management', {tag: ['@TC-8639', '@crit-flow']}, async ({page, api}
   const conversationListPage = new ConversationListPage(page);
 
   // Test steps
-  await page.goto(webAppPath);
-  await singleSignOnPage.enterEmailOnSSOPage(owner.email);
-  await loginPage.inputPassword(owner.password);
-  await loginPage.clickSignInButton();
+
+  await test.step('Members logs in into the application', async () => {
+    await page.goto(webAppPath);
+    await singleSignOnPage.enterEmailOnSSOPage(owner.email);
+    await loginPage.inputPassword(owner.password);
+    await loginPage.clickSignInButton();
+    await dataShareConsentModal.clickDecline();
+  });
 
   // TODO:
   // zautomation also features the following steps:
@@ -97,29 +103,41 @@ test('Account Management', {tag: ['@TC-8639', '@crit-flow']}, async ({page, api}
   //
   // but these are not a part of the original test case, so I skip them here.
 
-  await dataShareConsentModal.clickDecline();
-  await conversationSidebar.clickPreferencesButton();
-  await accountPage.toggleSendUsageData();
-  await accountPage.toggleAppLock();
-  await appLockModal.setPasscode(appLockPassphrase);
-  await conversationSidebar.clickAllConversationsButton();
-  expect(await conversationListPage.isConversationItemVisible(conversationName));
+  await test.step('Member opens settings', async () => {
+    await conversationSidebar.clickPreferencesButton();
+  });
 
-  await page.reload();
-  expect(await appLockModal.isVisible());
-  expect(await conversationListPage.isConversationItemVisible(conversationName)).toBeFalsy();
-  expect(await appLockModal.getAppLockModalHeader()).toContain('Enter passcode to unlock');
-  expect(await appLockModal.getAppLockModalText()).toContain('Passcode');
+  await test.step('Member enables logging in settings', async () => {
+    await accountPage.toggleSendUsageData();
+  });
 
-  await appLockModal.unlockAppWithPasscode(appLockPassphrase);
-  expect(await appLockModal.isHidden());
-  expect(await conversationListPage.isConversationItemVisible(conversationName));
+  await test.step('Member enables applock and sets their password', async () => {
+    await accountPage.toggleAppLock();
+    await appLockModal.setPasscode(appLockPassphrase);
+    await conversationSidebar.clickAllConversationsButton();
+    expect(await conversationListPage.isConversationItemVisible(conversationName));
+  });
+
+  await test.step('Member verifies if applock is working', async () => {
+    await page.reload();
+    expect(await appLockModal.isVisible());
+    expect(await conversationListPage.isConversationItemVisible(conversationName)).toBeFalsy();
+    expect(await appLockModal.getAppLockModalHeader()).toContain('Enter passcode to unlock');
+    expect(await appLockModal.getAppLockModalText()).toContain('Passcode');
+
+    await appLockModal.unlockAppWithPasscode(appLockPassphrase);
+    expect(await appLockModal.isHidden());
+    expect(await conversationListPage.isConversationItemVisible(conversationName));
+  });
 
   // TODO: Missing test steps for TC-8639 from testiny:
   // Member changes their email address to a new email address
   // Member resets their password
   //
   // These steps were not implemented in zautomation, so I skipped them here for the time being.
+  await test.step('Member changes their email address to a new email address', async () => {});
+
+  await test.step('Member resets their password ', async () => {});
 });
 
 test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow']}, async ({page, api}) => {
@@ -152,89 +170,119 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow']}, async ({pa
   const accountPage = new AccountPage(page);
 
   // Test steps
-  await page.goto(webAppPath);
-  await singleSignOnPage.enterEmailOnSSOPage(userA.email);
-  await welcomePage.clickCreateAccountButton();
-  await welcomePage.clickCreatePersonalAccountButton();
-  expect(await registrationPage.isPasswordPolicyInfoVisible());
+  await test.step('User A opens the application and registers personal account', async () => {
+    await page.goto(webAppPath);
+    await singleSignOnPage.enterEmailOnSSOPage(userA.email);
+    await welcomePage.clickCreateAccountButton();
+    await welcomePage.clickCreatePersonalAccountButton();
+    expect(await registrationPage.isPasswordPolicyInfoVisible());
 
-  await registrationPage.fillInUserInfo(userA);
-  expect(await registrationPage.isSubmitButtonEnabled()).toBeFalsy();
+    await registrationPage.fillInUserInfo(userA);
+    expect(await registrationPage.isSubmitButtonEnabled()).toBeFalsy();
 
-  await registrationPage.toggleTermsCheckbox();
-  expect(await registrationPage.isSubmitButtonEnabled()).toBeTruthy();
+    await registrationPage.toggleTermsCheckbox();
+    expect(await registrationPage.isSubmitButtonEnabled()).toBeTruthy();
 
-  await registrationPage.clickSubmitButton();
-  const verificationCode = await api.inbucket.getVerificationCode(userA.email);
-  await verificationPage.enterVerificationCode(verificationCode);
-  await marketingConsentModal.clickConfirmButton();
-  expect(await setUsernamePage.getHandleInputValue()).toBe(userA.username);
+    await registrationPage.clickSubmitButton();
+    const verificationCode = await api.inbucket.getVerificationCode(userA.email);
+    await verificationPage.enterVerificationCode(verificationCode);
+    await marketingConsentModal.clickConfirmButton();
+  });
 
-  await setUsernamePage.clickNextButton();
-  await dataShareConsentModal.isModalPresent();
-  await dataShareConsentModal.clickDecline();
-  expect(await conversationSidebar.getPersonalStatusName()).toBe(`${userA.firstName} ${userA.lastName}`);
-  expect(await conversationSidebar.getPersonalUserName()).toContain(userA.username);
-  expect(await conversationPage.isWatermarkVisible());
+  await test.step('Personal user A sets user name', async () => {
+    // Expect that automatic username generation is correct
+    expect(await setUsernamePage.getHandleInputValue()).toBe(userA.username);
+    const newUsername = userA.username.slice(0, 10) + faker.string.alpha(5).toLowerCase();
+    userA.username = newUsername;
+    await setUsernamePage.setUsername(newUsername);
+    await setUsernamePage.clickNextButton();
+  });
 
-  await conversationSidebar.clickConnectButton();
-  await startUIPage.searchForUser(userB.username);
-  await startUIPage.clickUserFromSearchResults(userB.username);
-  expect(await userProfileModal.isVisible());
+  await test.step('Personal user A declines sending anonymous usage data', async () => {
+    await dataShareConsentModal.isModalPresent();
+    await dataShareConsentModal.clickDecline();
+  });
 
-  await userProfileModal.clickConnectButton();
-  await conversationListPage.openConversation(userB.fullName);
-  expect(await outgoingConnectionPage.getOutgoingConnectionUsername()).toContain(userB.username);
-  expect(await outgoingConnectionPage.isPendingIconVisible(userB.fullName));
+  // TODO: Add this step to Testiny
+  await test.step('Personal user A checks that username was set correctly', async () => {
+    expect(await conversationSidebar.getPersonalStatusName()).toBe(`${userA.firstName} ${userA.lastName}`);
+    expect(await conversationSidebar.getPersonalUserName()).toContain(userA.username);
+    expect(await conversationPage.isWatermarkVisible());
+  });
 
-  await api.acceptConnectionRequest(userB);
-  expect(await outgoingConnectionPage.isPendingIconHidden(userB.fullName));
+  await test.step('Personal user A searches for other personal user B', async () => {
+    await conversationSidebar.clickConnectButton();
+    await startUIPage.searchForUser(userB.username);
+    await startUIPage.clickUserFromSearchResults(userB.username);
+    expect(await userProfileModal.isVisible());
+  });
 
-  // TODO: Conversation sometimes closes after connection request was approved, so we need to reopen it
-  await conversationListPage.openConversation(userB.fullName);
-  expect(await conversationPage.isConversationOpen(userB.fullName));
+  await test.step('Personal user A sends a connection request to personal user B', async () => {
+    await userProfileModal.clickConnectButton();
+    await conversationListPage.openConversation(userB.fullName);
+    expect(await outgoingConnectionPage.getOutgoingConnectionUsername()).toContain(userB.username);
+    expect(await outgoingConnectionPage.isPendingIconVisible(userB.fullName));
+  });
 
-  await conversationPage.sendMessage('Hello there');
-  expect(await conversationPage.isMessageVisible('Hello there')).toBeTruthy();
+  await test.step('Personal user B accepts request', async () => {
+    await api.acceptConnectionRequest(userB);
+    expect(await outgoingConnectionPage.isPendingIconHidden(userB.fullName));
+  });
 
-  // TODO: Sending message through test service (Kalium) is not working properly, needs investigation
-  await api.sendMessageToPersonalConversation(userB, userA, 'Heya');
-  expect(await conversationPage.isMessageVisible('Heya')).toBeTruthy();
+  await test.step('Personal user A and personal user B exchange some messages', async () => {
+    // TODO: Conversation sometimes closes after connection request was approved, so we need to reopen it
+    await conversationListPage.openConversation(userB.fullName);
+    expect(await conversationPage.isConversationOpen(userB.fullName));
 
-  await conversationListPage.clickConversationOptions(userB.fullName);
-  await conversationListPage.clickBlockConversation();
-  expect(await blockWarningModal.isModalPresent());
-  expect(await blockWarningModal.getModalTitle()).toContain(`Block ${userB.fullName}`);
-  expect(await blockWarningModal.getModalText()).toContain(
-    `${userB.fullName} won’t be able to contact you or add you to group conversations.`,
-  );
+    await conversationPage.sendMessage('Hello there');
+    expect(await conversationPage.isMessageVisible('Hello there')).toBeTruthy();
 
-  await blockWarningModal.clickBlock();
-  expect(await conversationListPage.isConversationBlocked(userB.fullName));
+    // TODO: Sending message through test service (Kalium) is not working properly, needs investigation
+    await api.sendMessageToPersonalConversation(userB, userA, 'Heya');
+    expect(await conversationPage.isMessageVisible('Heya')).toBeTruthy();
+  });
 
-  // [WPB-18093] Backend not returning the blocked 1:1 in conversations list
-  // When User <Contact> sends message "See this?" to personal MLS conversation <Name>
-  // Then I do not see text message See this?
+  await test.step('Personal user A blocks personal user B', async () => {
+    await conversationListPage.clickConversationOptions(userB.fullName);
+    await conversationListPage.clickBlockConversation();
+    expect(await blockWarningModal.isModalPresent());
+    expect(await blockWarningModal.getModalTitle()).toContain(`Block ${userB.fullName}`);
+    expect(await blockWarningModal.getModalText()).toContain(
+      `${userB.fullName} won’t be able to contact you or add you to group conversations.`,
+    );
 
-  await conversationSidebar.clickPreferencesButton();
-  await accountPage.clickDeleteAccountButton();
-  expect(await deleteAccountModal.isModalPresent());
-  expect(await deleteAccountModal.getModalTitle()).toContain('Delete account');
-  expect(await deleteAccountModal.getModalText()).toContain(
-    'We will send you an email. Follow the link to delete your account permanently.',
-  );
+    await blockWarningModal.clickBlock();
+    expect(await conversationListPage.isConversationBlocked(userB.fullName));
 
-  await deleteAccountModal.clickDelete();
-  const url = await api.inbucket.getAccountDeletionURL(userA.email);
+    // [WPB-18093] Backend not returning the blocked 1:1 in conversations list
+    // When User <Contact> sends message "See this?" to personal MLS conversation <Name>
+    // Then I do not see text message See this?
+  });
 
-  const newTab = await page.context().newPage();
-  await newTab.goto(url);
-  const deleteAccountPage = new DeleteAccountPage(newTab);
-  await deleteAccountPage.clickDeleteAccountButton();
-  expect(await deleteAccountPage.isAccountDeletedHeadlineVisible());
+  await test.step('Personal user A opens settings', async () => {
+    await conversationSidebar.clickPreferencesButton();
+  });
 
-  await newTab.close();
-  expect(await welcomePage.getLogoutReasonText()).toContain('You were signed out because your account was deleted');
+  await test.step('Personal User A deletes their account', async () => {
+    await accountPage.clickDeleteAccountButton();
+    expect(await deleteAccountModal.isModalPresent());
+    expect(await deleteAccountModal.getModalTitle()).toContain('Delete account');
+    expect(await deleteAccountModal.getModalText()).toContain(
+      'We will send you an email. Follow the link to delete your account permanently.',
+    );
+
+    await deleteAccountModal.clickDelete();
+    const url = await api.inbucket.getAccountDeletionURL(userA.email);
+
+    const newTab = await page.context().newPage();
+    await newTab.goto(url);
+    const deleteAccountPage = new DeleteAccountPage(newTab);
+    await deleteAccountPage.clickDeleteAccountButton();
+    expect(await deleteAccountPage.isAccountDeletedHeadlineVisible());
+
+    await newTab.close();
+    expect(await welcomePage.getLogoutReasonText()).toContain('You were signed out because your account was deleted');
+  });
 });
 
 test.afterAll(async ({api}) => {
