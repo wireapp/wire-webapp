@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.65.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.64.0...@wireapp/api-client@27.65.0) (2025-06-18)
+
+### Features
+
+* **api-client:** define conversation cells state enum ([#7083](https://github.com/wireapp/wire-web-packages/issues/7083)) ([b462f08](https://github.com/wireapp/wire-web-packages/commit/b462f08de8fe239abe8e8cbf957339a45e6c6392))
+
 # [27.64.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.63.0...@wireapp/api-client@27.64.0) (2025-06-17)
 
 ### Features
