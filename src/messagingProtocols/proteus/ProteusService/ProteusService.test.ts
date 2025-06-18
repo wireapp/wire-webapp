@@ -21,6 +21,7 @@
 import * as Recipients from '../Utility/Recipients';
 
 import {
+  CONVERSATION_CELLS_STATE,
   CONVERSATION_ACCESS_ROLE,
   CONVERSATION_TYPE,
   Conversation,
@@ -685,7 +686,7 @@ describe('ProteusService', () => {
       id: '',
       type: CONVERSATION_TYPE.REGULAR,
       creator: '',
-      cells_state: 'disabled',
+      cells_state: CONVERSATION_CELLS_STATE.DISABLED,
       access: [],
       access_role: [CONVERSATION_ACCESS_ROLE.GUEST],
       members: {
