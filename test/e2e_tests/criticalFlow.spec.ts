@@ -240,7 +240,7 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow']}, async ({pa
     await conversationListPage.openConversation(userB.fullName);
     expect(await conversationPage.isConversationOpen(userB.fullName));
 
-    // TODO: Bug [WPB-18281] Message is not visible in the conversation after sending it
+    // TODO: Bug [WPB-18226] Message is not visible in the conversation after sending it
     // await conversationPage.sendMessage('Hello there');
     // expect(await conversationPage.isMessageVisible('Hello there')).toBeTruthy();
 
