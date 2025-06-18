@@ -89,7 +89,6 @@ test('Account Management', {tag: ['@TC-8639', '@crit-flow']}, async ({page, api}
   });
 
   // Test steps
-
   await test.step('Members logs in into the application', async () => {
     await page.goto(webAppPath);
     await singleSignOnPage.enterEmailOnSSOPage(owner.email);
@@ -173,7 +172,8 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow']}, async ({pa
   await test.step('Preconditions: Creating preconditions for the test via API', async () => {
     await api.createPersonalUser(userB);
     createdUsers.push(userB);
-    await api.addDevicesToUser(userB, 1);
+    // Disabled until [WPB-18255] is done
+    // await api.addDevicesToUser(userB, 1);
   });
 
   // Test steps
@@ -210,7 +210,6 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow']}, async ({pa
     await dataShareConsentModal.clickDecline();
   });
 
-  // TODO: Add this step to Testiny
   await test.step('Personal user A checks that username was set correctly', async () => {
     expect(await conversationSidebar.getPersonalStatusName()).toBe(`${userA.firstName} ${userA.lastName}`);
     expect(await conversationSidebar.getPersonalUserName()).toContain(userA.username);
@@ -244,9 +243,9 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow']}, async ({pa
     await conversationPage.sendMessage('Hello there');
     expect(await conversationPage.isMessageVisible('Hello there')).toBeTruthy();
 
-    // TODO: Sending message through test service (Kalium) is not working properly, needs investigation
-    await api.sendMessageToPersonalConversation(userB, userA, 'Heya');
-    expect(await conversationPage.isMessageVisible('Heya')).toBeTruthy();
+    // Disabled until [WPB-18255] is done
+    // await api.sendMessageToPersonalConversation(userB, userA, 'Heya');
+    // expect(await conversationPage.isMessageVisible('Heya')).toBeTruthy();
   });
 
   await test.step('Personal user A blocks personal user B', async () => {
