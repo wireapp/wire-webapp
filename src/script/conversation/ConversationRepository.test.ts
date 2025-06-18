@@ -1817,6 +1817,7 @@ describe('ConversationRepository', () => {
             access: [CONVERSATION_ACCESS.INVITE],
             access_role: CONVERSATION_LEGACY_ACCESS_ROLE.ACTIVATED,
             access_role_v2: [],
+            cells_state: 'disabled',
             creator: 'c472ba79-0bca-4a74-aaa3-a559a16705d3',
             id: 'c9405f98-e25a-4b1f-ade7-227ea765dff7',
             last_event: '0.0',
