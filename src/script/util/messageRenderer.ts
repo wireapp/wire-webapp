@@ -72,7 +72,7 @@ markdownit.linkify.add('wire:', {
     return 0;
   },
   normalize: match => {
-    // match.url has the form ‘wire:...’; replace it with ‘wire://...’ if needed
+    // match.url has the form ‘wire:/...’; replace it with ‘wire://...’ if needed
     if (match.url.startsWith('wire:/') && !match.url.startsWith('wire://')) {
       match.url = match.url.replace('wire:/', 'wire://');
     }
