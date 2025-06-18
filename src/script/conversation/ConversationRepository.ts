@@ -153,6 +153,7 @@ import {isMemberMessage} from '../guards/Message';
 import * as LegalHoldEvaluator from '../legal-hold/LegalHoldEvaluator';
 import {MessageCategory} from '../message/MessageCategory';
 import {SystemMessageType} from '../message/SystemMessageType';
+import {initMLSGroupConversation} from '../mls';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {SelfRepository} from '../self/SelfRepository';
 import {Core} from '../service/CoreSingleton';
@@ -3659,6 +3660,30 @@ export class ConversationRepository {
     const updatedMessageEntity = await this.updateMessageUserEntities(messageEntity);
     if (conversationEntity && updatedMessageEntity) {
       conversationEntity.addMessage(updatedMessageEntity);
+    }
+
+    /**
+     * if user joins a mls conversation using a guest link they do not receive a welcome message
+     * and we only receive the group creation event instead
+     * In this case we need to establish the mls group conversation
+     */
+    const isMLSConversation = isMLSCapableConversation(conversationEntity);
+
+    if (isMLSConversation) {
+      const isAlreadyEstablished = await this.conversationService.isMLSGroupEstablishedLocally(
+        conversationEntity.groupId,
+      );
+
+      const selfUser = this.userState.self();
+
+      if (!selfUser?.qualifiedId) {
+        throw new Error('Self user qualified ID is not defined');
+      }
+
+      // If the group is not established yet, we need to establish it
+      if (!isAlreadyEstablished) {
+        await initMLSGroupConversation(conversationEntity, selfUser?.qualifiedId, {core: this.core});
+      }
     }
 
     return {conversationEntity, messageEntity: updatedMessageEntity};
