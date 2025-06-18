@@ -21,30 +21,20 @@ import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/LocalizerUtil';
 
-import {buttonStyles, wrapperStyles} from './CellsMoveActions.styles';
+import {buttonStyles, wrapperStyles} from './CellsFiltersModalActions.styles';
 
-interface CellsMoveActionsProps {
-  onCancel: () => void;
-  onMove: () => void;
-  moveDisabled: boolean;
-  moveLoading: boolean;
+interface CellsFiltersModalActionsProps {
+  onSecondaryAction: () => void;
+  onPrimaryAction: () => void;
 }
-
-export const CellsMoveActions = ({onCancel, onMove, moveDisabled, moveLoading}: CellsMoveActionsProps) => {
+export const CellsFiltersModalActions = ({onSecondaryAction, onPrimaryAction}: CellsFiltersModalActionsProps) => {
   return (
     <div css={wrapperStyles}>
-      <Button variant={ButtonVariant.SECONDARY} onClick={onCancel} css={buttonStyles}>
-        {t('cells.moveNodeModal.cancelButton')}
+      <Button variant={ButtonVariant.SECONDARY} onClick={onSecondaryAction} css={buttonStyles}>
+        {t('cells.filtersModal.secondaryAction')}
       </Button>
-      <Button
-        variant={ButtonVariant.PRIMARY}
-        type="submit"
-        css={buttonStyles}
-        onClick={onMove}
-        disabled={moveDisabled}
-        showLoading={moveLoading}
-      >
-        {t('cells.moveNodeModal.moveButton')}
+      <Button variant={ButtonVariant.PRIMARY} css={buttonStyles} onClick={onPrimaryAction}>
+        {t('cells.filtersModal.primaryAction')}
       </Button>
     </div>
   );

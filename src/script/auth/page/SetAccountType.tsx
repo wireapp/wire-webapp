@@ -39,7 +39,7 @@ export const SetAccountType = () => {
   };
 
   const onCreateTeamAccount = () => {
-    window.open(`${Config.getConfig().URL.TEAMS_BASE}/register/email`, '_blank');
+    window.open(`${Config.getConfig().URL.TEAMS_BASE}/signup/account?origin=web_desktop`, '_blank');
   };
 
   if (!Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION) {

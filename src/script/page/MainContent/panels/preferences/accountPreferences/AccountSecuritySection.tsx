@@ -19,12 +19,11 @@
 
 import React from 'react';
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
-import {Link, LinkVariant} from '@wireapp/react-ui-kit';
+import {TabIndex, Link, LinkVariant} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';

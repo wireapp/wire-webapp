@@ -45,6 +45,8 @@ import {getModalOptions, ModalType} from './Modals';
 import {OIDCService} from './OIDCService';
 import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
 
+import {ConversationState} from '../conversation/ConversationState';
+
 interface E2EIHandlerParams {
   discoveryUrl: string;
   gracePeriodInSeconds: number;
@@ -312,6 +314,13 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
           return userData.id_token;
         },
         certificateTtl: this.certificateTtl,
+        getAllConversations: () => {
+          const conversationState = container.resolve(ConversationState);
+          const conversations = conversationState.conversations().map(conversation => ({
+            group_id: conversation.groupId ?? '',
+          }));
+          return Promise.resolve(conversations);
+        },
       });
 
       // Notify user about E2EI enrolment success

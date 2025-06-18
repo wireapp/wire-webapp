@@ -17,25 +17,8 @@
  *
  */
 
-import {useState} from 'react';
+import {CSSObject} from '@emotion/react';
 
-import {CellsRepository} from 'src/script/cells/CellsRepository';
-
-export const useMoveCellsNode = ({cellsRepository}: {cellsRepository: CellsRepository}) => {
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-
-  const moveNode = async ({currentPath, targetPath}: {currentPath: string; targetPath: string}) => {
-    setStatus('loading');
-    try {
-      await cellsRepository.moveNode({
-        currentPath,
-        targetPath,
-      });
-      setStatus('success');
-    } catch (error) {
-      setStatus('error');
-    }
-  };
-
-  return {moveNode, status};
+export const largeModalStyles: CSSObject = {
+  width: '508px',
 };

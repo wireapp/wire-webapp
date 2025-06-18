@@ -24,11 +24,17 @@ import {CellPagination} from '../cellPagination/cellPagination';
 
 export type Status = 'idle' | 'loading' | 'fetchingMore' | 'success' | 'error';
 
+interface FiltersState {
+  tags: string[];
+  setTags: (tags: string[]) => void;
+}
+
 interface CellsState {
   nodes: CellNode[];
   status: Status;
   pagination: CellPagination | null;
   error: Error | null;
+  filters: FiltersState;
   setNodes: (nodes: CellNode[]) => void;
   setStatus: (status: Status) => void;
   setError: (error: Error | null) => void;
@@ -36,13 +42,24 @@ interface CellsState {
   setPublicLink: (nodeId: string, data: CellNode['publicLink']) => void;
   removeNode: (nodeId: string) => void;
   clearAll: () => void;
+  getActiveFiltersCount: () => number;
 }
 
-export const useCellsStore = create<CellsState>(set => ({
+export const useCellsStore = create<CellsState>((set, get) => ({
   nodes: [],
   status: 'idle',
   error: null,
   pagination: null,
+  filters: {
+    tags: [],
+    setTags: tags =>
+      set(state => ({
+        filters: {
+          ...state.filters,
+          tags,
+        },
+      })),
+  },
   setNodes: nodes => set({nodes}),
   setStatus: status => set({status}),
   setError: error => set({error}),
@@ -56,4 +73,14 @@ export const useCellsStore = create<CellsState>(set => ({
       nodes: state.nodes.filter(node => node.id !== nodeId),
     })),
   clearAll: () => set({nodes: [], error: null}),
+  getActiveFiltersCount: () => {
+    const {filters} = get();
+    let count = 0;
+
+    if (filters.tags.length > 0) {
+      count += 1;
+    }
+
+    return count;
+  },
 }));

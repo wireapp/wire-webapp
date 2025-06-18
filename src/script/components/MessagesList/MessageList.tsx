@@ -19,8 +19,9 @@
 
 import {useRef} from 'react';
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
+
+import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {VirtualizedMessagesList} from 'Components/MessagesList/VirtualizedMessagesList/VirtualizedMessagesList';

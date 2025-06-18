@@ -19,12 +19,11 @@
 
 import React, {useCallback, useEffect, useState} from 'react';
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {Button, ButtonVariant, useTimeout} from '@wireapp/react-ui-kit';
+import {TabIndex, Button, ButtonVariant, useTimeout} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {RestrictedVideo} from 'Components/asset/RestrictedVideo';

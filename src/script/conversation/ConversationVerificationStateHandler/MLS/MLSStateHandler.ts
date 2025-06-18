@@ -159,7 +159,7 @@ export class MLSConversationVerificationStateHandler {
           break;
         }
 
-        const matchingName = identity.x509Identity?.displayName === user.name();
+        const matchingName = identity.x509Identity?.display_name === user.name();
         const matchingHandle = checkUserHandle(identity, user);
         if (!matchingHandle || !matchingName) {
           this.logger.warn(`User identity and user entity do not match for userId: ${stringifiedQualifiedId}`);
@@ -198,8 +198,15 @@ export class MLSConversationVerificationStateHandler {
   };
 
   public checkConversationVerificationState = async (conversation: Conversation): Promise<void> => {
+    // Is the E2EI feature enabled?
+    const isE2EIEnabled = E2EIHandler.getInstance().isE2EIEnabled();
+
+    if (!isE2EIEnabled) {
+      return;
+    }
+
     // Is the feature supported and enabled?
-    const isMLSAndE2EIEnabled = (await this.core.isMLSActiveForClient()) && E2EIHandler.getInstance().isE2EIEnabled();
+    const isMLSAndE2EIEnabled = await this.core.isMLSActiveForClient();
     // We only want to check MLS conversations that are not self conversations
     const isMLSAndNotSelfConversation =
       isMLSConversation(conversation) && conversation.type() !== CONVERSATION_TYPE.SELF;

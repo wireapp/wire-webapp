@@ -20,11 +20,11 @@
 import React, {useEffect, useState} from 'react';
 
 import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation/';
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import {
+  TabIndex,
   Checkbox,
   CheckboxLabel,
   CloseDetachedWindowIcon,

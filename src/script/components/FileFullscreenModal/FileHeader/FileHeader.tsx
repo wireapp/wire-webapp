@@ -17,7 +17,7 @@
  *
  */
 
-import {CloseIcon} from '@wireapp/react-ui-kit';
+import {BadgesWithTooltip, CloseIcon} from '@wireapp/react-ui-kit';
 
 import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
 import {MessageTime} from 'Components/MessagesList/Message/MessageTime';
@@ -39,9 +39,10 @@ interface FileHeaderProps {
   fileExtension: string;
   senderName: string;
   timestamp: number;
+  badges?: string[];
 }
 
-export const FileHeader = ({onClose, fileName, fileExtension, senderName, timestamp}: FileHeaderProps) => {
+export const FileHeader = ({onClose, fileName, fileExtension, senderName, timestamp, badges}: FileHeaderProps) => {
   const timeAgo = useRelativeTimestamp(timestamp);
 
   return (
@@ -62,6 +63,7 @@ export const FileHeader = ({onClose, fileName, fileExtension, senderName, timest
           <MessageTime timestamp={timestamp} data-timestamp-type="normal" css={textStyles}>
             {timeAgo}
           </MessageTime>
+          {badges && badges.length > 0 && <BadgesWithTooltip items={badges} />}
         </div>
       </div>
     </header>

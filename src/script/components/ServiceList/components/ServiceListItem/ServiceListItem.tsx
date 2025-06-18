@@ -17,7 +17,7 @@
  *
  */
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {ParticipantItemContent} from 'Components/ParticipantItemContent';

@@ -21,23 +21,22 @@ import {CloseIcon, IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/LocalizerUtil';
 
-import {closeButtonStyles, headerStyles, headingStyles} from './CellsMoveNodeModalHeader.styles';
+import {closeButtonStyles, headerStyles, headingStyles} from './CellsFilterModalHeader.styles';
 
-interface CellsMoveNodeModalHeaderProps {
-  title: string;
+interface CellsFilterModalHeaderProps {
   onClose: () => void;
 }
 
-export const CellsMoveNodeModalHeader = ({title, onClose}: CellsMoveNodeModalHeaderProps) => {
+export const CellsFilterModalHeader = ({onClose}: CellsFilterModalHeaderProps) => {
   return (
     <header css={headerStyles}>
-      <h3 css={headingStyles}>{title}</h3>
+      <h3 css={headingStyles}>{t('cells.filtersModal.title')}</h3>
       <IconButton
         variant={IconButtonVariant.SECONDARY}
         type="button"
         css={closeButtonStyles}
         onClick={onClose}
-        aria-label={t('cells.newItemMenuModal.closeButton')}
+        aria-label={t('cells.filtersModal.closeButton')}
       >
         <CloseIcon />
       </IconButton>

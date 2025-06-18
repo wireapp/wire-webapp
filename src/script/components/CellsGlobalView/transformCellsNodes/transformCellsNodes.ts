@@ -39,6 +39,10 @@ export const transformCellsNodes = (nodes: RestNode[]): CellNode[] => {
     const conversationName = node.ContextWorkspace?.Label || '';
     const path = node.Path;
     const url = node.PreSignedGET?.Url;
+    const tags = getTags(node);
+    const presignedUrlExpiresAt = node.PreSignedGET?.ExpiresAt
+      ? new Date(Number(node.PreSignedGET?.ExpiresAt) * TIME_IN_MILLIS.SECOND)
+      : null;
 
     if (node.Type === 'COLLECTION') {
       return {
@@ -52,6 +56,8 @@ export const transformCellsNodes = (nodes: RestNode[]): CellNode[] => {
         sizeMb,
         uploadedAtTimestamp,
         publicLink,
+        tags,
+        presignedUrlExpiresAt,
       };
     }
 
@@ -70,6 +76,8 @@ export const transformCellsNodes = (nodes: RestNode[]): CellNode[] => {
       previewPdfUrl: getPreviewPdfUrl(node),
       uploadedAtTimestamp,
       publicLink,
+      tags,
+      presignedUrlExpiresAt,
     };
   });
 };
@@ -98,4 +106,15 @@ const getFileSize = (node: RestNode): string => {
 const getOwner = (node: RestNode): string => {
   const name = node.UserMetadata?.find(meta => meta.Namespace === 'usermeta-owner')?.JsonValue;
   return name ? JSON.parse(name) : '';
+};
+
+const getTags = (node: RestNode): string[] => {
+  const tags = node.UserMetadata?.find(meta => meta.Namespace === 'usermeta-tags')?.JsonValue;
+
+  if (!tags) {
+    return [];
+  }
+
+  const parsedTags = JSON.parse(tags);
+  return parsedTags.split(',').map((tag: string) => tag.trim());
 };

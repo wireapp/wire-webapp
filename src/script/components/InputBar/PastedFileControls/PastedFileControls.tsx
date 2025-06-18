@@ -19,7 +19,7 @@
 
 import {FC} from 'react';
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+import {TabIndex} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';

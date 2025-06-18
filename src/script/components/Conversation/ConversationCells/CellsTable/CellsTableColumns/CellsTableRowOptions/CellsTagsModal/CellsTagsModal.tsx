@@ -17,34 +17,13 @@
  *
  */
 
-import {
-  Button,
-  ButtonVariant,
-  ComboboxSelect,
-  ErrorMessage,
-  IconButton,
-  IconButtonVariant,
-} from '@wireapp/react-ui-kit';
+import {ComboboxSelect, ErrorMessage} from '@wireapp/react-ui-kit';
 
-import {CloseIcon} from 'Components/Icon';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
+import {CellsModal} from 'Components/Conversation/ConversationCells/common/CellsModal/CellsModal';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
-import {handleEscDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import {
-  actionsWrapperStyles,
-  buttonStyles,
-  closeButtonStyles,
-  contentStyles,
-  descriptionStyles,
-  headerStyles,
-  headingStyles,
-  menuListCSS,
-  modalStyles,
-  selectWrapperStyles,
-  wrapperStyles,
-} from './CellsTagsModal.styles';
+import {contentStyles, descriptionStyles, menuListCSS, selectWrapperStyles} from './CellsTagsModal.styles';
 import {useTagsManagement} from './useTagsManagement/useTagsManagement';
 
 interface CellsTagsModalProps {
@@ -88,56 +67,35 @@ export const CellsTagsModal = ({
   };
 
   return (
-    <ModalComponent
-      isShown={isOpen}
-      onClosed={onClose}
-      onBgClick={onClose}
-      wrapperCSS={modalStyles}
-      onKeyDown={event => handleEscDown(event, onClose)}
-    >
-      <div css={wrapperStyles}>
-        <header css={headerStyles}>
-          <h3 css={headingStyles}>{t('cells.tagsModal.title')}</h3>
-          <IconButton
-            variant={IconButtonVariant.SECONDARY}
-            type="button"
-            css={closeButtonStyles}
-            onClick={onClose}
-            aria-label={t('cells.tagsModal.closeButton')}
-          >
-            <CloseIcon />
-          </IconButton>
-        </header>
-        <div css={contentStyles}>
-          <p css={descriptionStyles}>{t('cells.tagsModal.description')}</p>
-          <div css={selectWrapperStyles}>
-            <ComboboxSelect
-              id="tags"
-              label={t('cells.tagsModal.label')}
-              placeholder={t('cells.tagsModal.placeholder')}
-              menuPotralTarget={document.body}
-              options={allTags}
-              value={selectedTags}
-              menuListCSS={menuListCSS}
-              isLoading={isLoadingAllTags}
-              onChange={handleChange}
-              onCreateOption={handleCreateOption}
-              createOptionLabel={name => t('cells.tagsModal.createOptionLabel', {name})}
-              noOptionsMessage={t('cells.tagsModal.noTagsFound')}
-              loadingMessage={t('cells.tagsModal.loading')}
-            />
-          </div>
-          {error && <ErrorMessage>{t('cells.tagsModal.error')}</ErrorMessage>}
+    <CellsModal isOpen={isOpen} onClose={onClose} size="large">
+      <CellsModal.Header>{t('cells.tagsModal.title')}</CellsModal.Header>
+      <div css={contentStyles}>
+        <p css={descriptionStyles}>{t('cells.tagsModal.description')}</p>
+        <div css={selectWrapperStyles}>
+          <ComboboxSelect
+            id="tags"
+            label={t('cells.tagsModal.label')}
+            placeholder={t('cells.tagsModal.placeholder')}
+            menuPortalTarget={document.body}
+            options={allTags}
+            value={selectedTags}
+            menuListCSS={menuListCSS}
+            isLoading={isLoadingAllTags}
+            onChange={handleChange}
+            onCreateOption={handleCreateOption}
+            createOptionLabel={name => t('cells.tagsModal.createOptionLabel', {name})}
+            noOptionsMessage={t('cells.tagsModal.noTagsFound')}
+            loadingMessage={t('cells.tagsModal.loading')}
+          />
         </div>
-        <div css={actionsWrapperStyles}>
-          <Button variant={ButtonVariant.SECONDARY} onClick={onClose} css={buttonStyles}>
-            {t('cells.tagsModal.cancelButton')}
-          </Button>
-          <Button variant={ButtonVariant.PRIMARY} css={buttonStyles} onClick={handleSave} disabled={isUpdatingTags}>
-            {t('cells.tagsModal.saveButton')}
-          </Button>
-        </div>
+        {error && <ErrorMessage>{t('cells.tagsModal.error')}</ErrorMessage>}
       </div>
-    </ModalComponent>
+      <CellsModal.Actions>
+        <CellsModal.SecondaryButton onClick={onClose}>{t('cells.tagsModal.cancelButton')}</CellsModal.SecondaryButton>
+        <CellsModal.PrimaryButton onClick={handleSave} isDisabled={isUpdatingTags}>
+          {t('cells.tagsModal.saveButton')}
+        </CellsModal.PrimaryButton>
+      </CellsModal.Actions>
+    </CellsModal>
   );
 };
