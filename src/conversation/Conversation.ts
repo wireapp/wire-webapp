@@ -63,6 +63,12 @@ export enum ADD_PERMISSION {
   ADMINS = 'admins',
 }
 
+export enum CONVERSATION_CELLS_STATE {
+  DISABLED = 'disabled',
+  PENDING = 'pending',
+  READY = 'ready',
+}
+
 type UUID = string;
 /**
  * A conversation object as returned from the server
@@ -73,7 +79,7 @@ export interface Conversation {
   id: UUID;
   type: CONVERSATION_TYPE;
   creator: UUID;
-  cells_state: 'disabled' | 'pending' | 'ready';
+  cells_state: CONVERSATION_CELLS_STATE;
   access: CONVERSATION_ACCESS[];
   group_conv_type?: GROUP_CONVERSATION_TYPE;
   add_permission?: ADD_PERMISSION;
