@@ -48,32 +48,13 @@ const createdTeams: Map<User, string> = new Map();
 
 test('Account Management', {tag: ['@TC-8639', '@crit-flow']}, async ({page, api}) => {
   test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
-  // Creating preconditions for the test via API
+
+  // Generating test data
   const owner = getUser();
   const member = getUser();
   const teamName = 'Critical';
   const conversationName = 'Tracking';
   const appLockPassphrase = generateSecurePassword();
-
-  await api.createTeamOwner(owner, teamName);
-  if (!owner.token) {
-    throw new Error(`Owner ${owner.username} has no token and can't be used for team creation`);
-  }
-  const teamId = await api.team.getTeamIdForUser(owner);
-  createdTeams.set(owner, teamId);
-  const invitationId = await api.team.inviteUserToTeam(
-    teamId,
-    member.email,
-    `${owner.firstName} ${owner.lastName}`,
-    owner.token,
-  );
-  const invitationCode = await api.brig.getTeamInvitationCodeForEmail(teamId, invitationId);
-
-  await api.createPersonalUser(member, invitationCode);
-  if (!member.id) {
-    throw new Error(`Member ${member.username} has no ID and can't be invited to the conversation`);
-  }
-  await api.conversation.inviteToConversation(member.id, owner.token, teamId, conversationName);
 
   // Initializing page objects
   const singleSignOnPage = new SingleSignOnPage(page);
@@ -83,6 +64,29 @@ test('Account Management', {tag: ['@TC-8639', '@crit-flow']}, async ({page, api}
   const accountPage = new AccountPage(page);
   const appLockModal = new AppLockModal(page);
   const conversationListPage = new ConversationListPage(page);
+
+  // Creating preconditions for the test via API
+  await test.step('Preconditions: Creating preconditions for the test via API', async () => {
+    await api.createTeamOwner(owner, teamName);
+    if (!owner.token) {
+      throw new Error(`Owner ${owner.username} has no token and can't be used for team creation`);
+    }
+    const teamId = await api.team.getTeamIdForUser(owner);
+    createdTeams.set(owner, teamId);
+    const invitationId = await api.team.inviteUserToTeam(
+      teamId,
+      member.email,
+      `${owner.firstName} ${owner.lastName}`,
+      owner.token,
+    );
+    const invitationCode = await api.brig.getTeamInvitationCodeForEmail(teamId, invitationId);
+
+    await api.createPersonalUser(member, invitationCode);
+    if (!member.id) {
+      throw new Error(`Member ${member.username} has no ID and can't be invited to the conversation`);
+    }
+    await api.conversation.inviteToConversation(member.id, owner.token, teamId, conversationName);
+  });
 
   // Test steps
 
@@ -143,13 +147,10 @@ test('Account Management', {tag: ['@TC-8639', '@crit-flow']}, async ({page, api}
 test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow']}, async ({page, api}) => {
   test.setTimeout(120_000); // Increasing test timeout to 120 seconds to accommodate the full flow
 
-  // Creating preconditions for the test via API
+  // Generating test data
   // userB is the contact user, userA is the user who registers
   const userB = getUser();
   const userA = getUser();
-  await api.createPersonalUser(userB);
-  createdUsers.push(userB);
-  await api.addDevicesToUser(userB, 1);
 
   // Initializing page objects
   const singleSignOnPage = new SingleSignOnPage(page);
@@ -168,6 +169,12 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow']}, async ({pa
   const blockWarningModal = new BlockWarningModal(page);
   const deleteAccountModal = new DeleteAccountModal(page);
   const accountPage = new AccountPage(page);
+
+  await test.step('Preconditions: Creating preconditions for the test via API', async () => {
+    await api.createPersonalUser(userB);
+    createdUsers.push(userB);
+    await api.addDevicesToUser(userB, 1);
+  });
 
   // Test steps
   await test.step('User A opens the application and registers personal account', async () => {
