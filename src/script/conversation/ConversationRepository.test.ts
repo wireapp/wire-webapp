@@ -28,6 +28,7 @@ import {
   CONVERSATION_TYPE,
   RemoteConversations,
   MLSConversation as BackendMLSConversation,
+  CONVERSATION_CELLS_STATE,
 } from '@wireapp/api-client/lib/conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
@@ -1817,7 +1818,7 @@ describe('ConversationRepository', () => {
             access: [CONVERSATION_ACCESS.INVITE],
             access_role: CONVERSATION_LEGACY_ACCESS_ROLE.ACTIVATED,
             access_role_v2: [],
-            cells_state: 'disabled',
+            cells_state: CONVERSATION_CELLS_STATE.DISABLED,
             creator: 'c472ba79-0bca-4a74-aaa3-a559a16705d3',
             id: 'c9405f98-e25a-4b1f-ade7-227ea765dff7',
             last_event: '0.0',

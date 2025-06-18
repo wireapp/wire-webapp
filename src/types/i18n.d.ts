@@ -422,6 +422,8 @@ declare module 'I18n/en-US.json' {
     'cells.pagination.previousPage': `Previous Page`;
     'cells.pagination.resultsOutOf': `{start}-{end} out of {total}`;
     'cells.pagination.rowsPerPage': `Rows per page`;
+    'cells.pending.description': `We\'re processing the files for this conversation. They’ll appear here once everything is ready.`;
+    'cells.pending.heading': `Files are being prepared`;
     'cells.refreshButton': `Refresh list`;
     'cells.renameNodeModal.headline': `Rename`;
     'cells.renameNodeModal.saveButton': `Save`;
