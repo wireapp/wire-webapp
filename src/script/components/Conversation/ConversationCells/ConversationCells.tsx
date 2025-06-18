@@ -81,7 +81,7 @@ export const ConversationCells = ({
 
   const isTableVisible = (isSuccess || isLoading) && isCellsStateReady;
   const isLoadingVisible = isLoading && isCellsStateReady;
-  const isNoNodesVisible = !isLoading && emptyView && isCellsStateReady;
+  const isNoNodesVisible = !isLoading && emptyView;
   const isPaginationVisible = !emptyView;
 
   return (
