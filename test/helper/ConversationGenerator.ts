@@ -23,6 +23,7 @@ import {
   CONVERSATION_ACCESS_ROLE,
   Conversation as BackendConversation,
   Member,
+  CONVERSATION_CELLS_STATE,
 } from '@wireapp/api-client/lib/conversation/';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
@@ -88,7 +89,7 @@ export function generateAPIConversation({
     creator: '',
     access_role: [CONVERSATION_ACCESS_ROLE.TEAM_MEMBER],
     members: {others: [], self: {} as Member},
-    cells_state: 'disabled',
+    cells_state: CONVERSATION_CELLS_STATE.DISABLED,
     ...overwites,
   };
 }

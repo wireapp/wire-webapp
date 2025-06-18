@@ -31,9 +31,10 @@ import {useCellsStore} from '../common/useCellsStore/useCellsStore';
 interface UseGetAllCellsNodesProps {
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
+  enabled: boolean;
 }
 
-export const useGetAllCellsNodes = ({cellsRepository, conversationQualifiedId}: UseGetAllCellsNodesProps) => {
+export const useGetAllCellsNodes = ({cellsRepository, conversationQualifiedId, enabled}: UseGetAllCellsNodesProps) => {
   const {setNodes, pageSize, setStatus, setPagination, setError, clearAll} = useCellsStore();
   const [offset, setOffset] = useState(0);
 
@@ -79,8 +80,10 @@ export const useGetAllCellsNodes = ({cellsRepository, conversationQualifiedId}: 
   }, [fetchNodes, setOffset, clearAll, id]);
 
   useEffect(() => {
-    void fetchNodes();
-  }, [fetchNodes]);
+    if (enabled) {
+      void fetchNodes();
+    }
+  }, [fetchNodes, enabled]);
 
   useEffect(() => {
     window.addEventListener('hashchange', handleHashChange);
