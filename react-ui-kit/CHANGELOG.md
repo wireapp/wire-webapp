@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.60.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.59.3...@wireapp/react-ui-kit@9.60.0) (2025-06-19)
+
+### Features
+
+* add sheild and pattern image [WPB-17531] ([#7085](https://github.com/wireapp/wire-web-packages/issues/7085)) ([ba80802](https://github.com/wireapp/wire-web-packages/commit/ba80802b773e7b1668c7bd21bf628dba14743f7c))
+
 ## [9.59.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.59.2...@wireapp/react-ui-kit@9.59.3) (2025-06-11)
 
 ### Bug Fixes
