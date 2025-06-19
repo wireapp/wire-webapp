@@ -17,27 +17,33 @@
  *
  */
 
+import {ReactNode} from 'react';
+
 import {CloseIcon, IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/LocalizerUtil';
 
-import {closeButtonStyles, headerStyles, headingStyles} from './CellsMoveNodeModalHeader.styles';
+import {headerStyles, headingStyles, closeButtonStyles} from './CellsModalHeader.styles';
 
-interface CellsMoveNodeModalHeaderProps {
-  title: string;
-  onClose: () => void;
+import {useCellsModal} from '../CellsModalContext/CellsModalContext';
+
+interface CellsModalHeaderProps {
+  children: ReactNode;
 }
 
-export const CellsMoveNodeModalHeader = ({title, onClose}: CellsMoveNodeModalHeaderProps) => {
+export const CellsModalHeader = ({children}: CellsModalHeaderProps) => {
+  const {onClose} = useCellsModal();
+
   return (
     <header css={headerStyles}>
-      <h3 css={headingStyles}>{title}</h3>
+      <h3 css={headingStyles}>{children}</h3>
+
       <IconButton
         variant={IconButtonVariant.SECONDARY}
         type="button"
         css={closeButtonStyles}
         onClick={onClose}
-        aria-label={t('cells.newItemMenuModal.closeButton')}
+        aria-label={t('cells.modal.closeButton')}
       >
         <CloseIcon />
       </IconButton>

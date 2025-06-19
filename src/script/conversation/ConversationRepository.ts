@@ -50,7 +50,7 @@ import {
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import type {BackendError} from '@wireapp/api-client/lib/http/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
-import {MLSCreateConversationResponse} from '@wireapp/core/lib/conversation';
+import {BaseCreateConversationResponse} from '@wireapp/core/lib/conversation';
 import {ClientMLSError, ClientMLSErrorLabel} from '@wireapp/core/lib/messagingProtocols/mls';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
@@ -390,6 +390,10 @@ export class ConversationRepository {
     return this.conversationService.addMLSConversationRecoveredListener(this.onMLSConversationRecovered);
   }
 
+  public initMLSEventDistributedListener() {
+    return this.conversationService.addMLSEventDistributedListener(this.onMLSEventDistributed);
+  }
+
   private readonly updateLocalMessageEntity = async ({
     obj: updatedEvent,
     oldObj: oldEvent,
@@ -473,7 +477,7 @@ export class ConversationRepository {
        * ToDo: Fetch all MLS Events from backend before doing anything else
        * Needs to be done to receive the latest epoch and avoid epoch mismatch errors
        */
-      let response: MLSCreateConversationResponse;
+      let response: BaseCreateConversationResponse;
       const isMLSConversation = payload.protocol === ConversationProtocol.MLS;
       if (isMLSConversation) {
         response = await this.core.service!.conversation.createMLSConversation(
@@ -483,10 +487,10 @@ export class ConversationRepository {
         );
       } else {
         const {conversation, failedToAdd} = await this.core.service!.conversation.createProteusConversation(payload);
-        response = {conversation, events: [], failedToAdd};
+        response = {conversation, failedToAdd};
       }
 
-      const {conversationEntity} = await this.onCreate({
+      const conversationEntity = await this.onCreate({
         conversation: response.conversation.qualified_id.id,
         data: {
           last_event: '0.0',
@@ -499,6 +503,11 @@ export class ConversationRepository {
         time: new Date().toISOString(),
         type: CONVERSATION_EVENT.CREATE,
       });
+
+      // ConversationEntity could be undefined if the conversation was not created
+      if (!conversationEntity) {
+        throw new ConversationError(ConversationError.TYPE.NOT_CREATED, ConversationError.MESSAGE.NOT_CREATED);
+      }
 
       const {failedToAdd} = response;
 
@@ -2411,17 +2420,13 @@ export class ConversationRepository {
       }
 
       if (isMLSCapableConversation(conversation)) {
-        const {failedToAdd, events} = await this.core.service!.conversation.addUsersToMLSConversation({
+        const {failedToAdd} = await this.core.service!.conversation.addUsersToMLSConversation({
           conversationId: conversation.qualifiedId,
           groupId: conversation.groupId,
           qualifiedUsers,
         });
 
         if (isMLSConversation(conversation)) {
-          if (events.length) {
-            events.forEach(event => this.eventRepository.injectEvent(event));
-          }
-
           if (failedToAdd && failedToAdd.length) {
             await this.eventRepository.injectEvent(
               EventBuilder.buildFailedToAddUsersEvent(failedToAdd, conversation, this.userState.self().id),
@@ -2623,13 +2628,11 @@ export class ConversationRepository {
    */
   private async removeMembersFromMLSConversation(conversationEntity: MLSConversation, userIds: QualifiedId[]) {
     const {groupId, qualifiedId} = conversationEntity;
-    const {events} = await this.core.service!.conversation.removeUsersFromMLSConversation({
+    await this.core.service!.conversation.removeUsersFromMLSConversation({
       conversationId: qualifiedId,
       groupId,
       qualifiedUserIds: userIds,
     });
-
-    return events;
   }
 
   /**
@@ -2676,11 +2679,12 @@ export class ConversationRepository {
    * @returns Resolves when member was removed from the conversation
    */
   public async removeMembers(conversationEntity: Conversation, userIds: QualifiedId[]) {
-    const events = isMLSConversation(conversationEntity)
-      ? await this.removeMembersFromMLSConversation(conversationEntity, userIds)
-      : await this.removeMembersFromConversation(conversationEntity, userIds);
-
-    await this.eventRepository.injectEvents(events, EventRepository.SOURCE.BACKEND_RESPONSE);
+    if (isMLSConversation(conversationEntity)) {
+      await this.removeMembersFromMLSConversation(conversationEntity, userIds);
+    } else {
+      const events = await this.removeMembersFromConversation(conversationEntity, userIds);
+      await this.eventRepository.injectEvents(events, EventRepository.SOURCE.BACKEND_RESPONSE);
+    }
   }
 
   /**
@@ -3572,6 +3576,13 @@ export class ConversationRepository {
     void this.eventRepository.injectEvent(event);
   };
 
+  /**
+   * Add "mls" system message to conversation.
+   */
+  private readonly onMLSEventDistributed = async (events: any): Promise<void> => {
+    await this.eventRepository.injectEvents(events, EventRepository.SOURCE.BACKEND_RESPONSE);
+  };
+
   private on1to1Creation(conversationEntity: Conversation, eventJson: OneToOneCreationEvent) {
     const message = this.event_mapper.mapJsonEvent(eventJson, conversationEntity);
     return this.updateMessageUserEntities(message).then((messageEntity: MemberMessage) => {
@@ -3596,7 +3607,7 @@ export class ConversationRepository {
   private async onCreate(
     eventJson: ConversationCreateEvent,
     eventSource?: EventSource,
-  ): Promise<{conversationEntity: Conversation}> {
+  ): Promise<Conversation | undefined> {
     const {conversation, data: eventData, qualified_conversation, time} = eventJson;
     const eventTimestamp = new Date(time).getTime();
     const initialTimestamp = isNaN(eventTimestamp) ? this.getLatestEventTimestamp(true) : eventTimestamp;
@@ -3604,12 +3615,8 @@ export class ConversationRepository {
       domain: eventJson.qualified_conversation?.domain ?? '',
       id: conversation,
     };
-    try {
-      const existingConversationEntity = this.conversationState.findConversation(conversationId);
-      if (existingConversationEntity) {
-        throw new ConversationError(ConversationError.TYPE.NO_CHANGES, ConversationError.MESSAGE.NO_CHANGES);
-      }
 
+    try {
       const conversationData = !eventSource
         ? // If there is no source, it means its a conversation created locally, no need to fetch it again
           eventData
@@ -3624,7 +3631,7 @@ export class ConversationRepository {
         this.proteusVerificationStateHandler.onConversationCreate(conversationEntity);
         await this.saveConversation(conversationEntity);
       }
-      return {conversationEntity};
+      return conversationEntity;
     } catch (error) {
       const isNoChanges = error.type === ConversationError.TYPE.NO_CHANGES;
       if (!isNoChanges) {

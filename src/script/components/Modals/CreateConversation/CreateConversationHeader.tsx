@@ -89,7 +89,7 @@ export const CreateConversationHeader = () => {
         <Icon.CloseIcon aria-hidden="true" className="modal__header__button" />
       </button>
 
-      <h2 id="group-creation-label" className="modal__header__title">
+      <h2 id="group-creation-label" className="modal__header__title" data-uie-name="status-people-selected">
         {t('createConversationModalHeader')}
       </h2>
 

@@ -17,25 +17,27 @@
  *
  */
 
-import {useState} from 'react';
+import {useEffect, useRef} from 'react';
 
-import {CellsRepository} from 'src/script/cells/CellsRepository';
+export const useInputAutoFocus = ({enabled}: {enabled: boolean}) => {
+  const inputRef = useRef<HTMLInputElement>(null);
 
-export const useMoveCellsNode = ({cellsRepository}: {cellsRepository: CellsRepository}) => {
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-
-  const moveNode = async ({currentPath, targetPath}: {currentPath: string; targetPath: string}) => {
-    setStatus('loading');
-    try {
-      await cellsRepository.moveNode({
-        currentPath,
-        targetPath,
-      });
-      setStatus('success');
-    } catch (error) {
-      setStatus('error');
+  useEffect(() => {
+    if (!enabled) {
+      return undefined;
     }
-  };
 
-  return {moveNode, status};
+    // Ensure the input is fully rendered
+    const timeoutId = setTimeout(() => {
+      inputRef.current?.focus();
+    });
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [enabled]);
+
+  return {
+    inputRef,
+  };
 };

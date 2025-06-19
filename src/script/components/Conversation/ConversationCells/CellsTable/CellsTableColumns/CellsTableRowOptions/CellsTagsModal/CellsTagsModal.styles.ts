@@ -19,37 +19,6 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const modalStyles: CSSObject = {
-  width: '508px',
-};
-
-export const wrapperStyles: CSSObject = {
-  padding: '8px',
-  width: '100%',
-  position: 'relative',
-};
-
-export const headerStyles: CSSObject = {
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  flexDirection: 'column',
-  marginTop: '16px',
-  marginBottom: '24px',
-};
-
-export const headingStyles: CSSObject = {
-  fontSize: 'var(--font-size-large)',
-  fontWeight: 'var(--font-weight-semibold)',
-  margin: '0',
-};
-
-export const closeButtonStyles: CSSObject = {
-  position: 'absolute',
-  right: '8px',
-  top: '8px',
-};
-
 export const contentStyles: CSSObject = {
   padding: '0 16px',
   marginBottom: '24px',
@@ -57,20 +26,6 @@ export const contentStyles: CSSObject = {
 
 export const descriptionStyles: CSSObject = {
   marginBottom: '24px',
-};
-
-export const actionsWrapperStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  flexDirection: 'row',
-  gap: '8px',
-  padding: '0 16px',
-  marginBottom: '8px',
-};
-
-export const buttonStyles: CSSObject = {
-  width: '100%',
-  margin: '0',
 };
 
 export const selectWrapperStyles: CSSObject = {

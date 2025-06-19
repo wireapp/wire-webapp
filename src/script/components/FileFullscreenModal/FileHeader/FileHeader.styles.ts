@@ -57,6 +57,7 @@ export const metadataStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
   gap: '16px',
+  fontSize: 'var(--font-size-small)',
 };
 
 export const nameStyles: CSSObject = {

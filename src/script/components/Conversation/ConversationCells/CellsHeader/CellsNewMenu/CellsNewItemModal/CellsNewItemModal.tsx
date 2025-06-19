@@ -19,24 +19,15 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {CloseIcon, IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
-
 import {CellsNewNodeForm} from 'Components/Conversation/ConversationCells/common/CellsNewNodeForm/CellsNewNodeForm';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
+import {useCellsNewItemForm} from 'Components/Conversation/ConversationCells/common/useCellsNewNodeForm/useCellsNewNodeForm';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
-import {handleEscDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import {
-  closeButtonStyles,
-  descriptionStyles,
-  headerStyles,
-  headingStyles,
-  modalStyles,
-  wrapperStyles,
-} from './CellsNewItemModal.styles';
+import {descriptionStyles} from './CellsNewItemModal.styles';
 
 import {CellNode} from '../../../common/cellNode/cellNode';
+import {CellsModal} from '../../../common/CellsModal/CellsModal';
 
 interface CellsNewItemModalProps {
   isOpen: boolean;
@@ -58,42 +49,32 @@ export const CellsNewItemModal = ({
   currentPath,
 }: CellsNewItemModalProps) => {
   const isFolder = type === 'folder';
-  return (
-    <ModalComponent
-      isShown={isOpen}
-      onClosed={onClose}
-      onBgClick={onClose}
-      onKeyDown={event => handleEscDown(event, onClose)}
-      wrapperCSS={modalStyles}
-    >
-      <div css={wrapperStyles}>
-        <header css={headerStyles}>
-          <h3 css={headingStyles}>
-            {t(isFolder ? 'cells.newItemMenuModal.headlineFolder' : 'cells.newItemMenuModal.headlineFile')}
-          </h3>
 
-          <IconButton
-            variant={IconButtonVariant.SECONDARY}
-            type="button"
-            css={closeButtonStyles}
-            onClick={onClose}
-            aria-label={t('cells.newItemMenuModal.closeButton')}
-          >
-            <CloseIcon />
-          </IconButton>
-        </header>
-        <p css={descriptionStyles}>
-          {t(isFolder ? 'cells.newItemMenuModal.descriptionFolder' : 'cells.newItemMenuModal.descriptionFile')}
-        </p>
-        <CellsNewNodeForm
-          type={type}
-          cellsRepository={cellsRepository}
-          conversationQualifiedId={conversationQualifiedId}
-          onSuccess={onSuccess}
-          currentPath={currentPath}
-          onSecondaryButtonClick={onClose}
-        />
-      </div>
-    </ModalComponent>
+  const {name, error, isSubmitting, handleSubmit, handleChange} = useCellsNewItemForm({
+    type,
+    cellsRepository,
+    conversationQualifiedId,
+    onSuccess,
+    currentPath,
+  });
+
+  return (
+    <CellsModal isOpen={isOpen} onClose={onClose} size="large">
+      <CellsModal.Header>
+        {t(isFolder ? 'cells.newItemMenuModal.headlineFolder' : 'cells.newItemMenuModal.headlineFile')}
+      </CellsModal.Header>
+      <p css={descriptionStyles}>
+        {t(isFolder ? 'cells.newItemMenuModal.descriptionFolder' : 'cells.newItemMenuModal.descriptionFile')}
+      </p>
+      <CellsNewNodeForm type={type} onSubmit={handleSubmit} inputValue={name} onChange={handleChange} error={error} />
+      <CellsModal.Actions>
+        <CellsModal.SecondaryButton onClick={onClose}>
+          {t('cells.newItemMenuModal.secondaryAction')}
+        </CellsModal.SecondaryButton>
+        <CellsModal.PrimaryButton onClick={handleSubmit} isDisabled={isSubmitting}>
+          {t('cells.newItemMenuModal.primaryAction')}
+        </CellsModal.PrimaryButton>
+      </CellsModal.Actions>
+    </CellsModal>
   );
 };

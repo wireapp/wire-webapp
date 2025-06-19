@@ -18,6 +18,7 @@
  */
 
 // Polyfill for "tsyringe" dependency injection
+
 // eslint-disable-next-line import/order
 
 import {Context} from '@wireapp/api-client/lib/auth';
@@ -351,10 +352,7 @@ export class App {
   private initializeCells({cellsRepository, selfUser}: {cellsRepository: CellsRepository; selfUser: User}) {
     const cellPydioApiKey = Config.getConfig().CELLS_TOKEN_SHARED_SECRET;
 
-    const cellsApiKey =
-      process.env.NODE_ENV === 'development'
-        ? cellPydioApiKey
-        : `${cellPydioApiKey}:${selfUser.qualifiedId.id}@${selfUser.qualifiedId.domain}`;
+    const cellsApiKey = `${cellPydioApiKey}:${selfUser.qualifiedId.id}@${selfUser.qualifiedId.domain}`;
 
     cellsRepository.initialize({
       pydio: {
@@ -520,6 +518,7 @@ export class App {
       if (this.core.hasMLSDevice) {
         //if mls is supported, we need to initialize the callbacks (they are used when decrypting messages)
         conversationRepository.initMLSConversationRecoveredListener();
+        conversationRepository.initMLSEventDistributedListener();
         conversationRepository.registerMLSConversationVerificationStateHandler(
           selfUser.qualifiedId.domain,
           this.updateConversationE2EIVerificationState,

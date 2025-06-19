@@ -19,23 +19,8 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const headerStyles: CSSObject = {
+export const modalContentStyles: CSSObject = {
   display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
   flexDirection: 'column',
-  marginTop: '16px',
-  marginBottom: '24px',
-};
-
-export const headingStyles: CSSObject = {
-  fontSize: 'var(--font-size-large)',
-  fontWeight: 'var(--font-weight-semibold)',
-  margin: '0',
-};
-
-export const closeButtonStyles: CSSObject = {
-  position: 'absolute',
-  right: '8px',
-  top: '8px',
+  gap: '16px',
 };

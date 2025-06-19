@@ -17,8 +17,6 @@
  *
  */
 
-import {useCallback} from 'react';
-
 import {container} from 'tsyringe';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
@@ -32,6 +30,7 @@ import {CellsLoader} from './CellsLoader/CellsLoader';
 import {CellsStateInfo} from './CellsStateInfo/CellsStateInfo';
 import {CellsTable} from './CellsTable/CellsTable';
 import {useCellsStore} from './common/useCellsStore/useCellsStore';
+import {useOnPresignedUrlExpired} from './useOnPresignedUrlExpired/useOnPresignedUrlExpired';
 import {useSearchCellsNodes} from './useSearchCellsNodes/useSearchCellsNodes';
 
 interface CellsGlobalViewProps {
@@ -45,9 +44,7 @@ export const CellsGlobalView = ({cellsRepository = container.resolve(CellsReposi
     cellsRepository,
   });
 
-  const handleRefresh = useCallback(async () => {
-    await handleReload();
-  }, [handleReload]);
+  useOnPresignedUrlExpired({refreshCallback: handleReload});
 
   const isLoading = nodesStatus === 'loading';
   const isFetchingMore = nodesStatus === 'fetchingMore';
@@ -74,7 +71,7 @@ export const CellsGlobalView = ({cellsRepository = container.resolve(CellsReposi
         searchValue={searchValue}
         onSearch={handleSearch}
         onClearSearch={handleClearSearch}
-        onRefresh={handleRefresh}
+        onRefresh={handleReload}
         searchStatus={nodesStatus}
         cellsRepository={cellsRepository}
       />

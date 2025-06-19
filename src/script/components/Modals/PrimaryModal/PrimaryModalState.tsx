@@ -146,6 +146,7 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
     allButtonsFullWidth = false,
     primaryBtnFirst = false,
     closeOnSecondaryAction = true,
+    size = 'small',
   } = options;
 
   const content = {
@@ -169,6 +170,7 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
     allButtonsFullWidth,
     primaryBtnFirst,
     closeOnSecondaryAction,
+    size,
   };
 
   switch (type) {

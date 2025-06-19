@@ -17,18 +17,21 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {useDatePassed} from 'Hooks/useDatePassed/useDatePassed';
 
-export const wrapperStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  flexDirection: 'row',
-  gap: '8px',
-  padding: '0 16px',
-  marginBottom: '8px',
-};
+import {useCellsStore} from '../common/useCellsStore/useCellsStore';
 
-export const buttonStyles: CSSObject = {
-  width: '100%',
-  margin: '0',
+// Every node has a url to its destination, which expires after some time.
+// When the url expires, we need to refresh the nodes to get the new url.
+// If we don't refresh the nodes, the user will see a broken image.
+export const useOnPresignedUrlExpired = ({refreshCallback}: {refreshCallback: () => void}) => {
+  const {nodes} = useCellsStore();
+
+  const nodesAvailable = nodes.length > 0;
+
+  useDatePassed({
+    enabled: nodesAvailable,
+    target: nodesAvailable ? nodes[0].presignedUrlExpiresAt : null,
+    callback: refreshCallback,
+  });
 };

@@ -28,12 +28,12 @@ import {
   CONVERSATION_TYPE,
   RemoteConversations,
   MLSConversation as BackendMLSConversation,
+  CONVERSATION_CELLS_STATE,
 } from '@wireapp/api-client/lib/conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
 import {
   ConversationProtocolUpdateEvent,
-  ConversationMemberLeaveEvent,
   ConversationCreateEvent,
   ConversationMemberJoinEvent,
   CONVERSATION_EVENT,
@@ -1818,6 +1818,7 @@ describe('ConversationRepository', () => {
             access: [CONVERSATION_ACCESS.INVITE],
             access_role: CONVERSATION_LEGACY_ACCESS_ROLE.ACTIVATED,
             access_role_v2: [],
+            cells_state: CONVERSATION_CELLS_STATE.DISABLED,
             creator: 'c472ba79-0bca-4a74-aaa3-a559a16705d3',
             id: 'c9405f98-e25a-4b1f-ade7-227ea765dff7',
             last_event: '0.0',
@@ -3154,19 +3155,12 @@ describe('ConversationRepository', () => {
 
       jest
         .spyOn(coreConversationService, 'removeUsersFromMLSConversation')
-        .mockResolvedValueOnce({events: [], conversation: {} as BackendConversation});
+        .mockResolvedValueOnce({} as BackendConversation);
       jest.spyOn(conversationRepository['eventRepository'], 'injectEvent').mockImplementation(jest.fn());
 
-      const mockedMemberLeaveEvent: ConversationMemberLeaveEvent = {
-        conversation: conversation.id,
-        data: {qualified_user_ids: [], user_ids: []},
-        from: '',
-        time: '',
-        type: CONVERSATION_EVENT.MEMBER_LEAVE,
-      };
       jest
         .spyOn(coreConversationService, 'removeUsersFromMLSConversation')
-        .mockResolvedValueOnce({events: [mockedMemberLeaveEvent], conversation: {} as BackendConversation});
+        .mockResolvedValueOnce({} as BackendConversation);
       await conversationRepository.removeMembers(conversation, [user1.qualifiedId]);
 
       expect(coreConversationService.removeUsersFromMLSConversation).toHaveBeenCalledWith({
