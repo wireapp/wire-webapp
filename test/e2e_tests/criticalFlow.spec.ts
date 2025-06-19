@@ -97,15 +97,6 @@ test('Account Management', {tag: ['@TC-8639', '@crit-flow']}, async ({page, api}
     await dataShareConsentModal.clickDecline();
   });
 
-  // TODO:
-  // zautomation also features the following steps:
-  //
-  //     When I remember number of reported events
-  //     And User <Owner> pinged in the conversation with Tracking
-  //     Then There are no added reported events
-  //
-  // but these are not a part of the original test case, so I skip them here.
-
   await test.step('Member opens settings', async () => {
     await conversationSidebar.clickPreferencesButton();
   });

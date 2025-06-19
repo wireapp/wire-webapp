@@ -28,8 +28,8 @@ export class StartUIPage {
   constructor(page: Page) {
     this.page = page;
 
-    this.searchInput = page.locator('#start-ui [data-uie-name="enter-users"]');
-    this.searchResults = page.locator('#start-ui [data-uie-name="item-user"] [data-uie-name="status-username"]');
+    this.searchInput = page.locator('[data-uie-name="enter-users"]');
+    this.searchResults = page.locator('[data-uie-name="item-user"] [data-uie-name="status-username"]');
   }
 
   async searchForUser(username: string) {

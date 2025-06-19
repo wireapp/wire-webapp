@@ -59,8 +59,6 @@ export class ConversationListPage {
   }
 
   private getConversationLocator(conversationName: string) {
-    return this.page.locator(
-      `#conversations [data-uie-name='item-conversation'][data-uie-value='${escapeHtml(conversationName)}']`,
-    );
+    return this.page.locator(`[data-uie-name='item-conversation'][data-uie-value='${escapeHtml(conversationName)}']`);
   }
 }
