@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [46.29.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.29.0...@wireapp/core@46.29.1) (2025-06-19)
+
+### Bug Fixes
+
+* **CC:** delete the old Db key under any circumstances after migration is done ([#7084](https://github.com/wireapp/wire-web-packages/issues/7084)) ([e92fd1f](https://github.com/wireapp/wire-web-packages/commit/e92fd1fefb626f06ffde62d216a57fa9397225d5))
+
 # [46.29.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.28.0...@wireapp/core@46.29.0) (2025-06-18)
 
 ### Features
