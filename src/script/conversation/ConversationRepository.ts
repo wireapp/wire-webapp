@@ -3682,7 +3682,7 @@ export class ConversationRepository {
 
       // If the group is not established yet, we need to establish it
       if (!isAlreadyEstablished) {
-        await initMLSGroupConversation(conversationEntity, selfUser?.qualifiedId, {core: this.core});
+        await initMLSGroupConversation(conversationEntity, selfUser.qualifiedId, {core: this.core});
       }
     }
 
