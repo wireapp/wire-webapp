@@ -87,25 +87,25 @@ const migrateOnceAndGetKey = async (
   // We retrieve the new key if it exists or generate a new one
   const keyNew = await getKey(generateSecretKey, coreCryptoNewKeyId, 32);
 
-  // If we dont retreive any key, we throw an error
-  // This should not happen since we generate a new key if it does not exist
   if (!keyNew || !keyOld) {
+    // If we dont retreive any key, we throw an error
+    // This should not happen since we generate a new key if it does not exist
     throw new Error('Key not found and could not be generated');
   }
 
   /**
-   * If the old key is freshly generated we dont need to migrate and return the new key
-   * If the old key exists and the new key is freshly generated, we need to migrate and then return the new key (This should only happen once !!!!)
-   * If the old key exists and the new key exists we return the new key
+   * Handles migration and cleanup of encryption keys.
+   *
+   * - If `keyNew` is freshly generated and `keyOld` is not freshly generated:
+   *     - Migrate data from `keyOld` to `keyNew`
    */
-  if (!keyOld.freshlyGenerated && keyNew.freshlyGenerated) {
-    // Create the new key in the format used by coreCrypto
+  if (keyNew.freshlyGenerated && !keyOld.freshlyGenerated) {
     const databaseKey = new DatabaseKey(keyNew.key);
-    // Run the migration
     await migrateDatabaseKeyTypeToBytes(coreCryptoDbName, Encoder.toBase64(keyOld.key).asString, databaseKey);
-    // delete the old key, it will be freshly generated in the next call and ensure we dont run the migration again
-    await keyOld.deleteKey();
   }
+
+  // Always clean up the old key
+  await keyOld.deleteKey();
 
   return {
     key: new DatabaseKey(keyNew.key),
