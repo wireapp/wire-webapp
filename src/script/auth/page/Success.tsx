@@ -19,6 +19,8 @@
 
 import {HTMLProps, useEffect} from 'react';
 
+import {SuccessShield} from '@wireapp/react-ui-kit/lib/Images/SuccessShield';
+
 import {FlexBox, Text, TextLink} from '@wireapp/react-ui-kit';
 
 import {Config} from 'src/script/Config';
@@ -27,7 +29,6 @@ import {t} from 'Util/LocalizerUtil';
 import {Page} from './Page';
 import {styles} from './Success.styles.';
 
-import {SuccessShield} from '../assets/SuccessShield';
 import {AccountRegistrationLayout} from '../component/AccountRegistrationLayout';
 import {EXTERNAL_ROUTE} from '../externalRoute';
 import {PageView, resetTelemetrySession, trackTelemetryPageView} from '../util/trackingUtil';
