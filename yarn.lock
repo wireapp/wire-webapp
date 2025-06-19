@@ -8502,9 +8502,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:46.29.0":
-  version: 46.29.0
-  resolution: "@wireapp/core@npm:46.29.0"
+"@wireapp/core@npm:46.29.1":
+  version: 46.29.1
+  resolution: "@wireapp/core@npm:46.29.1"
   dependencies:
     "@wireapp/api-client": "npm:^27.65.0"
     "@wireapp/commons": "npm:^5.4.2"
@@ -8524,7 +8524,7 @@ __metadata:
     long: "npm:^5.2.0"
     uuid: "npm:9.0.1"
     zod: "npm:3.24.2"
-  checksum: 10/44a01f9654234d34ed0776c9ee8775d97e91eda54a46c736b95dc0e8de8e858470f04b28d3d05615591681969f4e173f144b43338857b939719496fc2d04f2b3
+  checksum: 10/4c4e2a6c31bd9acd5a188d3e42831b79c5ef8969a82e508371293e08a35b5826593477e09560f545eb3f59b9cde34391ae088d93af7b84170c8c264899ba2fc4
   languageName: node
   linkType: hard
 
@@ -22128,7 +22128,7 @@ __metadata:
     "@wireapp/avs-debugger": "npm:0.0.7"
     "@wireapp/commons": "npm:5.4.2"
     "@wireapp/copy-config": "npm:2.3.0"
-    "@wireapp/core": "npm:46.29.0"
+    "@wireapp/core": "npm:46.29.1"
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/kalium-backup": "npm:0.0.3"
     "@wireapp/prettier-config": "npm:0.6.4"
