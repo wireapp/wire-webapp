@@ -49,7 +49,7 @@ const BackupFileUpload = ({
           ref={fileInputRef}
           tabIndex={TabIndex.UNFOCUSABLE}
           type="file"
-          accept={`.${HistoryExportConfig.FILE_EXTENSION}`}
+          accept={`.${HistoryExportConfig.LEGACY_FILE_EXTENSION},.${HistoryExportConfig.UNIVERSAL_FILE_EXTENSION}`}
           onChange={onFileChange}
           onFocus={({target}) => target.blur()}
           data-uie-name="input-import-file"

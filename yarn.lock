@@ -5248,6 +5248,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@js-joda/core@npm:3.2.0":
+  version: 3.2.0
+  resolution: "@js-joda/core@npm:3.2.0"
+  checksum: 10/af7d3717eacbee33c7b7af68d17ea99765218e3d1fff7c7ea555986181a8ee6459b8c7289f346f9e67e7dfbb97f16c356e98efd9d0cb0ae2137608f38e837ee9
+  languageName: node
+  linkType: hard
+
 "@jsdoc/salty@npm:^0.2.1":
   version: 0.2.7
   resolution: "@jsdoc/salty@npm:0.2.7"
@@ -8495,9 +8502,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:46.29.0":
-  version: 46.29.0
-  resolution: "@wireapp/core@npm:46.29.0"
+"@wireapp/core@npm:46.29.1":
+  version: 46.29.1
+  resolution: "@wireapp/core@npm:46.29.1"
   dependencies:
     "@wireapp/api-client": "npm:^27.65.0"
     "@wireapp/commons": "npm:^5.4.2"
@@ -8517,7 +8524,7 @@ __metadata:
     long: "npm:^5.2.0"
     uuid: "npm:9.0.1"
     zod: "npm:3.24.2"
-  checksum: 10/44a01f9654234d34ed0776c9ee8775d97e91eda54a46c736b95dc0e8de8e858470f04b28d3d05615591681969f4e173f144b43338857b939719496fc2d04f2b3
+  checksum: 10/4c4e2a6c31bd9acd5a188d3e42831b79c5ef8969a82e508371293e08a35b5826593477e09560f545eb3f59b9cde34391ae088d93af7b84170c8c264899ba2fc4
   languageName: node
   linkType: hard
 
@@ -8567,6 +8574,19 @@ __metadata:
     eslint: ^8
     prettier: ^3
   checksum: 10/8844ff876b9a8293c9a09932d8185762fb4b61c0946d456949cb9871de34a29de5d02aa649ec163beae52e47695c3c08951d901bc718a605104af4ace152170f
+  languageName: node
+  linkType: hard
+
+"@wireapp/kalium-backup@npm:0.0.3":
+  version: 0.0.3
+  resolution: "@wireapp/kalium-backup@npm:0.0.3"
+  dependencies:
+    "@js-joda/core": "npm:3.2.0"
+    format-util: "npm:^1.0.5"
+    jszip: "npm:3.10.1"
+    libsodium-wrappers-sumo: "npm:0.7.9"
+    protobufjs: "npm:^7.3.2"
+  checksum: 10/92ffab3f2d1ea290543ee86aeec2e0d2a78a8b719a95bc248175900111b749dad90306ceaa95bd2b8acc3754a256260fa103706a8364496d9eff4ff63b476ce9
   languageName: node
   linkType: hard
 
@@ -12742,6 +12762,13 @@ __metadata:
     combined-stream: "npm:^1.0.8"
     mime-types: "npm:^2.1.12"
   checksum: 10/7264aa760a8cf09482816d8300f1b6e2423de1b02bba612a136857413fdc96d7178298ced106817655facc6b89036c6e12ae31c9eb5bdc16aabf502ae8a5d805
+  languageName: node
+  linkType: hard
+
+"format-util@npm:^1.0.5":
+  version: 1.0.5
+  resolution: "format-util@npm:1.0.5"
+  checksum: 10/0c8622e54ad899ca184ff0b4999e9ff9567965051bade140911209d60554c2ea4d43075763c1cf574d2f740966afe46469c9284357919505cdddf1a0b65ff85c
   languageName: node
   linkType: hard
 
@@ -18465,6 +18492,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"protobufjs@npm:^7.3.2":
+  version: 7.5.0
+  resolution: "protobufjs@npm:7.5.0"
+  dependencies:
+    "@protobufjs/aspromise": "npm:^1.1.2"
+    "@protobufjs/base64": "npm:^1.1.2"
+    "@protobufjs/codegen": "npm:^2.0.4"
+    "@protobufjs/eventemitter": "npm:^1.1.0"
+    "@protobufjs/fetch": "npm:^1.1.0"
+    "@protobufjs/float": "npm:^1.0.2"
+    "@protobufjs/inquire": "npm:^1.1.0"
+    "@protobufjs/path": "npm:^1.1.2"
+    "@protobufjs/pool": "npm:^1.1.0"
+    "@protobufjs/utf8": "npm:^1.1.0"
+    "@types/node": "npm:>=13.7.0"
+    long: "npm:^5.0.0"
+  checksum: 10/c4fcc116b7aa5f15250420cf95a669969e1e29379d70ff2f4e3e2f5dbbc2dab2be0adef9ade02d1d6ea94179b34bac8b8458f30b089fe040e4e9fc2a29fdb713
+  languageName: node
+  linkType: hard
+
 "proxy-from-env@npm:^1.1.0":
   version: 1.1.0
   resolution: "proxy-from-env@npm:1.1.0"
@@ -22081,8 +22128,9 @@ __metadata:
     "@wireapp/avs-debugger": "npm:0.0.7"
     "@wireapp/commons": "npm:5.4.2"
     "@wireapp/copy-config": "npm:2.3.0"
-    "@wireapp/core": "npm:46.29.0"
+    "@wireapp/core": "npm:46.29.1"
     "@wireapp/eslint-config": "npm:3.0.7"
+    "@wireapp/kalium-backup": "npm:0.0.3"
     "@wireapp/prettier-config": "npm:0.6.4"
     "@wireapp/react-ui-kit": "npm:9.59.3"
     "@wireapp/store-engine": "npm:5.1.11"
@@ -22191,6 +22239,7 @@ __metadata:
     webpack-hot-middleware: "npm:2.26.1"
     webrtc-adapter: "npm:9.0.1"
     workbox-webpack-plugin: "npm:7.3.0"
+    zod: "npm:^3.24.2"
     zustand: "npm:4.5.5"
   languageName: unknown
   linkType: soft
@@ -22664,6 +22713,13 @@ __metadata:
   version: 3.24.2
   resolution: "zod@npm:3.24.2"
   checksum: 10/604c62a8cf8e330d78b106a557f4b44f5d14845d20b1360a423ccc09b58cb8525ccf7e4b40cf1bd4852d22393d2c67774b5817ec5a2fedab25f543b36ed15943
+  languageName: node
+  linkType: hard
+
+"zod@npm:^3.24.2":
+  version: 3.24.3
+  resolution: "zod@npm:3.24.3"
+  checksum: 10/1b15db625ca633324084f3a8587bfb907043bbca407a09f7d5da6a9781b3838c68e9312b49e91e479d2f8bf04cdda5810803ac9504e3b7ccbec3adf2de625fb8
   languageName: node
   linkType: hard
 
