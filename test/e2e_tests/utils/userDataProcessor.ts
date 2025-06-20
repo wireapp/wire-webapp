@@ -18,8 +18,8 @@
  */
 
 export const sanitizeName = (name: string): string => {
-  // Remove any characters that are not letters, numbers, or hyphens
-  return name.replace(/[^a-zA-Z0-9-]/g, '');
+  // Remove any characters that are not letters
+  return name.replace(/[^a-zA-Z]/g, '');
 };
 
 export const escapeHtml = (str: string): string => {
