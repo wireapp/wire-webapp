@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [46.29.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.29.2...@wireapp/core@46.29.3) (2025-06-23)
+
+### Bug Fixes
+
+* **CC:** remove duplicated epoch change event and add debug logging ([#7087](https://github.com/wireapp/wire-web-packages/issues/7087)) ([973ccb6](https://github.com/wireapp/wire-web-packages/commit/973ccb64f4484bb954754bdf268c0da688aace2c))
+
 ## [46.29.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.29.1...@wireapp/core@46.29.2) (2025-06-23)
 
 **Note:** Version bump only for package @wireapp/core
