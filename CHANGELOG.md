@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.66.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.65.0...@wireapp/api-client@27.66.0) (2025-06-23)
+
+### Features
+
+* **api-client/cells:** remove default sorting ([#7086](https://github.com/wireapp/wire-web-packages/issues/7086)) ([e53c202](https://github.com/wireapp/wire-web-packages/commit/e53c2020db047e345d2c35507e9b666500a678b5))
+
 # [27.65.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.64.0...@wireapp/api-client@27.65.0) (2025-06-18)
 
 ### Features
