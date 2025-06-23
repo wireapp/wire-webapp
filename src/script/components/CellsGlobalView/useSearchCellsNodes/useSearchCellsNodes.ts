@@ -21,7 +21,7 @@ import {useCallback, useEffect, useRef, useState} from 'react';
 
 import {useDebouncedCallback} from 'use-debounce';
 
-import {CellsRepository, SortBy, SortDirection} from 'src/script/cells/CellsRepository';
+import {CellsRepository} from 'src/script/cells/CellsRepository';
 
 import {useCellsStore, Status} from '../common/useCellsStore/useCellsStore';
 import {transformCellsNodes} from '../transformCellsNodes/transformCellsNodes';
@@ -45,22 +45,16 @@ export const useSearchCellsNodes = ({cellsRepository}: UseSearchCellsNodesProps)
   const shouldPerformFullReload = useRef(true);
 
   const searchNodes = useCallback(
-    async ({
-      query,
-      status,
-      limit = pageSize,
-      sortBy,
-      sortDirection,
-    }: {
-      query: string;
-      status: Status;
-      limit?: number;
-      sortBy?: SortBy;
-      sortDirection?: SortDirection;
-    }) => {
+    async ({query, status, limit = pageSize}: {query: string; status: Status; limit?: number}) => {
       try {
         setStatus(status);
-        const result = await cellsRepository.searchNodes({query, limit, tags: filters.tags, sortBy, sortDirection});
+        const result = await cellsRepository.searchNodes({
+          query,
+          limit,
+          tags: filters.tags,
+          sortBy: searchQuery ? undefined : 'mtime',
+          sortDirection: searchQuery ? undefined : 'desc',
+        });
         setNodes(transformCellsNodes(result.Nodes || []));
         if (result.Pagination) {
           setPagination(transformCellsPagination(result.Pagination));
@@ -81,13 +75,13 @@ export const useSearchCellsNodes = ({cellsRepository}: UseSearchCellsNodesProps)
     },
     // cellsRepository is not a dependency because it's a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [pageSize, setNodes, setPagination, setStatus, filters],
+    [pageSize, setNodes, setPagination, setStatus, filters, searchQuery],
   );
 
   const searchNodesDebounced = useDebouncedCallback(async (value: string) => {
     shouldPerformFullReload.current = false;
     setSearchQuery(value);
-    await searchNodes({query: value, status: 'loading', sortBy: 'mtime', sortDirection: 'asc'});
+    await searchNodes({query: value, status: 'loading'});
     shouldPerformFullReload.current = true;
   }, DEBOUNCE_TIME);
 
