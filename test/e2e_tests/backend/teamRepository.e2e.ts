@@ -17,11 +17,11 @@
  *
  */
 
-import {BackendClient} from './backendClient';
+import {BackendClientE2E} from './backendClient.e2e';
 
 import {User} from '../data/user';
 
-export class TeamRepository extends BackendClient {
+export class TeamRepositoryE2E extends BackendClientE2E {
   async getTeamIdForUser(user: User): Promise<string> {
     const response = await this.axiosInstance.get('teams', {
       headers: {

@@ -17,9 +17,9 @@
  *
  */
 
-import {BackendClient} from './backendClient';
+import {BackendClientE2E} from './backendClient.e2e';
 
-export class ConversationRepository extends BackendClient {
+export class ConversationRepositoryE2E extends BackendClientE2E {
   async inviteToConversation(inviteeId: string, inviterToken: string, teamId: string, conversationName: string) {
     await this.axiosInstance.post(
       'conversations',

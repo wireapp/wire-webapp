@@ -17,11 +17,11 @@
  *
  */
 
-import {BackendClient} from './backendClient';
+import {BackendClientE2E} from './backendClient.e2e';
 
 const BASIC_AUTH = process.env.BASIC_AUTH;
 
-export class BrigRepository extends BackendClient {
+export class BrigRepositoryE2E extends BackendClientE2E {
   public async getActivationCodeForEmail(email: string): Promise<string> {
     const activationCodeResponse = await this.axiosInstance.get(`/i/users/activation-code`, {
       params: {email: email},

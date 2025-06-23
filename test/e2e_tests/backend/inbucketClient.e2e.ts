@@ -19,7 +19,7 @@
 
 import axios, {AxiosInstance} from 'axios';
 
-export class InbucketClient {
+export class InbucketClientE2E {
   private readonly axiosInstance: AxiosInstance;
   private readonly inbucketUsername;
   private readonly inbucketPassword;

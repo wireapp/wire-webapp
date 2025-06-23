@@ -17,33 +17,26 @@
  *
  */
 
-import {BackendClient} from './backendClient';
+import {BackendClientE2E} from './backendClient.e2e';
 
-const domain = process.env.DOMAIN;
-
-export class ConnectionsRepository extends BackendClient {
-  async getConnectionsList(token: string) {
-    const response = await this.axiosInstance.post(
-      'list-connections',
-      {
-        page_state: '',
+export class UserRepositoryE2E extends BackendClientE2E {
+  public async deleteUser(userPassword: string, token: string) {
+    await this.axiosInstance.request({
+      url: 'self',
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
       },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+      data: {
+        password: userPassword,
       },
-    );
-    return response;
+    });
   }
 
-  async acceptConnectionRequest(token: string, connectionId: string) {
-    await this.axiosInstance.post(
-      `connections/${domain}/${connectionId}`,
-      {
-        status: 'accepted',
-      },
+  public async setUniqueUsername(username: string, token: string) {
+    await this.axiosInstance.put(
+      'self/handle',
+      {handle: username},
       {
         headers: {
           Authorization: `Bearer ${token}`,

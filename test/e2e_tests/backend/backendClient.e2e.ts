@@ -17,15 +17,18 @@
  *
  */
 
-import {BackendClient} from './backendClient';
+import axios, {AxiosInstance} from 'axios';
 
-export class FeatureConfigRepository extends BackendClient {
-  async isMlsEnabled(token: string): Promise<boolean> {
-    const response = await this.axiosInstance.get('feature-configs/mls', {
+export class BackendClientE2E {
+  readonly axiosInstance: AxiosInstance;
+
+  constructor() {
+    this.axiosInstance = axios.create({
+      baseURL: process.env.BACKEND_URL,
+      withCredentials: true,
       headers: {
-        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
       },
     });
-    return response.data.status === 'enabled';
   }
 }

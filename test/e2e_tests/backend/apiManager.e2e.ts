@@ -19,39 +19,39 @@
 
 import {AxiosResponse} from 'axios';
 
-import {AuthRepository} from './authRepository';
-import {BrigRepository} from './brigRepository';
-import {ConnectionsRepository as ConnectionRepository} from './connectionRepository';
-import {ConversationRepository} from './conversationRepository';
-import {FeatureConfigRepository} from './featureConfigRepository';
-import {InbucketClient} from './inbucketClient';
-import {TeamRepository} from './teamRepository';
-import {TestServiceClient} from './testServiceClient';
-import {UserRepository} from './userRepository';
+import {AuthRepositoryE2E} from './authRepository.e2e';
+import {BrigRepositoryE2E} from './brigRepository.e2e';
+import {ConnectionRepositoryE2E} from './connectionRepository.e2e';
+import {ConversationRepositoryE2E} from './conversationRepository.e2e';
+import {FeatureConfigRepositoryE2E} from './featureConfigRepository.e2e';
+import {InbucketClientE2E} from './inbucketClient.e2e';
+import {TeamRepositoryE2E} from './teamRepository.e2e';
+import {TestServiceClientE2E} from './testServiceClient.e2e';
+import {UserRepositoryE2E} from './userRepository.e2e';
 
 import {User} from '../data/user';
 
-export class ApiManager {
-  user: UserRepository;
-  auth: AuthRepository;
-  brig: BrigRepository;
-  testService: TestServiceClient;
-  team: TeamRepository;
-  conversation: ConversationRepository;
-  featureConfig: FeatureConfigRepository;
-  inbucket: InbucketClient;
-  connection: ConnectionRepository;
+export class ApiManagerE2E {
+  user: UserRepositoryE2E;
+  auth: AuthRepositoryE2E;
+  brig: BrigRepositoryE2E;
+  testService: TestServiceClientE2E;
+  team: TeamRepositoryE2E;
+  conversation: ConversationRepositoryE2E;
+  featureConfig: FeatureConfigRepositoryE2E;
+  inbucket: InbucketClientE2E;
+  connection: ConnectionRepositoryE2E;
 
   constructor() {
-    this.user = new UserRepository();
-    this.auth = new AuthRepository();
-    this.brig = new BrigRepository();
-    this.testService = new TestServiceClient();
-    this.team = new TeamRepository();
-    this.conversation = new ConversationRepository();
-    this.featureConfig = new FeatureConfigRepository();
-    this.inbucket = new InbucketClient();
-    this.connection = new ConnectionRepository();
+    this.user = new UserRepositoryE2E();
+    this.auth = new AuthRepositoryE2E();
+    this.brig = new BrigRepositoryE2E();
+    this.testService = new TestServiceClientE2E();
+    this.team = new TeamRepositoryE2E();
+    this.conversation = new ConversationRepositoryE2E();
+    this.featureConfig = new FeatureConfigRepositoryE2E();
+    this.inbucket = new InbucketClientE2E();
+    this.connection = new ConnectionRepositoryE2E();
   }
 
   async addDevicesToUser(user: User, numberOfDevices: number) {

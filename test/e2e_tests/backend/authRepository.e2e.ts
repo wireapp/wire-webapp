@@ -19,11 +19,11 @@
 
 import {AxiosResponse} from 'axios';
 
-import {BackendClient} from './backendClient';
+import {BackendClientE2E} from './backendClient.e2e';
 
 import {User} from '../data/user';
 
-export class AuthRepository extends BackendClient {
+export class AuthRepositoryE2E extends BackendClientE2E {
   public async registerUser(user: User, invitationCode?: string): Promise<AxiosResponse> {
     const response = await this.axiosInstance.post('register', {
       password: user.password,

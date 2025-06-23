@@ -19,16 +19,36 @@
 
 import axios, {AxiosInstance} from 'axios';
 
-export class BackendClient {
-  readonly axiosInstance: AxiosInstance;
+export class TestServiceClientE2E {
+  private readonly axiosInstance: AxiosInstance;
 
   constructor() {
     this.axiosInstance = axios.create({
-      baseURL: process.env.BACKEND_URL,
+      baseURL: process.env.TEST_SERVICE_URL,
       withCredentials: true,
       headers: {
         'Content-Type': 'application/json',
       },
+    });
+  }
+
+  async createInstance(password: string, email: string, deviceName: string, developmentApiEnabled: boolean) {
+    const response = await this.axiosInstance.put('/api/v1/instance', {
+      password,
+      name: 'Generic Test Name',
+      backend: 'staging',
+      developmentApiEnabled,
+      deviceName,
+      email,
+    });
+    return response.data;
+  }
+
+  async sendText(instanceId: string, conversationId: string, text: string) {
+    return await this.axiosInstance.post(`/api/v1/instance/${instanceId}/sendText`, {
+      legalHoldStatus: 1,
+      conversationId,
+      text,
     });
   }
 }

@@ -17,32 +17,15 @@
  *
  */
 
-import {BackendClient} from './backendClient';
+import {BackendClientE2E} from './backendClient.e2e';
 
-export class UserRepository extends BackendClient {
-  public async deleteUser(userPassword: string, token: string) {
-    await this.axiosInstance.request({
-      url: 'self',
-      method: 'DELETE',
+export class FeatureConfigRepositoryE2E extends BackendClientE2E {
+  async isMlsEnabled(token: string): Promise<boolean> {
+    const response = await this.axiosInstance.get('feature-configs/mls', {
       headers: {
         Authorization: `Bearer ${token}`,
       },
-      data: {
-        password: userPassword,
-      },
     });
-  }
-
-  public async setUniqueUsername(username: string, token: string) {
-    await this.axiosInstance.put(
-      'self/handle',
-      {handle: username},
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      },
-    );
+    return response.data.status === 'enabled';
   }
 }
