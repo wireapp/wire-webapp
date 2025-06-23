@@ -34,6 +34,7 @@ interface UseSearchCellsNodesProps {
 const PAGE_INITIAL_SIZE = 30;
 const PAGE_SIZE_INCREMENT = 20;
 const DEBOUNCE_TIME = 300;
+const FETCH_ALL_QUERY = '*';
 
 export const useSearchCellsNodes = ({cellsRepository}: UseSearchCellsNodesProps) => {
   const {setNodes, setStatus, setPagination, clearAll, filters} = useCellsStore();
@@ -48,12 +49,13 @@ export const useSearchCellsNodes = ({cellsRepository}: UseSearchCellsNodesProps)
     async ({query, status, limit = pageSize}: {query: string; status: Status; limit?: number}) => {
       try {
         setStatus(status);
+        const shouldSort = !query || query === FETCH_ALL_QUERY;
         const result = await cellsRepository.searchNodes({
           query,
           limit,
           tags: filters.tags,
-          sortBy: searchQuery ? undefined : 'mtime',
-          sortDirection: searchQuery ? undefined : 'desc',
+          sortBy: shouldSort ? 'mtime' : undefined,
+          sortDirection: shouldSort ? 'desc' : undefined,
         });
         setNodes(transformCellsNodes(result.Nodes || []));
         if (result.Pagination) {
@@ -75,7 +77,7 @@ export const useSearchCellsNodes = ({cellsRepository}: UseSearchCellsNodesProps)
     },
     // cellsRepository is not a dependency because it's a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [pageSize, setNodes, setPagination, setStatus, filters, searchQuery],
+    [pageSize, setNodes, setPagination, setStatus, filters],
   );
 
   const searchNodesDebounced = useDebouncedCallback(async (value: string) => {
@@ -99,26 +101,30 @@ export const useSearchCellsNodes = ({cellsRepository}: UseSearchCellsNodesProps)
     setPageSize(PAGE_INITIAL_SIZE);
     setSearchValue('');
     setSearchQuery('');
-    await searchNodes({query: '*', status: 'loading'});
+    await searchNodes({query: FETCH_ALL_QUERY, status: 'loading'});
   };
 
   const handleReload = async () => {
     setStatus('loading');
     clearAll();
-    await searchNodes({query: searchQuery || '*', status: 'loading'});
+    await searchNodes({query: searchQuery || FETCH_ALL_QUERY, status: 'loading'});
   };
 
   const increasePageSize = useCallback(async () => {
     shouldPerformFullReload.current = false;
     setStatus('fetchingMore');
     setPageSize(pageSize + PAGE_SIZE_INCREMENT);
-    await searchNodes({query: searchQuery || '*', status: 'fetchingMore', limit: pageSize + PAGE_SIZE_INCREMENT});
+    await searchNodes({
+      query: searchQuery || FETCH_ALL_QUERY,
+      status: 'fetchingMore',
+      limit: pageSize + PAGE_SIZE_INCREMENT,
+    });
     shouldPerformFullReload.current = true;
   }, [pageSize, searchNodes, searchQuery, setStatus]);
 
   useEffect(() => {
     if (isInitialLoad.current || shouldPerformFullReload.current) {
-      void searchNodes({query: searchQuery || '*', status: 'loading'});
+      void searchNodes({query: searchQuery || FETCH_ALL_QUERY, status: 'loading'});
     }
   }, [searchNodes, searchQuery]);
 
