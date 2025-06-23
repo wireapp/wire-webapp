@@ -32,7 +32,7 @@ import {APIClient} from '@wireapp/api-client';
 import {Ciphersuite, CoreCrypto, CoreCryptoContext, DecryptedMessage, WelcomeBundle} from '@wireapp/core-crypto';
 
 import {CORE_CRYPTO_ERROR_NAMES} from './CoreCryptoMLSError';
-import {InitClientOptions, MLSService, MLSServiceEvents} from './MLSService';
+import {InitClientOptions, MLSService} from './MLSService';
 
 import {AddUsersFailure, AddUsersFailureReasons} from '../../../conversation';
 import {openDB} from '../../../storage/CoreDB';
@@ -533,7 +533,7 @@ describe('MLSService', () => {
   });
 
   describe('handleMLSMessageAddEvent', () => {
-    it('decrypts a message and emits new epoch event if epoch has changed', async () => {
+    it('decrypts a message', async () => {
       const [mlsService, {transactionContext, coreCrypto}] = await createMLSService();
 
       const mockGroupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm3OQFc=';
@@ -548,7 +548,6 @@ describe('MLSService', () => {
 
       jest.spyOn(transactionContext, 'decryptMessage').mockResolvedValueOnce(mockedDecryptoedMessage);
       jest.spyOn(coreCrypto, 'conversationEpoch').mockResolvedValueOnce(mockedNewEpoch);
-      jest.spyOn(mlsService, 'emit').mockImplementation(jest.fn());
 
       const mockedMLSWelcomeEvent: ConversationMLSMessageAddEvent = {
         type: CONVERSATION_EVENT.MLS_MESSAGE_ADD,
@@ -561,10 +560,6 @@ describe('MLSService', () => {
 
       await mlsService.handleMLSMessageAddEvent(mockedMLSWelcomeEvent, getGroupIdFromConversationId);
       expect(transactionContext.decryptMessage).toHaveBeenCalled();
-      expect(mlsService.emit).toHaveBeenCalledWith(MLSServiceEvents.NEW_EPOCH, {
-        epoch: mockedNewEpoch,
-        groupId: mockGroupId,
-      });
     });
 
     it('handles pending propoals with a delay after decrypting a message', async () => {

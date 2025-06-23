@@ -23,7 +23,7 @@ import {Decoder} from 'bazinga64';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {HandledEventPayload} from '../../../../../notification';
-import {MLSService, MLSServiceEvents, optionalToUint8Array} from '../../../MLSService/MLSService';
+import {MLSService, optionalToUint8Array} from '../../../MLSService/MLSService';
 
 interface HandleMLSMessageAddParams {
   event: ConversationMLSMessageAddEvent;
@@ -47,7 +47,7 @@ export const handleMLSMessageAdd = async ({
     return null;
   }
 
-  const {message, commitDelay, hasEpochChanged, senderClientId: encodedSenderClientId} = decryptedMessage;
+  const {message, commitDelay, senderClientId: encodedSenderClientId} = decryptedMessage;
 
   if (encodedSenderClientId) {
     const decoder = new TextDecoder();
@@ -64,11 +64,6 @@ export const handleMLSMessageAdd = async ({
       delayInMs: commitDelay ?? 0,
       eventTime: event.time,
     });
-  }
-
-  if (hasEpochChanged) {
-    const newEpoch = await mlsService.getEpoch(groupId);
-    mlsService.emit(MLSServiceEvents.NEW_EPOCH, {groupId, epoch: newEpoch});
   }
 
   return message ? {event, decryptedData: GenericMessage.decode(message)} : null;

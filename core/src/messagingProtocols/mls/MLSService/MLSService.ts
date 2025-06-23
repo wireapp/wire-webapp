@@ -137,6 +137,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     const epochObserver: EpochObserver = {
       epochChanged: async (groupId, epoch) => {
         const groupIdStr = Encoder.toBase64(groupId).asString;
+        this.logger.info(`Epoch changed for group ${groupIdStr}, new epoch: ${epoch}`);
         this.emit(MLSServiceEvents.NEW_EPOCH, {epoch, groupId: groupIdStr});
       },
     };
