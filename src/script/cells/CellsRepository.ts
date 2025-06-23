@@ -37,9 +37,9 @@ interface CellsConfig {
   };
 }
 
+export type SortDirection = 'asc' | 'desc';
+
 const DEFAULT_MAX_FILES_LIMIT = 100;
-const SEARCH_DEFAULT_SORT_FIELD = 'mtime';
-const SEARCH_DEFAULT_SORT_DIR = 'desc';
 
 @singleton()
 export class CellsRepository {
@@ -118,18 +118,22 @@ export class CellsRepository {
     limit = DEFAULT_MAX_FILES_LIMIT,
     offset = 0,
     type,
+    sortBy,
+    sortDirection,
   }: {
     path: string;
     limit?: number;
     offset?: number;
     type?: 'file' | 'folder';
+    sortBy?: string;
+    sortDirection?: SortDirection;
   }) {
     return this.apiClient.api.cells.getAllNodes({
       path: path || this.basePath,
       limit,
       offset,
-      sortBy: SEARCH_DEFAULT_SORT_FIELD,
-      sortDirection: SEARCH_DEFAULT_SORT_DIR,
+      sortBy,
+      sortDirection,
       ...(type ? {type: type === 'file' ? 'LEAF' : 'COLLECTION'} : {}),
     });
   }
@@ -172,12 +176,24 @@ export class CellsRepository {
     return this.apiClient.api.cells.deleteNodePublicLink({uuid});
   }
 
-  async searchNodes({query, limit = DEFAULT_MAX_FILES_LIMIT, tags}: {query: string; limit?: number; tags?: string[]}) {
+  async searchNodes({
+    query,
+    limit = DEFAULT_MAX_FILES_LIMIT,
+    tags,
+    sortBy,
+    sortDirection,
+  }: {
+    query: string;
+    limit?: number;
+    tags?: string[];
+    sortBy?: string;
+    sortDirection?: SortDirection;
+  }) {
     return this.apiClient.api.cells.searchNodes({
       phrase: query,
       limit,
-      sortBy: SEARCH_DEFAULT_SORT_FIELD,
-      sortDirection: SEARCH_DEFAULT_SORT_DIR,
+      sortBy,
+      sortDirection,
       tags,
     });
   }
