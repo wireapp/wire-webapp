@@ -47,8 +47,8 @@ jobs:
       - name: Generate PR comment
         id: generate_comment
         run: |
-          node test/e2e_tests/scripts/post-playwright-summary.js > tmp.txt
-          COMMENT=$(cat tmp.txt)
+          node test/e2e_tests/scripts/post-playwright-summary.js
+          COMMENT=$(cat playwright-summary.txt)
           echo "comment<<EOF" >> $GITHUB_OUTPUT
           echo "$COMMENT" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT

@@ -1,9 +1,6 @@
 const fs = require('fs');
 const path = require('path');
 
-console.log('Checking if report exists...');
-console.log('report exists:', fs.existsSync('playwright-report/index.html'));
-
 const jsonPath = path.resolve('playwright-report', 'report.json');
 const report = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
 
