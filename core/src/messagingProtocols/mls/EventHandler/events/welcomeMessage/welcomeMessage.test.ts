@@ -48,6 +48,11 @@ const mockParams = {
     scheduleKeyMaterialRenewal: jest.fn(),
     getEpoch: jest.fn(),
     emit: jest.fn(),
+    logger: {
+      info: jest.fn(),
+      warn: jest.fn(),
+      error: jest.fn(),
+    },
   } as unknown as MLSService,
   dryRun: false,
 };

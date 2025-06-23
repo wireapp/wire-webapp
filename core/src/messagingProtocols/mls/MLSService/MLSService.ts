@@ -391,7 +391,14 @@ export class MLSService extends TypedEventEmitter<Events> {
     if (welcomeBundle.id) {
       //after we've successfully joined via external commit, we schedule periodic key material renewal
       const groupIdStr = Encoder.toBase64(welcomeBundle.id).asString;
+      const newEpoch = await this.getEpoch(groupIdStr);
+
+      // Schedule the next key material renewal
       await this.scheduleKeyMaterialRenewal(groupIdStr);
+
+      // Notify subscribers about the new epoch
+      this.emit(MLSServiceEvents.NEW_EPOCH, {groupId: groupIdStr, epoch: newEpoch});
+      this.logger.info(`Joined MLS group with id ${groupIdStr} via external commit, new epoch: ${newEpoch}`);
     }
   }
 
