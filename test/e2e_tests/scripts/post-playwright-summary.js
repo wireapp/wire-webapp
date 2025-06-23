@@ -1,8 +1,43 @@
 const fs = require('fs');
 const path = require('path');
 
+console.log('Checking if report exists...');
+console.log('report exists:', fs.existsSync('playwright-report/index.html'));
+
 const jsonPath = path.resolve('playwright-report', 'report.json');
 const report = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+
+function waitForFile(filePath, timeout = 5000, interval = 200) {
+  const absolutePath = path.resolve(filePath);
+
+  return new Promise((resolve, reject) => {
+    const startTime = Date.now();
+
+    const check = () => {
+      if (fs.existsSync(absolutePath)) {
+        return resolve(true);
+      }
+      if (Date.now() - startTime > timeout) {
+        return reject(new Error(`File not found: ${absolutePath} (after ${timeout}ms)`));
+      }
+      setTimeout(check, interval);
+    };
+
+    check();
+  });
+}
+
+(async () => {
+  try {
+    await waitForFile('playwright-report/index.html', 10000);
+    console.log('✅ Report is ready. Continuing...');
+
+    // Your summary logic here
+  } catch (err) {
+    console.error('❌ Report not found in time:', err.message);
+    process.exit(1);
+  }
+})();
 
 let passed = 0,
   failed = 0,
