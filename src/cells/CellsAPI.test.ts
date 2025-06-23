@@ -338,8 +338,6 @@ describe('CellsAPI', () => {
         Flags: ['WithPreSignedURLs'],
         Limit: '10',
         Offset: '0',
-        SortField: 'mtime',
-        SortDirDesc: true,
         Filters: {
           Type: 'UNKNOWN',
           Status: {
@@ -367,8 +365,6 @@ describe('CellsAPI', () => {
         Flags: ['WithPreSignedURLs'],
         Limit: '10',
         Offset: '0',
-        SortField: 'mtime',
-        SortDirDesc: true,
         Filters: {
           Type: 'UNKNOWN',
           Status: {
@@ -396,8 +392,6 @@ describe('CellsAPI', () => {
         Flags: ['WithPreSignedURLs'],
         Limit: '10',
         Offset: '0',
-        SortField: 'mtime',
-        SortDirDesc: true,
         Filters: {
           Type: 'UNKNOWN',
           Status: {
@@ -429,8 +423,6 @@ describe('CellsAPI', () => {
         Flags: ['WithPreSignedURLs'],
         Limit: '5',
         Offset: '10',
-        SortField: 'mtime',
-        SortDirDesc: true,
         Filters: {
           Type: 'UNKNOWN',
           Status: {
@@ -524,8 +516,6 @@ describe('CellsAPI', () => {
         Flags: ['WithPreSignedURLs'],
         Limit: '10',
         Offset: '0',
-        SortField: 'mtime',
-        SortDirDesc: true,
         Filters: {
           Type: 'LEAF',
           Status: {
@@ -1251,8 +1241,6 @@ describe('CellsAPI', () => {
         Flags: ['WithPreSignedURLs'],
         Limit: '10',
         Offset: '0',
-        SortDirDesc: true,
-        SortField: 'mtime',
       });
       expect(result).toEqual(mockResponse);
     });
@@ -1289,8 +1277,6 @@ describe('CellsAPI', () => {
         Flags: ['WithPreSignedURLs'],
         Limit: '10',
         Offset: '0',
-        SortDirDesc: true,
-        SortField: 'mtime',
       });
       expect(result).toEqual(mockResponse);
     });
@@ -1327,8 +1313,6 @@ describe('CellsAPI', () => {
         Flags: ['WithPreSignedURLs'],
         Limit: '10',
         Offset: '0',
-        SortDirDesc: true,
-        SortField: 'mtime',
       });
       expect(result).toEqual(mockResponse);
     });
@@ -1369,8 +1353,6 @@ describe('CellsAPI', () => {
         Flags: ['WithPreSignedURLs'],
         Limit: '5',
         Offset: '10',
-        SortDirDesc: true,
-        SortField: 'mtime',
       });
       expect(result).toEqual(mockResponse);
     });
@@ -1491,8 +1473,6 @@ describe('CellsAPI', () => {
         Flags: ['WithPreSignedURLs'],
         Limit: '10',
         Offset: '0',
-        SortDirDesc: true,
-        SortField: 'mtime',
       });
       expect(result).toEqual(mockResponse);
     });
@@ -1520,8 +1500,6 @@ describe('CellsAPI', () => {
         Flags: ['WithPreSignedURLs'],
         Limit: '10',
         Offset: '0',
-        SortDirDesc: true,
-        SortField: 'mtime',
       });
       expect(result).toEqual(mockResponse);
     });
@@ -1549,8 +1527,6 @@ describe('CellsAPI', () => {
         Flags: ['WithPreSignedURLs'],
         Limit: '10',
         Offset: '0',
-        SortDirDesc: true,
-        SortField: 'mtime',
       });
       expect(result).toEqual(mockResponse);
     });
@@ -1584,8 +1560,6 @@ describe('CellsAPI', () => {
         Flags: ['WithPreSignedURLs'],
         Limit: '10',
         Offset: '0',
-        SortDirDesc: true,
-        SortField: 'mtime',
       });
       expect(result).toEqual(mockResponse);
     });
@@ -1619,8 +1593,6 @@ describe('CellsAPI', () => {
         Flags: ['WithPreSignedURLs'],
         Limit: '10',
         Offset: '0',
-        SortDirDesc: true,
-        SortField: 'mtime',
       });
       expect(result).toEqual(mockResponse);
     });

@@ -46,8 +46,6 @@ export type SortDirection = 'asc' | 'desc';
 const CONFIGURATION_ERROR = 'CellsAPI is not initialized. Call initialize() before using any methods.';
 const DEFAULT_LIMIT = 10;
 const DEFAULT_OFFSET = 0;
-const DEFAULT_SEARCH_SORT_FIELD = 'mtime';
-const DEFAULT_SEARCH_SORT_DIRECTION: SortDirection = 'desc';
 const USER_META_TAGS_NAMESPACE = 'usermeta-tags';
 
 interface CellsConfig {
@@ -303,8 +301,8 @@ export class CellsAPI {
     path,
     limit = DEFAULT_LIMIT,
     offset = DEFAULT_OFFSET,
-    sortBy = DEFAULT_SEARCH_SORT_FIELD,
-    sortDirection = DEFAULT_SEARCH_SORT_DIRECTION,
+    sortBy,
+    sortDirection,
     type,
     deleted = false,
   }: {
@@ -331,12 +329,9 @@ export class CellsAPI {
           Deleted: deleted ? 'Only' : 'Not',
         },
       },
+      SortField: sortBy,
+      SortDirDesc: sortDirection ? sortDirection === 'desc' : undefined,
     };
-
-    if (sortBy) {
-      request.SortField = sortBy;
-      request.SortDirDesc = sortDirection === 'desc';
-    }
 
     const result = await this.client.lookup(request);
 
@@ -347,8 +342,8 @@ export class CellsAPI {
     phrase,
     limit = DEFAULT_LIMIT,
     offset = DEFAULT_OFFSET,
-    sortBy = DEFAULT_SEARCH_SORT_FIELD,
-    sortDirection = DEFAULT_SEARCH_SORT_DIRECTION,
+    sortBy,
+    sortDirection,
     type,
     tags,
     deleted = false,
@@ -379,12 +374,9 @@ export class CellsAPI {
       Flags: ['WithPreSignedURLs'],
       Limit: `${limit}`,
       Offset: `${offset}`,
+      SortField: sortBy,
+      SortDirDesc: sortDirection ? sortDirection === 'desc' : undefined,
     };
-
-    if (sortBy) {
-      request.SortField = sortBy;
-      request.SortDirDesc = sortDirection === 'desc';
-    }
 
     const result = await this.client.lookup(request);
 
