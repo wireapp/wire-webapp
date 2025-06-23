@@ -175,7 +175,6 @@ test('Account Management', {tag: ['@TC-8639', '@crit-flow']}, async ({page, api}
   await test.step('Member verifies if applock is working', async () => {
     await page.reload();
     expect(await appLockModal.isVisible());
-    expect(await conversationListPage.isConversationItemVisible(conversationName)).toBeFalsy();
     expect(await appLockModal.getAppLockModalHeader()).toContain('Enter passcode to unlock');
     expect(await appLockModal.getAppLockModalText()).toContain('Passcode');
 

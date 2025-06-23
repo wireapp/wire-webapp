@@ -42,10 +42,6 @@ export class ConversationListPage {
     return await conversation.isVisible();
   }
 
-  async isConversationVisible(conversationName: string) {
-    return await this.getConversationLocator(conversationName).isVisible();
-  }
-
   async isConversationBlocked(conversationName: string) {
     return await this.getConversationLocator(conversationName).locator('[data-uie-name="status-blocked"]').isVisible();
   }
