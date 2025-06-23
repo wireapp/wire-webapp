@@ -1508,6 +1508,7 @@ export class CallingRepository {
       return call.epochCache.store({serializedConversationId, epoch, clients, secretKey});
     }
 
+    this.logger.info(`Set Epoch Info: ${epoch} conversation: ${serializedConversationId}`);
     return this.wCall?.setEpochInfo(this.wUser, serializedConversationId, epoch, JSON.stringify(clients), secretKey);
   };
 
