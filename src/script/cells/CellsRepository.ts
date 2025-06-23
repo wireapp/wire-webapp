@@ -37,6 +37,10 @@ interface CellsConfig {
   };
 }
 
+// Currently, the cells backend doesn't specify the sortable fields (they're dynamic).
+// When backend will specify the sortable fields, we'll need to update this type.
+// The "(string & {})" indicates that all strings are valid, but we get autocomplete for the union values.
+export type SortBy = 'mtime' | 'name' | (string & {});
 export type SortDirection = 'asc' | 'desc';
 
 const DEFAULT_MAX_FILES_LIMIT = 100;
@@ -125,7 +129,7 @@ export class CellsRepository {
     limit?: number;
     offset?: number;
     type?: 'file' | 'folder';
-    sortBy?: string;
+    sortBy?: SortBy;
     sortDirection?: SortDirection;
   }) {
     return this.apiClient.api.cells.getAllNodes({
@@ -186,7 +190,7 @@ export class CellsRepository {
     query: string;
     limit?: number;
     tags?: string[];
-    sortBy?: string;
+    sortBy?: SortBy;
     sortDirection?: SortDirection;
   }) {
     return this.apiClient.api.cells.searchNodes({

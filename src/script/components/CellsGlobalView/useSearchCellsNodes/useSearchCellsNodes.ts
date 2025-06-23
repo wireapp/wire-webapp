@@ -21,7 +21,7 @@ import {useCallback, useEffect, useRef, useState} from 'react';
 
 import {useDebouncedCallback} from 'use-debounce';
 
-import {CellsRepository} from 'src/script/cells/CellsRepository';
+import {CellsRepository, SortBy, SortDirection} from 'src/script/cells/CellsRepository';
 
 import {useCellsStore, Status} from '../common/useCellsStore/useCellsStore';
 import {transformCellsNodes} from '../transformCellsNodes/transformCellsNodes';
@@ -45,10 +45,22 @@ export const useSearchCellsNodes = ({cellsRepository}: UseSearchCellsNodesProps)
   const shouldPerformFullReload = useRef(true);
 
   const searchNodes = useCallback(
-    async ({query, status, limit = pageSize}: {query: string; status: Status; limit?: number}) => {
+    async ({
+      query,
+      status,
+      limit = pageSize,
+      sortBy,
+      sortDirection,
+    }: {
+      query: string;
+      status: Status;
+      limit?: number;
+      sortBy?: SortBy;
+      sortDirection?: SortDirection;
+    }) => {
       try {
         setStatus(status);
-        const result = await cellsRepository.searchNodes({query, limit, tags: filters.tags});
+        const result = await cellsRepository.searchNodes({query, limit, tags: filters.tags, sortBy, sortDirection});
         setNodes(transformCellsNodes(result.Nodes || []));
         if (result.Pagination) {
           setPagination(transformCellsPagination(result.Pagination));
@@ -75,7 +87,7 @@ export const useSearchCellsNodes = ({cellsRepository}: UseSearchCellsNodesProps)
   const searchNodesDebounced = useDebouncedCallback(async (value: string) => {
     shouldPerformFullReload.current = false;
     setSearchQuery(value);
-    await searchNodes({query: value, status: 'loading'});
+    await searchNodes({query: value, status: 'loading', sortBy: 'mtime', sortDirection: 'asc'});
     shouldPerformFullReload.current = true;
   }, DEBOUNCE_TIME);
 
