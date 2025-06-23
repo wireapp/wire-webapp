@@ -45,7 +45,11 @@ jobs:
           path: playwright-report/
 
       - name: Generate PR comment
-        run: node test/e2e_test/scripts/post-playwright-summary.js
+        run: |
+          ls
+          cd ..
+          ls
+          node test/e2e_test/scripts/post-playwright-summary.js
 
       - name: Comment on PR
         uses: marocchino/sticky-pull-request-comment@v2
