@@ -17,20 +17,11 @@
  *
  */
 
-import {test as baseTest} from '@playwright/test';
-
-import {ApiManagerE2E} from './backend/apiManager.e2e';
-
-// Define custom test type with axios fixture
-type Fixtures = {
-  api: ApiManagerE2E;
+export const sanitizeName = (name: string): string => {
+  // Remove any characters that are not letters
+  return name.replace(/[^a-zA-Z]/g, '');
 };
 
-export const test = baseTest.extend<Fixtures>({
-  api: async ({request}, use) => {
-    // Create a new instance of ApiManager for each test
-    await use(new ApiManagerE2E());
-  },
-});
-
-export {expect} from '@playwright/test';
+export const escapeHtml = (str: string): string => {
+  return str.replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/-/g, '&#45;');
+};

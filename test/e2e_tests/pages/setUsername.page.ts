@@ -17,20 +17,30 @@
  *
  */
 
-import {test as baseTest} from '@playwright/test';
+import {Page, Locator} from '@playwright/test';
 
-import {ApiManagerE2E} from './backend/apiManager.e2e';
+export class SetUsernamePage {
+  readonly page: Page;
 
-// Define custom test type with axios fixture
-type Fixtures = {
-  api: ApiManagerE2E;
-};
+  readonly handleInput: Locator;
+  readonly nextButton: Locator;
 
-export const test = baseTest.extend<Fixtures>({
-  api: async ({request}, use) => {
-    // Create a new instance of ApiManager for each test
-    await use(new ApiManagerE2E());
-  },
-});
+  constructor(page: Page) {
+    this.page = page;
 
-export {expect} from '@playwright/test';
+    this.handleInput = page.locator('[data-uie-name="enter-handle"]');
+    this.nextButton = page.locator('[data-uie-name="do-send-handle"]');
+  }
+
+  async setUsername(username: string) {
+    await this.handleInput.fill(username);
+  }
+
+  async getHandleInputValue() {
+    return (await this.handleInput.inputValue()) ?? '';
+  }
+
+  async clickNextButton() {
+    await this.nextButton.click();
+  }
+}
