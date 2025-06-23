@@ -45,7 +45,13 @@ jobs:
           path: playwright-report/
 
       - name: Generate PR comment
-        run: node test/e2e_tests/scripts/post-playwright-summary.js
+        id: generate_comment
+        run: |
+          node test/e2e_tests/scripts/post-playwright-summary.js > tmp.txt
+          COMMENT=$(cat tmp.txt)
+          echo "comment<<EOF" >> $GITHUB_OUTPUT
+          echo "$COMMENT" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Comment on PR
         uses: marocchino/sticky-pull-request-comment@v2
