@@ -22,6 +22,7 @@ import React, {useEffect, useState} from 'react';
 import {BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
 import {ConsentType} from '@wireapp/api-client/lib/self/index';
 import {connect} from 'react-redux';
+import {useLocation} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
 
 import {Runtime} from '@wireapp/commons';
@@ -62,15 +63,14 @@ const SetHandleComponent = ({
 }: Props & ConnectedProps & DispatchProps) => {
   const [error, setError] = useState(null);
   const [handle, setHandle] = useState('');
+  const {state} = useLocation();
+  const isNewAccount = state?.isNewAccount ?? false;
 
   useEffect(() => {
     if (hasSelfHandle) {
       void removeLocalStorage(QUERY_KEY.JOIN_EXPIRES);
-      if (Runtime.isDesktopApp()) {
-        resetTelemetrySession();
+      if (!isNewAccount) {
         window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP));
-      } else {
-        navigate(ROUTE.SUCCESS);
       }
     }
   }, [hasSelfHandle]);
@@ -96,6 +96,12 @@ const SetHandleComponent = ({
     event.preventDefault();
     try {
       await doSetHandle(handle.trim());
+      if (Runtime.isDesktopApp() || !isNewAccount) {
+        resetTelemetrySession();
+        window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP));
+      } else {
+        navigate(ROUTE.SUCCESS);
+      }
     } catch (error) {
       if (isBackendError(error) && error.label === BackendErrorLabel.INVALID_HANDLE && handle.trim().length < 2) {
         error.label = SyntheticErrorLabel.HANDLE_TOO_SHORT;

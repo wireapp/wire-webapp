@@ -62,7 +62,7 @@ const VerifyEmailCodeComponent = ({
         email_code,
       };
       await doRegisterPersonal(validAccount, entropyData);
-      navigate(ROUTE.SET_HANDLE);
+      navigate(ROUTE.SET_HANDLE, {state: {isNewAccount: true}});
     } catch (error) {
       trackTelemetryPageView(PageView.ACCOUNT_VERIFICATION_FAILED_SCREEN_2_5);
       logger.error('Failed to create personal account', error);
