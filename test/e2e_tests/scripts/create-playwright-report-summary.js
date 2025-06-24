@@ -4,55 +4,83 @@ const path = require('path');
 const jsonPath = path.resolve('playwright-report', 'report.json');
 const report = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
 
-let passed = 0,
-  failed = 0,
-  skipped = 0,
-  flaky = 0,
-  total = 0,
-  totalDuration = 0;
+const stats = report.stats;
+
+let passed = stats.expected,
+  failed = stats.unexpected,
+  skipped = stats.skipped,
+  flaky = stats.flaky,
+  total = passed + failed + skipped + flaky,
+  totalDuration = stats.duration;
 
 const failures = [];
 const flakyTests = [];
 
+const stripAnsi = str =>
+  str.replace(
+    // regex to match ANSI escape codes
+    /\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])/g,
+    '',
+  );
+
 for (const suite of report.suites) {
   for (const spec of suite.specs) {
     for (const test of spec.tests) {
-      total++;
-
-      const result = test.results[0]; // First result is assumed representative
-      const status = result.status;
-      const duration = result.duration || 0;
-      totalDuration += duration;
-
-      const location = `${spec.file}:${test.location.line}`;
+      const title = `${spec.title} (tags: ${spec.tags.join(', ')})`;
+      const specLocation = `${spec.file}:${spec.line}`;
       const retries = test.results.length - 1;
+      const hasPassed = test.results.some(r => r.status === 'passed');
+      const hasRetries = retries > 0;
 
-      if (status === 'passed') {
-        passed++;
-      } else if (status === 'failed') {
-        failed++;
-        const errMsg = result.error?.message?.split('\n')[0] || 'Unknown error';
-        failures.push(`- ❌ **${test.title}**
-  📂 \`${location}\`
-  🧵 \`${errMsg}\`
-  🕒 \`${duration}ms\``);
-      } else {
-        skipped++;
+      // Only include in failures if no retries succeeded
+      if (!hasPassed) {
+        for (const result of test.results) {
+          if (result.status !== 'passed') {
+            let failureInfo = `- ❌ **${title}**\n  📂 \`${specLocation}\`\n  ⏱ Duration: ${result.duration}ms\n`;
+
+            if (result.errors?.length) {
+              failureInfo += `**Errors:**\n`;
+              result.errors.forEach(e => {
+                failureInfo += `\n \`${stripAnsi(e.message)}\``;
+                if (e.location) {
+                  failureInfo += ` at \`${e.location.file}:${e.location.line}:${e.location.column}\``;
+                }
+                failureInfo += '\n';
+              });
+            }
+
+            failures.push(failureInfo);
+          }
+        }
       }
 
-      if (retries > 0) {
-        flaky++;
-        flakyTests.push(`- ⚠️ **${test.title}**
-  📂 \`${location}\`
-  🔁 Retries: ${retries}
-  🕒 Last duration: \`${duration}ms\``);
+      // Mark as flaky if it passed after retries
+      if (hasRetries && hasPassed) {
+        const retryDetails = test.results
+          .map((result, index) => {
+            const errors = (result.errors || [])
+              .map((err, i) => {
+                const clean = stripAnsi(err.message || '');
+                return `_Error ${i + 1}_:\n\`\`\`\n${clean}\n\`\`\``;
+              })
+              .join('\n\n');
+
+            return `**Retry ${index + 1}** — 🕒 \`${result.duration}ms\`\n\n${errors}`.trim();
+          })
+          .join('\n\n---\n\n');
+
+        flakyTests.push(`- ⚠️ **${title}**
+📂 \`${specLocation}\`
+🔁 Retries: ${retries}
+
+${retryDetails}`);
       }
     }
   }
 }
 
 const summary = `
-### 🧪 Playwright Test Summary ###
+### 🧪 Playwright Test Summary
 
 - ✅ **Passed:** ${passed}
 - ❌ **Failed:** ${failed}
@@ -64,7 +92,10 @@ const summary = `
 ${
   failures.length > 0
     ? `#### ❗ **Failures**
-${failures.join('\n\n')}`
+
+::group::🔽 Click to expand failures
+${failures.join('\n\n')}
+::endgroup::`
     : '🎉 All tests passed!'
 }
 
