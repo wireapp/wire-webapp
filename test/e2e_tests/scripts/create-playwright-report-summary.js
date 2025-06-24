@@ -19,7 +19,7 @@ const flakyTests = [];
 const stripAnsi = str =>
   str.replace(
     // regex to match ANSI escape codes
-    /\x1B\[[0-?]*[ -/]*[@-~]/g,
+    /\u001b\[[0-?]*[ -/]*[@-~]/g,
     '',
   );
 
