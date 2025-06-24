@@ -34,23 +34,21 @@ for (const suite of report.suites) {
 
       // Only include in failures if no retries succeeded
       if (!hasPassed) {
-        for (const result of test.results) {
-          if (result.status !== 'passed') {
-            let failureInfo = `- ❌ **${title}**\n  📂 \`${specLocation}\`\n  ⏱ Duration: ${result.duration}ms\n`;
+        const lastResult = test.results[test.results.length - 1];
 
-            if (result.errors?.length) {
-              failureInfo += `**Errors:**\n`;
-              result.errors.forEach(e => {
-                failureInfo += `\n \`${stripAnsi(e.message)}\``;
-                if (e.location) {
-                  failureInfo += ` at \`${e.location.file}:${e.location.line}:${e.location.column}\``;
-                }
-                failureInfo += '\n';
-              });
-            }
+        if (lastResult.status !== 'passed') {
+          // Show only the last (final) failure
+          let failureInfo = `<details> \n <summary> ❌ ${title} </summary>\n  📂 \`${specLocation}\`\n  ⏱ Duration: ${lastResult.duration}ms\n`;
 
-            failures.push(failureInfo);
+          if (lastResult.errors?.length) {
+            failureInfo += `**Errors:**\n`;
+            lastResult.errors.forEach(e => {
+              failureInfo += `\n\`\`\`\n${stripAnsi(e.message)}\n\`\`\``;
+            });
           }
+
+          failureInfo += `\n</details>`;
+          failures.push(failureInfo);
         }
       }
 
@@ -89,15 +87,7 @@ const summary = `
 - 📊 **Total:** ${total}
 - ⏱ **Total Runtime:** ${totalDuration}ms (~${(totalDuration / 1000).toFixed(1)}s)
 
-${
-  failures.length > 0
-    ? `#### ❗ **Failures**
-
-::group::🔽 Click to expand failures
-${failures.join('\n\n')}
-::endgroup::`
-    : '🎉 All tests passed!'
-}
+${failures.length > 0 ? `### ❗ **Failures** \n\n ${failures.join('\n\n')}` : '🎉 All tests passed!'}
 
 ${
   flakyTests.length > 0
