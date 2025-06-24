@@ -17,28 +17,40 @@
  *
  */
 
-import {faker} from '@faker-js/faker';
+import {
+  generateWireEmail,
+  generateFirstName,
+  generateLastName,
+  generateSecurePassword,
+  generateUsername,
+} from '../utils/userDataGenerator';
 
 export interface User {
+  id?: string;
   email: string;
   password: string;
   firstName: string;
   lastName: string;
+  fullName: string;
   username: string;
-  token: string | null;
+  devices: string[];
+  teamId?: string;
+  token?: string;
 }
 
 export const getUser = (user: Partial<User> = {}): User => {
   // Ensure lastName is always defined, as it is used in email and username generation
-  const lastName = user.lastName ?? faker.person.lastName();
+  const lastName = user.lastName ?? generateLastName();
+  const firstName = user.firstName ?? generateFirstName();
 
   return {
     ...user,
-    email: user.email ?? faker.internet.email({lastName, provider: 'wire.engineering'}).toLowerCase(),
-    password: user.password ?? faker.internet.password({length: 8, pattern: /[A-Za-z\d!@#$]/}),
-    firstName: user.firstName ?? faker.person.firstName(),
+    email: user.email ?? generateWireEmail(lastName),
+    password: user.password ?? generateSecurePassword(),
+    firstName,
     lastName,
-    username: user.username ?? `${lastName}${faker.string.alpha({length: 5, casing: 'lower'})}`.toLowerCase(),
-    token: user.token ?? null,
+    fullName: user.fullName ?? `${firstName} ${lastName}`,
+    username: user.username ?? generateUsername(firstName, lastName),
+    devices: user.devices ?? [],
   };
 };

@@ -17,20 +17,15 @@
  *
  */
 
-import {test as baseTest} from '@playwright/test';
+import {BackendClientE2E} from './backendClient.e2e';
 
-import {ApiManagerE2E} from './backend/apiManager.e2e';
-
-// Define custom test type with axios fixture
-type Fixtures = {
-  api: ApiManagerE2E;
-};
-
-export const test = baseTest.extend<Fixtures>({
-  api: async ({request}, use) => {
-    // Create a new instance of ApiManager for each test
-    await use(new ApiManagerE2E());
-  },
-});
-
-export {expect} from '@playwright/test';
+export class FeatureConfigRepositoryE2E extends BackendClientE2E {
+  async isMlsEnabled(token: string): Promise<boolean> {
+    const response = await this.axiosInstance.get('feature-configs/mls', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data.status === 'enabled';
+  }
+}

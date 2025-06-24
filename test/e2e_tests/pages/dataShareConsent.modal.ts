@@ -25,8 +25,8 @@ export class DataShareConsentModal {
   readonly modal: Locator;
   readonly modalTitle: Locator;
   readonly modalText: Locator;
-  readonly actionButton: Locator;
-  readonly cancelButton: Locator;
+  readonly agreeButton: Locator;
+  readonly declineButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -34,8 +34,8 @@ export class DataShareConsentModal {
     this.modal = page.locator("[data-uie-name='primary-modals-container'][aria-label='Consent to share user data']");
     this.modalTitle = this.modal.locator("[data-uie-name='status-modal-title']");
     this.modalText = this.modal.locator("[data-uie-name='status-modal-text']");
-    this.actionButton = this.modal.locator("[data-uie-name='do-action']");
-    this.cancelButton = this.modal.locator("[data-uie-name='do-secondary']");
+    this.agreeButton = this.modal.locator("[data-uie-name='do-action']");
+    this.declineButton = this.modal.locator("[data-uie-name='do-secondary']");
   }
 
   async isModalPresent() {
@@ -51,14 +51,15 @@ export class DataShareConsentModal {
   }
 
   async isActionButtonVisible() {
-    return await this.actionButton.isVisible();
+    return await this.agreeButton.isVisible();
   }
 
   async clickDecline() {
-    await this.cancelButton.click();
+    await this.declineButton.isVisible();
+    await this.declineButton.click();
   }
 
   async clickConfirm() {
-    await this.actionButton.click();
+    await this.agreeButton.click();
   }
 }
