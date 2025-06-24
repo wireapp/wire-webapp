@@ -54,6 +54,7 @@ export const CellsMoveNodeModal = ({
   const [activeModalContent, setActiveModalContent] = useState<'move' | 'create'>('move');
 
   const {folders, refresh, status, shouldShowLoadingSpinner} = useGetCellsFolders({
+    nodeToMove,
     cellsRepository,
     conversationQualifiedId,
     currentPath,
