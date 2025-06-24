@@ -16,12 +16,10 @@ let passed = stats.expected,
 const failures = [];
 const flakyTests = [];
 
-const stripAnsi = str =>
-  str.replace(
-    // regex to match ANSI escape codes
-    /\u001b\[[0-?]*[ -/]*[@-~]/g,
-    '',
-  );
+const ESC = String.fromCharCode(27); // same as '\x1B' or '\u001b'
+const ansiRegex = new RegExp(`${ESC}\\[[0-?]*[ -/]*[@-~]`, 'g');
+
+const stripAnsi = str => str.replace(ansiRegex, '');
 
 for (const suite of report.suites) {
   for (const spec of suite.specs) {
