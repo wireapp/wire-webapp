@@ -19,6 +19,7 @@
 
 import {BackendClientE2E} from './backendClient.e2e';
 
+import {Service} from '../data/serviceInfo';
 import {User} from '../data/user';
 
 export class TeamRepositoryE2E extends BackendClientE2E {
@@ -39,13 +40,32 @@ export class TeamRepositoryE2E extends BackendClientE2E {
     throw new Error('No teams found for the user');
   }
 
-  async inviteUserToTeam(teamId: string, emailOfInvitee: string, inviterName: string, token: string): Promise<string> {
+  async inviteUserToTeam(emailOfInvitee: string, teamOwner: User): Promise<string> {
     const response = this.axiosInstance.post(
-      `teams/${teamId}/invitations`,
+      `teams/${teamOwner.teamId}/invitations`,
       {
-        inviterName: inviterName,
+        inviterName: `${teamOwner.firstName} ${teamOwner.lastName}`,
         role: 'member',
         email: emailOfInvitee,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${teamOwner.token}`,
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+
+    return (await response).data.id;
+  }
+
+  async addServiceToTeamWhitelist(teamId: string, service: Service, token: string) {
+    await this.axiosInstance.post(
+      `teams/${teamId}/services/whitelist`,
+      {
+        provider: service.providerId,
+        id: service.serviceId,
+        whitelisted: true,
       },
       {
         headers: {
@@ -54,8 +74,6 @@ export class TeamRepositoryE2E extends BackendClientE2E {
         },
       },
     );
-
-    return (await response).data.id;
   }
 
   async deleteTeam(user: User, teamId: string) {

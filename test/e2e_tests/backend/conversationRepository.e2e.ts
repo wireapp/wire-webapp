@@ -20,7 +20,12 @@
 import {BackendClientE2E} from './backendClient.e2e';
 
 export class ConversationRepositoryE2E extends BackendClientE2E {
-  async inviteToConversation(inviteeId: string, inviterToken: string, teamId: string, conversationName: string) {
+  async inviteToConversation(
+    inviteeIds: string | string[],
+    inviterToken: string,
+    teamId: string,
+    conversationName: string,
+  ) {
     await this.axiosInstance.post(
       'conversations',
       {
@@ -33,7 +38,7 @@ export class ConversationRepositoryE2E extends BackendClientE2E {
           teamid: teamId,
         },
         qualified_users: [],
-        users: [inviteeId],
+        users: [inviteeIds].flat(),
       },
       {
         headers: {

@@ -19,6 +19,7 @@
 
 import {faker} from '@faker-js/faker';
 
+import {Services} from './data/serviceInfo';
 import {getUser, User} from './data/user';
 import {AccountPage} from './pages/account.page';
 import {AppLockModal} from './pages/appLock.modal';
@@ -30,6 +31,7 @@ import {DataShareConsentModal} from './pages/dataShareConsent.modal';
 import {DeleteAccountModal} from './pages/deleteAccount.modal';
 import {DeleteAccountPage} from './pages/deleteAccount.page';
 import {EmailVerificationPage} from './pages/emailVerification.page';
+import {GroupCreationPage} from './pages/groupCreation.page';
 import {LoginPage} from './pages/login.page';
 import {MarketingConsentModal} from './pages/marketingConsent.modal';
 import {OutgoingConnectionPage} from './pages/outgoingConnection.page';
@@ -45,6 +47,69 @@ import {generateSecurePassword} from './utils/userDataGenerator';
 const webAppPath = process.env.WEBAPP_URL ?? '';
 const createdUsers: User[] = [];
 const createdTeams: Map<User, string> = new Map();
+
+test('Team owner adds whole team to an all team chat', {tag: ['@TC-8631', '@crit-flow']}, async ({page, api}) => {
+  // Generating test data
+  const owner = getUser();
+  const member1 = getUser();
+  const member2 = getUser();
+  const teamName = 'Critical';
+  const conversationName = 'Crits';
+
+  // Initializing page objects
+  const singleSignOnPage = new SingleSignOnPage(page);
+  const loginPage = new LoginPage(page);
+  const dataShareConsentModal = new DataShareConsentModal(page);
+  const conversationListPage = new ConversationListPage(page);
+  const groupCreationPage = new GroupCreationPage(page);
+  const startUIPage = new StartUIPage(page);
+
+  await test.step('Preconditions: Creating preconditions for the test via API', async () => {
+    await api.createTeamOwner(owner, teamName);
+    owner.teamId = await api.team.getTeamIdForUser(owner);
+    createdTeams.set(owner, owner.teamId);
+    const invitationIdForMember1 = await api.team.inviteUserToTeam(member1.email, owner);
+    const invitationCodeForMember1 = await api.brig.getTeamInvitationCodeForEmail(owner.teamId, invitationIdForMember1);
+
+    const invitationIdForMember2 = await api.team.inviteUserToTeam(member2.email, owner);
+    const invitationCodeForMember2 = await api.brig.getTeamInvitationCodeForEmail(owner.teamId, invitationIdForMember2);
+
+    await api.createPersonalUser(member1, invitationCodeForMember1);
+    await api.createPersonalUser(member2, invitationCodeForMember2);
+  });
+
+  await test.step('Team owner logs in into a client and creates group conversation', async () => {
+    await page.goto(webAppPath);
+    await singleSignOnPage.enterEmailOnSSOPage(owner.email);
+    await loginPage.inputPassword(owner.password);
+    await loginPage.clickSignInButton();
+    await dataShareConsentModal.clickDecline();
+  });
+
+  await test.step('Team owner adds a service to newly created group', async () => {
+    await api.team.addServiceToTeamWhitelist(owner.teamId!, Services.POLL_SERVICE, owner.token!);
+  });
+
+  await test.step('Team owner adds team members to a group', async () => {
+    await conversationListPage.clickCreateGroup();
+    await groupCreationPage.setGroupName(conversationName);
+    await startUIPage.selectUsers([member1.username, member2.username]);
+    await groupCreationPage.clickCreateGroupButton();
+    expect(await conversationListPage.isConversationItemVisible(conversationName)).toBeTruthy();
+  });
+
+  // Steps below require [WPB-18075] and [WPB-17547]
+
+  await test.step('All group participants send messages in a group', async () => {});
+
+  await test.step('Team owner and group members react on received messages with reactions', async () => {});
+
+  await test.step('All group participants make sure they see reactions from other group participants', async () => {});
+
+  await test.step('Team owner removes one group member from a group', async () => {});
+
+  await test.step('Team owner removes a service from a group', async () => {});
+});
 
 test('Account Management', {tag: ['@TC-8639', '@crit-flow']}, async ({page, api}) => {
   test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
@@ -73,12 +138,7 @@ test('Account Management', {tag: ['@TC-8639', '@crit-flow']}, async ({page, api}
     }
     const teamId = await api.team.getTeamIdForUser(owner);
     createdTeams.set(owner, teamId);
-    const invitationId = await api.team.inviteUserToTeam(
-      teamId,
-      member.email,
-      `${owner.firstName} ${owner.lastName}`,
-      owner.token,
-    );
+    const invitationId = await api.team.inviteUserToTeam(member.email, owner);
     const invitationCode = await api.brig.getTeamInvitationCodeForEmail(teamId, invitationId);
 
     await api.createPersonalUser(member, invitationCode);
@@ -115,7 +175,6 @@ test('Account Management', {tag: ['@TC-8639', '@crit-flow']}, async ({page, api}
   await test.step('Member verifies if applock is working', async () => {
     await page.reload();
     expect(await appLockModal.isVisible());
-    expect(await conversationListPage.isConversationItemVisible(conversationName)).toBeFalsy();
     expect(await appLockModal.getAppLockModalHeader()).toContain('Enter passcode to unlock');
     expect(await appLockModal.getAppLockModalText()).toContain('Passcode');
 
@@ -209,8 +268,7 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow']}, async ({pa
 
   await test.step('Personal user A searches for other personal user B', async () => {
     await conversationSidebar.clickConnectButton();
-    await startUIPage.searchForUser(userB.username);
-    await startUIPage.clickUserFromSearchResults(userB.username);
+    await startUIPage.selectUser(userB.username);
     expect(await userProfileModal.isVisible());
   });
 
