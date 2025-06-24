@@ -463,7 +463,9 @@ export class App {
       try {
         await this.core.initClient(localClient, getClientMLSConfig(teamFeatures));
       } catch (error) {
-        await this.showForceLogoutModal(SIGN_OUT_REASON.CLIENT_REMOVED);
+        console.warn('Failed to initialize client', {error});
+        this.showForceLogoutModal(SIGN_OUT_REASON.CLIENT_REMOVED);
+        return;
       }
 
       const e2eiHandler = await configureE2EI(teamFeatures);
