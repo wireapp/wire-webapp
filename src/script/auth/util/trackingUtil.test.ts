@@ -170,13 +170,11 @@ describe('trackingUtil', () => {
   });
 
   describe('resetTelemetrySession', () => {
-    beforeEach(() => {
+    it('should remove device id and end session', () => {
       (Config.getConfig as jest.Mock).mockReturnValueOnce(configFactory());
       trackingUtil.initializeTelemetry();
       jest.clearAllMocks();
-    });
 
-    it('should remove device id and end session', () => {
       trackingUtil.resetTelemetrySession();
       expect(localStorageMock.removeItem).toHaveBeenCalledWith(REPORTING_DEVICE_ID);
       expect(telemetry.endSession).toHaveBeenCalled();
