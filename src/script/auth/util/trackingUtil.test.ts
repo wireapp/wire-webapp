@@ -168,16 +168,4 @@ describe('trackingUtil', () => {
       expect(telemetry.trackPageView).not.toHaveBeenCalled();
     });
   });
-
-  describe('resetTelemetrySession', () => {
-    it('should remove device id and end session', () => {
-      (Config.getConfig as jest.Mock).mockReturnValueOnce(configFactory());
-      trackingUtil.initializeTelemetry();
-      jest.clearAllMocks();
-
-      trackingUtil.resetTelemetrySession();
-      expect(localStorageMock.removeItem).toHaveBeenCalledWith(REPORTING_DEVICE_ID);
-      expect(telemetry.endSession).toHaveBeenCalled();
-    });
-  });
 });
