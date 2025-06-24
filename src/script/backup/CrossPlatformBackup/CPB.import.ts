@@ -24,7 +24,7 @@ import {mapEventRecord} from './importMappers/mapEventRecord';
 
 import {ConversationRecord, EventRecord, UserRecord} from '../../storage';
 import {FileDescriptor, Filename} from '../Backup.types';
-import {DifferentAccountError, IncompatibleBackupError} from '../Error';
+import {DifferentAccountError, IncompatibleBackupError, IncompatibleBackupFormatError, InvalidPassword} from '../Error';
 
 import {CPBLogger, peekCrossPlatformData} from '.';
 
@@ -100,8 +100,16 @@ export const importCPBHistoryToDatabase = async ({
   }
 
   if (result instanceof BackupImportResult.Failure) {
+    if (result === BackupImportResult.Failure.MissingOrWrongPassphrase) {
+      CPBLogger.log(`Backup import failed: ${result}`);
+      throw new InvalidPassword('Invalid password');
+    }
+    if (result === BackupImportResult.Failure.ParsingFailure) {
+      CPBLogger.log(`Backup import failed: ${result}`);
+      throw new IncompatibleBackupError('Incompatible cross-platform backup');
+    }
     CPBLogger.log(`Backup import failed: ${result}`);
-    throw new IncompatibleBackupError('Incompatible cross-platform backup');
+    throw new IncompatibleBackupFormatError('Incompatible format');
   }
 
   return {archiveVersion: parseInt(peekedData.archiveVersion), fileDescriptors: FileDescriptor};
