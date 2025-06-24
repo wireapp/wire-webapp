@@ -34,18 +34,11 @@ interface CellsNewNodeFormProps {
   inputValue: string;
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
   error: string | null;
-  inputFocusEnabled: boolean;
+  isOpen: boolean;
 }
 
-export const CellsNewNodeForm = ({
-  type,
-  onSubmit,
-  inputValue,
-  onChange,
-  error,
-  inputFocusEnabled,
-}: CellsNewNodeFormProps) => {
-  const {inputRef} = useInputAutoFocus({enabled: inputFocusEnabled});
+export const CellsNewNodeForm = ({type, onSubmit, inputValue, onChange, error, isOpen}: CellsNewNodeFormProps) => {
+  const {inputRef} = useInputAutoFocus({enabled: isOpen});
 
   return (
     <form onSubmit={onSubmit}>

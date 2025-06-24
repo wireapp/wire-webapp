@@ -72,7 +72,7 @@ export const CellsNewItemModal = ({
         inputValue={name}
         onChange={handleChange}
         error={error}
-        inputFocusEnabled={isOpen}
+        isOpen={isOpen}
       />
       <CellsModal.Actions>
         <CellsModal.SecondaryButton onClick={onClose}>
