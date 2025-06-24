@@ -17,20 +17,32 @@
  *
  */
 
-import {test as baseTest} from '@playwright/test';
+import {BackendClientE2E} from './backendClient.e2e';
 
-import {ApiManagerE2E} from './backend/apiManager.e2e';
+export class UserRepositoryE2E extends BackendClientE2E {
+  public async deleteUser(userPassword: string, token: string) {
+    await this.axiosInstance.request({
+      url: 'self',
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      data: {
+        password: userPassword,
+      },
+    });
+  }
 
-// Define custom test type with axios fixture
-type Fixtures = {
-  api: ApiManagerE2E;
-};
-
-export const test = baseTest.extend<Fixtures>({
-  api: async ({request}, use) => {
-    // Create a new instance of ApiManager for each test
-    await use(new ApiManagerE2E());
-  },
-});
-
-export {expect} from '@playwright/test';
+  public async setUniqueUsername(username: string, token: string) {
+    await this.axiosInstance.put(
+      'self/handle',
+      {handle: username},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+  }
+}

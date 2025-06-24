@@ -17,20 +17,25 @@
  *
  */
 
-import {test as baseTest} from '@playwright/test';
+import {Page, Locator} from '@playwright/test';
 
-import {ApiManagerE2E} from './backend/apiManager.e2e';
+export class UserProfileModal {
+  readonly page: Page;
 
-// Define custom test type with axios fixture
-type Fixtures = {
-  api: ApiManagerE2E;
-};
+  readonly modal: Locator;
+  readonly connectButton: Locator;
 
-export const test = baseTest.extend<Fixtures>({
-  api: async ({request}, use) => {
-    // Create a new instance of ApiManager for each test
-    await use(new ApiManagerE2E());
-  },
-});
+  constructor(page: Page) {
+    this.page = page;
+    this.modal = page.locator('[data-uie-name="modal-user-profile"]');
+    this.connectButton = page.locator('[data-uie-name="modal-user-profile"] [data-uie-name="do-send-request"]');
+  }
 
-export {expect} from '@playwright/test';
+  async isVisible() {
+    await this.modal.isVisible();
+  }
+
+  async clickConnectButton() {
+    await this.connectButton.click();
+  }
+}

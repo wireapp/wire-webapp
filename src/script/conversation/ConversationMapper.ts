@@ -30,6 +30,7 @@ import {
   ADD_PERMISSION,
   CONVERSATION_CELLS_STATE,
 } from '@wireapp/api-client/lib/conversation';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 import {isObject} from 'underscore';
 
@@ -292,11 +293,25 @@ export class ConversationMapper {
     }
 
     // Active participants from database or backend payload
-    const participatingUserIds =
-      qualified_others ||
-      (members?.others
-        ? members.others.map(other => ({domain: other.qualified_id?.domain || '', id: other.id}))
-        : others.map(userId => ({domain: '', id: userId})));
+    let participatingUserIds: QualifiedId[] = [];
+
+    if (qualified_others) {
+      participatingUserIds = qualified_others;
+    }
+
+    if (!qualified_others && members?.others?.length) {
+      participatingUserIds = members.others.map(other => ({
+        domain: other.qualified_id?.domain ?? '',
+        id: other.id,
+      }));
+    }
+
+    if (!qualified_others && !members?.others?.length && others) {
+      participatingUserIds = others.map(userId => ({
+        domain: '',
+        id: userId,
+      }));
+    }
 
     conversationEntity.participating_user_ids(participatingUserIds);
 

@@ -17,20 +17,18 @@
  *
  */
 
-import {test as baseTest} from '@playwright/test';
+import axios, {AxiosInstance} from 'axios';
 
-import {ApiManagerE2E} from './backend/apiManager.e2e';
+export class BackendClientE2E {
+  readonly axiosInstance: AxiosInstance;
 
-// Define custom test type with axios fixture
-type Fixtures = {
-  api: ApiManagerE2E;
-};
-
-export const test = baseTest.extend<Fixtures>({
-  api: async ({request}, use) => {
-    // Create a new instance of ApiManager for each test
-    await use(new ApiManagerE2E());
-  },
-});
-
-export {expect} from '@playwright/test';
+  constructor() {
+    this.axiosInstance = axios.create({
+      baseURL: process.env.BACKEND_URL,
+      withCredentials: true,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  }
+}
