@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.1.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@3.0.21...@wireapp/eslint-config@3.1.0) (2025-06-24)
+
+### Features
+
+* Async Notification implementation [WPB-17183] ([#7066](https://github.com/wireapp/wire-web-packages/issues/7066)) ([594ba87](https://github.com/wireapp/wire-web-packages/commit/594ba87b0b27b8a24a11c002357e748eebd6a6dd))
+
 ## [3.0.21](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@3.0.20...@wireapp/eslint-config@3.0.21) (2025-01-21)
 
 **Note:** Version bump only for package @wireapp/eslint-config
