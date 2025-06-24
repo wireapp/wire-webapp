@@ -109,7 +109,6 @@ describe('ClientRepository', () => {
 
       spyOn(clientService, 'loadClientFromDb').and.returnValue(Promise.resolve(clientPayloadDatabase));
       spyOn(clientService, 'getClientById').and.returnValue(Promise.resolve(clientPayloadServer));
-      spyOn(clientService, 'putClientCapabilities').and.returnValue(Promise.resolve());
 
       return testFactory.client_repository.getValidLocalClient().then(client => {
         expect(client).toBeDefined();
