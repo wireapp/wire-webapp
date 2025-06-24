@@ -45,6 +45,7 @@ jobs:
           path: playwright-report/
 
       - name: Generate PR comment
+        if: always()
         id: generate_comment
         run: |
           node test/e2e_tests/scripts/create-playwright-report-summary.js
@@ -54,6 +55,7 @@ jobs:
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Comment on PR
+        if: always()
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           header: playwright-summary
