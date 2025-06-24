@@ -26,7 +26,7 @@ import {Message} from 'Components/MessagesList/Message';
 import {MarkerComponent} from 'Components/MessagesList/Message/Marker';
 import {MessagesListParams} from 'Components/MessagesList/MessageList.types';
 import {UploadAssets} from 'Components/MessagesList/UploadAssets';
-import {getLastUnreadMessageIndex, verticallyCenterMessage} from 'Components/MessagesList/utils/helpers';
+import {verticallyCenterMessage} from 'Components/MessagesList/utils/helpers';
 import {filterMessages} from 'Components/MessagesList/utils/messagesFilter';
 import {groupMessagesBySenderAndTime, isMarker} from 'Components/MessagesList/utils/messagesGroup';
 import {useLoadMessages} from 'Components/MessagesList/VirtualizedMessagesList/useLoadMessages';
@@ -155,8 +155,6 @@ export const VirtualizedMessagesList = ({
     }
   };
 
-  const lastUnreadMessageIndex = getLastUnreadMessageIndex(conversationLastReadTimestamp.current, groupedMessages);
-
   const virtualItems = virtualizer.getVirtualItems();
 
   const lastIndex = groupedMessages.length - 1;
@@ -173,12 +171,8 @@ export const VirtualizedMessagesList = ({
       loadConversation(conversation);
     }
 
-    if (lastUnreadMessageIndex !== -1) {
-      virtualizer.scrollToIndex(lastUnreadMessageIndex, {align: 'start'});
-      conversationLastReadTimestamp.current = groupedMessages[lastUnreadMessageIndex].timestamp;
-    } else {
-      virtualizer.scrollToIndex(groupedMessages.length - 1, {align: 'end'});
-    }
+    conversationLastReadTimestamp.current = groupedMessages[groupedMessages.length - 1].timestamp;
+    virtualizer.scrollToIndex(groupedMessages.length - 1, {align: 'end'});
   };
 
   return (

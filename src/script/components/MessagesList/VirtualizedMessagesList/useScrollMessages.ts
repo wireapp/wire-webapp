@@ -45,6 +45,10 @@ export const useScrollMessages = (
       return;
     }
 
+    if (virtualizer.isScrolling) {
+      return;
+    }
+
     const lastMessage = messages[messages.length - 1];
 
     if (isMarker(lastMessage)) {
@@ -63,6 +67,10 @@ export const useScrollMessages = (
     }
 
     if (messages.length === 0) {
+      return;
+    }
+
+    if (virtualizer.isScrolling) {
       return;
     }
 
