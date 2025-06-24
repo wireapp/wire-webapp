@@ -17,7 +17,7 @@
  *
  */
 
-import {ClientType, Location, MLSPublicKeyRecord, PublicClient} from './';
+import {ClientCapability, ClientType, Location, MLSPublicKeyRecord, PublicClient} from './';
 
 export interface AddedClient extends PublicClient {
   /** The IP address from which the client was registered */
@@ -34,5 +34,6 @@ export interface AddedClient extends PublicClient {
 
 export interface RegisteredClient extends AddedClient {
   /** The cookie label */
+  capabilities: ClientCapability[];
   cookie: string;
 }

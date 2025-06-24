@@ -65,7 +65,6 @@ export class NotificationAPI {
     clientId?: string,
     size: number = NOTIFICATION_SIZE_MAXIMUM,
     since?: string,
-    abortController?: AbortController,
   ): Promise<NotificationList> {
     const config: AxiosRequestConfig = {
       method: 'get',
@@ -77,7 +76,7 @@ export class NotificationAPI {
       url: NotificationAPI.URL.NOTIFICATION,
     };
 
-    const response = await this.client.sendJSON<NotificationList>(config, false, abortController);
+    const response = await this.client.sendJSON<NotificationList>(config, false);
     return response.data;
   }
 
@@ -87,11 +86,7 @@ export class NotificationAPI {
    * @param lastNotificationId Only return notifications more recent than this
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/push/fetchNotifications
    */
-  public async getAllNotifications(
-    clientId?: string,
-    lastNotificationId?: string,
-    abortController?: AbortController,
-  ): Promise<NotificationsReponse> {
+  public async getAllNotifications(clientId?: string, lastNotificationId?: string): Promise<NotificationsReponse> {
     const getNotificationChunks = async (
       notificationList: Notification[],
       currentClientId?: string,
@@ -106,12 +101,7 @@ export class NotificationAPI {
       let hasMissedNotifications = false;
 
       try {
-        payload = await this.getNotifications(
-          currentClientId,
-          NOTIFICATION_SIZE_MAXIMUM,
-          currentNotificationId,
-          abortController,
-        );
+        payload = await this.getNotifications(currentClientId, NOTIFICATION_SIZE_MAXIMUM, currentNotificationId);
       } catch (error) {
         const isAxiosError = axios.isAxiosError(error);
 

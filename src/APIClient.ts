@@ -41,7 +41,7 @@ import {parseAccessToken} from './auth/parseAccessToken';
 import {BroadcastAPI} from './broadcast/';
 import {CellsAPI} from './cells/CellsAPI';
 import {ClientAPI, ClientType} from './client/';
-import {Config} from './Config';
+import {Config, MINIMUM_API_VERSION} from './Config';
 import {ConnectionAPI} from './connection/';
 import {ConversationAPI} from './conversation/';
 import {Backend} from './env/';
@@ -200,7 +200,7 @@ export class APIClient extends EventEmitter {
       http: httpClient,
       ws: webSocket,
     };
-    this.backendFeatures = this.computeBackendFeatures(0);
+    this.backendFeatures = this.computeBackendFeatures(MINIMUM_API_VERSION);
     this.api = this.configureApis(this.backendFeatures);
   }
 
@@ -269,39 +269,54 @@ export class APIClient extends EventEmitter {
   }
 
   /**
-   * Will set the APIClient to use a specific version of the API (by default uses version 0)
-   * It will fetch the API Config and use the highest possible version
-   * @param min mininum version to use
-   * @param max maximum version to use
-   * @param allowDev allow the api-client to use development version of the api (if present). The dev version also need to be listed on the supportedVersions given as parameters
-   *   If we have version 2 that is a dev version, this is going to be the output of those calls
-   *   - useVersion(0, 2, true) > version 2 is used
-   *   - useVersion(0, 2) > version 1 is used
-   *   - useVersion(0, 1, true) > version 1 is used
-   * @return The highest version that is both supported by client and backend
+   * Sets the API client to use the highest supported version within a given range,
+   * with a hard minimum of version 8 enforced.
+   *
+   * @param min - Minimum acceptable version (must be ≥ 8)
+   * @param max - Maximum acceptable version
+   * @param allowDev - If true, allows using development versions from the backend
+   * @returns Backend feature configuration for the selected version
+   * @throws Error if no compatible version is found
    */
-  async useVersion(min: number, max: number, allowDev?: boolean): Promise<BackendFeatures> {
-    let backendVersions: BackendVersionResponse = {supported: [0], domain: ''};
-    try {
-      backendVersions = (await this.transport.http.sendRequest<BackendVersionResponse>({url: '/api-version'})).data;
-    } catch (error) {}
-    const devVersions = allowDev ? backendVersions.development ?? [] : [];
-    const highestCommonVersion = backendVersions.supported
-      .concat(devVersions)
-      .sort()
-      .reverse()
-      .find(version => version >= min && version <= max);
+  async useVersion(min: number, max: number, allowDev: boolean = false): Promise<BackendFeatures> {
+    if (min < MINIMUM_API_VERSION) {
+      throw new Error(`Minimum supported API version is ${MINIMUM_API_VERSION}. Received: ${min}`);
+    }
 
-    if (highestCommonVersion === undefined) {
-      const supportedStr = backendVersions.supported.join(', ');
+    const response = await this.transport.http.sendRequest<BackendVersionResponse>({
+      url: '/api-version',
+    });
+
+    const {supported, development = [], domain, federation} = response.data;
+    const availableVersions = allowDev ? [...supported, ...development] : supported;
+    const compatibleVersion = this.findHighestCompatibleVersion(availableVersions, min, max);
+
+    if (compatibleVersion === undefined) {
       throw new Error(
-        `Backend does not support requested versions [${min}-${max}] (supported versions ${supportedStr})`,
+        `No compatible API version in range [${min}-${max}]. ` + `Backend supports: [${supported.join(', ')}]`,
       );
     }
-    this.backendFeatures = this.computeBackendFeatures(highestCommonVersion, backendVersions);
-    this.transport.http.useVersion(this.backendFeatures.version);
+
+    this.backendFeatures = this.computeBackendFeatures(compatibleVersion, {federation, supported, development, domain});
+    this.transport.http.useVersion(compatibleVersion);
+    this.transport.ws.useVersion(compatibleVersion);
     this.api = this.configureApis(this.backendFeatures);
+
     return this.backendFeatures;
+  }
+
+  /**
+   * Returns the highest version from the list that falls within the specified range.
+   *
+   * @param versions - List of available versions
+   * @param min - Minimum required version
+   * @param max - Maximum allowed version
+   * @returns The highest version in the allowed range, or undefined if none are compatible
+   */
+  private findHighestCompatibleVersion(versions: number[], min: number, max: number): number | undefined {
+    const inRangeVersions = versions.filter(version => version >= min && version <= max);
+    const [highestVersion] = inRangeVersions.sort((a, b) => b - a);
+    return highestVersion;
   }
 
   public async init(clientType: ClientType = ClientType.NONE, cookie?: Cookie): Promise<Context> {

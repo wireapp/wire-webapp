@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,11 +17,18 @@
  *
  */
 
-import {BackendData} from './env/';
-
-export interface Config {
-  urls: BackendData;
-  headers?: Record<string, string>;
+export interface AcknowledgeEvent {
+  type: AcknowledgeType;
+  data?: AcknowledgeData;
 }
 
-export const MINIMUM_API_VERSION = 8;
+export interface AcknowledgeData {
+  delivery_tag: number;
+  multiple: boolean;
+}
+
+export enum AcknowledgeType {
+  ACK = 'ack',
+  ACK_MESSAGE_COUNT = 'ack_message_count',
+  ACK_FULL_SYNC = 'ack_full_sync',
+}
