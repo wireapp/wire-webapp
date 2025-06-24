@@ -22,17 +22,16 @@ import {useEffect, useState} from 'react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {CellNode} from 'Components/Conversation/ConversationCells/common/cellNode/cellNode';
+import {CellsModal} from 'Components/Conversation/ConversationCells/common/CellsModal/CellsModal';
+import {CellsNewNodeForm} from 'Components/Conversation/ConversationCells/common/CellsNewNodeForm/CellsNewNodeForm';
 import {getCellsFilesPath} from 'Components/Conversation/ConversationCells/common/getCellsFilesPath/getCellsFilesPath';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
+import {useCellsNewItemForm} from 'Components/Conversation/ConversationCells/common/useCellsNewNodeForm/useCellsNewNodeForm';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
-import {handleEscDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {CellsFoldersListModalContent} from './CellsFoldersListModalContent/CellsFoldersListModalContent';
-import {modalStyles, wrapperStyles} from './CellsMoveNodeModal.styles';
-import {CellsMoveNodeModalHeader} from './CellsMoveNodeModalHeader/CellsMoveNodeModalHeader';
-import {CellsNewFolderModalContent} from './CellsNewFolderModalContent/CellsNewFolderModalContent';
 import {useGetCellsFolders} from './useGetCellsFolders/useGetCellsFolders';
+import {useMoveCellsNode} from './useMoveCellNode/useMoveCellsNode';
 
 interface CellsMoveNodeModalProps {
   isOpen: boolean;
@@ -61,51 +60,91 @@ export const CellsMoveNodeModal = ({
     enabled: isOpen,
   });
 
+  const {
+    handleMove,
+    movingDisabled,
+    status: moveNodeStatus,
+  } = useMoveCellsNode({
+    cellsRepository,
+    nodeToMove,
+    conversationQualifiedId,
+    currentPath,
+    onClose,
+  });
+
+  const {
+    name,
+    error,
+    isSubmitting,
+    handleSubmit: handleCreateNewFolder,
+    handleChange,
+  } = useCellsNewItemForm({
+    type: 'folder',
+    cellsRepository,
+    conversationQualifiedId,
+    onSuccess: () => {
+      void refresh();
+      setActiveModalContent('move');
+    },
+    currentPath,
+  });
+
   useEffect(() => {
     if (isOpen) {
       setActiveModalContent('move');
     }
   }, [isOpen]);
 
+  const isMoveLoading = moveNodeStatus === 'loading';
+
   return (
-    <ModalComponent
-      isShown={isOpen}
-      onClosed={onClose}
-      onBgClick={onClose}
-      wrapperCSS={modalStyles}
-      onKeyDown={event => handleEscDown(event, onClose)}
-    >
-      <div css={wrapperStyles}>
-        <CellsMoveNodeModalHeader
-          onClose={onClose}
-          title={
-            activeModalContent === 'move' ? t('cells.moveNodeModal.moveTitle') : t('cells.moveNodeModal.createTitle')
-          }
-        />
-        {activeModalContent === 'move' ? (
+    <CellsModal isOpen={isOpen} onClose={onClose} size="large">
+      <CellsModal.Header>
+        {activeModalContent === 'move' ? t('cells.moveNodeModal.moveTitle') : t('cells.moveNodeModal.createTitle')}
+      </CellsModal.Header>
+      {activeModalContent === 'move' ? (
+        <>
           <CellsFoldersListModalContent
-            nodeToMove={nodeToMove}
             items={folders}
             status={status}
             shouldShowLoadingSpinner={shouldShowLoadingSpinner}
-            conversationQualifiedId={conversationQualifiedId}
             conversationName={conversationName}
-            cellsRepository={cellsRepository}
             currentPath={currentPath}
             onPathChange={setCurrentPath}
             onChangeModalContent={setActiveModalContent}
-            onClose={onClose}
           />
-        ) : (
-          <CellsNewFolderModalContent
-            cellsRepository={cellsRepository}
-            conversationQualifiedId={conversationQualifiedId}
-            currentPath={currentPath}
-            onRefresh={refresh}
-            onChangeModalContent={setActiveModalContent}
+          <CellsModal.Actions>
+            <CellsModal.SecondaryButton onClick={onClose}>
+              {t('cells.moveNodeModal.cancelButton')}
+            </CellsModal.SecondaryButton>
+            <CellsModal.PrimaryButton
+              onClick={handleMove}
+              isDisabled={movingDisabled || shouldShowLoadingSpinner || isMoveLoading}
+              isLoading={isMoveLoading}
+            >
+              {t('cells.moveNodeModal.moveButton')}
+            </CellsModal.PrimaryButton>
+          </CellsModal.Actions>
+        </>
+      ) : (
+        <>
+          <CellsNewNodeForm
+            type="folder"
+            onSubmit={handleCreateNewFolder}
+            inputValue={name}
+            onChange={handleChange}
+            error={error}
           />
-        )}
-      </div>
-    </ModalComponent>
+          <CellsModal.Actions>
+            <CellsModal.SecondaryButton onClick={() => setActiveModalContent('move')}>
+              {t('cells.newItemMenuModal.secondaryAction')}
+            </CellsModal.SecondaryButton>
+            <CellsModal.PrimaryButton onClick={handleCreateNewFolder} isDisabled={isSubmitting}>
+              {t('cells.newItemMenuModal.primaryAction')}
+            </CellsModal.PrimaryButton>
+          </CellsModal.Actions>
+        </>
+      )}
+    </CellsModal>
   );
 };

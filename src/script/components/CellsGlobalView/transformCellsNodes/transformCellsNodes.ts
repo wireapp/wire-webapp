@@ -40,6 +40,9 @@ export const transformCellsNodes = (nodes: RestNode[]): CellNode[] => {
     const path = node.Path;
     const url = node.PreSignedGET?.Url;
     const tags = getTags(node);
+    const presignedUrlExpiresAt = node.PreSignedGET?.ExpiresAt
+      ? new Date(Number(node.PreSignedGET?.ExpiresAt) * TIME_IN_MILLIS.SECOND)
+      : null;
 
     if (node.Type === 'COLLECTION') {
       return {
@@ -54,6 +57,7 @@ export const transformCellsNodes = (nodes: RestNode[]): CellNode[] => {
         uploadedAtTimestamp,
         publicLink,
         tags,
+        presignedUrlExpiresAt,
       };
     }
 
@@ -73,6 +77,7 @@ export const transformCellsNodes = (nodes: RestNode[]): CellNode[] => {
       uploadedAtTimestamp,
       publicLink,
       tags,
+      presignedUrlExpiresAt,
     };
   });
 };
