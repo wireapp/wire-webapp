@@ -38,10 +38,10 @@ for (const suite of report.suites) {
 
         if (lastResult.status !== 'passed') {
           // Show only the last (final) failure
-          let failureInfo = `<details> \n <summary> ❌ ${title} </summary>\n  📂 \`${specLocation}\`\n  ⏱ Duration: ${lastResult.duration}ms\n`;
+          let failureInfo = `<details> \n <summary> ❌ ${title} </summary><br> \n\n  Location: **${specLocation}**\n  Duration: **${lastResult.duration}ms**\n`;
 
           if (lastResult.errors?.length) {
-            failureInfo += `**Errors:**\n`;
+            failureInfo += `\n**Errors:**\n`;
             lastResult.errors.forEach(e => {
               failureInfo += `\n\`\`\`\n${stripAnsi(e.message)}\n\`\`\``;
             });
