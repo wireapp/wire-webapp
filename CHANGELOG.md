@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [46.30.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.29.4...@wireapp/core@46.30.0) (2025-06-24)
+
+### Features
+
+* Async Notification implementation [WPB-17183] ([#7066](https://github.com/wireapp/wire-web-packages/issues/7066)) ([594ba87](https://github.com/wireapp/wire-web-packages/commit/594ba87b0b27b8a24a11c002357e748eebd6a6dd))
+
 ## [46.29.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.29.3...@wireapp/core@46.29.4) (2025-06-23)
 
 ### Bug Fixes
