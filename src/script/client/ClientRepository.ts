@@ -17,7 +17,7 @@
  *
  */
 
-import {ClientCapability, ClientType, PublicClient, RegisteredClient} from '@wireapp/api-client/lib/client/';
+import {ClientType, PublicClient, RegisteredClient} from '@wireapp/api-client/lib/client/';
 import {UserClientAddEvent, UserClientRemoveEvent, USER_EVENT} from '@wireapp/api-client/lib/event';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {amplify} from 'amplify';
@@ -252,9 +252,6 @@ export class ClientRepository {
       if (!currentClient) {
         throw new ClientError(ClientError.TYPE.CLIENT_NOT_SET, ClientError.MESSAGE.CLIENT_NOT_SET);
       }
-      await this.clientService.putClientCapabilities(currentClient.id, {
-        capabilities: [ClientCapability.LEGAL_HOLD_IMPLICIT_CONSENT],
-      });
 
       return currentClient;
     } catch (error) {
