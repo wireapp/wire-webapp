@@ -36,37 +36,13 @@ describe('"AssetAPI"', () => {
     const assetId = 'my-asset-id';
     const assetToken = 'my-asset-token';
 
-    await apiClient.api.asset.getAssetV3(assetId, assetToken);
-
-    expect(apiClient.transport.http.sendRequest).toHaveBeenCalledWith(
-      expect.objectContaining({
-        params: {
-          asset_token: assetToken,
-        },
-        url: expect.stringMatching(new RegExp(assetId)),
-      }),
-    );
-  });
-
-  it('removes token parameters', async () => {
-    jest.spyOn(apiClient.transport.http, 'sendRequest').mockReturnValue(
-      Promise.resolve({
-        config: {},
-        data: '',
-        headers: {},
-        status: StatusCode.OK,
-        statusText: 'OK',
-      }),
-    );
-    const assetId = 'my-asset-id';
-
-    await apiClient.api.asset.getAssetV3(assetId);
-
-    expect(apiClient.transport.http.sendRequest).toHaveBeenCalledWith(
-      expect.objectContaining({
-        params: {},
-        url: expect.stringMatching(new RegExp(assetId)),
-      }),
-    );
+    let errorMessage;
+    try {
+      await apiClient.api.asset.getAssetV3(assetId, assetToken);
+    } catch (error) {
+      errorMessage = error.message;
+    } finally {
+      expect(errorMessage).toContain('Asset v3 is not supported on backend');
+    }
   });
 });

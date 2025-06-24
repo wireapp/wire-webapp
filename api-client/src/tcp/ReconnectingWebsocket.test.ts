@@ -23,8 +23,6 @@ import {Server as WebSocketServer} from 'ws';
 
 import {AddressInfo} from 'net';
 
-import {TimeUtil} from '@wireapp/commons';
-
 import {ReconnectingWebsocket} from './ReconnectingWebsocket';
 
 const reservedPorts: number[] = [];
@@ -135,17 +133,4 @@ describe('ReconnectingWebsocket', () => {
       }
     });
   }, 2000);
-
-  it('sends ping messages', done => {
-    const RWS = new ReconnectingWebsocket(() => getServerAddress(), {pingInterval: TimeUtil.TimeInMillis.SECOND});
-    RWS.setOnMessage((data: string) => {
-      expect(JSON.parse(data)).toEqual({fromServer: 'Echo: ping'});
-      RWS.disconnect();
-    });
-    RWS.setOnClose(event => {
-      expect(event.wasClean).toBe(true);
-      done();
-    });
-    RWS.connect();
-  });
 });

@@ -141,6 +141,7 @@ module.exports = {
     "react-hooks/exhaustive-deps": "warn",
     "react/no-unknown-property": ["error", { "ignore": ["css"] }],
     'sort-vars': 'error',
+    "@typescript-eslint/require-array-sort-compare": "warn",
     strict: ['error', 'global'],
     "unused-imports/no-unused-imports": "error",
     "import/no-unresolved": "error",

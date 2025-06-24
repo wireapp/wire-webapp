@@ -40,11 +40,6 @@ export enum WEBSOCKET_STATE {
   CLOSED = 3,
 }
 
-export enum PingMessage {
-  PING = 'ping',
-  PONG = 'pong',
-}
-
 export class ReconnectingWebsocket {
   private static readonly RECONNECTING_OPTIONS: Options = {
     WebSocket: WebSocketNode,
@@ -58,29 +53,14 @@ export class ReconnectingWebsocket {
 
   private readonly logger: logdown.Logger;
   private socket?: RWS;
-  private pingerId?: NodeJS.Timeout;
-  private readonly PING_INTERVAL = TimeUtil.TimeInMillis.SECOND * 20;
-  private hasUnansweredPing: boolean;
 
   private onOpen?: (event: Event) => void;
   private onMessage?: (data: string) => void;
   private onError?: (error: ErrorEvent) => void;
   private onClose?: (event: CloseEvent) => void;
 
-  constructor(
-    private readonly onReconnect: () => Promise<string>,
-    options: {
-      pingInterval?: number;
-    } = {},
-  ) {
+  constructor(private readonly onReconnect: () => Promise<string>) {
     this.logger = LogFactory.getLogger('@wireapp/api-client/tcp/ReconnectingWebsocket');
-
-    if (options.pingInterval) {
-      this.PING_INTERVAL = options.pingInterval;
-    }
-
-    this.hasUnansweredPing = false;
-
     /**
      * According to https://developer.mozilla.org/en-US/docs/Web/API/Navigator/onLine, navigator.onLine attribute and 'online' and 'offline' events are not reliable enough (especially when it's truthy).
      * We won't receive the 'offline' event when the system goes to sleep (e.g. closing the lid of a laptop).
@@ -109,10 +89,8 @@ export class ReconnectingWebsocket {
     this.logger.debug('Incoming message');
 
     const data = buffer.bufferToString(event.data);
-    if (data === PingMessage.PONG) {
-      this.logger.debug('Received pong from WebSocket');
-      this.hasUnansweredPing = false;
-    } else if (this.onMessage) {
+
+    if (this.onMessage) {
       this.onMessage(data);
     }
   };
@@ -129,15 +107,11 @@ export class ReconnectingWebsocket {
 
   private readonly internalOnReconnect = async (): Promise<string> => {
     this.logger.debug('Connecting to WebSocket');
-    // The ping is needed to keep the connection alive as long as possible.
-    // Otherwise the connection would be closed after 1 min of inactivity and re-established.
-    this.startPinging();
     return this.onReconnect();
   };
 
   private readonly internalOnClose = (event: CloseEvent) => {
-    this.logger.debug('WebSocket closed');
-    this.stopPinging();
+    this.logger.debug(`WebSocket closed with code: ${event?.code}${event?.reason ? `Reason: ${event?.reason}` : ''}`);
     if (this.onClose) {
       this.onClose(event);
     }
@@ -145,7 +119,6 @@ export class ReconnectingWebsocket {
 
   public connect(): void {
     this.socket = this.getReconnectingWebsocket();
-
     this.socket.onmessage = this.internalOnMessage;
     this.socket.onerror = this.internalOnError;
     this.socket.onopen = this.internalOnOpen;
@@ -153,35 +126,8 @@ export class ReconnectingWebsocket {
   }
 
   public send(message: any): void {
-    if (this.socket) {
-      this.socket.send(message);
-    }
+    this.socket?.send(message);
   }
-
-  private startPinging(): void {
-    this.stopPinging();
-    this.hasUnansweredPing = false;
-    this.pingerId = setInterval(this.sendPing, this.PING_INTERVAL);
-  }
-
-  private stopPinging(): void {
-    if (this.pingerId) {
-      clearInterval(this.pingerId);
-    }
-  }
-
-  private readonly sendPing = (): void => {
-    if (this.socket) {
-      if (this.hasUnansweredPing) {
-        this.logger.warn('Ping interval check failed');
-        this.stopPinging();
-        this.socket.reconnect();
-        return;
-      }
-      this.hasUnansweredPing = true;
-      this.send(PingMessage.PING);
-    }
-  };
 
   public getState(): WEBSOCKET_STATE {
     return this.socket ? this.socket.readyState : WEBSOCKET_STATE.CLOSED;

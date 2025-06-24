@@ -23,7 +23,7 @@ import {WebSocketClient} from './WebSocketClient';
 
 import {InvalidTokenError} from '../auth/AuthenticationError';
 import {TEAM_EVENT} from '../event/';
-import {Notification} from '../notification';
+import {ConsumableEvent, ConsumableNotification} from '../notification/ConsumableNotification';
 
 const accessTokenPayload = {
   access_token:
@@ -97,14 +97,14 @@ describe('WebSocketClient', () => {
     });
 
     it('calls "onMessage" when WebSocket received message', async () => {
-      const message = 'hello';
+      const message = {type: ConsumableEvent.MISSED};
       const websocketClient = new WebSocketClient('ws://url', fakeHttpClient);
       const onMessageSpy = jest.spyOn(websocketClient as any, 'onMessage');
       const socket = websocketClient['socket'];
       jest.spyOn(socket as any, 'getReconnectingWebsocket').mockReturnValue(fakeSocket);
 
       await websocketClient.connect();
-      fakeSocket.onmessage({data: Buffer.from(JSON.stringify({message}), 'utf-8')});
+      fakeSocket.onmessage({data: Buffer.from(JSON.stringify(message), 'utf-8')});
 
       expect(onMessageSpy).toHaveBeenCalledTimes(1);
     });
@@ -118,7 +118,8 @@ describe('WebSocketClient', () => {
       const socket = websocketClient['socket'];
       jest.spyOn(socket as any, 'getReconnectingWebsocket').mockReturnValue(fakeSocket);
 
-      await websocketClient.connect(undefined, onConnect);
+      websocketClient.useVersion(8);
+      websocketClient.connect(undefined, onConnect);
       fakeSocket.onopen();
       await websocketClient['onReconnect']();
       expect(onConnectResult).toHaveBeenCalledTimes(1);
@@ -143,18 +144,24 @@ describe('WebSocketClient', () => {
   });
 
   describe('connect', () => {
-    const fakeNotification: Notification = {
-      id: '123',
-      payload: [
-        {
-          data: {
-            user: 'Bob',
-          },
-          team: '456',
-          time: new Date().toISOString(),
-          type: TEAM_EVENT.MEMBER_JOIN,
+    const fakeNotification: ConsumableNotification = {
+      type: ConsumableEvent.EVENT,
+      data: {
+        delivery_tag: 1,
+        event: {
+          id: 'event-id',
+          payload: [
+            {
+              data: {
+                user: 'Bob',
+              },
+              team: '456',
+              time: new Date().toISOString(),
+              type: TEAM_EVENT.MEMBER_JOIN,
+            },
+          ],
         },
-      ],
+      },
     };
 
     it('does not lock websocket by default', async () => {

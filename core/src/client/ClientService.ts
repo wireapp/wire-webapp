@@ -18,7 +18,13 @@
  */
 
 import {LoginData} from '@wireapp/api-client/lib/auth/';
-import {ClientCapability, ClientType, CreateClientPayload, RegisteredClient} from '@wireapp/api-client/lib/client/';
+import {
+  ClientCapability,
+  ClientCapabilityData,
+  ClientType,
+  CreateClientPayload,
+  RegisteredClient,
+} from '@wireapp/api-client/lib/client/';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import axios from 'axios';
 import {StatusCodes} from 'http-status-codes';
@@ -107,7 +113,7 @@ export class ClientService {
    *
    * @return the loaded client or undefined
    */
-  public async loadClient(): Promise<RegisteredClient | undefined> {
+  public async loadClient(): Promise<MetaClient | undefined> {
     const loadedClient = await this.getLocalClient();
 
     if (!loadedClient) {
@@ -134,6 +140,10 @@ export class ClientService {
 
   private createLocalClient(client: RegisteredClient, domain?: string): Promise<MetaClient> {
     return this.database.createLocalClient(client, domain);
+  }
+
+  public putClientCapabilities(clientId: string, capabilities: ClientCapabilityData): Promise<void> {
+    return this.backend.putClient(clientId, capabilities);
   }
 
   /**
@@ -165,7 +175,7 @@ export class ClientService {
 
     const newClient: CreateClientPayload = {
       class: clientInfo.classification,
-      capabilities: [ClientCapability.LEGAL_HOLD_IMPLICIT_CONSENT],
+      capabilities: [ClientCapability.LEGAL_HOLD_IMPLICIT_CONSENT, ClientCapability.CONSUMABLE_NOTIFICATIONS],
       cookie: clientInfo.cookieLabel,
       label: clientInfo.label,
       lastkey: lastPrekey,

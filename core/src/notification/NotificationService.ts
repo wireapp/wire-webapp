@@ -85,9 +85,9 @@ export class NotificationService extends TypedEventEmitter<Events> {
     this.database = new NotificationDatabaseRepository(storeEngine);
   }
 
-  private async getAllNotifications(since: string, abortController: AbortController) {
+  private async getAllNotifications(since: string) {
     const clientId = this.apiClient.clientId;
-    return this.backend.getAllNotifications(clientId, since, abortController);
+    return this.backend.getAllNotifications(clientId, since);
   }
 
   /** Should only be called with a completely new client. */
@@ -135,10 +135,9 @@ export class NotificationService extends TypedEventEmitter<Events> {
   public async processNotificationStream(
     notificationHandler: NotificationHandler,
     onMissedNotifications: (notificationId: string) => void,
-    abortHandler: AbortController,
   ): Promise<{total: number; error: number; success: number}> {
     const lastNotificationId = await this.database.getLastNotificationId();
-    const {notifications, missedNotification} = await this.getAllNotifications(lastNotificationId, abortHandler);
+    const {notifications, missedNotification} = await this.getAllNotifications(lastNotificationId);
     if (missedNotification) {
       onMissedNotifications(missedNotification);
     }
@@ -150,13 +149,6 @@ export class NotificationService extends TypedEventEmitter<Events> {
         : `No notification to process from the stream`;
     this.logger.log(logMessage);
     for (const [index, notification] of notifications.entries()) {
-      if (abortHandler.signal.aborted) {
-        /* Stop handling notifications if the websocket has been disconnected.
-         * Upon reconnecting we are going to restart handling the notification stream for where we left of
-         */
-        this.logger.warn(`Stop processing notifications as connection to websocket was closed`);
-        return results;
-      }
       try {
         await notificationHandler(notification, NotificationSource.NOTIFICATION_STREAM, {
           done: index + 1,
