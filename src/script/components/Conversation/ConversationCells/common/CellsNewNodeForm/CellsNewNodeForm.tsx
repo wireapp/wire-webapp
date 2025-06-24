@@ -17,7 +17,7 @@
  *
  */
 
-import {ChangeEvent, FormEvent, useEffect, useRef} from 'react';
+import {ChangeEvent, FormEvent} from 'react';
 
 import {ErrorMessage, Input, Label} from '@wireapp/react-ui-kit';
 
@@ -26,6 +26,7 @@ import {t} from 'Util/LocalizerUtil';
 import {inputWrapperStyles} from './CellsNewNodeForm.styles';
 
 import {CellNode} from '../cellNode/cellNode';
+import {useInputAutoFocus} from '../useInputAutoFocus/useInputAutoFocus';
 
 interface CellsNewNodeFormProps {
   type: CellNode['type'];
@@ -33,14 +34,18 @@ interface CellsNewNodeFormProps {
   inputValue: string;
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
   error: string | null;
+  inputFocusEnabled: boolean;
 }
 
-export const CellsNewNodeForm = ({type, onSubmit, inputValue, onChange, error}: CellsNewNodeFormProps) => {
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
+export const CellsNewNodeForm = ({
+  type,
+  onSubmit,
+  inputValue,
+  onChange,
+  error,
+  inputFocusEnabled,
+}: CellsNewNodeFormProps) => {
+  const {inputRef} = useInputAutoFocus({enabled: inputFocusEnabled});
 
   return (
     <form onSubmit={onSubmit}>

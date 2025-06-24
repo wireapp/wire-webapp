@@ -134,6 +134,7 @@ export const CellsMoveNodeModal = ({
             inputValue={name}
             onChange={handleChange}
             error={error}
+            inputFocusEnabled={isOpen}
           />
           <CellsModal.Actions>
             <CellsModal.SecondaryButton onClick={() => setActiveModalContent('move')}>
