@@ -32,11 +32,22 @@ export class StartUIPage {
     this.searchResults = page.locator('[data-uie-name="item-user"] [data-uie-name="status-username"]');
   }
 
-  async searchForUser(username: string) {
+  async selectUsers(usernames: string[]) {
+    for (const username of usernames) {
+      await this.selectUser(username);
+    }
+  }
+
+  async selectUser(username: string) {
+    await this.searchForUser(username);
+    await this.clickUserFromSearchResults(username);
+  }
+
+  private async searchForUser(username: string) {
     await this.searchInput.fill(username);
   }
 
-  async clickUserFromSearchResults(username: string) {
+  private async clickUserFromSearchResults(username: string) {
     await this.searchResults.first().waitFor({state: 'visible'});
     for (const result of await this.searchResults.all()) {
       const text = await result.textContent();

@@ -53,10 +53,12 @@ export class AppLockModal {
   }
 
   async isVisible() {
+    await this.appLockModal.waitFor({state: 'visible'});
     return await this.appLockModal.isVisible();
   }
 
   async isHidden() {
+    await this.appLockModal.waitFor({state: 'hidden'});
     return await this.appLockModal.isHidden();
   }
 
