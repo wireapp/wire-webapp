@@ -27,11 +27,12 @@ import {
   LoginData,
   PreKey,
 } from '@wireapp/api-client/lib/auth';
-import {ClientClassification, ClientType, RegisteredClient} from '@wireapp/api-client/lib/client/';
+import {ClientCapability, ClientClassification, ClientType, RegisteredClient} from '@wireapp/api-client/lib/client/';
 import {SUBCONVERSATION_ID} from '@wireapp/api-client/lib/conversation';
 import * as Events from '@wireapp/api-client/lib/event';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 import {Notification} from '@wireapp/api-client/lib/notification/';
+import {ConsumableEvent, ConsumableNotification} from '@wireapp/api-client/lib/notification/ConsumableNotification';
 import {WebSocketClient} from '@wireapp/api-client/lib/tcp/';
 import {WEBSOCKET_STATE} from '@wireapp/api-client/lib/tcp/ReconnectingWebsocket';
 import {FEATURE_KEY, FeatureStatus} from '@wireapp/api-client/lib/team';
@@ -77,6 +78,7 @@ import {SelfService} from './self/';
 import {CoreDatabase, deleteDB, openDB} from './storage/CoreDB';
 import {TeamService} from './team/';
 import {UserService} from './user/';
+import {LocalStorageStore} from './util/LocalStorageStore';
 import {RecurringTaskScheduler} from './util/RecurringTaskScheduler';
 
 export type ProcessedEventPayload = HandledEventPayload;
@@ -135,6 +137,8 @@ type Events = {
   [EVENTS.NEW_SESSION]: NewClient;
 };
 
+export const AccountLocalStorageStore = LocalStorageStore('core_account');
+
 export class Account extends TypedEventEmitter<Events> {
   private readonly apiClient: APIClient;
   private readonly logger: logdown.Logger;
@@ -144,6 +148,9 @@ export class Account extends TypedEventEmitter<Events> {
   private db?: CoreDatabase;
   private encryptedDb?: EncryptedStore<any>;
   private coreCallbacks?: CoreCallbacks;
+  private totalPendingNotifications: number = 0;
+  private remainingNotifications: number = 0;
+  private connectionState: ConnectionState = ConnectionState.CLOSED;
 
   public service?: {
     mls?: MLSService;
@@ -582,9 +589,9 @@ export class Account extends TypedEventEmitter<Events> {
    * @param callbacks callbacks that will be called to handle different events
    * @returns close a function that will disconnect from the websocket
    */
-  public listen({
+  public async listen({
     onEvent = () => {},
-    onConnectionStateChanged = () => {},
+    onConnectionStateChanged: onConnectionStateChangedCallBack = () => {},
     onNotificationStreamProgress = () => {},
     onMissedNotifications = () => {},
     dryRun = false,
@@ -619,12 +626,85 @@ export class Account extends TypedEventEmitter<Events> {
      * When set will not decrypt and not store the last notification ID. This is useful if you only want to subscribe to unencrypted backend events
      */
     dryRun?: boolean;
-  } = {}): () => void {
+  } = {}): Promise<() => void> {
     if (!this.currentClient) {
       throw new Error('Client has not been initialized - please login first');
     }
 
-    const handleEvent = async (payload: HandledEventPayload, source: NotificationSource) => {
+    const onConnectionStateChanged = this.createConnectionStateChangedHandler(onConnectionStateChangedCallBack);
+
+    const handleEvent = this.createEventHandler(onEvent);
+
+    const handleLegacyNotification = this.createLegacyNotificationHandler(handleEvent, dryRun);
+    const handleNotification = this.createNotificationHandler(
+      handleEvent,
+      onNotificationStreamProgress,
+      onConnectionStateChanged,
+      dryRun,
+    );
+
+    const handleMissedNotifications = this.createLegacyMissedNotificationsHandler(onMissedNotifications);
+    const processNotificationStream = this.createLegacyNotificationStreamProcessor({
+      handleLegacyNotification,
+      handleMissedNotifications,
+      onNotificationStreamProgress,
+      onConnectionStateChanged,
+    });
+
+    this.setupWebSocketListeners(handleNotification, onConnectionStateChanged);
+
+    const isClientCapableOfConsumableNotifications = this.getClientCapabilities().includes(
+      ClientCapability.CONSUMABLE_NOTIFICATIONS,
+    );
+
+    /*
+     * When enabling async notifications, be aware that the backend maintains a separate queue
+     * for new async notifications (/events weboscket endpoint), which only starts populating *after* the client declares support
+     * for async notifications.
+     *
+     * Therefore, after declaring support, it's necessary to perform one final fetch from the legacy
+     * system to ensure no notifications are missed—since older notifications won't
+     * appear in the new queue.
+     *
+     * These two systems are separate, and the transition timing
+     * is important to avoid missing any messages during the switch.
+     */
+    if (!isClientCapableOfConsumableNotifications) {
+      // let the backend now client is capable of consumable notifications
+      await this.service?.client.putClientCapabilities(this.currentClient.id, {
+        capabilities: [ClientCapability.LEGAL_HOLD_IMPLICIT_CONSENT, ClientCapability.CONSUMABLE_NOTIFICATIONS],
+      });
+
+      // do a quick legacy sync without connecting to any websockets
+      await processNotificationStream();
+    }
+
+    this.apiClient.connect();
+
+    return () => {
+      this.apiClient.disconnect();
+      onConnectionStateChanged(ConnectionState.CLOSED);
+      this.apiClient.transport.ws.removeAllListeners();
+    };
+  }
+
+  private createConnectionStateChangedHandler(
+    onConnectionStateChanged: (state: ConnectionState) => void,
+  ): (state: ConnectionState) => void {
+    return (state: ConnectionState) => {
+      this.connectionState = state;
+      onConnectionStateChanged(state);
+      this.logger.info(`Connection state changed to: ${state}`);
+    };
+  }
+
+  /**
+   * Creates the event handler that is invoked for each decrypted event from the backend.
+   * Responsible for handling specific event types like `MESSAGE_TIMER_UPDATE`, and then
+   * forwarding the event to the consumer via the `onEvent` callback.
+   */
+  private createEventHandler(onEvent: (payload: HandledEventPayload, source: NotificationSource) => void) {
+    return async (payload: HandledEventPayload, source: NotificationSource) => {
       const {event} = payload;
       switch (event?.type) {
         case CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE: {
@@ -637,47 +717,135 @@ export class Account extends TypedEventEmitter<Events> {
           break;
         }
       }
-      await onEvent(payload, source);
-    };
 
-    const handleNotification = async (notification: Notification, source: NotificationSource): Promise<void> => {
+      // Always forward the event to the consumer
+      onEvent(payload, source);
+    };
+  }
+
+  private createLegacyNotificationHandler(
+    handleEvent: (payload: HandledEventPayload, source: NotificationSource) => Promise<void>,
+    dryRun: boolean,
+  ) {
+    return async (notification: Notification, source: NotificationSource): Promise<void> => {
       try {
         const messages = this.service!.notification.handleNotification(notification, source, dryRun);
+
         for await (const message of messages) {
           await handleEvent(message, source);
         }
       } catch (error) {
-        this.logger.error(`Failed to handle notification ID "${notification.id}": ${(error as any).message}`, error);
+        this.logger.error(
+          `Failed to handle legacy notification "${notification.id}": ${(error as any).message}`,
+          error,
+        );
       }
     };
+  }
 
-    this.apiClient.transport.ws.removeAllListeners(WebSocketClient.TOPIC.ON_MESSAGE);
-    this.apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_MESSAGE, notification =>
-      handleNotification(notification, NotificationSource.WEBSOCKET),
-    );
-    this.apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_STATE_CHANGE, wsState => {
-      const mapping: Partial<Record<WEBSOCKET_STATE, ConnectionState>> = {
-        [WEBSOCKET_STATE.CLOSED]: ConnectionState.CLOSED,
-        [WEBSOCKET_STATE.CONNECTING]: ConnectionState.CONNECTING,
-      };
-      const connectionState = mapping[wsState];
-      if (connectionState) {
-        onConnectionStateChanged(connectionState);
+  private createNotificationHandler(
+    handleEvent: (payload: HandledEventPayload, source: NotificationSource) => Promise<void>,
+    onNotificationStreamProgress: ({done, total}: {done: number; total: number}) => void,
+    onConnectionStateChanged: (state: ConnectionState) => void,
+    dryRun: boolean,
+  ) {
+    return async (notification: ConsumableNotification, source: NotificationSource): Promise<void> => {
+      try {
+        if (notification.type === ConsumableEvent.MISSED) {
+          this.reactToMissedNotification();
+          return;
+        }
+
+        if (notification.type === ConsumableEvent.MESSAGE_COUNT) {
+          const {
+            data: {count},
+          } = notification;
+
+          onNotificationStreamProgress({total: count, done: 0});
+          this.totalPendingNotifications = count;
+          this.remainingNotifications = 0;
+          this.apiClient.transport.ws.acknowledgeMessageCountNotification();
+          pauseMessageSending();
+
+          onConnectionStateChanged(ConnectionState.PROCESSING_NOTIFICATIONS);
+
+          if (count === 0) {
+            resumeMessageSending();
+            onConnectionStateChanged(ConnectionState.LIVE);
+          }
+
+          return;
+        }
+
+        const event = notification.data.event;
+        const messages = this.service!.notification.handleNotification(event, source, dryRun);
+
+        if (this.connectionState !== ConnectionState.LIVE) {
+          this.remainingNotifications++;
+          onNotificationStreamProgress({
+            done: this.remainingNotifications,
+            total: this.totalPendingNotifications,
+          });
+        }
+
+        this.apiClient.transport.ws.acknowledgeNotification(notification);
+
+        for await (const message of messages) {
+          await handleEvent(message, source);
+        }
+
+        if (
+          this.totalPendingNotifications === this.remainingNotifications &&
+          this.connectionState !== ConnectionState.LIVE
+        ) {
+          resumeMessageSending();
+          onConnectionStateChanged(ConnectionState.LIVE);
+        }
+      } catch (error) {
+        this.logger.error(
+          `Failed to handle consumable notification "${notification.type}": ${(error as any).message}`,
+          error,
+        );
       }
-    });
+    };
+  }
 
-    const handleMissedNotifications = async (notificationId: string) => {
+  /**
+   * Returns a function to handle missed notifications — i.e., when the backend indicates
+   * that some notifications were lost due to age (typically >28 days).
+   * Also handles MLS-specific epoch mismatch recovery by triggering a conversation rejoin.
+   */
+  private createLegacyMissedNotificationsHandler(onMissedNotifications: (notificationId: string) => void) {
+    return async (notificationId: string) => {
       if (this.hasMLSDevice) {
         queueConversationRejoin('all-conversations', () =>
           this.service!.conversation.handleConversationsEpochMismatch(),
         );
       }
+
       return onMissedNotifications(notificationId);
     };
+  }
 
-    const processNotificationStream = async (abortHandler: AbortController) => {
-      // Lock websocket in order to buffer any message that arrives while we handle the notification stream
-      this.apiClient.transport.ws.lock();
+  /**
+   * Returns a processor function for the notification stream (legacy sync).
+   * It pauses message sending and MLS rejoining during stream handling to prevent race conditions,
+   * then resumes normal operations after sync is complete.
+   *
+   * @param handlers Various logic handlers wired to notification callbacks
+   */
+  private createLegacyNotificationStreamProcessor({
+    handleLegacyNotification,
+    handleMissedNotifications,
+    onNotificationStreamProgress,
+    onConnectionStateChanged,
+  }: {
+    handleLegacyNotification: (notification: Notification, source: NotificationSource) => Promise<void>;
+    handleMissedNotifications: (notificationId: string) => Promise<void>;
+    onNotificationStreamProgress: ({done, total}: {done: number; total: number}) => void;
+    onConnectionStateChanged: (state: ConnectionState) => void;
+  }) {
+    return async () => {
       pauseMessageSending();
       // We want to avoid triggering rejoins of out-of-sync MLS conversations while we are processing the notification stream
       pauseRejoiningMLSConversations();
@@ -685,35 +853,97 @@ export class Account extends TypedEventEmitter<Events> {
 
       const results = await this.service!.notification.processNotificationStream(
         async (notification, source, progress) => {
-          await handleNotification(notification, source);
+          await handleLegacyNotification(notification, source);
           onNotificationStreamProgress(progress);
         },
         handleMissedNotifications,
-        abortHandler,
       );
-      this.logger.info('Finished processing notifications', results);
 
-      if (abortHandler.signal.aborted) {
-        this.logger.warn('Ending connection process as websocket was closed');
-        return;
-      }
-      onConnectionStateChanged(ConnectionState.LIVE);
-      // We can now unlock the websocket and let the new messages being handled and decrypted
-      this.apiClient.transport.ws.unlock();
+      this.logger.info('Finished processing notifications from the legacy endpoint', results);
+
       // We need to wait for the notification stream to be fully handled before releasing the message sending queue.
       // This is due to the nature of how message are encrypted, any change in mls epoch needs to happen before we start encrypting any kind of messages
       this.logger.info(`Resuming message sending. ${getQueueLength()} messages to be sent`);
       resumeMessageSending();
       resumeRejoiningMLSConversations();
+      onConnectionStateChanged(ConnectionState.LIVE);
     };
+  }
 
-    this.apiClient.connect(processNotificationStream);
+  /**
+   * Sets up WebSocket event listeners for:
+   * - Incoming backend messages
+   * - WebSocket state changes
+   * On each new backend message, we pass it to the  notification handler.
+   * On state changes, we map raw socket states to public connection states and emit them.
+   */
+  private setupWebSocketListeners(
+    handleNotification: (notification: ConsumableNotification, source: NotificationSource) => Promise<void>,
+    onConnectionStateChanged: (state: ConnectionState) => void,
+  ) {
+    this.apiClient.transport.ws.removeAllListeners(WebSocketClient.TOPIC.ON_MESSAGE);
 
-    return () => {
-      this.apiClient.disconnect();
-      onConnectionStateChanged(ConnectionState.CLOSED);
-      this.apiClient.transport.ws.removeAllListeners();
-    };
+    this.apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_MESSAGE, notification =>
+      handleNotification(notification, NotificationSource.WEBSOCKET),
+    );
+
+    this.apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_STATE_CHANGE, wsState => {
+      const mapping: Partial<Record<WEBSOCKET_STATE, ConnectionState>> = {
+        [WEBSOCKET_STATE.CLOSED]: ConnectionState.CLOSED,
+        [WEBSOCKET_STATE.CONNECTING]: ConnectionState.CONNECTING,
+      };
+
+      const connectionState = mapping[wsState];
+      if (connectionState) {
+        onConnectionStateChanged(connectionState);
+      }
+    });
+  }
+
+  /**
+   * Handles logic for reacting to a missed notification event.
+   *
+   * The backend sends a special "missed notification" signal if it detects
+   * that the client has missed one or more notifications. Once this signal is sent,
+   * the backend will **stop sending all further notifications** until the client
+   * acknowledges the missed state.
+   *
+   * Because our app currently lacks functionality to perform a full real-time sync
+   * while running, we must reload the application to re-fetch the entire state.
+   *
+   * On first detection of the missed notification:
+   * - We set a local storage flag (`has_missing_notification`) to mark that we've
+   *   entered this state.
+   * - We reload the application so the state can be re-fetched from scratch.
+   *
+   * On the next load:
+   * - If the flag is already present, we acknowledge the missed notification via
+   * the WebSocket transport, unblocking the backend so it resumes sending updates
+   * then we remove the flag.
+   */
+  private reactToMissedNotification() {
+    const localStorageKey = 'has_missing_notification';
+
+    // First-time handling: set flag and reload to trigger full re-fetch of state.
+    if (!AccountLocalStorageStore.has(localStorageKey)) {
+      AccountLocalStorageStore.add(localStorageKey, 'true');
+      window.location.reload();
+      return;
+    }
+
+    // After reload: acknowledge the missed notification so backend resumes notifications.
+    this.apiClient.transport.ws.acknowledgeMissedNotification();
+    AccountLocalStorageStore.remove(localStorageKey);
+  }
+
+  public getClientCapabilities() {
+    return this.currentClient?.capabilities || [];
+  }
+
+  public checkIsConsumable(
+    notification: Notification | ConsumableNotification,
+  ): notification is ConsumableNotification {
+    return 'type' in notification;
   }
 
   private generateDbName(context: Context) {
