@@ -63,8 +63,6 @@ jobs:
             🧪 **Playwright Test Summary**
             🔗 [Download Full Report Artifact](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
 
-            ```markdown
             ${{ steps.generate_comment.outputs.comment }}
-            ```
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
