@@ -77,98 +77,169 @@ export class PageManager {
 
   private _singleSignOnPage!: SingleSignOnPage;
   get singleSignOnPage(): SingleSignOnPage {
-    return (this._singleSignOnPage ??= new SingleSignOnPage(this.page));
+    if (!this._singleSignOnPage) {
+      this._singleSignOnPage = new SingleSignOnPage(this.page);
+    }
+    return this._singleSignOnPage;
   }
 
   private _loginPage!: LoginPage;
   get loginPage(): LoginPage {
-    return (this._loginPage ??= new LoginPage(this.page));
+    if (!this._loginPage) {
+      this._loginPage = new LoginPage(this.page);
+    }
+    return this._loginPage;
   }
 
   private _dataShareConsentModal!: DataShareConsentModal;
   get dataShareConsentModal(): DataShareConsentModal {
-    return (this._dataShareConsentModal ??= new DataShareConsentModal(this.page));
+    if (!this._dataShareConsentModal) {
+      this._dataShareConsentModal = new DataShareConsentModal(this.page);
+    }
+    return this._dataShareConsentModal;
   }
 
   private _conversationSidebar!: ConversationSidebar;
   get conversationSidebar(): ConversationSidebar {
-    return (this._conversationSidebar ??= new ConversationSidebar(this.page));
+    if (!this._conversationSidebar) {
+      this._conversationSidebar = new ConversationSidebar(this.page);
+    }
+    return this._conversationSidebar;
   }
 
   private _appLockModal!: AppLockModal;
   get appLockModal(): AppLockModal {
-    return (this._appLockModal ??= new AppLockModal(this.page));
+    if (!this._appLockModal) {
+      this._appLockModal = new AppLockModal(this.page);
+    }
+    return this._appLockModal;
   }
 
   private _conversationListPage!: ConversationListPage;
   get conversationListPage(): ConversationListPage {
-    return (this._conversationListPage ??= new ConversationListPage(this.page));
+    if (!this._conversationListPage) {
+      this._conversationListPage = new ConversationListPage(this.page);
+    }
+    return this._conversationListPage;
   }
 
   private _accountPage!: AccountPage;
   get accountPage(): AccountPage {
-    return (this._accountPage ??= new AccountPage(this.page));
+    if (!this._accountPage) {
+      this._accountPage = new AccountPage(this.page);
+    }
+    return this._accountPage;
   }
 
   private _welcomePage!: WelcomePage;
   get welcomePage(): WelcomePage {
-    return (this._welcomePage ??= new WelcomePage(this.page));
+    if (!this._welcomePage) {
+      this._welcomePage = new WelcomePage(this.page);
+    }
+    return this._welcomePage;
   }
 
   private _registrationPage!: RegistrationPage;
   get registrationPage(): RegistrationPage {
-    return (this._registrationPage ??= new RegistrationPage(this.page));
+    if (!this._registrationPage) {
+      this._registrationPage = new RegistrationPage(this.page);
+    }
+    return this._registrationPage;
   }
 
   private _verificationPage!: EmailVerificationPage;
   get verificationPage(): EmailVerificationPage {
-    return (this._verificationPage ??= new EmailVerificationPage(this.page));
+    if (!this._verificationPage) {
+      this._verificationPage = new EmailVerificationPage(this.page);
+    }
+    return this._verificationPage;
   }
+
   private _marketingConsentModal!: MarketingConsentModal;
   get marketingConsentModal(): MarketingConsentModal {
-    return (this._marketingConsentModal ??= new MarketingConsentModal(this.page));
+    if (!this._marketingConsentModal) {
+      this._marketingConsentModal = new MarketingConsentModal(this.page);
+    }
+    return this._marketingConsentModal;
   }
+
   private _setUsernamePage!: SetUsernamePage;
   get setUsernamePage(): SetUsernamePage {
-    return (this._setUsernamePage ??= new SetUsernamePage(this.page));
+    if (!this._setUsernamePage) {
+      this._setUsernamePage = new SetUsernamePage(this.page);
+    }
+    return this._setUsernamePage;
   }
+
   private _startUIPage!: StartUIPage;
   get startUIPage(): StartUIPage {
-    return (this._startUIPage ??= new StartUIPage(this.page));
+    if (!this._startUIPage) {
+      this._startUIPage = new StartUIPage(this.page);
+    }
+    return this._startUIPage;
   }
+
   private _userProfileModal!: UserProfileModal;
   get userProfileModal(): UserProfileModal {
-    return (this._userProfileModal ??= new UserProfileModal(this.page));
+    if (!this._userProfileModal) {
+      this._userProfileModal = new UserProfileModal(this.page);
+    }
+    return this._userProfileModal;
   }
+
   private _outgoingConnectionPage!: OutgoingConnectionPage;
   get outgoingConnectionPage(): OutgoingConnectionPage {
-    return (this._outgoingConnectionPage ??= new OutgoingConnectionPage(this.page));
+    if (!this._outgoingConnectionPage) {
+      this._outgoingConnectionPage = new OutgoingConnectionPage(this.page);
+    }
+    return this._outgoingConnectionPage;
   }
+
   private _blockWarningModal!: BlockWarningModal;
   get blockWarningModal(): BlockWarningModal {
-    return (this._blockWarningModal ??= new BlockWarningModal(this.page));
+    if (!this._blockWarningModal) {
+      this._blockWarningModal = new BlockWarningModal(this.page);
+    }
+    return this._blockWarningModal;
   }
+
   private _deleteAccountModal!: DeleteAccountModal;
   get deleteAccountModal(): DeleteAccountModal {
-    return (this._deleteAccountModal ??= new DeleteAccountModal(this.page));
+    if (!this._deleteAccountModal) {
+      this._deleteAccountModal = new DeleteAccountModal(this.page);
+    }
+    return this._deleteAccountModal;
   }
+
   private _emailVerificationPage!: EmailVerificationPage;
   get emailVerificationPage(): EmailVerificationPage {
-    return (this._emailVerificationPage ??= new EmailVerificationPage(this.page));
+    if (!this._emailVerificationPage) {
+      this._emailVerificationPage = new EmailVerificationPage(this.page);
+    }
+    return this._emailVerificationPage;
   }
 
   private _conversationPage!: ConversationPage;
   get conversationPage(): ConversationPage {
-    return (this._conversationPage ??= new ConversationPage(this.page));
+    if (!this._conversationPage) {
+      this._conversationPage = new ConversationPage(this.page);
+    }
+    return this._conversationPage;
   }
 
   private _deleteAccountPage!: DeleteAccountPage;
   get deleteAccountPage(): DeleteAccountPage {
-    return (this._deleteAccountPage ??= new DeleteAccountPage(this.page));
+    if (!this._deleteAccountPage) {
+      this._deleteAccountPage = new DeleteAccountPage(this.page);
+    }
+    return this._deleteAccountPage;
   }
 
   private _groupCreationPage!: GroupCreationPage;
   get groupCreationPage(): GroupCreationPage {
-    return (this._groupCreationPage ??= new GroupCreationPage(this.page));
+    if (!this._groupCreationPage) {
+      this._groupCreationPage = new GroupCreationPage(this.page);
+    }
+    return this._groupCreationPage;
   }
 }
