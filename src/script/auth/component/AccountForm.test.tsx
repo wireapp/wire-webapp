@@ -32,7 +32,7 @@ describe('when entering account data', () => {
   const emailInput = () => wrapper.getByTestId('enter-email') as HTMLInputElement;
   const passwordInput = () => wrapper.getByTestId('enter-password') as HTMLInputElement;
   const doNextButton = () => wrapper.getByTestId('do-next') as HTMLButtonElement;
-  const doTermsCheckbox = () => wrapper.getByTestId('do-terms') as HTMLInputElement;
+  const doTermsCheckbox = () => wrapper.getByTestId('do-accept-terms') as HTMLInputElement;
   const validationErrorMessage = () => wrapper.getByTestId('error-message');
 
   describe('the submit button', () => {

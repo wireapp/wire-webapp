@@ -40,6 +40,13 @@ import {ValidationError} from '../module/action/ValidationError';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as AccentColor from '../util/AccentColor';
+import {
+  EventName,
+  initializeTelemetry,
+  resetTelemetrySession,
+  Segmentation,
+  trackTelemetryEvent,
+} from '../util/trackingUtil';
 
 const logger = getLogger('AccountForm');
 
@@ -63,14 +70,18 @@ const AccountFormComponent = ({
     name: account.name,
     password: account.password,
     termsAccepted: account.termsAccepted,
+    privacyPolicyAccepted: account.privacyPolicyAccepted,
     confirmPassword: account.password,
   });
+
+  const [hasMultiplePasswordEntries, setHasMultiplePasswordEntries] = useState(false);
 
   const [validInputs, setValidInputs] = useState<Record<string, boolean>>({
     email: true,
     name: true,
     password: true,
     confirmPassword: true,
+    privacyPolicy: true,
     terms: true,
   });
 
@@ -82,6 +93,7 @@ const AccountFormComponent = ({
     password: useRef<HTMLInputElement | null>(null),
     confirmPassword: useRef<HTMLInputElement | null>(null),
     terms: useRef<HTMLInputElement | null>(null),
+    privacyPolicy: useRef<HTMLInputElement | null>(null),
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -103,6 +115,9 @@ const AccountFormComponent = ({
 
           if (validationError) {
             errors.push(validationError);
+            if (inputKey === 'password') {
+              setHasMultiplePasswordEntries(true);
+            }
           }
         }
         newValidInputs[inputKey] = currentInputNode.validity.valid;
@@ -119,6 +134,15 @@ const AccountFormComponent = ({
       await (beforeSubmit && beforeSubmit());
       await pushAccountRegistrationData({...registrationData});
       await doSendActivationCode(registrationData.email);
+
+      if (registrationData.privacyPolicyAccepted) {
+        initializeTelemetry();
+        trackTelemetryEvent(EventName.ACCOUNT_SETUP_SCREEN_1, {
+          [Segmentation.MULTIPLE_PASSWORD_TRIES]: hasMultiplePasswordEntries,
+        });
+      } else {
+        resetTelemetrySession();
+      }
 
       return onSubmit();
     } catch (error) {
@@ -261,29 +285,50 @@ const AccountFormComponent = ({
           setValidInputs({...validInputs, terms: true});
         }}
         markInvalid={!validInputs.terms}
-        aligncenter
-        name="accept"
-        id="accept"
+        name="accept-terms"
+        id="accept-terms"
         required
         checked={registrationData.termsAccepted}
-        data-uie-name="do-terms"
+        data-uie-name="do-accept-terms"
       >
-        <CheckboxLabel htmlFor="accept" css={styles.checkboxLabel}>
+        <CheckboxLabel htmlFor="accept-terms" css={styles.checkboxLabel}>
           <FormattedMessage
-            id="accountForm.termsAndPrivacyPolicy"
+            id="accountForm.termsAndConditions"
             values={{
-              terms: (...chunks: string[] | React.ReactNode[]) => (
+              termsAndConditionsLink: (
                 <a
                   target="_blank"
                   rel="noopener noreferrer"
-                  data-uie-name="go-terms"
+                  data-uie-name="go-terms-and-conditions"
                   href={Config.getConfig().URL.TERMS_OF_USE_PERSONAL}
                   css={styles.checkboxLink}
                 >
-                  {chunks}
+                  {t('accountForm.termsAndConditionsLink')}
                 </a>
               ),
-              privacypolicy: (...chunks: string[] | React.ReactNode[]) => (
+            }}
+          />
+        </CheckboxLabel>
+      </Checkbox>
+
+      <Checkbox
+        ref={inputs.privacyPolicy}
+        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+          inputs.privacyPolicy.current?.setCustomValidity('');
+          setRegistrationData({...registrationData, privacyPolicyAccepted: event.target.checked});
+          setValidInputs({...validInputs, privacyPolicy: true});
+        }}
+        markInvalid={!validInputs.privacyPolicy}
+        name="accept-privacy-policy"
+        id="accept-privacy-policy"
+        checked={registrationData.privacyPolicyAccepted}
+        data-uie-name="do-accept-privacy-policy"
+      >
+        <CheckboxLabel htmlFor="accept-privacy-policy" css={styles.checkboxLabel}>
+          <FormattedMessage
+            id="accountForm.privacyPolicy"
+            values={{
+              privacyPolicyLink: (
                 <a
                   target="_blank"
                   rel="noopener noreferrer"
@@ -291,7 +336,7 @@ const AccountFormComponent = ({
                   href={Config.getConfig().URL.PRIVACY_POLICY}
                   css={styles.checkboxLink}
                 >
-                  {chunks}
+                  {t('accountForm.privacyPolicyLink')}
                 </a>
               ),
             }}
