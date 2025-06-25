@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [27.67.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.67.0...@wireapp/api-client@27.67.1) (2025-06-25)
+
+### Bug Fixes
+
+* **api-client/cells:** searchNodes tags ([#7089](https://github.com/wireapp/wire-web-packages/issues/7089)) ([23e153f](https://github.com/wireapp/wire-web-packages/commit/23e153f2a8b53365f755ed91de3fff82e6730651))
+
 # [27.67.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.66.0...@wireapp/api-client@27.67.0) (2025-06-24)
 
 ### Features
