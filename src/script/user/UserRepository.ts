@@ -645,7 +645,6 @@ export class UserRepository extends TypedEventEmitter<Events> {
    */
   private async fetchUsers(userIds: QualifiedId[]): Promise<User[]> {
     const {found, failed} = await this.fetchRawUsers(userIds, this.userState.self().domain);
-    console.log('found', found);
     const dbUsers = await this.userService.loadUsersFromDb();
     const users = this.mapUserResponse(found, failed, dbUsers);
 
