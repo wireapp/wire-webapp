@@ -19,16 +19,23 @@
 
 import {useCallback, useEffect, useRef, useState} from 'react';
 
+import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {parseQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 import {useDebouncedCallback} from 'use-debounce';
 
 import {CellsRepository} from 'src/script/cells/CellsRepository';
+import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
+import {UserRepository} from 'src/script/user/UserRepository';
 
+import {getUserQualifiedIdFromNode} from '../common/getUserQualifiedIdFromNode/getUserQualifiedIdFromNode';
 import {useCellsStore, Status} from '../common/useCellsStore/useCellsStore';
 import {transformCellsNodes} from '../transformCellsNodes/transformCellsNodes';
 import {transformCellsPagination} from '../transformCellsPagination/transformCellsPagination';
 
 interface UseSearchCellsNodesProps {
   cellsRepository: CellsRepository;
+  userRepository: UserRepository;
+  conversationRepository: ConversationRepository;
 }
 
 const PAGE_INITIAL_SIZE = 30;
@@ -36,7 +43,11 @@ const PAGE_SIZE_INCREMENT = 20;
 const DEBOUNCE_TIME = 300;
 const FETCH_ALL_QUERY = '*';
 
-export const useSearchCellsNodes = ({cellsRepository}: UseSearchCellsNodesProps) => {
+export const useSearchCellsNodes = ({
+  cellsRepository,
+  userRepository,
+  conversationRepository,
+}: UseSearchCellsNodesProps) => {
   const {setNodes, setStatus, setPagination, clearAll, filters} = useCellsStore();
 
   const [searchValue, setSearchValue] = useState('');
@@ -49,7 +60,9 @@ export const useSearchCellsNodes = ({cellsRepository}: UseSearchCellsNodesProps)
     async ({query, status, limit = pageSize}: {query: string; status: Status; limit?: number}) => {
       try {
         setStatus(status);
+
         const shouldSort = !query || query === FETCH_ALL_QUERY;
+
         const result = await cellsRepository.searchNodes({
           query,
           limit,
@@ -57,7 +70,24 @@ export const useSearchCellsNodes = ({cellsRepository}: UseSearchCellsNodesProps)
           sortBy: shouldSort ? 'mtime' : undefined,
           sortDirection: shouldSort ? 'desc' : undefined,
         });
-        setNodes(transformCellsNodes(result.Nodes || []));
+
+        const users = await userRepository.getUsersById(
+          result.Nodes?.map(node => getUserQualifiedIdFromNode(node)).filter(Boolean) as QualifiedId[],
+        );
+
+        const conversations = await Promise.all(
+          result.Nodes?.map(node =>
+            conversationRepository.getConversationById(parseQualifiedId(node.ContextWorkspace?.Uuid || '')),
+          ),
+        );
+
+        const transformedNodes = transformCellsNodes({
+          nodes: result.Nodes || [],
+          users,
+          conversations,
+        });
+
+        setNodes(transformedNodes);
         if (result.Pagination) {
           setPagination(transformCellsPagination(result.Pagination));
         } else {

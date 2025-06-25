@@ -1,0 +1,57 @@
+/*
+ * Wire
+ * Copyright (C) 2025 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conversation/';
+
+import {GroupAvatar} from 'Components/Avatar';
+import {ChannelAvatar} from 'Components/Avatar/ChannelAvatar';
+import {Conversation} from 'src/script/entity/Conversation';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
+
+import {avatarWrapperStyles, textStyles, wrapperStyles} from './CellsConversationColumn.styles';
+
+interface CellsConversationColumnProps {
+  conversation?: Conversation;
+}
+
+export const CellsConversationColumn = ({conversation}: CellsConversationColumnProps) => {
+  const {isChannel, isGroupOrChannel} = useKoSubscribableChildren(conversation!, ['isChannel', 'isGroupOrChannel']);
+  const {isChannelsEnabled} = useChannelsFeatureFlag();
+
+  if (!isGroupOrChannel) {
+    return <span css={textStyles}>{conversation!.name()}</span>;
+  }
+
+  return (
+    <div css={wrapperStyles}>
+      <div css={avatarWrapperStyles}>
+        {isChannel && isChannelsEnabled ? (
+          <ChannelAvatar
+            conversationID={conversation!.id}
+            isLocked={!conversation!.accessModes?.includes(CONVERSATION_ACCESS.LINK)}
+          />
+        ) : (
+          <GroupAvatar conversationID={conversation!.id} />
+        )}
+      </div>
+      <span css={textStyles}>{conversation!.name()}</span>
+    </div>
+  );
+};
