@@ -207,7 +207,6 @@ const AccountFormComponent = ({
           maxLength={64}
           minLength={2}
           pattern=".{2,64}"
-          required
           data-uie-name="enter-name"
         />
 
@@ -228,7 +227,6 @@ const AccountFormComponent = ({
           onKeyDown={event => handleEnterDown(event, () => inputs.password.current?.focus())}
           maxLength={128}
           type="email"
-          required
           data-uie-name="enter-email"
         />
 
@@ -248,7 +246,6 @@ const AccountFormComponent = ({
           type="password"
           placeholder={t('accountForm.passwordPlaceholder')}
           pattern={ValidationUtil.getNewPasswordPattern(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH)}
-          required
           data-uie-name="enter-password"
         />
         <Text muted css={styles.passwordInfo(!!validationErrors.length)} data-uie-name="element-password-help">
@@ -270,7 +267,6 @@ const AccountFormComponent = ({
           type="password"
           placeholder={t('accountForm.confirmPasswordPlaceholder')}
           pattern={`^${registrationData.password?.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`}
-          required
           data-uie-name="enter-confirm-password"
         />
 
@@ -287,7 +283,6 @@ const AccountFormComponent = ({
         markInvalid={!validInputs.terms}
         name="accept-terms"
         id="accept-terms"
-        required
         checked={registrationData.termsAccepted}
         data-uie-name="do-accept-terms"
       >
