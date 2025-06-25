@@ -369,7 +369,7 @@ export class CellsAPI {
         Status: {
           Deleted: deleted ? 'Only' : 'Not',
         },
-        Metadata: tags?.length ? [{Namespace: USER_META_TAGS_NAMESPACE, Term: tags.join(',')}] : [],
+        Metadata: tags?.length ? [{Namespace: USER_META_TAGS_NAMESPACE, Term: this.transformTagsToJson(tags)}] : [],
       },
       Flags: ['WithPreSignedURLs'],
       Limit: `${limit}`,
@@ -497,11 +497,15 @@ export class CellsAPI {
       MetaUpdates: [
         {
           Operation: tags.length > 0 ? 'PUT' : 'DELETE',
-          UserMeta: {Namespace: USER_META_TAGS_NAMESPACE, JsonValue: JSON.stringify(tags.join(','))},
+          UserMeta: {Namespace: USER_META_TAGS_NAMESPACE, JsonValue: this.transformTagsToJson(tags)},
         },
       ],
     });
 
     return result.data;
+  }
+
+  private transformTagsToJson(tags: string[]): string {
+    return JSON.stringify(tags.join(','));
   }
 }
