@@ -1555,7 +1555,7 @@ describe('CellsAPI', () => {
           Status: {
             Deleted: 'Not',
           },
-          Metadata: [{Namespace: 'usermeta-tags', Term: tags.join(',')}],
+          Metadata: [{Namespace: 'usermeta-tags', Term: JSON.stringify(tags.join(','))}],
         },
         Flags: ['WithPreSignedURLs'],
         Limit: '10',
