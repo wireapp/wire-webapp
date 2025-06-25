@@ -19,7 +19,7 @@
 
 import {useEffect, useRef} from 'react';
 
-export const useInputAutoFocus = ({enabled}: {enabled: boolean}) => {
+export const useInputAutoFocus = ({enabled = true, delayMs = 1}: {enabled?: boolean; delayMs?: number}) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -30,12 +30,12 @@ export const useInputAutoFocus = ({enabled}: {enabled: boolean}) => {
     // Ensure the input is fully rendered
     const timeoutId = setTimeout(() => {
       inputRef.current?.focus();
-    });
+    }, delayMs);
 
     return () => {
       clearTimeout(timeoutId);
     };
-  }, [enabled]);
+  }, [enabled, delayMs]);
 
   return {
     inputRef,
