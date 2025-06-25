@@ -17,26 +17,15 @@
  *
  */
 
-import {test as baseTest} from '@playwright/test';
+export class Service {
+  constructor(
+    public providerId: string,
+    public serviceId: string,
+  ) {}
+}
 
-import {ApiManagerE2E} from './backend/apiManager.e2e';
-import {PageManager} from './pages/pageManager';
-
-// Define custom test type with axios fixture
-type Fixtures = {
-  api: ApiManagerE2E;
-  pages: PageManager;
+export const Services = {
+  POLL_SERVICE: new Service('d1e52fa0-46bc-46fa-acc1-95bd91735de1', '40085205-4499-4cd7-a093-ca7d3c1d8b21'),
+  ECHO_SERVICE: new Service('d64af9ae-e0c5-4ce6-b38a-02fd9363b54c', 'd693bd64-79ae-4970-ad12-4df49cfe4038'),
+  TRACKER_SERVICE: new Service('d64af9ae-e0c5-4ce6-b38a-02fd9363b54c', '7ba4aac9-1bbb-41bd-b782-b57157665157'),
 };
-
-export const test = baseTest.extend<Fixtures>({
-  api: async ({request}, use) => {
-    // Create a new instance of ApiManager for each test
-    await use(new ApiManagerE2E());
-  },
-  pages: async ({page}, use) => {
-    // Create a new instance of PageManager for each test
-    await use(new PageManager(page));
-  },
-});
-
-export {expect} from '@playwright/test';

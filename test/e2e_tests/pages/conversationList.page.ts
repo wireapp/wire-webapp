@@ -25,20 +25,21 @@ export class ConversationListPage {
   readonly page: Page;
 
   readonly blockConversationMenuButton: Locator;
+  readonly createGroupButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
 
     this.blockConversationMenuButton = page.locator('#btn-block[data-uie-name="conversation-list-options-menu"]');
+    this.createGroupButton = page.locator(
+      '[data-uie-name="conversation-list-header"] [data-uie-name="go-create-group"]',
+    );
   }
 
   async isConversationItemVisible(conversationName: string) {
     const conversation = this.getConversationLocator(conversationName);
+    await conversation.waitFor({state: 'visible'});
     return await conversation.isVisible();
-  }
-
-  async isConversationVisible(conversationName: string) {
-    return await this.getConversationLocator(conversationName).isVisible();
   }
 
   async isConversationBlocked(conversationName: string) {
@@ -56,6 +57,10 @@ export class ConversationListPage {
 
   async clickBlockConversation() {
     await this.blockConversationMenuButton.click();
+  }
+
+  async clickCreateGroup() {
+    await this.createGroupButton.click();
   }
 
   private getConversationLocator(conversationName: string) {

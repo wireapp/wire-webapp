@@ -17,7 +17,7 @@
  *
  */
 
-import type {RegisteredClient, QualifiedUserClientMap, ClientCapabilityData} from '@wireapp/api-client/lib/client';
+import type {RegisteredClient, QualifiedUserClientMap} from '@wireapp/api-client/lib/client';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
@@ -50,17 +50,6 @@ export class ClientService {
    */
   deleteClient(clientId: string, password: string): Promise<void> {
     return this.apiClient.api.client.deleteClient(clientId, password);
-  }
-
-  /**
-   * Updates capabilities of a client.
-   *
-   * @param clientId ID of client to be updated
-   * @param clientCapabilities New capabilities of the client
-   * @returns Resolves once the update of the client is complete
-   */
-  putClientCapabilities(clientId: string, clientCapabilities: ClientCapabilityData): Promise<void> {
-    return this.apiClient.api.client.putClient(clientId, clientCapabilities);
   }
 
   /**
