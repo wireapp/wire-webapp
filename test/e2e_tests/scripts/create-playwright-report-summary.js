@@ -50,7 +50,7 @@ for (const suite of report.suites) {
         }
       }
 
-      // Mark as flaky if it passed after retries
+      // Test is flaky if it passed after retries
       if (hasRetries && hasPassed) {
         const retryDetails = test.results
           .map((result, index) => {
@@ -65,15 +65,18 @@ for (const suite of report.suites) {
           })
           .join('\n\n---\n\n');
 
-        flakyTests.push(`- ⚠️ **${title}**
-📂 \`${specLocation}\`
-🔁 Retries: ${retries}
-
-${retryDetails}`);
+        flakyTests.push(
+          `<details> \n <summary> ⚠️ ${title} </summary><br> \n\n  Location: **${specLocation}**\n Retries: **${retries}**\n\n${retryDetails}\n</details>`,
+        );
       }
     }
   }
 }
+
+const minutes = Math.floor(totalDuration / 60000);
+const totalSeconds = Math.round((totalDuration % 60000) / 1000);
+const seconds = totalSeconds % 60;
+const formattedTime = `~ ${minutes} min ${seconds} sec`;
 
 const summary = `
 ### 🧪 Playwright Test Summary
@@ -83,13 +86,13 @@ const summary = `
 - ⏭ **Skipped:** ${skipped}
 - 🔁 **Flaky:** ${flaky}
 - 📊 **Total:** ${total}
-- ⏱ **Total Runtime:** ${totalDuration}ms (~${(totalDuration / 1000).toFixed(1)}s)
+- ⏱ **Total Runtime:** ${(totalDuration / 1000).toFixed(1)}s (${formattedTime})
 
 ${failures.length > 0 ? `### ❗ **Failures** \n\n ${failures.join('\n\n')}` : '🎉 All tests passed!'}
 
 ${
   flakyTests.length > 0
-    ? `\n---\n\n#### ⚠️ **Flaky Tests**
+    ? `\n---\n\n### ⚠️ **Flaky Tests**
 ${flakyTests.join('\n\n')}`
     : ''
 }
