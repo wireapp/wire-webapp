@@ -26,7 +26,7 @@ import * as telemetry from '@wireapp/telemetry';
 import {Config} from 'src/script/Config';
 import {createUuid} from 'Util/uuid';
 
-import * as trackingUtil from './trackingUtil';
+import * as trackingUtil from '../trackingUtil';
 
 const REPORTING_DEVICE_ID = 'REPORTING_DEVICE_ID';
 const MOCK_UUID = 'mock-uuid';

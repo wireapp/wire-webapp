@@ -43,6 +43,7 @@ import * as AccentColor from '../util/AccentColor';
 import {
   EventName,
   initializeTelemetry,
+  isTelemetryEnabled,
   resetTelemetrySession,
   Segmentation,
   trackTelemetryEvent,
@@ -306,38 +307,40 @@ const AccountFormComponent = ({
         </CheckboxLabel>
       </Checkbox>
 
-      <Checkbox
-        ref={inputs.privacyPolicy}
-        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-          inputs.privacyPolicy.current?.setCustomValidity('');
-          setRegistrationData({...registrationData, privacyPolicyAccepted: event.target.checked});
-          setValidInputs({...validInputs, privacyPolicy: true});
-        }}
-        markInvalid={!validInputs.privacyPolicy}
-        name="accept-privacy-policy"
-        id="accept-privacy-policy"
-        checked={registrationData.privacyPolicyAccepted}
-        data-uie-name="do-accept-privacy-policy"
-      >
-        <CheckboxLabel htmlFor="accept-privacy-policy" css={styles.checkboxLabel}>
-          <FormattedMessage
-            id="accountForm.privacyPolicy"
-            values={{
-              privacyPolicyLink: (
-                <a
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  data-uie-name="go-privacy-policy"
-                  href={Config.getConfig().URL.PRIVACY_POLICY}
-                  css={styles.checkboxLink}
-                >
-                  {t('accountForm.privacyPolicyLink')}
-                </a>
-              ),
-            }}
-          />
-        </CheckboxLabel>
-      </Checkbox>
+      {isTelemetryEnabled() && (
+        <Checkbox
+          ref={inputs.privacyPolicy}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            inputs.privacyPolicy.current?.setCustomValidity('');
+            setRegistrationData({...registrationData, privacyPolicyAccepted: event.target.checked});
+            setValidInputs({...validInputs, privacyPolicy: true});
+          }}
+          markInvalid={!validInputs.privacyPolicy}
+          name="accept-privacy-policy"
+          id="accept-privacy-policy"
+          checked={registrationData.privacyPolicyAccepted}
+          data-uie-name="do-accept-privacy-policy"
+        >
+          <CheckboxLabel htmlFor="accept-privacy-policy" css={styles.checkboxLabel}>
+            <FormattedMessage
+              id="accountForm.privacyPolicy"
+              values={{
+                privacyPolicyLink: (
+                  <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-uie-name="go-privacy-policy"
+                    href={Config.getConfig().URL.PRIVACY_POLICY}
+                    css={styles.checkboxLink}
+                  >
+                    {t('accountForm.privacyPolicyLink')}
+                  </a>
+                ),
+              }}
+            />
+          </CheckboxLabel>
+        </Checkbox>
+      )}
 
       <Button
         disabled={isSubmitDisabled}
