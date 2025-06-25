@@ -761,7 +761,6 @@ export class Account extends TypedEventEmitter<Events> {
             data: {count},
           } = notification;
 
-          onNotificationStreamProgress({total: count, done: 0});
           this.totalPendingNotifications = count;
           this.remainingNotifications = 0;
           this.apiClient.transport.ws.acknowledgeMessageCountNotification();
@@ -772,6 +771,8 @@ export class Account extends TypedEventEmitter<Events> {
           if (count === 0) {
             resumeMessageSending();
             onConnectionStateChanged(ConnectionState.LIVE);
+          } else {
+            onNotificationStreamProgress({total: count, done: 0});
           }
 
           return;
@@ -795,7 +796,7 @@ export class Account extends TypedEventEmitter<Events> {
         }
 
         if (
-          this.totalPendingNotifications === this.remainingNotifications &&
+          this.totalPendingNotifications >= this.remainingNotifications &&
           this.connectionState !== ConnectionState.LIVE
         ) {
           resumeMessageSending();
