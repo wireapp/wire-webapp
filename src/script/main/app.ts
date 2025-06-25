@@ -465,7 +465,6 @@ export class App {
       } catch (error) {
         console.warn('Failed to initialize client', {error});
         this.showForceLogoutModal(SIGN_OUT_REASON.CLIENT_REMOVED);
-        return;
       }
 
       const e2eiHandler = await configureE2EI(teamFeatures);
