@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [46.30.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.30.0...@wireapp/core@46.30.1) (2025-06-25)
+
+### Bug Fixes
+
+* **core:** Do not show decrypting 0 out 0 messages [WPB-17183] ([#7090](https://github.com/wireapp/wire-web-packages/issues/7090)) ([8f828c7](https://github.com/wireapp/wire-web-packages/commit/8f828c7e362029819e86fa7844d916624c7e68fb))
+
 # [46.30.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.29.4...@wireapp/core@46.30.0) (2025-06-24)
 
 ### Features
