@@ -67,7 +67,7 @@ export const Success = () => {
           </TextLink>
 
           <TextLink
-            data-uie-name="do-download-wire"
+            data-uie-name="do-open-wire-web"
             onClick={() => secureOpen(pathWithParams(EXTERNAL_ROUTE.WEBAPP))}
             css={styles.link}
           >
