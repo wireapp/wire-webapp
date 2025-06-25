@@ -24,6 +24,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {UserRepository} from 'src/script/user/UserRepository';
 
+import {getUsersFromNodes} from './getUsersFromNodes';
 import {transformDataToCellsNodes, transformToCellPagination} from './transformDataToCellsNodes';
 
 import {getCellsApiPath} from '../common/getCellsApiPath/getCellsApiPath';
@@ -57,14 +58,7 @@ export const useGetAllCellsNodes = ({
         offset,
       });
 
-      const users = await userRepository.getUsersById([
-        {
-          domain: 'staging.zinfra.io',
-          id: 'bc8bda7a-cc18-4d54-96d8-09e6dff6ee14',
-        },
-      ]);
-
-      console.log('users', users[0].previewPictureResource());
+      const users = await getUsersFromNodes({nodes: result.Nodes, userRepository});
 
       if (!result.Nodes?.length) {
         setStatus('success');
@@ -72,7 +66,7 @@ export const useGetAllCellsNodes = ({
         return;
       }
 
-      const transformedNodes = transformDataToCellsNodes(result.Nodes);
+      const transformedNodes = transformDataToCellsNodes({nodes: result.Nodes, users});
       setNodes({conversationId: id, nodes: transformedNodes});
 
       const pagination = result.Pagination ? transformToCellPagination(result.Pagination) : null;

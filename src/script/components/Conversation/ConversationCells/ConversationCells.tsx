@@ -96,6 +96,7 @@ export const ConversationCells = ({
         conversationName={conversationName}
         cellsRepository={cellsRepository}
       />
+
       {isTableVisible && (
         <CellsTable
           nodes={isLoading ? [] : nodes}
