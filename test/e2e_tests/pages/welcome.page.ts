@@ -23,11 +23,35 @@ export class WelcomePage {
   readonly page: Page;
 
   readonly loginButton: Locator;
+  readonly createAccountButton: Locator;
+  readonly createEnterpriseAccountButton: Locator;
+  readonly createPersonalAccountButton: Locator;
+  readonly logoutReasonText: Locator;
 
   constructor(page: Page) {
     this.page = page;
 
     this.loginButton = page.locator('[data-uie-name="go-login"]');
+    this.createAccountButton = page.locator('[data-uie-name="go-create-account"]');
+    this.createEnterpriseAccountButton = page.locator(
+      '[data-uie-name="select-account-type-button"][variant="primary"]',
+    );
+    this.createPersonalAccountButton = page.locator(
+      '[data-uie-name="select-account-type-button"][variant="secondary"]',
+    );
+    this.logoutReasonText = page.locator('[data-uie-name="status-logout-reason"]');
+  }
+
+  async getLogoutReasonText() {
+    return (await this.logoutReasonText.textContent()) ?? '';
+  }
+
+  async clickCreateAccountButton() {
+    await this.createAccountButton.click();
+  }
+
+  async clickCreatePersonalAccountButton() {
+    await this.createPersonalAccountButton.click();
   }
 
   async clickLogin() {

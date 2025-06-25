@@ -36,3 +36,9 @@ export const isInRecycleBin = () => {
 
   return parts[1]?.includes(RECYCLE_BIN_PATH);
 };
+
+export const getNodeRootParentPath = ({nodePath}: {nodePath: string}) => {
+  const segments = nodePath.split('/');
+  const recycleBinIndex = segments.indexOf(RECYCLE_BIN_PATH);
+  return segments[recycleBinIndex + 1] || '';
+};

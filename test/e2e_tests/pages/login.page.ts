@@ -35,8 +35,8 @@ export class LoginPage {
     this.backButton = page.locator('[data-uie-name="go-index"]');
     this.signInButton = page.locator('[data-uie-name="do-sign-in"]');
     this.loginForm = page.locator('[data-uie-name="login"]');
-    this.emailInput = this.loginForm.locator('[data-uie-name="enter-email"]');
-    this.passwordInput = this.loginForm.locator('[data-uie-name="enter-password"]');
+    this.emailInput = page.locator('[data-uie-name="enter-email"]');
+    this.passwordInput = page.locator('[data-uie-name="enter-password"]');
     this.loginErrorText = page.locator('[data-uie-name="error-message"]');
   }
 

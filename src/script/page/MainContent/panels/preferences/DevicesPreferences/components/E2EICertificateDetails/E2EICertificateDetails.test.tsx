@@ -34,13 +34,14 @@ import {E2EICertificateDetails} from './E2EICertificateDetails';
 const generateIdentity = (status: MLSStatuses, credentialType = CredentialType.X509): WireIdentity => ({
   status,
   x509Identity: {
+    free: jest.fn(),
     certificate: 'certificate',
-    displayName: '',
+    display_name: '',
     domain: '',
     handle: '',
-    notBefore: BigInt(0),
-    notAfter: BigInt(0),
-    serialNumber: '',
+    not_after: BigInt(0),
+    not_before: BigInt(0),
+    serial_number: '',
   },
   credentialType,
   deviceId: '',

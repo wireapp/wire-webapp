@@ -37,9 +37,13 @@ interface CellsConfig {
   };
 }
 
+// Currently, the cells backend doesn't specify the sortable fields (they're dynamic).
+// When backend will specify the exact fields, we'll update this type.
+// The "(string & {})" indicates that all strings are valid, but we get autocomplete for the union values.
+export type SortBy = 'mtime' | (string & {});
+export type SortDirection = 'asc' | 'desc';
+
 const DEFAULT_MAX_FILES_LIMIT = 100;
-const SEARCH_DEFAULT_SORT_FIELD = 'mtime';
-const SEARCH_DEFAULT_SORT_DIR = 'desc';
 
 @singleton()
 export class CellsRepository {
@@ -118,24 +122,32 @@ export class CellsRepository {
     limit = DEFAULT_MAX_FILES_LIMIT,
     offset = 0,
     type,
+    sortBy,
+    sortDirection,
   }: {
     path: string;
     limit?: number;
     offset?: number;
     type?: 'file' | 'folder';
+    sortBy?: SortBy;
+    sortDirection?: SortDirection;
   }) {
     return this.apiClient.api.cells.getAllNodes({
       path: path || this.basePath,
       limit,
       offset,
-      sortBy: SEARCH_DEFAULT_SORT_FIELD,
-      sortDirection: SEARCH_DEFAULT_SORT_DIR,
+      sortBy,
+      sortDirection,
       ...(type ? {type: type === 'file' ? 'LEAF' : 'COLLECTION'} : {}),
     });
   }
 
   async getNode({uuid}: {uuid: string}) {
     return this.apiClient.api.cells.getNode({id: uuid});
+  }
+
+  async lookupNodeByPath({path}: {path: string}) {
+    return this.apiClient.api.cells.lookupNodeByPath({path});
   }
 
   async createFolder({path, name}: {path: string; name: string}) {
@@ -168,12 +180,24 @@ export class CellsRepository {
     return this.apiClient.api.cells.deleteNodePublicLink({uuid});
   }
 
-  async searchNodes({query, limit = DEFAULT_MAX_FILES_LIMIT, tags}: {query: string; limit?: number; tags?: string[]}) {
+  async searchNodes({
+    query,
+    limit = DEFAULT_MAX_FILES_LIMIT,
+    tags,
+    sortBy,
+    sortDirection,
+  }: {
+    query: string;
+    limit?: number;
+    tags?: string[];
+    sortBy?: SortBy;
+    sortDirection?: SortDirection;
+  }) {
     return this.apiClient.api.cells.searchNodes({
       phrase: query,
       limit,
-      sortBy: SEARCH_DEFAULT_SORT_FIELD,
-      sortDirection: SEARCH_DEFAULT_SORT_DIR,
+      sortBy,
+      sortDirection,
       tags,
     });
   }
@@ -184,6 +208,10 @@ export class CellsRepository {
 
   async restoreNode({uuid}: {uuid: string}) {
     return this.apiClient.api.cells.restoreNode({uuid});
+  }
+
+  async renameNode({currentPath, newName}: {currentPath: string; newName: string}) {
+    return this.apiClient.api.cells.renameNode({currentPath, newName});
   }
 
   async getAllTags() {

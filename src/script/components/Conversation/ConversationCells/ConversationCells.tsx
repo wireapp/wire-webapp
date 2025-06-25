@@ -17,6 +17,7 @@
  *
  */
 
+import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
@@ -33,12 +34,14 @@ import {useCellsStore} from './common/useCellsStore/useCellsStore';
 import {wrapperStyles} from './ConversationCells.styles';
 import {useCellsPagination} from './useCellsPagination/useCellsPagination';
 import {useGetAllCellsNodes} from './useGetAllCellsNodes/useGetAllCellsNodes';
+import {useOnPresignedUrlExpired} from './useOnPresignedUrlExpired/useOnPresignedUrlExpired';
 
 interface ConversationCellsProps {
   cellsRepository?: CellsRepository;
   userRepository?: UserRepository;
   conversationQualifiedId: QualifiedId;
   conversationName: string;
+  cellsState: CONVERSATION_CELLS_STATE;
 }
 
 export const ConversationCells = ({
@@ -46,12 +49,20 @@ export const ConversationCells = ({
   userRepository = container.resolve(UserRepository),
   conversationQualifiedId,
   conversationName,
+  cellsState,
 }: ConversationCellsProps) => {
   const {getNodes, status: nodesStatus, getPagination} = useCellsStore();
 
   const conversationId = conversationQualifiedId.id;
+  const isCellsStateReady = cellsState === CONVERSATION_CELLS_STATE.READY;
+  const isCellsStatePending = cellsState === CONVERSATION_CELLS_STATE.PENDING;
 
-  const {refresh, setOffset} = useGetAllCellsNodes({cellsRepository, userRepository, conversationQualifiedId});
+  const {refresh, setOffset} = useGetAllCellsNodes({
+    cellsRepository,
+    conversationQualifiedId,
+    enabled: isCellsStateReady,
+    userRepository,
+  });
 
   const nodes = getNodes({conversationId});
   const pagination = getPagination({conversationId});
@@ -63,12 +74,19 @@ export const ConversationCells = ({
     currentNodesCount: nodes.length,
   });
 
+  useOnPresignedUrlExpired({conversationId, refreshCallback: refresh});
+
   const isLoading = nodesStatus === 'loading';
   const isError = nodesStatus === 'error';
   const isSuccess = nodesStatus === 'success';
-  const hasNodes = !!nodes.length;
 
-  const emptyView = !isError && !hasNodes;
+  const hasNodes = !!nodes.length;
+  const emptyView = !isError && !hasNodes && isCellsStateReady;
+
+  const isTableVisible = (isSuccess || isLoading) && isCellsStateReady;
+  const isLoadingVisible = isLoading && isCellsStateReady;
+  const isNoNodesVisible = !isLoading && emptyView;
+  const isPaginationVisible = !emptyView;
 
   return (
     <div css={wrapperStyles}>
@@ -78,7 +96,7 @@ export const ConversationCells = ({
         conversationName={conversationName}
         cellsRepository={cellsRepository}
       />
-      {(isSuccess || isLoading) && (
+      {isTableVisible && (
         <CellsTable
           nodes={isLoading ? [] : nodes}
           cellsRepository={cellsRepository}
@@ -87,12 +105,15 @@ export const ConversationCells = ({
           onRefresh={refresh}
         />
       )}
-      {!isLoading && emptyView && (
+      {isCellsStatePending && (
+        <CellsStateInfo heading={t('cells.pending.heading')} description={t('cells.pending.description')} />
+      )}
+      {isNoNodesVisible && (
         <CellsStateInfo heading={t('cells.noNodes.heading')} description={t('cells.noNodes.description')} />
       )}
-      {isLoading && <CellsLoader />}
+      {isLoadingVisible && <CellsLoader />}
       {isError && <CellsStateInfo heading={t('cells.error.heading')} description={t('cells.error.description')} />}
-      {!emptyView && <CellsPagination {...getPaginationProps()} goToPage={goToPage} />}
+      {isPaginationVisible && <CellsPagination {...getPaginationProps()} goToPage={goToPage} />}
     </div>
   );
 };

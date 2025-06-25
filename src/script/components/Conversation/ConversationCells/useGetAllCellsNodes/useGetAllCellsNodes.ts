@@ -33,12 +33,14 @@ interface UseGetAllCellsNodesProps {
   cellsRepository: CellsRepository;
   userRepository: UserRepository;
   conversationQualifiedId: QualifiedId;
+  enabled: boolean;
 }
 
 export const useGetAllCellsNodes = ({
   cellsRepository,
   userRepository,
   conversationQualifiedId,
+  enabled,
 }: UseGetAllCellsNodesProps) => {
   const {setNodes, pageSize, setStatus, setPagination, setError, clearAll} = useCellsStore();
   const [offset, setOffset] = useState(0);
@@ -94,8 +96,10 @@ export const useGetAllCellsNodes = ({
   }, [fetchNodes, setOffset, clearAll, id]);
 
   useEffect(() => {
-    void fetchNodes();
-  }, [fetchNodes]);
+    if (enabled) {
+      void fetchNodes();
+    }
+  }, [fetchNodes, enabled]);
 
   useEffect(() => {
     window.addEventListener('hashchange', handleHashChange);
