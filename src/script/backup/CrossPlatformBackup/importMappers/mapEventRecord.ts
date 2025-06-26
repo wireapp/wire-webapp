@@ -105,8 +105,12 @@ const mapMessageContentToCategory = (message: BackupMessage): MessageCategory =>
     return MessageCategory.LOCATION;
   }
   if (isAssetContent(message.content)) {
+    const name = message.content.name;
     const metadata = message.content.metaData;
     if (!metadata) {
+      if (name) {
+        return MessageCategory.FILE;
+      }
       return MessageCategory.UNDEFINED;
     }
     if (isImageContent(metadata)) {
@@ -147,7 +151,7 @@ const mapAssetMessageToEventRecord = (message: AssetBackupMessage): EventRecord 
   data: {
     content_length: message.content.size.toString(),
     content_type: message.content.mimeType.toString(),
-    info: message.content.metaData,
+    info: {...message.content.metaData, name: message.content.name?.toString() ?? null},
     domain: message.content.assetDomain?.toString(),
     key: message.content.assetId?.toString(),
     otr_key: transformArrayToObject(message.content.otrKey),
