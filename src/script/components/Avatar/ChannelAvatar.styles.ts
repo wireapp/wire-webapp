@@ -31,7 +31,7 @@ export const channelAvatarContainerCss = ({border, size}: {border: string; size:
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  overflow: size === 'small' ? 'hidden' : 'auto',
+  overflow: size === 'small' ? 'hidden' : 'visible',
 });
 
 export const channelAvatarIconCss = ({
