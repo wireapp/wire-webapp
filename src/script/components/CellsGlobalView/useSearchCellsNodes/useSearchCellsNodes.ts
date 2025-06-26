@@ -19,7 +19,6 @@
 
 import {useCallback, useEffect, useRef, useState} from 'react';
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {useDebouncedCallback} from 'use-debounce';
 
 import {CellsRepository} from 'src/script/cells/CellsRepository';
@@ -27,8 +26,8 @@ import {ConversationRepository} from 'src/script/conversation/ConversationReposi
 import {UserRepository} from 'src/script/user/UserRepository';
 
 import {getConversationsFromNodes} from './getConversationsFromNodes';
+import {getUsersFromNodes} from './getUsersFromNodes';
 
-import {getUserQualifiedIdFromNode} from '../common/getUserQualifiedIdFromNode/getUserQualifiedIdFromNode';
 import {useCellsStore, Status} from '../common/useCellsStore/useCellsStore';
 import {transformCellsNodes} from '../transformCellsNodes/transformCellsNodes';
 import {transformCellsPagination} from '../transformCellsPagination/transformCellsPagination';
@@ -72,9 +71,10 @@ export const useSearchCellsNodes = ({
           sortDirection: shouldSort ? 'desc' : undefined,
         });
 
-        const users = await userRepository.getUsersById(
-          result.Nodes?.map(node => getUserQualifiedIdFromNode(node)).filter(Boolean) as QualifiedId[],
-        );
+        const users = await getUsersFromNodes({
+          nodes: result.Nodes || [],
+          userRepository,
+        });
 
         const conversations = await getConversationsFromNodes({
           nodes: result.Nodes || [],
