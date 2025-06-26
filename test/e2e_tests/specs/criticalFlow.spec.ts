@@ -19,10 +19,10 @@
 
 import {faker} from '@faker-js/faker';
 
-import {Services} from './data/serviceInfo';
-import {getUser, User} from './data/user';
-import {test, expect} from './test.fixtures';
-import {generateSecurePassword} from './utils/userDataGenerator';
+import {Services} from '../data/serviceInfo';
+import {getUser, User} from '../data/user';
+import {test, expect} from '../test.fixtures';
+import {generateSecurePassword} from '../utils/userDataGenerator';
 
 const createdUsers: User[] = [];
 const createdTeams: Map<User, string> = new Map();

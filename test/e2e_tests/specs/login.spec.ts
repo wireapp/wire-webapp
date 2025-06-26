@@ -17,8 +17,8 @@
  *
  */
 
-import {User, getUser} from './data/user';
-import {test, expect} from './test.fixtures';
+import {User, getUser} from '../data/user';
+import {test, expect} from '../test.fixtures';
 
 const createdUsers: User[] = [];
 

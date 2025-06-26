@@ -37,10 +37,13 @@ import {RegistrationPage} from './registration.page';
 import {SetUsernamePage} from './setUsername.page';
 import {SingleSignOnPage} from './singleSignOn.page';
 import {StartUIPage} from './startUI.page';
+import {TeamLoginPage} from './teamLogin.page';
+import {TeamsPage} from './teams.page';
 import {UserProfileModal} from './userProfile.modal';
 import {WelcomePage} from './welcome.page';
 
 const webAppPath = process.env.WEBAPP_URL ?? '';
+const teamManagementPath = process.env.TEAM_MANAGEMENT_URL ?? '';
 
 export class PageManager {
   constructor(private readonly page: Page) {}
@@ -65,6 +68,12 @@ export class PageManager {
 
   public openMainPage() {
     return this.page.goto(webAppPath, {
+      waitUntil: 'networkidle',
+    });
+  }
+
+  public openTeamManagementPage() {
+    return this.page.goto(teamManagementPath, {
       waitUntil: 'networkidle',
     });
   }
@@ -241,5 +250,21 @@ export class PageManager {
       this._groupCreationPage = new GroupCreationPage(this.page);
     }
     return this._groupCreationPage;
+  }
+
+  private _teamLoginPage!: TeamLoginPage;
+  get teamLoginPage(): TeamLoginPage {
+    if (!this._teamLoginPage) {
+      this._teamLoginPage = new TeamLoginPage(this.page);
+    }
+    return this._teamLoginPage;
+  }
+
+  private _teamsPage!: TeamsPage;
+  get teamsPage(): TeamsPage {
+    if (!this._teamsPage) {
+      this._teamsPage = new TeamsPage(this.page);
+    }
+    return this._teamsPage;
   }
 }
