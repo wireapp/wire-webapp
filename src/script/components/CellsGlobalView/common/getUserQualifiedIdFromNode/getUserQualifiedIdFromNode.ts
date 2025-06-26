@@ -17,27 +17,20 @@
  *
  */
 
-import {MouseEvent as ReactMouseEvent} from 'react';
-
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {parseQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
+import {RestNode} from 'cells-sdk-ts';
 
-import {useSidebarStore, SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
-import {generateConversationUrl} from 'src/script/router/routeGenerator';
-import {createNavigate} from 'src/script/router/routerBindings';
+export const getUserQualifiedIdFromNode = (node: RestNode): QualifiedId | null => {
+  const userQualifiedIdJson = node.UserMetadata?.find(
+    metadata => metadata.Namespace === 'usermeta-owner-uuid',
+  )?.JsonValue;
 
-export const openFolder = ({path, event}: {path: string; event?: ReactMouseEvent<HTMLButtonElement>}) => {
-  const [idWithDomain, ...filePathParts] = path.split('/');
-  const {id, domain} = parseQualifiedId(idWithDomain);
-  const filePath = `files/${filePathParts.join('/')}`;
+  if (!userQualifiedIdJson) {
+    return null;
+  }
 
-  const store = useSidebarStore.getState();
+  const userQualifiedId = JSON.parse(userQualifiedIdJson) as string;
 
-  store.setCurrentTab(SidebarTabs.RECENT);
-  createNavigate(
-    generateConversationUrl({
-      id,
-      domain,
-      filePath,
-    }),
-  )(event);
+  return parseQualifiedId(userQualifiedId);
 };
