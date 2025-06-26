@@ -21,6 +21,7 @@ import {CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conversation/';
 
 import {GroupAvatar} from 'Components/Avatar';
 import {ChannelAvatar} from 'Components/Avatar/ChannelAvatar';
+import {openConversation} from 'Components/CellsGlobalView/common/openConversation/openConversation';
 import {Conversation} from 'src/script/entity/Conversation';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
@@ -28,30 +29,26 @@ import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 import {avatarWrapperStyles, textStyles, wrapperStyles} from './CellsConversationColumn.styles';
 
 interface CellsConversationColumnProps {
-  conversation?: Conversation;
+  conversation: Conversation;
 }
 
 export const CellsConversationColumn = ({conversation}: CellsConversationColumnProps) => {
-  const {isChannel, isGroupOrChannel} = useKoSubscribableChildren(conversation!, ['isChannel', 'isGroupOrChannel']);
+  const {isChannel} = useKoSubscribableChildren(conversation, ['isChannel']);
   const {isChannelsEnabled} = useChannelsFeatureFlag();
 
-  if (!isGroupOrChannel) {
-    return <span css={textStyles}>{conversation!.name()}</span>;
-  }
-
   return (
-    <div css={wrapperStyles}>
+    <button css={wrapperStyles} onClick={() => openConversation(conversation.qualifiedId)}>
       <div css={avatarWrapperStyles}>
         {isChannel && isChannelsEnabled ? (
           <ChannelAvatar
-            conversationID={conversation!.id}
-            isLocked={!conversation!.accessModes?.includes(CONVERSATION_ACCESS.LINK)}
+            conversationID={conversation.id}
+            isLocked={!conversation.accessModes?.includes(CONVERSATION_ACCESS.LINK)}
           />
         ) : (
-          <GroupAvatar conversationID={conversation!.id} size="small" />
+          <GroupAvatar conversationID={conversation.id} size="small" />
         )}
       </div>
-      <span css={textStyles}>{conversation!.name()}</span>
-    </div>
+      <span css={textStyles}>{conversation.name()}</span>
+    </button>
   );
 };

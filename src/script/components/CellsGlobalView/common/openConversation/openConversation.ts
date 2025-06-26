@@ -17,27 +17,14 @@
  *
  */
 
-import {MouseEvent as ReactMouseEvent} from 'react';
-
-import {parseQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {useSidebarStore, SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate} from 'src/script/router/routerBindings';
 
-export const openFolder = ({path, event}: {path: string; event?: ReactMouseEvent<HTMLButtonElement>}) => {
-  const [idWithDomain, ...filePathParts] = path.split('/');
-  const {id, domain} = parseQualifiedId(idWithDomain);
-  const filePath = `files/${filePathParts.join('/')}`;
-
+export const openConversation = (conversationQualifiedId: QualifiedId) => {
   const store = useSidebarStore.getState();
-
   store.setCurrentTab(SidebarTabs.RECENT);
-  createNavigate(
-    generateConversationUrl({
-      id,
-      domain,
-      filePath,
-    }),
-  )(event);
+  createNavigate(generateConversationUrl(conversationQualifiedId))();
 };

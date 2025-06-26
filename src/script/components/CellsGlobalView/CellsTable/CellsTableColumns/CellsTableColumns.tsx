@@ -22,7 +22,7 @@ import {createColumnHelper} from '@tanstack/react-table';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
 
-import {CellsConversationColumn} from './CellsConversationColumn/CellConversationColumn';
+import {CellsConversationColumn} from './CellsConversationColumn/CellsConversationColumn';
 import {CellsTableOwnerColumn} from './CellsOwnerColumn/CellsOwnerColumn';
 import {CellsTableDateColumn} from './CellsTableDateColumn/CellsTableDateColumn';
 import {CellsTableNameColumn} from './CellsTableNameColumn/CellsTableNameColumn';
@@ -41,7 +41,7 @@ export const getCellsTableColumns = ({cellsRepository}: {cellsRepository: CellsR
   }),
   columnHelper.accessor('conversationName', {
     header: t('cells.tableRow.conversationName'),
-    cell: info => <CellsConversationColumn conversation={info.row.original.conversation} />,
+    cell: info => <CellsConversationColumn conversation={info.row.original.conversation!} />,
     size: 190,
   }),
   columnHelper.accessor('owner', {
