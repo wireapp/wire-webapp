@@ -40,7 +40,7 @@ export class RegistrationPage {
     this.passwordInput = page.locator('[data-uie-name="enter-password"]');
     this.confirmPasswordInput = page.locator('[data-uie-name="enter-confirm-password"]');
     this.submitButton = page.locator('[data-uie-name="do-next"]');
-    this.termsCheckbox = page.locator('[data-uie-name="do-terms"]');
+    this.termsCheckbox = page.locator('[data-uie-name="do-accept-terms"]');
   }
 
   async isPasswordPolicyInfoVisible() {

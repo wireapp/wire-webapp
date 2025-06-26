@@ -17,14 +17,26 @@
  *
  */
 
+import {parseQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 import {RestNode} from 'cells-sdk-ts';
 
+import {Conversation} from 'src/script/entity/Conversation';
+import {User} from 'src/script/entity/User';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {formatBytes, getFileExtension} from 'Util/util';
 
 import {CellNode} from '../common/cellNode/cellNode';
+import {getUserQualifiedIdFromNode} from '../common/getUserQualifiedIdFromNode/getUserQualifiedIdFromNode';
 
-export const transformCellsNodes = (nodes: RestNode[]): CellNode[] => {
+export const transformCellsNodes = ({
+  nodes,
+  users,
+  conversations,
+}: {
+  nodes: RestNode[];
+  users: User[];
+  conversations: Conversation[];
+}): CellNode[] => {
   return nodes.map(node => {
     const id = node.Uuid;
     const owner = getOwner(node);
@@ -44,6 +56,12 @@ export const transformCellsNodes = (nodes: RestNode[]): CellNode[] => {
       ? new Date(Number(node.PreSignedGET?.ExpiresAt) * TIME_IN_MILLIS.SECOND)
       : null;
 
+    const conversationQualifiedId = parseQualifiedId(node.ContextWorkspace?.Uuid || '');
+    const conversation = conversations.find(conversation => conversation.qualifiedId.id === conversationQualifiedId.id);
+
+    const userQualifiedId = getUserQualifiedIdFromNode(node);
+    const user = users.find(user => user.qualifiedId.id === userQualifiedId?.id) || null;
+
     if (node.Type === 'COLLECTION') {
       return {
         id,
@@ -58,6 +76,8 @@ export const transformCellsNodes = (nodes: RestNode[]): CellNode[] => {
         publicLink,
         tags,
         presignedUrlExpiresAt,
+        user,
+        conversation,
       };
     }
 
@@ -78,6 +98,8 @@ export const transformCellsNodes = (nodes: RestNode[]): CellNode[] => {
       publicLink,
       tags,
       presignedUrlExpiresAt,
+      user,
+      conversation,
     };
   });
 };
