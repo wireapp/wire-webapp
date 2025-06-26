@@ -24,10 +24,10 @@ import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {UserRepository} from 'src/script/user/UserRepository';
 
+import {getUsersFromNodes} from './getUsersFromNodes';
 import {transformDataToCellsNodes, transformToCellPagination} from './transformDataToCellsNodes';
 
 import {getCellsApiPath} from '../common/getCellsApiPath/getCellsApiPath';
-import {getUserQualifiedIdFromNode} from '../common/getUserQualifiedIdFromNode/getUserQualifiedIdFromNode';
 import {useCellsStore} from '../common/useCellsStore/useCellsStore';
 
 interface UseGetAllCellsNodesProps {
@@ -58,9 +58,7 @@ export const useGetAllCellsNodes = ({
         offset,
       });
 
-      const users = await userRepository.getUsersById(
-        result.Nodes?.map(node => getUserQualifiedIdFromNode(node)).filter(Boolean) as QualifiedId[],
-      );
+      const users = await getUsersFromNodes({nodes: result.Nodes || [], userRepository});
 
       if (!result.Nodes?.length) {
         setStatus('success');
