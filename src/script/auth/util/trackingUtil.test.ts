@@ -78,7 +78,7 @@ describe('trackingUtil', () => {
 
   describe('initializeTelemetry', () => {
     it('should initialize telemetry and set device id if not present', () => {
-      (Config.getConfig as jest.Mock).mockReturnValueOnce(configFactory());
+      (Config.getConfig as jest.Mock).mockReturnValue(configFactory());
       localStorageMock.getItem.mockReturnValueOnce(null);
       trackingUtil.initializeTelemetry();
       expect(telemetry.initialize).toHaveBeenCalledWith(
@@ -99,13 +99,13 @@ describe('trackingUtil', () => {
     });
 
     it('should not initialize telemetry if COUNTLY_ENABLE_LOGGING is false', async () => {
-      (Config.getConfig as jest.Mock).mockReturnValueOnce(configFactory({COUNTLY_ENABLE_LOGGING: false}));
+      (Config.getConfig as jest.Mock).mockReturnValue(configFactory({COUNTLY_ENABLE_LOGGING: false}));
       trackingUtil.initializeTelemetry();
       expect(telemetry.initialize).not.toHaveBeenCalled();
     });
 
     it('should not initialize telemetry if COUNTLY_API_KEY is missing', () => {
-      (Config.getConfig as jest.Mock).mockReturnValueOnce(configFactory({COUNTLY_API_KEY: ''}));
+      (Config.getConfig as jest.Mock).mockReturnValue(configFactory({COUNTLY_API_KEY: ''}));
       trackingUtil.initializeTelemetry();
       expect(telemetry.initialize).not.toHaveBeenCalled();
     });

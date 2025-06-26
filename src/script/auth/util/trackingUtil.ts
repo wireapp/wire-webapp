@@ -55,10 +55,20 @@ export enum PageView {
   ACCOUNT_COMPLETION_SCREEN_4 = 'account_completion_screen_4',
 }
 
-export const initializeTelemetry = () => {
-  const {COUNTLY_ENABLE_LOGGING, VERSION, COUNTLY_API_KEY, COUNTLY_SERVER_URL} = Config.getConfig();
+export const isTelemetryEnabled = () => {
+  const {COUNTLY_ENABLE_LOGGING, COUNTLY_API_KEY} = Config.getConfig();
 
   if (!COUNTLY_ENABLE_LOGGING || !COUNTLY_API_KEY || !telemetry.isLoaded()) {
+    return false;
+  }
+
+  return true;
+};
+
+export const initializeTelemetry = () => {
+  const {VERSION, COUNTLY_API_KEY, COUNTLY_SERVER_URL} = Config.getConfig();
+
+  if (!isTelemetryEnabled()) {
     return;
   }
 

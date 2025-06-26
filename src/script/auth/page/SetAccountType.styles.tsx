@@ -46,7 +46,7 @@ export const styles: {
   container: {
     width: '100%',
     padding: '38px',
-    maxWidth: '1000px',
+    maxWidth: '750px',
     margin: 'auto',
     marginBottom: '10vw',
     flexDirection: 'column',
@@ -105,6 +105,7 @@ export const styles: {
     flex: 1,
     height: 360,
     position: 'relative',
+    background: COLOR_V2.WHITE,
     [mediaQueryDesktop]: {
       margin: '16px 0',
     },

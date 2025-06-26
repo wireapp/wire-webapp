@@ -25,10 +25,13 @@ export const leftSectionCss: CSSObject = {
   background: 'black',
   margin: 0,
   height: '100vh',
-  width: '460px',
+  width: '360px',
   padding: '6rem 4rem',
   position: 'relative',
   minHeight: '42rem',
+  [media.desktopXL]: {
+    width: '460px',
+  },
   [media.tabletDown]: {
     display: 'none',
   },
@@ -49,7 +52,7 @@ export const whiteFontCss: CSSObject = {
 export const bodyCss: CSSObject = {
   flex: 'auto',
   flexDirection: 'row',
-  background: COLOR_V2.WHITE,
+  background: COLOR_V2.GRAY_10,
   height: '100%',
   minHeight: '100vh',
 };
