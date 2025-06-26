@@ -20,12 +20,13 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {parseQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 import {useDebouncedCallback} from 'use-debounce';
 
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {UserRepository} from 'src/script/user/UserRepository';
+
+import {getConversationsFromNodes} from './getConversationsFromNodes';
 
 import {getUserQualifiedIdFromNode} from '../common/getUserQualifiedIdFromNode/getUserQualifiedIdFromNode';
 import {useCellsStore, Status} from '../common/useCellsStore/useCellsStore';
@@ -75,11 +76,10 @@ export const useSearchCellsNodes = ({
           result.Nodes?.map(node => getUserQualifiedIdFromNode(node)).filter(Boolean) as QualifiedId[],
         );
 
-        const conversations = await Promise.all(
-          result.Nodes?.map(node =>
-            conversationRepository.getConversationById(parseQualifiedId(node.ContextWorkspace?.Uuid || '')),
-          ),
-        );
+        const conversations = await getConversationsFromNodes({
+          nodes: result.Nodes || [],
+          conversationRepository,
+        });
 
         const transformedNodes = transformCellsNodes({
           nodes: result.Nodes || [],
