@@ -356,12 +356,14 @@ export class App {
   }: {
     cellsRepository: CellsRepository;
     selfUser: User;
-    accessToken?: string;
+    accessToken: string;
   }) {
     const cellPydioApiKey = Config.getConfig().CELLS_TOKEN_SHARED_SECRET;
     const cellsInitWithZauthToken = Config.getConfig().FEATURE.CELLS_INIT_WITH_ZAUTH_TOKEN;
 
-    const cellsApiKey = `${cellsInitWithZauthToken ? accessToken : cellPydioApiKey}:${selfUser.qualifiedId.id}@${selfUser.qualifiedId.domain}`;
+    const cellsApiKey = cellsInitWithZauthToken
+      ? accessToken
+      : `${cellPydioApiKey}:${selfUser.qualifiedId.id}@${selfUser.qualifiedId.domain}`;
 
     cellsRepository.initialize({
       pydio: {
@@ -426,7 +428,7 @@ export class App {
 
       const selfUser = await this.repository.user.getSelf([{position: 'App.initiateSelfUser', vendor: 'webapp'}]);
 
-      const accessToken = this.apiClient.transport.http.accessTokenStore.accessToken?.access_token;
+      const accessToken = this.apiClient.transport.http.accessTokenStore.accessToken?.access_token!;
 
       this.initializeCells({cellsRepository, selfUser, accessToken});
 
