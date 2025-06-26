@@ -40,7 +40,7 @@ export const ChannelAvatar = ({conversationID, className, isLocked = true, size 
         css={channelAvatarIconCss({color: colorPalette.color, background: colorPalette.background, size})}
         data-uie-name="group-avatar-box-wrapper"
       >
-        <ChannelIcon width={size === 'small' ? 12 : 16} />
+        <ChannelIcon width={size === 'small' ? 10 : 16} />
       </div>
       {isLocked && (
         <div css={channelAvatarLockIconCss}>
