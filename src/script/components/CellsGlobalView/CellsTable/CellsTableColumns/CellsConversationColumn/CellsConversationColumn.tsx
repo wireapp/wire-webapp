@@ -17,8 +17,6 @@
  *
  */
 
-import {CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conversation/';
-
 import {GroupAvatar} from 'Components/Avatar';
 import {ChannelAvatar} from 'Components/Avatar/ChannelAvatar';
 import {openConversation} from 'Components/CellsGlobalView/common/openConversation/openConversation';
@@ -40,10 +38,7 @@ export const CellsConversationColumn = ({conversation}: CellsConversationColumnP
     <button css={wrapperStyles} onClick={() => openConversation(conversation.qualifiedId)}>
       <div css={avatarWrapperStyles}>
         {isChannel && isChannelsEnabled ? (
-          <ChannelAvatar
-            conversationID={conversation.id}
-            isLocked={!conversation.accessModes?.includes(CONVERSATION_ACCESS.LINK)}
-          />
+          <ChannelAvatar conversationID={conversation.id} isLocked={false} size="small" />
         ) : (
           <GroupAvatar conversationID={conversation.id} size="small" />
         )}

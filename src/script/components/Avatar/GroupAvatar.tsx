@@ -34,7 +34,7 @@ export const GroupAvatar = ({conversationID, className, size = 'large'}: GroupAv
       className={className}
       css={{
         ...CSS_SQUARE(size === 'small' ? 16 : 32),
-        border: '1px solid var(--border-color)',
+        border: `${size === 'small' ? 0.5 : 1}px solid var(--border-color)`,
         borderRadius: size === 'small' ? 4 : 8,
       }}
     >
