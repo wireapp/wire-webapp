@@ -25,7 +25,7 @@ const createdTeams: Map<User, string> = new Map();
 
 test(
   'Verify I can log in to admin panel only with valid hidden or shown password',
-  {tag: ['@flow-tm', '@TC-2157', '@TC-2158', '@TC-2159', '@TC-2156', '@TC-2155', '@teamManagement-regression']},
+  {tag: ['@crit-flow-tm', '@TC-2157', '@TC-2158', '@TC-2159', '@TC-2156', '@TC-2155', '@teamManagement-regression']},
   async ({api, pages}) => {
     // Creating test data
     const teamOwner = getUser();
