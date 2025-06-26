@@ -40,7 +40,7 @@ export const CellsConversationColumn = ({conversation, name}: CellsConversationC
 };
 
 const ConversationAvatar = ({conversation}: {conversation: Conversation}) => {
-  const {isChannel} = useKoSubscribableChildren(conversation, ['isChannel']);
+  const {isChannel, display_name: displayName} = useKoSubscribableChildren(conversation, ['isChannel', 'display_name']);
   const {isChannelsEnabled} = useChannelsFeatureFlag();
 
   return (
@@ -52,7 +52,7 @@ const ConversationAvatar = ({conversation}: {conversation: Conversation}) => {
           <GroupAvatar conversationID={conversation.id} size="small" />
         )}
       </div>
-      <span css={textStyles}>{conversation.name()}</span>
+      <span css={textStyles}>{displayName}</span>
     </button>
   );
 };
