@@ -30,7 +30,7 @@ import {getUserQualifiedIdFromNode} from '../common/getUserQualifiedIdFromNode/g
 export const transformDataToCellsNodes = ({nodes, users}: {nodes: RestNode[]; users: User[]}): Array<CellNode> => {
   return (
     nodes
-      .map((node, index) => {
+      .map(node => {
         const id = node.Uuid;
         const owner = getOwner(node);
         const name = getName(node.Path);
