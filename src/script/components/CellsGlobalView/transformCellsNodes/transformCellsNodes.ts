@@ -60,7 +60,7 @@ export const transformCellsNodes = ({
     const conversation = conversations.find(conversation => conversation.qualifiedId.id === conversationQualifiedId.id);
 
     const userQualifiedId = getUserQualifiedIdFromNode(node);
-    const user = userQualifiedId ? users.find(user => user.qualifiedId.id === userQualifiedId.id) || null : null;
+    const user = users.find(user => user.qualifiedId.id === userQualifiedId?.id) || null;
 
     if (node.Type === 'COLLECTION') {
       return {
