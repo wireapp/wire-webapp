@@ -41,7 +41,7 @@ export const getCellsTableColumns = ({cellsRepository}: {cellsRepository: CellsR
   }),
   columnHelper.accessor('conversationName', {
     header: t('cells.tableRow.conversationName'),
-    cell: info => <CellsConversationColumn conversation={info.row.original.conversation!} />,
+    cell: info => <CellsConversationColumn conversation={info.row.original.conversation} name={info.getValue()} />,
     size: 190,
   }),
   columnHelper.accessor('owner', {

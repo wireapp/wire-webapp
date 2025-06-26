@@ -27,10 +27,19 @@ import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 import {avatarWrapperStyles, textStyles, wrapperStyles} from './CellsConversationColumn.styles';
 
 interface CellsConversationColumnProps {
-  conversation: Conversation;
+  conversation?: Conversation;
+  name: string;
 }
 
-export const CellsConversationColumn = ({conversation}: CellsConversationColumnProps) => {
+export const CellsConversationColumn = ({conversation, name}: CellsConversationColumnProps) => {
+  if (!conversation) {
+    return <span css={textStyles}>{name}</span>;
+  }
+
+  return <ConversationAvatar conversation={conversation} />;
+};
+
+const ConversationAvatar = ({conversation}: {conversation: Conversation}) => {
   const {isChannel} = useKoSubscribableChildren(conversation, ['isChannel']);
   const {isChannelsEnabled} = useChannelsFeatureFlag();
 
