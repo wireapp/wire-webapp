@@ -34,6 +34,8 @@ export const getConversationsFromNodes = async ({
   }
 
   return Promise.all(
-    nodes.map(node => conversationRepository.getConversationById(parseQualifiedId(node.ContextWorkspace?.Uuid || ''))),
+    nodes
+      .map(node => conversationRepository.getConversationById(parseQualifiedId(node.ContextWorkspace?.Uuid || '')))
+      .filter(Boolean),
   );
 };
