@@ -20,12 +20,14 @@
 import {RestNode, RestPagination} from 'cells-sdk-ts';
 
 import {CellPagination} from 'Components/Conversation/ConversationCells/common/cellPagination/cellPagination';
+import {User} from 'src/script/entity/User';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {formatBytes, getFileExtension} from 'Util/util';
 
 import {CellNode} from '../common/cellNode/cellNode';
+import {getUserQualifiedIdFromNode} from '../common/getUserQualifiedIdFromNode/getUserQualifiedIdFromNode';
 
-export const transformDataToCellsNodes = (nodes: RestNode[]): Array<CellNode> => {
+export const transformDataToCellsNodes = ({nodes, users}: {nodes: RestNode[]; users: User[]}): Array<CellNode> => {
   return (
     nodes
       .map(node => {
@@ -44,6 +46,8 @@ export const transformDataToCellsNodes = (nodes: RestNode[]): Array<CellNode> =>
         const presignedUrlExpiresAt = node.PreSignedGET?.ExpiresAt
           ? new Date(Number(node.PreSignedGET?.ExpiresAt) * TIME_IN_MILLIS.SECOND)
           : null;
+        const userQualifiedId = getUserQualifiedIdFromNode(node);
+        const user = users.find(user => user.qualifiedId.id === userQualifiedId?.id) || null;
 
         if (node.Type === 'COLLECTION') {
           return {
@@ -58,6 +62,7 @@ export const transformDataToCellsNodes = (nodes: RestNode[]): Array<CellNode> =>
             publicLink,
             tags: getTags(node),
             presignedUrlExpiresAt,
+            user,
           };
         }
 
@@ -78,6 +83,7 @@ export const transformDataToCellsNodes = (nodes: RestNode[]): Array<CellNode> =>
           publicLink,
           tags: getTags(node),
           presignedUrlExpiresAt,
+          user,
         };
       })
       // eslint-disable-next-line id-length

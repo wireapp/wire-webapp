@@ -39,6 +39,7 @@ export interface RegistrationDataState {
   password?: string;
   team?: TeamData;
   termsAccepted: boolean;
+  privacyPolicyAccepted: boolean;
   customBackendURL: string;
   accountCreationEnabled: boolean;
   shouldDisplayWarning: boolean;
@@ -69,6 +70,7 @@ export const initialAuthState: AuthState = {
     customBackendURL: '',
     accountCreationEnabled: false,
     shouldDisplayWarning: false,
+    privacyPolicyAccepted: false,
     name: '',
   },
   currentFlow: null,

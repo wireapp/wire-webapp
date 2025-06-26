@@ -32,15 +32,11 @@ export const openFolder = ({path, event}: {path: string; event?: ReactMouseEvent
 
   const store = useSidebarStore.getState();
 
-  // Temporary solution to handle the local development
-  // TODO: remove this once we have a proper way to handle the domain per env
-  const domainPerEnv = process.env.NODE_ENV === 'development' ? 'staging.zinfra.io' : domain;
-
   store.setCurrentTab(SidebarTabs.RECENT);
   createNavigate(
     generateConversationUrl({
       id,
-      domain: domainPerEnv,
+      domain,
       filePath,
     }),
   )(event);

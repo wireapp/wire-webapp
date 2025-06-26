@@ -95,6 +95,9 @@ const config = {
   },
 
   AVS_VERSION: packageJson.dependencies['@wireapp/avs'],
+
+  COUNTLY_SERVER_URL: 'https://countly.wire.com/',
+  GET_WIRE_URL: 'https://get.wire.com',
 } as const;
 
 export type Configuration = typeof config;

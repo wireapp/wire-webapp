@@ -54,6 +54,7 @@ export const CellsMoveNodeModal = ({
   const [activeModalContent, setActiveModalContent] = useState<'move' | 'create'>('move');
 
   const {folders, refresh, status, shouldShowLoadingSpinner} = useGetCellsFolders({
+    nodeToMove,
     cellsRepository,
     conversationQualifiedId,
     currentPath,
@@ -134,6 +135,7 @@ export const CellsMoveNodeModal = ({
             inputValue={name}
             onChange={handleChange}
             error={error}
+            isOpen={isOpen}
           />
           <CellsModal.Actions>
             <CellsModal.SecondaryButton onClick={() => setActiveModalContent('move')}>
