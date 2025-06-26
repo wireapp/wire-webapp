@@ -83,6 +83,7 @@ import {ClientEvent} from '../event/Client';
 import {isContentMessage} from '../guards/Message';
 import {CALL_MESSAGE_TYPE} from '../message/CallMessageType';
 import {MentionEntity} from '../message/MentionEntity';
+import {MessageCategory} from '../message/MessageCategory';
 import {QuoteEntity} from '../message/QuoteEntity';
 import {StatusType} from '../message/StatusType';
 import {SystemMessageType} from '../message/SystemMessageType';
@@ -867,7 +868,7 @@ export class EventMapper {
   _mapAsset(event: LegacyEventRecord) {
     const eventData = event.data;
     const category = event.category;
-    const isFile = category === 512;
+    const isFile = category === MessageCategory.FILE;
     const mimeType = eventData.content_type;
     const isImage = mimeType && mimeType.startsWith('image/');
     return isImage && !isFile ? this._mapAssetImage(event) : this._mapAssetFile(event);
