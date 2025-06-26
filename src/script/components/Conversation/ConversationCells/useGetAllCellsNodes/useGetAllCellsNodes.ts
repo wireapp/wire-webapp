@@ -58,13 +58,13 @@ export const useGetAllCellsNodes = ({
         offset,
       });
 
-      const users = await getUsersFromNodes({nodes: result.Nodes || [], userRepository});
-
       if (!result.Nodes?.length) {
         setStatus('success');
         setPagination({conversationId: id, pagination: null});
         return;
       }
+
+      const users = await getUsersFromNodes({nodes: result.Nodes, userRepository});
 
       const transformedNodes = transformDataToCellsNodes({nodes: result.Nodes, users});
       setNodes({conversationId: id, nodes: transformedNodes});
