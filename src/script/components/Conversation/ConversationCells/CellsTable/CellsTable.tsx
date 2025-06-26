@@ -53,12 +53,7 @@ export const CellsTable = ({
 }: CellsTableProps) => {
   const table = useReactTable({
     data: nodes,
-    columns: getCellsTableColumns({
-      cellsRepository,
-      conversationQualifiedId,
-      conversationName,
-      onRefresh,
-    }),
+    columns: getCellsTableColumns({cellsRepository, conversationQualifiedId, conversationName, onRefresh}),
     getCoreRowModel: getCoreRowModel(),
   });
 

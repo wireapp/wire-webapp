@@ -23,9 +23,9 @@ import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
 
+import {textWithEllipsisStyles} from './CellsTableColumns.styles';
 import {CellsTableDateColumn} from './CellsTableDateColumn/CellsTableDateColumn';
 import {CellsTableNameColumn} from './CellsTableNameColumn/CellsTableNameColumn';
-import {CellsTableOwnerColumn} from './CellsTableOwnerColumn/CellsTableOwnerColumn';
 import {CellsTableRowOptions} from './CellsTableRowOptions/CellsTableRowOptions';
 import {CellsTableSharedColumn} from './CellsTableSharedColumn/CellsTableSharedColumn';
 import {CellsTagsColumn} from './CellsTagsColumn/CellsTagsColumn';
@@ -51,7 +51,7 @@ export const getCellsTableColumns = ({
   }),
   columnHelper.accessor('owner', {
     header: t('cells.tableRow.owner'),
-    cell: info => <CellsTableOwnerColumn owner={info.getValue()} user={info.row.original.user} />,
+    cell: info => <span css={textWithEllipsisStyles}>{info.getValue()}</span>,
     size: 170,
   }),
   columnHelper.accessor('sizeMb', {

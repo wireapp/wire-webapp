@@ -515,7 +515,6 @@ export const Conversation = ({
                   <ConversationCells
                     conversationQualifiedId={activeConversation.qualifiedId}
                     conversationName={activeConversation.name()}
-                    userRepository={repositories.user}
                     cellsState={activeConversation.cellsState()}
                   />
                 )}

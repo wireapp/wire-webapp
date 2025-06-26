@@ -17,9 +17,6 @@
  *
  */
 
-import {Conversation} from 'src/script/entity/Conversation';
-import {User} from 'src/script/entity/User';
-
 export interface CellFile {
   id: string;
   type: 'file';
@@ -41,8 +38,6 @@ export interface CellFile {
   };
   tags: string[];
   presignedUrlExpiresAt: Date | null;
-  user: User | null;
-  conversation?: Conversation;
 }
 
 export interface CellFolder {
@@ -63,8 +58,6 @@ export interface CellFolder {
   };
   tags: string[];
   presignedUrlExpiresAt: Date | null;
-  user: User | null;
-  conversation?: Conversation;
 }
 
 export type CellNode = CellFile | CellFolder;

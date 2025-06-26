@@ -22,7 +22,6 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
 import {CellsRepository} from 'src/script/cells/CellsRepository';
-import {UserRepository} from 'src/script/user/UserRepository';
 import {t} from 'Util/LocalizerUtil';
 
 import {CellsHeader} from './CellsHeader/CellsHeader';
@@ -38,7 +37,6 @@ import {useOnPresignedUrlExpired} from './useOnPresignedUrlExpired/useOnPresigne
 
 interface ConversationCellsProps {
   cellsRepository?: CellsRepository;
-  userRepository?: UserRepository;
   conversationQualifiedId: QualifiedId;
   conversationName: string;
   cellsState: CONVERSATION_CELLS_STATE;
@@ -46,7 +44,6 @@ interface ConversationCellsProps {
 
 export const ConversationCells = ({
   cellsRepository = container.resolve(CellsRepository),
-  userRepository = container.resolve(UserRepository),
   conversationQualifiedId,
   conversationName,
   cellsState,
@@ -61,7 +58,6 @@ export const ConversationCells = ({
     cellsRepository,
     conversationQualifiedId,
     enabled: isCellsStateReady,
-    userRepository,
   });
 
   const nodes = getNodes({conversationId});
@@ -96,7 +92,6 @@ export const ConversationCells = ({
         conversationName={conversationName}
         cellsRepository={cellsRepository}
       />
-
       {isTableVisible && (
         <CellsTable
           nodes={isLoading ? [] : nodes}

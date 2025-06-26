@@ -22,11 +22,6 @@ import {useCallback, useEffect, useRef, useState} from 'react';
 import {useDebouncedCallback} from 'use-debounce';
 
 import {CellsRepository} from 'src/script/cells/CellsRepository';
-import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
-import {UserRepository} from 'src/script/user/UserRepository';
-
-import {getConversationsFromNodes} from './getConversationsFromNodes';
-import {getUsersFromNodes} from './getUsersFromNodes';
 
 import {useCellsStore, Status} from '../common/useCellsStore/useCellsStore';
 import {transformCellsNodes} from '../transformCellsNodes/transformCellsNodes';
@@ -34,8 +29,6 @@ import {transformCellsPagination} from '../transformCellsPagination/transformCel
 
 interface UseSearchCellsNodesProps {
   cellsRepository: CellsRepository;
-  userRepository: UserRepository;
-  conversationRepository: ConversationRepository;
 }
 
 const PAGE_INITIAL_SIZE = 30;
@@ -43,11 +36,7 @@ const PAGE_SIZE_INCREMENT = 20;
 const DEBOUNCE_TIME = 300;
 const FETCH_ALL_QUERY = '*';
 
-export const useSearchCellsNodes = ({
-  cellsRepository,
-  userRepository,
-  conversationRepository,
-}: UseSearchCellsNodesProps) => {
+export const useSearchCellsNodes = ({cellsRepository}: UseSearchCellsNodesProps) => {
   const {setNodes, setStatus, setPagination, clearAll, filters} = useCellsStore();
 
   const [searchValue, setSearchValue] = useState('');
@@ -60,9 +49,7 @@ export const useSearchCellsNodes = ({
     async ({query, status, limit = pageSize}: {query: string; status: Status; limit?: number}) => {
       try {
         setStatus(status);
-
         const shouldSort = !query || query === FETCH_ALL_QUERY;
-
         const result = await cellsRepository.searchNodes({
           query,
           limit,
@@ -70,24 +57,7 @@ export const useSearchCellsNodes = ({
           sortBy: shouldSort ? 'mtime' : undefined,
           sortDirection: shouldSort ? 'desc' : undefined,
         });
-
-        const users = await getUsersFromNodes({
-          nodes: result.Nodes || [],
-          userRepository,
-        });
-
-        const conversations = await getConversationsFromNodes({
-          nodes: result.Nodes || [],
-          conversationRepository,
-        });
-
-        const transformedNodes = transformCellsNodes({
-          nodes: result.Nodes || [],
-          users,
-          conversations,
-        });
-
-        setNodes(transformedNodes);
+        setNodes(transformCellsNodes(result.Nodes || []));
         if (result.Pagination) {
           setPagination(transformCellsPagination(result.Pagination));
         } else {

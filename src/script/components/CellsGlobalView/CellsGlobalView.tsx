@@ -22,8 +22,6 @@ import {container} from 'tsyringe';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {CellsRepository} from 'src/script/cells/CellsRepository';
-import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
-import {UserRepository} from 'src/script/user/UserRepository';
 import {t} from 'Util/LocalizerUtil';
 
 import {loadMoreWrapperStyles, wrapperStyles} from './CellsGlobalView.styles';
@@ -37,21 +35,13 @@ import {useSearchCellsNodes} from './useSearchCellsNodes/useSearchCellsNodes';
 
 interface CellsGlobalViewProps {
   cellsRepository?: CellsRepository;
-  userRepository?: UserRepository;
-  conversationRepository?: ConversationRepository;
 }
 
-export const CellsGlobalView = ({
-  cellsRepository = container.resolve(CellsRepository),
-  userRepository = container.resolve(UserRepository),
-  conversationRepository = container.resolve(ConversationRepository),
-}: CellsGlobalViewProps) => {
+export const CellsGlobalView = ({cellsRepository = container.resolve(CellsRepository)}: CellsGlobalViewProps) => {
   const {nodes, status: nodesStatus, pagination} = useCellsStore();
 
   const {searchValue, handleSearch, handleClearSearch, handleReload, increasePageSize} = useSearchCellsNodes({
     cellsRepository,
-    userRepository,
-    conversationRepository,
   });
 
   useOnPresignedUrlExpired({refreshCallback: handleReload});

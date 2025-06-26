@@ -21,39 +21,38 @@ import {getGroupAvatarColors} from 'Util/avatarUtil';
 import {CSS_SQUARE} from 'Util/CSSMixin';
 
 export interface GroupAvatarProps {
-  size?: 'small' | 'large';
   className?: string;
   conversationID?: string;
 }
 
-export const GroupAvatar = ({conversationID, className, size = 'large'}: GroupAvatarProps) => {
+export const GroupAvatar = ({conversationID, className}: GroupAvatarProps) => {
   const colors = getGroupAvatarColors(conversationID);
 
   return (
     <div
       className={className}
       css={{
-        ...CSS_SQUARE(size === 'small' ? 16 : 32),
-        border: `${size === 'small' ? 0.5 : 1}px solid var(--border-color)`,
-        borderRadius: size === 'small' ? 4 : 8,
+        ...CSS_SQUARE(32),
+        border: '1px solid var(--border-color)',
+        borderRadius: 8,
       }}
     >
       <div
         css={{
-          ...CSS_SQUARE(size === 'small' ? '100%' : 28),
+          ...CSS_SQUARE(28),
           backgroundColor: 'var(--group-icon-bg)',
           display: 'flex',
           flexWrap: 'wrap',
-          margin: size === 'small' ? 0 : 1,
+          margin: 1,
           overflow: 'hidden',
-          borderRadius: size === 'small' ? 4 : 7,
+          borderRadius: 7,
         }}
         data-uie-name="group-avatar-box-wrapper"
       >
         <svg
           css={{margin: 'auto'}}
-          width={size === 'small' ? 12 : 20}
-          height={size === 'small' ? 'auto' : 28}
+          width="20"
+          height="28"
           viewBox="0 0 20 10"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"

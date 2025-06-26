@@ -22,8 +22,7 @@ import {createColumnHelper} from '@tanstack/react-table';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
 
-import {CellsConversationColumn} from './CellsConversationColumn/CellsConversationColumn';
-import {CellsTableOwnerColumn} from './CellsOwnerColumn/CellsOwnerColumn';
+import {textWithEllipsisStyles} from './CellsTableColumns.styles';
 import {CellsTableDateColumn} from './CellsTableDateColumn/CellsTableDateColumn';
 import {CellsTableNameColumn} from './CellsTableNameColumn/CellsTableNameColumn';
 import {CellsTableRowOptions} from './CellsTableRowOptions/CellsTableRowOptions';
@@ -41,12 +40,12 @@ export const getCellsTableColumns = ({cellsRepository}: {cellsRepository: CellsR
   }),
   columnHelper.accessor('conversationName', {
     header: t('cells.tableRow.conversationName'),
-    cell: info => <CellsConversationColumn conversation={info.row.original.conversation} name={info.getValue()} />,
+    cell: info => <span css={textWithEllipsisStyles}>{info.getValue()}</span>,
     size: 190,
   }),
   columnHelper.accessor('owner', {
     header: t('cells.tableRow.owner'),
-    cell: info => <CellsTableOwnerColumn owner={info.getValue()} user={info.row.original.user} />,
+    cell: info => <span css={textWithEllipsisStyles}>{info.getValue()}</span>,
     size: 175,
   }),
   columnHelper.accessor('tags', {
