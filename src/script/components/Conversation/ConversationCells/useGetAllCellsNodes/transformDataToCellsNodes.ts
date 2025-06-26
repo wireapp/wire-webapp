@@ -47,7 +47,7 @@ export const transformDataToCellsNodes = ({nodes, users}: {nodes: RestNode[]; us
           ? new Date(Number(node.PreSignedGET?.ExpiresAt) * TIME_IN_MILLIS.SECOND)
           : null;
         const userQualifiedId = getUserQualifiedIdFromNode(node);
-        const user = userQualifiedId ? users.find(user => user.qualifiedId.id === userQualifiedId.id) || null : null;
+        const user = users.find(user => user.qualifiedId.id === userQualifiedId?.id) || null;
 
         if (node.Type === 'COLLECTION') {
           return {
