@@ -48,7 +48,7 @@ export const CellsConversationColumn = ({conversation}: CellsConversationColumnP
             isLocked={!conversation!.accessModes?.includes(CONVERSATION_ACCESS.LINK)}
           />
         ) : (
-          <GroupAvatar conversationID={conversation!.id} />
+          <GroupAvatar conversationID={conversation!.id} size="small" />
         )}
       </div>
       <span css={textStyles}>{conversation!.name()}</span>
