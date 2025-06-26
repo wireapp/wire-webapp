@@ -19,6 +19,8 @@
 
 import {CSSObject} from '@emotion/react';
 
+import {ellipsis} from '@wireapp/react-ui-kit';
+
 export const wrapperStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
@@ -35,8 +37,6 @@ export const avatarWrapperStyles: CSSObject = {
 };
 
 export const textStyles: CSSObject = {
+  ...ellipsis(),
   display: 'block',
-  textOverflow: 'ellipsis',
-  overflow: 'hidden',
-  whiteSpace: 'nowrap',
 };
