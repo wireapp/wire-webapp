@@ -66,7 +66,14 @@ export const CellsNewItemModal = ({
       <p css={descriptionStyles}>
         {t(isFolder ? 'cells.newItemMenuModal.descriptionFolder' : 'cells.newItemMenuModal.descriptionFile')}
       </p>
-      <CellsNewNodeForm type={type} onSubmit={handleSubmit} inputValue={name} onChange={handleChange} error={error} />
+      <CellsNewNodeForm
+        type={type}
+        onSubmit={handleSubmit}
+        inputValue={name}
+        onChange={handleChange}
+        error={error}
+        isOpen={isOpen}
+      />
       <CellsModal.Actions>
         <CellsModal.SecondaryButton onClick={onClose}>
           {t('cells.newItemMenuModal.secondaryAction')}

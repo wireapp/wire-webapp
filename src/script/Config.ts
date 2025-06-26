@@ -17,6 +17,8 @@
  *
  */
 
+import {MINIMUM_API_VERSION} from '@wireapp/api-client/lib/Config';
+
 import {Runtime} from '@wireapp/commons';
 
 import {createUuid} from 'Util/uuid';
@@ -84,7 +86,7 @@ const config = {
   ALLOWED_IMAGE_TYPES: ['image/bmp', 'image/gif', 'image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
 
   /** Which min and max version of the backend api do we support */
-  SUPPORTED_API_RANGE: [8, env.ENABLE_DEV_BACKEND_API ? Infinity : 8],
+  SUPPORTED_API_RANGE: [MINIMUM_API_VERSION, env.ENABLE_DEV_BACKEND_API ? Infinity : MINIMUM_API_VERSION],
 
   /** DataDog client api keys acces */
   dataDog: {
@@ -93,6 +95,9 @@ const config = {
   },
 
   AVS_VERSION: packageJson.dependencies['@wireapp/avs'],
+
+  COUNTLY_SERVER_URL: 'https://countly.wire.com/',
+  GET_WIRE_URL: 'https://get.wire.com',
 } as const;
 
 export type Configuration = typeof config;

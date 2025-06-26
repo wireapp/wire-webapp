@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2025 Wire Swiss GmbH
+ * Copyright (C) 2021 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,35 +19,37 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const wrapperStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  gap: '8px',
-  width: '100%',
-  padding: '0 16px',
-  marginBottom: '24px',
-};
+import {COLOR_V2} from '@wireapp/react-ui-kit';
 
-export const textStyles: CSSObject = {
-  fontSize: 'var(--font-size-medium)',
-};
-
-export const buttonStyles: CSSObject = {
-  margin: '0',
-};
-
-export const activeItemStyles: CSSObject = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: '8px',
-  padding: '0 8px',
-  fontSize: 'var(--font-size-medium)',
-  color: 'var(--main-color)',
-  height: '32px',
-  margin: '0',
-};
-
-export const iconStyles: CSSObject = {
-  marginRight: '8px',
+export const styles: {
+  container: CSSObject;
+  heading: CSSObject;
+  subHeading: CSSObject;
+  link: CSSObject;
+} = {
+  container: {
+    maxWidth: '390px',
+    flexDirection: 'column',
+    alignItems: 'center',
+    margin: 'auto',
+    gap: '16px',
+    padding: '24px',
+  },
+  heading: {
+    fontSize: '24px',
+    fontWeight: 500,
+    marginBottom: '8px',
+    width: '100%',
+  },
+  subHeading: {
+    fontSize: '16px',
+    width: '100%',
+  },
+  link: {
+    fontWeight: 500,
+    letterSpacing: '0.05px',
+    lineHeight: '24px',
+    textDecoration: 'underline',
+    color: COLOR_V2.BLACK,
+  },
 };

@@ -45,6 +45,7 @@ import {SetEntropyPage} from './SetEntropyPage';
 import {SetHandle} from './SetHandle';
 import {SetPassword} from './SetPassword';
 import {SingleSignOn} from './SingleSignOn';
+import {Success} from './Success';
 import {VerifyEmailCode} from './VerifyEmailCode';
 import {VerifyEmailLink} from './VerifyEmailLink';
 
@@ -160,6 +161,7 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
               <Route path={ROUTE.HISTORY_INFO} element={<ProtectedHistoryInfo />} />
               <Route path={`${ROUTE.AUTHORIZE}`} element={<ProtectedOAuthPermissions />} />
               <Route path={ROUTE.CUSTOM_BACKEND} element={<CustomBackend />} />
+              <Route path={ROUTE.SUCCESS} element={<Success />} />
               <Route
                 path={`${ROUTE.LOGIN}/*`}
                 element={
