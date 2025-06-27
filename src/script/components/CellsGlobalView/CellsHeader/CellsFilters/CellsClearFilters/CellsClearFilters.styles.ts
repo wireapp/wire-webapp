@@ -17,20 +17,18 @@
  *
  */
 
-import {CellsRepository} from 'src/script/cells/CellsRepository';
+import {CSSObject} from '@emotion/react';
 
-import {CellsClearFilters} from './CellsClearFilters/CellsClearFilters';
-import {CellsFiltersMenu} from './CellsFiltersMenu/CellsFiltersMenu';
-
-interface CellsFiltersProps {
-  cellsRepository: CellsRepository;
-}
-
-export const CellsFilters = ({cellsRepository}: CellsFiltersProps) => {
-  return (
-    <>
-      <CellsFiltersMenu cellsRepository={cellsRepository} />
-      <CellsClearFilters />
-    </>
-  );
+export const buttonStyles: CSSObject = {
+  height: '32px',
+  padding: '0 8px',
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
+  fontSize: 'var(--font-size-medium)',
+  fontWeight: 'var(--font-weight-bold)',
+  cursor: 'pointer',
+  background: 'none',
+  border: '1px solid transparent',
+  margin: 0,
 };

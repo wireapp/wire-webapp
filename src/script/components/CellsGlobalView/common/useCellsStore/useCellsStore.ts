@@ -27,6 +27,7 @@ export type Status = 'idle' | 'loading' | 'fetchingMore' | 'success' | 'error';
 interface FiltersState {
   tags: string[];
   setTags: (tags: string[]) => void;
+  clearAll: () => void;
 }
 
 interface CellsState {
@@ -57,6 +58,13 @@ export const useCellsStore = create<CellsState>((set, get) => ({
         filters: {
           ...state.filters,
           tags,
+        },
+      })),
+    clearAll: () =>
+      set(state => ({
+        filters: {
+          ...state.filters,
+          tags: [],
         },
       })),
   },

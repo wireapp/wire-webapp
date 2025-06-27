@@ -17,20 +17,30 @@
  *
  */
 
-import {CellsRepository} from 'src/script/cells/CellsRepository';
+import {useEffect} from 'react';
 
-import {CellsClearFilters} from './CellsClearFilters/CellsClearFilters';
-import {CellsFiltersMenu} from './CellsFiltersMenu/CellsFiltersMenu';
+import {useCellsStore} from 'Components/CellsGlobalView/common/useCellsStore/useCellsStore';
 
-interface CellsFiltersProps {
-  cellsRepository: CellsRepository;
-}
+import {useModalFiltersStore} from '../useModalFiltersStore/useModalFiltersStore';
 
-export const CellsFilters = ({cellsRepository}: CellsFiltersProps) => {
-  return (
-    <>
-      <CellsFiltersMenu cellsRepository={cellsRepository} />
-      <CellsClearFilters />
-    </>
-  );
+export const useModalFilters = ({enabled}: {enabled: boolean}) => {
+  const {filters} = useCellsStore();
+  const {tags, setTags, initialize} = useModalFiltersStore(state => state);
+
+  useEffect(() => {
+    if (!enabled) {
+      return;
+    }
+    initialize({tags: filters.tags});
+  }, [enabled, filters.tags, initialize]);
+
+  const handleSave = () => {
+    filters.setTags(tags);
+  };
+
+  return {
+    tags,
+    setTags,
+    handleSave,
+  };
 };

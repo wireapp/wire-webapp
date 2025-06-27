@@ -17,29 +17,19 @@
  *
  */
 
-import {useEffect} from 'react';
+import {Button, ButtonVariant, CloseIcon} from '@wireapp/react-ui-kit';
 
-import {useCellsStore} from '../../../../common/useCellsStore/useCellsStore';
-import {useModalFiltersStore} from '../useModalFiltersStore/useModalFiltersStore';
+import {useCellsStore} from 'Components/CellsGlobalView/common/useCellsStore/useCellsStore';
 
-export const useModalFilters = ({enabled}: {enabled: boolean}) => {
-  const {filters} = useCellsStore();
-  const {tags, setTags, initialize} = useModalFiltersStore(state => state);
+import {buttonStyles} from './CellsClearFilters.styles';
 
-  useEffect(() => {
-    if (!enabled) {
-      return;
-    }
-    initialize({tags: filters.tags});
-  }, [enabled, filters.tags, initialize]);
+export const CellsClearFilters = () => {
+  const clearAll = useCellsStore(state => state.filters.clearAll);
 
-  const handleSave = () => {
-    filters.setTags(tags);
-  };
-
-  return {
-    tags,
-    setTags,
-    handleSave,
-  };
+  return (
+    <Button variant={ButtonVariant.TERTIARY} css={buttonStyles} onClick={clearAll}>
+      <CloseIcon />
+      Clear all
+    </Button>
+  );
 };
