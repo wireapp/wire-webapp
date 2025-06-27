@@ -28,15 +28,19 @@ import {
   SupportIcon,
   ChannelIcon,
   CollectionIcon,
+  TeamIcon,
 } from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {User} from 'src/script/entity/User';
+import {getManageTeamUrl} from 'src/script/externalRoute';
 import {ConversationFolderTab} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTab/ConversationFolderTab';
 import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {Core} from 'src/script/service/CoreSingleton';
 import {TeamState} from 'src/script/team/TeamState';
+import {FEATURES, hasAccessToFeature} from 'src/script/user/UserPermission';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isDataDogEnabled} from 'Util/DataDog';
 import {getWebEnvironment} from 'Util/Environment';
 import {replaceLink, t} from 'Util/LocalizerUtil';
@@ -89,6 +93,7 @@ export const ConversationTabs = ({
   const core = container.resolve(Core);
   const teamState = container.resolve(TeamState);
   const totalUnreadConversations = unreadConversations.length;
+  const {teamRole} = useKoSubscribableChildren(selfUser, ['teamRole']);
 
   const totalUnreadFavoriteConversations = favoriteConversations.filter(favoriteConversation =>
     favoriteConversation.hasUnread(),
@@ -165,7 +170,7 @@ export const ConversationTabs = ({
       unreadConversations: channelConversationsLength,
     });
   }
-
+  const manageTeamUrl = getManageTeamUrl();
   const replaceWireLink = replaceLink('https://app.wire.com', '', '');
 
   return (
@@ -293,6 +298,24 @@ export const ConversationTabs = ({
           showNotificationsBadge={showNotificationsBadge}
           isActive={currentTab === SidebarTabs.PREFERENCES}
         />
+
+        {hasAccessToFeature(FEATURES.MANAGE_TEAM, teamRole) && (
+          <a
+            rel="nofollow noopener noreferrer"
+            target="_blank"
+            href={manageTeamUrl}
+            type="button"
+            className="conversations-sidebar-btn"
+            title={t('preferencesAccountManageTeam')}
+            data-uie-name="go-team-management"
+          >
+            <span className="conversations-sidebar-btn--text-wrapper">
+              <TeamIcon />
+              <span className="conversations-sidebar-btn--text"> {t('preferencesAccountManageTeam')}</span>
+              <ExternalLinkIcon className="external-link-icon" />
+            </span>
+          </a>
+        )}
 
         <a
           rel="nofollow noopener noreferrer"
