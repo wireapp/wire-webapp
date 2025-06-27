@@ -20,14 +20,9 @@
 import {CSSObject} from '@emotion/react';
 
 export const buttonStyles: CSSObject = {
-  height: '32px',
-  padding: '0 8px',
   display: 'flex',
   alignItems: 'center',
   gap: '8px',
-  fontSize: 'var(--font-size-medium)',
-  fontWeight: 'var(--font-weight-bold)',
-  cursor: 'pointer',
   background: 'none',
   border: '1px solid transparent',
   margin: 0,
