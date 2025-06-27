@@ -28,6 +28,7 @@ interface FiltersState {
   tags: string[];
   setTags: (tags: string[]) => void;
   clearAll: () => void;
+  getActiveCount: () => number;
 }
 
 interface CellsState {
@@ -43,7 +44,6 @@ interface CellsState {
   setPublicLink: (nodeId: string, data: CellNode['publicLink']) => void;
   removeNode: (nodeId: string) => void;
   clearAll: () => void;
-  getActiveFiltersCount: () => number;
 }
 
 export const useCellsStore = create<CellsState>((set, get) => ({
@@ -67,6 +67,16 @@ export const useCellsStore = create<CellsState>((set, get) => ({
           tags: [],
         },
       })),
+    getActiveCount: () => {
+      const {filters} = get();
+      let count = 0;
+
+      if (filters.tags.length > 0) {
+        count += 1;
+      }
+
+      return count;
+    },
   },
   setNodes: nodes => set({nodes}),
   setStatus: status => set({status}),
@@ -81,14 +91,4 @@ export const useCellsStore = create<CellsState>((set, get) => ({
       nodes: state.nodes.filter(node => node.id !== nodeId),
     })),
   clearAll: () => set({nodes: [], error: null}),
-  getActiveFiltersCount: () => {
-    const {filters} = get();
-    let count = 0;
-
-    if (filters.tags.length > 0) {
-      count += 1;
-    }
-
-    return count;
-  },
 }));

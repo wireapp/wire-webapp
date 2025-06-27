@@ -21,7 +21,6 @@ import {useState} from 'react';
 
 import {IconButton, IconButtonVariant, OptionsIcon} from '@wireapp/react-ui-kit';
 
-import {useCellsStore} from 'Components/CellsGlobalView/common/useCellsStore/useCellsStore';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 
 import {buttonStyles, counterStyles} from './CellsFiltersMenu.styles';
@@ -29,17 +28,16 @@ import {CellsFiltersModal} from './CellsFiltersModal/CellsFiltersModal';
 import {useGetAllTags} from './useGetAllTags/useGetAllTags';
 
 interface CellsFiltersMenuProps {
+  activeFiltersCount: number;
   cellsRepository: CellsRepository;
 }
 
-export const CellsFiltersMenu = ({cellsRepository}: CellsFiltersMenuProps) => {
+export const CellsFiltersMenu = ({activeFiltersCount, cellsRepository}: CellsFiltersMenuProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const {tags} = useGetAllTags({
     cellsRepository,
   });
-
-  const activeFiltersCount = useCellsStore(state => state.getActiveFiltersCount());
 
   return (
     <>

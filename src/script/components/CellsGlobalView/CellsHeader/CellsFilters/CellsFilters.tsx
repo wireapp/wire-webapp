@@ -17,6 +17,7 @@
  *
  */
 
+import {useCellsStore} from 'Components/CellsGlobalView/common/useCellsStore/useCellsStore';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 
 import {CellsClearFilters} from './CellsClearFilters/CellsClearFilters';
@@ -27,10 +28,15 @@ interface CellsFiltersProps {
 }
 
 export const CellsFilters = ({cellsRepository}: CellsFiltersProps) => {
+  const {activeFiltersCount, clearAllFilters} = useCellsStore(state => ({
+    activeFiltersCount: state.filters.getActiveCount(),
+    clearAllFilters: state.filters.clearAll,
+  }));
+
   return (
     <>
-      <CellsFiltersMenu cellsRepository={cellsRepository} />
-      <CellsClearFilters />
+      <CellsFiltersMenu activeFiltersCount={activeFiltersCount} cellsRepository={cellsRepository} />
+      <CellsClearFilters onClearAll={clearAllFilters} />
     </>
   );
 };

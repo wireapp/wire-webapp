@@ -19,15 +19,15 @@
 
 import {Button, ButtonVariant, CloseIcon} from '@wireapp/react-ui-kit';
 
-import {useCellsStore} from 'Components/CellsGlobalView/common/useCellsStore/useCellsStore';
-
 import {buttonStyles} from './CellsClearFilters.styles';
 
-export const CellsClearFilters = () => {
-  const clearAll = useCellsStore(state => state.filters.clearAll);
+interface CellsClearFiltersProps {
+  onClearAll: () => void;
+}
 
+export const CellsClearFilters = ({onClearAll}: CellsClearFiltersProps) => {
   return (
-    <Button variant={ButtonVariant.TERTIARY} css={buttonStyles} onClick={clearAll}>
+    <Button variant={ButtonVariant.TERTIARY} css={buttonStyles} onClick={onClearAll}>
       <CloseIcon />
       Clear all
     </Button>
