@@ -36,7 +36,7 @@ export const CellsFilters = ({cellsRepository}: CellsFiltersProps) => {
   return (
     <>
       <CellsFiltersMenu activeFiltersCount={activeFiltersCount} cellsRepository={cellsRepository} />
-      <CellsClearFilters onClearAll={clearAllFilters} />
+      {activeFiltersCount > 0 && <CellsClearFilters onClearAll={clearAllFilters} />}
     </>
   );
 };
