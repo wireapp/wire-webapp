@@ -32,6 +32,7 @@ export const mapConversationRecord = ({id: qualifiedId, name}: BackUpConversatio
     id: qualifiedId.id.toString(),
     name: name.toString(),
     domain: qualifiedId.domain.toString(),
+    last_read_timestamp: new Date().getTime(),
   } as ConversationRecord;
   return conversationRecord;
 };
