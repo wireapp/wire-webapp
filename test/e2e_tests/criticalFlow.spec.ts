@@ -197,6 +197,7 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow']}, async ({pa
     userA.username = newUsername;
     await pages.setUsernamePage.setUsername(newUsername);
     await pages.setUsernamePage.clickNextButton();
+    await pages.registerSuccessPage.clickOpenWireWebButton();
   });
 
   await test.step('Personal user A declines sending anonymous usage data', async () => {

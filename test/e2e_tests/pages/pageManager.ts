@@ -33,6 +33,7 @@ import {GroupCreationPage} from './groupCreation.page';
 import {LoginPage} from './login.page';
 import {MarketingConsentModal} from './marketingConsent.modal';
 import {OutgoingConnectionPage} from './outgoingConnection.page';
+import {RegisterSuccessPage} from './registerSuccess.page';
 import {RegistrationPage} from './registration.page';
 import {SetUsernamePage} from './setUsername.page';
 import {SingleSignOnPage} from './singleSignOn.page';
@@ -241,5 +242,13 @@ export class PageManager {
       this._groupCreationPage = new GroupCreationPage(this.page);
     }
     return this._groupCreationPage;
+  }
+
+  private _registerSuccessPage!: RegisterSuccessPage;
+  get registerSuccessPage(): RegisterSuccessPage {
+    if (!this._registerSuccessPage) {
+      this._registerSuccessPage = new RegisterSuccessPage(this.page);
+    }
+    return this._registerSuccessPage;
   }
 }
