@@ -28,7 +28,9 @@ import {
   RemoteConversations,
   GROUP_CONVERSATION_TYPE,
   ADD_PERMISSION,
+  CONVERSATION_CELLS_STATE,
 } from '@wireapp/api-client/lib/conversation';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 import {isObject} from 'underscore';
 
@@ -258,6 +260,7 @@ export class ConversationMapper {
       initial_protocol,
       group_conv_type,
       add_permission,
+      cells_state,
     } = conversationData;
 
     let conversationEntity = new Conversation(
@@ -276,7 +279,7 @@ export class ConversationMapper {
     conversationEntity.name(name || '');
     conversationEntity.groupConversationType(group_conv_type || GROUP_CONVERSATION_TYPE.GROUP_CONVERSATION);
     conversationEntity.conversationModerator(add_permission || ADD_PERMISSION.ADMINS);
-
+    conversationEntity.cellsState(cells_state || CONVERSATION_CELLS_STATE.DISABLED);
     const selfState = members?.self || conversationData;
     conversationEntity = ConversationMapper.updateSelfStatus(conversationEntity, selfState as any);
 
@@ -290,11 +293,25 @@ export class ConversationMapper {
     }
 
     // Active participants from database or backend payload
-    const participatingUserIds =
-      qualified_others ||
-      (members?.others
-        ? members.others.map(other => ({domain: other.qualified_id?.domain || '', id: other.id}))
-        : others.map(userId => ({domain: '', id: userId})));
+    let participatingUserIds: QualifiedId[] = [];
+
+    if (qualified_others) {
+      participatingUserIds = qualified_others;
+    }
+
+    if (!qualified_others && members?.others?.length) {
+      participatingUserIds = members.others.map(other => ({
+        domain: other.qualified_id?.domain ?? '',
+        id: other.id,
+      }));
+    }
+
+    if (!qualified_others && !members?.others?.length && others) {
+      participatingUserIds = others.map(userId => ({
+        domain: '',
+        id: userId,
+      }));
+    }
 
     conversationEntity.participating_user_ids(participatingUserIds);
 
@@ -399,6 +416,7 @@ export class ConversationMapper {
       protocol,
       group_conv_type,
       add_permission,
+      cells_state,
     } = remoteConversationData;
     const {others: othersStates, self: selfState} = members;
 
@@ -420,6 +438,7 @@ export class ConversationMapper {
       type,
       group_conv_type,
       add_permission,
+      cells_state,
     };
 
     const qualified_others = othersStates?.filter(other => !!other.qualified_id).map(({qualified_id}) => qualified_id);

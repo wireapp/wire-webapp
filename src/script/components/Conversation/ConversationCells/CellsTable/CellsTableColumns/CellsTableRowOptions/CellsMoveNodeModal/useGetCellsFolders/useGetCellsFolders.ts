@@ -21,6 +21,7 @@ import {useCallback, useEffect, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
+import {CellNode} from 'Components/Conversation/ConversationCells/common/cellNode/cellNode';
 import {getCellsApiPath} from 'Components/Conversation/ConversationCells/common/getCellsApiPath/getCellsApiPath';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 
@@ -28,6 +29,7 @@ import {transformNodesToCellsFolders} from './transformNodesToCellsFolders';
 
 interface UseGetCellsFoldersProps {
   currentPath: string;
+  nodeToMove: CellNode;
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
 
@@ -44,6 +46,7 @@ interface Folder {
 const SHOW_LOADING_SPINNER_DELAY_MS = 1000;
 
 export const useGetCellsFolders = ({
+  nodeToMove,
   cellsRepository,
   conversationQualifiedId,
   currentPath,
@@ -73,7 +76,9 @@ export const useGetCellsFolders = ({
       }
 
       const transformedFolders = transformNodesToCellsFolders(result.Nodes);
-      setFolders(transformedFolders);
+      const filteredFolders = transformedFolders.filter(folder => folder.path !== nodeToMove.path);
+
+      setFolders(filteredFolders);
       setStatus('success');
     } catch (error) {
       setFolders([]);
@@ -82,7 +87,7 @@ export const useGetCellsFolders = ({
     }
     // cellsRepository is not a dependency because it's a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setFolders, setStatus, conversationQualifiedId, enabled, currentPath]);
+  }, [setFolders, setStatus, conversationQualifiedId, enabled, currentPath, nodeToMove]);
 
   useEffect(() => {
     void fetchFolders();

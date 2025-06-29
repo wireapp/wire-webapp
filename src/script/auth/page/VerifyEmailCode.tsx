@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import React, {useEffect} from 'react';
 
 import type {RegisterData} from '@wireapp/api-client/lib/auth/';
 import {FormattedMessage} from 'react-intl';
@@ -41,6 +41,7 @@ import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
 import {parseError} from '../util/errorUtil';
+import {PageView, trackTelemetryPageView} from '../util/trackingUtil';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
@@ -61,8 +62,9 @@ const VerifyEmailCodeComponent = ({
         email_code,
       };
       await doRegisterPersonal(validAccount, entropyData);
-      navigate(ROUTE.SET_HANDLE);
+      navigate(ROUTE.SET_HANDLE, {state: {isNewAccount: true}});
     } catch (error) {
+      trackTelemetryPageView(PageView.ACCOUNT_VERIFICATION_FAILED_SCREEN_2_5);
       logger.error('Failed to create personal account', error);
     }
   };
@@ -79,6 +81,10 @@ const VerifyEmailCodeComponent = ({
       logger.error('Failed to send email code', error);
     }
   };
+
+  useEffect(() => {
+    trackTelemetryPageView(PageView.ACCOUNT_VERIFICATION_SCREEN_2);
+  }, []);
 
   return (
     <Page hasAccountData>

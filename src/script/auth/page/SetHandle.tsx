@@ -22,10 +22,13 @@ import React, {useEffect, useState} from 'react';
 import {BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
 import {ConsentType} from '@wireapp/api-client/lib/self/index';
 import {connect} from 'react-redux';
+import {useLocation} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
 
+import {Runtime} from '@wireapp/commons';
 import {Button, ContainerXS, Form, Input, InputBlock, InputSubmitCombo, Text} from '@wireapp/react-ui-kit';
 
+import {navigate} from 'src/script/router/Router';
 import {StorageKey} from 'src/script/storage';
 import {t} from 'Util/LocalizerUtil';
 import {storeValue} from 'Util/StorageUtil';
@@ -39,9 +42,10 @@ import {EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action';
 import {bindActionCreators, RootState} from '../module/reducer';
 import * as SelfSelector from '../module/selector/SelfSelector';
-import {QUERY_KEY} from '../route';
+import {QUERY_KEY, ROUTE} from '../route';
 import {parseError} from '../util/errorUtil';
 import {createSuggestions} from '../util/handleUtil';
+import {PageView, resetTelemetrySession, trackTelemetryPageView} from '../util/trackingUtil';
 import {pathWithParams} from '../util/urlUtil';
 
 type Props = React.HTMLProps<HTMLDivElement>;
@@ -59,11 +63,15 @@ const SetHandleComponent = ({
 }: Props & ConnectedProps & DispatchProps) => {
   const [error, setError] = useState(null);
   const [handle, setHandle] = useState('');
+  const {state} = useLocation();
+  const isNewAccount = state?.isNewAccount ?? false;
 
   useEffect(() => {
     if (hasSelfHandle) {
       void removeLocalStorage(QUERY_KEY.JOIN_EXPIRES);
-      window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP));
+      if (!isNewAccount) {
+        window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP));
+      }
     }
   }, [hasSelfHandle]);
 
@@ -78,6 +86,8 @@ const SetHandleComponent = ({
         setError(error);
       }
     })();
+
+    trackTelemetryPageView(PageView.ACCOUNT_USERNAME_SCREEN_3);
   }, []);
 
   const updateConsent = (consentType: ConsentType, value: number): Promise<void> => doSetConsent(consentType, value);
@@ -86,6 +96,12 @@ const SetHandleComponent = ({
     event.preventDefault();
     try {
       await doSetHandle(handle.trim());
+      if (Runtime.isDesktopApp() || !isNewAccount) {
+        resetTelemetrySession();
+        window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP));
+      } else {
+        navigate(ROUTE.SUCCESS);
+      }
     } catch (error) {
       if (isBackendError(error) && error.label === BackendErrorLabel.INVALID_HANDLE && handle.trim().length < 2) {
         error.label = SyntheticErrorLabel.HANDLE_TOO_SHORT;

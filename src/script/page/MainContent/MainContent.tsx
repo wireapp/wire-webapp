@@ -258,7 +258,13 @@ const MainContent: FC<MainContentProps> = ({
               />
             )}
 
-            {contentState === ContentState.CELLS && <CellsGlobalView />}
+            {contentState === ContentState.CELLS && (
+              <CellsGlobalView
+                cellsRepository={repositories.cells}
+                userRepository={repositories.user}
+                conversationRepository={repositories.conversation}
+              />
+            )}
           </>
         </Animated>
       </SwitchTransition>
