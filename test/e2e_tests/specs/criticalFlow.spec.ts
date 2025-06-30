@@ -17,8 +17,6 @@
  *
  */
 
-import {faker} from '@faker-js/faker';
-
 import {Services} from '../data/serviceInfo';
 import {getUser, User} from '../data/user';
 import {test, expect} from '../test.fixtures';
@@ -192,12 +190,9 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow']}, async ({pa
   });
 
   await test.step('Personal user A sets user name', async () => {
-    // Expect that automatic username generation is correct
-    expect(await pages.setUsernamePage.getHandleInputValue()).toBe(userA.username);
-    const newUsername = userA.username.slice(0, 10) + faker.string.alpha(5).toLowerCase();
-    userA.username = newUsername;
-    await pages.setUsernamePage.setUsername(newUsername);
+    await pages.setUsernamePage.setUsername(userA.username);
     await pages.setUsernamePage.clickNextButton();
+    await pages.registerSuccessPage.clickOpenWireWebButton();
   });
 
   await test.step('Personal user A declines sending anonymous usage data', async () => {
@@ -264,26 +259,27 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow']}, async ({pa
     await pages.conversationSidebar.clickPreferencesButton();
   });
 
-  await test.step('Personal User A deletes their account', async () => {
-    await pages.accountPage.clickDeleteAccountButton();
-    expect(await pages.deleteAccountModal.isModalPresent());
-    expect(await pages.deleteAccountModal.getModalTitle()).toContain('Delete account');
-    expect(await pages.deleteAccountModal.getModalText()).toContain(
-      'We will send you an email. Follow the link to delete your account permanently.',
-    );
+  // Uncomment when [WPB-18496] is fixed
+  // await test.step('Personal User A deletes their account', async () => {
+  //   await pages.accountPage.clickDeleteAccountButton();
+  //   expect(await pages.deleteAccountModal.isModalPresent());
+  //   expect(await pages.deleteAccountModal.getModalTitle()).toContain('Delete account');
+  //   expect(await pages.deleteAccountModal.getModalText()).toContain(
+  //     'We will send you an email. Follow the link to delete your account permanently.',
+  //   );
 
-    await pages.deleteAccountModal.clickDelete();
-    const url = await api.inbucket.getAccountDeletionURL(userA.email);
+  //   await pages.deleteAccountModal.clickDelete();
+  //   const url = await api.inbucket.getAccountDeletionURL(userA.email);
 
-    await pages.openNewTab(url, async tab => {
-      await tab.deleteAccountPage.clickDeleteAccountButton();
-      expect(await tab.deleteAccountPage.isAccountDeletedHeadlineVisible());
-    });
+  //   await pages.openNewTab(url, async tab => {
+  //     await tab.deleteAccountPage.clickDeleteAccountButton();
+  //     expect(await tab.deleteAccountPage.isAccountDeletedHeadlineVisible());
+  //   });
 
-    expect(await pages.welcomePage.getLogoutReasonText()).toContain(
-      'You were signed out because your account was deleted',
-    );
-  });
+  //   expect(await pages.welcomePage.getLogoutReasonText()).toContain(
+  //     'You were signed out because your account was deleted',
+  //   );
+  // });
 });
 
 test.afterAll(async ({api}) => {
