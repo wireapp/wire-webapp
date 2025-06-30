@@ -17,26 +17,30 @@
  *
  */
 
+import {useEffect} from 'react';
+
 import {useCellsStore} from 'Components/CellsGlobalView/common/useCellsStore/useCellsStore';
-import {CellsRepository} from 'src/script/cells/CellsRepository';
 
-import {CellsClearFilters} from './CellsClearFilters/CellsClearFilters';
-import {CellsFiltersMenu} from './CellsFiltersMenu/CellsFiltersMenu';
+import {useModalFiltersStore} from '../useModalFiltersStore/useModalFiltersStore';
 
-interface CellsFiltersProps {
-  cellsRepository: CellsRepository;
-}
+export const useModalFilters = ({enabled}: {enabled: boolean}) => {
+  const {filters} = useCellsStore();
+  const {tags, setTags, initialize} = useModalFiltersStore(state => state);
 
-export const CellsFilters = ({cellsRepository}: CellsFiltersProps) => {
-  const {activeFiltersCount, clearAllFilters} = useCellsStore(state => ({
-    activeFiltersCount: state.filters.getActiveCount(),
-    clearAllFilters: state.filters.clearAll,
-  }));
+  useEffect(() => {
+    if (!enabled) {
+      return;
+    }
+    initialize({tags: filters.tags});
+  }, [enabled, filters.tags, initialize]);
 
-  return (
-    <>
-      <CellsFiltersMenu activeFiltersCount={activeFiltersCount} cellsRepository={cellsRepository} />
-      {activeFiltersCount > 0 && <CellsClearFilters onClearAll={clearAllFilters} />}
-    </>
-  );
+  const handleSave = () => {
+    filters.setTags(tags);
+  };
+
+  return {
+    tags,
+    setTags,
+    handleSave,
+  };
 };
