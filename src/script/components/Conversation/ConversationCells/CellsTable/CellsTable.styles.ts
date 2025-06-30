@@ -36,7 +36,7 @@ export const tableStyles: CSSObject = {
 };
 
 export const headerCellStyles: CSSObject = {
-  padding: '12px',
+  padding: '8px',
   textAlign: 'left',
   borderBottom: '1px solid var(--gray-70)',
   fontSize: 'var(--font-size-small)',
