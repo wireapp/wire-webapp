@@ -121,7 +121,7 @@ const getUploadedAtTimestamp = (node: RestNode): number => {
 };
 
 const getSize = (node: RestNode): string => {
-  return node.Size ? formatBytes(node.Size as unknown as number) : '0 MB';
+  return node.Size ? formatBytes(node.Size as unknown as number) : '-';
 };
 
 const getOwner = (node: RestNode): string => {
