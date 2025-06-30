@@ -21,6 +21,7 @@ import {CSSObject} from '@emotion/react';
 import {StylesConfig} from 'react-select';
 
 import {Theme} from '../../Identity/Theme';
+import {visuallyHidden} from '../../utils';
 import {
   baseContainerStyles,
   baseControlStyles,
@@ -77,7 +78,7 @@ export const selectStyles = ({
   option: (provided, {isDisabled, isFocused, isSelected, isMulti}) => ({
     ...provided,
     ...baseOptionStyles({theme, isDisabled, isFocused, isSelected, isMulti}),
-    padding: '10px 18px',
+    padding: '10px 16px',
     fontWeight: 400,
     '&:not(:last-of-type)': {
       borderBottom: `1px solid ${theme.Select.borderColor}`,
@@ -150,3 +151,5 @@ export const noOptionsMessageStyles = {
 export const loadingMessageStyles = {
   padding: '8px 12px',
 };
+
+export const labelCSS = ({isVisuallyHidden}: {isVisuallyHidden: boolean}) => (isVisuallyHidden ? visuallyHidden() : {});

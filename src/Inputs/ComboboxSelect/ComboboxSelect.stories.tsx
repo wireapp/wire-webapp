@@ -140,3 +140,13 @@ export const Loading: Story = {
     loadingMessage: 'Loading options...',
   },
 };
+
+export const WithLabelVisuallyHidden: Story = {
+  args: {
+    id: 'with-label-visually-hidden-select',
+    label: 'Select options',
+    labelVisuallyHidden: true,
+    options: initialOptions,
+    noOptionsMessage: 'No options available',
+  },
+};

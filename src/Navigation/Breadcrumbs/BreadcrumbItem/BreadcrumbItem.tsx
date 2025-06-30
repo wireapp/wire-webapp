@@ -26,9 +26,10 @@ interface BreadcrumbItemProps {
   icon?: ReactNode;
   isActive: boolean;
   onClick: (event: ReactMouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  isFirst: boolean;
 }
 
-export const BreadcrumbItem = ({name, icon, isActive, onClick}: BreadcrumbItemProps) => {
+export const BreadcrumbItem = ({name, icon, isActive, onClick, isFirst}: BreadcrumbItemProps) => {
   return (
     <li css={listItemStyles}>
       {isActive ? (
@@ -37,7 +38,7 @@ export const BreadcrumbItem = ({name, icon, isActive, onClick}: BreadcrumbItemPr
           {name}
         </span>
       ) : (
-        <button type="button" css={buttonStyles} onClick={onClick}>
+        <button type="button" css={buttonStyles({isFirst})} onClick={onClick}>
           {icon}
           {name}
         </button>
