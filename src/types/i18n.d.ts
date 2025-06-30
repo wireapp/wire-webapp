@@ -368,6 +368,7 @@ declare module 'I18n/en-US.json' {
     'callingRestrictedConferenceCallTeamMemberModalTitle': `Feature unavailable`;
     'cameraStatusOff': `off`;
     'cameraStatusOn': `on`;
+    'cells.clearFilters.button': `Clear all`;
     'cells.deletePermanentlyModal.button': `Delete`;
     'cells.deletePermanentlyModal.file.description': `This will permanently delete the file {name} for all participants.`;
     'cells.deletePermanentlyModal.folder.description': `This will permanently delete the folder {name} and its contents for all participants.`;
