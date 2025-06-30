@@ -419,6 +419,7 @@ declare module 'I18n/en-US.json' {
     'cells.options.move': `Move`;
     'cells.options.share': `Share`;
     'cells.options.restore': `Restore`;
+    'cells.options.rename': `Rename`;
     'cells.options.label': `More options`;
     'cells.pagination.loadMoreResults': `Load More Results`;
     'cells.pagination.nextPage': `Next Page`;
