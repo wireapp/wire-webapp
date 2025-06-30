@@ -155,8 +155,16 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
     backupRepository.cancelAction();
   };
 
+  const onClose = () => {
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.HISTORY.BACKUP_CANCELLED, {
+      [Segmentation.GENERAL.STEP]: Segmentation.BACKUP_CREATION.CANCELLATION_STEP.BEFORE_BACKUP,
+    });
+    dismissExport();
+  };
+
   const showBackupModal = () => {
     PrimaryModal.show(PrimaryModal.type.PASSWORD_ADVANCED_SECURITY, {
+      close: () => onClose(),
       primaryAction: {
         action: async (password: string, hasMultipleAttempts: boolean) => {
           exportHistory(password, hasMultipleAttempts);
@@ -165,12 +173,7 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
       },
       secondaryAction: [
         {
-          action: () => {
-            amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.HISTORY.BACKUP_CANCELLED, {
-              [Segmentation.GENERAL.STEP]: Segmentation.BACKUP_CREATION.CANCELLATION_STEP.BEFORE_BACKUP,
-            });
-            dismissExport();
-          },
+          action: () => onClose(),
           text: t('backupEncryptionModalCloseBtn'),
         },
       ],
