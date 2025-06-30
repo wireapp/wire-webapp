@@ -44,3 +44,11 @@ export const ellipsis = (): CSSObject => ({
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
 });
+
+export const visuallyHidden = (): CSSObject => ({
+  position: 'absolute',
+  left: '-9999px',
+  top: 'auto',
+  width: '1px',
+  height: '1px',
+});

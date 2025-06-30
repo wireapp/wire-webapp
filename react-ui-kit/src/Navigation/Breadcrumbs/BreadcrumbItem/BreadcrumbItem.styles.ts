@@ -27,7 +27,7 @@ export const listItemStyles: CSSObject = {
   flexShrink: 0,
 };
 
-export const buttonStyles: CSSObject = {
+export const buttonStyles = ({isFirst}: {isFirst: boolean}): CSSObject => ({
   background: 'none',
   border: 'none',
   padding: '0 8px',
@@ -38,16 +38,19 @@ export const buttonStyles: CSSObject = {
   alignItems: 'center',
   gap: '8px',
 
+  ...(isFirst && {paddingLeft: '0'}),
+
   '&:hover': {
     color: 'var(--main-color)',
   },
-};
+});
 
 export const activeItemStyles: CSSObject = {
   display: 'inline-flex',
   alignItems: 'center',
   gap: '8px',
-  padding: '0 8px',
+  paddingLeft: '8px',
+  paddingRight: '0',
   fontSize: '14px',
   color: 'var(--main-color)',
 };

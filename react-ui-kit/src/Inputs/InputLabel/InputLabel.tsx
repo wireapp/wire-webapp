@@ -19,6 +19,8 @@
 
 import {FC, ReactNode} from 'react';
 
+import {CSSObject} from '@emotion/react';
+
 import {COLOR_V2} from '../../Identity';
 import {Theme} from '../../Identity/Theme';
 
@@ -27,9 +29,10 @@ export interface InputLabelProps {
   htmlFor?: string;
   markInvalid?: boolean;
   isRequired?: boolean;
+  labelCSS?: CSSObject;
 }
 
-const InputLabel: FC<InputLabelProps> = ({htmlFor, markInvalid, isRequired, children, ...props}) => (
+const InputLabel: FC<InputLabelProps> = ({htmlFor, markInvalid, isRequired, children, labelCSS, ...props}) => (
   <label
     htmlFor={htmlFor}
     css={(theme: Theme) => ({
@@ -39,6 +42,7 @@ const InputLabel: FC<InputLabelProps> = ({htmlFor, markInvalid, isRequired, chil
       color: markInvalid ? COLOR_V2.RED_LIGHT_500 : theme.Input.labelColor,
       marginBottom: '2px',
       display: 'block',
+      ...labelCSS,
     })}
     {...props}
   >

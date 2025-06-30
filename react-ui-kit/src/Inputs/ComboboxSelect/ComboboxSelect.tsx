@@ -23,7 +23,13 @@ import {CSSObject, useTheme} from '@emotion/react';
 import BaseSelect, {components, MenuPosition, MultiValueRemoveProps, NoticeProps} from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 
-import {selectStyles, noOptionsMessageStyles, wrapperStyles, loadingMessageStyles} from './ComboboxSelect.styles';
+import {
+  selectStyles,
+  noOptionsMessageStyles,
+  wrapperStyles,
+  loadingMessageStyles,
+  labelCSS,
+} from './ComboboxSelect.styles';
 
 import {CloseIcon} from '../../DataDisplay/Icon';
 import {Theme} from '../../Identity/Theme';
@@ -48,12 +54,14 @@ export interface ComboboxSelectProps {
   createOptionLabel?: (inputValue: string) => string;
   noOptionsMessage: string;
   label?: string;
+  labelVisuallyHidden?: boolean;
   required?: boolean;
   menuPortalTarget?: HTMLElement;
   menuPosition?: MenuPosition;
   menuListCSS?: CSSObject;
   isLoading?: boolean;
   loadingMessage?: string;
+  closeMenuOnSelect?: boolean;
 }
 
 export const ComboboxSelect = ({
@@ -68,17 +76,19 @@ export const ComboboxSelect = ({
   createOptionLabel,
   noOptionsMessage,
   label,
+  labelVisuallyHidden = false,
   required,
   menuPortalTarget,
   menuPosition = 'absolute',
   menuListCSS,
   isLoading = false,
   loadingMessage,
+  closeMenuOnSelect = true,
 }: ComboboxSelectProps) => {
   return (
     <div css={wrapperStyles} data-uie-name={dataUieName}>
       {label && (
-        <InputLabel htmlFor={id} isRequired={required}>
+        <InputLabel htmlFor={id} isRequired={required} labelCSS={labelCSS({isVisuallyHidden: labelVisuallyHidden})}>
           {label}
         </InputLabel>
       )}
@@ -98,6 +108,7 @@ export const ComboboxSelect = ({
         noOptionsMessage={noOptionsMessage}
         loadingMessage={loadingMessage}
         menuListCSS={menuListCSS}
+        closeMenuOnSelect={closeMenuOnSelect}
       />
     </div>
   );
@@ -119,6 +130,7 @@ const Select = ({
   isLoading = false,
   loadingMessage,
   creatable = false,
+  closeMenuOnSelect = true,
 }: ComboboxSelectProps & {creatable?: boolean}) => {
   const theme = useTheme() as Theme;
 
@@ -136,6 +148,7 @@ const Select = ({
     return (
       <BaseSelect
         id={id}
+        inputId={id}
         options={options}
         value={value}
         onChange={onChange}
@@ -147,7 +160,7 @@ const Select = ({
         menuPosition={menuPosition}
         styles={selectStyles({theme, menuListCSS})}
         classNamePrefix="select"
-        closeMenuOnSelect={false}
+        closeMenuOnSelect={closeMenuOnSelect}
         components={components}
       />
     );
@@ -156,6 +169,7 @@ const Select = ({
   return (
     <CreatableSelect
       id={id}
+      inputId={id}
       options={options}
       value={value}
       onChange={onChange}
@@ -169,7 +183,7 @@ const Select = ({
       classNamePrefix="select"
       formatCreateLabel={createOptionLabel}
       onCreateOption={onCreateOption}
-      closeMenuOnSelect={false}
+      closeMenuOnSelect={closeMenuOnSelect}
       isLoading={isLoading}
       components={components}
     />

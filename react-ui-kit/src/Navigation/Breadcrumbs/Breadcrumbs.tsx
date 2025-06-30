@@ -65,6 +65,7 @@ export const Breadcrumbs = ({
               icon={crumb.icon}
               isActive={index === items.length - 1}
               onClick={() => onItemClick(crumb)}
+              isFirst={index === 0}
             />
           </>
         ))}
@@ -86,6 +87,7 @@ export const Breadcrumbs = ({
         icon={firstCrumb.icon}
         isActive={false}
         onClick={() => onItemClick(firstCrumb)}
+        isFirst={true}
       />
       <BreadcrumbLeaf />
       <CombainedBreadcrumbs items={middleCrumbs} onItemClick={onItemClick} />
@@ -99,6 +101,7 @@ export const Breadcrumbs = ({
             icon={crumb.icon}
             isActive={index === lastTwoCrumbs.length - 1}
             onClick={() => onItemClick(crumb)}
+            isFirst={false}
           />
         </>
       ))}
