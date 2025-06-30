@@ -20,7 +20,7 @@
 import {isObject} from 'src/script/guards/common';
 
 import {AssetMetaData, BackupMessageContent} from './CPB.library';
-import {ImageAsset} from './CPB.types';
+import {AudioAsset, ImageAsset} from './CPB.types';
 
 const AssetContentType = {
   Image: ['image/jpg', 'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/'],
@@ -53,6 +53,11 @@ const AssetContentType = {
 
 const hasNameProperty = (infoObject: unknown): infoObject is {name: string} =>
   isObject(infoObject) && 'name' in infoObject;
+const isAudioAsset = (contentType: string, metaObject: unknown): metaObject is AudioAsset =>
+  AssetContentType.isAudio(contentType) &&
+  isObject(metaObject) &&
+  'normalization' in metaObject &&
+  'duration' in metaObject;
 const isImageAsset = (contentType: string, infoObject: unknown): infoObject is ImageAsset =>
   AssetContentType.isImage(contentType) &&
   isObject(infoObject) &&
@@ -60,31 +65,18 @@ const isImageAsset = (contentType: string, infoObject: unknown): infoObject is I
   'width' in infoObject &&
   'tag' in infoObject;
 
-// These can be used in the future if we have to pass more data for these kind of file types
-
-// const isFileAsset = (contentType: string, infoObject: unknown): infoObject is FileAsset =>
-//   AssetContentType.isData(contentType) && hasNameProperty(infoObject);
-//const isVideoAsset = (contentType: string, infoObject: unknown): infoObject is VideoAsset =>
-//  AssetContentType.isVideo(contentType) && isObject(infoObject) && infoObject !== null && 'name' in infoObject;
-//const isAudioAsset = (contentType: string, infoObject: unknown): infoObject is AudioAsset =>
-//  AssetContentType.isAudio(contentType) && isObject(infoObject) && infoObject !== null && 'name' in infoObject;
-//const isTextAsset = (contentType: string, infoObject: unknown): infoObject is TexttAsset =>
-//  AssetContentType.isText(contentType) && isObject(infoObject) && infoObject !== null && 'name' in infoObject;
-//const isOtherAsset = (contentType: string, infoObject: unknown): infoObject is OtherAsset =>
-//  AssetContentType.isOther(contentType) && isObject(infoObject) && infoObject !== null && 'name' in infoObject;
-// const isUndefinedAsset = (contentType: string, infoObject: unknown): infoObject is UndefinedAsset =>
-//   AssetContentType.isUndefined(contentType) && hasNameProperty(infoObject);
-
 /**
  * Build metadata for an asset backup
  * @param contentType
  * @param infoObject
  * @returns metadata for the asset
  */
-export const buildMetaData = (contentType: string, infoObject: unknown) => {
+export const buildMetaData = (contentType: string, infoObject: unknown, metaObject: unknown) => {
   let metaData: AssetMetaData | null;
 
-  if (isImageAsset(contentType, infoObject)) {
+  if (isAudioAsset(contentType, metaObject)) {
+    metaData = new BackupMessageContent.Asset.AssetMetadata.Audio(metaObject.normalization, metaObject.duration);
+  } else if (isImageAsset(contentType, infoObject)) {
     metaData = new BackupMessageContent.Asset.AssetMetadata.Image(infoObject.width, infoObject.height, infoObject.tag);
   } else if (hasNameProperty(infoObject)) {
     metaData = new BackupMessageContent.Asset.AssetMetadata.Generic(infoObject.name);
