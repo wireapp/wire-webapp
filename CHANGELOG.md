@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.60.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.60.0...@wireapp/react-ui-kit@9.60.1) (2025-06-30)
+
+### Bug Fixes
+
+* **react-ui-kit:** cells design bugs [WPB-18354] ([#7091](https://github.com/wireapp/wire-web-packages/issues/7091)) ([c5feb0b](https://github.com/wireapp/wire-web-packages/commit/c5feb0b3bf718a540572d1aecd59c012b885df6b))
+
 # [9.60.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.59.3...@wireapp/react-ui-kit@9.60.0) (2025-06-19)
 
 ### Features
