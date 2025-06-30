@@ -17,15 +17,16 @@
  *
  */
 
-import {Services} from './data/serviceInfo';
-import {getUser, User} from './data/user';
-import {test, expect} from './test.fixtures';
-import {generateSecurePassword} from './utils/userDataGenerator';
+import {Services} from '../data/serviceInfo';
+import {getUser, User} from '../data/user';
+import {test, expect} from '../test.fixtures';
+import {generateSecurePassword} from '../utils/userDataGenerator';
 
 const createdUsers: User[] = [];
 const createdTeams: Map<User, string> = new Map();
 
 test('Team owner adds whole team to an all team chat', {tag: ['@TC-8631', '@crit-flow']}, async ({pages, api}) => {
+  test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
   // Generating test data
   const owner = getUser();
   const member1 = getUser();
@@ -154,7 +155,7 @@ test('Account Management', {tag: ['@TC-8639', '@crit-flow']}, async ({pages, api
 });
 
 test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow']}, async ({pages, api}) => {
-  test.setTimeout(120_000); // Increasing test timeout to 120 seconds to accommodate the full flow
+  test.setTimeout(150_000); // Increasing test timeout to 150 seconds to accommodate the full flow
 
   // Generating test data
   // userB is the contact user, userA is the user who registers

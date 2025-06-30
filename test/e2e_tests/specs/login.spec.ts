@@ -17,14 +17,15 @@
  *
  */
 
-import {User, getUser} from './data/user';
-import {test, expect} from './test.fixtures';
+import {User, getUser} from '../data/user';
+import {test, expect} from '../test.fixtures';
+import {generateSecurePassword} from '../utils/userDataGenerator';
 
 const createdUsers: User[] = [];
 
 test('Verify sign in error appearance in case of wrong credentials', {tag: ['@TC-3465', '@smoke']}, async ({pages}) => {
   const incorrectEmail = 'blablabla@wire.engineering';
-  const incorrectPassword = 'pass#$12367!';
+  const incorrectPassword = generateSecurePassword();
 
   await pages.openMainPage();
   await pages.singleSignOnPage.enterEmailOnSSOPage(incorrectEmail);
