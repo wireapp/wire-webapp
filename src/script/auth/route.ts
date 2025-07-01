@@ -88,4 +88,5 @@ export const ROUTE = {
   VERIFY_EMAIL_CODE: '/verifyemailcode',
   VERIFY_EMAIL_LINK: '/verifyemaillink',
   E2EI_OAUTH_REDIRECT: '/e2ei-redirect',
+  SUCCESS: '/success',
 };

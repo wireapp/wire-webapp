@@ -180,7 +180,10 @@ declare module 'I18n/en-US.json' {
     'accountForm.passwordPlaceholder': `Password`;
     'accountForm.submitButton': `Next`;
     'accountForm.terms': `I accept the <terms>terms and conditions</terms>`;
-    'accountForm.termsAndPrivacyPolicy': `I accept the <terms>terms and conditions</terms> and <privacypolicy>privacy policy</privacypolicy>`;
+    'accountForm.privacyPolicy': `I agree to share anonymous usage data. Find all details in our {privacyPolicyLink} (optional)`;
+    'accountForm.privacyPolicyLink': `Privacy Policy`;
+    'accountForm.termsAndConditions': `I accept Wire\'s {termsAndConditionsLink}`;
+    'accountForm.termsAndConditionsLink': `Terms & Conditions`;
     'acme.done.button': `Ok`;
     'acme.done.button.close': `Close window \'Certificate Downloaded\'`;
     'acme.done.button.secondary': `Certificate details`;
@@ -365,6 +368,7 @@ declare module 'I18n/en-US.json' {
     'callingRestrictedConferenceCallTeamMemberModalTitle': `Feature unavailable`;
     'cameraStatusOff': `off`;
     'cameraStatusOn': `on`;
+    'cells.clearFilters.button': `Clear all`;
     'cells.deletePermanentlyModal.button': `Delete`;
     'cells.deletePermanentlyModal.file.description': `This will permanently delete the file {name} for all participants.`;
     'cells.deletePermanentlyModal.folder.description': `This will permanently delete the folder {name} and its contents for all participants.`;
@@ -504,6 +508,10 @@ declare module 'I18n/en-US.json' {
     'chooseHandle.headline': `Set your username`;
     'chooseHandle.subhead': `Your username helps people find you.`;
     'chooseHandle.submitButton': `Continue`;
+    'success.header': `Great, your personal account is set up. Now you can connect with people.`;
+    'success.subheader': `What do you want to do next?`;
+    'success.downloadButton': `Download Wire`;
+    'success.openWebAppText': `Open Wire for web`;
     'clientItem.passwordPlaceholder': `Password`;
     'clientManager.headline': `Remove a device`;
     'clientManager.logout': `Cancel process`;

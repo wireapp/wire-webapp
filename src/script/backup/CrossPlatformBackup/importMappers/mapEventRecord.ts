@@ -18,6 +18,7 @@
  */
 
 import {ClientEvent} from 'src/script/event/Client';
+import {MessageCategory} from 'src/script/message/MessageCategory';
 import {EventRecord} from 'src/script/storage';
 
 import {CPBLogger} from '..';
@@ -79,6 +80,58 @@ const isAssetContent = (content: BackupMessageContent): content is BackupMessage
   content instanceof BackupMessageContent.Asset;
 const isLocationContent = (content: BackupMessageContent): content is BackupMessageContent.Location =>
   content instanceof BackupMessageContent.Location;
+const isImageContent = (
+  metadata: BackupMessageContent.Asset.AssetMetadata,
+): metadata is BackupMessageContent.Asset.AssetMetadata.Image =>
+  metadata instanceof BackupMessageContent.Asset.AssetMetadata.Image;
+const isVideoContent = (
+  metadata: BackupMessageContent.Asset.AssetMetadata,
+): metadata is BackupMessageContent.Asset.AssetMetadata.Video =>
+  metadata instanceof BackupMessageContent.Asset.AssetMetadata.Video;
+const isAudioContent = (
+  metadata: BackupMessageContent.Asset.AssetMetadata,
+): metadata is BackupMessageContent.Asset.AssetMetadata.Audio =>
+  metadata instanceof BackupMessageContent.Asset.AssetMetadata.Audio;
+const isFileContent = (
+  metadata: BackupMessageContent.Asset.AssetMetadata,
+): metadata is BackupMessageContent.Asset.AssetMetadata.Generic =>
+  metadata instanceof BackupMessageContent.Asset.AssetMetadata.Generic;
+
+const mapMessageContentToCategory = (message: BackupMessage): MessageCategory => {
+  if (isTextContent(message.content)) {
+    return MessageCategory.TEXT;
+  }
+  if (isLocationContent(message.content)) {
+    return MessageCategory.LOCATION;
+  }
+  if (isAssetContent(message.content)) {
+    const name = message.content.name;
+    const metadata = message.content.metaData;
+    if (!metadata) {
+      if (name) {
+        return MessageCategory.FILE;
+      }
+      return MessageCategory.UNDEFINED;
+    }
+    if (isImageContent(metadata)) {
+      const mimeType = message.content.mimeType;
+      if (mimeType === 'image/gif') {
+        return MessageCategory.GIF;
+      }
+      return MessageCategory.IMAGE;
+    }
+    if (isVideoContent(metadata)) {
+      return MessageCategory.VIDEO;
+    }
+    if (isAudioContent(metadata)) {
+      return MessageCategory.AUDIO;
+    }
+    if (isFileContent(metadata)) {
+      return MessageCategory.FILE;
+    }
+  }
+  return MessageCategory.UNDEFINED;
+};
 
 type TextBackupMessage = BackupMessage & {content: BackupMessageContent.Text};
 const mapTextMessageToEventRecord = (message: TextBackupMessage): EventRecord => ({
@@ -88,7 +141,7 @@ const mapTextMessageToEventRecord = (message: TextBackupMessage): EventRecord =>
   },
   // there is a type mismatch here, but it is not relevant for the import
   type: ClientEvent.CONVERSATION.MESSAGE_ADD as any,
-  category: 16,
+  category: mapMessageContentToCategory(message),
 });
 
 type AssetBackupMessage = BackupMessage & {content: BackupMessageContent.Asset};
@@ -98,7 +151,7 @@ const mapAssetMessageToEventRecord = (message: AssetBackupMessage): EventRecord 
   data: {
     content_length: message.content.size.toString(),
     content_type: message.content.mimeType.toString(),
-    info: message.content.metaData,
+    info: {...message.content.metaData, name: message.content.name?.toString() ?? null},
     domain: message.content.assetDomain?.toString(),
     key: message.content.assetId?.toString(),
     otr_key: transformArrayToObject(message.content.otrKey),
@@ -108,7 +161,7 @@ const mapAssetMessageToEventRecord = (message: AssetBackupMessage): EventRecord 
   },
   // there is a type mismatch here, but it is not relevant for the import
   type: ClientEvent.CONVERSATION.ASSET_ADD as any,
-  category: 128,
+  category: mapMessageContentToCategory(message),
 });
 
 type LocationBackupMessage = BackupMessage & {content: BackupMessageContent.Location};
@@ -124,7 +177,7 @@ const mapLocationMessageToEventRecord = (message: LocationBackupMessage): EventR
     },
   },
   type: ClientEvent.CONVERSATION.LOCATION as any,
-  category: 4096,
+  category: mapMessageContentToCategory(message),
 });
 
 /**

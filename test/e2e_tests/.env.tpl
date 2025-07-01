@@ -17,9 +17,15 @@
 //
 
 # Define browsers [chromium, firefox, webkit]
-BROWSERS=chromium,firefox
+BROWSERS=chromium
 HEADLESS=true
+TEST_SERVICE_URL=http://192.168.2.18:8080
 
-BACKEND_URL=op://Test Automation/BackendConnection staging-with-webapp-master/backendUrl
-WEBAPP_URL=op://Test Automation/BackendConnection staging-with-webapp-master/webappUrl
-BASIC_AUTH=op://Test Automation/BackendConnection staging-with-webapp-master/basicAuth
+INBUCKET_USERNAME=op://Test Automation/BackendConnection staging/inbucketUsername
+INBUCKET_PASSWORD=op://Test Automation/BackendConnection staging/inbucketPassword
+INBUCKET_URL=op://Test Automation/BackendConnection staging/inbucketUrl
+BACKEND_URL=op://Test Automation/BackendConnection staging/backendUrl
+WEBAPP_URL=op://Test Automation/BackendConnection staging/webappUrl
+TEAM_MANAGEMENT_URL=op://Test Automation/BackendConnection staging/teamManagementUrl
+DOMAIN=op://Test Automation/BackendConnection staging/domain
+BASIC_AUTH=op://Test Automation/BackendConnection staging/basicAuth

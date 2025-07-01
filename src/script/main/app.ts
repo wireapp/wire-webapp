@@ -349,10 +349,21 @@ export class App {
     amplify.subscribe(WebAppEvents.LIFECYCLE.SIGN_OUT, this.logout);
   }
 
-  private initializeCells({cellsRepository, selfUser}: {cellsRepository: CellsRepository; selfUser: User}) {
+  private initializeCells({
+    cellsRepository,
+    selfUser,
+    accessToken,
+  }: {
+    cellsRepository: CellsRepository;
+    selfUser: User;
+    accessToken: string;
+  }) {
     const cellPydioApiKey = Config.getConfig().CELLS_TOKEN_SHARED_SECRET;
+    const cellsInitWithZauthToken = Config.getConfig().FEATURE.CELLS_INIT_WITH_ZAUTH_TOKEN;
 
-    const cellsApiKey = `${cellPydioApiKey}:${selfUser.qualifiedId.id}@${selfUser.qualifiedId.domain}`;
+    const cellsApiKey = cellsInitWithZauthToken
+      ? accessToken
+      : `${cellPydioApiKey}:${selfUser.qualifiedId.id}@${selfUser.qualifiedId.domain}`;
 
     cellsRepository.initialize({
       pydio: {
@@ -417,7 +428,9 @@ export class App {
 
       const selfUser = await this.repository.user.getSelf([{position: 'App.initiateSelfUser', vendor: 'webapp'}]);
 
-      this.initializeCells({cellsRepository, selfUser});
+      const accessToken = this.apiClient.transport.http.accessTokenStore.accessToken?.access_token!;
+
+      this.initializeCells({cellsRepository, selfUser, accessToken});
 
       await initializeDataDog(this.config, selfUser.qualifiedId);
       const eventLogger = new InitializationEventLogger(selfUser.id);
@@ -463,7 +476,8 @@ export class App {
       try {
         await this.core.initClient(localClient, getClientMLSConfig(teamFeatures));
       } catch (error) {
-        await this.showForceLogoutModal(SIGN_OUT_REASON.CLIENT_REMOVED);
+        console.warn('Failed to initialize client', {error});
+        this.showForceLogoutModal(SIGN_OUT_REASON.CLIENT_REMOVED);
       }
 
       const e2eiHandler = await configureE2EI(teamFeatures);
@@ -536,6 +550,11 @@ export class App {
 
       let totalNotifications = 0;
       await eventRepository.connectWebSocket(this.core, ({done, total}) => {
+        /**
+         * NOTE: this call back is now also called when client was already open but websocket
+         * was offline for a while hence it can be used to demonstrate number of pending messages
+         * even when app is already loaded and in the main screen view
+         */
         const baseMessage = t('initDecryption');
         const extraInfo = this.config.FEATURE.SHOW_LOADING_INFORMATION
           ? ` ${t('initProgress', {number1: done.toString(), number2: total.toString()})}`

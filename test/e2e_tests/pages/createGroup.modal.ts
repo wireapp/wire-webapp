@@ -17,29 +17,20 @@
  *
  */
 
-import {useEffect} from 'react';
+import {Locator, Page} from '@playwright/test';
 
-import {useCellsStore} from '../../../../common/useCellsStore/useCellsStore';
-import {useModalFiltersStore} from '../useModalFiltersStore/useModalFiltersStore';
+export class CreateGroupModal {
+  readonly page: Page;
 
-export const useModalFilters = ({enabled}: {enabled: boolean}) => {
-  const {filters} = useCellsStore();
-  const {tags, setTags, initialize} = useModalFiltersStore(state => state);
+  readonly createGroupModal: Locator;
+  readonly createGroupNameInput: Locator;
+  readonly createGroupSubmitButton: Locator;
 
-  useEffect(() => {
-    if (!enabled) {
-      return;
-    }
-    initialize({tags: filters.tags});
-  }, [enabled, filters.tags, initialize]);
+  constructor(page: Page) {
+    this.page = page;
 
-  const handleSave = () => {
-    filters.setTags(tags);
-  };
-
-  return {
-    tags,
-    setTags,
-    handleSave,
-  };
-};
+    this.createGroupModal = page.locator('[data-uie-name="group-creation-label"]');
+    this.createGroupNameInput = this.createGroupModal.locator('[data-uie-name="enter-group-name"]');
+    this.createGroupSubmitButton = this.createGroupModal.locator('[data-uie-name="submit"]');
+  }
+}
