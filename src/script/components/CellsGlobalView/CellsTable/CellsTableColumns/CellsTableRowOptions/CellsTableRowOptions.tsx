@@ -51,13 +51,13 @@ export const CellsTableRowOptions = ({node, cellsRepository}: CellsTableRowOptio
         </button>
       </DropdownMenu.Trigger>
       <DropdownMenu.Content>
-        <DropdownMenu.Item onClick={() => showShareModal({type: node.type, uuid: node.id, cellsRepository})}>
-          {t('cells.options.share')}
-        </DropdownMenu.Item>
         <DropdownMenu.Item
           onClick={() => (node.type === 'folder' ? openFolder({path: node.path}) : handleOpenFile(node))}
         >
           {t('cells.options.open')}
+        </DropdownMenu.Item>
+        <DropdownMenu.Item onClick={() => showShareModal({type: node.type, uuid: node.id, cellsRepository})}>
+          {t('cells.options.share')}
         </DropdownMenu.Item>
         {url && (
           <DropdownMenu.Item
