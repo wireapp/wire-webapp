@@ -19,7 +19,7 @@
 
 import {MouseEvent, KeyboardEvent} from 'react';
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {DeviceVerificationBadges} from 'Components/Badge';
 import * as Icon from 'Components/Icon';

@@ -22,13 +22,12 @@ import React, {useEffect, useState} from 'react';
 import {BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
 import {ConsentType} from '@wireapp/api-client/lib/self/index';
 import {connect} from 'react-redux';
-import {useLocation} from 'react-router';
+import {useLocation, useNavigate} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
 
 import {Runtime} from '@wireapp/commons';
 import {Button, ContainerXS, Form, Input, InputBlock, InputSubmitCombo, Text} from '@wireapp/react-ui-kit';
 
-import {navigate} from 'src/script/router/Router';
 import {StorageKey} from 'src/script/storage';
 import {t} from 'Util/LocalizerUtil';
 import {storeValue} from 'Util/StorageUtil';
@@ -64,6 +63,7 @@ const SetHandleComponent = ({
   const [error, setError] = useState(null);
   const [handle, setHandle] = useState('');
   const {state} = useLocation();
+  const navigate = useNavigate();
   const isNewAccount = state?.isNewAccount ?? false;
 
   useEffect(() => {
