@@ -421,6 +421,7 @@
   "cells.options.label": "Больше вариантов",
   "cells.options.move": "Переместить",
   "cells.options.open": "Открыть",
+  "cells.options.rename": "Rename",
   "cells.options.restore": "Восстановить",
   "cells.options.share": "Поделится",
   "cells.options.tags": "Добавить или удалить теги",

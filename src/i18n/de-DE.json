@@ -421,6 +421,7 @@
   "cells.options.label": "Weitere Optionen",
   "cells.options.move": "Move",
   "cells.options.open": "Öffnen",
+  "cells.options.rename": "Rename",
   "cells.options.restore": "Wiederherstellen",
   "cells.options.share": "Teilen",
   "cells.options.tags": "Tags hinzufügen oder entfernen",
