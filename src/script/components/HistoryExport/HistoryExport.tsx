@@ -164,7 +164,7 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
 
   const showBackupModal = () => {
     PrimaryModal.show(PrimaryModal.type.PASSWORD_ADVANCED_SECURITY, {
-      close: () => onClose(),
+      preventClose: true,
       primaryAction: {
         action: async (password: string, hasMultipleAttempts: boolean) => {
           exportHistory(password, hasMultipleAttempts);
