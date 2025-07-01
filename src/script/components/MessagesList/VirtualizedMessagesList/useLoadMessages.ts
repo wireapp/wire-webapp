@@ -81,10 +81,6 @@ export const useLoadMessages = (
   // virtualized list — likely to show newly loaded messages in a chat or feed.
   // It waits for layout updates to ensure the DOM is in a stable state before scrolling.
   useLayoutEffect(() => {
-    if (virtualizer.isScrolling) {
-      return;
-    }
-
     if (loadingMessages || !nbOfMessages.current) {
       return;
     }
@@ -95,15 +91,7 @@ export const useLoadMessages = (
       return;
     }
 
-    const scrollTop = scrollElement.scrollTop;
-    const scrollHeight = scrollElement.scrollHeight;
-    const clientHeight = scrollElement.clientHeight;
-
-    const distanceToBottom = scrollHeight - scrollTop - clientHeight;
-
-    if (distanceToBottom < 50) {
-      virtualizer.scrollToIndex(itemsLength - nbOfMessages.current, {align: 'start'});
-    }
+    virtualizer.scrollToIndex(itemsLength - nbOfMessages.current, {align: 'start'});
   }, [itemsLength, loadingMessages, virtualizer]);
 
   // This function ensures that after user scroll to top or bottom content,
