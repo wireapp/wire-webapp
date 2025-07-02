@@ -21,6 +21,9 @@ jobs:
           node-version: 18.16.x
           cache: 'yarn'
 
+      - name: Install Yarn
+        run: npm install -g yarn
+
       - name: Install JS dependencies
         run: yarn --immutable
 

@@ -165,8 +165,7 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow']}, async ({pa
   await test.step('Preconditions: Creating preconditions for the test via API', async () => {
     await api.createPersonalUser(userB);
     createdUsers.push(userB);
-    // Disabled until [WPB-18255] is done
-    // await api.addDevicesToUser(userB, 1);
+    await api.addDevicesToUser(userB, 1);
   });
 
   // Test steps
@@ -233,9 +232,8 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow']}, async ({pa
     // await conversationPage.sendMessage('Hello there');
     // expect(await conversationPage.isMessageVisible('Hello there')).toBeTruthy();
 
-    // Disabled until [WPB-18255] is done
-    // await api.sendMessageToPersonalConversation(userB, userA, 'Heya');
-    // expect(await conversationPage.isMessageVisible('Heya')).toBeTruthy();
+    await api.sendMessageToPersonalConversation(userB, userA, 'Heya');
+    expect(await pages.conversationPage.isMessageVisible('Heya')).toBeTruthy();
   });
 
   await test.step('Personal user A blocks personal user B', async () => {
