@@ -19,10 +19,18 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18.16.x
-          cache: 'yarn'
 
       - name: Install Yarn
         run: npm install -g yarn
+
+      - name: Cache node_modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            **/node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
 
       - name: Install JS dependencies
         run: yarn --immutable
