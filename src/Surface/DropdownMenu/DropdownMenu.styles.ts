@@ -72,7 +72,7 @@ export const contentStyle: CSSObject = {
   zIndex: 'var(--z-index-modal)',
   padding: '8px 0',
   borderRadius: '12px',
-  backgroundColor: 'var(--modal-bg)',
+  backgroundColor: 'var(--dropdown-menu-bg)',
   boxShadow: '0 0 1px 0 rgba(0, 0, 0, 0.08), 0 8px 24px 0 rgba(0, 0, 0, 0.16)',
   animationDuration: '400ms',
   animationTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
@@ -96,10 +96,11 @@ export const contentStyle: CSSObject = {
 };
 
 export const itemStyle: CSSObject = {
+  height: '30px',
   fontSize: '12px',
   fontWeight: 400,
   lineHeight: '2rem',
-  padding: '0 8px',
+  padding: '0 24px',
   position: 'relative',
   userSelect: 'none',
   outline: 'none',
