@@ -160,7 +160,13 @@ const CellsTableRowOptionsContent = ({
   return (
     <>
       <DropdownMenu.Content>
-        <DropdownMenu.Item onClick={() => setIsMoveNodeModalOpen(true)}>{t('cells.options.move')}</DropdownMenu.Item>
+        <DropdownMenu.Item
+          onClick={() =>
+            node.type === 'folder' ? openFolder({conversationQualifiedId, name: node.name}) : handleOpenFile(node)
+          }
+        >
+          {t('cells.options.open')}
+        </DropdownMenu.Item>
         <DropdownMenu.Item
           onClick={() =>
             showShareModal({
@@ -173,20 +179,17 @@ const CellsTableRowOptionsContent = ({
         >
           {t('cells.options.share')}
         </DropdownMenu.Item>
-        <DropdownMenu.Item
-          onClick={() =>
-            node.type === 'folder' ? openFolder({conversationQualifiedId, name: node.name}) : handleOpenFile(node)
-          }
-        >
-          {t('cells.options.open')}
-        </DropdownMenu.Item>
+
         {url && (
           <DropdownMenu.Item onClick={() => forcedDownloadFile({url, name})}>
             {t('cells.options.download')}
           </DropdownMenu.Item>
         )}
+        <DropdownMenu.Item onClick={() => setIsRenameNodeModalOpen(true)}>
+          {t('cells.options.rename')}
+        </DropdownMenu.Item>
+        <DropdownMenu.Item onClick={() => setIsMoveNodeModalOpen(true)}>{t('cells.options.move')}</DropdownMenu.Item>
         <DropdownMenu.Item onClick={() => setIsTagsModalOpen(true)}>{t('cells.options.tags')}</DropdownMenu.Item>
-        <DropdownMenu.Item onClick={() => setIsRenameNodeModalOpen(true)}>Rename</DropdownMenu.Item>
         <DropdownMenu.Item
           onClick={() =>
             showMoveToRecycleBinModal({
