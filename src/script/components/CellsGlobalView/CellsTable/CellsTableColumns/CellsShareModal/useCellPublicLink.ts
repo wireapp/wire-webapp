@@ -34,7 +34,7 @@ type PublicLinkStatus = 'idle' | 'loading' | 'error' | 'success';
 export const useCellPublicLink = ({uuid, cellsRepository}: UseCellPublicLinkParams) => {
   const {nodes, setPublicLink} = useCellsStore();
   const node = nodes.find(n => n.id === uuid);
-  const [isEnabled, setIsEnabled] = useState(!!node?.publicLink);
+  const [isEnabled, setIsEnabled] = useState(!!node?.publicLink?.alreadyShared || false);
   const [status, setStatus] = useState<PublicLinkStatus>(node?.publicLink ? 'success' : 'idle');
 
   const createPublicLink = useCallback(async () => {
@@ -106,7 +106,7 @@ export const useCellPublicLink = ({uuid, cellsRepository}: UseCellPublicLinkPara
   }, []);
 
   useEffect(() => {
-    const shouldDeleteLink = !isEnabled && node?.publicLink;
+    const shouldDeleteLink = !isEnabled && node?.publicLink?.url;
     const shouldCreateNewLink = isEnabled && !node?.publicLink?.alreadyShared;
     const shouldGetLink = isEnabled && node?.publicLink?.alreadyShared;
 
