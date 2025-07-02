@@ -36,7 +36,7 @@ jobs:
         run: yarn --immutable
 
       - name: Install Playwright browsers
-        run: yarn playwright install --with-deps
+        run: yarn playwright install
 
       - name: Install 1Password
         uses: 1password/install-cli-action@v1
