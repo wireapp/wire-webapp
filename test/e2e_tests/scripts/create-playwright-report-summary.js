@@ -57,16 +57,19 @@ for (const suite of report.suites) {
             const errors = (result.errors || [])
               .map((err, i) => {
                 const clean = stripAnsi(err.message || '');
-                return `_Error ${i + 1}_:\n\`\`\`\n${clean}\n\`\`\``;
+                return `\n\`\`\`\n${clean}\n\`\`\``;
               })
               .join('\n\n');
 
-            return `**Retry ${index + 1}** — 🕒 \`${result.duration}ms\`\n\n${errors}`.trim();
+            if (!errors) {
+              return `**Attempt ${index + 1}** \n Result: ✅ **Passed** \n Duration: **${result.duration}ms**`;
+            }
+            return `**Attempt ${index + 1}** \n Result: ❌ **Failed** \n Duration: **${result.duration}ms** \n\n **Errors:** \n ${errors}`.trim();
           })
-          .join('\n\n---\n\n');
+          .join('\n\n');
 
         flakyTests.push(
-          `<details> \n <summary> ⚠️ ${title} </summary><br> \n\n  Location: **${specLocation}**\n Retries: **${retries}**\n\n${retryDetails}\n</details>`,
+          `<details> \n <summary> ⚠️ ${title} </summary><br> \n\n  Location: **${specLocation}**\n\n${retryDetails}\n</details>`,
         );
       }
     }
@@ -88,11 +91,11 @@ const summary = `
 - 📊 **Total:** ${total}
 - ⏱ **Total Runtime:** ${(totalDuration / 1000).toFixed(1)}s (${formattedTime})
 
-${failures.length > 0 ? `### ❗ **Failures** \n\n ${failures.join('\n\n')}` : '🎉 All tests passed!'}
+${failures.length > 0 ? `### **Failed Tests:** \n\n ${failures.join('\n\n')}` : '🎉 All tests passed!'}
 
 ${
   flakyTests.length > 0
-    ? `\n---\n\n### ⚠️ **Flaky Tests**
+    ? `\n\n### **Flaky Tests:**
 ${flakyTests.join('\n\n')}`
     : ''
 }

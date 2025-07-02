@@ -25,6 +25,7 @@ export const wrapperStyles: CSSObject = {
   alignItems: 'flex-start',
   flexDirection: 'column',
   marginBottom: '20px',
+  paddingRight: '8px',
   width: '100%',
 };
 

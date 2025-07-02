@@ -17,8 +17,6 @@
  *
  */
 
-import {CSSProperties} from 'react';
-
 import {CSSObject} from '@emotion/react';
 
 const form: CSSObject = {
@@ -37,12 +35,16 @@ const passwordInfo = (hasValidationErrors: boolean): CSSObject => ({
   fontSize: '12px',
 });
 
-const checkbox: CSSProperties = {
-  justifyContent: 'center',
+const checkbox: CSSObject = {
+  marginBottom: '6px',
+  '& label': {
+    alignItems: 'flex-start',
+  },
 };
 
 const checkboxLabel: CSSObject = {
   fontSize: '14px',
+  lineHeight: '16px',
 };
 
 const checkboxLink: CSSObject = {

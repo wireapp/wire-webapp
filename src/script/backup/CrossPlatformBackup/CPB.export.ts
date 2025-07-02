@@ -140,6 +140,11 @@ export const exportCPBHistoryFromDatabase = async ({
   });
 
   eventRecords.forEach((record, index) => {
+    if (record.ephemeral_expires) {
+      // eslint-disable-next-line no-console
+      CPBLogger.warn('Ephemeral events are not supported in backups');
+      return;
+    }
     const {success, data: eventData, error} = EventTableEntrySchema.safeParse(record);
     if (success) {
       const {from, from_client_id, id, qualified_conversation, qualified_from, primary_key, time, type} = eventData;
@@ -176,7 +181,7 @@ export const exportCPBHistoryFromDatabase = async ({
           return;
         }
 
-        const metaData = buildMetaData(assetParseData.content_type, assetParseData.info);
+        const metaData = buildMetaData(assetParseData.content_type, assetParseData.info, assetParseData.meta);
 
         const asset = new BackupMessageContent.Asset(
           assetParseData.content_type,
