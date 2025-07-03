@@ -73,7 +73,7 @@ export class ConversationPage {
         }
         return true;
       }
-      await this.page.waitForTimeout(500); // Wait for 0.5 second before next attempt
+      await this.page.waitForTimeout(1000); // Wait for 1 second before next attempt
     }
 
     return false;

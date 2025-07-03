@@ -229,8 +229,8 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow']}, async ({pa
     expect(await pages.conversationPage.isConversationOpen(userB.fullName));
 
     // TODO: Bug [WPB-18226] Message is not visible in the conversation after sending it
-    // await conversationPage.sendMessage('Hello there');
-    // expect(await conversationPage.isMessageVisible('Hello there')).toBeTruthy();
+    await pages.conversationPage.sendMessage('Hello there');
+    expect(await pages.conversationPage.isMessageVisible('Hello there')).toBeTruthy();
 
     await api.sendMessageToPersonalConversation(userB, userA, 'Heya');
     expect(await pages.conversationPage.isMessageVisible('Heya')).toBeTruthy();
