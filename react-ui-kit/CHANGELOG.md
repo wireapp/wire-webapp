@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.61.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.61.0...@wireapp/react-ui-kit@9.61.1) (2025-07-03)
+
+### Bug Fixes
+
+* **react-ui-kit:** dropdown menu bg color ([#7095](https://github.com/wireapp/wire-web-packages/issues/7095)) ([506a4bb](https://github.com/wireapp/wire-web-packages/commit/506a4bb60f2af186ee182d88b4859cd0fa40feeb))
+
 # [9.61.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.60.1...@wireapp/react-ui-kit@9.61.0) (2025-07-02)
 
 ### Features
