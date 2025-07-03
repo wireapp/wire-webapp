@@ -19,12 +19,6 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const listStyles: CSSObject = {
-  display: 'flex',
-  padding: '0',
-  margin: '0',
-  alignItems: 'center',
-  listStyle: 'none',
-  flexGrow: 1,
-  overflowX: 'auto',
+export const wrapperStyles: CSSObject = {
+  padding: '0 8px',
 };
