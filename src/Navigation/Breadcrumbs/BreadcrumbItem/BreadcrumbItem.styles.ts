@@ -45,12 +45,12 @@ export const buttonStyles = ({isFirst}: {isFirst: boolean}): CSSObject => ({
   },
 });
 
-export const activeItemStyles: CSSObject = {
+export const activeItemStyles = ({isFirst}: {isFirst: boolean}): CSSObject => ({
   display: 'inline-flex',
   alignItems: 'center',
   gap: '8px',
-  paddingLeft: '8px',
+  paddingLeft: isFirst ? '0' : '8px',
   paddingRight: '0',
   fontSize: '14px',
   color: 'var(--main-color)',
-};
+});

@@ -71,3 +71,7 @@ export const WithIconsAndCombinedItems: Story = {
     />
   ),
 };
+
+export const OneItem: Story = {
+  render: () => <Breadcrumbs items={[{name: 'Home'}]} onItemClick={() => {}} />,
+};

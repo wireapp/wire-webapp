@@ -33,7 +33,7 @@ export const BreadcrumbItem = ({name, icon, isActive, onClick, isFirst}: Breadcr
   return (
     <li css={listItemStyles}>
       {isActive ? (
-        <span css={activeItemStyles}>
+        <span css={activeItemStyles({isFirst})}>
           {icon}
           {name}
         </span>
