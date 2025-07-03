@@ -84,7 +84,7 @@ export const useCellsStore = create<CellsState>((set, get) => ({
   setPagination: pagination => set({pagination}),
   setPublicLink: (nodeId, updates) =>
     set(state => ({
-      nodes: state.nodes.map(node => (node.id === nodeId ? {...node, ...updates} : node)),
+      nodes: state.nodes.map(node => (node.id === nodeId ? {...node, publicLink: updates} : node)),
     })),
   removeNode: nodeId =>
     set(state => ({

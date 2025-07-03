@@ -47,6 +47,7 @@ interface ShareModalParams {
 
 export const showShareModal = ({type, uuid, conversationId, cellsRepository}: ShareModalParams) => {
   PrimaryModal.show(PrimaryModal.type.CONFIRM, {
+    size: 'large',
     primaryAction: {action: () => {}, text: t('cells.shareModal.primaryAction')},
     text: {
       message: (
