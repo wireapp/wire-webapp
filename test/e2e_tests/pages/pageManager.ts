@@ -40,6 +40,7 @@ import {SingleSignOnPage} from './singleSignOn.page';
 import {StartUIPage} from './startUI.page';
 import {TeamLoginPage} from './teamLogin.page';
 import {TeamsPage} from './teams.page';
+import {TeamSignUpPage} from './teamSignUp.page';
 import {UserProfileModal} from './userProfile.modal';
 import {WelcomePage} from './welcome.page';
 
@@ -275,5 +276,13 @@ export class PageManager {
       this._registerSuccessPage = new RegisterSuccessPage(this.page);
     }
     return this._registerSuccessPage;
+  }
+
+  private _teamSignUpPage!: TeamSignUpPage;
+  get teamSignUpPage(): TeamSignUpPage {
+    if (!this._teamSignUpPage) {
+      this._teamSignUpPage = new TeamSignUpPage(this.page);
+    }
+    return this._teamSignUpPage;
   }
 }
