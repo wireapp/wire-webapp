@@ -19,27 +19,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18.16.x
-
-      - name: Install Yarn
-        run: npm install -g yarn
-
-      - name: Cache node_modules
-        uses: actions/cache@v3
-        with:
-          path: |
-            **/node_modules
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
+          cache: 'yarn'
 
       - name: Install JS dependencies
         run: yarn --immutable
 
-      - name: Install system dependencies for Playwright
-        run: yarn playwright install-deps
-
       - name: Install Playwright browsers
-        run: yarn playwright install
+        run: yarn playwright install --with-deps
 
       - name: Install 1Password
         uses: 1password/install-cli-action@v1
