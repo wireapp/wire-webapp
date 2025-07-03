@@ -182,7 +182,7 @@ const dark: () => CSSObject = () => ({
   '--app-bg': COLOR_V2.GRAY_95,
   '--main-color': COLOR.WHITE,
   '--modal-bg': '#26272c',
-  '--dropdown-menu-bg': COLOR.GRAY_95,
+  '--dropdown-menu-bg': COLOR_V2.GRAY_100,
 
   // Foreground
   '--foreground-fade-16': '#9fa1a729',
