@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.61.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.61.1...@wireapp/react-ui-kit@9.61.2) (2025-07-03)
+
+### Bug Fixes
+
+* **react-ui-kit:** Breadcrumbs padding ([#7094](https://github.com/wireapp/wire-web-packages/issues/7094)) ([9f79f23](https://github.com/wireapp/wire-web-packages/commit/9f79f232b86b6cd95bf9669d102d5536f47c173b))
+
 ## [9.61.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.61.0...@wireapp/react-ui-kit@9.61.1) (2025-07-03)
 
 ### Bug Fixes
