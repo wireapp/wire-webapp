@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [46.31.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.30.2...@wireapp/core@46.31.0) (2025-07-04)
+
+### Features
+
+* **core, api-client:** Introduce WebSocket Notification Marker Synchronization [WPB-18486] ([#7092](https://github.com/wireapp/wire-web-packages/issues/7092)) ([bd15692](https://github.com/wireapp/wire-web-packages/commit/bd156929e9f08e18fb14c9785973cf78ef5b63eb))
+
 ## [46.30.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.30.1...@wireapp/core@46.30.2) (2025-06-25)
 
 **Note:** Version bump only for package @wireapp/core
