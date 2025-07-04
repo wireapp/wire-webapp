@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/promise-queue@2.3.12...@wireapp/promise-queue@2.4.0) (2025-07-04)
+
+### Features
+
+* **core, api-client:** Introduce WebSocket Notification Marker Synchronization [WPB-18486] ([#7092](https://github.com/wireapp/wire-web-packages/issues/7092)) ([bd15692](https://github.com/wireapp/wire-web-packages/commit/bd156929e9f08e18fb14c9785973cf78ef5b63eb))
+
 ## [2.3.12](https://github.com/wireapp/wire-web-packages/compare/@wireapp/promise-queue@2.3.11...@wireapp/promise-queue@2.3.12) (2025-03-03)
 
 **Note:** Version bump only for package @wireapp/promise-queue
