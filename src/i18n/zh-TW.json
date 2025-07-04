@@ -1077,7 +1077,7 @@
   "index.welcome": "Welcome to {brandName}!",
   "initDecryption": "解密訊息中",
   "initEvents": "載入訊息中",
-  "initProgress": " — {number1} 之 {number2}",
+  "initProgress": "Loading messages from {time} ago",
   "initReceivedSelfUser": "你好，{user}。",
   "initReceivedUserData": "檢查新訊息中",
   "initUpdatedFromNotifications": "快將完成 - 好好享受{brandName}吧",

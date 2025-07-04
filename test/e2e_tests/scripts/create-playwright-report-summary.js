@@ -2,7 +2,15 @@ const fs = require('fs');
 const path = require('path');
 
 const jsonPath = path.resolve('playwright-report', 'report.json');
-const report = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+let report;
+
+try {
+  report = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+} catch (error) {
+  const errorMessage = `❌ Error: report.json not found at ${jsonPath} ❌`;
+  fs.writeFileSync('playwright-report-summary.txt', errorMessage);
+  process.exit(1);
+}
 
 const stats = report.stats;
 

@@ -1077,7 +1077,7 @@
   "index.welcome": "Welcome to {brandName}!",
   "initDecryption": "メッセージの復号",
   "initEvents": "メッセージを読み込み中...",
-  "initProgress": " — {number1} of {number2}",
+  "initProgress": "Loading messages from {time} ago",
   "initReceivedSelfUser": "こんにちは、{user} さん。",
   "initReceivedUserData": "新しいメッセージを確認する",
   "initUpdatedFromNotifications": "もうすぐ終わります - ワイヤ を楽しんで！",

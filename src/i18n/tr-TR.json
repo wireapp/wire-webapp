@@ -1077,7 +1077,7 @@
   "index.welcome": "Welcome to {brandName}!",
   "initDecryption": "Mesajların şifresini çöz",
   "initEvents": "İletiler yükleniyor",
-  "initProgress": " — {number2}’de/da {number1}",
+  "initProgress": "Loading messages from {time} ago",
   "initReceivedSelfUser": "Merhaba, {user}.",
   "initReceivedUserData": "Yeni mesajlar kontrol ediliyor",
   "initUpdatedFromNotifications": "Neredeyse bitti - {brandName}’ın keyfini çıkarın",

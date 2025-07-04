@@ -1077,7 +1077,7 @@
   "index.welcome": "Welcome to {brandName}!",
   "initDecryption": "Dekrypterer beskeder",
   "initEvents": "Indlæser meddelelser",
-  "initProgress": " — {number1} af {number2}",
+  "initProgress": "Loading messages from {time} ago",
   "initReceivedSelfUser": "Hej, {user}.",
   "initReceivedUserData": "Tjekker for nye beskeder",
   "initUpdatedFromNotifications": "Snart færdig - God fornøjelse med {brandName}",

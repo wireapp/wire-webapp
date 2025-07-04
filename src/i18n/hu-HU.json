@@ -1077,7 +1077,7 @@
   "index.welcome": "Welcome to {brandName}!",
   "initDecryption": "Üzenetek visszafejtése",
   "initEvents": "Üzenetek betöltése",
-  "initProgress": " — {number1} / {number2}",
+  "initProgress": "Loading messages from {time} ago",
   "initReceivedSelfUser": "Szia {user}!",
   "initReceivedUserData": "Új üzenetek megtekintése",
   "initUpdatedFromNotifications": "Majdnem kész - Élvezd a {brandName}-t",

@@ -1077,7 +1077,7 @@
   "index.welcome": "Welcome to {brandName}!",
   "initDecryption": "Avkrypterar meddelanden",
   "initEvents": "Laddar meddelanden",
-  "initProgress": " — {number1} av {number2}",
+  "initProgress": "Loading messages from {time} ago",
   "initReceivedSelfUser": "Hej, {user}.",
   "initReceivedUserData": "Söker efter nya meddelanden",
   "initUpdatedFromNotifications": "Nästan klart - Njut av {brandName}",

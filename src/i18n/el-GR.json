@@ -1077,7 +1077,7 @@
   "index.welcome": "Welcome to {brandName}!",
   "initDecryption": "Decrypting messages",
   "initEvents": "Φόρτωση μηνυμάτων",
-  "initProgress": " — {number1} of {number2}",
+  "initProgress": "Loading messages from {time} ago",
   "initReceivedSelfUser": "Γεια σου, {user}.",
   "initReceivedUserData": "Ελέγξτε για νέα μηνύματα",
   "initUpdatedFromNotifications": "Almost done - Enjoy {brandName}",

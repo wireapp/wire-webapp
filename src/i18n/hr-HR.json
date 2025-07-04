@@ -1077,7 +1077,7 @@
   "index.welcome": "Welcome to {brandName}!",
   "initDecryption": "Dešifriranje poruka",
   "initEvents": "Učitavanje poruka",
-  "initProgress": " — {number1} od {number2}",
+  "initProgress": "Loading messages from {time} ago",
   "initReceivedSelfUser": "Pozdrav, {user}.",
   "initReceivedUserData": "Provjeravanje novih poruka",
   "initUpdatedFromNotifications": "Uskoro gotovo - Uživajte s {brandName}",

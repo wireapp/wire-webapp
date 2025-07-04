@@ -1077,7 +1077,7 @@
   "index.welcome": "Welcome to {brandName}!",
   "initDecryption": "Puretaan viestejä",
   "initEvents": "Ladataan viestejä",
-  "initProgress": " — {number1} / {number2}",
+  "initProgress": "Loading messages from {time} ago",
   "initReceivedSelfUser": "He, {user}.",
   "initReceivedUserData": "Tarkistetaan uusia viestejä",
   "initUpdatedFromNotifications": "Melkein valmista - nauti Wirestä",

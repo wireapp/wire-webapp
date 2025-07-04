@@ -1077,7 +1077,7 @@
   "index.welcome": "Welcome to {brandName}!",
   "initDecryption": "فك تعمية الرسائل",
   "initEvents": "جارٍ تحميل الرسائل",
-  "initProgress": " {number1} من {number2}",
+  "initProgress": "Loading messages from {time} ago",
   "initReceivedSelfUser": "مرحبا، {user}.",
   "initReceivedUserData": "جاري التحقق عن وجود رسائل جديدة",
   "initUpdatedFromNotifications": "تقريبا انتهى - استمتع بـ Wire",

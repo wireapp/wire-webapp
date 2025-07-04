@@ -1077,7 +1077,7 @@
   "index.welcome": "Welcome to {brandName}!",
   "initDecryption": "පණිවිඩ විසංකේතනය වෙමින්",
   "initEvents": "පණිවිඩ පූරණය වෙමින්",
-  "initProgress": " — {number1} / {number2}",
+  "initProgress": "Loading messages from {time} ago",
   "initReceivedSelfUser": "ආයුබෝවන් {user},",
   "initReceivedUserData": "නව පණිවිඩ පරීක්‍ෂා වෙමින්",
   "initUpdatedFromNotifications": "සියල්ල අහවරයි - {brandName} භුක්ති විඳින්න",
