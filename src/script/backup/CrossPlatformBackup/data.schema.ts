@@ -67,6 +67,7 @@ export const AssetContentSchema = zod.object({
   domain: zod.string().optional(),
   info: zod.any(),
   key: zod.string(),
+  meta: zod.any(),
   otr_key: zod.record(zod.string(), zod.number()),
   sha256: zod.record(zod.string(), zod.number()),
   token: zod.string().optional(),

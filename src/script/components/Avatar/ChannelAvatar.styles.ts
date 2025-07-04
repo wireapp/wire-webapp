@@ -21,21 +21,35 @@ import {CSSObject} from '@emotion/react';
 
 import {CSS_SQUARE} from 'Util/CSSMixin';
 
-export const channelAvatarContainerCss = (border: string): CSSObject => ({
-  ...CSS_SQUARE(28),
-  border: `1px solid var(--${border})`,
-  borderRadius: 8,
+import {ChannelAvatarSize} from './ChannelAvatar';
+
+export const channelAvatarContainerCss = ({border, size}: {border: string; size: ChannelAvatarSize}): CSSObject => ({
+  ...CSS_SQUARE(size === 'small' ? 16 : 28),
+  border: `${size === 'small' ? 0.5 : 1}px solid var(--${border})`,
+  borderRadius: size === 'small' ? 4 : 8,
   position: 'relative',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  overflow: size === 'small' ? 'hidden' : 'visible',
 });
 
-export const channelAvatarIconCss = (color: string, background: string): CSSObject => ({
-  ...CSS_SQUARE(26),
+export const channelAvatarIconCss = ({
+  color,
+  background,
+  size,
+}: {
+  color: string;
+  background: string;
+  size: ChannelAvatarSize;
+}): CSSObject => ({
+  ...CSS_SQUARE(size === 'small' ? '100%' : 26),
   backgroundColor: `var(--${background})`,
   color: `var(--${color})`,
   display: 'flex',
   flexWrap: 'wrap',
   overflow: 'hidden',
-  borderRadius: 7,
+  borderRadius: size === 'small' ? 0 : 7,
   justifyContent: 'center',
   alignContent: 'center',
 });

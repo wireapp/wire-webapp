@@ -44,6 +44,7 @@ const unsetRegistrationData: RegistrationDataState = {
   customBackendURL: '',
   accountCreationEnabled: false,
   shouldDisplayWarning: false,
+  privacyPolicyAccepted: false,
 };
 
 export const isAuthenticated = (state: RootState) => state.authState.isAuthenticated;

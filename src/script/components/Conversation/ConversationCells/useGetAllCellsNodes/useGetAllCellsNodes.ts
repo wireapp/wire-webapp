@@ -22,7 +22,9 @@ import {useEffect, useCallback, useState} from 'react';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {CellsRepository} from 'src/script/cells/CellsRepository';
+import {UserRepository} from 'src/script/user/UserRepository';
 
+import {getUsersFromNodes} from './getUsersFromNodes';
 import {transformDataToCellsNodes, transformToCellPagination} from './transformDataToCellsNodes';
 
 import {getCellsApiPath} from '../common/getCellsApiPath/getCellsApiPath';
@@ -30,11 +32,17 @@ import {useCellsStore} from '../common/useCellsStore/useCellsStore';
 
 interface UseGetAllCellsNodesProps {
   cellsRepository: CellsRepository;
+  userRepository: UserRepository;
   conversationQualifiedId: QualifiedId;
   enabled: boolean;
 }
 
-export const useGetAllCellsNodes = ({cellsRepository, conversationQualifiedId, enabled}: UseGetAllCellsNodesProps) => {
+export const useGetAllCellsNodes = ({
+  cellsRepository,
+  userRepository,
+  conversationQualifiedId,
+  enabled,
+}: UseGetAllCellsNodesProps) => {
   const {setNodes, pageSize, setStatus, setPagination, setError, clearAll} = useCellsStore();
   const [offset, setOffset] = useState(0);
 
@@ -56,7 +64,9 @@ export const useGetAllCellsNodes = ({cellsRepository, conversationQualifiedId, e
         return;
       }
 
-      const transformedNodes = transformDataToCellsNodes(result.Nodes);
+      const users = await getUsersFromNodes({nodes: result.Nodes, userRepository});
+
+      const transformedNodes = transformDataToCellsNodes({nodes: result.Nodes, users});
       setNodes({conversationId: id, nodes: transformedNodes});
 
       const pagination = result.Pagination ? transformToCellPagination(result.Pagination) : null;

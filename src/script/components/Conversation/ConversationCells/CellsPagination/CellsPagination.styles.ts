@@ -23,6 +23,7 @@ export const containerStyles: CSSObject = {
   marginTop: '20px',
   alignItems: 'center',
   fontSize: 'var(--font-size-medium)',
+  padding: '0 8px',
 };
 
 export const pagesContainerStyles: CSSObject = {
