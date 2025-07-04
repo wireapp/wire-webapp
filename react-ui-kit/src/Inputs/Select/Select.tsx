@@ -53,6 +53,9 @@ export interface SelectProps<IsMulti extends boolean, Group extends GroupBase<Op
   wrapperCSS?: CSSObject;
   selectControlCSS?: CSSObject;
   selectContainerCSS?: CSSObject;
+  selectMenuCSS?: CSSObject;
+  selectGroupCSS?: CSSObject;
+  selectGroupHeadingCSS?: CSSObject;
   label?: string;
   helperText?: string;
   error?: ReactElement;
@@ -62,6 +65,7 @@ export interface SelectProps<IsMulti extends boolean, Group extends GroupBase<Op
   isSearchable?: boolean;
   overlayMenu?: boolean;
   menuListHeading?: string;
+  hideControl?: boolean;
 }
 
 export const Select = <IsMulti extends boolean = false, Group extends GroupBase<Option> = GroupBase<Option>>({
@@ -77,11 +81,15 @@ export const Select = <IsMulti extends boolean = false, Group extends GroupBase<
   menuCSS = {},
   selectControlCSS = {},
   selectContainerCSS = {},
+  selectMenuCSS = {},
+  selectGroupCSS = {},
+  selectGroupHeadingCSS = {},
   markInvalid = false,
   required = false,
   isSearchable = false,
   overlayMenu = true,
   menuListHeading,
+  hideControl = false,
   ...props
 }: SelectProps<IsMulti, Group>) => {
   const theme = useTheme();
@@ -116,6 +124,9 @@ export const Select = <IsMulti extends boolean = false, Group extends GroupBase<
             menuPosition: overlayMenu ? 'absolute' : 'relative',
             controlCSS: selectControlCSS,
             containerCSS: selectContainerCSS,
+            menuCSS: selectMenuCSS,
+            groupCSS: selectGroupCSS,
+            groupHeadingCSS: selectGroupHeadingCSS,
           }) as StylesConfig
         }
         components={{
@@ -125,6 +136,7 @@ export const Select = <IsMulti extends boolean = false, Group extends GroupBase<
           Menu: SelectMenu(dataUieName, menuCSS),
           ValueContainer: SelectValueContainer,
           IndicatorsContainer: SelectIndicatorsContainer,
+          ...(hideControl && {Control: () => null}),
           ...(menuListHeading && {MenuList: SelectMenuList(menuListHeading, dataUieName)}),
         }}
         tabIndex={TabIndex.UNFOCUSABLE}

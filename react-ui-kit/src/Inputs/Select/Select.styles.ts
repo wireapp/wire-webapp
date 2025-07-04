@@ -40,6 +40,9 @@ interface CustomStylesParams {
   menuPosition?: 'absolute' | 'relative';
   controlCSS: CSSObject;
   containerCSS: CSSObject;
+  menuCSS: CSSObject;
+  groupCSS: CSSObject;
+  groupHeadingCSS: CSSObject;
 }
 
 export const customStyles = ({
@@ -48,6 +51,9 @@ export const customStyles = ({
   menuPosition = 'absolute',
   controlCSS,
   containerCSS,
+  menuCSS,
+  groupCSS,
+  groupHeadingCSS,
 }: CustomStylesParams): StylesConfig<Option, false, GroupBase<Option>> => ({
   indicatorSeparator: baseIndicatorSeparatorStyles,
   indicatorsContainer: provided => provided,
@@ -74,6 +80,7 @@ export const customStyles = ({
     ...(isGroup(options) && {
       minWidth: '400px',
     }),
+    ...menuCSS,
   }),
   menuList: provided => ({
     ...provided,
@@ -115,5 +122,19 @@ export const customStyles = ({
     padding: 0,
     width: '100%',
     display: 'grid',
+  }),
+  groupHeading: base => ({
+    ...base,
+    color: theme.general.color,
+    fontSize: theme.fontSizes.small,
+    lineHeight: 1,
+    padding: '8px 16px 6px',
+    textAlign: 'left',
+    ...groupHeadingCSS,
+  }),
+  group: provided => ({
+    ...provided,
+    backgroundColor: theme.Input.backgroundColor,
+    ...groupCSS,
   }),
 });
