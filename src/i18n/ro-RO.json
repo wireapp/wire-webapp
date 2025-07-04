@@ -1077,7 +1077,7 @@
   "index.welcome": "Welcome to {brandName}!",
   "initDecryption": "Se decriptează mesaje",
   "initEvents": "Se încarcă mesaje",
-  "initProgress": " — {number1} din {number2}",
+  "initProgress": "Loading messages from {time} ago",
   "initReceivedSelfUser": "Bună, {user}.",
   "initReceivedUserData": "Verifică dacă sunt mesaje noi",
   "initUpdatedFromNotifications": "Aproape gata - Bucură-te de {brandName}",

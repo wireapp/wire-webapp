@@ -1077,7 +1077,7 @@
   "index.welcome": "Welcome to {brandName}!",
   "initDecryption": "Dešifrovat zprávu",
   "initEvents": "Zprávy se načítají",
-  "initProgress": " — {number1} of {number2}",
+  "initProgress": "Loading messages from {time} ago",
   "initReceivedSelfUser": "Ahoj, {user}.",
   "initReceivedUserData": "Kontrola nových zpráv",
   "initUpdatedFromNotifications": "Almost done - Enjoy {brandName}",

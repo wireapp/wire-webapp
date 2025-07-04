@@ -1077,7 +1077,7 @@
   "index.welcome": "Welcome to {brandName}!",
   "initDecryption": "کدگشائی پیام ها",
   "initEvents": "بارگذاری پیام ها",
-  "initProgress": " — {number1} of {number2}",
+  "initProgress": "Loading messages from {time} ago",
   "initReceivedSelfUser": "سلام، {user}.",
   "initReceivedUserData": "در حال چک کردن پیام‌های جدید",
   "initUpdatedFromNotifications": "تقریبا انجام شده - از وایر لذت ببرید",

@@ -1077,7 +1077,7 @@
   "index.welcome": "Welcome to {brandName}!",
   "initDecryption": "Descifrando mensajes",
   "initEvents": "Cargando mensajes",
-  "initProgress": " — {number1} de {number2}",
+  "initProgress": "Loading messages from {time} ago",
   "initReceivedSelfUser": "Hola, {user}.",
   "initReceivedUserData": "Buscando mensajes nuevos",
   "initUpdatedFromNotifications": "Casi terminado - Disfruta {brandName}",
