@@ -25,6 +25,7 @@ import {
   ClientType,
   RegisteredClient,
 } from '@wireapp/api-client/lib/client';
+import {MINIMUM_API_VERSION} from '@wireapp/api-client/lib/Config';
 import {ConversationAPI} from '@wireapp/api-client/lib/conversation';
 import {BackendEvent} from '@wireapp/api-client/lib/event';
 import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
@@ -96,8 +97,9 @@ describe('Account', () => {
     user: 'aaf9a833-ef30-4c22-86a0-9adc8a15b3b4',
   };
 
-  const BACKEND_VERSION = 8;
-  const websocketServerAddress = `${MOCK_BACKEND.ws}/v${BACKEND_VERSION}/events?access_token=${accessTokenData.access_token}`;
+  const markerId = '90da5591-0a26-45f8-bbb2-6c0fc4a2df19';
+
+  const websocketServerAddress = `${MOCK_BACKEND.ws}/v${MINIMUM_API_VERSION}/events?access_token=${accessTokenData.access_token}&marker=${markerId}`;
 
   beforeEach(() => {
     nock(MOCK_BACKEND.rest)
@@ -141,9 +143,9 @@ describe('Account', () => {
     nock(MOCK_BACKEND.rest)
       .get(`/api-version`)
       .reply(HTTP_STATUS.OK, {
-        supported: [BACKEND_VERSION],
+        supported: [MINIMUM_API_VERSION],
         federation: false,
-        development: [BACKEND_VERSION + 1],
+        development: [MINIMUM_API_VERSION + 1],
         domain: 'zinfra.io',
       });
 
@@ -300,7 +302,12 @@ describe('Account', () => {
         .spyOn(dependencies.account.service!.notification['database'], 'getLastNotificationId')
         .mockResolvedValue('0');
 
-      await account.useAPIVersion(BACKEND_VERSION, BACKEND_VERSION);
+      await account.useAPIVersion(MINIMUM_API_VERSION, MINIMUM_API_VERSION);
+
+      jest
+        .spyOn(dependencies.apiClient.transport.ws, 'buildWebSocketUrl')
+        .mockResolvedValue(websocketServerAddress as never);
+      jest.spyOn(dependencies.account, 'getNotificationEventTime').mockReturnValue('2025-10-01T00:00:00Z');
     });
 
     afterEach(() => {
