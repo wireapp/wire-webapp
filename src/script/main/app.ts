@@ -428,7 +428,7 @@ export class App {
 
       const selfUser = await this.repository.user.getSelf([{position: 'App.initiateSelfUser', vendor: 'webapp'}]);
 
-      const accessToken = this.apiClient.transport.http.accessTokenStore.accessToken?.access_token!;
+      const accessToken = this.apiClient.transport.http.accessTokenStore.accessTokenData?.access_token!;
 
       this.initializeCells({cellsRepository, selfUser, accessToken});
 
