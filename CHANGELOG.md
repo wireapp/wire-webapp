@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.68.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.67.1...@wireapp/api-client@27.68.0) (2025-07-04)
+
+### Features
+
+* **core, api-client:** Introduce WebSocket Notification Marker Synchronization [WPB-18486] ([#7092](https://github.com/wireapp/wire-web-packages/issues/7092)) ([bd15692](https://github.com/wireapp/wire-web-packages/commit/bd156929e9f08e18fb14c9785973cf78ef5b63eb))
+
 ## [27.67.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.67.0...@wireapp/api-client@27.67.1) (2025-06-25)
 
 ### Bug Fixes
