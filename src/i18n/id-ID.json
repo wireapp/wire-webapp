@@ -1077,7 +1077,7 @@
   "index.welcome": "Welcome to {brandName}!",
   "initDecryption": "Menguraikan pesan",
   "initEvents": "Memuat pesan",
-  "initProgress": " - {number1} dari {number2}",
+  "initProgress": "Loading messages from {time} ago",
   "initReceivedSelfUser": "Halo, {user} .",
   "initReceivedUserData": "Periksa pesan baru",
   "initUpdatedFromNotifications": "Hampir selesai - Enjoy {brandName}",

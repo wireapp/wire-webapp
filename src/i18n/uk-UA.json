@@ -1077,7 +1077,7 @@
   "index.welcome": "Welcome to {brandName}!",
   "initDecryption": "Дешифрую повідомлення",
   "initEvents": "Завантажую повідомлення",
-  "initProgress": " — {number1} з {number2}",
+  "initProgress": "Loading messages from {time} ago",
   "initReceivedSelfUser": "Привіт {user}.",
   "initReceivedUserData": "Перевіряю наявність нових повідомлень",
   "initUpdatedFromNotifications": "Майже завершено - Приємного користування!",

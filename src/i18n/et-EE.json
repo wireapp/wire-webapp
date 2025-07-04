@@ -1077,7 +1077,7 @@
   "index.welcome": "Welcome to {brandName}!",
   "initDecryption": "Dekrüptin sõnumeid",
   "initEvents": "Laadin sõnumeid",
-  "initProgress": " — {number1}/{number2}",
+  "initProgress": "Loading messages from {time} ago",
   "initReceivedSelfUser": "Tere, {user}.",
   "initReceivedUserData": "Kontrollin uusi sõnumeid",
   "initUpdatedFromNotifications": "Peaaegu valmis - naudi {brandName}’i",

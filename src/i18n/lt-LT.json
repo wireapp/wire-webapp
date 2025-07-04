@@ -1077,7 +1077,7 @@
   "index.welcome": "Welcome to {brandName}!",
   "initDecryption": "Iššifruojamos žinutės",
   "initEvents": "Įkeliamos žinutės",
-  "initProgress": " — {number1} iš {number2}",
+  "initProgress": "Loading messages from {time} ago",
   "initReceivedSelfUser": "Sveiki, {user}.",
   "initReceivedUserData": "Tikrinama ar yra naujų žinučių",
   "initUpdatedFromNotifications": "Beveik baigta – mėgaukitės „{brandName}“",
