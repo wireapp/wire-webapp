@@ -34,6 +34,7 @@ import {
   ConsumableNotification,
   ConsumableNotificationEvent,
   ConsumableNotificationSchema,
+  ConsumableNotificationSynchronization,
 } from '../notification/ConsumableNotification';
 
 enum TOPIC {
@@ -224,24 +225,42 @@ export class WebSocketClient extends EventEmitter {
     return this.isSocketLocked;
   }
 
-  private buildWebSocketUrl(): string {
-    const store = this.client.accessTokenStore.accessToken;
-    const token = store && store.access_token ? store.access_token : '';
-    if (!token) {
+  public buildWebSocketUrl(): string {
+    const {
+      accessTokenStore: {getAccessToken, getNextMarkerToken},
+    } = this.client;
+    const accessToken = getAccessToken?.() ?? '';
+    const markerToken = getNextMarkerToken?.();
+
+    if (!accessToken) {
       this.logger.warn('Reconnecting WebSocket with unset token');
     }
 
     if (!this.versionPrefix) {
-      throw new Error('Backend api version is not set to connect to web socket');
+      throw new Error('Missing backend API version: cannot establish WebSocket connection');
     }
 
-    let url = `${this.baseUrl}${this.versionPrefix}/events?access_token=${token}`;
-    if (this.clientId) {
-      // Note: If no client ID is given, then the WebSocket connection will receive all notifications for all clients
-      // of the connected user
-      url += `&client=${this.clientId}`;
+    const queryParams = new URLSearchParams({
+      access_token: accessToken,
+    });
+
+    if (markerToken) {
+      queryParams.append('sync_marker', markerToken);
     }
-    return url;
+
+    /**
+     * @note If no client ID is given, then the WebSocket connection
+     * will receive all notifications for all clients of the connected user
+     */
+    if (this.clientId) {
+      queryParams.append('client', this.clientId);
+    }
+
+    const queryString = queryParams.toString();
+
+    this.logger.info(`WebSocket URL: ${this.baseUrl}${this.versionPrefix}/events?${queryString}`);
+
+    return `${this.baseUrl}${this.versionPrefix}/events?${queryString}`;
   }
 
   public acknowledgeMissedNotification() {
@@ -252,9 +271,13 @@ export class WebSocketClient extends EventEmitter {
     this.socket.send(jsonEvent);
   }
 
-  public acknowledgeMessageCountNotification() {
+  public acknowledgeConsumableNotificationSynchronization(notification: ConsumableNotificationSynchronization) {
     const jsonEvent = JSON.stringify({
-      type: AcknowledgeType.ACK_MESSAGE_COUNT,
+      type: AcknowledgeType.ACK,
+      data: {
+        multiple: false,
+        delivery_tag: notification.data.delivery_tag,
+      },
     });
 
     this.socket.send(jsonEvent);

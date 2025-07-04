@@ -29,6 +29,5 @@ export interface AcknowledgeData {
 
 export enum AcknowledgeType {
   ACK = 'ack',
-  ACK_MESSAGE_COUNT = 'ack_message_count',
   ACK_FULL_SYNC = 'ack_full_sync',
 }
