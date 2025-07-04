@@ -8545,9 +8545,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/react-ui-kit@npm:9.61.2":
-  version: 9.61.2
-  resolution: "@wireapp/react-ui-kit@npm:9.61.2"
+"@wireapp/react-ui-kit@npm:9.62.0":
+  version: 9.62.0
+  resolution: "@wireapp/react-ui-kit@npm:9.62.0"
   dependencies:
     "@radix-ui/react-accordion": "npm:1.2.11"
     "@radix-ui/react-dropdown-menu": "npm:2.1.14"
@@ -8564,7 +8564,7 @@ __metadata:
   peerDependenciesMeta:
     "@types/react":
       optional: true
-  checksum: 10/9ec461fc7aef46fea84deb814ec5871376eaecabceaa625b826c08f11dd3e225b844f206336f519e6d8ef1501942fba7e861547f5482d272698f17ac7f9bdc39
+  checksum: 10/62e117733c1734b71d69f5bc08155b50587f02dceed572af268f3459382878934d6cfb3ff7c79be4853542410853be536e5764880b44a671c10712e3cac384b3
   languageName: node
   linkType: hard
 
@@ -22002,7 +22002,7 @@ __metadata:
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/kalium-backup": "npm:0.0.3"
     "@wireapp/prettier-config": "npm:0.6.4"
-    "@wireapp/react-ui-kit": "npm:9.61.2"
+    "@wireapp/react-ui-kit": "npm:9.62.0"
     "@wireapp/store-engine": "npm:5.1.11"
     "@wireapp/store-engine-dexie": "npm:2.1.15"
     "@wireapp/telemetry": "npm:0.3.1"
