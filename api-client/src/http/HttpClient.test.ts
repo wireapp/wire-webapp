@@ -29,7 +29,7 @@ import {BackendError, StatusCode} from '.';
 describe('HttpClient', () => {
   const testConfig = {urls: {rest: 'https://test.zinfra.io', ws: '', name: 'test'}};
   const mockedAccessTokenStore: Partial<AccessTokenStore> = {
-    accessToken: {
+    accessTokenData: {
       access_token:
         'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsd' +
         'DPOBfBP-uz_b0gAKBQ==.v=1.k=1.d=1498600993.t=a.l=.u=aaf9a833-ef30-4c2' +
@@ -49,11 +49,11 @@ describe('HttpClient', () => {
         message: 'Token expired',
       });
 
-      nock(testConfig.urls.rest).get(AuthAPI.URL.ACCESS).reply(StatusCode.OK, mockedAccessTokenStore.accessToken);
+      nock(testConfig.urls.rest).get(AuthAPI.URL.ACCESS).reply(StatusCode.OK, mockedAccessTokenStore.accessTokenData);
 
       const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenStore);
       client.refreshAccessToken = () => {
-        return Promise.resolve(mockedAccessTokenStore.accessToken!);
+        return Promise.resolve(mockedAccessTokenStore.accessTokenData!);
       };
 
       await client._sendRequest({config: {method: 'GET', baseURL: testConfig.urls.rest, url: AuthAPI.URL.ACCESS}});

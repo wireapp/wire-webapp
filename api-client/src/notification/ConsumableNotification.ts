@@ -28,13 +28,44 @@ import {BackendEvent} from '../event';
 export enum ConsumableEvent {
   EVENT = 'event',
   MISSED = 'notifications_missed',
-  MESSAGE_COUNT = 'message_count',
+  SYNCHRONIZATION = 'synchronization',
+}
+
+/**
+ * Notification type for synchronization messages sent by the server
+ * to indicate the end of the message queue at the time of connection.
+ *
+ * This message is **only included** if the client initiated the WebSocket
+ * connection using a `sync_marker` query parameter.
+ * @TODO when BackendEvent is typed in zod use:
+ * export type ConsumableNotificationSynchronization = z.infer<typeof ConsumableNotificationSynchronization>;
+ */
+export interface ConsumableNotificationSynchronization {
+  /**
+   * Always set to "synchronization" to distinguish from other message types.
+   */
+  type: ConsumableEvent.SYNCHRONIZATION;
+
+  data: {
+    /**
+     * Unique delivery tag assigned by the server for this synchronization message.
+     * Must be acknowledged once processed to allow server-side cleanup.
+     */
+    delivery_tag: number;
+
+    /**
+     * Unique identifier (UUID) that matches the `sync_marker` value the client provided
+     * during the WebSocket connection initiation. Used to ensure the message
+     * corresponds to the current synchronization session.
+     */
+    marker_id: string;
+  };
 }
 
 /**
  * Notification type received when the client has missed messages due to being offline too long.
  * Requires a full re-sync before consuming more notifications.
- * TODO: when BackendEvent is typed in zod use:
+ * @TODO when BackendEvent is typed in zod use:
  * export type ConsumableNotificationMissed = z.infer<typeof ConsumableNotificationMissedSchema>;
  */
 export interface ConsumableNotificationMissed {
@@ -44,7 +75,7 @@ export interface ConsumableNotificationMissed {
 /**
  * Notification type for actual backend events, contains one or more event payloads.
  * Includes a delivery tag for acknowledgment.
- * TODO: when BackendEvent is typed in zod use:
+ * @TODO when BackendEvent is typed in zod use:
  * export type ConsumableNotificationEvent = z.infer<typeof ConsumableNotificationEventSchema>;
  */
 export interface ConsumableNotificationEvent {
@@ -59,34 +90,30 @@ export interface ConsumableNotificationEvent {
 }
 
 /**
- * Notification sent after connecting to indicate current number of messages queued.
- * TODO: when BackendEvent is typed in zod use:
- * export type ConsumableNotificationMessageCount = z.infer<typeof ConsumableNotificationMessageCountSchema>;
- */
-export interface ConsumableNotificationMessageCount {
-  type: ConsumableEvent.MESSAGE_COUNT;
-  data: {
-    count: number;
-  };
-}
-
-/**
  * Union of all valid notification types supported by the WebSocket backend.
- * TODO: when BackendEvent is typed in zod use:
+ * @TODO when BackendEvent is typed in zod use:
  * export const ConsumableNotificationSchema = z.discriminatedUnion('type', [
-    ConsumableNotificationMissedSchema,
-    ConsumableNotificationEventSchema,
-    ConsumableNotificationMessageCountSchema,
-  ]);
+ *   ConsumableNotificationMissedSchema,
+ *   ConsumableNotificationEventSchema,
+ *.  ConsumableNotificationSynchronization
+ * ]);
  */
 export type ConsumableNotification =
   | ConsumableNotificationMissed
   | ConsumableNotificationEvent
-  | ConsumableNotificationMessageCount;
+  | ConsumableNotificationSynchronization;
 
 const BackendEventSchema = z.object({
   id: z.string(),
-  payload: z.array(z.unknown()), // TODO: Replace `z.any()` with BackendEvent schema when available
+  payload: z.array(z.unknown()), // @TODO Replace `z.unknown()` with BackendEvent schema when available
+});
+
+export const ConsumableNotificationSynchronizationSchema = z.object({
+  type: z.literal(ConsumableEvent.SYNCHRONIZATION),
+  data: z.object({
+    delivery_tag: z.number(),
+    marker_id: z.string(),
+  }),
 });
 
 export const ConsumableNotificationMissedSchema = z.object({
@@ -101,15 +128,8 @@ export const ConsumableNotificationEventSchema = z.object({
   }),
 });
 
-export const ConsumableNotificationMessageCountSchema = z.object({
-  type: z.literal(ConsumableEvent.MESSAGE_COUNT),
-  data: z.object({
-    count: z.number(),
-  }),
-});
-
 export const ConsumableNotificationSchema = z.discriminatedUnion('type', [
   ConsumableNotificationMissedSchema,
   ConsumableNotificationEventSchema,
-  ConsumableNotificationMessageCountSchema,
+  ConsumableNotificationSynchronizationSchema,
 ]);

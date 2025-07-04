@@ -22,6 +22,7 @@
 import {WebSocketClient} from './WebSocketClient';
 
 import {InvalidTokenError} from '../auth/AuthenticationError';
+import {MINIMUM_API_VERSION} from '../Config';
 import {TEAM_EVENT} from '../event/';
 import {ConsumableEvent, ConsumableNotification} from '../notification/ConsumableNotification';
 
@@ -118,7 +119,7 @@ describe('WebSocketClient', () => {
       const socket = websocketClient['socket'];
       jest.spyOn(socket as any, 'getReconnectingWebsocket').mockReturnValue(fakeSocket);
 
-      websocketClient.useVersion(8);
+      websocketClient.useVersion(MINIMUM_API_VERSION);
       websocketClient.connect(undefined, onConnect);
       fakeSocket.onopen();
       await websocketClient['onReconnect']();

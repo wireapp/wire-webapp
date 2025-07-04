@@ -112,7 +112,7 @@ describe('APIClient', () => {
       } catch (error) {
         errorMessage = error.message;
       } finally {
-        expect(errorMessage).toContain('Minimum supported API version is 8.');
+        expect(errorMessage).toContain(`Minimum supported API version is ${MINIMUM_API_VERSION}. Received: 0`);
       }
     });
 
@@ -165,7 +165,11 @@ describe('APIClient', () => {
       jest.spyOn(client.transport.http, 'sendRequest').mockReturnValue({
         data: {supported: [MINIMUM_API_VERSION, MINIMUM_API_VERSION + 1], development: [MINIMUM_API_VERSION + 2]},
       } as any);
-      const {version, isFederated, federationEndpoints} = await client.useVersion(MINIMUM_API_VERSION, 9, true);
+      const {version, isFederated, federationEndpoints} = await client.useVersion(
+        MINIMUM_API_VERSION,
+        MINIMUM_API_VERSION + 1,
+        true,
+      );
       expect(version).toBe(MINIMUM_API_VERSION + 1);
       expect(isFederated).toBe(false);
       expect(federationEndpoints).toBe(true);
@@ -258,7 +262,7 @@ describe('APIClient', () => {
       const client = new APIClient(testConfig);
       const context = await client.login(loginData);
       expect(context.userId).toBe(accessTokenData.user);
-      expect(client['accessTokenStore'].accessToken?.access_token).toBe(accessTokenData.access_token);
+      expect(client['accessTokenStore'].accessTokenData?.access_token).toBe(accessTokenData.access_token);
     });
 
     // eslint-disable-next-line jest/expect-expect
@@ -285,10 +289,10 @@ describe('APIClient', () => {
       const context = await client.login(loginData);
       expect(context.userId).toBe(accessTokenData.user);
       // Make access token invalid
-      delete (client['accessTokenStore'].accessToken as any)?.access_token;
+      delete (client['accessTokenStore'].accessTokenData as any)?.access_token;
       const response = await client.api.user.getUsers({handles: [queriedHandle]});
       expect(response[0].name).toBe(userData[0].name);
-      expect(client['accessTokenStore'].accessToken?.access_token).toBeDefined();
+      expect(client['accessTokenStore'].accessTokenData?.access_token).toBeDefined();
     });
   });
 
@@ -354,7 +358,7 @@ describe('APIClient', () => {
 
       const context = await client.register(registerData);
       expect(context.userId).toBe(registerData.id);
-      expect(client['accessTokenStore'].accessToken?.access_token).toBe(accessTokenData.access_token);
+      expect(client['accessTokenStore'].accessTokenData?.access_token).toBe(accessTokenData.access_token);
     });
   });
 });

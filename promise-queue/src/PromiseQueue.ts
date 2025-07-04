@@ -131,6 +131,10 @@ export class PromiseQueue {
     return this;
   }
 
+  isPaused(): boolean {
+    return this.paused;
+  }
+
   /**
    * Queued function is executed when queue is empty or previous functions are executed.
    * @param fn Function to be executed in queue order
@@ -162,6 +166,23 @@ export class PromiseQueue {
     if (this.interval) {
       clearInterval(this.interval);
       this.interval = undefined;
+    }
+  }
+
+  /**
+   * Flushes the queue by removing all pending tasks without executing them.
+   * All flushed promises are rejected with the provided reason.
+   *
+   * Running tasks are unaffected.
+   */
+  flush(reason: Error = new Error('Queue was flushed')): void {
+    while (this.queue.length > 0) {
+      const entry = this.queue.shift();
+      if (entry) {
+        // Prevent accidental resolve if the task ever runs
+        entry.resolveFn = () => {};
+        entry.rejectFn(reason);
+      }
     }
   }
 }

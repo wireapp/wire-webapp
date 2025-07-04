@@ -132,7 +132,17 @@ export class NotificationService extends TypedEventEmitter<Events> {
     return this.database.updateLastNotificationId(lastNotification);
   }
 
-  public async processNotificationStream(
+  /**
+   * Processes the notification stream and calls the provided handler for each notification.
+   * If there are missed notifications, it will call the onMissedNotifications callback with the missed notification ID.
+   *
+   * @param notificationHandler - The handler to process each notification.
+   * @param onMissedNotifications - Callback to handle missed notifications.
+   * @returns An object containing the total number of notifications processed, number of errors, and successes.
+   *
+   * @deprecated When all client are migrated to the consumable/async notification stream, this method must be removed.
+   */
+  public async legacyProcessNotificationStream(
     notificationHandler: NotificationHandler,
     onMissedNotifications: (notificationId: string) => void,
   ): Promise<{total: number; error: number; success: number}> {

@@ -136,9 +136,9 @@ export class HttpClient extends EventEmitter {
   }
 
   public async _sendRequest<T>({config, isFirstTry = true, abortController}: SendRequest): Promise<AxiosResponse<T>> {
-    if (this.accessTokenStore.accessToken) {
+    if (this.accessTokenStore.accessTokenData) {
       // TODO: remove tokenAsParam
-      const {token_type, access_token} = this.accessTokenStore.accessToken;
+      const {token_type, access_token} = this.accessTokenStore.accessTokenData;
 
       config.headers = {
         ...config.headers,
@@ -169,7 +169,7 @@ export class HttpClient extends EventEmitter {
         return this._sendRequest<T>({config, isFirstTry: false, abortController});
       };
 
-      const hasAccessToken = !!this.accessTokenStore?.accessToken;
+      const hasAccessToken = !!this.accessTokenStore?.accessTokenData;
 
       if (axios.isAxiosError(error) && error.response?.status === StatusCode.UNAUTHORIZED) {
         return retryWithTokenRefresh();
@@ -234,8 +234,8 @@ export class HttpClient extends EventEmitter {
 
   public async refreshAccessToken(): Promise<AccessTokenData> {
     let expiredAccessToken: AccessTokenData | undefined;
-    if (this.accessTokenStore.accessToken?.access_token) {
-      expiredAccessToken = this.accessTokenStore.accessToken;
+    if (this.accessTokenStore.accessTokenData?.access_token) {
+      expiredAccessToken = this.accessTokenStore.accessTokenData;
     }
 
     const accessToken = await this.postAccess(expiredAccessToken);
@@ -272,7 +272,7 @@ export class HttpClient extends EventEmitter {
    * @param  {string} clientId - id of the client with which the new login session will be associated
    */
   public async associateClientWithSession(clientId: string): Promise<AccessTokenData> {
-    const storedToken = this.accessTokenStore.accessToken;
+    const storedToken = this.accessTokenStore.accessTokenData;
     const newToken = await this.postAccess(storedToken, clientId);
 
     return this.accessTokenStore.updateToken(newToken);

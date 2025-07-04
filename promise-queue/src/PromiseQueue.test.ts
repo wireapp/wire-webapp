@@ -20,8 +20,8 @@
 import {PromiseQueue} from './PromiseQueue';
 
 class Deferred<T = undefined> {
-  public resolve: (value: T) => void;
-  public reject: () => void;
+  public resolve: ((value: T) => void) | undefined;
+  public reject: (() => void) | undefined;
   public promise: Promise<T>;
   constructor() {
     this.promise = new Promise((resolve, reject) => {
@@ -174,10 +174,96 @@ describe('PromiseQueue', () => {
 
       expect(queue.hasRunningTasks()).toBe(true);
 
-      promise.resolve(undefined);
+      promise.resolve?.(undefined);
       await done;
       await new Promise(res => setTimeout(res));
       expect(queue.hasRunningTasks()).toBe(false);
+      expect(queue.getLength()).toBe(0);
+    });
+  });
+
+  describe('flush', () => {
+    it('rejects all pending tasks and prevents execution', async () => {
+      const queue = new PromiseQueue({name: 'FlushQueue'});
+
+      const runSpy = jest.fn();
+      const rejectSpy = jest.fn();
+      const flushError = new Error('Flushed');
+
+      // Push a task that runs immediately
+      await queue.push(() => Promise.resolve());
+
+      // Push pending tasks
+      const p1 = queue
+        .push(() => {
+          runSpy();
+          return Promise.resolve('Task 1 completed');
+        })
+        .catch(error => {
+          rejectSpy();
+          throw error;
+        });
+
+      const p2 = queue
+        .push(() => {
+          runSpy();
+          return Promise.resolve('Task 2 completed');
+        })
+        .catch(error => {
+          rejectSpy();
+          throw error;
+        });
+
+      queue.flush(flushError);
+
+      await expect(p1).rejects.toThrow('Flushed');
+      await expect(p2).rejects.toThrow('Flushed');
+
+      expect(runSpy).not.toHaveBeenCalled();
+      expect(rejectSpy).toHaveBeenCalledTimes(2);
+    });
+
+    it('does not cancel a currently running task', async () => {
+      const queue = new PromiseQueue({name: 'FlushQueue'});
+
+      const started = new Deferred();
+      const unblock = new Deferred();
+      const finished: string[] = [];
+
+      const runningTask = async () => {
+        started.resolve?.(undefined); // Signal start
+        await unblock.promise;
+        finished.push('running');
+      };
+
+      const pendingTask = async () => {
+        finished.push('pending');
+      };
+
+      void queue.push(runningTask);
+      await started.promise;
+
+      // Add a task that should be flushed
+      void queue.push(pendingTask).catch(() => {
+        finished.push('flushed');
+      });
+
+      queue.flush();
+
+      unblock.resolve?.(undefined);
+
+      await new Promise(res => setTimeout(res, 0)); // allow queue to flush execution
+      expect(finished).toEqual(['flushed', 'running']);
+    });
+
+    it('leaves queue empty after flush', () => {
+      const queue = new PromiseQueue({name: 'FlushQueue'});
+
+      void queue.push(() => Promise.resolve()).catch(() => {});
+      void queue.push(() => Promise.resolve()).catch(() => {});
+
+      queue.flush();
+
       expect(queue.getLength()).toBe(0);
     });
   });
