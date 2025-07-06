@@ -2066,10 +2066,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dotenv@npm:16.5.0":
-  version: 16.5.0
-  resolution: "dotenv@npm:16.5.0"
-  checksum: 10/e68a16834f1a41cc2dfb01563bc150668ad675e6cd09191211467b5c0806b6ecd6ec438e021aa8e01cd0e72d2b70ef4302bec7cc0fe15b6955f85230b62dc8a9
+"dotenv@npm:17.0.1":
+  version: 17.0.1
+  resolution: "dotenv@npm:17.0.1"
+  checksum: 10/050987c31eff3089a09358390c95cfb0fb2d66bb85b8e868d8aac3551d2dd81f963719dcb9103f7af5ea84c4aff446b39ebaa812d7fd03d9adf2402535877cd7
   languageName: node
   linkType: hard
 
@@ -5715,7 +5715,7 @@ __metadata:
     "@types/jest": "npm:^29.5.14"
     "@types/node": "npm:22.5.5"
     "@wireapp/commons": "npm:5.4.2"
-    dotenv: "npm:16.5.0"
+    dotenv: "npm:17.0.1"
     dotenv-extended: "npm:2.9.0"
     express: "npm:4.21.2"
     express-sitemap-xml: "npm:3.1.0"
