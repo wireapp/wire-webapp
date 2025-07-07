@@ -344,7 +344,7 @@ export class Account extends TypedEventEmitter<Events> {
   /**
    * Will register a new client for the current user
    */
-  public regsterClient = async (
+  public registerClient = async (
     loginData: LoginData,
     clientInfo: ClientInfo = coreDefaultClient,
     /** will add extra manual entropy to the client's identity being created */
@@ -362,7 +362,6 @@ export class Account extends TypedEventEmitter<Events> {
     const client = await this.service.client.register(loginData, clientInfo, initialPreKeys);
     const clientId = client.id;
 
-    await this.service.notification.initializeNotificationStream(clientId);
     await this.service.client.synchronizeClients(clientId);
     return client;
   };
