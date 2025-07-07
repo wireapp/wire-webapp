@@ -231,18 +231,18 @@ export class Account extends TypedEventEmitter<Events> {
    *   - useVersion(0, 1, true) > version 1 is used
    * @return The highest version that is both supported by client and backend
    */
-  public async useAPIVersion(min: number, max: number, allowDev?: boolean) {
+  public useAPIVersion = async (min: number, max: number, allowDev?: boolean) => {
     const features = await this.apiClient.useVersion(min, max, allowDev);
     this.backendFeatures = features;
     return features;
-  }
+  };
 
-  private persistCookie(storeEngine: CRUDEngine, cookie: Cookie): Promise<string> {
+  private persistCookie = (storeEngine: CRUDEngine, cookie: Cookie): Promise<string> => {
     const entity = {expiration: cookie.expiration, zuid: cookie.zuid};
     return storeEngine.updateOrCreate(AUTH_TABLE_NAME, AUTH_COOKIE_KEY, entity);
-  }
+  };
 
-  public async enrollE2EI({
+  public enrollE2EI = async ({
     displayName,
     handle,
     teamId,
@@ -264,7 +264,7 @@ export class Account extends TypedEventEmitter<Events> {
     getAllConversations: getAllConversationsCallback;
     /** number of seconds the certificate should be valid (default 90 days) */
     certificateTtl?: number;
-  }) {
+  }) => {
     const context = this.apiClient.context;
     const domain = context?.domain ?? '';
 
@@ -293,7 +293,7 @@ export class Account extends TypedEventEmitter<Events> {
       getOAuthToken,
       getAllConversations,
     );
-  }
+  };
 
   get clientId(): string {
     return this.apiClient.validatedClientId;
@@ -309,22 +309,22 @@ export class Account extends TypedEventEmitter<Events> {
    * @param registration The user's data
    * @param clientType Type of client to create (temporary or permanent)
    */
-  public async register(registration: RegisterData, clientType: ClientType): Promise<Context> {
+  public register = async (registration: RegisterData, clientType: ClientType): Promise<Context> => {
     const context = await this.apiClient.register(registration, clientType);
     await this.initServices(context);
     return context;
-  }
+  };
 
   /**
    * Will init the core with an already logged in user
    *
    * @param clientType The type of client the user is using (temporary or permanent)
    */
-  public async init(clientType: ClientType, {cookie}: InitOptions = {}): Promise<Context> {
+  public init = async (clientType: ClientType, {cookie}: InitOptions = {}): Promise<Context> => {
     const context = await this.apiClient.init(clientType, cookie);
     await this.initServices(context);
     return context;
-  }
+  };
 
   /**
    * Will log the user in with the given credential.
@@ -332,24 +332,24 @@ export class Account extends TypedEventEmitter<Events> {
    * @param loginData The credentials of the user
    * @param clientInfo Info about the client to create (name, type...)
    */
-  public async login(loginData: LoginData): Promise<Context> {
+  public login = async (loginData: LoginData): Promise<Context> => {
     this.resetContext();
     LoginSanitizer.removeNonPrintableCharacters(loginData);
 
     const context = await this.apiClient.login(loginData);
     await this.initServices(context);
     return context;
-  }
+  };
 
   /**
    * Will register a new client for the current user
    */
-  public async registerClient(
+  public regsterClient = async (
     loginData: LoginData,
     clientInfo: ClientInfo = coreDefaultClient,
     /** will add extra manual entropy to the client's identity being created */
     entropyData?: Uint8Array,
-  ): Promise<RegisteredClient> {
+  ): Promise<RegisteredClient> => {
     if (!this.service || !this.apiClient.context || !this.storeEngine) {
       throw new Error('Services are not set or context not initialized.');
     }
@@ -365,7 +365,7 @@ export class Account extends TypedEventEmitter<Events> {
     await this.service.notification.initializeNotificationStream(clientId);
     await this.service.client.synchronizeClients(clientId);
     return client;
-  }
+  };
 
   public getLocalClient() {
     return this.service?.client.loadClient();
@@ -376,7 +376,7 @@ export class Account extends TypedEventEmitter<Events> {
    *
    * @returns The local existing client or undefined if the client does not exist or is not valid (non existing on backend)
    */
-  public async initClient(client: RegisteredClient, mlsConfig?: InitClientOptions) {
+  public initClient = async (client: RegisteredClient, mlsConfig?: InitClientOptions) => {
     if (!this.service || !this.apiClient.context || !this.storeEngine) {
       throw new Error('Services are not set.');
     }
@@ -402,9 +402,9 @@ export class Account extends TypedEventEmitter<Events> {
 
     this.currentClient = client;
     return client;
-  }
+  };
 
-  private async buildCryptoClient(context: Context, storeEngine: CRUDEngine, encryptedStore: EncryptedStore) {
+  private buildCryptoClient = async (context: Context, storeEngine: CRUDEngine, encryptedStore: EncryptedStore) => {
     const baseConfig = {
       nbPrekeys: this.options.nbPrekeys,
       onNewPrekeys: async (prekeys: PreKey[]) => {
@@ -431,7 +431,7 @@ export class Account extends TypedEventEmitter<Events> {
     const {buildClient} = await import('./messagingProtocols/proteus/ProteusService/CryptoClient/CryptoboxWrapper');
     const client = buildClient(storeEngine, baseConfig);
     return [CryptoClientType.CRYPTOBOX, client] as const;
-  }
+  };
 
   /**
    * In order to be able to send MLS messages, the core needs a few information from the consumer.
@@ -440,11 +440,11 @@ export class Account extends TypedEventEmitter<Events> {
    * - what is the groupId of a conversation
    * @param coreCallbacks
    */
-  configureCoreCallbacks(coreCallbacks: CoreCallbacks) {
+  configureCoreCallbacks = (coreCallbacks: CoreCallbacks) => {
     this.coreCallbacks = coreCallbacks;
-  }
+  };
 
-  private async initServices(context: Context): Promise<void> {
+  private initServices = async (context: Context): Promise<void> => {
     const encryptedStoreName = this.generateEncryptedDbName(context);
     this.encryptedDb = this.options.systemCrypto
       ? await createCustomEncryptedStore(encryptedStoreName, this.options.systemCrypto)
@@ -523,19 +523,19 @@ export class Account extends TypedEventEmitter<Events> {
       team: teamService,
       user: userService,
     };
-  }
+  };
 
-  private resetContext(): void {
+  private resetContext = (): void => {
     this.currentClient = undefined;
     delete this.apiClient.context;
     delete this.service;
-  }
+  };
 
   /**
    * Will logout the current user
    * @param clearData if set to `true` will completely wipe any database that was created by the Account
    */
-  public async logout(data?: {clearAllData?: boolean; clearCryptoData?: boolean}): Promise<void> {
+  public logout = async (data?: {clearAllData?: boolean; clearCryptoData?: boolean}): Promise<void> => {
     this.db?.close();
     this.encryptedDb?.close();
 
@@ -547,9 +547,9 @@ export class Account extends TypedEventEmitter<Events> {
 
     await this.apiClient.logout();
     this.resetContext();
-  }
+  };
 
-  private async wipeCommonData(): Promise<void> {
+  private wipeCommonData = async (): Promise<void> => {
     await this.service?.client.deleteLocalClient();
 
     if (this.storeEngine) {
@@ -558,12 +558,12 @@ export class Account extends TypedEventEmitter<Events> {
 
     // needs to be wiped last
     await this.encryptedDb?.wipe();
-  }
+  };
 
   /**
    * Will delete the identity and history of the current user
    */
-  private async wipeAllData(): Promise<void> {
+  private wipeAllData = async (): Promise<void> => {
     if (this.storeEngine) {
       await deleteIdentity(this.storeEngine, false);
     }
@@ -571,18 +571,18 @@ export class Account extends TypedEventEmitter<Events> {
       await deleteDB(this.db);
     }
     await this.wipeCommonData();
-  }
+  };
 
   /**
    * Will delete the cryptography and client of the current user
    * Will keep the history intact
    */
-  private async wipeCryptoData(): Promise<void> {
+  private wipeCryptoData = async (): Promise<void> => {
     if (this.storeEngine) {
       await deleteIdentity(this.storeEngine, true);
     }
     await this.wipeCommonData();
-  }
+  };
 
   /**
    * return true if the current user has a MLS device that is initialized and ready to use
@@ -598,7 +598,7 @@ export class Account extends TypedEventEmitter<Events> {
    * @param callbacks callbacks that will be called to handle different events
    * @returns close a function that will disconnect from the websocket
    */
-  public async listen({
+  public listen = async ({
     onEvent = () => {},
     onConnectionStateChanged: onConnectionStateChangedCallBack = () => {},
     onNotificationStreamProgress = () => {},
@@ -635,7 +635,7 @@ export class Account extends TypedEventEmitter<Events> {
      * When set will not decrypt and not store the last notification ID. This is useful if you only want to subscribe to unencrypted backend events
      */
     dryRun?: boolean;
-  } = {}): Promise<() => void> {
+  } = {}): Promise<() => void> => {
     if (!this.currentClient) {
       throw new Error('Client has not been initialized - please login first');
     }
@@ -703,29 +703,29 @@ export class Account extends TypedEventEmitter<Events> {
     });
 
     return () => {
+      this.pauseAndFlushNotificationQueue();
       this.apiClient.disconnect();
       onConnectionStateChanged(ConnectionState.CLOSED);
       this.apiClient.transport.ws.removeAllListeners();
     };
-  }
+  };
 
-  private createConnectionStateChangedHandler(
+  private createConnectionStateChangedHandler = (
     onConnectionStateChanged: (state: ConnectionState) => void,
-  ): (state: ConnectionState) => void {
-    return (state: ConnectionState) => {
-      console.info(`Connection state changed to: ${state}`);
+  ): ((state: ConnectionState) => void) => {
+    return (state: ConnectionState): void => {
       this.connectionState = state;
       onConnectionStateChanged(state);
       this.logger.info(`Connection state changed to: ${state}`);
     };
-  }
+  };
 
   /**
    * Creates the event handler that is invoked for each decrypted event from the backend.
    * Responsible for handling specific event types like `MESSAGE_TIMER_UPDATE`, and then
    * forwarding the event to the consumer via the `onEvent` callback.
    */
-  private createEventHandler(onEvent: (payload: HandledEventPayload, source: NotificationSource) => void) {
+  private createEventHandler = (onEvent: (payload: HandledEventPayload, source: NotificationSource) => void) => {
     return async (payload: HandledEventPayload, source: NotificationSource) => {
       const {event} = payload;
       switch (event?.type) {
@@ -743,7 +743,7 @@ export class Account extends TypedEventEmitter<Events> {
       // Always forward the event to the consumer
       onEvent(payload, source);
     };
-  }
+  };
 
   /**
    * @deprecated This method is used to handle legacy notifications from the backend.
@@ -751,10 +751,10 @@ export class Account extends TypedEventEmitter<Events> {
    * It can be replaced with the new notification handling system using `ConsumableNotification`
    * when all clients are capable of handling consumable notifications.
    */
-  private createLegacyNotificationHandler(
+  private createLegacyNotificationHandler = (
     handleEvent: (payload: HandledEventPayload, source: NotificationSource) => Promise<void>,
     dryRun: boolean,
-  ) {
+  ) => {
     return async (notification: Notification, source: NotificationSource): Promise<void> => {
       try {
         const messages = this.service!.notification.handleNotification(notification, source, dryRun);
@@ -769,14 +769,14 @@ export class Account extends TypedEventEmitter<Events> {
         );
       }
     };
-  }
+  };
 
-  private createNotificationHandler(
+  private createNotificationHandler = (
     handleEvent: (payload: HandledEventPayload, source: NotificationSource) => Promise<void>,
     onNotificationStreamProgress: (currentProcessingNotificationTimestamp: string) => void,
     onConnectionStateChanged: (state: ConnectionState) => void,
     dryRun: boolean,
-  ) {
+  ) => {
     return async (notification: ConsumableNotification, source: NotificationSource): Promise<void> => {
       try {
         if (notification.type === ConsumableEvent.MISSED) {
@@ -785,29 +785,40 @@ export class Account extends TypedEventEmitter<Events> {
         }
 
         if (notification.type === ConsumableEvent.SYNCHRONIZATION) {
-          void this.notificationProcessingQueue.push(() =>
-            this.handleSynchronizationNotification(notification, onConnectionStateChanged),
-          );
+          void this.notificationProcessingQueue
+            .push(() => this.handleSynchronizationNotification(notification, onConnectionStateChanged))
+            .catch(this.handleNotificationQueueError);
           return;
         }
 
-        void this.notificationProcessingQueue.push(() =>
-          this.decryptAckEmitNotification(notification, handleEvent, source, onNotificationStreamProgress, dryRun),
-        );
+        void this.notificationProcessingQueue
+          .push(() =>
+            this.decryptAckEmitNotification(notification, handleEvent, source, onNotificationStreamProgress, dryRun),
+          )
+          .catch(this.handleNotificationQueueError);
       } catch (error) {
         this.logger.error(`Failed to handle notification "${notification.type}": ${(error as any).message}`, error);
       }
     };
-  }
+  };
 
-  private acknowledgeSynchronizationNotification(notification: ConsumableNotificationSynchronization) {
+  private handleNotificationQueueError = (error: unknown) => {
+    if (error instanceof Error && error.message.includes('Queue was flushed')) {
+      // queue is flushed manually so we ignore the error
+      this.logger.info('Notification processing queue was flushed, ignoring error', error);
+      return;
+    }
+    throw error;
+  };
+
+  private acknowledgeSynchronizationNotification = (notification: ConsumableNotificationSynchronization) => {
     this.apiClient.transport.ws.acknowledgeConsumableNotificationSynchronization(notification);
-  }
+  };
 
-  private async handleSynchronizationNotification(
+  private handleSynchronizationNotification = async (
     notification: ConsumableNotificationSynchronization,
     onConnectionStateChanged: (state: ConnectionState) => void,
-  ) {
+  ) => {
     this.acknowledgeSynchronizationNotification(notification);
 
     const markerId = notification.data.marker_id;
@@ -823,15 +834,15 @@ export class Account extends TypedEventEmitter<Events> {
       resumeMessageSending();
       onConnectionStateChanged(ConnectionState.LIVE);
     }
-  }
+  };
 
-  private async decryptAckEmitNotification(
+  private decryptAckEmitNotification = async (
     notification: ConsumableNotificationEvent,
     handleEvent: (payload: HandledEventPayload, source: NotificationSource) => Promise<void>,
     source: NotificationSource,
     onNotificationStreamProgress: (currentProcessingNotificationTimestamp: string) => void,
     dryRun: boolean,
-  ): Promise<void> {
+  ): Promise<void> => {
     try {
       const payloads = this.service!.notification.handleNotification(notification.data.event, source, dryRun);
 
@@ -850,15 +861,15 @@ export class Account extends TypedEventEmitter<Events> {
     } catch (err) {
       this.logger.error(`Failed to process notification ${notification.data.delivery_tag}`, err);
     }
-  }
+  };
 
-  public getNotificationEventTime(backendEvent: Events.BackendEvent) {
+  public getNotificationEventTime = (backendEvent: Events.BackendEvent) => {
     if ('time' in backendEvent && typeof backendEvent.time === 'string') {
       return backendEvent.time;
     }
 
     return null;
-  }
+  };
 
   /**
    * Returns a function to handle missed notifications — i.e., when the backend indicates
@@ -869,7 +880,7 @@ export class Account extends TypedEventEmitter<Events> {
    * It should be replaced with the new notification handling system using `ConsumableNotification`.
    * when all clients are capable of handling consumable notifications.
    */
-  private createLegacyMissedNotificationsHandler(onMissedNotifications: (notificationId: string) => void) {
+  private createLegacyMissedNotificationsHandler = (onMissedNotifications: (notificationId: string) => void) => {
     return async (notificationId: string) => {
       if (this.hasMLSDevice) {
         queueConversationRejoin('all-conversations', () =>
@@ -879,7 +890,7 @@ export class Account extends TypedEventEmitter<Events> {
 
       return onMissedNotifications(notificationId);
     };
-  }
+  };
 
   /**
    * Returns a processor function for the notification stream (legacy sync).
@@ -892,7 +903,7 @@ export class Account extends TypedEventEmitter<Events> {
    *
    * @param handlers Various logic handlers wired to notification callbacks
    */
-  private createLegacyNotificationStreamProcessor({
+  private createLegacyNotificationStreamProcessor = ({
     handleLegacyNotification,
     handleMissedNotifications,
     onNotificationStreamProgress,
@@ -902,7 +913,7 @@ export class Account extends TypedEventEmitter<Events> {
     handleMissedNotifications: (notificationId: string) => Promise<void>;
     onNotificationStreamProgress: (currentProcessingNotificationTimestamp: string) => void;
     onConnectionStateChanged: (state: ConnectionState) => void;
-  }) {
+  }) => {
     return async () => {
       pauseMessageSending();
       // We want to avoid triggering rejoins of out-of-sync MLS conversations while we are processing the notification stream
@@ -926,7 +937,19 @@ export class Account extends TypedEventEmitter<Events> {
       resumeRejoiningMLSConversations();
       onConnectionStateChanged(ConnectionState.LIVE);
     };
-  }
+  };
+
+  /**
+   * In case of a closed connection, we flush the notification processing queue.
+   * As we are not acknowledging them before decryption is done
+   * they will be resent next time the connection is opened
+   * this is to avoid duplicate decryption of notifications
+   */
+  private pauseAndFlushNotificationQueue = () => {
+    this.notificationProcessingQueue.pause();
+    this.notificationProcessingQueue.flush();
+    this.logger.info('Notification processing queue paused and flushed');
+  };
 
   /**
    * Sets up WebSocket event listeners for:
@@ -935,10 +958,10 @@ export class Account extends TypedEventEmitter<Events> {
    * On each new backend message, we pass it to the  notification handler.
    * On state changes, we map raw socket states to public connection states and emit them.
    */
-  private setupWebSocketListeners(
+  private setupWebSocketListeners = (
     handleNotification: (notification: ConsumableNotification, source: NotificationSource) => Promise<void>,
     onConnectionStateChanged: (state: ConnectionState) => void,
-  ) {
+  ) => {
     this.apiClient.transport.ws.removeAllListeners(WebSocketClient.TOPIC.ON_MESSAGE);
 
     this.apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_MESSAGE, notification =>
@@ -954,21 +977,14 @@ export class Account extends TypedEventEmitter<Events> {
       const connectionState = mapping[wsState];
 
       if (connectionState === ConnectionState.CLOSED) {
-        this.notificationProcessingQueue.pause();
-        /**
-         * In case of a closed connection, we flush the notification processing queue.
-         * As we are not acknowledging them before decryption is done
-         * they will be resent next time the connection is opened
-         * this is to avoid duplicate decryption of notifications
-         */
-        this.notificationProcessingQueue.flush();
+        this.pauseAndFlushNotificationQueue();
       }
 
       if (connectionState) {
         onConnectionStateChanged(connectionState);
       }
     });
-  }
+  };
 
   /**
    * Handles logic for reacting to a missed notification event.
@@ -991,7 +1007,7 @@ export class Account extends TypedEventEmitter<Events> {
    * the WebSocket transport, unblocking the backend so it resumes sending updates
    * then we remove the flag.
    */
-  private reactToMissedNotification() {
+  private reactToMissedNotification = () => {
     const localStorageKey = 'has_missing_notification';
 
     // First-time handling: set flag and reload to trigger full re-fetch of state.
@@ -1004,32 +1020,32 @@ export class Account extends TypedEventEmitter<Events> {
     // After reload: acknowledge the missed notification so backend resumes notifications.
     this.apiClient.transport.ws.acknowledgeMissedNotification();
     AccountLocalStorageStore.remove(localStorageKey);
-  }
+  };
 
-  public getClientCapabilities() {
+  public getClientCapabilities = () => {
     return this.currentClient?.capabilities || [];
-  }
+  };
 
-  public checkIsConsumable(
+  public checkIsConsumable = (
     notification: Notification | ConsumableNotification,
-  ): notification is ConsumableNotification {
+  ): notification is ConsumableNotification => {
     return 'type' in notification;
-  }
+  };
 
-  private generateDbName(context: Context) {
+  private generateDbName = (context: Context) => {
     const clientType = context.clientType === ClientType.NONE ? '' : `@${context.clientType}`;
     return `wire@${this.apiClient.config.urls.name}@${context.userId}${clientType}`;
-  }
+  };
 
-  private generateCoreDbName(context: Context) {
+  private generateCoreDbName = (context: Context) => {
     return `core-${this.generateDbName(context)}`;
-  }
+  };
 
-  private generateEncryptedDbName(context: Context) {
+  private generateEncryptedDbName = (context: Context) => {
     return `secrets-${this.generateDbName(context)}`;
-  }
+  };
 
-  private async initEngine(context: Context, encryptedStore: EncryptedStore): Promise<CRUDEngine> {
+  private initEngine = async (context: Context, encryptedStore: EncryptedStore): Promise<CRUDEngine> => {
     const dbName = this.generateDbName(context);
     this.logger.debug(`Initialising store with name "${dbName}"...`);
     const openDb = async () => {
@@ -1050,7 +1066,7 @@ export class Account extends TypedEventEmitter<Events> {
       await this.persistCookie(storeEngine, cookie);
     }
     return storeEngine;
-  }
+  };
 
   private groupIdFromConversationId = async (
     conversationId: QualifiedId,
@@ -1063,7 +1079,7 @@ export class Account extends TypedEventEmitter<Events> {
     return this.service?.subconversation.getSubconversationGroupId(conversationId, subconversationId);
   };
 
-  public async isMLSActiveForClient(): Promise<boolean> {
+  public isMLSActiveForClient = async (): Promise<boolean> => {
     // Check for CoreCrypto library, it is required for MLS
     if (!this.options.coreCryptoConfig?.enabled) {
       return false;
@@ -1077,5 +1093,5 @@ export class Account extends TypedEventEmitter<Events> {
     // Check if MLS is enabled for the public via backend feature flag
     const commonConfig = (await this.service?.team.getCommonFeatureConfig()) ?? {};
     return commonConfig[FEATURE_KEY.MLS]?.status === FeatureStatus.ENABLED;
-  }
+  };
 }
