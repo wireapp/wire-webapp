@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [46.31.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.31.1...@wireapp/core@46.31.2) (2025-07-07)
+
+### Bug Fixes
+
+* **core:** Do not call /notifications/last once switched to consumable-notifications ([#7099](https://github.com/wireapp/wire-web-packages/issues/7099)) ([cb0757e](https://github.com/wireapp/wire-web-packages/commit/cb0757e6a150f76313f893ac9f27a0ecc9f9d15b))
+
 ## [46.31.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.31.0...@wireapp/core@46.31.1) (2025-07-07)
 
 ### Bug Fixes
