@@ -90,8 +90,13 @@ export class NotificationService extends TypedEventEmitter<Events> {
     return this.backend.getAllNotifications(clientId, since);
   }
 
-  /** Should only be called with a completely new client. */
-  public async initializeNotificationStream(clientId: string): Promise<string> {
+  /**
+   * Should only be called with a completely new client.
+   *
+   * @deprecated This method is used to handle legacy notifications from the backend.
+   * It can be removed when all clients are capable of handling consumable notifications.
+   */
+  public async legacyInitializeNotificationStream(clientId: string): Promise<string> {
     await this.setLastEventDate(new Date(0));
     const latestNotification = await this.backend.getLastNotification(clientId);
     return this.setLastNotificationId(latestNotification);
