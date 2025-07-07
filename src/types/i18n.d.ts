@@ -441,9 +441,11 @@ declare module 'I18n/en-US.json' {
     'cells.refreshButton': `Refresh list`;
     'cells.renameNodeModal.cancelButton': `Cancel`;
     'cells.renameNodeModal.error': `Something went wrong, please try again later.`;
-    'cells.renameNodeModal.headline': `Rename`;
+    'cells.renameNodeModal.headline.file': `Rename file`;
+    'cells.renameNodeModal.headline.folder': `Rename folder`;
     'cells.renameNodeModal.label': `Name`;
     'cells.renameNodeModal.nameRequired': `Name is required`;
+    'cells.renameNodeModal.invalidCharacters': `Name cannot contain "/" or "." characters`;
     'cells.renameNodeModal.placeholder': `Enter a new name`;
     'cells.renameNodeModal.saveButton': `Save`;
     'cells.restore.error': `Something went wrong, please try again later and refresh the list.`;
@@ -1081,7 +1083,7 @@ declare module 'I18n/en-US.json' {
     'index.welcome': `Welcome to {brandName}!`;
     'initDecryption': `Decrypting messages`;
     'initEvents': `Loading messages`;
-    'initProgress': ` — {number1} of {number2}`;
+    "initProgress": "Loading messages from {time} ago",
     'initReceivedSelfUser': `Hello, {user}.`;
     'initReceivedUserData': `Checking for new messages`;
     'initUpdatedFromNotifications': `Almost done - Enjoy {brandName}`;

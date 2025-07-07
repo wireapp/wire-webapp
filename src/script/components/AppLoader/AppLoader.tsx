@@ -26,18 +26,16 @@ import {styles} from './AppLoader.styles';
 import {User} from '../../entity/User';
 
 interface AppLoaderProps {
-  init: (onProgress: (progress: number, message?: string) => void) => Promise<User | undefined>;
+  init: (onProgress: (message?: string) => void) => Promise<User | undefined>;
   children: (selfUser: User) => ReactNode;
 }
 
 interface LoadingProgress {
-  progress: number;
   message: string;
 }
 
 const defaultLoadingState: LoadingProgress = {
   message: '',
-  progress: 0,
 };
 
 export const AppLoader: FC<AppLoaderProps> = ({init, children}) => {
@@ -51,8 +49,8 @@ export const AppLoader: FC<AppLoaderProps> = ({init, children}) => {
     }
     isFirstRender.current = false;
 
-    init((progress, message) => {
-      setLoadingState(previousState => ({message: message ?? previousState?.message ?? '', progress}));
+    init(message => {
+      setLoadingState(previousState => ({message: message ?? previousState?.message ?? ''}));
     }).then(user => setSelfUser(user));
   }, []);
 

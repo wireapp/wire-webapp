@@ -22,6 +22,7 @@ import {ChangeEvent, FormEvent, MouseEvent, useState} from 'react';
 import {CellNode} from 'Components/Conversation/ConversationCells/common/cellNode/cellNode';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
+import {trimFileExtension} from 'Util/util';
 
 interface UseCellsRenameFormProps {
   node: CellNode;
@@ -29,12 +30,15 @@ interface UseCellsRenameFormProps {
   onSuccess: () => void;
 }
 
+const INVALID_CHARACTERS = ['/', '.'];
+
 export const useCellsRenameForm = ({node, cellsRepository, onSuccess}: UseCellsRenameFormProps) => {
-  const [name, setName] = useState(node.name);
+  const [name, setName] = useState(trimFileExtension(node.name));
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const isDisabled = isSubmitting || name === node.name;
+  const hasInvalidCharacters = INVALID_CHARACTERS.some(char => name.includes(char));
+  const isDisabled = isSubmitting || name === node.name || !name.trim();
 
   const renameNode = async (name: string) => {
     try {
@@ -61,6 +65,12 @@ export const useCellsRenameForm = ({node, cellsRepository, onSuccess}: UseCellsR
       return;
     }
 
+    if (hasInvalidCharacters) {
+      setError(t('cells.renameNodeModal.invalidCharacters'));
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
       await renameNode(name);
     } finally {
@@ -70,7 +80,7 @@ export const useCellsRenameForm = ({node, cellsRepository, onSuccess}: UseCellsR
 
   const handleNameChange = (event: ChangeEvent<HTMLInputElement>) => {
     setName(event.currentTarget.value);
-    if (error === t('cells.renameNodeModal.nameRequired')) {
+    if (error === t('cells.renameNodeModal.nameRequired') || error === t('cells.renameNodeModal.invalidCharacters')) {
       setError(null);
     }
   };

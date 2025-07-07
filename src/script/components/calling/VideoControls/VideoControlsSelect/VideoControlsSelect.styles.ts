@@ -17,21 +17,14 @@
  *
  */
 
-import {Breadcrumbs} from '@wireapp/react-ui-kit';
+import {CSSObject} from '@emotion/react';
 
-import {wrapperStyles} from './CellsBreadcrumbs.styles';
+export const selectGroupStyles: CSSObject = {
+  paddingBottom: 0,
+  paddingTop: 0,
 
-interface CellsBreadcrumbsProps {
-  maxNotCombinedItems?: number;
-  items: Array<{name: string; path: string}>;
-
-  onItemClick: (item: {name: string}) => void;
-}
-
-export const CellsBreadcrumbs = ({maxNotCombinedItems, items, onItemClick}: CellsBreadcrumbsProps) => {
-  return (
-    <div css={wrapperStyles}>
-      <Breadcrumbs items={items} maxNotCombinedItems={maxNotCombinedItems} onItemClick={onItemClick} />
-    </div>
-  );
+  ':not(:last-of-type)': {
+    paddingTop: 0,
+    paddingBottom: '4px',
+  },
 };

@@ -193,7 +193,7 @@ export class EventRepository {
    */
   async connectWebSocket(
     account: Account,
-    onNotificationStreamProgress: (progress: {done: number; total: number}) => void,
+    onNotificationStreamProgress: (currentProcessingNotificationTimestamp: string) => void,
     dryRun = false,
   ): Promise<void> {
     await this.handleTimeDrift();
