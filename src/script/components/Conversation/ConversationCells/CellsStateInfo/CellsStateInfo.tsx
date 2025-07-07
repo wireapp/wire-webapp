@@ -20,14 +20,14 @@
 import {headingStyles, paragraphStyles, wrapperStyles} from './CellStateInfo.styles';
 
 interface CellsStateInfoProps {
-  heading: string;
+  heading?: string;
   description: string;
 }
 
 export const CellsStateInfo = ({heading, description}: CellsStateInfoProps) => {
   return (
     <div css={wrapperStyles}>
-      <h3 css={headingStyles}>{heading}</h3>
+      {heading && <h3 css={headingStyles}>{heading}</h3>}
       <p css={paragraphStyles}>{description}</p>
     </div>
   );
