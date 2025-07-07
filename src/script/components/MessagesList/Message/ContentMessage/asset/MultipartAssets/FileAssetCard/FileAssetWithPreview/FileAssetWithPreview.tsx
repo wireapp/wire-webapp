@@ -82,7 +82,7 @@ export const FileAssetWithPreview = ({
         <button
           css={contentWrapperStyles}
           onClick={() => setIsOpen(true)}
-          aria-label={t('cellsGlobalView.optionOpen')}
+          aria-label={t('cells.options.open')}
           aria-controls={id}
           aria-haspopup="dialog"
           aria-expanded={isOpen}
@@ -101,7 +101,7 @@ export const FileAssetWithPreview = ({
               {shouldDisplayPreviewError && (
                 <>
                   <AlertIcon css={errorIconStyles} width={14} height={14} />
-                  <p css={errorTextStyles}>{t('cellsUnavailableFilePreview')}</p>
+                  <p css={errorTextStyles}>{t('cells.unavailableFilePreview')}</p>
                 </>
               )}
             </div>

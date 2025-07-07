@@ -45,10 +45,10 @@ interface ShareFileModalParams {
 
 export const showShareFileModal = ({uuid, cellsRepository}: ShareFileModalParams) => {
   PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-    primaryAction: {action: () => {}, text: t('cellsGlobalView.shareFileModalPrimaryAction')},
+    primaryAction: {action: () => {}, text: t('cells.shareModal.primaryAction')},
     text: {
       message: <CellsShareFileModalContent uuid={uuid} cellsRepository={cellsRepository} />,
-      title: t('cellsGlobalView.shareFileModalHeading'),
+      title: t('cells.shareModal.heading'),
     },
   });
 };
@@ -63,10 +63,10 @@ const CellsShareFileModalContent = ({uuid, cellsRepository}: ShareFileModalParam
       <div css={switchContainerStyles}>
         <div>
           <Label htmlFor="switch-public-link" css={labelStyles}>
-            {t('cellsGlobalView.shareFileModalEnablePublicLink')}
+            {t('cells.shareModal.enablePublicLink')}
           </Label>
           <p id="switch-public-link-description" css={publicLinkDescriptionStyles}>
-            {t('cellsGlobalView.shareFileModalEnablePublicLinkDescription')}
+            {t('cells.shareModal.enablePublicLink.file.description')}
           </p>
         </div>
         <div css={switchWrapperStyles}>
@@ -82,13 +82,13 @@ const CellsShareFileModalContent = ({uuid, cellsRepository}: ShareFileModalParam
       {isEnabled && status === 'success' && link && (
         <div css={inputWrapperStyles}>
           <label htmlFor="generated-public-link" className="visually-hidden">
-            {t('cellsGlobalView.shareFileModalGeneratedPublicLink')}
+            {t('cells.shareModal.generatedPublicLink')}
           </label>
           <Input id="generated-public-link" value={link} wrapperCSS={inputStyles} disabled={isInputDisabled} readOnly />
           <CopyToClipboardButton
             textToCopy={link}
-            displayText={t('cellsGlobalView.shareFileModalCopyLink')}
-            copySuccessText={t('cellsGlobalView.shareFileModalLinkCopied')}
+            displayText={t('cells.shareModal.copyLink')}
+            copySuccessText={t('cells.shareModal.linkCopied')}
           />
         </div>
       )}
@@ -97,7 +97,7 @@ const CellsShareFileModalContent = ({uuid, cellsRepository}: ShareFileModalParam
           <CellsTableLoader />
         </div>
       )}
-      {status === 'error' && <div>{t('cellsGlobalView.shareFileModalErrorLoadingLink')}</div>}
+      {status === 'error' && <div>{t('cells.shareModal.error.loadingLink')}</div>}
     </div>
   );
 };

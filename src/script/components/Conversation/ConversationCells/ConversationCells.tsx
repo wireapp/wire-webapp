@@ -72,7 +72,7 @@ export const ConversationCells = ({
   const hasFiles = !!files.length;
 
   const deleteFileFailedNotification = useAppNotification({
-    message: t('cellsGlobalView.deleteModalError'),
+    message: t('cells.deleteModal.error'),
   });
 
   const handleDeleteFile = useCallback(
@@ -110,18 +110,10 @@ export const ConversationCells = ({
         />
       )}
       {!isLoading && emptyView && (
-        <CellsStateInfo
-          heading={t('cellsGlobalView.noFilesHeading')}
-          description={t('cellsGlobalView.noFilesDescription')}
-        />
+        <CellsStateInfo heading={t('cells.noNodes.heading')} description={t('cells.noNodes.description')} />
       )}
       {isLoading && <CellsLoader minHeight={loaderHeight} />}
-      {isError && (
-        <CellsStateInfo
-          heading={t('cellsGlobalView.errorHeading')}
-          description={t('cellsGlobalView.errorDescription')}
-        />
-      )}
+      {isError && <CellsStateInfo heading={t('cells.error.heading')} description={t('cells.error.description')} />}
       {!emptyView && <CellsPagination {...getPaginationProps()} goToPage={goToPage} />}
     </div>
   );
