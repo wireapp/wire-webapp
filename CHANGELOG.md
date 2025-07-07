@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [46.31.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.31.0...@wireapp/core@46.31.1) (2025-07-07)
+
+### Bug Fixes
+
+* **core:** Pause and flush notification queue on disconnect call [WPB-18486] ([#7097](https://github.com/wireapp/wire-web-packages/issues/7097)) ([df40324](https://github.com/wireapp/wire-web-packages/commit/df40324907d77dde75675e895025d37300cda375))
+
 # [46.31.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.30.2...@wireapp/core@46.31.0) (2025-07-04)
 
 ### Features
