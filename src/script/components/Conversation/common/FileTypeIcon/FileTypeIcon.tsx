@@ -19,8 +19,6 @@
 
 import {ComponentType, CSSProperties} from 'react';
 
-import {SVGIconProps} from '@wireapp/react-ui-kit/lib/Icon/SVGIcon';
-
 import {
   PdfFileIcon,
   ImageFileIcon,
@@ -33,6 +31,7 @@ import {
   CodeFileIcon,
   ArchiveFileIcon,
   OtherFileIcon,
+  SVGIconProps,
 } from '@wireapp/react-ui-kit';
 
 import {FileType} from 'Util/getFileTypeFromExtension/fileType';

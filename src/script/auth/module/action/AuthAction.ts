@@ -34,7 +34,7 @@ import {AuthActionCreator} from './creator/';
 import {LabeledError} from './LabeledError';
 import {LocalStorageAction, LocalStorageKey} from './LocalStorageAction';
 
-import {currentCurrency, currentLanguage} from '../../localeConfig';
+import {currentLanguage} from '../../localeConfig';
 import type {Api, RootState, ThunkAction, ThunkDispatch} from '../reducer';
 import type {LoginDataState, RegistrationDataState} from '../reducer/authReducer';
 
@@ -273,32 +273,7 @@ export class AuthAction {
     };
   };
 
-  doRegisterTeam = (registration: RegisterData): ThunkAction => {
-    return async (dispatch, getState, {getConfig, core, actions: {clientAction, selfAction, localStorageAction}}) => {
-      const clientType = ClientType.PERMANENT;
-      registration.locale = currentLanguage();
-      registration.name = registration.name.trim();
-      registration.email = registration.email.trim();
-      registration.team.icon = 'default';
-      registration.team.currency = currentCurrency();
-      registration.team.name = registration.team.name.trim();
-
-      dispatch(AuthActionCreator.startRegisterTeam());
-      try {
-        await dispatch(this.doSilentLogout());
-        await core.register(registration, clientType);
-        await this.persistClientData(clientType, dispatch, localStorageAction);
-        await dispatch(selfAction.fetchSelf());
-        await dispatch(clientAction.doInitializeClient(clientType));
-        dispatch(AuthActionCreator.successfulRegisterTeam(registration));
-      } catch (error) {
-        dispatch(AuthActionCreator.failedRegisterTeam(error));
-        throw error;
-      }
-    };
-  };
-
-  doRegisterPersonal = (registration: RegisterData, entropyData: Uint8Array): ThunkAction => {
+  doRegisterPersonal = (registration: RegisterData, entropyData?: Uint8Array): ThunkAction => {
     return async (
       dispatch,
       getState,
@@ -421,24 +396,6 @@ export class AuthAction {
       } catch (error) {
         dispatch(AuthActionCreator.failedLogout(error));
       }
-    };
-  };
-
-  enterPersonalCreationFlow = (): ThunkAction => {
-    return async dispatch => {
-      dispatch(AuthActionCreator.enterPersonalCreationFlow());
-    };
-  };
-
-  enterTeamCreationFlow = (): ThunkAction => {
-    return async dispatch => {
-      dispatch(AuthActionCreator.enterTeamCreationFlow());
-    };
-  };
-
-  enterGenericInviteCreationFlow = (): ThunkAction => {
-    return async dispatch => {
-      dispatch(AuthActionCreator.enterGenericInviteCreationFlow());
     };
   };
 

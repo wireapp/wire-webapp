@@ -20,9 +20,9 @@
 import React from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {VIDEO_STATE} from '@wireapp/avs';
+import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import * as Icon from 'Components/Icon';

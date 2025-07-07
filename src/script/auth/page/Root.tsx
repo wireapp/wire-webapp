@@ -32,13 +32,11 @@ import {t} from 'Util/LocalizerUtil';
 import {ClientManager} from './ClientManager';
 import {ConversationJoin} from './ConversationJoin';
 import {ConversationJoinInvalid} from './ConversationJoinInvalid';
-import {CreateAccount} from './CreateAccount';
 import {CreatePersonalAccount} from './CreatePersonalAccount';
 import {CustomBackend} from './CustomBackend';
 import {CustomEnvironmentRedirect} from './CustomEnvironmentRedirect';
 import {HistoryInfo} from './HistoryInfo';
 import {Index} from './Index';
-import {InitialInvite} from './InitialInvite';
 import {Login} from './Login';
 import {OAuthPermissions} from './OAuthPermissions';
 import {SetAccountType} from './SetAccountType';
@@ -47,7 +45,7 @@ import {SetEntropyPage} from './SetEntropyPage';
 import {SetHandle} from './SetHandle';
 import {SetPassword} from './SetPassword';
 import {SingleSignOn} from './SingleSignOn';
-import {TeamName} from './TeamName';
+import {Success} from './Success';
 import {VerifyEmailCode} from './VerifyEmailCode';
 import {VerifyEmailLink} from './VerifyEmailLink';
 
@@ -121,7 +119,6 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
   };
 
   const ProtectedHistoryInfo = () => isAuthenticatedCheck(<HistoryInfo />);
-  const ProtectedInitialInvite = () => isAuthenticatedCheck(<InitialInvite />);
   const ProtectedClientManager = () => isAuthenticatedCheck(<ClientManager />);
 
   const ProtectedSetHandle = () => isAuthenticatedCheck(<SetHandle />);
@@ -161,13 +158,10 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
               <Route path={ROUTE.CLIENTS} element={<ProtectedClientManager />} />
               <Route path={ROUTE.CONVERSATION_JOIN_INVALID} element={<ConversationJoinInvalid />} />
               <Route path={ROUTE.CONVERSATION_JOIN} element={<ConversationJoin />} />
-              {Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
-                <Route path={ROUTE.CREATE_TEAM} element={<TeamName />} />
-              )}
               <Route path={ROUTE.HISTORY_INFO} element={<ProtectedHistoryInfo />} />
-              <Route path={ROUTE.INITIAL_INVITE} element={<ProtectedInitialInvite />} />
               <Route path={`${ROUTE.AUTHORIZE}`} element={<ProtectedOAuthPermissions />} />
               <Route path={ROUTE.CUSTOM_BACKEND} element={<CustomBackend />} />
+              <Route path={ROUTE.SUCCESS} element={<Success />} />
               <Route
                 path={`${ROUTE.LOGIN}/*`}
                 element={
@@ -229,9 +223,6 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
               )}
               {Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
                 <Route path={ROUTE.CREATE_ACCOUNT} element={<CreatePersonalAccount />} />
-              )}
-              {Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
-                <Route path={ROUTE.CREATE_TEAM_ACCOUNT} element={<CreateAccount />} />
               )}
               <Route path="*" element={<Navigate to={ROUTE.INDEX} replace />} />
             </Routes>

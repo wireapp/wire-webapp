@@ -74,11 +74,9 @@ export const ROUTE = {
   CONVERSATION_JOIN_INVALID: '/join-conversation-invalid',
   CREATE_ACCOUNT: '/createaccount',
   CREATE_TEAM: '/createteam',
-  CREATE_TEAM_ACCOUNT: '/createteamaccount',
   CUSTOM_ENV_REDIRECT: '/custom-env-redirect',
   HISTORY_INFO: '/historyinfo',
   INDEX: '/',
-  INITIAL_INVITE: '/teaminvite',
   LOGIN: '/login',
   CUSTOM_BACKEND: '/custom-backend',
   SET_ACCOUNT_TYPE: '/setaccounttype',
@@ -90,4 +88,5 @@ export const ROUTE = {
   VERIFY_EMAIL_CODE: '/verifyemailcode',
   VERIFY_EMAIL_LINK: '/verifyemaillink',
   E2EI_OAUTH_REDIRECT: '/e2ei-redirect',
+  SUCCESS: '/success',
 };
