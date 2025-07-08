@@ -372,6 +372,7 @@
   "cells.deletePermanentlyModal.file.description": "Это навсегда удалит файл {name} для всех участников.",
   "cells.deletePermanentlyModal.folder.description": "Это навсегда удалит папку {name} и ее содержимое для всех участников.",
   "cells.deletePermanentlyModal.headline": "Удалить навсегда?",
+  "cells.emptyRecycleBin.description": "You'll find all deleted files and folders here.",
   "cells.emptySearchResults.description": "Попробуйте изменить поиск или проверьте наличие опечатки.",
   "cells.emptySearchResults.heading": "Подходящих файлов не найдено",
   "cells.error.description": "Не удалось загрузить список файлов. Пожалуйста, повторите попытку позже.",
