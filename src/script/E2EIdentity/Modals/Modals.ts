@@ -224,6 +224,7 @@ export const getModalOptions = ({
           action: secondaryActionFn,
           text: t('acme.done.button.secondary'),
         },
+        ...hideCloseBtn,
       };
       modalType = PrimaryModal.type.ACKNOWLEDGE;
       break;
