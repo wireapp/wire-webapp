@@ -51,7 +51,9 @@ export const CellsRenameNodeModal = ({
 
   return (
     <CellsModal isOpen={isOpen} onClose={onClose} size="large">
-      <CellsModal.Header>{t('cells.renameNodeModal.headline')}</CellsModal.Header>
+      <CellsModal.Header>
+        {t(node.type === 'file' ? 'cells.renameNodeModal.headline.file' : 'cells.renameNodeModal.headline.folder')}
+      </CellsModal.Header>
       <CellsRenameForm
         isOpen={isOpen}
         onSubmit={handleRename}

@@ -243,7 +243,6 @@ export class DebugUtil {
   }
 
   async reconnectWebSocketWithLastNotificationIdFromBackend({dryRun} = {dryRun: false}) {
-    await this.core.service?.notification.initializeNotificationStream(this.clientState.currentClient!.id);
     return this.reconnectWebSocket({dryRun});
   }
 

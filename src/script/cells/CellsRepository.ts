@@ -124,6 +124,7 @@ export class CellsRepository {
     type,
     sortBy,
     sortDirection,
+    deleted = false,
   }: {
     path: string;
     limit?: number;
@@ -131,6 +132,7 @@ export class CellsRepository {
     type?: 'file' | 'folder';
     sortBy?: SortBy;
     sortDirection?: SortDirection;
+    deleted?: boolean;
   }) {
     return this.apiClient.api.cells.getAllNodes({
       path: path || this.basePath,
@@ -139,6 +141,7 @@ export class CellsRepository {
       sortBy,
       sortDirection,
       ...(type ? {type: type === 'file' ? 'LEAF' : 'COLLECTION'} : {}),
+      deleted,
     });
   }
 

@@ -286,6 +286,7 @@ const AccountFormComponent = ({
         id="accept-terms"
         checked={registrationData.termsAccepted}
         data-uie-name="do-accept-terms"
+        wrapperCSS={styles.checkbox}
       >
         <CheckboxLabel htmlFor="accept-terms" css={styles.checkboxLabel}>
           <FormattedMessage
@@ -309,6 +310,7 @@ const AccountFormComponent = ({
 
       {isTelemetryEnabled() && (
         <Checkbox
+          wrapperCSS={styles.checkbox}
           ref={inputs.privacyPolicy}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
             inputs.privacyPolicy.current?.setCustomValidity('');

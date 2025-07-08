@@ -35,7 +35,7 @@ export const CreateConversationSubmit = () => {
       disabled={!!error || !conversationName}
       type="button"
       onClick={onSubmit}
-      data-uie-name="submit"
+      data-uie-name="do-create-group"
       showLoading={isLoading}
       variant={ButtonVariant.TERTIARY}
     >

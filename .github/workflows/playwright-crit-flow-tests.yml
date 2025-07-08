@@ -8,7 +8,8 @@ on:
 jobs:
   smoke-tests:
     name: Run Playwright Critical Flow Tests
-    runs-on: ubuntu-latest
+    if: github.repository == 'wireapp/wire-webapp'
+    runs-on: [self-hosted, Linux, X64, office]
 
     steps:
       - name: Checkout repository
