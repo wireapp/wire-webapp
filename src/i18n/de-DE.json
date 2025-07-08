@@ -372,6 +372,7 @@
   "cells.deletePermanentlyModal.file.description": "Dies wird die Datei {name} für alle Teilnehmer dauerhaft löschen.",
   "cells.deletePermanentlyModal.folder.description": "Dies wird den Ordner {name} und dessen Inhalt für alle Teilnehmer dauerhaft löschen.",
   "cells.deletePermanentlyModal.headline": "Endgültig löschen?",
+  "cells.emptyRecycleBin.description": "You'll find all deleted files and folders here.",
   "cells.emptySearchResults.description": "Try adjusting your search or check for typos.",
   "cells.emptySearchResults.heading": "No matching files found",
   "cells.error.description": "The list of files couldn't be loaded. Please try again later.",
