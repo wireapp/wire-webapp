@@ -19,6 +19,7 @@
 
 import {UIEvent, useCallback, useState} from 'react';
 
+import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {container} from 'tsyringe';
 
 import {useMatchMedia} from '@wireapp/react-ui-kit';
@@ -105,7 +106,7 @@ export const Conversation = ({
     'isFileSharingSendingEnabled',
   ]);
 
-  const {is1to1, isRequest, isReadOnlyConversation, isSelfUserRemoved} = useKoSubscribableChildren(
+  const {is1to1, isRequest, isReadOnlyConversation, isSelfUserRemoved, cellsState} = useKoSubscribableChildren(
     activeConversation!,
     [
       'is1to1',
@@ -115,6 +116,7 @@ export const Conversation = ({
       'connection',
       'isReadOnlyConversation',
       'isSelfUserRemoved',
+      'cellsState',
     ],
   );
 
@@ -471,7 +473,7 @@ export const Conversation = ({
     isDisabled: isFileTabActive,
   });
 
-  const isCellsEnabled = Config.getConfig().FEATURE.ENABLE_CELLS && activeConversation?.cellsState() !== 'disabled';
+  const isCellsEnabled = Config.getConfig().FEATURE.ENABLE_CELLS && cellsState !== CONVERSATION_CELLS_STATE.DISABLED;
 
   return (
     <ConversationFileDropzone
@@ -510,7 +512,7 @@ export const Conversation = ({
                     conversationQualifiedId={activeConversation.qualifiedId}
                     conversationName={activeConversation.name()}
                     userRepository={repositories.user}
-                    cellsState={activeConversation.cellsState()}
+                    cellsState={cellsState}
                   />
                 )}
               </ConversationTabPanel>

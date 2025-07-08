@@ -39,6 +39,7 @@ export const CellsTagsFilter = ({allTags, selectedTags, onTagsChange}: CellsTags
       <ComboboxSelect
         id="tags"
         label={t('cells.filtersModal.tags.label')}
+        labelVisuallyHidden
         placeholder={t('cells.filtersModal.tags.placeholder')}
         menuPortalTarget={document.body}
         options={transformTags(allTags)}

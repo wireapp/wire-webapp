@@ -19,9 +19,12 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const wrapperStyles: CSSObject = {
-  padding: '16px 0',
-  display: 'flex',
-  flexDirection: 'column',
-  height: '100%',
+export const selectGroupStyles: CSSObject = {
+  paddingBottom: 0,
+  paddingTop: 0,
+
+  ':not(:last-of-type)': {
+    paddingTop: 0,
+    paddingBottom: '4px',
+  },
 };
