@@ -378,6 +378,7 @@ declare module 'I18n/en-US.json' {
     'cells.deletePermanentlyModal.headline': `Delete permanently?`;
     'cells.emptySearchResults.description': `Try adjusting your search or check for typos.`;
     'cells.emptySearchResults.heading': `No matching files found`;
+    'cells.emptyRecycleBin.description': `You\'ll find all deleted files and folders here.`;
     'cells.error.description': `The list of files couldn\'t be loaded. Please try again later.`;
     'cells.error.heading': `Something went wrong loading`;
     'cells.filtersModal.accordion.tags': `Tags`;
@@ -441,7 +442,9 @@ declare module 'I18n/en-US.json' {
     'cells.refreshButton': `Refresh list`;
     'cells.renameNodeModal.cancelButton': `Cancel`;
     'cells.renameNodeModal.error': `Something went wrong, please try again later.`;
-    'cells.renameNodeModal.headline': `Rename`;
+    'cells.renameNodeModal.headline.file': `Rename file`;
+    'cells.renameNodeModal.headline.folder': `Rename folder`;
+    'cells.renameNodeModal.invalidCharacters': `Name cannot contain "/" or "." characters`;
     'cells.renameNodeModal.label': `Name`;
     'cells.renameNodeModal.nameRequired': `Name is required`;
     'cells.renameNodeModal.placeholder': `Enter a new name`;
@@ -1081,7 +1084,7 @@ declare module 'I18n/en-US.json' {
     'index.welcome': `Welcome to {brandName}!`;
     'initDecryption': `Decrypting messages`;
     'initEvents': `Loading messages`;
-    'initProgress': ` — {number1} of {number2}`;
+    'initProgress': `Loading messages from {time} ago`;
     'initReceivedSelfUser': `Hello, {user}.`;
     'initReceivedUserData': `Checking for new messages`;
     'initUpdatedFromNotifications': `Almost done - Enjoy {brandName}`;

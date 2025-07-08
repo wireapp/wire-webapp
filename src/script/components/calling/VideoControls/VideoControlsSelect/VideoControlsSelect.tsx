@@ -21,6 +21,8 @@ import React from 'react';
 
 import {Select} from '@wireapp/react-ui-kit';
 
+import {selectGroupStyles} from 'Components/calling/VideoControls/VideoControlsSelect/VideoControlsSelect.styles';
+
 type VideoControlsSelectProps = Pick<
   React.ComponentProps<typeof Select<false>>,
   | 'value'
@@ -66,6 +68,8 @@ export const VideoControlsSelect = ({
       menuIsOpen={menuIsOpen}
       wrapperCSS={wrapperCSS}
       menuCSS={menuCSS}
+      hideControl
+      selectGroupCSS={selectGroupStyles}
     />
   );
 };

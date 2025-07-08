@@ -28,6 +28,8 @@ import {getUsersFromNodes} from './getUsersFromNodes';
 import {transformDataToCellsNodes, transformToCellPagination} from './transformDataToCellsNodes';
 
 import {getCellsApiPath} from '../common/getCellsApiPath/getCellsApiPath';
+import {getCellsFilesPath} from '../common/getCellsFilesPath/getCellsFilesPath';
+import {RECYCLE_BIN_PATH} from '../common/recycleBin/recycleBin';
 import {useCellsStore} from '../common/useCellsStore/useCellsStore';
 
 interface UseGetAllCellsNodesProps {
@@ -56,6 +58,7 @@ export const useGetAllCellsNodes = ({
         path: getCellsApiPath({conversationQualifiedId}),
         limit: pageSize,
         offset,
+        deleted: getCellsFilesPath() === RECYCLE_BIN_PATH,
       });
 
       if (!result.Nodes?.length) {

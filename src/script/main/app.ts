@@ -43,7 +43,7 @@ import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {includesString} from 'Util/StringUtil';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {durationFrom, formatCoarseDuration, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {appendParameter} from 'Util/UrlUtil';
 import {AppInitializationStep, checkIndexedDb, InitializationEventLogger} from 'Util/util';
 
@@ -395,7 +395,7 @@ export class App {
    * @param config
    * @param onProgress
    */
-  async initApp(clientType: ClientType, onProgress: (progress: number, message?: string) => void) {
+  async initApp(clientType: ClientType, onProgress: (message?: string) => void) {
     // add body information
     const startTime = Date.now();
     await updateApiVersion();
@@ -423,19 +423,20 @@ export class App {
         cells: cellsRepository,
       } = this.repository;
       await checkIndexedDb();
-      onProgress(2.5);
+
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
 
       const selfUser = await this.repository.user.getSelf([{position: 'App.initiateSelfUser', vendor: 'webapp'}]);
 
-      const accessToken = this.apiClient.transport.http.accessTokenStore.accessToken?.access_token!;
+      const accessToken = this.apiClient.transport.http.accessTokenStore.accessTokenData?.access_token!;
 
       this.initializeCells({cellsRepository, selfUser, accessToken});
 
       await initializeDataDog(this.config, selfUser.qualifiedId);
       const eventLogger = new InitializationEventLogger(selfUser.id);
       eventLogger.log(AppInitializationStep.AppInitialize);
-      onProgress(5, t('initReceivedSelfUser', {user: selfUser.name()}, {}, true));
+
+      onProgress(t('initReceivedSelfUser', {user: selfUser.name()}, {}, true));
 
       try {
         await this.core.init(clientType);
@@ -511,11 +512,12 @@ export class App {
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_SELF_USER);
       const clientEntity = await this._initiateSelfUserClients(selfUser, clientRepository);
       callingRepository.initAvs(selfUser, clientEntity.id);
-      onProgress(7.5, t('initValidatedClient'));
+
+      onProgress(t('initValidatedClient'));
+
       telemetry.timeStep(AppInitTimingsStep.VALIDATED_CLIENT);
       telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity.type ?? clientType);
       eventLogger.log(AppInitializationStep.ValidatedClient);
-      onProgress(10);
       telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
       const {connections, deadConnections} = await connectionRepository.getConnections(teamMembers);
@@ -540,7 +542,7 @@ export class App {
         );
       }
 
-      onProgress(25, t('initReceivedUserData'));
+      onProgress(t('initReceivedUserData'));
       telemetry.addStatistic(AppInitStatisticsValue.CONVERSATIONS, conversations.length, 50);
       this._subscribeToUnloadEvents(selfUser);
       this._subscribeToBeforeUnload();
@@ -549,7 +551,7 @@ export class App {
       await conversationRepository.conversationRoleRepository.loadTeamRoles();
 
       let totalNotifications = 0;
-      await eventRepository.connectWebSocket(this.core, ({done, total}) => {
+      await eventRepository.connectWebSocket(this.core, (currentProcessingNotificationTimestamp: string) => {
         /**
          * NOTE: this call back is now also called when client was already open but websocket
          * was offline for a while hence it can be used to demonstrate number of pending messages
@@ -557,12 +559,13 @@ export class App {
          */
         const baseMessage = t('initDecryption');
         const extraInfo = this.config.FEATURE.SHOW_LOADING_INFORMATION
-          ? ` ${t('initProgress', {number1: done.toString(), number2: total.toString()})}`
+          ? ` ${t('initProgress', {time: formatCoarseDuration(durationFrom(currentProcessingNotificationTimestamp))})}`
           : '';
 
-        totalNotifications = total;
-        onProgress(25 + 50 * (done / total), `${baseMessage}${extraInfo}`);
+        totalNotifications++;
+        onProgress(`${baseMessage}${extraInfo}`);
       });
+
       eventLogger.log(AppInitializationStep.DecryptionCompleted, {count: totalNotifications});
 
       await conversationRepository.init1To1Conversations(connections, conversations);
@@ -591,14 +594,12 @@ export class App {
       eventLogger.log(AppInitializationStep.SetupMLS);
       telemetry.timeStep(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
       telemetry.addStatistic(AppInitStatisticsValue.NOTIFICATIONS, totalNotifications, 100);
-      onProgress(97.5, t('initUpdatedFromNotifications', {brandName: this.config.BRAND_NAME}));
+      onProgress(t('initUpdatedFromNotifications', {brandName: this.config.BRAND_NAME}));
 
       const clientEntities = await clientRepository.updateClientsForSelf();
 
       // We unblock the lock screen by loading this code asynchronously, to make it appear to the user that the app is done loading earlier.
       void eventTrackerRepository.init(propertiesRepository.getUserConsentStatus().isTelemetryConsentGiven);
-
-      onProgress(99);
 
       eventLogger.log(AppInitializationStep.ClientsUpdated, {count: clientEntities.length});
       telemetry.addStatistic(AppInitStatisticsValue.CLIENTS, clientEntities.length);
