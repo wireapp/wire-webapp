@@ -23,21 +23,21 @@ export class TeamsPage {
   readonly page: Page;
 
   readonly profileIcon: Locator;
-  readonly manageTeamButton: Locator;
+  readonly peopleButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
 
     this.profileIcon = page.locator("[data-uie-name='element-avatar-image']");
-    this.manageTeamButton = page.locator("[data-uie-name='go-manage-team-page']");
+    this.peopleButton = page.locator("[data-uie-name='go-manage-team-page']");
   }
 
   async isProfileIconVisible() {
     return await this.profileIcon.isVisible();
   }
 
-  async clickManageTeamButton() {
-    await this.manageTeamButton.click();
+  async clickPeopleButton() {
+    await this.peopleButton.click();
   }
 
   async isUserVisibleAsSelf(name: string) {

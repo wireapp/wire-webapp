@@ -38,6 +38,8 @@ export class TeamSignUpPage {
   readonly continueButton: Locator;
   readonly inviteEmailInput: Locator;
   readonly goToTeamSettingsButton: Locator;
+  readonly termsCheckbox: Locator;
+  readonly privacyPolicyCheckbox: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -57,6 +59,8 @@ export class TeamSignUpPage {
     this.continueButton = page.locator('button[type="submit"]');
     this.inviteEmailInput = page.locator('[name="email"]');
     this.goToTeamSettingsButton = page.locator('[data-uie-name="do-go-to-team-management"]');
+    this.termsCheckbox = page.locator('[data-uie-name="do-accept-terms"]');
+    this.privacyPolicyCheckbox = page.locator('[data-uie-name="do-accept-privacy-policy"]');
   }
 
   async inputEmail(email: string) {
@@ -136,6 +140,14 @@ export class TeamSignUpPage {
     await this.roleDropdown.click();
     const option = this.getRoleOption(role);
     await option.click();
+  }
+
+  async toggleTermsCheckbox() {
+    await this.termsCheckbox.dispatchEvent('click');
+  }
+
+  async togglePrivacyPolicyCheckbox() {
+    await this.privacyPolicyCheckbox.dispatchEvent('click');
   }
 
   async inputInviteEmail(email: string, index: number = 0) {

@@ -38,9 +38,10 @@ import {RegistrationPage} from './registration.page';
 import {SetUsernamePage} from './setUsername.page';
 import {SingleSignOnPage} from './singleSignOn.page';
 import {StartUIPage} from './startUI.page';
-import {TeamLoginPage} from './teamLogin.page';
-import {TeamsPage} from './teams.page';
-import {TeamSignUpPage} from './teamSignUp.page';
+import {TeamDataShareConsentModal} from './team_management/teamDataShareConsent.modal';
+import {TeamLoginPage} from './team_management/teamLogin.page';
+import {TeamsPage} from './team_management/teams.page';
+import {TeamSignUpPage} from './team_management/teamSignUp.page';
 import {UserProfileModal} from './userProfile.modal';
 import {WelcomePage} from './welcome.page';
 
@@ -284,5 +285,13 @@ export class PageManager {
       this._teamSignUpPage = new TeamSignUpPage(this.page);
     }
     return this._teamSignUpPage;
+  }
+
+  private _teamDataShareConsentModal!: TeamDataShareConsentModal;
+  get teamDataShareConsentModal(): TeamDataShareConsentModal {
+    if (!this._teamDataShareConsentModal) {
+      this._teamDataShareConsentModal = new TeamDataShareConsentModal(this.page);
+    }
+    return this._teamDataShareConsentModal;
   }
 }

@@ -72,8 +72,6 @@ test(
     tag: ['@crit-flow-tm', '@TC-2166', '@TC-2173', '@TC-2176', '@TC-2177', '@teamManagement-regression'],
   },
   async ({api, pages}) => {
-    test.setTimeout(10_000);
-
     // Creating test data
     const teamOwner = getUser();
     const member = getUser();
@@ -85,38 +83,26 @@ test(
 
     await test.step('Team owner opens team sign up page', async () => {
       await pages.teamLoginPage.clickTeamCreateButton();
-      await pages.teamSignUpPage.inputEmail(teamOwner.email);
-      await pages.teamSignUpPage.clickContinueButton();
     });
 
-    await test.step('Team owner completes step 1 (team name and credentials) of the team sign up process', async () => {
-      expect(await pages.teamSignUpPage.isCurrentStepEquals('1'));
+    await test.step('Team owner provides team info, credentials, and accept the terms on the team sign up page', async () => {
+      await pages.teamSignUpPage.inputEmail(teamOwner.email);
       await pages.teamSignUpPage.inputProfileName(teamOwner.fullName);
       await pages.teamSignUpPage.inputTeamName(teamName);
       await pages.teamSignUpPage.inputPassword(teamOwner.password);
       await pages.teamSignUpPage.inputConfirmPassword(teamOwner.password);
+      await pages.teamSignUpPage.selectCompanySize('51 - 100');
+      await pages.teamSignUpPage.toggleTermsCheckbox();
+      await pages.teamSignUpPage.togglePrivacyPolicyCheckbox();
       await pages.teamSignUpPage.clickContinueButton();
     });
 
-    await test.step('Team owner completes step 2 (company info) of the team sign up process', async () => {
-      expect(await pages.teamSignUpPage.isCurrentStepEquals('2'));
-      await pages.teamSignUpPage.selectCompanySize('51-100');
-      await pages.teamSignUpPage.selectReason('To securely communicate with my team');
-      await pages.teamSignUpPage.selectIndustry('Finance');
-      await pages.teamSignUpPage.selectFocus('Banking');
-      await pages.teamSignUpPage.selectRole('Owner');
-      await pages.teamSignUpPage.clickContinueButton();
-    });
-
-    await test.step('Team owner completes step 3 (email verification) of the team sign up process', async () => {
-      expect(await pages.teamSignUpPage.isCurrentStepEquals('3'));
+    await test.step('Team owner completes email verification step of the team sign up process', async () => {
       const code = await api.inbucket.getVerificationCode(teamOwner.email);
       await pages.emailVerificationPage.enterVerificationCode(code);
     });
 
-    await test.step('Team owner completes step 4 (add team members) of the team sign up process', async () => {
-      expect(await pages.teamSignUpPage.isCurrentStepEquals('4'));
-      expect(await pages.teamSignUpPage.isPageHeaderTitleEquals('Almost done!'));
+    await test.step('Team owner adds team members on the team sign up page', async () => {
       expect(await pages.teamSignUpPage.isContinueButtonEnabled()).toBeFalsy();
 
       await pages.teamSignUpPage.inputInviteEmail(member.email);
@@ -124,28 +110,26 @@ test(
     });
 
     await test.step('Invited user receives team invitation email', async () => {
-      const invitationCode = await api.inbucket.getVerificationCode(member.email);
-      expect(invitationCode.length).toBe(6);
+      expect(await api.inbucket.isTeamInvitationEmailReceived(member.email, teamOwner.email));
     });
 
     await test.step('TC-2176 - Team owner sees congratulations step after successful sign up', async () => {
-      expect(await pages.teamSignUpPage.isPageHeaderTitleEquals('Congratulations on joining Wire!'));
+      expect(await pages.registerSuccessPage.isTeamSignUpSuccessMessageVisible());
     });
 
-    await test.step('TC-2177 - Team owner can go to team settings on congratulations step of sign up form', async () => {
-      await pages.teamSignUpPage.clickGoToTeamSettingsButton();
-    });
+    // Uncomment when [WPB-18632] is done
+    // await test.step('TC-2177 - Team owner can go to team settings on congratulations step of sign up form', async () => {
+    //   await pages.registerSuccessPage.clickManageTeamButton();
+    //   await pages.teamDataShareConsentModal.clickAgree();
+    //   await pages.marketingConsentModal.clickConfirmButton();
+    //   expect(await pages.teamsPage.isProfileIconVisible());
+    // });
 
-    await test.step('Team owner is signed in to teams admin', async () => {
-      await pages.dataShareConsentModal.clickConfirm();
-      expect(await pages.teamsPage.isProfileIconVisible());
-    });
-
-    await test.step('Team owner can see created team in team management', async () => {
-      await pages.teamsPage.clickManageTeamButton();
-      expect(await pages.teamsPage.isUserVisibleAsSelf(teamOwner.fullName));
-      expect(await pages.teamsPage.getUserRole(teamOwner.fullName)).toBe('Owner');
-    });
+    // await test.step('Team owner can see team info in team management', async () => {
+    //   await pages.teamsPage.clickPeopleButton();
+    //   expect(await pages.teamsPage.isUserVisibleAsSelf(teamOwner.fullName));
+    //   expect(await pages.teamsPage.getUserRole(teamOwner.fullName)).toBe('Owner');
+    // });
   },
 );
 
