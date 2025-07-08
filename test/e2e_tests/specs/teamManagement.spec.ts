@@ -117,19 +117,18 @@ test(
       expect(await pages.registerSuccessPage.isTeamSignUpSuccessMessageVisible());
     });
 
-    // Uncomment when [WPB-18632] is done
-    // await test.step('TC-2177 - Team owner can go to team settings on congratulations step of sign up form', async () => {
-    //   await pages.registerSuccessPage.clickManageTeamButton();
-    //   await pages.teamDataShareConsentModal.clickAgree();
-    //   await pages.marketingConsentModal.clickConfirmButton();
-    //   expect(await pages.teamsPage.isProfileIconVisible());
-    // });
+    await test.step('TC-2177 - Team owner can go to team settings on congratulations step of sign up form', async () => {
+      await pages.registerSuccessPage.clickManageTeamButton();
+      await pages.teamDataShareConsentModal.clickAgree();
+      await pages.marketingConsentModal.clickConfirmButton();
+      expect(await pages.teamsPage.isProfileIconVisible());
+    });
 
-    // await test.step('Team owner can see team info in team management', async () => {
-    //   await pages.teamsPage.clickPeopleButton();
-    //   expect(await pages.teamsPage.isUserVisibleAsSelf(teamOwner.fullName));
-    //   expect(await pages.teamsPage.getUserRole(teamOwner.fullName)).toBe('Owner');
-    // });
+    await test.step('Team owner can see team info in team management', async () => {
+      await pages.teamsPage.clickPeopleButton();
+      expect(await pages.teamsPage.isUserVisibleAsSelf(teamOwner.fullName));
+      expect(await pages.teamsPage.getUserRole(teamOwner.fullName)).toBe('Owner');
+    });
   },
 );
 
