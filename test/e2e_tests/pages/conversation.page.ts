@@ -60,7 +60,7 @@ export class ConversationPage {
 
   async isMessageVisible(messageText: string) {
     // Trying multiple times for the message to appear
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 10; i++) {
       const messages = await this.page.locator(`[data-uie-name='item-message'] .message-body`).all();
       if (messages.length === 0) {
         continue;
@@ -73,7 +73,7 @@ export class ConversationPage {
         }
         return true;
       }
-      await this.page.waitForTimeout(1000); // Wait for 1 second before next attempt
+      await this.page.waitForTimeout(500); // Wait for 0.5 second before next attempt
     }
 
     return false;
