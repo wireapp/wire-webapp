@@ -374,6 +374,7 @@
   "cells.deletePermanentlyModal.headline": "Delete permanently?",
   "cells.emptySearchResults.description": "Try adjusting your search or check for typos.",
   "cells.emptySearchResults.heading": "No matching files found",
+  "cells.emptyRecycleBin.description": "You'll find all deleted files and folders here.",
   "cells.error.description": "The list of files couldn't be loaded. Please try again later.",
   "cells.error.heading": "Something went wrong loading",
   "cells.filtersModal.accordion.tags": "Tags",
