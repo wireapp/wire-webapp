@@ -42,14 +42,14 @@ import {
 } from './Error';
 import {createMetaData, exportHistory, importLegacyBackupToDatabase} from './LegacyBackup.helper';
 
-import {Config} from '../Config';
-import type {ConversationRepository} from '../conversation/ConversationRepository';
-import {isReadableConversation} from '../conversation/ConversationSelectors';
-import type {Conversation} from '../entity/Conversation';
-import {User} from '../entity/User';
-import {EventRecord, UserRecord} from '../storage';
-import {ConversationRecord} from '../storage/record/ConversationRecord';
-import {StorageSchemata} from '../storage/StorageSchemata';
+import {Config} from '../../Config';
+import type {ConversationRepository} from '../../conversation/ConversationRepository';
+import {isReadableConversation} from '../../conversation/ConversationSelectors';
+import type {Conversation} from '../../entity/Conversation';
+import {User} from '../../entity/User';
+import {EventRecord, UserRecord} from '../../storage';
+import {ConversationRecord} from '../../storage/record/ConversationRecord';
+import {StorageSchemata} from '../../storage/StorageSchemata';
 
 /* eslint-enable */
 

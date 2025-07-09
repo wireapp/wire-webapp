@@ -27,6 +27,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {LoadingBar} from 'Components/LoadingBar/LoadingBar';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {CancelError} from 'Repositories/backup/Error';
 import {ClientState} from 'src/script/client/ClientState';
 import {User} from 'src/script/entity/User';
 import {ContentState} from 'src/script/page/useAppState';
@@ -37,7 +38,6 @@ import {getLogger} from 'Util/Logger';
 import {getCurrentDate} from 'Util/TimeUtil';
 import {downloadBlob} from 'Util/util';
 
-import {CancelError} from '../../backup/Error';
 import {Config} from '../../Config';
 import {RootContext} from '../../page/RootProvider';
 
