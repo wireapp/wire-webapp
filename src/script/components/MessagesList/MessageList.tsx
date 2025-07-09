@@ -26,6 +26,7 @@ import {TabIndex} from '@wireapp/react-ui-kit';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {JumpToLastMessageButton} from 'Components/MessagesList/JumpToLastMessageButton';
 import {filterMessages} from 'Components/MessagesList/utils/messagesFilter';
+import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
@@ -47,7 +48,6 @@ import {UploadAssets} from './UploadAssets';
 import {groupMessagesBySenderAndTime, isMarker} from './utils/messagesGroup';
 import {updateScroll, FocusedElement} from './utils/scrollUpdater';
 
-import {AssetRepository} from '../../assets/AssetRepository';
 import {Conversation} from '../../entity/Conversation';
 
 interface MessagesListParams {

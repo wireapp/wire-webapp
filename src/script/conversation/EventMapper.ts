@@ -22,6 +22,8 @@ import {container} from 'tsyringe';
 
 import {LinkPreview, Mention} from '@wireapp/protocol-messaging';
 
+import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
+import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {userReactionMapToReactionMap} from 'Util/ReactionUtil';
@@ -41,8 +43,6 @@ import {
   MultipartMessageAddEvent,
 } from './EventBuilder';
 
-import {AssetRemoteData} from '../assets/AssetRemoteData';
-import {AssetTransferState} from '../assets/AssetTransferState';
 import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
 import {AssetData} from '../cryptography/CryptographyMapper';
 import type {Conversation} from '../entity/Conversation';

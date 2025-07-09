@@ -37,6 +37,7 @@ import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {initializeDataDog} from 'Util/DataDog';
 import {DebugUtil} from 'Util/DebugUtil';
 import {Environment} from 'Util/Environment';
@@ -48,7 +49,6 @@ import {appendParameter} from 'Util/UrlUtil';
 import {AppInitializationStep, checkIndexedDb, InitializationEventLogger} from 'Util/util';
 
 import '../../style/default.less';
-import {AssetRepository} from '../assets/AssetRepository';
 import {AudioRepository} from '../audio/AudioRepository';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {URLParameter} from '../auth/URLParameter';

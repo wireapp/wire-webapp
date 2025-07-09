@@ -27,6 +27,7 @@ import {Runtime} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {Declension, t, getUserName} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
@@ -37,7 +38,6 @@ import {ValidationUtilError} from 'Util/ValidationUtil';
 
 import {PermissionState} from './PermissionState';
 
-import {AssetRepository} from '../assets/AssetRepository';
 import {AudioRepository} from '../audio/AudioRepository';
 import {AudioType} from '../audio/AudioType';
 import {CallingViewMode, CallState} from '../calling/CallState';

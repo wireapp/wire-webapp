@@ -61,6 +61,8 @@ import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/pr
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {TYPING_TIMEOUT, useTypingIndicatorState} from 'Components/InputBar/TypingIndicator';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
 import {getNextItem} from 'Util/ArrayUtil';
 import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/FileTypeUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
@@ -111,18 +113,6 @@ import {
   OnConversationE2EIVerificationStateChange,
   OnConversationVerificationStateChange,
 } from './ConversationVerificationStateHandler/shared';
-import {EventMapper} from './EventMapper';
-import {MessageRepository} from './MessageRepository';
-import {NOTIFICATION_STATE} from './NotificationSetting';
-
-import {AssetTransferState} from '../assets/AssetTransferState';
-import {CallingRepository} from '../calling/CallingRepository';
-import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
-import {PrimaryModal} from '../components/Modals/PrimaryModal';
-import {Config} from '../Config';
-import {ConnectionEntity} from '../connection/ConnectionEntity';
-import {ConnectionRepository} from '../connection/ConnectionRepository';
-import {ConnectionState} from '../connection/ConnectionState';
 import {
   AssetAddEvent,
   ButtonActionConfirmationEvent,
@@ -134,7 +124,17 @@ import {
   MessageHiddenEvent,
   OneToOneCreationEvent,
   TeamMemberLeaveEvent,
-} from '../conversation/EventBuilder';
+} from './EventBuilder';
+import {EventMapper} from './EventMapper';
+import {MessageRepository} from './MessageRepository';
+import {NOTIFICATION_STATE} from './NotificationSetting';
+
+import {CallingRepository} from '../calling/CallingRepository';
+import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
+import {Config} from '../Config';
+import {ConnectionEntity} from '../connection/ConnectionEntity';
+import {ConnectionRepository} from '../connection/ConnectionRepository';
+import {ConnectionState} from '../connection/ConnectionState';
 import {Conversation} from '../entity/Conversation';
 import {ContentMessage} from '../entity/message/ContentMessage';
 import {DeleteConversationMessage} from '../entity/message/DeleteConversationMessage';
@@ -158,7 +158,7 @@ import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {SelfRepository} from '../self/SelfRepository';
 import {Core} from '../service/CoreSingleton';
 import type {EventRecord} from '../storage';
-import {ConversationRecord} from '../storage/record/ConversationRecord';
+import {ConversationRecord} from '../storage';
 import {TeamRepository} from '../team/TeamRepository';
 import {TeamState} from '../team/TeamState';
 import {ServerTimeHandler} from '../time/serverTimeHandler';

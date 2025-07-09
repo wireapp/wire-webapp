@@ -25,6 +25,7 @@ import cx from 'classnames';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ZoomableImage} from 'Components/ZoomableImage';
+import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {User} from 'src/script/entity/User';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -35,7 +36,6 @@ import {waitFor} from 'Util/waitFor';
 import {DetailViewModalFooter} from './DetailViewModalFooter';
 import {DetailViewModalHeader} from './DetailViewModalHeader';
 
-import {AssetRepository} from '../../../assets/AssetRepository';
 import {ConversationRepository} from '../../../conversation/ConversationRepository';
 import {MessageRepository} from '../../../conversation/MessageRepository';
 import {Conversation} from '../../../entity/Conversation';

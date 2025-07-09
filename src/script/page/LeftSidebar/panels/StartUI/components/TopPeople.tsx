@@ -21,9 +21,10 @@ import React from 'react';
 
 import {container} from 'tsyringe';
 
+import {AssetRepository} from 'Repositories/assets/AssetRepository';
+
 import {TopContact} from './topPeople/TopContact';
 
-import {AssetRepository} from '../../../../../assets/AssetRepository';
 import {User} from '../../../../../entity/User';
 
 interface TopPeopleProps {

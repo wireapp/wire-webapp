@@ -54,15 +54,16 @@ import {
   InCallHandRaise,
 } from '@wireapp/protocol-messaging';
 
+import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
 import {CALL_MESSAGE_TYPE} from 'src/script/calling/enum/CallMessageType';
 import {getLogger, Logger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {base64ToArray, arrayToBase64} from 'Util/util';
 
-import {AssetTransferState} from '../assets/AssetTransferState';
+import {PROTO_MESSAGE_TYPE} from './ProtoMessageType';
+
 import {ConversationEphemeralHandler} from '../conversation/ConversationEphemeralHandler';
 import {MessageAddEvent} from '../conversation/EventBuilder';
-import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {CryptographyError} from '../error/CryptographyError';
 import {ClientEvent, CONVERSATION} from '../event/Client';
 import {StatusType} from '../message/StatusType';

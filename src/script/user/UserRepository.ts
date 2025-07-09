@@ -45,6 +45,8 @@ import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
+import {mapProfileAssetsV1} from 'Repositories/assets/AssetMapper';
+import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {chunk, partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
@@ -58,8 +60,6 @@ import {UserMapper} from './UserMapper';
 import type {UserService} from './UserService';
 import {UserState} from './UserState';
 
-import {mapProfileAssetsV1} from '../assets/AssetMapper';
-import {AssetRepository} from '../assets/AssetRepository';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import type {ClientRepository, QualifiedUserClientEntityMap} from '../client';
 import {ClientEntity} from '../client/ClientEntity';

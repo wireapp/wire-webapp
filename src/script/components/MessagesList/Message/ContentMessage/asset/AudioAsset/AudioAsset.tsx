@@ -23,7 +23,7 @@ import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import * as Icon from 'Components/Icon';
-import {AssetTransferState} from 'src/script/assets/AssetTransferState';
+import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
 import type {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import type {FileAsset} from 'src/script/entity/message/FileAsset';
 import {TeamState} from 'src/script/team/TeamState';

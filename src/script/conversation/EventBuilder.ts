@@ -32,9 +32,9 @@ import {DecryptionError} from '@wireapp/core/lib/errors/DecryptionError';
 import type {REASON as AVS_REASON} from '@wireapp/avs';
 import type {Asset, LegalHoldStatus} from '@wireapp/protocol-messaging';
 
+import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
 import {createUuid} from 'Util/uuid';
 
-import {AssetTransferState} from '../assets/AssetTransferState';
 import type {Conversation} from '../entity/Conversation';
 import type {Message} from '../entity/message/Message';
 import type {User} from '../entity/User';
