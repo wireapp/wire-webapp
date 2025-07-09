@@ -44,6 +44,7 @@ export class TeamsPage {
     const selfUserLocator = this.page.locator(
       `[data-uie-name='member-list-item'][data-uie-value='${name}'] [data-uie-name='member-list-item-you']`,
     );
+    await selfUserLocator.waitFor({state: 'visible'});
     return await selfUserLocator.isVisible();
   }
 
