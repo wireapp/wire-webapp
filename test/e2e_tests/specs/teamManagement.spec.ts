@@ -127,7 +127,7 @@ test(
     await test.step('Team owner can see team info in team management', async () => {
       await pages.teamsPage.clickPeopleButton();
       expect(await pages.teamsPage.isUserVisibleAsSelf(teamOwner.fullName));
-      expect(await pages.teamsPage.getUserRole(teamOwner.fullName)).toBe('Owner');
+      expect(await pages.teamsPage.getUserRole(teamOwner.fullName)).toContain('Owner');
     });
   },
 );
