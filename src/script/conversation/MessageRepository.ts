@@ -52,6 +52,8 @@ import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {buildMetadata, ImageMetadata, isAudio, isImage, isVideo} from 'Repositories/assets/AssetMetaDataBuilder';
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
+import {AudioRepository} from 'Repositories/audio/AudioRepository';
+import {AudioType} from 'Repositories/audio/AudioType';
 import {
   cancelSendingLinkPreview,
   clearLinkPreviewSendingState,
@@ -78,8 +80,6 @@ import {EventBuilder} from './EventBuilder';
 import {EventMapper} from './EventMapper';
 import {getLinkPreviewFromString} from './linkPreviews';
 
-import {AudioRepository} from '../audio/AudioRepository';
-import {AudioType} from '../audio/AudioType';
 import {ClientState} from '../client/ClientState';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';

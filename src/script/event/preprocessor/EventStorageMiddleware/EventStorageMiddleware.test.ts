@@ -19,7 +19,7 @@
 
 import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 
-import {AssetTransferState} from 'src/script/assets/AssetTransferState';
+import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
 import {ConversationState} from 'src/script/conversation/ConversationState';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
