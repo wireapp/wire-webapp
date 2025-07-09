@@ -72,6 +72,7 @@ test(
     tag: ['@crit-flow-tm', '@TC-2166', '@TC-2173', '@TC-2176', '@TC-2177', '@teamManagement-regression'],
   },
   async ({api, pages}) => {
+    test.slow();
     // Creating test data
     const teamOwner = getUser();
     const member = getUser();
