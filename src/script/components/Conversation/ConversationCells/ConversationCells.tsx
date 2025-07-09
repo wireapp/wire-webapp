@@ -17,12 +17,14 @@
  *
  */
 
+import {memo} from 'react';
+
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {container} from 'tsyringe';
 
 import {CellsRepository} from 'src/script/cells/CellsRepository';
+import {Conversation} from 'src/script/entity/Conversation';
 import {UserRepository} from 'src/script/user/UserRepository';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {CellsHeader} from './CellsHeader/CellsHeader';
@@ -38,86 +40,86 @@ import {useGetAllCellsNodes} from './useGetAllCellsNodes/useGetAllCellsNodes';
 import {useOnPresignedUrlExpired} from './useOnPresignedUrlExpired/useOnPresignedUrlExpired';
 
 interface ConversationCellsProps {
-  cellsRepository?: CellsRepository;
-  userRepository?: UserRepository;
-  conversationQualifiedId: QualifiedId;
-  conversationName: string;
-  cellsState: CONVERSATION_CELLS_STATE;
+  cellsRepository: CellsRepository;
+  userRepository: UserRepository;
+  activeConversation: Conversation;
 }
 
-export const ConversationCells = ({
-  cellsRepository = container.resolve(CellsRepository),
-  userRepository = container.resolve(UserRepository),
-  conversationQualifiedId,
-  conversationName,
-  cellsState,
-}: ConversationCellsProps) => {
-  const {getNodes, status: nodesStatus, getPagination} = useCellsStore();
+export const ConversationCells = memo(
+  ({cellsRepository, userRepository, activeConversation}: ConversationCellsProps) => {
+    const {cellsState, name} = useKoSubscribableChildren(activeConversation, ['cellsState', 'name']);
 
-  const conversationId = conversationQualifiedId.id;
-  const isCellsStateReady = cellsState === CONVERSATION_CELLS_STATE.READY;
-  const isCellsStatePending = cellsState === CONVERSATION_CELLS_STATE.PENDING;
+    const {getNodes, status: nodesStatus, getPagination} = useCellsStore();
 
-  const {refresh, setOffset} = useGetAllCellsNodes({
-    cellsRepository,
-    conversationQualifiedId,
-    enabled: isCellsStateReady,
-    userRepository,
-  });
+    const conversationId = activeConversation.id;
+    const conversationQualifiedId = activeConversation.qualifiedId;
 
-  const nodes = getNodes({conversationId});
-  const pagination = getPagination({conversationId});
+    const isCellsStateReady = cellsState === CONVERSATION_CELLS_STATE.READY;
+    const isCellsStatePending = cellsState === CONVERSATION_CELLS_STATE.PENDING;
 
-  const {goToPage, getPaginationProps} = useCellsPagination({
-    pagination,
-    conversationId,
-    setOffset,
-    currentNodesCount: nodes.length,
-  });
+    const {refresh, setOffset} = useGetAllCellsNodes({
+      cellsRepository,
+      conversationQualifiedId,
+      enabled: isCellsStateReady,
+      userRepository,
+    });
 
-  useOnPresignedUrlExpired({conversationId, refreshCallback: refresh});
+    const nodes = getNodes({conversationId});
+    const pagination = getPagination({conversationId});
 
-  const isLoading = nodesStatus === 'loading';
-  const isError = nodesStatus === 'error';
-  const isSuccess = nodesStatus === 'success';
+    const {goToPage, getPaginationProps} = useCellsPagination({
+      pagination,
+      conversationId,
+      setOffset,
+      currentNodesCount: nodes.length,
+    });
 
-  const hasNodes = !!nodes.length;
-  const emptyView = !isError && !hasNodes && isCellsStateReady;
+    useOnPresignedUrlExpired({conversationId, refreshCallback: refresh});
 
-  const isTableVisible = (isSuccess || isLoading) && isCellsStateReady;
-  const isLoadingVisible = isLoading && isCellsStateReady;
-  const isNoNodesVisible = !isLoading && emptyView && !isInRecycleBin();
-  const isPaginationVisible = !emptyView;
-  const isEmptyRecycleBin = isInRecycleBin() && emptyView && !isLoading;
+    const isLoading = nodesStatus === 'loading';
+    const isError = nodesStatus === 'error';
+    const isSuccess = nodesStatus === 'success';
 
-  return (
-    <div css={wrapperStyles}>
-      <CellsHeader
-        onRefresh={refresh}
-        conversationQualifiedId={conversationQualifiedId}
-        conversationName={conversationName}
-        cellsRepository={cellsRepository}
-      />
+    const hasNodes = !!nodes.length;
+    const emptyView = !isError && !hasNodes && isCellsStateReady;
 
-      {isTableVisible && (
-        <CellsTable
-          nodes={isLoading ? [] : nodes}
-          cellsRepository={cellsRepository}
-          conversationQualifiedId={conversationQualifiedId}
-          conversationName={conversationName}
+    const isTableVisible = (isSuccess || isLoading) && isCellsStateReady;
+    const isLoadingVisible = isLoading && isCellsStateReady;
+    const isNoNodesVisible = !isLoading && emptyView && !isInRecycleBin();
+    const isPaginationVisible = !emptyView;
+    const isEmptyRecycleBin = isInRecycleBin() && emptyView && !isLoading;
+
+    return (
+      <div css={wrapperStyles}>
+        <CellsHeader
           onRefresh={refresh}
+          conversationQualifiedId={conversationQualifiedId}
+          conversationName={name}
+          cellsRepository={cellsRepository}
         />
-      )}
-      {isCellsStatePending && (
-        <CellsStateInfo heading={t('cells.pending.heading')} description={t('cells.pending.description')} />
-      )}
-      {isNoNodesVisible && (
-        <CellsStateInfo heading={t('cells.noNodes.heading')} description={t('cells.noNodes.description')} />
-      )}
-      {isEmptyRecycleBin && <CellsStateInfo description={t('cells.emptyRecycleBin.description')} />}
-      {isLoadingVisible && <CellsLoader />}
-      {isError && <CellsStateInfo heading={t('cells.error.heading')} description={t('cells.error.description')} />}
-      {isPaginationVisible && <CellsPagination {...getPaginationProps()} goToPage={goToPage} />}
-    </div>
-  );
-};
+
+        {isTableVisible && (
+          <CellsTable
+            nodes={isLoading ? [] : nodes}
+            cellsRepository={cellsRepository}
+            conversationQualifiedId={conversationQualifiedId}
+            conversationName={name}
+            onRefresh={refresh}
+          />
+        )}
+        {isCellsStatePending && (
+          <CellsStateInfo heading={t('cells.pending.heading')} description={t('cells.pending.description')} />
+        )}
+        {isNoNodesVisible && (
+          <CellsStateInfo heading={t('cells.noNodes.heading')} description={t('cells.noNodes.description')} />
+        )}
+        {isEmptyRecycleBin && <CellsStateInfo description={t('cells.emptyRecycleBin.description')} />}
+        {isLoadingVisible && <CellsLoader />}
+        {isError && <CellsStateInfo heading={t('cells.error.heading')} description={t('cells.error.description')} />}
+        {isPaginationVisible && <CellsPagination {...getPaginationProps()} goToPage={goToPage} />}
+      </div>
+    );
+  },
+);
+
+ConversationCells.displayName = 'ConversationCells';
