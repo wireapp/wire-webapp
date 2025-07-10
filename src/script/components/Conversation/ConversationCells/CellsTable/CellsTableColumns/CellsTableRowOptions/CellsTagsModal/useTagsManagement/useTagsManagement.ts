@@ -22,6 +22,7 @@ import {useCallback, useState} from 'react';
 import {ComboboxSelectOption} from '@wireapp/react-ui-kit';
 
 import {CellsRepository} from 'src/script/cells/CellsRepository';
+import {t} from 'Util/LocalizerUtil';
 
 import {transformTagToSelectOption} from './transformTagToSelectOption/transformTagToSelectOption';
 import {useGetAllTags} from './useGetAllTags/useGetAllTags';
@@ -44,12 +45,13 @@ export const useTagsManagement = ({
     initialSelectedTags.map(transformTagToSelectOption),
   );
   const [isUpdatingTags, setIsUpdatingTags] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   const handleSetAllTags = useCallback((tags: string[]) => {
     setAllTags(tags.map(transformTagToSelectOption));
   }, []);
 
-  const {isLoading: isLoadingAllTags, error} = useGetAllTags({
+  const {isLoading: isLoadingAllTags, error: apiError} = useGetAllTags({
     cellsRepository,
     enabled: fetchTagsEnabled,
     onSuccess: handleSetAllTags,
@@ -60,6 +62,13 @@ export const useTagsManagement = ({
       return;
     }
 
+    if (inputValue.includes(',')) {
+      setValidationError(t('cells.tagsModal.validationError.comma'));
+      return;
+    }
+
+    setValidationError(null);
+
     const newOption = transformTagToSelectOption(inputValue);
     setAllTags(prev => [...prev, newOption]);
     setSelectedTags(prev => [...prev, newOption]);
@@ -67,6 +76,7 @@ export const useTagsManagement = ({
 
   const handleChange = (value: ComboboxSelectOption | ComboboxSelectOption[]) => {
     setSelectedTags(Array.isArray(value) ? value : [value]);
+    setValidationError(null);
   };
 
   const handleUpdateTags = async (uuid: string) => {
@@ -84,7 +94,8 @@ export const useTagsManagement = ({
     selectedTags,
     isUpdatingTags,
     isLoadingAllTags,
-    error,
+    apiError,
+    validationError,
     handleCreateOption,
     handleChange,
     handleUpdateTags,

@@ -81,14 +81,25 @@ export const getModalOptions = ({
   </div>
   `;
 
-  const gracePeriodOverParagraph = t('acme.settingsChanged.gracePeriodOver.paragraph', undefined, {
-    br: '<br>',
-    ...replaceLearnMore,
-  });
-
-  const settingsChangedParagraph = t('acme.settingsChanged.paragraph', undefined, {br: '<br>', ...replaceLearnMore});
-
   const supportUrl = Config.getConfig().URL.SUPPORT.E2EI_VERIFICATION_CERTIFICATE;
+
+  const gracePeriodOverParagraph = t(
+    'acme.settingsChanged.gracePeriodOver.paragraph',
+    {url: supportUrl},
+    {
+      br: '<br>',
+      ...replaceLearnMore,
+    },
+  );
+
+  const settingsChangedParagraph = t(
+    'acme.settingsChanged.paragraph',
+    {url: supportUrl},
+    {
+      br: '<br>',
+      ...replaceLearnMore,
+    },
+  );
 
   switch (type) {
     case ModalType.ENROLL:
@@ -224,6 +235,7 @@ export const getModalOptions = ({
           action: secondaryActionFn,
           text: t('acme.done.button.secondary'),
         },
+        ...hideCloseBtn,
       };
       modalType = PrimaryModal.type.ACKNOWLEDGE;
       break;
