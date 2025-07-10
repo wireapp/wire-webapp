@@ -28,6 +28,7 @@ export class TeamLoginPage {
   readonly hidePassword: Locator;
   readonly errorMessage: Locator;
   readonly loginButton: Locator;
+  readonly teamCreateButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -38,6 +39,7 @@ export class TeamLoginPage {
     this.hidePassword = page.locator('[data-uie-name="do-hide-password"]');
     this.errorMessage = page.locator('[data-uie-name="error-message"]');
     this.loginButton = page.locator('[data-uie-name="do-login"]');
+    this.teamCreateButton = page.locator('[data-uie-name="go-create-team"]');
   }
 
   async inputEmail(email: string) {
@@ -71,5 +73,9 @@ export class TeamLoginPage {
 
   async getErrorMessage() {
     return (await this.errorMessage.textContent()) ?? '';
+  }
+
+  async clickTeamCreateButton() {
+    await this.teamCreateButton.click();
   }
 }
