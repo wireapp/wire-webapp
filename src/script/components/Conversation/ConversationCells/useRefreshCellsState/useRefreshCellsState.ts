@@ -62,29 +62,25 @@ export const useRefreshCellsState = ({
       intervalRef.current = null;
     }
 
-    if (cellsState === CONVERSATION_CELLS_STATE.PENDING) {
-      // Check if we've reached the max count limit
-      if (fetchCountRef.current >= MAX_REFRESH_COUNT) {
-        setIsRefreshing(false);
-        return undefined;
-      }
-
-      setIsRefreshing(true);
-      intervalRef.current = setInterval(() => {
-        // Check again inside the interval in case the state changed
-        if (fetchCountRef.current >= MAX_REFRESH_COUNT) {
-          if (intervalRef.current) {
-            clearInterval(intervalRef.current);
-            intervalRef.current = null;
-          }
-          setIsRefreshing(false);
-          return;
-        }
-        void refreshCellsState();
-      }, REFRESH_INTERVAL_MS);
-    } else {
+    if (cellsState !== CONVERSATION_CELLS_STATE.PENDING) {
       setIsRefreshing(false);
+      return undefined;
     }
+
+    if (fetchCountRef.current >= MAX_REFRESH_COUNT) {
+      setIsRefreshing(false);
+      return undefined;
+    }
+
+    intervalRef.current = setInterval(() => {
+      if (fetchCountRef.current >= MAX_REFRESH_COUNT) {
+        clearInterval(intervalRef.current!);
+        intervalRef.current = null;
+        setIsRefreshing(false);
+        return;
+      }
+      void refreshCellsState();
+    }, REFRESH_INTERVAL_MS);
 
     return () => {
       if (intervalRef.current) {
