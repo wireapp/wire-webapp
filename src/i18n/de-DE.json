@@ -482,7 +482,7 @@
   "cells.tableRow.shared.truthyValue": "Yes",
   "cells.tableRow.size": "Größe",
   "cells.tableRow.tags": "Tags",
-  "cells.tagsModal.apiError": "Something went wrong",
+  "cells.tagsModal.apiError": "Ein Fehler ist aufgetreten",
   "cells.tagsModal.cancelButton": "Abbrechen",
   "cells.tagsModal.createOptionLabel": "Create tag \"{name}\"",
   "cells.tagsModal.description": "Alle Mitglieder Ihres Teams können diese Tags sehen und verwenden.",
