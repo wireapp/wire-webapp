@@ -89,6 +89,26 @@ export class InbucketClientE2E {
     return accountDeletionURL;
   }
 
+  async isTeamInvitationEmailReceived(inviteeEmail: string, inviterEmail: string) {
+    const timeoutLimit = 30000;
+    const delayBetweenAttempts = 500;
+    const maxAttempts = timeoutLimit / delayBetweenAttempts;
+    let attempt = 0;
+    while (attempt < maxAttempts) {
+      const response = await this.getLatestEmail(inviteeEmail);
+      if (response.status === 200) {
+        const message = response.data;
+        if (message.body.text.includes(`${inviterEmail} has invited you to join a team on Wire.`)) {
+          return true;
+        }
+      }
+      await new Promise(resolve => setTimeout(resolve, delayBetweenAttempts));
+      attempt++;
+    }
+
+    return false;
+  }
+
   private async getLatestEmail(email: string) {
     return await this.axiosInstance.get(`/api/v1/mailbox/${email}/latest`, {
       headers: {

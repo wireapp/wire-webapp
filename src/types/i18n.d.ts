@@ -376,9 +376,9 @@ declare module 'I18n/en-US.json' {
     'cells.deletePermanentlyModal.file.description': `This will permanently delete the file {name} for all participants.`;
     'cells.deletePermanentlyModal.folder.description': `This will permanently delete the folder {name} and its contents for all participants.`;
     'cells.deletePermanentlyModal.headline': `Delete permanently?`;
+    'cells.emptyRecycleBin.description': `You\'ll find all deleted files and folders here.`;
     'cells.emptySearchResults.description': `Try adjusting your search or check for typos.`;
     'cells.emptySearchResults.heading': `No matching files found`;
-    'cells.emptyRecycleBin.description': `You\'ll find all deleted files and folders here.`;
     'cells.error.description': `The list of files couldn\'t be loaded. Please try again later.`;
     'cells.error.heading': `Something went wrong loading`;
     'cells.filtersModal.accordion.tags': `Tags`;
@@ -489,7 +489,8 @@ declare module 'I18n/en-US.json' {
     'cells.tagsModal.cancelButton': `Cancel`;
     'cells.tagsModal.createOptionLabel': `Create tag "{name}"`;
     'cells.tagsModal.description': `All members of your team can see and use those tags.`;
-    'cells.tagsModal.error': `Something went wrong`;
+    'cells.tagsModal.apiError': `Something went wrong`;
+    'cells.tagsModal.validationError.comma': `Tag names cannot contain commas`;
     'cells.tagsModal.label': `Tags`;
     'cells.tagsModal.loading': `Loading tags...`;
     'cells.tagsModal.noTagsFound': `No tags created yet. Type to add a tag.`;

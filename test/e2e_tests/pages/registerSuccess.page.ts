@@ -24,15 +24,29 @@ export class RegisterSuccessPage {
 
   readonly downloadWireButton: Locator;
   readonly openWireWebButton: Locator;
+  readonly manageTeamButton: Locator;
+  readonly teamSignUpSuccessMessage: Locator;
 
   constructor(page: Page) {
     this.page = page;
 
     this.downloadWireButton = page.locator('[data-uie-name="do-download-wire"]');
     this.openWireWebButton = page.locator('[data-uie-name="do-open-wire-web"]');
+    this.manageTeamButton = page.locator('[data-uie-name="do-manage-team"]');
+    this.teamSignUpSuccessMessage = page.locator(
+      '//span[text()="Your team is now ready to collaborate easily and securely!"]',
+    );
   }
 
   async clickOpenWireWebButton() {
     await this.openWireWebButton.click();
+  }
+
+  async clickManageTeamButton() {
+    await this.manageTeamButton.click();
+  }
+
+  async isTeamSignUpSuccessMessageVisible() {
+    return await this.teamSignUpSuccessMessage.isVisible();
   }
 }
