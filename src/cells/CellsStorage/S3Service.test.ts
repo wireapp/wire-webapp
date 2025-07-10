@@ -40,7 +40,7 @@ describe('S3Service', () => {
 
     (S3Client as jest.Mock).mockImplementation(() => mockS3Client);
 
-    service = new S3Service(testConfig);
+    service = new S3Service({config: testConfig, getAccessToken: jest.fn()});
   });
 
   it('creates an S3Client with the correct configuration', () => {

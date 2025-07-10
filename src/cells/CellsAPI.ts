@@ -48,14 +48,16 @@ const DEFAULT_LIMIT = 10;
 const DEFAULT_OFFSET = 0;
 const USER_META_TAGS_NAMESPACE = 'usermeta-tags';
 
+// TODO: remove the apiKey (from pydio and s3) once the Pydio backend has fully support for the auth with the Wire's access token
+// If it's passed we use it to authenticate, instead of the access token
 interface CellsConfig {
   pydio: {
-    apiKey: string;
+    apiKey?: string;
     segment: string;
     url: string;
   };
   s3: {
-    apiKey: string;
+    apiKey?: string;
     bucket: string;
     endpoint: string;
     region: string;
@@ -90,19 +92,44 @@ export class CellsAPI {
     httpClient?: HttpClient;
     storageService?: CellsStorage;
   }) {
-    const http =
-      httpClient ||
-      new HttpClient(
+    const http = httpClient || this.getHttpClient({cellsConfig});
+
+    this.storageService =
+      storageService || new S3Service({config: cellsConfig.s3, getAccessToken: this.accessTokenStore.getAccessToken});
+    this.client = new NodeServiceApi(undefined, undefined, http.client);
+  }
+
+  private getHttpClient({cellsConfig}: {cellsConfig: CellsConfig}) {
+    const baseHttpClientConfig = {
+      ...this.httpClientConfig,
+      urls: {...this.httpClientConfig.urls, rest: cellsConfig.pydio.url + cellsConfig.pydio.segment},
+      headers: {...this.httpClientConfig.headers},
+    };
+
+    if (cellsConfig.pydio.apiKey) {
+      return new HttpClient(
         {
-          ...this.httpClientConfig,
-          urls: {...this.httpClientConfig.urls, rest: cellsConfig.pydio.url + cellsConfig.pydio.segment},
-          headers: {...this.httpClientConfig.headers, Authorization: `Bearer ${cellsConfig.pydio.apiKey}`},
+          ...baseHttpClientConfig,
+          headers: {...baseHttpClientConfig.headers, Authorization: `Bearer ${cellsConfig.pydio.apiKey}`},
         },
         this.accessTokenStore,
       );
+    }
 
-    this.storageService = storageService || new S3Service(cellsConfig.s3);
-    this.client = new NodeServiceApi(undefined, undefined, http.client);
+    const http = new HttpClient(baseHttpClientConfig, this.accessTokenStore);
+
+    // Add axios interceptor to automatically add Authorization header to every request
+    // Althouht the HttpClient handles the authorization already (see _sendRequest), as we pass a custom axios instance to the NodeServiceApi, we need to add it manually
+    http.client.interceptors.request.use(config => {
+      const accessToken = this.accessTokenStore.getAccessToken();
+      if (accessToken) {
+        config.headers = config.headers || {};
+        config.headers.Authorization = `Bearer ${accessToken}`;
+      }
+      return config;
+    });
+
+    return http;
   }
 
   async uploadNodeDraft({

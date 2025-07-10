@@ -23,7 +23,7 @@ import {Upload} from '@aws-sdk/lib-storage';
 import {CellsStorage, CellsStorageError} from './CellsStorage';
 
 interface S3ServiceConfig {
-  apiKey: string;
+  apiKey?: string;
   bucket: string;
   endpoint: string;
   region: string;
@@ -35,18 +35,33 @@ export const PART_SIZE = 10 * 1024 * 1024; // 10MB
 export class S3Service implements CellsStorage {
   private client: S3Client;
   private bucket: string;
+  private getAccessToken: () => string | undefined;
 
-  constructor({apiKey, bucket, endpoint, region}: S3ServiceConfig) {
-    this.bucket = bucket;
+  constructor({config, getAccessToken}: {config: S3ServiceConfig; getAccessToken: () => string | undefined}) {
+    this.bucket = config.bucket;
+    this.getAccessToken = getAccessToken;
 
     this.client = new S3Client({
-      endpoint,
+      endpoint: config.endpoint,
       forcePathStyle: true,
-      region,
-      credentials: async () => ({
-        accessKeyId: apiKey,
-        secretAccessKey: 'gatewaysecret',
-      }),
+      region: config.region,
+      credentials: async () => {
+        if (config.apiKey) {
+          return {
+            accessKeyId: config.apiKey,
+            secretAccessKey: 'gatewaysecret',
+          };
+        }
+
+        const accessToken = this.getAccessToken();
+        if (!accessToken) {
+          throw new Error('No access token available for S3 authentication');
+        }
+        return {
+          accessKeyId: accessToken,
+          secretAccessKey: 'gatewaysecret',
+        };
+      },
       requestChecksumCalculation: 'WHEN_REQUIRED',
     });
   }
