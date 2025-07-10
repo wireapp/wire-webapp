@@ -25,6 +25,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 
 const REFRESH_INTERVAL_MS = 10000;
+const MAX_REFRESH_COUNT = 5;
 
 // Refreshes the cells state in a interval when the state is PENDING
 // Ensures that the cells state is always up to date and to avoid the user seeing a stale state
@@ -38,12 +39,15 @@ export const useRefreshCellsState = ({
   conversationQualifiedId: QualifiedId;
 }) => {
   const [cellsState, setCellsState] = useState(initialCellState);
+  const [isRefreshing, setIsRefreshing] = useState(cellsState === CONVERSATION_CELLS_STATE.PENDING);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const isInitialMount = useRef(true);
+  const fetchCountRef = useRef(0);
 
   const refreshCellsState = useCallback(async () => {
     const conversation = await conversationRepository.fetchConversationById(conversationQualifiedId);
     setCellsState(conversation.cellsState());
+    fetchCountRef.current += 1;
   }, [conversationRepository, conversationQualifiedId]);
 
   useEffect(() => {
@@ -59,9 +63,27 @@ export const useRefreshCellsState = ({
     }
 
     if (cellsState === CONVERSATION_CELLS_STATE.PENDING) {
+      // Check if we've reached the max count limit
+      if (fetchCountRef.current >= MAX_REFRESH_COUNT) {
+        setIsRefreshing(false);
+        return undefined;
+      }
+
+      setIsRefreshing(true);
       intervalRef.current = setInterval(() => {
+        // Check again inside the interval in case the state changed
+        if (fetchCountRef.current >= MAX_REFRESH_COUNT) {
+          if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+          }
+          setIsRefreshing(false);
+          return;
+        }
         void refreshCellsState();
       }, REFRESH_INTERVAL_MS);
+    } else {
+      setIsRefreshing(false);
     }
 
     return () => {
@@ -72,5 +94,5 @@ export const useRefreshCellsState = ({
     };
   }, [cellsState, refreshCellsState]);
 
-  return {cellsState};
+  return {cellsState, isRefreshing};
 };

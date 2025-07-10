@@ -60,7 +60,7 @@ export const ConversationCells = ({
 
   const conversationId = conversationQualifiedId.id;
 
-  const {cellsState} = useRefreshCellsState({
+  const {cellsState, isRefreshing} = useRefreshCellsState({
     initialCellState,
     conversationRepository,
     conversationQualifiedId,
@@ -119,14 +119,14 @@ export const ConversationCells = ({
           onRefresh={refresh}
         />
       )}
-      {isCellsStatePending && (
+      {isCellsStatePending && !isRefreshing && (
         <CellsStateInfo heading={t('cells.pending.heading')} description={t('cells.pending.description')} />
       )}
       {isNoNodesVisible && (
         <CellsStateInfo heading={t('cells.noNodes.heading')} description={t('cells.noNodes.description')} />
       )}
       {isEmptyRecycleBin && <CellsStateInfo description={t('cells.emptyRecycleBin.description')} />}
-      {isLoadingVisible && <CellsLoader />}
+      {(isLoadingVisible || isRefreshing) && <CellsLoader />}
       {isError && <CellsStateInfo heading={t('cells.error.heading')} description={t('cells.error.description')} />}
       {isPaginationVisible && <CellsPagination {...getPaginationProps()} goToPage={goToPage} />}
     </div>
