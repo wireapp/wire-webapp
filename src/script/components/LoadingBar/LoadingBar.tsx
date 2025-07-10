@@ -23,12 +23,12 @@ import cx from 'classnames';
 
 export interface LoadingBarProps {
   message?: string;
-  progress: number;
   className?: string;
   centerText?: boolean;
+  progress?: number;
 }
 
-const LoadingBar: FC<LoadingBarProps> = ({progress, message, className = '', centerText = true}) => (
+const LoadingBar: FC<LoadingBarProps> = ({message, progress = 0, className = '', centerText = true}) => (
   <div className={cx('loading-bar', {'text-center': centerText}, className)}>
     {message && <div className="progress-console">{message}</div>}
     <div className="progress-bar">

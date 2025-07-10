@@ -30,6 +30,7 @@ import {CellsLoader} from './CellsLoader/CellsLoader';
 import {CellsPagination} from './CellsPagination/CellsPagination';
 import {CellsStateInfo} from './CellsStateInfo/CellsStateInfo';
 import {CellsTable} from './CellsTable/CellsTable';
+import {isInRecycleBin} from './common/recycleBin/recycleBin';
 import {useCellsStore} from './common/useCellsStore/useCellsStore';
 import {wrapperStyles} from './ConversationCells.styles';
 import {useCellsPagination} from './useCellsPagination/useCellsPagination';
@@ -85,8 +86,9 @@ export const ConversationCells = ({
 
   const isTableVisible = (isSuccess || isLoading) && isCellsStateReady;
   const isLoadingVisible = isLoading && isCellsStateReady;
-  const isNoNodesVisible = !isLoading && emptyView;
+  const isNoNodesVisible = !isLoading && emptyView && !isInRecycleBin();
   const isPaginationVisible = !emptyView;
+  const isEmptyRecycleBin = isInRecycleBin() && emptyView && !isLoading;
 
   return (
     <div css={wrapperStyles}>
@@ -112,6 +114,7 @@ export const ConversationCells = ({
       {isNoNodesVisible && (
         <CellsStateInfo heading={t('cells.noNodes.heading')} description={t('cells.noNodes.description')} />
       )}
+      {isEmptyRecycleBin && <CellsStateInfo description={t('cells.emptyRecycleBin.description')} />}
       {isLoadingVisible && <CellsLoader />}
       {isError && <CellsStateInfo heading={t('cells.error.heading')} description={t('cells.error.description')} />}
       {isPaginationVisible && <CellsPagination {...getPaginationProps()} goToPage={goToPage} />}

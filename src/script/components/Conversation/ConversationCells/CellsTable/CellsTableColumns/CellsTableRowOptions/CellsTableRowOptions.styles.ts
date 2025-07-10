@@ -38,8 +38,8 @@ export const buttonStyles: CSSObject = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    width: '40px',
-    height: '40px',
+    width: '32px',
+    height: '32px',
     padding: '0',
   },
 };

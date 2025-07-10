@@ -46,8 +46,11 @@ export type ImageAsset = commonAsset & {
   width: number;
   tag: string;
 };
+export type AudioAsset = commonAsset & {
+  normalization: Int8Array | null;
+  duration: any;
+};
 export type FileAsset = commonAsset;
-export type AudioAsset = commonAsset;
 export type VideoAsset = commonAsset;
 export type TextAsset = commonAsset;
 export type UndefinedAsset = commonAsset;

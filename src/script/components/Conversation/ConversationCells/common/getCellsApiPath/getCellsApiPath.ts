@@ -19,9 +19,8 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {Config} from 'src/script/Config';
-
 import {getCellsFilesPath} from '../getCellsFilesPath/getCellsFilesPath';
+import {RECYCLE_BIN_PATH} from '../recycleBin/recycleBin';
 
 export const getCellsApiPath = ({
   conversationQualifiedId,
@@ -32,7 +31,10 @@ export const getCellsApiPath = ({
 }) => {
   const {domain, id} = conversationQualifiedId;
 
-  const domainPerEnv = process.env.NODE_ENV === 'development' ? Config.getConfig().CELLS_WIRE_DOMAIN : domain;
+  // When there’re no files/folders in the bin, the api returns 404.
+  // It’s because, we pass “recycle_bin” as a path for the api, but the folder itself doesn’t exist on the backend yet - it’s being created when a file/folder is deleted.
+  // That's why if the current path (in the url) is the recycle bin, we don't want to add it to the path. We use the "deleted" flag instead (in useGetAllCellsNodes).
+  const path = currentPath && currentPath !== RECYCLE_BIN_PATH ? `/${currentPath}` : '';
 
-  return `${id}@${domainPerEnv}${currentPath ? `/${currentPath}` : ''}`;
+  return `${id}@${domain}${path}`;
 };

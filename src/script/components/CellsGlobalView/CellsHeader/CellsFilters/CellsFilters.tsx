@@ -17,35 +17,26 @@
  *
  */
 
-import {useState} from 'react';
-
-import {IconButton, IconButtonVariant, OptionsIcon} from '@wireapp/react-ui-kit';
-
 import {useCellsStore} from 'Components/CellsGlobalView/common/useCellsStore/useCellsStore';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 
-import {buttonStyles, counterStyles} from './CellsFilters.styles';
-import {CellsFiltersModal} from './CellsFiltersModal/CellsFiltersModal';
-import {useGetAllTags} from './useGetAllTags/useGetAllTags';
+import {CellsClearFilters} from './CellsClearFilters/CellsClearFilters';
+import {CellsFiltersMenu} from './CellsFiltersMenu/CellsFiltersMenu';
 
 interface CellsFiltersProps {
   cellsRepository: CellsRepository;
 }
 
 export const CellsFilters = ({cellsRepository}: CellsFiltersProps) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const {tags} = useGetAllTags({
-    cellsRepository,
-  });
-  const activeFiltersCount = useCellsStore(state => state.getActiveFiltersCount());
+  const {activeFiltersCount, clearAllFilters} = useCellsStore(state => ({
+    activeFiltersCount: state.filters.getActiveCount(),
+    clearAllFilters: state.filters.clearAll,
+  }));
 
   return (
     <>
-      <IconButton variant={IconButtonVariant.PRIMARY} css={buttonStyles} onClick={() => setIsOpen(true)}>
-        <OptionsIcon />
-        {activeFiltersCount > 0 && <span css={counterStyles}>{activeFiltersCount}</span>}
-      </IconButton>
-      <CellsFiltersModal isOpen={isOpen} tags={tags} onClose={() => setIsOpen(false)} />
+      <CellsFiltersMenu activeFiltersCount={activeFiltersCount} cellsRepository={cellsRepository} />
+      {activeFiltersCount > 0 && <CellsClearFilters onClearAll={clearAllFilters} />}
     </>
   );
 };

@@ -33,14 +33,20 @@ import {GroupCreationPage} from './groupCreation.page';
 import {LoginPage} from './login.page';
 import {MarketingConsentModal} from './marketingConsent.modal';
 import {OutgoingConnectionPage} from './outgoingConnection.page';
+import {RegisterSuccessPage} from './registerSuccess.page';
 import {RegistrationPage} from './registration.page';
 import {SetUsernamePage} from './setUsername.page';
 import {SingleSignOnPage} from './singleSignOn.page';
 import {StartUIPage} from './startUI.page';
+import {TeamDataShareConsentModal} from './team_management/teamDataShareConsent.modal';
+import {TeamLoginPage} from './team_management/teamLogin.page';
+import {TeamsPage} from './team_management/teams.page';
+import {TeamSignUpPage} from './team_management/teamSignUp.page';
 import {UserProfileModal} from './userProfile.modal';
 import {WelcomePage} from './welcome.page';
 
 const webAppPath = process.env.WEBAPP_URL ?? '';
+const teamManagementPath = process.env.TEAM_MANAGEMENT_URL ?? '';
 
 export class PageManager {
   constructor(private readonly page: Page) {}
@@ -65,6 +71,12 @@ export class PageManager {
 
   public openMainPage() {
     return this.page.goto(webAppPath, {
+      waitUntil: 'networkidle',
+    });
+  }
+
+  public openTeamManagementPage() {
+    return this.page.goto(teamManagementPath, {
       waitUntil: 'networkidle',
     });
   }
@@ -241,5 +253,45 @@ export class PageManager {
       this._groupCreationPage = new GroupCreationPage(this.page);
     }
     return this._groupCreationPage;
+  }
+
+  private _teamLoginPage!: TeamLoginPage;
+  get teamLoginPage(): TeamLoginPage {
+    if (!this._teamLoginPage) {
+      this._teamLoginPage = new TeamLoginPage(this.page);
+    }
+    return this._teamLoginPage;
+  }
+
+  private _teamsPage!: TeamsPage;
+  get teamsPage(): TeamsPage {
+    if (!this._teamsPage) {
+      this._teamsPage = new TeamsPage(this.page);
+    }
+    return this._teamsPage;
+  }
+
+  private _registerSuccessPage!: RegisterSuccessPage;
+  get registerSuccessPage(): RegisterSuccessPage {
+    if (!this._registerSuccessPage) {
+      this._registerSuccessPage = new RegisterSuccessPage(this.page);
+    }
+    return this._registerSuccessPage;
+  }
+
+  private _teamSignUpPage!: TeamSignUpPage;
+  get teamSignUpPage(): TeamSignUpPage {
+    if (!this._teamSignUpPage) {
+      this._teamSignUpPage = new TeamSignUpPage(this.page);
+    }
+    return this._teamSignUpPage;
+  }
+
+  private _teamDataShareConsentModal!: TeamDataShareConsentModal;
+  get teamDataShareConsentModal(): TeamDataShareConsentModal {
+    if (!this._teamDataShareConsentModal) {
+      this._teamDataShareConsentModal = new TeamDataShareConsentModal(this.page);
+    }
+    return this._teamDataShareConsentModal;
   }
 }
