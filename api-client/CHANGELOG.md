@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.69.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.68.0...@wireapp/api-client@27.69.0) (2025-07-10)
+
+### Features
+
+* **cells:** access token as api key ([#7098](https://github.com/wireapp/wire-web-packages/issues/7098)) ([7182069](https://github.com/wireapp/wire-web-packages/commit/7182069acaa46cc7ec05cf90be7405b7fcd27d63))
+
 # [27.68.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.67.1...@wireapp/api-client@27.68.0) (2025-07-04)
 
 ### Features
