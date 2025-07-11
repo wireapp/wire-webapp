@@ -19,7 +19,7 @@
 
 import {ApiManagerE2E} from 'test/e2e_tests/backend/apiManager.e2e';
 
-import {User} from '../../data/user';
+import {User} from '../data/user';
 
 const createdUsers: User[] = [];
 const createdTeams: Map<User, string> = new Map();

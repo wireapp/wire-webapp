@@ -17,11 +17,10 @@
  *
  */
 
-import {addCreatedTeam, tearDown} from './util';
-
 import {Services} from '../../data/serviceInfo';
 import {getUser} from '../../data/user';
 import {test, expect} from '../../test.fixtures';
+import {addCreatedTeam, tearDown} from '../../utils/tearDownUtil';
 
 test('Team owner adds whole team to an all team chat', {tag: ['@TC-8631', '@crit-flow']}, async ({pages, api}) => {
   test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow

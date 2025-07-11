@@ -17,10 +17,9 @@
  *
  */
 
-import {addCreatedTeam, tearDown} from './util';
-
 import {getUser} from '../../data/user';
 import {test, expect} from '../../test.fixtures';
+import {addCreatedTeam, tearDown} from '../../utils/tearDownUtil';
 import {generateSecurePassword} from '../../utils/userDataGenerator';
 
 test('Account Management', {tag: ['@TC-8639', '@crit-flow']}, async ({pages, api}) => {

@@ -17,10 +17,9 @@
  *
  */
 
-import {addCreatedUser, tearDown} from './util';
-
 import {getUser} from '../../data/user';
 import {test, expect} from '../../test.fixtures';
+import {addCreatedUser, tearDown} from '../../utils/tearDownUtil';
 
 test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow']}, async ({pages, api}) => {
   test.setTimeout(150_000); // Increasing test timeout to 150 seconds to accommodate the full flow
