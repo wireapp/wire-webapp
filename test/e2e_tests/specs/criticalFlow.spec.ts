@@ -17,13 +17,12 @@
  *
  */
 
+import {createdTeams, createdUsers} from './CriticalFlow';
+
 import {Services} from '../data/serviceInfo';
-import {getUser, User} from '../data/user';
+import {getUser} from '../data/user';
 import {test, expect} from '../test.fixtures';
 import {generateSecurePassword} from '../utils/userDataGenerator';
-
-const createdUsers: User[] = [];
-const createdTeams: Map<User, string> = new Map();
 
 test('Team owner adds whole team to an all team chat', {tag: ['@TC-8631', '@crit-flow']}, async ({pages, api}) => {
   test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow

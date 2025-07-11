@@ -40,11 +40,13 @@ export const generateSecurePassword = (length: number = 8): string => {
 };
 
 export const generateLastName = (): string => {
-  return faker.person.lastName();
+  // Remove apostrophes from last names
+  return faker.person.lastName().replace("'", '');
 };
 
 export const generateFirstName = (): string => {
-  return faker.person.firstName();
+  // Remove apostrophes from first names
+  return faker.person.firstName().replace("'", '');
 };
 
 export const generateWireEmail = (lastName: string): string => {
