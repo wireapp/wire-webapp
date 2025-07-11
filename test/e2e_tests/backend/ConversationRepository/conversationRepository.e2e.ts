@@ -17,7 +17,10 @@
  *
  */
 
-import {BackendClientE2E} from './backendClient.e2e';
+import {createGroupConversationData, createGroupConversationDataParams} from './conversationRepository.mocks';
+
+import {TEST_API_VERSION} from '../';
+import {BackendClientE2E} from '../backendClient.e2e';
 
 export class ConversationRepositoryE2E extends BackendClientE2E {
   async inviteToConversation(
@@ -49,6 +52,23 @@ export class ConversationRepositoryE2E extends BackendClientE2E {
     );
   }
 
+  async createGroupConversation(token: string, data: createGroupConversationDataParams) {
+    const conversationData = createGroupConversationData(data);
+    try {
+      const response = await this.axiosInstance.post(`${TEST_API_VERSION}/conversations`, conversationData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      return response.data;
+    } catch (error) {
+      console.error('Error creating group conversation:', error);
+      throw error;
+    }
+  }
+
   async getMLSConversationWithUser(token: string, conversationPartnerId: string, timeout = 10000) {
     const retryDelay = 1000;
     const maxRetries = timeout / retryDelay;
@@ -72,7 +92,7 @@ export class ConversationRepositoryE2E extends BackendClientE2E {
       }
 
       const response = await this.axiosInstance.post(
-        'v4/conversations/list',
+        `${TEST_API_VERSION}/conversations/list`,
         {
           qualified_ids: qualifiedIds,
         },

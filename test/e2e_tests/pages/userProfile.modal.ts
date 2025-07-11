@@ -24,11 +24,15 @@ export class UserProfileModal {
 
   readonly modal: Locator;
   readonly connectButton: Locator;
+  readonly startConversationButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
     this.modal = page.locator('[data-uie-name="modal-user-profile"]');
     this.connectButton = page.locator('[data-uie-name="modal-user-profile"] [data-uie-name="do-send-request"]');
+    this.startConversationButton = page.locator(
+      '[data-uie-name="modal-user-profile"] [data-uie-name="start-conversation"]',
+    );
   }
 
   async isVisible() {
@@ -37,5 +41,9 @@ export class UserProfileModal {
 
   async clickConnectButton() {
     await this.connectButton.click();
+  }
+
+  async clickStartConversation() {
+    await this.startConversationButton.click();
   }
 }

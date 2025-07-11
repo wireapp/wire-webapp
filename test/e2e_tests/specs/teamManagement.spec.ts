@@ -17,11 +17,10 @@
  *
  */
 
-import {getUser, User} from '../data/user';
+import {getUser} from '../data/user';
 import {test, expect} from '../test.fixtures';
+import {addCreatedTeam, tearDown} from '../utils/tearDownUtil';
 import {generateSecurePassword} from '../utils/userDataGenerator';
-
-const createdTeams: Map<User, string> = new Map();
 
 test(
   'Verify I can log in to admin panel only with valid hidden or shown password',
@@ -35,7 +34,7 @@ test(
 
     await test.step('Preconditions: Creating preconditions for the test via API', async () => {
       await api.createTeamOwner(teamOwner, teamName);
-      createdTeams.set(teamOwner, teamOwner.teamId!);
+      addCreatedTeam(teamOwner, teamOwner.teamId!);
     });
 
     await test.step('Team owner opens team management page', async () => {
@@ -134,7 +133,5 @@ test(
 );
 
 test.afterAll(async ({api}) => {
-  for (const [user, teamId] of createdTeams.entries()) {
-    await api.team.deleteTeam(user, teamId);
-  }
+  await tearDown(api);
 });

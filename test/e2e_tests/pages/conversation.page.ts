@@ -19,6 +19,8 @@
 
 import {Locator, Page} from '@playwright/test';
 
+import {selectByDataAttribute} from '../utils/useSelector';
+
 export class ConversationPage {
   readonly page: Page;
 
@@ -29,22 +31,24 @@ export class ConversationPage {
   readonly messageInput: Locator;
   readonly sendMessageButton: Locator;
   readonly watermark: Locator;
+  readonly openGroupInformationViaName: Locator;
 
   constructor(page: Page) {
     this.page = page;
 
-    this.createGroupButton = page.locator('[data-uie-name="go-create-group"]');
-    this.createGroupModal = page.locator('[data-uie-name="group-creation-label"]');
-    this.createGroupNameInput = this.createGroupModal.locator('[data-uie-name="enter-group-name"]');
-    this.createGroupSubmitButton = this.createGroupModal.locator('[data-uie-name="submit"]');
-    this.messageInput = page.locator('[data-uie-name="input-message"]');
-    this.watermark = page.locator('[data-uie-name="no-conversation"] svg');
-    this.sendMessageButton = page.locator('[data-uie-name="do-send-message"]');
+    this.createGroupButton = page.locator(selectByDataAttribute('go-create-group'));
+    this.createGroupModal = page.locator(selectByDataAttribute('group-creation-label'));
+    this.createGroupNameInput = this.createGroupModal.locator(selectByDataAttribute('enter-group-name'));
+    this.createGroupSubmitButton = this.createGroupModal.locator(selectByDataAttribute('submit'));
+    this.messageInput = page.locator(selectByDataAttribute('input-message'));
+    this.watermark = page.locator(`${selectByDataAttribute('no-conversation')} svg`);
+    this.sendMessageButton = page.locator(selectByDataAttribute('do-send-message'));
+    this.openGroupInformationViaName = page.locator(selectByDataAttribute('status-conversation-title-bar-label'));
   }
 
   async isConversationOpen(conversationName: string) {
     return (
-      (await this.page.locator(`[data-uie-name='status-conversation-title-bar-label']`).textContent()) ===
+      (await this.page.locator(selectByDataAttribute('status-conversation-title-bar-label')).textContent()) ===
       conversationName
     );
   }
@@ -58,10 +62,19 @@ export class ConversationPage {
     await this.messageInput.press('Enter');
   }
 
+  async sendMention(memberId: string) {
+    await this.messageInput.fill(`@`);
+    await this.page
+      .locator(`${selectByDataAttribute('item-mention-suggestion')}[data-uie-value="${memberId}"]`)
+      .click({timeout: 1000});
+
+    await this.messageInput.press('Enter');
+  }
+
   async isMessageVisible(messageText: string) {
     // Trying multiple times for the message to appear
     for (let i = 0; i < 10; i++) {
-      const messages = await this.page.locator(`[data-uie-name='item-message'] .message-body`).all();
+      const messages = await this.page.locator(`${selectByDataAttribute('item-message')} .message-body`).all();
       if (messages.length === 0) {
         continue;
       }
@@ -77,5 +90,9 @@ export class ConversationPage {
     }
 
     return false;
+  }
+
+  async openGroupInformation() {
+    await this.openGroupInformationViaName.click();
   }
 }

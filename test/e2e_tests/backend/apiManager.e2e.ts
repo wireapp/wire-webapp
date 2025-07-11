@@ -22,7 +22,7 @@ import {AxiosResponse} from 'axios';
 import {AuthRepositoryE2E} from './authRepository.e2e';
 import {BrigRepositoryE2E} from './brigRepository.e2e';
 import {ConnectionRepositoryE2E} from './connectionRepository.e2e';
-import {ConversationRepositoryE2E} from './conversationRepository.e2e';
+import {ConversationRepositoryE2E} from './ConversationRepository';
 import {FeatureConfigRepositoryE2E} from './featureConfigRepository.e2e';
 import {InbucketClientE2E} from './inbucketClient.e2e';
 import {TeamRepositoryE2E} from './teamRepository.e2e';

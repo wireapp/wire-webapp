@@ -20,6 +20,7 @@
 import {getUser} from '../../data/user';
 import {test, expect} from '../../test.fixtures';
 import {addCreatedTeam, tearDown} from '../../utils/tearDownUtil';
+import {loginUser} from '../../utils/userActions';
 import {generateSecurePassword} from '../../utils/userDataGenerator';
 
 test('Account Management', {tag: ['@TC-8639', '@crit-flow']}, async ({pages, api}) => {
@@ -52,11 +53,7 @@ test('Account Management', {tag: ['@TC-8639', '@crit-flow']}, async ({pages, api
 
   // Test steps
   await test.step('Members logs in into the application', async () => {
-    await pages.openMainPage();
-    await pages.singleSignOnPage.enterEmailOnSSOPage(owner.email);
-    await pages.loginPage.inputPassword(owner.password);
-    await pages.loginPage.clickSignInButton();
-    await pages.dataShareConsentModal.clickDecline();
+    await loginUser(member, pages);
   });
 
   await test.step('Member opens settings', async () => {
