@@ -19,6 +19,7 @@
 
 import React, {useEffect, useRef, useState} from 'react';
 
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
@@ -89,7 +90,7 @@ const StartUI: React.FC<StartUIProps> = ({
 
   const actions = mainViewModel.actions;
   const isTeam = teamState.isTeam();
-  const isMLSEnabled = teamState.isMLSEnabled();
+  const defaultProtocol = teamState.teamFeatures()?.mls?.config.defaultProtocol;
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState(Tabs.PEOPLE);
@@ -149,7 +150,7 @@ const StartUI: React.FC<StartUIProps> = ({
           forceDark
         />
       </div>
-      {isTeam && canChatWithServices() && !isMLSEnabled && (
+      {isTeam && canChatWithServices() && defaultProtocol != ConversationProtocol.MLS && (
         <ul className="start-ui-list-tabs">
           <li className={`start-ui-list-tab ${activeTab === Tabs.PEOPLE ? 'active' : ''}`}>
             <button

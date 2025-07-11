@@ -23,14 +23,35 @@ export class TeamsPage {
   readonly page: Page;
 
   readonly profileIcon: Locator;
+  readonly peopleButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
 
     this.profileIcon = page.locator("[data-uie-name='element-avatar-image']");
+    this.peopleButton = page.locator("[data-uie-name='go-manage-team-page']");
   }
 
   async isProfileIconVisible() {
     return await this.profileIcon.isVisible();
+  }
+
+  async clickPeopleButton() {
+    await this.peopleButton.click();
+  }
+
+  async isUserVisibleAsSelf(name: string) {
+    const selfUserLocator = this.page.locator(
+      `[data-uie-name='member-list-item'][data-uie-value='${name}'] [data-uie-name='member-list-item-you']`,
+    );
+    await selfUserLocator.waitFor({state: 'visible'});
+    return await selfUserLocator.isVisible();
+  }
+
+  async getUserRole(name: string) {
+    const userRoleLocator = this.page.locator(
+      `[data-uie-name='member-list-item'][data-uie-value='${name}'] [data-uie-name='select-member-role']`,
+    );
+    return (await userRoleLocator.textContent()) ?? '';
   }
 }

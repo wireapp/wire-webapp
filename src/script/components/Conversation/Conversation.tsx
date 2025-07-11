@@ -518,6 +518,7 @@ export const Conversation = ({
                     activeConversation={activeConversation}
                     userRepository={repositories.user}
                     cellsRepository={repositories.cells}
+                    conversationRepository={conversationRepository}
                   />
                 )}
               </ConversationTabPanel>

@@ -22,6 +22,7 @@ import {memo} from 'react';
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 
 import {CellsRepository} from 'src/script/cells/CellsRepository';
+import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {Conversation} from 'src/script/entity/Conversation';
 import {UserRepository} from 'src/script/user/UserRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -38,21 +39,29 @@ import {wrapperStyles} from './ConversationCells.styles';
 import {useCellsPagination} from './useCellsPagination/useCellsPagination';
 import {useGetAllCellsNodes} from './useGetAllCellsNodes/useGetAllCellsNodes';
 import {useOnPresignedUrlExpired} from './useOnPresignedUrlExpired/useOnPresignedUrlExpired';
+import {useRefreshCellsState} from './useRefreshCellsState/useRefreshCellsState';
 
 interface ConversationCellsProps {
   cellsRepository: CellsRepository;
   userRepository: UserRepository;
   activeConversation: Conversation;
+  conversationRepository: ConversationRepository;
 }
 
 export const ConversationCells = memo(
-  ({cellsRepository, userRepository, activeConversation}: ConversationCellsProps) => {
-    const {cellsState, name} = useKoSubscribableChildren(activeConversation, ['cellsState', 'name']);
+  ({cellsRepository, userRepository, activeConversation, conversationRepository}: ConversationCellsProps) => {
+    const {cellsState: initialCellState, name} = useKoSubscribableChildren(activeConversation, ['cellsState', 'name']);
 
     const {getNodes, status: nodesStatus, getPagination} = useCellsStore();
 
     const conversationId = activeConversation.id;
     const conversationQualifiedId = activeConversation.qualifiedId;
+
+    const {cellsState, isRefreshing} = useRefreshCellsState({
+      initialCellState,
+      conversationRepository,
+      conversationQualifiedId,
+    });
 
     const isCellsStateReady = cellsState === CONVERSATION_CELLS_STATE.READY;
     const isCellsStatePending = cellsState === CONVERSATION_CELLS_STATE.PENDING;
@@ -107,14 +116,14 @@ export const ConversationCells = memo(
             onRefresh={refresh}
           />
         )}
-        {isCellsStatePending && (
+        {isCellsStatePending && !isRefreshing && (
           <CellsStateInfo heading={t('cells.pending.heading')} description={t('cells.pending.description')} />
         )}
         {isNoNodesVisible && (
           <CellsStateInfo heading={t('cells.noNodes.heading')} description={t('cells.noNodes.description')} />
         )}
         {isEmptyRecycleBin && <CellsStateInfo description={t('cells.emptyRecycleBin.description')} />}
-        {isLoadingVisible && <CellsLoader />}
+        {(isLoadingVisible || isRefreshing) && <CellsLoader />}
         {isError && <CellsStateInfo heading={t('cells.error.heading')} description={t('cells.error.description')} />}
         {isPaginationVisible && <CellsPagination {...getPaginationProps()} goToPage={goToPage} />}
       </div>
