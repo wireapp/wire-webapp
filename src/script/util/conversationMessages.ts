@@ -17,10 +17,10 @@
  *
  */
 
+import {AssetType} from 'Repositories/assets/AssetType';
 import {Asset} from 'src/script/entity/message/Asset';
 import type {FileAsset as FileAssetType} from 'src/script/entity/message/FileAsset';
 
-import {AssetType} from '../assets/AssetType';
 import {Conversation} from '../entity/Conversation';
 import type {Message} from '../entity/message/Message';
 

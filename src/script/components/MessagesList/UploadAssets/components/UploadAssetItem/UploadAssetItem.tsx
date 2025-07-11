@@ -22,11 +22,10 @@ import {useEffect, useState} from 'react';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {LoadingBar} from 'Components/LoadingBar';
+import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {t} from 'Util/LocalizerUtil';
 
 import {uploadingProgressText} from './UploadAssetItem.styles';
-
-import {AssetRepository} from '../../../../../assets/AssetRepository';
 
 interface Props {
   assetRepository: AssetRepository;

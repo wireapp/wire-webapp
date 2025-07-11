@@ -28,6 +28,7 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {entities} from 'test/api/payloads';
 import {TestFactory} from 'test/helper/TestFactory';
 import {generateAPIUser} from 'test/helper/UserGenerator';
@@ -38,7 +39,6 @@ import {UserRepository} from './UserRepository';
 import {UserService} from './UserService';
 import {UserState} from './UserState';
 
-import {AssetRepository} from '../assets/AssetRepository';
 import {ClientRepository} from '../client';
 import {ClientMapper} from '../client/ClientMapper';
 import {ConnectionEntity} from '../connection/ConnectionEntity';

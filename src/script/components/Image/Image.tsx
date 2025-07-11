@@ -24,12 +24,12 @@ import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import {InViewport} from 'Components/InViewport';
+import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {getImageStyle, getWrapperStyles} from './Image.styles';
 import {RestrictedImage} from './RestrictedImage';
 
-import {AssetRemoteData} from '../../assets/AssetRemoteData';
 import {Config} from '../../Config';
 import {MediumImage} from '../../entity/message/MediumImage';
 import {TeamState} from '../../team/TeamState';

@@ -24,11 +24,11 @@ import {container} from 'tsyringe';
 
 import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 
+import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
 import {getLogger, Logger} from 'Util/Logger';
 
 import {ClientEvent, CONVERSATION as CLIENT_CONVERSATION_EVENT} from './Client';
 
-import {AssetTransferState} from '../assets/AssetTransferState';
 import {BaseError, BASE_ERROR_TYPE} from '../error/BaseError';
 import {ConversationError} from '../error/ConversationError';
 import {StorageError} from '../error/StorageError';

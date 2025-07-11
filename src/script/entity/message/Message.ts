@@ -22,6 +22,8 @@ import ko from 'knockout';
 
 import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
+import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
+import {AssetType} from 'Repositories/assets/AssetType';
 import {t, getUserName} from 'Util/LocalizerUtil';
 import {formatDateNumeral, formatDurationCaption, formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
 
@@ -44,8 +46,6 @@ import type {PingMessage} from './PingMessage';
 import type {SystemMessage} from './SystemMessage';
 import type {VerificationMessage} from './VerificationMessage';
 
-import {AssetTransferState} from '../../assets/AssetTransferState';
-import {AssetType} from '../../assets/AssetType';
 import {EphemeralStatusType} from '../../message/EphemeralStatusType';
 import type {MessageCategory} from '../../message/MessageCategory';
 import {StatusType} from '../../message/StatusType';

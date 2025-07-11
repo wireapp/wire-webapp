@@ -17,8 +17,8 @@
  *
  */
 
-import {ENCRYPTED_BACKUP_FORMAT} from '../backup/BackUpHeader';
-import {isCPBackup, peekCrossPlatformData} from '../backup/CrossPlatformBackup';
+import {ENCRYPTED_BACKUP_FORMAT} from 'Repositories/backup/BackUpHeader';
+import {isCPBackup, peekCrossPlatformData} from 'Repositories/backup/CrossPlatformBackup';
 
 export const checkBackupEncryption = async (data: ArrayBuffer | Blob): Promise<boolean> => {
   if (data instanceof Blob) {

@@ -23,8 +23,8 @@ import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
 
-import {CONVERSATION} from '../event/Client';
-import {StorageService} from '../storage';
+import {CONVERSATION} from '../../event/Client';
+import {StorageService} from '../../storage';
 
 export class BackupService {
   private readonly logger: Logger;

@@ -25,6 +25,8 @@ import {MessageSendingState} from '@wireapp/core/lib/conversation';
 import {Account} from '@wireapp/core';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
+import {AssetRepository} from 'Repositories/assets/AssetRepository';
+import {AudioRepository} from 'Repositories/audio/AudioRepository';
 import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
 import {Conversation} from 'src/script/entity/Conversation';
@@ -38,8 +40,6 @@ import {createUuid} from 'Util/uuid';
 import {ConversationRepository} from './ConversationRepository';
 import {ConversationState} from './ConversationState';
 
-import {AssetRepository} from '../assets/AssetRepository';
-import {AudioRepository} from '../audio/AudioRepository';
 import {ClientEntity} from '../client/ClientEntity';
 import {ClientState} from '../client/ClientState';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';

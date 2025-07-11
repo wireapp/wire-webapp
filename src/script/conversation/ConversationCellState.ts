@@ -17,13 +17,13 @@
  *
  */
 
+import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
 import {t} from 'Util/LocalizerUtil';
 import {getRenderedTextContent} from 'Util/messageRenderer';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {ConversationStatusIcon} from './ConversationStatusIcon';
 
-import {AssetTransferState} from '../assets/AssetTransferState';
 import type {Conversation} from '../entity/Conversation';
 import type {FileAsset} from '../entity/message/FileAsset';
 import type {MemberMessage} from '../entity/message/MemberMessage';

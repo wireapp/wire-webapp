@@ -17,7 +17,7 @@
  *
  */
 
-import {AssetTransferState} from 'src/script/assets/AssetTransferState';
+import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
 import type {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import type {FileAsset} from 'src/script/entity/message/FileAsset';
 

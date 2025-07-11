@@ -25,7 +25,7 @@ import {createUuid} from 'Util/uuid';
 import {AssetRemoteData} from './AssetRemoteData';
 import {AssetRepository, AssetUploadOptions} from './AssetRepository';
 
-import {Core} from '../service/CoreSingleton';
+import {Core} from '../../service/CoreSingleton';
 
 describe('AssetRepository', () => {
   let assetRepository: AssetRepository;

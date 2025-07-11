@@ -17,7 +17,7 @@
  *
  */
 
-import {AssetTransferState} from 'src/script/assets/AssetTransferState';
+import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
 
 interface GetFileAssetStatusParams {
   uploadProgress: number;

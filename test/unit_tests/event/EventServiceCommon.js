@@ -17,7 +17,7 @@
  *
  */
 
-import {AssetTransferState} from 'src/script/assets/AssetTransferState';
+import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
 import {ConversationError} from 'src/script/error/ConversationError';
 import {StorageError} from 'src/script/error/StorageError';
 import {MessageCategory} from 'src/script/message/MessageCategory';

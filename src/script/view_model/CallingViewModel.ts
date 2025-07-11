@@ -28,12 +28,12 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ButtonGroupTab} from 'Components/calling/ButtonGroup';
 import 'Components/calling/ChooseScreen';
+import type {AudioRepository} from 'Repositories/audio/AudioRepository';
+import {AudioType} from 'Repositories/audio/AudioType';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 
-import type {AudioRepository} from '../audio/AudioRepository';
-import {AudioType} from '../audio/AudioType';
 import type {Call} from '../calling/Call';
 import {CallingRepository} from '../calling/CallingRepository';
 import {CallState, DesktopScreenShareMenu} from '../calling/CallState';

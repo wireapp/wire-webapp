@@ -21,6 +21,7 @@ import {act, fireEvent, render, waitFor} from '@testing-library/react';
 
 import {FileWithPreview} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
 import {InputBar} from 'Components/InputBar/index';
+import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {Config} from 'src/script/Config';
@@ -29,7 +30,6 @@ import {SelfService} from 'src/script/self/SelfService';
 import {createUuid} from 'Util/uuid';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
-import {AssetRepository} from '../../assets/AssetRepository';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
 import {MessageRepository} from '../../conversation/MessageRepository';
 import {Conversation} from '../../entity/Conversation';
