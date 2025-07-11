@@ -27,14 +27,18 @@ const createdTeams: Map<User, string> = new Map();
 export const getCreatedUsers = () => createdUsers;
 export const getCreatedTeams = () => createdTeams;
 
+// Utility functions to manage created personal users for cleanup
 export const addCreatedUser = (user: User) => {
   createdUsers.push(user);
 };
 
+// Utility functions to manage created teams for cleanup (no need to pass user, as teams are associated with users)
 export const addCreatedTeam = (user: User, teamId: string) => {
   createdTeams.set(user, teamId);
 };
 
+// Function to tear down created users and teams
+// This function should be called after tests to clean up the created data
 export const tearDown = async (api: ApiManagerE2E) => {
   for (const [user, teamId] of createdTeams.entries()) {
     await api.team.deleteTeam(user, teamId);

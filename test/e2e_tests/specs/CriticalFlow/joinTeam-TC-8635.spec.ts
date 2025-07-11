@@ -19,10 +19,10 @@
 
 import {getUser} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pages/pageManager';
+import {addCreatedTeam, tearDown} from 'test/e2e_tests/utils/tearDownUtil';
+import {loginUser, sendMessageFromAtoB} from 'test/e2e_tests/utils/userActions';
 
 import {test, expect} from '../../test.fixtures';
-
-import {createdTeams, loginUser, sendMessageFromAtoB} from '.';
 
 test('New person joins team and setups up device', {tag: ['@TC-8635', '@crit-flow']}, async ({pages, api, browser}) => {
   test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
@@ -40,7 +40,7 @@ test('New person joins team and setups up device', {tag: ['@TC-8635', '@crit-flo
     // Precondition: Team owner exists in a team with 1 team member
     await api.createTeamOwner(owner, teamName);
     owner.teamId = await api.team.getTeamIdForUser(owner);
-    createdTeams.set(owner, owner.teamId);
+    addCreatedTeam(owner, owner.teamId);
     const invitationIdForMember1 = await api.team.inviteUserToTeam(member1.email, owner);
     const invitationCodeForMember1 = await api.brig.getTeamInvitationCodeForEmail(owner.teamId, invitationIdForMember1);
     await api.createPersonalUser(member1, invitationCodeForMember1);
@@ -134,4 +134,8 @@ test('New person joins team and setups up device', {tag: ['@TC-8635', '@crit-flo
   await test.step('A sees the mention in the chat', async () => {
     await expect(pages.conversationPage.page.getByText(`@${memberA.fullName}`)).toBeVisible({timeout: 10000});
   });
+});
+
+test.afterAll(async ({api}) => {
+  await tearDown(api);
 });

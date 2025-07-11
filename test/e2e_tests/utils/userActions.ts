@@ -17,11 +17,8 @@
  *
  */
 
-import {User} from '../../data/user';
-import {expect} from '../../test.fixtures';
-
-export const createdUsers: User[] = [];
-export const createdTeams: Map<User, string> = new Map();
+import {User} from '../data/user';
+import {expect} from '../test.fixtures';
 
 export const loginUser = async (user: User, pages: any) => {
   await pages.openMainPage();
