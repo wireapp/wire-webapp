@@ -38,7 +38,7 @@ export class AccountPage {
     this.appLockCheckbox = page.locator("[data-uie-name='status-preference-applock']+label");
     this.deleteAccountButton = page.locator("[data-uie-name='go-delete-account']");
     this.backUpButton = page.locator("[data-uie-name='do-backup-export']");
-    this.restoreBackupButton = page.locator("[data-uie-name='do-backup-impport']");
+    this.restoreBackupButton = page.locator("[data-uie-name='do-backup-import']+button");
     this.logoutButton = page.locator("[data-uie-name='do-logout']");
   }
 

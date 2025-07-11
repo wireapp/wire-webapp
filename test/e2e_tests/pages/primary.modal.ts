@@ -23,24 +23,31 @@ export class PrimaryModal {
   readonly page: Page;
 
   readonly primaryModal: Locator;
+  readonly title: Locator;
   readonly passwordInput: Locator;
   readonly primaryButton: Locator;
   readonly secondaryButton: Locator;
   readonly checkbox: Locator;
+  readonly optionModal: Locator;
 
   constructor(page: Page) {
     this.page = page;
 
-    this.primaryModal = page.locator('[data-uie-name="modal-template-password-advance"]');
+    this.primaryModal = page.locator('[data-uie-name="primary-modals-container"]');
+    this.title = this.primaryModal.locator('[data-uie-name="status-modal-title"]');
+    this.optionModal = this.primaryModal.locator('[data-uie-name="modal-template-option"]');
     this.passwordInput = this.primaryModal.locator('[data-uie-name="backup-password"]');
     this.primaryButton = this.primaryModal.locator('[data-uie-name="do-action"]');
     this.secondaryButton = this.primaryModal.locator('[data-uie-name="do-secondary"]');
-    this.checkbox = this.primaryModal.locator('[data-uie-name="modal-option-checkbox"]');
+    this.checkbox = this.primaryModal.locator('[data-uie-name="modal-option-checkbox"]+label');
   }
 
-  async isVisible() {
-    await this.primaryModal.waitFor({state: 'visible'});
-    return await this.primaryModal.isVisible();
+  async isTitleVisible() {
+    await this.title.waitFor({state: 'visible'});
+  }
+
+  async isTitleHidden() {
+    await this.title.waitFor({state: 'hidden'});
   }
 
   async enterPassword(password: string) {
