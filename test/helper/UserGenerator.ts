@@ -52,7 +52,7 @@ export function generateAPIUser(
         type: 'image',
       },
     ],
-    handle: faker.internet.userName(),
+    handle: faker.internet.username(),
     id: id.id,
     // replace special chars to avoid escaping problems with querying the DOM
     name: faker.person.fullName().replace(/[^a-zA-Z ]/g, ''),
