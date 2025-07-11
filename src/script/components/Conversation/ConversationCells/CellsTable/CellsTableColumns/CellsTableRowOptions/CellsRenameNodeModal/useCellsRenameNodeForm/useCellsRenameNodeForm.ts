@@ -22,7 +22,7 @@ import {ChangeEvent, FormEvent, MouseEvent, useState} from 'react';
 import {CellNode} from 'Components/Conversation/ConversationCells/common/cellNode/cellNode';
 import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
-import {trimFileExtension} from 'Util/util';
+import {getFileExtension, trimFileExtension} from 'Util/util';
 
 interface UseCellsRenameFormProps {
   node: CellNode;
@@ -42,7 +42,7 @@ export const useCellsRenameForm = ({node, cellsRepository, onSuccess}: UseCellsR
 
   const renameNode = async (name: string) => {
     try {
-      await cellsRepository.renameNode({currentPath: node.path, newName: name});
+      await cellsRepository.renameNode({currentPath: node.path, newName: `${name}.${getFileExtension(node.name)}`});
       onSuccess();
     } catch (error) {
       setError(t('cells.renameNodeModal.error'));
