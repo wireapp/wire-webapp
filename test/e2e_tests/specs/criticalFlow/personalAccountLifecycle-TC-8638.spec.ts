@@ -17,142 +17,9 @@
  *
  */
 
-import {Services} from '../data/serviceInfo';
-import {getUser, User} from '../data/user';
-import {test, expect} from '../test.fixtures';
-import {generateSecurePassword} from '../utils/userDataGenerator';
-
-const createdUsers: User[] = [];
-const createdTeams: Map<User, string> = new Map();
-
-test('Team owner adds whole team to an all team chat', {tag: ['@TC-8631', '@crit-flow']}, async ({pages, api}) => {
-  test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
-  // Generating test data
-  const owner = getUser();
-  const member1 = getUser();
-  const member2 = getUser();
-  const teamName = 'Critical';
-  const conversationName = 'Crits';
-
-  await test.step('Preconditions: Creating preconditions for the test via API', async () => {
-    await api.createTeamOwner(owner, teamName);
-    owner.teamId = await api.team.getTeamIdForUser(owner);
-    createdTeams.set(owner, owner.teamId);
-    const invitationIdForMember1 = await api.team.inviteUserToTeam(member1.email, owner);
-    const invitationCodeForMember1 = await api.brig.getTeamInvitationCodeForEmail(owner.teamId, invitationIdForMember1);
-
-    const invitationIdForMember2 = await api.team.inviteUserToTeam(member2.email, owner);
-    const invitationCodeForMember2 = await api.brig.getTeamInvitationCodeForEmail(owner.teamId, invitationIdForMember2);
-
-    await api.createPersonalUser(member1, invitationCodeForMember1);
-    await api.createPersonalUser(member2, invitationCodeForMember2);
-  });
-
-  await test.step('Team owner logs in into a client and creates group conversation', async () => {
-    await pages.openMainPage();
-    await pages.singleSignOnPage.enterEmailOnSSOPage(owner.email);
-    await pages.loginPage.inputPassword(owner.password);
-    await pages.loginPage.clickSignInButton();
-    await pages.dataShareConsentModal.clickDecline();
-  });
-
-  await test.step('Team owner adds a service to newly created group', async () => {
-    await api.team.addServiceToTeamWhitelist(owner.teamId!, Services.POLL_SERVICE, owner.token!);
-  });
-
-  await test.step('Team owner adds team members to a group', async () => {
-    await pages.conversationListPage.clickCreateGroup();
-    await pages.groupCreationPage.setGroupName(conversationName);
-    await pages.startUIPage.selectUsers([member1.username, member2.username]);
-    await pages.groupCreationPage.clickCreateGroupButton();
-    expect(await pages.conversationListPage.isConversationItemVisible(conversationName)).toBeTruthy();
-  });
-
-  // Steps below require [WPB-18075] and [WPB-17547]
-
-  await test.step('All group participants send messages in a group', async () => {});
-
-  await test.step('Team owner and group members react on received messages with reactions', async () => {});
-
-  await test.step('All group participants make sure they see reactions from other group participants', async () => {});
-
-  await test.step('Team owner removes one group member from a group', async () => {});
-
-  await test.step('Team owner removes a service from a group', async () => {});
-});
-
-test('Account Management', {tag: ['@TC-8639', '@crit-flow']}, async ({pages, api}) => {
-  test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
-
-  // Generating test data
-  const owner = getUser();
-  const member = getUser();
-  const teamName = 'Critical';
-  const conversationName = 'Tracking';
-  const appLockPassphrase = generateSecurePassword();
-
-  // Creating preconditions for the test via API
-  await test.step('Preconditions: Creating preconditions for the test via API', async () => {
-    await api.createTeamOwner(owner, teamName);
-    if (!owner.token) {
-      throw new Error(`Owner ${owner.username} has no token and can't be used for team creation`);
-    }
-    const teamId = await api.team.getTeamIdForUser(owner);
-    createdTeams.set(owner, teamId);
-    const invitationId = await api.team.inviteUserToTeam(member.email, owner);
-    const invitationCode = await api.brig.getTeamInvitationCodeForEmail(teamId, invitationId);
-
-    await api.createPersonalUser(member, invitationCode);
-    if (!member.id) {
-      throw new Error(`Member ${member.username} has no ID and can't be invited to the conversation`);
-    }
-    await api.conversation.inviteToConversation(member.id, owner.token, teamId, conversationName);
-  });
-
-  // Test steps
-  await test.step('Members logs in into the application', async () => {
-    await pages.openMainPage();
-    await pages.singleSignOnPage.enterEmailOnSSOPage(owner.email);
-    await pages.loginPage.inputPassword(owner.password);
-    await pages.loginPage.clickSignInButton();
-    await pages.dataShareConsentModal.clickDecline();
-  });
-
-  await test.step('Member opens settings', async () => {
-    await pages.conversationSidebar.clickPreferencesButton();
-  });
-
-  await test.step('Member enables logging in settings', async () => {
-    await pages.accountPage.toggleSendUsageData();
-  });
-
-  await test.step('Member enables applock and sets their password', async () => {
-    await pages.accountPage.toggleAppLock();
-    await pages.appLockModal.setPasscode(appLockPassphrase);
-    await pages.conversationSidebar.clickAllConversationsButton();
-    expect(await pages.conversationListPage.isConversationItemVisible(conversationName));
-  });
-
-  await test.step('Member verifies if applock is working', async () => {
-    await pages.refreshPage();
-    expect(await pages.appLockModal.isVisible());
-    expect(await pages.appLockModal.getAppLockModalHeader()).toContain('Enter passcode to unlock');
-    expect(await pages.appLockModal.getAppLockModalText()).toContain('Passcode');
-
-    await pages.appLockModal.unlockAppWithPasscode(appLockPassphrase);
-    expect(await pages.appLockModal.isHidden());
-    expect(await pages.conversationListPage.isConversationItemVisible(conversationName));
-  });
-
-  // TODO: Missing test steps for TC-8639 from testiny:
-  // Member changes their email address to a new email address
-  // Member resets their password
-  //
-  // These steps were not implemented in zautomation, so I skipped them here for the time being.
-  await test.step('Member changes their email address to a new email address', async () => {});
-
-  await test.step('Member resets their password ', async () => {});
-});
+import {getUser} from '../../data/user';
+import {test, expect} from '../../test.fixtures';
+import {addCreatedUser, tearDown} from '../../utils/tearDownUtil';
 
 test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow']}, async ({pages, api}) => {
   test.setTimeout(150_000); // Increasing test timeout to 150 seconds to accommodate the full flow
@@ -164,7 +31,7 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow']}, async ({pa
 
   await test.step('Preconditions: Creating preconditions for the test via API', async () => {
     await api.createPersonalUser(userB);
-    createdUsers.push(userB);
+    addCreatedUser(userB);
     await api.addDevicesToUser(userB, 1);
   });
 
@@ -281,15 +148,5 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow']}, async ({pa
 });
 
 test.afterAll(async ({api}) => {
-  for (const [user, teamId] of createdTeams.entries()) {
-    await api.team.deleteTeam(user, teamId);
-  }
-
-  for (const user of createdUsers) {
-    const token = user.token ?? (await api.auth.loginUser(user)).data.access_token;
-    if (!token) {
-      throw new Error(`Couldn't fetch token for ${user.username} and therefore can't delete the user`);
-    }
-    await api.user.deleteUser(user.password, token);
-  }
+  await tearDown(api);
 });
