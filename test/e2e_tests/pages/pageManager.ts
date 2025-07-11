@@ -32,11 +32,13 @@ import {DeleteAccountModal} from './deleteAccount.modal';
 import {DeleteAccountPage} from './deleteAccount.page';
 import {EmailVerificationPage} from './emailVerification.page';
 import {GroupCreationPage} from './groupCreation.page';
+import {HistoryExportPage} from './historyExport.page';
 import {HistoryInfoPage} from './infoHistory.page';
 import {LeaveConversationModal} from './leaveConversation.modal';
 import {LoginPage} from './login.page';
 import {MarketingConsentModal} from './marketingConsent.modal';
 import {OutgoingConnectionPage} from './outgoingConnection.page';
+import {PrimaryModal} from './primary.modal';
 import {RegisterSuccessPage} from './registerSuccess.page';
 import {RegistrationPage} from './registration.page';
 import {SetUsernamePage} from './setUsername.page';
@@ -327,5 +329,21 @@ export class PageManager {
       this._leaveConversationModal = new LeaveConversationModal(this.page);
     }
     return this._leaveConversationModal;
+  }
+
+  private _primaryModal!: PrimaryModal;
+  get primaryModal(): PrimaryModal {
+    if (!this._primaryModal) {
+      this._primaryModal = new PrimaryModal(this.page);
+    }
+    return this._primaryModal;
+  }
+
+  private _historyExportPage!: HistoryExportPage;
+  get historyExportPage(): HistoryExportPage {
+    if (!this._historyExportPage) {
+      this._historyExportPage = new HistoryExportPage(this.page);
+    }
+    return this._historyExportPage;
   }
 }
