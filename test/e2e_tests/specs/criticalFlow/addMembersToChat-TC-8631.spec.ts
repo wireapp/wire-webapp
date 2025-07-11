@@ -17,7 +17,7 @@
  *
  */
 
-import {loginUser} from 'test/e2e_tests/utils/userActions';
+import {loginUser} from '../utils/userActions';
 
 import {Services} from '../../data/serviceInfo';
 import {getUser} from '../../data/user';
