@@ -106,7 +106,6 @@ export const ConversationCells = memo(
           conversationName={name}
           cellsRepository={cellsRepository}
         />
-
         {isTableVisible && (
           <CellsTable
             nodes={isLoading ? [] : nodes}
