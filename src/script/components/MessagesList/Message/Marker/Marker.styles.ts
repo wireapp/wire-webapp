@@ -20,9 +20,7 @@
 import {css} from '@emotion/react';
 
 export const baseMarkerStyle = css`
-  height: 48px;
   padding-top: 8px; // TODO margin top is not working because of collapsing margins
-  margin-bottom: 16px;
   line-height: 2.5rem;
   user-select: none;
 

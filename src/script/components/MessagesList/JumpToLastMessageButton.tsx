@@ -17,9 +17,7 @@
  *
  */
 
-import {HTMLProps, useEffect, useState} from 'react';
-
-import {useDebouncedCallback} from 'use-debounce';
+import {HTMLProps} from 'react';
 
 import {ChevronIcon, IconButton} from '@wireapp/react-ui-kit';
 
@@ -29,31 +27,11 @@ import {
 } from 'Components/MessagesList/MessageList.styles';
 import {t} from 'Util/LocalizerUtil';
 
-import {Conversation} from '../../entity/Conversation';
-
 export interface JumpToLastMessageButtonProps extends HTMLProps<HTMLElement> {
   onGoToLastMessage: () => void;
-  conversation: Conversation;
 }
 
-export const JumpToLastMessageButton = ({onGoToLastMessage, conversation}: JumpToLastMessageButtonProps) => {
-  const [isLastMessageVisible, setIsLastMessageVisible] = useState(conversation.isLastMessageVisible());
-
-  const debouncedSetVisibility = useDebouncedCallback((value: boolean) => {
-    setIsLastMessageVisible(value);
-  }, 200);
-
-  useEffect(() => {
-    const subscription = conversation.isLastMessageVisible.subscribe(debouncedSetVisibility);
-    return () => {
-      subscription.dispose();
-    };
-  }, [conversation, debouncedSetVisibility]);
-
-  if (isLastMessageVisible) {
-    return null;
-  }
-
+export const JumpToLastMessageButton = ({onGoToLastMessage}: JumpToLastMessageButtonProps) => {
   return (
     <IconButton
       aria-label={t('jumpToLastMessage')}
