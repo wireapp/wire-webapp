@@ -349,20 +349,12 @@ export class App {
     amplify.subscribe(WebAppEvents.LIFECYCLE.SIGN_OUT, this.logout);
   }
 
-  private initializeCells({
-    cellsRepository,
-    selfUser,
-    accessToken,
-  }: {
-    cellsRepository: CellsRepository;
-    selfUser: User;
-    accessToken: string;
-  }) {
+  private initializeCells({cellsRepository, selfUser}: {cellsRepository: CellsRepository; selfUser: User}) {
     const cellPydioApiKey = Config.getConfig().CELLS_TOKEN_SHARED_SECRET;
     const cellsInitWithZauthToken = Config.getConfig().FEATURE.CELLS_INIT_WITH_ZAUTH_TOKEN;
 
     const cellsApiKey = cellsInitWithZauthToken
-      ? accessToken
+      ? undefined
       : `${cellPydioApiKey}:${selfUser.qualifiedId.id}@${selfUser.qualifiedId.domain}`;
 
     cellsRepository.initialize({
@@ -428,9 +420,7 @@ export class App {
 
       const selfUser = await this.repository.user.getSelf([{position: 'App.initiateSelfUser', vendor: 'webapp'}]);
 
-      const accessToken = this.apiClient.transport.http.accessTokenStore.accessTokenData?.access_token!;
-
-      this.initializeCells({cellsRepository, selfUser, accessToken});
+      this.initializeCells({cellsRepository, selfUser});
 
       await initializeDataDog(this.config, selfUser.qualifiedId);
       const eventLogger = new InitializationEventLogger(selfUser.id);
