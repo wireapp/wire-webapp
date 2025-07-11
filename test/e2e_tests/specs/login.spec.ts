@@ -17,12 +17,11 @@
  *
  */
 
-import {User, getUser} from '../data/user';
+import {getUser} from '../data/user';
 import {test, expect} from '../test.fixtures';
+import {addCreatedUser, tearDown} from '../utils/tearDownUtil';
 import {loginUser} from '../utils/userActions';
 import {generateSecurePassword} from '../utils/userDataGenerator';
-
-const createdUsers: User[] = [];
 
 test('Verify sign in error appearance in case of wrong credentials', {tag: ['@TC-3465', '@smoke']}, async ({pages}) => {
   const incorrectEmail = 'blablabla@wire.engineering';
@@ -44,7 +43,7 @@ test('Verify you can sign in by email', {tag: ['@TC-3461', '@regression']}, asyn
   await api.createPersonalUser(user);
 
   // Adding created user to the list for later cleanup
-  createdUsers.push(user);
+  addCreatedUser(user);
 
   await loginUser(user, pages);
 
@@ -53,10 +52,5 @@ test('Verify you can sign in by email', {tag: ['@TC-3461', '@regression']}, asyn
 });
 
 test.afterAll(async ({api}) => {
-  for (const user of createdUsers) {
-    if (!user.token) {
-      throw new Error(`User ${user.username} has no token and can't be deleted`);
-    }
-    await api.user.deleteUser(user.password, user.token);
-  }
+  await tearDown(api);
 });
