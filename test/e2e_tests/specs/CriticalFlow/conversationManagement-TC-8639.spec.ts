@@ -26,7 +26,7 @@ test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({p
 
   // Generating test data
   const owner = getUser();
-  const members = Array.from({length: 2}, () => getUser());
+  const members = Array.from({length: 5}, () => getUser());
 
   const teamName = 'Conversation Management';
   const conversationName = 'Test Conversation';
