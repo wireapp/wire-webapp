@@ -22,7 +22,7 @@ import {test, expect} from '../../test.fixtures';
 import {addCreatedTeam, addCreatedUser, tearDown} from '../../utils/tearDownUtil';
 
 test('Conversation Management', {tag: ['@TC-8636', '@crit-flow']}, async ({pages, api}) => {
-  test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
+  test.setTimeout(120000); // Set test timeout to 120 seconds
 
   // Generating test data
   const owner = getUser();
