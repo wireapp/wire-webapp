@@ -35,17 +35,18 @@ export const FileAssetOptions = ({onOpen, src, name, extension}: FileAssetOption
   return (
     <DropdownMenu>
       <DropdownMenu.Trigger asChild>
-        <button css={buttonStyles}>
+        <button aria-label={t('cells.options.label')} css={buttonStyles}>
           <MoreIcon css={iconStyles} />
         </button>
       </DropdownMenu.Trigger>
       <DropdownMenu.Content>
         <DropdownMenu.Item onClick={onOpen}>{t('cells.options.open')}</DropdownMenu.Item>
-        {src && (
-          <DropdownMenu.Item onClick={() => forcedDownloadFile({url: src, name: `${name}.${extension}`})}>
-            {t('cells.options.download')}
-          </DropdownMenu.Item>
-        )}
+        <DropdownMenu.Item
+          onClick={() => forcedDownloadFile({url: src || '', name: `${name}.${extension}`})}
+          aria-label={t('cells.options.download')}
+        >
+          {t('cells.options.download')}
+        </DropdownMenu.Item>
       </DropdownMenu.Content>
     </DropdownMenu>
   );
