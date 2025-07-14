@@ -19,17 +19,16 @@
 
 import {getUser, User} from '../../data/user';
 import {test, expect} from '../../test.fixtures';
-import {addCreatedTeam, addCreatedUser, tearDownAll} from '../../utils/tearDownUtil';
+import {addCreatedTeam, addCreatedUser, removeCreatedTeam, removeCreatedUser} from '../../utils/tearDownUtil';
+
+// Generating test data
+const owner = getUser();
+const members = Array.from({length: 5}, () => getUser());
+const teamName = 'Conversation Management';
+const conversationName = 'Test Conversation';
 
 test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({pages, api}) => {
   test.setTimeout(300000); // Set test timeout to 5 minutes
-
-  // Generating test data
-  const owner = getUser();
-  const members = Array.from({length: 5}, () => getUser());
-
-  const teamName = 'Conversation Management';
-  const conversationName = 'Test Conversation';
 
   const inviteMembers = async () => {
     await Promise.all(
@@ -141,5 +140,6 @@ test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({p
 });
 
 test.afterAll(async ({api}) => {
-  await tearDownAll(api);
+  await removeCreatedTeam(api, owner);
+  await Promise.all(members.map(member => removeCreatedUser(api, member)));
 });
