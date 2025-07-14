@@ -17,11 +17,13 @@
  *
  */
 
-import {User, getUser} from '../data/user';
+import {getUser} from '../data/user';
 import {test, expect} from '../test.fixtures';
+import {addCreatedUser, removeCreatedUser} from '../utils/tearDownUtil';
+import {loginUser} from '../utils/userActions';
 import {generateSecurePassword} from '../utils/userDataGenerator';
 
-const createdUsers: User[] = [];
+const user = getUser();
 
 test('Verify sign in error appearance in case of wrong credentials', {tag: ['@TC-3465', '@smoke']}, async ({pages}) => {
   const incorrectEmail = 'blablabla@wire.engineering';
@@ -37,29 +39,20 @@ test('Verify sign in error appearance in case of wrong credentials', {tag: ['@TC
   expect(errorMessage).toBe('Please verify your details and try again');
 });
 
-test('Verify you can sign in by username', {tag: ['@TC-3461', '@regression']}, async ({pages, api}) => {
+test('Verify you can sign in by email', {tag: ['@TC-3461', '@regression']}, async ({pages, api}) => {
   // Create user with random password, email, username, lastName, firstName
-  const user = getUser();
+
   await api.createPersonalUser(user);
 
   // Adding created user to the list for later cleanup
-  createdUsers.push(user);
+  addCreatedUser(user);
 
-  await pages.openMainPage();
-  await pages.singleSignOnPage.enterEmailOnSSOPage(user.email);
-  await pages.loginPage.inputPassword(user.password);
-  await pages.loginPage.clickSignInButton();
-  await pages.dataShareConsentModal.clickDecline();
+  await loginUser(user, pages);
 
   expect(await pages.conversationSidebar.getPersonalStatusName()).toBe(`${user.firstName} ${user.lastName}`);
   expect(await pages.conversationSidebar.getPersonalUserName()).toContain(user.username);
 });
 
 test.afterAll(async ({api}) => {
-  for (const user of createdUsers) {
-    if (!user.token) {
-      throw new Error(`User ${user.username} has no token and can't be deleted`);
-    }
-    await api.user.deleteUser(user.password, user.token);
-  }
+  await removeCreatedUser(api, user);
 });

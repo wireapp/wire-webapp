@@ -20,16 +20,18 @@
 import {Services} from '../../data/serviceInfo';
 import {getUser} from '../../data/user';
 import {test, expect} from '../../test.fixtures';
-import {addCreatedTeam, tearDown} from '../../utils/tearDownUtil';
+import {addCreatedTeam, removeCreatedTeam} from '../../utils/tearDownUtil';
+import {loginUser} from '../../utils/userActions';
 
-test('Team owner adds whole team to an all team chat', {tag: ['@TC-8631', '@crit-flow']}, async ({pages, api}) => {
+// Generating test data
+const owner = getUser();
+const member1 = getUser();
+const member2 = getUser();
+const teamName = 'Critical';
+const conversationName = 'Crits';
+
+test('Team owner adds whole team to an all team chat', {tag: ['@TC-8631', '@crit-flow-web']}, async ({pages, api}) => {
   test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
-  // Generating test data
-  const owner = getUser();
-  const member1 = getUser();
-  const member2 = getUser();
-  const teamName = 'Critical';
-  const conversationName = 'Crits';
 
   await test.step('Preconditions: Creating preconditions for the test via API', async () => {
     await api.createTeamOwner(owner, teamName);
@@ -46,11 +48,7 @@ test('Team owner adds whole team to an all team chat', {tag: ['@TC-8631', '@crit
   });
 
   await test.step('Team owner logs in into a client and creates group conversation', async () => {
-    await pages.openMainPage();
-    await pages.singleSignOnPage.enterEmailOnSSOPage(owner.email);
-    await pages.loginPage.inputPassword(owner.password);
-    await pages.loginPage.clickSignInButton();
-    await pages.dataShareConsentModal.clickDecline();
+    await loginUser(owner, pages);
   });
 
   await test.step('Team owner adds a service to newly created group', async () => {
@@ -79,5 +77,5 @@ test('Team owner adds whole team to an all team chat', {tag: ['@TC-8631', '@crit
 });
 
 test.afterAll(async ({api}) => {
-  await tearDown(api);
+  await removeCreatedTeam(api, owner);
 });

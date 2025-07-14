@@ -32,6 +32,10 @@ export class AuthRepositoryE2E extends BackendClientE2E {
       ...(invitationCode && {team_code: invitationCode}),
     });
     user.id = response.data.id;
+    user.qualifiedId = {
+      domain: response.data?.domain ?? '',
+      id: response.data.id,
+    };
     return response;
   }
 
@@ -49,6 +53,10 @@ export class AuthRepositoryE2E extends BackendClientE2E {
     });
     user.id = response.data.id;
     user.teamId = response.data.team;
+    user.qualifiedId = {
+      domain: response.data?.domain ?? '',
+      id: response.data.id,
+    };
     return response;
   }
 
@@ -81,6 +89,10 @@ export class AuthRepositoryE2E extends BackendClientE2E {
     );
     user.token = response.data.access_token;
     user.id = response.data.user;
+    user.qualifiedId = {
+      domain: response.data?.domain ?? '',
+      id: response.data.id,
+    };
     return response;
   }
 
