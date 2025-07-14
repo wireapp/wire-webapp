@@ -21,7 +21,7 @@ import {getUser, User} from '../../data/user';
 import {test, expect} from '../../test.fixtures';
 import {addCreatedTeam, addCreatedUser, tearDownAll} from '../../utils/tearDownUtil';
 
-test('Conversation Management', {tag: ['@TC-8636', '@crit-flow']}, async ({pages, api}) => {
+test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({pages, api}) => {
   test.setTimeout(420000); // Set test timeout to 7 minutes
 
   // Generating test data
