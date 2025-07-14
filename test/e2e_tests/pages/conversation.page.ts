@@ -76,7 +76,14 @@ export class ConversationPage {
   async isMessageVisible(messageText: string) {
     // Trying multiple times for the message to appear
     for (let i = 0; i < 10; i++) {
-      const messages = await this.page.locator(`[data-uie-name='item-message'] .message-body`).all();
+      const locator = this.page.locator(`[data-uie-name='item-message'] .message-body:not(:has(p.text-foreground))`);
+
+      // Wait for at least one matching element to appear (optional timeout can be set)
+      await locator.first().waitFor({state: 'visible'});
+
+      // Then get all matching elements
+      const messages = await locator.all();
+
       if (messages.length === 0) {
         continue;
       }

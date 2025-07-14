@@ -21,14 +21,14 @@ import {getUser, User} from '../../data/user';
 import {test, expect} from '../../test.fixtures';
 import {addCreatedTeam, addCreatedUser, tearDown} from '../../utils/tearDownUtil';
 
-test('Group Management', {tag: ['@TC-8636', '@crit-flow']}, async ({pages, api}) => {
+test('Conversation Management', {tag: ['@TC-8636', '@crit-flow']}, async ({pages, api}) => {
   test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
 
   // Generating test data
   const owner = getUser();
   const members = Array.from({length: 5}, () => getUser());
 
-  const teamName = 'Group Management';
+  const teamName = 'Conversation Management';
   const conversationName = 'Test Conversation';
 
   const inviteMembers = async () => {
@@ -52,7 +52,6 @@ test('Group Management', {tag: ['@TC-8636', '@crit-flow']}, async ({pages, api})
   const logOutUser = async () => {
     await pages.conversationSidebar.clickPreferencesButton();
     await pages.settingsPage.clickLogoutButton();
-    await pages.confirmLogoutModal.toggleModalCheck();
     await pages.confirmLogoutModal.clickConfirm();
   };
 
