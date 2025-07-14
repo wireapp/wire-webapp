@@ -29,6 +29,8 @@ export class ConversationPage {
   readonly messageInput: Locator;
   readonly sendMessageButton: Locator;
   readonly watermark: Locator;
+  readonly timerMessageButton: Locator;
+  readonly timerTenSecondsButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -39,7 +41,9 @@ export class ConversationPage {
     this.createGroupSubmitButton = this.createGroupModal.locator('[data-uie-name="submit"]');
     this.messageInput = page.locator('[data-uie-name="input-message"]');
     this.watermark = page.locator('[data-uie-name="no-conversation"] svg');
-    this.sendMessageButton = page.locator('[data-uie-name="do-send-message"]');
+    this.sendMessageButton = page.locator('[data-uie-name="do-send-message"]:enabled');
+    this.timerMessageButton = page.locator('[data-uie-name="do-set-ephemeral-timer"]');
+    this.timerTenSecondsButton = page.locator('#btn-10-seconds');
   }
 
   async isConversationOpen(conversationName: string) {
@@ -56,6 +60,17 @@ export class ConversationPage {
   async sendMessage(message: string) {
     await this.messageInput.fill(message);
     await this.messageInput.press('Enter');
+  }
+
+  async createGroup(groupName: string) {
+    await this.createGroupButton.click();
+    await this.createGroupNameInput.fill(groupName);
+    await this.createGroupSubmitButton.click();
+  }
+
+  async enableAutoDeleteMessages() {
+    await this.timerMessageButton.click();
+    await this.timerTenSecondsButton.click();
   }
 
   async isMessageVisible(messageText: string) {
@@ -77,5 +92,13 @@ export class ConversationPage {
     }
 
     return false;
+  }
+
+  async isConversationReadonly() {
+    await this.messageInput.waitFor({state: 'detached'});
+  }
+
+  async isMessageInputVisible() {
+    return await this.messageInput.isVisible();
   }
 }

@@ -24,9 +24,6 @@ import {User} from '../data/user';
 const createdUsers: User[] = [];
 const createdTeams: Map<User, string> = new Map();
 
-export const getCreatedUsers = () => createdUsers;
-export const getCreatedTeams = () => createdTeams;
-
 export const addCreatedUser = (user: User) => {
   createdUsers.push(user);
 };

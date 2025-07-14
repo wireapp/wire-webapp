@@ -229,6 +229,7 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
     case PrimaryModalType.OPTION: {
       if (!hideSecondary) {
         content.secondaryAction = {text: t('modalOptionSecondary'), ...content.secondaryAction};
+        content.modalUie = PrimaryModalType.OPTION;
       }
       break;
     }

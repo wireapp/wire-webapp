@@ -19,25 +19,17 @@
 
 import {Locator, Page} from '@playwright/test';
 
-export class SingleSignOnPage {
+export class SettingsPage {
   readonly page: Page;
-
-  readonly ssoCodeEmailInput: Locator;
-  readonly ssoSignInButton: Locator;
+  private logoutButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
 
-    this.ssoCodeEmailInput = page.locator('#sso-code-email');
-    this.ssoSignInButton = page.locator('[data-uie-name="do-sso-sign-in"]');
+    this.logoutButton = this.page.locator("[data-uie-name='do-logout']");
   }
 
-  async enterEmailOnSSOPage(email: string) {
-    await this.ssoCodeEmailInput.fill(email);
-    await this.ssoSignInButton.click();
-  }
-
-  async isSSOPageVisible() {
-    return this.ssoCodeEmailInput.waitFor({state: 'visible'});
+  async clickLogoutButton() {
+    await this.logoutButton.click();
   }
 }

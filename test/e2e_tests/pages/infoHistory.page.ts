@@ -19,25 +19,17 @@
 
 import {Locator, Page} from '@playwright/test';
 
-export class SingleSignOnPage {
+export class HistoryInfoPage {
   readonly page: Page;
-
-  readonly ssoCodeEmailInput: Locator;
-  readonly ssoSignInButton: Locator;
+  private continueButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
 
-    this.ssoCodeEmailInput = page.locator('#sso-code-email');
-    this.ssoSignInButton = page.locator('[data-uie-name="do-sso-sign-in"]');
+    this.continueButton = this.page.locator("[data-uie-name='do-history-confirm']");
   }
 
-  async enterEmailOnSSOPage(email: string) {
-    await this.ssoCodeEmailInput.fill(email);
-    await this.ssoSignInButton.click();
-  }
-
-  async isSSOPageVisible() {
-    return this.ssoCodeEmailInput.waitFor({state: 'visible'});
+  async clickConfirmButton() {
+    await this.continueButton.click();
   }
 }

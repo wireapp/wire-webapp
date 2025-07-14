@@ -26,6 +26,8 @@ export class ConversationListPage {
 
   readonly blockConversationMenuButton: Locator;
   readonly createGroupButton: Locator;
+  readonly leaveConversationButton: Locator;
+  readonly searchConversationsInput: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -34,6 +36,8 @@ export class ConversationListPage {
     this.createGroupButton = page.locator(
       '[data-uie-name="conversation-list-header"] [data-uie-name="go-create-group"]',
     );
+    this.leaveConversationButton = page.locator('[data-uie-name="conversation-leave"]');
+    this.searchConversationsInput = page.locator('[data-uie-name="search-conversations"]');
   }
 
   async isConversationItemVisible(conversationName: string) {
@@ -65,5 +69,19 @@ export class ConversationListPage {
 
   private getConversationLocator(conversationName: string) {
     return this.page.locator(`[data-uie-name='item-conversation'][data-uie-value='${escapeHtml(conversationName)}']`);
+  }
+
+  async openContextMenu(conversationName: string) {
+    await this.getConversationLocator(conversationName).click();
+    await this.getConversationLocator(conversationName).click({button: 'right'});
+  }
+
+  async leaveConversation() {
+    await this.leaveConversationButton.click();
+  }
+
+  async searchConversation(conversationName: string) {
+    await this.searchConversationsInput.fill(conversationName);
+    await this.openConversation(conversationName);
   }
 }

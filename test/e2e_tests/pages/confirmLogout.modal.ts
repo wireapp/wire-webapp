@@ -17,27 +17,34 @@
  *
  */
 
-import {Locator, Page} from '@playwright/test';
+import {Page, Locator} from '@playwright/test';
 
-export class SingleSignOnPage {
+export class ConfirmLogoutModal {
   readonly page: Page;
 
-  readonly ssoCodeEmailInput: Locator;
-  readonly ssoSignInButton: Locator;
+  readonly modal: Locator;
+  readonly modalCheckbox: Locator;
+  readonly cancelButton: Locator;
+  readonly confirmButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
 
-    this.ssoCodeEmailInput = page.locator('#sso-code-email');
-    this.ssoSignInButton = page.locator('[data-uie-name="do-sso-sign-in"]');
+    this.modal = page.locator("[data-uie-name='modal-template-option']");
+    this.modalCheckbox = this.modal.locator('label[for="clear-data-checkbox"]');
+    this.cancelButton = this.modal.locator("[data-uie-name='do-secondary']");
+    this.confirmButton = this.modal.locator("[data-uie-name='do-action']");
   }
 
-  async enterEmailOnSSOPage(email: string) {
-    await this.ssoCodeEmailInput.fill(email);
-    await this.ssoSignInButton.click();
+  async toggleModalCheck() {
+    await this.modalCheckbox.click();
   }
 
-  async isSSOPageVisible() {
-    return this.ssoCodeEmailInput.waitFor({state: 'visible'});
+  async clickCancel() {
+    await this.cancelButton.click();
+  }
+
+  async clickConfirm() {
+    await this.confirmButton.click();
   }
 }

@@ -22,6 +22,7 @@ import {Page} from '@playwright/test';
 import {AccountPage} from './account.page';
 import {AppLockModal} from './appLock.modal';
 import {BlockWarningModal} from './blockWarning.modal';
+import {ConfirmLogoutModal} from './confirmLogout.modal';
 import {ConversationPage} from './conversation.page';
 import {ConversationListPage} from './conversationList.page';
 import {ConversationSidebar} from './conversationSidebar.page';
@@ -30,11 +31,14 @@ import {DeleteAccountModal} from './deleteAccount.modal';
 import {DeleteAccountPage} from './deleteAccount.page';
 import {EmailVerificationPage} from './emailVerification.page';
 import {GroupCreationPage} from './groupCreation.page';
+import {HistoryInfoPage} from './infoHistory.page';
+import {LeaveConversationModal} from './leaveConversation.modal';
 import {LoginPage} from './login.page';
 import {MarketingConsentModal} from './marketingConsent.modal';
 import {OutgoingConnectionPage} from './outgoingConnection.page';
 import {RegisterSuccessPage} from './registerSuccess.page';
 import {RegistrationPage} from './registration.page';
+import {SettingsPage} from './settings.page';
 import {SetUsernamePage} from './setUsername.page';
 import {SingleSignOnPage} from './singleSignOn.page';
 import {StartUIPage} from './startUI.page';
@@ -81,10 +85,8 @@ export class PageManager {
     });
   }
 
-  public refreshPage() {
-    return this.page.reload({
-      waitUntil: 'networkidle',
-    });
+  public refreshPage(options: {waitUntil?: 'load' | 'domcontentloaded' | 'networkidle'} = {waitUntil: 'networkidle'}) {
+    return this.page.reload(options);
   }
 
   private _singleSignOnPage!: SingleSignOnPage;
@@ -293,5 +295,37 @@ export class PageManager {
       this._teamDataShareConsentModal = new TeamDataShareConsentModal(this.page);
     }
     return this._teamDataShareConsentModal;
+  }
+
+  private _historyInfoPage!: HistoryInfoPage;
+  get historyInfoPage(): HistoryInfoPage {
+    if (!this._historyInfoPage) {
+      this._historyInfoPage = new HistoryInfoPage(this.page);
+    }
+    return this._historyInfoPage;
+  }
+
+  private _settingsPage!: SettingsPage;
+  get settingsPage(): SettingsPage {
+    if (!this._settingsPage) {
+      this._settingsPage = new SettingsPage(this.page);
+    }
+    return this._settingsPage;
+  }
+
+  private _confirmLogoutModal!: ConfirmLogoutModal;
+  get confirmLogoutModal(): ConfirmLogoutModal {
+    if (!this._confirmLogoutModal) {
+      this._confirmLogoutModal = new ConfirmLogoutModal(this.page);
+    }
+    return this._confirmLogoutModal;
+  }
+
+  private _leaveConversationModal!: LeaveConversationModal;
+  get leaveConversationModal(): LeaveConversationModal {
+    if (!this._leaveConversationModal) {
+      this._leaveConversationModal = new LeaveConversationModal(this.page);
+    }
+    return this._leaveConversationModal;
   }
 }
