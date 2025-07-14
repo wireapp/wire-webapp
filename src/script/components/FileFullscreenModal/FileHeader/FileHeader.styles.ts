@@ -89,3 +89,16 @@ export const loaderIconStyles: CSSObject = {
     color: 'var(--gray-40)',
   },
 };
+
+export const actionButtonsStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
+};
+
+export const downloadButtonStyles: CSSObject = {
+  marginBottom: '0',
+  flexShrink: '0',
+  width: '40px',
+  height: '32px',
+};

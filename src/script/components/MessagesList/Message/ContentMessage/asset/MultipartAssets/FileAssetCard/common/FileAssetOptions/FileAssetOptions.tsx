@@ -17,55 +17,36 @@
  *
  */
 
-import {MouseEvent as ReactMouseEvent, KeyboardEvent, useId} from 'react';
+import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 
-import {MoreIcon} from '@wireapp/react-ui-kit';
-
-import {showContextMenu} from 'src/script/ui/ContextMenu';
-import {isSpaceOrEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
-import {setContextMenuPosition} from 'Util/util';
+import {forcedDownloadFile} from 'Util/util';
 
 import {buttonStyles, iconStyles} from './FileAssetOptions.styles';
 
 interface FileAssetOptionsProps {
+  src?: string;
+  name: string;
+  extension: string;
   onOpen: () => void;
 }
 
-export const FileAssetOptions = ({onOpen}: FileAssetOptionsProps) => {
-  const id = useId();
-
-  const showOptionsMenu = (event: ReactMouseEvent<HTMLButtonElement> | MouseEvent) => {
-    showContextMenu({
-      event,
-      entries: [
-        {
-          label: t('cells.options.open'),
-          click: () => onOpen(),
-        },
-      ],
-      identifier: id,
-    });
-  };
-
-  const handleKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
-    if (isSpaceOrEnterKey(event.key)) {
-      const newEvent = setContextMenuPosition(event);
-      showOptionsMenu(newEvent);
-    }
-  };
-
+export const FileAssetOptions = ({onOpen, src, name, extension}: FileAssetOptionsProps) => {
   return (
-    <>
-      <button
-        css={buttonStyles}
-        id={id}
-        onKeyDown={handleKeyDown}
-        onClick={showOptionsMenu}
-        aria-label={t('cells.options.label')}
-      >
-        <MoreIcon css={iconStyles} />
-      </button>
-    </>
+    <DropdownMenu>
+      <DropdownMenu.Trigger asChild>
+        <button css={buttonStyles}>
+          <MoreIcon css={iconStyles} />
+        </button>
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Content>
+        <DropdownMenu.Item onClick={onOpen}>{t('cells.options.open')}</DropdownMenu.Item>
+        {src && (
+          <DropdownMenu.Item onClick={() => forcedDownloadFile({url: src, name: `${name}.${extension}`})}>
+            {t('cells.options.download')}
+          </DropdownMenu.Item>
+        )}
+      </DropdownMenu.Content>
+    </DropdownMenu>
   );
 };
