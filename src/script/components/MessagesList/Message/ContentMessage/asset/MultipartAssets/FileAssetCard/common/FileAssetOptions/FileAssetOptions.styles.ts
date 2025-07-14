@@ -25,6 +25,7 @@ export const buttonStyles: CSSObject = {
   cursor: 'pointer',
   padding: '0',
   marginLeft: 'auto',
+  zIndex: '1',
 };
 
 export const iconStyles: CSSObject = {

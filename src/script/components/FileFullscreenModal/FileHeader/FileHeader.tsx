@@ -83,6 +83,7 @@ export const FileHeader = ({
           variant={ButtonVariant.TERTIARY}
           css={downloadButtonStyles}
           onClick={() => forcedDownloadFile({url: filePreviewUrl || '', name: `${fileName}.${fileExtension}`})}
+          aria-label={t('cells.imageFullScreenModal.downloadButton')}
         >
           <DownloadIcon />
         </Button>
