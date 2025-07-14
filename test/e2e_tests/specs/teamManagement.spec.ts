@@ -19,19 +19,19 @@
 
 import {getUser} from '../data/user';
 import {test, expect} from '../test.fixtures';
-import {addCreatedTeam, tearDown} from '../utils/tearDownUtil';
+import {addCreatedTeam, removeCreatedTeam} from '../utils/tearDownUtil';
 import {generateSecurePassword} from '../utils/userDataGenerator';
+
+// Creating test data
+const teamOwner = getUser();
+const teamName = 'Startup';
+const invalidPassword = generateSecurePassword(10);
+const errorMessage = 'Please verify your details and try again.';
 
 test(
   'Verify I can log in to admin panel only with valid hidden or shown password',
   {tag: ['@crit-flow-tm', '@TC-2157', '@TC-2158', '@TC-2159', '@TC-2156', '@TC-2155', '@teamManagement-regression']},
   async ({api, pages}) => {
-    // Creating test data
-    const teamOwner = getUser();
-    const teamName = 'Startup';
-    const invalidPassword = generateSecurePassword(10);
-    const errorMessage = 'Please verify your details and try again.';
-
     await test.step('Preconditions: Creating preconditions for the test via API', async () => {
       await api.createTeamOwner(teamOwner, teamName);
       addCreatedTeam(teamOwner, teamOwner.teamId!);
@@ -133,5 +133,5 @@ test(
 );
 
 test.afterAll(async ({api}) => {
-  await tearDown(api);
+  await removeCreatedTeam(api, teamOwner);
 });

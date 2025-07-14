@@ -19,123 +19,134 @@
 
 import {getUser} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pages/pageManager';
-import {addCreatedTeam, tearDown} from 'test/e2e_tests/utils/tearDownUtil';
+import {addCreatedTeam, removeCreatedTeam} from 'test/e2e_tests/utils/tearDownUtil';
 import {loginUser, sendMessageFromAtoB} from 'test/e2e_tests/utils/userActions';
 
 import {test, expect} from '../../test.fixtures';
 
-test('New person joins team and setups up device', {tag: ['@TC-8635', '@crit-flow']}, async ({pages, api, browser}) => {
-  test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
-  // Generating test data
-  const owner = getUser();
-  const member1 = getUser();
-  const memberA = getUser();
-  const teamName = 'Critical';
-  const conversationName = 'Crits';
-  const textFromAToOwner = 'Hello Team Owner!';
-  const textFromOwnerToA = 'Keep up the good work!';
-  let adminPages: PageManager;
+// Generating test data
+const owner = getUser();
+const member1 = getUser();
+const memberA = getUser();
+const teamName = 'Critical';
+const conversationName = 'Crits';
+const textFromAToOwner = 'Hello Team Owner!';
+const textFromOwnerToA = 'Keep up the good work!';
+let adminPages: PageManager;
 
-  await test.step('Preconditions: Creating preconditions for the test via API', async () => {
-    // Precondition: Team owner exists in a team with 1 team member
-    await api.createTeamOwner(owner, teamName);
-    owner.teamId = await api.team.getTeamIdForUser(owner);
-    addCreatedTeam(owner, owner.teamId);
-    const invitationIdForMember1 = await api.team.inviteUserToTeam(member1.email, owner);
-    const invitationCodeForMember1 = await api.brig.getTeamInvitationCodeForEmail(owner.teamId, invitationIdForMember1);
-    await api.createPersonalUser(member1, invitationCodeForMember1);
+test(
+  'New person joins team and setups up device',
+  {tag: ['@TC-8635', '@crit-flow-web']},
+  async ({pages, api, browser}) => {
+    test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
 
-    // Precondition: Team has a group chat with existing team members
-    if (!owner.token) {
-      throw new Error(`Owner ${owner.username} has no token and can't be used for team creation`);
-    }
-    if (!(owner.qualifiedId?.id.length && member1.qualifiedId?.id.length)) {
-      throw new Error(
-        `Owner or member1 qualifiedId is not set. Ensure users are created before creating the conversation. Owner ID: ${
-          owner.qualifiedId
-        }, Member1 ID: ${member1.qualifiedId}`,
+    await test.step('Preconditions: Creating preconditions for the test via API', async () => {
+      // Precondition: Team owner exists in a team with 1 team member
+      await api.createTeamOwner(owner, teamName);
+      owner.teamId = await api.team.getTeamIdForUser(owner);
+      addCreatedTeam(owner, owner.teamId);
+      const invitationIdForMember1 = await api.team.inviteUserToTeam(member1.email, owner);
+      const invitationCodeForMember1 = await api.brig.getTeamInvitationCodeForEmail(
+        owner.teamId,
+        invitationIdForMember1,
       );
-    }
-    await api.conversation.createGroupConversation(owner.token, {
-      name: conversationName,
-      protocol: 'proteus',
-      qualifiedUsers: [member1.qualifiedId],
-      team: {
-        teamid: owner.teamId,
-      },
+      await api.createPersonalUser(member1, invitationCodeForMember1);
+
+      // Precondition: Team has a group chat with existing team members
+      if (!owner.token) {
+        throw new Error(`Owner ${owner.username} has no token and can't be used for team creation`);
+      }
+      if (!(owner.qualifiedId?.id.length && member1.qualifiedId?.id.length)) {
+        throw new Error(
+          `Owner or member1 qualifiedId is not set. Ensure users are created before creating the conversation. Owner ID: ${
+            owner.qualifiedId
+          }, Member1 ID: ${member1.qualifiedId}`,
+        );
+      }
+      await api.conversation.createGroupConversation(owner.token, {
+        name: conversationName,
+        protocol: 'proteus',
+        qualifiedUsers: [member1.qualifiedId],
+        team: {
+          teamid: owner.teamId,
+        },
+      });
+
+      // Precondition: Team owner adds a new team member A
+      const invitationIdForMemberA = await api.team.inviteUserToTeam(memberA.email, owner);
+      const invitationCodeForMemberA = await api.brig.getTeamInvitationCodeForEmail(
+        owner.teamId,
+        invitationIdForMemberA,
+      );
+      await api.createPersonalUser(memberA, invitationCodeForMemberA);
+
+      // Create Admin context for team owner
+      const adminContext = await browser.newContext();
+      const adminPage = await adminContext.newPage();
+      adminPages = new PageManager(adminPage);
     });
 
-    // Precondition: Team owner adds a new team member A
-    const invitationIdForMemberA = await api.team.inviteUserToTeam(memberA.email, owner);
-    const invitationCodeForMemberA = await api.brig.getTeamInvitationCodeForEmail(owner.teamId, invitationIdForMemberA);
-    await api.createPersonalUser(memberA, invitationCodeForMemberA);
+    await test.step('A logs in', async () => {
+      await loginUser(memberA, pages);
+    });
 
-    // Create Admin context for team owner
-    const adminContext = await browser.newContext();
-    const adminPage = await adminContext.newPage();
-    adminPages = new PageManager(adminPage);
-  });
+    await test.step('Owner logs in', async () => {
+      await loginUser(owner, adminPages);
+    });
 
-  await test.step('A logs in', async () => {
-    await loginUser(memberA, pages);
-  });
+    await test.step('A searches for Team Owner', async () => {
+      await pages.conversationSidebar.clickConnectButton();
+      await pages.startUIPage.selectUser(owner.username);
+      expect(await pages.userProfileModal.isVisible());
+      await pages.userProfileModal.clickStartConversation();
+    });
 
-  await test.step('Owner logs in', async () => {
-    await loginUser(owner, adminPages);
-  });
+    await test.step('A sends text to Team Owner', async () => {
+      await sendMessageFromAtoB(pages, owner, textFromAToOwner);
+    });
 
-  await test.step('A searches for Team Owner', async () => {
-    await pages.conversationSidebar.clickConnectButton();
-    await pages.startUIPage.selectUser(owner.username);
-    expect(await pages.userProfileModal.isVisible());
-    await pages.userProfileModal.clickStartConversation();
-  });
+    await test.step('Team owner receives text of A and sends a text to A', async () => {
+      await expect(pages.conversationPage.page.getByText(textFromAToOwner)).toBeVisible({timeout: 10000});
+      await sendMessageFromAtoB(adminPages, memberA, textFromOwnerToA);
+    });
 
-  await test.step('A sends text to Team Owner', async () => {
-    await sendMessageFromAtoB(pages, owner, textFromAToOwner);
-  });
+    await test.step('A receives Text of Team Owner', async () => {
+      await expect(pages.conversationPage.page.getByText(textFromOwnerToA)).toBeVisible({timeout: 10000});
+    });
 
-  await test.step('Team owner receives text of A and sends a text to A', async () => {
-    await expect(pages.conversationPage.page.getByText(textFromAToOwner)).toBeVisible({timeout: 10000});
-    await sendMessageFromAtoB(adminPages, memberA, textFromOwnerToA);
-  });
+    await test.step('Team owner adds A to chat', async () => {
+      // Team owner opens the group chat
+      await adminPages.conversationListPage.openConversation(conversationName);
+      expect(await adminPages.conversationPage.isConversationOpen(conversationName));
 
-  await test.step('A receives Text of Team Owner', async () => {
-    await expect(pages.conversationPage.page.getByText(textFromOwnerToA)).toBeVisible({timeout: 10000});
-  });
+      // Team owner opens group information and adds A to the group
+      await adminPages.conversationPage.openGroupInformation();
+      expect(await adminPages.conversationDetailsPage.isOpen(conversationName)).toBeTruthy();
+      await adminPages.conversationDetailsPage.clickAddPeopleButton();
+      await adminPages.conversationDetailsPage.addUsersToConversation([memberA.fullName]);
 
-  await test.step('Team owner adds A to chat', async () => {
-    // Team owner opens the group chat
-    await adminPages.conversationListPage.openConversation(conversationName);
-    expect(await adminPages.conversationPage.isConversationOpen(conversationName));
+      // Team owner confirms the addition of A to the group
+      expect(await adminPages.conversationDetailsPage.isUserPartOfConversationAsMember(memberA.fullName));
+      await expect(
+        adminPages.conversationPage.page.getByText(`You added ${memberA.fullName} to the conversation`),
+      ).toBeVisible({timeout: 10000});
+    });
 
-    // Team owner opens group information and adds A to the group
-    await adminPages.conversationPage.openGroupInformation();
-    expect(await adminPages.conversationDetailsPage.isOpen(conversationName)).toBeTruthy();
-    await adminPages.conversationDetailsPage.clickAddPeopleButton();
-    await adminPages.conversationDetailsPage.addUsersToConversation([memberA.fullName]);
+    await test.step('A sees the chat', async () => {
+      await pages.conversationListPage.openConversation(conversationName);
+      expect(await adminPages.conversationPage.isConversationOpen(conversationName));
+    });
 
-    // Team owner confirms the addition of A to the group
-    expect(await adminPages.conversationDetailsPage.isUserPartOfConversationAsMember(memberA.fullName));
-    await expect(
-      adminPages.conversationPage.page.getByText(`You added ${memberA.fullName} to the conversation`),
-    ).toBeVisible({timeout: 10000});
-  });
+    await test.step('Team owner mentions A', async () => {
+      await adminPages.conversationPage.sendMention(memberA.qualifiedId!.id);
+    });
 
-  await test.step('A sees the chat', async () => {
-    await pages.conversationListPage.openConversation(conversationName);
-    expect(await adminPages.conversationPage.isConversationOpen(conversationName));
-  });
-
-  await test.step('Team owner mentions A', async () => {
-    await adminPages.conversationPage.sendMention(memberA.qualifiedId!.id);
-  });
-
-  await test.step('A sees the mention in the chat', async () => {
-    await expect(pages.conversationPage.page.getByText(`@${memberA.fullName}`)).toBeVisible({timeout: 10000});
-  });
-});
+    await test.step('A sees the mention in the chat', async () => {
+      await expect(pages.conversationPage.page.getByText(`@${memberA.fullName}`)).toBeVisible({timeout: 10000});
+    });
+  },
+);
 
 test.afterAll(async ({api}) => {
-  await tearDown(api);
+  await removeCreatedTeam(api, owner);
 });

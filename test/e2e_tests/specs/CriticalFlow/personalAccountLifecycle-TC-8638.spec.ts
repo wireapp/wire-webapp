@@ -19,15 +19,15 @@
 
 import {getUser} from '../../data/user';
 import {test, expect} from '../../test.fixtures';
-import {addCreatedUser, tearDown} from '../../utils/tearDownUtil';
+import {addCreatedUser, removeCreatedUser} from '../../utils/tearDownUtil';
 
-test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow']}, async ({pages, api}) => {
+// Generating test data
+// userB is the contact user, userA is the user who registers
+const userB = getUser();
+const userA = getUser();
+
+test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async ({pages, api}) => {
   test.setTimeout(150_000); // Increasing test timeout to 150 seconds to accommodate the full flow
-
-  // Generating test data
-  // userB is the contact user, userA is the user who registers
-  const userB = getUser();
-  const userA = getUser();
 
   await test.step('Preconditions: Creating preconditions for the test via API', async () => {
     await api.createPersonalUser(userB);
@@ -148,5 +148,5 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow']}, async ({pa
 });
 
 test.afterAll(async ({api}) => {
-  await tearDown(api);
+  await removeCreatedUser(api, userB);
 });

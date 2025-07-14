@@ -19,9 +19,11 @@
 
 import {getUser} from '../data/user';
 import {test, expect} from '../test.fixtures';
-import {addCreatedUser, tearDown} from '../utils/tearDownUtil';
+import {addCreatedUser, removeCreatedUser} from '../utils/tearDownUtil';
 import {loginUser} from '../utils/userActions';
 import {generateSecurePassword} from '../utils/userDataGenerator';
+
+const user = getUser();
 
 test('Verify sign in error appearance in case of wrong credentials', {tag: ['@TC-3465', '@smoke']}, async ({pages}) => {
   const incorrectEmail = 'blablabla@wire.engineering';
@@ -39,7 +41,7 @@ test('Verify sign in error appearance in case of wrong credentials', {tag: ['@TC
 
 test('Verify you can sign in by email', {tag: ['@TC-3461', '@regression']}, async ({pages, api}) => {
   // Create user with random password, email, username, lastName, firstName
-  const user = getUser();
+
   await api.createPersonalUser(user);
 
   // Adding created user to the list for later cleanup
@@ -52,5 +54,5 @@ test('Verify you can sign in by email', {tag: ['@TC-3461', '@regression']}, asyn
 });
 
 test.afterAll(async ({api}) => {
-  await tearDown(api);
+  await removeCreatedUser(api, user);
 });

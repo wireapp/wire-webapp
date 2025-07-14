@@ -19,19 +19,19 @@
 
 import {getUser} from '../../data/user';
 import {test, expect} from '../../test.fixtures';
-import {addCreatedTeam, tearDown} from '../../utils/tearDownUtil';
+import {addCreatedTeam, removeCreatedTeam} from '../../utils/tearDownUtil';
 import {loginUser} from '../../utils/userActions';
 import {generateSecurePassword} from '../../utils/userDataGenerator';
 
-test('Account Management', {tag: ['@TC-8639', '@crit-flow']}, async ({pages, api}) => {
-  test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
+// Generating test data
+const owner = getUser();
+const member = getUser();
+const teamName = 'Critical';
+const conversationName = 'Tracking';
+const appLockPassphrase = generateSecurePassword();
 
-  // Generating test data
-  const owner = getUser();
-  const member = getUser();
-  const teamName = 'Critical';
-  const conversationName = 'Tracking';
-  const appLockPassphrase = generateSecurePassword();
+test('Account Management', {tag: ['@TC-8639', '@crit-flow-web']}, async ({pages, api}) => {
+  test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
 
   // Creating preconditions for the test via API
   await test.step('Preconditions: Creating preconditions for the test via API', async () => {
@@ -93,5 +93,5 @@ test('Account Management', {tag: ['@TC-8639', '@crit-flow']}, async ({pages, api
 });
 
 test.afterAll(async ({api}) => {
-  await tearDown(api);
+  await removeCreatedTeam(api, owner);
 });

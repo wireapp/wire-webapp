@@ -21,7 +21,7 @@ import {ApiManagerE2E} from 'test/e2e_tests/backend/apiManager.e2e';
 
 import {User} from '../data/user';
 
-const createdUsers: User[] = [];
+const createdUsers: Map<User['id'], User> = new Map();
 const createdTeams: Map<User, string> = new Map();
 
 export const getCreatedUsers = () => createdUsers;
@@ -29,28 +29,54 @@ export const getCreatedTeams = () => createdTeams;
 
 // Utility functions to manage created personal users for cleanup
 export const addCreatedUser = (user: User) => {
-  createdUsers.push(user);
+  if (!user.id) {
+    throw new Error('User must have an ID to be added to createdUsers');
+  }
+  createdUsers.set(user.id, user);
 };
 
 // Utility functions to manage created teams for cleanup (no need to pass user, as teams are associated with users)
 export const addCreatedTeam = (user: User, teamId: string) => {
+  if (!user.id) {
+    throw new Error('User must have an ID to be added to createdTeams');
+  }
   createdTeams.set(user, teamId);
+};
+
+export const removeCreatedTeam = async (api: ApiManagerE2E, user: User) => {
+  if (!user.id) {
+    throw new Error('User must have an ID to remove from createdTeams');
+  }
+  const teamId = createdTeams.get(user);
+  if (!teamId) {
+    throw new Error(`No team found for user ${user.id}`);
+  }
+  await api.team.deleteTeam(user, teamId);
+  createdTeams.delete(user);
+};
+
+export const removeCreatedUser = async (api: ApiManagerE2E, user: User) => {
+  if (!user.id) {
+    throw new Error('User must have an ID to remove from createdUsers');
+  }
+  const token = user.token ?? (await api.auth.loginUser(user)).data.access_token;
+  if (!token) {
+    throw new Error(`Couldn't fetch token for ${user.username}`);
+  }
+  await api.user.deleteUser(user.password, token);
+  createdUsers.delete(user.id);
 };
 
 // Function to tear down created users and teams
 // This function should be called after tests to clean up the created data
-export const tearDown = async (api: ApiManagerE2E) => {
-  for (const [user, teamId] of createdTeams.entries()) {
-    await api.team.deleteTeam(user, teamId);
+export const tearDownAll = async (api: ApiManagerE2E) => {
+  for (const [user] of createdTeams.entries()) {
+    await removeCreatedTeam(api, user);
   }
   createdTeams.clear();
 
-  for (const user of createdUsers) {
-    const token = user.token ?? (await api.auth.loginUser(user)).data.access_token;
-    if (!token) {
-      throw new Error(`Couldn't fetch token for ${user.username}`);
-    }
-    await api.user.deleteUser(user.password, token);
+  for (const [, user] of createdUsers.entries()) {
+    await removeCreatedUser(api, user);
   }
-  createdUsers.length = 0;
+  createdUsers.clear();
 };
