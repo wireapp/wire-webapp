@@ -19,14 +19,15 @@
 
 import {Locator, Page} from '@playwright/test';
 
+import {selectByDataAttribute} from '../utils/useSelector';
+
 export class HistoryInfoPage {
   readonly page: Page;
   private continueButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
-
-    this.continueButton = this.page.locator("[data-uie-name='do-history-confirm']");
+    this.continueButton = this.page.locator(selectByDataAttribute('do-history-confirm'));
   }
 
   async clickConfirmButton() {

@@ -19,6 +19,8 @@
 
 import {Page, Locator} from '@playwright/test';
 
+import {selectByDataAttribute, selectByLabel} from '../utils/useSelector';
+
 export class LeaveConversationModal {
   readonly page: Page;
 
@@ -30,10 +32,10 @@ export class LeaveConversationModal {
   constructor(page: Page) {
     this.page = page;
 
-    this.modal = page.locator("[data-uie-name='modal-template-option']");
-    this.modalCheckbox = this.modal.locator('label[for="clear-data-checkbox"]');
-    this.cancelButton = this.modal.locator("[data-uie-name='do-secondary']");
-    this.confirmButton = this.modal.locator("[data-uie-name='do-action']");
+    this.modal = page.locator(selectByDataAttribute('modal-template-option'));
+    this.modalCheckbox = this.modal.locator(selectByLabel('clear-data-checkbox'));
+    this.cancelButton = this.modal.locator(selectByDataAttribute('do-secondary'));
+    this.confirmButton = this.modal.locator(selectByDataAttribute('do-action'));
   }
 
   async toggleCheckbox() {

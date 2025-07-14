@@ -19,14 +19,15 @@
 
 import {Locator, Page} from '@playwright/test';
 
+import {selectByDataAttribute} from '../utils/useSelector';
+
 export class SettingsPage {
   readonly page: Page;
   private logoutButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
-
-    this.logoutButton = this.page.locator("[data-uie-name='do-logout']");
+    this.logoutButton = this.page.locator(selectByDataAttribute('do-logout'));
   }
 
   async clickLogoutButton() {
