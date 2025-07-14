@@ -23,7 +23,7 @@ import {selectByDataAttribute} from '../utils/useSelector';
 
 export class HistoryInfoPage {
   readonly page: Page;
-  private continueButton: Locator;
+  private readonly continueButton: Locator;
 
   constructor(page: Page) {
     this.page = page;

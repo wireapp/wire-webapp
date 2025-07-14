@@ -23,7 +23,7 @@ import {selectByDataAttribute} from '../utils/useSelector';
 
 export class SettingsPage {
   readonly page: Page;
-  private logoutButton: Locator;
+  private readonly logoutButton: Locator;
 
   constructor(page: Page) {
     this.page = page;

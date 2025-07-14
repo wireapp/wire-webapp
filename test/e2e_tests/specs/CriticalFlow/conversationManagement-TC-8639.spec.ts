@@ -95,10 +95,12 @@ test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({p
     await logOutUser();
   });
 
-  await test.step('Team members signed in to the application and sent messages', async () => {
-    for await (const member of members) {
+  await test.step('Team members sign in, accept terms, send messages, and log out', async () => {
+    for (const member of members) {
       await loginUser(member);
-      await pages.dataShareConsentModal.clickConfirm();
+      if (await pages.dataShareConsentModal.isModalPresent()) {
+        await pages.dataShareConsentModal.clickConfirm();
+      }
       await sendMessage(conversationName, `Hello team! ${member.firstName} here.`);
       await logOutUser();
     }
@@ -107,7 +109,7 @@ test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({p
   await test.step('Team owner signed in to the application and verify messages', async () => {
     await loginUser(owner);
     await pages.conversationListPage.openConversation(conversationName);
-    for await (const member of members) {
+    for (const member of members) {
       expect(await pages.conversationPage.isMessageVisible(`Hello team! ${member.firstName} here.`)).toBeTruthy();
     }
   });
