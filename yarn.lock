@@ -8310,9 +8310,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^27.68.0":
-  version: 27.68.0
-  resolution: "@wireapp/api-client@npm:27.68.0"
+"@wireapp/api-client@npm:^27.69.0":
+  version: 27.69.0
+  resolution: "@wireapp/api-client@npm:27.69.0"
   dependencies:
     "@aws-sdk/client-s3": "npm:3.750.0"
     "@aws-sdk/lib-storage": "npm:3.779.0"
@@ -8331,7 +8331,7 @@ __metadata:
     uuid: "npm:11.1.0"
     ws: "npm:8.18.1"
     zod: "npm:3.24.2"
-  checksum: 10/c51b42f70c878830b1760345d23fc93513b3aea7aaacef83b891fa6abfac9cc2195bd886ac128353f59f5d0d9de499c9d91500251f64021ac3b2eb50f3c38147
+  checksum: 10/629471a11d7768b772274cbe1784a99a28c79c0b05715e5469683cb04dbbaf3334dce8e36f8ae387e70f3dbdf04d7f73758e9a7bc687ce034b8e517afdad2a68
   languageName: node
   linkType: hard
 
@@ -8396,11 +8396,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:46.31.2":
-  version: 46.31.2
-  resolution: "@wireapp/core@npm:46.31.2"
+"@wireapp/core@npm:46.31.3":
+  version: 46.31.3
+  resolution: "@wireapp/core@npm:46.31.3"
   dependencies:
-    "@wireapp/api-client": "npm:^27.68.0"
+    "@wireapp/api-client": "npm:^27.69.0"
     "@wireapp/commons": "npm:^5.4.2"
     "@wireapp/core-crypto": "npm:7.0.1"
     "@wireapp/cryptobox": "npm:12.8.0"
@@ -8418,7 +8418,7 @@ __metadata:
     long: "npm:^5.2.0"
     uuid: "npm:9.0.1"
     zod: "npm:3.24.2"
-  checksum: 10/a5742306e0c15cd7831b9d81e72f001aad1d0d6f33ef641ca6d3b7be9a803dd80721c3089a8684e3a4c6c46294c073652c02a4ef7cb6a16dcc9a6bea77b4f3f2
+  checksum: 10/0c5651aef57169acdb55d133b4a95ce0c4361dc7d2444e13d85812e753c96c9f6c2a6f9a53c9f12df8e22f079e22c1a4493f796bf076f0096a67cc86e34aa2ea
   languageName: node
   linkType: hard
 
@@ -21998,7 +21998,7 @@ __metadata:
     "@wireapp/avs-debugger": "npm:0.0.7"
     "@wireapp/commons": "npm:5.4.2"
     "@wireapp/copy-config": "npm:2.3.0"
-    "@wireapp/core": "npm:46.31.2"
+    "@wireapp/core": "npm:46.31.3"
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/kalium-backup": "npm:0.0.3"
     "@wireapp/prettier-config": "npm:0.6.4"
