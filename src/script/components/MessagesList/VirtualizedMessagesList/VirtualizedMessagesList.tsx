@@ -97,7 +97,7 @@ export const VirtualizedMessagesList = ({
 
   useEffect(() => {
     if (!initialMessageId) {
-      return;
+      return () => undefined;
     }
 
     setHighlightedMessage(initialMessageId);
