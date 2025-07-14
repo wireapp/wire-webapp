@@ -93,6 +93,11 @@ export class ApiManagerE2E {
     await this.user.setUniqueUsername(user.username, user.token);
   }
 
+  async enableConferenceCallingFeature(teamId: string) {
+    await this.brig.unlockConferenceCallingFeature(teamId);
+    await this.brig.enableConferenceCallingBackdoorViaBackdoorTeam(teamId);
+  }
+
   async createTeamOwner(user: User, teamName: string) {
     // 1. Book email
     await this.auth.bookEmail(user.email);

@@ -214,7 +214,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
 
       {!minimized && isMuted && (
         <span className="group-video-grid__element__label__icon">
-          <Icon.MicOffIcon data-uie-name="mic-icon-off" />
+          <Icon.MicOffIcon data-uie-name="mic-icon-off" data-uie-user-name={name} />
         </span>
       )}
 

@@ -22,6 +22,7 @@ import {Page} from '@playwright/test';
 import {AccountPage} from './account.page';
 import {AppLockModal} from './appLock.modal';
 import {BlockWarningModal} from './blockWarning.modal';
+import {CallingPage} from './calling.page';
 import {ConversationPage} from './conversation.page';
 import {ConversationListPage} from './conversationList.page';
 import {ConversationSidebar} from './conversationSidebar.page';
@@ -125,6 +126,14 @@ export class PageManager {
       this._appLockModal = new AppLockModal(this.page);
     }
     return this._appLockModal;
+  }
+
+  private _callingPage!: CallingPage;
+  get callingPage(): CallingPage {
+    if (!this._callingPage) {
+      this._callingPage = new CallingPage(this.page);
+    }
+    return this._callingPage;
   }
 
   private _conversationListPage!: ConversationListPage;

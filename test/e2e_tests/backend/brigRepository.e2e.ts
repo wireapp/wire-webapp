@@ -46,4 +46,30 @@ export class BrigRepositoryE2E extends BackendClientE2E {
 
     return invitationCodeResponse.data.code;
   }
+
+  public async unlockConferenceCallingFeature(teamId: string) {
+    await this.axiosInstance.put(
+      `/i/teams/${teamId}/features/conferenceCalling/unlocked`,
+      {},
+      {
+        headers: {
+          Authorization: `Basic ${BASIC_AUTH}`,
+        },
+      },
+    );
+  }
+
+  public async enableConferenceCallingBackdoorViaBackdoorTeam(teamId: string) {
+    await this.axiosInstance.patch(
+      `/i/teams/${teamId}/features/conferenceCalling`,
+      {
+        status: 'enabled',
+      },
+      {
+        headers: {
+          Authorization: `Basic ${BASIC_AUTH}`,
+        },
+      },
+    );
+  }
 }
