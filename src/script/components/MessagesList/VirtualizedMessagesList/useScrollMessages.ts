@@ -17,7 +17,7 @@
  *
  */
 
-import {MutableRefObject, useEffect, useRef} from 'react';
+import {MutableRefObject, useEffect, useRef, useState} from 'react';
 
 import {Virtualizer} from '@tanstack/react-virtual';
 
@@ -31,21 +31,38 @@ interface Props {
   highlightedMessage?: string;
   userId: string;
   conversationLastReadTimestamp: MutableRefObject<number>;
+  setHighlightedMessage: (messageId: string | undefined) => void;
 }
 
 export const useScrollMessages = (
   virtualizer: Virtualizer<HTMLDivElement, Element>,
-  {conversation, messages, highlightedMessage, userId, conversationLastReadTimestamp}: Props,
+  {conversation, messages, highlightedMessage, userId, conversationLastReadTimestamp, setHighlightedMessage}: Props,
 ) => {
   const hasInitialScrollRef = useRef(false);
+  const [hasScrolledToHighlightedMessage, setHasScrolledToHighlightedMessage] = useState(false);
+
+  // 🟡 Scroll to highlightedMessage ONCE — only once per mount
+  useEffect(() => {
+    if (!highlightedMessage || hasScrolledToHighlightedMessage) {
+      return;
+    }
+
+    const index = messages.findIndex(message => !isMarker(message) && message.message.id === highlightedMessage);
+
+    if (index === -1) {
+      return;
+    }
+
+    setHasScrolledToHighlightedMessage(true);
+
+    requestAnimationFrame(() => {
+      virtualizer.scrollToIndex(index, {align: 'center'});
+    });
+  }, [highlightedMessage, hasScrolledToHighlightedMessage, messages, virtualizer]);
 
   // This function scroll to currently send message by self user.
   useEffect(() => {
     if (messages.length === 0) {
-      return;
-    }
-
-    if (virtualizer.isScrolling) {
       return;
     }
 
@@ -55,14 +72,22 @@ export const useScrollMessages = (
       return;
     }
 
-    if (lastMessage.message.status() === StatusType.SENDING && lastMessage.message.user().id === userId) {
-      virtualizer.scrollToIndex(messages.length - 1, {behavior: 'smooth'});
+    const isSendingStatus = lastMessage.message.status() === StatusType.SENDING;
+
+    if (virtualizer.isScrolling && !isSendingStatus) {
+      return;
+    }
+
+    if (isSendingStatus && lastMessage.message.user().id === userId) {
+      requestAnimationFrame(() => {
+        virtualizer.scrollToIndex(messages.length - 1);
+      });
     }
   }, [messages, userId, virtualizer]);
 
   // This function scrolling to the first unread message or bottom to the message list on initialization.
   useEffect(() => {
-    if (highlightedMessage || hasInitialScrollRef.current) {
+    if (hasInitialScrollRef.current) {
       return;
     }
 
@@ -71,6 +96,10 @@ export const useScrollMessages = (
     }
 
     if (virtualizer.isScrolling) {
+      return;
+    }
+
+    if (highlightedMessage && !hasScrolledToHighlightedMessage) {
       return;
     }
 
@@ -92,7 +121,9 @@ export const useScrollMessages = (
       lastUnreadMessageIndex = firstUnreadMessage;
     }
 
-    virtualizer.scrollToIndex(lastUnreadMessageIndex, {align: 'end'});
-    hasInitialScrollRef.current = true;
-  }, [conversation, userId, virtualizer, highlightedMessage, messages, conversationLastReadTimestamp]);
+    requestAnimationFrame(() => {
+      virtualizer.scrollToIndex(lastUnreadMessageIndex, {align: 'end'});
+      hasInitialScrollRef.current = true;
+    });
+  }, [conversation, userId, virtualizer, messages, conversationLastReadTimestamp, highlightedMessage]);
 };

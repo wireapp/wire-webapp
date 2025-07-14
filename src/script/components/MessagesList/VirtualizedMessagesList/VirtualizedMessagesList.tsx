@@ -35,6 +35,7 @@ import {useRoveFocus} from 'Hooks/useRoveFocus';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {Conversation} from '../../../entity/Conversation';
+import {Message as MessageEntity} from '../../../entity/message/Message';
 import {JumpToLastMessageButton} from '../JumpToLastMessageButton';
 
 const ESTIMATED_ELEMENT_SIZE = 36;
@@ -42,7 +43,7 @@ const ESTIMATED_ELEMENT_SIZE = 36;
 interface Props extends Omit<MessagesListParams, 'isRightSidebarOpen'> {
   parentElement: HTMLDivElement;
   conversationLastReadTimestamp: MutableRefObject<number>;
-  loadConversation: (conversation: Conversation) => void;
+  loadConversation: (conversation: Conversation) => Promise<MessageEntity[]>;
 }
 
 export const VirtualizedMessagesList = ({
@@ -89,8 +90,25 @@ export const VirtualizedMessagesList = ({
   const filteredMessages = filterMessages(allMessages);
   const groupedMessages = groupMessagesBySenderAndTime(filteredMessages, conversationLastReadTimestamp.current);
 
-  const [highlightedMessage, setHighlightedMessage] = useState<string | undefined>(conversation.initialMessage()?.id);
+  const initialMessageId = conversation.initialMessage()?.id;
+
+  const [highlightedMessage, setHighlightedMessage] = useState<string | undefined>(undefined);
   const [loadingMessages, setLoadingMessages] = useState(false);
+
+  useEffect(() => {
+    if (!initialMessageId) {
+      return;
+    }
+
+    setHighlightedMessage(initialMessageId);
+
+    const timeout = setTimeout(() => {
+      setHighlightedMessage(undefined);
+      conversation.initialMessage(undefined);
+    }, 3000);
+
+    return () => clearTimeout(timeout);
+  }, [initialMessageId]);
 
   const {focusedId, handleKeyDown, setFocusedId} = useRoveFocus(filteredMessages.map(message => message.id));
 
@@ -116,6 +134,7 @@ export const VirtualizedMessagesList = ({
     conversation,
     messages: groupedMessages,
     highlightedMessage,
+    setHighlightedMessage,
     userId: selfUser.id,
     conversationLastReadTimestamp,
   });
@@ -140,12 +159,17 @@ export const VirtualizedMessagesList = ({
       return;
     }
 
-    virtualizer.scrollToIndex(messageIndex, {align: 'center'});
+    requestAnimationFrame(() => {
+      virtualizer.scrollToIndex(messageIndex, {align: 'center'});
+    });
   };
 
   const onTimestampClick = async (messageId: string) => {
     setHighlightedMessage(messageId);
-    setTimeout(() => setHighlightedMessage(undefined), 5000);
+
+    const highlightMessageTimeout = setTimeout(() => setHighlightedMessage(undefined), 3000);
+    clearTimeout(highlightMessageTimeout);
+
     const messageIsLoaded = conversation.getMessage(messageId);
 
     if (!messageIsLoaded) {
@@ -156,23 +180,25 @@ export const VirtualizedMessagesList = ({
   };
 
   const virtualItems = virtualizer.getVirtualItems();
-
   const lastIndex = groupedMessages.length - 1;
-
   const isLastMessageVisible = virtualItems.some(item => item.index === lastIndex);
 
-  const onJumpToLastMessageClick = () => {
+  const onJumpToLastMessageClick = async () => {
     setHighlightedMessage(undefined);
     conversation.initialMessage(undefined);
 
     if (!conversation.hasLastReceivedMessageLoaded()) {
       updateConversationLastRead(conversation);
       conversation.release();
-      loadConversation(conversation);
+
+      await loadConversation(conversation);
     }
 
     conversationLastReadTimestamp.current = groupedMessages[groupedMessages.length - 1].timestamp;
-    virtualizer.scrollToIndex(groupedMessages.length - 1, {align: 'end'});
+
+    requestAnimationFrame(() => {
+      virtualizer.scrollToIndex(groupedMessages.length - 1, {align: 'end'});
+    });
   };
 
   return (
