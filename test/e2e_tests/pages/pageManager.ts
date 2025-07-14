@@ -33,6 +33,7 @@ import {DeleteAccountPage} from './deleteAccount.page';
 import {EmailVerificationPage} from './emailVerification.page';
 import {GroupCreationPage} from './groupCreation.page';
 import {HistoryExportPage} from './historyExport.page';
+import {HistoryImportPage} from './historyImport.page';
 import {HistoryInfoPage} from './infoHistory.page';
 import {LeaveConversationModal} from './leaveConversation.modal';
 import {LoginPage} from './login.page';
@@ -345,5 +346,13 @@ export class PageManager {
       this._historyExportPage = new HistoryExportPage(this.page);
     }
     return this._historyExportPage;
+  }
+
+  private _historyImportPage!: HistoryImportPage;
+  get historyImportPage(): HistoryImportPage {
+    if (!this._historyImportPage) {
+      this._historyImportPage = new HistoryImportPage(this.page);
+    }
+    return this._historyImportPage;
   }
 }

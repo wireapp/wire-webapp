@@ -28,6 +28,7 @@ export class AccountPage {
   readonly appLockCheckbox: Locator;
   readonly deleteAccountButton: Locator;
   readonly backUpButton: Locator;
+  readonly backupFileInput: Locator;
   readonly restoreBackupButton: Locator;
   readonly logoutButton: Locator;
 
@@ -38,6 +39,7 @@ export class AccountPage {
     this.appLockCheckbox = page.locator("[data-uie-name='status-preference-applock']+label");
     this.deleteAccountButton = page.locator("[data-uie-name='go-delete-account']");
     this.backUpButton = page.locator("[data-uie-name='do-backup-export']");
+    this.backupFileInput = page.locator("[data-uie-name='input-import-file']");
     this.restoreBackupButton = page.locator("[data-uie-name='do-backup-import']+button");
     this.logoutButton = page.locator("[data-uie-name='do-logout']");
   }

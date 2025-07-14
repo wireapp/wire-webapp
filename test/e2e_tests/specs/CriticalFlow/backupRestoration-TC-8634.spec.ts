@@ -17,9 +17,11 @@
  *
  */
 
+import {loginUser} from 'test/e2e_tests/utils/userActions';
+
 import {getUser} from '../../data/user';
 import {test, expect} from '../../test.fixtures';
-import {tearDown} from '../../utils/tearDownUtil';
+import {tearDownAll} from '../../utils/tearDownUtil';
 
 test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow']}, async ({pages, api}) => {
   test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
@@ -33,11 +35,7 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow']}, a
 
   // Test steps
   await test.step('User logs in', async () => {
-    await pages.openMainPage();
-    await pages.singleSignOnPage.enterEmailOnSSOPage(user.email);
-    await pages.loginPage.inputPassword(user.password);
-    await pages.loginPage.clickSignInButton();
-    await pages.dataShareConsentModal.clickDecline();
+    await loginUser(user, pages);
   });
 
   await test.step('User creates and saves a backup', async () => {
@@ -47,7 +45,11 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow']}, a
     await pages.primaryModal.clickPrimaryButton();
     expect(pages.primaryModal.isTitleHidden()).toBeTruthy();
     expect(pages.historyExportPage.isVisible()).toBeTruthy();
-    await pages.historyExportPage.clickCancelButton();
+    const [download] = await Promise.all([
+      pages.historyExportPage.page.waitForEvent('download'),
+      pages.historyExportPage.clickSaveFileButton(),
+    ]);
+    await download.saveAs(`./test-results/backups/${user.id}.desktop_wbu`);
   });
 
   await test.step('User logs out and clears all data', async () => {
@@ -67,10 +69,14 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow']}, a
 
   await test.step('User restores the previously created backup', async () => {
     await pages.conversationSidebar.clickPreferencesButton();
+    await pages.accountPage.backupFileInput.setInputFiles(`./test-results/backups/${user.id}.desktop_wbu`);
     await pages.accountPage.clickRestoreBackupButton();
+    await pages.conversationSidebar.clickPreferencesButton();
+    await pages.accountPage.clickBackUpButton();
+    expect(pages.historyImportPage.importSuccessHeadline.isVisible()).toBeTruthy();
   });
 });
 
 test.afterAll(async ({api}) => {
-  await tearDown(api);
+  await tearDownAll(api);
 });
