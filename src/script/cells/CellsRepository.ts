@@ -25,12 +25,12 @@ import {APIClient} from '../service/APIClientSingleton';
 
 interface CellsConfig {
   pydio: {
-    apiKey: string;
+    apiKey?: string;
     segment: string;
     url: string;
   };
   s3: {
-    apiKey: string;
+    apiKey?: string;
     bucket: string;
     endpoint: string;
     region: string;
