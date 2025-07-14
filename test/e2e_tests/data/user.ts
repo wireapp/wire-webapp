@@ -36,6 +36,10 @@ export interface User {
   devices: string[];
   teamId?: string;
   token?: string;
+  qualifiedId?: {
+    domain: string;
+    id: string;
+  };
 }
 
 export const getUser = (user: Partial<User> = {}): User => {
