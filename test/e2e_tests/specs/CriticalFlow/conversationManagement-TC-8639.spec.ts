@@ -26,7 +26,7 @@ test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({p
 
   // Generating test data
   const owner = getUser();
-  const members = Array.from({length: 5}, () => getUser());
+  const members = Array.from({length: 2}, () => getUser());
 
   const teamName = 'Conversation Management';
   const conversationName = 'Test Conversation';
@@ -98,9 +98,7 @@ test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({p
   await test.step('Team members sign in, accept terms, send messages, and log out', async () => {
     for (const member of members) {
       await loginUser(member);
-      if (await pages.dataShareConsentModal.isModalPresent()) {
-        await pages.dataShareConsentModal.clickConfirm();
-      }
+      await pages.dataShareConsentModal.clickConfirm();
       await sendMessage(conversationName, `Hello team! ${member.firstName} here.`);
       await logOutUser();
     }

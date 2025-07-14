@@ -19,7 +19,7 @@
 
 import {Locator, Page} from '@playwright/test';
 
-import {selectByClass, selectByDataAttribute} from '../utils/useSelector';
+import {selectByClass, selectByDataAttribute, selectById} from '../utils/useSelector';
 
 export class ConversationPage {
   readonly page: Page;
@@ -47,7 +47,7 @@ export class ConversationPage {
     this.sendMessageButton = page.locator(selectByDataAttribute('do-send-message'));
     this.openGroupInformationViaName = page.locator(selectByDataAttribute('status-conversation-title-bar-label'));
     this.timerMessageButton = page.locator(selectByDataAttribute('do-set-ephemeral-timer'));
-    this.timerTenSecondsButton = page.locator(selectByDataAttribute('btn-10-seconds'));
+    this.timerTenSecondsButton = page.locator(selectById('btn-10-seconds'));
   }
 
   async isConversationOpen(conversationName: string) {
