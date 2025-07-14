@@ -19,7 +19,7 @@
 
 import {getUser, User} from '../../data/user';
 import {test, expect} from '../../test.fixtures';
-import {addCreatedTeam, addCreatedUser, removeCreatedTeam, removeCreatedUser} from '../../utils/tearDownUtil';
+import {addCreatedTeam, addCreatedUser, removeCreatedTeam} from '../../utils/tearDownUtil';
 
 // Generating test data
 const owner = getUser();
@@ -141,5 +141,4 @@ test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({p
 
 test.afterAll(async ({api}) => {
   await removeCreatedTeam(api, owner);
-  await Promise.all(members.map(member => removeCreatedUser(api, member)));
 });
