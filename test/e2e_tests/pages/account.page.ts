@@ -19,12 +19,15 @@
 
 import {Page, Locator} from '@playwright/test';
 
+import {selectByDataAttribute} from '../utils/useSelector';
+
 export class AccountPage {
   readonly page: Page;
 
   readonly sendUsageDataCheckbox: Locator;
   readonly appLockCheckbox: Locator;
   readonly deleteAccountButton: Locator;
+  private readonly logoutButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -32,6 +35,7 @@ export class AccountPage {
     this.sendUsageDataCheckbox = page.locator("[data-uie-name='status-preference-telemetry']+label");
     this.appLockCheckbox = page.locator("[data-uie-name='status-preference-applock']+label");
     this.deleteAccountButton = page.locator("[data-uie-name='go-delete-account']");
+    this.logoutButton = this.page.locator(selectByDataAttribute('do-logout'));
   }
 
   async clickDeleteAccountButton() {
@@ -44,5 +48,9 @@ export class AccountPage {
 
   async toggleAppLock() {
     await this.appLockCheckbox.click();
+  }
+
+  async clickLogoutButton() {
+    await this.logoutButton.click();
   }
 }

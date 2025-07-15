@@ -39,7 +39,6 @@ import {MarketingConsentModal} from './marketingConsent.modal';
 import {OutgoingConnectionPage} from './outgoingConnection.page';
 import {RegisterSuccessPage} from './registerSuccess.page';
 import {RegistrationPage} from './registration.page';
-import {SettingsPage} from './settings.page';
 import {SetUsernamePage} from './setUsername.page';
 import {SingleSignOnPage} from './singleSignOn.page';
 import {StartUIPage} from './startUI.page';
@@ -312,14 +311,6 @@ export class PageManager {
       this._historyInfoPage = new HistoryInfoPage(this.page);
     }
     return this._historyInfoPage;
-  }
-
-  private _settingsPage!: SettingsPage;
-  get settingsPage(): SettingsPage {
-    if (!this._settingsPage) {
-      this._settingsPage = new SettingsPage(this.page);
-    }
-    return this._settingsPage;
   }
 
   private _confirmLogoutModal!: ConfirmLogoutModal;

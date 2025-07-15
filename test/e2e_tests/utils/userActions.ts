@@ -54,7 +54,7 @@ export const inviteMembers = async (members: User[], owner: User, api: ApiManage
 
 export const logOutUser = async (pages: PageManager) => {
   await pages.conversationSidebar.clickPreferencesButton();
-  await pages.settingsPage.clickLogoutButton();
+  await pages.accountPage.clickLogoutButton();
   await pages.confirmLogoutModal.clickConfirm();
 };
 
