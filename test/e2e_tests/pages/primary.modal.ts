@@ -28,6 +28,7 @@ export class PrimaryModal {
   readonly primaryButton: Locator;
   readonly secondaryButton: Locator;
   readonly checkbox: Locator;
+  readonly customCheckbox: Locator;
   readonly optionModal: Locator;
 
   constructor(page: Page) {
@@ -39,7 +40,8 @@ export class PrimaryModal {
     this.passwordInput = this.primaryModal.locator('[data-uie-name="backup-password"]');
     this.primaryButton = this.primaryModal.locator('[data-uie-name="do-action"]');
     this.secondaryButton = this.primaryModal.locator('[data-uie-name="do-secondary"]');
-    this.checkbox = this.primaryModal.locator('[data-uie-name="modal-option-checkbox"]+label');
+    this.checkbox = this.primaryModal.locator('[data-uie-name="modal-option-checkbox"]');
+    this.customCheckbox = this.primaryModal.locator('[data-uie-name="modal-option-checkbox"]+label');
   }
 
   async isTitleVisible() {
@@ -63,6 +65,6 @@ export class PrimaryModal {
   }
 
   async toggleCheckbox() {
-    await this.checkbox.click();
+    await this.customCheckbox.click();
   }
 }

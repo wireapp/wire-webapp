@@ -21,12 +21,14 @@ import {loginUser} from 'test/e2e_tests/utils/userActions';
 
 import {getUser} from '../../data/user';
 import {test, expect} from '../../test.fixtures';
-import {tearDownAll} from '../../utils/tearDownUtil';
+import {removeCreatedUser} from '../../utils/tearDownUtil';
+
+// Generating test data
+const user = getUser();
+let fileName: string;
 
 test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow']}, async ({pages, api}) => {
   test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
-  // Generating test data
-  const user = getUser();
 
   // Creating preconditions for the test via API
   await test.step('Preconditions: Creating preconditions for the test via API', async () => {
@@ -49,7 +51,8 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow']}, a
       pages.historyExportPage.page.waitForEvent('download'),
       pages.historyExportPage.clickSaveFileButton(),
     ]);
-    await download.saveAs(`./test-results/backups/${user.id}.desktop_wbu`);
+    fileName = `./test-results/downloads/${download.suggestedFilename()}`;
+    await download.saveAs(fileName);
   });
 
   await test.step('User logs out and clears all data', async () => {
@@ -57,10 +60,12 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow']}, a
     await pages.accountPage.clickLogoutButton();
     expect(pages.primaryModal.isTitleVisible()).toBeTruthy();
     await pages.primaryModal.toggleCheckbox();
+    expect(pages.primaryModal.checkbox.isChecked()).toBeTruthy();
     await pages.primaryModal.clickPrimaryButton();
   });
 
   await test.step('User logs back in', async () => {
+    expect(pages.singleSignOnPage.isVisible()).toBeTruthy();
     await pages.singleSignOnPage.enterEmailOnSSOPage(user.email);
     await pages.loginPage.inputPassword(user.password);
     await pages.loginPage.clickSignInButton();
@@ -69,14 +74,11 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow']}, a
 
   await test.step('User restores the previously created backup', async () => {
     await pages.conversationSidebar.clickPreferencesButton();
-    await pages.accountPage.backupFileInput.setInputFiles(`./test-results/backups/${user.id}.desktop_wbu`);
-    await pages.accountPage.clickRestoreBackupButton();
-    await pages.conversationSidebar.clickPreferencesButton();
-    await pages.accountPage.clickBackUpButton();
+    await pages.accountPage.backupFileInput.setInputFiles(fileName);
     expect(pages.historyImportPage.importSuccessHeadline.isVisible()).toBeTruthy();
   });
 });
 
 test.afterAll(async ({api}) => {
-  await tearDownAll(api);
+  await removeCreatedUser(api, user);
 });
