@@ -37,9 +37,9 @@ export class AccountPage {
 
     this.sendUsageDataCheckbox = page.locator("[data-uie-name='status-preference-telemetry']+label");
     this.appLockCheckbox = page.locator("[data-uie-name='status-preference-applock']+label");
-    this.deleteAccountButton = page.locator("[data-uie-name='go-delete-account']");
-    this.backUpButton = page.locator("[data-uie-name='do-backup-export']");
-    this.backupFileInput = page.locator("[data-uie-name='input-import-file']");
+    this.deleteAccountButton = page.locator(selectByDataAttribute('do-delete-account'));
+    this.backUpButton = page.locator(selectByDataAttribute('do-backup-export'));
+    this.backupFileInput = page.locator(selectByDataAttribute('input-import-file'));
     this.restoreBackupButton = page.locator("[data-uie-name='do-backup-import']+button");
     this.logoutButton = page.locator(selectByDataAttribute('do-logout'));
   }
