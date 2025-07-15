@@ -40,6 +40,8 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow']}, a
     await loginUser(user, pages);
   });
 
+  await test.step('User generates data', async () => {});
+
   await test.step('User creates and saves a backup', async () => {
     await pages.conversationSidebar.clickPreferencesButton();
     await pages.accountPage.clickBackUpButton();
@@ -69,7 +71,7 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow']}, a
     await pages.singleSignOnPage.enterEmailOnSSOPage(user.email);
     await pages.loginPage.inputPassword(user.password);
     await pages.loginPage.clickSignInButton();
-    await pages.historyInfoPage.clickHistoryInfoPButton();
+    await pages.historyInfoPage.clickConfirmButton();
   });
 
   await test.step('User restores the previously created backup', async () => {
