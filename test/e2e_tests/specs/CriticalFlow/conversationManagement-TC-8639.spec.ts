@@ -19,7 +19,7 @@
 
 import {getUser, User} from '../../data/user';
 import {test, expect} from '../../test.fixtures';
-import {addCreatedTeam, addCreatedUser, removeCreatedTeam, removeCreatedUser} from '../../utils/tearDownUtil';
+import {addCreatedTeam, removeCreatedTeam} from '../../utils/tearDownUtil';
 
 // Generating test data
 const owner = getUser();
@@ -36,7 +36,6 @@ test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({p
         const invitationId = await api.team.inviteUserToTeam(member.email, owner);
         const invitationCode = await api.brig.getTeamInvitationCodeForEmail(owner.teamId!, invitationId);
         await api.createPersonalUser(member, invitationCode);
-        addCreatedUser(member);
       }),
     );
   };
@@ -141,5 +140,4 @@ test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({p
 
 test.afterAll(async ({api}) => {
   await removeCreatedTeam(api, owner);
-  await Promise.all(members.map(member => removeCreatedUser(api, member)));
 });
