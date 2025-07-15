@@ -23,6 +23,7 @@ import os from 'os';
 import path from 'path';
 
 import {LogFactory} from './LogFactory';
+import {redactSensitiveData} from './util/StringUtil';
 
 describe('LogFactory', () => {
   describe('createLoggerName', () => {
@@ -89,5 +90,35 @@ describe('LogFactory', () => {
       const result = await fs.readFile(logFile, 'utf-8');
       expect(result).toBe(`${logMessage1}${os.EOL}${logMessage2}${os.EOL}`);
     });
+  });
+});
+
+describe('redactSensitiveData', () => {
+  it('redacts Bearer token in plain strings', () => {
+    const input = 'Authorization: Bearer abcd1234.DEF456ghi==';
+    const output = redactSensitiveData(input);
+    expect(output).toBe('Authorization: Bearer [REDACTED]');
+  });
+
+  it('redacts Authorization header in object', () => {
+    const input = {
+      headers: {
+        Authorization: 'Bearer my.secret.token',
+      },
+    };
+    const output = redactSensitiveData(input);
+    expect(output.headers.Authorization).toBe('Bearer [REDACTED]');
+  });
+
+  it('does not modify unrelated strings', () => {
+    const input = 'This is safe';
+    const output = redactSensitiveData(input);
+    expect(output).toBe('This is safe');
+  });
+
+  it('does not modify unrelated objects', () => {
+    const input = {foo: 'bar'};
+    const output = redactSensitiveData(input);
+    expect(output).toEqual({foo: 'bar'});
   });
 });
